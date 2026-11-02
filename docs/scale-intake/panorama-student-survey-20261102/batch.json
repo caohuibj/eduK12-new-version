@@ -1,0 +1,2464 @@
+{
+  "recordType": "content_research_work_record_not_runtime_payload",
+  "mother": {
+    "key": "panorama_ss_guide_en",
+    "name": "Panorama Student Survey",
+    "status": "CANDIDATE_PENDING_REVIEW",
+    "version": "public-guide-snapshot-f7588c4b",
+    "measurementVersion": null,
+    "scoringVersion": null,
+    "reportVersion": null,
+    "totalScore": null
+  },
+  "baseSha": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "sourceSnapshot": {
+    "url": "https://panorama-www.s3.amazonaws.com/files/User-Guide.pdf",
+    "sha256": "f7588c4bac98f7c915f0b4961f6618e8d4487208ee017dbf6ce4cd4b35e6db2e",
+    "bytes": 957377,
+    "pages": 30,
+    "pdfMetadataCreated": "2024-10-30T20:45:47Z",
+    "officialEditionDate": null,
+    "retrievedOn": "2026-11-02"
+  },
+  "scoringReferenceSnapshot": {
+    "url": "https://go.panoramaed.com/hubfs/Validity-Report-Student-Topics-2020.pdf",
+    "title": "Reliability and Validity of Panorama’s Survey Topics for Students: 2024 Update with Addendum for Versioned Content",
+    "sha256": "90a605d87dc1460c7227013341766a2493897169392075568fd6f4c9256fa877",
+    "bytes": 1093556,
+    "pages": 22,
+    "scoringPage": 7,
+    "versioningPages": [
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "warning": "URL basename says 2020 but retrieved file is updated; item-version binding not established."
+  },
+  "rights": {
+    "status": "SCOPE_UNRESOLVED",
+    "publicItemRedistributionConfirmed": false,
+    "commercialDigitalAdministrationConfirmed": false,
+    "translationPermissionConfirmed": false,
+    "authorizationRecordCreated": false,
+    "note": "公开可读与可供学校选模块使用，不等于本项目公开再分发或商用数字题库许可。未签署条款、联系作者或提交表单。"
+  },
+  "modules": [
+    {
+      "key": "panorama_ss_guide_classroom_pedagogical_effectiveness_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜教学成效感知｜3–5年级｜学生填答",
+      "sourcePage": 8,
+      "sourceModule": "Pedagogical Effectiveness",
+      "level": "classroom",
+      "evaluationTarget": "teacher",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 7,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            7
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 4,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "选一个没听懂的地方，问“能再举一个例子吗？”",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "回想一次让学生更容易理解的讲解，保留其中可重复使用的安排。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_pedagogical_effectiveness_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜教学成效感知｜6–12年级｜学生填答",
+      "sourcePage": 8,
+      "sourceModule": "Pedagogical Effectiveness",
+      "level": "classroom",
+      "evaluationTarget": "teacher",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 9,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            9
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 5,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "记下一个未理解的步骤，找合适时机请老师换一种方式解释。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "回想一次让学生更容易理解的讲解，保留其中可重复使用的安排。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_climate_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜课堂气氛｜3–5年级｜学生填答",
+      "sourcePage": 9,
+      "sourceModule": "Classroom Climate",
+      "level": "classroom",
+      "evaluationTarget": "classroom",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            2
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        },
+        {
+          "positions": [
+            3,
+            3
+          ],
+          "optionCount": 7,
+          "rawOrdinalRange": [
+            1,
+            7
+          ]
+        },
+        {
+          "positions": [
+            4,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "1 + 4*(r-1)/6 for 7-option item; linear transformation inference",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "如果一条课堂约定让你不明白，可以请可信的成人帮你问清楚。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "与学生共同选择一条最需要说清楚的课堂约定，并说明如何公平执行。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_climate_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜课堂气氛｜6–12年级｜学生填答",
+      "sourcePage": 9,
+      "sourceModule": "Classroom Climate",
+      "level": "classroom",
+      "evaluationTarget": "classroom",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            2
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        },
+        {
+          "positions": [
+            3,
+            3
+          ],
+          "optionCount": 7,
+          "rawOrdinalRange": [
+            1,
+            7
+          ]
+        },
+        {
+          "positions": [
+            4,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "1 + 4*(r-1)/6 for 7-option item; linear transformation inference",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "选一条不清楚的课堂约定，请老师说明它怎样适用于大家。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "与学生共同选择一条最需要说清楚的课堂约定，并说明如何公平执行。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_rigorous_expectations_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜课堂高期望支持｜3–5年级｜学生填答",
+      "sourcePage": 10,
+      "sourceModule": "Classroom Rigorous Expectations",
+      "level": "classroom",
+      "evaluationTarget": "teacher",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "遇到难题时，可以问“我先做哪一步？可以用什么帮助？”",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "把挑战要求与可获得的帮助一起说明，检查学生是否理解下一步。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_rigorous_expectations_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜课堂高期望支持｜6–12年级｜学生填答",
+      "sourcePage": 10,
+      "sourceModule": "Classroom Rigorous Expectations",
+      "level": "classroom",
+      "evaluationTarget": "teacher",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "把困难说具体，询问完成任务的第一步和可以获得的帮助。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "把挑战要求与可获得的帮助一起说明，检查学生是否理解下一步。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_engagement_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜课堂投入｜3–5年级｜学生填答",
+      "sourcePage": 11,
+      "sourceModule": "Classroom Engagement",
+      "level": "classroom",
+      "evaluationTarget": "classroom",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "想一想哪种课堂活动让你更愿意参加，把这个需要告诉老师。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "请学生指出一种更容易参与的活动安排，下一次试做并收集反馈。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_engagement_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜课堂投入｜6–12年级｜学生填答",
+      "sourcePage": 11,
+      "sourceModule": "Classroom Engagement",
+      "level": "classroom",
+      "evaluationTarget": "classroom",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "记下一种有助于投入的活动方式，尝试向老师表达自己的学习需要。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "请学生指出一种更容易参与的活动安排，下一次试做并收集反馈。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_teacher_student_relationships_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜课堂师生关系｜3–5年级｜学生填答",
+      "sourcePage": 12,
+      "sourceModule": "Classroom Teacher-Student Relationships",
+      "level": "classroom",
+      "evaluationTarget": "teacher",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "想让老师知道一件学习上的需要，可以请可信的成人陪你表达。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "安排一个学生可以表达需要的短交流，说明后续会怎样回应。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_teacher_student_relationships_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜课堂师生关系｜6–12年级｜学生填答",
+      "sourcePage": 12,
+      "sourceModule": "Classroom Teacher-Student Relationships",
+      "level": "classroom",
+      "evaluationTarget": "teacher",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "选择让自己安心的交流方式，向老师表达一个具体的学习需要；也可请可信成人协助。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "安排一个学生可以表达需要的短交流，说明后续会怎样回应。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_belonging_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜课堂归属感｜3–5年级｜学生填答",
+      "sourcePage": 13,
+      "sourceModule": "Classroom Belonging",
+      "level": "classroom",
+      "evaluationTarget": "classroom",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "想一想谁能让你安心，需要时请这位成人帮你找到一起参加活动的方法。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "和学生商量一种能让更多人被听见的参与方式，关注较少发言者的体验。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_belonging_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜课堂归属感｜6–12年级｜学生填答",
+      "sourcePage": 13,
+      "sourceModule": "Classroom Belonging",
+      "level": "classroom",
+      "evaluationTarget": "classroom",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "找一位可信的成人，讨论一种让自己更容易参与班级活动的安排。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "和学生商量一种能让更多人被听见的参与方式，关注较少发言者的体验。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_valuing_subject_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学科价值感｜3–5年级｜学生填答",
+      "sourcePage": 14,
+      "sourceModule": "Valuing of Subject",
+      "level": "classroom",
+      "evaluationTarget": "classroom",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "找一个这门课和你生活有关的小例子，下次可以请老师讲一讲。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "选择一个与学生生活有关的应用例子，让学生说明其意义。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_valuing_subject_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学科价值感｜6–12年级｜学生填答",
+      "sourcePage": 14,
+      "sourceModule": "Valuing of Subject",
+      "level": "classroom",
+      "evaluationTarget": "classroom",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "选一个自己在意的问题，问问这门课的知识能怎样帮助理解它。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "选择一个与学生生活有关的应用例子，让学生说明其意义。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_learning_strategies_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜课堂学习策略｜3–5年级｜学生填答",
+      "sourcePage": 15,
+      "sourceModule": "Classroom Learning Strategies",
+      "level": "classroom",
+      "evaluationTarget": "classroom",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "卡住时试试把任务分成一小步，再请老师看看这样做是否合适。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "示范一种遇到困难时可尝试的替代方法，并邀请学生比较是否有帮助。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_learning_strategies_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜课堂学习策略｜6–12年级｜学生填答",
+      "sourcePage": 15,
+      "sourceModule": "Classroom Learning Strategies",
+      "level": "classroom",
+      "evaluationTarget": "classroom",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "选一项任务，先试一种新方法并记下是否有帮助；需要时请老师一起调整。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "示范一种遇到困难时可尝试的替代方法，并邀请学生比较是否有帮助。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_mindset_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜课堂可发展信念｜3–5年级｜学生填答",
+      "sourcePage": 16,
+      "sourceModule": "Classroom Mindset",
+      "level": "classroom",
+      "evaluationTarget": "classroom",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "选一个可以再试的小步骤，需要时问老师“下次我可以怎么做？”",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "把一次错误当作讨论下一步学习办法的机会，避免给学生贴能力标签。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_classroom_mindset_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜课堂可发展信念｜6–12年级｜学生填答",
+      "sourcePage": 16,
+      "sourceModule": "Classroom Mindset",
+      "level": "classroom",
+      "evaluationTarget": "classroom",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "回看一次错误，选一个可以调整的学习步骤，并向老师询问具体建议。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "把一次错误当作讨论下一步学习办法的机会，避免给学生贴能力标签。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_climate_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校气氛｜3–5年级｜学生填答",
+      "sourcePage": 17,
+      "sourceModule": "School Climate",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            2
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        },
+        {
+          "positions": [
+            3,
+            3
+          ],
+          "optionCount": 7,
+          "rawOrdinalRange": [
+            1,
+            7
+          ]
+        },
+        {
+          "positions": [
+            4,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "1 + 4*(r-1)/6 for 7-option item; linear transformation inference",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "如果学校的一件事让你不舒服，可以告诉一位让你安心的成人。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "从规则、环境和互动中选一个具体问题，明确可以协调的改进安排。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_climate_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校气氛｜6–12年级｜学生填答",
+      "sourcePage": 17,
+      "sourceModule": "School Climate",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            2
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        },
+        {
+          "positions": [
+            3,
+            3
+          ],
+          "optionCount": 7,
+          "rawOrdinalRange": [
+            1,
+            7
+          ]
+        },
+        {
+          "positions": [
+            4,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "1 + 4*(r-1)/6 for 7-option item; linear transformation inference",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "记下校园里一个具体的体验，选择可信成人讨论需要怎样的支持。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "从规则、环境和互动中选一个具体问题，明确可以协调的改进安排。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_rigorous_expectations_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校高期望支持｜3–5年级｜学生填答",
+      "sourcePage": 18,
+      "sourceModule": "School Rigorous Expectations",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "作业太难、要求又不明白时，可以问“我需要先做到什么？”",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "检查不同课堂的要求和帮助是否清楚，邀请学生说明遇到的障碍。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_rigorous_expectations_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校高期望支持｜6–12年级｜学生填答",
+      "sourcePage": 18,
+      "sourceModule": "School Rigorous Expectations",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "向合适的老师问清任务要求，并说明自己完成它需要的帮助。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "检查不同课堂的要求和帮助是否清楚，邀请学生说明遇到的障碍。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_engagement_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校学习投入｜3–5年级｜学生填答",
+      "sourcePage": 19,
+      "sourceModule": "School Engagement",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "想想学校里哪种学习活动你更愿意参加，可以告诉可信的老师。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "收集学生更愿意投入的学习活动实例，与年级团队讨论可试行的调整。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_engagement_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校学习投入｜6–12年级｜学生填答",
+      "sourcePage": 19,
+      "sourceModule": "School Engagement",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "选一个更容易投入学习的场景，想想其中哪种安排值得向老师提出。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "收集学生更愿意投入的学习活动实例，与年级团队讨论可试行的调整。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_teacher_student_relationships_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜全校师生关系｜3–5年级｜学生填答",
+      "sourcePage": 20,
+      "sourceModule": "School Teacher-Student Relationships",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "找一位你愿意说话的成人，告诉他一件你希望得到帮助的事。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "让学生知道可以向哪些成人求助，并确认他们是否觉得交流得到回应。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_teacher_student_relationships_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜全校师生关系｜6–12年级｜学生填答",
+      "sourcePage": 20,
+      "sourceModule": "School Teacher-Student Relationships",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "列出一位可以求助的校内成人，选择合适方式表达一个具体需要。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "让学生知道可以向哪些成人求助，并确认他们是否觉得交流得到回应。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_belonging_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校归属感｜3–5年级｜学生填答",
+      "sourcePage": 21,
+      "sourceModule": "School Belonging",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "可以请可信的成人帮你找一种让你觉得安心的校园活动。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "共同检查学生被尊重、获得支持和参与校园生活的机会。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_belonging_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校归属感｜6–12年级｜学生填答",
+      "sourcePage": 21,
+      "sourceModule": "School Belonging",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "找一位可信成人，讨论一个让自己更愿意参与校园生活的小安排。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "共同检查学生被尊重、获得支持和参与校园生活的机会。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_valuing_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校价值感｜3–5年级｜学生填答",
+      "sourcePage": 22,
+      "sourceModule": "Valuing of School",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "选一件你想学会的小事，问问老师学校里有什么机会可以试试。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "邀请学生谈谈学习与自己目标的联系，把不同看法当作课程改进线索。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_valuing_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校价值感｜6–12年级｜学生填答",
+      "sourcePage": 22,
+      "sourceModule": "Valuing of School",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "把一个自己的目标与学习中的具体内容联系起来，请老师帮助寻找可以尝试的机会。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "邀请学生谈谈学习与自己目标的联系，把不同看法当作课程改进线索。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_learning_strategies_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校学习策略｜3–5年级｜学生填答",
+      "sourcePage": 23,
+      "sourceModule": "School Learning Strategies",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "为今天的一项任务选好第一步，卡住时可以请人帮忙。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "协调不同学科示范同一种学习计划方法，保留学生选择适合办法的空间。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_learning_strategies_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校学习策略｜6–12年级｜学生填答",
+      "sourcePage": 23,
+      "sourceModule": "School Learning Strategies",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "为一项任务写下简单计划，完成后看看哪一步需要换个办法。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "协调不同学科示范同一种学习计划方法，保留学生选择适合办法的空间。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_mindset_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校可发展信念｜3–5年级｜学生填答",
+      "sourcePage": 24,
+      "sourceModule": "School Mindset",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "进步有时需要帮助，可以请老师和你一起选一个下次要试的小办法。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "讨论可以改变的学习做法与可获得的支持，不把信念高低当作学生责任。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_mindset_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校可发展信念｜6–12年级｜学生填答",
+      "sourcePage": 24,
+      "sourceModule": "School Mindset",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 4,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            4
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 2,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "挑一个可以调整的学习做法，并讨论需要什么资源或支持。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "讨论可以改变的学习做法与可获得的支持，不把信念高低当作学生责任。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_perseverance_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜坚持与目标推进｜3–5年级｜学生填答",
+      "sourcePage": 25,
+      "sourceModule": "Perseverance",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "把想做的事分成一个小步骤；太累或遇到困难时可以找人帮忙。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "帮助学生把目标拆成可执行的一步，并一起识别需要成人协调的困难。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_perseverance_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜坚持与目标推进｜6–12年级｜学生填答",
+      "sourcePage": 25,
+      "sourceModule": "Perseverance",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "raw_ordinals_positive",
+      "proposedPositiveRecode": "r (1..5 ordinal); pending exact-version binding",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "把目标拆成下一步，分清自己能尝试的事和需要成人协调的困难。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "帮助学生把目标拆成可执行的一步，并一起识别需要成人协调的困难。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_safety_g3_5_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校安全感｜3–5年级｜学生填答",
+      "sourcePage": 26,
+      "sourceModule": "School Safety",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 5,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            5
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "all_raw_ordinals_negative_for_safety",
+      "proposedPositiveRecode": "6-r (5-option risk items); inference from positive-direction rule",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "如果担心、害怕或受到不好的对待，请找让你安心的成人；没得到帮助可以再找另一位。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "先确认学生可用的求助渠道和安全支持；涉及具体风险的反馈按学校已有流程处理。"
+        }
+      }
+    },
+    {
+      "key": "panorama_ss_guide_school_safety_g6_12_en",
+      "catalogVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "name": "Panorama Student Survey｜学校安全感｜6–12年级｜学生填答",
+      "sourcePage": 26,
+      "sourceModule": "School Safety",
+      "level": "school",
+      "evaluationTarget": "school",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "locale": "en",
+      "respondent": "student",
+      "itemCount": 6,
+      "itemOrdinalGroups": [
+        {
+          "positions": [
+            1,
+            6
+          ],
+          "optionCount": 5,
+          "rawOrdinalRange": [
+            1,
+            5
+          ]
+        }
+      ],
+      "directionObserved": "all_raw_ordinals_negative_for_safety",
+      "proposedPositiveRecode": "6-r (5-option risk items); inference from positive-direction rule",
+      "researchMinimumAnswered": 3,
+      "researchMissingBoundaryStatus": "family-level analysis rule; exact guide mapping pending",
+      "status": "CATALOG_ONLY",
+      "measurementVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "reportDrafts": {
+        "status": "EDITORIAL_ONLY_NOT_RUNTIME_R",
+        "student": {
+          "recipient": "student_respondent",
+          "visibleWhen": "只有既有身份、结果接收者授权、匿名/保密与发布规则允许学生查看本次个人反馈时；填答不自动等于可见。",
+          "action": "遇到威胁、不公平或不当对待时，选择可信成人或学校已有求助渠道寻求支持；没有得到回应可继续找其他支持。",
+          "lowExperienceNote": "不舒服的经历值得被认真听见。这些回答不是能力评定，也不表示问题该由你一个人解决。",
+          "insufficientEvidenceNote": "这些回答还不足以作出可靠分析，不会用缺失回答替你下判断。"
+        },
+        "teacher": {
+          "recipient": "authorized_teacher_aggregate_viewer",
+          "visibleWhen": "仅既有授权的群体汇总，遵守实际最小人数、匿名、发布和敏感信息规则；不透传学生个体或开放原答。",
+          "action": "先确认学生可用的求助渠道和安全支持；涉及具体风险的反馈按学校已有流程处理。"
+        }
+      }
+    }
+  ],
+  "forms": [
+    {
+      "key": "panorama_ss_guide_classroom_open_g3_5_en",
+      "name": "Panorama Student Survey｜课堂开放反馈（无计分表单）｜3–5年级｜学生填答",
+      "status": "METADATA_CANDIDATE_ONLY",
+      "sourcePage": 27,
+      "sourcePromptCount": 26,
+      "locale": "en",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "sourceHasSeparateGradeForms": false,
+      "versionNote": "按目标年级分开管理的项目组卷候选；原指南开放题/背景题为共享来源，并未提供分年级平行表。",
+      "evaluationTarget": "classroom",
+      "scoring": null,
+      "report": null,
+      "payload": null,
+      "tags": [
+        "family:panorama_student_survey",
+        "usecase:student_feedback",
+        "evaluation_target:classroom",
+        "respondent:student",
+        "grade:3_5",
+        "age:chronological_not_specified",
+        "locale:en",
+        "rights:public_redist_unknown",
+        "availability:metadata_candidate",
+        "maturity:pilot",
+        "form:no_scoring"
+      ],
+      "blockers": [
+        "PUBLIC_ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED"
+      ],
+      "notes": "开放题仅按描述性反馈处理；不以情感分析、教师优劣标签或分数代替学生原意；当前不复制题文。"
+    },
+    {
+      "key": "panorama_ss_guide_school_open_g3_5_en",
+      "name": "Panorama Student Survey｜学校开放反馈（无计分表单）｜3–5年级｜学生填答",
+      "status": "METADATA_CANDIDATE_ONLY",
+      "sourcePage": 28,
+      "sourcePromptCount": 13,
+      "locale": "en",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "sourceHasSeparateGradeForms": false,
+      "versionNote": "按目标年级分开管理的项目组卷候选；原指南开放题/背景题为共享来源，并未提供分年级平行表。",
+      "evaluationTarget": "school",
+      "scoring": null,
+      "report": null,
+      "payload": null,
+      "tags": [
+        "family:panorama_student_survey",
+        "usecase:student_feedback",
+        "evaluation_target:school",
+        "respondent:student",
+        "grade:3_5",
+        "age:chronological_not_specified",
+        "locale:en",
+        "rights:public_redist_unknown",
+        "availability:metadata_candidate",
+        "maturity:pilot",
+        "form:no_scoring"
+      ],
+      "blockers": [
+        "PUBLIC_ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED"
+      ],
+      "notes": "开放题仅按描述性反馈处理；不以情感分析、教师优劣标签或分数代替学生原意；当前不复制题文。"
+    },
+    {
+      "key": "panorama_ss_guide_background_g3_5_en",
+      "name": "Panorama Student Survey｜背景信息（无计分表单）｜3–5年级｜学生填答",
+      "status": "METADATA_CANDIDATE_ONLY",
+      "sourcePage": 28,
+      "sourcePromptCount": 7,
+      "locale": "en",
+      "gradeRange": [
+        3,
+        5
+      ],
+      "sourceHasSeparateGradeForms": false,
+      "versionNote": "按目标年级分开管理的项目组卷候选；原指南开放题/背景题为共享来源，并未提供分年级平行表。",
+      "evaluationTarget": "school",
+      "scoring": null,
+      "report": null,
+      "payload": null,
+      "tags": [
+        "family:panorama_student_survey",
+        "usecase:student_feedback",
+        "evaluation_target:school",
+        "respondent:student",
+        "grade:3_5",
+        "age:chronological_not_specified",
+        "locale:en",
+        "rights:public_redist_unknown",
+        "availability:metadata_candidate",
+        "maturity:pilot",
+        "form:no_scoring"
+      ],
+      "blockers": [
+        "PUBLIC_ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SOURCE_BACKGROUND_RESPONSE_OPTIONS_NOT_SUPPLIED"
+      ],
+      "notes": "原背景题缺选项，不发明性别/族群/家长教育水平分类；可选背景信息不进入计分报告。"
+    },
+    {
+      "key": "panorama_ss_guide_classroom_open_g6_12_en",
+      "name": "Panorama Student Survey｜课堂开放反馈（无计分表单）｜6–12年级｜学生填答",
+      "status": "METADATA_CANDIDATE_ONLY",
+      "sourcePage": 27,
+      "sourcePromptCount": 26,
+      "locale": "en",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "sourceHasSeparateGradeForms": false,
+      "versionNote": "按目标年级分开管理的项目组卷候选；原指南开放题/背景题为共享来源，并未提供分年级平行表。",
+      "evaluationTarget": "classroom",
+      "scoring": null,
+      "report": null,
+      "payload": null,
+      "tags": [
+        "family:panorama_student_survey",
+        "usecase:student_feedback",
+        "evaluation_target:classroom",
+        "respondent:student",
+        "grade:6_12",
+        "age:chronological_not_specified",
+        "locale:en",
+        "rights:public_redist_unknown",
+        "availability:metadata_candidate",
+        "maturity:pilot",
+        "form:no_scoring"
+      ],
+      "blockers": [
+        "PUBLIC_ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED"
+      ],
+      "notes": "开放题仅按描述性反馈处理；不以情感分析、教师优劣标签或分数代替学生原意；当前不复制题文。"
+    },
+    {
+      "key": "panorama_ss_guide_school_open_g6_12_en",
+      "name": "Panorama Student Survey｜学校开放反馈（无计分表单）｜6–12年级｜学生填答",
+      "status": "METADATA_CANDIDATE_ONLY",
+      "sourcePage": 28,
+      "sourcePromptCount": 13,
+      "locale": "en",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "sourceHasSeparateGradeForms": false,
+      "versionNote": "按目标年级分开管理的项目组卷候选；原指南开放题/背景题为共享来源，并未提供分年级平行表。",
+      "evaluationTarget": "school",
+      "scoring": null,
+      "report": null,
+      "payload": null,
+      "tags": [
+        "family:panorama_student_survey",
+        "usecase:student_feedback",
+        "evaluation_target:school",
+        "respondent:student",
+        "grade:6_12",
+        "age:chronological_not_specified",
+        "locale:en",
+        "rights:public_redist_unknown",
+        "availability:metadata_candidate",
+        "maturity:pilot",
+        "form:no_scoring"
+      ],
+      "blockers": [
+        "PUBLIC_ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED"
+      ],
+      "notes": "开放题仅按描述性反馈处理；不以情感分析、教师优劣标签或分数代替学生原意；当前不复制题文。"
+    },
+    {
+      "key": "panorama_ss_guide_background_g6_12_en",
+      "name": "Panorama Student Survey｜背景信息（无计分表单）｜6–12年级｜学生填答",
+      "status": "METADATA_CANDIDATE_ONLY",
+      "sourcePage": 28,
+      "sourcePromptCount": 7,
+      "locale": "en",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "sourceHasSeparateGradeForms": false,
+      "versionNote": "按目标年级分开管理的项目组卷候选；原指南开放题/背景题为共享来源，并未提供分年级平行表。",
+      "evaluationTarget": "school",
+      "scoring": null,
+      "report": null,
+      "payload": null,
+      "tags": [
+        "family:panorama_student_survey",
+        "usecase:student_feedback",
+        "evaluation_target:school",
+        "respondent:student",
+        "grade:6_12",
+        "age:chronological_not_specified",
+        "locale:en",
+        "rights:public_redist_unknown",
+        "availability:metadata_candidate",
+        "maturity:pilot",
+        "form:no_scoring"
+      ],
+      "blockers": [
+        "PUBLIC_ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SOURCE_BACKGROUND_RESPONSE_OPTIONS_NOT_SUPPLIED"
+      ],
+      "notes": "原背景题缺选项，不发明性别/族群/家长教育水平分类；可选背景信息不进入计分报告。"
+    }
+  ],
+  "optionalComposites": [
+    {
+      "key": "panorama_ss_guide_classroom_combo_g3_5_en",
+      "kind": "ordinary_composite_questionnaire_plan",
+      "status": "NOT_CREATED",
+      "moduleKeys": [
+        "panorama_ss_guide_classroom_pedagogical_effectiveness_g3_5_en",
+        "panorama_ss_guide_classroom_climate_g3_5_en",
+        "panorama_ss_guide_classroom_rigorous_expectations_g3_5_en",
+        "panorama_ss_guide_classroom_teacher_student_relationships_g3_5_en"
+      ],
+      "optionalFormKeys": [
+        "panorama_ss_guide_classroom_open_g3_5_en",
+        "panorama_ss_guide_background_g3_5_en"
+      ],
+      "totalScore": null,
+      "notes": "仅普通组合清单；4模块位于指南建议4–7主题范围。保留整模块、年级、对象、语言与三轴版本；所有子项取得合法内容并核计分后才可通过现有编辑器组卷。"
+    },
+    {
+      "key": "panorama_ss_guide_school_combo_g3_5_en",
+      "kind": "ordinary_composite_questionnaire_plan",
+      "status": "NOT_CREATED",
+      "moduleKeys": [
+        "panorama_ss_guide_school_climate_g3_5_en",
+        "panorama_ss_guide_school_belonging_g3_5_en",
+        "panorama_ss_guide_school_engagement_g3_5_en",
+        "panorama_ss_guide_school_safety_g3_5_en"
+      ],
+      "optionalFormKeys": [
+        "panorama_ss_guide_school_open_g3_5_en",
+        "panorama_ss_guide_background_g3_5_en"
+      ],
+      "totalScore": null,
+      "notes": "仅普通组合清单；4模块位于指南建议4–7主题范围。保留整模块、年级、对象、语言与三轴版本；所有子项取得合法内容并核计分后才可通过现有编辑器组卷。"
+    },
+    {
+      "key": "panorama_ss_guide_classroom_combo_g6_12_en",
+      "kind": "ordinary_composite_questionnaire_plan",
+      "status": "NOT_CREATED",
+      "moduleKeys": [
+        "panorama_ss_guide_classroom_pedagogical_effectiveness_g6_12_en",
+        "panorama_ss_guide_classroom_climate_g6_12_en",
+        "panorama_ss_guide_classroom_rigorous_expectations_g6_12_en",
+        "panorama_ss_guide_classroom_teacher_student_relationships_g6_12_en"
+      ],
+      "optionalFormKeys": [
+        "panorama_ss_guide_classroom_open_g6_12_en",
+        "panorama_ss_guide_background_g6_12_en"
+      ],
+      "totalScore": null,
+      "notes": "仅普通组合清单；4模块位于指南建议4–7主题范围。保留整模块、年级、对象、语言与三轴版本；所有子项取得合法内容并核计分后才可通过现有编辑器组卷。"
+    },
+    {
+      "key": "panorama_ss_guide_school_combo_g6_12_en",
+      "kind": "ordinary_composite_questionnaire_plan",
+      "status": "NOT_CREATED",
+      "moduleKeys": [
+        "panorama_ss_guide_school_climate_g6_12_en",
+        "panorama_ss_guide_school_belonging_g6_12_en",
+        "panorama_ss_guide_school_engagement_g6_12_en",
+        "panorama_ss_guide_school_safety_g6_12_en"
+      ],
+      "optionalFormKeys": [
+        "panorama_ss_guide_school_open_g6_12_en",
+        "panorama_ss_guide_background_g6_12_en"
+      ],
+      "totalScore": null,
+      "notes": "仅普通组合清单；4模块位于指南建议4–7主题范围。保留整模块、年级、对象、语言与三轴版本；所有子项取得合法内容并核计分后才可通过现有编辑器组卷。"
+    }
+  ],
+  "dedup": {
+    "baseSha": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+    "sourceJsonFilesChecked": 235,
+    "parentReportedRegisteredVersionsChecked": 258,
+    "sameSourceFound": false,
+    "checks": [
+      "Panorama/Gehlbach/source URL/module aliases",
+      "representative original item phrases in all source.json plus instrument declarations",
+      "GitHub all-state Panorama PR search and panorama branch search returned empty"
+    ],
+    "openPrSnapshot": {
+      "count": 26,
+      "panoramaMatches": 0,
+      "note": "Refreshed title/branch snapshot; parent previously audited 24 open PRs and 10 content PR paths. No claim that local scan re-read all 26 full PR trees."
+    },
+    "productionDatabase": "NOT_CHECKED",
+    "productionAdminCustomContent": "NOT_CHECKED",
+    "requiredBeforeActualImport": "再按作者/来源快照/题项/语言/年级/版本核目标DB与管理员自建同义ID；重合引用既有，不重复建立。"
+  },
+  "validation": {
+    "schema": "PENDING",
+    "registryAndPreview": "PENDING",
+    "formalCI": "NOT_RUN",
+    "isolatedDbInstall": "NOT_APPLICABLE_CATALOG_ONLY",
+    "developmentDbInstalled": false,
+    "productionInstalled": false,
+    "published": false
+  }
+}
