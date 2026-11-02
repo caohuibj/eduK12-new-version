@@ -128,7 +128,7 @@ function knownJob(jobs,name){
 }
 
 export async function verifiedBackendRegression({token,repo,pr,branch,prHead,baseSha,currentRunId,
-  currentCheckout='HEAD',currentTree=treeFor(currentCheckout),fetchApi=github,fetchPages=pages,download=officialZip}){
+  currentCheckout='HEAD',currentTree=treeFor(git('rev-parse',currentCheckout)),fetchApi=github,fetchPages=pages,download=officialZip}){
   assert(/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(repo));
   mustSha(prHead);mustSha(baseSha);
   assert(Number.isSafeInteger(pr)&&pr>0&&Number.isSafeInteger(currentRunId));
