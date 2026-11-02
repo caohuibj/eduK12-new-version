@@ -1,0 +1,271 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "dmee_class_t_application_teacher_self_en",
+      "title": "Application",
+      "description": "Teacher self-reflection using the author’s English translations from Table S1. Choose the frequency that describes your practice. There are no teacher grades or performance rankings. You may leave items blank when you cannot describe them. No fixed recall window was specified in the published item table. This unscored form does not reproduce the paper’s ESEM factor scores. Do not enter pupils’ names or identifiable cases. Platform guidance is newly written and is not the original administration script.",
+      "questions": [
+        {
+          "itemKey": "dmee_en_item_31",
+          "type": "LIKERT",
+          "prompt": "I give written application exercises to be done individually.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_32",
+          "type": "LIKERT",
+          "prompt": "I give you written exercises to do in pairs.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_33",
+          "type": "LIKERT",
+          "prompt": "I give written exercises to be done in groups.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_34",
+          "type": "LIKERT",
+          "prompt": "I give oral exercises to apply what has just been taught.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_35",
+          "type": "LIKERT",
+          "prompt": "The exercises I give are specific (they target a particular skill or type of task).",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_36",
+          "type": "LIKERT",
+          "prompt": "The exercises I give involve the integration of several skills.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_37",
+          "type": "LIKERT",
+          "prompt": "The exercises I give are corrected collectively in class or by myself during or after school.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    }
+  ]
+}

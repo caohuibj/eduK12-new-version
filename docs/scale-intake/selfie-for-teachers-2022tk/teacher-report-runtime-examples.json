@@ -1,0 +1,655 @@
+[
+  {
+    "case": "normal_self_position",
+    "synthetic": true,
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-selfie4t",
+        "code": "selfie4t_2022tk_assessment_en_teacher_self",
+        "name": "SELFIEforTEACHERS｜评价（3项）｜教师自评｜2022 Toolkit英文固定版",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-selfie4t",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "reportAudience": "teacher",
+        "localizationVersion": "1.0.0",
+        "definitionHash": "bb4476b343ab35838fbd6c11ac03b4aa2ec180c647def3c83736e3219cd3f4af",
+        "referenceVersions": [],
+        "assessmentContext": null
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "S4T_4_1",
+          "responseValue": "B1",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "S4T_4_2",
+          "responseValue": "B1",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "S4T_4_3",
+          "responseValue": "B1",
+          "baseScore": 3,
+          "score": 3
+        }
+      ],
+      "scores": [
+        {
+          "key": "competence_4_1",
+          "type": "dimension",
+          "label": "4.1 Assessment strategies",
+          "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 3,
+          "range": {
+            "min": 0,
+            "max": 6
+          },
+          "expectedItems": [
+            "S4T_4_1"
+          ],
+          "answeredItems": [
+            "S4T_4_1"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "competence_4_2",
+          "type": "dimension",
+          "label": "4.2 Analysing evidence",
+          "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 3,
+          "range": {
+            "min": 0,
+            "max": 6
+          },
+          "expectedItems": [
+            "S4T_4_2"
+          ],
+          "answeredItems": [
+            "S4T_4_2"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "competence_4_3",
+          "type": "dimension",
+          "label": "4.3 Feedback and planning",
+          "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 3,
+          "range": {
+            "min": 0,
+            "max": 6
+          },
+          "expectedItems": [
+            "S4T_4_3"
+          ],
+          "answeredItems": [
+            "S4T_4_3"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "competence_4_1",
+          "headline": "Reflecting on competence 4.1",
+          "label": null,
+          "interpretation": "This response records the maturity statement you selected for this specific digital competence. The statements describe awareness, exploration, use, purposeful selection, reflective support and wider initiative in item-specific ways. A higher point value indicates a later self-described position in this framework; it does not establish better teaching or better student outcomes. The separate not-aware response is a valid starting point for learning. Use a recent example and your working conditions to put the choice in context. The displayed points preserve the original statement order: 0 = not aware; 1 = A1; 2 = A2; 3 = B1; 4 = B2; 5 = C1; 6 = C2. These codes are maturity statements within this framework, not agreement levels, teacher grades or population percentiles.",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "Choose one recent example connected with this competence. What did you do, what evidence did you notice, and which conditions helped or limited it?"
+            },
+            {
+              "category": "strategy",
+              "text": "Choose one question about students’ understanding. Collect a small amount of learning evidence and decide what you would change after seeing it."
+            },
+            {
+              "category": "support",
+              "text": "Keep feedback and student data proportionate to the learning need, and use your school’s approved arrangements for data protection."
+            }
+          ],
+          "limitations": [
+            "Fixed source: 2022 Toolkit Annex I for complete item text and A1–C2 labels; official2023 report p.11/Annex1 for seventh not-aware option and0–6 point mapping. The2023 report omits the B2 row for6.5; no omitted row was invented.",
+            "These are self-reported digital-competence positions, not observed teaching, student learning outcomes, professional certification, personality labels or a school/teacher ranking.",
+            "The six separate digital area units, instructions, feedback and conservative missing policy are project adaptations. Current online text, independent-area validity and Chinese-version validity were not established.",
+            "Missing answers remain null and are not treated as a zero-point not-aware response. Any missing competence makes this area invalid/incomplete for interpretation. Other area units have their own completeness; no missing value is imputed. This project policy is not claimed as an author-issued missing-data algorithm.",
+            "No area average, global192-point score, overall proficiency band, population norm, percentile or cross-tool total is supplied. Consult the official Toolkit and2023 report for original glossary and full-tool interpretation."
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "competence_4_2",
+          "headline": "Reflecting on competence 4.2",
+          "label": null,
+          "interpretation": "This response records the maturity statement you selected for this specific digital competence. The statements describe awareness, exploration, use, purposeful selection, reflective support and wider initiative in item-specific ways. A higher point value indicates a later self-described position in this framework; it does not establish better teaching or better student outcomes. The separate not-aware response is a valid starting point for learning. Use a recent example and your working conditions to put the choice in context. The displayed points preserve the original statement order: 0 = not aware; 1 = A1; 2 = A2; 3 = B1; 4 = B2; 5 = C1; 6 = C2. These codes are maturity statements within this framework, not agreement levels, teacher grades or population percentiles.",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "Choose one recent example connected with this competence. What did you do, what evidence did you notice, and which conditions helped or limited it?"
+            },
+            {
+              "category": "strategy",
+              "text": "Choose one question about students’ understanding. Collect a small amount of learning evidence and decide what you would change after seeing it."
+            },
+            {
+              "category": "support",
+              "text": "Keep feedback and student data proportionate to the learning need, and use your school’s approved arrangements for data protection."
+            }
+          ],
+          "limitations": [
+            "Fixed source: 2022 Toolkit Annex I for complete item text and A1–C2 labels; official2023 report p.11/Annex1 for seventh not-aware option and0–6 point mapping. The2023 report omits the B2 row for6.5; no omitted row was invented.",
+            "These are self-reported digital-competence positions, not observed teaching, student learning outcomes, professional certification, personality labels or a school/teacher ranking.",
+            "The six separate digital area units, instructions, feedback and conservative missing policy are project adaptations. Current online text, independent-area validity and Chinese-version validity were not established.",
+            "Missing answers remain null and are not treated as a zero-point not-aware response. Any missing competence makes this area invalid/incomplete for interpretation. Other area units have their own completeness; no missing value is imputed. This project policy is not claimed as an author-issued missing-data algorithm.",
+            "No area average, global192-point score, overall proficiency band, population norm, percentile or cross-tool total is supplied. Consult the official Toolkit and2023 report for original glossary and full-tool interpretation."
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "competence_4_3",
+          "headline": "Reflecting on competence 4.3",
+          "label": null,
+          "interpretation": "This response records the maturity statement you selected for this specific digital competence. The statements describe awareness, exploration, use, purposeful selection, reflective support and wider initiative in item-specific ways. A higher point value indicates a later self-described position in this framework; it does not establish better teaching or better student outcomes. The separate not-aware response is a valid starting point for learning. Use a recent example and your working conditions to put the choice in context. The displayed points preserve the original statement order: 0 = not aware; 1 = A1; 2 = A2; 3 = B1; 4 = B2; 5 = C1; 6 = C2. These codes are maturity statements within this framework, not agreement levels, teacher grades or population percentiles.",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "Choose one recent example connected with this competence. What did you do, what evidence did you notice, and which conditions helped or limited it?"
+            },
+            {
+              "category": "strategy",
+              "text": "Choose one question about students’ understanding. Collect a small amount of learning evidence and decide what you would change after seeing it."
+            },
+            {
+              "category": "support",
+              "text": "Keep feedback and student data proportionate to the learning need, and use your school’s approved arrangements for data protection."
+            }
+          ],
+          "limitations": [
+            "Fixed source: 2022 Toolkit Annex I for complete item text and A1–C2 labels; official2023 report p.11/Annex1 for seventh not-aware option and0–6 point mapping. The2023 report omits the B2 row for6.5; no omitted row was invented.",
+            "These are self-reported digital-competence positions, not observed teaching, student learning outcomes, professional certification, personality labels or a school/teacher ranking.",
+            "The six separate digital area units, instructions, feedback and conservative missing policy are project adaptations. Current online text, independent-area validity and Chinese-version validity were not established.",
+            "Missing answers remain null and are not treated as a zero-point not-aware response. Any missing competence makes this area invalid/incomplete for interpretation. Other area units have their own completeness; no missing value is imputed. This project policy is not claimed as an author-issued missing-data algorithm.",
+            "No area average, global192-point score, overall proficiency band, population norm, percentile or cross-tool total is supplied. Consult the official Toolkit and2023 report for original glossary and full-tool interpretation."
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "Fixed source: 2022 Toolkit Annex I for complete item text and A1–C2 labels; official2023 report p.11/Annex1 for seventh not-aware option and0–6 point mapping. The2023 report omits the B2 row for6.5; no omitted row was invented.",
+        "These are self-reported digital-competence positions, not observed teaching, student learning outcomes, professional certification, personality labels or a school/teacher ranking.",
+        "The six separate digital area units, instructions, feedback and conservative missing policy are project adaptations. Current online text, independent-area validity and Chinese-version validity were not established.",
+        "Missing answers remain null and are not treated as a zero-point not-aware response. Any missing competence makes this area invalid/incomplete for interpretation. Other area units have their own completeness; no missing value is imputed. This project policy is not claimed as an author-issued missing-data algorithm.",
+        "No area average, global192-point score, overall proficiency band, population norm, percentile or cross-tool total is supplied. Consult the official Toolkit and2023 report for original glossary and full-tool interpretation.",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "For supportive professional learning reflection by the teacher receiving their own authorized results. A1–C2 are this framework’s maturity codes, not grades for teacher quality. No EU endorsement, badge or certificate is issued. Existing access and feedback permissions still apply."
+    }
+  },
+  {
+    "case": "difficult_or_unfamiliar",
+    "synthetic": true,
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-selfie4t",
+        "code": "selfie4t_2022tk_assessment_en_teacher_self",
+        "name": "SELFIEforTEACHERS｜评价（3项）｜教师自评｜2022 Toolkit英文固定版",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-selfie4t",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "reportAudience": "teacher",
+        "localizationVersion": "1.0.0",
+        "definitionHash": "bb4476b343ab35838fbd6c11ac03b4aa2ec180c647def3c83736e3219cd3f4af",
+        "referenceVersions": [],
+        "assessmentContext": null
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "S4T_4_1",
+          "responseValue": "UNAWARE",
+          "baseScore": 0,
+          "score": 0
+        },
+        {
+          "itemCode": "S4T_4_2",
+          "responseValue": "UNAWARE",
+          "baseScore": 0,
+          "score": 0
+        },
+        {
+          "itemCode": "S4T_4_3",
+          "responseValue": "UNAWARE",
+          "baseScore": 0,
+          "score": 0
+        }
+      ],
+      "scores": [
+        {
+          "key": "competence_4_1",
+          "type": "dimension",
+          "label": "4.1 Assessment strategies",
+          "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 0,
+          "range": {
+            "min": 0,
+            "max": 6
+          },
+          "expectedItems": [
+            "S4T_4_1"
+          ],
+          "answeredItems": [
+            "S4T_4_1"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "competence_4_2",
+          "type": "dimension",
+          "label": "4.2 Analysing evidence",
+          "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 0,
+          "range": {
+            "min": 0,
+            "max": 6
+          },
+          "expectedItems": [
+            "S4T_4_2"
+          ],
+          "answeredItems": [
+            "S4T_4_2"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "competence_4_3",
+          "type": "dimension",
+          "label": "4.3 Feedback and planning",
+          "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 0,
+          "range": {
+            "min": 0,
+            "max": 6
+          },
+          "expectedItems": [
+            "S4T_4_3"
+          ],
+          "answeredItems": [
+            "S4T_4_3"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "competence_4_1",
+          "headline": "Reflecting on competence 4.1",
+          "label": null,
+          "interpretation": "This response records the maturity statement you selected for this specific digital competence. The statements describe awareness, exploration, use, purposeful selection, reflective support and wider initiative in item-specific ways. A higher point value indicates a later self-described position in this framework; it does not establish better teaching or better student outcomes. The separate not-aware response is a valid starting point for learning. Use a recent example and your working conditions to put the choice in context. The displayed points preserve the original statement order: 0 = not aware; 1 = A1; 2 = A2; 3 = B1; 4 = B2; 5 = C1; 6 = C2. These codes are maturity statements within this framework, not agreement levels, teacher grades or population percentiles.",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "Choose one recent example connected with this competence. What did you do, what evidence did you notice, and which conditions helped or limited it?"
+            },
+            {
+              "category": "strategy",
+              "text": "Choose one question about students’ understanding. Collect a small amount of learning evidence and decide what you would change after seeing it."
+            },
+            {
+              "category": "support",
+              "text": "Keep feedback and student data proportionate to the learning need, and use your school’s approved arrangements for data protection."
+            }
+          ],
+          "limitations": [
+            "Fixed source: 2022 Toolkit Annex I for complete item text and A1–C2 labels; official2023 report p.11/Annex1 for seventh not-aware option and0–6 point mapping. The2023 report omits the B2 row for6.5; no omitted row was invented.",
+            "These are self-reported digital-competence positions, not observed teaching, student learning outcomes, professional certification, personality labels or a school/teacher ranking.",
+            "The six separate digital area units, instructions, feedback and conservative missing policy are project adaptations. Current online text, independent-area validity and Chinese-version validity were not established.",
+            "Missing answers remain null and are not treated as a zero-point not-aware response. Any missing competence makes this area invalid/incomplete for interpretation. Other area units have their own completeness; no missing value is imputed. This project policy is not claimed as an author-issued missing-data algorithm.",
+            "No area average, global192-point score, overall proficiency band, population norm, percentile or cross-tool total is supplied. Consult the official Toolkit and2023 report for original glossary and full-tool interpretation."
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "competence_4_2",
+          "headline": "Reflecting on competence 4.2",
+          "label": null,
+          "interpretation": "This response records the maturity statement you selected for this specific digital competence. The statements describe awareness, exploration, use, purposeful selection, reflective support and wider initiative in item-specific ways. A higher point value indicates a later self-described position in this framework; it does not establish better teaching or better student outcomes. The separate not-aware response is a valid starting point for learning. Use a recent example and your working conditions to put the choice in context. The displayed points preserve the original statement order: 0 = not aware; 1 = A1; 2 = A2; 3 = B1; 4 = B2; 5 = C1; 6 = C2. These codes are maturity statements within this framework, not agreement levels, teacher grades or population percentiles.",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "Choose one recent example connected with this competence. What did you do, what evidence did you notice, and which conditions helped or limited it?"
+            },
+            {
+              "category": "strategy",
+              "text": "Choose one question about students’ understanding. Collect a small amount of learning evidence and decide what you would change after seeing it."
+            },
+            {
+              "category": "support",
+              "text": "Keep feedback and student data proportionate to the learning need, and use your school’s approved arrangements for data protection."
+            }
+          ],
+          "limitations": [
+            "Fixed source: 2022 Toolkit Annex I for complete item text and A1–C2 labels; official2023 report p.11/Annex1 for seventh not-aware option and0–6 point mapping. The2023 report omits the B2 row for6.5; no omitted row was invented.",
+            "These are self-reported digital-competence positions, not observed teaching, student learning outcomes, professional certification, personality labels or a school/teacher ranking.",
+            "The six separate digital area units, instructions, feedback and conservative missing policy are project adaptations. Current online text, independent-area validity and Chinese-version validity were not established.",
+            "Missing answers remain null and are not treated as a zero-point not-aware response. Any missing competence makes this area invalid/incomplete for interpretation. Other area units have their own completeness; no missing value is imputed. This project policy is not claimed as an author-issued missing-data algorithm.",
+            "No area average, global192-point score, overall proficiency band, population norm, percentile or cross-tool total is supplied. Consult the official Toolkit and2023 report for original glossary and full-tool interpretation."
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "competence_4_3",
+          "headline": "Reflecting on competence 4.3",
+          "label": null,
+          "interpretation": "This response records the maturity statement you selected for this specific digital competence. The statements describe awareness, exploration, use, purposeful selection, reflective support and wider initiative in item-specific ways. A higher point value indicates a later self-described position in this framework; it does not establish better teaching or better student outcomes. The separate not-aware response is a valid starting point for learning. Use a recent example and your working conditions to put the choice in context. The displayed points preserve the original statement order: 0 = not aware; 1 = A1; 2 = A2; 3 = B1; 4 = B2; 5 = C1; 6 = C2. These codes are maturity statements within this framework, not agreement levels, teacher grades or population percentiles.",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "Choose one recent example connected with this competence. What did you do, what evidence did you notice, and which conditions helped or limited it?"
+            },
+            {
+              "category": "strategy",
+              "text": "Choose one question about students’ understanding. Collect a small amount of learning evidence and decide what you would change after seeing it."
+            },
+            {
+              "category": "support",
+              "text": "Keep feedback and student data proportionate to the learning need, and use your school’s approved arrangements for data protection."
+            }
+          ],
+          "limitations": [
+            "Fixed source: 2022 Toolkit Annex I for complete item text and A1–C2 labels; official2023 report p.11/Annex1 for seventh not-aware option and0–6 point mapping. The2023 report omits the B2 row for6.5; no omitted row was invented.",
+            "These are self-reported digital-competence positions, not observed teaching, student learning outcomes, professional certification, personality labels or a school/teacher ranking.",
+            "The six separate digital area units, instructions, feedback and conservative missing policy are project adaptations. Current online text, independent-area validity and Chinese-version validity were not established.",
+            "Missing answers remain null and are not treated as a zero-point not-aware response. Any missing competence makes this area invalid/incomplete for interpretation. Other area units have their own completeness; no missing value is imputed. This project policy is not claimed as an author-issued missing-data algorithm.",
+            "No area average, global192-point score, overall proficiency band, population norm, percentile or cross-tool total is supplied. Consult the official Toolkit and2023 report for original glossary and full-tool interpretation."
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "Fixed source: 2022 Toolkit Annex I for complete item text and A1–C2 labels; official2023 report p.11/Annex1 for seventh not-aware option and0–6 point mapping. The2023 report omits the B2 row for6.5; no omitted row was invented.",
+        "These are self-reported digital-competence positions, not observed teaching, student learning outcomes, professional certification, personality labels or a school/teacher ranking.",
+        "The six separate digital area units, instructions, feedback and conservative missing policy are project adaptations. Current online text, independent-area validity and Chinese-version validity were not established.",
+        "Missing answers remain null and are not treated as a zero-point not-aware response. Any missing competence makes this area invalid/incomplete for interpretation. Other area units have their own completeness; no missing value is imputed. This project policy is not claimed as an author-issued missing-data algorithm.",
+        "No area average, global192-point score, overall proficiency band, population norm, percentile or cross-tool total is supplied. Consult the official Toolkit and2023 report for original glossary and full-tool interpretation.",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "For supportive professional learning reflection by the teacher receiving their own authorized results. A1–C2 are this framework’s maturity codes, not grades for teacher quality. No EU endorsement, badge or certificate is issued. Existing access and feedback permissions still apply."
+    }
+  },
+  {
+    "case": "insufficient_one_missing",
+    "synthetic": true,
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-selfie4t",
+        "code": "selfie4t_2022tk_assessment_en_teacher_self",
+        "name": "SELFIEforTEACHERS｜评价（3项）｜教师自评｜2022 Toolkit英文固定版",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-selfie4t",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "reportAudience": "teacher",
+        "localizationVersion": "1.0.0",
+        "definitionHash": "bb4476b343ab35838fbd6c11ac03b4aa2ec180c647def3c83736e3219cd3f4af",
+        "referenceVersions": [],
+        "assessmentContext": null
+      },
+      "quality": {
+        "status": "invalid",
+        "flags": [
+          "missing_items",
+          "score_not_calculable"
+        ]
+      },
+      "itemScores": [
+        {
+          "itemCode": "S4T_4_1",
+          "responseValue": "B1",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "S4T_4_2",
+          "responseValue": "B1",
+          "baseScore": 3,
+          "score": 3
+        }
+      ],
+      "scores": [
+        {
+          "key": "competence_4_1",
+          "type": "dimension",
+          "label": "4.1 Assessment strategies",
+          "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 3,
+          "range": {
+            "min": 0,
+            "max": 6
+          },
+          "expectedItems": [
+            "S4T_4_1"
+          ],
+          "answeredItems": [
+            "S4T_4_1"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "competence_4_2",
+          "type": "dimension",
+          "label": "4.2 Analysing evidence",
+          "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 3,
+          "range": {
+            "min": 0,
+            "max": 6
+          },
+          "expectedItems": [
+            "S4T_4_2"
+          ],
+          "answeredItems": [
+            "S4T_4_2"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "competence_4_3",
+          "type": "dimension",
+          "label": "4.3 Feedback and planning",
+          "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": null,
+          "range": {
+            "min": 0,
+            "max": 6
+          },
+          "expectedItems": [
+            "S4T_4_3"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [],
+      "caveats": [
+        "Fixed source: 2022 Toolkit Annex I for complete item text and A1–C2 labels; official2023 report p.11/Annex1 for seventh not-aware option and0–6 point mapping. The2023 report omits the B2 row for6.5; no omitted row was invented.",
+        "These are self-reported digital-competence positions, not observed teaching, student learning outcomes, professional certification, personality labels or a school/teacher ranking.",
+        "The six separate digital area units, instructions, feedback and conservative missing policy are project adaptations. Current online text, independent-area validity and Chinese-version validity were not established.",
+        "Missing answers remain null and are not treated as a zero-point not-aware response. Any missing competence makes this area invalid/incomplete for interpretation. Other area units have their own completeness; no missing value is imputed. This project policy is not claimed as an author-issued missing-data algorithm.",
+        "No area average, global192-point score, overall proficiency band, population norm, percentile or cross-tool total is supplied. Consult the official Toolkit and2023 report for original glossary and full-tool interpretation.",
+        "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "For supportive professional learning reflection by the teacher receiving their own authorized results. A1–C2 are this framework’s maturity codes, not grades for teacher quality. No EU endorsement, badge or certificate is issued. Existing access and feedback permissions still apply."
+    }
+  },
+  {
+    "case": "insufficient_all_missing",
+    "synthetic": true,
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-selfie4t",
+        "code": "selfie4t_2022tk_assessment_en_teacher_self",
+        "name": "SELFIEforTEACHERS｜评价（3项）｜教师自评｜2022 Toolkit英文固定版",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-selfie4t",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "reportAudience": "teacher",
+        "localizationVersion": "1.0.0",
+        "definitionHash": "bb4476b343ab35838fbd6c11ac03b4aa2ec180c647def3c83736e3219cd3f4af",
+        "referenceVersions": [],
+        "assessmentContext": null
+      },
+      "quality": {
+        "status": "invalid",
+        "flags": [
+          "missing_items",
+          "score_not_calculable"
+        ]
+      },
+      "itemScores": [],
+      "scores": [
+        {
+          "key": "competence_4_1",
+          "type": "dimension",
+          "label": "4.1 Assessment strategies",
+          "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": null,
+          "range": {
+            "min": 0,
+            "max": 6
+          },
+          "expectedItems": [
+            "S4T_4_1"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        },
+        {
+          "key": "competence_4_2",
+          "type": "dimension",
+          "label": "4.2 Analysing evidence",
+          "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": null,
+          "range": {
+            "min": 0,
+            "max": 6
+          },
+          "expectedItems": [
+            "S4T_4_2"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        },
+        {
+          "key": "competence_4_3",
+          "type": "dimension",
+          "label": "4.3 Feedback and planning",
+          "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": null,
+          "range": {
+            "min": 0,
+            "max": 6
+          },
+          "expectedItems": [
+            "S4T_4_3"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [],
+      "caveats": [
+        "Fixed source: 2022 Toolkit Annex I for complete item text and A1–C2 labels; official2023 report p.11/Annex1 for seventh not-aware option and0–6 point mapping. The2023 report omits the B2 row for6.5; no omitted row was invented.",
+        "These are self-reported digital-competence positions, not observed teaching, student learning outcomes, professional certification, personality labels or a school/teacher ranking.",
+        "The six separate digital area units, instructions, feedback and conservative missing policy are project adaptations. Current online text, independent-area validity and Chinese-version validity were not established.",
+        "Missing answers remain null and are not treated as a zero-point not-aware response. Any missing competence makes this area invalid/incomplete for interpretation. Other area units have their own completeness; no missing value is imputed. This project policy is not claimed as an author-issued missing-data algorithm.",
+        "No area average, global192-point score, overall proficiency band, population norm, percentile or cross-tool total is supplied. Consult the official Toolkit and2023 report for original glossary and full-tool interpretation.",
+        "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "For supportive professional learning reflection by the teacher receiving their own authorized results. A1–C2 are this framework’s maturity codes, not grades for teacher quality. No EU endorsement, badge or certificate is issued. Existing access and feedback permissions still apply."
+    }
+  }
+]

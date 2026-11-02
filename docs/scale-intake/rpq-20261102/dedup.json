@@ -1,0 +1,463 @@
+{
+  "base": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "mainDeclarations": 258,
+  "mainJsonSources": 235,
+  "mainProbeOutcome": "No matches for RPQ, full name, authorRogers/Priddis, DOI and representative original item substring in original main source declarations/json. Initial author probe completed before new sources were written; item probe reads immutable base.",
+  "representativeItemProbeSha256": "0e16f6cb7522dfe3b9d6fa02217db07d1e49248b4e2f63aac6be889ab232c4e7",
+  "openPrCount": 45,
+  "openPrPathCount": 6336,
+  "prHeads": [
+    {
+      "number": 562,
+      "head": "239576c9aa4a5294c2a7b1a4b24c204357377f80",
+      "changedPaths": 18
+    },
+    {
+      "number": 561,
+      "head": "80f44193c09d61841b40c1707a1323c1552a01cb",
+      "changedPaths": 8
+    },
+    {
+      "number": 560,
+      "head": "fb17b18d5804bce4a550dc53b1d33c3a069dbed6",
+      "changedPaths": 76
+    },
+    {
+      "number": 559,
+      "head": "87fbe2eefd34aa79fc8983d8c5a2c726b667aa25",
+      "changedPaths": 32
+    },
+    {
+      "number": 558,
+      "head": "5e57ff4fa40d0b462bc9aee69facd3dd6c8b8b9d",
+      "changedPaths": 26
+    },
+    {
+      "number": 557,
+      "head": "0a0cd827f92e445b4bb56d775a82e05bebc36437",
+      "changedPaths": 5
+    },
+    {
+      "number": 555,
+      "head": "d9511b6478a04ed21a6f6b9dcab870095bfcf58b",
+      "changedPaths": 71
+    },
+    {
+      "number": 554,
+      "head": "84b802dd591ef623e615194552c800e2f7b78862",
+      "changedPaths": 35
+    },
+    {
+      "number": 553,
+      "head": "6162cda4b880b3c89b3d712d6c316fb9ee108ed7",
+      "changedPaths": 28
+    },
+    {
+      "number": 552,
+      "head": "51569d88e26ef7d9c58ef93cca206c451159673d",
+      "changedPaths": 16
+    },
+    {
+      "number": 550,
+      "head": "21162f30b500011c6b3e9f296fad0d0545b58755",
+      "changedPaths": 24
+    },
+    {
+      "number": 549,
+      "head": "03f0d3409a8499b7cf0db0bb8c4cac67810797bf",
+      "changedPaths": 4
+    },
+    {
+      "number": 548,
+      "head": "7820b248cc8aae4a97f583c761b462eae2f9a54a",
+      "changedPaths": 16
+    },
+    {
+      "number": 547,
+      "head": "a8ddd88f7256bf9534603fc825dc71ef326ebfa8",
+      "changedPaths": 14
+    },
+    {
+      "number": 546,
+      "head": "64cbe6a78fc42292f80d780200bd8882034d7bcb",
+      "changedPaths": 13
+    },
+    {
+      "number": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d",
+      "changedPaths": 40
+    },
+    {
+      "number": 544,
+      "head": "f05c29a5f0843ede8bc8d450be7708d5c1fc4de1",
+      "changedPaths": 23
+    },
+    {
+      "number": 543,
+      "head": "12acadbed9944c2d04dfaadb44d24682c2aa5078",
+      "changedPaths": 82
+    },
+    {
+      "number": 542,
+      "head": "2426aee58647236dd6084845ea834f23a95c6b17",
+      "changedPaths": 37
+    },
+    {
+      "number": 541,
+      "head": "e70c178a2a939fb6e495336f017908eec00a149e",
+      "changedPaths": 31
+    },
+    {
+      "number": 540,
+      "head": "9e7c43efc02e60bd6704b8974f77dfb74d54e9f6",
+      "changedPaths": 27
+    },
+    {
+      "number": 537,
+      "head": "d354ac2731cf4d0426ae5371096e3d720e9c5671",
+      "changedPaths": 17
+    },
+    {
+      "number": 529,
+      "head": "cff8728f67818a28b9ab0a2189c30040470dbd6b",
+      "changedPaths": 5
+    },
+    {
+      "number": 515,
+      "head": "70a6b3bc54e30c95c35733a705c6350f929d2a6d",
+      "changedPaths": 6
+    },
+    {
+      "number": 491,
+      "head": "290aa955a3445bcb0b519829423e626d044a2fc1",
+      "changedPaths": 4
+    },
+    {
+      "number": 489,
+      "head": "dafc0b90b337e5ec7ab28f5b28208d74f51f2b28",
+      "changedPaths": 3
+    },
+    {
+      "number": 488,
+      "head": "0c526f0529ab47c0054f9470d0bb9217e1d787a5",
+      "changedPaths": 3
+    },
+    {
+      "number": 482,
+      "head": "9feffb8d0f5c91dd19f0744c43d62dba0a2818f8",
+      "changedPaths": 310
+    },
+    {
+      "number": 441,
+      "head": "16d9bbaa5fffb424ce463220d6f9f7d3a7280db5",
+      "changedPaths": 693
+    },
+    {
+      "number": 413,
+      "head": "0f8057fa75bcb89215275f6ad7695f189fcf0e65",
+      "changedPaths": 15
+    },
+    {
+      "number": 412,
+      "head": "4d79bc45d607f8e771eccfacc49a7558b8a3985e",
+      "changedPaths": 1
+    },
+    {
+      "number": 397,
+      "head": "3ee375d87aa8d72ad8de5dcdf5ce10fd1a0a763d",
+      "changedPaths": 2
+    },
+    {
+      "number": 383,
+      "head": "5454a7d7630a4ccb7125d0c621fa10317dc6924f",
+      "changedPaths": 5
+    },
+    {
+      "number": 379,
+      "head": "333200ade0c6cb42130cbc052189ba9c64691a12",
+      "changedPaths": 272
+    },
+    {
+      "number": 375,
+      "head": "5eca82fb13bcf0f2bbf3bb5b6deaa47fa1f9b792",
+      "changedPaths": 374
+    },
+    {
+      "number": 373,
+      "head": "3f17247865a6a83e5ee9e88cf3d0fa3060b59a53",
+      "changedPaths": 61
+    },
+    {
+      "number": 371,
+      "head": "75b956cbd4c45f75beee606fb53257494adc1ca0",
+      "changedPaths": 208
+    },
+    {
+      "number": 370,
+      "head": "bfd6dcbca24567219ec24979481f3da8e0137984",
+      "changedPaths": 66
+    },
+    {
+      "number": 368,
+      "head": "1388d5db6f845b8d907f0e4090e4fd727aea8926",
+      "changedPaths": 2101
+    },
+    {
+      "number": 367,
+      "head": "8e4440cac46086f73390f8774c40853beb9a6ddd",
+      "changedPaths": 136
+    },
+    {
+      "number": 362,
+      "head": "e2b23122e1a41f52f61719fdd31a6daf338b97e1",
+      "changedPaths": 9
+    },
+    {
+      "number": 360,
+      "head": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2",
+      "changedPaths": 1269
+    },
+    {
+      "number": 330,
+      "head": "bf73bdf66dcc4e1e169a0153596c43efdc203a0a",
+      "changedPaths": 15
+    },
+    {
+      "number": 329,
+      "head": "a5effd7f86249a77b7c82606130e5db6f89aae45",
+      "changedPaths": 62
+    },
+    {
+      "number": 328,
+      "head": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+      "changedPaths": 73
+    }
+  ],
+  "scaleSourcePrProbes": [
+    {
+      "number": 560,
+      "head": "fb17b18d5804bce4a550dc53b1d33c3a069dbed6",
+      "method": "GitHub full diff",
+      "sha256": "0750d7b64750b7da7cf08826dc9532fed17a74b97755fed88b55f962ffd9fb31",
+      "bytes": 414959,
+      "matches": []
+    },
+    {
+      "number": 559,
+      "head": "87fbe2eefd34aa79fc8983d8c5a2c726b667aa25",
+      "method": "GitHub full diff",
+      "sha256": "92922654866320ab787ef61af4c4d7d3fe9bdaf479e848c2c4cfa4aacdcddeea",
+      "bytes": 179471,
+      "matches": []
+    },
+    {
+      "number": 558,
+      "head": "5e57ff4fa40d0b462bc9aee69facd3dd6c8b8b9d",
+      "method": "GitHub full diff",
+      "sha256": "13c1a6647d196fa7cfa87ebe5c3de8f63cf2164d0120cd91b5ddefb3c5ddc37b",
+      "bytes": 118343,
+      "matches": []
+    },
+    {
+      "number": 555,
+      "head": "d9511b6478a04ed21a6f6b9dcab870095bfcf58b",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "1928bd3e124fbfd23130722f0862e15234e0cf0a425a55aa194aa723df3e8a37",
+      "bytes": 346875,
+      "matches": []
+    },
+    {
+      "number": 554,
+      "head": "84b802dd591ef623e615194552c800e2f7b78862",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "cac054c21fed761e6a074b33c7a0749eee99fb415de0714c9525f01e6b1ec4a4",
+      "bytes": 173088,
+      "matches": []
+    },
+    {
+      "number": 553,
+      "head": "6162cda4b880b3c89b3d712d6c316fb9ee108ed7",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "d66d07776b69c3201c8d14e461cd45377e540e4ef13ad7caf56188cf1ad7237f",
+      "bytes": 202763,
+      "matches": []
+    },
+    {
+      "number": 552,
+      "head": "51569d88e26ef7d9c58ef93cca206c451159673d",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "ef0a1ffb550e43808c1678d63960355019bf2ab29341149f344443bc342ed8a5",
+      "bytes": 96929,
+      "matches": []
+    },
+    {
+      "number": 550,
+      "head": "21162f30b500011c6b3e9f296fad0d0545b58755",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "eb18caf72f540ce15baa0fe9d5f4e614375bec51d80a705a6d52f659a616bdee",
+      "bytes": 120513,
+      "matches": []
+    },
+    {
+      "number": 548,
+      "head": "7820b248cc8aae4a97f583c761b462eae2f9a54a",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "0eaad0109e03d80c1c2a691016efb2033ff9f5c006f56c9f3947acdeb154cb0c",
+      "bytes": 85489,
+      "matches": []
+    },
+    {
+      "number": 547,
+      "head": "a8ddd88f7256bf9534603fc825dc71ef326ebfa8",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "a14bc9076f18df669902051575cf6a2107195f61415670276fe92be3fa1043fa",
+      "bytes": 88032,
+      "matches": []
+    },
+    {
+      "number": 546,
+      "head": "64cbe6a78fc42292f80d780200bd8882034d7bcb",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "fd533da56bba85ad22fe299a3e2ff4c74272312a3ff921b3186aad8bfb74a647",
+      "bytes": 74568,
+      "matches": []
+    },
+    {
+      "number": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "4cdd1aba5b754b9eb709509a3b8b6b689660d3ab4ff202575cdb6202cfc1779d",
+      "bytes": 196143,
+      "matches": []
+    },
+    {
+      "number": 544,
+      "head": "f05c29a5f0843ede8bc8d450be7708d5c1fc4de1",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "0623131de1e0b7779ddbffe7ff4ca325a906a7d7dcfe38b632a4e41ddbacf01a",
+      "bytes": 128090,
+      "matches": []
+    },
+    {
+      "number": 543,
+      "head": "12acadbed9944c2d04dfaadb44d24682c2aa5078",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "0ad42821ba44927378ed73f0d058cc80962d0216716be5967be33f761cb1a87c",
+      "bytes": 461076,
+      "matches": []
+    },
+    {
+      "number": 542,
+      "head": "2426aee58647236dd6084845ea834f23a95c6b17",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "cd4a63ae9e2a48ee8a0afd5b31e86be3c28ae80c50c88c178210e3c4b43cd2e3",
+      "bytes": 256529,
+      "matches": []
+    },
+    {
+      "number": 541,
+      "head": "e70c178a2a939fb6e495336f017908eec00a149e",
+      "method": "GitHub full diff",
+      "sha256": "dad6b689c6ac0ed926aabd91eac47a7c24e7cd8f924548e8e0be89ef11df6a21",
+      "bytes": 164897,
+      "matches": []
+    },
+    {
+      "number": 540,
+      "head": "9e7c43efc02e60bd6704b8974f77dfb74d54e9f6",
+      "method": "GitHub full diff",
+      "sha256": "5867061ee1bff8bb196dd36650488e5f17064d0279aeed65ac92600c646be8b0",
+      "bytes": 134185,
+      "matches": []
+    },
+    {
+      "number": 413,
+      "head": "0f8057fa75bcb89215275f6ad7695f189fcf0e65",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "0515de034d2ed082f983f9ffe85ecc982c86f157dd33b299410033174d1a0c4a",
+      "bytes": 91338,
+      "matches": []
+    },
+    {
+      "number": 383,
+      "head": "5454a7d7630a4ccb7125d0c621fa10317dc6924f",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "5720b0111532a2e57888357e489c1c362517b6106c1ebf2cf324dc618f6e2bdb",
+      "bytes": 67570,
+      "matches": []
+    },
+    {
+      "number": 379,
+      "head": "333200ade0c6cb42130cbc052189ba9c64691a12",
+      "method": "exact-head changed source paths (GitHub diff-size limit retained)",
+      "pathsChecked": 99,
+      "matches": []
+    },
+    {
+      "number": 375,
+      "head": "5eca82fb13bcf0f2bbf3bb5b6deaa47fa1f9b792",
+      "method": "exact-head changed source paths (GitHub diff-size limit retained)",
+      "pathsChecked": 75,
+      "matches": []
+    },
+    {
+      "number": 373,
+      "head": "3f17247865a6a83e5ee9e88cf3d0fa3060b59a53",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "77cdc1b9328e45d231dcb4e1fe4946b43582b0a562dd76878202510100c68e3b",
+      "bytes": 341363,
+      "matches": []
+    },
+    {
+      "number": 371,
+      "head": "75b956cbd4c45f75beee606fb53257494adc1ca0",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "290c9c4431e28a55045e8baa0f594a3197a25697f6a7a8388dff802e7e0f9f56",
+      "bytes": 730351,
+      "matches": []
+    },
+    {
+      "number": 370,
+      "head": "bfd6dcbca24567219ec24979481f3da8e0137984",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "cab5ac3d72a8a15de5dc5dcb86a801eb3c60ccdfb974a600f40b20f553439b34",
+      "bytes": 305371,
+      "matches": []
+    },
+    {
+      "number": 367,
+      "head": "8e4440cac46086f73390f8774c40853beb9a6ddd",
+      "method": "existing exact-head raw diff re-probed for RPQ",
+      "sha256": "4dbed5d5505ca330efb079e11addcaf57e89640cd8ead78d8a783a6da38a7c8c",
+      "bytes": 865289,
+      "matches": []
+    },
+    {
+      "number": 362,
+      "head": "e2b23122e1a41f52f61719fdd31a6daf338b97e1",
+      "method": "GitHub full diff",
+      "sha256": "4336bd763f5ab3dcf6578dad9327e2fe87c8b4950e7f1b9129e933dab9569942",
+      "bytes": 176883,
+      "matches": []
+    },
+    {
+      "number": 328,
+      "head": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+      "method": "GitHub full diff",
+      "sha256": "56893c79ae83c06be25a9057dffa762a2078e4905a68b660a0af3917e37b0cfc",
+      "bytes": 744142,
+      "matches": []
+    }
+  ],
+  "unverified": [
+    "Production database",
+    "Administrator-created tools",
+    "Exhaustive semantic equivalence beyond source/author/version/item probes"
+  ],
+  "note": "Existing school reflection titles alone do not imply same-sourceRPQ. Exact source and shared10/30 items checked; short10 directly reuses component instead of duplicate native package.",
+  "finalMainRefresh": {
+    "base": "25d812d1f024bcc375b738235dd400654c679ff4",
+    "scaleSourceTreeUnchanged": true,
+    "note": "Main refresh adds independent situational declarations and docs, not scale identities; immutable source/author/item probes reused. Production/custom duplicate inventory still unknown."
+  }
+}

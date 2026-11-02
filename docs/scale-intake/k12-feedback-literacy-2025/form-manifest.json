@@ -1,0 +1,339 @@
+{
+  "schemaVersion": 1,
+  "artifactPurpose": "Content preparation manifest; not a new runtime/import engine",
+  "motherTag": "family:k12_tfl2025",
+  "forms": [
+    {
+      "key": "k12_tfl2025_knowledge_en_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "name": "中国K12反馈素养｜反馈知识无分反思｜教师自评｜2025英文公开题文",
+      "locale": "en",
+      "sourceItemCodes": [
+        "K1",
+        "K2",
+        "K3",
+        "K4",
+        "K5",
+        "K6",
+        "K7"
+      ],
+      "definitionFile": "k12_tfl2025_knowledge_en_teacher_self_form.native.json",
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:en",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "text:published_en"
+      ],
+      "templateKind": "FORM_TEMPLATE",
+      "reportMode": "COLLECTION_ONLY",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "instruction": "These statements come from a teacher feedback-giving literacy study. For each statement, you may describe an example, a learning need or a question. You can leave any statement unanswered or decline to answer. No ratings, scores, levels or automated judgements are produced. This is a project reflection form, not the original validated questionnaire; the original teacher response anchors and scoring instructions have not been verified. Your perspective does not establish the feedback students actually received. Do not include student names or identifiable work. © The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "source": {
+        "title": "K-12 teacher feedback-giving literacy: published final 30 English items, Tables 2–3",
+        "citation": "Kang, C., Huang, J., Liu, Y., & Yin, H. (2025). Development and validation of a generic self-assessment scale for K-12 teachers as feedback givers: Insights from item response theory and factor analysis. Humanities and Social Sciences Communications, 12, 616. https://doi.org/10.1057/s41599-025-04927-4.",
+        "url": "https://www.nature.com/articles/s41599-025-04927-4",
+        "publicationYear": 2025
+      },
+      "rights": "© The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "status": "PREPARED_FOR_EXISTING_FORM_IMPORT"
+    },
+    {
+      "key": "k12_tfl2025_skills_en_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "name": "中国K12反馈素养｜反馈技能无分反思｜教师自评｜2025英文公开题文",
+      "locale": "en",
+      "sourceItemCodes": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5",
+        "S6",
+        "S7",
+        "S8"
+      ],
+      "definitionFile": "k12_tfl2025_skills_en_teacher_self_form.native.json",
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:en",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "text:published_en"
+      ],
+      "templateKind": "FORM_TEMPLATE",
+      "reportMode": "COLLECTION_ONLY",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "instruction": "These statements come from a teacher feedback-giving literacy study. For each statement, you may describe an example, a learning need or a question. You can leave any statement unanswered or decline to answer. No ratings, scores, levels or automated judgements are produced. This is a project reflection form, not the original validated questionnaire; the original teacher response anchors and scoring instructions have not been verified. Your perspective does not establish the feedback students actually received. Do not include student names or identifiable work. © The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "source": {
+        "title": "K-12 teacher feedback-giving literacy: published final 30 English items, Tables 2–3",
+        "citation": "Kang, C., Huang, J., Liu, Y., & Yin, H. (2025). Development and validation of a generic self-assessment scale for K-12 teachers as feedback givers: Insights from item response theory and factor analysis. Humanities and Social Sciences Communications, 12, 616. https://doi.org/10.1057/s41599-025-04927-4.",
+        "url": "https://www.nature.com/articles/s41599-025-04927-4",
+        "publicationYear": 2025
+      },
+      "rights": "© The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "status": "PREPARED_FOR_EXISTING_FORM_IMPORT"
+    },
+    {
+      "key": "k12_tfl2025_values_en_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "name": "中国K12反馈素养｜反馈价值无分反思｜教师自评｜2025英文公开题文",
+      "locale": "en",
+      "sourceItemCodes": [
+        "V1",
+        "V2",
+        "V3",
+        "V4",
+        "V5",
+        "V6",
+        "V7",
+        "V8"
+      ],
+      "definitionFile": "k12_tfl2025_values_en_teacher_self_form.native.json",
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:en",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "text:published_en"
+      ],
+      "templateKind": "FORM_TEMPLATE",
+      "reportMode": "COLLECTION_ONLY",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "instruction": "These statements come from a teacher feedback-giving literacy study. For each statement, you may describe an example, a learning need or a question. You can leave any statement unanswered or decline to answer. No ratings, scores, levels or automated judgements are produced. This is a project reflection form, not the original validated questionnaire; the original teacher response anchors and scoring instructions have not been verified. Your perspective does not establish the feedback students actually received. Do not include student names or identifiable work. © The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "source": {
+        "title": "K-12 teacher feedback-giving literacy: published final 30 English items, Tables 2–3",
+        "citation": "Kang, C., Huang, J., Liu, Y., & Yin, H. (2025). Development and validation of a generic self-assessment scale for K-12 teachers as feedback givers: Insights from item response theory and factor analysis. Humanities and Social Sciences Communications, 12, 616. https://doi.org/10.1057/s41599-025-04927-4.",
+        "url": "https://www.nature.com/articles/s41599-025-04927-4",
+        "publicationYear": 2025
+      },
+      "rights": "© The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "status": "PREPARED_FOR_EXISTING_FORM_IMPORT"
+    },
+    {
+      "key": "k12_tfl2025_actionability_en_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "name": "中国K12反馈素养｜反馈行动性无分反思｜教师自评｜2025英文公开题文",
+      "locale": "en",
+      "sourceItemCodes": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7"
+      ],
+      "definitionFile": "k12_tfl2025_actionability_en_teacher_self_form.native.json",
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:en",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "text:published_en"
+      ],
+      "templateKind": "FORM_TEMPLATE",
+      "reportMode": "COLLECTION_ONLY",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "instruction": "These statements come from a teacher feedback-giving literacy study. For each statement, you may describe an example, a learning need or a question. You can leave any statement unanswered or decline to answer. No ratings, scores, levels or automated judgements are produced. This is a project reflection form, not the original validated questionnaire; the original teacher response anchors and scoring instructions have not been verified. Your perspective does not establish the feedback students actually received. Do not include student names or identifiable work. © The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "source": {
+        "title": "K-12 teacher feedback-giving literacy: published final 30 English items, Tables 2–3",
+        "citation": "Kang, C., Huang, J., Liu, Y., & Yin, H. (2025). Development and validation of a generic self-assessment scale for K-12 teachers as feedback givers: Insights from item response theory and factor analysis. Humanities and Social Sciences Communications, 12, 616. https://doi.org/10.1057/s41599-025-04927-4.",
+        "url": "https://www.nature.com/articles/s41599-025-04927-4",
+        "publicationYear": 2025
+      },
+      "rights": "© The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "status": "PREPARED_FOR_EXISTING_FORM_IMPORT"
+    },
+    {
+      "key": "k12_tfl2025_knowledge_zh_cn_working_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "name": "中国K12反馈素养｜反馈知识无分反思｜教师自评｜项目中文工作译文",
+      "locale": "zh-CN",
+      "sourceItemCodes": [
+        "K1",
+        "K2",
+        "K3",
+        "K4",
+        "K5",
+        "K6",
+        "K7"
+      ],
+      "definitionFile": "k12_tfl2025_knowledge_zh_cn_working_teacher_self_form.native.json",
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:zh-CN",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "translation:working"
+      ],
+      "templateKind": "FORM_TEMPLATE",
+      "reportMode": "COLLECTION_ONLY",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "instruction": "下列陈述来自教师反馈素养研究，中文为项目工作译文，不是原研究正式中文版。请任选陈述，描述一个实例、学习需要或疑问；可以留空或拒答。不填等级、不计分、不生成能力评语。这是项目改编的无分反思表单，原教师作答选项和计分说明尚未核得。自我认识不能证明学生实际收到的反馈质量。请勿填写学生姓名或可识别的作业信息。 来源：Kang、Huang、Liu、Yin（2025），DOI 10.1057/s41599-025-04927-4，表2–3；原作者CC BY 4.0 https://creativecommons.org/licenses/by/4.0/。改动：拆分、可选文字反思、项目指导语和中文工作翻译；不表示原作者认可。",
+      "source": {
+        "title": "K-12 teacher feedback-giving literacy: published final 30 English items, Tables 2–3",
+        "citation": "Kang, C., Huang, J., Liu, Y., & Yin, H. (2025). Development and validation of a generic self-assessment scale for K-12 teachers as feedback givers: Insights from item response theory and factor analysis. Humanities and Social Sciences Communications, 12, 616. https://doi.org/10.1057/s41599-025-04927-4.",
+        "url": "https://www.nature.com/articles/s41599-025-04927-4",
+        "publicationYear": 2025
+      },
+      "rights": "© The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "status": "PREPARED_FOR_EXISTING_FORM_IMPORT"
+    },
+    {
+      "key": "k12_tfl2025_skills_zh_cn_working_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "name": "中国K12反馈素养｜反馈技能无分反思｜教师自评｜项目中文工作译文",
+      "locale": "zh-CN",
+      "sourceItemCodes": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5",
+        "S6",
+        "S7",
+        "S8"
+      ],
+      "definitionFile": "k12_tfl2025_skills_zh_cn_working_teacher_self_form.native.json",
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:zh-CN",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "translation:working"
+      ],
+      "templateKind": "FORM_TEMPLATE",
+      "reportMode": "COLLECTION_ONLY",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "instruction": "下列陈述来自教师反馈素养研究，中文为项目工作译文，不是原研究正式中文版。请任选陈述，描述一个实例、学习需要或疑问；可以留空或拒答。不填等级、不计分、不生成能力评语。这是项目改编的无分反思表单，原教师作答选项和计分说明尚未核得。自我认识不能证明学生实际收到的反馈质量。请勿填写学生姓名或可识别的作业信息。 来源：Kang、Huang、Liu、Yin（2025），DOI 10.1057/s41599-025-04927-4，表2–3；原作者CC BY 4.0 https://creativecommons.org/licenses/by/4.0/。改动：拆分、可选文字反思、项目指导语和中文工作翻译；不表示原作者认可。",
+      "source": {
+        "title": "K-12 teacher feedback-giving literacy: published final 30 English items, Tables 2–3",
+        "citation": "Kang, C., Huang, J., Liu, Y., & Yin, H. (2025). Development and validation of a generic self-assessment scale for K-12 teachers as feedback givers: Insights from item response theory and factor analysis. Humanities and Social Sciences Communications, 12, 616. https://doi.org/10.1057/s41599-025-04927-4.",
+        "url": "https://www.nature.com/articles/s41599-025-04927-4",
+        "publicationYear": 2025
+      },
+      "rights": "© The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "status": "PREPARED_FOR_EXISTING_FORM_IMPORT"
+    },
+    {
+      "key": "k12_tfl2025_values_zh_cn_working_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "name": "中国K12反馈素养｜反馈价值无分反思｜教师自评｜项目中文工作译文",
+      "locale": "zh-CN",
+      "sourceItemCodes": [
+        "V1",
+        "V2",
+        "V3",
+        "V4",
+        "V5",
+        "V6",
+        "V7",
+        "V8"
+      ],
+      "definitionFile": "k12_tfl2025_values_zh_cn_working_teacher_self_form.native.json",
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:zh-CN",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "translation:working"
+      ],
+      "templateKind": "FORM_TEMPLATE",
+      "reportMode": "COLLECTION_ONLY",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "instruction": "下列陈述来自教师反馈素养研究，中文为项目工作译文，不是原研究正式中文版。请任选陈述，描述一个实例、学习需要或疑问；可以留空或拒答。不填等级、不计分、不生成能力评语。这是项目改编的无分反思表单，原教师作答选项和计分说明尚未核得。自我认识不能证明学生实际收到的反馈质量。请勿填写学生姓名或可识别的作业信息。 来源：Kang、Huang、Liu、Yin（2025），DOI 10.1057/s41599-025-04927-4，表2–3；原作者CC BY 4.0 https://creativecommons.org/licenses/by/4.0/。改动：拆分、可选文字反思、项目指导语和中文工作翻译；不表示原作者认可。",
+      "source": {
+        "title": "K-12 teacher feedback-giving literacy: published final 30 English items, Tables 2–3",
+        "citation": "Kang, C., Huang, J., Liu, Y., & Yin, H. (2025). Development and validation of a generic self-assessment scale for K-12 teachers as feedback givers: Insights from item response theory and factor analysis. Humanities and Social Sciences Communications, 12, 616. https://doi.org/10.1057/s41599-025-04927-4.",
+        "url": "https://www.nature.com/articles/s41599-025-04927-4",
+        "publicationYear": 2025
+      },
+      "rights": "© The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "status": "PREPARED_FOR_EXISTING_FORM_IMPORT"
+    },
+    {
+      "key": "k12_tfl2025_actionability_zh_cn_working_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "name": "中国K12反馈素养｜反馈行动性无分反思｜教师自评｜项目中文工作译文",
+      "locale": "zh-CN",
+      "sourceItemCodes": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7"
+      ],
+      "definitionFile": "k12_tfl2025_actionability_zh_cn_working_teacher_self_form.native.json",
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:zh-CN",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "translation:working"
+      ],
+      "templateKind": "FORM_TEMPLATE",
+      "reportMode": "COLLECTION_ONLY",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "instruction": "下列陈述来自教师反馈素养研究，中文为项目工作译文，不是原研究正式中文版。请任选陈述，描述一个实例、学习需要或疑问；可以留空或拒答。不填等级、不计分、不生成能力评语。这是项目改编的无分反思表单，原教师作答选项和计分说明尚未核得。自我认识不能证明学生实际收到的反馈质量。请勿填写学生姓名或可识别的作业信息。 来源：Kang、Huang、Liu、Yin（2025），DOI 10.1057/s41599-025-04927-4，表2–3；原作者CC BY 4.0 https://creativecommons.org/licenses/by/4.0/。改动：拆分、可选文字反思、项目指导语和中文工作翻译；不表示原作者认可。",
+      "source": {
+        "title": "K-12 teacher feedback-giving literacy: published final 30 English items, Tables 2–3",
+        "citation": "Kang, C., Huang, J., Liu, Y., & Yin, H. (2025). Development and validation of a generic self-assessment scale for K-12 teachers as feedback givers: Insights from item response theory and factor analysis. Humanities and Social Sciences Communications, 12, 616. https://doi.org/10.1057/s41599-025-04927-4.",
+        "url": "https://www.nature.com/articles/s41599-025-04927-4",
+        "publicationYear": 2025
+      },
+      "rights": "© The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "status": "PREPARED_FOR_EXISTING_FORM_IMPORT"
+    }
+  ]
+}

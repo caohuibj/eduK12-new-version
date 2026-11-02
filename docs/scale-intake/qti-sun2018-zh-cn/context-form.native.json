@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "qti_sun2018_context",
+      "title": "施测背景（选填、不计分）",
+      "description": "优先使用本次施测预置代号。不要填写真实姓名、生日或联系方式；不确定或不愿提供可跳过。",
+      "questions": [
+        {
+          "itemKey": "qti_context_grade",
+          "type": "SINGLE",
+          "prompt": "本次所在年级（选填）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "g7",
+              "label": "七年级"
+            },
+            {
+              "optionKey": "g8",
+              "label": "八年级"
+            },
+            {
+              "optionKey": "g9",
+              "label": "九年级"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_context_class",
+          "type": "SHORT_TEXT",
+          "prompt": "本次班级或课程代号（选填，不填真实姓名）",
+          "required": false,
+          "allowRefusal": true,
+          "maxLength": 40,
+          "options": [],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_context_teacher",
+          "type": "SHORT_TEXT",
+          "prompt": "本次被评教师代号（选填，不填真实姓名）",
+          "required": false,
+          "allowRefusal": true,
+          "maxLength": 40,
+          "options": [],
+          "rows": []
+        }
+      ]
+    }
+  ]
+}

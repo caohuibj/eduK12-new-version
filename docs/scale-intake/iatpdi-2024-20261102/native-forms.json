@@ -1,0 +1,982 @@
+{
+  "recordType": "native_form_api_arguments_and_source_handoff_not_new_runtime_schema",
+  "familyTag": "family:iatpdi",
+  "sourceUrl": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1445865/full",
+  "sourceLicense": "CC BY4.0; table1 newly added35 items authored by Dorji/Nima; excludes third-party Adlam C/D",
+  "sourceSha256": {
+    "article.pdf": "34978b8341fd372e0d7e8c50a527ff089059e1157b130bdf5b94fbdd0d71f428",
+    "article.xml": "5fb7da4d780c66686a1867d6cf85afeef90ccbc44435bbfd9760d6510369766e"
+  },
+  "model2": {
+    "count": 34,
+    "assessment": 7,
+    "content": 10,
+    "process": 10,
+    "product": 7,
+    "excludedSourceItem": 8,
+    "importantDistinction": "Authors recommend retaining item8 in discussion, so 34 is the fitted M2 model rather than an unqualified final questionnaire."
+  },
+  "resources": [
+    {
+      "instrumentKey": "iatpdi_2024_m2_assessment7_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceDomain": "Assessment",
+      "sourceItemIds": [
+        "B01",
+        "B02",
+        "B03",
+        "B04",
+        "B05",
+        "B06",
+        "B07"
+      ],
+      "sourceItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "sourceLocation": "Table1, Model2 retained rows",
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "tags": [
+        "family:iatpdi",
+        "role:teacher_self",
+        "level:k12",
+        "lang:en",
+        "version:2024-m2",
+        "use:reflection",
+        "state:research",
+        "license:ccby4"
+      ],
+      "create": {
+        "name": "IATPDI｜评价（无计分）｜教师自评｜2024M2英文",
+        "description": "Original IATPDI 2024 English item content, unscored Form. Dorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.",
+        "instruction": "EduK12 project administration instructions: Reflect on your teaching practices in your own teaching context; no additional recall period has been imposed. You may leave a question unanswered. This is an unscored record of self-reported practices, not a judgement of teaching quality. Original statements and frequency anchors are reproduced from the article. Some original statements rely on learning styles or multiple intelligences; they are preserved as source wording, not endorsed as evidence-based recommendations. Do not label learners by fixed types or assume that matching teaching to a learning style improves learning.\n\nDorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.\nhttps://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1445865/full\nCC BY 4.0, ©2024 Dorji and Nima. Changes: item grouping, unscored Form format and project instructions; no translation of the English original items."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Project administration prompt: How often do you use the following practices?",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Project administration prompt: How often do you use the following practices?",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "seldom (infrequently)"
+            },
+            {
+              "optionKey": "r3",
+              "label": "sometimes (on certain occasions or in certain circumstances)"
+            },
+            {
+              "optionKey": "r4",
+              "label": "often (frequently or many times)"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "b01",
+              "label": "Before beginning a unit, I assess student’s readiness level (student’s prior knowledge, understanding, and skill related to a particular sequence of learning which vary from lesson to lesson, skill to skill, and concept to concept) and plan instruction/activity accordingly."
+            },
+            {
+              "rowKey": "b02",
+              "label": "To assess each student’s readiness level, I pre-test them, question them about their background knowledge, use KWL charts (charts that ask students to identify what they already know, what they want to know, and what they have learned about a topic), concept inventories (multiple choice or short answer tests), concept map activities, etc."
+            },
+            {
+              "rowKey": "b03",
+              "label": "Before beginning a lesson or activity, I assess student’s interest (child’s affinity, curiosity, or passion for a particular topic or skill) and deliver instruction accordingly."
+            },
+            {
+              "rowKey": "b04",
+              "label": "To identify student’s areas of interest, I conduct student-teacher conferences, use personally developed interest inventories or interest inventories that are available in educational resources and online."
+            },
+            {
+              "rowKey": "b05",
+              "label": "Before beginning a lesson, I assess student’s learning profiles (student’s preferred method of learning, which is influenced by learning style, intillegence preferences, gender, or culture) and plan instruction/activity accordingly."
+            },
+            {
+              "rowKey": "b06",
+              "label": "To assess student’s learning style preferences, I use learning style inventories like Kolb’s Learning Style Inventory, Fleming’s VARK Learning Style Questionnarie, Jackson’s Learning Styles Profiler, multiple intelligences test (based on Howard Gardner’s multiple intelligences model), and many others which are readily available in educational resources and online."
+            },
+            {
+              "rowKey": "b07",
+              "label": "I assess students often (i.e., their readiness level and interest) so that instruction may be modified to keep students challenged just beyond their level of comfort."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "iatpdi_2024_m2_assessment7_teacher_self_en",
+            "title": "IATPDI｜评价（无计分）｜教师自评｜2024M2英文",
+            "description": "EduK12 project administration instructions: Reflect on your teaching practices in your own teaching context; no additional recall period has been imposed. You may leave a question unanswered. This is an unscored record of self-reported practices, not a judgement of teaching quality. Original statements and frequency anchors are reproduced from the article. Some original statements rely on learning styles or multiple intelligences; they are preserved as source wording, not endorsed as evidence-based recommendations. Do not label learners by fixed types or assume that matching teaching to a learning style improves learning.\n\nDorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.\nhttps://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1445865/full\nCC BY 4.0, ©2024 Dorji and Nima. Changes: item grouping, unscored Form format and project instructions; no translation of the English original items.",
+            "questions": [
+              {
+                "itemKey": "iatpdi_2024_m2_assessment7_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Project administration prompt: How often do you use the following practices?",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "seldom (infrequently)"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "sometimes (on certain occasions or in certain circumstances)"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "often (frequently or many times)"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "b01",
+                    "label": "Before beginning a unit, I assess student’s readiness level (student’s prior knowledge, understanding, and skill related to a particular sequence of learning which vary from lesson to lesson, skill to skill, and concept to concept) and plan instruction/activity accordingly."
+                  },
+                  {
+                    "rowKey": "b02",
+                    "label": "To assess each student’s readiness level, I pre-test them, question them about their background knowledge, use KWL charts (charts that ask students to identify what they already know, what they want to know, and what they have learned about a topic), concept inventories (multiple choice or short answer tests), concept map activities, etc."
+                  },
+                  {
+                    "rowKey": "b03",
+                    "label": "Before beginning a lesson or activity, I assess student’s interest (child’s affinity, curiosity, or passion for a particular topic or skill) and deliver instruction accordingly."
+                  },
+                  {
+                    "rowKey": "b04",
+                    "label": "To identify student’s areas of interest, I conduct student-teacher conferences, use personally developed interest inventories or interest inventories that are available in educational resources and online."
+                  },
+                  {
+                    "rowKey": "b05",
+                    "label": "Before beginning a lesson, I assess student’s learning profiles (student’s preferred method of learning, which is influenced by learning style, intillegence preferences, gender, or culture) and plan instruction/activity accordingly."
+                  },
+                  {
+                    "rowKey": "b06",
+                    "label": "To assess student’s learning style preferences, I use learning style inventories like Kolb’s Learning Style Inventory, Fleming’s VARK Learning Style Questionnarie, Jackson’s Learning Styles Profiler, multiple intelligences test (based on Howard Gardner’s multiple intelligences model), and many others which are readily available in educational resources and online."
+                  },
+                  {
+                    "rowKey": "b07",
+                    "label": "I assess students often (i.e., their readiness level and interest) so that instruction may be modified to keep students challenged just beyond their level of comfort."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "iatpdi_2024_m2_content10_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceDomain": "Content",
+      "sourceItemIds": [
+        "B09",
+        "B10",
+        "B11",
+        "B12",
+        "B13",
+        "B14",
+        "B15",
+        "B16",
+        "B17",
+        "B18"
+      ],
+      "sourceItemNumbers": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "sourceLocation": "Table1, Model2 retained rows",
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "tags": [
+        "family:iatpdi",
+        "role:teacher_self",
+        "level:k12",
+        "lang:en",
+        "version:2024-m2",
+        "use:reflection",
+        "state:research",
+        "license:ccby4"
+      ],
+      "create": {
+        "name": "IATPDI｜内容（无计分）｜教师自评｜2024M2英文",
+        "description": "Original IATPDI 2024 English item content, unscored Form. Dorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.",
+        "instruction": "EduK12 project administration instructions: Reflect on your teaching practices in your own teaching context; no additional recall period has been imposed. You may leave a question unanswered. This is an unscored record of self-reported practices, not a judgement of teaching quality. Original statements and frequency anchors are reproduced from the article. Some original statements rely on learning styles or multiple intelligences; they are preserved as source wording, not endorsed as evidence-based recommendations. Do not label learners by fixed types or assume that matching teaching to a learning style improves learning.\n\nDorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.\nhttps://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1445865/full\nCC BY 4.0, ©2024 Dorji and Nima. Changes: item grouping, unscored Form format and project instructions; no translation of the English original items."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Project administration prompt: How often do you use the following practices?",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Project administration prompt: How often do you use the following practices?",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "seldom (infrequently)"
+            },
+            {
+              "optionKey": "r3",
+              "label": "sometimes (on certain occasions or in certain circumstances)"
+            },
+            {
+              "optionKey": "r4",
+              "label": "often (frequently or many times)"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "b09",
+              "label": "I tier content based on students’ abilities (When teachers tier content, all students complete the same type of activity, but the content varies in difficulty)."
+            },
+            {
+              "rowKey": "b10",
+              "label": "I use variety of materials related to the content (e.g., internet resources, magazines, newspapers, audio books, videos, etc.) in addition to the standard grade-level textbooks, to let students access the information in the way that works for them."
+            },
+            {
+              "rowKey": "b11",
+              "label": "I present concept through both part-to-whole (starting with the smallest part of something and building up to teaching a more complex system) and whole-to-part approaches to convey key concepts to varied students."
+            },
+            {
+              "rowKey": "b12",
+              "label": "I provide digests of key ideas, highlighted print materials, or text materials at varied reading levels of complexity as a means to help them develop understanding and knowledge of the topic or concept."
+            },
+            {
+              "rowKey": "b13",
+              "label": "I present ideas through auditory, visual, and kinesthetic means (e.g., supplement oral presentations with visual demonstrations, computer simulations/programs, and videos; use graphic organizers, diagrams, and charts, etc.)."
+            },
+            {
+              "rowKey": "b14",
+              "label": "I use several instructional formats (e.g., whole class, small groups, pairs, one-on-one teacher directed group) to teach content."
+            },
+            {
+              "rowKey": "b15",
+              "label": "I meet with small groups to re-teach an idea or skill for struggling students, or to extend the thinking or skills of advanced students."
+            },
+            {
+              "rowKey": "b16",
+              "label": "I reteach students who need another demonstration, or exempt students who already demonstrate mastery from sitting through a re-teaching session."
+            },
+            {
+              "rowKey": "b17",
+              "label": "I use manipulatives and models (tangible objects that can help students better understand abstract concepts) with some, but not all, students to assist them understand a new idea."
+            },
+            {
+              "rowKey": "b18",
+              "label": "To differentiate instruction for advanced students who have already mastered certain concept or skills, I practice curriculum compacting (a process that involves pre-assessing students before a unit of study and then eliminating content in areas of mastery)."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "iatpdi_2024_m2_content10_teacher_self_en",
+            "title": "IATPDI｜内容（无计分）｜教师自评｜2024M2英文",
+            "description": "EduK12 project administration instructions: Reflect on your teaching practices in your own teaching context; no additional recall period has been imposed. You may leave a question unanswered. This is an unscored record of self-reported practices, not a judgement of teaching quality. Original statements and frequency anchors are reproduced from the article. Some original statements rely on learning styles or multiple intelligences; they are preserved as source wording, not endorsed as evidence-based recommendations. Do not label learners by fixed types or assume that matching teaching to a learning style improves learning.\n\nDorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.\nhttps://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1445865/full\nCC BY 4.0, ©2024 Dorji and Nima. Changes: item grouping, unscored Form format and project instructions; no translation of the English original items.",
+            "questions": [
+              {
+                "itemKey": "iatpdi_2024_m2_content10_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Project administration prompt: How often do you use the following practices?",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "seldom (infrequently)"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "sometimes (on certain occasions or in certain circumstances)"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "often (frequently or many times)"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "b09",
+                    "label": "I tier content based on students’ abilities (When teachers tier content, all students complete the same type of activity, but the content varies in difficulty)."
+                  },
+                  {
+                    "rowKey": "b10",
+                    "label": "I use variety of materials related to the content (e.g., internet resources, magazines, newspapers, audio books, videos, etc.) in addition to the standard grade-level textbooks, to let students access the information in the way that works for them."
+                  },
+                  {
+                    "rowKey": "b11",
+                    "label": "I present concept through both part-to-whole (starting with the smallest part of something and building up to teaching a more complex system) and whole-to-part approaches to convey key concepts to varied students."
+                  },
+                  {
+                    "rowKey": "b12",
+                    "label": "I provide digests of key ideas, highlighted print materials, or text materials at varied reading levels of complexity as a means to help them develop understanding and knowledge of the topic or concept."
+                  },
+                  {
+                    "rowKey": "b13",
+                    "label": "I present ideas through auditory, visual, and kinesthetic means (e.g., supplement oral presentations with visual demonstrations, computer simulations/programs, and videos; use graphic organizers, diagrams, and charts, etc.)."
+                  },
+                  {
+                    "rowKey": "b14",
+                    "label": "I use several instructional formats (e.g., whole class, small groups, pairs, one-on-one teacher directed group) to teach content."
+                  },
+                  {
+                    "rowKey": "b15",
+                    "label": "I meet with small groups to re-teach an idea or skill for struggling students, or to extend the thinking or skills of advanced students."
+                  },
+                  {
+                    "rowKey": "b16",
+                    "label": "I reteach students who need another demonstration, or exempt students who already demonstrate mastery from sitting through a re-teaching session."
+                  },
+                  {
+                    "rowKey": "b17",
+                    "label": "I use manipulatives and models (tangible objects that can help students better understand abstract concepts) with some, but not all, students to assist them understand a new idea."
+                  },
+                  {
+                    "rowKey": "b18",
+                    "label": "To differentiate instruction for advanced students who have already mastered certain concept or skills, I practice curriculum compacting (a process that involves pre-assessing students before a unit of study and then eliminating content in areas of mastery)."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "iatpdi_2024_m2_process10_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceDomain": "Process",
+      "sourceItemIds": [
+        "B19",
+        "B20",
+        "B21",
+        "B22",
+        "B23",
+        "B24",
+        "B25",
+        "B26",
+        "B27",
+        "B28"
+      ],
+      "sourceItemNumbers": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ],
+      "sourceLocation": "Table1, Model2 retained rows",
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "tags": [
+        "family:iatpdi",
+        "role:teacher_self",
+        "level:k12",
+        "lang:en",
+        "version:2024-m2",
+        "use:reflection",
+        "state:research",
+        "license:ccby4"
+      ],
+      "create": {
+        "name": "IATPDI｜过程（无计分）｜教师自评｜2024M2英文",
+        "description": "Original IATPDI 2024 English item content, unscored Form. Dorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.",
+        "instruction": "EduK12 project administration instructions: Reflect on your teaching practices in your own teaching context; no additional recall period has been imposed. You may leave a question unanswered. This is an unscored record of self-reported practices, not a judgement of teaching quality. Original statements and frequency anchors are reproduced from the article. Some original statements rely on learning styles or multiple intelligences; they are preserved as source wording, not endorsed as evidence-based recommendations. Do not label learners by fixed types or assume that matching teaching to a learning style improves learning.\n\nDorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.\nhttps://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1445865/full\nCC BY 4.0, ©2024 Dorji and Nima. Changes: item grouping, unscored Form format and project instructions; no translation of the English original items."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Project administration prompt: How often do you use the following practices?",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Project administration prompt: How often do you use the following practices?",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "seldom (infrequently)"
+            },
+            {
+              "optionKey": "r3",
+              "label": "sometimes (on certain occasions or in certain circumstances)"
+            },
+            {
+              "optionKey": "r4",
+              "label": "often (frequently or many times)"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "b19",
+              "label": "I present content through various media and formats (visual, auditory, reading/writing, or kinesthetic means) to help students understand and assimilate facts, concepts, or skills being taught."
+            },
+            {
+              "rowKey": "b20",
+              "label": "As appropriate, I vary the format of lessons through a unit to maintain student engagement and interest (e.g., use simulation activities, cooperative learning, inquiry-based learning, class debates, interactive lecture-discussions, work in pairs, etc.)."
+            },
+            {
+              "rowKey": "b21",
+              "label": "I use several instructional groups (e.g., whole class, small groups, pairs, one-on-one teacher directed group, groups of similar readiness level, interest, learning profile, and/or achievement level)."
+            },
+            {
+              "rowKey": "b22",
+              "label": "I use a variety of instructional strategies (e.g., lectures, demonstrations, manupulatives, role plays, simulations, readings, jigsaws, cubing, think-pair-shares, tiered activities, centers, stations, peer-to-peer tutoring approaches, etc.)."
+            },
+            {
+              "rowKey": "b23",
+              "label": "In re-teaching, I use different instructional methods from the one I used to teach the concept or skill the first time."
+            },
+            {
+              "rowKey": "b24",
+              "label": "Whenever possible, I vary tasks for my students from simple to complex based on their abilities (e.g., break assignments/activities into smaller parts with structured directions at varied levels of specificity)."
+            },
+            {
+              "rowKey": "b25",
+              "label": "I use tiered activities where all students work with the same content, but proceed with different levels of support, challenge, or complexity."
+            },
+            {
+              "rowKey": "b26",
+              "label": "As appropriate, I vary the length of time a student may take to complete a task in order to provide additional support for a struggling student or to encourage an advanced student to pursue a topic in greater depth."
+            },
+            {
+              "rowKey": "b27",
+              "label": "As appropriate, I use models and manupulatives with some, but not all, students to assist them understand a new idea."
+            },
+            {
+              "rowKey": "b28",
+              "label": "I provide various levels of scaffolding (variety of temporary instructional supports) to help students move successfully from one instructional level to the next, or help students gain higher levels of understanding and skill."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "iatpdi_2024_m2_process10_teacher_self_en",
+            "title": "IATPDI｜过程（无计分）｜教师自评｜2024M2英文",
+            "description": "EduK12 project administration instructions: Reflect on your teaching practices in your own teaching context; no additional recall period has been imposed. You may leave a question unanswered. This is an unscored record of self-reported practices, not a judgement of teaching quality. Original statements and frequency anchors are reproduced from the article. Some original statements rely on learning styles or multiple intelligences; they are preserved as source wording, not endorsed as evidence-based recommendations. Do not label learners by fixed types or assume that matching teaching to a learning style improves learning.\n\nDorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.\nhttps://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1445865/full\nCC BY 4.0, ©2024 Dorji and Nima. Changes: item grouping, unscored Form format and project instructions; no translation of the English original items.",
+            "questions": [
+              {
+                "itemKey": "iatpdi_2024_m2_process10_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Project administration prompt: How often do you use the following practices?",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "seldom (infrequently)"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "sometimes (on certain occasions or in certain circumstances)"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "often (frequently or many times)"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "b19",
+                    "label": "I present content through various media and formats (visual, auditory, reading/writing, or kinesthetic means) to help students understand and assimilate facts, concepts, or skills being taught."
+                  },
+                  {
+                    "rowKey": "b20",
+                    "label": "As appropriate, I vary the format of lessons through a unit to maintain student engagement and interest (e.g., use simulation activities, cooperative learning, inquiry-based learning, class debates, interactive lecture-discussions, work in pairs, etc.)."
+                  },
+                  {
+                    "rowKey": "b21",
+                    "label": "I use several instructional groups (e.g., whole class, small groups, pairs, one-on-one teacher directed group, groups of similar readiness level, interest, learning profile, and/or achievement level)."
+                  },
+                  {
+                    "rowKey": "b22",
+                    "label": "I use a variety of instructional strategies (e.g., lectures, demonstrations, manupulatives, role plays, simulations, readings, jigsaws, cubing, think-pair-shares, tiered activities, centers, stations, peer-to-peer tutoring approaches, etc.)."
+                  },
+                  {
+                    "rowKey": "b23",
+                    "label": "In re-teaching, I use different instructional methods from the one I used to teach the concept or skill the first time."
+                  },
+                  {
+                    "rowKey": "b24",
+                    "label": "Whenever possible, I vary tasks for my students from simple to complex based on their abilities (e.g., break assignments/activities into smaller parts with structured directions at varied levels of specificity)."
+                  },
+                  {
+                    "rowKey": "b25",
+                    "label": "I use tiered activities where all students work with the same content, but proceed with different levels of support, challenge, or complexity."
+                  },
+                  {
+                    "rowKey": "b26",
+                    "label": "As appropriate, I vary the length of time a student may take to complete a task in order to provide additional support for a struggling student or to encourage an advanced student to pursue a topic in greater depth."
+                  },
+                  {
+                    "rowKey": "b27",
+                    "label": "As appropriate, I use models and manupulatives with some, but not all, students to assist them understand a new idea."
+                  },
+                  {
+                    "rowKey": "b28",
+                    "label": "I provide various levels of scaffolding (variety of temporary instructional supports) to help students move successfully from one instructional level to the next, or help students gain higher levels of understanding and skill."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "iatpdi_2024_m2_product7_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceDomain": "Product",
+      "sourceItemIds": [
+        "B29",
+        "B30",
+        "B31",
+        "B32",
+        "B33",
+        "B34",
+        "B35"
+      ],
+      "sourceItemNumbers": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "sourceLocation": "Table1, Model2 retained rows",
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "tags": [
+        "family:iatpdi",
+        "role:teacher_self",
+        "level:k12",
+        "lang:en",
+        "version:2024-m2",
+        "use:reflection",
+        "state:research",
+        "license:ccby4"
+      ],
+      "create": {
+        "name": "IATPDI｜产出（无计分）｜教师自评｜2024M2英文",
+        "description": "Original IATPDI 2024 English item content, unscored Form. Dorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.",
+        "instruction": "EduK12 project administration instructions: Reflect on your teaching practices in your own teaching context; no additional recall period has been imposed. You may leave a question unanswered. This is an unscored record of self-reported practices, not a judgement of teaching quality. Original statements and frequency anchors are reproduced from the article. Some original statements rely on learning styles or multiple intelligences; they are preserved as source wording, not endorsed as evidence-based recommendations. Do not label learners by fixed types or assume that matching teaching to a learning style improves learning.\n\nDorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.\nhttps://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1445865/full\nCC BY 4.0, ©2024 Dorji and Nima. Changes: item grouping, unscored Form format and project instructions; no translation of the English original items."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Project administration prompt: How often do you use the following practices?",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Project administration prompt: How often do you use the following practices?",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "seldom (infrequently)"
+            },
+            {
+              "optionKey": "r3",
+              "label": "sometimes (on certain occasions or in certain circumstances)"
+            },
+            {
+              "optionKey": "r4",
+              "label": "often (frequently or many times)"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "b29",
+              "label": "As appropriate, besides giving choice in how they demonstrate their mastery of the learning objectives, I also give students a menu of product options (e.g., making model, scrapbook, comic strip, poster, video; writing essay, letter, portfolio, poem, short story, play, song, journal, report; or conduct debate, oral/PowerPoint presentation, etc.) which allow them to demonstrate mastery of their learning in a way they prefer."
+            },
+            {
+              "rowKey": "b30",
+              "label": "As appropriate, I offer differentiated assignments/projects (i.e., at varying degrees of difficulty based on pre-assessments) to demonstrate mastery of the same learning objectives."
+            },
+            {
+              "rowKey": "b31",
+              "label": "As appropriate, I encourage students to create their own product assignments that meet required expectations, besides menu of product options, to express what they have learned."
+            },
+            {
+              "rowKey": "b32",
+              "label": "As appropriate, I allow students to work alone, in pairs, or in small groups to complete their final product to demonstrate mastery of their learning."
+            },
+            {
+              "rowKey": "b33",
+              "label": "I use rubrics that match and extend students’ varied skill levels (Rubrics is a tool that clearly state the purpose and goal of the project, steps for completing the project, and expectations of the final product, and how the final product will be assessed)."
+            },
+            {
+              "rowKey": "b34",
+              "label": "I use a wide variety of assessments to evaluate students’ products on essential skills that are provided at different levels of complexity, abstractness, and open-endedness."
+            },
+            {
+              "rowKey": "b35",
+              "label": "My final product assignment work demands critical and creative thinking."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "iatpdi_2024_m2_product7_teacher_self_en",
+            "title": "IATPDI｜产出（无计分）｜教师自评｜2024M2英文",
+            "description": "EduK12 project administration instructions: Reflect on your teaching practices in your own teaching context; no additional recall period has been imposed. You may leave a question unanswered. This is an unscored record of self-reported practices, not a judgement of teaching quality. Original statements and frequency anchors are reproduced from the article. Some original statements rely on learning styles or multiple intelligences; they are preserved as source wording, not endorsed as evidence-based recommendations. Do not label learners by fixed types or assume that matching teaching to a learning style improves learning.\n\nDorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.\nhttps://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1445865/full\nCC BY 4.0, ©2024 Dorji and Nima. Changes: item grouping, unscored Form format and project instructions; no translation of the English original items.",
+            "questions": [
+              {
+                "itemKey": "iatpdi_2024_m2_product7_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Project administration prompt: How often do you use the following practices?",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "seldom (infrequently)"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "sometimes (on certain occasions or in certain circumstances)"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "often (frequently or many times)"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "b29",
+                    "label": "As appropriate, besides giving choice in how they demonstrate their mastery of the learning objectives, I also give students a menu of product options (e.g., making model, scrapbook, comic strip, poster, video; writing essay, letter, portfolio, poem, short story, play, song, journal, report; or conduct debate, oral/PowerPoint presentation, etc.) which allow them to demonstrate mastery of their learning in a way they prefer."
+                  },
+                  {
+                    "rowKey": "b30",
+                    "label": "As appropriate, I offer differentiated assignments/projects (i.e., at varying degrees of difficulty based on pre-assessments) to demonstrate mastery of the same learning objectives."
+                  },
+                  {
+                    "rowKey": "b31",
+                    "label": "As appropriate, I encourage students to create their own product assignments that meet required expectations, besides menu of product options, to express what they have learned."
+                  },
+                  {
+                    "rowKey": "b32",
+                    "label": "As appropriate, I allow students to work alone, in pairs, or in small groups to complete their final product to demonstrate mastery of their learning."
+                  },
+                  {
+                    "rowKey": "b33",
+                    "label": "I use rubrics that match and extend students’ varied skill levels (Rubrics is a tool that clearly state the purpose and goal of the project, steps for completing the project, and expectations of the final product, and how the final product will be assessed)."
+                  },
+                  {
+                    "rowKey": "b34",
+                    "label": "I use a wide variety of assessments to evaluate students’ products on essential skills that are provided at different levels of complexity, abstractness, and open-endedness."
+                  },
+                  {
+                    "rowKey": "b35",
+                    "label": "My final product assignment work demands critical and creative thinking."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "iatpdi_2024_summative_item8_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceDomain": null,
+      "sourceItemIds": [
+        "B08"
+      ],
+      "sourceItemNumbers": [
+        8
+      ],
+      "sourceLocation": "Table1 item8 / §4.2 removal / §5 retention recommendation",
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "tags": [
+        "family:iatpdi",
+        "role:teacher_self",
+        "level:k12",
+        "lang:en",
+        "version:2024-extra",
+        "use:reflection",
+        "state:research",
+        "license:ccby4"
+      ],
+      "create": {
+        "name": "IATPDI｜M2删除但作者建议保留的第8项（无计分）｜教师自评｜2024补充英文",
+        "description": "Original IATPDI 2024 English item content, unscored Form. Dorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.",
+        "instruction": "EduK12 project administration instructions: Reflect on your teaching practices in your own teaching context; no additional recall period has been imposed. You may leave a question unanswered. This is an unscored record of self-reported practices, not a judgement of teaching quality. Original statements and frequency anchors are reproduced from the article. Some original statements rely on learning styles or multiple intelligences; they are preserved as source wording, not endorsed as evidence-based recommendations. Do not label learners by fixed types or assume that matching teaching to a learning style improves learning.\n\nDorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.\nhttps://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1445865/full\nCC BY 4.0, ©2024 Dorji and Nima. Changes: item grouping, unscored Form format and project instructions; no translation of the English original items.\n\nThis additional item was excluded from the fitted 34-item M2 model; the authors nevertheless recommend retaining it. It is not included in the M2 four-group combination."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Project administration prompt: How often do you use the following practices?",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Project administration prompt: How often do you use the following practices?",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "seldom (infrequently)"
+            },
+            {
+              "optionKey": "r3",
+              "label": "sometimes (on certain occasions or in certain circumstances)"
+            },
+            {
+              "optionKey": "r4",
+              "label": "often (frequently or many times)"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "b08",
+              "label": "I administer summative assessment at the end of unit of study to determine students’ knowledge acquisition and measure the effectiveness of differentiated instruction."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "iatpdi_2024_summative_item8_teacher_self_en",
+            "title": "IATPDI｜M2删除但作者建议保留的第8项（无计分）｜教师自评｜2024补充英文",
+            "description": "EduK12 project administration instructions: Reflect on your teaching practices in your own teaching context; no additional recall period has been imposed. You may leave a question unanswered. This is an unscored record of self-reported practices, not a judgement of teaching quality. Original statements and frequency anchors are reproduced from the article. Some original statements rely on learning styles or multiple intelligences; they are preserved as source wording, not endorsed as evidence-based recommendations. Do not label learners by fixed types or assume that matching teaching to a learning style improves learning.\n\nDorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.\nhttps://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1445865/full\nCC BY 4.0, ©2024 Dorji and Nima. Changes: item grouping, unscored Form format and project instructions; no translation of the English original items.",
+            "questions": [
+              {
+                "itemKey": "iatpdi_2024_summative_item8_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Project administration prompt: How often do you use the following practices?",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "seldom (infrequently)"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "sometimes (on certain occasions or in certain circumstances)"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "often (frequently or many times)"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "b08",
+                    "label": "I administer summative assessment at the end of unit of study to determine students’ knowledge acquisition and measure the effectiveness of differentiated instruction."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "iatpdi_2024_qualitative_reflection_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceDomain": null,
+      "sourceItemIds": [
+        "discussion_qualitative_prompt"
+      ],
+      "sourceItemNumbers": [],
+      "sourceLocation": "§5 Discussion, unnumbered open-ended question",
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "tags": [
+        "family:iatpdi",
+        "role:teacher_self",
+        "level:k12",
+        "lang:en",
+        "version:2024-extra",
+        "use:reflection",
+        "state:research",
+        "license:ccby4"
+      ],
+      "create": {
+        "name": "IATPDI｜原文开放反思（无计分）｜教师自评｜2024补充英文",
+        "description": "Original IATPDI 2024 English item content, unscored Form. Dorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.",
+        "instruction": "EduK12 project administration instructions: Reflect on your teaching practices in your own teaching context; no additional recall period has been imposed. You may leave a question unanswered. This is an unscored record of self-reported practices, not a judgement of teaching quality. Original statements and frequency anchors are reproduced from the article. Some original statements rely on learning styles or multiple intelligences; they are preserved as source wording, not endorsed as evidence-based recommendations. Do not label learners by fixed types or assume that matching teaching to a learning style improves learning.\n\nDorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.\nhttps://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1445865/full\nCC BY 4.0, ©2024 Dorji and Nima. Changes: item grouping, unscored Form format and project instructions; no translation of the English original items."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "long_text",
+        "formLabel": "Can you describe a specific instance or example from your teaching experience where you successfully implemented differentiated instruction? Please elaborate on the strategies you used, challenges you faced, and the outcomes for your students",
+        "required": false,
+        "formDefinition": {
+          "type": "LONG_TEXT",
+          "prompt": "Can you describe a specific instance or example from your teaching experience where you successfully implemented differentiated instruction? Please elaborate on the strategies you used, challenges you faced, and the outcomes for your students",
+          "required": false,
+          "maxLength": 5000,
+          "options": [],
+          "rows": []
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "iatpdi_2024_qualitative_reflection_teacher_self_en",
+            "title": "IATPDI｜原文开放反思（无计分）｜教师自评｜2024补充英文",
+            "description": "EduK12 project administration instructions: Reflect on your teaching practices in your own teaching context; no additional recall period has been imposed. You may leave a question unanswered. This is an unscored record of self-reported practices, not a judgement of teaching quality. Original statements and frequency anchors are reproduced from the article. Some original statements rely on learning styles or multiple intelligences; they are preserved as source wording, not endorsed as evidence-based recommendations. Do not label learners by fixed types or assume that matching teaching to a learning style improves learning.\n\nDorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.\nhttps://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1445865/full\nCC BY 4.0, ©2024 Dorji and Nima. Changes: item grouping, unscored Form format and project instructions; no translation of the English original items.",
+            "questions": [
+              {
+                "itemKey": "iatpdi_2024_qualitative_reflection_teacher_self_en",
+                "type": "LONG_TEXT",
+                "prompt": "Can you describe a specific instance or example from your teaching experience where you successfully implemented differentiated instruction? Please elaborate on the strategies you used, challenges you faced, and the outcomes for your students",
+                "required": false,
+                "maxLength": 5000,
+                "options": [],
+                "rows": []
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "ordinaryCombinations": [
+    {
+      "key": "iatpdi_2024_m2_four_groups_teacher_self_en",
+      "name": "IATPDI｜M2四题集34项（无计分）｜教师自评｜2024英文",
+      "tags": [
+        "family:iatpdi",
+        "role:teacher_self",
+        "level:k12",
+        "lang:en",
+        "version:2024-m2",
+        "use:reflection"
+      ],
+      "sourceOrder": [
+        "iatpdi_2024_m2_assessment7_teacher_self_en",
+        "iatpdi_2024_m2_content10_teacher_self_en",
+        "iatpdi_2024_m2_process10_teacher_self_en",
+        "iatpdi_2024_m2_product7_teacher_self_en"
+      ],
+      "crossToolScore": false
+    }
+  ]
+}

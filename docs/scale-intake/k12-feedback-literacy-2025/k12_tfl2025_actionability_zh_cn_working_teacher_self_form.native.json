@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "a_reflection",
+      "title": "中国K12反馈素养｜反馈行动性无分反思｜教师自评｜项目中文工作译文",
+      "description": "下列陈述来自教师反馈素养研究，中文为项目工作译文，不是原研究正式中文版。请任选陈述，描述一个实例、学习需要或疑问；可以留空或拒答。不填等级、不计分、不生成能力评语。这是项目改编的无分反思表单，原教师作答选项和计分说明尚未核得。自我认识不能证明学生实际收到的反馈质量。请勿填写学生姓名或可识别的作业信息。 来源：Kang、Huang、Liu、Yin（2025），DOI 10.1057/s41599-025-04927-4，表2–3；原作者CC BY 4.0 https://creativecommons.org/licenses/by/4.0/。改动：拆分、可选文字反思、项目指导语和中文工作翻译；不表示原作者认可。",
+      "questions": [
+        {
+          "itemKey": "a1",
+          "type": "LONG_TEXT",
+          "prompt": "A1: 我的反馈易于理解和付诸行动。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "a2",
+          "type": "LONG_TEXT",
+          "prompt": "A2: 我的反馈既考虑学生的优势，也强调需要改进的具体方面。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "a3",
+          "type": "LONG_TEXT",
+          "prompt": "A3: 我的反馈鼓励学生反思和改进。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "a4",
+          "type": "LONG_TEXT",
+          "prompt": "A4: 我的反馈包含具体、可行的步骤，便于学生理解和实施。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "a5",
+          "type": "LONG_TEXT",
+          "prompt": "A5: 我的反馈帮助学生理解自己当前的学习水平以及今后如何改进。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "a6",
+          "type": "LONG_TEXT",
+          "prompt": "A6: 我能在适当的时机提供可付诸行动的反馈。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "a7",
+          "type": "LONG_TEXT",
+          "prompt": "A7: 我的反馈能激励学生更深入地学习课程内容。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        }
+      ]
+    }
+  ]
+}
