@@ -1,0 +1,231 @@
+{
+  "schema": "RESEARCH_DOSSIER_ONLY_NOT_NATIVE_IMPORT_PAYLOAD",
+  "motherPrefix": "韩国TPD2014",
+  "projectAliasNotOfficialAcronym": true,
+  "sharedTag": "family:ktpd2014",
+  "registeredInstruments": 0,
+  "nativeScales": 0,
+  "nativeForms": 0,
+  "databaseImports": 0,
+  "variants": [
+    {
+      "variantRef": "kr_tpd_self2014_primary_ko",
+      "referenceIsRegisteredInstrumentKey": false,
+      "name": "韩国TPD2014｜专业发展自评准则｜教师自评｜小学·韩文",
+      "role": "teacher_self",
+      "subject": "teacher",
+      "schoolStage": "primary",
+      "language": "ko",
+      "sourceYear": 2014,
+      "declaredOriginalItemCount": 50,
+      "itemCountVerification": "AUTHOR_ABSTRACT_ONLY",
+      "finalItemTextAcquired": false,
+      "domains": [
+        {
+          "domainRef": "educator_character",
+          "originalLabel": "교육자적 인성",
+          "projectChineseGloss": "教育者品格（非已核职业伦理全构念）",
+          "glossValidation": "PROJECT_DRAFT_NOT_VALIDATED_TRANSLATION",
+          "originalItemNumbers": null,
+          "originalItemCount": null,
+          "nativeScaleBuilt": false,
+          "nativeFormBuilt": false,
+          "independentAdministrationEvidence": "NOT_REVIEWED"
+        },
+        {
+          "domainRef": "instructional_professionalism",
+          "originalLabel": "수업전문성",
+          "projectChineseGloss": "教学专业性",
+          "glossValidation": "PROJECT_DRAFT_NOT_VALIDATED_TRANSLATION",
+          "originalItemNumbers": null,
+          "originalItemCount": null,
+          "nativeScaleBuilt": false,
+          "nativeFormBuilt": false,
+          "independentAdministrationEvidence": "NOT_REVIEWED"
+        },
+        {
+          "domainRef": "class_operations_guidance",
+          "originalLabel": "학급운영 및 생활지도",
+          "projectChineseGloss": "班级运营与生活指导（原版合并领域）",
+          "glossValidation": "PROJECT_DRAFT_NOT_VALIDATED_TRANSLATION",
+          "originalItemNumbers": null,
+          "originalItemCount": null,
+          "nativeScaleBuilt": false,
+          "nativeFormBuilt": false,
+          "independentAdministrationEvidence": "NOT_REVIEWED"
+        },
+        {
+          "domainRef": "school_management_participation",
+          "originalLabel": "학교경영참여",
+          "projectChineseGloss": "学校管理参与",
+          "glossValidation": "PROJECT_DRAFT_NOT_VALIDATED_TRANSLATION",
+          "originalItemNumbers": null,
+          "originalItemCount": null,
+          "nativeScaleBuilt": false,
+          "nativeFormBuilt": false,
+          "independentAdministrationEvidence": "NOT_REVIEWED"
+        },
+        {
+          "domainRef": "self_development",
+          "originalLabel": "자기연찬",
+          "projectChineseGloss": "自我研修",
+          "glossValidation": "PROJECT_DRAFT_NOT_VALIDATED_TRANSLATION",
+          "originalItemNumbers": null,
+          "originalItemCount": null,
+          "nativeScaleBuilt": false,
+          "nativeFormBuilt": false,
+          "independentAdministrationEvidence": "NOT_REVIEWED"
+        }
+      ],
+      "tags": [
+        "family:ktpd2014",
+        "role:teacher_self",
+        "stage:primary",
+        "lang:ko",
+        "version:2014",
+        "use:reflection",
+        "status:research",
+        "rights:unverified"
+      ],
+      "tagsPersisted": false,
+      "versionAxes": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "nativeStatus": "NOT_BUILT_MISSING_ORIGINAL_ITEMS",
+      "scoring": {
+        "responseOptions": null,
+        "responseAnchorCount": null,
+        "itemKey": null,
+        "reverseItems": null,
+        "aggregation": null,
+        "missingPolicy": null,
+        "range": null,
+        "direction": null,
+        "norms": "NOT_REVIEWED",
+        "numericReportEnabled": false
+      },
+      "formStatus": "NOT_BUILT_MISSING_ORIGINAL_ITEMS",
+      "ordinaryCombination": "NOT_CREATED; school-stage-specific plan only; no cross-stage equivalence or total."
+    },
+    {
+      "variantRef": "kr_tpd_self2014_secondary_ko",
+      "referenceIsRegisteredInstrumentKey": false,
+      "name": "韩国TPD2014｜专业发展自评准则｜教师自评｜中学·韩文",
+      "role": "teacher_self",
+      "subject": "teacher",
+      "schoolStage": "secondary",
+      "language": "ko",
+      "sourceYear": 2014,
+      "declaredOriginalItemCount": 51,
+      "itemCountVerification": "AUTHOR_ABSTRACT_ONLY",
+      "finalItemTextAcquired": false,
+      "domains": [
+        {
+          "domainRef": "instructional_professionalism",
+          "originalLabel": "수업전문성",
+          "projectChineseGloss": "教学专业性",
+          "glossValidation": "PROJECT_DRAFT_NOT_VALIDATED_TRANSLATION",
+          "originalItemNumbers": null,
+          "originalItemCount": null,
+          "nativeScaleBuilt": false,
+          "nativeFormBuilt": false,
+          "independentAdministrationEvidence": "NOT_REVIEWED"
+        },
+        {
+          "domainRef": "school_management_participation",
+          "originalLabel": "학교경영참여",
+          "projectChineseGloss": "学校管理参与",
+          "glossValidation": "PROJECT_DRAFT_NOT_VALIDATED_TRANSLATION",
+          "originalItemNumbers": null,
+          "originalItemCount": null,
+          "nativeScaleBuilt": false,
+          "nativeFormBuilt": false,
+          "independentAdministrationEvidence": "NOT_REVIEWED"
+        },
+        {
+          "domainRef": "teaching_capacity_development",
+          "originalLabel": "교수역량 강화",
+          "projectChineseGloss": "教学能力发展",
+          "glossValidation": "PROJECT_DRAFT_NOT_VALIDATED_TRANSLATION",
+          "originalItemNumbers": null,
+          "originalItemCount": null,
+          "nativeScaleBuilt": false,
+          "nativeFormBuilt": false,
+          "independentAdministrationEvidence": "NOT_REVIEWED"
+        },
+        {
+          "domainRef": "class_management",
+          "originalLabel": "학급관리",
+          "projectChineseGloss": "班级管理",
+          "glossValidation": "PROJECT_DRAFT_NOT_VALIDATED_TRANSLATION",
+          "originalItemNumbers": null,
+          "originalItemCount": null,
+          "nativeScaleBuilt": false,
+          "nativeFormBuilt": false,
+          "independentAdministrationEvidence": "NOT_REVIEWED"
+        },
+        {
+          "domainRef": "educator_character",
+          "originalLabel": "교육자적 인성",
+          "projectChineseGloss": "教育者品格（非已核职业伦理全构念）",
+          "glossValidation": "PROJECT_DRAFT_NOT_VALIDATED_TRANSLATION",
+          "originalItemNumbers": null,
+          "originalItemCount": null,
+          "nativeScaleBuilt": false,
+          "nativeFormBuilt": false,
+          "independentAdministrationEvidence": "NOT_REVIEWED"
+        },
+        {
+          "domainRef": "student_guidance",
+          "originalLabel": "학생생활지도",
+          "projectChineseGloss": "学生生活指导",
+          "glossValidation": "PROJECT_DRAFT_NOT_VALIDATED_TRANSLATION",
+          "originalItemNumbers": null,
+          "originalItemCount": null,
+          "nativeScaleBuilt": false,
+          "nativeFormBuilt": false,
+          "independentAdministrationEvidence": "NOT_REVIEWED"
+        }
+      ],
+      "tags": [
+        "family:ktpd2014",
+        "role:teacher_self",
+        "stage:secondary",
+        "lang:ko",
+        "version:2014",
+        "use:reflection",
+        "status:research",
+        "rights:unverified"
+      ],
+      "tagsPersisted": false,
+      "versionAxes": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "nativeStatus": "NOT_BUILT_MISSING_ORIGINAL_ITEMS",
+      "scoring": {
+        "responseOptions": null,
+        "responseAnchorCount": null,
+        "itemKey": null,
+        "reverseItems": null,
+        "aggregation": null,
+        "missingPolicy": null,
+        "range": null,
+        "direction": null,
+        "norms": "NOT_REVIEWED",
+        "numericReportEnabled": false
+      },
+      "formStatus": "NOT_BUILT_MISSING_ORIGINAL_ITEMS",
+      "ordinaryCombination": "NOT_CREATED; school-stage-specific plan only; no cross-stage equivalence or total."
+    }
+  ],
+  "boundary": "Original5/6 domains remain distinct. The informal ethics/teaching/management/growth summary is not a four-factor score key. Primary combined class-operations/guidance is not silently split into two scales. Unknown item counts are not distributed to add up to50/51.",
+  "nextNativeDecision": {
+    "sourceItemsAndOfficialScoring": "Existing native Scale per verified original subscale, retaining exact school stage/language/year and original score direction. No invented cutoffs or cross-tool total.",
+    "sourceItemsPermittedButNoScoring": "Existing native no-score Form retaining original items/options/order; no numeric option score or fabricated scale report.",
+    "noItems": "Keep explicit material-request dossier only; do not register hollow executable/catalog mother entries."
+  }
+}
