@@ -85,11 +85,14 @@ export class BundleDefinitionProvider {
     if (entry.definition.status !== 'PUBLISHED') blockers.push('BUNDLE_NOT_PUBLISHED')
     // These code-owned packages have a dedicated episode/assignment product.
     // Ordinary mixed bundles still cannot be instantiated as one participant.
+    const childVersion = version === '0.1.0' || version === '0.1.1'
+      && entry.definition.slots.some(slot => slot.unitType === 'SCALE')
+      && entry.definition.slots.filter(slot => slot.unitType === 'SCALE').every(slot => slot.instrumentKey === 'chexi_zh_hans' && slot.instrumentVersion === '1.0.1')
     const childObserver = !!entry.declarativePackage && /^child_chexi_(parent|teacher)_zh_cn_v1$/.test(key)
-      && version === '0.1.0' && entry.definition.category === 'observer'
+      && childVersion && entry.definition.category === 'observer'
       && entry.definition.engine.key === 'declarative-evidence-v1'
     const childIntegrated = !!entry.declarativePackage && /^child_cognitive_control_(parent|teacher|parent_teacher)_zh_cn$/.test(key)
-      && version === '0.1.0' && entry.definition.category === 'integrated'
+      && childVersion && entry.definition.category === 'integrated'
       && entry.definition.engine.key === 'declarative-evidence-v1'
     if (!childObserver && !childIntegrated && (entry.definition.category === 'observer' || entry.definition.respondentTypes.some(value => value !== 'SELF'))) {
       blockers.push('OBSERVER_DELIVERY_REQUIRES_DEDICATED_PRODUCT')

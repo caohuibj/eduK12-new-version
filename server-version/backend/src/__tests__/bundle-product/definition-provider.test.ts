@@ -2,16 +2,34 @@ import { describe, expect, it } from 'vitest'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { createCodeBundleDefinitionProvider } from '../../modules/bundle-product/code-catalog'
 import { BundleDefinitionProvider, freezeBundleProductionDefinition, readFrozenBundleProductionDefinition } from '../../modules/bundle-product/definition-provider'
+import { loadPackage } from '../../modules/assessment-bundle/onboarding/loader'
+import { packageEntry } from '../../modules/assessment-bundle/onboarding/catalog'
+import path from 'node:path'
 const catalog=createCodeBundleDefinitionProvider()
 const entry=()=>catalog.exact('integrated_gonogo_adexi_adult_zh_cn_v1','1.0.0')!
 const freeze=()=>freezeBundleProductionDefinition(entry(),{frozenAt:'2026-09-22T00:00:00.000Z',sourceReference:'code:test'})
 describe('Bundle production definition provider and full freeze',()=>{
-  it('keeps all existing draft products blocked and observer products separate',()=>{
+  const childRevision = (key: string, version = '0.1.1', instrumentVersion = '1.0.1') => {
+    const pack = loadPackage(path.resolve(__dirname, '../../modules/assessment-bundle/packages', key, '0.1.0'))
+    pack.manifest.definition.bundleVersion = version
+    for (const slot of pack.manifest.definition.slots) if (slot.unitType === 'SCALE') slot.instrumentVersion = instrumentVersion
+    return new BundleDefinitionProvider([packageEntry(pack)])
+  }
+  it.each(['child_chexi_parent_zh_cn_v1', 'child_chexi_teacher_zh_cn_v1', 'child_cognitive_control_parent_zh_cn', 'child_cognitive_control_teacher_zh_cn', 'child_cognitive_control_parent_teacher_zh_cn'])('recognizes the exact dedicated %s revision while retaining unpublished status', key => {
+    const blockers = childRevision(key).publicationBlockers(key, '0.1.1')
+    expect(blockers).not.toContain('OBSERVER_DELIVERY_REQUIRES_DEDICATED_PRODUCT')
+    expect(blockers).toContain('BUNDLE_NOT_PUBLISHED')
+  })
+  it.each([['0.1.1', '1.0.0'], ['0.1.2', '1.0.1']])('does not admit an unrecognized child revision %s with source %s', (version, sourceVersion) => {
+    const key = 'child_chexi_parent_zh_cn_v1'
+    expect(childRevision(key, version, sourceVersion).publicationBlockers(key, version)).toContain('OBSERVER_DELIVERY_REQUIRES_DEDICATED_PRODUCT')
+  })
+  it('keeps all existing draft products unpublished and non-dedicated observer products separate',()=>{
     expect(catalog.list().filter(entry => !entry.declarativePackage)).toHaveLength(7)
     for(const item of catalog.list()) {
       expect(item.definition.status).toBe('DRAFT')
       expect(catalog.publicationBlockers(item.definition.bundleKey,item.definition.bundleVersion)).toContain('BUNDLE_NOT_PUBLISHED')
-      if(item.definition.category==='observer') expect(catalog.publicationBlockers(item.definition.bundleKey,item.definition.bundleVersion)).toContain('OBSERVER_DELIVERY_REQUIRES_DEDICATED_PRODUCT')
+      if(item.definition.category==='observer' && !['child_chexi_parent_zh_cn_v1', 'child_chexi_teacher_zh_cn_v1'].includes(item.definition.bundleKey)) expect(catalog.publicationBlockers(item.definition.bundleKey,item.definition.bundleVersion)).toContain('OBSERVER_DELIVERY_REQUIRES_DEDICATED_PRODUCT')
     }
   })
   it('rejects aliases and duplicate definitions; never resolves an unknown exact version to latest',()=>{

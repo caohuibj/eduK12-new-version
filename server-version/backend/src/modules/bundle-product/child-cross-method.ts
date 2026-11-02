@@ -137,8 +137,13 @@ export function createChildCrossMethodService(db: any = prisma, hooks: {
         if (input.teacherObserverCompositeId) selections.push({ role: 'TEACHER', userId: actor.userId, source: await template(input.teacherObserverCompositeId, actor.userId, tx), relation: resolveCourseTeacherStudentRelationship({ courseId, courseCreatorUserId: actor.userId, membershipStudentUserId: child.id, membershipStatus: membership.status, subjectUserId: child.id, subjectRole: 'STUDENT', respondentUserId: actor.userId, respondentRole: 'TEACHER' }) })
         for (const selection of selections.slice(1)) {
           const slots = selection.source.frozen.bundleSnapshot.slotBindings.filter(s => s.unitType !== 'FORM')
+          const observers = targetEntry.definition.slots.filter(s => s.unitType === 'SCALE')
+          const expected = observers.find(s => s.respondentType === selection.role)
           if (selection.source.row.courseId !== courseId || slots.length !== 1 || slots[0].unitType !== 'SCALE'
-            || slots[0].instrumentKey !== 'chexi_zh_hans' || slots[0].instrumentVersion !== '1.0.0' || slots[0].respondentType !== selection.role) throw compositeBadRequest('观察配置必须使用同一CHEXI精确版本与真实成人角色')
+            || !expected || expected.instrumentKey !== 'chexi_zh_hans'
+            || observers.some(s => s.instrumentKey !== expected.instrumentKey || s.instrumentVersion !== expected.instrumentVersion)
+            || slots[0].instrumentKey !== expected.instrumentKey || slots[0].instrumentVersion !== expected.instrumentVersion
+            || slots[0].respondentType !== selection.role) throw compositeBadRequest('观察配置必须使用同一CHEXI精确版本与真实成人角色')
         }
         const wanted = ['SELF', ...selections.slice(1).map(s => s.role)].sort()
         if (JSON.stringify([...targetEntry.definition.respondentTypes].sort()) !== JSON.stringify(wanted)) throw compositeBadRequest('联合报告配置与实际报告者不匹配')

@@ -23,12 +23,19 @@ const actor = { userId: 'teacher', role: 'TEACHER' }, childActor = { userId: 'ch
 const requestId = '20000000-0000-4000-8000-000000000001'
 const reportRequest = '20000000-0000-4000-8000-000000000002'
 
-function harness() {
+function harness(sourceVersion = '1.0.0', targetVersion = sourceVersion) {
+  const selectedPack = (name: string) => {
+    const p = pack(name)
+    for (const slot of p.manifest.definition.slots) if (slot.unitType === 'SCALE' && slot.instrumentKey === 'chexi_zh_hans') {
+      slot.instrumentVersion = name.startsWith('child_cognitive_control_') ? targetVersion : sourceVersion
+    }
+    return p
+  }
   const assignments = new Map<string, any>(), episodes = new Map<string, any>(), attempts = new Map<string, any>(), consents = new Map<string, any>(), analyses = new Map<string, any>()
   const templates = new Map<string, any>()
   const names = ['child_cognitive_tasks_zh_cn', 'child_chexi_parent_zh_cn_v1', 'child_chexi_teacher_zh_cn_v1']
   for (const [i, name] of names.entries()) {
-    const p = pack(name), frozen = freezeBundleProductionDefinition(packageEntry(p), { frozenAt: '2026-11-01T00:00:00.000Z', sourceReference: 'fixture' })
+    const p = selectedPack(name), frozen = freezeBundleProductionDefinition(packageEntry(p), { frozenAt: '2026-11-01T00:00:00.000Z', sourceReference: 'fixture' })
     const bindings = { schemaVersion: 1, slots: frozen.bundleSnapshot.slotBindings.filter(s => s.unitType !== 'FORM').map(s => ({ slotKey: s.slotKey, itemId: name + '-' + s.slotKey, unitType: s.unitType })), context: [] }
     templates.set(['tasks','parent','teacher-observer'][i], { id: ['tasks','parent','teacher-observer'][i], createdBy: 'teacher', status: 'PUBLISHED', courseId: 'course', publicEnabled: false, productKind: 'ASSESSMENT_BUNDLE', bundleInstance: {
       definitionHash: frozen.contentHash, definitionEncrypted: encryptCognitivePayload(frozen), bindingsHash: canonicalHash(bindings), bindingsEncrypted: encryptCognitivePayload(bindings),
@@ -57,9 +64,9 @@ function harness() {
       upsert: async ({ create }: any) => { const a = { id: 'analysis-' + analyses.size, retryCount: 0, ...create }; analyses.set(a.id, a); return a },
     },
   }
-  const eligible = vi.fn(async (_actor: any, key: string) => packageEntry(pack(key)))
+  const eligible = vi.fn(async (_actor: any, key: string) => packageEntry(selectedPack(key)))
   const frozenReads = vi.fn(async (id: string) => {
-    const t = attempts.get(id), source = templates.get(t.compositeAssessmentId), p = pack(names[t.compositeAssessmentId === 'tasks' ? 0 : t.compositeAssessmentId === 'parent' ? 1 : 2])
+    const t = attempts.get(id), source = templates.get(t.compositeAssessmentId), p = selectedPack(names[t.compositeAssessmentId === 'tasks' ? 0 : t.compositeAssessmentId === 'parent' ? 1 : 2])
     const values = t.compositeAssessmentId === 'tasks' ? pack('child_cognitive_tasks_zh_cn').fixtures.valid.values : {}
     return { parent: { ...t, compositeAssessment: source }, payloads: p.manifest.definition.slots.filter(slot => slot.unitType !== 'FORM').map(slot => ({ header: { slotKey: compositeItemSlotKey(names[t.compositeAssessmentId === 'tasks' ? 0 : t.compositeAssessmentId === 'parent' ? 1 : 2] + '-' + slot.slotKey, slot.unitType as any) }, envelope: {
       resultHash: canonicalHash({ id, slot: slot.slotKey }), core: { instrumentKey: slot.instrumentKey, instrumentVersion: slot.instrumentVersion, quality: { status: 'interpretable' } },
@@ -106,6 +113,18 @@ describe('child cross-method existing-runtime composition', () => {
     const parent = [...h.assignments.values()].find(a => a.respondentRole === 'PARENT')
     await expect(h.service.start({ userId: 'parent-user', role: 'PARENT' }, parent.assignmentId)).rejects.toThrow('consent')
     expect(h.attempts.size).toBe(0)
+  })
+  it('uses the eligible target exact CHEXI revision for both independent observers', async () => {
+    const h = harness('1.0.1')
+    const issued = await h.issue()
+    expect(issued.assignments).toHaveLength(3)
+    expect([...h.assignments.values()].filter(a => a.relationshipKind !== 'SELF').map(a => a.respondentUserId).sort()).toEqual(['parent-user', 'teacher'])
+  })
+  it.each([['1.0.0', '1.0.1'], ['1.0.1', '1.0.0']])('rejects source %s when the eligible target requires %s before creating a round', async (sourceVersion, targetVersion) => {
+    const h = harness(sourceVersion, targetVersion)
+    await expect(h.issue()).rejects.toThrow('CHEXI精确版本')
+    expect(h.episodes.size).toBe(0)
+    expect(h.assignments.size).toBe(0)
   })
   it('collects actual frozen sources, keeps parent 2 and teacher 4 separate, and reads saved facts without rescoring', async () => {
     const h = harness(); await h.complete()
