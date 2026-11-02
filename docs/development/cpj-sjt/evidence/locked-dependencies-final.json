@@ -1,0 +1,16 @@
+{
+  "backend": {
+    "lockSha256": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "actualPackageManifestsChecked": 445,
+    "requiredMissing": [],
+    "actualVersionMismatches": [],
+    "optionalPlatformPackagesAbsent": 91
+  },
+  "frontend": {
+    "lockSha256": "5e42020d487b8bac83287d77d9f7ca9c4fa5b9b6c682bbe494d040fc7f203b7d",
+    "actualPackageManifestsChecked": 395,
+    "requiredMissing": [],
+    "actualVersionMismatches": [],
+    "optionalPlatformPackagesAbsent": 85
+  }
+}
