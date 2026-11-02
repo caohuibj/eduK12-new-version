@@ -75,6 +75,8 @@ export const UNIFIED_SCALE_CHILD_ADMISSION_SELECT = {
       name: true,
       instrumentVersion: true,
       instrumentClass: true,
+      standardSourceKind: true,
+      standardToolKey: true,
       status: true,
     },
   },
@@ -107,6 +109,8 @@ export type ScaleAdmissionChildRow = {
     id: string
     code: string
     name: string
+    standardSourceKind?: string
+    standardToolKey?: string | null
     instrumentVersion: string
     instrumentClass: 'STANDARD' | 'CUSTOM_DESCRIPTIVE'
     status: string
@@ -523,6 +527,14 @@ export const ensureScaleAdmissionAtDelivery = async (
   return activateScaleAdmission(loaded as ScaleAdmissionChildRow, parent)
 }
 
+/** Identity projection only, after the caller's frozen parent/source proof.
+ * Internal DB row codes never replace this dedicated instrument's business key. */
+export function frozenScaleInstrumentKey(row:Pick<ScaleAdmissionChildRow,'scale'|'compositeAttemptId'>):string {
+  return row.compositeAttemptId&&row.scale.standardSourceKind==='DB_IMPORTED'
+    &&row.scale.standardToolKey==='chexi_zh_hans'&&row.scale.instrumentVersion==='1.0.1'
+    ? row.scale.standardToolKey : row.scale.code
+}
+
 export const readStoredScaleAdmission = (
   row: Pick<ScaleAdmissionChildRow, 'frozenAdmissionSnapshotEncrypted' | 'frozenAdmissionSnapshotHash'>,
 ): VersionedFrozenUnitAdmission | null => (
@@ -539,12 +551,13 @@ const validateStoredAgainstRuntime = async (
   db?: import('../assessment-runtime/shared-scale-runtime').SharedScaleArtifactDb,
 ): Promise<VersionedFrozenUnitAdmission> => {
   assertAdmissionParentBinding(row, stored)
+  const runtime = (await loadScaleAdmissionRuntime(row, db))
+  const scaleCode=frozenScaleInstrumentKey(row)
   if (stored.attemptEpoch !== row.attemptEpoch || stored.scale?.id !== row.scale.id
-    || stored.scale?.code !== row.scale.code || stored.scale?.instrumentVersion !== row.scale.instrumentVersion
+    || stored.scale?.code !== scaleCode || stored.scale?.instrumentVersion !== row.scale.instrumentVersion
     || (stored.principal.userId !== null && row.userId !== null && stored.principal.userId !== row.userId)) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结准入身份或轮次不匹配', 409)
   }
-  const runtime = (await loadScaleAdmissionRuntime(row, db))
   if (runtime.schemaVersion !== stored.schemaVersion) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表运行时与准入快照版本不匹配', 409)
   }
@@ -554,7 +567,7 @@ const validateStoredAgainstRuntime = async (
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '本轮测评已超过冻结完成期限，请重新开始', 409)
     }
     const identityBindingHash = canonicalHash({
-      instrumentKey: row.scale.code, instrumentVersion: row.scale.instrumentVersion,
+      instrumentKey: scaleCode, instrumentVersion: row.scale.instrumentVersion,
       sourceDefinitionHash: runtime.sourceDefinitionHash, compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash,
       runtimePolicyHash: runtime.runtimePolicyHash, deploymentPolicyHash: stored.scalePolicy?.deployment?.policyHash,
       attemptEpoch: row.attemptEpoch, principal: stored.principal, parent: stored.parent,
@@ -659,13 +672,17 @@ const activateUnstoredScaleAdmission = async (
     assertFinalOnly(loaded.deliveryMode)
     assertAttemptEpoch(loaded.attemptEpoch, row.attemptEpoch)
     if (!row.compositeItemId) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
+    const exactBundle=loaded.compositeAssessment.productKind==='ASSESSMENT_BUNDLE'&&row.scale.code.startsWith('db-scale:')
+      ? await (await import('../bundle-product/standard-source')).readEnteredBundleScaleChild(db,row.id) : undefined
+    const slotScale=exactBundle?{...row.scale,code:exactBundle.row.snapshot.toolKey,instrumentVersion:exactBundle.row.snapshot.instrumentVersion}:row.scale
+    if(exactBundle&&(runtime.instrumentKey!==slotScale.code||runtime.instrumentVersion!==slotScale.instrumentVersion))throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH','Bundle 原生量表冻结身份不匹配',409)
     const slotKey = compositeItemSlotKey(row.compositeItemId, 'SCALE')
     const slot = await readRequiredScaleSlot({
       encrypted: loaded.frozenActiveSlotSetEncrypted,
       storedHash: loaded.frozenActiveSlotSetHash,
       attemptEpoch: row.attemptEpoch,
       slotKey,
-      scale: row.scale,
+      scale: slotScale,
     }, db)
     const compiledRuntimeHash = compiledRuntimeHashFrom(slot, row.compiledRuntimeHash)
     if (compiledRuntimeHash !== runtime.compiledRuntime.compiledRuntimeHash) {
@@ -674,11 +691,11 @@ const activateUnstoredScaleAdmission = async (
     const legacyRequiresContext = hasContextSection(loaded.compositeAssessment.formSections)
     const context = readCompositeAttemptContext(loaded)
     if (context.decryptError) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文无法读取，请联系管理员', 500)
-    const bundleContext = await loadBundleScaleStartContext(db, loaded, row.compositeItemId, row.scale.code, row.scale.instrumentVersion, context.context?.values ?? null)
+    const bundleContext = await loadBundleScaleStartContext(db, loaded, row.compositeItemId, slotScale.code, slotScale.instrumentVersion, context.context?.values ?? null)
     const snapshot = await createScaleAdmissionForRuntime({
       db,
       attemptEpoch: row.attemptEpoch,
-      scale: row.scale,
+      scale: slotScale,
       principal: {
         userId: row.userId ?? loaded.userId,
         questionnaireSessionId: null,

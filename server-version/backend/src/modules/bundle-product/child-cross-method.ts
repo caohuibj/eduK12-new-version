@@ -80,6 +80,10 @@ export function createChildCrossMethodService(db: any = prisma, hooks: {
       || row.productKind !== 'ASSESSMENT_BUNDLE' || !row.bundleInstance) throw compositeForbidden('必须选择本教师已发布的课程固定测评包')
     const { frozen } = readInstance(row.bundleInstance)
     await eligible({ userId: teacherId, role: 'TEACHER' } as any, frozen.bundleSnapshot.bundleKey, frozen.bundleSnapshot.bundleVersion, tx)
+    if(frozen.declarativePackage?.manifest.scaleDependencies){
+      const items=await tx.compositeAssessmentItem.findMany({where:{compositeAssessmentId:row.id}})
+      await (await import('./standard-source')).readBundleScaleSources(tx,row,items)
+    }
     return { row, frozen }
   }
   async function acceptedForTeacher(a: RelationalAssignmentRecordV1, teacherId: string, tx = db) {

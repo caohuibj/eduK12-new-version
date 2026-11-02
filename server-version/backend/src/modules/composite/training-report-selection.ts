@@ -1,4 +1,5 @@
 import {assertCompositionPublicContent} from '../education-tools/private-tool.composition-content'
+import {validateBundleScaleDerivedContent} from '../bundle-product/standard-source'
 import {assertEducationRuntimeContentScope} from './education-content-scope'
 import { z } from 'zod'
 import { Prisma } from '@prisma/client'
@@ -25,6 +26,11 @@ export async function validateTrainingReportPointer(db:Prisma.TransactionClient,
 }) {
   let report=input.releases.get(input.reportReleaseId)
   if(!report){const loaded=await getContentRelease(db,input.reportReleaseId,true);if(!loaded)fail();report=loaded;input.releases.set(report.releaseId,report)}
+  if(input.unit.source.bundleStandard){
+    if(report.layer!=='REPORT'||input.contentHash!==undefined&&report.contentHash!==input.contentHash||input.publication&&report.status!=='PUBLISHED')fail()
+    await validateBundleScaleDerivedContent(db,input.unit,report,{compositeId:input.compositeId,ownerId:input.ownerId})
+    return {releaseId:report.releaseId,contentHash:report.contentHash}
+  }
   if(input.unit.source.educationStandard){
     if(report.layer!=='REPORT'||report.family!==input.unit.family||input.contentHash!==undefined&&report.contentHash!==input.contentHash||input.publication&&report.status!=='PUBLISHED')fail()
     await assertCompositionPublicContent(db,{compositeId:input.compositeId,ownerId:input.ownerId,unit:input.unit,release:report})

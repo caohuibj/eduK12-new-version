@@ -24,6 +24,7 @@ import { BundleDefinitionProvider, freezeBundleProductionDefinition } from './de
 import { createCodeBundleDefinitionProvider } from './code-catalog'
 import {catalogClassificationTags,catalogTagFacets,matchesCatalogDiscovery,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import { bundleBirthYearMonthForm, validateBundleStartContextMappings } from './start-context'
+import {prepareBundleScaleSource,readBundleScaleSources} from './standard-source'
 
 export type BundleActor = { userId: string; role: UserRole }
 export const author = (actor: BundleActor) => {
@@ -37,7 +38,7 @@ const createSchema = z.object({
   requestId: z.string().guid(), bundleKey: z.string().min(1), bundleVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
   name: z.string().trim().min(1).max(200), courseId: z.string().min(1).nullable(),
   publicEnabled: z.boolean().default(false), expiresAt: z.string().datetime().nullable().default(null),
-  bindings: z.array(z.object({ slotKey: z.string().min(1), resourceId: z.string().min(1).optional() }).strict()).max(100),
+  bindings: z.array(z.object({ slotKey: z.string().min(1), resourceId: z.string().min(1).optional(), useGrantId:z.string().guid().optional() }).strict()).max(100),
 }).strict()
 
 export function createBundleProductService(provider: BundleDefinitionProvider) {
@@ -125,12 +126,19 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
         if (!slot.required) throw compositeBadRequest('当前 Bundle 投放仅支持必填测评槽位')
         const binding = input.bindings.find(v => v.slotKey === slot.slotKey)!
         let scaleDisclosure: EffectiveScaleDisclosureSnapshot | undefined
-        const data: any = { compositeAssessmentId: row.id, type: slot.unitType, required: true, position: position++ }
+        let standardSource: Awaited<ReturnType<typeof prepareBundleScaleSource>>['source'] | undefined
+        const data: any = { id:randomUUID(),compositeAssessmentId: row.id, type: slot.unitType, required: true, position: position++ }
         if (slot.unitType === 'SCALE') {
           const scale = await tx.scale.findUnique({ where: { id: binding.resourceId ?? '' } })
-          if (!scale || scale.code !== slot.instrumentKey || scale.instrumentVersion !== slot.instrumentVersion) throw compositeBadRequest('量表精确版本不匹配')
-          await assertValidItem({ type: 'SCALE', required: true, scaleId: scale.id }, actor.userId, actor.role, row, tx)
-          scaleDisclosure = createScaleProjectionContext({instrumentKey:scale.code,instrumentVersion:scale.instrumentVersion,instrumentClass:scale.instrumentClass,audience:'subject',purpose:'report'}).frozenPolicy
+          if (!scale) throw compositeBadRequest('量表精确版本不匹配')
+          if(entry.declarativePackage?.manifest.scaleDependencies?.some(p=>p.slotKey===slot.slotKey)){
+            const exact=await prepareBundleScaleSource(tx,{pack:entry.declarativePackage,slotKey:slot.slotKey,composite:row,itemId:data.id,scaleId:scale.id,useGrantId:binding.useGrantId})
+            standardSource=exact.source;scaleDisclosure=exact.disclosure
+          }else{
+            if(scale.code!==slot.instrumentKey||scale.instrumentVersion!==slot.instrumentVersion||binding.useGrantId)throw compositeBadRequest('量表精确版本不匹配')
+            await assertValidItem({ type: 'SCALE', required: true, scaleId: scale.id }, actor.userId, actor.role, row, tx)
+            scaleDisclosure = createScaleProjectionContext({instrumentKey:scale.code,instrumentVersion:scale.instrumentVersion,instrumentClass:scale.instrumentClass,audience:'subject',purpose:'report'}).frozenPolicy
+          }
           data.scaleId = scale.id
         } else if (slot.unitType === 'COGNITIVE') {
           const source = await tx.cognitiveAssignment.findUnique({ where: { id: binding.resourceId ?? '' }, include: { config: true } })
@@ -156,7 +164,7 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
           data.situationalInstrumentKey = slot.instrumentKey; data.situationalInstrumentVersion = slot.instrumentVersion
         }
         const item = await tx.compositeAssessmentItem.create({ data })
-        bindings.slots.push({ slotKey: slot.slotKey, itemId: item.id, unitType: slot.unitType, ...(scaleDisclosure ? {scaleDisclosure} : {}) })
+        bindings.slots.push({ slotKey: slot.slotKey, itemId: item.id, unitType: slot.unitType, ...(scaleDisclosure ? {scaleDisclosure} : {}),...(standardSource?{standardSource}:{}) })
       }
       await tx.bundleInstance.create({ data: { compositeId: row.id, bundleKey: definition.bundleKey, bundleVersion: definition.bundleVersion,
         definitionHash: frozen.contentHash, definitionEncrypted: encryptCognitivePayload(frozen),
@@ -193,8 +201,9 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
       const current = freezeBundleProductionDefinition(entry, { frozenAt: frozen.frozenAt, sourceReference: frozen.source.reference })
       if (current.contentHash !== frozen.contentHash) throw compositeConflict('同版本定义已变化，请重新创建')
       const items = await tx.compositeAssessmentItem.findMany({ where: { compositeAssessmentId: id }, include: { cognitiveAssignment: { include: { config: true } } } })
+      const exactSources=await readBundleScaleSources(tx,row,items)
       for (const item of items) {
-        if (item.type === 'SCALE') await assertValidItem({ type: 'SCALE', required: true, scaleId: item.scaleId! }, actor.userId, actor.role, row, tx)
+        if (item.type === 'SCALE'&&!exactSources.has(item.id)) await assertValidItem({ type: 'SCALE', required: true, scaleId: item.scaleId! }, actor.userId, actor.role, row, tx)
         if (item.type === 'COGNITIVE') {
           if (!item.cognitiveAssignment || !await canInstantiateConfig(actor.userId, actor.role, item.cognitiveAssignment.config)) throw compositeForbidden('认知配置授权已失效')
           // Creation already froze this owned copy's scientific configuration.

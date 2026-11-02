@@ -3,10 +3,11 @@ import {decryptCognitivePayload} from '../cognitive/cognitive.security'
 import {readFrozenBundleProductionDefinition} from './definition-provider'
 import {compositeConflict} from '../composite/composite.errors'
 import type {EffectiveScaleDisclosureSnapshot} from '../scale/projection/types'
+import type {BundleScaleSource} from './standard-source'
 
 export type BundleBindings = {
   schemaVersion: 1
-  slots: Array<{ slotKey: string; itemId: string; unitType: string; scaleDisclosure?: EffectiveScaleDisclosureSnapshot }>
+  slots: Array<{ slotKey: string; itemId: string; unitType: string; scaleDisclosure?: EffectiveScaleDisclosureSnapshot; standardSource?: BundleScaleSource }>
   context: Array<{ contextKey: string; itemId: string; valueType: string }>
 }
 export function readInstance(row: { definitionEncrypted: string; definitionHash: string; bindingsEncrypted: string; bindingsHash: string }) {

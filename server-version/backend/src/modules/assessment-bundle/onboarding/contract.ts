@@ -5,6 +5,8 @@ import { parseBundleContextDefinition } from '../context'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { assessmentBundleDefinitionSchema, BUNDLE_KEY, EXACT_VERSION, SLOT_KEY } from '../schema'
 import { parseAssessmentBundleDefinition } from '../definition'
+import { scaleInstrumentSourceV1Schema,parseScaleInstrumentSourceSchema } from '../../scale/onboarding/schema'
+import { validateScaleInstrumentSource } from '../../scale/onboarding/validate-instrument'
 
 export const PACKAGE_LIMITS = { bytes: 1024 * 1024, depth: 24, conditionDepth: 8, conditions: 256, rules: 64, evidence: 128, blocks: 128 } as const
 const key = z.string().regex(SLOT_KEY).max(100)
@@ -37,6 +39,7 @@ const packageV1Schema = z.object({
     definition: declaration,
     files: z.object({ evidence: z.literal('evidence-map.json'), rules: z.literal('rules.json'), report: z.literal('report.json'), scientific: z.literal('scientific.json'), publication: z.literal('publication.json'), context: z.literal('context.json').optional() }).strict(),
     cognitiveDependencies: z.array(z.object({ slotKey: key, configVersion: version, engineVersion: version, scoringVersion: version, profile: z.enum(['standard', 'experience', 'research']) }).strict()).max(64),
+    scaleDependencies: z.array(z.object({slotKey:key,releaseId:z.string().guid(),combinationHash:z.string().regex(/^[a-f0-9]{64}$/),source:scaleInstrumentSourceV1Schema}).strict()).min(1).max(2).optional(),
   }).strict(),
   evidence: z.array(z.object({
     evidenceKey: key, slotKey: key, selector: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_.]*$/).max(100),
@@ -194,6 +197,27 @@ export function parseDeclarativePackage(raw: unknown): DeclarativePackage {
   unique(value.scientific.references.map(r => r.id), 'scientific.references')
   unique(value.manifest.cognitiveDependencies.map(d => d.slotKey), 'manifest.cognitiveDependencies')
   const slots = new Map(definition.slots.map(s => [s.slotKey, s]))
+  const scaleDependencies = value.manifest.scaleDependencies
+  if (scaleDependencies) {
+    if (value.schemaVersion !== 1 || definition.bundleVersion !== '0.1.1'
+      || !/^(?:child_chexi_(?:parent|teacher)_zh_cn_v1|child_cognitive_control_(?:parent|teacher|parent_teacher)_zh_cn)$/.test(definition.bundleKey)) fail('manifest.scaleDependencies', 'dedicated CHEXI revision required')
+    unique(scaleDependencies.map(d => d.slotKey), 'manifest.scaleDependencies')
+    if (scaleDependencies.length !== definition.slots.filter(s => s.unitType === 'SCALE').length) fail('manifest.scaleDependencies', 'all SCALE slots require exact sources')
+    let sharedSource: string | undefined
+    for (const dependency of scaleDependencies) {
+      const slot = slots.get(dependency.slotKey), source = dependency.source
+      if (slot?.unitType !== 'SCALE' || !['PARENT','TEACHER'].includes(slot.respondentType)
+        || slot.instrumentKey !== 'chexi_zh_hans' || slot.instrumentVersion !== '1.0.1'
+        || source.identity.instrumentKey !== slot.instrumentKey || source.identity.instrumentVersion !== slot.instrumentVersion
+        || !source.executable || source.executable.definition.scoring.scorerKey || source.executable.scorerPlugins?.length
+        || source.executable.references.length || source.executable.definition.referencePolicy.type !== 'none') fail('manifest.scaleDependencies', 'exact JSON CHEXI source without norms required')
+      const validation = validateScaleInstrumentSource(parseScaleInstrumentSourceSchema(source), {requireInstruction:true,executeGoldenCases:false})
+      if (!validation.valid) fail('manifest.scaleDependencies', validation.issues.filter(i => i.severity === 'error').map(i => i.message).join('; '))
+      const sourceHash = canonicalHash(source)
+      if (sharedSource && sharedSource !== sourceHash) fail('manifest.scaleDependencies', 'observers must share one frozen source contract')
+      sharedSource = sourceHash
+    }
+  }
   const evidence = new Map(value.evidence.map(e => [e.evidenceKey, e]))
   const references = new Map(value.scientific.references.map(r => [r.id, r]))
   for (const e of value.evidence) {
