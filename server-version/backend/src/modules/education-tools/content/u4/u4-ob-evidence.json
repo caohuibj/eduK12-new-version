@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "ob-evidence",
+      "title": "每一原始事件一条记录",
+      "questions": [
+        {
+          "itemKey": "evidence-ref",
+          "type": "LONG_TEXT",
+          "prompt": "证据稳定代号（仅本次去标识事件，如EV-01；同一事件多专题复用）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "observation-scope",
+          "type": "LONG_TEXT",
+          "prompt": "课次、观察时段、取样位置、未覆盖的环节；不用学生姓名",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "teacher-fact",
+          "type": "LONG_TEXT",
+          "prompt": "教师原话／行为。访谈计划或推断须明确另标，不当作发生事实",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "student-fact",
+          "type": "LONG_TEXT",
+          "prompt": "学生实际回应／作品（去标识），尚不能判断的部分",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "conditions",
+          "type": "LONG_TEXT",
+          "prompt": "支持条件、限制及其他解释",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "counter-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "后续／相反材料及是否同一事件",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "next-action",
+          "type": "LONG_TEXT",
+          "prompt": "只选一项改进行动及下一次复核证据",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        }
+      ],
+      "description": "X01 学习意义（T01）：教师怎样说明学科问题或任务价值？学生有没有形成自己联系的机会？有没有只把分数、服从或活动热闹当意义？观察不能替学生判断是否真觉得有价值。\nX02 清晰度（T02）：重点、步骤和概念条件如何被呈现？学生表示不理解后，教师改变了什么解释方式？讲得流畅与学生听懂分开。\nX03 差异化支持（T04）：调整根据哪一项具体需要？共同目标是否保留？受助者和其他学生如何继续学习？不采纳固定学习风格标签。\nX04 自我调节支持（T06）：学生是否用标准检查进展、解释调整理由？区分教师替学生管理和学生自己作决定。\nX05 日常关怀与身份尊重（T09）：没有冲突时是否也倾听、跟进和接纳不同经验？不把个体学生当作某一群体代言人，不要求披露家庭或身份隐私。\nX06 资源可及（T05/T11）：材料、设备、语言或身体条件是否让部分学生无法参与？替代路径是否仍能支持同一核心目标？主专题由本次观察问题决定，其余为关联，不重复记分。\n独立观察初判不覆盖；讨论后另留记录。本表内部引用不自动产生数据库跨记录关联。"
+    }
+  ]
+}

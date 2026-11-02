@@ -1,0 +1,516 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "sr-experience",
+      "title": "自己的感受",
+      "questions": [
+        {
+          "itemKey": "sr-x01",
+          "type": "SINGLE",
+          "prompt": "在这门课上，我可以说“还没有懂”，不必担心被嘲笑。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "x0",
+              "label": "完全不符合"
+            },
+            {
+              "optionKey": "x1",
+              "label": "比较不符合"
+            },
+            {
+              "optionKey": "x2",
+              "label": "一部分符合"
+            },
+            {
+              "optionKey": "x3",
+              "label": "比较符合"
+            },
+            {
+              "optionKey": "x4",
+              "label": "非常符合"
+            },
+            {
+              "optionKey": "u",
+              "label": "无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "sr-x02",
+          "type": "SINGLE",
+          "prompt": "即使回答错了，我仍觉得自己受到尊重。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "x0",
+              "label": "完全不符合"
+            },
+            {
+              "optionKey": "x1",
+              "label": "比较不符合"
+            },
+            {
+              "optionKey": "x2",
+              "label": "一部分符合"
+            },
+            {
+              "optionKey": "x3",
+              "label": "比较符合"
+            },
+            {
+              "optionKey": "x4",
+              "label": "非常符合"
+            },
+            {
+              "optionKey": "u",
+              "label": "无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "sr-x03",
+          "type": "SINGLE",
+          "prompt": "我觉得自己是这个班学习活动中受到重视的一员。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "x0",
+              "label": "完全不符合"
+            },
+            {
+              "optionKey": "x1",
+              "label": "比较不符合"
+            },
+            {
+              "optionKey": "x2",
+              "label": "一部分符合"
+            },
+            {
+              "optionKey": "x3",
+              "label": "比较符合"
+            },
+            {
+              "optionKey": "x4",
+              "label": "非常符合"
+            },
+            {
+              "optionKey": "u",
+              "label": "无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "sr-x04",
+          "type": "SINGLE",
+          "prompt": "遇到学习困难时，我觉得这位老师愿意帮助我。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "x0",
+              "label": "完全不符合"
+            },
+            {
+              "optionKey": "x1",
+              "label": "比较不符合"
+            },
+            {
+              "optionKey": "x2",
+              "label": "一部分符合"
+            },
+            {
+              "optionKey": "x3",
+              "label": "比较符合"
+            },
+            {
+              "optionKey": "x4",
+              "label": "非常符合"
+            },
+            {
+              "optionKey": "u",
+              "label": "无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "sr-x05",
+          "type": "SINGLE",
+          "prompt": "我觉得这门课所学内容值得学习。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "x0",
+              "label": "完全不符合"
+            },
+            {
+              "optionKey": "x1",
+              "label": "比较不符合"
+            },
+            {
+              "optionKey": "x2",
+              "label": "一部分符合"
+            },
+            {
+              "optionKey": "x3",
+              "label": "比较符合"
+            },
+            {
+              "optionKey": "x4",
+              "label": "非常符合"
+            },
+            {
+              "optionKey": "u",
+              "label": "无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "sr-x06",
+          "type": "SINGLE",
+          "prompt": "即使现在有困难，我觉得自己能找到逐步学会的办法。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "x0",
+              "label": "完全不符合"
+            },
+            {
+              "optionKey": "x1",
+              "label": "比较不符合"
+            },
+            {
+              "optionKey": "x2",
+              "label": "一部分符合"
+            },
+            {
+              "optionKey": "x3",
+              "label": "比较符合"
+            },
+            {
+              "optionKey": "x4",
+              "label": "非常符合"
+            },
+            {
+              "optionKey": "u",
+              "label": "无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "sr-x07",
+          "type": "SINGLE",
+          "prompt": "我觉得自己能对这门课中一部分学习活动作出决定。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "x0",
+              "label": "完全不符合"
+            },
+            {
+              "optionKey": "x1",
+              "label": "比较不符合"
+            },
+            {
+              "optionKey": "x2",
+              "label": "一部分符合"
+            },
+            {
+              "optionKey": "x3",
+              "label": "比较符合"
+            },
+            {
+              "optionKey": "x4",
+              "label": "非常符合"
+            },
+            {
+              "optionKey": "u",
+              "label": "无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "sr-x08",
+          "type": "SINGLE",
+          "prompt": "这门课的学习节奏让我感到来不及理解所学内容。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "x0",
+              "label": "完全不符合"
+            },
+            {
+              "optionKey": "x1",
+              "label": "比较不符合"
+            },
+            {
+              "optionKey": "x2",
+              "label": "一部分符合"
+            },
+            {
+              "optionKey": "x3",
+              "label": "比较符合"
+            },
+            {
+              "optionKey": "x4",
+              "label": "非常符合"
+            },
+            {
+              "optionKey": "u",
+              "label": "无法判断"
+            }
+          ],
+          "rows": []
+        }
+      ],
+      "description": "组织者须在发放时固定并显示教师、班级、课程及起止日期。默认最近四个实际教学周，不足四周照实记录。不要将不同课程或单课版混用。 这部分问符合程度，不是频率。八项分别呈现，不求总分；负担项不反向合并。"
+    }
+  ],
+  "descriptive": {
+    "version": "ordinal-description-v1",
+    "selfAudience": "NONE",
+    "items": [
+      {
+        "itemKey": "sr-x01",
+        "values": [
+          {
+            "optionKey": "x0",
+            "code": 0
+          },
+          {
+            "optionKey": "x1",
+            "code": 1
+          },
+          {
+            "optionKey": "x2",
+            "code": 2
+          },
+          {
+            "optionKey": "x3",
+            "code": 3
+          },
+          {
+            "optionKey": "x4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "u"
+        ]
+      },
+      {
+        "itemKey": "sr-x02",
+        "values": [
+          {
+            "optionKey": "x0",
+            "code": 0
+          },
+          {
+            "optionKey": "x1",
+            "code": 1
+          },
+          {
+            "optionKey": "x2",
+            "code": 2
+          },
+          {
+            "optionKey": "x3",
+            "code": 3
+          },
+          {
+            "optionKey": "x4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "u"
+        ]
+      },
+      {
+        "itemKey": "sr-x03",
+        "values": [
+          {
+            "optionKey": "x0",
+            "code": 0
+          },
+          {
+            "optionKey": "x1",
+            "code": 1
+          },
+          {
+            "optionKey": "x2",
+            "code": 2
+          },
+          {
+            "optionKey": "x3",
+            "code": 3
+          },
+          {
+            "optionKey": "x4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "u"
+        ]
+      },
+      {
+        "itemKey": "sr-x04",
+        "values": [
+          {
+            "optionKey": "x0",
+            "code": 0
+          },
+          {
+            "optionKey": "x1",
+            "code": 1
+          },
+          {
+            "optionKey": "x2",
+            "code": 2
+          },
+          {
+            "optionKey": "x3",
+            "code": 3
+          },
+          {
+            "optionKey": "x4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "u"
+        ]
+      },
+      {
+        "itemKey": "sr-x05",
+        "values": [
+          {
+            "optionKey": "x0",
+            "code": 0
+          },
+          {
+            "optionKey": "x1",
+            "code": 1
+          },
+          {
+            "optionKey": "x2",
+            "code": 2
+          },
+          {
+            "optionKey": "x3",
+            "code": 3
+          },
+          {
+            "optionKey": "x4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "u"
+        ]
+      },
+      {
+        "itemKey": "sr-x06",
+        "values": [
+          {
+            "optionKey": "x0",
+            "code": 0
+          },
+          {
+            "optionKey": "x1",
+            "code": 1
+          },
+          {
+            "optionKey": "x2",
+            "code": 2
+          },
+          {
+            "optionKey": "x3",
+            "code": 3
+          },
+          {
+            "optionKey": "x4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "u"
+        ]
+      },
+      {
+        "itemKey": "sr-x07",
+        "values": [
+          {
+            "optionKey": "x0",
+            "code": 0
+          },
+          {
+            "optionKey": "x1",
+            "code": 1
+          },
+          {
+            "optionKey": "x2",
+            "code": 2
+          },
+          {
+            "optionKey": "x3",
+            "code": 3
+          },
+          {
+            "optionKey": "x4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "u"
+        ]
+      },
+      {
+        "itemKey": "sr-x08",
+        "values": [
+          {
+            "optionKey": "x0",
+            "code": 0
+          },
+          {
+            "optionKey": "x1",
+            "code": 1
+          },
+          {
+            "optionKey": "x2",
+            "code": 2
+          },
+          {
+            "optionKey": "x3",
+            "code": 3
+          },
+          {
+            "optionKey": "x4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "u"
+        ]
+      }
+    ],
+    "exploratoryMeans": false,
+    "groups": []
+  }
+}

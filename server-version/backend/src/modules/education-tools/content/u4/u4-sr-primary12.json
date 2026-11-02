@@ -1,0 +1,728 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "sr-primary",
+      "title": "回想这门课",
+      "questions": [
+        {
+          "itemKey": "p01",
+          "type": "SINGLE",
+          "prompt": "老师会说清楚，做这个任务是要学会什么。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "p0",
+              "label": "从没有"
+            },
+            {
+              "optionKey": "p1",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "p2",
+              "label": "经常"
+            },
+            {
+              "optionKey": "p3",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "没遇到"
+            },
+            {
+              "optionKey": "u",
+              "label": "不记得"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "p02",
+          "type": "SINGLE",
+          "prompt": "我说没听懂时，老师会换个例子讲。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "p0",
+              "label": "从没有"
+            },
+            {
+              "optionKey": "p1",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "p2",
+              "label": "经常"
+            },
+            {
+              "optionKey": "p3",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "没遇到"
+            },
+            {
+              "optionKey": "u",
+              "label": "不记得"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "p03",
+          "type": "SINGLE",
+          "prompt": "老师会问我，为什么这样想。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "p0",
+              "label": "从没有"
+            },
+            {
+              "optionKey": "p1",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "p2",
+              "label": "经常"
+            },
+            {
+              "optionKey": "p3",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "没遇到"
+            },
+            {
+              "optionKey": "u",
+              "label": "不记得"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "p04",
+          "type": "SINGLE",
+          "prompt": "老师提示以后，还让我自己试一试。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "p0",
+              "label": "从没有"
+            },
+            {
+              "optionKey": "p1",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "p2",
+              "label": "经常"
+            },
+            {
+              "optionKey": "p3",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "没遇到"
+            },
+            {
+              "optionKey": "u",
+              "label": "不记得"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "p05",
+          "type": "SINGLE",
+          "prompt": "回答问题前，我有时间先想一想。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "p0",
+              "label": "从没有"
+            },
+            {
+              "optionKey": "p1",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "p2",
+              "label": "经常"
+            },
+            {
+              "optionKey": "p3",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "没遇到"
+            },
+            {
+              "optionKey": "u",
+              "label": "不记得"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "p06",
+          "type": "SINGLE",
+          "prompt": "老师会教我检查自己哪里会了、哪里还不会。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "p0",
+              "label": "从没有"
+            },
+            {
+              "optionKey": "p1",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "p2",
+              "label": "经常"
+            },
+            {
+              "optionKey": "p3",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "没遇到"
+            },
+            {
+              "optionKey": "u",
+              "label": "不记得"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "p07",
+          "type": "SINGLE",
+          "prompt": "我答错时，老师会问我是怎样想出来的。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "p0",
+              "label": "从没有"
+            },
+            {
+              "optionKey": "p1",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "p2",
+              "label": "经常"
+            },
+            {
+              "optionKey": "p3",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "没遇到"
+            },
+            {
+              "optionKey": "u",
+              "label": "不记得"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "p08",
+          "type": "SINGLE",
+          "prompt": "老师给了建议以后，我有机会改一改或再试一试。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "p0",
+              "label": "从没有"
+            },
+            {
+              "optionKey": "p1",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "p2",
+              "label": "经常"
+            },
+            {
+              "optionKey": "p3",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "没遇到"
+            },
+            {
+              "optionKey": "u",
+              "label": "不记得"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "p09",
+          "type": "SINGLE",
+          "prompt": "我有困难时，老师会听我说清楚。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "p0",
+              "label": "从没有"
+            },
+            {
+              "optionKey": "p1",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "p2",
+              "label": "经常"
+            },
+            {
+              "optionKey": "p3",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "没遇到"
+            },
+            {
+              "optionKey": "u",
+              "label": "不记得"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "p10",
+          "type": "SINGLE",
+          "prompt": "和同学一起做任务时，我也有机会说自己的想法。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "p0",
+              "label": "从没有"
+            },
+            {
+              "optionKey": "p1",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "p2",
+              "label": "经常"
+            },
+            {
+              "optionKey": "p3",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "没遇到"
+            },
+            {
+              "optionKey": "u",
+              "label": "不记得"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "p11",
+          "type": "SINGLE",
+          "prompt": "换一个活动时，我知道下一步要做什么。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "p0",
+              "label": "从没有"
+            },
+            {
+              "optionKey": "p1",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "p2",
+              "label": "经常"
+            },
+            {
+              "optionKey": "p3",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "没遇到"
+            },
+            {
+              "optionKey": "u",
+              "label": "不记得"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "p12",
+          "type": "SINGLE",
+          "prompt": "老师提醒我以后，我知道怎样回到学习中。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "p0",
+              "label": "从没有"
+            },
+            {
+              "optionKey": "p1",
+              "label": "偶尔"
+            },
+            {
+              "optionKey": "p2",
+              "label": "经常"
+            },
+            {
+              "optionKey": "p3",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "没遇到"
+            },
+            {
+              "optionKey": "u",
+              "label": "不记得"
+            }
+          ],
+          "rows": []
+        }
+      ],
+      "description": "组织者须在发放时固定并显示教师、班级、课程及起止日期。默认最近四个实际教学周，不足四周照实记录。不要将不同课程或单课版混用。 按从没有、偶尔、经常、几乎每次作答；不知道、没遇到、不想回答都可以如实选择。四级选项与24题五级版本不能直接比较。"
+    }
+  ],
+  "descriptive": {
+    "version": "ordinal-description-v1",
+    "selfAudience": "NONE",
+    "items": [
+      {
+        "itemKey": "p01",
+        "values": [
+          {
+            "optionKey": "p0",
+            "code": 0
+          },
+          {
+            "optionKey": "p1",
+            "code": 1
+          },
+          {
+            "optionKey": "p2",
+            "code": 2
+          },
+          {
+            "optionKey": "p3",
+            "code": 3
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "p02",
+        "values": [
+          {
+            "optionKey": "p0",
+            "code": 0
+          },
+          {
+            "optionKey": "p1",
+            "code": 1
+          },
+          {
+            "optionKey": "p2",
+            "code": 2
+          },
+          {
+            "optionKey": "p3",
+            "code": 3
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "p03",
+        "values": [
+          {
+            "optionKey": "p0",
+            "code": 0
+          },
+          {
+            "optionKey": "p1",
+            "code": 1
+          },
+          {
+            "optionKey": "p2",
+            "code": 2
+          },
+          {
+            "optionKey": "p3",
+            "code": 3
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "p04",
+        "values": [
+          {
+            "optionKey": "p0",
+            "code": 0
+          },
+          {
+            "optionKey": "p1",
+            "code": 1
+          },
+          {
+            "optionKey": "p2",
+            "code": 2
+          },
+          {
+            "optionKey": "p3",
+            "code": 3
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "p05",
+        "values": [
+          {
+            "optionKey": "p0",
+            "code": 0
+          },
+          {
+            "optionKey": "p1",
+            "code": 1
+          },
+          {
+            "optionKey": "p2",
+            "code": 2
+          },
+          {
+            "optionKey": "p3",
+            "code": 3
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "p06",
+        "values": [
+          {
+            "optionKey": "p0",
+            "code": 0
+          },
+          {
+            "optionKey": "p1",
+            "code": 1
+          },
+          {
+            "optionKey": "p2",
+            "code": 2
+          },
+          {
+            "optionKey": "p3",
+            "code": 3
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "p07",
+        "values": [
+          {
+            "optionKey": "p0",
+            "code": 0
+          },
+          {
+            "optionKey": "p1",
+            "code": 1
+          },
+          {
+            "optionKey": "p2",
+            "code": 2
+          },
+          {
+            "optionKey": "p3",
+            "code": 3
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "p08",
+        "values": [
+          {
+            "optionKey": "p0",
+            "code": 0
+          },
+          {
+            "optionKey": "p1",
+            "code": 1
+          },
+          {
+            "optionKey": "p2",
+            "code": 2
+          },
+          {
+            "optionKey": "p3",
+            "code": 3
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "p09",
+        "values": [
+          {
+            "optionKey": "p0",
+            "code": 0
+          },
+          {
+            "optionKey": "p1",
+            "code": 1
+          },
+          {
+            "optionKey": "p2",
+            "code": 2
+          },
+          {
+            "optionKey": "p3",
+            "code": 3
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "p10",
+        "values": [
+          {
+            "optionKey": "p0",
+            "code": 0
+          },
+          {
+            "optionKey": "p1",
+            "code": 1
+          },
+          {
+            "optionKey": "p2",
+            "code": 2
+          },
+          {
+            "optionKey": "p3",
+            "code": 3
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "p11",
+        "values": [
+          {
+            "optionKey": "p0",
+            "code": 0
+          },
+          {
+            "optionKey": "p1",
+            "code": 1
+          },
+          {
+            "optionKey": "p2",
+            "code": 2
+          },
+          {
+            "optionKey": "p3",
+            "code": 3
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "p12",
+        "values": [
+          {
+            "optionKey": "p0",
+            "code": 0
+          },
+          {
+            "optionKey": "p1",
+            "code": 1
+          },
+          {
+            "optionKey": "p2",
+            "code": 2
+          },
+          {
+            "optionKey": "p3",
+            "code": 3
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      }
+    ],
+    "exploratoryMeans": false,
+    "groups": []
+  }
+}

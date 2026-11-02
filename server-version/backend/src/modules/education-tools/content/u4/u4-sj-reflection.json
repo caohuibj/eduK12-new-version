@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "sj-reflection",
+      "title": "完成后反思",
+      "questions": [
+        {
+          "itemKey": "sj-x01",
+          "type": "LONG_TEXT",
+          "prompt": "你最想保护的学习目标是什么？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "sj-x02",
+          "type": "LONG_TEXT",
+          "prompt": "哪条新信息改变了你的判断？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "sj-x03",
+          "type": "LONG_TEXT",
+          "prompt": "在自己的下一节课中准备尝试什么、如何知道是否有效？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        }
+      ],
+      "description": "单独施测，并注明已看过哪些反馈及作答时间；不得回填成首次选择时的动机。"
+    }
+  ]
+}

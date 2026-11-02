@@ -1,3 +1,4 @@
+import {describeFormResponse} from '../assessment-core/form/descriptive'
 import {Prisma} from '@prisma/client'
 import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
 import {readFormSectionCollectionFacts} from '../assessment-runtime/form-facts'
@@ -43,7 +44,7 @@ export async function collectStudentCompositionFinals(tx:Tx,input:{organizationI
   if(block.kind==='FORM'){
    const form=formDraftSchema.parse(definition.definition)
    if(form.pages.length!==block.sectionIds.length||form.pages.reduce((n,page)=>n+page.questions.length,0)!==block.itemIds.length)fail()
-   return {block,form,unit:null,items:createProtectedFormItems(form),metrics:null,comparableKey:studentFormComparableKey(form)}
+   return {block,form,unit:null,items:createProtectedFormItems(form),metrics:null,descriptiveMeans:form.descriptive?.exploratoryMeans?createStudentScaleMetrics(form.descriptive.groups):[],comparableKey:studentFormComparableKey(form)}
   }
   const unit=identity.units.find(unit=>unit.itemId===block.itemIds[0]),ceiling=identity.binding.unitReports.find(unit=>unit.blockId===block.blockId)
   if(!unit||!ceiling||ceiling.versionId!==block.versionId||ceiling.contentHash!==block.contentHash||!definition.scores)fail()
@@ -105,6 +106,10 @@ export async function collectStudentCompositionFinals(tx:Tx,input:{organizationI
       offset+=page.questions.length
      }
      recordProtectedFormAnswers(source.items!,answers,missing)
+     if(source.descriptiveMeans?.length){
+      const described=describeFormResponse(source.form,answers,missing)!
+      recordStudentScaleMetrics(source.descriptiveMeans,described.exploratoryMeans.map(g=>({key:g.key,value:g.value,quality:g.value===null?'not_calculable':'calculated'})),'interpretable')
+     }
     }else if(source.metrics.length){
      const itemId=source.block.itemIds[0],slot=set.slots.find(slot=>slot.slotKey===compositeItemSlotKey(itemId,'SCALE'))
      const finalIndex=scaleFinals.findIndex(final=>final.compositeAttemptId===parent.id&&final.attemptEpoch===parent.attemptEpoch&&final.slotKey===compositeItemSlotKey(itemId,'SCALE'))
@@ -126,7 +131,8 @@ export async function collectStudentCompositionFinals(tx:Tx,input:{organizationI
  if(seen!==input.count)fail()
  return {respondents,comparableKeys:[...new Set(blocks.map(block=>block.comparableKey))],units:blocks.map(source=>({
   blockId:source.block.blockId,kind:source.block.kind,title:source.block.title,versionId:source.block.versionId,contentHash:source.block.contentHash,
-  ...(source.form?{distributions:discloseProtectedFormItems(source.items!,input.count,input.options)}:
+  ...(source.form?{distributions:discloseProtectedFormItems(source.items!,input.count,input.options,input.minimum),
+    ...(source.descriptiveMeans?.length?{exploratoryMeans:discloseStudentScaleMetrics(source.descriptiveMeans,input.count,input.minimum,input.options)}:{})}:
    {metrics:discloseStudentScaleMetrics(source.metrics,input.count,input.minimum,input.options),...(source.metrics.length?{}:{state:'WITHHELD' as const,reason:'AUDIENCE_NOT_ALLOWED'})}),
  }))}
 }

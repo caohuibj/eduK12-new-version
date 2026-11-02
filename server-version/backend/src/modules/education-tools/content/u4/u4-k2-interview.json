@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "k2-interview",
+      "title": "访谈提示",
+      "questions": [
+        {
+          "itemKey": "sr-k2-i01",
+          "type": "LONG_TEXT",
+          "prompt": "你遇到不会的地方时可以怎样求助？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "sr-k2-i02",
+          "type": "LONG_TEXT",
+          "prompt": "想一想刚才这节课，换活动的时候，你是怎么知道接下来做什么的？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "sr-k2-i03",
+          "type": "LONG_TEXT",
+          "prompt": "说错了以后发生什么？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "sr-k2-i04",
+          "type": "LONG_TEXT",
+          "prompt": "想一想刚才这节课，有没有哪一步是你自己试着做的？可以说说那时候的事吗？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "sr-k2-i05",
+          "type": "LONG_TEXT",
+          "prompt": "和同学一起做时你做了什么？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "sr-k2-i06",
+          "type": "LONG_TEXT",
+          "prompt": "你希望课堂改变一件什么事？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        }
+      ],
+      "description": "由获准主持人记录儿童原意、实施方式和无法判断之处。每项均可不答；不要写姓名或诱导教师好坏。不是儿童独立自填的有效量表；本候选明确锚定一节课，不与四周问卷等值。"
+    }
+  ]
+}

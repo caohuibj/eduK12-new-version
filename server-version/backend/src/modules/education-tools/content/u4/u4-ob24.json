@@ -1,0 +1,2153 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "ob-t01",
+      "title": "T01 目标、任务与学习意义",
+      "questions": [
+        {
+          "itemKey": "observe-t01",
+          "type": "SINGLE",
+          "prompt": "本次是否记录本专题？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "yes",
+              "label": "记录本专题"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次不记录"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "ob-t01-a-opportunity",
+          "type": "SINGLE",
+          "prompt": "核对主要任务实际要求的行动／产出是否对应学习目标，不只看活动完成。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t01",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t01-a-judgment",
+          "type": "SINGLE",
+          "prompt": "核对主要任务实际要求的行动／产出是否对应学习目标，不只看活动完成。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t01",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t01-a-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t01",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t01-b-opportunity",
+          "type": "SINGLE",
+          "prompt": "根据学生产出核对目标达成，并据此保留、调整或替换任务。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t01",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t01-b-judgment",
+          "type": "SINGLE",
+          "prompt": "根据学生产出核对目标达成，并据此保留、调整或替换任务。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t01",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t01-b-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t01",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        }
+      ],
+      "description": "仅记录所观察片段；机会与证据类别分开。未选择专题保持未呈现，不能转成零。"
+    },
+    {
+      "pageKey": "ob-t02",
+      "title": "T02 内容准确、解释清晰与概念联系",
+      "questions": [
+        {
+          "itemKey": "observe-t02",
+          "type": "SINGLE",
+          "prompt": "本次是否记录本专题？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "yes",
+              "label": "记录本专题"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次不记录"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "ob-t02-a-opportunity",
+          "type": "SINGLE",
+          "prompt": "用准确条件、例子或表征说明概念联系；发现错误时作合适更正。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t02",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t02-a-judgment",
+          "type": "SINGLE",
+          "prompt": "用准确条件、例子或表征说明概念联系；发现错误时作合适更正。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t02",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t02-a-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t02",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t02-b-opportunity",
+          "type": "SINGLE",
+          "prompt": "用学生解释、对比例或迁移检查概念联系，而非只复述术语。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t02",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t02-b-judgment",
+          "type": "SINGLE",
+          "prompt": "用学生解释、对比例或迁移检查概念联系，而非只复述术语。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t02",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t02-b-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t02",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        }
+      ],
+      "description": "仅记录所观察片段；机会与证据类别分开。未选择专题保持未呈现，不能转成零。"
+    },
+    {
+      "pageKey": "ob-t03",
+      "title": "T03 解释、论证与认知挑战",
+      "questions": [
+        {
+          "itemKey": "observe-t03",
+          "type": "SINGLE",
+          "prompt": "本次是否记录本专题？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "yes",
+              "label": "记录本专题"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次不记录"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "ob-t03-a-opportunity",
+          "type": "SINGLE",
+          "prompt": "任务要求并实际留给学生解释、比较理由或权衡证据的空间。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t03",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t03-a-judgment",
+          "type": "SINGLE",
+          "prompt": "任务要求并实际留给学生解释、比较理由或权衡证据的空间。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t03",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t03-a-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t03",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t03-b-opportunity",
+          "type": "SINGLE",
+          "prompt": "面对不同或相反证据，支持学生检查并修订推理。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t03",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t03-b-judgment",
+          "type": "SINGLE",
+          "prompt": "面对不同或相反证据，支持学生检查并修订推理。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t03",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t03-b-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t03",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        }
+      ],
+      "description": "仅记录所观察片段；机会与证据类别分开。未选择专题保持未呈现，不能转成零。"
+    },
+    {
+      "pageKey": "ob-t04",
+      "title": "T04 按需支持、支架与独立迁移",
+      "questions": [
+        {
+          "itemKey": "observe-t04",
+          "type": "SINGLE",
+          "prompt": "本次是否记录本专题？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "yes",
+              "label": "记录本专题"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次不记录"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "ob-t04-a-opportunity",
+          "type": "SINGLE",
+          "prompt": "根据具体困难提供适量、可调整的支持，而非一律代做或一律放手。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t04",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t04-a-judgment",
+          "type": "SINGLE",
+          "prompt": "根据具体困难提供适量、可调整的支持，而非一律代做或一律放手。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t04",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t04-a-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t04",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t04-b-opportunity",
+          "type": "SINGLE",
+          "prompt": "查看提示后表现，减少或改变支架，并检查独立尝试。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t04",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t04-b-judgment",
+          "type": "SINGLE",
+          "prompt": "查看提示后表现，减少或改变支架，并检查独立尝试。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t04",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t04-b-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t04",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        }
+      ],
+      "description": "仅记录所观察片段；机会与证据类别分开。未选择专题保持未呈现，不能转成零。"
+    },
+    {
+      "pageKey": "ob-t05",
+      "title": "T05 可及、公平与实质参与",
+      "questions": [
+        {
+          "itemKey": "observe-t05",
+          "type": "SINGLE",
+          "prompt": "本次是否记录本专题？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "yes",
+              "label": "记录本专题"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次不记录"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "ob-t05-a-opportunity",
+          "type": "SINGLE",
+          "prompt": "提供思考和表达入口，记录不同位置及需要的学生是否能进入任务。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t05",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t05-a-judgment",
+          "type": "SINGLE",
+          "prompt": "提供思考和表达入口，记录不同位置及需要的学生是否能进入任务。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t05",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t05-a-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t05",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t05-b-opportunity",
+          "type": "SINGLE",
+          "prompt": "区分机会、实际回应和理解质量，据个人证据调整参与安排。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t05",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t05-b-judgment",
+          "type": "SINGLE",
+          "prompt": "区分机会、实际回应和理解质量，据个人证据调整参与安排。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t05",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t05-b-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t05",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        }
+      ],
+      "description": "仅记录所观察片段；机会与证据类别分开。未选择专题保持未呈现，不能转成零。"
+    },
+    {
+      "pageKey": "ob-t06",
+      "title": "T06 自主支持与自我调节学习",
+      "questions": [
+        {
+          "itemKey": "observe-t06",
+          "type": "SINGLE",
+          "prompt": "本次是否记录本专题？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "yes",
+              "label": "记录本专题"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次不记录"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "ob-t06-a-opportunity",
+          "type": "SINGLE",
+          "prompt": "在清晰边界内给学生实质学习决策，不只选择外观或展示形式。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t06",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t06-a-judgment",
+          "type": "SINGLE",
+          "prompt": "在清晰边界内给学生实质学习决策，不只选择外观或展示形式。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t06",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t06-a-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t06",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t06-b-opportunity",
+          "type": "SINGLE",
+          "prompt": "支持学生依据标准与证据自检、修订并决定下一步。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t06",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t06-b-judgment",
+          "type": "SINGLE",
+          "prompt": "支持学生依据标准与证据自检、修订并决定下一步。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t06",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t06-b-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t06",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        }
+      ],
+      "description": "仅记录所观察片段；机会与证据类别分开。未选择专题保持未呈现，不能转成零。"
+    },
+    {
+      "pageKey": "ob-t07",
+      "title": "T07 诊断取证与审慎判断",
+      "questions": [
+        {
+          "itemKey": "observe-t07",
+          "type": "SINGLE",
+          "prompt": "本次是否记录本专题？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "yes",
+              "label": "记录本专题"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次不记录"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "ob-t07-a-opportunity",
+          "type": "SINGLE",
+          "prompt": "检查任务能区分理解原因，记录取样及原始证据来源。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t07",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t07-a-judgment",
+          "type": "SINGLE",
+          "prompt": "检查任务能区分理解原因，记录取样及原始证据来源。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t07",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t07-a-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t07",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t07-b-opportunity",
+          "type": "SINGLE",
+          "prompt": "根据新证据调整诊断，区分表达困难、规则记忆、概念误解与信息不足。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t07",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t07-b-judgment",
+          "type": "SINGLE",
+          "prompt": "根据新证据调整诊断，区分表达困难、规则记忆、概念误解与信息不足。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t07",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t07-b-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t07",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        }
+      ],
+      "description": "仅记录所观察片段；机会与证据类别分开。未选择专题保持未呈现，不能转成零。"
+    },
+    {
+      "pageKey": "ob-t08",
+      "title": "T08 反馈使用、重试与教学调适",
+      "questions": [
+        {
+          "itemKey": "observe-t08",
+          "type": "SINGLE",
+          "prompt": "本次是否记录本专题？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "yes",
+              "label": "记录本专题"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次不记录"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "ob-t08-a-opportunity",
+          "type": "SINGLE",
+          "prompt": "关键反馈能被学生落实到具体修改或重试。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t08",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t08-a-judgment",
+          "type": "SINGLE",
+          "prompt": "关键反馈能被学生落实到具体修改或重试。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t08",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t08-a-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t08",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t08-b-opportunity",
+          "type": "SINGLE",
+          "prompt": "查看反馈使用后的学习证据，必要时调整教学并以新任务核对。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t08",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t08-b-judgment",
+          "type": "SINGLE",
+          "prompt": "查看反馈使用后的学习证据，必要时调整教学并以新任务核对。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t08",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t08-b-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t08",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        }
+      ],
+      "description": "仅记录所观察片段；机会与证据类别分开。未选择专题保持未呈现，不能转成零。"
+    },
+    {
+      "pageKey": "ob-t09",
+      "title": "T09 尊重、持续关怀与安全表达",
+      "questions": [
+        {
+          "itemKey": "observe-t09",
+          "type": "SINGLE",
+          "prompt": "本次是否记录本专题？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "yes",
+              "label": "记录本专题"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次不记录"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "ob-t09-a-opportunity",
+          "type": "SINGLE",
+          "prompt": "回应具体观点和行为，阻止羞辱，保留私下或替代表达渠道。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t09",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t09-a-judgment",
+          "type": "SINGLE",
+          "prompt": "回应具体观点和行为，阻止羞辱，保留私下或替代表达渠道。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t09",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t09-a-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t09",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t09-b-opportunity",
+          "type": "SINGLE",
+          "prompt": "查看后续参与与修复需要，落实适当支持，不用安静、道歉或笑容推断内心恢复。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t09",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t09-b-judgment",
+          "type": "SINGLE",
+          "prompt": "查看后续参与与修复需要，落实适当支持，不用安静、道歉或笑容推断内心恢复。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t09",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t09-b-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t09",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        }
+      ],
+      "description": "仅记录所观察片段；机会与证据类别分开。未选择专题保持未呈现，不能转成零。"
+    },
+    {
+      "pageKey": "ob-t10",
+      "title": "T10 协作对话、互惠与共同建构",
+      "questions": [
+        {
+          "itemKey": "observe-t10",
+          "type": "SINGLE",
+          "prompt": "本次是否记录本专题？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "yes",
+              "label": "记录本专题"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次不记录"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "ob-t10-a-opportunity",
+          "type": "SINGLE",
+          "prompt": "任务需要相互解释或信息整合，成员有实质贡献。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t10",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t10-a-judgment",
+          "type": "SINGLE",
+          "prompt": "任务需要相互解释或信息整合，成员有实质贡献。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t10",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t10-a-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t10",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t10-b-opportunity",
+          "type": "SINGLE",
+          "prompt": "检查个人理解和互惠，处理包办、复制、固定强弱及过度互助负担。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t10",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t10-b-judgment",
+          "type": "SINGLE",
+          "prompt": "检查个人理解和互惠，处理包办、复制、固定强弱及过度互助负担。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t10",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t10-b-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t10",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        }
+      ],
+      "description": "仅记录所观察片段；机会与证据类别分开。未选择专题保持未呈现，不能转成零。"
+    },
+    {
+      "pageKey": "ob-t11",
+      "title": "T11 流程、节奏与资源组织",
+      "questions": [
+        {
+          "itemKey": "observe-t11",
+          "type": "SINGLE",
+          "prompt": "本次是否记录本专题？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "yes",
+              "label": "记录本专题"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次不记录"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "ob-t11-a-opportunity",
+          "type": "SINGLE",
+          "prompt": "进入、转换和收束可执行，保留核心学习活动时间。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t11",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t11-a-judgment",
+          "type": "SINGLE",
+          "prompt": "进入、转换和收束可执行，保留核心学习活动时间。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t11",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t11-a-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t11",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t11-b-opportunity",
+          "type": "SINGLE",
+          "prompt": "根据等待和产出调整节奏，必要时切换任务或媒介并守住安全。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t11",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t11-b-judgment",
+          "type": "SINGLE",
+          "prompt": "根据等待和产出调整节奏，必要时切换任务或媒介并守住安全。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t11",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t11-b-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t11",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        }
+      ],
+      "description": "仅记录所观察片段；机会与证据类别分开。未选择专题保持未呈现，不能转成零。"
+    },
+    {
+      "pageKey": "ob-t12",
+      "title": "T12 支持性规范、相称回应与重返学习",
+      "questions": [
+        {
+          "itemKey": "observe-t12",
+          "type": "SINGLE",
+          "prompt": "本次是否记录本专题？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "yes",
+              "label": "记录本专题"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次不记录"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "ob-t12-a-opportunity",
+          "type": "SINGLE",
+          "prompt": "说明与任务适配、可观察的行为期待及替代方式。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t12",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t12-a-judgment",
+          "type": "SINGLE",
+          "prompt": "说明与任务适配、可观察的行为期待及替代方式。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t12",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t12-a-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t12",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t12-b-opportunity",
+          "type": "SINGLE",
+          "prompt": "用足够且相称的回应处理越界，支持回到任务并检查参与恢复。\n机会状态",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "op",
+              "label": "有适用机会"
+            },
+            {
+              "optionKey": "no",
+              "label": "本次未出现"
+            },
+            {
+              "optionKey": "un",
+              "label": "机会不明"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t12",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t12-b-judgment",
+          "type": "SINGLE",
+          "prompt": "用足够且相称的回应处理越界，支持回到任务并检查参与恢复。\n证据类别（不是分数）",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "sup",
+              "label": "有支持证据"
+            },
+            {
+              "optionKey": "con",
+              "label": "有明确相反证据"
+            },
+            {
+              "optionKey": "mix",
+              "label": "支持与相反证据并存"
+            },
+            {
+              "optionKey": "ins",
+              "label": "材料不足"
+            },
+            {
+              "optionKey": "na",
+              "label": "不适用"
+            }
+          ],
+          "rows": [],
+          "displayIf": {
+            "itemKey": "observe-t12",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        },
+        {
+          "itemKey": "ob-t12-b-evidence",
+          "type": "LONG_TEXT",
+          "prompt": "支持本判断的evidence_ref及仍不能判断的范围。原始事实保存在独立证据记录，重复引用不增加样本。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 500,
+          "displayIf": {
+            "itemKey": "observe-t12",
+            "operator": "EQUALS",
+            "optionKey": "yes"
+          }
+        }
+      ],
+      "description": "仅记录所观察片段；机会与证据类别分开。未选择专题保持未呈现，不能转成零。"
+    }
+  ]
+}

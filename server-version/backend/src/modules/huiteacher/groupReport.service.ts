@@ -32,10 +32,12 @@ type FinalPayload={
   privateScoring:null
 }
 type CountMap=Map<string,number>
+type DescriptiveRule=NonNullable<FormDraft['descriptive']>['items'][number]
 type ItemAccumulator={
   itemKey:string;prompt:string;type:string;
   categories:{optionKey:string;label:string}[];
   counts:CountMap;
+  descriptive?:DescriptiveRule;
 }
 const add=(counts:CountMap,key:string)=>counts.set(key,(counts.get(key)??0)+1)
 const reportableChoices=new Set(['SINGLE','LIKERT','MATRIX','MULTIPLE','MATRIX_MULTIPLE'])
@@ -52,6 +54,7 @@ export const createProtectedFormItems=(form:FormDraft)=>{
       categories:reportableChoices.has(q.type)
         ?q.options.map(opt=>({optionKey:opt.optionKey,label:opt.label})):[],
       counts:new Map(),
+      ...(form.descriptive?.items.find(rule=>rule.itemKey===item.key)?{descriptive:form.descriptive.items.find(rule=>rule.itemKey===item.key)!}:{}),
     })
   }
   return items
@@ -105,12 +108,13 @@ export const recordProtectedFormAnswers=(items:ItemAccumulator[],
       add(item.counts,'REFUSED')
     }else if(value===undefined&&(reason==='SHOWN_MISSING'||reason==='NOT_SHOWN')){
       add(item.counts,'MISSING')
+      if(item.descriptive)add(item.counts,reason)
     }else{
       reject('HUITEACHER_REPORT_FINAL_INTEGRITY_FAILURE',409)
     }
   }
 }
-export const discloseProtectedFormItems=(items:ItemAccumulator[],count:number,options?:PrivacyOptions)=>{
+export const discloseProtectedFormItems=(items:ItemAccumulator[],count:number,options?:PrivacyOptions,minimumValid=5)=>{
   return items.map(item=>{
     if(!reportableChoices.has(item.type))
       return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
@@ -122,7 +126,8 @@ export const discloseProtectedFormItems=(items:ItemAccumulator[],count:number,op
       ...item.categories.map(opt=>({key:opt.optionKey,label:opt.label,
         count:item.counts.get(opt.optionKey)??0})),
       {key:'REFUSED',label:'明确拒答',count:item.counts.get('REFUSED')??0},
-      {key:'MISSING',label:'未提供有效回答',count:item.counts.get('MISSING')??0},
+      ...(item.descriptive?[{key:'SHOWN_MISSING',label:'跳过',count:item.counts.get('SHOWN_MISSING')??0},
+        {key:'NOT_SHOWN',label:'未呈现',count:item.counts.get('NOT_SHOWN')??0}]:[{key:'MISSING',label:'未提供有效回答',count:item.counts.get('MISSING')??0}]),
     ]
     const respondentN=multi
       ?(item.counts.get('ANSWERED')??0)
@@ -141,6 +146,19 @@ export const discloseProtectedFormItems=(items:ItemAccumulator[],count:number,op
     if((options?.withholdSmallCells??true)&&small)
       return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
         status:'WITHHELD' as const,reason:'SMALL_CELL' as const}
+    if(item.descriptive){
+      const validKeys=new Set(item.descriptive.values.map(v=>v.optionKey))
+      const validN=cells.filter(c=>validKeys.has(c.key)).reduce((sum,c)=>sum+c.count,0)
+      if(validN<minimumValid)return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,status:'WITHHELD' as const,reason:'MINIMUM_VALID_N' as const}
+      const rounded=options?.restrictedStatisticsProjection===true
+      const percentage=(n:number,d:number)=>rounded?Math.round(n*10/d)*10:n*100/d
+      return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,status:'READY' as const,
+        cells:cells.map(c=>({key:c.key,label:c.label,...(!rounded?{count:c.count}:{}),percentage:percentage(c.count,count)})),
+        descriptive:{version:'ordinal-description-v1' as const,submittedN:rounded?null:count,validN:rounded?null:validN,
+          frequencyDenominator:'VALID_ORDINAL_RESPONSES' as const,nonresponseDenominator:'SUBMITTED_RESPONSES' as const,
+          frequencies:cells.filter(c=>validKeys.has(c.key)).map(c=>({key:c.key,label:c.label,percentage:percentage(c.count,validN)}))},
+        ...(rounded?{precision:'ROUNDED_10_PERCENT' as const}:{})}
+    }
     if(options?.restrictedStatisticsProjection)
       return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
         status:'READY' as const,
