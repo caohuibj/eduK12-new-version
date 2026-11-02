@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "wihic52_actual_zh_cn_upper_secondary_student",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "WIHIC｜实际课堂52题研究候选（中文）｜高中｜学生填答",
+      "abbreviation": "WIHIC52",
+      "instrumentFamily": "What Is Happening In this Class? (WIHIC)"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "Mother-tool metadata only. Seven dimensions of perceived classroom learning environment; no executable mother total, item form or scoring for this record.",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "family:wihic",
+        "学生评教",
+        "评价对象:课堂",
+        "评价对象:教师",
+        "response:student_self_perception",
+        "locale:zh-CN",
+        "availability:catalog_only",
+        "maturity:pilot",
+        "form:actual",
+        "population:upper_secondary_student",
+        "rights:questionnaire_scope_unresolved"
+      ]
+    },
+    "population": {
+      "minAge": 14,
+      "maxAge": 18,
+      "gradeRange": {
+        "minGrade": 10,
+        "maxGrade": 11
+      },
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "English age/grade limits are the initial project scope, not source validation cut-offs. Chinese 2026 sample covers grades 10–11; abstract age 14–18 differs from Method age 15–18. Complete Mandarin form was not obtained; no item translation or deletion-based reconstruction is supplied."
+    },
+    "administration": {
+      "itemCount": 52,
+      "estimatedMinutes": 15,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "Current classroom perceptions; preferred form is only an unverified separate candidate.",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Catalog metadata only; no administration or individual scoring from this record.",
+        "Time estimate is a project estimate.",
+        "Actual/preferred, English/Mandarin, lower/upper-secondary versions remain separate."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Source identity and version tracking only; this catalog record cannot be administered."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Meng, Y. (2026). Learning Environments Research, 29, 27. https://doi.org/10.1007/s10984-026-09583-2",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Metadata only; no full translated or preferred questionnaire has been verified. The actual English mother references a separate ordinary-composite recipe."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "STUDENT",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Psychometric validation of the Chinese version of WIHIC in Mainland Chinese adolescents",
+      "citation": "Meng, Y. (2026). Learning Environments Research, 29, 27. https://doi.org/10.1007/s10984-026-09583-2",
+      "url": "https://link.springer.com/article/10.1007/s10984-026-09583-2",
+      "publicationYear": 2026
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "Student Cohesiveness",
+        "Teacher Support",
+        "Involvement",
+        "Investigation",
+        "Task Orientation",
+        "Cooperation",
+        "Equity"
+      ],
+      "limitations": [
+        "No executable mother score or report. All seven scales retain separate outcomes.",
+        "Chinese 52-item and preferred English item forms require verification from an authorized complete source; do not derive them by deleting or rewriting English items."
+      ],
+      "disclaimer": "Catalog candidate only; not installed or ready for administration."
+    },
+    "blockers": [
+      "COMPLETE_OFFICIAL_MANDARIN_ITEM_FORM_NOT_VERIFIED",
+      "ADAPTED_SIX_ITEMS_FULL_WORDING_NOT_VERIFIED",
+      "QUESTIONNAIRE_REUSE_SCOPE_NOT_ESTABLISHED",
+      "NO_ITEM_TEXT_OR_EXECUTABLE"
+    ]
+  }
+}

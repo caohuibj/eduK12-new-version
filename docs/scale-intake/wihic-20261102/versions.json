@@ -1,0 +1,89 @@
+{
+  "mother": "WIHIC",
+  "preparedAt": "2026-11-02",
+  "children": [
+    {
+      "instrumentKey": "wihic_student_cohesiveness_actual_en_lower_secondary_student",
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "parameterReference": "none",
+      "localizationVersion": "1.0.0",
+      "instructionVersion": "1.0.0",
+      "status": "DRAFT_HIDDEN_CANDIDATE",
+      "items": 8
+    },
+    {
+      "instrumentKey": "wihic_teacher_support_actual_en_lower_secondary_student",
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "parameterReference": "none",
+      "localizationVersion": "1.0.0",
+      "instructionVersion": "1.0.0",
+      "status": "DRAFT_HIDDEN_CANDIDATE",
+      "items": 8
+    },
+    {
+      "instrumentKey": "wihic_involvement_actual_en_lower_secondary_student",
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "parameterReference": "none",
+      "localizationVersion": "1.0.0",
+      "instructionVersion": "1.0.0",
+      "status": "DRAFT_HIDDEN_CANDIDATE",
+      "items": 8
+    },
+    {
+      "instrumentKey": "wihic_investigation_actual_en_lower_secondary_student",
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "parameterReference": "none",
+      "localizationVersion": "1.0.0",
+      "instructionVersion": "1.0.0",
+      "status": "DRAFT_HIDDEN_CANDIDATE",
+      "items": 8
+    },
+    {
+      "instrumentKey": "wihic_task_orientation_actual_en_lower_secondary_student",
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "parameterReference": "none",
+      "localizationVersion": "1.0.0",
+      "instructionVersion": "1.0.0",
+      "status": "DRAFT_HIDDEN_CANDIDATE",
+      "items": 8
+    },
+    {
+      "instrumentKey": "wihic_cooperation_actual_en_lower_secondary_student",
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "parameterReference": "none",
+      "localizationVersion": "1.0.0",
+      "instructionVersion": "1.0.0",
+      "status": "DRAFT_HIDDEN_CANDIDATE",
+      "items": 8
+    },
+    {
+      "instrumentKey": "wihic_equity_actual_en_lower_secondary_student",
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "parameterReference": "none",
+      "localizationVersion": "1.0.0",
+      "instructionVersion": "1.0.0",
+      "status": "DRAFT_HIDDEN_CANDIDATE",
+      "items": 8
+    }
+  ],
+  "unscoredForms": [],
+  "catalogOnly": [
+    "wihic56_actual_en_lower_secondary_student",
+    "wihic56_preferred_en_lower_secondary_student",
+    "wihic52_actual_zh_cn_upper_secondary_student"
+  ]
+}
