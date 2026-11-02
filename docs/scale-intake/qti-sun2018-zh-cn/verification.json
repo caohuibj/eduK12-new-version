@@ -1,0 +1,132 @@
+{
+  "status": "PREPARATION_VALIDATED_CATALOG_ONLY_NOT_INSTALLED",
+  "baseline": "adad907a4",
+  "checkedOn": "2026-11-02",
+  "scope": "9 source identities; 1 original 40-item parent metadata plus 8 octant candidates",
+  "checks": {
+    "source_schema_and_catalog": {
+      "status": "PASSED_ASSERTIONS_IN_FAILED_HARNESS",
+      "checked": 9,
+      "details": "readSelectedSource + checkSelectedSource completed for all nine before later math assertion failure; no full CLI/CI success is asserted."
+    },
+    "no_executable_projection": {
+      "status": "PASSED_ASSERTIONS_IN_FAILED_HARNESS",
+      "checked": 9,
+      "result": "undefined from existing projectScalePackage"
+    },
+    "native_install_preview": {
+      "status": "PASSED_ASSERTIONS_IN_FAILED_HARNESS",
+      "rejected": 9,
+      "error": "Scale instrument is not executable or has no compiled runtime policy",
+      "databaseAccesses": 0,
+      "db": "trap proxy, not a real database"
+    },
+    "item_counts_and_mapping": {
+      "status": "PASSED_ASSERTIONS_IN_FAILED_HARNESS",
+      "uniqueItems": 40,
+      "octantCounts": [
+        5,
+        5,
+        4,
+        7,
+        4,
+        5,
+        5,
+        5
+      ]
+    },
+    "math_and_report_preparation": {
+      "status": "PASS",
+      "command": "python /tmp/qti-math-reports.py",
+      "weightCorners": 512,
+      "studentExamples": 3,
+      "teacherExamples": 3,
+      "unscoredFactsOnly": true,
+      "note": "Mathematical bounds of printed weights under an explicitly hypothetical [0,1] input, not official normalization/scoring validation."
+    },
+    "generated_index": {
+      "status": "PASS",
+      "command": "tsx scripts/generate-scale-instruments.ts --check"
+    },
+    "real_isolated_db_import": "NOT_RUN_CATALOG_ONLY",
+    "buildScaleResult": "NOT_RUN_NO_EXECUTABLE_DEFINITION",
+    "runtime_report_projection": "NOT_RUN_NO_RUNTIME_R",
+    "formal_ci": {
+      "status": "NOT_RUN",
+      "reason": "Draft content candidate uses [skip ci]; no merge qualification claimed. AGENTS.md requires reading Notion CI checklist before activation; Notion fetch returned Unknown tool (not an approval denial). No CI intentionally activated."
+    },
+    "production_or_admin_created_dedup": "NOT_QUERIED",
+    "notion_ci_checklist": {
+      "target": "https://app.notion.com/p/404d27635a388186ac80de3593da05a5",
+      "status": "UNAVAILABLE",
+      "action": "notion.fetch with link_id",
+      "result": "Mcp -32001 Unknown tool notion.fetch",
+      "pending": "Read checklist before any later CI activation; no page write attempted."
+    }
+  },
+  "failureHistory": [
+    {
+      "action": "initial preparation shell",
+      "status": "FAILED_NO_CONTENT_CREATED",
+      "reason": "Working directory already backend; repeated server-version/backend prefix made ln fail; rerun from worktree root."
+    },
+    {
+      "action": "local harness first run",
+      "status": "FAILED_HARNESS_ASSERTION",
+      "reason": "Expected null for absent projectScalePackage; existing API returns undefined. Fixed harness only."
+    },
+    {
+      "action": "local harness second run",
+      "status": "FAILED_HARNESS_ASSERTION",
+      "reason": "Exact zero expected from floating point sum; actual 1.1102230246251565e-16. Nine source/install-preflight cases and item mapping had completed; preserved as individual passed assertions inside failed invocation. Supplemental math/report validation uses 1e-12 tolerance, justified by six-decimal published weights; no source or engine changed."
+    }
+  ],
+  "environment": {
+    "node": "v24.19.0",
+    "declaredNodeEngine": ">=24.21.0 <25",
+    "engineConformance": false,
+    "dependencies": "Existing node_modules reused via untracked symlink; consumed direct package versions match candidate lock, entire environment/lock closure not attested. No locked npm ci claim.",
+    "directVersions": {
+      "tsx": "4.23.12",
+      "esbuild": "0.28.2",
+      "typescript": "5.9.3",
+      "zod": "4.6.7",
+      "@prisma/client": "5.22.0",
+      "prisma": "5.22.0"
+    },
+    "directVersionsMatchLock": {
+      "tsx": true,
+      "esbuild": true,
+      "typescript": true,
+      "zod": true,
+      "@prisma/client": true,
+      "prisma": true
+    }
+  },
+  "sha256": {
+    "server-version/backend/src/modules/scale/instruments/qti_sun2018_dissatisfied_zh_cn/1.0.0/source.json": "4d89e7888ce9bb98dfeb9f59ee5dfc0245b36fd2c9ea55746b99cc9ab3943f50",
+    "server-version/backend/src/modules/scale/instruments/qti_sun2018_confrontational_zh_cn/1.0.0/source.json": "392f05c1d47b1a175dfb2d4756e97513762de793f6e8b791d039fd1e6c198e3d",
+    "server-version/backend/src/modules/scale/instruments/qti_sun2018_understanding_zh_cn/1.0.0/source.json": "63a955ce116535f19fad3c1b439210d86e32c24e987dfa02413170657496658f",
+    "server-version/backend/src/modules/scale/instruments/qti_sun2018_compliant_zh_cn/1.0.0/source.json": "fe9d5106ca754ae47288dcd538cdef88b84eea94506e2ef9c33490abc8f788d5",
+    "server-version/backend/src/modules/scale/instruments/qti_sun2018_helpful_zh_cn/1.0.0/source.json": "bc38b316c2a52eaa1e7e774326306fe128787f7a74ae19b2a87283910a042210",
+    "server-version/backend/src/modules/scale/instruments/qti_sun2018_imposing_zh_cn/1.0.0/source.json": "948d54021f56cc011843637656aa8512dadaf8788849065773086d8e6c587f8d",
+    "server-version/backend/src/modules/scale/instruments/qti_sun2018_uncertain_zh_cn/1.0.0/source.json": "3de9383be137a3f9cf8ac467b3a248734acafefd2e729ade775498f4966e6d1b",
+    "server-version/backend/src/modules/scale/instruments/qti_sun2018_40_zh_cn/1.0.0/source.json": "9cc1bbdfe43c1ae383d2631e3be9e4f87399cde460bec4ea60890bb6a9a35760",
+    "server-version/backend/src/modules/scale/instruments/qti_sun2018_directing_zh_cn/1.0.0/source.json": "541f91e4878b0c4100042b650d3ec42b0313b5baf2ee432b83f169b849898530",
+    "docs/scale-intake/qti-sun2018-zh-cn/item-preparation.json": "3ba375a8c3b99572e1238daa4c811e5e523cba3d63ff0f6c923598ad2508c6a6",
+    "docs/scale-intake/qti-sun2018-zh-cn/scoring-preparation.json": "089c6993351c2c0a74c124c89daf61abcd1b8641fcd3f5b9c5cad2244160ebf9",
+    "docs/scale-intake/qti-sun2018-zh-cn/report-examples.json": "baaec3d5b67e8437689fd80d46f7d086009f40ec7e97116f334fd0eb7cde2e95"
+  },
+  "installState": {
+    "development": "NOT_INSTALLED",
+    "production": "NOT_TOUCHED",
+    "candidate": "CATALOG_ONLY"
+  },
+  "blockers": [
+    "Exact Chinese response anchors, intermediate labels, numeric coding and full instructions absent from article",
+    "Source missing-response policy not specified; complete_required is proposal only",
+    "Agency/Communion normalization/scale coding not fully specified",
+    "Cross-octant frozen permutation not prepared; can use existing fixed display after protocol confirmed",
+    "Independent octant administration validity not established; full 40-item administration remains preferred"
+  ]
+}
