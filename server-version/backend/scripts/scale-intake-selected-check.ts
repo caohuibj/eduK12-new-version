@@ -8,6 +8,7 @@ import { dirname, posix, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import ts from 'typescript'
 import { inspectScaleContent } from './scale-onboarding-check.mjs'
+import { inspectSelectedScaleImports } from '../../../.github/scripts/declarative-content.mjs'
 import { parseScaleInstrumentSourceSchema } from '../src/modules/scale/onboarding/schema'
 import { validateScaleInstrumentSource } from '../src/modules/scale/onboarding/validate-instrument'
 import { hashScaleDefinition, isScaleContentItem } from '../src/modules/scale/scale-definition'
@@ -33,18 +34,7 @@ export async function readSelectedSource(file: string, read: (file: string) => s
   const text = read(file)
   assert.deepEqual(inspectScaleContent(file.slice(prefix.length), text), [], `UNSAFE_DECLARATION:${file}`)
   const tree = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true)
-  let jsonBinding: string | undefined
-  for (const statement of tree.statements) {
-    if (ts.isImportDeclaration(statement)) {
-      const clause = statement.importClause
-      if (clause?.isTypeOnly) continue
-      assert.equal((statement.moduleSpecifier as ts.StringLiteral).text, './source.json', `UNSUPPORTED_CONTENT_IMPORT:${file}`)
-      assert.ok(clause?.name && !clause.namedBindings && !jsonBinding, `UNSUPPORTED_JSON_WRAPPER:${file}`)
-      jsonBinding = clause.name.text
-    } else {
-      assert.ok(ts.isVariableStatement(statement) && (statement.declarationList.flags & ts.NodeFlags.Const), `UNSUPPORTED_DECLARATION:${file}`)
-    }
-  }
+  const { jsonBinding } = inspectSelectedScaleImports(ts, tree, file)
   // Transpile only after the existing guard; imports are restricted above. A
   // data module lets historical source use its historical JSON, not HEAD's JSON.
   const moduleText = ts.transpileModule(text, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText
