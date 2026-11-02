@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "colorado_sps_self_assessment_g6_12_teacher_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Colorado SPS｜教师自评无计分表单｜6–12年级课堂｜教师填答",
+      "abbreviation": "Colorado SPS",
+      "instrumentFamily": "Colorado SPS — CEI Student Perception Survey"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "教师自评（无计分）；仅来源目录候选。Keep original teacher form numbering 1–34. Its parallel student content is not evidence for validated teacher scores or measurement equivalence. Preserve source typos in any authorized transcription and log proposed corrections separately.",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:colorado_sps",
+        "教师反思",
+        "评价对象:教师",
+        "评价对象:课堂",
+        "school_context:not_school_rating",
+        "grades:6-12",
+        "age:grade_based_source_no_fixed_age",
+        "respondent:teacher",
+        "language:en",
+        "rights:permission_pending",
+        "use:research",
+        "maturity:PILOT",
+        "availability:catalog_only",
+        "unit_kind:unscored_form_candidate",
+        "source:CEI_6_12",
+        "content:Teacher Self-Assessment"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "教师填写，课堂对应6–12年级；grade标签指课堂，不代表教师年龄或学籍。无教师自评量表效度或常模主张。"
+    },
+    "administration": {
+      "itemCount": 34,
+      "estimatedMinutes": 10,
+      "administrationModes": [
+        "PAPER",
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "指定教师及课堂的学习经历；来源未指定固定回忆天数。候选不能施测。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Keep original teacher form numbering 1–34. Its parallel student content is not evidence for validated teacher scores or measurement equivalence. Preserve source typos in any authorized transcription and log proposed corrections separately.",
+        "Self-reflection form, not a validated teacher scale; no numeric score/report",
+        "Original wording/files omitted pending permission. Estimated minutes are editorial placeholders, not published administration times."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅供来源追索、题键和许可核对；不是现成可施测版本。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Teacher Self-Assessment for Grades 6–12; Thompson School District; source-language metadata only; Chinese editorial labels are not item translations.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "No validated Chinese form registered. English/Spanish bilingual administration files were inspected to locate English row order only. Separate Spanish validation/version is not asserted."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Teacher Self-Assessment for Grades 6–12; Thompson School District",
+      "citation": "The Colorado Education Initiative; Thompson School District teacher self-assessment; undated; hosted 2014/09. Exact retrieval hash and item-key mapping: docs/scale-intake/colorado-sps-20261102/sources.json and inventory.json.",
+      "url": "https://www.coloradoedinitiative.org/wp-content/uploads/2014/09/SPS_results_self-assessment-6-12_CEI.pdf"
+    },
+    "reportPlan": {
+      "dimensionLabels": [],
+      "limitations": [
+        "CATALOG_ONLY: source metadata, not an administrable instrument or report.",
+        "Original English only; Chinese names/report examples are editorial, not a validated Chinese translation.",
+        "Full-form student validation does not establish standalone subscale administration or teacher-self-assessment validity.",
+        "Recipient and respondent differ: student feedback only if the existing participant/report authorization permits it; teacher aggregate feedback only if current release, anonymity, minimum-count and disclosure rules permit it. No item-level student answers or sensitive open text may be exposed by these examples.",
+        "No norms, teacher rankings, student diagnosis, pass/fail cutoffs, cross-tool score, or inferred permission.",
+        "Unscored form: retain factual choices/text only; scoring, psychometric report and normative interpretation are not applicable."
+      ],
+      "disclaimer": "CATALOG_ONLY；题文未公开导入；C/P/R均未实例化。无计分表单不生成评分报告。"
+    },
+    "blockers": [
+      "PUBLIC_PLATFORM_REDISTRIBUTION_PERMISSION_NOT_ESTABLISHED",
+      "NO_EXECUTABLE_CONTENT_PACKAGE",
+      "NATIVE_UNSCORED_FORM_MAPPING_PENDING_AUTHORIZATION"
+    ]
+  }
+}

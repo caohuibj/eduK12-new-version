@@ -1,0 +1,236 @@
+{
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "contentHead": "de11ffa4319e622ea40015ca46653127fc3b6144",
+  "contentTree": "e8405f0dc75eeba85731942b20dcb1b44c01c2a7",
+  "checkedAt": "2026-11-02",
+  "runtime": "Node v24.19.0",
+  "selectedDependencyVersions": {
+    "tsx": "4.23.12",
+    "typescript": "5.9.3",
+    "zod": "4.6.7"
+  },
+  "dependencyNote": "npm ls confirms selected installed versions match current lock. No dependency installation or full audit; historical npm metadata contains a mirror resolved URL, not a new download in this task.",
+  "checks": [
+    {
+      "name": "generate-scale-instruments --check",
+      "exitCode": 0,
+      "status": "PASS",
+      "scope": "Existing generated index matches declarations; no all-source scoring."
+    },
+    {
+      "name": "git diff --check",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "scale-intake-selected-check.ts",
+      "exitCode": 1,
+      "status": "FAIL",
+      "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+      "head": "de11ffa4319e622ea40015ca46653127fc3b6144",
+      "command": "SCALE_INTAKE_BASE_SHA=<base> SCALE_INTAKE_HEAD_SHA=<contentHead> node --import tsx scripts/scale-intake-selected-check.ts",
+      "error": "BUILTIN_SCALE_STATIC_UNRESOLVED_USE_BROADER_CONTENT_LANE:server-version/backend/src/modules/assessment-bundle/bundles/child-chexi-observer-zh-cn-v1.ts:factory-shape",
+      "phase": "checkSelectedBuiltinDependencies at scale-intake-selected-check.ts:266, main:323",
+      "partialEvidence": "main lines310–320 finish all eight source AST/schema/validator and CATALOG_ONLY checks plus generated-bundle dependency scan before this builtin scan is called. No per-source result JSON was emitted; completion of preceding checks is inferred from that control flow. Do not label the overall CLI successful.",
+      "scopeIssue": "Unchanged CHEXI exported function/property-based identity is outside the current static checker subset. This PR does not edit it, the checker, CI, assertions or scopes. No fallback full-platform test was run."
+    },
+    {
+      "name": "native registry and non-executable boundary probe",
+      "exitCode": 0,
+      "status": "PASS",
+      "scope": "Native registry read and non-executable materialize boundary, not real database import or report authorization test",
+      "results": [
+        {
+          "key": "timss2023_instructional_clarity_mathematics_g4_student_us_en",
+          "status": "CATALOG_ONLY",
+          "catalogOccurrences": 1,
+          "executable": false,
+          "runtimePolicy": false,
+          "materialize": "rejected before database access"
+        },
+        {
+          "key": "timss2023_disorderly_behavior_mathematics_g4_student_us_en",
+          "status": "CATALOG_ONLY",
+          "catalogOccurrences": 1,
+          "executable": false,
+          "runtimePolicy": false,
+          "materialize": "rejected before database access"
+        },
+        {
+          "key": "timss2023_instructional_clarity_science_g4_student_us_en",
+          "status": "CATALOG_ONLY",
+          "catalogOccurrences": 1,
+          "executable": false,
+          "runtimePolicy": false,
+          "materialize": "rejected before database access"
+        },
+        {
+          "key": "timss2023_disorderly_behavior_science_g4_student_us_en",
+          "status": "CATALOG_ONLY",
+          "catalogOccurrences": 1,
+          "executable": false,
+          "runtimePolicy": false,
+          "materialize": "rejected before database access"
+        },
+        {
+          "key": "timss2023_instructional_clarity_mathematics_g8_student_us_en",
+          "status": "CATALOG_ONLY",
+          "catalogOccurrences": 1,
+          "executable": false,
+          "runtimePolicy": false,
+          "materialize": "rejected before database access"
+        },
+        {
+          "key": "timss2023_disorderly_behavior_mathematics_g8_student_us_en",
+          "status": "CATALOG_ONLY",
+          "catalogOccurrences": 1,
+          "executable": false,
+          "runtimePolicy": false,
+          "materialize": "rejected before database access"
+        },
+        {
+          "key": "timss2023_instructional_clarity_science_g8_student_us_en",
+          "status": "CATALOG_ONLY",
+          "catalogOccurrences": 1,
+          "executable": false,
+          "runtimePolicy": false,
+          "materialize": "rejected before database access"
+        },
+        {
+          "key": "timss2023_disorderly_behavior_science_g8_student_us_en",
+          "status": "CATALOG_ONLY",
+          "catalogOccurrences": 1,
+          "executable": false,
+          "runtimePolicy": false,
+          "materialize": "rejected before database access"
+        }
+      ],
+      "forms": "4 metadata-only records; null scores/reverseItems",
+      "combinations": "4 optional references; null aggregate score"
+    },
+    {
+      "name": "actual-diff CI classifier dry read",
+      "exitCode": 0,
+      "status": "PASS",
+      "result": {
+        "scenario": "content",
+        "scale_intake_light": true,
+        "content": true,
+        "scale": true,
+        "frontend_build": false,
+        "codeql": true,
+        "application_route": "legacy"
+      },
+      "note": "Local classifier output, not a CI run or qualified merge status."
+    },
+    {
+      "name": "report editorial review",
+      "status": "MANUAL_CONTENT_REVIEW",
+      "scope": "Grade4/8 student and authorized teacher-group normal/low/insufficient/unscored examples; no runtime results or visual/report-recipient authorization execution."
+    }
+  ],
+  "notExecuted": [
+    "official CI",
+    "full application tests/build/types/browser",
+    "database import or migrations",
+    "PCM/WLE numerical scoring",
+    "real student/teacher report disclosure paths",
+    "ordinary form runtime creation/submission",
+    "production duplicate inventory",
+    "merge",
+    "deployment",
+    "production write"
+  ],
+  "ciPreparation": {
+    "notionPage": "404d27635a388186ac80de3593da05a5",
+    "readStatus": "PENDING_CONNECTION_FAILURE",
+    "observedErrors": [
+      "requires non-empty link_id",
+      "Unknown tool notion.fetch after supplying page id as link_id"
+    ],
+    "formalCI": "NOT_ACTIVATED; Draft commits use [skip ci]; known local checker limitation retained; no control edits"
+  },
+  "preparationErrors": [
+    {
+      "action": "git add",
+      "exitCode": 128,
+      "reason": "relative docs path issued from backend cwd; no files staged; corrected to repository root before commit"
+    },
+    {
+      "action": "read content-scope.mjs",
+      "exitCode": 1,
+      "reason": "relative .github path issued from backend cwd; corrected to repository root; no mutation"
+    }
+  ],
+  "sourceInputHashes": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_disorderly_behavior_mathematics_g4_student_us_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_disorderly_behavior_mathematics_g4_student_us_en/1.0.0/source.json",
+      "sha256": "5b4c76e45782b7c9a14725bf49aeb19fee501a25d59a71e52a441e95bb108307"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_disorderly_behavior_mathematics_g8_student_us_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_disorderly_behavior_mathematics_g8_student_us_en/1.0.0/source.json",
+      "sha256": "58c8c162b12e2377c2d8d8998a39440bf8ce2d08207edc2b9a76f925a0311cf3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_disorderly_behavior_science_g4_student_us_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_disorderly_behavior_science_g4_student_us_en/1.0.0/source.json",
+      "sha256": "64b295c6b97c9dd0e7a3ae16af91f6d4badce8ee129354ea33151553cc5485c0"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_disorderly_behavior_science_g8_student_us_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_disorderly_behavior_science_g8_student_us_en/1.0.0/source.json",
+      "sha256": "07c2435cf2a28c79610f51eb925c7e01853923b3683432b6d6d2ed7e187850e8"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_instructional_clarity_mathematics_g4_student_us_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_instructional_clarity_mathematics_g4_student_us_en/1.0.0/source.json",
+      "sha256": "8fb0f7797e46c48e2badb85f3642a58e0e7f9790bb9df0e20af4b452ed51adcc"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_instructional_clarity_mathematics_g8_student_us_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_instructional_clarity_mathematics_g8_student_us_en/1.0.0/source.json",
+      "sha256": "97bf6af73a0cbb2db22bdef928cacb33106d4497c51e40af5a1c6658fdb54169"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_instructional_clarity_science_g4_student_us_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_instructional_clarity_science_g4_student_us_en/1.0.0/source.json",
+      "sha256": "eb515d0e065f71d2be72a92295801730b26479e22388904c170858b7ed89a25a"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_instructional_clarity_science_g8_student_us_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/timss2023_instructional_clarity_science_g8_student_us_en/1.0.0/source.json",
+      "sha256": "d0077894a1c7a3c84c71c8842b88dec93ce9a9536c0dd5e4cfa703b8bf21b2a0"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+      "sha256": "674ff556369a29cf44b7c2299dce966c3a464985c307cdce65e6cfd3510c195f"
+    }
+  ],
+  "evidenceReuse": "Later README/validation-only commit may reuse the exact source input hashes above; it must not claim a new CLI or database execution."
+}

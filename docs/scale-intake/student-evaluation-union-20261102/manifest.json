@@ -1,0 +1,223 @@
+{
+  "recordFormat": "integration provenance, not an importer payload or new gate",
+  "base": "6cbf4eaa5a269f54f9872b656d0294a48ec15dc2",
+  "previouslyMerged": [
+    {
+      "pr": 549,
+      "mergeSHA": "25d812d1f024bcc375b738235dd400654c679ff4"
+    },
+    {
+      "pr": 540,
+      "mergeSHA": "6cad86d8f721a45a47a91290edf1523519d1d239"
+    },
+    {
+      "pr": 541,
+      "mergeSHA": "6cbf4eaa5a269f54f9872b656d0294a48ec15dc2",
+      "head": "1c52bd020441814092ee5314491c7655f82050bc",
+      "CI": 41374276673
+    }
+  ],
+  "remainingMotherTools": [
+    {
+      "pr": 542,
+      "head": "2426aee58647236dd6084845ea834f23a95c6b17",
+      "originalReviewedHead": "2426aee58647236dd6084845ea834f23a95c6b17",
+      "originalContentAndDocsUnchanged": true,
+      "integrationCommit": "105a8af13d514b0940d1c96b7bc44b41a72e4718",
+      "nativeSources": 10,
+      "executableScales": 7,
+      "statusesPreserved": "CATALOG_ONLY, CANDIDATE/PILOT; seven WIHIC DRAFT scales only",
+      "priorValidation": "per-tool source/schema/report/form/isolated evidence retained; no reinstallation or publication"
+    },
+    {
+      "pr": 543,
+      "head": "12acadbed9944c2d04dfaadb44d24682c2aa5078",
+      "originalReviewedHead": "12acadbed9944c2d04dfaadb44d24682c2aa5078",
+      "originalContentAndDocsUnchanged": true,
+      "integrationCommit": "12f5d013094c6e5aa761268bfddec75e31795587",
+      "nativeSources": 38,
+      "executableScales": 0,
+      "statusesPreserved": "CATALOG_ONLY, CANDIDATE/PILOT; seven WIHIC DRAFT scales only",
+      "priorValidation": "per-tool source/schema/report/form/isolated evidence retained; no reinstallation or publication"
+    },
+    {
+      "pr": 544,
+      "head": "f05c29a5f0843ede8bc8d450be7708d5c1fc4de1",
+      "originalReviewedHead": "f05c29a5f0843ede8bc8d450be7708d5c1fc4de1",
+      "originalContentAndDocsUnchanged": true,
+      "integrationCommit": "dcaaac57196c2e0f1ba5299bc2e9b34994928d48",
+      "nativeSources": 9,
+      "executableScales": 0,
+      "statusesPreserved": "CATALOG_ONLY, CANDIDATE/PILOT; seven WIHIC DRAFT scales only",
+      "priorValidation": "per-tool source/schema/report/form/isolated evidence retained; no reinstallation or publication"
+    },
+    {
+      "pr": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d",
+      "originalReviewedHead": "783729150611c865cf753bff408288a39a141c6d",
+      "originalContentAndDocsUnchanged": true,
+      "integrationCommit": "d175c2154447008eb602d6c31fdad8c10c439a1f",
+      "nativeSources": 9,
+      "executableScales": 0,
+      "statusesPreserved": "CATALOG_ONLY, CANDIDATE/PILOT; seven WIHIC DRAFT scales only",
+      "priorValidation": "per-tool source/schema/report/form/isolated evidence retained; no reinstallation or publication"
+    },
+    {
+      "pr": 546,
+      "head": "64cbe6a78fc42292f80d780200bd8882034d7bcb",
+      "originalReviewedHead": "64cbe6a78fc42292f80d780200bd8882034d7bcb",
+      "originalContentAndDocsUnchanged": true,
+      "integrationCommit": "3429529277fc55e399118315fccdbbfde4a2e6e7",
+      "nativeSources": 4,
+      "executableScales": 0,
+      "statusesPreserved": "CATALOG_ONLY, CANDIDATE/PILOT; seven WIHIC DRAFT scales only",
+      "priorValidation": "per-tool source/schema/report/form/isolated evidence retained; no reinstallation or publication"
+    },
+    {
+      "pr": 547,
+      "head": "a8ddd88f7256bf9534603fc825dc71ef326ebfa8",
+      "originalReviewedHead": "a8ddd88f7256bf9534603fc825dc71ef326ebfa8",
+      "originalContentAndDocsUnchanged": true,
+      "integrationCommit": "c07e455d7b93d8e6d39f489ed1c735e923f3e67a",
+      "nativeSources": 4,
+      "executableScales": 0,
+      "statusesPreserved": "CATALOG_ONLY, CANDIDATE/PILOT; seven WIHIC DRAFT scales only",
+      "priorValidation": "per-tool source/schema/report/form/isolated evidence retained; no reinstallation or publication"
+    },
+    {
+      "pr": 548,
+      "head": "7820b248cc8aae4a97f583c761b462eae2f9a54a",
+      "originalReviewedHead": "7820b248cc8aae4a97f583c761b462eae2f9a54a",
+      "originalContentAndDocsUnchanged": true,
+      "integrationCommit": "9a8697f4fa144848934f877f5426c846d5583d01",
+      "nativeSources": 4,
+      "executableScales": 0,
+      "statusesPreserved": "CATALOG_ONLY, CANDIDATE/PILOT; seven WIHIC DRAFT scales only",
+      "priorValidation": "per-tool source/schema/report/form/isolated evidence retained; no reinstallation or publication"
+    },
+    {
+      "pr": 550,
+      "head": "21162f30b500011c6b3e9f296fad0d0545b58755",
+      "originalReviewedHead": "21162f30b500011c6b3e9f296fad0d0545b58755",
+      "originalContentAndDocsUnchanged": true,
+      "integrationCommit": "7dbc6586fc8000371e06d2b7397c938ad9455531",
+      "nativeSources": 8,
+      "executableScales": 0,
+      "statusesPreserved": "CATALOG_ONLY, CANDIDATE/PILOT; seven WIHIC DRAFT scales only",
+      "priorValidation": "per-tool source/schema/report/form/isolated evidence retained; no reinstallation or publication"
+    },
+    {
+      "pr": 552,
+      "head": "51569d88e26ef7d9c58ef93cca206c451159673d",
+      "originalReviewedHead": "51569d88e26ef7d9c58ef93cca206c451159673d",
+      "originalContentAndDocsUnchanged": true,
+      "integrationCommit": "ffbf509cccc2ca443ab509f15b8f64c36b9ff081",
+      "nativeSources": 5,
+      "executableScales": 0,
+      "statusesPreserved": "CATALOG_ONLY, CANDIDATE/PILOT; seven WIHIC DRAFT scales only",
+      "priorValidation": "per-tool source/schema/report/form/isolated evidence retained; no reinstallation or publication"
+    },
+    {
+      "pr": 553,
+      "head": "6162cda4b880b3c89b3d712d6c316fb9ee108ed7",
+      "originalReviewedHead": "6162cda4b880b3c89b3d712d6c316fb9ee108ed7",
+      "originalContentAndDocsUnchanged": true,
+      "integrationCommit": "60d84f288bd48fa411fcf4fa418b36ba38b2b1bb",
+      "nativeSources": 11,
+      "executableScales": 0,
+      "statusesPreserved": "CATALOG_ONLY, CANDIDATE/PILOT; seven WIHIC DRAFT scales only",
+      "priorValidation": "per-tool source/schema/report/form/isolated evidence retained; no reinstallation or publication"
+    },
+    {
+      "pr": 554,
+      "head": "84b802dd591ef623e615194552c800e2f7b78862",
+      "originalReviewedHead": "84b802dd591ef623e615194552c800e2f7b78862",
+      "originalContentAndDocsUnchanged": true,
+      "integrationCommit": "3b5d649c988ad98e0289c91196ff6191a9f19cd4",
+      "nativeSources": 13,
+      "executableScales": 0,
+      "statusesPreserved": "CATALOG_ONLY, CANDIDATE/PILOT; seven WIHIC DRAFT scales only",
+      "priorValidation": "per-tool source/schema/report/form/isolated evidence retained; no reinstallation or publication"
+    },
+    {
+      "pr": 555,
+      "head": "d9511b6478a04ed21a6f6b9dcab870095bfcf58b",
+      "originalReviewedHead": "d9511b6478a04ed21a6f6b9dcab870095bfcf58b",
+      "originalContentAndDocsUnchanged": true,
+      "integrationCommit": "b6426cf29735d70e26d95e4cdf06b65b52a5e1be",
+      "nativeSources": 29,
+      "executableScales": 0,
+      "statusesPreserved": "CATALOG_ONLY, CANDIDATE/PILOT; seven WIHIC DRAFT scales only",
+      "priorValidation": "per-tool source/schema/report/form/isolated evidence retained; no reinstallation or publication"
+    }
+  ],
+  "nativeSourcesAdded": 144,
+  "nativeExecutableScalesAdded": 7,
+  "nativeExecutableScaleReleaseStatus": "DRAFT",
+  "newRuntimeLogic": false,
+  "newPermissionsOrGates": false,
+  "productionWrites": false,
+  "deployments": false,
+  "registry": "existing generate-scale-instruments.ts; exact source union; no hand deletion",
+  "originalPRClosure": "Only GitHub actual merged status after original head is contained in main; no manual close as merge",
+  "verificationPlan": {
+    "scope": "complete base-to-head content-only diff",
+    "selected": "existing scale-intake AST/schema, seven WIHIC scorers/report fixtures, static bundle dependencies, registry --check, required CodeQL and aggregate as actually routed",
+    "notRepeatedLocally": "owner scoring/form/import checks with unchanged source blobs; no full backend/frontend/DB/browser tests",
+    "CI": "NOT_RUN_AT_PREPARATION"
+  },
+  "originalCollectedHeads": [
+    {
+      "pr": 541,
+      "head": "1c52bd020441814092ee5314491c7655f82050bc"
+    },
+    {
+      "pr": 542,
+      "head": "2426aee58647236dd6084845ea834f23a95c6b17"
+    },
+    {
+      "pr": 543,
+      "head": "12acadbed9944c2d04dfaadb44d24682c2aa5078"
+    },
+    {
+      "pr": 544,
+      "head": "f05c29a5f0843ede8bc8d450be7708d5c1fc4de1"
+    },
+    {
+      "pr": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d"
+    },
+    {
+      "pr": 546,
+      "head": "64cbe6a78fc42292f80d780200bd8882034d7bcb"
+    },
+    {
+      "pr": 547,
+      "head": "a8ddd88f7256bf9534603fc825dc71ef326ebfa8"
+    },
+    {
+      "pr": 548,
+      "head": "7820b248cc8aae4a97f583c761b462eae2f9a54a"
+    },
+    {
+      "pr": 550,
+      "head": "21162f30b500011c6b3e9f296fad0d0545b58755"
+    },
+    {
+      "pr": 552,
+      "head": "51569d88e26ef7d9c58ef93cca206c451159673d"
+    },
+    {
+      "pr": 553,
+      "head": "6162cda4b880b3c89b3d712d6c316fb9ee108ed7"
+    },
+    {
+      "pr": 554,
+      "head": "84b802dd591ef623e615194552c800e2f7b78862"
+    },
+    {
+      "pr": 555,
+      "head": "d9511b6478a04ed21a6f6b9dcab870095bfcf58b"
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "nyc_school_survey_2026_inclusive_environment_student_en_us",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "NYC School Survey 2026｜包容性学校体验｜6–12年级｜学生填答（目录候选）",
+      "abbreviation": "NYCSS2026",
+      "instrumentFamily": "NYC School Survey — 2026 Student / 2025–26 school year"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "描述归属、公平与参与体验，不把不公平归责于学生。 仅登记来源和原题编号，当前无可作答内容或得分。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:nyc_school_survey",
+        "wave:2026",
+        "school_year:2025_26",
+        "respondent:student",
+        "purpose:student_feedback",
+        "context:student_evaluation",
+        "language:en_US",
+        "age:official_grade_6_12_not_exact_age",
+        "source:NYCPS",
+        "maturity:PILOT",
+        "use:research",
+        "availability:catalog_only",
+        "rights:redistribution_unconfirmed",
+        "route:no_score_form_pending_topic_clarification",
+        "evaluation_target:school"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 6,
+        "maxGrade": 12
+      },
+      "populationNotes": "官方2026学生版适用6–12年级；年龄未给硬界，不用年级推造年龄阈值。填答者为学生；描述自己的学校经历，不绑定某一位教师。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "2025–26学年，自2025年9月至官方2026施测时；不滚动替换为当前学年。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "仅登记官方题本编号：Q14, Q17, Q25, Q26, Q61。",
+        "estimatedMinutes仅为项目编排粗估（每题约20秒向上取整）；非官方时长、未实测，目录不可施测。",
+        "原问卷可跳题，保留原题序、学年、群体对象和频率定义；此处不复制指导语或题文。",
+        "本包不含题文、选项、executable、C/P/R运行版本；许可未确认不公开题本。",
+        "官方主题用于学校群体反馈，拆项不证明独立量表效度，不把多个课堂或教师改成个人教师分。",
+        "OFFICIAL_QUESTION_NUMBER_CONFLICT",
+        "Q17_TOPIC_SUBGROUP_RESTRICTION",
+        "THREE_OPTION_FAVORABILITY_UNRESOLVED"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "官方2026来源已读取；本地独立施测与再分发许可未建立，当前只是元数据候选。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en-US",
+    "targetLocale": "en-US",
+    "localizationVersion": "1.0.0",
+    "translationSource": "官方2026英语学生题本的元数据；没有题项翻译。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "中文目录名和原创报告示例不构成已验证中文版；官方纸本为sample/proof，不据此宣称在线跳转已核。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "STUDENT",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "NYC School Survey — Student (2025–26); 2026 Scoring Technical Guide",
+      "citation": "NYC Public Schools, 2026. Official student instrument Q14,17,25,26,61; scoring guide printed pp. 11, updated 2026-05-29. Metadata only.",
+      "url": "https://infohub.nyced.org/docs/default-source/default-document-library/2026-nyc-school-survey-student-survey.pdf",
+      "publicationYear": 2026
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "包容性学校体验"
+      ],
+      "limitations": [
+        "当前仅来源元数据，不可作答、不计分、不生成学生或教师结果。",
+        "官方学校群体百分比不等于学生能力分；无跨工具总分、常模或教师排名。",
+        "2026为新基线，不套用旧年份计分、中文效度或纵向比较。",
+        "学生版与教师群体版示例见docs/scale-intake/nyc-school-survey-2026-20261102/report-examples.md；仅内容草稿，不改变接收者授权。"
+      ],
+      "disclaimer": "许可、题号和独立施测证据按实际状态分别处理；目录登记不等于公共库授权或数据库安装。"
+    },
+    "blockers": [
+      "PUBLIC_ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
+      "EXECUTABLE_CONTENT_NOT_PREPARED",
+      "STANDALONE_ADMINISTRATION_VALIDITY_NOT_ESTABLISHED",
+      "OFFICIAL_QUESTION_NUMBER_CONFLICT",
+      "Q17_TOPIC_SUBGROUP_RESTRICTION",
+      "THREE_OPTION_FAVORABILITY_UNRESOLVED"
+    ]
+  }
+}

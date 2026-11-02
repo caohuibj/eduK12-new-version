@@ -1,0 +1,189 @@
+{
+  "queriedOn": "2026-11-02",
+  "method": "All open PR metadata plus all paginated changed filenames; no full-item or semantic comparison of PR blobs claimed.",
+  "openPullRequestCount": 26,
+  "rows": [
+    {
+      "number": 539,
+      "head": "0ef13277b8634dcde2fa2e7446486a13c61206b5",
+      "fileCount": 277,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 538,
+      "head": "c6c415436ed3ff6f3de2cdf320b7c160cc4fd489",
+      "fileCount": 33,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 537,
+      "head": "46ff029d9cca20b221208e85257b5fa482eaefa3",
+      "fileCount": 17,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 529,
+      "head": "cff8728f67818a28b9ab0a2189c30040470dbd6b",
+      "fileCount": 5,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 515,
+      "head": "70a6b3bc54e30c95c35733a705c6350f929d2a6d",
+      "fileCount": 6,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 491,
+      "head": "290aa955a3445bcb0b519829423e626d044a2fc1",
+      "fileCount": 4,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 489,
+      "head": "dafc0b90b337e5ec7ab28f5b28208d74f51f2b28",
+      "fileCount": 3,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 488,
+      "head": "0c526f0529ab47c0054f9470d0bb9217e1d787a5",
+      "fileCount": 3,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 482,
+      "head": "9feffb8d0f5c91dd19f0744c43d62dba0a2818f8",
+      "fileCount": 310,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 441,
+      "head": "16d9bbaa5fffb424ce463220d6f9f7d3a7280db5",
+      "fileCount": 693,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 413,
+      "head": "0f8057fa75bcb89215275f6ad7695f189fcf0e65",
+      "fileCount": 15,
+      "miPaths": [],
+      "scalePaths": 14
+    },
+    {
+      "number": 412,
+      "head": "4d79bc45d607f8e771eccfacc49a7558b8a3985e",
+      "fileCount": 1,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 397,
+      "head": "3ee375d87aa8d72ad8de5dcdf5ce10fd1a0a763d",
+      "fileCount": 2,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 383,
+      "head": "5454a7d7630a4ccb7125d0c621fa10317dc6924f",
+      "fileCount": 5,
+      "miPaths": [],
+      "scalePaths": 4
+    },
+    {
+      "number": 379,
+      "head": "333200ade0c6cb42130cbc052189ba9c64691a12",
+      "fileCount": 272,
+      "miPaths": [],
+      "scalePaths": 252
+    },
+    {
+      "number": 375,
+      "head": "5eca82fb13bcf0f2bbf3bb5b6deaa47fa1f9b792",
+      "fileCount": 374,
+      "miPaths": [],
+      "scalePaths": 215
+    },
+    {
+      "number": 373,
+      "head": "3f17247865a6a83e5ee9e88cf3d0fa3060b59a53",
+      "fileCount": 61,
+      "miPaths": [],
+      "scalePaths": 41
+    },
+    {
+      "number": 371,
+      "head": "75b956cbd4c45f75beee606fb53257494adc1ca0",
+      "fileCount": 208,
+      "miPaths": [],
+      "scalePaths": 39
+    },
+    {
+      "number": 370,
+      "head": "bfd6dcbca24567219ec24979481f3da8e0137984",
+      "fileCount": 66,
+      "miPaths": [],
+      "scalePaths": 14
+    },
+    {
+      "number": 368,
+      "head": "1388d5db6f845b8d907f0e4090e4fd727aea8926",
+      "fileCount": 2101,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 367,
+      "head": "8e4440cac46086f73390f8774c40853beb9a6ddd",
+      "fileCount": 136,
+      "miPaths": [],
+      "scalePaths": 18
+    },
+    {
+      "number": 362,
+      "head": "e2b23122e1a41f52f61719fdd31a6daf338b97e1",
+      "fileCount": 9,
+      "miPaths": [],
+      "scalePaths": 8
+    },
+    {
+      "number": 360,
+      "head": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2",
+      "fileCount": 1269,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 330,
+      "head": "bf73bdf66dcc4e1e169a0153596c43efdc203a0a",
+      "fileCount": 15,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 329,
+      "head": "a5effd7f86249a77b7c82606130e5db6f89aae45",
+      "fileCount": 62,
+      "miPaths": [],
+      "scalePaths": 0
+    },
+    {
+      "number": 328,
+      "head": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+      "fileCount": 73,
+      "miPaths": [],
+      "scalePaths": 53
+    }
+  ]
+}

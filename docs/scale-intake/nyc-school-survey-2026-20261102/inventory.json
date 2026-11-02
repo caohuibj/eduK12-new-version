@@ -1,0 +1,490 @@
+{
+  "recordKind": "content_intake_work_record_not_runtime_payload",
+  "mother": {
+    "key": "nyc_school_survey_2026_student_en_us",
+    "name": "NYC School Survey 2026｜学生版｜6–12年级｜学生填答",
+    "sourceEdition": "2025–26 school year / 2026 administration",
+    "language": "en-US",
+    "sourceItemCount": 61,
+    "registeredAsSeparateExecutable": false,
+    "versionState": "母工具是来源分组，不另建重复施测量表；子项只有目录身份1.0.0，C/P/R均未创建。"
+  },
+  "baseCommit": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "sources": [
+    {
+      "id": "student",
+      "url": "https://infohub.nyced.org/docs/default-source/default-document-library/2026-nyc-school-survey-student-survey.pdf",
+      "sha256": "daa73b2fb9329b26d0920b925e24a727a9a36d44a9997fd8aaa430bf0b64c645",
+      "bytes": 287262,
+      "pages": 7,
+      "read": true,
+      "repositoryContainsFullText": false
+    },
+    {
+      "id": "scoring",
+      "url": "https://infohub.nyced.org/docs/default-source/default-document-library/2026-framework-and-school-survey-scoring-technical-guide.pdf",
+      "sha256": "1d35ed52bc478c4f86bd1b1f570c73a647db36f7b173d5a0f3c04b3ea81233b4",
+      "bytes": 774692,
+      "pages": 28,
+      "read": true,
+      "repositoryContainsFullText": false
+    },
+    {
+      "id": "revisions",
+      "url": "https://infohub.nyced.org/docs/default-source/default-document-library/2026-nyc-school-survey-student-revisions-one-pager.pdf",
+      "sha256": "66329ba439da107bfb98236c4b04fd4f96d24f200eb7a456c8fbbbf97b200e62",
+      "bytes": 157012,
+      "pages": 2,
+      "read": true,
+      "repositoryContainsFullText": false
+    }
+  ],
+  "rights": {
+    "status": "REDISTRIBUTION_UNCONFIRMED",
+    "policyUrl": "https://infohub.nyced.org/privacy-policy",
+    "notes": "网站声明内容受版权保护；未发现题项公开再分发授权。无联系、签约、接受需签署条款或上传原PDF。"
+  },
+  "children": [
+    {
+      "instrumentKey": "nyc_school_survey_2026_academic_press_student_en_us",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "label": "学业挑战",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "officialTopic": "Academic Press",
+      "officialCategory": "Instruction and Performance",
+      "sourceQuestionNumbers": [
+        2,
+        4,
+        5,
+        6
+      ],
+      "scoringGuidePrintedPages": [
+        5,
+        6
+      ],
+      "candidateRoute": "official_topic_candidate",
+      "runtimeVersions": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "status": "CATALOG_ONLY",
+      "sourceBlockers": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_course_clarity_student_en_us",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "label": "学习目标与课堂解释",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "officialTopic": "Course Clarity",
+      "officialCategory": "Instruction and Performance",
+      "sourceQuestionNumbers": [
+        1,
+        3,
+        7,
+        10
+      ],
+      "scoringGuidePrintedPages": [
+        6
+      ],
+      "candidateRoute": "official_topic_candidate",
+      "runtimeVersions": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "status": "CATALOG_ONLY",
+      "sourceBlockers": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_cultural_awareness_student_en_us",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "label": "文化意识与包容性教学",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "officialTopic": "Cultural Awareness and Inclusive Classroom Instruction",
+      "officialCategory": "Instruction and Performance",
+      "sourceQuestionNumbers": [
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "scoringGuidePrintedPages": [
+        6
+      ],
+      "candidateRoute": "official_topic_candidate",
+      "runtimeVersions": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "status": "CATALOG_ONLY",
+      "sourceBlockers": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_guidance_ms_student_en_us",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "label": "升学与发展支持",
+      "gradeRange": [
+        6,
+        8
+      ],
+      "officialTopic": "Guidance",
+      "officialCategory": "Safety and School Climate",
+      "sourceQuestionNumbers": [
+        18,
+        29,
+        30
+      ],
+      "scoringGuidePrintedPages": [
+        10
+      ],
+      "candidateRoute": "official_topic_candidate",
+      "runtimeVersions": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "status": "CATALOG_ONLY",
+      "sourceBlockers": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_guidance_hs_student_en_us",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "label": "升学与生涯支持",
+      "gradeRange": [
+        9,
+        12
+      ],
+      "officialTopic": "Guidance",
+      "officialCategory": "Safety and School Climate",
+      "sourceQuestionNumbers": [
+        18,
+        29,
+        31,
+        32,
+        33
+      ],
+      "scoringGuidePrintedPages": [
+        10
+      ],
+      "candidateRoute": "official_topic_candidate",
+      "runtimeVersions": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "status": "CATALOG_ONLY",
+      "sourceBlockers": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_inclusive_environment_student_en_us",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "label": "包容性学校体验",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "officialTopic": "Inclusive Learning Environment",
+      "officialCategory": "Safety and School Climate",
+      "sourceQuestionNumbers": [
+        14,
+        17,
+        25,
+        26,
+        61
+      ],
+      "scoringGuidePrintedPages": [
+        11
+      ],
+      "candidateRoute": "no_score_form_pending_topic_clarification",
+      "runtimeVersions": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "status": "CATALOG_ONLY",
+      "sourceBlockers": [
+        "OFFICIAL_QUESTION_NUMBER_CONFLICT",
+        "Q17_TOPIC_SUBGROUP_RESTRICTION",
+        "THREE_OPTION_FAVORABILITY_UNRESOLVED"
+      ]
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_personal_attention_support_student_en_us",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "label": "关注与支持",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "officialTopic": "Personal Attention and Support",
+      "officialCategory": "Safety and School Climate",
+      "sourceQuestionNumbers": [
+        8,
+        9,
+        16,
+        19
+      ],
+      "scoringGuidePrintedPages": [
+        12,
+        13
+      ],
+      "candidateRoute": "official_topic_candidate",
+      "runtimeVersions": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "status": "CATALOG_ONLY",
+      "sourceBlockers": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_preventing_bullying_student_en_us",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "label": "校园欺凌观察",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "officialTopic": "Preventing Bullying",
+      "officialCategory": "Safety and School Climate",
+      "sourceQuestionNumbers": [
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56
+      ],
+      "scoringGuidePrintedPages": [
+        13
+      ],
+      "candidateRoute": "official_topic_candidate",
+      "runtimeVersions": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "status": "CATALOG_ONLY",
+      "sourceBlockers": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_safety_student_en_us",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "label": "校园安全体验",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "officialTopic": "Safety",
+      "officialCategory": "Safety and School Climate",
+      "sourceQuestionNumbers": [
+        39,
+        40,
+        41,
+        44,
+        57,
+        59,
+        60
+      ],
+      "scoringGuidePrintedPages": [
+        14
+      ],
+      "candidateRoute": "no_score_form_pending_topic_clarification",
+      "runtimeVersions": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "status": "CATALOG_ONLY",
+      "sourceBlockers": [
+        "OFFICIAL_QUESTION_NUMBER_CONFLICT"
+      ]
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_social_emotional_student_en_us",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "label": "关系与情绪支持",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "officialTopic": "Social-Emotional",
+      "officialCategory": "Safety and School Climate",
+      "sourceQuestionNumbers": [
+        15,
+        34,
+        35,
+        36
+      ],
+      "scoringGuidePrintedPages": [
+        14
+      ],
+      "candidateRoute": "no_score_form_pending_topic_clarification",
+      "runtimeVersions": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "status": "CATALOG_ONLY",
+      "sourceBlockers": [
+        "THREE_OPTION_FAVORABILITY_UNRESOLVED"
+      ]
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_student_teacher_trust_student_en_us",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "label": "学生感受到的师生信任",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "officialTopic": "Student-Teacher Trust",
+      "officialCategory": "Safety and School Climate",
+      "sourceQuestionNumbers": [
+        11,
+        12,
+        13,
+        27,
+        28
+      ],
+      "scoringGuidePrintedPages": [
+        15
+      ],
+      "candidateRoute": "official_topic_candidate",
+      "runtimeVersions": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "status": "CATALOG_ONLY",
+      "sourceBlockers": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_facilities_services_student_en_us",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "label": "校园设施与服务",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "officialTopic": "School Facilities and Services",
+      "officialCategory": "School Description",
+      "sourceQuestionNumbers": [
+        37,
+        38
+      ],
+      "scoringGuidePrintedPages": [
+        18
+      ],
+      "candidateRoute": "no_score_form_pending_topic_clarification",
+      "runtimeVersions": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "status": "CATALOG_ONLY",
+      "sourceBlockers": [
+        "THREE_OPTION_FAVORABILITY_UNRESOLVED"
+      ]
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_additional_experiences_student_en_us",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "label": "补充学校体验表单",
+      "gradeRange": [
+        6,
+        12
+      ],
+      "officialTopic": null,
+      "officialCategory": "Additional Questions",
+      "sourceQuestionNumbers": [
+        42,
+        43,
+        58
+      ],
+      "scoringGuidePrintedPages": [
+        19
+      ],
+      "candidateRoute": "no_score_form",
+      "runtimeVersions": {
+        "content": null,
+        "scoring": null,
+        "report": null
+      },
+      "status": "CATALOG_ONLY",
+      "sourceBlockers": [
+        "OFFICIAL_QUESTION_NUMBER_CONFLICT"
+      ]
+    }
+  ],
+  "database": {
+    "development": "NOT_IMPORTED_CATALOG_ONLY",
+    "production": "NOT_QUERIED_NOT_WRITTEN"
+  },
+  "combinationPlan": {
+    "status": "CANDIDATE_ONLY_NOT_INSTALLED",
+    "type": "existing_ordinary_combination_questionnaire",
+    "middleSchoolChildren": [
+      "nyc_school_survey_2026_academic_press_student_en_us",
+      "nyc_school_survey_2026_course_clarity_student_en_us",
+      "nyc_school_survey_2026_cultural_awareness_student_en_us",
+      "nyc_school_survey_2026_guidance_ms_student_en_us",
+      "nyc_school_survey_2026_inclusive_environment_student_en_us",
+      "nyc_school_survey_2026_personal_attention_support_student_en_us",
+      "nyc_school_survey_2026_preventing_bullying_student_en_us",
+      "nyc_school_survey_2026_safety_student_en_us",
+      "nyc_school_survey_2026_social_emotional_student_en_us",
+      "nyc_school_survey_2026_student_teacher_trust_student_en_us",
+      "nyc_school_survey_2026_facilities_services_student_en_us",
+      "nyc_school_survey_2026_additional_experiences_student_en_us"
+    ],
+    "highSchoolChildren": [
+      "nyc_school_survey_2026_academic_press_student_en_us",
+      "nyc_school_survey_2026_course_clarity_student_en_us",
+      "nyc_school_survey_2026_cultural_awareness_student_en_us",
+      "nyc_school_survey_2026_guidance_hs_student_en_us",
+      "nyc_school_survey_2026_inclusive_environment_student_en_us",
+      "nyc_school_survey_2026_personal_attention_support_student_en_us",
+      "nyc_school_survey_2026_preventing_bullying_student_en_us",
+      "nyc_school_survey_2026_safety_student_en_us",
+      "nyc_school_survey_2026_social_emotional_student_en_us",
+      "nyc_school_survey_2026_student_teacher_trust_student_en_us",
+      "nyc_school_survey_2026_facilities_services_student_en_us",
+      "nyc_school_survey_2026_additional_experiences_student_en_us"
+    ],
+    "itemOrder": "原题序；Q18/Q29仅回答一次，不把官方主题排列作为新施测顺序。",
+    "totalScore": null,
+    "fallback": "合法取得内容后，缺原生可表达的官方群体算法或冲突未解决时，只做既有无计分Form，不开发群体计分引擎。"
+  }
+}

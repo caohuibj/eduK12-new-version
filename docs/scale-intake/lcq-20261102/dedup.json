@@ -1,0 +1,223 @@
+{
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "mainMatches": [
+    "server-version/backend/src/modules/scale/instruments/talis2018_classroom_disruption_zh_cn/1.0.0/source.json"
+  ],
+  "openPRs": [
+    {
+      "number": 539,
+      "files": 277,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 102,
+      "headSHAObservedAfterPatchScan": "0ef13277b8634dcde2fa2e7446486a13c61206b5"
+    },
+    {
+      "number": 538,
+      "files": 33,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 0,
+      "headSHAObservedAfterPatchScan": "c6c415436ed3ff6f3de2cdf320b7c160cc4fd489"
+    },
+    {
+      "number": 537,
+      "files": 17,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 1,
+      "headSHAObservedAfterPatchScan": "46ff029d9cca20b221208e85257b5fa482eaefa3"
+    },
+    {
+      "number": 529,
+      "files": 5,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 0,
+      "headSHAObservedAfterPatchScan": "cff8728f67818a28b9ab0a2189c30040470dbd6b"
+    },
+    {
+      "number": 515,
+      "files": 6,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 0,
+      "headSHAObservedAfterPatchScan": "70a6b3bc54e30c95c35733a705c6350f929d2a6d"
+    },
+    {
+      "number": 491,
+      "files": 4,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 0,
+      "headSHAObservedAfterPatchScan": "290aa955a3445bcb0b519829423e626d044a2fc1"
+    },
+    {
+      "number": 489,
+      "files": 3,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 0,
+      "headSHAObservedAfterPatchScan": "dafc0b90b337e5ec7ab28f5b28208d74f51f2b28"
+    },
+    {
+      "number": 488,
+      "files": 3,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 0,
+      "headSHAObservedAfterPatchScan": "0c526f0529ab47c0054f9470d0bb9217e1d787a5"
+    },
+    {
+      "number": 482,
+      "files": 310,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 0,
+      "headSHAObservedAfterPatchScan": "9feffb8d0f5c91dd19f0744c43d62dba0a2818f8"
+    },
+    {
+      "number": 441,
+      "files": 693,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 2,
+      "headSHAObservedAfterPatchScan": "16d9bbaa5fffb424ce463220d6f9f7d3a7280db5"
+    },
+    {
+      "number": 413,
+      "files": 15,
+      "sourceFiles": 4,
+      "matches": [],
+      "patchesUnavailable": 0,
+      "headSHAObservedAfterPatchScan": "0f8057fa75bcb89215275f6ad7695f189fcf0e65"
+    },
+    {
+      "number": 412,
+      "files": 1,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 0,
+      "headSHAObservedAfterPatchScan": "4d79bc45d607f8e771eccfacc49a7558b8a3985e"
+    },
+    {
+      "number": 397,
+      "files": 2,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 0,
+      "headSHAObservedAfterPatchScan": "3ee375d87aa8d72ad8de5dcdf5ce10fd1a0a763d"
+    },
+    {
+      "number": 383,
+      "files": 5,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 0,
+      "headSHAObservedAfterPatchScan": "5454a7d7630a4ccb7125d0c621fa10317dc6924f"
+    },
+    {
+      "number": 379,
+      "files": 272,
+      "sourceFiles": 41,
+      "matches": [],
+      "patchesUnavailable": 29,
+      "headSHAObservedAfterPatchScan": "333200ade0c6cb42130cbc052189ba9c64691a12"
+    },
+    {
+      "number": 375,
+      "files": 374,
+      "sourceFiles": 32,
+      "matches": [],
+      "patchesUnavailable": 75,
+      "headSHAObservedAfterPatchScan": "5eca82fb13bcf0f2bbf3bb5b6deaa47fa1f9b792"
+    },
+    {
+      "number": 373,
+      "files": 61,
+      "sourceFiles": 3,
+      "matches": [],
+      "patchesUnavailable": 5,
+      "headSHAObservedAfterPatchScan": "3f17247865a6a83e5ee9e88cf3d0fa3060b59a53"
+    },
+    {
+      "number": 371,
+      "files": 208,
+      "sourceFiles": 3,
+      "matches": [],
+      "patchesUnavailable": 86,
+      "headSHAObservedAfterPatchScan": "75b956cbd4c45f75beee606fb53257494adc1ca0"
+    },
+    {
+      "number": 370,
+      "files": 66,
+      "sourceFiles": 1,
+      "matches": [],
+      "patchesUnavailable": 20,
+      "headSHAObservedAfterPatchScan": "bfd6dcbca24567219ec24979481f3da8e0137984"
+    },
+    {
+      "number": 368,
+      "files": 2101,
+      "sourceFiles": 1,
+      "matches": [],
+      "patchesUnavailable": 446,
+      "headSHAObservedAfterPatchScan": "1388d5db6f845b8d907f0e4090e4fd727aea8926"
+    },
+    {
+      "number": 367,
+      "files": 136,
+      "sourceFiles": 1,
+      "matches": [],
+      "patchesUnavailable": 46,
+      "headSHAObservedAfterPatchScan": "8e4440cac46086f73390f8774c40853beb9a6ddd"
+    },
+    {
+      "number": 362,
+      "files": 9,
+      "sourceFiles": 1,
+      "matches": [],
+      "patchesUnavailable": 1,
+      "headSHAObservedAfterPatchScan": "e2b23122e1a41f52f61719fdd31a6daf338b97e1"
+    },
+    {
+      "number": 360,
+      "files": 1269,
+      "sourceFiles": 1,
+      "matches": [],
+      "patchesUnavailable": 302,
+      "headSHAObservedAfterPatchScan": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2"
+    },
+    {
+      "number": 330,
+      "files": 15,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 0,
+      "headSHAObservedAfterPatchScan": "bf73bdf66dcc4e1e169a0153596c43efdc203a0a"
+    },
+    {
+      "number": 329,
+      "files": 62,
+      "sourceFiles": 0,
+      "matches": [],
+      "patchesUnavailable": 1,
+      "headSHAObservedAfterPatchScan": "a5effd7f86249a77b7c82606130e5db6f89aae45"
+    },
+    {
+      "number": 328,
+      "files": 73,
+      "sourceFiles": 5,
+      "matches": [],
+      "patchesUnavailable": 2,
+      "headSHAObservedAfterPatchScan": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf"
+    }
+  ],
+  "productionAndAdministratorCustomToolsChecked": false,
+  "method": "Full local source JSON text; open-PR filenames and available patches; prior parent audit supplied full-source comparison. Patch omissions are not full-file proof.",
+  "mainMatchDisposition": "TALIS classroom-disruption item uses generic 学习氛围; not LCQ source/items. No same-source LCQ found.",
+  "checkedAtUTC": "2026-11-02T00:30:40.623480+00:00",
+  "registeredIdentitiesBefore": 258,
+  "patchScanOpenPRCount": 26,
+  "registeredSourceFilesBefore": 235
+}

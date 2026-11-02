@@ -1,0 +1,100 @@
+{
+  "checkedDate": "2026-11-02",
+  "permissionStatus": "NOT_OBTAINED",
+  "permissionContactsPage": "https://nces.ed.gov/timss/questionnaire.asp",
+  "ieaPermissionProcedure": "https://www.iea.nl/data-tools/using-study-materials",
+  "rightsSummary": "NCES requires NCES and IEA permission before external questionnaire use. International context-questionnaire page requires prior permission for assessment/learning materials and prohibits reproduction/distribution/translation without written permission. No permission request sent, terms signed, or permission inferred.",
+  "rawMaterialStorage": "Read-only research copies in /tmp/timss2023-research of this execution environment, not tracked or included in PR. They are not a durable licensed content delivery.",
+  "sources": [
+    {
+      "url": "https://nces.ed.gov/timss/questionnaire.asp",
+      "bytes": 36493,
+      "sha256": "a7b5c72690ad95b515b8aa4c2f325d480f6348b0fbd746fd8f11a84733f218e3",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    },
+    {
+      "url": "https://timss2023.org/results/context-questionnaires/",
+      "bytes": 135683,
+      "sha256": "7d71d62d6d7beb0b8c84afd2101caf1dbebc8d61299de5964c525d1027b2a9c8",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    },
+    {
+      "url": "https://nces.ed.gov/timss/pdf/T23_GR4_StudentQ_USA_Questionnaire.pdf",
+      "bytes": 1202229,
+      "sha256": "a6a5fa8c94ab950fe13d98941073cebfb22e251b2e5fb03a7bdd605c43935482",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    },
+    {
+      "url": "https://nces.ed.gov/timss/pdf/T23_GR8_StudentQ_USA_Questionnaire.pdf",
+      "bytes": 810554,
+      "sha256": "51e1306fb2d1a12224ecc912301399d6fd2cdb39b01e6e1edc6dbfdbb8f0cc03",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    },
+    {
+      "url": "https://timss2023.org/wp-content/uploads/2024/10/T23_Student_Questionnaire_4.pdf",
+      "bytes": 304451,
+      "sha256": "cb49c8335a65d319c9490404b621b5d8f326b55893cc451ba646212db2a092d8",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    },
+    {
+      "url": "https://timss2023.org/wp-content/uploads/2024/10/T23_Student_Questionnaire_Integrated_Science_8.pdf",
+      "bytes": 309079,
+      "sha256": "46716b7bfd2eb1d4c471ec9d976d53be8691499826419879311e7549a1de5132",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    },
+    {
+      "url": "https://timss2023.org/wp-content/uploads/2024/12/T23_TR_Chap15.pdf",
+      "bytes": 627026,
+      "sha256": "267a4607602694cfbafebc1cefe2486dbf3213366550234312395adaa3a9d58f",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    },
+    {
+      "url": "https://timss2023.org/wp-content/uploads/methods/T23_TR_Exh15.10_EquivalenceTables_G8.xlsx",
+      "bytes": 71384,
+      "sha256": "bcdd2a35b5a77e6b80cb5c9e8fc5e7078cd3cfcb161c64416a98fa82edcf1978",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    },
+    {
+      "url": "https://timss2023.org/wp-content/uploads/methods/T23_TR_Exh15.8_TransformationConstants_G8.xlsx",
+      "bytes": 47907,
+      "sha256": "eab273b1c3f7fa0e582798b7dfd9759d89e76140c616915add66f3d22fe7432f",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    },
+    {
+      "url": "https://timss2023.org/wp-content/uploads/methods/T23_TR_Exh15.9_EquivalenceTables_G4.xlsx",
+      "bytes": 55526,
+      "sha256": "4bbafbee0b464cdd73d956d33942dfd0a2d272b2324b036bec856c73b0fe3b3f",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    },
+    {
+      "url": "https://timss2023.org/wp-content/uploads/methods/T23_TR_Exh15.7_TransformationConstants_G4.xlsx",
+      "bytes": 35947,
+      "sha256": "fcf114c932f1ff8ec2381aa4751559999cb6c2ad28f90e2579a622575bc04f46",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    },
+    {
+      "url": "https://timss2023.org/wp-content/uploads/methods/T23_TR_Exh15.3_ScaleDescriptions_G4.xlsx",
+      "bytes": 761162,
+      "sha256": "698ac04b067541a6e14ea61b239208cdd775725fe0f258c96561577954dba74e",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    },
+    {
+      "url": "https://timss2023.org/wp-content/uploads/methods/T23_TR_Exh15.6_ItemParameters_G8.xlsx",
+      "bytes": 96970,
+      "sha256": "ac700b25f6c1b93b84ba20f442da5ee19f60054083c99e8fe8abaf7f3efd6047",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    },
+    {
+      "url": "https://timss2023.org/wp-content/uploads/methods/T23_TR_Exh15.4_ScaleDescriptions_G8.xlsx",
+      "bytes": 894529,
+      "sha256": "1994e2e3399d908a0502edb5edf6270f0c6fae06b4c6d9ed833708be7e372ff6",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    },
+    {
+      "url": "https://timss2023.org/wp-content/uploads/methods/T23_TR_Exh15.5_ItemParameters_G4.xlsx",
+      "bytes": 77188,
+      "sha256": "1698912be28a927256d03a56dae09b4293eebaf0f8ddad7b1ba478bd9973693a",
+      "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "status": "PASS",
+  "catalogSources": [
+    {
+      "instrumentKey": "cultivate_sy27_meaningful_work_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cultivate_sy27_learning_goals_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cultivate_sy27_well_organized_classroom_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cultivate_sy27_supportive_teaching_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cultivate_sy27_feedback_for_growth_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cultivate_sy27_classroom_community_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cultivate_sy27_student_voice_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cultivate_sy27_teacher_caring_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cultivate_sy27_affirming_identities_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    }
+  ],
+  "allRegisteredSources": 267,
+  "handoffChildren": 23,
+  "responseUnits": 75,
+  "dbAccesses": 0,
+  "nativeInstallPlan": "9 rejected before database access",
+  "scoring": "NOT_EXECUTED_NO_EXECUTABLE",
+  "runtimeReport": "NOT_EXECUTED_NO_REPORT_VERSION",
+  "databaseImport": "NOT_EXECUTED_CATALOG_ONLY",
+  "baseSha": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "scope": "9 catalog sources, ordinary wrappers, generated index, handoff documents",
+  "environment": "local cloud environment; reused preinstalled backend node_modules; not a clean CI install",
+  "nodeVersion": "v24.21.0",
+  "generatedIndexCheck": "PASS",
+  "copyrightPermission": "NOT_ESTABLISHED_BY_ENGINEERING_CHECKS",
+  "inputSha256": {
+    "server-version/backend/src/modules/scale/instruments/cultivate_sy27_learning_goals_en/1.0.0/source.json": "8a2e19566e2692111ed0ba87cf90baf4ce90d3073eb190aa37779cee75c06dae",
+    "server-version/backend/src/modules/scale/instruments/cultivate_sy27_feedback_for_growth_en/1.0.0/source.json": "dc6d0b54e8d32bd6e0c4f89c11e0eb3d773b948b3fa57595587b42aa36494930",
+    "server-version/backend/src/modules/scale/instruments/cultivate_sy27_classroom_community_en/1.0.0/source.json": "3a50bacc0efad46e991a57678b15b772a9f457345fd5b652ad0af5e9c01f39ac",
+    "server-version/backend/src/modules/scale/instruments/cultivate_sy27_meaningful_work_en/1.0.0/source.json": "87746e3aef6189c7ae02bc5f3415f4bd43b31834395b69638ac715ae6cb3b2b5",
+    "server-version/backend/src/modules/scale/instruments/cultivate_sy27_supportive_teaching_en/1.0.0/source.json": "d07405b53c283fcf531049a5d6d599656539a3a060254edd68e9c8f2b274d7af",
+    "server-version/backend/src/modules/scale/instruments/cultivate_sy27_affirming_identities_en/1.0.0/source.json": "a62736717c8fe03176b2eb1fbd3cce0b02ab4ad5b39462383a2d415abee61afc",
+    "server-version/backend/src/modules/scale/instruments/cultivate_sy27_well_organized_classroom_en/1.0.0/source.json": "42f8349c47c8c6740dfca48d3cf8cc8bf851dd774b1d0cf95a9a1fb3ee433858",
+    "server-version/backend/src/modules/scale/instruments/cultivate_sy27_student_voice_en/1.0.0/source.json": "0fffe47ea4e3fb5b10f5fe7af7a33ee04f2cc1ce27abdbb817a5b97b8bd22c74",
+    "server-version/backend/src/modules/scale/instruments/cultivate_sy27_teacher_caring_en/1.0.0/source.json": "a5c12bca6b7b1e3470ea98ebd3f89585c67cc91e8e1630005e0d8b91fd0b17fa",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/src/modules/scale/onboarding/schema.ts": "a037587db31680599c90cdef724d093491efed86541d89a167f7b9a704d7edee",
+    "server-version/backend/src/modules/scale/onboarding/install.ts": "bfc6cf19f4ee7de7b33ef3ec4304c0f3ae9e473866d017c75832501b2f9275d7",
+    "server-version/backend/src/modules/scale/library/catalog-manifest.ts": "b041a4196f3fdaef889d2e4d5be548639a7a89198be9ea55e6018127c151e154",
+    "server-version/backend/scripts/scale-intake-selected-check.ts": "a6e02bd0b7fe4071ecd1050e35f8ad988873ef841b5c2b1e5821b51838ec1831"
+  }
+}

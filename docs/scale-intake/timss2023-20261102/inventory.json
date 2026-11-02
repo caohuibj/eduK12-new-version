@@ -1,0 +1,429 @@
+{
+  "recordKind": "research_handoff_not_new_runtime_schema",
+  "mother": {
+    "key": "timss2023",
+    "name": "TIMSS 2023",
+    "surveyCycle": 2023,
+    "scope": "US English Grade 4 and Grade 8 mathematics/general-integrated science classroom experience",
+    "status": "候选待审；无开发库可施测安装",
+    "metadataRevision": 1,
+    "runtimeC": null,
+    "runtimeP": null,
+    "runtimeR": null
+  },
+  "scales": [
+    {
+      "key": "timss2023_instructional_clarity_mathematics_g4_student_us_en",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "status": "CATALOG_ONLY",
+      "nativeType": "SCALE_CATALOG",
+      "grade": 4,
+      "country": "US",
+      "contentLocale": "en-US",
+      "respondent": "STUDENT",
+      "evaluationTarget": [
+        "TEACHER",
+        "CLASSROOM"
+      ],
+      "officialScoreVariable": "ASBGICM",
+      "officialCategoryVariable": "ASDGICM",
+      "officialItemIds": [
+        "ASBM03A",
+        "ASBM03B",
+        "ASBM03C",
+        "ASBM03D",
+        "ASBM03E",
+        "ASBM03F",
+        "ASBM03G"
+      ],
+      "usQuestion": "Q21ABCDEFG",
+      "itemCount": 7,
+      "measurementVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "independentAdministration": "NOT_ESTABLISHED"
+    },
+    {
+      "key": "timss2023_disorderly_behavior_mathematics_g4_student_us_en",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "status": "CATALOG_ONLY",
+      "nativeType": "SCALE_CATALOG",
+      "grade": 4,
+      "country": "US",
+      "contentLocale": "en-US",
+      "respondent": "STUDENT",
+      "evaluationTarget": [
+        "CLASSROOM"
+      ],
+      "officialScoreVariable": "ASBGDML",
+      "officialCategoryVariable": "ASDGDML",
+      "officialItemIds": [
+        "ASBM04A",
+        "ASBM04B",
+        "ASBM04C",
+        "ASBM04D",
+        "ASBM04E",
+        "ASBM04F"
+      ],
+      "usQuestion": "Q22ABCDEF",
+      "itemCount": 6,
+      "measurementVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "independentAdministration": "NOT_ESTABLISHED"
+    },
+    {
+      "key": "timss2023_instructional_clarity_science_g4_student_us_en",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "status": "CATALOG_ONLY",
+      "nativeType": "SCALE_CATALOG",
+      "grade": 4,
+      "country": "US",
+      "contentLocale": "en-US",
+      "respondent": "STUDENT",
+      "evaluationTarget": [
+        "TEACHER",
+        "CLASSROOM"
+      ],
+      "officialScoreVariable": "ASBGICS",
+      "officialCategoryVariable": "ASDGICS",
+      "officialItemIds": [
+        "ASBS08A",
+        "ASBS08B",
+        "ASBS08C",
+        "ASBS08D",
+        "ASBS08E",
+        "ASBS08F",
+        "ASBS08G"
+      ],
+      "usQuestion": "Q26ABCDEFG",
+      "itemCount": 7,
+      "measurementVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "independentAdministration": "NOT_ESTABLISHED"
+    },
+    {
+      "key": "timss2023_disorderly_behavior_science_g4_student_us_en",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "status": "CATALOG_ONLY",
+      "nativeType": "SCALE_CATALOG",
+      "grade": 4,
+      "country": "US",
+      "contentLocale": "en-US",
+      "respondent": "STUDENT",
+      "evaluationTarget": [
+        "CLASSROOM"
+      ],
+      "officialScoreVariable": "ASBGDSL",
+      "officialCategoryVariable": "ASDGDSL",
+      "officialItemIds": [
+        "ASBS09A",
+        "ASBS09B",
+        "ASBS09C",
+        "ASBS09D",
+        "ASBS09E",
+        "ASBS09F"
+      ],
+      "usQuestion": "Q27ABCDEF",
+      "itemCount": 6,
+      "measurementVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "independentAdministration": "NOT_ESTABLISHED"
+    },
+    {
+      "key": "timss2023_instructional_clarity_mathematics_g8_student_us_en",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "status": "CATALOG_ONLY",
+      "nativeType": "SCALE_CATALOG",
+      "grade": 8,
+      "country": "US",
+      "contentLocale": "en-US",
+      "respondent": "STUDENT",
+      "evaluationTarget": [
+        "TEACHER",
+        "CLASSROOM"
+      ],
+      "officialScoreVariable": "BSBGICM",
+      "officialCategoryVariable": "BSDGICM",
+      "officialItemIds": [
+        "BSBM20A",
+        "BSBM20B",
+        "BSBM20C",
+        "BSBM20D",
+        "BSBM20E",
+        "BSBM20F",
+        "BSBM20G"
+      ],
+      "usQuestion": "Q24ABCDEFG",
+      "itemCount": 7,
+      "measurementVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "independentAdministration": "NOT_ESTABLISHED"
+    },
+    {
+      "key": "timss2023_disorderly_behavior_mathematics_g8_student_us_en",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "status": "CATALOG_ONLY",
+      "nativeType": "SCALE_CATALOG",
+      "grade": 8,
+      "country": "US",
+      "contentLocale": "en-US",
+      "respondent": "STUDENT",
+      "evaluationTarget": [
+        "CLASSROOM"
+      ],
+      "officialScoreVariable": "BSBGDML",
+      "officialCategoryVariable": "BSDGDML",
+      "officialItemIds": [
+        "BSBM21A",
+        "BSBM21B",
+        "BSBM21C",
+        "BSBM21D",
+        "BSBM21E",
+        "BSBM21F"
+      ],
+      "usQuestion": "Q25ABCDEF",
+      "itemCount": 6,
+      "measurementVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "independentAdministration": "NOT_ESTABLISHED"
+    },
+    {
+      "key": "timss2023_instructional_clarity_science_g8_student_us_en",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "status": "CATALOG_ONLY",
+      "nativeType": "SCALE_CATALOG",
+      "grade": 8,
+      "country": "US",
+      "contentLocale": "en-US",
+      "respondent": "STUDENT",
+      "evaluationTarget": [
+        "TEACHER",
+        "CLASSROOM"
+      ],
+      "officialScoreVariable": "BSBGICS",
+      "officialCategoryVariable": "BSDGICS",
+      "officialItemIds": [
+        "BSBS26A",
+        "BSBS26B",
+        "BSBS26C",
+        "BSBS26D",
+        "BSBS26E",
+        "BSBS26F",
+        "BSBS26G"
+      ],
+      "usQuestion": "Q30ABCDEFG",
+      "itemCount": 7,
+      "measurementVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "independentAdministration": "NOT_ESTABLISHED"
+    },
+    {
+      "key": "timss2023_disorderly_behavior_science_g8_student_us_en",
+      "catalogIdentityVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "status": "CATALOG_ONLY",
+      "nativeType": "SCALE_CATALOG",
+      "grade": 8,
+      "country": "US",
+      "contentLocale": "en-US",
+      "respondent": "STUDENT",
+      "evaluationTarget": [
+        "CLASSROOM"
+      ],
+      "officialScoreVariable": "BSBGDSL",
+      "officialCategoryVariable": "BSDGDSL",
+      "officialItemIds": [
+        "BSBS27A",
+        "BSBS27B",
+        "BSBS27C",
+        "BSBS27D",
+        "BSBS27E",
+        "BSBS27F"
+      ],
+      "usQuestion": "Q31ABCDEF",
+      "itemCount": 6,
+      "measurementVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "independentAdministration": "NOT_ESTABLISHED"
+    }
+  ],
+  "forms": [
+    {
+      "key": "timss2023_classroom_activities_mathematics_g4_student_us_en",
+      "name": "TIMSS 2023｜数学课堂活动记录｜4年级｜学生（美国英语，无分表单候选）",
+      "candidateRevision": 1,
+      "nativeTarget": "EXISTING_ORDINARY_FORM",
+      "status": "METADATA_ONLY_PERMISSION_PENDING",
+      "grade": 4,
+      "country": "US",
+      "contentLocale": "en-US",
+      "respondent": "STUDENT",
+      "usQuestions": [
+        "Q19",
+        "Q21HI"
+      ],
+      "itemCount": 3,
+      "score": null,
+      "reverseItems": null,
+      "missingRule": "保留未答为null/未填；不补零，不把未填解读为从未发生。",
+      "resultPresentation": "仅记录已选活动/频率与未填状态，不给能力、清晰度、认知激活或课堂总分。",
+      "boundary": "额外活动题未列入官方清晰度七题参数；不据题块自行造认知激活量表。没有题文/选项/作答包。"
+    },
+    {
+      "key": "timss2023_classroom_activities_science_g4_student_us_en",
+      "name": "TIMSS 2023｜科学课堂活动记录｜4年级｜学生（美国英语，无分表单候选）",
+      "candidateRevision": 1,
+      "nativeTarget": "EXISTING_ORDINARY_FORM",
+      "status": "METADATA_ONLY_PERMISSION_PENDING",
+      "grade": 4,
+      "country": "US",
+      "contentLocale": "en-US",
+      "respondent": "STUDENT",
+      "usQuestions": [
+        "Q24",
+        "Q26HI"
+      ],
+      "itemCount": 3,
+      "score": null,
+      "reverseItems": null,
+      "missingRule": "保留未答为null/未填；不补零，不把未填解读为从未发生。",
+      "resultPresentation": "仅记录已选活动/频率与未填状态，不给能力、清晰度、认知激活或课堂总分。",
+      "boundary": "额外活动题未列入官方清晰度七题参数；不据题块自行造认知激活量表。没有题文/选项/作答包。"
+    },
+    {
+      "key": "timss2023_classroom_activities_mathematics_g8_student_us_en",
+      "name": "TIMSS 2023｜数学课堂活动记录｜8年级｜学生（美国英语，无分表单候选）",
+      "candidateRevision": 1,
+      "nativeTarget": "EXISTING_ORDINARY_FORM",
+      "status": "METADATA_ONLY_PERMISSION_PENDING",
+      "grade": 8,
+      "country": "US",
+      "contentLocale": "en-US",
+      "respondent": "STUDENT",
+      "usQuestions": [
+        "Q22",
+        "Q24HIJ"
+      ],
+      "itemCount": 4,
+      "score": null,
+      "reverseItems": null,
+      "missingRule": "保留未答为null/未填；不补零，不把未填解读为从未发生。",
+      "resultPresentation": "仅记录已选活动/频率与未填状态，不给能力、清晰度、认知激活或课堂总分。",
+      "boundary": "额外活动题未列入官方清晰度七题参数；不据题块自行造认知激活量表。没有题文/选项/作答包。"
+    },
+    {
+      "key": "timss2023_classroom_activities_science_g8_student_us_en",
+      "name": "TIMSS 2023｜科学课堂活动记录｜8年级｜学生（美国英语，无分表单候选）",
+      "candidateRevision": 1,
+      "nativeTarget": "EXISTING_ORDINARY_FORM",
+      "status": "METADATA_ONLY_PERMISSION_PENDING",
+      "grade": 8,
+      "country": "US",
+      "contentLocale": "en-US",
+      "respondent": "STUDENT",
+      "usQuestions": [
+        "Q28",
+        "Q30HIJ"
+      ],
+      "itemCount": 4,
+      "score": null,
+      "reverseItems": null,
+      "missingRule": "保留未答为null/未填；不补零，不把未填解读为从未发生。",
+      "resultPresentation": "仅记录已选活动/频率与未填状态，不给能力、清晰度、认知激活或课堂总分。",
+      "boundary": "额外活动题未列入官方清晰度七题参数；不据题块自行造认知激活量表。没有题文/选项/作答包。"
+    }
+  ],
+  "optionalCombinations": [
+    {
+      "key": "timss2023_classroom_mathematics_g4_student_us_en",
+      "nativeTarget": "EXISTING_ORDINARY_COMPOSITE_QUESTIONNAIRE",
+      "status": "OPTIONAL_METADATA_ONLY",
+      "grade": 4,
+      "country": "US",
+      "contentLocale": "en-US",
+      "members": [
+        "timss2023_instructional_clarity_mathematics_g4_student_us_en",
+        "timss2023_disorderly_behavior_mathematics_g4_student_us_en",
+        "timss2023_classroom_activities_mathematics_g4_student_us_en"
+      ],
+      "scoreAggregation": null,
+      "note": "仅在合法获得所需内容并验证适用语境后，用既有普通组合问卷选配；各量表单独结果、表单无分，不建立跨工具或母工具总分。"
+    },
+    {
+      "key": "timss2023_classroom_science_g4_student_us_en",
+      "nativeTarget": "EXISTING_ORDINARY_COMPOSITE_QUESTIONNAIRE",
+      "status": "OPTIONAL_METADATA_ONLY",
+      "grade": 4,
+      "country": "US",
+      "contentLocale": "en-US",
+      "members": [
+        "timss2023_instructional_clarity_science_g4_student_us_en",
+        "timss2023_disorderly_behavior_science_g4_student_us_en",
+        "timss2023_classroom_activities_science_g4_student_us_en"
+      ],
+      "scoreAggregation": null,
+      "note": "仅在合法获得所需内容并验证适用语境后，用既有普通组合问卷选配；各量表单独结果、表单无分，不建立跨工具或母工具总分。"
+    },
+    {
+      "key": "timss2023_classroom_mathematics_g8_student_us_en",
+      "nativeTarget": "EXISTING_ORDINARY_COMPOSITE_QUESTIONNAIRE",
+      "status": "OPTIONAL_METADATA_ONLY",
+      "grade": 8,
+      "country": "US",
+      "contentLocale": "en-US",
+      "members": [
+        "timss2023_instructional_clarity_mathematics_g8_student_us_en",
+        "timss2023_disorderly_behavior_mathematics_g8_student_us_en",
+        "timss2023_classroom_activities_mathematics_g8_student_us_en"
+      ],
+      "scoreAggregation": null,
+      "note": "仅在合法获得所需内容并验证适用语境后，用既有普通组合问卷选配；各量表单独结果、表单无分，不建立跨工具或母工具总分。"
+    },
+    {
+      "key": "timss2023_classroom_science_g8_student_us_en",
+      "nativeTarget": "EXISTING_ORDINARY_COMPOSITE_QUESTIONNAIRE",
+      "status": "OPTIONAL_METADATA_ONLY",
+      "grade": 8,
+      "country": "US",
+      "contentLocale": "en-US",
+      "members": [
+        "timss2023_instructional_clarity_science_g8_student_us_en",
+        "timss2023_disorderly_behavior_science_g8_student_us_en",
+        "timss2023_classroom_activities_science_g8_student_us_en"
+      ],
+      "scoreAggregation": null,
+      "note": "仅在合法获得所需内容并验证适用语境后，用既有普通组合问卷选配；各量表单独结果、表单无分，不建立跨工具或母工具总分。"
+    }
+  ],
+  "referenceOnlyVersions": [
+    "International English Grade 4 questionnaire",
+    "International English Grade 8 integrated-science questionnaire"
+  ],
+  "excluded": [
+    "Grade 8 separate science subjects",
+    "other countries/languages without exact source verification",
+    "achievement items",
+    "whole-survey background scales",
+    "2019/2027/longitudinal waves"
+  ],
+  "notImplemented": [
+    "new engine",
+    "new permission or gate",
+    "new cross-tool score",
+    "student or teacher runtime disclosure changes"
+  ]
+}

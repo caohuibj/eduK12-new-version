@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "timss2023_instructional_clarity_science_g8_student_us_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "TIMSS 2023｜科学教学清晰度｜8年级｜学生（美国英语，目录候选）",
+      "abbreviation": "BSBGICS",
+      "instrumentFamily": "TIMSS 2023 US English student classroom-experience modules"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "学生报告的科学课堂教学清晰度体验；只登记美国英语2023波次来源和官方指数身份，无可施测题本、计分或个人结果。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "student_evaluation",
+        "target:teacher",
+        "target:classroom",
+        "respondent:student",
+        "grade:8",
+        "age:grade8_school_cohort",
+        "subject:science",
+        "language:en-US",
+        "country:US",
+        "source:IEA_NCES_TIMSS2023",
+        "rights:permission_required",
+        "availability:catalog_only",
+        "status:research_pilot"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 8,
+        "maxGrade": 8
+      },
+      "populationNotes": "美国TIMSS 2023第8年级学生；年级队列不是固定年龄常模。SELF指学生报告自己的课堂体验，不是教师自评；评价对象与报告接收者分别管理。无本地独立施测效度。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 7,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SUPERVISED"
+      ],
+      "timeFrame": "原2023学生问卷学科课堂语境；本目录不可施测",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "美国题号Q30 A,B,C,D,E,F,G；官方指数BSBGICS；国际数据库原项BSBS26A,BSBS26B,BSBS26C,BSBS26D,BSBS26E,BSBS26F,BSBS26G。",
+        "美国问卷题号与国际原项变量号分别登记；不把国际模板、分科科学或其他国家/语言当同一内容版本。",
+        "预计2分钟仅为目录所需项目粗估，未实测；不从整卷时长推成官方子量表时长。",
+        "保留原模块语境；指数可单独计分不证明拆开独立施测有效。",
+        "官方指数使用PCM/WLE和分指数转换，不能把题块均分当官方分。",
+        "NCES和IEA要求事先许可；本包没有题文、选项、指导语、可作答配置或计分参数。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅供来源检索和后续合法授权后的研究准备；不是施测许可、独立模块验证或中国学生常模。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en-US",
+    "targetLocale": "en-US",
+    "localizationVersion": "1.0.0",
+    "translationSource": "NCES发布的美国英语TIMSS 2023学生问卷；本包只登记元数据。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "NOT_ESTABLISHED",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "没有新译题文；中文目录名称和中文报告编辑草稿不构成已验证中文版。"
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "TIMSS 2023 Grade 8 US Student Questionnaire — BSBGICS module metadata",
+      "citation": "NCES/IEA TIMSS 2023 US Student Questionnaire Q30; Yin & Reynolds (2024), Technical Report Chapter 15, Exhibits 15.4, 15.6, 15.8, 15.10.",
+      "url": "https://nces.ed.gov/timss/pdf/T23_GR8_StudentQ_USA_Questionnaire.pdf",
+      "publicationYear": 2023
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "教学清晰度"
+      ],
+      "limitations": [
+        "学生个人反馈只在原有接收者授权允许时显示；教师只看符合原有匿名、发布和最小人数规则的授权群体汇总。",
+        "学生文案解释自己的课堂体验；不评价教师优劣，不把低体验当学生能力问题，不要求学生承担纠正课堂环境的责任。",
+        "失序行为官方指数高分表示干扰较少；清晰度高分表示感知更清楚，不为鼓励改计分方向。",
+        "本目录无实际结果；正常/低体验/信息不足的学生和教师文案仅见同母工具report-examples.md编辑草稿。"
+      ],
+      "disclaimer": "当前不可施测，无C/P/R运行版本和数值报告。八个指数分别解释，无TIMSS母工具总分。"
+    },
+    "blockers": [
+      "NCES_IEA_PERMISSION_NOT_OBTAINED",
+      "EXECUTABLE_CONTENT_NOT_PREPARED",
+      "OFFICIAL_PCM_WLE_REPRODUCTION_NOT_VALIDATED",
+      "INDEPENDENT_MODULE_ADMINISTRATION_NOT_ESTABLISHED"
+    ]
+  }
+}

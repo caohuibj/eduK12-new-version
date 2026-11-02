@@ -1,0 +1,53 @@
+{
+  "status": "LOCAL_TARGETED_CHECKS_PASSED",
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "recordedAtUTC": "2026-11-02T00:30:40.623480+00:00",
+  "evidenceKind": "transcribed successful tool results plus current unchanged input SHA256; not CI and not database execution",
+  "checkedSources": 4,
+  "sourceValidation": {
+    "method": "existing checkSelectedSource",
+    "status": "CATALOG_ONLY",
+    "administrable": false,
+    "goldenCases": 0,
+    "scoringExecutions": 0,
+    "issues": []
+  },
+  "generatorCheck": {
+    "command": "node --import tsx scripts/generate-scale-instruments.ts --check",
+    "exitCode": 0
+  },
+  "registry": {
+    "totalSources": 262,
+    "lcqSources": 4,
+    "executables": 0,
+    "runtimePolicies": 0,
+    "tripletParts": 0,
+    "reportVariants": 0,
+    "disclosurePoliciesAdded": 0
+  },
+  "installBoundary": {
+    "entry": "planScaleInstrumentInstall",
+    "rejections": 4,
+    "reason": "Scale instrument is not executable or has no compiled runtime policy",
+    "databaseCalls": 0
+  },
+  "inputsSHA256": {
+    "server-version/backend/src/modules/scale/instruments/lcq15_faculty_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/lcq15_faculty_en/1.0.0/source.json": "e87f70709e8939436634a4e95de6430893e80116476e00bac6178605b846c890",
+    "server-version/backend/src/modules/scale/instruments/lcq15_instructor_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/lcq15_instructor_en/1.0.0/source.json": "7b65a82b365c9e8a3488c11704cd3cb02c469af333a2fefd8429a9fa26deb6de",
+    "server-version/backend/src/modules/scale/instruments/lcq6_faculty_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/lcq6_faculty_en/1.0.0/source.json": "f5fe5690080ecf2acf4eabbae66f5b10517f8b4dd2defe9d255dbe7d0d28a53f",
+    "server-version/backend/src/modules/scale/instruments/lcq6_instructor_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/lcq6_instructor_en/1.0.0/source.json": "2f37189e0ad0a29193f5ac5301bca4d98bb2a1699819c8dc4040e77e66383cd1",
+    "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts": "4a4d847347732f7474912b6603d304e2f9cef3415c4ce8a9a8839867548d9a9d"
+  },
+  "notExecuted": [
+    "database import (no executable content)",
+    "production/admin-custom-tool dedup",
+    "numerical scoring/missing/reverse tests (no verified scoring)",
+    "report rendering (no runtime R)",
+    "full backend/frontend/browser",
+    "GitHub Actions (same-input local checks retained; no CI qualification claim)"
+  ]
+}

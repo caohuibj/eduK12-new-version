@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "qti_sun2018_confrontational_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "QTI中文Sun2018｜对抗｜初中7–9年级｜学生评教",
+      "abbreviation": "QTI-Sun2018-O7",
+      "instrumentFamily": "QTI Sun/Mainhard/Wubbels Chinese 40-item (2017 online / 2018 issue)"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "原40题QTI第7八分区：对抗（Confrontational），同母工具的内容和分数拆分候选；不主张独立施测效度。",
+      "constructLevel": "FACET",
+      "constructOverlapTags": [
+        "qti",
+        "qti_sun2018",
+        "source:10.1007/s10984-017-9243-z",
+        "evaluation:student_rates_teacher",
+        "evaluation_target:teacher",
+        "context:classroom",
+        "respondent:student",
+        "population:grade_7_9",
+        "sample_age:11_17",
+        "locale:zh-CN",
+        "rights:CC_BY_4_0_article_table4",
+        "status:PILOT",
+        "availability:catalog_only",
+        "administration:retain_full_40_randomized",
+        "score:no_40_item_total",
+        "octant:7",
+        "parent:qti_sun2018_40_zh_cn"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 7,
+        "maxGrade": 9
+      },
+      "populationNotes": "2015年山东威海4所公办初中、40班；1995份可用学生问卷，80名教师；样本年龄11–17，平均13.49。年龄范围是样本描述，不是全年龄效度或纳入门槛。非教师自评、非小学或香港繁体版。",
+      "respondentTypes": [
+        "OBSERVER"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "一般课堂中的教师行为；未指定固定回忆天数。当前目录不可施测；用时仅项目估计，未实测。",
+      "requiredTraining": false,
+      "itemOrderLocked": false,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "附录表4按维度排列仅为展示；原文p16要求施测前随机排列40题。不得按维度成块施测。",
+        "精确中文五点锚点、中间标签、数值编码及原缺失处理未完整载于论文。",
+        "现有发布不支持运行期随机化；可在内容阶段预先随机混排并核对冻结题序后复用randomizeItems=false；本次未冻结。",
+        "子项为内容/计分拆分候选，优先保留原40题组卷；独立短表效度未确立。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原研究支持完整中文40题在对应初中样本的研究用途；当前数字形式和独立子项未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅规划发展性反馈；无个体诊断、教师绩效、排名或常模。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Original Chinese Table 4 in Sun/Mainhard/Wubbels (2018; online 2017), not a new translation.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "NOT_ESTABLISHED",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "原研究进行了中文访谈和结构效度评估；本项目转录、数字实现及子项独立施测尚未测量学审核。保留中文，不用英文释义替代。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "STUDENT_REPORT"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Development and evaluation of a Chinese version of the Questionnaire on Teacher Interaction (QTI)",
+      "citation": "Sun, X., Mainhard, T., & Wubbels, T. (2018; online 2017). Development and evaluation of a Chinese version of the Questionnaire on Teacher Interaction (QTI). Learning Environments Research, 21, 1–17. https://doi.org/10.1007/s10984-017-9243-z",
+      "url": "https://link.springer.com/content/pdf/10.1007/s10984-017-9243-z.pdf",
+      "publicationYear": 2018
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "对抗"
+      ],
+      "limitations": [
+        "不可施测，无可执行C/P/R版本；1.0.0是候选来源身份。",
+        "原题文、维度、来源许可位于 docs/scale-intake/qti-sun2018-zh-cn/；40题无总分。",
+        "Agency/Communion由八维圆环权重派生，非新题库；缩放不明前不显示数值。",
+        "无中国K12常模、教师优秀等级、群体百分位或跨工具总分。",
+        "缺失不作0分；原文未规定缺失算法，complete_required只是未激活的工程提案。"
+      ],
+      "disclaimer": "候选待审；已取得附录完整中文40题，缺精确中文响应锚点/编码和完整施测计分协议；开发库、生产库均未导入。"
+    },
+    "blockers": [
+      "EXACT_CHINESE_RESPONSE_ANCHORS_AND_NUMERIC_CODING_NOT_REPRODUCED",
+      "FROZEN_CROSS_OCTANT_ORDER_NOT_PREPARED",
+      "SOURCE_MISSING_RESPONSE_POLICY_NOT_SPECIFIED",
+      "INDEPENDENT_OCTANT_ADMINISTRATION_NOT_VALIDATED"
+    ]
+  }
+}

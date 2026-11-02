@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "lcq15_faculty_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "LCQ｜自主支持15题·全体教师｜高校（K12待验证）｜学生（仅目录）",
+      "abbreviation": "LCQ-15-FACULTY-EN",
+      "instrumentFamily": "LCQ — Learning Climate Questionnaire"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [
+        "MOTIVATION"
+      ],
+      "constructDefinition": "学生感知全体教师提供的自主支持；单一构念，属于学习环境的特定方面，不等同整体教学质量或学生自主能力。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:lcq",
+        "purpose:student_feedback",
+        "评价用途:学生评教",
+        "construct:perceived_autonomy_support",
+        "target:faculty",
+        "评价对象:教师",
+        "context:general_learning_climate",
+        "respondent:student",
+        "填答者:学生",
+        "population:college_graduate",
+        "年龄:未核定",
+        "学段:高校",
+        "k12:applicability_unestablished",
+        "locale:en",
+        "来源许可:受限_未接受条款",
+        "rights:public_redistribution_not_authorized",
+        "availability:catalog_only",
+        "status:PILOT",
+        "use:research_candidate",
+        "form:lcq15"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "学生评价所接触教师的自主支持，SELF表示学生报告自身感知；不是教师自评。已核原始研究为高校/医学课程；不填写臆测年龄或K12年级范围。原研究证据不能替代该目录精确英文题本的本地验证。"
+    },
+    "administration": {
+      "itemCount": 15,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "待正式指导语核定；应明确课程、评价对象和接触阶段，原研究不同时间点分别保留",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "官方说明长版15题，保留完整单一构念。",
+        "官方允许一般学习氛围使用faculty members整体指称；完整对应题本和指导语待取得，不能把特定教师题文自动全局替换后称已验证。",
+        "目录字段用时为项目整理估计，未经实测；PAPER只描述题本形式，不表示当前可施测或数字使用已获授权。",
+        "无题项、作答选项或回忆期替代文本；不得凭研究统计、网页摘要或二手转载生成题库。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅作来源与版本研究准备；该精确题本/指称/语言的可用性待核。中国K12使用未建立。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "官方LCQ公开介绍仅用于来源识别；本包无题文、翻译或新中文题本。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "名称和整理说明采用中文，不表示问卷已翻译。完整英文题本及相关许可待取得；高校证据不外推中国K12。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "STUDENT",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Learning Climate Questionnaire, 15-item, faculty referent (metadata only)",
+      "citation": "Center for Self-Determination Theory, LCQ public description (accessed 2026-11-02); Williams & Deci (1996), JPSP 70(4), 767–779; Black & Deci (2000), Science Education 84, 740–756. Exact current item form not obtained.",
+      "url": "https://selfdeterminationtheory.org/learning-climate-questionnaire/"
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "感知自主支持"
+      ],
+      "limitations": [
+        "仅目录候选；没有正式题本、指导语、选项、可执行计分或结果报告。",
+        "官方题本下载需接受条款；本任务未接受。条款对第三方分发、网上发布和商用有明确限制，本项目相关书面授权未取得。",
+        "1996年原研究为高校医学生、15题5点版本；不能与当前网站题本混用。原始现行计分手册及个体缺失规则未取得。",
+        "主要已核证据来自高校/研究生情境；本英文版本在中国K12的年龄、年级适配及测量效度未建立；无已验证中文版或本地常模。",
+        "特定教师与全体教师指称不得混答或合并；15题和6题是备选完整版本，不能拆成多个自主支持子维度。"
+      ],
+      "disclaimer": "仅为候选来源目录；没有内容C、计分参数P或报告R可执行版本，不可施测或报告个人得分。"
+    },
+    "blockers": [
+      "OFFICIAL_QUESTIONNAIRE_TERMS_NOT_ACCEPTED",
+      "FULL_OFFICIAL_ITEM_FORM_NOT_OBTAINED",
+      "PUBLIC_ITEM_REDISTRIBUTION_NOT_AUTHORIZED",
+      "DIGITAL_USE_SCOPE_NOT_ESTABLISHED",
+      "CURRENT_SCORING_AND_REVERSE_KEY_NOT_VERIFIED",
+      "INDIVIDUAL_MISSING_RULE_NOT_VERIFIED",
+      "K12_CHINESE_APPLICABILITY_NOT_ESTABLISHED",
+      "FACULTY_WORDING_AND_INSTRUCTIONS_NOT_OBTAINED"
+    ]
+  }
+}

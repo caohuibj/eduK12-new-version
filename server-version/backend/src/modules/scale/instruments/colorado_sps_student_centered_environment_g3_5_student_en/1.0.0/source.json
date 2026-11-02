@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "colorado_sps_student_centered_environment_g3_5_student_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Colorado SPS｜Student-Centered Environment（以学生为中心的环境）｜3–5年级｜学生填答",
+      "abbreviation": "Colorado SPS",
+      "instrumentFamily": "Colorado SPS — CEI Student Perception Survey"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "以学生为中心的环境；仅来源目录候选。Study Q retains Spring 2013 numbering with deleted item gap; final positions are 1-based English survey rows in official DOCX, not new item codes.",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:colorado_sps",
+        "学生评教",
+        "评价对象:教师",
+        "评价对象:课堂",
+        "school_context:not_school_rating",
+        "grades:3-5",
+        "age:grade_based_source_no_fixed_age",
+        "respondent:student",
+        "language:en",
+        "rights:permission_pending",
+        "use:research",
+        "maturity:PILOT",
+        "availability:catalog_only",
+        "unit_kind:scale_candidate",
+        "source:CEI_3_5",
+        "content:Student-Centered Environment"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "OBSERVER"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "populationNotes": "学生对指定教师及课堂作答；原来源界定3–5年级，没有固定年龄边界。目录OBSERVER表示学生观察者，不是教师填答。",
+      "gradeRange": {
+        "minGrade": 3,
+        "maxGrade": 5
+      }
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "PAPER",
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "指定教师及课堂的学习经历；来源未指定固定回忆天数。候选不能施测。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Study Q retains Spring 2013 numbering with deleted item gap; final positions are 1-based English survey rows in official DOCX, not new item codes.",
+        "NOT_ESTABLISHED; keep original 34-row order and full administration context",
+        "Original wording/files omitted pending permission. Estimated minutes are editorial placeholders, not published administration times."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅供来源追索、题键和许可核对；不是现成可施测版本。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "SPS grades 3–5 final item-to-element overview; source-language metadata only; Chinese editorial labels are not item translations.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "No validated Chinese form registered. English/Spanish bilingual administration files were inspected to locate English row order only. Separate Spanish validation/version is not asserted."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "STUDENT_REPORT"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "SPS grades 3–5 final item-to-element overview",
+      "citation": "The Colorado Education Initiative; copyright 2014; hosted 2015/02. Exact retrieval hash and item-key mapping: docs/scale-intake/colorado-sps-20261102/sources.json and inventory.json.",
+      "url": "https://www.coloradoedinitiative.org/wp-content/uploads/2015/02/SPS_Administration_survey-instrument-3-5-CEI.pdf"
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "以学生为中心的环境"
+      ],
+      "limitations": [
+        "CATALOG_ONLY: source metadata, not an administrable instrument or report.",
+        "Original English only; Chinese names/report examples are editorial, not a validated Chinese translation.",
+        "Full-form student validation does not establish standalone subscale administration or teacher-self-assessment validity.",
+        "Recipient and respondent differ: student feedback only if the existing participant/report authorization permits it; teacher aggregate feedback only if current release, anonymity, minimum-count and disclosure rules permit it. No item-level student answers or sensitive open text may be exposed by these examples.",
+        "No norms, teacher rankings, student diagnosis, pass/fail cutoffs, cross-tool score, or inferred permission.",
+        "Published validation and descriptive teacher aggregates used full-form context; no independent subscale validation claimed."
+      ],
+      "disclaimer": "CATALOG_ONLY；题文未公开导入；C/P/R均未实例化。无计分表单不生成评分报告。"
+    },
+    "blockers": [
+      "PUBLIC_PLATFORM_REDISTRIBUTION_PERMISSION_NOT_ESTABLISHED",
+      "NO_EXECUTABLE_CONTENT_PACKAGE",
+      "STANDALONE_SUBSCALE_ADMINISTRATION_NOT_ESTABLISHED",
+      "MISSING_RESPONSE_AGGREGATION_POLICY_NOT_FINALIZED"
+    ]
+  }
+}
