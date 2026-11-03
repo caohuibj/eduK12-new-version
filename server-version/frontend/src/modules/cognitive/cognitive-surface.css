@@ -66,3 +66,31 @@
  * These selectors cannot enter the timed task boundary. */
 .cognitive-surface .hui-page>section[aria-label] :is(.text-slate-500,.text-slate-600,.text-slate-900){color:#626b74!important}
 .cognitive-surface .cognitive-preparation :is(.hui-status--pending,.hui-status--info){background:#f8f9fa;border-color:#dfe3e7;color:#454f59}
+
+
+/* Training dark theme for non-timed cognitive preparation and status screens. */
+@media screen {
+  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) {
+    --runner-ink:var(--training-ink); --runner-muted:var(--training-muted);
+    --runner-line:var(--training-border); --runner-surface:var(--training-surface);
+    --runner-page:var(--training-paper); --runner-soft:var(--training-raised);
+    color:var(--training-ink); background:var(--training-surface); color-scheme:dark;
+  }
+  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) .hui-product {
+    --hui-color-text:var(--training-ink)!important; --hui-color-muted:var(--training-muted)!important;
+    --hui-color-surface:var(--training-surface)!important; --hui-color-background:var(--training-paper)!important;
+    --hui-color-border:var(--training-border)!important; --hui-color-action:var(--training-bamboo)!important;
+  }
+  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) :is(.hui-page,[data-assessment-shell-header],section[aria-label="测评进度"],.cognitive-task-panel,.cognitive-task-cue,[aria-label="认知任务设备检查"]) {
+    background:var(--training-surface)!important; color:var(--training-ink)!important; border-color:var(--training-border)!important;
+  }
+  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) :is([data-assessment-shell-header] h1,.cognitive-task-title) { color:var(--training-ink)!important; }
+  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) :is([data-assessment-shell-header] p,.cognitive-task-eyebrow,.cognitive-task-description,.cognitive-task-result-score,.cognitive-task-result-detail,.hui-page>section[aria-label] .text-slate-500,.hui-page>section[aria-label] .text-slate-600,.hui-page>section[aria-label] .text-slate-900) { color:var(--training-muted)!important; }
+  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) :is(.cognitive-task-hint,.cognitive-task-transition-meta,.cognitive-preparation .hui-status--pending,.cognitive-preparation .hui-status--info) { background:var(--training-raised)!important; color:var(--training-ink)!important; border-color:var(--training-border)!important; }
+  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) :is(.btn-primary,.hui-button--primary) { background:var(--training-bamboo)!important; border-color:var(--training-bamboo)!important; color:var(--training-on-accent)!important; }
+  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) :is(.btn-primary,.hui-button--primary):hover:not(:disabled) { background:#cdddb9!important; border-color:#cdddb9!important; color:var(--training-on-accent)!important; }
+  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) :is(.btn-secondary,.hui-button--secondary) { background:var(--training-raised)!important; border-color:var(--training-border)!important; color:var(--training-ink)!important; }
+  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) [role=progressbar] { background:var(--training-raised)!important; }
+  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) [role=progressbar]>div { background:var(--training-bamboo)!important; }
+  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) .cognitive-preparation>[data-assessment-shell-actions] { border-color:var(--training-border); }
+}
