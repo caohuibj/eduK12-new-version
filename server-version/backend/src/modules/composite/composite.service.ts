@@ -2472,10 +2472,17 @@ const loadSummaryMarkerPresence = async (ids: string[]) => {
   return presence
 }
 
-export const listAvailableForStudent = async (userId: string, now = Date.now(), courseId?: string, summary = false) => {
+/**
+ * `authorizedCourseIds` lets an internal caller that has already read this
+ * student's ACTIVE/APPROVED non-library memberships reuse them instead of
+ * re-reading. It must never carry caller-supplied course ids. Composite rows
+ * still require a non-library course below, so the result is identical.
+ */
+export const listAvailableForStudent = async (userId: string, now = Date.now(), courseId?: string, summary = false, authorizedCourseIds?: string[]) => {
   // Catalog consumers opt in; older detail consumers keep their original response.
-  const memberships = await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, ...(courseId ? { courseId } : {}) }, select: { courseId: true } })
-  const courseIds = memberships.map((item) => item.courseId)
+  const courseIds = authorizedCourseIds
+    ? authorizedCourseIds.filter((id) => !courseId || id === courseId)
+    : (await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, ...(courseId ? { courseId } : {}) }, select: { courseId: true } })).map((item) => item.courseId)
   if (!courseIds.length) return []
   const list = await prisma.compositeAssessment.findMany({
     // Publication governs new starts. Archived deliveries remain discoverable
@@ -2483,7 +2490,13 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
     where: { AND: [{ OR: [
       { status: 'PUBLISHED' },
       { status: 'ARCHIVED', attempts: { some: { userId, status: { in: ['IN_PROGRESS', 'COMPLETED'] } } } },
-    ] }], OR: [
+    ] }],
+    // While the cognitive module is off, a product with a COGNITIVE item is
+    // listed only if this student already has an attempt (any status). This is
+    // the in-memory `supportedList` rule below, pushed into SQL so the catalog
+    // is not materialized just to be dropped; the in-memory rule stays as-is.
+    ...(config.cognitiveModuleEnabled ? {} : { NOT: { items: { some: { type: 'COGNITIVE' } }, attempts: { none: { userId } } } }),
+    OR: [
       { productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId: { in: courseIds }, course: { isLibrary: false } },
       { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds }, course: { isLibrary: false } } } },
     ] },

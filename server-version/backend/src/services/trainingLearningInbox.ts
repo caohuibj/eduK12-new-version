@@ -1,5 +1,5 @@
 import { prisma } from '../config/database';
-import { listStudentTasks } from './studentTasks';
+import { listStudentTasksInCourses } from './studentTasks';
 import { listStudentAssignments } from '../modules/cognitive/assignment.service';
 import { withLearningCourse } from './trainingLearningLinks';
 export type LearningKind = 'ASSIGNMENT' | 'CHECKIN' | 'ASSESSMENT';
@@ -30,14 +30,14 @@ const iso = (value: Date | null | undefined) => value?.toISOString() ?? null;
 /** Owner-bound metadata only. Opening this inbox never starts an attempt,
  * reads answers/scores, generates reports, or grants report access. */
 export async function listTrainingLearningInbox(userId: string, query: LearningQuery, now = new Date()) {
-    const [feed, memberships] = await Promise.all([
-        listStudentTasks(userId, { page: 1, pageSize: Number.MAX_SAFE_INTEGER }, now),
-        prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false, courseType: 'TRAINING_COURSE' } }, select: { course: { select: { id: true, title: true } } } }),
-    ]);
+    const memberships = await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false, courseType: 'TRAINING_COURSE' } }, select: { course: { select: { id: true, title: true } } } });
     const courseMap = new Map(memberships.map(m => [m.course.id, m.course]));
     const courseIds = [...courseMap.keys()];
     const validCourses = (courses: Course[]) => courses.filter(c => courseMap.has(c.id)).map(c => courseMap.get(c.id)!);
-    const tasks = feed.list.map(t => ({ ...t, courses: validCourses(t.courses) })).filter(t => t.courses.length > 0);
+    // Only tasks linked to this student's Training memberships are read; the
+    // whole cross-course task catalog is never built just to be filtered here.
+    const feed = await listStudentTasksInCourses(userId, [...courseMap.values()], now);
+    const tasks = feed.map(t => ({ ...t, courses: validCourses(t.courses) })).filter(t => t.courses.length > 0);
     const assignments = tasks.filter(t => t.kind === 'ASSIGNMENT');
     const questions = tasks.filter(t => t.kind === 'QUESTIONNAIRE');
     const composites = tasks.filter(t => t.kind === 'COMPOSITE');
