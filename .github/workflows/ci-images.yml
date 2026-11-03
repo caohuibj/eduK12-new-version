@@ -118,11 +118,35 @@ jobs:
             echo "ready=false" >> "$GITHUB_OUTPUT"
           fi
       - name: install Trivy 0.70.0 once per runner
+        id: trivy-install
         if: steps.trivy-local.outputs.ready != 'true'
+        continue-on-error: true
         uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
         with:
           version: v0.70.0
           cache: false
+      - name: fall back to a direct Trivy download when the action cannot reach the release host
+        if: steps.trivy-local.outputs.ready != 'true' && steps.trivy-install.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          bin_dir="$HOME/.local/bin/trivy-bin"
+          # The setup action resolved the tag through api.github.com but failed
+          # to resolve github.com for the release asset on this runner (exit 6).
+          # Fetch the exact asset through the API host instead, with retries;
+          # the octet-stream accept header 302s to the release asset CDN.
+          asset_url="$(curl -fsS --max-time 20 https://api.github.com/repos/aquasecurity/trivy/releases/tags/v0.70.0 \
+            | python3 -c "import json,sys;print(next(a['url'] for a in json.load(sys.stdin)['assets'] if a['name']=='trivy_0.70.0_Linux-64bit.tar.gz'))")"
+          ok=""
+          for attempt in 1 2 3; do
+            if curl -fsSL --retry 4 --retry-delay 8 --retry-all-errors --max-time 180 \
+                -H "Accept: application/octet-stream" -o /tmp/trivy-0.70.0.tar.gz "$asset_url"; then
+              ok=yes; break
+            fi
+            sleep "$((attempt * 10))"
+          done
+          [ -n "$ok" ] || { echo "Trivy fallback download failed" >&2; exit 1; }
+          tar -xzf /tmp/trivy-0.70.0.tar.gz -C "$bin_dir" trivy
+          "$bin_dir/trivy" --version | grep -q '^Version: 0\.70\.0$'
       - name: recheck actual Cognitive product scope before selecting its compile path
         if: inputs.cognitive_product
         working-directory: .
