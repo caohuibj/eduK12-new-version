@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { admitCognitiveAttempt, readCognitiveQuota } from '../../modules/cognitive/attempt-quota'
 
-const root = { id: 'task', courseId: 'course', createdBy: 'author', configId: 'config', maxAttempts: 1 }
+const root = { id: 'task', courseId: 'course', createdBy: 'author', configId: 'config', maxAttempts: 1, listedStandalone: true }
 const course = { courseType: 'TRAINING_COURSE', isLibrary: false }
-const composite = { id: 'bundle', productKind: 'ASSESSMENT_BUNDLE', courseId: 'course', maxAttempts: 1, reportPackageKey: null, analysisProtocolKey: null }
+const composite = { id: 'bundle', productKind: 'ASSESSMENT_BUNDLE', courseId: 'course', maxAttempts: 1, reportPackageKey: null, analysisProtocolKey: null, trainingFlowFrozen: { schemaVersion: 2 } }
 const makeParent = () => ({ id: 'parent', compositeAssessmentId: 'bundle', compositeAssessment: { ...composite }, userId: 'student', status: 'IN_PROGRESS', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1 })
 const item = { id: 'slot', type: 'COGNITIVE', compositeAssessmentId: 'bundle', cognitiveAssignmentId: 'task' }
 let parent: ReturnType<typeof makeParent>
@@ -81,6 +81,12 @@ describe('Training participation quotas belong to the delivery task', () => {
     if (change === 'terminal') parent.status = 'COMPLETED'
     await expect(admitCognitiveAttempt(tx, 'student', change === 'source' ? 'other-config-task' : 'task', scope)).rejects.toMatchObject({ statusCode: 409 })
     expect(db.cognitiveSession.count).not.toHaveBeenCalled()
+  })
+  it('preserves shared source quota for an ordinary legacy composite in a Training course', async () => {
+    parent.compositeAssessment = { ...composite, trainingFlowFrozen: null } as any
+    db.cognitiveSession.count.mockResolvedValue(1)
+    await expect(admitCognitiveAttempt(tx, 'student', 'task', scope)).rejects.toMatchObject({ statusCode: 409 })
+    expect(db.cognitiveSession.count.mock.calls[0][0].where).not.toHaveProperty('compositeAttemptId')
   })
   it('keeps legacy and non-Training quota behavior unchanged', async () => {
     db.course.findUnique.mockResolvedValue({ courseType: 'LEGACY_COURSE', isLibrary: false })

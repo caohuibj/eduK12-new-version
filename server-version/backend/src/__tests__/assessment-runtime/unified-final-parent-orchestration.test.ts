@@ -27,7 +27,9 @@ import { submitScaleAssessmentFinalWithContext } from '../../modules/scale/scale
 import { submitCompositeFormSectionFinal } from '../../modules/composite/final-submit.service'
 
 const submissionId = '64000000-0000-4000-8000-000000000001'
-const child = (parent: string | null = 'parent') => ({ id: 'child', compositeAttemptId: parent, questionnaireAssessmentId: null, attemptEpoch: 1, attemptNo: 1, runtimeGeneration: 'UNIFIED_V1' })
+const child = (parent: string | null = 'parent') => ({ id: 'child', compositeAttemptId: parent,
+  compositeAttempt: parent ? { trainingFeedbackSnapshotHash: 'frozen-feedback' } : null,
+  questionnaireAssessmentId: null, attemptEpoch: 1, attemptNo: 1, runtimeGeneration: 'UNIFIED_V1' })
 const input = { submissionId, attemptEpoch: 1, definitionHash: 'a'.repeat(64) }
 const adapters = [
   { name: 'cognitive', native: m.cognitive, submit: () => submitCognitiveSessionFinalWithContext('owner', { ...input, sessionId: 'child', trials: [] } as any) },
@@ -38,7 +40,7 @@ beforeEach(() => {
   vi.clearAllMocks(); m.unitActive = false; m.events = []
   m.db.cognitiveSession.findUnique.mockResolvedValue(child())
   m.db.assessment.findUnique.mockResolvedValue(child())
-  m.db.compositeAssessmentAttempt.findUnique.mockResolvedValue({ id: 'parent', userId: 'owner', runtimeGeneration: 'UNIFIED_V1',
+  m.db.compositeAssessmentAttempt.findUnique.mockResolvedValue({ id: 'parent', userId: 'owner', runtimeGeneration: 'UNIFIED_V1', trainingFeedbackSnapshotHash: 'frozen-feedback',
     trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
     trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null, trainingFlowPathEncrypted: null, trainingFlowPathHash: null,
     compositeAssessment: { creationKey: null, trainingFlowDraft: null, trainingFlowFrozen: null, trainingFlowDigest: null,
@@ -80,6 +82,13 @@ describe('Unified child FINAL completes its parent without a runner reread', () 
   it.each(adapters.slice(0, 2))('$name standalone submission does not finalize a composite', async adapter => {
     m.db.cognitiveSession.findUnique.mockResolvedValue(child(null)); m.db.assessment.findUnique.mockResolvedValue(child(null))
     await adapter.submit(); expect(m.finalize).not.toHaveBeenCalled()
+  })
+  it.each(adapters.slice(0, 2))('$name does not eagerly close an unmarked historical Unified parent', async adapter => {
+    const unmarked = { ...child(), compositeAttempt: { trainingFeedbackSnapshotHash: null } }
+    m.db.cognitiveSession.findUnique.mockResolvedValue(unmarked)
+    m.db.assessment.findUnique.mockResolvedValue(unmarked)
+    await adapter.submit()
+    expect(m.finalize).not.toHaveBeenCalled()
   })
   it('retains an unfinished aggregate instead of treating one form section as the whole report', async () => {
     m.finalize.mockResolvedValue({ status: 'IN_PROGRESS', progress: 50, completedAt: null })

@@ -20,7 +20,7 @@ async function admitTrainingCompositeSlot(db: Tx, userId: string, assignmentId: 
   const composite = parent?.compositeAssessment
   const courseId = parent?.deliveryCourseId ?? composite?.courseId
   if (!composite || !['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE', 'LEGACY_COMPOSITE'].includes(composite.productKind)
-    || parent?.assignmentRef
+    || parent?.assignmentRef || !usesScopedTrainingQuota(composite)
     || !await isTrainingTaskCourse(db, courseId)) return false
   if (!parent || parent.userId !== userId || parent.subjectUserId && parent.subjectUserId !== userId
     || parent.respondentUserId && parent.respondentUserId !== userId || parent.status !== 'IN_PROGRESS'
@@ -41,6 +41,18 @@ async function admitTrainingCompositeSlot(db: Tx, userId: string, assignmentId: 
   return true
 }
 
+/** Only an explicitly frozen Training delivery may replace the historical
+ * cross-entrance source quota with parent/slot isolation. A course type alone
+ * is not sufficient: older Questionnaire and Bundle deliveries also use it. */
+export function usesScopedTrainingQuota(composite: {
+  trainingFlowFrozen?: unknown
+  trainingVariantFrozen?: unknown
+  personalTrackingBaselineId?: string | null
+} | null | undefined): boolean {
+  return Boolean(composite && (composite.trainingFlowFrozen != null
+    || composite.trainingVariantFrozen != null || composite.personalTrackingBaselineId != null))
+}
+
 export async function cognitiveQuotaSource(db: Tx, assignmentId: string) {
   const assignment = await db.cognitiveAssignment.findUnique({ where: { id: assignmentId } })
   if (!assignment) throw NOT_FOUND('认知任务不存在')
@@ -53,9 +65,12 @@ export async function cognitiveQuotaSource(db: Tx, assignmentId: string) {
 }
 
 async function isStandaloneTrainingAssignment(db: Tx, assignmentId: string) {
-  const assignment = await db.cognitiveAssignment.findUnique({ where: { id: assignmentId }, select: { courseId: true } })
+  const assignment = await db.cognitiveAssignment.findUnique({ where: { id: assignmentId }, select: { courseId: true, quotaSourceAssignmentId: true, listedStandalone: true } })
   if (!assignment) throw NOT_FOUND('认知任务不存在')
-  return isTrainingTaskCourse(db, assignment.courseId)
+  // Only a separately listed delivered alias receives an independent allowance.
+  // Its canonical source still retains the old cross-entrance quota contract.
+  return Boolean(assignment.quotaSourceAssignmentId && assignment.listedStandalone)
+    && await isTrainingTaskCourse(db, assignment.courseId)
 }
 
 export async function lockCognitiveQuota(db: Tx, userId: string, sourceId: string) {

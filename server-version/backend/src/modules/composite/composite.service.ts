@@ -117,7 +117,7 @@ import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
 import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
 import { ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
-import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota, readCognitiveQuota, isTrainingTaskCourse } from '../cognitive/attempt-quota'
+import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota, readCognitiveQuota, isTrainingTaskCourse, usesScopedTrainingQuota } from '../cognitive/attempt-quota'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
 import { missingRequiredScaleItemCodes, ScaleAnswerValidationError, validateScaleAnswer } from '../scale/scale-scoring'
 import type { DeviceInputProvenanceV1 } from '../scale/device-input-provenance'
@@ -3026,7 +3026,8 @@ const createAttempt = async (
   if (prepared) {
     try { await assertAssessmentAssetReferencesReady(candidateMedia, db) }
     catch { throw compositeBadRequest('候选分卷包含不可用或不匹配的冻结媒体') }
-    if (userId && variantEnabled && !await isTrainingTaskCourse(db as Prisma.TransactionClient, composite.deliveryCourseId ?? composite.courseId)) {
+    if (userId && variantEnabled && !(usesScopedTrainingQuota(composite)
+      && await isTrainingTaskCourse(db as Prisma.TransactionClient, composite.deliveryCourseId ?? composite.courseId))) {
       const cognitiveItems=composite.items.filter((i:any)=>i.type==='COGNITIVE')
       const sources = await Promise.all(cognitiveItems.map((i:any)=>cognitiveQuotaSource(db as any,i.cognitiveAssignmentId)))
       const byItem=new Map<string,string>(cognitiveItems.map((item:any,index:number)=>[item.id,sources[index].id]))
@@ -3345,7 +3346,8 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
   const next = await prisma.$transaction(async (tx: Db) => {
     await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
     await lockCompositeAttempt(tx, attemptId)
-    const trainingTask = await isTrainingTaskCourse(tx as Prisma.TransactionClient, composite.deliveryCourseId ?? composite.courseId)
+    const trainingTask = usesScopedTrainingQuota(composite)
+      && await isTrainingTaskCourse(tx as Prisma.TransactionClient, composite.deliveryCourseId ?? composite.courseId)
     if(composite.trainingVariantFrozen != null || composite.trainingFlowFrozen?.schemaVersion===2 || trainingTask){
       const used=await tx.compositeAssessmentAttempt.count({where:{compositeAssessmentId:composite.id,...(existing.userId?{userId:existing.userId}:{participantKey:(existing as any).participantKey})}})
       if(!Number.isInteger(composite.maxAttempts)||composite.maxAttempts<1||composite.maxAttempts>100||used>=composite.maxAttempts)throw compositeConflict(trainingTask ? '已达到综合测评最大次数；重新开始也会计次。' : '概率分卷次数已用完；取消和重启也计入次数')
@@ -5667,7 +5669,8 @@ const reportStatusForHeader = async (parent: any, joinedJob?: Awaited<ReturnType
   // completion. A queued job must not strand the learner on "continue" while
   // generation runs; genuinely incomplete unit sets retain WAITING.
   if (release?.configured && release.state === 'WAITING_SUBMISSION' && job &&
-    (job.wholeSubmissionId || job.requestedRevision > 0) && (job.status === 'PENDING' || job.status === 'PROCESSING')) release.state = 'REPORT_PROCESSING'
+    (job.wholeSubmissionId ? job.status !== 'WAITING'
+      : job.requestedRevision > 0 && (job.status === 'PENDING' || job.status === 'PROCESSING'))) release.state = 'REPORT_PROCESSING'
   return {
     ...(release?.configured ? { participantFeedback: { state: release.state, releaseAt: release.releaseAt } } : {}),
     ...(feedback ? { feedbackPollProfile: feedback.profile } : {}),

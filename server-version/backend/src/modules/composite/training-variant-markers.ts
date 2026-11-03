@@ -12,12 +12,23 @@ export const TRAINING_VARIANT_DEFINITION_MARKER_SELECT = {
 export const TRAINING_VARIANT_PARENT_MARKER_SELECT = {
   id: true,
   trainingContentBindingHash: true, trainingReferenceBindingHash: true,
+  trainingFeedbackSnapshotHash: true,
   trainingFlowSnapshotEncrypted: true, trainingFlowSnapshotHash: true,
   trainingFlowPathEncrypted: true, trainingFlowPathHash: true,
   trainingVariantAllocationEncrypted: true,
   trainingVariantAllocationHash: true,
   compositeAssessment: { select: TRAINING_VARIANT_DEFINITION_MARKER_SELECT },
 } as const satisfies Prisma.CompositeAssessmentAttemptSelect
+
+/** Versioned Training receipts permit eager parent reconciliation after UNIT
+ * admission is released. Historical unmarked Unified parents still reconcile
+ * on their authorized GET path, preserving their FINAL response contract. */
+export const shouldReconcileTrainingParent = (parent: {
+  trainingFeedbackSnapshotHash?: string | null
+  trainingFlowSnapshotHash?: string | null
+  trainingVariantAllocationHash?: string | null
+} | null | undefined): boolean => Boolean(parent?.trainingFeedbackSnapshotHash
+  || parent?.trainingFlowSnapshotHash || parent?.trainingVariantAllocationHash)
 
 export type TrainingVariantDefinitionMarkers = Prisma.CompositeAssessmentGetPayload<{
   select: typeof TRAINING_VARIANT_DEFINITION_MARKER_SELECT
