@@ -2305,6 +2305,50 @@ export const disableAccessToken = async (userId: string, role: UserRole, composi
   await prisma.compositeAssessmentAccessToken.update({ where: { id: tokenId }, data: { isActive: false } })
 }
 
+// Summary only tests marker presence. `true` stands in for a non-null column;
+// `null` is a loaded null; `undefined` (row or flag missing) stays fail-closed.
+const summaryPresenceBit = (value: unknown): true | null | undefined =>
+  value === true ? true : value === false ? null : undefined
+
+type SummaryMarkerPresence = {
+  trainingFlowDraft: true | null | undefined
+  trainingFlowFrozen: true | null | undefined
+  trainingFlowDigest: true | null | undefined
+  trainingVariantFrozen: true | null | undefined
+  hasCognitive: boolean | undefined
+}
+
+const loadSummaryMarkerPresence = async (ids: string[]) => {
+  const presence = new Map<string, SummaryMarkerPresence>()
+  if (!ids.length) return presence
+  // Column names match prisma/schema.prisma @@map / @map. Values stay parameters.
+  const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
+    SELECT "id",
+      ("training_flow_draft" IS NOT NULL) AS "trainingFlowDraft",
+      ("training_flow_frozen" IS NOT NULL) AS "trainingFlowFrozen",
+      ("training_flow_digest" IS NOT NULL) AS "trainingFlowDigest",
+      ("training_variant_frozen" IS NOT NULL) AS "trainingVariantFrozen",
+      EXISTS (
+        SELECT 1 FROM "composite_assessment_items" AS item
+        WHERE item."composite_assessment_id" = "composite_assessments"."id"
+          AND item."type"::text = 'COGNITIVE'
+      ) AS "hasCognitive"
+    FROM "composite_assessments"
+    WHERE "id" IN (${Prisma.join(ids)})
+  `)
+  for (const row of rows) {
+    if (typeof row.id !== 'string') continue
+    presence.set(row.id, {
+      trainingFlowDraft: summaryPresenceBit(row.trainingFlowDraft),
+      trainingFlowFrozen: summaryPresenceBit(row.trainingFlowFrozen),
+      trainingFlowDigest: summaryPresenceBit(row.trainingFlowDigest),
+      trainingVariantFrozen: summaryPresenceBit(row.trainingVariantFrozen),
+      hasCognitive: row.hasCognitive === true ? true : row.hasCognitive === false ? false : undefined,
+    })
+  }
+  return presence
+}
+
 export const listAvailableForStudent = async (userId: string, now = Date.now(), courseId?: string, summary = false) => {
   // Catalog consumers opt in; older detail consumers keep their original response.
   const memberships = await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, ...(courseId ? { courseId } : {}) }, select: { courseId: true } })
@@ -2335,33 +2379,59 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       reportPackageKey: true,
       reportPackageVersion: true,
       reportPackageSnapshotEncrypted: !summary,
-      trainingVariantFrozen: true,
-      // Missing markers mean UNKNOWN, not legacy. Keep every marker loaded.
-      ...TRAINING_FLOW_DEFINITION_SELECT,
+      // Detail still loads every marker: a missing property is UNKNOWN, not legacy.
+      // Summary asks only for IS NOT NULL, so the Json bodies are never parsed.
+      ...(summary ? {} : { trainingVariantFrozen: true, ...TRAINING_FLOW_DEFINITION_SELECT }),
       course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
-      items: {
-        orderBy: { position: 'asc' },
+      items: summary ? false : {
+        orderBy: { position: 'asc' as const },
         select: {
           id: true,
           type: true,
           position: true,
-          scale: summary ? false : { select: { name: true } },
-          cognitiveAssignment: summary ? false : { select: { title: true } },
-          formLabel: !summary,
+          scale: { select: { name: true } },
+          cognitiveAssignment: { select: { title: true } },
+          formLabel: true,
         },
       },
-      formSections: summary
-        ? { select: { id: true } }
-        : { orderBy: { position: 'asc' }, include: { items: { select: { id: true, contextKey: true } } } },
+      formSections: summary ? false : { orderBy: { position: 'asc' as const }, include: { items: { select: { id: true, contextKey: true } } } },
+      ...(summary ? { _count: { select: {
+        items: { where: { type: { not: 'FORM' as const } } },
+        formSections: true,
+      } } } : {}),
     },
   })
-  const attemptRows = await prisma.compositeAssessmentAttempt.findMany({ where: { userId, compositeAssessmentId: { in: list.map((item) => item.id) } }, orderBy: { startedAt: 'desc' }, select: { id: true, compositeAssessmentId: true, status: true, taskSatisfaction: true, progress: true, completedAt: true, cognitiveSessions: { select: { status: true, frozenAdmissionSnapshotHash: true } } } })
+  const ids = list.map((item) => item.id)
+  const [attemptRows, markerPresence] = await Promise.all([
+    prisma.compositeAssessmentAttempt.findMany({
+      where: { userId, compositeAssessmentId: { in: ids } },
+      orderBy: { startedAt: 'desc' },
+      select: {
+        id: true,
+        compositeAssessmentId: true,
+        status: true,
+        taskSatisfaction: true,
+        progress: true,
+        completedAt: true,
+        // admissionPaused is false while the module is on, so summary skips the join.
+        ...(!summary || !config.cognitiveModuleEnabled ? {
+          cognitiveSessions: summary
+            ? { where: { status: 'IN_PROGRESS' as const }, select: { status: true, frozenAdmissionSnapshotHash: true } }
+            : { select: { status: true, frozenAdmissionSnapshotHash: true } },
+        } : {}),
+      },
+    }),
+    summary ? loadSummaryMarkerPresence(ids) : Promise.resolve(new Map<string, SummaryMarkerPresence>()),
+  ])
   const attempts = attemptRows.map(({ cognitiveSessions, ...attempt }) => ({ ...attempt,
     admissionPaused: !config.cognitiveModuleEnabled && cognitiveSessions?.some(session => session.status === 'IN_PROGRESS' && !session.frozenAdmissionSnapshotHash),
   }))
   const historicalIds = new Set(attempts.map(attempt => attempt.compositeAssessmentId))
+  const hasCognitiveItem = (item: { id: string; items?: Array<{ type: string }> }) => summary
+    ? markerPresence.get(item.id)?.hasCognitive !== false
+    : item.items?.some(child => child.type === 'COGNITIVE') === true
   const supportedList = config.cognitiveModuleEnabled ? list : list.filter(item =>
-    !item.items.some(child => child.type === 'COGNITIVE') || historicalIds.has(item.id))
+    !hasCognitiveItem(item) || historicalIds.has(item.id))
   const latest = new Map<string, any>()
   for (const attempt of attempts) {
     // 查询已按 startedAt 倒序，最新的进行中记录必须优先于更早的已完成记录，保证可继续作答。
@@ -2390,10 +2460,14 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
     const latestCompletedAttempt = compositeAttempts.find((attempt) => attempt.status === 'COMPLETED') ?? null
     // Historical satisfaction is independent of the newest submitted report.
     const latestSatisfiedAttempt = compositeAttempts.find(isTaskSatisfied) ?? null
-    const sections = item.formSections ?? []
-    const hasTrainingFlow = hasTrainingFlowDefinitionMarkers(item)
-    const hideUnits = summary || item.trainingVariantFrozen != null || hasTrainingFlow
-    const nonFormItems = item.items.filter((child: any) => child.type !== 'FORM')
+    const markers = summary ? markerPresence.get(item.id) : undefined
+    const hasTrainingFlow = hasTrainingFlowDefinitionMarkers(summary ? markers : item)
+    const variantFrozen = summary ? markers?.trainingVariantFrozen : item.trainingVariantFrozen
+    const hideUnits = summary || variantFrozen != null || hasTrainingFlow
+    const sections = summary ? [] : (item.formSections ?? [])
+    const nonFormItems = summary ? [] : item.items.filter((child: any) => child.type !== 'FORM')
+    const moduleCount = summary ? item._count.items + item._count.formSections : nonFormItems.length + sections.length
+    const hasCognitive = summary ? markers?.hasCognitive !== false : item.items.some((child: any) => child.type === 'COGNITIVE')
     // Reuse one frozen-package decode for both projections. Hidden candidate
     // unions need only their count; never decode labels or build their units.
     const packageSlotLabels = hideUnits ? new Map<number, string>() : getFrozenPackageSlotLabels(item)
@@ -2424,17 +2498,17 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       description: item.description,
       instruction: summary ? null : item.instruction,
       deliveryMode: 'FINAL_ONLY' as const,
-      estimatedModules: hasTrainingFlow ? null : nonFormItems.length + sections.length,
+      estimatedModules: hasTrainingFlow ? null : moduleCount,
       course: item.course,
       opensAt: item.opensAt,
       expiresAt: item.expiresAt,
       maxAttempts: item.maxAttempts,
       attemptsUsed,
       availability,
-      canStartNewAttempt: item.status === 'PUBLISHED' && (config.cognitiveModuleEnabled || !item.items.some((child: any) => child.type === 'COGNITIVE')) && availability === 'OPEN' && !canContinue && attemptsUsed < item.maxAttempts,
+      canStartNewAttempt: item.status === 'PUBLISHED' && (config.cognitiveModuleEnabled || !hasCognitive) && availability === 'OPEN' && !canContinue && attemptsUsed < item.maxAttempts,
       canContinue,
       admissionPaused: Boolean(admissionPaused),
-      weightedVariants: item.trainingVariantFrozen != null,
+      weightedVariants: variantFrozen != null,
       items: hideUnits ? [] : item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, packageSlotLabels) })),
       units: hideUnits ? [] : units,
       formSections: hideUnits ? [] : sections,
