@@ -1,4 +1,5 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
+import { classifyStartTransaction } from './start-transient'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
@@ -3470,7 +3471,7 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
 
   for (let retry = 0; retry < 2; retry += 1) {
     try {
-      const attempt = await prisma.$transaction(async (tx: Db) => {
+      const attempt = await classifyStartTransaction(() => prisma.$transaction(async (tx: Db) => {
         if (composite.productKind === 'QUESTIONNAIRE' && composite.deliveryMode !== 'LEGACY') {
           await lockAuthenticatedAdmission(tx, compositeId, userId)
         } else {
@@ -3490,7 +3491,7 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
           select: { attemptNo: true },
         })
         return createAttempt(tx, composite, userId, null, undefined, (latest?.attemptNo ?? 0) + 1)
-      })
+      }))
       return { attempt: await getAttemptState(attempt.id, { userId }), recoveryToken: null }
     } catch (err) {
       if (!isUniqueConstraintError(err) || retry === 1) throw err
@@ -3536,7 +3537,7 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
   assertSupportedComposite(composite)
   await assertStudentEligibility(composite, userId)
 
-  const next = await prisma.$transaction(async (tx: Db) => {
+  const next = await classifyStartTransaction(() => prisma.$transaction(async (tx: Db) => {
     await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
     await lockCompositeAttempt(tx, attemptId)
     const trainingTask = usesScopedTrainingQuota(composite)
@@ -3576,7 +3577,7 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
       undefined,
       materialRestartClaim(current,composite),
     )
-  })
+  }))
   return { attempt: await getAttemptState(next.id, { userId }), recoveryToken: null }
 }
 
