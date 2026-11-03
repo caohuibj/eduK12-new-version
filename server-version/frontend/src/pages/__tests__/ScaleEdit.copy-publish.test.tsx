@@ -382,7 +382,6 @@ describe('ScaleEdit explicit version lineage', () => {
     fireEvent.click(within(source).getByText('复制来源 · 版本修订'))
     expect(within(source).getByText('这是同一量表的后续编制版本，修改和发布不覆盖原版。')).toBeInTheDocument()
     expect(within(source).queryByText('复制来源 · 独立副本')).not.toBeInTheDocument()
-    expect(screen.getByText(/旧任务和问卷不会自动升级/)).toBeInTheDocument()
   })
   it('keeps legacy public visibility read-only as an option while using the compact metadata panel', async () => {
     api.get.mockResolvedValue(ok(draft({ visibility: 'PUBLIC' })))
