@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: ${{ fromJSON(inputs.focus == 'full' && '["fixtures","shard-1","shard-2","shard-3","shard-4"]' || '["focused"]') }}
+        group: ${{ fromJSON(inputs.focus == 'full' && '["fixtures","shard-1","shard-2","shard-3","shard-4","shard-5","shard-6"]' || '["focused"]') }}
     env:
       NODE_ENV: test
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -143,7 +143,11 @@ jobs:
           # Self-hosted runners already retain ~/.npm; remote cache uploads can
           # block the single slot long after the tests and service cleanup finish.
           cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
-          cache-dependency-path: server-version/backend/package-lock.json
+          # The frontend lockfile is included because every group runs `npm ci` in
+          # server-version/frontend for the cross-tree Cognitive package tests.
+          cache-dependency-path: |
+            server-version/backend/package-lock.json
+            server-version/frontend/package-lock.json
       - name: validate disjoint regression report controls
         if: matrix.group == 'fixtures' || matrix.group == 'focused'
         run: node --test ../../.github/scripts/backend-regression-reports.test.mjs
