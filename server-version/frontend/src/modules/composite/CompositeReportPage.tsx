@@ -82,7 +82,13 @@ const CompositeReportContent: React.FC = () => {
   const pollingProfile = generation?.feedbackPollProfile ?? (generation?.wholeSubmissionReceived ? 'QUEUED' : 'LEGACY')
   const automaticPollLimit = pollingProfile === 'LEGACY' ? 12 : REPORT_AUTO_POLL_LIMIT
   const participantFeedback = staffMode ? null : generation?.participantFeedback
-  const canPollGeneration = !participantFeedback || participantFeedback.state === 'REPORT_PROCESSING'
+  // Older/in-flight status projections may still say WAITING_SUBMISSION after
+  // accepted FINALs queued generation. Poll status only; disclosure still
+  // requires the server's AVAILABLE decision before any report is shown.
+  const acceptedReportProcessing = Boolean(generation?.hasAcceptedSubmission &&
+    ['PENDING', 'PROCESSING'].includes(generation.reportStatus.state))
+  const canPollGeneration = !participantFeedback || participantFeedback.state === 'REPORT_PROCESSING' ||
+    participantFeedback.state === 'WAITING_SUBMISSION' && acceptedReportProcessing
 
   const studyReturn=attemptId?sessionStorage.getItem(`composite:study:return:${attemptId}`):null
   const ownStudyReturn=studyReturn && /^\/public\/studies\/[0-9a-f-]{36}$/.test(studyReturn)?studyReturn:null
@@ -297,7 +303,7 @@ const CompositeReportContent: React.FC = () => {
 
   if (!report && participantFeedback && (
     participantFeedback.state === 'GENERATED_NOT_RELEASED' ||
-    participantFeedback.state === 'WAITING_SUBMISSION' ||
+    participantFeedback.state === 'WAITING_SUBMISSION' && !acceptedReportProcessing ||
     participantFeedback.state === 'UNAVAILABLE'
   )) {
     const waitingForSubmission = participantFeedback.state === 'WAITING_SUBMISSION'

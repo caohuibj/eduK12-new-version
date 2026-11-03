@@ -1,4 +1,5 @@
 import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
+import { shouldReconcileTrainingParent } from '../composite/training-variant-markers'
 import { assertCognitiveNewAdmissionEnabled, isCognitiveNewAdmissionEnabled } from './product-eligibility'
 import { encryptCompactCognitivePayload } from './cognitive.security'
 import { sharedControlWritesEnabled } from '../assessment-runtime/shared-control-records'
@@ -304,6 +305,10 @@ const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
   if (child.runtimeGeneration === 'UNIFIED_V1') {
     return {
       ...(await submitUnifiedCognitiveSessionFinal(input, child)),
+      // Canonical child FINAL is already committed. Non-async parents still
+      // need their completeness check, after releasing the UNIT permit.
+      shouldFinalize: Boolean(child.compositeAttemptId) && shouldReconcileTrainingParent(child.compositeAttempt),
+      finalizeCompositeAttemptId: child.compositeAttemptId ?? null,
       internalContext,
     }
   }
