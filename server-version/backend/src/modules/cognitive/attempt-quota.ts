@@ -20,8 +20,7 @@ async function admitTrainingCompositeSlot(db: Tx, userId: string, assignmentId: 
   const composite = parent?.compositeAssessment
   const courseId = parent?.deliveryCourseId ?? composite?.courseId
   if (!composite || !['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE', 'LEGACY_COMPOSITE'].includes(composite.productKind)
-    || parent?.assignmentRef || !usesScopedTrainingQuota(composite)
-    || !await isTrainingTaskCourse(db, courseId)) return false
+    || parent?.assignmentRef || !await isTrainingTaskCourse(db, courseId)) return false
   if (!parent || parent.userId !== userId || parent.subjectUserId && parent.subjectUserId !== userId
     || parent.respondentUserId && parent.respondentUserId !== userId || parent.status !== 'IN_PROGRESS'
     || parent.deliveryMode !== 'FINAL_ONLY' || parent.runtimeGeneration !== 'UNIFIED_V1'
@@ -30,6 +29,24 @@ async function admitTrainingCompositeSlot(db: Tx, userId: string, assignmentId: 
   if (!item || item.type !== 'COGNITIVE' || item.compositeAssessmentId !== composite.id || !item.cognitiveAssignmentId) throw CONFLICT('组合认知任务的题目来源不匹配')
   const [actual, selected] = await Promise.all([cognitiveQuotaSource(db, assignmentId), cognitiveQuotaSource(db, item.cognitiveAssignmentId)])
   if (actual.id !== selected.id) throw CONFLICT('组合认知任务的工具来源不匹配')
+  if (!usesScopedTrainingQuota(composite)) {
+    // Historical Questionnaire/Bundle admissions retain the cross-entrance
+    // source quota. A Training alias whose canonical source has no course can
+    // use the exact delivered slot only with a fully verified frozen binding.
+    const binding = trainingContentAttemptBindingSchema.safeParse(parent.trainingContentBinding)
+    const unit = binding.success ? binding.data.units.find(entry =>
+      entry.itemId === item.id && entry.family === 'COGNITIVE') : undefined
+    if (actual.courseId != null || !composite.trainingContentSnapshotHash
+      || !parent.trainingContentBindingHash || !binding.success
+      || binding.data.compositeId !== composite.id
+      || binding.data.attemptId !== parent.id
+      || binding.data.epoch !== parent.attemptEpoch
+      || binding.data.publicationHash !== composite.trainingContentSnapshotHash
+      || canonicalHash(binding.data) !== parent.trainingContentBindingHash
+      || unit?.source.kind !== 'COGNITIVE_CONFIG'
+      || unit.source.assignmentId !== item.cognitiveAssignmentId
+      || unit.source.id !== actual.configId) return false
+  }
   if (composite.personalTrackingBaselineId) await trainingWaveScope(db, userId, assignmentId, actual, scope)
   const parentsUsed = await db.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: composite.id, userId } })
   if (!Number.isInteger(composite.maxAttempts) || composite.maxAttempts < 1 || parentsUsed > composite.maxAttempts) throw CONFLICT('已达到综合测评最大次数')

@@ -8,6 +8,7 @@ import {
 
 const legacy = (): TrainingVariantParentMarkers => ({
   id: 'attempt',
+  trainingFeedbackSnapshotHash: null,
   trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null,
   trainingFlowPathEncrypted: null, trainingFlowPathHash: null,
   trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
@@ -62,6 +63,7 @@ describe('Training variant marker projection contract', () => {
       ...Object.fromEntries(fields.filter(([owner]) => owner === 'definition').map(([, field]) => [field, true])) })
     expect(TRAINING_VARIANT_PARENT_MARKER_SELECT).toEqual({ id: true,
       trainingContentBindingHash: true, trainingReferenceBindingHash: true,
+      trainingFeedbackSnapshotHash: true,
       trainingFlowSnapshotEncrypted: true, trainingFlowSnapshotHash: true,
       trainingFlowPathEncrypted: true, trainingFlowPathHash: true, trainingVariantAllocationEncrypted: true,
       trainingVariantAllocationHash: true, compositeAssessment: { select: TRAINING_VARIANT_DEFINITION_MARKER_SELECT } })
