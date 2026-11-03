@@ -1,0 +1,446 @@
+{
+  "recordType": "PALS2000_LOCAL_CONTENT_CANDIDATE_EVIDENCE",
+  "recordedOn": "2026-11-02",
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "diffScope": "29 new native CATALOG_ONLY declarations + generated index + source/metadata/report/form preparation docs. No engine, permission, schema, lock, frozen source, migration or production change.",
+  "deduplication": {
+    "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+    "nativeInstrumentWrappers": 258,
+    "nativeJsonSources": 235,
+    "mainFilesChecked": 493,
+    "sourceItemPrefixesChecked": 152,
+    "mainSameSourceOrItemPrefixMatches": [],
+    "openPrsChecked": 26,
+    "openPrFileListsRead": true,
+    "openPrPalsPathMatches": [],
+    "contentPrHeads": [
+      {
+        "pr": 413,
+        "head": "0f8057fa75bcb89215275f6ad7695f189fcf0e65"
+      },
+      {
+        "pr": 383,
+        "head": "5454a7d7630a4ccb7125d0c621fa10317dc6924f"
+      },
+      {
+        "pr": 379,
+        "head": "333200ade0c6cb42130cbc052189ba9c64691a12"
+      },
+      {
+        "pr": 375,
+        "head": "5eca82fb13bcf0f2bbf3bb5b6deaa47fa1f9b792"
+      },
+      {
+        "pr": 373,
+        "head": "3f17247865a6a83e5ee9e88cf3d0fa3060b59a53"
+      },
+      {
+        "pr": 371,
+        "head": "75b956cbd4c45f75beee606fb53257494adc1ca0"
+      },
+      {
+        "pr": 370,
+        "head": "bfd6dcbca24567219ec24979481f3da8e0137984"
+      },
+      {
+        "pr": 367,
+        "head": "8e4440cac46086f73390f8774c40853beb9a6ddd"
+      },
+      {
+        "pr": 362,
+        "head": "e2b23122e1a41f52f61719fdd31a6daf338b97e1"
+      },
+      {
+        "pr": 328,
+        "head": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf"
+      }
+    ],
+    "changedNativeDeclarationFilesChecked": 185,
+    "contentPrSameSourceOrItemPrefixMatches": [],
+    "sameNameRemoteBranchQuery": "git ls-remote --heads origin *pals* *PALS* *adaptive*: no matches",
+    "productionAndAdminPrivateTools": "UNKNOWN_NOT_QUERIED",
+    "limitation": "Repository source and changed PR source declarations only; prefix matching supplements source/author/version checks and is not a production database or all-remote-branch inventory."
+  },
+  "localContracts": {
+    "status": "PASS",
+    "node": "v24.21.0",
+    "checks": {
+      "nativeSchemaAndCatalog": 29,
+      "catalogNonExecutableBoundary": 29,
+      "formsDefinitionCsvImportNormalization": 2,
+      "engineScoringCases": 0,
+      "runtimeReports": 0,
+      "databaseImports": 0
+    },
+    "catalogResults": [
+      {
+        "instrumentKey": "pals2000_personal_mastery_original_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_personal_performance_approach_original_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_personal_performance_avoid_original_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_personal_mastery_revised_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_personal_performance_approach_revised_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_personal_performance_avoid_revised_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_teacher_mastery_goal_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_teacher_performance_approach_goal_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_teacher_performance_avoid_goal_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_classroom_mastery_structure_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_classroom_performance_approach_structure_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_classroom_performance_avoid_structure_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_academic_efficacy_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_academic_press_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_academic_self_handicapping_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_avoiding_novelty_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_cheating_behavior_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_disruptive_behavior_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_low_achievement_self_presentation_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_school_future_skepticism_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_parent_mastery_goal_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_parent_performance_goal_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_home_school_dissonance_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_neighborhood_space_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_school_mastery_structure_teacher_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_school_performance_structure_teacher_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_mastery_instruction_teacher_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_performance_instruction_teacher_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "pals2000_personal_teaching_efficacy_teacher_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      }
+    ],
+    "formResults": [
+      {
+        "formKey": "pals2000_student_context_en",
+        "status": "FORM_DEFINITION_CSV_IMPORT_AND_ANSWER_NORMALIZATION_PASS",
+        "questions": 5,
+        "blankRemainsMissing": true,
+        "scoring": false,
+        "definitionDigest": "8640a85e5ee380947052a12279a89b553ce5ef2dab3e56d25627590d0ab7aaf7",
+        "scope": "pure functions; no persistence, report generation, authorization or UI"
+      },
+      {
+        "formKey": "pals2000_teacher_context_en",
+        "status": "FORM_DEFINITION_CSV_IMPORT_AND_ANSWER_NORMALIZATION_PASS",
+        "questions": 5,
+        "blankRemainsMissing": true,
+        "scoring": false,
+        "definitionDigest": "aabf5fa6720039fbb7a1989d96dd70bfeb18c1034b32fc85e4d7b4f7e8081e2d",
+        "scope": "pure functions; no persistence, report generation, authorization or UI"
+      }
+    ]
+  },
+  "inputHashes": {
+    "server-version/backend/src/modules/scale/instruments/pals2000_personal_mastery_original_en/1.0.0/source.json": "3112f0d92346556ce60284d6420874506fdf64a4cbb7229f49bdb0387c1edfd7",
+    "server-version/backend/src/modules/scale/instruments/pals2000_personal_performance_approach_original_en/1.0.0/source.json": "f5adb58c394b3ff159be88e62fb1410034b3811656ba7531a3f000143d3df689",
+    "server-version/backend/src/modules/scale/instruments/pals2000_personal_performance_avoid_original_en/1.0.0/source.json": "a5fca59029bed9d8b872db500f50747edcb552adb42357c3d34abc301f7deda9",
+    "server-version/backend/src/modules/scale/instruments/pals2000_personal_mastery_revised_en/1.0.0/source.json": "77bf4ae499d10f5590cc6e181f5a0b11227876449207b4798f70ef9f564e44d2",
+    "server-version/backend/src/modules/scale/instruments/pals2000_personal_performance_approach_revised_en/1.0.0/source.json": "833d50860290a1a3a7215fd4759c4fc26c664730e693d4a4f3470db9433d3e8d",
+    "server-version/backend/src/modules/scale/instruments/pals2000_personal_performance_avoid_revised_en/1.0.0/source.json": "967855845ca89baefd5e28859823bdd8555f94ca7f037717393ce6e03358a68b",
+    "server-version/backend/src/modules/scale/instruments/pals2000_teacher_mastery_goal_en/1.0.0/source.json": "f3e5e0f4c57e413221b1da640b9cb2908f0472130a7404ad7bb1a9a5cbd0920b",
+    "server-version/backend/src/modules/scale/instruments/pals2000_teacher_performance_approach_goal_en/1.0.0/source.json": "067ba4c705bb3ae2a1fecf0e8cc6285cf4f8fde1d7bc22f2880545b38fc6493f",
+    "server-version/backend/src/modules/scale/instruments/pals2000_teacher_performance_avoid_goal_en/1.0.0/source.json": "d92ee753b9faed6dc675946a3240ec2634d9518f5c261db86126ed092ea2e36f",
+    "server-version/backend/src/modules/scale/instruments/pals2000_classroom_mastery_structure_en/1.0.0/source.json": "73f83606944e2cba0dcc9ebc2973096cd3b93d9a2b9683e0bd13fca122c2ba14",
+    "server-version/backend/src/modules/scale/instruments/pals2000_classroom_performance_approach_structure_en/1.0.0/source.json": "1a8b67914618824a821514f02a09b51d187f865d962f83d1105c3a3f2e2eecd9",
+    "server-version/backend/src/modules/scale/instruments/pals2000_classroom_performance_avoid_structure_en/1.0.0/source.json": "9e0ce75c35fb5424aea5064edade9f8e879c14242b98dee47967ae6723099ca0",
+    "server-version/backend/src/modules/scale/instruments/pals2000_academic_efficacy_en/1.0.0/source.json": "e6d5e4a37edb75855b54146494301dee5e35483e1b144e7f1dc5572502db4105",
+    "server-version/backend/src/modules/scale/instruments/pals2000_academic_press_en/1.0.0/source.json": "95206dab5aadfe61712011ef1d4d3ed6edb1fe4f9d1bcc1bdd4ed763ac1f1746",
+    "server-version/backend/src/modules/scale/instruments/pals2000_academic_self_handicapping_en/1.0.0/source.json": "5699135aa231f862129cca652dd68b418647afb94a82b25db49b4cffef496cf7",
+    "server-version/backend/src/modules/scale/instruments/pals2000_avoiding_novelty_en/1.0.0/source.json": "44c34390630163442963b973b85016cef097a0cb7a6d14580a2fd2f76dd1ace7",
+    "server-version/backend/src/modules/scale/instruments/pals2000_cheating_behavior_en/1.0.0/source.json": "42b5933b6cbd716dfa217f3547cea393394ff4debab154eb75f3d83ea2134ee6",
+    "server-version/backend/src/modules/scale/instruments/pals2000_disruptive_behavior_en/1.0.0/source.json": "c672556daea13cc3f391cb120094726b670fcba79216a6288dc47e166d401adf",
+    "server-version/backend/src/modules/scale/instruments/pals2000_low_achievement_self_presentation_en/1.0.0/source.json": "fb2a879513de9031f56bebdc0959c5c275e96f767dc831add31131d3fd690853",
+    "server-version/backend/src/modules/scale/instruments/pals2000_school_future_skepticism_en/1.0.0/source.json": "836367064dc388ed5470475ac214da9f4b8bdc1f301ef940f0c418490f62378b",
+    "server-version/backend/src/modules/scale/instruments/pals2000_parent_mastery_goal_en/1.0.0/source.json": "f01020a52e1ea8088508bd7e41706dd548d7735c2f62aa2bfb5af82e0105c129",
+    "server-version/backend/src/modules/scale/instruments/pals2000_parent_performance_goal_en/1.0.0/source.json": "935a1e8f132ee75f23d697a94fe06f513c94dcd5640bca085ae7ca4f3a173078",
+    "server-version/backend/src/modules/scale/instruments/pals2000_home_school_dissonance_en/1.0.0/source.json": "7e2d43c1e4d1a31871809b8c4beb66142c8b8f16dedb70931f46f1a480521f11",
+    "server-version/backend/src/modules/scale/instruments/pals2000_neighborhood_space_en/1.0.0/source.json": "b9f022e1d4a9c559ee0b68a071e379220b56a46a18af582058ed301dea30835c",
+    "server-version/backend/src/modules/scale/instruments/pals2000_school_mastery_structure_teacher_en/1.0.0/source.json": "d2e11c4550dba30f1933d3f0631ae01b0e25c0eb7b64fb4ca7ceacbd5835c853",
+    "server-version/backend/src/modules/scale/instruments/pals2000_school_performance_structure_teacher_en/1.0.0/source.json": "2296a02e8cc78c4c3fd4001e4ee3b5f94e9634822fb454b8015d1d4b364f0304",
+    "server-version/backend/src/modules/scale/instruments/pals2000_mastery_instruction_teacher_en/1.0.0/source.json": "fbe886da5207a59cab48a8ce0923b2d13eb47285eae8698dd3aad639fb4403db",
+    "server-version/backend/src/modules/scale/instruments/pals2000_performance_instruction_teacher_en/1.0.0/source.json": "5749b2ae283b4da9f302d7f4d9560be07795ed4353b311caa52ab15c064f1210",
+    "server-version/backend/src/modules/scale/instruments/pals2000_personal_teaching_efficacy_teacher_en/1.0.0/source.json": "aa6f6603375c53632d72e6c893225e215f336d25063e0b09c2ab90f5494f2516",
+    "docs/scale-intake/pals2000-20261102/pals2000_teacher_context_en.form.json": "d1caf99592994cecda6e77dd5480512a174706a2dff0d287f02f3d0dfaffe7f8",
+    "docs/scale-intake/pals2000-20261102/pals2000_student_context_en.form.json": "9082af96014509344471148a37a6221a6594f44e059b371778ec634622b11ddb",
+    "docs/scale-intake/pals2000-20261102/pals2000_teacher_context_en.import.txt": "44a9c6a83220718c1e6ecfc07871506de1300f9d18feb5e1b3ea3140dceae9d5",
+    "docs/scale-intake/pals2000-20261102/pals2000_student_context_en.import.txt": "7ce4cb78c20ba6e02abc456eb7c0581ab47c4987e74c8c80013884fcb299ada0"
+  },
+  "toolchain": {
+    "node": "24.21.0",
+    "nodeArchive": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz",
+    "nodeArchiveSha256": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6",
+    "backendLockSha256": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "dependencies": "npm ci --ignore-scripts --no-audit --no-fund; official npm registry; replace-registry-host=always; task-owned /tmp cache; lock unchanged",
+    "dependencySetupHistory": [
+      "Inherited node_modules lock differs from selected main; not accepted as frozen evidence.",
+      "First dependency setup used Node24.19 and failed to create default /home/agent/.npm cache; corrected task-local cache and runtime; interrupted partial attempt retained outside worktree.",
+      "Final locked install: 443 packages installed successfully under task-local runtime/cache. No integrity or lockfile checks disabled."
+    ]
+  },
+  "generatorCheck": "PASS; existing generator --check matches 29 new wrappers and existing sources",
+  "scoringBoundary": "NOT_EXECUTABLE; zero engine scoring cases. Reverse/missing/range are reviewed metadata and editorial proposals, not tested or confirmed official runtime algorithms.",
+  "reportBoundary": "DRAFT_TEXT_ONLY; student/authorized aggregate/teacher-self normal, low-support, evidence-insufficient samples reviewed. No live participant report, authorization E2E or rendering performed.",
+  "formBoundary": "PASS pure FORM definition, existing CSV parser/import builder and answer normalization. No DB import, persistence or publication claimed.",
+  "database": {
+    "development": "NOT_RUN; catalogs have no executable policy and current native installer cannot install them",
+    "isolatedInstallation": "NOT_RUN; no legitimate executable install payload; forms prepared but no target administrator/form draft selected",
+    "production": "NOT_RUN",
+    "adminPrivateDeduplication": "UNKNOWN_NOT_QUERIED"
+  },
+  "ciAtRecordCreation": "NOT_RUN; final source head/tree and actual run must be read back after authorized Draft PR creation; no skip-ci claim or full platform request",
+  "notionCiPreflight": {
+    "page": "https://app.notion.com/p/404d27635a388186ac80de3593da05a5",
+    "read": "PASS via available Qiang connection after Hui connection returned404; page content fetched before CI activation",
+    "applicable": [
+      {
+        "id": "CI-007",
+        "state": "PASS",
+        "basis": "generated registry matches wrappers; no API routes added"
+      },
+      {
+        "id": "CI-020",
+        "state": "PENDING_FINAL_CANDIDATE",
+        "basis": "local contracts pass; immutable head/tree/full diff and selected jobs to be frozen immediately before push/PR"
+      }
+    ],
+    "notApplicable": [
+      "CI-001 DB opt-ins: no DB suite selected",
+      "CI-003 frontend type closure: no frontend or type API change",
+      "CI-006 authority fixtures: no grant, permission or runtime mutation",
+      "Browser, performance, recovery and runtime product histories: no affected behavior"
+    ]
+  },
+  "nextActions": [
+    "Obtain project-appropriate PALS licensing scope without agent acceptance or signature.",
+    "Recheck source/author/item/version aliases in actual target DB and administrator private tools before executable intake.",
+    "After licensing, prepare real C/P/R and representative scorer/report/isolated install readback through existing contracts.",
+    "Form candidates may be independently reviewed/imported via existing editor/CSV flow under current authorization.",
+    "No merge, production write or deployment in this task."
+  ]
+}

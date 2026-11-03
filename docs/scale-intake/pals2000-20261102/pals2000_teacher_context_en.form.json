@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "pages": [
+    {
+      "pageKey": "pals2000_teacher_context_en_page",
+      "title": "PALS2000 context — teacher",
+      "description": "Optional questions about this class or course. You may leave any field blank. These questions have no score.",
+      "questions": [
+        {
+          "itemKey": "pals2000_teacher_context_en_grade",
+          "type": "NUMBER",
+          "prompt": "Grade level taught in this context (1–12).",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "min": 1,
+          "max": 12,
+          "integerOnly": true
+        },
+        {
+          "itemKey": "pals2000_teacher_context_en_subject",
+          "type": "SHORT_TEXT",
+          "prompt": "Subject or course for this learning context (optional).",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 120
+        },
+        {
+          "itemKey": "pals2000_teacher_context_en_context_code",
+          "type": "SHORT_TEXT",
+          "prompt": "Researcher-provided class or course code (optional; do not enter a person’s name).",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 120
+        },
+        {
+          "itemKey": "pals2000_teacher_context_en_reference_period",
+          "type": "SHORT_TEXT",
+          "prompt": "School term or reference period for this learning context (optional).",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 120
+        },
+        {
+          "itemKey": "pals2000_teacher_context_en_context_note",
+          "type": "LONG_TEXT",
+          "prompt": "Any factual context needed to understand this setting (optional; please leave out names and private details).",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 600
+        }
+      ]
+    }
+  ]
+}
