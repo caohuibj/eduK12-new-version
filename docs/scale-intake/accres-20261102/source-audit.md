@@ -28,3 +28,13 @@
 | observation.docx | `4e42be478617f72a5c649f8dfc76084fa84a77762eb2c472e4f1b26ef5d42d03` |
 
 排重见 [dedup-evidence.json](dedup-evidence.json)：实际主干与开放 PR 的题名/作者/来源/构念路径检索，以及完整题文归一化比对。未发现仓库 source.json 同题；语义改写、不可见 PR 附件、生产库和管理员自建仍有核查限制。
+
+## 独立复核记录（2026-11-03，PR review 阶段）
+
+对上表两个直接来源做了独立获取与逐题复核，不依赖本档先前的转录结论：
+
+- 重新下载 guide.pdf 与 instrument.docx，SHA-256 与上表完全一致（`3d2e292f…` / `7d2b7a66…`）。
+- 从 Word 原文独立抽取 35 个题项（排除指导语中 2 条 Culture 定义），编号 1–35 连续；分区边界逐题核对为 1–13 ECP / 14–24 CCC（标题 "Consideration of Culture and Context"）/ 25–35 AIS，与三个目录候选的 itemCount 13/11/11 及中文分区名一致。
+- PDF↔Word 归一化逐题比对：34/35 完整吻合（含 ligature 伪影修正后的第 2、18、30 题）；第 31 题（"…relevant behavior support."）在 PDF 中跨页且渲染文本被裁切，仅在下一页残留不完整续文，与本文"第31题裁切、以 Word 为准"的结论一致；第 24 题跨页续文完整。故"34/35 吻合"声明经独立复现为准确。
+- Scoring Guide 的 Step 1（逐题各类别回应百分比）→ Step 2（合并 Agree+Strongly Agree 比例）→ Step 3（按分区排序强弱项）与本文"群体各题回应比例、不产生个人分数"的判定一致；PDF 中未见个人聚合、反向或缺失规则。
+- 结论：目录候选元数据（题数、分区、六档 1–6、CATALOG_ONLY、无个人计分）对原件的保真性通过独立复核。
