@@ -4,7 +4,7 @@ const {db,feed,cognitive}=vi.hoisted(()=>({
  feed:vi.fn(),cognitive:vi.fn(),
 }))
 vi.mock('../../config/database',()=>({prisma:db}))
-vi.mock('../../services/studentTasks',()=>({listStudentTasks:feed}))
+vi.mock('../../services/studentTasks',()=>({listStudentTasksInCourses:async(...args:unknown[])=>(await feed(...args)).list}))
 vi.mock('../../modules/cognitive/assignment.service',()=>({listStudentAssignments:cognitive}))
 import {listTrainingLearningInbox,type LearningQuery} from '../../services/trainingLearningInbox'
 import type {StudentTask} from '../../services/studentTasks'
@@ -25,6 +25,15 @@ describe('Training learner overview metadata',()=>{
   expect(result.list.map(r=>r.key)).toEqual(['QUESTIONNAIRE:q','ASSIGNMENT:a','CHECKIN:check'])
   expect(result.list[0].courses).toEqual([c,d])
   expect(result.list[0].href).toBe('/student/questionnaires/q?courseId=c&courseSection=assessments')
+ })
+ it('reads tasks only for the Training memberships, never an unbounded cross-course page',async()=>{
+  await listTrainingLearningInbox('student',query,now)
+  expect(feed).toHaveBeenCalledTimes(1)
+  expect(feed).toHaveBeenCalledWith('student',[c,d],now)
+  db.courseStudent.findMany.mockResolvedValue([])
+  feed.mockClear()
+  await listTrainingLearningInbox('student',query,now)
+  expect(feed).toHaveBeenCalledWith('student',[],now)
  })
  it('uses actual Training memberships and original actionable eligibility, without public discovery',async()=>{
   feed.mockResolvedValue({list:[task('campus','ASSIGNMENT',{courses:[{id:'campus',title:'校园'}]}),task('public','QUESTIONNAIRE',{courses:[]}),task('done','ASSIGNMENT',{state:'COMPLETED',canStart:false}),task('closed','CHECKIN',{state:'EXPIRED',canStart:false,href:null}),task('open')]})
