@@ -41,11 +41,12 @@ test('backend module workflow removes only unrelated outer frontend and acceptan
   const block=name=>ci.split(`\n  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0];
   for(const draft of [true,false]){
     const outputs=scopeOutputs('false','false','false',{scenario:'backend',application_route:'legacy'});
-    const needs={scope:{result:'success',outputs}};
+    const needs={scope:{result:'success',outputs},
+      'backend-regression-reuse':{result:'skipped',outputs:{reuse_backend_regression:'false'}}};
     const github={event_name:'pull_request',ref_name:'feature/backend',event:{pull_request:{draft,number:1,head:{ref:'feature/backend'}}}};
     for(const name of ['maintenance','pr-light-backend','pr-light-frontend','backend','backend-regression','frontend','frontend-build','browser','backend-browser-build','miniprogram','docker','post-merge-smoke']){
       const expr=block(name).match(/^    if: \$\{\{ (.+) \}\}$/m)[1];
-      const actual=new Function('needs','github','vars','cancelled','fromJSON',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false,JSON.parse);
+      const actual=new Function('needs','github','vars','cancelled','fromJSON','always',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false,JSON.parse,()=>true);
       assert.equal(Boolean(actual),draft?name==='pr-light-backend':['backend','backend-regression','docker'].includes(name),name+' draft='+draft);
     }
   }
@@ -101,11 +102,12 @@ test('affected frontend workflow conditions agree with the existing merge jobs',
   const block=name=>ci.split(`\n  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0];
   for(const draft of [true,false]){
     const outputs=scopeOutputs('false','false','true',{scenario:'frontend',frontend_affected:'true',application_route:'legacy'});
-    const needs={scope:{outputs,result:'success'},'frontend-build':{result:'success'},'backend-browser-build':{result:'success'}};
+    const needs={scope:{outputs,result:'success'},'frontend-build':{result:'success'},'backend-browser-build':{result:'success'},
+      'backend-regression-reuse':{result:'skipped',outputs:{reuse_backend_regression:'false'}}};
     const github={event_name:'pull_request',ref_name:'feature/local-page',event:{pull_request:{draft,number:1,head:{ref:'feature/local-page'}}}};
     for(const name of ['frontend','frontend-build','pr-light-frontend','backend-browser-build','browser','docker','post-merge-smoke']){
       const expr=block(name).match(/^    if: \$\{\{ (.+) \}\}$/m)[1];
-      const selected=new Function('needs','github','vars','cancelled',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false);
+      const selected=new Function('needs','github','vars','cancelled','always',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false,()=>true);
       assert.equal(Boolean(selected),name==='frontend'||name==='docker'&&!draft,name+' draft='+draft);
     }
   }
@@ -115,14 +117,14 @@ test('affected frontend workflow conditions agree with the existing merge jobs',
   assert.match(frontend,/\['related','--run',\.\.\.files\]/);
   assert.doesNotMatch(frontend,/npm test -- --changed/);
   assert.match(frontend,/report\.numPassedTests>0/,'a missing related-test result cannot pass');
-  assert.match(frontend,/if: inputs\.survey_selection != true && inputs\.affected_only != true && inputs\.cognitive_owned_by_backend != true\n        run: npm test/);
+  assert.match(frontend,/if: inputs\.affected_only != true && inputs\.cognitive_owned_by_backend != true\n        run: npm test/);
   const full=frontend.match(/name: full frontend tests\n        if: (.+)\n/)[1];
   const partition=frontend.match(/name: frontend tests excluding exact onboarding-owned suites\n        if: (.+)\n/)[1];
-  for(const survey_selection of [false,true])for(const affected_only of [false,true])for(const cognitive_owned_by_backend of [false,true]){
-    const inputs={survey_selection,affected_only,cognitive_owned_by_backend};
+  for(const affected_only of [false,true])for(const cognitive_owned_by_backend of [false,true]){
+    const inputs={affected_only,cognitive_owned_by_backend};
     const enabled=expression=>Boolean(new Function('inputs',`return (${expression})`)(inputs));
-    assert.equal(enabled(full),!survey_selection&&!affected_only&&!cognitive_owned_by_backend);
-    assert.equal(enabled(partition),!survey_selection&&!affected_only&&cognitive_owned_by_backend);
+    assert.equal(enabled(full),!affected_only&&!cognitive_owned_by_backend);
+    assert.equal(enabled(partition),!affected_only&&cognitive_owned_by_backend);
   }
 });
 test('all three content domains and combined content qualify', () => {
@@ -142,42 +144,6 @@ test('empty, core, executable additions and mixed changes require full checks', 
 });
 
 import { recheckCognitiveIntake, requiredChecks, failedChecks } from './merge-gate.mjs';
-import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
-test('personal tracking Draft reuses existing producers without qualifying Ready or unrelated maintenance',()=>{
-  const marker={file:'server-version/backend/src/modules/reporting/personal-tracking.ts',status:'A',oldMode:'000000',newMode:'100644'};
-  const draft={event:'pull_request',draft:true};
-  assert.equal(personalTrackingDraftScope([marker],draft),true);
-  assert.equal(personalTrackingDraftScope([marker,{...marker,file:'docs/evidence/personal-longitudinal-20261030/continuation/source.json'}],draft),true);
-  assert.throws(()=>personalTrackingDraftScope([marker,{...marker,file:'docs/evidence/personal-longitudinal-20261030/continuation/code.mjs'}],draft),/no broad fallback/);
-  assert.equal(personalTrackingDraftScope([marker],{...draft,draft:false}),false);
-  assert.equal(personalTrackingDraftScope([marker],{...draft,event:'push'}),false);
-  assert.throws(()=>personalTrackingDraftScope([marker],{...draft,forceFull:true}),/does not authorize/);
-  for(const other of [
-    {...marker,file:'server-version/backend/package-lock.json'},
-    {...marker,file:'server-version/scripts/host-ops/backup.py'},
-    {...marker,file:'server-version/backend/src/modules/auth/other.ts'},
-    {...marker,status:'D',oldMode:'100644',newMode:'000000'},
-    {...marker,newMode:'120000'},
-  ])assert.throws(()=>personalTrackingDraftScope([marker,other],draft),/no broad fallback/);
-  const scope=scopeOutputs('false','false','false',{application_route:'legacy',personal_tracking_draft:'true'});
-  const needs={scope:{outputs:scope,result:'success'},'pr-light-backend':{result:'success'},'pr-light-frontend':{result:'success'}};
-  assert.deepEqual(requiredChecks(needs,true),['scope','pr-light-backend','pr-light-frontend']);
-  assert.deepEqual(failedChecks(needs,true),[]);
-  assert.ok(failedChecks({...needs,'pr-light-backend':{result:'skipped'}},true).includes('pr-light-backend'));
-  assert.ok(failedChecks(needs,false).includes('scope'));
-  assert.ok(requiredChecks({scope:{outputs:{...scope,personal_tracking_draft:'false'}}},false).includes('backend-regression'));
-});
-test('Training personal tracking selects the same bounded Draft producers and refuses unrelated writes',()=>{
-  const entry=file=>({file,status:'A',oldMode:'000000',newMode:'100644'});
-  const entries=['server-version/backend/src/modules/composite/personal-tracking.ts',
-    'server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql',
-    'server-version/backend/src/modules/bundle-product/service.ts',
-    'docs/evidence/personal-longitudinal-training-20261030/manifest.json'].map(entry);
-  assert.equal(personalTrackingDraftScope(entries,{event:'pull_request',draft:true}),true);
-  assert.equal(personalTrackingDraftScope(entries,{event:'pull_request',draft:false}),false);
-  assert.throws(()=>personalTrackingDraftScope([...entries,entry('server-version/backend/src/modules/auth/changed.ts')],{event:'pull_request',draft:true}),/no broad fallback/);
-  assert.throws(()=>personalTrackingDraftScope(entries,{event:'pull_request',draft:true,forceFull:true}),/does not authorize/);
-});
 test('aggregate checks only selected jobs, and fails closed for every selected job', () => {
   assert.ok(requiredChecks({ scope: { outputs: scopeOutputs() } }, false).includes('backend-regression'));
   for (const [content, presentation, draft] of [
@@ -624,7 +590,8 @@ test('actual Git diffs select different documentation, presentation, content, fr
         for(const k of Object.keys(acceptanceFor([])))assert.equal(output[k],false,k);
       }
       const outputs=Object.fromEntries(Object.entries(output).map(([key,value])=>[key,String(value)]));
-      const needs={scope:{result:'success',outputs}};
+      const needs={scope:{result:'success',outputs},
+        'backend-regression-reuse':{result:'success',outputs:{reuse_backend_regression:'false'}}};
       for(const name of requiredChecks(needs,false)) needs[name]={...needs[name],result:'success'};
       assert.deepEqual(failedChecks(needs,false),[],file);
       assert.deepEqual(JSON.parse(output.docker_runner),['ubuntu-24.04']);
@@ -663,20 +630,6 @@ test('guidance documents use only documentation gate; mixed or nonregular change
     assert.ok(failedChecks({...needs,documentation:{result:bad}},false).includes('documentation'));
 });
 
-test('Teacher personal tracking stays in the same bounded Draft route with no Ready or unknown-path grant',()=>{
- const entry=file=>({file,status:'A',oldMode:'000000',newMode:'100644'});
- const entries=['server-version/backend/src/modules/reporting/education-personal-tracking.ts',
-  'server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql',
-  'server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts',
-  'server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx',
-  'docs/evidence/personal-longitudinal-teacher-20261030/manifest.json'].map(entry);
- const draft={event:'pull_request',draft:true};
- assert.equal(personalTrackingDraftScope(entries,draft),true);
- assert.equal(personalTrackingDraftScope(entries,{...draft,draft:false}),false);
- assert.throws(()=>personalTrackingDraftScope([...entries,entry('server-version/backend/src/modules/huiteacher/authority.ts')],draft),/no broad fallback/);
- assert.throws(()=>personalTrackingDraftScope(entries,{...draft,forceFull:true}),/does not authorize/);
-});
-
 test('image build tooling gate requires real Docker success only on Ready and rejects malformed flags',()=>{
   for(const draft of [true,false]){
     const needs={scope:{result:'success',outputs:scopeOutputs('false','false','false',{scenario:'release-tooling',image_build:'true'})}};
@@ -688,7 +641,8 @@ test('image build tooling gate requires real Docker success only on Ready and re
       assert(failedChecks({...needs,[name]:{...needs[name],result}},draft).includes(name),name+':'+result);
     for(const image_build of ['yes','',true])assert(failedChecks({...needs,scope:{...needs.scope,outputs:{...needs.scope.outputs,image_build}}},draft).includes('scope'));
   }
-  const mixed={scope:{result:'success',outputs:scopeOutputs('false','false','false',{scenario:'platform',image_build:'true'})}};
+  const mixed={scope:{result:'success',outputs:scopeOutputs('false','false','false',{scenario:'platform',image_build:'true'})},
+    'backend-regression-reuse':{result:'success',outputs:{reuse_backend_regression:'false'}}};
   assert(failedChecks(mixed,false).includes('scope'));
 });
 
@@ -697,7 +651,8 @@ test('image build tooling workflow selects existing tools Docker and CodeQL with
   const block=name=>ci.split(`\n  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0];
   const names=['maintenance','backend','backend-regression','frontend-build','frontend','browser','docker','codeql','miniprogram','accept-media','accept-ui','accept-visual','accept-perf','accept-ops','release-tools'];
   for(const draft of [true,false])for(const imageBuild of [true,false]){
-    const needs={scope:{result:'success',outputs:scopeOutputs('false','false','false',{scenario:'release-tooling',image_build:String(imageBuild),application_route:'legacy'})}};
+    const needs={scope:{result:'success',outputs:scopeOutputs('false','false','false',{scenario:'release-tooling',image_build:String(imageBuild),application_route:'legacy'})},
+      'backend-regression-reuse':{result:'skipped',outputs:{reuse_backend_regression:'false'}}};
     for(const name of [...names,'backend-browser-build'])needs[name]={result:'skipped'};
     const github={event_name:'pull_request',ref_name:'build-inputs',event:{pull_request:{draft,number:1,head:{ref:'build-inputs'}}}};
     for(const name of names){
@@ -765,7 +720,8 @@ test('Cognitive full scope scans every path for native, unsafe, duplicate and no
 });
 test('Cognitive mixed full gate retains generated checks and rejects failed, missing or skipped qualification',()=>{
   const outputs=scopeOutputs('false','false','false',{scenario:'platform',application_route:'legacy',frontend_build:'true',cognitive:'true',cognitive_intake_light:'false'});
-  const needs={scope:{result:'success',outputs}};
+  const needs={scope:{result:'success',outputs},
+    'backend-regression-reuse':{result:'success',outputs:{reuse_backend_regression:'false'}}};
   const required=requiredChecks(needs,false);
   for(const name of ['backend','backend-regression','frontend','browser','docker','codeql'])assert(required.includes(name),name);
   for(const name of required)needs[name]={...needs[name],result:'success'};
@@ -787,7 +743,8 @@ test('Cognitive mixed with image inputs selects full route and gate recomputes i
     const dockerfile='server-version/frontend/Dockerfile';mkdirSync(dirname(join(dir,dockerfile)),{recursive:true});writeFileSync(join(dir,dockerfile),'FROM node:24\n');commit();const head=git('rev-parse','HEAD');
     const output=JSON.parse(execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{cwd:dir,encoding:'utf8',env:{...process.env,CI_EVENT:'pull_request',CI_BASE_SHA:base,CI_FORCE_FULL:'false',CI_PR_REPOSITORY:'fixture/repo',GITHUB_REPOSITORY:'fixture/repo',GITHUB_OUTPUT:''}}));
     assert.equal(output.scenario,'platform');assert.equal(output.cognitive_intake_light,false);assert.equal(output.cognitive,true);assert.equal(output.image_build,false);
-    const needs={scope:{result:'success',outputs:Object.fromEntries(Object.entries(output).map(([k,v])=>[k,String(v)]))}};
+    const needs={scope:{result:'success',outputs:Object.fromEntries(Object.entries(output).map(([k,v])=>[k,String(v)]))},
+      'backend-regression-reuse':{result:'success',outputs:{reuse_backend_regression:'false'}}};
     for(const name of requiredChecks(needs,false))needs[name]={...needs[name],result:'success'};
     assert.deepEqual(recheckCognitiveIntake(needs,{base,head,cwd:dir}),[]);
     assert(recheckCognitiveIntake({...needs,backend:{result:'failure'}},{base,head,cwd:dir}).includes('backend'));

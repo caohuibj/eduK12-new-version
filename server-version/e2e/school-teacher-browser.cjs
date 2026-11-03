@@ -778,7 +778,7 @@ async function run() {
           await shot(s, 'typed-matrix-row-refusal')
           for (const section of [1, 2]) {
             const pending = p.waitForResponse(r => r.request().method() === 'POST' && /\/form-sections\/[^/]+\/submit$/.test(new URL(r.url()).pathname))
-            await player().getByRole('button', { name: s.product === 'SCHOOL' ? '提交本页' : '提交整个区段', exact: true }).click()
+            await player().getByRole('button', { name: s.product === 'SCHOOL' ? '提交本页' : '提交本页', exact: true }).click()
             const response = await pending; assert.equal(response.status(), 200)
             if (section === 1) {
               const payload = response.request().postDataJSON(), values = Object.fromEntries(payload.answers.map(answer => [answer.formItemId, answer.value]))

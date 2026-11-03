@@ -116,7 +116,7 @@ async function scenario(browser, engine, width) {
     assert.ok(saved)
     for (const n of [1, 2]) {
       await first.getByRole('textbox', { name: new RegExp('合成回答 ' + n) }).fill('合成答卷 A' + n)
-      await first.getByRole('button', { name: '提交整个区段' }).click()
+      await first.getByRole('button', { name: '提交本页' }).click()
     }
     await first.getByText('ANON-SYNTH-1', { exact: true }).waitFor()
     assert.equal(attempts.get('synthetic-attempt-1').answers.length, 2)
