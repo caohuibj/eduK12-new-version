@@ -475,7 +475,11 @@ const cases = [
     await page.getByRole('heading', { name: '学习自我调节量表', exact: true }).waitFor()
     await page.getByTestId('scale-core-feedback').waitFor()
     assert.equal(await page.getByTestId('scale-score-layer').evaluate(el => Boolean(el.compareDocumentPosition(document.querySelector('[data-testid="scale-core-feedback"]')) & Node.DOCUMENT_POSITION_FOLLOWING)), true, 'scores precede interpretation')
-    assert.equal(await page.getByTestId('scale-caveats').evaluate(el => el.closest('details') === null), true, 'limitations remain expanded')
+    const caveatsState = await page.getByTestId('scale-caveats').evaluate(el => {
+      const details = el.closest('details')
+      return details ? { title: details.querySelector('summary')?.textContent?.trim(), open: details.open } : null
+    })
+    assert.deepEqual(caveatsState, { title: '阅读提示与适用范围', open: false }, 'limitations start collapsed under reading guidance')
     assert.equal(await page.locator('.report-primary-score .report-range').count(), 1, 'total and range share one reading unit')
   } },
   { id: 'cognitive-history', route: '/student/cognitive/history', role: 'STUDENT', ready: (page) => page.getByRole('heading', { name: '认知测评历史', exact: true }).waitFor() },
