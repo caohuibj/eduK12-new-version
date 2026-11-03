@@ -7,6 +7,7 @@ import {assertTrainingPrivateReferenceAdmissionCurrent} from '../composite/train
 import { Prisma } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
+import { classifyStartTransaction } from '../composite/start-transient'
 import { startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
 import {resolvePublishedTeacherForm,teacherFormResourceRef,
   TEACHER_FORM_RUNTIME_KIND} from '../huiteacher/formRunResource'
@@ -133,7 +134,7 @@ const startTransactionalComposite = async (input: {
   executionId: string
   actorUserId: string
   launch: LaunchEnvelope
-}): Promise<RunStartExecutionResult> => prisma.$transaction(async (tx) => {
+}): Promise<RunStartExecutionResult> => classifyStartTransaction(() => prisma.$transaction(async (tx) => {
   const libraryUses=input.launch.resourceKey.startsWith('education-composition:')?await lockCompositionStartLibraryUses(tx,input):undefined
   await lockExecutionEnvelope(tx, input.executionId)
   const claims = await tx.$queryRaw<Array<{ state: string; claimGeneration: number }>>`
@@ -263,7 +264,7 @@ const startTransactionalComposite = async (input: {
   await assertTrainingPrivateReferenceAdmissionCurrent(tx)
   if(libraryUses)await assertEducationLibraryUses(tx,libraryUses.context,libraryUses.entryIds,{locked:libraryUses.uses,requireLocked:true})
   return { state: 'STARTED' as const, runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: attempt.id, replayed: false }
-})
+  }))
 
 /**
  * The existing Run CLAIM/Admission/Provenance contract is authoritative.
@@ -273,7 +274,7 @@ const startTransactionalComposite = async (input: {
 const startTransactionalTeacherForm = async (input:{
   decision:Extract<RunStartClaimDecision,{kind:'ACQUIRED'|'RECOVER'}>
   executionId:string;actorUserId:string;launch:LaunchEnvelope
-}):Promise<RunStartExecutionResult>=>prisma.$transaction(async tx=>{
+}):Promise<RunStartExecutionResult>=>classifyStartTransaction(()=>prisma.$transaction(async tx=>{
   await lockExecutionEnvelope(tx,input.executionId)
   const rows=await tx.$queryRaw<Array<{state:string;claimGeneration:number}>>`
     SELECT "state","claim_generation" AS "claimGeneration"
@@ -398,7 +399,7 @@ const startTransactionalTeacherForm = async (input:{
   })
   return {state:'STARTED' as const,runtimeBindingKind:TEACHER_FORM_RUNTIME_KIND,
     runtimeBindingRef:attempt.id,replayed:false}
-})
+  }))
 
 const recoverOrDispatchExternal = async (input: {
   decision: Extract<RunStartClaimDecision, { kind: 'ACQUIRED' | 'RECOVER' }>
