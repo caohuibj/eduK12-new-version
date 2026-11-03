@@ -1,11 +1,17 @@
 import { Request, Response, NextFunction } from 'express'
 import { error, instrumentError, completionBusy } from '../utils/response'
 import { logger } from '../utils/logger'
+import { isAssessmentStartBusyError } from '../modules/composite/start-transient'
 
 export const errorHandler = (err: any, req: Request & { requestId?: string }, res: Response, _next: NextFunction) => {
   // Only the shared completion boundary classifies transient DB failures.
   // Preserve its safe retry contract in routes without a local busy mapper.
   if (err?.code === 'COMPLETION_BUSY') return completionBusy(res, err.retryAfterSeconds)
+  // A Run START transaction that rolled back before committing is safe to retry.
+  if (isAssessmentStartBusyError(err)) {
+    res.setHeader('Retry-After', String(err.retryAfterSeconds))
+    return instrumentError(res, err.code, err.message, 503)
+  }
   if (err?.code === 'ASSESSMENT_RUNTIME_UNAVAILABLE' && err?.statusCode === 503) {
     res.setHeader('Retry-After', '5')
     return instrumentError(res, 'ASSESSMENT_RUNTIME_UNAVAILABLE', '测评内容暂时无法读取，作答会保留，请稍后重试。', 503)
