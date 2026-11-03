@@ -11,6 +11,7 @@ import {readEducationSjtSources} from '../education-tools/native-source.sjt'
 import {admitEducationNativeCognitive} from '../education-tools/native-source.cognitive'
 import { emptyOptionalReportRelations, OPTIONAL_REPORT_RELATION_COUNTS } from './composite-report-read-plan'
 import { lockAuthenticatedAdmission } from './authenticated-admission-lock'
+import { lockRelationalAdmission } from './relational-admission-lock'
 import {publicTrainingFormDefinition} from '../assessment-runtime/typed-form'
 import {assertTrainingMaterialsUsable,trainingFormMaterials,inspectTrainingMaterials} from '../assessment-media/training-materials'
 import { assertScalePublicationRights } from '../scale/scale-publication-guard'
@@ -3413,7 +3414,12 @@ export const startRelationalCompositeAttemptInTransaction = async (
   if (input.attemptIdentity.respondentUserId !== input.respondentUserId) {
     throw compositeForbidden('关系测评 respondent identity 不匹配')
   }
-  await db.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${input.compositeAssessmentId} FOR UPDATE`
+  // Different participants of the same Composite admit concurrently (FOR SHARE
+  // + participant-scoped advisory lock). Publication/content mutations still
+  // hold FOR UPDATE, so a mutation that returns always orders after every
+  // admission it overlaps with, exactly as the previous exclusive row lock did.
+  const participantKey = `user:${input.respondentUserId}`
+  await lockRelationalAdmission(db, input.compositeAssessmentId, participantKey)
   const composite = await loadComposite(input.compositeAssessmentId, true, db)
   assertSupportedComposite(composite, false, false)
   if (composite.status !== 'PUBLISHED') throw compositeBadRequest('关系测评运行目标尚未发布')
@@ -3431,7 +3437,6 @@ export const startRelationalCompositeAttemptInTransaction = async (
     return existing
   }
 
-  const participantKey = `user:${input.respondentUserId}`
   const latest = await db.compositeAssessmentAttempt.findFirst({
     where: { compositeAssessmentId: input.compositeAssessmentId, participantKey },
     orderBy: { attemptNo: 'desc' },

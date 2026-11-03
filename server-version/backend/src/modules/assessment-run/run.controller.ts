@@ -5,11 +5,12 @@ import {educationPrivateRunTrackInput} from '../education-tools/private-tool.run
 import {prisma} from '../../config/database'
 import {listEducationLibraryResourcePage} from '../scale-library-governance/education-catalog'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
+import { isAssessmentStartBusyError } from '../composite/start-transient'
 import { acceptRunExecutionConsent } from './consent'
 import {educationTrackingSelectionSchema} from '../reporting/education-personal-tracking'
 import { z } from 'zod'
 import type { Request, Response } from 'express'
-import { error, success, unauthorized } from '../../utils/response'
+import { error, instrumentError, success, unauthorized } from '../../utils/response'
 import { addAssessmentRunTrackDraft, createAssessmentRunDraft, type AssessmentRunStatus } from './repository'
 import { previewAssessmentRun, publishAssessmentRun } from './publish'
 import { startAssessmentRunExecution } from './startExecution'
@@ -68,6 +69,11 @@ const listRunSchema = z.object({
 
 const fail = (res: Response, err: unknown) => {
   if (err instanceof RelationalAssessmentError) return error(res, err.message, -1, 409)
+  // START transaction rolled back on a transient DB outcome: safe to retry.
+  if (isAssessmentStartBusyError(err)) {
+    res.setHeader('Retry-After', String(err.retryAfterSeconds))
+    return instrumentError(res, err.code, err.message, 503)
+  }
   const known = err as { code?: string; message?: string; statusCode?: number }
   if (known && typeof known.statusCode === 'number') {
     return error(res, known.message ?? known.code ?? 'Run operation failed', -1, known.statusCode)
