@@ -1,4 +1,5 @@
 import { serveProjectedReportImage } from '../reporting/report-image-delivery'
+import { isAssessmentStartBusyError } from './start-transient'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
 import { wholeQuestionnaireArrival, markAssessmentTimeline, traceAssessmentPhase, traceAssessmentPhaseSync } from '../../services/runtimeObservability'
 import { Request, Response } from 'express'
@@ -918,6 +919,11 @@ const recoveryFromBody = (req: Request): string => {
 }
 
 const handleError = (res: Response, err: unknown): Response => {
+  // START/RESTART transaction rolled back on a transient DB outcome: safe to retry.
+  if (isAssessmentStartBusyError(err)) {
+    res.setHeader('Retry-After', String(err.retryAfterSeconds))
+    return instrumentError(res, err.code, err.message, 503)
+  }
   if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
   if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
   if (err instanceof z.ZodError) return error(res, err.issues.map((item) => item.message).join('; '), -1, 400)
