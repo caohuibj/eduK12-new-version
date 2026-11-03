@@ -46,8 +46,21 @@ Backend Regression 使用独立的 `backend-regression-reuse` 任务，检索相
 
 注意：这是真实接线的 **Backend Regression 一个 lane**；其他昂贵检查仍使用原执行方式。分级和检查点机制将逐步扩展，不应将单 lane 的复用描述成全 CI 全自动复用。
 
-## 已关闭历史 PR 的 CI 清理
+## 过时 CI 清理（2026-11-02，PR #613）
 
-#356、#357、#363、#364 已关闭并合并（#356 的 post-merge 资格链路也已结束）。从在线的 `.github/workflows/ci.yml` DAG 移除了共 39 个只为这些历史提交服务的顶层 job 和 5 个僵尸 merge-gate `needs`，并取消 PR356 手动参数入口。主 CI 从约 6,639 行减少到约 3,206 行；原有 Backend/Frontend/Browser/CodeQL/Docker 等常规检查及固定 required gate 仍保留。
+所有“精确候选/单 PR”路线对应的 PR 均已合并，它们的固定 head/tree/run 绑定无法准入任何未来 PR，因此整体移除，而不是继续在 DAG 中保留僵尸 job：
 
-专用归档测试和脚本尚保留作为历史证据，不意味着历史路由仍可作为新 PR 的资格通道；剩余历史字符串需要谨慎逐步替换，以免误放行新工作流。新增的 `ci-legacy-retirement.test.mjs` 检查被移除的 job 不会被重新引入，以及当前 `needs` 不引用不存在的 job。
+- `ci.yml` 由 93 个 job 缩减到 46 个；`merge gate / ready PR` 的 `needs` 仅含保留 job。
+- 删除所有不再被 `ci.yml` 调用的 `ci-*.yml`（survey、training、school-teacher、scale-authoring、campus、measurement-browser、shared-assessment-foundation、cognitive-step 等）、整个 `.github/evidence/`、对应 bindings/reuse/functional 脚本及测试、`maintenance-merge.py`，以及 `ci-maintenance.yml` 中固定历史 run 号的 `ops_followup`/`cache_policy_followup` 资格步骤。
+- 同步删除被可复用 workflow 中的单 PR 输入（`survey_selection`、`performance_smoke`、`merge_proof`、`run_performance_tests` 等）。
+- 新增 `ci-legacy-retirement.test.mjs` 断言：每个 `ci-*.yml` 都被 `ci.yml` 调用；workflow 与非测试脚本引用的 `.github/{scripts,workflows,config}` 文件都存在；被删除的历史路线不会被重新引入。
+- 保留原则：每个保留 job 或脚本都应服务于未来 PR 的通用分级（见下），或是固定的合并门禁/发布/维护工具。`docs/release/README.md` 中历史小节仅作审计记录，其 bindings 与脚本已不存在，不能作为新 PR 的路线。
+
+不在本次范围：`server-version/e2e/*`、产品源码与 `docs/evidence/**` 下的历史证据文档，未修改其内容。
+
+## 保留的分级与复用（以实际代码为准）
+
+- 分级路由：documentation、content、presentation（CSS）、frontend-test、affected-frontend、backend-unit、edge-config、cognitive-product、cognitive-intake-light、catalog-discovery、homepage-copy、maintenance、release-tooling、dependencies、A/B scoped-release；其余/混合/未知差异走 legacy/platform 全量。
+- Draft 平台 PR 只运行 `pr-light-*`；重型 browser/media/ui/ops/perf 仅在 Ready 的全量路线运行；轻量路由不会激活这些 job（`content-scope.test.mjs`、`ci-topology.test.mjs` 断言）。
+- 跨提交复用目前只有 `backend-regression-reuse` 一条：同仓 PR、legacy/platform 路线、失败关闭；其他检查没有跨 run 复用，同一提交内的 artifact 由 producer 构建一次、consumer 校验后使用。
+- 本次清理 PR 因删除大量 CI 控制文件且修改了 browser/frontend/backend-regression 可复用 workflow，按 release 策略归为 C/legacy 全量路线；未为它新增“删除豁免”。其后仅触及轻量范围的 PR 不会激活这些重型 job。

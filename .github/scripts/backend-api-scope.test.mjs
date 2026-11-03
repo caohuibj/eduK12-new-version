@@ -14,7 +14,7 @@ test('actual workflow skips full regression for Form focus and keeps ordinary ba
  const text=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
  const block=text.slice(text.indexOf('\n  backend-regression:\n'),text.indexOf('\n  frontend-build:'));
  const expression=/^    if: \$\{\{ (.*) \}\}$/m.exec(block)?.[1];assert.ok(expression);
- const selected=(focus,scenario='backend')=>runInNewContext(expression,{needs:{scope:{outputs:{backend_focus:focus,scenario,dependencies_frontend_only:'false',application_route:'legacy',documentation:'false',maintenance:'false',content:'false',frontend:'false',presentation:'false'}}},github:{event_name:'pull_request',ref_name:'synthetic',event:{pull_request:{number:1,draft:false,head:{ref:'synthetic'}}}},vars:{CI_FORCE_FULL:'false'},cancelled:()=>false});
+ const selected=(focus,scenario='backend')=>runInNewContext(expression,{always:()=>true,needs:{'backend-regression-reuse':{result:'skipped',outputs:{reuse_backend_regression:'false'}},scope:{result:'success',outputs:{backend_focus:focus,scenario,dependencies_frontend_only:'false',application_route:'legacy',documentation:'false',maintenance:'false',content:'false',frontend:'false',presentation:'false'}}},github:{event_name:'pull_request',ref_name:'synthetic',event:{pull_request:{number:1,draft:false,head:{ref:'synthetic'}}}},vars:{CI_FORCE_FULL:'false'},cancelled:()=>false});
  assert.equal(selected('form-intake'),false);assert.equal(selected('full'),true);assert.equal(selected('full','catalog-discovery'),false);
  assert.match(text,/name: bounded backend API route and actual job selection contracts\n        if: steps\.scope\.outputs\.backend_focus == 'form-intake'/);
 });

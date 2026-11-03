@@ -117,14 +117,14 @@ test('affected frontend workflow conditions agree with the existing merge jobs',
   assert.match(frontend,/\['related','--run',\.\.\.files\]/);
   assert.doesNotMatch(frontend,/npm test -- --changed/);
   assert.match(frontend,/report\.numPassedTests>0/,'a missing related-test result cannot pass');
-  assert.match(frontend,/if: inputs\.survey_selection != true && inputs\.affected_only != true && inputs\.cognitive_owned_by_backend != true\n        run: npm test/);
+  assert.match(frontend,/if: inputs\.affected_only != true && inputs\.cognitive_owned_by_backend != true\n        run: npm test/);
   const full=frontend.match(/name: full frontend tests\n        if: (.+)\n/)[1];
   const partition=frontend.match(/name: frontend tests excluding exact onboarding-owned suites\n        if: (.+)\n/)[1];
-  for(const survey_selection of [false,true])for(const affected_only of [false,true])for(const cognitive_owned_by_backend of [false,true]){
-    const inputs={survey_selection,affected_only,cognitive_owned_by_backend};
+  for(const affected_only of [false,true])for(const cognitive_owned_by_backend of [false,true]){
+    const inputs={affected_only,cognitive_owned_by_backend};
     const enabled=expression=>Boolean(new Function('inputs',`return (${expression})`)(inputs));
-    assert.equal(enabled(full),!survey_selection&&!affected_only&&!cognitive_owned_by_backend);
-    assert.equal(enabled(partition),!survey_selection&&!affected_only&&cognitive_owned_by_backend);
+    assert.equal(enabled(full),!affected_only&&!cognitive_owned_by_backend);
+    assert.equal(enabled(partition),!affected_only&&cognitive_owned_by_backend);
   }
 });
 test('all three content domains and combined content qualify', () => {
@@ -144,43 +144,6 @@ test('empty, core, executable additions and mixed changes require full checks', 
 });
 
 import { recheckCognitiveIntake, requiredChecks, failedChecks } from './merge-gate.mjs';
-import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
-test('personal tracking Draft reuses existing producers without qualifying Ready or unrelated maintenance',()=>{
-  const marker={file:'server-version/backend/src/modules/reporting/personal-tracking.ts',status:'A',oldMode:'000000',newMode:'100644'};
-  const draft={event:'pull_request',draft:true};
-  assert.equal(personalTrackingDraftScope([marker],draft),true);
-  assert.equal(personalTrackingDraftScope([marker,{...marker,file:'docs/evidence/personal-longitudinal-20261030/continuation/source.json'}],draft),true);
-  assert.throws(()=>personalTrackingDraftScope([marker,{...marker,file:'docs/evidence/personal-longitudinal-20261030/continuation/code.mjs'}],draft),/no broad fallback/);
-  assert.equal(personalTrackingDraftScope([marker],{...draft,draft:false}),false);
-  assert.equal(personalTrackingDraftScope([marker],{...draft,event:'push'}),false);
-  assert.throws(()=>personalTrackingDraftScope([marker],{...draft,forceFull:true}),/does not authorize/);
-  for(const other of [
-    {...marker,file:'server-version/backend/package-lock.json'},
-    {...marker,file:'server-version/scripts/host-ops/backup.py'},
-    {...marker,file:'server-version/backend/src/modules/auth/other.ts'},
-    {...marker,status:'D',oldMode:'100644',newMode:'000000'},
-    {...marker,newMode:'120000'},
-  ])assert.throws(()=>personalTrackingDraftScope([marker,other],draft),/no broad fallback/);
-  const scope=scopeOutputs('false','false','false',{application_route:'legacy',personal_tracking_draft:'true'});
-  const needs={scope:{outputs:scope,result:'success'},'pr-light-backend':{result:'success'},'pr-light-frontend':{result:'success'}};
-  assert.deepEqual(requiredChecks(needs,true),['scope','pr-light-backend','pr-light-frontend']);
-  assert.deepEqual(failedChecks(needs,true),[]);
-  assert.ok(failedChecks({...needs,'pr-light-backend':{result:'skipped'}},true).includes('pr-light-backend'));
-  assert.ok(failedChecks(needs,false).includes('scope'));
-  assert.ok(requiredChecks({scope:{outputs:{...scope,personal_tracking_draft:'false'}}},false).includes('backend-regression'));
-  assert.match(readFileSync('.github/workflows/ci.yml','utf8').split('\n  backend-regression-reuse:\n')[1],/personal_tracking_draft != 'true'/);
-});
-test('Training personal tracking selects the same bounded Draft producers and refuses unrelated writes',()=>{
-  const entry=file=>({file,status:'A',oldMode:'000000',newMode:'100644'});
-  const entries=['server-version/backend/src/modules/composite/personal-tracking.ts',
-    'server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql',
-    'server-version/backend/src/modules/bundle-product/service.ts',
-    'docs/evidence/personal-longitudinal-training-20261030/manifest.json'].map(entry);
-  assert.equal(personalTrackingDraftScope(entries,{event:'pull_request',draft:true}),true);
-  assert.equal(personalTrackingDraftScope(entries,{event:'pull_request',draft:false}),false);
-  assert.throws(()=>personalTrackingDraftScope([...entries,entry('server-version/backend/src/modules/auth/changed.ts')],{event:'pull_request',draft:true}),/no broad fallback/);
-  assert.throws(()=>personalTrackingDraftScope(entries,{event:'pull_request',draft:true,forceFull:true}),/does not authorize/);
-});
 test('aggregate checks only selected jobs, and fails closed for every selected job', () => {
   assert.ok(requiredChecks({ scope: { outputs: scopeOutputs() } }, false).includes('backend-regression'));
   for (const [content, presentation, draft] of [
@@ -665,20 +628,6 @@ test('guidance documents use only documentation gate; mixed or nonregular change
   assert.deepEqual(failedChecks(needs,false),[]);
   for(const bad of ['failure','cancelled','skipped',undefined])
     assert.ok(failedChecks({...needs,documentation:{result:bad}},false).includes('documentation'));
-});
-
-test('Teacher personal tracking stays in the same bounded Draft route with no Ready or unknown-path grant',()=>{
- const entry=file=>({file,status:'A',oldMode:'000000',newMode:'100644'});
- const entries=['server-version/backend/src/modules/reporting/education-personal-tracking.ts',
-  'server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql',
-  'server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts',
-  'server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx',
-  'docs/evidence/personal-longitudinal-teacher-20261030/manifest.json'].map(entry);
- const draft={event:'pull_request',draft:true};
- assert.equal(personalTrackingDraftScope(entries,draft),true);
- assert.equal(personalTrackingDraftScope(entries,{...draft,draft:false}),false);
- assert.throws(()=>personalTrackingDraftScope([...entries,entry('server-version/backend/src/modules/huiteacher/authority.ts')],draft),/no broad fallback/);
- assert.throws(()=>personalTrackingDraftScope(entries,{...draft,forceFull:true}),/does not authorize/);
 });
 
 test('image build tooling gate requires real Docker success only on Ready and rejects malformed flags',()=>{

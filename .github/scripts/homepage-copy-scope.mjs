@@ -12,7 +12,6 @@ export const copyTools = new Set([
   '.github/workflows/ci-homepage-copy.yml', '.github/scripts/content-scope.mjs',
   '.github/scripts/merge-gate.mjs', '.github/workflows/ci.yml', 'docs/release/README.md',
   '.github/workflows/scale-onboarding-boundary.yml', '.github/scripts/content-workflows.test.mjs',
-  '.github/scripts/school-teacher-native.test.mjs',
   '.github/workflows/ci-frontend.yml', '.github/scripts/content-scope.test.mjs',
   'server-version/scripts/release/policy.mjs', 'docs/ci-runner-policy.md',
 ]);

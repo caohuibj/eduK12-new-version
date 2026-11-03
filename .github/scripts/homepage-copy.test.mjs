@@ -130,7 +130,7 @@ test('real workflow conditions select only public candidate and SAST for executa
  const needs=new Proxy({scope:{result:'success',outputs}},{get:(value,key)=>value[key]||{result:'skipped',outputs:{}}}),github={event_name:'pull_request',ref_name:'feature/public',event:{pull_request:{number:1234,draft:false,head:{ref:'feature/public'}}}};
  for(const name of ['homepage-copy','codeql','backend','backend-browser-build','backend-regression','frontend','frontend-build','browser','docker','accept-perf','accept-ops']) {
   const expression=block(name).match(/^    if: \$\{\{ (.+) \}\}$/m)?.[1];assert.ok(expression,name);
-  const selected=new Function('needs','github','vars','cancelled','fromJSON','contains',`return (${expression.replace(/needs\.([a-z][a-z0-9-]*)/g,(_,key)=>'needs['+JSON.stringify(key)+']')})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false,JSON.parse,(list,item)=>list.includes(item));
+  const selected=new Function('needs','github','vars','cancelled','always','fromJSON','contains',`return (${expression.replace(/needs\.([a-z][a-z0-9-]*)/g,(_,key)=>'needs['+JSON.stringify(key)+']')})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false,()=>true,JSON.parse,(list,item)=>list.includes(item));
   assert.equal(Boolean(selected),['homepage-copy','codeql'].includes(name),name);
  }
 });
@@ -139,7 +139,7 @@ test('passive CUA notes retain the CSS-only route and CSS does not run TypeScrip
  const css='server-version/frontend/src/components/catalog-discovery.css';
  assert.equal(classifyChanges([entry(css),entry('docs/cua-catalog-empty.md')]).presentation,true);
  const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
- const visual=ci.split('\n  visual:\n')[1].split('\n  survey-review:')[0];
+ const visual=ci.split('\n  visual:\n')[1].split('\n  pr-light-backend:')[0];
  assert.match(visual,/npm run build/);assert.doesNotMatch(visual,/npm run lint|npm run typecheck|npm test/);
 });
 

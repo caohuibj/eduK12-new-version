@@ -49,10 +49,6 @@ export function recipe(check,base,head) {
    commands.push(['node','--test','.github/scripts/ci-image-plan.test.mjs']);
    commands.push(['node','--test','--test-name-pattern=^frontend route builds only the frontend image','.github/scripts/content-workflows.test.mjs']);
   }
-  if(files.some(f=>f==='.github/scripts/onboarding-scope.mjs'||f==='.github/scripts/onboarding-controls.test.mjs')) {
-   commands.push(['node','--test','--test-name-pattern=^(onboarding (accepts unchanged main controls|still rejects changed control bytes|needs before snapshots|scope binds exact source)|stable gate still requires admission|Task1 scope refuses incomplete inventories)',
-    '.github/scripts/onboarding-controls.test.mjs','.github/scripts/task1-onboarding-controls.test.mjs']);
-  }
   if(cognitiveIntakeToolingChanged(files)) {
    commands.push(['node','--test','.github/scripts/cognitive-intake-scope.test.mjs','.github/scripts/cognitive-intake-check.test.mjs','server-version/scripts/cognitive/onboarding-selection.test.cjs']);
   }
@@ -61,7 +57,7 @@ export function recipe(check,base,head) {
   if(backendTests.length)commands.push(['npm','--prefix','server-version/backend','test','--',...backendTests,'--maxWorkers=1']);
   if(files.includes('server-version/backend/src/scripts/cognitive-onboarding-check.ts'))commands.push(['node','server-version/backend/node_modules/typescript/bin/tsc','--project','server-version/backend/tsconfig.json','--noEmit']);
   if(scaleIntakeToolingChanged(files)) {
-   commands.push(['node','--test','.github/scripts/scale-intake-scope.test.mjs','.github/scripts/admin-permissions-functional.test.mjs','.github/scripts/ci-topology.test.mjs','.github/scripts/content-workflows.test.mjs','.github/scripts/maintenance-routing.test.mjs']);
+   commands.push(['node','--test','.github/scripts/scale-intake-scope.test.mjs','.github/scripts/ci-topology.test.mjs','.github/scripts/content-workflows.test.mjs','.github/scripts/maintenance-routing.test.mjs']);
    commands.push(['node','--import','./server-version/backend/node_modules/tsx/dist/loader.mjs','--test','server-version/backend/scripts/scale-intake-selected-check.test.ts']);
   }
   if(files.some(f=>f.startsWith('server-version/ops/nginx/')||f.endsWith('/ingress.py')||f.endsWith('/test_ingress.py'))) {

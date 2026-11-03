@@ -337,7 +337,6 @@ test('frontend compilation and checks are separate while both remain required',(
   assert.match(job(ci,'scope'),/head\.repo\.full_name == github\.repository/);
   const diagnostic=fs.readFileSync(new URL('./cognitive-ci-diagnostics.sh',import.meta.url),'utf8');
   assert.match(diagnostic,/server-version\/frontend[\s\S]*npm ci[\s\S]*server-version\/backend[\s\S]*cognitive:onboarding-check -- --all --json/);
-  assert.match(job(source('ci-cognitive-step'),'cognitive'),/cognitive-ci-diagnostics\.sh/);
 });
 
 test('manual step probes select one shared component and cannot schedule full CI or CodeQL', () => {
@@ -348,10 +347,9 @@ test('manual step probes select one shared component and cannot schedule full CI
   assert.match(job(ci,'probe-images'),/uses: \.\/\.github\/workflows\/ci-images\.yml/);
   assert.match(job(ci,'probe-cognitive'),/inputs\.step_probe == 'cognitive'/);
   const cognitiveProbe=job(ci,'probe-cognitive');
-  assert.doesNotMatch(cognitiveProbe,/uses: \.\/\.github\/workflows\/ci-cognitive-step\.yml/);
+  assert.doesNotMatch(cognitiveProbe,/uses: \.\/\.github\/workflows\//);
+  assert.match(cognitiveProbe,/cognitive-ci-diagnostics\.sh/);
   assert.match(cognitiveProbe,/permissions:\n      contents: read/);
-  const originalDiagnostic=job(source('ci-cognitive-step'),'cognitive');
-  assert.equal(cognitiveProbe.slice(cognitiveProbe.indexOf('    runs-on:')).trim(),originalDiagnostic.slice(originalDiagnostic.indexOf('    runs-on:')).trim());
   assert.match(job(ci,'probe-frontend'),/inputs\.step_probe == 'frontend'/);
   assert.match(job(ci,'probe-frontend'),/uses: \.\/\.github\/workflows\/ci-frontend\.yml/);
   assert.match(job(ci,'probe-maintenance'),/inputs\.step_probe == 'maintenance'/);
@@ -365,13 +363,7 @@ test('different component probes have independent concurrency groups while same-
   const ci=source('ci');
   assert.match(ci,/group:.*inputs\.step_probe \|\| 'none'/);
   assert.match(ci,/group:.*inputs\.step_probe == 'images' && inputs\.probe_frontend_only && 'frontend' \|\| 'all'/);
-  const expression=ci.match(/^  cancel-in-progress: \$\{\{ (.+) \}\}$/m)?.[1];
-  assert.ok(expression,'ordinary updates must have an explicit cancellation condition');
-  const permits=new Function('github',`return (${expression});`);
-  const github=(head,ref)=>({event:{pull_request:{head:{ref:head}}},ref_name:ref});
-  assert.equal(permits(github('feature/test','feature/test')),true);
-  assert.equal(permits(github('fix/runtime-time-and-validation-20261025','feature/test')),false);
-  assert.equal(permits(github('feature/test','fix/runtime-time-and-validation-20261025')),false);
+  assert.match(ci,/^  cancel-in-progress: true$/m,'stale updates of the same route must be cancelled');
 });
 
 test('all versioned jobs are pinned to hosted Ubuntu and cannot accept local runner overrides',()=>{
