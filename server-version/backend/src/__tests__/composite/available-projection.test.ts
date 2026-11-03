@@ -7,7 +7,7 @@ const { db } = vi.hoisted(() => {
   process.env.COGNITIVE_MODULE_ENABLED = 'true'
   return { db: {
   courseStudent: { findMany: vi.fn() }, compositeAssessment: { findMany: vi.fn() },
-  compositeAssessmentAttempt: { findMany: vi.fn() },
+  compositeAssessmentAttempt: { findMany: vi.fn() }, $queryRaw: vi.fn(),
 } }
 })
 vi.mock('../../config/database', () => ({ prisma: db }))
@@ -16,6 +16,7 @@ vi.mock('../../modules/composite/report-package-label', async importOriginal => 
   return { ...actual, getFrozenPackageSlotLabels: vi.fn(actual.getFrozenPackageSlotLabels) }
 })
 import { listAvailableForStudent } from '../../modules/composite/composite.service'
+import { config } from '../../config'
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { getFrozenPackageSlotLabels } from '../../modules/composite/report-package-label'
 
@@ -39,11 +40,22 @@ const fixture = (override: Record<string, unknown> = {}) => ({
   reportPackageKey: 'synthetic', reportPackageVersion: '1', reportPackageSnapshotEncrypted: frozen,
   items, formSections: [section], ...override,
 })
+const presenceFlag = (value: unknown) => value === undefined ? undefined : value !== null
 // Model Prisma's select instead of returning full rows regardless of projection.
 const project = (row: Record<string, any>, select: Record<string, any>) => Object.fromEntries(
-  Object.entries(select).filter(([, value]) => value !== false).map(([key, value]) => [key, value === true || !value.select ? row[key]
-    : Array.isArray(row[key]) ? row[key].map((child: any) => project(child, value.select))
-      : row[key] == null ? row[key] : project(row[key], value.select)]))
+  Object.entries(select).filter(([, value]) => value !== false).map(([key, value]) => {
+    if (key === '_count') {
+      const counts = Object.fromEntries(Object.entries(value.select).map(([rel, spec]) => {
+        const children = row[rel] ?? []
+        const excluded = spec && typeof spec === 'object' ? (spec as { where?: { type?: { not?: string } } }).where?.type?.not : undefined
+        return [rel, excluded ? children.filter((child: any) => child.type !== excluded).length : children.length]
+      }))
+      return [key, counts]
+    }
+    return [key, value === true || !value.select ? row[key]
+      : Array.isArray(row[key]) ? row[key].map((child: any) => project(child, value.select))
+        : row[key] == null ? row[key] : project(row[key], value.select)]
+  }))
 let source: ReturnType<typeof fixture>[]
 beforeEach(() => {
   vi.clearAllMocks()
@@ -51,7 +63,26 @@ beforeEach(() => {
   db.courseStudent.findMany.mockResolvedValue([{ courseId: 'course' }])
   db.compositeAssessmentAttempt.findMany.mockResolvedValue([])
   db.compositeAssessment.findMany.mockImplementation(async ({ select }) => source.map(row => project(row, select)))
+  db.$queryRaw.mockImplementation(async () => source.map(row => {
+    const trainingFlowDraft = presenceFlag(row.trainingFlowDraft)
+    const trainingFlowFrozen = presenceFlag(row.trainingFlowFrozen)
+    const trainingFlowDigest = presenceFlag(row.trainingFlowDigest)
+    const trainingVariantFrozen = presenceFlag(row.trainingVariantFrozen)
+    const flow = trainingFlowDraft === true || trainingFlowFrozen === true || trainingFlowDigest === true
+    const nonForm = (row.items ?? []).filter((item: { type: string }) => item.type !== 'FORM').length
+    return {
+      id: row.id,
+      trainingFlowDraft,
+      trainingFlowFrozen,
+      trainingFlowDigest,
+      trainingVariantFrozen,
+      // The module-on query returns NULL. JSON null and SQL NULL both map to false.
+      hasCognitive: config.cognitiveModuleEnabled ? null : (row.items ?? []).some((item: { type: string }) => item.type === 'COGNITIVE'),
+      moduleCount: flow ? null : nonForm + (row.formSections?.length ?? 0),
+    }
+  }))
 })
+const cards = (rows: any[]) => rows.map(({ instruction, items, units, formSections, ...card }) => card)
 describe('student available projection', () => {
   it('keeps frozen labels, form sections and ordered units with one package read', async () => {
     const [row] = await listAvailableForStudent('student')
@@ -89,6 +120,14 @@ describe('student available projection', () => {
     expect(getFrozenPackageSlotLabels).toHaveBeenCalledTimes(475)
     expect(db.compositeAssessment.findMany).toHaveBeenCalledTimes(1)
     expect(db.compositeAssessmentAttempt.findMany).toHaveBeenCalledTimes(1)
+    expect(db.$queryRaw).not.toHaveBeenCalled()
+    const select = db.compositeAssessment.findMany.mock.calls[0][0].select
+    expect(select.trainingFlowDraft).toBe(true)
+    expect(select.trainingFlowFrozen).toBe(true)
+    expect(select.trainingFlowDigest).toBe(true)
+    expect(select.trainingVariantFrozen).toBe(true)
+    expect(select.items.select.scale).toEqual({ select: { name: true } })
+    expect(db.compositeAssessmentAttempt.findMany.mock.calls[0][0].select.cognitiveSessions).toEqual({ select: { status: true, frozenAdmissionSnapshotHash: true } })
   })
 })
 
@@ -103,7 +142,6 @@ describe('opt-in student catalog summary', () => {
     const detail = await listAvailableForStudent('student', 0, 'course')
     vi.mocked(getFrozenPackageSlotLabels).mockClear()
     const summary = await listAvailableForStudent('student', 0, 'course', true)
-    const cards = (rows: any[]) => rows.map(({ instruction, items, units, formSections, ...card }) => card)
     expect(cards(summary)).toEqual(cards(detail))
     expect(summary).toHaveLength(475)
     expect(summary.every(row => row.items.length === 0 && row.units.length === 0 && row.formSections.length === 0 && row.instruction === null)).toBe(true)
@@ -111,13 +149,29 @@ describe('opt-in student catalog summary', () => {
     const select = db.compositeAssessment.findMany.mock.calls.at(-1)![0].select
     expect(select.reportPackageSnapshotEncrypted).toBe(false)
     expect(select.instruction).toBe(false)
-    expect(select.items.select.scale).toBe(false)
-    expect(select.items.select.cognitiveAssignment).toBe(false)
-    expect(select.formSections).toEqual({ select: { id: true } })
-    expect(select.trainingFlowDraft).toBe(true)
-    expect(select.trainingFlowFrozen).toBe(true)
-    expect(select.trainingFlowDigest).toBe(true)
-    expect(select.trainingVariantFrozen).toBe(true)
+    expect(select.items).toBe(false)
+    expect(select.formSections).toBe(false)
+    expect(select).not.toHaveProperty('_count')
+    expect(select).not.toHaveProperty('trainingFlowDraft')
+    expect(select).not.toHaveProperty('trainingFlowFrozen')
+    expect(select).not.toHaveProperty('trainingFlowDigest')
+    expect(select).not.toHaveProperty('trainingVariantFrozen')
+    expect(db.$queryRaw).toHaveBeenCalledTimes(1)
+    const presenceSql = db.$queryRaw.mock.calls[0][0]
+    const presenceText = presenceSql.strings.join('\n')
+    expect(presenceText.match(/IS NOT NULL/g)).toHaveLength(4)
+    expect(presenceText.match(/jsonb_typeof/g)).toHaveLength(3)
+    expect(presenceText).toContain(`jsonb_typeof("training_flow_draft") <> 'null'`)
+    expect(presenceText).toContain(`jsonb_typeof("training_flow_frozen") <> 'null'`)
+    expect(presenceText).toContain(`jsonb_typeof("training_variant_frozen") <> 'null'`)
+    expect(presenceText).toContain('"training_flow_digest" IS NOT NULL')
+    expect(presenceText).toContain('NULL::boolean')
+    expect(presenceText).not.toContain('EXISTS')
+    expect(presenceText).not.toContain('::text')
+    expect(presenceText).toContain('count(*)::int')
+    expect(presenceSql.values).toEqual(source.map(row => row.id))
+    expect(db.compositeAssessmentAttempt.findMany.mock.calls.at(-1)![0].select).not.toHaveProperty('cognitiveSessions')
+    expect(db.compositeAssessment.findMany.mock.calls.at(-2)![0].select.trainingVariantFrozen).toBe(true)
     const bytes = (rows: unknown) => ({ json: Buffer.byteLength(JSON.stringify(rows)), gzip: gzipSync(JSON.stringify(rows)).byteLength })
     expect(bytes(summary).gzip).toBeLessThan(bytes(detail).gzip)
     console.info('COMPOSITE_SUMMARY_BYTES', JSON.stringify({ rows: 475, detail: bytes(detail), summary: bytes(summary), source: 'synthetic rows, not production timing' }))
@@ -130,7 +184,99 @@ describe('opt-in student catalog summary', () => {
     expect(db.courseStudent.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { studentId: 'student', status: { in: ['ACTIVE', 'APPROVED'] }, courseId: 'course' } }))
     db.courseStudent.findMany.mockResolvedValue([])
     db.compositeAssessment.findMany.mockClear()
+    db.$queryRaw.mockClear()
     expect(await listAvailableForStudent('student', 0, 'denied', true)).toEqual([])
     expect(db.compositeAssessment.findMany).not.toHaveBeenCalled()
+    expect(db.$queryRaw).not.toHaveBeenCalled()
+  })
+  it.each(['trainingFlowDraft', 'trainingFlowFrozen', 'trainingFlowDigest', 'trainingVariantFrozen'])('summary matches detail when %s is set', async marker => {
+    source = [fixture({ [marker]: marker.endsWith('Digest') ? 'digest' : { frozen: true } })]
+    const detail = await listAvailableForStudent('student', 0, 'course')
+    const summary = await listAvailableForStudent('student', 0, 'course', true)
+    expect(cards(summary)).toEqual(cards(detail))
+    expect(summary[0]).toMatchObject({ items: [], units: [], formSections: [], instruction: null })
+    expect(db.compositeAssessment.findMany.mock.calls.at(-1)![0].select).not.toHaveProperty(marker)
+  })
+  it('summary matches detail when flow and variant markers are both set', async () => {
+    source = [fixture({ trainingFlowFrozen: { frozen: true }, trainingVariantFrozen: { variant: true } })]
+    const detail = await listAvailableForStudent('student', 0, 'course')
+    const summary = await listAvailableForStudent('student', 0, 'course', true)
+    expect(detail[0]).toMatchObject({ estimatedModules: null, weightedVariants: true, items: [], units: [], formSections: [] })
+    expect(cards(summary)).toEqual(cards(detail))
+  })
+  it('summary keeps an incomplete presence flag fail-closed', async () => {
+    source = [fixture({ trainingFlowFrozen: undefined })]
+    const detail = await listAvailableForStudent('student', 0, 'course')
+    const summary = await listAvailableForStudent('student', 0, 'course', true)
+    expect(detail[0]).toMatchObject({ estimatedModules: null, weightedVariants: false, items: [], units: [], formSections: [] })
+    expect(cards(summary)).toEqual(cards(detail))
+    expect(summary[0].instruction).toBeNull()
+  })
+  it('reloads markers through Prisma when the raw result misses a row', async () => {
+    db.$queryRaw.mockResolvedValueOnce([])
+    const detail = await listAvailableForStudent('student', 0, 'course')
+    const summary = await listAvailableForStudent('student', 0, 'course', true)
+    expect(cards(summary)).toEqual(cards(detail))
+    const fallback = db.compositeAssessment.findMany.mock.calls.at(-1)![0].select
+    expect(fallback.trainingFlowDraft).toBe(true)
+    expect(fallback._count).toEqual({ select: { items: { where: { type: { not: 'FORM' } } }, formSections: true } })
+    expect(fallback).not.toHaveProperty('items')
+  })
+  it('stays fail-closed when Prisma also omits the marker row', async () => {
+    db.$queryRaw.mockResolvedValueOnce([])
+    let calls = 0
+    db.compositeAssessment.findMany.mockImplementation(async ({ select }) => {
+      calls += 1
+      return calls === 1 ? source.map(row => project(row, select)) : []
+    })
+    const [row] = await listAvailableForStudent('student', 0, 'course', true)
+    expect(calls).toBe(2)
+    expect(row).toMatchObject({ estimatedModules: null, weightedVariants: false, items: [], units: [], formSections: [], instruction: null })
+  })
+  it('reloads markers when a raw flag is not a boolean', async () => {
+    db.$queryRaw.mockResolvedValueOnce([{
+      id: 'assessment', trainingFlowDraft: 'null', trainingFlowFrozen: false, trainingFlowDigest: false,
+      trainingVariantFrozen: false, hasCognitive: null, moduleCount: 3,
+    }])
+    const detail = await listAvailableForStudent('student', 0, 'course')
+    const summary = await listAvailableForStudent('student', 0, 'course', true)
+    expect(cards(summary)).toEqual(cards(detail))
+    expect(db.compositeAssessment.findMany.mock.calls.at(-1)![0].select.trainingVariantFrozen).toBe(true)
+  })
+  it('summary treats a JSON-null marker flag the same as a JS null marker', async () => {
+    source = [fixture({ trainingFlowDraft: null, trainingVariantFrozen: null })]
+    const detail = await listAvailableForStudent('student', 0, 'course')
+    const summary = await listAvailableForStudent('student', 0, 'course', true)
+    expect(detail[0]).toMatchObject({ estimatedModules: 3, weightedVariants: false })
+    expect(cards(summary)).toEqual(cards(detail))
+  })
+  it('summary hides new cognitive work when the module is off without loading item rows', async () => {
+    config.cognitiveModuleEnabled = false
+    try {
+      source = [
+        fixture({ id: 'hidden-cog' }),
+        fixture({ id: 'paused', items }),
+        fixture({ id: 'scale-only', items: items.filter(item => item.type !== 'COGNITIVE') }),
+      ]
+      db.compositeAssessmentAttempt.findMany.mockResolvedValue([
+        { id: 'paused-attempt', compositeAssessmentId: 'paused', status: 'IN_PROGRESS', progress: 1, taskSatisfaction: null,
+          cognitiveSessions: [{ status: 'IN_PROGRESS', frozenAdmissionSnapshotHash: null }] },
+      ])
+      const rows = await listAvailableForStudent('student', 0, 'course', true)
+      expect(rows.map(row => row.id)).toEqual(['paused', 'scale-only'])
+      expect(rows[0]).toMatchObject({ canStartNewAttempt: false, canContinue: false, admissionPaused: true, estimatedModules: 3 })
+      expect(rows[1]).toMatchObject({ canStartNewAttempt: true, estimatedModules: 2, weightedVariants: false })
+      expect(db.compositeAssessment.findMany.mock.calls[0][0].select.items).toBe(false)
+      const presenceText = db.$queryRaw.mock.calls[0][0].strings.join('\n')
+      expect(presenceText).toContain('EXISTS')
+      expect(presenceText).toContain(`item."type" = 'COGNITIVE'::"CompositeAssessmentItemType"`)
+      expect(presenceText).not.toContain('::text')
+      expect(presenceText).not.toContain('NULL::boolean')
+      expect(db.compositeAssessmentAttempt.findMany.mock.calls[0][0].select.cognitiveSessions).toEqual({
+        where: { status: 'IN_PROGRESS' }, select: { status: true, frozenAdmissionSnapshotHash: true },
+      })
+    } finally {
+      config.cognitiveModuleEnabled = true
+    }
   })
 })

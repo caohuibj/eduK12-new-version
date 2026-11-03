@@ -7,9 +7,11 @@ const { db } = vi.hoisted(() => ({ db: {
   courseStudent: { findMany: vi.fn() }, compositeAssessment: { findMany: vi.fn() },
   compositeAssessmentAttempt: { findMany: vi.fn() }, questionnaireCourseDelivery: { findMany: vi.fn() },
   assignment: { findMany: vi.fn() }, checkin: { findMany: vi.fn() }, questionnaire: { findMany: vi.fn() },
+  $queryRaw: vi.fn(),
 } }))
 vi.mock('../../config/database', () => ({ prisma: db }))
 import { listAvailableForStudent } from '../../modules/composite/composite.service'
+import { config } from '../../config'
 import { compositeController } from '../../modules/composite/composite.controller'
 import { listStudentTasks } from '../../services/studentTasks'
 const now = new Date('2026-10-31T00:00:00.000Z')
@@ -37,7 +39,7 @@ beforeEach(() => {
     return ['c0', 'c1', 'c2', 'c3'].filter(id => !where.courseId || where.courseId === id)
       .map(id => select.course ? { course: { id, title: id } } : { courseId: id })
   })
-  db.compositeAssessment.findMany.mockImplementation(async ({ where }) => {
+  db.compositeAssessment.findMany.mockImplementation(async ({ where, select }) => {
     expect(where.AND).toEqual([{ OR: [
       { status: 'PUBLISHED' }, { status: 'ARCHIVED', attempts: { some: { userId: 'student', status: { in: ['IN_PROGRESS', 'COMPLETED'] } } } },
     ] }])
@@ -47,7 +49,22 @@ beforeEach(() => {
     const questionnaireIds = where.OR[1].questionnaireCourses.some.courseId.in
     const result = rows.filter(row => row.productKind === 'QUESTIONNAIRE'
       ? row.deliveryIds.some(id => questionnaireIds.includes(id)) : legacyIds.includes(row.course!.id))
-    reads.composites += result.length; return result
+    reads.composites += result.length
+    if (!select?._count) return result
+    return result.map(row => ({ ...row, _count: {
+      items: (row.items ?? []).filter((item: { type?: string }) => !select._count.select.items?.where || item.type !== 'FORM').length,
+      formSections: (row.formSections ?? []).length,
+    } }))
+  })
+  db.$queryRaw.mockImplementation(async (query: { values?: unknown[] }) => {
+    const requested = new Set((query?.values ?? []).filter((value): value is string => typeof value === 'string'))
+    return rows.filter(row => requested.has(row.id)).map(row => ({
+      id: row.id,
+      // These fixtures have no marker columns. false is SQL NULL / JSON null (absent).
+      trainingFlowDraft: false, trainingFlowFrozen: false, trainingFlowDigest: false, trainingVariantFrozen: false,
+      hasCognitive: config.cognitiveModuleEnabled ? null : false,
+      moduleCount: (row.items ?? []).filter((item: { type?: string }) => item.type !== 'FORM').length + (row.formSections ?? []).length,
+    }))
   })
   db.compositeAssessmentAttempt.findMany.mockImplementation(async ({ where, orderBy }) => {
     expect(where.userId).toBe('student'); expect(orderBy).toEqual({ startedAt: 'desc' })
