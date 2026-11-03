@@ -96,6 +96,14 @@ router.post('/attempts/:attemptId/bundle-retry', authenticate, respondentAttempt
 router.get('/attempts/:attemptId/report-status', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.reportStatus)
 router.post('/attempts/:attemptId/report-retry', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.retryReport)
 router.get('/attempts/:attemptId/report', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.report)
+router.get('/attempts/:attemptId/changes/availability',authenticate,respondentAttemptAccess,relationalGenericReportGuard,async(req,res,next)=>{
+  try{
+    const {readTrainingPersonalChangesAvailability}=await import('./personal-tracking.service')
+    return success(res,await readTrainingPersonalChangesAvailability(req.params.attemptId,req.user!.userId))
+  }catch(cause){const status=(cause as {statusCode?:number}).statusCode
+    if(status&&status>=400&&status<500)return instrumentError(res,'PERSONAL_CHANGES_UNAVAILABLE',(cause as Error).message,status)
+    return next(cause)}
+})
 router.post('/attempts/:attemptId/changes',authenticate,respondentAttemptAccess,relationalGenericReportGuard,async(req,res,next)=>{
   try{
     const {readTrainingPersonalChanges}=await import('./personal-tracking.service')

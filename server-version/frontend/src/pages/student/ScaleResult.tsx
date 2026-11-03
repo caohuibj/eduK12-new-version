@@ -6,7 +6,7 @@ import apiClient from '../../api/client'
 import ReportShell from '../../modules/reporting/ReportShell'
 import ScaleUnitReportCard, { type SafeScaleUnitReport } from '../../modules/reporting/ScaleUnitReportCard'
 import type { ExternalScaleReport, ScaleResultV2 } from '../../modules/reporting/types'
-import { ReportSection } from '../../modules/reporting/ReportPrimitives'
+import { ReportSupporting } from '../../modules/reporting/ReportPrimitives'
 
 export interface Assessment {
   id: string
@@ -160,19 +160,10 @@ const ScaleResult: React.FC = () => {
     <ReportShell
       title={assessment.scale.name}
       description={isEducational ? '完成反馈' : '测评报告'}
-      facts={facts}
-      status={{
-        kind: 'success',
-        title: '已提交',
-        description: isEducational
-          ? '下面是一份不提供受限个体分数或心理健康标签的教育性反馈。'
-          : '以下内容来自当前已完成结果记录。',
-      }}
       backAction={<button type="button" onClick={() => navigate('/my-assessments')} className="hui-button hui-button--secondary">{learner.enabled ? learner.backLabel : '返回量表列表'}</button>}
     >
-      <ReportSection title="结果详情" eyebrow="量表结果">
-        <ScaleUnitReportCard report={safeReport} />
-      </ReportSection>
+      <ScaleUnitReportCard report={safeReport} compactMetadata />
+      {facts.length > 0 && <ReportSupporting facts={facts} testId="report-completion-facts"><p>已提交</p></ReportSupporting>}
     </ReportShell>
   )
 }

@@ -32,7 +32,9 @@ export function EducationScalePersonalReport({data,api,executionId,entry}:{
     {recognized&&typeof data.message==='string'&&data.message&&<p>{data.message}</p>}
     {!ready?<p>当前报告尚未获准显示，不提供个人分数、解释或图片。</p>:
       !units.length?<p>本次测评已完成，当前没有获准展示的逐工具报告内容。</p>:
-        units.map((report,index)=><ScaleUnitReportCard key={report.itemId??`${report.scaleId??report.scaleCode}:${index}`}
-          report={report} loadReportImage={loadReportImage}/>)}
+        units.map((report,index)=><section key={report.itemId??`${report.scaleId??report.scaleCode}:${index}`}>
+          {units.length > 1 && <h3>{report.scaleName}</h3>}
+          <ScaleUnitReportCard report={report} loadReportImage={loadReportImage} compactMetadata/>
+        </section>)}
   </div>
 }

@@ -27,7 +27,10 @@ export function EducationOrdinaryFeedback({data,api,executionId,entry}:{data:Ord
     </>:unit.kind!=='SCALE'?<p>本工具未开放个人反馈。</p>:
     unit.declaredReport?<>{unit.message&&<p>{unit.message}</p>}<DeclaredReportContent report={unit.declaredReport} showMetricKeys={false}/></>:
     (unit.nativeScaleUnits??[]).filter(report=>report?.type==='SCALE'&&report.kind==='scale'&&typeof report.scaleName==='string').map((report,index)=>
-     <ScaleUnitReportCard key={unit.blockId+':'+(report.itemId??index)} report={report} loadReportImage={loadImage}/>) }
+     <div key={unit.blockId+':'+(report.itemId??index)}>
+      {(unit.nativeScaleUnits?.length??0)>1&&<h5>{report.scaleName}</h5>}
+      <ScaleUnitReportCard report={report} loadReportImage={loadImage} compactMetadata/>
+     </div>) }
   </section>)}
  </div>
 }

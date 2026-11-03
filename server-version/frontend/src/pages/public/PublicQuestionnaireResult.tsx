@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { Clock, FileText } from 'lucide-react'
 import ScaleUnitReportCard from '../../modules/reporting/ScaleUnitReportCard'
 import type { CollectionQuestionnaireResponse } from '../../modules/reporting/types'
 import { createPublicCapabilityClient } from '../../api/publicCapabilityClient'
 import { readQuestionnaireResumeToken } from '../../utils/questionnaireResume'
 import { normalizeApiError } from '../../utils/normalizeApiError'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
-import { ReportCoreSummary, ReportSection } from '../../modules/reporting/ReportPrimitives'
+import { ReportSection, ReportSupporting } from '../../modules/reporting/ReportPrimitives'
 
 const formatTime = (ms: number) => {
   const minutes = Math.floor(ms / 60000)
@@ -115,34 +114,26 @@ const PublicQuestionnaireResult: React.FC = () => {
 
   return (
     <ProductPage width="report" className="hui-report hui-public-questionnaire-report">
-      <PageHeader title={report.questionnaireName} description="各量表结果独立展示，不生成跨量表总体分。" />
-
-      <ReportCoreSummary label="报告说明">
-        <p>本页展示本次匿名问卷中已经生成的量表结果。不同量表和维度保留各自的计分与解释语义。</p>
-      </ReportCoreSummary>
-
-      <div className="report-facts" data-testid="public-questionnaire-completion-facts">
-        <dl>
-          <div>
-            <dt>完成时间</dt>
-            <dd>{report.completedAt ? new Date(report.completedAt).toLocaleString('zh-CN') : '—'}</dd>
-          </div>
-          {report.totalTime != null && (
-            <div>
-              <dt><Clock size={13} aria-hidden="true" className="inline mr-1" />总用时</dt>
-              <dd>{formatTime(report.totalTime)}</dd>
-            </div>
-          )}
-          <div>
-            <dt><FileText size={13} aria-hidden="true" className="inline mr-1" />报告维度</dt>
-            <dd>{report.totalDimensions} 个维度</dd>
-          </div>
-        </dl>
-      </div>
-
+      <PageHeader title={report.unitReports.length === 1 ? report.unitReports[0].scaleName : report.questionnaireName} description={report.unitReports.length === 1 ? undefined : '各量表结果独立展示，不生成跨量表总体分。'} />
       <div className="report-body">
+        {report.unitReports.map((unitReport, index) => (
+          <ReportSection
+            key={unitReport.itemId || unitReport.scaleId || index}
+            title={unitReport.scaleName}
+            className={report.unitReports.length === 1 ? "report-single-unit" : undefined}
+            eyebrow={`量表 ${index + 1}`}
+          >
+            <ScaleUnitReportCard report={unitReport} loadReportImage={loadReportImage} compactMetadata />
+          </ReportSection>
+        ))}
+        <ReportSupporting testId="public-questionnaire-completion-facts" facts={[
+          {label:'完成时间',value:report.completedAt ? new Date(report.completedAt).toLocaleString('zh-CN') : '—'},
+          ...(report.totalTime != null ? [{label:'总用时',value:formatTime(report.totalTime)}] : []),
+          {label:'报告维度',value:`${report.totalDimensions} 个维度`},
+        ]}>
+        {report.unitReports.length === 1 && <p>问卷：<span>{report.questionnaireName}</span></p>}
         {report.backgroundValues.length > 0 && (
-          <ReportSection title="表单回答" eyebrow="作答信息">
+          <section className="report-supporting__section"><h3>表单回答</h3>
             <dl className="hui-public-questionnaire-report__background">
               {report.backgroundValues.map((item) => (
                 <div key={item.itemId}>
@@ -151,18 +142,10 @@ const PublicQuestionnaireResult: React.FC = () => {
                 </div>
               ))}
             </dl>
-          </ReportSection>
+          </section>
         )}
 
-        {report.unitReports.map((unitReport, index) => (
-          <ReportSection
-            key={unitReport.itemId || unitReport.scaleId || index}
-            title={unitReport.scaleName}
-            eyebrow={`量表 ${index + 1}`}
-          >
-            <ScaleUnitReportCard report={unitReport} loadReportImage={loadReportImage} />
-          </ReportSection>
-        ))}
+        </ReportSupporting>
       </div>
     </ProductPage>
   )

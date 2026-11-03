@@ -11,6 +11,14 @@ import {evaluateTrainingFeedbackForAttempt} from './training-feedback-binding'
 type Proof={userId:string;study?:never}|{userId?:never;study:{studyId:string;credential:string}}
 function fail():never{throw compositeForbidden('本人变化报告不可访问')}
 
+/** Only expose configuration for the participant's own completed attempt. */
+export async function readTrainingPersonalChangesAvailability(attemptId:string,userId:string){
+ const end=await prisma.compositeAssessmentAttempt.findUnique({where:{id:attemptId},select:{userId:true,status:true,completedAt:true,assignmentRef:true,subjectUserId:true,respondentUserId:true,compositeAssessment:{select:{personalTrackingBaselineId:true}}}})
+ if(!end||end.status!=='COMPLETED'||!end.completedAt||end.userId!==userId||end.assignmentRef
+   ||end.subjectUserId&&end.subjectUserId!==end.userId||end.respondentUserId&&end.respondentUserId!==end.userId)fail()
+ return {configured:Boolean(end.compositeAssessment.personalTrackingBaselineId)}
+}
+
 /** On-demand SELF projection; FINAL and answer persistence remain unchanged. */
 export async function readTrainingPersonalChanges(attemptId:string,proof:Proof){
  return prisma.$transaction(async tx=>{
