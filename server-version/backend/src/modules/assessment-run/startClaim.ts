@@ -2,6 +2,7 @@ import type { RunResourceAuthorityRegistry } from './resourceAuthority'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { logger } from '../../utils/logger'
 import { assertCurrentRunStartAuthority } from './startAuthority'
 import { freezeRunExecutionScientificProvenanceInTransaction } from './scientificProvenance'
 import { loadRunExecutionStartAdmission, type RunAttemptIdentityBinding, type RunStartAdmission } from './startAdmission'
@@ -286,4 +287,48 @@ export const abortUndispatchedRunStartClaim = async (
     WHERE "execution_id" = ${input.executionId} AND "state" = 'CLAIMED' AND "dispatched_at" IS NULL
   `
   return Number(changed) === 1
+}
+
+/** The runtime dispatch transaction rolled back with a known-safe outcome, so
+ * nothing from this attempt committed — but the CLAIMED row from the first
+ * transaction still holds its lease. Shorten only that undispatched claim's
+ * lease so the next request can take over immediately through the existing
+ * generation CAS, instead of waiting out the full lease. The row itself, its
+ * operationKey, its frozen admission identity and the audit trail stay.
+ * DISPATCHED/UNKNOWN/COMPLETED/ABORTED claims and executions that already
+ * carry a runtime binding are never touched. This must NOT route through
+ * abortUndispatchedRunStartClaim: ABORTED is the terminal lifecycle state and
+ * would turn a retryable busy outcome into a permanent RUN_START_ABORTED. */
+export const releaseRolledBackRunStartClaim = async (input: {
+  claimId: string
+  executionId: string
+  generation: number
+}): Promise<boolean> => {
+  try {
+    const changed = await prisma.$executeRaw`
+      UPDATE "assessment_run_execution_start_claims" c
+      SET "lease_until" = transaction_timestamp(), "updated_at" = transaction_timestamp()
+      WHERE c."id" = ${input.claimId}
+        AND c."execution_id" = ${input.executionId}
+        AND c."claim_generation" = ${input.generation}
+        AND c."state" = 'CLAIMED'
+        AND c."dispatched_at" IS NULL
+        AND NOT EXISTS (
+          SELECT 1 FROM "assessment_run_executions" e
+          WHERE e."id" = c."execution_id"
+            AND (e."runtime_binding_kind" IS NOT NULL OR e."runtime_binding_ref" IS NOT NULL)
+        )
+    `
+    return Number(changed) === 1
+  } catch (err) {
+    // Safe degradation: keep the original lease and its existing recovery
+    // path; the caller reports the real remaining wait to the client.
+    logger.warn('Run START rolled-back claim lease release failed', {
+      claimId: input.claimId,
+      executionId: input.executionId,
+      generation: input.generation,
+      error: err,
+    })
+    return false
+  }
 }
