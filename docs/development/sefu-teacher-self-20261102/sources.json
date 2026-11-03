@@ -1,0 +1,123 @@
+{
+  "checkedDate": "2026-11-02",
+  "leadOnly": {
+    "section": "03｜SEfU",
+    "readThrough": "Connected Google Drive fetch",
+    "status": "Research lead read; not a questionnaire or permission instrument; raw private report not copied to Git.",
+    "title": "教师自评教学质量工具：13项比较、全文状态与学生评价—课堂观察对照",
+    "linkNotPublished": "User-supplied research lead was read through Drive; private link and raw report omitted from public Git."
+  },
+  "officialIndexedSources": [
+    {
+      "url": "https://www.sefu-online.de/index.php/ueber_sefu",
+      "sourceType": "official indexed page text",
+      "finding": "Voluntary developmental self-evaluation, teacher-controlled results, not interschool comparison."
+    },
+    {
+      "url": "https://www.sefu-online.de/index.php/frageboegen",
+      "sourceType": "official indexed page text",
+      "finding": "Three perspectives; exact full question wording requires account; secondary short15+4context+2open; public single-feature example not full questionnaire."
+    },
+    {
+      "url": "https://www.sefu-online.de/meinBereich.php/vorlage/vollen_fragebogen_anzeigen/333",
+      "sourceType": "official indexed template333 topic list",
+      "finding": "15 topic labels only; topic labels are not original full items or subscale definitions."
+    },
+    {
+      "url": "https://www.sefu-online.de/index.php/sonstiges/agb",
+      "sourceType": "official indexed terms text",
+      "finding": "Regular access for NRW,Saxony,Thuringia teachers; other German states can request test access, one concurrent survey. Regular/test teacher access free. Does not establish global/commercial embedding/redistribution/translation rights."
+    }
+  ],
+  "directNetworkChecks": [
+    {
+      "requestedUrl": "https://www.sefu-online.de/index.php/ueber_sefu",
+      "finalUrl": "https://www.ktest.de/offline.html",
+      "status": 200,
+      "bytes": 4546,
+      "sha256": "ddabdeaf775e4a34a32a9240f5bcbc2d51b41ced5c9d88b1050ddae9ef04b081",
+      "meaning": "Security-maintenance offline notice, not questionnaire content or permission denial; no bypass attempted."
+    },
+    {
+      "requestedUrl": "https://www.sefu-online.de/index.php/frageboegen",
+      "finalUrl": "https://www.ktest.de/offline.html",
+      "status": 200,
+      "bytes": 4546,
+      "sha256": "ddabdeaf775e4a34a32a9240f5bcbc2d51b41ced5c9d88b1050ddae9ef04b081",
+      "meaning": "Security-maintenance offline notice, not questionnaire content or permission denial; no bypass attempted."
+    },
+    {
+      "requestedUrl": "https://www.sefu-online.de/index.php/sonstiges/agb",
+      "finalUrl": "https://www.ktest.de/offline.html",
+      "status": 200,
+      "bytes": 4546,
+      "sha256": "ddabdeaf775e4a34a32a9240f5bcbc2d51b41ced5c9d88b1050ddae9ef04b081",
+      "meaning": "Security-maintenance offline notice, not questionnaire content or permission denial; no bypass attempted."
+    },
+    {
+      "requestedUrl": "https://www.sefu-online.de/meinBereich.php/vorlage/vollen_fragebogen_anzeigen/333",
+      "finalUrl": "https://www.ktest.de/offline.html",
+      "status": 200,
+      "bytes": 4546,
+      "sha256": "ddabdeaf775e4a34a32a9240f5bcbc2d51b41ced5c9d88b1050ddae9ef04b081",
+      "meaning": "Security-maintenance offline notice, not questionnaire content or permission denial; no bypass attempted."
+    }
+  ],
+  "primaryDownloadedDocuments": [
+    {
+      "file": "guide2016.pdf",
+      "requestedUrl": "https://referenzrahmen-schulqualitaet.nrw.de/system/files/media/document/file/604964_ein_leitfaden_zur_nutzung_von_sefu.pdf",
+      "finalUrl": "https://referenzrahmen-schulqualitaet.nrw.de/system/files/media/document/file/604964_ein_leitfaden_zur_nutzung_von_sefu.pdf",
+      "status": 200,
+      "bytes": 1560715,
+      "sha256": "216d144f83a9c086e55d32829671c7f0660850b5975ce874ade7fe13bc5fbdc4",
+      "pdf": true,
+      "publiclyCommitted": false
+    },
+    {
+      "file": "guide2012.pdf",
+      "requestedUrl": "https://referenzrahmen-schulqualitaet.nrw.de/system/files/media/document/file/rolff_2012_hinweisezurnutzungvonfeedback.pdf",
+      "finalUrl": "https://referenzrahmen-schulqualitaet.nrw.de/system/files/media/document/file/rolff_2012_hinweisezurnutzungvonfeedback.pdf",
+      "status": 200,
+      "bytes": 383777,
+      "sha256": "e383463175a3a9babdc307e243c54427d8e94294e2d966954ab663760dafa72d",
+      "pdf": true,
+      "publiclyCommitted": false
+    },
+    {
+      "file": "kaempfe2009.pdf",
+      "requestedUrl": "https://referenzrahmen-schulqualitaet.nrw.de/system/files/media/document/file/kaempfe_2009_schueleralsexpertenfuerunterricht.pdf",
+      "finalUrl": "https://referenzrahmen-schulqualitaet.nrw.de/system/files/media/document/file/kaempfe_2009_schueleralsexpertenfuerunterricht.pdf",
+      "status": 200,
+      "bytes": 216161,
+      "sha256": "7d943dbffef5926a972699230efcd419974aa93ee50ed776c251e98af1cd901a",
+      "pdf": true,
+      "identityCorrection": "Portal link label describes a2010 article, but actual downloaded PDF identifies Nicole Kämpfe, Schulleitung und Schulentwicklung, April2009,18pages. Use actual artifact identity, not link label.",
+      "publiclyCommitted": false
+    },
+    {
+      "file": "author2009.pdf",
+      "requestedUrl": "https://www.kompetenztest.de/download/szfb-2009-kaempfe-n-sefu-dds.pdf",
+      "finalUrl": "https://www.kompetenztest.de/download/szfb-2009-kaempfe-n-sefu-dds.pdf",
+      "status": 200,
+      "bytes": 221038,
+      "sha256": "58c3c97d32afa184c06103735ba8374be0d97b118e4ea4903248c56ec85ace03",
+      "pdf": true,
+      "publiclyCommitted": false
+    }
+  ],
+  "interpretation": "Official indexed descriptions support metadata; direct current service is offline. Dated2012/2016 documents and2009 research are separate historical versions. No current complete teacher short15 or permission to embed/reproduce source content in EduK12 obtained.",
+  "rights": {
+    "currentQuestionnaire": "EXTERNAL_PLATFORM_REUSE_UNCONFIRMED",
+    "historicalPdf": "Publicly readable institutional publications; no affirmative open license for embedded item reproduction established. Do not redistribute source items or images in PR.",
+    "actionsNotTaken": [
+      "created account",
+      "requested trial access",
+      "accepted terms",
+      "logged into others account",
+      "contacted authors/support",
+      "bypassed login or maintenance notice"
+    ],
+    "rawStorage": "Temporary research files in /tmp/sefu-self-20261102 of this environment, excluded from Git."
+  }
+}
