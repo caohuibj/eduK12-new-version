@@ -2305,8 +2305,9 @@ export const disableAccessToken = async (userId: string, role: UserRole, composi
   await prisma.compositeAssessmentAccessToken.update({ where: { id: tokenId }, data: { isActive: false } })
 }
 
-// Summary only tests marker presence. `true` stands in for a non-null column;
-// `null` is a loaded null; `undefined` (row or flag missing) stays fail-closed.
+// Summary only tests marker presence. `true` stands in for a JSON/text value
+// that is present; `null` is a loaded null. JSON null is absent, matching
+// Prisma (JsonNull and DbNull both become JS null). `undefined` stays fail-closed.
 const summaryPresenceBit = (value: unknown): true | null | undefined =>
   value === true ? true : value === false ? null : undefined
 
@@ -2316,35 +2317,157 @@ type SummaryMarkerPresence = {
   trainingFlowDigest: true | null | undefined
   trainingVariantFrozen: true | null | undefined
   hasCognitive: boolean | undefined
+  // Null when a training-flow marker is present (estimatedModules is unused).
+  moduleCount: number | null | undefined
+}
+
+const loadedMarkerBit = (value: unknown): true | null | undefined =>
+  value === undefined ? undefined : value !== null ? true : null
+
+const integerCount = (value: unknown): number | undefined => {
+  if (typeof value === 'number' && Number.isInteger(value) && value >= 0) return value
+  if (typeof value === 'bigint' && value >= 0n && value <= BigInt(Number.MAX_SAFE_INTEGER)) return Number(value)
+  return undefined
+}
+
+// A short or mistyped raw result must not be treated as "no markers". Fall
+// back to the Prisma read, which applies the same JS null check as detail mode.
+// Rows still missing after that read were deleted between queries and stay
+// fail-closed instead of failing the whole catalog.
+const loadSummaryMarkerPresenceFallback = async (ids: string[], includeCognitive: boolean) => {
+  const presence = new Map<string, SummaryMarkerPresence>()
+  const rows = await prisma.compositeAssessment.findMany({
+    where: { id: { in: ids } },
+    select: {
+      id: true,
+      trainingFlowDraft: true,
+      trainingFlowFrozen: true,
+      trainingFlowDigest: true,
+      trainingVariantFrozen: true,
+      ...(includeCognitive ? { items: { where: { type: 'COGNITIVE' as const }, select: { id: true }, take: 1 } } : {}),
+      _count: { select: { items: { where: { type: { not: 'FORM' as const } } }, formSections: true } },
+    },
+  }) as Array<{
+    id: string
+    trainingFlowDraft: unknown
+    trainingFlowFrozen: unknown
+    trainingFlowDigest: unknown
+    trainingVariantFrozen: unknown
+    items?: Array<{ id: string }>
+    _count?: { items?: number; formSections?: number }
+  }>
+  for (const row of rows) {
+    const trainingFlowDraft = loadedMarkerBit(row.trainingFlowDraft)
+    const trainingFlowFrozen = loadedMarkerBit(row.trainingFlowFrozen)
+    const trainingFlowDigest = loadedMarkerBit(row.trainingFlowDigest)
+    const trainingVariantFrozen = loadedMarkerBit(row.trainingVariantFrozen)
+    const flow = hasTrainingFlowDefinitionMarkers({ trainingFlowDraft, trainingFlowFrozen, trainingFlowDigest })
+    const items = integerCount(row._count?.items)
+    const sections = integerCount(row._count?.formSections)
+    presence.set(row.id, {
+      trainingFlowDraft,
+      trainingFlowFrozen,
+      trainingFlowDigest,
+      trainingVariantFrozen,
+      hasCognitive: includeCognitive ? (row.items?.length ?? 0) > 0 : undefined,
+      moduleCount: flow ? null : items !== undefined && sections !== undefined ? items + sections : undefined,
+    })
+  }
+  if (presence.size !== ids.length) {
+    logger.warn('Composite summary marker fallback did not cover every assessment', { requested: ids.length, returned: presence.size })
+  }
+  return presence
 }
 
 const loadSummaryMarkerPresence = async (ids: string[]) => {
-  const presence = new Map<string, SummaryMarkerPresence>()
-  if (!ids.length) return presence
-  // Column names match prisma/schema.prisma @@map / @map. Values stay parameters.
-  const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
-    SELECT "id",
-      ("training_flow_draft" IS NOT NULL) AS "trainingFlowDraft",
-      ("training_flow_frozen" IS NOT NULL) AS "trainingFlowFrozen",
-      ("training_flow_digest" IS NOT NULL) AS "trainingFlowDigest",
-      ("training_variant_frozen" IS NOT NULL) AS "trainingVariantFrozen",
-      EXISTS (
+  if (!ids.length) return new Map<string, SummaryMarkerPresence>()
+  // hasCognitive only filters the catalog and blocks new starts while the module is off.
+  const includeCognitive = !config.cognitiveModuleEnabled
+  const cognitiveSql = includeCognitive
+    ? Prisma.sql`EXISTS (
         SELECT 1 FROM "composite_assessment_items" AS item
         WHERE item."composite_assessment_id" = "composite_assessments"."id"
-          AND item."type"::text = 'COGNITIVE'
-      ) AS "hasCognitive"
-    FROM "composite_assessments"
-    WHERE "id" IN (${Prisma.join(ids)})
-  `)
-  for (const row of rows) {
-    if (typeof row.id !== 'string') continue
-    presence.set(row.id, {
-      trainingFlowDraft: summaryPresenceBit(row.trainingFlowDraft),
-      trainingFlowFrozen: summaryPresenceBit(row.trainingFlowFrozen),
-      trainingFlowDigest: summaryPresenceBit(row.trainingFlowDigest),
-      trainingVariantFrozen: summaryPresenceBit(row.trainingVariantFrozen),
-      hasCognitive: row.hasCognitive === true ? true : row.hasCognitive === false ? false : undefined,
+          AND item."type" = 'COGNITIVE'::"CompositeAssessmentItemType"
+      )`
+    : Prisma.sql`NULL::boolean`
+  let rows: unknown
+  try {
+    // Column names match prisma/schema.prisma @@map / @map. Values stay parameters.
+    // jsonb columns: JSON null is not SQL NULL, but Prisma returns it as JS null.
+    rows = await prisma.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
+      SELECT
+        marker."id",
+        marker."trainingFlowDraft",
+        marker."trainingFlowFrozen",
+        marker."trainingFlowDigest",
+        marker."trainingVariantFrozen",
+        marker."hasCognitive",
+        CASE
+          WHEN marker."trainingFlowDraft" OR marker."trainingFlowFrozen" OR marker."trainingFlowDigest" THEN NULL
+          ELSE (
+            (SELECT count(*)::int FROM "composite_assessment_items" AS item
+              WHERE item."composite_assessment_id" = marker."id"
+                AND item."type" <> 'FORM'::"CompositeAssessmentItemType")
+            +
+            (SELECT count(*)::int FROM "composite_form_sections" AS section
+              WHERE section."composite_assessment_id" = marker."id")
+          )
+        END AS "moduleCount"
+      FROM (
+        SELECT "id",
+          ("training_flow_draft" IS NOT NULL AND jsonb_typeof("training_flow_draft") <> 'null') AS "trainingFlowDraft",
+          ("training_flow_frozen" IS NOT NULL AND jsonb_typeof("training_flow_frozen") <> 'null') AS "trainingFlowFrozen",
+          ("training_flow_digest" IS NOT NULL) AS "trainingFlowDigest",
+          ("training_variant_frozen" IS NOT NULL AND jsonb_typeof("training_variant_frozen") <> 'null') AS "trainingVariantFrozen",
+          ${cognitiveSql} AS "hasCognitive"
+        FROM "composite_assessments"
+        WHERE "id" IN (${Prisma.join(ids)})
+      ) AS marker
+    `)
+  } catch {
+    logger.warn('Composite summary marker query failed; falling back to Prisma', { requested: ids.length })
+    return loadSummaryMarkerPresenceFallback(ids, includeCognitive)
+  }
+  const allowed = new Set(ids)
+  const presence = new Map<string, SummaryMarkerPresence>()
+  const list = Array.isArray(rows) ? rows : null
+  let valid = list !== null && list.length === ids.length
+  if (list && valid) {
+    for (const row of list) {
+      if (!row || typeof row !== 'object') { valid = false; break }
+      const record = row as Record<string, unknown>
+      const id = record.id
+      const trainingFlowDraft = record.trainingFlowDraft
+      const trainingFlowFrozen = record.trainingFlowFrozen
+      const trainingFlowDigest = record.trainingFlowDigest
+      const trainingVariantFrozen = record.trainingVariantFrozen
+      const flagsAreBoolean = [trainingFlowDraft, trainingFlowFrozen, trainingFlowDigest, trainingVariantFrozen]
+        .every((flag) => flag === true || flag === false)
+      const cognitive = includeCognitive ? record.hasCognitive : record.hasCognitive == null ? undefined : 'invalid'
+      const cognitiveOk = includeCognitive ? cognitive === true || cognitive === false : cognitive === undefined
+      if (typeof id !== 'string' || !allowed.has(id) || presence.has(id) || !flagsAreBoolean || !cognitiveOk) {
+        valid = false
+        break
+      }
+      const flow = trainingFlowDraft === true || trainingFlowFrozen === true || trainingFlowDigest === true
+      const moduleCount = flow ? (record.moduleCount === null ? null : undefined) : integerCount(record.moduleCount)
+      if (moduleCount === undefined) { valid = false; break }
+      presence.set(id, {
+        trainingFlowDraft: summaryPresenceBit(trainingFlowDraft),
+        trainingFlowFrozen: summaryPresenceBit(trainingFlowFrozen),
+        trainingFlowDigest: summaryPresenceBit(trainingFlowDigest),
+        trainingVariantFrozen: summaryPresenceBit(trainingVariantFrozen),
+        hasCognitive: includeCognitive ? cognitive === true : undefined,
+        moduleCount,
+      })
+    }
+  }
+  if (!valid || presence.size !== ids.length) {
+    logger.warn('Composite summary marker query was incomplete; falling back to Prisma', {
+      requested: ids.length,
+      returned: list ? list.length : -1,
     })
+    return loadSummaryMarkerPresenceFallback(ids, includeCognitive)
   }
   return presence
 }
@@ -2380,7 +2503,7 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       reportPackageVersion: true,
       reportPackageSnapshotEncrypted: !summary,
       // Detail still loads every marker: a missing property is UNKNOWN, not legacy.
-      // Summary asks only for IS NOT NULL, so the Json bodies are never parsed.
+      // Summary asks only for presence, so the Json bodies are never parsed.
       ...(summary ? {} : { trainingVariantFrozen: true, ...TRAINING_FLOW_DEFINITION_SELECT }),
       course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
       items: summary ? false : {
@@ -2395,10 +2518,6 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
         },
       },
       formSections: summary ? false : { orderBy: { position: 'asc' as const }, include: { items: { select: { id: true, contextKey: true } } } },
-      ...(summary ? { _count: { select: {
-        items: { where: { type: { not: 'FORM' as const } } },
-        formSections: true,
-      } } } : {}),
     },
   })
   const ids = list.map((item) => item.id)
@@ -2466,7 +2585,7 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
     const hideUnits = summary || variantFrozen != null || hasTrainingFlow
     const sections = summary ? [] : (item.formSections ?? [])
     const nonFormItems = summary ? [] : item.items.filter((child: any) => child.type !== 'FORM')
-    const moduleCount = summary ? item._count.items + item._count.formSections : nonFormItems.length + sections.length
+    const moduleCount = summary ? markers?.moduleCount : nonFormItems.length + sections.length
     const hasCognitive = summary ? markers?.hasCognitive !== false : item.items.some((child: any) => child.type === 'COGNITIVE')
     // Reuse one frozen-package decode for both projections. Hidden candidate
     // unions need only their count; never decode labels or build their units.
@@ -2498,7 +2617,7 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       description: item.description,
       instruction: summary ? null : item.instruction,
       deliveryMode: 'FINAL_ONLY' as const,
-      estimatedModules: hasTrainingFlow ? null : moduleCount,
+      estimatedModules: hasTrainingFlow || moduleCount == null ? null : moduleCount,
       course: item.course,
       opensAt: item.opensAt,
       expiresAt: item.expiresAt,

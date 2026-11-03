@@ -11,6 +11,7 @@ const { db } = vi.hoisted(() => ({ db: {
 } }))
 vi.mock('../../config/database', () => ({ prisma: db }))
 import { listAvailableForStudent } from '../../modules/composite/composite.service'
+import { config } from '../../config'
 import { compositeController } from '../../modules/composite/composite.controller'
 import { listStudentTasks } from '../../services/studentTasks'
 const now = new Date('2026-10-31T00:00:00.000Z')
@@ -55,12 +56,16 @@ beforeEach(() => {
       formSections: (row.formSections ?? []).length,
     } }))
   })
-  db.$queryRaw.mockImplementation(async () => rows.map(row => ({
-    id: row.id,
-    // These fixtures omit marker columns. Undefined keeps the same fail-closed card as an unprojected row.
-    trainingFlowDraft: undefined, trainingFlowFrozen: undefined, trainingFlowDigest: undefined, trainingVariantFrozen: undefined,
-    hasCognitive: (row.items ?? []).some((item: { type?: string }) => item.type === 'COGNITIVE'),
-  })))
+  db.$queryRaw.mockImplementation(async (query: { values?: unknown[] }) => {
+    const requested = new Set((query?.values ?? []).filter((value): value is string => typeof value === 'string'))
+    return rows.filter(row => requested.has(row.id)).map(row => ({
+      id: row.id,
+      // These fixtures have no marker columns. false is SQL NULL / JSON null (absent).
+      trainingFlowDraft: false, trainingFlowFrozen: false, trainingFlowDigest: false, trainingVariantFrozen: false,
+      hasCognitive: config.cognitiveModuleEnabled ? null : false,
+      moduleCount: (row.items ?? []).filter((item: { type?: string }) => item.type !== 'FORM').length + (row.formSections ?? []).length,
+    }))
+  })
   db.compositeAssessmentAttempt.findMany.mockImplementation(async ({ where, orderBy }) => {
     expect(where.userId).toBe('student'); expect(orderBy).toEqual({ startedAt: 'desc' })
     const result = attempts.filter(row => where.compositeAssessmentId.in.includes(row.compositeAssessmentId))
