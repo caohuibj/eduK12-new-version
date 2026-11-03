@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {runInNewContext} from 'node:vm';
+import {regressionGroups} from './backend-regression-selection.mjs';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const scopes = JSON.parse(fs.readFileSync(new URL('../config/acceptance-scopes.json', import.meta.url), 'utf8'));
@@ -317,7 +318,8 @@ test('media probes and grouped execution share scenarios, fresh databases and ex
 
 test('frontend compilation and checks are separate while both remain required',()=>{
   const ci=source('ci'),front=job(source('ci-frontend'),'frontend');
-  for(const name of ['backend','backend-regression','codeql','frontend-build']) assert.match(job(ci,name),/needs: scope/);
+  for(const name of ['backend','codeql','frontend-build']) assert.match(job(ci,name),/needs: scope/);
+  assert.match(job(ci,'backend-regression'),/needs: \[scope, backend-regression-reuse\]/);
   assert.match(front,/name: lint/);assert.match(front,/name: typecheck/);assert.match(front,/full frontend tests/);
   assert.match(front,/--frontend/);assert.match(front,/3072/);assert.match(front,/mac-ci-cleanup/);
   assert.match(front,/defaults:\n      run:\n        working-directory: server-version\/frontend\n/);
@@ -336,7 +338,6 @@ test('frontend compilation and checks are separate while both remain required',(
   assert.match(job(ci,'scope'),/head\.repo\.full_name == github\.repository/);
   const diagnostic=fs.readFileSync(new URL('./cognitive-ci-diagnostics.sh',import.meta.url),'utf8');
   assert.match(diagnostic,/server-version\/frontend[\s\S]*npm ci[\s\S]*server-version\/backend[\s\S]*cognitive:onboarding-check -- --all --json/);
-  assert.match(job(source('ci-cognitive-step'),'cognitive'),/cognitive-ci-diagnostics\.sh/);
 });
 
 test('manual step probes select one shared component and cannot schedule full CI or CodeQL', () => {
@@ -347,29 +348,23 @@ test('manual step probes select one shared component and cannot schedule full CI
   assert.match(job(ci,'probe-images'),/uses: \.\/\.github\/workflows\/ci-images\.yml/);
   assert.match(job(ci,'probe-cognitive'),/inputs\.step_probe == 'cognitive'/);
   const cognitiveProbe=job(ci,'probe-cognitive');
-  assert.doesNotMatch(cognitiveProbe,/uses: \.\/\.github\/workflows\/ci-cognitive-step\.yml/);
+  assert.doesNotMatch(cognitiveProbe,/uses: \.\/\.github\/workflows\//);
+  assert.match(cognitiveProbe,/cognitive-ci-diagnostics\.sh/);
   assert.match(cognitiveProbe,/permissions:\n      contents: read/);
-  const originalDiagnostic=job(source('ci-cognitive-step'),'cognitive');
-  assert.equal(cognitiveProbe.slice(cognitiveProbe.indexOf('    runs-on:')).trim(),originalDiagnostic.slice(originalDiagnostic.indexOf('    runs-on:')).trim());
   assert.match(job(ci,'probe-frontend'),/inputs\.step_probe == 'frontend'/);
   assert.match(job(ci,'probe-frontend'),/uses: \.\/\.github\/workflows\/ci-frontend\.yml/);
   assert.match(job(ci,'probe-maintenance'),/inputs\.step_probe == 'maintenance'/);
   assert.match(job(ci,'probe-maintenance'),/uses: \.\/\.github\/workflows\/ci-maintenance\.yml/);
   assert.match(source('ci-frontend'),/runs-on: ubuntu-24\.04/);
-  for(const name of ['backend','backend-regression','codeql']) assert.match(job(ci,name),/needs: scope/);
+  for(const name of ['backend','codeql']) assert.match(job(ci,name),/needs: scope/);
+  assert.match(job(ci,'backend-regression'),/needs: \[scope, backend-regression-reuse\]/);
 });
 
 test('different component probes have independent concurrency groups while same-route updates cancel stale runs', () => {
   const ci=source('ci');
   assert.match(ci,/group:.*inputs\.step_probe \|\| 'none'/);
   assert.match(ci,/group:.*inputs\.step_probe == 'images' && inputs\.probe_frontend_only && 'frontend' \|\| 'all'/);
-  const expression=ci.match(/^  cancel-in-progress: \$\{\{ (.+) \}\}$/m)?.[1];
-  assert.ok(expression,'ordinary updates must have an explicit cancellation condition');
-  const permits=new Function('github',`return (${expression});`);
-  const github=(head,ref)=>({event:{pull_request:{head:{ref:head}}},ref_name:ref});
-  assert.equal(permits(github('feature/test','feature/test')),true);
-  assert.equal(permits(github('fix/runtime-time-and-validation-20261025','feature/test')),false);
-  assert.equal(permits(github('feature/test','fix/runtime-time-and-validation-20261025')),false);
+  assert.match(ci,/^  cancel-in-progress: true$/m,'stale updates of the same route must be cancelled');
 });
 
 test('all versioned jobs are pinned to hosted Ubuntu and cannot accept local runner overrides',()=>{
@@ -477,7 +472,7 @@ test('light test-only route never starts unrelated builds, scans or platform smo
     // These existing job predicates use JavaScript-compatible boolean syntax.
     // Check the complete condition, including leading exact-route exclusions;
     // a textual prefix cannot establish that a later OR does not bypass it.
-    const allowed=new Function('needs','github','vars','cancelled',`return (${expression});`);
+    const allowed=new Function('needs','github','vars','cancelled','always',`return (${expression});`);
     let platformReachable=false;
     for(const event of ['pull_request','push','workflow_dispatch']) for(const draft of [false,true])
       for(const force of ['false','true']) for(const frontend of ['false','true']) {
@@ -487,9 +482,10 @@ test('light test-only route never starts unrelated builds, scans or platform smo
           repository:'caohuibj/eduK12-new-version',
           event:{pull_request:{draft,number:379,head:{ref:'feature/ci-synthetic',
             repo:{full_name:'caohuibj/eduK12-new-version'}}}}},vars={CI_FORCE_FULL:force};
-        assert.equal(allowed({scope:{outputs}},github,vars,()=>false),false,
+        const needs={scope:{result:'success',outputs},'backend-regression-reuse':{result:'skipped',outputs:{reuse_backend_regression:'false'}}};
+        assert.equal(allowed(needs,github,vars,()=>false,()=>true),false,
           name+' must exclude frontend-test for every event/draft/force/frontend context');
-        platformReachable||=allowed({scope:{outputs:{...outputs,scenario:'platform'}}},github,vars,()=>false);
+        platformReachable||=allowed({...needs,scope:{result:'success',outputs:{...outputs,scenario:'platform',application_route:'legacy'}}},github,vars,()=>false,()=>true);
       }
     assert.equal(platformReachable,true,name+' must still admit its ordinary platform work');
   }
@@ -522,7 +518,7 @@ test('backend regression groups isolate services and retain the complete mandato
   assert.match(groups,/timeout-minutes: 45/);
   assert.match(groups,/fail-fast: false/);
   assert.ok(groups.indexOf('uses: actions/setup-node@v4') < groups.indexOf('name: validate disjoint regression report controls'));
-  assert.ok(groups.includes('["fixtures","shard-1","shard-2","shard-3","shard-4"]'));
+  assert.ok(groups.includes(JSON.stringify(regressionGroups)));
   assert.ok(groups.includes('["focused"]'));
   assert.match(groups,/services:\n      postgres:/);assert.match(groups,/      redis:/);
   const steps=groups.split('      - name: ');
@@ -547,4 +543,48 @@ test('backend regression groups isolate services and retain the complete mandato
   assert.ok(aggregate.includes('hosted critical integration suites must not skip'));
   assert.ok(aggregate.includes('assert-release-test-report.mjs'));
   assert.doesNotMatch(aggregate,/continue-on-error:/);
+});
+
+test('backend-only unit edits use a dedicated bounded route with unchanged fixed merge gate',async()=>{
+  const {unitOnly}=await import('./ci-qualification.mjs');
+  const {requiredChecks}=await import('./merge-gate.mjs');
+  const ci=source('ci');
+  const scope=fs.readFileSync(new URL('./content-scope.mjs',import.meta.url),'utf8');
+  const gate=fs.readFileSync(new URL('./merge-gate.mjs',import.meta.url),'utf8');
+  const example={file:'server-version/backend/src/__tests__/situational/scientific-governance.test.ts',
+    status:'M',oldMode:'100644',newMode:'100644'};
+  assert.equal(unitOnly([example]),true);
+  assert.equal(unitOnly([example,{...example,file:'server-version/backend/src/modules/situational/runtime.ts'}]),false);
+  assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'backend-unit'}}},false),['scope','backend-unit']);
+  assert.match(scope,/backendUnit \? 'backend-unit'/);
+  assert.match(gate,/recomputed-backend-unit-scope/);
+  assert.match(job(ci,'backend-unit'),/ci-backend-unit-runner\.mjs/);
+  assert.ok(jobNeeds(job(ci,'merge-gate')).includes('backend-unit'));
+  const refs=[...ci.matchAll(/uses:\s+\.\/\.github\/workflows\/([^\s]+)/g)].map(row=>row[1]);
+  assert.ok(new Set(refs).size<=46,'No additional reusable-workflow fanout until legacy CI is simplified');
+});
+
+test('authenticated regression reuse executes only with a current-HEAD verifier and cannot bypass the merge gate',async()=>{
+  const {requiredChecks,failedChecks}=await import('./merge-gate.mjs');
+  const ci=source('ci');
+  const candidate=job(ci,'backend-regression-reuse');
+  const regression=job(ci,'backend-regression');
+  assert.match(candidate,/actions: read/);
+  assert.match(candidate,/ci-backend-regression-reuse\.mjs/);
+  assert.match(regression,/reuse_backend_regression != 'true'/);
+  assert.ok(jobNeeds(job(ci,'merge-gate')).includes('backend-regression-reuse'));
+  const base={scope:{result:'success',outputs:{application_route:'legacy',scenario:'platform'}}};
+  const notReused={...base,'backend-regression-reuse':{result:'success',outputs:{
+    reuse_backend_regression:'false',source_run:'',evidence_digest:''}}};
+  assert.ok(requiredChecks(notReused,false).includes('backend-regression'));
+  const reused={...base,'backend-regression-reuse':{result:'success',outputs:{
+    reuse_backend_regression:'true',source_run:'12345',evidence_digest:'a'.repeat(64)}}};
+  assert.ok(!requiredChecks(reused,false).includes('backend-regression'));
+  assert.ok(requiredChecks(reused,false).includes('backend-regression-reuse'));
+  assert.ok(failedChecks({...reused,'backend-regression-reuse':{
+    result:'failure',outputs:reused['backend-regression-reuse'].outputs}},false).includes('backend-regression-reuse'));
+  assert.ok(failedChecks({...reused,'backend-regression-reuse':{
+    result:'success',outputs:{reuse_backend_regression:'true',source_run:'',evidence_digest:''}}},false)
+    .includes('backend-regression-reuse-evidence'));
+  assert.ok(failedChecks({...notReused,'backend-regression':{result:'failure'}},false).includes('backend-regression'));
 });

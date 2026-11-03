@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: ${{ fromJSON(inputs.focus == 'full' && '["fixtures","shard-1","shard-2","shard-3","shard-4"]' || '["focused"]') }}
+        group: ${{ fromJSON(inputs.focus == 'full' && '["fixtures","shard-1","shard-2","shard-3","shard-4","shard-5","shard-6"]' || '["focused"]') }}
     env:
       NODE_ENV: test
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -143,7 +143,11 @@ jobs:
           # Self-hosted runners already retain ~/.npm; remote cache uploads can
           # block the single slot long after the tests and service cleanup finish.
           cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
-          cache-dependency-path: server-version/backend/package-lock.json
+          # The frontend lockfile is included because every group runs `npm ci` in
+          # server-version/frontend for the cross-tree Cognitive package tests.
+          cache-dependency-path: |
+            server-version/backend/package-lock.json
+            server-version/frontend/package-lock.json
       - name: validate disjoint regression report controls
         if: matrix.group == 'fixtures' || matrix.group == 'focused'
         run: node --test ../../.github/scripts/backend-regression-reports.test.mjs
@@ -153,14 +157,6 @@ jobs:
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - name: prepare canvas source-build dependencies
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
-      - name: accept original locked audit and unchanged backend unit evidence
-        if: inputs.focus == 'survey-wave-selection'
-        working-directory: .
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          git fetch --no-tags --depth=1 origin b65f7d658db33f1ebbf08e655f6d41164ebc653d
-          python3 -B .github/scripts/survey-wave-selection-reuse.py backend
       - name: npm ci
         run: npm ci
       - name: prisma generate and guarded migration
@@ -209,14 +205,12 @@ jobs:
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool evc_source_ci_test
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --owner=ptool evc_restore_ci_test
       - name: seed reference and configuration data
-        if: inputs.focus != 'survey-wave-selection'
         run: npm run db:seed
         env:
           ADMIN_USERNAME: ci-admin
           ADMIN_PASSWORD: ci-admin-password-2026
       - name: backfill check-in token protection
         id: regression-data
-        if: inputs.focus != 'survey-wave-selection'
         run: npm run db:backfill:checkin-tokens
       - name: prepare isolated Teacher restricted-runtime fixture
         id: teacher-runtime-fixture
@@ -229,14 +223,13 @@ jobs:
           docker exec "$CI_POSTGRES_SERVICE_ID" psql -X -v ON_ERROR_STOP=1 -U ptool -d pr363_runtime_test -c "CREATE ROLE pr363_runtime LOGIN PASSWORD 'synthetic-runtime-only' NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS; REVOKE CREATE ON DATABASE pr363_runtime_test FROM PUBLIC; REVOKE CREATE ON SCHEMA public FROM PUBLIC; GRANT CONNECT ON DATABASE pr363_runtime_test TO pr363_runtime; GRANT USAGE ON SCHEMA public TO pr363_runtime;"
           docker exec -i "$CI_POSTGRES_SERVICE_ID" psql -X -v ON_ERROR_STOP=1 -U ptool -d pr363_runtime_test -v target_database=pr363_runtime_test -v migration_owner=ptool -v runtime_role=pr363_runtime -v "table_policy=$(cat scripts/runtime-table-policy.json)" < scripts/runtime-role-defaults.sql
       - name: frontend dependencies for cross-tree Cognitive package tests
-        if: inputs.focus != 'survey-wave-selection'
         working-directory: server-version/frontend
         run: npm ci --ignore-scripts
       - name: validate regression selection
         env:
           REGRESSION_FOCUS: ${{ inputs.focus }}
         run: |
-          case "$REGRESSION_FOCUS" in full|reporting|assessment-repair|survey-wave-selection) ;; *) exit 1 ;; esac
+          case "$REGRESSION_FOCUS" in full|reporting|assessment-repair) ;; *) exit 1 ;; esac
       - name: prepare the existing historical schema and legacy publisher sources
         id: historical-fixtures
         if: inputs.focus == 'full' && matrix.group == 'fixtures'
@@ -252,15 +245,6 @@ jobs:
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --owner=ptool group_native_ci_test
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --owner=ptool group_native_restore_test_ci
           DATABASE_URL='postgresql://ptool:ptool123@localhost:5432/group_native_ci_test?schema=public' node node_modules/prisma/build/index.js migrate deploy --schema "$RUNNER_TEMP/group-native-main/server-version/backend/prisma/schema.prisma"
-      - name: bounded Survey Wave options and authoritative freeze contracts
-        if: inputs.focus == 'survey-wave-selection'
-        env:
-          SURVEY_PUBLICATION_ENABLED: 'true'
-          SURVEY_WORKSPACE_ENABLED: 'true'
-        run: |
-          npx tsc --noEmit --incremental false
-          npm test -- src/__tests__/measurement-content/survey-content-options.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
-          node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json src/__tests__/measurement-content/survey-content-options.postgres.integration.test.ts
       - name: R5 assessment repair regression
         if: inputs.focus == 'assessment-repair'
         env:

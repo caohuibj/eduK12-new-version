@@ -87,8 +87,9 @@ test('merge-gate large full-object transport preserves hostile strings with a sm
   for(const flag of ['frontend_build','ui_required','visual_hosted','codeql','media2','media7','situational_video','situational_branching','video_core','app_shell','canonical_visual','perf_smoke','ops'])outputs[flag]='true';
   outputs.media_selection=JSON.stringify(['media2','video_core','media7','situational_video','situational_branching']);
   outputs.media_groups=JSON.stringify(['images-video','cognitive-situational']);
-  const needs={scope:{result:'success',outputs}};
-  for(const key of requiredChecks(needs,false))if(key!=='scope')needs[key]={result:'success',outputs:{preserved:payload}};
+  const needs={scope:{result:'success',outputs},
+    'backend-regression-reuse':{result:'success',outputs:{reuse_backend_regression:'false'}}};
+  for(const key of requiredChecks(needs,false))if(key!=='scope'&&key!=='backend-regression-reuse')needs[key]={result:'success',outputs:{preserved:payload}};
   const serialize=value=>JSON.stringify(JSON.stringify(value));
   const write=value=>{writeFileSync(script,mergeGateWriter().replace('${{ toJSON(toJSON(needs)) }}',serialize(value)));return spawnSync(process.execPath,[script],{env,encoding:'utf8'});};
   const cli=()=>spawnSync(process.execPath,[new URL('./merge-gate.mjs',import.meta.url).pathname],{cwd:dir,env,encoding:'utf8'});

@@ -3,6 +3,10 @@
 首次 full、frontend-only、service 和 content 更新统一见 [部署操作手册](operations.md)。
 `server-version/scripts/release/update.sh` 默认只生成计划，复用现场 Compose 入口与现有内容 CLI；不自动构建、迁移小修或触发生产切换。
 
+## 退役的历史精确候选路线（2026-11-02）
+
+本文以下多数小节记录已合并 PR 的一次性“精确候选”路线（survey、training、school-teacher、scale-authoring、campus、PR356/357/363/364 等）。这些路线的 bindings、reuse 脚本、evidence、专用 workflow 和合并门禁分支已在 PR #613 删除，仅作审计记录，**不能**作为新 PR 的入口；新工作只使用通用分级与 A/B/C 规则，见 [ci-risk-tier-and-reuse.md](../ci-risk-tier-and-reuse.md)。目前唯一的跨提交 CI 复用是 `backend-regression-reuse`。
+
 ## Frontend startup / catalog paging scope (2026-10-21)
 
 This bounded `frontend-performance` scenario admits only the named product-entry,
@@ -290,7 +294,7 @@ GitHub 是此路线正式验收的唯一执行位置：scope 验证内容边界�
 
 ## 校园专用合并验证
 
-已授权的校园页面、导航与只读注册码解析使用[校园 CI 版本 1](campus-ci.md)的精确文件/模式路线。它保留注册、权限、账号域、MFA、实际候选页面、镜像安全及 CodeQL 和失败关闭的合并汇总；不冒充 A/B 部署资格。仅可核验、输入一致的本 PR 官方 artifact 可接纳已成功的构建/契约/镜像扫描；浏览器失败只能复验浏览器，异常证据停止。应用完整本地签名接纳仍未实现。
+校园页面等历史“精确文件/模式”路线（原 `campus-ci.md`）已于 2026-11-02 随过时 CI 清理退役，不再准入新 PR。
 
 
 ## Survey 首页专用合并验证（survey-home v1）

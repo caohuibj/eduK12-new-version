@@ -17,7 +17,7 @@ async function completeFour(page, label) {
   await answer.waitFor()
   assert.equal(await answer.inputValue(),'学习与合作')
   assert.equal(page.url(),route)
-  await page.getByRole('button',{name:'提交整个区段',exact:true}).click()
+  await page.getByRole('button',{name:'提交本页',exact:true}).click()
   await page.getByRole('button',{name:'是',exact:true}).click()
   await page.waitForTimeout(300)
   await page.getByRole('button',{name:'提交整份量表',exact:true}).click()

@@ -158,7 +158,7 @@ async function main() {
     await student.goto(base + '/student/composite/' + id)
     await student.locator('.training-form-surface').waitFor()
     const before = writes.length
-    await student.getByRole('button', { name: '提交整个区段', exact: true }).click()
+    await student.getByRole('button', { name: '提交本页', exact: true }).click()
     await student.getByText('还有 1 个必填字段未完成', { exact: true }).waitFor()
     assert.equal(writes.length, before)
     await student.locator('.form-player textarea').fill(text)
@@ -195,7 +195,7 @@ async function main() {
       }
       assert.equal(writes.length, i, 'Only previous section FINALs may have written')
       const final = student.waitForResponse(r => /\/form-sections\/[^/]+\/submit$/.test(new URL(r.url()).pathname) && r.request().method() === 'POST')
-      await student.getByRole('button', { name: '提交整个区段', exact: true }).click()
+      await student.getByRole('button', { name: '提交本页', exact: true }).click()
       const response = await final
       assert.equal(response.status(), 200)
       accepted.push(response.request().postDataJSON())

@@ -8,7 +8,7 @@ const change=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
 const entries=[...checks.sources,...checks.tests,...checks.documents,...checks.controls].map(change);
 const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
 const job=name=>ci.split('\n  '+name+':\n')[1]?.split(/\n(?=  \S)/)[0];
-const outputs={scenario:'catalog-discovery',application_route:'legacy',bundle_runtime:'true',bundle_family:'false',runner_profile:'hosted',run_performance_tests:'false',training_functional_only:'false',admin_permissions_functional_only:'false',codeql:'true',frontend_affected:'true',media_selection:'[]',media_groups:'[]',...Object.fromEntries(['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content','presentation','frontend','documentation',...Object.keys(acceptanceFor([]))].map(k=>[k,'false']))};
+const outputs={scenario:'catalog-discovery',application_route:'legacy',bundle_runtime:'true',bundle_family:'false',runner_profile:'hosted',codeql:'true',frontend_affected:'true',media_selection:'[]',media_groups:'[]',...Object.fromEntries(['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content','presentation','frontend','documentation',...Object.keys(acceptanceFor([]))].map(k=>[k,'false']))};
 
 test('runtime focus accepts only enumerated regular runtime, tests, documents and route controls',()=>{
  assert(bundleRuntimeScope(entries));assert(catalogDiscoveryScope(entries));
@@ -36,7 +36,7 @@ test('Ready requires actual bounded backend frontend image and SAST success; Dra
 });
 
 test('existing jobs select this recipe without starting platform maintenance mini media or recovery jobs',()=>{
- const needs={scope:{result:'success',outputs}},github={event_name:'pull_request',ref_name:'test',event:{pull_request:{number:999,draft:false,head:{ref:'test'}}}},vars={CI_FORCE_FULL:'false'};
+ const needs={scope:{result:'success',outputs},'backend-regression-reuse':{result:'skipped',outputs:{reuse_backend_regression:'false'}}},github={event_name:'pull_request',ref_name:'test',event:{pull_request:{number:999,draft:false,head:{ref:'test'}}}},vars={CI_FORCE_FULL:'false'};
  const selected=[];
  for(const name of ['catalog-discovery','frontend','docker','codeql','backend','backend-regression','pr-light-backend','pr-light-frontend','backend-browser-build','frontend-build','browser','maintenance','miniprogram','accept-media','accept-ui','accept-visual','accept-perf','accept-ops']){
   const text=job(name);assert(text,name);const expression=text.match(/^    if: (?:\$\{\{ )?(.+?)(?: \}\})?$/m)?.[1];assert(expression,name);

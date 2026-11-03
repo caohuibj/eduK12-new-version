@@ -76,7 +76,7 @@ test('complete-group report coverage rejects missing, foreign and duplicate path
 
 test('group aggregation refuses missing, repeated or inconsistent inventories',async()=>{
   const {assertRegressionGroupCoverage}=await import('./backend-regression-reports.mjs');
-  const names=['fixtures','shard-1','shard-2','shard-3','shard-4'];
+  const {regressionGroups:names}=await import('./backend-regression-selection.mjs');
   const files=names.map(name=>`src/__tests__/${name}.test.ts`).sort();
   const plans=names.map(group=>({group,expectedFiles:[`src/__tests__/${group}.test.ts`],fullExpectedFiles:files}));
   const combined=mergeRegressionReports(files.map(file=>report(file)));
@@ -93,7 +93,7 @@ test('same-run retries retain immutable attempts and choose newest per group wit
   const {collectRegressionGroups}=await import('./backend-regression-reports.mjs');
   const directory=mkdtempSync(join(tmpdir(),'regression-attempts-'));t.after(()=>rmSync(directory,{recursive:true,force:true}));
   const execution={runId:'123',sha:'a'.repeat(40),attempt:2};
-  const groups=['fixtures','shard-1','shard-2','shard-3','shard-4'];
+  const {regressionGroups:groups}=await import('./backend-regression-selection.mjs');
   const files=groups.map(group=>`src/__tests__/${group}.test.ts`).sort();
   function artifact(group,attempt,passed=true,changes={}){
     const dir=join(directory,`backend-regression-group-${group}-run-123-attempt-${attempt}`);mkdirSync(dir,{recursive:true});

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { classifyChanges, maintenanceFile, acceptanceFor } from './content-scope.mjs';
 import { requiredChecks, failedChecks } from './merge-gate.mjs';
 const root = 'server-version/scripts/attachment-backup/';
@@ -94,7 +94,7 @@ test('normal scheduler runs maintenance for pure attachment changes and keeps ap
   const routingInstall='npm ci --prefix .github/release-tools --ignore-scripts --no-audit --no-fund';
   assert.equal(lane.split(routingInstall).length-1,1,'only the exact locked routing-tool install is allowed');
   assert.ok(lane.includes(`      - name: prepare locked CI routing parser dependencies
-        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true' && steps.cdnscope.outputs.cdn_only != 'true'
+        if: steps.backupscope.outputs.backup_only != 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         run: ${routingInstall}`),'routing tools keep the existing qualification guards');
   assert.doesNotMatch(lane.replace(routingInstall,''),/npm ci|DATABASE_URL|COS_SECRET|BACKUP_ENCRYPTION_KEY/);
   for(const name of ['ci-backend','ci-frontend'])
@@ -182,25 +182,19 @@ test('daily backup chain and read-only capacity planning use exact maintenance p
 });
 
 
-test('reviewed merge evidence is limited to the maintenance route and exact admission files',()=>{
- const host='server-version/scripts/host-ops/';
- for(const path of ['.github/scripts/maintenance-merge.py','.github/scripts/test_maintenance_merge.py'])
-   assert.equal(classifyChanges([entry(host+'storage.py'),entry(path)]).maintenance,true,path);
- assert.equal(classifyChanges([entry(host+'storage.py'),entry('.github/scripts/fake-maintenance-proof.py')]).maintenance,false);
+test('maintenance lane keeps its real checks and no exact-run follow-up shortcuts',()=>{
  const ci=source('ci'),lane=source('ci-maintenance');
- assert.match(job(ci,'maintenance'),/merge_proof:.*pull_request.number == 292.*outputs.scenario == 'maintenance'/);
  assert.match(job(ci,'scope'),/affected maintenance routing and merge contracts/);
- assert.match(lane,/python3 -B .github\/scripts\/maintenance-merge.py/);
+ assert.doesNotMatch(lane,/followup|qualified|merge_proof|maintenance-merge/);
+ assert.equal(existsSync(new URL('./maintenance-merge.py',import.meta.url)),false);
  for(const name of ['CI routing and attachment invariants','Host launcher and existing monitoring guards',
  'Check shell and systemd units without starting production services','Real isolated Docker launcher and failed-task cleanup',
- 'Actual encrypted database restore and failure-volume cleanup']) {
-  const step=lane.split('      - name: '+name+'\n')[1]?.split('      - name: ')[0]??'';
-  assert.match(step,/steps.mergequalified.outputs.reused != 'true'/,name);
- }
+ 'Actual encrypted database restore and failure-volume cleanup'])
+  assert.ok(lane.includes('      - name: '+name+'\n'),name);
  assert.match(job(ci,'merge-gate'),/run: node .github\/scripts\/merge-gate.mjs/);
 });
 
- test('CDN viewer-only operations use exact host maintenance files',()=>{
+test('CDN viewer-only operations use exact host maintenance files',()=>{
   const host='server-version/scripts/host-ops/';
   for(const file of ['cdn.py','test_cdn.py','cdn-origin.cjs','cdn-origin.test.cjs','CDN.md'])assert.equal(classifyChanges([entry(host+file)]).maintenance,true,file);
   for(const file of ['cdn-delete-media.py','cdn-publish-app.py'])assert.equal(classifyChanges([entry(host+'cdn.py'),entry(host+file)]).maintenance,false,file);
