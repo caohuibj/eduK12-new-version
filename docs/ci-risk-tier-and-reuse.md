@@ -66,7 +66,8 @@ PR #613 合并后的首个完整 run（41563144407，22 分 7 秒）实测：除
 - Backend Regression 的串行 shard 由 4 个增加为 6 个（`regressionShardCount`，每个约 226 个文件，仍保持互斥且覆盖完整）；该常量同时驱动分区、报告汇总、复用验证，workflow matrix 由测试断言与其一致。串行的 `fixtures` 分组（有序 producer/consumer，约 888s）成为最长的 backend-regression job；并发峰值由 16 增加到约 18，低于免费计划 20 个并发上限。
 - 回归 job 的 npm 缓存纳入 `server-version/frontend/package-lock.json`，减少每个分组约 50s 的跨树前端 `npm ci` 的下载时间。
 - 未采用：并行文件执行（每组独占一个 Postgres/Redis，本机实测 80 个文件 86s→60s 且暴露共享数据库冲突）、全局 `isolate`/`pool` 调整（大量测试依赖 `vi.mock`），以及未经验证的“无 DB 文件”分类。
-- 不改变：必需检查 `merge gate / ready PR`、任何断言或扫描阈值。预期（需在本 PR 的实测 run 中核对，而非预先声称）：首轮全量约 16–17 分钟；仅前端/文档的后续推送在复用通过时跳过回归，约 13 分钟（codeql 与 browser 链）。
+- 不改变：必需检查 `merge gate / ready PR`、任何断言或扫描阈值。
+- 实测（PR #614 首轮全量 run 41570391106）：全流程 16m 50s（原 22m 7s）；backend regression 各组 fixtures 880s、shard-6 884s、shard-2 841s、shard-5 783s、shard-1 624s、shard-3 610s、shard-4 544s，其余 job 均 ≤ 755s。此后串行 `fixtures`（有序 producer/consumer，无法在不改变保留数据库顺序的前提下拆分）与 shard 之间的文件权重不均（轮询按文件数而非耗时分配）是剩余的关键路径；进一步按实测耗时均衡 shard 预计只再节省约 1 分钟，未在本 PR 实施。
 
 ## 保留的分级与复用（以实际代码为准）
 
