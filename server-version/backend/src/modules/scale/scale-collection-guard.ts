@@ -1,5 +1,5 @@
 import {assertLibraryUseGrantCurrent} from '../scale-library-governance/usage'
-import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
+import {assertToolEntryPolicy,lockToolPolicyAdmission} from '../assessment-governance/tool-entry-policy'
 import {getScaleInstrumentSource} from './onboarding/instrument-registry'
 import {scaleSourcePolicyIdentity} from './onboarding/source-snapshot'
 import {ContentReleaseError} from '../measurement-content/release'
@@ -82,6 +82,17 @@ export async function assertTrainingScaleCollectionAllowed(tx:Prisma.Transaction
   if(!newEntryIds.length)return
   const standard=await tx.$queryRaw<Array<{code:string;instrument_version:string;instrument_class:string;library_entry_id:string|null;measurement_release_id:string|null;content_hash:string|null}>>(Prisma.sql`SELECT s.code,s.instrument_version,s.instrument_class::text,s.library_entry_id,s.measurement_release_id,r.content_hash FROM scales s LEFT JOIN measurement_content_releases r ON r.id=s.measurement_release_id
     WHERE s.id IN (${Prisma.join(newEntryIds)}) AND (s.instrument_class='STANDARD' OR s.library_entry_id IS NOT NULL) ORDER BY s.id FOR SHARE OF s`)
+  // Shared admission locks in one sorted batch when no row needs a library
+  // use-grant check: revocation locks use-grant before tool-grant, so rows that
+  // check a use-grant keep that order through the per-row path below.
+  if(!scope.sourceOwnerId||!standard.some(row=>row.library_entry_id)){
+   const identities=standard.flatMap(row=>{
+    if(row.library_entry_id)return row.measurement_release_id&&row.content_hash?[{resourceKey:'release:'+row.measurement_release_id,fingerprint:row.content_hash}]:[]
+    const source=getScaleInstrumentSource(row.code,row.instrument_version)
+    return source?[scaleSourcePolicyIdentity(source)]:[]
+   })
+   await lockToolPolicyAdmission(tx,identities)
+  }
   const checkedEntries=new Set<string>()
   for(const row of standard){
     if(row.library_entry_id){

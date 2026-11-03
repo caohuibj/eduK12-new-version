@@ -4,8 +4,54 @@ export type ToolEntryProduct='TRAINING'|'SURVEY'
 export type StandardCombinationEntryProduct=ToolEntryProduct|'SCHOOL'|'TEACHER'
 export type PolicyIdentity={resourceKey:string;fingerprint:string}
 export type ToolPolicy={decision:'PENDING'|'APPROVED'|'RETURNED';paused:boolean;version:number;reason:string}
-export async function readToolPolicy(tx:Prisma.TransactionClient,identity:PolicyIdentity,lock=false,product:StandardCombinationEntryProduct='SURVEY'):Promise<ToolPolicy>{
- if(lock)await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-tool:'+identity.resourceKey}))`
+/** Tool-policy lock modes on the shared `survey-tool:<resourceKey>` advisory key.
+ * ADMISSION_READ: transaction-scoped SHARED lock, taken before the policy row is
+ * read and held to commit. Concurrent admissions do not block each other.
+ * POLICY_MUTATION: transaction-scoped EXCLUSIVE lock. A writer waits for every
+ * in-flight admission that already holds the shared lock, and while it waits or
+ * holds the key, later shared requests queue behind it. So once a mutation has
+ * committed and returned, no admission can still commit on the old policy.
+ * Never cache the policy row: only the lock acquisition is de-duplicated, and
+ * only inside one interactive transaction. */
+export type ToolPolicyLock=false|'ADMISSION_READ'|'POLICY_MUTATION'
+type HeldMode='SHARED'|'EXCLUSIVE'
+const heldToolPolicyLocks=new WeakMap<object,Map<string,HeldMode>>()
+const toolPolicyLockKey=(identity:PolicyIdentity)=>'survey-tool:'+identity.resourceKey
+/** Interactive transaction clients have no `$transaction`. The global client
+ * runs each statement in its own implicit transaction, so never de-duplicate it. */
+function heldLocks(tx:Prisma.TransactionClient){
+ if(typeof (tx as {$transaction?:unknown}).$transaction==='function')return null
+ let held=heldToolPolicyLocks.get(tx)
+ if(!held){held=new Map();heldToolPolicyLocks.set(tx,held)}
+ return held
+}
+function sortedKeys(identities:readonly PolicyIdentity[]){
+ return [...new Set(identities.map(toolPolicyLockKey))].sort()
+}
+/** SHARED admission lock for every identity, each key at most once per
+ * transaction, multiple keys in one statement in sorted key order. */
+export async function lockToolPolicyAdmission(tx:Prisma.TransactionClient,identities:readonly PolicyIdentity[]){
+ const held=heldLocks(tx)
+ const keys=sortedKeys(identities).filter(key=>!held?.has(key))
+ if(!keys.length)return
+ if(keys.length===1)await tx.$executeRaw`SELECT pg_advisory_xact_lock_shared(hashtext(${keys[0]}))`
+ else await tx.$executeRaw`SELECT count(pg_advisory_xact_lock_shared(hashtext(k))) FROM unnest(${keys}::text[]) WITH ORDINALITY AS t(k,n)`
+ for(const key of keys)held?.set(key,'SHARED')
+}
+/** EXCLUSIVE mutation lock, sorted key order, each key at most once per
+ * transaction. A shared key already held by this transaction is still upgraded:
+ * no current mutator reads its own key as an admission first. */
+export async function lockToolPolicyMutation(tx:Prisma.TransactionClient,identities:readonly PolicyIdentity[]){
+ const held=heldLocks(tx)
+ for(const key of sortedKeys(identities)){
+  if(held?.get(key)==='EXCLUSIVE')continue
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${key}))`
+  held?.set(key,'EXCLUSIVE')
+ }
+}
+export async function readToolPolicy(tx:Prisma.TransactionClient,identity:PolicyIdentity,lock:ToolPolicyLock=false,product:StandardCombinationEntryProduct='SURVEY'):Promise<ToolPolicy>{
+ if(lock==='ADMISSION_READ')await lockToolPolicyAdmission(tx,[identity])
+ else if(lock==='POLICY_MUTATION')await lockToolPolicyMutation(tx,[identity])
  const rows=await tx.$queryRaw<ToolPolicy[]>(Prisma.sql`SELECT decision,paused,version,reason FROM survey_tool_policies
   WHERE product=${product} AND resource_key=${identity.resourceKey} AND fingerprint=${identity.fingerprint} ${lock?Prisma.sql`FOR SHARE`:Prisma.empty}`)
  return rows[0]??{decision:'PENDING',paused:false,version:0,reason:product+' 入口尚未获准'}
@@ -49,7 +95,7 @@ export async function approveCognitiveProfileEntryPolicies(tx:Prisma.Transaction
  return writeEntryPolicies(tx,identity,exactStandardCombinationEntryProducts(rawProducts),actorId,reason)
 }
 async function writeEntryPolicies<T extends StandardCombinationEntryProduct>(tx:Prisma.TransactionClient,identity:PolicyIdentity,products:T[],actorId:string,reason:string){
- await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-tool:'+identity.resourceKey}))`
+ await lockToolPolicyMutation(tx,[identity])
  // A later explicit scope change stops new admission in removed entries.
  await tx.$executeRaw(Prisma.sql`UPDATE survey_tool_policies SET decision='RETURNED',reason=${reason},reviewed_by=${actorId},
   version=version+1,updated_at=clock_timestamp() WHERE resource_key=${identity.resourceKey} AND fingerprint=${identity.fingerprint}
@@ -61,7 +107,7 @@ async function writeEntryPolicies<T extends StandardCombinationEntryProduct>(tx:
  return products
 }
 export async function assertToolEntryPolicy(tx:Prisma.TransactionClient,identity:PolicyIdentity,product:StandardCombinationEntryProduct){
- const policy=await readToolPolicy(tx,identity,true,product)
+ const policy=await readToolPolicy(tx,identity,'ADMISSION_READ',product)
  if(policy.decision!=='APPROVED'||policy.paused)throw new AdminPermissionError(409,'该精确版本未获本入口准入或已停止新增使用：'+product+'；'+policy.reason)
  return policy
 }
