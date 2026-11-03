@@ -397,7 +397,7 @@ const runCompositeFlow = async (browser, fixture, publicMode) => {
       assert.equal(await request.headerValue('x-recovery-token'), recoveryToken, 'public Form image request did not carry the existing recovery token')
     }
 
-    await page.getByRole('button', { name: '提交整个区段', exact: true }).click()
+    await page.getByRole('button', { name: '提交本页', exact: true }).click()
     await page.getByRole('heading', { name: fixture.scale.name, exact: true }).waitFor({ state: 'visible', timeout: 30000 })
     await assertImage(page, fixture.scale.assetId, 'MEDIA-2 scale question image')
     await page.getByRole('button', { name: '选项 1', exact: true }).click()

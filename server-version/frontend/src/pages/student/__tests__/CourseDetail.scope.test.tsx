@@ -35,5 +35,5 @@ it('scopes both Composite availability and delivery pagination to the current co
   expect({
     availabilityOptions: get.mock.calls.find(([path]) => path === '/composite-assessments/available')?.[1],
     taskURIs: get.mock.calls.filter(([path]) => path.startsWith('/courses/my/tasks?')).map(([path]) => path),
-  }).toEqual({ availabilityOptions: { params: { courseId } }, taskURIs: ['/courses/my/tasks?page=1&pageSize=100&courseId=course-a'] })
+  }).toEqual({ availabilityOptions: { params: { courseId, view: 'summary' } }, taskURIs: ['/courses/my/tasks?page=1&pageSize=100&courseId=course-a'] })
 })

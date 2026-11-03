@@ -1,0 +1,341 @@
+{
+  "dataKind": "synthetic_only",
+  "representative": {
+    "key": "rpq2024_reflective_practice10_teacher_self_en",
+    "normal": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "60fdcf52-91ad-47e7-9fea-58c036701e76",
+        "code": "rpq2024_reflective_practice10_teacher_self_en",
+        "name": "RPQ｜专业反思｜教师自评｜2024英文10题",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "60fdcf52-91ad-47e7-9fea-58c036701e76",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "76f03d0cc250107319e6365c5d86d39147aa7966ca721f32acad099b97f2a166",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "teacher",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "RPQ2024_01",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "RPQ2024_02",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "RPQ2024_03",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "RPQ2024_04",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "RPQ2024_05",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "RPQ2024_06",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "RPQ2024_07",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "RPQ2024_08",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "RPQ2024_09",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "RPQ2024_10",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        }
+      ],
+      "scores": [
+        {
+          "key": "reflective_practice10",
+          "type": "total",
+          "label": "Reflective practice (mean 1–6)",
+          "description": "More frequent self-reported reflection during and after professional interactions, not objectively better teaching.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 3.5,
+          "range": {
+            "min": 1,
+            "max": 6
+          },
+          "expectedItems": [
+            "RPQ2024_01",
+            "RPQ2024_02",
+            "RPQ2024_03",
+            "RPQ2024_04",
+            "RPQ2024_05",
+            "RPQ2024_06",
+            "RPQ2024_07",
+            "RPQ2024_08",
+            "RPQ2024_09",
+            "RPQ2024_10"
+          ],
+          "answeredItems": [
+            "RPQ2024_01",
+            "RPQ2024_02",
+            "RPQ2024_03",
+            "RPQ2024_04",
+            "RPQ2024_05",
+            "RPQ2024_06",
+            "RPQ2024_07",
+            "RPQ2024_08",
+            "RPQ2024_09",
+            "RPQ2024_10"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "reflective_practice10",
+          "headline": "Your professional reflective practice in context",
+          "label": null,
+          "interpretation": "This mean describes how often you reported reflecting on interactions, your own assumptions and ways to improve practice. More frequent reflection is not proof of effective teaching, student progress or better professional decisions; it also does not establish rumination. You can keep a helpful reflective habit while checking what happened in one concrete interaction. If reflection feels difficult, time, workload and access to a trusted colleague may matter alongside personal habits. The mean ranges from 1 to 6 and follows the source frequency anchors; it is not a population percentile. No high/low threshold or teacher ranking is applied.",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "Choose one interaction. Separate what you observed from what you inferred, and choose one small action or question to check next time."
+            },
+            {
+              "category": "support",
+              "text": "Use practical support that fits your situation. You do not need to change a number or complete repeated questionnaires before asking for help."
+            }
+          ],
+          "limitations": [
+            "English2024 professional self-report; client/student wording follows original instruction, not a validated Chinese teacher adaptation.",
+            "No author missing-answer rule was located. Project complete_required withholds this component mean if any item is missing; missing is not zero and no imputation is used. Other independently completed components remain separate.",
+            "Splitting author-scored components does not prove independent administration equivalence; preserve the full30-item sequence for studies using the original extended protocol.",
+            "No local teacher norm, diagnosis, student-outcome inference or cross-component total."
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "English2024 professional self-report; client/student wording follows original instruction, not a validated Chinese teacher adaptation.",
+        "No author missing-answer rule was located. Project complete_required withholds this component mean if any item is missing; missing is not zero and no imputation is used. Other independently completed components remain separate.",
+        "Splitting author-scored components does not prove independent administration equivalence; preserve the full30-item sequence for studies using the original extended protocol.",
+        "No local teacher norm, diagnosis, student-outcome inference or cross-component total.",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "Teacher development and research only. Rogers, S. L., Van Winkle, L., Michels, N., Lucas, C., Ziada, H., Da Silva, E. J., Jotangia, A., Gabrielsson, S., Gustafsson, S., & Priddis, L. (2024). Further development of the reflective practice questionnaire. PeerJ 12:e16879. https://doi.org/10.7717/peerj.16879"
+    },
+    "missing": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "60fdcf52-91ad-47e7-9fea-58c036701e76",
+        "code": "rpq2024_reflective_practice10_teacher_self_en",
+        "name": "RPQ｜专业反思｜教师自评｜2024英文10题",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "60fdcf52-91ad-47e7-9fea-58c036701e76",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "76f03d0cc250107319e6365c5d86d39147aa7966ca721f32acad099b97f2a166",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "teacher",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "invalid",
+        "flags": [
+          "missing_items",
+          "score_not_calculable"
+        ]
+      },
+      "itemScores": [
+        {
+          "itemCode": "RPQ2024_02",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "RPQ2024_03",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "RPQ2024_04",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "RPQ2024_05",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "RPQ2024_06",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "RPQ2024_07",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "RPQ2024_08",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "RPQ2024_09",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "RPQ2024_10",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        }
+      ],
+      "scores": [
+        {
+          "key": "reflective_practice10",
+          "type": "total",
+          "label": "Reflective practice (mean 1–6)",
+          "description": "More frequent self-reported reflection during and after professional interactions, not objectively better teaching.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": null,
+          "range": {
+            "min": 1,
+            "max": 6
+          },
+          "expectedItems": [
+            "RPQ2024_01",
+            "RPQ2024_02",
+            "RPQ2024_03",
+            "RPQ2024_04",
+            "RPQ2024_05",
+            "RPQ2024_06",
+            "RPQ2024_07",
+            "RPQ2024_08",
+            "RPQ2024_09",
+            "RPQ2024_10"
+          ],
+          "answeredItems": [
+            "RPQ2024_02",
+            "RPQ2024_03",
+            "RPQ2024_04",
+            "RPQ2024_05",
+            "RPQ2024_06",
+            "RPQ2024_07",
+            "RPQ2024_08",
+            "RPQ2024_09",
+            "RPQ2024_10"
+          ],
+          "status": "not_calculable",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [],
+      "caveats": [
+        "English2024 professional self-report; client/student wording follows original instruction, not a validated Chinese teacher adaptation.",
+        "No author missing-answer rule was located. Project complete_required withholds this component mean if any item is missing; missing is not zero and no imputation is used. Other independently completed components remain separate.",
+        "Splitting author-scored components does not prove independent administration equivalence; preserve the full30-item sequence for studies using the original extended protocol.",
+        "No local teacher norm, diagnosis, student-outcome inference or cross-component total.",
+        "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "Teacher development and research only. Rogers, S. L., Van Winkle, L., Michels, N., Lucas, C., Ziada, H., Da Silva, E. J., Jotangia, A., Gabrielsson, S., Gustafsson, S., & Priddis, L. (2024). Further development of the reflective practice questionnaire. PeerJ 12:e16879. https://doi.org/10.7717/peerj.16879"
+    }
+  },
+  "allFourReportOutcomes": [
+    {
+      "key": "rpq2024_reflective_practice10_teacher_self_en",
+      "normalMean": 3.5,
+      "normalQuality": "interpretable",
+      "normalInterpretations": 1,
+      "missingMean": null,
+      "missingQuality": "invalid",
+      "missingInterpretations": 0
+    },
+    {
+      "key": "rpq2024_confidence8_teacher_self_en",
+      "normalMean": 3.5,
+      "normalQuality": "interpretable",
+      "normalInterpretations": 1,
+      "missingMean": null,
+      "missingQuality": "invalid",
+      "missingInterpretations": 0
+    },
+    {
+      "key": "rpq2024_uncertainty_stress8_teacher_self_en",
+      "normalMean": 3.5,
+      "normalQuality": "interpretable",
+      "normalInterpretations": 1,
+      "missingMean": null,
+      "missingQuality": "invalid",
+      "missingInterpretations": 0
+    },
+    {
+      "key": "rpq2024_work_satisfaction4_teacher_self_en",
+      "normalMean": 3.5,
+      "normalQuality": "interpretable",
+      "normalInterpretations": 1,
+      "missingMean": null,
+      "missingQuality": "invalid",
+      "missingInterpretations": 0
+    }
+  ]
+}

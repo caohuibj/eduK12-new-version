@@ -59,7 +59,11 @@ describe('server-wide discovery before public-catalog pagination', () => {
     expect(result.hasMore).toBe(false)
     expect(result.list[0].tags).toContain('student_self_report')
     expect(result.list[0].classificationTags).toContainEqual({ id: 'student_self_report', label: '学生', facet: 'population' })
-    expect(result.tagFacets.subject).toHaveLength(6)
+    // Facets describe the entire catalog, including the KSTC science sources,
+    // even when the requested old tag and Chinese alias match only mathematics.
+    expect(result.tagFacets.subject.map(tag => tag.id).sort()).toEqual([
+      'biology', 'chemistry', 'chinese', 'english', 'mathematics', 'physics', 'subject:science',
+    ])
   })
   it('paginates every source-declared student standard version without duplicates or missing versions', async () => {
     expect(studentVersions.length).toBeGreaterThan(25)

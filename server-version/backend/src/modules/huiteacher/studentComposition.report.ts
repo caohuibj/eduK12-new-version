@@ -1,4 +1,5 @@
 import {describeFormResponse} from '../assessment-core/form/descriptive'
+import {privateToolContentHash} from '../education-tools/private-tool.definition'
 import {Prisma} from '@prisma/client'
 import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
 import {readFormSectionCollectionFacts} from '../assessment-runtime/form-facts'
@@ -26,13 +27,15 @@ export async function collectStudentCompositionFinals(tx:Tx,input:{organizationI
  if(identity.origin.variantKey!=='TEACHER:STUDENT_REPORT'||identity.origin.contentHash!==input.contentHash)fail()
  // Read original Form definitions once for immutable question identity and
  // comparable hashes; Scale reporting needs only score labels, never formulas.
- const definitions=await tx.$queryRaw<Array<{blockId:string;definition:unknown;scores:Array<{key:string;label:string;displayPrecision?:number}>|null}>>(Prisma.sql`
-  SELECT b->>'blockId' AS "blockId",
+ const definitions=await tx.$queryRaw<Array<{blockId:string;definition:unknown;privateTitle:string|null;privateHash:string|null;scores:Array<{key:string;label:string;displayPrecision?:number}>|null}>>(Prisma.sql`
+  SELECT b->>'blockId' AS "blockId",v.title AS "privateTitle",v.content_hash AS "privateHash",
    CASE WHEN b->>'kind'='FORM' THEN COALESCE(v.definition,g.snapshot#>'{unit,displayDefinition}') END AS definition,
    CASE WHEN b->>'kind'='SCALE' THEN (SELECT jsonb_agg(jsonb_build_object('key',score->>'key','label',score->>'label','displayPrecision',score->'displayPrecision'))
     FROM jsonb_array_elements(COALESCE(v.definition,std.snapshot->'definition',library.snapshot->'compiledDefinition')->'scoring'->'scores') score) END AS scores
   FROM composite_assessments c CROSS JOIN LATERAL jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b
   LEFT JOIN education_private_tool_versions v ON v.id=b->>'versionId' AND b->>'sourceProvider'='PRIVATE_VERSION'
+   AND v.entry='TEACHER' AND v.organization_id=${input.organizationId} AND v.owner_user_id=${identity.origin.ownerUserId}
+   AND v.kind=b->>'kind' AND v.content_hash=b->>'contentHash'
   LEFT JOIN survey_governed_tools g ON g.id=b->>'versionId' AND b->>'sourceProvider'='PUBLIC_FORM' AND g.snapshot_hash=b->>'contentHash'
   LEFT JOIN survey_standard_releases std ON std.id=b->>'versionId' AND b->>'sourceProvider'='STANDARD_SCALE' AND std.combination_hash=b->>'contentHash'
   LEFT JOIN scale_library_entries entry ON entry.id=b->>'versionId' AND b->>'sourceProvider'='LIBRARY_SCALE'
@@ -42,6 +45,9 @@ export async function collectStudentCompositionFinals(tx:Tx,input:{organizationI
  const blocks=identity.manifest.map(block=>{
   const definition=definitions.find(row=>row.blockId===block.blockId);if(!definition)fail()
   if(block.kind==='FORM'){
+   if(block.sourceProvider==='PRIVATE_VERSION'
+    && (definition.privateHash!==block.contentHash||typeof definition.privateTitle!=='string'
+      ||privateToolContentHash('FORM',definition.privateTitle,definition.definition)!==block.contentHash))fail()
    const form=formDraftSchema.parse(definition.definition)
    if(form.pages.length!==block.sectionIds.length||form.pages.reduce((n,page)=>n+page.questions.length,0)!==block.itemIds.length)fail()
    return {block,form,unit:null,items:createProtectedFormItems(form),metrics:null,descriptiveMeans:form.descriptive?.exploratoryMeans?createStudentScaleMetrics(form.descriptive.groups):[],comparableKey:studentFormComparableKey(form)}

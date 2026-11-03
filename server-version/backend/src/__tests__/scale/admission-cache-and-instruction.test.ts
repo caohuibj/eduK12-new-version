@@ -13,6 +13,12 @@ const state = vi.hoisted(() => ({ registry: null as any, deployment: null as any
 vi.mock('../../modules/scale/onboarding/instrument-registry', async original => {
   const actual = await original<typeof import('../../modules/scale/onboarding/instrument-registry')>()
   return { ...actual,
+    // Materialization consumes the registry object directly. Share the same
+    // isolated immutable cache as the wrapper consumers below.
+    SCALE_INSTRUMENT_REGISTRY: {
+      getSource: (...args: any[]) => state.registry.getSource(...args),
+      getValidation: (...args: any[]) => state.registry.getValidation(...args),
+    },
     listScaleInstrumentSources: () => state.registry.listSources(),
     getScaleInstrumentSource: (...args: any[]) => state.registry.getSource(...args),
     getScaleInstrumentValidation: (...args: any[]) => state.registry.getValidation(...args),

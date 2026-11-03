@@ -87,8 +87,9 @@ test('merge-gate large full-object transport preserves hostile strings with a sm
   for(const flag of ['frontend_build','ui_required','visual_hosted','codeql','media2','media7','situational_video','situational_branching','video_core','app_shell','canonical_visual','perf_smoke','ops'])outputs[flag]='true';
   outputs.media_selection=JSON.stringify(['media2','video_core','media7','situational_video','situational_branching']);
   outputs.media_groups=JSON.stringify(['images-video','cognitive-situational']);
-  const needs={scope:{result:'success',outputs}};
-  for(const key of requiredChecks(needs,false))if(key!=='scope')needs[key]={result:'success',outputs:{preserved:payload}};
+  const needs={scope:{result:'success',outputs},
+    'backend-regression-reuse':{result:'success',outputs:{reuse_backend_regression:'false'}}};
+  for(const key of requiredChecks(needs,false))if(key!=='scope'&&key!=='backend-regression-reuse')needs[key]={result:'success',outputs:{preserved:payload}};
   const serialize=value=>JSON.stringify(JSON.stringify(value));
   const write=value=>{writeFileSync(script,mergeGateWriter().replace('${{ toJSON(toJSON(needs)) }}',serialize(value)));return spawnSync(process.execPath,[script],{env,encoding:'utf8'});};
   const cli=()=>spawnSync(process.execPath,[new URL('./merge-gate.mjs',import.meta.url).pathname],{cwd:dir,env,encoding:'utf8'});
@@ -159,9 +160,12 @@ test('Training PostgreSQL additions execute against the disposable service and c
   for(const variable of ['TRAINING_MATERIAL_TEST_DATABASE_URL','RELEASE_INTEGRATION_DATABASE_URL','INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL'])
     assert.ok(regression.includes(`${variable}: ${database}`),`${variable} must select the isolated job database`);
   assert.match(regression,/TRAINING_MATERIAL_ISOLATED_DB: '1'/);
-  const required=regression.split('name: hosted critical integration suites must not skip')[1]?.split('      - name:')[0]??'';
-  assert.match(required,/if: inputs\.focus == 'full'/);
-  assert.match(required,/node scripts\/assert-release-test-report\.mjs \/tmp\/eduk12-backend-vitest\.json/);
+  const aggregate=regression.split('\n  backend-regression-reports:\n')[1]?.split(/\n  [\w-]+:\n/)[0]??'';
+  assert.match(aggregate,/^    needs: backend-regression$/m);
+  assert.match(aggregate,/^    if: always\(\) && inputs\.focus == 'full'$/m);
+  const required=aggregate.split('name: hosted critical integration suites must not skip')[1]?.split('      - name:')[0]??'';
+  assert.doesNotMatch(required,/^\s+(?:if|continue-on-error):/m);
+  assert.ok(required.includes("node scripts/assert-release-test-report.mjs '${{ runner.temp }}/regression-reports/eduk12-backend-vitest.json'"));
   for(const file of ['migration/training-material-allocation','integration/sjt-image-retention','scale/scale-import'])
     assert.ok(required.includes(`src/__tests__/${file}.postgres.integration.test.ts`),`${file} must be present and non-skipped`);
 });

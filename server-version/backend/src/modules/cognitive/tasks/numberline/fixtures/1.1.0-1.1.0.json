@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "numberline",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0"
+  },
+  "provenance": "Synthetic exact-identity fixture, authored 2026-11-02 from existing configVersion 1.1.0 (0-100/A/4s) and buildNumberlineNpTargets. Fixed seed preserves all six frozen target positions and order. Perfect positions yield zero error; six unanswered trials yield null metrics and insufficient quality. Expectations derived independently and verified with scoreNumberlineNpV1. Existing historical fixtures and NP tests remain authoritative; no empirical or scientific qualification claimed.",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 6,
+          "lineMax": 100,
+          "targetSet": "A",
+          "stimulusSetVersion": "siegler-opfer-2003-np-numeric-v1.0.0",
+          "maxResponseMs": 4000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "synthetic-numberline-np-onboarding",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "targetNumber": 6,
+              "responsePosition": 0.06,
+              "rtMs": 1000,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "targetNumber": 42,
+              "responsePosition": 0.42,
+              "rtMs": 1000,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "targetNumber": 18,
+              "responsePosition": 0.18,
+              "rtMs": 1000,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "targetNumber": 2,
+              "responsePosition": 0.02,
+              "rtMs": 1000,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "targetNumber": 4,
+              "responsePosition": 0.04,
+              "rtMs": 1000,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "targetNumber": 71,
+              "responsePosition": 0.71,
+              "rtMs": 1000,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "paePercent": 0,
+          "biasPercent": 0,
+          "withinTenRate": 1,
+          "medianRtMs": 1000,
+          "validTrialCount": 6,
+          "timeoutCount": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidTrials": false,
+          "excessiveTimeouts": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 6,
+          "lineMax": 100,
+          "targetSet": "A",
+          "stimulusSetVersion": "siegler-opfer-2003-np-numeric-v1.0.0",
+          "maxResponseMs": 4000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "synthetic-numberline-np-onboarding",
+        "trials": []
+      },
+      "expectedError": "numberline NP requires exactly six trials"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 6,
+          "lineMax": 100,
+          "targetSet": "A",
+          "stimulusSetVersion": "siegler-opfer-2003-np-numeric-v1.0.0",
+          "maxResponseMs": 4000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "synthetic-numberline-np-onboarding",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "targetNumber": 6,
+              "responsePosition": 0.06,
+              "rtMs": 1000,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "numberline NP requires exactly six trials"
+    },
+    {
+      "name": "all-omissions",
+      "input": {
+        "config": {
+          "totalTrials": 6,
+          "lineMax": 100,
+          "targetSet": "A",
+          "stimulusSetVersion": "siegler-opfer-2003-np-numeric-v1.0.0",
+          "maxResponseMs": 4000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "synthetic-numberline-np-onboarding",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "targetNumber": 6,
+              "responsePosition": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "targetNumber": 42,
+              "responsePosition": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "targetNumber": 18,
+              "responsePosition": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "targetNumber": 2,
+              "responsePosition": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "targetNumber": 4,
+              "responsePosition": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "targetNumber": 71,
+              "responsePosition": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 0,
+        "metrics": {
+          "paePercent": null,
+          "biasPercent": null,
+          "withinTenRate": null,
+          "medianRtMs": null,
+          "validTrialCount": 0,
+          "timeoutCount": 6
+        },
+        "qualityFlags": {
+          "interpretable": false,
+          "insufficientValidTrials": true,
+          "excessiveTimeouts": true,
+          "interrupted": false
+        }
+      }
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import { canStartLibraryCourseScale } from './scale-access'
 import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
+import { shouldReconcileTrainingParent } from '../composite/training-variant-markers'
 import { loadScaleAnswers } from './scale-workflow.service'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -253,8 +254,12 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, loca
     const data = receiptOnly
       ? await submitUnifiedScaleAssessmentFinal(input, child, undefined, undefined, true)
       : await submitUnifiedScaleAssessmentFinal(input, child)
+    const shouldFinalize = !receiptOnly && Boolean(child.compositeAttemptId)
+      && shouldReconcileTrainingParent(child.compositeAttempt)
     return {
       ...data,
+      shouldFinalize,
+      finalizeAssessment: shouldFinalize ? child : null,
       internalContext: {
         compositeAttemptId: child.compositeAttemptId ?? null,
         attemptEpoch: child.attemptEpoch,

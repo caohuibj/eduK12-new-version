@@ -2,7 +2,7 @@ import { beforeEach,afterEach,describe,expect,it,vi } from 'vitest'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 
 const mocks=vi.hoisted(()=>({tx:{
-  $queryRaw:vi.fn(),
+  $queryRaw:vi.fn(),$executeRaw:vi.fn(),
   surveyWave:{findUniqueOrThrow:vi.fn(),updateMany:vi.fn()},
   surveyInstrumentDraft:{findMany:vi.fn()},
   surveyPublication:{aggregate:vi.fn(),create:vi.fn()},
@@ -25,6 +25,17 @@ const makeWave=()=>({id:'wave',projectId:'project',status:'DRAFT',revision:3,pub
   groupIpPolicy:draftPolicy as unknown,groupIpActivatedAt:null as Date|null,
   opensAt:null as Date|null,closesAt:null as Date|null,finishUntil:null as Date|null})
 let wave=makeWave()
+// Publication persistence binds the serialized snapshot directly to JSONB.
+const writtenPublication=()=>{
+  expect(mocks.tx.$executeRaw).toHaveBeenCalledTimes(1)
+  const [strings,id,projectId,version,definitionDigest,serial,consentVersion,createdAt]=mocks.tx.$executeRaw.mock.calls[0]
+  expect(strings.join('?').replace(/\s+/g,' ').trim()).toBe(
+    'INSERT INTO survey_publications (id,project_id,version,definition_digest,compiled_snapshot,consent_version,purpose,created_at) VALUES (?,?,?,?,?::jsonb, ?,\'RESEARCH_ONLY\',?)')
+  expect({projectId,version,consentVersion}).toEqual({projectId:'project',version:1,consentVersion:1})
+  expect(typeof serial).toBe('string')
+  expect(mocks.tx.surveyPublication.create).not.toHaveBeenCalled()
+  return {id,definitionDigest,compiledSnapshot:JSON.parse(serial),createdAt}
+}
 const freeze=()=>freezeResearchWaveDraft({actorUserId:'owner',projectId:'project',waveId:'wave',revision:3})
 beforeEach(()=>{
   vi.clearAllMocks();vi.useFakeTimers();vi.setSystemTime(now);wave=makeWave()
@@ -47,7 +58,7 @@ afterEach(()=>vi.useRealTimers())
 describe('Survey group IP policy freezing contracts (mocked transaction)',()=>{
   it('freezes the server local day into both immutable snapshot and wave, without activating',async()=>{
     const result=await freeze()
-    const publication=mocks.tx.surveyPublication.create.mock.calls[0][0].data
+    const publication=writtenPublication()
     const update=mocks.tx.surveyWave.updateMany.mock.calls[0][0].data
     const policy={...draftPolicy,activationDate:'2026-10-17'}
     expect(publication.compiledSnapshot.groupIpPolicy).toEqual(policy)
@@ -55,7 +66,8 @@ describe('Survey group IP policy freezing contracts (mocked transaction)',()=>{
     expect(publication.definitionDigest).toBe(canonicalHash(publication.compiledSnapshot))
     expect(update.groupIpPolicy).toEqual(policy)
     expect(update).not.toHaveProperty('groupIpActivatedAt')
-    expect(result.digest).toBe(publication.definitionDigest)
+    expect(result).toMatchObject({publicationId:publication.id,digest:publication.definitionDigest})
+    expect(update.publicationId).toBe(publication.id)
     const queries=mocks.tx.$queryRaw.mock.calls.map(call=>call[0].join(' '))
     expect(queries[0]).toContain('FOR UPDATE OF p')
     expect(queries[1]).toContain('FOR UPDATE')
@@ -63,7 +75,7 @@ describe('Survey group IP policy freezing contracts (mocked transaction)',()=>{
   it('keeps ordinary snapshot shape unchanged with the new policy absent',async()=>{
     wave.groupIpPolicy=null
     await freeze()
-    const publication=mocks.tx.surveyPublication.create.mock.calls[0][0].data
+    const publication=writtenPublication()
     expect(publication.compiledSnapshot).not.toHaveProperty('groupIpPolicy')
     expect(mocks.tx.surveyWave.updateMany.mock.calls[0][0].data).not.toHaveProperty('groupIpActivatedAt')
   })
@@ -78,6 +90,7 @@ describe('Survey group IP policy freezing contracts (mocked transaction)',()=>{
       if(kind==='injected-day')wave.groupIpPolicy={...draftPolicy,activationDate:'2026-10-18'}
       await expect(freeze()).rejects.toThrow()
       expect(mocks.tx.surveyPublication.create).not.toHaveBeenCalled()
+      expect(mocks.tx.$executeRaw).not.toHaveBeenCalled()
       expect(mocks.tx.surveyWave.updateMany).not.toHaveBeenCalled()
     })
 })

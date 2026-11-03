@@ -1,0 +1,160 @@
+{
+  "mother": "RPQ",
+  "familyTag": "family:rpq",
+  "components": [
+    {
+      "key": "rpq2024_reflective_practice10_teacher_self_en",
+      "C": "1.0.0",
+      "P": "1.0.0",
+      "R": "1.0.0",
+      "status": "DRAFT/PILOT",
+      "sourceVersion": 2024,
+      "sourceItems": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "scoreKey": "reflective_practice10",
+      "formula": "equal-weight mean",
+      "range": [
+        1,
+        6
+      ],
+      "reverseItems": [],
+      "missing": "project complete_required; not specified by author",
+      "familyTag": "family:rpq",
+      "standaloneAdministrationEvidence": "NOT_ESTABLISHED"
+    },
+    {
+      "key": "rpq2024_confidence8_teacher_self_en",
+      "C": "1.0.0",
+      "P": "1.0.0",
+      "R": "1.0.0",
+      "status": "DRAFT/PILOT",
+      "sourceVersion": 2024,
+      "sourceItems": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "scoreKey": "confidence8",
+      "formula": "equal-weight mean",
+      "range": [
+        1,
+        6
+      ],
+      "reverseItems": [],
+      "missing": "project complete_required; not specified by author",
+      "familyTag": "family:rpq",
+      "standaloneAdministrationEvidence": "NOT_ESTABLISHED"
+    },
+    {
+      "key": "rpq2024_uncertainty_stress8_teacher_self_en",
+      "C": "1.0.0",
+      "P": "1.0.0",
+      "R": "1.0.0",
+      "status": "DRAFT/PILOT",
+      "sourceVersion": 2024,
+      "sourceItems": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "scoreKey": "uncertainty_stress8",
+      "formula": "equal-weight mean",
+      "range": [
+        1,
+        6
+      ],
+      "reverseItems": [],
+      "missing": "project complete_required; not specified by author",
+      "familyTag": "family:rpq",
+      "standaloneAdministrationEvidence": "NOT_ESTABLISHED"
+    },
+    {
+      "key": "rpq2024_work_satisfaction4_teacher_self_en",
+      "C": "1.0.0",
+      "P": "1.0.0",
+      "R": "1.0.0",
+      "status": "DRAFT/PILOT",
+      "sourceVersion": 2024,
+      "sourceItems": [
+        27,
+        28,
+        29,
+        30
+      ],
+      "scoreKey": "work_satisfaction4",
+      "formula": "equal-weight mean",
+      "range": [
+        1,
+        6
+      ],
+      "reverseItems": [],
+      "missing": "project complete_required; not specified by author",
+      "familyTag": "family:rpq",
+      "standaloneAdministrationEvidence": "NOT_ESTABLISHED"
+    }
+  ],
+  "shortVersion": {
+    "source": "Author2024 Table5,10 items",
+    "usesExistingComponent": "rpq2024_reflective_practice10_teacher_self_en",
+    "duplicatePackageCreated": false
+  },
+  "extendedVersion": {
+    "source": "Author2024 Table6,30 items",
+    "ordinaryCombinationMembers": [
+      "rpq2024_reflective_practice10_teacher_self_en",
+      "rpq2024_confidence8_teacher_self_en",
+      "rpq2024_uncertainty_stress8_teacher_self_en",
+      "rpq2024_work_satisfaction4_teacher_self_en"
+    ],
+    "aggregateScore": null,
+    "createdInDatabase": false
+  },
+  "optionalFacetsNotSeparatelyRegistered": {
+    "general_confidence": [
+      11,
+      12,
+      13,
+      14
+    ],
+    "communication_confidence": [
+      15,
+      16,
+      17,
+      18
+    ],
+    "stress": [
+      19,
+      20,
+      21,
+      22
+    ],
+    "uncertainty": [
+      23,
+      24,
+      25,
+      26
+    ]
+  },
+  "unscoredSourceParts": [],
+  "note": "All source2024 items belong to scored components; no original unscored form invented.2018 forty-item and supervision6 manual separately audited in notes, not silently imported as current version."
+}

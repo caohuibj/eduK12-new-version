@@ -44,6 +44,29 @@ beforeEach(() => {
 })
 afterEach(() => { vi.unstubAllEnvs(); vi.useRealTimers() })
 describe('opt-in participant report view', () => {
+  it.each(['PENDING', 'PROCESSING'])('projects accepted unit FINALs as report processing while the job is %s', async status => {
+    state.parent.status = 'IN_PROGRESS'; state.parent.completedAt = null; state.parent.asyncReportEpoch = 1
+    state.job = { ...readyFeedbackJob(state.parent), status, wholeSubmissionId: null, requestedRevision: 1 }
+    const view = await getCompositeReportView('attempt-1', { userId: 'student-1' })
+    expect(view.generation).toMatchObject({ hasAcceptedSubmission: true, wholeSubmissionReceived: false,
+      reportStatus: { state: status }, participantFeedback: { state: 'REPORT_PROCESSING' } })
+    expect(view.report).toBeNull()
+    expect(db.compositeAssessmentAttempt.findUnique).not.toHaveBeenCalled()
+  })
+  it.each(['FAILED', 'CANCELLED'])('does not project a %s report job as processing', async status => {
+    state.parent.status = 'IN_PROGRESS'; state.parent.completedAt = null; state.parent.asyncReportEpoch = 1
+    state.job = { ...readyFeedbackJob(state.parent), status, wholeSubmissionId: null, requestedRevision: 1 }
+    const view = await getCompositeReportView('attempt-1', { userId: 'student-1' })
+    expect(view.generation).toMatchObject({ reportStatus: { state: status }, participantFeedback: { state: 'WAITING_SUBMISSION' } })
+    expect(view.report).toBeNull()
+  })
+  it('keeps a genuinely incomplete unit set waiting without exposing a report', async () => {
+    state.parent.status = 'IN_PROGRESS'; state.parent.completedAt = null; state.parent.asyncReportEpoch = 1
+    state.job = { ...readyFeedbackJob(state.parent), status: 'WAITING', wholeSubmissionId: null, requestedRevision: 1 }
+    const view = await getCompositeReportView('attempt-1', { userId: 'student-1' })
+    expect(view.generation).toMatchObject({ reportStatus: { state: 'WAITING' }, participantFeedback: { state: 'WAITING_SUBMISSION' } })
+    expect(view.report).toBeNull()
+  })
   it('returns unopened generation without loading report relations', async () => {
     const view = await getCompositeReportView('attempt-1', { userId: 'student-1' })
     expect(view.generation.participantFeedback?.state).toBe('GENERATED_NOT_RELEASED')

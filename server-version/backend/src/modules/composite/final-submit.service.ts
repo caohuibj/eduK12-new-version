@@ -1,4 +1,5 @@
 import {assertTrainingPrivateReferenceAdmissionCurrent} from './training-private-reference-use'
+import {shouldReconcileTrainingParent} from './training-variant-markers'
 import { assertTrainingFormFinalPrincipal, assertTrainingSectionSelected, TRAINING_VARIANT_DEFINITION_MARKER_SELECT, TRAINING_VARIANT_PARENT_MARKER_SELECT } from './training-variant-child-scope'
 import { Prisma } from '@prisma/client'
 import { normalizeTypedCompositeFormAnswer, normalizeTypedCompositeSection, validateTypedCompositeSectionDefinition, legacyFormValueProjection, type TypedFormValue } from '../assessment-runtime/typed-form'
@@ -482,7 +483,10 @@ const submitCompositeFormSectionFinalImpl = async (input: SectionSubmitInput) =>
   const selectedParent = await assertTrainingSectionSelected(input.attemptId, input.sectionId, { parent: route })
   if (route.runtimeGeneration === 'UNIFIED_V1') {
     const { submitUnifiedCompositeFormSectionFinal } = await import('../assessment-runtime/unified-form-section-final-submit.service')
-    return submitUnifiedCompositeFormSectionFinal(input, route.compositeAssessment?.bundleInstance, selectedParent)
+    const result = await submitUnifiedCompositeFormSectionFinal(input, route.compositeAssessment?.bundleInstance, selectedParent)
+    return shouldReconcileTrainingParent(route)
+      ? { ...result, shouldFinalize: true, finalizeCompositeAttemptId: input.attemptId }
+      : result
   }
   const attempt = await measureRequestPhase('final_submit_admission', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: input.attemptId },

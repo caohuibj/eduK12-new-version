@@ -32,6 +32,11 @@ test('valid signed local success is admitted, not re-executed',()=>fixture(({bas
  assert.equal(r.status,0,r.stderr);assert.match(r.stdout,/REUSED local check/);
  // Fixture has none of the real test scripts: success proves no test command ran.
 }));
+test('backend compile workflow selects its existing Bundle declaration contract once',()=>fixture(({base,head})=>{
+ const commands=recipe('release-tools',base,head),selected=commands.filter(argv=>argv.includes('.github/scripts/content-workflows.test.mjs'));
+ assert.equal(selected.length,1);assert(selected[0].some(arg=>arg.startsWith('--test-name-pattern=^content declarations keep pure')));
+ assert(!commands.flat().some(arg=>['build','db:migrate','--all','prisma'].includes(arg)));
+},'.github/workflows/ci-backend.yml'));
 test('missing key, tampering, failure, missing command and wrong identity are rejected',()=>fixture(({base,head,payload})=>{
  const signed=seal(payload,keys.privateKey);assert.throws(()=>authenticate(signed,''));
  const tampered=structuredClone(signed);tampered.payload.head='0'.repeat(40);assert.throws(()=>authenticate(tampered,pub));
@@ -99,17 +104,6 @@ test('development CLI recipe selects API catalog and subprocess consumers plus c
   assert(commands.some(argv=>argv.includes('server-version/backend/tsconfig.json')&&argv.includes('--noEmit')));
   assert(!commands.flat().some(arg=>/playwright|docker|migrate|^build$/.test(arg)));
  },cli);
-});
-test('onboarding tooling changes select affected controls without application commands',()=>{
- for(const file of ['.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-controls.test.mjs'])fixture(({base,head})=>{
-  const commands=recipe('release-tools',base,head),selected=commands.find(argv=>argv.includes('.github/scripts/onboarding-controls.test.mjs'));
-  assert(selected,'Changed onboarding controls must be checked by the existing tools recipe');
-  const pattern=new RegExp(selected.find(arg=>arg.startsWith('--test-name-pattern=')).slice('--test-name-pattern='.length));
-  for(const name of ['onboarding accepts unchanged main controls','onboarding still rejects changed control bytes','onboarding needs before snapshots','onboarding scope binds exact source','stable gate still requires admission','Task1 scope refuses incomplete inventories'])assert(pattern.test(name),name);
-  assert(!pattern.test('Task1 exact candidate remains disabled'));
-  assert(commands.every(argv=>argv[0]==='node'&&argv.includes('--test')));
-  assert(!commands.flat().some(arg=>/vitest|playwright|prisma|(?:^|\/)tsc$/.test(arg)));
- },file);
 });
 test('guidance docs select documentation only; no backend or recovery jobs',()=>{
  const s=classifyChanges(['AGENTS.md','docs/release/README.md','.github/PULL_REQUEST_TEMPLATE.md'].map(regular));

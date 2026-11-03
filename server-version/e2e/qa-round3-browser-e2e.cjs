@@ -21,7 +21,8 @@ const fixture = { attempt: {
   currentItem: { id: 'unit-1', type: 'SCALE', definitionHash: 'local-r3-definition', scaleAssessmentId: 'r3-browser-scale-attempt', scale: { id: 'scale-1', name: '本地三题量表', definition } },
 } }
 esbuild.buildSync({ entryPoints: [path.join(__dirname, 'qa-round3-browser-fixture.tsx')], outfile: path.join(output, 'fixture.js'),
-  bundle: true, jsx: 'automatic', nodePaths: [path.join(__dirname, '../frontend/node_modules')], define: require('./qa-round3-browser-build.cjs') })
+  bundle: true, jsx: 'automatic', nodePaths: [path.join(__dirname, '../frontend/node_modules')],
+  loader: { '.png': 'dataurl', '.webp': 'dataurl', '.avif': 'dataurl' }, define: require('./qa-round3-browser-build.cjs') })
 const html = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><link rel="stylesheet" href="/fixture.css"><div id="root"></div><script id="fixture" type="application/json">' +
   JSON.stringify(fixture).replace(/</g, '\\u003c') + '</script><script src="/fixture.js"></script></html>'
 const server = http.createServer(async (req, res) => {
@@ -108,12 +109,12 @@ const server = http.createServer(async (req, res) => {
     await page.goto(base + '/?mode=scoring')
     await page.getByRole('button', { name: '计分', exact: true }).click()
     await page.getByRole('button', { name: '+ 总分', exact: true }).click()
-    for (const name of ['Q1', 'Q2', 'Q3']) await page.getByRole('button', { name, exact: true }).click()
+    for (const name of ['第 1 题：浏览器量表题 1', '第 2 题：浏览器量表题 2', '第 3 题：浏览器量表题 3']) await page.getByRole('button', { name, exact: true }).click()
     await page.getByRole('button', { name: '保存计分定义' }).click()
     await page.getByText(/已保存，并重新读取确认/).waitFor()
     await page.reload()
     await page.getByRole('button', { name: '计分', exact: true }).click()
-    for (const name of ['Q1', 'Q2', 'Q3']) assert.equal(await page.getByRole('button', { name, exact: true }).getAttribute('aria-pressed'), 'true')
+    for (const name of ['第 1 题：浏览器量表题 1', '第 2 题：浏览器量表题 2', '第 3 题：浏览器量表题 3']) assert.equal(await page.getByRole('button', { name, exact: true }).getAttribute('aria-pressed'), 'true')
     evidence.checks.push('all three explicitly selected score items survive save, HTTP readback and reload')
     await page.goto(base + '/?mode=scale-export')
     const scaleDownloads = []

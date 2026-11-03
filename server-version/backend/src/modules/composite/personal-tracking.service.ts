@@ -52,6 +52,9 @@ export async function readTrainingPersonalChanges(attemptId:string,proof:Proof){
       Prisma.sql`a.user_id IS NULL AND a.id IN (${Prisma.join(study!.attemptIds.length?study!.attemptIds:[''])})`}
    ORDER BY a.composite_assessment_id,a.completed_at DESC,a.id DESC`)
   const parents=latest.length?await tx.compositeAssessmentAttempt.findMany({where:{id:{in:latest.map(a=>a.id)}},include:{compositeAssessment:true}}):[]
+  // Row order is not a result-source fact. Keep the leaf/hash arrays stable
+  // when PostgreSQL returns the same authorized parents in a different order.
+  parents.sort((a,b)=>a.compositeAssessmentId.localeCompare(b.compositeAssessmentId)||a.id.localeCompare(b.id))
   const now=new Date()
   const leaves=await readTrainingPersonalLeafs(tx,{scopedSubjectId:proof.userId??study!.scopedSubjectId,plan:plan!,parents})
   // Own credential/membership/current owner checks above run before all cache

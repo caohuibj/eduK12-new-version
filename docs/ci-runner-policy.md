@@ -49,6 +49,8 @@ and unscoped CI changes select the full platform route. Malformed classification
 Management-UI content publication without a Git change uses application publication
 validation. A server release is separate from WeChat mini-program publication.
 
+> 2026-11-02: per-PR exact-candidate lanes and their reusable workflows were removed (PR #613); only the generic tiers, the A/B/C release routes and the `backend-regression-reuse` lane remain. See `docs/ci-risk-tier-and-reuse.md`. Historical scenario descriptions below that name those lanes are records, not live routes.
+
 ## Current CI routing: GitHub-hosted only (public repository)
 
 The repository is public. All automatic PR CI, post-merge smoke, manual component probes,

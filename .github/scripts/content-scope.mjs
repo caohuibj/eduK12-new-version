@@ -1,61 +1,13 @@
-import {readMaintenanceRepairScope,maintenanceRepairOutputs} from './maintenance-repair-scope.mjs';
+import {unitOnly} from './ci-qualification.mjs';
+import {studentDiscoveryScope} from './student-discovery-scope.mjs';
 import {readEdgeScope,edgeConfigOutputs} from './edge-config-scope.mjs';
 import {cognitiveMixedProductScope,cognitiveProductPlan,cognitiveProductOutputs} from './cognitive-product-scope.mjs';
 import {backendApiFocus} from './backend-api-scope.mjs';
-import {catalogDiscoveryScope,catalogDiffBase,bundleFamilyScope,bundleRuntimeScope} from './catalog-discovery-scope.mjs';
-import {personalTrackingReadyPlan,personalTrackingReadyOutputs} from './personal-tracking-ready.mjs';
-import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
+import {catalogDiscoveryScope,catalogDiffBase,bundleFamilyScope,bundleRuntimeScope,authoringPolishScope} from './catalog-discovery-scope.mjs';
 import {selectCognitiveIntake, cognitiveTaskRoot} from './cognitive-intake-scope.mjs';
 import {selectScaleIntake} from './scale-intake-scope.mjs';
 import {declarationReaders,verifiedDeclarativeContent} from './declarative-content.mjs';
-import {onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {pr364Plan,pr364Outputs} from './pr364-scope.mjs';
-import {pr363Plan,pr363Outputs} from './pr363-scope.mjs';
-import {reportPlanningPlan,reportPlanningOutputs} from './report-planning-scope.mjs';
-import {groupReportDraftPlan,groupReportDraftOutputs,groupReportDiffBase} from './group-report-draft.mjs';
-import {pr357Plan,pr357Outputs} from './pr357-scope.mjs';
-import {post356Plan,post356Outputs} from './post356-scope.mjs';
-import {refuseUnplannedPR356} from './pr356-entry.mjs';
-export {refuseUnplannedPR356} from './pr356-entry.mjs';
-import {surveyGovernancePlan,surveyGovernanceOutputs} from './survey-governance-scope.mjs';
-import {trainingPolishPlan,trainingPolishOutputs} from './training-polish-scope.mjs';
-import {sjtNativePlan,sjtNativeOutputs} from './sjt-native-scope.mjs';
-import {trainingEntryPlan,trainingEntryOutputs} from './training-entry-scope.mjs';
-import {surveyReviewPlan,surveyReviewOutputs} from './survey-review-scope.mjs';
-import {trainingTeacherPlan,trainingTeacherOutputs} from './training-teacher-scope.mjs';
-import {trainingAdminIntegrationPlan,trainingAdminIntegrationOutputs} from './training-admin-integration-scope.mjs';
-import {participantCapacityPlan,participantCapacityOutputs} from './participant-capacity-scope.mjs';
-import {surveyAssessmentPlan,surveyAssessmentOutputs} from './survey-assessment-scope.mjs';
-import {trainingAssessmentPlan,trainingAssessmentOutputs} from './training-assessment-scope.mjs';
-import {schoolTeacherVisualPlan,schoolTeacherVisualOutputs} from './school-teacher-visual-scope.mjs';
-import {participantAccessPlan,participantAccessOutputs} from './participant-access-scope.mjs';
-import {trainingManualUIPlan,trainingManualUIOutputs} from './training-manual-ui-scope.mjs';
-import {surveyManualUIPlan,surveyManualUIOutputs} from './survey-manual-ui-scope.mjs';
-import {sharedAuthoringPlan,sharedAuthoringOutputs} from './shared-authoring-scope.mjs';
-import {schoolTeacherPlan,schoolTeacherOutputs} from './school-teacher-scope.mjs';
-import {surveyWorkspacePlan,surveyWorkspaceOutputs} from './survey-workspace-scope.mjs';
-import {trainingAppearancePlan,trainingAppearanceOutputs} from './training-appearance-scope.mjs';
-import {surveyCloudPlan,surveyCloudOutputs} from './survey-cloud-scope.mjs';
-import {authenticatorPlan,authenticatorOutputs} from './admin-authenticator-scope.mjs';
-import {surveyExperiencePlan,surveyExperienceOutputs} from './survey-experience-scope.mjs';
-import {scaleLibraryGovernancePlan,scaleLibraryGovernanceOutputs} from './scale-library-governance-scope.mjs';
-import {compositeCsvMemoryPlan,compositeCsvMemoryOutputs} from './composite-csv-memory-scope.mjs';
-import {trainingWorkspacePlan,trainingWorkspaceOutputs} from './training-workspace-scope.mjs';
-import {exactCandidatePlan,exactCandidateOutputs} from './exact-candidate-scope.mjs';
-import {trainingFunctionalPlan} from './training-functional.mjs';
-import {adminFunctionalPlan} from './admin-permissions-functional.mjs';
-import {surveyMacPlan,rejectSurveyManual} from './survey-mac-ui-scope.mjs';
-import {reviewedCandidatePlan} from './reviewed-candidate-scope.mjs';
-import {surveyCandidatePlan} from './survey-candidate-scope.mjs';
-import {sharedAssetStoragePlan} from './shared-asset-storage-scope.mjs';
-import {assessmentCapacityPlan} from './assessment-capacity-scope.mjs';
-import {teacherSurveyPlan} from './teacher-survey-scope.mjs';
-import {accessEfficiencyPlan} from './access-efficiency-scope.mjs';
-import {backendSecurityEfficiencyPlan} from './backend-security-efficiency-scope.mjs';
-import {teacherHomePlan} from './teacher-home-scope.mjs';
-import {surveyHomePlan} from './survey-home-scope.mjs';
 import {homepageCopyPlan,publicRenderBoundary} from './homepage-copy-scope.mjs';
-import {campusPlan} from './campus-scope.mjs';
 import { execFileSync } from 'node:child_process';
 import { appendFileSync, readFileSync } from 'node:fs';
 import { posix } from 'node:path';
@@ -64,9 +16,6 @@ import { mediaPlan } from './ci-media-plan.mjs';
 import { dependencyScope, frontendDependencyFilesOnly } from './dependency-scope.mjs';
 import { plan as applicationPlan, toolingOnly, imageBuildOnly, engineeringEvidenceFile, backendTestFile } from '../../server-version/scripts/release/policy.mjs';
 
-// Keep route refusal independent of the candidate verifier. The official
-// source CLI consumes this module while awaiting metadata; importing it back
-// from here would leave its top-level await unresolved.
 
 const modules = 'server-version/backend/src/modules/';
 const frontendSrc = 'server-version/frontend/src/';
@@ -128,63 +77,6 @@ function frontendModuleSurfaceFile(file) {
   const path = file.replace(/\/__tests__\//g, '/').replace(/\.(?:test|spec)\.(tsx?)$/, '.$1');
   if (/\/(?:CognitiveRunner|api|types|registry)(?:[./-])|scoring|scorer|algorithm|finalizer|trial-timing|reference-data/i.test(path)) return false;
   return /^server-version\/frontend\/src\/modules\/(?:cognitive|composite)\/(?:[^/]+\.(?:tsx|css|scss)|(?:pages|components)\/.+\.(?:tsx|css|scss)|hooks\/use[A-Z][^/]*\.tsx?|core\/use[A-Z][^/]*\.tsx?)$/.test(path);
-}
-
-// Bounded presentation/startup optimization, not a generic authorization/runtime
-// exemption. Complete raw diff admission keeps all other consumers unchanged.
-export const frontendPerformanceFiles = new Set([
-  'main.tsx', 'product-entry.ts', 'product-entry.test.ts', 'pages/ScaleList.tsx',
-  'pages/__tests__/ScaleList.grants.test.tsx', 'training/context.test.ts', 'school/SchoolLanding.tsx',
-  'school/school-landing.css', 'school/school-workspace.css',
-  'school/huischool-campus-sunlight.webp',
-].map(file => frontendSrc + file));
-export const frontendPerformanceTools = new Set([
-  '.github/scripts/content-scope.mjs', '.github/scripts/merge-gate.mjs',
-  '.github/scripts/frontend-performance.test.mjs', '.github/scripts/frontend-performance-browser.mjs',
-  '.github/workflows/ci.yml', '.github/workflows/ci-frontend-build.yml',
-  'docs/release/README.md',
-]);
-export function requireFrontendPerformanceScope(required, admitted) {
-  if (required && !admitted) throw new Error('Frontend optimization scope drift: stop; unrelated platform fallback is not authorized');
-}
-export function frontendPerformanceScope(entries, read) {
-  if (!entries.length || !entries.some(e => frontendPerformanceFiles.has(e.file))) return false;
-  for (const e of entries) {
-    if (!frontendPerformanceFiles.has(e.file) && !frontendPerformanceTools.has(e.file)) return false;
-    if (e.newMode !== '100644' || !((e.status === 'A' && e.oldMode === '000000')
-      || (e.status === 'M' && e.oldMode === '100644'))) return false;
-    if (e.file.endsWith('.webp')) {
-      const bytes = read(e.file);
-      if (!Buffer.isBuffer(bytes) || bytes.length < 20 || bytes.toString('ascii',0,4) !== 'RIFF'
-        || bytes.toString('ascii',8,12) !== 'WEBP' || bytes.readUInt32LE(4) !== bytes.length - 8
-        || !['VP8 ', 'VP8L', 'VP8X'].includes(bytes.toString('ascii',12,16))) return false;
-    }
-  }
-  return true;
-}
-
-// Bounded private Wave discovery/selection increment; never a broad Survey exemption.
-export const surveyWaveSelectionFiles = new Set([
-  ...['content-options.service.ts','content-selection.ts','waves.routes.ts','waves.service.ts'].map(f => modules+'survey/'+f),
-  ...['survey-content-options.test.ts','survey-frozen-feedback-read.test.ts','survey-content-options.postgres.integration.test.ts'].map(f => 'server-version/backend/src/__tests__/measurement-content/'+f),
-  ...['SurveyWaveContentSelection.tsx','SurveyWaveContentSelection.test.tsx','SurveyWaveStudio.tsx','SurveyWaveStudio.content.test.tsx','SurveyWaveStudio.feedback.test.tsx'].map(f => frontendSrc+'survey/'+f),
-]);
-export const surveyWaveSelectionTools = new Set([
-  '.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs',
-  '.github/scripts/survey-wave-selection.test.mjs','.github/scripts/survey-wave-selection-browser.mjs',
-  '.github/scripts/survey-wave-selection-reuse.py','.github/scripts/survey-wave-selection-reuse.test.py',
-  '.github/scripts/maintenance-routing.test.mjs',
-  '.github/workflows/ci.yml','.github/workflows/ci-backend-regression.yml',
-  '.github/workflows/ci-frontend.yml','.github/workflows/ci-images.yml','docs/release/README.md',
-]);
-export function surveyWaveSelectionScope(entries) {
-  return entries.length > 0 && entries.some(e => e.file === modules+'survey/content-options.service.ts')
-    && entries.every(e => (surveyWaveSelectionFiles.has(e.file) || surveyWaveSelectionTools.has(e.file))
-      && e.newMode === '100644' && ((e.status === 'A' && e.oldMode === '000000') || (e.status === 'M' && e.oldMode === '100644')));
-}
-export function requireSurveyWaveSelectionScope(required, admitted, event, forceFull) {
-  if (required && (!admitted || event === 'workflow_dispatch' || forceFull === 'true'))
-    throw Error('Survey Wave selection scope drift: stop; unrelated platform fallback is not authorized');
 }
 
 // Only existing UI-surface test modules qualify. Production source, shared
@@ -272,8 +164,6 @@ const maintenanceRoutingFiles = new Set([
   '.github/scripts/content-scope.mjs','.github/scripts/content-scope.test.mjs',
   '.github/scripts/merge-gate.mjs','.github/scripts/maintenance-routing.test.mjs',
   '.github/scripts/content-workflows.test.mjs',
-  '.github/scripts/maintenance-merge.py','.github/scripts/test_maintenance_merge.py',
-  '.github/scripts/post356-scope.mjs','.github/scripts/post356-scope.test.mjs',
 ]);
 const monitorRoot = 'server-version/scripts/host-ops/';
 const cleanupRoot = 'server-version/scripts/cos-cleanup/';
@@ -417,98 +307,17 @@ export function runnerPlan({ profile = 'hosted', scenario = 'platform' } = {}) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
-  refuseUnplannedPR356();
-  const base = catalogDiffBase(process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),changedEntries);
-  if((event==='push'||event==='pull_request'&&process.env.CI_PR_REPOSITORY===process.env.GITHUB_REPOSITORY)&&process.env.CI_FORCE_FULL!=='true'&&readEdgeScope(base)){const output={...edgeConfigOutputs(),diff_base:base};console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  if((event==='push'||event==='pull_request'&&process.env.CI_PR_REPOSITORY===process.env.GITHUB_REPOSITORY)&&process.env.CI_FORCE_FULL!=='true'&&readMaintenanceRepairScope(base)){const output={...maintenanceRepairOutputs(),diff_base:base};console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const personal=personalTrackingReadyPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),{event,branch:process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME,draft:process.env.CI_IS_DRAFT==='true',forceFull:process.env.CI_FORCE_FULL==='true'});
-  if(personal){const output=personalTrackingReadyOutputs(personal);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const onboarding=onboardingPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(onboarding){const output=onboardingOutputs(onboarding);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const groupHead=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),groupBase=groupReportDiffBase(base,groupHead);
-  const groupDraft=groupReportDraftPlan(event==='workflow_dispatch'?[]:changedEntries(groupBase),groupBase,groupHead);
-  if(groupDraft){const output=groupReportDraftOutputs(groupDraft);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const pr364=pr364Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(pr364){const output=pr364Outputs(pr364);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const pr363=pr363Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(pr363){const output=pr363Outputs(pr363);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const reportPlanning=reportPlanningPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(reportPlanning){const output=reportPlanningOutputs(reportPlanning);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const pr357=pr357Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(pr357){const output=pr357Outputs(pr357);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const post356=post356Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(post356){const output=post356Outputs(post356);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const surveyGovernance=surveyGovernancePlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(surveyGovernance){const output=surveyGovernanceOutputs(surveyGovernance);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const polish=trainingPolishPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(polish){const output=trainingPolishOutputs(polish);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const sjtNative=sjtNativePlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(sjtNative){const output=sjtNativeOutputs(sjtNative);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const trainingEntry=trainingEntryPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(trainingEntry){const output=trainingEntryOutputs(trainingEntry);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const surveyReview=surveyReviewPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(surveyReview){const output=surveyReviewOutputs(surveyReview);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const teacherManagement=trainingTeacherPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(teacherManagement){const output=trainingTeacherOutputs(teacherManagement);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const adminIntegration=trainingAdminIntegrationPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(adminIntegration){const output=trainingAdminIntegrationOutputs(adminIntegration);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const participantCapacity=participantCapacityPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(participantCapacity){const output=participantCapacityOutputs(participantCapacity);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const surveyAssessment=surveyAssessmentPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(surveyAssessment){const output=surveyAssessmentOutputs(surveyAssessment);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const trainingAssessment=trainingAssessmentPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(trainingAssessment){const output=trainingAssessmentOutputs(trainingAssessment);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const participant=participantAccessPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(participant){const output=participantAccessOutputs(participant);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const schoolTeacherVisual=schoolTeacherVisualPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(schoolTeacherVisual){const output=schoolTeacherVisualOutputs(schoolTeacherVisual);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const trainingManualUI=trainingManualUIPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(trainingManualUI){const output=trainingManualUIOutputs(trainingManualUI);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const surveyManualUI=surveyManualUIPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(surveyManualUI){const output=surveyManualUIOutputs(surveyManualUI);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const sharedAuthoring=sharedAuthoringPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(sharedAuthoring){const output=sharedAuthoringOutputs(sharedAuthoring);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const schoolTeacher=schoolTeacherPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(schoolTeacher){
-    if(schoolTeacher.candidate==='native-bundle'&&schoolTeacher.postMerge){const {observeNativeMain}=await import('./school-teacher-native.mjs');schoolTeacher.mainObservation=await observeNativeMain(schoolTeacher);}
-    const output=schoolTeacherOutputs(schoolTeacher);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);
-  }
-  const surveyWorkspace=surveyWorkspacePlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(surveyWorkspace){const output=surveyWorkspaceOutputs(surveyWorkspace);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const appearance=trainingAppearancePlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(appearance){const output=trainingAppearanceOutputs(appearance);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const cloud=surveyCloudPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(cloud){const output=surveyCloudOutputs(cloud);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const adminAuthenticator=authenticatorPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(adminAuthenticator){const output=authenticatorOutputs(adminAuthenticator);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const exact = exactCandidatePlan(base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(exact) {
-    const output=exactCandidateOutputs(exact);
+  const full = process.env.CI_FORCE_FULL === 'true';
+  const head = execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+  const base = catalogDiffBase(process.env.CI_BASE_SHA,head,changedEntries);
+  const emit = output => {
     console.log(JSON.stringify(output));
-    if(process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
-      Object.entries(output).map(([key,value])=>`${key}=${value}\n`).join(''));
+    if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, Object.entries(output).map(([key,value])=>`${key}=${value}\n`).join(''));
+  };
+  if ((event==='push'||event==='pull_request'&&process.env.CI_PR_REPOSITORY===process.env.GITHUB_REPOSITORY)&&!full&&readEdgeScope(base)) {
+    emit({...edgeConfigOutputs(),diff_base:base});
     process.exit(0);
   }
-  const experience=surveyExperiencePlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if((process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME)==='work/survey-experience-20261022'&&!experience)throw Error('Survey experience drift: no full-platform fallback');
-  if(experience){const output={...surveyExperienceOutputs(experience),...Object.fromEntries(Object.entries(runnerPlan({scenario:"survey-experience"})).map(([k,v])=>[k,Array.isArray(v)?JSON.stringify(v):v]))};console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const governance = scaleLibraryGovernancePlan(event === 'workflow_dispatch' ? [] : changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if((process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME)==='work/scale-library-governance-20261021'&&!governance)throw Error('Scale governance candidate drift: full-platform fallback is not authorized');
-  if(governance){
-    const output={...scaleLibraryGovernanceOutputs(governance),...Object.fromEntries(Object.entries(runnerPlan({scenario:'scale-library-governance'})).map(([k,v])=>[k,Array.isArray(v)?JSON.stringify(v):v]))};
-    console.log(JSON.stringify(output));
-    if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));
-    process.exit(0);
-  }
-  const csv = compositeCsvMemoryPlan(event === 'workflow_dispatch' ? [] : changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if((process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME)==='work/composite-csv-memory-20261021'&&!csv)throw Error('CSV memory candidate drift: full-platform fallback is not authorized');
-  if(csv){
-    const output={...compositeCsvMemoryOutputs(csv),...Object.fromEntries(Object.entries(runnerPlan({scenario:'composite-csv-memory'})).map(([k,v])=>[k,Array.isArray(v)?JSON.stringify(v):v]))};
-    console.log(JSON.stringify(output));
-    if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));
-    process.exit(0);
-  }
-  rejectSurveyManual();
   // Admission is also checked in job.if before checkout.
   if (event === 'pull_request' && process.env.CI_PR_REPOSITORY !== process.env.GITHUB_REPOSITORY)
     throw new Error('External PRs require a separately approved isolated workflow');
@@ -516,96 +325,53 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE !== 'true')
     throw new Error('Choose a step_probe for component CI, or explicitly set full_acceptance=true for whole-platform CI');
   const entries = event === 'workflow_dispatch' ? [] : changedEntries(base);
-  const workspace=trainingWorkspacePlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(['fix/training-course-pagination-20261021','backup/mac-training-workspace-20261022','work/training-followup-integrated-20261022'].includes(process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME)&&!workspace)throw Error('Frozen Training workspace drift: unrelated platform fallback is not authorized');
-  if(workspace){
-    const output={...trainingWorkspaceOutputs(workspace),...Object.fromEntries(Object.entries(runnerPlan({scenario:'training-workspace'})).map(([k,v])=>[k,Array.isArray(v)?JSON.stringify(v):v]))};
-    console.log(JSON.stringify(output));
-    if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));
-    process.exit(0);
-  }
   const files = entries.map(entry => entry.file);
-  const trainingFunctional = event === 'workflow_dispatch' ? null
-    : trainingFunctionalPlan(entries, base, execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim());
-  const adminFunctional = event === 'workflow_dispatch' ? null
-    : adminFunctionalPlan(entries, base, execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim());
-  if (adminFunctional && trainingFunctional) throw new Error('Functional scope declarations must be mutually exclusive');
-  if (process.env.CI_ADMIN_FUNCTIONAL_REQUIRED === 'true' && !adminFunctional)
-    throw new Error('Known admin candidate must retain its explicit functional-only scope; do not fall back to performance');
-  if (process.env.CI_TRAINING_FUNCTIONAL_REQUIRED === 'true' && !trainingFunctional)
-    throw new Error('Known Training candidate must retain its explicit functional-only scope; do not fall back to performance');
   const result = event === 'workflow_dispatch'
     ? { maintenance:false, content:false, presentation:false, frontend:false, documentation:false, domains:[] }
-    : classifyChanges(entries, process.env.CI_FORCE_FULL === 'true', {readHeadFile:file=>gitContent('HEAD',file),readBaseFile:file=>gitContent(base,file)});
+    : classifyChanges(entries, full, {readHeadFile:file=>gitContent('HEAD',file),readBaseFile:file=>gitContent(base,file)});
   const mixedContent=result.content && result.domains.length>1;
   const cognitiveCandidate=entries.some(e=>/^server-version\/(?:backend\/src\/modules\/cognitive\/(?:tasks|generated|content-candidates)\/|frontend\/src\/modules\/cognitive\/(?:(?:tasks|generated)\/|native-runners\.tsx$))/.test(e.file));
   const cognitiveMixed = cognitiveCandidate && !mixedContent && !result.cognitive_intake_light && cognitiveMixedProductScope(entries, file=>gitContent('HEAD',file),file=>gitContent(base,file));
   if (cognitiveMixed) Object.assign(result, {maintenance:false,content:false,presentation:false,documentation:false,frontend:false,frontend_test:false,backend_modules:false,domains:[...new Set([...result.domains,'cognitive'])]});
-  if(cognitiveCandidate && !mixedContent && !result.cognitive_intake_light && !cognitiveMixed && process.env.CI_FORCE_FULL!=='true' && event!=='workflow_dispatch') {
+  if(cognitiveCandidate && !mixedContent && !result.cognitive_intake_light && !cognitiveMixed && !full && event!=='workflow_dispatch') {
     const refused=selectCognitiveIntake(entries,file=>gitContent('HEAD',file),{readBaseFile:file=>gitContent(base,file)});
     console.log(JSON.stringify({kind:'cognitive-intake-refusal',base,...refused}));
     throw Error('UNSUPPORTED_COGNITIVE_INTAKE:'+refused.reason+': explicit affected route required; no platform fallback');
   }
-  const basicDependencies = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
+  const basicDependencies = !full && event !== 'workflow_dispatch'
     && dependencyScope(entries, {base});
-  const mixedFrontendDependencies = !basicDependencies && process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
+  const mixedFrontendDependencies = !basicDependencies && !full && event !== 'workflow_dispatch'
     && frontendDependencyScope(entries,{base});
   const dependencies = basicDependencies || mixedFrontendDependencies;
   const frontendDependencies = mixedFrontendDependencies || basicDependencies && frontendDependencyFilesOnly(entries);
   const backendModules = result.backend_modules && !result.content && !result.frontend && !result.presentation && !result.documentation;
-  const surveySelection = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' && surveyWaveSelectionScope(entries);
-  requireSurveyWaveSelectionScope(process.env.CI_SURVEY_SELECTION_REQUIRED === 'true', surveySelection, event, process.env.CI_FORCE_FULL);
-  const performance = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
-    && frontendPerformanceScope(entries, file => execFileSync('git', ['show', `HEAD:${file}`], {maxBuffer: 8 * 1024 * 1024}));
-  requireFrontendPerformanceScope(process.env.CI_FRONTEND_PERFORMANCE_REQUIRED === 'true', performance);
-  if (performance) { result.frontend = true; result.content = false; result.presentation = false; result.documentation = false; }
-  const frontendTest = !performance && result.frontend_test === true;
+  const frontendTest = result.frontend_test === true;
   const frontend = result.frontend === true && !frontendTest;
-  const affectedFrontend = !performance && frontend && result.frontend_affected === true;
-  const releaseTools = !result.documentation && !dependencies && process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' && toolingOnly(entries);
+  const affectedFrontend = frontend && result.frontend_affected === true;
+  const releaseTools = !result.documentation && !dependencies && !full && event !== 'workflow_dispatch' && toolingOnly(entries);
   const imageBuild = releaseTools && imageBuildOnly(entries);
-  const campus = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? campusPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
-  const copy = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? homepageCopyPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
-  const teacher = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? teacherHomePlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
-  const survey = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? surveyHomePlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
-  const backendRepair = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? backendSecurityEfficiencyPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
-  const surveyCandidate = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? surveyCandidatePlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
-  const sharedStorage = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? sharedAssetStoragePlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
-  const efficiency = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? accessEfficiencyPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
-  const assessment = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? assessmentCapacityPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
-  const review = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? teacherSurveyPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
-  const reviewedCandidate = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? reviewedCandidatePlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
-  if (process.env.CI_REVIEWED_CANDIDATE_REQUIRED === 'true' && !reviewedCandidate)
-    throw new Error('Known reviewed candidate is missing fixed source evidence or has an unreviewed diff; stop instead of starting unrelated legacy checks');
-  if (process.env.CI_SURVEY_MAC_REQUIRED === 'true' && (process.env.CI_FORCE_FULL === 'true' || event === 'workflow_dispatch'))
-    throw new Error('Known Survey Mac candidate cannot fall back to full/dispatch');
-  const surveyMac = event !== 'workflow_dispatch'
-    ? surveyMacPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
-  if(surveyMac && process.env.CI_FORCE_FULL==='true') throw new Error('Exact Survey Mac candidate cannot run unrelated full acceptance');
-  const catalogDiscovery=event!=='workflow_dispatch'&&process.env.CI_FORCE_FULL!=='true'&&catalogDiscoveryScope(entries);
-  const productHead=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+  const copy = !full && event !== 'workflow_dispatch' ? homepageCopyPlan(entries,base,head) : null;
+  const catalogDiscovery=event!=='workflow_dispatch'&&!full&&catalogDiscoveryScope(entries,{readHeadFile:file=>gitContent('HEAD',file),readBaseFile:file=>gitContent(base,file)});
   const productRead=ref=>file=>{try{return execFileSync('git',['show',ref+':'+file],{encoding:'utf8',stdio:['ignore','pipe','ignore']});}catch{return null;}};
-  const product=event!=='workflow_dispatch'&&process.env.CI_FORCE_FULL!=='true'&&cognitiveProductPlan(changedEntries(base),base,productHead,productRead(productHead),productRead(base));
-  if(product){const output=cognitiveProductOutputs(product);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const scenario = catalogDiscovery ? 'catalog-discovery' : cognitiveMixed ? 'platform' : surveySelection ? 'survey-wave-selection' : performance ? 'frontend-performance' : trainingFunctional || adminFunctional ? 'platform' : surveyMac ? 'survey-mac-ui' : reviewedCandidate ? 'reviewed-candidate' : surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : releaseTools ? 'release-tooling' : dependencies ? 'dependencies' : backendModules ? 'backend' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
+  const product=event!=='workflow_dispatch'&&!full&&cognitiveProductPlan(changedEntries(base),base,head,productRead(head),productRead(base));
+  if(product){emit(cognitiveProductOutputs(product));process.exit(0);}
+  const backendUnit = event === 'pull_request' && !full && unitOnly(entries);
+  const scenario = catalogDiscovery ? 'catalog-discovery' : cognitiveMixed ? 'platform' : copy ? 'homepage-copy' : releaseTools ? 'release-tooling' : backendUnit ? 'backend-unit' : dependencies ? 'dependencies' : backendModules ? 'backend' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
     : result.presentation ? 'presentation' : frontendTest ? 'frontend-test' : frontend ? 'frontend' : 'platform';
   // Local pages are covered by related tests and one frontend build. The broad
   // student/** visual inventory does not require every platform browser fixture.
   const selectedAcceptance = acceptanceFor(files);
-  const acceptance = catalogDiscovery || result.presentation || result.cognitive_intake_light || surveySelection || performance || affectedFrontend || backendModules || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || teacher || survey || copy || campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
+  const acceptance = catalogDiscovery || result.presentation || result.cognitive_intake_light || affectedFrontend || backendModules || copy || frontendTest || backendUnit || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
     for (const key of Object.keys(acceptance)) acceptance[key] = true;
-  // Preserve every platform functional/security/build/recovery check. Only the
-  // explicitly cancelled phase-0 performance job is omitted for this integration.
-  if (trainingFunctional || adminFunctional) acceptance.perf_smoke = false;
   const plan = runnerPlan({ profile:process.env.CI_RUNNER_PROFILE || 'hosted', scenario });
   const mediaSelection = ['media2','video_core','media7','situational_video','situational_branching'].filter(key => acceptance[key]);
   const uiRequired = acceptance.app_shell || acceptance.canonical_visual;
-  const frontendBuild = Boolean(surveyCandidate) || Boolean(assessment) || Boolean(efficiency) || dependencies || frontend && !affectedFrontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
-  const codeql = catalogDiscovery || Boolean(copy?.sast) || surveySelection || Boolean(surveyMac) || Boolean(reviewedCandidate) || Boolean(surveyCandidate) || Boolean(sharedStorage) || Boolean(assessment) || Boolean(review) || Boolean(efficiency) || Boolean(backendRepair) || Boolean(teacher) || Boolean(survey) || Boolean(campus) || releaseTools || dependencies || backendModules || scenario === 'platform' || frontend
+  const frontendBuild = dependencies || frontend && !affectedFrontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
+  const codeql = catalogDiscovery || Boolean(copy?.sast) || releaseTools || dependencies || backendModules || scenario === 'platform' || frontend
     || (result.content && contentCodeqlRequired(entries,declarationReaders(base)));
-  const release = event === 'workflow_dispatch' || process.env.CI_FORCE_FULL === 'true' ? null : applicationPlan(base, execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  const output = { backend_focus:result.backend_focus||'full', bundle_family:catalogDiscovery&&bundleFamilyScope(entries), bundle_runtime:catalogDiscovery&&bundleRuntimeScope(entries), personal_tracking_draft:personalTrackingDraftScope(entries,{event,draft:process.env.CI_IS_DRAFT==='true',forceFull:process.env.CI_FORCE_FULL==='true'}), admin_permissions_functional_only:Boolean(adminFunctional), admin_permissions_functional_plan:JSON.stringify(adminFunctional), training_functional_only:Boolean(trainingFunctional), run_performance_tests:!(catalogDiscovery || trainingFunctional || adminFunctional), training_functional_plan:JSON.stringify(trainingFunctional), survey_mac_ui_plan:JSON.stringify(surveyMac), reviewed_candidate_plan:JSON.stringify(reviewedCandidate), survey_candidate_plan:JSON.stringify(surveyCandidate), shared_asset_storage_plan:JSON.stringify(sharedStorage), assessment_capacity_plan:JSON.stringify(assessment), teacher_survey_plan:JSON.stringify(review), access_efficiency_plan:JSON.stringify(efficiency), backend_security_efficiency_plan:JSON.stringify(backendRepair), teacher_home_plan:JSON.stringify(teacher), survey_home_plan:JSON.stringify(survey), homepage_copy_plan:JSON.stringify(copy), application_route:trainingFunctional || adminFunctional ? 'legacy' : surveyMac ? 'survey-mac-ui' : reviewedCandidate ? 'reviewed-candidate' : surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : release && release.route !== 'C' ? release.route : 'legacy', campus_plan:JSON.stringify(campus), release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
+  const release = event === 'workflow_dispatch' || full ? null : applicationPlan(base, head);
+  const output = { authoring_polish:catalogDiscovery&&authoringPolishScope(entries), student_discovery:catalogDiscovery&&studentDiscoveryScope(entries,{readHeadFile:file=>gitContent('HEAD',file),readBaseFile:file=>gitContent(base,file)}), backend_focus:result.backend_focus||'full', bundle_family:catalogDiscovery&&bundleFamilyScope(entries), bundle_runtime:catalogDiscovery&&bundleRuntimeScope(entries), homepage_copy_plan:JSON.stringify(copy), application_route:copy ? 'homepage-copy' : backendUnit ? 'backend-unit' : release && release.route !== 'C' ? release.route : 'legacy', release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
     documentation: result.documentation, diff_base:base, codeql, scenario, image_build:imageBuild, frontend_affected:affectedFrontend||catalogDiscovery,
     dependencies_frontend_only:frontendDependencies,
     frontend_build:catalogDiscovery?false:frontendBuild, ui_required:uiRequired,
@@ -615,7 +381,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
       [key, Array.isArray(value) ? JSON.stringify(value) : value])) };
-  console.log(JSON.stringify({ ...output, base, validationClosure: result.cognitive_intake_light ? 'selected-cognitive-tasks' : 'all-bundles', platformReasons: catalogDiscovery || surveySelection || performance || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || dependencies ? [] : platformReasons(entries, process.env.CI_FORCE_FULL === 'true' || event === 'workflow_dispatch') }));
+  console.log(JSON.stringify({ ...output, base, validationClosure: result.cognitive_intake_light ? 'selected-cognitive-tasks' : 'all-bundles', platformReasons: catalogDiscovery || dependencies ? [] : platformReasons(entries, full || event === 'workflow_dispatch') }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
 }

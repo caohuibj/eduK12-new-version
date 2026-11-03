@@ -157,7 +157,7 @@ describe('FinalQuestionnaireAssessment Scale provenance placement', () => {
     const user = userEvent.setup()
     const { post } = renderAssessment(makeFormData())
 
-    await user.click(await screen.findByRole('button', { name: '提交整个区段' }))
+    await user.click(await screen.findByRole('button', { name: '提交本页' }))
     await waitFor(() => expect(post).toHaveBeenCalledTimes(1))
 
     const [path, body] = post.mock.calls[0] as [string, Record<string, unknown>]
@@ -174,7 +174,7 @@ describe('FinalQuestionnaireAssessment Scale provenance placement', () => {
 
     const input = await screen.findByRole('textbox', { name: /年级/ })
     await user.type(input, '六年级')
-    await user.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await user.click(screen.getByRole('button', { name: '提交本页' }))
     await waitFor(() => expect(post).toHaveBeenCalledTimes(1))
 
     const body = post.mock.calls[0][1] as { answers: Array<{ formItemId: string; value: unknown }> }
@@ -277,7 +277,7 @@ describe('FinalQuestionnaireAssessment Scale provenance placement', () => {
     await user.type(await screen.findByRole('textbox', { name: /年级/ }), '六年级')
     await user.click(screen.getByRole('button', { name: '下一题' }))
     await user.type(screen.getByRole('textbox', { name: /班级/ }), '一班')
-    await user.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await user.click(screen.getByRole('button', { name: '提交本页' }))
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('response lost'))
     const original = structuredClone(post.mock.calls[0][1])
     const stored = await finalDraftStore.get('questionnaire-form-section:questionnaire-assessment-1:form-section-1')
@@ -289,8 +289,8 @@ describe('FinalQuestionnaireAssessment Scale provenance placement', () => {
     expect(screen.getByRole('textbox', { name: /年级/ })).toBeDisabled()
     expect(screen.getByRole('textbox', { name: /年级/ })).toHaveValue('六年级')
     await user.click(screen.getByRole('button', { name: '下一题' }))
-    expect(screen.getByRole('button', { name: '提交整个区段' })).toBeEnabled()
-    await user.click(screen.getByRole('button', { name: '提交整个区段' }))
+    expect(screen.getByRole('button', { name: '提交本页' })).toBeEnabled()
+    await user.click(screen.getByRole('button', { name: '提交本页' }))
     await waitFor(() => expect(post).toHaveBeenCalledTimes(2))
     expect(post.mock.calls[1][1]).toEqual(original)
   })
@@ -303,7 +303,7 @@ describe('FinalQuestionnaireAssessment Scale provenance placement', () => {
       const { post } = renderAssessment(makeFormData())
       const answer = await screen.findByRole('textbox', { name: /年级/ })
       expect(answer).toBeDisabled()
-      expect(screen.getByRole('button', { name: '提交整个区段' })).toBeDisabled()
+      expect(screen.getByRole('button', { name: '提交本页' })).toBeDisabled()
       expect(post).not.toHaveBeenCalled()
     } finally { ensure.mockRestore() }
   })
@@ -314,7 +314,7 @@ describe('FinalQuestionnaireAssessment Scale provenance placement', () => {
     let rejectReload!: (error: Error) => void
     onReload.mockImplementation(() => new Promise<void>((_, reject) => { rejectReload = reject }))
     const seal = vi.spyOn(finalDraftStore, 'sealForSubmission')
-    const submitLabel = kind === 'Form' ? '提交整个区段' : '提交整份量表'
+    const submitLabel = kind === 'Form' ? '提交本页' : '提交整份量表'
     if (kind === 'Scale') await user.click(await screen.findByRole('button', { name: '经常' }))
     await user.click(await screen.findByRole('button', { name: submitLabel }))
     await waitFor(() => expect(onReload).toHaveBeenCalledTimes(1))

@@ -81,6 +81,16 @@ suite('U4 candidate to frozen Teacher SELF Form FINAL and authorized description
   expect(feedback.data.units[0]).toMatchObject({kind:'FORM',state:'READY',formDescription:{version:'ordinal-description-v1',
    items:[{code:0,state:'VALID'},{code:2,state:'VALID'},{code:null,state:'NONRESPONSE_OPTION'}],exploratoryMeans:[{value:null,completeItems:2,expectedItems:3}]}})
   expect(JSON.stringify(feedback.value)).not.toMatch(/canonicalResultEncrypted|collectionFactsEncrypted|manifestHash/)
+  // Reject source drift even when the stored content hash was not updated.
+  const frozenRow=await db.educationPrivateToolVersion.findUniqueOrThrow({where:{id:fixed.id},select:{definition:true}})
+  const changedDefinition=structuredClone(frozenRow.definition) as any
+  changedDefinition.pages[0].questions[0].prompt+=' (unverified drift)'
+  await db.educationPrivateToolVersion.update({where:{id:fixed.id},data:{definition:changedDefinition}})
+  try{
+   expect((await request(`/run-executions/${execution.id}/feedback`,auth)).status).toBe(404)
+  }finally{
+   await db.educationPrivateToolVersion.update({where:{id:fixed.id},data:{definition:frozenRow.definition as any}})
+  }
   await expect(readTeacherOrdinaryFeedback({executionId:execution.id,actorUserId:f.managerUserId})).rejects.toMatchObject({statusCode:404})
   await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:f.organizationId,userId:f.participantUserId,permission:'REPORT_READ',reason:'Synthetic withdrawal',deniedByUserId:f.managerUserId}})
   expect((await request(`/run-executions/${execution.id}/feedback`,auth)).status).toBe(404)

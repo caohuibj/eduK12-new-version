@@ -25,6 +25,10 @@ export function formDescriptiveIssues(form:FormDraft){
   const opts=[...item.values.map(v=>v.optionKey),...item.nonresponseOptionKeys]
   if(!q||!['SINGLE','LIKERT'].includes(q.type)||q.otherOptionKey||q.options.some(o=>o.score!==undefined)
    ||opts.length!==q.options.length||new Set(opts).size!==opts.length||q.options.some(o=>!opts.includes(o.optionKey)))fail('描述规则必须完整区分本题有序选项和非回答选项，不能包含分数或文本')
+  // Reserve protected aggregate buckets for true refusal/missing states.
+  // A user-choice option may never share one of their accounting keys.
+  if(opts.some(optionKey=>['ANSWERED','REFUSED','MISSING','SHOWN_MISSING','NOT_SHOWN'].includes(optionKey)))
+   fail('描述选项编码不能占用系统拒答或缺失状态')
   const codes=item.values.map(v=>v.code).sort((a,b)=>a-b)
   if(codes.some((code,i)=>code!==i))fail('有序类别代码必须从 0 连续排列，不是能力刻度')
  }

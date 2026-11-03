@@ -1,5 +1,6 @@
 import type {Prisma} from '@prisma/client'
 import {validateFormDefinition} from '../assessment-core/form/definition'
+import {privateToolContentHash} from '../education-tools/private-tool.definition'
 import {describeFormResponse} from '../assessment-core/form/descriptive'
 import {readFormSectionCollectionFacts} from '../assessment-runtime/form-facts'
 import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
@@ -15,13 +16,17 @@ function fail():never{return reportingFail('REPORT_NOT_FOUND','reporting resourc
 export async function readOrdinaryFormDescriptions(tx:Prisma.TransactionClient,input:{identity:Identity;
  parentId:string;attemptEpoch:number;slots:Awaited<ReturnType<typeof loadFrozenActiveSlotSet>>;blockIds:Set<string>}){
  const blocks=input.identity.manifest.filter(b=>input.blockIds.has(b.blockId))
- const rows=await tx.educationPrivateToolVersion.findMany({where:{id:{in:blocks.map(b=>b.versionId)},kind:'FORM',entry:'TEACHER'},select:{id:true,contentHash:true,definition:true}})
+ const rows=await tx.educationPrivateToolVersion.findMany({where:{
+  id:{in:blocks.map(b=>b.versionId)},kind:'FORM',entry:'TEACHER',
+  organizationId:input.identity.origin.organizationId,ownerUserId:input.identity.origin.ownerUserId,
+ },select:{id:true,title:true,contentHash:true,definition:true}})
  const finals=await tx.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:input.parentId,attemptEpoch:input.attemptEpoch,slotKey:{in:blocks.flatMap(b=>b.sectionIds.map(formSectionSlotKey))}}})
  const sections=await tx.compositeFormSectionAttempt.findMany({where:{attemptId:input.parentId,attemptEpoch:input.attemptEpoch,sectionId:{in:blocks.flatMap(b=>b.sectionIds)},status:'COMPLETED'},select:{id:true,sectionId:true,submissionId:true}})
  const reports=new Map<string,NonNullable<ReturnType<typeof describeFormResponse>>>()
  for(const b of blocks){
   if(b.kind!=='FORM'||b.sourceProvider!=='PRIVATE_VERSION')fail()
   const row=rows.find(r=>r.id===b.versionId&&r.contentHash===b.contentHash)
+  if(!row||privateToolContentHash('FORM',row.title,row.definition)!==b.contentHash)fail()
   const checked=validateFormDefinition(row?.definition,{forPreview:true}),form=checked.definition
   if(!form||checked.issues.some(i=>i.severity==='error')||form.descriptive?.selfAudience!=='TEACHER'||form.pages.length!==b.sectionIds.length)fail()
   const answers:Record<string,unknown>={},missing:Array<{itemKey:string;reason:string}>=[]

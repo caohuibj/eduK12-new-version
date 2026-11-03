@@ -24,7 +24,7 @@ describe('proofread audited scoring contract', () => {
       else expect(legacyScore(entry.input as never)).toEqual(entry.expected)
     }
     expect(executionEntries.map(entry => [entry.engineVersion, entry.scoringVersion])).toEqual([['1.0.0','1.0.0'], ['1.1.0','1.1.0']])
-    expect(participantPresentations.map(entry => [entry.engineVersion, entry.scoringVersion, entry.presentationVersion])).toEqual([['1.0.0','1.0.0','1.0.0'], ['1.1.0','1.1.0','1.1.0']])
+    expect(participantPresentations.map(entry => [entry.engineVersion, entry.scoringVersion, entry.presentationVersion])).toEqual([['1.0.0','1.0.0','1.0.0'], ['1.1.0','1.1.0','1.1.0'], ['1.1.0','1.1.0','3.0.0']])
   })
   it('uses formal denominator and distinguishes correct, error, timeout and missing RT', () => {
     const data = trials()

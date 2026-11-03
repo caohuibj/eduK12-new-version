@@ -37,6 +37,14 @@ describe('U4 frozen Form ordinal descriptions',()=>{
   const empty=normalized(form,{})
   expect(describeFormResponse(form,empty.rawAnswers,empty.missing)!.exploratoryMeans).toEqual([])
  })
+ it('refuses descriptive option keys reserved for missing/refusal states',()=>{
+  for(const reserved of ['ANSWERED','REFUSED','MISSING','SHOWN_MISSING','NOT_SHOWN']){
+   const form=selected()
+   form.pages[0].questions[0].options[0].optionKey=reserved
+   form.descriptive!.items[0].values[0].optionKey=reserved
+   expect(validateFormDefinition(form).issues.map(issue=>issue.message)).toContain('描述选项编码不能占用系统拒答或缺失状态')
+  }
+ })
  it('report-only configuration preserves content comparison identity, including legacy identity',()=>{
   const f=selected(),{descriptive,...legacy}=f
   expect(studentFormComparableKey(f)).toBe('FORM:'+canonicalHash({kind:'FORM',definition:legacy}))

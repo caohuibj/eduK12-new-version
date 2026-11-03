@@ -1,0 +1,41 @@
+{
+  "status": "PASSED",
+  "sourceTextFidelity": {
+    "competences": 32,
+    "levelStatements": 192,
+    "commonZeroOptions": 32,
+    "normalizationTrace": "original-items-and-mapping.json",
+    "completeResponsibleUseB2": true
+  },
+  "noAggregate": true,
+  "noReverseScoring": true,
+  "noAgreementAnchors": true,
+  "invalidResponses": [
+    {
+      "value": 0,
+      "rejected": true
+    },
+    {
+      "value": 7,
+      "rejected": true
+    },
+    {
+      "value": "strongly_agree",
+      "rejected": true
+    }
+  ],
+  "runtimeReportCases": 4,
+  "missingAndZeroDistinct": true,
+  "versionAxes": "C/scoring/R1.0.0; Pnone",
+  "dependencyLockSha256": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+  "prismaSchemaSha256": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+  "sourceHashes": {
+    "src/modules/scale/instruments/selfie4t_2022tk_assessment_en_teacher_self/1.0.0/source.json": "797735d43554e8af517aa43aaa9ffff3c6d41901df612a5f06ca4d069bacc018",
+    "src/modules/scale/instruments/selfie4t_2022tk_digital_resources_en_teacher_self/1.0.0/source.json": "d988d43e3ebb7a47f3eea8934cf930ee99f7c6ccb63d749f562ad34fc39013da",
+    "src/modules/scale/instruments/selfie4t_2022tk_empowering_learners_en_teacher_self/1.0.0/source.json": "adc735c046bd7ff42c0ba299907c9d443c7ccd765aa3cfe0c9518d9a4ece6c8b",
+    "src/modules/scale/instruments/selfie4t_2022tk_learners_digital_competence_en_teacher_self/1.0.0/source.json": "8125701fe1ab20972235b496eb272f36b3b20ecf8f5d819ad415dcb19f323a2b",
+    "src/modules/scale/instruments/selfie4t_2022tk_professional_engagement_en_teacher_self/1.0.0/source.json": "a0297df8c0a4d60ed68ed06e67c15d8166e6ea8e5c551a647f0b175053a64a63",
+    "src/modules/scale/instruments/selfie4t_2022tk_teaching_learning_en_teacher_self/1.0.0/source.json": "412f3dd5c8b159ef88ab01e4efd1f50ff9aee5095982f6954ef9bbd44398b28d"
+  },
+  "boundary": "Unsigned local targeted content and semantic evidence; not formal CI, human review, production dedup or current-online equivalence"
+}

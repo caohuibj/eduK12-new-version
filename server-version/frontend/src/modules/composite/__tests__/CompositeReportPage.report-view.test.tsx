@@ -116,6 +116,19 @@ describe('Training participant combined report callback', () => {
     expect(screen.getByText('合并读取报告')).toBeInTheDocument()
     expect(mocks.api.reportStatus).not.toHaveBeenCalled(); expect(mocks.api.report).not.toHaveBeenCalled()
   })
+  it.each(['PENDING', 'PROCESSING'] as const)('polls an accepted unit submission despite a stale WAITING_SUBMISSION hint (%s)', async state => {
+    vi.useFakeTimers()
+    const pending = { ...generation(state, 'WAITING_SUBMISSION'), wholeSubmissionReceived: false }
+    mocks.api.reportView.mockResolvedValueOnce(view(pending, null)).mockResolvedValue(view(generation('READY', 'AVAILABLE')))
+    mount(); await flush()
+    expect(screen.getByText('作答记录已保存，报告生成中')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '继续作答' })).toBeNull()
+    expect(screen.queryByText('合并读取报告')).toBeNull()
+    await act(async () => { await vi.advanceTimersByTimeAsync(250) })
+    expect(screen.getByText('合并读取报告')).toBeInTheDocument()
+    expect(mocks.api.reportView).toHaveBeenCalledTimes(2)
+    expect(mocks.api.report).not.toHaveBeenCalled()
+  })
 
   it('keeps hidden-page polling idle and resumes only after visibility returns', async () => {
     vi.useFakeTimers()

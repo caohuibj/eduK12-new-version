@@ -168,7 +168,7 @@ const CourseDetailContent: React.FC = () => {
   const fetchComposites = async () => {
     beginSectionLoad('composites')
     try {
-      const response = await apiClient.get<{ list: CompositeAssessment[] }>('/composite-assessments/available', { params: { courseId } })
+      const response = await apiClient.get<{ list: CompositeAssessment[] }>('/composite-assessments/available', { params: { courseId, view: 'summary' } })
       if (response.code !== 0) throw new Error(response.message || '获取综合测评列表失败')
       const available = response.data?.list || []
       const deliveredIds = new Set<string>()

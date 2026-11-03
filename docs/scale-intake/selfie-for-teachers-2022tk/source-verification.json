@@ -1,0 +1,34 @@
+{
+  "verifiedAt": "2026-11-02",
+  "itemOriginal": {
+    "url": "https://education.ec.europa.eu/sites/default/files/2022-12/selfie-for-teachers-toolkit-dec-22_en.pdf",
+    "sha256": "0356e21f6d57be36002a1c906544dd4c50a7d9c06fdffc24869ead75b4d178e8",
+    "pages": 66,
+    "read": "Rights page, instructions and complete Annex I PDF49–64; all32 competence introductions and192 A1–C2 statements checked",
+    "license": "CC BY 4.0; EU-owned text only; non-EU figures/logos excluded"
+  },
+  "scoringOriginal": {
+    "url": "https://publications.jrc.ec.europa.eu/repository/bitstream/JRC131282/JRC131282_01.pdf",
+    "sha256": "396f5afabaa3b83a9fa17e87dc5e9b9732c0bc10de46f7d113bbd0c0abc34125",
+    "pages": 124,
+    "read": "Rights page, p11 awareness option, scoring Annex1 p92/PDF96, detailed item content and discrepancy at6.5/PDF86",
+    "license": "CC BY 4.0; attribution and project change notice retained"
+  },
+  "currentPublicEntry": {
+    "url": "https://education.ec.europa.eu/selfie-for-teachers/get-started/toolkit-for-users",
+    "pageUpdated": "2026-03-24",
+    "result": "Public page retrieved; rendered/raw response exposed no direct current questionnaire publication link. Fixed2022 official PDF remains accessible. Do not label this content as the current login-only online edition."
+  },
+  "onlineTool": {
+    "url": "https://selfie-in-education.ec.europa.eu/educators/",
+    "access": "Public landing only; actual questionnaire requires EU Login; no account, login, terms acceptance or bypass attempted"
+  },
+  "discrepancy": "2023 chapter4 responsible-use6.5 lacks B2 row; visual/text confirmation. All item/level content consistently uses complete2022 Toolkit, including6.5 B2. Common not-aware option and0–6 scoring use2023 p11/Annex1. No missing statement constructed.",
+  "notClaimed": [
+    "Validated Chinese translation",
+    "Current online exact equivalence",
+    "DigCompEdu Check-In22 equivalence",
+    "Independent six-area administration validation",
+    "Teacher performance ranking or certification"
+  ]
+}

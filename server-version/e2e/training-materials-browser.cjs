@@ -234,7 +234,7 @@ async function main() {
   stage = 'real Form FINAL and replay'
   await anonymous.locator('.form-player textarea').fill('C20 real browser FINAL')
   const finalResponse = anonymous.waitForResponse(r => /\/form-sections\/[^/]+\/submit$/.test(new URL(r.url()).pathname) && r.request().method() === 'POST')
-  await anonymous.getByRole('button', { name: '提交整个区段', exact: true }).click()
+  await anonymous.getByRole('button', { name: '提交本页', exact: true }).click()
   const accepted = await finalResponse
   assert.equal(accepted.status(), 200)
   const finalBody = accepted.request().postDataJSON()

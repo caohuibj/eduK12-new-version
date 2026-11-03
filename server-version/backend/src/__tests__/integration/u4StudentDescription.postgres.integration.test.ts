@@ -107,6 +107,15 @@ suite('U4 independent student topic, real FINAL and protected descriptive report
   expect(unit.distributions![0].descriptive!.frequencies[0].percentage).toBe(50)
   expect(unit.distributions![0].cells!.find(c=>c.key==='na')!.percentage).toBe(25)
   expect(JSON.stringify(report)).not.toMatch(/respondentUserId|sourceAttemptId|collectionFactsEncrypted/)
+  const frozenRow=await db.educationPrivateToolVersion.findUniqueOrThrow({where:{id:source.id},select:{definition:true}})
+  const changedDefinition=structuredClone(frozenRow.definition) as any
+  changedDefinition.pages[0].questions[0].prompt+=' (unverified drift)'
+  await db.educationPrivateToolVersion.update({where:{id:source.id},data:{definition:changedDefinition}})
+  try{
+   await expect(readHuiteacherStudentFeedbackReport(campaign)).rejects.toMatchObject({statusCode:409})
+  }finally{
+   await db.educationPrivateToolVersion.update({where:{id:source.id},data:{definition:frozenRow.definition as any}})
+  }
   await expect(readHuiteacherStudentFeedbackReport({...campaign,actorUserId:students[0]})).rejects.toThrow()
   expect(await readHuiteacherStudentFeedbackReport({...campaign,actorUserId:teacher.id})).toEqual(report)
  },120_000)

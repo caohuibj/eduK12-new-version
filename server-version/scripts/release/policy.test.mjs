@@ -35,7 +35,7 @@ test('selected route is exact success, not a job count; login keeps SAST boundar
 });
 
 test('tooling-only C never implies application builds or data recovery; mixed files/modes are rejected',()=>{
- const files=['server-version/scripts/release/executor.py','.github/workflows/ci.yml','.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-controls.test.mjs','.github/scripts/dependency-scope.mjs','.github/scripts/dependency-routing.test.mjs','docs/development/ci-gate-cleanup-20261031.md'].map(regular);assert.equal(toolingOnly(files),true);
+ const files=['server-version/scripts/release/executor.py','.github/workflows/ci.yml','.github/scripts/scale-intake-scope.mjs','.github/scripts/scale-intake-scope.test.mjs','.github/scripts/dependency-scope.mjs','.github/scripts/dependency-routing.test.mjs','docs/development/ci-gate-cleanup-20261031.md'].map(regular);assert.equal(toolingOnly(files),true);
  for(const extra of [regular(css),regular('server-version/backend/prisma/schema.prisma'),regular('server-version/scripts/release/unknown.py'),regular('.github/scripts/onboarding-bindings.json'),regular('.github/scripts/onboarding-new-check.mjs'),{...files[0],status:'D',newMode:'000000'},{...files[0],newMode:'100755'},{...files[0],newMode:'120000'}])assert.equal(toolingOnly([...files,extra]),false);
  const needs={scope:{result:'success',outputs:{scenario:'release-tooling'}}};assert.deepEqual(requiredChecks(needs,true),['scope','release-tools']);assert.deepEqual(requiredChecks(needs,false),['scope','release-tools','codeql']);
 });
@@ -78,7 +78,7 @@ test('exact ingress bundle uses tools gate; unknown vhosts, app files, deletions
 });
 
  test('native CodeQL configuration uses existing tooling route, not application acceptance',()=>{
- const files=['.github/workflows/ci.yml','.github/scripts/school-teacher-native.mjs','.github/scripts/school-teacher-native.test.mjs','docs/performance/codeql-analysis-20261030.md','server-version/scripts/release/policy.mjs','server-version/scripts/release/policy.test.mjs'].map(regular);
+ const files=['.github/workflows/ci.yml','.github/scripts/scale-intake-scope.mjs','.github/scripts/scale-intake-scope.test.mjs','docs/performance/codeql-analysis-20261030.md','server-version/scripts/release/policy.mjs','server-version/scripts/release/policy.test.mjs'].map(regular);
  assert.equal(toolingOnly(files),true);
  assert.equal(toolingOnly([...files,regular(auth)]),false);
  const needs={scope:{result:'success',outputs:{scenario:'release-tooling'}},'release-tools':{result:'success'},codeql:{result:'success'}};

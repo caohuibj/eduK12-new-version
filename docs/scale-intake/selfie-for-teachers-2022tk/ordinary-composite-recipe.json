@@ -1,0 +1,92 @@
+{
+  "artifactPurpose": "Existing ordinary-composite assembly recipe, not a new import/runtime schema",
+  "version": "1.0.0",
+  "motherTag": "family:selfie4t",
+  "motherKey": "selfie4t_2022tk_32_en_teacher_self",
+  "orderedScaleUnits": [
+    {
+      "instrumentKey": "selfie4t_2022tk_professional_engagement_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "competenceCodes": [
+        "1.1",
+        "1.2",
+        "1.3",
+        "1.4",
+        "1.5",
+        "1.6",
+        "1.7",
+        "1.8",
+        "1.9"
+      ]
+    },
+    {
+      "instrumentKey": "selfie4t_2022tk_digital_resources_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "competenceCodes": [
+        "2.1",
+        "2.2",
+        "2.3",
+        "2.4",
+        "2.5"
+      ]
+    },
+    {
+      "instrumentKey": "selfie4t_2022tk_teaching_learning_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "competenceCodes": [
+        "3.1",
+        "3.2",
+        "3.3",
+        "3.4",
+        "3.5"
+      ]
+    },
+    {
+      "instrumentKey": "selfie4t_2022tk_assessment_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "competenceCodes": [
+        "4.1",
+        "4.2",
+        "4.3"
+      ]
+    },
+    {
+      "instrumentKey": "selfie4t_2022tk_empowering_learners_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "competenceCodes": [
+        "5.1",
+        "5.2",
+        "5.3",
+        "5.4"
+      ]
+    },
+    {
+      "instrumentKey": "selfie4t_2022tk_learners_digital_competence_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "competenceCodes": [
+        "6.1",
+        "6.2",
+        "6.3",
+        "6.4",
+        "6.5",
+        "6.6"
+      ]
+    }
+  ],
+  "unscoredForms": [],
+  "outputs": "32 separate competence self-positions0–6, no area/global aggregate",
+  "status": "PREPARED_NOT_PUBLISHED",
+  "note": "No cross-tool sum, full-tool proficiency classification, EU badge or certificate. Source whole-tool bands are provenance only."
+}

@@ -47,7 +47,7 @@ it('uses the real Teacher host and Final form section with CSRF, forwarding the 
  await waitFor(()=>expect(input).toBeEnabled())
  fireEvent.change(input,{target:{value:'数学'}})
  expect(await screen.findByText('已保存到本机。',{exact:true})).toHaveClass('assessment-local-save-status')
- const submit=screen.getByRole('button',{name:'提交整个区段'})
+ const submit=screen.getByRole('button',{name:'提交本页'})
  await waitFor(()=>expect(submit).toBeEnabled());fireEvent.click(submit)
  await waitFor(()=>expect(saved).toBe(true))
  await waitFor(()=>expect(finalReads).toHaveLength(1))

@@ -178,7 +178,15 @@ suite('Mini role operations and shared classroom against actual HTTP/PostgreSQL/
   const t=await logged(teacher),state=await t.runtime.classrooms.state(classroom.id),handler=new ClassroomSocketHandler(),acks:any[]=[]
   const broadcast=vi.spyOn(socketService,'broadcastToRoom').mockImplementation(()=>{});try{
    await Promise.all([t.runtime.classrooms.command(classroom.id,'START',{questionId:question.id},state),...Array.from({length:8},async()=>{await (handler as any).handleTeacherStart({handshake:{headers:{cookie:'ptool_session='+generateToken({userId:teacher.id,username:teacher.username,role:'TEACHER',tokenVersion:teacher.tokenVersion})}},data:{authenticated:true,userId:teacher.id,userRole:'TEACHER',tokenVersion:0,classroomId:classroom.id},emit:vi.fn()},{questionId:question.id,timeLimit:60},(p:any)=>acks.push(p))})])
-   const active=await prisma.classroomQuestion.findMany({where:{classroomId:classroom.id,startedAt:{not:null},endedAt:null}});expect(active).toHaveLength(1);expect(acks.every(a=>a.ok&&a.question.startedAt===active[0].startedAt!.toISOString())).toBe(true);expect(broadcast).toHaveBeenCalledTimes(1)
+   const active=await prisma.classroomQuestion.findMany({where:{classroomId:classroom.id,startedAt:{not:null},endedAt:null}});expect(active).toHaveLength(1);expect(acks).toHaveLength(8);expect(acks.every(a=>a.ok&&a.question.startedAt===active[0].startedAt!.toISOString())).toBe(true)
+   // One start is delivered once to each audience; students receive a
+   // sanitized payload instead of the former shared classroom broadcast.
+   expect(broadcast.mock.calls.map(([room,event])=>[room,event])).toEqual([
+    ['classroom:'+classroom.id+':students','broadcast:question'],
+    ['classroom:'+classroom.id+':teacher','broadcast:question'],
+    ['classroom:'+classroom.id+':bigscreen','broadcast:question'],
+   ])
+   expect(broadcast.mock.calls[0][2].questionContent.correctAnswer).toBeUndefined()
   }finally{broadcast.mockRestore();(handler as any).activeTimers.forEach((t:any)=>clearTimeout(t))}
  })
  it('repeat answer is idempotent; different answer, forged identity, and old round are rejected',async()=>{

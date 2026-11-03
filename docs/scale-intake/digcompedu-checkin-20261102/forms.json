@@ -1,0 +1,621 @@
+{
+  "source": "https://doi.org/10.7717/peerj.18456/supp-1",
+  "license": "CC BY 4.0; attribution and adaptation details in README.md and item-map.json",
+  "forms": [
+    {
+      "key": "digcompedu_checkin_peerj2023_pre_positioning_en",
+      "name": "DigCompEdu Check-In｜施测前自我定位（无分）｜教师自评｜高教英文2023（PeerJ2024）",
+      "version": "1.0.0",
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "form:pre_positioning"
+      ],
+      "sourceQuestions": [
+        2
+      ],
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "pre_positioning",
+            "title": "施测前自我定位",
+            "description": "Optional self-positioning, no calculated proficiency grade or diagnosis. Project separation of the source pre/post questions.",
+            "questions": [
+              {
+                "itemKey": "dce_context_2",
+                "type": "SINGLE",
+                "prompt": "How do you currently assess your digital competence as an academic teaching in higher or further education?",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "A1. Newcomer"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "A2. Explorer"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "B1. Integrator"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "B2. Expert"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "C1. Leader"
+                  },
+                  {
+                    "optionKey": "o6",
+                    "label": "C2. Pioneer"
+                  }
+                ],
+                "rows": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "digcompedu_checkin_peerj2023_context_en",
+      "name": "DigCompEdu Check-In｜背景与数字教学条件（无分）｜教师自评｜高教英文2023（PeerJ2024）",
+      "version": "1.0.0",
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "form:context"
+      ],
+      "sourceQuestions": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "context",
+            "title": "Optional context / no scores",
+            "description": "Only provide information you wish to share. These contextual responses are not scored and do not determine competence. Do not include identifiable student information.",
+            "questions": [
+              {
+                "itemKey": "dce_context_25",
+                "type": "SINGLE",
+                "prompt": "Academic Title:",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "Prof. Dr."
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "Assoc. Prof. Dr."
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "Assist. Prof. Dr."
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "Research Assistant"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "Lecturer"
+                  }
+                ],
+                "rows": []
+              },
+              {
+                "itemKey": "dce_context_26",
+                "type": "SINGLE",
+                "prompt": "Your gender:",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "Female"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "Male"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "Prefer not to say"
+                  }
+                ],
+                "rows": []
+              },
+              {
+                "itemKey": "dce_context_27",
+                "type": "NUMBER",
+                "prompt": "Your age:",
+                "required": false,
+                "options": [],
+                "rows": [],
+                "min": 0
+              },
+              {
+                "itemKey": "dce_context_28",
+                "type": "NUMBER",
+                "prompt": "Teaching experience in higher education in years:",
+                "required": false,
+                "options": [],
+                "rows": [],
+                "min": 0
+              },
+              {
+                "itemKey": "dce_context_29",
+                "type": "MULTIPLE",
+                "prompt": "In which of the following subject areas do you teach? Multiple answers are possible.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "Nursing"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "Nutrition and Dietetics"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "Physiotherapy and Rehabilitation"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "Audiology"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "Healthcare Management"
+                  },
+                  {
+                    "optionKey": "o6",
+                    "label": "Social Work"
+                  },
+                  {
+                    "optionKey": "o7",
+                    "label": "Exercise and Sport Sciences"
+                  },
+                  {
+                    "optionKey": "o8",
+                    "label": "Occupational Therapy"
+                  },
+                  {
+                    "optionKey": "o9",
+                    "label": "Other:"
+                  }
+                ],
+                "rows": [],
+                "otherOptionKey": "o9",
+                "otherMaxLength": 300
+              },
+              {
+                "itemKey": "dce_context_30",
+                "type": "MULTIPLE",
+                "prompt": "What is the main profile of the students you teach? Multiple answers are possible.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "Undergraduate students"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "Graduate master students"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "Graduate doctorate students"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "Adult students full-time"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "Adult students part-time"
+                  },
+                  {
+                    "optionKey": "o6",
+                    "label": "Other:"
+                  }
+                ],
+                "rows": [],
+                "otherOptionKey": "o6",
+                "otherMaxLength": 300
+              },
+              {
+                "itemKey": "dce_context_31",
+                "type": "NUMBER",
+                "prompt": "How long have you been using DT in teaching? (Indicate in years / zero for never). Digital Technology (DT) means all information and communication technologies such as mobile phone, computer, Internet, software etc. that can be used to create, view, distribute, modify, store, retrieve, transmit and receive information electronically in a digital form.",
+                "required": false,
+                "options": [],
+                "rows": [],
+                "min": 0
+              },
+              {
+                "itemKey": "dce_context_32",
+                "type": "MULTIPLE",
+                "prompt": "Which digital tools have you or your students already used for teaching and learning? Multiple answers are possible.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "Presentations"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "Digital posters, mindmaps, planning tools"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "Watching videos / listening to audios"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "Digital quizzes or polls (ie Kahoot, Mentimeter, etc)"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "Blogs or wikis"
+                  },
+                  {
+                    "optionKey": "o6",
+                    "label": "Creating videos / audios"
+                  },
+                  {
+                    "optionKey": "o7",
+                    "label": "Online/Virtual learning environments (Moodle, etc)"
+                  },
+                  {
+                    "optionKey": "o8",
+                    "label": "Online communication tools (Zoom, Teams, Skype, Google Meet, etc)"
+                  },
+                  {
+                    "optionKey": "o9",
+                    "label": "I have not yet used any digital tools in class"
+                  },
+                  {
+                    "optionKey": "o10",
+                    "label": "Other:"
+                  }
+                ],
+                "rows": [],
+                "otherOptionKey": "o10",
+                "otherMaxLength": 300
+              },
+              {
+                "itemKey": "dce_context_33",
+                "type": "MULTIPLE",
+                "prompt": "Do you have the following digital technologies for teaching / learning provided by your university? Multiple answers are possible.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "Learning Management System or Virtual Learning Environment (like Moodle/Blackboard- etc.)"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "Student Enrolment and Grading System (course lists, grading, attendance, etc.)"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "Asynchronous Communication Tools (Email, SMS, Messaging)"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "Synchronous Communication Tools (Zoom, Teams, Skype etc.)"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "Online or electronic measurement and evaluation systems"
+                  },
+                  {
+                    "optionKey": "o6",
+                    "label": "Other:"
+                  }
+                ],
+                "rows": [],
+                "otherOptionKey": "o6",
+                "otherMaxLength": 300
+              },
+              {
+                "itemKey": "dce_context_34",
+                "type": "MULTIPLE",
+                "prompt": "Do you have advanced or field-specific DT for teaching / learning? Multiple answers are possible.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "Augmented/Virtual Reality Tools or environments"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "Simulations"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "Software or applications for specific tasks (like for advanced calculation, data analysis, etc.)"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "Special institutional membership for certain online collections / databases"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "Other:"
+                  }
+                ],
+                "rows": [],
+                "otherOptionKey": "o5",
+                "otherMaxLength": 300
+              },
+              {
+                "itemKey": "dce_context_35",
+                "type": "MULTIPLE",
+                "prompt": "Do you have any experience in teaching online? Multiple answers are possible.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "Yes, I've given a fully online course only during the Covid pandemic"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "Yes, I've given a fully online course before the Covid pandemic"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "Yes, I've given a partially online course (in blended or hybrid form) only during the Covid Pandemic"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "Yes, I've given a partially online course (in blended or hybrid form) before the Covid Pandemic"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "No, I have never given an online course"
+                  },
+                  {
+                    "optionKey": "o6",
+                    "label": "Other:"
+                  }
+                ],
+                "rows": [],
+                "otherOptionKey": "o6",
+                "otherMaxLength": 300
+              },
+              {
+                "itemKey": "dce_context_36",
+                "type": "MULTIPLE",
+                "prompt": "Do you have any experience in participating/enrolling an online course or certificate programme? Multiple answers are possible.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "Yes, I've participated/enrolled a fully online course/certificate programme"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "Yes, I've participated/enrolled a partially online (in blended or hybrid form) course/certificate programme"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "No, I don't have such learning experience"
+                  }
+                ],
+                "rows": []
+              },
+              {
+                "itemKey": "dce_context_37",
+                "type": "MATRIX",
+                "prompt": "How would you describe yourself and your private use of digital technologies? Select only one option in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "Strongly disagree"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "Disagree"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "Neither agree or disagree"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "Agree"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "Strongly agree"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "r1",
+                    "label": "I find it easy to work with computers and other technical equipment"
+                  },
+                  {
+                    "rowKey": "r2",
+                    "label": "I use the Internet extensively and competently"
+                  },
+                  {
+                    "rowKey": "r3",
+                    "label": "I am open and curious about new apps, programs, resources"
+                  },
+                  {
+                    "rowKey": "r4",
+                    "label": "I am a member of various social networks"
+                  }
+                ]
+              },
+              {
+                "itemKey": "dce_context_38",
+                "type": "MATRIX",
+                "prompt": "How well does your work environment meet the following criteria? Select only one option in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "Strongly disagree"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "Disagree"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "Neither agree or disagree"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "Agree"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "Strongly agree"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "r1",
+                    "label": "The department invests in updating and improving the technical infrastructure."
+                  },
+                  {
+                    "rowKey": "r2",
+                    "label": "The department provides the necessary technical support."
+                  },
+                  {
+                    "rowKey": "r3",
+                    "label": "Students have access to digital devices"
+                  },
+                  {
+                    "rowKey": "r4",
+                    "label": "The internet connection of the department is reliable and fast."
+                  },
+                  {
+                    "rowKey": "r5",
+                    "label": "The department supports the development of my digital competence, e.g. through continuous professional development activities."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "digcompedu_checkin_peerj2023_post_positioning_en",
+      "name": "DigCompEdu Check-In｜施测后自我定位（无分）｜教师自评｜高教英文2023（PeerJ2024）",
+      "version": "1.0.0",
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "form:post_positioning"
+      ],
+      "sourceQuestions": [
+        39
+      ],
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "post_positioning",
+            "title": "施测后自我定位",
+            "description": "Optional self-positioning, no calculated proficiency grade or diagnosis. Project separation of the source pre/post questions.",
+            "questions": [
+              {
+                "itemKey": "dce_context_39",
+                "type": "SINGLE",
+                "prompt": "How would you now, after responding to the questionnaire, assess your digital competence as an academic teaching in higher or further education? Assign a level of competence from A1 to C2, where A1 is the lowest and C2 the highest level.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "o1",
+                    "label": "A1. Newcomer"
+                  },
+                  {
+                    "optionKey": "o2",
+                    "label": "A2. Explorer"
+                  },
+                  {
+                    "optionKey": "o3",
+                    "label": "B1. Integrator"
+                  },
+                  {
+                    "optionKey": "o4",
+                    "label": "B2. Expert"
+                  },
+                  {
+                    "optionKey": "o5",
+                    "label": "C1. Leader"
+                  },
+                  {
+                    "optionKey": "o6",
+                    "label": "C2. Pioneer"
+                  }
+                ],
+                "rows": []
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "adaptations": [
+    "All background and positioning questions are optional (source required flags removed).",
+    "Source question1 email collection omitted; use existing platform identity controls.",
+    "Question33 editorial parenthesis about seeking partner LMS names omitted.",
+    "Question34/35 Turkish Other label Diğer normalised to English Other.",
+    "Mechanical PDF missing-letter/line-wrap repairs in question33 and36; no response scores.",
+    "Non-negative number entry is a project data-entry guard, not an author-specified score rule.",
+    "Pre/post positioning labels punctuated consistently. No A1–C2 calculated classification or matrix score."
+  ]
+}

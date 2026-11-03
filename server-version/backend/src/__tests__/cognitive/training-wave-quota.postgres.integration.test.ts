@@ -42,10 +42,17 @@ suite('Training frozen Cognitive wave quota, real PostgreSQL',()=>{
     const t2=await wave(2),p2=await parent(t2)
     expect(await readCognitiveQuota(tx,user.id,wrapper.id,{compositeAssessmentId:t2.row.id,compositeItemId:t2.itemId})).toMatchObject({remainingAttempts:1})
     await admitCognitiveAttempt(tx,user.id,wrapper.id,p2.scope)
-    // No scope / an ordinary copied task cannot borrow the plan's new allowance.
+    // The delivered Training wrapper has its own standalone allowance, even
+    // though its canonical source has no course and a composite was completed.
+    expect(await readCognitiveQuota(tx,user.id,wrapper.id)).toMatchObject({usedAttempts:0,remainingAttempts:1})
+    await expect(admitCognitiveAttempt(tx,user.id,wrapper.id)).resolves.toBeUndefined()
+    // The source without a Training course retains its global quota semantics.
+    await expect(admitCognitiveAttempt(tx,user.id,root.id)).rejects.toMatchObject({statusCode:409})
+    await tx.cognitiveSession.create({data:{userId:user.id,participantKey:randomUUID(),assignmentId:wrapper.id,configId:config.id,testType:'SYNTHETIC_QUOTA',configVersion:'1',configSnapshotEncrypted:'synthetic-quota-only',engineVersion:'1',scoringVersion:'1',randomSeed:'synthetic',status:'COMPLETED'}})
     await expect(admitCognitiveAttempt(tx,user.id,wrapper.id)).rejects.toMatchObject({statusCode:409})
     const ordinary=await wave(3,false),ordinaryParent=await parent(ordinary)
-    await expect(admitCognitiveAttempt(tx,user.id,wrapper.id,ordinaryParent.scope)).rejects.toMatchObject({statusCode:409})
+    // A different legitimate Training delivery has its own parent allowance.
+    await admitCognitiveAttempt(tx,user.id,wrapper.id,ordinaryParent.scope)
     // A forged subject must never become scope authority.
     await tx.compositeAssessmentAttempt.update({where:{id:p2.row.id},data:{respondentUserId:(await tx.user.create({data:{username:'other-'+randomUUID(),passwordHash:'synthetic',role:'STUDENT'}})).id}})
     await expect(admitCognitiveAttempt(tx,user.id,wrapper.id,p2.scope)).rejects.toMatchObject({statusCode:409})

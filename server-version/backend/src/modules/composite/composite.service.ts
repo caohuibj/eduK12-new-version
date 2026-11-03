@@ -29,7 +29,7 @@ import { freezeTrainingPersistenceSnapshot, readTrainingPersistencePolicy, train
 import { trainingRoundPublicationIdentity, prepareTrainingPublicRound, assertTrainingTokenRound, publicRoundMetadata, trainingRoundSelect, type TrainingRoundInput } from './training-public-round'
 import { allocateTrainingMaterial, materialRestartClaim } from './training-material-allocation'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { resolveTrainingFlowScopeForMaterialization, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers, type VerifiedTrainingFlowMaterialization } from './training-flow-scope'
+import { resolveTrainingFlowScopeForMaterialization, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers, TRAINING_FLOW_DEFINITION_SELECT, type VerifiedTrainingFlowMaterialization } from './training-flow-scope'
 import { buildTrainingFlowUnits } from './training-flow-definition'
 import { freezeTrainingFlowAssignment } from './training-flow-assignment-snapshot'
 import { compileTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey } from '../assessment-core/flow/training'
@@ -117,7 +117,7 @@ import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
 import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
 import { ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
-import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota, readCognitiveQuota } from '../cognitive/attempt-quota'
+import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota, readCognitiveQuota, isTrainingTaskCourse, usesScopedTrainingQuota } from '../cognitive/attempt-quota'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
 import { missingRequiredScaleItemCodes, ScaleAnswerValidationError, validateScaleAnswer } from '../scale/scale-scoring'
 import type { DeviceInputProvenanceV1 } from '../scale/device-input-provenance'
@@ -2305,7 +2305,8 @@ export const disableAccessToken = async (userId: string, role: UserRole, composi
   await prisma.compositeAssessmentAccessToken.update({ where: { id: tokenId }, data: { isActive: false } })
 }
 
-export const listAvailableForStudent = async (userId: string, now = Date.now(), courseId?: string) => {
+export const listAvailableForStudent = async (userId: string, now = Date.now(), courseId?: string, summary = false) => {
+  // Catalog consumers opt in; older detail consumers keep their original response.
   const memberships = await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, ...(courseId ? { courseId } : {}) }, select: { courseId: true } })
   const courseIds = memberships.map((item) => item.courseId)
   if (!courseIds.length) return []
@@ -2320,7 +2321,23 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds }, course: { isLibrary: false } } } },
     ] },
     orderBy: { publishedAt: 'desc' },
-    include: {
+    select: {
+      id: true,
+      productKind: true,
+      code: true,
+      name: true,
+      description: true,
+      instruction: !summary,
+      status: true,
+      opensAt: true,
+      expiresAt: true,
+      maxAttempts: true,
+      reportPackageKey: true,
+      reportPackageVersion: true,
+      reportPackageSnapshotEncrypted: !summary,
+      trainingVariantFrozen: true,
+      // Missing markers mean UNKNOWN, not legacy. Keep every marker loaded.
+      ...TRAINING_FLOW_DEFINITION_SELECT,
       course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
       items: {
         orderBy: { position: 'asc' },
@@ -2328,15 +2345,14 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
           id: true,
           type: true,
           position: true,
-          scale: { select: { name: true } },
-          cognitiveAssignment: { select: { title: true } },
-          formLabel: true,
+          scale: summary ? false : { select: { name: true } },
+          cognitiveAssignment: summary ? false : { select: { title: true } },
+          formLabel: !summary,
         },
       },
-      formSections: {
-        orderBy: { position: 'asc' },
-        include: { items: { select: { id: true, contextKey: true } } },
-      },
+      formSections: summary
+        ? { select: { id: true } }
+        : { orderBy: { position: 'asc' }, include: { items: { select: { id: true, contextKey: true } } } },
     },
   })
   const attemptRows = await prisma.compositeAssessmentAttempt.findMany({ where: { userId, compositeAssessmentId: { in: list.map((item) => item.id) } }, orderBy: { startedAt: 'desc' }, select: { id: true, compositeAssessmentId: true, status: true, taskSatisfaction: true, progress: true, completedAt: true, cognitiveSessions: { select: { status: true, frozenAdmissionSnapshotHash: true } } } })
@@ -2375,14 +2391,19 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
     // Historical satisfaction is independent of the newest submitted report.
     const latestSatisfiedAttempt = compositeAttempts.find(isTaskSatisfied) ?? null
     const sections = item.formSections ?? []
-    const units = [
-      ...item.items
-        .filter((child: any) => child.type !== 'FORM')
+    const hasTrainingFlow = hasTrainingFlowDefinitionMarkers(item)
+    const hideUnits = summary || item.trainingVariantFrozen != null || hasTrainingFlow
+    const nonFormItems = item.items.filter((child: any) => child.type !== 'FORM')
+    // Reuse one frozen-package decode for both projections. Hidden candidate
+    // unions need only their count; never decode labels or build their units.
+    const packageSlotLabels = hideUnits ? new Map<number, string>() : getFrozenPackageSlotLabels(item)
+    const units = hideUnits ? [] : [
+      ...nonFormItems
         .map((child: any) => ({
           type: child.type === 'SCALE' ? 'scale' as const : child.type === 'COGNITIVE' ? 'cognitive' as const : 'situational' as const,
           id: child.id,
           position: child.position,
-          label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)),
+          label: resolveCompositeItemLabel(child, packageSlotLabels),
           itemCount: 1,
           contextSection: false,
         })),
@@ -2401,9 +2422,9 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       code: item.code,
       name: item.name,
       description: item.description,
-      instruction: item.instruction,
+      instruction: summary ? null : item.instruction,
       deliveryMode: 'FINAL_ONLY' as const,
-      estimatedModules: hasTrainingFlowDefinitionMarkers(item) ? null : units.length,
+      estimatedModules: hasTrainingFlow ? null : nonFormItems.length + sections.length,
       course: item.course,
       opensAt: item.opensAt,
       expiresAt: item.expiresAt,
@@ -2414,9 +2435,9 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       canContinue,
       admissionPaused: Boolean(admissionPaused),
       weightedVariants: item.trainingVariantFrozen != null,
-      items: (item.trainingVariantFrozen != null || hasTrainingFlowDefinitionMarkers(item)) ? [] : item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)) })),
-      units: (item.trainingVariantFrozen != null || hasTrainingFlowDefinitionMarkers(item)) ? [] : units,
-      formSections: (item.trainingVariantFrozen != null || hasTrainingFlowDefinitionMarkers(item)) ? [] : sections,
+      items: hideUnits ? [] : item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, packageSlotLabels) })),
+      units: hideUnits ? [] : units,
+      formSections: hideUnits ? [] : sections,
       attempt: latestAttempt,
       latestCompletedAttempt: latestCompletedAttempt ? { ...latestCompletedAttempt, taskSatisfied: isTaskSatisfied(latestCompletedAttempt) } : null,
       latestSatisfiedAttempt,
@@ -3005,7 +3026,8 @@ const createAttempt = async (
   if (prepared) {
     try { await assertAssessmentAssetReferencesReady(candidateMedia, db) }
     catch { throw compositeBadRequest('候选分卷包含不可用或不匹配的冻结媒体') }
-    if (userId && variantEnabled) {
+    if (userId && variantEnabled && !(usesScopedTrainingQuota(composite)
+      && await isTrainingTaskCourse(db as Prisma.TransactionClient, composite.deliveryCourseId ?? composite.courseId))) {
       const cognitiveItems=composite.items.filter((i:any)=>i.type==='COGNITIVE')
       const sources = await Promise.all(cognitiveItems.map((i:any)=>cognitiveQuotaSource(db as any,i.cognitiveAssignmentId)))
       const byItem=new Map<string,string>(cognitiveItems.map((item:any,index:number)=>[item.id,sources[index].id]))
@@ -3324,9 +3346,11 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
   const next = await prisma.$transaction(async (tx: Db) => {
     await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
     await lockCompositeAttempt(tx, attemptId)
-    if(composite.trainingVariantFrozen != null || composite.trainingFlowFrozen?.schemaVersion===2){
+    const trainingTask = usesScopedTrainingQuota(composite)
+      && await isTrainingTaskCourse(tx as Prisma.TransactionClient, composite.deliveryCourseId ?? composite.courseId)
+    if(composite.trainingVariantFrozen != null || composite.trainingFlowFrozen?.schemaVersion===2 || trainingTask){
       const used=await tx.compositeAssessmentAttempt.count({where:{compositeAssessmentId:composite.id,...(existing.userId?{userId:existing.userId}:{participantKey:(existing as any).participantKey})}})
-      if(!Number.isInteger(composite.maxAttempts)||composite.maxAttempts<1||composite.maxAttempts>100||used>=composite.maxAttempts)throw compositeConflict('概率分卷次数已用完；取消和重启也计入次数')
+      if(!Number.isInteger(composite.maxAttempts)||composite.maxAttempts<1||composite.maxAttempts>100||used>=composite.maxAttempts)throw compositeConflict(trainingTask ? '已达到综合测评最大次数；重新开始也会计次。' : '概率分卷次数已用完；取消和重启也计入次数')
     }
     await assertNoAcceptedWholeQuestionnaire(tx as Prisma.TransactionClient, attemptId)
     const current = await tx.compositeAssessmentAttempt.findUnique({
@@ -5641,9 +5665,12 @@ const reportStatusForHeader = async (parent: any, joinedJob?: Awaited<ReturnType
     ? await readCompositeReportJobHeader(parent.id, parent.attemptEpoch) : null
   const feedback = job?.wholeSubmissionId ? readWholeReportFeedbackHint(parent.id, job.wholeSubmissionId) : null
   const release = participant ? evaluateTrainingFeedbackForAttempt(parent, { reportReady: trainingFeedbackReportReady(parent, job) }) : null
-  // A durable whole FINAL can precede aggregate completion while generation
-  // runs. Keep that processing state distinct from an unfinished submission.
-  if (release?.configured && release.state === 'WAITING_SUBMISSION' && job?.wholeSubmissionId && job.status !== 'WAITING') release.state = 'REPORT_PROCESSING'
+  // Whole FINAL and a complete set of unit FINALs can both precede parent
+  // completion. A queued job must not strand the learner on "continue" while
+  // generation runs; genuinely incomplete unit sets retain WAITING.
+  if (release?.configured && release.state === 'WAITING_SUBMISSION' && job &&
+    (job.wholeSubmissionId ? job.status !== 'WAITING'
+      : job.requestedRevision > 0 && (job.status === 'PENDING' || job.status === 'PROCESSING'))) release.state = 'REPORT_PROCESSING'
   return {
     ...(release?.configured ? { participantFeedback: { state: release.state, releaseAt: release.releaseAt } } : {}),
     ...(feedback ? { feedbackPollProfile: feedback.profile } : {}),

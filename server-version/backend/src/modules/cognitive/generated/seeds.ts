@@ -152,6 +152,7 @@ export const cognitiveSeeds = [
   task44[1],
   task45[0],
   task45[1],
+  task45[2],
   task46[0],
   task46[1],
   task47[0],

@@ -40,6 +40,7 @@ export function ScaleDefinitionEditor({ definition, setDefinition, activeTab, re
   const responseSet = definition.responseSets[0]
   const sortedItems = useMemo(() => [...definition.items].sort((a, b) => a.sortOrder - b.sortOrder), [definition.items])
   const contentItems = sortedItems.filter(item => !item.purpose || item.purpose === 'CONTENT')
+  const itemNumbers = new Map(sortedItems.map((item, index) => [item.itemCode, index + 1]))
   const replaceOptions = (options: ResponseOption[]) => {
     if (readOnly || controlsDisabled) return false
     const removedTarget = definition.items.find(item => item.purpose === 'ATTENTION_CHECK' && item.responseSetKey === responseSet.key && item.attentionTarget !== undefined && !options.some(option => option.value === item.attentionTarget))
@@ -186,7 +187,7 @@ export function ScaleDefinitionEditor({ definition, setDefinition, activeTab, re
             {!readOnly && <label className="scale-score-field scale-score-aggregation">聚合方式<select disabled={controlsDisabled} value={score.source.aggregation} onChange={event => updateScore(score.key, { source: { ...score.source, aggregation: event.target.value as Aggregation } })} className="input"><option value="sum">求和</option><option value="mean">平均</option></select><small>新建默认求和，可改为平均。求和是分数相加，平均是相加后除以题目数。</small></label>}
             {readOnly && score.source.aggregation !== 'sum' && <p className="scale-score-fixed-method">计分方式：平均（当前版本已固定）</p>}
           </div>
-          <div className="scale-score-items"><h3>纳入计分的题目</h3><p role="status">{scoreSelectionSummary(score)}</p><div className="scale-score-item-options">{contentItems.map(item => <button type="button" key={item.itemCode} aria-pressed={scoreSourceFor(definition, score.key).some(candidate => candidate.itemCode === item.itemCode)} disabled={controlsDisabled} onClick={() => toggleScoreItem(score.key, item.itemCode)}><span aria-hidden="true">{scoreSourceFor(definition, score.key).some(candidate => candidate.itemCode === item.itemCode) ? '☑ ' : '☐ '}</span>{item.itemCode}</button>)}</div></div>
+          <div className="scale-score-items"><h3>纳入计分的题目</h3><p role="status">{scoreSelectionSummary(score)}</p><div className="scale-score-item-options">{contentItems.map(item => <button type="button" key={item.itemCode} aria-label={`第 ${itemNumbers.get(item.itemCode)} 题：${item.content || '未填写题干'}`} title={`${item.itemCode} · ${item.content || '未填写题干'}`} aria-pressed={scoreSourceFor(definition, score.key).some(candidate => candidate.itemCode === item.itemCode)} disabled={controlsDisabled} onClick={() => toggleScoreItem(score.key, item.itemCode)}><span aria-hidden="true">{scoreSourceFor(definition, score.key).some(candidate => candidate.itemCode === item.itemCode) ? '☑' : '☐'}</span><span className="scale-score-item-label"><strong>第 {itemNumbers.get(item.itemCode)} 题</strong><span>{item.content || '未填写题干'}</span></span></button>)}</div></div>
         </article>)}</div>
         {!definition.scoring.scores.length && <p className="scale-score-empty">尚未设置计分项。请先添加总分或维度分，再选择参与计分的题目。</p>}
         <footer className="scale-scoring-footer"><p>保存前请核对纳入题目、分数范围和报告文案。</p><button onClick={() => void saveDefinition()} disabled={controlsDisabled || mediaUploadCount > 0 || pending} className="hui-button hui-button--primary">保存计分定义</button></footer>

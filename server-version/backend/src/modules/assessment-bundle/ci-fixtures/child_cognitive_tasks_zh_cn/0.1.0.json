@@ -1,0 +1,3984 @@
+{
+  "schemaVersion": 1,
+  "synthetic": true,
+  "randomSeed": "0123456789abcdef0123456789abcdef",
+  "context": {},
+  "slots": {
+    "gonogo": {
+      "type": "COGNITIVE",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "startedAtPerfMs": 0,
+          "endedAtPerfMs": 300,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 1,
+          "phase": "test",
+          "startedAtPerfMs": 1300,
+          "endedAtPerfMs": 1600,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 2,
+          "phase": "test",
+          "startedAtPerfMs": 2600,
+          "endedAtPerfMs": 2900,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 3,
+          "phase": "test",
+          "startedAtPerfMs": 3900,
+          "endedAtPerfMs": 4200,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 4,
+          "phase": "test",
+          "startedAtPerfMs": 5200,
+          "endedAtPerfMs": 5500,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 5,
+          "phase": "test",
+          "startedAtPerfMs": 6500,
+          "endedAtPerfMs": 6800,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 6,
+          "phase": "test",
+          "startedAtPerfMs": 7800,
+          "endedAtPerfMs": 8100,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 7,
+          "phase": "test",
+          "startedAtPerfMs": 9100,
+          "endedAtPerfMs": 9400,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 8,
+          "phase": "test",
+          "startedAtPerfMs": 10400,
+          "endedAtPerfMs": 10700,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 9,
+          "phase": "test",
+          "startedAtPerfMs": 11700,
+          "endedAtPerfMs": 12000,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 10,
+          "phase": "test",
+          "startedAtPerfMs": 13000,
+          "endedAtPerfMs": 13300,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 11,
+          "phase": "test",
+          "startedAtPerfMs": 14300,
+          "endedAtPerfMs": 14600,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 12,
+          "phase": "test",
+          "startedAtPerfMs": 15600,
+          "endedAtPerfMs": 15900,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 13,
+          "phase": "test",
+          "startedAtPerfMs": 16900,
+          "endedAtPerfMs": 17200,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 14,
+          "phase": "test",
+          "startedAtPerfMs": 18200,
+          "endedAtPerfMs": 18500,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 15,
+          "phase": "test",
+          "startedAtPerfMs": 19500,
+          "endedAtPerfMs": 19800,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 16,
+          "phase": "test",
+          "startedAtPerfMs": 20800,
+          "endedAtPerfMs": 21100,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 17,
+          "phase": "test",
+          "startedAtPerfMs": 22100,
+          "endedAtPerfMs": 22400,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 18,
+          "phase": "test",
+          "startedAtPerfMs": 23400,
+          "endedAtPerfMs": 23700,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 19,
+          "phase": "test",
+          "startedAtPerfMs": 24700,
+          "endedAtPerfMs": 25000,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 20,
+          "phase": "test",
+          "startedAtPerfMs": 26000,
+          "endedAtPerfMs": 26300,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 21,
+          "phase": "test",
+          "startedAtPerfMs": 27300,
+          "endedAtPerfMs": 27600,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 22,
+          "phase": "test",
+          "startedAtPerfMs": 28600,
+          "endedAtPerfMs": 28900,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 23,
+          "phase": "test",
+          "startedAtPerfMs": 29900,
+          "endedAtPerfMs": 30200,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 24,
+          "phase": "test",
+          "startedAtPerfMs": 31200,
+          "endedAtPerfMs": 31500,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 25,
+          "phase": "test",
+          "startedAtPerfMs": 32500,
+          "endedAtPerfMs": 32800,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 26,
+          "phase": "test",
+          "startedAtPerfMs": 33800,
+          "endedAtPerfMs": 34100,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 27,
+          "phase": "test",
+          "startedAtPerfMs": 35100,
+          "endedAtPerfMs": 35400,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 28,
+          "phase": "test",
+          "startedAtPerfMs": 36400,
+          "endedAtPerfMs": 36700,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 29,
+          "phase": "test",
+          "startedAtPerfMs": 37700,
+          "endedAtPerfMs": 38000,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 30,
+          "phase": "test",
+          "startedAtPerfMs": 39000,
+          "endedAtPerfMs": 39300,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 31,
+          "phase": "test",
+          "startedAtPerfMs": 40300,
+          "endedAtPerfMs": 40600,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 32,
+          "phase": "test",
+          "startedAtPerfMs": 41600,
+          "endedAtPerfMs": 41900,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 33,
+          "phase": "test",
+          "startedAtPerfMs": 42900,
+          "endedAtPerfMs": 43200,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 34,
+          "phase": "test",
+          "startedAtPerfMs": 44200,
+          "endedAtPerfMs": 44500,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 35,
+          "phase": "test",
+          "startedAtPerfMs": 45500,
+          "endedAtPerfMs": 45800,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 36,
+          "phase": "test",
+          "startedAtPerfMs": 46800,
+          "endedAtPerfMs": 47100,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 37,
+          "phase": "test",
+          "startedAtPerfMs": 48100,
+          "endedAtPerfMs": 48400,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 38,
+          "phase": "test",
+          "startedAtPerfMs": 49400,
+          "endedAtPerfMs": 49700,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 39,
+          "phase": "test",
+          "startedAtPerfMs": 50700,
+          "endedAtPerfMs": 51000,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 40,
+          "phase": "test",
+          "startedAtPerfMs": 52000,
+          "endedAtPerfMs": 52300,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 41,
+          "phase": "test",
+          "startedAtPerfMs": 53300,
+          "endedAtPerfMs": 53600,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 42,
+          "phase": "test",
+          "startedAtPerfMs": 54600,
+          "endedAtPerfMs": 54900,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 43,
+          "phase": "test",
+          "startedAtPerfMs": 55900,
+          "endedAtPerfMs": 56200,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 44,
+          "phase": "test",
+          "startedAtPerfMs": 57200,
+          "endedAtPerfMs": 57500,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 45,
+          "phase": "test",
+          "startedAtPerfMs": 58500,
+          "endedAtPerfMs": 58800,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 46,
+          "phase": "test",
+          "startedAtPerfMs": 59800,
+          "endedAtPerfMs": 60100,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 47,
+          "phase": "test",
+          "startedAtPerfMs": 61100,
+          "endedAtPerfMs": 61400,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 48,
+          "phase": "test",
+          "startedAtPerfMs": 62400,
+          "endedAtPerfMs": 62700,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 49,
+          "phase": "test",
+          "startedAtPerfMs": 63700,
+          "endedAtPerfMs": 64000,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 50,
+          "phase": "test",
+          "startedAtPerfMs": 65000,
+          "endedAtPerfMs": 65300,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 51,
+          "phase": "test",
+          "startedAtPerfMs": 66300,
+          "endedAtPerfMs": 66600,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 52,
+          "phase": "test",
+          "startedAtPerfMs": 67600,
+          "endedAtPerfMs": 67900,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 53,
+          "phase": "test",
+          "startedAtPerfMs": 68900,
+          "endedAtPerfMs": 69200,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 54,
+          "phase": "test",
+          "startedAtPerfMs": 70200,
+          "endedAtPerfMs": 70500,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 55,
+          "phase": "test",
+          "startedAtPerfMs": 71500,
+          "endedAtPerfMs": 71800,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 56,
+          "phase": "test",
+          "startedAtPerfMs": 72800,
+          "endedAtPerfMs": 73100,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 57,
+          "phase": "test",
+          "startedAtPerfMs": 74100,
+          "endedAtPerfMs": 74400,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 58,
+          "phase": "test",
+          "startedAtPerfMs": 75400,
+          "endedAtPerfMs": 75700,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 59,
+          "phase": "test",
+          "startedAtPerfMs": 76700,
+          "endedAtPerfMs": 77000,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 60,
+          "phase": "test",
+          "startedAtPerfMs": 78000,
+          "endedAtPerfMs": 78300,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 61,
+          "phase": "test",
+          "startedAtPerfMs": 79300,
+          "endedAtPerfMs": 79600,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 62,
+          "phase": "test",
+          "startedAtPerfMs": 80600,
+          "endedAtPerfMs": 80900,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 63,
+          "phase": "test",
+          "startedAtPerfMs": 81900,
+          "endedAtPerfMs": 82200,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 64,
+          "phase": "test",
+          "startedAtPerfMs": 83200,
+          "endedAtPerfMs": 83500,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 65,
+          "phase": "test",
+          "startedAtPerfMs": 84500,
+          "endedAtPerfMs": 84800,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 66,
+          "phase": "test",
+          "startedAtPerfMs": 85800,
+          "endedAtPerfMs": 86100,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 67,
+          "phase": "test",
+          "startedAtPerfMs": 87100,
+          "endedAtPerfMs": 87400,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 68,
+          "phase": "test",
+          "startedAtPerfMs": 88400,
+          "endedAtPerfMs": 88700,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 69,
+          "phase": "test",
+          "startedAtPerfMs": 89700,
+          "endedAtPerfMs": 90000,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 70,
+          "phase": "test",
+          "startedAtPerfMs": 91000,
+          "endedAtPerfMs": 91300,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 71,
+          "phase": "test",
+          "startedAtPerfMs": 92300,
+          "endedAtPerfMs": 92600,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 72,
+          "phase": "test",
+          "startedAtPerfMs": 93600,
+          "endedAtPerfMs": 93900,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 73,
+          "phase": "test",
+          "startedAtPerfMs": 94900,
+          "endedAtPerfMs": 95200,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 74,
+          "phase": "test",
+          "startedAtPerfMs": 96200,
+          "endedAtPerfMs": 96500,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 75,
+          "phase": "test",
+          "startedAtPerfMs": 97500,
+          "endedAtPerfMs": 97800,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 76,
+          "phase": "test",
+          "startedAtPerfMs": 98800,
+          "endedAtPerfMs": 99100,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 77,
+          "phase": "test",
+          "startedAtPerfMs": 100100,
+          "endedAtPerfMs": 100400,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 78,
+          "phase": "test",
+          "startedAtPerfMs": 101400,
+          "endedAtPerfMs": 101700,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 79,
+          "phase": "test",
+          "startedAtPerfMs": 102700,
+          "endedAtPerfMs": 103000,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 80,
+          "phase": "test",
+          "startedAtPerfMs": 104000,
+          "endedAtPerfMs": 104300,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 81,
+          "phase": "test",
+          "startedAtPerfMs": 105300,
+          "endedAtPerfMs": 105600,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 82,
+          "phase": "test",
+          "startedAtPerfMs": 106600,
+          "endedAtPerfMs": 106900,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 83,
+          "phase": "test",
+          "startedAtPerfMs": 107900,
+          "endedAtPerfMs": 108200,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 84,
+          "phase": "test",
+          "startedAtPerfMs": 109200,
+          "endedAtPerfMs": 109500,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 85,
+          "phase": "test",
+          "startedAtPerfMs": 110500,
+          "endedAtPerfMs": 110800,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 86,
+          "phase": "test",
+          "startedAtPerfMs": 111800,
+          "endedAtPerfMs": 112100,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 87,
+          "phase": "test",
+          "startedAtPerfMs": 113100,
+          "endedAtPerfMs": 113400,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 88,
+          "phase": "test",
+          "startedAtPerfMs": 114400,
+          "endedAtPerfMs": 114700,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 89,
+          "phase": "test",
+          "startedAtPerfMs": 115700,
+          "endedAtPerfMs": 116000,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 90,
+          "phase": "test",
+          "startedAtPerfMs": 117000,
+          "endedAtPerfMs": 117300,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 91,
+          "phase": "test",
+          "startedAtPerfMs": 118300,
+          "endedAtPerfMs": 118600,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 92,
+          "phase": "test",
+          "startedAtPerfMs": 119600,
+          "endedAtPerfMs": 119900,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 93,
+          "phase": "test",
+          "startedAtPerfMs": 120900,
+          "endedAtPerfMs": 121200,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 94,
+          "phase": "test",
+          "startedAtPerfMs": 122200,
+          "endedAtPerfMs": 122500,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 95,
+          "phase": "test",
+          "startedAtPerfMs": 123500,
+          "endedAtPerfMs": 123800,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 96,
+          "phase": "test",
+          "startedAtPerfMs": 124800,
+          "endedAtPerfMs": 125100,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 97,
+          "phase": "test",
+          "startedAtPerfMs": 126100,
+          "endedAtPerfMs": 126400,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 98,
+          "phase": "test",
+          "startedAtPerfMs": 127400,
+          "endedAtPerfMs": 127700,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 99,
+          "phase": "test",
+          "startedAtPerfMs": 128700,
+          "endedAtPerfMs": 129000,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 100,
+          "phase": "test",
+          "startedAtPerfMs": 130000,
+          "endedAtPerfMs": 130300,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 101,
+          "phase": "test",
+          "startedAtPerfMs": 131300,
+          "endedAtPerfMs": 131600,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 102,
+          "phase": "test",
+          "startedAtPerfMs": 132600,
+          "endedAtPerfMs": 132900,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 103,
+          "phase": "test",
+          "startedAtPerfMs": 133900,
+          "endedAtPerfMs": 134200,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 104,
+          "phase": "test",
+          "startedAtPerfMs": 135200,
+          "endedAtPerfMs": 135500,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 105,
+          "phase": "test",
+          "startedAtPerfMs": 136500,
+          "endedAtPerfMs": 136800,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 106,
+          "phase": "test",
+          "startedAtPerfMs": 137800,
+          "endedAtPerfMs": 138100,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 107,
+          "phase": "test",
+          "startedAtPerfMs": 139100,
+          "endedAtPerfMs": 139400,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 108,
+          "phase": "test",
+          "startedAtPerfMs": 140400,
+          "endedAtPerfMs": 140700,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 109,
+          "phase": "test",
+          "startedAtPerfMs": 141700,
+          "endedAtPerfMs": 142000,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 110,
+          "phase": "test",
+          "startedAtPerfMs": 143000,
+          "endedAtPerfMs": 143300,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 111,
+          "phase": "test",
+          "startedAtPerfMs": 144300,
+          "endedAtPerfMs": 144600,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 112,
+          "phase": "test",
+          "startedAtPerfMs": 145600,
+          "endedAtPerfMs": 145900,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 113,
+          "phase": "test",
+          "startedAtPerfMs": 146900,
+          "endedAtPerfMs": 147200,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 114,
+          "phase": "test",
+          "startedAtPerfMs": 148200,
+          "endedAtPerfMs": 148500,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 115,
+          "phase": "test",
+          "startedAtPerfMs": 149500,
+          "endedAtPerfMs": 149800,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 116,
+          "phase": "test",
+          "startedAtPerfMs": 150800,
+          "endedAtPerfMs": 151100,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 117,
+          "phase": "test",
+          "startedAtPerfMs": 152100,
+          "endedAtPerfMs": 152400,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 118,
+          "phase": "test",
+          "startedAtPerfMs": 153400,
+          "endedAtPerfMs": 153700,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "go",
+            "responded": true,
+            "rtMs": 300,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 119,
+          "phase": "test",
+          "startedAtPerfMs": 154700,
+          "endedAtPerfMs": 155000,
+          "durationMs": 300,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "trialType": "nogo",
+            "responded": false,
+            "rtMs": null,
+            "interrupted": false
+          }
+        }
+      ]
+    },
+    "flanker": {
+      "type": "COGNITIVE",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "startedAtPerfMs": 0,
+          "endedAtPerfMs": 500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 1,
+          "phase": "test",
+          "startedAtPerfMs": 2200,
+          "endedAtPerfMs": 2700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 2,
+          "phase": "test",
+          "startedAtPerfMs": 4400,
+          "endedAtPerfMs": 4900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 3,
+          "phase": "test",
+          "startedAtPerfMs": 6600,
+          "endedAtPerfMs": 7100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 4,
+          "phase": "test",
+          "startedAtPerfMs": 8800,
+          "endedAtPerfMs": 9300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 5,
+          "phase": "test",
+          "startedAtPerfMs": 11000,
+          "endedAtPerfMs": 11500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 6,
+          "phase": "test",
+          "startedAtPerfMs": 13200,
+          "endedAtPerfMs": 13700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 7,
+          "phase": "test",
+          "startedAtPerfMs": 15400,
+          "endedAtPerfMs": 15900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 8,
+          "phase": "test",
+          "startedAtPerfMs": 17600,
+          "endedAtPerfMs": 18100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 9,
+          "phase": "test",
+          "startedAtPerfMs": 19800,
+          "endedAtPerfMs": 20300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 10,
+          "phase": "test",
+          "startedAtPerfMs": 22000,
+          "endedAtPerfMs": 22500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 11,
+          "phase": "test",
+          "startedAtPerfMs": 24200,
+          "endedAtPerfMs": 24700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 12,
+          "phase": "test",
+          "startedAtPerfMs": 26400,
+          "endedAtPerfMs": 26900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 13,
+          "phase": "test",
+          "startedAtPerfMs": 28600,
+          "endedAtPerfMs": 29100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 14,
+          "phase": "test",
+          "startedAtPerfMs": 30800,
+          "endedAtPerfMs": 31300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 15,
+          "phase": "test",
+          "startedAtPerfMs": 33000,
+          "endedAtPerfMs": 33500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 16,
+          "phase": "test",
+          "startedAtPerfMs": 35200,
+          "endedAtPerfMs": 35700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 17,
+          "phase": "test",
+          "startedAtPerfMs": 37400,
+          "endedAtPerfMs": 37900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 18,
+          "phase": "test",
+          "startedAtPerfMs": 39600,
+          "endedAtPerfMs": 40100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 19,
+          "phase": "test",
+          "startedAtPerfMs": 41800,
+          "endedAtPerfMs": 42300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 20,
+          "phase": "test",
+          "startedAtPerfMs": 44000,
+          "endedAtPerfMs": 44500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 21,
+          "phase": "test",
+          "startedAtPerfMs": 46200,
+          "endedAtPerfMs": 46700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 22,
+          "phase": "test",
+          "startedAtPerfMs": 48400,
+          "endedAtPerfMs": 48900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 23,
+          "phase": "test",
+          "startedAtPerfMs": 50600,
+          "endedAtPerfMs": 51100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 24,
+          "phase": "test",
+          "startedAtPerfMs": 52800,
+          "endedAtPerfMs": 53300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 25,
+          "phase": "test",
+          "startedAtPerfMs": 55000,
+          "endedAtPerfMs": 55500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 26,
+          "phase": "test",
+          "startedAtPerfMs": 57200,
+          "endedAtPerfMs": 57700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 27,
+          "phase": "test",
+          "startedAtPerfMs": 59400,
+          "endedAtPerfMs": 59900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 28,
+          "phase": "test",
+          "startedAtPerfMs": 61600,
+          "endedAtPerfMs": 62100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 29,
+          "phase": "test",
+          "startedAtPerfMs": 63800,
+          "endedAtPerfMs": 64300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 30,
+          "phase": "test",
+          "startedAtPerfMs": 66000,
+          "endedAtPerfMs": 66500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 31,
+          "phase": "test",
+          "startedAtPerfMs": 68200,
+          "endedAtPerfMs": 68700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 32,
+          "phase": "test",
+          "startedAtPerfMs": 70400,
+          "endedAtPerfMs": 70900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 33,
+          "phase": "test",
+          "startedAtPerfMs": 72600,
+          "endedAtPerfMs": 73100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 34,
+          "phase": "test",
+          "startedAtPerfMs": 74800,
+          "endedAtPerfMs": 75300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 35,
+          "phase": "test",
+          "startedAtPerfMs": 77000,
+          "endedAtPerfMs": 77500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 36,
+          "phase": "test",
+          "startedAtPerfMs": 79200,
+          "endedAtPerfMs": 79700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 37,
+          "phase": "test",
+          "startedAtPerfMs": 81400,
+          "endedAtPerfMs": 81900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 38,
+          "phase": "test",
+          "startedAtPerfMs": 83600,
+          "endedAtPerfMs": 84100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 39,
+          "phase": "test",
+          "startedAtPerfMs": 85800,
+          "endedAtPerfMs": 86300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 40,
+          "phase": "test",
+          "startedAtPerfMs": 88000,
+          "endedAtPerfMs": 88500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 41,
+          "phase": "test",
+          "startedAtPerfMs": 90200,
+          "endedAtPerfMs": 90700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 42,
+          "phase": "test",
+          "startedAtPerfMs": 92400,
+          "endedAtPerfMs": 92900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 43,
+          "phase": "test",
+          "startedAtPerfMs": 94600,
+          "endedAtPerfMs": 95100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 44,
+          "phase": "test",
+          "startedAtPerfMs": 96800,
+          "endedAtPerfMs": 97300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 45,
+          "phase": "test",
+          "startedAtPerfMs": 99000,
+          "endedAtPerfMs": 99500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 46,
+          "phase": "test",
+          "startedAtPerfMs": 101200,
+          "endedAtPerfMs": 101700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 47,
+          "phase": "test",
+          "startedAtPerfMs": 103400,
+          "endedAtPerfMs": 103900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 48,
+          "phase": "test",
+          "startedAtPerfMs": 105600,
+          "endedAtPerfMs": 106100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 49,
+          "phase": "test",
+          "startedAtPerfMs": 107800,
+          "endedAtPerfMs": 108300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 50,
+          "phase": "test",
+          "startedAtPerfMs": 110000,
+          "endedAtPerfMs": 110500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 51,
+          "phase": "test",
+          "startedAtPerfMs": 112200,
+          "endedAtPerfMs": 112700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 52,
+          "phase": "test",
+          "startedAtPerfMs": 114400,
+          "endedAtPerfMs": 114900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 53,
+          "phase": "test",
+          "startedAtPerfMs": 116600,
+          "endedAtPerfMs": 117100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 54,
+          "phase": "test",
+          "startedAtPerfMs": 118800,
+          "endedAtPerfMs": 119300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 55,
+          "phase": "test",
+          "startedAtPerfMs": 121000,
+          "endedAtPerfMs": 121500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 56,
+          "phase": "test",
+          "startedAtPerfMs": 123200,
+          "endedAtPerfMs": 123700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 57,
+          "phase": "test",
+          "startedAtPerfMs": 125400,
+          "endedAtPerfMs": 125900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 58,
+          "phase": "test",
+          "startedAtPerfMs": 127600,
+          "endedAtPerfMs": 128100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 59,
+          "phase": "test",
+          "startedAtPerfMs": 129800,
+          "endedAtPerfMs": 130300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 60,
+          "phase": "test",
+          "startedAtPerfMs": 132000,
+          "endedAtPerfMs": 132500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 61,
+          "phase": "test",
+          "startedAtPerfMs": 134200,
+          "endedAtPerfMs": 134700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 62,
+          "phase": "test",
+          "startedAtPerfMs": 136400,
+          "endedAtPerfMs": 136900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 63,
+          "phase": "test",
+          "startedAtPerfMs": 138600,
+          "endedAtPerfMs": 139100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 64,
+          "phase": "test",
+          "startedAtPerfMs": 140800,
+          "endedAtPerfMs": 141300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 65,
+          "phase": "test",
+          "startedAtPerfMs": 143000,
+          "endedAtPerfMs": 143500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 66,
+          "phase": "test",
+          "startedAtPerfMs": 145200,
+          "endedAtPerfMs": 145700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 67,
+          "phase": "test",
+          "startedAtPerfMs": 147400,
+          "endedAtPerfMs": 147900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 68,
+          "phase": "test",
+          "startedAtPerfMs": 149600,
+          "endedAtPerfMs": 150100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 69,
+          "phase": "test",
+          "startedAtPerfMs": 151800,
+          "endedAtPerfMs": 152300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 70,
+          "phase": "test",
+          "startedAtPerfMs": 154000,
+          "endedAtPerfMs": 154500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 71,
+          "phase": "test",
+          "startedAtPerfMs": 156200,
+          "endedAtPerfMs": 156700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 72,
+          "phase": "test",
+          "startedAtPerfMs": 158400,
+          "endedAtPerfMs": 158900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 73,
+          "phase": "test",
+          "startedAtPerfMs": 160600,
+          "endedAtPerfMs": 161100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 74,
+          "phase": "test",
+          "startedAtPerfMs": 162800,
+          "endedAtPerfMs": 163300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 75,
+          "phase": "test",
+          "startedAtPerfMs": 165000,
+          "endedAtPerfMs": 165500,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 76,
+          "phase": "test",
+          "startedAtPerfMs": 167200,
+          "endedAtPerfMs": 167700,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "right",
+            "response": "left",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 77,
+          "phase": "test",
+          "startedAtPerfMs": 169400,
+          "endedAtPerfMs": 169900,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "left",
+            "response": "right",
+            "rtMs": 488,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 78,
+          "phase": "test",
+          "startedAtPerfMs": 171600,
+          "endedAtPerfMs": 172100,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "right",
+            "flankerDirection": "right",
+            "response": "right",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 79,
+          "phase": "test",
+          "startedAtPerfMs": 173800,
+          "endedAtPerfMs": 174300,
+          "durationMs": 500,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "targetDirection": "left",
+            "flankerDirection": "left",
+            "response": "left",
+            "rtMs": 500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        }
+      ]
+    }
+  },
+  "expectedKind": "COMPUTED",
+  "expectedRuleIds": [
+    "gonogo_observation",
+    "flanker_observation",
+    "task_reflection"
+  ]
+}

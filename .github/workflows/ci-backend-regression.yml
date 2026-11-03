@@ -20,12 +20,18 @@ env:
 
 jobs:
   backend-regression:
-    name: backend regression (isolated job database)
+    name: backend regression (${{ matrix.group }}, isolated job database)
     runs-on: ubuntu-24.04
     timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        group: ${{ fromJSON(inputs.focus == 'full' && '["fixtures","shard-1","shard-2","shard-3","shard-4","shard-5","shard-6"]' || '["focused"]') }}
     env:
       NODE_ENV: test
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      CHILD_CROSS_METHOD_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      COGNITIVE_ASSIGNMENT_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       COGNITIVE_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR8_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR26_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -35,6 +41,7 @@ jobs:
       V32_2_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       V32_3_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      BUNDLE_JSON_ROUNDTRIP_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       SJT_UPLOAD_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -127,32 +134,29 @@ jobs:
           if(problems.length)throw new Error('Missing or foreign job database opt-ins:\n'+problems.join('\n'));
           console.log('All 9 explicit newer integration opt-ins match the disposable job database; execution remains serial.');
           NODE
-      - name: validate disjoint regression report controls
-        run: node --test ../../.github/scripts/backend-regression-reports.test.mjs
       - name: clear reports from previous regression jobs
         # Self-hosted /tmp persists between jobs; never upload old-focus evidence.
-        run: rm -f /tmp/eduk12-backend-vitest.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-teacher-runtime-vitest.json /tmp/eduk12-cognitive-install-vitest.json /tmp/eduk12-library-http-vitest.json /tmp/eduk12-component-import-vitest.json /tmp/eduk12-parent-vitest.json /tmp/eduk12-r5-vitest.json /tmp/eduk12-hosted-ci-env.txt /tmp/eduk12-teacher-self-group.json /tmp/eduk12-library-self-group.json /tmp/eduk12-teacher-private-group.json /tmp/eduk12-school-private-source.json /tmp/eduk12-school-composition-delta.json /tmp/eduk12-school-native-source.json /tmp/eduk12-school-native-reports.json /tmp/eduk12-education-marker.json /tmp/eduk12-education-feedback-policy.json /tmp/eduk12-education-standard-marker.json /tmp/eduk12-education-license-selection.json /tmp/eduk12-education-publication.json /tmp/eduk12-group-native.json /tmp/eduk12-evc-lifecycle.json /tmp/eduk12-evc-restore.json /tmp/eduk12-legacy-education-setup.json
+        run: rm -f /tmp/eduk12-backend-vitest-fixtures.json /tmp/eduk12-backend-vitest-${{ matrix.group }}.json /tmp/eduk12-backend-inventory-${{ matrix.group }}.json /tmp/eduk12-backend-vitest.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-teacher-runtime-vitest.json /tmp/eduk12-cognitive-install-vitest.json /tmp/eduk12-cognitive-admin-intake-vitest.json /tmp/eduk12-library-http-vitest.json /tmp/eduk12-component-import-vitest.json /tmp/eduk12-parent-vitest.json /tmp/eduk12-r5-vitest.json /tmp/eduk12-hosted-ci-env.txt /tmp/eduk12-teacher-self-group.json /tmp/eduk12-library-self-group.json /tmp/eduk12-teacher-private-group.json /tmp/eduk12-school-private-source.json /tmp/eduk12-school-composition-delta.json /tmp/eduk12-school-native-source.json /tmp/eduk12-school-native-reports.json /tmp/eduk12-education-marker.json /tmp/eduk12-education-feedback-policy.json /tmp/eduk12-education-standard-marker.json /tmp/eduk12-education-license-selection.json /tmp/eduk12-education-publication.json /tmp/eduk12-group-native.json /tmp/eduk12-evc-lifecycle.json /tmp/eduk12-evc-restore.json /tmp/eduk12-legacy-education-setup.json
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
           # Self-hosted runners already retain ~/.npm; remote cache uploads can
           # block the single slot long after the tests and service cleanup finish.
           cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
-          cache-dependency-path: server-version/backend/package-lock.json
+          # The frontend lockfile is included because every group runs `npm ci` in
+          # server-version/frontend for the cross-tree Cognitive package tests.
+          cache-dependency-path: |
+            server-version/backend/package-lock.json
+            server-version/frontend/package-lock.json
+      - name: validate disjoint regression report controls
+        if: matrix.group == 'fixtures' || matrix.group == 'focused'
+        run: node --test ../../.github/scripts/backend-regression-reports.test.mjs
       - name: verify runner capacity and clean application ports
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: check hosted runner disk headroom
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - name: prepare canvas source-build dependencies
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
-      - name: accept original locked audit and unchanged backend unit evidence
-        if: inputs.focus == 'survey-wave-selection'
-        working-directory: .
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          git fetch --no-tags --depth=1 origin b65f7d658db33f1ebbf08e655f6d41164ebc653d
-          python3 -B .github/scripts/survey-wave-selection-reuse.py backend
       - name: npm ci
         run: npm ci
       - name: prisma generate and guarded migration
@@ -186,12 +190,13 @@ jobs:
           NODE
       - name: retain empty migrated databases for isolated consumers
         id: empty-fixtures
-        if: inputs.focus == 'full'
+        if: inputs.focus == 'full' && matrix.group == 'fixtures'
         env:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
         run: |
           # These consumers require no installed configs or seeded business rows.
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool cognitive_install_ci_test
+          docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool cognitive_admin_intake_ci_test
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool library_http_ci_test
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool component_import_ci_test
           for variant in marker feedback_policy standard_marker license_selection publication; do
@@ -200,18 +205,16 @@ jobs:
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool evc_source_ci_test
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --owner=ptool evc_restore_ci_test
       - name: seed reference and configuration data
-        if: inputs.focus != 'survey-wave-selection'
         run: npm run db:seed
         env:
           ADMIN_USERNAME: ci-admin
           ADMIN_PASSWORD: ci-admin-password-2026
       - name: backfill check-in token protection
         id: regression-data
-        if: inputs.focus != 'survey-wave-selection'
         run: npm run db:backfill:checkin-tokens
       - name: prepare isolated Teacher restricted-runtime fixture
         id: teacher-runtime-fixture
-        if: inputs.focus == 'full'
+        if: inputs.focus == 'full' && matrix.group == 'fixtures'
         env:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
         run: |
@@ -220,17 +223,16 @@ jobs:
           docker exec "$CI_POSTGRES_SERVICE_ID" psql -X -v ON_ERROR_STOP=1 -U ptool -d pr363_runtime_test -c "CREATE ROLE pr363_runtime LOGIN PASSWORD 'synthetic-runtime-only' NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS; REVOKE CREATE ON DATABASE pr363_runtime_test FROM PUBLIC; REVOKE CREATE ON SCHEMA public FROM PUBLIC; GRANT CONNECT ON DATABASE pr363_runtime_test TO pr363_runtime; GRANT USAGE ON SCHEMA public TO pr363_runtime;"
           docker exec -i "$CI_POSTGRES_SERVICE_ID" psql -X -v ON_ERROR_STOP=1 -U ptool -d pr363_runtime_test -v target_database=pr363_runtime_test -v migration_owner=ptool -v runtime_role=pr363_runtime -v "table_policy=$(cat scripts/runtime-table-policy.json)" < scripts/runtime-role-defaults.sql
       - name: frontend dependencies for cross-tree Cognitive package tests
-        if: inputs.focus != 'survey-wave-selection'
         working-directory: server-version/frontend
         run: npm ci --ignore-scripts
       - name: validate regression selection
         env:
           REGRESSION_FOCUS: ${{ inputs.focus }}
         run: |
-          case "$REGRESSION_FOCUS" in full|reporting|assessment-repair|survey-wave-selection) ;; *) exit 1 ;; esac
+          case "$REGRESSION_FOCUS" in full|reporting|assessment-repair) ;; *) exit 1 ;; esac
       - name: prepare the existing historical schema and legacy publisher sources
         id: historical-fixtures
-        if: inputs.focus == 'full'
+        if: inputs.focus == 'full' && matrix.group == 'fixtures'
         env:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
         run: |
@@ -243,15 +245,6 @@ jobs:
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --owner=ptool group_native_ci_test
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --owner=ptool group_native_restore_test_ci
           DATABASE_URL='postgresql://ptool:ptool123@localhost:5432/group_native_ci_test?schema=public' node node_modules/prisma/build/index.js migrate deploy --schema "$RUNNER_TEMP/group-native-main/server-version/backend/prisma/schema.prisma"
-      - name: bounded Survey Wave options and authoritative freeze contracts
-        if: inputs.focus == 'survey-wave-selection'
-        env:
-          SURVEY_PUBLICATION_ENABLED: 'true'
-          SURVEY_WORKSPACE_ENABLED: 'true'
-        run: |
-          npx tsc --noEmit --incremental false
-          npm test -- src/__tests__/measurement-content/survey-content-options.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
-          node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json src/__tests__/measurement-content/survey-content-options.postgres.integration.test.ts
       - name: R5 assessment repair regression
         if: inputs.focus == 'assessment-repair'
         env:
@@ -266,7 +259,7 @@ jobs:
           node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json src/__tests__/integration/reportingHttp.postgres.integration.test.ts src/__tests__/integration/registered-resource-longitudinal.postgres.integration.test.ts
       - name: Training Bundle checkpoint producer
         id: training-bundle
-        if: (success() || failure()) && inputs.focus == 'full' && steps.regression-data.outcome == 'success'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.regression-data.outcome == 'success'
         run: |
           # This hosted job owns these fixed synthetic checkpoint paths.
           rm -f /tmp/training-native-bundle-group-bootstrap.json /tmp/training-native-bundle-group-fixture.json /tmp/training-native-bundle-group-disclosed-fixture.json /tmp/training-scale-course-delivery-fixture.json /tmp/training-scale-course-delivery-started.json /tmp/training-standalone-scale-group-fixture.json /tmp/training-standalone-cognitive-group-fixture.json
@@ -274,14 +267,14 @@ jobs:
           node scripts/assert-release-test-report.mjs /tmp/eduk12-training-bundle-producer.json src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts
       - name: Training Scale course checkpoint producer
         id: training-course
-        if: (success() || failure()) && inputs.focus == 'full' && steps.training-bundle.outcome == 'success'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.training-bundle.outcome == 'success'
         # A failed producer blocks its consumers even when it left partial JSON.
         run: |
           npm test -- src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-training-course-producer.json
           node scripts/assert-release-test-report.mjs /tmp/eduk12-training-course-producer.json src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts
       - name: Teacher SELF and library GROUP checkpoints before private consumers
         id: teacher-groups
-        if: (success() || failure()) && inputs.focus == 'full' && steps.regression-data.outcome == 'success'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.regression-data.outcome == 'success'
         env:
           TEACHER_SELF_GROUP_CONTINUATION: /tmp/teacher-self-group-scale/source.json
           TEACHER_PRIVATE_LIBRARY_GROUP_CHECKPOINT: /tmp/library-self-group-release/source.json
@@ -295,7 +288,7 @@ jobs:
           npm test -- src/__tests__/integration/librarySelfGroupScale.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-library-self-group.json
           npm test -- src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-teacher-private-group.json
       - name: School private publication checkpoint and its delta consumer
-        if: (success() || failure()) && inputs.focus == 'full' && steps.regression-data.outcome == 'success'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.regression-data.outcome == 'success'
         env:
           SCHOOL_GROUP_COMPOSITION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
           SCHOOL_GROUP_COMPOSITION_CHECKPOINT: ${{ runner.temp }}/school-private-source-${{ github.run_id }}-${{ github.run_attempt }}.json
@@ -303,7 +296,7 @@ jobs:
           npm test -- src/__tests__/integration/schoolPrivateGroupSource.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-school-private-source.json
           npm test -- src/__tests__/integration/schoolSelfGroupCompositionDelta.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-school-composition-delta.json
       - name: School native waves before their retained-report consumers
-        if: (success() || failure()) && inputs.focus == 'full' && steps.regression-data.outcome == 'success'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.regression-data.outcome == 'success'
         env:
           SCHOOL_GROUP_NATIVE_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
           SCHOOL_GROUP_NATIVE_CHECKPOINT: ${{ runner.temp }}/school-native-${{ github.run_id }}-${{ github.run_attempt }}.json
@@ -311,15 +304,18 @@ jobs:
           npm test -- src/__tests__/integration/schoolSelfGroupNative.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-school-native-source.json
           npm test -- src/__tests__/integration/schoolSelfGroupNativeReports.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-school-native-reports.json
       - name: full functional regression
-        if: (success() || failure()) && inputs.focus == 'full' && steps.training-course.outcome == 'success' && steps.teacher-groups.outcome == 'success'
+        if: (success() || failure()) && inputs.focus == 'full' && ((matrix.group == 'fixtures' && steps.training-course.outcome == 'success' && steps.teacher-groups.outcome == 'success') || (matrix.group != 'fixtures' && steps.regression-data.outcome == 'success'))
         env:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
           TEACHER_PRIVATE_GROUP_LONGITUDINAL_CHECKPOINT: ${{ runner.temp }}/teacher-private-group-longitudinal-${{ github.run_id }}-${{ github.run_attempt }}.json
-        # Real-PG suites remain serial. The single hardware-sensitive burst is
-        # covered by the isolated backend job. Producers precede their consumers;
-        # roster and export use Redis DB14/15. Reports cover the disjoint executions.
+        # Every group owns its service DB/Redis and runs serially. Retained
+        # checkpoint consumers stay with the existing ordered fixture producers.
+        # The backend job still owns the single hardware-sensitive burst.
         run: >-
-          npm test -- --no-file-parallelism
+          node "$GITHUB_WORKSPACE/.github/scripts/backend-regression-selection.mjs"
+          '${{ matrix.group }}'
+          '/tmp/eduk12-backend-vitest-${{ matrix.group == 'fixtures' && 'base' || matrix.group }}.json'
+          '/tmp/eduk12-backend-inventory-${{ matrix.group }}.json'
           --exclude=src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
           --exclude=src/__tests__/integration/training-mac-export.postgres.integration.test.ts
           --exclude=src/__tests__/integration/educationRosterJobs.postgres.integration.test.ts
@@ -330,6 +326,7 @@ jobs:
           --exclude=src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts
           --exclude=src/__tests__/integration/pr363-source-sql.postgres.integration.test.ts
           --exclude=src/__tests__/cognitive/onboarding-install.postgres.integration.test.ts
+          --exclude=src/__tests__/cognitive/admin-intake.postgres.integration.test.ts
           --exclude=src/__tests__/survey/library-management.http.integration.test.ts
           --exclude=src/__tests__/scale/component-publication.postgres.integration.test.ts
           --exclude=src/__tests__/scale/component-management.http.integration.test.ts
@@ -348,9 +345,8 @@ jobs:
           --exclude=src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts
           --exclude=src/__tests__/bundle-onboarding/profile-lifecycle.postgres.integration.test.ts
           --exclude=src/__tests__/bundle-onboarding/profile-restore.postgres.integration.test.ts
-          --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest-base.json
       - name: isolated roster consumer on this job Redis DB 14
-        if: (success() || failure()) && inputs.focus == 'full'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures'
         env:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
           REDIS_URL: redis://localhost:6379/14
@@ -359,7 +355,7 @@ jobs:
           npm test -- src/__tests__/integration/educationRosterJobs.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest-roster.json
           node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest-roster.json src/__tests__/integration/educationRosterJobs.postgres.integration.test.ts
       - name: isolated export consumer on this job Redis DB 15
-        if: (success() || failure()) && inputs.focus == 'full'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures'
         env:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
           CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
@@ -390,7 +386,7 @@ jobs:
           process.exitCode=result.status??1;
           NODE
       - name: Teacher restricted-runtime and source SQL regression
-        if: (success() || failure()) && inputs.focus == 'full' && steps.teacher-runtime-fixture.outcome == 'success'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.teacher-runtime-fixture.outcome == 'success'
         env:
           DATABASE_URL: postgresql://pr363_runtime:synthetic-runtime-only@localhost:5432/pr363_runtime_test?schema=public
           DATABASE_URL_RUNTIME: postgresql://pr363_runtime:synthetic-runtime-only@localhost:5432/pr363_runtime_test?schema=public
@@ -403,15 +399,24 @@ jobs:
           npm test -- src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts src/__tests__/integration/pr363-source-sql.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-teacher-runtime-vitest.json
           node scripts/assert-release-test-report.mjs /tmp/eduk12-teacher-runtime-vitest.json src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts src/__tests__/integration/pr363-source-sql.postgres.integration.test.ts
       - name: initial Cognitive installation in its empty database
-        if: (success() || failure()) && inputs.focus == 'full' && steps.empty-fixtures.outcome == 'success'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.empty-fixtures.outcome == 'success'
         env:
           DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/cognitive_install_ci_test?schema=public
           COGNITIVE_INSTALL_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/cognitive_install_ci_test?schema=public
         run: |
           npm test -- src/__tests__/cognitive/onboarding-install.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-cognitive-install-vitest.json
           node scripts/assert-release-test-report.mjs /tmp/eduk12-cognitive-install-vitest.json src/__tests__/cognitive/onboarding-install.postgres.integration.test.ts
+      - name: Cognitive admin intake on its own empty migrated database
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.empty-fixtures.outcome == 'success'
+        env:
+          ADMIN_AUTH_ORIGIN: http://localhost:5174
+          DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/cognitive_admin_intake_ci_test?schema=public
+          COGNITIVE_INSTALL_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/cognitive_admin_intake_ci_test?schema=public
+        run: |
+          npm test -- src/__tests__/cognitive/admin-intake.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-cognitive-admin-intake-vitest.json
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-cognitive-admin-intake-vitest.json src/__tests__/cognitive/admin-intake.postgres.integration.test.ts
       - name: Library HTTP consumer in its empty database and Redis DB 13
-        if: (success() || failure()) && inputs.focus == 'full' && steps.empty-fixtures.outcome == 'success'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.empty-fixtures.outcome == 'success'
         env:
           DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/library_http_ci_test?schema=public
           LIBRARY_MANAGEMENT_HTTP_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/library_http_ci_test?schema=public
@@ -421,7 +426,7 @@ jobs:
           npm test -- src/__tests__/survey/library-management.http.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-library-http-vitest.json
           node scripts/assert-release-test-report.mjs /tmp/eduk12-library-http-vitest.json src/__tests__/survey/library-management.http.integration.test.ts
       - name: component import and system-admin HTTP in their empty database
-        if: (success() || failure()) && inputs.focus == 'full' && steps.empty-fixtures.outcome == 'success'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.empty-fixtures.outcome == 'success'
         env:
           # Step-local URLs exist before Vitest imports database/fixture modules.
           # The job default and every other suite keep their existing databases.
@@ -434,7 +439,7 @@ jobs:
           node scripts/assert-release-test-report.mjs /tmp/eduk12-component-import-vitest.json src/__tests__/scale/component-publication.postgres.integration.test.ts src/__tests__/scale/component-management.http.integration.test.ts
       - name: real legacy education publication for the current compatibility consumer
         id: legacy-feedback
-        if: (success() || failure()) && inputs.focus == 'full' && steps.empty-fixtures.outcome == 'success' && steps.historical-fixtures.outcome == 'success'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.empty-fixtures.outcome == 'success' && steps.historical-fixtures.outcome == 'success'
         env:
           DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/education_feedback_policy_ci_test?schema=public
           EDUCATION_MARKER_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/education_feedback_policy_ci_test?schema=public
@@ -459,7 +464,7 @@ jobs:
           }finally{await prisma.$disconnect()}})().catch(e=>{console.error(e);process.exitCode=1});
           NODE
       - name: Education consumers on five distinct unseeded fixtures
-        if: (success() || failure()) && inputs.focus == 'full' && steps.empty-fixtures.outcome == 'success'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.empty-fixtures.outcome == 'success'
         env:
           LEGACY_RESOURCE_ID: ${{ steps.legacy-feedback.outputs.resource_id }}
         run: |
@@ -478,7 +483,7 @@ jobs:
           done
           exit "$status"
       - name: exact historical schema upgrade and native artifact restore
-        if: (success() || failure()) && inputs.focus == 'full' && steps.historical-fixtures.outcome == 'success'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.historical-fixtures.outcome == 'success'
         env:
           DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/group_native_ci_test?schema=public
           GROUP_REPORT_QUALIFICATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/group_native_ci_test?schema=public
@@ -487,7 +492,7 @@ jobs:
           GROUP_REPORT_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
         run: npm test -- src/__tests__/reporting/task-artifact-native.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-group-native.json
       - name: fresh EVC source and separate native restore consumer
-        if: (success() || failure()) && inputs.focus == 'full' && steps.empty-fixtures.outcome == 'success'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures' && steps.empty-fixtures.outcome == 'success'
         env:
           DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/evc_source_ci_test?schema=public
           BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/evc_source_ci_test?schema=public
@@ -501,9 +506,9 @@ jobs:
           docker exec -i "$CI_POSTGRES_SERVICE_ID" pg_restore -U ptool -d evc_restore_ci_test --exit-on-error --no-owner --no-privileges < "$RUNNER_TEMP/evc-native.dump"
           DATABASE_URL='postgresql://ptool:ptool123@localhost:5432/evc_restore_ci_test?schema=public' EVC_RESTORE_DATABASE_URL='postgresql://ptool:ptool123@localhost:5432/evc_restore_ci_test?schema=public' npm test -- src/__tests__/bundle-onboarding/profile-restore.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-evc-restore.json
       - name: preserve all disjoint functional reports and require their complete union
-        if: (success() || failure()) && inputs.focus == 'full'
+        if: (success() || failure()) && inputs.focus == 'full' && matrix.group == 'fixtures'
         run: >-
-          node "$GITHUB_WORKSPACE/.github/scripts/backend-regression-reports.mjs" /tmp/eduk12-backend-vitest.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-teacher-runtime-vitest.json /tmp/eduk12-cognitive-install-vitest.json /tmp/eduk12-library-http-vitest.json /tmp/eduk12-component-import-vitest.json
+          node "$GITHUB_WORKSPACE/.github/scripts/backend-regression-reports.mjs" /tmp/eduk12-backend-vitest-fixtures.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-teacher-runtime-vitest.json /tmp/eduk12-cognitive-install-vitest.json /tmp/eduk12-cognitive-admin-intake-vitest.json /tmp/eduk12-library-http-vitest.json /tmp/eduk12-component-import-vitest.json
           /tmp/eduk12-teacher-self-group.json
           /tmp/eduk12-library-self-group.json
           /tmp/eduk12-teacher-private-group.json
@@ -520,7 +525,7 @@ jobs:
           /tmp/eduk12-evc-lifecycle.json
           /tmp/eduk12-evc-restore.json
       - name: capture hosted runner resources
-        if: always()
+        if: always() && (matrix.group == 'fixtures' || matrix.group == 'focused')
         run: |-
           {
             echo "node $(node -v)"
@@ -529,10 +534,92 @@ jobs:
             df -h /tmp | tail -1
             date -u +"timestamp %FT%TZ"
           } > /tmp/eduk12-hosted-ci-env.txt
-      - name: hosted critical integration suites must not skip
-        if: inputs.focus == 'full'
+      - name: upload vitest report artifact
+        if: always() && (matrix.group == 'fixtures' || matrix.group == 'focused')
+        continue-on-error: ${{ matrix.group == 'focused' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.group == 'fixtures' && format('backend-regression-group-fixtures-run-{0}-attempt-{1}', github.run_id, github.run_attempt) || 'backend-vitest-report' }}
+          path: |
+            /tmp/eduk12-backend-inventory-fixtures.json
+            /tmp/eduk12-backend-vitest-fixtures.json
+            /tmp/eduk12-backend-vitest.json
+            /tmp/eduk12-backend-vitest-base.json
+            /tmp/eduk12-backend-vitest-export.json
+            /tmp/eduk12-backend-vitest-roster.json
+            /tmp/eduk12-training-bundle-producer.json
+            /tmp/eduk12-training-course-producer.json
+            /tmp/eduk12-teacher-runtime-vitest.json
+            /tmp/eduk12-cognitive-install-vitest.json
+            /tmp/eduk12-cognitive-admin-intake-vitest.json
+            /tmp/eduk12-library-http-vitest.json
+            /tmp/eduk12-component-import-vitest.json
+            /tmp/eduk12-teacher-self-group.json
+            /tmp/eduk12-library-self-group.json
+            /tmp/eduk12-teacher-private-group.json
+            /tmp/eduk12-school-private-source.json
+            /tmp/eduk12-school-composition-delta.json
+            /tmp/eduk12-school-native-source.json
+            /tmp/eduk12-school-native-reports.json
+            /tmp/eduk12-education-marker.json
+            /tmp/eduk12-education-feedback-policy.json
+            /tmp/eduk12-education-standard-marker.json
+            /tmp/eduk12-education-license-selection.json
+            /tmp/eduk12-education-publication.json
+            /tmp/eduk12-group-native.json
+            /tmp/eduk12-evc-lifecycle.json
+            /tmp/eduk12-evc-restore.json
+            /tmp/eduk12-legacy-education-setup.json
+            /tmp/eduk12-parent-vitest.json
+            /tmp/eduk12-r5-vitest.json
+            /tmp/eduk12-hosted-ci-env.txt
+          if-no-files-found: ${{ matrix.group == 'fixtures' && 'error' || 'ignore' }}
+      - name: upload this shard's original report and exact file selection
+        if: always() && startsWith(matrix.group, 'shard-')
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-regression-group-${{ matrix.group }}-run-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+          path: |
+            /tmp/eduk12-backend-vitest-${{ matrix.group }}.json
+            /tmp/eduk12-backend-inventory-${{ matrix.group }}.json
+          if-no-files-found: error
+      - name: remove this job's ephemeral services and anonymous volumes
+        if: always()
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
+
+  backend-regression-reports:
+    name: backend regression complete reports
+    needs: backend-regression
+    if: always() && inputs.focus == 'full'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    defaults:
+      run:
+        working-directory: server-version/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: download this run's disjoint group reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: backend-regression-group-*-run-${{ github.run_id }}-attempt-*
+          path: ${{ runner.temp }}/regression-reports/group-artifacts
+      - name: require complete disjoint coverage and preserve every original verdict
+        if: success() || failure()
+        env:
+          REGRESSION_GROUP_RESULT: ${{ needs.backend-regression.result }}
         run: >-
-          node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json
+          node "$GITHUB_WORKSPACE/.github/scripts/backend-regression-reports.mjs"
+          '${{ runner.temp }}/regression-reports/eduk12-backend-vitest.json'
+          --collect '${{ runner.temp }}/regression-reports/group-artifacts'
+      - name: hosted critical integration suites must not skip
+        run: >-
+          node scripts/assert-release-test-report.mjs '${{ runner.temp }}/regression-reports/eduk12-backend-vitest.json'
           src/__tests__/integration/teacherSelfGroupScale.postgres.integration.test.ts
           src/__tests__/integration/librarySelfGroupScale.postgres.integration.test.ts
           src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts
@@ -557,6 +644,9 @@ jobs:
           src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts
           src/__tests__/integration/pr363-source-sql.postgres.integration.test.ts
           src/__tests__/cognitive/onboarding-install.postgres.integration.test.ts
+          src/__tests__/cognitive/admin-intake.postgres.integration.test.ts
+          src/__tests__/cognitive/assignment-publication-race.postgres.integration.test.ts
+          src/__tests__/assessment-bundle/child-cross-method.postgres.integration.test.ts
           src/__tests__/survey/library-management.http.integration.test.ts
           src/__tests__/scale/component-publication.postgres.integration.test.ts
           src/__tests__/scale/component-management.http.integration.test.ts
@@ -573,6 +663,7 @@ jobs:
           src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts
           src/__tests__/bundle-product/product.postgres.integration.test.ts
           src/__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts
+          src/__tests__/bundle-onboarding/package-json-roundtrip.postgres.integration.test.ts
           src/__tests__/bundle-onboarding/content.postgres.integration.test.ts
           src/__tests__/questionnaire/product.postgres.integration.test.ts
           src/__tests__/questionnaire/workbench.postgres.integration.test.ts
@@ -643,46 +734,10 @@ jobs:
           src/__tests__/survey/research-final.contract.test.ts
           src/__tests__/survey/research-builder.contract.test.ts
           src/__tests__/survey/research-analytics.contract.test.ts
-      - name: upload vitest report artifact
+      - name: preserve complete and original regression reports
         if: always()
-        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: backend-vitest-report
-          path: |
-            /tmp/eduk12-backend-vitest.json
-            /tmp/eduk12-backend-vitest-base.json
-            /tmp/eduk12-backend-vitest-export.json
-            /tmp/eduk12-backend-vitest-roster.json
-            /tmp/eduk12-training-bundle-producer.json
-            /tmp/eduk12-training-course-producer.json
-            /tmp/eduk12-teacher-runtime-vitest.json
-            /tmp/eduk12-cognitive-install-vitest.json
-            /tmp/eduk12-library-http-vitest.json
-            /tmp/eduk12-component-import-vitest.json
-            /tmp/eduk12-teacher-self-group.json
-            /tmp/eduk12-library-self-group.json
-            /tmp/eduk12-teacher-private-group.json
-            /tmp/eduk12-school-private-source.json
-            /tmp/eduk12-school-composition-delta.json
-            /tmp/eduk12-school-native-source.json
-            /tmp/eduk12-school-native-reports.json
-            /tmp/eduk12-education-marker.json
-            /tmp/eduk12-education-feedback-policy.json
-            /tmp/eduk12-education-standard-marker.json
-            /tmp/eduk12-education-license-selection.json
-            /tmp/eduk12-education-publication.json
-            /tmp/eduk12-group-native.json
-            /tmp/eduk12-evc-lifecycle.json
-            /tmp/eduk12-evc-restore.json
-            /tmp/eduk12-legacy-education-setup.json
-            /tmp/eduk12-parent-vitest.json
-            /tmp/eduk12-r5-vitest.json
-            /tmp/eduk12-hosted-ci-env.txt
-          if-no-files-found: ignore
-      - name: remove this job's ephemeral services and anonymous volumes
-        if: always()
-        env:
-          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
-          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
+          name: backend-vitest-report-run-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/regression-reports
+          if-no-files-found: error

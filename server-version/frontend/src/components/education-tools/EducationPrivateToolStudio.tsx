@@ -21,6 +21,7 @@ const EducationCompositionStudio=deferredPage(async()=>({default:(await import('
 const EducationPackageLibrary=deferredPage(async()=>({default:(await import('./EducationPackageLibrary')).EducationPackageLibrary}))
 import {privateToolBase,privateToolError,type PrivateToolApi,type PrivateTool,type PrivateToolSummary,type PrivateToolKind,type PrivateToolValidation,type PrivateToolVersion,type PrivateDraftState,type PrivateToolIssue} from './privateToolClient'
 import './education-private-tools.css'
+import {ScaleAuthoringHelp} from '../assessment-authoring/ScaleAuthoringHelp'
 
 type Props={api:PrivateToolApi;organizationId:string;entry:'SCHOOL'|'TEACHER';actorId?:string;onDraftStateChange?:(state:PrivateDraftState)=>void}
 function SchoolLayout({entry,className,children}:{entry:Props['entry'];className:string;children:ReactNode}){return entry==='SCHOOL'?<div className={className}>{children}</div>:<>{children}</>}
@@ -71,7 +72,7 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
  const [sharingVersion,setSharingVersion]=useState<PrivateToolVersion|null>(null)
  const [sharingState,setSharingState]=useState<PrivateDraftState>({dirty:false,writing:false})
  const sharingStateRef=useRef(sharingState);sharingStateRef.current=sharingState
- const [tab,setTab]=useState<'responses'|'items'|'scores'|'report'>('responses')
+ const [tab,setTab]=useState<'responses'|'items'|'scores'|'report'>('items')
  const [previewing,setPreviewing]=useState(false)
  const [answers,setAnswers]=useState<Record<string,ProfessionalAnswer>>({})
  const [previewResult,setPreviewResult]=useState<unknown>(null)
@@ -100,7 +101,7 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
  }),[api,base,operate])
  useEffect(()=>{void refreshList()},[refreshList])
  const mayLeave=()=>!locked.current&&!importPending.current&&!sharingStateRef.current.writing&&mediaPending.current===0&&(!dirtyRef.current||window.confirm('当前草稿尚未保存，确定放弃修改吗？'))
- const apply=(value:PrivateTool)=>{setEditorSessionRevision(revision=>revision+1);clearPending();setCsvPending(false);setSharingVersion(null);setSharingState({dirty:false,writing:false});setTool(value);setSaved(fingerprint(value));setValidation(null);setPreviewing(false);setAnswers({});setPreviewResult(null);setTab('responses')}
+ const apply=(value:PrivateTool)=>{setEditorSessionRevision(revision=>revision+1);clearPending();setCsvPending(false);setSharingVersion(null);setSharingState({dirty:false,writing:false});setTool(value);setSaved(fingerprint(value));setValidation(null);setPreviewing(false);setAnswers({});setPreviewResult(null);setTab('items')}
  const open=(id:string)=>{
   if(!mayLeave())return
   void operate(async current=>{
@@ -202,7 +203,7 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
    </select></label>}
    {entry==='SCHOOL'&&tool.kind==='FORM'&&!previewing&&<EducationFormBulkImport key={`${tool.id}:${editorSessionRevision}`} api={api} organizationId={organizationId} actorId={actorId} tool={tool} disabled={dirty||bulkPending||busy||importBusy||mediaCount>0||sharingState.writing} onBusy={onImportBusy} onPendingChange={setCsvPending} onImported={value=>{apply(value);setNotice('表单题目已追加并保存，请重新检查定义。')}}/>}
    {previewing&&checked?<><p>使用已保存定义进行试填，不创建被试任务、不保存正式作答。</p><fieldset disabled={busy||importBusy||mediaCount>0||sharingState.writing}><PrivateToolPreview renderMaterials={items=>items?.map(item=><EducationMaterialPreview key={item.asset.assetId} api={api} organizationId={organizationId} toolId={tool.id} item={item}/>)} imageAdapter={imageAdapter} tool={tool} answers={answers} onAnswer={(key,value)=>{setAnswers(old=>({...old,[key]:value}));setPreviewResult(null)}}/></fieldset><button type="button" disabled={busy||importBusy||mediaCount>0||sharingState.writing} onClick={preview}>检查试填结果</button>{previewResult!==null&&<details open><summary>服务端预览结果</summary><pre>{JSON.stringify(previewResult,null,2)}</pre></details>}</>
-    :tool.kind==='SCALE'?<><nav className="education-private-tabs" aria-label="量表编辑分区">{([['responses','响应选项'],['items','题目'],['scores','计分'],['report','报告文案']] as const).map(([key,label])=><button type="button" key={key} disabled={csvPending||busy||importBusy||mediaCount>0||sharingState.writing} aria-pressed={tab===key} onClick={()=>setTab(key)}>{label}</button>)}</nav>{tab==='report'&&<label className="education-private-step-help"><input type="checkbox"
+    :tool.kind==='SCALE'?<><nav className="education-private-tabs" aria-label="量表编辑分区">{([['items','题目'],['responses','响应选项'],['scores','计分'],['report','报告文案']] as const).map(([key,label],index)=><button type="button" key={key} disabled={csvPending||busy||importBusy||mediaCount>0||sharingState.writing} aria-pressed={tab===key} onClick={()=>setTab(key)}><span className="scale-author-step" aria-hidden="true">{index+1}</span>{label}</button>)}</nav><ScaleAuthoringHelp section={tab} variant="education"/>{tab==='report'&&<label className="education-private-step-help"><input type="checkbox"
       disabled={busy||importBusy||csvPending||mediaCount>0||sharingState.writing}
       checked={(tool.definition as ScaleDefinition).report.audienceContract?.audience===(entry==='TEACHER'?'teacher':'student')}
       onChange={event=>{const definition=tool.definition as ScaleDefinition;const {audienceContract:_audience,...report}=definition.report
