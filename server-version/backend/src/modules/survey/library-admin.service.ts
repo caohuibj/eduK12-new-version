@@ -117,7 +117,7 @@ export async function changeSurveyToolPolicy(actorId:string,input:PolicyIdentity
    contentReady=Boolean(d?.items?.length&&d?.scoring?.scores?.length&&d?.report)
   }else fail(400,'不支持的工具范围')
   if(input.decision==='APPROVED'&&!contentReady)fail(409,'题目、计分和报告尚未完整，不能批准 Survey 使用范围')
-  const current=await readToolPolicy(tx,input,true)
+  const current=await readToolPolicy(tx,input,'POLICY_MUTATION')
   if(input.decision!==current.decision)await assertStandardSystem(tx,actorId)
   if(current.version!==input.expectedVersion)fail(409,'审批状态已变化，请刷新后重试')
   await tx.$executeRaw`INSERT INTO survey_tool_policies(resource_key,fingerprint,decision,paused,reason,reviewed_by)

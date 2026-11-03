@@ -11,7 +11,7 @@ import {assertSjtEntryDistributionAuthority,sjtEntryDistributionReceiptSchema,Sj
 import type {CatalogSourceSnapshot} from './catalog.sources'
 import type {ResearchFrozenPublication} from './publication.service'
 export type {ToolEntryProduct,PolicyIdentity,ToolPolicy} from '../assessment-governance/tool-entry-policy'
-export {readToolPolicy,readToolPolicies,exactToolEntryProducts,approveToolEntryPolicies,assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
+export {readToolPolicy,readToolPolicies,exactToolEntryProducts,approveToolEntryPolicies,assertToolEntryPolicy,lockToolPolicyAdmission,lockToolPolicyMutation,type ToolPolicyLock} from '../assessment-governance/tool-entry-policy'
 import {readToolPolicy,type PolicyIdentity} from '../assessment-governance/tool-entry-policy'
 import {readFrozenSurveyStandardUses,assertSurveyStandardUseAuthority} from '../assessment-authorization/survey-standard-use'
 export const standardPolicyIdentity=(key:string,version:string):PolicyIdentity=>{
@@ -36,7 +36,7 @@ export async function snapshotPolicyIdentity(tx:Prisma.TransactionClient,snapsho
  return {resourceKey:`${snapshot.ref.kind}:${snapshot.ref.sourceId}:${snapshot.ref.sourceVersion}`,fingerprint:snapshot.definitionDigest}
 }
 export async function assertSurveyToolPolicy(tx:Prisma.TransactionClient,identity:PolicyIdentity,requireApproval:boolean){
- const policy=await readToolPolicy(tx,identity,true)
+ const policy=await readToolPolicy(tx,identity,'ADMISSION_READ')
  if(policy.paused)throw new AdminPermissionError(409,'该精确版本已暂停 Survey 分配和新作答准入：'+policy.reason)
  if(policy.decision==='RETURNED')throw new AdminPermissionError(409,'该精确版本的 Survey 准入已撤回：'+policy.reason)
  if(requireApproval&&policy.decision!=='APPROVED')throw new AdminPermissionError(409,'该精确版本尚未通过 Survey 范围审批：'+policy.reason)
