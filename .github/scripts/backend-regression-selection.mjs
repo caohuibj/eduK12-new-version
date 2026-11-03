@@ -4,7 +4,10 @@ import {matchesGlob,resolve} from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 
-export const regressionGroups=['fixtures','shard-1','shard-2','shard-3','shard-4'];
+// Shard wall time scales with file count (import cost dominates). Six shards keep the serial
+// fixtures group, not a shard, as the longest backend-regression job. The workflow matrix must list the same groups.
+export const regressionShardCount=6;
+export const regressionGroups=['fixtures',...Array.from({length:regressionShardCount},(_,i)=>`shard-${i+1}`)];
 export const backendOwnedFile='src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts';
 // Keep retained file/row consumers with their producers, including opt-in manual
 // continuations. Scheduling never enables those opt-ins or copies mutable DBs.
@@ -40,7 +43,7 @@ export function partitionRegressionFiles(files,excluded){
     assert.ok(file.startsWith('src/__tests__/')&&file.endsWith('.test.ts'),`Unexpected test path: ${file}`);
     if(excludedSet.has(file))continue;
     const retained=fixturePatterns.some(pattern=>matchesGlob(file.slice('src/__tests__/'.length),pattern));
-    groups[retained?'fixtures':`shard-${shard++%4+1}`].push(file);
+    groups[retained?'fixtures':`shard-${shard++%regressionShardCount+1}`].push(file);
   }
   const special=excluded.filter(file=>file!==backendOwnedFile);
   return {groups,special,expectedFiles:[...files].filter(file=>file!==backendOwnedFile).sort()};

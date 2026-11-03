@@ -37,6 +37,15 @@ test('closure fingerprints include exact modes and bytes but omit unrelated fron
  assert.notEqual(closureDigest('frontend',source),closureDigest('frontend',[source[0],source[1],{...source[2],sha:sha('d')}]));
  assert.throws(()=>closureDigest('backend-regression',[...source,source[0]]));
 });
+test('closure digest accepts real trees whose locale order differs from code-unit order',()=>{
+ const paths=['.github/PULL_REQUEST_TEMPLATE.md','.github/config/checks.json','server-version/backend/Dockerfile',
+  'server-version/backend/delete-files.js','server-version/backend/ecosystem.config.js','server-version/backend/FORM.md','server-version/scripts/a_b.py','server-version/scripts/a-b.py'];
+ const tree=paths.map((path,i)=>({path,mode:'100644',type:'blob',sha:sha(String(i%9))}));
+ const digest=closureDigest('backend-regression',tree);
+ assert.match(digest,/^[a-f0-9]{64}$/);
+ assert.equal(closureDigest('backend-regression',[...tree].reverse()),digest);
+ assert.throws(()=>closureDigest('backend-regression',[...tree,tree[0]]));
+});
 test('cross-run checkpoint accepts only official success with unchanged full closure',()=>{
  const now=Date.parse('2026-11-02T12:00:00Z');
  const tree=[

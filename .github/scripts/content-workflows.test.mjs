@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {runInNewContext} from 'node:vm';
+import {regressionGroups} from './backend-regression-selection.mjs';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const scopes = JSON.parse(fs.readFileSync(new URL('../config/acceptance-scopes.json', import.meta.url), 'utf8'));
@@ -517,7 +518,7 @@ test('backend regression groups isolate services and retain the complete mandato
   assert.match(groups,/timeout-minutes: 45/);
   assert.match(groups,/fail-fast: false/);
   assert.ok(groups.indexOf('uses: actions/setup-node@v4') < groups.indexOf('name: validate disjoint regression report controls'));
-  assert.ok(groups.includes('["fixtures","shard-1","shard-2","shard-3","shard-4"]'));
+  assert.ok(groups.includes(JSON.stringify(regressionGroups)));
   assert.ok(groups.includes('["focused"]'));
   assert.match(groups,/services:\n      postgres:/);assert.match(groups,/      redis:/);
   const steps=groups.split('      - name: ');

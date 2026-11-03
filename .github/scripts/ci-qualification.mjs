@@ -46,11 +46,13 @@ const ROOTS=Object.freeze({
   'docker':['.github/','server-version/'],
   'codeql':['.github/','server-version/']
 });
+// Code-unit order is the same order enforced by the duplicate/order check below;
+// locale collation disagrees on mixed-case and punctuated paths in real trees.
 export function closureDigest(check,tree){
   const roots=ROOTS[check];
   assert(roots,'Unknown CI qualification check');
   assert(Array.isArray(tree)&&tree.length>0,'Complete git tree required');
-  const selected=tree.filter(e=>roots.some(r=>e.path.startsWith(r))).sort((a,b)=>a.path.localeCompare(b.path,'en'));
+  const selected=tree.filter(e=>roots.some(r=>e.path.startsWith(r))).sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0);
   assert(selected.length>0,'Missing qualification inputs');
   let previous='';
   const hash=createHash('sha256');
