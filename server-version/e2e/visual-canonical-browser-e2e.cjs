@@ -432,8 +432,12 @@ const cases = [
       }))
     }),
     ready: async (page) => {
-      await page.getByRole('heading', { name: '学习体验匿名问卷', exact: true }).waitFor()
-      await page.getByText('各量表结果独立展示，不生成跨量表总体分。', { exact: true }).waitFor()
+      await page.getByRole('heading', { name: '学习投入', exact: true }).waitFor()
+      const supporting = page.getByTestId('public-questionnaire-completion-facts')
+      const summary = supporting.getByText('作答信息与阅读说明', { exact: true })
+      await summary.waitFor()
+      await summary.click()
+      await page.getByText('问卷：学习体验匿名问卷', { exact: true }).waitFor()
     },
   },
   {
