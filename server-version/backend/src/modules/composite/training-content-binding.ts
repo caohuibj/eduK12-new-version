@@ -404,10 +404,6 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
   return {binding,bindingHash:canonicalHash(binding),recheckSourceLicenses:async()=>{for(const receipt of staticReceipts)await recheckStaticSjtConsumerLicense(db,receipt)}}
 }
 
-/** Publish only (never preview or historical reads): compile each ordinary
- * Scale unit's static runtime once, verify it projects to the exact published
- * release, append it content-addressed in the publishing transaction, and emit
- * a schemaVersion 2 snapshot. A code-package Scale is frozen at publish. */
 /** Builds the format-3 static artifact for one eligible SCALE unit from the
  * live scale row, or returns a drift reason when that row no longer reproduces
  * the unit's pinned releaseId/contentHash. Never fabricates. */
@@ -423,6 +419,10 @@ export async function buildScaleUnitArtifact(db:Prisma.TransactionClient,item:an
     ...(unit.source.libraryEntryId?{measurementPresentation:await freezeLibraryScalePresentation(db,item.scale,definition)}:{})})
 }
 
+/** Publish only (never preview or historical reads): compile each ordinary
+ * Scale unit's static runtime once, verify it projects to the exact published
+ * release, append it content-addressed in the publishing transaction, and emit
+ * a schemaVersion 2 snapshot. A code-package Scale is frozen at publish. */
 export async function attachPublishedScaleArtifacts(db:Prisma.TransactionClient,composite:{id:string;items:any[]},
   content:{snapshot:TrainingContentSnapshot;releases:Map<string,Stored>}){
   const {snapshot}=content
