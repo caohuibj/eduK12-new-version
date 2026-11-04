@@ -63,6 +63,22 @@ test('four serial shards and the retained fixture lane cover the exact existing 
   assert.throws(()=>partitionRegressionFiles(files,excluded.filter(file=>file!==backendOwnedFile)));
 });
 
+test('weighted regression scheduling is deterministic, balanced and rejects invalid weights',async()=>{
+  const {scheduleWeightedRegressionShards,estimateRegressionFileMs}=await import('./backend-regression-selection.mjs');
+  const heavy=Array.from({length:6},(_,i)=>`src/__tests__/integration/slow-${i}.test.ts`);
+  const light=Array.from({length:12},(_,i)=>`src/__tests__/utils/fast-${i}.test.ts`);
+  const files=[...heavy,...light];
+  const weightOf=file=>file.includes('/integration/')?20000:1000;
+  const first=scheduleWeightedRegressionShards(files,weightOf);
+  assert.deepEqual(scheduleWeightedRegressionShards([...files].reverse(),weightOf),first);
+  assert.deepEqual(first.map(group=>group.length),[3,3,3,3,3,3]);
+  assert.deepEqual(first.flat().sort(),files.sort());
+  assert.deepEqual(first.map(group=>group.filter(file=>file.includes('/integration/')).length),[1,1,1,1,1,1]);
+  assert.ok(estimateRegressionFileMs('src/__tests__/integration/a.test.ts')>estimateRegressionFileMs('src/__tests__/utils/b.test.ts'));
+  assert.equal(estimateRegressionFileMs('src/__tests__/new-directory/a.test.ts'),3000);
+  assert.throws(()=>scheduleWeightedRegressionShards(files,()=>0),/Invalid regression scheduling weight/);
+});
+
 test('complete-group report coverage rejects missing, foreign and duplicate paths without changing verdicts',async()=>{
   const {assertRegressionFiles}=await import('./backend-regression-reports.mjs');
   const expected=['src/__tests__/one.test.ts','src/__tests__/two.test.ts'];

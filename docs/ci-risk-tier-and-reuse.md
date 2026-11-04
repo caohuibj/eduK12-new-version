@@ -75,3 +75,10 @@ PR #613 合并后的首个完整 run（41563144407，22 分 7 秒）实测：除
 - Draft 平台 PR 只运行 `pr-light-*`；重型 browser/media/ui/ops/perf 仅在 Ready 的全量路线运行；轻量路由不会激活这些 job（`content-scope.test.mjs`、`ci-topology.test.mjs` 断言）。
 - 跨提交复用目前只有 `backend-regression-reuse` 一条：同仓 PR、legacy/platform 路线、失败关闭；其他检查没有跨 run 复用，同一提交内的 artifact 由 producer 构建一次、consumer 校验后使用。
 - 本次清理 PR 因删除大量 CI 控制文件且修改了 browser/frontend/backend-regression 可复用 workflow，按 release 策略归为 C/legacy 全量路线；未为它新增“删除豁免”。其后仅触及轻量范围的 PR 不会激活这些重型 job。
+
+## 下一阶段：按历史耗时均衡 Backend Regression（2026-11-04）
+
+- 第一期只调整六个普通 shard 的**分配顺序**。用 PR #619 最后一次完整成功回归（run 41754088324）日志中的串行测试完成时间间隔，按测试目录计算保守权重；低样本目录采用 3 秒默认值。
+- 保持每组文件数差值不超过一、固定 `fixtures` producer/consumer 顺序、不变的 `backendOwnedFile` 和显式排除集；所有完整文件清单、分组 inventory、失败报告和 merge-gate 检查继续拒绝遗漏。
+- 基于该 run 六个普通 shard 的日志，原分组相对耗时估算约 542–780 秒；目录加权重新分配的离线模拟约 618–661 秒。**模拟不等于新 CI 实测**，且同一 runner 的导入/缓存可能变化；必须以新 PR 的 Full Gate 作为准入。
+- 下一步再依据至少三轮实测更新权重或升级至按文件统计；评估独立 fixtures 链的安全拆分。不得取消安全、数据库恢复或跨浏览器必需覆盖。
