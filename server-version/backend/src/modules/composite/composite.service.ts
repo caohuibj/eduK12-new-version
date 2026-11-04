@@ -22,7 +22,7 @@ import {assertTrainingPrivateReferenceAdmissionCurrent} from './training-private
 import {attachTrainingReferenceSelection} from './training-reference-selection'
 import {freezeTrainingReferenceBinding} from './training-reference-binding'
 import {assertCurrentTrainingContentOwner,attachTrainingReportSelection} from './training-report-selection'
-import {prepareTrainingContentSnapshot,prepareTrainingContentAttemptBinding} from './training-content-binding'
+import {prepareTrainingContentSnapshot,attachPublishedScaleArtifacts,prepareTrainingContentAttemptBinding} from './training-content-binding'
 import {inheritTrainingTrackingSources,freezeTrainingTracking,readTrainingTracking} from './personal-tracking'
 import {verifyStoredTrainingStandardItem,freezeTrainingStandardScaleRuntime,trainingStandardCombinationSummary} from './training-standard-combination'
 import { evaluateTrainingFeedbackForAttempt, prepareTrainingFeedbackBinding, freezeTrainingFeedbackSnapshot, trainingFeedbackAttemptSelect, trainingFeedbackParentSelect, type TrainingFeedbackBinding } from './training-feedback-binding'
@@ -2186,6 +2186,8 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
       if(!clock||expiry<=clock.now)throw compositeForbidden('报告选择作者账号已到期')
     }
   }
+  // Publish only: preview and historical reads never append artifacts.
+  if(content&&standardMode==='PUBLISH')content={...content,...await attachPublishedScaleArtifacts(prisma as Prisma.TransactionClient,composite,content)}
   await content?.recheckSourceLicenses()
   return { analysisProtocolSnapshotEncrypted, reportPackageSnapshotEncrypted, ...variantFields, ...flowFields, ...persistenceFields, ...feedbackFields,
     ...(content?{trainingContentSnapshot:content.snapshot as Prisma.InputJsonValue,trainingContentSnapshotHash:content.snapshotHash}:{}) }

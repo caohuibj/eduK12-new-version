@@ -1,0 +1,104 @@
+import { gzipSync, gunzipSync } from 'node:zlib'
+import { z } from 'zod'
+import { canonicalHash, canonicalJsonBytes, retainImmutableCanonicalValue } from './canonical'
+import { BoundedArtifactCache } from './bounded-artifact-cache'
+import { encryptUnifiedRuntimePayload, decryptUnifiedRuntimePayload } from './security'
+import { createFrozenScaleRuntimeSnapshot } from './runtime-snapshot'
+import { sharedScaleArtifactRepositoryForDatabase, type SharedScaleArtifactDb, type SharedScaleArtifactRecord } from './shared-scale-runtime'
+import type { FrozenScaleInstruction } from './frozen-scale-instruction'
+import { frozenScalePresentationSchema, type FrozenScalePresentation } from '../scale/scale-presentation'
+import type { ScaleDefinitionV2 } from '../scale/scale-definition'
+
+/** Format 3: publish-time STATIC Scale content for an ordinary Training
+ * publication. Reference bindings, deployment policy and frozenAt stay live at
+ * START and are never part of this artifact. Content-addressed and immutable. */
+export const PUBLISHED_SCALE_ARTIFACT_FORMAT = 3 as const
+const MAX_PLAIN_BYTES = 2 * 1024 * 1024
+const MAX_CIPHER_BYTES = 4 * 1024 * 1024
+const digest = z.string().regex(/^[0-9a-f]{64}$/)
+const bodySchema = z.object({ kind: z.literal('SCALE_PUBLISHED_STATIC'), storageVersion: z.literal(3), artifactHash: digest,
+  codec: z.literal('gzip-json-v1'), plaintextBytes: z.number().int().positive().max(MAX_PLAIN_BYTES), data: z.string().max(MAX_CIPHER_BYTES) }).strict()
+export const publishedScaleArtifactSchema = z.object({
+  kind: z.literal('SCALE_PUBLISHED_STATIC'), schemaVersion: z.literal(1),
+  release: z.object({ releaseId: z.string().guid(), contentHash: digest }).strict(),
+  instrumentKey: z.string().min(1), instrumentVersion: z.string().min(1),
+  sourceDefinitionHash: digest, legacyDefinitionHash: digest,
+  definition: z.record(z.string(), z.unknown()), compiledRuntime: z.record(z.string(), z.unknown()),
+  instruction: z.unknown().nullable(),
+  measurementPresentation: frozenScalePresentationSchema.optional(),
+}).strict()
+export type PublishedScaleArtifact = Omit<z.infer<typeof publishedScaleArtifactSchema>,'definition'|'compiledRuntime'|'instruction'> & {
+  definition: ScaleDefinitionV2; compiledRuntime: ReturnType<typeof createFrozenScaleRuntimeSnapshot>['compiledRuntime']; instruction: FrozenScaleInstruction | null }
+export type PublishedScaleArtifactRef = { formatVersion: 3; hash: string }
+
+export const publishedScaleArtifactHash = (artifact: unknown): string => canonicalHash({ storageVersion: 3, artifact })
+
+/** Compile exactly what START compiles today, minus the live parts. */
+export function buildPublishedScaleArtifact(input: { instrumentKey: string; instrumentVersion: string; definition: ScaleDefinitionV2;
+  instruction: FrozenScaleInstruction | null; measurementPresentation?: FrozenScalePresentation; release: { releaseId: string; contentHash: string } }) {
+  const frozen = createFrozenScaleRuntimeSnapshot({ instrumentKey: input.instrumentKey, instrumentVersion: input.instrumentVersion,
+    definition: input.definition, instruction: input.instruction, referenceBindings: [], frozenAt: new Date(0) })
+  const artifact: PublishedScaleArtifact = { kind: 'SCALE_PUBLISHED_STATIC', schemaVersion: 1,
+    release: { releaseId: input.release.releaseId, contentHash: input.release.contentHash },
+    instrumentKey: frozen.instrumentKey, instrumentVersion: frozen.instrumentVersion,
+    sourceDefinitionHash: frozen.sourceDefinitionHash, legacyDefinitionHash: frozen.legacyDefinitionHash,
+    definition: frozen.definition, compiledRuntime: frozen.compiledRuntime, instruction: frozen.instruction ?? null,
+    ...(input.measurementPresentation ? { measurementPresentation: input.measurementPresentation } : {}) }
+  const bytes = canonicalJsonBytes(artifact)
+  if (bytes.length > MAX_PLAIN_BYTES) throw new Error('Published Scale artifact exceeds size limit')
+  const hash = publishedScaleArtifactHash(artifact)
+  const record: SharedScaleArtifactRecord = { artifactHash: hash, formatVersion: PUBLISHED_SCALE_ARTIFACT_FORMAT, plaintextBytes: bytes.length,
+    payloadEncrypted: encryptUnifiedRuntimePayload({ kind: 'SCALE_PUBLISHED_STATIC', storageVersion: 3, artifactHash: hash,
+      codec: 'gzip-json-v1', plaintextBytes: bytes.length, data: gzipSync(bytes, { level: 6 }).toString('base64') }) }
+  return { artifact, hash, record }
+}
+
+/** Fail closed: hash, format, size, envelope and content are all re-verified. */
+export function decodePublishedScaleArtifact(row: SharedScaleArtifactRecord, expectedHash: string): PublishedScaleArtifact {
+  if (row.artifactHash !== expectedHash || row.formatVersion !== PUBLISHED_SCALE_ARTIFACT_FORMAT || row.payloadEncrypted.length > MAX_CIPHER_BYTES
+    || row.plaintextBytes < 1 || row.plaintextBytes > MAX_PLAIN_BYTES) throw new Error('Invalid published Scale artifact record')
+  const body = bodySchema.parse(decryptUnifiedRuntimePayload<unknown>(row.payloadEncrypted))
+  if (body.artifactHash !== expectedHash || body.plaintextBytes !== row.plaintextBytes) throw new Error('Published Scale artifact metadata mismatch')
+  if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(body.data)) throw new Error('Invalid published Scale artifact encoding')
+  const bytes = gunzipSync(Buffer.from(body.data, 'base64'), { maxOutputLength: MAX_PLAIN_BYTES })
+  if (bytes.length !== body.plaintextBytes) throw new Error('Published Scale artifact size mismatch')
+  const artifact = publishedScaleArtifactSchema.parse(JSON.parse(bytes.toString("utf8"))) as unknown as PublishedScaleArtifact
+  if (publishedScaleArtifactHash(artifact) !== expectedHash) throw new Error('Published Scale artifact hash mismatch')
+  // Recompile from the stored definition: the compiled runtime must be exactly
+  // what this code would compile today, otherwise fail closed.
+  const recompiled = buildPublishedScaleArtifact({ instrumentKey: artifact.instrumentKey, instrumentVersion: artifact.instrumentVersion,
+    definition: artifact.definition, instruction: artifact.instruction, measurementPresentation: artifact.measurementPresentation, release: artifact.release })
+  if (recompiled.hash !== expectedHash) throw new Error('Published Scale artifact compile mismatch')
+  return retainImmutableCanonicalValue(artifact)
+}
+
+/** Append inside the publishing transaction, then read back and verify. */
+export async function appendPublishedScaleArtifact(db: SharedScaleArtifactDb, built: ReturnType<typeof buildPublishedScaleArtifact>): Promise<PublishedScaleArtifactRef> {
+  const repository = sharedScaleArtifactRepositoryForDatabase(db)
+  await repository.insert(built.record)
+  const row = await repository.find(built.hash)
+  if (!row) throw new Error('Published Scale artifact missing after append')
+  decodePublishedScaleArtifact(row, built.hash)
+  return { formatVersion: 3, hash: built.hash }
+}
+
+// Only verified, committed-by-hash immutable scientific content is cached.
+const cache = new BoundedArtifactCache<PublishedScaleArtifact>(64, 8 * 1024 * 1024)
+export async function loadPublishedScaleArtifacts(db: SharedScaleArtifactDb, hashes: string[]): Promise<Map<string, PublishedScaleArtifact>> {
+  const out = new Map<string, PublishedScaleArtifact>(), missing: string[] = []
+  for (const hash of new Set(hashes)) { if (!digest.safeParse(hash).success) throw new Error('Invalid published Scale artifact hash'); const hit = cache.get(hash); if (hit) out.set(hash, hit); else missing.push(hash) }
+  if (missing.length) {
+    const rows = await db.$queryRaw<SharedScaleArtifactRecord[]>`SELECT artifact_hash AS "artifactHash", format_version AS "formatVersion",
+      plaintext_bytes AS "plaintextBytes", payload_encrypted AS "payloadEncrypted" FROM assessment_runtime_artifacts WHERE artifact_hash = ANY(${missing}::text[])`
+    const byHash = new Map(rows.map(row => [row.artifactHash, row]))
+    for (const hash of missing) {
+      const row = byHash.get(hash)
+      if (!row) throw new Error('Published Scale artifact missing')
+      const artifact = decodePublishedScaleArtifact(row, hash)
+      cache.set(hash, artifact, row.plaintextBytes * 5 + 1024)
+      out.set(hash, artifact)
+    }
+  }
+  return out
+}
+export const publishedScaleArtifactCacheStats = () => cache.stats()
