@@ -104,7 +104,7 @@ it.each([true, false])('opens document attachments with native Enter and Space o
   expect(mocks.post).not.toHaveBeenCalled()
 })
 
-it.each([true, false])('preserves pending, retry identity, native alerts and accepted-write hydration (Training=%s)', async training => {
+it.each([true, false])('preserves pending, retry identity, inline feedback and accepted-write hydration (Training=%s)', async training => {
   mocks.training.mockReturnValue(training)
   const user = userEvent.setup()
   const data = { ...assignment, questions: [] }
@@ -121,9 +121,8 @@ it.each([true, false])('preserves pending, retry identity, native alerts and acc
   expect(submit).toBeDisabled()
   const firstKey = mocks.post.mock.calls[0][2].headers['Idempotency-Key']
   await act(async () => reject({ status: 500, message: '稍后重试' }))
-  expect(window.alert).toHaveBeenLastCalledWith('稍后重试')
+  expect(await screen.findByRole('alert')).toHaveTextContent('稍后重试')
   expect(input).toHaveValue('保留这份作答')
-  expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   expect(submit).toBeEnabled()
 
   let accept!: (value: unknown) => void
@@ -133,7 +132,7 @@ it.each([true, false])('preserves pending, retry identity, native alerts and acc
   const focus = vi.spyOn(HTMLElement.prototype, 'focus')
   await act(async () => accept({ code: 0 }))
   expect(await screen.findByText('我的提交')).toBeInTheDocument()
-  expect(window.alert).toHaveBeenLastCalledWith('提交成功！')
+  expect(screen.getByRole('status')).toHaveTextContent('提交成功！')
   expect(focus).not.toHaveBeenCalled()
   expect(mocks.post).toHaveBeenCalledTimes(2)
   expect(mocks.post.mock.calls[1]).toEqual(['/assignments/a1/submit', { content: '保留这份作答', answers: undefined, expectedRevision: 0 }, { headers: { 'Idempotency-Key': firstKey } }])
