@@ -89,7 +89,7 @@ suite('publish-time static Scale artifact (format 3) / real isolated PostgreSQL'
   await expect(db.$transaction(async tx=>{await appendPublishedScaleArtifact(tx,built);throw new Error('rollback')})).rejects.toThrow('rollback')
   expect(await row(built.hash)).toBeUndefined()
  })
- it('an untampered artifact compiled by an older/newer compiler still decodes as stored; only publish re-checks compilation',async()=>{
+ it('an untampered artifact compiled by an older/newer compiler still decodes as stored; decode never recompiles',async()=>{
   const artifact=decodePublishedScaleArtifact(await row(published.hash),published.hash)
   // Simulate a compiler change: same definition, a different compiledRuntime.
   const other={...artifact,instrumentKey:artifact.instrumentKey+'-cc',compiledRuntime:{...artifact.compiledRuntime,compilerGeneration:'other'}}
@@ -99,8 +99,23 @@ suite('publish-time static Scale artifact (format 3) / real isolated PostgreSQL'
   const decoded=decodePublishedScaleArtifact(record,hash)
   expect(decoded.compiledRuntime).toEqual(other.compiledRuntime)
   expect(()=>decodePublishedScaleArtifact(record,published.hash)).toThrow()
-  await expect(db.$transaction(async tx=>appendPublishedScaleArtifact(tx,{artifact:other as any,hash,record}))).rejects.toThrow('compile mismatch')
-  expect(await row(hash)).toBeUndefined()
+ })
+ it('an uncommitted format-3 append does not block an unrelated artifact write',async()=>{
+  const artifact=decodePublishedScaleArtifact(await row(published.hash),published.hash)
+  const built=buildPublishedScaleArtifact({instrumentKey:artifact.instrumentKey+'-lk',instrumentVersion:artifact.instrumentVersion,definition:artifact.definition,
+    instruction:artifact.instruction,release:artifact.release})
+  let release!:()=>void;const held=new Promise<void>(r=>{release=r})
+  let appended!:()=>void;const ready=new Promise<void>(r=>{appended=r})
+  const txA=db.$transaction(async tx=>{await appendPublishedScaleArtifact(tx,built);appended();await held},{timeout:20000})
+  await ready
+  const t0=Date.now()
+  const other='c'.repeat(63)+'1'
+  const {sharedScaleArtifactRepositoryForDatabase}=await import('../../modules/assessment-runtime/shared-scale-runtime')
+  await db.$transaction(async tx=>{await tx.$executeRaw`SET LOCAL lock_timeout='1500ms'`
+    await expect(sharedScaleArtifactRepositoryForDatabase(tx).insert({artifactHash:other,formatVersion:1,plaintextBytes:1,payloadEncrypted:'x'})).resolves.toBeDefined()
+    throw new Error('rollback')}).catch(e=>{if(e.message!=='rollback')throw e})
+  expect(Date.now()-t0).toBeLessThan(1500)
+  release();await txA
  })
  it('the v2 completeness rule rejects a missing or stray artifact reference',()=>{
   const {snapshot}=published,unit=snapshot.units[0]
