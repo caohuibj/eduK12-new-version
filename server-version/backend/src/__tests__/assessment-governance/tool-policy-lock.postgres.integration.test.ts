@@ -2,7 +2,7 @@ import {randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {afterAll,beforeAll,describe,expect,it} from 'vitest'
 import {prisma as db} from '../../config/database'
-import {approveToolEntryPolicies,assertToolEntryPolicy,lockToolPolicyAdmission} from '../../modules/assessment-governance/tool-entry-policy'
+import {readToolPolicy,approveToolEntryPolicies,assertToolEntryPolicy,lockToolPolicyAdmission} from '../../modules/assessment-governance/tool-entry-policy'
 
 // Real Postgres: shared admission locks vs exclusive policy mutations.
 // Opt-in, synthetic rows only, cleaned up afterwards.
@@ -54,7 +54,7 @@ suite('tool-policy ADMISSION_READ / POLICY_MUTATION on real Postgres',()=>{
   await db.$transaction(async tx=>{
    await tx.$executeRaw`SET LOCAL lock_timeout='1s'`
    await assertToolEntryPolicy(tx,identity,'TRAINING')
-   await lockToolPolicyAdmission(tx,[identity,{resourceKey:'release:lock-test-other',fingerprint}])
+   await lockToolPolicyAdmission(tx,[identity,{resourceKey:'release:lock-test-other',fingerprint}],'TRAINING')
   },serializable)
   events.push('b:committed')
   first.release();await first.done
@@ -90,5 +90,38 @@ suite('tool-policy ADMISSION_READ / POLICY_MUTATION on real Postgres',()=>{
   expect(events.filter(e=>e.endsWith(':admitted'))).toHaveLength(5)
   expect(await advisoryWaiters()).toBe(0)
   holders.forEach(h=>h.release());await Promise.all(holders.map(h=>h.done))
+ })
+ it('a Survey-only policy mutation does not wait on an in-flight Training admission',async()=>{
+  const identity=await approvedIdentity(),events:string[]=[]
+  const inflight=holdingAdmission(identity,events,'training')
+  await inflight.locked
+  await db.$transaction(async tx=>{
+   await tx.$executeRaw`SET LOCAL lock_timeout='1s'`
+   const row=await readToolPolicy(tx,identity,'POLICY_MUTATION','SURVEY')
+   expect(row.decision).toBe('APPROVED')
+   await tx.$executeRaw`UPDATE survey_tool_policies SET paused=true WHERE resource_key=${identity.resourceKey} AND product='SURVEY'`
+  },{maxWait:5000,timeout:30000})
+  events.push('survey-pause:committed')
+  inflight.release();await inflight.done
+  expect(events).toEqual(['training:admitted','survey-pause:committed','training:committed'])
+  await expect(db.$transaction(tx=>assertToolEntryPolicy(tx,identity,'SURVEY'),serializable)).rejects.toMatchObject({statusCode:409})
+  await db.$transaction(tx=>assertToolEntryPolicy(tx,identity,'TRAINING'),serializable)
+ })
+ it('PENDING->APPROVED insert with no row yet is serialized behind an in-flight admission',async()=>{
+  const identity={resourceKey:'release:lock-test-'+randomUUID(),fingerprint};keys.push(identity.resourceKey)
+  const events:string[]=[],locked=deferred(),release=deferred()
+  const admission=db.$transaction(async tx=>{
+   const row=await readToolPolicy(tx,identity,'ADMISSION_READ','TRAINING')
+   events.push('admission:read-'+row.decision);locked.resolve()
+   await release.promise
+  },serializable).then(()=>{events.push('admission:committed')})
+  await locked.promise
+  const approve=db.$transaction(tx=>approveToolEntryPolicies(tx,identity,['TRAINING'],actor,'insert race'),{maxWait:5000,timeout:30000})
+   .then(()=>{events.push('approve:returned')})
+  await until(async()=>await advisoryWaiters()>=1)
+  expect(events).toEqual(['admission:read-PENDING'])
+  release.resolve();await admission;await approve
+  expect(events).toEqual(['admission:read-PENDING','admission:committed','approve:returned'])
+  await db.$transaction(tx=>assertToolEntryPolicy(tx,identity,'TRAINING'),serializable)
  })
 })
