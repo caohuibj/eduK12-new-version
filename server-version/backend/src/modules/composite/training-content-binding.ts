@@ -408,6 +408,21 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
  * Scale unit's static runtime once, verify it projects to the exact published
  * release, append it content-addressed in the publishing transaction, and emit
  * a schemaVersion 2 snapshot. A code-package Scale is frozen at publish. */
+/** Builds the format-3 static artifact for one eligible SCALE unit from the
+ * live scale row, or returns a drift reason when that row no longer reproduces
+ * the unit's pinned releaseId/contentHash. Never fabricates. */
+export async function buildScaleUnitArtifact(db:Prisma.TransactionClient,item:any,unit:Unit,release:Stored|null|undefined){
+  if(!item||item.type!=='SCALE'||item.scale?.id!==unit.source.id)return 'SOURCE_ITEM_MISMATCH' as const
+  if(!release||release.releaseId!==unit.measurement.releaseId||release.contentHash!==unit.measurement.contentHash)return 'RELEASE_MISMATCH' as const
+  const definition=frozenDatabaseScaleDefinition(item.scale)
+  const projected=prepareRelease(scaleMeasurementRelease({localId:item.scale.code,version:release.version,instrumentVersion:item.scale.instrumentVersion,
+    definition,instrumentClass:item.scale.instrumentClass,scope:release.scope,...(unit.source.libraryEntryId?{presentationMode:libraryPresentationMode(release)}:{})}))
+  if(projected.contentHash!==release.contentHash)return 'CONTENT_HASH_DRIFT' as const
+  return buildPublishedScaleArtifact({instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,definition,
+    instruction:resolveFrozenScaleInstructionForScale(item.scale),release:{releaseId:release.releaseId,contentHash:release.contentHash},
+    ...(unit.source.libraryEntryId?{measurementPresentation:await freezeLibraryScalePresentation(db,item.scale,definition)}:{})})
+}
+
 export async function attachPublishedScaleArtifacts(db:Prisma.TransactionClient,composite:{id:string;items:any[]},
   content:{snapshot:TrainingContentSnapshot;releases:Map<string,Stored>}){
   const {snapshot}=content
@@ -416,15 +431,8 @@ export async function attachPublishedScaleArtifacts(db:Prisma.TransactionClient,
   const units:Unit[]=[]
   for(const unit of snapshot.units){
     if(!publishedArtifactEligible(unit)){units.push(unit);continue}
-    const item=items.get(unit.itemId),release=content.releases.get(unit.measurement.releaseId)
-    if(!item||item.type!=='SCALE'||item.scale?.id!==unit.source.id||!release||release.contentHash!==unit.measurement.contentHash)fail('SOURCE_MISMATCH')
-    const definition=frozenDatabaseScaleDefinition(item.scale)
-    const projected=prepareRelease(scaleMeasurementRelease({localId:item.scale.code,version:release.version,instrumentVersion:item.scale.instrumentVersion,
-      definition,instrumentClass:item.scale.instrumentClass,scope:release.scope,...(unit.source.libraryEntryId?{presentationMode:libraryPresentationMode(release)}:{})}))
-    if(projected.contentHash!==release.contentHash)fail('SOURCE_MISMATCH')
-    const built=buildPublishedScaleArtifact({instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,definition,
-      instruction:resolveFrozenScaleInstructionForScale(item.scale),release:{releaseId:release.releaseId,contentHash:release.contentHash},
-      ...(unit.source.libraryEntryId?{measurementPresentation:await freezeLibraryScalePresentation(db,item.scale,definition)}:{})})
+    const built=await buildScaleUnitArtifact(db,items.get(unit.itemId),unit,content.releases.get(unit.measurement.releaseId))
+    if(typeof built==='string')fail('SOURCE_MISMATCH')
     units.push({...unit,artifact:await appendPublishedScaleArtifact(db,built)})
   }
   const next=trainingContentSnapshotSchema.parse({...snapshot,schemaVersion:2,units})
