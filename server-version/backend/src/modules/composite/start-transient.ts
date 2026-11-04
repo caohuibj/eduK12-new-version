@@ -12,7 +12,14 @@ export const ASSESSMENT_START_BUSY='ASSESSMENT_START_BUSY'
 export class AssessmentStartBusyError extends Error{
  readonly code=ASSESSMENT_START_BUSY
  readonly statusCode=503
- constructor(readonly reason:string,readonly retryAfterSeconds=1){super('综合测评开始请求繁忙，请稍后重试')}
+ /** Original rolled-back error text, for server-side diagnostics only; never
+  * included in the HTTP response body. Distinguishes a transaction that never
+  * began (maxWait/connection acquisition) from one that ran and expired. */
+ readonly originalMessage?:string
+ constructor(readonly reason:string,readonly retryAfterSeconds=1,originalMessage?:string){
+   super('综合测评开始请求繁忙，请稍后重试')
+   this.originalMessage=originalMessage
+ }
 }
 export const isAssessmentStartBusyError=(error:unknown):error is AssessmentStartBusyError=>error instanceof AssessmentStartBusyError
 
@@ -31,7 +38,7 @@ export async function classifyStartTransaction<T>(run:()=>Promise<T>):Promise<T>
  try{return await run()}
  catch(error){
   const reason=rolledBackStartReason(error)
-  if(reason)throw new AssessmentStartBusyError(reason)
+  if(reason)throw new AssessmentStartBusyError(reason,1,error instanceof Error?error.message:undefined)
   throw error
  }
 }
