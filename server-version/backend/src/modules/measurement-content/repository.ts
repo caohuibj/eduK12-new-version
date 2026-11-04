@@ -12,21 +12,22 @@ type Row = {
   scope: PreparedRelease['scope']; asset_refs: PreparedRelease['assetRefs']; source_release_id: string | null;
   published_by: string; published_at: Date; status: ReleaseStatus;
 }
-const decode = (r: Row): StoredRelease => ({
-  ...prepareRelease({ layer: r.layer, family: r.family, key: r.content_key, version: r.version, content: r.content,
-    scope: r.scope, provenance: r.provenance, assetRefs: r.asset_refs, sourceReleaseId: r.source_release_id }),
-  hashScheme: r.hash_scheme, contentHash: r.content_hash, releaseId: r.id, status: r.status,
-  publishedBy: r.published_by, publishedAt: r.published_at,
-})
+/** Decodes one persisted row and verifies its stored digest from the single
+ * prepareRelease projection (prepareRelease is idempotent on its own output,
+ * so a second rehash of the decoded value proved nothing new). */
+const decode = (r: Row): StoredRelease => {
+  const prepared = prepareRelease({ layer: r.layer, family: r.family, key: r.content_key, version: r.version, content: r.content,
+    scope: r.scope, provenance: r.provenance, assetRefs: r.asset_refs, sourceReleaseId: r.source_release_id })
+  if (prepared.contentHash !== r.content_hash || r.hash_scheme !== 'MEASUREMENT_CONTENT_CANONICAL_V1')
+    throw new ContentReleaseError('CONTENT_RELEASE_HASH_MISMATCH')
+  return { ...prepared, hashScheme: r.hash_scheme, contentHash: r.content_hash, releaseId: r.id, status: r.status,
+    publishedBy: r.published_by, publishedAt: r.published_at }
+}
 export async function getContentRelease(db: Db, releaseId: string, lockForPublication = false): Promise<StoredRelease | null> {
   const rows = await db.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM measurement_content_releases WHERE id=${releaseId} ${lockForPublication ? Prisma.sql`FOR SHARE` : Prisma.empty}`)
   if (!rows[0]) return null
   const row = rows[0]
-  const value = decode(row)
-  if (prepareRelease(valueForInput(value)).contentHash !== row.content_hash || value.hashScheme !== 'MEASUREMENT_CONTENT_CANONICAL_V1') {
-    throw new ContentReleaseError('CONTENT_RELEASE_HASH_MISMATCH')
-  }
-  return value
+  return decode(row)
 }
 /** Bounded projection preload; uses exactly the same persisted hash checks as
  * single-release reads. A missing ID remains absent, never synthesized. */
@@ -38,12 +39,7 @@ export async function getContentReleaseBatch(db: Db, ids: string[], lockForPubli
     ORDER BY id ${lockForPublication ? Prisma.sql`FOR SHARE` : Prisma.empty}`)
   if (new Set(rows.map(row => row.id)).size !== rows.length || rows.some(row => !unique.includes(row.id)))
     throw new ContentReleaseError('CONTENT_RELEASE_BATCH_INVALID')
-  return new Map(rows.map(row => {
-    const value = decode(row)
-    if (prepareRelease(valueForInput(value)).contentHash !== row.content_hash || value.hashScheme !== 'MEASUREMENT_CONTENT_CANONICAL_V1')
-      throw new ContentReleaseError('CONTENT_RELEASE_HASH_MISMATCH')
-    return [value.releaseId, value]
-  }))
+  return new Map(rows.map(row => { const value = decode(row); return [value.releaseId, value] }))
 }
 /** Admission/freezing resolves an existing exact identity and holds its state
  * lock through the caller's transaction. It never publishes a missing version. */

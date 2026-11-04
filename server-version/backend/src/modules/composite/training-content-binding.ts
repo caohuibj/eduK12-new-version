@@ -19,7 +19,7 @@ import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import type {EducationSlotPresentation} from '../assessment-runtime/attempt-runtime'
-import { getContentRelease } from '../measurement-content/repository'
+import { getContentRelease, getContentReleaseBatch } from '../measurement-content/repository'
 import { ContentReleaseError, prepareRelease, type ReleaseInput } from '../measurement-content/release'
 import { scaleMeasurementRelease } from '../measurement-content/scale'
 import { cognitiveMeasurementRelease } from '../measurement-content/cognitive'
@@ -155,7 +155,7 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
 /** Exact saved scientific identity for both START and historical reports.
  * Current use rights are checked by NEW admission, never this reader. No live
  * profile/report/compiler lookup is needed for an already published unit. */
-async function frozenCognitiveMeasurement(db:Prisma.TransactionClient,release:Stored,source:Unit['source'],item?:any):Promise<ReleaseInput>{
+async function frozenCognitiveMeasurement(db:Prisma.TransactionClient,release:Stored,source:Unit['source'],item?:any,lockBase=true):Promise<ReleaseInput>{
  const pin=source.cognitiveProfile
  if(!pin||source.kind!=='COGNITIVE_CONFIG'||!trainingMeasurementSourceScopeMatches(release,source)||release.layer!=='MEASUREMENT'||release.family!=='COGNITIVE'||release.scope.kind!=='PRIVATE')fail('COGNITIVE_PROFILE_INVALID')
  const artifact=await loadCognitiveProfileArtifact(pin.artifactHash,undefined)
@@ -163,7 +163,7 @@ async function frozenCognitiveMeasurement(db:Prisma.TransactionClient,release:St
   ||release.sourceReleaseId!==artifact.identity.measurement.releaseId||release.provenance.profileArtifactHash!==pin.artifactHash
   ||release.provenance.assignmentId!==source.assignmentId||release.provenance.configId!==source.id
   ||release.provenance.profile!==artifact.identity.profile||release.provenance.resolvedConfigHash!==artifact.identity.resolvedConfigHash)fail('COGNITIVE_PROFILE_INVALID')
- const base=await getContentRelease(db,artifact.identity.measurement.releaseId,true)
+ const base=await getContentRelease(db,artifact.identity.measurement.releaseId,lockBase)
  if(!base||base.layer!=='MEASUREMENT'||base.family!=='COGNITIVE'||base.contentHash!==artifact.identity.measurement.contentHash)fail('COGNITIVE_PROFILE_INVALID')
  const {report:_,...config}=artifact.resolvedConfig,expected=JSON.parse(JSON.stringify(base.content.executable))
  expected.config=config
@@ -334,6 +334,11 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
   const itemsById=new Map<string,any>(actualItems.map(item=>[item.id,item]))
   if(actualItems.length!==snapshot.units.length||itemsById.size!==actualItems.length)fail('SOURCE_MISMATCH')
   const releases=new Map<string,Stored>(),staticReceipts:Array<Awaited<ReturnType<typeof readStaticSjtMeasurementForStart>>>=[]
+  // START binds by the publication digest: one unlocked batch read. Release
+  // rows are content-immutable (DB trigger); the only runtime status change is
+  // PUBLISHED->RETIRED, which must not block new STARTs (REVOKED still fails).
+  // Each row's stored digest is re-verified on decode.
+  const prefetched=await getContentReleaseBatch(db,snapshot.units.filter(unit=>!unit.source.standardCombination&&unit.source.kind!=='STATIC_SJT_REGISTRY').map(unit=>unit.measurement.releaseId),false)
   for(const unit of snapshot.units){
     const item=itemsById.get(unit.itemId)
     if(!item||({SCALE:'SCALE',COGNITIVE:'COGNITIVE',SITUATIONAL:'SJT'} as Record<string,string>)[item.type]!==unit.family)fail('SOURCE_MISMATCH')
@@ -355,8 +360,9 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
       if(current.mapping.id!==unit.source.id||current.release.releaseId!==unit.measurement.releaseId)fail('SOURCE_MISMATCH')
       releases.set(current.release.releaseId,current.release);staticReceipts.push(current)
     }
-    let release=releases.get(unit.measurement.releaseId)
-    if(!release){const loaded=await getContentRelease(db,unit.measurement.releaseId,true);if(!loaded)fail('RELEASE_REQUIRED');release=loaded;releases.set(release.releaseId,release)}
+    let release=releases.get(unit.measurement.releaseId)??prefetched.get(unit.measurement.releaseId)
+    if(!release){const loaded=await getContentRelease(db,unit.measurement.releaseId,false);if(!loaded)fail('RELEASE_REQUIRED');release=loaded}
+    releases.set(release.releaseId,release)
     if(release.layer!=='MEASUREMENT'||release.family!==unit.family||release.status==='REVOKED'
       ||release.contentHash!==unit.measurement.contentHash||release.content.measurementHash!==unit.measurement.measurementHash)fail('BINDING_INVALID')
     const library=unit.source.libraryEntryId?await readExactLibrarySource(db,release,unit.source,'FROZEN_IDENTITY'):null
@@ -369,7 +375,7 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
     }
     if(!library&&!privateSource)assertScope(release,unit.source)
     if((library||privateSource)&&canonicalHash(item.scale.definition)!==canonicalHash((library??privateSource)!.definition))fail('SOURCE_MISMATCH')
-    const expected=unit.source.cognitiveProfile?await frozenCognitiveMeasurement(db,release,unit.source,item):projectActualMeasurement(item,release,input.resolvedSituational,Boolean(library||privateSource))
+    const expected=unit.source.cognitiveProfile?await frozenCognitiveMeasurement(db,release,unit.source,item,false):projectActualMeasurement(item,release,input.resolvedSituational,Boolean(library||privateSource))
     if(expected.family!==unit.family||prepareRelease(expected).contentHash!==unit.measurement.contentHash
       ||canonicalHash(expected.content)!==canonicalHash(release.content))fail('SOURCE_MISMATCH')
   }

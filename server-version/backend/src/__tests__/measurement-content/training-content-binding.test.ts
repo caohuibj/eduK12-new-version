@@ -1,7 +1,7 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
-const mocks=vi.hoisted(()=>({release:vi.fn(),decrypt:vi.fn(),staticRead:vi.fn()}))
+const mocks=vi.hoisted(()=>({release:vi.fn(),batch:vi.fn(),decrypt:vi.fn(),staticRead:vi.fn()}))
 vi.mock('../../modules/situational/static-measurement-release',()=>({readStaticSjtMeasurementForStart:mocks.staticRead}))
-vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.release}))
+vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.release,getContentReleaseBatch:mocks.batch}))
 vi.mock('../../modules/scale/scale-workflow.service',()=>({frozenDatabaseScaleDefinition:(scale:any)=>scale.definition}))
 vi.mock('../../modules/cognitive/cognitive.security',()=>({decryptCognitivePayload:mocks.decrypt,encryptCognitivePayload:vi.fn()}))
 import {prepareTrainingContentSnapshot,prepareTrainingContentAttemptBinding} from '../../modules/composite/training-content-binding'
@@ -26,7 +26,8 @@ const storedScale=()=>({...prepareRelease(scaleMeasurementRelease({localId:'loca
 const row={kind:'SCALE',id:'scale',owner_id:'source-owner',measurement_release_id:rid,instrument_key:null,instrument_version:null}
 const db={$queryRaw:vi.fn()}
 const empty=new Map<string,ResolvedSituationalRelease>()
-beforeEach(()=>{vi.resetAllMocks();db.$queryRaw.mockResolvedValue([row]);mocks.release.mockResolvedValue(storedScale());mocks.staticRead.mockRejectedValue(new Error('CONTENT_STATIC_SJT_MAPPING_MISSING'))})
+beforeEach(()=>{vi.resetAllMocks();db.$queryRaw.mockResolvedValue([row]);mocks.release.mockResolvedValue(storedScale());mocks.staticRead.mockRejectedValue(new Error('CONTENT_STATIC_SJT_MAPPING_MISSING'))
+ mocks.batch.mockImplementation(async(d:any,ids:string[])=>new Map(await Promise.all([...new Set(ids)].map(async id=>[id,await mocks.release(d,id,false)] as const))))})
 const prepare=(value:any=composite(),resolved=empty)=>prepareTrainingContentSnapshot(db as never,value,resolved)
 const start=(publication:any,value:any=composite(),resolved=empty)=>prepareTrainingContentAttemptBinding(db as never,{compositeId:'composite',attemptId:'attempt',epoch:2,
  snapshot:publication.snapshot,snapshotHash:publication.snapshotHash,composite:value,resolvedSituational:resolved})
@@ -65,6 +66,9 @@ describe('Training compact measurement publication and START binding',()=>{
   expect(result!.bindingHash).toBe(canonicalHash(result!.binding))
   expect(result!.binding).toMatchObject({compositeId:'composite',attemptId:'attempt',epoch:2,publicationHash:publication.snapshotHash})
   expect(db.$queryRaw).not.toHaveBeenCalled()
+  // Bind-by-digest START: one unlocked batch read; a RETIRED release never waits on/holds a release row lock.
+  expect(mocks.batch).toHaveBeenCalledExactlyOnceWith(db,[rid],false)
+  expect(mocks.release.mock.calls.every(call=>call[2]===false)).toBe(true)
   mocks.release.mockResolvedValueOnce({...storedScale(),status:'REVOKED'})
   await expect(start(publication)).rejects.toThrow('CONTENT_TRAINING_BINDING_INVALID')
   const changed=composite();changed.items[0].scale.definition.scoring.itemRules[0].transform={type:'reverse'}
