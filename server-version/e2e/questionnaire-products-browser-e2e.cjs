@@ -54,6 +54,10 @@ async function completeFour(page, label) {
   const reportButton=page.getByRole('button',{name:'查看个人报告',exact:true})
   if(await reportButton.isVisible()) await reportButton.click()
   await page.waitForURL(url=>url.pathname.endsWith('/report'),{timeout:30000})
+  const supporting=page.locator('details').filter({has:page.getByText('作答信息与阅读说明',{exact:true})}).first()
+  await supporting.waitFor({state:'attached',timeout:30000})
+  assert.equal(await supporting.evaluate(details=>details.open),false,'supporting information starts collapsed')
+  await supporting.locator('summary').click()
   await page.getByText('本次学习目标',{exact:false}).waitFor({timeout:30000})
   await page.screenshot({path:output+'/'+label+'-report.png',fullPage:true})
 }
