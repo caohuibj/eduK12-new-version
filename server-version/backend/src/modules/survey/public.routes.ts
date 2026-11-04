@@ -47,6 +47,10 @@ const id=z.string().guid(), secret=z.string().regex(/^[A-Za-z0-9_-]{43}$/)
 const code=z.string().regex(/^R-[A-Z0-9]{8,32}$/)
 const consent=z.object({consent:z.literal(true),consentVersion:z.number().int().positive()})
 const entry=consent.extend({entryToken:secret}).strict()
+// Anonymous SINGLE_UNLINKED starts carry a client-generated operation identity
+// (high-entropy, persisted before the first request) plus the attempt bearer,
+// so one logical start can only ever admit one attempt.
+const entryUnlinked=entry.extend({operationKey:secret,accessCredential:secret}).strict()
 const linked=consent.extend({researchCode:code,accessCredential:secret}).strict()
 const identity=z.object({researchCode:code,accessCredential:secret}).strict()
 const proof=z.object({researchCode:code.optional(),accessCredential:secret}).strict()
@@ -92,7 +96,7 @@ publicSurveyRouter.post('/r/:publicId/waves/:waveId/start',handle(req=>
     waveId:id.parse(req.params.waveId),...linked.parse(req.body)})))
 publicSurveyRouter.post('/r/:publicId/waves/:waveId/start-unlinked',handle(req=>
   admission.startSingleUnlinkedWave({publicId:id.parse(req.params.publicId),
-    waveId:id.parse(req.params.waveId),...entry.parse(req.body)})))
+    waveId:id.parse(req.params.waveId),...entryUnlinked.parse(req.body)})))
 publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/task',handle(req=>
   getOwnResearchTask({publicId:id.parse(req.params.publicId),
     attemptId:id.parse(req.params.attemptId),...proof.parse(req.body)})))
