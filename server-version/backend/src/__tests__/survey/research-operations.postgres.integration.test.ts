@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
 import { beforeAll,afterAll,describe,expect,it } from 'vitest'
+import { surveyStartKeys } from '../integration/survey-test-keys'
 import type { Request } from 'express'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 import { publishSurveyMeasurementDraft } from '../../modules/survey/measurement-publication.service'

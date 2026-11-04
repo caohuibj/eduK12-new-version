@@ -1,5 +1,6 @@
 import {randomUUID} from 'node:crypto'
 import {afterAll,describe,expect,it,vi} from 'vitest'
+import { surveyStartKeys } from '../integration/survey-test-keys'
 const suite=process.env.PR356_INSTRUCTION_ISOLATED==='1'?describe:describe.skip
 suite('ordinary published SCALE instruction through actual Survey delivery',()=>{
  let db:any

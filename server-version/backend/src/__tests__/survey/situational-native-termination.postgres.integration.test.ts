@@ -2,6 +2,7 @@ import {grantGovernedCatalogFixture,revokeGovernedCatalogFixture} from '../fixtu
 import { randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { surveyStartKeys } from '../integration/survey-test-keys'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 import { decryptFrozenSituationalRuntimeSnapshot } from '../../modules/assessment-runtime/situational-runtime-snapshot'
