@@ -81,6 +81,14 @@ export async function appendPublishedScaleArtifact(db: SharedScaleArtifactDb, bu
 }
 
 // Only verified, committed-by-hash immutable scientific content is cached.
+// Usage constraint (T2 evidence): an in-transaction read of a row appended in
+// the SAME transaction fills this process cache with an uncommitted artifact
+// and survives that transaction's rollback (content-addressed, so a later real
+// insert of the same hash is byte-identical and the phantom stays benign).
+// Current flows never do this - appends live in publish/backfill transactions,
+// loads in START binding transactions that only see committed refs. Keep it
+// that way: do not call loadPublishedScaleArtifacts inside a transaction that
+// has appended artifacts in this process.
 const cache = new BoundedArtifactCache<PublishedScaleArtifact>(64, 8 * 1024 * 1024)
 export async function loadPublishedScaleArtifacts(db: SharedScaleArtifactDb, hashes: string[]): Promise<Map<string, PublishedScaleArtifact>> {
   const out = new Map<string, PublishedScaleArtifact>(), missing: string[] = []
