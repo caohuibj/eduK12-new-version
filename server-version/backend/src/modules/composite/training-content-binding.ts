@@ -25,6 +25,9 @@ import { scaleMeasurementRelease } from '../measurement-content/scale'
 import { cognitiveMeasurementRelease } from '../measurement-content/cognitive'
 import { sjtMeasurementRelease } from '../measurement-content/sjt'
 import { frozenDatabaseScaleDefinition } from '../scale/scale-workflow.service'
+import { resolveFrozenScaleInstructionForScale } from '../scale/onboarding/instrument-registry'
+import { freezeLibraryScalePresentation } from '../scale/scale-presentation'
+import { appendPublishedScaleArtifact, buildPublishedScaleArtifact } from '../assessment-runtime/published-scale-artifact'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { decryptCognitivePayload } from '../cognitive/cognitive.security'
 import { hashResolvedConfig } from '../cognitive/profile-freeze'
@@ -46,14 +49,25 @@ const sourceSchema=z.object({kind:z.enum(['SCALE','COGNITIVE_CONFIG','SJT_AUTHOR
   ctx.addIssue({code:'custom',message:'Exact source identity required'})
 })
 const unitSchema=z.object({itemId:text,family:z.enum(['SCALE','COGNITIVE','SJT']),source:sourceSchema,
-  measurement:z.object({releaseId:z.string().guid(),contentHash:digest,measurementHash:digest}).strict(),referencePolicy:trainingReferencePolicySchema.optional(),report:z.object({releaseId:z.string().guid(),contentHash:digest}).strict().optional()}).strict()
-export const trainingContentSnapshotSchema=z.object({schemaVersion:z.literal(1),compositeId:text,units:z.array(unitSchema).max(1000),
+  measurement:z.object({releaseId:z.string().guid(),contentHash:digest,measurementHash:digest}).strict(),referencePolicy:trainingReferencePolicySchema.optional(),report:z.object({releaseId:z.string().guid(),contentHash:digest}).strict().optional(),
+  artifact:z.object({formatVersion:z.literal(3),hash:digest}).strict().optional()}).strict()
+export const trainingContentSnapshotSchema=z.object({schemaVersion:z.union([z.literal(1),z.literal(2)]),compositeId:text,units:z.array(unitSchema).max(1000),
  educationBinding:educationCompositionBindingSchema.optional()}).strict()
 export type TrainingContentSnapshot=z.infer<typeof trainingContentSnapshotSchema>
 export const trainingContentAttemptBindingSchema=trainingContentSnapshotSchema.omit({educationBinding:true}).extend({
  attemptId:text,epoch:z.number().int().positive(),publicationHash:digest,educationComposition:educationCompositionRuntimeAnchorSchema.optional(),
 }).strict()
 type Unit=TrainingContentSnapshot['units'][number]
+/** Ordinary single Scale units: the only units that carry a publish-time
+ * static artifact. Education, private, library-education and standard
+ * combination units keep their existing v1 paths. */
+export const publishedArtifactEligible=(unit:Unit)=>unit.family==='SCALE'&&unit.source.kind==='SCALE'&&!unit.source.standardCombination
+  &&!unit.source.privateVersionId&&!unit.source.educationBinding&&!unit.source.educationStandard&&!unit.source.educationLibrary&&!unit.source.educationNative
+/** v2 completeness rule (kept outside the schema so .shape/.extend keep working). */
+export function assertTrainingSnapshotArtifacts(snapshot:TrainingContentSnapshot){
+  if(snapshot.schemaVersion===1){if(snapshot.units.some(unit=>unit.artifact))fail('SNAPSHOT_INVALID');return}
+  if(snapshot.educationBinding||snapshot.units.some(unit=>publishedArtifactEligible(unit)!==Boolean(unit.artifact)))fail('SNAPSHOT_INVALID')
+}
 type Stored=NonNullable<Awaited<ReturnType<typeof getContentRelease>>>
 type SourceRow={library_entry_id?:string|null;kind:Unit['source']['kind'];id:string;assignment_id:string|null;owner_id:string|null;measurement_release_id:string|null;instrument_key:string|null;instrument_version:string|null}
 class TrainingContentError extends ContentReleaseError { readonly statusCode=409 }
@@ -290,6 +304,7 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
   const parsed=trainingContentSnapshotSchema.safeParse(input.snapshot)
   if(!parsed.success)fail('SNAPSHOT_INVALID')
   const snapshot=parsed.data
+  assertTrainingSnapshotArtifacts(snapshot)
   if(snapshot.compositeId!==input.compositeId||(!input.educationComposition&&canonicalHash(snapshot)!==input.snapshotHash)
     ||new Set(snapshot.units.map(unit=>unit.itemId)).size!==snapshot.units.length||!input.attemptId||!Number.isSafeInteger(input.epoch)||input.epoch<1)fail('SNAPSHOT_INVALID')
   if(input.composite.id!==input.compositeId||input.composite.items.length>1000)fail('SNAPSHOT_INVALID')
@@ -387,4 +402,32 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
   const binding={schemaVersion:1 as const,compositeId:input.compositeId,attemptId:input.attemptId,epoch:input.epoch,
     publicationHash:input.snapshotHash,units:snapshot.units}
   return {binding,bindingHash:canonicalHash(binding),recheckSourceLicenses:async()=>{for(const receipt of staticReceipts)await recheckStaticSjtConsumerLicense(db,receipt)}}
+}
+
+/** Publish only (never preview or historical reads): compile each ordinary
+ * Scale unit's static runtime once, verify it projects to the exact published
+ * release, append it content-addressed in the publishing transaction, and emit
+ * a schemaVersion 2 snapshot. A code-package Scale is frozen at publish. */
+export async function attachPublishedScaleArtifacts(db:Prisma.TransactionClient,composite:{id:string;items:any[]},
+  content:{snapshot:TrainingContentSnapshot;releases:Map<string,Stored>}){
+  const {snapshot}=content
+  if(snapshot.schemaVersion!==1||snapshot.educationBinding||!snapshot.units.some(publishedArtifactEligible))return {snapshot,snapshotHash:canonicalHash(snapshot)}
+  const items=new Map(composite.items.map((item:any)=>[item.id,item]))
+  const units:Unit[]=[]
+  for(const unit of snapshot.units){
+    if(!publishedArtifactEligible(unit)){units.push(unit);continue}
+    const item=items.get(unit.itemId),release=content.releases.get(unit.measurement.releaseId)
+    if(!item||item.type!=='SCALE'||item.scale?.id!==unit.source.id||!release||release.contentHash!==unit.measurement.contentHash)fail('SOURCE_MISMATCH')
+    const definition=frozenDatabaseScaleDefinition(item.scale)
+    const projected=prepareRelease(scaleMeasurementRelease({localId:item.scale.code,version:release.version,instrumentVersion:item.scale.instrumentVersion,
+      definition,instrumentClass:item.scale.instrumentClass,scope:release.scope,...(unit.source.libraryEntryId?{presentationMode:libraryPresentationMode(release)}:{})}))
+    if(projected.contentHash!==release.contentHash)fail('SOURCE_MISMATCH')
+    const built=buildPublishedScaleArtifact({instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,definition,
+      instruction:resolveFrozenScaleInstructionForScale(item.scale),release:{releaseId:release.releaseId,contentHash:release.contentHash},
+      ...(unit.source.libraryEntryId?{measurementPresentation:await freezeLibraryScalePresentation(db,item.scale,definition)}:{})})
+    units.push({...unit,artifact:await appendPublishedScaleArtifact(db,built)})
+  }
+  const next=trainingContentSnapshotSchema.parse({...snapshot,schemaVersion:2,units})
+  assertTrainingSnapshotArtifacts(next)
+  return {snapshot:next,snapshotHash:canonicalHash(next)}
 }
