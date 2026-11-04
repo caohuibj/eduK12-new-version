@@ -50,7 +50,7 @@ const entry=consent.extend({entryToken:secret}).strict()
 // Anonymous SINGLE_UNLINKED starts carry a client-generated operation identity
 // (high-entropy, persisted before the first request) plus the attempt bearer,
 // so one logical start can only ever admit one attempt.
-const entryUnlinked=entry.extend({operationKey:secret,accessCredential:secret}).strict()
+const entryUnlinked=entry.extend({operationKey:secret.optional(),accessCredential:secret.optional()}).strict()
 const linked=consent.extend({researchCode:code,accessCredential:secret}).strict()
 const identity=z.object({researchCode:code,accessCredential:secret}).strict()
 const proof=z.object({researchCode:code.optional(),accessCredential:secret}).strict()

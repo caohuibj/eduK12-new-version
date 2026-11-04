@@ -6,6 +6,9 @@ import { randomUUID } from 'node:crypto'
  * flows keep independent identities; a test that wants to exercise replay
  * captures the returned pair and reuses it deliberately. */
 export const surveyStartKeys = (label = 'survey-start') => {
-  const raw = Buffer.from(randomUUID() + randomUUID() + label).toString('base64url')
-  return { operationKey: ('k' + raw).slice(0, 43), accessCredential: ('c' + raw).slice(0, 43) }
+  // Two INDEPENDENT CSPRNG draws: knowing one value must not derive the other
+  // (the real client uses two separate getRandomValues calls).
+  const operationKey = ('k' + Buffer.from(randomUUID() + randomUUID() + label).toString('base64url')).slice(0, 43)
+  const accessCredential = ('c' + Buffer.from(randomUUID() + randomUUID()).toString('base64url')).slice(0, 43)
+  return { operationKey, accessCredential }
 }

@@ -41,10 +41,12 @@ suite('anonymous SINGLE_UNLINKED START idempotency on real PostgreSQL', () => {
   let waveQuota1 = ''
   let waveUnlimited = ''
   let waveScopeFree = ''
+  let waveScopeFree2 = ''
+  let entryScopeFree = ''
+  let entryScopeFree2 = ''
   let entryQuota5 = ''
   let entryQuota1 = ''
   let entryUnlimited = ''
-  let entryScopeFree = ''
   const suffix = randomUUID()
 
   const start = (input: { publicId: string; waveId: string; entryToken: string; operationKey: string; accessCredential: string; consentVersion?: number }) =>
@@ -107,6 +109,8 @@ suite('anonymous SINGLE_UNLINKED START idempotency on real PostgreSQL', () => {
     entryQuota1 = (await makeEntry(projectAId, waveQuota1)).secret
     const w3 = await makeWave(projectAId, 3, null); waveScopeFree = w3.id
     entryScopeFree = (await makeEntry(projectAId, waveScopeFree)).secret
+    const w4 = await makeWave(projectAId, 4, null); waveScopeFree2 = w4.id
+    entryScopeFree2 = (await makeEntry(projectAId, waveScopeFree2)).secret
     const b = await makeProject('Idempotency matrix B')
     projectB = b.publicId!; projectBId = b.id
     const wu = await makeWave(projectBId, 1, null); waveUnlimited = wu.id
@@ -155,16 +159,38 @@ suite('anonymous SINGLE_UNLINKED START idempotency on real PostgreSQL', () => {
 
   it('concurrent replays of one operation identity admit exactly one attempt', async () => {
     const k = keys('concurrent')
+    const before = (await db.surveyWave.findUniqueOrThrow({ where: { id: waveQuota5 } })).startsCount
     const [a, b] = await Promise.all([
       start({ publicId: projectA, waveId: waveQuota5, entryToken: entryQuota5, ...k }),
       start({ publicId: projectA, waveId: waveQuota5, entryToken: entryQuota5, ...k }),
     ])
     expect(a.attemptId).toBe(b.attemptId)
-    expect(a.recovered && b.recovered ? 'both-recovered' : 'one-admitted').toBeDefined()
-    const attemptCount = await db.surveyWaveAttempt.count({ where: { waveId: waveQuota5 } })
-    const withKey = await db.surveyWaveAttempt.count({ where: { operationKeyHash: hashResearchCredential(k.operationKey) } })
-    expect(withKey).toBe(1)
-    void attemptCount
+    // Exactly one request performed the fresh admission; the other recovered.
+    expect([a.recovered, b.recovered].sort()).toEqual([false, true])
+    const after = (await db.surveyWave.findUniqueOrThrow({ where: { id: waveQuota5 } })).startsCount
+    expect(after - before).toBe(1)
+    expect(await db.surveyWaveAttempt.count({ where: { operationKeyHash: hashResearchCredential(k.operationKey) } })).toBe(1)
+  }, 60000)
+
+  it('replay still honors entry-token and wave governance (no recovery bypass)', async () => {
+    const k = keys('boundary')
+    const first = await start({ publicId: projectA, waveId: waveQuota5, entryToken: entryQuota5, ...k })
+    expect(first.recovered).toBe(false)
+    const entryRow = await db.surveyEntryToken.findFirstOrThrow({ where: { waveId: waveQuota5, revokedAt: null } })
+    // Entry token revoked: the recorded attempt cannot be recovered either.
+    await db.surveyEntryToken.update({ where: { id: entryRow.id }, data: { revokedAt: new Date() } })
+    await expect(start({ publicId: projectA, waveId: waveQuota5, entryToken: entryQuota5, ...k }))
+      .rejects.toMatchObject({ message: '研究招募链接已经失效' })
+    await db.surveyEntryToken.update({ where: { id: entryRow.id }, data: { revokedAt: null } })
+    // Wave closed: recovery ends with the wave, same as new starts.
+    await db.surveyWave.update({ where: { id: waveQuota5 }, data: { status: 'CLOSED' } })
+    await expect(start({ publicId: projectA, waveId: waveQuota5, entryToken: entryQuota5, ...k }))
+      .rejects.toMatchObject({ message: '研究波次尚未开放' })
+    await db.surveyWave.update({ where: { id: waveQuota5 }, data: { status: 'OPEN' } })
+    // Governance restored: the identity still recovers the original attempt.
+    const replay = await start({ publicId: projectA, waveId: waveQuota5, entryToken: entryQuota5, ...k })
+    expect(replay.attemptId).toBe(first.attemptId)
+    expect(replay.recovered).toBe(true)
   }, 60000)
 
   it('a distinct operation identity is a new participant and the quota limit still binds', async () => {
@@ -180,8 +206,8 @@ suite('anonymous SINGLE_UNLINKED START idempotency on real PostgreSQL', () => {
 
   it('the operation identity is scoped per wave: the same key on another wave starts fresh', async () => {
     const k = keys('scoped')
-    const wave1 = await start({ publicId: projectA, waveId: waveQuota5, entryToken: entryQuota5, ...k })
-    const wave2 = await start({ publicId: projectA, waveId: waveScopeFree, entryToken: entryScopeFree, operationKey: k.operationKey, accessCredential: k.accessCredential })
+    const wave1 = await start({ publicId: projectA, waveId: waveScopeFree, entryToken: entryScopeFree, ...k })
+    const wave2 = await start({ publicId: projectA, waveId: waveScopeFree2, entryToken: entryScopeFree2, operationKey: k.operationKey, accessCredential: k.accessCredential })
     expect(wave2.attemptId).not.toBe(wave1.attemptId)
     expect(wave2.recovered).toBe(false)
     expect(await db.surveyWaveAttempt.count({ where: { operationKeyHash: hashResearchCredential(k.operationKey) } })).toBe(2)
