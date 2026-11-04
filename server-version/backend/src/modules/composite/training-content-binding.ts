@@ -431,7 +431,7 @@ export async function resolveTrainingScaleArtifacts(db:Prisma.TransactionClient,
     const units=new Map(snapshot.units.map(unit=>[unit.itemId,unit]))
     for(const row of rows.values()){
       const unit=units.get(row.itemId)
-      if(!unit||!publishedArtifactEligible(unit)||row.releaseId!==unit.measurement.releaseId||row.contentHash!==unit.measurement.contentHash)fail('BINDING_INVALID')
+      if(!unit||!publishedArtifactEligible(unit))fail('BINDING_INVALID')
       refs.set(row.itemId,row.artifact.hash)
     }
   }

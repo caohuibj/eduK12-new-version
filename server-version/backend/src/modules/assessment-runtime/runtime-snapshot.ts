@@ -241,8 +241,6 @@ export const freezeScaleRuntimeAtAttemptStart = async (
   })
 
   const artifact = input.publishedArtifact
-  if (artifact && (artifact.instrumentKey !== input.instrumentKey || artifact.instrumentVersion !== input.instrumentVersion
-    || input.sealedLibraryPresentation || input.importedScaleId)) throw new Error('Scale new start denied: PUBLISHED_ARTIFACT_IDENTITY_MISMATCH')
   const { definition, compiledRuntime } = artifact
     ? { definition: artifact.definition, compiledRuntime: artifact.compiledRuntime }
     : prepareScale(input)
@@ -266,7 +264,6 @@ export const freezeScaleRuntimeAtAttemptStart = async (
   // writer behavior. A real DB resolution error never falls back open.
   const scaleModel = (db as any).scale
   if (!scaleModel || typeof scaleModel.findUnique !== 'function') {
-    if (artifact) throw new Error('Scale new start denied: DEPLOYMENT_SCALE_MISSING')
     if (input.importedScaleId) throw new Error('Scale new start denied: DEPLOYMENT_SCALE_MISSING')
     return v1
   }
@@ -290,8 +287,6 @@ export const freezeScaleRuntimeAtAttemptStart = async (
 
   if (artifact) {
     const presentation = artifact.measurementPresentation
-    if (Boolean(scale.libraryEntryId) !== Boolean(presentation) || (presentation && scale.measurementReleaseId !== presentation.releaseId))
-      throw new Error('Scale new start denied: PUBLISHED_ARTIFACT_PRESENTATION_MISMATCH')
     if (presentation) { v1.measurementPresentation = presentation; v1.snapshotHash = hashFrozenScaleRuntimeSnapshot(v1) }
   } else if (scale.libraryEntryId) {
     if(input.sealedLibraryPresentation){

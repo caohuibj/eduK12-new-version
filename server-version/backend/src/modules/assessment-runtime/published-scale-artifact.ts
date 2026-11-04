@@ -71,7 +71,6 @@ export function decodePublishedScaleArtifact(row: SharedScaleArtifactRecord, exp
   return retainImmutableCanonicalValue(artifact)
 }
 
-/** Publish-time only: the stored artifact must be exactly what this code compiles now. */
 /** Append inside the publishing transaction. The hash is the primary key and
  * the content address, so a conflict means identical content already exists. */
 export async function appendPublishedScaleArtifact(db: SharedScaleArtifactDb, built: ReturnType<typeof buildPublishedScaleArtifact>): Promise<PublishedScaleArtifactRef> {
