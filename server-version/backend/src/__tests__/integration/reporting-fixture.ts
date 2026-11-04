@@ -36,7 +36,7 @@ type PopulationFixture = {
 
 export const buildReportingFixture = async (prisma: PrismaClient, population: number, protectedSubject = false, repeated?: {
   ownerId: string; organizationId: string; members: Array<{ userId: string; membershipId: string }>; resourceKey: string; at: Date; resourceVersion?: string
-}, resultDisclosure?: ResultDisclosureContractV1, scalePoint?:{identity:ScaleReferenceIdentityV1;value:number}): Promise<PopulationFixture> => {
+}, resultDisclosure?: ResultDisclosureContractV1, scalePoint?:{identity:ScaleReferenceIdentityV1;value:number}, queryGraphOnly = false): Promise<PopulationFixture> => {
   const prefix = `reporting-qb-${population}-${randomUUID().slice(0, 8)}`
   const ownerId = repeated?.ownerId ?? randomUUID()
   const organizationId = repeated?.organizationId ?? randomUUID()
@@ -193,6 +193,10 @@ export const buildReportingFixture = async (prisma: PrismaClient, population: nu
     graphJson,
   )
 
+  // Query-budget tests need the genuine 100/1k/5k-person PostgreSQL
+  // execution/identity graph, not unrelated Composite Attempt/result payload
+  // rows. Keep the complete fixture for every report/result acceptance caller.
+  if (!queryGraphOnly) {
   await prisma.compositeAssessment.create({
     data: {
       id: compositeId,
@@ -267,6 +271,7 @@ export const buildReportingFixture = async (prisma: PrismaClient, population: nu
       completedAt: now,
     })),
   })
+  }
 
   const cohort: ReportingCohortSnapshotRecord = {
     id: randomUUID(),

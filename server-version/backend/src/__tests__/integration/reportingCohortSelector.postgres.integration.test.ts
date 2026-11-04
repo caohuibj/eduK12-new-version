@@ -94,10 +94,22 @@ describe('historical filtered cohorts (real PostgreSQL)', () => {
     prisma.$use(async (params, next) => { count++; return next(params) })
     const counts: number[] = []
     for (const n of [100, 1000, 5000]) {
-      const f = await buildReportingFixture(prisma, n)
+      const started = Date.now()
+      // This test measures the selection query plan, not Composite Attempt
+      // materialization or encrypted result decryption. Retain the complete
+      // Postgres execution + identity graph at every population size.
+      const f = await buildReportingFixture(prisma, n, false, undefined, undefined, undefined, true)
+      const populated = await prisma.$queryRaw<Array<{ populationN: bigint }>>`
+        SELECT count(*)::bigint AS "populationN" FROM assessment_run_executions
+        WHERE organization_id = ${f.organizationId} AND run_id = ${f.runId} AND track_id = ${f.trackId}
+      `
+      expect(Number(populated[0]?.populationN)).toBe(n)
+      const setupMs = Date.now() - started
       count = 0
-      await freezeRunTrackCohort({ ...f, generatedByUserId: f.ownerId, cohortSelector: selector(f.members.slice(0, 5).map(m => m.membershipId)) })
+      const cohort = await freezeRunTrackCohort({ ...f, generatedByUserId: f.ownerId, cohortSelector: selector(f.members.slice(0, 5).map(m => m.membershipId)) })
       counts.push(count)
+      expect(cohort.members).toHaveLength(5)
+      console.info(`reporting cohort query budget: population=${n} setupMs=${setupMs} selectionMs=${Date.now()-started-setupMs} queries=${count}`)
     }
     expect(new Set(counts).size).toBe(1)
     expect(counts[0]).toBeLessThanOrEqual(6)
