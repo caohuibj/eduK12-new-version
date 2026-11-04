@@ -27,7 +27,8 @@ import { sjtMeasurementRelease } from '../measurement-content/sjt'
 import { frozenDatabaseScaleDefinition } from '../scale/scale-workflow.service'
 import { resolveFrozenScaleInstructionForScale } from '../scale/onboarding/instrument-registry'
 import { freezeLibraryScalePresentation } from '../scale/scale-presentation'
-import { appendPublishedScaleArtifact, buildPublishedScaleArtifact } from '../assessment-runtime/published-scale-artifact'
+import { appendPublishedScaleArtifact, buildPublishedScaleArtifact, loadPublishedScaleArtifacts, type PublishedScaleArtifact } from '../assessment-runtime/published-scale-artifact'
+import { loadLegacyScaleArtifactMap } from './training-legacy-scale-artifacts'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { decryptCognitivePayload } from '../cognitive/cognitive.security'
 import { hashResolvedConfig } from '../cognitive/profile-freeze'
@@ -298,7 +299,7 @@ function assertScope(release:Stored,source:Unit['source']){
 
 /** New START binds exact publication pointers. Historical null/null remains
  * legacy; recovery uses the already stored attempt binding, never this selector. */
-export async function prepareTrainingContentAttemptBinding(db:Prisma.TransactionClient,input:{compositeId:string;attemptId:string;epoch:number;snapshot:unknown;snapshotHash:string|null|undefined;composite:{id:string;createdBy?:string|null;items:any[]};resolvedSituational:Map<string,ResolvedSituationalRelease>;educationComposition?:EducationCompositionPolicyBinding}){
+export async function prepareTrainingContentAttemptBinding(db:Prisma.TransactionClient,input:{compositeId:string;attemptId:string;epoch:number;snapshot:unknown;snapshotHash:string|null|undefined;scaleArtifacts?:Map<string,PublishedScaleArtifact>;composite:{id:string;createdBy?:string|null;items:any[]};resolvedSituational:Map<string,ResolvedSituationalRelease>;educationComposition?:EducationCompositionPolicyBinding}){
   if(input.snapshot==null&&input.snapshotHash==null)return null
   if(!input.snapshot||!input.snapshotHash)fail('SNAPSHOT_INVALID')
   const parsed=trainingContentSnapshotSchema.safeParse(input.snapshot)
@@ -390,6 +391,10 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
     }
     if(!library&&!privateSource)assertScope(release,unit.source)
     if((library||privateSource)&&canonicalHash(item.scale.definition)!==canonicalHash((library??privateSource)!.definition))fail('SOURCE_MISMATCH')
+    // A verified publish-time artifact is hash-bound to this exact release, so
+    // the live Scale row is not re-projected (published content stays frozen).
+    const artifact=item.type==='SCALE'?input.scaleArtifacts?.get(unit.itemId):undefined
+    if(artifact){if(artifact.release.releaseId!==release.releaseId||artifact.release.contentHash!==release.contentHash)fail('BINDING_INVALID');continue}
     const expected=unit.source.cognitiveProfile?await frozenCognitiveMeasurement(db,release,unit.source,item,false):projectActualMeasurement(item,release,input.resolvedSituational,Boolean(library||privateSource))
     if(expected.family!==unit.family||prepareRelease(expected).contentHash!==unit.measurement.contentHash
       ||canonicalHash(expected.content)!==canonicalHash(release.content))fail('SOURCE_MISMATCH')
@@ -402,6 +407,44 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
   const binding={schemaVersion:1 as const,compositeId:input.compositeId,attemptId:input.attemptId,epoch:input.epoch,
     publicationHash:input.snapshotHash,units:snapshot.units}
   return {binding,bindingHash:canonicalHash(binding),recheckSourceLicenses:async()=>{for(const receipt of staticReceipts)await recheckStaticSjtConsumerLicense(db,receipt)}}
+}
+
+/** START only: the verified static artifact per eligible SCALE item, from a v2
+ * snapshot's unit.artifact or a v1 publication's insert-only legacy map. Units
+ * without one keep today's live-compile path. Missing or tampered artifacts
+ * fail closed; never re-derived from the live Scale row. */
+export async function resolveTrainingScaleArtifacts(db:Prisma.TransactionClient,input:{compositeId:string;snapshot:unknown;snapshotHash:string|null|undefined;educationComposition?:unknown}):Promise<Map<string,PublishedScaleArtifact>>{
+  const out=new Map<string,PublishedScaleArtifact>()
+  if(input.educationComposition||input.snapshot==null||!input.snapshotHash)return out
+  const parsed=trainingContentSnapshotSchema.safeParse(input.snapshot)
+  if(!parsed.success)fail('SNAPSHOT_INVALID')
+  const snapshot=parsed.data
+  if(snapshot.educationBinding||snapshot.compositeId!==input.compositeId||canonicalHash(snapshot)!==input.snapshotHash)return out
+  const refs=new Map<string,string>()
+  if(snapshot.schemaVersion===2){for(const unit of snapshot.units)if(unit.artifact)refs.set(unit.itemId,unit.artifact.hash)}
+  else{
+    // Lightweight unit doubles without raw SQL keep the legacy path (as the
+    // Scale freeze does); a real DB error never falls back open.
+    if(typeof (db as any).$queryRaw!=='function')return out
+    const rows=await loadLegacyScaleArtifactMap(db,input.compositeId,input.snapshotHash)
+    if(rows.size===0)return out
+    const units=new Map(snapshot.units.map(unit=>[unit.itemId,unit]))
+    for(const row of rows.values()){
+      const unit=units.get(row.itemId)
+      if(!unit||!publishedArtifactEligible(unit)||row.releaseId!==unit.measurement.releaseId||row.contentHash!==unit.measurement.contentHash)fail('BINDING_INVALID')
+      refs.set(row.itemId,row.artifact.hash)
+    }
+  }
+  if(refs.size===0)return out
+  let loaded:Map<string,PublishedScaleArtifact>
+  try{loaded=await loadPublishedScaleArtifacts(db,[...refs.values()])}catch{fail('BINDING_INVALID')}
+  const units=new Map(snapshot.units.map(unit=>[unit.itemId,unit]))
+  for(const [itemId,hash] of refs){
+    const artifact=loaded!.get(hash),unit=units.get(itemId)!
+    if(!artifact||artifact.release.releaseId!==unit.measurement.releaseId||artifact.release.contentHash!==unit.measurement.contentHash)fail('BINDING_INVALID')
+    out.set(itemId,artifact)
+  }
+  return out
 }
 
 /** Builds the format-3 static artifact for one eligible SCALE unit from the

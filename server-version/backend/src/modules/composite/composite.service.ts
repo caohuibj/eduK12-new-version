@@ -22,7 +22,7 @@ import {assertTrainingPrivateReferenceAdmissionCurrent} from './training-private
 import {attachTrainingReferenceSelection} from './training-reference-selection'
 import {freezeTrainingReferenceBinding} from './training-reference-binding'
 import {assertCurrentTrainingContentOwner,attachTrainingReportSelection} from './training-report-selection'
-import {prepareTrainingContentSnapshot,attachPublishedScaleArtifacts,prepareTrainingContentAttemptBinding} from './training-content-binding'
+import {prepareTrainingContentSnapshot,attachPublishedScaleArtifacts,prepareTrainingContentAttemptBinding,resolveTrainingScaleArtifacts} from './training-content-binding'
 import {inheritTrainingTrackingSources,freezeTrainingTracking,readTrainingTracking} from './personal-tracking'
 import {verifyStoredTrainingStandardItem,freezeTrainingStandardScaleRuntime,trainingStandardCombinationSummary} from './training-standard-combination'
 import { evaluateTrainingFeedbackForAttempt, prepareTrainingFeedbackBinding, freezeTrainingFeedbackSnapshot, trainingFeedbackAttemptSelect, trainingFeedbackParentSelect, type TrainingFeedbackBinding } from './training-feedback-binding'
@@ -2769,6 +2769,17 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   })
 }
 
+// START: the verified publish-time Scale artifact for an item, set once per
+// START before any freeze. Keyed by the item object, never serialized.
+const publishedScaleArtifactByItem=new WeakMap<object,import('../assessment-runtime/published-scale-artifact').PublishedScaleArtifact>()
+const compositeScaleFreezeInput=(item:any)=>{
+  const artifact=publishedScaleArtifactByItem.get(item)
+  return artifact
+    ? {instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,definition:artifact.definition,
+        requestedMode:'COMPOSITE' as const,instruction:artifact.instruction,publishedArtifact:artifact}
+    : {instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,definition:frozenDatabaseScaleDefinition(item.scale),
+        requestedMode:'COMPOSITE' as const,instruction:resolveFrozenScaleInstructionForScale(item.scale)}
+}
 const createChildRecords = async (db: Db, attempt: any, composite: {productKind:string}, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>, prepared?: PreparedVariantRuntimes, verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization,educationProduct?:'SCHOOL'|'TEACHER',educationAttempt?:VerifiedEducationAttempt) => {
   // Prisma create/findUnique parent rows contain scalar fields only. Product
   // policy comes from the caller's already-loaded server-owned composite.
@@ -2800,13 +2811,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
     if (!item.required) continue
     if (item.type === 'SCALE') {
       const frozenScale = attempt.runtimeGeneration === 'UNIFIED_V1'
-        ? prepared?.scales.get(item.id) ?? await freezeScaleRuntimeAtAttemptStart(db, {
-            instrumentKey: item.scale.code,
-            instrumentVersion: item.scale.instrumentVersion,
-            definition: frozenDatabaseScaleDefinition(item.scale),
-            requestedMode: 'COMPOSITE',
-            instruction: resolveFrozenScaleInstructionForScale(item.scale),
-          })
+        ? prepared?.scales.get(item.id) ?? await freezeScaleRuntimeAtAttemptStart(db, compositeScaleFreezeInput(item))
         : null
       if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
       // Parent START (createAttempt) already admitted every child Scale in this
@@ -3170,6 +3175,9 @@ const createAttempt = async (
     // Anonymous entry obtains the same unique persisted delivery, never a client hint.
     composite.deliveryCourseId = compositeSjtGrantScope(composite)!.courseId
   }
+  const trainingScaleArtifacts=await resolveTrainingScaleArtifacts(db as Prisma.TransactionClient,{compositeId:composite.id,
+    snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,educationComposition})
+  for(const item of composite.items){const artifact=trainingScaleArtifacts.get(item.id);if(artifact&&item.type==='SCALE'&&item.standardCombinationSource==null)publishedScaleArtifactByItem.set(item,artifact)}
   if (prepared) {
     try {
     for (const item of composite.items) {
@@ -3203,11 +3211,7 @@ const createAttempt = async (
       }
       else if (item.type === 'SCALE'&&item.standardCombinationSource!=null)prepared.scales.set(item.id,await freezeTrainingStandardScaleRuntime(db as Prisma.TransactionClient,
         await verifyStoredTrainingStandardItem(db as Prisma.TransactionClient,composite,item,'COLLECTION')))
-      else if (item.type === 'SCALE') prepared.scales.set(item.id, await freezeScaleRuntimeAtAttemptStart(db, {
-        instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,
-        definition:frozenDatabaseScaleDefinition(item.scale),requestedMode:'COMPOSITE',
-        instruction:resolveFrozenScaleInstructionForScale(item.scale),
-      }))
+      else if (item.type === 'SCALE') prepared.scales.set(item.id, await freezeScaleRuntimeAtAttemptStart(db, compositeScaleFreezeInput(item)))
       if (item.type === 'COGNITIVE') {
         assertCognitiveModuleEnabled()
         const assignment=item.cognitiveAssignment
@@ -3275,7 +3279,7 @@ const createAttempt = async (
   const contentCandidate=await prepareTrainingContentAttemptBinding(db as Prisma.TransactionClient,{
     compositeId:composite.id,attemptId:newAttemptId,epoch:attemptEpoch,
     snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,
-    composite,resolvedSituational:situationalReleases,educationComposition,
+    composite,resolvedSituational:situationalReleases,educationComposition,scaleArtifacts:trainingScaleArtifacts,
   })
   let variantAllocation: ReturnType<typeof createWeightedVariantAllocation> | null = null
   if (variantEnabled) {
