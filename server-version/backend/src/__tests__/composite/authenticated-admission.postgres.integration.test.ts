@@ -11,6 +11,7 @@ let db: typeof import('../../config/database')['prisma']
 let runtime: typeof import('../../modules/composite/composite.service')
 let courseId: string
 const publications: string[] = []
+const scaleIds: string[] = []
 const deferred = () => { let resolve!: () => void; const promise = new Promise<void>(r => { resolve = r }); return { resolve, promise } }
 async function fixture() {
   const id = prefix + '-' + publications.length
@@ -28,6 +29,30 @@ async function fixture() {
   await db.compositeAssessment.update({ where: { id }, data: { status: 'PUBLISHED', publishedAt: new Date() } })
   return id
 }
+// Several CUSTOM_DESCRIPTIVE Scale children: parent START admits them all at
+// once; children are created without repeating that admission per item.
+async function scaleFixture(count = 3) {
+  const id = prefix + '-' + publications.length
+  publications.push(id)
+  const { compileResearchScale } = await import('../../modules/survey/builder.compiler')
+  const { hashScaleDefinition } = await import('../../modules/scale/scale-definition')
+  const definition = compileResearchScale('Synthetic admission source', { schemaVersion: 1, respondentType: 'participant_self_report', aggregation: 'mean',
+    responseOptions: [{ optionKey: 'low', label: 'Low', score: 0 }, { optionKey: 'high', label: 'High', score: 2 }],
+    dimensions: [{ dimensionKey: 'total', label: 'Total', direction: 'descriptive' }],
+    items: [{ itemKey: 'item', prompt: 'Synthetic item', required: true, reverse: false, dimensionKeys: ['total'] }] })
+  const scales: string[] = []
+  for (let i = 0; i < count; i++) {
+    const scale = await db.scale.create({ data: { code: id + '-scale-' + i, name: 'Synthetic admission scale', creatorId: teacher, status: 'PUBLISHED',
+      instrumentClass: 'CUSTOM_DESCRIPTIVE', instrumentVersion: '1', definition, definitionHash: hashScaleDefinition(definition) } })
+    scales.push(scale.id); scaleIds.push(scale.id)
+  }
+  await db.compositeAssessment.create({ data: { id, code: id, name: 'Synthetic multi-scale admission', createdBy: teacher,
+    productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', status: 'DRAFT', maxAttempts: 1,
+    questionnaireCourses: { create: { courseId } },
+    items: { create: scales.map((scaleId, position) => ({ type: 'SCALE' as const, position, required: true, scaleId })) } } })
+  await db.compositeAssessment.update({ where: { id }, data: { status: 'PUBLISHED', publishedAt: new Date() } })
+  return { id, scales }
+}
 suite('authenticated admission lock boundaries (real isolated PostgreSQL)', () => {
   beforeAll(async () => {
     requireIsolatedReleaseDatabase(url!)
@@ -40,14 +65,18 @@ suite('authenticated admission lock boundaries (real isolated PostgreSQL)', () =
       students: { create: [a,b].map(studentId => ({ studentId, status: 'ACTIVE' as const })) },
     } })
     courseId = course.id
-  })
+  }, 60000)
   afterAll(async () => {
     if (!db) return
     try {
+      await db.assessment.deleteMany({ where: { scaleId: { in: scaleIds } } })
       await db.compositeAssessmentAttempt.deleteMany({ where: { compositeAssessmentId: { in: publications } } })
       await db.compositeAssessment.deleteMany({ where: { id: { in: publications } } })
+      // Emergency-stop history is append-only; its synthetic Scale/owner are retained.
+      const retained = (await db.scaleLibraryEmergencyStop.findMany({ where: { targetId: { in: scaleIds } } })).map(row => row.targetId)
+      await db.scale.deleteMany({ where: { id: { in: scaleIds.filter(id => !retained.includes(id)) } } })
       if (courseId) await db.course.delete({ where: { id: courseId } })
-      await db.user.deleteMany({ where: { id: { in: [teacher,a,b] } } })
+      await db.user.deleteMany({ where: { id: { in: retained.length ? [a,b] : [teacher,a,b] } } })
     } finally { await db.$disconnect() }
   })
   it('admits a different student while the first student owns its admission transaction', async () => {
@@ -72,6 +101,38 @@ suite('authenticated admission lock boundaries (real isolated PostgreSQL)', () =
     await db.compositeAssessmentAttempt.update({ where: { id: results[0].attempt.id }, data: { status: 'COMPLETED' } })
     await expect(runtime.startUserAttempt(a,id)).rejects.toMatchObject({ statusCode: 409 })
   })
+  it('replays one multi-scale START: same attempt, one quota decision, one child per Scale', async () => {
+    const { id, scales } = await scaleFixture(3)
+    const results = await Promise.all(Array.from({ length: 4 }, () => runtime.startUserAttempt(a, id)))
+    expect(new Set(results.map(row => row.attempt.id)).size).toBe(1)
+    expect(await db.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: id, userId: a } })).toBe(1)
+    const children = await db.assessment.findMany({ where: { compositeAttemptId: results[0].attempt.id } })
+    expect(children.map(child => child.scaleId).sort()).toEqual([...scales].sort())
+    expect((await runtime.startUserAttempt(a, id)).attempt.id).toBe(results[0].attempt.id)
+    await db.compositeAssessmentAttempt.update({ where: { id: results[0].attempt.id }, data: { status: 'COMPLETED' } })
+    await expect(runtime.startUserAttempt(a, id)).rejects.toMatchObject({ statusCode: 409 })
+  }, 60000)
+  it('orders a child Scale emergency stop before START: no admission commits after the stop returns', async () => {
+    const { id, scales } = await scaleFixture(3)
+    const stopped = scales[2], ready = deferred(), release = deferred()
+    // Same writes as scale-library stopCollection(TRAINING_SCALE), held open.
+    const stop = db.$transaction(async tx => {
+      await tx.$executeRaw`UPDATE scales SET id=id WHERE id=${stopped}`
+      await tx.scaleLibraryEmergencyStop.create({ data: { targetKind: 'TRAINING_SCALE', targetId: stopped, actorId: teacher, reason: 'Synthetic ordering fixture' } })
+      ready.resolve(); await release.promise
+    }, { timeout: 15000 })
+    await ready.promise
+    let settled = false
+    const racing = runtime.startUserAttempt(b, id).then(v => { settled = true; return v }, e => { settled = true; throw e })
+    racing.catch(() => undefined)
+    await new Promise(resolve => setTimeout(resolve, 500))
+    expect(settled).toBe(false)
+    release.resolve(); await stop
+    await expect(racing).rejects.toMatchObject({ statusCode: 409 })
+    await expect(runtime.startUserAttempt(a, id)).rejects.toMatchObject({ statusCode: 409 })
+    expect(await db.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: id } })).toBe(0)
+    expect(await db.assessment.count({ where: { scaleId: { in: scales } } })).toBe(0)
+  }, 60000)
   it('keeps archive behind admitted readers and refuses a new start after archive commits', async () => {
     const id = await fixture(), ready = deferred(), release = deferred(), updateStarted = deferred()
     const held = db.$transaction(async tx => {

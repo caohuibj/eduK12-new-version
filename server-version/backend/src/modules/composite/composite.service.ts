@@ -10,7 +10,7 @@ import {resolveEducationAssessmentSituationalItems} from '../education-tools/ass
 import {readEducationSjtSources} from '../education-tools/native-source.sjt'
 import {admitEducationNativeCognitive} from '../education-tools/native-source.cognitive'
 import { emptyOptionalReportRelations, OPTIONAL_REPORT_RELATION_COUNTS } from './composite-report-read-plan'
-import { lockAuthenticatedAdmission } from './authenticated-admission-lock'
+import { lockAuthenticatedAdmission, lockCompositeAdmissionShare } from './authenticated-admission-lock'
 import { lockRelationalAdmission } from './relational-admission-lock'
 import {publicTrainingFormDefinition} from '../assessment-runtime/typed-form'
 import {assertTrainingMaterialsUsable,trainingFormMaterials,inspectTrainingMaterials} from '../assessment-media/training-materials'
@@ -31,6 +31,7 @@ import { freezeTrainingPersistenceSnapshot, readTrainingPersistencePolicy, train
 import { trainingRoundPublicationIdentity, prepareTrainingPublicRound, assertTrainingTokenRound, publicRoundMetadata, trainingRoundSelect, type TrainingRoundInput } from './training-public-round'
 import { allocateTrainingMaterial, materialRestartClaim } from './training-material-allocation'
 import { canonicalHash } from '../assessment-runtime/canonical'
+import { assertStandardItemsVerifiedByContentBinding } from './training-start-child-admission'
 import { resolveTrainingFlowScopeForMaterialization, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers, TRAINING_FLOW_DEFINITION_SELECT, type VerifiedTrainingFlowMaterialization } from './training-flow-scope'
 import { buildTrainingFlowUnits } from './training-flow-definition'
 import { freezeTrainingFlowAssignment } from './training-flow-assignment-snapshot'
@@ -2806,10 +2807,19 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
           })
         : null
       if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
-      // Match the existing parent START boundary for education organization resources.
-      if(composite.productKind==='ORGANIZATION_RESOURCE')await assertScaleLibraryCollectionAllowed(db as Prisma.TransactionClient,[],[item.scaleId!])
-      else await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient, [item.scaleId!],{compositeAttemptId:attempt.id,compositeItemIds:[item.id],
-        ...(verifiedFlowMaterialization?{verifiedFlowMaterialization,compositeAttemptEpoch:attempt.attemptEpoch}:{})})
+      // Parent START (createAttempt) already admitted every child Scale in this
+      // same transaction under the same locks (parent guard + content binding),
+      // so it is not repeated per child. Only a lazily materialized flow unit,
+      // admitted outside parent START, keeps its own per-item admission here.
+      if(verifiedFlowMaterialization){
+        if(composite.productKind==='ORGANIZATION_RESOURCE')await assertScaleLibraryCollectionAllowed(db as Prisma.TransactionClient,[],[item.scaleId!])
+        else await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient, [item.scaleId!],{compositeAttemptId:attempt.id,compositeItemIds:[item.id],
+          verifiedFlowMaterialization,compositeAttemptEpoch:attempt.attemptEpoch})
+      }else if(composite.productKind!=='ORGANIZATION_RESOURCE'){
+        // The parent guard skips exact STANDARD items because the content
+        // binding revalidated them; fail closed if this one was not bound.
+        assertStandardItemsVerifiedByContentBinding([item],attempt.trainingContentBinding?.units)
+      }
       const child = await db.assessment.create({
         data: {
           scaleId: item.scaleId,
@@ -2995,7 +3005,7 @@ const createAttempt = async (
     ||(!educationComposition&&relationalIdentity.subjectUserId!==userId)||relationalIdentity.respondentUserId!==userId))throw compositeForbidden('教育测评准入上下文不匹配')
   // Parent START and publication stop/archive serialize on the same row. Child
   // progression later consumes the already-admitted immutable runtime plan.
-  await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE', composite.id)
+  await lockCompositeAdmissionShare(db as Prisma.TransactionClient, composite.id)
   if (!['QUESTIONNAIRE','ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     const current=await db.compositeAssessment.findUnique({where:{id:composite.id},
       select:{status:true,trainingContentSnapshot:true,trainingContentSnapshotHash:true}})
