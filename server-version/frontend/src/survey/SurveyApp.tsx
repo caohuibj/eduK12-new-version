@@ -393,7 +393,7 @@ function SurveyApplication(){
           ?<a href={surveyAdminLoginUrl()!}>系统管理员入口：研究者与工具授权</a>
           :<p>当前地址未配置管理员入口。</p>}</div>
       </SurveyEntryPanel>}
-      {!loading&&screen==='mfa'&&<section className="survey-mfa-panel bg-white rounded-xl border p-6 my-4 max-w-xl mx-auto">
+      {!loading&&screen==='mfa'&&recovery.length===0&&<section className="survey-mfa-panel bg-white rounded-xl border p-6 my-4 max-w-xl mx-auto">
         <div className="survey-entry-heading"><h2 className="text-xl font-semibold">{enrolled?'双因素验证':'绑定 TOTP 验证器'}</h2><AuthenticatorHelp/></div>
         {!enrolled&&!uri&&<button className="btn-primary" disabled={busy} onClick={setup}>生成二维码</button>}
         {uri&&<div className="my-4"><QRCodeSVG value={uri} size={180}/><p className="text-sm mt-2">验证器手动密钥：</p>
@@ -409,7 +409,7 @@ function SurveyApplication(){
         <h2 className="text-xl font-semibold">一次性恢复码</h2>
         <p>请离线保存，恢复码每个只能使用一次，关闭本页后无法再次查看。</p>
         <code className="block whitespace-pre-wrap break-all bg-slate-100 p-4 my-3">{recovery.join('\n')}</code>
-        <button className="btn-primary" onClick={()=>{setRecovery([]);void refresh(true)}}>我已保存，进入工作台</button>
+        <button className="btn-primary" onClick={()=>{setRecovery([]);setNotice('');void refresh(true)}}>我已保存，进入工作台</button>
       </section>}
       {!loading&&user&&screen==='work'&&user.mustChangePassword&&<section className="bg-white rounded-xl border p-6 my-4">
         <h2 className="font-semibold text-xl">首次登录 · 修改研究者密码</h2>

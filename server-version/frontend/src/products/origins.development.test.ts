@@ -10,7 +10,7 @@ describe('explicit loopback Survey presentation links', () => {
     'preserves the current Survey origin and existing admin target at %s', origin => {
       const url = new URL(origin)
       const admin = `${url.protocol}//${url.hostname === '127.0.0.1' ? '127.0.0.1' : 'localhost'}:${url.port}`
-      expect(productOrigins(origin)).toEqual({ admin, survey: url.origin })
+      expect(productOrigins(origin)).toEqual({ admin, survey: url.origin, school: `${url.protocol}//school.localhost:${url.port}` })
       expect(surveyAdminLoginUrl(origin)).toBe(admin + '/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
       for (const kind of ['claim', 'reset-password'] as const) {
         const invite = new URL(surveyInvitationUrl(kind, 'synthetic&?#/token', origin)!)
@@ -27,7 +27,7 @@ describe('explicit loopback Survey presentation links', () => {
     vi.stubEnv('DEV', false)
     expect(productOrigins('http://localhost:5174')).toBeNull()
     expect(productOrigins('http://localhost:5174', true)?.survey).toBe('http://survey.localhost:5174')
-    expect(productOrigins('https://survey.eduk12.top')).toEqual({ admin: 'https://training.eduk12.top', survey: 'https://survey.eduk12.top' })
+    expect(productOrigins('https://survey.eduk12.top')).toEqual({ admin: 'https://training.eduk12.top', survey: 'https://survey.eduk12.top', school: 'https://school.eduk12.top' })
   })
   it.each([undefined, '', 'training', 'SURVEY', ' survey'])(
     'preserves default subdomain links for option %j', option => {
@@ -37,7 +37,7 @@ describe('explicit loopback Survey presentation links', () => {
   )
   it.each(['http://survey.localhost:5174', 'http://training.localhost:5174'])(
     'does not change non-loopback alias mapping for %s', origin => {
-      expect(productOrigins(origin)).toEqual({ admin: 'http://localhost:5174', survey: 'http://survey.localhost:5174' })
+      expect(productOrigins(origin)).toEqual({ admin: 'http://localhost:5174', survey: 'http://survey.localhost:5174', school: 'http://school.localhost:5174' })
     },
   )
   it.each(['http://localhost.attacker.test:5174', 'http://127.0.0.1.attacker.test:5174', 'http://192.168.1.2:5174',
