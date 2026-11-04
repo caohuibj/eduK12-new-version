@@ -8,6 +8,12 @@ const baseUrl = process.env.QUESTIONNAIRE_PRODUCT_BASE_URL || 'http://127.0.0.1:
 const output = process.env.QUESTIONNAIRE_PRODUCT_EVIDENCE || '/tmp/huisurvey-q1-browser'
 fs.mkdirSync(output,{recursive:true})
 function ok(response) { assert.equal(response.status,200,JSON.stringify(response.body)); assert.equal(response.body.code,0); return response.body.data }
+async function expandSupportingInfo(page) {
+  const supporting=page.locator('details').filter({has:page.getByText('作答信息与阅读说明',{exact:true})}).first()
+  await supporting.waitFor({state:'attached',timeout:30000})
+  assert.equal(await supporting.evaluate(details=>details.open),false,'supporting information starts collapsed')
+  await supporting.locator('summary').click()
+}
 async function completeFour(page, label) {
   const answer=page.getByRole('textbox',{name:/^本次学习目标\s*必填$/})
   await answer.fill('学习与合作')
@@ -54,6 +60,7 @@ async function completeFour(page, label) {
   const reportButton=page.getByRole('button',{name:'查看个人报告',exact:true})
   if(await reportButton.isVisible()) await reportButton.click()
   await page.waitForURL(url=>url.pathname.endsWith('/report'),{timeout:30000})
+  await expandSupportingInfo(page)
   await page.getByText('本次学习目标',{exact:false}).waitFor({timeout:30000})
   await page.screenshot({path:output+'/'+label+'-report.png',fullPage:true})
 }
@@ -161,6 +168,7 @@ async function main() {
       const reportUrl=student.url()
       await student.goto(publicEntry)
       await student.waitForURL(reportUrl,{timeout:30000})
+      await expandSupportingInfo(student)
       await student.getByText('本次学习目标',{exact:false}).waitFor()
     }
     fs.writeFileSync(output+'/result.json',JSON.stringify({id,name,teacherAuthoring:true,multiCourse:true,fourTypes:true,legacyBypassBlocked:true,studentEntry:true,studentCompleted:true,publicMode,errors},null,2))

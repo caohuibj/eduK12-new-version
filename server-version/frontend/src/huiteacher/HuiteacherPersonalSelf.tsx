@@ -174,7 +174,7 @@ export function HuiteacherPersonalSelf({api}:{api:Api}){
               <h4>{i.headline}</h4><p>{i.interpretation}</p>
               {i.guidance.map((g,k)=><p key={k}>{g.text}</p>)}
             </article>)}
-            <p className="ht-muted">{reports[x.assessmentId].disclaimer}</p>
+            <details><summary>阅读提示</summary><p className="ht-muted">{reports[x.assessmentId].disclaimer}</p></details>
           </>}
       </div></TeacherAssessmentPage>}
     </article>)}</div>

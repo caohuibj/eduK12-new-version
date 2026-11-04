@@ -158,6 +158,15 @@ export function ReportDetails({
   )
 }
 
+export function ReportSupporting({ facts, children, testId }: { facts: Array<{ label: string; value: ReactNode }>; children?: ReactNode; testId?: string }) {
+  return <ReportDetails title="作答信息与阅读说明" testId={testId}>
+    {facts.length > 0 && <section className="report-supporting__facts" aria-label="完成信息"><dl>
+      {facts.map(fact => <div key={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}
+    </dl></section>}
+    {children}
+  </ReportDetails>
+}
+
 export function ReportDisclaimer({ children, testId }: { children: ReactNode; testId?: string }) {
   return <p className="report-disclaimer" data-testid={testId}>{children}</p>
 }

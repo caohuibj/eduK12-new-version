@@ -39,6 +39,8 @@ describe('report scheduler capacity and drain', () => {
     expect(h.parent).not.toHaveBeenCalled()
   })
 
+  // Virtual-time behavior remains asserted at 1ms; the wall-clock budget
+  // accommodates module reloads on saturated CI runners.
   it('refills a finished slot immediately without waiting for the poll interval', async () => {
     const jobs = [job(1), job(2), job(3)]
     h.claim.mockImplementation(async () => jobs.shift() ?? null)
@@ -46,7 +48,7 @@ describe('report scheduler capacity and drain', () => {
     expect(finishes).toHaveLength(2); expect(worker!.activeCompositeReportJobs()).toBe(2)
     finishes[0](); await flush(); await vi.advanceTimersByTimeAsync(1)
     expect(finishes).toHaveLength(3); expect(worker!.activeCompositeReportJobs()).toBe(2)
-  })
+  }, 15_000)
 
   it('coalesces simultaneous completions and never overlaps job claims or exceeds concurrency', async () => {
     const jobs = Array.from({ length: 6 }, (_, index) => job(index))

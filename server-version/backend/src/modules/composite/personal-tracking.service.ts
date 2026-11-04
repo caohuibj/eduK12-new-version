@@ -11,6 +11,35 @@ import {evaluateTrainingFeedbackForAttempt} from './training-feedback-binding'
 type Proof={userId:string;study?:never}|{userId?:never;study:{studyId:string;credential:string}}
 function fail():never{throw compositeForbidden('本人变化报告不可访问')}
 
+/** Read-only CTA eligibility for an own completed Training attempt. The POST
+ * remains the authority and rechecks all fences before projecting changes. */
+export async function readTrainingPersonalChangesAvailability(attemptId:string,userId:string){
+ const end=await prisma.compositeAssessmentAttempt.findUnique({where:{id:attemptId},select:{
+  userId:true,status:true,completedAt:true,assignmentRef:true,subjectUserId:true,respondentUserId:true,
+  deliveryCourseId:true,compositeAssessment:{select:{
+   personalTrackingBaselineId:true,createdBy:true,status:true,productKind:true,courseId:true,
+  }},
+ }})
+ if(!end||end.status!=='COMPLETED'||!end.completedAt||end.userId!==userId||end.assignmentRef
+   ||end.subjectUserId&&end.subjectUserId!==end.userId||end.respondentUserId&&end.respondentUserId!==end.userId)fail()
+ const publication=end.compositeAssessment
+ if(!publication.personalTrackingBaselineId||!publication.createdBy
+   ||!['PUBLISHED','ARCHIVED'].includes(publication.status)
+   ||!['QUESTIONNAIRE','ASSESSMENT_BUNDLE'].includes(publication.productKind))return {configured:false}
+ const courseId=end.deliveryCourseId??(publication.productKind==='ASSESSMENT_BUNDLE'?publication.courseId:null)
+ if(!courseId)return {configured:false}
+ const [creator,person,membership]=await Promise.all([
+  prisma.user.findUnique({where:{id:publication.createdBy},select:{isActive:true,isFrozen:true,expiresAt:true,accountDomain:true}}),
+  prisma.user.findUnique({where:{id:userId},select:{isActive:true,isFrozen:true,expiresAt:true,accountDomain:true}}),
+  prisma.courseStudent.findFirst({where:{studentId:userId,courseId,
+   status:{in:['ACTIVE','APPROVED']},course:{courseType:'TRAINING_COURSE',isLibrary:false}},select:{id:true}}),
+ ])
+ const now=new Date()
+ const active=(user:typeof person)=>Boolean(user?.isActive&&!user.isFrozen
+  &&(!user.expiresAt||user.expiresAt>now)&&['LEGACY','TRAINING'].includes(user.accountDomain))
+ return {configured:active(creator)&&active(person)&&Boolean(membership)}
+}
+
 /** On-demand SELF projection; FINAL and answer persistence remain unchanged. */
 export async function readTrainingPersonalChanges(attemptId:string,proof:Proof){
  return prisma.$transaction(async tx=>{
