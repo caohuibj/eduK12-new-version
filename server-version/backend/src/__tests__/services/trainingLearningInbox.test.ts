@@ -39,7 +39,7 @@ describe('Training learner overview metadata',()=>{
   feed.mockResolvedValue({list:[task('campus','ASSIGNMENT',{courses:[{id:'campus',title:'校园'}]}),task('public','QUESTIONNAIRE',{courses:[]}),task('done','ASSIGNMENT',{state:'COMPLETED',canStart:false}),task('closed','CHECKIN',{state:'EXPIRED',canStart:false,href:null}),task('open')]})
   const result=await listTrainingLearningInbox('student',query,now)
   expect(result.list.map(r=>r.title)).toEqual(['open'])
-  expect(db.courseStudent.findMany).toHaveBeenCalledWith(expect.objectContaining({where:{studentId:'student',status:{in:['ACTIVE','APPROVED']},course:{isLibrary:false,courseType:'TRAINING_COURSE'}}}))
+  expect(db.courseStudent.findMany).toHaveBeenCalledWith(expect.objectContaining({where:{studentId:'student',status:{in:['ACTIVE','APPROVED']},course:{isLibrary:false,courseType:{not:'CAMPUS_ACTIVITY'}}}}))
   expect(db.scale.findMany.mock.calls[0][0].where).toEqual({status:'PUBLISHED',visibility:{in:['PUBLIC','COURSE']},courseScales:{some:{courseId:{in:['c','d']}}}})
  })
  it('shows only nonempty teacher exercise comments, never check-in feedback or comment contents',async()=>{
