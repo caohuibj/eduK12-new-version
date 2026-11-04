@@ -7,7 +7,6 @@ import { type Prisma, type PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
-import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {
   createFrozenUnitAdmission,
@@ -751,8 +750,12 @@ export const activateScaleAdmission = async (
       if (!current || current.attemptEpoch !== row.attemptEpoch) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评轮次已改变', 409)
       const winner = await loadStoredScaleAdmission(current,tx)
       if (winner) return (await validateStoredAgainstRuntime(current, winner, referenceTimeMs, tx))
-      if(current.compositeAttemptId)await assertTrainingScaleCollectionAllowed(tx,[current.scaleId],{compositeAttemptId:current.compositeAttemptId,compositeItemIds:current.compositeItemId?[current.compositeItemId]:[]})
-      else await assertScaleLibraryCollectionAllowed(tx,[],[current.scaleId])
+      // Business decision: an emergency stop blocks new STARTs only. A composite
+      // child exists only after its parent START (or verified flow
+      // materialization) admitted it in that transaction, so re-proving
+      // admission here would only stop an already started attempt. Standalone
+      // rows keep their collection check.
+      if(!current.compositeAttemptId)await assertScaleLibraryCollectionAllowed(tx,[],[current.scaleId])
       // Load the parent inside this transaction, never use a pre-transaction context.
       return activateUnstoredScaleAdmission(tx, current, (await loadScaleAdmissionRuntime(current, tx)))
     },
