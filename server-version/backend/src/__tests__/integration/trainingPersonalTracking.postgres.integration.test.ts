@@ -165,7 +165,9 @@ suite('Training personal longitudinal native publication and SELF results',()=>{
   const first=await composite.startUserAttempt(student.id,source.id)
   await finish(first.attempt.id,{userId:student.id},'no')
   const changed=scaleDefinitionFor(1,'changed-after-T1')
-  await db.scale.update({where:{id:scale.id},data:{definition:changed as any,definitionHash:hashScaleDefinition(changed)}})
+  // A definition referenced by an attempt is frozen (SCALE_DEFINITION_REFERENCED); T2 must still inherit exact C.
+  const original=(await db.scale.findUniqueOrThrow({where:{id:scale.id}})).definition
+  await expect(db.scale.update({where:{id:scale.id},data:{definition:changed as any,definitionHash:hashScaleDefinition(changed)}})).rejects.toThrow('SCALE_DEFINITION_REFERENCED')
   next=await product.copy(actor,source.id,{requestId:id()},{trackingNext:true})
   expect(next.personalTracking.ordinal).toBe(2)
   await product.update(actor,next.id,{revision:next.revision,name:next.name,courseIds:[course.id],publicEnabled:true,expiresAt:future().toISOString()})
@@ -182,7 +184,7 @@ suite('Training personal longitudinal native publication and SELF results',()=>{
    const again=await readTrainingPersonalChanges(second.attempt.id,{userId:student.id})
    expect(again).toEqual(changes)
   }finally{personalParentOrder=null}
-  expect((await db.scale.findUniqueOrThrow({where:{id:scale.id}})).definition).toEqual(changed)
+  expect((await db.scale.findUniqueOrThrow({where:{id:scale.id}})).definition).toEqual(original)
   await expect(readTrainingPersonalChanges(second.attempt.id,{userId:teacher.id})).rejects.toMatchObject({statusCode:403})
   const final=await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:second.attempt.id}})
   expect(Object.keys(final.personalChangesSnapshots as object)).toHaveLength(1)
