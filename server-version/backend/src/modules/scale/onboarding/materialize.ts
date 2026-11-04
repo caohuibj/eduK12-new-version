@@ -60,6 +60,8 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
     if (scale.definition && canonicalHash(scale.definition) !== canonicalHash(executable.definition) && !allowsScaleAxisRevision(scale.definition,executable.definition)) throw new Error('SCALE_DEFINITION_CONFLICT')
     if (scale.definitionHash && scale.definitionHash !== definitionHash) throw new Error('SCALE_DEFINITION_CONFLICT')
     const revision=scale.definition && canonicalHash(scale.definition)!==canonicalHash(executable.definition)
+    const instructionRevision=!!source.instruction && (scale.instruction ?? null) !== source.instruction.text
+    if ((revision || instructionRevision) && await scaleReferencedByPublishedContent(db, scale.id)) throw new Error('SCALE_DEFINITION_REFERENCED')
     if (!scale.definitionHash || !scale.definition || revision) {
       scale = await db.scale.update({
         where: { id: scale.id },
@@ -111,4 +113,12 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
     referenceUnchanged.push(reference.referenceVersion)
   }
   return { scale, created, definitionHash, referenceCreates, referenceUnchanged, instruction }
+}
+
+/** True when a published Training snapshot freezes this scale; such rows are immutable (DB trigger scale_published_reference_immutable). */
+export async function scaleReferencedByPublishedContent(db: { $queryRaw: Prisma.TransactionClient['$queryRaw'] }, scaleId: string): Promise<boolean> {
+  const rows = await db.$queryRaw<Array<{ one: number }>>(Prisma.sql`SELECT 1 AS one FROM composite_assessment_items i
+    JOIN composite_assessments c ON c.id=i.composite_assessment_id
+    WHERE i.scale_id=${scaleId} AND c.training_content_snapshot IS NOT NULL LIMIT 1`)
+  return rows.length > 0
 }

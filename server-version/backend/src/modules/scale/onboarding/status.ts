@@ -24,6 +24,7 @@ const admissionNextActions: Record<string, { stage: string; owner: string; next:
   PRODUCT_NOT_READY: { stage: '产品就绪检查', owner: '平台管理员', next: '按 product-readiness 检查表补齐缺失项' },
   SCALE_NOT_INSTALLED: { stage: '安装', owner: '平台管理员', next: '先执行 install（物化内容+部署策略），再发布' },
   DEPLOYMENT_BINDING_MISSING: { stage: '安装', owner: '平台管理员', next: '没有 ACTIVE 部署策略；先完成安装' },
+  SCALE_DEFINITION_REFERENCED: { stage: '内容一致性', owner: '内容线', next: '量表已被已发布训练内容冻结引用，不能原地修订；请以新版本/新量表发布' },
   SCALE_DEFINITION_CONFLICT: { stage: '内容一致性', owner: '内容线', next: '库内量表与源码定义哈希不一致，核查导入是否被手工改动' },
   REFERENCES_NOT_INSTALLED: { stage: '参数安装', owner: '平台管理员', next: '存在尚未安装的 reference set，先重跑安装' },
   PUBLICATION_PREVIEW_STALE: { stage: '发布操作', owner: '平台管理员', next: '预览后内容已变化，用新 proofHash 重新确认发布' },

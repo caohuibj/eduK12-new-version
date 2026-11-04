@@ -100,7 +100,7 @@ describe('frozen scale instruction content contract', () => {
     const {materializeScaleInstrumentContent}=await import('../../modules/scale/onboarding/materialize')
     const {hashScaleDefinition}=await import('../../modules/scale/scale-definition')
     const row={id:'s',status:'PUBLISHED',instrumentClass:'STANDARD',instrumentVersion:'1.0.0',definition:source().executable!.definition,definitionHash:hashScaleDefinition(source().executable!.definition),instruction:instruction.text}
-    const db={scale:{findUnique:vi.fn(async()=>row),update:vi.fn(async({data}:any)=>({...row,...data}))},assessmentReferenceSet:{}}
+    const db={$queryRaw:vi.fn(async()=>[]),scale:{findUnique:vi.fn(async()=>row),update:vi.fn(async({data}:any)=>({...row,...data}))},assessmentReferenceSet:{}}
     await materializeScaleInstrumentContent(db as never,{instrumentKey:'nfc10_zh_cn',instrumentVersion:'1.0.0',actorUserId:'admin'},materializationRegistry)
     expect(db.scale.update).toHaveBeenCalledExactlyOnceWith({where:{id:'s'},data:{instruction:'Revised administration wording'}})
     getScaleInstrumentSource.mockReturnValue(source({instruction:undefined}))
