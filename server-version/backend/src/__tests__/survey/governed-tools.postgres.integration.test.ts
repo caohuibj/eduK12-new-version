@@ -6,6 +6,7 @@ import {createServer,type Server} from 'node:http'
 import express from 'express'
 import {describe,it,expect,beforeAll,afterAll,vi} from 'vitest'
 import {prisma as db} from '../../config/database'
+import { surveyStartKeys } from '../integration/survey-test-keys'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {generateToken} from '../../utils/jwt'
 import {csrfProtection} from '../../middleware/csrf'
@@ -76,7 +77,7 @@ await entry(formId);await entry(sjtId,system.id);await entry(cogId);await expect
   const w=await createWave(owner.id,pid,{requestId:randomUUID(),title:'Whole package',consentText:'Synthetic isolated consent, no actual participant.',generalText:'Synthetic',instrumentIds:ids,allowNewParticipants:true});wid=w.id;await prepareWave(owner.id,pid,wid,w.revision);const frozen=await getWave(owner.id,pid,wid);opened=await openWave(owner.id,pid,wid,frozen.revision);const publication=await db.surveyPublication.findUniqueOrThrow({where:{id:opened.publicationId!}});expect((publication.compiledSnapshot as any).governedPackages[0].slots).toHaveLength(3)
  },60000)
  it('runs cognitive child FINAL and parent FINAL, and atomically saves the combined report',async()=>{
-  const a=await startSingleUnlinkedWave({publicId:opened.publicId,waveId:wid,entryToken:opened.entrySecret,consentVersion:1,consent:true}),p={publicId:opened.publicId,attemptId:a.attemptId,accessCredential:a.accessCredential};const pub=await db.surveyPublication.findUniqueOrThrow({where:{id:opened.publicationId!}}),units=(pub.compiledSnapshot as any).units;const answers:any={};const gate=vi.spyOn(service,'assertGovernedEntryAllowed'),packageGate=vi.spyOn(packages,'assertFrozenPackageAdmissions');gate.mockClear();packageGate.mockClear();const provenance={schemaVersion:1 as const,deviceClass:'DESKTOP_LAPTOP' as const,administrationMode:'KEYBOARD_MOUSE' as const};const references=[]
+  const a=await startSingleUnlinkedWave({ ...surveyStartKeys('governed-tools'),publicId:opened.publicId,waveId:wid,entryToken:opened.entrySecret,consentVersion:1,consent:true}),p={publicId:opened.publicId,attemptId:a.attemptId,accessCredential:a.accessCredential};const pub=await db.surveyPublication.findUniqueOrThrow({where:{id:opened.publicationId!}}),units=(pub.compiledSnapshot as any).units;const answers:any={};const gate=vi.spyOn(service,'assertGovernedEntryAllowed'),packageGate=vi.spyOn(packages,'assertFrozenPackageAdmissions');gate.mockClear();packageGate.mockClear();const provenance={schemaVersion:1 as const,deviceClass:'DESKTOP_LAPTOP' as const,administrationMode:'KEYBOARD_MOUSE' as const};const references=[]
   for(const u of units){answers[u.instrumentKey]={};if(u.kind!=='COGNITIVE'){answers[u.instrumentKey]=syntheticUnitAnswers(u,0);continue}const s=await startSurveyCognitive(p,u.instrumentKey,{priorAnswers:answers,administrationProvenance:provenance});const child=await submitSurveyCognitiveFinal(p,u.instrumentKey,s.sessionId,{submissionId:randomUUID(),attemptEpoch:s.attemptEpoch,definitionHash:s.definitionHash!,trials:syntheticCognitiveTrials(s.randomSeed,1),administrationProvenance:provenance});references.push(child.resultReference)}
   await submitResearchFinal({...p,submissionId:randomUUID(),answers,cognitiveReferences:references});finalId=(await db.surveyWaveFinal.findFirstOrThrow({where:{attemptId:a.attemptId}})).id
   const reports=await readGovernedPackageReports(owner.id,{projectId:pid,waveId:wid,finalId});expect(reports.list).toHaveLength(1);expect(JSON.stringify(reports.list)).toContain('combined-1');expect(JSON.stringify(reports.list)).toContain('Yes');expect((await listGovernedPackageReports(owner.id,pid,wid,1)).list).toHaveLength(1);const sjt=units.find((u:any)=>u.kind==='SJT');expect((await readSurveyStoredReport(owner.id,{projectId:pid,waveId:wid,finalId,instrumentKey:sjt.instrumentKey})).report.blocks.length).toBeGreaterThan(0);expect(gate).not.toHaveBeenCalled();expect(packageGate).not.toHaveBeenCalled();gate.mockRestore();packageGate.mockRestore()
@@ -86,7 +87,7 @@ await entry(formId);await entry(sjtId,system.id);await entry(cogId);await expect
   const second=await packages.importSurveyPackage(owner.id,pid,packageGrant.id,randomUUID()),ids=[...imported.bindings,...second.bindings].map((b:{draftId:string})=>b.draftId)
   const w=await createWave(owner.id,pid,{requestId:randomUUID(),title:'Synthetic atomic reports',consentText:'Synthetic isolated consent with no actual participant.',generalText:'Synthetic',instrumentIds:ids,allowNewParticipants:true})
   await prepareWave(owner.id,pid,w.id,w.revision);const ready=await getWave(owner.id,pid,w.id),entry=await openWave(owner.id,pid,w.id,ready.revision)
-  const a=await startSingleUnlinkedWave({publicId:entry.publicId,waveId:w.id,entryToken:entry.entrySecret,consentVersion:1,consent:true}),p={publicId:entry.publicId,attemptId:a.attemptId,accessCredential:a.accessCredential}
+  const a=await startSingleUnlinkedWave({ ...surveyStartKeys('governed-tools'),publicId:entry.publicId,waveId:w.id,entryToken:entry.entrySecret,consentVersion:1,consent:true}),p={publicId:entry.publicId,attemptId:a.attemptId,accessCredential:a.accessCredential}
   const publication=await db.surveyPublication.findUniqueOrThrow({where:{id:entry.publicationId!}}),units=(publication.compiledSnapshot as unknown as {units:Parameters<typeof syntheticUnitAnswers>[0][]}).units,answers:Record<string,unknown>={},references=[]
   const provenance={schemaVersion:1 as const,deviceClass:'DESKTOP_LAPTOP' as const,administrationMode:'KEYBOARD_MOUSE' as const}
   for(const u of units){answers[u.instrumentKey]=syntheticUnitAnswers(u,0);if(u.kind==='COGNITIVE'){const s=await startSurveyCognitive(p,u.instrumentKey,{priorAnswers:answers,administrationProvenance:provenance}),child=await submitSurveyCognitiveFinal(p,u.instrumentKey,s.sessionId,{submissionId:randomUUID(),attemptEpoch:s.attemptEpoch,definitionHash:s.definitionHash!,trials:syntheticCognitiveTrials(s.randomSeed,1),administrationProvenance:provenance});references.push(child.resultReference)}}
@@ -102,7 +103,7 @@ await entry(formId);await entry(sjtId,system.id);await entry(cogId);await expect
   expect((await readGovernedPackageReports(owner.id,{projectId:pid,waveId:w.id,finalId:final.id})).list).toHaveLength(2)
  },60000)
  it('revokes new package use while admitted in-flight participants still complete under frozen rules',async()=>{
-  const inFlight=await startSingleUnlinkedWave({publicId:opened.publicId,waveId:wid,entryToken:opened.entrySecret,consentVersion:1,consent:true}),p={publicId:opened.publicId,attemptId:inFlight.attemptId,accessCredential:inFlight.accessCredential}
+  const inFlight=await startSingleUnlinkedWave({ ...surveyStartKeys('governed-tools'),publicId:opened.publicId,waveId:wid,entryToken:opened.entrySecret,consentVersion:1,consent:true}),p={publicId:opened.publicId,attemptId:inFlight.attemptId,accessCredential:inFlight.accessCredential}
   const pub=await db.surveyPublication.findUniqueOrThrow({where:{id:opened.publicationId!}}),units=(pub.compiledSnapshot as any).units,answers:any={},references=[],provenance={schemaVersion:1 as const,deviceClass:'DESKTOP_LAPTOP' as const,administrationMode:'KEYBOARD_MOUSE' as const}
   for(const u of units){answers[u.instrumentKey]={};if(u.kind!=='COGNITIVE'){answers[u.instrumentKey]=syntheticUnitAnswers(u,0);continue}const s=await startSurveyCognitive(p,u.instrumentKey,{priorAnswers:answers,administrationProvenance:provenance});const child=await submitSurveyCognitiveFinal(p,u.instrumentKey,s.sessionId,{submissionId:randomUUID(),attemptEpoch:s.attemptEpoch,definitionHash:s.definitionHash!,trials:syntheticCognitiveTrials(s.randomSeed,1),administrationProvenance:provenance});references.push(child.resultReference)}
   const before=await db.surveyWaveFinal.findUnique({where:{id:finalId}})
@@ -111,7 +112,7 @@ await entry(formId);await entry(sjtId,system.id);await entry(cogId);await expect
   expect(inFlightFinal.status).toBe('COMPLETED')
   expect(await db.surveyWaveFinal.count({where:{attemptId:inFlight.attemptId}})).toBe(1)
   await expect(packages.importSurveyPackage(owner.id,pid,packageGrant.id,randomUUID())).rejects.toMatchObject({statusCode:403})
-  await expect(startSingleUnlinkedWave({publicId:opened.publicId,waveId:wid,entryToken:opened.entrySecret,consentVersion:1,consent:true})).rejects.toThrow()
+  await expect(startSingleUnlinkedWave({ ...surveyStartKeys('governed-tools'),publicId:opened.publicId,waveId:wid,entryToken:opened.entrySecret,consentVersion:1,consent:true})).rejects.toThrow()
   expect(await db.surveyWaveFinal.findUnique({where:{id:finalId}})).toEqual(before)
   expect((await readGovernedPackageReports(owner.id,{projectId:pid,waveId:wid,finalId})).list).toHaveLength(1)
   await expect(db.$executeRaw`DELETE FROM survey_package_report_artifacts WHERE final_id=${finalId}`).rejects.toThrow('append-only')
@@ -136,7 +137,7 @@ await entry(formId);await entry(sjtId,system.id);await entry(cogId);await expect
   expect((await getWave(owner.id,pid,wave.id)).publicationId).toBeNull()
   const valid=await createWave(owner.id,pid,{requestId:randomUUID(),title:'Valid long-text expansion',consentText:'Synthetic isolated consent with no actual participant.',generalText:'Synthetic',instrumentIds:one.bindings.map(b=>b.draftId),allowNewParticipants:true})
   await prepareWave(owner.id,pid,valid.id,valid.revision);const prepared=await getWave(owner.id,pid,valid.id),opened=await openWave(owner.id,pid,valid.id,prepared.revision)
-  const attempt=await startSingleUnlinkedWave({publicId:opened.publicId,waveId:valid.id,entryToken:opened.entrySecret,consentVersion:1,consent:true}),answer='\u0000'.repeat(10000)
+  const attempt=await startSingleUnlinkedWave({ ...surveyStartKeys('governed-tools'),publicId:opened.publicId,waveId:valid.id,entryToken:opened.entrySecret,consentVersion:1,consent:true}),answer='\u0000'.repeat(10000)
   await submitResearchFinal({publicId:opened.publicId,attemptId:attempt.attemptId,accessCredential:attempt.accessCredential,submissionId:randomUUID(),answers:{[one.bindings[0].instrumentKey]:{text:answer}}})
   const final=await db.surveyWaveFinal.findFirstOrThrow({where:{attemptId:attempt.attemptId}}),report=await readGovernedPackageReports(owner.id,{projectId:pid,waveId:valid.id,finalId:final.id})
   expect(JSON.stringify(report.list)).toContain(JSON.stringify(answer).slice(1,-1));expect(report.list).toHaveLength(1)

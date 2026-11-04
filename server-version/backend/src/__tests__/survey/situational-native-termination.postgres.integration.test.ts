@@ -108,7 +108,7 @@ suite('Survey native host termination and material-only assignment — PostgreSQ
     const publication = await db.surveyPublication.findUniqueOrThrow({ where: { id: prepared.publicationId } })
     const snapshot = publication.compiledSnapshot as unknown as ResearchFrozenPublication
     expect(canonicalHash(snapshot)).toBe(publication.definitionDigest)
-    const admit = async (): Promise<Proof> => ({ publicId: opened.publicId, ...await startSingleUnlinkedWave({
+    const admit = async (): Promise<Proof> => ({ publicId: opened.publicId, ...await startSingleUnlinkedWave({ ...surveyStartKeys('situational-native-termination'),
       publicId: opened.publicId, waveId: draft.id, entryToken: opened.entrySecret, consent: true, consentVersion: 1,
     }) })
     return { id: draft.id, snapshot, admit }

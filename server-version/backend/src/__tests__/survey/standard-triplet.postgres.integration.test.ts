@@ -3,6 +3,7 @@ import {createServer,type Server} from 'node:http'
 import express from 'express'
 import {describe,it,expect,beforeAll,afterAll,vi} from 'vitest'
 import {prisma as db} from '../../config/database'
+import { surveyStartKeys } from '../integration/survey-test-keys'
 import {generateToken} from '../../utils/jwt'
 import {csrfProtection} from '../../middleware/csrf'
 import {errorHandler} from '../../middleware/errorHandler'
@@ -101,7 +102,7 @@ suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
   await publishSurveyMeasurementDraft(owner,pid,draft.id,draft.revision)
   const wave=await createWave(owner,pid,{requestId:randomUUID(),title:'Trial downstream',consentText:'Synthetic isolated trial consent, no human response.',generalText:'Synthetic test.',instrumentIds:[draft.id],allowNewParticipants:true});wid=wave.id
   await prepareWave(owner,pid,wid,wave.revision);const frozen=await getWave(owner,pid,wid),opened=await openWave(owner,pid,wid,frozen.revision)
-  const admitted=await startSingleUnlinkedWave({publicId:opened.publicId,waveId:wid,entryToken:opened.entrySecret,consentVersion:1,consent:true})
+  const admitted=await startSingleUnlinkedWave({ ...surveyStartKeys('standard-triplet'),publicId:opened.publicId,waveId:wid,entryToken:opened.entrySecret,consentVersion:1,consent:true})
   const task=await getOwnResearchTask({publicId:opened.publicId,attemptId:admitted.attemptId,accessCredential:admitted.accessCredential});instrumentKey=task.units[0].instrumentKey
   const cases=(await db.$queryRaw<any[]>`SELECT answers FROM survey_standard_trials WHERE release_id=${onlineId} ORDER BY case_index`)[1]
   await submitResearchFinal({publicId:opened.publicId,attemptId:admitted.attemptId,accessCredential:admitted.accessCredential,submissionId:randomUUID(),answers:{[instrumentKey]:cases.answers},itemTimings:{[instrumentKey]:Object.fromEntries(Object.keys(cases.answers).map(key=>[key,{schemaVersion:1,firstResponseMs:1000,activeTimeMs:1500,changeCount:0,visits:1,revisitCount:0,interrupted:false,recoveredWithoutClock:false}]))}})

@@ -3,6 +3,7 @@ import {createServer,type Server} from 'node:http'
 import express from 'express'
 import {beforeAll,afterAll,describe,it,expect} from 'vitest'
 import {prisma as db} from '../../config/database'
+import { surveyStartKeys } from '../integration/survey-test-keys'
 import {generateToken} from '../../utils/jwt'
 import {csrfProtection} from '../../middleware/csrf'
 import {surveyPlatformRouter} from '../../modules/survey/platform.routes'
@@ -46,7 +47,7 @@ suite('independent Survey admin with real HTTP, current DB and deidentified expo
    {itemKey:'identity',type:'SHORT_TEXT',prompt:'Text',required:false,options:[],rows:[]}]}]}})
   const w=await createWave(owner,pid,{requestId:randomUUID(),title:'Wave',consentText:'This is an isolated synthetic consent fixture only.',generalText:'No personal diagnosis.',instrumentIds:[draft.id],allowNewParticipants:true})
   await prepareWave(owner,pid,w.id,w.revision);const frozen=await getWave(owner,pid,w.id),opened=await openWave(owner,pid,w.id,frozen.revision)
-  const admitted=await startSingleUnlinkedWave({publicId:opened.publicId,waveId:w.id,entryToken:opened.entrySecret,consentVersion:1,consent:true})
+  const admitted=await startSingleUnlinkedWave({ ...surveyStartKeys('admin-separation'),publicId:opened.publicId,waveId:w.id,entryToken:opened.entrySecret,consentVersion:1,consent:true})
   const task=await getOwnResearchTask({publicId:opened.publicId,attemptId:admitted.attemptId,accessCredential:admitted.accessCredential})
   await submitResearchFinal({publicId:opened.publicId,attemptId:admitted.attemptId,accessCredential:admitted.accessCredential,submissionId:randomUUID(),answers:{[task.units[0].instrumentKey]:{choice:'privatecode',identity:'SECRET_NAME_AND_PHONE_13800000000'}}})
   finalId=(await db.surveyWaveFinal.findFirstOrThrow({where:{projectId:pid}})).id

@@ -1,6 +1,7 @@
 import {randomUUID} from 'node:crypto'
 import {afterAll,beforeAll,describe,expect,it,vi} from 'vitest'
 import {prisma as db} from '../../config/database'
+import { surveyStartKeys } from '../integration/survey-test-keys'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {decryptUnifiedRuntimePayload} from '../../modules/assessment-runtime/security'
 import {submitGovernedSource,approveGovernedTool,governedRow,withdrawGovernedTool} from '../../modules/survey/governed-tool.service'
@@ -72,7 +73,7 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
    const wave=await createWave(actor,projectId,{requestId:randomUUID(),title:'Synthetic scope',consentText:'Synthetic scope consent without human participants.',generalText:'Synthetic',instrumentIds:[draft.id],allowNewParticipants:true})
    await prepareWave(actor,projectId,wave.id,wave.revision);const prepared=await getWave(actor,projectId,wave.id),opened=await openWave(actor,projectId,wave.id,prepared.revision)
    const snapshot=(await db.surveyPublication.findUniqueOrThrow({where:{id:opened.publicationId!}})).compiledSnapshot as unknown as ResearchFrozenPublication
-   const enter=async()=>{const a=await startSingleUnlinkedWave({publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true});return {publicId:opened.publicId,attemptId:a.attemptId,accessCredential:a.accessCredential}}
+   const enter=async()=>{const a=await startSingleUnlinkedWave({ ...surveyStartKeys('governed-native'),publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true});return {publicId:opened.publicId,attemptId:a.attemptId,accessCredential:a.accessCredential}}
    const participant=await enter(),child=await startSurveySituational(participant,'native')
    const input={submissionId:randomUUID(),attemptEpoch:1,definitionHash:snapshot.units[0].nativeSituational!.definitionHash,...syntheticNativeSituationalSubmission(snapshot.units[0],0,child.attempt.id)}
    const receipt=(await submitSurveySituationalFinal(participant,'native',child.attempt.id,input)).receipt!
@@ -119,7 +120,7 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   await prepareWave(owner,projectId,wave.id,wave.revision);const prepared=await getWave(owner,projectId,wave.id),opened=await openWave(owner,projectId,wave.id,prepared.revision)
   const publication=await db.surveyPublication.findUniqueOrThrow({where:{id:opened.publicationId!}}),unit=(publication.compiledSnapshot as unknown as ResearchFrozenPublication).units[0]
   expect(unit.nativeSituational!.definitionHash).toBe(compiled.definitionHash)
-  const attempt=await startSingleUnlinkedWave({publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true}),p={publicId:opened.publicId,attemptId:attempt.attemptId,accessCredential:attempt.accessCredential}
+  const attempt=await startSingleUnlinkedWave({ ...surveyStartKeys('governed-native'),publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true}),p={publicId:opened.publicId,attemptId:attempt.attemptId,accessCredential:attempt.accessCredential}
   const child=await startSurveySituational(p,'native'),input={submissionId:randomUUID(),attemptEpoch:1,definitionHash:unit.nativeSituational!.definitionHash,...syntheticNativeSituationalSubmission(unit,0,child.attempt.id)}
   const receipts=await Promise.all([submitSurveySituationalFinal(p,'native',child.attempt.id,input),submitSurveySituationalFinal(p,'native',child.attempt.id,input)])
   expect(receipts[0].receipt).toEqual(receipts[1].receipt)
@@ -150,7 +151,7 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   const frozen=await getWave(owner,projectId,wave.id),opened=await openWave(owner,projectId,wave.id,frozen.revision)
   const publication=await db.surveyPublication.findUniqueOrThrow({where:{id:opened.publicationId!}}),snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication,unit=snapshot.units[0]
   expect(unit.executionProtocol).toBe('SITUATIONAL_NATIVE_V1');expect(unit.nativeSituational).toMatchObject({attemptEpoch:1,definitionHash:canonicalHash(pkg.definition)})
-  const enter=async()=>{const a=await startSingleUnlinkedWave({publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true});return {publicId:opened.publicId,attemptId:a.attemptId,accessCredential:a.accessCredential}}
+  const enter=async()=>{const a=await startSingleUnlinkedWave({ ...surveyStartKeys('governed-native'),publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true});return {publicId:opened.publicId,attemptId:a.attemptId,accessCredential:a.accessCredential}}
   const first=await enter(),inFlight=await enter(),notStarted=await enter()
   const oldChild=await startSurveySituational(inFlight,'native'),oldInput={submissionId:randomUUID(),attemptEpoch:1,definitionHash:unit.nativeSituational!.definitionHash,...syntheticNativeSituationalSubmission(unit,1,oldChild.attempt.id)}
   await saveSurveyCheckpoint(inFlight,{revision:0,answers:{native:{}}})
