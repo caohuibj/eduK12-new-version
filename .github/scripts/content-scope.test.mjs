@@ -837,3 +837,26 @@ test('CI-only routing actually starts no irrelevant business or browser jobs',()
     }
   }
 });
+
+test('routing and merge-gate source changes never bypass platform verification through release tooling',()=>{
+  const repo=mkdtempSync(join(tmpdir(),'ci-controls-')),cwd=process.cwd();
+  const git=(...args)=>execFileSync('git',args,{cwd:repo,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+  const commit=()=>{git('add','.');git('-c','user.name=CI fixture','-c','user.email=ci@example.invalid','commit','-qm','test');};
+  try{
+    git('init','-q');
+    const file=join(repo,'.github/scripts/content-scope.mjs');
+    mkdirSync(dirname(file),{recursive:true});
+    writeFileSync(file,'// previous router\n');commit();
+    const base=git('rev-parse','HEAD');
+    writeFileSync(file,'// changed router\n');commit();
+    process.chdir(repo);
+    const env={...process.env,CI_EVENT:'pull_request',CI_BASE_SHA:base,CI_HEAD_REF:'feature/ci-routing',
+      CI_PR_REPOSITORY:'fixture/repo',GITHUB_REPOSITORY:'fixture/repo',CI_FORCE_FULL:'',GITHUB_OUTPUT:''};
+    const result=JSON.parse(execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],
+      {env,encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+    assert.equal(result.scenario,'platform');
+    assert.equal(result.application_route,'legacy');
+    assert.equal(result.codeql,true);
+    assert.equal(result.frontend_build,true);
+  }finally{process.chdir(cwd);rmSync(repo,{recursive:true,force:true});}
+});

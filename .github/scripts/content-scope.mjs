@@ -376,7 +376,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if(product){emit(cognitiveProductOutputs(product));process.exit(0);}
   const backendUnit = event === 'pull_request' && !full && unitOnly(entries);
   const ciTooling = event === 'pull_request' && !full ? ciToolingScenario(entries) : null;
-  const scenario = ciTooling || (catalogDiscovery ? 'catalog-discovery' : cognitiveMixed ? 'platform' : copy ? 'homepage-copy' : releaseTools ? 'release-tooling' : backendUnit ? 'backend-unit' : dependencies ? 'dependencies' : backendModules ? 'backend' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
+  // Router/gate changes must prove the full platform topology, never just release-tools.
+  const controlFiles=new Set(['.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml']);
+  const criticalCiControl=event === 'pull_request' && entries.some(({file})=>controlFiles.has(file));
+  const scenario = criticalCiControl ? 'platform' : ciTooling || (catalogDiscovery ? 'catalog-discovery' : cognitiveMixed ? 'platform' : copy ? 'homepage-copy' : releaseTools ? 'release-tooling' : backendUnit ? 'backend-unit' : dependencies ? 'dependencies' : backendModules ? 'backend' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
     : result.presentation ? 'presentation' : frontendTest ? 'frontend-test' : frontend ? 'frontend' : 'platform');
   // Local pages are covered by related tests and one frontend build. The broad
   // student/** visual inventory does not require every platform browser fixture.
@@ -391,7 +394,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const codeql = !ciTooling && (catalogDiscovery || Boolean(copy?.sast) || releaseTools || dependencies || backendModules || scenario === 'platform' || frontend
     || (result.content && contentCodeqlRequired(entries,declarationReaders(base))));
   const release = event === 'workflow_dispatch' || full ? null : applicationPlan(base, head);
-  const output = { authoring_polish:catalogDiscovery&&authoringPolishScope(entries), student_discovery:catalogDiscovery&&studentDiscoveryScope(entries,{readHeadFile:file=>gitContent('HEAD',file),readBaseFile:file=>gitContent(base,file)}), backend_focus:result.backend_focus||'full', bundle_family:catalogDiscovery&&bundleFamilyScope(entries), bundle_runtime:catalogDiscovery&&bundleRuntimeScope(entries), homepage_copy_plan:JSON.stringify(copy), application_route:ciTooling ? 'legacy' : copy ? 'homepage-copy' : backendUnit ? 'backend-unit' : release && release.route !== 'C' ? release.route : 'legacy', release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
+  const output = { authoring_polish:catalogDiscovery&&authoringPolishScope(entries), student_discovery:catalogDiscovery&&studentDiscoveryScope(entries,{readHeadFile:file=>gitContent('HEAD',file),readBaseFile:file=>gitContent(base,file)}), backend_focus:result.backend_focus||'full', bundle_family:catalogDiscovery&&bundleFamilyScope(entries), bundle_runtime:catalogDiscovery&&bundleRuntimeScope(entries), homepage_copy_plan:JSON.stringify(copy), application_route:ciTooling || criticalCiControl ? 'legacy' : copy ? 'homepage-copy' : backendUnit ? 'backend-unit' : release && release.route !== 'C' ? release.route : 'legacy', release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
     documentation: result.documentation, diff_base:base, codeql, scenario, image_build:imageBuild, frontend_affected:affectedFrontend||catalogDiscovery,
     dependencies_frontend_only:frontendDependencies,
     frontend_build:catalogDiscovery?false:frontendBuild, ui_required:uiRequired,
