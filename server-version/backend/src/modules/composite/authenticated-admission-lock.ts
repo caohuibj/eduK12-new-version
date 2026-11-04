@@ -1,18 +1,19 @@
 import type { Prisma } from '@prisma/client'
 
-type RawTx = Pick<Prisma.TransactionClient, '$queryRaw'>
-// Row locks live until COMMIT/ROLLBACK, and an interactive transaction client
-// is one object for its whole life, so a held SHARE lock is never re-taken.
+type RawTx = Pick<Prisma.TransactionClient, '$queryRaw' | '$queryRawUnsafe'>
+const COMPOSITE_SHARE_SQL = 'SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE'
+// Marks are written only by lockAuthenticatedAdmission, whose caller passes the
+// client of a fresh prisma.$transaction. Row locks live until COMMIT/ROLLBACK and
+// that client is one object for the whole transaction, so a marked client
+// already holds the SHARE lock. Unmarked clients (including any non-tx client)
+// always take the lock.
 const heldCompositeShareLocks = new WeakMap<object, Set<string>>()
 
-/** Parent START and publication stop/archive serialize on this row. Taken at
- * most once per transaction; a repeat would not add any ordering. */
+/** Parent START and publication stop/archive serialize on this row. Skips the
+ * statement only when lockAuthenticatedAdmission already took it on this tx. */
 export async function lockCompositeAdmissionShare(tx: RawTx, compositeId: string): Promise<void> {
-  let held = heldCompositeShareLocks.get(tx)
-  if (held?.has(compositeId)) return
-  await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${compositeId} FOR SHARE`
-  if (!held) heldCompositeShareLocks.set(tx, held = new Set())
-  held.add(compositeId)
+  if (heldCompositeShareLocks.get(tx)?.has(compositeId)) return
+  await tx.$queryRawUnsafe(COMPOSITE_SHARE_SQL, compositeId)
 }
 
 /** Readers may admit different students concurrently. Archive/publication
@@ -23,7 +24,10 @@ export async function lockAuthenticatedAdmission(
   compositeId: string,
   userId: string,
 ): Promise<void> {
-  await lockCompositeAdmissionShare(tx, compositeId)
+  await tx.$queryRawUnsafe(COMPOSITE_SHARE_SQL, compositeId)
+  let held = heldCompositeShareLocks.get(tx)
+  if (!held) heldCompositeShareLocks.set(tx, held = new Set())
+  held.add(compositeId)
   // A hash collision only causes conservative extra serialization. Prefix and
   // tuple encoding keep this lock namespace separate from other advisory uses.
   const identity = JSON.stringify(['training-authenticated-admission-v1', compositeId, userId])

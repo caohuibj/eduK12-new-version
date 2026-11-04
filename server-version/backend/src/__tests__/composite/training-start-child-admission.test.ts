@@ -21,17 +21,20 @@ describe('Training START child admission (PR-1: no per-child repeat of parent ad
     expect(() => assertStandardItemsVerifiedByContentBinding([item], [{ ...unit, source: { ...unit.source, id: 'scale-2' } }])).toThrow('CONTENT_TRAINING_STANDARD_FROZEN_IDENTITY_CHANGED')
     expect(() => assertStandardItemsVerifiedByContentBinding([item], [{ ...unit, source: { ...unit.source, standardCombination: { ...standard, version: '2' } } }])).toThrow('CONTENT_TRAINING_STANDARD_FROZEN_IDENTITY_CHANGED')
   })
-  it('takes the parent composite FOR SHARE once per transaction, never across transactions', async () => {
-    const tx = { $queryRaw: vi.fn().mockResolvedValue([]) }, other = { $queryRaw: vi.fn().mockResolvedValue([]) }
+  it('skips the createAttempt FOR SHARE only after lockAuthenticatedAdmission took it on the same tx', async () => {
+    const mk = () => ({ $queryRaw: vi.fn().mockResolvedValue([]), $queryRawUnsafe: vi.fn().mockResolvedValue([]) })
+    const tx = mk(), other = mk()
     await lockAuthenticatedAdmission(tx as any, 'c1', 'u1')
     await lockCompositeAdmissionShare(tx as any, 'c1')
     await lockCompositeAdmissionShare(tx as any, 'c2')
     await lockCompositeAdmissionShare(other as any, 'c1')
-    const sql = (mock: any) => mock.$queryRaw.mock.calls.map((call: any) => call[0].join('?'))
-    expect(sql(tx).filter((q: string) => q.includes('FOR SHARE'))).toHaveLength(2)
-    expect(sql(tx).filter((q: string) => q.includes('pg_advisory_xact_lock'))).toHaveLength(1)
-    expect(tx.$queryRaw.mock.calls.filter((call: any) => call[0].join('?').includes('FOR SHARE')).map((call: any) => call[1])).toEqual(['c1', 'c2'])
-    expect(sql(other)).toHaveLength(1)
+    await lockCompositeAdmissionShare(other as any, 'c1')
+    const shares = (mock: any) => mock.$queryRawUnsafe.mock.calls
+    expect(shares(tx).map((call: any) => call[0])).toEqual(Array(2).fill('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE'))
+    expect(shares(tx).map((call: any) => call[1])).toEqual(['c1', 'c2'])
+    expect(tx.$queryRaw.mock.calls.filter((call: any) => call[0].join('?').includes('pg_advisory_xact_lock'))).toHaveLength(1)
+    // an unmarked client (no lockAuthenticatedAdmission in it) never skips
+    expect(shares(other)).toHaveLength(2); expect(other.$queryRaw).not.toHaveBeenCalled()
   })
   it('keeps per-item admission only for lazily materialized flow units (source contract)', () => {
     const source = readFileSync('src/modules/composite/composite.service.ts', 'utf8')
