@@ -129,6 +129,12 @@ jobs:
 
       - name: Real worker process handles SIGTERM
         working-directory: server-version
+        # Earlier export smoke tests intentionally leave failed/retry queue state in
+        # Redis DB 0. Use an isolated logical DB to validate the shutdown path
+        # without counting jobs left active by a different test process.
+        # The worker must still stop within its bounded deadline and exit 0.
+        env:
+          REDIS_URL: redis://localhost:6379/15
         run: node e2e/ops-worker-sigterm-smoke.mjs
 
       - name: Rehearse populated PostgreSQL 14 to 16 logical upgrade

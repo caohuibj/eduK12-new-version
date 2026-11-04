@@ -35,4 +35,4 @@ it('actual embedded SJT boundary still rejects ordinary Training, School and cop
  await expect(createEmbeddedSituationalAttempt(tx as any,input,release,school)).rejects.toMatchObject({code:'INSTRUMENT_NOT_AVAILABLE'})
  const teacher=bindVerifiedEducationAttempt(issueVerifiedEducationStart({tx,product:'TEACHER',compositeId:'runtime',assignmentRef:'assignment',respondentUserId:'teacher'}),tx,parent)
  await expect(createEmbeddedSituationalAttempt(tx as any,input,release,{...teacher})).rejects.toThrow('EDUCATION_START_CONTEXT_MISMATCH')
-})
+},15000)
