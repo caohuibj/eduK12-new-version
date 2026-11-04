@@ -1,5 +1,5 @@
 import {assertLibraryUseGrantCurrent} from '../scale-library-governance/usage'
-import {assertToolEntryPolicy,lockToolPolicyAdmission} from '../assessment-governance/tool-entry-policy'
+import {assertToolEntryPolicy,prefetchToolPolicyAdmission} from '../assessment-governance/tool-entry-policy'
 import {getScaleInstrumentSource} from './onboarding/instrument-registry'
 import {scaleSourcePolicyIdentity} from './onboarding/source-snapshot'
 import {ContentReleaseError} from '../measurement-content/release'
@@ -91,7 +91,7 @@ export async function assertTrainingScaleCollectionAllowed(tx:Prisma.Transaction
     const source=getScaleInstrumentSource(row.code,row.instrument_version)
     return source?[scaleSourcePolicyIdentity(source)]:[]
    })
-   await lockToolPolicyAdmission(tx,identities)
+   await prefetchToolPolicyAdmission(tx,identities,'TRAINING')
   }
   const checkedEntries=new Set<string>()
   for(const row of standard){

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks=vi.hoisted(()=>({policy:vi.fn()}))
 vi.mock('../../config/database',()=>({prisma:{}}))
-vi.mock('../../modules/assessment-governance/tool-entry-policy',()=>({assertToolEntryPolicy:mocks.policy,lockToolPolicyAdmission:vi.fn(async()=>undefined)}))
+vi.mock('../../modules/assessment-governance/tool-entry-policy',()=>({assertToolEntryPolicy:mocks.policy,prefetchToolPolicyAdmission:vi.fn(async()=>undefined)}))
 
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'

@@ -4,19 +4,37 @@ export type ToolEntryProduct='TRAINING'|'SURVEY'
 export type StandardCombinationEntryProduct=ToolEntryProduct|'SCHOOL'|'TEACHER'
 export type PolicyIdentity={resourceKey:string;fingerprint:string}
 export type ToolPolicy={decision:'PENDING'|'APPROVED'|'RETURNED';paused:boolean;version:number;reason:string}
-/** Tool-policy lock modes on the shared `survey-tool:<resourceKey>` advisory key.
- * ADMISSION_READ: transaction-scoped SHARED lock, taken before the policy row is
- * read and held to commit. Concurrent admissions do not block each other.
- * POLICY_MUTATION: transaction-scoped EXCLUSIVE lock. A writer waits for every
- * in-flight admission that already holds the shared lock, and while it waits or
- * holds the key, later shared requests queue behind it. So once a mutation has
- * committed and returned, no admission can still commit on the old policy.
- * Never cache the policy row: only the lock acquisition is de-duplicated, and
- * only inside one interactive transaction. */
+/** Tool-policy lock modes on the advisory key
+ * `survey-tool:<product>:<resourceKey>:<fingerprint>`, i.e. exactly one
+ * survey_tool_policies primary key, so a Survey policy writer never queues
+ * Training admissions (and vice versa).
+ * ADMISSION_READ: transaction-scoped SHARED lock on the admitting product's key,
+ * taken before the policy row is read FOR SHARE and held to commit. Concurrent
+ * admissions do not block each other.
+ * POLICY_MUTATION: transaction-scoped EXCLUSIVE lock on every product key the
+ * writer may change (all entry products unless the writer names one). A writer
+ * waits for every in-flight admission holding a shared key it writes, and later
+ * shared requests queue behind it. So once a mutation has committed and returned,
+ * no admission can still commit on the old policy. The advisory key also
+ * serializes the PENDING->APPROVED insert race when no row exists yet.
+ * Row cache: an ADMISSION_READ row is read at most once per interactive
+ * transaction. It is safe because the shared key plus FOR SHARE are held to
+ * commit, so no other writer can commit a change first; a mutation lock taken by
+ * the same transaction drops the cache. Never cached for the global client. */
 export type ToolPolicyLock=false|'ADMISSION_READ'|'POLICY_MUTATION'
 type HeldMode='SHARED'|'EXCLUSIVE'
+export const ALL_ENTRY_PRODUCTS:readonly StandardCombinationEntryProduct[]=['SCHOOL','SURVEY','TEACHER','TRAINING']
 const heldToolPolicyLocks=new WeakMap<object,Map<string,HeldMode>>()
-const toolPolicyLockKey=(identity:PolicyIdentity)=>'survey-tool:'+identity.resourceKey
+const admittedPolicyRows=new WeakMap<object,Map<string,ToolPolicy>>()
+export const toolPolicyLockKey=(identity:PolicyIdentity,product:StandardCombinationEntryProduct)=>'survey-tool:'+product+':'+identity.resourceKey+':'+identity.fingerprint
+const rowKey=(identity:PolicyIdentity,product:StandardCombinationEntryProduct)=>product+'\u0000'+identity.resourceKey+'\u0000'+identity.fingerprint
+const pending=(product:string):ToolPolicy=>({decision:'PENDING',paused:false,version:0,reason:product+' 入口尚未获准'})
+function rowCache(tx:Prisma.TransactionClient){
+ if(typeof (tx as {$transaction?:unknown}).$transaction==='function')return null
+ let rows=admittedPolicyRows.get(tx)
+ if(!rows){rows=new Map();admittedPolicyRows.set(tx,rows)}
+ return rows
+}
 /** Interactive transaction clients have no `$transaction`. The global client
  * runs each statement in its own implicit transaction, so never de-duplicate it. */
 function heldLocks(tx:Prisma.TransactionClient){
@@ -25,14 +43,14 @@ function heldLocks(tx:Prisma.TransactionClient){
  if(!held){held=new Map();heldToolPolicyLocks.set(tx,held)}
  return held
 }
-function sortedKeys(identities:readonly PolicyIdentity[]){
- return [...new Set(identities.map(toolPolicyLockKey))].sort()
+function sortedKeys(identities:readonly PolicyIdentity[],products:readonly StandardCombinationEntryProduct[]){
+ return [...new Set(identities.flatMap(identity=>products.map(product=>toolPolicyLockKey(identity,product))))].sort()
 }
 /** SHARED admission lock for every identity, each key at most once per
  * transaction, multiple keys in one statement in sorted key order. */
-export async function lockToolPolicyAdmission(tx:Prisma.TransactionClient,identities:readonly PolicyIdentity[]){
+export async function lockToolPolicyAdmission(tx:Prisma.TransactionClient,identities:readonly PolicyIdentity[],product:StandardCombinationEntryProduct){
  const held=heldLocks(tx)
- const keys=sortedKeys(identities).filter(key=>!held?.has(key))
+ const keys=sortedKeys(identities,[product]).filter(key=>!held?.has(key))
  if(!keys.length)return
  if(keys.length===1)await tx.$executeRaw`SELECT pg_advisory_xact_lock_shared(hashtext(${keys[0]}))`
  else await tx.$executeRaw`SELECT count(pg_advisory_xact_lock_shared(hashtext(k))) FROM unnest(${keys}::text[]) WITH ORDINALITY AS t(k,n)`
@@ -41,20 +59,48 @@ export async function lockToolPolicyAdmission(tx:Prisma.TransactionClient,identi
 /** EXCLUSIVE mutation lock, sorted key order, each key at most once per
  * transaction. A shared key already held by this transaction is still upgraded:
  * no current mutator reads its own key as an admission first. */
-export async function lockToolPolicyMutation(tx:Prisma.TransactionClient,identities:readonly PolicyIdentity[]){
+export async function lockToolPolicyMutation(tx:Prisma.TransactionClient,identities:readonly PolicyIdentity[],products:readonly StandardCombinationEntryProduct[]=ALL_ENTRY_PRODUCTS){
  const held=heldLocks(tx)
- for(const key of sortedKeys(identities)){
+ admittedPolicyRows.delete(tx)
+ for(const key of sortedKeys(identities,products)){
   if(held?.get(key)==='EXCLUSIVE')continue
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${key}))`
   held?.set(key,'EXCLUSIVE')
  }
 }
 export async function readToolPolicy(tx:Prisma.TransactionClient,identity:PolicyIdentity,lock:ToolPolicyLock=false,product:StandardCombinationEntryProduct='SURVEY'):Promise<ToolPolicy>{
- if(lock==='ADMISSION_READ')await lockToolPolicyAdmission(tx,[identity])
- else if(lock==='POLICY_MUTATION')await lockToolPolicyMutation(tx,[identity])
+ if(lock==='ADMISSION_READ'){
+  const cached=rowCache(tx)?.get(rowKey(identity,product))
+  if(cached)return {...cached}
+  await prefetchToolPolicyAdmission(tx,[identity],product)
+  return {...rowCache(tx)?.get(rowKey(identity,product))??await readAdmissionRow(tx,identity,product)}
+ }
+ if(lock==='POLICY_MUTATION')await lockToolPolicyMutation(tx,[identity],[product])
  const rows=await tx.$queryRaw<ToolPolicy[]>(Prisma.sql`SELECT decision,paused,version,reason FROM survey_tool_policies
   WHERE product=${product} AND resource_key=${identity.resourceKey} AND fingerprint=${identity.fingerprint} ${lock?Prisma.sql`FOR SHARE`:Prisma.empty}`)
  return rows[0]??{decision:'PENDING',paused:false,version:0,reason:product+' 入口尚未获准'}
+}
+async function readAdmissionRow(tx:Prisma.TransactionClient,identity:PolicyIdentity,product:StandardCombinationEntryProduct){
+ const rows=await tx.$queryRaw<ToolPolicy[]>(Prisma.sql`SELECT decision,paused,version,reason FROM survey_tool_policies
+  WHERE product=${product} AND resource_key=${identity.resourceKey} AND fingerprint=${identity.fingerprint} FOR SHARE`)
+ return rows[0]??pending(product)
+}
+/** ADMISSION_READ for many identities: shared keys in one sorted statement, then
+ * every not-yet-read row in one FOR SHARE query, cached to commit (see above). */
+export async function prefetchToolPolicyAdmission(tx:Prisma.TransactionClient,identities:readonly PolicyIdentity[],product:StandardCombinationEntryProduct){
+ await lockToolPolicyAdmission(tx,identities,product)
+ const cache=rowCache(tx)
+ if(!cache)return
+ const missing=[...new Map(identities.filter(i=>!cache.has(rowKey(i,product))).map(i=>[rowKey(i,product),i])).values()]
+ if(!missing.length)return
+ const rows=missing.length===1
+  ?[{resource_key:missing[0].resourceKey,fingerprint:missing[0].fingerprint,...await readAdmissionRow(tx,missing[0],product)}]
+  :await tx.$queryRaw<Array<ToolPolicy&{resource_key:string;fingerprint:string}>>(Prisma.sql`SELECT resource_key,fingerprint,decision,paused,version,reason FROM survey_tool_policies
+   WHERE product=${product} AND (resource_key,fingerprint) IN (${Prisma.join(missing.map(i=>Prisma.sql`(${i.resourceKey},${i.fingerprint})`))}) ORDER BY resource_key,fingerprint FOR SHARE`)
+ for(const i of missing){
+  const r=rows.find(r=>r.resource_key===i.resourceKey&&r.fingerprint===i.fingerprint)
+  cache.set(rowKey(i,product),r?{decision:r.decision,paused:r.paused,version:r.version,reason:r.reason}:pending(product))
+ }
 }
 /** Current list hints only, never an authority cache or an action proof. */
 export async function readToolPolicies(tx:Prisma.TransactionClient,identities:readonly PolicyIdentity[],product:StandardCombinationEntryProduct='SURVEY'){
