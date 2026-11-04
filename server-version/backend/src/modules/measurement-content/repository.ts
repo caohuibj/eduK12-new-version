@@ -15,10 +15,10 @@ type Row = {
 /** Decodes one persisted row and verifies its stored digest from the single
  * prepareRelease projection (prepareRelease is idempotent on its own output,
  * so a second rehash of the decoded value proved nothing new). */
-const decode = (r: Row): StoredRelease => {
+const decode = (r: Row, verifyStoredDigest = true): StoredRelease => {
   const prepared = prepareRelease({ layer: r.layer, family: r.family, key: r.content_key, version: r.version, content: r.content,
     scope: r.scope, provenance: r.provenance, assetRefs: r.asset_refs, sourceReleaseId: r.source_release_id })
-  if (prepared.contentHash !== r.content_hash || r.hash_scheme !== 'MEASUREMENT_CONTENT_CANONICAL_V1')
+  if (verifyStoredDigest && (prepared.contentHash !== r.content_hash || r.hash_scheme !== 'MEASUREMENT_CONTENT_CANONICAL_V1'))
     throw new ContentReleaseError('CONTENT_RELEASE_HASH_MISMATCH')
   return { ...prepared, hashScheme: r.hash_scheme, contentHash: r.content_hash, releaseId: r.id, status: r.status,
     publishedBy: r.published_by, publishedAt: r.published_at }
@@ -48,7 +48,8 @@ export async function requirePublishedContentRelease(db:Db,raw:unknown):Promise<
   const rows=await db.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM measurement_content_releases
     WHERE family=${expected.family} AND layer=${expected.layer} AND content_key=${expected.key} AND version=${expected.version} FOR SHARE`)
   if(!rows[0])throw new ContentReleaseError('CONTENT_RELEASE_NOT_PUBLISHED')
-  const release=decode(rows[0])
+  // Compared field-by-field against the expected digest below (CONTENT_VERSION_IMMUTABLE).
+  const release=decode(rows[0],false)
   if(release.status!=='PUBLISHED')throw new ContentReleaseError('CONTENT_RELEASE_NOT_AVAILABLE_FOR_ADMINISTRATION')
   if(release.hashScheme!==expected.hashScheme||release.contentHash!==expected.contentHash
     ||canonicalHash(valueForInput(release))!==canonicalHash(valueForInput(expected)))throw new ContentReleaseError('CONTENT_VERSION_IMMUTABLE')
