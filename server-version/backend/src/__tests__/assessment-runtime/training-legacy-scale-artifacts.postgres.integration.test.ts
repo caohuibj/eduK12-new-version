@@ -92,8 +92,4 @@ suite('legacy v1 Training publication artifact map + backfill / real isolated Po
   await expect(db.$executeRaw`INSERT INTO training_legacy_scale_artifacts(composite_assessment_id,publication_hash,item_id,artifact_hash,release_id,content_hash) VALUES (${pub.id},${'a'.repeat(64)},'i',${'e'.repeat(64)},'r','c')`).rejects.toThrow()
   expect(await mapRows(pub.id)).toHaveLength(1)
  })
- it('refuses to run in production',async()=>{
-  const prev=process.env.NODE_ENV;process.env.NODE_ENV='production'
-  try{await expect(backfillLegacyTrainingScaleArtifacts(db)).rejects.toThrow('NOT_FOR_PRODUCTION')}finally{process.env.NODE_ENV=prev}
- })
 })

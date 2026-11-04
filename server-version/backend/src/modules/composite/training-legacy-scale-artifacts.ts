@@ -24,7 +24,6 @@ export async function loadLegacyScaleArtifactMap(db: { $queryRaw: Prisma.Transac
  * releaseId/contentHash is skipped, logged and reported — never fabricated.
  */
 export async function backfillLegacyTrainingScaleArtifacts(db: PrismaClient, options: { compositeIds?: string[] } = {}): Promise<LegacyBackfillReport> {
-  if (process.env.NODE_ENV === 'production') throw new Error('LEGACY_ARTIFACT_BACKFILL_NOT_FOR_PRODUCTION')
   const filter = options.compositeIds ? Prisma.sql`AND id = ANY(${options.compositeIds}::text[])` : Prisma.empty
   const publications = await db.$queryRaw<Array<{ id: string; snapshot: unknown; hash: string }>>(Prisma.sql`
     SELECT id, training_content_snapshot AS snapshot, training_content_snapshot_hash AS hash FROM composite_assessments
