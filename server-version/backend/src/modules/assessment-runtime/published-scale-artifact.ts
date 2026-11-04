@@ -4,7 +4,7 @@ import { canonicalHash, canonicalJsonBytes, retainImmutableCanonicalValue } from
 import { BoundedArtifactCache } from './bounded-artifact-cache'
 import { encryptUnifiedRuntimePayload, decryptUnifiedRuntimePayload } from './security'
 import { createFrozenScaleRuntimeSnapshot } from './runtime-snapshot'
-import { sharedScaleArtifactRepositoryForDatabase, type SharedScaleArtifactDb, type SharedScaleArtifactRecord } from './shared-scale-runtime'
+import { type SharedScaleArtifactDb, type SharedScaleArtifactRecord } from './shared-scale-runtime'
 import type { FrozenScaleInstruction } from './frozen-scale-instruction'
 import { frozenScalePresentationSchema, type FrozenScalePresentation } from '../scale/scale-presentation'
 import type { ScaleDefinitionV2 } from '../scale/scale-definition'
@@ -64,21 +64,19 @@ export function decodePublishedScaleArtifact(row: SharedScaleArtifactRecord, exp
   if (bytes.length !== body.plaintextBytes) throw new Error('Published Scale artifact size mismatch')
   const artifact = publishedScaleArtifactSchema.parse(JSON.parse(bytes.toString("utf8"))) as unknown as PublishedScaleArtifact
   if (publishedScaleArtifactHash(artifact) !== expectedHash) throw new Error('Published Scale artifact hash mismatch')
-  // Recompile from the stored definition: the compiled runtime must be exactly
-  // what this code would compile today, otherwise fail closed.
-  const recompiled = buildPublishedScaleArtifact({ instrumentKey: artifact.instrumentKey, instrumentVersion: artifact.instrumentVersion,
-    definition: artifact.definition, instruction: artifact.instruction, measurementPresentation: artifact.measurementPresentation, release: artifact.release })
-  if (recompiled.hash !== expectedHash) throw new Error('Published Scale artifact compile mismatch')
+  // Integrity is the content hash (pinned by the immutable publication) over the
+  // authenticated envelope. Do NOT recompile on read: published Training freezes
+  // the compiled runtime at publish, and a later compiler change must neither
+  // reject nor silently alter untampered published content.
   return retainImmutableCanonicalValue(artifact)
 }
 
-/** Append inside the publishing transaction, then read back and verify. */
+/** Append inside the publishing transaction. The hash is the primary key and
+ * the content address, so a conflict means identical content already exists. */
 export async function appendPublishedScaleArtifact(db: SharedScaleArtifactDb, built: ReturnType<typeof buildPublishedScaleArtifact>): Promise<PublishedScaleArtifactRef> {
-  const repository = sharedScaleArtifactRepositoryForDatabase(db)
-  await repository.insert(built.record)
-  const row = await repository.find(built.hash)
-  if (!row) throw new Error('Published Scale artifact missing after append')
-  decodePublishedScaleArtifact(row, built.hash)
+  const r = built.record
+  await db.$queryRaw`INSERT INTO assessment_runtime_artifacts (artifact_hash, format_version, plaintext_bytes, payload_encrypted)
+    VALUES (${r.artifactHash}, ${r.formatVersion}, ${r.plaintextBytes}, ${r.payloadEncrypted}) ON CONFLICT (artifact_hash) DO NOTHING RETURNING artifact_hash`
   return { formatVersion: 3, hash: built.hash }
 }
 

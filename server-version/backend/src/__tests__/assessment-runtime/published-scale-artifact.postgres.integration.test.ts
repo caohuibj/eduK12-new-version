@@ -7,7 +7,10 @@ import {publishContentRelease} from '../../modules/measurement-content/repositor
 import {scaleMeasurementRelease} from '../../modules/measurement-content/scale'
 import {compileResearchScale} from '../../modules/survey/builder.compiler'
 import {submit,review} from '../../modules/scale-library-governance/service'
-import {decodePublishedScaleArtifact,loadPublishedScaleArtifacts,buildPublishedScaleArtifact,appendPublishedScaleArtifact} from '../../modules/assessment-runtime/published-scale-artifact'
+import {decodePublishedScaleArtifact,loadPublishedScaleArtifacts,buildPublishedScaleArtifact,appendPublishedScaleArtifact,publishedScaleArtifactHash} from '../../modules/assessment-runtime/published-scale-artifact'
+import {gzipSync} from 'node:zlib'
+import {canonicalJsonBytes} from '../../modules/assessment-runtime/canonical'
+import {encryptUnifiedRuntimePayload} from '../../modules/assessment-runtime/security'
 import {trainingContentSnapshotSchema,assertTrainingSnapshotArtifacts} from '../../modules/composite/training-content-binding'
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
 let db:PrismaClient,admin:string,owner:string,project:string
@@ -85,6 +88,34 @@ suite('publish-time static Scale artifact (format 3) / real isolated PostgreSQL'
     instruction:artifact.instruction,release:artifact.release})
   await expect(db.$transaction(async tx=>{await appendPublishedScaleArtifact(tx,built);throw new Error('rollback')})).rejects.toThrow('rollback')
   expect(await row(built.hash)).toBeUndefined()
+ })
+ it('an untampered artifact compiled by an older/newer compiler still decodes as stored; decode never recompiles',async()=>{
+  const artifact=decodePublishedScaleArtifact(await row(published.hash),published.hash)
+  // Simulate a compiler change: same definition, a different compiledRuntime.
+  const other={...artifact,instrumentKey:artifact.instrumentKey+'-cc',compiledRuntime:{...artifact.compiledRuntime,compilerGeneration:'other'}}
+  const bytes=canonicalJsonBytes(other),hash=publishedScaleArtifactHash(other)
+  const record={artifactHash:hash,formatVersion:3,plaintextBytes:bytes.length,payloadEncrypted:encryptUnifiedRuntimePayload({kind:'SCALE_PUBLISHED_STATIC',storageVersion:3,
+    artifactHash:hash,codec:'gzip-json-v1',plaintextBytes:bytes.length,data:gzipSync(bytes).toString('base64')})}
+  const decoded=decodePublishedScaleArtifact(record,hash)
+  expect(decoded.compiledRuntime).toEqual(other.compiledRuntime)
+  expect(()=>decodePublishedScaleArtifact(record,published.hash)).toThrow()
+ })
+ it('an uncommitted format-3 append does not block an unrelated artifact write',async()=>{
+  const artifact=decodePublishedScaleArtifact(await row(published.hash),published.hash)
+  const built=buildPublishedScaleArtifact({instrumentKey:artifact.instrumentKey+'-lk',instrumentVersion:artifact.instrumentVersion,definition:artifact.definition,
+    instruction:artifact.instruction,release:artifact.release})
+  let release!:()=>void;const held=new Promise<void>(r=>{release=r})
+  let appended!:()=>void;const ready=new Promise<void>(r=>{appended=r})
+  const txA=db.$transaction(async tx=>{await appendPublishedScaleArtifact(tx,built);appended();await held},{timeout:20000})
+  await ready
+  const t0=Date.now()
+  const other='c'.repeat(63)+'1'
+  const {sharedScaleArtifactRepositoryForDatabase}=await import('../../modules/assessment-runtime/shared-scale-runtime')
+  await db.$transaction(async tx=>{await tx.$executeRaw`SET LOCAL lock_timeout='1500ms'`
+    await expect(sharedScaleArtifactRepositoryForDatabase(tx).insert({artifactHash:other,formatVersion:1,plaintextBytes:1,payloadEncrypted:'x'})).resolves.toBeDefined()
+    throw new Error('rollback')}).catch(e=>{if(e.message!=='rollback')throw e})
+  expect(Date.now()-t0).toBeLessThan(1500)
+  release();await txA
  })
  it('the v2 completeness rule rejects a missing or stray artifact reference',()=>{
   const {snapshot}=published,unit=snapshot.units[0]

@@ -224,6 +224,10 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     /** Content facts from an actual immutable education unit, never authority.
      * The owning START layer verifies current U and DB seal containment. */
     sealedLibraryPresentation?: {entryId:string;sourceDefinitionHash:string;presentation:FrozenScalePresentation}
+    /** Verified, hash-bound publish-time static content (format 3). When set,
+     * definition, compiled runtime, instruction and library presentation come
+     * only from it; reference bindings, deployment and policy stay live. */
+    publishedArtifact?: import('./published-scale-artifact').PublishedScaleArtifact
   },
 ): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
   assertAssessmentStartResources()
@@ -236,7 +240,10 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     version: input.instrumentVersion,
   })
 
-  const { definition, compiledRuntime } = prepareScale(input)
+  const artifact = input.publishedArtifact
+  const { definition, compiledRuntime } = artifact
+    ? { definition: artifact.definition, compiledRuntime: artifact.compiledRuntime }
+    : prepareScale(input)
   const referenceBindings = await freezeExactReferenceBindings(db, {
     instrumentType: 'SCALE',
     instrumentKey: input.instrumentKey,
@@ -249,7 +256,7 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     compiledRuntime,
     referenceBindings,
     frozenAt: input.frozenAt,
-    instruction: input.instruction,
+    instruction: artifact ? artifact.instruction : input.instruction,
   })
 
   // Production Prisma clients expose Scale. Lightweight unit doubles used by
@@ -278,7 +285,10 @@ export const freezeScaleRuntimeAtAttemptStart = async (
   if (!scale) throw new Error('Scale new start denied: DEPLOYMENT_SCALE_MISSING')
   if (scale.instrumentVersion !== input.instrumentVersion) throw new Error('Scale new start denied: DEPLOYMENT_VERSION_CONFLICT')
 
-  if (scale.libraryEntryId) {
+  if (artifact) {
+    const presentation = artifact.measurementPresentation
+    if (presentation) { v1.measurementPresentation = presentation; v1.snapshotHash = hashFrozenScaleRuntimeSnapshot(v1) }
+  } else if (scale.libraryEntryId) {
     if(input.sealedLibraryPresentation){
       const source=input.sealedLibraryPresentation,presentation=frozenScalePresentationSchema.parse(source.presentation)
       if(scale.libraryEntryId!==source.entryId||scale.measurementReleaseId!==presentation.releaseId||v1.sourceDefinitionHash!==source.sourceDefinitionHash)
