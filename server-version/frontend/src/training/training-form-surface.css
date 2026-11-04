@@ -1,5 +1,8 @@
 /* Opt-in ordinary Form surfaces only. Never applied to a timed runner ancestor. */
-.training-form-surface,
+.training-form-surface {
+  color: var(--training-ink, #1f403b);
+  background: var(--training-paper, #f8f5ee);
+}
 .hui-training.hui-app--standard.training-workspace-shell .training-form-management {
   --training-paper: #f8f5ee;
   --training-surface: #fffdf9;
@@ -22,20 +25,24 @@
   color: var(--training-ink);
 }
 .training-form-surface .form-player input,
-.training-form-surface .form-player textarea {
+.training-form-surface .form-player textarea,
+.training-form-surface .form-player select {
   accent-color: var(--training-bamboo);
+  color: var(--training-ink);
+  background: var(--training-input, var(--training-surface, #fffdf9));
+  border-color: var(--training-border, #dce3d8);
 }
 .training-form-surface .form-player label:has(input:checked) {
   border-color: var(--training-bamboo);
-  background: #edf3ec;
+  background: color-mix(in srgb, var(--training-bamboo) 12%, var(--training-surface, #fffdf9));
 }
 .training-form-surface .bg-blue-700,
 .training-form-surface .btn-primary {
   background: var(--training-bamboo);
-  color: #fffdf9;
+  color: var(--training-on-accent, #fffdf9);
 }
 .training-form-surface .form-player-skip {
-  border-color: #60736a;
+  border-color: var(--training-muted, #60736a);
   color: var(--training-ink);
   margin-left: auto;
   order: 1;
@@ -53,8 +60,40 @@
 }
 
 .training-form-report .report-metric {
-  background: #fffdf9;
-  border-color: #dce3d8;
-  color: #1f403b;
+  background: var(--training-surface, #fffdf9);
+  border-color: var(--training-border, #dce3d8);
+  color: var(--training-ink, #1f403b);
   overflow-wrap: anywhere;
+}
+
+@media screen {
+  .hui-training[data-training-theme="dark"] .training-form-surface :is(.text-slate-500, .text-slate-600, .text-gray-500, .text-gray-600) {
+    color: var(--training-muted, #b8c8bc);
+  }
+  .hui-training[data-training-theme="dark"] .training-form-surface :is(.text-slate-900, .text-gray-800) {
+    color: var(--training-ink, #e5e9df);
+  }
+  .hui-training[data-training-theme="dark"] .training-form-surface .text-red-500 {
+    color: var(--hui-ds-color-danger, #f0a79b);
+  }
+  .hui-training[data-training-theme="dark"] .training-form-surface .border-slate-200 {
+    border-color: var(--training-border, #354339);
+  }
+  .hui-training[data-training-theme="dark"] .training-form-surface .bg-slate-100 {
+    background: var(--training-raised, #253029);
+  }
+  .hui-training[data-training-theme="dark"] .training-form-report .report-metric {
+    background: var(--training-raised, #253029);
+    border-color: var(--training-border, #354339);
+    color: var(--training-ink, #e5e9df);
+  }
+  .hui-training[data-training-theme="dark"] .training-form-report .report-metric .text-gray-600 {
+    color: var(--training-muted, #b8c8bc);
+  }
+  .hui-training[data-training-theme="dark"] .training-form-report .report-metric .text-gray-800 {
+    color: var(--training-ink, #e5e9df);
+  }
+  .hui-training[data-training-theme="dark"] .hui-report [data-testid="composite-report-supporting"] .report-details__body {
+    color: var(--training-ink, #e5e9df);
+  }
 }

@@ -100,6 +100,9 @@ const CompositeReportContent: React.FC = () => {
   const legacyModules = (report as (CompositeReport & { modules?: LegacyCompositeModule[] }) | null)?.modules || []
   const unitReports = (report?.unitReports || legacyModules).filter((module) => module.type !== 'FORM') as CompositeReport['unitReports']
   const backgroundValues = report?.backgroundValues || legacyModules.filter((module) => module.type === 'FORM')
+  const trainingFormOnlyReport = isTrainingHost() && !teacherMode && !publicMode && !partial &&
+    report !== null && report.reportState !== 'PARTIAL' && !report.bundleReport && !report.packageReport &&
+    unitReports.length === 0 && backgroundValues.length > 0
   const shouldLoadSnapshots = staffMode && !report?.bundleReport && Boolean(report?.packageReport || selectedSnapshotId)
 
   const loadReportImage = useCallback(async (assetId: string) => {
@@ -388,15 +391,17 @@ const CompositeReportContent: React.FC = () => {
   const compactLearnerReport = (isTrainingHost() && !staffMode && !publicMode) || unitReports.some(unit => unit.type === 'SCALE')
   const singleLearnerUnit = compactLearnerReport && unitReports.length === 1 && !report.bundleReport && !report.packageReport ? unitReports[0] : null
   const singleLearnerTitle = singleLearnerUnit ? (singleLearnerUnit.type === 'SCALE' ? singleLearnerUnit.scaleName : singleLearnerUnit.label || singleLearnerUnit.type) : null
-  const personalChanges = isTrainingHost()&&!staffMode&&!publicMode&&!partial&&attemptId&&user?.id&&report.reportState!=='PARTIAL'
+  const personalChanges = isTrainingHost()&&!staffMode&&!publicMode&&!partial&&attemptId&&user?.id&&report !== null&&report.reportState!=='PARTIAL'&&unitReports.length>0
     ? <TrainingPersonalChanges attemptId={attemptId} actorId={user.id} checkAvailability/> : null
 
   return (
     <ReportShell
       title={singleLearnerTitle || report.name}
-      description={singleLearnerUnit && report.reportState !== 'PARTIAL' ? undefined : report.reportState === 'PARTIAL' ? '作答尚未全部完成。这里只读展示已完成单项的冻结结果，不生成整体报告。' : report.productKind === 'ASSESSMENT_BUNDLE' ? '综合报告结合各项冻结结果，以下同时保留单项反馈。' : '以下按内容顺序展示各项测评的独立结果。'}
+      description={(trainingFormOnlyReport || (singleLearnerUnit && report.reportState !== 'PARTIAL')) ? undefined : report.reportState === 'PARTIAL' ? '作答尚未全部完成。这里只读展示已完成单项的冻结结果，不生成整体报告。' : report.productKind === 'ASSESSMENT_BUNDLE' ? '综合报告结合各项冻结结果，以下同时保留单项反馈。' : '以下按内容顺序展示各项测评的独立结果。'}
       facts={compactLearnerReport ? [] : facts}
-      status={compactLearnerReport && !submittedNotSatisfied ? undefined : { kind: submittedNotSatisfied ? 'info' : 'success', title: submittedNotSatisfied ? '已交卷，任务未达成' : '已提交', description: submittedNotSatisfied ? '本次作答已保存并计入作答次数；任务条件未达成，仍可查看本次报告。' : '本次作答已提交，测评结果如下。' }}
+      status={trainingFormOnlyReport
+        ? { kind: 'success', title: '已提交' }
+        : compactLearnerReport && !submittedNotSatisfied ? undefined : { kind: submittedNotSatisfied ? 'info' : 'success', title: submittedNotSatisfied ? '已交卷，任务未达成' : '已提交', description: submittedNotSatisfied ? '本次作答已保存并计入作答次数；任务条件未达成，仍可查看本次报告。' : '本次作答已提交，测评结果如下。' }}
       backAction={<button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">{learner.enabled ? learner.backLabel : '返回'}</button>}
     >
       {snapshotControls}
