@@ -3,6 +3,7 @@ import express from 'express'
 import type { Server } from 'node:http'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { prisma } from '../../config/database'
+import { surveyStartKeys } from '../integration/survey-test-keys'
 import { requireIsolatedReleaseDatabase, integrationDatabaseUrl } from '../integration/integration-env'
 import { createDraft, updateDraft } from '../../modules/survey/builder.service'
 import { createWave, getWave } from '../../modules/survey/waves.service'
@@ -63,7 +64,7 @@ suite('Survey generated group snapshot / real HTTP and PostgreSQL', () => {
     await prepareWave(ownerId, projectId, waveId, wave.revision)
     const prepared = await getWave(ownerId, projectId, waveId), opened = await openWave(ownerId, projectId, waveId, prepared.revision)
     for (const [hours, activities] of [[0, ['read', 'talk']], [2, ['read']]] as const) {
-      const participant = await startSingleUnlinkedWave({ publicId: opened.publicId, waveId, entryToken: opened.entrySecret, consentVersion: 1, consent: true })
+      const participant = await startSingleUnlinkedWave({ ...surveyStartKeys('group-report'), publicId: opened.publicId, waveId, entryToken: opened.entrySecret, consentVersion: 1, consent: true })
       const task = await getOwnResearchTask({ publicId: opened.publicId, attemptId: participant.attemptId, accessCredential: participant.accessCredential })
       await submitResearchFinal({ publicId: opened.publicId, attemptId: participant.attemptId, accessCredential: participant.accessCredential, submissionId: randomUUID(),
         answers: { [task.units[0].instrumentKey]: { hours, activities: [...activities] } } })

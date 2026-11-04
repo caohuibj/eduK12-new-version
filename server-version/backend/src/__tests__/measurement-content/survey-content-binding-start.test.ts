@@ -30,10 +30,10 @@ describe('actual Survey START binding integration',()=>{
   it('binds anonymous START without treating the participant as author or exposing binding',async()=>{
     tx.$queryRaw.mockImplementation(async(query:TemplateStringsArray)=>query.join(' ').includes('"owner_user_id"')
       ?[{ownerUserId:'owner',status:'ACTIVE',collectionMode:'SINGLE_UNLINKED'}]:[{id:'owner'}])
-    const result=await startSingleUnlinkedWave({publicId,waveId:'wave',entryToken:'a'.repeat(43),consent:true,consentVersion:1})
+    const result=await startSingleUnlinkedWave({publicId,waveId:'wave',entryToken:'a'.repeat(43),consent:true,consentVersion:1,operationKey:'k'.repeat(43),accessCredential:'c'.repeat(43)})
     expect(m.allocate.mock.invocationCallOrder[0]).toBeLessThan(m.bind.mock.invocationCallOrder[0])
     expect(m.bind.mock.calls[0][1]).toEqual({projectId:'project',waveId:'wave',attemptId:'attempt',publicationId:'publication',newAttempt:true})
-    expect(result).toEqual({attemptId:'attempt',waveId:'wave',status:'STARTED',accessCredential:'a'.repeat(43)})
+    expect(result).toEqual({attemptId:'attempt',waveId:'wave',status:'STARTED',recovered:false,accessCredential:'c'.repeat(43)})
   })
   it('validates original linked recovery without allocation or backfill',async()=>{
     tx.surveyWaveAttempt.findFirst.mockResolvedValue({id:'prior',status:'STARTED'})

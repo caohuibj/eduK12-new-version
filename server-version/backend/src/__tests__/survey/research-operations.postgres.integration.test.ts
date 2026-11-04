@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
 import { beforeAll,afterAll,describe,expect,it } from 'vitest'
+import { surveyStartKeys } from '../integration/survey-test-keys'
 import type { Request } from 'express'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 import { publishSurveyMeasurementDraft } from '../../modules/survey/measurement-publication.service'
@@ -127,7 +128,7 @@ suite('Survey PR4 real PG: bounded quota, opt-in encrypted checkpoint, exact N',
   }) as unknown as Request
   it('atomically accepts exactly two participants, without leaking a third quota/Attempt',async()=>{
     const batch=await Promise.allSettled(Array.from({length:5},()=>
-      startSingleUnlinkedWave({publicId,waveId,entryToken,
+      startSingleUnlinkedWave({ ...surveyStartKeys('research-operations'),publicId,waveId,entryToken,
         consent:true,consentVersion:1})))
     const admitted=batch.filter((r):r is PromiseFulfilledResult<
       Awaited<ReturnType<typeof startSingleUnlinkedWave>>>=>r.status==='fulfilled')
