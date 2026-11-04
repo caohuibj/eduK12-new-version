@@ -2,7 +2,7 @@ import {randomUUID,createHash} from 'node:crypto'
 import {PrismaClient} from '@prisma/client'
 import {afterAll,beforeAll,describe,expect,it} from 'vitest'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integration/integration-env'
-import {scaleReferencedByPublishedContent} from '../../modules/scale/onboarding/materialize'
+import {scaleReferencedByPublishedContent,scaleMaterializeWritesProtectedFields} from '../../modules/scale/onboarding/materialize'
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
 const hex=(v:string)=>createHash('sha256').update(v).digest('hex')
 let db:PrismaClient,owner:string
@@ -32,6 +32,21 @@ suite('scale_published_reference_immutable / real isolated PostgreSQL',()=>{
     await db.scale.update({where:{id},data:{status:'DEPRECATED',tags:['x']}})
     const row=await db.scale.findUniqueOrThrow({where:{id}})
     expect(row).toMatchObject({instruction:'old',definitionHash:hex('d1'),status:'DEPRECATED'})
+  })
+  it('preflight flags a legacy NULL definition/definitionHash backfill that the trigger would reject',async()=>{
+    for(const legacy of [{definitionHash:null},{definition:null},{definition:null,definitionHash:null}]){
+      const id=await scale();await db.$executeRaw`UPDATE scales SET definition_hash=NULL WHERE id=${id} AND ${'definitionHash' in legacy}`
+      if('definition' in legacy) await db.$executeRaw`UPDATE scales SET definition=NULL WHERE id=${id}`
+      await composite(id,true)
+      const row=await db.scale.findUniqueOrThrow({where:{id}})
+      // Same content as the source: only the legacy backfill would write protected columns.
+      expect(scaleMaterializeWritesProtectedFields(row,{v:1},'old')).toBe(true)
+      expect(await scaleReferencedByPublishedContent(db,id)).toBe(true)
+      await expect(db.scale.update({where:{id},data:{definition:{v:1} as any,definitionHash:hex('d1')}})).rejects.toThrow(/SCALE_DEFINITION_REFERENCED/)
+    }
+    const full=await db.scale.findUniqueOrThrow({where:{id:await scale()}})
+    expect(scaleMaterializeWritesProtectedFields(full,{v:1},'old')).toBe(false)
+    expect(scaleMaterializeWritesProtectedFields(full,{v:1},undefined)).toBe(false)
   })
   it('leaves scales referenced only by unpublished drafts (or not at all) editable',async()=>{
     const draft=await scale();await composite(draft,false)

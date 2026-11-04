@@ -114,6 +114,7 @@ describe('frozen scale instruction content contract', () => {
     getScaleInstrumentSource.mockImplementation((_key: string, version: string) => source({ identity: { instrumentKey: 'nfc10_zh_cn', instrumentVersion: version } }))
     const { materializeScaleInstrumentContent } = await import('../../modules/scale/onboarding/materialize')
     const db = {
+      $queryRaw: vi.fn(async () => []),
       scale: {
         findUnique: vi.fn(async () => null),
         create: vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 'scale-1', ...data })),

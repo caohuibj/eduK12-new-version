@@ -6,7 +6,7 @@ import { randomUUID } from 'node:crypto'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { hashScaleDefinition } from '../scale-definition'
-import { materializeScaleInstrumentContent, scaleReferencedByPublishedContent } from './materialize'
+import { materializeScaleInstrumentContent, scaleReferencedByPublishedContent, scaleMaterializeWritesProtectedFields } from './materialize'
 import { getScaleInstrumentRuntimePolicy, getScaleInstrumentSource, getScaleInstrumentValidation } from './instrument-registry'
 import {
   evaluateScaleDeployment,
@@ -88,8 +88,7 @@ const resolvePlan = async (
     if (scale.definition && canonicalHash(scale.definition) !== canonicalHash(source.executable.definition) && !allowsScaleAxisRevision(scale.definition,source.executable.definition)) blockers.push('SCALE_DEFINITION_CONFLICT')
     if (scale.definitionHash && scale.definitionHash !== hashScaleDefinition(source.executable.definition)) blockers.push('SCALE_DEFINITION_CONFLICT')
     if (scale.status === 'DEPRECATED' || scale.status === 'ARCHIVED') blockers.push('SCALE_LIFECYCLE_BLOCKS_REACTIVATION')
-    const inPlaceRevision = (!!scale.definition && canonicalHash(scale.definition) !== canonicalHash(source.executable.definition))
-      || (!!source.instruction && (scale.instruction ?? null) !== source.instruction.text)
+    const inPlaceRevision = scaleMaterializeWritesProtectedFields(scale, source.executable.definition, source.instruction?.text)
     if (inPlaceRevision && await scaleReferencedByPublishedContent(db, scale.id)) blockers.push('SCALE_DEFINITION_REFERENCED')
   }
 
