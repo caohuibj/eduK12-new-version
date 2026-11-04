@@ -34,6 +34,7 @@ const db = (isAdmin = true) => {
   const definition = source.executable!.definition
   return {
     user: { findUnique: vi.fn(async () => ({ platformRole: isAdmin ? 'SYSTEM_ADMIN' : 'USER', isActive: true, isFrozen: false, expiresAt: null })) },
+    $queryRaw: vi.fn(async () => []),
     scale: { findUnique: vi.fn(async () => ({ id: 'synthetic-scale', instrumentClass: 'STANDARD', instrumentVersion: '1.0.0', definition, definitionHash: hashScaleDefinition(definition), status: 'DRAFT', visibility: 'HIDDEN' })) },
     assessmentReferenceSet: { findUnique: vi.fn(async () => ({ definition: source.executable!.references[0], status: source.executable!.references[0].status })) },
   }
