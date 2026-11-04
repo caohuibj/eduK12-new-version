@@ -60,6 +60,7 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
     if (scale.definition && canonicalHash(scale.definition) !== canonicalHash(executable.definition) && !allowsScaleAxisRevision(scale.definition,executable.definition)) throw new Error('SCALE_DEFINITION_CONFLICT')
     if (scale.definitionHash && scale.definitionHash !== definitionHash) throw new Error('SCALE_DEFINITION_CONFLICT')
     const revision=scale.definition && canonicalHash(scale.definition)!==canonicalHash(executable.definition)
+    if (scaleMaterializeWritesProtectedFields(scale, executable.definition, source.instruction?.text) && await scaleReferencedByPublishedContent(db, scale.id)) throw new Error('SCALE_DEFINITION_REFERENCED')
     if (!scale.definitionHash || !scale.definition || revision) {
       scale = await db.scale.update({
         where: { id: scale.id },
@@ -111,4 +112,22 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
     referenceUnchanged.push(reference.referenceVersion)
   }
   return { scale, created, definitionHash, referenceCreates, referenceUnchanged, instruction }
+}
+
+/** True when a published Training snapshot freezes this scale; such rows are immutable (DB trigger scale_published_reference_immutable). */
+export async function scaleReferencedByPublishedContent(db: { $queryRaw: Prisma.TransactionClient['$queryRaw'] }, scaleId: string): Promise<boolean> {
+  const rows = await db.$queryRaw<Array<{ one: number }>>(Prisma.sql`SELECT 1 AS one FROM composite_assessment_items i
+    JOIN composite_assessments c ON c.id=i.composite_assessment_id
+    WHERE i.scale_id=${scaleId} AND c.training_content_snapshot IS NOT NULL LIMIT 1`)
+  return rows.length > 0
+}
+
+/** True when materialize would write a column protected by scale_published_reference_immutable:
+ * a definition/instruction revision, or backfilling a legacy NULL definition/definitionHash.
+ * Preview and install both use this so the DB trigger is never the first to refuse. */
+export function scaleMaterializeWritesProtectedFields(scale: { definition: unknown; definitionHash: string | null; instruction: string | null },
+  definition: unknown, instructionText: string | undefined): boolean {
+  return !scale.definition || !scale.definitionHash
+    || canonicalHash(scale.definition) !== canonicalHash(definition)
+    || (instructionText !== undefined && (scale.instruction ?? null) !== instructionText)
 }
