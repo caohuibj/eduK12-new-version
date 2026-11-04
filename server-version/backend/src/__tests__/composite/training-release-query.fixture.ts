@@ -9,8 +9,21 @@ import { decryptCognitivePayload } from '../../modules/cognitive/cognitive.secur
  * remain real. This fixture is not evidence of PostgreSQL locking/concurrency. */
 export function trainingReleaseQueryFixture(currentComposite: () => Promise<any>) {
   let releases: any[] = []
+  // Content-addressed publish-time Scale artifacts (format 3), append-only.
+  const artifacts = new Map<string, any>()
   return async (query: any, ...args: unknown[]) => {
     const sql = Array.from(query.strings ?? query).join(' ')
+    const values: any[] = query.strings ? query.values : args
+    if (sql.includes('INSERT INTO assessment_runtime_artifacts')) {
+      const [artifactHash, formatVersion, plaintextBytes, payloadEncrypted] = values as any[]
+      if (artifacts.has(artifactHash)) return []
+      artifacts.set(artifactHash, { artifactHash, formatVersion, plaintextBytes, payloadEncrypted })
+      return [{ artifact_hash: artifactHash }]
+    }
+    if (sql.includes('FROM assessment_runtime_artifacts')) {
+      const wanted = ([] as any[]).concat(values[0])
+      return wanted.map(hash => artifacts.get(hash)).filter(Boolean)
+    }
     if (sql.includes('WITH scale_sources AS')) {
       const composite = await currentComposite()
       releases = []
@@ -39,7 +52,7 @@ export function trainingReleaseQueryFixture(currentComposite: () => Promise<any>
       })
     }
     if (sql.includes('SELECT * FROM measurement_content_releases')) {
-      const values = query.values ?? args
+      const values: any[] = query.strings ? query.values : args
       return releases.filter(row => values.includes(row.id))
     }
     return [] // Existing unit doubles: no library entries/stops; not a lock proof.
