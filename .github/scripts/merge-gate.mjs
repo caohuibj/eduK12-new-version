@@ -78,6 +78,8 @@ const acceptanceJobs = {
 export function requiredChecks(needs, draft) {
   if(needs.scope?.outputs?.application_route==='edge-config')return ['scope','edge-config'];
   const scope = needs.scope?.outputs ?? {};
+  if(scope.scenario==='ci-unit')return ['scope'];
+  if(scope.scenario==='ci-regression')return ['scope','backend-regression'];
   if(scope.application_route==='backend-unit')return ['scope','backend-unit'];
   if(scope.application_route==='cognitive-product')return draft?['scope']:['scope','cognitive-product','docker','codeql'];
   if(scope.scenario === 'catalog-discovery') return draft?['scope']:['scope','catalog-discovery','frontend','docker','codeql'];
@@ -179,7 +181,7 @@ export function failedChecks(needs, draft) {
   if(scope.image_build!==undefined&&(!['true','false'].includes(scope.image_build)
     ||scope.image_build==='true'&&scope.scenario!=='release-tooling'))failed.push('scope');
   const flags = ['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
-  const scenarios = {'catalog-discovery':['false','false','false','false'],backend:['false','false','false','false'], 'release-tooling':['false','false','false','false'], 'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
+  const scenarios = {'ci-unit':['false','false','false','false'],'ci-regression':['false','false','false','false'],'catalog-discovery':['false','false','false','false'],backend:['false','false','false','false'], 'release-tooling':['false','false','false','false'], 'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
     presentation: ['false','true','false','false'], frontend: ['false','false','true','false'], platform: ['false','false','false','false']};
   const expected = scenarios[scope.scenario];
   const requiresCodeql = ['catalog-discovery','platform','backend','dependencies','frontend','content-frontend','release-tooling'].includes(scope.scenario);
@@ -204,7 +206,9 @@ export function failedChecks(needs, draft) {
     || scope.media_groups !== JSON.stringify(selected.length ? mediaPlan(selected) : [])
     || (scope.scenario === 'platform' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'true'));
   if (scope.scenario === 'release-tooling' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'false')) failed.push('scope');
-  if (['backend','catalog-discovery'].includes(scope.scenario) && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'false')) failed.push('scope');
+  if (['backend','catalog-discovery','ci-unit','ci-regression'].includes(scope.scenario) && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'false')) failed.push('scope');
+  if (['ci-unit','ci-regression'].includes(scope.scenario) && (scope.codeql !== 'false' || scope.frontend_build !== 'false' || scope.application_route !== 'legacy'))
+    if (!failed.includes('scope')) failed.unshift('scope');
   if (scope.scenario === 'frontend-test' && (scope.codeql !== 'false'
     || Object.keys(acceptanceJobs).some(key => scope[key] !== 'false')))
     if (!failed.includes('scope')) failed.unshift('scope');
@@ -215,6 +219,14 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const needs = readNeeds();
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if (['ci-unit','ci-regression'].includes(needs.scope?.outputs?.scenario)) {
+    try {
+      const {changedEntries,ciToolingScenario}=await import('./content-scope.mjs');
+      if (process.env.CI_FORCE_FULL==='true' ||
+          ciToolingScenario(changedEntries(process.env.CI_BASE_SHA))!==needs.scope.outputs.scenario)
+        failed.push('recomputed-ci-tooling');
+    } catch { failed.push('recomputed-ci-tooling'); }
+  }
   if(needs.scope?.outputs?.application_route==='backend-unit'){
     try {const {changedEntries}=await import('./content-scope.mjs');
       if(!unitOnly(changedEntries(process.env.CI_BASE_SHA)))failed.push('recomputed-backend-unit-scope');
