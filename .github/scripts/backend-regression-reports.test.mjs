@@ -32,7 +32,7 @@ test('missing, overlapping, empty and malformed reports are refused',()=>{
     [report('a'),{...report('b'),numTotalTests:NaN}]])assert.throws(()=>mergeRegressionReports(reports));
 });
 
-test('four serial shards and the retained fixture lane cover the exact existing file inventory once',async()=>{
+test('six serial shards and the retained fixture lane cover the exact existing file inventory once',async()=>{
   const {globSync,readFileSync}=await import('node:fs');
   const {fileURLToPath}=await import('node:url');
   const {partitionRegressionFiles,regressionGroups,backendOwnedFile}=await import('./backend-regression-selection.mjs');
@@ -64,7 +64,12 @@ test('four serial shards and the retained fixture lane cover the exact existing 
 });
 
 test('weighted regression scheduling is deterministic, balanced and rejects invalid weights',async()=>{
-  const {scheduleWeightedRegressionShards,estimateRegressionFileMs}=await import('./backend-regression-selection.mjs');
+  const {scheduleWeightedRegressionShards,estimateRegressionFileMs,historicalRegressionFileMs,regressionWeightSources}=await import('./backend-regression-selection.mjs');
+  assert.equal(regressionWeightSources.length,3,'File weights use three full green runs');
+  assert.equal(new Set(regressionWeightSources).size,3);
+  assert.ok(Object.keys(historicalRegressionFileMs).length>=1300,'Missing recorded per-file observations');
+  const measured=Object.keys(historicalRegressionFileMs)[0];
+  assert.equal(estimateRegressionFileMs('src/__tests__/'+measured),historicalRegressionFileMs[measured]);
   const heavy=Array.from({length:6},(_,i)=>`src/__tests__/integration/slow-${i}.test.ts`);
   const light=Array.from({length:12},(_,i)=>`src/__tests__/utils/fast-${i}.test.ts`);
   const files=[...heavy,...light];
@@ -74,8 +79,8 @@ test('weighted regression scheduling is deterministic, balanced and rejects inva
   assert.deepEqual(first.map(group=>group.length),[3,3,3,3,3,3]);
   assert.deepEqual(first.flat().sort(),files.sort());
   assert.deepEqual(first.map(group=>group.filter(file=>file.includes('/integration/')).length),[1,1,1,1,1,1]);
-  assert.ok(estimateRegressionFileMs('src/__tests__/integration/a.test.ts')>estimateRegressionFileMs('src/__tests__/utils/b.test.ts'));
   assert.equal(estimateRegressionFileMs('src/__tests__/new-directory/a.test.ts'),3000);
+  assert.equal(estimateRegressionFileMs('src/__tests__/integration/nonexistent.test.ts'),3000,'Unknown files must not inherit a directory-average weight');
   assert.throws(()=>scheduleWeightedRegressionShards(files,()=>0),/Invalid regression scheduling weight/);
 });
 

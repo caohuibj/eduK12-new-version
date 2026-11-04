@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {globSync,writeFileSync} from 'node:fs';
+import {globSync,readFileSync,writeFileSync} from 'node:fs';
 import {matchesGlob,resolve} from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
@@ -12,33 +12,27 @@ export const regressionShardCount=6;
 export const regressionGroups=['fixtures',...Array.from({length:regressionShardCount},(_,i)=>`shard-${i+1}`)];
 export const backendOwnedFile='src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts';
 
-// Conservative directory averages from the last green PR #619 full run:
-// https://github.com/caohuibj/eduK12-new-version/actions/runs/41754088324
-// These are bounded inter-file wall-clock gaps from the serial Vitest logs,
-// not asserted per-file CPU times. Directories with fewer than three samples
-// use the 3s default. Weights affect only scheduling, never which tests run.
-export const historicalRegressionDirectoryMs=Object.freeze({
-  'admin-permissions':568, 'anonymous-study':1199, 'assessment-bundle':1286,
-  'assessment-context':1815, 'assessment-governance':2013, 'assessment-media':1455,
-  'assessment-policy':1157, 'assessment-reference':1061, 'assessment-relational':872,
-  'assessment-run':4103, 'assessment-runtime':1822, 'bundle-onboarding':3448,
-  'bundle-product':4537, 'campus':2209, 'cognitive':1252, 'cognitive-analysis':1587,
-  'composite':3576, 'config':500, 'controllers':1151, 'education-roster':2066,
-  'education-tools':3477, 'hotpath':2456, 'huiteacher':3910, 'integration':5814,
-  'measurement-content':2918, 'middleware':900, 'migration':500,
-  'parent-portal':1337, 'questionnaire':4755, 'reporting':2524, 'scale':1727,
-  'scale-library-governance':4000, 'security':890, 'services':701,
-  'situational':3074, 'survey':4364, 'training-analysis':2363, 'utils':500,
-  'workers':2552,
-});
-export const estimateRegressionFileMs=file=>{
-  const directory=file.slice('src/__tests__/'.length).split('/')[0];
-  return historicalRegressionDirectoryMs[directory]??3000;
-};
+// Auditable exact-file timing snapshot from three green complete CI runs.
+// File completion gaps approximate serial Vitest import + execution overhead;
+// the cap and median suppress transient log/runner noise. A newly introduced
+// test uses the conservative default, never an invented same-directory mean.
+const timingSnapshot=JSON.parse(readFileSync(new URL('../config/backend-regression-file-weights.json',import.meta.url),'utf8'));
+assert.equal(timingSnapshot.schema,1,'Unknown regression timing snapshot schema');
+assert.ok(Array.isArray(timingSnapshot.sourceRuns)&&timingSnapshot.sourceRuns.length>=3
+  &&new Set(timingSnapshot.sourceRuns).size===timingSnapshot.sourceRuns.length,'Timing snapshot needs three distinct full runs');
+assert.ok(timingSnapshot.weights&&typeof timingSnapshot.weights==='object'&&!Array.isArray(timingSnapshot.weights),'Missing regression file weights');
+for(const [file,ms] of Object.entries(timingSnapshot.weights)){
+  assert.ok(file.endsWith('.test.ts')&&!file.startsWith('/')&&!file.includes('..'),'Invalid regression timing file');
+  assert.ok(Number.isFinite(ms)&&ms>=200&&ms<=30000,'Invalid measured regression file weight');
+}
+export const regressionWeightSources=Object.freeze([...timingSnapshot.sourceRuns]);
+export const historicalRegressionFileMs=Object.freeze(timingSnapshot.weights);
+export const estimateRegressionFileMs=file=>
+  historicalRegressionFileMs[file.slice('src/__tests__/'.length)]??3000;
 
 // Deterministic longest-estimated-file-first allocation. Exact shard
 // capacities preserve the existing near-equal file counts while balancing
-// costly Postgres/import-heavy directories. Unknown files receive 3s.
+// expensive individual test files. Unknown files receive 3s.
 export function scheduleWeightedRegressionShards(files,weightOf=estimateRegressionFileMs){
   const weights=new Map(files.map(file=>{
     const weight=weightOf(file);
@@ -115,8 +109,12 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
   const expectedFiles=group==='fixtures'?[...files,...plan.special].sort():files;
   const execution={runId:process.env.GITHUB_RUN_ID??null,sha:process.env.GITHUB_SHA??null,attempt:Number(process.env.GITHUB_RUN_ATTEMPT)||null};
   writeFileSync(inventory,JSON.stringify({group,execution,expectedFiles,fullExpectedFiles:plan.expectedFiles},null,2)+'\n');
-  const estimatedSeconds=Math.round(files.reduce((sum,file)=>sum+estimateRegressionFileMs(file),0)/1000);
-  console.log(`Regression ${group}: ${files.length} serial main files${group==='fixtures'?`, plus ${plan.special.length} existing explicit consumers`:''}; predicted directory-weight ${estimatedSeconds}s`);
+  if(group==='fixtures'){
+    console.log(`Regression fixtures: ${files.length} serial main files, plus ${plan.special.length} existing explicit consumers; no runtime prediction (separate producer/consumer/restore phases)`);
+  }else{
+    const estimatedSeconds=Math.round(files.reduce((sum,file)=>sum+estimateRegressionFileMs(file),0)/1000);
+    console.log(`Regression ${group}: ${files.length} serial main files; estimated file-weight ${estimatedSeconds}s (not full job duration)`);
+  }
   const child=spawnSync(process.execPath,[resolve('node_modules/vitest/vitest.mjs'),'run',...files,
     '--no-file-parallelism','--reporter=default','--reporter=json',`--outputFile=${report}`],{stdio:'inherit',env:process.env});
   if(child.error)console.error(child.error);
