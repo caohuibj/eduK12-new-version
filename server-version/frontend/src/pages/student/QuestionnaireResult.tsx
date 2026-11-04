@@ -5,7 +5,7 @@ import apiClient, { sessionFetch } from '../../api/client'
 import ReportShell from '../../modules/reporting/ReportShell'
 import ScaleUnitReportCard from '../../modules/reporting/ScaleUnitReportCard'
 import type { CollectionQuestionnaireResponse } from '../../modules/reporting/types'
-import { ReportSection } from '../../modules/reporting/ReportPrimitives'
+import { ReportSection, ReportSupporting } from '../../modules/reporting/ReportPrimitives'
 import { apiErrorMessage } from '../../utils/apiErrorMessage'
 
 const formatTime = (ms: number) => {
@@ -83,25 +83,10 @@ const QuestionnaireResult: React.FC = () => {
 
   return (
     <ReportShell
-      title={result.questionnaireName}
-      description="各量表结果独立展示。"
-      facts={facts}
-      status={{ kind: 'success', title: '问卷已完成', description: '以下内容来自当前已完成结果记录。' }}
+      title={result.unitReports.length === 1 ? result.unitReports[0].scaleName : result.questionnaireName}
+      description={result.unitReports.length === 1 ? undefined : "各量表结果独立展示。"}
       backAction={<button type="button" onClick={() => navigate('/student/questionnaires')} className="hui-button hui-button--secondary">{learner.enabled ? learner.backLabel : '返回问卷列表'}</button>}
     >
-      {result.backgroundValues.length > 0 && (
-        <ReportSection title="表单回答" eyebrow="作答信息">
-          <div className="report-metric-grid">
-            {result.backgroundValues.map((item) => (
-              <div key={item.itemId} className="report-metric">
-                <div className="report-metric__label">{item.label || '表单项'}</div>
-                <div className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{item.displayValue ?? item.value ?? '—'}</div>
-              </div>
-            ))}
-          </div>
-        </ReportSection>
-      )}
-
       {result.unitReports.length > 1 && (
         <ReportSection title="报告目录" eyebrow="Scales" description="问卷内各量表保持独立评分、解释与 reference。">
           <nav className="report-module-index" aria-label="问卷量表目录">
@@ -110,10 +95,26 @@ const QuestionnaireResult: React.FC = () => {
         </ReportSection>
       )}
       {result.unitReports.map((report, index) => (
-        <ReportSection key={report.itemId || report.scaleId || index} id={`questionnaire-unit-${index}`} title={`量表 ${index + 1}: ${report.scaleName}`} eyebrow="Scale">
-          <ScaleUnitReportCard report={report} loadReportImage={loadReportImage} />
+        <ReportSection key={report.itemId || report.scaleId || index} id={`questionnaire-unit-${index}`} className={result.unitReports.length === 1 ? "report-single-unit" : undefined} title={`量表 ${index + 1}: ${report.scaleName}`} eyebrow="Scale">
+          <ScaleUnitReportCard report={report} loadReportImage={loadReportImage} compactMetadata />
         </ReportSection>
       ))}
+      <ReportSupporting facts={facts}>
+      {result.unitReports.length === 1 && <p>问卷：<span>{result.questionnaireName}</span></p>}
+      {result.backgroundValues.length > 0 && (
+        <section className="report-supporting__section"><h3>表单回答</h3>
+          <div className="report-metric-grid">
+            {result.backgroundValues.map((item) => (
+              <div key={item.itemId} className="report-metric">
+                <div className="report-metric__label">{item.label || '表单项'}</div>
+                <div className="mt-1 whitespace-pre-wrap text-sm">{item.displayValue ?? item.value ?? '—'}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      </ReportSupporting>
     </ReportShell>
   )
 }

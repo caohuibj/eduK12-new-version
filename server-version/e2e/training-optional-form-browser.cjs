@@ -60,6 +60,20 @@ function parseCsv(source) {
   if (row.length || value) { row.push(value); rows.push(row) }
   return rows
 }
+async function assertOptionalAnswersVisible(page) {
+  // The learner report keeps answers inside a native closed <details>; the
+  // staff report may retain the legacy expanded section.
+  const answers = page.getByTestId('composite-background-values')
+  await answers.waitFor({ state: 'attached', timeout: 30000 })
+  const supporting = page.getByTestId('composite-report-supporting')
+  if (await supporting.count()) {
+    assert.equal(await supporting.evaluate(node => node.open), false, 'supporting facts start collapsed')
+    await supporting.locator('summary').click()
+  }
+  const missing = answers.getByText('未作答', { exact: true })
+  await missing.first().waitFor({ state: 'visible' })
+  assert.equal(await missing.count(), 4, 'all four explicit null answers survive FINAL')
+}
 async function main() {
   const browser = await chromium.launch({ headless: true,
     ...(process.env.BROWSER_EXECUTABLE ? { executablePath: process.env.BROWSER_EXECUTABLE } : {}),
@@ -208,13 +222,11 @@ async function main() {
     await student.reload()
     const reportButton = student.getByRole('button', { name: '查看个人报告', exact: true })
     if (await reportButton.isVisible()) await reportButton.click()
-    await student.getByText('未作答', { exact: true }).first().waitFor()
-    assert.equal(await student.getByText('未作答', { exact: true }).count(), 4)
+    await assertOptionalAnswersVisible(student)
     await shots(student, 'student-report')
     await teacher.goto(base + '/composite-assessments/' + id + '/results')
     await teacher.getByRole('button', { name: '查看报告', exact: true }).first().click()
-    await teacher.getByText('未作答', { exact: true }).first().waitFor()
-    assert.equal(await teacher.getByText('未作答', { exact: true }).count(), 4)
+    await assertOptionalAnswersVisible(teacher)
     await shots(teacher, 'teacher-report')
     check('Both actual authenticated report pages retain four missing values')
     // The questionnaire page exposes JSON, not a CSV button. Exercise the existing

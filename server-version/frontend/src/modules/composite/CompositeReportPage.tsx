@@ -24,7 +24,8 @@ import type { CognitiveSingleTaskReport } from '../cognitive/types'
 import ReportShell from '../reporting/ReportShell'
 import ScaleUnitReportCard, { type SafeScaleUnitReport } from '../reporting/ScaleUnitReportCard'
 import SituationalReportCard, { type SituationalReportView } from '../reporting/SituationalReportCard'
-import { ReportSection } from '../reporting/ReportPrimitives'
+import { ReportDetails, ReportSection } from '../reporting/ReportPrimitives'
+import './composite-report-layout.css'
 
 const formStateLabels: Record<string, string> = { ANSWERED: '已回答', REFUSED: '明确拒答', SHOWN_MISSING: '已显示未填写', NOT_SHOWN: '未显示' }
 
@@ -384,21 +385,27 @@ const CompositeReportContent: React.FC = () => {
     ...(report.anonymousCode ? [{ label: '匿名编号', value: report.anonymousCode }] : []),
   ]
 
+  const compactLearnerReport = (isTrainingHost() && !staffMode && !publicMode) || unitReports.some(unit => unit.type === 'SCALE')
+  const singleLearnerUnit = compactLearnerReport && unitReports.length === 1 && !report.bundleReport && !report.packageReport ? unitReports[0] : null
+  const singleLearnerTitle = singleLearnerUnit ? (singleLearnerUnit.type === 'SCALE' ? singleLearnerUnit.scaleName : singleLearnerUnit.label || singleLearnerUnit.type) : null
+  const personalChanges = isTrainingHost()&&!staffMode&&!publicMode&&!partial&&attemptId&&user?.id&&report.reportState!=='PARTIAL'
+    ? <TrainingPersonalChanges attemptId={attemptId} actorId={user.id} checkAvailability/> : null
+
   return (
     <ReportShell
-      title={report.name}
-      description={report.reportState === 'PARTIAL' ? '作答尚未全部完成。这里只读展示已完成单项的冻结结果，不生成整体报告。' : report.productKind === 'ASSESSMENT_BUNDLE' ? '综合报告结合各项冻结结果，以下同时保留单项反馈。' : '以下按内容顺序展示各项测评的独立结果。'}
-      facts={facts}
-      status={{ kind: submittedNotSatisfied ? 'info' : 'success', title: submittedNotSatisfied ? '已交卷，任务未达成' : '已提交', description: submittedNotSatisfied ? '本次作答已保存并计入作答次数；任务条件未达成，仍可查看本次报告。' : '本次作答已提交，测评结果如下。' }}
+      title={singleLearnerTitle || report.name}
+      description={singleLearnerUnit && report.reportState !== 'PARTIAL' ? undefined : report.reportState === 'PARTIAL' ? '作答尚未全部完成。这里只读展示已完成单项的冻结结果，不生成整体报告。' : report.productKind === 'ASSESSMENT_BUNDLE' ? '综合报告结合各项冻结结果，以下同时保留单项反馈。' : '以下按内容顺序展示各项测评的独立结果。'}
+      facts={compactLearnerReport ? [] : facts}
+      status={compactLearnerReport && !submittedNotSatisfied ? undefined : { kind: submittedNotSatisfied ? 'info' : 'success', title: submittedNotSatisfied ? '已交卷，任务未达成' : '已提交', description: submittedNotSatisfied ? '本次作答已保存并计入作答次数；任务条件未达成，仍可查看本次报告。' : '本次作答已提交，测评结果如下。' }}
       backAction={<button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">{learner.enabled ? learner.backLabel : '返回'}</button>}
     >
       {snapshotControls}
-      {isTrainingHost()&&!staffMode&&!publicMode&&!partial&&attemptId&&user?.id&&report.reportState!=='PARTIAL'&&<TrainingPersonalChanges attemptId={attemptId} actorId={user.id}/>}
+      {!compactLearnerReport && personalChanges}
       {report.bundleReport && attemptId && <BundleReport report={report.bundleReport} attemptId={attemptId} staff={staffMode} recoveryToken={publicMode ? recoveryToken : undefined} reload={()=>void load()} />}
       {report.packageReport && <CompositePackageReport report={report.packageReport} />}
       {report.reportState === 'PARTIAL' && !unitReports.length && <ReportSection title="暂无已完成单项">完成单项并正式提交后，可在此查看其冻结结果。</ReportSection>}
-      <ReportSection title="适用范围与解释边界" description="参考来源、适用人群与版本以各单项报告的已审批方案为准。">质量受限或没有可用参考依据时，保留相应说明；重复测验的差异不自动代表成长或能力改变。</ReportSection>
-      {backgroundValues.length > 0 && <ReportSection title="表单回答" eyebrow="作答信息" testId="composite-background-values">
+      {!compactLearnerReport && <ReportSection title="适用范围与解释边界" description="参考来源、适用人群与版本以各单项报告的已审批方案为准。">质量受限或没有可用参考依据时，保留相应说明；重复测验的差异不自动代表成长或能力改变。</ReportSection>}
+      {!compactLearnerReport && backgroundValues.length > 0 && <ReportSection title="表单回答" eyebrow="作答信息" testId="composite-background-values">
         <div className={`grid gap-3 sm:grid-cols-2${isTrainingHost() && !publicMode ? ' training-form-report' : ''}`}>{backgroundValues.map((background) => (
           <div key={background.itemId} className="report-metric">
             <div className="report-metric__label">{background.label || '表单回答'}</div>
@@ -426,6 +433,7 @@ const CompositeReportContent: React.FC = () => {
         <ReportSection
           key={module.itemId}
           id={`composite-report-unit-${index}`}
+          className={singleLearnerUnit ? "composite-report-single" : undefined}
           title={module.type === 'SCALE' ? module.scaleName : module.label || module.type}
           eyebrow={`模块 ${index + 1}`}
           testId={`composite-unit-report-${module.itemId}`}
@@ -434,7 +442,7 @@ const CompositeReportContent: React.FC = () => {
             <p className="text-amber-700">该模块结果无法解密，分数未展示。</p>
           ) : (
             <>
-              {module.type === 'SCALE' && <><ScaleUnitReportCard report={module as SafeScaleUnitReport} loadReportImage={loadReportImage} />{staffMode && module.trainingTiming && <TrainingTimingReport value={module.trainingTiming} />}</>}
+              {module.type === 'SCALE' && <><ScaleUnitReportCard report={module as SafeScaleUnitReport} loadReportImage={loadReportImage} compactMetadata={compactLearnerReport} />{staffMode && module.trainingTiming && <TrainingTimingReport value={module.trainingTiming} />}</>}
               {module.type === 'COGNITIVE' && (
                 module.singleTaskReport
                   ? <CognitiveSingleTaskReportCard report={module.singleTaskReport as unknown as CognitiveSingleTaskReport} headingLevel={3} />
@@ -445,6 +453,31 @@ const CompositeReportContent: React.FC = () => {
           )}
         </ReportSection>
       ))}
+      {compactLearnerReport && <>
+        {personalChanges}
+        <div className="composite-report-supporting">
+          <ReportDetails title="作答信息与阅读说明" testId="composite-report-supporting">
+            {singleLearnerUnit && singleLearnerTitle !== report.name && <p>问卷：{report.name}</p>}
+            {facts.length > 0 && <section className="composite-report-supporting__facts" aria-label="完成信息">
+              <dl>{facts.map(fact => <div key={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}</dl>
+            </section>}
+            {backgroundValues.length > 0 && <section className="composite-report-supporting__section" data-testid="composite-background-values">
+              <h3>表单回答</h3>
+              <div className={`grid gap-3 sm:grid-cols-2${isTrainingHost() && !publicMode ? " training-form-report" : ""}`}>{backgroundValues.map(background => <div key={background.itemId} className="report-metric">
+                <div className="report-metric__label">{background.label || '表单回答'}</div>
+                {background.state && <p className="mt-1 text-sm">{formStateLabels[background.state] ?? '作答状态待核对'}</p>}
+                {background.presentation ? <ReadonlyFormAnswer value={background.typedValue??null} presentation={background.presentation} state={background.state} rowStates={background.rowStates} /> : <div className="mt-1 whitespace-pre-wrap text-sm">{background.displayValue ?? background.value ?? (background.state ? '—' : '未作答')}</div>}
+                {background.otherText && <p className="mt-1 whitespace-pre-wrap text-sm">其他说明：{background.otherText}</p>}
+                {!background.presentation && background.rowStates && <ul className="mt-1 text-sm">{Object.entries(background.rowStates).map(([key, state]) => <li key={key}>{key}：{formStateLabels[state] ?? '作答状态待核对'}</li>)}</ul>}
+              </div>)}</div>
+            </section>}
+            <section className="composite-report-supporting__section">
+              <h3>适用范围与解释边界</h3>
+              <p>参考来源、适用人群与版本以各单项报告的已审批方案为准。质量受限或没有可用参考依据时，保留相应说明；重复测验的差异不自动代表成长或能力改变。</p>
+            </section>
+          </ReportDetails>
+        </div>
+      </>}
     </ReportShell>
   )
 }

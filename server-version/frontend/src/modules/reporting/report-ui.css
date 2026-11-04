@@ -747,3 +747,22 @@
     color: var(--hui-ds-status-warning-text, #e7cc92);
   }
 }
+
+.report-supporting__facts dl { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,180px),1fr)); gap: 12px 20px; margin: 0; }
+.report-supporting__facts dt { color: var(--report-muted); font-size: 12px; font-weight: 650; }
+.report-supporting__facts dd { margin: 4px 0 0; color: var(--report-ink); overflow-wrap: anywhere; }
+.report-supporting__section { margin-top: 20px; color: var(--report-ink); }
+.report-supporting__section h3 { color: var(--report-ink); margin: 0 0 8px; font-size: 14px; }
+.report-single-unit.report-section { border: 0; background: transparent; box-shadow: none; }
+.report-single-unit > .report-section__header { display: none; }
+.report-single-unit > .report-section__body { padding: 0; }
+
+@media screen {
+  :is(.hui-training[data-training-theme="dark"], .hs-app[data-theme="dark"], .ht-app[data-theme="dark"]) .educational-feedback :is(.bg-gray-50, .rounded-lg.border) {
+    background: var(--hui-ds-color-surface, #253029);
+    border-color: var(--hui-ds-color-line, #354339);
+  }
+  :is(.hui-training[data-training-theme="dark"], .hs-app[data-theme="dark"], .ht-app[data-theme="dark"]) .educational-feedback :is(.text-gray-800, .text-gray-700, .text-gray-500) {
+    color: var(--hui-ds-color-ink, #e5e9df);
+  }
+}

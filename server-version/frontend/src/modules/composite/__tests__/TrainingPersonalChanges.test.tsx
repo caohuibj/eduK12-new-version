@@ -1,12 +1,21 @@
-import {act,cleanup,fireEvent,render,screen} from '@testing-library/react'
+import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
 import {afterEach,describe,it,expect,vi} from 'vitest'
-const mocks=vi.hoisted(()=>({post:vi.fn(),study:vi.fn(),changes:vi.fn()}))
-vi.mock('../../../api/client',()=>({default:{post:mocks.post}}))
+const mocks=vi.hoisted(()=>({post:vi.fn(),get:vi.fn(),study:vi.fn(),changes:vi.fn()}))
+vi.mock('../../../api/client',()=>({default:{post:mocks.post,get:mocks.get}}))
 vi.mock('../../../api/anonymousStudy',()=>({publicStudyApi:mocks.study}))
 vi.mock('../../reporting/PersonalChangesReport',()=>({PersonalChangesReport:({report}:{report:{reportId:string}})=><div>{report.reportId}</div>}))
 import {TrainingPersonalChanges} from '../TrainingPersonalChanges'
 afterEach(()=>{cleanup();vi.resetAllMocks()})
 describe('Training own changes request scope',()=>{
+ it('shows the action only for a configured attempt',async()=>{
+  mocks.get.mockResolvedValueOnce({code:0,data:{configured:false}}).mockResolvedValueOnce({code:0,data:{configured:true}})
+  const view=render(<TrainingPersonalChanges attemptId="unconfigured" actorId="student" checkAvailability/>)
+  await waitFor(()=>expect(mocks.get).toHaveBeenCalledTimes(1))
+  expect(screen.queryByRole('button',{name:'查看我的变化'})).toBeNull()
+  view.rerender(<TrainingPersonalChanges attemptId="configured" actorId="student" checkAvailability/>)
+  expect(await screen.findByRole('button',{name:'查看我的变化'})).toBeInTheDocument()
+  expect(mocks.post).not.toHaveBeenCalled()
+ })
  it('discards an old response when the account/attempt changes',async()=>{
   let complete!:(value:unknown)=>void
   mocks.post.mockImplementationOnce(()=>new Promise(resolve=>{complete=resolve})).mockResolvedValueOnce({code:0,data:{status:'AVAILABLE',reportId:'bob-view'}})

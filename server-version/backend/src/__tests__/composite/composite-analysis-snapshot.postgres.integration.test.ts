@@ -447,14 +447,23 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
     process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
     process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
     process.env.COGNITIVE_MODULE_ENABLED = 'true'
-    const snapshotService = await import('../../modules/composite/composite-analysis-snapshot.service')
+    // Import independent modules concurrently; this suite initializes a real
+    // database fixture and has exceeded the global 10s hook timeout under CI.
+    const [snapshotService, composite, cognitiveSecurity, cognitiveRegistry,
+      profileFreeze, analysisRegistry, scaleFinal, formFinal, db] = await Promise.all([
+      import('../../modules/composite/composite-analysis-snapshot.service'),
+      import('../../modules/composite/composite.service'),
+      import('../../modules/cognitive/cognitive.security'),
+      import('../../modules/cognitive/cognitive.registry'),
+      import('../../modules/cognitive/profile-freeze'),
+      import('../../modules/cognitive-analysis'),
+      import('../../modules/scale/scale-final-submit.service'),
+      import('../../modules/composite/final-submit.service'),
+      import('../../config/database'),
+    ])
     persistOrGetPackageAnalysisSnapshot = snapshotService.persistOrGetPackageAnalysisSnapshot
     readCompletionPackageAnalysisSnapshot = snapshotService.readCompletionPackageAnalysisSnapshot
-    compositeService = await import('../../modules/composite/composite.service')
-    const cognitiveSecurity = await import('../../modules/cognitive/cognitive.security')
-    const cognitiveRegistry = await import('../../modules/cognitive/cognitive.registry')
-    const profileFreeze = await import('../../modules/cognitive/profile-freeze')
-    const analysisRegistry = await import('../../modules/cognitive-analysis')
+    compositeService = composite
     encryptCognitivePayload = cognitiveSecurity.encryptCognitivePayload
     getCognitiveRegistryEntry = cognitiveRegistry.getCognitiveRegistryEntry
     freezeAssignmentProfile = profileFreeze.freezeAssignmentProfile
@@ -462,10 +471,9 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
     getAnalysisProtocolDefinition = analysisRegistry.getAnalysisProtocolDefinition
     getReportPackageDefinition = analysisRegistry.getReportPackageDefinition
     listCognitiveEvidenceMappingsForTask = analysisRegistry.listCognitiveEvidenceMappingsForTask
-    submitScaleAssessmentFinal = (await import('../../modules/scale/scale-final-submit.service')).submitScaleAssessmentFinal
-    submitCompositeFormSectionFinal = (await import('../../modules/composite/final-submit.service')).submitCompositeFormSectionFinal
-    ensureCompositeFormSections = (await import('../../modules/composite/final-submit.service')).ensureCompositeFormSections
-    const db = await import('../../config/database')
+    submitScaleAssessmentFinal = scaleFinal.submitScaleAssessmentFinal
+    submitCompositeFormSectionFinal = formFinal.submitCompositeFormSectionFinal
+    ensureCompositeFormSections = formFinal.ensureCompositeFormSections
     prisma = db.prisma
 
     const suffix = Date.now().toString(36)
@@ -490,7 +498,7 @@ suite('PR8 package analysis snapshot PostgreSQL integration', () => {
       },
     })
     attemptId = attempt.id
-  })
+  }, 60_000)
 
   beforeEach(async () => {
     await prisma.compositeAnalysisSnapshot.deleteMany({ where: { attemptId } })

@@ -123,7 +123,7 @@ const overlayFor = (score: ExternalScaleScoreValue, references: ScaleReferenceVa
   }
 }
 
-const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportImage?: (assetId: string) => Promise<Blob> }> = ({ report, loadReportImage }) => {
+const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportImage?: (assetId: string) => Promise<Blob>; compactMetadata?: boolean }> = ({ report, loadReportImage, compactMetadata = false }) => {
   if (report.decryptError) {
     return <p className="text-amber-700">该量表结果无法解密，分数未展示。</p>
   }
@@ -152,11 +152,11 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
 
   return (
     <div data-testid={`scale-unit-report-${report.itemId || report.scaleId}`} className="scale-unit-report space-y-5">
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+      {!compactMetadata && <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
         <span>{report.scaleName}</span>
         {report.method?.reportVersion && <span>报告版本 {report.method.reportVersion}</span>}
         {quality?.status && <span>数据质量：{qualityStatusLabel(quality.status)}</span>}
-      </div>
+      </div>}
 
       <ReportSection
         title={dimensionScores.length > 0 ? '结果概览' : '实际得分'}
@@ -222,7 +222,7 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
                       ))}
                     </ul>
                   )}
-                  {interpretation.limitations.length > 0 && (
+                  {!compactMetadata && interpretation.limitations.length > 0 && (
                     <p className="text-xs text-amber-700">解释限制：{interpretation.limitations.join('；')}</p>
                   )}
                 </article>
@@ -232,13 +232,14 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
         </div>
       )}
 
+      {invalid && compactMetadata && report.method?.reportVersion && <ReportDetails title="报告版本信息"><p>报告版本：{report.method.reportVersion}</p></ReportDetails>}
       {invalid && (
         <ReportCoreSummary label="数据质量">
           <p>当前作答不足以稳定计算核心分数，因此不提供解释或群体参考。</p>
         </ReportCoreSummary>
       )}
 
-      {(report.caveats || []).length > 0 && (
+      {!compactMetadata && (report.caveats || []).length > 0 && (
         <ReportSection title="阅读提示" eyebrow="限制" headingLevel={3}>
           <ul className="list-disc space-y-1 pl-5 text-sm text-amber-700" data-testid="scale-caveats">
             {report.caveats.map((caveat) => <li key={caveat}>{caveat}</li>)}
@@ -246,9 +247,21 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
         </ReportSection>
       )}
 
-      {report.disclaimer && <ReportDisclaimer testId="scale-disclaimer">{report.disclaimer}</ReportDisclaimer>}
+      {!compactMetadata && report.disclaimer && <ReportDisclaimer testId="scale-disclaimer">{report.disclaimer}</ReportDisclaimer>}
+      {compactMetadata && ((report.caveats || []).length > 0 || report.disclaimer || interpretations.some(entry => entry.limitations.length > 0)) && (
+        <ReportDetails title="阅读提示与适用范围">
+          {interpretations.map((entry, index) => {
+            const uniqueLimitations = entry.limitations.filter(limit => !(report.caveats || []).includes(limit))
+            return uniqueLimitations.length > 0 && <p key={index}>解释限制：{uniqueLimitations.join('；')}</p>
+          })}
+          {(report.caveats || []).length > 0 && <ul className="list-disc space-y-1 pl-5" data-testid="scale-caveats">{report.caveats.map(caveat => <li key={caveat}>{caveat}</li>)}</ul>}
+          {report.disclaimer && <p data-testid="scale-disclaimer">{report.disclaimer}</p>}
+        </ReportDetails>
+      )}
       {!invalid && (
         <ReportDetails title="科学依据与详细参考" testId="scale-reference-layer">
+          {compactMetadata && report.method?.reportVersion && <p>报告版本：{report.method.reportVersion}</p>}
+          {compactMetadata && quality?.status && <p>数据质量：{qualityStatusLabel(quality.status)}</p>}
           {references.length === 0 ? (
             <p>未提供群体参考。</p>
           ) : (
