@@ -22,8 +22,6 @@ import { UNIFIED_SCALE_CHILD_ADMISSION_SELECT, ensureScaleAdmissionAtDelivery, l
 import { assertUnifiedScaleDelivery, submitUnifiedScaleAssessmentFinal, submitUnifiedScaleCollectionBatch } from '../scale/unified-final-submit.service'
 import { preloadFrozenReferenceDb } from '../assessment-runtime/reference-binding'
 import { runnerDefinition } from '../scale/scale-definition'
-import {assertTrainingScaleCollectionAllowed} from '../scale/scale-collection-guard'
-import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 
 const encryptWholeRawPayload = (value: unknown): string => encryptUnifiedRuntimePayload(compactAssessmentStorageEnabled() ? packWholeRawEnvelope(value) : value)
 
@@ -353,14 +351,14 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
     submissionId: input.submissionId, payloadHash: canonical.hash, answersEncrypted: encrypted, acceptedAt: new Date(receivedAtMs),
     requiredFormSlots: manifest.requiredFormSlots, validationHash: prior.wholeValidationHash,
   },async tx=>{
-    // A new durable ACK is still collection. Resolve and lock every selected
-    // real child/source in this same receipt transaction, including ordinary
-    // questionnaires. A previously accepted replay returned above.
+    // Resolve every selected real child in this same receipt transaction,
+    // including ordinary questionnaires. A previously accepted replay returned above.
     const children=await tx.assessment.findMany({where:{id:{in:prepared.map(unit=>unit.assessmentId)},compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,
       compositeItemId:{in:prepared.map(unit=>unit.itemId)}},select:{id:true,scaleId:true,compositeItemId:true}})
     if(children.length!==prepared.length||children.some(child=>!prepared.some(unit=>unit.assessmentId===child.id&&unit.itemId===child.compositeItemId)))throw failure('整卷工具来源已变化')
-    if(parent.hasStandardCombination)await assertTrainingScaleCollectionAllowed(tx,children.map(child=>child.scaleId),{compositeAttemptId:parent.id,compositeItemIds:children.map(child=>child.compositeItemId!)})
-    else await assertScaleLibraryCollectionAllowed(tx,[],children.map(child=>child.scaleId))
+    // Business decision: attempts already started may finish after an
+    // emergency stop. Every selected child was admitted by this attempt's
+    // START, so no collection re-check here; new STARTs stay blocked.
   })
   const feedback = rememberWholeReportFeedbackHint(attemptId, input.submissionId, detachedWholeReceiptsEnabled() && !receipt.replayed ? recordWholeReceiptStored() : receipt.queueDepth)
   return receiptResponse(attemptId, input.submissionId, canonical.hash, receipt.acceptedAt, receipt.replayed, feedback.profile)
