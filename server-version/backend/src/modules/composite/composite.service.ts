@@ -147,6 +147,7 @@ import {
 } from '../situational/situational-runtime.service'
 import { assertSituationalAssetReferencesReady } from '../situational/situational-asset.service'
 import { loadSituationalReleaseMetadata, type SituationalReleaseMetadata, inspectSituationalReleases, resolveSituationalReleases, situationalReleaseKey, type ResolvedSituationalRelease } from '../situational/situational-release.service'
+import { listSituationPackages } from '../situational/situation-package.registry'
 import { projectSjtReleaseStatus } from '../situational/authoring/service'
 import type {
   AddCompositeItemInput,
@@ -5595,11 +5596,15 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
           : null
         const scientificContext = frozenSituationalScientificProjection(child?.runtimeSnapshotEncrypted ? decryptFrozenSituationalRuntimeSnapshot(child.runtimeSnapshotEncrypted).scientificContext : undefined)
         if (canonical && canonical.core.unitType !== 'SITUATIONAL') throw new Error('wrong situational canonical unit type')
+        // SJT items carry no scale/cognitive/form label source; fall back to the
+        // published instrument title so learners never see a raw registry key.
+        const situationalTitle = listSituationPackages().find(pkg =>
+          pkg.key === item.situationalInstrumentKey && pkg.instrumentVersion === item.situationalInstrumentVersion)?.definition.source.title
         unitReports.push({
           itemId: item.id,
           type: 'SITUATIONAL' as const,
           kind: 'situational' as const,
-          label: resolveCompositeItemLabel(item, packageSlotLabels),
+          label: resolveCompositeItemLabel(item, packageSlotLabels) || situationalTitle || null,
           scienceMaturity: scientificContext.scientificMaturity,
           scientificContext,
           instrumentKey: canonical?.core.instrumentKey ?? child?.instrumentKey ?? item.situationalInstrumentKey ?? null,
