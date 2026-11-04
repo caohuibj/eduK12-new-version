@@ -1,6 +1,7 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
 const mocks=vi.hoisted(()=>({release:vi.fn(),media:vi.fn()}))
-vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.release}))
+vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.release,
+ getContentReleaseBatch:async(db:any,ids:string[],lock:boolean)=>{const out=new Map<string,any>();for(const id of new Set(ids)){const r=await mocks.release(db,id,lock);if(r)out.set(id,r)}return out}}))
 vi.mock('../../modules/scale-library-governance/media',()=>({assertLibraryMediaReady:mocks.media}))
 import {prepareTrainingContentSnapshot,prepareTrainingContentAttemptBinding,trainingMeasurementSourceScopeMatchesForConsumer} from '../../modules/composite/training-content-binding'
 import {compileResearchScale} from '../../modules/survey/builder.compiler'
