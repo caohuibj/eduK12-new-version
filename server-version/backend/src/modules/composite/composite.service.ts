@@ -3534,6 +3534,16 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
   assertSupportedComposite(composite, false, false)
   await assertStudentEligibility(composite, userId)
 
+  // Fast resume only locks the matching attempt row, not the composite row
+  // or new-START admission gate. FOR SHARE waits for a concurrent restart's
+  // status UPDATE, so a retired attempt is not selected as IN_PROGRESS.
+  const [inProgress] = await prisma.$queryRaw<Array<{ id: string }>>`
+    SELECT "id" FROM "composite_assessment_attempts"
+    WHERE "composite_assessment_id" = ${compositeId} AND "user_id" = ${userId}
+      AND "status" = 'IN_PROGRESS'
+    ORDER BY "started_at" DESC LIMIT 1 FOR SHARE`
+  if (inProgress) return { attempt: await getAttemptState(inProgress.id, { userId }), recoveryToken: null }
+
   const isUniqueConstraintError = (err: unknown) =>
     typeof err === 'object' && err !== null && 'code' in err && (err as { code?: unknown }).code === 'P2002'
 
