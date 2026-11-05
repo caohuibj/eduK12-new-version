@@ -1,5 +1,5 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
-import { classifyStartTransaction, AssessmentStartBusyError } from './start-transient'
+import { classifyStartTransaction, AssessmentStartBusyError, rethrowGateBusyAsStartBusy } from './start-transient'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
@@ -12,7 +12,8 @@ import {admitEducationNativeCognitive} from '../education-tools/native-source.co
 import { emptyOptionalReportRelations, OPTIONAL_REPORT_RELATION_COUNTS } from './composite-report-read-plan'
 import { lockAuthenticatedAdmission, lockCompositeAdmissionShare } from './authenticated-admission-lock'
 import { lockRelationalAdmission } from './relational-admission-lock'
-import { BoundedAdmissionGate, BoundedAdmissionBusyError } from '../../services/boundedAdmissionGate'
+import { BoundedAdmissionGate } from '../../services/boundedAdmissionGate'
+import { defaultStartAdmissionBound } from '../../config/databasePool'
 import {publicTrainingFormDefinition} from '../assessment-runtime/typed-form'
 import {assertTrainingMaterialsUsable,trainingFormMaterials,inspectTrainingMaterials} from '../assessment-media/training-materials'
 import { assertScalePublicationRights } from '../scale/scale-publication-guard'
@@ -3503,22 +3504,25 @@ const envPositive = (name: string, fallback: number) => {
   const value = Number(process.env[name])
   return Number.isSafeInteger(value) && value > 0 ? value : fallback
 }
-const trainingStartGate = new BoundedAdmissionGate({
-  name: 'training_start_admission',
-  maxConcurrent: envPositive('TRAINING_START_MAX_CONCURRENT', 24),
-  maxQueue: envPositive('TRAINING_START_MAX_QUEUE', 300),
-  maxWaitMs: envPositive('TRAINING_START_MAX_WAIT_MS', 10000),
-  retryAfterSeconds: 1,
-  busyCode: 'ASSESSMENT_START_BUSY',
-  busyMessage: '综合测评开始请求繁忙，请稍后重试',
-})
-const rethrowGateBusyAsStartBusy = (err: unknown): unknown => {
-  if (err instanceof BoundedAdmissionBusyError) {
-    throw new AssessmentStartBusyError(
-      err.reason === 'timeout' ? 'ADMISSION_WAIT_TIMEOUT' : 'ADMISSION_QUEUE_FULL',
-      err.retryAfterSeconds)
+// Lazy: the bound derives from the EFFECTIVE pool size at first START (an
+// explicit TRAINING_START_MAX_CONCURRENT overrides; otherwise at most 3/4 of
+// the pool, reserving connections for other business). Deriving the bound
+// before the pool is known would let the gate admit more starts than the
+// database can host.
+let gateInstance: BoundedAdmissionGate | undefined
+const trainingStartGate = (): BoundedAdmissionGate => {
+  if (!gateInstance) {
+    gateInstance = new BoundedAdmissionGate({
+      name: 'training_start_admission',
+      maxConcurrent: envPositive('TRAINING_START_MAX_CONCURRENT', defaultStartAdmissionBound(process.env.DATABASE_URL)),
+      maxQueue: envPositive('TRAINING_START_MAX_QUEUE', 300),
+      maxWaitMs: envPositive('TRAINING_START_MAX_WAIT_MS', 10000),
+      retryAfterSeconds: 1,
+      busyCode: 'ASSESSMENT_START_BUSY',
+      busyMessage: '综合测评开始请求繁忙，请稍后重试',
+    })
   }
-  return err
+  return gateInstance
 }
 export const startUserAttempt = async (userId: string, compositeId: string) => {
   // Pure-read (write-time invariant): the student start path never lazily
@@ -3535,7 +3539,7 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
     try {
       const attempt = await classifyStartTransaction(async () => {
         try {
-          return await trainingStartGate.run(() => prisma.$transaction(async (tx: Db) => {
+          return await trainingStartGate().run(() => prisma.$transaction(async (tx: Db) => {
         if (composite.productKind === 'QUESTIONNAIRE' && composite.deliveryMode !== 'LEGACY') {
           await lockAuthenticatedAdmission(tx, compositeId, userId)
         } else {

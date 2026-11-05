@@ -26,6 +26,10 @@ suite('bounded Training START admission on real PostgreSQL', () => {
   const students: string[] = []
 
   beforeAll(async () => {
+    // Reproduce the exact configuration validated in the c150 experiment:
+    // an explicit 24-wide admission window against a 24-wide pool.
+    process.env.TRAINING_START_MAX_CONCURRENT = '24'
+    process.env.TRAINING_START_MAX_WAIT_MS = '10000'
     const { compileResearchScale } = await import('../../modules/survey/builder.compiler')
     const { hashScaleDefinition } = await import('../../modules/scale/scale-definition')
     const owner = await db.user.create({ data: {
