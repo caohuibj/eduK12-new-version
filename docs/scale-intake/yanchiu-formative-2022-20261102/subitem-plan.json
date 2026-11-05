@@ -1,0 +1,219 @@
+{
+  "familyTag": "family:yanchiu_formative_2022",
+  "role": "teacher_self",
+  "sourceLanguage": "zh-Hant",
+  "sourceYear": 2022,
+  "runtimeVersionsAllocated": false,
+  "candidateOnly": true,
+  "groups": [
+    {
+      "candidateSuffix": "examination_culture",
+      "label": "高風險及問責性的評估",
+      "author57FormItems": [
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "paperTableA2RetainedItems": [
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "missingFromPaperFinalSet": [],
+      "sourceDefinition": "1-6 agreement, not practice frequency",
+      "scoreMethod": "NOT_IMPLEMENTED_NO_OFFICIAL_INDIVIDUAL_RULE",
+      "deliveryStatus": "RIGHTS_SCOPE_PENDING_NOT_IMPORTED"
+    },
+    {
+      "candidateSuffix": "teaching_environment",
+      "label": "教學環境",
+      "author57FormItems": [
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "paperTableA2RetainedItems": [
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "missingFromPaperFinalSet": [],
+      "sourceDefinition": "1-6 agreement, not practice frequency",
+      "scoreMethod": "NOT_IMPLEMENTED_NO_OFFICIAL_INDIVIDUAL_RULE",
+      "deliveryStatus": "RIGHTS_SCOPE_PENDING_NOT_IMPORTED"
+    },
+    {
+      "candidateSuffix": "school_support",
+      "label": "學校政策及支援",
+      "author57FormItems": [
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "paperTableA2RetainedItems": [
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "missingFromPaperFinalSet": [],
+      "sourceDefinition": "1-6 agreement, not practice frequency",
+      "scoreMethod": "NOT_IMPLEMENTED_NO_OFFICIAL_INDIVIDUAL_RULE",
+      "deliveryStatus": "RIGHTS_SCOPE_PENDING_NOT_IMPORTED"
+    },
+    {
+      "candidateSuffix": "student_attributes",
+      "label": "教師感知的學生特征",
+      "author57FormItems": [
+        26,
+        27,
+        28,
+        29,
+        30
+      ],
+      "paperTableA2RetainedItems": [
+        26,
+        27,
+        28,
+        29,
+        30
+      ],
+      "missingFromPaperFinalSet": [],
+      "sourceDefinition": "1-6 agreement, not practice frequency",
+      "scoreMethod": "NOT_IMPLEMENTED_NO_OFFICIAL_INDIVIDUAL_RULE",
+      "deliveryStatus": "RIGHTS_SCOPE_PENDING_NOT_IMPORTED"
+    },
+    {
+      "candidateSuffix": "instrumental_attitude",
+      "label": "工具性態度",
+      "author57FormItems": [
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "paperTableA2RetainedItems": [
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "missingFromPaperFinalSet": [
+        39,
+        40
+      ],
+      "sourceDefinition": "1-6 agreement, not practice frequency",
+      "scoreMethod": "NOT_IMPLEMENTED_NO_OFFICIAL_INDIVIDUAL_RULE",
+      "deliveryStatus": "RIGHTS_SCOPE_PENDING_NOT_IMPORTED"
+    },
+    {
+      "candidateSuffix": "self_efficacy",
+      "label": "自我效能",
+      "author57FormItems": [
+        41,
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "paperTableA2RetainedItems": [
+        41,
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "missingFromPaperFinalSet": [],
+      "sourceDefinition": "1-6 agreement, not practice frequency",
+      "scoreMethod": "NOT_IMPLEMENTED_NO_OFFICIAL_INDIVIDUAL_RULE",
+      "deliveryStatus": "RIGHTS_SCOPE_PENDING_NOT_IMPORTED"
+    },
+    {
+      "candidateSuffix": "intention",
+      "label": "意願",
+      "author57FormItems": [
+        47,
+        48,
+        49,
+        50,
+        51,
+        52
+      ],
+      "paperTableA2RetainedItems": [
+        47,
+        48,
+        49,
+        51,
+        52
+      ],
+      "missingFromPaperFinalSet": [
+        50
+      ],
+      "sourceDefinition": "1-6 agreement, not practice frequency",
+      "scoreMethod": "NOT_IMPLEMENTED_NO_OFFICIAL_INDIVIDUAL_RULE",
+      "deliveryStatus": "RIGHTS_SCOPE_PENDING_NOT_IMPORTED"
+    },
+    {
+      "candidateSuffix": "subjective_norm",
+      "label": "主觀常模",
+      "author57FormItems": [
+        53,
+        54,
+        55,
+        56,
+        57
+      ],
+      "paperTableA2RetainedItems": [
+        54,
+        55,
+        56,
+        57
+      ],
+      "missingFromPaperFinalSet": [
+        53
+      ],
+      "sourceDefinition": "1-6 agreement, not practice frequency",
+      "scoreMethod": "NOT_IMPLEMENTED_NO_OFFICIAL_INDIVIDUAL_RULE",
+      "deliveryStatus": "RIGHTS_SCOPE_PENDING_NOT_IMPORTED"
+    }
+  ],
+  "practiceItems": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "practiceHandling": "Reuse exact-version TFAPS only after match; no duplicate practice scale",
+  "rawFormItemCount": 57,
+  "paperRetainedItemsIncludingPractice": 53,
+  "paperRetainedCountIsNotANewAuthorQuestionnaire": true
+}
