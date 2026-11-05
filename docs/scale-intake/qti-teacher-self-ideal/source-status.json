@@ -1,0 +1,146 @@
+{
+  "recordType": "RESEARCH_DOSSIER_NOT_TOOL_REGISTRATION",
+  "checkedOn": "2026-11-02",
+  "baseline": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "motherTool": "QTI teacher actual self-perception / teacher ideal",
+  "status": "CURRENT_FORMS_NOT_OBTAINED; HISTORICAL_SELF48_TEXT_LOCATED_BUT_RIGHTS_RESTRICTED",
+  "newRuntimeSources": 0,
+  "newCatalogEntries": 0,
+  "newNativeForms": 0,
+  "C": null,
+  "P": null,
+  "R": null,
+  "sources": [
+    {
+      "sourceId": "uu-current-programme",
+      "url": "https://professionals.uu.nl/en/programme/questionnaire-on-teacher-interaction-qti",
+      "kind": "OFFICIAL_SERVICE_DESCRIPTION",
+      "read": "FULL_PUBLIC_PAGE",
+      "findings": [
+        "Teacher self-perception and teacher ideal are distinct native perspectives; student perception is separate.",
+        "Official page links subscription and paid one-time administration; no account/subscription/payment was initiated.",
+        "Current item count, complete teacher items, teacher-specific response instructions, octant mapping, scoring and exact questionnaire version are not supplied on this page."
+      ],
+      "nativeTeacherItemsObtained": false,
+      "redistributionPermission": "NOT_ESTABLISHED"
+    },
+    {
+      "sourceId": "uu-platform-manual-jan2023",
+      "url": "https://vil.fss.uu.nl/files/Manual_en_online_2023.pdf",
+      "kind": "OFFICIAL_OPERATIONAL_MANUAL",
+      "read": "FULL_2_PAGES",
+      "findings": [
+        "January 2023 operational manual; its date is not a questionnaire content version.",
+        "English/Dutch secondary and higher-education service variants; teacher self and ideal completion described.",
+        "No complete questionnaire items or scoring key in this manual. Service group-size requirements are not adopted as EduK12 privacy thresholds."
+      ],
+      "nativeTeacherItemsObtained": false,
+      "redistributionPermission": "NOT_ESTABLISHED"
+    },
+    {
+      "sourceId": "lee2010-thesis",
+      "url": "https://curate.curtin.edu.au/articles/thesis/Teacher_interpersonal_behaviour_in_gifted_students_Primary_Science_classrooms_and_effects_on_achievement/31462462/1/files/62347123.pdf",
+      "citation": "Lee, Yoke Cheng (2010). Teacher interpersonal behaviour in gifted students' Primary Science classrooms and effects on achievement. PhD thesis, Curtin University of Technology.",
+      "kind": "HISTORICAL_PRIMARY_STUDY",
+      "read": "PDF_TEXT_READ; APPENDIX_SCANS_NOT_VISUALLY_VERIFIED",
+      "findings": [
+        "Historical Singapore primary science / Gifted Education Programme context; not the current Utrecht secondary form.",
+        "Methods pp46-47 describe teachers completing actual and ideal versions.",
+        "Appendix F printed pp139-140 (PDF indices152-153) exposes a 48-item Teacher Self form and 1-5 Never/Always endpoints; OCR contains defects and is not an exact verified transcription.",
+        "Appendix E printed pp137-138 (PDF indices150-151) is listed for ideal teacher, but its scanned content was not extracted or visually verified."
+      ],
+      "teacherActual": {
+        "declaredItems": 48,
+        "itemNumberCoverage": "1-48 visible in retrieved text",
+        "exactTextVerified": false,
+        "sourcePages": [
+          139,
+          140
+        ]
+      },
+      "teacherIdeal": {
+        "completeItemsVerified": false,
+        "sourcePages": [
+          137,
+          138
+        ]
+      },
+      "redistributionPermission": "ALL_RIGHTS_RESERVED_WRITTEN_PERMISSION_REQUIRED"
+    },
+    {
+      "sourceId": "curtin-figshare-metadata",
+      "url": "https://api.figshare.com/v2/articles/31462462",
+      "kind": "OFFICIAL_REPOSITORY_PUBLIC_METADATA",
+      "read": "HTTP_200_JSON",
+      "license": {
+        "value": 300,
+        "name": "All rights reserved, written permission required",
+        "url": "https://researchtoolkit.library.curtin.edu.au/publishing/curate/meeting-copyright-obligations#accordion_curate-copyright-statement_collapse_all-rights-reserved"
+      },
+      "repositoryOpenAccessField": "Open access",
+      "rawMetadataSha256": "4593de6e1542701ffe7cac78a1eea0a5902d9f38987287994b47b41c04c30aa6",
+      "findings": [
+        "Open access describes reading availability; the item-specific license requires written permission.",
+        "Repository publication timestamp is not the March2010 thesis date or a QTI content/scoring version."
+      ]
+    },
+    {
+      "sourceId": "curtin-rights-policy",
+      "url": "https://researchtoolkit.library.curtin.edu.au/publishing/curate/meeting-copyright-obligations#accordion_curate-copyright-statement_collapse_all-rights-reserved",
+      "kind": "OFFICIAL_REPOSITORY_COPYRIGHT_EXPLANATION",
+      "read": "PUBLIC_PAGE_READ",
+      "findings": [
+        "All-rights-reserved explanation retains reproduction, adaptation, publication and communication rights; no item redistribution permission inferred."
+      ]
+    },
+    {
+      "sourceId": "fisher-fraser-cresswell1995",
+      "url": "https://ro.ecu.edu.au/ajte/vol20/iss1/2/",
+      "citation": "Fisher, D., Fraser, B., & Cresswell, J. (1995). Using the Questionnaire on Teacher Interaction in the Professional Development of Teachers. DOI10.14221/ajte.1995v20n1.2.",
+      "kind": "HISTORICAL_PRIMARY_ARTICLE",
+      "read": "LANDING_PAGE_ONLY; PDF_HTTP403",
+      "redistributionPermission": "NOT_ESTABLISHED"
+    },
+    {
+      "sourceId": "nugent2009",
+      "url": "https://stars.library.ucf.edu/etd/3860/",
+      "citation": "Nugent, Tisome (2009). The Impact Of Teacher-student Interaction On Student Motivation And Achievement. UCF dissertation CFE0002884.",
+      "kind": "HISTORICAL_PRIMARY_STUDY",
+      "read": "LANDING_PAGE_ONLY; PDF_HTTP403",
+      "redistributionPermission": "NOT_ESTABLISHED"
+    },
+    {
+      "sourceId": "xin-lin2000",
+      "citation": "Xin, Z., & Lin, C. (2000). 教师互动问卷中文版的初步修订及应用. 心理科学23(4),404-407.",
+      "kind": "CHINESE_TEACHER_SELF_BIBLIOGRAPHIC_LEAD",
+      "read": "CITATION_AND_VERSION_DESCRIPTION_IN_SUN2018_ONLY",
+      "nativeTeacherItemsObtained": false,
+      "redistributionPermission": "NOT_ESTABLISHED",
+      "note": "Not the Sun2018 Chinese student40 form in PR545; no reconstructed Chinese teacher questions."
+    }
+  ],
+  "accessFailures": [
+    {
+      "target": "interpersonal-relationships-in-education.sites.uu.nl and teaching-and-learning-collection.sites.uu.nl",
+      "result": "Anubis anti-bot challenge; not solved/bypassed",
+      "effect": "Public search snippets not treated as full questionnaires"
+    },
+    {
+      "target": "Curtin thesis PDF direct shell download",
+      "result": "HTTP403; no local PDF created",
+      "effect": "No bypass attempted; retrieved web text remains limited evidence"
+    },
+    {
+      "target": "Curtin Appendix E/F screenshot",
+      "result": "Non-retryable screenshot error on short-lived storage redirect",
+      "effect": "No exact scan/OCR correction or ideal-item verification claimed"
+    },
+    {
+      "target": "ECU1995 and UCF2009 publisher PDF endpoints",
+      "result": "HTTP403",
+      "effect": "Landing pages and citations only; no full-item claim"
+    }
+  ],
+  "publicFileBoundary": "Only source metadata, original project commentary, tag/report plans and missing-material checklist. No questionnaire items, native definitions, restricted PDFs, signed URLs, credentials or real participant data.",
+  "initialSourceAuditBaseline": "3818f2b399e805ec0cbcad803b832ad4ec4fbc02"
+}
