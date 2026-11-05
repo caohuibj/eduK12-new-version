@@ -1,5 +1,5 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
-import { classifyStartTransaction } from './start-transient'
+import { classifyStartTransaction, AssessmentStartBusyError, rethrowGateBusyAsStartBusy } from './start-transient'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
@@ -12,6 +12,8 @@ import {admitEducationNativeCognitive} from '../education-tools/native-source.co
 import { emptyOptionalReportRelations, OPTIONAL_REPORT_RELATION_COUNTS } from './composite-report-read-plan'
 import { lockAuthenticatedAdmission, lockCompositeAdmissionShare } from './authenticated-admission-lock'
 import { lockRelationalAdmission } from './relational-admission-lock'
+import { BoundedAdmissionGate } from '../../services/boundedAdmissionGate'
+import { defaultStartAdmissionBound } from '../../config/databasePool'
 import {publicTrainingFormDefinition} from '../assessment-runtime/typed-form'
 import {assertTrainingMaterialsUsable,trainingFormMaterials,inspectTrainingMaterials} from '../assessment-media/training-materials'
 import { assertScalePublicationRights } from '../scale/scale-publication-guard'
@@ -3492,6 +3494,36 @@ export async function startFieldCompositeAttemptInTransaction(db:Db,input:{compo
  return {attempt,replayed:false}
 }
 
+/** Bounded admission for the authenticated Training START transaction: at most
+ * MAX_CONCURRENT transactions in flight (aligned with the connection pool), a
+ * bounded queue whose waiters hold NO database connection, and an explicit
+ * wait budget. Queue-full/wait-timeout surface as the existing safe-retry 503
+ * semantics. Env-tunable; the bound is per instance (multi-instance
+ * deployments size each instance against the shared pool budget). */
+const envPositive = (name: string, fallback: number) => {
+  const value = Number(process.env[name])
+  return Number.isSafeInteger(value) && value > 0 ? value : fallback
+}
+// Lazy: the bound derives from the EFFECTIVE pool size at first START (an
+// explicit TRAINING_START_MAX_CONCURRENT overrides; otherwise at most 3/4 of
+// the pool, reserving connections for other business). Deriving the bound
+// before the pool is known would let the gate admit more starts than the
+// database can host.
+let gateInstance: BoundedAdmissionGate | undefined
+const trainingStartGate = (): BoundedAdmissionGate => {
+  if (!gateInstance) {
+    gateInstance = new BoundedAdmissionGate({
+      name: 'training_start_admission',
+      maxConcurrent: envPositive('TRAINING_START_MAX_CONCURRENT', defaultStartAdmissionBound(process.env.DATABASE_URL)),
+      maxQueue: envPositive('TRAINING_START_MAX_QUEUE', 300),
+      maxWaitMs: envPositive('TRAINING_START_MAX_WAIT_MS', 10000),
+      retryAfterSeconds: 1,
+      busyCode: 'ASSESSMENT_START_BUSY',
+      busyMessage: '综合测评开始请求繁忙，请稍后重试',
+    })
+  }
+  return gateInstance
+}
 export const startUserAttempt = async (userId: string, compositeId: string) => {
   // Pure-read (write-time invariant): the student start path never lazily
   // repairs sections on a published composite. loadComposite already includes
@@ -3505,7 +3537,9 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
 
   for (let retry = 0; retry < 2; retry += 1) {
     try {
-      const attempt = await classifyStartTransaction(() => prisma.$transaction(async (tx: Db) => {
+      const attempt = await classifyStartTransaction(async () => {
+        try {
+          return await trainingStartGate().run(() => prisma.$transaction(async (tx: Db) => {
         if (composite.productKind === 'QUESTIONNAIRE' && composite.deliveryMode !== 'LEGACY') {
           await lockAuthenticatedAdmission(tx, compositeId, userId)
         } else {
@@ -3525,7 +3559,9 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
           select: { attemptNo: true },
         })
         return createAttempt(tx, composite, userId, null, undefined, (latest?.attemptNo ?? 0) + 1)
-      }))
+          }, { maxWait: 10_000, timeout: 30_000 }))
+        } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
+      })
       return { attempt: await getAttemptState(attempt.id, { userId }), recoveryToken: null }
     } catch (err) {
       if (!isUniqueConstraintError(err) || retry === 1) throw err
