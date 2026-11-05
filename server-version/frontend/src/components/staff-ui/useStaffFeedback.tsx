@@ -22,9 +22,11 @@ export function useStaffFeedback({dialogClassName}:{dialogClassName?:string}={})
   const clear = useCallback(() => setNotice(null), [])
   const feedback = <>
     {notice && <div className="staff-feedback"><ProductStatus kind={notice.kind} title={notice.title} announce={notice.kind === 'error' ? 'assertive' : 'polite'} actions={<button type="button" className="staff-text-button" onClick={clear}>关闭</button>}>{notice.body}</ProductStatus></div>}
-    <ManagementDialog className={dialogClassName} open={Boolean(pending)} title={pending?.title || '确认操作'} description={pending?.body} onClose={() => finish(false)} width="compact"
+    {/* The confirm message renders as visible body text: an sr-only-only body
+        leaves a blank band between the header and the action row. */}
+    <ManagementDialog className={dialogClassName} open={Boolean(pending)} title={pending?.title || '确认操作'} onClose={() => finish(false)} width="compact"
       actions={<><ProductButton onClick={() => finish(false)}>{pending?.cancelLabel || '取消'}</ProductButton><ProductButton variant={pending?.danger ? 'danger' : 'primary'} onClick={() => finish(true)}>{pending?.confirmLabel || '确认'}</ProductButton></>}>
-      <span className="sr-only">请确认是否继续此操作。</span>
+      <div className="staff-dialog__description">{pending?.body ?? '请确认是否继续此操作。'}</div>
     </ManagementDialog>
   </>
   return { feedback, confirm, success, error, warning, info, clear }

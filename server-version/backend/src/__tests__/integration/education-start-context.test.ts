@@ -15,6 +15,7 @@ describe('transaction-bound education START context',()=>{
  })
 })
 import {bindVerifiedEducationAttempt,readVerifiedEducationAttempt} from '../../modules/assessment-run/education-start-context'
+import {createEmbeddedSituationalAttempt} from '../../modules/situational/situational-runtime.service'
 it('binds teacher permission to one actual same-transaction parent and rejects forged, observer and cross-parent use',()=>{
  const facts={tx:{},product:'TEACHER' as const,compositeId:'runtime',assignmentRef:'assignment',respondentUserId:'teacher'},proof=issueVerifiedEducationStart(facts)
  const parent={id:'parent',compositeAssessmentId:'runtime',assignmentRef:'assignment',userId:'teacher',subjectUserId:'teacher',respondentUserId:'teacher'}
@@ -26,7 +27,6 @@ it('binds teacher permission to one actual same-transaction parent and rejects f
  expect(()=>bindVerifiedEducationAttempt(proof,facts.tx,{...parent,subjectUserId:'student'})).toThrow('EDUCATION_START_CONTEXT_MISMATCH')
 })
 it('actual embedded SJT boundary still rejects ordinary Training, School and copied teacher hints',async()=>{
- const {createEmbeddedSituationalAttempt}=await import('../../modules/situational/situational-runtime.service')
  const tx={situationalAttempt:{findFirst:async()=>null}},parent={id:'parent',compositeAssessmentId:'runtime',assignmentRef:'assignment',userId:'teacher',subjectUserId:'teacher',respondentUserId:'teacher'}
  const input={userId:'teacher',participantKey:'synthetic',compositeAttemptId:'parent',compositeItemId:'item',compositeSlotKey:'slot',instrumentKey:'synthetic',instrumentVersion:'1.0.0',attemptEpoch:1}
  const release={situationPackage:{key:'synthetic',instrumentVersion:'1.0.0',definition:{respondentType:'teacher_self_report'}},snapshot:{}} as any

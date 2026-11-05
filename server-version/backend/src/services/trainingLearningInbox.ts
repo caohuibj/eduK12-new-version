@@ -30,7 +30,10 @@ const iso = (value: Date | null | undefined) => value?.toISOString() ?? null;
 /** Owner-bound metadata only. Opening this inbox never starts an attempt,
  * reads answers/scores, generates reports, or grants report access. */
 export async function listTrainingLearningInbox(userId: string, query: LearningQuery, now = new Date()) {
-    const memberships = await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false, courseType: 'TRAINING_COURSE' } }, select: { course: { select: { id: true, title: true } } } });
+    // Same membership scope as the student course list (courseController.myCourses):
+    // legacy and training courses are both learner-visible, so the cross-course
+    // aggregate must not silently drop tasks the course pages already offer.
+    const memberships = await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false, courseType: { not: 'CAMPUS_ACTIVITY' } } }, select: { course: { select: { id: true, title: true } } } });
     const courseMap = new Map(memberships.map(m => [m.course.id, m.course]));
     const courseIds = [...courseMap.keys()];
     const validCourses = (courses: Course[]) => courses.filter(c => courseMap.has(c.id)).map(c => courseMap.get(c.id)!);

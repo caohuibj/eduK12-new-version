@@ -5,7 +5,7 @@ import {TeacherAssessmentProvider} from './TeacherAssessmentPage'
 
 import {createEducationAssessmentFeedback} from '../components/education-tools/educationAssessmentFeedbackAdapter'
 
-import {SCHOOL_HOST} from '../school/context'
+import {schoolEntryLoginUrl} from '../products/origins'
 
 import {usePrivateToolCapability,type PrivateDraftState} from '../components/education-tools/privateToolClient'
 
@@ -476,7 +476,7 @@ function HuiteacherApplication(){
     </section>:
     !me&&screen==='mfa'?<section className="ht-panel ht-form-panel"><h1>双因素验证</h1>
       <p>为保护学校管理权限，请使用身份验证器完成登录。</p>
-      {!mfaEnrolled&&<button disabled={working} onClick={()=>mfa('setup')}>设置身份验证器</button>}
+      {recoveryCodes.length===0&&<>{!mfaEnrolled&&<button disabled={working} onClick={()=>mfa('setup')}>设置身份验证器</button>}
       {mfaUri&&<div className="ht-mfa-setup">
         <p>使用身份验证器扫描二维码，再输入 6 位动态验证码。</p>
         <QRCodeSVG value={mfaUri} size={164} marginSize={2} title="身份验证器设置二维码"/>
@@ -484,7 +484,7 @@ function HuiteacherApplication(){
       </div>}
       <Field label="验证码或恢复码" value={mfaCode} set={setMfaCode}/>
       <button className="ht-primary" disabled={working} onClick={()=>mfa(mfaEnrolled?'verify':'confirm')}>完成验证</button>
-      {mfaEnrolled&&<button disabled={working} onClick={()=>mfa('recovery')}>使用恢复码</button>}
+      {mfaEnrolled&&<button disabled={working} onClick={()=>mfa('recovery')}>使用恢复码</button>}</>}
       {recoveryCodes.length>0&&<div className="ht-secret"><strong>请离线保存恢复码；仅此时展示</strong>
         <pre>{recoveryCodes.join('\n')}</pre><button onClick={()=>{setRecoveryCodes([]);void reload()}}>我已保存</button></div>}
     </section>:
@@ -524,7 +524,7 @@ function HuiteacherApplication(){
       <>
 
       {workspaceTab==='private-tools'&&selectedOrg&&canAuthorPrivateTools&&<EducationAssessmentRegistrationPanel key={'registration:'+me.id+':'+selectedOrg} api={teacherApi} organizationId={selectedOrg} actorId={me.id} product="TEACHER"/>}
-      {workspaceTab==='private-tools'&&(canAuthorPrivateTools?<><aside className="ht-panel" aria-label="学生测评编制入口提示"><p className="ht-muted">此处自编工具用于 Teacher 教师测评。心理教师为学生编制量表、表单及发布活动，请前往 School 的“我的工具”和活动管理。学校须已开通 School，并授予本人对应权限；使用同一教育账号单独登录，两个入口的私有草稿与固定版本不会自动互通。</p><a href={`https://${SCHOOL_HOST}/login`} target="_blank" rel="noopener noreferrer">前往 School 编制学生测评</a></aside><EducationPrivateToolStudio key={`TEACHER:${me.id}:${selectedOrg}`} api={teacherApi} organizationId={selectedOrg} entry="TEACHER" actorId={me.id} onDraftStateChange={setPrivateDraftState}/></>:<section className="ht-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
+      {workspaceTab==='private-tools'&&(canAuthorPrivateTools?<><aside className="ht-panel" aria-label="学生测评编制入口提示"><p className="ht-muted">此处自编工具用于 Teacher 教师测评。心理教师为学生编制量表、表单及发布活动，请前往 School 的“我的工具”和活动管理。学校须已开通 School，并授予本人对应权限；使用同一教育账号单独登录，两个入口的私有草稿与固定版本不会自动互通。</p>{(() => { const href = schoolEntryLoginUrl(); return href ? <a href={href} target="_blank" rel="noopener noreferrer">前往 School 编制学生测评</a> : null })()}</aside><EducationPrivateToolStudio key={`TEACHER:${me.id}:${selectedOrg}`} api={teacherApi} organizationId={selectedOrg} entry="TEACHER" actorId={me.id} onDraftStateChange={setPrivateDraftState}/></>:<section className="ht-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
       {workspaceTab==='teacher'&&<>
         <div className="ht-workspace-body">
         <nav className="ht-workspace-jumps" aria-label="个人任务分区">

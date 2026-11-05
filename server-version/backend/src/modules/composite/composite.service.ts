@@ -149,6 +149,7 @@ import {
 } from '../situational/situational-runtime.service'
 import { assertSituationalAssetReferencesReady } from '../situational/situational-asset.service'
 import { loadSituationalReleaseMetadata, type SituationalReleaseMetadata, inspectSituationalReleases, resolveSituationalReleases, situationalReleaseKey, type ResolvedSituationalRelease } from '../situational/situational-release.service'
+import { getSituationPackage } from '../situational/situation-package.registry'
 import { projectSjtReleaseStatus } from '../situational/authoring/service'
 import type {
   AddCompositeItemInput,
@@ -187,6 +188,7 @@ import type {
 import {
   getFrozenPackageSlotLabels,
   resolveCompositeItemLabel,
+  resolveSituationalReportLabel,
   resolveLibraryItemLabel,
 } from './report-package-label'
 import {
@@ -5629,13 +5631,19 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
         const canonical = child?.canonicalResultEncrypted
           ? parseCanonicalUnitResultEnvelope(decryptUnifiedRuntimePayload<unknown>(child.canonicalResultEncrypted))
           : null
-        const scientificContext = frozenSituationalScientificProjection(child?.runtimeSnapshotEncrypted ? decryptFrozenSituationalRuntimeSnapshot(child.runtimeSnapshotEncrypted).scientificContext : undefined)
+        // The already-frozen definition is authoritative for historical report
+        // presentation, including uploaded releases and later title changes.
+        const frozenSituational = child?.runtimeSnapshotEncrypted
+          ? decryptFrozenSituationalRuntimeSnapshot(child.runtimeSnapshotEncrypted)
+          : null
+        const scientificContext = frozenSituationalScientificProjection(frozenSituational?.scientificContext)
         if (canonical && canonical.core.unitType !== 'SITUATIONAL') throw new Error('wrong situational canonical unit type')
+        const builtinTitle = getSituationPackage(item.situationalInstrumentKey, item.situationalInstrumentVersion)?.definition.source.title
         unitReports.push({
           itemId: item.id,
           type: 'SITUATIONAL' as const,
           kind: 'situational' as const,
-          label: resolveCompositeItemLabel(item, packageSlotLabels),
+          label: resolveSituationalReportLabel(item, frozenSituational?.definition.source.title, builtinTitle, packageSlotLabels),
           scienceMaturity: scientificContext.scientificMaturity,
           scientificContext,
           instrumentKey: canonical?.core.instrumentKey ?? child?.instrumentKey ?? item.situationalInstrumentKey ?? null,

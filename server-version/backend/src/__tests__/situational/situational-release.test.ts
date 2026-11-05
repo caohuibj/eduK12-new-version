@@ -64,7 +64,7 @@ describe('exact SJT release resolution', () => {
     const metadata = { ...identity, status: 'RETIRED', definitionHash: compiled.definitionHash, packageKey: identity.instrumentKey, packageVersion: identity.instrumentVersion, packageStatus: 'PUBLISHED', modelKey: 'AUTHOR_KEY_SUM', scoringVersion: 'author-key-sum-v1' }
     mocks.query.mockResolvedValue([metadata])
     const result = await loadSituationalReleaseMetadata([identity, identity])
-    expect(result.get(situationalReleaseKey(identity))).toEqual({ status: 'RETIRED', scienceMaturity: 'PILOT' })
+    expect(result.get(situationalReleaseKey(identity))).toEqual({ status: 'RETIRED', scienceMaturity: 'PILOT', title: null })
     expect(mocks.query).toHaveBeenCalledTimes(1)
     expect(mocks.findMany).not.toHaveBeenCalled()
     mocks.query.mockResolvedValue([{ ...metadata, modelKey: 'UNKNOWN' }])

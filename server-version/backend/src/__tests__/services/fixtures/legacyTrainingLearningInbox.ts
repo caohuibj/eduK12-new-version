@@ -25,10 +25,13 @@ type LearningRow = {
 const iso = (value: Date | null | undefined) => value?.toISOString() ?? null;
 /** Owner-bound metadata only. Opening this inbox never starts an attempt,
  * reads answers/scores, generates reports, or grants report access. */
+
+// Membership scope intentionally mirrors courseController.myCourses; the inbox
+// covers every learner-visible course since the scope-alignment fix (PR #637).
 export async function legacyListTrainingLearningInbox(userId: string, query: LearningQuery, now = new Date()) {
     const [feed, memberships] = await Promise.all([
         listStudentTasks(userId, { page: 1, pageSize: Number.MAX_SAFE_INTEGER }, now),
-        prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false, courseType: 'TRAINING_COURSE' } }, select: { course: { select: { id: true, title: true } } } }),
+        prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false, courseType: { not: 'CAMPUS_ACTIVITY' } } }, select: { course: { select: { id: true, title: true } } } }),
     ]);
     const courseMap = new Map(memberships.map(m => [m.course.id, m.course]));
     const courseIds = [...courseMap.keys()];
