@@ -36,8 +36,11 @@ export interface AssessmentShellProps {
   eyebrow?: string
   instructions?: ReactNode
   instructionsSummary?: string
+  instructionsOpenByDefault?: boolean
   estimatedMinutes?: number | null
   progress?: AssessmentProgress
+  progressPlacement?: 'top' | 'bottom'
+  collapseOpenPath?: boolean
   saveStatus?: AssessmentSaveStatus
   submissionStatus?: AssessmentSubmissionStatus
   recoveryState?: AssessmentRecoveryState
@@ -50,7 +53,7 @@ export interface AssessmentShellProps {
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
-function ProgressView({ progress }: { progress: AssessmentProgress }) {
+function ProgressView({ progress, collapseOpenPath = false }: { progress: AssessmentProgress; collapseOpenPath?: boolean }) {
   const label = progress.label ?? '测评进度'
 
   if (progress.kind === 'phase') {
@@ -64,10 +67,22 @@ function ProgressView({ progress }: { progress: AssessmentProgress }) {
   }
 
   if (progress.kind === 'open-path') {
+    const visited = Math.max(0, progress.visited)
+    if (collapseOpenPath) {
+      return (
+        <details aria-label={label} className="assessment-open-path">
+          <summary>
+            <span>{label}</span>
+            <span className="assessment-open-path-count">{progress.visitedLabel ?? '已完成'} {visited} 个步骤</span>
+          </summary>
+          {progress.current ? <div className="assessment-open-path-detail">当前：{progress.current}</div> : null}
+        </details>
+      )
+    }
     return (
       <section aria-label={label} className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-3">
         <p className="text-sm font-medium text-slate-500">{label}</p>
-        <p className="mt-1 font-semibold text-slate-900">{progress.visitedLabel ?? '已完成'} {Math.max(0, progress.visited)} 个步骤</p>
+        <p className="mt-1 font-semibold text-slate-900">{progress.visitedLabel ?? '已完成'} {visited} 个步骤</p>
         {progress.current ? <p className="mt-1 text-sm text-slate-600">当前：{progress.current}</p> : null}
       </section>
     )
@@ -162,8 +177,11 @@ export function AssessmentShell({
   eyebrow = '测评',
   instructions,
   instructionsSummary,
+  instructionsOpenByDefault = false,
   estimatedMinutes,
   progress,
+  progressPlacement = 'top',
+  collapseOpenPath = false,
   saveStatus = { state: 'idle' },
   submissionStatus = { state: 'idle' },
   recoveryState = { state: 'none' },
@@ -184,14 +202,14 @@ export function AssessmentShell({
           {estimatedMinutes ? <p className="text-sm text-slate-500 sm:text-right">预计约 {estimatedMinutes} 分钟</p> : null}
         </div>
         {instructions ? instructionsSummary ? (
-          <details className="assessment-instructions">
+          <details className="assessment-instructions" open={instructionsOpenByDefault}>
             <summary>{instructionsSummary}</summary>
             <div className="max-w-prose whitespace-pre-wrap text-sm text-slate-600">{instructions}</div>
           </details>
         ) : <div className="max-w-prose whitespace-pre-wrap text-sm text-slate-600">{instructions}</div> : null}
       </header>
 
-      {progress ? <ProgressView progress={progress} /> : null}
+      {progress && progressPlacement === 'top' ? <ProgressView progress={progress} collapseOpenPath={collapseOpenPath} /> : null}
       <ShellStatuses
         saveStatus={saveStatus}
         submissionStatus={submissionStatus}
@@ -202,6 +220,7 @@ export function AssessmentShell({
       <div data-assessment-shell-content>{children}</div>
       {actions ? <div className="mt-5" data-assessment-shell-actions>{actions}</div> : null}
       {navigation ? <div className="mt-6" data-assessment-shell-navigation>{navigation}</div> : null}
+      {progress && progressPlacement === 'bottom' ? <div className="mt-6" data-assessment-shell-progress="bottom"><ProgressView progress={progress} collapseOpenPath={collapseOpenPath} /></div> : null}
     </ProductPage>
   )
 }

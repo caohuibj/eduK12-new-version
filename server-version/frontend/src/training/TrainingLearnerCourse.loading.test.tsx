@@ -50,6 +50,16 @@ it('starts one discovery fan-out during repeated tab switches while the first re
   expect(mocks.cognitive).toHaveBeenCalledTimes(1)
 })
 
+it('refreshes settled assessment availability when returning to the assessment tab', async () => {
+  render(<Page />)
+  await screen.findByText('培训师还没有向这门课程发布测评。')
+  expect(mocks.cognitive).toHaveBeenCalledTimes(1)
+  fireEvent.click(screen.getByRole('button', { name: '练习' }))
+  fireEvent.click(screen.getByRole('button', { name: '测评' }))
+  await waitFor(() => expect(mocks.cognitive).toHaveBeenCalledTimes(2))
+  await screen.findByText('培训师还没有向这门课程发布测评。')
+})
+
 it('does not publish a previous course discovery after navigating to another course', async () => {
   const pending = deferred<unknown>()
   const original = mocks.get.getMockImplementation()!

@@ -85,6 +85,34 @@ suite('Training START resume bypasses the admission gate (real PostgreSQL)', () 
     expect(await db.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: compositeId, userId: a } })).toBe(1)
   }, 60000)
 
+  it('does not recover an attempt whose retirement transaction is in flight', async () => {
+    const first = await startUserAttempt(a, compositeId)
+    let release!: () => void
+    const held = new Promise<void>(resolve => { release = resolve })
+    let marked!: () => void
+    const updated = new Promise<void>(resolve => { marked = resolve })
+    const retiring = db.$transaction(async tx => {
+      await tx.compositeAssessmentAttempt.update({
+        where: { id: first.attempt.id },
+        data: { status: 'ABANDONED', completedAt: new Date() },
+      })
+      marked()
+      await held
+    }, { maxWait: 10000, timeout: 60000 })
+    await updated
+    const nextStart = startUserAttempt(a, compositeId)
+    // The attempt row is still locked by the retiring transaction. A plain
+    // SELECT would incorrectly return the old IN_PROGRESS row immediately.
+    await new Promise(resolve => setTimeout(resolve, 300))
+    release()
+    await retiring
+    const next = await nextStart
+    expect(next.attempt.status).toBe('IN_PROGRESS')
+    expect(next.attempt.id).not.toBe(first.attempt.id)
+    expect(await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: first.attempt.id } }))
+      .toMatchObject({ status: 'ABANDONED' })
+  }, 60000)
+
   it('still applies the live eligibility checks to a resume', async () => {
     await db.courseStudent.update({ where: { courseId_studentId: { courseId, studentId: a } }, data: { status: 'PENDING' } })
     await expect(startUserAttempt(a, compositeId)).rejects.toMatchObject({ message: '不是问卷投放课程的有效学生' })
