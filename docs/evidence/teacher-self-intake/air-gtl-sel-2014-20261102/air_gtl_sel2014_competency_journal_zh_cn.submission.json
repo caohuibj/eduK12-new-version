@@ -1,0 +1,157 @@
+{
+  "requestId": "e08ed152-f084-5652-8e23-b7ef373a95aa",
+  "toolKey": "air_gtl_sel2014_competency_journal_zh_cn",
+  "version": "0.1.0",
+  "title": "AIR/GTL SEL｜自身SEL情境札记（项目自编）｜教师自评｜zh-CN v0.1.0",
+  "definition": {
+    "schemaVersion": 1,
+    "pages": [
+      {
+        "pageKey": "competency_journal_page",
+        "title": "自身SEL情境札记",
+        "description": "这是一份可跳过任意问题的个人反思记录。它没有分数，不用于判断教学优劣。可以只记录一件事，并选择一个需要支持的小步骤。",
+        "questions": [
+          {
+            "itemKey": "competency_context",
+            "type": "SINGLE",
+            "prompt": "这次记录主要发生在哪种互动中？",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "social_interactions",
+                "label": "相处、沟通与课堂秩序"
+              },
+              {
+                "optionKey": "instructional_interactions",
+                "label": "任务、讨论与学习支持"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "competency_topic",
+            "type": "SINGLE",
+            "prompt": "这次想留意自己哪一方面的经历？",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "self_awareness",
+                "label": "自我觉察"
+              },
+              {
+                "optionKey": "self_management",
+                "label": "自我管理与情绪调节"
+              },
+              {
+                "optionKey": "social_awareness",
+                "label": "理解他人和情境"
+              },
+              {
+                "optionKey": "relationship_skills",
+                "label": "关系与沟通"
+              },
+              {
+                "optionKey": "responsible_decision",
+                "label": "负责任的决策"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "competency_situation",
+            "type": "LONG_TEXT",
+            "prompt": "写下一个你愿意回顾的具体时刻；可以略去人物身份和私人细节。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1200
+          },
+          {
+            "itemKey": "competency_response",
+            "type": "LONG_TEXT",
+            "prompt": "当时你注意到自己有什么感受或想法，又作了什么选择？只写你愿意保留的部分。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1200
+          },
+          {
+            "itemKey": "competency_support",
+            "type": "LONG_TEXT",
+            "prompt": "有哪些情境条件或支持可能影响了这次经历？你还希望得到什么帮助？",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1200
+          },
+          {
+            "itemKey": "competency_next",
+            "type": "LONG_TEXT",
+            "prompt": "回到类似情境时，你想保留或小幅调整哪一个做法？",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1200
+          }
+        ]
+      }
+    ]
+  },
+  "statement": "EduK12项目自编的开放式记录与行动模板，借用一般反思流程；没有复制、翻译或逐题改写AIR/GTL原手册题项，不冒充原工具或其短版；待审，无评分。",
+  "classificationTags": [
+    "population:teacher",
+    "response:self",
+    "domain:teacher_workplace",
+    "language_validation:content_zh-CN",
+    "license:self_authored",
+    "use:not_diagnostic"
+  ],
+  "reference": {
+    "tags": [
+      "family:air_gtl_sel",
+      "role:teacher_self",
+      "stage:k12",
+      "language:zh-CN",
+      "version:project_0_1_0",
+      "use:developmental_reflection",
+      "research:PILOT",
+      "content:project_authored_journal",
+      "scoring:none",
+      "journal:competency_journal"
+    ],
+    "motherTool": "AIR/GTL SEL teaching reflection",
+    "motherTag": "family:air_gtl_sel",
+    "contentOrigin": "PROJECT_AUTHORED_OPEN_JOURNAL_NOT_ORIGINAL_AIR_INSTRUMENT",
+    "sourceContext": {
+      "author": "Nicholas Yoder",
+      "year": 2014,
+      "url": "https://files.eric.ed.gov/fulltext/ED553369.pdf",
+      "sha256": "0b3cfdd980e55bec88ea6bfde5ec231cf4864ee84c477c2902f474dc9702c37b",
+      "relationship": "bibliographic and broad-topic context only; no original items, rating anchors or reflection questions reproduced"
+    },
+    "language": "zh-CN",
+    "translationStatus": "NOT_A_TRANSLATION_OF_ORIGINAL_ITEMS",
+    "audience": {
+      "respondent": "teacher_self",
+      "receiver": "teacher_self_or_existing_explicit_authorization",
+      "studentVersion": null
+    },
+    "versions": {
+      "content": "0.1.0",
+      "parameters": null,
+      "report": null
+    },
+    "scientificMaturity": "PILOT",
+    "rights": {
+      "originalSource": "AIR 2014 all rights reserved; project reuse scope unresolved",
+      "thesePrompts": "project-authored draft; do not imply AIR approval or licensing of original content"
+    },
+    "scoring": "NONE",
+    "reportPolicy": "COMPLETION_ONLY",
+    "limitations": [
+      "描述个人记录，不推断实际教学质量、学生获得的支持或能力水平。",
+      "没有原工具量表得分、常模、诊断或跨工具总分。",
+      "填写者不等于所有报告接收者；不自动改变原有可见范围或共享规则。"
+    ]
+  }
+}

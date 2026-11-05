@@ -1,0 +1,781 @@
+{
+  "motherTool": "AIR/GTL SEL teaching reflection",
+  "motherTag": "family:air_gtl_sel",
+  "source": {
+    "author": "Nicholas Yoder",
+    "year": 2014,
+    "month": "February",
+    "title": "Self-Assessing Social and Emotional Instruction and Competencies: A Tool for Teachers",
+    "url": "https://files.eric.ed.gov/fulltext/ED553369.pdf",
+    "sha256": "0b3cfdd980e55bec88ea6bfde5ec231cf4864ee84c477c2902f474dc9702c37b",
+    "pages": 30,
+    "rightsNotice": "Copyright 2014 American Institutes for Research. All rights reserved.",
+    "rightsConclusion": "No project-specific digital adaptation/translation/public redistribution license obtained; original questionnaire text is not reproduced.",
+    "retrieved": "2026-11-02"
+  },
+  "components": [
+    {
+      "candidateKey": "air_gtl_sel2014_practice_student_centered_discipline_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "1A",
+      "topicNameZhEditorial": "支持学习的规则与纪律",
+      "printedPage": 4,
+      "pdfPage": 10,
+      "itemCount": 8,
+      "itemLocalLetters": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h"
+      ],
+      "sourceResponseRange": [
+        1,
+        5
+      ],
+      "sourceAggregation": "manual p13 asks average within this practice; no all-practice quality total",
+      "printedMaximum": 35,
+      "arithmeticMaximum": 40,
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established by this intake; source warns not empirically tested within teacher evaluation system",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_practice_teacher_language_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "1A",
+      "topicNameZhEditorial": "教师表达与回应",
+      "printedPage": 4,
+      "pdfPage": 10,
+      "itemCount": 3,
+      "itemLocalLetters": [
+        "a",
+        "b",
+        "c"
+      ],
+      "sourceResponseRange": [
+        1,
+        5
+      ],
+      "sourceAggregation": "manual p13 asks average within this practice; no all-practice quality total",
+      "printedMaximum": 15,
+      "arithmeticMaximum": 15,
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established by this intake; source warns not empirically tested within teacher evaluation system",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_practice_responsibility_choice_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "1A",
+      "topicNameZhEditorial": "责任与选择",
+      "printedPage": 5,
+      "pdfPage": 11,
+      "itemCount": 5,
+      "itemLocalLetters": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "sourceResponseRange": [
+        1,
+        5
+      ],
+      "sourceAggregation": "manual p13 asks average within this practice; no all-practice quality total",
+      "printedMaximum": 25,
+      "arithmeticMaximum": 25,
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established by this intake; source warns not empirically tested within teacher evaluation system",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_practice_warmth_support_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "1A",
+      "topicNameZhEditorial": "温暖与支持",
+      "printedPage": 5,
+      "pdfPage": 11,
+      "itemCount": 7,
+      "itemLocalLetters": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g"
+      ],
+      "sourceResponseRange": [
+        1,
+        5
+      ],
+      "sourceAggregation": "manual p13 asks average within this practice; no all-practice quality total",
+      "printedMaximum": 35,
+      "arithmeticMaximum": 35,
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established by this intake; source warns not empirically tested within teacher evaluation system",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_practice_cooperative_learning_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "2A",
+      "topicNameZhEditorial": "合作学习",
+      "printedPage": 8,
+      "pdfPage": 14,
+      "itemCount": 7,
+      "itemLocalLetters": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g"
+      ],
+      "sourceResponseRange": [
+        1,
+        5
+      ],
+      "sourceAggregation": "manual p13 asks average within this practice; no all-practice quality total",
+      "printedMaximum": 35,
+      "arithmeticMaximum": 35,
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established by this intake; source warns not empirically tested within teacher evaluation system",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_practice_classroom_discussions_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "2A",
+      "topicNameZhEditorial": "课堂讨论",
+      "printedPage": 8,
+      "pdfPage": 14,
+      "itemCount": 5,
+      "itemLocalLetters": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "sourceResponseRange": [
+        1,
+        5
+      ],
+      "sourceAggregation": "manual p13 asks average within this practice; no all-practice quality total",
+      "printedMaximum": 25,
+      "arithmeticMaximum": 25,
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established by this intake; source warns not empirically tested within teacher evaluation system",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_practice_self_assessment_reflection_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "2A",
+      "topicNameZhEditorial": "学习中的自评与反思",
+      "printedPage": 9,
+      "pdfPage": 15,
+      "itemCount": 8,
+      "itemLocalLetters": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h"
+      ],
+      "sourceResponseRange": [
+        1,
+        5
+      ],
+      "sourceAggregation": "manual p13 asks average within this practice; no all-practice quality total",
+      "printedMaximum": 40,
+      "arithmeticMaximum": 40,
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established by this intake; source warns not empirically tested within teacher evaluation system",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_practice_balanced_instruction_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "2A",
+      "topicNameZhEditorial": "多种教学方式的安排",
+      "printedPage": 9,
+      "pdfPage": 15,
+      "itemCount": 6,
+      "itemLocalLetters": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f"
+      ],
+      "sourceResponseRange": [
+        1,
+        5
+      ],
+      "sourceAggregation": "manual p13 asks average within this practice; no all-practice quality total",
+      "printedMaximum": 30,
+      "arithmeticMaximum": 30,
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established by this intake; source warns not empirically tested within teacher evaluation system",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_practice_academic_press_expectations_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "2A",
+      "topicNameZhEditorial": "学习挑战与期望",
+      "printedPage": 10,
+      "pdfPage": 16,
+      "itemCount": 5,
+      "itemLocalLetters": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "sourceResponseRange": [
+        1,
+        5
+      ],
+      "sourceAggregation": "manual p13 asks average within this practice; no all-practice quality total",
+      "printedMaximum": 25,
+      "arithmeticMaximum": 25,
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established by this intake; source warns not empirically tested within teacher evaluation system",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_practice_competence_building_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "2A",
+      "topicNameZhEditorial": "示范、练习与反馈支持",
+      "printedPage": 10,
+      "pdfPage": 16,
+      "itemCount": 8,
+      "itemLocalLetters": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h"
+      ],
+      "sourceResponseRange": [
+        1,
+        5
+      ],
+      "sourceAggregation": "manual p13 asks average within this practice; no all-practice quality total",
+      "printedMaximum": 40,
+      "arithmeticMaximum": 40,
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established by this intake; source warns not empirically tested within teacher evaluation system",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_social_interactions_self_awareness_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "1B",
+      "topicNameZhEditorial": "自我觉察",
+      "context": "social_interactions",
+      "printedPage": 6,
+      "pdfPage": 12,
+      "itemCount": 5,
+      "sourceResponseRange": [
+        1,
+        4
+      ],
+      "sourceAggregation": "manual p14 aggregates competency evidence across two practice contexts; do not assume independent scored short-form validity",
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established; source contexts retained separately",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "context:social_interactions",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_social_interactions_self_management_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "1B",
+      "topicNameZhEditorial": "自我管理与情绪调节",
+      "context": "social_interactions",
+      "printedPage": 6,
+      "pdfPage": 12,
+      "itemCount": 4,
+      "sourceResponseRange": [
+        1,
+        4
+      ],
+      "sourceAggregation": "manual p14 aggregates competency evidence across two practice contexts; do not assume independent scored short-form validity",
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established; source contexts retained separately",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "context:social_interactions",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_social_interactions_social_awareness_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "1B",
+      "topicNameZhEditorial": "理解他人和情境",
+      "context": "social_interactions",
+      "printedPage": 7,
+      "pdfPage": 13,
+      "itemCount": 4,
+      "sourceResponseRange": [
+        1,
+        4
+      ],
+      "sourceAggregation": "manual p14 aggregates competency evidence across two practice contexts; do not assume independent scored short-form validity",
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established; source contexts retained separately",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "context:social_interactions",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_social_interactions_relationship_skills_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "1B",
+      "topicNameZhEditorial": "关系与沟通",
+      "context": "social_interactions",
+      "printedPage": 7,
+      "pdfPage": 13,
+      "itemCount": 4,
+      "sourceResponseRange": [
+        1,
+        4
+      ],
+      "sourceAggregation": "manual p14 aggregates competency evidence across two practice contexts; do not assume independent scored short-form validity",
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established; source contexts retained separately",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "context:social_interactions",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_social_interactions_responsible_decision_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "1B",
+      "topicNameZhEditorial": "负责任的决策",
+      "context": "social_interactions",
+      "printedPage": 7,
+      "pdfPage": 13,
+      "itemCount": 4,
+      "sourceResponseRange": [
+        1,
+        4
+      ],
+      "sourceAggregation": "manual p14 aggregates competency evidence across two practice contexts; do not assume independent scored short-form validity",
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established; source contexts retained separately",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "context:social_interactions",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_instructional_interactions_self_awareness_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "2B",
+      "topicNameZhEditorial": "自我觉察",
+      "context": "instructional_interactions",
+      "printedPage": 11,
+      "pdfPage": 17,
+      "itemCount": 5,
+      "sourceResponseRange": [
+        1,
+        4
+      ],
+      "sourceAggregation": "manual p14 aggregates competency evidence across two practice contexts; do not assume independent scored short-form validity",
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established; source contexts retained separately",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "context:instructional_interactions",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_instructional_interactions_self_management_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "2B",
+      "topicNameZhEditorial": "自我管理与情绪调节",
+      "context": "instructional_interactions",
+      "printedPage": 11,
+      "pdfPage": 17,
+      "itemCount": 4,
+      "sourceResponseRange": [
+        1,
+        4
+      ],
+      "sourceAggregation": "manual p14 aggregates competency evidence across two practice contexts; do not assume independent scored short-form validity",
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established; source contexts retained separately",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "context:instructional_interactions",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_instructional_interactions_social_awareness_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "2B",
+      "topicNameZhEditorial": "理解他人和情境",
+      "context": "instructional_interactions",
+      "printedPage": 12,
+      "pdfPage": 18,
+      "itemCount": 4,
+      "sourceResponseRange": [
+        1,
+        4
+      ],
+      "sourceAggregation": "manual p14 aggregates competency evidence across two practice contexts; do not assume independent scored short-form validity",
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established; source contexts retained separately",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "context:instructional_interactions",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_instructional_interactions_relationship_skills_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "2B",
+      "topicNameZhEditorial": "关系与沟通",
+      "context": "instructional_interactions",
+      "printedPage": 12,
+      "pdfPage": 18,
+      "itemCount": 4,
+      "sourceResponseRange": [
+        1,
+        4
+      ],
+      "sourceAggregation": "manual p14 aggregates competency evidence across two practice contexts; do not assume independent scored short-form validity",
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established; source contexts retained separately",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "context:instructional_interactions",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    },
+    {
+      "candidateKey": "air_gtl_sel2014_instructional_interactions_responsible_decision_en",
+      "sourceRole": "teacher_self",
+      "sourceVersion": "Yoder_2014_February",
+      "sourceLanguage": "en",
+      "sourcePart": "2B",
+      "topicNameZhEditorial": "负责任的决策",
+      "context": "instructional_interactions",
+      "printedPage": 12,
+      "pdfPage": 18,
+      "itemCount": 4,
+      "sourceResponseRange": [
+        1,
+        4
+      ],
+      "sourceAggregation": "manual p14 aggregates competency evidence across two practice contexts; do not assume independent scored short-form validity",
+      "reverseItemsMarked": false,
+      "missingRule": "NOT_SPECIFIED",
+      "sourceItemTextIncluded": false,
+      "implementation": "SOURCE_METADATA_ONLY_RIGHTS_SCOPE_UNRESOLVED",
+      "independentValidity": "not established; source contexts retained separately",
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "version:yoder2014",
+        "context:instructional_interactions",
+        "use:developmental_reflection",
+        "rights:original_redistribution_unresolved"
+      ]
+    }
+  ],
+  "sourceSections": {
+    "socialPracticeItems": 23,
+    "instructionalPracticeItems": 39,
+    "socialContextCompetencyItems": 21,
+    "instructionalContextCompetencyItems": 21,
+    "totalSourceItemOccurrences": 104,
+    "reflectionQuestionCounts": {
+      "practiceReflection": 8,
+      "competencyReflection": 4
+    },
+    "reflectionPages": [
+      13,
+      14
+    ]
+  },
+  "scoringIssue": {
+    "component": "student_centered_discipline",
+    "definitionPagePrinted": 4,
+    "definitionPagePdf": 10,
+    "items": "a–h (8 rows)",
+    "responseRange": [
+      1,
+      5
+    ],
+    "computedMaximum": 40,
+    "printedScoringPageMaximum": 35,
+    "scoringPagePrinted": 13,
+    "scoringPagePdf": 19,
+    "resolution": "UNRESOLVED_SOURCE_INCONSISTENCY; no silent item deletion, denominator correction, or implemented official score"
+  },
+  "versionBoundary": {
+    "selected": "2014 original only",
+    "related2022": "https://www.air.org/sites/default/files/2022-12/GTL-Educator-Self-Assessment-Refreshed-2014-508.pdf",
+    "related2022Status": "different title/order/wording; read only to identify separate refreshed version, not imported or substituted"
+  },
+  "originalInstrumentStatus": "FULLTEXT_READ_NOT_IMPORTED_RIGHTS_UNRESOLVED",
+  "sourceCprVersions": {
+    "content": null,
+    "parameters": null,
+    "report": null
+  }
+}

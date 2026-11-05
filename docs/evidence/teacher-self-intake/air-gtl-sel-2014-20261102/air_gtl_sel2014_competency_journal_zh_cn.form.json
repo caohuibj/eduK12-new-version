@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "pages": [
+    {
+      "pageKey": "competency_journal_page",
+      "title": "自身SEL情境札记",
+      "description": "这是一份可跳过任意问题的个人反思记录。它没有分数，不用于判断教学优劣。可以只记录一件事，并选择一个需要支持的小步骤。",
+      "questions": [
+        {
+          "itemKey": "competency_context",
+          "type": "SINGLE",
+          "prompt": "这次记录主要发生在哪种互动中？",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "social_interactions",
+              "label": "相处、沟通与课堂秩序"
+            },
+            {
+              "optionKey": "instructional_interactions",
+              "label": "任务、讨论与学习支持"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "competency_topic",
+          "type": "SINGLE",
+          "prompt": "这次想留意自己哪一方面的经历？",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "self_awareness",
+              "label": "自我觉察"
+            },
+            {
+              "optionKey": "self_management",
+              "label": "自我管理与情绪调节"
+            },
+            {
+              "optionKey": "social_awareness",
+              "label": "理解他人和情境"
+            },
+            {
+              "optionKey": "relationship_skills",
+              "label": "关系与沟通"
+            },
+            {
+              "optionKey": "responsible_decision",
+              "label": "负责任的决策"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "competency_situation",
+          "type": "LONG_TEXT",
+          "prompt": "写下一个你愿意回顾的具体时刻；可以略去人物身份和私人细节。",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "competency_response",
+          "type": "LONG_TEXT",
+          "prompt": "当时你注意到自己有什么感受或想法，又作了什么选择？只写你愿意保留的部分。",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "competency_support",
+          "type": "LONG_TEXT",
+          "prompt": "有哪些情境条件或支持可能影响了这次经历？你还希望得到什么帮助？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "competency_next",
+          "type": "LONG_TEXT",
+          "prompt": "回到类似情境时，你想保留或小幅调整哪一个做法？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        }
+      ]
+    }
+  ]
+}
