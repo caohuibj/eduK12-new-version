@@ -3532,6 +3532,17 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
   assertSupportedComposite(composite, false, false)
   await assertStudentEligibility(composite, userId)
 
+  // Resume does not need the admission gate: the in-tx lock below never
+  // re-reads publication state for an existing attempt, so returning the
+  // IN_PROGRESS attempt after the same live eligibility checks is the same
+  // decision without queueing behind new starts.
+  const inProgress = await prisma.compositeAssessmentAttempt.findFirst({
+    where: { compositeAssessmentId: compositeId, userId, status: 'IN_PROGRESS' },
+    orderBy: { startedAt: 'desc' },
+    select: { id: true },
+  })
+  if (inProgress) return { attempt: await getAttemptState(inProgress.id, { userId }), recoveryToken: null }
+
   const isUniqueConstraintError = (err: unknown) =>
     typeof err === 'object' && err !== null && 'code' in err && (err as { code?: unknown }).code === 'P2002'
 
