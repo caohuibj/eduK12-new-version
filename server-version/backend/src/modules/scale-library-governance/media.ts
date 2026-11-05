@@ -105,7 +105,7 @@ export async function retainLibrarySubmissionMedia(tx:Tx,submissionId:string,raw
 }
 export async function approveLibraryMedia(tx:Tx,entryId:string,submissionId:string,raw:LibraryMediaManifest) {
   const manifest=assertLibraryMediaManifest(raw)
-  await assertManifestAssetVersions(tx,manifest)
+  await assertManifestAssetVersions(tx,[manifest])
   await retainAssessmentAssetReferences({owner:{entityType:'ScaleLibraryMedia',entityId:entryId,field:'media'},references:manifest.items,db:tx})
   // No external copy/job is needed: one DB transaction publishes all immutable logical
   // catalog records and their retention pins, or none. READY is never claimed for a queued copy.
@@ -115,18 +115,27 @@ export async function approveLibraryMedia(tx:Tx,entryId:string,submissionId:stri
   const pins=manifest.items.length?await tx.assetReference.count({where:{entityType:'ScaleLibrarySubmission',entityId:submissionId,field:'media',assetId:{in:manifest.items.map(i=>i.assetId)}}}):0
   if (pins!==manifest.items.length) fail('SCALE_LIBRARY_SUBMISSION_MEDIA_NOT_RETAINED')
 }
-async function assertManifestAssetVersions(tx:Tx,manifest:LibraryMediaManifest) {
-  const ids=manifest.items.map(i=>i.assetId)
+async function assertManifestAssetVersions(tx:Tx,manifests:readonly LibraryMediaManifest[]) {
+  const items=manifests.flatMap(manifest=>manifest.items),ids=[...new Set(items.map(i=>i.assetId))]
   await lockStoredAssetRows(tx,ids)
   const assets=ids.length?await tx.storedAsset.findMany({where:{id:{in:ids}}}):[]
-  if(assets.length!==ids.length||manifest.items.some(item=>!assets.some(a=>a.id===item.assetId&&!a.deletedAt&&a.accessScope==='PRIVATE'&&a.sha256===item.contentHash&&a.mimeType===item.mimeType&&a.sizeBytes===item.sizeBytes&&a.createdAt.toISOString()===item.assetVersion)))
+  if(assets.length!==ids.length||items.some(item=>!assets.some(a=>a.id===item.assetId&&!a.deletedAt&&a.accessScope==='PRIVATE'&&a.sha256===item.contentHash&&a.mimeType===item.mimeType&&a.sizeBytes===item.sizeBytes&&a.createdAt.toISOString()===item.assetVersion)))
     fail('SCALE_LIBRARY_MEDIA_FROZEN_VERSION_MISMATCH')
 }
 export async function assertLibraryMediaReady(tx:Tx,entryId:string,raw:LibraryMediaManifest) {
-  const manifest=assertLibraryMediaManifest(raw)
-  await assertManifestAssetVersions(tx,manifest)
-  const rows=await tx.$queryRaw<Array<{asset_id:string;identity:unknown;manifest_hash:string;state:string}>>(Prisma.sql`
-    SELECT asset_id,identity,manifest_hash,state FROM scale_library_media WHERE entry_id=${entryId} FOR SHARE`)
-  if(rows.length!==manifest.items.length||manifest.items.some(item=>!rows.some(row=>row.asset_id===item.assetId&&row.state==='READY'&&row.manifest_hash===manifest.manifestHash&&canonicalHash(row.identity)===canonicalHash(item))))
-    fail('SCALE_LIBRARY_MEDIA_NOT_READY')
+  await assertLibraryMediaReadyBatch(tx,[{entryId,manifest:raw}])
+}
+/** Same per-entry READY check for many entries with one read per table. */
+export async function assertLibraryMediaReadyBatch(tx:Tx,input:ReadonlyArray<{entryId:string;manifest:LibraryMediaManifest}>) {
+  if(!input.length)return
+  const manifests=input.map(({manifest})=>assertLibraryMediaManifest(manifest))
+  await assertManifestAssetVersions(tx,manifests)
+  const entryIds=[...new Set(input.map(i=>i.entryId))]
+  const rows=await tx.$queryRaw<Array<{entry_id:string;asset_id:string;identity:unknown;manifest_hash:string;state:string}>>(Prisma.sql`
+    SELECT entry_id,asset_id,identity,manifest_hash,state FROM scale_library_media WHERE entry_id=ANY(${entryIds}::text[]) ORDER BY entry_id,id FOR SHARE`)
+  for(const [index,{entryId}] of input.entries()){
+    const manifest=manifests[index],own=rows.filter(row=>row.entry_id===entryId)
+    if(own.length!==manifest.items.length||manifest.items.some(item=>!own.some(row=>row.asset_id===item.assetId&&row.state==='READY'&&row.manifest_hash===manifest.manifestHash&&canonicalHash(row.identity)===canonicalHash(item))))
+      fail('SCALE_LIBRARY_MEDIA_NOT_READY')
+  }
 }
