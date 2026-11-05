@@ -6,6 +6,10 @@ import {ContentReleaseError} from '../measurement-content/release'
 import {assertLibraryMediaReadyBatch} from './media'
 import type {LibrarySnapshot} from './source'
 const fail=():never=>{throw new ContentReleaseError('CONTENT_SCALE_LIBRARY_IDENTITY_MISMATCH')}
+/** MEASUREMENT-layer release after the exact SCALE identity guards below. Keeps
+ * caller access to measurementHash the same as the prior singular return type. */
+type LibraryScaleRelease=Extract<StoredRelease,{layer:'MEASUREMENT'}>
+type LibraryScaleSource={release:LibraryScaleRelease;definition:LibrarySnapshot['compiledDefinition'];rights:null}
 /** Exact approved entry adapter, NEVER a general exception to PRIVATE scope.
  * Original creator is provenance only. The caller independently authorizes use.
  * FROZEN_IDENTITY is restricted to a previously stored publication/attempt tuple;
@@ -15,7 +19,7 @@ export async function readLibraryScaleMeasurementSource(tx:Prisma.TransactionCli
 }
 /** Same exact-entry checks for many wrappers, one locked read per table. */
 export async function readLibraryScaleMeasurementSources(tx:Prisma.TransactionClient,scales:readonly Scale[],purpose:'NEW_USE'|'FROZEN_IDENTITY'='NEW_USE'){
- const result=new Map<string,{release:StoredRelease;definition:LibrarySnapshot['compiledDefinition'];rights:null}>()
+ const result=new Map<string,LibraryScaleSource>()
  if(!scales.length)return result
  if(scales.some(scale=>!scale.libraryEntryId))return fail()
  const entryIds=[...new Set(scales.map(scale=>scale.libraryEntryId!))].sort()
