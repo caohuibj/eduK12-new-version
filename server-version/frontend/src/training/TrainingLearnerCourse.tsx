@@ -63,6 +63,16 @@ export default function TrainingLearnerCourse() {
   const [assessmentRevision, setAssessmentRevision] = useState(0)
   const requests = useRef<CourseRequests>({ key: '' })
   const assessmentRequest = useRef<{ key: string; promise: Promise<CourseAssessmentResult> } | null>(null)
+  const previousSection = useRef(section)
+
+  useEffect(() => {
+    const returningToAssessments = previousSection.current !== 'assessments' && section === 'assessments'
+    previousSection.current = section
+    if (returningToAssessments && assessments) {
+      setAssessments(null)
+      setAssessmentRevision(value => value + 1)
+    }
+  }, [section, assessments])
 
   // Keep current course data separate from previous course. Ignore stale loads.
   useEffect(() => {

@@ -25,6 +25,15 @@ export default function TrainingContextBack({ role }: { role: Role | undefined }
     </section>
   }
   const studentRoot = role === 'STUDENT'
+  if (studentRoot && /^\/student\/composite\/situational\/[^/]+(?:\/|$)/.test(path)) {
+    const query = new URLSearchParams(location.search)
+    const returnTo = internalReturnTo(query.get('returnTo'))
+    const courseId = query.get('courseId')
+    const safeCourse = courseId && /^[A-Za-z0-9_-]{1,100}$/.test(courseId) ? courseId : null
+    const to = returnTo || (safeCourse ? `/student/courses/${encodeURIComponent(safeCourse)}?section=assessments` : '/student')
+    const label = returnTo ? '返回上一页' : safeCourse ? '返回当前课程' : '返回我的课程'
+    return <Link className="training-context-back" to={to}><ArrowLeft size={16} aria-hidden="true" />{label}</Link>
+  }
   if (studentRoot && /^\/student\/(?:assignments|checkins|scales|questionnaires|cognitive|composite|situational)\//.test(path)) return null
   const search=new URLSearchParams(location.search)
   const returnTo=internalReturnTo(search.get('returnTo'))
