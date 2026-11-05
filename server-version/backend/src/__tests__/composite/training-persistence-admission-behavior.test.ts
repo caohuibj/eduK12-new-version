@@ -7,7 +7,7 @@ const { db, state, inserted } = vi.hoisted(() => ({
   db: {
     $transaction: vi.fn(), $queryRaw: vi.fn(), $queryRawUnsafe: vi.fn(),
     compositeAssessment: { findUnique: vi.fn() }, courseStudent: { findFirst: vi.fn() },
-    compositeAssessmentAttempt: { findFirst: vi.fn(), count: vi.fn(), create: vi.fn() },
+    compositeAssessmentAttempt: { findFirst: vi.fn(), findUnique: vi.fn(), count: vi.fn(), create: vi.fn() },
   },
   state: { publication: {} as Record<string, any>, runtimeOverrides: {} as Record<string, unknown>, locked: {} as Record<string, any>, order: [] as string[] },
   inserted: new Error('fixture stops at the atomic insert boundary'),
@@ -64,6 +64,7 @@ beforeEach(() => {
   })
   db.courseStudent.findFirst.mockResolvedValue({ courseId: 'training', status: 'ACTIVE' })
   db.compositeAssessmentAttempt.findFirst.mockResolvedValue(null)
+  db.compositeAssessmentAttempt.findUnique.mockResolvedValue(null)
   db.compositeAssessmentAttempt.count.mockResolvedValue(0)
   db.compositeAssessmentAttempt.create.mockImplementation(async () => { state.order.push('insert'); throw inserted })
 })
@@ -126,7 +127,10 @@ describe('C23 persistence admission projection (schema-aware mock DB, actual sta
     expect(db.compositeAssessmentAttempt.create).not.toHaveBeenCalled()
   })
   it('retains Training course/author lock and enrollment revalidation', async () => {
-    db.$queryRaw.mockImplementation(async (query: TemplateStringsArray) => query.join('').includes('FOR SHARE OF c,u') ? [] : [{ id: 'publication' }])
+    db.$queryRaw.mockImplementation(async (query: TemplateStringsArray) =>
+      query.join('').includes('composite_assessment_attempts') || query.join('').includes('FOR SHARE OF c,u')
+        ? []
+        : [{ id: 'publication' }])
     await expect(startUserAttempt('student', 'publication')).rejects.toMatchObject({ statusCode: 403, message: 'Training 课程已关闭或投放权限无效' })
     expect(db.compositeAssessmentAttempt.create).not.toHaveBeenCalled()
   })
