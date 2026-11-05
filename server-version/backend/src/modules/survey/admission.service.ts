@@ -214,21 +214,53 @@ export async function startLinkedWave(input:{
   })
 }
 export async function startSingleUnlinkedWave(input:{
-  publicId:string;waveId:string;entryToken:string;consentVersion:number;consent:boolean
+  publicId:string;waveId:string;entryToken:string;consentVersion:number;consent:boolean;
+  operationKey?:string;accessCredential?:string
 }){
   enabled()
   if(!input.consent)blocked('必须先同意本研究的参与说明')
+  // The two client-generated values are OPTIONAL to keep rolling deploys
+  // compatible: pages served by the previous backend never send them, and
+  // open tabs must keep working against the new one. Both absent → the
+  // deprecated server-generated session with no replay identity (exactly the
+  // pre-idempotency behavior). Both present → full-entropy format enforced,
+  // the values must differ, and the idempotent path applies. The current
+  // frontend always sends them.
+  const legacy=!input.operationKey&&!input.accessCredential
+  if(!legacy&&(!secretPattern.test(input.operationKey??'')||!secretPattern.test(input.accessCredential??'')
+    ||input.operationKey===input.accessCredential))blocked('开始凭证不合法')
   const project=await prisma.$transaction(tx=>projectPublic(tx,input.publicId))
-  const proof=freshUnlinkedSession()
+  const serverSession=legacy?freshUnlinkedSession():null
+  const operationKeyHash=legacy?null:hashResearchCredential(input.operationKey!)
+  const sessionHash=hashResearchCredential(legacy?serverSession!.accessCredential:input.accessCredential!)
+  const bearer=legacy?serverSession!.accessCredential:input.accessCredential!
   return prisma.$transaction(async tx=>{
     const wave=await openWaveLocked(tx,project.id,input.waveId,false)
     await validateEntry(tx,project.id,wave.id,input.entryToken)
+    // Replay first, before any quota is claimed: the same operation identity
+    // recovers the original attempt when the first response was lost. The
+    // bearer must match the recorded session hash, so a different or guessed
+    // credential cannot recover someone else's attempt. Replay deliberately
+    // runs after the wave/entry governance gates: closing a wave, pausing the
+    // project or expiring the recruitment token still ends recovery, exactly
+    // as it ends new starts. Consent was recorded at creation and the attempt
+    // continues under it (mirrors LINKED replay).
+    if(operationKeyHash){
+      const previous=await tx.surveyWaveAttempt.findFirst({where:{
+        projectId:project.id,waveId:wave.id,operationKeyHash,
+      }})
+      if(previous){
+        if(previous.sessionHash!==sessionHash)blocked('开始凭证与本轮记录不匹配')
+        await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:previous.id,publicationId:wave.publicationId!,newAttempt:false})
+        return {attemptId:previous.id,waveId:wave.id,status:previous.status,recovered:true,accessCredential:bearer}
+      }
+    }
     if(input.consentVersion!==wave.consentVersion)blocked('研究说明已更新，请重新确认')
     if(!hasQuota(wave))blocked('本波次参与名额已用尽')
     await claimQuota(tx,wave.id,wave.startsCount)
     const row=await tx.surveyWaveAttempt.create({data:{
       id:randomUUID(),projectId:project.id,waveId:wave.id,
-      sessionHash:proof.sessionHash,status:'STARTED',
+      sessionHash,...(operationKeyHash?{operationKeyHash}:{}),status:'STARTED',
     }})
     await tx.surveyConsent.create({data:{
       id:randomUUID(),projectId:project.id,waveId:wave.id,
@@ -236,11 +268,11 @@ export async function startSingleUnlinkedWave(input:{
     }})
     await allocateResearchFlowOnAdmission(tx,{
       publicationId:wave.publicationId!,projectId:project.id,waveId:wave.id,
-      attemptId:row.id,participantId:null,accessCredential:proof.accessCredential,
+      attemptId:row.id,participantId:null,accessCredential:bearer,
     })
     await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:row.id,publicationId:wave.publicationId!,newAttempt:true})
     return {attemptId:row.id,waveId:wave.id,status:'STARTED',
-      accessCredential:proof.accessCredential}
+      recovered:false,accessCredential:bearer}
   })
 }
 type SurveyAttemptProof={publicId:string;attemptId:string;researchCode?:string;accessCredential:string}

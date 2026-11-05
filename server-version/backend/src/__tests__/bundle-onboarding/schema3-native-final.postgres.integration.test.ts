@@ -118,7 +118,7 @@ test('installs one schema3 native Bundle, grants exact use, commits FINAL and re
   const wave=await once('wave',()=>createWave(owner.id,project.id,{requestId:randomUUID(),title:'Synthetic schema3 final',consentText:'Synthetic noncommercial test only. No human participant or diagnosis.',generalText:'Saved.',instrumentIds:imported.bindings.map((b:any)=>b.draftId),allowNewParticipants:true}))
   await once('prepared',async()=>{await prepareWave(owner.id,project.id,wave.id,wave.revision,undefined,imported.bindings.filter((b:any)=>b.slotKey!=='context').map((b:any)=>({instrumentId:b.draftId,feedback:{policyVersion:'SURVEY_RAW_METRICS_V1' as const,mode:'DESCRIPTIVE' as const,metricKeys:pack.manifest.definition.slots.find(s=>s.slotKey===b.slotKey)!.valueSelectors!,release:'AFTER_FINAL' as const}})));return true})
   const opened=await once('opened',async()=>{const w=await getWave(owner.id,project.id,wave.id);return openWave(owner.id,project.id,wave.id,w.revision)})
-  const attempt=await once('attempt',()=>startSingleUnlinkedWave({publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true}))
+  const attempt=await once('attempt',()=>startSingleUnlinkedWave({publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true,operationKey:'k'.repeat(43),accessCredential:'c'.repeat(43)}))
   const snapshot=(await db.surveyPublication.findUniqueOrThrow({where:{id:opened.publicationId!}})).compiledSnapshot as unknown as ResearchFrozenPublication
   const answers:Record<string,unknown>={},timings:Record<string,unknown>={}
   for(const unit of snapshot.units){

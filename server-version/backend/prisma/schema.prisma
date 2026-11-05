@@ -3179,6 +3179,7 @@ model SurveyWaveAttempt {
   participantId  String?       @map("participant_id")
   participant    SurveyParticipant? @relation(fields:[participantId],references:[id],onDelete:Restrict)
   sessionHash    String?       @map("session_hash")
+  operationKeyHash String?     @map("operation_key_hash")
   runtimeAttemptId String?     @unique @map("runtime_attempt_id")
   flowAssignmentCipher String?  @map("flow_assignment_cipher")
   contentBindingCipher String? @map("content_binding_cipher")
@@ -3195,6 +3196,7 @@ model SurveyWaveAttempt {
   @@unique([id,projectId,waveId],map:"survey_attempts_id_project_wave_uniq")
   @@unique([waveId,participantId],map:"survey_attempts_wave_participant_key")
   @@unique([waveId,sessionHash],map:"survey_attempts_wave_session_key")
+  @@unique([projectId,waveId,operationKeyHash],map:"survey_attempts_project_wave_operation_key")
   @@index([projectId,waveId,status],map:"survey_attempts_project_wave_status_idx")
   @@map("survey_wave_attempts")
 }

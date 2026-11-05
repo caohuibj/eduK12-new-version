@@ -1,5 +1,6 @@
 import {randomUUID} from 'node:crypto'
 import {afterAll,describe,expect,it,vi} from 'vitest'
+import { surveyStartKeys } from '../integration/survey-test-keys'
 const suite=process.env.PR356_INSTRUCTION_ISOLATED==='1'?describe:describe.skip
 suite('ordinary published SCALE instruction through actual Survey delivery',()=>{
  let db:any
@@ -38,7 +39,7 @@ suite('ordinary published SCALE instruction through actual Survey delivery',()=>
   await publish.prepareWave(owner,pid,wave.id,wave.revision)
   const frozen=await waves.getWave(owner,pid,wave.id),opened=await publish.openWave(owner,pid,wave.id,frozen.revision)
   await db.scale.update({where:{id:scale.id},data:{instruction:'Changed after freeze'}})
-  const admitted=await (await import('../../modules/survey/admission.service')).startSingleUnlinkedWave({publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true})
+  const admitted=await (await import('../../modules/survey/admission.service')).startSingleUnlinkedWave({publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true,...surveyStartKeys('catalog-instruction')})
   const task=await (await import('../../modules/survey/task.public')).getOwnResearchTask({publicId:opened.publicId,attemptId:admitted.attemptId,accessCredential:admitted.accessCredential})
   expect(task.units[0].instruction).toBe(expectedInstruction)
  },120000)

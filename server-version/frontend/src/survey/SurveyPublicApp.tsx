@@ -106,6 +106,65 @@ const feedbackQualityText=(value:string)=>({interpretable:'本次结果可作参
 const feedbackMetricStatusText=(value:string)=>({OK:'已计算',calculated:'已计算',INSUFFICIENT_DATA:'有效作答不足',insufficient_data:'有效作答不足',INVALID:'本次数据无效',invalid:'本次数据无效',not_calculable:'暂无法计算',limited:'仅供有限参考'} as Record<string,string>)[value]??'暂无法说明'
 type SingleResume={attemptId:string;accessCredential:string;createdAt:number}
 const singleStorageKey=(id:string)=>'huisurvey:v1:single:'+id
+// The client generates BOTH values before the first anonymous start and keeps
+// them per (publicId, wave): the operation identity lets the server recover the
+// original attempt when the first response is lost, and the bearer stays the
+// attempt credential. Session storage survives refreshes; the memory fallback
+// keeps in-tab retries identical even when private storage is blocked.
+type UnlinkedStartIdentity={operationKey:string;accessCredential:string}
+const startIdentityKey=(publicId:string,waveId:string)=>`huisurvey:v1:start-identity:${publicId}:${waveId}`
+const memoryStartIdentities=new Map<string,UnlinkedStartIdentity>()
+const randomUrlSecret=()=>{
+  const bytes=new Uint8Array(32)
+  crypto.getRandomValues(bytes)
+  let binary=''
+  for(const b of bytes)binary+=String.fromCharCode(b)
+  return btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')
+}
+const ensureUnlinkedStartIdentity=(publicId:string,waveId:string):UnlinkedStartIdentity=>{
+  const key=startIdentityKey(publicId,waveId)
+  const memory=memoryStartIdentities.get(key)
+  if(memory)return memory
+  try{
+    const json=sessionStorage.getItem(key)
+    if(json){
+      const saved=JSON.parse(json) as UnlinkedStartIdentity
+      if(/^[A-Za-z0-9_-]{43}$/.test(saved.operationKey)
+        &&/^[A-Za-z0-9_-]{43}$/.test(saved.accessCredential)
+        &&saved.operationKey!==saved.accessCredential){
+        memoryStartIdentities.set(key,saved)
+        return saved
+      }
+      sessionStorage.removeItem(key)
+    }
+  }catch{/* private session storage unavailable */}
+  const generated:UnlinkedStartIdentity={operationKey:randomUrlSecret(),accessCredential:randomUrlSecret()}
+  memoryStartIdentities.set(key,generated)
+  try{sessionStorage.setItem(key,JSON.stringify(generated))}catch{/* memory-only identity */}
+  return generated
+}
+// The start identity lives exactly as long as the START exchange: once the
+// server response is processed (or the attempt completes / is screened out),
+// it is destroyed. A shared-browser participant who arrives after that - even
+// in the same tab - always gets a fresh identity instead of the previous
+// participant's replay rights.
+const clearUnlinkedStartIdentity=(publicId:string,waveId:string)=>{
+  const key=startIdentityKey(publicId,waveId)
+  memoryStartIdentities.delete(key)
+  try{sessionStorage.removeItem(key)}catch{/* private session storage unavailable */}
+}
+const clearUnlinkedStartIdentities=(publicId:string)=>{
+  const prefix=startIdentityKey(publicId,'')
+  for(const key of [...memoryStartIdentities.keys()])if(key.startsWith(prefix))memoryStartIdentities.delete(key)
+  try{
+    const doomed:string[]=[]
+    for(let i=0;i<sessionStorage.length;i+=1){
+      const k=sessionStorage.key(i)
+      if(k&&k.startsWith(prefix))doomed.push(k)
+    }
+    for(const k of doomed)sessionStorage.removeItem(k)
+  }catch{/* private session storage unavailable */}
+}
 const readSingleResume=(id:string):SingleResume|null=>{
   try{
     const json=sessionStorage.getItem(singleStorageKey(id))
@@ -447,6 +506,7 @@ export default function SurveyPublicApp(){
   }
   const markCompleted=(id:string,proof:{accessCredential:string;researchCode?:string})=>{
     completedAttempts.current.add(id)
+    clearUnlinkedStartIdentities(publicId)
     clearLocalSurveyDraft(publicId,id)
     void clearCognitive(id).then(ok=>{if(!ok)setError('服务器已确认完成，但本机试次清理失败，请清理本网站存储。')})
     setCheckpointRevision(0);setTask(null);setCompletion({attemptId:id,proof})
@@ -454,6 +514,7 @@ export default function SurveyPublicApp(){
   }
   const markScreenedOut=(id:string)=>{
     completedAttempts.current.add(id)
+    clearUnlinkedStartIdentities(publicId)
     finalRequest.current=null;setFinalSealed(false)
     clearLocalSurveyDraft(publicId,id);void clearCognitive(id);setCheckpointRevision(0)
     try{sessionStorage.removeItem(singleStorageKey(publicId))}catch{/* private session unavailable */}
@@ -561,11 +622,16 @@ export default function SurveyPublicApp(){
       })
       await loadTask(started.attemptId,researchCode.trim().toUpperCase(),accessCredential.trim())
     }else{
+      const startIdentity=ensureUnlinkedStartIdentity(publicId,wave.id)
       const started=await publicApi<{attemptId:string;accessCredential:string}>(
         base+'/waves/'+wave.id+'/start-unlinked','POST',{
           entryToken,consent:true,consentVersion:wave.consentVersion,
+          operationKey:startIdentity.operationKey,accessCredential:startIdentity.accessCredential,
         })
       setAccessCredential(started.accessCredential)
+      // The START exchange is over: destroy the operation identity so a later
+      // participant in this tab can never inherit its replay rights.
+      clearUnlinkedStartIdentity(publicId,wave.id)
       discardEntry()
       const temp:SingleResume={attemptId:started.attemptId,
         accessCredential:started.accessCredential,createdAt:Date.now()}
