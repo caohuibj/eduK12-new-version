@@ -1,0 +1,147 @@
+{
+  "requestId": "52277547-138b-54b2-9a63-1d7483015161",
+  "toolKey": "pisa2022_st267_usa_en_student_form",
+  "version": "1.0.0",
+  "title": "PISA 2022｜师生关系｜中学15岁目标群体｜学生填答（美国英文）｜无计分描述表单",
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "r90f97477ae92b5c8cfc24283",
+        "title": "PISA 2022｜师生关系｜中学15岁目标群体｜学生填答（美国英文）｜无计分描述表单",
+        "questions": [
+          {
+            "itemKey": "rbb744ceab786ca93ba9bc849",
+            "type": "MATRIX",
+            "prompt": "To what extent do you agree or disagree with the following statements? (Please select one response in each row.)",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "r2e88e716c500da953d95522c",
+                "label": "Strongly disagree"
+              },
+              {
+                "optionKey": "r9e4034839c9a8c422517c083",
+                "label": "Disagree"
+              },
+              {
+                "optionKey": "rdd22810936dcf17071228ff7",
+                "label": "Agree"
+              },
+              {
+                "optionKey": "re862b73aae7ccac8c5079204",
+                "label": "Strongly agree"
+              }
+            ],
+            "rows": [
+              {
+                "rowKey": "r39b5934ac714ade24d71d0ce",
+                "label": "The teachers at my school are respectful towards me."
+              },
+              {
+                "rowKey": "rd5a592b2d0777bff7299e78f",
+                "label": "If I walked into my classes upset, my teachers would be concerned about me."
+              },
+              {
+                "rowKey": "r583dc216e20c1dbb7c28e737",
+                "label": "If I came back to visit my school three years from now, my teachers would be excited to see me."
+              },
+              {
+                "rowKey": "r4b59113a76a92511a859f265",
+                "label": "I feel intimidated by the teachers at my school."
+              },
+              {
+                "rowKey": "rf5828acca6b4faafd37918f3",
+                "label": "When my teachers ask how I am doing, they are really interested in my answer."
+              },
+              {
+                "rowKey": "r941c03c36d3b9586d4aa54fc",
+                "label": "The teachers at my school are friendly towards me."
+              },
+              {
+                "rowKey": "rf053232d6863996d69cd51a2",
+                "label": "The teachers at my school are interested in students' well-being."
+              },
+              {
+                "rowKey": "r10e549c00f6769ecf0bf6e21",
+                "label": "The teachers at my school are mean towards me."
+              }
+            ]
+          }
+        ],
+        "description": "OECD (2022), PISA 2022 national questionnaires, United States, Main Survey, student questionnaire, https://www.oecd.org/content/dam/oecd/en/data/datasets/pisa/pisa-2022-datasets/national-versions-pisa-2022-datasets/United%20States.zip. English source text reused under OECD Terms and Conditions section 1.2 (pre-1 July 2024 OECD written content; subject to any actual third-party or specific notice). This is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries. This is a local descriptive extraction, not an official PISA administration. No scores are calculated. You may leave a response blank. https://www.oecd.org/en/about/terms-conditions.html"
+      }
+    ]
+  },
+  "classificationTags": [
+    "response:self",
+    "use:research"
+  ],
+  "statement": "Source-derived English digital adaptation of OECD PISA 2022 USA Main Survey selected classroom questionnaire block under OECD written-content terms §1.2; source authorship remains OECD/national source, not the submitting administrator. Descriptive categorical Form only, no WLE or translated items.",
+  "reference": {
+    "familyTag": "mother:PISA_2022",
+    "locale": "en-US",
+    "respondent": "student",
+    "sourceBlock": "ST267",
+    "sourceItems": [
+      "ST267Q01JA",
+      "ST267Q02JA",
+      "ST267Q03JA",
+      "ST267Q04JA",
+      "ST267Q05JA",
+      "ST267Q06JA",
+      "ST267Q07JA",
+      "ST267Q08JA"
+    ],
+    "sourceItemToRow": {
+      "ST267Q01JA": {
+        "itemKey": "rbb744ceab786ca93ba9bc849",
+        "rowKey": "r39b5934ac714ade24d71d0ce"
+      },
+      "ST267Q02JA": {
+        "itemKey": "rbb744ceab786ca93ba9bc849",
+        "rowKey": "rd5a592b2d0777bff7299e78f"
+      },
+      "ST267Q03JA": {
+        "itemKey": "rbb744ceab786ca93ba9bc849",
+        "rowKey": "r583dc216e20c1dbb7c28e737"
+      },
+      "ST267Q04JA": {
+        "itemKey": "rbb744ceab786ca93ba9bc849",
+        "rowKey": "r4b59113a76a92511a859f265"
+      },
+      "ST267Q05JA": {
+        "itemKey": "rbb744ceab786ca93ba9bc849",
+        "rowKey": "rf5828acca6b4faafd37918f3"
+      },
+      "ST267Q06JA": {
+        "itemKey": "rbb744ceab786ca93ba9bc849",
+        "rowKey": "r941c03c36d3b9586d4aa54fc"
+      },
+      "ST267Q07JA": {
+        "itemKey": "rbb744ceab786ca93ba9bc849",
+        "rowKey": "rf053232d6863996d69cd51a2"
+      },
+      "ST267Q08JA": {
+        "itemKey": "rbb744ceab786ca93ba9bc849",
+        "rowKey": "r10e549c00f6769ecf0bf6e21"
+      }
+    },
+    "sourceUrl": "https://www.oecd.org/content/dam/oecd/en/data/datasets/pisa/pisa-2022-datasets/national-versions-pisa-2022-datasets/United%20States.zip",
+    "sourceMember": "USA/eng-USA_United States-Student_Questionnaire_MS22.pdf",
+    "sourceMemberSha256": "baf0191c8da494801063dce61922d8a7fbbabee81ba559b943f5fb2d224ee6f2",
+    "nationalSourceUrl": "https://nces.ed.gov/surveys/pisa/pisa2022/questionnaires/P22_StuQ-USA.html",
+    "licenseBasis": "https://www.oecd.org/en/about/terms-conditions.html §1.2",
+    "attribution": "OECD (2022), PISA 2022 national questionnaires, United States, Main Survey, student questionnaire, https://www.oecd.org/content/dam/oecd/en/data/datasets/pisa/pisa-2022-datasets/national-versions-pisa-2022-datasets/United%20States.zip. English source text reused under OECD Terms and Conditions section 1.2 (pre-1 July 2024 OECD written content; subject to any actual third-party or specific notice). This is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries. This is a local descriptive extraction, not an official PISA administration. No scores are calculated. You may leave a response blank. https://www.oecd.org/en/about/terms-conditions.html",
+    "digitalChanges": [
+      "One intact source block per MATRIX; original English prompts/options/rows retained",
+      "Original source row and option keys retained; optional missing responses, no recoding/imputation",
+      "Page title and source/adaptation notice added; no official NCES privacy/OMB text copied"
+    ],
+    "noOfficialWle": true,
+    "scoringParameters": null,
+    "runtimeReport": null,
+    "studentAndTeacherDisclosure": "Existing authorization/anonymous aggregation/minimum group size/release rules only; no new access grant",
+    "tagsNote": "familyTag and source role/locale retained as reference annotations; classificationTags includes only existing allowed dictionary IDs, no new tag engine."
+  }
+}

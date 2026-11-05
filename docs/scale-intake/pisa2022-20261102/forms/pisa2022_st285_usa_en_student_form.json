@@ -1,0 +1,160 @@
+{
+  "requestId": "02b88621-e382-5b83-a05f-e229409c6aca",
+  "toolKey": "pisa2022_st285_usa_en_student_form",
+  "version": "1.0.0",
+  "title": "PISA 2022｜数学认知激活：促进推理｜中学15岁目标群体｜学生填答（美国英文）｜无计分描述表单",
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "rb6f7972e67457ca4aa784120",
+        "title": "PISA 2022｜数学认知激活：促进推理｜中学15岁目标群体｜学生填答（美国英文）｜无计分描述表单",
+        "questions": [
+          {
+            "itemKey": "ra1ba588b9e01c217a01feb16",
+            "type": "MATRIX",
+            "prompt": "This school year, how often did your teacher do the following things in your mathematics lessons? (Please select one response in each row.)",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "rf521ab777f6f9d21579886c5",
+                "label": "Never or almost never"
+              },
+              {
+                "optionKey": "r5d3efbc81ccd66c1f6dcb664",
+                "label": "Less than half of the lessons"
+              },
+              {
+                "optionKey": "r43445dcda48794b8f87ad6c3",
+                "label": "About half of the lessons"
+              },
+              {
+                "optionKey": "r93ac96c5e0bed53d69919bb3",
+                "label": "More than half of the lessons"
+              },
+              {
+                "optionKey": "r98e9045ea6a1cc4ce2850201",
+                "label": "Every lesson or almost every lesson"
+              }
+            ],
+            "rows": [
+              {
+                "rowKey": "r5f69b17f22dd51f855a57549",
+                "label": "The teacher asked us to solve mathematics problems without computing anything."
+              },
+              {
+                "rowKey": "r6ab97fde71fd13d69abba3f1",
+                "label": "The teacher asked us to explain how we solved a mathematics problem."
+              },
+              {
+                "rowKey": "rb0543d793ac5897b3002d7c3",
+                "label": "The teacher asked us to explain what assumptions we were making when solving a mathematics problem."
+              },
+              {
+                "rowKey": "r9b3be6a16d23676b86c2814b",
+                "label": "The teacher asked us to explain our reasoning when solving a mathematics problem."
+              },
+              {
+                "rowKey": "r7bb76c4682cfe22f64117cfe",
+                "label": "The teacher asked us to defend our answer to a mathematics problem."
+              },
+              {
+                "rowKey": "r97e188ee82cb0babd6cbd2a9",
+                "label": "The teacher asked us to think about how new and old mathematics topics were related."
+              },
+              {
+                "rowKey": "r8ee140dcd87621f6c58a85f2",
+                "label": "The teacher encouraged us to think about how to solve mathematics problems in different ways than demonstrated in class."
+              },
+              {
+                "rowKey": "r975f4fdeef8bf1bf134fe3e9",
+                "label": "The teacher told us to keep trying even when we face difficulties with a mathematics task."
+              },
+              {
+                "rowKey": "r1a8b9773ad7b5021a3d517d3",
+                "label": "The teacher taught us to memorize rules and apply them to solve mathematics problems."
+              }
+            ]
+          }
+        ],
+        "description": "OECD (2022), PISA 2022 national questionnaires, United States, Main Survey, student questionnaire, https://www.oecd.org/content/dam/oecd/en/data/datasets/pisa/pisa-2022-datasets/national-versions-pisa-2022-datasets/United%20States.zip. English source text reused under OECD Terms and Conditions section 1.2 (pre-1 July 2024 OECD written content; subject to any actual third-party or specific notice). This is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries. This is a local descriptive extraction, not an official PISA administration. No scores are calculated. You may leave a response blank. https://www.oecd.org/en/about/terms-conditions.html"
+      }
+    ]
+  },
+  "classificationTags": [
+    "response:self",
+    "use:research"
+  ],
+  "statement": "Source-derived English digital adaptation of OECD PISA 2022 USA Main Survey selected classroom questionnaire block under OECD written-content terms §1.2; source authorship remains OECD/national source, not the submitting administrator. Descriptive categorical Form only, no WLE or translated items.",
+  "reference": {
+    "familyTag": "mother:PISA_2022",
+    "locale": "en-US",
+    "respondent": "student",
+    "sourceBlock": "ST285",
+    "sourceItems": [
+      "ST285Q01JA",
+      "ST285Q02JA",
+      "ST285Q03JA",
+      "ST285Q04JA",
+      "ST285Q05JA",
+      "ST285Q06JA",
+      "ST285Q07JA",
+      "ST285Q08JA",
+      "ST285Q09JA"
+    ],
+    "sourceItemToRow": {
+      "ST285Q01JA": {
+        "itemKey": "ra1ba588b9e01c217a01feb16",
+        "rowKey": "r5f69b17f22dd51f855a57549"
+      },
+      "ST285Q02JA": {
+        "itemKey": "ra1ba588b9e01c217a01feb16",
+        "rowKey": "r6ab97fde71fd13d69abba3f1"
+      },
+      "ST285Q03JA": {
+        "itemKey": "ra1ba588b9e01c217a01feb16",
+        "rowKey": "rb0543d793ac5897b3002d7c3"
+      },
+      "ST285Q04JA": {
+        "itemKey": "ra1ba588b9e01c217a01feb16",
+        "rowKey": "r9b3be6a16d23676b86c2814b"
+      },
+      "ST285Q05JA": {
+        "itemKey": "ra1ba588b9e01c217a01feb16",
+        "rowKey": "r7bb76c4682cfe22f64117cfe"
+      },
+      "ST285Q06JA": {
+        "itemKey": "ra1ba588b9e01c217a01feb16",
+        "rowKey": "r97e188ee82cb0babd6cbd2a9"
+      },
+      "ST285Q07JA": {
+        "itemKey": "ra1ba588b9e01c217a01feb16",
+        "rowKey": "r8ee140dcd87621f6c58a85f2"
+      },
+      "ST285Q08JA": {
+        "itemKey": "ra1ba588b9e01c217a01feb16",
+        "rowKey": "r975f4fdeef8bf1bf134fe3e9"
+      },
+      "ST285Q09JA": {
+        "itemKey": "ra1ba588b9e01c217a01feb16",
+        "rowKey": "r1a8b9773ad7b5021a3d517d3"
+      }
+    },
+    "sourceUrl": "https://www.oecd.org/content/dam/oecd/en/data/datasets/pisa/pisa-2022-datasets/national-versions-pisa-2022-datasets/United%20States.zip",
+    "sourceMember": "USA/eng-USA_United States-Student_Questionnaire_MS22.pdf",
+    "sourceMemberSha256": "baf0191c8da494801063dce61922d8a7fbbabee81ba559b943f5fb2d224ee6f2",
+    "nationalSourceUrl": "https://nces.ed.gov/surveys/pisa/pisa2022/questionnaires/P22_StuQ-USA.html",
+    "licenseBasis": "https://www.oecd.org/en/about/terms-conditions.html §1.2",
+    "attribution": "OECD (2022), PISA 2022 national questionnaires, United States, Main Survey, student questionnaire, https://www.oecd.org/content/dam/oecd/en/data/datasets/pisa/pisa-2022-datasets/national-versions-pisa-2022-datasets/United%20States.zip. English source text reused under OECD Terms and Conditions section 1.2 (pre-1 July 2024 OECD written content; subject to any actual third-party or specific notice). This is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries. This is a local descriptive extraction, not an official PISA administration. No scores are calculated. You may leave a response blank. https://www.oecd.org/en/about/terms-conditions.html",
+    "digitalChanges": [
+      "One intact source block per MATRIX; original English prompts/options/rows retained",
+      "Original source row and option keys retained; optional missing responses, no recoding/imputation",
+      "Page title and source/adaptation notice added; no official NCES privacy/OMB text copied"
+    ],
+    "noOfficialWle": true,
+    "scoringParameters": null,
+    "runtimeReport": null,
+    "studentAndTeacherDisclosure": "Existing authorization/anonymous aggregation/minimum group size/release rules only; no new access grant",
+    "tagsNote": "familyTag and source role/locale retained as reference annotations; classificationTags includes only existing allowed dictionary IDs, no new tag engine."
+  }
+}
