@@ -107,7 +107,10 @@ describe('Training configured-policy admission projection (mock DB, actual start
     expect(db.compositeAssessmentAttempt.create).not.toHaveBeenCalled()
   })
   it('retains Training course/author lock and enrollment revalidation', async () => {
-    db.$queryRaw.mockImplementation(async (query: TemplateStringsArray) => query.join('').includes('FOR SHARE OF c,u') ? [] : [{ id: 'publication' }])
+    db.$queryRaw.mockImplementation(async (query: TemplateStringsArray) =>
+      query.join('').includes('composite_assessment_attempts') || query.join('').includes('FOR SHARE OF c,u')
+        ? []
+        : [{ id: 'publication' }])
     await expect(startUserAttempt('student', 'publication')).rejects.toMatchObject({ statusCode: 403, message: 'Training 课程已关闭或投放权限无效' })
     expect(db.compositeAssessmentAttempt.create).not.toHaveBeenCalled()
   })
