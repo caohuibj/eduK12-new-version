@@ -27,6 +27,28 @@
 }
 .composite-report-supporting__section p { margin: 0; }
 @media screen {
+  .hui-training[data-training-theme="dark"] .hui-report .report-metric {
+    background: var(--training-raised, #253029);
+    border-color: var(--training-border, #354339);
+    color: var(--training-ink, #e5e9df);
+  }
+  .hui-training[data-training-theme="dark"] .hui-report .report-metric--emphasis {
+    background: var(--training-raised, #253029);
+  }
+  .hui-training[data-training-theme="dark"] .hui-report .report-metric__label,
+  .hui-training[data-training-theme="dark"] .hui-report .report-metric__description,
+  .hui-training[data-training-theme="dark"] .hui-report .report-metric__meta {
+    color: var(--training-muted, #a7b2a5);
+  }
+  .hui-training[data-training-theme="dark"] .hui-report .report-metric__value {
+    color: var(--training-ink, #e5e9df);
+  }
+  .hui-training[data-training-theme="dark"] .hui-report .report-metric :is(.text-gray-600, .text-slate-600) {
+    color: var(--training-muted, #a7b2a5);
+  }
+  .hui-training[data-training-theme="dark"] .hui-report .report-metric :is(.text-gray-800, .text-slate-900) {
+    color: var(--training-ink, #e5e9df);
+  }
   .hui-training[data-training-theme="dark"] .composite-report-supporting .report-details {
     background: var(--training-raised, #253029);
     border-color: var(--training-border, #354339);

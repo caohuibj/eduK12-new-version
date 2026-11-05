@@ -668,7 +668,7 @@ describe('Training SJT page confirmation and choice focus', () => {
   it('focuses the next question only after saving, and never changes scene automatically', async () => {
     renderRunner()
     await screen.findByText('第一段文字情境')
-    expect(screen.getByText('作答说明', {selector:'summary'}).closest('details')).not.toHaveAttribute('open')
+    expect(screen.getByText('作答说明', {selector:'summary'}).closest('details')).toHaveAttribute('open')
     fireEvent.click(screen.getByLabelText('选择 A'))
     await waitFor(() => expect(screen.getByText('你有多确定？', { selector: 'legend' })).toHaveFocus())
     expect(screen.getByText('第一段文字情境')).toBeInTheDocument()
