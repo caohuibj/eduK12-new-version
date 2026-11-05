@@ -1,4 +1,4 @@
-import {assertLibraryUseGrantCurrent} from '../scale-library-governance/usage'
+import {assertLibraryUseGrantsCurrent} from '../scale-library-governance/usage'
 import {assertToolEntryPolicy,prefetchToolPolicyAdmission} from '../assessment-governance/tool-entry-policy'
 import {getScaleInstrumentSource} from './onboarding/instrument-registry'
 import {scaleSourcePolicyIdentity} from './onboarding/source-snapshot'
@@ -83,8 +83,8 @@ export async function assertTrainingScaleCollectionAllowed(tx:Prisma.Transaction
   const standard=await tx.$queryRaw<Array<{code:string;instrument_version:string;instrument_class:string;library_entry_id:string|null;measurement_release_id:string|null;content_hash:string|null}>>(Prisma.sql`SELECT s.code,s.instrument_version,s.instrument_class::text,s.library_entry_id,s.measurement_release_id,r.content_hash FROM scales s LEFT JOIN measurement_content_releases r ON r.id=s.measurement_release_id
     WHERE s.id IN (${Prisma.join(newEntryIds)}) AND (s.instrument_class='STANDARD' OR s.library_entry_id IS NOT NULL) ORDER BY s.id FOR SHARE OF s`)
   // Shared admission locks in one sorted batch when no row needs a library
-  // use-grant check: revocation locks use-grant before tool-grant, so rows that
-  // check a use-grant keep that order through the per-row path below.
+  // use-grant check. Library use-grants lock release/entry before tool policy,
+  // so that set takes the batched grant path and skips the policy prefetch here.
   if(!scope.sourceOwnerId||!standard.some(row=>row.library_entry_id)){
    const identities=standard.flatMap(row=>{
     if(row.library_entry_id)return row.measurement_release_id&&row.content_hash?[{resourceKey:'release:'+row.measurement_release_id,fingerprint:row.content_hash}]:[]
@@ -93,12 +93,16 @@ export async function assertTrainingScaleCollectionAllowed(tx:Prisma.Transaction
    })
    await prefetchToolPolicyAdmission(tx,identities,'TRAINING')
   }
+  if(scope.sourceOwnerId){
+    const entryIds=standard.flatMap(row=>row.library_entry_id?[row.library_entry_id]:[])
+    if(entryIds.length)await assertLibraryUseGrantsCurrent(tx,{entryIds,userId:scope.sourceOwnerId,product:'TRAINING'})
+  }
   const checkedEntries=new Set<string>()
   for(const row of standard){
     if(row.library_entry_id){
-      if(checkedEntries.has(row.library_entry_id))continue
-      if(scope.sourceOwnerId)await assertLibraryUseGrantCurrent(tx,{entryId:row.library_entry_id,userId:scope.sourceOwnerId,product:'TRAINING'})
-      else if(row.measurement_release_id&&row.content_hash)await assertToolEntryPolicy(tx,{resourceKey:'release:'+row.measurement_release_id,fingerprint:row.content_hash},'TRAINING')
+      // sourceOwnerId already checked every distinct entry via the batch above.
+      if(checkedEntries.has(row.library_entry_id)||scope.sourceOwnerId)continue
+      if(row.measurement_release_id&&row.content_hash)await assertToolEntryPolicy(tx,{resourceKey:'release:'+row.measurement_release_id,fingerprint:row.content_hash},'TRAINING')
       else throw new ContentReleaseError('CONTENT_TRAINING_ENTRY_SOURCE_MISSING')
       checkedEntries.add(row.library_entry_id);continue
     }

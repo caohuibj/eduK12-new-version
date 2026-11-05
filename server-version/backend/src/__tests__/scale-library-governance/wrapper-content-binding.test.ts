@@ -2,7 +2,7 @@ import {beforeEach,describe,expect,it,vi} from 'vitest'
 const mocks=vi.hoisted(()=>({release:vi.fn(),media:vi.fn()}))
 vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.release,
  getContentReleaseBatch:async(db:any,ids:string[],lock:boolean)=>{const out=new Map<string,any>();for(const id of new Set(ids)){const r=await mocks.release(db,id,lock);if(r)out.set(id,r)}return out}}))
-vi.mock('../../modules/scale-library-governance/media',()=>({assertLibraryMediaReady:mocks.media}))
+vi.mock('../../modules/scale-library-governance/media',()=>({assertLibraryMediaReady:mocks.media,assertLibraryMediaReadyBatch:async(tx:any,input:any[])=>{for(const i of input)await mocks.media(tx,i.entryId,i.manifest)}}))
 import {prepareTrainingContentSnapshot,prepareTrainingContentAttemptBinding,trainingMeasurementSourceScopeMatchesForConsumer} from '../../modules/composite/training-content-binding'
 import {compileResearchScale} from '../../modules/survey/builder.compiler'
 import {scaleMeasurementRelease} from '../../modules/measurement-content/scale'
@@ -14,15 +14,16 @@ const definition=compileResearchScale('Exact library fixture',{schemaVersion:1,p
 const release={...prepareRelease(scaleMeasurementRelease({localId:'original-draft',version:'v1',instrumentVersion:'1',definition,instrumentClass:'CUSTOM_DESCRIPTIVE',scope:{kind:'PRIVATE',product:'SURVEY',ownerId:'historical-author',resourceId:'original-project'},presentationMode:'ALL_AT_ONCE'})),releaseId,status:'PUBLISHED' as const,publishedBy:'historical-author',publishedAt:new Date(0)}
 const snapshot={title:'Exact library fixture',product:'SURVEY',instrumentClass:'CUSTOM_DESCRIPTIVE',compiledDefinition:definition,definition:{},mediaManifest:{schemaVersion:1,manifestHash:'a'.repeat(64),items:[],releaseIds:[releaseId]}}
 let wrapper:any,row:any
-const db={$queryRaw:vi.fn(),scale:{findUnique:vi.fn()}}
+const db={$queryRaw:vi.fn(),scale:{findUnique:vi.fn(),findMany:vi.fn()}}
 const composite=()=>({id:'composite',items:[{id:'item',type:'SCALE',scale:wrapper}]})
 const prepare=()=>prepareTrainingContentSnapshot(db as never,composite(),new Map())
 const start=(publication:any)=>prepareTrainingContentAttemptBinding(db as never,{compositeId:'composite',attemptId:'attempt',epoch:1,snapshot:publication.snapshot,snapshotHash:publication.snapshotHash,composite:composite(),resolvedSituational:new Map()})
 beforeEach(()=>{
  vi.resetAllMocks();mocks.release.mockResolvedValue(release);mocks.media.mockResolvedValue(undefined)
  wrapper={id:'wrapper',code:'library:'+entryId,name:snapshot.title,creatorId:'historical-author',libraryEntryId:entryId,status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',instrumentVersion:'1',definition,definitionHash:hashScaleDefinition(definition),measurementReleaseId:releaseId}
- row={release_id:releaseId,status:'ACTIVE',snapshot,snapshot_hash:canonicalHash(snapshot),author_id:'historical-author'}
+ row={id:entryId,release_id:releaseId,status:'ACTIVE',snapshot,snapshot_hash:canonicalHash(snapshot),author_id:'historical-author'}
  db.scale.findUnique.mockImplementation(async()=>wrapper)
+ db.scale.findMany.mockImplementation(async({where}:{where:{id:{in:string[]}}})=>where.id.in.includes(wrapper.id)?[wrapper]:[])
  db.$queryRaw.mockImplementation(async(query:{strings:string[]})=>query.strings.join('').includes('WITH scale_sources')?[{kind:'SCALE',id:'wrapper',owner_id:'historical-author',measurement_release_id:releaseId,library_entry_id:entryId}]:[row])
 })
 describe('approved library wrapper through real Training content binding',()=>{

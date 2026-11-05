@@ -1,7 +1,7 @@
 import {describe,it,expect,vi} from 'vitest'
 vi.mock('../../config/database',()=>({prisma:{}}))
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
-import {collectLibraryMediaIdentities,buildLibraryMediaManifest,assertLibraryMediaConsent,assertLibraryMediaManifest,approveLibraryMedia,assertLibraryMediaReady} from '../../modules/scale-library-governance/media'
+import {collectLibraryMediaIdentities,buildLibraryMediaManifest,assertLibraryMediaConsent,assertLibraryMediaManifest,approveLibraryMedia,assertLibraryMediaReady,assertLibraryMediaReadyBatch} from '../../modules/scale-library-governance/media'
 const image={assetId:'00000000-0000-4000-8000-000000000001',contentHash:'a'.repeat(64),mimeType:'image/png'}
 const video={assetId:'00000000-0000-4000-8000-000000000002',contentHash:'b'.repeat(64),mimeType:'video/mp4'}
 const caption={assetId:'00000000-0000-4000-8000-000000000003',contentHash:'c'.repeat(64),mimeType:'text/vtt'}
@@ -64,5 +64,30 @@ describe('scale-bound library media manifest',()=>{
   await expect(approveLibraryMedia(tx as never,'entry','submission',m)).rejects.toThrow('FROZEN_VERSION')
   tx.storedAsset.findMany.mockResolvedValue(assets)
   await expect(assertLibraryMediaReady(tx as never,'entry',m)).rejects.toThrow('NOT_READY')
+ })
+})
+
+describe('batch library media READY',()=>{
+ it('checks many entries with one asset lock and one media read',async()=>{
+  const tx=db(),m=await buildLibraryMediaManifest(tx as never,'author',snapshot as never,release as never)
+  tx.$queryRaw.mockClear();tx.storedAsset.findMany.mockClear()
+  tx.$queryRaw.mockResolvedValue([
+   ...m.items.map(item=>({entry_id:'entry',asset_id:item.assetId,identity:item,manifest_hash:m.manifestHash,state:'READY'})),
+   ...m.items.map(item=>({entry_id:'entry-2',asset_id:item.assetId,identity:item,manifest_hash:m.manifestHash,state:'READY'})),
+  ])
+  await expect(assertLibraryMediaReadyBatch(tx as never,[{entryId:'entry',manifest:m},{entryId:'entry-2',manifest:m}])).resolves.toBeUndefined()
+  // asset lock ($queryRaw) + one FOR SHARE media read; findMany once for the union of assets
+  expect(tx.$queryRaw).toHaveBeenCalledTimes(2)
+  expect(tx.storedAsset.findMany).toHaveBeenCalledTimes(1)
+ })
+ it('fails closed when one entry is not READY',async()=>{
+  const tx=db(),m=await buildLibraryMediaManifest(tx as never,'author',snapshot as never,release as never)
+  tx.$queryRaw.mockResolvedValue(m.items.map(item=>({entry_id:'entry',asset_id:item.assetId,identity:item,manifest_hash:m.manifestHash,state:'READY'})))
+  await expect(assertLibraryMediaReadyBatch(tx as never,[{entryId:'entry',manifest:m},{entryId:'entry-2',manifest:m}])).rejects.toThrow('NOT_READY')
+ })
+ it('singular Ready reuses the batch path',async()=>{
+  const tx=db(),m=await buildLibraryMediaManifest(tx as never,'author',snapshot as never,release as never)
+  tx.$queryRaw.mockResolvedValue(m.items.map(item=>({entry_id:'entry',asset_id:item.assetId,identity:item,manifest_hash:m.manifestHash,state:'READY'})))
+  await expect(assertLibraryMediaReady(tx as never,'entry',m)).resolves.toBeUndefined()
  })
 })

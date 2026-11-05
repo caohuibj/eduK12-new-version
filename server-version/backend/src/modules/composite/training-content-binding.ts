@@ -8,7 +8,7 @@ import {educationMarkerBindingSchema} from '../education-tools/assessment-resour
 import {educationCompositionBindingSchema,educationCompositionRuntimeAnchorSchema,type EducationCompositionPolicyBinding,type EducationCompositionRuntimeAnchor} from '../education-tools/private-tool.composition-contracts'
 import {readEducationMarkerSource} from '../education-tools/assessment-resource.marker'
 import {readPrivateRuntimeScaleSource,assertPrivateRuntimeCompositeIdentity} from '../education-tools/private-tool.runtime-source'
-import {readLibraryScaleMeasurementSource} from '../scale-library-governance/training-source'
+import {readLibraryScaleMeasurementSource,readLibraryScaleMeasurementSources} from '../scale-library-governance/training-source'
 import {trainingReferencePolicySchema} from './training-reference-selection'
 import {trainingStandardItemSourceSchema,verifyStoredTrainingStandardItem} from './training-standard-combination'
 import {readTrainingStandardContentIdentity} from './training-standard-content'
@@ -125,6 +125,11 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
       {kind:'STATIC_SJT_REGISTRY',id:mapping.id,owner_id:null,measurement_release_id:release.releaseId,instrument_key:mapping.instrument_key,instrument_version:mapping.instrument_version,assignment_id:null})
     releases.set(release.releaseId,release)
   }
+  // Publication/history snapshot builders keep the original NEW_USE exact-entry
+  // check; FROZEN_IDENTITY remains the START attempt-binding path only.
+  const libraryScaleIds=[...new Set(items.flatMap(item=>item.type==='SCALE'&&item.scale?.libraryEntryId?[item.scale.id as string]:[]))]
+  const libraryScales=libraryScaleIds.length?await db.scale.findMany({where:{id:{in:libraryScaleIds}}}):[]
+  const libraryByScale=libraryScales.length?await readLibraryScaleMeasurementSources(db,libraryScales,'NEW_USE'):new Map<string,ExactLibrary>()
   const units:Unit[]=[]
   for(const item of items){
     if(item.standardCombinationSource!=null){
@@ -154,7 +159,15 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
     const privateId=inherited?.source.privateVersionId??(original.success?original.data.units.find(unit=>unit.itemId===item.id)?.source.privateVersionId:undefined)
     const privateSource=privateId?await readExactPrivateSource(db,release,{...source,privateVersionId:privateId}):null
     if(privateSource)source.privateVersionId=privateId
-    const library=source.libraryEntryId?await readExactLibrarySource(db,release,source,'NEW_USE'):null
+    let library:ExactLibrary|null=null
+    if(source.libraryEntryId){
+      const cached=libraryByScale.get(source.id)
+      if(cached){
+        if(cached.release.releaseId!==release.releaseId||cached.release.contentHash!==release.contentHash
+          ||canonicalHash(cached.release.scope)!==canonicalHash(release.scope))fail('SOURCE_MISMATCH')
+        library=cached
+      }else library=await readExactLibrarySource(db,release,source,'NEW_USE')
+    }
     if(!library&&!privateSource)assertScope(release,source)
     if(library&&canonicalHash(item.scale.definition)!==canonicalHash(library.definition))fail('SOURCE_MISMATCH')
     const expected=source.cognitiveProfile?await frozenCognitiveMeasurement(db,release,source,item):projectActualMeasurement(item,release,resolvedSituational,Boolean(library))
@@ -238,14 +251,32 @@ function libraryPresentationMode(release:Stored):'ALL_AT_ONCE'|'ONE_BY_ONE'|'RUN
  if(mode!=='ALL_AT_ONCE'&&mode!=='ONE_BY_ONE'&&mode!=='RUNNER_DEFAULT')fail('SOURCE_MISMATCH')
  return mode
 }
+type ExactLibrary=Awaited<ReturnType<typeof readLibraryScaleMeasurementSource>>
 async function readExactLibrarySource(db:Prisma.TransactionClient,release:Stored,source:Unit['source'],purpose:'NEW_USE'|'FROZEN_IDENTITY'){
- if(source.kind!=='SCALE'||!source.libraryEntryId)fail('SCOPE_DENIED')
- const scale=await db.scale.findUnique({where:{id:source.id}})
- if(!scale||scale.libraryEntryId!==source.libraryEntryId||scale.creatorId!==source.ownerId)fail('SCOPE_DENIED')
- const exact=await readLibraryScaleMeasurementSource(db,scale,purpose)
- if(exact.release.releaseId!==release.releaseId||exact.release.contentHash!==release.contentHash
-   ||canonicalHash(exact.release.scope)!==canonicalHash(release.scope))fail('SOURCE_MISMATCH')
- return exact
+ return (await loadExactLibrarySources(db,[{release,source}],purpose)).get(source.id)!
+}
+/** Same exact wrapper checks for many library units with one locked read per table. */
+async function loadExactLibrarySources(db:Prisma.TransactionClient,requests:ReadonlyArray<{release:Stored;source:Unit['source']}>,purpose:'NEW_USE'|'FROZEN_IDENTITY'){
+ const result=new Map<string,ExactLibrary>()
+ if(!requests.length)return result
+ for(const {source} of requests)if(source.kind!=='SCALE'||!source.libraryEntryId)fail('SCOPE_DENIED')
+ const scaleIds=[...new Set(requests.map(({source})=>source.id))]
+ const scales=await db.scale.findMany({where:{id:{in:scaleIds}}})
+ const byId=new Map(scales.map(scale=>[scale.id,scale]))
+ const ordered:typeof scales=[]
+ for(const {source} of requests){
+  const scale=byId.get(source.id)
+  if(!scale||scale.libraryEntryId!==source.libraryEntryId||scale.creatorId!==source.ownerId)fail('SCOPE_DENIED')
+  if(!ordered.some(row=>row.id===scale.id))ordered.push(scale)
+ }
+ const exacts=await readLibraryScaleMeasurementSources(db,ordered,purpose)
+ for(const {release,source} of requests){
+  const exact=exacts.get(source.id)
+  if(!exact||exact.release.releaseId!==release.releaseId||exact.release.contentHash!==release.contentHash
+    ||canonicalHash(exact.release.scope)!==canonicalHash(release.scope))fail('SOURCE_MISMATCH')
+  result.set(source.id,exact)
+ }
+ return result
 }
 /** Frozen consumers validate the real platform wrapper, never a client-provided
  * entry marker or a widened PRIVATE scope. Their existing lifecycle/stop policy
@@ -355,6 +386,12 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
   // PUBLISHED->RETIRED, which must not block new STARTs (REVOKED still fails).
   // Each row's stored digest is re-verified on decode.
   const prefetched=await getContentReleaseBatch(db,snapshot.units.filter(unit=>!unit.source.standardCombination&&unit.source.kind!=='STATIC_SJT_REGISTRY').map(unit=>unit.measurement.releaseId),false)
+  const libraryRequests=snapshot.units.flatMap(unit=>{
+    if(!unit.source.libraryEntryId||unit.source.standardCombination)return []
+    const release=prefetched.get(unit.measurement.releaseId)
+    return release?[{release,source:unit.source}]:[]
+  })
+  const libraryExacts=await loadExactLibrarySources(db,libraryRequests,'FROZEN_IDENTITY')
   for(const unit of snapshot.units){
     const item=itemsById.get(unit.itemId)
     if(!item||({SCALE:'SCALE',COGNITIVE:'COGNITIVE',SITUATIONAL:'SJT'} as Record<string,string>)[item.type]!==unit.family)fail('SOURCE_MISMATCH')
@@ -381,7 +418,7 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
     releases.set(release.releaseId,release)
     if(release.layer!=='MEASUREMENT'||release.family!==unit.family||release.status==='REVOKED'
       ||release.contentHash!==unit.measurement.contentHash||release.content.measurementHash!==unit.measurement.measurementHash)fail('BINDING_INVALID')
-    const library=unit.source.libraryEntryId?await readExactLibrarySource(db,release,unit.source,'FROZEN_IDENTITY'):null
+    const library=unit.source.libraryEntryId?(libraryExacts.get(unit.source.id)??await readExactLibrarySource(db,release,unit.source,'FROZEN_IDENTITY')):null
     const privateSource=unit.source.privateVersionId?await readExactPrivateSource(db,release,unit.source):null
     if(privateSource){
       if(unit.source.educationBinding){
