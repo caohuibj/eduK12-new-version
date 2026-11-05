@@ -41,6 +41,9 @@ beforeEach(() => {
   db.$transaction.mockImplementation(async callback => callback(db))
   db.$queryRawUnsafe.mockImplementation(async () => { state.order.push('publication-lock'); return [{ id: 'publication' }] })
   db.$queryRaw.mockImplementation(async (query: TemplateStringsArray) => {
+    // No previous attempt in this fixture; fast resume must miss and reach
+    // the original locked START path whose publication gates are asserted below.
+    if (query.join('').includes('composite_assessment_attempts')) return []
     if (query.join('').includes('FOR SHARE OF c,u')) { state.order.push('course-lock'); return [{ id: 'training', endedAt: null }] }
     return [{ id: 'publication' }]
   })

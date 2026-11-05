@@ -132,7 +132,8 @@ beforeEach(() => {
   mockPrisma.compositeAssessmentAttempt.findFirst.mockResolvedValue(null)
   mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(0)
   mockPrisma.compositeAssessmentAttempt.updateMany.mockResolvedValue({ count: 0 })
-  mockPrisma.$queryRaw.mockResolvedValue([{ id: 'attempt-1' }])
+  mockPrisma.$queryRaw.mockImplementation(async (query: TemplateStringsArray) =>
+    query.join('').includes('composite_assessment_attempts') ? [] : [{ id: 'attempt-1' }])
 })
 
 describe('copyable PATCH', () => {
