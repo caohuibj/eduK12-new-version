@@ -3,6 +3,8 @@ import {beforeEach,describe,expect,it,vi} from 'vitest'
 const m=vi.hoisted(()=>({start:vi.fn(),restart:vi.fn()}))
 vi.mock('../../modules/composite/composite.service',async orig=>({...(await orig() as object),startUserAttempt:m.start,restartUserAttempt:m.restart}))
 import {compositeController} from '../../modules/composite/composite.controller'
+import {AssessmentStartBusyError,rethrowGateBusyAsStartBusy} from '../../modules/composite/start-transient'
+import {BoundedAdmissionBusyError} from '../../services/boundedAdmissionGate'
 import {AssessmentStartBusyError,classifyStartTransaction,rolledBackStartReason} from '../../modules/composite/start-transient'
 
 const known=(code:string,message='raw internal detail: relation secret_table',meta?:Record<string,unknown>)=>
@@ -34,6 +36,34 @@ function fakeRes(){
 }
 const req={user:{userId:'u1',role:'STUDENT'},params:{id:'c1',attemptId:'a1'},query:{},body:{}} as any
 
+describe('gate-busy wiring (queue_full / timeout -> 503 contract)',()=>{
+ const gateBusy=(reason:'queue_full'|'timeout')=>new BoundedAdmissionBusyError({gate:'training_start_admission',reason,retryAfterSeconds:1,code:'ASSESSMENT_START_BUSY'})
+ const fakeRes=()=>{const res:any={headers:{},statusCode:200};res.setHeader=(k:string,v:string)=>{res.headers[k]=v;return res};res.status=(s:number)=>{res.statusCode=s;return res};res.json=(b:unknown)=>{res.body=b;return res};return res}
+ it.each([['queue_full','ADMISSION_QUEUE_FULL','queue_full'],['timeout','ADMISSION_WAIT_TIMEOUT','queue_timeout']])('%s maps to the safe-retry 503',(reason,expectedReason,expectedClass)=>{
+  const busyError=gateBusy(reason as 'queue_full'|'timeout')
+  let converted:unknown
+  try{rethrowGateBusyAsStartBusy(busyError)}catch(e){converted=e}
+  expect(converted).toBeInstanceOf(AssessmentStartBusyError)
+  const busy=converted as AssessmentStartBusyError
+  expect(busy.reason).toBe(expectedReason)
+  expect(busy.retryAfterSeconds).toBe(1)
+  expect(busy.diagnosticClass).toBe(expectedClass)
+ })
+ it('non-gate errors pass through untouched',()=>{
+  const other=new Error('boom')
+  expect(rethrowGateBusyAsStartBusy(other)).toBe(other)
+ })
+ it('a gate-busy START reaches the controller as 503 with Retry-After and a safe body',async()=>{
+  const busyError=gateBusy('queue_full')
+  m.start.mockImplementation(()=>Promise.reject(rethrowGateBusyAsStartBusy(busyError)))
+  const res=fakeRes()
+  await compositeController.startAttempt(req,res)
+  expect(res.statusCode).toBe(503)
+  expect(res.headers['Retry-After']).toBe('1')
+  expect(res.body).toEqual({code:'ASSESSMENT_START_BUSY',message:'综合测评开始请求繁忙，请稍后重试',data:null})
+  expect(JSON.stringify(res.body)).not.toMatch(/bounded|queue|pool|training_start/)
+ })
+})
 describe('START transient rollback classification',()=>{
  beforeEach(()=>{m.start.mockReset();m.restart.mockReset()})
  it.each(rolledBack)('%s is a known rollback',(_n,err,reason)=>{expect(rolledBackStartReason(err)).toBe(reason)})
