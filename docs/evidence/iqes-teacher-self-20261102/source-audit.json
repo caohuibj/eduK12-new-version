@@ -1,0 +1,208 @@
+{
+  "dossierVersion": "1.0.0",
+  "documentKind": "SOURCE_AUDIT_ONLY_NOT_AN_IMPORT_PAYLOAD",
+  "motherTool": "IQES Unterrichtsqualität",
+  "status": "BLOCKED_FULL_TEXT_AND_REUSE_SCOPE",
+  "checkedOn": "2026-11-02",
+  "base": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "familyTag": "family:iqes",
+  "installedTools": 0,
+  "nativeScales": 0,
+  "nativeForms": 0,
+  "registeredCatalogEntries": 0,
+  "instrumentContentVersion": null,
+  "scoringParameterVersion": null,
+  "runtimeReportVersion": null,
+  "sourceVersions": [
+    {
+      "sourceId": "L02",
+      "title": "Selbsteinschätzung zur Unterrichtsqualität",
+      "role": "teacher_self",
+      "authors": [
+        "Andreas Helmke",
+        "Gerold Brägger"
+      ],
+      "sourceEdition": "2009-12-01 (visible footer on official public preview)",
+      "officialPages": 6,
+      "pagesActuallyRead": [
+        1
+      ],
+      "fullTextObtained": false,
+      "verifiedItemCount": null,
+      "previewItemCount": 6,
+      "language": "de",
+      "stage": "all stages per catalog; not an empirical age/grade validation claim",
+      "identityPlan": "iqes_l02_teacher_self_de_20091201",
+      "nativeKindDecision": "UNDECIDED_UNTIL_COMPLETE_ITEMS_AND_SCORING_INSTRUCTIONS",
+      "sourceVersionNote": "The official overview links S01a-d today, but this dated preview refers to older L01a-c. Do not silently pair versions."
+    },
+    {
+      "sourceId": "L03",
+      "title": "Beobachtungsbogen für gegenseitige Unterrichtsbesuche",
+      "role": "observer",
+      "authors": [
+        "Andreas Helmke"
+      ],
+      "sourceEdition": null,
+      "officialPages": 2,
+      "pagesActuallyRead": [],
+      "fullTextObtained": false,
+      "verifiedItemCount": null,
+      "language": "de",
+      "stage": "all stages per catalog",
+      "identityPlan": "iqes_l03_observer_de_version_pending",
+      "nativeKindDecision": "CURRENT_EDITION_NOT_OBTAINED"
+    },
+    {
+      "sourceId": "L03_legacy_appendix",
+      "title": "Unterrichtsbeobachtungsbogen (historical appendix, not current-edition equivalence)",
+      "role": "observer",
+      "authors": [
+        "Andreas Helmke",
+        "Gerold Brägger (collaboration)",
+        "Wolfgang Wagner (collaboration)"
+      ],
+      "sourceEdition": null,
+      "sourceCarrier": "38-page collegial-feedback practice guide, educational portal repost; exact questionnaire edition date not established",
+      "pagesActuallyRead": [
+        37,
+        38
+      ],
+      "fullTextObtained": true,
+      "verifiedNumberedRows": 50,
+      "numericRowsAreScores": false,
+      "structuralFacts": [
+        "Rows1-43 and46-50 have categorical judgement responses; source zero means not observable, not a low score",
+        "Rows44-45 use percentage bands; do not score these as the same1-4 scale",
+        "Source also has annotations, observed social forms and media-use checklist fields"
+      ],
+      "licenseForEduK12Reuse": "NOT_ESTABLISHED; public repost is not a licence",
+      "identityPlan": "iqes_l03_observer_de_legacy_edition_pending",
+      "nativeKindDecision": "DESCRIPTIVE_FORM_CANDIDATE_ONLY_AFTER_LAWFUL_REUSE_SCOPE_CONFIRMED; no author-endorsed aggregate algorithm verified"
+    },
+    {
+      "sourceId": "L03a",
+      "title": "Auswertungshilfe zum Unterrichtsbeobachtungsbogen",
+      "role": "observer_guidance",
+      "authors": [
+        "Andreas Helmke"
+      ],
+      "officialPages": 6,
+      "pagesActuallyRead": [],
+      "fullTextObtained": false,
+      "sourceEdition": null,
+      "language": "de",
+      "nativeKindDecision": "GUIDANCE_NOT_A_NEW_SCALE"
+    },
+    {
+      "sourceId": "S01a",
+      "title": "Schülerinnen- und Schülerbefragung zur Unterrichtsqualität",
+      "role": "student",
+      "sourceEdition": null,
+      "gradeScope": "grades3-6",
+      "fullTextObtained": false,
+      "verifiedItemCount": null,
+      "language": "de",
+      "identityPlan": "iqes_s01a_student_de_version_pending",
+      "nativeKindDecision": "UNDECIDED_UNTIL_FULL_VERSION_EXPORT_AND_USAGE_SCOPE"
+    },
+    {
+      "sourceId": "S01b",
+      "title": "Schülerinnen- und Schülerbefragung zur Unterrichtsqualität",
+      "role": "student",
+      "sourceEdition": null,
+      "gradeScope": "grades7-9",
+      "fullTextObtained": false,
+      "verifiedItemCount": null,
+      "language": "de",
+      "identityPlan": "iqes_s01b_student_de_version_pending",
+      "nativeKindDecision": "UNDECIDED_UNTIL_FULL_VERSION_EXPORT_AND_USAGE_SCOPE"
+    },
+    {
+      "sourceId": "S01c",
+      "title": "Schülerinnen- und Schülerbefragung zur Unterrichtsqualität",
+      "role": "student",
+      "sourceEdition": null,
+      "gradeScope": "grade10+",
+      "fullTextObtained": false,
+      "verifiedItemCount": null,
+      "language": "de",
+      "identityPlan": "iqes_s01c_student_de_version_pending",
+      "nativeKindDecision": "UNDECIDED_UNTIL_FULL_VERSION_EXPORT_AND_USAGE_SCOPE"
+    },
+    {
+      "sourceId": "S01d",
+      "title": "Schülerinnen- und Schülerbefragung zur Unterrichtsqualität",
+      "role": "student",
+      "sourceEdition": null,
+      "gradeScope": "vocational education",
+      "fullTextObtained": false,
+      "verifiedItemCount": null,
+      "language": "de",
+      "identityPlan": "iqes_s01d_student_de_version_pending",
+      "nativeKindDecision": "UNDECIDED_UNTIL_FULL_VERSION_EXPORT_AND_USAGE_SCOPE"
+    },
+    {
+      "sourceId": "S02",
+      "title": "Lehrpersonen-Befragung zur Unterrichtsqualität",
+      "role": "teacher respondent; exact target/self-report scope unverified",
+      "sourceEdition": null,
+      "fullTextObtained": false,
+      "verifiedItemCount": null,
+      "language": "de",
+      "nativeKindDecision": "SEPARATE_FROM_L02; do not relabel as L02 teacher self-report"
+    }
+  ],
+  "evidence": [
+    {
+      "sourceUrl": "https://www.iqesonline.net/feedback/feedback-zum-unterricht/faecheruebergreifende-unterrichtsqualitaet/",
+      "bytes": 366137,
+      "sha256": "71bfd82facc68b062d3c72057fda163ecab87f93dbc8637ca1f2f5004dd5609e",
+      "readScope": "Official metadata, subscription notices and actual linked preview only; no login"
+    },
+    {
+      "sourceUrl": "https://www.iqesonline.net/feedback/feedback-zum-unterricht/faecheruebergreifende-unterrichtsqualitaet/",
+      "bytes": 116164,
+      "sha256": "71ee5d39773fb295073fa4251a1b6d5005aa504bc51e59b895d513e365a14a51",
+      "readScope": "Official rendered preview only, footer date2009-12-01 and1/6 visually inspected; image not committed"
+    },
+    {
+      "sourceUrl": "https://www.berufskolleg-iserlohn.de/wp-content/uploads/2025/10/bkis_schulprogramm_2017_web.pdf",
+      "bytes": 4205226,
+      "sha256": "8061ecab92f5012beb15967f863d97d72a1823513d4edcbc64bae74440ce4626",
+      "readScope": "Physical page59 only reprints L02 page1; subsequent page changes topic; NOT full6-page L02"
+    },
+    {
+      "sourceUrl": "https://gwb.schule.at/mod/resource/view.php?id=76629&redirect=1",
+      "bytes": 1072613,
+      "sha256": "458c135c66ef72b8c5be07bdc5330073b5520ab947807b422e0d8237234c1093",
+      "readScope": "Full historical L03 appendix physically pp37-38 inspected; rights/current-edition equivalence unresolved"
+    },
+    {
+      "sourceUrl": "https://www.iqesonline.net/ueber-iqes/agb-abos/",
+      "bytes": 381727,
+      "sha256": "25b991362707e7f8fb796d4917cfb713436d686c8d1f53806050437459ade223",
+      "readScope": "Public subscription terms read, no contract accepted; software-use licence is not a verified external item-redistribution grant"
+    }
+  ],
+  "accessObservations": {
+    "officialL02L03L03a": "Overview explicitly restricts full media content to subscribers; no login or subscription created",
+    "publicS01AndS02": "Actual linked public routes return identical441-byte JS app shell, no item text in HTTP body",
+    "browserAttempt": "Normal fresh unauthenticated Chromium navigation to S02 failed with ERR_CERT_AUTHORITY_INVALID; TLS was not disabled, no hidden APIs or alternate protected downloads accessed",
+    "driveSearch": "IQES/L02/German-title content searches returned only the13-tool comparison report; author/name-filtered searches returned no source files. This is bounded search evidence, not a global absence claim"
+  },
+  "rights": {
+    "iqesContent": "Official copyright reserved; no Creative Commons or EduK12 external hosting/translation/redistribution permission found",
+    "subscription": "No new subscription, registration, terms acceptance, paid-wall bypass, credential reuse, or commercial-translation assertion",
+    "historicalPublicReposts": "Read for provenance/completeness only; not selected as licensed current content",
+    "permittedPublicDossier": "Original analysis and bibliographic/source-access metadata only; zero item/option text, preview image, sourcePDF, or private user report text committed"
+  },
+  "notPerformed": [
+    "No source catalog placeholder or generated registry change",
+    "No item/scoring/report schema tests: complete authorised source inputs absent",
+    "No isolated database import: no permitted complete native payload",
+    "No scoring, reverse, missingness algorithm or independent-subscale validity claim invented",
+    "No CI workflow/gate change, CHEXI fix, productionDB access, deployment, or merge"
+  ],
+  "initialResearchBase": "adad907a4b68606ce71bb1a4f2d7c511c872c715"
+}
