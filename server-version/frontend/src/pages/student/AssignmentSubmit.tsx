@@ -35,6 +35,9 @@ const AssignmentSubmit: React.FC = () => {
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState('')
   const [formErrorAttempt, setFormErrorAttempt] = useState(0)
+  // Blocking alert() freezes the embedded/automated renderer and interrupts
+  // keyboard flow; submission results use the same inline status as check-in.
+  const [feedback, setFeedback] = useState<{ kind: 'success' | 'error'; message: string } | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null)
   const [showPdfViewer, setShowPdfViewer] = useState(false)
@@ -124,6 +127,7 @@ const AssignmentSubmit: React.FC = () => {
     setTextAnswers({})
     setIsEditing(false)
     setFormError('')
+    setFeedback(null)
     setSelectedDocument(null)
     setShowPdfViewer(false)
     submitIdempotencyKeyRef.current = null
@@ -215,12 +219,12 @@ const AssignmentSubmit: React.FC = () => {
       if (response.code === 0) {
         submitIdempotencyKeyRef.current = null
         const isUpdate = submission !== null
-        alert(isUpdate ? '修改成功！' : '提交成功！')
+        setFeedback({ kind: 'success', message: isUpdate ? '修改成功！' : '提交成功！' })
         setIsEditing(false)
         fetchAssignmentDetail()
       } else {
         submitIdempotencyKeyRef.current = null
-        alert(response.message || '提交失败')
+        setFeedback({ kind: 'error', message: response.message || '提交失败' })
       }
     } catch (error: any) {
       if (routeEpoch !== routeEpochRef.current) return
@@ -230,7 +234,7 @@ const AssignmentSubmit: React.FC = () => {
       if (shouldClearIdempotencyKey(error)) {
         submitIdempotencyKeyRef.current = null
       }
-      alert(submissionErrorMessage(error, '提交失败'))
+      setFeedback({ kind: 'error', message: submissionErrorMessage(error, '提交失败') })
     } finally {
       if (routeEpoch === routeEpochRef.current) {
         submitInFlightRef.current = false
@@ -286,6 +290,16 @@ const AssignmentSubmit: React.FC = () => {
         title={assignment.title}
         description={assignment.description || '查看练习要求并完成本次提交。'}
       />
+
+      {feedback ? (
+        <ProductStatus
+          kind={feedback.kind}
+          title={feedback.kind === 'success' ? '操作已完成' : '操作未完成'}
+          announce={feedback.kind === 'success' ? 'polite' : 'assertive'}
+        >
+          {feedback.message}
+        </ProductStatus>
+      ) : null}
 
       <section className="student-submit-info" aria-label="练习说明">
         {assignment.content && (

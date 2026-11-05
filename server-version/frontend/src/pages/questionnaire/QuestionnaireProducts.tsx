@@ -690,6 +690,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
               (v.standardCombinationSummary ? (v.scale?.name??'标准量表')+' · '+(v.standardCombinationSummary.authorizationMode==='PRECISE'?(v.standardCombinationSummary.configurationName??'管理员固定配置'):'已批准组合 · '+standardVersionLabel(v.standardCombinationSummary.axisVersions)) : null) ||
               v.scale?.name ||
               v.cognitiveAssignment?.title ||
+              v.situational?.title ||
               v.situational?.key ||
               labels[v.type],
           })),

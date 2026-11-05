@@ -5,7 +5,7 @@ import { surveyGovernanceNavigation } from '../components/app-shell/navigation'
 describe('trusted product origin links', () => {
   it.each(['https://survey.eduk12.top','https://training.eduk12.top','http://TRAINING.EDUK12.TOP.:8080'])(
     'uses canonical HTTPS production origins for %s', origin => {
-      expect(productOrigins(origin, false)).toEqual({admin:'https://training.eduk12.top',survey:'https://survey.eduk12.top'})
+      expect(productOrigins(origin, false)).toEqual({admin:'https://training.eduk12.top',survey:'https://survey.eduk12.top',school:'https://school.eduk12.top'})
       expect(surveyAdminLoginUrl(origin, false)).toBe('https://training.eduk12.top/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
     })
   it.each(['localhost','127.0.0.1','survey.localhost','training.localhost'])(
@@ -13,7 +13,7 @@ describe('trusted product origin links', () => {
       for (const scheme of ['http','https']) {
         const origin=`${scheme}://${host}:5173`
         const admin=`${scheme}://${host==='127.0.0.1'?host:'localhost'}:5173`
-        expect(productOrigins(origin,true)).toEqual({admin,survey:`${scheme}://survey.localhost:5173`})
+        expect(productOrigins(origin,true)).toEqual({admin,survey:`${scheme}://survey.localhost:5173`,school:`${scheme}://school.localhost:5173`})
         expect(surveyAdminLoginUrl(origin,true)).toBe(admin+'/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
         expect(productOrigins(origin,false)).toBeNull()
       }

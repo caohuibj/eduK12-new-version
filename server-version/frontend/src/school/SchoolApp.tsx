@@ -518,7 +518,7 @@ function SchoolApplication(){
           <button className="hs-primary" disabled={working}>创建校园账号</button>
         </form>
       </section>}
-      {!loading&&!user&&screen==='mfa'&&<section className="hs-panel hs-narrow">
+      {!loading&&!user&&screen==='mfa'&&recoveryCodes.length===0&&<section className="hs-panel hs-narrow">
         <h1>账号安全验证</h1>
         <p>学校管理员和具有专业敏感权限的人员必须完成密码 + TOTP 动态验证码登录。</p>
         {!mfaEnrolled&&<div><button onClick={()=>void beginMfa()} disabled={working}>开始绑定验证器</button>
@@ -533,7 +533,7 @@ function SchoolApplication(){
       {!loading&&recoveryCodes.length>0&&<section className="hs-panel hs-narrow">
         <h2>请离线保存一次性恢复码</h2><p>此列表不会再次显示。不要保存到浏览器本地存储或共享设备。</p>
         <div className="hs-secret">{recoveryCodes.map(code=><code key={code}>{code}</code>)}</div>
-        <button className="hs-primary" onClick={()=>{setRecoveryCodes([]);void refresh()}}>已妥善保存，进入校园</button>
+        <button className="hs-primary" onClick={()=>{setRecoveryCodes([]);setNotice('');setError('');void refresh()}}>已妥善保存，进入校园</button>
       </section>}
       {!loading&&user&&screen==='workspace'&&user.mustChangePassword&&recoveryCodes.length===0&&<section className="hs-panel hs-narrow">
         <h1>首次登录 · 修改密码</h1>

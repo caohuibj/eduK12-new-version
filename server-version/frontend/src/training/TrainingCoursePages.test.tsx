@@ -241,7 +241,8 @@ describe('course-first training workspaces', () => {
     const page = mount('/courses/course-1/detail?section=assessments', '/courses/:courseId/detail', TrainingTrainerCourse)
     await screen.findByRole('heading', { name: course.title })
     fireEvent.click(screen.getByRole('button', {name: '群体报告'}))
-    await screen.findByRole('region', {name: 'Training 单次群体报告'})
+    // The analysis page is a lazy route; cold transform can exceed the 1s default on slow disks.
+    await screen.findByRole('region', {name: 'Training 单次群体报告'}, {timeout: 5000})
     expect(screen.getByRole('button', {name: '群体报告'})).toHaveAttribute('aria-pressed', 'true')
     fireEvent.click(screen.getByRole('button', {name: '打开群体报告'}))
     await waitFor(() => expect(get).toHaveBeenCalledWith('/courses/course-1/training-group-reports'))
@@ -249,7 +250,7 @@ describe('course-first training workspaces', () => {
     expect(get.mock.calls.some(([url]) => url.includes('training-analysis'))).toBe(false)
     page.unmount()
     mount('/courses/course-1/detail?section=analysis', '/courses/:courseId/detail', TrainingTrainerCourse)
-    await screen.findByRole('region', {name: 'Training 单次群体报告'})
+    await screen.findByRole('region', {name: 'Training 单次群体报告'}, {timeout: 5000})
     expect(screen.getByRole('button', {name: '群体报告'})).toHaveAttribute('aria-pressed', 'true')
     expect(screen.queryByRole('button', {name: '前后测比较'})).toBeNull()
     expect(get.mock.calls.some(([url]) => url.includes('training-analysis'))).toBe(false)

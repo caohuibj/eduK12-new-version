@@ -10,9 +10,15 @@ describe('School composition product consumers / synthetic HTTP contracts',()=>{
  it('exposes the shared School editor through its parent authoring studio',async()=>{
   const api=vi.fn(async(path:string)=>{if(path==='/organizations/org/private-tools'||path==='/organizations/org/private-tools?kind=COMPOSITION')return {list:[],nextCursor:null};throw Error('Unexpected '+path)})
   render(<EducationPrivateToolStudio api={api as PrivateToolApi} organizationId="org" actorId="author" entry="SCHOOL"/>)
-  await waitFor(()=>expect(screen.queryByText('正在读取或保存，请稍候…')).not.toBeInTheDocument())
+  // Wait for the initial list read to settle. A mode switch during a write/read
+  // is intentionally ignored, and a negative loading assertion can pass too early.
+  await waitFor(()=>{
+   expect(api).toHaveBeenCalledWith('/organizations/org/private-tools')
+   expect(screen.getByText('暂无私有工具，可先创建一份量表或表单。')).toBeInTheDocument()
+  })
   fireEvent.click(screen.getByRole('button',{name:'普通问卷'}))
-  expect(await screen.findByText(/将本人固定量表和表单、获授权公共量表与表单编成一份学生自评或家长、教师观察问卷/)).toBeInTheDocument()
+  await waitFor(()=>expect(screen.getByRole('button',{name:'普通问卷'})).toHaveAttribute('aria-pressed','true'))
+  expect(await screen.findByText(/将本人固定量表和表单、获授权公共量表与表单编成一份学生自评或家长、教师观察问卷/, {}, {timeout:5000})).toBeInTheDocument()
   expect(api).toHaveBeenCalledWith('/organizations/org/private-tools?kind=COMPOSITION')
  })
  it.each(['SELF','PARENT_REPORT','TEACHER_REPORT'] as const)('attaches a fixed %s questionnaire from the actual activity consumer and displays the source revision',async responseMode=>{

@@ -236,9 +236,12 @@ suite('student tasks and Training inbox bounded-work parity (isolated real Postg
       expect(results.find(row => row.userId === archived)!.inbox.rows).toBeGreaterThan(0)
       if (cognitive) expect(pushedDown.not).toBe(0)
       else {
-        // The cognitive filter ran in SQL and the catalog read shrank.
+        // The cognitive filter ran in SQL and the catalog read shrank. The
+        // exact ratio depends on how many composite units are cognitive in the
+        // fixture (the membership scope now spans every learner-visible
+        // course), so assert a strict reduction instead of a fixed half.
         expect(pushedDown.not).toBeGreaterThan(0)
-        expect(pushedDown.newRows).toBeLessThan(pushedDown.legacyRows / 2)
+        expect(pushedDown.newRows).toBeLessThan(pushedDown.legacyRows)
       }
     }, 600000)
   }

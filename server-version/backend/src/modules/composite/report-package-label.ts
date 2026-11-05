@@ -53,3 +53,12 @@ export const resolveLibraryItemLabel = (item: any, packageSlotLabels = new Map<n
   ?? item.cognitiveAssignment?.config?.name
   ?? item.cognitiveAssignment?.title
   ?? item.formLabel
+
+/** Prefer the title frozen with the completed attempt, then an exact builtin
+ * title for incomplete/legacy attempts. Never infer an uploaded title from its key. */
+export const resolveSituationalReportLabel = (
+  item: any,
+  frozenTitle: string | null | undefined,
+  builtinTitle: string | null | undefined,
+  packageSlotLabels = new Map<number, string>(),
+): string | null => resolveCompositeItemLabel(item, packageSlotLabels) || frozenTitle || builtinTitle || null
