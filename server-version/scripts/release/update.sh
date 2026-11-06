@@ -83,10 +83,19 @@ if "$apply"; then
 fi
 # The profile belongs to the existing entry; no daemon/global configuration changes.
 export EDUK12_RELEASE_OVERLAY="$live"
+if [[ "$mode" = full ]]; then
+  # Early read-only index-contract check, before any business service stops:
+  # a broken index state fails fast here so the release never takes downtime
+  # for a migration that cannot succeed. The formal preflight below still
+  # re-runs after the stop, because the database may change in between.
+  run "$entry" -f "$ops" --profile ops run --rm --no-deps migrate node scripts/assessment-run-index-contract.mjs pre
+fi
 if [[ "$mode" != frontend ]]; then run "$entry" stop -t "$grace" "${services[@]}"; fi
 if [[ "$mode" = full ]]; then
   run "$entry" -f "$ops" --profile ops run --rm --no-deps migrate node scripts/pr24-migration-preflight.mjs
-  run "$entry" -f "$ops" --profile ops run --rm --no-deps migrate ./node_modules/.bin/prisma migrate deploy
+  run "$entry" -f "$ops" --profile ops run --rm --no-deps migrate node scripts/assessment-run-index-contract.mjs pre
+  run "$entry" -f "$ops" --profile ops run --rm --no-deps migrate node scripts/migrate-deploy-bounded.mjs
+  run "$entry" -f "$ops" --profile ops run --rm --no-deps migrate node scripts/assessment-run-index-contract.mjs post
   run "$roles"
   if [[ "$data_action" = backfill ]]; then
     run "$entry" -f "$ops" --profile ops run --rm --no-deps checkin-token-backfill
