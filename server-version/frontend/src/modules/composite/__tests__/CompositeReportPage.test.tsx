@@ -54,6 +54,33 @@ describe('CompositeReportPage cognitive module', () => {
     expect(mockCompositeApi.report).not.toHaveBeenCalled()
     expect(mockCompositeApi.reanalyze).not.toHaveBeenCalled()
   })
+  it.each([
+    { taskSatisfied: false, expectedTitle: '已交卷，任务未达成', expectedDescription: '本次作答已保存并计入作答次数；任务条件未达成，仍可查看本次报告。' },
+    { taskSatisfied: true, expectedTitle: '已提交', expectedDescription: null },
+    { taskSatisfied: undefined, expectedTitle: '已提交', expectedDescription: null },
+  ])('preserves task satisfaction on Training Form-only report (taskSatisfied=$taskSatisfied)', async ({ taskSatisfied, expectedTitle, expectedDescription }) => {
+    trainingHost.mockReturnValue(true)
+    mockCompositeApi.reportView.mockResolvedValue({ code: 0, data: {
+      generation: { reportStatus: { state: 'READY' } },
+      report: {
+        id: 'attempt-1', assessmentId: 'q', name: '普通表单', productKind: 'QUESTIONNAIRE', reportMode: 'COLLECTION_ONLY',
+        taskSatisfied, backgroundValues: [{ itemId: 'form-answer', type: 'FORM', label: '问卷反馈', value: '反馈内容' }], unitReports: [],
+      },
+    } })
+    render(<MemoryRouter initialEntries={['/student/composite/attempts/attempt-1/report']}><Routes><Route path="/student/composite/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes></MemoryRouter>)
+    expect(await screen.findByText(expectedTitle)).toBeInTheDocument()
+    expect(screen.getByText('反馈内容')).toBeInTheDocument()
+    if (expectedDescription) {
+      expect(screen.getByText(expectedDescription)).toBeInTheDocument()
+      expect(screen.queryByText('已提交')).not.toBeInTheDocument()
+    } else {
+      expect(screen.queryByText('已交卷，任务未达成')).not.toBeInTheDocument()
+      expect(screen.queryByText('本次作答已提交，测评结果如下。')).not.toBeInTheDocument()
+    }
+    expect(screen.queryByText('以下按内容顺序展示各项测评的独立结果。')).not.toBeInTheDocument()
+    expect(mockCompositeApi.reportView).toHaveBeenCalledTimes(1)
+  })
+
   it('marks an unfinished collection as read-only partial and never asks for package analysis', async () => {
     authState.user = { role: 'TEACHER' }
     mockCompositeApi.teacherReport.mockResolvedValue({ code: 0, data: { id: 'partial-attempt', assessmentId: 'q', name: '部分结果', productKind: 'QUESTIONNAIRE', reportMode: 'COLLECTION_ONLY', reportState: 'PARTIAL', completedAt: null, totalTime: null, anonymousCode: null, backgroundValues: [], unitReports: [] } })
