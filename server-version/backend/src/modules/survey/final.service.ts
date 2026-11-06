@@ -68,6 +68,12 @@ export async function submitResearchFinal(input:FinalInput){
   })
   assertCanonicalSubmissionPayloadSize(canonical,1024*1024,'研究 FINAL 作答')
   return withFinalOnlyCompletionTransaction(async tx=>{
+      // Decision D-6 (2026-11-06, product-confirmed): PAUSE / CLOSE blocks new
+    // intake (START), not an already-admitted FINAL. This path intentionally
+    // does NOT check wave.status; the submission window (finishUntil /
+    // closesAt), consent, credential revocation and attempt status are the
+    // gates. Do not add a wave.status check here without a new product
+    // decision.
     // Match Project -> Wave -> Attempt ordering used by pause/close/hard-stop.
     // The Wave SHARE lock stabilizes the original completion window. A current
     // recruitment stop blocks new STARTs, not this already-admitted FINAL.

@@ -454,6 +454,12 @@ suite('Four-type Questionnaire production lifecycle', () => {
     let row=await fresh()
     row=await add(row,{type:'FORM',formType:'text_input',formLabel:'Restart field'})
     row=await product.publish(actor,row.id,{revision:row.revision})
+    // Decision D-7 (2026-11-06): restart counts toward maxAttempts on every
+    // composite. The product default is maxAttempts=1, which leaves no quota
+    // for a restart; this mechanics test needs a quota of 2 so the restart
+    // itself is not quota-bound (the quota rejection is covered by
+    // boundRunReplayRealBinding's D-7 case).
+    await db.compositeAssessment.update({ where: { id: row.id }, data: { maxAttempts: 2 } })
     const original=await runtime.startUserAttempt(student,row.id)
     const originalItem=original.attempt.currentItem as any
     const restarted=await runtime.restartUserAttempt(student,original.attempt.id)

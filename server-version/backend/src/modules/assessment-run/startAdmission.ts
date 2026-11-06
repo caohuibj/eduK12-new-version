@@ -136,6 +136,11 @@ export const buildRunAttemptIdentity = async (
   }
 }
 
+// Decision D-8 (2026-11-06, product-confirmed): a Run does NOT use
+// maxAttempts. Single-use per execution is enforced by the claim +
+// assignment uniqueness (one START claim per execution, one relational
+// assignment per execution), not by a quota. No quota check belongs in this
+// admission path or in the dispatch that follows it.
 export const loadRunExecutionStartAdmission = async (input: {
   tx?: Tx
   executionId: string

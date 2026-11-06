@@ -58,7 +58,12 @@ suite('Assessment Run close/cancel arbitration (real PostgreSQL)', () => {
   })
   afterAll(async () => db.$disconnect())
 
-  it('closes new intake without expiring an admitted undispatched claim', async () => {
+  // Decision D-9 (2026-11-06, product-confirmed): CLOSE terminates a
+  // CLAIMED-but-undispatched execution (EXPIRED + claim ABORTED, reusing the
+  // CANCEL semantics). A later START gets a clean terminal refusal
+  // (ABORTED), not a repeated RUN_NOT_STARTABLE loop. UNKNOWN claims are
+  // still preserved for recovery (next case).
+  it('closes new intake and terminates an admitted undispatched claim (decision D-9, 2026-11-06)', async () => {
     const fixture = await createExecution('close-claimed')
     const claim = await acquireRunExecutionStartClaim({ executionId: fixture.executionId, actorUserId: fixture.actorUserId })
     expect(claim.kind).toBe('ACQUIRED')
@@ -66,9 +71,9 @@ suite('Assessment Run close/cancel arbitration (real PostgreSQL)', () => {
     const rows = await db.$queryRawUnsafe<Array<{ runStatus: string; executionStatus: string; claimState: string }>>(
       `SELECT r.status AS "runStatus", e.status AS "executionStatus", c.state AS "claimState" FROM assessment_runs r JOIN assessment_run_executions e ON e.run_id=r.id JOIN assessment_run_execution_start_claims c ON c.execution_id=e.id WHERE e.id=$1`, fixture.executionId,
     )
-    expect(rows[0]).toEqual({ runStatus: 'CLOSED', executionStatus: 'ASSIGNED', claimState: 'CLAIMED' })
+    expect(rows[0]).toEqual({ runStatus: 'CLOSED', executionStatus: 'EXPIRED', claimState: 'ABORTED' })
     await expect(acquireRunExecutionStartClaim({ executionId: fixture.executionId, actorUserId: fixture.actorUserId }))
-      .resolves.toMatchObject({ kind: 'IN_PROGRESS' })
+      .resolves.toMatchObject({ kind: 'ABORTED' })
   })
 
   it('closes intake while preserving UNKNOWN for recovery', async () => {

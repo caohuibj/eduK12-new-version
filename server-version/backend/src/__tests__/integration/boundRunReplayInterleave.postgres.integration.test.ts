@@ -15,13 +15,16 @@ import { publishAssessmentRun } from '../../modules/assessment-run/publish'
  * BOUND Run replay governance matrix with deterministic interleaving (real
  * PostgreSQL, tx1 + tx2 existing-branch end-to-end).
  *
- * Pinned CURRENT semantics (product confirmation pending, must not be
- * silently tightened): a Run CLOSE or execution REVOKED committed inside the
+ * Product decisions D-1 / D-2 (2026-11-06, see bound-replay-decision.md §6):
+ * a Run CLOSE (D-1) or execution REVOKED (D-2) committed inside the
  * envelope-lock window does NOT change the replay outcome, because the BOUND
- * branch performs no status checks. Each interleave holds the execution row,
- * issues the replay, OBSERVES it blocked on an assessment_run_executions
- * query owned by the holder, commits the state flip in the same transaction,
- * then asserts the preserved outcome.
+ * branch performs no status checks — revocation blocks only new intake,
+ * already-bound work finishes. D-2 additionally records that REVOKED has no
+ * production writer; the REVOKED case below is a defensive pin, not
+ * production evidence. Each interleave holds the execution row, issues the
+ * replay, OBSERVES it blocked on an assessment_run_executions query owned by
+ * the holder, commits the state flip in the same transaction, then asserts
+ * the preserved outcome.
  */
 const DB_URL = integrationDatabaseUrl('TRAINING_START_ADMISSION_INTEGRATION_DATABASE_URL', 'PR26_INTEGRATION_DATABASE_URL', 'COGNITIVE_INTEGRATION_DB_URL')
 const suite = DB_URL ? describe : describe.skip
@@ -53,6 +56,21 @@ suite('BOUND Run replay governance interleave (real PostgreSQL)', () => {
         runtimeLaunchTarget: { kind: 'COMPOSITE', ref: compositeId } }
     },
   }])
+
+  // publishAssessmentRun runs at Serializable isolation, so two concurrent
+  // publishes (e.g. this suite running beside another integration file in the
+  // same vitest invocation) can abort each other with 40001. That is a
+  // transient serialization abort by definition, not a product failure; retry
+  // the publish, mirroring the production START path's transient handling.
+  const publishAssessmentRunWithRetry = async (args: Parameters<typeof publishAssessmentRun>[0]): Promise<void> => {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try { await publishAssessmentRun(args); return }
+      catch (e: unknown) {
+        if ((e as { code?: string }).code === '40001' && attempt < 2) continue
+        throw e
+      }
+    }
+  }
 
   const bindExecution = async (executionId: string, actorUserId: string): Promise<void> => {
     const d = await acquireRunExecutionStartClaim({ executionId, actorUserId, resourceRegistry: registry })
@@ -133,7 +151,7 @@ suite('BOUND Run replay governance interleave (real PostgreSQL)', () => {
       resource: { family: 'BUNDLE', key: `${suffix}-res`, version: '1.0.0' },
       subjectSelector: { kind: 'MEMBERSHIP_IDS', membershipIds: memberships.map(m => m.membershipId) },
       respondentSelector: { kind: 'MEMBERSHIP_IDS', membershipIds: memberships.map(m => m.membershipId) }, requestedPolicy: policy })
-    await publishAssessmentRun({ organizationId, runId: run.id, actorUserId: owner.id, expectedVersion: 2, resourceRegistry: registry })
+    await publishAssessmentRunWithRetry({ organizationId, runId: run.id, actorUserId: owner.id, expectedVersion: 2, resourceRegistry: registry })
     runId = run.id
     const rows = await db.$queryRaw<Array<{ executionId: string; userId: string }>>`
       SELECT e.id AS "executionId", a.user_id AS "userId"
@@ -187,7 +205,7 @@ suite('BOUND Run replay governance interleave (real PostgreSQL)', () => {
       .rejects.toMatchObject({ code: 'RUN_EXECUTION_ACTOR' })
   }, 30000)
 
-  it('Run CLOSE committed inside the envelope-lock window does not change the BOUND replay outcome (pinned behavior)', async () => {
+  it('Run CLOSE committed inside the envelope-lock window does not change the BOUND replay outcome (decision D-1, 2026-11-06)', async () => {
     const exec = bound[1]
     // The holder starts at the RUN row (the CLOSE UPDATE itself), matching the
     // product closeAssessmentRun lock order (Run -> Executions); the replay is
@@ -208,7 +226,7 @@ suite('BOUND Run replay governance interleave (real PostgreSQL)', () => {
     }
   }, 30000)
 
-  it('execution REVOKED inside the envelope-lock window does not change the BOUND replay outcome (pinned behavior)', async () => {
+  it('execution REVOKED inside the envelope-lock window does not change the BOUND replay outcome (decision D-2, 2026-11-06; defensive pin, no production writer)', async () => {
     const exec = bound[2]
     const outcome = await interleave(
       tx => tx.$queryRaw`SELECT id FROM assessment_run_executions WHERE id=${exec.executionId} FOR UPDATE`,
@@ -243,9 +261,10 @@ suite('BOUND Run replay governance interleave (real PostgreSQL)', () => {
     expect(binding.ref).toBe(result.runtimeBindingRef)
     const claim = (await db.$queryRaw<Array<{ state: string }>>`
       SELECT state FROM assessment_run_execution_start_claims WHERE execution_id=${exec.executionId}`)[0]
-    // The product advances the dispatched claim to its terminal state; both
-    // are legitimate post-conditions of the existing-branch attach.
-    expect(['DISPATCHED', 'COMPLETED']).toContain(claim.state)
+    // B-15: the success path's only legitimate final claim state is
+    // COMPLETED (attachBindingInTransaction calls markRunStartClaimCompleted).
+    // A DISPATCHED claim here would mean the completion step did not run.
+    expect(claim.state).toBe('COMPLETED')
     // Second call must take the tx1 BOUND fast path with the same binding.
     const replay = await startAssessmentRunExecution({ executionId: exec.executionId, actorUserId: exec.actorUserId })
     if (replay.state !== 'STARTED') throw new Error(`expected STARTED replay, got ${replay.state}`)
