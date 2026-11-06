@@ -10,13 +10,19 @@
 --   no measurable write degradation in the experiment
 -- Fixture caveat: the non-empty measurement used a LEGACY product-domain org;
 -- SCHOOL-domain runs (huiteacher/campus event wiring) were not exercised at
--- this scale. Review decision pending: this migration alone does not approve
--- anything.
+-- this scale.
 --
--- CONCURRENTLY note: prisma migrate runs migrations inside a transaction, so
--- this file uses a plain CREATE INDEX (brief write lock while building). If
--- the production table is expected to be much larger at deploy time, apply
--- CONCURRENTLY out-of-band first and keep this migration as a no-op guard.
+-- Locking: plain CREATE INDEX takes a SHARE lock on assessment_run_executions
+-- (writes wait, reads continue) for the duration of the build.
+-- Prisma 5 migrate deploy runs a multi-statement migration script as one
+-- implicit transaction; a script whose only statement is
+-- CREATE INDEX CONCURRENTLY is not wrapped. This migration keeps the plain
+-- form. Optional out-of-band path for a large table: build the same index
+-- with CREATE INDEX CONCURRENTLY first; IF NOT EXISTS then makes this file a
+-- no-op. A failed or cancelled CONCURRENTLY build leaves an INVALID index with
+-- this name that IF NOT EXISTS would silently keep, so before running migrate
+-- check pg_index.indisvalid for it and, if false, DROP INDEX CONCURRENTLY and
+-- rebuild it.
 CREATE INDEX IF NOT EXISTS
   "assessment_run_executions_respondent_created_idx"
   ON "assessment_run_executions" ("respondent_actor_snapshot_id", "created_at" DESC);

@@ -21,14 +21,17 @@ suite('assessment_run_executions respondent index migration (real PostgreSQL)', 
     await db.$disconnect()
   })
 
-  it('has the respondent+created_at DESC index with the migration-intended definition', async () => {
-    const rows = await db.$queryRawUnsafe<Array<{ indexdef: string }>>(
-      `SELECT indexdef FROM pg_indexes
-       WHERE indexname = 'assessment_run_executions_respondent_created_idx'`,
+  it('has a valid, ready respondent+created_at DESC index with the migration-intended definition', async () => {
+    // pg_index, not pg_indexes: a failed CONCURRENTLY build leaves an INVALID
+    // index of the same name, which must not count as present.
+    const rows = await db.$queryRawUnsafe<Array<{ indisvalid: boolean; indisready: boolean; indexdef: string }>>(
+      `SELECT i.indisvalid, i.indisready, pg_get_indexdef(i.indexrelid) AS indexdef
+         FROM pg_index i JOIN pg_class c ON c.oid = i.indexrelid
+        WHERE c.relname = 'assessment_run_executions_respondent_created_idx'`,
     )
     expect(rows).toHaveLength(1)
-    expect(rows[0].indexdef).toContain('assessment_run_executions')
-    expect(rows[0].indexdef).toContain('respondent_actor_snapshot_id')
-    expect(rows[0].indexdef).toContain('created_at DESC')
+    expect(rows[0].indisvalid).toBe(true)
+    expect(rows[0].indisready).toBe(true)
+    expect(rows[0].indexdef).toMatch(/ ON (\w+\.)?assessment_run_executions USING btree \(respondent_actor_snapshot_id, created_at DESC\)$/)
   }, 30000)
 })
