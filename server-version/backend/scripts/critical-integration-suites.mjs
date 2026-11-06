@@ -110,4 +110,21 @@ export const criticalIntegrationSuites = [
       'frozen consent survives re-consent: dispatch and replay keep A while the current consent is B (D-5)',
     ],
   },
+  {
+    file: 'src/__tests__/integration/boundRunReplayRealBinding.postgres.integration.test.ts',
+    minPassedAssertions: 3,
+    cases: [
+      'three layers after CLOSE: START replay + runtime read/fill + submit + report read on the real binding (D-1)',
+      'CLOSE terminates a CLAIMED-but-undispatched execution: EXPIRED + claim ABORTED (D-9)',
+      'restart counts toward maxAttempts on a plain questionnaire: maxAttempts=1 cannot restart, maxAttempts=2 allows exactly one restart (D-7)',
+    ],
+  },
+  {
+    file: 'src/__tests__/integration/boundRunReplayConsentFrozen.postgres.integration.test.ts',
+    minPassedAssertions: 2,
+    cases: [
+      'other frozen identity fields still reject after a change (D-5 negative)',
+      'frozen consent survives re-consent: dispatch and replay keep A while the current consent is B (D-5)',
+    ],
+  },
 ]
