@@ -14,6 +14,8 @@ import { createCampusActivity, changeCampusActivityStatus } from '../../modules/
 import { allocateCampusActivityParticipants } from '../../modules/campus/activity.allocation'
 import { createCampusActivityRunDraft } from '../../modules/campus/activity.runs'
 import { listCampusTeacherRunTasks } from '../../modules/campus/teacher-tasks'
+import { listMyAssessments } from '../../modules/assessment-policy/inbox.routes'
+import { assessmentRunController } from '../../modules/assessment-run/run.controller'
 import type { AuthenticatedPrincipal } from '../../types'
 
 const DB_URL = integrationDatabaseUrl(
@@ -92,21 +94,58 @@ async function mapChunked<T, R>(items: T[], size: number, fn: (item: T) => Promi
   return out
 }
 
+// Minimal Express res stub for the handler-level round-trip tests: the
+// handlers only use setHeader, status().json() and json(). There is no
+// supertest harness in this repo, so the handlers are invoked directly with
+// req.user preset, bypassing only the authenticate middleware.
+function stubRes() {
+  const res: any = {
+    statusCode: 200,
+    body: undefined as unknown,
+    setHeader() {},
+    status(code: number) { res.statusCode = code; return res },
+    json(body: unknown) { res.body = body; return res },
+  }
+  return res
+}
+const throwingNext = (err: unknown): never => { throw err }
+
 suite('Teacher task slot competition (real PostgreSQL)', () => {
+  let prevCampusEligibilityHmacKey: string | undefined
+  let hadCampusEligibilityHmacKey = false
+  let sharedSeed: Awaited<ReturnType<typeof seedTeacherSlotRun>> | null = null
+
   beforeAll(async () => {
     requireIsolatedReleaseDatabase(DB_URL!)
     // listCampusTeacherRunTasks derives student references from this HMAC
     // key; other campus integration tests set the same test-only value.
+    // Save and restore it: a leaked test-only value must not change the
+    // environment for suites sharing the worker (P2-03).
+    hadCampusEligibilityHmacKey = Object.prototype.hasOwnProperty.call(process.env, 'CAMPUS_ELIGIBILITY_HMAC_KEY')
+    prevCampusEligibilityHmacKey = process.env.CAMPUS_ELIGIBILITY_HMAC_KEY
     process.env.CAMPUS_ELIGIBILITY_HMAC_KEY = 'ab'.repeat(32)
     db = new PrismaClient({ datasources: { db: { url: DB_URL! } } })
     await db.$connect()
-  })
-  afterAll(async () => db.$disconnect())
+    // One shared unstaggered seed for the new tests: publish inserts all 101
+    // executions in one transaction, so they share a single microsecond
+    // timestamp — the production shape the keyset cursor must handle.
+    sharedSeed = await seedTeacherSlotRun(false, false)
+  }, 240_000)
+  afterAll(async () => {
+    try { if (db) await db.$disconnect() }
+    finally {
+      if (hadCampusEligibilityHmacKey) process.env.CAMPUS_ELIGIBILITY_HMAC_KEY = prevCampusEligibilityHmacKey!
+      else delete process.env.CAMPUS_ELIGIBILITY_HMAC_KEY
+    }
+  }, 120_000)
 
   // One OPEN campus activity, one PUBLISHED run, 101 executions: the same
   // teacher observes 101 students of one class. The 101st execution is the
   // newest; the other 100 are staggered older by seed order.
-  async function seedTeacherSlotRun(denyLast: boolean) {
+  // staggerCreatedAt=false keeps the publish-time timestamps untouched: all
+  // 101 rows share the single transaction-start timestamp, the production
+  // shape for the keyset cursor.
+  async function seedTeacherSlotRun(denyLast: boolean, staggerCreatedAt = true) {
     const seed = `${suffix}-${randomUUID().slice(0, 8)}`
     const owner = await createUser('owner', UserRole.TEACHER)
     const teacher = await createUser('teacher', UserRole.TEACHER)
@@ -204,7 +243,9 @@ suite('Teacher task slot competition (real PostgreSQL)', () => {
     }
 
     // Deterministic ordering: the 101st execution is newest, the other 100
-    // are older, staggered by seed order.
+    // are older, staggered by seed order. Skipped when staggerCreatedAt is
+    // false: the publish-time timestamps are then all identical, which is
+    // the production case the same-timestamp test pins.
     const executions = await db.$queryRaw<Array<{ id: string; subjectUserId: string }>>`
       SELECT e."id", s."user_id" AS "subjectUserId"
       FROM "assessment_run_executions" e
@@ -213,11 +254,13 @@ suite('Teacher task slot competition (real PostgreSQL)', () => {
     `
     expect(executions).toHaveLength(101)
     const bySubject = new Map(executions.map((row) => [row.subjectUserId, row.id]))
-    const now = Date.now()
-    for (let i = 0; i < participants.length; i++) {
-      await db.$executeRaw`UPDATE "assessment_run_executions" SET "created_at" = ${new Date(now - (101 - i) * 60_000)} WHERE "id" = ${bySubject.get(participants[i].id)!}`
+    if (staggerCreatedAt) {
+      const now = Date.now()
+      for (let i = 0; i < participants.length; i++) {
+        await db.$executeRaw`UPDATE "assessment_run_executions" SET "created_at" = ${new Date(now - (101 - i) * 60_000)} WHERE "id" = ${bySubject.get(participants[i].id)!}`
+      }
+      await db.$executeRaw`UPDATE "assessment_run_executions" SET "created_at" = ${new Date(now)} WHERE "id" = ${bySubject.get(extra.id)!}`
     }
-    await db.$executeRaw`UPDATE "assessment_run_executions" SET "created_at" = ${new Date(now)} WHERE "id" = ${bySubject.get(extra.id)!}`
     return {
       organizationId, teacher, runId: run.id, bySubject, participants, extra,
       oldestEligibleId: bySubject.get(participants[0].id)!,
@@ -271,5 +314,84 @@ suite('Teacher task slot competition (real PostgreSQL)', () => {
     expect(pages).toBe(34)
     expect(new Set(seen).size).toBe(101)
     expect(seen).toEqual([bySubject.get(extra.id)!, ...participants.slice().reverse().map((s) => bySubject.get(s.id)!)])
+  }, 180_000)
+
+  it('pages all 101 tasks when every execution shares one microsecond timestamp', async () => {
+    // P1 counterexample (review of PR #648): a Run publish inserts all its
+    // executions in one transaction, so CURRENT_TIMESTAMP — the transaction
+    // start — is identical for all of them. A cursor built from a JavaScript
+    // Date (millisecond precision) truncates 12:00:00.123456 to 12:00:00.123,
+    // and the next page's (created_at, id) comparison then drops every
+    // remaining row sharing that timestamp. The cursor must carry full
+    // TIMESTAMPTZ(6) precision, sourced from PostgreSQL itself.
+    const { teacher, runId } = sharedSeed!
+    const distinct = await db.$queryRaw<Array<{ count: string }>>`
+      SELECT COUNT(DISTINCT "created_at") AS "count" FROM "assessment_run_executions" WHERE "run_id" = ${runId}`
+    expect(Number(distinct[0].count)).toBe(1)
+    const expected = await db.$queryRaw<Array<{ id: string }>>`
+      SELECT "id" FROM "assessment_run_executions" WHERE "run_id" = ${runId}
+      ORDER BY "created_at" DESC, "id" DESC`
+    const seen: string[] = []
+    let cursor: { createdAt: string; id: string } | undefined
+    let pages = 0
+    while (true) {
+      const page = await listAssignedRunTasks(teacher.id, { limit: 3, cursor })
+      expect(page.list.length).toBeLessThanOrEqual(3)
+      if (page.nextCursor) expect(page.nextCursor.createdAt).toMatch(/\.\d{6}Z$/)
+      seen.push(...page.list.map((row) => row.executionId))
+      pages++
+      if (!page.nextCursor) break
+      cursor = page.nextCursor
+      expect(pages).toBeLessThan(100)
+    }
+    expect(pages).toBe(34)
+    expect(new Set(seen).size).toBe(101)
+    expect(seen).toEqual(expected.map((row) => row.id))
+  }, 180_000)
+
+  it('inbox HTTP round-trip: the returned nextRunCursor string fetches the next page', async () => {
+    // P1-02: the inbox endpoint must return the cursor as the same opaque
+    // base64url string its query accepts; returning the internal
+    // {createdAt, id} object cannot be sent back verbatim.
+    const { teacher } = sharedSeed!
+    const req1: any = { user: { userId: teacher.id, role: 'TEACHER' }, query: { runLimit: '3' } }
+    const res1 = stubRes()
+    await listMyAssessments(req1, res1, throwingNext)
+    expect(res1.statusCode).toBe(200)
+    const first = res1.body.data
+    expect(typeof first.nextRunCursor).toBe('string')
+    const firstRunIds = first.list.filter((t: any) => t.sourceType === 'ORGANIZATION_RUN').map((t: any) => t.taskId)
+    expect(firstRunIds).toHaveLength(3)
+    const req2: any = { user: { userId: teacher.id, role: 'TEACHER' }, query: { runCursor: first.nextRunCursor, runLimit: '3' } }
+    const res2 = stubRes()
+    await listMyAssessments(req2, res2, throwingNext)
+    expect(res2.statusCode).toBe(200)
+    const second = res2.body.data
+    expect(typeof second.nextRunCursor).toBe('string')
+    const secondRunIds = second.list.filter((t: any) => t.sourceType === 'ORGANIZATION_RUN').map((t: any) => t.taskId)
+    expect(secondRunIds).toHaveLength(3)
+    expect(secondRunIds.some((id: string) => firstRunIds.includes(id))).toBe(false)
+  }, 180_000)
+
+  it('assigned-tasks HTTP round-trip: the returned nextCursor string fetches the next page', async () => {
+    // P1-02, second endpoint: same round-trip property for
+    // GET /organizations/assigned-tasks.
+    const { teacher } = sharedSeed!
+    const req1: any = { user: { userId: teacher.id, role: 'TEACHER' }, query: { limit: '3' } }
+    const res1 = stubRes()
+    await assessmentRunController.assignedTasks(req1, res1)
+    expect(res1.statusCode).toBe(200)
+    const first = res1.body.data
+    expect(typeof first.nextCursor).toBe('string')
+    expect(first.list).toHaveLength(3)
+    const req2: any = { user: { userId: teacher.id, role: 'TEACHER' }, query: { cursor: first.nextCursor, limit: '3' } }
+    const res2 = stubRes()
+    await assessmentRunController.assignedTasks(req2, res2)
+    expect(res2.statusCode).toBe(200)
+    const second = res2.body.data
+    expect(second.list).toHaveLength(3)
+    const firstIds = first.list.map((t: any) => t.executionId)
+    const secondIds = second.list.map((t: any) => t.executionId)
+    expect(secondIds.some((id: string) => firstIds.includes(id))).toBe(false)
   }, 180_000)
 })

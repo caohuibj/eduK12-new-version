@@ -6,11 +6,13 @@ import { z } from 'zod'
 import { authenticate } from '../../middleware/auth'
 import { error, success, unauthorized } from '../../utils/response'
 import { listRespondentAssessments } from './inbox'
-import { decodeRunTaskCursor } from '../assessment-run/productRead'
+import { decodeRunTaskCursor, encodeRunTaskCursor } from '../assessment-run/productRead'
 
 const router = Router()
 router.use(authenticate)
-router.get('/', async (req, res, next) => {
+// Exported for the round-trip test: the handler is invoked directly with a
+// stubbed req/res, bypassing only the authenticate middleware.
+export async function listMyAssessments(req: any, res: any, next: any) {
   res.setHeader('Cache-Control', 'no-store')
   if (!req.user) return unauthorized(res)
   const parsed = z.object({
@@ -21,9 +23,16 @@ router.get('/', async (req, res, next) => {
   let runCursor
   try { runCursor = decodeRunTaskCursor(parsed.data.runCursor) }
   catch { return error(res, '任务游标无效', -1, 400) }
-  try { return success(res, await listRespondentAssessments(req.user.userId, req.user.role, { runCursor, runLimit: parsed.data.runLimit })) }
+  try {
+    const data = await listRespondentAssessments(req.user.userId, req.user.role, { runCursor, runLimit: parsed.data.runLimit })
+    // The wire cursor is an opaque base64url string: the client sends back
+    // exactly what the server returned. Never leak the internal
+    // {createdAt, id} object across the HTTP boundary.
+    return success(res, { ...data, nextRunCursor: data.nextRunCursor ? encodeRunTaskCursor(data.nextRunCursor) : null })
+  }
   catch (error) { next(error) }
-})
+}
+router.get('/', listMyAssessments)
 router.get('/catalog', async (req, res, next) => {
   res.setHeader('Cache-Control', 'no-store')
   if (!req.user) return unauthorized(res)

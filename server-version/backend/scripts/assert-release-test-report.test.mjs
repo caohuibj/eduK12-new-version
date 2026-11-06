@@ -33,8 +33,8 @@ function buildReport(overrides = (r) => r) {
   })
   const report = {
     success: true,
-    numTotalTests: 16,
-    numPassedTests: 15,
+    numTotalTests: 19,
+    numPassedTests: 18,
     numFailedTests: 0,
     numPendingTests: 1,
     testResults: suites,
@@ -58,7 +58,7 @@ function writeReport(report) {
   return file
 }
 
-// CI-08: all five critical suites actually ran and passed -> gate passes,
+// CI-08: all six critical suites actually ran and passed -> gate passes,
 // and a legitimate opt-in skip elsewhere does not fail the gate (CI-07).
 test('CI-08/CI-07: manifest suites pass, unrelated opt-in skip is ignored', () => {
   const result = checkReleaseTestReport(buildReport(), [], {

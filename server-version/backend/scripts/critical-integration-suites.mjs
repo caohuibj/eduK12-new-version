@@ -19,7 +19,8 @@
  *   explicit file lists; the manifest adds case-level checks on top.
  *
  * Each entry records the exact `it` titles at the review baseline
- * (commit 3939c84836). `minPassedAssertions` is the floor of passed
+ * (commit 3939c84836) — except the teacher slot-competition suite, whose
+ * titles are as of PR #648. `minPassedAssertions` is the floor of passed
  * assertion results for the suite (one per `it` in vitest JSON output).
  * If a case is renamed, deleted, or skipped, the report check fails:
  * renaming breaks the title match, deleting breaks both the title match
@@ -28,7 +29,7 @@
  * To add a suite: append an entry here and update the test that pins this
  * manifest (`assert-release-test-report.test.mjs`). Do not add the same
  * suite to the inline workflow/script lists — the manifest is the only
- * list for these five.
+ * list for these six.
  *
  * Paths are relative to `server-version/backend/` (the working directory of
  * both consumers).
@@ -76,6 +77,17 @@ export const criticalIntegrationSuites = [
     minPassedAssertions: 1,
     cases: [
       'has a valid, ready respondent+created_at DESC index with the migration-intended definition',
+    ],
+  },
+  {
+    file: 'src/__tests__/integration/teacherTaskSlotCompetition.postgres.integration.test.ts',
+    minPassedAssertions: 5,
+    cases: [
+      'does not drop an eligible task when a newer denied-student execution shares the run',
+      'pages run tasks by (created_at, id) keyset without loss or duplication',
+      'pages all 101 tasks when every execution shares one microsecond timestamp',
+      'inbox HTTP round-trip: the returned nextRunCursor string fetches the next page',
+      'assigned-tasks HTTP round-trip: the returned nextCursor string fetches the next page',
     ],
   },
 ]
