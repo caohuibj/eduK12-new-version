@@ -25,7 +25,7 @@ import { relationalProductRegistry } from '../assessment-relational/product-regi
 import { listReleasedRegisteredResourcePage } from './registeredResources'
 import { relationalEntryToRunPolicy } from './resourceAuthority'
 import { productionRunResourceAuthorityRegistry } from './resourceAuthority'
-import { listAssignedRunTasks, listAssessmentRunProducts, readAssessmentRunProduct } from './productRead'
+import { decodeRunTaskCursor, listAssignedRunTasks, listAssessmentRunProducts, readAssessmentRunProduct } from './productRead'
 
 const selectorSchema = z.record(z.string(), z.unknown()).default({})
 const policySchema = z.object({
@@ -127,7 +127,15 @@ export const assessmentRunController = {
   async schoolActivityResources(req:Request,res:Response,scope:{organizationId:string;courseId:string}){return resourcesResponse(req,res,scope)},
   async assignedTasks(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
-    try { return success(res, await listAssignedRunTasks(req.user.userId)) }
+    const parsed = z.object({
+      cursor: z.string().max(500).optional(),
+      limit: z.coerce.number().int().min(1).max(100).optional(),
+    }).strict().safeParse(req.query)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message, -1, 400)
+    let cursor
+    try { cursor = decodeRunTaskCursor(parsed.data.cursor) }
+    catch { return error(res, '任务游标无效', -1, 400) }
+    try { return success(res, await listAssignedRunTasks(req.user.userId, { cursor, limit: parsed.data.limit })) }
     catch (err) { return fail(res, err) }
   },
   async list(req: Request, res: Response) {

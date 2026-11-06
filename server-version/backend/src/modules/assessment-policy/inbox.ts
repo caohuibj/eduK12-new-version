@@ -5,7 +5,7 @@ import { respondentCompletionFeedback } from './feedback'
 import { prisma } from '../../config/database'
 import { listStudentAssignments } from '../cognitive/assignment.service'
 import type { UserRole } from '@prisma/client'
-import { listAssignedRunTasks } from '../assessment-run/productRead'
+import { listAssignedRunTasks, type RunTaskCursor } from '../assessment-run/productRead'
 import { relationalProductService } from '../assessment-relational/product.service'
 import { filterLegacyRelationalAssignments } from '../assessment-relational/legacy-domain'
 import { listStudentTasks } from '../../services/studentTasks'
@@ -35,10 +35,16 @@ export interface RespondentAssessmentTask {
 }
 
 /** Only the authenticated respondent is accepted. Owning services continue to
- * authorize start/resume/report; discovery never grants access or returns scores. */
-export async function listRespondentAssessments(userId: string, accountRole: UserRole) {
+ * authorize start/resume/report; discovery never grants access or returns scores.
+ * The ORGANIZATION_RUN portion pages by (created_at, id) keyset cursor; the
+ * other sources keep their existing bounded reads, so nextRunCursor advances
+ * only the run-task portion. */
+export async function listRespondentAssessments(userId: string, accountRole: UserRole, options?: {
+  runCursor?: RunTaskCursor
+  runLimit?: number
+}) {
   const [runs, relational, course] = await Promise.all([
-    listAssignedRunTasks(userId),
+    listAssignedRunTasks(userId, { cursor: options?.runCursor, limit: options?.runLimit }),
     ['STUDENT', 'TEACHER', 'PARENT'].includes(accountRole)
       ? relationalProductService.tasks(userId, accountRole).then(filterLegacyRelationalAssignments)
       : Promise.resolve([]),
@@ -122,5 +128,6 @@ export async function listRespondentAssessments(userId: string, accountRole: Use
   }
   list.sort((a, b) => Number(a.state === 'COMPLETED') - Number(b.state === 'COMPLETED') || a.title.localeCompare(b.title) || a.taskId.localeCompare(b.taskId))
   return { list: list.map(task => ({ ...task, feedback: respondentCompletionFeedback(task) })), pendingCount: list.filter(task => ['OPEN', 'ASSIGNED', 'PENDING', 'STARTED', 'IN_PROGRESS'].includes(task.state)).length,
-    truncated: ownScales.length > 100 || runs.truncated || relational.length >= 100 || (course?.total ?? 0) > 200 }
+    truncated: ownScales.length > 100 || runs.truncated || relational.length >= 100 || (course?.total ?? 0) > 200,
+    nextRunCursor: runs.nextCursor ?? null }
 }

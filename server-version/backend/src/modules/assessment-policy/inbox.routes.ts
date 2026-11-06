@@ -2,16 +2,26 @@ import { readRespondentRunSummary } from '../reporting/respondentSummary'
 import { listParticipantLongitudinal, readParticipantLongitudinal } from '../reporting/participantService'
 import { assessmentDeliveryCatalog } from './catalog'
 import { Router } from 'express'
+import { z } from 'zod'
 import { authenticate } from '../../middleware/auth'
-import { success, unauthorized } from '../../utils/response'
+import { error, success, unauthorized } from '../../utils/response'
 import { listRespondentAssessments } from './inbox'
+import { decodeRunTaskCursor } from '../assessment-run/productRead'
 
 const router = Router()
 router.use(authenticate)
 router.get('/', async (req, res, next) => {
   res.setHeader('Cache-Control', 'no-store')
   if (!req.user) return unauthorized(res)
-  try { return success(res, await listRespondentAssessments(req.user.userId, req.user.role)) }
+  const parsed = z.object({
+    runCursor: z.string().max(500).optional(),
+    runLimit: z.coerce.number().int().min(1).max(100).optional(),
+  }).strict().safeParse(req.query)
+  if (!parsed.success) return error(res, parsed.error.issues[0].message, -1, 400)
+  let runCursor
+  try { runCursor = decodeRunTaskCursor(parsed.data.runCursor) }
+  catch { return error(res, '任务游标无效', -1, 400) }
+  try { return success(res, await listRespondentAssessments(req.user.userId, req.user.role, { runCursor, runLimit: parsed.data.runLimit })) }
   catch (error) { next(error) }
 })
 router.get('/catalog', async (req, res, next) => {

@@ -159,17 +159,62 @@ export async function readAssessmentRunProduct(
   }
 }
 
+/** Keyset cursor for run-task pagination: the (created_at, id) pair of the
+ * last row of the previous page, in the reader's ORDER BY
+ * (created_at DESC, id DESC). The wire form is an opaque base64url JSON
+ * string; it is a page bookmark, not a capability, so it is unsigned. */
+export interface RunTaskCursor { createdAt: string; id: string }
+
+export function encodeRunTaskCursor(cursor: RunTaskCursor): string {
+  const createdAt = new Date(cursor.createdAt)
+  if (typeof cursor.id !== 'string' || !cursor.id || Number.isNaN(createdAt.getTime()))
+    throw new Error('RUN_TASK_CURSOR_INVALID')
+  return Buffer.from(JSON.stringify({ createdAt: createdAt.toISOString(), id: cursor.id })).toString('base64url')
+}
+
+export function decodeRunTaskCursor(value: unknown): RunTaskCursor | undefined {
+  if (value === undefined || value === null || value === '') return undefined
+  if (typeof value !== 'string' || value.length > 500) throw new Error('RUN_TASK_CURSOR_INVALID')
+  let parsed: unknown
+  try { parsed = JSON.parse(Buffer.from(value, 'base64url').toString()) }
+  catch { throw new Error('RUN_TASK_CURSOR_INVALID') }
+  const createdAt = (parsed as { createdAt?: unknown } | null)?.createdAt
+  const id = (parsed as { id?: unknown } | null)?.id
+  const date = new Date(typeof createdAt === 'string' ? createdAt : NaN)
+  if (typeof id !== 'string' || !id || Number.isNaN(date.getTime())) throw new Error('RUN_TASK_CURSOR_INVALID')
+  return { createdAt: date.toISOString(), id }
+}
+
 /** Exact respondent tasks with their assigned subject; no peer respondents, answers or scores. */
 export async function listAssignedRunTasks(userId: string, options?: {
   runIds?: string[]
+  /** DB-side allowlist: only these executions are returned. The teacher task
+   * list uses it so non-eligible executions cannot consume the reader's
+   * top-100 slots (A-01). */
+  executionIds?: string[]
+  /** Keyset page bookmark from a previous response's nextCursor. */
+  cursor?: RunTaskCursor
+  /** Page size, default 100, hard-capped at 100. Pagination, not a raise. */
+  limit?: number
   /** Campus inbox only: restore an already bound attempt, never new admission. */
   preserveBoundSchoolContinuation?: boolean
   /** Own completed ordinary observer feedback; does not authorize collection. */
   includeCompletedSchoolFeedback?: boolean
 }) {
-  if(options?.runIds && options.runIds.length===0) return { list:[], truncated:false }
+  if(options?.runIds && options.runIds.length===0) return { list:[], truncated:false, nextCursor:null as RunTaskCursor | null }
+  if(options?.executionIds && options.executionIds.length===0) return { list:[], truncated:false, nextCursor:null as RunTaskCursor | null }
+  const limit = Math.min(100, Math.max(1, Math.floor(options?.limit ?? 100)))
+  const cursorDate = options?.cursor ? new Date(options.cursor.createdAt) : null
+  if (options?.cursor && (Number.isNaN(cursorDate!.getTime()) || !options.cursor.id))
+    throw new Error('RUN_TASK_CURSOR_INVALID')
   const runScope=options?.runIds
     ? Prisma.sql`AND r."id" IN (${Prisma.join(options.runIds)})`
+    : Prisma.empty
+  const executionScope=options?.executionIds
+    ? Prisma.sql`AND e."id" IN (${Prisma.join(options.executionIds)})`
+    : Prisma.empty
+  const cursorScope=cursorDate
+    ? Prisma.sql`AND (e."created_at", e."id") < (${cursorDate}, ${options!.cursor!.id})`
     : Prisma.empty
   const schoolScope = options?.preserveBoundSchoolContinuation
     ? Prisma.sql`(EXISTS (SELECT 1 FROM "campus_activity_runs" ar
@@ -190,7 +235,7 @@ export async function listAssignedRunTasks(userId: string, options?: {
     ? completedSchoolOrdinaryFeedbackSql(Prisma.sql`e."id"`,userId)
     : Prisma.sql`FALSE`
   const list = await prisma.$queryRaw<Array<{
-    __boundSchoolContinuation: boolean;
+    __boundSchoolContinuation: boolean; createdAt: Date;
     executionId: string; organizationId: string; runId: string; runName: string;
     subjectUserId: string; subjectRole: string; subjectName: string; respondentRole: string; relationship: string; perspective: string; deadline: Date | null;
     runStatus: string; status: string; claimState: string | null;
@@ -198,6 +243,7 @@ export async function listAssignedRunTasks(userId: string, options?: {
     governedReport: boolean; reportAttemptId: string | null; consentRequired: boolean; consentPurpose: string | null; consentVisibility: string | null;
   }>>`
     SELECT ${schoolContinuation} AS "__boundSchoolContinuation",
+      e."created_at" AS "createdAt",
       e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",
       r."name" AS "runName", r."status" AS "runStatus", r."intake_deadline" AS "deadline",
       subject."user_id" AS "subjectUserId", subject."actor_role" AS "subjectRole", subject_user."username" AS "subjectName", respondent."actor_role" AS "respondentRole",
@@ -230,18 +276,25 @@ export async function listAssignedRunTasks(userId: string, options?: {
     LEFT JOIN "assessment_attempt_consents" consent ON consent."id" = a."consent_id"
     WHERE respondent."user_id" = ${userId}
       ${runScope}
+      ${executionScope}
+      ${cursorScope}
       AND ((${closedScope}
       AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)}
       AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
         WHERE d."organization_id" = e."organization_id" AND d."user_id" = ${userId}
           AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START')))
         OR ${completedSchoolFeedback})
-    ORDER BY e."created_at" DESC, e."id" DESC LIMIT 101
+    ORDER BY e."created_at" DESC, e."id" DESC LIMIT ${limit + 1}
   `
+  const page = list.slice(0, limit)
+  const last = page[page.length - 1]
   return {
-    list: list.slice(0, 100).map(({__boundSchoolContinuation,...task})=>({
+    list: page.map(({__boundSchoolContinuation, createdAt: _createdAt, ...task})=>({
       ...task,...(__boundSchoolContinuation?{canResumeExisting:true}:{}),
     })),
-    truncated: list.length > 100,
+    truncated: list.length > limit,
+    nextCursor: list.length > limit && last
+      ? { createdAt: last.createdAt.toISOString(), id: last.executionId }
+      : null,
   }
 }
