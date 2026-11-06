@@ -235,7 +235,11 @@ const createPackageCompletionFixture = async (malformedSnapshot = false) => {
       status: 'PUBLISHED',
       courseId,
       createdBy: userId,
-      maxAttempts: 1,
+      // Decision D-7 (2026-11-06): restart counts toward maxAttempts on every
+      // composite. This fixture restarts its attempt to exercise the completion
+      // path, so it needs a quota of 2; the quota rejection itself is covered
+      // by boundRunReplayRealBinding's D-7 case.
+      maxAttempts: 2,
       publishedAt: new Date(),
       analysisProtocolKey: packageDefinition.analysisProtocolKey,
       analysisProtocolVersion: packageDefinition.analysisProtocolVersion,

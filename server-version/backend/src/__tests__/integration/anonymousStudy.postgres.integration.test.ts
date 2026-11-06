@@ -138,4 +138,24 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   await expect(study.createWaveWithLink(owner,'TEACHER',s.id,{requestId:randomUUID(),compositeId:cid,title:'Over limit',expiresAt:new Date(Date.now()+86400000).toISOString(),maxUses:0})).rejects.toMatchObject({statusCode:400})
   expect(await prisma.compositeAssessmentAccessToken.count({where:{compositeAssessmentId:cid}})).toBe(before)
  },60000)
+ it('public restart counts toward maxAttempts and never pre-abandons on quota exhaustion (decision D-7, 2026-11-06)',async()=>{
+  // The shared composite defaults to maxAttempts=1; raise it for this test
+  // only and restore it, so the earlier tests keep their maxAttempts=1 pin.
+  await prisma.compositeAssessment.update({where:{id:cid},data:{maxAttempts:2}})
+  try {
+   const t=await token()
+   const first=await composite.startPublicAttempt(t.token)
+   expect(first.attempt.status).toBe('IN_PROGRESS')
+   await expect(composite.restartPublicAttempt(first.attempt.id,hashRecoveryToken('other'))).rejects.toMatchObject({statusCode:403})
+   const second=await composite.restartPublicAttempt(first.attempt.id,hashRecoveryToken(first.recoveryToken!))
+   expect(second.attempt.id).not.toBe(first.attempt.id)
+   expect((await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:first.attempt.id}})).status).toBe('ABANDONED')
+   expect((await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:second.attempt.id}})).status).toBe('IN_PROGRESS')
+   await expect(composite.restartPublicAttempt(second.attempt.id,hashRecoveryToken(second.recoveryToken!))).rejects.toMatchObject({statusCode:409})
+   // Quota exhaustion must not pre-abandon the current attempt.
+   expect((await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:second.attempt.id}})).status).toBe('IN_PROGRESS')
+  } finally {
+   await prisma.compositeAssessment.update({where:{id:cid},data:{maxAttempts:1}})
+  }
+ },60000)
 })

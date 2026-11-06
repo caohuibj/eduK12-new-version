@@ -158,6 +158,13 @@ export const acquireRunExecutionStartClaim = async (input: {
     if (execution.respondentUserId !== input.actorUserId) {
       throw new RunStartClaimError('RUN_EXECUTION_ACTOR', 'only the frozen respondent may own START', 403)
     }
+    // Decision D-1 / D-3 (2026-11-06, product-confirmed): a BOUND replay
+    // intentionally performs NO Run-status or authority recheck here. A Run
+    // CLOSE (D-1) or a membership / role / participation revocation (D-3)
+    // blocks only NEW intake: fresh claims below go through
+    // assertCurrentRunStartAuthority and the PUBLISHED check, while work that
+    // is already bound finishes under its frozen admission. Do not add a
+    // recheck to this branch without a new product decision.
     if (execution.runtimeBindingKind && execution.runtimeBindingRef) {
       const claim = await lockClaim(tx, input.executionId)
       return {

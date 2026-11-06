@@ -75,7 +75,12 @@ const lockExecutions = async (tx: Tx, runId: string): Promise<ExecutionLifecycle
 
 const expireUnstarted = async (tx: Tx, row: ExecutionLifecycleRow, mode: 'CLOSE' | 'CANCEL') => {
   if (row.status !== 'ASSIGNED' || row.runtimeBindingRef) return
-  if (mode === 'CLOSE' && ['CLAIMED', 'DISPATCHED', 'UNKNOWN', 'COMPLETED'].includes(row.claimState ?? '')) return
+  // Decision D-9 (2026-11-06, product-confirmed): CLOSE terminates
+  // CLAIMED-but-undispatched executions (EXPIRED + claim ABORTED via the
+  // branch below, reusing the CANCEL semantics). Only DISPATCHED / UNKNOWN /
+  // COMPLETED claims keep the old skip: a dispatch that already started must
+  // not be torn down mid-flight.
+  if (mode === 'CLOSE' && ['DISPATCHED', 'UNKNOWN', 'COMPLETED'].includes(row.claimState ?? '')) return
   const executionState = mode === 'CLOSE' ? 'EXPIRED' : 'CANCELLED'
   const assignmentState = mode === 'CLOSE' ? 'EXPIRED' : 'REVOKED'
   const nowRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`

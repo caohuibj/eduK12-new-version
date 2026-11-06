@@ -3624,10 +3624,14 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
     await lockCompositeAttempt(tx, attemptId)
     const trainingTask = usesScopedTrainingQuota(composite)
       && await isTrainingTaskCourse(tx as Prisma.TransactionClient, composite.deliveryCourseId ?? composite.courseId)
-    if(composite.trainingVariantFrozen != null || composite.trainingFlowFrozen?.schemaVersion===2 || trainingTask){
-      const used=await tx.compositeAssessmentAttempt.count({where:{compositeAssessmentId:composite.id,...(existing.userId?{userId:existing.userId}:{participantKey:(existing as any).participantKey})}})
-      if(!Number.isInteger(composite.maxAttempts)||composite.maxAttempts<1||composite.maxAttempts>100||used>=composite.maxAttempts)throw compositeConflict(trainingTask ? '已达到综合测评最大次数；重新开始也会计次。' : '概率分卷次数已用完；取消和重启也计入次数')
-    }
+    // Decision D-7 (2026-11-06, product-confirmed): restart counts toward
+    // maxAttempts on every composite, not only training variants. A restart
+    // abandons the current attempt and creates a new one, so the abandoned
+    // attempt still consumes quota; once the quota is exhausted no further
+    // restart is possible. The check is unconditional, matching the new-START
+    // quota check; the training-only error message is kept for training tasks.
+    const used=await tx.compositeAssessmentAttempt.count({where:{compositeAssessmentId:composite.id,...(existing.userId?{userId:existing.userId}:{participantKey:(existing as any).participantKey})}})
+    if(!Number.isInteger(composite.maxAttempts)||composite.maxAttempts<1||composite.maxAttempts>100||used>=composite.maxAttempts)throw compositeConflict(trainingTask ? '已达到综合测评最大次数；重新开始也会计次。' : '概率分卷次数已用完；取消和重启也计入次数')
     await assertNoAcceptedWholeQuestionnaire(tx as Prisma.TransactionClient, attemptId)
     const current = await tx.compositeAssessmentAttempt.findUnique({
       where: { id: attemptId },
@@ -3871,10 +3875,12 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
     if(tokens.length!==1||!tokens[0].isActive||new Date(tokens[0].expiresAt).getTime()<=Date.now())throw compositeForbidden('公开链接已失效')
     const roundCourseId=await assertTrainingTokenRound(tx as Prisma.TransactionClient,{...tokens[0],compositeAssessmentId:composite.id})
     await lockCompositeAttempt(tx, attemptId)
-    if(composite.trainingVariantFrozen != null || composite.trainingFlowFrozen?.schemaVersion===2){
-      const used=await tx.compositeAssessmentAttempt.count({where:{compositeAssessmentId:composite.id,...(existing.userId?{userId:existing.userId}:{participantKey:(existing as any).participantKey})}})
-      if(!Number.isInteger(composite.maxAttempts)||composite.maxAttempts<1||composite.maxAttempts>100||used>=composite.maxAttempts)throw compositeConflict('概率分卷次数已用完；取消和重启也计入次数')
-    }
+    // Decision D-7 (2026-11-06, product-confirmed): restart counts toward
+    // maxAttempts on every composite, not only training variants; see
+    // restartUserAttempt. The check is unconditional, matching the new-START
+    // quota check.
+    const used=await tx.compositeAssessmentAttempt.count({where:{compositeAssessmentId:composite.id,...(existing.userId?{userId:existing.userId}:{participantKey:(existing as any).participantKey})}})
+    if(!Number.isInteger(composite.maxAttempts)||composite.maxAttempts<1||composite.maxAttempts>100||used>=composite.maxAttempts)throw compositeConflict('概率分卷次数已用完；取消和重启也计入次数')
     await assertNoAcceptedWholeQuestionnaire(tx as Prisma.TransactionClient, attemptId)
     const current = await tx.compositeAssessmentAttempt.findUnique({
       where: { id: attemptId },
