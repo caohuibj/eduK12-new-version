@@ -159,17 +159,89 @@ export async function readAssessmentRunProduct(
   }
 }
 
+/** Keyset cursor for run-task pagination: the (created_at, id) pair of the
+ * last row of the previous page, in the reader's ORDER BY
+ * (created_at DESC, id DESC). The wire form is an opaque base64url JSON
+ * string; it is a page bookmark, not a capability, so it is unsigned.
+ *
+ * createdAt MUST carry the full TIMESTAMPTZ(6) microsecond precision
+ * (e.g. `2026-11-06T12:00:00.123456Z`). A JavaScript Date only holds
+ * milliseconds: building the cursor from `Date.toISOString()` truncates
+ * `12:00:00.123456` to `12:00:00.123`, and the next page's
+ * `(created_at, id) < (cursor, id)` comparison then excludes every
+ * remaining row sharing the original microsecond timestamp — which is the
+ * normal case, because a Run publish inserts all its executions in one
+ * transaction and CURRENT_TIMESTAMP is the transaction start. The cursor
+ * is therefore sourced from PostgreSQL itself
+ * (`to_char(created_at AT TIME ZONE 'UTC', ...US...)`) and passed back to
+ * PostgreSQL as a timestamptz parameter, never through a Date. */
+export interface RunTaskCursor { createdAt: string; id: string }
+
+const MICROSECOND_CURSOR_TIMESTAMP = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.(\d{3})(\d{3})?Z$/
+
+/** Canonicalize a cursor timestamp to six fractional digits. A legacy
+ * three-digit (millisecond) value is zero-padded; anything else is rejected. */
+function canonicalCursorTimestamp(value: unknown): string | null {
+  if (typeof value !== 'string') return null
+  const match = MICROSECOND_CURSOR_TIMESTAMP.exec(value)
+  if (!match || Number.isNaN(new Date(value).getTime())) return null
+  return `${match[1]}.${match[2]}${match[3] ?? '000'}Z`
+}
+
+export function encodeRunTaskCursor(cursor: RunTaskCursor): string {
+  const createdAt = canonicalCursorTimestamp(cursor.createdAt)
+  if (typeof cursor.id !== 'string' || !cursor.id || createdAt === null)
+    throw new Error('RUN_TASK_CURSOR_INVALID')
+  return Buffer.from(JSON.stringify({ createdAt, id: cursor.id })).toString('base64url')
+}
+
+export function decodeRunTaskCursor(value: unknown): RunTaskCursor | undefined {
+  if (value === undefined || value === null || value === '') return undefined
+  if (typeof value !== 'string' || value.length > 500) throw new Error('RUN_TASK_CURSOR_INVALID')
+  let parsed: unknown
+  try { parsed = JSON.parse(Buffer.from(value, 'base64url').toString()) }
+  catch { throw new Error('RUN_TASK_CURSOR_INVALID') }
+  const createdAt = canonicalCursorTimestamp((parsed as { createdAt?: unknown } | null)?.createdAt)
+  const id = (parsed as { id?: unknown } | null)?.id
+  if (typeof id !== 'string' || !id || createdAt === null) throw new Error('RUN_TASK_CURSOR_INVALID')
+  return { createdAt, id }
+}
+
 /** Exact respondent tasks with their assigned subject; no peer respondents, answers or scores. */
 export async function listAssignedRunTasks(userId: string, options?: {
   runIds?: string[]
+  /** DB-side allowlist: only these executions are returned. The teacher task
+   * list uses it so non-eligible executions cannot consume the reader's
+   * top-100 slots (A-01). */
+  executionIds?: string[]
+  /** Keyset page bookmark from a previous response's nextCursor. */
+  cursor?: RunTaskCursor
+  /** Page size, default 100, hard-capped at 100. Pagination, not a raise. */
+  limit?: number
   /** Campus inbox only: restore an already bound attempt, never new admission. */
   preserveBoundSchoolContinuation?: boolean
   /** Own completed ordinary observer feedback; does not authorize collection. */
   includeCompletedSchoolFeedback?: boolean
 }) {
-  if(options?.runIds && options.runIds.length===0) return { list:[], truncated:false }
+  if(options?.runIds && options.runIds.length===0) return { list:[], truncated:false, nextCursor:null as RunTaskCursor | null }
+  if(options?.executionIds && options.executionIds.length===0) return { list:[], truncated:false, nextCursor:null as RunTaskCursor | null }
+  const limit = Math.min(100, Math.max(1, Math.floor(options?.limit ?? 100)))
+  // The cursor timestamp is a microsecond ISO string, validated by the
+  // canonicalizer; it is passed to PostgreSQL as a timestamptz parameter so
+  // the comparison keeps full TIMESTAMPTZ(6) precision. Never route it
+  // through a JavaScript Date here: that truncates to milliseconds and
+  // drops same-microsecond rows from later pages.
+  const cursorCreatedAt = options?.cursor ? canonicalCursorTimestamp(options.cursor.createdAt) : null
+  if (options?.cursor && (cursorCreatedAt === null || !options.cursor.id))
+    throw new Error('RUN_TASK_CURSOR_INVALID')
   const runScope=options?.runIds
     ? Prisma.sql`AND r."id" IN (${Prisma.join(options.runIds)})`
+    : Prisma.empty
+  const executionScope=options?.executionIds
+    ? Prisma.sql`AND e."id" IN (${Prisma.join(options.executionIds)})`
+    : Prisma.empty
+  const cursorScope=cursorCreatedAt
+    ? Prisma.sql`AND (e."created_at", e."id") < (${cursorCreatedAt}::timestamptz, ${options!.cursor!.id})`
     : Prisma.empty
   const schoolScope = options?.preserveBoundSchoolContinuation
     ? Prisma.sql`(EXISTS (SELECT 1 FROM "campus_activity_runs" ar
@@ -190,7 +262,7 @@ export async function listAssignedRunTasks(userId: string, options?: {
     ? completedSchoolOrdinaryFeedbackSql(Prisma.sql`e."id"`,userId)
     : Prisma.sql`FALSE`
   const list = await prisma.$queryRaw<Array<{
-    __boundSchoolContinuation: boolean;
+    __boundSchoolContinuation: boolean; createdAtMicros: string;
     executionId: string; organizationId: string; runId: string; runName: string;
     subjectUserId: string; subjectRole: string; subjectName: string; respondentRole: string; relationship: string; perspective: string; deadline: Date | null;
     runStatus: string; status: string; claimState: string | null;
@@ -198,6 +270,7 @@ export async function listAssignedRunTasks(userId: string, options?: {
     governedReport: boolean; reportAttemptId: string | null; consentRequired: boolean; consentPurpose: string | null; consentVisibility: string | null;
   }>>`
     SELECT ${schoolContinuation} AS "__boundSchoolContinuation",
+      to_char(e."created_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros",
       e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",
       r."name" AS "runName", r."status" AS "runStatus", r."intake_deadline" AS "deadline",
       subject."user_id" AS "subjectUserId", subject."actor_role" AS "subjectRole", subject_user."username" AS "subjectName", respondent."actor_role" AS "respondentRole",
@@ -230,18 +303,25 @@ export async function listAssignedRunTasks(userId: string, options?: {
     LEFT JOIN "assessment_attempt_consents" consent ON consent."id" = a."consent_id"
     WHERE respondent."user_id" = ${userId}
       ${runScope}
+      ${executionScope}
+      ${cursorScope}
       AND ((${closedScope}
       AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)}
       AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
         WHERE d."organization_id" = e."organization_id" AND d."user_id" = ${userId}
           AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START')))
         OR ${completedSchoolFeedback})
-    ORDER BY e."created_at" DESC, e."id" DESC LIMIT 101
+    ORDER BY e."created_at" DESC, e."id" DESC LIMIT ${limit + 1}
   `
+  const page = list.slice(0, limit)
+  const last = page[page.length - 1]
   return {
-    list: list.slice(0, 100).map(({__boundSchoolContinuation,...task})=>({
+    list: page.map(({__boundSchoolContinuation, createdAtMicros: _createdAtMicros, ...task})=>({
       ...task,...(__boundSchoolContinuation?{canResumeExisting:true}:{}),
     })),
-    truncated: list.length > 100,
+    truncated: list.length > limit,
+    nextCursor: list.length > limit && last
+      ? { createdAt: last.createdAtMicros, id: last.executionId }
+      : null,
   }
 }

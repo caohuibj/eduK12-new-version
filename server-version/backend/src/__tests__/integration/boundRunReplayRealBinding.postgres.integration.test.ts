@@ -11,6 +11,7 @@ import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { createOrganization, createMembership, grantPersona } from '../../modules/organization/service'
 import { createAssessmentRunDraft, addAssessmentRunTrackDraft } from '../../modules/assessment-run/repository'
 import { publishAssessmentRun } from '../../modules/assessment-run/publish'
+import { rolledBackStartReason } from '../../modules/composite/start-transient'
 import { finalizeCompositeAttemptIfReady, getAttemptState, getReport, restartUserAttempt, startUserAttempt } from '../../modules/composite/composite.service'
 import { submitCompositeFormSectionFinal } from '../../modules/composite/final-submit.service'
 
@@ -77,7 +78,11 @@ suite('BOUND replay against a real binding (real PostgreSQL)', () => {
     for (let attempt = 0; attempt < 3; attempt++) {
       try { await publishAssessmentRun(args); return }
       catch (e: unknown) {
-        if ((e as { code?: string }).code === '40001' && attempt < 2) continue
+        // P2-04: classify with the shared START transient classifier, not a
+        // bare top-level code check. Prisma surfaces a serialization conflict
+        // as P2034 or as P2010 with the SQLSTATE in meta.code; a business
+        // error must never be retried. The last error is rethrown as-is.
+        if (rolledBackStartReason(e) !== null && attempt < 2) continue
         throw e
       }
     }
@@ -241,10 +246,21 @@ suite('BOUND replay against a real binding (real PostgreSQL)', () => {
       .rejects.toMatchObject({ code: 'RUN_START_ABORTED' })
   }, 60000)
 
-  it('restart counts toward maxAttempts on a plain questionnaire: maxAttempts=1 cannot restart (D-7)', async () => {
+  it('restart counts toward maxAttempts on a plain questionnaire: maxAttempts=1 cannot restart, maxAttempts=2 allows exactly one restart (D-7)', async () => {
     const original = await startUserAttempt(studentA, d7CompositeId)
     expect((original.attempt as { status: string }).status).toBe('IN_PROGRESS')
     await expect(restartUserAttempt(studentA, (original.attempt as { id: string }).id))
       .rejects.toMatchObject({ message: expect.stringContaining('次数已用完') })
+    // Quota exhaustion leaves the current attempt untouched (not pre-abandoned).
+    expect((await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: (original.attempt as { id: string }).id } })).status).toBe('IN_PROGRESS')
+    await db.compositeAssessment.update({ where: { id: d7CompositeId }, data: { maxAttempts: 2 } })
+    const restarted = await restartUserAttempt(studentA, (original.attempt as { id: string }).id)
+    const currentId = (restarted.attempt as { id: string }).id
+    expect(currentId).not.toBe((original.attempt as { id: string }).id)
+    expect((await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: (original.attempt as { id: string }).id } })).status).toBe('ABANDONED')
+    expect((await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: currentId } })).status).toBe('IN_PROGRESS')
+    await expect(restartUserAttempt(studentA, currentId))
+      .rejects.toMatchObject({ message: expect.stringContaining('次数已用完') })
+    expect((await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: currentId } })).status).toBe('IN_PROGRESS')
   }, 60000)
 })

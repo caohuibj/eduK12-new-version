@@ -10,6 +10,7 @@ import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { createOrganization, createMembership, grantPersona } from '../../modules/organization/service'
 import { createAssessmentRunDraft, addAssessmentRunTrackDraft } from '../../modules/assessment-run/repository'
 import { publishAssessmentRun } from '../../modules/assessment-run/publish'
+import { rolledBackStartReason } from '../../modules/composite/start-transient'
 
 /**
  * BOUND Run replay governance matrix with deterministic interleaving (real
@@ -66,7 +67,11 @@ suite('BOUND Run replay governance interleave (real PostgreSQL)', () => {
     for (let attempt = 0; attempt < 3; attempt++) {
       try { await publishAssessmentRun(args); return }
       catch (e: unknown) {
-        if ((e as { code?: string }).code === '40001' && attempt < 2) continue
+        // P2-04: classify with the shared START transient classifier, not a
+        // bare top-level code check. Prisma surfaces a serialization conflict
+        // as P2034 or as P2010 with the SQLSTATE in meta.code; a business
+        // error must never be retried. The last error is rethrown as-is.
+        if (rolledBackStartReason(e) !== null && attempt < 2) continue
         throw e
       }
     }
