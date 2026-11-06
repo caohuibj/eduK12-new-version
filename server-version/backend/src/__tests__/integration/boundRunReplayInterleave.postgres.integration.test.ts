@@ -1,11 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma as db } from '../../config/database'
-import { integrationDatabaseUrl } from './integration-env'
+import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integration-env'
 import { startAssessmentRunExecution } from '../../modules/assessment-run/startExecution'
 import { acquireRunExecutionStartClaim } from '../../modules/assessment-run/startClaim'
-import { RunResourceAuthorityRegistry } from '../../modules/assessment-run/resourceAuthority'
+import { RunResourceAuthorityRegistry, type RunResourcePolicy, type RunResourceRef } from '../../modules/assessment-run/resourceAuthority'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { createOrganization, createMembership, grantPersona } from '../../modules/organization/service'
 import { createAssessmentRunDraft, addAssessmentRunTrackDraft } from '../../modules/assessment-run/repository'
@@ -25,6 +25,7 @@ import { publishAssessmentRun } from '../../modules/assessment-run/publish'
  */
 const DB_URL = integrationDatabaseUrl('TRAINING_START_ADMISSION_INTEGRATION_DATABASE_URL', 'PR26_INTEGRATION_DATABASE_URL', 'COGNITIVE_INTEGRATION_DB_URL')
 const suite = DB_URL ? describe : describe.skip
+if (DB_URL) requireIsolatedReleaseDatabase(DB_URL)
 
 const policy = {
   subjectRoles: ['STUDENT'], respondentRoles: ['STUDENT'], relationshipKinds: ['SELF'],
@@ -40,12 +41,13 @@ suite('BOUND Run replay governance interleave (real PostgreSQL)', () => {
   const bound: Array<{ executionId: string; actorUserId: string }> = []
   const unbound: Array<{ executionId: string; actorUserId: string }> = []
   const strangerId = `${suffix}-stranger`
+  const createdUserIds: string[] = []
   const observer = new PrismaClient({ datasources: { db: { url: DB_URL } } })
   const registry = new RunResourceAuthorityRegistry([{
     family: 'BUNDLE',
     capabilities: { transactionMode: 'TRANSACTIONAL_DB', startMode: 'TRANSACTIONAL', supportsLookupByOperationKey: false,
       supportsSafeCancel: false, finalAuthority: 'CANONICAL_RUNTIME', runtimeBindingKind: 'COMPOSITE', runV1Enabled: true },
-    async resolveExact(ref: { family: string; key: string; version: string }) {
+    async resolveExact(ref: RunResourceRef): Promise<RunResourcePolicy> {
       return { family: ref.family, key: ref.key, version: ref.version, scientificMaturity: 'PILOT',
         applicabilityHash: canonicalHash({ ref, policy }), ...policy,
         runtimeLaunchTarget: { kind: 'COMPOSITE', ref: compositeId } }
@@ -59,11 +61,14 @@ suite('BOUND Run replay governance interleave (real PostgreSQL)', () => {
     await db.$executeRaw`UPDATE assessment_run_execution_start_claims SET state='DISPATCHED', dispatched_at=transaction_timestamp(), updated_at=transaction_timestamp() WHERE execution_id=${executionId}`
   }
 
-  /** Hold the execution row FOR UPDATE, issue the replay, observe it blocked
-   * on an assessment_run_executions query owned by this holder, run the flip
-   * in the same transaction, commit, then collect the replay outcome. */
-  const interleave = async (executionId: string, flip: (tx: Parameters<Parameters<typeof db.$transaction>[0]>[0]) => Promise<void>,
-    probe: () => Promise<unknown>): Promise<{ ok: boolean; value?: unknown; message?: string }> => {
+  type Tx = Parameters<Parameters<typeof db.$transaction>[0]>[0]
+  /** `hold` takes the row lock in a test-owned transaction; the replay is then
+   * issued and OBSERVED Lock-waiting on a query matching `blockedQuery` that is
+   * blocked by this holder PID (deadline fails the case); `flip` runs in the
+   * same transaction, which then commits; the replay outcome is returned.
+   * Holder and replay are settled on every path before returning. */
+  const interleave = async (hold: (tx: Tx) => Promise<unknown>, flip: (tx: Tx) => Promise<unknown>,
+    probe: () => Promise<unknown>, blockedQuery: string): Promise<{ ok: boolean; value?: unknown; message?: string }> => {
     let ready!: () => void
     const held = new Promise<void>(r => { ready = r })
     let releaseFlip!: () => void
@@ -72,41 +77,49 @@ suite('BOUND Run replay governance interleave (real PostgreSQL)', () => {
     const holder = db.$transaction(async tx => {
       const [pidRow] = await tx.$queryRawUnsafe<Array<{ pid: number }>>('SELECT pg_backend_pid() AS pid')
       holderPid = pidRow.pid
-      await tx.$queryRawUnsafe('SELECT id FROM assessment_run_executions WHERE id = $1 FOR UPDATE', executionId)
+      await hold(tx)
       ready()
       await flipGate
       await flip(tx)
     }, { maxWait: 10000, timeout: 30000 })
-    holder.catch(() => {})
-    await held
-    const outcome = probe()
-      .then(v => ({ ok: true as const, value: v }))
-      .catch((e: { code?: string; message?: string }) => ({ ok: false as const, message: String(e.code ?? e.message ?? 'error') }))
-    const deadline = Date.now() + 15000
-    for (;;) {
-      const rows = await observer.$queryRawUnsafe<Array<{ pid: number }>>(
-        `SELECT s.pid FROM pg_stat_activity s
-         WHERE s.wait_event_type = 'Lock' AND cardinality(pg_blocking_pids(s.pid)) > 0
-           AND ${holderPid} = ANY(pg_blocking_pids(s.pid))
-           AND s.query ILIKE '%assessment_run_executions%'`)
-      if (rows.length > 0) break
-      if (Date.now() > deadline) { releaseFlip(); await holder; throw new Error('replay never observed blocked on the execution row') }
-      await new Promise(r => setTimeout(r, 50))
+    let outcome: Promise<{ ok: boolean; value?: unknown; message?: string }> | undefined
+    try {
+      // A holder that fails before signalling surfaces here instead of hanging.
+      await Promise.race([held, holder.then(() => { throw new Error('holder ended before taking the row lock') })])
+      outcome = probe()
+        .then(v => ({ ok: true as const, value: v }))
+        .catch((e: { code?: string; message?: string }) => ({ ok: false as const, message: String(e.code ?? e.message ?? 'error') }))
+      const deadline = Date.now() + 15000
+      for (;;) {
+        const rows = await observer.$queryRawUnsafe<Array<{ pid: number }>>(
+          `SELECT s.pid FROM pg_stat_activity s
+           WHERE s.wait_event_type = 'Lock' AND ${holderPid} = ANY(pg_blocking_pids(s.pid))
+             AND s.query ILIKE $1`, blockedQuery)
+        if (rows.length > 0) break
+        if (Date.now() > deadline) throw new Error(`replay never observed blocked on ${blockedQuery}`)
+        await new Promise(r => setTimeout(r, 50))
+      }
+      releaseFlip()
+      await holder
+      return await outcome
+    } finally {
+      releaseFlip()
+      await Promise.allSettled([holder, ...(outcome ? [outcome] : [])])
     }
-    releaseFlip()
-    await holder
-    return outcome
   }
 
   beforeAll(async () => {
     const owner = await db.user.create({ data: { username: `${suffix}-owner`, passwordHash: 'SYNTHETIC NONLOGIN', role: 'TEACHER', teacherApproved: true, accountDomain: 'LEGACY' } })
     ownerUserId = owner.id
+    createdUserIds.push(owner.id)
     await db.user.create({ data: { id: strangerId, username: strangerId, passwordHash: 'SYNTHETIC NONLOGIN', role: 'STUDENT', accountDomain: 'LEGACY' } })
+    createdUserIds.push(strangerId)
     const org = await createOrganization({ name: `${suffix} org`, meta: { actorUserId: owner.id, commandKey: randomUUID() } })
     organizationId = org.organization.id
     const memberships: Array<{ membershipId: string; userId: string }> = []
     for (let i = 0; i < 8; i++) {
       const student = await db.user.create({ data: { username: `${suffix}-s${i}`, passwordHash: 'SYNTHETIC NONLOGIN', role: 'STUDENT', accountDomain: 'LEGACY' } })
+      createdUserIds.push(student.id)
       const m = await createMembership({ organizationId, userId: student.id, meta: { actorUserId: owner.id, commandKey: randomUUID() } })
       await grantPersona({ organizationId, membershipId: m.id, persona: 'STUDENT', meta: { actorUserId: owner.id, commandKey: randomUUID() } })
       memberships.push({ membershipId: m.id, userId: student.id })
@@ -133,19 +146,24 @@ suite('BOUND Run replay governance interleave (real PostgreSQL)', () => {
 
   afterAll(async () => {
     try {
-      // Suffix-keyed best-effort cleanup (isolated DB; FK order).
-      const step = (p: Promise<unknown>): Promise<unknown> => p.catch(() => undefined)
-      await step(db.compositeAssessmentAttempt.deleteMany({ where: { compositeAssessmentId: compositeId } }))
-      await step(db.compositeAssessment.deleteMany({ where: { code: `${suffix}-composite` } }))
-      await step(db.$executeRaw`DELETE FROM assessment_run_execution_start_claims WHERE execution_id IN (SELECT id FROM assessment_run_executions WHERE run_id=${runId})`)
-      await step(db.$executeRaw`DELETE FROM assessment_run_executions WHERE run_id=${runId}`)
-      await step(db.$executeRaw`DELETE FROM assessment_run_actor_snapshots WHERE run_id=${runId}`)
-      await step(db.$executeRaw`DELETE FROM assessment_run_relationship_snapshots WHERE run_id=${runId}`)
-      await step(db.$executeRaw`DELETE FROM assessment_run_tracks WHERE run_id=${runId}`)
-      await step(db.$executeRaw`DELETE FROM assessment_runs WHERE id=${runId}`)
-      await step(db.organizationMembership.deleteMany({ where: { organizationId } }))
-      await step(db.$executeRaw`DELETE FROM organizations WHERE id=${organizationId}`)
-      await step(db.user.deleteMany({ where: { username: { startsWith: suffix } } }))
+      // Exact this-run cleanup (FK order) of every deletable row; a failure
+      // here is a real defect and fails the suite. The run/tracks/actor
+      // snapshots, episode allocations, organization, memberships/personas and
+      // users stay in the
+      // disposable isolated database: they are anchored by FKs from episode
+      // rows and append-only organization governance audit rows.
+      if (compositeId) {
+        await db.compositeAssessmentAttempt.deleteMany({ where: { compositeAssessmentId: compositeId } })
+        await db.compositeAssessment.deleteMany({ where: { id: compositeId } })
+      }
+      if (runId) {
+        await db.$executeRaw`DELETE FROM assessment_run_execution_start_claims WHERE execution_id IN (SELECT id FROM assessment_run_executions WHERE run_id=${runId})`
+        const assignments = await db.$queryRaw<Array<{ id: string }>>`
+          SELECT relational_assignment_id AS id FROM assessment_run_executions WHERE run_id=${runId} AND relational_assignment_id IS NOT NULL`
+        await db.$executeRaw`DELETE FROM assessment_run_executions WHERE run_id=${runId}`
+        if (assignments.length) await db.$executeRaw`DELETE FROM relational_assessment_assignments WHERE id IN (${Prisma.join(assignments.map(a => a.id))})`
+        await db.$executeRaw`DELETE FROM assessment_run_relationship_snapshots WHERE run_id=${runId}`
+      }
     } finally {
       await observer.$disconnect()
       await (await import('../../config/queue')).closeQueues(true)
@@ -171,54 +189,32 @@ suite('BOUND Run replay governance interleave (real PostgreSQL)', () => {
 
   it('Run CLOSE committed inside the envelope-lock window does not change the BOUND replay outcome (pinned behavior)', async () => {
     const exec = bound[1]
-    // The holder starts at the RUN row, matching the product closeAssessmentRun
-    // lock order (Run -> Executions); the replay is observed blocked on the run
-    // row, the CLOSE commits, and the replay then re-reads governance under its
-    // own envelope locks and must still return the bound attempt.
-    let ready!: () => void
-    const held = new Promise<void>(r => { ready = r })
-    let releaseFlip!: () => void
-    const flipGate = new Promise<void>(r => { releaseFlip = r })
-    let holderPid = 0
-    const holder = db.$transaction(async tx => {
-      const [pidRow] = await tx.$queryRawUnsafe<Array<{ pid: number }>>('SELECT pg_backend_pid() AS pid')
-      holderPid = pidRow.pid
-      await tx.$queryRawUnsafe(`UPDATE assessment_runs SET status='CLOSED', closed_at=transaction_timestamp() WHERE id='${runId}'`)
-      ready()
-      await flipGate
-    }, { maxWait: 10000, timeout: 30000 })
-    holder.catch(() => {})
-    await held
-    // Issue the probe while the run row is held; observe it blocked on an
-    // assessment_runs query owned by this holder; then commit the CLOSE.
-    const outcome = startAssessmentRunExecution({ executionId: exec.executionId, actorUserId: exec.actorUserId })
-      .then(v => ({ ok: true as const, v })).catch(e => ({ ok: false as const, message: String((e as { code?: string; message?: string }).code ?? e.message ?? 'error') }))
-    const deadline = Date.now() + 15000
-    for (;;) {
-      const rows = await observer.$queryRawUnsafe<Array<{ pid: number; query: string }>>(
-        `SELECT s.pid FROM pg_stat_activity s
-         WHERE s.wait_event_type = 'Lock' AND cardinality(pg_blocking_pids(s.pid)) > 0
-           AND ${holderPid} = ANY(pg_blocking_pids(s.pid))
-           AND s.query ILIKE '%assessment_run%'`)
-      if (rows.length > 0) break
-      if (Date.now() > deadline) { releaseFlip(); await holder; throw new Error('replay never observed blocked on the run row') }
-      await new Promise(r => setTimeout(r, 50))
+    // The holder starts at the RUN row (the CLOSE UPDATE itself), matching the
+    // product closeAssessmentRun lock order (Run -> Executions); the replay is
+    // observed blocked behind it, the CLOSE commits, and the replay then
+    // re-reads governance under its own envelope locks.
+    try {
+      const outcome = await interleave(
+        tx => tx.$executeRaw`UPDATE assessment_runs SET status='CLOSED', closed_at=transaction_timestamp() WHERE id=${runId}`,
+        async () => undefined,
+        () => startAssessmentRunExecution({ executionId: exec.executionId, actorUserId: exec.actorUserId }),
+        '%assessment_run%')
+      expect(outcome.ok).toBe(true)
+      expect((outcome.value as { replayed?: boolean }).replayed).toBe(true)
+      expect((outcome.value as { runtimeBindingKind?: string }).runtimeBindingKind).toBe('COMPOSITE')
+    } finally {
+      // Test hygiene only: restore the run so later cases see a PUBLISHED run.
+      await db.$executeRaw`UPDATE assessment_runs SET status='PUBLISHED', closed_at=NULL WHERE id=${runId}`
     }
-    releaseFlip()
-    await holder
-    const resolved = await outcome
-    expect(resolved.ok).toBe(true)
-    expect((resolved.v as { replayed?: boolean }).replayed).toBe(true)
-    expect((resolved.v as { runtimeBindingKind?: string }).runtimeBindingKind).toBe('COMPOSITE')
-    // Test hygiene only: restore the run so later cases see a PUBLISHED run.
-    await db.$executeRaw`UPDATE assessment_runs SET status='PUBLISHED', closed_at=NULL WHERE id=${runId}`
   }, 30000)
 
   it('execution REVOKED inside the envelope-lock window does not change the BOUND replay outcome (pinned behavior)', async () => {
     const exec = bound[2]
-    const outcome = await interleave(exec.executionId,
+    const outcome = await interleave(
+      tx => tx.$queryRaw`SELECT id FROM assessment_run_executions WHERE id=${exec.executionId} FOR UPDATE`,
       tx => tx.$executeRaw`UPDATE assessment_run_executions SET status='REVOKED' WHERE id=${exec.executionId}`,
-      () => startAssessmentRunExecution({ executionId: exec.executionId, actorUserId: exec.actorUserId }))
+      () => startAssessmentRunExecution({ executionId: exec.executionId, actorUserId: exec.actorUserId }),
+      '%assessment_run_executions%')
     expect(outcome.ok).toBe(true)
     expect((outcome.value as { replayed?: boolean }).replayed).toBe(true)
   }, 30000)
@@ -239,7 +235,7 @@ suite('BOUND Run replay governance interleave (real PostgreSQL)', () => {
       respondentType: 'SELF' as never, episodeId: assignment.episodeId, assignmentRef: assignment.id } })
     await db.$executeRaw`UPDATE relational_assessment_assignments SET status='STARTED' WHERE id=${assignment.id}`
     const result = await startAssessmentRunExecution({ executionId: exec.executionId, actorUserId: exec.actorUserId, resourceRegistry: registry })
-    expect(result.state).toBe('STARTED')
+    if (result.state !== 'STARTED') throw new Error(`expected STARTED, got ${result.state}`)
     expect(result.replayed).toBe(true)
     const binding = (await db.$queryRaw<Array<{ kind: string | null; ref: string | null }>>`
       SELECT runtime_binding_kind AS kind, runtime_binding_ref AS ref FROM assessment_run_executions WHERE id=${exec.executionId}`)[0]
@@ -252,6 +248,7 @@ suite('BOUND Run replay governance interleave (real PostgreSQL)', () => {
     expect(['DISPATCHED', 'COMPLETED']).toContain(claim.state)
     // Second call must take the tx1 BOUND fast path with the same binding.
     const replay = await startAssessmentRunExecution({ executionId: exec.executionId, actorUserId: exec.actorUserId })
+    if (replay.state !== 'STARTED') throw new Error(`expected STARTED replay, got ${replay.state}`)
     expect(replay.replayed).toBe(true)
     expect(replay.runtimeBindingRef).toBe(result.runtimeBindingRef)
   }, 60000)
