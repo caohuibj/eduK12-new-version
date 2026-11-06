@@ -1,3 +1,15 @@
+// LEGACY host deployment config — NOT used by the Docker/Compose path
+// (the backend Dockerfile runs plain `node dist/index.js`, no PM2).
+// Do not copy these values into the container deployment:
+// - max_memory_restart '200M' sits below the safe RSS of a process with a
+//   150MB heap cap (node_args --max-old-space-size=150): heap + native +
+//   code routinely exceeds 200MB under load, so PM2 would restart healthy
+//   processes. If this file is ever used again, raise the threshold first.
+// - instances: 2 in cluster mode runs two Node processes, each with its own
+//   Prisma pool and its own admission gates, doubling both. The preflight
+//   (scripts/prelaunch-resource-preflight.mjs) accounts the backend as a
+//   single process, so a cluster deployment would silently exceed the pool
+//   and gate budgets it validates.
 require('dotenv').config({ path: '/opt/ptool/server-version/backend/.env' })
 
 module.exports = {

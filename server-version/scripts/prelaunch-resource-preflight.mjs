@@ -63,6 +63,24 @@ export function inspectResourceContract(compose, {capacity=false}={}) {
    }
   }
  }
+ // FINAL-gate consistency: the three FINAL admission gates share the API
+ // process's Prisma pool. A single gate must never admit more concurrent
+ // operations than the pool can serve, and the admitted total must stay
+ // within a bounded multiple of the pool. The known-safe conservative
+ // envelope (7+3+8=18 vs pool 10, 1.8x) passes; the Compose fallbacks
+ // (50+20+50=120 vs pool 20, 6x) fail. A hard "sum <= pool" rule would
+ // reject the known-safe envelope, so the bound is 2x, not 1x. The worker
+ // process does not enforce these gates, so only the backend values count.
+ const backendService=result.services.backend
+ const finalGateLimits=['UNIT_SUBMIT_ADMISSION_LIMIT','AGGREGATE_FINALIZATION_ADMISSION_LIMIT','QUESTIONNAIRE_COMPLETION_ADMISSION_LIMIT'].map(key=>{
+  const value=backendService[key]
+  if(!Number.isSafeInteger(value)||value<1)throw new Error(`Missing ${key}`)
+  return value
+ })
+ const finalGateConcurrencyTotal=finalGateLimits.reduce((sum,limit)=>sum+limit,0)
+ if(finalGateLimits.some(limit=>limit>backendService.prismaPool))throw new Error('FINAL admission limit exceeds Prisma pool')
+ if(finalGateConcurrencyTotal>2*backendService.prismaPool)throw new Error('FINAL admission limits exceed twice the Prisma pool')
+ result.finalGateConcurrencyTotal=finalGateConcurrencyTotal
  if(cpu>4.000001 || memory>3584*1048576)throw new Error('4C4G starting envelope exceeded; reserve at least 512MiB for the host')
  const redis=services.redis.command || [];const maxIndex=redis.indexOf('--maxmemory');const policyIndex=redis.indexOf('--maxmemory-policy')
  if(maxIndex<0 || size(redis[maxIndex+1])>size(services.redis.mem_limit)*.65 || redis[policyIndex+1]!=='noeviction')throw new Error('Redis persistence/queue headroom or policy invalid')

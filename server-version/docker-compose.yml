@@ -248,6 +248,10 @@ services:
     cpus: ${WORKER_CPUS:-0.75}
     cpu_shares: ${WORKER_CPU_SHARES:-512}
     mem_limit: ${WORKER_MEM_LIMIT:-768m}
+    # Must exceed the worker's internal shutdown budget (30s, WORKER_SHUTDOWN_TIMEOUT_SECONDS):
+    # without it Compose sends SIGKILL after its 10s default, before the drain/cancel/close
+    # sequence in workers/main.ts can finish and while Bull jobs are still in flight.
+    stop_grace_period: 45s
     image: server-version-backend:latest
     build:
       context: ./backend
