@@ -13,7 +13,7 @@ export interface InboxTask {
   feedback?: { title: string; message: string } | null
   subject?: { role: string; displayName?: string }; consentState: string; runTask?: AssignedRunTask
 }
-export interface AssessmentInbox { list: InboxTask[]; pendingCount: number; truncated: boolean }
+export interface AssessmentInbox { list: InboxTask[]; pendingCount: number; truncated: boolean; nextRunCursor?: string | null }
 const stateLabels: Record<string, string> = { OPEN: '待完成', ASSIGNED: '待完成', PENDING: '待完成', STARTED: '进行中', IN_PROGRESS: '进行中', COMPLETED: '已完成', SUBMITTED_NOT_SATISFIED: '已交卷，任务未达成', EXPIRED: '已过期', REVOKED: '已撤回', CANCELLED: '已取消', UPCOMING: '尚未开始', UNAVAILABLE: '暂不可用' }
 
 interface CatalogCard { title: string; launchTarget: string; journey: { resource: { family: string; key: string; version: string }; initiationModes: string[] } }

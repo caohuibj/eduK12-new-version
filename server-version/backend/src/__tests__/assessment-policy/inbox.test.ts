@@ -14,7 +14,7 @@ beforeEach(() => { vi.clearAllMocks(); mocks.runs.mockResolvedValue({ list: [], 
 describe('respondent inbox', () => {
   it('uses exact identity for ADMIN respondents without requesting tenant data', async () => {
     await listRespondentAssessments('admin-self', 'ADMIN')
-    expect(mocks.runs).toHaveBeenCalledWith('admin-self')
+    expect(mocks.runs).toHaveBeenCalledWith('admin-self', { cursor: undefined, limit: undefined })
     expect(mocks.scales.mock.calls[0][0].where).toMatchObject({ userId: 'admin-self', compositeAttemptId: null, questionnaireAssessmentId: null })
     expect(mocks.course).not.toHaveBeenCalled()
     expect(mocks.relational).not.toHaveBeenCalled()

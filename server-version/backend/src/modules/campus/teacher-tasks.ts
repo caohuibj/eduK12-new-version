@@ -93,6 +93,10 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, o
   if(!allowed.length)return {list:[],truncated:candidates.length>100}
   const official=await listAssignedRunTasks(actor.userId,{
     runIds:[...new Set(allowed.map(t=>t.runId))],
+    // DB-side allowlist: the reader returns exactly the eligible executions,
+    // so executions the candidate query excluded cannot consume its top-100
+    // slots and silently drop an eligible task (A-01).
+    executionIds:allowed.map(t=>t.executionId),
     preserveBoundSchoolContinuation:true,
     includeCompletedSchoolFeedback:true,
   })
