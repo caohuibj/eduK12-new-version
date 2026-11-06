@@ -39,13 +39,28 @@ beforeEach(() => {
   }
   configure(true, false)
   db.$transaction.mockImplementation(async callback => callback(db))
-  db.$queryRawUnsafe.mockImplementation(async () => { state.order.push('publication-lock'); return [{ id: 'publication' }] })
+  db.$queryRawUnsafe.mockImplementation(async (query: string) => {
+    // Both SQL channels must fail loudly on unknown queries: the unsafe
+    // channel carries the admission share lock and asset locks, so a silent
+    // catch-all here would let new queries pass vacuously.
+    if (typeof query === 'string' && query.includes('composite_assessments') && query.includes('FOR SHARE')) {
+      state.order.push('publication-lock'); return [{ id: 'publication' }]
+    }
+    if (typeof query === 'string' && query.includes('FOR SHARE')) return [{ id: 'training', endedAt: null }]
+    throw new Error(`unexpected $queryRawUnsafe in the START admission path: ${String(query).slice(0, 160)}`)
+  })
   db.$queryRaw.mockImplementation(async (query: TemplateStringsArray) => {
-    // No previous attempt in this fixture; fast resume must miss and reach
-    // the original locked START path whose publication gates are asserted below.
-    if (query.join('').includes('composite_assessment_attempts')) return []
-    if (query.join('').includes('FOR SHARE OF c,u')) { state.order.push('course-lock'); return [{ id: 'training', endedAt: null }] }
-    return [{ id: 'publication' }]
+    // Dispatch on the anchored SQL shapes the START path actually issues;
+    // anything else must fail loudly instead of silently receiving a
+    // catch-all fixture row.
+    const sql = query.join('')
+    // Fast resume read (PR #641): no previous attempt in this fixture.
+    if (sql.includes('FROM "composite_assessment_attempts"') && sql.includes('FOR SHARE')) return []
+    if (sql.includes('FOR SHARE OF c,u')) { state.order.push('course-lock'); return [{ id: 'training', endedAt: null }] }
+    if (sql.includes('FROM "composite_assessments"') && sql.includes('FOR UPDATE')) return [{ id: 'publication' }]
+    // Authenticated-admission advisory lock; the return row is not consumed.
+    if (sql.includes('pg_advisory_xact_lock')) return [{ locked: 1 }]
+    throw new Error(`unexpected $queryRaw in the START admission path: ${sql.slice(0, 160)}`)
   })
   db.compositeAssessment.findUnique.mockImplementation(async ({ select }) => {
     if (!select) return { ...state.publication }
@@ -107,10 +122,17 @@ describe('Training configured-policy admission projection (mock DB, actual start
     expect(db.compositeAssessmentAttempt.create).not.toHaveBeenCalled()
   })
   it('retains Training course/author lock and enrollment revalidation', async () => {
-    db.$queryRaw.mockImplementation(async (query: TemplateStringsArray) =>
-      query.join('').includes('composite_assessment_attempts') || query.join('').includes('FOR SHARE OF c,u')
-        ? []
-        : [{ id: 'publication' }])
+    db.$queryRaw.mockImplementation(async (query: TemplateStringsArray) => {
+      // Same anchored dispatch as the shared fixture; the course lock row is
+      // withheld here so the enrollment revalidation is actually exercised.
+      const sql = query.join('')
+      if (sql.includes('FROM "composite_assessment_attempts"') && sql.includes('FOR SHARE')) return []
+      if (sql.includes('FOR SHARE OF c,u')) return []
+      if (sql.includes('FROM "composite_assessments"') && sql.includes('FOR UPDATE')) return [{ id: 'publication' }]
+      // Authenticated-admission advisory lock; the return row is not consumed.
+      if (sql.includes('pg_advisory_xact_lock')) return [{ locked: 1 }]
+      throw new Error(`unexpected $queryRaw in the START admission path: ${sql.slice(0, 160)}`)
+    })
     await expect(startUserAttempt('student', 'publication')).rejects.toMatchObject({ statusCode: 403, message: 'Training 课程已关闭或投放权限无效' })
     expect(db.compositeAssessmentAttempt.create).not.toHaveBeenCalled()
   })
