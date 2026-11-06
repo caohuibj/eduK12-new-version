@@ -394,4 +394,29 @@ suite('Teacher task slot competition (real PostgreSQL)', () => {
     const secondIds = second.list.map((t: any) => t.executionId)
     expect(secondIds.some((id: string) => firstIds.includes(id))).toBe(false)
   }, 180_000)
+
+  it('invalid-date cursor is rejected with 400 on the inbox endpoint', async () => {
+    // A forged cursor carrying a nonexistent calendar date (2026-02-31)
+    // must fail at decode with 400, never reach PostgreSQL's
+    // ::timestamptz, which would reject it as HTTP 500.
+    const { teacher } = sharedSeed!
+    const forged = Buffer.from(JSON.stringify({ createdAt: '2026-02-31T12:00:00.123456Z', id: 'x' })).toString('base64url')
+    const req: any = { user: { userId: teacher.id, role: 'TEACHER' }, query: { runCursor: forged, runLimit: '3' } }
+    const res = stubRes()
+    await listMyAssessments(req, res, throwingNext)
+    expect(res.statusCode).toBe(400)
+    expect(res.body.message).toBe('任务游标无效')
+  }, 180_000)
+
+  it('invalid-date cursor is rejected with 400 on the assigned-tasks endpoint', async () => {
+    // Same property for GET /organizations/assigned-tasks: 2026 is not a
+    // leap year, so 2026-02-29 is a nonexistent date.
+    const { teacher } = sharedSeed!
+    const forged = Buffer.from(JSON.stringify({ createdAt: '2026-02-29T12:00:00.123456Z', id: 'x' })).toString('base64url')
+    const req: any = { user: { userId: teacher.id, role: 'TEACHER' }, query: { cursor: forged, limit: '3' } }
+    const res = stubRes()
+    await assessmentRunController.assignedTasks(req, res)
+    expect(res.statusCode).toBe(400)
+    expect(res.body.message).toBe('任务游标无效')
+  }, 180_000)
 })

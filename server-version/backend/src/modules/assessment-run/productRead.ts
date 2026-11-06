@@ -180,11 +180,24 @@ export interface RunTaskCursor { createdAt: string; id: string }
 const MICROSECOND_CURSOR_TIMESTAMP = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.(\d{3})(\d{3})?Z$/
 
 /** Canonicalize a cursor timestamp to six fractional digits. A legacy
- * three-digit (millisecond) value is zero-padded; anything else is rejected. */
+ * three-digit (millisecond) value is zero-padded; anything else is rejected.
+ *
+ * The calendar is validated component by component. `new Date()` must NOT
+ * be used here: it normalizes nonexistent dates (2026-02-31 becomes
+ * 2026-03-03) instead of rejecting them, and the original string would
+ * then reach PostgreSQL's ::timestamptz, which rejects it — surfacing as
+ * HTTP 500 instead of the promised 400 for a bad cursor. The microsecond
+ * digits are kept verbatim (never rebuilt from a Date). Year 0000 is also
+ * rejected: PostgreSQL's timestamptz range starts at year 0001. */
 function canonicalCursorTimestamp(value: unknown): string | null {
   if (typeof value !== 'string') return null
   const match = MICROSECOND_CURSOR_TIMESTAMP.exec(value)
-  if (!match || Number.isNaN(new Date(value).getTime())) return null
+  if (!match) return null
+  const [year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0] = match[1].split(/[-T:]/).map(Number)
+  if (year < 1 || month < 1 || month > 12 || hour > 23 || minute > 59 || second > 59) return null
+  const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)
+  const daysInMonth = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1]!
+  if (day < 1 || day > daysInMonth) return null
   return `${match[1]}.${match[2]}${match[3] ?? '000'}Z`
 }
 
