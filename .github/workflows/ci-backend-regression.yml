@@ -150,7 +150,7 @@ jobs:
             server-version/frontend/package-lock.json
       - name: validate disjoint regression report controls
         if: matrix.group == 'fixtures' || matrix.group == 'focused'
-        run: node --test ../../.github/scripts/backend-regression-reports.test.mjs
+        run: node --test ../../.github/scripts/backend-regression-reports.test.mjs scripts/assert-release-test-report.test.mjs scripts/assessment-run-index-contract.test.mjs scripts/migrate-deploy-bounded.test.mjs
       - name: verify runner capacity and clean application ports
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: check hosted runner disk headroom
@@ -620,6 +620,7 @@ jobs:
       - name: hosted critical integration suites must not skip
         run: >-
           node scripts/assert-release-test-report.mjs '${{ runner.temp }}/regression-reports/eduk12-backend-vitest.json'
+          --manifest scripts/critical-integration-suites.mjs
           src/__tests__/integration/teacherSelfGroupScale.postgres.integration.test.ts
           src/__tests__/integration/librarySelfGroupScale.postgres.integration.test.ts
           src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts
