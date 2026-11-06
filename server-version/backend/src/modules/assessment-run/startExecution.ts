@@ -194,6 +194,13 @@ const startTransactionalComposite = async (input: {
       consentId: true,
     },
   })
+  // Decision D-4 (2026-11-06, product-confirmed): replay of an existing
+  // attempt is EXEMPT from the governance recheck that the new-attempt branch
+  // below performs (assertCurrentRunStartAuthority + Run PUBLISHED). The only
+  // gates here are the frozen-identity match and a STARTED assignment; a
+  // revocation or Run CLOSE committed after the attempt was created does not
+  // change the outcome. The exemption scope is exactly this branch: a fresh
+  // claim for the same execution still re-checks authority.
   if (existing) {
     if (
       existing.compositeAssessmentId !== input.launch.runtimeTargetRef
@@ -257,7 +264,13 @@ const startTransactionalComposite = async (input: {
   // The claim freezes runtime identity before this transaction. The relational
   // transition still checks current assignment/consent authority, but its legacy
   // occupational respondent mapping must not replace that admitted identity.
-  for (const key of ['subjectUserId', 'respondentUserId', 'episodeId', 'assignmentRef', 'consentId'] as const) {
+  // Decision D-5 (2026-11-06, product-confirmed): consent is frozen at claim
+  // time and stays valid for the whole START flow. relational.start resolves
+  // the CURRENT accepted consent, which may differ from the frozen one after
+  // a re-consent; that difference is deliberately NOT a mismatch. The attempt
+  // below is created with the frozen admission identity, so replay and new
+  // attempt both run under the frozen consent.
+  for (const key of ['subjectUserId', 'respondentUserId', 'episodeId', 'assignmentRef'] as const) {
     if (started.attemptIdentity[key] !== admission.attemptIdentity[key]) {
       throw new RunStartExecutionError('RUN_RUNTIME_BINDING_MISMATCH', 'current assignment or consent differs from frozen Run admission', 409)
     }

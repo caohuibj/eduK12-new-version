@@ -20,7 +20,8 @@
  *
  * Each entry records the exact `it` titles at the review baseline
  * (commit 3939c84836) — except the teacher slot-competition suite, whose
- * titles are as of PR #648. `minPassedAssertions` is the floor of passed
+ * titles are as of PR #648, and the BOUND real-binding and frozen-consent
+ * suites, whose titles are as of PR #649. `minPassedAssertions` is the floor of passed
  * assertion results for the suite (one per `it` in vitest JSON output).
  * If a case is renamed, deleted, or skipped, the report check fails:
  * renaming breaks the title match, deleting breaks both the title match
@@ -29,7 +30,7 @@
  * To add a suite: append an entry here and update the test that pins this
  * manifest (`assert-release-test-report.test.mjs`). Do not add the same
  * suite to the inline workflow/script lists — the manifest is the only
- * list for these six.
+ * list for these eight.
  *
  * Paths are relative to `server-version/backend/` (the working directory of
  * both consumers).
@@ -67,8 +68,8 @@ export const criticalIntegrationSuites = [
     cases: [
       'concurrent first admission on one execution fences to exactly one ACQUIRED',
       'unauthorized actor is rejected on the BOUND path',
-      'Run CLOSE committed inside the envelope-lock window does not change the BOUND replay outcome (pinned behavior)',
-      'execution REVOKED inside the envelope-lock window does not change the BOUND replay outcome (pinned behavior)',
+      'Run CLOSE committed inside the envelope-lock window does not change the BOUND replay outcome (decision D-1, 2026-11-06)',
+      'execution REVOKED inside the envelope-lock window does not change the BOUND replay outcome (decision D-2, 2026-11-06; defensive pin, no production writer)',
       'tx2 existing-branch end-to-end: frozen identity match attaches binding and dispatches the claim',
     ],
   },
@@ -88,6 +89,23 @@ export const criticalIntegrationSuites = [
       'pages all 101 tasks when every execution shares one microsecond timestamp',
       'inbox HTTP round-trip: the returned nextRunCursor string fetches the next page',
       'assigned-tasks HTTP round-trip: the returned nextCursor string fetches the next page',
+    ],
+  },
+  {
+    file: 'src/__tests__/integration/boundRunReplayRealBinding.postgres.integration.test.ts',
+    minPassedAssertions: 3,
+    cases: [
+      'three layers after CLOSE: START replay + runtime read/fill + submit + report read on the real binding (D-1)',
+      'CLOSE terminates a CLAIMED-but-undispatched execution: EXPIRED + claim ABORTED (D-9)',
+      'restart counts toward maxAttempts on a plain questionnaire: maxAttempts=1 cannot restart, maxAttempts=2 allows exactly one restart (D-7)',
+    ],
+  },
+  {
+    file: 'src/__tests__/integration/boundRunReplayConsentFrozen.postgres.integration.test.ts',
+    minPassedAssertions: 2,
+    cases: [
+      'other frozen identity fields still reject after a change (D-5 negative)',
+      'frozen consent survives re-consent: dispatch and replay keep A while the current consent is B (D-5)',
     ],
   },
 ]
