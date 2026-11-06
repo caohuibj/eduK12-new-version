@@ -309,7 +309,7 @@ jobs:
         run: |
           node --input-type=module <<'JS'
           import {appendFileSync} from 'node:fs';
-          import {changedEntries,classifyChanges} from './.github/scripts/content-scope.mjs';
+          import {changedEntries,classifyChanges,ciToolingScenario} from './.github/scripts/content-scope.mjs';
           import {catalogDiffBase,catalogDiscoveryScope} from './.github/scripts/catalog-discovery-scope.mjs';
           import {execFileSync} from 'node:child_process';
           import {toolingOnly} from './server-version/scripts/release/policy.mjs';
@@ -317,7 +317,7 @@ jobs:
           const actualBase=catalogDiffBase(process.env.CI_BASE_SHA,checkout,changedEntries);
           const entries=process.env.CI_EVENT==='workflow_dispatch'?[]:changedEntries(actualBase);
           const docs=classifyChanges(entries,process.env.CI_FORCE_FULL==='true').documentation;
-          const lightweight=process.env.CI_FORCE_FULL!=='true' && (catalogDiscoveryScope(entries)||docs||toolingOnly(entries));
+          const lightweight=process.env.CI_FORCE_FULL!=='true' && (catalogDiscoveryScope(entries)||docs||toolingOnly(entries)||ciToolingScenario(entries));
           appendFileSync(process.env.GITHUB_OUTPUT,`documentation=${docs}\nlightweight=${lightweight}\n`);
           JS
       - name: install pinned release classification tools
@@ -340,6 +340,25 @@ jobs:
           CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: node .github/scripts/content-scope.mjs
+      - name: run changed CI contract tests once
+        if: steps.scope.outputs.scenario == 'ci-unit'
+        env:
+          CI_BASE_SHA: ${{ steps.scope.outputs.diff_base }}
+        run: |
+          node --input-type=module <<'JS'
+          import {spawnSync} from 'node:child_process';
+          import {changedEntries,ciToolingScenario} from './.github/scripts/content-scope.mjs';
+          const entries=changedEntries(process.env.CI_BASE_SHA);
+          if(ciToolingScenario(entries)!=='ci-unit')throw Error('Changed CI test files must match the full diff');
+          // Qualification suites above already ran once in this job.
+          const done=new Set(['ci-qualification.test.mjs','ci-backend-regression-reuse.test.mjs','ci-legacy-retirement.test.mjs']);
+          const changed=entries.map(entry=>entry.file).filter(file=>!done.has(file.split('/').at(-1)));
+          if(changed.length){
+            const result=spawnSync(process.execPath,['--test',...changed],{stdio:'inherit'});
+            if(result.error)throw result.error;
+            if(result.status!==0)throw Error('CI contract tests failed: '+result.status);
+          }
+          JS
       - name: bounded backend API route and actual job selection contracts
         if: steps.scope.outputs.backend_focus == 'form-intake'
         run: node --test .github/scripts/backend-api-scope.test.mjs
@@ -714,7 +733,7 @@ jobs:
   backend:
     needs: scope
     name: backend (migrate + build + performance gate)
-    if: ${{ needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.dependencies_frontend_only != 'true' && ((((needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))) }}
+    if: ${{ (needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.dependencies_frontend_only != 'true' && ((((needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))))) && needs.scope.outputs.scenario != 'ci-unit' && needs.scope.outputs.scenario != 'ci-regression' }}
     uses: ./.github/workflows/ci-backend.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -754,7 +773,7 @@ jobs:
   backend-regression:
     needs: [scope, backend-regression-reuse]
     name: backend regression (isolated job database)
-    if: ${{ always() && needs.scope.result == 'success' && needs['backend-regression-reuse'].result != 'failure' && needs['backend-regression-reuse'].outputs.reuse_backend_regression != 'true' && (needs.scope.outputs.backend_focus != 'form-intake' && needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.dependencies_frontend_only != 'true' && ((((needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))))) }}
+    if: ${{ ((always() && needs.scope.result == 'success' && needs['backend-regression-reuse'].result != 'failure' && needs['backend-regression-reuse'].outputs.reuse_backend_regression != 'true' && (needs.scope.outputs.backend_focus != 'form-intake' && needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.dependencies_frontend_only != 'true' && ((((needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))))) && needs.scope.outputs.scenario != 'ci-unit') || (always() && needs.scope.result == 'success' && needs.scope.outputs.scenario == 'ci-regression' && needs['backend-regression-reuse'].result != 'failure') }}
     uses: ./.github/workflows/ci-backend-regression.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -775,7 +794,7 @@ jobs:
     # Run independently; the aggregate still requires both successful jobs.
     needs: scope
     name: frontend (lint + types + selected tests)
-    if: ${{ (needs.scope.outputs.scenario != 'catalog-discovery' || github.event.pull_request.draft == false) && (needs.scope.outputs.scenario != 'backend' && ((((!cancelled() && ((needs.scope.outputs.frontend_affected == 'true' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'frontend-test' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))) }}
+    if: ${{ ((needs.scope.outputs.scenario != 'catalog-discovery' || github.event.pull_request.draft == false) && (needs.scope.outputs.scenario != 'backend' && ((((!cancelled() && ((needs.scope.outputs.frontend_affected == 'true' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'frontend-test' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))))) && needs.scope.outputs.scenario != 'ci-unit' && needs.scope.outputs.scenario != 'ci-regression' }}
     uses: ./.github/workflows/ci-frontend.yml
     with:
       bundle_family: ${{ needs.scope.outputs.bundle_family == 'true' }}
@@ -792,7 +811,7 @@ jobs:
     name: browser (seeded Situational Bundle + static visual acceptance)
     # Browser acceptance executes after both production lanes have passed.
     needs: [scope, backend, backend-browser-build, frontend-build]
-    if: ${{ needs.scope.outputs.scenario != 'backend' && (needs.scope.outputs.frontend_affected != 'true' && ((((needs.scope.outputs.scenario != 'dependencies' && (!cancelled() && needs.scope.result == 'success' && needs.frontend-build.result == 'success' && ((needs.scope.outputs.frontend == 'true' && needs.backend-browser-build.result == 'success') || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && needs.backend.result == 'success')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))) }}
+    if: ${{ (needs.scope.outputs.scenario != 'backend' && (needs.scope.outputs.frontend_affected != 'true' && ((((needs.scope.outputs.scenario != 'dependencies' && (!cancelled() && needs.scope.result == 'success' && needs.frontend-build.result == 'success' && ((needs.scope.outputs.frontend == 'true' && needs.backend-browser-build.result == 'success') || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && needs.backend.result == 'success')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))))) && needs.scope.outputs.scenario != 'ci-unit' && needs.scope.outputs.scenario != 'ci-regression' }}
     uses: ./.github/workflows/ci-browser.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -803,7 +822,7 @@ jobs:
     # artifacts. Start it with scope; the merge gate independently requires
     # backend, production image scans and all other selected checks.
     needs: scope
-    if: ${{ (!cancelled() && needs.scope.result == 'success' && needs.scope.outputs.application_route == 'cognitive-product' && github.event_name == 'pull_request' && github.event.pull_request.draft == false) || ((needs.scope.outputs.scenario == 'release-tooling' && needs.scope.outputs.image_build == 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false) || (((((needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))))) }}
+    if: ${{ ((!cancelled() && needs.scope.result == 'success' && needs.scope.outputs.application_route == 'cognitive-product' && github.event_name == 'pull_request' && github.event.pull_request.draft == false) || ((needs.scope.outputs.scenario == 'release-tooling' && needs.scope.outputs.image_build == 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false) || (((((needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))))) && needs.scope.outputs.scenario != 'ci-unit' && needs.scope.outputs.scenario != 'ci-regression' }}
     uses: ./.github/workflows/ci-images.yml
     with:
       cognitive_product: ${{ needs.scope.outputs.application_route == 'cognitive-product' }}
@@ -883,7 +902,7 @@ jobs:
   miniprogram:
     name: mini program / foundation contract and page smoke
     needs: scope
-    if: ${{ needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.scenario != 'backend' && (((needs.scope.outputs.scenario != 'frontend-test' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true'))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))) }}
+    if: ${{ (needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.scenario != 'backend' && (((needs.scope.outputs.scenario != 'frontend-test' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true'))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))) && needs.scope.outputs.scenario != 'ci-unit' && needs.scope.outputs.scenario != 'ci-regression' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:

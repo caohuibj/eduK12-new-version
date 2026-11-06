@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classify, cognitiveMixedProductScope, frontendFile, frontendTestFile, frontendTestOnly, frontendAffected, backendModuleFilesOnly, acceptanceFor, documentationFile, runnerPlan } from './content-scope.mjs';
+import { classify, cognitiveMixedProductScope, frontendFile, frontendTestFile, frontendTestOnly, frontendAffected, backendModuleFilesOnly, ciToolingScenario, acceptanceFor, documentationFile, runnerPlan } from './content-scope.mjs';
 function scopeOutputs(content='false', presentation='false', frontend='false', extra={}) {
   const scenario = extra.scenario ?? (content === 'true' ? (frontend === 'true' ? 'content-frontend' : 'content') : presentation === 'true' ? 'presentation' : frontend === 'true' ? 'frontend' : 'platform');
   const output = {...Object.fromEntries(Object.keys(acceptanceFor([])).map(key=>[key,scenario === 'platform' ? 'true' : 'false'])),
@@ -779,4 +779,84 @@ test('affected display selects its existing report suite once without following 
   calls.push([exe,...args]);
  }});
  assert.equal(calls.length,1);assert.equal(calls[0][4],'run');assert.equal(calls[0][5],'src/training/TrainingGroupReports.test.tsx');assert.equal(calls[0].includes('related'),false);
+});
+
+test('CI-only selection is explicit and fails closed on mixed, deleted, new or untrusted files',()=>{
+  const changed=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
+  const unit=changed('.github/scripts/ci-topology.test.mjs');
+  const selection=changed('.github/scripts/backend-regression-selection.mjs');
+  const reports=changed('.github/scripts/backend-regression-reports.mjs');
+  const reportTest=changed('.github/scripts/backend-regression-reports.test.mjs');
+  assert.equal(ciToolingScenario([unit]),'ci-unit');
+  assert.equal(ciToolingScenario([unit,changed('.github/scripts/content-scope.test.mjs')]),'ci-unit');
+  assert.equal(ciToolingScenario([selection,reports,reportTest]),'ci-regression');
+  for(const other of [
+    '.github/workflows/ci.yml','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs',
+    '.github/workflows/ci-backend-regression.yml','server-version/backend/src/modules/reporting/cohort.ts',
+    'server-version/backend/src/__tests__/integration/reportingCohortSelector.postgres.integration.test.ts',
+  ])assert.equal(ciToolingScenario([unit,changed(other)]),null,other);
+  assert.equal(ciToolingScenario([unit,selection]),null,'Mixed routes require full checks');
+  for(const altered of [
+    {...unit,status:'D',newMode:'000000'}, {...unit,status:'A',oldMode:'000000'},
+    {...unit,newMode:'120000'}, {...unit,oldMode:'100755'},
+    {...unit,file:'.github/scripts/../merge-gate.mjs'},
+  ])assert.equal(ciToolingScenario([altered]),null,JSON.stringify(altered));
+  assert.equal(ciToolingScenario([]),null);
+});
+
+test('CI-only merge gate requires exact owned checks and refuses missing results',()=>{
+  for(const scenario of ['ci-unit','ci-regression']){
+    const outputs=scopeOutputs('false','false','false',{scenario,application_route:'legacy',codeql:'false'});
+    const required=scenario==='ci-unit'?['scope']:['scope','backend-regression'];
+    const needs={scope:{result:'success',outputs},'backend-regression':{result:'success'}};
+    assert.deepEqual(requiredChecks(needs,false),required);
+    assert.deepEqual(failedChecks(needs,false),[]);
+    for(const job of required)for(const result of ['failure','cancelled','skipped',undefined])
+      assert.ok(failedChecks({...needs,[job]:{result,...(job==='scope'?{outputs}:{})}},false).includes(job));
+    for(const change of [{codeql:'true'},{frontend_build:'true'},{ops:'true'},{application_route:'backend-unit'}])
+      assert.ok(failedChecks({...needs,scope:{result:'success',outputs:{...outputs,...change}}},false).includes('scope'));
+  }
+});
+
+test('CI-only routing actually starts no irrelevant business or browser jobs',()=>{
+  const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const block=name=>ci.split('\n  '+name+':\n')[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0];
+  const github={event_name:'pull_request',event:{pull_request:{draft:false,head:{repo:{full_name:'example/repo'}}}}};
+  for(const scenario of ['ci-unit','ci-regression']){
+    const outputs=scopeOutputs('false','false','false',{scenario,application_route:'legacy',codeql:'false'});
+    const needs={scope:{result:'success',outputs},'backend-regression-reuse':{result:'skipped',outputs:{reuse_backend_regression:'false'}},
+      backend:{result:'skipped'},'frontend-build':{result:'skipped'},'backend-browser-build':{result:'skipped'}};
+    for(const name of ['backend','backend-regression','frontend','frontend-build','browser','docker','miniprogram','accept-ops','accept-perf','accept-media','accept-ui','accept-visual']){
+      const match=block(name)?.match(/^    if: \$\{\{ (.+) \}\}$/m);
+      assert.ok(match,'Missing selection for '+name);
+      const expr=match[1].replaceAll('needs.frontend-build','needs["frontend-build"]').replaceAll('needs.backend-browser-build','needs["backend-browser-build"]');
+      const actual=new Function('needs','github','vars','cancelled','always','fromJSON','inputs','success','failure','contains',
+        'return ('+expr+')')(needs,github,{CI_FORCE_FULL:'false'},()=>false,()=>true,JSON.parse,{},()=>true,()=>false,
+        (items,value)=>items.includes(value));
+      assert.equal(Boolean(actual),scenario==='ci-regression'&&name==='backend-regression',scenario+' '+name);
+    }
+  }
+});
+
+test('routing and merge-gate source changes never bypass platform verification through release tooling',()=>{
+  const repo=mkdtempSync(join(tmpdir(),'ci-controls-')),cwd=process.cwd();
+  const git=(...args)=>execFileSync('git',args,{cwd:repo,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+  const commit=()=>{git('add','.');git('-c','user.name=CI fixture','-c','user.email=ci@example.invalid','commit','-qm','test');};
+  try{
+    git('init','-q');
+    const file=join(repo,'.github/scripts/content-scope.mjs');
+    mkdirSync(dirname(file),{recursive:true});
+    writeFileSync(file,'// previous router\n');commit();
+    const base=git('rev-parse','HEAD');
+    writeFileSync(file,'// changed router\n');commit();
+    process.chdir(repo);
+    const env={...process.env,CI_EVENT:'pull_request',CI_BASE_SHA:base,CI_HEAD_REF:'feature/ci-routing',
+      CI_PR_REPOSITORY:'fixture/repo',GITHUB_REPOSITORY:'fixture/repo',CI_FORCE_FULL:'',GITHUB_OUTPUT:''};
+    const result=JSON.parse(execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],
+      {env,encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+    assert.equal(result.scenario,'platform');
+    assert.equal(result.application_route,'legacy');
+    assert.equal(result.codeql,true);
+    assert.equal(result.frontend_build,true);
+  }finally{process.chdir(cwd);rmSync(repo,{recursive:true,force:true});}
 });
