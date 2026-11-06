@@ -201,9 +201,11 @@ test('frontend route builds only the frontend image but preserves scan, CSP and 
   assert.match(docker,/FRONTEND_ONLY:/);
   assert.match(docker,/scan frontend image \(high and critical\)/);
   assert.match(docker,/frontend-nginx-static-smoke/);
-  const browser=job(source('ci-browser'),'browser');
-  for(const check of ['storage fault','four-role','Organization cross-role','production CSP'])
-    assert.ok(browser.includes(check),check);
+  const host=job(source('ci-browser'),'browser-host');
+  const container=job(source('ci-browser'),'browser-container');
+  for(const check of ['storage fault','four-role','Organization cross-role'])
+    assert.ok(host.includes(check),check);
+  assert.ok(container.includes('production CSP'),'production CSP');
 });
 
 test('Phase 0 closure is manual targeted evidence and never competes with PR CI', () => {
@@ -233,7 +235,8 @@ test('mixed A-B ordering is stable across independent BASE and HEAD fixture seed
 
 
 test('browser build restore retries retain exact-run authority and fail closed', () => {
-  const browser = job(source('ci-browser'), 'browser');
+  for (const jobName of ['browser-host', 'browser-container']) {
+  const browser = job(source('ci-browser'), jobName);
   for (const kind of ['frontend', 'backend']) {
     const names = [`restore tested ${kind} build`, `retry tested ${kind} build download`, `final tested ${kind} build download`];
     const steps = browser.split('      - name: ');
@@ -253,6 +256,7 @@ test('browser build restore retries retain exact-run authority and fail closed',
     assert.ok(guard);
     assert.doesNotMatch(guard, /continue-on-error:|\n        if:/);
     assert.ok(guard.includes(`ci-artifact.mjs\" verify ${kind}`));
+  }
   }
 });
 
@@ -425,14 +429,17 @@ test('test-only UI code runs frontend regression without production/backend buil
 });
 
 test('browser scenario matrix partitions every former acceptance, isolates databases, and never drops a lane',()=>{
-  const browser=source('ci-browser'),part=job(browser,'browser');
+  const browser=source('ci-browser');
+  const host=job(browser,'browser-host'),container=job(browser,'browser-container');
   assert.match(browser,/default: '\["foundation","products","security"\]'/);
-  assert.match(part,/fail-fast: false/);
-  assert.match(part,/group: \$\{\{ fromJSON\(inputs\.groups\) \}\}/);
-  assert.match(part,/CI_BROWSER_GROUPS: \$\{\{ inputs\.groups \}\}/);
-  assert.match(part,/ci-browser-plan\.mjs/);
-  assert.match(part,/node "\$GITHUB_WORKSPACE\/\.github\/scripts\/ci-browser-plan\.mjs"/);
-  assert.match(part,/name: situational-bundle-browser-evidence-\$\{\{ matrix\.group \}\}/);
+  // The host job keeps the foundation/products matrix; security runs in a container job.
+  assert.match(host,/fail-fast: false/);
+  assert.match(host,/group: \['foundation', 'products'\]/);
+  assert.doesNotMatch(host,/fromJSON\(inputs\.groups\)/);
+  assert.match(host,/CI_BROWSER_GROUPS: \$\{\{ inputs\.groups \}\}/);
+  assert.match(host,/ci-browser-plan\.mjs/);
+  assert.match(host,/node "\$GITHUB_WORKSPACE\/\.github\/scripts\/ci-browser-plan\.mjs"/);
+  assert.match(host,/name: situational-bundle-browser-evidence-\$\{\{ matrix\.group \}\}/);
   for(const [group,steps] of Object.entries({
     foundation:['run seeded browser acceptance','run FE-11 storage fault acceptance',
       'run RA-02 four-role relational acceptance','run PR5 Organization cross-role acceptance',
@@ -441,19 +448,33 @@ test('browser scenario matrix partitions every former acceptance, isolates datab
     products:['verify Bundle V3 browser lifecycle in isolated catalog','multi-role respondent inbox responsive acceptance',
       'anonymous study identity responsive acceptance','Reporting V2.2 final product scenarios',
       'anonymous questionnaire completion and exhausted-link recovery'],
-    security:['enforced production CSP browser acceptance'],
   })) for(const title of steps){
-    const start=part.indexOf('      - name: '+title+'\n');
+    const start=host.indexOf('      - name: '+title+'\n');
     assert.ok(start>=0,title);
-    assert.match(part.slice(start,start+160),new RegExp("if: matrix\\.group == '"+group+"'"),title);
+    assert.match(host.slice(start,start+160),new RegExp("if: matrix\\.group == '"+group+"'"),title);
   }
-  assert.match(part,/postgres:/);
-  assert.match(part,/redis:/);
-  assert.match(part,/ci-artifact\.mjs\" verify backend/);
-  assert.match(part,/ci-artifact\.mjs\" verify frontend/);
-  const csp=part.slice(part.indexOf('      - name: enforced production CSP browser acceptance'),part.indexOf('      - name: administrator virtual CTAP2'));
+  assert.match(host,/postgres:/);
+  assert.match(host,/redis:/);
+  assert.match(host,/ci-artifact\.mjs\" verify backend/);
+  assert.match(host,/ci-artifact\.mjs\" verify frontend/);
+  // Security runs only in the container job, with no matrix guard on its CSP step.
+  assert.match(container,/image: mcr\.microsoft\.com\/playwright:v1\.62\.1-noble/);
+  assert.match(container,/name: situational-bundle-browser-evidence-security/);
+  assert.doesNotMatch(container,/matrix\.group|fromJSON\(inputs\.groups\)/);
+  assert.doesNotMatch(container,/npx playwright-core install-deps/);
+  assert.doesNotMatch(container,/deps_marker/);
+  assert.match(container,/postgres:/);
+  assert.match(container,/redis:/);
+  assert.match(container,/ci-artifact\.mjs\" verify backend/);
+  assert.match(container,/ci-artifact\.mjs\" verify frontend/);
+  const csp=container.slice(container.indexOf('      - name: enforced production CSP browser acceptance'),container.indexOf('      - name: upload seeded browser evidence'));
   assert.match(csp,/node e2e\/production-csp-browser\.cjs/);
   assert.doesNotMatch(csp,/apt-get|ffmpeg/);
+  assert.doesNotMatch(csp,/if: matrix\.group/);
+  // The host retains the CSP step only behind its security guard, which its
+  // foundation/products matrix can never satisfy; the container is the live lane.
+  const hostCsp=host.slice(host.indexOf('      - name: enforced production CSP browser acceptance'),host.indexOf('      - name: upload seeded browser evidence'));
+  assert.match(hostCsp,/if: matrix\.group == 'security'/);
   assert.match(job(source('ci'),'browser'),/uses: \.\/\.github\/workflows\/ci-browser\.yml/);
   const dependencies=jobNeeds(job(source('ci'),'merge-gate'));
   for(const name of ['scope','backend-regression','frontend-build','frontend','browser','docker'])
@@ -588,3 +609,4 @@ test('authenticated regression reuse executes only with a current-HEAD verifier 
     .includes('backend-regression-reuse-evidence'));
   assert.ok(failedChecks({...notReused,'backend-regression':{result:'failure'}},false).includes('backend-regression'));
 });
+
