@@ -12,7 +12,7 @@
     "start": "node dist/index.js",
     "start:worker": "node dist/workers/main.js",
     "db:migrate": "prisma migrate dev",
-    "db:migrate:guarded": "node scripts/pr24-migration-preflight.mjs && prisma migrate deploy && node scripts/runtime-role-contract.mjs post-migrate",
+    "db:migrate:guarded": "node scripts/pr24-migration-preflight.mjs && node scripts/assessment-run-index-contract.mjs pre && node scripts/migrate-deploy-bounded.mjs && node scripts/assessment-run-index-contract.mjs post && node scripts/runtime-role-contract.mjs post-migrate",
     "db:runtime:verify": "node scripts/runtime-role-contract.mjs verify",
     "db:backfill:public-tokens": "tsx src/scripts/pr27-backfill-public-access-tokens.ts",
     "db:backfill:checkin-tokens": "npm run db:backfill:public-tokens",
