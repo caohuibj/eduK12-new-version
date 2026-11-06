@@ -33,8 +33,8 @@ function buildReport(overrides = (r) => r) {
   })
   const report = {
     success: true,
-    numTotalTests: 19,
-    numPassedTests: 18,
+    numTotalTests: 21,
+    numPassedTests: 20,
     numFailedTests: 0,
     numPendingTests: 1,
     testResults: suites,

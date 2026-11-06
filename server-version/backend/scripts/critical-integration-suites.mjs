@@ -81,13 +81,15 @@ export const criticalIntegrationSuites = [
   },
   {
     file: 'src/__tests__/integration/teacherTaskSlotCompetition.postgres.integration.test.ts',
-    minPassedAssertions: 5,
+    minPassedAssertions: 7,
     cases: [
       'does not drop an eligible task when a newer denied-student execution shares the run',
       'pages run tasks by (created_at, id) keyset without loss or duplication',
       'pages all 101 tasks when every execution shares one microsecond timestamp',
       'inbox HTTP round-trip: the returned nextRunCursor string fetches the next page',
       'assigned-tasks HTTP round-trip: the returned nextCursor string fetches the next page',
+      'invalid-date cursor is rejected with 400 on the inbox endpoint',
+      'invalid-date cursor is rejected with 400 on the assigned-tasks endpoint',
     ],
   },
 ]
