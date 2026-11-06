@@ -120,6 +120,7 @@ suite('Training START resume bypasses the admission gate (real PostgreSQL)', () 
     const first = await startUserAttempt(a, compositeId)
     let release!: () => void
     let bStart: Promise<unknown> | undefined
+    let resumedRaw: Promise<unknown> | undefined
     let blockerPid = 0
     let blockerError: unknown = undefined
     const held = new Promise<void>(r => { release = r })
@@ -147,8 +148,9 @@ suite('Training START resume bypasses the admission gate (real PostgreSQL)', () 
       await waitForBlockedBy(blockerPid, 20000, 'new START behind the composite row lock',
         /composite_assessments[\s\S]*FOR (SHARE|UPDATE)/i)
       const t0 = Date.now()
+      resumedRaw = startUserAttempt(a, compositeId)
       const resumed = await Promise.race([
-        startUserAttempt(a, compositeId),
+        resumedRaw,
         new Promise<never>((_, rej) => setTimeout(() => rej(new Error('resume queued behind the gate')), 5000)),
       ])
       const elapsed = Date.now() - t0
@@ -158,11 +160,9 @@ suite('Training START resume bypasses the admission gate (real PostgreSQL)', () 
       expect(await db.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: compositeId, userId: a } })).toBe(1)
     } finally {
       release()
-      const settled = await Promise.allSettled([blocker, ...(bStart ? [bStart] : [])])
-      // Cleanup must not mask the original assertion error: only a cleanup
-      // failure on an otherwise-passing test surfaces here.
-      const firstRejection = settled.find(s => s.status === 'rejected')
-      if (firstRejection && !bStart) throw firstRejection.reason
+      // The raw resume can outlive Promise.race's 5s timeout winner.
+      // Drain it before afterAll removes the fixture; do not mask the primary failure.
+      await Promise.allSettled([blocker, ...(bStart ? [bStart] : []), ...(resumedRaw ? [resumedRaw] : [])])
     }
   }, 60000)
 
