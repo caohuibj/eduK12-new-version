@@ -208,6 +208,25 @@ export function failedChecks(needs, draft) {
   if (scope.scenario === 'frontend-test' && (scope.codeql !== 'false'
     || Object.keys(acceptanceJobs).some(key => scope[key] !== 'false')))
     if (!failed.includes('scope')) failed.unshift('scope');
+  if(scope.frontend_retest!==undefined&&!['true','false'].includes(scope.frontend_retest))
+    failed.push('frontend-retest-proof');
+  if(scope.frontend_retest==='true'&&(
+    scope.scenario!=='frontend-test'||scope.application_route!=='legacy'
+    ||scope.frontend_test!=='true'||scope.frontend_build!=='false'
+    ||scope.codeql!=='false'||scope.frontend!=='false'||scope.content!=='false'
+    ||scope.maintenance!=='false'||scope.documentation!=='false'
+    ||scope.presentation!=='false'||scope.frontend_affected!=='false'
+    ||Object.keys(acceptanceJobs).some(key=>scope[key]!=='false')
+    ||!/^src\/[a-zA-Z0-9_./-]+\.(?:test|spec)\.tsx?$/.test(scope.frontend_retest_file||'')
+    ||!/^\d+$/.test(scope.frontend_retest_source_run||'')
+    ||!/^([a-f0-9]{40})$/.test(scope.frontend_retest_source_sha||'')
+    ||!/^([a-f0-9]{64})$/.test(scope.frontend_retest_gate_digest||'')
+    ||!/^([a-f0-9]{64})$/.test(scope.frontend_retest_report_digest||'')
+  ))failed.push('frontend-retest-proof');
+  if(scope.frontend_retest!=='true'&&(
+    scope.frontend_retest_file||scope.frontend_retest_source_run
+    ||scope.frontend_retest_source_sha||scope.frontend_retest_gate_digest
+    ||scope.frontend_retest_report_digest))failed.push('frontend-retest-proof');
   if (malformedTopology && !failed.includes('scope')) failed.unshift('scope');
   return failed;
 }
@@ -252,6 +271,32 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const p=JSON.parse(needs.scope.outputs.homepage_copy_plan);
     const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
     if (p.head!==head || JSON.stringify(homepageCopyPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p)) failed.push('recomputed-homepage-copy-plan');
+  }
+  // A source CI verdict is never pasted onto this head. Re-verify the
+  // GitHub-hosted source artifacts, complete requirement manifest, original
+  // failure, unchanged main and immediate single-test delta at merge time.
+  if(needs.scope?.outputs?.frontend_retest==='true'){
+    try{
+      if(draft||process.env.CI_FORCE_FULL==='true')throw Error('Retest forbidden for draft/forced full');
+      const {verifiedFrontendRetest}=await import('./ci-frontend-retest.mjs');
+      const scope=needs.scope.outputs;
+      const proof=await verifiedFrontendRetest({
+        token:process.env.GH_TOKEN,repo:process.env.GITHUB_REPOSITORY,
+        pr:Number(process.env.CI_PR_NUMBER),branch:process.env.CI_HEAD_REF,
+        prHead:process.env.CI_SOURCE_HEAD,baseSha:process.env.CI_BASE_SHA,
+        currentRunId:Number(process.env.GITHUB_RUN_ID),
+        sourceId:scope.frontend_retest_source_run
+      });
+      if(!proof||proof.testFile!==scope.frontend_retest_file
+        ||String(proof.runId)!==scope.frontend_retest_source_run
+        ||proof.sourceSha!==scope.frontend_retest_source_sha
+        ||proof.gateDigest!==scope.frontend_retest_gate_digest
+        ||proof.reportDigest!==scope.frontend_retest_report_digest)
+        throw Error('Retest source proof cannot be reproduced');
+    }catch(e){
+      console.error('Frontend retest merge gate refused: '+String(e?.message||e).slice(0,350));
+      failed.push('recomputed-frontend-retest-proof');
+    }
   }
   console.log(JSON.stringify({ required: requiredChecks(needs, draft), failed }));
   if (failed.length) process.exit(1);

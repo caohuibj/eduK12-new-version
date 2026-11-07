@@ -381,6 +381,47 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
       [key, Array.isArray(value) ? JSON.stringify(value) : value])) };
+  // This is NOT a new PR-diff shortcut. Only a verified, already-completed
+  // full platform run may be resumed after an immediate single-test repair.
+  // Existing lightweight frontend, content and test-only routes are untouched.
+  Object.assign(output,{frontend_retest:false,frontend_retest_file:'',
+    frontend_retest_source_run:'',frontend_retest_source_sha:'',
+    frontend_retest_gate_digest:'',frontend_retest_report_digest:''});
+  if(event==='pull_request' && scenario==='platform' && output.application_route==='legacy'
+      && !full && process.env.CI_IS_DRAFT!=='true') {
+    try {
+      const {verifiedFrontendRetest}=await import('./ci-frontend-retest.mjs');
+      const evidence=await verifiedFrontendRetest({
+        token:process.env.GH_TOKEN,repo:process.env.GITHUB_REPOSITORY,
+        pr:Number(process.env.CI_PR_NUMBER),branch:process.env.CI_HEAD_REF,
+        prHead:process.env.CI_SOURCE_HEAD,baseSha:base,
+        currentRunId:Number(process.env.GITHUB_RUN_ID)
+      });
+      if(evidence){
+        // The GitHub source report and ALL other required source jobs were
+        // independently checked. Only the repaired Vitest file runs on HEAD.
+        const retestPlan=runnerPlan({profile:'hosted',scenario:'frontend-test'});
+        Object.assign(output,{
+          scenario:'frontend-test',frontend_test:true,frontend:false,content:false,
+          presentation:false,documentation:false,maintenance:false,codeql:false,
+          frontend_build:false,ui_required:false,frontend_affected:false,
+          media_selection:'[]',media_groups:'[]',...Object.fromEntries(
+            Object.keys(acceptance).map(key=>[key,false])),
+          ...retestPlan,
+          frontend_retest:true,frontend_retest_file:evidence.testFile,
+          frontend_retest_source_run:String(evidence.runId),
+          frontend_retest_source_sha:evidence.sourceSha,
+          frontend_retest_gate_digest:evidence.gateDigest,
+          frontend_retest_report_digest:evidence.reportDigest
+        });
+        console.log(JSON.stringify({kind:'verified-single-frontend-retest',
+          sourceRun:evidence.runId,file:evidence.testFile}));
+      }
+    }catch(error){
+      console.warn('Frontend retest rejected; normal complete CI retained: '+
+        String(error?.message||error).slice(0,350));
+    }
+  }
   console.log(JSON.stringify({ ...output, base, validationClosure: result.cognitive_intake_light ? 'selected-cognitive-tasks' : 'all-bundles', platformReasons: catalogDiscovery || dependencies ? [] : platformReasons(entries, full || event === 'workflow_dispatch') }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));

@@ -784,6 +784,8 @@ jobs:
       authoring_polish: ${{ needs.scope.outputs.authoring_polish == 'true' }}
       runner_labels: '["ubuntu-24.04"]'
       affected_only: ${{ needs.scope.outputs.frontend_affected == 'true' }}
+      retry_only: ${{ needs.scope.outputs.frontend_retest == 'true' }}
+      retry_file: ${{ needs.scope.outputs.frontend_retest_file }}
       catalog_discovery: ${{ needs.scope.outputs.scenario == 'catalog-discovery' }}
       cognitive_owned_by_backend: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.frontend == 'true' && needs.scope.outputs.frontend_affected != 'true' && needs.scope.outputs.scenario != 'dependencies' }}
       base_sha: ${{ needs.scope.outputs.diff_base }}
@@ -1146,5 +1148,12 @@ jobs:
         npm ci --ignore-scripts --prefix .github/release-tools
         mkdir -p server-version/backend/node_modules
         test -e server-version/backend/node_modules/typescript || ln -s "$PWD/.github/release-tools/node_modules/typescript" server-version/backend/node_modules/typescript
+    - name: preserve original required-check evidence for safe future retests
+      uses: actions/upload-artifact@v4
+      with:
+        name: ci-gate-evidence-run-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/merge-gate-needs-${{ github.run_id }}-${{ github.run_attempt }}.json
+        if-no-files-found: error
+        retention-days: 3
     - name: require exact success for the selected route
       run: node .github/scripts/merge-gate.mjs
