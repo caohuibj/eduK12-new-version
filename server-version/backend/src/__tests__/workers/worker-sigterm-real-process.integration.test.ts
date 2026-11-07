@@ -132,20 +132,28 @@ suite('worker real-process SIGTERM',()=>{
       const code=await worker.waitExit()
         expect(code).toBe(0)
         const fresh=await Promise.all(jobs.map(async(j)=>probe.getJob(String(j.id))))
-        const states=await Promise.all(fresh.map(async(j)=>({id:String(j!.id),state:await j!.getState(),attemptsMade:j!.attemptsMade})))
-        // The job that was active at SIGTERM was attempted (attemptsMade>=1)
-        // and reached a terminal-or-retry state — completed, delayed
-        // (failed attempt awaiting its 5s backoff), or waiting (backoff
-        // elapsed and Bull promoted it) — never stuck active, never
-        // exhausted to failed, never vanished. The other jobs were never
-        // started (paused at shutdown) and stay waiting for restart.
-        // Why delayed/waiting is the usual outcome here: under tsx-from-
-        // source the export child takes ~30s to import the backend graph
-        // (measured 31.5s), so the 7.5s first drain window usually cancels
-        // it; production runs compiled JS (child startup <1s), so the
-        // clean-drain path dominates there. Either way the job is not lost.
+        const states=await Promise.all(fresh.map(async(j)=>({id:String(j!.id),state:await j!.getState()})))
+        // The job that was active at SIGTERM reached a terminal-or-retry
+        // state — completed, delayed (failed attempt awaiting its 5s
+        // backoff), or waiting (backoff elapsed and Bull promoted it) —
+        // never stuck active, never exhausted to failed, never vanished.
+        // The other jobs were never started (paused at shutdown) and stay
+        // waiting for restart. Why delayed/waiting is the usual outcome
+        // here: under tsx-from-source the export child takes ~30s to import
+        // the backend graph (measured 31.5s), so the 7.5s first drain window
+        // usually cancels it; production runs compiled JS (child startup
+        // <1s), so the clean-drain path dominates there. Either way the job
+        // is not lost.
+        // NOTE: do NOT assert attemptsMade here. In Bull v4 attemptsMade is
+        // only incremented by Job._saveAttempt, which runs when an attempt
+        // completes (or fails) — a SIGTERM-cancelled attempt may never reach
+        // it, so a cancelled in-flight job legitimately reports
+        // attemptsMade = 0 (observed in CI run 42324373928, where this test
+        // failed on exactly that assertion while the job itself had
+        // recovered correctly). "Active before SIGTERM" (the poll above) is
+        // the proof the job was in flight; the state assertions below are
+        // the proof it was not lost.
         const activeJob=states.find((x)=>x.id===activeId)
-        expect(activeJob?.attemptsMade).toBeGreaterThanOrEqual(1)
         expect(activeJob && ['completed','delayed','waiting'].includes(activeJob.state)).toBe(true)
         expect(states.every((x)=>['completed','waiting','delayed'].includes(x.state))).toBe(true)
         expect(states).toHaveLength(3)
