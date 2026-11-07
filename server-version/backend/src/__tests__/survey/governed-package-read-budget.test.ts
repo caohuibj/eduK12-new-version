@@ -17,8 +17,9 @@ describe('bounded stored package report reads',()=>{
  it('writes an explicit budget version with a hashed format-v2 artifact and reads it independently of date',async()=>{
   const tx={$executeRaw:vi.fn()},p={title:'Synthetic',hash:'a'.repeat(64),report:{version:'v1',title:'Report',introduction:'',disclaimer:'',blocks:[{type:'TEXT',text:'Synthetic'}]},slots:[],importId:'import',toolId:'tool'}
   await persistGovernedPackageReports(tx as never,{projectId:'project',waveId:'wave',finalId:'final',sourceFinalHash:'final-hash',snapshot:{governedPackages:[p],units:[]} as never,calculated:{units:[]} as never})
-  const [sql,...values]=tx.$executeRaw.mock.calls[0]
-  expect(sql.join('')).toContain('report_cipher,budget_version')
+  const [statement]=tx.$executeRaw.mock.calls[0]
+  const values=statement.values
+  expect(statement.sql).toContain('report_cipher,budget_version')
   expect(values[10]).toBe(1)
   const row={id:values[0],tool_id:'tool',import_id:'import',source_final_hash:'final-hash',report_hash:values[8],report_cipher:values[9],budget_version:1,created_at:new Date('2020-01-01')}
   const result=await reader([{id:row.id,bytes:row.report_cipher.length,budget_version:1}],[row]).read()

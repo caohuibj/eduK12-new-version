@@ -7,7 +7,7 @@ const { db, state, inserted } = vi.hoisted(() => ({
   db: {
     $transaction: vi.fn(), $queryRaw: vi.fn(), $queryRawUnsafe: vi.fn(),
     compositeAssessment: { findUnique: vi.fn() }, courseStudent: { findFirst: vi.fn() },
-    compositeAssessmentAttempt: { findFirst: vi.fn(), findUnique: vi.fn(), count: vi.fn(), create: vi.fn() },
+    compositeAssessmentAttempt: { findFirst: vi.fn(), findUnique: vi.fn(), count: vi.fn(), aggregate: vi.fn(), create: vi.fn() },
   },
   state: { publication: {} as Record<string, any>, runtimeOverrides: {} as Record<string, unknown>, locked: {} as Record<string, any>, order: [] as string[] },
   inserted: new Error('fixture stops at the atomic insert boundary'),
@@ -82,6 +82,7 @@ beforeEach(() => {
   db.compositeAssessmentAttempt.findFirst.mockResolvedValue(null)
   db.compositeAssessmentAttempt.findUnique.mockResolvedValue(null)
   db.compositeAssessmentAttempt.count.mockResolvedValue(0)
+  db.compositeAssessmentAttempt.aggregate.mockResolvedValue({ _count: { _all: 0 }, _max: { attemptNo: null } })
   db.compositeAssessmentAttempt.create.mockImplementation(async () => { state.order.push('insert'); throw inserted })
 })
 afterEach(() => vi.unstubAllEnvs())

@@ -3563,14 +3563,13 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
         })
         if (existing) return existing
 
-        const used = await tx.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: compositeId, userId } })
-        if (used >= composite.maxAttempts) throw compositeConflict('已达到综合测评最大次数')
-        const latest = await tx.compositeAssessmentAttempt.findFirst({
+        const usage = await tx.compositeAssessmentAttempt.aggregate({
           where: { compositeAssessmentId: compositeId, userId },
-          orderBy: { attemptNo: 'desc' },
-          select: { attemptNo: true },
+          _count: { _all: true },
+          _max: { attemptNo: true },
         })
-        return createAttempt(tx, composite, userId, null, undefined, (latest?.attemptNo ?? 0) + 1)
+        if (usage._count._all >= composite.maxAttempts) throw compositeConflict('已达到综合测评最大次数')
+        return createAttempt(tx, composite, userId, null, undefined, (usage._max.attemptNo ?? 0) + 1)
           }, { maxWait: 10_000, timeout: 30_000 }))
         } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
       })

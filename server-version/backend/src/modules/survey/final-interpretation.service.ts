@@ -49,6 +49,8 @@ export async function interpretSurveyContentBinding(tx:Prisma.TransactionClient,
 }):Promise<SurveyFinalInterpretation>{
   const {binding}=input
   const cache=input.releases??new Map<string,StoredRelease>()
+  // Reads stay lazy by contract: the shared interpreter skips reference/report
+  // reads behind revoked / not-executed / quality stop guards. Do not prefetch.
   const read=async(id:string,hash:string)=>{
     let release=cache.get(id)
     if(!release){release=(await getContentRelease(tx,id,true))??undefined;if(release)cache.set(id,release)}

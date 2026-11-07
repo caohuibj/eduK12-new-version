@@ -1,6 +1,6 @@
 import {beforeEach,afterEach,describe,it,expect,vi} from 'vitest'
 const mocks=vi.hoisted(()=>({educationReport:vi.fn(),get:vi.fn(),disclosure:vi.fn()}))
-vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.get}))
+vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.get,prefetchContentReleases:async(db:any,cache:Map<string,any>,ids:string[],lock?:boolean)=>{for(const id of new Set(ids)){const r=await mocks.get(db,id,lock);if(r)cache.set(id,r)}}}))
 vi.mock('../../modules/composite/training-metric-disclosure',async importOriginal=>({...await importOriginal<typeof import('../../modules/composite/training-metric-disclosure')>(),loadTrainingMetricDisclosure:mocks.disclosure}))
 import {DISCLOSURE_PRESETS} from '../../modules/scale/policy/disclosure'
 vi.mock('../../modules/composite/training-report-selection',()=>({validateTrainingReportPointer:mocks.educationReport}))
