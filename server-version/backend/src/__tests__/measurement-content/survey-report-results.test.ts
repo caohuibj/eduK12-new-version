@@ -3,7 +3,7 @@ const mocks=vi.hoisted(()=>({source:vi.fn(),auth:vi.fn(),get:vi.fn(),transaction
 vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction}}))
 vi.mock('../../modules/survey/analytics.source',()=>({loadSurveySource:mocks.source}))
 vi.mock('../../modules/survey/builder.service',()=>({authorizedProject:mocks.auth,SurveyBuilderError:class extends Error{statusCode=403}}))
-vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.get}))
+vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.get,prefetchContentReleases:async(db:any,cache:Map<string,any>,ids:string[],lock?:boolean)=>{for(const id of new Set(ids)){const r=await mocks.get(db,id,lock);if(r)cache.set(id,r)}}}))
 vi.mock('../../modules/survey/system-data-authority',()=>({assertSystemSurveyDataAudit:mocks.systemAuth}))
 import {readSurveyStoredReport,listSurveyStoredReports} from '../../modules/survey/report-results.service'
 const hash='a'.repeat(64),scope={kind:'PRIVATE',ownerId:'owner',product:'SURVEY',resourceId:'project'}

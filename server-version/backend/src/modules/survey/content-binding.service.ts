@@ -3,7 +3,7 @@ import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
-import {getContentRelease,type StoredRelease} from '../measurement-content/repository'
+import {getContentRelease,prefetchContentReleases,type StoredRelease} from '../measurement-content/repository'
 import {selectFrozenReferencePolicy,type VerifiedReferenceForSelection} from '../measurement-content/reference-policy'
 import type {AssessmentReferenceEntry} from '../assessment-reference/reference'
 import type {ResearchFrozenPublication} from './publication.service'
@@ -80,15 +80,22 @@ export async function bindSurveyAttemptContent(tx:Prisma.TransactionClient,input
   if(!input.newAttempt&&!row.content_binding_cipher)return // Legacy recovery never invents an assignment/content binding.
   const cache=new Map<string,StoredRelease>()
   const read=async(id:string)=>{
-    if(cache.has(id))return cache.get(id)!
-    const release=await getContentRelease(tx,id,true)
-    if(!release||release.scope.kind!=='PRIVATE'||release.scope.product!=='SURVEY'||release.scope.resourceId!==input.projectId
+    // Scope validation runs on every call, not only on the fetch path: a
+    // prefetched cache entry must be validated exactly like a freshly read one.
+    let release=cache.get(id)
+    if(!release){release=await getContentRelease(tx,id,true)??undefined;if(!release)fail();cache.set(id,release!)}
+    if(release.scope.kind!=='PRIVATE'||release.scope.product!=='SURVEY'||release.scope.resourceId!==input.projectId
       ||release.scope.ownerId!==row.owner_id)fail()
-    cache.set(id,release!);return release!
+    return release!
   }
   if(row.content_binding_cipher){
     const binding=decodeSurveyAttemptContentBinding({...input,definitionDigest:row.definition_digest,selectedSnapshot:selected,
       contentBindingCipher:row.content_binding_cipher,contentBindingHash:row.content_binding_hash})!
+    // One round trip for every distinct release this recovery validates; the
+    // per-item scope/hash checks below stay exactly where they were.
+    await prefetchContentReleases(tx,cache,binding.units.flatMap(unit=>[unit.measurement.releaseId,
+      ...unit.references.filter(ref=>ref.status==='SELECTED').map(ref=>ref.releaseId),
+      ...(unit.report?[unit.report.releaseId]:[])]),true)
     for(const unit of binding.units){
       for(const item of [unit.measurement,...unit.references.filter(ref=>ref.status==='SELECTED'),...(unit.report?[unit.report]:[])]){
         const release=await read(item.releaseId)
@@ -99,6 +106,9 @@ export async function bindSurveyAttemptContent(tx:Prisma.TransactionClient,input
     return
   }
   if(!input.newAttempt)return // Explicit old data behavior: no inferred/new binding on recovery.
+  await prefetchContentReleases(tx,cache,selected.units.flatMap(unit=>[unit.measurementRelease?.releaseId,
+    ...(unit.contentSelection?.referencePolicy.choices.map(choice=>choice.releaseId)??[]),
+    ...(unit.contentSelection?.reportRelease?[unit.contentSelection.reportRelease.releaseId]:[])]).filter((id): id is string=>Boolean(id)),true)
   const units:SurveyAttemptContentBinding['units']=[]
   for(const unit of selected.units){
     if(!unit.measurementRelease){if(unit.contentSelection)fail();continue}

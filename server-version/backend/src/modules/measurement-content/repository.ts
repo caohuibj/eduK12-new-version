@@ -41,6 +41,17 @@ export async function getContentReleaseBatch(db: Db, ids: string[], lockForPubli
     throw new ContentReleaseError('CONTENT_RELEASE_BATCH_INVALID')
   return new Map(rows.map(row => { const value = decode(row); return [value.releaseId, value] }))
 }
+/** Prefetch a bounded set of releases into an existing request-local cache in
+ * one round trip. Same rows, same FOR SHARE semantics, same decode as the
+ * single-release reads; the caller's per-ID lookups and scope/hash checks stay
+ * in place and keep working (a missing ID stays absent and is re-read
+ * per-ID/fails exactly as before). Beyond the 1000-ID batch limit this is a
+ * no-op so the caller keeps its original behavior on extreme bindings. */
+export async function prefetchContentReleases(db: Db, cache: Map<string, StoredRelease>, ids: string[], lockForPublication = false): Promise<void> {
+  const unique = [...new Set(ids)].filter(id => id && !cache.has(id))
+  if (!unique.length || unique.length > 1000) return
+  for (const [id, release] of await getContentReleaseBatch(db, unique, lockForPublication)) cache.set(id, release)
+}
 /** Admission/freezing resolves an existing exact identity and holds its state
  * lock through the caller's transaction. It never publishes a missing version. */
 export async function requirePublishedContentRelease(db:Db,raw:unknown):Promise<StoredRelease>{

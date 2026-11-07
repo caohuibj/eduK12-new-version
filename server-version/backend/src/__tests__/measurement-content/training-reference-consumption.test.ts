@@ -1,6 +1,6 @@
 import {afterEach,beforeEach,describe,it,expect,vi} from 'vitest'
 const mocks=vi.hoisted(()=>({get:vi.fn(),formal:vi.fn(),disclosure:vi.fn()}))
-vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.get}))
+vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.get,prefetchContentReleases:async(db:any,cache:Map<string,any>,ids:string[],lock?:boolean)=>{for(const id of new Set(ids)){const r=await mocks.get(db,id,lock);if(r)cache.set(id,r)}}}))
 vi.mock('../../modules/measurement-content/formal-reference-resolver',()=>({resolveFormalReferenceRelease:mocks.formal}))
 vi.mock('../../modules/composite/training-metric-disclosure',async importOriginal=>({...await importOriginal<typeof import('../../modules/composite/training-metric-disclosure')>(),loadTrainingMetricDisclosure:mocks.disclosure}))
 import {DISCLOSURE_PRESETS} from '../../modules/scale/policy/disclosure'

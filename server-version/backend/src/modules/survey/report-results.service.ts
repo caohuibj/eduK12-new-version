@@ -4,7 +4,7 @@ import {surveyAttemptCode} from './analytics.export-format'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
-import {getContentRelease,type StoredRelease} from '../measurement-content/repository'
+import {getContentRelease,prefetchContentReleases,type StoredRelease} from '../measurement-content/repository'
 import {renderDeclaredReport,DECLARATIVE_REPORT_GENERATOR,type ReportMetricFact,type ReportReferenceFact} from '../measurement-content/report-renderer'
 import {authorizedProject,SurveyBuilderError} from './builder.service'
 import {loadSurveySource} from './analytics.source'
@@ -35,6 +35,10 @@ export async function readSurveyStoredReport(actorId:string,input:{projectId:str
     const nativeAudience=await readSurveyNativeReportAudience(tx,input)
     if(nativeAudience!==undefined&&nativeAudience!=='researcher')fail(403,'此原生整包单项报告未向研究者开放')
     const cache=new Map<string,StoredRelease>()
+    // One round trip for the bound measurement/report and selected references;
+    // the per-pointer hash/scope checks below are unchanged.
+    await prefetchContentReleases(tx,cache,[bound!.measurement.releaseId,bound!.report!.releaseId,
+      ...bound!.references.filter(slot=>slot.status==='SELECTED').map(slot=>slot.releaseId)],true)
     const read=async(pointer:{releaseId:string;contentHash:string})=>{
       let release=cache.get(pointer.releaseId)
       if(!release){release=(await getContentRelease(tx,pointer.releaseId,true))??undefined;if(release)cache.set(pointer.releaseId,release)}
