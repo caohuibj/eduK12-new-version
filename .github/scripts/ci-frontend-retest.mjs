@@ -25,8 +25,9 @@ export function eligibleTestDelta(before,after) {
     const result=new Map();
     for(const entry of entries){
       assert(typeof entry.path==='string'&&!result.has(entry.path),'Bad/duplicate tree path');
-      assert(/^[a-f0-9]{40}$/.test(entry.sha)&&/^100(644|755)$/.test(entry.mode)&&entry.type==='blob','Unsafe tree object');
-      result.set(entry.path,entry.mode+':'+entry.sha);
+      assert(/^[a-f0-9]{40}$/.test(entry.sha)&&/^(100644|100755|120000|160000)$/.test(entry.mode)
+        &&(entry.mode==='160000'?entry.type==='commit':entry.type==='blob'),'Unsafe tree object');
+      result.set(entry.path,entry.mode+':'+entry.type+':'+entry.sha);
     }
     return result;
   };
@@ -36,7 +37,7 @@ export function eligibleTestDelta(before,after) {
   if(changed.length!==1)return null;
   const path=changed[0];
   if(!frontendTestFile(path)||!source.has(path)||!target.has(path)
-      ||!source.get(path).startsWith('100644:')||!target.get(path).startsWith('100644:'))return null;
+      ||!source.get(path).startsWith('100644:blob:')||!target.get(path).startsWith('100644:blob:'))return null;
   return path.slice(filePrefix.length);
 }
 
@@ -179,6 +180,7 @@ export async function verifiedFrontendRetest({token,repo,pr,branch,prHead,baseSh
   fetchParent(prHead);
   const parent=git('rev-parse',prHead+'^');
   if(!sha40.test(parent))return null;
+  fetchParent(parent);
   const sourceTree=treeFor(parent),currentTree=treeFor(prHead);
   const testFile=eligibleTestDelta(sourceTree,currentTree);
   if(!testFile)return null;
