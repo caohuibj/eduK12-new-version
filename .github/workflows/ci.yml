@@ -558,10 +558,14 @@ jobs:
         run: |
           mkdir -p "$HOME/.npm"
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
       - name: npm ci
         run: npm ci
+      - name: prepare canvas source-build dependencies
+        run: |
+          node -e "require('canvas')" 2>/dev/null || (
+            bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+            npm rebuild canvas
+          )
       - name: content routing boundary tests
         run: node --test ../../.github/scripts/cognitive-content.test.mjs ../../.github/scripts/content-workflows.test.mjs
       - name: prisma generate
@@ -658,11 +662,16 @@ jobs:
         run: |
           mkdir -p "$HOME/.npm"
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
       - name: backend npm ci
         working-directory: server-version/backend
         run: npm ci
+      - name: prepare canvas source-build dependencies
+        working-directory: server-version/backend
+        run: |
+          node -e "require('canvas')" 2>/dev/null || (
+            bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+            npm rebuild canvas
+          )
       - name: backend prisma generate
         working-directory: server-version/backend
         run: npx prisma generate
@@ -795,7 +804,7 @@ jobs:
       retry_file: ${{ needs.scope.outputs.frontend_retest_file }}
       retry_case: ${{ needs.scope.outputs.frontend_retest_case }}
       catalog_discovery: ${{ needs.scope.outputs.scenario == 'catalog-discovery' }}
-      cognitive_owned_by_backend: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.frontend == 'true' && needs.scope.outputs.frontend_affected != 'true' && needs.scope.outputs.scenario != 'dependencies' }}
+      cognitive_owned_by_backend: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.frontend_affected != 'true' && needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.scenario == 'platform' && needs.scope.outputs.backend_focus != 'form-intake')) }}
       base_sha: ${{ needs.scope.outputs.diff_base }}
 
   browser:

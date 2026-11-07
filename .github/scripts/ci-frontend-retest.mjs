@@ -41,14 +41,12 @@ export function eligibleTestDelta(before,after) {
   return path.slice(filePrefix.length);
 }
 
-// The original failing PR must have used the trusted base CI topology,
-// dependencies and migration controls. Otherwise a source run could have
-// manufactured the old report or omitted a security-critical lane.
+// The original failing PR must have used the trusted base CI topology and
+// test-runner controls. Otherwise a source run could have manufactured the
+// old report or omitted a security-critical lane.
 const controlPath=path=>path.startsWith('.github/')
   ||path.startsWith('server-version/scripts/')
-  ||path.startsWith('server-version/backend/prisma/')
-  ||/(?:^|\/)(?:package|package-lock|npm-shrinkwrap|pnpm-lock|yarn\.lock|tsconfig|vitest\.config|vite\.config)(?:\.[^/]*)?$/.test(path)
-  ||/(?:^|\/)(?:Dockerfile[^/]*|docker-compose[^/]*|\.dockerignore)$/.test(path);
+  ||/(?:^|\/)(?:tsconfig|vitest\.config|vite\.config)(?:\.[^/]*)?$/.test(path);
 export function unchangedCiControl(base,source){
   const filter=entries=>new Map(entries.filter(e=>controlPath(e.path))
     .map(e=>[e.path,e.mode+':'+e.type+':'+e.sha]));

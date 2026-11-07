@@ -70,6 +70,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
+          cache-dependency-path: |
+            server-version/frontend/package-lock.json
+            server-version/backend/package-lock.json
       - name: verify runner capacity and clean application ports
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs" --frontend
       - name: configure runner-local npm cache
@@ -120,14 +124,6 @@ jobs:
         id: full-frontend-tests
         if: inputs.affected_only != true && inputs.cognitive_owned_by_backend != true && !inputs.retry_only
         run: npm test -- --reporter=default --reporter=json --outputFile="$RUNNER_TEMP/frontend-vitest.json"
-      - name: publish original full Vitest verdicts for safe future repair
-        if: ${{ always() && steps.full-frontend-tests.outcome != 'skipped' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-vitest-report-run-${{ github.run_id }}-attempt-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/frontend-vitest.json
-          if-no-files-found: error
-          retention-days: 3
       - name: rerun exactly the repaired frontend test file after proven full CI
         if: inputs.retry_only
         env:
@@ -157,7 +153,18 @@ jobs:
           JS
       - name: frontend tests excluding exact onboarding-owned suites
         if: inputs.affected_only != true && !inputs.retry_only && inputs.cognitive_owned_by_backend
+        id: partitioned-frontend-tests
+        env:
+          FRONTEND_VITEST_JSON: ${{ runner.temp }}/frontend-vitest.json
         run: node ../scripts/cognitive/frontend-tests.cjs --onboarding-owned-by-backend
+      - name: publish original full Vitest verdicts for safe future repair
+        if: ${{ always() && (steps.full-frontend-tests.outcome != 'skipped' || steps.partitioned-frontend-tests.outcome != 'skipped') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-vitest-report-run-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/frontend-vitest.json
+          if-no-files-found: error
+          retention-days: 3
       - name: dependency-related frontend tests
         if: inputs.affected_only && !inputs.retry_only && inputs.catalog_discovery != true
         run: |

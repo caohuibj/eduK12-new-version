@@ -79,14 +79,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
+          cache-dependency-path: server-version/backend/package-lock.json
       - name: verify runner capacity and clean application ports
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - uses: grafana/setup-k6-action@v1
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
       - name: install backend dependencies
         working-directory: server-version/backend
         run: npm ci
+      - name: prepare canvas source-build dependencies
+        working-directory: server-version/backend
+        run: |
+          node -e "require('canvas')" 2>/dev/null || (
+            bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+            npm rebuild canvas
+          )
       - name: generate Prisma client and migrate disposable database
         working-directory: server-version/backend
         run: |

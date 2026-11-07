@@ -31,11 +31,13 @@ test('retest admits only an existing 100644 frontend test file, with every other
   assert.equal(eligibleTestDelta(before,[f('server-version/frontend/src/pages/student/new.test.tsx','b'.repeat(40)),f(other)]),null);
   assert.throws(()=>eligibleTestDelta(before,[...after,after[0]]),/duplicate/);
 });
-test('safe reuse requires original CI, dependencies, Prisma and runtime controls identical to main',()=>{
-  const main=[f('.github/workflows/ci.yml'),f('server-version/frontend/package-lock.json'),
-    f('server-version/backend/prisma/schema.prisma'),f(other)];
-  assert.equal(unchangedCiControl(main,[...main.slice(0,3),f(other,'b'.repeat(40))]),true,
-    'A completed first full run can validate ordinary backend source changes');
+test('safe reuse requires original CI workflows, scripts and test runner configs identical to main while admitting Prisma and dependency PRs',()=>{
+  const main=[f('.github/workflows/ci.yml'),f('server-version/scripts/cognitive/frontend-tests.cjs'),
+    f('server-version/frontend/vitest.config.ts'),f('server-version/backend/prisma/schema.prisma'),
+    f('server-version/frontend/package-lock.json'),f(other)];
+  assert.equal(unchangedCiControl(main,[...main.slice(0,3),f('server-version/backend/prisma/schema.prisma','b'.repeat(40)),
+    f('server-version/frontend/package-lock.json','c'.repeat(40)),f(other,'d'.repeat(40))]),true,
+    'A completed first full run can validate backend, Prisma and lockfile changes');
   for(const changed of [0,1,2]){
     const source=[...main];source[changed]={...source[changed],sha:'b'.repeat(40)};
     assert.equal(unchangedCiControl(main,source),false,'Cannot trust modified control '+changed);

@@ -116,11 +116,16 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: browser-chromium-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json') }}
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
       - name: backend npm ci
         working-directory: server-version/backend
         run: npm ci
+      - name: prepare canvas source-build dependencies
+        working-directory: server-version/backend
+        run: |
+          node -e "require('canvas')" 2>/dev/null || (
+            bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+            npm rebuild canvas
+          )
       - name: prepare Chromium for seeded browser
         working-directory: server-version/backend
         run: |
@@ -213,6 +218,7 @@ jobs:
         working-directory: server-version/backend
         run: npx tsx ../e2e/situational-bundle-browser-fixture.ts
       - name: seed PR5 Organization fixture
+        if: matrix.group == 'foundation'
         working-directory: server-version/backend
         run: npx tsx ../e2e/pr5-organization-browser-fixture.ts
       - name: start backend
@@ -568,11 +574,16 @@ jobs:
           path: .ci/npm-cache
           key: browser-npm-container-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json', 'server-version/frontend/package-lock.json') }}
           restore-keys: browser-npm-container-${{ runner.os }}-${{ runner.arch }}-
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
       - name: backend npm ci
         working-directory: server-version/backend
         run: npm ci
+      - name: prepare canvas source-build dependencies
+        working-directory: server-version/backend
+        run: |
+          node -e "require('canvas')" 2>/dev/null || (
+            bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+            npm rebuild canvas
+          )
       - name: prepare Chromium for seeded browser
         working-directory: server-version/backend
         run: |

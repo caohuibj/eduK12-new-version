@@ -29,7 +29,10 @@ const fixturePatterns=[
   'bundle-onboarding/education-native*','bundle-onboarding/teacher-jdr-*',
   'bundle-onboarding/survey-native.postgres*','bundle-onboarding/schema3-native-final*',
   'bundle-product/education-package-continuation*','assessment-runtime/compact-assessment-storage*',
+  'cognitive/four-task-integration*','cognitive/unknown-task-onboarding*',
+  'reporting/group-longitudinal*','survey/personal-tracking*',
 ];
+const heavyIntegration=file=>/(?:\.(?:postgres|http|cli)\.|\/integration\/)/.test(file);
 
 export function partitionRegressionFiles(files,excluded){
   assert.equal(new Set(files).size,files.length,'Duplicate discovered regression file');
@@ -38,13 +41,17 @@ export function partitionRegressionFiles(files,excluded){
   const all=new Set(files);
   for(const file of excluded)assert.ok(all.has(file),`Unknown regression exclusion: ${file}`);
   const excludedSet=new Set(excluded),groups=Object.fromEntries(regressionGroups.map(group=>[group,[]]));
-  let shard=0;
+  const sharded=[];
   for(const file of [...files].sort()){
     assert.ok(file.startsWith('src/__tests__/')&&file.endsWith('.test.ts'),`Unexpected test path: ${file}`);
     if(excludedSet.has(file))continue;
     const retained=fixturePatterns.some(pattern=>matchesGlob(file.slice('src/__tests__/'.length),pattern));
-    groups[retained?'fixtures':`shard-${shard++%regressionShardCount+1}`].push(file);
+    if(retained)groups.fixtures.push(file);
+    else sharded.push(file);
   }
+  const ordered=[...sharded.filter(heavyIntegration),...sharded.filter(file=>!heavyIntegration(file))];
+  ordered.forEach((file,index)=>groups[`shard-${index%regressionShardCount+1}`].push(file));
+  for(const group of regressionGroups.slice(1))groups[group].sort();
   const special=excluded.filter(file=>file!==backendOwnedFile);
   return {groups,special,expectedFiles:[...files].filter(file=>file!==backendOwnedFile).sort()};
 }

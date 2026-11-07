@@ -14,7 +14,8 @@ function frontendTestArguments(root){
 if(require.main===module){
  const root=path.resolve(__dirname,'../../..'),cwd=path.join(root,'server-version/frontend')
  if(process.argv.slice(2).join(' ')!=='--onboarding-owned-by-backend')throw Error('Explicit onboarding owner required')
- const result=spawnSync(process.execPath,[path.join(cwd,'node_modules/vitest/vitest.mjs'),...frontendTestArguments(root)],{cwd,env:process.env,stdio:'inherit'})
+ const reportArgs=process.env.FRONTEND_VITEST_JSON?['--reporter=default','--reporter=json','--outputFile='+process.env.FRONTEND_VITEST_JSON]:[]
+ const result=spawnSync(process.execPath,[path.join(cwd,'node_modules/vitest/vitest.mjs'),...frontendTestArguments(root),...reportArgs],{cwd,env:process.env,stdio:'inherit'})
  if(result.error)throw result.error
  process.exitCode=result.status??1
 }

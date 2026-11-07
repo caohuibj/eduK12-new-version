@@ -87,10 +87,14 @@ jobs:
     # Each external installation is independently observable and bounded.
     # A stalled registry / apt / browser download fails the gate rather than
     # holding the whole 25-minute media job without progress.
-    - name: prepare native Canvas libraries (bounded)
-      run: timeout -k 10s 240s bash server-version/scripts/ci-install-canvas-deps.sh
     - name: install backend dependencies (bounded)
       run: timeout -k 10s 240s npm ci --prefix server-version/backend
+    - name: prepare native Canvas libraries (bounded)
+      run: |
+        node -e "require('./server-version/backend/node_modules/canvas')" 2>/dev/null || (
+          timeout -k 10s 240s bash server-version/scripts/ci-install-canvas-deps.sh
+          timeout -k 10s 240s npm rebuild canvas --prefix server-version/backend
+        )
     - name: install frontend dependencies (bounded)
       run: timeout -k 10s 240s npm ci --prefix server-version/frontend
     - name: install pinned Chromium and system dependencies (bounded)
