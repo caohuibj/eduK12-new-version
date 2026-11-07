@@ -83,6 +83,17 @@ export function validateFailureReport(report,testFile) {
   return true;
 }
 
+// A green suite is insufficient if the originally failing assertion was
+// simply deleted. Carry its original title as a safe base64url identity.
+export function failedAssertionCase(report,testFile){
+  validateFailureReport(report,testFile);
+  const bad=report.testResults.flatMap(s=>s.assertionResults.filter(a=>a.status==='failed'));
+  assert.equal(bad.length,1);
+  const name=bad[0].fullName||bad[0].title;
+  assert(typeof name==='string'&&name.length>0&&name.length<=512,'Missing failing test identity');
+  return Buffer.from(name,'utf8').toString('base64url');
+}
+
 export function validateSourceEvidence({run,jobs,needs,report,baseSha,pr,repo,testFile,now=Date.now()}) {
   assert(run&&run.path==='.github/workflows/ci.yml'&&run.event==='pull_request'
     &&run.status==='completed'&&run.conclusion==='failure','Source run is not a completed failed CI');
@@ -223,6 +234,7 @@ export async function verifiedFrontendRetest({token,repo,pr,branch,prHead,baseSh
       // source->current tree relationship is independently authenticated.
       if(sourceId&&String(run.id)!==String(sourceId))throw Error('Incorrect provenance run');
       return {testFile,runId:run.id,sourceSha:parent,baseSha,
+        failedCase:failedAssertionCase(vitest.data,testFile),
         gateDigest:prior.digest,reportDigest:vitest.digest};
     }catch(e){
       if(!quiet)console.warn('Reject frontend retest source '+run.id+': '+String(e?.message||e).slice(0,350));

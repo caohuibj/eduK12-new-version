@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {eligibleTestDelta,validateFailureReport,validateSourceEvidence,unchangedCiControl} from './ci-frontend-retest.mjs';
+import {eligibleTestDelta,validateFailureReport,validateSourceEvidence,unchangedCiControl,failedAssertionCase} from './ci-frontend-retest.mjs';
 import {classifyChanges,frontendTestOnly} from './content-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 import {mediaPlan} from './ci-media-plan.mjs';
@@ -14,7 +14,7 @@ const report={
   success:false,numFailedTests:1,numPassedTests:4,
   testResults:[
     {name:'/home/runner/work/repo/server-version/frontend/src/survey/SurveyQuestionnaireSelection.test.tsx',
-      assertionResults:[{status:'passed'},{status:'failed'}]},
+      assertionResults:[{status:'passed'},{status:'failed',fullName:'adds normal questionnaire content in stored order'}]},
     {name:'/home/runner/work/repo/server-version/frontend/src/pages/student/Something.test.tsx',
       assertionResults:[{status:'passed'},{status:'passed'}]}
   ]
@@ -45,6 +45,11 @@ test('safe reuse requires original CI, dependencies, Prisma and runtime controls
 });
 test('single failing Vitest report must identify exactly the corrected file and every failed assertion',()=>{
   assert.equal(validateFailureReport(report,testPath.slice('server-version/frontend/'.length)),true);
+  assert.equal(failedAssertionCase(report,testPath.slice('server-version/frontend/'.length)),
+    Buffer.from('adds normal questionnaire content in stored order').toString('base64url'));
+  const missing=structuredClone(report);delete missing.testResults[0].assertionResults[1].fullName;
+  assert.throws(()=>failedAssertionCase(missing,testPath.slice('server-version/frontend/'.length)));
+
   for(const change of [
     r=>{r.success=true},r=>{r.numFailedTests=2},
     r=>{r.numPassedTests=0},r=>{r.testResults=[]},
@@ -124,7 +129,8 @@ test('new merge-gate evidence fields cannot be set without a verified targeted r
     media_selection:'[]',media_groups:'[]',frontend_retest:'true',
     frontend_retest_file:'src/survey/SurveyQuestionnaireSelection.test.tsx',
     frontend_retest_source_run:'48',frontend_retest_source_sha:'a'.repeat(40),
-    frontend_retest_gate_digest:'d'.repeat(64),frontend_retest_report_digest:'e'.repeat(64)
+    frontend_retest_gate_digest:'d'.repeat(64),frontend_retest_report_digest:'e'.repeat(64),
+    frontend_retest_case:Buffer.from('adds normal questionnaire content in stored order').toString('base64url')
   }},frontend:{result:'success'}};
   assert.deepEqual(failedChecks(lightweight,false),[]);
   assert(failedChecks({...lightweight,scope:{...lightweight.scope,outputs:{

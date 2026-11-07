@@ -389,7 +389,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   // Existing lightweight frontend, content and test-only routes are untouched.
   Object.assign(output,{frontend_retest:false,frontend_retest_file:'',
     frontend_retest_source_run:'',frontend_retest_source_sha:'',
-    frontend_retest_gate_digest:'',frontend_retest_report_digest:''});
+    frontend_retest_gate_digest:'',frontend_retest_report_digest:'',
+    frontend_retest_case:''});
   if(event==='pull_request' && scenario==='platform' && output.application_route==='legacy'
       && !full && process.env.CI_IS_DRAFT!=='true') {
     try {
@@ -415,7 +416,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
           frontend_retest_source_run:String(evidence.runId),
           frontend_retest_source_sha:evidence.sourceSha,
           frontend_retest_gate_digest:evidence.gateDigest,
-          frontend_retest_report_digest:evidence.reportDigest
+          frontend_retest_report_digest:evidence.reportDigest,
+          frontend_retest_case:evidence.failedCase
         });
         console.log(JSON.stringify({kind:'verified-single-frontend-retest',
           sourceRun:evidence.runId,file:evidence.testFile}));

@@ -222,11 +222,12 @@ export function failedChecks(needs, draft) {
     ||!/^([a-f0-9]{40})$/.test(scope.frontend_retest_source_sha||'')
     ||!/^([a-f0-9]{64})$/.test(scope.frontend_retest_gate_digest||'')
     ||!/^([a-f0-9]{64})$/.test(scope.frontend_retest_report_digest||'')
+    ||!/^([A-Za-z0-9_-]{3,1024})$/.test(scope.frontend_retest_case||'')
   ))failed.push('frontend-retest-proof');
   if(scope.frontend_retest!=='true'&&(
     scope.frontend_retest_file||scope.frontend_retest_source_run
     ||scope.frontend_retest_source_sha||scope.frontend_retest_gate_digest
-    ||scope.frontend_retest_report_digest))failed.push('frontend-retest-proof');
+    ||scope.frontend_retest_report_digest||scope.frontend_retest_case))failed.push('frontend-retest-proof');
   if (malformedTopology && !failed.includes('scope')) failed.unshift('scope');
   return failed;
 }
@@ -291,7 +292,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
         ||String(proof.runId)!==scope.frontend_retest_source_run
         ||proof.sourceSha!==scope.frontend_retest_source_sha
         ||proof.gateDigest!==scope.frontend_retest_gate_digest
-        ||proof.reportDigest!==scope.frontend_retest_report_digest)
+        ||proof.reportDigest!==scope.frontend_retest_report_digest
+        ||proof.failedCase!==scope.frontend_retest_case)
         throw Error('Retest source proof cannot be reproduced');
     }catch(e){
       console.error('Frontend retest merge gate refused: '+String(e?.message||e).slice(0,350));

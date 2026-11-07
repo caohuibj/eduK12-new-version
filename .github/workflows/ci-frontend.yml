@@ -30,6 +30,9 @@ on:
       retry_file:
         type: string
         default: ''
+      retry_case:
+        type: string
+        default: ''
       cognitive_owned_by_backend:
         type: boolean
         default: false
@@ -129,6 +132,7 @@ jobs:
         if: inputs.retry_only
         env:
           RETEST_FILE: ${{ inputs.retry_file }}
+          RETEST_CASE: ${{ inputs.retry_case }}
         run: |
           npm run lint
           npm run typecheck
@@ -138,6 +142,9 @@ jobs:
           import {readFileSync} from 'node:fs';
           import {join} from 'node:path';
           const file=process.env.RETEST_FILE;
+          assert(/^[A-Za-z0-9_-]{3,1024}$/.test(process.env.RETEST_CASE||''),'Invalid exact original test identity');
+          const original=Buffer.from(process.env.RETEST_CASE,'base64url').toString('utf8');
+          assert(original.length>0&&original.length<=512,'Invalid original assertion name');
           assert(/^src\/[a-zA-Z0-9_./-]+\.(?:test|spec)\.tsx?$/.test(file) && !file.split('/').some(v=>v==='.'||v==='..'), 'Invalid approved frontend test');
           for(let i=1;i<=3;i++){
             const report=join(process.env.RUNNER_TEMP,'frontend-retest-'+i+'.json');
@@ -145,6 +152,7 @@ jobs:
             const result=JSON.parse(readFileSync(report,'utf8'));
             assert(result.success===true && result.numFailedTests===0 && result.numPassedTests>0, 'Targeted frontend regression did not pass');
             assert(result.testResults?.length===1 && result.testResults[0].name.replaceAll('\\','/').endsWith('/server-version/frontend/'+file), 'Different test was executed');
+            assert(result.testResults[0].assertionResults?.some(t=>(t.fullName||t.title)===original&&t.status==='passed'), 'Originally failing assertion was removed or not passed');
           }
           JS
       - name: frontend tests excluding exact onboarding-owned suites
