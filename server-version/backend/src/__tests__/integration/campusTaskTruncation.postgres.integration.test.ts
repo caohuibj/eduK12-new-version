@@ -269,6 +269,26 @@ suite('campus task list truncation (real PostgreSQL)', () => {
     expect(assignments).toEqual([f!.assignmentId])
   }, 60_000)
 
+  it('filters a directed activityId in the database and later batches skip ordinary-task reads', async () => {
+    const first = await listCampusStudentTasks(actor(f!.students[0]!), { page: 1, pageSize: 100 })
+    expect(first.list.length).toBeGreaterThan(0)
+    expect(first.nextRunCursor).toBeTruthy()
+    // A random activityId owns no authorized activities for this student.
+    const wrong = await listCampusStudentTasks(actor(f!.students[0]!), { page: 1, pageSize: 100, activityId: randomUUID() })
+    expect(wrong.list).toHaveLength(0)
+    expect(wrong.total).toBe(0)
+    // Later Run-task batches return measurement tasks only (assignments and
+    // check-ins are skipped, not fetched-and-discarded) and the cursor keeps
+    // advancing the same traversal.
+    const page2 = await listCampusStudentTasks(actor(f!.students[0]!), {
+      page: 1, pageSize: 100, runCursor: decodeRunTaskCursor(encodeRunTaskCursor(first.nextRunCursor!)),
+    })
+    expect(page2.list.length).toBeGreaterThan(0)
+    expect(page2.list.every(t => t.kind === 'MEASUREMENT')).toBe(true)
+    const overlap = page2.list.filter(t => first.list.some(o => o.id === t.id))
+    expect(overlap).toHaveLength(0)
+  }, 60_000)
+
   it('rejects malformed cursors on all three campus list entry points', async () => {
     const bad = Buffer.from('{"createdAt":"2026-02-31T00:00:00.000000Z","id":"x"}').toString('base64url')
     expect(() => decodeRunTaskCursor(bad)).toThrow()
