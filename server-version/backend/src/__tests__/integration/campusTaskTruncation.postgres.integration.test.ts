@@ -6,6 +6,7 @@ import { grantSyntheticHuischoolProduct } from './educationProductFixture'
 import { createOrganizationUnit } from '../../modules/organization/structure'
 import { assignStaffToClass, assignStudentToClass } from '../../modules/organization/classRelationships'
 import { createCampusActivity, changeCampusActivityStatus } from '../../modules/campus/activity.service'
+import { addCampusActivityTask } from '../../modules/campus/activity.tasks'
 import { allocateCampusActivityParticipants } from '../../modules/campus/activity.allocation'
 import { createCampusActivityRunDraft } from '../../modules/campus/activity.runs'
 import { listCampusStudentTasks, listCampusParentRunTasks } from '../../modules/campus/activity.tasks'
@@ -107,10 +108,12 @@ async function seed() {
   const parent = await db.user.create({ data: {
     username: name('trunc_parent_'), accountDomain: 'SCHOOL', role: 'PARENT', passwordHash: 'synthetic-only',
   } })
-  await db.parentStudentRelationship.create({ data: {
-    id: randomUUID(), parentUserId: parent.id, studentUserId: students[0]!.id,
-    status: 'ACTIVE', approvedByUserId: students[0]!.id, approvedAt: new Date(),
-  } })
+  for (const student of students.slice(0,2)) {
+    await db.parentStudentRelationship.create({ data: {
+      id: randomUUID(), parentUserId: parent.id, studentUserId: student.id,
+      status: 'ACTIVE', approvedByUserId: student.id, approvedAt: new Date(),
+    } })
+  }
 
   const owner = actor(admin)
   const activity = await createCampusActivity({ actor: owner, organizationId, title: name('Truncation activity'), purpose: 'STUDENT_WELLBEING' })
@@ -169,19 +172,26 @@ async function seed() {
   for (let index = 0; index < RUNS_PER_ROLE; index++) {
     selfRunIds.push(await draft(`trunc-self-${index}`, selfPolicy,
       { kind: 'MEMBERSHIP_IDS', membershipIds: [memberships[0]!] }, { kind: 'MEMBERSHIP_IDS', membershipIds: [memberships[0]!] }))
+    // Last parent Run has two subjects for the same parent. A Run-keyset
+    // cursor could hide one of its executions at the 100-row cutoff.
     parentRunIds.push(await draft(`trunc-parent-${index}`, parentPolicy,
-      { kind: 'MEMBERSHIP_IDS', membershipIds: [memberships[0]!] }, { kind: 'RELATED_PARENT' }))
+      { kind: 'MEMBERSHIP_IDS', membershipIds: index===RUNS_PER_ROLE-1
+        ? [memberships[0]!,memberships[1]!] : [memberships[0]!] }, { kind: 'RELATED_PARENT' }))
   }
   const teacherRunId = await draft('trunc-teacher', teacherPolicy,
     { kind: 'MEMBERSHIP_IDS', membershipIds: memberships }, { kind: 'MEMBERSHIP_IDS', membershipIds: [teacherMember.id] })
 
+  const assignment=await addCampusActivityTask({
+    actor: owner, organizationId, courseId: activity.id, kind: 'ASSIGNMENT',
+    title: 'Synthetic mixed-list assignment',
+  })
   await changeCampusActivityStatus({ actor: owner, organizationId, courseId: activity.id, action: 'SUBMIT', expectedVersion: 1 })
   await changeCampusActivityStatus({ actor: owner, organizationId, courseId: activity.id, action: 'OPEN', expectedVersion: 2 })
   for (const runId of [...selfRunIds, ...parentRunIds, teacherRunId]) {
     await publishWithRetry({ organizationId, runId, actorUserId: admin.id, expectedVersion: 2, resourceRegistry: registry })
   }
 
-  return { organizationId, activityId: activity.id, admin, teacher, parent, students, teacherRunId, selfRunIds, parentRunIds }
+  return { organizationId, activityId: activity.id, admin, teacher, parent, students, teacherRunId, selfRunIds, parentRunIds, assignmentId:assignment.id }
 }
 
 suite('campus task list truncation (real PostgreSQL)', () => {
@@ -219,28 +229,44 @@ suite('campus task list truncation (real PostgreSQL)', () => {
       cursor = decodeRunTaskCursor(encodeRunTaskCursor(page.nextCursor))
       expect(pages).toBeLessThan(10)
     }
-    // One RELATED_PARENT execution per parent run, published newest-last.
-    expect(seen).toHaveLength(RUNS_PER_ROLE)
-    expect(new Set(seen).size).toBe(RUNS_PER_ROLE)
+    // 105 parent Runs, but the newest Run has two eligible child executions.
+    expect(seen).toHaveLength(RUNS_PER_ROLE+1)
+    expect(new Set(seen).size).toBe(RUNS_PER_ROLE+1)
   }, 60_000)
 
-  it('makes every Run task past 100 reachable through the student nextRunCursor', async () => {
+  it('drains default 25-item pages before advancing Run cursor, without repeating mixed tasks', async () => {
     const seen: string[] = []
+    const assignments: string[] = []
     let cursor: RunTaskCursor | undefined
-    let pages = 0
+    let batches = 0
     for (;;) {
-      const page = await listCampusStudentTasks(actor(f!.students[0]!), { page: 1, pageSize: 100, runCursor: cursor })
-      seen.push(...page.list.filter(t => t.kind === 'MEASUREMENT').map(t => t.id))
-      pages++
-      if (!page.nextRunCursor) break
-      cursor = decodeRunTaskCursor(encodeRunTaskCursor(page.nextRunCursor))
-      expect(pages).toBeLessThan(10)
+      let pageNumber = 1
+      let next: RunTaskCursor | null = null
+      for (;;) {
+        const page = await listCampusStudentTasks(actor(f!.students[0]!), {
+          page: pageNumber, pageSize: 25, runCursor: cursor,
+        })
+        expect(page.list.length).toBeLessThanOrEqual(25)
+        seen.push(...page.list.filter(t => t.kind === 'MEASUREMENT').map(t => t.id))
+        assignments.push(...page.list.filter(t => t.kind === 'ASSIGNMENT').map(t => t.id))
+        if (page.hasMore) {
+          expect(page.nextRunCursor).toBeNull()
+          pageNumber++
+          expect(pageNumber).toBeLessThan(12)
+        } else {
+          next = page.nextRunCursor
+          break
+        }
+      }
+      batches++
+      if (!next) break
+      cursor = decodeRunTaskCursor(encodeRunTaskCursor(next))
+      expect(batches).toBeLessThan(10)
     }
+    expect(batches).toBeGreaterThan(1)
     expect(seen).toHaveLength(RUNS_PER_ROLE)
     expect(new Set(seen).size).toBe(RUNS_PER_ROLE)
-    // The SELF-run respondent's own status stays readable on every page.
-    const first = await listCampusStudentTasks(actor(f!.students[0]!), { page: 1, pageSize: 100 })
-    expect(first.list.every(t => t.kind === 'MEASUREMENT')).toBe(true)
+    expect(assignments).toEqual([f!.assignmentId])
   }, 60_000)
 
   it('rejects malformed cursors on all three campus list entry points', async () => {
