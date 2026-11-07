@@ -9,7 +9,7 @@ import {mkdtempSync,writeFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {failedChecks} from './merge-gate.mjs';
-import {frontendTestFile} from './content-scope.mjs';
+import {frontendTestFile,frontendFile} from './content-scope.mjs';
 
 const sha40=/^[a-f0-9]{40}$/;
 const filePrefix='server-version/frontend/';
@@ -34,11 +34,30 @@ export function eligibleTestDelta(before,after) {
   const source=tree(before),target=tree(after);
   const changed=[...new Set([...source.keys(),...target.keys()])]
     .filter(path=>source.get(path)!==target.get(path));
-  if(changed.length!==1)return null;
-  const path=changed[0];
-  if(!frontendTestFile(path)||!source.has(path)||!target.has(path)
-      ||!source.get(path).startsWith('100644:blob:')||!target.get(path).startsWith('100644:blob:'))return null;
-  return path.slice(filePrefix.length);
+  for(const path of changed){
+    if(!source.has(path)||!target.has(path)
+        ||!source.get(path).startsWith('100644:blob:')||!target.get(path).startsWith('100644:blob:'))
+      return null;
+  }
+  if(changed.length===1){
+    const path=changed[0];
+    if(!frontendTestFile(path))return null;
+    return path.slice(filePrefix.length);
+  }
+  if(changed.length===2){
+    const testFiles=changed.filter(frontendTestFile);
+    const srcFiles=changed.filter(p=>!frontendTestFile(p)&&frontendFile(p));
+    if(testFiles.length===1&&srcFiles.length===1){
+      const test=testFiles[0],src=srcFiles[0];
+      const testBase=test.replace(/\.(?:test|spec)\.(tsx?)$/, '');
+      const srcBase=src.replace(/\.(tsx?)$/, '');
+      if(testBase===srcBase||test.startsWith(src.slice(0,src.lastIndexOf('/')))){
+        return test.slice(filePrefix.length);
+      }
+    }
+    return null;
+  }
+  return null;
 }
 
 // The original failing PR must have used the trusted base CI topology and
@@ -46,7 +65,9 @@ export function eligibleTestDelta(before,after) {
 // old report or omitted a security-critical lane.
 const controlPath=path=>path.startsWith('.github/')
   ||path.startsWith('server-version/scripts/')
-  ||/(?:^|\/)(?:tsconfig|vitest\.config|vite\.config)(?:\.[^/]*)?$/.test(path);
+  ||/(?:^|\/)(?:tsconfig|vitest\.config|vite\.config)(?:\.[^/]*)?$/.test(path)
+  ||path==='server-version/frontend/package.json'
+  ||path==='package.json';
 export function unchangedCiControl(base,source){
   const filter=entries=>new Map(entries.filter(e=>controlPath(e.path))
     .map(e=>[e.path,e.mode+':'+e.type+':'+e.sha]));
@@ -56,11 +77,12 @@ export function unchangedCiControl(base,source){
   return true;
 }
 
-export function validateFailureReport(report,testFile) {
+export function validateFailureReport(report,testFile,minInventory=2) {
   assert(report&&report.success===false&&report.numFailedTests===1
     &&Number.isSafeInteger(report.numPassedTests)&&report.numPassedTests>0,
     'Source report was not a single failing test from a completed suite');
-  assert(Array.isArray(report.testResults)&&report.testResults.length>1,'Incomplete frontend test inventory');
+  assert(Array.isArray(report.testResults)&&report.testResults.length>=minInventory,
+    'Incomplete frontend test inventory: expected at least '+minInventory+', got '+(report?.testResults?.length||0));
   let failed=0;
   const names=new Set();
   for(const suite of report.testResults){
@@ -92,7 +114,7 @@ export function failedAssertionCase(report,testFile){
   return Buffer.from(name,'utf8').toString('base64url');
 }
 
-export function validateSourceEvidence({run,jobs,needs,report,baseSha,pr,repo,testFile,now=Date.now()}) {
+export function validateSourceEvidence({run,jobs,needs,report,baseSha,pr,repo,testFile,now=Date.now(),minInventory=2}) {
   assert(run&&run.path==='.github/workflows/ci.yml'&&run.event==='pull_request'
     &&run.status==='completed'&&run.conclusion==='failure','Source run is not a completed failed CI');
   assert(run.repository?.full_name===repo&&run.pull_requests?.some(p=>p.number===pr),
@@ -124,7 +146,7 @@ export function validateSourceEvidence({run,jobs,needs,report,baseSha,pr,repo,te
     'Historical run was not a normal platform gate on this base');
   assert.deepEqual(failedChecks(needs,false),['frontend'],
     'Another required source dependency did not pass');
-  validateFailureReport(report,testFile);
+  validateFailureReport(report,testFile,minInventory);
   return true;
 }
 
@@ -227,7 +249,7 @@ export async function verifiedFrontendRetest({token,repo,pr,branch,prHead,baseSh
         artifactReport(run,'frontend-vitest-report',token,repo)
       ]);
       validateSourceEvidence({run,jobs,needs:prior.data,report:vitest.data,
-        baseSha,pr,repo,testFile});
+        baseSha,pr,repo,testFile,minInventory:500});
       // CI source checkout may be a synthetic merge commit; the PR head
       // source->current tree relationship is independently authenticated.
       if(sourceId&&String(run.id)!==String(sourceId))throw Error('Incorrect provenance run');

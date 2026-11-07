@@ -4,9 +4,9 @@ import {matchesGlob,resolve} from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 
-// Shard wall time scales with file count (import cost dominates). Six shards keep the serial
-// fixtures group, not a shard, as the longest backend-regression job. The workflow matrix must list the same groups.
-export const regressionShardCount=6;
+// Shard wall time scales with file count (import cost dominates). Eight shards keep each shard
+// around ~176 files, bringing single-shard vitest wall time down from ~14m to ~9-10m.
+export const regressionShardCount=8;
 export const regressionGroups=['fixtures',...Array.from({length:regressionShardCount},(_,i)=>`shard-${i+1}`)];
 export const backendOwnedFile='src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts';
 // Keep retained file/row consumers with their producers, including opt-in manual

@@ -30,6 +30,15 @@ test('retest admits only an existing 100644 frontend test file, with every other
   assert.equal(eligibleTestDelta(before,[f(testPath),f(other,'b'.repeat(40))]),null);
   assert.equal(eligibleTestDelta(before,[f('server-version/frontend/src/pages/student/new.test.tsx','b'.repeat(40)),f(other)]),null);
   assert.throws(()=>eligibleTestDelta(before,[...after,after[0]]),/duplicate/);
+
+  // 2 files: paired component and test
+  const componentPath='server-version/frontend/src/survey/SurveyQuestionnaireSelection.tsx';
+  const pairedBefore=[f(testPath),f(componentPath),f(other)];
+  const pairedAfter=[f(testPath,'b'.repeat(40)),f(componentPath,'c'.repeat(40)),f(other)];
+  assert.equal(eligibleTestDelta(pairedBefore,pairedAfter),'src/survey/SurveyQuestionnaireSelection.test.tsx');
+  // 2 files: unpaired component and test
+  const unpairedAfter=[f(testPath,'b'.repeat(40)),f('server-version/frontend/src/pages/student/Something.tsx','c'.repeat(40)),f(other)];
+  assert.equal(eligibleTestDelta(pairedBefore,unpairedAfter),null);
 });
 test('safe reuse requires original CI workflows, scripts and test runner configs identical to main while admitting Prisma and dependency PRs',()=>{
   const main=[f('.github/workflows/ci.yml'),f('server-version/scripts/cognitive/frontend-tests.cjs'),
@@ -44,9 +53,12 @@ test('safe reuse requires original CI workflows, scripts and test runner configs
   }
   assert.equal(unchangedCiControl(main,[...main,f('.github/scripts/custom.mjs')]),false);
   assert.equal(unchangedCiControl(main,main.slice(1)),false);
+  const withPkg=[...main,f('server-version/frontend/package.json')];
+  assert.equal(unchangedCiControl(withPkg,[...main,f('server-version/frontend/package.json','b'.repeat(40))]),false,'Cannot modify frontend package.json');
 });
 test('single failing Vitest report must identify exactly the corrected file and every failed assertion',()=>{
   assert.equal(validateFailureReport(report,testPath.slice('server-version/frontend/'.length)),true);
+  assert.throws(()=>validateFailureReport(report,testPath.slice('server-version/frontend/'.length),500),/Incomplete frontend test inventory/);
   assert.equal(failedAssertionCase(report,testPath.slice('server-version/frontend/'.length)),
     Buffer.from('adds normal questionnaire content in stored order').toString('base64url'));
   const missing=structuredClone(report);delete missing.testResults[0].assertionResults[1].fullName;
