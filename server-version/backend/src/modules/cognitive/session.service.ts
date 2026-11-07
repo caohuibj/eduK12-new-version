@@ -10,6 +10,7 @@ import { prisma } from '../../config/database'
 import type { AssetDatabase } from '../../services/assetStorage'
 import {
   encryptCognitivePayload,
+  encryptCognitivePayloadForStorage,
   decryptCognitivePayload,
   getParticipantKey,
 } from './cognitive.security'
@@ -102,7 +103,7 @@ export const createCognitiveSessionConfigSnapshot = (input: {
     configVersion: input.configVersion,
     config: input.config,
   })
-  return encryptCognitivePayload(snapshot)
+  return encryptCognitivePayloadForStorage(snapshot)
 }
 
 /**

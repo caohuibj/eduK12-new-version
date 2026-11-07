@@ -1,8 +1,6 @@
 import {assertCurrentStudyPrincipal} from '../anonymous-study/admission-principal'
 import {assertPrivateFormFinalCurrent} from '../assessment-run/educationPrivateFormExecution'
 import { lockTrainingFlowFinalAdmission, requiresTrainingFlowFinalLock } from '../composite/training-variant-child-scope'
-import { encryptCompactCognitivePayload } from './cognitive.security'
-import { sharedControlWritesEnabled } from '../assessment-runtime/shared-control-records'
 import { createHash } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -20,7 +18,7 @@ import {
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
 import { loadFrozenMeasurementContext } from './profile-freeze'
-import { decryptCognitivePayload, encryptCognitivePayload } from './cognitive.security'
+import { decryptCognitivePayload, encryptCognitivePayload, encryptCognitivePayloadForStorage } from './cognitive.security'
 import { loadCognitiveSessionConfig } from './session.service'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
 import {
@@ -435,7 +433,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
         ? { administrationProvenance: input.administrationProvenance }
         : {}),
     })),
-    resultSnapshot: (sharedControlWritesEnabled()?encryptCompactCognitivePayload(resultSnapshot):encryptCognitivePayload(resultSnapshot)),
+    resultSnapshot: encryptCognitivePayloadForStorage(resultSnapshot),
     canonicalResult: canonicalResult
       ? encryptUnifiedRuntimePayload(createCanonicalUnitResultEnvelope({
           core: canonicalResult,
