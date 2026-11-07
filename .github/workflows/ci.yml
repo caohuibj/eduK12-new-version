@@ -558,14 +558,14 @@ jobs:
         run: |
           mkdir -p "$HOME/.npm"
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
-      - name: npm ci
-        run: npm ci
-      - name: prepare canvas source-build dependencies
+      - name: backend npm ci (with canvas self-healing)
         run: |
-          node -e "require('canvas')" 2>/dev/null || (
+          if ! npm ci; then
+            echo "::warning::npm ci failed, attempting canvas system dependencies self-healing..."
             bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
-            npm rebuild canvas
-          )
+            npm ci
+          fi
+          node -e "require('canvas')"
       - name: content routing boundary tests
         run: node --test ../../.github/scripts/cognitive-content.test.mjs ../../.github/scripts/content-workflows.test.mjs
       - name: prisma generate
@@ -662,16 +662,15 @@ jobs:
         run: |
           mkdir -p "$HOME/.npm"
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
-      - name: backend npm ci
-        working-directory: server-version/backend
-        run: npm ci
-      - name: prepare canvas source-build dependencies
+      - name: backend npm ci (with canvas self-healing)
         working-directory: server-version/backend
         run: |
-          node -e "require('canvas')" 2>/dev/null || (
+          if ! npm ci; then
+            echo "::warning::npm ci failed, attempting canvas system dependencies self-healing..."
             bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
-            npm rebuild canvas
-          )
+            npm ci
+          fi
+          node -e "require('canvas')"
       - name: backend prisma generate
         working-directory: server-version/backend
         run: npx prisma generate

@@ -155,14 +155,14 @@ jobs:
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: check hosted runner disk headroom
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
-      - name: npm ci
-        run: npm ci
-      - name: prepare canvas source-build dependencies
+      - name: backend npm ci (with canvas self-healing)
         run: |
-          node -e "require('canvas')" 2>/dev/null || (
+          if ! npm ci; then
+            echo "::warning::npm ci failed, attempting canvas system dependencies self-healing..."
             bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
-            npm rebuild canvas
-          )
+            npm ci
+          fi
+          node -e "require('canvas')"
       - name: prisma generate and guarded migration
         run: |
           npx prisma generate

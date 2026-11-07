@@ -333,6 +333,33 @@ test('UI-only route saves backend regression but retains real API browser, Docke
     for (const result of ['skipped','cancelled','failure',undefined])
       assert.ok(failedChecks({...needs,[job]:{result}},false).includes(job));
 });
+test('Dimension 1: pure frontend PR routes to frontend scenario skipping backend regression with fail-closed security', () => {
+  const pureFrontendEntries = [
+    {file: 'server-version/frontend/src/school/SchoolApp.tsx', status: 'M', oldMode: '100644', newMode: '100644'},
+    {file: 'server-version/frontend/src/school/SchoolApp.test.tsx', status: 'M', oldMode: '100644', newMode: '100644'}
+  ];
+  const classified = classifyChanges(pureFrontendEntries);
+  assert.equal(classified.frontend, true);
+  assert.equal(classified.content, false);
+  assert.equal(classified.backend_modules, false);
+  assert.equal(classified.frontend_test, false);
+
+  // Merge gate requirements for scenario: 'frontend'
+  const needs = {scope: {result: 'success', outputs: scopeOutputs('false', 'false', 'true')}};
+  const required = requiredChecks(needs, false);
+  assert.deepEqual(required, ['scope', 'backend-browser-build', 'frontend', 'browser', 'docker', 'frontend-build', 'codeql']);
+  assert.ok(!required.includes('backend'));
+  assert.ok(!required.includes('backend-regression'));
+
+  // Touching backend code immediately escalates to platform
+  const mixedEntries = [
+    ...pureFrontendEntries,
+    {file: 'server-version/backend/src/routes/auth.ts', status: 'M', oldMode: '100644', newMode: '100644'}
+  ];
+  const mixedClassified = classifyChanges(mixedEntries);
+  assert.equal(mixedClassified.frontend, false);
+  assert.equal(mixedClassified.backend_modules, false);
+});
 test('measurement pages and React hooks use full frontend without widening narrow shortcuts',()=>{
   const src='server-version/frontend/src/';
   const files=[
