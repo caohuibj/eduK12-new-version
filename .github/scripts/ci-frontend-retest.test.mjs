@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {eligibleTestDelta,validateFailureReport,validateSourceEvidence} from './ci-frontend-retest.mjs';
+import {eligibleTestDelta,validateFailureReport,validateSourceEvidence,unchangedCiControl} from './ci-frontend-retest.mjs';
 import {classifyChanges,frontendTestOnly} from './content-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 import {mediaPlan} from './ci-media-plan.mjs';
@@ -30,6 +30,18 @@ test('retest admits only an existing 100644 frontend test file, with every other
   assert.equal(eligibleTestDelta(before,[f(testPath),f(other,'b'.repeat(40))]),null);
   assert.equal(eligibleTestDelta(before,[f('server-version/frontend/src/pages/student/new.test.tsx','b'.repeat(40)),f(other)]),null);
   assert.throws(()=>eligibleTestDelta(before,[...after,after[0]]),/duplicate/);
+});
+test('safe reuse requires original CI, dependencies, Prisma and runtime controls identical to main',()=>{
+  const main=[f('.github/workflows/ci.yml'),f('server-version/frontend/package-lock.json'),
+    f('server-version/backend/prisma/schema.prisma'),f(other)];
+  assert.equal(unchangedCiControl(main,[...main.slice(0,3),f(other,'b'.repeat(40))]),true,
+    'A completed first full run can validate ordinary backend source changes');
+  for(const changed of [0,1,2]){
+    const source=[...main];source[changed]={...source[changed],sha:'b'.repeat(40)};
+    assert.equal(unchangedCiControl(main,source),false,'Cannot trust modified control '+changed);
+  }
+  assert.equal(unchangedCiControl(main,[...main,f('.github/scripts/custom.mjs')]),false);
+  assert.equal(unchangedCiControl(main,main.slice(1)),false);
 });
 test('single failing Vitest report must identify exactly the corrected file and every failed assertion',()=>{
   assert.equal(validateFailureReport(report,testPath.slice('server-version/frontend/'.length)),true);

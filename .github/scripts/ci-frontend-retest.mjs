@@ -41,6 +41,23 @@ export function eligibleTestDelta(before,after) {
   return path.slice(filePrefix.length);
 }
 
+// The original failing PR must have used the trusted base CI topology,
+// dependencies and migration controls. Otherwise a source run could have
+// manufactured the old report or omitted a security-critical lane.
+const controlPath=path=>path.startsWith('.github/')
+  ||path.startsWith('server-version/scripts/')
+  ||path.startsWith('server-version/backend/prisma/')
+  ||/(?:^|\/)(?:package|package-lock|npm-shrinkwrap|pnpm-lock|yarn\.lock|tsconfig|vitest\.config|vite\.config)(?:\.[^/]*)?$/.test(path)
+  ||/(?:^|\/)(?:Dockerfile[^/]*|docker-compose[^/]*|\.dockerignore)$/.test(path);
+export function unchangedCiControl(base,source){
+  const filter=entries=>new Map(entries.filter(e=>controlPath(e.path))
+    .map(e=>[e.path,e.mode+':'+e.type+':'+e.sha]));
+  const old=filter(base),now=filter(source);
+  for(const name of new Set([...old.keys(),...now.keys()]))
+    if(old.get(name)!==now.get(name))return false;
+  return true;
+}
+
 export function validateFailureReport(report,testFile) {
   assert(report&&report.success===false&&report.numFailedTests===1
     &&Number.isSafeInteger(report.numPassedTests)&&report.numPassedTests>0,
@@ -181,7 +198,9 @@ export async function verifiedFrontendRetest({token,repo,pr,branch,prHead,baseSh
   const parent=git('rev-parse',prHead+'^');
   if(!sha40.test(parent))return null;
   fetchParent(parent);
+  fetchParent(baseSha);
   const sourceTree=treeFor(parent),currentTree=treeFor(prHead);
+  if(!unchangedCiControl(treeFor(baseSha),sourceTree))return null;
   const testFile=eligibleTestDelta(sourceTree,currentTree);
   if(!testFile)return null;
   // The entire workflow, lockfiles, production files and main base are

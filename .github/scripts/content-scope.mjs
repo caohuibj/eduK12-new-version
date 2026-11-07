@@ -306,6 +306,9 @@ export function runnerPlan({ profile = 'hosted', scenario = 'platform' } = {}) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  // Keep the module itself synchronous: merge-gate imports this classifier.
+  // A top-level await of the verifier would deadlock that import cycle.
+  void (async()=>{
   const event = process.env.CI_EVENT;
   const full = process.env.CI_FORCE_FULL === 'true';
   const head = execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
@@ -425,4 +428,5 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   console.log(JSON.stringify({ ...output, base, validationClosure: result.cognitive_intake_light ? 'selected-cognitive-tasks' : 'all-bundles', platformReasons: catalogDiscovery || dependencies ? [] : platformReasons(entries, full || event === 'workflow_dispatch') }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
+  })().catch(error=>{console.error(error);process.exitCode=1});
 }
