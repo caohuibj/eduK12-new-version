@@ -13,6 +13,18 @@ const integer=(value,name,min=1,max=10000)=>{
  if(!Number.isSafeInteger(number)||number<min||number>max)throw new Error(`Invalid ${name}`)
  return number
 }
+// Compose duration strings: '45s', '1m30s', '1500ms', or a bare number of
+// seconds. Anything else (or a negative value) is a contract violation.
+const durationSeconds=(value,name)=>{
+ if(typeof value==='number'&&Number.isFinite(value)&&value>=0)return value
+ const text=String(value).trim()
+ if(!text)throw new Error(`Invalid ${name}`)
+ if(/^\d+(?:\.\d+)?$/.test(text))return Number(text)
+ const parts=[...text.matchAll(/(\d+(?:\.\d+)?)(ms|s|m|h)/g)]
+ const consumed=parts.map(part=>part[0]).join('')
+ if(!parts.length||consumed!==text.replace(/\s+/g,''))throw new Error(`Invalid ${name}`)
+ return parts.reduce((sum,part)=>sum+Number(part[1])*({ms:0.001,s:1,m:60,h:3600}[part[2]]),0)
+}
 // Compose intentionally renders these six optional caps as empty strings.
 // Empty means the backend derives bounded values from the class-size/token
 // audience inputs; an explicitly supplied cap still has to be a positive integer.
@@ -67,10 +79,11 @@ export function inspectResourceContract(compose, {capacity=false}={}) {
  // process's Prisma pool. A single gate must never admit more concurrent
  // operations than the pool can serve, and the admitted total must stay
  // within a bounded multiple of the pool. The known-safe conservative
- // envelope (7+3+8=18 vs pool 10, 1.8x) passes; the Compose fallbacks
- // (50+20+50=120 vs pool 20, 6x) fail. A hard "sum <= pool" rule would
- // reject the known-safe envelope, so the bound is 2x, not 1x. The worker
- // process does not enforce these gates, so only the backend values count.
+ // envelope (7+3+8=18 vs pool 10, 1.8x) passes; the previous Compose
+ // fallbacks (50+20+50=120 vs pool 20, 6x) failed. A hard "sum <= pool"
+ // rule would reject the known-safe envelope, so the bound is 2x, not 1x.
+ // The worker process does not enforce these gates, so only the backend
+ // values count.
  const backendService=result.services.backend
  const finalGateLimits=['UNIT_SUBMIT_ADMISSION_LIMIT','AGGREGATE_FINALIZATION_ADMISSION_LIMIT','QUESTIONNAIRE_COMPLETION_ADMISSION_LIMIT'].map(key=>{
   const value=backendService[key]
@@ -81,6 +94,18 @@ export function inspectResourceContract(compose, {capacity=false}={}) {
  if(finalGateLimits.some(limit=>limit>backendService.prismaPool))throw new Error('FINAL admission limit exceeds Prisma pool')
  if(finalGateConcurrencyTotal>2*backendService.prismaPool)throw new Error('FINAL admission limits exceed twice the Prisma pool')
  result.finalGateConcurrencyTotal=finalGateConcurrencyTotal
+ // Worker stop-grace consistency: Compose sends SIGKILL when the grace
+ // expires, so the grace must exceed the worker's internal shutdown budget
+ // (WORKER_SHUTDOWN_TIMEOUT_SECONDS, runtimeResources.ts) by a 15s margin
+ // for the drain/cancel/close sequence to finish. Absent values fall back
+ // to the Compose defaults (grace 10s, budget 30s), which fail the rule:
+ // an explicit grace is effectively required. The defaults (45s vs 30s)
+ // pass with exactly the 15s margin.
+ const workerEnv=services.worker.environment || {}
+ const workerGraceSeconds=services.worker.stop_grace_period===undefined?10:durationSeconds(services.worker.stop_grace_period,'worker stop_grace_period')
+ const workerBudgetSeconds=workerEnv.WORKER_SHUTDOWN_TIMEOUT_SECONDS===undefined||workerEnv.WORKER_SHUTDOWN_TIMEOUT_SECONDS===''?30:integer(workerEnv.WORKER_SHUTDOWN_TIMEOUT_SECONDS,'WORKER_SHUTDOWN_TIMEOUT_SECONDS',5,300)
+ result.services.worker={...result.services.worker,stopGracePeriodSeconds:workerGraceSeconds,workerShutdownTimeoutSeconds:workerBudgetSeconds}
+ if(workerGraceSeconds<workerBudgetSeconds+15)throw new Error('Worker stop_grace_period must exceed WORKER_SHUTDOWN_TIMEOUT_SECONDS by at least 15s')
  if(cpu>4.000001 || memory>3584*1048576)throw new Error('4C4G starting envelope exceeded; reserve at least 512MiB for the host')
  const redis=services.redis.command || [];const maxIndex=redis.indexOf('--maxmemory');const policyIndex=redis.indexOf('--maxmemory-policy')
  if(maxIndex<0 || size(redis[maxIndex+1])>size(services.redis.mem_limit)*.65 || redis[policyIndex+1]!=='noeviction')throw new Error('Redis persistence/queue headroom or policy invalid')

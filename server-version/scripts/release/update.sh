@@ -89,6 +89,22 @@ if [[ "$mode" = full ]]; then
   # for a migration that cannot succeed. The formal preflight below still
   # re-runs after the stop, because the database may change in between.
   run "$entry" -f "$ops" --profile ops run --rm --no-deps migrate node scripts/assessment-run-index-contract.mjs pre
+  # Early resource-contract check on the ACTUAL next profile, before any
+  # business service stops: the preflight validates the rendered Compose
+  # document about to be activated (FINAL gates vs Prisma pool, worker stop
+  # grace vs shutdown budget, CPU/memory/pool budgets, HTTPS/CORS). The
+  # next profile is a rendered `docker compose config --format json`
+  # document, the same shape CI validates. Non-full modes change images
+  # only (enforced by the profile diff above), so their resource contract
+  # is unchanged from the live profile and needs no re-check here. The
+  # preflight script lives outside the backend build context, so it is
+  # mounted read-only into the migrate container alongside the next
+  # profile. Like the index check, a failure aborts before the stop.
+  preflight_script="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)/prelaunch-resource-preflight.mjs"
+  run "$entry" -f "$ops" --profile ops run --rm --no-deps \
+    -v "$preflight_script:/tmp/prelaunch-resource-preflight.mjs:ro" \
+    -v "$next:/tmp/next-profile.json:ro" \
+    migrate node /tmp/prelaunch-resource-preflight.mjs --compose-json /tmp/next-profile.json
 fi
 if [[ "$mode" != frontend ]]; then run "$entry" stop -t "$grace" "${services[@]}"; fi
 if [[ "$mode" = full ]]; then

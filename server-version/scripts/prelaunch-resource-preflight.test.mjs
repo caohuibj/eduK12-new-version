@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import {inspectResourceContract} from './prelaunch-resource-preflight.mjs'
 const fixture=()=>{
  const env={CORS_ORIGIN:'https://app.test',COOKIE_SECURE:'true',TRUST_PROXY_HOPS:'1',ASSET_MIGRATION_COMPLETE:'true',DATABASE_URL:'postgresql://u:secret@db/app',PRISMA_CONNECTION_POOL_SIZE:'10',PRISMA_POOL_TIMEOUT:'30',EXPORT_CONCURRENCY:'1',NODE_OPTIONS:'--max-old-space-size=640',BACKGROUND_WORKERS_ENABLED:'false',UNIT_SUBMIT_ADMISSION_LIMIT:'7',AGGREGATE_FINALIZATION_ADMISSION_LIMIT:'3',QUESTIONNAIRE_COMPLETION_ADMISSION_LIMIT:'8'}
- return {services:{postgres:{cpus:1,mem_limit:1073741824,command:['postgres','-c','shared_buffers=256MB','-c','max_connections=80']},redis:{cpus:.25,mem_limit:268435456,command:['redis-server','--maxmemory','128mb','--maxmemory-policy','noeviction']},backend:{cpus:1.75,mem_limit:1073741824,environment:env},worker:{cpus:.75,mem_limit:805306368,environment:{...env,NODE_OPTIONS:'--max-old-space-size=192',PRISMA_CONNECTION_POOL_SIZE:'4',BACKGROUND_WORKERS_ENABLED:'true'}},frontend:{cpus:.25,mem_limit:134217728,ports:[{host_ip:'127.0.0.1'}]}}}
+ return {services:{postgres:{cpus:1,mem_limit:1073741824,command:['postgres','-c','shared_buffers=256MB','-c','max_connections=80']},redis:{cpus:.25,mem_limit:268435456,command:['redis-server','--maxmemory','128mb','--maxmemory-policy','noeviction']},backend:{cpus:1.75,mem_limit:1073741824,environment:env},worker:{cpus:.75,mem_limit:805306368,stop_grace_period:'45s',environment:{...env,NODE_OPTIONS:'--max-old-space-size=192',PRISMA_CONNECTION_POOL_SIZE:'4',BACKGROUND_WORKERS_ENABLED:'true',WORKER_SHUTDOWN_TIMEOUT_SECONDS:'30'}},frontend:{cpus:.25,mem_limit:134217728,ports:[{host_ip:'127.0.0.1'}]}}}
 }
 test('reports safe effective budgets including subprocess heaps/pools, never secrets',()=>{
  const report=inspectResourceContract(fixture())
@@ -65,7 +65,7 @@ test('FINAL gate limits stay within the API pool: conservative envelope passes, 
  assert.equal(report.services.backend.UNIT_SUBMIT_ADMISSION_LIMIT,7)
  assert.equal(report.services.backend.AGGREGATE_FINALIZATION_ADMISSION_LIMIT,3)
  assert.equal(report.services.backend.QUESTIONNAIRE_COMPLETION_ADMISSION_LIMIT,8)
- // Compose fallbacks (50/20/50 vs pool 20): a single gate already exceeds the pool.
+ // The previous Compose fallbacks (50/20/50 vs pool 20): a single gate already exceeds the pool.
  const fallback=fixture()
  fallback.services.backend.environment.UNIT_SUBMIT_ADMISSION_LIMIT='50'
  fallback.services.backend.environment.AGGREGATE_FINALIZATION_ADMISSION_LIMIT='20'
@@ -88,4 +88,37 @@ test('FINAL gate limits stay within the API pool: conservative envelope passes, 
  const missing=fixture()
  delete missing.services.backend.environment.QUESTIONNAIRE_COMPLETION_ADMISSION_LIMIT
  assert.throws(()=>inspectResourceContract(missing),/Missing QUESTIONNAIRE_COMPLETION_ADMISSION_LIMIT/)
+})
+
+test('worker stop grace must exceed the internal shutdown budget by 15s',()=>{
+ // Defaults (45s grace vs 30s budget) pass with exactly the 15s margin.
+ const defaults=inspectResourceContract(fixture())
+ assert.equal(defaults.services.worker.stopGracePeriodSeconds,45)
+ assert.equal(defaults.services.worker.workerShutdownTimeoutSeconds,30)
+ // Raising the internal budget without raising the grace fails.
+ const tight=fixture()
+ tight.services.worker.environment.WORKER_SHUTDOWN_TIMEOUT_SECONDS='60'
+ assert.throws(()=>inspectResourceContract(tight),/stop_grace_period must exceed WORKER_SHUTDOWN_TIMEOUT_SECONDS by at least 15s/)
+ // Raising both keeps the 15s margin and passes.
+ const raised=fixture()
+ raised.services.worker.environment.WORKER_SHUTDOWN_TIMEOUT_SECONDS='60'
+ raised.services.worker.stop_grace_period='75s'
+ assert.equal(inspectResourceContract(raised).services.worker.stopGracePeriodSeconds,75)
+ // Compound durations parse ('1m30s' = 90s >= 60 + 15).
+ const compound=fixture()
+ compound.services.worker.environment.WORKER_SHUTDOWN_TIMEOUT_SECONDS='60'
+ compound.services.worker.stop_grace_period='1m30s'
+ assert.equal(inspectResourceContract(compound).services.worker.stopGracePeriodSeconds,90)
+ // A grace equal to the budget (zero margin) fails.
+ const zero=fixture()
+ zero.services.worker.stop_grace_period='30s'
+ assert.throws(()=>inspectResourceContract(zero),/stop_grace_period must exceed WORKER_SHUTDOWN_TIMEOUT_SECONDS/)
+ // No explicit grace falls back to the 10s Compose default and fails.
+ const missing=fixture()
+ delete missing.services.worker.stop_grace_period
+ assert.throws(()=>inspectResourceContract(missing),/stop_grace_period must exceed WORKER_SHUTDOWN_TIMEOUT_SECONDS/)
+ // An unparseable grace is a contract violation, not a silent default.
+ const invalid=fixture()
+ invalid.services.worker.stop_grace_period='soon'
+ assert.throws(()=>inspectResourceContract(invalid),/Invalid worker stop_grace_period/)
 })

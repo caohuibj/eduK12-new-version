@@ -1,15 +1,22 @@
-// LEGACY host deployment config — NOT used by the Docker/Compose path
-// (the backend Dockerfile runs plain `node dist/index.js`, no PM2).
-// Do not copy these values into the container deployment:
-// - max_memory_restart '200M' sits below the safe RSS of a process with a
+// LEGACY host deployment config — NOT used by any live deployment path.
+// Evidence (2026-11-07): the backend Dockerfile runs plain
+// `node dist/index.js` (no PM2); neither docker-compose.yml, update.sh,
+// nor any CI workflow references PM2 or this file; the only mentions are
+// historical docs, backend/monitor.sh (itself disabled — it exits 1
+// immediately; its pm2 calls sit in a dead LEGACY_SCRIPT block),
+// and a CI test that lists the path as sample data. The values below were
+// fixed as defense-in-depth (2026-11-07) so a future revival of this file
+// does not inherit the two hazards:
+// - max_memory_restart was '200M', below the safe RSS of a process with a
 //   150MB heap cap (node_args --max-old-space-size=150): heap + native +
-//   code routinely exceeds 200MB under load, so PM2 would restart healthy
-//   processes. If this file is ever used again, raise the threshold first.
-// - instances: 2 in cluster mode runs two Node processes, each with its own
-//   Prisma pool and its own admission gates, doubling both. The preflight
-//   (scripts/prelaunch-resource-preflight.mjs) accounts the backend as a
-//   single process, so a cluster deployment would silently exceed the pool
-//   and gate budgets it validates.
+//   code routinely exceeds 200MB under load, so PM2 restarted healthy
+//   processes. Now '512M': above worst-case healthy RSS (~250-400MB)
+//   with headroom, while still catching a genuine leak.
+// - instances was 2 in cluster mode: two Node processes, each with its
+//   own Prisma pool and its own admission gates, doubling both. The
+//   preflight (scripts/prelaunch-resource-preflight.mjs) accounts the
+//   backend as a single process, so a cluster deployment would silently
+//   exceed the pool and gate budgets it validates. Now 1.
 require('dotenv').config({ path: '/opt/ptool/server-version/backend/.env' })
 
 module.exports = {
@@ -18,7 +25,9 @@ module.exports = {
     script: 'dist/index.js',
     cwd: '/opt/ptool/server-version/backend',
     // 集群模式 - Redis Adapter 支持跨进程通信
-    instances: 2,
+    // Single process: cluster mode would double the Prisma pool and the
+    // admission gates per process, which the preflight accounts as one.
+    instances: 1,
     exec_mode: 'cluster',
     env: {
       NODE_ENV: 'production',
@@ -34,7 +43,7 @@ module.exports = {
     
     // 内存管理
     node_args: '--max-old-space-size=150',  // Node.js堆内存上限150MB
-    max_memory_restart: '200M',        // 内存超过200M自动重启
+    max_memory_restart: '512M',        // 健康 RSS 约 250-400MB，200M 会误杀健康进程；512M 留有余量仍可捕获真实泄漏
     
     // 日志配置
     error_file: '/home/ubuntu/.pm2/logs/ptool-backend-error.log',

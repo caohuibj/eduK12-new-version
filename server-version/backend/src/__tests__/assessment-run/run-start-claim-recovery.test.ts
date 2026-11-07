@@ -119,4 +119,49 @@ describe('Run START claim recovery',()=>{
     })).resolves.toBe(false)
     expect(logger.warn).toHaveBeenCalled()
   })
+
+  it('a P2024 pool timeout on the post-claim envelope read returns 503 and releases the lease',async()=>{
+    // The claim already committed, so the single-transaction safety
+    // condition does not apply — but the retry still recovers the same
+    // attempt: the claim is undispatched, the lease is shortened, and the
+    // retry takes over through the generation CAS with the same operationKey.
+    m.acquire.mockResolvedValueOnce({kind:'ACQUIRED',claim:claimFixture(),admission:{}})
+    const p2024=new Prisma.PrismaClientKnownRequestError('Timed out fetching a new connection',{code:'P2024',clientVersion:'5.22.0'})
+    m.raw.mockRejectedValueOnce(p2024)
+    m.release.mockResolvedValueOnce(true)
+    await expect(startAssessmentRunExecution({executionId:'exec-1',actorUserId:'u1'}))
+      .rejects.toMatchObject({code:'ASSESSMENT_START_BUSY',reason:'P2024',retryAfterSeconds:1})
+    expect(m.release).toHaveBeenCalledExactlyOnceWith({claimId:'claim-1',executionId:'exec-1',generation:3})
+  })
+
+  it('a P2028 maxWait on the post-claim envelope read shares the same recovery wiring',async()=>{
+    m.acquire.mockResolvedValueOnce({kind:'ACQUIRED',claim:claimFixture(),admission:{}})
+    m.raw.mockRejectedValueOnce(p2028MaxWait())
+    m.release.mockResolvedValueOnce(true)
+    await expect(startAssessmentRunExecution({executionId:'exec-1',actorUserId:'u1'}))
+      .rejects.toMatchObject({code:'ASSESSMENT_START_BUSY',reason:'P2028',retryAfterSeconds:1})
+    expect(m.release).toHaveBeenCalledExactlyOnceWith({claimId:'claim-1',executionId:'exec-1',generation:3})
+  })
+
+  it('when the post-claim read lease release cannot run, Retry-After reports the real remaining lease',async()=>{
+    m.acquire.mockResolvedValueOnce({kind:'ACQUIRED',claim:claimFixture(),admission:{}})
+    const p2024=new Prisma.PrismaClientKnownRequestError('Timed out fetching a new connection',{code:'P2024',clientVersion:'5.22.0'})
+    m.raw.mockRejectedValueOnce(p2024)
+    m.release.mockResolvedValueOnce(false)
+    let thrown:unknown
+    await startAssessmentRunExecution({executionId:'exec-1',actorUserId:'u1'}).catch((e)=>{thrown=e})
+    expect(thrown).toBeInstanceOf(AssessmentStartBusyError)
+    const busy=thrown as AssessmentStartBusyError
+    expect(busy.reason).toBe('P2024')
+    expect(busy.retryAfterSeconds).toBeGreaterThanOrEqual(19)
+    expect(busy.retryAfterSeconds).toBeLessThanOrEqual(21)
+  })
+
+  it('a non-classified envelope read failure keeps the claim lease and rethrows untouched',async()=>{
+    m.acquire.mockResolvedValueOnce({kind:'ACQUIRED',claim:claimFixture(),admission:{}})
+    const boom=new Error('boom')
+    m.raw.mockRejectedValueOnce(boom)
+    await expect(startAssessmentRunExecution({executionId:'exec-1',actorUserId:'u1'})).rejects.toBe(boom)
+    expect(m.release).not.toHaveBeenCalled()
+  })
 })
