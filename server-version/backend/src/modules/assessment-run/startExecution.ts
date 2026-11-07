@@ -7,7 +7,7 @@ import {assertTrainingPrivateReferenceAdmissionCurrent} from '../composite/train
 import { Prisma } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
-import { classifyStartTransaction, isAssessmentStartBusyError, AssessmentStartBusyError } from '../composite/start-transient'
+import { classifyStartTransaction, isAssessmentStartBusyError, AssessmentStartBusyError, rolledBackStartReason } from '../composite/start-transient'
 import { startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
 import {resolvePublishedTeacherForm,teacherFormResourceRef,
   TEACHER_FORM_RUNTIME_KIND} from '../huiteacher/formRunResource'
@@ -528,7 +528,24 @@ export const startAssessmentRunExecution = async (input: {
   if (decision.kind === 'IN_PROGRESS') return { state: 'IN_PROGRESS', operationKey: decision.claim.operationKey }
   if (decision.kind === 'ABORTED') throw new RunStartExecutionError('RUN_START_ABORTED', 'Run START was aborted by lifecycle arbitration', 409)
 
-  const launch = await readLaunchEnvelope(prisma, input.executionId)
+  // The claim transaction already committed, so a pool timeout on this
+  // non-transactional read is NOT covered by the single-transaction safety
+  // condition of rolledBackStartReason — but the retry still provably
+  // recovers the same attempt: nothing from the dispatch committed
+  // (dispatch never started), the claim is undispatched, and the existing
+  // lease-release helper shortens the CLAIMED claim's lease so the retry
+  // takes over through the generation CAS with the same operationKey and
+  // frozen admission (or, when the lease cannot be shortened, reports the
+  // real remaining wait instead of a blind 1s retry). Without the release,
+  // the retry would hit IN_PROGRESS until the 30s lease expires.
+  let launch: LaunchEnvelope
+  try {
+    launch = await readLaunchEnvelope(prisma, input.executionId)
+  } catch (err) {
+    const reason = rolledBackStartReason(err)
+    if (!reason) throw err
+    throw await releaseClaimAfterRolledBackDispatch(decision.claim, new AssessmentStartBusyError(reason))
+  }
   const resourceRegistry = input.resourceRegistry ?? productionRunResourceAuthorityRegistry
   const resourceAdapter = resourceRegistry.assertStartSupported(launch.family)
   if (resourceAdapter.capabilities.transactionMode === 'TRANSACTIONAL_DB') {

@@ -6,9 +6,10 @@ vi.mock('../../modules/assessment-run/resourceBoundary',()=>({
   assertCurrentRunManagerBoundary:vi.fn(),
   assertCurrentRunPublisherBoundary:vi.fn(),
 }))
+import {Prisma} from '@prisma/client'
 import {assessmentRunController as runController} from '../../modules/assessment-run/run.controller'
 import {errorHandler} from '../../middleware/errorHandler'
-import {AssessmentStartBusyError} from '../../modules/composite/start-transient'
+import {AssessmentStartBusyError,classifyStartTransaction} from '../../modules/composite/start-transient'
 import {logger} from '../../utils/logger'
 
 function fakeRes(){
@@ -30,6 +31,19 @@ describe('Run START transient rollback → 503 ASSESSMENT_START_BUSY',()=>{
 
   it('run.controller START maps a rolled-back transaction to 503 with Retry-After',async()=>{
     m.start.mockRejectedValue(new AssessmentStartBusyError('P2028'))
+    const res=fakeRes()
+    await runController.startExecution(req,res)
+    expect(res.statusCode).toBe(503)
+    expect(res.headers['Retry-After']).toBe('1')
+    expect(res.body).toEqual({code:'ASSESSMENT_START_BUSY',message:'综合测评开始请求繁忙，请稍后重试',data:null})
+    expect(m.start).toHaveBeenCalledTimes(1)
+  })
+
+  it('run.controller START maps a raw P2024 pool timeout to 503 with Retry-After',async()=>{
+    // The P2024 surfaces from the claim/dispatch transaction before BEGIN, so the
+    // classifier reclassifies it as a safe-retry 503 instead of a generic 500.
+    const p2024=new Prisma.PrismaClientKnownRequestError('Timed out fetching a new connection',{code:'P2024',clientVersion:'5.22.0'})
+    m.start.mockImplementation(()=>classifyStartTransaction(()=>Promise.reject(p2024)))
     const res=fakeRes()
     await runController.startExecution(req,res)
     expect(res.statusCode).toBe(503)
