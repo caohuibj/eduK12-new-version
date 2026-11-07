@@ -42,9 +42,10 @@ it('saves the exact researcher DTO and reopens participant feedback without disp
  const before=structuredClone(savedSurveyNativeFeedback(snapshot.governedPackages,result,release()))
  const execute=vi.fn().mockResolvedValue(1)
  await persistGovernedPackageReports({$executeRaw:execute} as any,{projectId:'project',waveId:'wave',finalId:'final',sourceFinalHash:'final-hash',snapshot:snapshot as any,calculated:result})
- const args=execute.mock.calls[0],artifact=decryptUnifiedRuntimePayload<any>(args[10])
+ const [statement]=execute.mock.calls[0],values=statement.values
+ const artifact=decryptUnifiedRuntimePayload<any>(values[9])
  expect(artifact.nativeBundle.derivedView).toEqual(result.nativeBundleReports[0].derivedViews!.researcher)
- expect(canonicalHash(artifact)).toBe(args[9])
+ expect(canonicalHash(artifact)).toBe(values[8])
  ;(result.units[1].privateScoring as any).scores.forEach((s:any)=>{s.value=1})
  expect(savedSurveyNativeFeedback(snapshot.governedPackages,result,release())).toEqual(before)
 })

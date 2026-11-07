@@ -5,7 +5,7 @@ import {referenceEntryKey} from '../../modules/measurement-content/reference-can
 import type {AssessmentReferenceEntry} from '../../modules/assessment-reference/reference'
 import {bindSurveyAttemptContent,decodeSurveyAttemptContentBinding,surveyAttemptContentBindingSchema} from '../../modules/survey/content-binding.service'
 const mocks=vi.hoisted(()=>({release:vi.fn(),assigned:vi.fn(),collection:vi.fn()}))
-vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.release}))
+vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.release,prefetchContentReleases:async(db:any,cache:Map<string,any>,ids:string[],lock?:boolean)=>{for(const id of new Set(ids)){const r=await mocks.release(db,id,lock);if(r)cache.set(id,r)}}}))
 vi.mock('../../modules/survey/flow.assignment',()=>({assignedSurveySnapshot:mocks.assigned}))
 vi.mock('../../modules/survey/scale-collection-guard',()=>({assertSurveyScaleCollectionAllowed:mocks.collection}))
 const scope={projectId:'project',waveId:'wave',attemptId:'attempt',publicationId:'publication'}

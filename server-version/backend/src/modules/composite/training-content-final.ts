@@ -77,6 +77,9 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
     }
   }
   const cache=new Map<string,StoredRelease>(),sources:TrainingFinalReceipt['sources']=[]
+  // Reads stay lazy by contract: the shared interpreter skips reference/report
+  // reads behind revoked / not-executed / quality stop guards, and the unit
+  // tests pin those guards with exact read counts. Do not prefetch here.
   const readRelease=async(id:string,expectedHash:string)=>{
     let release=cache.get(id)
     if(!release){release=(await getContentRelease(tx,id,true))??undefined;if(release)cache.set(id,release)}

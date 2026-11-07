@@ -5,7 +5,7 @@ import type {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
 import {loadStoredCanonicalUnitResults} from '../assessment-runtime/compact-assessment-storage'
-import {getContentRelease,type StoredRelease} from '../measurement-content/repository'
+import {getContentRelease,prefetchContentReleases,type StoredRelease} from '../measurement-content/repository'
 import {ContentReleaseError} from '../measurement-content/release'
 import {renderDeclaredReport,DECLARATIVE_REPORT_GENERATOR,type ReportMetricFact} from '../measurement-content/report-renderer'
 import {decodeTrainingFinalReceipt} from './training-content-final'
@@ -48,6 +48,10 @@ export async function readTrainingContentReports(db:Prisma.TransactionClient,inp
  if(envelopes.length!==rows.length)fail()
  const facts=new Map(rows.map((row,i)=>[row.slotKey,{row,envelope:envelopes[i]}]))
  const cache=new Map<string,StoredRelease>()
+ // One round trip for every distinct release this report renders (measurements,
+ // reports, selected references); the per-pointer checks below are unchanged.
+ await prefetchContentReleases(db,cache,expected.flatMap(({bound})=>[bound.measurement.releaseId,bound.report!.releaseId,
+  ...(referenceBinding?.units.find(u=>u.itemId===bound.itemId)?.references??[]).filter(slot=>slot.status==='SELECTED').map(slot=>slot.releaseId)]),true)
  const read=async(pointer:{releaseId:string;contentHash:string})=>{
   let release=cache.get(pointer.releaseId)
   if(!release){release=(await getContentRelease(db,pointer.releaseId,true))??undefined;if(release)cache.set(pointer.releaseId,release)}

@@ -12,6 +12,10 @@ import type {ResearchFrozenPublication} from './publication.service'
 import {assertPackageReportBytes,jsonBytes,PACKAGE_REPORT_MAX_CIPHER_BYTES,PACKAGE_REPORT_BUDGET_VERSION,hasPackageReportBudget} from './governed-package.budget'
 export async function persistGovernedPackageReports(tx:Prisma.TransactionClient,input:{projectId:string;waveId:string;finalId:string;sourceFinalHash:string;snapshot:ResearchFrozenPublication;calculated:SurveyComputedFinal}){
  let bytes=0,cipherBytes=0
+ // Per-package generation, cumulative budget asserts and content identity are
+ // unchanged; only the K single-row INSERTs below collapse into one
+ // multi-row statement in the same transaction (all-or-nothing either way).
+ const rows:Prisma.Sql[]=[]
  for(const p of input.snapshot.governedPackages??[]){
   if(!p.report&&!p.nativeBundle)continue
   const components=p.slots.map(s=>{const u=input.snapshot.units.find(u=>u.draftId===s.draftId&&u.instrumentKey===s.instrumentKey);if(!u)throw new Error('组合报告固定组件缺失');return {slotKey:s.slotKey,unit:{ref:{kind:u.kind},displayDefinition:u.displayDefinition}}})
@@ -23,8 +27,9 @@ export async function persistGovernedPackageReports(tx:Prisma.TransactionClient,
   bytes+=jsonBytes(value);assertPackageReportBytes(bytes,'生成合计')
   const hash=canonicalHash(value),cipher=encryptUnifiedRuntimePayload(value)
   cipherBytes+=Buffer.byteLength(cipher,'utf8');assertPackageReportBytes(cipherBytes,'生成密文合计',PACKAGE_REPORT_MAX_CIPHER_BYTES)
-  await tx.$executeRaw`INSERT INTO survey_package_report_artifacts(id,project_id,wave_id,final_id,import_id,tool_id,snapshot_hash,source_final_hash,report_hash,report_cipher,budget_version) VALUES(${randomUUID()},${input.projectId},${input.waveId},${input.finalId},${p.importId},${p.toolId},${p.hash},${input.sourceFinalHash},${hash},${cipher},${PACKAGE_REPORT_BUDGET_VERSION})`
+  rows.push(Prisma.sql`(${randomUUID()},${input.projectId},${input.waveId},${input.finalId},${p.importId},${p.toolId},${p.hash},${input.sourceFinalHash},${hash},${cipher},${PACKAGE_REPORT_BUDGET_VERSION})`)
  }
+ if(rows.length)await tx.$executeRaw(Prisma.sql`INSERT INTO survey_package_report_artifacts(id,project_id,wave_id,final_id,import_id,tool_id,snapshot_hash,source_final_hash,report_hash,report_cipher,budget_version) VALUES ${Prisma.join(rows)}`)
 }
 export async function readGovernedPackageReports(actor:string,input:{projectId:string;waveId:string;finalId:string;systemAccess?:SystemDataAccess}){return prisma.$transaction(async tx=>{
  if(input.systemAccess)await assertSystemSurveyDataAudit(tx,actor,input.projectId,input.systemAccess);else await authorizedProject(tx,actor,input.projectId,false)

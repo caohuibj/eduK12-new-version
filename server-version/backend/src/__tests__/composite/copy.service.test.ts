@@ -8,7 +8,7 @@ process.env.COGNITIVE_MODULE_ENABLED = 'true'
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     compositeAssessment: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
-    compositeAssessmentAttempt: { groupBy: vi.fn(), findMany: vi.fn(), count: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
+    compositeAssessmentAttempt: { groupBy: vi.fn(), findMany: vi.fn(), count: vi.fn(), aggregate: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
     cognitiveSession: { create: vi.fn(), count: vi.fn() },
     $queryRaw: vi.fn(),
     $queryRawUnsafe: vi.fn(),
@@ -131,6 +131,7 @@ beforeEach(() => {
   mockPrisma.course.findUnique.mockResolvedValue(teacherCourse)
   mockPrisma.compositeAssessmentAttempt.findFirst.mockResolvedValue(null)
   mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(0)
+  mockPrisma.compositeAssessmentAttempt.aggregate.mockResolvedValue({ _count: { _all: 0 }, _max: { attemptNo: null } })
   mockPrisma.compositeAssessmentAttempt.updateMany.mockResolvedValue({ count: 0 })
   mockPrisma.$queryRaw.mockImplementation(async (query: TemplateStringsArray) =>
     query.join('').includes('composite_assessment_attempts') ? [] : [{ id: 'attempt-1' }])
