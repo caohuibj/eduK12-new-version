@@ -1,5 +1,5 @@
 import { createHmac } from 'crypto'
-import { encryptCompactField } from '../assessment-runtime/compact-field-codec'
+import { compactAssessmentStorageEnabled, encryptCompactField } from '../assessment-runtime/compact-field-codec'
 import { encryptField, decryptField, HEX_32_BYTE_KEY } from '../../utils/encryption'
 import { getParticipantKey as getSharedParticipantKey } from '../assessment-runtime/participant-key'
 
@@ -73,6 +73,14 @@ export const encryptCognitivePayload = <T>(value: T): string => {
 
 // The compressed wire format retains the same authenticated domain envelope.
 export const encryptCompactCognitivePayload = <T>(value: T): string => encryptCompactField({ version: ENVELOPE_VERSION, value })
+
+/**
+ * Flag-aware writer for large stored Cognitive fields (result/config snapshots).
+ * Compact (ekc1) when ASSESSMENT_COMPACT_FACTS_ENABLED=true, otherwise hex.
+ * Reads already handle both formats via decryptField, so no read-side change.
+ */
+export const encryptCognitivePayloadForStorage = <T>(value: T): string =>
+  compactAssessmentStorageEnabled() ? encryptCompactCognitivePayload(value) : encryptCognitivePayload(value)
 
 // 严格解密：非加密格式直接抛错，绝不回退明文。
 export const decryptCognitivePayload = <T>(field: string): T => {

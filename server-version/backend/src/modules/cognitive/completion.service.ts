@@ -3,6 +3,7 @@ import { assertTrainingChildSelected } from '../composite/training-variant-child
 import { prisma } from '../../config/database'
 import {
   encryptCognitivePayload,
+  encryptCognitivePayloadForStorage,
   decryptCognitivePayload,
 } from './cognitive.security'
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
@@ -206,7 +207,7 @@ const completeV2Session = async (tx: any, session: any, snapshot: Awaited<Return
     assessmentContext: contextState.reference,
   })
 
-  const resultSnapshotEncrypted = encryptCognitivePayload(resultSnapshot)
+  const resultSnapshotEncrypted = encryptCognitivePayloadForStorage(resultSnapshot)
   const metricsEncrypted = encryptCognitivePayload(scored.metrics)
   // Keep the legacy compatibility column as a boolean flag map for existing
   // composite/export readers; the complete three-state quality object lives

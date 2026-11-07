@@ -4,7 +4,7 @@ import { BoundedArtifactCache } from './bounded-artifact-cache'
 import { canonicalHash, canonicalJsonBytes, retainImmutableCanonicalValue } from './canonical'
 import { encryptCompactField, decryptCompactField } from './compact-field-codec'
 import { encryptControlReference, decryptControlReference, isControlReferenceField } from './control-reference-codec'
-import { decryptCognitivePayload, encryptCognitivePayload } from '../cognitive/cognitive.security'
+import { decryptCognitivePayload, encryptCognitivePayloadForStorage } from '../cognitive/cognitive.security'
 import { sessionConfigFromStoredValue } from '../cognitive/v2/session-snapshot'
 import { sharedControlWritesEnabled } from './shared-control-records'
 
@@ -38,7 +38,7 @@ const read=async(key:string,db:Db=prisma):Promise<Entry>=>{
  return retain(key,verify(rows[0],key),db)
 }
 export const storeSharedCognitiveRuntime=async(snapshot:any,db:Db=prisma):Promise<string>=>{
- if(!sharedControlWritesEnabled())return encryptCognitivePayload(snapshot)
+ if(!sharedControlWritesEnabled())return encryptCognitivePayloadForStorage(snapshot)
  const artifact=withoutTime(snapshot),key=hash(artifact),bytes=canonicalJsonBytes(artifact).length
  if(bytes<1||bytes>MAX)throw new Error('Cognitive runtime size limit')
  let entry=cache.get(key)??(db!==prisma?txMap(db).get(key):undefined)

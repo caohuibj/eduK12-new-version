@@ -1,8 +1,6 @@
 import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
 import { shouldReconcileTrainingParent } from '../composite/training-variant-markers'
 import { assertCognitiveNewAdmissionEnabled, isCognitiveNewAdmissionEnabled } from './product-eligibility'
-import { encryptCompactCognitivePayload } from './cognitive.security'
-import { sharedControlWritesEnabled } from '../assessment-runtime/shared-control-records'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import {
@@ -19,7 +17,7 @@ import {
   validateSubmissionId,
 } from '../../services/instrumentFinalSubmit'
 import { loadFrozenMeasurementContext } from './profile-freeze'
-import { decryptCognitivePayload, encryptCognitivePayload, hashTrialPayload } from './cognitive.security'
+import { decryptCognitivePayload, encryptCognitivePayload, encryptCognitivePayloadForStorage, hashTrialPayload } from './cognitive.security'
 import { loadCognitiveSessionConfig } from './session.service'
 import { lockSession } from './session-lock'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
@@ -284,7 +282,7 @@ const prepareFinalCognitiveData = async (
       payloadEncrypted: encryptCognitivePayload(trial),
       payloadHash: hashTrialPayload(trial),
     })),
-    resultSnapshotEncrypted: (sharedControlWritesEnabled()?encryptCompactCognitivePayload(resultSnapshot):encryptCognitivePayload(resultSnapshot)),
+    resultSnapshotEncrypted: encryptCognitivePayloadForStorage(resultSnapshot),
     metricsEncrypted: encryptCognitivePayload(scored.metrics),
     qualityFlagsEncrypted: encryptCognitivePayload(scored.quality.flags),
   }))
