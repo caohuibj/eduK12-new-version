@@ -252,6 +252,13 @@ jobs:
       homepage_copy_plan: ${{ steps.scope.outputs.homepage_copy_plan }}
       frontend: ${{ steps.scope.outputs.frontend }}
       frontend_test: ${{ steps.scope.outputs.frontend_test }}
+      frontend_retest: ${{ steps.scope.outputs.frontend_retest }}
+      frontend_retest_file: ${{ steps.scope.outputs.frontend_retest_file }}
+      frontend_retest_case: ${{ steps.scope.outputs.frontend_retest_case }}
+      frontend_retest_source_run: ${{ steps.scope.outputs.frontend_retest_source_run }}
+      frontend_retest_source_sha: ${{ steps.scope.outputs.frontend_retest_source_sha }}
+      frontend_retest_gate_digest: ${{ steps.scope.outputs.frontend_retest_gate_digest }}
+      frontend_retest_report_digest: ${{ steps.scope.outputs.frontend_retest_report_digest }}
       image_build: ${{ steps.scope.outputs.image_build }}
       dependencies_frontend_only: ${{ steps.scope.outputs.dependencies_frontend_only }}
       frontend_affected: ${{ steps.scope.outputs.frontend_affected }}
@@ -290,7 +297,7 @@ jobs:
         with:
           node-version: '24.21.0'
       - name: verify bounded risk-tier routing and historical evidence refusal
-        run: node --test .github/scripts/ci-qualification.test.mjs .github/scripts/ci-backend-regression-reuse.test.mjs .github/scripts/ci-legacy-retirement.test.mjs
+        run: node --test .github/scripts/ci-qualification.test.mjs .github/scripts/ci-backend-regression-reuse.test.mjs .github/scripts/ci-legacy-retirement.test.mjs .github/scripts/ci-frontend-retest.test.mjs
       - name: fetch the exact diff base without full history
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -551,10 +558,14 @@ jobs:
         run: |
           mkdir -p "$HOME/.npm"
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
       - name: npm ci
         run: npm ci
+      - name: prepare canvas source-build dependencies
+        run: |
+          node -e "require('canvas')" 2>/dev/null || (
+            bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+            npm rebuild canvas
+          )
       - name: content routing boundary tests
         run: node --test ../../.github/scripts/cognitive-content.test.mjs ../../.github/scripts/content-workflows.test.mjs
       - name: prisma generate
@@ -651,11 +662,16 @@ jobs:
         run: |
           mkdir -p "$HOME/.npm"
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
       - name: backend npm ci
         working-directory: server-version/backend
         run: npm ci
+      - name: prepare canvas source-build dependencies
+        working-directory: server-version/backend
+        run: |
+          node -e "require('canvas')" 2>/dev/null || (
+            bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+            npm rebuild canvas
+          )
       - name: backend prisma generate
         working-directory: server-version/backend
         run: npx prisma generate
@@ -784,8 +800,11 @@ jobs:
       authoring_polish: ${{ needs.scope.outputs.authoring_polish == 'true' }}
       runner_labels: '["ubuntu-24.04"]'
       affected_only: ${{ needs.scope.outputs.frontend_affected == 'true' }}
+      retry_only: ${{ needs.scope.outputs.frontend_retest == 'true' }}
+      retry_file: ${{ needs.scope.outputs.frontend_retest_file }}
+      retry_case: ${{ needs.scope.outputs.frontend_retest_case }}
       catalog_discovery: ${{ needs.scope.outputs.scenario == 'catalog-discovery' }}
-      cognitive_owned_by_backend: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.frontend == 'true' && needs.scope.outputs.frontend_affected != 'true' && needs.scope.outputs.scenario != 'dependencies' }}
+      cognitive_owned_by_backend: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.frontend_affected != 'true' && needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.scenario == 'platform' && needs.scope.outputs.backend_focus != 'form-intake')) }}
       base_sha: ${{ needs.scope.outputs.diff_base }}
 
   browser:
@@ -1146,5 +1165,12 @@ jobs:
         npm ci --ignore-scripts --prefix .github/release-tools
         mkdir -p server-version/backend/node_modules
         test -e server-version/backend/node_modules/typescript || ln -s "$PWD/.github/release-tools/node_modules/typescript" server-version/backend/node_modules/typescript
+    - name: preserve original required-check evidence for safe future retests
+      uses: actions/upload-artifact@v4
+      with:
+        name: ci-gate-evidence-run-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/merge-gate-needs-${{ github.run_id }}-${{ github.run_attempt }}.json
+        if-no-files-found: error
+        retention-days: 3
     - name: require exact success for the selected route
       run: node .github/scripts/merge-gate.mjs

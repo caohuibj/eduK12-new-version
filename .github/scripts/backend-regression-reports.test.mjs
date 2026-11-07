@@ -49,6 +49,8 @@ test('four serial shards and the retained fixture lane cover the exact existing 
   for(const group of regressionGroups)assert.ok(plan.groups[group].length>0);
   const sizes=regressionGroups.slice(1).map(group=>plan.groups[group].length);
   assert.ok(Math.max(...sizes)-Math.min(...sizes)<=1);
+  const heavyCounts=regressionGroups.slice(1).map(group=>plan.groups[group].filter(file=>/(?:\.(?:postgres|http|cli)\.|\/integration\/)/.test(file)).length);
+  assert.ok(Math.max(...heavyCounts)-Math.min(...heavyCounts)<=1);
   for(const leaf of ['trainingStandaloneScaleGroup','trainingStandaloneCognitiveGroup','trainingLegacyScaleStart',
     'teacherPrivateCompositionLongitudinal','teacherNumericGroup','teacherNumericPartial','teacherNativeGroup',
     'teacherGroupTransaction','teacherPersonalLongitudinal.browser','schoolPersonalLongitudinal.browser'])
@@ -56,7 +58,9 @@ test('four serial shards and the retained fixture lane cover the exact existing 
   for(const file of ['assessment-authorization/education-draft-replacement-audit.postgres.integration.test.ts',
     'survey/onboarding-pagination.postgres.integration.test.ts','scale/pr356-entry-lifecycle.postgres.integration.test.ts',
     'measurement-content/private-reference-expiry.postgres.integration.test.ts',
-    'bundle-onboarding/education-native-continuation.postgres.integration.test.ts'])
+    'bundle-onboarding/education-native-continuation.postgres.integration.test.ts',
+    'cognitive/four-task-integration.test.ts','cognitive/unknown-task-onboarding.test.ts',
+    'reporting/group-longitudinal.test.ts','survey/personal-tracking.postgres.integration.test.ts'])
     assert.ok(plan.groups.fixtures.includes(`src/__tests__/${file}`),file);
   assert.throws(()=>partitionRegressionFiles([...files,files[0]],excluded));
   assert.throws(()=>partitionRegressionFiles(files,[...excluded,'src/__tests__/missing.test.ts']));

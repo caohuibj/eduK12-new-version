@@ -155,10 +155,14 @@ jobs:
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: check hosted runner disk headroom
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
       - name: npm ci
         run: npm ci
+      - name: prepare canvas source-build dependencies
+        run: |
+          node -e "require('canvas')" 2>/dev/null || (
+            bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+            npm rebuild canvas
+          )
       - name: prisma generate and guarded migration
         run: |
           npx prisma generate
@@ -223,6 +227,7 @@ jobs:
           docker exec "$CI_POSTGRES_SERVICE_ID" psql -X -v ON_ERROR_STOP=1 -U ptool -d pr363_runtime_test -c "CREATE ROLE pr363_runtime LOGIN PASSWORD 'synthetic-runtime-only' NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS; REVOKE CREATE ON DATABASE pr363_runtime_test FROM PUBLIC; REVOKE CREATE ON SCHEMA public FROM PUBLIC; GRANT CONNECT ON DATABASE pr363_runtime_test TO pr363_runtime; GRANT USAGE ON SCHEMA public TO pr363_runtime;"
           docker exec -i "$CI_POSTGRES_SERVICE_ID" psql -X -v ON_ERROR_STOP=1 -U ptool -d pr363_runtime_test -v target_database=pr363_runtime_test -v migration_owner=ptool -v runtime_role=pr363_runtime -v "table_policy=$(cat scripts/runtime-table-policy.json)" < scripts/runtime-role-defaults.sql
       - name: frontend dependencies for cross-tree Cognitive package tests
+        if: matrix.group == 'fixtures' || matrix.group == 'focused'
         working-directory: server-version/frontend
         run: npm ci --ignore-scripts
       - name: validate regression selection
@@ -469,6 +474,7 @@ jobs:
           LEGACY_RESOURCE_ID: ${{ steps.legacy-feedback.outputs.resource_id }}
         run: |
           status=0
+          pids=()
           for variant in marker feedback-policy standard-marker license-selection publication; do
             if [[ "$variant" == feedback-policy && -z "$LEGACY_RESOURCE_ID" ]]; then
               echo 'Feedback consumer not run: its real legacy publication producer failed.'
@@ -479,7 +485,13 @@ jobs:
             target="postgresql://ptool:ptool123@localhost:5432/${database}?schema=public"
             legacy=()
             if [[ "$variant" == feedback-policy ]]; then legacy=("EDUCATION_PRIVATE_MARKER_RESOURCE_ID=$LEGACY_RESOURCE_ID"); fi
-            if ! env -u EDUCATION_PRIVATE_MARKER_RESOURCE_ID DATABASE_URL="$target" EDUCATION_MARKER_TEST_DATABASE_URL="$target" EDUCATION_ASSESSMENT_PUBLICATION_TEST_DATABASE_URL="$target" "${legacy[@]}" npm test -- "src/__tests__/education-tools/assessment-resource.${variant}.postgres.integration.test.ts" --no-file-parallelism --reporter=default --reporter=json --outputFile="/tmp/eduk12-education-${variant}.json"; then status=1; fi
+            (
+              env -u EDUCATION_PRIVATE_MARKER_RESOURCE_ID DATABASE_URL="$target" EDUCATION_MARKER_TEST_DATABASE_URL="$target" EDUCATION_ASSESSMENT_PUBLICATION_TEST_DATABASE_URL="$target" "${legacy[@]}" npm test -- "src/__tests__/education-tools/assessment-resource.${variant}.postgres.integration.test.ts" --no-file-parallelism --reporter=default --reporter=json --outputFile="/tmp/eduk12-education-${variant}.json"
+            ) &
+            pids+=("$!")
+          done
+          for pid in "${pids[@]}"; do
+            if ! wait "$pid"; then status=1; fi
           done
           exit "$status"
       - name: exact historical schema upgrade and native artifact restore

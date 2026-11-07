@@ -41,6 +41,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
+          cache-dependency-path: |
+            server-version/frontend/package-lock.json
+            ci/browser/package-lock.json
       - run: node .github/scripts/runner-preflight.mjs --frontend
       - name: install only frontend and browser runtime
         run: |
