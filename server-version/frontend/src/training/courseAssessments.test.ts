@@ -53,7 +53,8 @@ describe('course-scope measurement projection', () => {
       }] } }) : fallback(url))
     const row = (await loadCourseAssessments(course, true)).items.find(item => item.key === 'composite:delivered')
     expect(row).toMatchObject({ action: '继续测评', href: '/student/composite/attempts/existing', reportHref: '/student/composite/attempts/completed/report' })
-    expect(get).toHaveBeenCalledWith('/courses/my/tasks?page=1&pageSize=100&courseId=' + course)
+    // The availability list is the single authority; the task feed is never re-read.
+    expect(get.mock.calls.every(([url]) => !String(url).includes('/courses/my/tasks'))).toBe(true)
   })
 
   it('retains archived completed feedback without offering another attempt', () => {
@@ -79,7 +80,7 @@ describe('course-scope measurement projection', () => {
     expect(get).toHaveBeenCalledWith('/scales/available', { params: { courseId: course } })
     expect(myCognitive).toHaveBeenCalledTimes(1)
     expect(get).toHaveBeenCalledWith('/composite-assessments/available', { params: { courseId: course, view: 'summary' } })
-    expect(get).toHaveBeenCalledWith('/courses/my/tasks?page=1&pageSize=100&courseId=' + encodeURIComponent(course))
+    expect(get.mock.calls.every(([url]) => !String(url).includes('/courses/my/tasks'))).toBe(true)
   })
 
   it('distinguishes exhausted cognitive quotas without offering an implicit fresh start', () => {
