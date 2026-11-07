@@ -184,10 +184,13 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
     (a.deadline??'9999').localeCompare(b.deadline??'9999')||
     a.kind.localeCompare(b.kind)||a.id.localeCompare(b.id))
   const offset=(input.page-1)*input.pageSize
+  const hasMore=offset+input.pageSize<tasks.length
+  // Do not expose the next Run batch until the caller drains this batch's
+  // local pages; otherwise advancing early skips tasks after page 1.
   return {list:tasks.slice(offset,offset+input.pageSize),total:tasks.length,page:input.page,
-    hasMore:offset+input.pageSize<tasks.length,
+    hasMore,
     truncated:activityRows.length>200||assigned.truncated,
-    nextRunCursor:assigned.nextCursor}
+    nextRunCursor:hasMore?null:assigned.nextCursor}
 }
 
 /** One bounded parent inbox. Uses the same canonical Run population gate as
