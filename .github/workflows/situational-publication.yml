@@ -3,6 +3,13 @@ on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'server-version/backend/src/modules/situational/**'
+      - 'server-version/backend/src/scripts/situational-*'
+      - 'server-version/backend/scripts/situational-*'
+      - 'server-version/backend/package.json'
+      - 'server-version/backend/package-lock.json'
+      - '.github/workflows/situational-publication.yml'
   pull_request_review:
     types: [submitted, dismissed]
 permissions:
@@ -60,6 +67,8 @@ jobs:
         if: steps.scope.outputs.relevant == 'true'
         with:
           node-version: '24.21.0'
+          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
+          cache-dependency-path: server-version/backend/package-lock.json
       - run: npm ci --ignore-scripts
         if: steps.scope.outputs.relevant == 'true'
         working-directory: server-version/backend

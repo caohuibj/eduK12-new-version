@@ -117,14 +117,16 @@ test('affected frontend workflow conditions agree with the existing merge jobs',
   assert.match(frontend,/\['related','--run',\.\.\.files\]/);
   assert.doesNotMatch(frontend,/npm test -- --changed/);
   assert.match(frontend,/report\.numPassedTests>0/,'a missing related-test result cannot pass');
-  assert.match(frontend,/if: inputs\.affected_only != true && inputs\.cognitive_owned_by_backend != true\n        run: npm test/);
-  const full=frontend.match(/name: full frontend tests\n        if: (.+)\n/)[1];
+  assert.match(frontend,/if: inputs\.affected_only != true && inputs\.cognitive_owned_by_backend != true && !inputs\.retry_only\n        run: npm test -- --reporter=default --reporter=json/);
+  const full=frontend.match(/name: full frontend tests\n        id: full-frontend-tests\n        if: (.+)\n/)[1];
   const partition=frontend.match(/name: frontend tests excluding exact onboarding-owned suites\n        if: (.+)\n/)[1];
-  for(const affected_only of [false,true])for(const cognitive_owned_by_backend of [false,true]){
-    const inputs={affected_only,cognitive_owned_by_backend};
+  const retest=frontend.match(/name: rerun exactly the repaired frontend test file after proven full CI\n        if: (.+)\n/)[1];
+  for(const affected_only of [false,true])for(const cognitive_owned_by_backend of [false,true])for(const retry_only of [false,true]){
+    const inputs={affected_only,cognitive_owned_by_backend,retry_only};
     const enabled=expression=>Boolean(new Function('inputs',`return (${expression})`)(inputs));
-    assert.equal(enabled(full),!affected_only&&!cognitive_owned_by_backend);
-    assert.equal(enabled(partition),!affected_only&&cognitive_owned_by_backend);
+    assert.equal(enabled(full),!affected_only&&!cognitive_owned_by_backend&&!retry_only);
+    assert.equal(enabled(partition),!affected_only&&cognitive_owned_by_backend&&!retry_only);
+    assert.equal(enabled(retest),retry_only);
   }
 });
 test('all three content domains and combined content qualify', () => {
@@ -330,6 +332,33 @@ test('UI-only route saves backend regression but retains real API browser, Docke
   for (const job of requiredChecks(needs,false))
     for (const result of ['skipped','cancelled','failure',undefined])
       assert.ok(failedChecks({...needs,[job]:{result}},false).includes(job));
+});
+test('Dimension 1: pure frontend PR routes to frontend scenario skipping backend regression with fail-closed security', () => {
+  const pureFrontendEntries = [
+    {file: 'server-version/frontend/src/school/SchoolApp.tsx', status: 'M', oldMode: '100644', newMode: '100644'},
+    {file: 'server-version/frontend/src/school/SchoolApp.test.tsx', status: 'M', oldMode: '100644', newMode: '100644'}
+  ];
+  const classified = classifyChanges(pureFrontendEntries);
+  assert.equal(classified.frontend, true);
+  assert.equal(classified.content, false);
+  assert.equal(classified.backend_modules, false);
+  assert.equal(classified.frontend_test, false);
+
+  // Merge gate requirements for scenario: 'frontend'
+  const needs = {scope: {result: 'success', outputs: scopeOutputs('false', 'false', 'true')}};
+  const required = requiredChecks(needs, false);
+  assert.deepEqual(required, ['scope', 'backend-browser-build', 'frontend', 'browser', 'docker', 'frontend-build', 'codeql']);
+  assert.ok(!required.includes('backend'));
+  assert.ok(!required.includes('backend-regression'));
+
+  // Touching backend code immediately escalates to platform
+  const mixedEntries = [
+    ...pureFrontendEntries,
+    {file: 'server-version/backend/src/routes/auth.ts', status: 'M', oldMode: '100644', newMode: '100644'}
+  ];
+  const mixedClassified = classifyChanges(mixedEntries);
+  assert.equal(mixedClassified.frontend, false);
+  assert.equal(mixedClassified.backend_modules, false);
 });
 test('measurement pages and React hooks use full frontend without widening narrow shortcuts',()=>{
   const src='server-version/frontend/src/';

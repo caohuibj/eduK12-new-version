@@ -5,7 +5,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
 import { lockAndAssertCampusActivityEditor, CampusActivityError } from './activity.service'
-import { listAssignedRunTasks } from '../assessment-run/productRead'
+import { listAssignedRunTasks, type RunTaskCursor } from '../assessment-run/productRead'
 
 const deny=(code:string,status=409):never=>{throw new CampusActivityError(code,status)}
 export type CampusTaskType='ASSIGNMENT'|'READING'|'CHECKIN'
@@ -44,6 +44,11 @@ export async function addCampusActivityTask(input:{
 type CampusActivityForStudent={courseId:string;organizationId:string;title:string}
 export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:{
   page:number;pageSize:number;activityId?:string
+  /** Keyset bookmark for the Run-task portion only (same contract as the
+   * /inbox reader): assignments and check-ins stay complete within the
+   * authorized activity set, while Run tasks past the former hard 100-execution
+   * cut become reachable by following nextRunCursor. */
+  runCursor?:RunTaskCursor
 }) {
   if(actor.accountDomain!=='SCHOOL'||actor.role!=='STUDENT')deny('CAMPUS_STUDENT_REQUIRED',403)
   // Membership, admission and current class/student assignment are all live
@@ -84,22 +89,36 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
         WHERE d."organization_id"=o."id" AND d."user_id"=${actor.userId}
           AND d."lifted_at" IS NULL
           AND d."permission" IN ('*','EDUCATION_ACCESS','HUISCHOOL_ACCESS','ACTIVITY_READ','RUN_START'))
+      -- A directed activityId lookup filters in the database: an in-memory
+      -- filter after LIMIT 201 would wrongly hide an authorized activity that
+      -- sorts beyond the first 201 rows.
+      ${input.activityId?Prisma.sql`AND a."course_id"=${input.activityId}`:Prisma.empty}
     ORDER BY a."course_id" LIMIT 201
   `
-  const authorized=input.activityId?activityRows.filter(a=>a.courseId===input.activityId):activityRows
+  const authorized=activityRows
   const ids=authorized.map(a=>a.courseId)
-  if(!ids.length)return {list:[],total:0,page:input.page,hasMore:false,truncated:activityRows.length>200}
-  const [assignments,checkins,linkedRuns]=await Promise.all([
-    prisma.assignment.findMany({
+  if(!ids.length)return {list:[],total:0,page:input.page,hasMore:false,truncated:activityRows.length>200,nextRunCursor:null as RunTaskCursor|null}
+  // Later Run-task batches consume neither assignments nor check-ins: skip
+  // those two reads entirely instead of fetching and discarding them.
+  type AssignmentRow={id:string;courseId:string;title:string;deadline:Date|null;tags:string[];submissions:Array<{status:string}>}
+  type CheckinRow={id:string;courseId:string;title:string;endTime:Date|null;submissions:Array<{id:string}>}
+  const assignmentReads:Promise<AssignmentRow[]>=input.runCursor
+    ?Promise.resolve([])
+    :prisma.assignment.findMany({
       where:{courseId:{in:ids},status:'PUBLISHED'},
       select:{id:true,courseId:true,title:true,deadline:true,tags:true,
         submissions:{where:{studentId:actor.userId},select:{status:true}}},
-    }),
-    prisma.checkin.findMany({
+    })
+  const checkinReads:Promise<CheckinRow[]>=input.runCursor
+    ?Promise.resolve([])
+    :prisma.checkin.findMany({
       where:{courseId:{in:ids}},
       select:{id:true,courseId:true,title:true,endTime:true,
         submissions:{where:{studentId:actor.userId},select:{id:true}}},
-    }),
+    })
+  const [assignments,checkins,linkedRuns]=await Promise.all([
+    assignmentReads,
+    checkinReads,
     prisma.$queryRaw<Array<{courseId:string;runId:string}>>`
       SELECT ar."course_id" AS "courseId", ar."run_id" AS "runId"
       FROM "campus_activity_runs" ar
@@ -111,6 +130,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
   const assigned=await listAssignedRunTasks(actor.userId,{
     runIds:linkedRuns.map(link=>link.runId),
     preserveBoundSchoolContinuation:true,
+    cursor:input.runCursor,
   })
   const runMap=new Map(linkedRuns.map(r=>[r.runId,r.courseId]))
   const activityMap=new Map(authorized.map(a=>[a.courseId,a]))
@@ -164,22 +184,30 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
     (a.deadline??'9999').localeCompare(b.deadline??'9999')||
     a.kind.localeCompare(b.kind)||a.id.localeCompare(b.id))
   const offset=(input.page-1)*input.pageSize
+  const hasMore=offset+input.pageSize<tasks.length
+  // Do not expose the next Run batch until the caller drains this batch's
+  // local pages; otherwise advancing early skips tasks after page 1.
   return {list:tasks.slice(offset,offset+input.pageSize),total:tasks.length,page:input.page,
-    hasMore:offset+input.pageSize<tasks.length,
-    truncated:activityRows.length>200||assigned.truncated}
+    hasMore,
+    truncated:activityRows.length>200||assigned.truncated,
+    nextRunCursor:hasMore?null:assigned.nextCursor}
 }
 
 /** One bounded parent inbox. Uses the same canonical Run population gate as
  * student tasks; returns no subject name, sensitive scores or FINAL artefacts.
+ * Pages use the same microsecond keyset cursor as the shared Run reader; the
+ * (created_at, run_id) pair makes the former created_at-only order total.
  */
-export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal){
+export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal,cursor?:RunTaskCursor){
   if(actor.accountDomain!=='SCHOOL'||actor.role!=='PARENT')
     deny('CAMPUS_PARENT_REQUIRED',403)
+  const cursorScope=cursor?Prisma.sql`AND (ar."created_at", ar."run_id") < (${cursor.createdAt}::timestamptz, ${cursor.id})`:Prisma.empty
   const links=await prisma.$queryRaw<Array<{
-    organizationId:string;courseId:string;runId:string;activityTitle:string
+    organizationId:string;courseId:string;runId:string;activityTitle:string;createdAtMicros:string
   }>>`
     SELECT ar."organization_id" AS "organizationId",
       ar."course_id" AS "courseId",ar."run_id" AS "runId",
+      to_char(ar."created_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros",
       course."title" AS "activityTitle"
     FROM "campus_activity_runs" ar
     JOIN "campus_activities" a ON a."course_id"=ar."course_id"
@@ -190,7 +218,10 @@ export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal){
       AND o."product_domain"='SCHOOL' AND o."status"='ACTIVE'
     JOIN "assessment_runs" r ON r."id"=ar."run_id"
       AND r."organization_id"=ar."organization_id"
-    WHERE ((a."status"='OPEN' AND (r."status"='PUBLISHED' OR (r."status"='CLOSED' AND EXISTS (
+    -- The whole disjunction is parenthesized so the keyset cursorScope below
+    -- AND-joins at the top level; unparenthesized, AND would bind inside the
+    -- second branch only and the cursor would never advance page 1's rows.
+    WHERE (((a."status"='OPEN' AND (r."status"='PUBLISHED' OR (r."status"='CLOSED' AND EXISTS (
         SELECT 1 FROM "assessment_run_executions" eligible
         WHERE eligible."organization_id"=r."organization_id" AND eligible."run_id"=r."id"
           AND ${boundCompositeContinuationSql(Prisma.sql`eligible."id"`,actor.userId)}
@@ -211,11 +242,12 @@ export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal){
         AND link."revoked_at" IS NULL
     )) OR EXISTS (SELECT 1 FROM assessment_run_executions history_execution
       WHERE history_execution.organization_id=ar.organization_id AND history_execution.run_id=ar.run_id
-        AND ${completedSchoolOrdinaryFeedbackSql(Prisma.sql`history_execution.id`,actor.userId)})
-    ORDER BY ar."created_at" DESC LIMIT 101
+        AND ${completedSchoolOrdinaryFeedbackSql(Prisma.sql`history_execution.id`,actor.userId)}))
+      ${cursorScope}
+    ORDER BY ar."created_at" DESC, ar."run_id" DESC LIMIT 101
   `
   const indexed=links.slice(0,100)
-  if(!indexed.length)return {list:[],truncated:links.length>100}
+  if(!indexed.length)return {list:[],truncated:links.length>100,nextCursor:null as RunTaskCursor|null}
   const tasks=await listAssignedRunTasks(actor.userId,{runIds:indexed.map(l=>l.runId),preserveBoundSchoolContinuation:true,includeCompletedSchoolFeedback:true})
   const byRun=new Map(indexed.map(l=>[l.runId,l]))
   const list=tasks.list.filter(t=>byRun.has(t.runId)).map(t=>{
@@ -231,5 +263,7 @@ export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal){
       // No child identifiers, reports, psychometric scores or raw responses.
     }
   })
-  return {list,truncated:links.length>100||tasks.truncated}
+  const last=indexed[indexed.length-1]
+  return {list,truncated:links.length>100||tasks.truncated,
+    nextCursor:links.length>100&&last?{createdAt:last.createdAtMicros,id:last.runId}:null}
 }

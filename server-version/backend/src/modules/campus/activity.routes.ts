@@ -11,6 +11,7 @@ import { checkinController } from '../../controllers/checkinController'
 import { allocateCampusActivityParticipants, revokeCampusActivityParticipant, listCampusActivityEligibleClasses } from './activity.allocation'
 import { addCampusActivityTask, listCampusStudentTasks, listCampusParentRunTasks } from './activity.tasks'
 import { listCampusTeacherRunTasks } from './teacher-tasks'
+import { decodeRunTaskCursor, encodeRunTaskCursor } from '../assessment-run/productRead'
 import { readCampusStudentStatus } from './admission.service'
 import { campusStudentReference } from './studentReference'
 import {
@@ -127,8 +128,11 @@ router.post('/organizations/:organizationId/activities/:courseId/tasks',
   }))
 
 router.get('/my/teacher-run-tasks',authenticateSchool,wrap(async(req,res)=>{
-  const query=z.object({organizationId:uuid}).strict().parse(req.query)
-  return success(res,await listCampusTeacherRunTasks(req.user!,query.organizationId))
+  const query=z.object({organizationId:uuid,cursor:z.string().max(500).optional()}).strict().parse(req.query)
+  let cursor
+  try{cursor=decodeRunTaskCursor(query.cursor)}catch{throw new CampusActivityError('CAMPUS_TASK_CURSOR_INVALID',400)}
+  const result=await listCampusTeacherRunTasks(req.user!,query.organizationId,cursor)
+  return success(res,{...result,nextCursor:result.nextCursor?encodeRunTaskCursor(result.nextCursor):null})
 }))
 router.get('/my/student-reference',authenticateSchool,wrap(async(req,res)=>{
   if(req.user?.accountDomain!=='SCHOOL'||req.user.role!=='STUDENT')
@@ -138,16 +142,24 @@ router.get('/my/student-reference',authenticateSchool,wrap(async(req,res)=>{
     throw new CampusActivityError('CAMPUS_STUDENT_NOT_APPROVED',403)
   return success(res,{reference:campusStudentReference(status.organizationId,req.user.userId)})
 }))
-router.get('/my/parent-run-tasks',authenticateSchool,wrap(async(req,res)=>
-  success(res,await listCampusParentRunTasks(req.user!))
-))
+router.get('/my/parent-run-tasks',authenticateSchool,wrap(async(req,res)=>{
+  const query=z.object({cursor:z.string().max(500).optional()}).strict().parse(req.query)
+  let cursor
+  try{cursor=decodeRunTaskCursor(query.cursor)}catch{throw new CampusActivityError('CAMPUS_TASK_CURSOR_INVALID',400)}
+  const result=await listCampusParentRunTasks(req.user!,cursor)
+  return success(res,{...result,nextCursor:result.nextCursor?encodeRunTaskCursor(result.nextCursor):null})
+}))
 router.get('/my/activity-tasks',authenticateSchool,wrap(async(req,res)=>{
   const query=z.object({
     page:z.coerce.number().int().min(1).default(1),
     pageSize:z.coerce.number().int().min(1).max(100).default(25),
     activityId:uuid.optional(),
+    runCursor:z.string().max(500).optional(),
   }).parse(req.query)
-  return success(res,await listCampusStudentTasks(req.user!,query))
+  let runCursor
+  try{runCursor=decodeRunTaskCursor(query.runCursor)}catch{throw new CampusActivityError('CAMPUS_TASK_CURSOR_INVALID',400)}
+  const result=await listCampusStudentTasks(req.user!,{...query,runCursor})
+  return success(res,{...result,nextRunCursor:result.nextRunCursor?encodeRunTaskCursor(result.nextRunCursor):null})
 }))
 
 // Existing Submission/CheckinSubmission runtimes remain authoritative;

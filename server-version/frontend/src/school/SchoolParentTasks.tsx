@@ -26,6 +26,10 @@ export function SchoolParentTasks(props:{api:SchoolApi}){
 }
 function ParentTasksSession({api}:{api:SchoolApi}){
   const [tasks,setTasks]=useState<ParentRunTask[]|null>(null)
+  // Forward-only keyset: 加载更多 appends the next batch; refresh restarts.
+  const [cursor,setCursor]=useState<string|null>(null)
+  const [hasMore,setHasMore]=useState(false)
+  const cursorRef=useRef<string|null>(null);cursorRef.current=cursor
   const [active,setActive]=useState<{execution:CampusExecutionRef;task:ParentRunTask}|null>(null)
   const [feedback,setFeedback]=useState<ParentRunTask|null>(null)
   const renderFeedback=useMemo(()=>createEducationAssessmentFeedback({api,entry:'SCHOOL'}),[api])
@@ -35,12 +39,16 @@ function ParentTasksSession({api}:{api:SchoolApi}){
   const scope=useMemo(()=>({pending:false}),[api])
   const currentScope=useRef<typeof scope|null>(scope)
   currentScope.current=scope
-  const refresh=useCallback(async()=>{
+  const refresh=useCallback(async(append=false)=>{
     if(currentScope.current!==scope||scope.pending)return
     scope.pending=true;setBusy(true);setError('')
     try{
-      const result=await api<{list:ParentRunTask[]}>('/my/parent-run-tasks')
-      if(currentScope.current===scope){setTasks(result.list)}
+      const activeCursor=append?cursorRef.current:null
+      const result=await api<{list:ParentRunTask[];nextCursor?:string|null}>('/my/parent-run-tasks'+(activeCursor?'?cursor='+encodeURIComponent(activeCursor):''))
+      if(currentScope.current===scope){
+        setTasks(prev=>append&&prev?[...prev,...result.list]:result.list)
+        setCursor(result.nextCursor??null);setHasMore(Boolean(result.nextCursor))
+      }
     }catch(e){
       if(currentScope.current===scope)setError(e instanceof Error?e.message:'家长测评任务暂不可用')
     }finally{
@@ -81,6 +89,10 @@ function ParentTasksSession({api}:{api:SchoolApi}){
           {task.status==='COMPLETED'&&task.feedbackMode==='COMPOSITION'&&<button disabled={busy} onClick={()=>{setActive(null);setFeedback(task)}}>查看完成反馈</button>}</div>
       </article>)}</div>}
       {tasks&&tasks.length>0&&visible.length===0&&<p className="hs-collection-empty">没有匹配的观察任务，请尝试其他关键词。</p>}
+      {tasks&&hasMore&&<div className="hs-actions hs-parent-task-pagination">
+        <button disabled={busy} onClick={()=>void refresh(true)}>加载更多观察任务</button>
+        <span>已加载 {tasks.length} 项</span>
+      </div>}
     </details>
     {feedback&&renderFeedback({executionId:feedback.executionId,title:feedback.runTitle,mode:'COMPOSITION',onClose:()=>setFeedback(null)})}
     {active&&<SchoolCompositeRunner key={active.execution.executionId} api={api} execution={active.execution} observer observerRole="parent" observerTaskTitle={active.task.runTitle}

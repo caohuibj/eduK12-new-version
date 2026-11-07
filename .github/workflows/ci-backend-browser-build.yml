@@ -33,12 +33,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
+          cache-dependency-path: |
+            server-version/backend/package-lock.json
+            server-version/frontend/package-lock.json
       - name: verify runner capacity and clean application ports
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
-      - name: npm ci
-        run: npm ci
+      - name: backend npm ci (with canvas self-healing)
+        run: |
+          if ! npm ci; then
+            echo "::warning::npm ci failed, attempting canvas system dependencies self-healing..."
+            bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+            npm ci
+          fi
+          node -e "require('canvas')"
       - name: prisma generate
         run: npx prisma generate
       - name: Cognitive onboarding with frontend acceptances

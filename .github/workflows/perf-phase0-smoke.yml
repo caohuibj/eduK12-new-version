@@ -79,14 +79,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
+          cache-dependency-path: server-version/backend/package-lock.json
       - name: verify runner capacity and clean application ports
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - uses: grafana/setup-k6-action@v1
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
-      - name: install backend dependencies
+      - name: install backend dependencies (with canvas self-healing)
         working-directory: server-version/backend
-        run: npm ci
+        run: |
+          if ! npm ci; then
+            echo "::warning::npm ci failed, attempting canvas system dependencies self-healing..."
+            bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+            npm ci
+          fi
+          node -e "require('canvas')"
       - name: generate Prisma client and migrate disposable database
         working-directory: server-version/backend
         run: |

@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import fs from 'node:fs/promises'
 import { ExportArtifactStatus, UserRole } from '../backend/node_modules/@prisma/client'
 import { prisma } from '../backend/src/config/database'
-import { closeQueues } from '../backend/src/config/queue'
+import { closeQueues, exportQueue } from '../backend/src/config/queue'
 import { enqueueExportJob } from '../backend/src/services/exportJobService'
 import { validateStorageKey } from '../backend/src/services/exportArtifactService'
 import '../backend/src/workers/exportProcessor'
@@ -76,6 +76,14 @@ async function main(): Promise<void> {
     if (batch.status !== expected) {
       throw new Error(`expected ${expected}, got ${batch.status} (${batch.errorCode || 'no error code'})`)
     }
+    while (
+      ((await exportQueue.getActiveCount()) > 0 ||
+        (await exportQueue.getWaitingCount()) > 0 ||
+        (await exportQueue.getDelayedCount()) > 0) &&
+      Date.now() < deadline
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, 100))
+    }
   
     const artifact = await prisma.exportArtifact.findFirst({ where: { batchId } })
     if (!artifact) throw new Error('export artifact missing')
@@ -101,7 +109,7 @@ async function main(): Promise<void> {
     }
     if (scaleId) await prisma.scale.deleteMany({ where: { id: scaleId } }).catch(() => undefined)
     if (userId) await prisma.user.deleteMany({ where: { id: userId } }).catch(() => undefined)
-    await closeQueues(true).catch(() => undefined)
+    await closeQueues(false).catch(() => undefined)
     await prisma.$disconnect().catch(() => undefined)
   }
   

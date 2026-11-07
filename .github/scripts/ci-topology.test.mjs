@@ -37,7 +37,7 @@ test('Cognitive suite ownership partitions exact declared files and keeps both j
  for(const result of ['failure','skipped','cancelled',undefined])assert(failedChecks({...complete,'backend-browser-build':{result}},false).length);
  const workflow=readFileSync(new URL('../workflows/ci-frontend.yml',import.meta.url),'utf8');
  assert.match(workflow,/cognitive_owned_by_backend:\n\s+type: boolean\n\s+default: false/);
- assert.match(workflow,/inputs\.cognitive_owned_by_backend != true\n\s+run: npm test/);
+ assert.match(workflow,/inputs\.cognitive_owned_by_backend != true && !inputs\.retry_only\n\s+run: npm test -- --reporter=default --reporter=json/);
  assert.match(workflow,/run: node \.\.\/scripts\/cognitive\/frontend-tests\.cjs --onboarding-owned-by-backend/);
 });
 

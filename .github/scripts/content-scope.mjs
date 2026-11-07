@@ -306,6 +306,9 @@ export function runnerPlan({ profile = 'hosted', scenario = 'platform' } = {}) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  // Keep the module itself synchronous: merge-gate imports this classifier.
+  // A top-level await of the verifier would deadlock that import cycle.
+  void (async()=>{
   const event = process.env.CI_EVENT;
   const full = process.env.CI_FORCE_FULL === 'true';
   const head = execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
@@ -381,7 +384,16 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
       [key, Array.isArray(value) ? JSON.stringify(value) : value])) };
+  // Cross-commit retest shortcut is suspended (P1 audit finding): Vitest reports
+  // lack full inventory verification and frontend/package.json control.
+  // Pure frontend PRs use Dimension 1 (scenario: 'frontend'), which runs all frontend
+  // checks in parallel on the PR HEAD without cross-commit caching risks.
+  Object.assign(output,{frontend_retest:false,frontend_retest_file:'',
+    frontend_retest_source_run:'',frontend_retest_source_sha:'',
+    frontend_retest_gate_digest:'',frontend_retest_report_digest:'',
+    frontend_retest_case:''});
   console.log(JSON.stringify({ ...output, base, validationClosure: result.cognitive_intake_light ? 'selected-cognitive-tasks' : 'all-bundles', platformReasons: catalogDiscovery || dependencies ? [] : platformReasons(entries, full || event === 'workflow_dispatch') }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
+  })().catch(error=>{console.error(error);process.exitCode=1});
 }

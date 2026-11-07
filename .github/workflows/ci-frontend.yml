@@ -24,6 +24,15 @@ on:
       affected_only:
         type: boolean
         default: false
+      retry_only:
+        type: boolean
+        default: false
+      retry_file:
+        type: string
+        default: ''
+      retry_case:
+        type: string
+        default: ''
       cognitive_owned_by_backend:
         type: boolean
         default: false
@@ -61,6 +70,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
+          cache-dependency-path: |
+            server-version/frontend/package-lock.json
+            server-version/backend/package-lock.json
       - name: verify runner capacity and clean application ports
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs" --frontend
       - name: configure runner-local npm cache
@@ -75,10 +88,10 @@ jobs:
           npm ci --ignore-scripts
           npx prisma generate
       - name: lint
-        if: inputs.affected_only != true
+        if: inputs.affected_only != true && !inputs.retry_only
         run: npm run lint
       - name: lint changed local page surfaces
-        if: inputs.affected_only
+        if: inputs.affected_only && !inputs.retry_only
         run: |
           node --input-type=module <<'JS'
           import {execFileSync} from 'node:child_process';
@@ -87,15 +100,15 @@ jobs:
           execFileSync('npm',['exec','--','eslint',...files],{stdio:'inherit'});
           JS
       - name: typecheck
-        if: inputs.affected_only != true
+        if: inputs.affected_only != true && !inputs.retry_only
         run: npm run typecheck
       - name: integrated application types without duplicate cognitive subset
-        if: inputs.affected_only
+        if: inputs.affected_only && !inputs.retry_only
         run: |
           if [ "${{ inputs.bundle_family }}" != "true" ] && [ "${{ inputs.bundle_runtime }}" != "true" ] && [ "${{ inputs.student_discovery }}" != "true" ]; then npm run pretypecheck; fi
           npx tsc -p tsconfig.app.json --noEmit
       - name: dependency audit (high and critical)
-        if: inputs.affected_only != true
+        if: inputs.affected_only != true && !inputs.retry_only
         run: |
           for attempt in 1 2 3; do
             if npm audit --audit-level=high; then
@@ -108,13 +121,52 @@ jobs:
           done
           exit 1
       - name: full frontend tests
-        if: inputs.affected_only != true && inputs.cognitive_owned_by_backend != true
-        run: npm test
+        id: full-frontend-tests
+        if: inputs.affected_only != true && inputs.cognitive_owned_by_backend != true && !inputs.retry_only
+        run: npm test -- --reporter=default --reporter=json --outputFile="$RUNNER_TEMP/frontend-vitest.json"
+      - name: rerun exactly the repaired frontend test file after proven full CI
+        if: inputs.retry_only
+        env:
+          RETEST_FILE: ${{ inputs.retry_file }}
+          RETEST_CASE: ${{ inputs.retry_case }}
+        run: |
+          npm run lint
+          npm run typecheck
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {execFileSync} from 'node:child_process';
+          import {readFileSync} from 'node:fs';
+          import {join} from 'node:path';
+          const file=process.env.RETEST_FILE;
+          assert(/^[A-Za-z0-9_-]{3,1024}$/.test(process.env.RETEST_CASE||''),'Invalid exact original test identity');
+          const original=Buffer.from(process.env.RETEST_CASE,'base64url').toString('utf8');
+          assert(original.length>0&&original.length<=512,'Invalid original assertion name');
+          assert(/^src\/[a-zA-Z0-9_./-]+\.(?:test|spec)\.tsx?$/.test(file) && !file.split('/').some(v=>v==='.'||v==='..'), 'Invalid approved frontend test');
+          for(let i=1;i<=3;i++){
+            const report=join(process.env.RUNNER_TEMP,'frontend-retest-'+i+'.json');
+            execFileSync('npm',['exec','--','vitest','run',file,'--maxWorkers=2','--reporter=json','--outputFile='+report],{stdio:'inherit'});
+            const result=JSON.parse(readFileSync(report,'utf8'));
+            assert(result.success===true && result.numFailedTests===0 && result.numPassedTests>0, 'Targeted frontend regression did not pass');
+            assert(result.testResults?.length===1 && result.testResults[0].name.replaceAll('\\','/').endsWith('/server-version/frontend/'+file), 'Different test was executed');
+            assert(result.testResults[0].assertionResults?.some(t=>(t.fullName||t.title)===original&&t.status==='passed'), 'Originally failing assertion was removed or not passed');
+          }
+          JS
       - name: frontend tests excluding exact onboarding-owned suites
-        if: inputs.affected_only != true && inputs.cognitive_owned_by_backend
+        if: inputs.affected_only != true && !inputs.retry_only && inputs.cognitive_owned_by_backend
+        id: partitioned-frontend-tests
+        env:
+          FRONTEND_VITEST_JSON: ${{ runner.temp }}/frontend-vitest.json
         run: node ../scripts/cognitive/frontend-tests.cjs --onboarding-owned-by-backend
+      - name: publish original full Vitest verdicts for safe future repair
+        if: ${{ always() && (steps.full-frontend-tests.outcome != 'skipped' || steps.partitioned-frontend-tests.outcome != 'skipped') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-vitest-report-run-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/frontend-vitest.json
+          if-no-files-found: error
+          retention-days: 3
       - name: dependency-related frontend tests
-        if: inputs.affected_only && inputs.catalog_discovery != true
+        if: inputs.affected_only && !inputs.retry_only && inputs.catalog_discovery != true
         run: |
           node --input-type=module <<'JS'
           import {execFileSync} from 'node:child_process';
@@ -132,7 +184,7 @@ jobs:
           if(report.success!==true||!(report.numPassedTests>0)||report.numFailedTests!==0)throw Error('Affected frontend tests missing or failed');
           JS
       - name: affected catalog selectors and paging contracts
-        if: inputs.catalog_discovery && !inputs.bundle_family && !inputs.bundle_runtime
+        if: inputs.catalog_discovery && !inputs.retry_only && !inputs.bundle_family && !inputs.bundle_runtime
         run: |
           node --input-type=module <<'JS'
           import {readFileSync} from 'node:fs';
@@ -144,7 +196,7 @@ jobs:
           execFileSync(process.execPath,['../backend/scripts/assert-release-test-report.mjs','/tmp/catalog-frontend.json',...files],{stdio:'inherit'});
           JS
       - name: affected frozen Bundle report components
-        if: inputs.bundle_runtime
+        if: inputs.bundle_runtime && !inputs.retry_only
         run: |
           node --input-type=module <<'JS'
           import {readFileSync} from 'node:fs';

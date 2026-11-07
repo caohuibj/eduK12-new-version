@@ -4,24 +4,30 @@ import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopul
 import {completedSchoolOrdinaryFeedbackSql} from '../assessment-run/completedSchoolFeedback'
 import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
-import { listAssignedRunTasks } from '../assessment-run/productRead'
+import { listAssignedRunTasks, type RunTaskCursor } from '../assessment-run/productRead'
 import { CampusActivityError } from './activity.service'
 import { campusStudentReference } from './studentReference'
 
 type EligibleTeacherExecution={
   executionId:string;runId:string;organizationId:string;activityId:string
-  activityTitle:string;studentUserId:string
+  activityTitle:string;studentUserId:string;createdAtMicros:string
 }
 
 /** Every item is an existing frozen Run execution, not a new campus scoring
  * path. The eligibility query requires a live teacher->class->student chain.
  * The canonical task reader independently rechecks present Run authority.
+ * Pages use the same (created_at, id) microsecond keyset cursor as the shared
+ * Run reader: the candidate query and the reader order identically and the
+ * executionIds allowlist keeps the two page sets aligned, so no eligible task
+ * is lost past the former hard 100-candidate cut.
  */
-export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, organizationId: string) {
+export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, organizationId: string, cursor?: RunTaskCursor) {
   if(actor.accountDomain!=='SCHOOL'||!['TEACHER','ADMIN'].includes(actor.role))
     throw new CampusActivityError('CAMPUS_TEACHER_REQUIRED',403)
+  const cursorScope=cursor?Prisma.sql`AND (e.created_at, e.id) < (${cursor.createdAt}::timestamptz, ${cursor.id})`:Prisma.empty
   const candidates=await prisma.$queryRaw<EligibleTeacherExecution[]>`
     SELECT e.id AS "executionId",e.run_id AS "runId",
+      to_char(e.created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros",
       ar.organization_id AS "organizationId",ar.course_id AS "activityId",
       course.title AS "activityTitle",s.user_id AS "studentUserId"
     FROM assessment_run_executions e
@@ -87,10 +93,11 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, o
         WHERE d.organization_id=e.organization_id AND d.user_id IN (${actor.userId},s.user_id)
           AND d.lifted_at IS NULL AND d.permission IN ('*','RUN_START','ACTIVITY_READ')))
        OR ${completedSchoolOrdinaryFeedbackSql(Prisma.sql`e.id`,actor.userId)})
+      ${cursorScope}
     ORDER BY e.created_at DESC,e.id DESC LIMIT 101
   `
   const allowed=candidates.slice(0,100)
-  if(!allowed.length)return {list:[],truncated:candidates.length>100}
+  if(!allowed.length)return {list:[],truncated:candidates.length>100,nextCursor:null as RunTaskCursor|null}
   const official=await listAssignedRunTasks(actor.userId,{
     runIds:[...new Set(allowed.map(t=>t.runId))],
     // DB-side allowlist: the reader returns exactly the eligible executions,
@@ -117,5 +124,7 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, o
       consentVisibility:row.consentVisibility,
     }]
   })
-  return {list,truncated:candidates.length>100||official.truncated}
+  const last=allowed[allowed.length-1]
+  return {list,truncated:candidates.length>100||official.truncated,
+    nextCursor:candidates.length>100&&last?{createdAt:last.createdAtMicros,id:last.executionId}:null}
 }

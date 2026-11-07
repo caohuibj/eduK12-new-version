@@ -199,3 +199,49 @@ it('navigates task breadcrumbs in-app only for ordinary clicks and rereads an ex
  expect(click(screen.getByRole('link',{name:'返回概览'}))).toBe(false)
  expect(onNavigate).toHaveBeenCalledTimes(2)
 })
+
+describe('two-layer student task pagination consumes gated Run batches',()=>{
+  it('drains local pages, advances nextRunCursor, and 上一页 returns to the previous batch',async()=>{
+    const allTasks=Array.from({length:105},(_,i)=>({id:'exec-'+String(i).padStart(3,'0'),
+      activityId:'campus-act',activityTitle:'校园测评活动',kind:'MEASUREMENT' as const,
+      resourceFamily:'SCALE',title:'正式测评 '+i,status:'PENDING' as const,deadline:null,
+      href:'/organizations/org/activities/act/runs/run/executions/exec-'+String(i).padStart(3,'0'),
+      canResumeExisting:false}))
+    let batch2Calls=0
+    const api=vi.fn(async(path:string)=>{
+      if(path==='/my/student-reference')return {reference:'SYNTHETIC-STUDENT'}
+      if(path.startsWith('/my/activity-tasks')){
+        const page=Number(new URLSearchParams(path.split('?')[1]).get('page')??'1')
+        const runCursor=new URLSearchParams(path.split('?')[1]).get('runCursor')
+        if(runCursor==='batch2-cursor'){
+          batch2Calls++
+          return {list:allTasks.slice(100),total:5,page,hasMore:false,truncated:false,nextRunCursor:null}
+        }
+        const start=(page-1)*25,list=allTasks.slice(start,start+25)
+        const hasMore=page*25<100
+        return {list,total:105,page,hasMore,truncated:false,nextRunCursor:hasMore?null:'batch2-cursor'}
+      }
+      throw Error('unexpected path '+path)
+    })
+    render(<SchoolStudentTasks api={api as unknown as SchoolApi}/>)
+    const next=()=>fireEvent.click(screen.getByRole('button',{name:'下一页'}))
+    const prev=()=>fireEvent.click(screen.getByRole('button',{name:'上一页'}))
+    // Batch 1: pages 1..5 of the locally sorted list. Each click waits for
+    // the async page load (the control disables while loading).
+    expect(await screen.findByText('正式测评 0')).toBeInTheDocument()
+    for(let nextPage=2;nextPage<=4;nextPage++){
+      fireEvent.click(screen.getByRole('button',{name:'下一页'}))
+      await screen.findByText(`第 ${nextPage} 页 · 共 105 个任务`)
+    }
+    // Batch drained at page 4: the gated cursor starts batch 2 at page 1.
+    fireEvent.click(screen.getByRole('button',{name:'下一页'}))
+    expect(await screen.findByText('正式测评 100')).toBeInTheDocument()
+    expect(screen.getByText('第 1 页 · 共 5 个任务')).toBeInTheDocument()
+    expect(batch2Calls).toBe(1)
+    // 上一页 crosses the batch boundary back to the drained batch's last page.
+    fireEvent.click(screen.getByRole('button',{name:'上一页'}))
+    expect(await screen.findByText('正式测评 75')).toBeInTheDocument()
+    expect(screen.getByText('第 4 页 · 共 105 个任务')).toBeInTheDocument()
+    expect(api.mock.calls.filter(([path])=>String(path).includes('runCursor=batch2-cursor'))).toHaveLength(1)
+  })
+})

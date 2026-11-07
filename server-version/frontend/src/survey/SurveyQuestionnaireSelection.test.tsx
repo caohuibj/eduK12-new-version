@@ -34,7 +34,7 @@ it('adds normal questionnaire content in stored order, supports reordering and s
  fireEvent.click(screen.getByRole('button',{name:'从工具集添加'}));fireEvent.click(await screen.findByRole('button',{name:'加入当前问卷'}))
  await waitFor(()=>expect(screen.getByLabelText('合成顺序')).toHaveTextContent('copyB,copyA'))
  expect(document.querySelector('.survey-selected-tools')?.textContent).toMatch(/第一份表单.*第二份表单/)
- expect(risk).toHaveBeenLastCalledWith({dirty:true,busy:false})
+ await waitFor(()=>expect(risk).toHaveBeenLastCalledWith({dirty:true,busy:false}))
  fireEvent.click(screen.getByRole('button',{name:'下移 第一份表单'}));expect(screen.getByLabelText('合成顺序')).toHaveTextContent('copyA,copyB')
  vi.spyOn(window,'confirm').mockReturnValue(false);fireEvent.click(screen.getByRole('button',{name:'新建波次'}))
  expect(screen.getByLabelText('合成顺序')).toHaveTextContent('copyA,copyB')

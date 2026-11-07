@@ -77,3 +77,28 @@ it('keeps compact observation guidance on demand and dismisses it without changi
  expect(toggle).toHaveFocus()
  expect(api).toHaveBeenCalledTimes(1)
 })
+
+describe('teacher observation inbox appends gated keyset batches',()=>{
+  it('loads more observer tasks with the cursor and stops when exhausted',async()=>{
+    const firstBatch=Array.from({length:100},(_,i)=>({executionId:'e'+i,runId:'r'+i,organizationId:'org',
+      activityId:'act',activityTitle:'活动',runTitle:'观察测评 '+i,studentReference:'S-'+i,
+      status:'ASSIGNED',deadline:null,consentRequired:false,consentPurpose:null,consentVisibility:null}))
+    const secondBatch=Array.from({length:5},(_,i)=>({executionId:'x'+i,runId:'x'+i,organizationId:'org',
+      activityId:'act',activityTitle:'活动',runTitle:'观察测评 x'+i,studentReference:'X-'+i,
+      status:'ASSIGNED',deadline:null,consentRequired:false,consentPurpose:null,consentVisibility:null}))
+    const api=vi.fn(async(path:string)=>{
+      if(path.includes('cursor=c2'))return {list:secondBatch,truncated:false,nextCursor:null}
+      if(path.startsWith('/my/teacher-run-tasks'))return {list:firstBatch,truncated:false,nextCursor:'c2'}
+      throw Error('unexpected path '+path)
+    })
+    const {SchoolTeacherTasks}=await import('./SchoolTeacherTasks')
+    render(<SchoolTeacherTasks api={api as unknown as SchoolApi} organizationId="org"/>)
+    expect(await screen.findByText('观察测评 0')).toBeInTheDocument()
+    expect(screen.getByText('已加载 100 项')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'加载更多观察任务'}))
+    expect(await screen.findByText('观察测评 x4')).toBeInTheDocument()
+    expect(await screen.findByText('105 项观察任务')).toBeInTheDocument()
+    expect(api).toHaveBeenCalledWith('/my/teacher-run-tasks?organizationId=org&cursor=c2')
+    expect(screen.queryByRole('button',{name:'加载更多观察任务'})).not.toBeInTheDocument()
+  })
+})
