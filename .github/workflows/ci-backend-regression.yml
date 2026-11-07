@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: ${{ fromJSON(inputs.focus == 'full' && '["fixtures","shard-1","shard-2","shard-3","shard-4","shard-5","shard-6"]' || '["focused"]') }}
+        group: ${{ fromJSON(inputs.focus == 'full' && '["fixtures","shard-1","shard-2","shard-3","shard-4","shard-5","shard-6","shard-7","shard-8"]' || '["focused"]') }}
     env:
       NODE_ENV: test
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public

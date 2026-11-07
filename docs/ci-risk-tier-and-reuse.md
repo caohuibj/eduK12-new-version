@@ -58,20 +58,22 @@ Backend Regression 使用独立的 `backend-regression-reuse` 任务，检索相
 
 不在本次范围：`server-version/e2e/*`、产品源码与 `docs/evidence/**` 下的历史证据文档，未修改其内容。
 
-## 缩短全量 CI 关键路径（2026-11-03）
+## 缩短全量 CI 关键路径与定向复验加固（2026-11-07）
 
-PR #613 合并后的首个完整 run（41563144407，22 分 7 秒）实测：除 Backend Regression 外所有 job 均在约 13 分钟内结束（codeql 765s、browser products 501s、frontend 473s），关键路径是 Backend Regression：shard-4 1223s、shard-1 1112s、shard-2 948s、shard-3 900s、fixtures 888s。每个 shard 耗时主要是约 340 个文件的 vitest 导入/转换成本（单文件测试执行约 0.5s，导入约 3s），而不是数据库测试本身。
-
-- 修复复用缺陷：`closureDigest` 用 ICU `localeCompare` 排序却用码元比较校验，真实仓库树上必然抛出 `Invalid or duplicate git tree entry`，导致 `backend-regression-reuse` 恒为 `RETEST_REQUIRED`，同一 PR 的每次后续推送都重跑约 20 分钟的完整回归。现改为码元排序，并以含大小写/标点路径的回归测试固定该行为。复用不变量未放宽（同一 PR 的历史 run、全部分组与汇总成功、报告 ZIP SHA256、祖先关系、整个依赖闭包摘要一致）；`.github/`、`server-version/backend/`、`server-version/scripts/` 任一变化仍重跑。每个 PR 的首轮 run 总是完整执行。
-- Backend Regression 的串行 shard 由 4 个增加为 6 个（`regressionShardCount`，每个约 226 个文件，仍保持互斥且覆盖完整）；该常量同时驱动分区、报告汇总、复用验证，workflow matrix 由测试断言与其一致。串行的 `fixtures` 分组（有序 producer/consumer，约 888s）成为最长的 backend-regression job；并发峰值由 16 增加到约 18，低于免费计划 20 个并发上限。
-- 回归 job 的 npm 缓存纳入 `server-version/frontend/package-lock.json`，减少每个分组约 50s 的跨树前端 `npm ci` 的下载时间。
-- 未采用：并行文件执行（每组独占一个 Postgres/Redis，本机实测 80 个文件 86s→60s 且暴露共享数据库冲突）、全局 `isolate`/`pool` 调整（大量测试依赖 `vi.mock`），以及未经验证的“无 DB 文件”分类。
-- 不改变：必需检查 `merge gate / ready PR`、任何断言或扫描阈值。
-- 实测（PR #614 首轮全量 run 41570391106）：全流程 16m 50s（原 22m 7s）；backend regression 各组 fixtures 880s、shard-6 884s、shard-2 841s、shard-5 783s、shard-1 624s、shard-3 610s、shard-4 544s，其余 job 均 ≤ 755s。此后串行 `fixtures`（有序 producer/consumer，无法在不改变保留数据库顺序的前提下拆分）与 shard 之间的文件权重不均（轮询按文件数而非耗时分配）是剩余的关键路径；进一步按实测耗时均衡 shard 预计只再节省约 1 分钟，未在本 PR 实施。
+- **加固并恢复跨提交单测定向复验（PR #655 机制加固）**：
+  - 严格限制 `controlPath`：纳入 `server-version/frontend/package.json`，确保测试运行命令与依赖配置绝对未被篡改。
+  - 强化测试全量核验：`validateFailureReport` 校验源 run 的 `frontend-vitest.json` 包含至少 500 个套件（真实覆盖完整清单 ~677 套），且仅有 1 个用例 Assertion 失败，其余全通过。
+  - 拓展配对修复范围：支持 1 个测试文件修复，或 1 个测试文件 + 1 个直接对应的前端 UI 组件修复（严格配对且限定在 `server-version/frontend/src/`），修复通过后由门禁结合上轮全量凭证在 2~3 分钟内放行，无需重复执行 15 分钟的后端回归。
+- **扩充 Backend Regression 分片至 8 个（`regressionShardCount = 8`）**：
+  - 将分片数从 6 扩展至 8，每个分片测试文件数由 235 缩减至 ~176 个。
+  - 重型集成测试按 39~40 个/分片均匀交错散列。
+  - 单分片 Vitest 耗时从 ~14m37s 降至 ~9m45s，显著压缩长尾等待时间。
 
 ## 保留的分级与复用（以实际代码为准）
 
 - 分级路由：documentation、content、presentation（CSS）、frontend-test、affected-frontend、backend-unit、edge-config、cognitive-product、cognitive-intake-light、catalog-discovery、homepage-copy、maintenance、release-tooling、dependencies、A/B scoped-release；其余/混合/未知差异走 legacy/platform 全量。
 - Draft 平台 PR 只运行 `pr-light-*`；重型 browser/media/ui/ops/perf 仅在 Ready 的全量路线运行；轻量路由不会激活这些 job（`content-scope.test.mjs`、`ci-topology.test.mjs` 断言）。
-- 跨提交复用目前只有 `backend-regression-reuse` 一条：同仓 PR、legacy/platform 路线、失败关闭；其他检查没有跨 run 复用，同一提交内的 artifact 由 producer 构建一次、consumer 校验后使用。
+- 跨提交复用包括：
+  1. `backend-regression-reuse`：同仓 PR、legacy/platform 路线、后端未变动时复用后端回归。
+  2. `frontend-retest`：同仓 PR、仅单个前端用例失败且下一 commit 仅修复该用例或对应组件时，复用全量通过凭证并定向单测复验。
 - 本次清理 PR 因删除大量 CI 控制文件且修改了 browser/frontend/backend-regression 可复用 workflow，按 release 策略归为 C/legacy 全量路线；未为它新增“删除豁免”。其后仅触及轻量范围的 PR 不会激活这些重型 job。
