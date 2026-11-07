@@ -51,36 +51,13 @@ async function attempt<T>(label: string, task: () => Promise<T>, fallback: T): P
 async function availableComposites(courseId: string): Promise<Composite[]> {
   const response = await apiClient.get<{ list: Composite[] }>('/composite-assessments/available', { params: { courseId, view: 'summary' } })
   if (response.code !== 0) throw new Error(response.message || '组合测评暂不可用')
-  const available = response.data?.list ?? []
-  const delivered = new Set<string>()
-  // A newer QUESTIONNAIRE can be delivered to multiple courses with its
-  // legacy "course" property null. The existing student task feed is the
-  // authority for this cross-course presentation; never infer from visibility.
-  if (available.some(item => item.productKind === 'QUESTIONNAIRE' && !item.course)) {
-    const unverified = new Set(available.filter(item => item.course?.id !== courseId).map(item => item.id))
-    let page = 1, read = 0, total = 1
-    const pageSize = 100
-    while (unverified.size > 0 && read < total && page <= 50) {
-      const result = await apiClient.get<{
-        list: Array<{ id: string; kind: string; courses: Array<{ id: string }> }>
-        total: number
-      }>('/courses/my/tasks?page=' + page + '&pageSize=' + pageSize + '&courseId=' + encodeURIComponent(courseId))
-      if (result.code !== 0) throw new Error(result.message || '课程测评投放查询失败')
-      const rows = result.data?.list || []
-      total = result.data?.total ?? 0
-      if (!rows.length && read < total) throw new Error('课程任务列表不完整')
-      for (const row of rows) {
-        if (row.kind === 'COMPOSITE' && row.courses?.some(course => course.id === courseId)) {
-          delivered.add(row.id)
-          unverified.delete(row.id)
-        }
-      }
-      read += rows.length
-      page += 1
-    }
-    if (unverified.size > 0 && read < total) throw new Error('课程任务数量超出本次查询限制，请联系培训师')
-  }
-  return available.filter(item => item.course?.id === courseId || delivered.has(item.id))
+  // The backend already scopes this list to the student's active course
+  // membership and the questionnaire_course_deliveries table — the same
+  // delivery rows the student task feed projects (contract locked by
+  // courseAssessmentsContract.postgres.integration.test.ts). The former
+  // /courses/my/tasks re-verification paged over that same table again
+  // (up to 50 extra requests) and is structurally redundant.
+  return response.data?.list ?? []
 }
 
 export function projectCourseAssessments(
