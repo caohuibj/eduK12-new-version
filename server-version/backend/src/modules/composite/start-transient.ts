@@ -2,7 +2,12 @@
  * Only errors raised by the interactive transaction itself are classified:
  * every code below means Postgres or Prisma rolled the transaction back (or
  * never began it), so nothing from this START committed and the client may
- * safely retry the same request. Errors after commit are never reclassified. */
+ * safely retry the same request. Errors after commit are never reclassified.
+ * P2024 (pool timeout fetching a connection) is classified only because
+ * every classifyStartTransaction call site wraps a single $transaction:
+ * Prisma can only raise it before BEGIN, so nothing committed. If a call
+ * site ever wraps non-transactional writes before the transaction, this
+ * classification must be revisited for that site. */
 const ROLLED_BACK_SQLSTATES=new Set(['40001','40P01','55P03'])
 // P2028 is a family of interactive-transaction API errors. Only these two are
 // known rollbacks: maxWait expired before BEGIN, or the engine expired the tx.
@@ -14,6 +19,7 @@ const diagnosticFrom=(reason:string,original?:string):StartBusyDiagnostic=>{
  if(reason==='ADMISSION_QUEUE_FULL')return 'queue_full'
  if(reason==='ADMISSION_WAIT_TIMEOUT')return 'queue_timeout'
  if(reason==='P2028')return /unable to start a transaction/i.test(original??'')?'pool_wait':/expired transaction/i.test(original??'')?'transaction_expired':'other'
+ if(reason==='P2024')return 'pool_wait'
  if(reason==='P2034')return 'write_conflict'
  return 'other'
 }
@@ -40,6 +46,7 @@ export function rolledBackStartReason(error:unknown):string|null{
  const e=error as {code?:unknown;message?:unknown;meta?:{code?:unknown}}|null
  if(!e||typeof e!=='object')return null
  if(e.code==='P2034')return 'P2034'
+ if(e.code==='P2024')return 'P2024'
  if(e.code==='P2028')return typeof e.message==='string'&&P2028_ROLLED_BACK.test(e.message)?'P2028':null
  const sqlState=typeof e.meta?.code==='string'?e.meta.code:typeof e.code==='string'?e.code:null
  return sqlState&&ROLLED_BACK_SQLSTATES.has(sqlState)?sqlState:null
