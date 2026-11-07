@@ -252,6 +252,13 @@ jobs:
       homepage_copy_plan: ${{ steps.scope.outputs.homepage_copy_plan }}
       frontend: ${{ steps.scope.outputs.frontend }}
       frontend_test: ${{ steps.scope.outputs.frontend_test }}
+      frontend_retest: ${{ steps.scope.outputs.frontend_retest }}
+      frontend_retest_file: ${{ steps.scope.outputs.frontend_retest_file }}
+      frontend_retest_case: ${{ steps.scope.outputs.frontend_retest_case }}
+      frontend_retest_source_run: ${{ steps.scope.outputs.frontend_retest_source_run }}
+      frontend_retest_source_sha: ${{ steps.scope.outputs.frontend_retest_source_sha }}
+      frontend_retest_gate_digest: ${{ steps.scope.outputs.frontend_retest_gate_digest }}
+      frontend_retest_report_digest: ${{ steps.scope.outputs.frontend_retest_report_digest }}
       image_build: ${{ steps.scope.outputs.image_build }}
       dependencies_frontend_only: ${{ steps.scope.outputs.dependencies_frontend_only }}
       frontend_affected: ${{ steps.scope.outputs.frontend_affected }}
