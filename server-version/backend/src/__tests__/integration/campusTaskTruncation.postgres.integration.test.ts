@@ -270,22 +270,29 @@ suite('campus task list truncation (real PostgreSQL)', () => {
   }, 60_000)
 
   it('filters a directed activityId in the database and later batches skip ordinary-task reads', async () => {
-    const first = await listCampusStudentTasks(actor(f!.students[0]!), { page: 1, pageSize: 100 })
-    expect(first.list.length).toBeGreaterThan(0)
-    expect(first.nextRunCursor).toBeTruthy()
+    // Drain the first batch's locally sorted pages (two-layer protocol) until
+    // the gated nextRunCursor is actually exposed on the final local page.
+    let first: Awaited<ReturnType<typeof listCampusStudentTasks>> | null = null
+    let batchCursor: RunTaskCursor | null = null
+    for (let page = 1; ; page++) {
+      const p = await listCampusStudentTasks(actor(f!.students[0]!), { page, pageSize: 25 })
+      if (!first) first = p
+      if (!p.hasMore) { batchCursor = p.nextRunCursor; expect(batchCursor).toBeTruthy(); break }
+      expect(page).toBeLessThan(30)
+    }
     // A random activityId owns no authorized activities for this student.
-    const wrong = await listCampusStudentTasks(actor(f!.students[0]!), { page: 1, pageSize: 100, activityId: randomUUID() })
+    const wrong = await listCampusStudentTasks(actor(f!.students[0]!), { page: 1, pageSize: 25, activityId: randomUUID() })
     expect(wrong.list).toHaveLength(0)
     expect(wrong.total).toBe(0)
     // Later Run-task batches return measurement tasks only (assignments and
     // check-ins are skipped, not fetched-and-discarded) and the cursor keeps
     // advancing the same traversal.
     const page2 = await listCampusStudentTasks(actor(f!.students[0]!), {
-      page: 1, pageSize: 100, runCursor: decodeRunTaskCursor(encodeRunTaskCursor(first.nextRunCursor!)),
+      page: 1, pageSize: 25, runCursor: decodeRunTaskCursor(encodeRunTaskCursor(batchCursor!)),
     })
     expect(page2.list.length).toBeGreaterThan(0)
     expect(page2.list.every(t => t.kind === 'MEASUREMENT')).toBe(true)
-    const overlap = page2.list.filter(t => first.list.some(o => o.id === t.id))
+    const overlap = page2.list.filter(t => first!.list.some(o => o.id === t.id))
     expect(overlap).toHaveLength(0)
   }, 60_000)
 
