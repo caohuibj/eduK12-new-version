@@ -35,3 +35,28 @@ describe('School parent observation collection',()=>{
   expect(api.mock.calls).toEqual([['/my/parent-run-tasks']])
  })
 })
+
+describe('parent observation inbox appends gated keyset batches',()=>{
+  it('loads more parent tasks with the cursor and stops when exhausted',async()=>{
+    const firstBatch=Array.from({length:100},(_,i)=>({executionId:'p'+i,runId:'r'+i,organizationId:'org',
+      activityId:'act',activityTitle:'活动',runTitle:'家校观察 '+i,
+      status:'ASSIGNED',deadline:null,consentRequired:false,consentPurpose:null,consentVisibility:null}))
+    const secondBatch=Array.from({length:3},(_,i)=>({executionId:'q'+i,runId:'q'+i,organizationId:'org',
+      activityId:'act',activityTitle:'活动',runTitle:'家校观察 x'+i,
+      status:'ASSIGNED',deadline:null,consentRequired:false,consentPurpose:null,consentVisibility:null}))
+    const api=vi.fn(async(path:string)=>{
+      if(path.includes('cursor=k2'))return {list:secondBatch,nextCursor:null}
+      if(path.startsWith('/my/parent-run-tasks'))return {list:firstBatch,nextCursor:'k2'}
+      throw Error('unexpected path '+path)
+    })
+    const {SchoolParentTasks}=await import('./SchoolParentTasks')
+    render(<SchoolParentTasks api={api as unknown as SchoolApi}/>)
+    expect(await screen.findByText('家校观察 0')).toBeInTheDocument()
+    expect(screen.getByText('已加载 100 项')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'加载更多观察任务'}))
+    expect(await screen.findByText('家校观察 x2')).toBeInTheDocument()
+    expect(await screen.findByText('103 项观察任务')).toBeInTheDocument()
+    expect(api).toHaveBeenCalledWith('/my/parent-run-tasks?cursor=k2')
+    expect(screen.queryByRole('button',{name:'加载更多观察任务'})).not.toBeInTheDocument()
+  })
+})

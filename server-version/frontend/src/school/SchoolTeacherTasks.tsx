@@ -20,7 +20,7 @@ type TeacherRunTask={
   feedbackMode?:'COMPOSITION'
   consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
 }
-type Inbox={list:TeacherRunTask[];truncated:boolean}
+type Inbox={list:TeacherRunTask[];truncated:boolean;nextCursor?:string|null}
 
 /** Observers never receive student login names, responses or individual
  * psychological results. Execution rights remain with the canonical Run.
@@ -34,6 +34,11 @@ export function SchoolTeacherTasks(props:Props){
 function TeacherTasksSession({api,organizationId,compact=false}:Props) {
   const inboxPath='/my/teacher-run-tasks?organizationId='+encodeURIComponent(organizationId)
   const [inbox,setInbox]=useState<Inbox|null>(null)
+  // Forward-only keyset: 下一批 appends the next 100 candidates to the loaded
+  // list; refresh restarts from the newest batch.
+  const [cursor,setCursor]=useState<string|null>(null)
+  const [hasMore,setHasMore]=useState(false)
+  const cursorRef=useRef<string|null>(null);cursorRef.current=cursor
   const [active,setActive]=useState<{execution:CampusExecutionRef;task:TeacherRunTask}|null>(null)
   const [feedback,setFeedback]=useState<TeacherRunTask|null>(null)
   const renderFeedback=useMemo(()=>createEducationAssessmentFeedback({api,entry:'SCHOOL'}),[api])
@@ -43,12 +48,16 @@ function TeacherTasksSession({api,organizationId,compact=false}:Props) {
   const scope=useMemo(()=>({pending:false}),[api,inboxPath])
   const currentScope=useRef<typeof scope|null>(scope)
   currentScope.current=scope
-  const refresh=useCallback(async()=>{
+  const refresh=useCallback(async(append=false)=>{
     if(currentScope.current!==scope||scope.pending)return
     scope.pending=true;setBusy(true);setError('')
     try{
-      const result=await api<Inbox>(inboxPath)
-      if(currentScope.current===scope){setInbox(result)}
+      const activeCursor=append?cursorRef.current:null
+      const result=await api<Inbox>(inboxPath+(activeCursor?'&cursor='+encodeURIComponent(activeCursor):''))
+      if(currentScope.current===scope){
+        setInbox(prev=>append&&prev?{list:[...prev.list,...result.list],truncated:result.truncated,nextCursor:result.nextCursor}:result)
+        setCursor(result.nextCursor??null);setHasMore(Boolean(result.nextCursor))
+      }
     }catch(e){
       if(currentScope.current===scope)setError(e instanceof Error?e.message:'教师观察任务暂不可读取')
     }finally{
@@ -91,7 +100,11 @@ function TeacherTasksSession({api,organizationId,compact=false}:Props) {
           {item.status==='COMPLETED'&&!compact&&<p>已完成。学生个人心理结果不会因教师作答自动开放。</p>}</div>
         </article>)}</div>}
     {inbox&&inbox.list.length>0&&visible.length===0&&<p className="hs-collection-empty">没有匹配的已加载观察任务，请尝试其他关键词。</p>}
-    {inbox?.truncated&&<p>任务数量较多，仅展示最近的部分任务；请联系学校管理员核查分配。</p>}
+    {inbox&&hasMore&&<div className="hs-actions hs-teacher-task-pagination">
+      <button disabled={busy} onClick={()=>void refresh(true)}>加载更多观察任务</button>
+      <span>已加载 {inbox.list.length} 项</span>
+    </div>}
+    {inbox?.truncated&&!hasMore&&<p>任务数量较多，仅展示最近的部分任务；请联系学校管理员核查分配。</p>}
     </details>
     {feedback&&renderFeedback({executionId:feedback.executionId,title:feedback.runTitle,mode:'COMPOSITION',onClose:()=>setFeedback(null)})}
     {active&&<SchoolCompositeRunner key={active.execution.executionId} api={api} execution={active.execution} observer={compact||active.task.feedbackMode==='COMPOSITION'} observerRole="teacher"

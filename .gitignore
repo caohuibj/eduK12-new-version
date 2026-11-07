@@ -8,6 +8,9 @@
 # disposable compose validation env (holds local test credentials)
 server-version/compose-validate.env
 
+# Never track local dependency folders or symlinks targeting developer machines.
+**/node_modules
+
 # Ephemeral release qualification output (never commit credentials/artifacts).
 .github/release-tools/node_modules/
 release-package/

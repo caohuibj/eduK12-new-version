@@ -23,7 +23,7 @@ export type SchoolTask={
   canResumeExisting?:boolean
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
-export type TaskPage={list:SchoolTask[];total:number;hasMore:boolean;truncated:boolean;page:number}
+export type TaskPage={list:SchoolTask[];total:number;hasMore:boolean;truncated:boolean;page:number;nextRunCursor?:string|null}
 type TaskDetails={
   id:string;title:string;description?:string|null;content?:string|null
   mySubmission?:{content?:string|null;status:string}|null
@@ -44,6 +44,14 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
   }
   const [query,setQuery]=useState(''),[sort,setSort]=useState('recommended'),[view,setView]=useState<SchoolCollectionView>('list')
   const [page,setPage]=useState(1)
+  // Two-layer pagination: within a Run-execution batch the ordinary page
+  // counter advances; only a fully delivered batch (hasMore=false) exposes
+  // nextRunCursor, which starts the next Run batch at page 1. The stack keeps
+  // each previous batch's entry cursor AND its last visited local page so
+  // 上一页 crosses batch boundaries without losing the position.
+  const [runCursor,setRunCursor]=useState<string|null>(null)
+  const [cursorStack,setCursorStack]=useState<Array<{cursor:string|null;page:number}>>([])
+  const runCursorRef=useRef<string|null>(null);runCursorRef.current=runCursor
   const [items,setItems]=useState<TaskPage|null>(null)
   const [selected,setSelected]=useState<SchoolTask|null>(null)
   const [details,setDetails]=useState<TaskDetails|null>(null)
@@ -70,11 +78,14 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
     else if(wasDetailOpen.current){inboxTitle.current?.focus({preventScroll:true});inboxTitle.current?.scrollIntoView?.({block:'start'})}
     wasDetailOpen.current=Boolean(selected&&details)
   },[selected,details])
-  const load=useCallback(async(targetPage:number)=>{
+  const load=useCallback(async(targetPage:number,cursorOverride?:string|null)=>{
     if(currentScope.current!==scope||scope.pending)return
     scope.pending=true;setLoading(true);setListError('');setRetryPage(targetPage);setFeedback(null)
     try{
-      const result=await api<TaskPage>('/my/activity-tasks?page='+targetPage+'&pageSize=25'+(activityId?'&activityId='+encodeURIComponent(activityId):''))
+      const activeCursor=cursorOverride!==undefined?cursorOverride:runCursorRef.current
+      const result=await api<TaskPage>('/my/activity-tasks?page='+targetPage+'&pageSize=25'
+        +(activityId?'&activityId='+encodeURIComponent(activityId):'')
+        +(activeCursor?'&runCursor='+encodeURIComponent(activeCursor):''))
       if(currentScope.current===scope){setItems(result);setPage(targetPage)}
     }catch(err){
       if(currentScope.current===scope)setListError(err instanceof Error?err.message:'活动待办暂不可用')
@@ -85,7 +96,7 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
   },[api,scope,activityId])
   useEffect(()=>{
     currentScope.current=scope
-    setFeedback(null);setItems(null);setPage(1)
+    setFeedback(null);setItems(null);setPage(1);setRunCursor(null);setCursorStack([])
     setSelected(null);setDetails(null);setAnswer('');setExecution(null);setError('');setNotice('');setQuery('');setSort('recommended')
     setStudentReference(null);setBusy(false)
     void load(1)
@@ -202,11 +213,27 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
         </article>})}
       </div>}
     {items&&items.list.length>0&&visibleTasks.length===0&&<p className="hs-collection-empty">{partial?'本页没有匹配的任务。可清空检索或切换其他页面。':'没有匹配的任务，请尝试其他关键词。'}</p>}
-    {items&&(page>1||items.hasMore)&&<div className="hs-actions hs-student-task-pagination">
-      <button disabled={page<=1||busy||loading} onClick={()=>void load(page-1)}>上一页</button>
+    {items&&(page>1||items.hasMore||items.nextRunCursor||cursorStack.length>0)&&<div className="hs-actions hs-student-task-pagination">
+      <button disabled={(page<=1&&cursorStack.length===0)||busy||loading} onClick={()=>{
+        if(page>1){void load(page-1);return}
+        const previous=cursorStack[cursorStack.length-1]
+        if(!previous)return
+        setCursorStack(cursorStack.slice(0,-1));setRunCursor(previous.cursor);runCursorRef.current=previous.cursor
+        void load(previous.page,previous.cursor)
+      }}>上一页</button>
       <span>第 {page} 页 · 共 {items.total} 个任务</span>
-      <button disabled={!items.hasMore||busy||loading} onClick={()=>void load(page+1)}>下一页</button>
-
+      <button disabled={busy||loading||(!items.hasMore&&!items.nextRunCursor)} onClick={()=>{
+        if(items.hasMore){void load(page+1);return}
+        // hasMore=false with a nextRunCursor: the local pages of this Run
+        // batch are drained; advance to the next execution batch at page 1,
+        // remembering this batch's cursor and exit page for 上一页.
+        const next=items.nextRunCursor
+        if(!next)return
+        const entry={cursor:runCursorRef.current,page}
+        setCursorStack(stack=>[...stack,entry])
+        setRunCursor(next);runCursorRef.current=next
+        void load(1,next)
+      }}>下一页</button>
     </div>}
     {items?.truncated&&<p className="hs-collection-summary">部分历史任务较多，请联系学校管理员。</p>}
     </details>
