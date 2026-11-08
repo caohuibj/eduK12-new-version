@@ -13,8 +13,8 @@ import { prisma } from '../../config/database'
 import { acceptsAsyncCompositeReport, assessmentReportConfig } from '../../config/assessmentReports'
 import { finalScaleSubmitSchema } from '../../services/scale-final-submit.schema'
 import { InstrumentFinalSubmitError, assertCanonicalSubmissionPayloadSize, prepareCanonicalSubmission } from '../../services/instrumentFinalSubmit'
-import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
-import { loadFrozenActiveSlotSet } from '../assessment-runtime/slot-set'
+import { withWholeSubmitAdmission } from '../../services/wholeSubmitAdmission'
+import { loadFrozenActiveSlotSet, formSectionSlotKey } from '../assessment-runtime/slot-set'
 import { encryptUnifiedRuntimePayload, decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { admitWholeReceiptStorage, recordWholeReceiptStored, detachedWholeReceiptsEnabled } from '../assessment-runtime/whole-receipt-storage'
 import { REPORT_PARENT_SELECT, storeWholeQuestionnaireValidation, registerWholeQuestionnaireReceipt, type WholeQuestionnaireReceipt, assertReportJobIdentity } from '../assessment-runtime/report-outbox.service'
@@ -30,10 +30,24 @@ const encryptWholeRawPayload = (value: unknown): string => encryptUnifiedRuntime
 
 const unitSchema = finalScaleSubmitSchema.omit({ submissionId: true, attemptEpoch: true, contextSnapshotHash: true })
   .extend({ itemId: z.string().min(1).max(200) })
+
+const formAnswerItemSchema = z.object({
+  formItemId: z.string().min(1).max(200),
+  value: z.unknown(),
+  otherText: z.string().optional(),
+})
+
+const formSectionAnswerSchema = z.object({
+  sectionId: z.string().min(1).max(200),
+  definitionHash: z.string().min(16).max(200),
+  answers: z.array(formAnswerItemSchema),
+})
+
 export const wholeQuestionnaireSubmitSchema = z.object({
   submissionId: z.string().min(16).max(200), attemptEpoch: z.number().int().min(1),
   slotSetHash: z.string().regex(/^[a-f0-9]{64}$/), contextSnapshotHash: z.string().max(200).nullable(),
   units: z.array(unitSchema).min(1).max(32),
+  formAnswers: z.array(formSectionAnswerSchema).optional(),
 }).strict()
 export type WholeQuestionnaireSubmitInput = z.infer<typeof wholeQuestionnaireSubmitSchema>
 type Principal = { userId?: string; recoveryTokenHash?: string }
@@ -180,32 +194,6 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
   if (!assessmentReportConfig().wholeSubmitEnabled) throw failure('整份交卷入口暂未开启')
   const { parent, children, frozen } = await loadParent(attemptId, principal)
   if (parent.status !== 'IN_PROGRESS') throw failure('问卷已结束')
-  const units = []
-  const manifest: WholeValidationManifest = { schemaVersion: process.env.ASSESSMENT_WHOLE_COMPACT_MANIFEST_ENABLED === 'true' ? 2 : 1, binding: { attemptId: parent.id, attemptEpoch: parent.attemptEpoch,
-    slotSetHash: parent.frozenActiveSlotSetHash!, contextHash: parent.contextSnapshotHash, userId: parent.userId, recoveryTokenHash: parent.recoveryTokenHash },
-    requiredFormSlots: frozen.slots.filter(slot => slot.required && slot.unitType === 'FORM_SECTION').map(slot => slot.slotKey), units: [] }
-  for (const { child, runtime } of children) {
-    if (child.status !== 'IN_PROGRESS') throw failure('已分量表交卷，不能改为整份交卷')
-    const admission = await ensureScaleAdmissionAtDelivery(child.id, parent, child)
-    await assertUnifiedScaleDelivery({ assessmentId: child.id, compositeAttemptId: attemptId, submissionId: 'whole-delivery-validation',
-      attemptEpoch: parent.attemptEpoch, definitionHash: runtime.legacyDefinitionHash, contextSnapshotHash: parent.contextSnapshotHash, answers: [], ...principal }, child, admission, runtime)
-    const sets = new Map(runtime.definition.responseSets.map(set => [set.key, set.options.map(option => option.value)]))
-    const ruleItems = runtime.definition.items.map(item => ({ itemCode: item.itemCode, required: Boolean(item.required), values: sets.get(item.responseSetKey)! }))
-    const compiled = manifest.schemaVersion === 2 ? compileWholeRules(runtime.legacyDefinitionHash, ruleItems) : null
-    const rule = compiled && wholeRules.has(compiled.hash) ? { rulesHash: compiled.hash } : { items: ruleItems }
-    manifest.units.push({ itemId: child.compositeItemId!, assessmentId: child.id, definitionHash: runtime.legacyDefinitionHash,
-      ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
-      admissionHash: admission.snapshotHash, deadlineMs: admission.schemaVersion === 2 && admission.scalePolicy?.deployment?.completionDeadline
-        ? Date.parse(admission.scalePolicy.deployment.completionDeadline) : null,
-      ...rule })
-    units.push({ itemId: child.compositeItemId!, scaleAssessmentId: child.id, definitionHash: runtime.legacyDefinitionHash,
-      presentationMode: runtime.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE',
-      ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
-      scale: { id: child.scale.id, name: child.scale.name, instruction: runtime.instruction !== undefined ? runtime.instruction?.text ?? null : child.scale.instruction, instrumentVersion: child.scale.instrumentVersion,
-        definition: runnerDefinition(runtime.definition) } })
-  }
-  const positions = new Map(parent.compositeAssessment.items.map(item => [item.id, item.position]))
-  units.sort((left, right) => (positions.get(left.itemId) ?? 0) - (positions.get(right.itemId) ?? 0))
   const rawSections = [...(parent.compositeAssessment.formSections || [])]
   rawSections.sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
   const formSections = rawSections.map((sec: any) => {
@@ -236,6 +224,42 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
       items,
     }
   })
+  const manifest: WholeValidationManifest = { schemaVersion: process.env.ASSESSMENT_WHOLE_COMPACT_MANIFEST_ENABLED === 'true' ? 2 : 1, binding: { attemptId: parent.id, attemptEpoch: parent.attemptEpoch,
+    slotSetHash: parent.frozenActiveSlotSetHash!, contextHash: parent.contextSnapshotHash, userId: parent.userId, recoveryTokenHash: parent.recoveryTokenHash },
+    requiredFormSlots: frozen.slots.filter(slot => slot.required && slot.unitType === 'FORM_SECTION').map(slot => slot.slotKey), units: [],
+    formSections: formSections.map(sec => ({
+      sectionId: sec.id,
+      definitionHash: sec.definitionHash,
+      items: sec.items.map(item => ({
+        id: item.id,
+        required: item.required !== false,
+        formType: item.formType,
+      })),
+    })),
+  }
+  const units: any[] = []
+  for (const { child, runtime } of children) {
+    if (child.status !== 'IN_PROGRESS') throw failure('已分量表交卷，不能改为整份交卷')
+    const admission = await ensureScaleAdmissionAtDelivery(child.id, parent, child)
+    await assertUnifiedScaleDelivery({ assessmentId: child.id, compositeAttemptId: attemptId, submissionId: 'whole-delivery-validation',
+      attemptEpoch: parent.attemptEpoch, definitionHash: runtime.legacyDefinitionHash, contextSnapshotHash: parent.contextSnapshotHash, answers: [], ...principal }, child, admission, runtime)
+    const sets = new Map(runtime.definition.responseSets.map(set => [set.key, set.options.map(option => option.value)]))
+    const ruleItems = runtime.definition.items.map(item => ({ itemCode: item.itemCode, required: Boolean(item.required), values: sets.get(item.responseSetKey)! }))
+    const compiled = manifest.schemaVersion === 2 ? compileWholeRules(runtime.legacyDefinitionHash, ruleItems) : null
+    const rule = compiled && wholeRules.has(compiled.hash) ? { rulesHash: compiled.hash } : { items: ruleItems }
+    manifest.units.push({ itemId: child.compositeItemId!, assessmentId: child.id, definitionHash: runtime.legacyDefinitionHash,
+      ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
+      admissionHash: admission.snapshotHash, deadlineMs: admission.schemaVersion === 2 && admission.scalePolicy?.deployment?.completionDeadline
+        ? Date.parse(admission.scalePolicy.deployment.completionDeadline) : null,
+      ...rule })
+    units.push({ itemId: child.compositeItemId!, scaleAssessmentId: child.id, definitionHash: runtime.legacyDefinitionHash,
+      presentationMode: runtime.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE',
+      ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
+      scale: { id: child.scale.id, name: child.scale.name, instruction: runtime.instruction !== undefined ? runtime.instruction?.text ?? null : child.scale.instruction, instrumentVersion: child.scale.instrumentVersion,
+        definition: runnerDefinition(runtime.definition) } })
+  }
+  const positions = new Map(parent.compositeAssessment.items.map(item => [item.id, item.position]))
+  units.sort((left, right) => (positions.get(left.itemId) ?? 0) - (positions.get(right.itemId) ?? 0))
   await storeWholeQuestionnaireValidation(parent, await storeSharedWholeValidation(manifest), prepareCanonicalSubmission(manifest).hash)
   return { attemptId, attemptEpoch: parent.attemptEpoch, slotSetHash: parent.frozenActiveSlotSetHash,
     contextSnapshotHash: parent.contextSnapshotHash, units, formSections }
@@ -246,6 +270,12 @@ const logicalPayload = (attemptId: string, input: WholeQuestionnaireSubmitInput,
   attemptId, attemptEpoch: input.attemptEpoch, slotSetHash: input.slotSetHash, contextSnapshotHash: input.contextSnapshotHash,
   units: [...input.units].sort((a, b) => a.itemId.localeCompare(b.itemId)).map(unit => ({ ...unit,
     answers: [...unit.answers].sort((a, b) => a.itemCode.localeCompare(b.itemCode)) })),
+  ...(input.formAnswers && input.formAnswers.length > 0 ? {
+    formAnswers: [...input.formAnswers].sort((a, b) => a.sectionId.localeCompare(b.sectionId)).map(section => ({
+      ...section,
+      answers: [...section.answers].sort((a, b) => a.formItemId.localeCompare(b.formItemId)),
+    }))
+  } : {}),
 })
 const childSubmissionId = (submissionId: string, itemId: string) => 'whole-' + createHash('sha256').update(submissionId + '/' + itemId).digest('hex')
 const receiptResponse = (attemptId: string, submissionId: string, payloadHash: string, acceptedAt: Date, replayed: boolean, feedbackPollProfile: ReportFeedbackProfile = 'QUEUED') => ({
@@ -326,7 +356,7 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
 export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQuestionnaireSubmitInput, principal: Principal,
   receivedAtMs = Date.now()) => {
   const admissionStarted = process.hrtime.bigint()
-  return withUnitSubmitAdmission(async () => {
+  return withWholeSubmitAdmission(async () => {
   assessmentTimelineSpan('whole.admission_wait', admissionStarted)
   const context = await traceAssessmentPhase('whole.owner_header_query', () => loadWholeSubmissionContext(attemptId))
   const parent = context?.parent
@@ -379,16 +409,19 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   const prepared = traceAssessmentPhaseSync('whole.integrity_check', () => prepareFromWholeManifest(input, manifest, principal, receivedAtMs))
   const encrypted = traceAssessmentPhaseSync('whole.envelope_encrypt', () => encryptWholeRawPayload({ schemaVersion: 1, binding: { attemptId, attemptEpoch: input.attemptEpoch,
     slotSetHash: input.slotSetHash, contextHash: input.contextSnapshotHash }, payloadHash: canonical.hash,
-    ...(timingSnapshotHash?{timingSnapshotHash}:{}),units: prepared }))
+    ...(timingSnapshotHash?{timingSnapshotHash}:{}),units: prepared.units,
+    ...(prepared.formAnswers.length > 0 ? { formAnswers: prepared.formAnswers } : {}) }))
+  const coveredFormSlots = new Set(prepared.formAnswers.map(f => formSectionSlotKey(f.sectionId)))
+  const remainingRequiredFormSlots = manifest.requiredFormSlots.filter(k => !coveredFormSlots.has(k))
   const receipt = await registerWholeQuestionnaireReceipt(parent, {
     submissionId: input.submissionId, payloadHash: canonical.hash, answersEncrypted: encrypted, acceptedAt: new Date(receivedAtMs),
-    requiredFormSlots: manifest.requiredFormSlots, validationHash: prior.wholeValidationHash,
+    requiredFormSlots: remainingRequiredFormSlots, validationHash: prior.wholeValidationHash,
   },async tx=>{
     // Resolve every selected real child in this same receipt transaction,
     // including ordinary questionnaires. A previously accepted replay returned above.
-    const children=await tx.assessment.findMany({where:{id:{in:prepared.map(unit=>unit.assessmentId)},compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,
-      compositeItemId:{in:prepared.map(unit=>unit.itemId)}},select:{id:true,scaleId:true,compositeItemId:true}})
-    if(children.length!==prepared.length||children.some(child=>!prepared.some(unit=>unit.assessmentId===child.id&&unit.itemId===child.compositeItemId)))throw failure('整卷工具来源已变化')
+    const children=await tx.assessment.findMany({where:{id:{in:prepared.units.map(unit=>unit.assessmentId)},compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,
+      compositeItemId:{in:prepared.units.map(unit=>unit.itemId)}},select:{id:true,scaleId:true,compositeItemId:true}})
+    if(children.length!==prepared.units.length||children.some(child=>!prepared.units.some(unit=>unit.assessmentId===child.id&&unit.itemId===child.compositeItemId)))throw failure('整卷工具来源已变化')
     // Business decision: attempts already started may finish after an
     // emergency stop. Every selected child was admitted by this attempt's
     // START, so no collection re-check here; new STARTs stay blocked.
@@ -407,14 +440,27 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
   if (!job.leaseToken || receipt.status !== 'PROCESSING' || !receipt.wholeAnswersEncrypted || !receipt.wholeAcceptedAt) throw failure('整份交卷处理租约已改变')
   const execution: WholeReceiptExecution = { submissionId: receipt.wholeSubmissionId, payloadHash: receipt.wholePayloadHash!, leaseToken: job.leaseToken, acceptedAtMs: receipt.wholeAcceptedAt.getTime() }
   const envelope = unpackWholeRawEnvelope(decryptUnifiedRuntimePayload<{ schemaVersion: number; binding: { attemptId: string; attemptEpoch: number; slotSetHash: string; contextHash: string | null };
-    timingSnapshotHash?:string; payloadHash: string; units: Array<Parameters<typeof submitUnifiedScaleAssessmentFinal>[0] & { itemId: string }> }>(receipt.wholeAnswersEncrypted))
+    timingSnapshotHash?:string; payloadHash: string; units: Array<Parameters<typeof submitUnifiedScaleAssessmentFinal>[0] & { itemId: string }>;
+    formAnswers?: Array<{ sectionId: string; definitionHash: string; answers: Array<{ formItemId: string; value: unknown; otherText?: string }> }>;
+  }>(receipt.wholeAnswersEncrypted))
   if (envelope.schemaVersion !== 1 || envelope.binding.attemptId !== job.attemptId || envelope.binding.attemptEpoch !== job.attemptEpoch
     || envelope.binding.slotSetHash !== job.slotSetHash || envelope.binding.contextHash !== job.contextHash
     || envelope.payloadHash !== receipt.wholePayloadHash || prepareCanonicalSubmission(logicalPayload(job.attemptId, { submissionId: receipt.wholeSubmissionId,
       attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextSnapshotHash: job.contextHash,
       units: envelope.units.map(unit => ({ itemId: unit.itemId, definitionHash: unit.definitionHash, answers: unit.answers,
         ...(unit.itemTimings!==undefined ? {itemTimings:unit.itemTimings} : {}),
-        ...(unit.deviceInputProvenance ? { deviceInputProvenance: unit.deviceInputProvenance } : {}) })) },envelope.timingSnapshotHash)).hash !== receipt.wholePayloadHash) throw failure('整份答案封存内容无法验证')
+        ...(unit.deviceInputProvenance ? { deviceInputProvenance: unit.deviceInputProvenance } : {}) })),
+      ...(envelope.formAnswers && envelope.formAnswers.length > 0 ? {
+        formAnswers: envelope.formAnswers.map(section => ({
+          sectionId: section.sectionId,
+          definitionHash: section.definitionHash,
+          answers: section.answers.map(ans => ({
+            formItemId: ans.formItemId,
+            value: ans.value,
+            ...(ans.otherText !== undefined ? { otherText: ans.otherText } : {}) })),
+        })),
+      } : {}),
+    },envelope.timingSnapshotHash)).hash !== receipt.wholePayloadHash) throw failure('整份答案封存内容无法验证')
   execution.studyReceipt=await acceptedStudyReceipt(job,envelope)
   const principal = envelope.units[0]?.userId ? { userId: envelope.units[0].userId } : { recoveryTokenHash: envelope.units[0]?.recoveryTokenHash }
   const reuseCommitted = process.env.ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED === 'true'
@@ -470,13 +516,25 @@ type WholeValidationManifest = {
   requiredFormSlots: string[];
   units: Array<{ itemId: string; assessmentId: string; definitionHash: string; admissionHash: string;
     trainingTiming?: TrainingTimingSnapshot; deadlineMs: number | null; rulesHash?: string; items?: WholeRuleItem[] }>;
+  formSections?: Array<{
+    sectionId: string;
+    definitionHash: string;
+    items: Array<{ id: string; required: boolean; formType: string }>;
+  }>;
 }
 const responseKey = (value: string | number) => typeof value + ':' + String(value)
+const isFormValueEmpty = (val: unknown) => {
+  if (val === null || val === undefined) return true
+  if (typeof val === 'string' && val.trim() === '') return true
+  if (Array.isArray(val) && val.length === 0) return true
+  return false
+}
+
 const prepareFromWholeManifest = (input: WholeQuestionnaireSubmitInput, manifest: WholeValidationManifest, principal: Principal, receivedAtMs: number) => {
   if (input.units.length !== manifest.units.length || new Set(input.units.map(unit => unit.itemId)).size !== input.units.length) throw failure('问卷量表缺失或重复', 400)
   const timingEntries=input.units.flatMap(unit=>Object.entries(unit.itemTimings??{}))
   if(timingEntries.length>3000||Buffer.byteLength(JSON.stringify(timingEntries),'utf8')>400000)throw failure('整卷计时超过3000题或400KB预算',400)
-  const prepared = []
+  const preparedUnits = []
   for (const unit of manifest.units) {
     const sent = input.units.find(candidate => candidate.itemId === unit.itemId)
     if (!sent || sent.definitionHash !== unit.definitionHash || (unit.deadlineMs !== null && receivedAtMs > unit.deadlineMs)) throw failure('量表冻结版本或完成期限不匹配')
@@ -492,10 +550,56 @@ const prepareFromWholeManifest = (input: WholeQuestionnaireSubmitInput, manifest
     }
     if (plan.items.some(item => item.required && !answers.has(item.itemCode))) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '问卷有必答题未完成', 409)
     normalizeTrainingScaleTiming(unit.trainingTiming,plan.items.map(item=>item.itemCode),[...answers.keys()],sent.itemTimings)
-    prepared.push({ ...sent, assessmentId: unit.assessmentId, compositeAttemptId: manifest.binding.attemptId,
+    preparedUnits.push({ ...sent, assessmentId: unit.assessmentId, compositeAttemptId: manifest.binding.attemptId,
       submissionId: childSubmissionId(input.submissionId, unit.itemId), attemptEpoch: input.attemptEpoch,
       contextSnapshotHash: input.contextSnapshotHash, ...principal,
       answers: plan.items.flatMap(item => answers.has(item.itemCode) ? [answers.get(item.itemCode)!] : []) })
   }
-  return prepared
+
+  const preparedForms: Array<{
+    sectionId: string;
+    definitionHash: string;
+    answers: Array<{ formItemId: string; value: unknown; otherText?: string }>;
+  }> = []
+
+  const manifestForms = manifest.formSections ?? []
+  const manifestFormsById = new Map(manifestForms.map(s => [s.sectionId, s]))
+
+  if (input.formAnswers && input.formAnswers.length > 0) {
+    for (const sentSec of input.formAnswers) {
+      const secDef = manifestFormsById.get(sentSec.sectionId)
+      if (!secDef) {
+        throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '表单区段未在问卷定义中', 400)
+      }
+      if (sentSec.definitionHash !== secDef.definitionHash) {
+        throw failure('表单冻结版本不匹配')
+      }
+      const itemMap = new Map(secDef.items.map(i => [i.id, i]))
+      const answersMap = new Map<string, typeof sentSec.answers[number]>()
+      for (const ans of sentSec.answers) {
+        if (!itemMap.has(ans.formItemId) || answersMap.has(ans.formItemId)) {
+          throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '表单答案包含重复题目或未知题目', 400)
+        }
+        answersMap.set(ans.formItemId, ans)
+      }
+      for (const item of secDef.items) {
+        if (item.required) {
+          const ans = answersMap.get(item.id)
+          if (!ans || isFormValueEmpty(ans.value)) {
+            throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '表单有必答题未完成', 409)
+          }
+        }
+      }
+      preparedForms.push({
+        sectionId: secDef.sectionId,
+        definitionHash: secDef.definitionHash,
+        answers: secDef.items.flatMap(item => {
+          const ans = answersMap.get(item.id)
+          return ans ? [{ formItemId: item.id, value: ans.value, ...(ans.otherText !== undefined ? { otherText: ans.otherText } : {}) }] : []
+        }),
+      })
+    }
+  }
+
+  return { units: preparedUnits, formAnswers: preparedForms }
 }

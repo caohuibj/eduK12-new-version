@@ -4774,11 +4774,9 @@ const getUnifiedCompositeAttemptState = async (
     trainingFlowDigest: attempt.compositeAssessment?.trainingFlowDigest,
     trainingFlowSnapshotHash: attempt.trainingFlowSnapshotHash ?? attempt.compositeAssessment?.trainingFlowSnapshotHash,
   })
-  const formsPresent = (attempt.compositeAssessment?.formSections?.length ?? 0) > 0
-  const allFormsCompleted = formsPresent && attempt.compositeAssessment.formSections.every((s: any) =>
-    completedSlot(formSectionSlotKey(s.id))
-  )
-  const canIngestWholeLocal = !formsPresent || allFormsCompleted
+  const wholeSubmitFeatureEnabled = Boolean(assessmentReportConfig().wholeSubmitEnabled)
+  const hasPartialScaleSubmissions = units.some((unit: any) => unit.type === 'SCALE' && unitCompleted(unit))
+  const canIngestWholeLocal = wholeSubmitFeatureEnabled && !hasPartialScaleSubmissions
   const executionMode = (isEligible && canIngestWholeLocal) ? ('WHOLE_LOCAL' as const) : ('STEPPED' as const)
   return {
     id: attempt.id,
