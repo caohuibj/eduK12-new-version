@@ -405,7 +405,12 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
     return { input: unit, child: bound.child }
   })
   let committedScales: Awaited<ReturnType<typeof submitUnifiedScaleCollectionBatch>> = null
-  if (process.env.ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED === 'true') {
+  // PR-1 (final-scale dedup): the collection batch is the default worker path —
+  // it merges the completion transaction, the report-job lease lock and the
+  // parent lock into one pass for all scale units. The flag remains only as an
+  // explicit opt-out ('false'); an unset flag no longer falls back to the
+  // per-unit loop.
+  if (process.env.ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED !== 'false') {
     committedScales = await traceAssessmentPhase('report.units_batch', () => submitUnifiedScaleCollectionBatch(job, units, execution, referenceDb))
   } else {
     for (const unit of units) await traceAssessmentPhase('report.unit',

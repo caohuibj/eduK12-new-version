@@ -290,6 +290,35 @@ suite('durable report outbox on isolated PostgreSQL', () => {
     expect(await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })).toMatchObject({ replayed: true, payloadHash: accepted.payloadHash })
   })
 
+  it('rebuilds a report from already completed units without tripping the collection guard receipt fence', async () => {
+    // PR-1 regression: the collection guard's receipt fence requires
+    // parent.status = 'IN_PROGRESS', but a completed parent whose units are
+    // all already submitted is a legitimate completedReplay, and the batch
+    // lease explicitly allows it. The batch must skip the guard for replayed
+    // units and rely on the batch lease + trailing fence.
+    // The env flag is unset here so this also proves the batch is the
+    // default worker path, not only an opt-in.
+    delete process.env.ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED
+    const f = await fixture(2), { whole, input } = await wholeInput(f)
+    const accepted = await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+    expect(accepted.status).toBe('ACCEPTED')
+    await processJob(await claim())
+    expect(await outbox.readCompositeReportJob(f.parent.id, 1)).toMatchObject({ status: 'READY' })
+    const parent = await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: f.parent.id } })
+    expect(parent.status).toBe('COMPLETED')
+    expect(await db.assessment.count({ where: { compositeAttemptId: f.parent.id, status: 'COMPLETED' } })).toBe(2)
+    // Requeue the same job as PROCESSING with a fresh lease, as if the worker
+    // were rebuilding the report after a crash. The batch now sees a COMPLETED
+    // parent with all units already completed (completedReplay).
+    const leaseToken = randomUUID()
+    const jobRow = await outbox.readCompositeReportJob(f.parent.id, 1)
+    await db.compositeReportJob.update({ where: { id: jobRow!.id },
+      data: { status: 'PROCESSING', leaseToken, leaseExpiresAt: new Date(Date.now() + 60_000), reportEncrypted: null, attemptCount: 1 } })
+    const job = await outbox.readCompositeReportJob(f.parent.id, 1)
+    await processJob(job!)
+    expect(await outbox.readCompositeReportJob(f.parent.id, 1)).toMatchObject({ status: 'READY' })
+  })
+
   it('reconstructs compact validation plans from durable frozen definitions after all process-local rules are lost', async () => {
     vi.stubEnv('ASSESSMENT_WHOLE_COMPACT_MANIFEST_ENABLED', 'true')
     const f = await fixture(3), { whole, input } = await wholeInput(f)

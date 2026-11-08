@@ -557,6 +557,21 @@ export const submitUnifiedScaleCollectionBatch = async (
     if (lease.length !== 1) throw new ReportProcessingLeaseLostError()
     const byId = new Map(rows.map(row => [row.id, row]))
     const writes = [], facts: ScaleFactRecord[] = [], snapshots: Prisma.AssessmentUnitSnapshotCreateManyInput[] = []
+    // PR-1 fix: the collection guard's receipt fence requires parent.status =
+    // 'IN_PROGRESS', but the batch lease above explicitly allows a COMPLETED
+    // parent for a full completedReplay (all units already submitted, report
+    // rebuild). Guard only the units that actually need new writes; a pure
+    // replay skips the guard and relies on the batch lease + trailing fence.
+    // (The old per-unit loop guarded each unit only after its replay
+    // `continue`, so replayed units never reached the guard.)
+    if (!completedReplay) {
+      const writable = prepared.filter(unit => unit.write !== null)
+      await assertTrainingScaleCollectionAllowed(tx,
+        writable.map(unit => unit.child.scaleId),
+        { compositeAttemptId: job.attemptId, compositeAttemptEpoch: job.attemptEpoch,
+          compositeItemIds: writable.map(unit => unit.child.compositeItemId).filter((id): id is string => Boolean(id)),
+          acceptedReceipt: execution })
+    }
     for (const unit of prepared) {
       const current = byId.get(unit.child.id)!, { admission, snapshot, submissionId, payloadHash } = unit.data
       assertFinalOnly(current.deliveryMode); assertAttemptEpoch(current.attemptEpoch, unit.input.attemptEpoch)
@@ -575,7 +590,6 @@ export const submitUnifiedScaleCollectionBatch = async (
       }
       if (current.status !== 'IN_PROGRESS' || !unit.write || current.snapshotId)
         throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表提交状态已变化', 409)
-      await assertTrainingScaleCollectionAllowed(tx, [unit.child.scaleId],{compositeAttemptId:unit.child.compositeAttemptId,compositeAttemptEpoch:unit.input.attemptEpoch,compositeItemIds:unit.child.compositeItemId?[unit.child.compositeItemId]:[],acceptedReceipt:execution})
       const { completedAt, encryptedAnswers, encrypted } = unit.write
       if (!encrypted.canonicalResult) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表缺少权威结果', 409)
       const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())
