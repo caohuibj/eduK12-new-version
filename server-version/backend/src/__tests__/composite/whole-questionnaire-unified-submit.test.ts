@@ -56,6 +56,30 @@ describe('Scheme X Unified Whole Questionnaire Submit & Encrypted Ingestion (PR 
     }
   })
 
+  it('rejects duplicate Form section IDs before accepting a whole submission', () => {
+    const formSection = {
+      sectionId: 'form-sec-1',
+      definitionHash: 'c'.repeat(64),
+      answers: [{ formItemId: 'f-1', value: 'original answer' }],
+    }
+    const payload = {
+      submissionId: '0123456789abcdef0123456789abcdef',
+      attemptEpoch: 1,
+      slotSetHash: 'a'.repeat(64),
+      contextSnapshotHash: null,
+      units: [{
+        itemId: 'scale-item-1',
+        definitionHash: 'b'.repeat(64),
+        answers: [{ itemCode: 'q1', responseValue: 3, responseTimeMs: 1200 }],
+      }],
+      formAnswers: [formSection, {
+        ...formSection,
+        answers: [{ formItemId: 'f-1', value: 'conflicting answer' }],
+      }],
+    }
+    expect(wholeQuestionnaireSubmitSchema.safeParse(payload).success).toBe(false)
+  })
+
   it('rejects invalid or missing required fields in submission schema', () => {
     const invalidPayload = {
       submissionId: 'short', // Too short (< 16 chars)
