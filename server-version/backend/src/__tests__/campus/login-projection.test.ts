@@ -8,7 +8,7 @@ vi.mock('../../middleware/auth',()=>({authenticateSchool:vi.fn()}))
 vi.mock('../../utils/sessionRevocation',()=>({revokeCurrentSession:vi.fn()}))
 vi.mock('../../middleware/mfaAttemptRateLimit',()=>({createMfaAttemptRateLimiter:()=>vi.fn()}))
 vi.mock('../../middleware/passwordChangeAdmission',()=>({passwordChangeRateLimit:vi.fn(),withPasswordChangeAdmission:(x:unknown)=>x}))
-vi.mock('../../middleware/loginRateLimit',()=>({loginRateLimit:vi.fn(),withLoginAccountFailureThrottle:(x:unknown)=>x,recordLoginFailure:vi.fn(),clearLoginFailures:vi.fn(),withLoginPasswordVerification:(fn:()=>unknown)=>state.gate(fn)}))
+vi.mock('../../middleware/loginRateLimit',()=>({loginRateLimit:vi.fn(),withLoginAccountFailureThrottle:(x:unknown)=>x,recordLoginFailure:vi.fn(),clearLoginFailures:vi.fn(),withLoginPasswordVerification:(fn:()=>unknown)=>state.gate(fn),withLoginAccountLookup:(fn:()=>unknown)=>fn()}))
 vi.mock('../../services/boundedAdmissionGate',()=>({isBoundedAdmissionBusyError:()=>false}))
 vi.mock('../../modules/campus/mfa.service',()=>({schoolAccountNeedsMfa:async()=>state.mfa,beginSchoolMfaChallenge:async()=>({mfaRequired:true,enrolled:true}),getPendingChallenge:vi.fn(),startSchoolMfaEnrollment:vi.fn(),finishSchoolMfa:vi.fn(),verifySchoolTotpStepUp:vi.fn()}))
 import router from '../../modules/campus/auth.routes'

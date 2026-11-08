@@ -12,7 +12,7 @@ import { passwordChangeRateLimit, withPasswordChangeAdmission } from '../../midd
 import { schoolAccountNeedsMfa, beginSchoolMfaChallenge, getPendingChallenge, startSchoolMfaEnrollment, finishSchoolMfa, verifySchoolTotpStepUp } from './mfa.service'
 import {
   loginRateLimit, withLoginAccountFailureThrottle, recordLoginFailure,
-  clearLoginFailures, withLoginPasswordVerification,
+  clearLoginFailures, withLoginPasswordVerification, withLoginAccountLookup,
 } from '../../middleware/loginRateLimit'
 import { isBoundedAdmissionBusyError } from '../../services/boundedAdmissionGate'
 
@@ -53,9 +53,11 @@ router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(async (req
     const parsed = loginSchema.safeParse(req.body)
     if (!parsed.success) return failedLogin(req, res)
     const normalizedLogin = parsed.data.username.toLowerCase()
-    const account = await prisma.campusAccount.findUnique({
-      where: { normalizedLogin }, include: { user: true },
-    })
+    const account = await withLoginAccountLookup(() =>
+      prisma.campusAccount.findUnique({
+        where: { normalizedLogin }, include: { user: true },
+      })
+    )
     const user = account?.user
     const usable = !!user && user.accountDomain === 'SCHOOL'
       && user.isActive && !user.isFrozen
@@ -63,7 +65,7 @@ router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(async (req
     const matches = await withLoginPasswordVerification(() =>
       comparePassword(parsed.data.password, usable ? user!.passwordHash : DUMMY_HASH)
     )
-    const match = usable && matches ? account : null
+    const match = usable && matches && user!.isActive && !user!.isFrozen ? account : null
     if (!match) return failedLogin(req, res)
 
     if (await schoolAccountNeedsMfa(match.userId)) {

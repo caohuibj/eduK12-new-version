@@ -1,7 +1,8 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
-const m=vi.hoisted(()=>({start:vi.fn(),parent:vi.fn(),getAttemptState:vi.fn()}))
+const m=vi.hoisted(()=>({start:vi.fn(),parent:vi.fn(),getAttemptState:vi.fn(),campusAccess:vi.fn()}))
 vi.mock('../../modules/assessment-run/startExecution',()=>({startAssessmentRunExecution:m.start}))
 vi.mock('../../modules/composite/composite.service',()=>({getAttemptState:m.getAttemptState}))
+vi.mock('../../modules/campus/campus-composite-authority',()=>({checkCampusCompositeAccessAuthority:m.campusAccess}))
 vi.mock('../../modules/assessment-run/resourceBoundary',()=>({
   assertRunExecutionParent:m.parent,
   assertCurrentRunManagerBoundary:vi.fn(),
@@ -29,7 +30,10 @@ const req={
 describe('Run START transient rollback → 503 ASSESSMENT_START_BUSY',()=>{
   beforeEach(()=>{m.start.mockReset();m.parent.mockReset();m.parent.mockResolvedValue(undefined);
     m.getAttemptState.mockReset();
-    vi.spyOn(logger,'error').mockImplementation(()=>{})})
+    m.campusAccess.mockReset();m.campusAccess.mockResolvedValue(true);
+    vi.spyOn(logger,'error').mockImplementation(()=>{});
+    vi.spyOn(logger,'info').mockImplementation(()=>{});
+    vi.spyOn(logger,'warn').mockImplementation(()=>{})})
 
   it('run.controller START maps a rolled-back transaction to 503 with Retry-After',async()=>{
     m.start.mockRejectedValue(new AssessmentStartBusyError('P2028'))
@@ -116,4 +120,32 @@ describe('Run START transient rollback → 503 ASSESSMENT_START_BUSY',()=>{
     expect(res.body.data.currentUnit).toBeUndefined()
     expect(m.getAttemptState).not.toHaveBeenCalled()
   })
+
+  it('omits currentUnit when campus composite access authority is revoked for SCHOOL user',async()=>{
+    m.start.mockResolvedValue({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-revoked',replayed:true})
+    m.campusAccess.mockResolvedValue(false)
+    const schoolReq={...req,user:{userId:'student-revoked',role:'STUDENT',accountDomain:'SCHOOL'},body:{delivery:'inline'}}
+    const res=fakeRes()
+    await runController.startExecution(schoolReq,res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.state).toBe('STARTED')
+    expect(res.body.data.currentUnit).toBeUndefined()
+    expect(m.campusAccess).toHaveBeenCalledWith({attemptId:'attempt-revoked',userId:'student-revoked'})
+    expect(m.getAttemptState).not.toHaveBeenCalled()
+  })
+
+  it('delivers currentUnit when campus composite access authority is valid for SCHOOL user',async()=>{
+    m.start.mockResolvedValue({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-valid',replayed:true})
+    m.campusAccess.mockResolvedValue(true)
+    m.getAttemptState.mockResolvedValue({id:'attempt-valid',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS'})
+    const schoolReq={...req,user:{userId:'student-valid',role:'STUDENT',accountDomain:'SCHOOL'},body:{delivery:'inline'}}
+    const res=fakeRes()
+    await runController.startExecution(schoolReq,res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.state).toBe('STARTED')
+    expect(res.body.data.currentUnit).toEqual({id:'attempt-valid',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS'})
+    expect(m.campusAccess).toHaveBeenCalledWith({attemptId:'attempt-valid',userId:'student-valid'})
+    expect(m.getAttemptState).toHaveBeenCalledWith('attempt-valid',{userId:'student-valid'},undefined,'current-unit')
+  })
 })
+

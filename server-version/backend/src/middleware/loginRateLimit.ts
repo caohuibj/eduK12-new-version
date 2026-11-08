@@ -29,6 +29,19 @@ export const loginPasswordVerificationAdmission = new BoundedAdmissionGate({
 export const withLoginPasswordVerification = <T>(operation: () => Promise<T>): Promise<T> =>
   loginPasswordVerificationAdmission.run(operation)
 
+export const loginAccountLookupAdmission = new BoundedAdmissionGate({
+  name: 'login_account_lookup',
+  maxConcurrent: configuredInteger('LOGIN_ACCOUNT_LOOKUP_MAX_CONCURRENT', 16),
+  maxQueue: configuredInteger('LOGIN_ACCOUNT_LOOKUP_MAX_QUEUE', 512, true),
+  maxWaitMs: configuredInteger('LOGIN_ACCOUNT_LOOKUP_MAX_WAIT_MS', 10_000),
+  retryAfterSeconds: 1,
+  busyCode: 'LOGIN_LOOKUP_BUSY',
+  busyMessage: '登录服务繁忙，请稍后重试',
+})
+
+export const withLoginAccountLookup = <T>(operation: () => Promise<T>): Promise<T> =>
+  loginAccountLookupAdmission.run(operation)
+
 export interface LoginRateLimitContext {
   accountKey: string
   failureKey: string

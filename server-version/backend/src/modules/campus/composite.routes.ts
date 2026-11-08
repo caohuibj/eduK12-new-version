@@ -57,21 +57,9 @@ async function campusCompositeAccess(req:Request,res:Response,next:NextFunction)
     const attemptId=req.params.attemptId
     if(!req.user||req.user.accountDomain!=='SCHOOL'||!attemptId)
       return notFound(res,'当前校园测评不可访问')
-    const rows=await prisma.$queryRaw<Array<{id:string}>>(Prisma.sql`
-      SELECT e."id" FROM "assessment_run_executions" e
-      JOIN "assessment_run_actor_snapshots" respondent
-        ON respondent."id"=e."respondent_actor_snapshot_id"
-        AND respondent."organization_id"=e."organization_id"
-        AND respondent."run_id"=e."run_id"
-      JOIN "campus_activity_runs" ca ON ca."run_id"=e."run_id"
-        AND ca."organization_id"=e."organization_id"
-      WHERE e."runtime_binding_kind"='COMPOSITE'
-        AND e."runtime_binding_ref"=${attemptId}
-        AND respondent."user_id"=${req.user.userId}
-        AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)}
-      LIMIT 1
-    `)
-    if(!rows.length)return notFound(res,'当前校园测评不可访问')
+    const { checkCampusCompositeAccessAuthority } = await import('./campus-composite-authority')
+    const allowed = await checkCampusCompositeAccessAuthority({ attemptId, userId: req.user.userId })
+    if(!allowed)return notFound(res,'当前校园测评不可访问')
     return next()
   }catch(error){return next(error)}
 }
