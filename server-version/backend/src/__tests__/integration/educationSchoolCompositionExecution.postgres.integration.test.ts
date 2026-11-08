@@ -136,7 +136,7 @@ suite('School psychological author / ordinary questionnaire real HTTP execution'
   })
 
   const revokedGet=await request('/composite-attempts/'+attempt+'?view=current-unit',actor.id)
-  expect(revokedGet.status).toBe(403)
+  expect(revokedGet.status).toBe(404)
 
   const replayed=await request(execution+'/start',actor.id,{delivery:'inline'})
   expect(replayed.data.currentUnit).toBeUndefined()
@@ -150,6 +150,6 @@ suite('School psychological author / ordinary questionnaire real HTTP execution'
    },
   })
   const outsiderGet=await request('/composite-attempts/'+attempt+'?view=current-unit',outsider.id)
-  expect(outsiderGet.status).toBe(403)
+  expect(outsiderGet.status).toBe(404)
  })
 })
