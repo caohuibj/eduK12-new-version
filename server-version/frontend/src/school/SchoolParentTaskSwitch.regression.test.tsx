@@ -45,7 +45,7 @@ describe('School parent task switch lifecycle regression',()=>{
   fireEvent.click(within(runner).getByRole('button',{name:'开始或继续正式测评'}))
   expect(await within(runner).findByTestId('review-attempt')).toHaveTextContent('attempt-a')
   expect(within(runner).getByText(stateA.currentItem.questionnaireInstruction)).toBeInTheDocument()
-  expect(api).toHaveBeenCalledWith(startA,'POST',{})
+  expect(api).toHaveBeenCalledWith(startA,'POST',{delivery:'inline'})
   // Use the actual still-available parent inbox summary, not rerendering the
   // runner manually or substituting a fake runner with its own state.
   const listToggle=screen.getByText('查看任务列表',{selector:'summary'})

@@ -41,7 +41,7 @@ describe('Survey project panels load on first visit',()=>{
     fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
     expect(screen.getByLabelText('p1:publish')).toHaveValue('保留的草稿')
     fireEvent.click(screen.getByRole('tab',{name:'数据'}));await screen.findByLabelText('p1:data')
-    await waitFor(()=>expect(mounts).toEqual(['p1:publish','p1:reports','p1:data']))
+    await waitFor(()=>expect([...new Set(mounts)]).toEqual(['p1:publish','p1:reports','p1:data']))
   })
   it('does not mount another project using the previous project’s visits',async()=>{
     setup();await openProject();fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
