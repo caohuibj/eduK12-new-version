@@ -15,7 +15,7 @@ import {
 } from '../campus/mfa.service'
 import {
   loginRateLimit, withLoginAccountFailureThrottle, recordLoginFailure,
-  clearLoginFailures, withLoginPasswordVerification,
+  clearLoginFailures, withLoginPasswordVerification, withLoginAccountLookup,
 } from '../../middleware/loginRateLimit'
 import { isBoundedAdmissionBusyError } from '../../services/boundedAdmissionGate'
 import { listEducationProductMemberships } from '../organization/educationProductAccess'
@@ -50,16 +50,18 @@ router.post('/login',loginRateLimit,withLoginAccountFailureThrottle(async(req,re
     const parsed=loginSchema.safeParse(req.body)
     if(!parsed.success)return failedLogin(req,res)
     const normalizedLogin=parsed.data.username.toLowerCase()
-    const match=await withLoginPasswordVerification(async()=>{
-      const account=await prisma.campusAccount.findUnique({
+    const account=await withLoginAccountLookup(()=>
+      prisma.campusAccount.findUnique({
         where:{normalizedLogin},include:{user:true},
       })
-      const u=account?.user
-      const usable=!!u && u.accountDomain==='SCHOOL' && u.isActive && !u.isFrozen
-        && (!u.expiresAt || u.expiresAt>new Date())
-      const ok=await comparePassword(parsed.data.password,usable?u!.passwordHash:DUMMY_HASH)
-      return usable&&ok?account:null
-    })
+    )
+    const user=account?.user
+    const usable=!!user && user.accountDomain==='SCHOOL' && user.isActive && !user.isFrozen
+      && (!user.expiresAt || user.expiresAt>new Date())
+    const ok=await withLoginPasswordVerification(()=>
+      comparePassword(parsed.data.password,usable?user!.passwordHash:DUMMY_HASH)
+    )
+    const match=usable&&ok&&user!.isActive&&!user!.isFrozen?account:null
     if(!match)return failedLogin(req,res)
     if(await schoolAccountNeedsMfa(match.userId)){
       const state=await beginSchoolMfaChallenge(req,res,match.userId,match.user.tokenVersion)

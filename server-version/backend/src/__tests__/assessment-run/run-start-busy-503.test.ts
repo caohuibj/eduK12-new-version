@@ -1,6 +1,8 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
-const m=vi.hoisted(()=>({start:vi.fn(),parent:vi.fn()}))
+const m=vi.hoisted(()=>({start:vi.fn(),parent:vi.fn(),getAttemptState:vi.fn(),campusAccess:vi.fn()}))
 vi.mock('../../modules/assessment-run/startExecution',()=>({startAssessmentRunExecution:m.start}))
+vi.mock('../../modules/composite/composite.service',()=>({getAttemptState:m.getAttemptState}))
+vi.mock('../../modules/campus/campus-composite-authority',()=>({checkCampusCompositeAccessAuthority:m.campusAccess}))
 vi.mock('../../modules/assessment-run/resourceBoundary',()=>({
   assertRunExecutionParent:m.parent,
   assertCurrentRunManagerBoundary:vi.fn(),
@@ -27,7 +29,11 @@ const req={
 
 describe('Run START transient rollback → 503 ASSESSMENT_START_BUSY',()=>{
   beforeEach(()=>{m.start.mockReset();m.parent.mockReset();m.parent.mockResolvedValue(undefined);
-    vi.spyOn(logger,'error').mockImplementation(()=>{})})
+    m.getAttemptState.mockReset();
+    m.campusAccess.mockReset();m.campusAccess.mockResolvedValue(true);
+    vi.spyOn(logger,'error').mockImplementation(()=>{});
+    vi.spyOn(logger,'info').mockImplementation(()=>{});
+    vi.spyOn(logger,'warn').mockImplementation(()=>{})})
 
   it('run.controller START maps a rolled-back transaction to 503 with Retry-After',async()=>{
     m.start.mockRejectedValue(new AssessmentStartBusyError('P2028'))
@@ -74,4 +80,72 @@ describe('Run START transient rollback → 503 ASSESSMENT_START_BUSY',()=>{
     expect(res.headers['Retry-After']).toBeUndefined()
     expect(res.body.message).toBe('服务器内部错误')
   })
+
+  it('attaches inline currentUnit when requested by body.delivery === "inline"',async()=>{
+    m.start.mockResolvedValue({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-1',replayed:false})
+    m.getAttemptState.mockResolvedValue({id:'attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:{id:'scale-1',type:'SCALE'}})
+    const res=fakeRes()
+    await runController.startExecution({...req,body:{delivery:'inline'},query:{}},res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.currentUnit).toEqual({id:'attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:{id:'scale-1',type:'SCALE'}})
+    expect(m.getAttemptState).toHaveBeenCalledWith('attempt-1',{userId:'student-1'},undefined,'current-unit')
+  })
+
+  it('attaches inline currentUnit when requested by query.view === "current-unit"',async()=>{
+    m.start.mockResolvedValue({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-2',replayed:false})
+    m.getAttemptState.mockResolvedValue({id:'attempt-2',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:{id:'form-1',type:'FORM_SECTION'}})
+    const res=fakeRes()
+    await runController.startExecution({...req,body:{},query:{view:'current-unit'}},res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.currentUnit).toEqual({id:'attempt-2',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:{id:'form-1',type:'FORM_SECTION'}})
+    expect(m.getAttemptState).toHaveBeenCalledWith('attempt-2',{userId:'student-1'},undefined,'current-unit')
+  })
+
+  it('safely omits currentUnit if getAttemptState fails without failing the committed START',async()=>{
+    m.start.mockResolvedValue({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-3',replayed:false})
+    m.getAttemptState.mockRejectedValue(new Error('transient projection error'))
+    const res=fakeRes()
+    await runController.startExecution({...req,body:{delivery:'inline'},query:{}},res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.currentUnit).toBeUndefined()
+    expect(res.body.data.state).toBe('STARTED')
+    expect(res.body.data.runtimeBindingRef).toBe('attempt-3')
+  })
+
+  it('does not attach currentUnit when delivery is not requested',async()=>{
+    m.start.mockResolvedValue({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-4',replayed:false})
+    const res=fakeRes()
+    await runController.startExecution({...req,body:{},query:{}},res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.currentUnit).toBeUndefined()
+    expect(m.getAttemptState).not.toHaveBeenCalled()
+  })
+
+  it('omits currentUnit when campus composite access authority is revoked for SCHOOL user',async()=>{
+    m.start.mockResolvedValue({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-revoked',replayed:true})
+    m.campusAccess.mockResolvedValue(false)
+    const schoolReq={...req,user:{userId:'student-revoked',role:'STUDENT',accountDomain:'SCHOOL'},body:{delivery:'inline'}}
+    const res=fakeRes()
+    await runController.startExecution(schoolReq,res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.state).toBe('STARTED')
+    expect(res.body.data.currentUnit).toBeUndefined()
+    expect(m.campusAccess).toHaveBeenCalledWith({attemptId:'attempt-revoked',userId:'student-revoked'})
+    expect(m.getAttemptState).not.toHaveBeenCalled()
+  })
+
+  it('delivers currentUnit when campus composite access authority is valid for SCHOOL user',async()=>{
+    m.start.mockResolvedValue({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-valid',replayed:true})
+    m.campusAccess.mockResolvedValue(true)
+    m.getAttemptState.mockResolvedValue({id:'attempt-valid',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS'})
+    const schoolReq={...req,user:{userId:'student-valid',role:'STUDENT',accountDomain:'SCHOOL'},body:{delivery:'inline'}}
+    const res=fakeRes()
+    await runController.startExecution(schoolReq,res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.state).toBe('STARTED')
+    expect(res.body.data.currentUnit).toEqual({id:'attempt-valid',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS'})
+    expect(m.campusAccess).toHaveBeenCalledWith({attemptId:'attempt-valid',userId:'student-valid'})
+    expect(m.getAttemptState).toHaveBeenCalledWith('attempt-valid',{userId:'student-valid'},undefined,'current-unit')
+  })
 })
+

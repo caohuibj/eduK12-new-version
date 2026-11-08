@@ -1,5 +1,5 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
-const state=vi.hoisted(()=>({mfa:false,forced:false,setCookie:vi.fn(),find:vi.fn()}))
+const state=vi.hoisted(()=>({mfa:false,forced:false,setCookie:vi.fn(),find:vi.fn(),gate:vi.fn((fn:()=>unknown)=>fn())}))
 vi.mock('../../config/database',()=>({prisma:{campusAccount:{findUnique:state.find}}}))
 vi.mock('../../utils/password',()=>({comparePassword:async()=>true,hashPassword:vi.fn(),isValidPassword:()=>true,PASSWORD_MAX_LENGTH:72}))
 vi.mock('../../utils/jwt',()=>({generateToken:()=> 'synthetic-token'}))
@@ -8,7 +8,7 @@ vi.mock('../../middleware/auth',()=>({authenticateSchool:vi.fn()}))
 vi.mock('../../utils/sessionRevocation',()=>({revokeCurrentSession:vi.fn()}))
 vi.mock('../../middleware/mfaAttemptRateLimit',()=>({createMfaAttemptRateLimiter:()=>vi.fn()}))
 vi.mock('../../middleware/passwordChangeAdmission',()=>({passwordChangeRateLimit:vi.fn(),withPasswordChangeAdmission:(x:unknown)=>x}))
-vi.mock('../../middleware/loginRateLimit',()=>({loginRateLimit:vi.fn(),withLoginAccountFailureThrottle:(x:unknown)=>x,recordLoginFailure:vi.fn(),clearLoginFailures:vi.fn(),withLoginPasswordVerification:(fn:()=>unknown)=>fn()}))
+vi.mock('../../middleware/loginRateLimit',()=>({loginRateLimit:vi.fn(),withLoginAccountFailureThrottle:(x:unknown)=>x,recordLoginFailure:vi.fn(),clearLoginFailures:vi.fn(),withLoginPasswordVerification:(fn:()=>unknown)=>state.gate(fn),withLoginAccountLookup:(fn:()=>unknown)=>fn()}))
 vi.mock('../../services/boundedAdmissionGate',()=>({isBoundedAdmissionBusyError:()=>false}))
 vi.mock('../../modules/campus/mfa.service',()=>({schoolAccountNeedsMfa:async()=>state.mfa,beginSchoolMfaChallenge:async()=>({mfaRequired:true,enrolled:true}),getPendingChallenge:vi.fn(),startSchoolMfaEnrollment:vi.fn(),finishSchoolMfa:vi.fn(),verifySchoolTotpStepUp:vi.fn()}))
 import router from '../../modules/campus/auth.routes'
@@ -34,5 +34,20 @@ describe('School login projection matches me without private fields',()=>{
   state.mfa=true
   expect((await call('/login','post')).data).toEqual({mfaRequired:true,enrolled:true})
   expect(state.setCookie).not.toHaveBeenCalled()
+ })
+ it('narrows password verification gate to password compare only, keeping account lookup outside',async()=>{
+  const events:string[]=[]
+  state.find.mockImplementation(async()=>{
+   events.push('db_find')
+   return {userId:'u',loginName:'student.one',user:currentUser()}
+  })
+  state.gate.mockImplementation(async(fn:()=>unknown)=>{
+   events.push('gate_enter')
+   const result=await fn()
+   events.push('gate_exit')
+   return result
+  })
+  await call('/login','post')
+  expect(events).toEqual(['db_find','gate_enter','gate_exit'])
  })
 })

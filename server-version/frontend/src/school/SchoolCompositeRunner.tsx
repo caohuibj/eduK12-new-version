@@ -70,15 +70,24 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
       }
       if(currentIdentity.current!==identity)return
       const result=await api<{
-        state:'STARTED'|'IN_PROGRESS';runtimeBindingKind?:string;runtimeBindingRef?:string
-      }>(prefix+'/start','POST',{})
+        state:'STARTED'|'IN_PROGRESS';runtimeBindingKind?:string;runtimeBindingRef?:string;currentUnit?:CompositeAttemptState
+      }>(prefix+'/start','POST',{delivery:'inline'})
       if(result.state==='IN_PROGRESS'){
         setError('启动请求正在确认中，请重新核对；请勿重复开启另一份测评。')
         return
       }
       if(result.state!=='STARTED'||result.runtimeBindingKind!=='COMPOSITE'
         ||!result.runtimeBindingRef)throw new Error('正式测评尚未提供安全的 Composite 执行实例')
-      await load(result.runtimeBindingRef)
+      if(result.currentUnit&&result.currentUnit.id===result.runtimeBindingRef&&result.currentUnit.deliveryMode==='FINAL_ONLY'){
+        if(currentIdentity.current!==identity)return
+        setState(result.currentUnit)
+        if(result.currentUnit.status==='COMPLETED'){
+          setDone(true)
+          if(!observer&&completion.current!==result.currentUnit.id){completion.current=result.currentUnit.id;onParentCompletedRef.current?.()}
+        }
+      }else{
+        await load(result.runtimeBindingRef)
+      }
     }catch(e){setError(e instanceof Error?e.message:'测评暂时不能开始')}
     finally{setBusy(false)}
   }

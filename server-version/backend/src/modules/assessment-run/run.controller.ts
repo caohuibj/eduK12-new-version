@@ -280,10 +280,54 @@ export const assessmentRunController = {
         runId: req.params.runId,
         executionId: req.params.executionId,
       })
-      return success(res, await startAssessmentRunExecution({
+      const started = await startAssessmentRunExecution({
         executionId: req.params.executionId,
         actorUserId: req.user.userId,
-      }))
+      })
+      const requestedDelivery = req.query.view === 'current-unit'
+        || req.query.delivery === 'inline'
+        || req.body?.delivery === 'inline'
+        || req.body?.view === 'current-unit'
+      if (
+        requestedDelivery
+        && started.state === 'STARTED'
+        && started.runtimeBindingKind === 'COMPOSITE'
+        && started.runtimeBindingRef
+      ) {
+        const startMs = Date.now()
+        try {
+          if (req.user.accountDomain === 'SCHOOL') {
+            const { checkCampusCompositeAccessAuthority } = await import('../campus/campus-composite-authority')
+            const allowed = await checkCampusCompositeAccessAuthority({
+              attemptId: started.runtimeBindingRef,
+              userId: req.user.userId,
+            })
+            if (!allowed) {
+              const { logger } = await import('../../utils/logger')
+              logger.info('assessment-run inline delivery', { phase: 'inline_delivery', outcome: 'fallback', reason: 'CAMPUS_AUTHORITY_DENIED' })
+              return success(res, started)
+            }
+          }
+          const { getAttemptState } = await import('../composite/composite.service')
+          const currentUnit = await getAttemptState(
+            started.runtimeBindingRef,
+            { userId: req.user.userId },
+            undefined,
+            'current-unit',
+          )
+          const wallTimeMs = Date.now() - startMs
+          const { logger } = await import('../../utils/logger')
+          logger.info('assessment-run inline delivery', { phase: 'inline_delivery', outcome: 'success', wallTimeMs })
+          return success(res, { ...started, currentUnit })
+        } catch (projectionErr: any) {
+          // Failure outside the committed transaction falls back to plain started result.
+          const wallTimeMs = Date.now() - startMs
+          const { logger } = await import('../../utils/logger')
+          logger.warn('assessment-run inline delivery', { phase: 'inline_delivery', outcome: 'fallback', reason: String(projectionErr?.message ?? 'unknown'), wallTimeMs })
+          return success(res, started)
+        }
+      }
+      return success(res, started)
     } catch (err) { return fail(res, err) }
   },
 
