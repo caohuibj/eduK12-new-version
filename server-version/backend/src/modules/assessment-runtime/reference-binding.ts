@@ -61,7 +61,7 @@ const toVerifiedReferenceSet = (row: ExactReferenceRow): VerifiedReferenceSet =>
   if (!validation.definition || validation.issues.some((issue) => issue.severity === 'error')) {
     throw new Error(`Reference set ${row.instrumentKey}/${row.referenceVersion} is invalid`)
   }
-  const definition = retainImmutableCanonicalValue(validation.definition)
+  const definition = retainImmutableCanonicalValue(structuredClone(validation.definition))
   const activeDefinition = definition.entries.some((entry) => entry.governance)
     ? retainImmutableCanonicalValue({ ...definition, status: 'ACTIVE' as const })
     : definition
