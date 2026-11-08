@@ -223,6 +223,7 @@ import {
   formSectionSlotKey,
   type FrozenActiveSlotV1,
 } from '../assessment-runtime/slot-set'
+import { BoundedArtifactCache } from '../assessment-runtime/bounded-artifact-cache'
 import { runnerDefinition } from '../scale/scale-definition'
 import type {
   CompositeReportAudience,
@@ -3047,6 +3048,33 @@ export interface RelationalCompositeAttemptIdentityV1 {
   consentId: string | null
 }
 
+// Ordinary frozen questionnaires (QUESTIONNAIRE + FINAL_ONLY, SCALE/FORM
+// only, no Training flow/variant/package/protocol/timing, no relational/
+// education/field entry) take a pruned START: the specialist branches are
+// no-ops for them. Evaluated once from the loaded publication; the
+// reassignment inside createAttempt only overlays policy/snapshot fields and
+// never changes these predicate fields (the variant block is the one place
+// items are filtered, and it only runs when variantEnabled, which already
+// fails this predicate). Kept: the admission lock, the publication re-read
+// and the course-student re-check (in-transaction race guards under the
+// lock), the content-binding release batch, and the collection guard.
+// Defined here (outside createAttempt) so the source-contract tests that
+// slice createAttempt's first 30000 characters keep their markers in range.
+const isOrdinaryQuestionnaireStart = (
+  composite: any,
+  relationalIdentity?: RelationalCompositeAttemptIdentityV1,
+  educationStart?: VerifiedEducationStart,
+  fieldStart?: VerifiedFieldStart,
+): boolean =>
+  composite.productKind === 'QUESTIONNAIRE' &&
+  composite.deliveryMode !== 'LEGACY' &&
+  !relationalIdentity && !educationStart && !fieldStart &&
+  composite.trainingFlowFrozen == null && composite.trainingVariantFrozen == null &&
+  composite.reportPackageKey == null && composite.analysisProtocolKey == null &&
+  composite.trainingTimingPolicy == null &&
+  !composite.items.some((item: any) => item.type === 'COGNITIVE' || item.type === 'SITUATIONAL') &&
+  !composite.items.some((item: any) => item.standardCombinationSource != null)
+
 const precomputeScaleOnlyActiveSlotSet = async (db: Db, input: {
   finalOnly: boolean; flowEnabled: boolean; composite: any; attemptEpoch: number;
   contentCandidate: any; prepared?: PreparedVariantRuntimes; formSections: any[];
@@ -3106,6 +3134,7 @@ const createAttempt = async (
   fieldStart?: VerifiedFieldStart,
 ) => {
   assertSupportedComposite(composite)
+  const isOrdinaryQuestionnaire = isOrdinaryQuestionnaireStart(composite, relationalIdentity, educationStart, fieldStart)
   const field=fieldStart?readVerifiedFieldStart(fieldStart,{tx:db,compositeId:composite.id,respondentUserId:userId??''}):undefined
   if(field&&(relationalIdentity||educationStart||accessTokenId||credential||composite.productKind!=='ORGANIZATION_RESOURCE'))throw compositeForbidden('现场观察准入上下文不匹配')
   const educationProduct=field?'TEACHER':educationStart?readVerifiedEducationStart(educationStart,{tx:db,compositeId:composite.id,assignmentRef:relationalIdentity?.assignmentRef??'',subjectUserId:relationalIdentity?.subjectUserId??'',respondentUserId:userId??''}):undefined
@@ -3124,7 +3153,7 @@ const createAttempt = async (
   }
   let feedbackBinding: TrainingFeedbackBinding | null = null
   let persistenceBinding: { publicationIdentity: Record<string, unknown>; courseId: string; roundId: string | null; cutoffs: Array<Date | null> } | null = null
-  if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) {
+  if(!isOrdinaryQuestionnaire && composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) {
     if(composite.productKind!=='ORGANIZATION_RESOURCE'||!(educationComposition||composite.creationKey?.startsWith('private-form:'))||(!relationalIdentity&&!field)||!userId
       ||composite.deliveryMode==='LEGACY'||composite.reportPackageKey||composite.analysisProtocolKey)
       throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
@@ -3250,7 +3279,7 @@ const createAttempt = async (
   const hasPreciseCognitiveProfiles=composite.items.some((item:any)=>item.type==='COGNITIVE'&&(readTrainingCognitiveTaskBinding(item.cognitiveAssignment?.courseSnapshot)!==null||readEducationCognitiveProfilePin(item.cognitiveAssignment?.courseSnapshot)!==null))
   const educationStandardUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationStandard):[]
   const educationLibraryUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationLibrary):[]
-  const educationStandards=await readEducationStandardStartSources(db as Prisma.TransactionClient,educationStandardUnits,composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scale))
+  const educationStandards=isOrdinaryQuestionnaire?new Map():await readEducationStandardStartSources(db as Prisma.TransactionClient,educationStandardUnits,composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scale))
   const educationFrozenScales=new Map<string,Awaited<ReturnType<typeof freezeExactStandardScaleDefinition>>>()
   const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled||hasStandardCombinations||hasPreciseCognitiveProfiles||educationStandardUnits.length>0||educationLibraryUnits.length>0) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
   if (variantEnabled && relationalIdentity) throw compositeBadRequest('概率分卷不支持关系测评投放')
@@ -3271,7 +3300,7 @@ const createAttempt = async (
   }
   const nativeSjtUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationNative?.provider==='SJT_RELEASE'):[]
   const nativeSjt=nativeSjtUnits.length?await readEducationSjtSources(db as Prisma.TransactionClient,nativeSjtUnits.map(unit=>({provider:'SJT_RELEASE',kind:'SJT',versionId:unit.source.educationNative!.sourceId,contentHash:unit.source.educationNative!.contentHash})),educationProduct!):null
-  const situationalReleases = nativeSjt?new Map([...nativeSjt.values()].map(source=>[situationalReleaseKey(source),source.resolved])):educationProduct
+  const situationalReleases = isOrdinaryQuestionnaire ? new Map() : nativeSjt?new Map([...nativeSjt.values()].map(source=>[situationalReleaseKey(source),source.resolved])):educationProduct
     ? await resolveEducationAssessmentSituationalItems(db as Prisma.TransactionClient,composite.items.filter((item:any)=>item.type==='SITUATIONAL').map(situationalItemIdentity),educationProduct)
     : await resolveCompositeSituationalItems(composite.items, db, true, compositeSjtGrantScope(composite))
   if ([...situationalReleases.values()].some(release => release.snapshot.authorizationReceipt)) {
@@ -3478,7 +3507,9 @@ const createAttempt = async (
       })),
     })
   }
-  const materialAssignment = await allocateTrainingMaterial(db,attempt,composite,restartMaterialClaimId)
+  // Material allocation returns null immediately without a flow (flow?.
+  // schemaVersion !== 2); ordinary questionnaires have no flow.
+  const materialAssignment = isOrdinaryQuestionnaire ? null : await allocateTrainingMaterial(db,attempt,composite,restartMaterialClaimId)
   const flowCandidate = flowEnabled ? await freezeTrainingFlowCandidates(db,attempt,composite,prepared!,situationalReleases) : null
   const runtime = flowCandidate?.runtime ?? await createChildRecords(db, attempt, composite, composite.items, userId, formSections, situationalReleases, prepared,undefined,educationProduct,educationStart?bindVerifiedEducationAttempt(educationStart,db,attempt):undefined)
   if (finalOnly && !precomputedActiveSlotSet) {
@@ -4385,7 +4416,84 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
   situationalAttempts: { select: { id: true, compositeItemId: true } },
 } satisfies Prisma.CompositeAssessmentAttemptSelect
 
+const UNIFIED_ATTEMPT_STATE_PARENT_SELECT_NARROWED = {
+  ...UNIFIED_ATTEMPT_STATE_PARENT_SELECT,
+  compositeAssessment: {
+    select: {
+      ...UNIFIED_ATTEMPT_STATE_PARENT_SELECT.compositeAssessment.select,
+      items: {
+        orderBy: { position: 'asc' },
+        select: {
+          id: true,
+          type: true,
+          position: true,
+          required: true,
+          scaleId: true,
+          cognitiveAssignmentId: true,
+          situationalInstrumentKey: true,
+          situationalInstrumentVersion: true,
+          formSectionId: true,
+          formLabel: true,
+          contextKey: true,
+          scale: {
+            select: {
+              id: true,
+              code: true,
+              name: true,
+              instrumentVersion: true,
+            },
+          },
+          cognitiveAssignment: { select: { id: true, title: true } },
+        },
+      },
+    },
+  },
+} satisfies Prisma.CompositeAssessmentAttemptSelect
+
+// Narrowed parent select for the attempt-state read. It is used for EVERY
+// attempt (not only frozen-ordinary ones): the dropped fields are never read
+// by getAttemptState / getUnifiedCompositeAttemptState, so the projection is
+// identical to the full select for all paths, and a single read keeps the
+// load-once contract (the locked Training child-candidate flow relies on
+// exactly one load read before the FLOW re-read below). Dropped, all
+// large-payload fields: the scale description/instruction/instrumentClass
+// (the current unit's scale text comes from its child row / frozen runtime),
+// and the FORM-item form fields (FORM items never reach the runner; forms
+// are delivered as formSections, whose full select is kept). Kept:
+// cognitiveAssignment id/title (resolveCompositeItemLabel reads it for
+// COGNITIVE summary labels) and the situational instrument keys (small
+// scalars). Every routing/marker scalar is kept via the spread —
+// assignmentRef, asyncReportEpoch, attemptEpoch, contextSnapshotHash, the
+// frozen hashes, and the training variant/flow markers — so scope resolution
+// never sees UNKNOWN, and the finalize/reconcile post-processing keeps its
+// inputs.
+
 export type CompositeAttemptStateView = 'full' | 'current-unit'
+
+// definitionHash is a pure function of the frozen composite (assessment id,
+// item ids/types/positions/form-section links, section ids/positions/item
+// ids) for a frozen attempt, so repeated state reads recompute the same
+// canonical hash. The frozen slot-set hash covers item identities and
+// definition hashes but not positions, so the cache key also carries the
+// item/section positions; a pure reorder must not reuse a stale hash.
+const cachedAttemptDefinitionHashes = new BoundedArtifactCache<string>(512, 512 * 1024)
+const cachedCompositeDefinitionHash = (attempt: any, sections: any[]): string => {
+  const key = [
+    attempt.compositeAssessment.id,
+    attempt.frozenActiveSlotSetHash,
+    attempt.compositeAssessment.items.map((item: any) => `${item.id}:${item.position}`).join(','),
+    sections.map((section: any) => `${section.id}:${section.position}`).join(','),
+  ].join('|')
+  const known = cachedAttemptDefinitionHashes.get(key)
+  if (known) return known
+  const hash = computeSubmissionPayloadHash({
+    assessmentId: attempt.compositeAssessment.id,
+    items: attempt.compositeAssessment.items.map((item: any) => ({ id: item.id, type: item.type, position: item.position, formSectionId: item.formSectionId ?? null })),
+    formSections: sections.map((section: any) => ({ id: section.id, position: section.position, itemIds: section.items.map((item: any) => item.id) })),
+  })
+  cachedAttemptDefinitionHashes.set(key, hash, hash.length)
+  return hash
+}
 
 const getUnifiedCompositeAttemptState = async (
   attempt: any,
@@ -4530,10 +4638,23 @@ const getUnifiedCompositeAttemptState = async (
     // Lazy current-unit: only the unfinished Scale loads its frozen runtime
     // and admission fields. The parent projection carries only cheap child
     // summaries, so the current unit does exactly one authoritative child read
-    // which is then shared by runtime validation and admission.
+    // which is then shared by runtime validation and admission. The current
+    // unit is incomplete by construction (it is the first unfinished unit),
+    // so it carries no persisted answers/result yet — the SCALE currentItem
+    // returns answers: [] and result only serves completed-final replays.
+    // Drop both payload columns for incomplete children; keep them when the
+    // slot already completed (defensive). The narrowed parent select no
+    // longer carries the scale description/instruction, so the current
+    // unit's scale text comes from this child row (same scale row).
+    const slotCompleted = headerByKey.get(slot.slotKey)?.terminalState === 'COMPLETED'
     const child = await prisma.assessment.findUnique({
       where: { id: summary.id },
-      select: { ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT, compositeAttempt: false },
+      select: {
+        ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
+        compositeAttempt: false,
+        ...(slotCompleted ? {} : { answers: false, result: false }),
+        scale: { select: { ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT.scale.select, description: true, instruction: true } },
+      },
     })
     if (!child || !child.runtimeSnapshotEncrypted) throw compositeConflict('量表冻结运行时不可用，请重启测评')
     try {
@@ -4558,8 +4679,8 @@ const getUnifiedCompositeAttemptState = async (
         scale: {
           id: item.scale.id,
           name: packageSlotLabels.get(item.position) ?? item.scale.name,
-          instruction: runtime.instruction !== undefined ? runtime.instruction?.text ?? null : item.scale.instruction ?? null,
-          description: item.scale.description ?? null,
+          instruction: runtime.instruction !== undefined ? runtime.instruction?.text ?? null : child.scale?.instruction ?? item.scale?.instruction ?? null,
+          description: child.scale?.description ?? item.scale?.description ?? null,
           instrumentVersion: item.scale.instrumentVersion,
           definition: runnerDefinition(runtime.definition),
         },
@@ -4643,11 +4764,7 @@ const getUnifiedCompositeAttemptState = async (
     const instruction=frozenEducationBlockInstruction(frozenSlotSet.slots,key)
     if(instruction)currentItem.questionnaireInstruction=instruction
   }
-  const definitionHash = computeSubmissionPayloadHash({
-    assessmentId: attempt.compositeAssessment.id,
-    items: attempt.compositeAssessment.items.map((item: any) => ({ id: item.id, type: item.type, position: item.position, formSectionId: item.formSectionId ?? null })),
-    formSections: sections.map((section: any) => ({ id: section.id, position: section.position, itemIds: section.items.map((item: any) => item.id) })),
-  })
+  const definitionHash = cachedCompositeDefinitionHash(attempt, sections)
   return {
     id: attempt.id,
     ...(trainingPersistenceMetadata(attempt) ? { trainingPersistence: trainingPersistenceMetadata(attempt), checkpointDefinitionHash: attempt.frozenActiveSlotSetHash } : {}),
@@ -5133,13 +5250,16 @@ const patchCompositeStateAfterFinalize = (
 }
 
 export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }, requestedUnit?: {itemId?:string;sectionId?:string}, view: CompositeAttemptStateView = 'full') => {
-  // Load-once: the parent row is read exactly once with the full unified
+  // Load-once: the parent row is read exactly once with the narrowed unified
   // select and shared by the unified state projection and the
-  // ensure*AtDelivery steps. The legacy path (rare, pre-UNIFIED_V1 attempts)
+  // ensure*AtDelivery steps. The narrowed shape drops only fields the
+  // projection never reads (see the select above), so it is identical to
+  // the full select for every attempt — no second read for special
+  // questionnaires. The legacy path (rare, pre-UNIFIED_V1 attempts)
   // re-reads through findAttempt below.
   let runtime = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
-    select: UNIFIED_ATTEMPT_STATE_PARENT_SELECT,
+    select: UNIFIED_ATTEMPT_STATE_PARENT_SELECT_NARROWED,
   }) as any
   if (!runtime) throw compositeNotFound('综合测评记录不存在')
   if (runtime.runtimeGeneration === 'UNIFIED_V1') {
