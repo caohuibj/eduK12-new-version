@@ -42,10 +42,16 @@ const responseError = (response: ApiResponse<unknown>) => Object.assign(new Erro
 const readAnswer = (raw: unknown): Answer => {
   if (typeof raw === 'object' && raw !== null) {
     const obj = raw as Record<string, unknown>
-    if ('responseValue' in obj || 'value' in obj || 'otherText' in obj) {
+    if ('responseValue' in obj) {
       return {
-        responseValue: obj.responseValue as string | number | undefined,
-        value: 'value' in obj ? obj.value : obj.responseValue,
+        responseValue: obj.responseValue as string | number,
+        responseTimeMs: typeof obj.responseTimeMs === 'number' ? obj.responseTimeMs : undefined,
+        changeCount: typeof obj.changeCount === 'number' ? obj.changeCount : undefined,
+      }
+    }
+    if ('value' in obj || 'otherText' in obj) {
+      return {
+        value: obj.value,
         responseTimeMs: typeof obj.responseTimeMs === 'number' ? obj.responseTimeMs : undefined,
         changeCount: typeof obj.changeCount === 'number' ? obj.changeCount : undefined,
         otherText: typeof obj.otherText === 'string' ? obj.otherText : undefined,
@@ -255,7 +261,6 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
     timingRef.current[current.unit.itemId]?.answer(current.question.itemCode, previous?.responseValue, value)
     const now = Date.now(), answer: Answer = {
       responseValue: value,
-      value,
       responseTimeMs: (previous?.responseTimeMs ?? 0) + Math.max(0, now - questionStart.current),
       changeCount: (previous?.changeCount ?? 0) + (previous && previous.responseValue !== value ? 1 : 0),
     }
@@ -481,16 +486,14 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
         const nextTiming: Record<string, SurveyScaleTimingTracker> = {}
         for (const unit of definition.units) {
           const row = rows.find(r => r.slotKey === `scale:${unit.itemId}`)
-          if (row) {
-            for (const q of unit.scale.definition!.items) if (Object.prototype.hasOwnProperty.call(row.answers, q.itemCode)) next[wholeAnswerKey(unit.itemId, q.itemCode)] = readAnswer(row.answers[q.itemCode])
-            if (unit.trainingTiming) nextTiming[unit.itemId] = new SurveyScaleTimingTracker(row.itemTimings ?? {}, Object.fromEntries(Object.entries(row.answers).map(([key, value]) => [key, readAnswer(value).responseValue])))
-          }
+          if (!row) throw new Error('服务器整卷草稿不完整，本机内容保持不变。')
+          for (const q of unit.scale.definition!.items) if (Object.prototype.hasOwnProperty.call(row.answers, q.itemCode)) next[wholeAnswerKey(unit.itemId, q.itemCode)] = readAnswer(row.answers[q.itemCode])
+          if (unit.trainingTiming) nextTiming[unit.itemId] = new SurveyScaleTimingTracker(row.itemTimings ?? {}, Object.fromEntries(Object.entries(row.answers).map(([key, value]) => [key, readAnswer(value).responseValue])))
         }
         for (const section of (definition.formSections || [])) {
           const row = rows.find(r => r.slotKey === `form:${section.id}`)
-          if (row) {
-            for (const item of section.items) if (Object.prototype.hasOwnProperty.call(row.answers, item.id)) next[wholeFormAnswerKey(section.id, item.id)] = readAnswer(row.answers[item.id])
-          }
+          if (!row) throw new Error('服务器整卷草稿不完整，本机内容保持不变。')
+          for (const item of section.items) if (Object.prototype.hasOwnProperty.call(row.answers, item.id)) next[wholeFormAnswerKey(section.id, item.id)] = readAnswer(row.answers[item.id])
         }
         const wholeScaleTiming = Object.fromEntries(definition.units.filter(unit => unit.trainingTiming).map(unit => [unit.itemId,
           { snapshotHash: unit.trainingTiming!.snapshotHash, items: nextTiming[unit.itemId]?.snapshot() ?? {} }]))
