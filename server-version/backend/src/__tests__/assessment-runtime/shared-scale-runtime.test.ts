@@ -138,3 +138,46 @@ it('roundtrips exact library presentation through shared runtime storage', async
   expect(restored).toEqual(frozen)
   expect(restored.measurementPresentation?.presentationMode).toBe('ALL_AT_ONCE')
 })
+
+it('persists storageVersion=3 published artifact references with zero DB writes and reconstructs V1/V2 snapshots', async () => {
+  const { buildPublishedScaleArtifact, cacheCommittedPublishedScaleArtifact } = await import('../../modules/assessment-runtime/published-scale-artifact')
+  const { decryptFrozenScaleRuntimeSnapshot, setSnapshotPublishedArtifactHash } = await import('../../modules/assessment-runtime/runtime-snapshot')
+  const s = source()
+  const built = buildPublishedScaleArtifact({
+    release: { releaseId: 'release-1', contentHash: 'a'.repeat(64) },
+    instrumentKey: s.identity.instrumentKey,
+    instrumentVersion: s.identity.instrumentVersion,
+    definition: s.executable!.definition,
+    instruction: null,
+  })
+  cacheCommittedPublishedScaleArtifact(built.record.artifactHash, built.artifact, built.record.plaintextBytes)
+  const m = memory()
+  m.rows.set(built.record.artifactHash, built.record)
+
+  const v1 = snapshot('2026-10-16T02:00:00.000Z')
+  setSnapshotPublishedArtifactHash(v1, built.record.artifactHash)
+  const cipherV1 = await m.store.save(v1)
+  expect(m.writes).not.toHaveBeenCalled()
+  const refV1 = reference(cipherV1)
+  expect(refV1.storageVersion).toBe(3)
+  expect(refV1.artifactHash).toBe(built.record.artifactHash)
+  expect(await m.store.load(refV1)).toEqual(v1)
+  expect(decryptFrozenScaleRuntimeSnapshot(cipherV1)).toEqual(v1)
+  await expect(m.store.load({ ...refV1, snapshotHash: '0'.repeat(64) })).rejects.toThrow('hash mismatch')
+
+  const v2 = createFrozenScaleRuntimeSnapshotV2ForTest({
+    instrumentKey: s.identity.instrumentKey,
+    instrumentVersion: s.identity.instrumentVersion,
+    definition: s.executable!.definition,
+    compiledPolicy: compileScalePolicy(s),
+    frozenAt: new Date('2026-10-16T03:00:00.000Z'),
+  })
+  setSnapshotPublishedArtifactHash(v2, built.record.artifactHash)
+  const cipherV2 = await m.store.save(v2)
+  expect(m.writes).not.toHaveBeenCalled()
+  const refV2 = reference(cipherV2)
+  expect(refV2.storageVersion).toBe(3)
+  expect(refV2.schemaVersion).toBe(2)
+  expect(await m.store.load(refV2)).toEqual(v2)
+  expect(decryptFrozenScaleRuntimeSnapshot(cipherV2)).toEqual(v2)
+})

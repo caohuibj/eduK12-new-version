@@ -2,7 +2,8 @@ import {
   validateReferenceSetDefinition,
   type AssessmentReferenceSetDefinition,
 } from '../assessment-reference/reference'
-import { canonicalHash } from './canonical'
+import { BoundedArtifactCache, artifactContentKey, jsonArtifactBytes } from './bounded-artifact-cache'
+import { canonicalHash, retainImmutableCanonicalValue } from './canonical'
 import type { ReferenceBindingSnapshot } from './types'
 import type {Prisma} from '@prisma/client'
 
@@ -28,7 +29,27 @@ export type ExactReferenceDb = {
 
 export type FrozenReferenceDb = ExactReferenceDb
 
-const toDefinition = (row: ExactReferenceRow): AssessmentReferenceSetDefinition => {
+type VerifiedReferenceSet = {
+  definition: AssessmentReferenceSetDefinition
+  activeDefinition: AssessmentReferenceSetDefinition
+  hash: string
+}
+
+const verifiedReferenceCache = new BoundedArtifactCache<VerifiedReferenceSet>(128, 8 * 1024 * 1024)
+
+const toVerifiedReferenceSet = (row: ExactReferenceRow): VerifiedReferenceSet => {
+  const bytes = jsonArtifactBytes({
+    instrumentType: row.instrumentType,
+    instrumentKey: row.instrumentKey,
+    referenceVersion: row.referenceVersion,
+    status: row.status,
+    definition: row.definition,
+  })
+  const cacheKey = bytes && bytes.length <= 1024 * 1024 ? artifactContentKey(bytes) : null
+  if (cacheKey) {
+    const cached = verifiedReferenceCache.get(cacheKey)
+    if (cached) return cached
+  }
   const validation = validateReferenceSetDefinition({
     ...(row.definition && typeof row.definition === 'object' ? row.definition : {}),
     schemaVersion: 1,
@@ -40,7 +61,16 @@ const toDefinition = (row: ExactReferenceRow): AssessmentReferenceSetDefinition 
   if (!validation.definition || validation.issues.some((issue) => issue.severity === 'error')) {
     throw new Error(`Reference set ${row.instrumentKey}/${row.referenceVersion} is invalid`)
   }
-  return validation.definition
+  const definition = retainImmutableCanonicalValue(validation.definition)
+  const activeDefinition = definition.entries.some((entry) => entry.governance)
+    ? retainImmutableCanonicalValue({ ...definition, status: 'ACTIVE' as const })
+    : definition
+  const hash = canonicalHash(activeDefinition)
+  const verified: VerifiedReferenceSet = { definition, activeDefinition, hash }
+  if (cacheKey && bytes) {
+    verifiedReferenceCache.set(cacheKey, verified, bytes.length * 4 + 512)
+  }
+  return verified
 }
 
 export const referenceSetHash = (definition: AssessmentReferenceSetDefinition): string => canonicalHash(definition.entries.some(entry => entry.governance) ? { ...definition, status: 'ACTIVE' } : definition)
@@ -59,9 +89,8 @@ export const loadExactReferenceSet = async (
     },
   })
   if (!row) throw new Error(`Reference set ${input.instrumentKey}/${input.referenceVersion} was not found`)
-  const definition = toDefinition(row)
-  const hash = referenceSetHash(definition)
-  return { definition, hash, status: row.status }
+  const verified = toVerifiedReferenceSet(row)
+  return { definition: verified.definition, hash: verified.hash, status: row.status }
 }
 
 export const freezeExactReferenceBindings = async (
@@ -98,8 +127,8 @@ export const freezeExactReferenceBindings = async (
   for (const version of versions) {
     const row = rowsByVersion.get(version)
     if (!row) throw new Error(`Reference set ${input.instrumentKey}/${version} was not found`)
-    const definition = toDefinition(row)
-    loadedByVersion.set(version, { hash: referenceSetHash(definition), status: row.status })
+    const verified = toVerifiedReferenceSet(row)
+    loadedByVersion.set(version, { hash: verified.hash, status: row.status })
   }
 
   return input.selections.map((selection) => {
@@ -148,9 +177,8 @@ export const loadFrozenReferenceSets = async (
     if (!loaded) {
       const row = byVersion.get(binding.referenceVersion)
       if (!row) throw new Error(`Reference set ${input.instrumentKey}/${binding.referenceVersion} was not found`)
-      const definition = toDefinition(row)
-      loaded = { definition: definition.entries.some(entry => entry.governance) ? { ...definition, status: 'ACTIVE' as const } : definition,
-        hash: referenceSetHash(definition) }
+      const verified = toVerifiedReferenceSet(row)
+      loaded = { definition: verified.activeDefinition, hash: verified.hash }
       loadedByVersion.set(binding.referenceVersion, loaded)
     }
     if (loaded.hash !== binding.referenceHash) {
