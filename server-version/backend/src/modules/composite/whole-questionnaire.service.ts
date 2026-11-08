@@ -47,7 +47,10 @@ export const wholeQuestionnaireSubmitSchema = z.object({
   submissionId: z.string().min(16).max(200), attemptEpoch: z.number().int().min(1),
   slotSetHash: z.string().regex(/^[a-f0-9]{64}$/), contextSnapshotHash: z.string().max(200).nullable(),
   units: z.array(unitSchema).min(1).max(32),
-  formAnswers: z.array(formSectionAnswerSchema).optional(),
+  formAnswers: z.array(formSectionAnswerSchema).refine(
+    sections => new Set(sections.map(section => section.sectionId)).size === sections.length,
+    '同一表单区段不能重复提交',
+  ).optional(),
 }).strict()
 export type WholeQuestionnaireSubmitInput = z.infer<typeof wholeQuestionnaireSubmitSchema>
 type Principal = { userId?: string; recoveryTokenHash?: string }
