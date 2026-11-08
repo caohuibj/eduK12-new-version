@@ -148,13 +148,50 @@ export interface ParticipantFeedbackStatus {
 }
 
 
+export interface WholeQuestionnaireFormSectionItem {
+  id: string
+  formType: string
+  formLabel: string
+  formPlaceholder: string | null
+  required: boolean
+  formOptions: Array<{ value: string; label: string }> | string | null
+  formDefinition?: import('../assessment-core/form/types').FormQuestion<never> | null
+  formPolicy?: Record<string, unknown> | null
+  contextKey: string | null
+  position?: number
+  formSectionPosition?: number | null
+}
+
+export interface WholeQuestionnaireFormSection {
+  id: string
+  title: string
+  description: string | null
+  position?: number
+  contextSection: boolean
+  definitionHash: string
+  status?: string
+  items: WholeQuestionnaireFormSectionItem[]
+}
+
 export interface WholeQuestionnaireDefinition {
   attemptId: string
   attemptEpoch: number
   slotSetHash: string
   contextSnapshotHash: string | null
-  units: Array<{ presentationMode?: 'ONE_BY_ONE' | 'ALL_AT_ONCE'; trainingTiming?:TrainingTimingBinding; itemId: string; scaleAssessmentId: string; definitionHash: string; scale: CompositeScale }>
+  units: Array<{ presentationMode?: 'ONE_BY_ONE' | 'ALL_AT_ONCE'; trainingTiming?:TrainingTimingBinding; itemId: string; scaleAssessmentId: string; definitionHash: string; scale: CompositeScale; position?: number }>
+  formSections?: WholeQuestionnaireFormSection[]
 }
+
+export interface WholeQuestionnaireFormAnswer {
+  sectionId: string
+  definitionHash: string
+  answers: Array<{
+    formItemId: string
+    value: unknown
+    otherText?: string
+  }>
+}
+
 export interface WholeQuestionnaireInput {
   submissionId: string
   attemptEpoch: number
@@ -162,6 +199,7 @@ export interface WholeQuestionnaireInput {
   contextSnapshotHash: string | null
   units: Array<{ itemTimings?:Record<string,unknown>; itemId: string; definitionHash: string; deviceInputProvenance?: DeviceInputProvenanceV1;
     answers: Array<{ itemCode: string; responseValue: string | number; responseTimeMs?: number; changeCount?: number }> }>
+  formAnswers?: WholeQuestionnaireFormAnswer[]
 }
 export interface WholeQuestionnaireReceipt {
   feedbackPollProfile?: 'FAST_START' | 'QUEUED'
