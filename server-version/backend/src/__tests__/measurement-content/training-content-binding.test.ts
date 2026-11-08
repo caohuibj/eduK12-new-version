@@ -320,13 +320,28 @@ it('START preserves the frozen private report even when revoked, with one read p
   expect(resolved.size).toBe(0)
  })
 
- it('sets artifactsRequired=true on new publications in attachPublishedScaleArtifacts', async () => {
+ it('sets artifactsRequired=true on new schemaVersion=1 publications in attachPublishedScaleArtifacts', async () => {
   const { attachPublishedScaleArtifacts } = await import('../../modules/composite/training-content-binding')
   const publication = await prepare()
+  const nonEligibleSnapshot = {
+    ...publication.snapshot,
+    units: [{
+      ...publication.snapshot.units[0],
+      source: {
+        ...publication.snapshot.units[0].source,
+        privateVersionId: '11111111-1111-4111-8111-111111111111',
+      },
+    }],
+  }
   const tx = {
     $queryRaw: vi.fn(async () => []),
     $executeRaw: vi.fn(async () => 1),
   }
-  const result = await attachPublishedScaleArtifacts(tx as never, composite(), publication)
+  const result = await attachPublishedScaleArtifacts(tx as never, composite(), { ...publication, snapshot: nonEligibleSnapshot })
+  expect(result.snapshot.schemaVersion).toBe(1)
   expect(result.snapshot.artifactsRequired).toBe(true)
+
+  const eligibleResult = await attachPublishedScaleArtifacts(tx as never, composite(), publication)
+  expect(eligibleResult.snapshot.schemaVersion).toBe(2)
+  expect(eligibleResult.snapshot.units[0].artifact).toBeDefined()
  })

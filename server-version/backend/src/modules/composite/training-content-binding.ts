@@ -479,9 +479,9 @@ export async function resolveTrainingScaleArtifacts(db:Prisma.TransactionClient,
       if(targetScaleUnits.some(unit=>!refs.has(unit.itemId)))fail('BINDING_INVALID')
     }
   }
-  if(snapshot.artifactsRequired&&targetScaleUnits.some(unit=>!refs.has(unit.itemId)))fail('BINDING_INVALID')
+  if(snapshot.schemaVersion===1&&snapshot.artifactsRequired&&targetScaleUnits.some(unit=>!refs.has(unit.itemId)))fail('BINDING_INVALID')
   if(refs.size===0){
-    if((snapshot.schemaVersion===2&&eligibleUnits.length>0)||(snapshot.artifactsRequired&&targetScaleUnits.length>0))fail('BINDING_INVALID')
+    if((snapshot.schemaVersion===2&&eligibleUnits.length>0)||(snapshot.schemaVersion===1&&snapshot.artifactsRequired&&targetScaleUnits.length>0))fail('BINDING_INVALID')
     return out
   }
   let loaded:Map<string,PublishedScaleArtifact>
@@ -574,7 +574,7 @@ export async function attachPublishedScaleArtifacts(db:Prisma.TransactionClient,
     if(typeof built==='string')fail('SOURCE_MISMATCH')
     units.push({...unit,artifact:await appendPublishedScaleArtifact(db,built)})
   }
-  const next=trainingContentSnapshotSchema.parse({...snapshot,schemaVersion:2,units,artifactsRequired:true})
+  const next=trainingContentSnapshotSchema.parse({...snapshot,schemaVersion:2,units})
   assertTrainingSnapshotArtifacts(next)
   const snapshotHash=canonicalHash(next)
   await attachLegacyScaleArtifactsForSnapshot(db,composite,next,snapshotHash,content.releases)
