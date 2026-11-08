@@ -272,3 +272,61 @@ it('START preserves the frozen private report even when revoked, with one read p
     educationComposition: { compositeId: 'composite' } as any,
   })).rejects.toThrow('BINDING_INVALID')
  })
+
+ it('fails closed when artifactsRequired=true on schemaVersion=1 snapshot and all side-table records are missing', async () => {
+  const { resolveTrainingScaleArtifacts } = await import('../../modules/composite/training-content-binding')
+  const publication = await prepare()
+  const requiredSnapshot = {
+    ...publication.snapshot,
+    artifactsRequired: true,
+  }
+  const tx = {
+    $queryRaw: vi.fn(async (query: any) => {
+      const sql = String(Array.isArray(query) ? query.join(' ') : query?.strings?.join(' ') ?? query)
+      if (sql.includes('FROM training_legacy_scale_artifacts')) return []
+      return []
+    }),
+    $executeRaw: vi.fn(),
+  }
+  await expect(resolveTrainingScaleArtifacts(tx as never, {
+    compositeId: 'composite',
+    snapshot: requiredSnapshot,
+    snapshotHash: 'required-hash',
+    educationComposition: { compositeId: 'composite' } as any,
+  })).rejects.toThrow('BINDING_INVALID')
+ })
+
+ it('permits historical schemaVersion=1 snapshot without artifactsRequired to fall back when side-table has 0 rows', async () => {
+  const { resolveTrainingScaleArtifacts } = await import('../../modules/composite/training-content-binding')
+  const publication = await prepare()
+  const historicalSnapshot = {
+    ...publication.snapshot,
+    artifactsRequired: undefined,
+  }
+  const tx = {
+    $queryRaw: vi.fn(async (query: any) => {
+      const sql = String(Array.isArray(query) ? query.join(' ') : query?.strings?.join(' ') ?? query)
+      if (sql.includes('FROM training_legacy_scale_artifacts')) return []
+      return []
+    }),
+    $executeRaw: vi.fn(),
+  }
+  const resolved = await resolveTrainingScaleArtifacts(tx as never, {
+    compositeId: 'composite',
+    snapshot: historicalSnapshot,
+    snapshotHash: 'historical-hash',
+    educationComposition: { compositeId: 'composite' } as any,
+  })
+  expect(resolved.size).toBe(0)
+ })
+
+ it('sets artifactsRequired=true on new publications in attachPublishedScaleArtifacts', async () => {
+  const { attachPublishedScaleArtifacts } = await import('../../modules/composite/training-content-binding')
+  const publication = await prepare()
+  const tx = {
+    $queryRaw: vi.fn(async () => []),
+    $executeRaw: vi.fn(async () => 1),
+  }
+  const result = await attachPublishedScaleArtifacts(tx as never, composite(), publication)
+  expect(result.snapshot.artifactsRequired).toBe(true)
+ })

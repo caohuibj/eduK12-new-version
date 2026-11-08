@@ -187,6 +187,8 @@ it('persists storageVersion=3 published artifact references with zero DB writes 
 
 it('persistFrozenScaleRuntimeSnapshot respects explicit ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED === true', async () => {
   const { persistFrozenScaleRuntimeSnapshot, decryptFrozenScaleRuntimeSnapshot, setSnapshotPublishedArtifactHash } = await import('../../modules/assessment-runtime/runtime-snapshot')
+  const { decryptUnifiedRuntimePayload } = await import('../../modules/assessment-runtime/security')
+  const { isPublishedSharedScaleRuntimeReference } = await import('../../modules/assessment-runtime/shared-scale-runtime')
   const v1 = snapshot('2026-10-16T02:00:00.000Z')
   setSnapshotPublishedArtifactHash(v1, 'a'.repeat(64))
 
@@ -194,15 +196,26 @@ it('persistFrozenScaleRuntimeSnapshot respects explicit ASSESSMENT_SHARED_RUNTIM
   const cipherDefault = await persistFrozenScaleRuntimeSnapshot(v1)
   const decodedDefault = decryptFrozenScaleRuntimeSnapshot(cipherDefault)
   expect(decodedDefault).toEqual(v1)
+  const rawDefault = decryptUnifiedRuntimePayload<any>(cipherDefault)
+  expect(isPublishedSharedScaleRuntimeReference(rawDefault)).toBe(false)
+  expect(rawDefault.storageVersion).toBeUndefined()
+  expect(rawDefault.definition).toBeDefined()
 
   vi.stubEnv('ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED', 'false')
   const cipherFalse = await persistFrozenScaleRuntimeSnapshot(v1)
   expect(decryptFrozenScaleRuntimeSnapshot(cipherFalse)).toEqual(v1)
+  const rawFalse = decryptUnifiedRuntimePayload<any>(cipherFalse)
+  expect(isPublishedSharedScaleRuntimeReference(rawFalse)).toBe(false)
+  expect(rawFalse.storageVersion).toBeUndefined()
+  expect(rawFalse.definition).toBeDefined()
 })
 
 it('falls back to inline encrypted snapshot when published reference exceeds 16KB bound', async () => {
   const { buildPublishedScaleArtifact, cacheCommittedPublishedScaleArtifact } = await import('../../modules/assessment-runtime/published-scale-artifact')
   const { loadFrozenScaleRuntimeSnapshot, setSnapshotPublishedArtifactHash } = await import('../../modules/assessment-runtime/runtime-snapshot')
+  const { isPublishedSharedScaleRuntimeReference } = await import('../../modules/assessment-runtime/shared-scale-runtime')
+  const { decryptUnifiedRuntimePayload } = await import('../../modules/assessment-runtime/security')
+  const crypto = await import('node:crypto')
   const s = source()
   const built = buildPublishedScaleArtifact({
     release: { releaseId: 'release-1', contentHash: 'a'.repeat(64) },
@@ -215,13 +228,15 @@ it('falls back to inline encrypted snapshot when published reference exceeds 16K
   const m = memory()
   m.rows.set(built.record.artifactHash, built.record)
 
+  // High-entropy random payload ensures ciphertext cannot compress below 16KB bound
+  const uncompressibleBody = crypto.randomBytes(20000).toString('base64')
   const basePolicy = compileScalePolicy(s)
   const policyDraft = {
     ...basePolicy,
     educationalFeedback: {
       schemaVersion: 1 as const,
       contentVersion: '1.0.0',
-      blocks: [{ id: 'b1', title: 'Large Feedback', body: 'x'.repeat(25000) }],
+      blocks: [{ id: 'b1', title: 'Large Feedback', body: uncompressibleBody }],
     },
   }
   const compiledPolicy = {
@@ -238,7 +253,15 @@ it('falls back to inline encrypted snapshot when published reference exceeds 16K
   setSnapshotPublishedArtifactHash(v2, built.record.artifactHash)
 
   const cipher = await m.store.save(v2)
+  expect(Buffer.byteLength(cipher)).toBeGreaterThan(16384)
+
+  const rawPayload = decryptUnifiedRuntimePayload<any>(cipher)
+  expect(isPublishedSharedScaleRuntimeReference(rawPayload)).toBe(false)
+  expect(rawPayload.storageVersion).toBeUndefined()
+  expect(rawPayload.definition).toBeDefined()
+
   const loaded = await loadFrozenScaleRuntimeSnapshot(cipher)
   expect(loaded.instrumentKey).toBe(v2.instrumentKey)
   expect(loaded.snapshotHash).toBe(v2.snapshotHash)
+  expect(loaded.compiledPolicy).toEqual(v2.compiledPolicy)
 })

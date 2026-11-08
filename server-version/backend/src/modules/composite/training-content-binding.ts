@@ -55,7 +55,7 @@ const unitSchema=z.object({itemId:text,family:z.enum(['SCALE','COGNITIVE','SJT']
   measurement:z.object({releaseId:z.string().guid(),contentHash:digest,measurementHash:digest}).strict(),referencePolicy:trainingReferencePolicySchema.optional(),report:z.object({releaseId:z.string().guid(),contentHash:digest}).strict().optional(),
   artifact:z.object({formatVersion:z.literal(3),hash:digest}).strict().optional()}).strict()
 export const trainingContentSnapshotSchema=z.object({schemaVersion:z.union([z.literal(1),z.literal(2)]),compositeId:text,units:z.array(unitSchema).max(1000),
- educationBinding:educationCompositionBindingSchema.optional()}).strict()
+ educationBinding:educationCompositionBindingSchema.optional(),artifactsRequired:z.boolean().optional()}).strict()
 export type TrainingContentSnapshot=z.infer<typeof trainingContentSnapshotSchema>
 export const trainingContentAttemptBindingSchema=trainingContentSnapshotSchema.omit({educationBinding:true}).extend({
  attemptId:text,epoch:z.number().int().positive(),publicationHash:digest,educationComposition:educationCompositionRuntimeAnchorSchema.optional(),
@@ -444,7 +444,7 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
       reportReleaseId:unit.report.releaseId,contentHash:unit.report.contentHash,publication:false,releases})
   }
   const binding={schemaVersion:1 as const,compositeId:input.compositeId,attemptId:input.attemptId,epoch:input.epoch,
-    publicationHash:input.snapshotHash,units:snapshot.units}
+    publicationHash:input.snapshotHash,units:snapshot.units,...(snapshot.artifactsRequired?{artifactsRequired:snapshot.artifactsRequired}:{})}
   return {binding,bindingHash:canonicalHash(binding),recheckSourceLicenses:async()=>{for(const receipt of staticReceipts)await recheckStaticSjtConsumerLicense(db,receipt)}}
 }
 
@@ -479,8 +479,9 @@ export async function resolveTrainingScaleArtifacts(db:Prisma.TransactionClient,
       if(targetScaleUnits.some(unit=>!refs.has(unit.itemId)))fail('BINDING_INVALID')
     }
   }
+  if(snapshot.artifactsRequired&&targetScaleUnits.some(unit=>!refs.has(unit.itemId)))fail('BINDING_INVALID')
   if(refs.size===0){
-    if(snapshot.schemaVersion===2&&eligibleUnits.length>0)fail('BINDING_INVALID')
+    if((snapshot.schemaVersion===2&&eligibleUnits.length>0)||(snapshot.artifactsRequired&&targetScaleUnits.length>0))fail('BINDING_INVALID')
     return out
   }
   let loaded:Map<string,PublishedScaleArtifact>
@@ -555,13 +556,15 @@ export async function attachLegacyScaleArtifactsForSnapshot(
 export async function attachPublishedScaleArtifacts(db:Prisma.TransactionClient,composite:{id:string;items:any[]},
   content:{snapshot:TrainingContentSnapshot;releases:Map<string,Stored>}){
   const {snapshot}=content
-  if(snapshot.schemaVersion!==1||snapshot.educationBinding){
-    return {snapshot,snapshotHash:canonicalHash(snapshot)}
-  }
-  if(!snapshot.units.some(publishedArtifactEligible)){
-    const snapshotHash=canonicalHash(snapshot)
-    await attachLegacyScaleArtifactsForSnapshot(db,composite,snapshot,snapshotHash,content.releases)
-    return {snapshot,snapshotHash}
+  if(snapshot.schemaVersion!==1)return {snapshot,snapshotHash:canonicalHash(snapshot)}
+  const hasEligible=snapshot.units.some(publishedArtifactEligible)
+  const hasTargetScale=snapshot.units.some(unit=>unit.family==='SCALE'&&unit.source.kind==='SCALE')
+  if(snapshot.educationBinding||!hasEligible){
+    if(!hasTargetScale)return {snapshot,snapshotHash:canonicalHash(snapshot)}
+    const next=trainingContentSnapshotSchema.parse({...snapshot,artifactsRequired:true})
+    const snapshotHash=canonicalHash(next)
+    await attachLegacyScaleArtifactsForSnapshot(db,composite,next,snapshotHash,content.releases)
+    return {snapshot:next,snapshotHash}
   }
   const items=new Map(composite.items.map((item:any)=>[item.id,item]))
   const units:Unit[]=[]
@@ -571,7 +574,7 @@ export async function attachPublishedScaleArtifacts(db:Prisma.TransactionClient,
     if(typeof built==='string')fail('SOURCE_MISMATCH')
     units.push({...unit,artifact:await appendPublishedScaleArtifact(db,built)})
   }
-  const next=trainingContentSnapshotSchema.parse({...snapshot,schemaVersion:2,units})
+  const next=trainingContentSnapshotSchema.parse({...snapshot,schemaVersion:2,units,artifactsRequired:true})
   assertTrainingSnapshotArtifacts(next)
   const snapshotHash=canonicalHash(next)
   await attachLegacyScaleArtifactsForSnapshot(db,composite,next,snapshotHash,content.releases)
