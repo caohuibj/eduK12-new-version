@@ -134,8 +134,8 @@ jobs:
           # to resolve github.com for the release asset on this runner (exit 6).
           # Fetch the exact asset through the API host instead, with retries;
           # the octet-stream accept header 302s to the release asset CDN.
-          asset_url="$(curl -fsS --max-time 20 https://api.github.com/repos/aquasecurity/trivy/releases/tags/v0.70.0 \
-            | python3 -c "import json,sys;print(next(a['url'] for a in json.load(sys.stdin)['assets'] if a['name']=='trivy_0.70.0_Linux-64bit.tar.gz'))")"
+          asset_url="$(curl -fsSL --retry 3 --retry-delay 4 --retry-all-errors --max-time 30 https://api.github.com/repos/aquasecurity/trivy/releases/tags/v0.70.0 \
+            | python3 -c "import json,sys;print(next(a['url'] for a in json.load(sys.stdin)['assets'] if a['name']=='trivy_0.70.0_Linux-64bit.tar.gz'))" 2>/dev/null || echo "https://github.com/aquasecurity/trivy/releases/download/v0.70.0/trivy_0.70.0_Linux-64bit.tar.gz")"
           ok=""
           for attempt in 1 2 3; do
             if curl -fsSL --retry 4 --retry-delay 8 --retry-all-errors --max-time 180 \

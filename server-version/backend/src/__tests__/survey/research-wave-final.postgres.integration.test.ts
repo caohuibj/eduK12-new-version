@@ -1247,7 +1247,8 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     const cipher=await db.surveyAttemptCheckpoint.findFirstOrThrow({
       where:{attemptId:linked.attemptId},
     })
-    expect(cipher.contentCipher).not.toContain('1234')
+    expect(cipher.contentCipher).not.toContain('firstResponseMs')
+    expect(cipher.contentCipher).not.toContain('itemone')
     const submissionId=randomUUID()
     const final=await submitResearchFinal({publicId:w.publicId,attemptId:linked.attemptId,
       researchCode:linked.researchCode,accessCredential:linked.accessCredential,

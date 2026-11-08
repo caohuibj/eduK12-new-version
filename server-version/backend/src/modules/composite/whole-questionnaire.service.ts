@@ -22,6 +22,9 @@ import { UNIFIED_SCALE_CHILD_ADMISSION_SELECT, ensureScaleAdmissionAtDelivery, l
 import { assertUnifiedScaleDelivery, submitUnifiedScaleAssessmentFinal, submitUnifiedScaleCollectionBatch } from '../scale/unified-final-submit.service'
 import { preloadFrozenReferenceDb } from '../assessment-runtime/reference-binding'
 import { runnerDefinition } from '../scale/scale-definition'
+import { publicTrainingFormDefinition } from '../assessment-runtime/typed-form'
+import { formSectionIdentityHash } from '../assessment-runtime/attempt-runtime'
+import { compositeFormSectionRuntimeDefinition, compositeSectionHasContext } from './composite.service'
 
 const encryptWholeRawPayload = (value: unknown): string => encryptUnifiedRuntimePayload(compactAssessmentStorageEnabled() ? packWholeRawEnvelope(value) : value)
 
@@ -203,9 +206,39 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
   }
   const positions = new Map(parent.compositeAssessment.items.map(item => [item.id, item.position]))
   units.sort((left, right) => (positions.get(left.itemId) ?? 0) - (positions.get(right.itemId) ?? 0))
+  const rawSections = [...(parent.compositeAssessment.formSections || [])]
+  rawSections.sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
+  const formSections = rawSections.map((sec: any) => {
+    const runtimeDef = compositeFormSectionRuntimeDefinition(sec)
+    const definitionHash = formSectionIdentityHash(runtimeDef)
+    const items = [...(sec.items || [])]
+      .sort((left: any, right: any) => (left.formSectionPosition ?? left.position) - (right.formSectionPosition ?? right.position))
+      .map((item: any) => ({
+        id: item.id,
+        formType: item.formType,
+        formLabel: item.formLabel,
+        formPlaceholder: item.formPlaceholder ?? null,
+        required: item.required !== false,
+        formOptions: item.formOptions ?? null,
+        ...(item.formDefinition != null ? { formDefinition: publicTrainingFormDefinition(item.formDefinition) } : {}),
+        ...(item.formPolicy != null ? { formPolicy: item.formPolicy } : {}),
+        contextKey: item.contextKey ?? null,
+        position: item.position,
+        formSectionPosition: item.formSectionPosition ?? null,
+      }))
+    return {
+      id: sec.id,
+      title: sec.title,
+      description: sec.description ?? null,
+      position: sec.position,
+      contextSection: compositeSectionHasContext(sec),
+      definitionHash,
+      items,
+    }
+  })
   await storeWholeQuestionnaireValidation(parent, await storeSharedWholeValidation(manifest), prepareCanonicalSubmission(manifest).hash)
   return { attemptId, attemptEpoch: parent.attemptEpoch, slotSetHash: parent.frozenActiveSlotSetHash,
-    contextSnapshotHash: parent.contextSnapshotHash, units }
+    contextSnapshotHash: parent.contextSnapshotHash, units, formSections }
 })
 
 const logicalPayload = (attemptId: string, input: WholeQuestionnaireSubmitInput, timingSnapshotHash?:string) => ({

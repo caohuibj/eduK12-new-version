@@ -323,7 +323,16 @@ export const assessmentRunController = {
           // Failure outside the committed transaction falls back to plain started result.
           const wallTimeMs = Date.now() - startMs
           const { logger } = await import('../../utils/logger')
-          logger.warn('assessment-run inline delivery', { phase: 'inline_delivery', outcome: 'fallback', reason: String(projectionErr?.message ?? 'unknown'), wallTimeMs })
+          const reason = projectionErr?.status === 403 || projectionErr?.code === 'FORBIDDEN'
+            ? 'ACCESS_FORBIDDEN'
+            : projectionErr?.status === 404
+            ? 'ATTEMPT_NOT_FOUND'
+            : projectionErr?.status === 409
+            ? 'STATE_CONFLICT'
+            : projectionErr?.code === 'ETIMEDOUT'
+            ? 'NETWORK_TIMEOUT'
+            : 'PROJECTION_ERROR'
+          logger.warn('assessment-run inline delivery', { phase: 'inline_delivery', outcome: 'fallback', reason, wallTimeMs })
           return success(res, started)
         }
       }
