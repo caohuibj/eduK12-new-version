@@ -854,6 +854,29 @@ suite('durable report outbox on isolated PostgreSQL', () => {
     expect(await db.assessmentUnitSnapshot.count({ where: { compositeAttemptId: f.parent.id } })).toBe(0)
   })
 
+  it('surfaces DEFINITION_MISMATCH instead of silently waiting when a required slot is SKIPPED', async () => {
+    const f = await fixture(2)
+    // The product has no skip policy yet; plant a SKIPPED snapshot directly
+    // to simulate corrupt/legacy data that evaluateCompleteness treats as
+    // invalid. The PR-2 count gate must not swallow it into a silent WAITING.
+    const secondChild = await db.assessment.findUniqueOrThrow({ where: { id: f.inputs[1].assessmentId }, select: { compositeItemId: true } })
+    await db.$executeRaw`
+      INSERT INTO "assessment_unit_snapshots"
+        ("id", "composite_attempt_id", "attempt_epoch", "slot_key", "unit_type", "terminal_state", "payload_kind",
+         "source_type", "source_attempt_id", "completed_at")
+      VALUES (${randomUUID()}, ${f.parent.id}, 1, ${`scale:${secondChild.compositeItemId}`}, 'SCALE', 'SKIPPED', 'UNIT_RESULT',
+        'ASSESSMENT', ${'skipped-source-' + randomUUID()}, (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'))
+    `
+    await expect(submit(f.inputs[0])).rejects.toMatchObject({ code: 'DEFINITION_MISMATCH', statusCode: 409 })
+  })
+
+  it('leaves the job WAITING on partial completion when no snapshot is invalid', async () => {
+    const f = await fixture(2)
+    await submit(f.inputs[0])
+    expect(await outbox.readCompositeReportJob(f.parent.id, 1)).toMatchObject({ status: 'WAITING', budgetHeld: false })
+    expect(await db.assessmentUnitSnapshot.count({ where: { compositeAttemptId: f.parent.id } })).toBe(1)
+  })
+
   it('fences expired completed-parent whole replays from the current lease owner', async () => {
     vi.stubEnv('ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED', 'true')
     const f = await fixture(3), { whole, input } = await wholeInput(f)

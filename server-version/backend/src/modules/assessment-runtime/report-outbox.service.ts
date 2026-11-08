@@ -6,7 +6,7 @@ import { markAssessmentTimeline, traceAssessmentPhase, recordAssessmentReportCla
 import type { WholeReceiptExecution } from '../composite/whole-questionnaire.service'
 import { randomUUID } from 'node:crypto'
 import { loadFrozenActiveSlotSet } from './slot-set'
-import { evaluateCompleteness } from './unified-aggregate'
+import { evaluateCompleteness, expectedPayloadKind } from './unified-aggregate'
 import { resolveTrainingFlowScope } from '../composite/training-flow-scope'
 import { Prisma, type CompositeReportJob } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -217,20 +217,42 @@ const enqueueBoundReport = async (tx: Prisma.TransactionClient, parent: BoundRep
       const flowEnabled = hasTrainingFlow(parent)
       if (!flowEnabled) {
         // PR-2: cheap necessary-condition pre-filter before the header scan.
-        // Each satisfied required slot needs a distinct COMPLETED snapshot
-        // (unique on (compositeAttemptId, attemptEpoch, slotKey)), so fewer
-        // COMPLETED rows than required slots proves the aggregate is not
-        // ready yet. Training-flow parents skip this gate: their
-        // completeness is path-dependent, not a static required count.
+        // A snapshot satisfies a required slot only when it matches the
+        // frozen slot's unitType and expected payload kind and is COMPLETED.
+        // Any other snapshot in this attempt+epoch is one
+        // evaluateCompleteness would flag as invalid (SKIPPED /
+        // NOT_APPLICABLE / unknown slot / wrong kind), so the gate must NOT
+        // early-return while such a snapshot exists — the full scan below
+        // is what raises DEFINITION_MISMATCH for it. Only when every
+        // snapshot is a valid COMPLETED one and fewer than the required
+        // slots are satisfied is the aggregate provably not ready yet.
+        // Training-flow parents skip this gate: their completeness is
+        // path-dependent, not a static required count.
         // The full scan below remains the sole authority for finality.
-        const requiredCount = slots.slots.filter((slot) => slot.required).length
-        const completedRows = await tx.$queryRaw<Array<{ count: bigint }>>`
-          SELECT count(*) AS "count" FROM "assessment_unit_snapshots"
-          WHERE "composite_attempt_id" = ${parent.id}
-            AND "attempt_epoch" = ${parent.attemptEpoch}
-            AND "terminal_state" = 'COMPLETED'
+        const requiredSlots = slots.slots.filter((slot) => slot.required)
+        const requiredCount = requiredSlots.length
+        const expected = requiredSlots.map((slot) => ({
+          slotKey: slot.slotKey,
+          unitType: slot.unitType,
+          payloadKind: expectedPayloadKind(slot),
+        }))
+        const gateRows = await tx.$queryRaw<Array<{ validCompleted: bigint; bad: bigint }>>`
+          SELECT
+            count(exp."slotKey") AS "validCompleted",
+            count(*) - count(exp."slotKey") AS "bad"
+          FROM "assessment_unit_snapshots" AS snap
+          LEFT JOIN jsonb_to_recordset(${JSON.stringify(expected)}::jsonb)
+            AS exp("slotKey" text, "unitType" text, "payloadKind" text)
+            ON exp."slotKey" = snap."slot_key"
+              AND exp."unitType" = snap."unit_type"::text
+              AND exp."payloadKind" = snap."payload_kind"::text
+              AND snap."terminal_state" = 'COMPLETED'
+          WHERE snap."composite_attempt_id" = ${parent.id}
+            AND snap."attempt_epoch" = ${parent.attemptEpoch}
         `
-        if (Number(completedRows[0]?.count ?? 0) < requiredCount) return job.id
+        const validCompleted = Number(gateRows[0]?.validCompleted ?? 0)
+        const bad = Number(gateRows[0]?.bad ?? 0)
+        if (bad === 0 && validCompleted < requiredCount) return job.id
       }
       const headers = acceptedFlow?.snapshots??await tx.assessmentUnitSnapshot.findMany({
         where: { compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch },
