@@ -58,6 +58,7 @@ import {withTrainingTimingReport} from './training-timing-report'
 import {readTrainingContentReports} from './training-content-report'
 import {decodeTrainingFinalReceipt} from './training-content-final'
 import {freezeTrainingTimingSnapshot,readTrainingTimingPolicy} from '../assessment-runtime/training-scale-timing'
+import { isWholeLocalEligible } from './whole-local-eligibility'
 import { typedFormPresentation } from '../reporting/typed-form-presentation'
 import { sharedControlWritesEnabled } from '../assessment-runtime/shared-control-records'
 import { readCommittedScaleFacts } from '../assessment-runtime/scale-fact-records'
@@ -4765,8 +4766,17 @@ const getUnifiedCompositeAttemptState = async (
     if(instruction)currentItem.questionnaireInstruction=instruction
   }
   const definitionHash = cachedCompositeDefinitionHash(attempt, sections)
+  const isEligible = isWholeLocalEligible({
+    items: attempt.compositeAssessment?.items,
+    formSections: attempt.compositeAssessment?.formSections,
+    trainingFlowDraft: attempt.compositeAssessment?.trainingFlowDraft,
+    trainingFlowFrozen: attempt.compositeAssessment?.trainingFlowFrozen,
+    trainingFlowDigest: attempt.compositeAssessment?.trainingFlowDigest,
+    trainingFlowSnapshotHash: attempt.trainingFlowSnapshotHash ?? attempt.compositeAssessment?.trainingFlowSnapshotHash,
+  })
   return {
     id: attempt.id,
+    executionMode: isEligible ? ('WHOLE_LOCAL' as const) : ('STEPPED' as const),
     ...(trainingPersistenceMetadata(attempt) ? { trainingPersistence: trainingPersistenceMetadata(attempt), checkpointDefinitionHash: attempt.frozenActiveSlotSetHash } : {}),
     assessmentId: attempt.compositeAssessment.id,
     name: attempt.compositeAssessment.name,

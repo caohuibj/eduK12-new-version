@@ -203,9 +203,29 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
   }
   const positions = new Map(parent.compositeAssessment.items.map(item => [item.id, item.position]))
   units.sort((left, right) => (positions.get(left.itemId) ?? 0) - (positions.get(right.itemId) ?? 0))
+  const formSections = (parent.compositeAssessment.formSections || []).map((sec: any) => ({
+    id: sec.id,
+    title: sec.title,
+    description: sec.description ?? null,
+    position: sec.position,
+    contextSection: sec.contextSection,
+    items: (sec.items || []).map((item: any) => ({
+      id: item.id,
+      formType: item.formType,
+      formLabel: item.formLabel,
+      formPlaceholder: item.formPlaceholder,
+      formOptions: item.formOptions,
+      formDefinition: item.formDefinition,
+      formPolicy: item.formPolicy,
+      contextKey: item.contextKey,
+      required: item.required,
+      position: item.position,
+      formSectionPosition: item.formSectionPosition,
+    })),
+  }))
   await storeWholeQuestionnaireValidation(parent, await storeSharedWholeValidation(manifest), prepareCanonicalSubmission(manifest).hash)
   return { attemptId, attemptEpoch: parent.attemptEpoch, slotSetHash: parent.frozenActiveSlotSetHash,
-    contextSnapshotHash: parent.contextSnapshotHash, units }
+    contextSnapshotHash: parent.contextSnapshotHash, units, formSections }
 })
 
 const logicalPayload = (attemptId: string, input: WholeQuestionnaireSubmitInput, timingSnapshotHash?:string) => ({
