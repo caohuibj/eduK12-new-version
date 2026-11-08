@@ -242,7 +242,9 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, loca
   const submissionId = validateSubmissionId(input.submissionId)
   // Only the private Composite parent/item lookup supplies this request-local row.
   // Unified submission still performs its normal admission checks and locked reread.
-  if (locatedChild && (locatedChild.id !== input.assessmentId || locatedChild.compositeAttemptId !== input.compositeAttemptId)) {
+  // PR-1: normalize null/undefined — questionnaire children have a null
+  // compositeAttemptId while the input omits the field (undefined).
+  if (locatedChild && (locatedChild.id !== input.assessmentId || (locatedChild.compositeAttemptId ?? null) !== (input.compositeAttemptId ?? null))) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不属于当前作答', 403)
   }
   const child = locatedChild ?? await measureRequestPhase('final_submit_admission', () => prisma.assessment.findUnique({
@@ -541,9 +543,11 @@ export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) =
 
 const questionnaireChild = async (scaleAssessmentId: string) => prisma.assessment.findUnique({
   where: { id: scaleAssessmentId },
+  // PR-1: load the full admission select once so callers can pass this row as
+  // `locatedChild` instead of re-reading the child inside the impl. The
+  // questionnaireAssessment projection is kept for the ownership check.
   select: {
-    id: true,
-    questionnaireAssessmentId: true,
+    ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
     questionnaireAssessment: { select: { id: true, userId: true, sessionId: true, resumeTokenHash: true } },
   },
 })
@@ -559,12 +563,13 @@ export const submitQuestionnaireScaleFinal = async (
     if (!child || child.questionnaireAssessmentId !== questionnaireAssessmentId || child.questionnaireAssessment?.userId !== context.userId) {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不属于当前问卷', 403)
     }
+    // PR-1: pass the already-loaded child so the impl does not re-read it.
     return submitScaleAssessmentFinalImpl({
       ...input,
       assessmentId: scaleAssessmentId,
       userId: context.userId,
       questionnaireSessionId: child.questionnaireAssessment.sessionId ?? undefined,
-    })
+    }, child)
   })
   return stripScaleFinalContext(await finalizeParentAfterUnitSubmit(result))
 }
@@ -580,13 +585,14 @@ export const submitQuestionnaireScaleFinalForPublic = async (
     if (!child || child.questionnaireAssessmentId === null || child.questionnaireAssessment?.sessionId !== sessionId) {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不属于当前会话', 403)
     }
+    // PR-1: pass the already-loaded child so the impl does not re-read it.
     return submitScaleAssessmentFinalImpl({
       ...input,
       assessmentId: scaleAssessmentId,
       userId: null,
       questionnaireSessionId: sessionId,
       recoveryTokenHash: resumeTokenHash,
-    })
+    }, child)
   })
   return stripScaleFinalContext(await finalizeParentAfterUnitSubmit(result))
 }

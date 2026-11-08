@@ -557,6 +557,15 @@ export const submitUnifiedScaleCollectionBatch = async (
     if (lease.length !== 1) throw new ReportProcessingLeaseLostError()
     const byId = new Map(rows.map(row => [row.id, row]))
     const writes = [], facts: ScaleFactRecord[] = [], snapshots: Prisma.AssessmentUnitSnapshotCreateManyInput[] = []
+    // PR-1: one collection-guard call for the whole batch. The guard dedups /
+    // sorts scale ids internally and validates the full bound child/item set
+    // against the accepted receipt (including its read-only receipt fence).
+    // Previously this ran once per unit inside the loop below.
+    await assertTrainingScaleCollectionAllowed(tx,
+      prepared.map(unit => unit.child.scaleId),
+      { compositeAttemptId: job.attemptId, compositeAttemptEpoch: job.attemptEpoch,
+        compositeItemIds: prepared.map(unit => unit.child.compositeItemId).filter((id): id is string => Boolean(id)),
+        acceptedReceipt: execution })
     for (const unit of prepared) {
       const current = byId.get(unit.child.id)!, { admission, snapshot, submissionId, payloadHash } = unit.data
       assertFinalOnly(current.deliveryMode); assertAttemptEpoch(current.attemptEpoch, unit.input.attemptEpoch)
@@ -575,7 +584,6 @@ export const submitUnifiedScaleCollectionBatch = async (
       }
       if (current.status !== 'IN_PROGRESS' || !unit.write || current.snapshotId)
         throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表提交状态已变化', 409)
-      await assertTrainingScaleCollectionAllowed(tx, [unit.child.scaleId],{compositeAttemptId:unit.child.compositeAttemptId,compositeAttemptEpoch:unit.input.attemptEpoch,compositeItemIds:unit.child.compositeItemId?[unit.child.compositeItemId]:[],acceptedReceipt:execution})
       const { completedAt, encryptedAnswers, encrypted } = unit.write
       if (!encrypted.canonicalResult) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表缺少权威结果', 409)
       const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())
