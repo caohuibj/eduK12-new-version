@@ -48,5 +48,12 @@ export function isWholeLocalEligible(candidate?: WholeLocalEligibilityCandidate 
   if (hasContextDependency) {
     return false
   }
+  // Form-only questionnaires stay stepped: the whole-submit protocol is bound
+  // to at least one Scale unit (units.min(1) on the submit schema, and the
+  // receipt principal derives from a Scale child), matching the delivery
+  // endpoint's "整份交卷的量表数量无效" constraint.
+  if (!candidate.items.some(item => item.type === 'SCALE')) {
+    return false
+  }
   return true
 }

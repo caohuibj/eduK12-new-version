@@ -6,12 +6,13 @@ import {
   activateStoredOrCatalogCompositeFormAdmission,
   ensureCompositeSectionAttempt,
   loadCompositeFormDefinition,
-  readStoredFormAdmission,
+  loadStoredFormAdmission,
 } from './form-admission.service'
 import { formSectionIdentityHash } from './attempt-runtime'
 import { mapCompositeSection, type CompositeSection } from './form-section-definition'
 import { normalizeCompositeSectionAnswers, type SectionSubmitInput } from '../composite/final-submit.service'
 import { submitUnifiedCompositeFormSectionFinal } from './unified-form-section-final-submit.service'
+import { ReportProcessingLeaseLostError } from './report-outbox.service'
 import type { TypedFormValue } from './typed-form'
 import type { WholeReceiptExecution } from '../composite/whole-questionnaire.service'
 
@@ -55,7 +56,12 @@ export const verifyWholeFormSectionsAtReceipt = async (
     })
     let definition: CompositeSection | undefined
     let identityHash: string | undefined
-    const admission = stored ? readStoredFormAdmission(stored) : null
+    // The async reader resolves both storage formats: the legacy encrypted
+    // snapshot and the shared-reference (UAR2) projection written when
+    // ASSESSMENT_SHARED_CONTROL_ENABLED stores shared admission plans. The
+    // sync legacy reader would throw STALE_ATTEMPT on a shared reference and
+    // reject an otherwise valid submission.
+    const admission = stored ? await loadStoredFormAdmission(stored) : null
     if (admission?.formSection && admission.formSection.kind === 'composite' && admission.formSection.id === section.sectionId) {
       identityHash = admission.formSection.identityHash
       definition = loadCompositeFormDefinition(admission)
@@ -84,7 +90,22 @@ const isContextSectionRow = (row: { contextSection: boolean; items: Array<{ cont
  * the running job. Context sections materialize first so the stepped
  * requiresContext ordering holds inside one envelope. Replays are idempotent:
  * the derived per-section submissionId and payload hash return the committed
- * state without rewriting snapshots. */
+ * state without rewriting snapshots.
+ *
+ * Storage model (X-04A review, P1): this chain writes exactly what the stepped
+ * path writes — the encrypted COLLECTION_FACTS snapshot AND the legacy
+ * `composite_form_answers` string projection (report building, personal
+ * tracking and variant export read that projection). Whole-mode answers are
+ * therefore NOT plaintext-free at rest beyond the existing composite Form
+ * storage model; the encrypted whole envelope is additionally retained on the
+ * report job. Any tightening of the plaintext projection is a storage-model
+ * migration for all Form writers, tracked separately.
+ *
+ * The ensure/activate calls below repeat work the unified submit also performs
+ * (X-04A review, P2): the pre-activation is what binds the submit input to the
+ * frozen admission's context hash before assertFormFrozenAdmission compares
+ * them, and the duplicate loads are accepted as the price of that binding
+ * without touching the authoritative gates. */
 export const materializeWholeFormSections = async (
   job: Pick<CompositeReportJob, 'attemptId' | 'attemptEpoch' | 'contextHash'>,
   sections: WholeFormAnswerSection[],
@@ -92,6 +113,19 @@ export const materializeWholeFormSections = async (
   principal: { userId?: string | null; recoveryTokenHash?: string },
 ) => {
   if (sections.length === 0) return []
+  // Lease pre-flight (X-04A review): the admission activation below performs
+  // deterministic preparatory writes (idempotent section-attempt row, frozen
+  // admission snapshot) before the lease-fenced snapshot transaction. An
+  // expired worker fails here instead of writing them; the authoritative
+  // snapshot/enqueue write stays fenced by the whole receipt inside the
+  // section transaction regardless of this check's TOCTOU window.
+  const lease = await prisma.$queryRaw<Array<{ id: string }>>`
+    SELECT "id" FROM "composite_report_jobs"
+    WHERE "attempt_id" = ${job.attemptId} AND "attempt_epoch" = ${job.attemptEpoch}
+      AND "status" = 'PROCESSING' AND "lease_token" = ${execution.leaseToken}
+      AND "lease_expires_at" > (clock_timestamp() AT TIME ZONE 'UTC')
+  `
+  if (!lease.length) throw new ReportProcessingLeaseLostError()
   const rows = await prisma.compositeFormSection.findMany({
     where: { id: { in: sections.map(section => section.sectionId) } },
     select: { id: true, contextSection: true, items: { select: { contextKey: true } } },
