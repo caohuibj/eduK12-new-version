@@ -6,17 +6,64 @@ import { z } from 'zod'
 import { canonicalHash, canonicalHashObjectParts, canonicalJsonBytes, retainImmutableCanonicalValue, hasImmutableCanonicalValue } from './canonical'
 import { BoundedArtifactCache, artifactContentKey, jsonArtifactBytes } from './bounded-artifact-cache'
 import { encryptUnifiedRuntimePayload, decryptUnifiedRuntimePayload } from './security'
-import { parseVersionedFrozenScaleRuntimeSnapshot, type VersionedFrozenScaleRuntimeSnapshot } from './runtime-snapshot'
+import {
+  cacheCommittedPublishedScaleArtifact,
+  decodePublishedScaleArtifact,
+  getCachedPublishedScaleArtifact,
+  type PublishedScaleArtifact,
+} from './published-scale-artifact'
+import {
+  getSnapshotPublishedArtifactHash,
+  parseVersionedFrozenScaleRuntimeSnapshot,
+  type VersionedFrozenScaleRuntimeSnapshot,
+} from './runtime-snapshot'
+import { createFrozenScaleRuntimeSnapshotV2FromV1 } from './runtime-snapshot-v2'
+import { parseCompiledScalePolicy, type CompiledScalePolicyV1 } from '../scale/policy/compile'
+import { frozenScalePresentationSchema } from '../scale/scale-presentation'
 
 const MAX_PLAIN_BYTES = 2 * 1024 * 1024
 const MAX_CIPHER_BYTES = 4 * 1024 * 1024
 const referenceSchema = z.object({ kind: z.literal('SHARED_SCALE_RUNTIME'), storageVersion: z.literal(1),
   artifactHash: z.string().regex(/^[0-9a-f]{64}$/), frozenAt: z.string().datetime({ offset: true }),
   snapshotHash: z.string().regex(/^[0-9a-f]{64}$/) }).strict()
+const publishedReferenceBindingSchema = z.object({
+  referenceKey: z.string().min(1),
+  referenceVersion: z.string().min(1),
+  referenceHash: z.string().regex(/^[0-9a-f]{64}$/),
+  scoreKey: z.string().min(1).optional(),
+  referenceKind: z.string().min(1).optional(),
+  profileKey: z.string().min(1).optional(),
+}).strict()
+const publishedReferenceV1Schema = z.object({
+  kind: z.literal('SHARED_SCALE_RUNTIME'),
+  storageVersion: z.literal(3),
+  artifactHash: z.string().regex(/^[0-9a-f]{64}$/),
+  schemaVersion: z.literal(1),
+  frozenAt: z.string().datetime({ offset: true }),
+  referenceBindings: z.array(publishedReferenceBindingSchema),
+  measurementPresentation: frozenScalePresentationSchema.optional(),
+  omitInstruction: z.literal(true).optional(),
+  snapshotHash: z.string().regex(/^[0-9a-f]{64}$/),
+}).strict()
+const publishedReferenceV2Schema = z.object({
+  kind: z.literal('SHARED_SCALE_RUNTIME'),
+  storageVersion: z.literal(3),
+  artifactHash: z.string().regex(/^[0-9a-f]{64}$/),
+  schemaVersion: z.literal(2),
+  frozenAt: z.string().datetime({ offset: true }),
+  referenceBindings: z.array(publishedReferenceBindingSchema),
+  measurementPresentation: frozenScalePresentationSchema.optional(),
+  omitInstruction: z.literal(true).optional(),
+  compiledPolicy: z.record(z.string(), z.unknown()),
+  runtimePolicyHash: z.string().regex(/^[0-9a-f]{64}$/),
+  snapshotHash: z.string().regex(/^[0-9a-f]{64}$/),
+}).strict()
+const publishedReferenceSchema = z.discriminatedUnion('schemaVersion', [publishedReferenceV1Schema, publishedReferenceV2Schema])
 const bodySchema = z.object({ kind: z.literal('SCALE_RUNTIME_ARTIFACT'), storageVersion: z.literal(1),
   artifactHash: z.string().regex(/^[0-9a-f]{64}$/), codec: z.literal('gzip-json-v1'),
   plaintextBytes: z.number().int().positive().max(MAX_PLAIN_BYTES), data: z.string().max(MAX_CIPHER_BYTES) }).strict()
 type SharedReference = z.infer<typeof referenceSchema>
+type PublishedSharedReference = z.infer<typeof publishedReferenceSchema>
 type Artifact = Omit<VersionedFrozenScaleRuntimeSnapshot, 'frozenAt' | 'snapshotHash'>
 export type SharedScaleArtifactRecord = { artifactHash: string; formatVersion: number; plaintextBytes: number; payloadEncrypted: string }
 export interface SharedScaleArtifactRepository {
@@ -34,9 +81,86 @@ const staticPart = (snapshot: VersionedFrozenScaleRuntimeSnapshot): Artifact => 
 export const isSharedScaleRuntimeReference = (value: unknown): boolean => (
   Boolean(value && typeof value === 'object' && (value as { kind?: unknown }).kind === 'SHARED_SCALE_RUNTIME')
 )
+export const isPublishedSharedScaleRuntimeReference = (value: unknown): boolean => (
+  Boolean(
+    value
+      && typeof value === 'object'
+      && (value as { kind?: unknown; storageVersion?: unknown }).kind === 'SHARED_SCALE_RUNTIME'
+      && (value as { storageVersion?: unknown }).storageVersion === 3,
+  )
+)
+
+const verifiedPublishedPolicies = new BoundedArtifactCache<CompiledScalePolicyV1>(128, 2 * 1024 * 1024)
+const resolveVerifiedPublishedPolicy = (raw: unknown): CompiledScalePolicyV1 => {
+  if (raw && typeof raw === 'object' && hasImmutableCanonicalValue(raw)) return raw as CompiledScalePolicyV1
+  const bytes = jsonArtifactBytes(raw)
+  const key = bytes && bytes.length <= 256 * 1024 ? artifactContentKey(bytes) : null
+  const known = key ? verifiedPublishedPolicies.get(key) : undefined
+  if (known) return known
+  const parsed = retainImmutableCanonicalValue(parseCompiledScalePolicy(raw))
+  if (key && bytes) verifiedPublishedPolicies.set(key, parsed, bytes.length * 4 + 512)
+  return parsed
+}
+
+const reconstructFromPublishedScaleArtifact = (
+  artifact: PublishedScaleArtifact,
+  reference: PublishedSharedReference,
+): VersionedFrozenScaleRuntimeSnapshot => {
+  const expectedSelections = artifact.compiledRuntime.referenceBindingDefinition.selections
+  if (reference.referenceBindings.length !== expectedSelections.length) {
+    throw new Error('Published Scale runtime reference bindings do not match compiled runtime')
+  }
+  expectedSelections.forEach((selection, index) => {
+    const binding = reference.referenceBindings[index]
+    if (
+      !binding
+      || binding.referenceKey !== selection.referenceKey
+      || binding.referenceVersion !== selection.referenceVersion
+      || binding.scoreKey !== selection.scoreKey
+      || binding.referenceKind !== selection.referenceKind
+    ) {
+      throw new Error('Published Scale runtime reference binding identity mismatch')
+    }
+  })
+  const measurementPresentation = artifact.measurementPresentation ?? reference.measurementPresentation
+  const unsignedV1 = {
+    schemaVersion: 1 as const,
+    runtimeGeneration: 'UNIFIED_V1' as const,
+    frozenAt: reference.frozenAt,
+    instrumentKey: artifact.instrumentKey,
+    instrumentVersion: artifact.instrumentVersion,
+    sourceDefinitionHash: artifact.sourceDefinitionHash,
+    legacyDefinitionHash: artifact.legacyDefinitionHash,
+    compiledRuntime: artifact.compiledRuntime,
+    referenceBindings: reference.referenceBindings as VersionedFrozenScaleRuntimeSnapshot['referenceBindings'],
+    definition: artifact.definition,
+    ...(measurementPresentation ? { measurementPresentation } : {}),
+    ...(reference.omitInstruction ? {} : { instruction: artifact.instruction }),
+  }
+  const v1 = { ...unsignedV1, snapshotHash: canonicalHashObjectParts(unsignedV1) }
+  if (reference.schemaVersion === 1) {
+    if (v1.snapshotHash !== reference.snapshotHash) throw new Error('Shared Scale runtime snapshot hash mismatch')
+    return v1
+  }
+  const compiledPolicy = resolveVerifiedPublishedPolicy(reference.compiledPolicy)
+  if (compiledPolicy.runtimePolicyHash !== reference.runtimePolicyHash) {
+    throw new Error('Published Scale runtime policy hash mismatch')
+  }
+  const v2 = createFrozenScaleRuntimeSnapshotV2FromV1(v1, compiledPolicy)
+  if (v2.snapshotHash !== reference.snapshotHash) throw new Error('Shared Scale runtime snapshot hash mismatch')
+  return v2
+}
+
+export const reconstructPublishedSharedScaleRuntimeSync = (value: unknown): VersionedFrozenScaleRuntimeSnapshot => {
+  const reference = publishedReferenceSchema.parse(value)
+  const artifact = getCachedPublishedScaleArtifact(reference.artifactHash)
+  if (!artifact) throw new Error('Published Scale runtime artifact is not cached in memory; use async loadFrozenScaleRuntimeSnapshot')
+  return reconstructFromPublishedScaleArtifact(artifact, reference)
+}
 
 export const createSharedScaleRuntimeStore = (repository: SharedScaleArtifactRepository) => {
   const artifacts = new BoundedArtifactCache<VerifiedArtifact>(64, 8 * 1024 * 1024)
+  const publishedArtifacts = new BoundedArtifactCache<PublishedScaleArtifact>(64, 8 * 1024 * 1024)
   const contentIndex = new BoundedArtifactCache<string>(128, 64 * 1024)
   const pending = new Map<string, Promise<VerifiedArtifact>>()
   const single = (key: string, work: () => Promise<VerifiedArtifact>): Promise<VerifiedArtifact> => {
@@ -105,6 +229,32 @@ export const createSharedScaleRuntimeStore = (repository: SharedScaleArtifactRep
   const save = async (snapshot: VersionedFrozenScaleRuntimeSnapshot,
     transactionRepository?: SharedScaleArtifactRepository,
   ): Promise<string> => {
+    const publishedArtifactHash = getSnapshotPublishedArtifactHash(snapshot)
+    const cachedPublishedArtifact = publishedArtifactHash ? getCachedPublishedScaleArtifact(publishedArtifactHash) : undefined
+    if (publishedArtifactHash && cachedPublishedArtifact) {
+      const publishedRef = publishedReferenceSchema.parse({
+        kind: 'SHARED_SCALE_RUNTIME',
+        storageVersion: 3,
+        artifactHash: publishedArtifactHash,
+        schemaVersion: snapshot.schemaVersion,
+        frozenAt: snapshot.frozenAt,
+        referenceBindings: snapshot.referenceBindings,
+        ...(snapshot.measurementPresentation && !cachedPublishedArtifact.measurementPresentation
+          ? { measurementPresentation: snapshot.measurementPresentation }
+          : {}),
+        ...(snapshot.instruction === undefined ? { omitInstruction: true as const } : {}),
+        ...(snapshot.schemaVersion === 2
+          ? { compiledPolicy: snapshot.compiledPolicy, runtimePolicyHash: snapshot.runtimePolicyHash }
+          : {}),
+        snapshotHash: snapshot.snapshotHash,
+      })
+      reconstructFromPublishedScaleArtifact(cachedPublishedArtifact, publishedRef)
+      const encrypted = sharedControlWritesEnabled()
+        ? encryptControlReference(publishedRef)
+        : encryptUnifiedRuntimePayload(publishedRef)
+      if (Buffer.byteLength(encrypted) > 16384) throw new Error('Shared Scale reference exceeds versioned storage bound')
+      return encrypted
+    }
     const raw = staticPart(snapshot)
     const fastParts = sharedControlWritesEnabled() && hasImmutableCanonicalValue(raw.definition)
       && hasImmutableCanonicalValue(raw.compiledRuntime)
@@ -175,6 +325,20 @@ export const createSharedScaleRuntimeStore = (repository: SharedScaleArtifactRep
   }
   const load = async (value: unknown, transactionRepository?: SharedScaleArtifactRepository): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
     const compact = value as any
+    if (compact?.storageVersion === 3) {
+      const reference = publishedReferenceSchema.parse(value)
+      let published = publishedArtifacts.get(reference.artifactHash) ?? getCachedPublishedScaleArtifact(reference.artifactHash)
+      if (!published) {
+        const row = await (transactionRepository ?? repository).find(reference.artifactHash)
+        if (!row) throw new Error('Shared Scale runtime artifact is missing; restore it before retrying')
+        published = decodePublishedScaleArtifact(row, reference.artifactHash)
+        publishedArtifacts.set(reference.artifactHash, published, row.plaintextBytes * 6 + row.payloadEncrypted.length * 2 + 2048)
+        if (!transactionRepository) {
+          cacheCommittedPublishedScaleArtifact(reference.artifactHash, published, row.plaintextBytes)
+        }
+      }
+      return reconstructFromPublishedScaleArtifact(published, reference)
+    }
     const reference = compact?.storageVersion === 2
       ? { ...referenceSchema.omit({ snapshotHash: true }).extend({ storageVersion: z.literal(2) }).parse(value), snapshotHash: undefined }
       : referenceSchema.parse(value)

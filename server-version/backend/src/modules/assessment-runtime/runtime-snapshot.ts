@@ -163,6 +163,104 @@ const prepareScale = (input: { instrumentKey: string; instrumentVersion: string;
   return { definition, compiledRuntime, legacyHash }
 }
 
+import { getCachedPublishedScaleArtifact, getPublishedScaleArtifactHash, type PublishedScaleArtifact } from './published-scale-artifact'
+import { isPublishedSharedScaleRuntimeReference, reconstructPublishedSharedScaleRuntimeSync } from './shared-scale-runtime'
+import { clearPreloadedActiveScaleDeployments, readActiveScaleDeployments, setPreloadedActiveScaleDeployments } from '../scale/deployment/repository'
+
+const snapshotPublishedArtifactHash = new WeakMap<VersionedFrozenScaleRuntimeSnapshot, string>()
+export const getSnapshotPublishedArtifactHash = (snapshot: VersionedFrozenScaleRuntimeSnapshot): string | undefined => (
+  snapshotPublishedArtifactHash.get(snapshot)
+)
+export const setSnapshotPublishedArtifactHash = (snapshot: VersionedFrozenScaleRuntimeSnapshot, hash: string): void => {
+  snapshotPublishedArtifactHash.set(snapshot, hash)
+}
+
+type PreloadedScaleRow = {
+  id: string
+  code: string
+  instrumentVersion: string
+  instrumentClass: 'STANDARD' | 'CUSTOM_DESCRIPTIVE'
+  status: string
+  libraryEntryId: string | null
+  measurementReleaseId: string | null
+  standardSourceKind: string | null
+  standardToolKey: string | null
+}
+type PreloadedScaleFreezeContext = {
+  scalesById: Map<string, PreloadedScaleRow>
+  scalesByCode: Map<string, PreloadedScaleRow>
+  importedScalesByToolVersion: Map<string, PreloadedScaleRow>
+}
+const preloadedScaleFreezeContexts = new WeakMap<object, PreloadedScaleFreezeContext>()
+
+export const withPreloadedScaleStartFreeze = async <T>(
+  db: unknown,
+  items: ReadonlyArray<{ scaleId?: string | null; code?: string | null; instrumentVersion?: string | null }>,
+  work: () => Promise<T>,
+): Promise<T> => {
+  const scaleModel = (db as any)?.scale
+  if (!db || typeof db !== 'object' || items.length <= 1 || !scaleModel || typeof scaleModel.findMany !== 'function' || preloadedScaleFreezeContexts.has(db)) {
+    return work()
+  }
+  const scaleIds = [...new Set(items.map((item) => item.scaleId).filter((id): id is string => typeof id === 'string' && id.length > 0))]
+  const codes = [...new Set(items.map((item) => item.code).filter((code): code is string => typeof code === 'string' && code.length > 0))]
+  if (scaleIds.length === 0 && codes.length === 0) {
+    return work()
+  }
+  const scaleSelect = {
+    id: true,
+    code: true,
+    instrumentVersion: true,
+    instrumentClass: true,
+    status: true,
+    libraryEntryId: true,
+    measurementReleaseId: true,
+    standardSourceKind: true,
+    standardToolKey: true,
+  }
+  try {
+    const orClauses: Array<Record<string, unknown>> = []
+    if (scaleIds.length > 0) orClauses.push({ id: { in: scaleIds } })
+    if (codes.length > 0) {
+      orClauses.push({ code: { in: codes } })
+      orClauses.push({ standardSourceKind: 'DB_IMPORTED', standardToolKey: { in: codes } })
+    }
+    const rows: PreloadedScaleRow[] = await scaleModel.findMany({
+      where: orClauses.length === 1 ? orClauses[0] : { OR: orClauses },
+      select: scaleSelect,
+    })
+    const scalesById = new Map<string, PreloadedScaleRow>()
+    const scalesByCode = new Map<string, PreloadedScaleRow>()
+    const importedScalesByToolVersion = new Map<string, PreloadedScaleRow>()
+    for (const row of rows) {
+      scalesById.set(row.id, row)
+      scalesByCode.set(row.code, row)
+      if (row.standardSourceKind === 'DB_IMPORTED' && row.standardToolKey) {
+        importedScalesByToolVersion.set(`${row.standardToolKey}\u0000${row.instrumentVersion}`, row)
+      }
+    }
+    preloadedScaleFreezeContexts.set(db, { scalesById, scalesByCode, importedScalesByToolVersion })
+    const allScaleIds = [...scalesById.keys()]
+    if (allScaleIds.length > 0 && allScaleIds.length <= 50 && typeof (db as any).$queryRaw === 'function') {
+      const deployments = await readActiveScaleDeployments(db as any, allScaleIds)
+      const deploymentMap = new Map<string, import('../scale/deployment/repository').StoredScaleDeploymentPolicyV1 | null>()
+      for (const id of allScaleIds) {
+        deploymentMap.set(id, deployments.get(id) ?? null)
+      }
+      setPreloadedActiveScaleDeployments(db as any, deploymentMap)
+    }
+  } catch {
+    preloadedScaleFreezeContexts.delete(db)
+    clearPreloadedActiveScaleDeployments(db as any)
+  }
+  try {
+    return await work()
+  } finally {
+    preloadedScaleFreezeContexts.delete(db)
+    clearPreloadedActiveScaleDeployments(db as any)
+  }
+}
+
 const buildFrozenScaleRuntimeSnapshot = (input: {
   instrumentKey: string
   instrumentVersion: string
@@ -171,9 +269,15 @@ const buildFrozenScaleRuntimeSnapshot = (input: {
   referenceBindings: ReferenceBindingSnapshot[]
   frozenAt?: Date
   instruction?: FrozenScaleInstruction | null
+  legacyDefinitionHash?: string
+  measurementPresentation?: FrozenScalePresentation
 }): FrozenScaleRuntimeSnapshotV1 => {
   const frozenAt = input.frozenAt ?? new Date()
   if (Number.isNaN(frozenAt.getTime())) throw new Error('Invalid frozen Scale runtime snapshot frozenAt')
+  const legacyDefinitionHash = input.legacyDefinitionHash ?? verifiedLegacyScaleDefinitionHash(input.definition)
+  if (input.legacyDefinitionHash && hasImmutableCanonicalValue(input.definition)) {
+    legacyHashes.set(input.definition, input.legacyDefinitionHash)
+  }
   const unsigned = unsignedSnapshot({
     schemaVersion: 1,
     runtimeGeneration: 'UNIFIED_V1',
@@ -181,10 +285,11 @@ const buildFrozenScaleRuntimeSnapshot = (input: {
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
     sourceDefinitionHash: input.compiledRuntime.sourceDefinitionHash,
-    legacyDefinitionHash: verifiedLegacyScaleDefinitionHash(input.definition),
+    legacyDefinitionHash,
     compiledRuntime: input.compiledRuntime,
     referenceBindings: input.referenceBindings,
     definition: input.definition,
+    ...(input.measurementPresentation ? { measurementPresentation: input.measurementPresentation } : {}),
     instruction: input.instruction ?? null,
   })
   return { ...unsigned, snapshotHash: canonicalHashObjectParts(unsigned) }
@@ -227,7 +332,7 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     /** Verified, hash-bound publish-time static content (format 3). When set,
      * definition, compiled runtime, instruction and library presentation come
      * only from it; reference bindings, deployment and policy stay live. */
-    publishedArtifact?: import('./published-scale-artifact').PublishedScaleArtifact
+    publishedArtifact?: PublishedScaleArtifact
   },
 ): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
   assertAssessmentStartResources()
@@ -241,6 +346,17 @@ export const freezeScaleRuntimeAtAttemptStart = async (
   })
 
   const artifact = input.publishedArtifact
+  const committedArtifactHash = artifact ? getPublishedScaleArtifactHash(artifact) : undefined
+  const canTagPublishedArtifact = Boolean(
+    artifact && committedArtifactHash && getCachedPublishedScaleArtifact(committedArtifactHash) === artifact,
+  )
+  const tagIfPublished = <T extends VersionedFrozenScaleRuntimeSnapshot>(snapshot: T): T => {
+    if (canTagPublishedArtifact && committedArtifactHash) {
+      setSnapshotPublishedArtifactHash(snapshot, committedArtifactHash)
+    }
+    return snapshot
+  }
+
   const { definition, compiledRuntime } = artifact
     ? { definition: artifact.definition, compiledRuntime: artifact.compiledRuntime }
     : prepareScale(input)
@@ -257,6 +373,8 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     referenceBindings,
     frozenAt: input.frozenAt,
     instruction: artifact ? artifact.instruction : input.instruction,
+    legacyDefinitionHash: artifact?.legacyDefinitionHash,
+    measurementPresentation: artifact?.measurementPresentation,
   })
 
   // Production Prisma clients expose Scale. Lightweight unit doubles used by
@@ -265,29 +383,44 @@ export const freezeScaleRuntimeAtAttemptStart = async (
   const scaleModel = (db as any).scale
   if (!scaleModel || typeof scaleModel.findUnique !== 'function') {
     if (input.importedScaleId) throw new Error('Scale new start denied: DEPLOYMENT_SCALE_MISSING')
-    return v1
+    return tagIfPublished(v1)
   }
   const scaleSelect = { id: true, code: true, instrumentVersion: true, instrumentClass: true, status: true, libraryEntryId: true, measurementReleaseId: true, standardSourceKind: true, standardToolKey: true }
-  let scale = await scaleModel.findUnique({
-    where: input.importedScaleId ? { id: input.importedScaleId } : { code: input.instrumentKey },
-    select: scaleSelect,
-  })
+  const preloaded = db && typeof db === 'object' ? preloadedScaleFreezeContexts.get(db) : undefined
+  let scale = preloaded
+    ? (input.importedScaleId ? preloaded.scalesById.get(input.importedScaleId) : preloaded.scalesByCode.get(input.instrumentKey)) ?? null
+    : undefined
+  if (scale === undefined) {
+    scale = await scaleModel.findUnique({
+      where: input.importedScaleId ? { id: input.importedScaleId } : { code: input.instrumentKey },
+      select: scaleSelect,
+    })
+  }
   if (input.importedScaleId && (!scale || scale.standardSourceKind !== 'DB_IMPORTED' || scale.standardToolKey !== input.instrumentKey || scale.instrumentVersion !== input.instrumentVersion)) {
     throw new Error('Scale new start denied: IMPORTED_SOURCE_IDENTITY_MISMATCH')
   }
   if(!input.importedScaleId&&(!scale||scale.instrumentVersion!==input.instrumentVersion)&&typeof scaleModel.findFirst==='function'){
-    const imported=await scaleModel.findFirst({
-      where:{standardSourceKind:'DB_IMPORTED',standardToolKey:input.instrumentKey,instrumentVersion:input.instrumentVersion},
-      select:scaleSelect,
-    })
+    const imported = preloaded
+      ? preloaded.importedScalesByToolVersion.get(`${input.instrumentKey}\u0000${input.instrumentVersion}`) ?? null
+      : await scaleModel.findFirst({
+          where:{standardSourceKind:'DB_IMPORTED',standardToolKey:input.instrumentKey,instrumentVersion:input.instrumentVersion},
+          select:scaleSelect,
+        })
     if(imported)scale=imported
   }
   if (!scale) throw new Error('Scale new start denied: DEPLOYMENT_SCALE_MISSING')
   if (scale.instrumentVersion !== input.instrumentVersion) throw new Error('Scale new start denied: DEPLOYMENT_VERSION_CONFLICT')
 
   if (artifact) {
-    const presentation = artifact.measurementPresentation
-    if (presentation) { v1.measurementPresentation = presentation; v1.snapshotHash = hashFrozenScaleRuntimeSnapshot(v1) }
+    if (input.sealedLibraryPresentation) {
+      const source = input.sealedLibraryPresentation, presentation = frozenScalePresentationSchema.parse(source.presentation)
+      if (scale.libraryEntryId !== source.entryId || scale.measurementReleaseId !== presentation.releaseId || v1.sourceDefinitionHash !== source.sourceDefinitionHash)
+        throw new Error('Frozen education library presentation identity mismatch')
+      if (!v1.measurementPresentation) {
+        v1.measurementPresentation = presentation
+        v1.snapshotHash = hashFrozenScaleRuntimeSnapshot(v1)
+      }
+    }
   } else if (scale.libraryEntryId) {
     if(input.sealedLibraryPresentation){
       const source=input.sealedLibraryPresentation,presentation=frozenScalePresentationSchema.parse(source.presentation)
@@ -303,8 +436,8 @@ export const freezeScaleRuntimeAtAttemptStart = async (
   if (!resolution.allowNewStarts) {
     throw new Error(`Scale new start denied: ${resolution.reasons.join(',') || 'UNKNOWN'}`)
   }
-  if (resolution.kind !== 'MANAGED_V2') return v1
-  return createFrozenScaleRuntimeSnapshotV2FromV1(v1, resolution.runtimePolicy)
+  if (resolution.kind !== 'MANAGED_V2') return tagIfPublished(v1)
+  return tagIfPublished(createFrozenScaleRuntimeSnapshotV2FromV1(v1, resolution.runtimePolicy))
 }
 
 export const hashFrozenScaleRuntimeSnapshot = (snapshot: FrozenScaleRuntimeSnapshotV1): string => (
@@ -388,13 +521,20 @@ export const encryptFrozenScaleRuntimeSnapshot = (snapshot: VersionedFrozenScale
   encryptUnifiedRuntimePayload(snapshot)
 )
 
-export const decryptFrozenScaleRuntimeSnapshot = (encrypted: string): VersionedFrozenScaleRuntimeSnapshot => (
-  parseVersionedFrozenScaleRuntimeSnapshot(decryptUnifiedRuntimePayload<unknown>(encrypted))
-)
+export const decryptFrozenScaleRuntimeSnapshot = (encrypted: string): VersionedFrozenScaleRuntimeSnapshot => {
+  const value = decryptUnifiedRuntimePayload<unknown>(encrypted)
+  if (isPublishedSharedScaleRuntimeReference(value)) {
+    return reconstructPublishedSharedScaleRuntimeSync(value)
+  }
+  return parseVersionedFrozenScaleRuntimeSnapshot(value)
+}
 
 /** New writes are opt-in; compatible reads remain unconditional for rollback. */
 export const persistFrozenScaleRuntimeSnapshot = async (snapshot: VersionedFrozenScaleRuntimeSnapshot, db?: import('./shared-scale-runtime').SharedScaleArtifactDb): Promise<string> => {
-  if (process.env.ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED !== 'true') return encryptFrozenScaleRuntimeSnapshot(snapshot)
+  if (process.env.ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED === 'false') return encryptFrozenScaleRuntimeSnapshot(snapshot)
+  if (process.env.ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED !== 'true' && !getSnapshotPublishedArtifactHash(snapshot)) {
+    return encryptFrozenScaleRuntimeSnapshot(snapshot)
+  }
   const shared = await import('./shared-scale-runtime')
   return shared.sharedScaleRuntimeStore.save(snapshot, db ? shared.sharedScaleArtifactRepositoryForDatabase(db) : undefined)
 }

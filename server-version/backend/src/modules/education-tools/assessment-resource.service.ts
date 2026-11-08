@@ -21,7 +21,7 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {validateResultDisclosureContract} from '../assessment-policy/result-disclosure'
 import {assertSelfGroupOwnSummaryCeiling,SELF_GROUP_POLICY_VERSION} from '../assessment-policy/self-group-contract'
 import {buildTrainingFlowUnits} from '../composite/training-flow-definition'
-import {trainingContentSnapshotSchema,type TrainingContentSnapshot} from '../composite/training-content-binding'
+import {attachLegacyScaleArtifactsForSnapshot,trainingContentSnapshotSchema,type TrainingContentSnapshot} from '../composite/training-content-binding'
 import {trainingReferenceSelectionSchema} from '../composite/training-reference-selection'
 import {getContentReleaseBatch,type StoredRelease} from '../measurement-content/repository'
 import {referenceEntryKey} from '../measurement-content/reference-candidate'
@@ -307,6 +307,7 @@ export async function registerEducationAssessment(c:EducationAssessmentContext,i
   await content.recheckSourceLicenses();await retainEducationAssessmentIssuers(tx,c,[p.createdAuthority,actor]);await captureEducationAssessmentIssuer(tx,c)
   await assertEducationAssessmentDistributionCurrent(tx,origin)
   await tx.compositeAssessment.update({where:{id:runtime.id},data:{trainingContentSnapshot:selected.snapshot,trainingContentSnapshotHash:origin.runtimeSnapshotHash}})
+  await attachLegacyScaleArtifactsForSnapshot(tx,runtime,selected.snapshot,origin.runtimeSnapshotHash,selected.releases)
   await tx.$executeRaw(Prisma.sql`INSERT INTO education_assessment_deliveries
    (id,product,organization_id,family,source_composite_id,runtime_composite_id,entry,entry_hash,created_by_user_id,created_authority)
    VALUES(${id},${c.product},${c.organizationId},${p.family},${source.id},${runtime.id},${JSON.stringify(entry)}::jsonb,${canonicalHash(entry)},${c.principal.userId},${JSON.stringify(actor)}::jsonb)`)

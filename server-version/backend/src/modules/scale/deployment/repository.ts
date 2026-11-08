@@ -1,6 +1,8 @@
 import { Prisma, type PrismaClient } from '@prisma/client'
 import type { InstrumentAuthorizationRecordV1 } from '../../assessment-authorization/types'
 import { parseInstrumentAuthorizationRecord } from '../../assessment-authorization/records-schema'
+import { BoundedArtifactCache, artifactContentKey, jsonArtifactBytes } from '../../assessment-runtime/bounded-artifact-cache'
+import { retainImmutableCanonicalValue } from '../../assessment-runtime/canonical'
 import {
   hashScaleDeploymentPolicy,
   scaleDeploymentPolicySchema,
@@ -42,25 +44,57 @@ const stringArray = (value: unknown): string[] => (
   Array.isArray(value) && value.every((entry) => typeof entry === 'string') ? [...value] : []
 )
 
+const verifiedDeploymentPolicyCache = new BoundedArtifactCache<{ policy: ScaleDeploymentPolicy; authorizationRefs: readonly string[] }>(256, 2 * 1024 * 1024)
+const preloadedActiveScaleDeployments = new WeakMap<object, Map<string, StoredScaleDeploymentPolicyV1 | null>>()
+
+export const setPreloadedActiveScaleDeployments = (
+  db: Db,
+  entries: Map<string, StoredScaleDeploymentPolicyV1 | null>,
+): void => {
+  if (db && typeof db === 'object') {
+    preloadedActiveScaleDeployments.set(db, entries)
+  }
+}
+
+export const clearPreloadedActiveScaleDeployments = (db: Db): void => {
+  if (db && typeof db === 'object') {
+    preloadedActiveScaleDeployments.delete(db)
+  }
+}
+
 const toDeployment = (row: DeploymentRow): StoredScaleDeploymentPolicyV1 => {
-  const policy = scaleDeploymentPolicySchema.parse(row.policyJson)
-  if (policy.revision !== row.revision) throw new Error('Scale deployment row revision does not match policy')
-  if (hashScaleDeploymentPolicy(policy) !== row.policyHash) throw new Error('Scale deployment policy hash mismatch')
   if (row.status !== 'DRAFT' && row.status !== 'ACTIVE' && row.status !== 'RETIRED') {
     throw new Error(`Unsupported Scale deployment status: ${row.status}`)
   }
-  const authorizationRefs = stringArray(row.authorizationRefs)
-  if (JSON.stringify([...authorizationRefs].sort()) !== JSON.stringify([...(policy.schemaVersion === 1 ? policy.authorizationRefs : [])].sort())) {
-    throw new Error('Scale deployment authorization refs do not match policy')
+  const bytes = jsonArtifactBytes({
+    revision: row.revision,
+    policyHash: row.policyHash,
+    policyJson: row.policyJson,
+    authorizationRefs: row.authorizationRefs,
+  })
+  const cacheKey = bytes && bytes.length <= 256 * 1024 ? artifactContentKey(bytes) : null
+  let verified = cacheKey ? verifiedDeploymentPolicyCache.get(cacheKey) : undefined
+  if (!verified) {
+    const policy = retainImmutableCanonicalValue(scaleDeploymentPolicySchema.parse(row.policyJson))
+    if (policy.revision !== row.revision) throw new Error('Scale deployment row revision does not match policy')
+    if (hashScaleDeploymentPolicy(policy) !== row.policyHash) throw new Error('Scale deployment policy hash mismatch')
+    const authorizationRefs = Object.freeze(stringArray(row.authorizationRefs))
+    if (JSON.stringify([...authorizationRefs].sort()) !== JSON.stringify([...(policy.schemaVersion === 1 ? policy.authorizationRefs : [])].sort())) {
+      throw new Error('Scale deployment authorization refs do not match policy')
+    }
+    verified = { policy, authorizationRefs }
+    if (cacheKey && bytes) {
+      verifiedDeploymentPolicyCache.set(cacheKey, verified, bytes.length * 4 + 256)
+    }
   }
   return {
     id: row.id,
     scaleId: row.scaleId,
     revision: row.revision,
     status: row.status,
-    policy,
+    policy: verified.policy,
     policyHash: row.policyHash,
-    authorizationRefs,
+    authorizationRefs: [...verified.authorizationRefs],
     createdByUserId: row.createdByUserId,
     createdAt: row.createdAt,
     activatedAt: row.activatedAt,
@@ -72,6 +106,10 @@ export const readActiveScaleDeployment = async (
   db: Db,
   scaleId: string,
 ): Promise<StoredScaleDeploymentPolicyV1 | null> => {
+  const preloaded = db && typeof db === 'object' ? preloadedActiveScaleDeployments.get(db) : undefined
+  if (preloaded && preloaded.has(scaleId)) {
+    return preloaded.get(scaleId) ?? null
+  }
   const rows = await db.$queryRaw<DeploymentRow[]>(Prisma.sql`
     SELECT
       "id",
@@ -144,6 +182,7 @@ export const activateScaleDeploymentRevision = async (input: {
   createdByUserId: string | null
   now?: Date
 }): Promise<{ created: boolean; deployment: StoredScaleDeploymentPolicyV1 }> => {
+  clearPreloadedActiveScaleDeployments(input.db)
   const policy = scaleDeploymentPolicyV2Schema.parse(input.policy)
   const policyHash = hashScaleDeploymentPolicy(policy)
   const existing = await readScaleDeploymentRevision(input.db, input.scaleId, policy.revision)

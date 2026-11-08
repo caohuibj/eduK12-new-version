@@ -211,6 +211,7 @@ import {
   loadFrozenScaleRuntimeSnapshot,
   persistFrozenScaleRuntimeSnapshot,
   freezeScaleRuntimeAtAttemptStart,
+  withPreloadedScaleStartFreeze,
 } from '../assessment-runtime/runtime-snapshot'
 import { compiledBundleRuntimeHashForSnapshot, evaluateCompleteness, type AggregateSnapshotHeader } from '../assessment-runtime/unified-aggregate'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
@@ -2811,100 +2812,153 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
       frozenAt: string
     }>,
   }
-  for (const item of items) {
-    if (!item.required) continue
-    if (item.type === 'SCALE') {
-      const frozenScale = attempt.runtimeGeneration === 'UNIFIED_V1'
-        ? prepared?.scales.get(item.id) ?? await freezeScaleRuntimeAtAttemptStart(db, compositeScaleFreezeInput(item))
-        : null
-      if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
-      // Parent START (createAttempt) already admitted every child Scale in this
-      // same transaction under the same locks (parent guard + content binding),
-      // so it is not repeated per child. Only a lazily materialized flow unit,
-      // admitted outside parent START, keeps its own per-item admission here.
-      if(verifiedFlowMaterialization){
-        if(composite.productKind==='ORGANIZATION_RESOURCE')await assertScaleLibraryCollectionAllowed(db as Prisma.TransactionClient,[],[item.scaleId!])
-        else await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient, [item.scaleId!],{compositeAttemptId:attempt.id,compositeItemIds:[item.id],
-          verifiedFlowMaterialization,compositeAttemptEpoch:attempt.attemptEpoch})
-      }else if(composite.productKind!=='ORGANIZATION_RESOURCE'){
-        // The parent guard skips exact STANDARD items because the content
-        // binding revalidated them; fail closed if this one was not bound.
-        assertStandardItemsVerifiedByContentBinding([item],attempt.trainingContentBinding?.units)
+  const requiredScaleItems = items.filter((item: any) => item.required && item.type === 'SCALE')
+  const canBatchScales = !verifiedFlowMaterialization && requiredScaleItems.length > 1 && typeof (db.assessment as any)?.createMany === 'function'
+  const pendingScales: Array<{ id: string; item: any; frozenScale: Awaited<ReturnType<typeof freezeScaleRuntimeAtAttemptStart>> | null; data: Record<string, unknown> }> = []
+  await withPreloadedScaleStartFreeze(
+    db,
+    requiredScaleItems.map((item: any) => ({ scaleId: item.scaleId, code: item.scale?.code, instrumentVersion: item.scale?.instrumentVersion })),
+    async () => {
+      for (const item of items) {
+        if (!item.required) continue
+        if (item.type === 'SCALE') {
+          const frozenScale = attempt.runtimeGeneration === 'UNIFIED_V1'
+            ? prepared?.scales.get(item.id) ?? await freezeScaleRuntimeAtAttemptStart(db, compositeScaleFreezeInput(item))
+            : null
+          if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
+          // Parent START (createAttempt) already admitted every child Scale in this
+          // same transaction under the same locks (parent guard + content binding),
+          // so it is not repeated per child. Only a lazily materialized flow unit,
+          // admitted outside parent START, keeps its own per-item admission here.
+          if(verifiedFlowMaterialization){
+            if(composite.productKind==='ORGANIZATION_RESOURCE')await assertScaleLibraryCollectionAllowed(db as Prisma.TransactionClient,[],[item.scaleId!])
+            else await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient, [item.scaleId!],{compositeAttemptId:attempt.id,compositeItemIds:[item.id],
+              verifiedFlowMaterialization,compositeAttemptEpoch:attempt.attemptEpoch})
+          }else if(composite.productKind!=='ORGANIZATION_RESOURCE'){
+            // The parent guard skips exact STANDARD items because the content
+            // binding revalidated them; fail closed if this one was not bound.
+            assertStandardItemsVerifiedByContentBinding([item],attempt.trainingContentBinding?.units)
+          }
+          if (canBatchScales) {
+            const childId = randomUUID()
+            pendingScales.push({
+              id: childId,
+              item,
+              frozenScale,
+              data: {
+                id: childId,
+                scaleId: item.scaleId,
+                userId,
+                status: 'IN_PROGRESS',
+                deliveryMode: 'FINAL_ONLY',
+                attemptEpoch: attempt.attemptEpoch ?? 1,
+                progress: 0,
+                answers: encryptScaleAnswers([]),
+                compositeAttemptId: attempt.id,
+                compositeItemId: item.id,
+                subjectUserId: attempt.subjectUserId ?? userId,
+                respondentUserId: attempt.respondentUserId ?? userId,
+                respondentType: attempt.respondentType ?? 'SELF',
+                ...(frozenScale ? {
+                  runtimeGeneration: 'UNIFIED_V1' as const,
+                  runtimeSnapshotEncrypted: prepared?.references?.get(item.id) ?? (await persistFrozenScaleRuntimeSnapshot(frozenScale, db)),
+                  compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
+                } : {}),
+              },
+            })
+            continue
+          }
+          const child = await db.assessment.create({
+            data: {
+              scaleId: item.scaleId,
+              userId,
+              status: 'IN_PROGRESS',
+              deliveryMode: 'FINAL_ONLY',
+              attemptEpoch: attempt.attemptEpoch ?? 1,
+              progress: 0,
+              answers: encryptScaleAnswers([]),
+              compositeAttemptId: attempt.id,
+              compositeItemId: item.id,
+              subjectUserId: attempt.subjectUserId ?? userId,
+              respondentUserId: attempt.respondentUserId ?? userId,
+              respondentType: attempt.respondentType ?? 'SELF',
+              ...(frozenScale ? {
+                runtimeGeneration: 'UNIFIED_V1' as const,
+                runtimeSnapshotEncrypted: prepared?.references?.get(item.id) ?? (await persistFrozenScaleRuntimeSnapshot(frozenScale, db)),
+                compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
+              } : {}),
+            },
+          })
+          if (frozenScale) {
+            await retainFrozenScaleAssessmentImages({ assessmentId: child.id, snapshot: frozenScale, db })
+            runtime.scales.push({
+              compositeItemId: item.id,
+              code: item.scale.code,
+              instrumentVersion: item.scale.instrumentVersion,
+              sourceDefinitionHash: frozenScale.sourceDefinitionHash,
+              compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
+            })
+          }
+        } else if (item.type === 'COGNITIVE') {
+          const session = await createCognitiveChild(db, attempt, item, userId, prepared?.cognitive.get(item.id), prepared?.assignments.get(item.id), prepared?.references?.get(item.id),educationAttempt)
+          if (attempt.runtimeGeneration === 'UNIFIED_V1') {
+            const snapshot = prepared?.cognitive.get(item.id)?.snapshot ?? (await cognitiveSessionService.loadCognitiveSessionConfig(session.configSnapshotEncrypted,db as any)).snapshot
+            if (!snapshot?.compiledRuntime) throw new Error('Unified Cognitive session runtime snapshot is missing')
+            runtime.cognitive.push({
+              compositeItemId: item.id,
+              testType: item.cognitiveAssignment.config.testType,
+              instrumentVersion: snapshot.compiledRuntime.instrumentVersion,
+              sourceDefinitionHash: snapshot.compiledRuntime.sourceDefinitionHash,
+              compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
+            })
+          }
+        } else if (item.type === 'SITUATIONAL') {
+          if (attempt.runtimeGeneration !== 'UNIFIED_V1') throw compositeBadRequest('情境化模块必须使用 Unified FINAL_ONLY 运行时')
+          const situation = assertSituationalCompositeItem(situationalReleases.get(situationalReleaseKey(situationalItemIdentity(item)))!,educationProduct)
+          const embedded = await createEmbeddedSituationalAttempt(db, {
+            userId,
+            // Composite parent rows retain their historical participant key
+            // format. Embedded Situational children use the shared pseudonym
+            // contract so owner admission is identical to standalone runtime.
+            participantKey: userId ? getParticipantKey(userId) : attempt.participantKey,
+            compositeAttemptId: attempt.id,
+            compositeItemId: item.id,
+            compositeSlotKey: compositeItemSlotKey(item.id, 'SITUATIONAL'),
+            instrumentKey: situation.situationPackage.key,
+            instrumentVersion: situation.situationPackage.instrumentVersion,
+            attemptEpoch: attempt.attemptEpoch ?? 1,
+          }, situation,educationAttempt)
+          runtime.situational.push({
+            compositeItemId: item.id,
+            instrumentKey: embedded.snapshot.instrumentKey,
+            instrumentVersion: embedded.snapshot.instrumentVersion,
+            definitionHash: embedded.snapshot.definitionHash,
+            compiledRuntimeHash: embedded.snapshot.compiledRuntimeHash,
+            scorerKey: embedded.snapshot.scorerKey,
+            scoringVersion: embedded.snapshot.scoringVersion,
+            runtimeGeneration: embedded.snapshot.runtimeGeneration,
+            deliveryMode: 'FINAL_ONLY',
+            frozenAt: embedded.snapshot.frozenAt,
+          })
+        }
       }
-      const child = await db.assessment.create({
-        data: {
-          scaleId: item.scaleId,
-          userId,
-          status: 'IN_PROGRESS',
-          deliveryMode: 'FINAL_ONLY',
-          attemptEpoch: attempt.attemptEpoch ?? 1,
-          progress: 0,
-          answers: encryptScaleAnswers([]),
-          compositeAttemptId: attempt.id,
-          compositeItemId: item.id,
-          subjectUserId: attempt.subjectUserId ?? userId,
-          respondentUserId: attempt.respondentUserId ?? userId,
-          respondentType: attempt.respondentType ?? 'SELF',
-          ...(frozenScale ? {
-            runtimeGeneration: 'UNIFIED_V1' as const,
-            runtimeSnapshotEncrypted: prepared?.references?.get(item.id) ?? (await persistFrozenScaleRuntimeSnapshot(frozenScale, db)),
-            compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
-          } : {}),
-        },
-      })
-      if (frozenScale) {
-        await retainFrozenScaleAssessmentImages({ assessmentId: child.id, snapshot: frozenScale, db })
-        runtime.scales.push({
-          compositeItemId: item.id,
-          code: item.scale.code,
-          instrumentVersion: item.scale.instrumentVersion,
-          sourceDefinitionHash: frozenScale.sourceDefinitionHash,
-          compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
-        })
+      if (pendingScales.length > 0) {
+        await db.assessment.createMany({ data: pendingScales.map((entry) => entry.data) })
+        for (const entry of pendingScales) {
+          if (entry.frozenScale) {
+            await retainFrozenScaleAssessmentImages({ assessmentId: entry.id, snapshot: entry.frozenScale, db })
+            runtime.scales.push({
+              compositeItemId: entry.item.id,
+              code: entry.item.scale.code,
+              instrumentVersion: entry.item.scale.instrumentVersion,
+              sourceDefinitionHash: entry.frozenScale.sourceDefinitionHash,
+              compiledRuntimeHash: entry.frozenScale.compiledRuntime.compiledRuntimeHash,
+            })
+          }
+        }
       }
-    } else if (item.type === 'COGNITIVE') {
-      const session = await createCognitiveChild(db, attempt, item, userId, prepared?.cognitive.get(item.id), prepared?.assignments.get(item.id), prepared?.references?.get(item.id),educationAttempt)
-      if (attempt.runtimeGeneration === 'UNIFIED_V1') {
-        const snapshot = prepared?.cognitive.get(item.id)?.snapshot ?? (await cognitiveSessionService.loadCognitiveSessionConfig(session.configSnapshotEncrypted,db as any)).snapshot
-        if (!snapshot?.compiledRuntime) throw new Error('Unified Cognitive session runtime snapshot is missing')
-        runtime.cognitive.push({
-          compositeItemId: item.id,
-          testType: item.cognitiveAssignment.config.testType,
-          instrumentVersion: snapshot.compiledRuntime.instrumentVersion,
-          sourceDefinitionHash: snapshot.compiledRuntime.sourceDefinitionHash,
-          compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
-        })
-      }
-    } else if (item.type === 'SITUATIONAL') {
-      if (attempt.runtimeGeneration !== 'UNIFIED_V1') throw compositeBadRequest('情境化模块必须使用 Unified FINAL_ONLY 运行时')
-      const situation = assertSituationalCompositeItem(situationalReleases.get(situationalReleaseKey(situationalItemIdentity(item)))!,educationProduct)
-      const embedded = await createEmbeddedSituationalAttempt(db, {
-        userId,
-        // Composite parent rows retain their historical participant key
-        // format. Embedded Situational children use the shared pseudonym
-        // contract so owner admission is identical to standalone runtime.
-        participantKey: userId ? getParticipantKey(userId) : attempt.participantKey,
-        compositeAttemptId: attempt.id,
-        compositeItemId: item.id,
-        compositeSlotKey: compositeItemSlotKey(item.id, 'SITUATIONAL'),
-        instrumentKey: situation.situationPackage.key,
-        instrumentVersion: situation.situationPackage.instrumentVersion,
-        attemptEpoch: attempt.attemptEpoch ?? 1,
-      }, situation,educationAttempt)
-      runtime.situational.push({
-        compositeItemId: item.id,
-        instrumentKey: embedded.snapshot.instrumentKey,
-        instrumentVersion: embedded.snapshot.instrumentVersion,
-        definitionHash: embedded.snapshot.definitionHash,
-        compiledRuntimeHash: embedded.snapshot.compiledRuntimeHash,
-        scorerKey: embedded.snapshot.scorerKey,
-        scoringVersion: embedded.snapshot.scoringVersion,
-        runtimeGeneration: embedded.snapshot.runtimeGeneration,
-        deliveryMode: 'FINAL_ONLY',
-        frozenAt: embedded.snapshot.frozenAt,
-      })
-    }
-  }
+    },
+  )
   return runtime
 }
 
@@ -2991,6 +3045,51 @@ export interface RelationalCompositeAttemptIdentityV1 {
   episodeId: string
   assignmentRef: string
   consentId: string | null
+}
+
+const precomputeScaleOnlyActiveSlotSet = async (db: Db, input: {
+  finalOnly: boolean; flowEnabled: boolean; composite: any; attemptEpoch: number;
+  contentCandidate: any; prepared?: PreparedVariantRuntimes; formSections: any[];
+}) => {
+  if (!input.finalOnly || input.flowEnabled
+    || !input.composite.items.some((item: any) => item.required && item.type === 'SCALE')
+    || !input.composite.items.every((item: any) => !item.required || item.type === 'FORM' || (item.type === 'SCALE' && Boolean(input.prepared?.scales.get(item.id) ?? publishedScaleArtifactByItem.get(item))))) {
+    return null
+  }
+  const slotSet = freezeCompositeActiveSlotSet({
+    attemptEpoch: input.attemptEpoch,
+    unitOrder: input.contentCandidate && 'educationUnitOrder' in input.contentCandidate ? input.contentCandidate.educationUnitOrder : undefined,
+    unitPresentation: input.contentCandidate && 'educationUnitPresentation' in input.contentCandidate ? input.contentCandidate.educationUnitPresentation : undefined,
+    scales: input.composite.items.filter((item: any) => item.required && item.type === 'SCALE').map((item: any) => {
+      const source = (input.prepared?.scales.get(item.id) ?? publishedScaleArtifactByItem.get(item))!
+      return { compositeItemId: item.id, code: item.scale.code, instrumentVersion: item.scale.instrumentVersion, sourceDefinitionHash: source.sourceDefinitionHash, compiledRuntimeHash: source.compiledRuntime.compiledRuntimeHash }
+    }),
+    cognitive: [], situational: [],
+    formSections: input.formSections.map((section: any) => ({ sectionId: section.id, definitionHash: formSectionIdentityHash(compositeFormSectionRuntimeDefinition(section)) })),
+  })
+  return { encrypted: await storeFrozenActiveSlotSet(slotSet, db), snapshotHash: slotSet.snapshotHash }
+}
+
+const freezeEducationLibraryScaleUnit = async (db: Db, item: any, libraryUnit: any, educationFrozenScales: Map<string, any>) => {
+  const source = libraryUnit.source.educationLibrary!, key = 'library:' + source.entryId, itemArtifact = publishedScaleArtifactByItem.get(item)
+  if (item.type !== 'SCALE' || item.scaleId !== libraryUnit.source.id || item.scale.libraryEntryId !== source.entryId || item.scale.creatorId !== libraryUnit.source.ownerId
+    || item.scale.measurementReleaseId !== libraryUnit.measurement.releaseId)
+    throw compositeForbidden('教育共用量表固定身份不一致')
+  let runtime = educationFrozenScales.get(key)
+  if (!runtime) {
+    runtime = await freezeScaleRuntimeAtAttemptStart(db, {
+      instrumentKey: item.scale.code, instrumentVersion: item.scale.instrumentVersion,
+      definition: itemArtifact ? itemArtifact.definition : frozenDatabaseScaleDefinition(item.scale), requestedMode: 'COMPOSITE',
+      instruction: itemArtifact ? itemArtifact.instruction : resolveFrozenScaleInstructionForScale(item.scale),
+      ...(itemArtifact ? { publishedArtifact: itemArtifact } : {}),
+      sealedLibraryPresentation: { entryId: source.entryId, sourceDefinitionHash: source.nativeDefinitionHash,
+        presentation: { releaseId: libraryUnit.measurement.releaseId, contentHash: libraryUnit.measurement.contentHash,
+          presentationMode: source.presentationMode === 'ALL_AT_ONCE' ? 'ALL_AT_ONCE' : 'ONE_BY_ONE' } },
+    })
+    educationFrozenScales.set(key, runtime)
+  }
+  if (runtime.sourceDefinitionHash !== source.nativeDefinitionHash) throw compositeForbidden('教育共用量表冻结内容不一致')
+  return runtime
 }
 
 const createAttempt = async (
@@ -3181,9 +3280,10 @@ const createAttempt = async (
   }
   const trainingScaleArtifacts=await resolveTrainingScaleArtifacts(db as Prisma.TransactionClient,{compositeId:composite.id,
     snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,educationComposition})
-  for(const item of composite.items){const artifact=trainingScaleArtifacts.get(item.id);if(artifact&&item.type==='SCALE'&&item.standardCombinationSource==null)publishedScaleArtifactByItem.set(item,artifact)}
+  for(const item of composite.items){const artifact=trainingScaleArtifacts.get(item.id);if(artifact&&item.type==='SCALE')publishedScaleArtifactByItem.set(item,artifact)}
   if (prepared) {
     try {
+    await withPreloadedScaleStartFreeze(db, composite.items.filter((i:any)=>i.type==='SCALE').map((i:any)=>({scaleId:i.scaleId,code:i.scale?.code,instrumentVersion:i.scale?.instrumentVersion})), async () => {
     for (const item of composite.items) {
       const educationUnit=educationStandardUnits.find(unit=>unit.itemId===item.id)
       const libraryUnit=educationLibraryUnits.find(unit=>unit.itemId===item.id)
@@ -3192,29 +3292,13 @@ const createAttempt = async (
         if(!source)throw compositeForbidden('教育标准量表固定版本不一致')
         const sourceId=educationUnit.source.educationStandard!.releaseId
         let runtime=educationFrozenScales.get(sourceId)
-        if(!runtime){runtime=await freezeExactStandardScaleDefinition(db as Prisma.TransactionClient,source);educationFrozenScales.set(sourceId,runtime)}
+        if(!runtime){runtime=await freezeExactStandardScaleDefinition(db as Prisma.TransactionClient,source,publishedScaleArtifactByItem.get(item));educationFrozenScales.set(sourceId,runtime)}
         if(runtime.sourceDefinitionHash!==educationUnit.source.educationStandard!.nativeDefinitionHash)throw compositeForbidden('教育标准量表冻结内容不一致')
         prepared.scales.set(item.id,runtime)
       }
-      else if(libraryUnit){
-        const source=libraryUnit.source.educationLibrary!,key='library:'+source.entryId
-        if(item.type!=='SCALE'||item.scaleId!==libraryUnit.source.id||item.scale.libraryEntryId!==source.entryId||item.scale.creatorId!==libraryUnit.source.ownerId
-          ||item.scale.measurementReleaseId!==libraryUnit.measurement.releaseId)
-          throw compositeForbidden('教育共用量表固定身份不一致')
-        let runtime=educationFrozenScales.get(key)
-        if(!runtime){
-          runtime=await freezeScaleRuntimeAtAttemptStart(db,{instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,
-            definition:frozenDatabaseScaleDefinition(item.scale),requestedMode:'COMPOSITE',instruction:resolveFrozenScaleInstructionForScale(item.scale),
-            sealedLibraryPresentation:{entryId:source.entryId,sourceDefinitionHash:source.nativeDefinitionHash,
-              presentation:{releaseId:libraryUnit.measurement.releaseId,contentHash:libraryUnit.measurement.contentHash,
-                presentationMode:source.presentationMode==='ALL_AT_ONCE'?'ALL_AT_ONCE':'ONE_BY_ONE'}}})
-          educationFrozenScales.set(key,runtime)
-        }
-        if(runtime.sourceDefinitionHash!==source.nativeDefinitionHash)throw compositeForbidden('教育共用量表冻结内容不一致')
-        prepared.scales.set(item.id,runtime)
-      }
+      else if(libraryUnit)prepared.scales.set(item.id,await freezeEducationLibraryScaleUnit(db,item,libraryUnit,educationFrozenScales))
       else if (item.type === 'SCALE'&&item.standardCombinationSource!=null)prepared.scales.set(item.id,await freezeTrainingStandardScaleRuntime(db as Prisma.TransactionClient,
-        await verifyStoredTrainingStandardItem(db as Prisma.TransactionClient,composite,item,'COLLECTION')))
+        await verifyStoredTrainingStandardItem(db as Prisma.TransactionClient,composite,item,'COLLECTION'),publishedScaleArtifactByItem.get(item)))
       else if (item.type === 'SCALE') prepared.scales.set(item.id, await freezeScaleRuntimeAtAttemptStart(db, compositeScaleFreezeInput(item)))
       if (item.type === 'COGNITIVE') {
         assertCognitiveModuleEnabled()
@@ -3237,6 +3321,7 @@ const createAttempt = async (
         }))
       }
     }
+    })
     for (const group of (variantEnabled?parseCompiledWeightedVariants(composite.trainingVariantFrozen).groups:[{selectedSectionIds:formSections.map((s:any)=>s.id),selectedItemIds:composite.items.map((i:any)=>i.id)}])) {
       const selectedSections=formSections.filter((section:any)=>group.selectedSectionIds.includes(section.id))
       for(const item of composite.items) {
@@ -3331,6 +3416,7 @@ const createAttempt = async (
   }
   const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
     units:contentCandidate.binding.units.filter(unit=>selectedContentItems.has(unit.itemId))}:null
+  const precomputedActiveSlotSet = await precomputeScaleOnlyActiveSlotSet(db, { finalOnly, flowEnabled, composite, attemptEpoch, contentCandidate, prepared, formSections })
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
       id: newAttemptId,
@@ -3369,6 +3455,10 @@ const createAttempt = async (
       ...(field?{subjectUserId:field.subjectUserId,respondentUserId:field.respondentUserId,respondentType:'OBSERVER',assignmentRef:null,episodeId:null,consentId:null}:{}),
       completedItems,
       progress,
+      ...(precomputedActiveSlotSet ? {
+        frozenActiveSlotSetEncrypted: precomputedActiveSlotSet.encrypted,
+        frozenActiveSlotSetHash: precomputedActiveSlotSet.snapshotHash,
+      } : {}),
     },
   })
   // With no demographic section there are no participant fields to collect.
@@ -3391,7 +3481,7 @@ const createAttempt = async (
   const materialAssignment = await allocateTrainingMaterial(db,attempt,composite,restartMaterialClaimId)
   const flowCandidate = flowEnabled ? await freezeTrainingFlowCandidates(db,attempt,composite,prepared!,situationalReleases) : null
   const runtime = flowCandidate?.runtime ?? await createChildRecords(db, attempt, composite, composite.items, userId, formSections, situationalReleases, prepared,undefined,educationProduct,educationStart?bindVerifiedEducationAttempt(educationStart,db,attempt):undefined)
-  if (finalOnly) {
+  if (finalOnly && !precomputedActiveSlotSet) {
     const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
       attemptEpoch,
       unitOrder:contentCandidate&&'educationUnitOrder' in contentCandidate?contentCandidate.educationUnitOrder:undefined,

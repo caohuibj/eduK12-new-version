@@ -33,6 +33,28 @@ export type PublishedScaleArtifactRef = { formatVersion: 3; hash: string }
 
 export const publishedScaleArtifactHash = (artifact: unknown): string => canonicalHash({ storageVersion: 3, artifact })
 
+const publishedArtifactHashes = new WeakMap<PublishedScaleArtifact, string>()
+
+function retainPublishedScaleArtifactChildren(artifact: PublishedScaleArtifact, hash?: string): PublishedScaleArtifact {
+  retainImmutableCanonicalValue(artifact.definition)
+  retainImmutableCanonicalValue(artifact.compiledRuntime)
+  if (artifact.instruction && typeof artifact.instruction === 'object') {
+    retainImmutableCanonicalValue(artifact.instruction)
+  }
+  if (artifact.measurementPresentation) {
+    retainImmutableCanonicalValue(artifact.measurementPresentation)
+  }
+  retainImmutableCanonicalValue(artifact)
+  if (hash && digest.safeParse(hash).success) {
+    publishedArtifactHashes.set(artifact, hash)
+  }
+  return artifact
+}
+
+export const getPublishedScaleArtifactHash = (artifact: PublishedScaleArtifact): string | undefined => (
+  publishedArtifactHashes.get(artifact)
+)
+
 /** Compile exactly what START compiles today, minus the live parts. */
 export function buildPublishedScaleArtifact(input: { instrumentKey: string; instrumentVersion: string; definition: ScaleDefinitionV2;
   instruction: FrozenScaleInstruction | null; measurementPresentation?: FrozenScalePresentation; release: { releaseId: string; contentHash: string } }) {
@@ -44,9 +66,11 @@ export function buildPublishedScaleArtifact(input: { instrumentKey: string; inst
     sourceDefinitionHash: frozen.sourceDefinitionHash, legacyDefinitionHash: frozen.legacyDefinitionHash,
     definition: frozen.definition, compiledRuntime: frozen.compiledRuntime, instruction: frozen.instruction ?? null,
     ...(input.measurementPresentation ? { measurementPresentation: input.measurementPresentation } : {}) }
+  retainPublishedScaleArtifactChildren(artifact)
   const bytes = canonicalJsonBytes(artifact)
   if (bytes.length > MAX_PLAIN_BYTES) throw new Error('Published Scale artifact exceeds size limit')
   const hash = publishedScaleArtifactHash(artifact)
+  publishedArtifactHashes.set(artifact, hash)
   const record: SharedScaleArtifactRecord = { artifactHash: hash, formatVersion: PUBLISHED_SCALE_ARTIFACT_FORMAT, plaintextBytes: bytes.length,
     payloadEncrypted: encryptUnifiedRuntimePayload({ kind: 'SCALE_PUBLISHED_STATIC', storageVersion: 3, artifactHash: hash,
       codec: 'gzip-json-v1', plaintextBytes: bytes.length, data: gzipSync(bytes, { level: 6 }).toString('base64') }) }
@@ -68,7 +92,7 @@ export function decodePublishedScaleArtifact(row: SharedScaleArtifactRecord, exp
   // authenticated envelope. Do NOT recompile on read: published Training freezes
   // the compiled runtime at publish, and a later compiler change must neither
   // reject nor silently alter untampered published content.
-  return retainImmutableCanonicalValue(artifact)
+  return retainPublishedScaleArtifactChildren(artifact, expectedHash)
 }
 
 /** Append inside the publishing transaction. The hash is the primary key and
@@ -89,10 +113,27 @@ export async function appendPublishedScaleArtifact(db: SharedScaleArtifactDb, bu
 // loads in START binding transactions that only see committed refs. Keep it
 // that way: do not call loadPublishedScaleArtifacts inside a transaction that
 // has appended artifacts in this process.
-const cache = new BoundedArtifactCache<PublishedScaleArtifact>(64, 8 * 1024 * 1024)
+const cache = new BoundedArtifactCache<PublishedScaleArtifact>(256, 32 * 1024 * 1024)
+export const getCachedPublishedScaleArtifact = (hash: string): PublishedScaleArtifact | undefined => (
+  digest.safeParse(hash).success ? cache.get(hash) : undefined
+)
+export const cacheCommittedPublishedScaleArtifact = (hash: string, artifact: PublishedScaleArtifact, plainBytes = 4096): void => {
+  if (!digest.safeParse(hash).success) return
+  retainPublishedScaleArtifactChildren(artifact, hash)
+  cache.set(hash, artifact, plainBytes * 5 + 1024)
+}
 export async function loadPublishedScaleArtifacts(db: SharedScaleArtifactDb, hashes: string[]): Promise<Map<string, PublishedScaleArtifact>> {
   const out = new Map<string, PublishedScaleArtifact>(), missing: string[] = []
-  for (const hash of new Set(hashes)) { if (!digest.safeParse(hash).success) throw new Error('Invalid published Scale artifact hash'); const hit = cache.get(hash); if (hit) out.set(hash, hit); else missing.push(hash) }
+  for (const hash of new Set(hashes)) {
+    if (!digest.safeParse(hash).success) throw new Error('Invalid published Scale artifact hash')
+    const hit = cache.get(hash)
+    if (hit) {
+      publishedArtifactHashes.set(hit, hash)
+      out.set(hash, hit)
+    } else {
+      missing.push(hash)
+    }
+  }
   if (missing.length) {
     const rows = await db.$queryRaw<SharedScaleArtifactRecord[]>`SELECT artifact_hash AS "artifactHash", format_version AS "formatVersion",
       plaintext_bytes AS "plaintextBytes", payload_encrypted AS "payloadEncrypted" FROM assessment_runtime_artifacts WHERE artifact_hash = ANY(${missing}::text[])`
