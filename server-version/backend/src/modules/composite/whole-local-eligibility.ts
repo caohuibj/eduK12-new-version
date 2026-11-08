@@ -10,7 +10,11 @@ export interface WholeLocalEligibilityCandidate {
 /**
  * Evaluates whether a composite assessment is eligible for Scheme X Local-First execution.
  * Eligible: Pure linear questionnaires composed exclusively of SCALE and FORM units,
- * without dynamic conditional branching or cognitive/situational interactive tasks.
+ * without dynamic conditional branching, cognitive/situational interactive tasks,
+ * or context (demographics) section dependencies. Context sections keep their
+ * existing stepped submission semantics — their frozen context hash feeds
+ * downstream admission and dynamic item projection, so a whole envelope must
+ * not swallow them in the first whole-submission phase.
  */
 export function isWholeLocalEligible(candidate?: WholeLocalEligibilityCandidate | null): boolean {
   if (!candidate) return false
@@ -35,6 +39,13 @@ export function isWholeLocalEligible(candidate?: WholeLocalEligibilityCandidate 
     item => item.type === 'COGNITIVE' || item.type === 'SITUATIONAL'
   )
   if (hasInteractiveOrTimed) {
+    return false
+  }
+  const hasContextDependency = (candidate.formSections ?? []).some(section => {
+    const typed = section as { contextSection?: unknown; items?: Array<{ contextKey?: unknown }> }
+    return Boolean(typed?.contextSection) || (typed?.items ?? []).some(item => Boolean(item.contextKey))
+  })
+  if (hasContextDependency) {
     return false
   }
   return true
