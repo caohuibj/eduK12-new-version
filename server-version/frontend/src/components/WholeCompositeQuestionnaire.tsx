@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { readMatchingWholeReceipt, rememberWholeReceipt, isRecoverableReceiptError, type WholeReceiptLookup } from '../modules/composite/receipt-recovery'
 import { sessionFetch } from '../api/client'
 import type { ApiResponse } from '../types'
-import type { CompositeAttemptState, CompositeReportStatus, WholeQuestionnaireDefinition, WholeQuestionnaireInput, WholeQuestionnaireReceipt } from '../modules/composite/types'
+import type { CompositeAttemptState, CompositeReportStatus, WholeQuestionnaireDefinition, WholeQuestionnaireInput, WholeQuestionnaireReceipt, WholeQuestionnaireFormSection, WholeQuestionnaireFormSectionItem } from '../modules/composite/types'
 import AssessmentImageGate from '../modules/assessment-media/AssessmentImageGate'
 import ScaleFormVideoGate from '../modules/assessment-media/ScaleFormVideoGate'
 import { assessmentImageItems } from '../modules/assessment-media/adapter'
@@ -21,7 +21,9 @@ import { recordFinalSubmissionFailure } from '../services/persistence/finalSubmi
 import { normalizeApiError } from '../utils/normalizeApiError'
 import { AssessmentShell } from './assessment-shell'
 import ScalePlayer from './questionnaire/ScalePlayer'
+import { FormPlayer, type FormPlayerValue } from './questionnaire/FormPlayer'
 import { useLocalDraftSaveQueue } from './questionnaire/useLocalDraftSaveQueue'
+import type { CompositeScaleRunnerItem } from '../modules/composite/types'
 
 export interface WholeQuestionnaireApi {
   wholeReceipt?: (id: string, submissionId: string, attemptEpoch: number) => Promise<ApiResponse<WholeReceiptLookup>>
@@ -30,14 +32,63 @@ export interface WholeQuestionnaireApi {
   reportStatus: (id: string) => Promise<ApiResponse<CompositeReportStatus>>
 }
 type Props = { state: CompositeAttemptState; api: WholeQuestionnaireApi; publicMode?: boolean; recoveryToken?: string; fallback: ReactNode; onExit: () => void; onCompleted: () => void }
-type Answer = { responseValue: string | number; responseTimeMs?: number; changeCount?: number }
+type Answer = { responseValue?: string | number; value?: unknown; responseTimeMs?: number; changeCount?: number; otherText?: string }
 export const wholeDraftKey = (id: string, epoch: number) => `composite-whole:${id}:${epoch}`
 export const wholeAnswerKey = (itemId: string, itemCode: string) => JSON.stringify([itemId, itemCode])
+export const wholeFormAnswerKey = (sectionId: string, formItemId: string) => `form:${sectionId}:${formItemId}`
 const responseError = (response: ApiResponse<unknown>) => Object.assign(new Error(response.message || '问卷请求失败'), {
   code: response.code, status: typeof response.code === 'number' ? response.code : undefined,
 })
-const readAnswer = (value: unknown): Answer => typeof value === 'object' && value !== null && 'responseValue' in value
-  ? value as Answer : { responseValue: value as string | number }
+const readAnswer = (raw: unknown): Answer => {
+  if (typeof raw === 'object' && raw !== null) {
+    const obj = raw as Record<string, unknown>
+    if ('responseValue' in obj || 'value' in obj || 'otherText' in obj) {
+      return {
+        responseValue: obj.responseValue as string | number | undefined,
+        value: 'value' in obj ? obj.value : obj.responseValue,
+        responseTimeMs: typeof obj.responseTimeMs === 'number' ? obj.responseTimeMs : undefined,
+        changeCount: typeof obj.changeCount === 'number' ? obj.changeCount : undefined,
+        otherText: typeof obj.otherText === 'string' ? obj.otherText : undefined,
+      }
+    }
+  }
+  return { responseValue: raw as string | number, value: raw }
+}
+
+export type FlattenedQuestion =
+  | {
+      kind: 'SCALE'
+      unit: WholeQuestionnaireDefinition['units'][number]
+      question: CompositeScaleRunnerItem
+      title: string
+      instruction?: string | null
+    }
+  | {
+      kind: 'FORM'
+      section: WholeQuestionnaireFormSection
+      item: WholeQuestionnaireFormSectionItem
+      title: string
+      instruction?: string | null
+    }
+
+function parseFormOptions(
+  rawOptions: WholeQuestionnaireFormSectionItem['formOptions'],
+  formDef?: WholeQuestionnaireFormSectionItem['formDefinition']
+): Array<{ value: string; label: string }> {
+  if (formDef && (formDef as any).options && Array.isArray((formDef as any).options) && (formDef as any).options.length > 0) {
+    return (formDef as any).options.map((o: any) => ({ value: String(o.optionKey ?? o.value ?? ''), label: String(o.label ?? '') }))
+  }
+  if (Array.isArray(rawOptions)) {
+    return rawOptions.map((o: any) => ({ value: String(o.value ?? o.optionKey ?? ''), label: String(o.label ?? '') }))
+  }
+  if (typeof rawOptions === 'string') {
+    try {
+      const parsed = JSON.parse(rawOptions)
+      if (Array.isArray(parsed)) return parsed.map((o: any) => ({ value: String(o.value ?? o.optionKey ?? ''), label: String(o.label ?? '') }))
+    } catch { /* ignore */ }
+  }
+  return []
+}
 
 function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, recoveryToken, fallback, onExit, onCompleted }: Props) {
   const draftKey = wholeDraftKey(state.id, state.attemptEpoch ?? 1)
@@ -61,7 +112,49 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   const timingMetadata=()=>Object.fromEntries((definition?.units??[]).filter(unit=>unit.trainingTiming&&timingRef.current[unit.itemId]).map(unit=>[unit.itemId,{snapshotHash:unit.trainingTiming!.snapshotHash,items:timingRef.current[unit.itemId].snapshot()}]))
   const local = useLocalDraftSaveQueue(draftKey)
   const { flush, schedule } = local
-  const questions = useMemo(() => definition?.units.flatMap(unit => unit.scale.definition!.items.map(question => ({ unit, question }))) ?? [], [definition])
+  const questions = useMemo<FlattenedQuestion[]>(() => {
+    if (!definition) return []
+    type Block =
+      | { kind: 'SCALE'; unit: WholeQuestionnaireDefinition['units'][number]; position: number }
+      | { kind: 'FORM'; section: WholeQuestionnaireFormSection; position: number }
+
+    const blocks: Block[] = []
+    if (definition.formSections) {
+      for (const [sIndex, section] of definition.formSections.entries()) {
+        blocks.push({ kind: 'FORM', section, position: section.position ?? sIndex })
+      }
+    }
+    for (const [uIndex, unit] of (definition.units || []).entries()) {
+      blocks.push({ kind: 'SCALE', unit, position: unit.position ?? (1000 + uIndex) })
+    }
+    blocks.sort((a, b) => a.position - b.position)
+
+    const result: FlattenedQuestion[] = []
+    for (const block of blocks) {
+      if (block.kind === 'SCALE') {
+        for (const question of block.unit.scale.definition?.items || []) {
+          result.push({
+            kind: 'SCALE',
+            unit: block.unit,
+            question,
+            title: block.unit.scale.name,
+            instruction: block.unit.scale.instruction,
+          })
+        }
+      } else {
+        for (const item of block.section.items || []) {
+          result.push({
+            kind: 'FORM',
+            section: block.section,
+            item,
+            title: block.section.title,
+            instruction: block.section.description,
+          })
+        }
+      }
+    }
+    return result
+  }, [definition])
   const current = questions[index]
   const locked = checkpointBusy || Boolean(meta && (meta.status !== 'DRAFT' || meta.sealedSubmission))
   useEffect(() => { questionStart.current = Date.now() }, [index, draftKey])
@@ -107,11 +200,15 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
         }
         const next = delivered.data
         // Whole-questionnaire flattening must not override a frozen whole-page unit.
-        if (next.units.some(unit => unit.presentationMode === 'ALL_AT_ONCE')) { setUseFallback(true); return }
+        if (next.units?.some(unit => unit.presentationMode === 'ALL_AT_ONCE')) { setUseFallback(true); return }
+        const totalItemsCount = (next.units?.reduce((n, u) => n + (u.scale.definition?.items.length ?? 0), 0) ?? 0)
+          + (next.formSections?.reduce((n, s) => n + (s.items?.length ?? 0), 0) ?? 0)
         if (next.attemptId !== state.id || next.attemptEpoch !== (state.attemptEpoch ?? 1)
-          || !next.units.length || next.units.some(unit => !unit.scale.definition?.items.length)) throw new Error('整卷内容不完整，请重新加载；本地草稿会保留。')
+          || totalItemsCount === 0
+          || (next.units && next.units.some(unit => !unit.scale.definition?.items.length))
+          || (next.formSections && next.formSections.some(s => !s.items.length))) throw new Error('整卷内容不完整，请重新加载；本地草稿会保留。')
         // Do not switch a pre-existing sealed unit into a different submission protocol.
-        const oldDrafts = await Promise.all(next.units.map(unit => finalDraftStore.get(`composite-scale:${unit.scaleAssessmentId}`)))
+        const oldDrafts = await Promise.all((next.units || []).map(unit => finalDraftStore.get(`composite-scale:${unit.scaleAssessmentId}`)))
         if (!existing && oldDrafts.some(old => old && (old.status !== 'DRAFT' || old.sealedSubmission))) { setUseFallback(true); return }
         let nextMeta = await finalDraftStore.ensure(createFinalDraftMeta({ draftKey, instrument: 'composite-whole',
           attemptId: state.id, attemptEpoch: next.attemptEpoch, definitionHash: next.slotSetHash,
@@ -153,27 +250,82 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   }, [state, api, draftKey, loadRound])
 
   const saveAnswer = async (value: string | number) => {
-    if (!current || locked || busy || submitting.current) return false
+    if (!current || current.kind !== 'SCALE' || locked || busy || submitting.current) return false
     const key = wholeAnswerKey(current.unit.itemId, current.question.itemCode), previous = answers[key]
-    timingRef.current[current.unit.itemId]?.answer(current.question.itemCode,previous?.responseValue,value)
-    const now = Date.now(), answer: Answer = { responseValue: value,
+    timingRef.current[current.unit.itemId]?.answer(current.question.itemCode, previous?.responseValue, value)
+    const now = Date.now(), answer: Answer = {
+      responseValue: value,
+      value,
       responseTimeMs: (previous?.responseTimeMs ?? 0) + Math.max(0, now - questionStart.current),
-      changeCount: (previous?.changeCount ?? 0) + (previous && previous.responseValue !== value ? 1 : 0) }
+      changeCount: (previous?.changeCount ?? 0) + (previous && previous.responseValue !== value ? 1 : 0),
+    }
     questionStart.current = now
     setAnswers(prior => ({ ...prior, [key]: answer }))
-    return schedule(key, () => finalDraftStore.putAnswer({ draftKey, itemKey: key, value: answer, updatedAt: now },
-      Object.keys(timingRef.current).length ? { wholeScaleTiming: timingMetadata() } : undefined))
+    return schedule(key, () => finalDraftStore.putAnswer(
+      { draftKey, itemKey: key, value: answer, updatedAt: now },
+      Object.keys(timingRef.current).length ? { wholeScaleTiming: timingMetadata() } : undefined
+    ))
   }
+
+  const saveFormAnswer = async (sectionId: string, formItemId: string, formValue: FormPlayerValue) => {
+    if (locked || busy || submitting.current) return false
+    const key = wholeFormAnswerKey(sectionId, formItemId), previous = answers[key]
+    const now = Date.now(), answer: Answer = {
+      value: formValue,
+      responseTimeMs: (previous?.responseTimeMs ?? 0) + Math.max(0, now - questionStart.current),
+      changeCount: (previous?.changeCount ?? 0) + 1,
+      otherText: previous?.otherText,
+    }
+    questionStart.current = now
+    setAnswers(prior => ({ ...prior, [key]: answer }))
+    return schedule(key, () => finalDraftStore.putAnswer(
+      { draftKey, itemKey: key, value: answer, updatedAt: now }
+    ))
+  }
+
+  const saveFormOtherText = (sectionId: string, formItemId: string, otherText: string) => {
+    if (locked || busy || submitting.current) return
+    const key = wholeFormAnswerKey(sectionId, formItemId), previous = answers[key]
+    const now = Date.now(), answer: Answer = {
+      value: previous?.value,
+      responseTimeMs: previous?.responseTimeMs,
+      changeCount: previous?.changeCount,
+      otherText,
+    }
+    setAnswers(prior => ({ ...prior, [key]: answer }))
+    void schedule(key, () => finalDraftStore.putAnswer(
+      { draftKey, itemKey: key, value: answer, updatedAt: now }
+    ))
+  }
+
   const saveAndExit = async () => {
     if (submitting.current || busy || checkpointBusy) return
     setBusy(true)
-    try { Object.values(timingRef.current).forEach(tracker=>tracker.pause()); if(!locked&&Object.keys(timingRef.current).length)await finalDraftStore.setInstrumentMetadata(draftKey,{wholeScaleTiming:timingMetadata()});await flush(); onExit() } catch (cause) { setError(normalizeApiError(cause).message) }
-    finally { setBusy(false) }
+    try {
+      Object.values(timingRef.current).forEach(tracker => tracker.pause())
+      if (!locked && Object.keys(timingRef.current).length) {
+        await finalDraftStore.setInstrumentMetadata(draftKey, { wholeScaleTiming: timingMetadata() })
+      }
+      await flush()
+      onExit()
+    } catch (cause) {
+      setError(normalizeApiError(cause).message)
+    } finally {
+      setBusy(false)
+    }
   }
+
   const submit = async () => {
     if (!meta || submitting.current || busy || checkpointBusy || accepted || meta.status === 'CONFLICT') return
     if (!meta.sealedSubmission) {
-      const missing = questions.findIndex(({ unit, question }) => question.required && answers[wholeAnswerKey(unit.itemId, question.itemCode)]?.responseValue === undefined)
+      const missing = questions.findIndex(q => {
+        if (q.kind === 'SCALE') {
+          return q.question.required && answers[wholeAnswerKey(q.unit.itemId, q.question.itemCode)]?.responseValue === undefined
+        } else {
+          const a = answers[wholeFormAnswerKey(q.section.id, q.item.id)]
+          return q.item.required && (a?.value === undefined || a?.value === null || a?.value === '')
+        }
+      })
       if (missing >= 0) {
         setIndex(missing)
         if (publicMode) window.requestAnimationFrame(() => {
@@ -183,7 +335,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
         setError('还有必答题未作答，请完成后提交整份问卷。'); return
       }
     }
-    Object.values(timingRef.current).forEach(tracker=>tracker.pause())
+    Object.values(timingRef.current).forEach(tracker => tracker.pause())
     submitting.current = true; setBusy(true); setError(null); setSubmitStartedAt(Date.now())
     let confirmed = false
     try {
@@ -191,17 +343,57 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       const sealed = await finalDraftStore.sealForSubmission<WholeQuestionnaireInput>(draftKey, snapshot => {
         if (!definition) throw new Error('整卷定义尚未加载')
         const saved = new Map(snapshot.answers.map(answer => [answer.itemKey, readAnswer(answer.value)]))
-        const missing = questions.some(({ unit, question }) => question.required && saved.get(wholeAnswerKey(unit.itemId, question.itemCode))?.responseValue === undefined)
+        const missing = questions.some(q => {
+          if (q.kind === 'SCALE') {
+            return q.question.required && saved.get(wholeAnswerKey(q.unit.itemId, q.question.itemCode))?.responseValue === undefined
+          } else {
+            const a = saved.get(wholeFormAnswerKey(q.section.id, q.item.id))
+            return q.item.required && (a?.value === undefined || a?.value === null || a?.value === '')
+          }
+        })
         if (missing) throw new Error('必答题尚未完整保存到本机，请确认后再提交。')
         const provenance = snapshot.meta.instrumentMetadata?.wholeUnitProvenance as Record<string, DeviceInputProvenanceV1> | undefined
-        return { submissionId: snapshot.meta.submissionId, attemptEpoch: snapshot.meta.attemptEpoch,
-          slotSetHash: snapshot.meta.definitionHash, contextSnapshotHash: snapshot.meta.contextSnapshotHash,
-          units: definition.units.map(unit => ({ itemId: unit.itemId, definitionHash: unit.definitionHash,
-            ...(unit.trainingTiming&&timingRef.current[unit.itemId]?{itemTimings:sealObservedScaleTimings(unit.scale.definition!.items.map(q=>q.itemCode),Object.fromEntries(unit.scale.definition!.items.filter(q=>saved.has(wholeAnswerKey(unit.itemId,q.itemCode))).map(q=>[q.itemCode,saved.get(wholeAnswerKey(unit.itemId,q.itemCode))!.responseValue])),timingRef.current[unit.itemId].snapshot())}:{}),
+        const formAnswers = (definition.formSections || []).map(section => ({
+          sectionId: section.id,
+          definitionHash: section.definitionHash,
+          answers: section.items.flatMap(item => {
+            const a = saved.get(wholeFormAnswerKey(section.id, item.id))
+            if (a?.value === undefined || a?.value === null) return []
+            return [{
+              formItemId: item.id,
+              value: a.value,
+              ...(a.otherText ? { otherText: a.otherText } : {}),
+            }]
+          }),
+        }))
+        return {
+          submissionId: snapshot.meta.submissionId,
+          attemptEpoch: snapshot.meta.attemptEpoch,
+          slotSetHash: snapshot.meta.definitionHash,
+          contextSnapshotHash: snapshot.meta.contextSnapshotHash,
+          units: (definition.units || []).map(unit => ({
+            itemId: unit.itemId,
+            definitionHash: unit.definitionHash,
+            ...(unit.trainingTiming && timingRef.current[unit.itemId] ? {
+              itemTimings: sealObservedScaleTimings(
+                unit.scale.definition!.items.map(q => q.itemCode),
+                Object.fromEntries(unit.scale.definition!.items.filter(q => saved.has(wholeAnswerKey(unit.itemId, q.itemCode))).map(q => [q.itemCode, saved.get(wholeAnswerKey(unit.itemId, q.itemCode))!.responseValue])),
+                timingRef.current[unit.itemId].snapshot()
+              ),
+            } : {}),
             answers: unit.scale.definition!.items.flatMap(question => {
               const answer = saved.get(wholeAnswerKey(unit.itemId, question.itemCode))
-              return answer?.responseValue === undefined ? [] : [{ itemCode: question.itemCode, ...answer }]
-            }), ...(provenance?.[unit.itemId] ? { deviceInputProvenance: provenance[unit.itemId] } : {}) })) }
+              return answer?.responseValue === undefined ? [] : [{
+                itemCode: question.itemCode,
+                responseValue: answer.responseValue,
+                ...(answer.responseTimeMs !== undefined ? { responseTimeMs: answer.responseTimeMs } : {}),
+                ...(answer.changeCount !== undefined ? { changeCount: answer.changeCount } : {}),
+              }]
+            }),
+            ...(provenance?.[unit.itemId] ? { deviceInputProvenance: provenance[unit.itemId] } : {}),
+          })),
+          ...(formAnswers.length > 0 ? { formAnswers } : {}),
+        }
       })
       if (!sealed) throw new Error('本地整卷草稿不存在，请重新加载')
       setMeta(sealed.meta)
@@ -242,7 +434,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       setError(normalizeApiError(cause).message)
     } finally { submitting.current = false; setBusy(false); setSubmitStartedAt(null) }
   }
-  const unitPath = current ? `${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(current.unit.itemId)}/scale` : ''
+  const unitPath = current && current.kind === 'SCALE' ? `${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(current.unit.itemId)}/scale` : ''
   const loadImage = useCallback(async (assetId: string) => {
     const response = await sessionFetch(`${unitPath}/assets/${encodeURIComponent(assetId)}/content`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken || '' } } : undefined)
     if (!response.ok) throw new Error(`视觉内容加载失败 (${response.status})`)
@@ -257,24 +449,52 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
     submissionStatus={accepted ? { state: 'committed', message: publicMode ? '整份问卷已可靠保存。报告按生成状态和开放权限显示，无需再次交卷。' : '整份问卷已可靠保存，正在生成报告。' } : busy ? { state: 'submitting', message: submitElapsedSeconds >= 8 ? `已等待 ${submitElapsedSeconds} 秒，正在确认服务器保存；请勿关闭，本机草稿仍保留。` : '正在提交并确认保存…' } : locked ? { state: 'pending', message: '整卷已封存，重试将使用相同内容。' } : { state: 'ready' }}
     actions={<button type="button" className="btn-secondary min-h-11" disabled={busy || checkpointBusy} onClick={() => void saveAndExit()}>保存并退出</button>}>
     {definition && meta && !accepted ? <TrainingCheckpointPanel policy={state.trainingPersistence} definitionHash={state.checkpointDefinitionHash} publicMode={publicMode} recoveryToken={recoveryToken}
-      disabled={busy || meta.status !== 'DRAFT' || !!meta.sealedSubmission} onBusy={setCheckpointBusy} activeSlotKeys={definition.units.map(unit=>`scale:${unit.itemId}`)}
-      getDrafts={async()=>{await flush();return definition.units.map(unit=>({slotKey:`scale:${unit.itemId}`,answers:Object.fromEntries(unit.scale.definition!.items.filter(q=>answers[wholeAnswerKey(unit.itemId,q.itemCode)]!==undefined).map(q=>[q.itemCode,answers[wholeAnswerKey(unit.itemId,q.itemCode)]])),...(timingRef.current[unit.itemId]?{itemTimings:timingRef.current[unit.itemId].snapshot()}: {})}))}}
-      restore={async rows=>{
+      disabled={busy || meta.status !== 'DRAFT' || !!meta.sealedSubmission} onBusy={setCheckpointBusy}
+      activeSlotKeys={[
+        ...definition.units.map(unit => `scale:${unit.itemId}`),
+        ...(definition.formSections || []).map(section => `form:${section.id}`),
+      ]}
+      getDrafts={async () => {
+        await flush()
+        const scaleDrafts = definition.units.map(unit => ({
+          slotKey: `scale:${unit.itemId}`,
+          answers: Object.fromEntries(
+            unit.scale.definition!.items
+              .filter(q => answers[wholeAnswerKey(unit.itemId, q.itemCode)] !== undefined)
+              .map(q => [q.itemCode, answers[wholeAnswerKey(unit.itemId, q.itemCode)]])
+          ),
+          ...(timingRef.current[unit.itemId] ? { itemTimings: timingRef.current[unit.itemId].snapshot() } : {}),
+        }))
+        const formDrafts = (definition.formSections || []).map(section => ({
+          slotKey: `form:${section.id}`,
+          answers: Object.fromEntries(
+            section.items
+              .filter(item => answers[wholeFormAnswerKey(section.id, item.id)] !== undefined)
+              .map(item => [item.id, answers[wholeFormAnswerKey(section.id, item.id)]])
+          ),
+        }))
+        return [...scaleDrafts, ...formDrafts]
+      }}
+      restore={async rows => {
         await flush()
         const next: Record<string, Answer> = {}
         const nextTiming: Record<string, SurveyScaleTimingTracker> = {}
         for (const unit of definition.units) {
-          const row = rows.find(row => row.slotKey === `scale:${unit.itemId}`)
-          // This is one logical whole-draft replacement. A partial server
-          // checkpoint cannot authorize discarding the other local units.
-          if (!row) throw new Error('服务器整卷草稿不完整，本机内容保持不变。')
-          for (const q of unit.scale.definition!.items) if (Object.prototype.hasOwnProperty.call(row.answers, q.itemCode)) next[wholeAnswerKey(unit.itemId, q.itemCode)] = readAnswer(row.answers[q.itemCode])
-          if (unit.trainingTiming) nextTiming[unit.itemId] = new SurveyScaleTimingTracker(row.itemTimings ?? {}, Object.fromEntries(Object.entries(row.answers).map(([key, value]) => [key, readAnswer(value).responseValue])))
+          const row = rows.find(r => r.slotKey === `scale:${unit.itemId}`)
+          if (row) {
+            for (const q of unit.scale.definition!.items) if (Object.prototype.hasOwnProperty.call(row.answers, q.itemCode)) next[wholeAnswerKey(unit.itemId, q.itemCode)] = readAnswer(row.answers[q.itemCode])
+            if (unit.trainingTiming) nextTiming[unit.itemId] = new SurveyScaleTimingTracker(row.itemTimings ?? {}, Object.fromEntries(Object.entries(row.answers).map(([key, value]) => [key, readAnswer(value).responseValue])))
+          }
+        }
+        for (const section of (definition.formSections || [])) {
+          const row = rows.find(r => r.slotKey === `form:${section.id}`)
+          if (row) {
+            for (const item of section.items) if (Object.prototype.hasOwnProperty.call(row.answers, item.id)) next[wholeFormAnswerKey(section.id, item.id)] = readAnswer(row.answers[item.id])
+          }
         }
         const wholeScaleTiming = Object.fromEntries(definition.units.filter(unit => unit.trainingTiming).map(unit => [unit.itemId,
-          { snapshotHash: unit.trainingTiming!.snapshotHash, items: nextTiming[unit.itemId].snapshot() }]))
+          { snapshotHash: unit.trainingTiming!.snapshotHash, items: nextTiming[unit.itemId]?.snapshot() ?? {} }]))
         await finalDraftStore.replaceAnswers(meta, Object.entries(next).map(([itemKey, value]) => ({ draftKey, itemKey, value, updatedAt: Date.now() })), { wholeScaleTiming })
-        // Every unit's answers and timing committed together before UI/ref changes.
         setCheckpointRestoreGeneration(value => value + 1)
         timingRef.current = nextTiming
         setAnswers(next); setIndex(0)
@@ -284,19 +504,52 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
     {accepted ? <div className="space-y-4"><h2 className="text-xl font-semibold">交卷成功</h2><p>答案已保存。可以离开页面，稍后查看报告；报告失败不需要重新交卷。</p><button className="btn-primary min-h-11" type="button" onClick={onCompleted}>查看报告进度</button></div>
       : meta?.sealedSubmission ? <div className="space-y-4"><p>整卷已封存，本机草稿会保留到服务器确认保存。</p><button type="button" className="btn-primary min-h-11" disabled={busy || meta.status === 'CONFLICT'} onClick={() => void submit()}>重试并确认整卷提交</button></div>
         : current ? <div id={publicMode ? `training-anonymous-whole-required:${state.id}` : undefined} tabIndex={publicMode ? -1 : undefined} className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
-          <h2 className="mb-3 text-xl font-semibold">{current.unit.scale.name}</h2>
-          {current.unit.scale.instruction ? <p className="mb-4 whitespace-pre-wrap text-slate-600">{current.unit.scale.instruction}</p> : null}
+          <h2 className="mb-3 text-xl font-semibold">{current.title}</h2>
+          {current.instruction ? <p className="mb-4 whitespace-pre-wrap text-slate-600">{current.instruction}</p> : null}
           <p className="mb-4 text-sm text-slate-600">整卷第 {index + 1} / {questions.length} 题</p>
-          <TrainingMaterials items={current.question.materials} loadAsset={loadImage}/>
-          <AssessmentImageGate items={assessmentImageItems((current.question as { images?: unknown }).images)} loadAsset={loadImage} disabled={busy}>
-            <ScaleFormVideoGate presentation={scaleItemVideoPresentation(current.question)} loadSources={() => requestAssessmentVideoCapabilities(`${unitPath}/items/${encodeURIComponent(current.question.itemCode)}/video-capability`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken || '' } } : undefined)}>
-              {(()=>{const player=(<ScalePlayer scopeKey={`${draftKey}:${current.unit.itemId}:${checkpointRestoreGeneration}`} autoAdvance={isTrainingHost() && !publicMode} item={current.question} value={answers[wholeAnswerKey(current.unit.itemId, current.question.itemCode)]?.responseValue}
-                answerDisabled={locked || busy} navigationDisabled={busy} submitDisabled={busy || meta?.status === 'CONFLICT'}
-                position={index + 1} total={questions.length} onChange={saveAnswer} onPrevious={() => setIndex(prior => Math.max(0, prior - 1))}
-                onNext={index + 1 < questions.length ? () => setIndex(prior => prior + 1) : undefined}
-                onSubmit={index + 1 === questions.length ? submit : undefined} submitLabel="提交整份问卷" submitting={busy} />);const tracker=timingRef.current[current.unit.itemId];return current.unit.trainingTiming&&tracker?<TrainingTimingBoundary tracker={tracker} itemKey={current.question.itemCode} locked={locked||busy} onTiming={()=>{if(!locked&&!busy&&!submitting.current)void schedule('whole-timing',()=>finalDraftStore.setInstrumentMetadata(draftKey,{wholeScaleTiming:timingMetadata()}).then(()=>undefined)).catch(()=>undefined)}}>{player}</TrainingTimingBoundary>:player})()}
-            </ScaleFormVideoGate>
-          </AssessmentImageGate>
+          {current.kind === 'SCALE' ? (
+            <>
+              <TrainingMaterials items={current.question.materials} loadAsset={loadImage}/>
+              <AssessmentImageGate items={assessmentImageItems((current.question as { images?: unknown }).images)} loadAsset={loadImage} disabled={busy}>
+                <ScaleFormVideoGate presentation={scaleItemVideoPresentation(current.question)} loadSources={() => requestAssessmentVideoCapabilities(`${unitPath}/items/${encodeURIComponent(current.question.itemCode)}/video-capability`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken || '' } } : undefined)}>
+                  {(()=>{const player=(<ScalePlayer scopeKey={`${draftKey}:${current.unit.itemId}:${checkpointRestoreGeneration}`} autoAdvance={isTrainingHost() && !publicMode} item={current.question} value={answers[wholeAnswerKey(current.unit.itemId, current.question.itemCode)]?.responseValue}
+                    answerDisabled={locked || busy} navigationDisabled={busy} submitDisabled={busy || meta?.status === 'CONFLICT'}
+                    position={index + 1} total={questions.length} onChange={saveAnswer} onPrevious={() => setIndex(prior => Math.max(0, prior - 1))}
+                    onNext={index + 1 < questions.length ? () => setIndex(prior => prior + 1) : undefined}
+                    onSubmit={index + 1 === questions.length ? submit : undefined} submitLabel="提交整份问卷" submitting={busy} />);const tracker=timingRef.current[current.unit.itemId];return current.unit.trainingTiming&&tracker?<TrainingTimingBoundary tracker={tracker} itemKey={current.question.itemCode} locked={locked||busy} onTiming={()=>{if(!locked&&!busy&&!submitting.current)void schedule('whole-timing',()=>finalDraftStore.setInstrumentMetadata(draftKey,{wholeScaleTiming:timingMetadata()}).then(()=>undefined)).catch(()=>undefined)}}>{player}</TrainingTimingBoundary>:player})()}
+                </ScaleFormVideoGate>
+              </AssessmentImageGate>
+            </>
+          ) : (
+            <FormPlayer
+              scopeKey={`${draftKey}:${current.section.id}:${checkpointRestoreGeneration}`}
+              autoAdvance={isTrainingHost() && !publicMode}
+              item={{
+                id: current.item.id,
+                type: current.item.formType,
+                label: current.item.formLabel,
+                placeholder: current.item.formPlaceholder,
+                required: current.item.required,
+                formDefinition: current.item.formDefinition,
+                formPolicy: current.item.formPolicy as any,
+              }}
+              options={parseFormOptions(current.item.formOptions, current.item.formDefinition)}
+              value={answers[wholeFormAnswerKey(current.section.id, current.item.id)]?.value as FormPlayerValue}
+              otherText={answers[wholeFormAnswerKey(current.section.id, current.item.id)]?.otherText}
+              onOtherTextChange={text => saveFormOtherText(current.section.id, current.item.id, text)}
+              answerDisabled={locked || busy}
+              navigationDisabled={busy}
+              submitDisabled={busy || meta?.status === 'CONFLICT'}
+              position={index + 1}
+              total={questions.length}
+              onChange={val => saveFormAnswer(current.section.id, current.item.id, val)}
+              onPrevious={() => setIndex(prior => Math.max(0, prior - 1))}
+              onNext={index + 1 < questions.length ? () => setIndex(prior => prior + 1) : undefined}
+              onSubmit={index + 1 === questions.length ? submit : undefined}
+              submitLabel="提交整份问卷"
+              submitting={busy}
+            />
+          )}
         </div> : <button type="button" className="btn-secondary min-h-11" onClick={() => setLoadRound(prior => prior + 1)}>重新加载整卷草稿</button>}
   </AssessmentShell>
 }

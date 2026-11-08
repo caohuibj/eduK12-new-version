@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import WholeCompositeQuestionnaire, { wholeAnswerKey, wholeDraftKey, type WholeQuestionnaireApi } from '../WholeCompositeQuestionnaire'
+import WholeCompositeQuestionnaire, { wholeAnswerKey, wholeFormAnswerKey, wholeDraftKey, type WholeQuestionnaireApi } from '../WholeCompositeQuestionnaire'
 import { createFinalDraftMeta, finalDraftStore } from '../../services/persistence/finalDraftStore'
 import type { CompositeAttemptState, WholeQuestionnaireDefinition, WholeQuestionnaireInput } from '../../modules/composite/types'
 const { retry } = vi.hoisted(() => ({ retry: vi.fn() }))
@@ -132,6 +132,190 @@ describe('whole questionnaire durable browser submission', () => {
     expect(saved.submissionId).toBe('whole-browser-sealed-submission'); expect(saved.answers).toBeUndefined()
   })
 
+  it('seamlessly renders mixed Form + Scale questionnaire, transitions with 0 HTTP calls, and submits unified payload', async () => {
+    const mixedDef: WholeQuestionnaireDefinition = {
+      attemptId: 'whole-attempt',
+      attemptEpoch: 1,
+      slotSetHash: 'm'.repeat(64),
+      contextSnapshotHash: 'context-mixed',
+      formSections: [
+        {
+          id: 'section-demographics',
+          title: '基本信息',
+          description: '请填写背景信息',
+          position: 0,
+          contextSection: false,
+          definitionHash: 'hash-form-sec',
+          items: [
+            {
+              id: 'gender-item',
+              formType: 'single_choice',
+              formLabel: '您的性别',
+              formPlaceholder: null,
+              required: true,
+              formOptions: [{ value: 'male', label: '男' }, { value: 'female', label: '女' }],
+              contextKey: 'gender',
+              position: 0,
+              formSectionPosition: 0,
+            },
+            {
+              id: 'age-item',
+              formType: 'fill_blank',
+              formLabel: '您的年龄',
+              formPlaceholder: '请输入年龄',
+              required: true,
+              formOptions: null,
+              contextKey: null,
+              position: 1,
+              formSectionPosition: 1,
+            },
+          ],
+        },
+      ],
+      units: [
+        {
+          itemId: 'scale-unit-1',
+          scaleAssessmentId: 'child-scale-1',
+          definitionHash: 'hash-scale-1',
+          position: 1,
+          scale: {
+            id: 'scale-1',
+            name: '学习动机量表',
+            instruction: '请根据实际情况选择',
+            definition: {
+              schemaVersion: 2,
+              respondentType: 'participant_self_report',
+              display: { randomizeItems: false },
+              items: [
+                {
+                  itemCode: 'sm-q1',
+                  content: '我对学习新知识感兴趣',
+                  type: 'single',
+                  required: true,
+                  sortOrder: 0,
+                  responseSetKey: 'likert',
+                  randomizeOptions: false,
+                  options: [{ value: 1, label: '完全不同意' }, { value: 2, label: '完全同意' }],
+                },
+              ],
+            },
+          },
+        },
+      ],
+    }
+
+    const client = api()
+    client.wholeDefinition.mockResolvedValue({ code: 0, data: mixedDef })
+    const completed = vi.fn()
+    view(client, completed)
+
+    expect(await screen.findByText('基本信息')).toBeInTheDocument()
+    expect(screen.getByText('您的性别')).toBeInTheDocument()
+    expect(screen.getByText('整卷第 1 / 3 题')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByLabelText('女'))
+    fireEvent.click(screen.getByRole('button', { name: '下一题' }))
+
+    expect(await screen.findByText('您的年龄')).toBeInTheDocument()
+    expect(screen.getByText('整卷第 2 / 3 题')).toBeInTheDocument()
+
+    fireEvent.change(screen.getByPlaceholderText('请输入年龄'), { target: { value: '25' } })
+    fireEvent.click(screen.getByRole('button', { name: '下一题' }))
+
+    expect(await screen.findByText('学习动机量表')).toBeInTheDocument()
+    expect(screen.getByText('我对学习新知识感兴趣')).toBeInTheDocument()
+    expect(screen.getByText('整卷第 3 / 3 题')).toBeInTheDocument()
+
+    expect(client.submitWhole).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByText('完全同意'))
+
+    fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
+    await waitFor(() => expect(client.submitWhole).toHaveBeenCalledTimes(1))
+
+    const payload = client.submitWhole.mock.calls[0][1]
+    expect(payload.units).toHaveLength(1)
+    expect(payload.units[0].itemId).toBe('scale-unit-1')
+    expect(payload.units[0].answers).toEqual([{ itemCode: 'sm-q1', responseValue: 2, responseTimeMs: expect.any(Number), changeCount: 0 }])
+
+    expect(payload.formAnswers).toBeDefined()
+    expect(payload.formAnswers).toHaveLength(1)
+    expect(payload.formAnswers[0].sectionId).toBe('section-demographics')
+    expect(payload.formAnswers[0].answers).toEqual([
+      { formItemId: 'gender-item', value: 'female' },
+      { formItemId: 'age-item', value: '25' },
+    ])
+
+    await screen.findByRole('heading', { name: '交卷成功' })
+    expect(completed).toHaveBeenCalledTimes(1)
+    expect(await finalDraftStore.get(key)).toBeNull()
+  })
+
+  it('blocks whole submission if a required form question is unanswered', async () => {
+    const mixedDef: WholeQuestionnaireDefinition = {
+      attemptId: 'whole-attempt',
+      attemptEpoch: 1,
+      slotSetHash: 'm'.repeat(64),
+      contextSnapshotHash: 'context-mixed',
+      formSections: [
+        {
+          id: 'sec-1',
+          title: '表单区',
+          description: null,
+          position: 0,
+          contextSection: false,
+          definitionHash: 'h-sec-1',
+          items: [
+            {
+              id: 'req-item',
+              formType: 'fill_blank',
+              formLabel: '必填表单题',
+              formPlaceholder: null,
+              required: true,
+              formOptions: null,
+              contextKey: null,
+              position: 0,
+              formSectionPosition: 0,
+            },
+          ],
+        },
+      ],
+      units: [
+        {
+          itemId: 'unit-1',
+          scaleAssessmentId: 'child-1',
+          definitionHash: 'h-scale-1',
+          position: 1,
+          scale: {
+            id: 'scale-1',
+            name: '量表 1',
+            definition: {
+              schemaVersion: 2,
+              respondentType: 'participant_self_report',
+              display: { randomizeItems: false },
+              items: [
+                { itemCode: 'q1', content: '题目 1', type: 'single', required: true, sortOrder: 0, responseSetKey: 'r', randomizeOptions: false, options: [{ value: 1, label: 'A' }] },
+              ],
+            },
+          },
+        },
+      ],
+    }
+
+    const client = api()
+    client.wholeDefinition.mockResolvedValue({ code: 0, data: mixedDef })
+    view(client)
+
+    expect(await screen.findByText('必填表单题')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '下一题' }))
+
+    expect(await screen.findByText('题目 1')).toBeInTheDocument()
+    fireEvent.click(screen.getByText('A'))
+
+    fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('还有必答题未作答')
+    expect(client.submitWhole).not.toHaveBeenCalled()
+  })
 })
 
 it('returns focus to the first missing anonymous whole-questionnaire answer without submitting',async()=>{
