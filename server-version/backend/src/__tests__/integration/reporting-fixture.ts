@@ -268,6 +268,17 @@ export const buildReportingFixture = async (prisma: PrismaClient, population: nu
     })),
   })
 
+  // Bulk inserts leave planner statistics stale: a reporting query issued
+  // right after this fixture can get a nested-loop plan over the fresh
+  // population instead of a hash join (observed: freezeRunTrackCohort
+  // 14s at n=5000 before autovacuum, ~0.1s after). Refresh statistics
+  // explicitly so cohort/result queries plan deterministically instead of
+  // racing autovacuum. This is test-fixture maintenance only; it changes
+  // no data and no production code.
+  await prisma.$executeRawUnsafe(
+    'ANALYZE assessment_runs, assessment_run_tracks, assessment_run_executions, assessment_run_actor_snapshots, assessment_run_relationship_snapshots, assessment_unit_snapshots, composite_assessment_attempts',
+  )
+
   const cohort: ReportingCohortSnapshotRecord = {
     id: randomUUID(),
     organizationId,
