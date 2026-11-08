@@ -33,6 +33,7 @@ import { encryptUnifiedRuntimePayload } from './security'
 import { createFormSectionCollectionFacts, createTypedFormSectionCollectionFacts, createPolicyFormSectionCollectionFacts, typedFormValueSchema } from './form-facts'
 import type { TypedFormValue } from './typed-form'
 import { insertCompletedUnitSnapshot } from './persistence'
+import type { WholeReceiptExecution } from '../composite/whole-questionnaire.service'
 import { formSectionSlotKey } from './slot-set'
 import { canonicalJsonBytes } from './canonical'
 import type { FrozenUnitAdmissionV1 } from './admission-snapshot'
@@ -315,6 +316,10 @@ export const submitUnifiedCompositeFormSectionFinal = async (
   input: CompositeSectionSubmitInput,
   _parent?: unknown,
   selectedParent?: unknown,
+  /** When materializing from a whole receipt, the running job's lease identity
+   * rides along: the unit-snapshot enqueue becomes a read-only receipt fence
+   * and can never create or mutate the job that is being processed. */
+  wholeReceipt?: WholeReceiptExecution,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
   const principalParent = await loadTrainingChildParent(input.attemptId, selectedParent)
@@ -454,6 +459,7 @@ export const submitUnifiedCompositeFormSectionFinal = async (
       sourceDefinitionHash,
       collectionFactsEncrypted: factsEncrypted,
       completedAt,
+      wholeReceipt,
     })
     await assertTrainingPrivateReferenceAdmissionCurrent(tx)
     return { replayed: false, sectionAttemptId: currentSection.id, contextSnapshotHash, payloadHash }

@@ -25,6 +25,7 @@ import { runnerDefinition } from '../scale/scale-definition'
 import { publicTrainingFormDefinition } from '../assessment-runtime/typed-form'
 import { formSectionIdentityHash } from '../assessment-runtime/attempt-runtime'
 import { compositeFormSectionRuntimeDefinition, compositeSectionHasContext } from './composite.service'
+import { verifyWholeFormSectionsAtReceipt, materializeWholeFormSections } from '../assessment-runtime/whole-form-materialization.service'
 
 const encryptWholeRawPayload = (value: unknown): string => encryptUnifiedRuntimePayload(compactAssessmentStorageEnabled() ? packWholeRawEnvelope(value) : value)
 
@@ -372,11 +373,12 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
     const { relationalRuntimeConsentAuthority } = await import('../assessment-relational/runtime-consent')
     await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId, principal.userId, parent)
   }
-  if (input.attemptEpoch !== parent.attemptEpoch || input.slotSetHash !== parent.frozenActiveSlotSetHash
-    || input.contextSnapshotHash !== parent.contextSnapshotHash) throw failure('交卷版本与当前问卷不匹配')
+  if (input.attemptEpoch !== parent.attemptEpoch || input.slotSetHash !== parent.frozenActiveSlotSetHash) throw failure('交卷版本与当前问卷不匹配')
   // A cached validation manifest is scientific data, never allocation authority.
   // Check all partial markers before receipt replay or registration; ordinary
-  // questionnaires retain their single-header fast path.
+  // questionnaires retain their single-header fast path. Variant authorization
+  // re-verifies even a replayed receipt: a frozen allocation that disappeared
+  // after acceptance must never ACK again.
   const verifiedParent = hasTrainingVariantMetadata(parent)
     ? await traceAssessmentPhase('whole.variant_scope', () => loadParent(attemptId, principal)) : undefined
   if (verifiedParent) {
@@ -391,9 +393,17 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   assertCanonicalSubmissionPayloadSize(canonical, 1536 * 1024, '整份问卷')
   const prior = context!.prior
   if (prior?.wholeSubmissionId) {
+    // X-04A: the accepted receipt replays before the context comparison, because
+    // worker-side Form materialization may advance the parent context hash
+    // (context sections commit at worker time) and a lost-ACK retry must still
+    // replay. Epoch, slot-set and variant authorization above still bind every
+    // replay; same id + different payload hash conflicts.
     if (prior.wholeSubmissionId !== input.submissionId || prior.wholePayloadHash !== canonical.hash) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '已收到不同的整份交卷内容', 409)
     return receiptResponse(attemptId, input.submissionId, canonical.hash, prior.wholeAcceptedAt!, true, readWholeReportFeedbackHint(attemptId, input.submissionId).profile)
   }
+  // The context hash is the only receipt-binding component whole Form
+  // materialization can advance; compare it for fresh submissions only.
+  if (input.contextSnapshotHash !== parent.contextSnapshotHash) throw failure('交卷版本与当前问卷不匹配')
   const settings = assessmentReportConfig()
   if (!settings.wholeSubmitEnabled || (!settings.enabled && parent.asyncReportEpoch !== parent.attemptEpoch)) {
     throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '整卷接收暂时暂停，本机封存答案已保留；稍后可用原交卷标识继续确认。', 503)
@@ -409,6 +419,12 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   if(manifest.units.some(unit=>unit.trainingTiming?.snapshotHash!==timingSnapshotHash))throw failure('计时策略与整卷准入不匹配')
   await traceAssessmentPhase('whole.validation_rules_resolve', () => ensureWholeRules(attemptId, principal, manifest, verifiedParent))
   const prepared = traceAssessmentPhaseSync('whole.integrity_check', () => prepareFromWholeManifest(input, manifest, principal, receivedAtMs))
+  if (prepared.formAnswers.length > 0) {
+    // X-04A: deterministic Form validation at receipt time, through the same
+    // frozen-admission chain the worker will use — an answer class the worker
+    // could not materialize must never be ACKed.
+    await traceAssessmentPhase('whole.form_frozen_validation', () => verifyWholeFormSectionsAtReceipt(attemptId, prepared.formAnswers))
+  }
   const encrypted = traceAssessmentPhaseSync('whole.envelope_encrypt', () => encryptWholeRawPayload({ schemaVersion: 1, binding: { attemptId, attemptEpoch: input.attemptEpoch,
     slotSetHash: input.slotSetHash, contextHash: input.contextSnapshotHash }, payloadHash: canonical.hash,
     ...(timingSnapshotHash?{timingSnapshotHash}:{}),units: prepared.units,
@@ -497,6 +513,15 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
     for (const unit of units) await traceAssessmentPhase('report.unit',
       () => submitUnifiedScaleAssessmentFinal(unit.input, unit.child, execution, referenceDb), unit.input.itemId)
   }
+  if (envelope.formAnswers && envelope.formAnswers.length > 0) {
+    // X-04A: whole-envelope Form sections materialize through the same
+    // authoritative chain as the stepped path (frozen admission, full
+    // normalization, encrypted COLLECTION_FACTS, completed FORM_SECTION
+    // snapshot) under the receipt lease fence; replays re-derive the same
+    // per-section submission ids and hit the committed-replay guard.
+    await traceAssessmentPhase('report.form_sections_materialize',
+      () => materializeWholeFormSections(job, envelope.formAnswers!, execution, principal))
+  }
   onVerifiedContext?.({ attemptId: job.attemptId, attemptEpoch: job.attemptEpoch,
     slotSetHash: job.slotSetHash, contextHash: job.contextHash,
     // Type-driven, not tied to the eight-scale fixture. Unsupported optional
@@ -568,6 +593,9 @@ const prepareFromWholeManifest = (input: WholeQuestionnaireSubmitInput, manifest
   const manifestFormsById = new Map(manifestForms.map(s => [s.sectionId, s]))
 
   if (input.formAnswers && input.formAnswers.length > 0) {
+    if (new Set(input.formAnswers.map(section => section.sectionId)).size !== input.formAnswers.length) {
+      throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '表单区段重复提交', 400)
+    }
     for (const sentSec of input.formAnswers) {
       const secDef = manifestFormsById.get(sentSec.sectionId)
       if (!secDef) {

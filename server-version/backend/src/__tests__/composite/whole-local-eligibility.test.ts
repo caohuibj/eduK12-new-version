@@ -22,6 +22,23 @@ describe('isWholeLocalEligible', () => {
     })).toBe(true)
   })
 
+  it('returns false when a form section carries context dependencies', () => {
+    // Context sections keep stepped semantics: their frozen context hash feeds
+    // downstream admission and dynamic item projection.
+    expect(isWholeLocalEligible({
+      items: [{ type: 'SCALE', position: 1 }, { type: 'FORM', position: 2 }],
+      formSections: [{ id: 'sec-1', contextSection: true, items: [] }],
+    })).toBe(false)
+    expect(isWholeLocalEligible({
+      items: [{ type: 'SCALE', position: 1 }, { type: 'FORM', position: 2 }],
+      formSections: [{ id: 'sec-1', contextSection: false, items: [{ id: 'i-1', contextKey: 'grade' }] }],
+    })).toBe(false)
+    expect(isWholeLocalEligible({
+      items: [{ type: 'SCALE', position: 1 }, { type: 'FORM', position: 2 }],
+      formSections: [{ id: 'sec-1', contextSection: false, items: [{ id: 'i-1', contextKey: null }] }],
+    })).toBe(true)
+  })
+
   it('returns false when candidate has Cognitive items', () => {
     expect(isWholeLocalEligible({
       items: [
