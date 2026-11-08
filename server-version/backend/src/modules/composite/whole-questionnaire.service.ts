@@ -227,15 +227,17 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
   const manifest: WholeValidationManifest = { schemaVersion: process.env.ASSESSMENT_WHOLE_COMPACT_MANIFEST_ENABLED === 'true' ? 2 : 1, binding: { attemptId: parent.id, attemptEpoch: parent.attemptEpoch,
     slotSetHash: parent.frozenActiveSlotSetHash!, contextHash: parent.contextSnapshotHash, userId: parent.userId, recoveryTokenHash: parent.recoveryTokenHash },
     requiredFormSlots: frozen.slots.filter(slot => slot.required && slot.unitType === 'FORM_SECTION').map(slot => slot.slotKey), units: [],
-    formSections: formSections.map(sec => ({
-      sectionId: sec.id,
-      definitionHash: sec.definitionHash,
-      items: sec.items.map(item => ({
-        id: item.id,
-        required: item.required !== false,
-        formType: item.formType,
+    ...(formSections.length > 0 ? {
+      formSections: formSections.map(sec => ({
+        sectionId: sec.id,
+        definitionHash: sec.definitionHash,
+        items: sec.items.map(item => ({
+          id: item.id,
+          required: item.required !== false,
+          formType: item.formType,
+        })),
       })),
-    })),
+    } : {}),
   }
   const units: any[] = []
   for (const { child, runtime } of children) {
