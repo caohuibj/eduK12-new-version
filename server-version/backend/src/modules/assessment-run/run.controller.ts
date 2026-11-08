@@ -321,6 +321,8 @@ export const assessmentRunController = {
           return success(res, { ...started, currentUnit })
         } catch (projectionErr: any) {
           // Failure outside the committed transaction falls back to plain started result.
+          const wallTimeMs = Date.now() - startMs
+          const { logger } = await import('../../utils/logger')
           const reason = projectionErr?.status === 403 || projectionErr?.code === 'FORBIDDEN'
             ? 'ACCESS_FORBIDDEN'
             : projectionErr?.status === 404
