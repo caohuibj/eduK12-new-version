@@ -1786,7 +1786,7 @@ const canonicalCompositeContentUnitType = (type: CompositeContentUnitInput['type
   return 'form-section' as const
 }
 
-const compositeSectionHasContext = (section: any) => (
+export const compositeSectionHasContext = (section: any) => (
   Boolean(section.contextSection) || Boolean(section.items?.some((item: any) => item.contextKey))
 )
 
@@ -4774,9 +4774,16 @@ const getUnifiedCompositeAttemptState = async (
     trainingFlowDigest: attempt.compositeAssessment?.trainingFlowDigest,
     trainingFlowSnapshotHash: attempt.trainingFlowSnapshotHash ?? attempt.compositeAssessment?.trainingFlowSnapshotHash,
   })
+  const formsPresent = (attempt.compositeAssessment?.formSections?.length ?? 0) > 0
+  const allFormsCompleted = formsPresent && attempt.compositeAssessment.formSections.every((s: any) =>
+    completedSlot(formSectionSlotKey(s.id))
+  )
+  const canIngestWholeLocal = !formsPresent || allFormsCompleted
+  const executionMode = (isEligible && canIngestWholeLocal) ? ('WHOLE_LOCAL' as const) : ('STEPPED' as const)
   return {
     id: attempt.id,
-    executionMode: isEligible ? ('WHOLE_LOCAL' as const) : ('STEPPED' as const),
+    executionMode,
+    wholeLocalEligible: isEligible,
     ...(trainingPersistenceMetadata(attempt) ? { trainingPersistence: trainingPersistenceMetadata(attempt), checkpointDefinitionHash: attempt.frozenActiveSlotSetHash } : {}),
     assessmentId: attempt.compositeAssessment.id,
     name: attempt.compositeAssessment.name,
