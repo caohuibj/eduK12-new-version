@@ -531,10 +531,7 @@ export const decryptFrozenScaleRuntimeSnapshot = (encrypted: string): VersionedF
 
 /** New writes are opt-in; compatible reads remain unconditional for rollback. */
 export const persistFrozenScaleRuntimeSnapshot = async (snapshot: VersionedFrozenScaleRuntimeSnapshot, db?: import('./shared-scale-runtime').SharedScaleArtifactDb): Promise<string> => {
-  if (process.env.ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED === 'false') return encryptFrozenScaleRuntimeSnapshot(snapshot)
-  if (process.env.ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED !== 'true' && !getSnapshotPublishedArtifactHash(snapshot)) {
-    return encryptFrozenScaleRuntimeSnapshot(snapshot)
-  }
+  if (process.env.ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED !== 'true') return encryptFrozenScaleRuntimeSnapshot(snapshot)
   const shared = await import('./shared-scale-runtime')
   return shared.sharedScaleRuntimeStore.save(snapshot, db ? shared.sharedScaleArtifactRepositoryForDatabase(db) : undefined)
 }

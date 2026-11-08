@@ -252,7 +252,7 @@ export const createSharedScaleRuntimeStore = (repository: SharedScaleArtifactRep
       const encrypted = sharedControlWritesEnabled()
         ? encryptControlReference(publishedRef)
         : encryptUnifiedRuntimePayload(publishedRef)
-      if (Buffer.byteLength(encrypted) > 16384) throw new Error('Shared Scale reference exceeds versioned storage bound')
+      if (Buffer.byteLength(encrypted) > 16384) return encryptUnifiedRuntimePayload(snapshot)
       return encrypted
     }
     const raw = staticPart(snapshot)

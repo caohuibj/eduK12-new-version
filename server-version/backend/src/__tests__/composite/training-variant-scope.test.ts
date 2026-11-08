@@ -53,3 +53,134 @@ it('detects each incomplete marker before a legacy report fast path', async()=>{
     await expect(resolveTrainingAttemptScope(attempt)).rejects.toThrow()
   }
 })
+
+it('resolves attempt scope for conditional Form probability variant when parent items query is narrowed', async () => {
+  const item1 = {
+    id: 'form_q1',
+    type: 'FORM',
+    formType: 'single_choice',
+    formLabel: 'Q1',
+    formOptions: [{ value: 'yes', label: 'Yes' }],
+    formDefinition: { itemKey: 'key_q1', type: 'SINGLE_CHOICE' },
+    required: true,
+    position: 0,
+    formSectionPosition: 0,
+    contextKey: null,
+    formSectionId: 'section_cond',
+  }
+  const item2 = {
+    id: 'form_q2',
+    type: 'FORM',
+    formType: 'text_input',
+    formLabel: 'Q2',
+    formOptions: [],
+    formDefinition: {
+      itemKey: 'key_q2',
+      type: 'TEXT',
+      displayIf: { itemKey: 'key_q1', op: 'eq', value: 'yes' },
+    },
+    required: false,
+    position: 1,
+    formSectionPosition: 1,
+    contextKey: null,
+    formSectionId: 'section_cond',
+  }
+  const section = {
+    id: 'section_cond',
+    title: 'Conditional Form Section',
+    description: null,
+    position: 0,
+    contextSection: false,
+    items: [item1, item2],
+  }
+  const section2 = {
+    id: 'section_other',
+    title: 'Other Section',
+    description: null,
+    position: 1,
+    contextSection: false,
+    items: [{
+      id: 'form_q3',
+      type: 'FORM',
+      formType: 'text_input',
+      formLabel: 'Q3',
+      formOptions: [],
+      formDefinition: { itemKey: 'key_q3', type: 'TEXT' },
+      required: false,
+      position: 2,
+      formSectionPosition: 0,
+      contextKey: null,
+      formSectionId: 'section_other',
+    }],
+  }
+  const publishComposite: any = {
+    trainingFlowDraft: null,
+    trainingFlowFrozen: null,
+    trainingFlowDigest: null,
+    id: 'comp_cond',
+    publishedAt: new Date('2026-10-18T00:00:00Z'),
+    items: [item1, item2, ...section2.items],
+    formSections: [section, section2],
+  }
+  publishComposite.trainingVariantDraft = {
+    schemaVersion: 1,
+    groups: [
+      { variantKey: 'group_0', label: 'Group 0', weight: 1, units: [{ type: 'FORM_SECTION', id: section.id }] },
+      { variantKey: 'group_1', label: 'Group 1', weight: 1, units: [{ type: 'FORM_SECTION', id: section2.id }] },
+    ],
+  }
+  publishComposite.trainingVariantFrozen = compileWeightedVariants(
+    publishComposite.trainingVariantDraft,
+    buildTrainingVariantUnion(publishComposite),
+  )
+  publishComposite.trainingVariantDigest = publishComposite.trainingVariantFrozen.configDigest
+
+  const allocation = createWeightedVariantAllocation(
+    publishComposite.trainingVariantFrozen,
+    { compositeId: 'comp_cond', attemptId: 'attempt_cond', participantKey: 'user:one', attemptEpoch: 1, publishedAt: publishComposite.publishedAt.toISOString() },
+    { randomInt: () => 0, assignedAt: '2026-10-18T00:00:00Z' },
+  )
+  const slotset = {
+    attemptEpoch: 1,
+    runtimeGeneration: 'UNIFIED_V1',
+    snapshotHash: 'slots_cond',
+    slots: [{
+      slotKey: 'form-section:section_cond',
+      unitType: 'FORM_SECTION',
+      sourceDefinitionIdentity: { hash: canonicalHash(mapCompositeSection(section)) },
+    }],
+  }
+
+  // Narrowed parent items omitting formDefinition
+  const narrowedItems = [
+    { id: 'form_q1', type: 'FORM', position: 0, required: true, formSectionId: 'section_cond' },
+    { id: 'form_q2', type: 'FORM', position: 1, required: false, formSectionId: 'section_cond' },
+    { id: 'form_q3', type: 'FORM', position: 2, required: false, formSectionId: 'section_other' },
+  ]
+  const readComposite: any = {
+    ...publishComposite,
+    items: narrowedItems,
+    formSections: [section, section2],
+  }
+  const attempt: any = {
+    trainingFlowSnapshotEncrypted: null,
+    trainingFlowSnapshotHash: null,
+    trainingFlowPathEncrypted: null,
+    trainingFlowPathHash: null,
+    runtimeGeneration: 'UNIFIED_V1',
+    deliveryMode: 'FINAL_ONLY',
+    id: 'attempt_cond',
+    participantKey: 'user:one',
+    attemptEpoch: 1,
+    compositeAssessment: readComposite,
+    trainingVariantAllocationEncrypted: JSON.stringify(allocation),
+    trainingVariantAllocationHash: allocation.allocationHash,
+    frozenActiveSlotSetEncrypted: JSON.stringify(slotset),
+    frozenActiveSlotSetHash: 'slots_cond',
+    formSectionAttempts: [{ sectionId: 'section_cond' }],
+  }
+
+  const resolved = await resolveTrainingAttemptScope(attempt)
+  expect(resolved.variant.allocationHash).toBe(allocation.allocationHash)
+  expect(resolved.sectionIds.has('section_cond')).toBe(true)
+})
