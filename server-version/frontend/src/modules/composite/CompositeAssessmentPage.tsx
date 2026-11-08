@@ -15,10 +15,12 @@ import {
   LockKeyhole,
 } from 'lucide-react'
 import { compositeApi, publicCompositeApi } from './api'
+import { wholeDefinitionWithInlineFallback } from './whole-definition-source'
 import type {
   CompositeAttemptState,
   CompositeCurrentItem,
   CompositePublicInfo,
+  WholeQuestionnaireDefinition,
 } from './types'
 import { resolveCompositeChildRouteContext } from './child-route-context'
 import { saveCognitiveRecoveryCredential } from '../cognitive/core/recovery-credential'
@@ -93,10 +95,22 @@ const CompositeAssessmentContent: React.FC = () => {
     && state?.trainingPersistence?.localCognitive?.enabled === true
     && state?.currentItem?.type === 'COGNITIVE'
     && state.currentItem.cognitiveSession?.sessionId === recoveryHint.get('sessionId')
-  const api = useMemo(
-    () => (publicMode ? publicCompositeApi(recoveryToken) : compositeApi),
-    [publicMode, recoveryToken],
-  )
+  // X-05A: the START response may carry the whole questionnaire definition
+  // inline (delivery=whole, WHOLE_LOCAL attempts only). It is consumed exactly
+  // once by the runner's definition fetch; every other path re-fetches via the
+  // authoritative GET endpoint.
+  const inlineWholeDefinitionRef = useRef<WholeQuestionnaireDefinition | null>(null)
+  const api = useMemo(() => {
+    const base = publicMode ? publicCompositeApi(recoveryToken) : compositeApi
+    return {
+      ...base,
+      wholeDefinition: (attemptId: string) => {
+        const inline = inlineWholeDefinitionRef.current
+        inlineWholeDefinitionRef.current = null
+        return wholeDefinitionWithInlineFallback(inline, attemptId, () => base.wholeDefinition(attemptId))
+      },
+    }
+  }, [publicMode, recoveryToken])
 
   const freezeBeforeMeasurement = async (
     next: CompositeAttemptState,
@@ -201,6 +215,7 @@ const CompositeAssessmentContent: React.FC = () => {
         if (signal.aborted) return
         if (response.code !== 0 || !response.data)
           throw new Error(response.message || '无法开始匿名综合测评')
+        inlineWholeDefinitionRef.current = response.data.wholeDefinition ?? null
         const returnedCredential = response.data.recoveryToken || credential
         if (returnedCredential) {
           setRecoveryToken(returnedCredential)
@@ -223,6 +238,7 @@ const CompositeAssessmentContent: React.FC = () => {
         if (signal.aborted) return
         if (response.code !== 0 || !response.data)
           throw new Error(response.message || '无法开始综合测评')
+        inlineWholeDefinitionRef.current = response.data.wholeDefinition ?? null
         if (response.data.attempt.status === 'COMPLETED' && !response.data.attempt.trainingFlow)
           goReport(response.data.attempt.id)
         else applyState(await freezeBeforeMeasurement(response.data.attempt))

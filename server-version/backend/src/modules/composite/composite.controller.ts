@@ -43,6 +43,7 @@ import {
   isTransientCompletionDatabaseError,
 } from '../../services/questionnaireCompletionAdmission'
 import { isUnitSubmitAdmissionBusyError } from '../../services/unitSubmitAdmission'
+import { startResponseWithInlineWholeDefinition } from './whole-start-inline'
 import { isWholeSubmitAdmissionBusyError } from '../../services/wholeSubmitAdmission'
 import {
   loadEmbeddedSituationalAttemptRuntime,
@@ -418,7 +419,9 @@ export const compositeController = {
     try {
       if (!req.user) return unauthorized(res)
       const data = await service.startUserAttempt(req.user.userId, req.params.id)
-      return success(res, data, '综合测评已开始')
+      const wantsWhole = req.query.delivery === 'whole' || (req.body as { delivery?: unknown } | undefined)?.delivery === 'whole'
+      const payload = await startResponseWithInlineWholeDefinition(wantsWhole, data, { userId: req.user.userId })
+      return success(res, payload, '综合测评已开始')
     } catch (err) { return handleError(res, err) }
   },
 
@@ -730,7 +733,13 @@ export const compositeController = {
     try {
       const input = z.object({ recoveryToken: z.string().min(20).max(200).optional() }).strict().parse(req.body || {})
       const data = await service.startPublicAttempt(req.params.token, input.recoveryToken)
-      return success(res, data, data.recoveryToken ? '匿名综合测评已开始，请保存恢复凭证' : '已恢复综合测评')
+      // The strict body schema stays untouched: inline delivery is requested via
+      // the query channel. A fresh start must bind the definition to the newly
+      // issued recovery token, a resume to the presented one.
+      const principalToken = data.recoveryToken ?? input.recoveryToken
+      const payload = await startResponseWithInlineWholeDefinition(req.query.delivery === 'whole', data,
+        principalToken ? { recoveryTokenHash: hashRecoveryToken(principalToken) } : {})
+      return success(res, payload, data.recoveryToken ? '匿名综合测评已开始，请保存恢复凭证' : '已恢复综合测评')
     } catch (err) { return handleError(res, err) }
   },
 
