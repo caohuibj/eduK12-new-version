@@ -115,4 +115,41 @@ suite('School psychological author / ordinary questionnaire real HTTP execution'
   expect(result.status).toBe(403)
   expect(await db.compositeAssessmentAttempt.count({where:{compositeAssessmentId:f.runtime.compositeId}})).toBe(0)
  })
+ it('enforces PostgreSQL revocation consistency between START inline and direct GET, preventing bypassed delivery',async()=>{
+  const f=await setupSchoolCompositionExecution(db,{instructions:['Revoke A','Revoke B','']})
+  const actor=await db.user.findUniqueOrThrow({where:{id:f.participantUserId}})
+  const execution=`/organizations/${f.organizationId}/activities/${f.workflow.id}/runs/${f.runId}/executions/${f.executionId}`
+  const started=await request(execution+'/start',actor.id,{delivery:'inline'})
+  expect(started.status,JSON.stringify(started.value)).toBe(200)
+  expect(started.data).toMatchObject({state:'STARTED',runtimeBindingKind:'COMPOSITE'})
+  const attempt=started.data.runtimeBindingRef
+  expect(started.data.currentUnit).toBeDefined()
+  expect(started.data.currentUnit.id).toBe(attempt)
+
+  const directGet=await request('/composite-attempts/'+attempt+'?view=current-unit',actor.id)
+  expect(directGet.status,JSON.stringify(directGet.value)).toBe(200)
+  expect(started.data.currentUnit).toEqual(directGet.data)
+
+  await db.organizationMembership.updateMany({
+   where:{organizationId:f.organizationId,userId:actor.id},
+   data:{validUntil:new Date()},
+  })
+
+  const revokedGet=await request('/composite-attempts/'+attempt+'?view=current-unit',actor.id)
+  expect(revokedGet.status).toBe(403)
+
+  const replayed=await request(execution+'/start',actor.id,{delivery:'inline'})
+  expect(replayed.data.currentUnit).toBeUndefined()
+
+  const outsider=await db.user.create({
+   data:{
+    username:'outsider'+randomUUID().replaceAll('-','').slice(0,18),
+    passwordHash:'synthetic-only',
+    accountDomain:'SCHOOL',
+    role:'STUDENT',
+   },
+  })
+  const outsiderGet=await request('/composite-attempts/'+attempt+'?view=current-unit',outsider.id)
+  expect(outsiderGet.status).toBe(403)
+ })
 })
