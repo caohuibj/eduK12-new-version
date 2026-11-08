@@ -557,15 +557,21 @@ export const submitUnifiedScaleCollectionBatch = async (
     if (lease.length !== 1) throw new ReportProcessingLeaseLostError()
     const byId = new Map(rows.map(row => [row.id, row]))
     const writes = [], facts: ScaleFactRecord[] = [], snapshots: Prisma.AssessmentUnitSnapshotCreateManyInput[] = []
-    // PR-1: one collection-guard call for the whole batch. The guard dedups /
-    // sorts scale ids internally and validates the full bound child/item set
-    // against the accepted receipt (including its read-only receipt fence).
-    // Previously this ran once per unit inside the loop below.
-    await assertTrainingScaleCollectionAllowed(tx,
-      prepared.map(unit => unit.child.scaleId),
-      { compositeAttemptId: job.attemptId, compositeAttemptEpoch: job.attemptEpoch,
-        compositeItemIds: prepared.map(unit => unit.child.compositeItemId).filter((id): id is string => Boolean(id)),
-        acceptedReceipt: execution })
+    // PR-1 fix: the collection guard's receipt fence requires parent.status =
+    // 'IN_PROGRESS', but the batch lease above explicitly allows a COMPLETED
+    // parent for a full completedReplay (all units already submitted, report
+    // rebuild). Guard only the units that actually need new writes; a pure
+    // replay skips the guard and relies on the batch lease + trailing fence.
+    // (The old per-unit loop guarded each unit only after its replay
+    // `continue`, so replayed units never reached the guard.)
+    if (!completedReplay) {
+      const writable = prepared.filter(unit => unit.write !== null)
+      await assertTrainingScaleCollectionAllowed(tx,
+        writable.map(unit => unit.child.scaleId),
+        { compositeAttemptId: job.attemptId, compositeAttemptEpoch: job.attemptEpoch,
+          compositeItemIds: writable.map(unit => unit.child.compositeItemId).filter((id): id is string => Boolean(id)),
+          acceptedReceipt: execution })
+    }
     for (const unit of prepared) {
       const current = byId.get(unit.child.id)!, { admission, snapshot, submissionId, payloadHash } = unit.data
       assertFinalOnly(current.deliveryMode); assertAttemptEpoch(current.attemptEpoch, unit.input.attemptEpoch)
