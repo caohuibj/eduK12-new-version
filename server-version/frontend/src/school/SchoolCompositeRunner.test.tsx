@@ -260,3 +260,28 @@ it('does not convert a completion hint into a parent completion or feedback tran
  expect(complete).not.toHaveBeenCalled();expect(finished).not.toHaveBeenCalled()
  expect(screen.queryByRole('heading',{name:'本次测评已完成'})).not.toBeInTheDocument()
 })
+
+it('renders directly from inline currentUnit delivery without initiating secondary GET current-unit request',async()=>{
+ const api=vi.fn(async(path:string,_method='GET',payload?:unknown)=>{
+  if(path.endsWith('/start')){
+   expect(payload).toEqual({delivery:'inline'})
+   return {
+    state:'STARTED',
+    runtimeBindingKind:'COMPOSITE',
+    runtimeBindingRef:'parent-attempt-1',
+    currentUnit:{
+     id:'parent-attempt-1',
+     deliveryMode:'FINAL_ONLY',
+     status:'IN_PROGRESS',
+     currentItem:{id:'unit-inline-1',type:'SCALE'},
+    },
+   }
+  }
+  throw new Error('Unexpected secondary request: '+path)
+ })
+ const {container}=render(<SchoolCompositeRunner api={api as unknown as SchoolApi} title="学生任务" execution={execution} onExit={vi.fn()} onFinished={vi.fn()}/>)
+ fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+ await waitFor(()=>expect(container.querySelector('.hs-school-task-runner--answer')).toBeTruthy())
+ expect(api).toHaveBeenCalledTimes(1)
+ expect(api.mock.calls[0][0]).toBe('/organizations/school-a/activities/campus-act-1/runs/run-1/executions/execution-1/start')
+})

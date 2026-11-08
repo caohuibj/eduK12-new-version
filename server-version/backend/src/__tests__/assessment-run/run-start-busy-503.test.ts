@@ -1,6 +1,7 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
-const m=vi.hoisted(()=>({start:vi.fn(),parent:vi.fn()}))
+const m=vi.hoisted(()=>({start:vi.fn(),parent:vi.fn(),getAttemptState:vi.fn()}))
 vi.mock('../../modules/assessment-run/startExecution',()=>({startAssessmentRunExecution:m.start}))
+vi.mock('../../modules/composite/composite.service',()=>({getAttemptState:m.getAttemptState}))
 vi.mock('../../modules/assessment-run/resourceBoundary',()=>({
   assertRunExecutionParent:m.parent,
   assertCurrentRunManagerBoundary:vi.fn(),
@@ -27,6 +28,7 @@ const req={
 
 describe('Run START transient rollback → 503 ASSESSMENT_START_BUSY',()=>{
   beforeEach(()=>{m.start.mockReset();m.parent.mockReset();m.parent.mockResolvedValue(undefined);
+    m.getAttemptState.mockReset();
     vi.spyOn(logger,'error').mockImplementation(()=>{})})
 
   it('run.controller START maps a rolled-back transaction to 503 with Retry-After',async()=>{
@@ -73,5 +75,45 @@ describe('Run START transient rollback → 503 ASSESSMENT_START_BUSY',()=>{
     expect(res.statusCode).toBe(500)
     expect(res.headers['Retry-After']).toBeUndefined()
     expect(res.body.message).toBe('服务器内部错误')
+  })
+
+  it('attaches inline currentUnit when requested by body.delivery === "inline"',async()=>{
+    m.start.mockResolvedValue({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-1',replayed:false})
+    m.getAttemptState.mockResolvedValue({id:'attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:{id:'scale-1',type:'SCALE'}})
+    const res=fakeRes()
+    await runController.startExecution({...req,body:{delivery:'inline'},query:{}},res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.currentUnit).toEqual({id:'attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:{id:'scale-1',type:'SCALE'}})
+    expect(m.getAttemptState).toHaveBeenCalledWith('attempt-1',{userId:'student-1'},undefined,'current-unit')
+  })
+
+  it('attaches inline currentUnit when requested by query.view === "current-unit"',async()=>{
+    m.start.mockResolvedValue({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-2',replayed:false})
+    m.getAttemptState.mockResolvedValue({id:'attempt-2',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:{id:'form-1',type:'FORM_SECTION'}})
+    const res=fakeRes()
+    await runController.startExecution({...req,body:{},query:{view:'current-unit'}},res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.currentUnit).toEqual({id:'attempt-2',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:{id:'form-1',type:'FORM_SECTION'}})
+    expect(m.getAttemptState).toHaveBeenCalledWith('attempt-2',{userId:'student-1'},undefined,'current-unit')
+  })
+
+  it('safely omits currentUnit if getAttemptState fails without failing the committed START',async()=>{
+    m.start.mockResolvedValue({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-3',replayed:false})
+    m.getAttemptState.mockRejectedValue(new Error('transient projection error'))
+    const res=fakeRes()
+    await runController.startExecution({...req,body:{delivery:'inline'},query:{}},res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.currentUnit).toBeUndefined()
+    expect(res.body.data.state).toBe('STARTED')
+    expect(res.body.data.runtimeBindingRef).toBe('attempt-3')
+  })
+
+  it('does not attach currentUnit when delivery is not requested',async()=>{
+    m.start.mockResolvedValue({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-4',replayed:false})
+    const res=fakeRes()
+    await runController.startExecution({...req,body:{},query:{}},res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.currentUnit).toBeUndefined()
+    expect(m.getAttemptState).not.toHaveBeenCalled()
   })
 })

@@ -53,17 +53,17 @@ router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(async (req
     const parsed = loginSchema.safeParse(req.body)
     if (!parsed.success) return failedLogin(req, res)
     const normalizedLogin = parsed.data.username.toLowerCase()
-    const match = await withLoginPasswordVerification(async () => {
-      const account = await prisma.campusAccount.findUnique({
-        where: { normalizedLogin }, include: { user: true },
-      })
-      const user = account?.user
-      const usable = !!user && user.accountDomain === 'SCHOOL'
-        && user.isActive && !user.isFrozen
-        && (!user.expiresAt || user.expiresAt > new Date())
-      const matches = await comparePassword(parsed.data.password, usable ? user!.passwordHash : DUMMY_HASH)
-      return usable && matches ? account : null
+    const account = await prisma.campusAccount.findUnique({
+      where: { normalizedLogin }, include: { user: true },
     })
+    const user = account?.user
+    const usable = !!user && user.accountDomain === 'SCHOOL'
+      && user.isActive && !user.isFrozen
+      && (!user.expiresAt || user.expiresAt > new Date())
+    const matches = await withLoginPasswordVerification(() =>
+      comparePassword(parsed.data.password, usable ? user!.passwordHash : DUMMY_HASH)
+    )
+    const match = usable && matches ? account : null
     if (!match) return failedLogin(req, res)
 
     if (await schoolAccountNeedsMfa(match.userId)) {

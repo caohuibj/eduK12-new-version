@@ -280,10 +280,35 @@ export const assessmentRunController = {
         runId: req.params.runId,
         executionId: req.params.executionId,
       })
-      return success(res, await startAssessmentRunExecution({
+      const started = await startAssessmentRunExecution({
         executionId: req.params.executionId,
         actorUserId: req.user.userId,
-      }))
+      })
+      const requestedDelivery = req.query.view === 'current-unit'
+        || req.query.delivery === 'inline'
+        || req.body?.delivery === 'inline'
+        || req.body?.view === 'current-unit'
+      if (
+        requestedDelivery
+        && started.state === 'STARTED'
+        && started.runtimeBindingKind === 'COMPOSITE'
+        && started.runtimeBindingRef
+      ) {
+        try {
+          const { getAttemptState } = await import('../composite/composite.service')
+          const currentUnit = await getAttemptState(
+            started.runtimeBindingRef,
+            { userId: req.user.userId },
+            undefined,
+            'current-unit',
+          )
+          return success(res, { ...started, currentUnit })
+        } catch {
+          // Failure outside the committed transaction falls back to plain started result.
+          return success(res, started)
+        }
+      }
+      return success(res, started)
     } catch (err) { return fail(res, err) }
   },
 
