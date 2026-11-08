@@ -149,21 +149,34 @@ export async function freezeTrainingStandardReference(tx:Prisma.TransactionClien
 
 /** The approved P/R definition reaches the native runtime. Existing exact native
  * P records must match the immutable approved P, never a latest/default set. */
-export async function freezeTrainingStandardScaleRuntime(tx:Prisma.TransactionClient,source:Awaited<ReturnType<typeof verifyStoredTrainingStandardItem>>){
- return freezeExactStandardScaleRuntime(tx,source.resolved.row.snapshot)
+export async function freezeTrainingStandardScaleRuntime(
+ tx:Prisma.TransactionClient,
+ source:Awaited<ReturnType<typeof verifyStoredTrainingStandardItem>>,
+ publishedArtifact?:import('../assessment-runtime/published-scale-artifact').PublishedScaleArtifact,
+){
+ return freezeExactStandardScaleRuntime(tx,source.resolved.row.snapshot,publishedArtifact)
 }
 
 /** Native freezing only. Each product must supply its own source/use proof. */
-export async function freezeExactStandardScaleRuntime(tx:Prisma.TransactionClient,t:import('../survey/standard-triplet.model').Triplet){
+export async function freezeExactStandardScaleRuntime(
+ tx:Prisma.TransactionClient,
+ t:import('../survey/standard-triplet.model').Triplet,
+ publishedArtifact?:import('../assessment-runtime/published-scale-artifact').PublishedScaleArtifact,
+){
  // Standard combinations freeze the versioned source instruction with the
  // exact approved tool version (presentation content, outside the P/R hash).
- return freezeExactStandardScaleDefinition(tx,{...t,instruction:frozenTripletInstruction(t),importedScaleId:databaseContentSource(t.parts.CONTENT)?.scaleId})
+ return freezeExactStandardScaleDefinition(tx,{...t,instruction:frozenTripletInstruction(t),importedScaleId:databaseContentSource(t.parts.CONTENT)?.scaleId,...(publishedArtifact?{publishedArtifact}:{})})
 }
 
 /** Pure native seam for an independently authorized immutable source. Instruction
  * provenance is validated by that source's seal, not reconstructed on resume. */
-export async function freezeExactStandardScaleDefinition(tx:Prisma.TransactionClient,t:Pick<import('../survey/standard-triplet.model').Triplet,'toolKey'|'instrumentVersion'|'definition'|'references'>&{instruction:import('../assessment-runtime/frozen-scale-instruction').FrozenScaleInstruction|null;importedScaleId?:string}){
- const frozen=await freezeScaleRuntimeAtAttemptStart(tx,{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,requestedMode:'COMPOSITE',instruction:t.instruction,importedScaleId:t.importedScaleId})
+export async function freezeExactStandardScaleDefinition(
+  tx:Prisma.TransactionClient,
+  t:Pick<import('../survey/standard-triplet.model').Triplet,'toolKey'|'instrumentVersion'|'definition'|'references'>&{instruction:import('../assessment-runtime/frozen-scale-instruction').FrozenScaleInstruction|null;importedScaleId?:string;publishedArtifact?:import('../assessment-runtime/published-scale-artifact').PublishedScaleArtifact},
+  publishedArtifact?:import('../assessment-runtime/published-scale-artifact').PublishedScaleArtifact,
+){
+ const artifact = publishedArtifact ?? t.publishedArtifact
+ const frozen=await freezeScaleRuntimeAtAttemptStart(tx,{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,requestedMode:'COMPOSITE',instruction:t.instruction,importedScaleId:t.importedScaleId,...(artifact?{publishedArtifact:artifact}:{})})
  assertNativeParameters(t.references,frozen.referenceBindings)
  return frozen
 }

@@ -10,7 +10,9 @@ import {readEducationMarkerSource} from '../education-tools/assessment-resource.
 import {readPrivateRuntimeScaleSource,assertPrivateRuntimeCompositeIdentity} from '../education-tools/private-tool.runtime-source'
 import {readLibraryScaleMeasurementSource,readLibraryScaleMeasurementSources} from '../scale-library-governance/training-source'
 import {trainingReferencePolicySchema} from './training-reference-selection'
-import {trainingStandardItemSourceSchema,verifyStoredTrainingStandardItem} from './training-standard-combination'
+import {decodeTrainingStandardItemSource,trainingStandardItemSourceSchema,verifyStoredTrainingStandardItem} from './training-standard-combination'
+import {readCurrentStandardCombination} from '../measurement-content/standard-combination-source'
+import {frozenTripletInstruction} from '../survey/standard-triplet.model'
 import {readTrainingStandardContentIdentity} from './training-standard-content'
 import {materializeStandardCombinationContent,previewStandardCombinationContent} from '../measurement-content/standard-combination-content'
 import {readStaticSjtMeasurementForStart,recheckStaticSjtConsumerLicense} from '../situational/static-measurement-release'
@@ -27,7 +29,7 @@ import { sjtMeasurementRelease } from '../measurement-content/sjt'
 import { frozenDatabaseScaleDefinition } from '../scale/scale-workflow.service'
 import { resolveFrozenScaleInstructionForScale } from '../scale/onboarding/instrument-registry'
 import { freezeLibraryScalePresentation } from '../scale/scale-presentation'
-import { appendPublishedScaleArtifact, buildPublishedScaleArtifact, loadPublishedScaleArtifacts, type PublishedScaleArtifact } from '../assessment-runtime/published-scale-artifact'
+import { appendPublishedScaleArtifact, buildPublishedScaleArtifact, loadPublishedScaleArtifacts, type PublishedScaleArtifact, type PublishedScaleArtifactRef } from '../assessment-runtime/published-scale-artifact'
 import { loadLegacyScaleArtifactMap } from './training-legacy-scale-artifacts'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { decryptCognitivePayload } from '../cognitive/cognitive.security'
@@ -452,30 +454,28 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
  * fail closed; never re-derived from the live Scale row. */
 export async function resolveTrainingScaleArtifacts(db:Prisma.TransactionClient,input:{compositeId:string;snapshot:unknown;snapshotHash:string|null|undefined;educationComposition?:unknown}):Promise<Map<string,PublishedScaleArtifact>>{
   const out=new Map<string,PublishedScaleArtifact>()
-  if(input.educationComposition||input.snapshot==null||!input.snapshotHash)return out
+  if(input.snapshot==null||!input.snapshotHash)return out
   const parsed=trainingContentSnapshotSchema.safeParse(input.snapshot)
   if(!parsed.success)fail('SNAPSHOT_INVALID')
   const snapshot=parsed.data
-  if(snapshot.educationBinding||snapshot.compositeId!==input.compositeId||canonicalHash(snapshot)!==input.snapshotHash)return out
+  if(snapshot.compositeId!==input.compositeId||(!input.educationComposition&&canonicalHash(snapshot)!==input.snapshotHash))return out
   const refs=new Map<string,string>()
-  if(snapshot.schemaVersion===2){for(const unit of snapshot.units)if(unit.artifact)refs.set(unit.itemId,unit.artifact.hash)}
-  else{
-    // Lightweight unit doubles without raw SQL keep the legacy path (as the
-    // Scale freeze does); a real DB error never falls back open.
-    if(typeof (db as any).$queryRaw!=='function')return out
+  const units=new Map(snapshot.units.map(unit=>[unit.itemId,unit]))
+  if(snapshot.schemaVersion===2){
+    for(const unit of snapshot.units)if(unit.artifact)refs.set(unit.itemId,unit.artifact.hash)
+  }
+  const needsLegacyLookup=snapshot.schemaVersion===1||snapshot.units.some(unit=>unit.family==='SCALE'&&unit.source.kind==='SCALE'&&!unit.artifact)
+  if(needsLegacyLookup&&typeof (db as any).$queryRaw==='function'){
     const rows=await loadLegacyScaleArtifactMap(db,input.compositeId,input.snapshotHash)
-    if(rows.size===0)return out
-    const units=new Map(snapshot.units.map(unit=>[unit.itemId,unit]))
     for(const row of rows.values()){
       const unit=units.get(row.itemId)
-      if(!unit||!publishedArtifactEligible(unit))fail('BINDING_INVALID')
-      refs.set(row.itemId,row.artifact.hash)
+      if(!unit||unit.family!=='SCALE'||unit.source.kind!=='SCALE'||row.releaseId!==unit.measurement.releaseId||row.contentHash!==unit.measurement.contentHash)fail('BINDING_INVALID')
+      if(!refs.has(row.itemId))refs.set(row.itemId,row.artifact.hash)
     }
   }
   if(refs.size===0)return out
   let loaded:Map<string,PublishedScaleArtifact>
   try{loaded=await loadPublishedScaleArtifacts(db,[...refs.values()])}catch{fail('BINDING_INVALID')}
-  const units=new Map(snapshot.units.map(unit=>[unit.itemId,unit]))
   for(const [itemId,hash] of refs){
     const artifact=loaded!.get(hash),unit=units.get(itemId)!
     if(!artifact||artifact.release.releaseId!==unit.measurement.releaseId||artifact.release.contentHash!==unit.measurement.contentHash)fail('BINDING_INVALID')
@@ -484,12 +484,34 @@ export async function resolveTrainingScaleArtifacts(db:Prisma.TransactionClient,
   return out
 }
 
-/** Builds the format-3 static artifact for one eligible SCALE unit from the
- * live scale row, or returns a drift reason when that row no longer reproduces
- * the unit's pinned releaseId/contentHash. Never fabricates. */
+export async function appendLegacyScaleArtifactBinding(
+  db:Prisma.TransactionClient,
+  input:{compositeId:string;publicationHash:string;itemId:string;built:ReturnType<typeof buildPublishedScaleArtifact>;releaseId:string;contentHash:string},
+):Promise<PublishedScaleArtifactRef>{
+  const ref=await appendPublishedScaleArtifact(db,input.built)
+  if(typeof (db as any).$executeRaw==='function'){
+    await db.$executeRaw(Prisma.sql`INSERT INTO training_legacy_scale_artifacts
+      (composite_assessment_id, publication_hash, item_id, artifact_hash, release_id, content_hash)
+      VALUES (${input.compositeId}, ${input.publicationHash}, ${input.itemId}, ${ref.hash}, ${input.releaseId}, ${input.contentHash})
+      ON CONFLICT DO NOTHING`)
+  }
+  return ref
+}
+
+/** Builds the format-3 static artifact for one SCALE unit from the live scale
+ * or approved standard combination row, or returns a drift reason when that row
+ * no longer reproduces the unit's pinned releaseId/contentHash. */
 export async function buildScaleUnitArtifact(db:Prisma.TransactionClient,item:any,unit:Unit,release:Stored|null|undefined){
   if(!item||item.type!=='SCALE'||item.scale?.id!==unit.source.id)return 'SOURCE_ITEM_MISMATCH' as const
   if(!release||release.releaseId!==unit.measurement.releaseId||release.contentHash!==unit.measurement.contentHash)return 'RELEASE_MISMATCH' as const
+  if(unit.source.standardCombination){
+    const marker=decodeTrainingStandardItemSource(unit.source.standardCombination)
+    const exact=await readCurrentStandardCombination(db,marker.reference.combination)
+    if(exact.measurement.releaseId!==release.releaseId||exact.measurement.contentHash!==release.contentHash)return 'RELEASE_MISMATCH' as const
+    return buildPublishedScaleArtifact({instrumentKey:exact.row.snapshot.toolKey,instrumentVersion:exact.row.snapshot.instrumentVersion,
+      definition:exact.row.snapshot.definition,instruction:frozenTripletInstruction(exact.row.snapshot),
+      release:{releaseId:release.releaseId,contentHash:release.contentHash}})
+  }
   const definition=frozenDatabaseScaleDefinition(item.scale)
   const projected=prepareRelease(scaleMeasurementRelease({localId:item.scale.code,version:release.version,instrumentVersion:item.scale.instrumentVersion,
     definition,instrumentClass:item.scale.instrumentClass,scope:release.scope,...(unit.source.libraryEntryId?{presentationMode:libraryPresentationMode(release)}:{})}))
@@ -499,6 +521,24 @@ export async function buildScaleUnitArtifact(db:Prisma.TransactionClient,item:an
     ...(unit.source.libraryEntryId?{measurementPresentation:await freezeLibraryScalePresentation(db,item.scale,definition)}:{})})
 }
 
+export async function attachLegacyScaleArtifactsForSnapshot(
+  db:Prisma.TransactionClient,
+  composite:{id:string;items:any[]},
+  snapshot:TrainingContentSnapshot,
+  snapshotHash:string,
+  releases:Map<string,Stored>,
+):Promise<void>{
+  if(typeof (db as any).$queryRaw!=='function'||typeof (db as any).$executeRaw!=='function')return
+  const items=new Map(composite.items.map((item:any)=>[item.id,item]))
+  for(const unit of snapshot.units){
+    if(unit.family!=='SCALE'||unit.source.kind!=='SCALE'||unit.artifact)continue
+    const built=await buildScaleUnitArtifact(db,items.get(unit.itemId),unit,releases.get(unit.measurement.releaseId))
+    if(typeof built==='string')fail('SOURCE_MISMATCH')
+    await appendLegacyScaleArtifactBinding(db,{compositeId:composite.id,publicationHash:snapshotHash,itemId:unit.itemId,
+      built,releaseId:unit.measurement.releaseId,contentHash:unit.measurement.contentHash})
+  }
+}
+
 /** Publish only (never preview or historical reads): compile each ordinary
  * Scale unit's static runtime once, verify it projects to the exact published
  * release, append it content-addressed in the publishing transaction, and emit
@@ -506,7 +546,14 @@ export async function buildScaleUnitArtifact(db:Prisma.TransactionClient,item:an
 export async function attachPublishedScaleArtifacts(db:Prisma.TransactionClient,composite:{id:string;items:any[]},
   content:{snapshot:TrainingContentSnapshot;releases:Map<string,Stored>}){
   const {snapshot}=content
-  if(snapshot.schemaVersion!==1||snapshot.educationBinding||!snapshot.units.some(publishedArtifactEligible))return {snapshot,snapshotHash:canonicalHash(snapshot)}
+  if(snapshot.schemaVersion!==1||snapshot.educationBinding){
+    return {snapshot,snapshotHash:canonicalHash(snapshot)}
+  }
+  if(!snapshot.units.some(publishedArtifactEligible)){
+    const snapshotHash=canonicalHash(snapshot)
+    await attachLegacyScaleArtifactsForSnapshot(db,composite,snapshot,snapshotHash,content.releases)
+    return {snapshot,snapshotHash}
+  }
   const items=new Map(composite.items.map((item:any)=>[item.id,item]))
   const units:Unit[]=[]
   for(const unit of snapshot.units){
@@ -517,5 +564,7 @@ export async function attachPublishedScaleArtifacts(db:Prisma.TransactionClient,
   }
   const next=trainingContentSnapshotSchema.parse({...snapshot,schemaVersion:2,units})
   assertTrainingSnapshotArtifacts(next)
-  return {snapshot:next,snapshotHash:canonicalHash(next)}
+  const snapshotHash=canonicalHash(next)
+  await attachLegacyScaleArtifactsForSnapshot(db,composite,next,snapshotHash,content.releases)
+  return {snapshot:next,snapshotHash}
 }

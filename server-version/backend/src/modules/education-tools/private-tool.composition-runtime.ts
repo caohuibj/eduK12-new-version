@@ -2,9 +2,13 @@ import {materializeStandardCombinationContent} from '../measurement-content/stan
 import {randomUUID} from 'node:crypto'
 import {Prisma,type EducationPrivateToolVersion} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
+import {buildPublishedScaleArtifact} from '../assessment-runtime/published-scale-artifact'
 import {publishContentRelease} from '../measurement-content/repository'
 import {hashScaleDefinition} from '../scale/scale-definition'
-import {trainingContentSnapshotSchema} from '../composite/training-content-binding'
+import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
+import {resolveFrozenScaleInstructionForScale} from '../scale/onboarding/instrument-registry'
+import {frozenTripletInstruction} from '../survey/standard-triplet.model'
+import {appendLegacyScaleArtifactBinding,trainingContentSnapshotSchema} from '../composite/training-content-binding'
 import {privateScaleMeasurementInput} from './private-tool.runtime-source'
 import {privateScaleCode} from './private-tool.runtime-origin'
 import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
@@ -104,6 +108,7 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
   name:version.title,instruction:compiled.definition.instruction,createdBy:c.principal.userId,productKind:'ORGANIZATION_RESOURCE',status:'DRAFT',publicEnabled:false,copyable:false}})
  const sections:Prisma.CompositeFormSectionCreateManyInput[]=[],items:Prisma.CompositeAssessmentItemCreateManyInput[]=[]
  const units:unknown[]=[],manifest:EducationCompositionBinding['manifest']=[]
+ const scaleArtifactTasks:Array<{itemId:string;leafKey:string;build:()=>ReturnType<typeof buildPublishedScaleArtifact>;releaseId:string;contentHash:string}>=[]
  let context:EducationCompositionBinding['context']
  if(compiled.definition.contextFields?.length){
   const sectionId=randomUUID(),itemIds:string[]=[]
@@ -126,6 +131,26 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
     {kind:'SCALE',id:scale.id,ownerId:leaf.version.ownerUserId,privateVersionId:leaf.version.id},
     measurement:{releaseId:release.releaseId,contentHash:release.contentHash,measurementHash:release.content.measurementHash},
     ...(derived?{referencePolicy:derived.referencePolicy,...(derived.report?{report:derived.report}:{})}:{})})
+   const leafKey=`${leaf.provider}:${leaf.version.id}`
+   scaleArtifactTasks.push({
+    itemId,
+    leafKey,
+    releaseId:release.releaseId,
+    contentHash:release.contentHash,
+    build:()=>leaf.provider==='STANDARD_SCALE'
+     ? buildPublishedScaleArtifact({instrumentKey:leaf.standard.row.snapshot.toolKey,instrumentVersion:leaf.standard.row.snapshot.instrumentVersion,
+        definition:leaf.standard.row.snapshot.definition,instruction:frozenTripletInstruction(leaf.standard.row.snapshot),
+        release:{releaseId:release.releaseId,contentHash:release.contentHash}})
+     : leaf.provider==='LIBRARY_SCALE'
+     ? buildPublishedScaleArtifact({instrumentKey:scale.code,instrumentVersion:scale.instrumentVersion,
+        definition:frozenDatabaseScaleDefinition(scale),instruction:resolveFrozenScaleInstructionForScale(scale),
+        measurementPresentation:{releaseId:release.releaseId,contentHash:release.contentHash,
+         presentationMode:leaf.library.descriptor.presentationMode==='ALL_AT_ONCE'?'ALL_AT_ONCE':'ONE_BY_ONE'},
+        release:{releaseId:release.releaseId,contentHash:release.contentHash}})
+     : buildPublishedScaleArtifact({instrumentKey:scale.code,instrumentVersion:scale.instrumentVersion,
+        definition:leaf.definition,instruction:resolveFrozenScaleInstructionForScale(scale),
+        release:{releaseId:release.releaseId,contentHash:release.contentHash}}),
+   })
   }else if(leaf.kind==='COGNITIVE'){
    const native=await materializeEducationCognitive(tx,c,leaf.native),itemId=randomUUID()
    itemIds.push(itemId);items.push({id:itemId,compositeAssessmentId:parent.id,type:'COGNITIVE',position:items.length,required:true,cognitiveAssignmentId:native.assignment.id})
@@ -166,5 +191,14 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
  // mapping and hash. Only this final write attaches the sealed namespace.
  await tx.compositeAssessment.update({where:{id:parent.id},data:{code:key,creationKey:key,creationHash:canonicalHash(origin),
   trainingContentSnapshot:snapshot as unknown as Prisma.InputJsonValue,trainingContentSnapshotHash:manifestHash}})
+ if(scaleArtifactTasks.length&&typeof (tx as any).$queryRaw==='function'&&typeof (tx as any).$executeRaw==='function'){
+  const builtByLeaf=new Map<string,ReturnType<typeof buildPublishedScaleArtifact>>()
+  for(const task of scaleArtifactTasks){
+   let built=builtByLeaf.get(task.leafKey)
+   if(!built){built=task.build();builtByLeaf.set(task.leafKey,built)}
+   await appendLegacyScaleArtifactBinding(tx,{compositeId:parent.id,publicationHash:manifestHash,itemId:task.itemId,
+    built,releaseId:task.releaseId,contentHash:task.contentHash})
+  }
+ }
  return {compositeId:parent.id,resourceKey:key,version:origin.adapterVersion,manifestHash,origin,status:'DRAFT' as const,identityOnly:true as const,canPublish:false as const}
 }

@@ -175,3 +175,52 @@ it('START preserves the frozen private report even when revoked, with one read p
   mocks.staticRead.mockResolvedValue({mapping,release:{...release,provenance:{...release.provenance,mappingId:'other'}}})
   await expect(start(publication,value,resolved)).rejects.toThrow('SCOPE_DENIED')
  })
+
+ it('attaches and resolves legacy side-table scale artifacts for schemaVersion=1 education and standardCombination units',async()=>{
+  const {attachLegacyScaleArtifactsForSnapshot,resolveTrainingScaleArtifacts}=await import('../../modules/composite/training-content-binding')
+  const {getPublishedScaleArtifactHash}=await import('../../modules/assessment-runtime/published-scale-artifact')
+  const publication=await prepare()
+  const runtimeArtifacts=new Map<string,any>()
+  const legacyRows:Array<{item_id:string;release_id:string;content_hash:string;artifact_hash:string}>=[]
+  const tx={
+   $queryRaw:vi.fn(async(query:any,...rest:any[])=>{
+    const strings=Array.isArray(query)?query:query.strings
+    const values=Array.isArray(query)?rest:query.values
+    const sql=strings?.join(' ')??String(query)
+    if(sql.includes('INSERT INTO assessment_runtime_artifacts')){
+     const [artifactHash,formatVersion,plaintextBytes,payloadEncrypted]=values
+     runtimeArtifacts.set(artifactHash,{artifactHash,formatVersion,plaintextBytes,payloadEncrypted})
+     return [{artifact_hash:artifactHash}]
+    }
+    if(sql.includes('FROM assessment_runtime_artifacts')){
+     return [...runtimeArtifacts.values()]
+    }
+    if(sql.includes('FROM training_legacy_scale_artifacts')){
+     return legacyRows
+    }
+    return []
+   }),
+   $executeRaw:vi.fn(async(query:any,...rest:any[])=>{
+    const values=Array.isArray(query)?rest:query.values
+    const [compositeId,snapshotHash,itemId,artifactHash,releaseId,contentHash]=values
+    expect(compositeId).toBe('composite')
+    expect(snapshotHash).toBe(publication.snapshotHash)
+    legacyRows.push({item_id:itemId,release_id:releaseId,content_hash:contentHash,artifact_hash:artifactHash})
+    return 1
+   }),
+  }
+  await attachLegacyScaleArtifactsForSnapshot(tx as never,composite(),publication.snapshot,publication.snapshotHash,publication.releases)
+  expect(legacyRows).toHaveLength(1)
+  expect(runtimeArtifacts.size).toBe(1)
+
+  const resolvedMap=await resolveTrainingScaleArtifacts(tx as never,{
+   compositeId:'composite',
+   snapshot:publication.snapshot,
+   snapshotHash:publication.snapshotHash,
+   educationComposition:{compositeId:'composite',compositionId:'comp-1',versionId:'ver-1',snapshotHash:publication.snapshotHash} as any,
+  })
+  expect(resolvedMap.size).toBe(1)
+  const resolvedArtifact=resolvedMap.get('item')!
+  expect(resolvedArtifact.instrumentKey).toBe('local')
+  expect(getPublishedScaleArtifactHash(resolvedArtifact)).toBe(legacyRows[0].artifact_hash)
+ })

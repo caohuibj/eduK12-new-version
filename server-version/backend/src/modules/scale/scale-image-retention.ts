@@ -66,13 +66,24 @@ const scaleAssessmentVideoReferencesForRetention = (definition: ScaleDefinitionV
   })
 )
 
-export const scaleAssessmentMediaReferences = (definition: ScaleDefinitionV2) => ([
+const mediaReferencesByDefinition = new WeakMap<ScaleDefinitionV2, ReturnType<typeof computeScaleAssessmentMediaReferences>>()
+
+const computeScaleAssessmentMediaReferences = (definition: ScaleDefinitionV2) => ([
   ...scaleAssessmentImageReferences(definition),
   ...scaleStimulusMaterialReferences(definition),
   ...scaleReportMaterialReferences(definition),
   ...scaleReportImageReferences(definition),
   ...scaleAssessmentVideoReferencesForRetention(definition),
 ])
+
+export const scaleAssessmentMediaReferences = (definition: ScaleDefinitionV2) => {
+  if (!Object.isFrozen(definition)) return computeScaleAssessmentMediaReferences(definition)
+  const cached = mediaReferencesByDefinition.get(definition)
+  if (cached) return [...cached]
+  const computed = computeScaleAssessmentMediaReferences(definition)
+  mediaReferencesByDefinition.set(definition, computed)
+  return [...computed]
+}
 
 export const assertScaleAssessmentImagesReady = async (
   definition: ScaleDefinitionV2,
