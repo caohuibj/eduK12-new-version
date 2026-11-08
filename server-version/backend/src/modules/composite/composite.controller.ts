@@ -43,6 +43,7 @@ import {
   isTransientCompletionDatabaseError,
 } from '../../services/questionnaireCompletionAdmission'
 import { isUnitSubmitAdmissionBusyError } from '../../services/unitSubmitAdmission'
+import { isWholeSubmitAdmissionBusyError } from '../../services/wholeSubmitAdmission'
 import {
   loadEmbeddedSituationalAttemptRuntime,
   situationalAttemptForResponse,
@@ -954,7 +955,7 @@ async function handleWholeSubmit(req: Request, res: Response, anonymous: boolean
       const status = err.code === 'RELATIONAL_ANALYSIS_ACCESS' || err.code === 'RELATIONAL_ASSIGNMENT_ACTOR' ? 403 : 409
       return instrumentError(res, err.code, err.message, status)
     }
-    if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
+    if (isUnitSubmitAdmissionBusyError(err) || isWholeSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
     if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
     if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
     if (isInstrumentFinalSubmitError(err)) {

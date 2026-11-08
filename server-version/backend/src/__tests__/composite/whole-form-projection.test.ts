@@ -5,7 +5,7 @@ import { formSectionIdentityHash } from '../../modules/assessment-runtime/attemp
 import { compositeFormSectionRuntimeDefinition, compositeSectionHasContext } from '../../modules/composite/composite.service'
 
 describe('Scheme X Whole Form Projection & Execution Mode Contracts', () => {
-  it('distinguishes structural eligibility from uncompleted form ingestion capability', () => {
+  it('evaluates runtime WHOLE_LOCAL execution mode when whole submission is enabled and no partial scale submissions exist', () => {
     const candidate = {
       items: [
         { type: 'FORM', position: 1 },
@@ -17,21 +17,19 @@ describe('Scheme X Whole Form Projection & Execution Mode Contracts', () => {
     expect(isEligible).toBe(true)
 
     // Helper simulating composite.service.ts executionMode calculation
-    const calcMode = (forms: any[], completedKeys: Set<string>) => {
-      const formsPresent = (forms?.length ?? 0) > 0
-      const allFormsCompleted = formsPresent && forms.every((s: any) => completedKeys.has(`form-section:${s.id}`))
-      const canIngestWholeLocal = !formsPresent || allFormsCompleted
+    const calcMode = (opts: { wholeSubmitEnabled: boolean; hasPartialScaleSubmissions: boolean }) => {
+      const canIngestWholeLocal = opts.wholeSubmitEnabled && !opts.hasPartialScaleSubmissions
       return (isEligible && canIngestWholeLocal) ? 'WHOLE_LOCAL' : 'STEPPED'
     }
 
-    // Uncompleted form sections => STEPPED (until PR X-03 lands unified form ingestion)
-    expect(calcMode(candidate.formSections, new Set())).toBe('STEPPED')
+    // Uncompleted form sections with wholeSubmitEnabled => WHOLE_LOCAL (PR X-03 unified ingestion)
+    expect(calcMode({ wholeSubmitEnabled: true, hasPartialScaleSubmissions: false })).toBe('WHOLE_LOCAL')
 
-    // Completed form sections => WHOLE_LOCAL
-    expect(calcMode(candidate.formSections, new Set(['form-section:sec-1']))).toBe('WHOLE_LOCAL')
+    // If wholeSubmitEnabled is disabled => STEPPED (runtime safety gate)
+    expect(calcMode({ wholeSubmitEnabled: false, hasPartialScaleSubmissions: false })).toBe('STEPPED')
 
-    // Pure scale assessment (no forms) => WHOLE_LOCAL
-    expect(calcMode([], new Set())).toBe('WHOLE_LOCAL')
+    // If partial scale submissions exist => STEPPED
+    expect(calcMode({ wholeSubmitEnabled: true, hasPartialScaleSubmissions: true })).toBe('STEPPED')
   })
 
   it('correctly sorts form sections by position and items by formSectionPosition', () => {

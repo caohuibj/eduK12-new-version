@@ -112,8 +112,11 @@ export const loadSharedSlotPlan = async (encrypted: string, decoded?:unknown, db
 
 export const storeSharedWholeValidation = async (manifest: any): Promise<string> => {
   if (!sharedControlWritesEnabled()) return encryptUnifiedRuntimePayload(manifest)
-  const plan = { schemaVersion: manifest.schemaVersion, requiredFormSlots: manifest.requiredFormSlots,
+  const plan: any = { schemaVersion: manifest.schemaVersion, requiredFormSlots: manifest.requiredFormSlots,
     units: manifest.units.map((u: any) => Object.fromEntries(Object.entries(u).filter(([k]) => !['assessmentId','admissionHash','trainingTiming'].includes(k)))) }
+  if (manifest.formSections && manifest.formSections.length > 0) {
+    plan.formSections = manifest.formSections
+  }
   const [p] = await publicTemplates.saveMany([{ kind: 'WHOLE_VALIDATION_PLAN', value: plan }])
   return encryptControlReference({ k: 'WVP2', p, b: manifest.binding, u: manifest.units.map((u: any) => [u.assessmentId, u.admissionHash, ...(u.trainingTiming ? [u.trainingTiming] : [])]) })
 }
