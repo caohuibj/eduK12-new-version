@@ -26,7 +26,7 @@ const storedScale=()=>({...prepareRelease(scaleMeasurementRelease({localId:'loca
 const row={kind:'SCALE',id:'scale',owner_id:'source-owner',measurement_release_id:rid,instrument_key:null,instrument_version:null}
 const db={$queryRaw:vi.fn()}
 const empty=new Map<string,ResolvedSituationalRelease>()
-beforeEach(()=>{vi.resetAllMocks();db.$queryRaw.mockResolvedValue([row]);mocks.release.mockResolvedValue(storedScale());mocks.staticRead.mockRejectedValue(new Error('CONTENT_STATIC_SJT_MAPPING_MISSING'))
+beforeEach(()=>{vi.resetAllMocks();vi.stubEnv('DATA_ENCRYPTION_KEY', 'a'.repeat(64));db.$queryRaw.mockResolvedValue([row]);mocks.release.mockResolvedValue(storedScale());mocks.staticRead.mockRejectedValue(new Error('CONTENT_STATIC_SJT_MAPPING_MISSING'))
  mocks.batch.mockImplementation(async(d:any,ids:string[])=>new Map(await Promise.all([...new Set(ids)].map(async id=>[id,await mocks.release(d,id,false)] as const))))})
 const prepare=(value:any=composite(),resolved=empty)=>prepareTrainingContentSnapshot(db as never,value,resolved)
 const start=(publication:any,value:any=composite(),resolved=empty)=>prepareTrainingContentAttemptBinding(db as never,{compositeId:'composite',attemptId:'attempt',epoch:2,
@@ -223,4 +223,52 @@ it('START preserves the frozen private report even when revoked, with one read p
   const resolvedArtifact=resolvedMap.get('item')!
   expect(resolvedArtifact.instrumentKey).toBe('local')
   expect(getPublishedScaleArtifactHash(resolvedArtifact)).toBe(legacyRows[0].artifact_hash)
+ })
+
+ it('fails closed when schemaVersion=2 snapshot has missing unit.artifact for eligible unit', async () => {
+  const { resolveTrainingScaleArtifacts } = await import('../../modules/composite/training-content-binding')
+  const publication = await prepare()
+  const snapshotV2 = {
+    ...publication.snapshot,
+    schemaVersion: 2,
+    units: publication.snapshot.units.map(u => ({ ...u, artifact: undefined })),
+  }
+  const tx = { $queryRaw: vi.fn(), $executeRaw: vi.fn() }
+  await expect(resolveTrainingScaleArtifacts(tx as never, {
+    compositeId: 'composite',
+    snapshot: snapshotV2,
+    snapshotHash: 'some-hash',
+    educationComposition: { compositeId: 'composite' } as any,
+  })).rejects.toThrow('BINDING_INVALID')
+ })
+
+ it('fails closed when legacy side-table artifact rows are partially missing for schemaVersion=1 scale units', async () => {
+  const { resolveTrainingScaleArtifacts } = await import('../../modules/composite/training-content-binding')
+  const publication = await prepare()
+  const unit1 = publication.snapshot.units[0]
+  const unit2 = { ...unit1, itemId: 'item_2' }
+  const multiSnapshot = {
+    ...publication.snapshot,
+    units: [unit1, unit2],
+  }
+  const partialRows = [{
+    item_id: 'item',
+    release_id: unit1.measurement.releaseId,
+    content_hash: unit1.measurement.contentHash,
+    artifact_hash: 'a'.repeat(64),
+  }]
+  const tx = {
+    $queryRaw: vi.fn(async (query: any) => {
+      const sql = String(Array.isArray(query) ? query.join(' ') : query?.strings?.join(' ') ?? query)
+      if (sql.includes('FROM training_legacy_scale_artifacts')) return partialRows
+      return []
+    }),
+    $executeRaw: vi.fn(),
+  }
+  await expect(resolveTrainingScaleArtifacts(tx as never, {
+    compositeId: 'composite',
+    snapshot: multiSnapshot,
+    snapshotHash: 'multi-hash',
+    educationComposition: { compositeId: 'composite' } as any,
+  })).rejects.toThrow('BINDING_INVALID')
  })

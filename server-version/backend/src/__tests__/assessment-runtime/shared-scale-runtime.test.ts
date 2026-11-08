@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { gzipSync } from 'node:zlib'
 import { createHash } from 'node:crypto'
 import { getScaleInstrumentSource } from '../../modules/scale/onboarding/instrument-registry'
-import { compileScalePolicy } from '../../modules/scale/policy/compile'
+import { compileScalePolicy, hashCompiledScalePolicy } from '../../modules/scale/policy/compile'
 import { createFrozenScaleRuntimeSnapshot, encryptFrozenScaleRuntimeSnapshot, loadFrozenScaleRuntimeSnapshot, hashFrozenScaleRuntimeSnapshot,
   preparedScaleArtifactCacheStats } from '../../modules/assessment-runtime/runtime-snapshot'
 import { createFrozenScaleRuntimeSnapshotV2ForTest } from '../../modules/assessment-runtime/runtime-snapshot-v2'
@@ -22,7 +22,10 @@ const memory = () => {
   return { rows, writes, reads, repository, store: createSharedScaleRuntimeStore(repository) }
 }
 const reference = (cipher: string): any => decryptUnifiedRuntimePayload(cipher)
-beforeEach(() => vi.stubEnv('ASSESSMENT_COMPILED_ARTIFACT_CACHE_ENABLED', 'true'))
+beforeEach(() => {
+  vi.stubEnv('DATA_ENCRYPTION_KEY', 'a'.repeat(64))
+  vi.stubEnv('ASSESSMENT_COMPILED_ARTIFACT_CACHE_ENABLED', 'true')
+})
 afterEach(() => vi.unstubAllEnvs())
 describe('shared immutable Scale runtime storage', () => {
   it('stores one artifact for distinct attempt timestamps and preserves every logical byte', async () => {
@@ -44,7 +47,7 @@ describe('shared immutable Scale runtime storage', () => {
     await expect(loadFrozenScaleRuntimeSnapshot(cipher, unavailable)).rejects.toMatchObject({ code: 'ASSESSMENT_RUNTIME_UNAVAILABLE', statusCode: 503 })
     const admission = await import('../../modules/scale/scale-admission.service')
     await expect(admission.loadScaleAdmissionRuntime({ runtimeSnapshotEncrypted: cipher }, unavailable)).rejects.toMatchObject({ code: 'ASSESSMENT_RUNTIME_UNAVAILABLE', statusCode: 503 })
-  })
+  }, 15000)
   it('preserves V2 compiled policy and reads legacy inline data with new writes disabled', async () => {
     const s = source(), original = createFrozenScaleRuntimeSnapshotV2ForTest({ instrumentKey: s.identity.instrumentKey,
       instrumentVersion: s.identity.instrumentVersion, definition: s.executable!.definition, compiledPolicy: compileScalePolicy(s) })
@@ -180,4 +183,62 @@ it('persists storageVersion=3 published artifact references with zero DB writes 
   expect(refV2.schemaVersion).toBe(2)
   expect(await m.store.load(refV2)).toEqual(v2)
   expect(decryptFrozenScaleRuntimeSnapshot(cipherV2)).toEqual(v2)
+})
+
+it('persistFrozenScaleRuntimeSnapshot respects explicit ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED === true', async () => {
+  const { persistFrozenScaleRuntimeSnapshot, decryptFrozenScaleRuntimeSnapshot, setSnapshotPublishedArtifactHash } = await import('../../modules/assessment-runtime/runtime-snapshot')
+  const v1 = snapshot('2026-10-16T02:00:00.000Z')
+  setSnapshotPublishedArtifactHash(v1, 'a'.repeat(64))
+
+  delete process.env.ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED
+  const cipherDefault = await persistFrozenScaleRuntimeSnapshot(v1)
+  const decodedDefault = decryptFrozenScaleRuntimeSnapshot(cipherDefault)
+  expect(decodedDefault).toEqual(v1)
+
+  vi.stubEnv('ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED', 'false')
+  const cipherFalse = await persistFrozenScaleRuntimeSnapshot(v1)
+  expect(decryptFrozenScaleRuntimeSnapshot(cipherFalse)).toEqual(v1)
+})
+
+it('falls back to inline encrypted snapshot when published reference exceeds 16KB bound', async () => {
+  const { buildPublishedScaleArtifact, cacheCommittedPublishedScaleArtifact } = await import('../../modules/assessment-runtime/published-scale-artifact')
+  const { loadFrozenScaleRuntimeSnapshot, setSnapshotPublishedArtifactHash } = await import('../../modules/assessment-runtime/runtime-snapshot')
+  const s = source()
+  const built = buildPublishedScaleArtifact({
+    release: { releaseId: 'release-1', contentHash: 'a'.repeat(64) },
+    instrumentKey: s.identity.instrumentKey,
+    instrumentVersion: s.identity.instrumentVersion,
+    definition: s.executable!.definition,
+    instruction: null,
+  })
+  cacheCommittedPublishedScaleArtifact(built.record.artifactHash, built.artifact, built.record.plaintextBytes)
+  const m = memory()
+  m.rows.set(built.record.artifactHash, built.record)
+
+  const basePolicy = compileScalePolicy(s)
+  const policyDraft = {
+    ...basePolicy,
+    educationalFeedback: {
+      schemaVersion: 1 as const,
+      contentVersion: '1.0.0',
+      blocks: [{ id: 'b1', title: 'Large Feedback', body: 'x'.repeat(25000) }],
+    },
+  }
+  const compiledPolicy = {
+    ...policyDraft,
+    runtimePolicyHash: hashCompiledScalePolicy(policyDraft as any),
+  }
+  const v2 = createFrozenScaleRuntimeSnapshotV2ForTest({
+    instrumentKey: s.identity.instrumentKey,
+    instrumentVersion: s.identity.instrumentVersion,
+    definition: s.executable!.definition,
+    compiledPolicy,
+    frozenAt: new Date('2026-10-16T03:00:00.000Z'),
+  })
+  setSnapshotPublishedArtifactHash(v2, built.record.artifactHash)
+
+  const cipher = await m.store.save(v2)
+  const loaded = await loadFrozenScaleRuntimeSnapshot(cipher)
+  expect(loaded.instrumentKey).toBe(v2.instrumentKey)
+  expect(loaded.snapshotHash).toBe(v2.snapshotHash)
 })

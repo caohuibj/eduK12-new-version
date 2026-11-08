@@ -11,7 +11,13 @@ import { compositeForbidden } from './composite.errors'
 /** Publication identity retains original IDs and positions. Projection never renumbers definitions. */
 export function buildTrainingVariantUnion(composite: any): WeightedVariantUnion {
   const items = composite.items ?? []
-  const stableKeys = new Map<string,string>(items.filter((i:any)=>i.formDefinition?.itemKey).map((i:any)=>[i.formDefinition.itemKey,i.id]))
+  const formSectionItems = (composite.formSections ?? []).flatMap((s: any) => s.items ?? [])
+  const stableKeys = new Map<string, string>()
+  for (const item of [...items, ...formSectionItems]) {
+    if (item?.formDefinition?.itemKey && item.id) {
+      stableKeys.set(item.formDefinition.itemKey, item.id)
+    }
+  }
   const units = [
     ...items.filter((i:any)=>i.type!=='FORM').map((i:any)=>({ type:'ITEM' as const,id:i.id,position:i.position,
       definitionHash:canonicalHash({id:i.id,type:i.type,position:i.position,required:i.required!==false,

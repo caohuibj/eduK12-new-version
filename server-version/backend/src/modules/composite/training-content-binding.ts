@@ -461,19 +461,28 @@ export async function resolveTrainingScaleArtifacts(db:Prisma.TransactionClient,
   if(snapshot.compositeId!==input.compositeId||(!input.educationComposition&&canonicalHash(snapshot)!==input.snapshotHash))return out
   const refs=new Map<string,string>()
   const units=new Map(snapshot.units.map(unit=>[unit.itemId,unit]))
+  const eligibleUnits=snapshot.units.filter(publishedArtifactEligible)
+  const targetScaleUnits=snapshot.units.filter(unit=>unit.family==='SCALE'&&unit.source.kind==='SCALE')
   if(snapshot.schemaVersion===2){
     for(const unit of snapshot.units)if(unit.artifact)refs.set(unit.itemId,unit.artifact.hash)
+    if(eligibleUnits.some(unit=>!refs.has(unit.itemId)))fail('BINDING_INVALID')
   }
   const needsLegacyLookup=snapshot.schemaVersion===1||snapshot.units.some(unit=>unit.family==='SCALE'&&unit.source.kind==='SCALE'&&!unit.artifact)
   if(needsLegacyLookup&&typeof (db as any).$queryRaw==='function'){
     const rows=await loadLegacyScaleArtifactMap(db,input.compositeId,input.snapshotHash)
-    for(const row of rows.values()){
-      const unit=units.get(row.itemId)
-      if(!unit||unit.family!=='SCALE'||unit.source.kind!=='SCALE'||row.releaseId!==unit.measurement.releaseId||row.contentHash!==unit.measurement.contentHash)fail('BINDING_INVALID')
-      if(!refs.has(row.itemId))refs.set(row.itemId,row.artifact.hash)
+    if(rows.size>0){
+      for(const row of rows.values()){
+        const unit=units.get(row.itemId)
+        if(!unit||unit.family!=='SCALE'||unit.source.kind!=='SCALE'||row.releaseId!==unit.measurement.releaseId||row.contentHash!==unit.measurement.contentHash)fail('BINDING_INVALID')
+        if(!refs.has(row.itemId))refs.set(row.itemId,row.artifact.hash)
+      }
+      if(targetScaleUnits.some(unit=>!refs.has(unit.itemId)))fail('BINDING_INVALID')
     }
   }
-  if(refs.size===0)return out
+  if(refs.size===0){
+    if(snapshot.schemaVersion===2&&eligibleUnits.length>0)fail('BINDING_INVALID')
+    return out
+  }
   let loaded:Map<string,PublishedScaleArtifact>
   try{loaded=await loadPublishedScaleArtifacts(db,[...refs.values()])}catch{fail('BINDING_INVALID')}
   for(const [itemId,hash] of refs){
