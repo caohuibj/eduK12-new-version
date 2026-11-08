@@ -215,6 +215,23 @@ const enqueueBoundReport = async (tx: Prisma.TransactionClient, parent: BoundRep
         throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '报告冻结单元绑定不匹配', 409)
       }
       const flowEnabled = hasTrainingFlow(parent)
+      if (!flowEnabled) {
+        // PR-2: cheap necessary-condition pre-filter before the header scan.
+        // Each satisfied required slot needs a distinct COMPLETED snapshot
+        // (unique on (compositeAttemptId, attemptEpoch, slotKey)), so fewer
+        // COMPLETED rows than required slots proves the aggregate is not
+        // ready yet. Training-flow parents skip this gate: their
+        // completeness is path-dependent, not a static required count.
+        // The full scan below remains the sole authority for finality.
+        const requiredCount = slots.slots.filter((slot) => slot.required).length
+        const completedRows = await tx.$queryRaw<Array<{ count: bigint }>>`
+          SELECT count(*) AS "count" FROM "assessment_unit_snapshots"
+          WHERE "composite_attempt_id" = ${parent.id}
+            AND "attempt_epoch" = ${parent.attemptEpoch}
+            AND "terminal_state" = 'COMPLETED'
+        `
+        if (Number(completedRows[0]?.count ?? 0) < requiredCount) return job.id
+      }
       const headers = acceptedFlow?.snapshots??await tx.assessmentUnitSnapshot.findMany({
         where: { compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch },
         ...(flowEnabled ? {} : { select: { slotKey: true, attemptEpoch: true, unitType: true, terminalState: true,
