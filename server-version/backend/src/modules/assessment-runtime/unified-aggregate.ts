@@ -41,7 +41,7 @@ export type AggregatePathCompletenessPolicy = {
   executedSlotKeys: readonly string[]
 }
 
-const expectedPayloadKind = (slot: FrozenActiveSlotV1): AggregateSnapshotHeader['payloadKind'] => (
+export const expectedPayloadKind = (slot: FrozenActiveSlotV1): AggregateSnapshotHeader['payloadKind'] => (
   slot.unitType === 'FORM_SECTION' ? 'COLLECTION_FACTS' : 'UNIT_RESULT'
 )
 
