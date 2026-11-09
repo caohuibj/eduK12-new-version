@@ -13,7 +13,7 @@ vi.mock('../../modules/assessment-runtime/form-admission.service', () => ({
   ensureCompositeSectionAttempt: (...args: unknown[]) => ensureAttempt(...args),
   activateStoredOrCatalogCompositeFormAdmission: (...args: unknown[]) => activateAdmission(...args),
   loadCompositeFormDefinition: (admission: { definition: unknown }) => admission.definition,
-  readStoredFormAdmission: (row: { admission?: unknown } | null) => row?.admission ?? null,
+  loadStoredFormAdmission: async (row: { admission?: unknown } | null) => row?.admission ?? null,
 }))
 vi.mock('../../modules/assessment-runtime/unified-form-section-final-submit.service', () => ({
   submitUnifiedCompositeFormSectionFinal: (...args: unknown[]) => submitSection(...args),
@@ -40,6 +40,7 @@ const principal = { userId: 'student-1' }
 
 beforeEach(() => {
   vi.clearAllMocks()
+  ;(prisma as any).$queryRaw = vi.fn().mockResolvedValue([{ id: 'job-1' }])
   ;(prisma as any).compositeFormSectionAttempt = { findUnique: vi.fn().mockResolvedValue(null) }
   ;(prisma as any).compositeFormSection = { findUnique: vi.fn(), findMany: vi.fn() }
 })
@@ -90,6 +91,20 @@ describe('whole Form materialization (X-04A)', () => {
       // Whole receipt rides along: snapshot enqueue becomes a read-only fence.
       expect(submitSection.mock.calls[index][3]).toBe(execution)
     }
+  })
+
+  it('fails closed on a lost lease before any preparatory admission write', async () => {
+    ;(prisma as any).$queryRaw = vi.fn().mockResolvedValue([])
+    ;(prisma.compositeFormSection as any).findMany.mockResolvedValue([{ id: 'sec-1', contextSection: false, items: [] }])
+    await expect(materializeWholeFormSections(
+      { attemptId: 'attempt-1', attemptEpoch: 1, contextHash: null },
+      [{ sectionId: 'sec-1', definitionHash, answers: [] }],
+      execution as any,
+      principal,
+    )).rejects.toMatchObject({ message: 'REPORT_PROCESSING_LEASE_LOST' })
+    expect(ensureAttempt).not.toHaveBeenCalled()
+    expect(activateAdmission).not.toHaveBeenCalled()
+    expect(submitSection).not.toHaveBeenCalled()
   })
 
   it('fails closed when the frozen admission identity does not match the delivered section hash', async () => {

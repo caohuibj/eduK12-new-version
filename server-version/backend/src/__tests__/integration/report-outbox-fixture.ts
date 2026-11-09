@@ -4,9 +4,11 @@ import { scaleDefinitionFor } from './mini-scale-definition'
 import { hashScaleDefinition } from '../../modules/scale/scale-definition'
 import { createFrozenScaleRuntimeSnapshot, encryptFrozenScaleRuntimeSnapshot } from '../../modules/assessment-runtime/runtime-snapshot'
 import { encryptFrozenActiveSlotSet } from '../../modules/assessment-runtime/slot-set'
-import { freezeCompositeActiveSlotSet } from '../../modules/assessment-runtime/attempt-runtime'
+import { freezeCompositeActiveSlotSet, formSectionIdentityHash } from '../../modules/assessment-runtime/attempt-runtime'
+import { compositeFormSectionRuntimeDefinition } from '../../modules/composite/composite.service'
 
-export const createReportOutboxFixture = async (db: PrismaClient, units = 1) => {
+export const createReportOutboxFixture = async (db: PrismaClient, units = 1, formSections = 0,
+  options: { contextSection?: boolean } = {}) => {
   const suffix = randomUUID().slice(0, 8)
   const owner = await db.user.create({ data: { username: 'report-owner-' + suffix, passwordHash: 'synthetic-unused', role: 'TEACHER' } })
   const participant = await db.user.create({ data: { username: 'report-participant-' + suffix, passwordHash: 'synthetic-unused', role: 'STUDENT' } })
@@ -26,10 +28,59 @@ export const createReportOutboxFixture = async (db: PrismaClient, units = 1) => 
     const item = await db.compositeAssessmentItem.create({ data: { compositeAssessmentId: composite.id, type: 'SCALE', position: index, required: true, scaleId: scale.id } })
     unitsData.push({ scale, runtime, item, definition })
   }
+  // Linear respondent Form sections (X-04A integration): the whole delivery
+  // hashes these rows with the exact runtime projection the endpoints use, so
+  // the frozen slot identity matches the manifest without fixture-specific
+  // hash arithmetic.
+  const sectionsData = []
+  if (options.contextSection) {
+    // Demographics context section: carries contextKey items and must be
+    // refused by the whole delivery boundary (v3.0 ruling, X-04A review).
+    const section = await db.compositeFormSection.create({ data: {
+      compositeAssessmentId: composite.id, title: 'Context', description: null,
+      position: units, contextSection: true,
+    } })
+    const item = await db.compositeAssessmentItem.create({ data: {
+      compositeAssessmentId: composite.id, type: 'FORM', formSectionId: section.id,
+      formType: 'text_input', formLabel: 'Context field', required: true,
+      position: units * 100, formSectionPosition: 0, contextKey: 'grade',
+    } })
+    const withItems = await db.compositeFormSection.findUniqueOrThrow({
+      where: { id: section.id }, include: { items: true },
+    })
+    sectionsData.push({ section, items: [item], definitionHash: formSectionIdentityHash(compositeFormSectionRuntimeDefinition(withItems)) })
+  }
+  for (let index = 0; index < formSections; index++) {
+    const section = await db.compositeFormSection.create({ data: {
+      compositeAssessmentId: composite.id, title: 'Synthetic form ' + index, description: null,
+      position: units + index, contextSection: false,
+    } })
+    // Form items are CompositeAssessmentItem rows scoped to the section. The
+    // (composite, position) unique key spans ALL items, so form items continue
+    // the composite-level position sequence after the Scale units; in-section
+    // order is carried by formSectionPosition.
+    const requiredItem = await db.compositeAssessmentItem.create({ data: {
+      compositeAssessmentId: composite.id, type: 'FORM', formSectionId: section.id,
+      formType: 'text_input', formLabel: 'Required field', required: true,
+      position: units + index * 2, formSectionPosition: 0,
+    } })
+    const optionalItem = await db.compositeAssessmentItem.create({ data: {
+      compositeAssessmentId: composite.id, type: 'FORM', formSectionId: section.id,
+      formType: 'text_input', formLabel: 'Optional field', required: false,
+      position: units + index * 2 + 1, formSectionPosition: 1,
+    } })
+    const withItems = await db.compositeFormSection.findUniqueOrThrow({
+      where: { id: section.id }, include: { items: true },
+    })
+    const definitionHash = formSectionIdentityHash(compositeFormSectionRuntimeDefinition(withItems))
+    sectionsData.push({ section, items: [requiredItem, optionalItem], definitionHash })
+  }
   const slots = freezeCompositeActiveSlotSet({ attemptEpoch: 1, scales: unitsData.map(unit => ({
     compositeItemId: unit.item.id, code: unit.scale.code, instrumentVersion: unit.scale.instrumentVersion,
     sourceDefinitionHash: unit.runtime.sourceDefinitionHash, compiledRuntimeHash: unit.runtime.compiledRuntime.compiledRuntimeHash,
-  })), cognitive: [], formSections: [] })
+  })), cognitive: [], formSections: sectionsData.map(section => ({
+    sectionId: section.section.id, definitionHash: section.definitionHash,
+  })) })
   const parent = await db.compositeAssessmentAttempt.create({ data: {
     compositeAssessmentId: composite.id, userId: participant.id, participantKey: 'report-principal-' + suffix,
     deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
@@ -48,5 +99,9 @@ export const createReportOutboxFixture = async (db: PrismaClient, units = 1) => 
       answers: unit.definition.items.map(item => ({ itemCode: item.itemCode, responseValue: 'yes' })),
     })
   }
-  return { parent, owner, participant, composite, inputs, scaleIds: unitsData.map(unit => unit.scale.id) }
+  return { parent, owner, participant, composite, inputs, scaleIds: unitsData.map(unit => unit.scale.id),
+    formSections: sectionsData.map(section => ({
+      sectionId: section.section.id, definitionHash: section.definitionHash,
+      requiredItemId: section.items[0]?.id ?? null, optionalItemId: section.items[1]?.id ?? null,
+    })) }
 }

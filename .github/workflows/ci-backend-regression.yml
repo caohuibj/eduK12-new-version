@@ -62,6 +62,8 @@ jobs:
       TRAINING_MATERIAL_ISOLATED_DB: '1'
       # Outbox fixtures require this exact disposable job DB; full suites run serially.
       REPORT_OUTBOX_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      # X-04A mixed Scale+Form whole-submission closure (same disposable DB).
+      WHOLE_FORM_CLOSURE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       # These suites create synthetic data, roll back, or only read
       # within this job's disposable PostgreSQL service.
       SCHOOL_PLAN_GROUP_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public

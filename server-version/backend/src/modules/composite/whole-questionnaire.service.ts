@@ -197,6 +197,14 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
   if (parent.status !== 'IN_PROGRESS') throw failure('问卷已结束')
   const rawSections = [...(parent.compositeAssessment.formSections || [])]
   rawSections.sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
+  // Server-side boundary for the context exclusion (X-04A review): the DTO's
+  // executionMode=STEPPED alone cannot constrain direct API callers, so whole
+  // delivery refuses context-bearing composites exactly like the eligibility
+  // contract does. Their frozen context hash feeds downstream admission and
+  // dynamic item projection and must commit through the stepped flow.
+  if (rawSections.some((sec: any) => compositeSectionHasContext(sec))) {
+    throw failure('含人口学上下文区段的问卷暂不支持整份交卷')
+  }
   const formSections = rawSections.map((sec: any) => {
     const runtimeDef = compositeFormSectionRuntimeDefinition(sec)
     const definitionHash = formSectionIdentityHash(runtimeDef)
