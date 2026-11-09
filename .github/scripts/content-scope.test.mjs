@@ -778,6 +778,13 @@ test('Cognitive mixed with image inputs selects full route and gate recomputes i
     assert.deepEqual(recheckCognitiveIntake(needs,{base,head,cwd:dir}),[]);
     assert(recheckCognitiveIntake({...needs,backend:{result:'failure'}},{base,head,cwd:dir}).includes('backend'));
     assert(recheckCognitiveIntake({...needs,scope:{...needs.scope,outputs:{...needs.scope.outputs,frontend:'true'}}},{base,head,cwd:dir}).includes('recomputed-cognitive-product-scope'));
+    const draftNeeds={scope:structuredClone(needs.scope),'backend-regression-reuse':structuredClone(needs['backend-regression-reuse'])};
+    for(const name of requiredChecks(draftNeeds,true))draftNeeds[name]={...draftNeeds[name],result:'success'};
+    assert.deepEqual(recheckCognitiveIntake(draftNeeds,{base,head,cwd:dir,draft:true}),[]);
+    for(const name of requiredChecks(draftNeeds,true))for(const result of ['failure','skipped','cancelled',undefined])
+      assert(recheckCognitiveIntake({...draftNeeds,[name]:{...draftNeeds[name],result}},{base,head,cwd:dir,draft:true}).includes(name),`${name}: ${result}`);
+    assert(recheckCognitiveIntake(draftNeeds,{base,head,cwd:dir,draft:false}).includes('backend'));
+    assert(recheckCognitiveIntake({...draftNeeds,scope:{...draftNeeds.scope,outputs:{...draftNeeds.scope.outputs,frontend:'true'}}},{base,head,cwd:dir,draft:true}).includes('recomputed-cognitive-product-scope'));
   } finally {rmSync(dir,{recursive:true,force:true});}
 });
 
