@@ -19,10 +19,42 @@ async function admitCompositeSlot(db: Tx, userId: string, assignmentId: string, 
   const parent = await db.compositeAssessmentAttempt.findUnique({ where: { id: scope.compositeAttemptId }, include: { compositeAssessment: true } })
   if (!parent) throw CONFLICT('组合认知任务的作答记录不存在')
   const composite = parent?.compositeAssessment
-  if (!composite || !['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE', 'LEGACY_COMPOSITE'].includes(composite.productKind)
-    || parent.assignmentRef && !readVerifiedEducationAttempt(proof,db,parent.id,userId)) throw CONFLICT('组合认知任务需要有效的父作答准入')
-  if (parent.assignmentRef) readVerifiedCompositionAttempt(proof,db,parent.id,userId,{compositeId:composite.id,assignmentRef:parent.assignmentRef})
-  if (!parent || parent.userId !== userId || parent.subjectUserId && parent.subjectUserId !== userId
+  if (!composite) throw CONFLICT('组合认知任务需要有效的父作答准入')
+  const educationProduct = parent.assignmentRef
+    ? readVerifiedEducationAttempt(proof, db, parent.id, userId)
+    : undefined
+  // Legacy relational bundle STARTs carry a server-created assignmentRef from
+  // createRelationalAssessmentService rather than the newer education START
+  // proof. Verify that persisted binding in this same transaction; never
+  // accept a caller-provided assignmentRef or an unbound organization task.
+  let verifiedRelationalBundle = false
+  if (parent.assignmentRef && !educationProduct && composite?.productKind === 'ASSESSMENT_BUNDLE') {
+    const assignment = await db.relationalAssessmentAssignment.findUnique({ where: { id: parent.assignmentRef } })
+    const respondentType = assignment?.respondentRole === 'PARENT' ? 'PARENT'
+      : assignment?.respondentRole === 'TEACHER' ? 'TEACHER'
+        : assignment?.relationshipKind === 'SELF' ? 'SELF' : null
+    verifiedRelationalBundle = Boolean(assignment
+      && assignment.status === 'STARTED'
+      && assignment.resourceKind === 'BUNDLE'
+      && assignment.resourceKey === composite.id
+      && assignment.episodeId === parent.episodeId
+      && assignment.subjectUserId === parent.subjectUserId
+      && assignment.respondentUserId === userId
+      && parent.userId === userId
+      && parent.respondentUserId === userId
+      && parent.respondentType === respondentType)
+  }
+  const supportedProduct = Boolean(
+    ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE', 'LEGACY_COMPOSITE'].includes(composite.productKind)
+    || composite.productKind === 'ORGANIZATION_RESOURCE' && educationProduct
+  )
+  if (!supportedProduct || parent.assignmentRef && !educationProduct && !verifiedRelationalBundle) {
+    throw CONFLICT('组合认知任务需要有效的父作答准入')
+  }
+  if (parent.assignmentRef && educationProduct) {
+    readVerifiedCompositionAttempt(proof, db, parent.id, userId, { compositeId: composite.id, assignmentRef: parent.assignmentRef })
+  }
+  if (parent.userId !== userId || parent.subjectUserId && parent.subjectUserId !== userId && !educationProduct && !verifiedRelationalBundle
     || parent.respondentUserId && parent.respondentUserId !== userId || parent.status !== 'IN_PROGRESS'
     || parent.deliveryMode !== 'FINAL_ONLY' || parent.runtimeGeneration !== 'UNIFIED_V1'
     || !Number.isSafeInteger(parent.attemptEpoch) || parent.attemptEpoch < 1) throw CONFLICT('组合认知任务的作答范围不匹配')

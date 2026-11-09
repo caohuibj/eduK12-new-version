@@ -11,6 +11,7 @@ let parent: ReturnType<typeof makeParent>
 const db = {
   course: { findUnique: vi.fn() }, cognitiveAssignment: { findUnique: vi.fn() },
   compositeAssessmentAttempt: { findUnique: vi.fn(), count: vi.fn() }, compositeAssessmentItem: { findUnique: vi.fn() },
+  relationalAssessmentAssignment: { findUnique: vi.fn() },
   cognitiveSession: { count: vi.fn(), findFirst: vi.fn() }, $queryRawUnsafe: vi.fn(),
 }
 const tx = db as any
@@ -34,6 +35,27 @@ describe('Training participation quotas belong to the delivery task', () => {
     expect(db.compositeAssessmentAttempt.count).toHaveBeenCalledWith({where:{compositeAssessmentId:'bundle',userId:'student',assignmentRef:'run-assignment'}})
     await expect(admitCognitiveAttempt(tx,'student','task',scope,{...proof})).rejects.toThrow('EDUCATION_START_CONTEXT_MISMATCH')
     await expect(admitCognitiveAttempt(tx,'student','task',scope)).rejects.toMatchObject({statusCode:409})
+  })
+  it.each(['SCHOOL','TEACHER'] as const)('%s registered Runs may use a verified organization resource', async product => {
+    const bound = { ...makeParent(), compositeAssessment: { ...composite, productKind: 'ORGANIZATION_RESOURCE' }, subjectUserId: 'student', respondentUserId: 'student', assignmentRef: 'run-assignment' }
+    db.compositeAssessmentAttempt.findUnique.mockResolvedValue(bound)
+    const start = issueVerifiedEducationStart({ tx, product, compositeId: 'bundle', subjectUserId: 'student', respondentUserId: 'student', assignmentRef: 'run-assignment' })
+    const proof = bindVerifiedEducationAttempt(start, tx, bound)
+    await expect(admitCognitiveAttempt(tx, 'student', 'task', scope, proof)).resolves.toBeUndefined()
+  })
+  it('verifies a legacy relational BUNDLE parent from its persisted assignment binding', async () => {
+    const bound = { ...makeParent(), subjectUserId: 'child', respondentUserId: 'student', respondentType: 'PARENT', episodeId: 'episode', assignmentRef: 'relational-assignment' }
+    db.compositeAssessmentAttempt.findUnique.mockResolvedValue(bound)
+    db.relationalAssessmentAssignment.findUnique.mockResolvedValue({
+      status: 'STARTED', resourceKind: 'BUNDLE', resourceKey: 'bundle', episodeId: 'episode',
+      subjectUserId: 'child', respondentUserId: 'student', respondentRole: 'PARENT', relationshipKind: 'PARENT_CHILD',
+    })
+    await expect(admitCognitiveAttempt(tx, 'student', 'task', scope)).resolves.toBeUndefined()
+    db.relationalAssessmentAssignment.findUnique.mockResolvedValue({
+      status: 'STARTED', resourceKind: 'BUNDLE', resourceKey: 'other-bundle', episodeId: 'episode',
+      subjectUserId: 'child', respondentUserId: 'student', respondentRole: 'PARENT', relationshipKind: 'PARENT_CHILD',
+    })
+    await expect(admitCognitiveAttempt(tx, 'student', 'task', scope)).rejects.toMatchObject({ statusCode: 409 })
   })
   it('counts and resumes standalone aliases without including any composite sessions', async () => {
     db.cognitiveSession.count.mockResolvedValue(1)
