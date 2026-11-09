@@ -356,10 +356,18 @@ export const submitUnifiedCompositeFormSectionFinal = async (
   // The unified path owns the context write. Bind observer demographics to the
   // persisted child identity before hashing, just as the legacy context writer
   // already does; never infer the subject from the adult principal or request.
-  const contextSubject = mappedSection.contextSection && !admission.contextSnapshotHash
-    ? await prisma.compositeAssessmentAttempt.findUnique({ where: { id: input.attemptId }, select: { subjectUserId: true } }) : null
+  // Reuse the already-loaded parent when UNIT routing selected subjectUserId;
+  // a narrow internal projection still resolves it from this attempt.
+  let contextSubjectUserId: string | null | undefined
+  if (mappedSection.contextSection && !admission.contextSnapshotHash) {
+    contextSubjectUserId = (parent as { subjectUserId?: string | null }).subjectUserId
+    if (contextSubjectUserId === undefined) {
+      const row = await prisma.compositeAssessmentAttempt.findUnique({ where: { id: input.attemptId }, select: { subjectUserId: true } })
+      contextSubjectUserId = row?.subjectUserId ?? null
+    }
+  }
   const context = mappedSection.contextSection && !admission.contextSnapshotHash
-    ? contextForEntries(normalized.normalized as NormalizedSectionEntry[], compositeContextItems(mappedSection), contextSubject?.subjectUserId)
+    ? contextForEntries(normalized.normalized as NormalizedSectionEntry[], compositeContextItems(mappedSection), contextSubjectUserId)
     : null
   const factsEncrypted = encryptUnifiedRuntimePayload(formFactsFor(mappedSection.id, normalized.normalized as NormalizedSectionEntry[]))
   const slotKey = admission.parent?.slotKey ?? formSectionSlotKey(mappedSection.id)

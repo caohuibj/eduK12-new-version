@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import {assertTrainingReferenceReadyForMeasurement} from './training-reference-admission'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
@@ -16,6 +17,21 @@ export {
   TRAINING_VARIANT_PARENT_MARKER_SELECT,
   trainingVariantMarkerState,
 } from './training-variant-markers'
+
+/** Parent projection shared by UNIT FINAL routing and admission. Callers that
+ * already loaded this row skip the later loadTrainingChildAdmissionParent read. */
+export const TRAINING_CHILD_ADMISSION_PARENT_SELECT = {
+  ...TRAINING_VARIANT_PARENT_MARKER_SELECT,
+  userId: true, recoveryTokenHash: true, assignmentRef: true, trainingTimingSnapshot: true,
+  runtimeGeneration: true, deliveryMode: true, attemptEpoch: true, subjectUserId: true,
+  contextSnapshotEncrypted: true, contextSnapshotHash: true,
+  frozenActiveSlotSetEncrypted: true, frozenActiveSlotSetHash: true,
+  compositeAssessment: { select: {
+    ...TRAINING_VARIANT_DEFINITION_MARKER_SELECT,
+    productKind: true, reportPackageKey: true, analysisProtocolKey: true, creationKey: true,
+    formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } },
+  } },
+} as const satisfies Prisma.CompositeAssessmentAttemptSelect
 
 const requireKnownMarkers = (parent: any): void => {
   if (trainingVariantMarkerState(parent) === 'UNKNOWN') {
@@ -162,18 +178,7 @@ export const loadTrainingChildAdmissionParent = async (attemptId: string, parent
     && Array.isArray(parent.compositeAssessment?.formSections)) return parent
   const loaded = await db.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
-    select: {
-      ...TRAINING_VARIANT_PARENT_MARKER_SELECT,
-      userId: true, recoveryTokenHash: true, assignmentRef: true, trainingTimingSnapshot: true,
-      runtimeGeneration: true, deliveryMode: true, attemptEpoch: true,
-      contextSnapshotEncrypted: true, contextSnapshotHash: true,
-      frozenActiveSlotSetEncrypted: true, frozenActiveSlotSetHash: true,
-      compositeAssessment: { select: {
-        ...TRAINING_VARIANT_DEFINITION_MARKER_SELECT,
-        productKind: true, reportPackageKey: true, analysisProtocolKey: true,
-        formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } },
-      } },
-    },
+    select: TRAINING_CHILD_ADMISSION_PARENT_SELECT,
   })
   if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
   requireKnownMarkers(loaded)

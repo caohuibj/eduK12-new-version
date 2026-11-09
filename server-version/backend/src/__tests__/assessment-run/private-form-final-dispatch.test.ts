@@ -32,4 +32,11 @@ describe('Private Form FINAL dispatch does not treat missing product projection 
   await expect(submitUnifiedCompositeFormSectionFinal(input)).rejects.toBe(reached)
   expect(m.read).not.toHaveBeenCalled();expect(m.section).not.toHaveBeenCalled();expect(m.child).toHaveBeenCalledOnce()
  })
+ it('does not treat a projected productKind as missing when UNIT routing already loaded it',async()=>{
+  m.parent.compositeAssessment.productKind='ORGANIZATION_RESOURCE'
+  const error=Object.assign(new Error('Unknown section'),{code:'PRIVATE_FORM_SECTION_NOT_FOUND',statusCode:404})
+  m.section.mockRejectedValue(error)
+  await expect(submitUnifiedCompositeFormSectionFinal(input)).rejects.toBe(error)
+  expect(m.read).not.toHaveBeenCalled();expect(m.section).toHaveBeenCalledWith(id,sectionId);expect(m.child).not.toHaveBeenCalled()
+ })
 })
