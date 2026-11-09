@@ -73,14 +73,23 @@ describe('Flanker publish-prep UX', () => {
     expect(Array.from(arrows).every((arrow) => arrow.className === '')).toBe(true)
 
     fireEvent.click(screen.getByRole('button', { name: '← 左' }))
+    expect(screen.getByRole('status', { name: '练习解析：正确' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '继续下一题' }))
     fireEvent.click(screen.getByRole('button', { name: '← 左' }))
+    const review = screen.getByRole('alert', { name: '练习解析：错误' })
+    expect(review).toHaveTextContent('正确做法右')
+    expect(review).toHaveTextContent('你的操作左')
+    fireEvent.click(screen.getByRole('button', { name: '继续下一题' }))
     expect(screen.getByText('上一题：不正确，正确答案是「右」')).toBeInTheDocument()
   })
 
-  it('advances exactly one practice item for one keyboard response', () => {
+  it('keeps feedback until explicit continue, then advances exactly one practice item', () => {
     render(<FlankerTask taskContext={baseContext} trialIndex={0} onTrialComplete={vi.fn()} />)
     fireEvent.click(screen.getByText('开始练习'))
     fireEvent.keyDown(window, { key: 'ArrowLeft' })
+    expect(screen.getByRole('status', { name: '练习解析：正确' })).toBeInTheDocument()
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '1')
+    fireEvent.click(screen.getByRole('button', { name: '继续下一题' }))
     expect(screen.getByText('练习 2 / 4')).toBeInTheDocument()
   })
 

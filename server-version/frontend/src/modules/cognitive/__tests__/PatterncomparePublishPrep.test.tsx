@@ -69,8 +69,12 @@ describe('Pattern Comparison publish-prep UX', () => {
     expect(stimuli.every((node) => node.tagName.toLowerCase() === 'svg')).toBe(true)
 
     fireEvent.click(screen.getByRole('button', { name: '相同' }))
+    expect(screen.getByRole('status', { name: '练习解析：正确' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '继续下一题' }))
     fireEvent.click(screen.getByRole('button', { name: '相同' }))
-    expect(screen.getByText('上一题：不正确，正确答案是「不同」')).toBeInTheDocument()
+    const review = screen.getByRole('alert', { name: '练习解析：错误' })
+    expect(review).toHaveTextContent('正确做法不同')
+    expect(review).toHaveTextContent('你的操作相同')
   })
 
   it('does not create an artificial timed-out trial when the total deadline has no valid response window left', async () => {
@@ -90,8 +94,9 @@ describe('Pattern Comparison publish-prep UX', () => {
       />,
     )
     fireEvent.click(screen.getByText('开始练习'))
-    for (const response of ['相同', '不同', '相同', '不同']) {
+    for (const [index, response] of ['相同', '不同', '相同', '不同'].entries()) {
       fireEvent.click(screen.getByRole('button', { name: response }))
+      fireEvent.click(screen.getByRole('button', { name: index === 3 ? '查看练习结果' : '继续下一题' }))
     }
     fireEvent.click(screen.getByText('开始正式测验'))
     await act(async () => {})

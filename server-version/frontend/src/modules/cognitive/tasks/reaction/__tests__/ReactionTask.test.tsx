@@ -89,8 +89,10 @@ function pointerRespond() {
 describe('deterministicForeperiod (§29 seeded foreperiod)', () => {
   it('keeps the formal trial count visible in the full-screen stage', async () => {
     await enterFormal(undefined, 4)
-    expect(screen.getByText('5 / 20')).toBeVisible()
-    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuemax', '20')
+    const progress = screen.getByRole('progressbar')
+    expect(progress.parentElement).toHaveTextContent('4 / 20')
+    expect(progress).toHaveAttribute('aria-valuenow', '4')
+    expect(progress).toHaveAttribute('aria-valuemax', '20')
   })
   it('is deterministic per (seed, trialIndex) and within range', () => {
     const a = deterministicForeperiod('seed-123', 0, 700, 1500)
@@ -144,7 +146,9 @@ describe('ReactionTask — instruction & practice', () => {
 
   it('enters formal after 3 practice trials', async () => {
     await enterFormal()
-    expect(screen.getByText('1 / 20')).toBeTruthy()
+    const progress = screen.getByRole('progressbar')
+    expect(progress.parentElement).toHaveTextContent('0 / 20')
+    expect(progress).toHaveAttribute('aria-valuenow', '0')
   })
 })
 

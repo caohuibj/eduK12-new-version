@@ -200,6 +200,7 @@ describe('FE-07B direct input timestamps', () => {
         fireEvent(practiceRoot, event)
       }
       act(() => vi.advanceTimersByTime(500 + 600))
+      fireEvent.click(screen.getByRole('button', { name: index === 3 ? '查看练习结果' : '继续下一题' }))
     }
 
     const startFormal = screen.getByText('开始正式测验')

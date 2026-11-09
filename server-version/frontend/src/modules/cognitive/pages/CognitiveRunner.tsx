@@ -48,6 +48,7 @@ type CognitiveRunnerTaskHostProps = {
   title: string
   runner: React.ComponentType<CognitiveTaskProps>
   runnerProps: CognitiveTaskProps
+  taskIdentity: { testType: string; engineVersion: string }
   initial: boolean
   hostOwnsInitialAction: boolean
   startDisabled: boolean
@@ -74,6 +75,7 @@ const CognitiveRunnerTaskHost: React.FC<CognitiveRunnerTaskHostProps> = ({
   title,
   runner: Runner,
   runnerProps,
+  taskIdentity,
   initial,
   hostOwnsInitialAction,
   startDisabled,
@@ -94,8 +96,8 @@ const CognitiveRunnerTaskHost: React.FC<CognitiveRunnerTaskHostProps> = ({
     onInitialAction: initial && !hostOwnsInitialAction ? onStart : undefined,
     disabled: initial && startDisabled,
     hideIntroTitle: true,
-    taskIdentity: { testType: runnerProps.taskContext.testType, engineVersion: runnerProps.taskContext.engineVersion },
-  }), [initial, hostOwnsInitialAction, onStart, startDisabled, runnerProps.taskContext.testType, runnerProps.taskContext.engineVersion])
+    taskIdentity,
+  }), [initial, hostOwnsInitialAction, onStart, startDisabled, taskIdentity.testType, taskIdentity.engineVersion])
   const progressContext = React.useMemo(() => focusProgress, [focusProgress.completed, focusProgress.total])
   const shellActions = initial && hostOwnsInitialAction ? (
     <div className="text-center">
@@ -495,6 +497,7 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
         title={title}
         runner={resolvedEntry!.RunnerComponent}
         runnerProps={runnerProps}
+        taskIdentity={{ testType: state.session!.testType, engineVersion: state.session!.engineVersion }}
         initial
         hostOwnsInitialAction={hostOwnsInitialAction}
         startDisabled={!mediaReady || !runnerCode.ready}
@@ -613,6 +616,7 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
         title={entry.name}
         runner={Runner}
         runnerProps={runnerProps}
+        taskIdentity={{ testType: state.session!.testType, engineVersion: state.session!.engineVersion }}
         initial={false}
         hostOwnsInitialAction={false}
         startDisabled
