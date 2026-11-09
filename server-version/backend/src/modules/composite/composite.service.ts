@@ -2792,11 +2792,20 @@ type ScaleFreezeMemoEntry = {
   frozenScale: Awaited<ReturnType<typeof freezeScaleRuntimeAtAttemptStart>>
   encryptedSnapshot: string
 }
-const scaleFreezeCache = new Map<string, ScaleFreezeMemoEntry>()
-const MAX_SCALE_FREEZE_CACHE = 512
+/** Per-START-transaction memo for frozen scale runtimes. Scoped to a single
+ * START so live admission (reference bindings, deployment policy, operational
+ * pause) is re-validated on every attempt: a memo entry never survives its
+ * transaction, so a rolled-back transaction leaves no dangling shared
+ * Artifact reference behind, and an admin pausing a scale or deactivating a
+ * reference set takes effect on the very next START. Within one START the
+ * same scale (e.g. hse_msit x8) is still frozen only once. */
+export type ScaleFreezeMemo = Map<string, ScaleFreezeMemoEntry>
+export const createScaleFreezeMemo = (): ScaleFreezeMemo => new Map()
 
 export const clearScaleFreezeCacheForTest = () => {
-  scaleFreezeCache.clear()
+  // No process-level scale freeze cache remains; per-START memos are
+  // discarded with their transaction. Kept so existing cleanup hooks keep
+  // compiling.
 }
 
 const scaleFreezeCacheKey = (item: any): string => {
@@ -2813,7 +2822,7 @@ const getEmptyScaleAnswersCiphertext = (): string => {
   return cachedEmptyScaleAnswersCiphertext
 }
 
-const createChildRecords = async (db: Db, attempt: any, composite: {productKind:string}, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>, prepared?: PreparedVariantRuntimes, verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization,educationProduct?:'SCHOOL'|'TEACHER',educationAttempt?:VerifiedEducationAttempt) => {
+const createChildRecords = async (db: Db, attempt: any, composite: {productKind:string}, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>, prepared?: PreparedVariantRuntimes, verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization,educationProduct?:'SCHOOL'|'TEACHER',educationAttempt?:VerifiedEducationAttempt,scaleFreezeMemo?: ScaleFreezeMemo) => {
   // Prisma create/findUnique parent rows contain scalar fields only. Product
   // policy comes from the caller's already-loaded server-owned composite.
   // A composition may reference several sources in different orders. Always
@@ -2851,7 +2860,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
         if (!item.required) continue
         if (item.type === 'SCALE') {
           const key = scaleFreezeCacheKey(item)
-          const memo = scaleFreezeCache.get(key)
+          const memo = scaleFreezeMemo?.get(key)
           let frozenScale = attempt.runtimeGeneration === 'UNIFIED_V1'
             ? prepared?.scales.get(item.id) ?? memo?.frozenScale ?? null
             : null
@@ -2860,18 +2869,10 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
           if (attempt.runtimeGeneration === 'UNIFIED_V1' && !frozenScale) {
             frozenScale = await freezeScaleRuntimeAtAttemptStart(db, compositeScaleFreezeInput(item))
             encryptedSnapshot = await persistFrozenScaleRuntimeSnapshot(frozenScale, db)
-            if (scaleFreezeCache.size >= MAX_SCALE_FREEZE_CACHE) {
-              const oldest = scaleFreezeCache.keys().next().value
-              if (oldest) scaleFreezeCache.delete(oldest)
-            }
-            scaleFreezeCache.set(key, { frozenScale, encryptedSnapshot })
+            scaleFreezeMemo?.set(key, { frozenScale, encryptedSnapshot })
           } else if (frozenScale && !encryptedSnapshot) {
             encryptedSnapshot = await persistFrozenScaleRuntimeSnapshot(frozenScale, db)
-            if (scaleFreezeCache.size >= MAX_SCALE_FREEZE_CACHE) {
-              const oldest = scaleFreezeCache.keys().next().value
-              if (oldest) scaleFreezeCache.delete(oldest)
-            }
-            scaleFreezeCache.set(key, { frozenScale, encryptedSnapshot })
+            scaleFreezeMemo?.set(key, { frozenScale, encryptedSnapshot })
           }
           if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
           // Parent START (createAttempt) already admitted every child Scale in this
@@ -3125,6 +3126,7 @@ const isOrdinaryQuestionnaireStart = (
 const precomputeScaleOnlyActiveSlotSet = async (db: Db, input: {
   finalOnly: boolean; flowEnabled: boolean; composite: any; attemptEpoch: number;
   contentCandidate: any; prepared?: PreparedVariantRuntimes; formSections: any[];
+  scaleFreezeMemo?: ScaleFreezeMemo;
 }) => {
   if (!input.finalOnly || input.flowEnabled
     || !input.composite.items.some((item: any) => item.required && item.type === 'SCALE')) {
@@ -3133,21 +3135,17 @@ const precomputeScaleOnlyActiveSlotSet = async (db: Db, input: {
   for (const item of input.composite.items) {
     if (!item.required || item.type !== 'SCALE') continue
     const key = scaleFreezeCacheKey(item)
-    if (!input.prepared?.scales.get(item.id) && !publishedScaleArtifactByItem.get(item) && !scaleFreezeCache.has(key)) {
+    if (!input.prepared?.scales.get(item.id) && !publishedScaleArtifactByItem.get(item) && !input.scaleFreezeMemo?.has(key)) {
       try {
         const frozen = await freezeScaleRuntimeAtAttemptStart(db, compositeScaleFreezeInput(item))
         const encrypted = await persistFrozenScaleRuntimeSnapshot(frozen, db)
-        if (scaleFreezeCache.size >= MAX_SCALE_FREEZE_CACHE) {
-          const oldest = scaleFreezeCache.keys().next().value
-          if (oldest) scaleFreezeCache.delete(oldest)
-        }
-        scaleFreezeCache.set(key, { frozenScale: frozen, encryptedSnapshot: encrypted })
+        input.scaleFreezeMemo?.set(key, { frozenScale: frozen, encryptedSnapshot: encrypted })
       } catch {
         return null
       }
     }
   }
-  if (!input.composite.items.every((item: any) => !item.required || item.type === 'FORM' || (item.type === 'SCALE' && Boolean(input.prepared?.scales.get(item.id) ?? publishedScaleArtifactByItem.get(item) ?? scaleFreezeCache.get(scaleFreezeCacheKey(item))?.frozenScale)))) {
+  if (!input.composite.items.every((item: any) => !item.required || item.type === 'FORM' || (item.type === 'SCALE' && Boolean(input.prepared?.scales.get(item.id) ?? publishedScaleArtifactByItem.get(item) ?? input.scaleFreezeMemo?.get(scaleFreezeCacheKey(item))?.frozenScale)))) {
     return null
   }
   const slotSet = freezeCompositeActiveSlotSet({
@@ -3155,7 +3153,7 @@ const precomputeScaleOnlyActiveSlotSet = async (db: Db, input: {
     unitOrder: input.contentCandidate && 'educationUnitOrder' in input.contentCandidate ? input.contentCandidate.educationUnitOrder : undefined,
     unitPresentation: input.contentCandidate && 'educationUnitPresentation' in input.contentCandidate ? input.contentCandidate.educationUnitPresentation : undefined,
     scales: input.composite.items.filter((item: any) => item.required && item.type === 'SCALE').map((item: any) => {
-      const source = (input.prepared?.scales.get(item.id) ?? publishedScaleArtifactByItem.get(item) ?? scaleFreezeCache.get(scaleFreezeCacheKey(item))?.frozenScale)!
+      const source = (input.prepared?.scales.get(item.id) ?? publishedScaleArtifactByItem.get(item) ?? input.scaleFreezeMemo?.get(scaleFreezeCacheKey(item))?.frozenScale)!
       return { compositeItemId: item.id, code: item.scale.code, instrumentVersion: item.scale.instrumentVersion, sourceDefinitionHash: source.sourceDefinitionHash, compiledRuntimeHash: source.compiledRuntime.compiledRuntimeHash }
     }),
     cognitive: [], situational: [],
@@ -3511,7 +3509,11 @@ const createAttempt = async (
   }
   const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
     units:contentCandidate.binding.units.filter(unit=>selectedContentItems.has(unit.itemId))}:null
-  const precomputedActiveSlotSet = await precomputeScaleOnlyActiveSlotSet(db, { finalOnly, flowEnabled, composite, attemptEpoch, contentCandidate, prepared, formSections })
+  // Per-START freeze memo: shared by the precompute and the child build
+  // inside this one transaction only. Each START re-validates live scale
+  // admission; nothing here survives to the next attempt.
+  const scaleFreezeMemo = createScaleFreezeMemo()
+  const precomputedActiveSlotSet = await precomputeScaleOnlyActiveSlotSet(db, { finalOnly, flowEnabled, composite, attemptEpoch, contentCandidate, prepared, formSections, scaleFreezeMemo })
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
       id: newAttemptId,
@@ -3577,7 +3579,7 @@ const createAttempt = async (
   // schemaVersion !== 2); ordinary questionnaires have no flow.
   const materialAssignment = isOrdinaryQuestionnaire ? null : await allocateTrainingMaterial(db,attempt,composite,restartMaterialClaimId)
   const flowCandidate = flowEnabled ? await freezeTrainingFlowCandidates(db,attempt,composite,prepared!,situationalReleases) : null
-  const runtime = flowCandidate?.runtime ?? await createChildRecords(db, attempt, composite, composite.items, userId, formSections, situationalReleases, prepared,undefined,educationProduct,educationStart?bindVerifiedEducationAttempt(educationStart,db,attempt):undefined)
+  const runtime = flowCandidate?.runtime ?? await createChildRecords(db, attempt, composite, composite.items, userId, formSections, situationalReleases, prepared,undefined,educationProduct,educationStart?bindVerifiedEducationAttempt(educationStart,db,attempt):undefined,scaleFreezeMemo)
   if (finalOnly && !precomputedActiveSlotSet) {
     const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
       attemptEpoch,

@@ -224,7 +224,17 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
   const { parent, children, frozen } = await loadParent(attemptId, principal)
   if (parent.status !== 'IN_PROGRESS') throw failure('问卷已结束')
 
-  let template = staticQuestionnaireTemplateCache.get(parent.frozenActiveSlotSetHash!)
+  // The SlotSet hash binds the frozen runtime, but the template also carries
+  // scaleName / scale.instruction from the live scale row, which the SlotSet
+  // hash does not cover. Include them in the key so an in-place scale rename
+  // or instruction edit invalidates the cached display template instead of
+  // serving the previous wording.
+  const displayKey = children
+    .map(({ child }: any) => [child.compositeItemId, child.scale.id, child.scale.name ?? '', child.scale.instruction ?? ''].join('\u0000'))
+    .sort()
+    .join('\u0001')
+  const templateCacheKey = `${parent.frozenActiveSlotSetHash!}\u0002${displayKey}`
+  let template = staticQuestionnaireTemplateCache.get(templateCacheKey)
   if (!template) {
     const rawSections = [...(parent.compositeAssessment.formSections || [])]
     rawSections.sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
@@ -304,7 +314,7 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
       const oldest = staticQuestionnaireTemplateCache.keys().next().value
       if (oldest) staticQuestionnaireTemplateCache.delete(oldest)
     }
-    staticQuestionnaireTemplateCache.set(parent.frozenActiveSlotSetHash!, template)
+    staticQuestionnaireTemplateCache.set(templateCacheKey, template)
   }
 
   const manifest: WholeValidationManifest = {

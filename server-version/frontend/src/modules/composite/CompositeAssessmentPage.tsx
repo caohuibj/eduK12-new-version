@@ -603,9 +603,8 @@ const CompositeAssessmentContent: React.FC = () => {
       />
     )
     if (shouldUseWholeRunner(state, relationalMode)) {
-      const inlineDef = inlineWholeDefinitionRef.current?.identity.attemptId === state.id ? inlineWholeDefinitionRef.current.definition : null
       return <>{anonymousRecovery}<WholeCompositeQuestionnaire state={state} api={api} publicMode={publicMode} recoveryToken={recoveryToken}
-        isFreshStart={isFreshStart} inlineWholeDefinition={inlineDef} fallback={unitAssessment} onExit={() => void saveAndExit()} onCompleted={() => goReport(state.id)} /></>
+        isFreshStart={isFreshStart} fallback={unitAssessment} onExit={() => void saveAndExit()} onCompleted={() => goReport(state.id)} /></>
     }
     return <>{anonymousRecovery}{unitAssessment}</>
   }
