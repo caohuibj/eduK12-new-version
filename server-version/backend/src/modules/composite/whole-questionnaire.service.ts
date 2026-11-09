@@ -18,7 +18,7 @@ import { loadFrozenActiveSlotSet, formSectionSlotKey } from '../assessment-runti
 import { encryptUnifiedRuntimePayload, decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { admitWholeReceiptStorage, recordWholeReceiptStored, detachedWholeReceiptsEnabled } from '../assessment-runtime/whole-receipt-storage'
 import { REPORT_PARENT_SELECT, storeWholeQuestionnaireValidation, registerWholeQuestionnaireReceipt, type WholeQuestionnaireReceipt, assertReportJobIdentity } from '../assessment-runtime/report-outbox.service'
-import { UNIFIED_SCALE_CHILD_ADMISSION_SELECT, ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime } from '../scale/scale-admission.service'
+import { UNIFIED_SCALE_CHILD_ADMISSION_SELECT, ensureScaleAdmissionAtDelivery, batchEnsureScaleAdmissionsAtDelivery, loadScaleAdmissionRuntime } from '../scale/scale-admission.service'
 import { assertUnifiedScaleDelivery, submitUnifiedScaleAssessmentFinal, submitUnifiedScaleCollectionBatch } from '../scale/unified-final-submit.service'
 import { preloadFrozenReferenceDb } from '../assessment-runtime/reference-binding'
 import { runnerDefinition } from '../scale/scale-definition'
@@ -68,6 +68,7 @@ const wholeParentSelect = {
   trainingTimingSnapshot: true, participantKey: true, trainingVariantAllocationEncrypted: true, trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
   contextSnapshotEncrypted: true, frozenActiveSlotSetEncrypted: true,
   compositeAssessment: { select: { id: true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
+    creationKey: true,
     publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,
     items: true, formSections: { include: {items: true} } } },
   scaleAssessments: { select: { ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
@@ -249,9 +250,11 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
     } : {}),
   }
   const units: any[] = []
+  const admissions = await batchEnsureScaleAdmissionsAtDelivery(parent, children)
   for (const { child, runtime } of children) {
     if (child.status !== 'IN_PROGRESS') throw failure('已分量表交卷，不能改为整份交卷')
-    const admission = await ensureScaleAdmissionAtDelivery(child.id, parent, child)
+    const admission = admissions.get(child.id)
+    if (!admission) throw failure('量表准入初始化失败')
     await assertUnifiedScaleDelivery({ assessmentId: child.id, compositeAttemptId: attemptId, submissionId: 'whole-delivery-validation',
       attemptEpoch: parent.attemptEpoch, definitionHash: runtime.legacyDefinitionHash, contextSnapshotHash: parent.contextSnapshotHash, answers: [], ...principal }, child, admission, runtime)
     const sets = new Map(runtime.definition.responseSets.map(set => [set.key, set.options.map(option => option.value)]))

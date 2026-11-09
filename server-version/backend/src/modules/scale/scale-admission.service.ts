@@ -3,7 +3,7 @@ import { assertTrainingChildSelected, loadTrainingChildAdmissionParent, TRAINING
 import {readTrainingTimingSnapshot,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { loadStoredVersionedUnitAdmission } from '../assessment-runtime/unit-admission'
 import { withSerializableScaleTransaction } from './deployment/transactions'
-import { type Prisma, type PrismaClient } from '@prisma/client'
+import { Prisma, type PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
@@ -761,3 +761,146 @@ export const activateScaleAdmission = async (
     },
   )
 }
+
+/**
+ * X-05C: batch admission projection for whole-questionnaire deliveries.
+ * Instead of executing 24 individual serializable transactions each doing row locks,
+ * parent attempt re-queries, and decrypting the active slot set, this function:
+ * 1. Validates already-stored admissions in memory without transactions.
+ * 2. Groups all unstored children into a SINGLE serializable transaction with
+ *    a single batch row lock (`WHERE id IN (...) ORDER BY id FOR UPDATE`),
+ *    reusing the parent context and slot projection.
+ */
+export const batchEnsureScaleAdmissionsAtDelivery = async (
+  parent: CompositeScaleAdmissionParent,
+  children: Array<{
+    slot: FrozenActiveSlotV1
+    child: ScaleAdmissionChildRow
+    runtime: VersionedFrozenScaleRuntimeSnapshot
+  }>,
+  referenceTimeMs = Date.now(),
+): Promise<Map<string, VersionedFrozenUnitAdmission>> => {
+  const result = new Map<string, VersionedFrozenUnitAdmission>()
+  if (children.length === 0) return result
+
+  if ((parent.compositeAssessment as { creationKey?: string } | undefined)?.creationKey?.endsWith(':TEACHER:EXPERT_REPORT:2.0.0')) {
+    const { currentFieldComposition } = await import('../huiteacher/fieldComposition.authority')
+    const firstUserId = children.find(c => c.child.userId)?.child.userId ?? parent.userId
+    if (!parent.id || !firstUserId) throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '现场观察需要本人教育账号', 403)
+    await currentFieldComposition(prisma, { attemptId: parent.id, actorUserId: firstUserId })
+  }
+
+  const unstored: typeof children = []
+  for (const item of children) {
+    const stored = await loadStoredScaleAdmission(item.child)
+    if (stored) {
+      result.set(item.child.id, await validateStoredAgainstRuntime(item.child, stored, referenceTimeMs))
+    } else {
+      unstored.push(item)
+    }
+  }
+
+  if (unstored.length === 0) return result
+
+  const batchPersisted = await withSerializableScaleTransaction(prisma, async (tx) => {
+    const txResult = new Map<string, VersionedFrozenUnitAdmission>()
+    const unstoredIds = unstored.map(u => u.child.id)
+    await tx.$queryRaw`
+      SELECT "id" FROM "assessments"
+      WHERE "id" IN (${Prisma.join(unstoredIds)})
+      ORDER BY "id" FOR UPDATE
+    `
+
+    const currentRows = await tx.assessment.findMany({
+      where: { id: { in: unstoredIds } },
+      select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
+    })
+    const currentById = new Map(currentRows.map(row => [row.id, row]))
+
+    const legacyRequiresContext = hasContextSection(parent.compositeAssessment.formSections)
+    const context = readCompositeAttemptContext(parent)
+    if (context.decryptError) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文无法读取，请联系管理员', 500)
+
+    for (const item of unstored) {
+      const current = currentById.get(item.child.id)
+      if (!current || current.attemptEpoch !== parent.attemptEpoch) {
+        throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评轮次已改变', 409)
+      }
+      assertFinalOnly(current.deliveryMode)
+
+      const winner = await loadStoredScaleAdmission(current, tx)
+      if (winner) {
+        txResult.set(current.id, await validateStoredAgainstRuntime(current, winner, referenceTimeMs, tx))
+        continue
+      }
+
+      if (!current.compositeItemId) {
+        throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
+      }
+
+      const slotKey = compositeItemSlotKey(current.compositeItemId, 'SCALE')
+      const compiledRuntimeHash = compiledRuntimeHashFrom(item.slot, current.compiledRuntimeHash)
+      if (compiledRuntimeHash !== item.runtime.compiledRuntime.compiledRuntimeHash) {
+        throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结单元运行时哈希不匹配', 409)
+      }
+
+      const bundleContext = await loadBundleScaleStartContext(
+        tx,
+        parent,
+        current.compositeItemId,
+        current.scale.code,
+        current.scale.instrumentVersion,
+        context.context?.values ?? null,
+      )
+
+      const recoveryTokenHash = await stableStudyAdmissionHash(
+        tx,
+        parent.id,
+        parent.recoveryTokenHash,
+        current.userId ?? parent.userId,
+      )
+
+      const snapshot = await createScaleAdmissionForRuntime({
+        db: tx,
+        attemptEpoch: current.attemptEpoch,
+        scale: current.scale,
+        principal: {
+          userId: current.userId ?? parent.userId,
+          questionnaireSessionId: null,
+          recoveryTokenHash,
+        },
+        parent: {
+          kind: 'composite',
+          parentId: parent.id,
+          slotKey,
+          sourceDefinitionHash: item.slot.sourceDefinitionIdentity.hash,
+          compiledRuntimeHash,
+        },
+        runtime: item.runtime,
+        requestedMode: 'COMPOSITE',
+        ...(bundleContext ? { bundleContext } : {}),
+        ...(parent.trainingTimingSnapshot ? { trainingTiming: readTrainingTimingSnapshot(parent.trainingTimingSnapshot)! } : {}),
+        contextSnapshotHash: parent.contextSnapshotHash,
+        contextValues: context.context?.values ?? null,
+        contextFrozenAt: context.context?.frozenAt ?? null,
+        contextSubjectUserId: context.context?.subjectUserId ?? null,
+        respondentType: current.respondentType,
+        subjectUserId: current.subjectUserId,
+        respondentUserId: current.respondentUserId,
+        legacyRequiresContext,
+      })
+
+      const persisted = await persistAdmission(tx, current.id, assertReady(snapshot))
+      txResult.set(current.id, persisted)
+    }
+
+    return txResult
+  })
+
+  for (const [id, admission] of batchPersisted) {
+    result.set(id, admission)
+  }
+
+  return result
+}
+
