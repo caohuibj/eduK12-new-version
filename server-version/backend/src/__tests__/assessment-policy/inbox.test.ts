@@ -37,7 +37,28 @@ it.each(['COMPLETED', 'SUBMITTED_NOT_SATISFIED'])('routes submitted course state
   const result = await listRespondentAssessments('student-a', 'STUDENT')
   expect(result.list[0]).toMatchObject({ state, launchTarget: null, reportTarget: '/student/composite/attempts/a/report', resultAvailability: 'REPORT', respondent: { userId: 'student-a', role: 'STUDENT' } })
   expect(result.pendingCount).toBe(0)
-  expect(mocks.course).toHaveBeenCalledWith('student-a', { page: 1, pageSize: 200 })
+  expect(mocks.course).toHaveBeenCalledWith('student-a', { page: 1, pageSize: 100, cursor: undefined })
+})
+
+it('pages COURSE tasks with a bounded keyset instead of a 200-row offset', async () => {
+  const courseCursor = { kind: 'QUESTIONNAIRE' as const, id: 'prev', state: 'PENDING' as const, deadline: null }
+  const nextCourseCursor = { kind: 'COMPOSITE' as const, id: 'q', state: 'PENDING' as const, deadline: null }
+  mocks.course.mockResolvedValue({
+    list: [{ id: 'q', kind: 'COMPOSITE', title: 'Course', state: 'PENDING', deadline: null, courses: [], href: '/student/composite/q' }],
+    total: 150, nextCursor: nextCourseCursor,
+  })
+  const result = await listRespondentAssessments('student-a', 'STUDENT', { courseCursor, courseLimit: 50 })
+  expect(mocks.course).toHaveBeenCalledWith('student-a', { page: 1, pageSize: 50, cursor: courseCursor })
+  expect(result.truncated).toBe(true)
+  expect(result.nextCourseCursor).toEqual(nextCourseCursor)
+  expect(result.list).toHaveLength(1)
+})
+
+it('keeps COURSE paging additive: first page without a cursor still returns list and nextRunCursor', async () => {
+  mocks.runs.mockResolvedValue({ list: [], truncated: false, nextCursor: null })
+  const result = await listRespondentAssessments('student-a', 'STUDENT')
+  expect(result).toMatchObject({ list: [], truncated: false, nextRunCursor: null, nextCourseCursor: null })
+  expect(mocks.course).toHaveBeenCalledWith('student-a', { page: 1, pageSize: 100, cursor: undefined })
 })
 
 

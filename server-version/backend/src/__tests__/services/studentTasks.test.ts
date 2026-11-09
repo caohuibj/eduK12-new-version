@@ -5,7 +5,7 @@ const { db, available } = vi.hoisted(() => ({
 }))
 vi.mock('../../config/database', () => ({ prisma: db }))
 vi.mock('../../modules/composite/composite.service', () => ({ listAvailableForStudent: available }))
-import { listStudentTasks } from '../../services/studentTasks'
+import { decodeStudentTaskCursor, encodeStudentTaskCursor, listStudentTasks } from '../../services/studentTasks'
 const now = new Date('2026-09-30T00:00:00Z')
 beforeEach(() => {
   vi.clearAllMocks()
@@ -26,6 +26,22 @@ describe('student task aggregate', () => {
     expect(result.counts.ACTIONABLE).toBe(2)
     expect(result.list.map(item => item.id)).toEqual(['active'])
     expect((await listStudentTasks('student', { page: 2, pageSize: 1, state: 'ACTIONABLE' }, now)).list.map(item => item.id)).toEqual(['pending'])
+  })
+  it('pages the in-memory (state, deadline, kind, id) order with a bounded keyset cursor', async () => {
+    db.assignment.findMany.mockResolvedValue([
+      { id: 'a3', courseId: 'c', title: 'c', deadline: null, submissions: [] },
+      { id: 'a1', courseId: 'c', title: 'a', deadline: null, submissions: [] },
+      { id: 'a2', courseId: 'c', title: 'b', deadline: null, submissions: [] },
+    ])
+    const first = await listStudentTasks('student', { page: 1, pageSize: 1 }, now)
+    expect(first.list.map(item => item.id)).toEqual(['a1'])
+    expect(first.nextCursor).toEqual({ kind: 'ASSIGNMENT', id: 'a1', state: 'PENDING', deadline: null })
+    expect(decodeStudentTaskCursor(encodeStudentTaskCursor(first.nextCursor!))).toEqual(first.nextCursor)
+    const second = await listStudentTasks('student', { page: 1, pageSize: 1, cursor: first.nextCursor! }, now)
+    expect(second.list.map(item => item.id)).toEqual(['a2'])
+    const third = await listStudentTasks('student', { page: 1, pageSize: 1, cursor: second.nextCursor! }, now)
+    expect(third.list.map(item => item.id)).toEqual(['a3'])
+    expect(third.nextCursor).toBeNull()
   })
   it('filters a course-specific task feed by an actual enrolled relation, not caller-provided authority', async () => {
     db.courseStudent.findMany.mockResolvedValue([
