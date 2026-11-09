@@ -120,8 +120,8 @@
 }
 
 /* Legacy Questionnaire / Composite runners that predate AssessmentShell. */
-.hui-app--assessment-runner [class~="max-w-2xl"],
-.hui-app--assessment-runner [class~="max-w-3xl"] {
+.hui-app--assessment-runner [class~="max-w-2xl"]:not(.cognitive-surface *),
+.hui-app--assessment-runner [class~="max-w-3xl"]:not(.cognitive-surface *) {
   width: min(100%,52rem);
   padding: 26px max(18px,env(safe-area-inset-left)) 38px max(18px,env(safe-area-inset-right));
 }

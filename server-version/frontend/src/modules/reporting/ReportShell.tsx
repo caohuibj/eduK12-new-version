@@ -52,10 +52,22 @@ export function ReportShell({
   testId = 'report-shell',
 }: ReportShellProps) {
   return (
-    <ProductPage width="report" className="hui-report" data-testid={testId}>
+    <ProductPage width="report" className="hui-report hui-report--summary-first" data-testid={testId}>
       {backAction && <div className="mb-4" data-report-screen-only>{backAction}</div>}
       <PageHeader title={title} description={description} />
 
+
+      {status && (
+        <div className="mb-5">
+          <ProductStatus kind={status.kind} title={status.title} announce={status.announce}>
+            {status.description}
+          </ProductStatus>
+        </div>
+      )}
+
+      {children && <div className="report-body">{children}</div>}
+
+      {(facts.length > 0 || limitations.length > 0) && <details className="report-supporting-details" data-testid="report-supporting-details"><summary>作答信息与阅读说明</summary>
       {facts.length > 0 && (
         <section className="report-facts" aria-label="完成信息" data-testid="report-completion-facts">
           <dl>
@@ -69,16 +81,6 @@ export function ReportShell({
         </section>
       )}
 
-      {status && (
-        <div className="mb-5">
-          <ProductStatus kind={status.kind} title={status.title} announce={status.announce}>
-            {status.description}
-          </ProductStatus>
-        </div>
-      )}
-
-      {children && <div className="report-body">{children}</div>}
-
       {limitations.length > 0 && (
         <section className="report-section mt-5" aria-labelledby="report-limitations-title" data-testid="report-limitations">
           <header className="report-section__header"><h2 id="report-limitations-title" className="report-section__title">阅读限制</h2></header>
@@ -87,6 +89,8 @@ export function ReportShell({
           </ul></div>
         </section>
       )}
+
+      </details>}
 
       {actions && (
         <ActionBar label="报告操作" className="mt-5" data-report-screen-only>

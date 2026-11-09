@@ -2,6 +2,15 @@ import type { CSSProperties, ReactNode } from 'react'
 import { ProductButton } from '../../../../components/product-ui'
 import './cognitive-task-presentation.css'
 
+/** Equal space above and below the action keeps its centre fixed as copy changes. */
+export function CognitiveCenteredTask({ header, children, footer }: { header?: ReactNode; children: ReactNode; footer?: ReactNode }) {
+  return <div className="cognitive-centered-task">
+    <div className="cognitive-centered-task__header">{header}</div>
+    <div className="cognitive-centered-task__target">{children}</div>
+    <div className="cognitive-centered-task__footer">{footer}</div>
+  </div>
+}
+
 export function CognitiveHint({
   children,
   label = '提示',

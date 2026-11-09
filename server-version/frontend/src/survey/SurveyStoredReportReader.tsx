@@ -1,4 +1,6 @@
 import {SurveyReinterpretationStudio} from './SurveyReinterpretationStudio'
+import {ReportDetails} from '../modules/reporting/ReportPrimitives'
+import type {ReactNode} from 'react'
 import {useEffect,useRef,useState} from 'react'
 type Pointer={releaseId:string;contentHash:string}
 type List={list:{finalId:string;attemptCode:string;completedAt:string;reports:{instrumentKey:string;measurementRelease:Pointer;reportRelease:Pointer|null;status:string}[]}[];nextAfterId:string|null}
@@ -20,10 +22,12 @@ function Block({value}:{value:unknown}){
   if(block.type==='ASSET')return <p>附件：{text(block.alt)}（未取得独立附件访问链接，不加载资源）</p>
   return null
 }
-export function SurveyDeclaredReport({report}:{report:DeclaredReport}){return <>
+export function SurveyDeclaredReport({report,metadata}:{report:DeclaredReport;metadata?:ReactNode}){return <>
   <h4 className="font-semibold">{report.title??'版本报告'}</h4>
   {report.blocks.map((block,index)=><Block key={index} value={block}/>)}
-  {report.limitations.map((line,index)=><p key={index}>{line}</p>)}<p>{report.disclaimer}</p>
+  {(metadata||report.limitations.length>0||report.disclaimer)&&<ReportDetails title="报告信息与阅读说明">
+    {metadata}{report.limitations.map((line,index)=><p key={index}>{line}</p>)}{report.disclaimer&&<p>{report.disclaimer}</p>}
+  </ReportDetails>}
 </>}
 /** Data-only report view: React text escaping, no HTML/script or guessed asset URL. */
 export function SurveyStoredReportReader({actorId,projectId,waveId,request}:{actorId?:string;projectId:string;waveId:string;request:<T>(path:string,method?:string,body?:unknown)=>Promise<T>}){
@@ -64,12 +68,11 @@ export function SurveyStoredReportReader({actorId,projectId,waveId,request}:{act
     {selected&&actorId&&<SurveyReinterpretationStudio key={actorId+':'+projectId+':'+waveId+':'+selected.finalId+':'+selected.instrumentKey}
       actorId={actorId} projectId={projectId} waveId={waveId} {...selected} request={request}/>}
     {view&&<article aria-label="精确 FINAL 报告" className="border rounded p-3 space-y-3">
-      <h4 className="font-semibold">{view.report.title??'版本报告'}</h4>
-      <p className="text-xs">研究者访问 · 模板受众 {view.intendedAudience} · 报告版本 {view.reportRelease.releaseId}</p>
-      <p className="text-xs break-all">FINAL 摘要 {view.sourceFinalHash} · 绑定摘要 {view.contentBindingHash}</p>
       {view.lifecycleNotices.map(notice=><p key={notice.layer+notice.releaseId} role="status">当前版本状态：{notice.layer} {notice.releaseId} · {notice.status}。保留已保存解释，不重新选择。</p>)}
-      {view.report.blocks.map((block,index)=><Block key={index} value={block}/>)}
-      {view.report.limitations.map((line,index)=><p key={index}>{line}</p>)}<p>{view.report.disclaimer}</p>
+      <SurveyDeclaredReport report={view.report} metadata={<>
+        <p className="text-xs">研究者访问 · 模板受众 {view.intendedAudience} · 报告版本 {view.reportRelease.releaseId}</p>
+        <p className="text-xs break-all">FINAL 摘要 {view.sourceFinalHash} · 绑定摘要 {view.contentBindingHash}</p>
+      </>}/>
     </article>}
   </section>
 }

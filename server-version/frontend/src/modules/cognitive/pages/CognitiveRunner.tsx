@@ -23,6 +23,7 @@ import { cognitiveVideoPresentationEntries } from '../video-presentation'
 import { useCognitiveInstructionVideoCompletion } from '../useCognitiveInstructionVideoCompletion'
 import { useCognitiveVideoSources } from '../useCognitiveVideoSources'
 import { compositeParentAttemptPath } from '../../composite/child-route-context'
+import { CognitiveFocusProgressContext } from '../tasks/shared/focus-progress'
 
 const presentationItems = (
   presentation: NonNullable<import('../types').CognitiveSession['presentation']> | undefined,
@@ -523,6 +524,7 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
       >
         {publicCredentialNotice}
         <div data-cognitive-task-root="true">
+          <CognitiveFocusProgressContext.Provider value={{ completed: state.trialIndex, total: total > 0 && !taskCompletes ? total : undefined }}>
           <Runner
             taskContext={campus?.requiredInput?{...state.taskContext,requiredInput:campus.requiredInput}:state.taskContext}
             imageAssetUrls={imageState.urls}
@@ -532,6 +534,7 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
             onTrialComplete={controller.appendTrial}
             onTaskComplete={taskCompletes ? completeWithProvenance : undefined}
           />
+          </CognitiveFocusProgressContext.Provider>
         </div>
         {state.error ? <p className="mt-3 text-center text-sm text-red-600">{state.error.message}</p> : null}
       </AssessmentShell>

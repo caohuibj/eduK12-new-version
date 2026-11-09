@@ -1,4 +1,5 @@
 import {BundleDerivedReport,isDerivedBundleView,type DerivedBundleView} from '../modules/reporting/BundleDerivedReport'
+import {ReportSupporting} from '../modules/reporting/ReportPrimitives'
 import {SurveyPersonalChanges} from './SurveyPersonalChanges'
 import BundleProfileSummary,{type BundleProfileView} from '../pages/bundle/BundleProfileSummary'
 import {clearSurveySituationalSessions,rememberSurveySituationalSession} from './survey-situational-local'
@@ -1263,12 +1264,10 @@ export default function SurveyPublicApp(){
           </article>)}
         </section>}
         {general.nativeBundles?.map(bundle=><section key={bundle.importId} aria-label="整体理论报告"><h2>{bundle.title}</h2>{bundle.derivedView?<BundleDerivedReport view={bundle.derivedView}/>:bundle.profileView?<BundleProfileSummary view={bundle.profileView}/>:<p>综合结果暂不可用；单项作答已保存。</p>}</section>)}
-        <p className="survey-completion-time">完成时间：{new Date(general.completedAt).toLocaleString('zh-CN')}</p>
         {info.project.collectionMode==='LINKED_WAVES'&&completion&&<SurveyPersonalChanges publicId={publicId} attemptId={completion.attemptId} proof={completion.proof}/>}
         {info.project.collectionMode==='LINKED_WAVES'&&<div className="survey-completion-primary">
           <button type="button" className={action('btn-secondary')} disabled={busy} onClick={returnHome}>返回我的研究波次</button>
         </div>}
-        {general.disclaimer&&<p className="survey-completion-disclaimer">{general.disclaimer}</p>}
         <details className="survey-completion-options" open={completionOptionsOpen}
           onToggle={event=>setCompletionOptionsOpen(event.currentTarget.open)}>
           <summary onClick={event=>{event.preventDefault();setCompletionOptionsOpen(open=>!open)}}>参与与数据管理</summary>
@@ -1285,6 +1284,9 @@ export default function SurveyPublicApp(){
             </div>
           </div>}
         </details>
+        <ReportSupporting facts={[{label:'完成时间',value:new Date(general.completedAt).toLocaleString('zh-CN')}]}>
+          {general.disclaimer&&<p className="survey-completion-disclaimer">{general.disclaimer}</p>}
+        </ReportSupporting>
       </section>}
       {participantEntry&&!identitySavePending&&home&&completedWaves.length>0&&<details className="survey-completed-receipts" open={receiptsOpen}
         onToggle={event=>setReceiptsOpen(event.currentTarget.open)}>

@@ -23,6 +23,8 @@ describe('ReportShell presentation boundary', () => {
     expect(screen.getByText('已提交')).toBeTruthy()
     expect(screen.getByText('领域报告正文')).toBeTruthy()
     expect(screen.getByTestId('report-limitations')).toHaveTextContent('仅解释本次作答。')
+    expect(screen.getByTestId('report-supporting-details')).not.toHaveAttribute('open')
+    expect(Boolean(screen.getByText('领域报告正文').compareDocumentPosition(screen.getByTestId('report-supporting-details')) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true)
     expect(screen.getByRole('button', { name: '返回记录' })).toBeTruthy()
   })
 })

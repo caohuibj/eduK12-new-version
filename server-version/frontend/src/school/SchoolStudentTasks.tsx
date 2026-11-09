@@ -141,6 +141,7 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
     executionRef.current=null;setExecution(null)
     const task=executionTask.current?.scope===scope&&executionTask.current.task.id===active.executionId?executionTask.current.task:undefined
     setNotice('本次测评已完成，正式提交已确认。')
+    setItems(old=>old?{...old,list:old.list.map(row=>row.id===active.executionId?{...row,status:'COMPLETED'}:row)}:old)
     void load(page)
     if(task&&task.resourceFamily!=='FORM')showFeedback(task)
   }

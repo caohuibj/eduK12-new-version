@@ -38,6 +38,8 @@ describe('popular and professional report voices', () => {
   it('retains anonymous record context and omits absent or invalid dates', () => {
     const view = render(<CognitiveV2ReportCard report={report} anonymousCode="DEMO-2026-0001" attemptNo={2} finishedAt="2026-10-01T08:30:00Z" />)
     const record = screen.getByText('匿名编号').closest('dl')!
+    expect(record.closest('details')).not.toHaveAttribute('open')
+    expect(Boolean(screen.getByRole('region', { name: '本次记录' }).compareDocumentPosition(record) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true)
     expect(record).toHaveTextContent('DEMO-2026-0001')
     expect(record.querySelector('time')).toHaveAttribute('datetime', '2026-10-01T08:30:00Z')
     expect(screen.getByText(/第 2 次/)).toBeInTheDocument()

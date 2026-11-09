@@ -16,6 +16,12 @@ describe('researcher exact saved report component',()=>{
   expect(container.querySelector('img')).toBeNull();expect(screen.getByText(/Licensed image/)).toBeTruthy()
   expect(screen.getByText('Saved guidance')).toBeTruthy();expect(screen.getByText('chart-score')).toBeTruthy()
   expect(screen.getByText(/REFERENCE ref.*REVOKED/)).toBeTruthy();expect(screen.getByText(/模板受众 student/)).toBeTruthy()
+  const details=screen.getByText('Limit').closest('details')!
+  expect(details).not.toHaveAttribute('open')
+  expect(screen.getByText(/FINAL 摘要/).closest('details')).toBe(details)
+  expect(screen.getByText('Saved guidance').closest('details')).toBeNull()
+  expect(screen.getByText(/REFERENCE ref.*REVOKED/).closest('details')).toBeNull()
+  expect(screen.getByText('Saved guidance').compareDocumentPosition(details)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   fireEvent.click(screen.getByRole('button',{name:'下一页报告记录'}));await waitFor(()=>expect(request).toHaveBeenLastCalledWith('/projects/project/analytics/waves/wave/reports?afterId=next'))
   expect(screen.queryByLabelText('精确 FINAL 报告')).toBeNull()
  })

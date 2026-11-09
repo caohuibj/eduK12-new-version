@@ -29,6 +29,9 @@ describe('actual Training content report reader',()=>{
   expect(screen.getByText(/图片替代文本：冻结图片说明/)).toBeInTheDocument();expect(container.querySelector('[src],[href="https://untrusted.example/leak"]')).toBeNull()
   expect(screen.getByText(/版本状态变更：REPORT.*已退役/)).toBeInTheDocument();expect(screen.getByText(/测量或报告版本已撤销/)).toBeInTheDocument()
   expect(screen.queryByText('撤销私密内容')).not.toBeInTheDocument();expect(screen.queryByText(/撤销后不得泄露/)).not.toBeInTheDocument()
+  expect(screen.getByText('冻结局限说明').closest('details')).not.toHaveAttribute('open')
+  expect(screen.getByText('exact-report-release').closest('details')).not.toHaveAttribute('open')
+  expect(screen.getByText('12.5').closest('details')).toBeNull()
  })
  it.each(['/student/composite/attempts/a/report','/public/composite/attempts/a/report'])('ignores malicious contentReports on participant/public route %s',async(path)=>{
   state.user={role:'ADMIN'};sessionStorage.setItem('composite:recovery:attempt:a','credential');mount(path);await screen.findByText('组合报告')

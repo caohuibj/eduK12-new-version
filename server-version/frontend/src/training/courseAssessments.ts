@@ -113,20 +113,23 @@ export function projectCourseAssessments(
     if (item.courseId !== courseId || item.listedStandalone === false || item.status !== 'PUBLISHED') continue
     if (!cognitiveEnabled && !item.continueHref && !item.latestCompletedSessionId && !item.admissionPaused) continue
     const canContinue = Boolean(item.continueHref)
+    const done = !item.admissionPaused && !canContinue && Boolean(item.latestCompletedSessionId)
+    const reportHref = item.latestCompletedSessionId ? '/student/cognitive/sessions/' + enc(item.latestCompletedSessionId) + '/result' : null
     const now = Date.now()
     const upcoming = Boolean(item.opensAt && new Date(item.opensAt).getTime() > now)
     const expired = Boolean(item.dueAt && new Date(item.dueAt).getTime() < now)
     const exhausted = item.remainingAttempts === 0
     // These labels are hints from existing metadata, not a second admission
     // system: the original CognitiveAssignmentEntry checks server authority.
-    const status = item.admissionPaused ? '暂不可用，重新开放后继续' : canContinue ? '进行中' : exhausted ? '尝试次数已用尽'
+    const status = item.admissionPaused ? '暂不可用，重新开放后继续' : canContinue ? '进行中' : done ? '已完成' : exhausted ? '尝试次数已用尽'
       : upcoming ? '尚未开始' : expired ? '已截止' : '待完成'
     items.push({
       key: 'cognitive:' + item.id, kind: 'cognitive', name: item.title,
       typeLabel: '认知测评', description: item.instruction,
-      status, completed: !canContinue && Boolean(item.latestCompletedSessionId),
-      href: item.admissionPaused ? null : !cognitiveEnabled ? item.continueHref || '/student/cognitive/sessions/' + enc(item.latestCompletedSessionId!) + '/result' : '/student/cognitive/assignments/' + enc(item.id),
-      action: item.admissionPaused ? '暂不可用' : canContinue ? '继续测评' : !cognitiveEnabled ? '查看反馈' : status === '待完成' ? '进入测评' : '查看任务',
+      status, completed: done,
+      href: item.admissionPaused ? null : canContinue ? item.continueHref! : done ? reportHref : '/student/cognitive/assignments/' + enc(item.id),
+      reportHref: canContinue ? reportHref : null,
+      action: item.admissionPaused ? '暂不可用' : canContinue ? '继续测评' : done ? '查看反馈' : status === '待完成' ? '进入测评' : '查看任务',
     })
   }
 

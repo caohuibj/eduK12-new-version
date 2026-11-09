@@ -51,7 +51,7 @@
   max-width: 54ch;
   margin: 12px auto 0;
   color: #40586e;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.75;
 }
 
@@ -205,7 +205,11 @@
 .cognitive-task-progress{
   width:min(100%,42rem);
   display:grid;
-  gap:7px;
+  gap:10px;
+  padding:14px 18px;
+  border:1px solid var(--runner-line,var(--hui-ds-color-line));
+  border-radius:16px;
+  background:var(--runner-surface,var(--hui-ds-color-surface));
   margin-inline:auto;
 }
 .cognitive-task-progress__meta{
@@ -214,14 +218,15 @@
   justify-content:space-between;
   gap:12px;
   color:var(--runner-muted,var(--hui-ds-color-muted));
-  font-size:12px;
+  font-size:15px;
 }
 .cognitive-task-progress__meta strong{
   color:var(--runner-ink,var(--hui-ds-color-ink));
-  font-size:12px;
+  font-size:16px;
+  font-variant-numeric:tabular-nums;
 }
 .cognitive-task-progress__track{
-  height:9px;
+  height:8px;
   overflow:hidden;
   border-radius:999px;
   background:#e5edf4;
@@ -232,8 +237,21 @@
   height:100%;
   border-radius:inherit;
   background:var(--runner-action,var(--hui-ds-color-action));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
   transition:width .18s ease;
 }
+
+.cognitive-centered-task{height:min(34rem,calc(100svh - 12rem));min-height:20rem;display:grid;grid-template-rows:minmax(0,1fr) auto minmax(0,1fr);text-align:center}
+.cognitive-focus-stage__body{width:min(100%,48rem);min-height:100%;margin-inline:auto;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:2rem 1.5rem}
+.cognitive-focus-stage__body[data-has-progress="true"]{padding-block:6rem}
+.cognitive-focus-stage__progress{position:absolute;inset:0 0 auto;width:min(100%,48rem);margin-inline:auto;padding:1rem 1.5rem}
+.cognitive-centered-task__header{align-self:start;padding-top:8px}
+.cognitive-centered-task__target{display:flex;align-items:center;justify-content:center;min-width:0}
+.cognitive-centered-task__footer{align-self:end;margin-inline:auto;max-width:40rem;font-size:16px;line-height:1.8}
+.cognitive-centered-task__footer .cognitive-task-description{margin-top:0}
+.cognitive-reaction-target{flex:none;touch-action:manipulation}
+/* Trial stimuli never move or scale on press: only action controls receive feedback. */
+.cognitive-reaction-target:focus-visible{outline:3px solid currentColor;outline-offset:7px}
 .cognitive-response-button{
   width:100%;
   min-height:52px;

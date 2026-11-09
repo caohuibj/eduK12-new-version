@@ -43,6 +43,18 @@ beforeEach(() => {
 })
 
 describe('course-scope measurement projection', () => {
+  it.each([{}, {remainingAttempts:0}, {dueAt:'2000-01-01T00:00:00Z'}])('keeps completed cognitive tasks completed despite remaining quota or windows: %j', extra => {
+    const [done, pending] = projectCourseAssessments(course, [], [], [
+      {id:'done',courseId:course,title:'已作答',status:'PUBLISHED',latestCompletedSessionId:'saved-result',...extra},
+      {id:'pending',courseId:course,title:'未作答',status:'PUBLISHED'},
+    ] as any, [])
+    expect(done).toMatchObject({completed:true,status:'已完成',action:'查看反馈',href:'/student/cognitive/sessions/saved-result/result'})
+    expect(pending).toMatchObject({completed:false,status:'待完成',action:'进入测评',href:'/student/cognitive/assignments/pending'})
+  })
+  it('continues an active cognitive attempt without labelling it completed and retains the prior feedback', () => {
+    const [row] = projectCourseAssessments(course,[],[],[{id:'active',courseId:course,title:'再次作答',status:'PUBLISHED',continueHref:'/student/cognitive/sessions/current',latestCompletedSessionId:'previous'}] as any,[])
+    expect(row).toMatchObject({completed:false,status:'进行中',action:'继续测评',href:'/student/cognitive/sessions/current',reportHref:'/student/cognitive/sessions/previous/result'})
+  })
   it('retains archived multi-course work and feedback using the authorized task feed', async () => {
     const fallback = get.getMockImplementation()!
     get.mockImplementation((url: string) => url === '/composite-assessments/available'

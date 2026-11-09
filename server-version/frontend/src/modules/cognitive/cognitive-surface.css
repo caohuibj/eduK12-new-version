@@ -94,3 +94,12 @@
   .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) [role=progressbar]>div { background:var(--training-bamboo)!important; }
   .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) .cognitive-preparation>[data-assessment-shell-actions] { border-color:var(--training-border); }
 }
+
+/* Shared readable instructions and tactile action feedback; stimulus shapes excluded. */
+.cognitive-surface [data-assessment-shell-header] p{font-size:15px!important}
+.cognitive-surface [data-cognitive-task-root] :is([class~="max-w-2xl"],[class~="max-w-3xl"]){margin-inline:auto}
+.cognitive-surface :is(.cognitive-task-description,.cognitive-task-hint,.cognitive-task-result-detail){font-size:16px;line-height:1.8}
+.cognitive-surface [data-cognitive-focus-stage] :is(p.text-xs,p.text-sm,div.text-xs,div.text-sm){font-size:15px;line-height:1.75}
+.cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button){transition:box-shadow .12s ease,filter .12s ease!important;font-size:16px!important;min-height:48px!important}
+.cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button):active:not(:disabled){box-shadow:inset 0 2px 5px rgb(0 0 0 / .18)!important;filter:brightness(.94)}
+@media(prefers-reduced-motion:reduce){.cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button){transition:none!important}}

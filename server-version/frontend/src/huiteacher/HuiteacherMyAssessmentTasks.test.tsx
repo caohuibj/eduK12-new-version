@@ -77,7 +77,8 @@ describe('Teacher participant host with synthetic runtime DTOs',()=>{
   render(<HuiteacherMyAssessmentTasks api={api as EducationReportApi} actorKey="teacher" onCompleted={onCompleted}/>)
   await open();await screen.findByText('本次测评已完成');await screen.findByText('合成列表刷新失败')
   expect(onCompleted).toHaveBeenCalledTimes(1)
-  fireEvent.click(screen.getByRole('button',{name:'返回任务列表'}));fireEvent.click(screen.getByRole('button',{name:'继续测评'}))
+  expect(screen.getByText('已完成')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button',{name:'返回任务列表'}));fireEvent.click(screen.getByRole('button',{name:'查看完成状态'}))
   await screen.findByText('本次测评已完成');expect(onCompleted).toHaveBeenCalledTimes(1)
  })
  it('collects the actual assigned consent before first canonical START',async()=>{
