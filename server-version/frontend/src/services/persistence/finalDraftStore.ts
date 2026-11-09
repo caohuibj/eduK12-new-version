@@ -399,6 +399,10 @@ export interface FinalDraftStore {
   snapshot(draftKey: string): Promise<FinalDraftSnapshot | null>
   sealForSubmission<T>(draftKey: string, buildPayload: (snapshot: FinalDraftSnapshot) => T): Promise<FinalDraftSealResult<T> | null>
   delete(draftKey: string): Promise<void>
+  /** Shared-device hygiene (X-05B): discard every locally cached draft so the
+   * next user of the device cannot read the previous one's answers. Drafts
+   * under an explicit training retention rule are preserved, matching delete(). */
+  clearAll(): Promise<void>
 }
 
 class MemoryFinalDraftStore implements FinalDraftStore {
@@ -612,6 +616,21 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     this.metas.delete(draftKey)
     for (const key of [...this.answers.keys()]) if (key.startsWith(`${draftKey}:`)) this.answers.delete(key)
     for (const key of [...this.trials.keys()]) if (key.startsWith(`${draftKey}:`)) this.trials.delete(key)
+  }
+
+  async clearAll() {
+    // Retained tombstones keep their meta only: the normal expiry flow has
+    // already dropped answers/trials, and this guarantees that invariant so a
+    // retained record can never carry another student's answers forward.
+    for (const draftKey of [...this.metas.keys()]) {
+      const retained = this.metas.get(draftKey)?.trainingRetention?.expiredAt !== undefined
+      if (retained) {
+        for (const key of [...this.answers.keys()]) if (key.startsWith(`${draftKey}:`)) this.answers.delete(key)
+        for (const key of [...this.trials.keys()]) if (key.startsWith(`${draftKey}:`)) this.trials.delete(key)
+        continue
+      }
+      await this.delete(draftKey)
+    }
   }
 }
 
@@ -952,6 +971,23 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
         const store = transaction.objectStore(name)
         const keys = await requestResult<IDBValidKey[]>(store.index(DRAFT_INDEX).getAllKeys(draftKey))
         for (const key of keys) store.delete(key)
+      }
+    })
+  }
+
+  async clearAll() {
+    await this.run<void>([META_STORE, ANSWER_STORE, TRIAL_STORE], 'readwrite', async (transaction) => {
+      const metas = await requestResult<FinalDraftMeta[]>(transaction.objectStore(META_STORE).getAll())
+      for (const meta of metas) {
+        // Retained tombstones keep their meta only (the expiry flow already
+        // dropped their records); guarantee no answers/trials survive.
+        for (const name of [ANSWER_STORE, TRIAL_STORE]) {
+          const store = transaction.objectStore(name)
+          const keys = await requestResult<IDBValidKey[]>(store.index(DRAFT_INDEX).getAllKeys(meta.draftKey))
+          for (const key of keys) store.delete(key)
+        }
+        if (meta.trainingRetention?.expiredAt !== undefined) continue
+        transaction.objectStore(META_STORE).delete(meta.draftKey)
       }
     })
   }

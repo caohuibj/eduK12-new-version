@@ -264,6 +264,33 @@ describe('per-browser logout and forced password realm boundaries', () => {
     expect(res.statusCode).toBe(403)
     expect(next).not.toHaveBeenCalled()
   })
+
+  it('enforces mandatory MFA from the merged principal facts for SCHOOL sessions (L-Fast V1)', async () => {
+    // needsMfa arrives inside the single principal roundtrip; no separate
+    // MFA cascade query may run afterwards.
+    const schoolReq = { headers: { cookie: 'huischool_session=test-token' }, originalUrl: '/api/campus/organizations/org-1', params: {} } as any
+    mockVerifyToken.mockReturnValue({ ...payload, accountDomain: 'SCHOOL' })
+    mockPrisma.$queryRaw.mockResolvedValue(dbRow({ accountDomain: 'SCHOOL', needsMfa: true }))
+    const res = makeRes(), next = vi.fn()
+    await authenticateSchool(schoolReq, res, next)
+    expect(res.statusCode).toBe(401)
+    expect(next).not.toHaveBeenCalled()
+    // Exactly one database roundtrip: the principal load itself.
+    expect(mockPrisma.$queryRaw).toHaveBeenCalledTimes(1)
+
+    // A current MFA-verified privileged session passes.
+    mockVerifyToken.mockReturnValue({ ...payload, accountDomain: 'SCHOOL', mfaVerifiedAt: Math.floor(Date.now() / 1000) })
+    const mfaSession = makeRes(), mfaNext = vi.fn()
+    await authenticateSchool(schoolReq, mfaSession, mfaNext)
+    expect(mfaNext).toHaveBeenCalledOnce()
+
+    // An ordinary account (needsMfa=false) never needs an MFA-verified token.
+    mockPrisma.$queryRaw.mockResolvedValue(dbRow({ accountDomain: 'SCHOOL', needsMfa: false }))
+    mockVerifyToken.mockReturnValue({ ...payload, accountDomain: 'SCHOOL' })
+    const ordinary = makeRes(), ordinaryNext = vi.fn()
+    await authenticateSchool(schoolReq, ordinary, ordinaryNext)
+    expect(ordinaryNext).toHaveBeenCalledOnce()
+  })
 })
 
 describe('requireSelfOrAdmin', () => {

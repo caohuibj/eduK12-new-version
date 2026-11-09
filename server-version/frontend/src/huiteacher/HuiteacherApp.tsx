@@ -10,6 +10,8 @@ import {schoolEntryLoginUrl} from '../products/origins'
 import {usePrivateToolCapability,type PrivateDraftState} from '../components/education-tools/privateToolClient'
 
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import {finalDraftStore} from '../services/persistence/finalDraftStore'
+import {clearHuiteacherSessionDrafts} from '../services/persistence/sessionDraftHygiene'
 import {flushSync} from 'react-dom'
 import {QRCodeSVG} from 'qrcode.react'
 import {UserRound,X,BookOpen,Compass,FileText,ClipboardList,Sprout,UsersRound,Info,MessageSquare,TrendingUp} from 'lucide-react'
@@ -377,6 +379,9 @@ function HuiteacherApplication(){
   })
   const changeAccountPassword=(oldPassword:string,newPassword:string)=>run(async()=>{
     await teacherApi('/auth/change-password','POST',{oldPassword,newPassword})
+    // Password rotation invalidates every session (X-05B): drop local answer
+    // carriers with the same shared-device hygiene as logout.
+    try { finalDraftStore.clearAll(); clearHuiteacherSessionDrafts() } catch { /* surfaced on next logout if still present */ }
     setAccountOpen(false);setMe(null);setSelectedOrg('');setScreen('login')
     setMessage('教育账号密码已修改，School 和 Teacher 需要分别重新登录')
   })
@@ -384,7 +389,15 @@ function HuiteacherApplication(){
     if(!canLeaveForm())return
     run(async()=>{
     await teacherApi('/auth/logout','POST',{})
-    setAccountOpen(false);setMe(null);setSelectedOrg('');setScreen('home');setMessage('')
+    // Shared-device hygiene (X-05B): drop the IndexedDB draft store and the
+    // Teacher product's sessionStorage answer carriers after the server-side
+    // revocation succeeded. Cleanup failure is surfaced, never silent — the
+    // account switch proceeds because the server session is already revoked,
+    // but the user is told local answers may remain on this machine.
+    let localCleanupFailed=false
+    try { finalDraftStore.clearAll(); clearHuiteacherSessionDrafts() } catch { localCleanupFailed=true }
+    setAccountOpen(false);setMe(null);setSelectedOrg('');setScreen('home')
+    setMessage(localCleanupFailed?'已退出教育账号；本机答卷草稿清理失败，共享设备前请手动清除浏览器站点数据':'')
     })
   }
   useEffect(()=>{

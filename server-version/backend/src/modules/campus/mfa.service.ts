@@ -59,8 +59,7 @@ function validStep(secret:Buffer,otp:string,lastUsedStep:bigint):number|null {
 
 // Current DB facts, not legacy User.role in a JWT, determine mandatory MFA.
 // Ordinary school teachers and parents are not automatically privileged.
-export async function schoolAccountNeedsMfa(userId:string):Promise<boolean> {
-  const rows=await prisma.$queryRaw<Array<{required:boolean}>>`
+export async function schoolAccountNeedsMfa(userId:string):Promise<boolean> {  const rows=await prisma.$queryRaw<Array<{required:boolean}>>`
     SELECT (
       u."role"::text='ADMIN' OR u."platform_role"::text='SYSTEM_ADMIN'
       OR EXISTS (
