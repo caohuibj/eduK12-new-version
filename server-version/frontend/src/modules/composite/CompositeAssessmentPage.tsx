@@ -15,10 +15,13 @@ import {
   LockKeyhole,
 } from 'lucide-react'
 import { compositeApi, publicCompositeApi } from './api'
+import { wholeDefinitionWithInlineFallback, type InlineWholeDefinitionIdentity } from './whole-definition-source'
+import { shouldUseWholeRunner } from './whole-runner-entry'
 import type {
   CompositeAttemptState,
   CompositeCurrentItem,
   CompositePublicInfo,
+  WholeQuestionnaireDefinition,
 } from './types'
 import { resolveCompositeChildRouteContext } from './child-route-context'
 import { saveCognitiveRecoveryCredential } from '../cognitive/core/recovery-credential'
@@ -93,10 +96,28 @@ const CompositeAssessmentContent: React.FC = () => {
     && state?.trainingPersistence?.localCognitive?.enabled === true
     && state?.currentItem?.type === 'COGNITIVE'
     && state.currentItem.cognitiveSession?.sessionId === recoveryHint.get('sessionId')
-  const api = useMemo(
-    () => (publicMode ? publicCompositeApi(recoveryToken) : compositeApi),
-    [publicMode, recoveryToken],
-  )
+  // X-05A: the START response may carry the whole questionnaire definition
+  // inline (delivery=whole, WHOLE_LOCAL attempts only). It is consumed exactly
+  // once by the runner's definition fetch; every other path re-fetches via the
+  // authoritative GET endpoint. The inline payload must additionally match the
+  // started attempt's frozen identity (epoch + context hash) before it is
+  // served; slot-set drift is fenced by the runner's draft meta identity.
+  const inlineWholeDefinitionRef = useRef<{
+    definition: WholeQuestionnaireDefinition
+    identity: InlineWholeDefinitionIdentity
+  } | null>(null)
+  const api = useMemo(() => {
+    const base = publicMode ? publicCompositeApi(recoveryToken) : compositeApi
+    return {
+      ...base,
+      wholeDefinition: (attemptId: string) => {
+        const inline = inlineWholeDefinitionRef.current
+        inlineWholeDefinitionRef.current = null
+        return wholeDefinitionWithInlineFallback(inline?.definition ?? null,
+          inline?.identity ?? { attemptId }, () => base.wholeDefinition(attemptId))
+      },
+    }
+  }, [publicMode, recoveryToken])
 
   const freezeBeforeMeasurement = async (
     next: CompositeAttemptState,
@@ -201,6 +222,13 @@ const CompositeAssessmentContent: React.FC = () => {
         if (signal.aborted) return
         if (response.code !== 0 || !response.data)
           throw new Error(response.message || '无法开始匿名综合测评')
+        const inlineWhole = response.data.wholeDefinition ?? null
+        inlineWholeDefinitionRef.current = inlineWhole ? {
+          definition: inlineWhole,
+          identity: { attemptId: response.data.attempt.id,
+            attemptEpoch: response.data.attempt.attemptEpoch,
+            contextSnapshotHash: response.data.attempt.contextSnapshotHash ?? null },
+        } : null
         const returnedCredential = response.data.recoveryToken || credential
         if (returnedCredential) {
           setRecoveryToken(returnedCredential)
@@ -223,6 +251,13 @@ const CompositeAssessmentContent: React.FC = () => {
         if (signal.aborted) return
         if (response.code !== 0 || !response.data)
           throw new Error(response.message || '无法开始综合测评')
+        const inlineWhole = response.data.wholeDefinition ?? null
+        inlineWholeDefinitionRef.current = inlineWhole ? {
+          definition: inlineWhole,
+          identity: { attemptId: response.data.attempt.id,
+            attemptEpoch: response.data.attempt.attemptEpoch,
+            contextSnapshotHash: response.data.attempt.contextSnapshotHash ?? null },
+        } : null
         if (response.data.attempt.status === 'COMPLETED' && !response.data.attempt.trainingFlow)
           goReport(response.data.attempt.id)
         else applyState(await freezeBeforeMeasurement(response.data.attempt))
@@ -559,7 +594,7 @@ const CompositeAssessmentContent: React.FC = () => {
         cognitiveRecovery={cognitiveRecoveryRequested ? { reason: 'LOCAL_DRAFT_EXPIRED', restarting: submitting, restartError: cognitiveRestartBlocked ? error : null } : undefined}
       />
     )
-    if (!state.trainingFlow && state.productKind === 'QUESTIONNAIRE' && !relationalMode && state.currentItem?.type === 'SCALE') {
+    if (shouldUseWholeRunner(state, relationalMode)) {
       return <>{anonymousRecovery}<WholeCompositeQuestionnaire state={state} api={api} publicMode={publicMode} recoveryToken={recoveryToken}
         fallback={unitAssessment} onExit={() => void saveAndExit()} onCompleted={() => goReport(state.id)} /></>
     }

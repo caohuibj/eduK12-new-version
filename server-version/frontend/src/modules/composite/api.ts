@@ -105,7 +105,7 @@ export const compositeApi = {
   disableToken: (id: string, tokenId: string) => apiClient.delete(`/composite-assessments/${id}/public-tokens/${tokenId}`),
   exportData: (id: string, input: { detail: 'summary' | 'full'; format: 'csv' | 'sav' | 'zip'; anonymize?: boolean; courseId?: string }, requestKey?: string) => apiClient.post<any>(`/composite-assessments/${id}/export`, input, { headers: { 'X-Export-Request-Key': requestKey } }),
   listAvailable: () => apiClient.get<{ list: Array<Record<string, unknown>> }>('/composite-assessments/available', { params: { view: 'summary' } }),
-  start: (assessmentId: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: null }>(`/composite-assessments/${assessmentId}/attempts`),
+  start: (assessmentId: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: null; wholeDefinition?: WholeQuestionnaireDefinition }>(`/composite-assessments/${assessmentId}/attempts`, { delivery: 'whole' }),
   restart: (attemptId: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: null }>(`/composite-assessments/attempts/${attemptId}/restart`),
   getAttempt: (attemptId: string, view: 'full' | 'current-unit' = 'full') => apiClient.get<CompositeAttemptState>(`/composite-assessments/attempts/${attemptId}${view === 'current-unit' ? '?view=current-unit' : ''}`),
   freezeContext: (attemptId: string) => apiClient.post<{ status: 'frozen'; frozenAt: string }>(`/composite-assessments/attempts/${attemptId}/context/freeze`, {}),
@@ -158,7 +158,7 @@ export const compositeApi = {
 
 export const publicCompositeApi = (recoveryToken: string) => ({
   info: (token: string) => apiClient.get<CompositePublicInfo>(`/public/composite-assessments/${token}`),
-  start: (token: string, resumeToken?: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: string | null }>(`/public/composite-assessments/${token}/start`, resumeToken ? { recoveryToken: resumeToken } : {}),
+  start: (token: string, resumeToken?: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: string | null; wholeDefinition?: WholeQuestionnaireDefinition }>(`/public/composite-assessments/${token}/start?delivery=whole`, resumeToken ? { recoveryToken: resumeToken } : {}),
   restart: (attemptId: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: string | null }>(`/public/composite-assessments/attempts/${attemptId}/restart`, {}, { headers: { 'X-Recovery-Token': recoveryToken } }),
   getAttempt: (attemptId: string, view: 'full' | 'current-unit' = 'full') => apiClient.get<CompositeAttemptState>(`/public/composite-assessments/attempts/${attemptId}${view === 'current-unit' ? '?view=current-unit' : ''}`, { headers: { 'X-Recovery-Token': recoveryToken } }),
   freezeContext: (attemptId: string) => apiClient.post<{ status: 'frozen'; frozenAt: string }>(`/public/composite-assessments/attempts/${attemptId}/context/freeze`, {}, { headers: { 'X-Recovery-Token': recoveryToken } }),
