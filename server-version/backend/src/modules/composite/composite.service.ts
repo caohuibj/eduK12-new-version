@@ -6355,7 +6355,7 @@ export const materializeCompositeQuestionnaireReport = async (attemptId: string,
   committedAttempt?: any,
 ) => {
   const committed = verifiedContext?.committed
-  const reusable = process.env.ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED === 'true'
+  const reusable = process.env.ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED !== 'false'
     && committed && committedAttempt && committedAttempt.id === attemptId
     && committedAttempt.attemptEpoch === expected.attemptEpoch
     && committedAttempt.frozenActiveSlotSetHash === expected.slotSetHash

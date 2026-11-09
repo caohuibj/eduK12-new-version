@@ -62,16 +62,16 @@ describe('versioned compressed report storage', () => {
     Object.defineProperty(report.unitReports[0], '__scaleProjectionPolicy', { value: { schemaVersion: 1, scores: ['wellbeing'] }, enumerable: false })
     Object.defineProperty(report.unitReports[1], '__frozenMetricDefinitions', { value: [{ key: 'accuracy', unit: 'ratio' }], enumerable: false })
     try {
-      delete process.env.ASSESSMENT_REPORT_COMPRESSION_ENABLED
+      process.env.ASSESSMENT_REPORT_COMPRESSION_ENABLED = 'false'
       const legacy = encryptCompositeCollectionReport(report, binding)
-      process.env.ASSESSMENT_REPORT_COMPRESSION_ENABLED = 'true'
+      delete process.env.ASSESSMENT_REPORT_COMPRESSION_ENABLED
       const packed = encryptCompositeCollectionReport(report, binding)
       expect(decryptField<any>(packed).schemaVersion).toBe(2)
       expect(packed.length).toBeLessThan(legacy.length / 3)
       const decoded = decryptCompositeCollectionReport(packed, binding)
       expect(decoded).toEqual(decryptCompositeCollectionReport(legacy, binding))
       expect(decoded.unitReports[1].__frozenMetricDefinitions).toEqual([{ key: 'accuracy', unit: 'ratio' }])
-      delete process.env.ASSESSMENT_REPORT_COMPRESSION_ENABLED
+      process.env.ASSESSMENT_REPORT_COMPRESSION_ENABLED = 'false'
       const rollback = encryptCompositeCollectionReport(decoded, binding)
       expect(decryptField<any>(rollback).schemaVersion).toBe(1)
       expect(decryptCompositeCollectionReport(rollback, binding)).toEqual(decoded)

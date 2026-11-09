@@ -35,7 +35,7 @@ export const processCompositeReportJob = async (job: CompositeReportJob): Promis
     const wholeService = await traceAssessmentPhase('report.whole_module_import', () => import('../modules/composite/whole-questionnaire.service'))
     let reportContext: import('../modules/composite/whole-questionnaire.service').WholeQuestionnaireReportContext | undefined
     const whole = await traceAssessmentPhase('report.units_and_snapshot_persistence',
-      () => wholeService.processWholeQuestionnaireAnswers(job, process.env.ASSESSMENT_REPORT_CONTEXT_REUSE_ENABLED === 'true'
+      () => wholeService.processWholeQuestionnaireAnswers(job, process.env.ASSESSMENT_REPORT_CONTEXT_REUSE_ENABLED !== 'false'
         ? context => { reportContext = context } : undefined))
     const committed = reportContext?.committed
     const committedParent = committed && committed.submissionId === job.wholeSubmissionId
