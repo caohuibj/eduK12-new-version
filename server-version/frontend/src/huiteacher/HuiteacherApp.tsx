@@ -381,7 +381,7 @@ function HuiteacherApplication(){
     await teacherApi('/auth/change-password','POST',{oldPassword,newPassword})
     // Password rotation invalidates every session (X-05B): drop local answer
     // carriers with the same shared-device hygiene as logout.
-    try { finalDraftStore.clearAll(); clearHuiteacherSessionDrafts() } catch { /* surfaced on next logout if still present */ }
+    try { await finalDraftStore.clearAll(); clearHuiteacherSessionDrafts() } catch { /* surfaced on next logout if still present */ }
     setAccountOpen(false);setMe(null);setSelectedOrg('');setScreen('login')
     setMessage('教育账号密码已修改，School 和 Teacher 需要分别重新登录')
   })
@@ -395,7 +395,7 @@ function HuiteacherApplication(){
     // account switch proceeds because the server session is already revoked,
     // but the user is told local answers may remain on this machine.
     let localCleanupFailed=false
-    try { finalDraftStore.clearAll(); clearHuiteacherSessionDrafts() } catch { localCleanupFailed=true }
+    try { await finalDraftStore.clearAll(); clearHuiteacherSessionDrafts() } catch { localCleanupFailed=true }
     setAccountOpen(false);setMe(null);setSelectedOrg('');setScreen('home')
     setMessage(localCleanupFailed?'已退出教育账号；本机答卷草稿清理失败，共享设备前请手动清除浏览器站点数据':'')
     })

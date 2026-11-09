@@ -23,8 +23,8 @@ export interface CurrentPrincipal {
    * accounts holding an admin role, ORG_ADMIN membership, an active
    * PRODUCT_ADMIN grant, or a sensitive capability grant
    * (PSYCHOLOGY_STAFF, PARENT_REPORT_DISCLOSURE, REPORT_MEMBER_EXPORT,
-   * REPORT_EXPORT). */
-  needsMfa?: boolean
+   * REPORT_EXPORT). Required: the auth middleware fails closed when absent. */
+  needsMfa: boolean
 }
 
 /** Select an existing business identity; this can only remove the Training

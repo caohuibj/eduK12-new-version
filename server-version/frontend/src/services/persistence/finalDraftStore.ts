@@ -375,6 +375,21 @@ const replacementMeta = (current: FinalDraftMeta, metadata?: Record<string, unkn
   ...(metadata === undefined ? {} : { instrumentMetadata: { ...current.instrumentMetadata, ...metadata } }),
 })
 
+/** Shared-device logout decision (X-05B review): a draft survives only when
+ * its answers have NOT yet been durably accepted and could still be replayed.
+ * Sealed-but-unconfirmed submissions (sealedSubmission present, or a
+ * SUBMITTING/RETRY_PENDING/CONFLICT status) are preserved so the same
+ * submissionId can replay after a lost ACK; pure local DRAFTs and confirmed
+ * COMPLETED leftovers are safe to discard. Cross-account reachability does not
+ * depend on this sweep: draft keys are namespaced by server-minted attempt ids
+ * and a different account's runner never queries another attempt's keys. */
+export const draftSurvivesSharedDeviceClear = (meta: Pick<FinalDraftMeta, 'status' | 'sealedSubmission'>): boolean => (
+  meta.sealedSubmission !== undefined
+  || meta.status === 'SUBMITTING'
+  || meta.status === 'RETRY_PENDING'
+  || meta.status === 'CONFLICT'
+)
+
 export interface FinalDraftStore {
   listTrainingCognitiveDrafts(after?: string | null): Promise<{ draftKeys: string[]; nextCursor: string | null }>
   expireTrainingCognitiveDraft(draftKey: string, now: number): Promise<boolean>
@@ -619,16 +634,16 @@ class MemoryFinalDraftStore implements FinalDraftStore {
   }
 
   async clearAll() {
-    // Retained tombstones keep their meta only: the normal expiry flow has
-    // already dropped answers/trials, and this guarantees that invariant so a
-    // retained record can never carry another student's answers forward.
     for (const draftKey of [...this.metas.keys()]) {
-      const retained = this.metas.get(draftKey)?.trainingRetention?.expiredAt !== undefined
-      if (retained) {
+      const meta = this.metas.get(draftKey)
+      if (meta?.trainingRetention?.expiredAt !== undefined) {
+        // Retained tombstones keep their meta only: the normal expiry flow has
+        // already dropped answers/trials, and this guarantees that invariant.
         for (const key of [...this.answers.keys()]) if (key.startsWith(`${draftKey}:`)) this.answers.delete(key)
         for (const key of [...this.trials.keys()]) if (key.startsWith(`${draftKey}:`)) this.trials.delete(key)
         continue
       }
+      if (meta && draftSurvivesSharedDeviceClear(meta)) continue
       await this.delete(draftKey)
     }
   }
@@ -981,13 +996,24 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
       for (const meta of metas) {
         // Retained tombstones keep their meta only (the expiry flow already
         // dropped their records); guarantee no answers/trials survive.
+        if (meta.trainingRetention?.expiredAt !== undefined) {
+          for (const name of [ANSWER_STORE, TRIAL_STORE]) {
+            const store = transaction.objectStore(name)
+            const keys = await requestResult<IDBValidKey[]>(store.index(DRAFT_INDEX).getAllKeys(meta.draftKey))
+            for (const key of keys) store.delete(key)
+          }
+          continue
+        }
+        // Unconfirmed sealed submissions survive the sweep WITH their payload
+        // (answers/trials are the replay body), so the original account can
+        // still recover after a lost ACK.
+        if (draftSurvivesSharedDeviceClear(meta)) continue
+        transaction.objectStore(META_STORE).delete(meta.draftKey)
         for (const name of [ANSWER_STORE, TRIAL_STORE]) {
           const store = transaction.objectStore(name)
           const keys = await requestResult<IDBValidKey[]>(store.index(DRAFT_INDEX).getAllKeys(meta.draftKey))
           for (const key of keys) store.delete(key)
         }
-        if (meta.trainingRetention?.expiredAt !== undefined) continue
-        transaction.objectStore(META_STORE).delete(meta.draftKey)
       }
     })
   }

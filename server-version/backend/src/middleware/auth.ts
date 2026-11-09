@@ -71,8 +71,10 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
     // V1): identical database predicates, identical request-time evaluation,
     // one fewer query per request for every product — ordinary users pay zero
     // and no route prefix is ever exempted from the check.
+    // Fail closed: a SCHOOL-domain principal without a resolved mandatory-MFA
+    // fact is treated as requiring MFA, never waved through.
     if ((product === 'SCHOOL' || product === 'HUITEACHER')
-      && principal!.needsMfa === true
+      && principal!.needsMfa !== false
       && (!payload.mfaVerifiedAt || payload.mfaVerifiedAt > Date.now()/1000)) {
       return unauthorized(res, '需要完成双因素认证')
     }

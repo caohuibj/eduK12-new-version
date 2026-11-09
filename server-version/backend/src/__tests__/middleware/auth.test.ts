@@ -232,7 +232,7 @@ describe('per-browser logout and forced password realm boundaries', () => {
     ['HUITEACHER','huiteacher_session',authenticateHuiteacher,'/api/huiteacher/auth/me','/api/huiteacher/my-form-tasks','HUITEACHER'],
   ] as const)('%s allows own /me, logout and change-password but no business work while forced', async (realm,cookieName,guard,mePath,businessPath,sessionProduct) => {
     mockVerifyToken.mockReturnValue({...payload,accountDomain:'SCHOOL',sessionProduct})
-    mockPrisma.$queryRaw.mockResolvedValue(dbRow({accountDomain:'SCHOOL',mustChangePassword:true}))
+    mockPrisma.$queryRaw.mockResolvedValue(dbRow({accountDomain:'SCHOOL',mustChangePassword:true,needsMfa:false}))
     const authPath=realm==='SCHOOL'?'/api/campus/auth/':'/api/huiteacher/auth/'
     for (const path of [mePath,authPath+'logout',authPath+'change-password']) {
       const req={headers:{cookie:cookieName+'=test-token'},originalUrl:path,params:{}} as any
@@ -290,6 +290,18 @@ describe('per-browser logout and forced password realm boundaries', () => {
     const ordinary = makeRes(), ordinaryNext = vi.fn()
     await authenticateSchool(schoolReq, ordinary, ordinaryNext)
     expect(ordinaryNext).toHaveBeenCalledOnce()
+  })
+
+  it('fails closed when a SCHOOL principal lacks a resolved mandatory-MFA fact', async () => {
+    // A row without needsMfa (legacy projection or schema drift) must never be
+    // waved through: absence is treated as requiring MFA.
+    const schoolReq = { headers: { cookie: 'huischool_session=test-token' }, originalUrl: '/api/campus/organizations/org-1', params: {} } as any
+    mockVerifyToken.mockReturnValue({ ...payload, accountDomain: 'SCHOOL' })
+    mockPrisma.$queryRaw.mockResolvedValue(dbRow({ accountDomain: 'SCHOOL' }))
+    const res = makeRes(), next = vi.fn()
+    await authenticateSchool(schoolReq, res, next)
+    expect(res.statusCode).toBe(401)
+    expect(next).not.toHaveBeenCalled()
   })
 })
 

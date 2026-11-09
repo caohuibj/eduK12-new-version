@@ -3,17 +3,27 @@ import { IndexedDbFinalDraftStore } from '../finalDraftStore'
 
 // Minimal transaction double for clearAll: enumerate metas, drop every
 // non-retained draft with its answers/trials, keep retained tombstones.
-function fixture(options: { retained?: boolean } = {}) {
-  const rows: Record<string, Array<{ key: IDBValidKey; draftKey: string; trainingRetention?: { expiredAt: number } }>> = {
+function fixture(options: { retained?: boolean; sealed?: boolean; submitting?: boolean } = {}) {
+  const rows: Record<string, Array<{ key: IDBValidKey; draftKey: string; trainingRetention?: { expiredAt: number };
+    status?: string; sealedSubmission?: { schemaVersion: 1; sealedAt: number; payload: unknown } }>> = {
     draftMeta: [
-      { key: 'draft-a', draftKey: 'draft-a' },
-      { key: 'draft-b', draftKey: 'draft-b', ...(options.retained ? { trainingRetention: { expiredAt: 1 } } : {}) },
+      { key: 'draft-a', draftKey: 'draft-a', status: 'DRAFT' },
+      { key: 'draft-b', draftKey: 'draft-b', status: 'DRAFT', ...(options.retained ? { trainingRetention: { expiredAt: 1 } } : {}) },
+      ...(options.sealed ? [{ key: 'draft-sealed', draftKey: 'draft-sealed', status: 'DRAFT',
+        sealedSubmission: { schemaVersion: 1 as const, sealedAt: 1, payload: { answers: ['unconfirmed'] } } }] : []),
+      ...(options.submitting ? [{ key: 'draft-submitting', draftKey: 'draft-submitting', status: 'SUBMITTING' }] : []),
     ],
     draftAnswers: [
       { key: ['draft-a', 'q:1'], draftKey: 'draft-a' },
       { key: ['draft-b', 'q:1'], draftKey: 'draft-b' },
+      ...(options.sealed ? [{ key: ['draft-sealed', 'q:1'], draftKey: 'draft-sealed' }] : []),
+      ...(options.submitting ? [{ key: ['draft-submitting', 'q:1'], draftKey: 'draft-submitting' }] : []),
     ],
-    draftTrials: [{ key: ['draft-a', 0], draftKey: 'draft-a' }, { key: ['draft-b', 3], draftKey: 'draft-b' }],
+    draftTrials: [
+      { key: ['draft-a', 0], draftKey: 'draft-a' }, { key: ['draft-b', 3], draftKey: 'draft-b' },
+      ...(options.sealed ? [{ key: ['draft-sealed', 0], draftKey: 'draft-sealed' }] : []),
+      ...(options.submitting ? [{ key: ['draft-submitting', 0], draftKey: 'draft-submitting' }] : []),
+    ],
   }
   const before = structuredClone(rows)
   const deletes = vi.fn()
@@ -71,6 +81,20 @@ function fixture(options: { retained?: boolean } = {}) {
 afterEach(() => vi.unstubAllGlobals())
 
 describe('shared-device clearAll (X-05B)', () => {
+  it('preserves unconfirmed sealed submissions and in-flight submissions for replay recovery', async () => {
+    const f = fixture({ sealed: true, submitting: true })
+    await f.store.clearAll()
+    // The sweep must keep every draft whose answers were not durably accepted:
+    // sealed-but-unconfirmed envelopes and SUBMITTING/RETRY_PENDING/CONFLICT
+    // drafts keep meta, answers and trials so the same submissionId can replay
+    // after a lost ACK.
+    expect(f.rows.draftMeta.map(row => row.draftKey).sort()).toEqual(['draft-sealed', 'draft-submitting'])
+    expect(f.rows.draftAnswers.map(row => row.draftKey).sort()).toEqual(['draft-sealed', 'draft-submitting'])
+    expect(f.rows.draftTrials.map(row => row.draftKey).sort()).toEqual(['draft-sealed', 'draft-submitting'])
+    // Only the safe-to-drop drafts (pure DRAFT leftovers) were deleted.
+    expect(f.deletes.mock.calls.filter(call => call[0] === 'draftMeta').map(call => call[1])).toEqual(['draft-a', 'draft-b'])
+  })
+
   it('discards every draft with its answers and trials in one transaction', async () => {
     const f = fixture()
     await f.store.clearAll()
