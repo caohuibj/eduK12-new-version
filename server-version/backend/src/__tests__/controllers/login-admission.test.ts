@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({
   findUnique: vi.fn(), principal: vi.fn(), comparePassword: vi.fn(), generateToken: vi.fn(), setSessionCookie: vi.fn(),
   recordLoginFailure: vi.fn(), clearLoginFailures: vi.fn(), withLoginPasswordVerification: vi.fn(),
+  withLoginAccountLookup: vi.fn(),
 }))
 vi.mock('../../config/database', () => ({ prisma: { user: { findUnique: mocks.findUnique }, $queryRaw: mocks.principal } }))
 vi.mock('../../utils/password', () => ({
@@ -13,6 +14,7 @@ vi.mock('../../utils/authCookies', () => ({ setSessionCookie: mocks.setSessionCo
 vi.mock('../../middleware/loginRateLimit', () => ({
   recordLoginFailure: mocks.recordLoginFailure, clearLoginFailures: mocks.clearLoginFailures,
   withLoginPasswordVerification: mocks.withLoginPasswordVerification,
+  withLoginAccountLookup: mocks.withLoginAccountLookup,
 }))
 vi.mock('../../utils/logger', () => ({ logger: { error: vi.fn() } }))
 import { authController } from '../../controllers/authController'
@@ -36,22 +38,23 @@ beforeEach(() => {
   })
   mocks.comparePassword.mockResolvedValue(true)
   mocks.withLoginPasswordVerification.mockImplementation((operation: () => unknown) => operation())
+  mocks.withLoginAccountLookup.mockImplementation((operation: () => unknown) => operation())
   mocks.recordLoginFailure.mockResolvedValue({ accountIpAllowed: true, accountGlobalAllowed: true, retryAfterSeconds: 1 })
   mocks.clearLoginFailures.mockResolvedValue(undefined)
   mocks.generateToken.mockReturnValue('test-only-session')
 })
 
 describe('bounded login execution and failure classification', () => {
-  it('reads current account authority only after admission to password work', async () => {
-    let admit!: () => void
-    const admitted = new Promise<void>((resolve) => { admit = resolve })
-    mocks.withLoginPasswordVerification.mockImplementation(async (operation: () => unknown) => { await admitted; return operation() })
+  it('reads current account authority through account lookup gate before password admission', async () => {
+    let admitPassword!: () => void
+    const passwordAdmitted = new Promise<void>((resolve) => { admitPassword = resolve })
+    mocks.withLoginPasswordVerification.mockImplementation(async (operation: () => unknown) => { await passwordAdmitted; return operation() })
     const res = response()
-    const pending = authController.login(request(), res)
-    await Promise.resolve()
-    expect(mocks.findUnique).not.toHaveBeenCalled()
     mocks.findUnique.mockResolvedValue({ ...user, isFrozen: true })
-    admit()
+    const pending = authController.login(request(), res)
+    await vi.waitFor(() => expect(mocks.findUnique).toHaveBeenCalledOnce())
+    expect(mocks.comparePassword).not.toHaveBeenCalled()
+    admitPassword()
     await pending
     expect(res.code).toBe(401)
     expect(mocks.comparePassword).toHaveBeenCalledOnce()

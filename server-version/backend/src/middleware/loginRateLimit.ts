@@ -18,7 +18,7 @@ const activeAccounts = new Map<string, symbol>()
 
 export const loginPasswordVerificationAdmission = new BoundedAdmissionGate({
   name: 'login_password_verify',
-  maxConcurrent: configuredInteger('LOGIN_PASSWORD_MAX_CONCURRENT', 4),
+  maxConcurrent: configuredInteger('LOGIN_PASSWORD_MAX_CONCURRENT', 8),
   maxQueue: configuredInteger('LOGIN_PASSWORD_MAX_QUEUE', 512, true),
   maxWaitMs: configuredInteger('LOGIN_PASSWORD_MAX_WAIT_MS', 30_000),
   retryAfterSeconds: 1,
