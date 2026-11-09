@@ -124,8 +124,9 @@ beforeEach(()=>{
   state.needsMfa=false
   state.verify.mockReturnValue({userId:state.principal.userId,accountDomain:'SCHOOL',
     sessionProduct:'HUITEACHER',tokenVersion:0})
+  // L-Fast V1: the mandatory-MFA facts ride the principal roundtrip itself.
   state.query.mockImplementation((parts:TemplateStringsArray)=>Promise.resolve(
-    parts.join('').includes('AS "userId"')?[{...state.principal}]:[{required:state.needsMfa}],
+    parts.join('').includes('AS "userId"')?[{...state.principal,needsMfa:state.needsMfa}]:[{required:state.needsMfa}],
   ))
   state.goals.mockResolvedValue({list:[]})
   state.privacy.mockResolvedValue({list:[]})
@@ -140,10 +141,10 @@ describe('Huiteacher matched route authentication and feature isolation',()=>{
     expect(state.goals).not.toHaveBeenCalled()
     expect(state.privacy).not.toHaveBeenCalled()
   })
-  it('authenticates a later privacy route with two DB checks instead of stacked module checks',async()=>{
+  it('authenticates a later privacy route with a single DB roundtrip instead of stacked module checks',async()=>{
     const res=await fetch(origin+'/api/huiteacher'+privacyPath,{headers})
     expect(res.status).toBe(200)
-    expect(state.query).toHaveBeenCalledTimes(2)
+    expect(state.query).toHaveBeenCalledTimes(1)
     expect(state.privacy).toHaveBeenCalledOnce()
     expect(res.headers.get('Cache-Control')).toBe('no-store')
   })
@@ -152,13 +153,13 @@ describe('Huiteacher matched route authentication and feature isolation',()=>{
     vi.stubEnv('HUITEACHER_IMPROVEMENT_ENABLED','false')
     const res=await fetch(origin+'/api/huiteacher'+privacyPath,{headers})
     expect(res.status).toBe(200)
-    expect(state.query).toHaveBeenCalledTimes(2)
+    expect(state.query).toHaveBeenCalledTimes(1)
     expect(state.privacy).toHaveBeenCalledOnce()
     for(const path of ['/my-student-feedback','/my-improvement-targets']){
       const disabled=await fetch(origin+'/api/huiteacher'+path,{headers})
       expect(disabled.status).toBe(404)
     }
-    expect(state.query).toHaveBeenCalledTimes(2)
+    expect(state.query).toHaveBeenCalledTimes(1)
   })
   it('keeps an unrelated route and verb out of authentication and feature checks',async()=>{
     vi.stubEnv('REPORT_PRIVACY_PREFERENCES_V1_ENABLED','false')
@@ -169,10 +170,10 @@ describe('Huiteacher matched route authentication and feature isolation',()=>{
   it('reloads current account state on the next request instead of caching it across requests',async()=>{
     const path=origin+'/api/huiteacher/my-improvement-targets'
     expect((await fetch(path,{headers})).status).toBe(200)
-    expect(state.query).toHaveBeenCalledTimes(2)
+    expect(state.query).toHaveBeenCalledTimes(1)
     state.principal.isFrozen=true
     expect((await fetch(path,{headers})).status).toBe(401)
-    expect(state.query).toHaveBeenCalledTimes(3)
+    expect(state.query).toHaveBeenCalledTimes(2)
     expect(state.goals).toHaveBeenCalledOnce()
   })
   it('retains mandatory MFA, product sessions, and sensitive step-up checks',async()=>{
