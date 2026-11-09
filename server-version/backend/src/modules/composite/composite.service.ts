@@ -22,7 +22,7 @@ import { assertScaleLibraryCollectionAllowed } from '../scale-library-governance
 import { assertCompositeCourseScope } from './composite-course-scope'
 import {assertTrainingPrivateReferenceAdmissionCurrent} from './training-private-reference-use'
 import {attachTrainingReferenceSelection} from './training-reference-selection'
-import {freezeTrainingReferenceBinding} from './training-reference-binding'
+import {freezeTrainingReferenceBinding, trainingBoundContent} from './training-reference-binding'
 import {assertCurrentTrainingContentOwner,attachTrainingReportSelection} from './training-report-selection'
 import {prepareTrainingContentSnapshot,attachPublishedScaleArtifacts,prepareTrainingContentAttemptBinding,resolveTrainingScaleArtifacts} from './training-content-binding'
 import {inheritTrainingTrackingSources,freezeTrainingTracking,readTrainingTracking} from './personal-tracking'
@@ -223,7 +223,6 @@ import {
   storeFrozenActiveSlotSet,
   formSectionSlotKey,
   type FrozenActiveSlotV1,
-  type FrozenActiveSlotSetV1,
 } from '../assessment-runtime/slot-set'
 import { BoundedArtifactCache } from '../assessment-runtime/bounded-artifact-cache'
 import { runnerDefinition } from '../scale/scale-definition'
@@ -3160,7 +3159,7 @@ const precomputeScaleOnlyActiveSlotSet = async (db: Db, input: {
     cognitive: [], situational: [],
     formSections: input.formSections.map((section: any) => ({ sectionId: section.id, definitionHash: formSectionIdentityHash(compositeFormSectionRuntimeDefinition(section)) })),
   })
-  return { encrypted: await storeFrozenActiveSlotSet(slotSet, db), snapshotHash: slotSet.snapshotHash, slotSet }
+  return { encrypted: await storeFrozenActiveSlotSet(slotSet, db), snapshotHash: slotSet.snapshotHash }
 }
 
 const freezeEducationLibraryScaleUnit = async (db: Db, item: any, libraryUnit: any, educationFrozenScales: Map<string, any>) => {
@@ -3563,10 +3562,13 @@ const createAttempt = async (
   // Freeze the explicit policy with the truthful empty context before creating
   // or exposing any measurement child. Context-bearing tasks bind atomically
   // when their context section is submitted, before the next runner is delivered.
-  const hasReferencePolicy = trainingContentBinding?.units?.some((u: any) => u.referencePolicy !== undefined)
-  if(hasReferencePolicy && trainingContentBinding&&!formSections.some((section:any)=>section.contextSection||section.items?.some((item:any)=>item.contextKey))
-    &&!composite.items.some((item:any)=>item.type==='FORM'&&item.contextKey)){
-    await freezeTrainingReferenceBinding(db as Prisma.TransactionClient,{...attempt,compositeAssessment:composite})
+  if (trainingContentBinding) {
+    const bound = trainingBoundContent({ ...attempt, compositeAssessmentId: composite.id })
+    const hasReferencePolicy = bound?.units?.some((u: any) => u.referencePolicy !== undefined)
+    if (hasReferencePolicy && !formSections.some((section: any) => section.contextSection || section.items?.some((item: any) => item.contextKey))
+      && !composite.items.some((item: any) => item.type === 'FORM' && item.contextKey)) {
+      await freezeTrainingReferenceBinding(db as Prisma.TransactionClient, { ...attempt, compositeAssessment: composite })
+    }
   }
   if (finalOnly && formSections.length > 0 && !flowEnabled) {
     await db.compositeFormSectionAttempt.createMany({
