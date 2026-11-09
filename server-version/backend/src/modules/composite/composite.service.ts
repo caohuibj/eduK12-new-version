@@ -3595,19 +3595,14 @@ const createAttempt = async (
         definitionHash: formSectionIdentityHash(compositeFormSectionRuntimeDefinition(section)),
       })),
     })
-    const encryptedSlotSet = await storeFrozenActiveSlotSet(frozenActiveSlotSet, db)
     await db.compositeAssessmentAttempt.update({
       where: { id: attempt.id },
       data: {
         ...(flowCandidate ? (()=>{const snapshot={...flowCandidate.snapshot,...(materialAssignment?{schemaVersion:2,materialAssignment}:{}),slotSetHash:frozenActiveSlotSet.snapshotHash};return {trainingFlowSnapshotEncrypted:encryptUnifiedRuntimePayload(snapshot),trainingFlowSnapshotHash:canonicalHash(snapshot)}})():{}),
-        frozenActiveSlotSetEncrypted: encryptedSlotSet,
+        frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet, db),
         frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
       },
     })
-    attempt.frozenActiveSlotSetEncrypted = encryptedSlotSet
-    attempt.frozenActiveSlotSetHash = frozenActiveSlotSet.snapshotHash
-    ;(attempt as any).precomputedSlotSet = frozenActiveSlotSet
-    ;(attempt as any).isFreshAttempt = true
   }
   if(materialAssignment){
     await ensureTrainingFlowCurrentChildInTransaction(db as Prisma.TransactionClient,attempt.id,userId?{userId}:{recoveryTokenHash:credential!.hash})
@@ -3615,10 +3610,6 @@ const createAttempt = async (
   }
   await contentCandidate?.recheckSourceLicenses()
   await assertTrainingPrivateReferenceAdmissionCurrent(db as Prisma.TransactionClient)
-  if (precomputedActiveSlotSet) {
-    (attempt as any).precomputedSlotSet = precomputedActiveSlotSet.slotSet;
-    (attempt as any).isFreshAttempt = true;
-  }
   return attempt
 }
 
@@ -3773,10 +3764,7 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
           }, { maxWait: 10_000, timeout: 30_000 }))
         } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
       })
-      if (attempt && !(attempt as any).compositeAssessment) {
-        (attempt as any).compositeAssessment = composite
-      }
-      return { attempt: await getAttemptState(attempt.id, { userId }, undefined, 'full', attempt), recoveryToken: null }
+      return { attempt: await getAttemptState(attempt.id, { userId }), recoveryToken: null }
     } catch (err) {
       if (!isUniqueConstraintError(err) || retry === 1) throw err
     }
@@ -4581,7 +4569,6 @@ const getUnifiedCompositeAttemptState = async (
   attempt: any,
   context: { userId?: string; recoveryTokenHash?: string },
   view: CompositeAttemptStateView = 'full',
-  options?: { isFreshAttempt?: boolean; precomputedSlotSet?: FrozenActiveSlotSetV1 },
 ) => {
   const attemptId = attempt.id
   const authorized = context.userId
@@ -4601,31 +4588,25 @@ const getUnifiedCompositeAttemptState = async (
   // their frozen slot set below, so retiring content cannot break resume/history.
   assertSupportedComposite(attempt.compositeAssessment, true)
 
-  let frozenSlotSet: FrozenActiveSlotSetV1
-  if (options?.precomputedSlotSet) {
-    frozenSlotSet = options.precomputedSlotSet
-  } else {
-    try {
-      if (!attempt.frozenActiveSlotSetEncrypted || !attempt.frozenActiveSlotSetHash) throw new Error('FrozenActiveSlotSet missing')
-      frozenSlotSet = await loadFrozenActiveSlotSet(attempt.frozenActiveSlotSetEncrypted)
-      if (
-        frozenSlotSet.snapshotHash !== attempt.frozenActiveSlotSetHash
-        || frozenSlotSet.attemptEpoch !== attempt.attemptEpoch
-        || frozenSlotSet.runtimeGeneration !== 'UNIFIED_V1'
-      ) throw new Error('FrozenActiveSlotSet identity mismatch')
-    } catch {
-      throw compositeConflict('综合测评冻结内容不可用，请重启测评')
-    }
+  let frozenSlotSet
+  try {
+    if (!attempt.frozenActiveSlotSetEncrypted || !attempt.frozenActiveSlotSetHash) throw new Error('FrozenActiveSlotSet missing')
+    frozenSlotSet = await loadFrozenActiveSlotSet(attempt.frozenActiveSlotSetEncrypted)
+    if (
+      frozenSlotSet.snapshotHash !== attempt.frozenActiveSlotSetHash
+      || frozenSlotSet.attemptEpoch !== attempt.attemptEpoch
+      || frozenSlotSet.runtimeGeneration !== 'UNIFIED_V1'
+    ) throw new Error('FrozenActiveSlotSet identity mismatch')
+  } catch {
+    throw compositeConflict('综合测评冻结内容不可用，请重启测评')
   }
 
   // Progress is closed over the frozen slot set and terminal headers only.
   // No answer, result, trial, or encrypted participant payload is selected.
-  const snapshotRows = options?.isFreshAttempt
-    ? []
-    : await prisma.assessmentUnitSnapshot.findMany({
-        where: { compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch },
-        select: { slotKey: true, terminalState: true },
-      })
+  const snapshotRows = await prisma.assessmentUnitSnapshot.findMany({
+    where: { compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch },
+    select: { slotKey: true, terminalState: true },
+  })
   const slotsByKey = new Map(frozenSlotSet.slots.map((slot: FrozenActiveSlotV1) => [slot.slotKey, slot]))
   const headers = snapshotRows.map((row) => unifiedCompositeProgressSnapshot(row, slotsByKey, attempt.attemptEpoch))
   const completeness = evaluateCompleteness({ slots: frozenSlotSet.slots, snapshots: headers, attemptEpoch: attempt.attemptEpoch, pathPolicy:attempt.trainingFlowScope?.aggregatePathPolicy })
@@ -5352,13 +5333,7 @@ const patchCompositeStateAfterFinalize = (
   }
 }
 
-export const getAttemptState = async (
-  attemptId: string,
-  context: { userId?: string; recoveryTokenHash?: string },
-  requestedUnit?: {itemId?:string;sectionId?:string},
-  view: CompositeAttemptStateView = 'full',
-  preloadedAttempt?: any
-) => {
+export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }, requestedUnit?: {itemId?:string;sectionId?:string}, view: CompositeAttemptStateView = 'full') => {
   // Load-once: the parent row is read exactly once with the narrowed unified
   // select and shared by the unified state projection and the
   // ensure*AtDelivery steps. The narrowed shape drops only fields the
@@ -5366,12 +5341,10 @@ export const getAttemptState = async (
   // the full select for every attempt — no second read for special
   // questionnaires. The legacy path (rare, pre-UNIFIED_V1 attempts)
   // re-reads through findAttempt below.
-  let runtime = (preloadedAttempt && preloadedAttempt.compositeAssessment && preloadedAttempt.id === attemptId)
-    ? preloadedAttempt
-    : await prisma.compositeAssessmentAttempt.findUnique({
-        where: { id: attemptId },
-        select: UNIFIED_ATTEMPT_STATE_PARENT_SELECT_NARROWED,
-      }) as any
+  let runtime = await prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId },
+    select: UNIFIED_ATTEMPT_STATE_PARENT_SELECT_NARROWED,
+  }) as any
   if (!runtime) throw compositeNotFound('综合测评记录不存在')
   if (runtime.runtimeGeneration === 'UNIFIED_V1') {
     if(trainingFlowMarkerState(runtime)==='FLOW'){
@@ -5384,10 +5357,7 @@ export const getAttemptState = async (
       const scope=await resolveTrainingAttemptScope(runtime)
       if((requestedUnit.itemId&&!scope.itemIds.has(requestedUnit.itemId))||(requestedUnit.sectionId&&!scope.sectionIds.has(requestedUnit.sectionId)))throw compositeForbidden('此内容未分配给当前作答')
     }
-    const state = await getUnifiedCompositeAttemptState(runtime, context, view, {
-      isFreshAttempt: Boolean(runtime.isFreshAttempt),
-      precomputedSlotSet: runtime.precomputedSlotSet,
-    })
+    const state = await getUnifiedCompositeAttemptState(runtime, context, view)
     // An authorized reread repairs a completion projection that failed after
     // canonical FINAL committed, without creating or resubmitting an attempt.
     if (state.status === 'COMPLETED' && runtime.assignmentRef) {
