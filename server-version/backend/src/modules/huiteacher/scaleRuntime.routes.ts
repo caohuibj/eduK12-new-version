@@ -12,6 +12,7 @@ import { asyncHandler } from '../../middleware/asyncHandler'
 import { success,notFound } from '../../utils/response'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
 import { startAssessmentRunExecution } from '../assessment-run/startExecution'
+import { attachInlineCurrentUnit, requestedInlineCurrentUnit } from '../composite/current-unit-start-inline'
 import {readTeacherPersonalChanges} from '../reporting/teacher-personal-changes.service'
 import { readTeacherPersonalScaleReport } from './scalePersonalReport.service'
 import { compositeController } from '../composite/composite.controller'
@@ -230,7 +231,14 @@ router.post('/run-executions/:executionId/start-scale',
     })
     if(result.state==='STARTED'&&result.runtimeBindingKind!=='COMPOSITE')
       throw new Error('Expected canonical Scale Composite binding')
-    return result
+    const attemptId=result.state==='STARTED'&&result.runtimeBindingKind==='COMPOSITE'
+      ?result.runtimeBindingRef:undefined
+    return attachInlineCurrentUnit({
+      requested:requestedInlineCurrentUnit(req),
+      started:result,
+      attemptId,
+      actorUserId:req.user!.userId,
+    })
   }))
 router.get('/composite-attempts/:attemptId',
   authenticateHuiteacher,requireScaleAttempt,compositeController.getAttempt)
