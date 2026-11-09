@@ -253,28 +253,69 @@ async function runBenchmark(vuCount: number, workerConcurrency = 8) {
   console.log(`✅ Phase 3 Done: All ${vuCount} reports READY (wall: ${reportTotalWallTime}ms)`)
 
   // 7. Phase 4: Read reports & verify score accuracy and payload compression
-  console.log(`\n⏳ Phase 4: Reading and verifying reports...`)
+  console.log(`\n⏳ Phase 4: Reading and exhaustively verifying all ${vuCount} reports (24 units each = ${vuCount * 24} units)...`)
   let sampleCipherSize = 0
   let sampleScoreValue = 0
+  let totalUnitsVerified = 0
 
   await Promise.all(
     submitResults.map(async ({ studentId, attemptId }) => {
+      // 1. Verify Attempt status
+      const attempt = await prisma.compositeAssessmentAttempt.findUnique({
+        where: { id: attemptId },
+        select: { status: true },
+      })
+      if (attempt?.status !== 'COMPLETED') {
+        throw new Error(`Assertion failed: attempt ${attemptId} status is ${attempt?.status}, expected COMPLETED`)
+      }
+
+      // 2. Verify Report Job status & ciphertext size
+      const job = await prisma.compositeReportJob.findFirst({ where: { attemptId } })
+      if (job?.status !== 'READY') {
+        throw new Error(`Assertion failed: report job for attempt ${attemptId} status is ${job?.status}, expected READY`)
+      }
+      if (!sampleCipherSize && job?.reportEncrypted) {
+        sampleCipherSize = Buffer.byteLength(job.reportEncrypted)
+      }
+
+      // 3. Read report view and measure read latency
       const t0 = Date.now()
       const view = await getCompositeReportView(attemptId, { userId: studentId })
       reportReadLatencies.push(Date.now() - t0)
 
-      if (!sampleCipherSize) {
-        const job = await prisma.compositeReportJob.findFirst({ where: { attemptId } })
-        sampleCipherSize = Buffer.byteLength(job?.reportEncrypted || '')
+      if (!view.report || !Array.isArray(view.report.unitReports)) {
+        throw new Error(`Assertion failed: attempt ${attemptId} missing report or unitReports`)
+      }
+      if (view.report.unitReports.length !== 24) {
+        throw new Error(`Assertion failed: attempt ${attemptId} has ${view.report.unitReports.length} unitReports, expected 24`)
+      }
+
+      // 4. Exhaustively verify every unit report and its scores
+      for (let uIdx = 0; uIdx < view.report.unitReports.length; uIdx++) {
+        const u = view.report.unitReports[uIdx]
+        const score = u.scores?.find((s: any) => s.key === 'engagement')
+        if (!score) {
+          throw new Error(`Assertion failed: attempt ${attemptId} unit ${uIdx} missing engagement score`)
+        }
+        if (score.value !== 30) {
+          throw new Error(`Assertion failed: attempt ${attemptId} unit ${uIdx} engagement score is ${score.value}, expected 30`)
+        }
+        if (score.status !== 'calculated') {
+          throw new Error(`Assertion failed: attempt ${attemptId} unit ${uIdx} score status is ${score.status}, expected calculated`)
+        }
+        if (score.direction !== 'higher_is_better') {
+          throw new Error(`Assertion failed: attempt ${attemptId} unit ${uIdx} direction is ${score.direction}, expected higher_is_better`)
+        }
+        totalUnitsVerified++
       }
 
       if (!sampleScoreValue) {
-        const firstUnit = view.report?.unitReports?.[0]
-        const score = firstUnit?.scores?.find((s: any) => s.key === 'engagement')
-        sampleScoreValue = score?.value
+        sampleScoreValue = view.report.unitReports[0].scores.find((s: any) => s.key === 'engagement')?.value
       }
     })
   )
+
+  console.log(`✅ Phase 4 Done: 100% Verified ${submitResults.length} attempts, ${totalUnitsVerified} unit reports all engagement = 30 (100% correct)`)
 
   await stopCompositeReportWorker(5000)
 
