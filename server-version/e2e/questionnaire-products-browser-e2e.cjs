@@ -35,7 +35,7 @@ async function completeFour(page, label) {
   await page.waitForFunction(()=>document.querySelector('input[type="radio"]')?.checked)
   await page.getByRole('button',{name:'提交测评',exact:true}).click()
   await page.getByRole('button',{name:'开始/继续认知任务',exact:true}).click()
-  await page.getByRole('button',{name:'开始测评',exact:true}).click()
+  // The unified Cognitive intro action starts the host session and practice together.
   await page.getByRole('button',{name:'开始练习',exact:true}).click()
   let green=false
   const deadline=Date.now()+300000
@@ -44,6 +44,9 @@ async function completeFour(page, label) {
     if(await formal.isVisible()) { await formal.click(); green=false }
     const retry=page.getByRole('button',{name:'重新练习',exact:true})
     if(await retry.isVisible()) { await retry.click(); green=false }
+    // Practice pauses for explicit feedback; advance each review before the next stimulus.
+    const review=page.getByRole('button',{name:/继续下一题|查看练习结果/}).first()
+    if(await review.isVisible()) { await review.click(); green=false }
     const stimulus=page.getByRole('button',{name:'respond',exact:true})
     // The stimulus can unmount between count() and getAttribute() as the
     // cognitive runner advances. Snapshot all matching nodes in one DOM
