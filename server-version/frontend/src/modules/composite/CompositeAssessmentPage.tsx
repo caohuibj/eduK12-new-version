@@ -75,6 +75,7 @@ const CompositeAssessmentContent: React.FC = () => {
   const [recoveryInput, setRecoveryInput] = useState('')
   const [newRecoveryToken, setNewRecoveryToken] = useState<string | null>(null)
   const [cognitiveRestartBlocked, setCognitiveRestartBlocked] = useState(false)
+  const [isFreshStart, setIsFreshStart] = useState(false)
   const restartInFlight = useRef(false)
   const [scaleAnswers, setScaleAnswers] = useState<
     Record<string, string | number>
@@ -195,6 +196,7 @@ const CompositeAssessmentContent: React.FC = () => {
       if (response.code !== 0 || !response.data)
         throw new Error(response.message || '综合测评记录不存在')
       if (publicMode) store(attemptKey(id), credential)
+      setIsFreshStart(false)
       applyState(await freezeBeforeMeasurement(response.data, credential))
     } catch (err) {
       setError((err as { message?: string }).message || '加载综合测评失败')
@@ -237,13 +239,15 @@ const CompositeAssessmentContent: React.FC = () => {
         }
         if (response.data.attempt.status === 'COMPLETED' && !response.data.attempt.trainingFlow)
           goReport(response.data.attempt.id)
-        else
+        else {
+          setIsFreshStart(true)
           applyState(
             await freezeBeforeMeasurement(
               response.data.attempt,
               returnedCredential,
             ),
           )
+        }
         if (response.data.recoveryToken)
           setNewRecoveryToken(response.data.recoveryToken)
       } else {
@@ -260,7 +264,10 @@ const CompositeAssessmentContent: React.FC = () => {
         } : null
         if (response.data.attempt.status === 'COMPLETED' && !response.data.attempt.trainingFlow)
           goReport(response.data.attempt.id)
-        else applyState(await freezeBeforeMeasurement(response.data.attempt))
+        else {
+          setIsFreshStart(true)
+          applyState(await freezeBeforeMeasurement(response.data.attempt))
+        }
       }
     } catch (err) {
       if (signal.aborted) return
@@ -349,6 +356,7 @@ const CompositeAssessmentContent: React.FC = () => {
     setRecoveryToken('')
     setRecoveryInput('')
     setNewRecoveryToken(null)
+    setIsFreshStart(false)
     const initialise = async () => {
       if (publicMode) {
         if (token) {
@@ -596,7 +604,7 @@ const CompositeAssessmentContent: React.FC = () => {
     )
     if (shouldUseWholeRunner(state, relationalMode)) {
       return <>{anonymousRecovery}<WholeCompositeQuestionnaire state={state} api={api} publicMode={publicMode} recoveryToken={recoveryToken}
-        fallback={unitAssessment} onExit={() => void saveAndExit()} onCompleted={() => goReport(state.id)} /></>
+        isFreshStart={isFreshStart} fallback={unitAssessment} onExit={() => void saveAndExit()} onCompleted={() => goReport(state.id)} /></>
     }
     return <>{anonymousRecovery}{unitAssessment}</>
   }

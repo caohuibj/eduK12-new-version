@@ -300,6 +300,110 @@ describe('Scheme X Batch Scale Admission at Delivery (PR X-05C)', () => {
     ])).rejects.toThrow('量表未绑定到当前测评单元')
   })
 
+  it('rejects in transaction when current child compositeAttemptId is null (fail-closed)', async () => {
+    const scale = { id: 'scale-1', code: 's1', name: 'SampleScale', instrumentVersion: '1' }
+    const validRuntime = createFrozenScaleRuntimeSnapshot({
+      instrumentKey: 's1',
+      instrumentVersion: '1',
+      definition: sampleDefinition,
+    })
+
+    const mockChild: any = {
+      id: 'child-1',
+      compositeItemId: 'item-1',
+      compositeAttemptId: 'parent-attempt-1',
+      attemptEpoch: 1,
+      deliveryMode: 'FINAL_ONLY',
+      scale,
+      frozenAdmissionSnapshotEncrypted: null,
+      frozenAdmissionSnapshotHash: null,
+    }
+
+    const mockSlot: any = {
+      slotKey: 'scale:item-1',
+      unitType: 'SCALE',
+      sourceDefinitionIdentity: { key: 's1', version: '1', hash: validRuntime.sourceDefinitionHash },
+      sourceBinding: { compositeItemId: 'item-1', compiledRuntimeHash: validRuntime.compiledRuntime.compiledRuntimeHash },
+    }
+
+    const mockTx = {
+      $queryRaw: vi.fn().mockResolvedValue([]),
+      assessment: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: 'child-1',
+            compositeItemId: 'item-1',
+            compositeAttemptId: null, // Detached / null composite attempt ID
+            attemptEpoch: 1,
+            deliveryMode: 'FINAL_ONLY',
+            scaleId: 'scale-1',
+            scale,
+            frozenAdmissionSnapshotEncrypted: null,
+            frozenAdmissionSnapshotHash: null,
+          },
+        ]),
+      },
+    }
+
+    vi.spyOn(prisma, '$transaction').mockImplementationOnce(async (callback: any) => callback(mockTx))
+
+    await expect(batchEnsureScaleAdmissionsAtDelivery(dummyParent, [
+      { slot: mockSlot, child: mockChild, runtime: validRuntime },
+    ])).rejects.toThrow('测评轮次已改变')
+  })
+
+  it('rejects in transaction when current child scaleId does not match slot scale binding', async () => {
+    const scale = { id: 'scale-1', code: 's1', name: 'SampleScale', instrumentVersion: '1' }
+    const validRuntime = createFrozenScaleRuntimeSnapshot({
+      instrumentKey: 's1',
+      instrumentVersion: '1',
+      definition: sampleDefinition,
+    })
+
+    const mockChild: any = {
+      id: 'child-1',
+      compositeItemId: 'item-1',
+      compositeAttemptId: 'parent-attempt-1',
+      attemptEpoch: 1,
+      deliveryMode: 'FINAL_ONLY',
+      scale,
+      frozenAdmissionSnapshotEncrypted: null,
+      frozenAdmissionSnapshotHash: null,
+    }
+
+    const mockSlot: any = {
+      slotKey: 'scale:item-1',
+      unitType: 'SCALE',
+      sourceDefinitionIdentity: { key: 's1', version: '1', hash: validRuntime.sourceDefinitionHash },
+      sourceBinding: { compositeItemId: 'item-1', scaleId: 'scale-1', compiledRuntimeHash: validRuntime.compiledRuntime.compiledRuntimeHash },
+    }
+
+    const mockTx = {
+      $queryRaw: vi.fn().mockResolvedValue([]),
+      assessment: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: 'child-1',
+            compositeItemId: 'item-1',
+            compositeAttemptId: 'parent-attempt-1',
+            attemptEpoch: 1,
+            deliveryMode: 'FINAL_ONLY',
+            scaleId: 'scale-different-2',
+            scale,
+            frozenAdmissionSnapshotEncrypted: null,
+            frozenAdmissionSnapshotHash: null,
+          },
+        ]),
+      },
+    }
+
+    vi.spyOn(prisma, '$transaction').mockImplementationOnce(async (callback: any) => callback(mockTx))
+
+    await expect(batchEnsureScaleAdmissionsAtDelivery(dummyParent, [
+      { slot: mockSlot, child: mockChild, runtime: validRuntime },
+    ])).rejects.toThrow('量表未绑定到当前测评单元')
+  })
+
   it('concurrency: if another concurrent request already persisted admission, transaction reuses the winner', async () => {
     const scale = { id: 'scale-1', code: 's1', name: 'SampleScale', instrumentVersion: '1' }
     const validRuntime = createFrozenScaleRuntimeSnapshot({
