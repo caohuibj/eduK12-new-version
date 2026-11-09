@@ -103,7 +103,7 @@ const CognitiveRunnerTaskHost: React.FC<CognitiveRunnerTaskHostProps> = ({
     <div className="text-center">
       <button type="button" onClick={onStart} disabled={startDisabled} className="btn-primary">开始测评</button>
     </div>
-  ) : actions
+  ) : initial ? actions : undefined
 
   return (
     <AssessmentShell
@@ -125,6 +125,11 @@ const CognitiveRunnerTaskHost: React.FC<CognitiveRunnerTaskHostProps> = ({
                 <Runner {...runnerProps} />
               </CognitiveTaskStartContext.Provider>
             </CognitiveFocusProgressContext.Provider>
+            {!initial && actions ? (
+              <div className="cognitive-task-workspace__actions" data-cognitive-presentation="completion-action">
+                {actions}
+              </div>
+            ) : null}
           </div>
         ) : waitingContent || <LoadingContent message="正在准备本次测验..." />}
       </div>

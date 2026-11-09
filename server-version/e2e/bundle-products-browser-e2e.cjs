@@ -27,7 +27,6 @@ async function completeFour(page, label) {
   await page.waitForFunction(()=>document.querySelector('input[type="radio"]')?.checked)
   await page.getByRole('button',{name:'提交测评',exact:true}).click()
   await page.getByRole('button',{name:'开始/继续认知任务',exact:true}).click()
-  await page.getByRole('button',{name:'开始测评',exact:true}).click()
   await page.getByRole('button',{name:'开始练习',exact:true}).click()
   let green=false
   const deadline=Date.now()+300000

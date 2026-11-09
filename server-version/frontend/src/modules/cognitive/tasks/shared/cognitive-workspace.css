@@ -40,6 +40,7 @@
   position:fixed;inset:0;z-index:40;display:grid;align-content:safe center;overflow-y:auto;
   padding:clamp(20px,4vh,40px) clamp(16px,4vw,48px);box-sizing:border-box;background:var(--cognitive-page);
 }
+.cognitive-task-workspace__actions{box-sizing:border-box;width:min(100%,var(--cognitive-width-feedback,60rem));margin-inline:auto;display:flex;justify-content:center;align-items:center;padding-top:8px}
 .cognitive-surface .cognitive-running .cognitive-task-workspace:not(:has([data-cognitive-focus-stage]))>div:not([data-cognitive-presentation]){
   width:100%!important;max-width:var(--cognitive-width-feedback,60rem)!important;margin-inline:auto;box-sizing:border-box;
   padding:clamp(24px,3vw,36px);border:1px solid var(--cognitive-line);border-radius:var(--cognitive-radius-panel,18px);
