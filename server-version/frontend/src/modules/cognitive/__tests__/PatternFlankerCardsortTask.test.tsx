@@ -8,6 +8,8 @@ import { cardsortSequence, flankerSequence, patterncompareTrial } from '../tasks
 import { resolveRunner } from '../registry'
 import golden from '../../../../../cognitive-randomization-golden-v1.json'
 
+const continuePractice = () => fireEvent.click(screen.getByRole('button', { name: /继续下一题|查看练习结果/ }))
+
 const baseContext = {
   sessionId: 'session-1',
   testType: 'patterncompare',
@@ -39,19 +41,19 @@ describe('Round 2 PR3 task runners', () => {
     const patternTrial = vi.fn()
     const pattern = render(<PatterncompareTask taskContext={{ ...baseContext, config: { durationSec: 30, trialTimeoutMs: 1000, isiMs: 10 } }} trialIndex={0} onTrialComplete={patternTrial} />)
     fireEvent.click(screen.getByText('开始练习'))
-    for (let index = 0; index < 4; index += 1) fireEvent.click(screen.getByRole('button', { name: '相同' }))
+    for (let index = 0; index < 4; index += 1) { fireEvent.click(screen.getByRole('button', { name: '相同' })); continuePractice() }
     expect(screen.getByText('重新练习')).toBeInTheDocument(); expect(patternTrial).not.toHaveBeenCalled(); pattern.unmount()
 
     const flankerTrial = vi.fn()
     const flanker = render(<FlankerTask taskContext={{ ...baseContext, testType: 'flanker', config: { totalTrials: 24, stimulusMs: 40, isiMs: 10 } }} trialIndex={0} onTrialComplete={flankerTrial} />)
     fireEvent.click(screen.getByText('开始练习'))
-    for (let index = 0; index < 4; index += 1) fireEvent.click(screen.getByRole('button', { name: '← 左' }))
+    for (let index = 0; index < 4; index += 1) { fireEvent.click(screen.getByRole('button', { name: '← 左' })); continuePractice() }
     expect(screen.getByText('重新练习')).toBeInTheDocument(); expect(flankerTrial).not.toHaveBeenCalled(); flanker.unmount()
 
     const cardsortTrial = vi.fn()
     render(<CardsortTask taskContext={{ ...baseContext, testType: 'cardsort', config: { totalTrials: 24, blockCount: 2, switchRatio: 0.33, cueMs: 10, stimulusMs: 40, isiMs: 10 } }} trialIndex={0} onTrialComplete={cardsortTrial} />)
     fireEvent.click(screen.getByText('开始练习'))
-    for (let index = 0; index < 4; index += 1) fireEvent.click(screen.getByRole('button', { name: /分到左侧/ }))
+    for (let index = 0; index < 4; index += 1) { fireEvent.click(screen.getByRole('button', { name: /分到左侧/ })); continuePractice() }
     expect(screen.getByText('重新练习')).toBeInTheDocument(); expect(cardsortTrial).not.toHaveBeenCalled()
   })
 
@@ -63,7 +65,7 @@ describe('Round 2 PR3 task runners', () => {
     }
     render(<PatterncompareTask {...props} />)
     fireEvent.click(screen.getByText('开始练习'))
-    for (const response of ['same', 'different', 'same', 'different'] as const) fireEvent.click(screen.getByRole('button', { name: response === 'same' ? '相同' : '不同' }))
+    for (const response of ['same', 'different', 'same', 'different'] as const) { fireEvent.click(screen.getByRole('button', { name: response === 'same' ? '相同' : '不同' })); continuePractice() }
     fireEvent.click(screen.getByText('开始正式测验'))
     expect(document.querySelector('[data-cognitive-focus-stage]')).toBeInTheDocument()
     expect(screen.getAllByRole('img', { name: '视觉图形刺激' })).toHaveLength(2)
@@ -76,7 +78,7 @@ describe('Round 2 PR3 task runners', () => {
     const expected = flankerSequence(baseContext.randomSeed, 24)[0]
     render(<FlankerTask taskContext={{ ...baseContext, testType: 'flanker', config: { totalTrials: 24, stimulusMs: 40, isiMs: 10 } }} trialIndex={0} onTrialComplete={onTrialComplete} />)
     fireEvent.click(screen.getByText('开始练习'))
-    for (const response of ['left', 'right', 'right', 'left'] as const) fireEvent.click(screen.getByRole('button', { name: response === 'left' ? '← 左' : '右 →' }))
+    for (const response of ['left', 'right', 'right', 'left'] as const) { fireEvent.click(screen.getByRole('button', { name: response === 'left' ? '← 左' : '右 →' })); continuePractice() }
     fireEvent.click(screen.getByText('开始正式测验'))
     act(() => { vi.advanceTimersByTime(10) })
     expect(screen.getByRole('img', { name: '视觉箭头干扰刺激' })).toBeInTheDocument()
@@ -93,7 +95,7 @@ describe('Round 2 PR3 task runners', () => {
     }
     const { rerender } = render(<CardsortTask {...props} trialIndex={0} />)
     fireEvent.click(screen.getByText('开始练习'))
-    for (const response of ['left', 'right', 'left', 'right'] as const) fireEvent.click(screen.getByRole('button', { name: response === 'left' ? /分到左侧/ : /分到右侧/ }))
+    for (const response of ['left', 'right', 'left', 'right'] as const) { fireEvent.click(screen.getByRole('button', { name: response === 'left' ? /分到左侧/ : /分到右侧/ })); continuePractice() }
     fireEvent.click(screen.getByText('开始正式测验'))
     rerender(<CardsortTask {...props} trialIndex={12} />)
     expect(await screen.findByText('区块完成，可以短暂休息')).toBeInTheDocument()
@@ -108,7 +110,7 @@ describe('Round 2 PR3 task runners', () => {
     }
     const { rerender } = render(<PatterncompareTask {...props} trialIndex={0} />)
     fireEvent.click(screen.getByText('开始练习'))
-    for (const response of ['same', 'different', 'same', 'different'] as const) fireEvent.click(screen.getByRole('button', { name: response === 'same' ? '相同' : '不同' }))
+    for (const response of ['same', 'different', 'same', 'different'] as const) { fireEvent.click(screen.getByRole('button', { name: response === 'same' ? '相同' : '不同' })); continuePractice() }
     fireEvent.click(screen.getByText('开始正式测验'))
     await act(async () => {})
     rerender(<PatterncompareTask {...props} trialIndex={1} />)

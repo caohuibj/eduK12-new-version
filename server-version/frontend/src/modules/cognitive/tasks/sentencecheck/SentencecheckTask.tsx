@@ -1,4 +1,4 @@
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeAnswer, type PracticeAnswerFeedback, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { SentencecheckConfig, SentencecheckTrialPayload } from '../../types'
@@ -33,7 +33,7 @@ export const SentencecheckTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
   const [practiceIndex, setPracticeIndex] = useState(0)
   const [practiceAttempt, setPracticeAttempt] = useState(1)
   const [practiceCorrect, setPracticeCorrect] = useState<boolean[]>([])
-  const [practiceFeedback, setPracticeFeedback] = useState<string | null>(null)
+  const [practiceFeedback, setPracticeFeedback] = useState<PracticeAnswerFeedback | null>(null)
   const [formalFeedback, setFormalFeedback] = useState<string | null>(null)
   const interruptedRef = useRef(false)
   const onsetRef = useRef<number | null>(null)
@@ -96,7 +96,9 @@ export const SentencecheckTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
       const statementTrue = trial.negated ? trial.askedValue !== actualValue : trial.askedValue === actualValue
       const correct = response === statementTrue
       setPracticeCorrect((current) => { const next = [...current]; next[practiceIndex] = correct; return next })
-      setPracticeFeedback(correct ? '正确：先核对句子说的属性，再与图片比较。' : '再核对一次：句子的属性值与图片实际一致吗？注意“不是”。')
+      setPracticeFeedback({ correct, prompt: trial.sentence,
+        expected: statementTrue ? '选择“相符”' : '选择“不相符”', actual: response ? '选择“相符”' : '选择“不相符”',
+        explanation: `本题核对${trial.questionKind === 'shape' ? '形状' : '颜色'}，图片实际为${actualValue}。${trial.negated ? `句子包含“不是”，需要判断图片是否不属于“${trial.askedValue}”。` : `句子说的是“${trial.askedValue}”，需要与图片直接比较。`}因此句子与图片${statementTrue ? '相符' : '不相符'}。` })
       setSubPhase('feedback'); return
     }
     void submitFormal(response)
@@ -133,10 +135,10 @@ export const SentencecheckTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
 
   if (phase === 'practice') {
     const trial = SENTENCECHECK_PRACTICE_TRIALS[practiceIndex]
-    return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 {practiceIndex + 1} / {SENTENCECHECK_PRACTICE_TRIALS.length} · 第 {practiceAttempt} 轮 · 不计入成绩</div>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-28 pt-8">+</div>}{subPhase === 'stimulus' && trial && <><p className="text-2xl font-semibold text-gray-800 pt-4">{trial.sentence}</p><div className="flex justify-center pt-3"><ShapeFigure shape={trial.shape} color={trial.color} /></div></>}{subPhase === 'feedback' && <div className="h-28 pt-8 text-gray-700">{practiceFeedback}</div>}<ResponseButtons show={subPhase === 'stimulus'} />{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary">{practiceIndex + 1 >= SENTENCECHECK_PRACTICE_TRIALS.length ? practiceCorrect.every(Boolean) ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div>
+    return <CognitiveFocusStage ariaLabel="句图验证练习" progress={{ completed: practiceIndex + (subPhase === 'feedback' ? 1 : 0), total: SENTENCECHECK_PRACTICE_TRIALS.length }}><div className="card p-8 max-w-2xl text-center"><p className="text-sm text-gray-500 mb-4">第 {practiceAttempt} 轮 · 练习不计入成绩</p>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-28 pt-8">+</div>}{subPhase === 'stimulus' && trial && <><p className="text-2xl font-semibold text-gray-800 pt-4">{trial.sentence}</p><div className="flex justify-center pt-3"><ShapeFigure shape={trial.shape} color={trial.color} /></div></>}{subPhase === 'feedback' && <CognitivePracticeAnswer feedback={practiceFeedback} />}<ResponseButtons show={subPhase === 'stimulus'} />{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary">{practiceIndex + 1 >= SENTENCECHECK_PRACTICE_TRIALS.length ? practiceCorrect.every(Boolean) ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div></CognitiveFocusStage>
   }
 
   if (!currentTrial) return <div className="card p-8 text-center text-gray-500">正在生成结果…</div>
 
-  return <CognitiveFocusStage ariaLabel="句图验证推理正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-40 pt-10">+</div>}{subPhase === 'stimulus' && <><p className="text-2xl font-semibold text-gray-800 pt-4">{currentTrial.sentence}</p><div className="flex justify-center pt-3"><ShapeFigure shape={currentTrial.shape} color={currentTrial.color} /></div></>}{subPhase === 'feedback' && <div className="h-40 pt-10 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<ResponseButtons show={subPhase === 'stimulus'} /><p className="text-xs text-gray-400 mt-6">按键 1 = 相符、2 = 不相符，或点击按钮作答</p></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="句图验证推理正式测验" progress={{ completed: trialIndex, total: totalTrials }}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-40 pt-10">+</div>}{subPhase === 'stimulus' && <><p className="text-2xl font-semibold text-gray-800 pt-4">{currentTrial.sentence}</p><div className="flex justify-center pt-3"><ShapeFigure shape={currentTrial.shape} color={currentTrial.color} /></div></>}{subPhase === 'feedback' && <div className="h-40 pt-10 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<ResponseButtons show={subPhase === 'stimulus'} /><p className="text-xs text-gray-400 mt-6">按键 1 = 相符、2 = 不相符，或点击按钮作答</p></div></CognitiveFocusStage>
 }

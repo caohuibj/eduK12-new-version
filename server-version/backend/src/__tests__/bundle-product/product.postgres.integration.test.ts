@@ -140,7 +140,7 @@ suite('Bundle V3 real FINAL lifecycle', () => {
     await expect(fresh({bundleVersion:'latest'})).rejects.toBeDefined()
     expect((await import('../../modules/bundle-product/code-catalog')).createCodeBundleDefinitionProvider().list().every(v=>v.definition.status==='DRAFT')).toBe(true)
   })
-  it.each(['standalone-first', 'bundle-first', 'concurrent'])('shares one cognitive quota across all four entrances: %s', async mode => {
+  it.each(['standalone-first', 'bundle-first', 'concurrent'])('keeps standalone, questionnaire, composition and bundle quotas independent: %s', async mode => {
     const original = await db.cognitiveAssignment.findUniqueOrThrow({ where: { id: assignmentId } })
     const source = await db.cognitiveAssignment.create({ data: {
       configId, courseId: course1, createdBy: actor.userId, title: 'Bundle quota root', status: 'PUBLISHED', maxAttempts: 1,
@@ -162,25 +162,33 @@ suite('Bundle V3 real FINAL lifecycle', () => {
     expect(await db.cognitiveAssignment.findUniqueOrThrow({ where: { id: item.cognitiveAssignmentId! } })).toMatchObject({ maxAttempts: 1, quotaSourceAssignmentId: source.id })
     const standalone = await import('../../modules/cognitive/session.service')
     const starts = [() => standalone.createSession(student, source.id), () => runtime.startUserAttempt(student, combined.id), () => runtime.startUserAttempt(student, legacy.id), () => runtime.startUserAttempt(student, fixed.id)]
+    let results: any[]
     if (mode === 'concurrent') {
-      const results = await Promise.allSettled(starts.map(start => start()))
-      expect(results.filter(result => result.status === 'fulfilled')).toHaveLength(1)
-      const rejected = results.filter(result => result.status === 'rejected') as PromiseRejectedResult[]
-      expect(rejected).toHaveLength(3)
-      expect(rejected.every(result => result.reason.statusCode === 409)).toBe(true)
+      results = await Promise.all(starts.map(start => start()))
     } else {
       const first = mode === 'bundle-first' ? 3 : 0
-      await starts[first]()
-      for (let index = 0; index < starts.length; index++) if (index !== first) await expect(starts[index]()).rejects.toMatchObject({ statusCode: 409 })
+      const ordered = [first, ...starts.map((_, index) => index).filter(index => index !== first)]
+      results = []
+      for (const index of ordered) results[index] = await starts[index]()
     }
+    expect(results).toHaveLength(4)
     const sessions = await db.cognitiveSession.findMany({ where: { userId: student, OR: [{ assignmentId: source.id }, { assignment: { quotaSourceAssignmentId: source.id } }] } })
-    expect(sessions).toHaveLength(1)
-    const active = sessions[0]
-    if (active.compositeAttemptId) {
-      const parent = await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: active.compositeAttemptId } })
+    expect(sessions).toHaveLength(4)
+    const standaloneSession = sessions.find(session => session.compositeAttemptId === null)!
+    const compositeSessions = sessions.filter(session => session.compositeAttemptId !== null)
+    expect(standaloneSession.assignmentId).toBe(source.id)
+    expect(compositeSessions).toHaveLength(3)
+    expect(new Set(compositeSessions.map(session => session.compositeAttemptId)).size).toBe(3)
+    expect((await standalone.createSession(student, source.id)).sessionId).toBe(standaloneSession.id)
+    for (const session of compositeSessions) {
+      const parent = await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: session.compositeAttemptId! } })
       expect((await runtime.startUserAttempt(student, parent.compositeAssessmentId)).attempt.id).toBe(parent.id)
-    } else expect((await standalone.createSession(student, source.id)).sessionId).toBe(active.id)
-    expect(await db.cognitiveSession.count({ where: { userId: student, OR: [{ assignmentId: source.id }, { assignment: { quotaSourceAssignmentId: source.id } }] } })).toBe(1)
+    }
+    const { readCognitiveQuota } = await import('../../modules/cognitive/attempt-quota')
+    await expect(db.$transaction(tx => readCognitiveQuota(tx, student, source.id))).resolves.toMatchObject({
+      maxAttempts: 1, usedAttempts: 1, remainingAttempts: 0,
+      continueHref: `/student/cognitive/sessions/${standaloneSession.id}`,
+    })
   }, 30000)
   it('publishes the frozen cognitive copy in the same transaction, rejects foreign ownership and rolls back a failed bundle publication',async()=>{
     requireIsolatedReleaseDatabase(url!)

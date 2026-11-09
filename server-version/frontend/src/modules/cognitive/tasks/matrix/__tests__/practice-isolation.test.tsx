@@ -25,7 +25,10 @@ it.each([false,true])('keeps old practice or uses independent new practice witho
  render(<MatrixTask taskContext={{sessionId:'test',testType:'matrix',engineVersion:revised?'1.1.0':'1.0.0',scoringVersion:'1.0.0',configVersion:revised?'1.1.0':'1.0.0',attemptNo:1,config,randomSeed:seed}} trialIndex={0} onTrialComplete={emit}/> )
  fireEvent.click(screen.getByText('开始练习'))
  const items=revised?practice:matrixSequence('matrix-practice-v1',6).slice(0,4)
- for(const p of items)fireEvent.click(screen.getByRole('button',{name:`选项 ${p.correctOption+1}`}))
+ for(const [index,p] of items.entries()){
+  fireEvent.click(screen.getByRole('button',{name:`选项 ${p.correctOption+1}`}))
+  fireEvent.click(screen.getByRole('button',{name:index===items.length-1?'查看练习结果':'继续下一题'}))
+ }
  expect(emit).not.toHaveBeenCalled();fireEvent.click(screen.getByText('开始正式测验'))
  const formal=matrixSequence(seed,6)[0]
  await act(async()=>fireEvent.click(screen.getByRole('button',{name:`选项 ${formal.correctOption+1}`})))

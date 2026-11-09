@@ -1,0 +1,69 @@
+.cognitive-task-panel--intro{grid-template-columns:minmax(0,1.3fr) minmax(16rem,.85fr)}
+/* Shared composition for instructions, practice and formal interaction. */
+.cognitive-task-intro__header{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.cognitive-task-journey{display:flex;gap:16px;flex-wrap:wrap;margin:0;padding:0;list-style:none;color:var(--cognitive-muted);font-size:13px;font-weight:650}
+.cognitive-task-journey li{display:flex;align-items:center;gap:6px}
+.cognitive-task-journey span{display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--cognitive-line);border-radius:50%;font-size:11px;font-variant-numeric:tabular-nums}
+.cognitive-task-journey [aria-current]{color:var(--cognitive-accent)}
+.cognitive-task-journey [aria-current] span{background:var(--cognitive-accent);border-color:var(--cognitive-accent);color:var(--cognitive-on-accent)}
+.cognitive-task-example__value{font-size:19px;line-height:1.5;font-weight:700;overflow-wrap:anywhere}
+.cognitive-task-example__value--symbol{font-size:22px;line-height:1.35;white-space:nowrap;letter-spacing:0}
+.cognitive-task-example__steps{gap:20px}
+.cognitive-task-example__step+.cognitive-task-example__step::before{left:-16px;font-size:18px}
+.cognitive-task-example__step{min-height:120px;align-content:center}
+.cognitive-task-hint{font-size:var(--cognitive-text-support,16px);line-height:1.8}
+.cognitive-task-cue{font-size:var(--cognitive-text-support,16px);padding:14px 18px}
+.cognitive-task-keyhint{font-size:13px;min-height:30px}
+.cognitive-response-button{font-size:17px;padding:14px 18px}
+.cognitive-response-button:active:not(:disabled){border-color:var(--cognitive-accent);box-shadow:inset 0 2px 4px rgb(0 0 0 / .08)}
+.cognitive-task-progress{box-sizing:border-box;width:100%;max-width:var(--cognitive-width-task,66rem)}
+.cognitive-task-progress__meta{gap:20px;align-items:baseline}
+.cognitive-task-progress__meta>span{min-width:0}
+.cognitive-task-progress__meta strong{flex:none;white-space:nowrap}
+.cognitive-task-progress__track{height:6px}
+.cognitive-task-progress__value{transition:width .22s ease-out}
+.cognitive-focus-stage__task{padding:clamp(22px,3vw,36px);border:1px solid var(--cognitive-line);border-radius:var(--cognitive-radius-panel,18px);background:var(--cognitive-surface);color:var(--cognitive-ink);box-sizing:border-box;font-size:var(--cognitive-text-body,18px);line-height:1.7;box-shadow:0 8px 28px rgb(24 39 50 / .04)}
+.cognitive-focus-stage__body>.cognitive-focus-stage__task>.card{padding:0;border:0;box-shadow:none;background:transparent}
+.cognitive-focus-stage__task:has(>.cognitive-centered-task){padding-block:0;border:0;box-shadow:none;background:transparent}
+.cognitive-practice-feedback{width:100%;max-width:var(--cognitive-width-feedback,60rem);margin-inline:auto;box-sizing:border-box}
+.cognitive-practice-feedback__content{margin-top:12px;font-size:var(--cognitive-text-body,18px);line-height:1.8}
+.cognitive-practice-feedback__content>p{margin-block:12px;font-size:inherit;line-height:inherit}
+.cognitive-practice-feedback__content>.cognitive-practice-answer__prompt{padding:16px 20px;border:1px solid var(--cognitive-line);border-radius:12px;background:var(--cognitive-surface);color:var(--cognitive-ink);font-size:20px;font-weight:650;line-height:1.65}
+.cognitive-practice-feedback__footer{display:flex;justify-content:flex-end;gap:12px;margin-top:20px}
+.cognitive-practice-review__visual{display:flex;justify-content:center;align-items:center;gap:24px;flex-wrap:wrap;margin:0 auto 24px;padding:20px;border:1px solid var(--cognitive-line);border-radius:14px;background:var(--cognitive-raised)}
+.cognitive-task-panel--result>p:first-of-type{font-size:24px;font-weight:650;line-height:1.6;color:var(--cognitive-ink)}
+.cognitive-practice-feedback__content>.btn-primary:last-child{display:flex;margin-left:auto;margin-top:20px}
+
+/* Task-local practice views share a viewport without product header/cards.
+ * No stimulus, timing, keyboard capture or phase state is altered here. */
+.cognitive-surface .cognitive-running .cognitive-task-workspace[data-cognitive-task-state="running"]:not(:has(.cognitive-task-panel--intro)):not(:has([data-cognitive-focus-stage])){
+  position:fixed;inset:0;z-index:40;display:grid;align-content:safe center;overflow-y:auto;
+  padding:clamp(20px,4vh,40px) clamp(16px,4vw,48px);box-sizing:border-box;background:var(--cognitive-page);
+}
+.cognitive-task-workspace__actions{box-sizing:border-box;width:min(100%,var(--cognitive-width-feedback,60rem));margin-inline:auto;display:flex;justify-content:center;align-items:center;padding-top:8px}
+.cognitive-surface .cognitive-running .cognitive-task-workspace:not(:has([data-cognitive-focus-stage]))>div:not([data-cognitive-presentation]){
+  width:100%!important;max-width:var(--cognitive-width-feedback,60rem)!important;margin-inline:auto;box-sizing:border-box;
+  padding:clamp(24px,3vw,36px);border:1px solid var(--cognitive-line);border-radius:var(--cognitive-radius-panel,18px);
+  background:var(--cognitive-surface);color:var(--cognitive-ink);font-size:var(--cognitive-text-body,18px);line-height:1.7;
+}
+.cognitive-task-workspace :is(.cognitive-task-panel--result,.cognitive-task-panel--transition){width:min(100%,var(--cognitive-width-feedback,60rem))}
+.cognitive-task-workspace :is(p.text-xs,p.text-sm,div.text-xs,div.text-sm){font-size:var(--cognitive-text-support,16px);line-height:1.75}
+.cognitive-surface .cognitive-task-workspace :is(p,div):is(.text-xs,.text-sm):is(.text-gray-400,.text-gray-500,.text-gray-600,.text-slate-500,.text-slate-600){color:var(--cognitive-muted)}
+.cognitive-task-workspace :is(.btn-primary,.btn-secondary,.hui-button){white-space:normal;line-height:1.45}
+.cognitive-surface .cognitive-task-workspace .cognitive-task-title{font-size:var(--cognitive-text-title)!important}
+.cognitive-surface .cognitive-focus-stage__body :is(.btn-primary,.btn-secondary){font-size:17px!important;min-height:52px!important}
+@media(max-width:600px){
+  .cognitive-task-journey{gap:10px;font-size:12px}.cognitive-task-journey span{width:23px;height:23px}
+  .cognitive-task-example__steps{grid-template-columns:1fr;gap:18px}
+  .cognitive-task-example__step{min-height:0;grid-template-columns:4rem minmax(0,1fr);text-align:left;justify-items:start;gap:6px 12px;padding:14px}
+  .cognitive-task-example__label{grid-row:1/3;align-self:center}
+  .cognitive-task-example__note{grid-column:2}
+  .cognitive-task-example__value--symbol{white-space:nowrap;font-size:22px;letter-spacing:0}
+  .cognitive-task-example__step+.cognitive-task-example__step::before{content:'↓';left:50%;top:-20px;transform:none;font-size:16px}
+  .cognitive-practice-feedback__footer>*{width:100%}
+}
+@media(prefers-reduced-motion:reduce){.cognitive-task-progress__value{transition:none}}
+
+@media(max-width:767px){.cognitive-task-panel--intro{grid-template-columns:minmax(0,1fr)}}
+
+.cognitive-practice-review__visual{background:#fff;color:#202c36}

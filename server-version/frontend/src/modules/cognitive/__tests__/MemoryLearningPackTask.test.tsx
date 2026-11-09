@@ -85,7 +85,7 @@ describe('Round 2 PR4 task runners', () => {
     expect(onTrialComplete).not.toHaveBeenCalled()
   })
 
-  it('hides formal digit responses while retaining practice feedback and keyboard-capable submission', async () => {
+  it('shows and edits formal backward digits before keyboard submission', async () => {
     vi.useFakeTimers()
     const onTrialComplete = vi.fn().mockResolvedValue(true)
     render(<DigitbackwardTask taskContext={{ ...context, config: { startSpan: 2, maxSpan: 4, digitDisplayMs: 1, digitIntervalMs: 0, readyDurationMs: 1, inactivityGuardMs: 1000 } }} trialIndex={0} onTrialComplete={onTrialComplete} />)
@@ -101,9 +101,17 @@ describe('Round 2 PR4 task runners', () => {
     const expected = digitBackwardSequence(context.randomSeed, 0, 2)
     fireEvent.keyDown(window, { key: String(expected[1]) })
     expect(screen.getByText('已输入 1 / 2')).toBeInTheDocument()
-    expect(screen.queryByText('退格')).not.toBeInTheDocument()
-    expect(screen.queryByText(/倒序输入：/)).not.toBeInTheDocument()
+    expect(screen.getByLabelText(`第 1 位：${expected[1]}`)).toBeInTheDocument()
+    fireEvent.keyDown(window, { key: 'Backspace' })
+    expect(screen.getByText('已输入 0 / 2')).toBeInTheDocument()
+    fireEvent.keyDown(window, { key: '0' })
+    fireEvent.click(screen.getByRole('button', { name: '清空' }))
+    expect(screen.getByText('已输入 0 / 2')).toBeInTheDocument()
+    fireEvent.keyDown(window, { key: '0' })
+    fireEvent.click(screen.getByRole('button', { name: '退格' }))
+    fireEvent.keyDown(window, { key: String(expected[1]) })
     fireEvent.keyDown(window, { key: String(expected[0]) })
+    expect(onTrialComplete).not.toHaveBeenCalled()
     fireEvent.keyDown(window, { key: 'Enter' })
     await vi.waitFor(() => expect(onTrialComplete).toHaveBeenCalledWith(expect.objectContaining({ sequence: expected, response: [...expected].reverse(), timedOut: false })))
   })

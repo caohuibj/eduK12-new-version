@@ -28,6 +28,7 @@ let situationalAttemptForResponse: typeof import('../../modules/situational/situ
 
 const createdUserIds: string[] = []
 const createdAttemptIds: string[] = []
+const createdCompositeIds: string[] = []
 
 const createUser = async (label: string): Promise<string> => {
   if (!db) throw new Error('Situational PR-B database is not connected')
@@ -117,6 +118,7 @@ suite('Situational PR-B standalone PostgreSQL runtime', () => {
   afterAll(async () => {
     if (!db) return
     await db.situationalAttempt.deleteMany({ where: { id: { in: createdAttemptIds } } })
+    await db.compositeAssessment.deleteMany({ where: { id: { in: createdCompositeIds } } })
     await db.user.deleteMany({ where: { id: { in: createdUserIds } } })
     await db.$disconnect()
     db = null
@@ -132,6 +134,23 @@ suite('Situational PR-B standalone PostgreSQL runtime', () => {
     compiledRuntimeHash: attempt.instrument.compiledRuntimeHash,
     scoringVersion: attempt.instrument.scoringVersion,
     responses,
+  })
+
+  it('keeps standalone start and numbering independent of an active composite child', async () => {
+    const userId = await createUser('separate-delivery')
+    const composite = await db!.compositeAssessment.create({data:{code:randomUUID(),name:'synthetic isolation',createdBy:userId}})
+    createdCompositeIds.push(composite.id)
+    const item = await db!.compositeAssessmentItem.create({data:{compositeAssessmentId:composite.id,type:'SITUATIONAL',situationalInstrumentKey:SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key,situationalInstrumentVersion:SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.instrumentVersion}})
+    const parent = await db!.compositeAssessmentAttempt.create({data:{compositeAssessmentId:composite.id,userId,participantKey:getParticipantKey(userId),runtimeGeneration:'UNIFIED_V1'}})
+    const runtime = await import('../../modules/situational/situational-runtime.service')
+    const child = await db!.$transaction(tx=>runtime.createEmbeddedSituationalAttempt(tx,{userId,participantKey:getParticipantKey(userId),compositeAttemptId:parent.id,compositeItemId:item.id,compositeSlotKey:`item:${item.id}:SITUATIONAL`,instrumentKey:SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key,instrumentVersion:SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.instrumentVersion,attemptEpoch:1}))
+    createdAttemptIds.push(child.row.id)
+    const standalone = await startSituationalAttempt(userId,{instrumentKey:SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key,instrumentVersion:SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.instrumentVersion})
+    createdAttemptIds.push(standalone.attemptId)
+    expect(standalone.attemptId).not.toBe(child.row.id)
+    expect(standalone.attempt.attemptNo).toBe(1)
+    expect((await startSituationalAttempt(userId,{instrumentKey:SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key,instrumentVersion:SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.instrumentVersion})).attemptId).toBe(standalone.attemptId)
+    expect((await db!.situationalAttempt.findUniqueOrThrow({where:{id:child.row.id}})).status).toBe('IN_PROGRESS')
   })
 
   it('supports start/resume, one-shot FINAL, replay, result and history without per-answer rows', async () => {

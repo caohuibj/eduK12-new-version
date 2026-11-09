@@ -766,3 +766,17 @@
     color: var(--hui-ds-color-ink, #e5e9df);
   }
 }
+
+@media screen {
+  .hui-app-main:has(.hui-report--summary-first){padding-top:18px!important}
+  .hui-report--summary-first.hui-page{padding-top:0!important}
+  .hui-report--summary-first .hui-page-header{margin-bottom:14px}
+  .report-supporting-details{margin-top:20px;padding:14px 18px;border:1px solid var(--report-line);border-radius:12px;background:var(--report-surface)}
+  .report-supporting-details>summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--report-ink)}
+  .report-supporting-details>.report-facts{margin:14px 0 0;padding:0;border:0;background:transparent}
+}
+@media print{
+  .report-supporting-details::details-content{display:block;content-visibility:visible}
+  .report-supporting-details>summary{display:none}
+  .report-supporting-details>section{display:block!important}
+}

@@ -19,14 +19,14 @@ export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd(),draft=
   if(!actual.selected && scope.cognitive_intake_light!=='true') {
     const readHead = file => {try{return execFileSync('git',['show',head+':'+file],{cwd,encoding:'utf8'});}catch{return null;}};
     if (cognitiveMixedProductScope(actual.entries, readHead, file=>{try{return execFileSync('git',['show',base+':'+file],{cwd,encoding:'utf8',stdio:['ignore','pipe','ignore']});}catch{return null;}})) {
-      // Recompute full qualification; emitted flags cannot downgrade shared code.
+      // Recompute platform scope; retain the event's Draft/Ready job selection.
       const scope = needs.scope?.outputs || {};
       if (scope.scenario !== 'platform' || scope.application_route !== 'legacy'
         || ['content','frontend','documentation','maintenance','presentation'].some(key=>scope[key]!=='false')
         || scope.cognitive!=='true' || scope.cognitive_intake_light!=='false'
         || scope.codeql!=='true' || scope.frontend_build!=='true'
         || Object.keys(acceptanceFor([])).some(key=>scope[key]!=='true')) return ['recomputed-cognitive-product-scope'];
-      return requiredChecks(needs,false).filter(name=>needs[name]?.result!=='success');
+      return requiredChecks(needs,draft).filter(name=>needs[name]?.result!=='success');
     }
     return actual.entries.some(e=>/^server-version\/(?:backend\/src\/modules\/cognitive\/(?:tasks|generated|content-candidates)\/|frontend\/src\/modules\/cognitive\/(?:(?:tasks|generated)\/|native-runners\.tsx$))/.test(e.file)) ? ['unsupported-cognitive-intake'] : [];
   }

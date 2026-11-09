@@ -1,3 +1,5 @@
+import { CognitivePracticeReview, type PracticeReview } from '../shared/CognitivePracticeReview'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import {MATRIX_PRACTICE_SET_V11,MATRIX_PRACTICE_V11} from './practice-v1.1'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './matrix-layout.css'
@@ -43,6 +45,7 @@ export const MatrixTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
   const sequence = useMemo(() => matrixSequence(taskContext.randomSeed, itemCount), [taskContext.randomSeed, itemCount])
   const [phase, setPhase] = useState<Phase>('instruction')
   const [practiceIndex, setPracticeIndex] = useState(0)
+  const [practiceReview, setPracticeReview] = useState<PracticeReview | null>(null)
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [feedback, setFeedback] = useState('')
   const [interrupted, setInterrupted] = useState(false)
@@ -52,7 +55,7 @@ export const MatrixTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
   const item = phase === 'practice' ? practice[practiceIndex] : sequence[trialIndex] ?? sequence[sequence.length - 1]
 
   const completeOnce = useCallback(async () => { if (completingRef.current) return; completingRef.current = true; await onTaskComplete?.() }, [onTaskComplete])
-  const startPractice = () => { setPracticeIndex(0); setPracticeCorrect(0); setFeedback(''); setPhase('practice') }
+  const startPractice = () => { setPracticeReview(null); setPracticeIndex(0); setPracticeCorrect(0); setFeedback(''); setPhase('practice') }
   const startFormal = () => { completingRef.current = false; setInterrupted(false); startedRef.current = performance.now(); setPhase('formal') }
 
   useEffect(() => { if (phase === 'formal') startedRef.current = performance.now() }, [phase, trialIndex])
@@ -88,16 +91,21 @@ export const MatrixTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
     const correct = option === item.correctOption
     const total = practiceCorrect + (correct ? 1 : 0)
     setPracticeCorrect(total); setFeedback(correct ? '正确' : '错误')
-    if (practiceIndex + 1 >= 4) setPhase('practice-result')
-    else setPracticeIndex((value) => value + 1)
+    setPracticeReview({ correct, expected: '选项 ' + (item.correctOption + 1), actual: '选项 ' + (option + 1), explanation: item.ruleFamily === 'alternation' ? '本题每行第一个和第三个图形相同。用前两行核对，再补入与第三行首格相同的图形。' : item.ruleFamily === 'progression' ? '本题各行按相同步长沿图形序列变化。比较前两行的连续变化，再延续第三行。' : '本题需要组合每行前两个位置的变化。对照前两行的完整关系，再选择能补全第三行的图形。' })
   }
+
+  if (phase === 'practice' && practiceReview) return <CognitivePracticeReview visual={<div><ItemView item={item} disabled choose={() => {}} /></div>} feedback={practiceReview} completed={practiceIndex + 1} total={4} onContinue={() => {
+    setPracticeReview(null)
+    if (practiceIndex + 1 >= 4) setPhase('practice-result')
+    else { setPracticeIndex(value => value + 1);  }
+  }} />
 
   if (phase === 'instruction') {
     return (
       <CognitiveTaskIntro
         title="矩阵规则推理"
         description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<><p>观察前两行的变化规律，选择最适合填入第三行问号的图形。</p><p>整理一盒彩色积木时，可能先看颜色交替，再看形状顺序；找到一个线索后，还要用另一行核对。 这次任务只记录本次作答表现。</p></>) : ("观察前两行的变化规律，选择最适合填入第三行问号的图形。")}
-        hint={<>本任务依赖视觉规则归纳；正式题目不会提示设计难度。内部生成题目；练习至少答对 3 / 4。</>}
+        hint={<>本任务依赖视觉规则归纳；正式题目不会提示设计难度。练习至少答对 3 / 4。</>}
         onAction={startPractice}
       />
     )
@@ -115,5 +123,7 @@ export const MatrixTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
       />
     )
   }
-  return <div className="p-6 text-center"><p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / 4${feedback ? ` · 上一题：${feedback}` : ''}` : `正式题目 ${trialIndex + 1} / ${itemCount}`}</p><ItemView item={item} disabled={submittingRef.current} choose={(option) => phase === 'practice' ? choosePractice(option) : void submitFormal(option)} /></div>
+  const content = <div className="p-6 text-center"><p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / 4${feedback ? ` · 上一题：${feedback}` : ''}` : `正式题目 ${trialIndex + 1} / ${itemCount}`}</p><ItemView item={item} disabled={submittingRef.current} choose={(option) => phase === 'practice' ? choosePractice(option) : void submitFormal(option)} /></div>
+  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="矩阵规则推理正式测验" progress={{ completed: trialIndex, total: itemCount }}>{content}</CognitiveFocusStage> : content
+
 }

@@ -4,6 +4,7 @@ import { CONFLICT, NOT_FOUND } from './cognitive.errors'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {personalTrackingPlanSchema} from '../reporting/personal-tracking'
 import {trainingContentAttemptBindingSchema,trainingContentSnapshotSchema} from '../composite/training-content-binding'
+import {readVerifiedEducationAttempt,readVerifiedCompositionAttempt,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
 
 type Tx = Prisma.TransactionClient
 
@@ -14,14 +15,46 @@ export async function isTrainingTaskCourse(db: Tx, courseId?: string | null) {
   return course?.courseType === 'TRAINING_COURSE' && !course.isLibrary
 }
 
-async function admitTrainingCompositeSlot(db: Tx, userId: string, assignmentId: string, scope: CompositeCognitiveQuotaScope) {
+async function admitCompositeSlot(db: Tx, userId: string, assignmentId: string, scope: CompositeCognitiveQuotaScope, proof?: VerifiedEducationAttempt) {
   const parent = await db.compositeAssessmentAttempt.findUnique({ where: { id: scope.compositeAttemptId }, include: { compositeAssessment: true } })
   if (!parent) throw CONFLICT('组合认知任务的作答记录不存在')
   const composite = parent?.compositeAssessment
-  const courseId = parent?.deliveryCourseId ?? composite?.courseId
-  if (!composite || !['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE', 'LEGACY_COMPOSITE'].includes(composite.productKind)
-    || parent?.assignmentRef || !await isTrainingTaskCourse(db, courseId)) return false
-  if (!parent || parent.userId !== userId || parent.subjectUserId && parent.subjectUserId !== userId
+  if (!composite) throw CONFLICT('组合认知任务需要有效的父作答准入')
+  const educationProduct = parent.assignmentRef
+    ? readVerifiedEducationAttempt(proof, db, parent.id, userId)
+    : undefined
+  // Legacy relational bundle STARTs carry a server-created assignmentRef from
+  // createRelationalAssessmentService rather than the newer education START
+  // proof. Verify that persisted binding in this same transaction; never
+  // accept a caller-provided assignmentRef or an unbound organization task.
+  let verifiedRelationalBundle = false
+  if (parent.assignmentRef && !educationProduct && composite?.productKind === 'ASSESSMENT_BUNDLE') {
+    const assignment = await db.relationalAssessmentAssignment.findUnique({ where: { id: parent.assignmentRef } })
+    const respondentType = assignment?.respondentRole === 'PARENT' ? 'PARENT'
+      : assignment?.respondentRole === 'TEACHER' ? 'TEACHER'
+        : assignment?.relationshipKind === 'SELF' ? 'SELF' : null
+    verifiedRelationalBundle = Boolean(assignment
+      && assignment.status === 'STARTED'
+      && assignment.resourceKind === 'BUNDLE'
+      && assignment.resourceKey === composite.id
+      && assignment.episodeId === parent.episodeId
+      && assignment.subjectUserId === parent.subjectUserId
+      && assignment.respondentUserId === userId
+      && parent.userId === userId
+      && parent.respondentUserId === userId
+      && parent.respondentType === respondentType)
+  }
+  const supportedProduct = Boolean(
+    ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE', 'LEGACY_COMPOSITE'].includes(composite.productKind)
+    || composite.productKind === 'ORGANIZATION_RESOURCE' && educationProduct
+  )
+  if (!supportedProduct || parent.assignmentRef && !educationProduct && !verifiedRelationalBundle) {
+    throw CONFLICT('组合认知任务需要有效的父作答准入')
+  }
+  if (parent.assignmentRef && educationProduct) {
+    readVerifiedCompositionAttempt(proof, db, parent.id, userId, { compositeId: composite.id, assignmentRef: parent.assignmentRef })
+  }
+  if (parent.userId !== userId || parent.subjectUserId && parent.subjectUserId !== userId && !educationProduct && !verifiedRelationalBundle
     || parent.respondentUserId && parent.respondentUserId !== userId || parent.status !== 'IN_PROGRESS'
     || parent.deliveryMode !== 'FINAL_ONLY' || parent.runtimeGeneration !== 'UNIFIED_V1'
     || !Number.isSafeInteger(parent.attemptEpoch) || parent.attemptEpoch < 1) throw CONFLICT('组合认知任务的作答范围不匹配')
@@ -29,26 +62,10 @@ async function admitTrainingCompositeSlot(db: Tx, userId: string, assignmentId: 
   if (!item || item.type !== 'COGNITIVE' || item.compositeAssessmentId !== composite.id || !item.cognitiveAssignmentId) throw CONFLICT('组合认知任务的题目来源不匹配')
   const [actual, selected] = await Promise.all([cognitiveQuotaSource(db, assignmentId), cognitiveQuotaSource(db, item.cognitiveAssignmentId)])
   if (actual.id !== selected.id) throw CONFLICT('组合认知任务的工具来源不匹配')
-  if (!usesScopedTrainingQuota(composite)) {
-    // Historical Questionnaire/Bundle admissions retain the cross-entrance
-    // source quota. A Training alias whose canonical source has no course can
-    // use the exact delivered slot only with a fully verified frozen binding.
-    const binding = trainingContentAttemptBindingSchema.safeParse(parent.trainingContentBinding)
-    const unit = binding.success ? binding.data.units.find(entry =>
-      entry.itemId === item.id && entry.family === 'COGNITIVE') : undefined
-    if (actual.courseId != null || !composite.trainingContentSnapshotHash
-      || !parent.trainingContentBindingHash || !binding.success
-      || binding.data.compositeId !== composite.id
-      || binding.data.attemptId !== parent.id
-      || binding.data.epoch !== parent.attemptEpoch
-      || binding.data.publicationHash !== composite.trainingContentSnapshotHash
-      || canonicalHash(binding.data) !== parent.trainingContentBindingHash
-      || unit?.source.kind !== 'COGNITIVE_CONFIG'
-      || unit.source.assignmentId !== item.cognitiveAssignmentId
-      || unit.source.id !== actual.configId) return false
-  }
+  // The admitted parent owns participation limits. Reusing an instrument must
+  // not spend the allowance of its standalone assignment or another delivery.
   if (composite.personalTrackingBaselineId) await trainingWaveScope(db, userId, assignmentId, actual, scope)
-  const parentsUsed = await db.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: composite.id, userId } })
+  const parentsUsed = await db.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: composite.id, userId, assignmentRef: parent.assignmentRef ?? null } })
   if (!Number.isInteger(composite.maxAttempts) || composite.maxAttempts < 1 || parentsUsed > composite.maxAttempts) throw CONFLICT('已达到综合测评最大次数')
   // The parent admission already owns the delivery's maxAttempts check and
   // participant lock. Each exact slot may materialize once within that attempt.
@@ -58,9 +75,8 @@ async function admitTrainingCompositeSlot(db: Tx, userId: string, assignmentId: 
   return true
 }
 
-/** Only an explicitly frozen Training delivery may replace the historical
- * cross-entrance source quota with parent/slot isolation. A course type alone
- * is not sufficient: older Questionnaire and Bundle deliveries also use it. */
+/** Identifies frozen Training flow, variant and longitudinal deliveries.
+ * Participation isolation is enforced separately by the admitted parent/slot. */
 export function usesScopedTrainingQuota(composite: {
   trainingFlowFrozen?: unknown
   trainingVariantFrozen?: unknown
@@ -81,24 +97,26 @@ export async function cognitiveQuotaSource(db: Tx, assignmentId: string) {
   return source
 }
 
-async function isStandaloneTrainingAssignment(db: Tx, assignmentId: string) {
-  const assignment = await db.cognitiveAssignment.findUnique({ where: { id: assignmentId }, select: { courseId: true, quotaSourceAssignmentId: true, listedStandalone: true } })
-  if (!assignment) throw NOT_FOUND('认知任务不存在')
-  // Only a separately listed delivered alias receives an independent allowance.
-  // Its canonical source still retains the old cross-entrance quota contract.
-  return Boolean(assignment.quotaSourceAssignmentId && assignment.listedStandalone)
-    && await isTrainingTaskCourse(db, assignment.courseId)
-}
-
 export async function lockCognitiveQuota(db: Tx, userId: string, sourceId: string) {
   await db.$queryRawUnsafe('SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended($1, 0))', `cognitive-quota:${sourceId}:${userId}`)
 }
 
 export async function readCognitiveQuota(db: Tx, userId: string, assignmentId: string, waveScope?: {compositeAssessmentId:string;compositeItemId:string}) {
+  if (!waveScope) {
+    const assignment = await db.cognitiveAssignment.findUnique({ where: { id: assignmentId } })
+    if (!assignment) throw NOT_FOUND('认知任务不存在')
+    const where = { userId, assignmentId, compositeAttemptId: null }
+    const used = await db.cognitiveSession.count({ where })
+    const session = await db.cognitiveSession.findFirst({ where: { ...where, status: 'IN_PROGRESS' },
+      orderBy: { createdAt: 'desc' }, select: { id: true, frozenAdmissionSnapshotHash: true } })
+    const admissionPaused = Boolean(session && !isCognitiveNewAdmissionEnabled() && !session.frozenAdmissionSnapshotHash)
+    return { admissionPaused, maxAttempts: assignment.maxAttempts, usedAttempts: used,
+      remainingAttempts: Math.max(0, assignment.maxAttempts - used),
+      continueHref: session && !admissionPaused ? `/student/cognitive/sessions/${session.id}` : null }
+  }
   const source = await cognitiveQuotaSource(db, assignmentId)
   const waveId=waveScope?await trainingWaveScope(db,userId,assignmentId,source,waveScope):null
-  const independentTask = !waveScope && await isStandaloneTrainingAssignment(db, assignmentId)
-  const where = { userId,...(independentTask ? { compositeAttemptId: null } : {}),...(waveId?{compositeAttempt:{compositeAssessmentId:waveId,userId,assignmentRef:null}}:{}), OR: [
+  const where = { userId,...(waveId?{compositeAttempt:{compositeAssessmentId:waveId,userId,assignmentRef:null}}:{}), OR: [
     { assignmentId: source.id }, { assignment: { quotaSourceAssignmentId: source.id } },
     { compositeItem: { cognitiveAssignmentId: source.id } }, { compositeItem: { cognitiveAssignment: { quotaSourceAssignmentId: source.id } } },
   ] }
@@ -158,20 +176,13 @@ async function trainingWaveScope(db:Tx,userId:string,assignmentId:string,source:
  return wave.id
 }
 
-/** Locks remain held through insertion. Training independent deliveries count
- * standalone aliases only; their composites use parent limits and exact slots.
- * Other products retain their existing source/wave quota semantics. */
-export async function admitCognitiveAttempt(db: Tx, userId: string, assignmentId: string, compositeScope?:CompositeCognitiveQuotaScope) {
-  if (compositeScope && await admitTrainingCompositeSlot(db, userId, assignmentId, compositeScope)) return
-  const source = await cognitiveQuotaSource(db, assignmentId)
-  await lockCognitiveQuota(db, userId, source.id)
-  const waveId=compositeScope?await trainingWaveScope(db,userId,assignmentId,source,compositeScope):null
-  const independentTask = !compositeScope && await isStandaloneTrainingAssignment(db, assignmentId)
-  const used = await db.cognitiveSession.count({ where: { userId, OR: [
-    { assignmentId: source.id },
-    { assignment: { quotaSourceAssignmentId: source.id } },
-    { compositeItem: { cognitiveAssignmentId: source.id } },
-    { compositeItem: { cognitiveAssignment: { quotaSourceAssignmentId: source.id } } },
-  ],...(independentTask ? { compositeAttemptId: null } : {}),...(waveId?{compositeAttempt:{compositeAssessmentId:waveId,userId,assignmentRef:null}}:{}) } })
-  if (used >= source.maxAttempts) throw CONFLICT(independentTask ? '已达到本次独立测评任务的最大次数；可继续已有作答。' : '已达到该认知任务最大次数。独立入口和组合测评共用次数；可继续已有作答。')
+/** Locks remain held through insertion. Standalone publications count their
+ * own sessions; composites and verified education Runs own parent/slot limits. */
+export async function admitCognitiveAttempt(db: Tx, userId: string, assignmentId: string, compositeScope?:CompositeCognitiveQuotaScope, proof?:VerifiedEducationAttempt) {
+  if (compositeScope && await admitCompositeSlot(db, userId, assignmentId, compositeScope, proof)) return
+  const assignment = await db.cognitiveAssignment.findUnique({ where: { id: assignmentId } })
+  if (!assignment) throw NOT_FOUND('认知任务不存在')
+  await lockCognitiveQuota(db, userId, assignment.id)
+  const used = await db.cognitiveSession.count({ where: { userId, assignmentId, compositeAttemptId: null } })
+  if (used >= assignment.maxAttempts) throw CONFLICT('已达到本次独立测评任务的最大次数；可继续已有作答。')
 }

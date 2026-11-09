@@ -3,11 +3,12 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import CognitiveRunner from '../pages/CognitiveRunner'
-import { runnerReducer } from '../core/runner.state'
+import { initialRunnerState, runnerReducer } from '../core/runner.state'
 import type { RunnerState } from '../core/runner.types'
 import type { CognitiveSession } from '../types'
 import { resolveRunner, registerCognitiveRunner } from '../registry'
 import { resolveCognitiveReadinessProfile } from '../core/readiness'
+import { cognitiveSeeds } from '../../../../../backend/src/modules/cognitive/generated/seeds'
 const harness = vi.hoisted(() => ({ controller: { state: {} as RunnerState, start: vi.fn(), appendTrial: vi.fn(), complete: vi.fn(), reload: vi.fn(), restart: vi.fn() } }))
 vi.mock('../core/useCognitiveSession', () => ({ useCognitiveSession: () => harness.controller }))
 const cases = [ ['wordanalogy','1.1.0','1'], ['wordmeaning','1.1.0','2'], ['wordproblem','2.0.0','4'], ['logicdeduce','2.0.0','2'], ['seriescomplete','1.1.0','2'], ['readingcomp','1.1.0','2'], ['proofread','1.1.0','4'], ['cogest','1.1.0','2'] ] as const
@@ -30,9 +31,14 @@ describe('bank intake exact registry and existing host completion', () => {
    expect(resolveCognitiveReadinessProfile('synthetic-undeclared-bank','1.1.0')).toBeUndefined()
  })
  it('allows the exact new version to prepare through the real READY page', async () => {
-   harness.controller.state={status:'READY',session:{sessionId:'bank-host',testType:'wordanalogy',engineVersion:'1.1.0',scoringVersion:'1.1.0',configVersion:'1.1.0',attemptNo:1,config:{totalTrials:18},randomSeed:'ready-contract'} as unknown as CognitiveSession,taskContext:null,trialIndex:0,error:null,result:null}
+   const seed=cognitiveSeeds.find(value=>value.testType==='wordanalogy'&&value.engineVersion==='1.1.0')!
+   harness.controller.state=runnerReducer(initialRunnerState,{type:'SESSION_LOADED',trialIndex:0,session:{
+     sessionId:'bank-host',assignmentId:'bank-host-assignment',testType:'wordanalogy',engineVersion:seed.engineVersion,
+     scoringVersion:seed.scoringVersion,configVersion:seed.configVersion,attemptNo:1,config:seed.config,
+     randomSeed:'ready-contract',status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',
+   } as unknown as CognitiveSession})
    render(tree())
-   await waitFor(()=>expect(screen.getByRole('button',{name:'开始测评'})).toBeEnabled())
+   await waitFor(()=>expect(screen.getByRole('button',{name:'开始练习'})).toBeEnabled())
  })
  it.each(cases)('%s uses the parent completion action after final index advancement and resolved failure', async(testType,version,practiceKey) => {
    const config={totalTrials:1,stimulusSetVersion:`${testType}-zh-v${version}`,fixationMs:400,timeoutMs:15000,validRtFloorMs:300,report:{reportVersion:version,referenceMode:'none'}}

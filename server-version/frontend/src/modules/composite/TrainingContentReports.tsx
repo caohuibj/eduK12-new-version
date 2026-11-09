@@ -1,5 +1,5 @@
 import type { CompositeReportAudience, TrainingContentReport } from './types'
-import { ReportSection } from '../reporting/ReportPrimitives'
+import { ReportDetails, ReportSection } from '../reporting/ReportPrimitives'
 
 const text=(value:unknown)=>typeof value==='string'?value:''
 const object=(value:unknown):Record<string,unknown>|null=>value!==null&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:null
@@ -29,8 +29,10 @@ function DeclaredBlock({value,showMetricKeys=true}:{value:unknown;showMetricKeys
 export function DeclaredReportContent({report,showMetricKeys=true}:{report:NonNullable<TrainingContentReport['rendered']>;showMetricKeys?:boolean}){
   return <>
     {Array.isArray(report.blocks)&&report.blocks.map((block,i)=><DeclaredBlock key={i} value={block} showMetricKeys={showMetricKeys}/>)}
-    {Array.isArray(report.limitations)&&report.limitations.length>0&&<div><h4>局限说明</h4><ul>{report.limitations.filter(line=>typeof line==='string').map((line,i)=><li key={i}>{line}</li>)}</ul></div>}
-    {typeof report.disclaimer==='string'&&report.disclaimer&&<p>{report.disclaimer}</p>}
+    {(!!report.limitations?.length||!!report.disclaimer)&&<ReportDetails title="阅读说明与解释边界">
+      {Array.isArray(report.limitations)&&report.limitations.length>0&&<ul>{report.limitations.filter(line=>typeof line==='string').map((line,i)=><li key={i}>{line}</li>)}</ul>}
+      {typeof report.disclaimer==='string'&&report.disclaimer&&<p>{report.disclaimer}</p>}
+    </ReportDetails>}
   </>
 }
 /** Presentation only: consume the server's exact saved-fact projection, never infer metrics or interpret references. */
@@ -40,13 +42,13 @@ export function TrainingContentReports({reports,audience,partial=false}:{reports
     <div className="space-y-5">{reports.map((report,index)=><article key={report.itemId+':'+index} className="rounded border p-4 space-y-3" aria-label={'私有报告 '+report.itemId}>
       <h3 className="font-semibold">{report.status==='READY'?report.rendered?.title||'私有报告':'私有报告'} · 单元 {report.itemId}</h3>
       <p>报告状态：{statuses[report.status]||'暂不可用'}</p>
-      {report.reportRelease&&<dl className="break-all"><dt>精确报告版本 ID</dt><dd>{report.reportRelease.releaseId}</dd><dt>内容校验值</dt><dd>{report.reportRelease.contentHash}</dd></dl>}
       {report.lifecycleNotices?.map((notice,i)=><p key={i} role="status">版本状态变更：{notice.layer} · {notice.releaseId} · {statuses[notice.status]||notice.status}</p>)}
       {report.status==='REVOKED'&&<p>测量或报告版本已撤销，停止展示报告内容；原始已保存计分事实未被改写。</p>}
       {report.status==='READY'&&report.rendered?.generatorVersion==='DECLARATIVE_REPORT_V1'&&<>
         <DeclaredReportContent report={report.rendered}/>
       </>}
       {report.status==='READY'&&report.rendered?.generatorVersion!=='DECLARATIVE_REPORT_V1'&&<p>报告格式暂不支持，未展示内容。</p>}
+      {report.reportRelease&&<ReportDetails title="报告版本"><dl className="break-all"><dt>精确报告版本 ID</dt><dd>{report.reportRelease.releaseId}</dd><dt>内容校验值</dt><dd>{report.reportRelease.contentHash}</dd></dl></ReportDetails>}
     </article>)}</div>
   </ReportSection>
 }

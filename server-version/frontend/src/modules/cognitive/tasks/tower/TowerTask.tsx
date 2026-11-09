@@ -1,3 +1,5 @@
+import { CognitiveTaskPanel, CognitivePracticeFeedback } from '../shared/CognitiveTaskPresentation'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -55,7 +57,7 @@ export const TowerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInde
     return () => document.removeEventListener('visibilitychange', onHidden)
   }, [phase])
 
-  const finishPractice = (correct: boolean) => { setPracticeCorrect((value) => value + (correct ? 1 : 0)); setFeedback(correct ? '正确完成' : '本题未完成'); setPhase('practice-feedback') }
+  const finishPractice = (correct: boolean) => { setPracticeCorrect((value) => value + (correct ? 1 : 0)); setFeedback(correct ? '已把圆盘移到目标位置。每次只能移动一根柱子最上方的小盘；先选来源柱，再选目标柱。' : '本题尚未达到目标位置。先比较当前与目标图中每个圆盘的位置，再规划移动顺序；大盘不能放到小盘上。'); setPhase('practice-feedback') }
   const nextPractice = () => {
     if (practiceIndex + 1 >= 4) { setPhase('practice-result'); return }
     const next = practiceIndex + 1; setPracticeIndex(next); resetProblem(PRACTICE[next]); setPhase('practice')
@@ -91,8 +93,10 @@ export const TowerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInde
   }, [phase, trialIndex, moves, inactivityGuardMs, submitFormal])
 
   if (phase === 'instruction') return <CognitiveTaskIntro title="塔式规划" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<><p>把当前圆盘状态变成目标状态。每次只移动每根柱最上方的一个圆盘，大盘不能放在小盘上方。先选择圆盘所在的柱，再选择目标柱。</p><p>搬书时，目标书被压在下面，可能要先把上面的书临时挪开，再一步步整理好；多挪几次不等于“不会规划”。 这次任务只记录本次作答表现。</p></>) : (<p>把当前圆盘状态变成目标状态。每次只移动每根柱最上方的一个圆盘，大盘不能放在小盘上方。先选择圆盘所在的柱，再选择目标柱。</p>)} hint={<><p>尽量规划后再操作；系统不会提示最优步数。练习至少完成 3 / 4，练习不计分。</p></>} onAction={startPractice} />
-  if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="p-8 text-center"><p className="mb-4">练习完成 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
-  if (phase === 'practice-feedback') return <div className="p-8 text-center"><p className="mb-4">{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
+  if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <CognitiveTaskPanel ariaLabel="练习结果" className="cognitive-task-panel--result"><h2 className="cognitive-task-title">练习结果</h2><p className="mb-4">练习完成 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></CognitiveTaskPanel> }
+  if (phase === 'practice-feedback') return <CognitivePracticeFeedback title="练习解析"><p className="mb-4">{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></CognitivePracticeFeedback>
 
-  return <div className="p-5 text-center"><p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / 4` : `正式问题 ${trialIndex + 1} / ${problemCount}`} · 已移动 {moves.length} 步</p><div className="grid gap-5 md:grid-cols-2"><Board state={state} selectedPeg={selectedPeg} onPeg={move} label="当前状态" /><Board state={problem.targetState} label="目标状态" /></div>{feedback && <p className="mt-3 text-sm text-amber-700">{feedback}</p>}{phase === 'formal' && atMoveLimit && !solved && <p className="mt-3 text-sm text-amber-700">已达到本题移动上限，请结束本题。</p>}<div className="mt-5 flex justify-center gap-3">{phase === 'practice' ? <button className="btn-secondary" onClick={() => finishPractice(false)}>本题无法完成</button> : <><button className="btn-primary" disabled={!solved} onClick={() => void submitFormal(false)}>提交已解问题</button><button className="btn-secondary" onClick={() => void submitFormal(true)}>结束本题</button></>}</div></div>
+  const content = <div className="p-5 text-center"><p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / 4` : `正式问题 ${trialIndex + 1} / ${problemCount}`} · 已移动 {moves.length} 步</p><div className="grid gap-5 md:grid-cols-2"><Board state={state} selectedPeg={selectedPeg} onPeg={move} label="当前状态" /><Board state={problem.targetState} label="目标状态" /></div>{feedback && <p className="mt-3 text-sm text-amber-700">{feedback}</p>}{phase === 'formal' && atMoveLimit && !solved && <p className="mt-3 text-sm text-amber-700">已达到本题移动上限，请结束本题。</p>}<div className="mt-5 flex justify-center gap-3">{phase === 'practice' ? <button className="btn-secondary" onClick={() => finishPractice(false)}>本题无法完成</button> : <><button className="btn-primary" disabled={!solved} onClick={() => void submitFormal(false)}>提交已解问题</button><button className="btn-secondary" onClick={() => void submitFormal(true)}>结束本题</button></>}</div></div>
+  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="塔式规划正式测验" progress={{ completed: trialIndex, total: problemCount }}>{content}</CognitiveFocusStage> : content
+
 }

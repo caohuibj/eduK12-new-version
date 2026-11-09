@@ -9,7 +9,10 @@ const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     compositeAssessment: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
     compositeAssessmentAttempt: { groupBy: vi.fn(), findMany: vi.fn(), count: vi.fn(), aggregate: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
-    cognitiveSession: { create: vi.fn(), count: vi.fn() },
+    compositeAssessmentItem: { findUnique: vi.fn() },
+    relationalAssessmentAssignment: { findUnique: vi.fn() },
+    cognitiveSession: { create: vi.fn(), count: vi.fn(), findUnique: vi.fn(), updateMany: vi.fn() },
+    assessmentUnitSnapshot: { findMany: vi.fn() },
     $queryRaw: vi.fn(),
     $queryRawUnsafe: vi.fn(),
     compositeAssessmentAccessToken: { findUnique: vi.fn(), create: vi.fn() },
@@ -254,6 +257,64 @@ describe('copyComposite', () => {
 
   it('copies a frozen cognitive snapshot into composite child sessions', async () => {
     const frozenCipher = encryptCognitivePayload(publishedConfig.config)
+    const cognitiveItem = {
+      id: 'item-cog',
+      type: 'COGNITIVE',
+      position: 0,
+      required: true,
+      cognitiveAssignmentId: 'wrapper-1',
+      cognitiveAssignment: {
+        id: 'wrapper-1',
+        resolvedConfigSnapshotEncrypted: frozenCipher,
+        config: publishedConfig,
+      },
+    }
+    const attemptState: Record<string, any> = {
+      trainingFlowSnapshotEncrypted: null,
+      trainingFlowSnapshotHash: null,
+      trainingFlowPathEncrypted: null,
+      trainingFlowPathHash: null,
+      trainingVariantAllocationEncrypted: null,
+      trainingVariantAllocationHash: null,
+      trainingContentBindingHash: null,
+      trainingReferenceBindingHash: null,
+      trainingFeedbackSnapshotHash: null,
+      id: 'attempt-1',
+      userId: 'student-1',
+      compositeAssessmentId: 'comp-1',
+      assignmentRef: null,
+      subjectUserId: 'student-1',
+      respondentUserId: 'student-1',
+      respondentType: 'SELF',
+      episodeId: null,
+      deliveryMode: 'FINAL_ONLY',
+      runtimeGeneration: 'UNIFIED_V1',
+      attemptEpoch: 1,
+      status: 'IN_PROGRESS',
+      contextSnapshotEncrypted: null,
+      contextSnapshotHash: null,
+      compositeAssessment: {
+        id: 'comp-1',
+        productKind: 'LEGACY_COMPOSITE',
+        creationKey: null,
+        maxAttempts: 1,
+        publishedAt: new Date('2026-01-01T00:00:00.000Z'),
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
+        items: [],
+        formSections: [],
+      },
+      scaleAssessments: [],
+      cognitiveSessions: [],
+      situationalAttempts: [],
+      formAnswers: [],
+      formSectionAttempts: [],
+    }
+    let cognitiveChild: Record<string, any> | null = null
     mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ id: 'wrapper-1', configId: publishedConfig.id, createdBy: 'teacher-1', maxAttempts: 1 })
     mockPrisma.cognitiveSession.count.mockResolvedValue(0)
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue({
@@ -264,44 +325,30 @@ describe('copyComposite', () => {
       opensAt: null,
       expiresAt: null,
       course: teacherCourse,
-      items: [{
-        id: 'item-cog',
-        type: 'COGNITIVE',
-        required: true,
-        cognitiveAssignmentId: 'wrapper-1',
-        cognitiveAssignment: {
-          id: 'wrapper-1',
-          resolvedConfigSnapshotEncrypted: frozenCipher,
-          config: publishedConfig,
-        },
-      }],
+      items: [cognitiveItem],
     })
     mockPrisma.courseStudent.findUnique.mockResolvedValue({ status: 'ACTIVE' })
-    mockPrisma.compositeAssessmentAttempt.create.mockResolvedValue({ id: 'attempt-1', anonymousCode: null })
-    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue({
-      trainingFlowSnapshotEncrypted: null,
-      trainingFlowSnapshotHash: null,
-      trainingFlowPathEncrypted: null,
-      trainingFlowPathHash: null,
-      trainingVariantAllocationEncrypted: null,
-      trainingVariantAllocationHash: null,
-      id: 'attempt-1',
-      userId: 'student-1',
-      status: 'IN_PROGRESS',
-      compositeAssessment: {
-        trainingFlowDraft: null,
-        trainingFlowFrozen: null,
-        trainingFlowDigest: null,
-        trainingVariantDraft: null,
-        trainingVariantFrozen: null,
-        trainingVariantDigest: null,
-        items: [],
-      },
-      scaleAssessments: [],
-      cognitiveSessions: [],
-      formAnswers: [],
+    mockPrisma.compositeAssessmentAttempt.create.mockResolvedValue({
+      id: 'attempt-1', anonymousCode: null, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
+      trainingContentBindingHash: null, trainingReferenceBindingHash: null,
     })
-    mockPrisma.cognitiveSession.create.mockResolvedValue({ id: 'sess-1' })
+    attemptState.compositeAssessment.items = [cognitiveItem]
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockImplementation(async () => attemptState)
+    mockPrisma.compositeAssessmentAttempt.update.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => {
+      Object.assign(attemptState, data)
+      return attemptState
+    })
+    mockPrisma.assessmentUnitSnapshot.findMany.mockResolvedValue([])
+    mockPrisma.compositeAssessmentItem.findUnique.mockResolvedValue({
+      id: 'item-cog', type: 'COGNITIVE', compositeAssessmentId: 'comp-1', cognitiveAssignmentId: 'wrapper-1',
+    })
+    mockPrisma.cognitiveSession.create.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => {
+      cognitiveChild = { ...data, id: 'sess-1', resultSnapshotEncrypted: null, submissionId: null, submissionPayloadHash: null, frozenAdmissionSnapshotEncrypted: null, frozenAdmissionSnapshotHash: null }
+      attemptState.cognitiveSessions = [{ id: 'sess-1', compositeItemId: 'item-cog' }]
+      return cognitiveChild
+    })
+    mockPrisma.cognitiveSession.findUnique.mockImplementation(async () => cognitiveChild)
+    mockPrisma.cognitiveSession.updateMany.mockResolvedValue({ count: 1 })
 
     await startUserAttempt('student-1', 'comp-1')
     const created = mockPrisma.cognitiveSession.create.mock.calls[0][0]

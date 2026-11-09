@@ -84,7 +84,7 @@ describe('AuditoryrtTask', () => {
     currentTime += 300
     fireEvent.keyDown(window, { key: ' ', code: 'Space' })
     await act(async () => { vi.advanceTimersByTime(0) })
-    expect(screen.getByText(/正确/)).toBeTruthy()
+    expect(screen.getByRole('status', { name: '练习解析：正确' })).toHaveTextContent('提示音后 300 毫秒按下')
     fireEvent.click(screen.getByText('下一个'))
     await act(async () => { vi.advanceTimersByTime(2000) })
     currentTime += 250

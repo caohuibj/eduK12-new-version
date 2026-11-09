@@ -195,7 +195,7 @@ export const NumberlineTask: React.FC<CognitiveTaskProps> = ({ taskContext, tria
   if (!currentTrial) return <div className="card p-8 text-center text-gray-500">正在生成结果…</div>
 
   return (
-    <CognitiveFocusStage ariaLabel="数字线估计正式测验">
+    <CognitiveFocusStage ariaLabel="数字线估计正式测验" progress={{ completed: trialIndex, total: totalTrials }}>
       <div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">
         {subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-16 pt-3">+</div>}
         {subPhase !== 'fixation' && <div className="text-5xl font-bold text-gray-800 h-16 pt-3">{currentTrial.targetNumber}</div>}

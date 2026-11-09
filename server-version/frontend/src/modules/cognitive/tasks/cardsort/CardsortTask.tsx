@@ -1,3 +1,4 @@
+import { CognitivePracticeReview, type PracticeReview } from '../shared/CognitivePracticeReview'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -50,6 +51,7 @@ export const CardsortTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   const sequence = useMemo(() => cardsortSequence(taskContext.randomSeed, total, config.blockCount ?? 3, config.switchRatio ?? 0.33), [taskContext.randomSeed, total, config.blockCount, config.switchRatio])
   const [phase, setPhase] = useState<Phase>('instruction')
   const [practiceIndex, setPracticeIndex] = useState(0)
+  const [practiceReview, setPracticeReview] = useState<PracticeReview | null>(null)
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [practiceFeedback, setPracticeFeedback] = useState<string | null>(null)
   const [visible, setVisible] = useState(false)
@@ -60,7 +62,7 @@ export const CardsortTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   const submittingRef = useRef(false)
   const releasedBlockRef = useRef(0)
 
-  const startPractice = () => { setPracticeIndex(0); setPracticeCorrect(0); setPracticeFeedback(null); setPhase('practice') }
+  const startPractice = () => { setPracticeReview(null); setPracticeIndex(0); setPracticeCorrect(0); setPracticeFeedback(null); setPhase('practice') }
   const startFormal = () => { releasedBlockRef.current = sequence[0]?.blockIndex ?? 0; setPhase('formal') }
 
   useEffect(() => {
@@ -106,11 +108,12 @@ export const CardsortTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
 
   const respond = (response: 'left' | 'right') => {
     if (phase === 'practice') {
+      if (practiceReview) return
       const correct = response === PRACTICE[practiceIndex].correctResponse
       setPracticeFeedback(correct ? '正确' : '错误')
-      const nextCorrect = practiceCorrect + (correct ? 1 : 0)
-      if (practiceIndex + 1 >= PRACTICE_TRIAL_COUNT) { setPracticeCorrect(nextCorrect); setPhase('practice-result') }
-      else { setPracticeCorrect(nextCorrect); setPracticeIndex((value) => value + 1) }
+      setPracticeCorrect(practiceCorrect + (correct ? 1 : 0))
+      const trial = PRACTICE[practiceIndex]
+      setPracticeReview({ correct, prompt: '本题按' + (trial.ruleCue === 'color' ? '颜色' : '形状') + '分类', expected: trial.correctResponse === 'left' ? '分到左侧红色圆形' : '分到右侧蓝色星形', actual: response === 'left' ? '你选择了左侧' : '你选择了右侧', explanation: trial.ruleCue === 'color' ? '当前只比较颜色：红色去左侧，蓝色去右侧，不看形状。' : '当前只比较形状：圆形去左侧，星形去右侧，不看颜色。' })
       return
     }
     if (phase !== 'formal' || !visible || responseRef.current || onsetRef.current == null) return
@@ -121,6 +124,7 @@ export const CardsortTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
     const onKeyDown = (event: KeyboardEvent) => {
+      if (phase === 'practice' && practiceReview) return
       if (event.repeat) return
       if (event.key === 'ArrowLeft') { event.preventDefault(); respond('left') }
       else if (event.key === 'ArrowRight') { event.preventDefault(); respond('right') }
@@ -134,6 +138,12 @@ export const CardsortTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
     event.preventDefault()
     respond(response)
   }
+
+  if (phase === 'practice' && practiceReview) return <CognitivePracticeReview visual={<Card color={PRACTICE[practiceIndex].stimulusColor} shape={PRACTICE[practiceIndex].stimulusShape} />} feedback={practiceReview} completed={practiceIndex + 1} total={PRACTICE_TRIAL_COUNT} onContinue={() => {
+    setPracticeReview(null)
+    if (practiceIndex + 1 >= PRACTICE_TRIAL_COUNT) setPhase('practice-result')
+    else { setPracticeIndex(value => value + 1);  }
+  }} />
 
   if (phase === 'instruction') {
     return (
@@ -171,5 +181,5 @@ export const CardsortTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
 
   const current = phase === 'practice' ? PRACTICE[practiceIndex] : sequence[trialIndex]
   const content = <div className="p-6 text-center"><p className="mb-2 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / ${PRACTICE_TRIAL_COUNT}` : `试次 ${trialIndex + 1} / ${total}`}</p>{phase === 'practice' && practiceFeedback && <p className="mb-2 text-sm">上一题：{practiceFeedback}</p>}<p className="mb-4 text-xl font-semibold text-primary">按{current?.ruleCue === 'color' ? '颜色' : '形状'}分类</p><div className="flex items-end justify-center gap-2 sm:gap-8"><button aria-label="分到左侧红色圆形" className="rounded border-2 border-transparent hover:border-primary" onPointerDown={(event) => onPointerResponse(event, 'left')} onClick={(event) => { if (event.detail === 0) respond('left') }}><Card color="red" shape="circle" compact /></button><div className={phase === 'formal' && !visible ? 'invisible' : ''}>{current && <Card color={current.stimulusColor} shape={current.stimulusShape} />}</div><button aria-label="分到右侧蓝色星形" className="rounded border-2 border-transparent hover:border-primary" onPointerDown={(event) => onPointerResponse(event, 'right')} onClick={(event) => { if (event.detail === 0) respond('right') }}><Card color="blue" shape="star" compact /></button></div></div>
-  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="规则卡片分类正式作答">{content}</CognitiveFocusStage> : content
+  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="规则卡片分类正式作答" progress={{ completed: trialIndex, total: total }}>{content}</CognitiveFocusStage> : content
 }

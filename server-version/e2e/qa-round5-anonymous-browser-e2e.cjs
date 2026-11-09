@@ -118,11 +118,14 @@ async function scenario(browser, engine, width) {
       await first.getByRole('textbox', { name: new RegExp('合成回答 ' + n) }).fill('合成答卷 A' + n)
       await first.getByRole('button', { name: '提交本页' }).click()
     }
-    await first.getByText('ANON-SYNTH-1', { exact: true }).waitFor()
+    const reportDetails = first.getByTestId('report-supporting-details')
+    assert.equal(await reportDetails.evaluate(element => element.open), false, 'supporting report facts start collapsed')
+    await first.getByText('ANON-SYNTH-1', { exact: true }).waitFor({ state: 'attached' })
     assert.equal(attempts.get('synthetic-attempt-1').answers.length, 2)
     assert.equal(await first.evaluate(() => sessionStorage.getItem('composite:recovery:token:open')), saved)
     await first.reload()
-    await first.getByText('ANON-SYNTH-1', { exact: true }).waitFor()
+    await first.getByTestId('report-supporting-details').evaluate(element => element.open = true)
+    await first.getByText('ANON-SYNTH-1', { exact: true }).waitFor({ state: 'visible' })
 
     const second = await newPage()
     await second.goto(base + '/public/composite/open')
@@ -136,7 +139,9 @@ async function scenario(browser, engine, width) {
     await recovered.goto(base + '/public/composite/open')
     await recovered.getByPlaceholder('粘贴保存时获得的恢复凭证（可选）').fill(saved)
     await recovered.getByRole('button', { name: '继续作答' }).click()
-    await recovered.getByText('ANON-SYNTH-1', { exact: true }).waitFor()
+    const recoveredDetails = recovered.getByTestId('report-supporting-details')
+    assert.equal(await recoveredDetails.evaluate(element => element.open), false, 'recovered report facts start collapsed')
+    await recovered.getByText('ANON-SYNTH-1', { exact: true }).waitFor({ state: 'attached' })
     assert.equal(admitted, 2, 'credential recovery does not create another attempt')
     await recovered.screenshot({ path: path.join(output, `${engine}-${width}-anonymous-recovery.png`), fullPage: true })
 

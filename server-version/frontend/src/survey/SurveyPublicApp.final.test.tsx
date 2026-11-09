@@ -127,7 +127,7 @@ describe('Survey first-success GENERAL receipt consumption',()=>{
     now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
     await screen.findByText(receiptText)
     expect(screen.getByText('本次提交的一般免责声明')).toBeInTheDocument()
-    expect(screen.getByText(/完成时间：/)).toBeInTheDocument()
+    expect(screen.getByText('完成时间').closest('details')).not.toHaveAttribute('open')
     expect(finalCalls).toHaveLength(1)
     expect(generalCalls()).toHaveLength(0)
     expect(screen.queryAllByRole('radio')).toHaveLength(0)
@@ -676,6 +676,13 @@ describe('participant stored raw feedback display',()=>{
     expect(screen.getByText(/本次结果可作参考/)).toBeInTheDocument()
     expect(screen.queryByText(/7 ms|试点测量/)).toBeNull()
     expect(generalCalls()).toHaveLength(1)
+    const details=screen.getByText('完成时间').closest('details')!
+    expect(details).not.toHaveAttribute('open')
+    expect(screen.getByText('受控指标').closest('details')).toBe(details)
+    const result=screen.getByText('原始总分：7（已计算）')
+    expect(result.closest('details')).toBeNull()
+    expect(result.compareDocumentPosition(details)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(screen.queryByText('我的变化')).not.toBeInTheDocument()
   })
   it('preserves cognitive ratio percent, millisecond units and existing pilot labeling',async()=>{
     taskValue={...taskValue,status:'COMPLETED'}

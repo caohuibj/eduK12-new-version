@@ -1,4 +1,4 @@
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeFeedback, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { RunningspanConfig, RunningspanTrialPayload } from '../../types'
@@ -132,10 +132,10 @@ export const RunningspanTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习未完成，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {
-    return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 · 第 {practiceAttempt} 轮 · 不计入成绩</div>{step === 'presentation' && <div className="text-6xl font-bold text-gray-800 h-32 pt-8">{visibleLetter ?? (presentationPosition < 0 ? '准备…' : '')}</div>}{step === 'recall' && <RecallPanel show />}{step === 'feedback' && <div className="h-32 pt-8 text-gray-700">{practiceFeedback}</div>}{step === 'feedback' && <button type="button" className="btn-primary" onClick={advancePractice}>开始正式测评</button>}</div>
+    return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 · 第 {practiceAttempt} 轮 · 不计入成绩</div>{step === 'presentation' && <div className="text-6xl font-bold text-gray-800 h-32 pt-8">{visibleLetter ?? (presentationPosition < 0 ? '准备…' : '')}</div>}{step === 'recall' && <RecallPanel show />}{step === 'feedback' && <CognitivePracticeFeedback>{practiceFeedback}</CognitivePracticeFeedback>}{step === 'feedback' && <button type="button" className="btn-primary" onClick={advancePractice}>开始正式测评</button>}</div>
   }
 
   if (!currentTrial) return <div className="card p-8 text-center text-gray-500">正在生成结果…</div>
 
-  return <CognitiveFocusStage ariaLabel="运行记忆广度正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500">第 {trialIndex + 1} / {totalTrials} 题</div>{step === 'presentation' && <div className="text-6xl font-bold text-gray-800 h-32 pt-8">{visibleLetter ?? (presentationPosition < 0 ? '准备…' : '')}</div>}{step === 'recall' && <RecallPanel show />}{step === 'feedback' && <div className="h-32 pt-8 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{step === 'recall' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}{step === 'presentation' && <p className="text-xs text-gray-400 mt-6">记住最近的 {recallLength} 个字母</p>}</div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="运行记忆广度正式测验" progress={{ completed: trialIndex, total: totalTrials }}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500">第 {trialIndex + 1} / {totalTrials} 题</div>{step === 'presentation' && <div className="text-6xl font-bold text-gray-800 h-32 pt-8">{visibleLetter ?? (presentationPosition < 0 ? '准备…' : '')}</div>}{step === 'recall' && <RecallPanel show />}{step === 'feedback' && <div className="h-32 pt-8 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{step === 'recall' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}{step === 'presentation' && <p className="text-xs text-gray-400 mt-6">记住最近的 {recallLength} 个字母</p>}</div></CognitiveFocusStage>
 }

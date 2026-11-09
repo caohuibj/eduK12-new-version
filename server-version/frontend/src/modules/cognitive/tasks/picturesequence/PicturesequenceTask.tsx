@@ -1,3 +1,5 @@
+import { CognitiveTaskPanel, CognitivePracticeFeedback } from '../shared/CognitiveTaskPresentation'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -128,7 +130,7 @@ export const PicturesequenceTask: React.FC<CognitiveTaskProps> = ({ taskContext,
     const expected = PRACTICE[practiceIndex]
     const correct = response.length === expected.length && response.every((item, index) => item === expected[index])
     setPracticeCorrect((value) => value + (correct ? 1 : 0))
-    setFeedback(correct ? '正确' : '顺序不正确')
+    setFeedback((correct ? '顺序正确。' : '顺序不正确。') + '正确顺序：' + expected.map(labelOf).join(' → ') + '；你的顺序：' + response.map(labelOf).join(' → ') + '。按学习时的先后顺序还原，不按动作的习惯顺序猜测。')
     setPhase('practice-feedback')
   }
   const nextPractice = () => {
@@ -153,14 +155,16 @@ export const PicturesequenceTask: React.FC<CognitiveTaskProps> = ({ taskContext,
     } finally { submittingRef.current = false }
   }
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="图片序列学习" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>记住日常场景出现的顺序，再按顺序点击还原。像复述一段小故事的先后顺序，这里看的是学习后还原这组卡片的表现。</p>) : (<p>记住日常场景出现的顺序，再按顺序点击还原。</p>)} hint={<><p>刺激为内部自制；练习至少答对 3 / 4。</p></>} onAction={startPractice} />
-  if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="text-center p-8"><p className="mb-4">练习正确 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
-  if (phase === 'practice-feedback') return <div className="text-center p-8"><p className="mb-4">上一题：{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
+  if (phase === 'instruction') return <CognitiveTaskIntro title="图片序列学习" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>记住日常场景出现的顺序，再按顺序点击还原。像复述一段小故事的先后顺序，这里看的是学习后还原这组卡片的表现。</p>) : (<p>记住日常场景出现的顺序，再按顺序点击还原。</p>)} hint={<><p>练习至少答对 3 / 4。</p></>} onAction={startPractice} />
+  if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <CognitiveTaskPanel ariaLabel="练习结果" className="cognitive-task-panel--result"><h2 className="cognitive-task-title">练习结果</h2><p className="mb-4">练习正确 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></CognitiveTaskPanel> }
+  if (phase === 'practice-feedback') return <CognitivePracticeFeedback title="练习解析"><p className="mb-4">上一题：{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></CognitivePracticeFeedback>
   if (phase === 'delayed-wait') return <div className="text-center p-8"><h3 className="text-lg font-semibold mb-3">短延迟回忆准备</h3><p className="text-gray-600">请保持当前页面，短暂等待后将在不重复呈现图片的情况下再次排序。</p></div>
 
   const studying = phase === 'practice-study' || phase === 'formal-study'
   const active = phase.startsWith('practice') ? PRACTICE[practiceIndex] : items
-  return <div className="p-6 text-center"><p className="mb-4 text-sm text-gray-500">{phase.startsWith('practice') ? `练习 ${practiceIndex + 1} / 4` : isDelayed ? '短延迟排序' : `学习轮次 ${trialIndex + 1} / ${learningRounds}`}</p>
+  const content = <div className="p-6 text-center"><p className="mb-4 text-sm text-gray-500">{phase.startsWith('practice') ? `练习 ${practiceIndex + 1} / 4` : isDelayed ? '短延迟排序' : `学习轮次 ${trialIndex + 1} / ${learningRounds}`}</p>
     {studying ? <><div className="grid grid-cols-2 gap-2 md:grid-cols-3">{active.map((item, index) => <Card key={item} itemId={item} index={index} />)}</div>{phase === 'practice-study' ? <button className="btn-primary mt-6" onClick={beginRecall}>我记好了，开始排序</button> : <p className="mt-6 text-sm text-gray-500">请持续记忆，呈现结束后将自动进入排序。</p>}</> : <><p className="mb-3">已选择：{response.length} / {active.length}</p><div className="mb-4 flex min-h-16 flex-wrap justify-center gap-2">{response.map((item, index) => <Card key={item} itemId={item} index={index} onClick={() => setResponse((value) => value.filter((candidate) => candidate !== item))} />)}</div><div className="grid grid-cols-2 gap-2 md:grid-cols-3">{choices.filter((item) => !response.includes(item)).map((item) => <Card key={item} itemId={item} onClick={() => choose(item)} />)}</div><button className="btn-primary mt-6" disabled={response.length !== active.length} onClick={() => phase === 'practice-recall' ? submitPractice() : void submitFormal()}>提交排序</button></>}
   </div>
+  return phase.startsWith('formal') ? <CognitiveFocusStage ariaLabel="图片序列学习正式测验" progress={{ completed: trialIndex, total: learningRounds + (delayedEnabled ? 1 : 0) }}>{content}</CognitiveFocusStage> : content
+
 }

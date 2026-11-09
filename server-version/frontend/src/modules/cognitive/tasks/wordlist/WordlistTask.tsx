@@ -1,3 +1,5 @@
+import { CognitiveTaskPanel, CognitivePracticeFeedback } from '../shared/CognitiveTaskPresentation'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -172,7 +174,7 @@ export const WordlistTask: React.FC<CognitiveTaskProps> = ({
     const expected = new Set(PRACTICE_WORDS.map(normalizeWordlistResponse))
     const correct = new Set(responsesRef.current.map(normalizeWordlistResponse).filter((value) => expected.has(value))).size
     setPracticePassedRounds((value) => value + (correct >= 3 ? 1 : 0))
-    setFeedback(`本轮记住了 ${correct} / ${PRACTICE_WORDS.length} 个词。`)
+    setFeedback(`本轮记住了 ${correct} / ${PRACTICE_WORDS.length} 个词。目标词：${PRACTICE_WORDS.join('、')}；你的输入：${responsesRef.current.join('、') || '未输入'}。漏掉的目标词：${PRACTICE_WORDS.filter(word => !responsesRef.current.map(normalizeWordlistResponse).includes(normalizeWordlistResponse(word))).join('、') || '无'}。回忆顺序不限，每个目标词只计一次。`)
     setPhase('practice-feedback')
   }
 
@@ -215,6 +217,8 @@ export const WordlistTask: React.FC<CognitiveTaskProps> = ({
     startedAtRef.current = performance.now()
   }
 
+  const taskFrame = (content: React.ReactNode) => phase.startsWith('formal') ? <CognitiveFocusStage ariaLabel="词表回忆正式测验" progress={{ completed: trialIndex, total: stages.length }}>{content}</CognitiveFocusStage> : content
+
   if (phase === 'instruction') {
     return (
       <CognitiveTaskIntro title="中文词表自由回忆" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>请记住逐词出现的中文词，并在每轮用键盘自由输入你记得的词。可以按 Enter 把输入加入列表。像过一会儿回想购物清单，这里记录每轮实际回忆出的目标词，不判断你是否健忘。</p>) : (<p>请记住逐词出现的中文词，并在每轮用键盘自由输入你记得的词。可以按 Enter 把输入加入列表。</p>)} hint={<><p>练习需要至少 3 / 4 轮达到基本熟悉；正式结果只描述本次作答，不进行繁简转换、同义词匹配或模糊纠错。</p></>} onAction={startPractice} />
@@ -224,28 +228,28 @@ export const WordlistTask: React.FC<CognitiveTaskProps> = ({
   if (phase === 'practice-result') {
     const passed = practicePassedRounds >= 3
     return (
-      <div className="card p-8 text-center">
+      <CognitiveTaskPanel ariaLabel="练习结果" className="cognitive-task-panel--result"><h2 className="cognitive-task-title">练习结果</h2>
         <p className="mb-4 text-gray-700">练习达到基本熟悉 {practicePassedRounds} / 4 轮</p>
         <button type="button" onClick={passed ? startFormal : startPractice} className={passed ? 'btn-primary' : 'btn-secondary'}>
           {passed ? '开始正式测验' : '重新练习'}
         </button>
-      </div>
+      </CognitiveTaskPanel>
     )
   }
 
   if (phase === 'practice-feedback') {
     return (
-      <div className="card p-8 text-center">
+      <CognitivePracticeFeedback title="练习解析">
         <p className="mb-5 text-gray-700">{feedback}</p>
         <button type="button" onClick={nextPractice} className="btn-primary">
           {practiceIndex + 1 >= 4 ? '查看练习结果' : '下一轮练习'}
         </button>
-      </div>
+      </CognitivePracticeFeedback>
     )
   }
 
   if (phase === 'practice-study' || phase === 'formal-study') {
-    return (
+    return taskFrame(
       <div className="card p-8 text-center">
         <p className="mb-3 text-sm text-gray-500">{phase === 'practice-study' ? `练习 ${practiceIndex + 1} / 4` : `正式阶段 ${trialIndex + 1} / ${stages.length}`}</p>
         <p className="mb-6 text-gray-600">请记住当前词</p>
@@ -257,7 +261,7 @@ export const WordlistTask: React.FC<CognitiveTaskProps> = ({
   }
 
   if (phase === 'formal-delay') {
-    return (
+    return taskFrame(
       <div className="card p-8 text-center">
         <p className="mb-3 text-sm text-gray-500">正式延迟阶段</p>
         <p className="text-gray-700">请保持当前页面，等待结束后将再次回忆刚才学习的词语。</p>
@@ -266,7 +270,7 @@ export const WordlistTask: React.FC<CognitiveTaskProps> = ({
   }
 
   const isPractice = phase === 'practice-recall'
-  return (
+  return taskFrame(
     <div className="card p-8">
       <div className="mb-4 flex items-center justify-between text-sm text-gray-500">
         <span>{isPractice ? `练习 ${practiceIndex + 1} / 4` : `正式阶段 ${trialIndex + 1} / ${stages.length}`}</span>

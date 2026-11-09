@@ -32,20 +32,22 @@ beforeEach(() => vi.clearAllMocks())
 afterEach(cleanup)
 
 describe('intake20 exact readiness through the existing host', () => {
-  // Real host, deferred imports and task introduction. Transport is synthetic;
+  // Real host, deferred imports and task-owned first action. Transport is synthetic;
   // this proves code preparation and READY -> RUNNING, not a real administration.
   it.each(['numberline', 'arithverify', 'semanticfluency', 'pursuitrotor', 'auditoryrt'])(
-    '%s prepares the exact runner and starts its actual introduction', async testType => {
+    '%s starts practice from its complete introduction in one action', async testType => {
       harness.controller.state = readyState(testType)
       const view = render(tree())
       harness.controller.start.mockImplementation(() => {
         harness.controller.state = runnerReducer(harness.controller.state, { type: 'START_RUN' })
         view.rerender(tree())
       })
-      const start = await screen.findByRole('button', { name: '开始测评' })
+      const start = await screen.findByRole('button', { name: '开始练习' })
       await waitFor(() => expect(start).toBeEnabled())
       fireEvent.click(start)
-      await waitFor(() => expect(screen.getByRole('button', { name: '开始练习' })).toBeEnabled())
+      await waitFor(() => expect(document.querySelector('[data-cognitive-task-state="running"]')).toBeTruthy())
+      expect(screen.queryByRole('button', { name: '开始测评' })).toBeNull()
+      expect(screen.queryByRole('button', { name: '开始练习' })).toBeNull()
       expect(harness.controller.start).toHaveBeenCalledTimes(1)
       expect(harness.controller.state.status).toBe('RUNNING')
       expect(harness.controller.appendTrial).not.toHaveBeenCalled()
@@ -54,7 +56,7 @@ describe('intake20 exact readiness through the existing host', () => {
   )
 
   it.each(['sentencecheck', 'visualwm', 'auditorynback'])(
-    '%s 1.1.0 keeps exact readiness and enters its actual introduction', async testType => {
+    '%s 1.1.0 keeps exact readiness and starts practice from its introduction', async testType => {
       expect(resolveRunner(testType, '1.1.0')).toBeDefined()
       expect(resolveCognitiveReadinessProfile(testType, '1.1.0')).toMatchObject({
         testType, engineVersion: '1.1.0', inputs: ['keyboard', 'pointer', 'touch'],
@@ -67,10 +69,12 @@ describe('intake20 exact readiness through the existing host', () => {
         harness.controller.state = runnerReducer(harness.controller.state, { type: 'START_RUN' })
         view.rerender(tree())
       })
-      const start = await screen.findByRole('button', { name: '开始测评' })
+      const start = await screen.findByRole('button', { name: '开始练习' })
       await waitFor(() => expect(start).toBeEnabled())
       fireEvent.click(start)
-      expect(await screen.findByRole('button', { name: '开始练习' })).toBeEnabled()
+      await waitFor(() => expect(document.querySelector('[data-cognitive-task-state="running"]')).toBeTruthy())
+      expect(screen.queryByRole('button', { name: '开始测评' })).toBeNull()
+      expect(screen.queryByRole('button', { name: '开始练习' })).toBeNull()
       expect(harness.controller.state.status).toBe('RUNNING')
       expect(harness.controller.start).toHaveBeenCalledTimes(1)
       expect(harness.controller.appendTrial).not.toHaveBeenCalled()

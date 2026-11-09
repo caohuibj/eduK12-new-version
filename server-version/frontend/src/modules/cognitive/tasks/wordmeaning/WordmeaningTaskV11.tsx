@@ -89,7 +89,7 @@ export function WordmeaningTaskV11({ taskContext, trialIndex, onTrialComplete }:
   if (phase === 'instruction') return <CognitiveTaskIntro title="词汇理解" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<><p>每题给出一个词语或词语语境，请选择意思最接近的解释。</p><p>读活动通知时，弄清“暂缓”和“取消”的区别，才不容易把安排理解错。 这次任务只记录本次作答表现。</p></>) : (<p>每题给出一个词语或词语语境，请选择意思最接近的解释。</p>)} hint={<p>按数字键 1–4 或点击选项。先准确理解，再在每题 {config.timeoutMs / 1000} 秒内作答；超时会记为未作答。练习使用独立题目，不计分。正式共 {config.totalTrials} 题。</p>} onAction={() => { setPracticeChoice(null); setStage('fixation'); setPhase('practice') }} />
   const item = phase === 'practice' ? practice : current
   if (!item) return <div className="card p-6" role="status">本次题目已作答完毕，正在结束测验。</div>
-  return <CognitiveFocusStage ariaLabel="词汇理解"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">
+  return <CognitiveFocusStage ariaLabel={phase === 'practice' ? '词汇理解练习' : '词汇理解正式测验'} progress={phase === 'formal' ? { completed: trialIndex, total: config.totalTrials } : undefined}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">
     <p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? '练习 · 独立题目 · 不计分' : `第 ${trialIndex + 1} / ${config.totalTrials} 题`}</p>
     {stage === 'fixation' && <div className="h-28 pt-10 text-4xl text-gray-400">+</div>}
     {stage !== 'fixation' && (stage === 'stimulus' || phase === 'practice') && <p className="pt-4 text-xl font-semibold text-gray-800">{item.word}</p>}

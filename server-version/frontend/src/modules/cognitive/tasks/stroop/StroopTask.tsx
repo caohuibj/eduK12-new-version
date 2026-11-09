@@ -1,4 +1,4 @@
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeAnswer, type PracticeAnswerFeedback, CognitiveTaskExample, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { StroopColor, StroopConfig, StroopTrialPayload } from '../../types'
@@ -26,7 +26,7 @@ export const StroopTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
   const [practiceIndex, setPracticeIndex] = useState(0)
   const [practiceAttempt, setPracticeAttempt] = useState(1)
   const [practiceCorrect, setPracticeCorrect] = useState<boolean[]>([])
-  const [practiceFeedback, setPracticeFeedback] = useState<string | null>(null)
+  const [practiceFeedback, setPracticeFeedback] = useState<PracticeAnswerFeedback | null>(null)
   const [formalFeedback, setFormalFeedback] = useState<string | null>(null)
   const interruptedRef = useRef(false)
   const onsetRef = useRef<number | null>(null)
@@ -83,7 +83,9 @@ export const StroopTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
       if (subPhase !== 'stimulus' || !trial) return
       const correct = color === trial.inkColor
       setPracticeCorrect((current) => { const next = [...current]; next[practiceIndex] = correct; return next })
-      setPracticeFeedback(correct ? '正确：只看字体颜色。' : '请忽略字义，只看字体颜色。'); setSubPhase('feedback'); return
+      setPracticeFeedback({ correct, prompt: `汉字“${trial.word}”，字体显示为${COLOR_LABEL[trial.inkColor]}色`,
+        expected: `选择${COLOR_LABEL[trial.inkColor]}色`, actual: `选择${COLOR_LABEL[color]}色`,
+        explanation: `本题按字体颜色判断。字义是“${trial.word}”，但字体实际为${COLOR_LABEL[trial.inkColor]}色；因此应选${COLOR_LABEL[trial.inkColor]}，不要跟着字义选。` }); setSubPhase('feedback'); return
     }
     void submitFormal(color)
   }, [phase, practiceIndex, subPhase, submitFormal])
@@ -106,15 +108,25 @@ export const StroopTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
     else setPhase('blocked')
   }, [practiceIndex, practiceCorrect, practiceAttempt])
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="色词 Stroop" description={<p>请忽略汉字含义，只报告文字显示的字体颜色。正式测验包含一致与冲突试次。</p>} hint={<><p>按键 1–4 或点击颜色按钮作答；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro
+    title="色词 Stroop"
+    description={<p>每题会出现一个带颜色的汉字。只判断“字本身显示的颜色”，忽略汉字表达的颜色含义；选项或按键对应字体颜色。</p>}
+    example={<CognitiveTaskExample title="图示：看字体颜色，不读汉字意思" steps={[
+      { label: '看到的字', value: <span style={{ color: 'var(--cognitive-stroop-ink, #1d4ed8)' }}>红</span>, note: '字的意思是“红”', state: 'observe' },
+      { label: '检查字体', value: '蓝色', note: '实际显示为蓝色', state: 'observe' },
+      { label: '选择答案', value: '蓝色', note: '选蓝，不选红', state: 'respond' },
+    ]} result="忽略字义“红”，按字体颜色“蓝色”作答。" explanation="正式测验会混合字义与字体颜色相同、不同的题目；每题都以实际显示的字体颜色为准。" />}
+    hint={<><p><strong>操作：</strong>按键 1–4 或点击颜色按钮，选择字体颜色。</p><p><strong>练习：</strong>先做不计分练习熟悉规则，通过后进入正式测验。</p></>}
+    onAction={startPractice}
+  />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习尚未通过，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {
     const trial = PRACTICE_TRIALS[practiceIndex]
-    return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 {practiceIndex + 1} / {PRACTICE_TRIALS.length} · 第 {practiceAttempt} 轮 · 不计入成绩</div>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-24 pt-6">+</div>}{subPhase === 'stimulus' && trial && <div className="text-6xl font-bold h-24 pt-3" style={{ color: COLOR_HEX[trial.inkColor] }}>{trial.word}</div>}{subPhase === 'feedback' && <div className="h-24 pt-6 text-gray-700">{practiceFeedback}</div>}{subPhase === 'stimulus' && <div className="grid grid-cols-2 gap-2 max-w-md mx-auto mt-4 sm:grid-cols-4">{COLORS.map((color, index) => <button key={color} type="button" onPointerDown={() => handleResponse(color)} className="btn-secondary min-h-12">{index + 1} · {COLOR_LABEL[color]}</button>)}</div>}{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary">{practiceIndex + 1 >= PRACTICE_TRIALS.length ? practiceCorrect.every(Boolean) ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div>
+    return <CognitiveFocusStage ariaLabel="色词判断练习" progress={{ completed: practiceIndex + (subPhase === 'feedback' ? 1 : 0), total: PRACTICE_TRIALS.length }}><div className="card p-8 max-w-2xl text-center"><p className="text-sm text-gray-500 mb-4">第 {practiceAttempt} 轮 · 练习不计入成绩</p>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-24 pt-6">+</div>}{subPhase === 'stimulus' && trial && <div className="text-6xl font-bold h-24 pt-3" style={{ color: COLOR_HEX[trial.inkColor] }}>{trial.word}</div>}{subPhase === 'feedback' && <CognitivePracticeAnswer feedback={practiceFeedback} />}{subPhase === 'stimulus' && <div className="grid grid-cols-2 gap-2 max-w-md mx-auto mt-4 sm:grid-cols-4">{COLORS.map((color, index) => <button key={color} type="button" onPointerDown={() => handleResponse(color)} className="btn-secondary min-h-12">{index + 1} · {COLOR_LABEL[color]}</button>)}</div>}{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary">{practiceIndex + 1 >= PRACTICE_TRIALS.length ? practiceCorrect.every(Boolean) ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div></CognitiveFocusStage>
   }
 
   if (!currentTrial) return <div className="card p-8 text-center text-gray-500">正在生成结果…</div>
 
-  return <CognitiveFocusStage ariaLabel="Stroop 正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-28 pt-8">+</div>}{subPhase === 'stimulus' && <div className="text-6xl font-bold h-28 pt-3" style={{ color: COLOR_HEX[currentTrial.inkColor] }}>{currentTrial.word}</div>}{subPhase === 'feedback' && <div className="h-28 pt-8 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && <div className="grid grid-cols-2 gap-3 max-w-md mx-auto mt-4 sm:grid-cols-4">{COLORS.map((color, index) => <button key={color} type="button" onPointerDown={() => handleResponse(color)} className="btn-secondary min-h-12">{index + 1} · {COLOR_LABEL[color]}</button>)}</div>}<p className="text-xs text-gray-400 mt-6">按键 1–4 或点击颜色按钮作答</p></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="Stroop 正式测验" progress={{ completed: trialIndex, total: totalTrials }}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-28 pt-8">+</div>}{subPhase === 'stimulus' && <div className="text-6xl font-bold h-28 pt-3" style={{ color: COLOR_HEX[currentTrial.inkColor] }}>{currentTrial.word}</div>}{subPhase === 'feedback' && <div className="h-28 pt-8 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && <div className="grid grid-cols-2 gap-3 max-w-md mx-auto mt-4 sm:grid-cols-4">{COLORS.map((color, index) => <button key={color} type="button" onPointerDown={() => handleResponse(color)} className="btn-secondary min-h-12">{index + 1} · {COLOR_LABEL[color]}</button>)}</div>}<p className="text-xs text-gray-400 mt-6">按键 1–4 或点击颜色按钮作答</p></div></CognitiveFocusStage>
 }

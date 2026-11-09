@@ -45,6 +45,8 @@ describe('School authoritative completion feedback consumer (synthetic transport
     await waitFor(()=>expect(api.mock.calls.filter(([path])=>path.startsWith('/reports/'))).toHaveLength(1))
     await act(async()=>{rejectList(Error('列表暂不可用'));await refresh.catch(()=>{})})
     expect(screen.getAllByRole('region',{name:'获准的个人测评反馈'})).toHaveLength(1)
+    expect(screen.getByText('已完成')).toBeInTheDocument()
+    expect(screen.queryByRole('button',{name:'开始／继续官方测评'})).not.toBeInTheDocument()
     expect(screen.getAllByRole('button',{name:'查看我的变化'})).toHaveLength(1)
     expect(api.mock.calls.some(call=>call.length>1)).toBe(false)
   })

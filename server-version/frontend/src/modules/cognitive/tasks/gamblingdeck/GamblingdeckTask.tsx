@@ -1,5 +1,5 @@
 import { reportIntroV3 } from './report-intro-v3'
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeFeedback, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { GamblingdeckConfig, GamblingdeckTrialPayload } from '../../types'
@@ -92,8 +92,8 @@ export const GamblingdeckTask: React.FC<CognitiveTaskProps> = ({ taskContext, tr
   )
 
   if (phase === 'practice') {
-    return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 · 不计入成绩</div><p className="text-gray-600">选一个箱子试试：</p><DeckGrid onPick={handlePracticePick} disabled={subPhase !== 'choice'} />{subPhase === 'feedback' && <><div className="mt-4 text-gray-700">{practiceFeedback}</div><button type="button" className="btn-primary" onClick={() => { setPracticeFeedback(null); setPracticeOutcome(null); setSubPhase('choice'); setPhase('formal') }}>开始正式测评</button></>}</div>
+    return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 · 不计入成绩</div><p className="text-gray-600">选一个箱子试试：</p><DeckGrid onPick={handlePracticePick} disabled={subPhase !== 'choice'} />{subPhase === 'feedback' && <><CognitivePracticeFeedback>{practiceFeedback}</CognitivePracticeFeedback><button type="button" className="btn-primary" onClick={() => { setPracticeFeedback(null); setPracticeOutcome(null); setSubPhase('choice'); setPhase('formal') }}>开始正式测评</button></>}</div>
   }
 
-  return <CognitiveFocusStage ariaLabel="宝箱决策学习正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500">{completedCount} / {totalTrials} · 当前累计 {netTotal}</div>{subPhase === 'choice' && <p className="text-gray-600 pt-3">选一个箱子：</p>}<DeckGrid onPick={(deck) => void submitFormal(deck)} disabled={subPhase !== 'choice'} />{subPhase === 'feedback' && <div className="mt-4 text-xl font-semibold text-gray-700">{formalFeedback}{lastOutcome !== null && <span className="ml-2 text-sm text-gray-500">（累计 {netTotal}）</span>}</div>}{subPhase === 'choice' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<p className="text-xs text-gray-400 mt-6">点击箱子作答 · 自定速，不限时</p></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="宝箱决策学习正式测验" progress={{ completed: trialIndex, total: totalTrials }}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500">{completedCount} / {totalTrials} · 当前累计 {netTotal}</div>{subPhase === 'choice' && <p className="text-gray-600 pt-3">选一个箱子：</p>}<DeckGrid onPick={(deck) => void submitFormal(deck)} disabled={subPhase !== 'choice'} />{subPhase === 'feedback' && <div className="mt-4 text-xl font-semibold text-gray-700">{formalFeedback}{lastOutcome !== null && <span className="ml-2 text-sm text-gray-500">（累计 {netTotal}）</span>}</div>}{subPhase === 'choice' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<p className="text-xs text-gray-400 mt-6">点击箱子作答 · 自定速，不限时</p></div></CognitiveFocusStage>
 }

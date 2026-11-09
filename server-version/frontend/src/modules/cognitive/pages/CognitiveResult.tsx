@@ -115,7 +115,7 @@ const CognitiveResult: React.FC = () => {
     const referenceRows = (result.references ?? [])
       .filter((reference) => reference && typeof reference === 'object') as Array<Record<string, unknown>>
     return (
-      <ProductPage width="report" className="hui-report">
+      <ProductPage width="report" className="hui-report cognitive-result-page">
         <button onClick={back} className="mb-4 inline-flex min-h-11 items-center gap-2 text-gray-500 hover:text-gray-700" data-report-screen-only>
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />{learner.enabled ? learner.backLabel : '返回列表'}
         </button>

@@ -5,12 +5,12 @@ import { useTrainingLearnerNavigation } from '../../../training/learnerNavigatio
 import CognitiveCredentialReset from './CognitiveCredentialReset'
 import CognitiveSessionEntry from './CognitiveSessionEntry'
 import { isPublicAssessmentPath, parentReturnTo } from '../../../components/app-shell/access'
-import { AssessmentShell, type AssessmentInteractionReadiness, type AssessmentProgress } from '../../../components/assessment-shell'
+import { AssessmentShell, type AssessmentInteractionReadiness, type AssessmentProgress, type AssessmentSaveStatus } from '../../../components/assessment-shell'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { cognitiveApi, publicCognitiveApi, type CognitiveSessionApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
-import { cognitiveInputNotice, resolveCognitiveReadinessProfile } from '../core/readiness'
+import { resolveCognitiveReadinessProfile } from '../core/readiness'
 import { useCognitiveSession } from '../core/useCognitiveSession'
 import { useAdministrationProvenance } from '../core/useAdministrationProvenance'
 import { resolveRunner } from '../registry'
@@ -23,6 +23,9 @@ import { cognitiveVideoPresentationEntries } from '../video-presentation'
 import { useCognitiveInstructionVideoCompletion } from '../useCognitiveInstructionVideoCompletion'
 import { useCognitiveVideoSources } from '../useCognitiveVideoSources'
 import { compositeParentAttemptPath } from '../../composite/child-route-context'
+import { CognitiveFocusProgressContext } from '../tasks/shared/focus-progress'
+import type { CognitiveTaskProps } from '../core/runner.types'
+import { CognitiveTaskStartContext, type CognitiveTaskStartContextValue } from '../tasks/shared/CognitiveTaskPresentation'
 
 const presentationItems = (
   presentation: NonNullable<import('../types').CognitiveSession['presentation']> | undefined,
@@ -40,6 +43,100 @@ const LoadingContent = ({ message }: { message: string }) => (
     <span className="ml-3 text-slate-600">{message}</span>
   </div>
 )
+
+type CognitiveRunnerTaskHostProps = {
+  title: string
+  runner: React.ComponentType<CognitiveTaskProps>
+  runnerProps: CognitiveTaskProps
+  taskIdentity: { testType: string; engineVersion: string }
+  initial: boolean
+  hostOwnsInitialAction: boolean
+  startDisabled: boolean
+  onStart: () => void
+  instructions?: React.ReactNode
+  progress?: AssessmentProgress
+  interactionReadiness?: AssessmentInteractionReadiness
+  saveStatus?: AssessmentSaveStatus
+  actions?: React.ReactNode
+  preStartContent?: React.ReactNode
+  waitingContent?: React.ReactNode
+  publicCredentialNotice?: React.ReactNode
+  errorMessage?: string
+  focusProgress: { completed: number; total?: number }
+  renderRunner: boolean
+}
+
+/**
+ * Shared READY/RUNNING host. Keeping this component and the Runner slot stable
+ * lets one task-owned button both start the host session and enter practice
+ * without resetting task-local state during READY -> RUNNING.
+ */
+const CognitiveRunnerTaskHost: React.FC<CognitiveRunnerTaskHostProps> = ({
+  title,
+  runner: Runner,
+  runnerProps,
+  taskIdentity,
+  initial,
+  hostOwnsInitialAction,
+  startDisabled,
+  onStart,
+  instructions,
+  progress,
+  interactionReadiness,
+  saveStatus,
+  actions,
+  preStartContent,
+  waitingContent,
+  publicCredentialNotice,
+  errorMessage,
+  focusProgress,
+  renderRunner,
+}) => {
+  const startContext = React.useMemo<CognitiveTaskStartContextValue>(() => ({
+    onInitialAction: initial && !hostOwnsInitialAction ? onStart : undefined,
+    disabled: initial && startDisabled,
+    hideIntroTitle: true,
+    taskIdentity,
+  }), [initial, hostOwnsInitialAction, onStart, startDisabled, taskIdentity.testType, taskIdentity.engineVersion])
+  const progressContext = React.useMemo(() => focusProgress, [focusProgress.completed, focusProgress.total])
+  const shellActions = initial && hostOwnsInitialAction ? (
+    <div className="text-center">
+      <button type="button" onClick={onStart} disabled={startDisabled} className="btn-primary">开始测评</button>
+    </div>
+  ) : initial ? actions : undefined
+
+  return (
+    <AssessmentShell
+      className={initial ? 'cognitive-preparation cognitive-initial-start' : 'cognitive-running'}
+      title={title}
+      instructions={instructions}
+      progress={initial ? progress : undefined}
+      interactionReadiness={interactionReadiness}
+      saveStatus={saveStatus}
+      actions={shellActions}
+    >
+      {publicCredentialNotice}
+      <div data-cognitive-start-content="true">{initial ? preStartContent : null}</div>
+      <div data-cognitive-task-mount="true">
+        {renderRunner ? (
+          <div className="cognitive-task-workspace" data-cognitive-task-root="true" data-cognitive-task-state={initial ? 'initial' : 'running'}>
+            <CognitiveFocusProgressContext.Provider value={progressContext}>
+              <CognitiveTaskStartContext.Provider value={startContext}>
+                <Runner {...runnerProps} />
+              </CognitiveTaskStartContext.Provider>
+            </CognitiveFocusProgressContext.Provider>
+            {!initial && actions ? (
+              <div className="cognitive-task-workspace__actions" data-cognitive-presentation="completion-action">
+                {actions}
+              </div>
+            ) : null}
+          </div>
+        ) : waitingContent || <LoadingContent message="正在准备本次测验..." />}
+      </div>
+      {errorMessage ? <p className="mt-3 text-center text-sm text-red-600">{errorMessage}</p> : null}
+    </AssessmentShell>
+  )
+}
 
 /**
  * CognitiveRunner（Stage B v1.1 §17/§20/§21）。
@@ -66,7 +163,7 @@ export type CampusCognitiveRunnerBinding = {
 type CognitiveRunnerProps={campus?: CampusCognitiveRunnerBinding;embedded?: CampusCognitiveRunnerBinding}
 
 export const CognitiveRunner: React.FC<CognitiveRunnerProps> = props => (
-  <div className="cognitive-surface"><CognitiveRunnerContent {...props}/></div>
+  <div className="cognitive-surface" data-cognitive-appearance="fixed"><CognitiveRunnerContent {...props}/></div>
 )
 
 const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacyCampus, embedded }) => {
@@ -337,33 +434,8 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
       interactionReadiness = { state: 'blocked', message: '开始前需要完整观看说明视频。' }
     }
 
-    const instructions = (
-      <div className="space-y-1">
-        <p>本次测评共 {total || '若干'} 个试次，请按任务提示完成。</p>
-        {state.session?.testType==='gonogo'&&<p>先阅读操作说明并完成练习，练习通过后再进入正式任务。</p>}
-        {cognitiveInputNotice(state.session!.testType, state.session!.engineVersion) ? (
-          <p>{cognitiveInputNotice(state.session!.testType, state.session!.engineVersion)}</p>
-        ) : null}
-      </div>
-    )
-
-    return (
-      <AssessmentShell
-        className="cognitive-preparation"
-        title={title}
-        instructions={instructions}
-        progress={{ kind: 'phase', phase: '准备开始', detail: '请先阅读任务说明并完成练习；正式测验开始后请保持专注。' }}
-        interactionReadiness={interactionReadiness}
-        actions={(
-          <div className="text-center">
-            <button type="button" onClick={controller.start} disabled={!mediaReady || !runnerCode.ready} className="btn-primary">
-              开始测评
-            </button>
-          </div>
-        )}
-      >
-        {publicCredentialNotice}
-        {runnerCode.error ? <div role="alert"><p>{runnerCode.error}</p><button type="button" onClick={runnerCode.retry} className="btn-secondary">重试测验程序</button></div> : null}
+    const preStartContent = (
+      <>
         {imageState.status === 'error' ? (
           <div role="alert" className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
             <p>视觉内容加载失败，当前不能开始测评。</p>
@@ -409,7 +481,41 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
             />
           )
         }) : null}
-      </AssessmentShell>
+      </>
+    )
+    const hostOwnsInitialAction = resolvedEntry?.startActionOwner === 'host'
+    const taskContext = campus?.requiredInput
+      ? { ...state.taskContext!, requiredInput: campus.requiredInput }
+      : state.taskContext!
+    const runnerProps: CognitiveTaskProps = {
+      taskContext,
+      imageAssetUrls: imageState.urls,
+      videoSources: videoState.sources,
+      refreshVideoSource: videoState.refresh,
+      trialIndex: state.trialIndex,
+      onTrialComplete: controller.appendTrial,
+      onTaskComplete: resolvedEntry?.completionMode === 'task' ? completeWithProvenance : undefined,
+    }
+
+    return (
+      <CognitiveRunnerTaskHost
+        title={title}
+        runner={resolvedEntry!.RunnerComponent}
+        runnerProps={runnerProps}
+        taskIdentity={{ testType: state.session!.testType, engineVersion: state.session!.engineVersion }}
+        initial
+        hostOwnsInitialAction={hostOwnsInitialAction}
+        startDisabled={!mediaReady || !runnerCode.ready}
+        onStart={controller.start}
+        interactionReadiness={interactionReadiness}
+        preStartContent={preStartContent}
+        waitingContent={runnerCode.error ? (
+          <div role="alert"><p>{runnerCode.error}</p><button type="button" onClick={runnerCode.retry} className="btn-secondary">重试测验程序</button></div>
+        ) : <LoadingContent message="正在准备本次测验程序…" />}
+        publicCredentialNotice={publicCredentialNotice}
+        focusProgress={{ completed: state.trialIndex, total: total > 0 ? total : undefined }}
+        renderRunner={runnerCode.ready && !hostOwnsInitialAction}
+      />
     )
   }
 
@@ -470,48 +576,58 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
       )
     }
 
-    if (!runnerCode.ready) {
-      return <AssessmentShell title={entry.name} interactionReadiness={{ state: runnerCode.error ? 'blocked' : 'preparing', message: runnerCode.error || '正在准备本次测验程序。' }}>
-        {runnerCode.error ? <div role="alert"><p>{runnerCode.error}</p><button type="button" onClick={runnerCode.retry} className="btn-secondary">重试测验程序</button></div> : <LoadingContent message="正在准备本次测验程序…" />}
-      </AssessmentShell>
-    }
-
-    if (!imagesReady || !videoCapabilitiesReady) {
-      const mediaError = imageState.status === 'error' || videoState.status === 'error'
-      return (
-        <AssessmentShell
-          title={entry.name}
-          progress={{ kind: 'phase', phase: '媒体恢复', detail: '任务不会在媒体未就绪时继续。' }}
-          interactionReadiness={mediaError
-            ? { state: 'blocked', message: '测评媒体未就绪；不会自动重跑已暴露的刺激。' }
-            : { state: 'preparing', message: '正在准备测评媒体。' }}
-        >
-          {imageState.status === 'error' ? (
-            <div role="alert" className="text-center text-red-700">
-              <p>视觉内容未就绪，测量不会继续。</p>
-              <button type="button" onClick={imageState.retry} className="btn-secondary mt-4">重试视觉内容</button>
-            </div>
-          ) : videoState.status === 'error' ? (
-            <div role="alert" className="text-center text-red-700">
-              <p>视频能力未就绪，测量不会继续。</p>
-              <button type="button" onClick={videoState.retry} className="btn-secondary mt-4">重试视频内容</button>
-            </div>
-          ) : <LoadingContent message="正在准备测评媒体..." />}
-        </AssessmentShell>
-      )
-    }
-
     const Runner = entry.RunnerComponent
     const taskCompletes = entry.completionMode === 'task'
     const isLastTrial = state.status === 'RUNNING' && total > 0 && state.trialIndex >= total && !taskCompletes
     const progress: AssessmentProgress = total > 0 && !taskCompletes
       ? { kind: 'position', current: Math.min(state.trialIndex + 1, total), total, label: '试次进度' }
       : { kind: 'phase', phase: '任务进行中', detail: `已记录 ${state.trialIndex} 个试次；完成点由当前任务契约决定。`, label: '任务进度' }
+    const mediaReadyForRunning = runnerCode.ready && imagesReady && videoCapabilitiesReady
+    const mediaError = imageState.status === 'error' || videoState.status === 'error'
+    const readiness: AssessmentInteractionReadiness | undefined = !runnerCode.ready
+      ? { state: runnerCode.error ? 'blocked' : 'preparing', message: runnerCode.error || '正在准备本次测验程序。' }
+      : !mediaReadyForRunning
+        ? mediaError
+          ? { state: 'blocked', message: '测评媒体未就绪；不会自动重跑已暴露的刺激。' }
+          : { state: 'preparing', message: '正在准备测评媒体。' }
+        : undefined
+    const waitingContent = runnerCode.error ? (
+      <div role="alert"><p>{runnerCode.error}</p><button type="button" onClick={runnerCode.retry} className="btn-secondary">重试测验程序</button></div>
+    ) : imageState.status === 'error' ? (
+      <div role="alert" className="text-center text-red-700">
+        <p>视觉内容未就绪，测量不会继续。</p>
+        <button type="button" onClick={imageState.retry} className="btn-secondary mt-4">重试视觉内容</button>
+      </div>
+    ) : videoState.status === 'error' ? (
+      <div role="alert" className="text-center text-red-700">
+        <p>视频能力未就绪，测量不会继续。</p>
+        <button type="button" onClick={videoState.retry} className="btn-secondary mt-4">重试视频内容</button>
+      </div>
+    ) : <LoadingContent message="正在准备测评媒体..." />
+    const runnerProps: CognitiveTaskProps = {
+      taskContext: campus?.requiredInput
+        ? { ...state.taskContext, requiredInput: campus.requiredInput }
+        : state.taskContext,
+      imageAssetUrls: imageState.urls,
+      videoSources: videoState.sources,
+      refreshVideoSource: videoState.refresh,
+      trialIndex: state.trialIndex,
+      onTrialComplete: controller.appendTrial,
+      onTaskComplete: taskCompletes ? completeWithProvenance : undefined,
+    }
 
     return (
-      <AssessmentShell
+      <CognitiveRunnerTaskHost
         title={entry.name}
+        runner={Runner}
+        runnerProps={runnerProps}
+        taskIdentity={{ testType: state.session!.testType, engineVersion: state.session!.engineVersion }}
+        initial={false}
+        hostOwnsInitialAction={false}
+        startDisabled
+        onStart={controller.start}
         progress={progress}
+        interactionReadiness={readiness}
         saveStatus={state.status === 'SUBMITTING_TRIAL' && state.session.deliveryMode === 'FINAL_ONLY'
           ? { state: 'saving', message: '正在把当前试次写入同一份本机草稿。' }
           : { state: 'idle' }}
@@ -520,21 +636,12 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
             <button type="button" onClick={() => void completeWithProvenance()} className="btn-primary">完成测评</button>
           </div>
         ) : undefined}
-      >
-        {publicCredentialNotice}
-        <div data-cognitive-task-root="true">
-          <Runner
-            taskContext={campus?.requiredInput?{...state.taskContext,requiredInput:campus.requiredInput}:state.taskContext}
-            imageAssetUrls={imageState.urls}
-            videoSources={videoState.sources}
-            refreshVideoSource={videoState.refresh}
-            trialIndex={state.trialIndex}
-            onTrialComplete={controller.appendTrial}
-            onTaskComplete={taskCompletes ? completeWithProvenance : undefined}
-          />
-        </div>
-        {state.error ? <p className="mt-3 text-center text-sm text-red-600">{state.error.message}</p> : null}
-      </AssessmentShell>
+        waitingContent={waitingContent}
+        publicCredentialNotice={publicCredentialNotice}
+        errorMessage={state.error?.message}
+        focusProgress={{ completed: state.trialIndex, total: total > 0 && !taskCompletes ? total : undefined }}
+        renderRunner={mediaReadyForRunning}
+      />
     )
   }
 

@@ -3,6 +3,7 @@ import {deferredPage} from '../components/page-loading/deferredPage'
 import {TeacherAssessmentPage} from './TeacherAssessmentPage'
 import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
 import {assessmentStatus,type AssessmentListPresentation} from './assessmentTaskPresentation'
+import {ReportDetails} from '../modules/reporting/ReportPrimitives'
 import {isCapabilitySources} from '../modules/assessment-media/video-capability-client'
 const FinalCompositeAssessment=deferredPage(()=>import('../components/FinalCompositeAssessment'),{
  label:'取消打开测评',run:props=>props.onExit(),
@@ -131,11 +132,12 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
     }
     const value=await load(attemptId)
     if(!valid())return
-    if(value.status==='COMPLETED'){sessionRef.current=null;setSession(null);showReport(item);void refresh()}
+    if(value.status==='COMPLETED'){sessionRef.current=null;setSession(null);confirmCompleted(item);showReport(item);void refresh()}
     else setSession({api,selected:item,attempt:value})
     })
   }
   const showReport=(item:Task)=>{if(currentApi.current===api){setFeedback({api,task:item});setMessage('')}}
+  const confirmCompleted=(item:Task)=>setTasks(old=>old.map(row=>row.executionId===item.executionId?{...row,status:'COMPLETED'}:row))
   const feedbackExecutionId=visibleFeedback?.task.executionId
   const readFeedback=useCallback(()=>api<EducationFeedbackData>(
     '/run-executions/'+feedbackExecutionId+'/personal-summary'),[api,feedbackExecutionId])
@@ -151,7 +153,7 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
     if(currentApi.current!==api||sessionEpoch.current!==token||sessionRef.current!==source)return
     // Section transitions read only the authoritative current unit. Refresh the
     // hidden task list after durable completion or an explicit saved exit.
-    if(value.status==='COMPLETED'){sessionRef.current=null;setSession(null);showReport(source.selected);void refresh()}
+    if(value.status==='COMPLETED'){sessionRef.current=null;setSession(null);confirmCompleted(source.selected);showReport(source.selected);void refresh()}
     else setSession({...source,attempt:value})
   }
   const submitScale=async(attemptId:string,itemId:string,payload:unknown)=>{
@@ -233,7 +235,9 @@ function renderTeacherLegacyFeedback(data:EducationFeedbackData){
       {metric.headline&&<p>{metric.headline}</p>}{metric.summary&&<p>{metric.summary}</p>}
       {metric.guidance?.map((guide,i)=><p key={i}>{guide.text}</p>)}
     </article>)}
-    {report.limitations?.map((line,i)=><p key={i} className="ht-muted">说明：{line}</p>)}
-    {report.disclaimer&&<p className="ht-muted">{report.disclaimer}</p>}
+    {(!!report.limitations?.length||!!report.disclaimer)&&<ReportDetails title="阅读说明与解释边界">
+      {report.limitations?.map((line,i)=><p key={i} className="ht-muted">说明：{line}</p>)}
+      {report.disclaimer&&<p className="ht-muted">{report.disclaimer}</p>}
+    </ReportDetails>}
   </div>
 }

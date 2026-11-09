@@ -1,4 +1,4 @@
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeAnswer, type PracticeAnswerFeedback, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { SeqlearnConfig, SeqlearnTrialPayload } from '../../types'
@@ -23,7 +23,7 @@ export const SeqlearnTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   const [phase, setPhase] = useState<Phase>('instruction')
   const [subPhase, setSubPhase] = useState<SubPhase>('fixation')
   const [practiceIndex, setPracticeIndex] = useState(0)
-  const [practiceFeedback, setPracticeFeedback] = useState<string | null>(null)
+  const [practiceFeedback, setPracticeFeedback] = useState<PracticeAnswerFeedback | null>(null)
   const [formalFeedback, setFormalFeedback] = useState<string | null>(null)
   const [practiceWrong, setPracticeWrong] = useState(false)
   const interruptedRef = useRef(false)
@@ -83,7 +83,9 @@ export const SeqlearnTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
       const expected = SEQLEARN_PRACTICE_POSITIONS[practiceIndex]
       const correct = response === expected
       setPracticeWrong(!correct)
-      setPracticeFeedback(correct ? '正确：按信号所在格子。' : `信号在第 ${expected} 格。`)
+      setPracticeFeedback({ correct, prompt: `信号出现在第 ${expected} 格`,
+        expected: `选择第 ${expected} 格`, actual: `选择第 ${response} 格`,
+        explanation: `四个格子从左往右依次对应 1、2、3、4。本题亮起的是第 ${expected} 格，应按 ${expected} 或点击这一格；不用预测下一题的位置。` })
       setSubPhase('feedback'); return
     }
     void submitFormal(response)
@@ -129,10 +131,10 @@ export const SeqlearnTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
 
   if (phase === 'practice') {
     const expected = SEQLEARN_PRACTICE_POSITIONS[practiceIndex]
-    return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 {practiceIndex + 1} / {SEQLEARN_PRACTICE_POSITIONS.length} · 不计入成绩</div>{subPhase === 'fixation' && <div className="h-16"></div>}{subPhase !== 'fixation' && <Boxes show={subPhase === 'stimulus'} highlight={subPhase === 'stimulus' ? expected : undefined} />}{subPhase === 'feedback' && <div className="h-10 pt-3 text-gray-700">{practiceFeedback}</div>}{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary">{practiceIndex + 1 >= SEQLEARN_PRACTICE_POSITIONS.length ? '开始正式测评' : '下一个'}</button>}</div>
+    return <CognitiveFocusStage ariaLabel="序列反应练习" progress={{ completed: practiceIndex + (subPhase === 'feedback' ? 1 : 0), total: SEQLEARN_PRACTICE_POSITIONS.length }}><div className="card p-8 max-w-2xl text-center"><p className="text-sm text-gray-500 mb-4">练习不计入成绩</p>{subPhase === 'fixation' && <div className="h-16"></div>}{subPhase !== 'fixation' && <Boxes show={subPhase === 'stimulus'} highlight={subPhase === 'stimulus' ? expected : undefined} />}{subPhase === 'feedback' && <CognitivePracticeAnswer feedback={practiceFeedback} />}{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary">{practiceIndex + 1 >= SEQLEARN_PRACTICE_POSITIONS.length ? '开始正式测评' : '下一个'}</button>}</div></CognitiveFocusStage>
   }
 
   if (!currentTrial) return <div className="card p-8 text-center text-gray-500">正在生成结果…</div>
 
-  return <CognitiveFocusStage ariaLabel="序列反应学习正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500">第 {trialIndex + 1} / {totalTrials} 题</div>{subPhase === 'fixation' && <div className="h-24"></div>}{subPhase !== 'fixation' && <Boxes show={subPhase === 'stimulus'} highlight={subPhase === 'stimulus' ? currentTrial.position : undefined} />}{subPhase === 'feedback' && <div className="h-10 pt-3 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<p className="text-xs text-gray-400 mt-4">按键 1–4 或点击格子作答</p></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="序列反应学习正式测验" progress={{ completed: trialIndex, total: totalTrials }}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500">第 {trialIndex + 1} / {totalTrials} 题</div>{subPhase === 'fixation' && <div className="h-24"></div>}{subPhase !== 'fixation' && <Boxes show={subPhase === 'stimulus'} highlight={subPhase === 'stimulus' ? currentTrial.position : undefined} />}{subPhase === 'feedback' && <div className="h-10 pt-3 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<p className="text-xs text-gray-400 mt-4">按键 1–4 或点击格子作答</p></div></CognitiveFocusStage>
 }

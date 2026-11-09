@@ -29,9 +29,51 @@ describe('N-Back and Corsi runners', () => {
     const onTrialComplete = vi.fn()
     render(<NbackTask taskContext={nbackContext} trialIndex={0} onTrialComplete={onTrialComplete} />)
     expect(screen.getByText('N-Back')).toBeTruthy()
+    expect(screen.getByText(/前 1 个先记忆/)).toBeTruthy()
     fireEvent.click(screen.getByText('开始练习'))
-    expect(screen.getByText(/1-back 练习 1/)).toBeTruthy()
+    expect(screen.getByText(/1-back 练习 · 观察 1/)).toBeTruthy()
     expect(onTrialComplete).not.toHaveBeenCalled()
+  })
+
+  it('does not score or give correctness feedback for the first N practice letters', async () => {
+    vi.useFakeTimers()
+    const onTrialComplete = vi.fn()
+    try {
+      render(<NbackTask taskContext={nbackContext} trialIndex={0} onTrialComplete={onTrialComplete} />)
+      fireEvent.click(screen.getByText('开始练习'))
+      await act(async () => { vi.advanceTimersByTime(nbackContext.config.isiMs) })
+      fireEvent.click(screen.getByRole('button', { name: /练习作答区/ }))
+      await act(async () => { vi.advanceTimersByTime(nbackContext.config.isiMs + nbackContext.config.stimulusMs) })
+      expect(screen.getByRole('status').textContent).toContain('观察阶段第 1 / 1 个字母')
+      expect(screen.getByRole('status', { name: '本题反馈：观察题' })).toBeTruthy()
+      expect(screen.getByText('只观察')).toBeTruthy()
+      expect(onTrialComplete).not.toHaveBeenCalled()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('explains a wrong scored answer with both letters and the expected and actual actions', async () => {
+    vi.useFakeTimers()
+    try {
+      render(<NbackTask taskContext={nbackContext} trialIndex={0} onTrialComplete={vi.fn()} />)
+      fireEvent.click(screen.getByText('开始练习'))
+      await act(async () => { vi.advanceTimersByTime(nbackContext.config.isiMs + nbackContext.config.stimulusMs + 600) })
+      fireEvent.click(screen.getByRole('button', { name: /继续下一题/ }))
+      await act(async () => { vi.advanceTimersByTime(nbackContext.config.isiMs) })
+      await act(async () => { vi.advanceTimersByTime(nbackContext.config.stimulusMs) })
+
+      const feedback = screen.getByRole('alert')
+      expect(feedback.textContent).toContain('当前字母“B”与往前第 1 个位置的“B”相同')
+      expect(feedback.textContent).toContain('正确做法')
+      expect(feedback.textContent).toContain('正确做法按一次')
+      expect(feedback.textContent).toContain('你的操作')
+      expect(feedback.textContent).toContain('没有按')
+      await act(async () => { vi.advanceTimersByTime(5000) })
+      expect(screen.getByRole('alert')).toBe(feedback)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('requires a new unscored practice gate before entering 2-back', async () => {
@@ -55,11 +97,14 @@ describe('N-Back and Corsi runners', () => {
       const practiceResponses = [false, true, false, true]
       for (const shouldRespond of practiceResponses) {
         await act(async () => { vi.advanceTimersByTime(10) })
-        if (shouldRespond) fireEvent.pointerDown(screen.getByRole('button'))
-        await act(async () => { vi.advanceTimersByTime(10 + 600) })
+        if (shouldRespond) fireEvent.click(screen.getByRole('button', { name: /练习作答区/ }))
+        await act(async () => { vi.advanceTimersByTime(10) })
+        fireEvent.click(screen.getByRole('button', { name: /继续下一题|查看练习结果/ }))
       }
 
       expect(screen.getByText(/1-back 练习结果/)).toBeTruthy()
+      expect(screen.getByRole('status').textContent).toContain('3/ 3')
+      expect(screen.getByText(/前 1 个字母只用于建立记忆/)).toBeTruthy()
       fireEvent.click(screen.getByText('开始正式测验'))
       expect(screen.getByText(/区块 1 \/ 2/)).toBeTruthy()
       fireEvent.click(screen.getByText('开始本区块'))
@@ -137,9 +182,11 @@ describe('N-Back and Corsi runners', () => {
       await reachResponsePhase()
       for (const block of [0, 4, 8]) fireEvent.click(screen.getByLabelText(`block-${block}`))
       fireEvent.click(screen.getByText('提交'))
+      fireEvent.click(screen.getByRole('button', { name: '继续下一题' }))
       await reachResponsePhase()
       for (const block of [2, 6, 1]) fireEvent.click(screen.getByLabelText(`block-${block}`))
       fireEvent.click(screen.getByText('提交'))
+      fireEvent.click(screen.getByRole('button', { name: '查看练习结果' }))
       fireEvent.click(screen.getByText('开始正式测验'))
       await reachResponsePhase()
       await act(async () => { vi.advanceTimersByTime(20); await Promise.resolve() })

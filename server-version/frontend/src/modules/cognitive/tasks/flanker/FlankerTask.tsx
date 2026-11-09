@@ -1,3 +1,4 @@
+import { CognitivePracticeReview, type PracticeReview } from '../shared/CognitivePracticeReview'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -44,6 +45,7 @@ export const FlankerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIn
   const sequence = useMemo(() => flankerSequence(taskContext.randomSeed, total), [taskContext.randomSeed, total])
   const [phase, setPhase] = useState<Phase>('instruction')
   const [practiceIndex, setPracticeIndex] = useState(0)
+  const [practiceReview, setPracticeReview] = useState<PracticeReview | null>(null)
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [practiceFeedback, setPracticeFeedback] = useState<string | null>(null)
   const [visible, setVisible] = useState(false)
@@ -56,7 +58,7 @@ export const FlankerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIn
 
   const startPractice = () => {
     practiceAnsweredRef.current = false
-    setPracticeIndex(0)
+    setPracticeReview(null); setPracticeIndex(0)
     setPracticeCorrect(0)
     setPracticeFeedback(null)
     setPhase('practice')
@@ -102,6 +104,7 @@ export const FlankerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIn
 
   const respond = (response: 'left' | 'right') => {
     if (phase === 'practice') {
+      if (practiceReview) return
       if (practiceAnsweredRef.current) return
       practiceAnsweredRef.current = true
       const practiceTrial = PRACTICE[practiceIndex]
@@ -109,14 +112,8 @@ export const FlankerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIn
       setPracticeFeedback(correct
         ? '正确'
         : `不正确，正确答案是「${responseLabel(practiceTrial.correctResponse)}」`)
-      const nextCorrect = practiceCorrect + (correct ? 1 : 0)
-      if (practiceIndex + 1 >= PRACTICE_TRIAL_COUNT) {
-        setPracticeCorrect(nextCorrect)
-        setPhase('practice-result')
-      } else {
-        setPracticeCorrect(nextCorrect)
-        setPracticeIndex((value) => value + 1)
-      }
+      setPracticeCorrect(practiceCorrect + (correct ? 1 : 0))
+      setPracticeReview({ correct, expected: responseLabel(practiceTrial.correctResponse), actual: responseLabel(response), explanation: '只判断正中央的箭头，两侧箭头是干扰。中央指左就选左，指右就选右。' })
       return
     }
     if (!visible || responseRef.current || onsetRef.current == null) return
@@ -127,6 +124,7 @@ export const FlankerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIn
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
     const onKeyDown = (event: KeyboardEvent) => {
+      if (phase === 'practice' && practiceReview) return
       if (event.repeat) return
       if (event.key === 'ArrowLeft') { event.preventDefault(); respond('left') }
       else if (event.key === 'ArrowRight') { event.preventDefault(); respond('right') }
@@ -140,6 +138,12 @@ export const FlankerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIn
     event.preventDefault()
     respond(response)
   }
+
+  if (phase === 'practice' && practiceReview) return <CognitivePracticeReview visual={<ArrowRow trial={PRACTICE[practiceIndex]} />} feedback={practiceReview} completed={practiceIndex + 1} total={PRACTICE_TRIAL_COUNT} onContinue={() => {
+    setPracticeReview(null)
+    if (practiceIndex + 1 >= PRACTICE_TRIAL_COUNT) setPhase('practice-result')
+    else { setPracticeIndex(value => value + 1);  }
+  }} />
 
   if (phase === 'instruction') {
     return (
@@ -180,5 +184,5 @@ export const FlankerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIn
       </div>
     </div>
   )
-  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="Flanker 正式作答">{content}</CognitiveFocusStage> : content
+  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="Flanker 正式作答" progress={{ completed: trialIndex, total: total }}>{content}</CognitiveFocusStage> : content
 }

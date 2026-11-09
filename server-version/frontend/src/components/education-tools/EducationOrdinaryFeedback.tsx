@@ -6,6 +6,7 @@ import CognitiveV2ReportCard from '../../modules/cognitive/CognitiveV2ReportCard
 import type {CognitiveV2Report} from '../../modules/cognitive/types'
 import SituationalReportCard,{type SituationalReportView} from '../../modules/reporting/SituationalReportCard'
 import type {EducationReportApi} from './EducationScalePersonalReport'
+import {ReportDetails} from '../../modules/reporting/ReportPrimitives'
 export type OrdinaryFeedbackUnit={blockId:string;kind:'SCALE'|'FORM'|'COGNITIVE'|'SJT';title:string;state:'READY'|'WITHHELD'|'COMPLETION_ONLY';nativeScaleUnits?:SafeScaleUnitReport[];nativeCognitiveReport?:CognitiveV2Report;nativeSituationalReport?:SituationalReportView&{limitations?:string[]};declaredReport?:NonNullable<TrainingContentReport['rendered']>;message?:string}
 export type OrdinaryFeedbackData={schemaVersion?:number;kind?:string;mode?:string;state?:string;title?:string;units?:OrdinaryFeedbackUnit[]}
 /** Only the server's block projection is rendered. No answers, same-key metric
@@ -22,8 +23,11 @@ export function EducationOrdinaryFeedback({data,api,executionId,entry}:{data:Ord
   {(Array.isArray(data.units)?data.units:[]).map(unit=><section key={unit.blockId} aria-label={unit.title}><h4>{unit.title}</h4>
    {unit.kind==='FORM'?<p>表单已完成，不计算量表分数。</p>:unit.state!=='READY'?<p>本工具未开放个人反馈。</p>:
     unit.kind==='COGNITIVE'&&unit.nativeCognitiveReport?<CognitiveV2ReportCard report={unit.nativeCognitiveReport}/>:unit.kind==='SJT'&&unit.nativeSituationalReport?<>
-     <SituationalReportCard report={unit.nativeSituationalReport}/>{unit.nativeSituationalReport.narrative&&unit.nativeSituationalReport.disclaimer&&<p>{unit.nativeSituationalReport.disclaimer}</p>}
-     {!!unit.nativeSituationalReport.limitations?.length&&<ul>{unit.nativeSituationalReport.limitations.map((text,index)=><li key={index}>{text}</li>)}</ul>}
+     <SituationalReportCard report={unit.nativeSituationalReport}/>
+     {(!!unit.nativeSituationalReport.limitations?.length||!!(unit.nativeSituationalReport.narrative&&unit.nativeSituationalReport.disclaimer))&&<ReportDetails title="阅读说明与解释边界">
+       {unit.nativeSituationalReport.narrative&&unit.nativeSituationalReport.disclaimer&&<p>{unit.nativeSituationalReport.disclaimer}</p>}
+       {!!unit.nativeSituationalReport.limitations?.length&&<ul>{unit.nativeSituationalReport.limitations.map((text,index)=><li key={index}>{text}</li>)}</ul>}
+     </ReportDetails>}
     </>:unit.kind!=='SCALE'?<p>本工具未开放个人反馈。</p>:
     unit.declaredReport?<>{unit.message&&<p>{unit.message}</p>}<DeclaredReportContent report={unit.declaredReport} showMetricKeys={false}/></>:
     (unit.nativeScaleUnits??[]).filter(report=>report?.type==='SCALE'&&report.kind==='scale'&&typeof report.scaleName==='string').map((report,index)=>

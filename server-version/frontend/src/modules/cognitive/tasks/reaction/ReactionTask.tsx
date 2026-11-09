@@ -1,4 +1,4 @@
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitiveCenteredTask, CognitiveTaskExample, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { ReactionConfig, ReactionTrialPayload } from '../../types'
@@ -129,16 +129,35 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   }, [phase, practiceSub, handlePracticeInput])
 
   const retryPractice = () => { setPracticePremature(false); setPracticeSub('ready'); setPracticeOnset(null); setPracticeFeedback(null) }
+  const beginPractice = () => setPhase('practice')
   const advancePractice = () => {
     if (practiceIndex + 1 >= PRACTICE_TRIALS) { setPhase('formal'); setPracticeIndex(0); setPracticePremature(false); setPracticeFeedback(null); return }
     setPracticeIndex((index) => index + 1); setPracticeSub('ready'); setPracticeOnset(null); setPracticePremature(false); setPracticeFeedback(null)
   }
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="反应速度" description={<p>屏幕上的圆点会在短暂等待后变成<span className="text-green-600 font-semibold">绿色</span>。看到绿色后，尽快点击或按任意键。</p>} hint={<><p>练习不计分；正式测验只以颜色变化作为目标刺激，不再同时改变指令文字。</p></>} onAction={() => setPhase('practice')} />
+  if (phase === 'instruction') return <CognitiveTaskIntro
+    title="反应速度"
+    description={<p>每题先显示等待提示，随后圆点会变成绿色。只有看到绿色后，才尽快点击圆点或按任意键；等待时不要提前操作。</p>}
+    example={<CognitiveTaskExample title="图示：看到绿色才反应" steps={[
+      { label: '等待', value: '灰色圆点', note: '手不要动', state: 'wait' },
+      { label: '目标出现', value: '绿色圆点', note: '立即点击或按键', state: 'respond' },
+      { label: '本题结束', value: '下一题', note: '重新等绿色', state: 'neutral' },
+    ]} result="灰色时等待；变绿后立即点击圆点或按任意键。" explanation="绿色出现前点击会被记录为过早反应，并重新等待；如果绿色出现后一直不操作，本题会按超时记录。" />}
+    hint={<><p><strong>练习：</strong>先完成 3 次不计分练习，熟悉等待和点击的时机。</p><p><strong>正式作答：</strong>共 {total} 题；尽量看着屏幕，绿色出现后再反应。不要按住按键。</p></>}
+    onAction={beginPractice}
+  />
 
-  if (phase === 'practice') return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 {practiceIndex + 1} / {PRACTICE_TRIALS}</div>{practiceSub !== 'feedback' ? <button aria-label={`practice trial ${practiceIndex}`} onClick={handlePracticeInput} className={`w-40 h-40 rounded-full mx-auto flex items-center justify-center ${stimulusClass(practiceSub === 'green')}`}><span className={`text-2xl font-bold ${practiceSub === 'green' ? 'text-white' : 'text-gray-600'}`}>{practiceSub === 'green' ? '点击！' : '等待…'}</span></button> : <div><p className="text-gray-700 mb-6">{practiceFeedback}</p><button onClick={practicePremature ? retryPractice : advancePractice} className="btn-primary">{practicePremature ? '重试' : practiceIndex + 1 >= PRACTICE_TRIALS ? '开始正式测评' : '下一个'}</button></div>}</div>
+  if (phase === 'practice') return <CognitiveFocusStage ariaLabel="反应速度练习"><CognitiveCenteredTask
+    header={<p className="text-sm text-gray-500">练习 {practiceIndex + 1} / {PRACTICE_TRIALS}</p>}
+    footer={<p className="text-gray-700">{practiceFeedback || '保持专注，等圆点变绿后再作答。'}</p>}>
+    {practiceSub !== 'feedback' ? <button type="button" aria-label={`practice trial ${practiceIndex}`} onClick={handlePracticeInput} className={`cognitive-reaction-target w-40 h-40 rounded-full flex items-center justify-center ${stimulusClass(practiceSub === 'green')}`}><span className={`text-2xl font-bold ${practiceSub === 'green' ? 'text-white' : 'text-gray-600'}`}>{practiceSub === 'green' ? '点击！' : '等待…'}</span></button>
+      : <button type="button" onClick={practicePremature ? retryPractice : advancePractice} className="btn-primary">{practicePremature ? '重试' : practiceIndex + 1 >= PRACTICE_TRIALS ? '开始正式测评' : '下一个'}</button>}
+  </CognitiveCenteredTask></CognitiveFocusStage>
 
-  if (trialIndex >= total) return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700">正式试次已完成，请提交测评结果。</p></div>
+  if (trialIndex >= total) return <div className="card mx-auto w-full max-w-2xl p-5 text-center sm:p-8"><p className="text-gray-700">正式试次已完成，请提交测评结果。</p></div>
 
-  return <CognitiveFocusStage ariaLabel="反应速度正式测验"><div className="mx-auto max-w-2xl text-center"><span className="sr-only">试次 {trialIndex + 1} / {total}</span><button onPointerDown={(event) => { if (event.isPrimary && (event.pointerType !== 'mouse' || event.button === 0)) handleFormalInput(event.pointerType === 'touch' ? 'touch' : 'pointer') }} className={`w-48 h-48 rounded-full mx-auto ${stimulusClass(sub === 'green')}`} aria-label={`trial ${trialIndex}`}><span className="sr-only">{sub === 'green' ? '点击！' : '等待'}</span></button><p className="text-xs text-gray-400 mt-6">看到绿色后尽快点击或按任意键{interrupted ? '（检测到页面切走，本次记为中断）' : ''}</p></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="反应速度正式测验" progress={{ completed: trialIndex, total }}><CognitiveCenteredTask
+    footer={<p className="text-gray-500">看到绿色后尽快点击或按任意键{interrupted ? '（检测到页面切走，本次记为中断）' : ''}</p>}>
+    <button onPointerDown={(event) => { if (event.isPrimary && (event.pointerType !== 'mouse' || event.button === 0)) handleFormalInput(event.pointerType === 'touch' ? 'touch' : 'pointer') }} className={`cognitive-reaction-target w-48 h-48 rounded-full mx-auto ${stimulusClass(sub === 'green')}`} aria-label={`trial ${trialIndex}`}><span className="sr-only">{sub === 'green' ? '点击！' : '等待'}</span></button>
+  </CognitiveCenteredTask></CognitiveFocusStage>
 }

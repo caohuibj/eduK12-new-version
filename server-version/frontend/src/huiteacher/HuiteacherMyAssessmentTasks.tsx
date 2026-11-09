@@ -73,6 +73,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
   if(state.status==='COMPLETED'){
    const completion={executionId:task.executionId,attemptId:state.id,...(task.mode?{mode:task.mode}:{})},key=completion.executionId+':'+completion.attemptId
    setSession({task,attempt:state,child:null,completion})
+   setRows(old=>old.map(row=>row.executionId===task.executionId?{...row,status:'COMPLETED'}:row))
    // Completion is durable even when list refresh or report reading fails.
    void refresh()
    if(!completed.current.has(key)){completed.current.add(key);completionCallback.current?.(completion)}

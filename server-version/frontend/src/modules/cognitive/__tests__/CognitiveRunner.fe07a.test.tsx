@@ -82,6 +82,19 @@ describe('FE-07A Cognitive shell integration', () => {
     await waitFor(()=>expect(container.querySelector('[data-cognitive-task-root]')).not.toBeNull())
     expect(container.querySelector('.cognitive-preparation')).toBeNull()
   })
+  it('keeps the final action inside the active cognitive viewport', async () => {
+    mocks.controller.state = { ...baseState(), trialIndex: 2 }
+
+    const { container } = render(app())
+    const workspace = await waitFor(() => {
+      const root = container.querySelector('[data-cognitive-task-root]')
+      expect(root).not.toBeNull()
+      return root!
+    })
+    const finish = await screen.findByRole('button', { name: '完成测评' })
+
+    expect(workspace.contains(finish)).toBe(true)
+  })
   it.each(['UNSUPPORTED', 'COMPLETED'])('keeps the authoritative Training parent on %s without creating another attempt', status => {
     const serverSession = { ...baseState().session, trainingPersistence: { attemptId: 'parent-real', courseId: 'course-real' } }
     mocks.controller.state = { ...baseState(), session: serverSession }

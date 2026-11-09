@@ -109,5 +109,5 @@ export const ProofreadTask: React.FC<CognitiveTaskProps> = ({ taskContext, trial
         : <button type="button" className="btn-primary mt-4" onClick={() => setPhase('instruction')}>重读说明后再练习</button>}
     </div> : <div role="status" className="mt-5"><p>{feedback}</p>{retry && <button type="button" className="btn-primary mt-4" onClick={() => void persistPending()}>重试提交</button>}</div>)}
   </div>
-  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="文本校对正式测验">{content}</CognitiveFocusStage> : content
+  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="文本校对正式测验" progress={{ completed: trialIndex, total: totalTrials }}>{content}</CognitiveFocusStage> : content
 }

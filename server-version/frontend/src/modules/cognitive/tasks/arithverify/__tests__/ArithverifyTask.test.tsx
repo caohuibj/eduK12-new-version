@@ -52,6 +52,25 @@ const enterFormal = async (onTrialComplete: Mock<(payload: Record<string, unknow
 }
 
 describe('ArithverifyTask', () => {
+  it('explains a wrong practice choice and waits for explicit continuation', () => {
+    const save = vi.fn()
+    render(<ArithverifyTask taskContext={context} trialIndex={0} onTrialComplete={save} />)
+    fireEvent.click(screen.getByText('开始练习'))
+    expect(screen.getByRole('progressbar', { name: '练习 · 已完成 / 总量' })).toHaveAttribute('aria-valuenow', '0')
+    act(() => vi.advanceTimersByTime(400))
+    respondWith(/2 · 错/)
+    const feedback = screen.getByRole('alert', { name: '练习解析：错误' })
+    expect(feedback).toHaveTextContent('3 + 4 = 7')
+    expect(feedback).toHaveTextContent('正确做法选择“对”')
+    expect(feedback).toHaveTextContent('你的操作选择“错”')
+    expect(feedback).toHaveTextContent('实际等于 7')
+    act(() => vi.advanceTimersByTime(30000))
+    expect(screen.getByRole('alert', { name: '练习解析：错误' })).toBe(feedback)
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '1')
+    expect(save).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByText('下一个'))
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
   it('requires both practice directions and submits observable facts in formal trials', async () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     await enterFormal(onTrialComplete)

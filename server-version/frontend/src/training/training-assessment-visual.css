@@ -204,60 +204,15 @@
   background: linear-gradient(115deg, #eef3e7, #faf8ef); border-color: #dce4d8; border-radius: 12px;
 }
 
-/* Preserve the original inherited presentation contract inside active tasks.
- * No descendant rules above match this boundary or anything beneath it. */
-.hui-training.hui-app.training-assessment-visual [data-cognitive-task-root] {
-  --runner-ink: var(--hui-ds-color-ink);
-  --runner-muted: var(--hui-ds-color-muted);
-  --runner-line: var(--hui-ds-role-runner-line);
-  --runner-page: var(--hui-ds-color-page-strong);
-  --runner-soft: var(--hui-ds-color-soft);
-  --runner-blue: var(--hui-ds-color-action);
-  --runner-blue-hover: var(--hui-ds-color-action-hover);
-  --runner-green: var(--hui-ds-color-success);
-  --runner-surface: var(--hui-ds-color-surface);
-  --hui-color-text: var(--runner-ink);
-  --hui-color-muted: var(--runner-muted);
-  --hui-color-surface: var(--runner-surface);
-  --hui-color-background: var(--runner-page);
-  --hui-color-border: var(--runner-line);
-  --hui-color-action: var(--runner-blue);
-  --hui-color-action-hover: var(--runner-blue-hover);
-  --hui-color-focus: var(--runner-blue);
-  color: var(--runner-ink);
-}
 @media (max-width: 640px) {
   .hui-training.hui-app.training-assessment-visual .hui-app-header { flex-wrap: nowrap; gap: 12px; padding-inline: 16px; }
   .hui-training.hui-app.training-assessment-visual .hui-account { width: auto; margin-left: auto; font-size: 11px; }
   .hui-training.hui-app.training-assessment-visual .training-wordmark.training-wordmark--mountain { font-size: 21px; }
   .hui-training.hui-app.training-assessment-visual .training-brand-icon { width: 43px; height: 31px; }
-  .hui-training.hui-app.training-assessment-visual .hui-product.hui-page { padding-inline: 16px; }
-  .hui-training.hui-app.training-assessment-visual [data-assessment-shell-header] { padding: 20px; }
-  .hui-training.hui-app.training-assessment-visual [data-assessment-shell-header] h1 { font-size: 24px; }
-  .hui-training.hui-app.training-assessment-visual [data-assessment-shell-content] > .card { padding: 20px; }
-}
-/* Do not change the active cognitive task's available width or padding. */
-.hui-training.hui-app.training-assessment-visual:has([data-cognitive-task-root]) .hui-product.hui-page {
-  padding: 28px max(18px,env(safe-area-inset-left)) 42px max(18px,env(safe-area-inset-right));
-}
-
-/* Explicit non-stimulus panels: instruction, practice feedback and completion.
- * Only surfaces and control colors change; metrics and active response/stimulus
- * elements inside the task boundary retain their original presentation. */
-.hui-training.hui-app.training-assessment-visual [data-cognitive-task-root] :is(.cognitive-task-panel--intro, .cognitive-task-panel--result, .cognitive-task-panel--transition, .cognitive-task-panel--completion) {
-  --hui-color-action: #285b47;
-  --hui-color-action-hover: #204a39;
-  --hui-color-focus: #4c7c59;
-  border-color: #dce4d8;
-  background: #fffefa;
-  box-shadow: 0 4px 18px #25442e05;
-}
-.hui-training.hui-app.training-assessment-visual [data-cognitive-task-root] :is(.cognitive-task-panel--intro, .cognitive-task-panel--result, .cognitive-task-panel--transition, .cognitive-task-panel--completion) > :is(.cognitive-task-title, .cognitive-task-eyebrow) {
-  color: #285b47;
-}
-.hui-training.hui-app.training-assessment-visual [data-cognitive-task-root] .cognitive-task-panel--intro > .cognitive-task-hint {
-  border-color: #dce4d8;
-  background: #f2f5ed;
+  .hui-training.hui-app.training-assessment-visual .hui-product.hui-page:not(:has([data-cognitive-task-root])) { padding-inline: 16px; }
+  .hui-training.hui-app.training-assessment-visual .hui-product.hui-page:not(:has([data-cognitive-task-root])) [data-assessment-shell-header] { padding: 20px; }
+  .hui-training.hui-app.training-assessment-visual .hui-product.hui-page:not(:has([data-cognitive-task-root])) [data-assessment-shell-header] h1 { font-size: 24px; }
+  .hui-training.hui-app.training-assessment-visual .hui-product.hui-page:not(:has([data-cognitive-task-root])) [data-assessment-shell-content] > .card { padding: 20px; }
 }
 .hui-training.hui-app.training-assessment-visual .hui-status__actions {
   display: flex;

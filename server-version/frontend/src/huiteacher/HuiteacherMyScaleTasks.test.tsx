@@ -51,7 +51,7 @@ describe('Teacher bound Scale continuation',()=>{
   it('renders authorized Teacher descriptive feedback instead of routing it to the education unit report',async()=>{
     const api=vi.fn(async(path:string)=>{
       if(path==='/my-scale-tasks')return {list:[{...task,status:'COMPLETED'}]}
-      if(path.endsWith('/personal-summary'))return {kind:'HUITEACHER_PERSONAL_DESCRIPTION',state:'READY',explanation:'本人描述性反馈',metrics:[{key:'reflection',label:'本次记录合计',value:12,precision:0,headline:'回看这一次教学体验',summary:'本机合成示例反馈',guidance:[]}],limitations:[]}
+      if(path.endsWith('/personal-summary'))return {kind:'HUITEACHER_PERSONAL_DESCRIPTION',state:'READY',explanation:'本人描述性反馈',metrics:[{key:'reflection',label:'本次记录合计',value:12,precision:0,headline:'回看这一次教学体验',summary:'本机合成示例反馈',guidance:[]}],limitations:['仅解释本次记录'],disclaimer:'保留的阅读边界'}
       throw Error('Unexpected request '+path)
     })
     render(<HuiteacherMyScaleTasks api={api as Parameters<typeof HuiteacherMyScaleTasks>[0]['api']}/>)
@@ -59,6 +59,10 @@ describe('Teacher bound Scale continuation',()=>{
     expect(await screen.findByRole('heading',{name:'本次记录合计'})).toBeInTheDocument()
     expect(screen.getByText('12',{selector:'strong'})).toBeInTheDocument()
     expect(screen.getByText('本机合成示例反馈')).toBeInTheDocument()
+    const details=screen.getByText('保留的阅读边界').closest('details')!
+    expect(details).not.toHaveAttribute('open')
+    expect(screen.getByText('12',{selector:'strong'}).closest('details')).toBeNull()
+    expect(screen.getByText('12',{selector:'strong'}).compareDocumentPosition(details)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(screen.queryByText(/当前报告尚未获准显示/)).not.toBeInTheDocument()
     expect(api.mock.calls.every(call=>call.length===1)).toBe(true)
   })
@@ -104,6 +108,8 @@ it('opens feedback from completed parent reload while a list refresh stays pendi
  expect(api.mock.calls.filter(([path])=>path.endsWith('/personal-summary'))).toHaveLength(0)
  await original.onReload()
  await screen.findByText('报告正在生成，请稍后重新读取。无需再次交卷。')
+ expect(screen.getByRole('button',{name:'查看本人反馈'})).toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'继续已有自评'})).not.toBeInTheDocument()
  original.onCompleted()
  await waitFor(()=>expect(api.mock.calls.filter(([path])=>path.endsWith('/personal-summary'))).toHaveLength(1))
  expect(screen.getByRole('region',{name:'获准的个人测评反馈'})).toHaveTextContent('正式提交已确认')

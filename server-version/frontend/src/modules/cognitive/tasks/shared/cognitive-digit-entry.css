@@ -1,0 +1,19 @@
+.cognitive-digit-entry{width:min(100%,32rem);margin-inline:auto;color:var(--cognitive-ink,#202c36);text-align:center}
+.cognitive-digit-entry__header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px;text-align:left}
+.cognitive-digit-entry__header h2{margin:0;font-size:22px;font-weight:720;line-height:1.4}
+.cognitive-digit-entry__header p{margin:0;color:var(--cognitive-muted,#586876);font-size:15px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.cognitive-digit-entry__slots{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;min-height:60px;padding:14px;border:1px solid var(--cognitive-line,#d9e2e8);border-radius:14px;background:var(--cognitive-raised,#f8fafb)}
+.cognitive-digit-entry__slot{display:grid;place-items:center;flex:0 0 36px;height:46px;border:1px solid var(--cognitive-line,#d9e2e8);border-radius:8px;background:var(--cognitive-surface,#fff);color:var(--cognitive-muted,#586876);font-size:26px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.cognitive-digit-entry__slot[data-filled=true]{color:var(--cognitive-ink,#202c36);border-color:var(--cognitive-focus,#7298aa)}
+.cognitive-digit-entry__slot[data-next=true]{outline:2px solid var(--cognitive-accent,#365e73);outline-offset:2px}
+.cognitive-digit-entry__hint{margin:14px 0 20px;color:var(--cognitive-muted,#586876);font-size:16px;line-height:1.7}
+.cognitive-digit-entry__keypad{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:min(100%,22rem);margin-inline:auto}
+.cognitive-digit-entry__keypad button{min-height:54px;min-width:0;padding:10px 12px;border:1px solid var(--cognitive-line,#d9e2e8);border-radius:10px;background:var(--cognitive-raised,#f8fafb);color:var(--cognitive-ink,#202c36);font:650 24px/1.2 system-ui,sans-serif;cursor:pointer;touch-action:manipulation}
+.cognitive-digit-entry__keypad button:hover:not(:disabled){border-color:var(--cognitive-accent,#365e73);background:var(--cognitive-soft,#edf3f6)}
+.cognitive-digit-entry__keypad button:active:not(:disabled){box-shadow:inset 0 2px 5px rgb(0 0 0 / .12)}
+.cognitive-digit-entry__keypad button:focus-visible{outline:3px solid var(--cognitive-focus,#7298aa);outline-offset:3px}
+.cognitive-digit-entry__keypad button:disabled{opacity:.45;cursor:not-allowed}
+.cognitive-digit-entry__keypad .cognitive-digit-entry__edit{font-size:16px;font-weight:650}
+.cognitive-digit-entry__submit{display:block;width:min(100%,22rem);margin:18px auto 0}
+.cognitive-digit-entry__keyboard{margin:12px 0 0;color:var(--cognitive-muted,#586876);font-size:13px;line-height:1.6}
+@media(max-width:600px){.cognitive-digit-entry__header{gap:10px}.cognitive-digit-entry__header h2{font-size:20px}.cognitive-digit-entry__header p{font-size:14px}.cognitive-digit-entry__slots{padding:12px;gap:7px}.cognitive-digit-entry__slot{flex-basis:32px;height:42px;font-size:24px}.cognitive-digit-entry__hint{font-size:15px;margin-bottom:16px}.cognitive-digit-entry__keypad{gap:8px}}

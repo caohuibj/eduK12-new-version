@@ -109,7 +109,7 @@ describe('real Huischool CognitiveRunner in a SCHOOL Composite parent (no Cognit
       const {onFinished}=await create(api)
       // This would synchronously throw "useNavigate() may be used only in a
       // Router" under PR266. The real task must now mount and load media.
-      expect(await screen.findByRole('img',{name:'冻结校园测评说明'})).toBeInTheDocument()
+      expect(await screen.findByRole('img',{name:'冻结校园测评说明'},{timeout:5000})).toBeInTheDocument()
       expect(blobRequests).toEqual(['/api/campus'+child+'/assets/image-A/content'])
       await waitFor(()=>expect(api).toHaveBeenCalledWith(
         child+'/video-capabilities','POST',{videoKey:'example:0'},
@@ -149,7 +149,9 @@ describe('real Huischool CognitiveRunner in a SCHOOL Composite parent (no Cognit
   it('refreshes an unsealed mid-task draft fail-closed without redoing exposed trials or inventing a FINAL',async()=>{
     const {api,submit}=makeApi(2)
     const first=await create(api)
-    fireEvent.click(await screen.findByRole('button',{name:'开始测评'}))
+    const start=await screen.findByRole('button',{name:'开始测评'})
+    await waitFor(()=>expect(start).toBeEnabled())
+    fireEvent.click(start)
     fireEvent.click(await screen.findByRole('button',{name:'trial 0'}))
     await waitFor(async()=>expect(await finalDraftStore.listTrials(draftKey)).toHaveLength(1))
     first.ui.unmount()

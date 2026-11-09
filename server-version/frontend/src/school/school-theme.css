@@ -70,8 +70,7 @@
 .hs-app[data-theme=dark] .hs-runner :is(.hs-primary,.bg-blue-700,.bg-blue-600,.bg-indigo-600,.bg-indigo-700):not([data-cognitive-task-root],[data-cognitive-task-root] *){background:var(--hs-primary);color:var(--hs-on-primary)}
 .hs-app[data-theme=dark] .hs-runner>p:not([data-cognitive-task-root],[data-cognitive-task-root] *){color:var(--hs-muted)}
 
-/* Scientific stimuli are immutable. Only surrounding product/answer shells follow appearance. */
-.hs-app[data-theme] [data-cognitive-task-root]{color-scheme:light;color:#183f30;--hs-primary:#356957;--hs-bg:#f4f7ec;--hs-accent:#d8ae60;--hs-ink:#183f30;--hs-border:#cdddc6;--hs-surface:rgba(255,255,245,.94);--hs-muted:#526d55}
+/* Cognitive task surfaces receive their neutral theme from cognitive-surface.css. */
 @media(max-width:600px){.hs-public-header .hs-brand-wordmark{width:90px}.hs-public-header .hs-brand-icon{width:36px}.hs-public-header{column-gap:6px}}
 
 /* Shared answer-shell prose only; scientific stimuli and styled alerts keep their own colors. */

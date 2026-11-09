@@ -22,7 +22,7 @@ const config = {
   report: { reportVersion: '1.0.0', referenceMode: 'simulated' as const },
 }
 
-const makeContext = (trialIndex = 0, seed = 'seed-123') => ({
+const makeContext = (_trialIndex = 0, seed = 'seed-123') => ({
   sessionId: 's1',
   testType: 'reaction',
   engineVersion: '1.0.0',
@@ -87,6 +87,13 @@ function pointerRespond() {
 }
 
 describe('deterministicForeperiod (§29 seeded foreperiod)', () => {
+  it('keeps the formal trial count visible in the full-screen stage', async () => {
+    await enterFormal(undefined, 4)
+    const progress = screen.getByRole('progressbar')
+    expect(progress.parentElement).toHaveTextContent('4 / 20')
+    expect(progress).toHaveAttribute('aria-valuenow', '4')
+    expect(progress).toHaveAttribute('aria-valuemax', '20')
+  })
   it('is deterministic per (seed, trialIndex) and within range', () => {
     const a = deterministicForeperiod('seed-123', 0, 700, 1500)
     const b = deterministicForeperiod('seed-123', 0, 700, 1500)
@@ -139,7 +146,9 @@ describe('ReactionTask — instruction & practice', () => {
 
   it('enters formal after 3 practice trials', async () => {
     await enterFormal()
-    expect(screen.getByText(/试次 1 \/ 20/)).toBeTruthy()
+    const progress = screen.getByRole('progressbar')
+    expect(progress.parentElement).toHaveTextContent('0 / 20')
+    expect(progress).toHaveAttribute('aria-valuenow', '0')
   })
 })
 

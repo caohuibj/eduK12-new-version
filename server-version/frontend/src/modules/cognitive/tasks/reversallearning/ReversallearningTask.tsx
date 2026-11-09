@@ -1,3 +1,5 @@
+import { CognitiveTaskPanel, CognitivePracticeFeedback } from '../shared/CognitiveTaskPresentation'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -182,28 +184,28 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
   if (phase === 'practice-result') {
     const passed = acquisitionOnlyPractice || practiceCorrect >= 3
     return (
-      <div className="card p-8 text-center">
+      <CognitiveTaskPanel ariaLabel="练习结果" className="cognitive-task-panel--result"><h2 className="cognitive-task-title">练习结果</h2>
         <p className="mb-4 text-gray-700">{revised ? `练习已完成 ${practice.length} 题` : `练习完成 ${practiceCorrect} / ${practice.length}`}</p>
         <button type="button" onClick={passed ? startFormal : startPractice} className={passed ? 'btn-primary' : 'btn-secondary'}>
           {passed ? '开始正式测验' : '重新练习'}
         </button>
-      </div>
+      </CognitiveTaskPanel>
     )
   }
 
   if (phase === 'practice-feedback') {
     return (
-      <div className="card p-8 text-center">
+      <CognitivePracticeFeedback title="练习解析">
         <p className="mb-5 text-gray-700">{feedback}</p>
         <button type="button" onClick={nextPractice} className="btn-primary">
           {practiceIndex + 1 >= practice.length ? '查看练习结果' : '下一题'}
         </button>
-      </div>
+      </CognitivePracticeFeedback>
     )
   }
 
   const segmentLabel = spec?.segment === 'reversal' ? '反转阶段' : '习得阶段'
-  return (
+  const content = (
     <div className="card p-8 text-center">
       <p className="mb-4 text-sm text-gray-500">
         {phase === 'practice' ? `练习 ${practiceIndex + 1} / ${practice.length}` : `正式试次 ${trialIndex + 1} / ${sequence.length}${revised ? '' : ` · ${segmentLabel}`}`}
@@ -232,4 +234,6 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
       {phase === 'formal' && completionPending && onTaskComplete && <button type="button" onClick={retryCompletion} className="btn-secondary mt-5">重试完成测评</button>}
     </div>
   )
+  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="反转学习正式测验" progress={{ completed: trialIndex, total: sequence.length }}>{content}</CognitiveFocusStage> : content
+
 }

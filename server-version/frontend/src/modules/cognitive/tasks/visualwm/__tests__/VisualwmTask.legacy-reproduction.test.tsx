@@ -29,7 +29,7 @@ it('reproduces the frozen 1.0.1 practice repeating formal trial zero', async () 
   await advance(900)
   const practiceProbe = squares()
   fireEvent.click(screen.getByText(visualwmTrial(seed, 0).isChange ? '2 · 改变' : '1 · 相同'), { detail: 0 })
-  expect(screen.getByText(/正确：颜色/)).toBeTruthy()
+  expect(screen.getByRole('status', { name: '练习解析：正确' })).toHaveTextContent(visualwmTrial(seed, 0).isChange ? '颜色已经改变' : '颜色没有改变')
   expect(save).not.toHaveBeenCalled()
 
   fireEvent.click(screen.getByText('开始正式测评'))

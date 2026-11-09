@@ -100,7 +100,8 @@ describe('FE-07B Go/No-Go and CPT frame timing routing', () => {
     act(() => vi.advanceTimersByTime(49))
     expect(screen.getByLabelText('respond').className).toContain('bg-green-500')
     act(() => vi.advanceTimersByTime(1))
-    expect(screen.getByLabelText('respond').className).toContain('bg-gray-200')
+    expect(screen.getByRole('alert', { name: '练习解析：错误' })).toBeInTheDocument()
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '1')
   })
 
   it('shows the full rules again before each repeated frame-timed practice without recording formal trials',async()=>{
@@ -113,6 +114,7 @@ describe('FE-07B Go/No-Go and CPT frame timing routing', () => {
     for(let i=0;i<4;i++){
       act(()=>vi.advanceTimersByTime(20));flushFrame(100+i*1000)
       await act(async()=>{vi.advanceTimersByTime(650)})
+      fireEvent.click(screen.getByRole('button',{name:i===3?'查看练习结果':'继续下一题'}))
     }
     fireEvent.click(screen.getByText('重新练习'))
     expect(screen.getByText('Go/No-Go · 操作说明')).toBeInTheDocument()
@@ -175,6 +177,7 @@ describe('FE-07B Go/No-Go and CPT frame timing routing', () => {
         Object.defineProperty(event,'timeStamp',{value:now+10});now+=10;fireEvent(window,event)
       }
       await act(async()=>{vi.advanceTimersByTime(650)})
+      fireEvent.click(screen.getByRole('button',{name:i===3?'查看练习结果':'继续下一题'}))
     }
     fireEvent.click(screen.getByText('开始正式测验'))
     act(()=>vi.advanceTimersByTime(20));now=5000;flushFrame(now)

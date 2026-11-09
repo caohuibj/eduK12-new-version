@@ -526,7 +526,7 @@ suite('Four-type Questionnaire production lifecycle', () => {
     expect(copy.status).toBe('DRAFT')
     expect((await product.publish(actor,copy.id,{revision:copy.revision})).status).toBe('PUBLISHED')
   },30000)
-  it('shares one source quota across standalone, composition and course copies under concurrency', async () => {
+  it('keeps standalone and composite cognitive delivery quotas independent under concurrency', async () => {
     const original = await db.cognitiveAssignment.findUniqueOrThrow({ where: { id: assignmentId } })
     const source = await db.cognitiveAssignment.create({ data: {
       configId, courseId: course1, createdBy: actor.userId, title: 'Quota source', status: 'PUBLISHED', maxAttempts: 1,
@@ -548,23 +548,28 @@ suite('Four-type Questionnaire production lifecycle', () => {
     const attempts = await Promise.allSettled([
       standalone.createSession(student, source.id), runtime.startUserAttempt(student, combined.id), runtime.startUserAttempt(student, legacy.id),
     ])
-    expect(attempts.filter(result => result.status === 'fulfilled')).toHaveLength(1)
-    expect(attempts.filter(result => result.status === 'rejected').every(result => (result as PromiseRejectedResult).reason.statusCode === 409)).toBe(true)
+    expect(attempts.filter(result => result.status === 'fulfilled')).toHaveLength(3)
+    expect(attempts.filter(result => result.status === 'rejected')).toHaveLength(0)
     const sessions = await db.cognitiveSession.findMany({ where: { userId: student, OR: [{ assignmentId: source.id }, { assignment: { quotaSourceAssignmentId: source.id } }] } })
-    expect(sessions).toHaveLength(1)
-    const active = sessions[0]
+    expect(sessions).toHaveLength(3)
+    const standaloneSession = sessions.find(session => session.compositeAttemptId === null)!
+    const compositeSessions = sessions.filter(session => session.compositeAttemptId !== null)
+    expect(standaloneSession.assignmentId).toBe(source.id)
+    expect(compositeSessions).toHaveLength(2)
+    expect(new Set(compositeSessions.map(session => session.compositeAttemptId)).size).toBe(2)
     const { readCognitiveQuota } = await import('../../modules/cognitive/attempt-quota')
     const quota = await db.$transaction(tx => readCognitiveQuota(tx, student, source.id))
-    expect(quota).toMatchObject({ maxAttempts: 1, usedAttempts: 1, remainingAttempts: 0, continueHref: active.compositeAttemptId ? `/student/composite/attempts/${active.compositeAttemptId}` : `/student/cognitive/sessions/${active.id}` })
-    if (active.compositeAttemptId) {
-      const parent = await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: active.compositeAttemptId } })
+    expect(quota).toMatchObject({ maxAttempts: 1, usedAttempts: 1, remainingAttempts: 0, continueHref: `/student/cognitive/sessions/${standaloneSession.id}` })
+    expect((await standalone.createSession(student, source.id)).sessionId).toBe(standaloneSession.id)
+    for (const session of compositeSessions) {
+      const parent = await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: session.compositeAttemptId! } })
       expect((await runtime.startUserAttempt(student, parent.compositeAssessmentId)).attempt.id).toBe(parent.id)
-    } else expect((await standalone.createSession(student, source.id)).sessionId).toBe(active.id)
+    }
     for (const status of ['INVALID', 'ABANDONED', 'COMPLETED'] as const) {
-      await db.cognitiveSession.update({ where: { id: active.id }, data: { status } })
+      await db.cognitiveSession.update({ where: { id: standaloneSession.id }, data: { status } })
       await expect(standalone.createSession(student, source.id)).rejects.toMatchObject({ statusCode: 409 })
     }
-    expect(await db.cognitiveSession.count({ where: { userId: student, OR: [{ assignmentId: source.id }, { assignment: { quotaSourceAssignmentId: source.id } }] } })).toBe(1)
+    expect(await db.cognitiveSession.count({ where: { userId: student, compositeAttemptId: null, assignmentId: source.id } })).toBe(1)
     // Equal configuration is a separate new task, not proof of shared quota.
     expect((await standalone.createSession(student, assignmentId)).sessionId).toBeTruthy()
   },30000)

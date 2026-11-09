@@ -1,3 +1,5 @@
+import { CognitiveTaskPanel, CognitivePracticeFeedback } from '../shared/CognitiveTaskPresentation'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { reportIntroV3 } from './report-intro-v3'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -128,7 +130,7 @@ export const LexicaldecisionTask: React.FC<CognitiveTaskProps> = ({
   const handlePracticeResponse = (response: Response) => {
     const correct = (practiceSpec.lexicality === 'real' && response === 'word') || (practiceSpec.lexicality === 'pseudo' && response === 'nonword')
     setPracticeCorrect((value) => value + (correct ? 1 : 0))
-    setFeedback(correct ? '回答正确。' : '这次回答不正确，请继续练习。')
+    setFeedback((correct ? '回答正确。' : '这次回答不正确。') + '本题词串：“' + practiceSpec.text + '”；正确类别：' + (practiceSpec.lexicality === 'real' ? '真词' : '伪词') + '；你的选择：' + (response === 'word' ? '真词' : '伪词') + '。判断整个词串是否为真实中文词，不能只因其中每个字都认识就选真词。')
     setPhase('practice-feedback')
   }
 
@@ -193,31 +195,31 @@ export const LexicaldecisionTask: React.FC<CognitiveTaskProps> = ({
   if (phase === 'practice-result') {
     const passed = practiceCorrect >= 3
     return (
-      <div className="card p-8 text-center">
+      <CognitiveTaskPanel ariaLabel="练习结果" className="cognitive-task-panel--result"><h2 className="cognitive-task-title">练习结果</h2>
         <p className="mb-4 text-gray-700">练习正确 {practiceCorrect} / {PRACTICE.length}</p>
         <button type="button" onClick={passed ? startFormal : startPractice} className={passed ? 'btn-primary' : 'btn-secondary'}>{passed ? '开始正式测验' : '重新练习'}</button>
-      </div>
+      </CognitiveTaskPanel>
     )
   }
 
   if (phase === 'practice-feedback') {
     return (
-      <div className="card p-8 text-center">
+      <CognitivePracticeFeedback title="练习解析">
         <p className="mb-5 text-gray-700">{feedback}</p>
         <button type="button" onClick={nextPractice} className="btn-primary">{practiceIndex + 1 >= PRACTICE.length ? '查看练习结果' : '下一题'}</button>
-      </div>
+      </CognitivePracticeFeedback>
     )
   }
 
   const spec = phase === 'practice' ? PRACTICE[practiceIndex] : formalSpec
-  return (
+  const content = (
     <div className="card p-8 text-center">
       <p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / ${PRACTICE.length}` : `正式试次 ${trialIndex + 1} / ${sequence.length}`}</p>
       <div className="mb-8 flex min-h-32 items-center justify-center rounded-xl bg-slate-50 text-5xl font-semibold tracking-widest text-slate-800" aria-label="当前词汇刺激">
         {stimulusVisible ? spec?.text : '···'}
       </div>
       <div className="mx-auto grid max-w-md grid-cols-2 gap-4">
-        <button type="button" onClick={() => handleResponse('word')} disabled={phase === 'formal' && (submitting || submittedRef.current || !responseEnabled)} className="rounded-xl border-2 border-emerald-200 bg-emerald-50 px-6 py-5 text-lg font-medium text-emerald-800 hover:bg-emerald-100 disabled:opacity-50">真词<br /><span className="text-xs font-normal">1 / W / ←</span></button>
+        <button type="button" onClick={() => handleResponse('word')} disabled={phase === 'formal' && (submitting || submittedRef.current || !responseEnabled)} className="cognitive-response-button flex-col">真词<br /><span className="text-xs font-normal">1 / W / ←</span></button>
         <button type="button" onClick={() => handleResponse('nonword')} disabled={phase === 'formal' && (submitting || submittedRef.current || !responseEnabled)} className="rounded-xl border-2 border-amber-200 bg-amber-50 px-6 py-5 text-lg font-medium text-amber-800 hover:bg-amber-100 disabled:opacity-50">伪词<br /><span className="text-xs font-normal">2 / N / →</span></button>
       </div>
       {phase === 'formal' && interrupted && <p className="mt-4 text-xs text-amber-700">检测到页面切换，中断状态会随正式试次提交。</p>}
@@ -225,4 +227,6 @@ export const LexicaldecisionTask: React.FC<CognitiveTaskProps> = ({
       {phase === 'formal' && completionPending && onTaskComplete && <button type="button" onClick={() => void onTaskComplete()} className="btn-secondary mt-4">重试完成测评</button>}
     </div>
   )
+  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="词汇判断正式测验" progress={{ completed: trialIndex, total: sequence.length }}>{content}</CognitiveFocusStage> : content
+
 }
