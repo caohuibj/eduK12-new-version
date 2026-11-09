@@ -6,6 +6,7 @@ import {catalogDiscoveryScope,bundleRuntimeSelectionMatches,authoringPolishScope
 import {cognitiveMixedProductScope, acceptanceFor, classifyChanges, contentCodeqlRequired} from './content-scope.mjs';
 import {execFileSync} from 'node:child_process';
 import {readCognitiveIntakeDiff} from './cognitive-intake-scope.mjs';
+import {verifiedFrontendRetest} from './ci-frontend-retest.mjs';
 export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd(),draft=false}={}) {
   const actual=readCognitiveIntakeDiff(base,head,{cwd});
   const scope=needs.scope?.outputs||{};
@@ -279,7 +280,6 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if(needs.scope?.outputs?.frontend_retest==='true'){
     try{
       if(draft||process.env.CI_FORCE_FULL==='true')throw Error('Retest forbidden for draft/forced full');
-      const {verifiedFrontendRetest}=await import('./ci-frontend-retest.mjs');
       const scope=needs.scope.outputs;
       const proof=await verifiedFrontendRetest({
         token:process.env.GH_TOKEN,repo:process.env.GITHUB_REPOSITORY,

@@ -41,12 +41,15 @@ export const isQuestionnaireCompletionAdmissionBusyError = (
   || (Boolean(error) && (error as { code?: unknown }).code === 'COMPLETION_BUSY')
 )
 
+const P2028_ROLLED_BACK = /Unable to start a transaction in the given time|expired transaction/i
+
 export const isTransientCompletionDatabaseError = (error: unknown): boolean => {
-  const candidate = error as { code?: unknown; meta?: { code?: unknown } } | null
+  const candidate = error as { code?: unknown; message?: unknown; meta?: { code?: unknown } } | null
   return candidate?.code === 'P2024'
     || candidate?.code === 'P2034'
     || candidate?.code === '40001'
     || candidate?.meta?.code === '40001'
+    || (candidate?.code === 'P2028' && typeof candidate?.message === 'string' && P2028_ROLLED_BACK.test(candidate.message))
 }
 
 export const toCompletionAdmissionBusyError = (
