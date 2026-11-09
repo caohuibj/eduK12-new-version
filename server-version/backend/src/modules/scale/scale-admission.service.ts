@@ -1,5 +1,5 @@
 import {stableStudyAdmissionHash} from '../anonymous-study/admission-principal'
-import { assertTrainingChildSelected, loadTrainingChildAdmissionParent, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
+import { assertTrainingChildSelected, loadTrainingChildAdmissionParent, TRAINING_CHILD_ADMISSION_PARENT_SELECT } from '../composite/training-variant-child-scope'
 import {readTrainingTimingSnapshot,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { loadStoredVersionedUnitAdmission } from '../assessment-runtime/unit-admission'
 import { withSerializableScaleTransaction } from './deployment/transactions'
@@ -60,9 +60,7 @@ export const UNIFIED_SCALE_CHILD_ADMISSION_SELECT = {
   questionnaireAssessmentId: true,
   compositeAttemptId: true,
   compositeItemId: true,
-  compositeAttempt: { select: {...TRAINING_VARIANT_PARENT_MARKER_SELECT,compositeAssessment:{select:{
-    ...TRAINING_VARIANT_PARENT_MARKER_SELECT.compositeAssessment.select,creationKey:true,
-  }}} },
+  compositeAttempt: { select: TRAINING_CHILD_ADMISSION_PARENT_SELECT },
   scaleId: true,
   subjectUserId: true,
   respondentUserId: true,

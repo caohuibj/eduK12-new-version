@@ -148,6 +148,12 @@ describe('Unified runtime architecture boundaries', () => {
     expect(compositeImpl).not.toMatch(/finalizeCompositeAttemptIfReady/)
     expect(compositeForm).toMatch(/withUnitSubmitAdmission\(\(\) => submitCompositeFormSectionFinalImpl/)
     expect(compositeForm).toMatch(/finalizeCompositeAttemptIfReady/)
+    expect(compositeForm).toMatch(/TRAINING_CHILD_ADMISSION_PARENT_SELECT/)
+    expect(source('modules/scale/scale-admission.service.ts')).toMatch(/compositeAttempt: \{ select: TRAINING_CHILD_ADMISSION_PARENT_SELECT \}/)
+    const unitGate = source('services/unitSubmitAdmission.ts')
+    expect(unitGate).toMatch(/maxConcurrent: configuredInteger\('UNIT_SUBMIT_ADMISSION_LIMIT', 7\)/)
+    expect(unitGate).toMatch(/maxQueue: configuredInteger\('UNIT_SUBMIT_ADMISSION_QUEUE', 16, true\)/)
+    expect(unitGate).toMatch(/maxWaitMs: configuredInteger\('UNIT_SUBMIT_ADMISSION_TIMEOUT_MS', 500\)/)
   })
 
   it('reconcile-once: terminal GET patches finalize result instead of rebuilding full state', () => {

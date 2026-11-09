@@ -19,6 +19,12 @@ describe('unit submit admission', () => {
     await expect(withUnitSubmitAdmission(async () => 'ok')).resolves.toBe('ok')
   })
 
+  it('keeps UNIT submit capacity at 7 concurrent / queue 16 / wait 500ms', () => {
+    expect(unitSubmitAdmission.getStats().options.maxConcurrent).toBe(7)
+    expect(unitSubmitAdmission.getStats().options.maxQueue).toBe(16)
+    expect(unitSubmitAdmission.getStats().options.maxWaitMs).toBe(500)
+  })
+
   it('maps gate busy errors to UnitSubmitAdmissionBusyError', async () => {
     const gate = new BoundedAdmissionGate({
       name: 'unit_submit_test',

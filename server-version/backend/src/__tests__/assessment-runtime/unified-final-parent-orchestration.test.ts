@@ -95,4 +95,16 @@ describe('Unified child FINAL completes its parent without a runner reread', () 
     const result = await adapters[2].submit()
     expect(result.parent).toMatchObject({ status: 'IN_PROGRESS', progress: 50 })
   })
+  it('loads form UNIT routing with the shared admission parent so UNIFIED can skip a second read', async () => {
+    await adapters[2].submit()
+    expect(m.db.compositeAssessmentAttempt.findUnique).toHaveBeenCalledTimes(1)
+    const select = m.db.compositeAssessmentAttempt.findUnique.mock.calls[0][0].select
+    expect(select.contextSnapshotHash).toBe(true)
+    expect(select.subjectUserId).toBe(true)
+    expect(select.compositeAssessment.select.productKind).toBe(true)
+    expect(select.compositeAssessment.select.formSections).toEqual({
+      select: { contextSection: true, items: { select: { contextKey: true } } },
+    })
+    expect(select.compositeAssessment.select.bundleInstance).toBe(true)
+  })
 })

@@ -9,7 +9,8 @@ vi.mock('../../config/database', () => ({ prisma: {
 } }))
 import { compileWeightedVariants, createWeightedVariantAllocation } from '../../modules/assessment-core/weighted-variants'
 import { buildTrainingVariantUnion, resolveTrainingAttemptScope } from '../../modules/composite/training-variant-scope'
-import { assertTrainingChildSelected, assertTrainingSectionSelected } from '../../modules/composite/training-variant-child-scope'
+import { assertTrainingChildSelected, assertTrainingSectionSelected, loadTrainingChildAdmissionParent, TRAINING_CHILD_ADMISSION_PARENT_SELECT } from '../../modules/composite/training-variant-child-scope'
+import { UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../../modules/scale/scale-admission.service'
 import { createFrozenActiveSlotSet, encryptFrozenActiveSlotSet } from '../../modules/assessment-runtime/slot-set'
 import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 import { activateCompositeFormAdmission, ensureCompositeSectionAttempt } from '../../modules/assessment-runtime/form-admission.service'
@@ -245,6 +246,53 @@ describe('C14 selected child scope enforcement', () => {
     const tx: any = { $queryRaw: vi.fn().mockResolvedValue([{ id: 'attempt' }]), compositeAssessmentAttempt: { findUnique: vi.fn().mockResolvedValue(parent), updateMany: vi.fn() } }
     await expect(freezeCompositeAttemptContext(tx, 'attempt')).rejects.toThrow(/冻结/)
     expect(tx.compositeAssessmentAttempt.updateMany).not.toHaveBeenCalled()
+  })
+})
+
+describe('UNIT FINAL admission parent reuse', () => {
+  const admissionParent = () => ({
+    id: 'attempt',
+    trainingContentBindingHash: null, trainingReferenceBindingHash: null, trainingFeedbackSnapshotHash: null,
+    trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null,
+    trainingFlowPathEncrypted: null, trainingFlowPathHash: null,
+    trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
+    userId: 'user', subjectUserId: 'subject', contextSnapshotHash: null,
+    compositeAssessment: {
+      creationKey: null, productKind: 'QUESTIONNAIRE',
+      trainingFlowDraft: null, trainingFlowFrozen: null, trainingFlowDigest: null,
+      trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null,
+      formSections: [],
+    },
+  })
+  it('shares one parent projection across form routing and scale child admission', () => {
+    expect(TRAINING_CHILD_ADMISSION_PARENT_SELECT.contextSnapshotHash).toBe(true)
+    expect(TRAINING_CHILD_ADMISSION_PARENT_SELECT.subjectUserId).toBe(true)
+    expect(TRAINING_CHILD_ADMISSION_PARENT_SELECT.compositeAssessment.select.productKind).toBe(true)
+    expect(TRAINING_CHILD_ADMISSION_PARENT_SELECT.compositeAssessment.select.formSections).toEqual({
+      select: { contextSection: true, items: { select: { contextKey: true } } },
+    })
+    expect(UNIFIED_SCALE_CHILD_ADMISSION_SELECT.compositeAttempt).toEqual({ select: TRAINING_CHILD_ADMISSION_PARENT_SELECT })
+  })
+  it('skips a second parent read when UNIT routing already loaded admission fields', async () => {
+    const parent = admissionParent()
+    expect(await loadTrainingChildAdmissionParent('attempt', parent)).toBe(parent)
+    expect(mocks.parent).not.toHaveBeenCalled()
+  })
+  it('reloads when contextSnapshotHash is unselected even if markers are complete', async () => {
+    const loaded = admissionParent()
+    const { contextSnapshotHash: _, ...narrow } = loaded
+    mocks.parent.mockResolvedValue(loaded)
+    expect(await loadTrainingChildAdmissionParent('attempt', narrow)).toBe(loaded)
+    expect(mocks.parent).toHaveBeenCalledTimes(1)
+    expect(mocks.parent.mock.calls[0][0].select).toBe(TRAINING_CHILD_ADMISSION_PARENT_SELECT)
+  })
+  it('reloads when formSections are missing from the caller projection', async () => {
+    const loaded = admissionParent()
+    const parent = { ...loaded, compositeAssessment: { ...loaded.compositeAssessment } }
+    delete (parent.compositeAssessment as { formSections?: unknown }).formSections
+    mocks.parent.mockResolvedValue(loaded)
+    expect(await loadTrainingChildAdmissionParent('attempt', parent)).toBe(loaded)
+    expect(mocks.parent).toHaveBeenCalledTimes(1)
   })
 })
 
