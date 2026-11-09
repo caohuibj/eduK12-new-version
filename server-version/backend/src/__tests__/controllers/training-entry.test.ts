@@ -4,7 +4,7 @@ vi.mock('../../config/database', () => ({ prisma: { user: { findUnique: m.user }
 vi.mock('../../utils/password', () => ({ comparePassword: m.compare, hashPassword: vi.fn(), isValidPassword: vi.fn(), PASSWORD_MIN_LENGTH: 8, PASSWORD_MAX_LENGTH: 128 }))
 vi.mock('../../utils/jwt', () => ({ generateToken: m.token }))
 vi.mock('../../utils/authCookies', () => ({ setSessionCookie: m.cookie, clearSessionCookie: vi.fn() }))
-vi.mock('../../middleware/loginRateLimit', () => ({ recordLoginFailure: m.failure, clearLoginFailures: m.clear, withLoginPasswordVerification: (fn: () => unknown) => fn() }))
+vi.mock('../../middleware/loginRateLimit', () => ({ recordLoginFailure: m.failure, clearLoginFailures: m.clear, withLoginPasswordVerification: (fn: () => unknown) => fn(), withLoginAccountLookup: (fn: () => unknown) => fn() }))
 vi.mock('../../middleware/registrationAdmission', () => ({ registrationRateLimit: m.rate }))
 vi.mock('../../utils/logger', () => ({ logger: { error: vi.fn() } }))
 import { trainingLogin, resolveTrainingCode, trainingCodeRateLimit } from '../../modules/training/auth'

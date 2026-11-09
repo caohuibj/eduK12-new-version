@@ -339,8 +339,51 @@ it('keeps anonymous receipt success distinct from report release and does not re
 
 it('skips redundant reportStatus check on fresh in-progress attempt for 0ms question render', async () => {
   const d = definition([1]), client = api(); client.wholeDefinition.mockResolvedValue({ code: 0, data: d })
-  render(<WholeCompositeQuestionnaire state={state} api={client} publicMode recoveryToken="synthetic-recovery" fallback={<p>fallback</p>} onCompleted={vi.fn()} onExit={vi.fn()}/>)
+  render(<WholeCompositeQuestionnaire state={state} isFreshStart api={client} publicMode recoveryToken="synthetic-recovery" fallback={<p>fallback</p>} onCompleted={vi.fn()} onExit={vi.fn()}/>)
   expect(await screen.findByText(/量表 0 题目 0/)).toBeInTheDocument()
   expect(client.reportStatus).not.toHaveBeenCalled()
   expect(client.wholeDefinition).toHaveBeenCalledTimes(1)
+})
+
+it('verifies cross-device / reload entry checks reportStatus and shows accepted screen without rendering Question 1', async () => {
+  const client = api()
+  client.reportStatus.mockResolvedValue({
+    code: 0,
+    data: {
+      wholeSubmissionReceived: true,
+      wholeSubmissionId: 'sub-device-a',
+      reportStatus: { state: 'PROCESSING', jobId: 'job-1', retryAfterSeconds: 3, errorCode: null, completedAt: null },
+    },
+  })
+  // isFreshStart is false (default when re-entering or on device B)
+  render(<WholeCompositeQuestionnaire state={state} isFreshStart={false} api={client} publicMode recoveryToken="synthetic-recovery" fallback={<p>fallback</p>} onCompleted={vi.fn()} onExit={vi.fn()}/>)
+
+  expect(await screen.findByRole('heading', { name: '交卷成功' })).toBeInTheDocument()
+  expect(client.reportStatus).toHaveBeenCalledTimes(1)
+  expect(client.wholeDefinition).not.toHaveBeenCalled()
+  expect(screen.queryByText(/量表 0 题目 0/)).not.toBeInTheDocument()
+})
+
+it('fetches the definition through api.wholeDefinition so the inline identity check still applies', async () => {
+  // X-09 review: the inline definition must go through wholeDefinitionWithInlineFallback
+  // (attemptId + epoch + context hash + one-time consumption). A direct prop would
+  // bypass the epoch check, so the runner always calls api.wholeDefinition here.
+  const d = definition([1]), client = api()
+  client.wholeDefinition.mockResolvedValue({ code: 0, data: d })
+  render(
+    <WholeCompositeQuestionnaire
+      state={state}
+      isFreshStart
+      api={client}
+      publicMode
+      recoveryToken="synthetic-recovery"
+      fallback={<p>fallback</p>}
+      onCompleted={vi.fn()}
+      onExit={vi.fn()}
+    />,
+  )
+  expect(await screen.findByText(/量表 0 题目 0/)).toBeInTheDocument()
+  expect(client.reportStatus).not.toHaveBeenCalled()
+  expect(client.wholeDefinition).toHaveBeenCalledTimes(1)
+  expect(client.wholeDefinition).toHaveBeenCalledWith(state.id)
 })

@@ -191,54 +191,116 @@ const ensureWholeRules = async (attemptId: string, principal: Principal, manifes
   }
 }
 
+type StaticQuestionnaireUnitTemplate = {
+  itemId: string
+  scaleId: string
+  scaleName: string
+  instrumentVersion: string
+  instruction: string | null
+  definitionHash: string
+  presentationMode: 'ONE_BY_ONE' | 'ALL_AT_ONCE'
+  runnerDefinition: ReturnType<typeof runnerDefinition>
+  rule: { rulesHash: string } | { items: Array<{ itemCode: string; required: boolean; values: Array<string | number> }> }
+  ruleItems: Array<{ itemCode: string; required: boolean; values: Array<string | number> }>
+}
+
+type StaticQuestionnaireTemplate = {
+  formSections: Array<any>
+  validationFormSections?: Array<any>
+  requiredFormSlots: string[]
+  unitTemplates: StaticQuestionnaireUnitTemplate[]
+}
+
+const staticQuestionnaireTemplateCache = new Map<string, StaticQuestionnaireTemplate>()
+const MAX_STATIC_QUESTIONNAIRE_TEMPLATES = 128
+
+export const clearWholeQuestionnaireStaticCacheForTest = () => {
+  staticQuestionnaireTemplateCache.clear()
+}
+
 /** Delivery only: freeze each admission once, before collecting any answers. */
 export const getWholeQuestionnaireDefinition = async (attemptId: string, principal: Principal) => withSharedControlContext(async () => {
   if (!assessmentReportConfig().wholeSubmitEnabled) throw failure('整份交卷入口暂未开启')
   const { parent, children, frozen } = await loadParent(attemptId, principal)
   if (parent.status !== 'IN_PROGRESS') throw failure('问卷已结束')
-  const rawSections = [...(parent.compositeAssessment.formSections || [])]
-  rawSections.sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
-  // Server-side boundary for the context exclusion (X-04A review): the DTO's
-  // executionMode=STEPPED alone cannot constrain direct API callers, so whole
-  // delivery refuses context-bearing composites exactly like the eligibility
-  // contract does. Their frozen context hash feeds downstream admission and
-  // dynamic item projection and must commit through the stepped flow.
-  if (rawSections.some((sec: any) => compositeSectionHasContext(sec))) {
-    throw failure('含人口学上下文区段的问卷暂不支持整份交卷')
-  }
-  const formSections = rawSections.map((sec: any) => {
-    const runtimeDef = compositeFormSectionRuntimeDefinition(sec)
-    const definitionHash = formSectionIdentityHash(runtimeDef)
-    const items = [...(sec.items || [])]
-      .sort((left: any, right: any) => (left.formSectionPosition ?? left.position) - (right.formSectionPosition ?? right.position))
-      .map((item: any) => ({
-        id: item.id,
-        formType: item.formType,
-        formLabel: item.formLabel,
-        formPlaceholder: item.formPlaceholder ?? null,
-        required: item.required !== false,
-        formOptions: item.formOptions ?? null,
-        ...(item.formDefinition != null ? { formDefinition: publicTrainingFormDefinition(item.formDefinition) } : {}),
-        ...(item.formPolicy != null ? { formPolicy: item.formPolicy } : {}),
-        contextKey: item.contextKey ?? null,
-        position: item.position,
-        formSectionPosition: item.formSectionPosition ?? null,
-      }))
-    return {
-      id: sec.id,
-      title: sec.title,
-      description: sec.description ?? null,
-      position: sec.position,
-      contextSection: compositeSectionHasContext(sec),
-      definitionHash,
-      items,
+
+  // The SlotSet hash binds the frozen runtime, but the template also carries
+  // scaleName / scale.instruction from the live scale row, which the SlotSet
+  // hash does not cover. Include them in the key so an in-place scale rename
+  // or instruction edit invalidates the cached display template instead of
+  // serving the previous wording.
+  const displayKey = children
+    .map(({ child }: any) => [child.compositeItemId, child.scale.id, child.scale.name ?? '', child.scale.instruction ?? ''].join('\u0000'))
+    .sort()
+    .join('\u0001')
+  const templateCacheKey = `${parent.frozenActiveSlotSetHash!}\u0002${displayKey}`
+  let template = staticQuestionnaireTemplateCache.get(templateCacheKey)
+  if (!template) {
+    const rawSections = [...(parent.compositeAssessment.formSections || [])]
+    rawSections.sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
+    // Server-side boundary for the context exclusion (X-04A review): the DTO's
+    // executionMode=STEPPED alone cannot constrain direct API callers, so whole
+    // delivery refuses context-bearing composites exactly like the eligibility
+    // contract does. Their frozen context hash feeds downstream admission and
+    // dynamic item projection and must commit through the stepped flow.
+    if (rawSections.some((sec: any) => compositeSectionHasContext(sec))) {
+      throw failure('含人口学上下文区段的问卷暂不支持整份交卷')
     }
-  })
-  const manifest: WholeValidationManifest = { schemaVersion: process.env.ASSESSMENT_WHOLE_COMPACT_MANIFEST_ENABLED === 'true' ? 2 : 1, binding: { attemptId: parent.id, attemptEpoch: parent.attemptEpoch,
-    slotSetHash: parent.frozenActiveSlotSetHash!, contextHash: parent.contextSnapshotHash, userId: parent.userId, recoveryTokenHash: parent.recoveryTokenHash },
-    requiredFormSlots: frozen.slots.filter(slot => slot.required && slot.unitType === 'FORM_SECTION').map(slot => slot.slotKey), units: [],
-    ...(formSections.length > 0 ? {
-      formSections: formSections.map(sec => ({
+    const formSections = rawSections.map((sec: any) => {
+      const runtimeDef = compositeFormSectionRuntimeDefinition(sec)
+      const definitionHash = formSectionIdentityHash(runtimeDef)
+      const items = [...(sec.items || [])]
+        .sort((left: any, right: any) => (left.formSectionPosition ?? left.position) - (right.formSectionPosition ?? right.position))
+        .map((item: any) => ({
+          id: item.id,
+          formType: item.formType,
+          formLabel: item.formLabel,
+          formPlaceholder: item.formPlaceholder ?? null,
+          required: item.required !== false,
+          formOptions: item.formOptions ?? null,
+          ...(item.formDefinition != null ? { formDefinition: publicTrainingFormDefinition(item.formDefinition) } : {}),
+          ...(item.formPolicy != null ? { formPolicy: item.formPolicy } : {}),
+          contextKey: item.contextKey ?? null,
+          position: item.position,
+          formSectionPosition: item.formSectionPosition ?? null,
+        }))
+      return {
+        id: sec.id,
+        title: sec.title,
+        description: sec.description ?? null,
+        position: sec.position,
+        contextSection: compositeSectionHasContext(sec),
+        definitionHash,
+        items,
+      }
+    })
+    const requiredFormSlots = frozen.slots.filter(slot => slot.required && slot.unitType === 'FORM_SECTION').map(slot => slot.slotKey)
+    const unitTemplates: StaticQuestionnaireUnitTemplate[] = []
+    for (const { child, runtime } of children) {
+      const sets = new Map(runtime.definition.responseSets.map(set => [set.key, set.options.map(option => option.value)]))
+      const ruleItems = runtime.definition.items.map(item => ({ itemCode: item.itemCode, required: Boolean(item.required), values: sets.get(item.responseSetKey)! }))
+      const compiled = compileWholeRules(runtime.legacyDefinitionHash, ruleItems)
+      const rule = compiled && wholeRules.has(compiled.hash) ? { rulesHash: compiled.hash } : { items: ruleItems }
+      unitTemplates.push({
+        itemId: child.compositeItemId!,
+        scaleId: child.scale.id,
+        scaleName: child.scale.name,
+        instrumentVersion: child.scale.instrumentVersion,
+        instruction: runtime.instruction !== undefined ? runtime.instruction?.text ?? null : child.scale.instruction,
+        definitionHash: runtime.legacyDefinitionHash,
+        presentationMode: runtime.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE',
+        runnerDefinition: runnerDefinition(runtime.definition),
+        rule,
+        ruleItems,
+      })
+    }
+    const positions = new Map(parent.compositeAssessment.items.map(item => [item.id, item.position]))
+    unitTemplates.sort((left, right) => (positions.get(left.itemId) ?? 0) - (positions.get(right.itemId) ?? 0))
+    template = {
+      formSections,
+      requiredFormSlots,
+      unitTemplates,
+      validationFormSections: formSections.length > 0 ? formSections.map(sec => ({
         sectionId: sec.id,
         definitionHash: sec.definitionHash,
         items: sec.items.map(item => ({
@@ -246,37 +308,85 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
           required: item.required !== false,
           formType: item.formType,
         })),
-      })),
-    } : {}),
+      })) : undefined,
+    }
+    if (staticQuestionnaireTemplateCache.size >= MAX_STATIC_QUESTIONNAIRE_TEMPLATES) {
+      const oldest = staticQuestionnaireTemplateCache.keys().next().value
+      if (oldest) staticQuestionnaireTemplateCache.delete(oldest)
+    }
+    staticQuestionnaireTemplateCache.set(templateCacheKey, template)
+  }
+
+  const manifest: WholeValidationManifest = {
+    schemaVersion: process.env.ASSESSMENT_WHOLE_COMPACT_MANIFEST_ENABLED === 'true' ? 2 : 1,
+    binding: {
+      attemptId: parent.id,
+      attemptEpoch: parent.attemptEpoch,
+      slotSetHash: parent.frozenActiveSlotSetHash!,
+      contextHash: parent.contextSnapshotHash,
+      userId: parent.userId,
+      recoveryTokenHash: parent.recoveryTokenHash,
+    },
+    requiredFormSlots: template.requiredFormSlots,
+    units: [],
+    ...(template.validationFormSections ? { formSections: template.validationFormSections } : {}),
   }
   const units: any[] = []
   const admissions = await batchEnsureScaleAdmissionsAtDelivery(parent, children)
-  for (const { child, runtime } of children) {
+  const childByItemId = new Map(children.map(c => [c.child.compositeItemId!, c]))
+
+  for (const tmpl of template.unitTemplates) {
+    const entry = childByItemId.get(tmpl.itemId)
+    if (!entry) throw failure('量表冻结记录不完整')
+    const { child, runtime } = entry
     if (child.status !== 'IN_PROGRESS') throw failure('已分量表交卷，不能改为整份交卷')
     const admission = admissions.get(child.id)
     if (!admission) throw failure('量表准入初始化失败')
-    await assertUnifiedScaleDelivery({ assessmentId: child.id, compositeAttemptId: attemptId, submissionId: 'whole-delivery-validation',
-      attemptEpoch: parent.attemptEpoch, definitionHash: runtime.legacyDefinitionHash, contextSnapshotHash: parent.contextSnapshotHash, answers: [], ...principal }, child, admission, runtime)
-    const sets = new Map(runtime.definition.responseSets.map(set => [set.key, set.options.map(option => option.value)]))
-    const ruleItems = runtime.definition.items.map(item => ({ itemCode: item.itemCode, required: Boolean(item.required), values: sets.get(item.responseSetKey)! }))
-    const compiled = manifest.schemaVersion === 2 ? compileWholeRules(runtime.legacyDefinitionHash, ruleItems) : null
-    const rule = compiled && wholeRules.has(compiled.hash) ? { rulesHash: compiled.hash } : { items: ruleItems }
-    manifest.units.push({ itemId: child.compositeItemId!, assessmentId: child.id, definitionHash: runtime.legacyDefinitionHash,
-      ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
-      admissionHash: admission.snapshotHash, deadlineMs: admission.schemaVersion === 2 && admission.scalePolicy?.deployment?.completionDeadline
+    await assertUnifiedScaleDelivery({
+      assessmentId: child.id,
+      compositeAttemptId: attemptId,
+      submissionId: 'whole-delivery-validation',
+      attemptEpoch: parent.attemptEpoch,
+      definitionHash: runtime.legacyDefinitionHash,
+      contextSnapshotHash: parent.contextSnapshotHash,
+      answers: [],
+      ...principal,
+    }, child, admission, runtime)
+    const rule = manifest.schemaVersion === 2 ? tmpl.rule : { items: tmpl.ruleItems }
+    manifest.units.push({
+      itemId: tmpl.itemId,
+      assessmentId: child.id,
+      definitionHash: tmpl.definitionHash,
+      ...(admission.trainingTiming ? { trainingTiming: admission.trainingTiming } : {}),
+      admissionHash: admission.snapshotHash,
+      deadlineMs: admission.schemaVersion === 2 && admission.scalePolicy?.deployment?.completionDeadline
         ? Date.parse(admission.scalePolicy.deployment.completionDeadline) : null,
-      ...rule })
-    units.push({ itemId: child.compositeItemId!, scaleAssessmentId: child.id, definitionHash: runtime.legacyDefinitionHash,
-      presentationMode: runtime.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE',
-      ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
-      scale: { id: child.scale.id, name: child.scale.name, instruction: runtime.instruction !== undefined ? runtime.instruction?.text ?? null : child.scale.instruction, instrumentVersion: child.scale.instrumentVersion,
-        definition: runnerDefinition(runtime.definition) } })
+      ...rule,
+    })
+    units.push({
+      itemId: tmpl.itemId,
+      scaleAssessmentId: child.id,
+      definitionHash: tmpl.definitionHash,
+      presentationMode: tmpl.presentationMode,
+      ...(admission.trainingTiming ? { trainingTiming: admission.trainingTiming } : {}),
+      scale: {
+        id: tmpl.scaleId,
+        name: tmpl.scaleName,
+        instruction: tmpl.instruction,
+        instrumentVersion: tmpl.instrumentVersion,
+        definition: tmpl.runnerDefinition,
+      },
+    })
   }
-  const positions = new Map(parent.compositeAssessment.items.map(item => [item.id, item.position]))
-  units.sort((left, right) => (positions.get(left.itemId) ?? 0) - (positions.get(right.itemId) ?? 0))
   await storeWholeQuestionnaireValidation(parent, await storeSharedWholeValidation(manifest), prepareCanonicalSubmission(manifest).hash)
-  return { attemptId, attemptEpoch: parent.attemptEpoch, slotSetHash: parent.frozenActiveSlotSetHash,
-    contextSnapshotHash: parent.contextSnapshotHash, units, formSections }
+  return {
+    attemptId,
+    attemptEpoch: parent.attemptEpoch,
+    slotSetHash: parent.frozenActiveSlotSetHash,
+    contextSnapshotHash: parent.contextSnapshotHash,
+    units,
+    formSections: template.formSections,
+  }
 })
 
 const logicalPayload = (attemptId: string, input: WholeQuestionnaireSubmitInput, timingSnapshotHash?:string) => ({

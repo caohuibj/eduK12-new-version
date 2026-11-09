@@ -171,7 +171,7 @@ suite('V32-1 additive PostgreSQL migration and constraints', () => {
         participantKey: `v32-1-${randomUUID()}`,
       },
     })
-  })
+  }, 60000)
 
   const createEmbeddedCognitiveFixture = async () => {
     const suffix = randomUUID()

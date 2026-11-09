@@ -835,19 +835,20 @@ export const batchEnsureScaleAdmissionsAtDelivery = async (
 
       for (const item of unstored) {
         const current = currentById.get(item.child.id)
-        if (!current || current.attemptEpoch !== parent.attemptEpoch || (current.compositeAttemptId && current.compositeAttemptId !== parent.id)) {
+        if (!current || current.attemptEpoch !== parent.attemptEpoch || current.compositeAttemptId !== parent.id) {
           throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评轮次已改变', 409)
         }
         assertFinalOnly(current.deliveryMode)
+
+        if (!current.compositeItemId || (item.slot.sourceBinding?.compositeItemId && current.compositeItemId !== item.slot.sourceBinding.compositeItemId)
+          || (item.slot.sourceBinding?.scaleId && current.scaleId !== item.slot.sourceBinding.scaleId)) {
+          throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
+        }
 
         const winner = await loadStoredScaleAdmission(current, tx)
         if (winner) {
           txResult.set(current.id, await validateStoredAgainstRuntime(current, winner, referenceTimeMs, tx))
           continue
-        }
-
-        if (!current.compositeItemId || (item.slot.sourceBinding?.compositeItemId && current.compositeItemId !== item.slot.sourceBinding.compositeItemId)) {
-          throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
         }
 
         await assertTrainingChildSelected(current, { parent: scopedParent, db: tx })
