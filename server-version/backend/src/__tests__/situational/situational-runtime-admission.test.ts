@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { prisma } from '../../config/database'
+import { startSituationalAttempt } from '../../modules/situational/situational-runtime.service'
 import {
   getSituationalInstrument,
   listSituationalInstruments,
@@ -19,6 +21,29 @@ const packageWithStatus = (
 })
 
 describe('Situational participant runtime admission', () => {
+  it.each(['active','latest'])('standalone %s lookup cannot select a composite or Survey child', async phase => {
+    const originalEncryption = process.env.DATA_ENCRYPTION_KEY
+    const originalPseudonym = process.env.DATA_PSEUDONYM_KEY
+    process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
+    process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
+    const stop = new Error('query-boundary-observed')
+    const query = vi.spyOn(prisma.situationalAttempt, 'findFirst').mockRejectedValue(stop)
+    if (phase === 'latest') query.mockResolvedValueOnce(null)
+    try {
+      await expect(startSituationalAttempt('separate-delivery-user', {
+        instrumentKey: SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.key,
+        instrumentVersion: SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.instrumentVersion,
+      })).rejects.toBe(stop)
+      for (const [args] of query.mock.calls) expect(args).toMatchObject({where:{compositeAttemptId:null,surveyAttemptId:null}})
+      expect(query).toHaveBeenCalledTimes(phase === 'latest' ? 2 : 1)
+    } finally {
+      query.mockRestore()
+      if (originalEncryption === undefined) delete process.env.DATA_ENCRYPTION_KEY
+      else process.env.DATA_ENCRYPTION_KEY = originalEncryption
+      if (originalPseudonym === undefined) delete process.env.DATA_PSEUDONYM_KEY
+      else process.env.DATA_PSEUDONYM_KEY = originalPseudonym
+    }
+  })
   it('exposes all executable-complete production packages regardless of PILOT maturity', () => {
     const instruments = listSituationalInstruments()
     expect(instruments.map((entry) => entry.key)).toEqual([

@@ -123,7 +123,7 @@ import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
 import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
 import { ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
-import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota, readCognitiveQuota, isTrainingTaskCourse, usesScopedTrainingQuota } from '../cognitive/attempt-quota'
+import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota, isTrainingTaskCourse, usesScopedTrainingQuota } from '../cognitive/attempt-quota'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
 import { missingRequiredScaleItemCodes, ScaleAnswerValidationError, validateScaleAnswer } from '../scale/scale-scoring'
 import type { DeviceInputProvenanceV1 } from '../scale/device-input-provenance'
@@ -2747,7 +2747,7 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   if(userId){
     const native=attempt.trainingContentBinding?.units?.some((unit:any)=>unit.itemId===item.id&&unit.source.educationNative?.provider==='COGNITIVE_CONFIG')
     if(native||readVerifiedLongitudinalEducationAttempt(educationAttempt,db,attempt,userId))await admitEducationNativeCognitive(db as Prisma.TransactionClient,{proof:educationAttempt,parent:attempt,actorUserId:userId,itemId:item.id,assignmentId:assignment.id,configId:config.id})
-    else await admitCognitiveAttempt(db,userId,assignment.id,{compositeAttemptId:attempt.id,compositeItemId:item.id})
+    else await admitCognitiveAttempt(db,userId,assignment.id,{compositeAttemptId:attempt.id,compositeItemId:item.id},educationAttempt)
   }
   return db.cognitiveSession.create({
     data: {
@@ -3369,27 +3369,7 @@ const createAttempt = async (
   if (prepared) {
     try { await assertAssessmentAssetReferencesReady(candidateMedia, db) }
     catch { throw compositeBadRequest('候选分卷包含不可用或不匹配的冻结媒体') }
-    if (userId && variantEnabled && !(usesScopedTrainingQuota(composite)
-      && await isTrainingTaskCourse(db as Prisma.TransactionClient, composite.deliveryCourseId ?? composite.courseId))) {
-      const cognitiveItems=composite.items.filter((i:any)=>i.type==='COGNITIVE')
-      const sources = await Promise.all(cognitiveItems.map((i:any)=>cognitiveQuotaSource(db as any,i.cognitiveAssignmentId)))
-      const byItem=new Map<string,string>(cognitiveItems.map((item:any,index:number)=>[item.id,sources[index].id]))
-      const sourceIds=[...new Set<string>(sources.map(source=>source.id))].sort()
-      for (const id of sourceIds) await lockCognitiveQuota(db as any,userId,id)
-      const quotas=new Map<string,number>()
-      for(const id of sourceIds){
-        // Read-only preflight uses the published leaf; START still verifies its
-        // actual parent binding. An untracked copy retains the global quota.
-        const items=cognitiveItems.filter((item:any)=>byItem.get(item.id)===id)
-        const remaining=await Promise.all(items.map((item:any)=>readCognitiveQuota(db as any,userId,item.cognitiveAssignmentId,{compositeAssessmentId:composite.id,compositeItemId:item.id})))
-        quotas.set(id,Math.min(...remaining.map(quota=>quota.remainingAttempts)))
-      }
-      for(const group of parseCompiledWeightedVariants(composite.trainingVariantFrozen).groups){
-        const needed=new Map<string,number>()
-        for(const id of group.selectedItemIds){const source=byItem.get(id);if(source)needed.set(source,(needed.get(source)??0)+1)}
-        for(const [source,count] of needed)if((quotas.get(source)??0)<count)throw compositeConflict('至少一个候选分卷的认知任务次数不足，不能改变原分配概率')
-      }
-    }
+
   }
 
   const newAttemptId = randomUUID()

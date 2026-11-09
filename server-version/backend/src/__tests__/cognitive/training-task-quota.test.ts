@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { admitCognitiveAttempt, readCognitiveQuota } from '../../modules/cognitive/attempt-quota'
+import {issueVerifiedEducationStart,bindVerifiedEducationAttempt} from '../../modules/assessment-run/education-start-context'
 
 const root = { id: 'task', courseId: 'course', createdBy: 'author', configId: 'config', maxAttempts: 1, listedStandalone: true }
 const course = { courseType: 'TRAINING_COURSE', isLibrary: false }
@@ -24,11 +25,21 @@ beforeEach(() => {
   db.cognitiveSession.count.mockResolvedValue(0); db.cognitiveSession.findFirst.mockResolvedValue(null)
 })
 describe('Training participation quotas belong to the delivery task', () => {
+  it.each(['SCHOOL','TEACHER'] as const)('%s registered Runs isolate quota with verified authority and reject copied proof', async product => {
+    const bound = {...makeParent(),subjectUserId:'student',respondentUserId:'student',assignmentRef:'run-assignment'}
+    db.compositeAssessmentAttempt.findUnique.mockResolvedValue(bound)
+    const start=issueVerifiedEducationStart({tx,product,compositeId:'bundle',subjectUserId:'student',respondentUserId:'student',assignmentRef:'run-assignment'})
+    const proof=bindVerifiedEducationAttempt(start,tx,bound)
+    await expect(admitCognitiveAttempt(tx,'student','task',scope,proof)).resolves.toBeUndefined()
+    expect(db.compositeAssessmentAttempt.count).toHaveBeenCalledWith({where:{compositeAssessmentId:'bundle',userId:'student',assignmentRef:'run-assignment'}})
+    await expect(admitCognitiveAttempt(tx,'student','task',scope,{...proof})).rejects.toThrow('EDUCATION_START_CONTEXT_MISMATCH')
+    await expect(admitCognitiveAttempt(tx,'student','task',scope)).rejects.toMatchObject({statusCode:409})
+  })
   it('counts and resumes standalone aliases without including any composite sessions', async () => {
     db.cognitiveSession.count.mockResolvedValue(1)
     db.cognitiveSession.findFirst.mockResolvedValue({ id: 'existing', compositeAttemptId: null, frozenAdmissionSnapshotHash: 'fixed' })
     expect(await readCognitiveQuota(tx, 'student', 'copy')).toMatchObject({ usedAttempts: 1, remainingAttempts: 0, continueHref: '/student/cognitive/sessions/existing' })
-    expect(db.cognitiveSession.count).toHaveBeenCalledWith({ where: expect.objectContaining({ userId: 'student', compositeAttemptId: null, OR: expect.arrayContaining([{ assignmentId: 'task' }]) }) })
+    expect(db.cognitiveSession.count).toHaveBeenCalledWith({ where: expect.objectContaining({ userId: 'student', compositeAttemptId: null, assignmentId: 'copy' }) })
     expect(db.cognitiveSession.findFirst.mock.calls[0][0].where.compositeAttemptId).toBeNull()
     await expect(admitCognitiveAttempt(tx, 'student', 'copy')).rejects.toMatchObject({ statusCode: 409 })
     expect(db.cognitiveSession.count.mock.calls.at(-1)![0].where.compositeAttemptId).toBeNull()
@@ -40,15 +51,15 @@ describe('Training participation quotas belong to the delivery task', () => {
     db.cognitiveSession.count.mockImplementation(async ({ where }) => where.compositeAttemptId === null ? 0 : 1)
     expect(await readCognitiveQuota(tx, 'student', 'copy')).toMatchObject({ usedAttempts: 0, remainingAttempts: 1 })
     await expect(admitCognitiveAttempt(tx, 'student', 'copy')).resolves.toBeUndefined()
-    expect(db.$queryRawUnsafe).toHaveBeenCalledWith(expect.any(String), 'cognitive-quota:task:student')
+    expect(db.$queryRawUnsafe).toHaveBeenCalledWith(expect.any(String), 'cognitive-quota:copy:student')
   })
-  it('does not apply Training isolation to a non-Training delivery with a Training source', async () => {
+  it('isolates standalone participation even outside a Training course', async () => {
     db.cognitiveAssignment.findUnique.mockImplementation(async ({ where }) => where.id === 'task'
       ? root : { ...root, id: 'copy', courseId: 'other-course', quotaSourceAssignmentId: 'task' })
     db.course.findUnique.mockImplementation(async ({ where }) => where.id === 'course' ? course : { courseType: 'LEGACY_COURSE', isLibrary: false })
     await readCognitiveQuota(tx, 'student', 'copy')
     await admitCognitiveAttempt(tx, 'student', 'copy')
-    expect(db.cognitiveSession.count.mock.calls.every(([args]) => !('compositeAttemptId' in args.where))).toBe(true)
+    expect(db.cognitiveSession.count.mock.calls.every(([args]) => args.where.compositeAttemptId === null && args.where.assignmentId === 'copy')).toBe(true)
   })
   it('does not consume a standalone task allowance when entering a legitimate bundle slot', async () => {
     db.cognitiveSession.count.mockImplementation(async ({ where }) => where.compositeAttemptId === 'parent' ? 0 : 99)
@@ -82,15 +93,22 @@ describe('Training participation quotas belong to the delivery task', () => {
     await expect(admitCognitiveAttempt(tx, 'student', change === 'source' ? 'other-config-task' : 'task', scope)).rejects.toMatchObject({ statusCode: 409 })
     expect(db.cognitiveSession.count).not.toHaveBeenCalled()
   })
-  it('preserves shared source quota for an ordinary legacy composite in a Training course', async () => {
-    parent.compositeAssessment = { ...composite, trainingFlowFrozen: null } as any
-    db.cognitiveSession.count.mockResolvedValue(1)
-    await expect(admitCognitiveAttempt(tx, 'student', 'task', scope)).rejects.toMatchObject({ statusCode: 409 })
-    expect(db.cognitiveSession.count.mock.calls[0][0].where).not.toHaveProperty('compositeAttemptId')
+  it.each(['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE', 'LEGACY_COMPOSITE'])('isolates an ordinary %s from already-used standalone source quota', async productKind => {
+    parent.compositeAssessment = { ...composite, productKind, trainingFlowFrozen: null } as any
+    db.cognitiveSession.count.mockImplementation(async ({where}) => where.compositeAttemptId === 'parent' ? 0 : 99)
+    await expect(admitCognitiveAttempt(tx, 'student', 'task', scope)).resolves.toBeUndefined()
+    expect(db.cognitiveSession.count).toHaveBeenCalledExactlyOnceWith({where:{userId:'student',compositeAttemptId:'parent',compositeItemId:'slot'}})
   })
-  it('keeps legacy and non-Training quota behavior unchanged', async () => {
+  it('isolates standalone source tasks from composite children in every course', async () => {
     db.course.findUnique.mockResolvedValue({ courseType: 'LEGACY_COURSE', isLibrary: false })
     await readCognitiveQuota(tx, 'student', 'task')
-    expect(db.cognitiveSession.count.mock.calls[0][0].where).not.toHaveProperty('compositeAttemptId')
+    expect(db.cognitiveSession.count.mock.calls[0][0].where).toMatchObject({assignmentId:'task',compositeAttemptId:null})
   })
+})
+
+it('separate published standalone assignments never spend one another’s allowance', async () => {
+  db.cognitiveSession.count.mockImplementation(async ({where}) => where.assignmentId === 'task' ? 1 : 0)
+  await expect(admitCognitiveAttempt(tx,'student','task')).rejects.toMatchObject({statusCode:409})
+  await expect(admitCognitiveAttempt(tx,'student','copy')).resolves.toBeUndefined()
+  expect(await readCognitiveQuota(tx,'student','copy')).toMatchObject({usedAttempts:0,remainingAttempts:1})
 })

@@ -381,7 +381,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
   // **不重新检查资格**（opensAt/dueAt/membership/archive 状态不影响"继续"已有 session，
   // 与 D5 "Trial 写入不重查资格" 的冻结思想一致）。
   const existing = await prisma.cognitiveSession.findFirst({
-    where: { assignmentId, participantKey, status: 'IN_PROGRESS' },
+    where: { assignmentId, participantKey, compositeAttemptId: null, status: 'IN_PROGRESS' },
     include: { assignment: { select: { resolvedReportSnapshotEncrypted: true } }, compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, trainingPersistenceSnapshot: true, trainingPersistenceSnapshotHash: true, deliveryCourseId: true, attemptEpoch: true, contextSnapshotHash: true } } },
   })
   if (existing) {
@@ -417,12 +417,12 @@ export const createSession = async (userId: string, assignmentId: string) => {
       const source = await cognitiveQuotaSource(tx, assignmentId)
       await lockCognitiveQuota(tx, userId, source.id)
       const resumed = await tx.cognitiveSession.findFirst({
-        where: { assignmentId, participantKey, status: 'IN_PROGRESS' },
+        where: { assignmentId, participantKey, compositeAttemptId: null, status: 'IN_PROGRESS' },
         include: { assignment: { select: { resolvedReportSnapshotEncrypted: true } }, compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, trainingPersistenceSnapshot: true, trainingPersistenceSnapshotHash: true, deliveryCourseId: true, attemptEpoch: true, contextSnapshotHash: true } } },
       })
       if (resumed) return resumed
       await admitCognitiveAttempt(tx, userId, assignmentId)
-      const last = await tx.cognitiveSession.findFirst({ where: { assignmentId, participantKey }, orderBy: { attemptNo: 'desc' }, select: { attemptNo: true } })
+      const last = await tx.cognitiveSession.findFirst({ where: { assignmentId, participantKey, compositeAttemptId: null }, orderBy: { attemptNo: 'desc' }, select: { attemptNo: true } })
       return tx.cognitiveSession.create({
       data: {
         userId,
@@ -449,7 +449,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
     if (isPrismaUniqueViolation(err)) {
       // @@unique([assignmentId, participantKey, attemptNo]) 并发冲突 → 重读当前 session（不引 Redis lock）。
       const current = await prisma.cognitiveSession.findFirst({
-        where: { assignmentId, participantKey, status: 'IN_PROGRESS' },
+        where: { assignmentId, participantKey, compositeAttemptId: null, status: 'IN_PROGRESS' },
         include: { assignment: { select: { resolvedReportSnapshotEncrypted: true } }, compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, trainingPersistenceSnapshot: true, trainingPersistenceSnapshotHash: true, deliveryCourseId: true, attemptEpoch: true, contextSnapshotHash: true } } },
       })
       if (current) return await toRunnerPayload(current)

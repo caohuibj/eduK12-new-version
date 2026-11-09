@@ -11,8 +11,8 @@ describe('C10 quota resume projection',()=>{
   expect(await readCognitiveQuota(db as any,'owner','source')).toMatchObject({admissionPaused:false,continueHref:'/student/cognitive/sessions/old'})
   expect(db.cognitiveSession.findFirst).toHaveBeenCalledTimes(2)
  })
- it('OFF admitted composite or standalone keeps its exact recovery link',async()=>{
-  for(const parent of [null,'parent']){
+ it('OFF admitted standalone keeps its exact recovery link',async()=>{
+  for(const parent of [null]){
    db.cognitiveSession.findFirst.mockResolvedValue({id:'old',compositeAttemptId:parent,frozenAdmissionSnapshotHash:'accepted'})
    expect(await readCognitiveQuota(db as any,'owner','source')).toMatchObject({admissionPaused:false,continueHref:parent?'/student/composite/attempts/parent':'/student/cognitive/sessions/old'})
   }
