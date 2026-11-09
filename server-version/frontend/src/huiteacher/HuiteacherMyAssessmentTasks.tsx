@@ -66,8 +66,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
   try{await work(valid)}catch(reason){if(valid())setError(reason instanceof Error?reason.message:'测评暂不可读取，请重试')}
   finally{if(valid())setBusy(false)}
  }
- const load=async(task:TeacherAssessmentTask,attemptId:string,valid:()=>boolean)=>{
-  const state=await api<CompositeAttemptState>(teacherAssessmentParentPath(attemptId)+'?view=current-unit')
+ const accept=(task:TeacherAssessmentTask,attemptId:string,state:CompositeAttemptState,valid:()=>boolean)=>{
   if(!valid())return
   if(state.id!==attemptId||state.deliveryMode!=='FINAL_ONLY')throw new Error('测评记录与当前冻结任务不一致')
   if(state.status==='COMPLETED'){
@@ -81,6 +80,10 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
    if(state.status!=='IN_PROGRESS')throw new Error('当前测评已结束，不能继续作答')
    setSession({task,attempt:state,child:null,completion:null})
   }
+ }
+ const load=async(task:TeacherAssessmentTask,attemptId:string,valid:()=>boolean)=>{
+  const state=await api<CompositeAttemptState>(teacherAssessmentParentPath(attemptId)+'?view=current-unit')
+  accept(task,attemptId,state,valid)
  }
  const open=(task:TeacherAssessmentTask)=>{
   if(active.current||busy)return
@@ -99,8 +102,8 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
     await api('/run-executions/'+encodeURIComponent(task.executionId)+'/assessment-consent/accept','POST',{})
     if(!valid())return
    }
-   const result=await api<{state:string;runtimeBindingKind?:string;runtimeBindingRef?:string}>(
-    '/run-executions/'+encodeURIComponent(task.executionId)+'/start-assessment','POST',{})
+   const result=await api<{state:string;runtimeBindingKind?:string;runtimeBindingRef?:string;currentUnit?:CompositeAttemptState}>(
+    '/run-executions/'+encodeURIComponent(task.executionId)+'/start-assessment','POST',{delivery:'inline'})
    if(!valid())return
    if(result.state==='IN_PROGRESS')throw new Error('测评正在建立，请稍后重新核对同一任务')
    if(result.state!=='STARTED'||result.runtimeBindingKind!=='COMPOSITE'||!result.runtimeBindingRef)throw new Error('当前任务尚无获授权的正式运行记录')
@@ -112,7 +115,12 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
    setRows(old=>old.map(row=>row.executionId===task.executionId?{...row,status:'STARTED',runtimeBindingRef:result.runtimeBindingRef!}:row))
    const startedSession={...source,task:startedTask}
    active.current=startedSession;setSession(startedSession)
-   await load(startedTask,result.runtimeBindingRef,valid)
+   const inline=result.currentUnit
+   if(inline&&inline.id===result.runtimeBindingRef&&inline.deliveryMode==='FINAL_ONLY'){
+    accept(startedTask,result.runtimeBindingRef,inline,valid)
+   }else{
+    await load(startedTask,result.runtimeBindingRef,valid)
+   }
   })
  }
  const reload=async()=>{

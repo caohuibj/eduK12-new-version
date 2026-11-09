@@ -45,6 +45,7 @@ import {
 } from '../../services/questionnaireCompletionAdmission'
 import { isUnitSubmitAdmissionBusyError } from '../../services/unitSubmitAdmission'
 import { startResponseWithInlineWholeDefinition } from './whole-start-inline'
+import { attachInlineCurrentUnit, requestedInlineCurrentUnit } from './current-unit-start-inline'
 import { isWholeSubmitAdmissionBusyError } from '../../services/wholeSubmitAdmission'
 import {
   loadEmbeddedSituationalAttemptRuntime,
@@ -422,7 +423,12 @@ export const compositeController = {
       const data = await service.startUserAttempt(req.user.userId, req.params.id)
       const wantsWhole = req.query.delivery === 'whole' || (req.body as { delivery?: unknown } | undefined)?.delivery === 'whole'
       const payload = await startResponseWithInlineWholeDefinition(wantsWhole, data, { userId: req.user.userId })
-      return success(res, payload, '综合测评已开始')
+      return success(res, await attachInlineCurrentUnit({
+        requested: requestedInlineCurrentUnit(req),
+        started: payload,
+        attemptId: payload.attempt?.id,
+        actorUserId: req.user.userId,
+      }), '综合测评已开始')
     } catch (err) { return handleError(res, err) }
   },
 

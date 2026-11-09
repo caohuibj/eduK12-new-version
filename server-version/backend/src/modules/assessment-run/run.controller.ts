@@ -14,6 +14,7 @@ import { error, instrumentError, success, unauthorized } from '../../utils/respo
 import { addAssessmentRunTrackDraft, createAssessmentRunDraft, type AssessmentRunStatus } from './repository'
 import { previewAssessmentRun, publishAssessmentRun } from './publish'
 import { startAssessmentRunExecution } from './startExecution'
+import { attachInlineCurrentUnit, requestedInlineCurrentUnit } from '../composite/current-unit-start-inline'
 import { readAssessmentRunProgress } from './progress'
 import { cancelAssessmentRun, closeAssessmentRun } from './lifecycle'
 import {
@@ -284,59 +285,17 @@ export const assessmentRunController = {
         executionId: req.params.executionId,
         actorUserId: req.user.userId,
       })
-      const requestedDelivery = req.query.view === 'current-unit'
-        || req.query.delivery === 'inline'
-        || req.body?.delivery === 'inline'
-        || req.body?.view === 'current-unit'
-      if (
-        requestedDelivery
-        && started.state === 'STARTED'
-        && started.runtimeBindingKind === 'COMPOSITE'
-        && started.runtimeBindingRef
-      ) {
-        const startMs = Date.now()
-        try {
-          if (req.user.accountDomain === 'SCHOOL') {
-            const { checkCampusCompositeAccessAuthority } = await import('../campus/campus-composite-authority')
-            const allowed = await checkCampusCompositeAccessAuthority({
-              attemptId: started.runtimeBindingRef,
-              userId: req.user.userId,
-            })
-            if (!allowed) {
-              const { logger } = await import('../../utils/logger')
-              logger.info('assessment-run inline delivery', { phase: 'inline_delivery', outcome: 'fallback', reason: 'CAMPUS_AUTHORITY_DENIED' })
-              return success(res, started)
-            }
-          }
-          const { getAttemptState } = await import('../composite/composite.service')
-          const currentUnit = await getAttemptState(
-            started.runtimeBindingRef,
-            { userId: req.user.userId },
-            undefined,
-            'current-unit',
-          )
-          const wallTimeMs = Date.now() - startMs
-          const { logger } = await import('../../utils/logger')
-          logger.info('assessment-run inline delivery', { phase: 'inline_delivery', outcome: 'success', wallTimeMs })
-          return success(res, { ...started, currentUnit })
-        } catch (projectionErr: any) {
-          // Failure outside the committed transaction falls back to plain started result.
-          const wallTimeMs = Date.now() - startMs
-          const { logger } = await import('../../utils/logger')
-          const reason = projectionErr?.status === 403 || projectionErr?.code === 'FORBIDDEN'
-            ? 'ACCESS_FORBIDDEN'
-            : projectionErr?.status === 404
-            ? 'ATTEMPT_NOT_FOUND'
-            : projectionErr?.status === 409
-            ? 'STATE_CONFLICT'
-            : projectionErr?.code === 'ETIMEDOUT'
-            ? 'NETWORK_TIMEOUT'
-            : 'PROJECTION_ERROR'
-          logger.warn('assessment-run inline delivery', { phase: 'inline_delivery', outcome: 'fallback', reason, wallTimeMs })
-          return success(res, started)
-        }
-      }
-      return success(res, started)
+      const attemptId = started.state === 'STARTED' && started.runtimeBindingKind === 'COMPOSITE'
+        ? started.runtimeBindingRef
+        : undefined
+      return success(res, await attachInlineCurrentUnit({
+        requested: requestedInlineCurrentUnit(req),
+        started,
+        attemptId,
+        actorUserId: req.user.userId,
+        accountDomain: req.user.accountDomain,
+        campusAuthority: true,
+      }))
     } catch (err) { return fail(res, err) }
   },
 

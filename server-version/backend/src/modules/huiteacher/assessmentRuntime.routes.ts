@@ -16,6 +16,7 @@ import {acceptRunExecutionConsent} from '../assessment-run/consent'
 import {relationalRuntimeConsentAuthority} from '../assessment-relational/runtime-consent'
 import {compositeController} from '../composite/composite.controller'
 import {getAttemptState} from '../composite/composite.service'
+import {attachInlineCurrentUnit,requestedInlineCurrentUnit} from '../composite/current-unit-start-inline'
 import {compositeImageController} from '../composite/composite-image.controller'
 import {compositeVideoController} from '../composite/composite-video.controller'
 import {getSession} from '../cognitive/session.service'
@@ -131,17 +132,26 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   const executionId=uuid.parse(req.params.executionId),proof=await access.own(req.user!.userId,{executionId})
   // Resume the exact durable binding without re-running new-intake admission.
   // All current product/source/actor/consent checks still run on subsequent reads.
+  let started
   if(proof.task.runtimeBindingRef){
    await relationalRuntimeConsentAuthority.assertCompositeFinal(proof.task.runtimeBindingRef,req.user!.userId)
-   return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:proof.task.runtimeBindingRef,replayed:true}
+   started={state:'STARTED' as const,runtimeBindingKind:'COMPOSITE' as const,runtimeBindingRef:proof.task.runtimeBindingRef,replayed:true}
+  }else{
+   started=await startAssessmentRunExecution({executionId,actorUserId:req.user!.userId})
+   if(started.state==='STARTED'){
+    if(started.runtimeBindingKind!=='COMPOSITE')throw new TeacherAssessmentRuntimeError()
+    // Re-read the actual persisted Run binding, not just the adapter response.
+    await access.own(req.user!.userId,{executionId,attemptId:started.runtimeBindingRef})
+   }
   }
-  const result=await startAssessmentRunExecution({executionId,actorUserId:req.user!.userId})
-  if(result.state==='STARTED'){
-   if(result.runtimeBindingKind!=='COMPOSITE')throw new TeacherAssessmentRuntimeError()
-   // Re-read the actual persisted Run binding, not just the adapter response.
-   await access.own(req.user!.userId,{executionId,attemptId:result.runtimeBindingRef})
-  }
-  return result
+  const attemptId=started.state==='STARTED'&&started.runtimeBindingKind==='COMPOSITE'
+   ?started.runtimeBindingRef:undefined
+  return attachInlineCurrentUnit({
+   requested:requestedInlineCurrentUnit(req),
+   started,
+   attemptId,
+   actorUserId:req.user!.userId,
+  })
  }))
  const parent='/assessment-composite-attempts/:attemptId'
  router.get(parent,attemptAccess,wrapped(async req=>projectTeacherCompositeRuntime(
