@@ -3595,14 +3595,19 @@ const createAttempt = async (
         definitionHash: formSectionIdentityHash(compositeFormSectionRuntimeDefinition(section)),
       })),
     })
+    const encryptedSlotSet = await storeFrozenActiveSlotSet(frozenActiveSlotSet, db)
     await db.compositeAssessmentAttempt.update({
       where: { id: attempt.id },
       data: {
         ...(flowCandidate ? (()=>{const snapshot={...flowCandidate.snapshot,...(materialAssignment?{schemaVersion:2,materialAssignment}:{}),slotSetHash:frozenActiveSlotSet.snapshotHash};return {trainingFlowSnapshotEncrypted:encryptUnifiedRuntimePayload(snapshot),trainingFlowSnapshotHash:canonicalHash(snapshot)}})():{}),
-        frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet, db),
+        frozenActiveSlotSetEncrypted: encryptedSlotSet,
         frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
       },
     })
+    attempt.frozenActiveSlotSetEncrypted = encryptedSlotSet
+    attempt.frozenActiveSlotSetHash = frozenActiveSlotSet.snapshotHash
+    ;(attempt as any).precomputedSlotSet = frozenActiveSlotSet
+    ;(attempt as any).isFreshAttempt = true
   }
   if(materialAssignment){
     await ensureTrainingFlowCurrentChildInTransaction(db as Prisma.TransactionClient,attempt.id,userId?{userId}:{recoveryTokenHash:credential!.hash})
