@@ -411,7 +411,7 @@ const finishCompositeReportJobAtomic = async (claimed: CompositeReportJob, outco
 }
 
 /** Lease/CAS fence covers publication AND exactly-once permit release. */
-export const finishCompositeReportJob = async (claimed: CompositeReportJob, outcome: ReportJobOutcome): Promise<boolean> => process.env.ASSESSMENT_REPORT_ATOMIC_FINISH_ENABLED === 'true'
+export const finishCompositeReportJob = async (claimed: CompositeReportJob, outcome: ReportJobOutcome): Promise<boolean> => process.env.ASSESSMENT_REPORT_ATOMIC_FINISH_ENABLED !== 'false'
   ? finishCompositeReportJobAtomic(claimed, outcome)
   : (
   prisma.$transaction(async tx => {

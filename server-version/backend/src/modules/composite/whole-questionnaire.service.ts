@@ -492,7 +492,7 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
     },envelope.timingSnapshotHash)).hash !== receipt.wholePayloadHash) throw failure('整份答案封存内容无法验证')
   execution.studyReceipt=await acceptedStudyReceipt(job,envelope)
   const principal = envelope.units[0]?.userId ? { userId: envelope.units[0].userId } : { recoveryTokenHash: envelope.units[0]?.recoveryTokenHash }
-  const reuseCommitted = process.env.ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED === 'true'
+  const reuseCommitted = process.env.ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED !== 'false'
   const { parent, children, frozen, reportParent } = await traceAssessmentPhase('report.frozen_context_load', async () => {
     const reportParent = reuseCommitted ? await prisma.compositeAssessmentAttempt.findUnique({
       where: { id: job.attemptId }, select: wholeReportParentSelect,

@@ -30,7 +30,7 @@ export const encryptCompositeCollectionReport = (report: Record<string, any>, bi
   if (Buffer.byteLength(serialized) > assessmentReportConfig().maxReportBytes) {
     throw new Error('REPORT_PAYLOAD_LIMIT')
   }
-  if (process.env.ASSESSMENT_REPORT_COMPRESSION_ENABLED === 'true' && Buffer.byteLength(serialized) >= 4096) {
+  if (process.env.ASSESSMENT_REPORT_COMPRESSION_ENABLED !== 'false' && Buffer.byteLength(serialized) >= 4096) {
     const packed: CompressedEnvelope = {
       schemaVersion: 2, codec: 'gzip-json-v1', plainBytes: Buffer.byteLength(serialized),
       plainSha256: createHash('sha256').update(serialized).digest('hex'),

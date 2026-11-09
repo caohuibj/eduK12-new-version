@@ -802,100 +802,107 @@ export const batchEnsureScaleAdmissionsAtDelivery = async (
 
   if (unstored.length === 0) return result
 
-  const batchPersisted = await withSerializableScaleTransaction(prisma, async (tx) => {
-    const txResult = new Map<string, VersionedFrozenUnitAdmission>()
-    const unstoredIds = unstored.map(u => u.child.id)
-    await tx.$queryRaw`
-      SELECT "id" FROM "assessments"
-      WHERE "id" IN (${Prisma.join(unstoredIds)})
-      ORDER BY "id" FOR UPDATE
-    `
+  const batchPersisted = await prisma.$transaction(
+    async (tx) => {
+      const txResult = new Map<string, VersionedFrozenUnitAdmission>()
+      const unstoredIds = unstored.map(u => u.child.id)
+      await tx.$queryRaw`
+        SELECT "id" FROM "assessments"
+        WHERE "id" IN (${Prisma.join(unstoredIds)})
+        ORDER BY "id" FOR UPDATE
+      `
 
-    const currentRows = await tx.assessment.findMany({
-      where: { id: { in: unstoredIds } },
-      select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
-    })
-    const currentById = new Map(currentRows.map(row => [row.id, row]))
-
-    const legacyRequiresContext = hasContextSection(parent.compositeAssessment.formSections)
-    const context = readCompositeAttemptContext(parent)
-    if (context.decryptError) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文无法读取，请联系管理员', 500)
-
-    for (const item of unstored) {
-      const current = currentById.get(item.child.id)
-      if (!current || current.attemptEpoch !== parent.attemptEpoch) {
-        throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评轮次已改变', 409)
-      }
-      assertFinalOnly(current.deliveryMode)
-
-      const winner = await loadStoredScaleAdmission(current, tx)
-      if (winner) {
-        txResult.set(current.id, await validateStoredAgainstRuntime(current, winner, referenceTimeMs, tx))
-        continue
-      }
-
-      if (!current.compositeItemId) {
-        throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
-      }
-
-      const slotKey = compositeItemSlotKey(current.compositeItemId, 'SCALE')
-      const compiledRuntimeHash = compiledRuntimeHashFrom(item.slot, current.compiledRuntimeHash)
-      if (compiledRuntimeHash !== item.runtime.compiledRuntime.compiledRuntimeHash) {
-        throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结单元运行时哈希不匹配', 409)
-      }
-
-      const bundleContext = await loadBundleScaleStartContext(
-        tx,
-        parent,
-        current.compositeItemId,
-        current.scale.code,
-        current.scale.instrumentVersion,
-        context.context?.values ?? null,
-      )
-
-      const recoveryTokenHash = await stableStudyAdmissionHash(
-        tx,
-        parent.id,
-        parent.recoveryTokenHash,
-        current.userId ?? parent.userId,
-      )
-
-      const snapshot = await createScaleAdmissionForRuntime({
-        db: tx,
-        attemptEpoch: current.attemptEpoch,
-        scale: current.scale,
-        principal: {
-          userId: current.userId ?? parent.userId,
-          questionnaireSessionId: null,
-          recoveryTokenHash,
-        },
-        parent: {
-          kind: 'composite',
-          parentId: parent.id,
-          slotKey,
-          sourceDefinitionHash: item.slot.sourceDefinitionIdentity.hash,
-          compiledRuntimeHash,
-        },
-        runtime: item.runtime,
-        requestedMode: 'COMPOSITE',
-        ...(bundleContext ? { bundleContext } : {}),
-        ...(parent.trainingTimingSnapshot ? { trainingTiming: readTrainingTimingSnapshot(parent.trainingTimingSnapshot)! } : {}),
-        contextSnapshotHash: parent.contextSnapshotHash,
-        contextValues: context.context?.values ?? null,
-        contextFrozenAt: context.context?.frozenAt ?? null,
-        contextSubjectUserId: context.context?.subjectUserId ?? null,
-        respondentType: current.respondentType,
-        subjectUserId: current.subjectUserId,
-        respondentUserId: current.respondentUserId,
-        legacyRequiresContext,
+      const currentRows = await tx.assessment.findMany({
+        where: { id: { in: unstoredIds } },
+        select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
       })
+      const currentById = new Map(currentRows.map(row => [row.id, row]))
 
-      const persisted = await persistAdmission(tx, current.id, assertReady(snapshot))
-      txResult.set(current.id, persisted)
-    }
+      const legacyRequiresContext = hasContextSection(parent.compositeAssessment.formSections)
+      const context = readCompositeAttemptContext(parent)
+      if (context.decryptError) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文无法读取，请联系管理员', 500)
 
-    return txResult
-  })
+      for (const item of unstored) {
+        const current = currentById.get(item.child.id)
+        if (!current || current.attemptEpoch !== parent.attemptEpoch) {
+          throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评轮次已改变', 409)
+        }
+        assertFinalOnly(current.deliveryMode)
+
+        const winner = await loadStoredScaleAdmission(current, tx)
+        if (winner) {
+          txResult.set(current.id, await validateStoredAgainstRuntime(current, winner, referenceTimeMs, tx))
+          continue
+        }
+
+        if (!current.compositeItemId) {
+          throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
+        }
+
+        const slotKey = compositeItemSlotKey(current.compositeItemId, 'SCALE')
+        const compiledRuntimeHash = compiledRuntimeHashFrom(item.slot, current.compiledRuntimeHash)
+        if (compiledRuntimeHash !== item.runtime.compiledRuntime.compiledRuntimeHash) {
+          throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结单元运行时哈希不匹配', 409)
+        }
+
+        const bundleContext = await loadBundleScaleStartContext(
+          tx,
+          parent,
+          current.compositeItemId,
+          current.scale.code,
+          current.scale.instrumentVersion,
+          context.context?.values ?? null,
+        )
+
+        const recoveryTokenHash = await stableStudyAdmissionHash(
+          tx,
+          parent.id,
+          parent.recoveryTokenHash,
+          current.userId ?? parent.userId,
+        )
+
+        const snapshot = await createScaleAdmissionForRuntime({
+          db: tx,
+          attemptEpoch: current.attemptEpoch,
+          scale: current.scale,
+          principal: {
+            userId: current.userId ?? parent.userId,
+            questionnaireSessionId: null,
+            recoveryTokenHash,
+          },
+          parent: {
+            kind: 'composite',
+            parentId: parent.id,
+            slotKey,
+            sourceDefinitionHash: item.slot.sourceDefinitionIdentity.hash,
+            compiledRuntimeHash,
+          },
+          runtime: item.runtime,
+          requestedMode: 'COMPOSITE',
+          ...(bundleContext ? { bundleContext } : {}),
+          ...(parent.trainingTimingSnapshot ? { trainingTiming: readTrainingTimingSnapshot(parent.trainingTimingSnapshot)! } : {}),
+          contextSnapshotHash: parent.contextSnapshotHash,
+          contextValues: context.context?.values ?? null,
+          contextFrozenAt: context.context?.frozenAt ?? null,
+          contextSubjectUserId: context.context?.subjectUserId ?? null,
+          respondentType: current.respondentType,
+          subjectUserId: current.subjectUserId,
+          respondentUserId: current.respondentUserId,
+          legacyRequiresContext,
+        })
+
+        const persisted = await persistAdmission(tx, current.id, assertReady(snapshot))
+        txResult.set(current.id, persisted)
+      }
+
+      return txResult
+    },
+    {
+      isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+      maxWait: 10_000,
+      timeout: 30_000,
+    },
+  )
 
   for (const [id, admission] of batchPersisted) {
     result.set(id, admission)
