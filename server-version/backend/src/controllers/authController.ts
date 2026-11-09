@@ -16,7 +16,7 @@ import { inactiveAccountMessage } from '../utils/accountStatus'
 import { z } from 'zod'
 import { setSessionCookie, clearSessionCookie, getSessionToken } from '../utils/authCookies'
 import { revokeCurrentSession } from '../utils/sessionRevocation'
-import { clearLoginFailures, recordLoginFailure, withLoginPasswordVerification } from '../middleware/loginRateLimit'
+import { clearLoginFailures, recordLoginFailure, withLoginPasswordVerification, withLoginAccountLookup } from '../middleware/loginRateLimit'
 import { isBoundedAdmissionBusyError } from '../services/boundedAdmissionGate'
 import { CourseNotJoinableError, courseJoinabilityMessage, isCourseJoinable } from '../utils/courseEnrollment'
 
@@ -72,15 +72,19 @@ export const authController = {
 
       const { username, password, expectedRole, adminAuthMethod } = result.data
       req.body = result.data
-      const user = await withLoginPasswordVerification(async () => {
-        const current = await prisma.user.findUnique({ where: { username } })
-        const usable = current && current.isActive && !current.isFrozen
-          && (!current.expiresAt || current.expiresAt > new Date())
-          && (current.role !== UserRole.TEACHER || current.teacherApproved)
-        const matches = await comparePassword(password, usable ? current.passwordHash : LOGIN_DUMMY_HASH)
-        // Recheck expiry after queued hashing; dummy success must stay a failure.
-        return usable && matches && (!current.expiresAt || current.expiresAt > new Date()) ? current : null
-      })
+      const current = await withLoginAccountLookup(() =>
+        prisma.user.findUnique({ where: { username } })
+      )
+      const usable = Boolean(
+        current && current.isActive && !current.isFrozen
+        && (!current.expiresAt || current.expiresAt > new Date())
+        && (current.role !== UserRole.TEACHER || current.teacherApproved)
+      )
+      const matches = await withLoginPasswordVerification(() =>
+        comparePassword(password, usable ? current!.passwordHash : LOGIN_DUMMY_HASH)
+      )
+      // Recheck expiry after queued hashing; dummy success must stay a failure.
+      const user = usable && matches && (!current!.expiresAt || current!.expiresAt > new Date()) ? current : null
       if (!user || !['LEGACY','TRAINING'].includes(user.accountDomain)) return failedLogin()
       const currentPrincipal = await loadCurrentPrincipal(user.id)
       if (!currentPrincipal) return failedLogin()
