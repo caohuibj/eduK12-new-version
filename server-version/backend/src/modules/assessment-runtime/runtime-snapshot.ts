@@ -517,16 +517,39 @@ export const parseVersionedFrozenScaleRuntimeSnapshot = (value: unknown): Versio
   throw new Error(`Unsupported Frozen Scale runtime snapshot schemaVersion: ${String(schemaVersion)}`)
 }
 
-export const encryptFrozenScaleRuntimeSnapshot = (snapshot: VersionedFrozenScaleRuntimeSnapshot): string => (
-  encryptUnifiedRuntimePayload(snapshot)
-)
+const decryptedScaleSnapshotCache = new Map<string, VersionedFrozenScaleRuntimeSnapshot>()
+const MAX_DECRYPTED_SCALE_CACHE_SIZE = 512
+
+export const clearDecryptedScaleSnapshotCacheForTest = () => {
+  decryptedScaleSnapshotCache.clear()
+}
+
+export const encryptFrozenScaleRuntimeSnapshot = (snapshot: VersionedFrozenScaleRuntimeSnapshot): string => {
+  const encrypted = encryptUnifiedRuntimePayload(snapshot)
+  if (decryptedScaleSnapshotCache.size >= MAX_DECRYPTED_SCALE_CACHE_SIZE) {
+    const oldest = decryptedScaleSnapshotCache.keys().next().value
+    if (oldest) decryptedScaleSnapshotCache.delete(oldest)
+  }
+  decryptedScaleSnapshotCache.set(encrypted, snapshot)
+  return encrypted
+}
 
 export const decryptFrozenScaleRuntimeSnapshot = (encrypted: string): VersionedFrozenScaleRuntimeSnapshot => {
+  const cached = decryptedScaleSnapshotCache.get(encrypted)
+  if (cached) return cached
   const value = decryptUnifiedRuntimePayload<unknown>(encrypted)
+  let snapshot: VersionedFrozenScaleRuntimeSnapshot
   if (isPublishedSharedScaleRuntimeReference(value)) {
-    return reconstructPublishedSharedScaleRuntimeSync(value)
+    snapshot = reconstructPublishedSharedScaleRuntimeSync(value)
+  } else {
+    snapshot = parseVersionedFrozenScaleRuntimeSnapshot(value)
   }
-  return parseVersionedFrozenScaleRuntimeSnapshot(value)
+  if (decryptedScaleSnapshotCache.size >= MAX_DECRYPTED_SCALE_CACHE_SIZE) {
+    const oldest = decryptedScaleSnapshotCache.keys().next().value
+    if (oldest) decryptedScaleSnapshotCache.delete(oldest)
+  }
+  decryptedScaleSnapshotCache.set(encrypted, snapshot)
+  return snapshot
 }
 
 /** New writes are opt-in; compatible reads remain unconditional for rollback. */
@@ -546,9 +569,25 @@ export class FrozenRuntimeStorageUnavailableError extends Error {
   }
 }
 export const loadFrozenScaleRuntimeSnapshot = async (encrypted: string, db?: import('./shared-scale-runtime').SharedScaleArtifactDb): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
+  const cached = decryptedScaleSnapshotCache.get(encrypted)
+  if (cached) return cached
   const value = decryptUnifiedRuntimePayload<unknown>(encrypted)
   const shared = await import('./shared-scale-runtime')
-  if (!shared.isSharedScaleRuntimeReference(value)) return parseVersionedFrozenScaleRuntimeSnapshot(value)
-  try { return await shared.sharedScaleRuntimeStore.load(value, db ? shared.sharedScaleArtifactRepositoryForDatabase(db) : undefined) }
-  catch (cause) { throw new FrozenRuntimeStorageUnavailableError(cause) }
+  let snapshot: VersionedFrozenScaleRuntimeSnapshot
+  if (!shared.isSharedScaleRuntimeReference(value)) {
+    snapshot = parseVersionedFrozenScaleRuntimeSnapshot(value)
+  } else {
+    try {
+      snapshot = await shared.sharedScaleRuntimeStore.load(value, db ? shared.sharedScaleArtifactRepositoryForDatabase(db) : undefined)
+    } catch (cause) {
+      throw new FrozenRuntimeStorageUnavailableError(cause)
+    }
+  }
+  if (decryptedScaleSnapshotCache.size >= MAX_DECRYPTED_SCALE_CACHE_SIZE) {
+    const oldest = decryptedScaleSnapshotCache.keys().next().value
+    if (oldest) decryptedScaleSnapshotCache.delete(oldest)
+  }
+  decryptedScaleSnapshotCache.set(encrypted, snapshot)
+  return snapshot
 }
+

@@ -31,7 +31,7 @@ export interface WholeQuestionnaireApi {
   submitWhole: (id: string, input: WholeQuestionnaireInput) => Promise<ApiResponse<WholeQuestionnaireReceipt>>
   reportStatus: (id: string) => Promise<ApiResponse<CompositeReportStatus>>
 }
-type Props = { state: CompositeAttemptState; api: WholeQuestionnaireApi; publicMode?: boolean; recoveryToken?: string; isFreshStart?: boolean; fallback: ReactNode; onExit: () => void; onCompleted: () => void }
+type Props = { state: CompositeAttemptState; api: WholeQuestionnaireApi; publicMode?: boolean; recoveryToken?: string; isFreshStart?: boolean; inlineWholeDefinition?: WholeQuestionnaireDefinition | null; fallback: ReactNode; onExit: () => void; onCompleted: () => void }
 type Answer = { responseValue?: string | number; value?: unknown; responseTimeMs?: number; changeCount?: number; otherText?: string }
 export const wholeDraftKey = (id: string, epoch: number) => `composite-whole:${id}:${epoch}`
 export const wholeAnswerKey = (itemId: string, itemCode: string) => JSON.stringify([itemId, itemCode])
@@ -96,7 +96,7 @@ function parseFormOptions(
   return []
 }
 
-function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, recoveryToken, isFreshStart = false, fallback, onExit, onCompleted }: Props) {
+function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, recoveryToken, isFreshStart = false, inlineWholeDefinition, fallback, onExit, onCompleted }: Props) {
   const draftKey = wholeDraftKey(state.id, state.attemptEpoch ?? 1)
   const [definition, setDefinition] = useState<WholeQuestionnaireDefinition | null>(null)
   const [meta, setMeta] = useState<FinalDraftMeta | null>(null)
@@ -203,10 +203,14 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
         }
         if (!existing && state.items.some(item => item.type === 'SCALE' && item.completed)) { setUseFallback(true); return }
         let delivered: ApiResponse<WholeQuestionnaireDefinition>
-        try { delivered = await api.wholeDefinition(state.id) }
-        catch (cause) {
-          if (!existing && normalizeApiError(cause).status === 409) { setUseFallback(true); return }
-          throw cause
+        if (inlineWholeDefinition && inlineWholeDefinition.attemptId === state.id) {
+          delivered = { code: 0, data: inlineWholeDefinition, message: 'OK' }
+        } else {
+          try { delivered = await api.wholeDefinition(state.id) }
+          catch (cause) {
+            if (!existing && normalizeApiError(cause).status === 409) { setUseFallback(true); return }
+            throw cause
+          }
         }
         if (delivered.code !== 0 || !delivered.data) {
           if (!existing && (delivered.code === 409 || delivered.code === 'STALE_ATTEMPT')) { setUseFallback(true); return }

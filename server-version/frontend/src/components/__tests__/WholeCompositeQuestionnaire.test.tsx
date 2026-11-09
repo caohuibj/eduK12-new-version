@@ -363,3 +363,23 @@ it('verifies cross-device / reload entry checks reportStatus and shows accepted 
   expect(client.wholeDefinition).not.toHaveBeenCalled()
   expect(screen.queryByText(/量表 0 题目 0/)).not.toBeInTheDocument()
 })
+
+it('uses inlineWholeDefinition directly when matching attemptId and skips api.wholeDefinition network roundtrip', async () => {
+  const d = definition([1]), client = api()
+  render(
+    <WholeCompositeQuestionnaire
+      state={state}
+      isFreshStart
+      inlineWholeDefinition={d}
+      api={client}
+      publicMode
+      recoveryToken="synthetic-recovery"
+      fallback={<p>fallback</p>}
+      onCompleted={vi.fn()}
+      onExit={vi.fn()}
+    />,
+  )
+  expect(await screen.findByText(/量表 0 题目 0/)).toBeInTheDocument()
+  expect(client.reportStatus).not.toHaveBeenCalled()
+  expect(client.wholeDefinition).not.toHaveBeenCalled()
+})

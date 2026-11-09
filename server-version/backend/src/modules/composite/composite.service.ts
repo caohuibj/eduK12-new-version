@@ -2787,6 +2787,32 @@ const compositeScaleFreezeInput=(item:any)=>{
     : {instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,definition:frozenDatabaseScaleDefinition(item.scale),
         requestedMode:'COMPOSITE' as const,instruction:resolveFrozenScaleInstructionForScale(item.scale)}
 }
+
+type ScaleFreezeMemoEntry = {
+  frozenScale: Awaited<ReturnType<typeof freezeScaleRuntimeAtAttemptStart>>
+  encryptedSnapshot: string
+}
+const scaleFreezeCache = new Map<string, ScaleFreezeMemoEntry>()
+const MAX_SCALE_FREEZE_CACHE = 512
+
+export const clearScaleFreezeCacheForTest = () => {
+  scaleFreezeCache.clear()
+}
+
+const scaleFreezeCacheKey = (item: any): string => {
+  const scale = item.scale
+  const updatedAt = scale?.updatedAt instanceof Date ? scale.updatedAt.toISOString() : (scale?.updatedAt ?? '')
+  return `${item.scaleId}:${scale?.code ?? ''}:${scale?.instrumentVersion ?? ''}:${updatedAt}`
+}
+
+let cachedEmptyScaleAnswersCiphertext: string | null = null
+const getEmptyScaleAnswersCiphertext = (): string => {
+  if (!cachedEmptyScaleAnswersCiphertext) {
+    cachedEmptyScaleAnswersCiphertext = encryptScaleAnswers([])
+  }
+  return cachedEmptyScaleAnswersCiphertext
+}
+
 const createChildRecords = async (db: Db, attempt: any, composite: {productKind:string}, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>, prepared?: PreparedVariantRuntimes, verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization,educationProduct?:'SCHOOL'|'TEACHER',educationAttempt?:VerifiedEducationAttempt) => {
   // Prisma create/findUnique parent rows contain scalar fields only. Product
   // policy comes from the caller's already-loaded server-owned composite.
@@ -2824,9 +2850,29 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
       for (const item of items) {
         if (!item.required) continue
         if (item.type === 'SCALE') {
-          const frozenScale = attempt.runtimeGeneration === 'UNIFIED_V1'
-            ? prepared?.scales.get(item.id) ?? await freezeScaleRuntimeAtAttemptStart(db, compositeScaleFreezeInput(item))
+          const key = scaleFreezeCacheKey(item)
+          const memo = scaleFreezeCache.get(key)
+          let frozenScale = attempt.runtimeGeneration === 'UNIFIED_V1'
+            ? prepared?.scales.get(item.id) ?? memo?.frozenScale ?? null
             : null
+          let encryptedSnapshot = prepared?.references?.get(item.id) ?? memo?.encryptedSnapshot
+
+          if (attempt.runtimeGeneration === 'UNIFIED_V1' && !frozenScale) {
+            frozenScale = await freezeScaleRuntimeAtAttemptStart(db, compositeScaleFreezeInput(item))
+            encryptedSnapshot = await persistFrozenScaleRuntimeSnapshot(frozenScale, db)
+            if (scaleFreezeCache.size >= MAX_SCALE_FREEZE_CACHE) {
+              const oldest = scaleFreezeCache.keys().next().value
+              if (oldest) scaleFreezeCache.delete(oldest)
+            }
+            scaleFreezeCache.set(key, { frozenScale, encryptedSnapshot })
+          } else if (frozenScale && !encryptedSnapshot) {
+            encryptedSnapshot = await persistFrozenScaleRuntimeSnapshot(frozenScale, db)
+            if (scaleFreezeCache.size >= MAX_SCALE_FREEZE_CACHE) {
+              const oldest = scaleFreezeCache.keys().next().value
+              if (oldest) scaleFreezeCache.delete(oldest)
+            }
+            scaleFreezeCache.set(key, { frozenScale, encryptedSnapshot })
+          }
           if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
           // Parent START (createAttempt) already admitted every child Scale in this
           // same transaction under the same locks (parent guard + content binding),
@@ -2855,7 +2901,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
                 deliveryMode: 'FINAL_ONLY',
                 attemptEpoch: attempt.attemptEpoch ?? 1,
                 progress: 0,
-                answers: encryptScaleAnswers([]),
+                answers: getEmptyScaleAnswersCiphertext(),
                 compositeAttemptId: attempt.id,
                 compositeItemId: item.id,
                 subjectUserId: attempt.subjectUserId ?? userId,
@@ -2863,7 +2909,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
                 respondentType: attempt.respondentType ?? 'SELF',
                 ...(frozenScale ? {
                   runtimeGeneration: 'UNIFIED_V1' as const,
-                  runtimeSnapshotEncrypted: prepared?.references?.get(item.id) ?? (await persistFrozenScaleRuntimeSnapshot(frozenScale, db)),
+                  runtimeSnapshotEncrypted: encryptedSnapshot ?? (await persistFrozenScaleRuntimeSnapshot(frozenScale, db)),
                   compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
                 } : {}),
               },
@@ -2878,7 +2924,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
               deliveryMode: 'FINAL_ONLY',
               attemptEpoch: attempt.attemptEpoch ?? 1,
               progress: 0,
-              answers: encryptScaleAnswers([]),
+              answers: getEmptyScaleAnswersCiphertext(),
               compositeAttemptId: attempt.id,
               compositeItemId: item.id,
               subjectUserId: attempt.subjectUserId ?? userId,
@@ -2886,7 +2932,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
               respondentType: attempt.respondentType ?? 'SELF',
               ...(frozenScale ? {
                 runtimeGeneration: 'UNIFIED_V1' as const,
-                runtimeSnapshotEncrypted: prepared?.references?.get(item.id) ?? (await persistFrozenScaleRuntimeSnapshot(frozenScale, db)),
+                runtimeSnapshotEncrypted: encryptedSnapshot ?? (await persistFrozenScaleRuntimeSnapshot(frozenScale, db)),
                 compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
               } : {}),
             },
@@ -3081,8 +3127,27 @@ const precomputeScaleOnlyActiveSlotSet = async (db: Db, input: {
   contentCandidate: any; prepared?: PreparedVariantRuntimes; formSections: any[];
 }) => {
   if (!input.finalOnly || input.flowEnabled
-    || !input.composite.items.some((item: any) => item.required && item.type === 'SCALE')
-    || !input.composite.items.every((item: any) => !item.required || item.type === 'FORM' || (item.type === 'SCALE' && Boolean(input.prepared?.scales.get(item.id) ?? publishedScaleArtifactByItem.get(item))))) {
+    || !input.composite.items.some((item: any) => item.required && item.type === 'SCALE')) {
+    return null
+  }
+  for (const item of input.composite.items) {
+    if (!item.required || item.type !== 'SCALE') continue
+    const key = scaleFreezeCacheKey(item)
+    if (!input.prepared?.scales.get(item.id) && !publishedScaleArtifactByItem.get(item) && !scaleFreezeCache.has(key)) {
+      try {
+        const frozen = await freezeScaleRuntimeAtAttemptStart(db, compositeScaleFreezeInput(item))
+        const encrypted = await persistFrozenScaleRuntimeSnapshot(frozen, db)
+        if (scaleFreezeCache.size >= MAX_SCALE_FREEZE_CACHE) {
+          const oldest = scaleFreezeCache.keys().next().value
+          if (oldest) scaleFreezeCache.delete(oldest)
+        }
+        scaleFreezeCache.set(key, { frozenScale: frozen, encryptedSnapshot: encrypted })
+      } catch {
+        return null
+      }
+    }
+  }
+  if (!input.composite.items.every((item: any) => !item.required || item.type === 'FORM' || (item.type === 'SCALE' && Boolean(input.prepared?.scales.get(item.id) ?? publishedScaleArtifactByItem.get(item) ?? scaleFreezeCache.get(scaleFreezeCacheKey(item))?.frozenScale)))) {
     return null
   }
   const slotSet = freezeCompositeActiveSlotSet({
@@ -3090,7 +3155,7 @@ const precomputeScaleOnlyActiveSlotSet = async (db: Db, input: {
     unitOrder: input.contentCandidate && 'educationUnitOrder' in input.contentCandidate ? input.contentCandidate.educationUnitOrder : undefined,
     unitPresentation: input.contentCandidate && 'educationUnitPresentation' in input.contentCandidate ? input.contentCandidate.educationUnitPresentation : undefined,
     scales: input.composite.items.filter((item: any) => item.required && item.type === 'SCALE').map((item: any) => {
-      const source = (input.prepared?.scales.get(item.id) ?? publishedScaleArtifactByItem.get(item))!
+      const source = (input.prepared?.scales.get(item.id) ?? publishedScaleArtifactByItem.get(item) ?? scaleFreezeCache.get(scaleFreezeCacheKey(item))?.frozenScale)!
       return { compositeItemId: item.id, code: item.scale.code, instrumentVersion: item.scale.instrumentVersion, sourceDefinitionHash: source.sourceDefinitionHash, compiledRuntimeHash: source.compiledRuntime.compiledRuntimeHash }
     }),
     cognitive: [], situational: [],
