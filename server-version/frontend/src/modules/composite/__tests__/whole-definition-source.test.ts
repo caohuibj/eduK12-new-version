@@ -10,10 +10,12 @@ const definition = (attemptId: string, overrides: Partial<WholeQuestionnaireDefi
 }) as unknown as WholeQuestionnaireDefinition
 
 describe('whole definition dual-track delivery (X-05A)', () => {
-  it('serves the inline payload without the fallback GET when it matches the attempt', async () => {
+  const identity = { attemptId: 'attempt-1', attemptEpoch: 1, contextSnapshotHash: null }
+
+  it('serves the inline payload without the fallback GET when the frozen identity matches', async () => {
     const inline = definition('attempt-1')
     const fallback = vi.fn()
-    const result = await wholeDefinitionWithInlineFallback(inline, 'attempt-1', fallback)
+    const result = await wholeDefinitionWithInlineFallback(inline, identity, fallback)
     expect(result.code).toBe(0)
     expect(result.data).toBe(inline)
     expect(fallback).not.toHaveBeenCalled()
@@ -25,18 +27,25 @@ describe('whole definition dual-track delivery (X-05A)', () => {
       formSections: [{ id: 'sec-1', title: 'Form', description: null, contextSection: false, definitionHash: 'c'.repeat(64), items: [] }],
     })
     const fallback = vi.fn()
-    const result = await wholeDefinitionWithInlineFallback(inline, 'attempt-1', fallback)
+    const result = await wholeDefinitionWithInlineFallback(inline, identity, fallback)
     expect(result.data).toBe(inline)
     expect(fallback).not.toHaveBeenCalled()
   })
 
-  it('falls back to GET when the inline payload is absent, stale or structurally incomplete', async () => {
-    const served = { code: 0, data: definition('attempt-2') }
+  it('falls back to GET when the frozen identity mismatches (stale epoch or context)', async () => {
+    const served = { code: 0, data: definition('attempt-1') }
     const fallback = vi.fn().mockResolvedValue(served)
-    await expect(wholeDefinitionWithInlineFallback(null, 'attempt-1', fallback)).resolves.toBe(served)
-    await expect(wholeDefinitionWithInlineFallback(definition('attempt-1'), 'attempt-2', fallback)).resolves.toBe(served)
-    await expect(wholeDefinitionWithInlineFallback(definition('attempt-1', { units: [], formSections: [] }), 'attempt-1', fallback)).resolves.toBe(served)
+    await expect(wholeDefinitionWithInlineFallback(definition('attempt-1'), { ...identity, attemptEpoch: 2 }, fallback)).resolves.toBe(served)
+    await expect(wholeDefinitionWithInlineFallback(definition('attempt-1'), { ...identity, contextSnapshotHash: 'ctx-2' }, fallback)).resolves.toBe(served)
+    await expect(wholeDefinitionWithInlineFallback(definition('attempt-2'), identity, fallback)).resolves.toBe(served)
     expect(fallback).toHaveBeenCalledTimes(3)
-    expect(fallback).toHaveBeenCalledWith()
+  })
+
+  it('falls back to GET when the inline payload is absent or structurally incomplete', async () => {
+    const served = { code: 0, data: definition('attempt-1') }
+    const fallback = vi.fn().mockResolvedValue(served)
+    await expect(wholeDefinitionWithInlineFallback(null, identity, fallback)).resolves.toBe(served)
+    await expect(wholeDefinitionWithInlineFallback(definition('attempt-1', { units: [], formSections: [] }), identity, fallback)).resolves.toBe(served)
+    expect(fallback).toHaveBeenCalledTimes(2)
   })
 })
