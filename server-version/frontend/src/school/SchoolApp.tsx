@@ -1,4 +1,5 @@
 import {deferredPage} from '../components/page-loading/deferredPage'
+import {finalDraftStore} from '../services/persistence/finalDraftStore'
 
 
 import {usePrivateToolCapability,type PrivateDraftState} from '../components/education-tools/privateToolClient'
@@ -331,6 +332,9 @@ function SchoolApplication(){
   })
   const changeAccountPassword=(oldPassword:string,newPassword:string)=>{void run(async()=>{
     await api('/auth/change-password','POST',{oldPassword,newPassword})
+    // Password rotation invalidates every session (X-05B): drop the local
+    // draft store with the same shared-device hygiene as logout.
+    try { await finalDraftStore.clearAll() } catch { /* surfaced on next logout if still present */ }
     setUser(null);setPassword('');setScreen('login')
     notify('密码已修改，所有 School／Teacher 会话失效，请重新登录')
   })}
@@ -338,8 +342,15 @@ function SchoolApplication(){
     if(!canLeavePrivateTools())return
     // Do not claim logout or clear the UI on a failed server-side revocation.
     await api('/auth/logout','POST',{})
+    // Shared-device hygiene (X-05B): the next user of this machine must not be
+    // able to read the previous one's cached answer drafts. A storage failure
+    // never blocks the logout (the server session is already revoked), but it
+    // is surfaced instead of claimed as clean.
+    let localCleanupFailed=false
+    try { await finalDraftStore.clearAll() } catch { localCleanupFailed=true }
     setUser(null);setSummary(null);setIssuedCodes([]);setRecoveryCodes([])
-    window.history.replaceState(null,'','/');setPage('overview');setScreen('home');notify('已退出校园账号')
+    window.history.replaceState(null,'','/');setPage('overview');setScreen('home')
+    notify(localCleanupFailed?'已退出校园账号；本机答卷草稿清理失败，共享设备前请手动清除浏览器站点数据':'已退出校园账号')
   })
   const stepUp=()=>run(async()=>{
     await api('/auth/mfa/step-up','POST',{code:stepUpCode})

@@ -6,7 +6,6 @@ import { inactiveAccountMessage } from '../utils/accountStatus'
 import { getSessionToken, getSchoolSessionToken, getSurveySessionToken, getHuiteacherSessionToken } from '../utils/authCookies'
 import { measureRequestPhase } from '../services/runtimeObservability'
 import { asBusinessPrincipal, loadCurrentPrincipal, toRequestPrincipal } from '../modules/organization/principal'
-import { schoolAccountNeedsMfa } from '../modules/campus/mfa.service'
 import { isSessionRevoked } from '../utils/sessionRevocation'
 import { needsAdminKey, validAdminProof, ADMIN_STEP_UP_SECONDS } from '../modules/admin-permissions/security'
 
@@ -68,7 +67,16 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
     }
 
     // Role elevation invalidates password-only SCHOOL sessions immediately.
-    if ((product === 'SCHOOL' || product === 'HUITEACHER') && await schoolAccountNeedsMfa(principal!.userId)
+    // The mandatory-MFA facts ride the same principal roundtrip (X-05B L-Fast
+    // V1): identical database predicates, identical request-time evaluation,
+    // one fewer query per request for every product — ordinary users pay zero
+    // and no route prefix is ever exempted from the check.
+    // Fail closed: a SCHOOL-domain principal without a resolved mandatory-MFA
+    // fact is treated as requiring MFA, never waved through.
+    const requiresMfa = principal!.needsMfa === true
+      || (principal!.needsMfa !== false && (principal!.role === UserRole.ADMIN || principal!.platformRole === 'SYSTEM_ADMIN'))
+    if ((product === 'SCHOOL' || product === 'HUITEACHER')
+      && requiresMfa
       && (!payload.mfaVerifiedAt || payload.mfaVerifiedAt > Date.now()/1000)) {
       return unauthorized(res, '需要完成双因素认证')
     }
