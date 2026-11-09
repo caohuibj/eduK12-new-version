@@ -1,3 +1,5 @@
+import { CognitiveTaskPanel } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeReview, type PracticeReview } from '../shared/CognitivePracticeReview'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
@@ -26,6 +28,7 @@ export const MentalrotationTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
   const sequence = useMemo(() => mentalRotationSequence(taskContext.randomSeed, total), [taskContext.randomSeed, total])
   const [phase, setPhase] = useState<Phase>('instruction')
   const [practiceIndex, setPracticeIndex] = useState(0)
+  const [practiceReview, setPracticeReview] = useState<PracticeReview | null>(null)
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [feedback, setFeedback] = useState('')
   const [visible, setVisible] = useState(false)
@@ -35,7 +38,7 @@ export const MentalrotationTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
   const completingRef = useRef(false)
   const item = phase === 'practice' ? PRACTICE[practiceIndex] : sequence[trialIndex] ?? sequence[sequence.length - 1]
   const completeOnce = useCallback(async () => { if (completingRef.current) return; completingRef.current = true; await onTaskComplete?.() }, [onTaskComplete])
-  const startPractice = () => { setPracticeIndex(0); setPracticeCorrect(0); setFeedback(''); setPhase('practice') }
+  const startPractice = () => { setPracticeReview(null); setPracticeIndex(0); setPracticeCorrect(0); setFeedback(''); setPhase('practice') }
   const startFormal = () => { completingRef.current = false; setInterrupted(false); setVisible(false); setPhase('formal') }
 
   const submitFormal = useCallback(async (response: 'same' | 'mirror' | null, timedOut = false) => {
@@ -82,7 +85,7 @@ export const MentalrotationTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
     const correct = response === item.correctResponse
     const next = practiceCorrect + (correct ? 1 : 0)
     setPracticeCorrect(next); setFeedback(correct ? '正确' : '错误')
-    if (practiceIndex + 1 >= 4) setPhase('practice-result'); else setPracticeIndex((value) => value + 1)
+    setPracticeReview({ correct, expected: item.correctResponse === 'same' ? '同一图形' : '镜像图形', actual: response === 'same' ? '同一图形' : '镜像图形', explanation: item.correctResponse === 'same' ? '右图只经过平面旋转，转回去可以与左图重合。' : '右图经过了镜像翻转，只在平面内转动不能与左图重合；注意折角与标记的相对位置。' })
   }
 
   const onPointerResponse = (event: ReactPointerEvent<HTMLButtonElement>, response: 'same' | 'mirror') => {
@@ -91,8 +94,14 @@ export const MentalrotationTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
     choose(response)
   }
 
+  if (phase === 'practice' && practiceReview) return <CognitivePracticeReview visual={<><ObjectGlyph family={item.objectFamily} variant={item.variant} /><ObjectGlyph family={item.objectFamily} variant={item.variant} angle={item.angle} mirrored={item.mirrored} /></>} feedback={practiceReview} completed={practiceIndex + 1} total={4} onContinue={() => {
+    setPracticeReview(null)
+    if (practiceIndex + 1 >= 4) setPhase('practice-result')
+    else { setPracticeIndex(value => value + 1);  }
+  }} />
+
   if (phase === 'instruction') return <CognitiveTaskIntro title="心理旋转" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<><p>判断右侧图形只是旋转后的同一图形，还是镜像图形。</p><p>拼一块拼图前，试着在脑中转动它，看看凸角能否对上缺口；镜面翻转则不一定能靠转动重合。 这次任务只记录本次作答表现。</p></>) : (<p>判断右侧图形只是旋转后的同一图形，还是镜像图形。</p>)} hint={<><p>正式测验可用方向键：← 同一图形，→ 镜像图形。</p><p>本任务依赖视觉比较；练习至少答对 3 / 4。</p></>} onAction={startPractice} />
-  if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="text-center p-8"><p className="mb-2">练习正确 {practiceCorrect} / 4</p><p className="mb-4 text-sm text-gray-500">上一题：{feedback}</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
+  if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <CognitiveTaskPanel ariaLabel="练习结果" className="cognitive-task-panel--result"><h2 className="cognitive-task-title">练习结果</h2><p className="mb-2">练习正确 {practiceCorrect} / 4</p><p className="mb-4 text-sm text-gray-500">上一题：{feedback}</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></CognitiveTaskPanel> }
   const content = <div className="p-8 text-center"><p className="mb-5 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / 4${feedback ? ` · 上一题：${feedback}` : ''}` : `正式试次 ${trialIndex + 1} / ${total}`}</p><div aria-label="两幅图形，请视觉判断是否为镜像" className={`mb-7 flex min-h-32 items-center justify-center gap-4 sm:gap-16 ${phase === 'formal' && !visible ? 'invisible' : ''}`}><ObjectGlyph family={item.objectFamily} variant={item.variant} /><ObjectGlyph family={item.objectFamily} variant={item.variant} angle={item.angle} mirrored={item.mirrored} /></div><div className="flex justify-center gap-4"><button className="btn-secondary px-4 sm:px-8" onPointerDown={(event) => onPointerResponse(event, 'same')} onClick={() => { if (phase !== 'formal') choose('same') }}>同一图形</button><button className="btn-secondary px-4 sm:px-8" onPointerDown={(event) => onPointerResponse(event, 'mirror')} onClick={() => { if (phase !== 'formal') choose('mirror') }}>镜像图形</button></div></div>
-  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="心理旋转正式作答">{content}</CognitiveFocusStage> : content
+  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="心理旋转正式作答" progress={{ completed: trialIndex, total: total }}>{content}</CognitiveFocusStage> : content
 }

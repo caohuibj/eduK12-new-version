@@ -1,8 +1,8 @@
+import { CognitivePracticeReview, type PracticeReview } from '../shared/CognitivePracticeReview'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { taskswitchSequence, type TaskswitchTrialSpec } from '../shared/prng'
-import { PRACTICE_FEEDBACK_MS } from '../shared/practice'
 import {
   CognitivePracticeResult,
   CognitiveTaskIntro,
@@ -86,6 +86,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [practiceNonce, setPracticeNonce] = useState(0)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [practiceReview, setPracticeReview] = useState<PracticeReview | null>(null)
   const [acknowledgedBlockIndex, setAcknowledgedBlockIndex] = useState<number | null>(null)
   const onsetRef = useRef<number | null>(null)
   const respondedRef = useRef(false)
@@ -103,7 +104,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
 
   const startPracticeStage = (stage: PracticeStage) => {
     setPracticeStage(stage)
-    setPracticeIndex(0)
+    setPracticeReview(null); setPracticeIndex(0)
     setPracticeCorrect(0)
     practiceCorrectRef.current = 0
     setFeedback(null)
@@ -165,15 +166,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
       if (phase === 'practice') {
         setFeedback(correct ? '正确' : `错误：当前规则是“${cueLabel(currentTrial.taskRule)}”。`)
         if (correct) practiceCorrectRef.current += 1
-        const nextIndex = practiceIndex + 1
-        window.setTimeout(() => {
-          if (nextIndex >= practiceTrials.length) {
-            setPracticeCorrect(practiceCorrectRef.current)
-            setPhase('practice-result')
-            return
-          }
-          setPracticeIndex(nextIndex)
-        }, PRACTICE_FEEDBACK_MS)
+        setPracticeReview({ correct, prompt: '规则：' + cueLabel(currentTrial.taskRule) + '；数字：' + currentTrial.stimulus, expected: currentTrial.correctResponse === 'left' ? '选择左侧' : '选择右侧', actual: responseRef.current == null ? '你没有作答' : (responseRef.current === 'left' ? '你选择了左侧' : '你选择了右侧'), explanation: currentTrial.taskRule === 'parity' ? '奇偶规则：奇数选左，偶数选右；忽略数字大小。' : '大小规则：小于 5 选左，大于 5 选右；忽略奇偶。' })
         return
       }
       if (!submittingRef.current && isTaskswitchFormalTrial(currentTrial)) {
@@ -217,6 +210,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
     : practiceTrials[practiceIndex]
 
   const respond = (side: 'left' | 'right') => {
+    if (phase === 'practice' && practiceReview) return
     if (subPhase !== 'stimulus' || respondedRef.current || onsetRef.current == null) return
     respondedRef.current = true
     responseRef.current = side
@@ -226,6 +220,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
     const onKeyDown = (event: KeyboardEvent) => {
+      if (phase === 'practice' && practiceReview) return
       if (event.repeat) return
       if (event.key === 'ArrowLeft') {
         event.preventDefault()
@@ -238,6 +233,12 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   })
+
+  if (phase === 'practice' && practiceReview) return <CognitivePracticeReview feedback={practiceReview} completed={practiceIndex + 1} total={practiceTrials.length} onContinue={() => {
+    setPracticeReview(null)
+    if (practiceIndex + 1 >= practiceTrials.length) { setPracticeCorrect(practiceCorrectRef.current); setPhase('practice-result') }
+    else setPracticeIndex(value => value + 1)
+  }} />
 
   if (phase === 'instruction') {
     return (
@@ -297,6 +298,6 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
   )
 
   return phase === 'formal'
-    ? <CognitiveFocusStage ariaLabel="任务转换正式测验">{taskBody}</CognitiveFocusStage>
+    ? <CognitiveFocusStage ariaLabel="任务转换正式测验" progress={{ completed: trialIndex, total: total }}>{taskBody}</CognitiveFocusStage>
     : taskBody
 }

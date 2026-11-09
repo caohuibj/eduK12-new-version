@@ -27,7 +27,7 @@ function setup(){
   fireEvent.click(screen.getByRole('button',{name:'测试设备通过'}))
   return {request,onCommitted,onRunningChange}
 }
-afterEach(async()=>{vi.restoreAllMocks();await finalDraftStore.delete('cognitive:'+session.sessionId);localStorage.clear()})
+afterEach(async()=>{vi.restoreAllMocks();await finalDraftStore.delete('cognitive:'+session.sessionId)})
 describe('Survey actual shared runner adapter',()=>{
   it('persists raw trials locally, sends one bearer-bound FINAL, and keeps child receipt distinct',async()=>{
     const {request,onCommitted}=setup()

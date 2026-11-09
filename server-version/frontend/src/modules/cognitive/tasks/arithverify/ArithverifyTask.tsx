@@ -1,4 +1,4 @@
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeAnswer, type PracticeAnswerFeedback, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { ArithverifyConfig, ArithverifyTrialPayload } from '../../types'
@@ -22,7 +22,7 @@ export const ArithverifyTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
   const [practiceIndex, setPracticeIndex] = useState(0)
   const [practiceAttempt, setPracticeAttempt] = useState(1)
   const [practiceCorrect, setPracticeCorrect] = useState<boolean[]>([])
-  const [practiceFeedback, setPracticeFeedback] = useState<string | null>(null)
+  const [practiceFeedback, setPracticeFeedback] = useState<PracticeAnswerFeedback | null>(null)
   const [formalFeedback, setFormalFeedback] = useState<string | null>(null)
   const interruptedRef = useRef(false)
   const onsetRef = useRef<number | null>(null)
@@ -83,7 +83,9 @@ export const ArithverifyTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
       if (subPhase !== 'stimulus' || !trial) return
       const correct = response === trial.isTrue
       setPracticeCorrect((current) => { const next = [...current]; next[practiceIndex] = correct; return next })
-      setPracticeFeedback(correct ? '正确：先心算，再比较。' : '再算一次：先把两个数相加，再和给出的结果比较。')
+      setPracticeFeedback({ correct, prompt: `${trial.leftOperand} + ${trial.rightOperand} = ${trial.displayedResult}`,
+        expected: trial.isTrue ? '选择“对”' : '选择“错”', actual: response ? '选择“对”' : '选择“错”',
+        explanation: `${trial.leftOperand} + ${trial.rightOperand} 实际等于 ${trial.leftOperand + trial.rightOperand}，${trial.isTrue ? '与题目右边相同，所以等式正确。' : `与题目给出的 ${trial.displayedResult} 不同，所以等式错误。`}先心算，再比较，不要只看算式是否眼熟。` })
       setSubPhase('feedback'); return
     }
     void submitFormal(response)
@@ -113,10 +115,10 @@ export const ArithverifyTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
 
   if (phase === 'practice') {
     const trial = ARITHVERIFY_PRACTICE_TRIALS[practiceIndex]
-    return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 {practiceIndex + 1} / {ARITHVERIFY_PRACTICE_TRIALS.length} · 第 {practiceAttempt} 轮 · 不计入成绩</div>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-24 pt-6">+</div>}{subPhase === 'stimulus' && trial && <div className="text-5xl font-bold text-gray-800 h-24 pt-4">{trial.leftOperand} + {trial.rightOperand} = {trial.displayedResult}</div>}{subPhase === 'feedback' && <div className="h-24 pt-6 text-gray-700">{practiceFeedback}</div>}{subPhase === 'stimulus' && <div className="grid grid-cols-2 gap-3 max-w-md mx-auto mt-4"><button type="button" onPointerDown={() => handleResponse(true)} onClick={event => { if (event.detail === 0) handleResponse(true) }} className="btn-secondary min-h-12">1 · 对</button><button type="button" onPointerDown={() => handleResponse(false)} onClick={event => { if (event.detail === 0) handleResponse(false) }} className="btn-secondary min-h-12">2 · 错</button></div>}{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary">{practiceIndex + 1 >= ARITHVERIFY_PRACTICE_TRIALS.length ? practiceCorrect.every(Boolean) ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div>
+    return <CognitiveFocusStage ariaLabel="算术验证练习" progress={{ completed: practiceIndex + (subPhase === 'feedback' ? 1 : 0), total: ARITHVERIFY_PRACTICE_TRIALS.length }}><div className="card p-8 max-w-2xl text-center"><p className="text-sm text-gray-500 mb-4">第 {practiceAttempt} 轮 · 练习不计入成绩</p>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-24 pt-6">+</div>}{subPhase === 'stimulus' && trial && <div className="text-5xl font-bold text-gray-800 h-24 pt-4">{trial.leftOperand} + {trial.rightOperand} = {trial.displayedResult}</div>}{subPhase === 'feedback' && <CognitivePracticeAnswer feedback={practiceFeedback} />}{subPhase === 'stimulus' && <div className="grid grid-cols-2 gap-3 max-w-md mx-auto mt-4"><button type="button" onPointerDown={() => handleResponse(true)} onClick={event => { if (event.detail === 0) handleResponse(true) }} className="btn-secondary min-h-12">1 · 对</button><button type="button" onPointerDown={() => handleResponse(false)} onClick={event => { if (event.detail === 0) handleResponse(false) }} className="btn-secondary min-h-12">2 · 错</button></div>}{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary">{practiceIndex + 1 >= ARITHVERIFY_PRACTICE_TRIALS.length ? practiceCorrect.every(Boolean) ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div></CognitiveFocusStage>
   }
 
   if (!currentTrial) return <div className="card p-8 text-center text-gray-500">正在生成结果…</div>
 
-  return <CognitiveFocusStage ariaLabel="算术验证正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-28 pt-8">+</div>}{subPhase === 'stimulus' && <div className="text-5xl font-bold text-gray-800 h-28 pt-8">{currentTrial.leftOperand} + {currentTrial.rightOperand} = {currentTrial.displayedResult}</div>}{subPhase === 'feedback' && <div className="h-28 pt-8 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}{subPhase === 'stimulus' && <div className="grid grid-cols-2 gap-3 max-w-md mx-auto mt-4"><button type="button" onPointerDown={() => handleResponse(true)} onClick={event => { if (event.detail === 0) handleResponse(true) }} className="btn-secondary min-h-12">1 · 对</button><button type="button" onPointerDown={() => handleResponse(false)} onClick={event => { if (event.detail === 0) handleResponse(false) }} className="btn-secondary min-h-12">2 · 错</button></div>}<p className="text-xs text-gray-400 mt-6">按键 1 = 对、2 = 错，或点击按钮作答</p></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="算术验证正式测验" progress={{ completed: trialIndex, total: totalTrials }}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-28 pt-8">+</div>}{subPhase === 'stimulus' && <div className="text-5xl font-bold text-gray-800 h-28 pt-8">{currentTrial.leftOperand} + {currentTrial.rightOperand} = {currentTrial.displayedResult}</div>}{subPhase === 'feedback' && <div className="h-28 pt-8 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}{subPhase === 'stimulus' && <div className="grid grid-cols-2 gap-3 max-w-md mx-auto mt-4"><button type="button" onPointerDown={() => handleResponse(true)} onClick={event => { if (event.detail === 0) handleResponse(true) }} className="btn-secondary min-h-12">1 · 对</button><button type="button" onPointerDown={() => handleResponse(false)} onClick={event => { if (event.detail === 0) handleResponse(false) }} className="btn-secondary min-h-12">2 · 错</button></div>}<p className="text-xs text-gray-400 mt-6">按键 1 = 对、2 = 错，或点击按钮作答</p></div></CognitiveFocusStage>
 }

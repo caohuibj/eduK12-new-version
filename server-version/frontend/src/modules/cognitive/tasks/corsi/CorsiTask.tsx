@@ -1,4 +1,6 @@
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitiveTaskPanel } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeReview, type PracticeReview } from '../shared/CognitivePracticeReview'
+import { CognitiveTaskExample, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
@@ -56,6 +58,7 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
   const [response, setResponse] = useState<number[]>([])
   const [lit, setLit] = useState<number | null>(null)
   const [practiceIndex, setPracticeIndex] = useState(0)
+  const [practiceReview, setPracticeReview] = useState<PracticeReview | null>(null)
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [practiceNonce, setPracticeNonce] = useState(0)
   const [inactivityExpired, setInactivityExpired] = useState(false)
@@ -72,7 +75,7 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
   const activeSequence = phase === 'practice' ? practiceSequence : sequence
 
   const startPractice = () => {
-    setPracticeIndex(0)
+    setPracticeReview(null); setPracticeIndex(0)
     setPracticeCorrect(0)
     setResponse([])
     responseRef.current = []
@@ -145,18 +148,8 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
   const submitPractice = () => {
     if (subPhase !== 'response' || response.length !== practiceSequence.length) return
     const correct = sameSequence(response, practiceSequence)
-    const nextCorrect = practiceCorrect + (correct ? 1 : 0)
-    const nextIndex = practiceIndex + 1
-    if (nextIndex >= PRACTICE_SEQUENCES.length) {
-      setPracticeCorrect(nextCorrect)
-      setPhase('practice-result')
-      return
-    }
-    setPracticeCorrect(nextCorrect)
-    setPracticeIndex(nextIndex)
-    setResponse([])
-    setLit(null)
-    setSubPhase('ready')
+    setPracticeCorrect(practiceCorrect + (correct ? 1 : 0))
+    setPracticeReview({ correct, expected: practiceSequence.map(block => '位置 ' + (block + 1)).join(' → '), actual: response.map(block => '位置 ' + (block + 1)).join(' → '), explanation: '把棋盘的九个方块按从左到右、从上到下记为位置 1–9；必须按亮起的先后顺序点回，点错位置或顺序都不算正确。' })
   }
 
   const submitFormal = useCallback(async (answer: number[] = response, timedOut = false) => {
@@ -219,23 +212,39 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
     return () => window.clearTimeout(timer)
   }, [phase, subPhase, inactivityGuardMs, inactivityExpired, trialIndex, submitFormal])
 
+  if (phase === 'practice' && practiceReview) return <CognitivePracticeReview visual={<div className="relative aspect-square w-60" aria-label="位置编号示意图">{BOARD.map((position, index) => <span key={index} className="absolute grid h-[19.5%] w-[19.5%] place-items-center rounded border" style={{ left: position.left, top: position.top }}>{index + 1}</span>)}</div>} feedback={practiceReview} completed={practiceIndex + 1} total={PRACTICE_SEQUENCES.length} onContinue={() => {
+    setPracticeReview(null)
+    if (practiceIndex + 1 >= PRACTICE_SEQUENCES.length) setPhase('practice-result')
+    else { setPracticeIndex(value => value + 1); setResponse([]); setLit(null); setSubPhase('ready'); }
+  }} />
+
   if (phase === 'instruction') {
     return (
-      <CognitiveTaskIntro title="Corsi 方块广度" description={<p>方块会依次亮起，请按同样顺序点击。</p>} hint={<><p>练习不计入正式成绩，未通过可以重练。</p></>} onAction={startPractice} />
+      <CognitiveTaskIntro
+        title="Corsi 方块广度"
+        description={<p>棋盘上的方块会按顺序逐个亮起。请观察亮起的位置和顺序；灯光结束后，在棋盘上按相同顺序逐个点击。</p>}
+        example={<CognitiveTaskExample title="图示：记住位置，再按原顺序点回去" steps={[
+          { label: '第 1 个亮起', value: '左上', note: '记住这个位置', state: 'observe' },
+          { label: '第 2 个亮起', value: '中间', note: '继续记住顺序', state: 'observe' },
+          { label: '第 3 个亮起', value: '右下', note: '现在依次点回', state: 'respond' },
+        ]} result={<>等亮光结束后，依次点击 <strong>左上 → 中间 → 右下</strong>。</>} explanation="只按方块位置，不需要数格子或记颜色；点错位置或顺序都算这题不正确。" />}
+        hint={<><p><strong>操作：</strong>灯光消失后再点击；不要在亮起过程中抢点。</p><p><strong>练习：</strong>练习不计入正式成绩；未通过可以重新练习。</p></>}
+        onAction={startPractice}
+      />
     )
   }
 
   if (phase === 'practice-result') {
     const passed = practiceCorrect >= PRACTICE_PASS
     return (
-      <div className="text-center p-8">
+      <CognitiveTaskPanel ariaLabel="练习结果" className="cognitive-task-panel--result"><h2 className="cognitive-task-title">练习结果</h2>
         <p className="mb-4">练习正确 {practiceCorrect} / {PRACTICE_SEQUENCES.length}</p>
         {passed ? (
           <button className="btn-primary" onClick={startFormal}>开始正式测验</button>
         ) : (
           <button className="btn-secondary" onClick={startPractice}>重新练习</button>
         )}
-      </div>
+      </CognitiveTaskPanel>
     )
   }
 
@@ -280,6 +289,6 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
   )
 
   return phase === 'formal'
-    ? <CognitiveFocusStage ariaLabel="Corsi 正式测验">{taskBody}</CognitiveFocusStage>
+    ? <CognitiveFocusStage ariaLabel="Corsi 正式测验" progress={{ completed: trialWithinLevel - 1, total: 2, label: `当前广度 ${span} · 本级已完成 / 总量` }}>{taskBody}</CognitiveFocusStage>
     : taskBody
 }

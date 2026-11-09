@@ -46,6 +46,7 @@ vi.mock('../registry', () => ({
       return null
     },
     completionMode: 'manual',
+    startActionOwner: 'host',
   }),
 }))
 
@@ -162,7 +163,7 @@ describe('MEDIA-3 Cognitive image presentation gate', () => {
 
     renderRunner()
 
-    expect(screen.getByRole('status').textContent).toContain('正在准备本次任务的冻结媒体。')
+    expect(screen.getByText('正在准备本次任务的冻结媒体。')).toBeTruthy()
     const start = screen.getByRole('button', { name: '开始测评' }) as HTMLButtonElement
     expect(start.disabled).toBe(true)
     fireEvent.click(start)

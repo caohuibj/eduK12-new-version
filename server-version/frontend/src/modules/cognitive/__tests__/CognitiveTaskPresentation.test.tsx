@@ -8,9 +8,40 @@ import {
   CognitiveTaskCompletionNotice,
   CognitiveTaskIntro,
   CognitiveTaskTransition,
+  CognitiveTaskStartContext,
+  CognitivePracticeFeedback,
 } from '../tasks/shared/CognitiveTaskPresentation'
+import { cognitiveRunnerEntries } from '../generated/runners'
+import { resolveTaskGuide } from '../tasks/shared/task-guides'
 
 describe('Cognitive task presentation primitives', () => {
+  it('provides a task-specific example for every registered real task', () => {
+    for (const entry of cognitiveRunnerEntries.filter(entry => entry.testType !== 'fake')) {
+      expect(resolveTaskGuide(entry.testType, entry.engineVersion), `${entry.testType}/${entry.engineVersion}`).toBeDefined()
+    }
+  })
+
+  it('shows the shared example while preserving the task-owned start action', () => {
+    const start = vi.fn()
+    render(<CognitiveTaskStartContext.Provider value={{ taskIdentity: { testType: 'flanker', engineVersion: '1.0.0' } }}>
+      <CognitiveTaskIntro title="箭头判断" description="只看中央箭头" onAction={start} />
+    </CognitiveTaskStartContext.Provider>)
+    expect(screen.getByText('→ → ← → →')).toBeVisible()
+    expect(screen.getByText('选择向左')).toBeVisible()
+    fireEvent.click(screen.getByRole('button', { name: '开始练习' }))
+    expect(start).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps feedback until the task receives the explicit continue action', () => {
+    const proceed = vi.fn()
+    render(<CognitivePracticeFeedback outcome="incorrect" badge="漏按" actions={<button onClick={proceed}>继续下一题</button>}>
+      当前字母与对照字母相同，应该按一次；你没有按。
+    </CognitivePracticeFeedback>)
+    expect(screen.getByRole('alert')).toHaveTextContent('应该按一次')
+    expect(proceed).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: '继续下一题' }))
+    expect(proceed).toHaveBeenCalledTimes(1)
+  })
   it('renders a reusable instruction panel without owning task state', () => {
     const start = vi.fn()
     render(

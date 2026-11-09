@@ -36,7 +36,7 @@ it('isolates the two-item practice while keeping formal seed, index, timing and 
   expect(screen.queryByText('2 · 改变')).toBeNull()
   await advance(1)
   fireEvent.click(screen.getByText('2 · 改变'), { detail: 0 })
-  expect(screen.getByText('正确：颜色变了！')).toBeTruthy()
+  expect(screen.getByRole('status', { name: '练习解析：正确' })).toHaveTextContent('颜色已经改变')
   expect(save).not.toHaveBeenCalled()
 
   fireEvent.click(screen.getByText('开始正式测评'))

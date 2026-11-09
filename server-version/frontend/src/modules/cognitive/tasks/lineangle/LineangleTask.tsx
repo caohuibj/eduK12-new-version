@@ -1,4 +1,4 @@
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeAnswer, type PracticeAnswerFeedback, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { LineangleConfig, LineangleTrialPayload } from '../../types'
@@ -43,7 +43,7 @@ export const LineangleTask: React.FC<CognitiveTaskProps> = ({ taskContext, trial
   const [practiceIndex, setPracticeIndex] = useState(0)
   const [practiceAttempt, setPracticeAttempt] = useState(1)
   const [practiceCorrect, setPracticeCorrect] = useState<boolean[]>([])
-  const [practiceFeedback, setPracticeFeedback] = useState<string | null>(null)
+  const [practiceFeedback, setPracticeFeedback] = useState<PracticeAnswerFeedback | null>(null)
   const [formalFeedback, setFormalFeedback] = useState<string | null>(null)
   const interruptedRef = useRef(false)
   const onsetRef = useRef<number | null>(null)
@@ -108,7 +108,10 @@ export const LineangleTask: React.FC<CognitiveTaskProps> = ({ taskContext, trial
       if (subPhase !== 'stimulus' || !trial) return
       const correct = revised ? axisAngle(responseAngle) === axisAngle(trial.targetAngle) : responseAngle === trial.targetAngle
       setPracticeCorrect((current) => { const next = [...current]; next[practiceIndex] = correct; return next })
-      setPracticeFeedback(correct ? '正确：找与目标平行的选项。' : '再对比一次：目标线段斜向哪边、角度多大？')
+      const expectedIndex = trial.optionAngles.findIndex(angle => revised ? axisAngle(angle) === axisAngle(trial.targetAngle) : angle === trial.targetAngle) + 1
+      setPracticeFeedback({ correct, prompt: '找到与上方目标线段平行的选项',
+        expected: `选择第 ${expectedIndex} 个选项`, actual: `选择第 ${trial.optionAngles.indexOf(responseAngle) + 1} 个选项`,
+        explanation: `第 ${expectedIndex} 个选项与目标线段平行。请对照线段倾斜的方向和角度，忽略它在画面中的位置。${revised ? '线段没有箭头，方向相反但平行也算相同。' : ''}` })
       setSubPhase('feedback'); return
     }
     void submitFormal(responseAngle)
@@ -140,10 +143,10 @@ export const LineangleTask: React.FC<CognitiveTaskProps> = ({ taskContext, trial
 
   if (phase === 'practice') {
     const trial = practiceTrials[practiceIndex]
-    return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-2">练习 {practiceIndex + 1} / {practiceTrials.length} · 第 {practiceAttempt} 轮 · 不计入成绩</div>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-24 pt-8">+</div>}{subPhase !== 'fixation' && trial && (<><div className="flex justify-center pt-2"><Figure angle={trial.targetAngle} /></div><div className={revised ? 'flex flex-wrap justify-center gap-2 pt-3' : 'flex justify-center gap-4 pt-3'}>{trial.optionAngles.map((angle, index) => <button key={angle} type="button" onPointerDown={() => handleResponse(angle)} className="btn-secondary p-2"><Figure angle={angle} width={90} />{revised && <span>{index + 1}</span>}</button>)}</div></>)}{subPhase === 'feedback' && <div className="h-16 pt-4 text-gray-700">{practiceFeedback}</div>}{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary">{practiceIndex + 1 >= practiceTrials.length ? practiceCorrect.every(Boolean) ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div>
+    return <CognitiveFocusStage ariaLabel="方向判断练习" progress={{ completed: practiceIndex + (subPhase === 'feedback' ? 1 : 0), total: practiceTrials.length }}><div className="card p-8 max-w-2xl text-center"><p className="text-sm text-gray-500 mb-4">第 {practiceAttempt} 轮 · 练习不计入成绩</p>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-24 pt-8">+</div>}{subPhase !== 'fixation' && trial && (<><div className="flex justify-center pt-2"><Figure angle={trial.targetAngle} /></div><div className={revised ? 'flex flex-wrap justify-center gap-2 pt-3' : 'flex justify-center gap-4 pt-3'}>{trial.optionAngles.map((angle, index) => <button key={angle} type="button" onPointerDown={() => handleResponse(angle)} className="btn-secondary p-2"><Figure angle={angle} width={90} />{revised && <span>{index + 1}</span>}</button>)}</div></>)}{subPhase === 'feedback' && <CognitivePracticeAnswer feedback={practiceFeedback} />}{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary">{practiceIndex + 1 >= practiceTrials.length ? practiceCorrect.every(Boolean) ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div></CognitiveFocusStage>
   }
 
   if (!currentTrial) return <div className="card p-8 text-center text-gray-500">正在生成结果…</div>
 
-  return <CognitiveFocusStage ariaLabel="线条方向判断正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-44 pt-10">+</div>}{subPhase !== 'fixation' && (<><div className="flex justify-center pt-2"><Figure angle={currentTrial.targetAngle} /></div><div className={revised ? 'flex flex-wrap justify-center gap-2 pt-3' : 'flex justify-center gap-4 pt-3'}>{currentTrial.optionAngles.map((angle, index) => <button key={angle} type="button" onPointerDown={() => handleResponse(angle)} className="btn-secondary p-2"><Figure angle={angle} width={90} />{revised && <span>{index + 1}</span>}</button>)}</div></>)}{subPhase === 'feedback' && <div className="h-16 pt-4 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<p className="text-xs text-gray-400 mt-4">按键 1–{currentTrial.optionAngles.length} 或点击选项作答</p></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="线条方向判断正式测验" progress={{ completed: trialIndex, total: totalTrials }}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-44 pt-10">+</div>}{subPhase !== 'fixation' && (<><div className="flex justify-center pt-2"><Figure angle={currentTrial.targetAngle} /></div><div className={revised ? 'flex flex-wrap justify-center gap-2 pt-3' : 'flex justify-center gap-4 pt-3'}>{currentTrial.optionAngles.map((angle, index) => <button key={angle} type="button" onPointerDown={() => handleResponse(angle)} className="btn-secondary p-2"><Figure angle={angle} width={90} />{revised && <span>{index + 1}</span>}</button>)}</div></>)}{subPhase === 'feedback' && <div className="h-16 pt-4 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<p className="text-xs text-gray-400 mt-4">按键 1–{currentTrial.optionAngles.length} 或点击选项作答</p></div></CognitiveFocusStage>
 }

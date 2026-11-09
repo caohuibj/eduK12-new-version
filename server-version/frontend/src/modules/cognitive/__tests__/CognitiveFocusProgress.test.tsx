@@ -4,19 +4,19 @@ import { CognitiveFocusStage } from '../tasks/shared/CognitiveFocusStage'
 import { CognitiveFocusProgressContext } from '../tasks/shared/focus-progress'
 
 describe('visible progress inside the cognitive focus stage', () => {
-  it('shows and updates the fixed-trial position without remounting the task', () => {
+  it('shows and updates the completed-trial count without remounting the task', () => {
     const view = (completed: number) => <CognitiveFocusProgressContext.Provider value={{completed,total:20}}><CognitiveFocusStage><input aria-label="保留作答" defaultValue="已输入" /></CognitiveFocusStage></CognitiveFocusProgressContext.Provider>
     const {rerender} = render(view(0))
     const task = screen.getByLabelText('保留作答')
-    expect(screen.getByText('1 / 20')).toBeVisible()
-    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow','1')
+    expect(screen.getByText('0 / 20')).toBeVisible()
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow','0')
     rerender(view(7))
-    expect(screen.getByText('8 / 20')).toBeVisible()
+    expect(screen.getByText('7 / 20')).toBeVisible()
     expect(screen.getByLabelText('保留作答')).toBe(task)
   })
   it('shows recorded observations without inventing an adaptive-task denominator', () => {
     render(<CognitiveFocusProgressContext.Provider value={{completed:6}}><CognitiveFocusStage>任务</CognitiveFocusStage></CognitiveFocusProgressContext.Provider>)
-    expect(screen.getByText('正式测试 · 已记录 6 次')).toBeVisible()
+    expect(screen.getByText(/自适应测验 · 已完成/)).toBeVisible()
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
   })
   it('keeps formal progress out of the practice stage', () => {

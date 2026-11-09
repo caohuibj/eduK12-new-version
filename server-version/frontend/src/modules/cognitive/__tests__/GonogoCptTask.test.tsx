@@ -64,7 +64,8 @@ describe('Go/No-Go and CPT runners', () => {
       for (let practiceIndex = 0; practiceIndex < 4; practiceIndex += 1) {
         await act(async () => { vi.advanceTimersByTime(20) })
         if (practiceIndex % 2 === 0) fireEvent.pointerDown(screen.getByRole('button'))
-        await act(async () => { vi.advanceTimersByTime(20 + 600) })
+        await act(async () => { vi.advanceTimersByTime(20) })
+        fireEvent.click(screen.getByRole('button', { name: /继续下一题|查看练习结果/ }))
       }
 
       expect(screen.getByLabelText('练习结果')).toHaveTextContent('练习正确 4 / 4')
@@ -93,8 +94,9 @@ describe('Go/No-Go and CPT runners', () => {
     fireEvent.click(screen.getByText('开始练习'))
     for (let i = 0; i < 4; i += 1) {
       act(() => {
-        vi.advanceTimersByTime(20 + 20 + 600)
+        vi.advanceTimersByTime(20 + 20)
       })
+      fireEvent.click(screen.getByRole('button', { name: /继续下一题|查看练习结果/ }))
     }
     expect(screen.getByText('重新练习')).toBeTruthy()
     expect(onTrialComplete).not.toHaveBeenCalled()
@@ -128,7 +130,10 @@ describe('Go/No-Go and CPT runners', () => {
     act(() => {
       vi.advanceTimersByTime(50)
     })
-    expect(screen.getByLabelText('respond').className).toContain('bg-gray-200')
+    expect(screen.getByRole('alert')).toHaveTextContent('漏按')
+    act(() => { vi.advanceTimersByTime(60000) })
+    expect(screen.getByLabelText('练习逐题解析')).toBeInTheDocument()
+    expect(screen.queryByLabelText('respond')).toBeNull()
     vi.useRealTimers()
   })
 

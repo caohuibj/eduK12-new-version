@@ -5,7 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import identities from '../../../../../../docs/cognitive/reports-47-20261101/identities.json'
 import { cognitiveSeeds } from '../../../../../backend/src/modules/cognitive/generated/seeds'
 import { cognitiveExecutionEntries as executionEntries } from '../../../../../backend/src/modules/cognitive/generated/execution'
-import CognitiveRunner from '../pages/CognitiveRunner'
+import CognitiveRunner, { CognitiveRunner as CognitiveRunnerHost } from '../pages/CognitiveRunner'
 import { initialRunnerState, runnerReducer } from '../core/runner.state'
 import type { RunnerState } from '../core/runner.types'
 import { resolveCognitiveReadinessProfile } from '../core/readiness'
@@ -35,7 +35,7 @@ it('the combined current identities keep exact C/S/R seeds, execution, runners a
 
 // Synthetic transport; real host, registry, deferred runner and task introduction.
 it.each(['lineangle', 'sharegame', 'embeddedfigures', 'icarmatrix', 'sentencecheck', 'visualwm', 'auditorynback'])(
-  '%s current report seed enters its actual introduction through the host', async task => {
+  '%s current report seed starts its task-specific practice directly from the shared host', async task => {
     const identity = identities.find(row => row.task === task)!
     const seed = cognitiveSeeds.find(row => row.testType === task && row.configVersion === identity.configVersion)!
     const readiness = resolveCognitiveReadinessProfile(task, seed.engineVersion)!
@@ -57,12 +57,75 @@ it.each(['lineangle', 'sharegame', 'embeddedfigures', 'icarmatrix', 'sentenceche
       harness.controller.state = runnerReducer(harness.controller.state, { type: 'START_RUN' })
       view.rerender(tree())
     })
-    const start = await screen.findByRole('button', { name: '开始测评' })
-    await waitFor(() => expect(start).toBeEnabled())
-    fireEvent.click(start)
-    expect(await screen.findByRole('button', { name: '开始练习' })).toBeEnabled()
+    const startPractice = await screen.findByRole('button', { name: '开始练习' })
+    await waitFor(() => expect(startPractice).toBeEnabled())
+    fireEvent.click(startPractice)
+    await waitFor(() => expect(document.querySelector('[data-cognitive-task-state="running"]')).toBeTruthy())
+    expect(screen.queryByRole('button', { name: '开始测评' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '开始练习' })).toBeNull()
     expect(harness.controller.state.status).toBe('RUNNING')
     expect(harness.controller.start).toHaveBeenCalledTimes(1)
+    expect(harness.controller.appendTrial).not.toHaveBeenCalled()
+    expect(harness.controller.complete).not.toHaveBeenCalled()
+  },
+)
+
+const sharedEntryCases = [
+  ['Training', 'training', 'nback', /1-back 练习 · 观察/],
+  ['Training', 'training', 'memory', /练习 1 \/ 2/],
+  ['Training', 'training', 'reaction', /练习 1 \/ 3/],
+  ['Survey', 'survey', 'memory', /练习 1 \/ 2/],
+  ['School', 'school', 'memory', /练习 1 \/ 2/],
+  ['Teacher', 'teacher', 'memory', /练习 1 \/ 2/],
+] as const
+
+it.each(sharedEntryCases)(
+  '%s %s entry shows one detailed introduction and starts %s practice with one click',
+  async (_label, surface, task, practiceLabel) => {
+    const seed = cognitiveSeeds.find(value => value.testType === task)
+    expect(seed, `${task} seed`).toBeDefined()
+    const sessionId = `single-start-${surface}-${task}`
+    const session = {
+      sessionId,
+      assignmentId: `assignment-${sessionId}`,
+      testType: task,
+      engineVersion: seed!.engineVersion,
+      scoringVersion: seed!.scoringVersion,
+      configVersion: seed!.configVersion,
+      attemptNo: 1,
+      config: seed!.config,
+      status: 'IN_PROGRESS',
+      deliveryMode: 'FINAL_ONLY',
+      randomSeed: `seed-${sessionId}`,
+    } as CognitiveSession
+    harness.controller.state = runnerReducer(initialRunnerState, { type: 'SESSION_LOADED', session, trialIndex: 0 })
+
+    const binding = { sessionId, api: {} as never, onCompleted: vi.fn(), onExit: vi.fn() }
+    const entry = surface === 'training'
+      ? <CognitiveRunner />
+      : surface === 'school'
+        ? <CognitiveRunnerHost campus={binding} />
+        : <CognitiveRunnerHost embedded={binding} />
+    const tree = () => (
+      <MemoryRouter initialEntries={[`/student/cognitive/sessions/${sessionId}`]}>
+        <Routes><Route path="/student/cognitive/sessions/:sessionId" element={entry} /></Routes>
+      </MemoryRouter>
+    )
+    const view = render(tree())
+    harness.controller.start.mockImplementation(() => {
+      harness.controller.state = runnerReducer(harness.controller.state, { type: 'START_RUN' })
+      view.rerender(tree())
+    })
+
+    const startPractice = await screen.findByRole('button', { name: '开始练习' })
+    expect(screen.queryByRole('button', { name: '开始测评' })).toBeNull()
+    expect(screen.getByRole('region', { name: `${resolveRunner(task, seed!.engineVersion)?.name}说明` })).toBeInTheDocument()
+    fireEvent.click(startPractice)
+
+    expect(await screen.findByText(practiceLabel)).toBeInTheDocument()
+    expect(harness.controller.start).toHaveBeenCalledTimes(1)
+    expect(harness.controller.state.status).toBe('RUNNING')
+    expect(screen.queryByRole('button', { name: '开始测评' })).toBeNull()
     expect(harness.controller.appendTrial).not.toHaveBeenCalled()
     expect(harness.controller.complete).not.toHaveBeenCalled()
   },

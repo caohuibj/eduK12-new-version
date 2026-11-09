@@ -1,3 +1,5 @@
+import { CognitiveTaskPanel, CognitivePracticeFeedback } from '../shared/CognitiveTaskPresentation'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -108,7 +110,7 @@ export const PairedassociateTask: React.FC<CognitiveTaskProps> = ({ taskContext,
   const submitPractice = () => {
     if (responses.length !== activeSet.length) return
     const correct = responses.every((item, index) => item.selectedPosition === activeSet[index].targetPosition)
-    setPracticeCorrect((value) => value + (correct ? 1 : 0)); setFeedback(correct ? '正确' : '至少有一个位置不正确'); setPhase('practice-feedback')
+    setPracticeCorrect((value) => value + (correct ? 1 : 0)); setFeedback((correct ? '配对正确。' : '至少有一个位置不正确。') + activeSet.map((item, index) => '第 ' + (index + 1) + ' 个图形：原位置 ' + (item.targetPosition + 1) + '，你选择了位置 ' + ((responses[index]?.selectedPosition ?? -1) + 1)).join('；') + '。记住每个图形与位置的对应关系，而不是只记出现顺序。'); setPhase('practice-feedback')
   }
   const nextPractice = () => {
     if (practiceIndex + 1 >= PRACTICE.length) { setPhase('practice-result'); return }
@@ -116,13 +118,15 @@ export const PairedassociateTask: React.FC<CognitiveTaskProps> = ({ taskContext,
   }
 
   if (phase === 'instruction') return <CognitiveTaskIntro title="图形—位置配对学习" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>记住每个抽象图形所在的位置，随后为每个图形选择原位置。像记住钥匙放在哪个抽屉，这个小游戏记录图形与位置之间的联系如何被记住。</p>) : (<p>记住每个抽象图形所在的位置，随后为每个图形选择原位置。</p>)} hint={<><p>本任务依赖视觉辨认图形；练习至少答对 3 / 4。</p><p>练习不计分。</p></>} onAction={startPractice} />
-  if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="text-center p-8"><p className="mb-4">练习正确 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
-  if (phase === 'practice-feedback') return <div className="text-center p-8"><p className="mb-4">上一题：{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
+  if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <CognitiveTaskPanel ariaLabel="练习结果" className="cognitive-task-panel--result"><h2 className="cognitive-task-title">练习结果</h2><p className="mb-4">练习正确 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></CognitiveTaskPanel> }
+  if (phase === 'practice-feedback') return <CognitivePracticeFeedback title="练习解析"><p className="mb-4">上一题：{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></CognitivePracticeFeedback>
   if (phase === 'delayed-wait') return <div className="text-center p-8"><h3 className="text-lg font-semibold mb-3">短延迟回忆准备</h3><p className="text-gray-600">请保持当前页面，短暂等待后将在不重复呈现配对的情况下再次作答。</p></div>
 
   const studying = phase === 'practice-study' || phase === 'formal-study'
   const positions = Array.from({ length: phase.startsWith('practice') ? 4 : activeSet.length }, (_, index) => index)
-  return <div className="p-6 text-center"><p className="mb-4 text-sm text-gray-500">{phase.startsWith('practice') ? `练习 ${practiceIndex + 1} / 4` : isDelayed ? '短延迟回忆' : `学习轮次 ${trialIndex + 1} / ${learningRounds}`}</p>
+  const content = <div className="p-6 text-center"><p className="mb-4 text-sm text-gray-500">{phase.startsWith('practice') ? `练习 ${practiceIndex + 1} / 4` : isDelayed ? '短延迟回忆' : `学习轮次 ${trialIndex + 1} / ${learningRounds}`}</p>
     {studying ? <><div className="grid grid-cols-3 gap-2 md:grid-cols-6">{positions.map((position) => { const item = activeSet.find((candidate) => candidate.targetPosition === position); return <div key={position} className="rounded-lg border bg-white p-3"><div className="text-xs text-gray-400">位置 {position + 1}</div><div className="mt-2">{item ? <Symbol itemId={item.itemId} /> : '·'}</div></div> })}</div>{phase === 'practice-study' ? <button className="btn-primary mt-6" onClick={beginRecall}>我记好了，开始作答</button> : <p className="mt-6 text-sm text-gray-500">请持续记忆，呈现结束后将自动进入作答。</p>}</> : <><div className="mb-5">{responseIndex < activeSet.length ? <Symbol itemId={activeSet[responseIndex].itemId} /> : <span className="text-5xl">✓</span>}</div><p className="mb-3 text-sm text-gray-500">已回答 {responses.length} / {activeSet.length}</p><div className="grid grid-cols-3 gap-2 md:grid-cols-6">{positions.map((position) => <button key={position} className="btn-secondary" disabled={responseIndex >= activeSet.length} onClick={() => choosePosition(position)}>位置 {position + 1}</button>)}</div>{responses.length === activeSet.length && <button className="btn-primary mt-6" onClick={() => phase === 'practice-recall' ? submitPractice() : void persistFormal(responses, false)}>提交本轮</button>}</>}
   </div>
+  return phase.startsWith('formal') ? <CognitiveFocusStage ariaLabel="配对学习正式测验" progress={{ completed: trialIndex, total: learningRounds + (delayedEnabled ? 1 : 0) }}>{content}</CognitiveFocusStage> : content
+
 }

@@ -1,3 +1,5 @@
+import { CognitiveTaskPanel, CognitivePracticeFeedback } from '../shared/CognitiveTaskPresentation'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { reportIntroV3 } from './report-intro-v3'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -132,7 +134,7 @@ export const EmotionrecognitionTask: React.FC<CognitiveTaskProps> = ({
   const handlePracticeResponse = (response: EmotionCategory) => {
     const correct = response === practiceSpec.emotion
     setPracticeCorrect((value) => value + (correct ? 1 : 0))
-    setFeedback(correct ? '分类正确。' : '这次分类不正确，请继续练习。')
+    setFeedback((correct ? '分类正确。' : '这次分类不正确。') + '本题示例表情：' + EMOTION_LABELS[practiceSpec.emotion] + '；你的选择：' + EMOTION_LABELS[response] + '。综合观察眉眼与嘴部，不只依据单一部位或自己的情绪作答。')
     setPhase('practice-feedback')
   }
 
@@ -197,25 +199,25 @@ export const EmotionrecognitionTask: React.FC<CognitiveTaskProps> = ({
   if (phase === 'practice-result') {
     const passed = practiceCorrect >= 4
     return (
-      <div className="card p-8 text-center">
+      <CognitiveTaskPanel ariaLabel="练习结果" className="cognitive-task-panel--result"><h2 className="cognitive-task-title">练习结果</h2>
         <p className="mb-4 text-gray-700">练习正确 {practiceCorrect} / {PRACTICE.length}</p>
         <button type="button" onClick={passed ? startFormal : startPractice} className={passed ? 'btn-primary' : 'btn-secondary'}>{passed ? '开始正式测验' : '重新练习'}</button>
-      </div>
+      </CognitiveTaskPanel>
     )
   }
 
   if (phase === 'practice-feedback') {
     return (
-      <div className="card p-8 text-center">
+      <CognitivePracticeFeedback title="练习解析">
         <p className="mb-5 text-gray-700">{feedback}</p>
         <button type="button" onClick={nextPractice} className="btn-primary">{practiceIndex + 1 >= PRACTICE.length ? '查看练习结果' : '下一题'}</button>
-      </div>
+      </CognitivePracticeFeedback>
     )
   }
 
   const spec = phase === 'practice' ? PRACTICE[practiceIndex] : formalSpec
   const asset = spec ? emotionAssetFor(spec.stimulusId) : emotionAssetFor('emotion-identity-01-happy')
-  return (
+  const content = (
     <div className="card p-8 text-center">
       <p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / ${PRACTICE.length}` : `正式试次 ${trialIndex + 1} / ${sequence.length}`}</p>
       <div
@@ -228,7 +230,7 @@ export const EmotionrecognitionTask: React.FC<CognitiveTaskProps> = ({
       </div>
       <div className="mx-auto grid max-w-xl grid-cols-2 gap-3 sm:grid-cols-3">
         {EMOTIONS.map((emotion, index) => (
-          <button key={emotion} type="button" onClick={() => handleResponse(emotion)} disabled={phase === 'formal' && (submitting || submittedRef.current || !responseEnabled)} className="rounded-xl border-2 border-sky-200 bg-white px-4 py-4 text-base text-sky-800 hover:bg-sky-50 disabled:opacity-50" aria-label={`选择${EMOTION_LABELS[emotion]}`}>
+          <button key={emotion} type="button" onClick={() => handleResponse(emotion)} disabled={phase === 'formal' && (submitting || submittedRef.current || !responseEnabled)} className="cognitive-response-button justify-center" aria-label={`选择${EMOTION_LABELS[emotion]}`}>
             {EMOTION_LABELS[emotion]}<span className="ml-1 text-xs text-gray-400">{index + 1}</span>
           </button>
         ))}
@@ -238,4 +240,6 @@ export const EmotionrecognitionTask: React.FC<CognitiveTaskProps> = ({
       {phase === 'formal' && completionPending && onTaskComplete && <button type="button" onClick={() => void onTaskComplete()} className="btn-secondary mt-4">重试完成测评</button>}
     </div>
   )
+  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="情绪辨认正式测验" progress={{ completed: trialIndex, total: sequence.length }}>{content}</CognitiveFocusStage> : content
+
 }

@@ -1,61 +1,80 @@
-/* Cognitive chrome has one palette across entry products. Timed stimuli are excluded. */
-.cognitive-surface {
-  --runner-ink:#252a30; --runner-muted:#626b74; --runner-line:#dfe3e7;
-  --runner-page:#f8f9fa; --runner-soft:#f3f4f5; --runner-blue:#303840;
-  --runner-blue-hover:#1f252b; --runner-action:#303840; --runner-surface:#fff;
-  color:#252a30; background:#fff; color-scheme:light;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  font-size:15px; line-height:1.7;
-}
+@import './tasks/shared/cognitive-design-tokens.css';
+
 .cognitive-surface .hui-product {
-  --hui-color-text:#252a30!important; --hui-color-muted:#626b74!important;
-  --hui-color-surface:#fff!important; --hui-color-background:#fff!important;
-  --hui-color-border:#dfe3e7!important; --hui-color-action:#303840!important;
-  --hui-color-action-hover:#1f252b!important; --hui-color-focus:#626b74!important;
+  --hui-color-text:var(--cognitive-ink)!important; --hui-color-muted:var(--cognitive-muted)!important;
+  --hui-color-surface:var(--cognitive-surface)!important; --hui-color-background:var(--cognitive-page)!important;
+  --hui-color-border:var(--cognitive-line)!important; --hui-color-action:var(--cognitive-accent)!important;
+  --hui-color-action-hover:var(--cognitive-accent-hover)!important; --hui-color-focus:var(--cognitive-focus)!important;
 }
-.cognitive-surface .hui-page { padding:24px!important; background:#fff!important; box-shadow:none!important; }
-.cognitive-surface [data-assessment-shell-header] { margin-bottom:24px!important; padding:0 0 20px!important; border:0!important; border-bottom:1px solid #e5e7eb!important; border-radius:0!important; background:#fff!important; box-shadow:none!important; }
-.cognitive-surface [data-assessment-shell-header] h1 { color:#252a30!important; font:600 24px/1.5 system-ui,sans-serif!important; letter-spacing:0!important; }
-.cognitive-surface [data-assessment-shell-header] p { color:#626b74!important; font-family:inherit!important; font-size:13px!important; line-height:1.8!important; }
-.cognitive-surface :is(.cognitive-task-panel,.cognitive-task-cue) { border-color:#dfe3e7!important; border-radius:10px!important; background:#fff!important; color:#252a30!important; box-shadow:none!important; }
-.cognitive-surface .cognitive-task-title { color:#252a30!important; font-family:inherit!important; font-size:23px!important; font-weight:600!important; letter-spacing:0!important; }
-.cognitive-surface .cognitive-task-eyebrow { color:#626b74!important; font-size:12px!important; font-weight:500!important; letter-spacing:0!important; }
-.cognitive-surface :is(.cognitive-task-description,.cognitive-task-result-score,.cognitive-task-result-detail) { color:#454f59!important; }
-.cognitive-surface :is(.cognitive-task-hint,.cognitive-task-transition-meta) { color:#626b74!important; border-color:#e5e7eb!important; border-radius:8px!important; background:#f8f9fa!important; font-weight:400!important; }
-.cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button) { min-height:44px!important; padding:10px 20px!important; border:1px solid #d7dce1!important; border-radius:8px!important; box-shadow:none!important; font-family:inherit!important; font-size:14px!important; font-weight:500!important; line-height:1.7!important; letter-spacing:0!important; transform:none!important; }
-.cognitive-surface :is(.btn-primary,.hui-button--primary) { color:#fff!important; border-color:#303840!important; background:#303840!important; }
-.cognitive-surface :is(.btn-primary,.hui-button--primary):hover:not(:disabled) { border-color:#1f252b!important; background:#1f252b!important; }
-.cognitive-surface :is(.btn-secondary,.hui-button--secondary) { color:#454f59!important; background:#fff!important; }
-.cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button):focus-visible { outline:2px solid #737d87!important; outline-offset:3px!important; }
-.cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button):disabled { opacity:.45!important; cursor:not-allowed; }
-.cognitive-surface [role=progressbar] { background:#e5e7eb!important; }
-.cognitive-surface [role=progressbar]>div,.cognitive-surface .cognitive-task-progress__value { background:#555f69!important; }
-.cognitive-surface [data-cognitive-focus-stage] { background:#f8f9fa!important; }
-.cognitive-surface.survey-cognitive-unit { padding:24px!important; border-color:#dfe3e7!important; border-radius:12px!important; box-shadow:none!important; }
-.cognitive-surface.survey-cognitive-unit>h3 { color:#252a30!important; font-family:inherit!important; font-size:18px!important; font-weight:600!important; }
-.cognitive-surface [aria-label="认知任务设备检查"] { border-color:#dfe3e7!important; background:#fff!important; color:#454f59!important; }
+.cognitive-surface [data-cognitive-task-root] {
+  --runner-ink:var(--cognitive-ink)!important;
+  --runner-muted:var(--cognitive-muted)!important;
+  --runner-line:var(--cognitive-line)!important;
+  --runner-page:var(--cognitive-page)!important;
+  --runner-soft:var(--cognitive-soft)!important;
+  --runner-blue:var(--cognitive-accent)!important;
+  --runner-blue-hover:var(--cognitive-accent-hover)!important;
+  --runner-action:var(--cognitive-accent)!important;
+  --runner-surface:var(--cognitive-surface)!important;
+  --hui-color-text:var(--cognitive-ink)!important;
+  --hui-color-muted:var(--cognitive-muted)!important;
+  --hui-color-surface:var(--cognitive-surface)!important;
+  --hui-color-background:var(--cognitive-page)!important;
+  --hui-color-border:var(--cognitive-line)!important;
+  --hui-color-action:var(--cognitive-accent)!important;
+  --hui-color-action-hover:var(--cognitive-accent-hover)!important;
+  --hui-color-focus:var(--cognitive-focus)!important;
+  color:var(--cognitive-ink)!important;
+  color-scheme:inherit!important;
+}
+.cognitive-surface .hui-page { padding:24px!important; background:var(--cognitive-page)!important; color:var(--cognitive-ink)!important; box-shadow:none!important; }
+.cognitive-surface [data-assessment-shell-header] { margin-bottom:24px!important; padding:0 0 20px!important; border:0!important; border-bottom:1px solid var(--cognitive-line)!important; border-radius:0!important; background:var(--cognitive-page)!important; box-shadow:none!important; }
+.cognitive-surface [data-assessment-shell-header] h1 { color:var(--cognitive-ink)!important; font:650 26px/1.35 system-ui,sans-serif!important; letter-spacing:-.025em!important; }
+.cognitive-surface [data-assessment-shell-header] p { color:var(--cognitive-muted)!important; font-family:inherit!important; font-size:15px!important; line-height:1.7!important; }
+.cognitive-surface :is(.cognitive-task-panel,.cognitive-task-cue) { border-color:var(--cognitive-line)!important; border-radius:16px!important; background:var(--cognitive-surface)!important; color:var(--cognitive-ink)!important; box-shadow:0 8px 28px rgb(24 39 30 / .045)!important; }
+.cognitive-surface .cognitive-task-title { color:var(--cognitive-ink)!important; font-family:inherit!important; font-size:clamp(24px,1.45rem + .7vw,32px)!important; font-weight:720!important; letter-spacing:-.025em!important; line-height:1.25!important; }
+.cognitive-surface .cognitive-task-eyebrow { color:var(--cognitive-accent)!important; font-size:12px!important; font-weight:800!important; letter-spacing:.075em!important; }
+.cognitive-surface :is(.cognitive-task-description,.cognitive-task-result-score,.cognitive-task-result-detail) { color:var(--cognitive-muted)!important; }
+.cognitive-surface :is(.cognitive-task-hint,.cognitive-task-transition-meta) { color:var(--cognitive-muted)!important; border-color:var(--cognitive-line)!important; border-radius:12px!important; background:var(--cognitive-raised)!important; font-weight:450!important; }
+.cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button) { min-height:48px!important; padding:11px 22px!important; border:1px solid var(--cognitive-line)!important; border-radius:11px!important; box-shadow:none!important; font-family:inherit!important; font-size:16px!important; font-weight:700!important; line-height:1.35!important; letter-spacing:0!important; transform:none!important; }
+.cognitive-surface :is(.btn-primary,.hui-button--primary) { color:var(--cognitive-on-accent)!important; border-color:var(--cognitive-accent)!important; background:var(--cognitive-accent)!important; }
+.cognitive-surface :is(.btn-primary,.hui-button--primary):hover:not(:disabled) { color:var(--cognitive-on-accent)!important; border-color:var(--cognitive-accent-hover)!important; background:var(--cognitive-accent-hover)!important; }
+.cognitive-surface :is(.btn-secondary,.hui-button--secondary) { color:var(--cognitive-ink)!important; background:var(--cognitive-raised)!important; }
+.cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button):focus-visible { outline:3px solid color-mix(in srgb,var(--cognitive-focus) 45%,transparent)!important; outline-offset:3px!important; }
+.cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button):disabled { opacity:.5!important; cursor:not-allowed; }
+.cognitive-surface [role=progressbar] { background:var(--cognitive-line)!important; }
+.cognitive-surface [role=progressbar]>div,.cognitive-surface .cognitive-task-progress__value { background:var(--cognitive-accent)!important; }
+.cognitive-surface [data-cognitive-focus-stage] { background:var(--cognitive-page)!important; }
+.cognitive-surface.survey-cognitive-unit { padding:24px!important; border-color:var(--cognitive-line)!important; border-radius:16px!important; background:var(--cognitive-surface)!important; box-shadow:none!important; }
+.cognitive-surface.survey-cognitive-unit>h3 { color:var(--cognitive-ink)!important; font-family:inherit!important; font-size:19px!important; font-weight:700!important; }
+.cognitive-surface [aria-label="认知任务设备检查"] { border-color:var(--cognitive-line)!important; background:var(--cognitive-raised)!important; color:var(--cognitive-muted)!important; }
 .cognitive-gonogo-rules { display:grid; gap:16px; padding:0; margin:24px 0; list-style:none; text-align:left; }
 .cognitive-gonogo-rules>li { display:flex; align-items:center; gap:16px; }
-.cognitive-gonogo-rules strong { color:#252a30; font-size:15px; font-weight:600; }
-.cognitive-gonogo-rules p { margin:3px 0 0; font-size:13px; line-height:1.8; }
+.cognitive-gonogo-rules strong { color:var(--cognitive-ink); font-size:16px; font-weight:700; }
+.cognitive-gonogo-rules p { margin:3px 0 0; color:var(--cognitive-muted); font-size:15px; line-height:1.7; }
 .cognitive-gonogo-example { flex:none; width:32px; height:32px; border-radius:50%; }
-.cognitive-gonogo-example--go { background:#22c55e; }
-.cognitive-gonogo-example--stop { background:#ef4444; }
-.cognitive-gonogo-example--wait { background:#e5e7eb; }
+.cognitive-gonogo-example--go { background:var(--cognitive-success); }
+.cognitive-gonogo-example--stop { background:var(--cognitive-danger); }
+.cognitive-gonogo-example--wait { border:1px solid var(--cognitive-line); background:var(--cognitive-raised); }
 @media(max-width:600px){.cognitive-surface .hui-page,.cognitive-surface.survey-cognitive-unit{padding:20px 16px!important}.cognitive-gonogo-rules>li{gap:12px}.cognitive-gonogo-example{width:28px;height:28px}}
 
 /* Product shells may also theme the non-timed progress card. */
-.cognitive-surface section[aria-label="测评进度"] { background:#fff!important; border-color:#dfe3e7!important; }
-.cognitive-surface section[aria-label="测评进度"] .text-slate-500 { color:#626b74!important; }
+.cognitive-surface section[aria-label="测评进度"] { background:var(--cognitive-surface)!important; border-color:var(--cognitive-line)!important; color:var(--cognitive-ink)!important; }
+.cognitive-surface section[aria-label="测评进度"] .text-slate-500 { color:var(--cognitive-muted)!important; }
 
 /* One shared non-timed preparation layout across Survey, Training and School.
  * Active trial pages never receive cognitive-preparation. */
 .cognitive-surface .hui-page.cognitive-preparation{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:20px 28px;align-items:start}
+.cognitive-surface .hui-page.cognitive-initial-start{--hui-page-width:82rem;grid-template-columns:minmax(0,1fr);gap:18px}
+.cognitive-surface .cognitive-initial-start>[data-assessment-shell-header],.cognitive-surface .cognitive-initial-start>[data-assessment-shell-content],.cognitive-surface .cognitive-initial-start>[data-assessment-shell-actions]{grid-column:1/-1;grid-row:auto}
+.cognitive-surface .cognitive-initial-start>[data-assessment-shell-header]{padding-bottom:12px!important}
+.cognitive-surface .cognitive-initial-start>[data-assessment-shell-actions]{padding-top:12px}
 .cognitive-preparation>*{grid-column:1/-1;min-width:0}
 .cognitive-surface .cognitive-preparation>[data-assessment-shell-header]{grid-column:1;grid-row:1;margin:0!important;padding:0!important;border:0!important}
-.cognitive-surface .cognitive-preparation>section[aria-label="测评进度"]{grid-column:2;grid-row:1;margin:0;border:1px solid #dfe3e7;border-radius:10px;padding:16px}
+.cognitive-surface .cognitive-initial-start>[data-assessment-shell-header]{width:min(100%,66rem);margin-inline:auto!important}
+.cognitive-surface .cognitive-preparation>section[aria-label="测评进度"]{grid-column:2;grid-row:1;margin:0;border:1px solid var(--cognitive-line);border-radius:14px;padding:16px;background:var(--cognitive-surface)}
 .cognitive-preparation>[data-assessment-shell-statuses]:empty,.cognitive-preparation>[data-assessment-shell-content]:empty{display:none}
-.cognitive-preparation>[data-assessment-shell-actions]{margin:0;padding-top:18px;border-top:1px solid #e5e7eb}
+.cognitive-preparation>[data-assessment-shell-actions]{margin:0;padding-top:18px;border-top:1px solid var(--cognitive-line)}
 .cognitive-preparation>[data-assessment-shell-actions]>div{text-align:right}
 @media(max-width:700px){
  .cognitive-surface .hui-page.cognitive-preparation{grid-template-columns:minmax(0,1fr);gap:18px}
@@ -64,42 +83,31 @@
 }
 /* Progress chrome stays legible and neutral under every product appearance.
  * These selectors cannot enter the timed task boundary. */
-.cognitive-surface .hui-page>section[aria-label] :is(.text-slate-500,.text-slate-600,.text-slate-900){color:#626b74!important}
-.cognitive-surface .cognitive-preparation :is(.hui-status--pending,.hui-status--info){background:#f8f9fa;border-color:#dfe3e7;color:#454f59}
+.cognitive-surface .hui-page>section[aria-label] :is(.text-slate-500,.text-slate-600,.text-slate-900){color:var(--cognitive-muted)!important}
+.cognitive-surface .cognitive-preparation :is(.hui-status--pending,.hui-status--info){background:var(--cognitive-raised);border-color:var(--cognitive-line);color:var(--cognitive-muted)}
 
-
-/* Training dark theme for non-timed cognitive preparation and status screens. */
-@media screen {
-  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) {
-    --runner-ink:var(--training-ink); --runner-muted:var(--training-muted);
-    --runner-line:var(--training-border); --runner-surface:var(--training-surface);
-    --runner-page:var(--training-paper); --runner-soft:var(--training-raised);
-    color:var(--training-ink); background:var(--training-surface); color-scheme:dark;
-  }
-  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) .hui-product {
-    --hui-color-text:var(--training-ink)!important; --hui-color-muted:var(--training-muted)!important;
-    --hui-color-surface:var(--training-surface)!important; --hui-color-background:var(--training-paper)!important;
-    --hui-color-border:var(--training-border)!important; --hui-color-action:var(--training-bamboo)!important;
-  }
-  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) :is(.hui-page,[data-assessment-shell-header],section[aria-label="测评进度"],.cognitive-task-panel,.cognitive-task-cue,[aria-label="认知任务设备检查"]) {
-    background:var(--training-surface)!important; color:var(--training-ink)!important; border-color:var(--training-border)!important;
-  }
-  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) :is([data-assessment-shell-header] h1,.cognitive-task-title) { color:var(--training-ink)!important; }
-  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) :is([data-assessment-shell-header] p,.cognitive-task-eyebrow,.cognitive-task-description,.cognitive-task-result-score,.cognitive-task-result-detail,.hui-page>section[aria-label] .text-slate-500,.hui-page>section[aria-label] .text-slate-600,.hui-page>section[aria-label] .text-slate-900) { color:var(--training-muted)!important; }
-  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) :is(.cognitive-task-hint,.cognitive-task-transition-meta,.cognitive-preparation .hui-status--pending,.cognitive-preparation .hui-status--info) { background:var(--training-raised)!important; color:var(--training-ink)!important; border-color:var(--training-border)!important; }
-  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) :is(.btn-primary,.hui-button--primary) { background:var(--training-bamboo)!important; border-color:var(--training-bamboo)!important; color:var(--training-on-accent)!important; }
-  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) :is(.btn-primary,.hui-button--primary):hover:not(:disabled) { background:#cdddb9!important; border-color:#cdddb9!important; color:var(--training-on-accent)!important; }
-  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) :is(.btn-secondary,.hui-button--secondary) { background:var(--training-raised)!important; border-color:var(--training-border)!important; color:var(--training-ink)!important; }
-  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) [role=progressbar] { background:var(--training-raised)!important; }
-  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) [role=progressbar]>div { background:var(--training-bamboo)!important; }
-  .hui-training[data-training-theme="dark"] .cognitive-surface:not(:has([data-cognitive-task-root])) .cognitive-preparation>[data-assessment-shell-actions] { border-color:var(--training-border); }
-}
 
 /* Shared readable instructions and tactile action feedback; stimulus shapes excluded. */
 .cognitive-surface [data-assessment-shell-header] p{font-size:15px!important}
 .cognitive-surface [data-cognitive-task-root] :is([class~="max-w-2xl"],[class~="max-w-3xl"]){margin-inline:auto}
 .cognitive-surface :is(.cognitive-task-description,.cognitive-task-hint,.cognitive-task-result-detail){font-size:16px;line-height:1.8}
-.cognitive-surface [data-cognitive-focus-stage] :is(p.text-xs,p.text-sm,div.text-xs,div.text-sm){font-size:15px;line-height:1.75}
+.cognitive-surface [data-cognitive-focus-stage] :is(p.text-xs,p.text-sm,div.text-xs,div.text-sm){font-size:16px;line-height:1.75}
 .cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button){transition:box-shadow .12s ease,filter .12s ease!important;font-size:16px!important;min-height:48px!important}
 .cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button):active:not(:disabled){box-shadow:inset 0 2px 5px rgb(0 0 0 / .18)!important;filter:brightness(.94)}
 @media(prefers-reduced-motion:reduce){.cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button){transition:none!important}}
+
+/* While a task is active, the task itself owns the viewport and progress UI.
+ * Keep a semantic page title for assistive technology without reserving a row. */
+.cognitive-surface .hui-page.cognitive-running{position:relative;display:block;width:100%!important;max-width:none!important;min-height:100svh;padding:0!important;margin:0!important}
+.cognitive-surface .cognitive-running>[data-assessment-shell-header]{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.cognitive-surface .cognitive-running>[data-assessment-shell-content]{display:block;width:100%;min-height:100svh;padding:clamp(20px,3.5vh,42px) clamp(16px,3vw,42px);box-sizing:border-box}
+.cognitive-surface .cognitive-running [data-cognitive-start-content]:empty{display:none}
+.cognitive-surface .cognitive-running [data-cognitive-task-mount],.cognitive-surface .cognitive-running [data-cognitive-task-root]{display:block;width:100%;min-width:0}
+.cognitive-surface .cognitive-running [data-cognitive-task-root] :is([class~="max-w-2xl"],[class~="max-w-3xl"]){width:100%!important;max-width:min(100%,72rem)!important;margin-inline:auto}
+.cognitive-surface .cognitive-running>[data-assessment-shell-statuses]:empty{display:none}
+.cognitive-surface .cognitive-running>[data-assessment-shell-statuses]:not(:empty){position:fixed;z-index:45;top:8px;right:8px;width:min(25rem,calc(100vw - 16px));margin:0!important}
+.cognitive-surface .cognitive-running>[data-assessment-shell-statuses]>:not(:empty){padding:8px 12px!important;font-size:13px!important;line-height:1.45!important}
+
+/* One viewport and palette for instructions, practice and scored trials.
+ * Keep product chrome/theme outside the cognitive visual field. Reports use their own pages. */
+.cognitive-surface[data-cognitive-appearance="fixed"]{position:fixed;inset:0;z-index:40;overflow-y:auto;min-height:100svh;background:var(--cognitive-page);color:var(--cognitive-ink);color-scheme:light}

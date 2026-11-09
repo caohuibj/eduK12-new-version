@@ -53,6 +53,7 @@ vi.mock('../registry', () => ({
       return <div data-testid="task-runner" />
     },
     completionMode: 'manual',
+    startActionOwner: 'host',
   }),
 }))
 

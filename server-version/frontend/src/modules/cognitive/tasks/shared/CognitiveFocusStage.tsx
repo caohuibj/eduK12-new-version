@@ -19,20 +19,21 @@ export const CognitiveFocusStage = ({
   progress?: FocusProgress
 }) => {
   const inheritedProgress = useContext(CognitiveFocusProgressContext)
-  const activeProgress = ariaLabel.includes('练习') ? undefined : progress ?? inheritedProgress
+  const practice = ariaLabel.includes('练习')
+  const activeProgress = progress ?? (practice ? undefined : inheritedProgress)
   return (
   <section
-    className="fixed inset-0 z-40 overflow-y-auto bg-slate-50"
+    className="cognitive-focus-stage fixed inset-0 z-40 overflow-y-auto bg-slate-50"
     aria-label={ariaLabel}
     data-cognitive-focus-stage
   >
     {activeProgress && <div className="cognitive-focus-stage__progress" data-cognitive-focus-progress>
       {activeProgress.total != null && activeProgress.total > 0
-        ? <CognitiveProgress current={Math.min(activeProgress.completed + 1, activeProgress.total)} total={activeProgress.total} label="正式测试 · 当前试次" />
-        : <p className="text-center text-sm text-gray-500">正式测试 · 已记录 {activeProgress.completed} 次</p>}
+        ? <CognitiveProgress current={activeProgress.completed} total={activeProgress.total} label={activeProgress.label ?? `${practice ? '练习' : '正式测验'} · 已完成 / 总量`} />
+        : <p className="cognitive-focus-stage__adaptive">自适应测验 · 已完成 <strong>{activeProgress.completed}</strong> 题<span>总题量随作答表现调整</span></p>}
     </div>}
     <div className="cognitive-focus-stage__body" data-has-progress={Boolean(activeProgress)}>
-      <div className="w-full">{children}</div>
+      <div className="cognitive-focus-stage__task w-full">{children}</div>
     </div>
   </section>
   )

@@ -1,8 +1,8 @@
+import { CognitivePracticeReview, type PracticeReview } from '../shared/CognitivePracticeReview'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { sstSequence } from '../shared/prng'
-import { PRACTICE_FEEDBACK_MS } from '../shared/practice'
 import {
   CognitivePracticeResult,
   CognitiveTaskIntro,
@@ -63,6 +63,7 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
   const [practiceStopCorrect, setPracticeStopCorrect] = useState(0)
   const [practiceNonce, setPracticeNonce] = useState(0)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [practiceReview, setPracticeReview] = useState<PracticeReview | null>(null)
   const onsetRef = useRef<number | null>(null)
   const respondedRef = useRef(false)
   const responseRef = useRef<'left' | 'right' | null>(null)
@@ -77,7 +78,7 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
 
   const startPracticeStage = (stage: PracticeStage) => {
     setPracticeStage(stage)
-    setPracticeIndex(0)
+    setPracticeReview(null); setPracticeIndex(0)
     setPracticeCorrect(0)
     setPracticeStopCorrect(0)
     practiceCorrectRef.current = 0
@@ -150,16 +151,7 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
         } else {
           setFeedback(correct ? '正确：箭头出现后立即按对应方向。' : '箭头出现后要立即按对应方向，不要等待停止信号。')
         }
-        const nextIndex = practiceIndex + 1
-        window.setTimeout(() => {
-          if (nextIndex >= practiceTrials.length) {
-            setPracticeCorrect(practiceCorrectRef.current)
-            setPracticeStopCorrect(practiceStopCorrectRef.current)
-            setPhase('practice-result')
-            return
-          }
-          setPracticeIndex(nextIndex)
-        }, PRACTICE_FEEDBACK_MS)
+        setPracticeReview({ correct, prompt: (current.goStimulus === 'left' ? '← 左箭头' : '→ 右箭头') + (current.trialType === 'stop' ? '，随后出现红色停止信号' : '，没有停止信号'), expected: current.trialType === 'stop' ? '尝试停止反应' : (current.goStimulus === 'left' ? '立即按左方向' : '立即按右方向'), actual: responseRef.current == null ? '你没有按键' : (responseRef.current === 'left' ? '你按了左方向' : '你按了右方向'), explanation: current.trialType === 'stop' ? '红色信号出现后要尝试抑制反应；不要为了等停止信号而放慢普通题。' : '没有停止信号的题要立即按箭头方向。按相反方向是误按，没有按键是漏按。' })
         return
       }
       if (!submittingRef.current) {
@@ -207,6 +199,7 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
   const current = phase === 'formal' ? sequence[trialIndex] : practiceTrials[practiceIndex]
 
   const respond = (side: 'left' | 'right') => {
+    if (phase === 'practice' && practiceReview) return
     if (!visible || respondedRef.current || onsetRef.current == null) return
     respondedRef.current = true
     responseRef.current = side
@@ -216,6 +209,7 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
     const onKeyDown = (event: KeyboardEvent) => {
+      if (phase === 'practice' && practiceReview) return
       if (event.repeat) return
       if (event.key === 'ArrowLeft') {
         event.preventDefault()
@@ -228,6 +222,12 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   })
+
+  if (phase === 'practice' && practiceReview) return <CognitivePracticeReview feedback={practiceReview} completed={practiceIndex + 1} total={practiceTrials.length} onContinue={() => {
+    setPracticeReview(null)
+    if (practiceIndex + 1 >= practiceTrials.length) { setPracticeCorrect(practiceCorrectRef.current); setPracticeStopCorrect(practiceStopCorrectRef.current); setPhase('practice-result') }
+    else setPracticeIndex(value => value + 1)
+  }} />
 
   if (phase === 'instruction') {
     return (
@@ -282,6 +282,6 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
   )
 
   return phase === 'formal'
-    ? <CognitiveFocusStage ariaLabel="停止信号正式测验">{taskBody}</CognitiveFocusStage>
+    ? <CognitiveFocusStage ariaLabel="停止信号正式测验" progress={{ completed: trialIndex, total: total }}>{taskBody}</CognitiveFocusStage>
     : taskBody
 }

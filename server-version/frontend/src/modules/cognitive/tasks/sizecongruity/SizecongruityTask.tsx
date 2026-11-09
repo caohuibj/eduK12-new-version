@@ -1,4 +1,4 @@
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeAnswer, type PracticeAnswerFeedback, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { SizecongruityConfig, SizecongruityTrialPayload } from '../../types'
@@ -40,7 +40,7 @@ export const SizecongruityTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
   const [practiceIndex, setPracticeIndex] = useState(0)
   const [practiceAttempt, setPracticeAttempt] = useState(1)
   const [practiceCorrect, setPracticeCorrect] = useState<boolean[]>([])
-  const [practiceFeedback, setPracticeFeedback] = useState<string | null>(null)
+  const [practiceFeedback, setPracticeFeedback] = useState<PracticeAnswerFeedback | null>(null)
   const [formalFeedback, setFormalFeedback] = useState<string | null>(null)
   const interruptedRef = useRef(false)
   const onsetRef = useRef<number | null>(null)
@@ -103,7 +103,9 @@ export const SizecongruityTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
       const largerSide: SizecongruitySide = trial.leftDigit > trial.rightDigit ? 'left' : 'right'
       const correct = response === largerSide
       setPracticeCorrect((current) => { const next = [...current]; next[practiceIndex] = correct; return next })
-      setPracticeFeedback(correct ? '正确：只比数值大小。' : '请忽略字号，只比较两个数的数值。')
+      setPracticeFeedback({ correct, prompt: `左边数字 ${trial.leftDigit}；右边数字 ${trial.rightDigit}`,
+        expected: largerSide === 'left' ? '选择左边' : '选择右边', actual: response === 'left' ? '选择左边' : '选择右边',
+        explanation: `${Math.max(trial.leftDigit, trial.rightDigit)} 的数值比 ${Math.min(trial.leftDigit, trial.rightDigit)} 大，所以应选${largerSide === 'left' ? '左' : '右'}边。数字在屏幕上写得大或小，不影响本题答案。` })
       setSubPhase('feedback'); return
     }
     void submitFormal(response)
@@ -140,10 +142,10 @@ export const SizecongruityTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
 
   if (phase === 'practice') {
     const trial = SIZECONGRUITY_PRACTICE_TRIALS[practiceIndex]
-    return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 {practiceIndex + 1} / {SIZECONGRUITY_PRACTICE_TRIALS.length} · 第 {practiceAttempt} 轮 · 不计入成绩</div>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-32 pt-8">+</div>}{subPhase === 'stimulus' && trial && <DigitPair {...trial} fontLargeRem={fontLargeRem} fontSmallRem={fontSmallRem} />}{subPhase === 'feedback' && <div className="h-32 pt-8 text-gray-700">{practiceFeedback}</div>}<ResponseButtons show={subPhase === 'stimulus'} />{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary">{practiceIndex + 1 >= SIZECONGRUITY_PRACTICE_TRIALS.length ? practiceCorrect.every(Boolean) ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div>
+    return <CognitiveFocusStage ariaLabel="数量比较练习" progress={{ completed: practiceIndex + (subPhase === 'feedback' ? 1 : 0), total: SIZECONGRUITY_PRACTICE_TRIALS.length }}><div className="card p-8 max-w-2xl text-center"><p className="text-sm text-gray-500 mb-4">第 {practiceAttempt} 轮 · 练习不计入成绩</p>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-32 pt-8">+</div>}{subPhase === 'stimulus' && trial && <DigitPair {...trial} fontLargeRem={fontLargeRem} fontSmallRem={fontSmallRem} />}{subPhase === 'feedback' && <CognitivePracticeAnswer feedback={practiceFeedback} />}<ResponseButtons show={subPhase === 'stimulus'} />{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary">{practiceIndex + 1 >= SIZECONGRUITY_PRACTICE_TRIALS.length ? practiceCorrect.every(Boolean) ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div></CognitiveFocusStage>
   }
 
   if (!currentTrial) return <div className="card p-8 text-center text-gray-500">正在生成结果…</div>
 
-  return <CognitiveFocusStage ariaLabel="数量大小比较正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-32 pt-8">+</div>}{subPhase === 'stimulus' && <DigitPair {...currentTrial} fontLargeRem={fontLargeRem} fontSmallRem={fontSmallRem} />}{subPhase === 'feedback' && <div className="h-32 pt-8 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<ResponseButtons show={subPhase === 'stimulus'} /><p className="text-xs text-gray-400 mt-6">按键 1/2、方向键或点击按钮作答</p></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="数量大小比较正式测验" progress={{ completed: trialIndex, total: totalTrials }}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-32 pt-8">+</div>}{subPhase === 'stimulus' && <DigitPair {...currentTrial} fontLargeRem={fontLargeRem} fontSmallRem={fontSmallRem} />}{subPhase === 'feedback' && <div className="h-32 pt-8 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<ResponseButtons show={subPhase === 'stimulus'} /><p className="text-xs text-gray-400 mt-6">按键 1/2、方向键或点击按钮作答</p></div></CognitiveFocusStage>
 }

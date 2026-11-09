@@ -1,9 +1,10 @@
+import { CognitivePracticeReview, type PracticeReview } from '../shared/CognitivePracticeReview'
 import {GonogoInstructions} from './GonogoInstructions'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { gonogoSequence } from '../shared/prng'
-import { PRACTICE_FEEDBACK_MS, PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } from '../shared/practice'
+import { PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } from '../shared/practice'
 import {
   CognitivePracticeResult,
   CognitiveTaskCompletionNotice,
@@ -23,13 +24,14 @@ export const GonogoTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [practiceNonce, setPracticeNonce] = useState(0)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [practiceReview, setPracticeReview] = useState<PracticeReview | null>(null)
   const onsetRef = useRef<number | null>(null)
   const respondedRef = useRef(false)
   const interruptedRef = useRef(false)
   const practiceCorrectRef = useRef(0)
 
   const startPractice = () => {
-    setPracticeIndex(0); setPracticeCorrect(0); practiceCorrectRef.current = 0; setFeedback(null); setVisible(false)
+    setPracticeReview(null); setPracticeIndex(0); setPracticeCorrect(0); practiceCorrectRef.current = 0; setFeedback(null); setVisible(false)
     respondedRef.current = false; interruptedRef.current = false; onsetRef.current = null; setPracticeNonce((value) => value + 1); setPhase('practice')
   }
   const startFormal = () => {
@@ -55,11 +57,7 @@ export const GonogoTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
       if (phase === 'practice') {
         setFeedback(correct ? '正确' : '错误')
         if (correct) practiceCorrectRef.current += 1
-        const nextIndex = practiceIndex + 1
-        window.setTimeout(() => {
-          if (nextIndex >= PRACTICE_TRIAL_COUNT) { setPracticeCorrect(practiceCorrectRef.current); setPhase('practice-result'); return }
-          setPracticeIndex(nextIndex)
-        }, PRACTICE_FEEDBACK_MS)
+        setPracticeReview({ correct, prompt: trialType === 'go' ? '本题：绿色圆形' : '本题：红色圆形', expected: trialType === 'go' ? '反应一次' : '不按键、不点击', actual: responded ? '你作出了反应' : '你没有反应', explanation: trialType === 'go' ? '绿色是目标，看到后应立即按一次；未按属于漏按。' : '红色出现时应保持不动，等待它消失；按键或点击属于误按。' })
         return
       }
       if (!responded) await onTrialComplete({ trialType, responded: false, rtMs: null, interrupted: interruptedRef.current })
@@ -79,12 +77,19 @@ export const GonogoTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
     const onKeyDown = (event: KeyboardEvent) => {
+      if (phase === 'practice' && practiceReview) return
       if (event.repeat || (event.key !== ' ' && event.key !== 'Enter')) return
       event.preventDefault(); void respond()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   })
+
+  if (phase === 'practice' && practiceReview) return <CognitivePracticeReview feedback={practiceReview} completed={practiceIndex + 1} total={PRACTICE_TRIAL_COUNT} onContinue={() => {
+    setPracticeReview(null)
+    if (practiceIndex + 1 >= PRACTICE_TRIAL_COUNT) { setPracticeCorrect(practiceCorrectRef.current); setPhase('practice-result') }
+    else setPracticeIndex(value => value + 1)
+  }} />
 
   if (phase === 'instruction') {
     return <GonogoInstructions keyboardOnly={taskContext.requiredInput==='KEYBOARD'} onStart={startPractice}/>
@@ -104,5 +109,5 @@ export const GonogoTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
   if (phase === 'formal' && trialIndex >= total) return <CognitiveTaskCompletionNotice />
 
   const taskBody = <div className="mx-auto max-w-2xl text-center p-8">{phase === 'practice' ? <p className="text-sm text-gray-500 mb-2">练习 {practiceIndex + 1} / {PRACTICE_TRIAL_COUNT}</p> : <span className="sr-only">试次 {trialIndex + 1} / {total}</span>}{feedback && <p className="text-sm mb-3">{feedback}</p>}<button type="button" aria-label="respond" className={`mx-auto h-32 w-32 rounded-full ${visible ? (trialType === 'go' ? 'bg-green-500' : 'bg-red-500') : 'bg-gray-200'}`} onPointerDown={() => { void respond() }}/>{phase === 'formal' ? <p className="mt-5 text-xs text-gray-400">绿色：按空格 / Enter 或点击圆形；红色：不要按</p> : null}</div>
-  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="Go No-Go 正式测验">{taskBody}</CognitiveFocusStage> : taskBody
+  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="Go No-Go 正式测验" progress={{ completed: trialIndex, total: total }}>{taskBody}</CognitiveFocusStage> : taskBody
 }

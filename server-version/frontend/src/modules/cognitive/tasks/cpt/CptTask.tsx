@@ -1,8 +1,9 @@
+import { CognitivePracticeReview, type PracticeReview } from '../shared/CognitivePracticeReview'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { cptSequence } from '../shared/prng'
-import { PRACTICE_FEEDBACK_MS, PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } from '../shared/practice'
+import { PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } from '../shared/practice'
 import {
   CognitivePracticeResult,
   CognitiveTaskCompletionNotice,
@@ -34,6 +35,7 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [practiceNonce, setPracticeNonce] = useState(0)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [practiceReview, setPracticeReview] = useState<PracticeReview | null>(null)
   const [acknowledgedBlockIndex, setAcknowledgedBlockIndex] = useState<number | null>(blockCount > 1 ? null : 0)
   const onsetRef = useRef<number | null>(null)
   const respondedRef = useRef(false)
@@ -41,7 +43,7 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
   const practiceCorrectRef = useRef(0)
 
   const startPractice = () => {
-    setPracticeIndex(0)
+    setPracticeReview(null); setPracticeIndex(0)
     setPracticeCorrect(0)
     practiceCorrectRef.current = 0
     setFeedback(null)
@@ -92,15 +94,7 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
       if (phase === 'practice') {
         setFeedback(correct ? '正确' : '错误')
         if (correct) practiceCorrectRef.current += 1
-        const nextIndex = practiceIndex + 1
-        window.setTimeout(() => {
-          if (nextIndex >= PRACTICE_TRIAL_COUNT) {
-            setPracticeCorrect(practiceCorrectRef.current)
-            setPhase('practice-result')
-            return
-          }
-          setPracticeIndex(nextIndex)
-        }, PRACTICE_FEEDBACK_MS)
+        setPracticeReview({ correct, prompt: '本题字母：' + current.stimulus, expected: current.isTarget ? '反应一次' : '保持不动', actual: responded ? '你作出了反应' : '你没有反应', explanation: current.isTarget ? 'X 是唯一的目标字母，应该按一次；没有反应属于漏按。' : '本题不是 X，应保持不动；只有看到 X 才需要反应。' })
         return
       }
       if (!responded) {
@@ -151,6 +145,7 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
     const onKeyDown = (event: KeyboardEvent) => {
+      if (phase === 'practice' && practiceReview) return
       if (event.repeat || (event.key !== ' ' && event.key !== 'Enter')) return
       event.preventDefault()
       void respond()
@@ -158,6 +153,12 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   })
+
+  if (phase === 'practice' && practiceReview) return <CognitivePracticeReview feedback={practiceReview} completed={practiceIndex + 1} total={PRACTICE_TRIAL_COUNT} onContinue={() => {
+    setPracticeReview(null)
+    if (practiceIndex + 1 >= PRACTICE_TRIAL_COUNT) { setPracticeCorrect(practiceCorrectRef.current); setPhase('practice-result') }
+    else setPracticeIndex(value => value + 1)
+  }} />
 
   if (phase === 'instruction') {
     return (
@@ -218,6 +219,6 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
   )
 
   return phase === 'formal'
-    ? <CognitiveFocusStage ariaLabel="CPT 正式测验">{taskBody}</CognitiveFocusStage>
+    ? <CognitiveFocusStage ariaLabel="CPT 正式测验" progress={{ completed: trialIndex, total: total }}>{taskBody}</CognitiveFocusStage>
     : taskBody
 }

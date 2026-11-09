@@ -1,4 +1,4 @@
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeFeedback, CognitiveTaskExample, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { AuditorynbackConfig, AuditorynbackTrialPayload } from '../../types'
@@ -58,7 +58,7 @@ export const AuditorynbackTask: React.FC<CognitiveTaskProps & { fixedTargetCount
     let feedback: string
     if (index < nLevel) {
       correct = !responded
-      feedback = responded ? `前 ${nLevel} 个音只听不按，先记住它们。` : '正确：先听、先记住。'
+      feedback = responded ? `前 ${nLevel} 个音只听不按，先记住它们。` : '先听并记住：这是建立对照的音，暂时没有比较对象。'
     } else {
       const isMatch = activeSequence[index] === activeSequence[index - nLevel]
       if (isMatch) {
@@ -168,15 +168,41 @@ export const AuditorynbackTask: React.FC<CognitiveTaskProps & { fixedTargetCount
     } else setPhase('blocked')
   }, [practiceIndex, practiceCorrect, practiceAttempt])
 
-  if (phase === 'instruction' || phase === 'practice-instruction') return <CognitiveTaskIntro title="听觉 n-back 工作记忆" description={taskContext.engineVersion === '1.0.1' && (taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? ((<p>你会听到一串高低不同的音。规则：新音和「往前第 {nLevel} 个」相同时，立刻按空格键（或点击按钮）。请在安静环境、戴耳机或调好音量后进行。像在一串提示音中跟踪刚才出现过的音，这里观察本次音高匹配，不给记忆能力定级。</p>)) : (<p>你会听到一串高低不同的音。规则：新音和「往前第 {nLevel} 个」相同时，立刻按空格键（或点击按钮）。请在安静环境、戴耳机或调好音量后进行。{fixedTargetCount && <>本次有 {totalTrials} 个正式音，前 {nLevel} 音只听；其后逐音比较，相同才按，不同不按；每个音都要听清。短版只描述本次记录。</>}</p>)} hint={<><p>点「开始练习」后开始播放练习音。请先调好舒适音量；前 {nLevel} 个音只听不按。</p><p>例如二音比较时，低音→高音→低音，第三个音与第一个相同，此时按一次。不同则不按；声音后的空档仍可回答，下一声开始后不要补答。每题只记首按，按住不连答。练习共8个音，全部正确才继续；失败重呈完整说明，最多3轮。练习不计入成绩。</p></>} onAction={() => { if (phase === 'practice-instruction') setPhase('practice'); else void startPractice() }} />
+  if (phase === 'instruction' || phase === 'practice-instruction') return <CognitiveTaskIntro
+    title="听觉 n-back 工作记忆"
+    description={taskContext.engineVersion === '1.0.1' && (taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0'
+      ? <p>你会听到一串高低不同的音。前 {nLevel} 个音只听并记住；之后每听到一个新音，就和往前第 {nLevel} 个音比较：音高相同按一次，不同就不按。请在安静环境中进行，并先调好舒适音量。这项任务只记录本次音高判断，不用于给记忆能力定级。</p>
+      : <p>你会听到一串高低不同的音。前 {nLevel} 个音只听并记住；之后每听到一个新音，就和往前第 {nLevel} 个音比较：音高相同按一次，不同就不按。请在安静环境中进行，并先调好舒适音量。{fixedTargetCount && <>本次正式测评有 {totalTrials} 个音。</>}</p>}
+    example={<CognitiveTaskExample title={`${nLevel}-back 听音示例`} steps={(
+      nLevel === 1
+        ? [
+            { label: '第 1 个音', value: '低音', note: '先记住，不按', state: 'observe' },
+            { label: '第 2 个音', value: '高音', note: '与前 1 个不同，不按', state: 'wait' },
+            { label: '第 3 个音', value: '高音', note: '与前 1 个相同，按一次', state: 'respond' },
+          ]
+        : nLevel === 2
+          ? [
+              { label: '第 1 个音', value: '低音', note: '只听', state: 'observe' },
+              { label: '第 2 个音', value: '高音', note: '只听', state: 'observe' },
+              { label: '第 3 个音', value: '低音', note: '与前 2 个中的第 1 个相同，按', state: 'respond' },
+            ]
+          : [
+              { label: '前 3 个音', value: '低·高·中', note: '只听并记住', state: 'observe' },
+              { label: '第 4 个音', value: '低音', note: '与前 3 个中的第 1 个相同，按', state: 'respond' },
+              { label: '如果不同', value: '不按', note: '保持安静等待下一声', state: 'wait' },
+            ]
+    )} result="相同才按一次；不相同就保持不动。前 N 个音只听、不作答。" explanation="声音后的短暂停顿仍可作答；下一声开始后不要补答，同一音只记第一次按键。" />}
+    hint={<><p><strong>操作：</strong>按空格键，或在屏幕上点击作答按钮。先确认音量合适。</p>{fixedTargetCount && <p><strong>正式进度：</strong>本次有 {totalTrials} 个正式音，正式作答时会显示已完成数和总量。</p>}<p><strong>练习：</strong>共 8 个音，全部判断正确后进入正式测验；失败会重新显示完整说明，最多练习 3 轮。练习不计入正式结果。</p></>}
+    onAction={() => { if (phase === 'practice-instruction') setPhase('practice'); else void startPractice() }}
+  />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">{practiceCorrect.length > 0 ? '练习尚未通过，本次正式测评未开始。' : '当前设备无法播放音频，本次测评未开始。请检查设备音量与浏览器音频权限。'}</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {
     const isWarmup = practiceIndex < nLevel
-    return <CognitiveFocusStage ariaLabel="听觉 n-back 练习"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500 mb-4">练习 {practiceIndex + 1} / {PRACTICE_SEQUENCE_LENGTH} · 第 {practiceAttempt} 轮 · 不计入成绩</div>{subPhase === 'sound' && <div className="text-5xl h-28 pt-6">🔊</div>}{subPhase === 'isi' && <div className="text-4xl text-gray-400 h-28 pt-8">和往前第 {nLevel} 个比</div>}{subPhase === 'feedback' && <div className="h-28 pt-8 text-gray-700">{practiceFeedback}</div>}<button type="button" className="btn-primary min-h-16 min-w-48 mt-4" onPointerDown={respond} onClick={(event) => { if (event.detail === 0) respond() }}>{isWarmup ? '前段只听，不用按' : '是匹配音就按'}</button>{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary mt-4">{practiceIndex + 1 >= PRACTICE_SEQUENCE_LENGTH ? practiceCorrect.filter(Boolean).length === PRACTICE_SEQUENCE_LENGTH ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div></CognitiveFocusStage>
+    return <CognitiveFocusStage ariaLabel="听觉 n-back 练习"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500 mb-4">练习 {practiceIndex + 1} / {PRACTICE_SEQUENCE_LENGTH} · 第 {practiceAttempt} 轮 · 不计入成绩</div>{subPhase === 'sound' && <div className="text-5xl h-28 pt-6">🔊</div>}{subPhase === 'isi' && <div className="text-4xl text-gray-400 h-28 pt-8">和往前第 {nLevel} 个比</div>}{subPhase === 'feedback' && <CognitivePracticeFeedback title={isWarmup ? '观察与记忆' : '练习解析'} outcome={isWarmup ? 'observation' : practiceCorrect[practiceIndex] ? 'correct' : 'incorrect'} badge={isWarmup ? '观察题' : practiceCorrect[practiceIndex] ? '答对了' : '再看一次'}>{practiceFeedback}</CognitivePracticeFeedback>}<button type="button" className="btn-primary min-h-16 min-w-48 mt-4" onPointerDown={respond} onClick={(event) => { if (event.detail === 0) respond() }}>{isWarmup ? '前段只听，不用按' : '是匹配音就按'}</button>{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary mt-4">{practiceIndex + 1 >= PRACTICE_SEQUENCE_LENGTH ? practiceCorrect.filter(Boolean).length === PRACTICE_SEQUENCE_LENGTH ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div></CognitiveFocusStage>
   }
 
   if (currentToneIndex === undefined) return <div className="card p-8 text-center text-gray-500">正在生成结果…</div>
 
-  return <CognitiveFocusStage ariaLabel="听觉 n-back 正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-400">第 {trialIndex + 1} / {totalTrials} 题</div>{subPhase === 'sound' && <div className="text-5xl h-28 pt-6">🔊</div>}{subPhase === 'isi' && <div className="text-4xl text-gray-400 h-28 pt-8">…</div>}{subPhase === 'feedback' && <><div className="h-28 pt-8 text-xl font-semibold text-gray-700">{formalFeedback}</div>{pendingPayloadRef.current && <button type="button" className="btn-secondary" onClick={() => { const payload = pendingPayloadRef.current; if (payload) void persistFormal(payload) }}>重试保存</button>}</>}<button type="button" aria-label="匹配按键" className="btn-primary min-h-16 min-w-48 mt-4" onPointerDown={respond} onClick={(event) => { if (event.detail === 0) respond() }}>和往前第 {nLevel} 个相同就按 / 空格</button></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="听觉 n-back 正式测验" progress={{ completed: trialIndex, total: totalTrials }}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-400">第 {trialIndex + 1} / {totalTrials} 题</div>{subPhase === 'sound' && <div className="text-5xl h-28 pt-6">🔊</div>}{subPhase === 'isi' && <div className="text-4xl text-gray-400 h-28 pt-8">…</div>}{subPhase === 'feedback' && <><div className="h-28 pt-8 text-xl font-semibold text-gray-700">{formalFeedback}</div>{pendingPayloadRef.current && <button type="button" className="btn-secondary" onClick={() => { const payload = pendingPayloadRef.current; if (payload) void persistFormal(payload) }}>重试保存</button>}</>}<button type="button" aria-label="匹配按键" className="btn-primary min-h-16 min-w-48 mt-4" onPointerDown={respond} onClick={(event) => { if (event.detail === 0) respond() }}>和往前第 {nLevel} 个相同就按 / 空格</button></div></CognitiveFocusStage>
 }

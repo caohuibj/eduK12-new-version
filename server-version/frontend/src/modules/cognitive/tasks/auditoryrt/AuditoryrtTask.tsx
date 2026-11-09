@@ -1,4 +1,4 @@
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeAnswer, type PracticeAnswerFeedback, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { AuditoryrtConfig, AuditoryrtTrialPayload } from '../../types'
@@ -26,7 +26,7 @@ export const AuditoryrtTask: React.FC<CognitiveTaskProps> = ({ taskContext, tria
   const [practiceIndex, setPracticeIndex] = useState(0)
   const [practiceAttempt, setPracticeAttempt] = useState(1)
   const [practicePassed, setPracticePassed] = useState<boolean[]>([])
-  const [practiceFeedback, setPracticeFeedback] = useState<string | null>(null)
+  const [practiceFeedback, setPracticeFeedback] = useState<PracticeAnswerFeedback | null>(null)
   const [formalFeedback, setFormalFeedback] = useState<string | null>(null)
   const audioRef = useRef<CognitiveAudio | null>(null)
   const interruptedRef = useRef(false)
@@ -75,11 +75,12 @@ export const AuditoryrtTask: React.FC<CognitiveTaskProps> = ({ taskContext, tria
     if (phase === 'practice') {
       if ((subPhase !== 'sound' && subPhase !== 'ready') || practiceResponseLockedRef.current) return
       practiceResponseLockedRef.current = true
-      if (subPhase === 'ready') { setPracticePassed((current) => { const next = [...current]; next[practiceIndex] = false; return next }); setPracticeFeedback('太快了——要等声音响起后再按。'); setSubPhase('feedback'); return }
+      if (subPhase === 'ready') { setPracticePassed((current) => { const next = [...current]; next[practiceIndex] = false; return next }); setPracticeFeedback({ correct: false, expected: '声音响起后再按一次', actual: '声音响起前就按了', explanation: '这次提前作答了。请等到真正听见提示音后再反应，不要根据等待时间猜声音何时出现。' }); setSubPhase('feedback'); return }
       const rt = onsetRef.current === null ? null : Math.max(0, Math.round(performance.now() - onsetRef.current))
       const correct = rt !== null && rt >= 150
       setPracticePassed((current) => { const next = [...current]; next[practiceIndex] = correct; return next })
-      setPracticeFeedback(correct ? '正确：听到声音后立即按键。' : '这次没有落在有效窗口内——听到声音后立即按键，不抢拍。')
+      setPracticeFeedback({ correct, expected: '听到声音后按一次', actual: rt === null ? '未确认有效的声音后反应' : `提示音后 ${rt} 毫秒按下`,
+        explanation: correct ? '正确：这次在提示音出现后作答。下一题仍要重新等待声音，每次只按一下，不要按住空格。' : '这次反应过早，未达到练习要求。请先确认听见提示音，再立即按一次，不要提前猜测。' })
       setSubPhase('feedback')
       return
     }
@@ -148,10 +149,10 @@ export const AuditoryrtTask: React.FC<CognitiveTaskProps> = ({ taskContext, tria
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">{practicePassed.length > 0 ? '练习尚未通过，本次正式测评未开始。' : '当前设备无法播放音频，本次测评未开始。请检查设备音量与浏览器音频权限。'}</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {
-    return <CognitiveFocusStage ariaLabel="听觉反应练习"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500 mb-4">练习 {practiceIndex + 1} / {PRACTICE_FOREPERIODS.length} · 第 {practiceAttempt} 轮 · 不计入成绩</div>{subPhase === 'ready' && <div className="text-4xl text-gray-400 h-28 pt-8">请安静等待声音…</div>}{subPhase === 'sound' && <div className="text-4xl font-bold h-28 pt-8">🔊 现在按！</div>}{subPhase === 'feedback' && <div className="h-28 pt-8 text-gray-700">{practiceFeedback}</div>}<button type="button" className="btn-primary min-h-16 min-w-48 mt-4" onPointerDown={respond} onClick={(event) => { if (event.detail === 0) respond() }}>按 空格 或点这里</button>{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary mt-4">{practiceIndex + 1 >= PRACTICE_FOREPERIODS.length ? practicePassed.every(Boolean) ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div></CognitiveFocusStage>
+    return <CognitiveFocusStage ariaLabel="听觉反应练习" progress={{ completed: practiceIndex + (subPhase === 'feedback' ? 1 : 0), total: PRACTICE_FOREPERIODS.length }}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><p className="text-sm text-gray-500 mb-4">第 {practiceAttempt} 轮 · 练习不计入成绩</p>{subPhase === 'ready' && <div className="text-4xl text-gray-400 h-28 pt-8">请安静等待声音…</div>}{subPhase === 'sound' && <div className="text-4xl font-bold h-28 pt-8">🔊 现在按！</div>}{subPhase === 'feedback' && <CognitivePracticeAnswer feedback={practiceFeedback} />}{subPhase !== 'feedback' && <button type="button" className="btn-primary min-h-16 min-w-48 mt-4" onPointerDown={respond} onClick={(event) => { if (event.detail === 0) respond() }}>按 空格 或点这里</button>}{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary mt-4">{practiceIndex + 1 >= PRACTICE_FOREPERIODS.length ? practicePassed.every(Boolean) ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div></CognitiveFocusStage>
   }
 
   if (!currentForeperiodMs) return <div className="card p-8 text-center text-gray-500">正在生成结果…</div>
 
-  return <CognitiveFocusStage ariaLabel="听觉反应正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-400">第 {trialIndex + 1} / {totalTrials} 题</div>{subPhase === 'ready' && <div className="text-4xl text-gray-400 h-28 pt-8">+</div>}{subPhase === 'sound' && <div className="text-5xl h-28 pt-6">🔊</div>}{subPhase === 'feedback' && <><div className="h-28 pt-8 text-xl font-semibold text-gray-700">{formalFeedback}</div>{pendingPayloadRef.current && <button type="button" className="btn-secondary" onClick={() => { const payload = pendingPayloadRef.current; if (payload) void persistFormal(payload) }}>重试保存</button>}</>}<button type="button" aria-label="反应按键" className="btn-primary min-h-16 min-w-48 mt-4" onPointerDown={respond} onClick={(event) => { if (event.detail === 0) respond() }}>听到声音按这里 / 空格</button></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="听觉反应正式测验" progress={{ completed: trialIndex, total: totalTrials }}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-400">第 {trialIndex + 1} / {totalTrials} 题</div>{subPhase === 'ready' && <div className="text-4xl text-gray-400 h-28 pt-8">+</div>}{subPhase === 'sound' && <div className="text-5xl h-28 pt-6">🔊</div>}{subPhase === 'feedback' && <><div className="h-28 pt-8 text-xl font-semibold text-gray-700">{formalFeedback}</div>{pendingPayloadRef.current && <button type="button" className="btn-secondary" onClick={() => { const payload = pendingPayloadRef.current; if (payload) void persistFormal(payload) }}>重试保存</button>}</>}<button type="button" aria-label="反应按键" className="btn-primary min-h-16 min-w-48 mt-4" onPointerDown={respond} onClick={(event) => { if (event.detail === 0) respond() }}>听到声音按这里 / 空格</button></div></CognitiveFocusStage>
 }

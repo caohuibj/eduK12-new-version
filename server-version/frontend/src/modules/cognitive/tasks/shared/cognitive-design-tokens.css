@@ -1,0 +1,38 @@
+/* Fixed cognitive appearance in every product and phase. Never follow product/browser themes. */
+.cognitive-surface {
+  --cognitive-page:#f4f7f9;
+  --cognitive-surface:#ffffff;
+  --cognitive-raised:#f8fafb;
+  --cognitive-soft:#edf3f6;
+  --cognitive-ink:#202c36;
+  --cognitive-muted:#586876;
+  --cognitive-line:#d9e2e8;
+  --cognitive-accent:#365e73;
+  --cognitive-accent-hover:#2b4c5e;
+  --cognitive-on-accent:#ffffff;
+  --cognitive-focus:#7298aa;
+  --cognitive-success:#2d6843;
+  --cognitive-success-bg:#edf6ef;
+  --cognitive-success-line:#bfd7c5;
+  --cognitive-warning:#705b28;
+  --cognitive-warning-bg:#f7f2e6;
+  --cognitive-warning-line:#e3d7b6;
+  --cognitive-danger:#93483d;
+  --cognitive-danger-bg:#faf1ef;
+  --cognitive-danger-line:#e4c8c2;
+  --cognitive-observe:#4b6477;
+  --cognitive-observe-bg:#eef3f6;
+  --cognitive-observe-line:#cdd9e1;
+  --cognitive-stroop-ink:#315f9b;
+  --runner-ink:var(--cognitive-ink); --runner-muted:var(--cognitive-muted); --runner-line:var(--cognitive-line);
+  --runner-page:var(--cognitive-page); --runner-soft:var(--cognitive-soft); --runner-blue:var(--cognitive-accent);
+  --runner-blue-hover:var(--cognitive-accent-hover); --runner-action:var(--cognitive-accent); --runner-surface:var(--cognitive-surface);
+  color:var(--cognitive-ink); background:var(--cognitive-page); color-scheme:light;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --cognitive-width-reading:66rem; --cognitive-width-task:66rem; --cognitive-width-feedback:60rem;
+  --cognitive-text-body:18px; --cognitive-text-support:16px; --cognitive-text-meta:14px;
+  --cognitive-text-title:clamp(26px,1.5rem + .65vw,34px);
+  --cognitive-space-1:8px; --cognitive-space-2:16px; --cognitive-space-3:24px; --cognitive-space-4:32px;
+  --cognitive-radius-panel:18px; --cognitive-radius-control:11px;
+  font-size:16px; line-height:1.65;
+}

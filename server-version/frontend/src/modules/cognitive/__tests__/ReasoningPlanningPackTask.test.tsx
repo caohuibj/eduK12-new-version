@@ -8,6 +8,8 @@ import { TowerTask } from '../tasks/tower/TowerTask'
 import { applyTowerMove, matrixSequence, mentalRotationSequence, towerSequence, type TowerMove, type TowerState } from '../tasks/shared/prng'
 import golden from '../../../../../cognitive-randomization-golden-v1.json'
 
+const continuePractice = () => fireEvent.click(screen.getByRole('button', { name: /继续下一题|查看练习结果/ }))
+
 const context = { sessionId: 'session-pr5', testType: 'matrix', engineVersion: '1.0.0', scoringVersion: '1.0.0', configVersion: '1.0.0', attemptNo: 1, randomSeed: 'golden-seed', config: {} }
 const shortestPath = (initial: TowerState, target: TowerState): Array<Omit<TowerMove, 'atMs'>> => {
   const queue: Array<{ state: TowerState; path: Array<Omit<TowerMove, 'atMs'>> }> = [{ state: initial, path: [] }]
@@ -40,13 +42,13 @@ describe('Round 2 PR5 task runners', () => {
     const matrixTrial = vi.fn()
     const matrix = render(<MatrixTask taskContext={{ ...context, config: { itemCount: 6, itemTimeoutMs: 1000 } }} trialIndex={0} onTrialComplete={matrixTrial} />)
     fireEvent.click(screen.getByText('开始练习'))
-    for (const item of matrixSequence('matrix-practice-v1', 6).slice(0, 4)) fireEvent.click(screen.getByRole('button', { name: `选项 ${(item.correctOption + 1) % 4 + 1}` }))
+    for (const item of matrixSequence('matrix-practice-v1', 6).slice(0, 4)) { fireEvent.click(screen.getByRole('button', { name: `选项 ${(item.correctOption + 1) % 4 + 1}` })); continuePractice() }
     expect(screen.getByText('重新练习')).toBeInTheDocument(); expect(matrixTrial).not.toHaveBeenCalled(); matrix.unmount()
 
     const rotationTrial = vi.fn()
     const rotation = render(<MentalrotationTask taskContext={{ ...context, testType: 'mentalrotation', config: { totalTrials: 12, stimulusMs: 50, isiMs: 1 } }} trialIndex={0} onTrialComplete={rotationTrial} />)
     fireEvent.click(screen.getByText('开始练习'))
-    for (let index = 0; index < 4; index += 1) fireEvent.click(screen.getByText('镜像图形'))
+    for (let index = 0; index < 4; index += 1) { fireEvent.click(screen.getByText('镜像图形')); continuePractice() }
     expect(screen.getByText('重新练习')).toBeInTheDocument(); expect(rotationTrial).not.toHaveBeenCalled(); rotation.unmount()
 
     const towerTrial = vi.fn()
@@ -60,7 +62,7 @@ describe('Round 2 PR5 task runners', () => {
     const onTrialComplete = vi.fn().mockResolvedValue(true)
     render(<MatrixTask taskContext={{ ...context, config: { itemCount: 6, itemTimeoutMs: 1000 } }} trialIndex={0} onTrialComplete={onTrialComplete} />)
     fireEvent.click(screen.getByText('开始练习'))
-    for (const item of matrixSequence('matrix-practice-v1', 6).slice(0, 4)) fireEvent.click(screen.getByRole('button', { name: `选项 ${item.correctOption + 1}` }))
+    for (const item of matrixSequence('matrix-practice-v1', 6).slice(0, 4)) { fireEvent.click(screen.getByRole('button', { name: `选项 ${item.correctOption + 1}` })); continuePractice() }
     fireEvent.click(screen.getByText('开始正式测验'))
     expect(screen.queryByText(/难度\s*[123]/)).not.toBeInTheDocument()
     const item = matrixSequence(context.randomSeed, 6)[0]
@@ -73,7 +75,7 @@ describe('Round 2 PR5 task runners', () => {
     const onTrialComplete = vi.fn().mockResolvedValue(true)
     render(<MentalrotationTask taskContext={{ ...context, testType: 'mentalrotation', config: { totalTrials: 12, stimulusMs: 50, isiMs: 1 } }} trialIndex={0} onTrialComplete={onTrialComplete} />)
     fireEvent.click(screen.getByText('开始练习'))
-    for (const item of mentalRotationSequence('rotation-practice-v1', 12).slice(0, 4)) fireEvent.click(screen.getByText(item.correctResponse === 'same' ? '同一图形' : '镜像图形'))
+    for (const item of mentalRotationSequence('rotation-practice-v1', 12).slice(0, 4)) { fireEvent.click(screen.getByText(item.correctResponse === 'same' ? '同一图形' : '镜像图形')); continuePractice() }
     fireEvent.click(screen.getByText('开始正式测验'))
     await act(async () => { await vi.advanceTimersByTimeAsync(2) })
     expect(screen.queryByLabelText(/镜像旋转|旋转 \d+ 度/)).not.toBeInTheDocument()

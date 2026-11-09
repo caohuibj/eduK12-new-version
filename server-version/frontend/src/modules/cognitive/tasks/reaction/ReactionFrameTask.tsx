@@ -1,4 +1,4 @@
-import { CognitiveCenteredTask } from '../shared/CognitiveTaskPresentation'
+import { CognitiveCenteredTask, CognitiveTaskExample, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { captureFrameTimingOnset, resolveEventResponseTimestamp, type CognitiveTimingOnset } from '../../core/response-timing'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -153,6 +153,7 @@ export const ReactionFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
   }, [phase, practiceSub, handlePracticeInput])
 
   const retryPractice = () => { setPracticePremature(false); setPracticeSub('ready'); setPracticeOnset(null); setPracticeFeedback(null) }
+  const beginPractice = () => setPhase('practice')
   const advancePractice = () => {
     if (practiceIndex + 1 >= PRACTICE_TRIALS) { setPhase('formal'); setPracticeIndex(0); setPracticePremature(false); setPracticeFeedback(null); return }
     setPracticeIndex((index) => index + 1); setPracticeSub('ready'); setPracticeOnset(null); setPracticePremature(false); setPracticeFeedback(null)
@@ -164,11 +165,17 @@ export const ReactionFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
   }
   const handlePointerCancel = (event: React.PointerEvent<HTMLButtonElement>) => { if (event.isPrimary) { timingDiagnostics.pointerCancelled(performance.now(), trialIndex); markInterrupted() } }
 
-  if (phase === 'instruction') return <CognitiveFocusStage ariaLabel="反应速度练习说明"><CognitiveCenteredTask
-    header={<><p className="text-sm text-gray-500">练习准备</p><h2 className="cognitive-task-title">反应速度</h2></>}
-    footer={<div className="cognitive-task-description"><p>圆点会在短暂等待后变成<span className="text-green-600 font-semibold">绿色</span>。看到绿色后，尽快点击或按任意键。</p><p>先完成 3 次练习；练习不计分。</p></div>}>
-    <button type="button" className="btn-primary" onClick={() => setPhase('practice')}>开始练习</button>
-  </CognitiveCenteredTask></CognitiveFocusStage>
+  if (phase === 'instruction') return <CognitiveTaskIntro
+    title="反应速度"
+    description={<p>每题先显示等待提示，随后圆点会变成绿色。只有看到绿色后，才尽快点击圆点或按任意键；等待时不要提前操作。</p>}
+    example={<CognitiveTaskExample title="图示：看到绿色才反应" steps={[
+      { label: '等待', value: '灰色圆点', note: '手不要动', state: 'wait' },
+      { label: '目标出现', value: '绿色圆点', note: '立即点击或按键', state: 'respond' },
+      { label: '本题结束', value: '下一题', note: '重新等绿色', state: 'neutral' },
+    ]} result="灰色时等待；变绿后立即点击圆点或按任意键。" explanation="绿色出现前点击会被记录为过早反应，并重新等待；如果绿色出现后一直不操作，本题会按超时记录。" />}
+    hint={<><p><strong>练习：</strong>先完成 3 次不计分练习，熟悉等待和点击的时机。</p><p><strong>正式作答：</strong>共 {total} 题；尽量看着屏幕，绿色出现后再反应。不要按住按键。</p></>}
+    onAction={beginPractice}
+  />
 
   if (phase === 'practice') return <CognitiveFocusStage ariaLabel="反应速度练习"><CognitiveCenteredTask
     header={<p className="text-sm text-gray-500">练习 {practiceIndex + 1} / {PRACTICE_TRIALS}</p>}

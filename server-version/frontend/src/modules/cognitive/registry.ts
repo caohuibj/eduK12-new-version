@@ -56,6 +56,8 @@ export interface CognitiveFrontendRegistryEntry {
   completionMode?: 'manual' | 'task'
   /** Exact task-owned input/resume contract, projected through generated runners. */
   readiness?: Omit<CognitiveReadinessProfile, 'testType' | 'engineVersion'>
+  /** Most production runners own their first instruction/action; synthetic runners may use the host start button. */
+  startActionOwner?: 'task' | 'host'
 }
 
 const REGISTRY = new Map<string, CognitiveFrontendRegistryEntry>()

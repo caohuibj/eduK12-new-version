@@ -89,7 +89,7 @@ export function WordanalogyTaskV11({ taskContext, trialIndex, onTrialComplete }:
   if (phase === 'instruction') return <CognitiveTaskIntro title="言语类比推理" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<><p>每题先读清前一对词的关系，再选择与后一对最匹配的选项。</p><p>整理“雨衣—防雨、手套—保暖”这样的词语时，先抓用途而不是只看词长或熟悉程度。 这次任务只记录本次作答表现。</p></>) : (<p>每题先读清前一对词的关系，再选择与后一对最匹配的选项。</p>)} hint={<p>按数字键 1–4 或点击选项。先准确理解，再在每题 {config.timeoutMs / 1000} 秒内作答；超时会记为未作答。练习使用独立题目，不计分。正式共 {config.totalTrials} 题。</p>} onAction={() => { setPracticeChoice(null); setStage('fixation'); setPhase('practice') }} />
   const item = phase === 'practice' ? practice : current
   if (!item) return <div className="card p-6" role="status">本次题目已作答完毕，正在结束测验。</div>
-  return <CognitiveFocusStage ariaLabel="言语类比推理"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">
+  return <CognitiveFocusStage ariaLabel={phase === 'practice' ? '言语类比推理练习' : '言语类比推理正式测验'} progress={phase === 'formal' ? { completed: trialIndex, total: config.totalTrials } : undefined}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">
     <p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? '练习 · 独立题目 · 不计分' : `第 ${trialIndex + 1} / ${config.totalTrials} 题`}</p>
     {stage === 'fixation' && <div className="h-28 pt-10 text-4xl text-gray-400">+</div>}
     {stage !== 'fixation' && (stage === 'stimulus' || phase === 'practice') && <p className="pt-4 text-xl font-semibold text-gray-800">{item.stem}</p>}

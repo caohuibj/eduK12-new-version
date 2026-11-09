@@ -1,3 +1,5 @@
+import { CognitiveTaskPanel } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeReview, type PracticeReview } from '../shared/CognitivePracticeReview'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
@@ -65,6 +67,7 @@ export const PatterncompareTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
   const validRtFloorMs = config.validRtFloorMs ?? 150
   const [phase, setPhase] = useState<Phase>('instruction')
   const [practiceIndex, setPracticeIndex] = useState(0)
+  const [practiceReview, setPracticeReview] = useState<PracticeReview | null>(null)
   const [practiceCorrect, setPracticeCorrect] = useState(0)
   const [practiceFeedback, setPracticeFeedback] = useState<string | null>(null)
   const [visible, setVisible] = useState(false)
@@ -76,7 +79,7 @@ export const PatterncompareTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
   const interruptedRef = useRef(false)
 
   const startPractice = () => {
-    setPracticeIndex(0)
+    setPracticeReview(null); setPracticeIndex(0)
     setPracticeCorrect(0)
     setPracticeFeedback(null)
     setPhase('practice')
@@ -159,6 +162,7 @@ export const PatterncompareTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
   ])
 
   const respondPractice = (response: 'same' | 'different') => {
+    if (practiceReview) return
     const expected = PRACTICE[practiceIndex].correctResponse
     const correct = response === expected
     setPracticeFeedback(
@@ -166,14 +170,8 @@ export const PatterncompareTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
         ? '上一题：正确'
         : `上一题：不正确，正确答案是「${expected === 'same' ? '相同' : '不同'}」`,
     )
-    const nextCorrect = practiceCorrect + (correct ? 1 : 0)
-    if (practiceIndex + 1 >= PRACTICE_TRIAL_COUNT) {
-      setPracticeCorrect(nextCorrect)
-      setPhase('practice-result')
-    } else {
-      setPracticeCorrect(nextCorrect)
-      setPracticeIndex((value) => value + 1)
-    }
+    setPracticeCorrect(practiceCorrect + (correct ? 1 : 0))
+      setPracticeReview({ correct, expected: expected === 'same' ? '相同' : '不同', actual: response === 'same' ? '相同' : '不同', explanation: [ '两边形状、填充和标记均相同。', '左边空心、右边实心，填充不同。', '两边的形状、标记和旋转方向均相同。', '左边是圆形、右边是方形，形状不同。' ][practiceIndex] })
   }
 
   const respondFormal = async (response: 'same' | 'different') => {
@@ -199,6 +197,7 @@ export const PatterncompareTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
     const onKeyDown = (event: KeyboardEvent) => {
+      if (phase === 'practice' && practiceReview) return
       if (event.repeat) return
       if (event.key === 'ArrowLeft') {
         event.preventDefault()
@@ -221,6 +220,12 @@ export const PatterncompareTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
     respond(response)
   }
 
+  if (phase === 'practice' && practiceReview) return <CognitivePracticeReview visual={<><Pattern pattern={PRACTICE[practiceIndex].leftPattern} /><Pattern pattern={PRACTICE[practiceIndex].rightPattern} /></>} feedback={practiceReview} completed={practiceIndex + 1} total={PRACTICE_TRIAL_COUNT} onContinue={() => {
+    setPracticeReview(null)
+    if (practiceIndex + 1 >= PRACTICE_TRIAL_COUNT) setPhase('practice-result')
+    else { setPracticeIndex(value => value + 1);  }
+  }} />
+
   if (phase === 'instruction') {
     return (
       <CognitiveTaskIntro title="图形模式比较" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>给相似图形当一次小侦探：判断左右两个图形是否完全相同。请比较形状、填充、标记和方向；只要有一项不同，就选择“不同”。</p>) : (<p>判断左右两个图形是否完全相同。请比较形状、填充、标记和方向；只要有一项不同，就选择“不同”。</p>)} hint={<><p>正式阶段约 {durationSec} 秒，请在保证准确的前提下尽快作答。键盘可使用 ← 表示相同、→ 表示不同，也可使用触控或鼠标。</p><p>先完成 4 题不计分练习，至少答对 3 题才能进入正式测验。本任务需要直接辨认图形细节；如果屏幕上的图形无法清楚辨认，请不要进入正式测验，并告知测验组织者。</p></>} onAction={startPractice} />
@@ -230,7 +235,7 @@ export const PatterncompareTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
   if (phase === 'practice-result') {
     const passed = practiceCorrect >= PRACTICE_PASS_CORRECT
     return (
-      <div className="mx-auto max-w-xl p-4 text-center sm:p-8">
+      <CognitiveTaskPanel ariaLabel="练习结果" className="cognitive-task-panel--result"><h2 className="cognitive-task-title">练习结果</h2>
         <p className="mb-2 text-lg font-medium">练习正确 {practiceCorrect} / {PRACTICE_TRIAL_COUNT}</p>
         <p className="mb-5 text-sm text-gray-600">
           {passed
@@ -243,7 +248,7 @@ export const PatterncompareTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
         >
           {passed ? '开始正式测验' : '重新练习'}
         </button>
-      </div>
+      </CognitiveTaskPanel>
     )
   }
 
@@ -292,6 +297,6 @@ export const PatterncompareTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
   )
 
   return phase === 'formal'
-    ? <CognitiveFocusStage ariaLabel="图形模式比较正式作答">{content}</CognitiveFocusStage>
+    ? <CognitiveFocusStage ariaLabel="图形模式比较正式作答" progress={{ completed: durationSec - remainingSec, total: durationSec, label: `计时进度（秒） · 已完成 ${trialIndex} 题` }}>{content}</CognitiveFocusStage>
     : content
 }

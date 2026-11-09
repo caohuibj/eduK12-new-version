@@ -1,4 +1,4 @@
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeAnswer, type PracticeAnswerFeedback, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { VisualwmConfig, VisualwmTrialPayload } from '../../types'
@@ -22,7 +22,7 @@ export const VisualwmTask: React.FC<VisualwmTaskProps> = ({ taskContext, trialIn
   const retentionMs = config?.retentionMs ?? 900
   const [phase, setPhase] = useState<Phase>('instruction')
   const [step, setStep] = useState<PhaseStep>('fixation')
-  const [practiceFeedback, setPracticeFeedback] = useState<string | null>(null)
+  const [practiceFeedback, setPracticeFeedback] = useState<PracticeAnswerFeedback | null>(null)
   const [formalFeedback, setFormalFeedback] = useState<string | null>(null)
   const interruptedRef = useRef(false)
   const submittingRef = useRef(false)
@@ -88,7 +88,9 @@ export const VisualwmTask: React.FC<VisualwmTaskProps> = ({ taskContext, trialIn
     if (step !== 'probe' || responseLockedRef.current || submittingRef.current) return
     responseLockedRef.current = true
     if (phase === 'practice') {
-      setPracticeFeedback(stimulus.isChange ? (response === 'change' ? '正确：颜色变了！' : '不对，颜色变了。') : (response === 'same' ? '正确：颜色没变！' : '不对，颜色没变。'))
+      setPracticeFeedback({ correct: response === (stimulus.isChange ? 'change' : 'same'), prompt: '比较带边框方块前后的颜色',
+        expected: stimulus.isChange ? '选择“改变”' : '选择“相同”', actual: response === 'change' ? '选择“改变”' : '选择“相同”',
+        explanation: `本题被标记位置的颜色${stimulus.isChange ? '已经改变' : '没有改变'}。判断的是这个位置的颜色，而不是方块数量、边框或整组位置有没有变化。` })
       setStep('feedback')
       return
     }
@@ -152,8 +154,8 @@ export const VisualwmTask: React.FC<VisualwmTaskProps> = ({ taskContext, trialIn
   if (phase === 'completed') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700">已全部完成，正在生成结果…</p></div>
 
   if (phase === 'practice') {
-    return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 · 不计入成绩</div>{step === 'fixation' && <div className="text-4xl text-gray-400 h-40 pt-12">+</div>}{step === 'study' && renderSquares(stimulus.colors, null)}{step === 'retention' && <div style={{ width: CANVAS, height: CANVAS }} className="mx-auto flex items-center justify-center"><span className="text-4xl text-gray-300">+</span></div>}{step === 'probe' && renderSquares(stimulus.colors, stimulus.probePosition, stimulus.probeColor)}<ResponseButtons show={step === 'probe'} />{step === 'feedback' && <><div className="h-12 pt-3 text-gray-700">{practiceFeedback}</div><button type="button" className="btn-primary" onClick={advancePractice}>开始正式测评</button></>}</div>
+    return <CognitiveFocusStage ariaLabel="视觉工作记忆练习" progress={{ completed: step === 'feedback' ? 1 : 0, total: 1 }}><div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 · 不计入成绩</div>{step === 'fixation' && <div className="text-4xl text-gray-400 h-40 pt-12">+</div>}{step === 'study' && renderSquares(stimulus.colors, null)}{step === 'retention' && <div style={{ width: CANVAS, height: CANVAS }} className="mx-auto flex items-center justify-center"><span className="text-4xl text-gray-300">+</span></div>}{step === 'probe' && renderSquares(stimulus.colors, stimulus.probePosition, stimulus.probeColor)}<ResponseButtons show={step === 'probe'} />{step === 'feedback' && <><CognitivePracticeAnswer feedback={practiceFeedback} /><button type="button" className="btn-primary" onClick={advancePractice}>开始正式测评</button></>}</div></CognitiveFocusStage>
   }
 
-  return <CognitiveFocusStage ariaLabel="视觉工作记忆正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500">第 {trialIndex + 1} / {totalTrials} 题</div>{step === 'fixation' && <div className="text-4xl text-gray-400 h-48 pt-16">+</div>}{step === 'study' && renderSquares(stimulus.colors, null)}{step === 'retention' && <div style={{ width: CANVAS, height: CANVAS }} className="mx-auto flex items-center justify-center"><span className="text-4xl text-gray-300">+</span></div>}{step === 'probe' && renderSquares(stimulus.colors, stimulus.probePosition, stimulus.probeColor)}<ResponseButtons show={step === 'probe'} />{step === 'feedback' && <><div className="h-24 pt-10 text-xl font-semibold text-gray-700">{formalFeedback}</div>{pendingPayloadRef.current && <button type="button" className="btn-secondary" onClick={() => { const payload = pendingPayloadRef.current; if (payload) void persistFormal(payload) }}>重试保存</button>}</>}{step === 'probe' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<p className="text-xs text-gray-400 mt-4">按键 1 = 相同、2 = 改变，或点击按钮</p></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="视觉工作记忆正式测验" progress={{ completed: trialIndex, total: totalTrials }}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500">第 {trialIndex + 1} / {totalTrials} 题</div>{step === 'fixation' && <div className="text-4xl text-gray-400 h-48 pt-16">+</div>}{step === 'study' && renderSquares(stimulus.colors, null)}{step === 'retention' && <div style={{ width: CANVAS, height: CANVAS }} className="mx-auto flex items-center justify-center"><span className="text-4xl text-gray-300">+</span></div>}{step === 'probe' && renderSquares(stimulus.colors, stimulus.probePosition, stimulus.probeColor)}<ResponseButtons show={step === 'probe'} />{step === 'feedback' && <><div className="h-24 pt-10 text-xl font-semibold text-gray-700">{formalFeedback}</div>{pendingPayloadRef.current && <button type="button" className="btn-secondary" onClick={() => { const payload = pendingPayloadRef.current; if (payload) void persistFormal(payload) }}>重试保存</button>}</>}{step === 'probe' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<p className="text-xs text-gray-400 mt-4">按键 1 = 相同、2 = 改变，或点击按钮</p></div></CognitiveFocusStage>
 }

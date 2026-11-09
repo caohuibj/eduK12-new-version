@@ -1,4 +1,4 @@
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeAnswer, type PracticeAnswerFeedback, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { SymbolmatchConfig, SymbolmatchTrialPayload } from '../../types'
@@ -21,7 +21,7 @@ export const SymbolmatchTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
   const [practiceIndex, setPracticeIndex] = useState(0)
   const [practiceAttempt, setPracticeAttempt] = useState(1)
   const [practiceCorrect, setPracticeCorrect] = useState<boolean[]>([])
-  const [practiceFeedback, setPracticeFeedback] = useState<string | null>(null)
+  const [practiceFeedback, setPracticeFeedback] = useState<PracticeAnswerFeedback | null>(null)
   const [formalFeedback, setFormalFeedback] = useState<string | null>(null)
   const interruptedRef = useRef(false)
   const onsetRef = useRef<number | null>(null)
@@ -80,7 +80,9 @@ export const SymbolmatchTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
       if (subPhase !== 'stimulus' || expected === undefined) return
       const correct = digit === expected
       setPracticeCorrect((current) => { const next = [...current]; next[practiceIndex] = correct; return next })
-      setPracticeFeedback(correct ? '正确：照着图例找数字。' : '再看一眼图例：找到这个符号对应的数字。')
+      setPracticeFeedback({ correct, prompt: `本题符号：${symbol}`,
+        expected: `选择数字 ${expected}`, actual: `选择数字 ${digit}`,
+        explanation: `本轮图例里，${symbol} 对应数字 ${expected}。先在图例中找到同一个符号，再按它对应的数字；不要按符号在屏幕上的位置作答。` })
       setSubPhase('feedback'); return
     }
     void submitFormal(digit)
@@ -130,10 +132,10 @@ export const SymbolmatchTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
 
   if (phase === 'practice') {
     const symbol = SYMBOLMATCH_PRACTICE_SYMBOLS[practiceIndex]
-    return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-2">练习 {practiceIndex + 1} / {SYMBOLMATCH_PRACTICE_SYMBOLS.length} · 第 {practiceAttempt} 轮 · 不计入成绩</div><KeyLegend />{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-24 pt-6">+</div>}{subPhase === 'stimulus' && symbol && <div className="text-6xl font-bold text-gray-800 h-24 pt-4">{symbol}</div>}{subPhase === 'feedback' && <div className="h-24 pt-6 text-gray-700">{practiceFeedback}</div>}<ResponseButtons show={subPhase === 'stimulus'} />{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary">{practiceIndex + 1 >= SYMBOLMATCH_PRACTICE_SYMBOLS.length ? practiceCorrect.every(Boolean) ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div>
+    return <CognitiveFocusStage ariaLabel="符号匹配练习" progress={{ completed: practiceIndex + (subPhase === 'feedback' ? 1 : 0), total: SYMBOLMATCH_PRACTICE_SYMBOLS.length }}><div className="card p-8 max-w-2xl text-center"><p className="text-sm text-gray-500 mb-4">第 {practiceAttempt} 轮 · 练习不计入成绩</p><KeyLegend />{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-24 pt-6">+</div>}{subPhase === 'stimulus' && symbol && <div className="text-6xl font-bold text-gray-800 h-24 pt-4">{symbol}</div>}{subPhase === 'feedback' && <CognitivePracticeAnswer feedback={practiceFeedback} />}<ResponseButtons show={subPhase === 'stimulus'} />{subPhase === 'feedback' && <button type="button" onClick={advancePractice} className="btn-primary">{practiceIndex + 1 >= SYMBOLMATCH_PRACTICE_SYMBOLS.length ? practiceCorrect.every(Boolean) ? '开始正式测评' : practiceAttempt < MAX_PRACTICE_ATTEMPTS ? '重新练习' : '结束' : '下一个'}</button>}</div></CognitiveFocusStage>
   }
 
   if (!currentSymbol) return <div className="card p-8 text-center text-gray-500">正在生成结果…</div>
 
-  return <CognitiveFocusStage ariaLabel="符号数字配对正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><KeyLegend />{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-24 pt-6">+</div>}{subPhase === 'stimulus' && <div className="text-6xl font-bold text-gray-800 h-24 pt-4">{currentSymbol}</div>}{subPhase === 'feedback' && <div className="h-24 pt-6 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-1 text-sm text-amber-600">{formalFeedback}</p>}<ResponseButtons show={subPhase === 'stimulus'} /><p className="text-xs text-gray-400 mt-6">按键 1–5 或点击按钮作答</p></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="符号数字配对正式测验" progress={{ completed: trialIndex, total: totalTrials }}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><KeyLegend />{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-24 pt-6">+</div>}{subPhase === 'stimulus' && <div className="text-6xl font-bold text-gray-800 h-24 pt-4">{currentSymbol}</div>}{subPhase === 'feedback' && <div className="h-24 pt-6 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-1 text-sm text-amber-600">{formalFeedback}</p>}<ResponseButtons show={subPhase === 'stimulus'} /><p className="text-xs text-gray-400 mt-6">按键 1–5 或点击按钮作答</p></div></CognitiveFocusStage>
 }

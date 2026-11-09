@@ -9,6 +9,7 @@ export const fakeRegistryEntry: CognitiveFrontendRegistryEntry = {
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
   RunnerComponent: FakeTask, prepareRunner: FakeTask.prepare,
+  startActionOwner: 'host',
   metricDefinitions: [
     { key: 'trialCount', label: '试次数', displayType: 'number' },
     { key: 'correctCount', label: '正确数', displayType: 'number' },

@@ -1,4 +1,4 @@
-import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitivePracticeFeedback, CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { ReadingcompConfig, ReadingcompTrialPayload } from './types'
@@ -109,10 +109,10 @@ export const ReadingcompTaskV1: React.FC<CognitiveTaskProps> = ({ taskContext, t
   ) : null
 
   if (phase === 'practice') {
-    return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 · 不计入成绩</div>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-24 pt-8">+</div>}{subPhase !== 'fixation' && <p className="text-xl font-semibold text-gray-800 pt-4">{item!.passage}</p>}<OptionButtons show={subPhase === 'stimulus'} />{subPhase === 'feedback' && <><div className="h-16 pt-4 text-gray-700">{practiceFeedback}</div><button type="button" className="btn-primary" onClick={advancePractice}>开始正式测评</button></>}</div>
+    return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 · 不计入成绩</div>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-24 pt-8">+</div>}{subPhase !== 'fixation' && <p className="text-xl font-semibold text-gray-800 pt-4">{item!.passage}</p>}<OptionButtons show={subPhase === 'stimulus'} />{subPhase === 'feedback' && <><CognitivePracticeFeedback>{practiceFeedback}</CognitivePracticeFeedback><button type="button" className="btn-primary" onClick={advancePractice}>开始正式测评</button></>}</div>
   }
 
   if (!currentTrial) return <div className="card p-8 text-center text-gray-500">正在生成结果…</div>
 
-  return <CognitiveFocusStage ariaLabel="阅读理解正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500">第 {trialIndex + 1} / {totalTrials} 题</div>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-28 pt-10">+</div>}{subPhase === 'stimulus' && <p className="text-xl font-semibold text-gray-800 pt-6">{currentTrial.passage}</p>}{subPhase === 'feedback' && <div className="h-28 pt-10 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<OptionButtons show={subPhase === 'stimulus'} /><p className="text-xs text-gray-400 mt-5">按键 1–4 或点击选项作答</p></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="阅读理解正式测验" progress={{ completed: trialIndex, total: totalTrials }}><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500">第 {trialIndex + 1} / {totalTrials} 题</div>{subPhase === 'fixation' && <div className="text-4xl text-gray-400 h-28 pt-10">+</div>}{subPhase === 'stimulus' && <p className="text-xl font-semibold text-gray-800 pt-6">{currentTrial.passage}</p>}{subPhase === 'feedback' && <div className="h-28 pt-10 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{subPhase === 'stimulus' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<OptionButtons show={subPhase === 'stimulus'} /><p className="text-xs text-gray-400 mt-5">按键 1–4 或点击选项作答</p></div></CognitiveFocusStage>
 }
