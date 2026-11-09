@@ -73,8 +73,10 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
     // and no route prefix is ever exempted from the check.
     // Fail closed: a SCHOOL-domain principal without a resolved mandatory-MFA
     // fact is treated as requiring MFA, never waved through.
+    const requiresMfa = principal!.needsMfa === true
+      || (principal!.needsMfa !== false && (principal!.role === UserRole.ADMIN || principal!.platformRole === 'SYSTEM_ADMIN'))
     if ((product === 'SCHOOL' || product === 'HUITEACHER')
-      && principal!.needsMfa !== false
+      && requiresMfa
       && (!payload.mfaVerifiedAt || payload.mfaVerifiedAt > Date.now()/1000)) {
       return unauthorized(res, '需要完成双因素认证')
     }

@@ -293,11 +293,11 @@ describe('per-browser logout and forced password realm boundaries', () => {
   })
 
   it('fails closed when a SCHOOL principal lacks a resolved mandatory-MFA fact', async () => {
-    // A row without needsMfa (legacy projection or schema drift) must never be
-    // waved through: absence is treated as requiring MFA.
+    // A privileged row without needsMfa (legacy projection or schema drift) must never be
+    // waved through: absence is treated as requiring MFA for privileged roles.
     const schoolReq = { headers: { cookie: 'huischool_session=test-token' }, originalUrl: '/api/campus/organizations/org-1', params: {} } as any
-    mockVerifyToken.mockReturnValue({ ...payload, accountDomain: 'SCHOOL' })
-    mockPrisma.$queryRaw.mockResolvedValue(dbRow({ accountDomain: 'SCHOOL' }))
+    mockVerifyToken.mockReturnValue({ ...payload, accountDomain: 'SCHOOL', role: UserRole.ADMIN })
+    mockPrisma.$queryRaw.mockResolvedValue(dbRow({ accountDomain: 'SCHOOL', role: UserRole.ADMIN }))
     const res = makeRes(), next = vi.fn()
     await authenticateSchool(schoolReq, res, next)
     expect(res.statusCode).toBe(401)
