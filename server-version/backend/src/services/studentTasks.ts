@@ -20,12 +20,45 @@ export interface StudentTask {
 }
 
 type CourseRef = { id: string; title: string }
+const taskKinds = ['ASSIGNMENT', 'CHECKIN', 'QUESTIONNAIRE', 'COMPOSITE'] as const
 const stateOrder: TaskState[] = ['IN_PROGRESS', 'PENDING', 'UPCOMING', 'EXPIRED', 'UNAVAILABLE', 'SUBMITTED_NOT_SATISFIED', 'COMPLETED']
 const compareTasks = (left: StudentTask, right: StudentTask) =>
   stateOrder.indexOf(left.state) - stateOrder.indexOf(right.state)
   || (left.deadline ?? '9999').localeCompare(right.deadline ?? '9999')
   || `${left.kind}:${left.id}`.localeCompare(`${right.kind}:${right.id}`)
 const isActionable = (item: StudentTask) => Boolean(item.href && (item.canContinue || item.canStart))
+
+/** In-memory keyset over the derived (state, deadline, kind, id) order. The
+ * visible set is still classified in full; this only bounds the returned page. */
+export type StudentTaskCursor = { kind: StudentTask['kind']; id: string; state: TaskState; deadline: string | null }
+
+function assertStudentTaskCursor(value: { kind?: unknown; id?: unknown; state?: unknown; deadline?: unknown }): StudentTaskCursor {
+  const kind = value.kind, id = value.id, state = value.state, deadline = value.deadline
+  if (!(taskKinds as readonly string[]).includes(kind as string) || !(taskStates as readonly string[]).includes(state as string)
+    || typeof id !== 'string' || !/^[a-zA-Z0-9_-]{1,100}$/.test(id)
+    || (deadline !== null && (typeof deadline !== 'string' || !Number.isFinite(Date.parse(deadline)))))
+    throw new Error('STUDENT_TASK_CURSOR_INVALID')
+  return { kind: kind as StudentTask['kind'], id, state: state as TaskState, deadline: deadline as string | null }
+}
+
+export function encodeStudentTaskCursor(cursor: StudentTaskCursor): string {
+  const value = assertStudentTaskCursor(cursor)
+  return Buffer.from(JSON.stringify(value)).toString('base64url')
+}
+
+export function decodeStudentTaskCursor(value: unknown): StudentTaskCursor | undefined {
+  if (value === undefined || value === null || value === '') return undefined
+  if (typeof value !== 'string' || value.length > 500) throw new Error('STUDENT_TASK_CURSOR_INVALID')
+  let parsed: unknown
+  try { parsed = JSON.parse(Buffer.from(value, 'base64url').toString()) }
+  catch { throw new Error('STUDENT_TASK_CURSOR_INVALID') }
+  return assertStudentTaskCursor((parsed ?? {}) as { kind?: unknown; id?: unknown; state?: unknown; deadline?: unknown })
+}
+
+function afterStudentTaskCursor(item: StudentTask, cursor: StudentTaskCursor) {
+  return compareTasks(item, { id: cursor.id, kind: cursor.kind, title: '', courses: [], state: cursor.state,
+    deadline: cursor.deadline, opensAt: null, canContinue: false, canStart: false, href: null }) > 0
+}
 
 /**
  * Build the task rows for an already-authorized course set. `courses` must come
@@ -129,7 +162,7 @@ async function buildStudentTasks(userId: string, courses: Map<string, CourseRef>
  * limits, and `counts` (per state + ACTIONABLE) is part of the contract, so
  * every visible row must be classified whichever page is asked for.
  */
-export async function listStudentTasks(userId: string, options: { page: number; pageSize: number; state?: typeof taskFilters[number]; courseId?: string }, now = new Date()) {
+export async function listStudentTasks(userId: string, options: { page: number; pageSize: number; state?: typeof taskFilters[number]; courseId?: string; cursor?: StudentTaskCursor }, now = new Date()) {
   const memberships = await prisma.courseStudent.findMany({
     where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false } },
     select: { course: { select: { id: true, title: true } } },
@@ -150,8 +183,14 @@ export async function listStudentTasks(userId: string, options: { page: number; 
     : tasks
   const counts = Object.fromEntries(taskStates.map(state => [state, scoped.filter(item => item.state === state).length])) as Record<TaskState, number>
   const filtered = scoped.filter(item => options.state === 'ACTIONABLE' ? isActionable(item) : !options.state || item.state === options.state).sort(compareTasks)
-  return { list: filtered.slice((options.page - 1) * options.pageSize, options.page * options.pageSize), total: filtered.length,
-    counts: { ...counts, ACTIONABLE: scoped.filter(isActionable).length }, page: options.page, pageSize: options.pageSize, generatedAt: now.toISOString() }
+  const remaining = options.cursor ? filtered.filter(item => afterStudentTaskCursor(item, options.cursor!))
+    : filtered.slice((options.page - 1) * options.pageSize)
+  const list = remaining.slice(0, options.pageSize)
+  const last = list.at(-1)
+  return { list, total: filtered.length,
+    counts: { ...counts, ACTIONABLE: scoped.filter(isActionable).length }, page: options.page, pageSize: options.pageSize, generatedAt: now.toISOString(),
+    nextCursor: remaining.length > options.pageSize && last
+      ? { kind: last.kind, id: last.id, state: last.state, deadline: last.deadline } : null }
 }
 
 /**

@@ -18,6 +18,8 @@ import { readTeacherPersonalScaleReport } from './scalePersonalReport.service'
 import { compositeController } from '../composite/composite.controller'
 import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
+import { listPage, ListCursorError } from '../../utils/listCursor'
+import { decodeRunTaskCursor, encodeRunTaskCursor } from '../assessment-run/productRead'
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
@@ -25,8 +27,8 @@ const uuid=z.string().guid()
 const wrap=(work:(req:Request)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
   try{return success(res,await work(req))}
   catch(e){
-    if(e instanceof ZodError)return res.status(400).json({
-      code:'HUITEACHER_SCALE_INPUT_INVALID',message:'教师个人测评参数无效',data:null,
+    if(e instanceof ZodError || e instanceof ListCursorError)return res.status(400).json({
+      code:'HUITEACHER_SCALE_INPUT_INVALID',message:e instanceof ListCursorError?e.message:'教师个人测评参数无效',data:null,
     })
     const known=e as {statusCode?:number;code?:string}
     if(known&&typeof known.statusCode==='number'
@@ -112,19 +114,32 @@ async function requireScaleAttempt(req:Request,res:Response,next:NextFunction){
     next()
   }catch(e){next(e)}
 }
-export async function listOwnTeacherScaleTasks(userId:string){
+export async function listOwnTeacherScaleTasks(userId:string,query:Request['query']={}){
+  if(query.page!==undefined&&query.page!=='1')throw new ListCursorError('请勿混用分页方式')
+  const pageSize=query.pageSize===undefined?'100'
+    :typeof query.pageSize==='number'?String(query.pageSize):query.pageSize
+  if(typeof pageSize!=='string')throw new ListCursorError('分页参数无效')
+  const {size}=listPage({pageSize})
+  let cursor
+  try{cursor=decodeRunTaskCursor(query.cursor)}
+  catch{throw new ListCursorError('分页游标无效')}
+  const cursorCreatedAt=cursor?cursor.createdAt:null
+  const cursorScope=cursorCreatedAt
+    ?Prisma.sql`AND (e."created_at", e."id") < (${cursorCreatedAt}::timestamptz, ${cursor!.id})`
+    :Prisma.empty
   const rows=await prisma.$queryRaw<Array<{
     executionId:string;eventId:string;eventTitle:string;runId:string;
     organizationId:string;status:string;runtimeBindingRef:string|null;
-    resourceKey:string;title:string;runStatus:string
-  }>>`
+    resourceKey:string;title:string;runStatus:string;createdAtMicros:string
+  }>>(Prisma.sql`
     SELECT e."id" AS "executionId",event."id" AS "eventId",
       event."title" AS "eventTitle",
       e."run_id" AS "runId",e."organization_id" AS "organizationId",
       e."status",e."runtime_binding_ref" AS "runtimeBindingRef",
       track."resource_key" AS "resourceKey",
       registered."entry"->>'title' AS "title",
-      run."status" AS "runStatus"
+      run."status" AS "runStatus",
+      to_char(e."created_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros"
     FROM "assessment_run_executions" e
     JOIN "assessment_runs" run ON run."organization_id"=e."organization_id"
       AND run."id"=e."run_id"
@@ -207,13 +222,20 @@ export async function listOwnTeacherScaleTasks(userId:string){
     AND ((track."resource_key" NOT LIKE 'library-scale:%' AND track."resource_key" NOT LIKE 'private-scale:%') OR CASE WHEN e."status"='COMPLETED'
         THEN ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`, 'REPORT_READ')}
         ELSE ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)} END)
-    ORDER BY e."created_at" DESC,e."id" DESC LIMIT 101
-  `
-  return {list:rows.slice(0,100),truncated:rows.length>100}
+    ${cursorScope}
+    ORDER BY e."created_at" DESC,e."id" DESC LIMIT ${size + 1}
+  `)
+  const page=rows.slice(0,size)
+  const last=page[page.length-1]
+  return {
+    list:page.map(({createdAtMicros:_createdAtMicros,...task})=>task),
+    truncated:rows.length>size,
+    nextCursor:rows.length>size&&last?encodeRunTaskCursor({createdAt:last.createdAtMicros,id:last.executionId}):null,
+  }
 }
 router.post('/scale-tasks/:executionId/changes',authenticateHuiteacher,wrap(req=>readTeacherPersonalChanges({actorUserId:req.user!.userId,executionId:uuid.parse(req.params.executionId)})))
 router.get('/my-scale-tasks',authenticateHuiteacher,wrap(async req=>
-  listOwnTeacherScaleTasks(req.user!.userId)))
+  listOwnTeacherScaleTasks(req.user!.userId,req.query)))
 router.post('/run-executions/:executionId/start-scale',
   authenticateHuiteacher,wrap(async req=>{
     const executionId=uuid.parse(req.params.executionId)

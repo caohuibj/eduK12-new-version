@@ -7,6 +7,7 @@ import { authenticate } from '../../middleware/auth'
 import { error, success, unauthorized } from '../../utils/response'
 import { listRespondentAssessments } from './inbox'
 import { decodeRunTaskCursor, encodeRunTaskCursor } from '../assessment-run/productRead'
+import { decodeStudentTaskCursor, encodeStudentTaskCursor } from '../../services/studentTasks'
 
 const router = Router()
 router.use(authenticate)
@@ -18,17 +19,28 @@ export async function listMyAssessments(req: any, res: any, next: any) {
   const parsed = z.object({
     runCursor: z.string().max(500).optional(),
     runLimit: z.coerce.number().int().min(1).max(100).optional(),
+    courseCursor: z.string().max(500).optional(),
+    courseLimit: z.coerce.number().int().min(1).max(100).optional(),
   }).strict().safeParse(req.query)
   if (!parsed.success) return error(res, parsed.error.issues[0].message, -1, 400)
   let runCursor
+  let courseCursor
   try { runCursor = decodeRunTaskCursor(parsed.data.runCursor) }
   catch { return error(res, '任务游标无效', -1, 400) }
+  try { courseCursor = decodeStudentTaskCursor(parsed.data.courseCursor) }
+  catch { return error(res, '任务游标无效', -1, 400) }
   try {
-    const data = await listRespondentAssessments(req.user.userId, req.user.role, { runCursor, runLimit: parsed.data.runLimit })
+    const data = await listRespondentAssessments(req.user.userId, req.user.role, {
+      runCursor, runLimit: parsed.data.runLimit, courseCursor, courseLimit: parsed.data.courseLimit,
+    })
     // The wire cursor is an opaque base64url string: the client sends back
-    // exactly what the server returned. Never leak the internal
-    // {createdAt, id} object across the HTTP boundary.
-    return success(res, { ...data, nextRunCursor: data.nextRunCursor ? encodeRunTaskCursor(data.nextRunCursor) : null })
+    // exactly what the server returned. Never leak the internal cursor
+    // object across the HTTP boundary.
+    return success(res, {
+      ...data,
+      nextRunCursor: data.nextRunCursor ? encodeRunTaskCursor(data.nextRunCursor) : null,
+      nextCourseCursor: data.nextCourseCursor ? encodeStudentTaskCursor(data.nextCourseCursor) : null,
+    })
   }
   catch (error) { next(error) }
 }
