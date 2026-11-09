@@ -190,9 +190,11 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
           }
           return
         }
-        const status = await api.reportStatus(state.id)
-        if (status.code !== 0 || !status.data) throw responseError(status)
-        if (status.data.wholeSubmissionReceived) { setAccepted(true); return }
+        if (state.status !== 'IN_PROGRESS' || (state as any).hasAcceptedSubmission) {
+          const status = await api.reportStatus(state.id)
+          if (status.code !== 0 || !status.data) throw responseError(status)
+          if (status.data.wholeSubmissionReceived) { setAccepted(true); return }
+        }
         if (!existing && state.items.some(item => item.type === 'SCALE' && item.completed)) { setUseFallback(true); return }
         let delivered: ApiResponse<WholeQuestionnaireDefinition>
         try { delivered = await api.wholeDefinition(state.id) }

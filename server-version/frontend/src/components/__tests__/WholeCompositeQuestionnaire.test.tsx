@@ -336,3 +336,11 @@ it('keeps anonymous receipt success distinct from report release and does not re
  expect(screen.getByRole('button',{name:'查看报告进度'})).toBeEnabled()
  expect(client.submitWhole).toHaveBeenCalledTimes(1)
 })
+
+it('skips redundant reportStatus check on fresh in-progress attempt for 0ms question render', async () => {
+  const d = definition([1]), client = api(); client.wholeDefinition.mockResolvedValue({ code: 0, data: d })
+  render(<WholeCompositeQuestionnaire state={state} api={client} publicMode recoveryToken="synthetic-recovery" fallback={<p>fallback</p>} onCompleted={vi.fn()} onExit={vi.fn()}/>)
+  expect(await screen.findByText(/量表 0 题目 0/)).toBeInTheDocument()
+  expect(client.reportStatus).not.toHaveBeenCalled()
+  expect(client.wholeDefinition).toHaveBeenCalledTimes(1)
+})
