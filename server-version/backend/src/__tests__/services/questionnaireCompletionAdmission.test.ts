@@ -120,12 +120,19 @@ describe('questionnaire completion admission', () => {
     { code: 'P2034' },
     { code: 'P2010', meta: { code: '40001' } },
     { code: '40001' },
+    { code: 'P2028', message: 'Transaction API error: Unable to start a transaction in the given time.' },
+    { code: 'P2028', message: 'Transaction API error: Transaction already closed: A commit cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms' },
   ])('maps transient database error $code to retryable completion busy', (error) => {
     expect(toCompletionAdmissionBusyError(error)).toMatchObject({
       code: 'COMPLETION_BUSY',
       reason: 'database_busy',
       retryAfterSeconds: 1,
     })
+  })
+
+  it('does not reclassify unclassified P2028 or generic errors', () => {
+    const unclassified = { code: 'P2028', message: 'Transaction API error: Transaction already closed: A query cannot be executed on a committed transaction.' }
+    expect(() => toCompletionAdmissionBusyError(unclassified)).toThrow()
   })
 
   it('records a labelled gate counter for database_busy', () => {

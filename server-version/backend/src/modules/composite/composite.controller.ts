@@ -4,6 +4,7 @@ import { RelationalAssessmentError } from '../assessment-relational/errors'
 import { wholeQuestionnaireArrival, markAssessmentTimeline, traceAssessmentPhase, traceAssessmentPhaseSync } from '../../services/runtimeObservability'
 import { Request, Response } from 'express'
 import { UserRole } from '@prisma/client'
+import { logger } from '../../utils/logger'
 import { success, error, notFound, unauthorized, completionBusy, assessmentSubmitBusy, instrumentError } from '../../utils/response'
 import * as service from './composite.service'
 import {
@@ -938,12 +939,16 @@ const handleError = (res: Response, err: unknown): Response => {
   if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
   if (err instanceof z.ZodError) return error(res, err.issues.map((item) => item.message).join('; '), -1, 400)
   if (service.isCompositeError(err)) {
+    if (err.statusCode >= 500) logger.error('综合测评业务异常', err)
     return err.statusCode < 500
       ? error(res, err.message, -1, err.statusCode)
       : error(res, '服务器内部错误', -1, 500)
   }
   const maybe = err as { statusCode?: unknown; message?: unknown }
-  if (typeof maybe.statusCode === 'number' && maybe.statusCode >= 400 && maybe.statusCode < 500) return error(res, typeof maybe.message === 'string' ? maybe.message : 'Request failed', -1, maybe.statusCode)
+  if (typeof maybe.statusCode === 'number' && maybe.statusCode >= 400 && maybe.statusCode < 500) {
+    return error(res, typeof maybe.message === 'string' ? maybe.message : 'Request failed', -1, maybe.statusCode)
+  }
+  logger.error('综合测评未捕获异常', err)
   return error(res, '服务器内部错误', -1, 500)
 }
 
