@@ -223,6 +223,7 @@ import {
   storeFrozenActiveSlotSet,
   formSectionSlotKey,
   type FrozenActiveSlotV1,
+  type FrozenActiveSlotSetV1,
 } from '../assessment-runtime/slot-set'
 import { BoundedArtifactCache } from '../assessment-runtime/bounded-artifact-cache'
 import { runnerDefinition } from '../scale/scale-definition'
@@ -3159,7 +3160,7 @@ const precomputeScaleOnlyActiveSlotSet = async (db: Db, input: {
     cognitive: [], situational: [],
     formSections: input.formSections.map((section: any) => ({ sectionId: section.id, definitionHash: formSectionIdentityHash(compositeFormSectionRuntimeDefinition(section)) })),
   })
-  return { encrypted: await storeFrozenActiveSlotSet(slotSet, db), snapshotHash: slotSet.snapshotHash }
+  return { encrypted: await storeFrozenActiveSlotSet(slotSet, db), snapshotHash: slotSet.snapshotHash, slotSet }
 }
 
 const freezeEducationLibraryScaleUnit = async (db: Db, item: any, libraryUnit: any, educationFrozenScales: Map<string, any>) => {
@@ -3562,7 +3563,8 @@ const createAttempt = async (
   // Freeze the explicit policy with the truthful empty context before creating
   // or exposing any measurement child. Context-bearing tasks bind atomically
   // when their context section is submitted, before the next runner is delivered.
-  if(trainingContentBinding&&!formSections.some((section:any)=>section.contextSection||section.items?.some((item:any)=>item.contextKey))
+  const hasReferencePolicy = trainingContentBinding?.units?.some((u: any) => u.referencePolicy !== undefined)
+  if(hasReferencePolicy && trainingContentBinding&&!formSections.some((section:any)=>section.contextSection||section.items?.some((item:any)=>item.contextKey))
     &&!composite.items.some((item:any)=>item.type==='FORM'&&item.contextKey)){
     await freezeTrainingReferenceBinding(db as Prisma.TransactionClient,{...attempt,compositeAssessment:composite})
   }
