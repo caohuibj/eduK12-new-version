@@ -297,14 +297,17 @@ async function runBenchmark(vuCount: number, workerConcurrency = 8) {
         if (!score) {
           throw new Error(`Assertion failed: attempt ${attemptId} unit ${uIdx} missing engagement score`)
         }
-        if (score.value !== 30) {
-          throw new Error(`Assertion failed: attempt ${attemptId} unit ${uIdx} engagement score is ${score.value}, expected 30`)
+        if (score.value !== 30 || score.value < 0 || score.value > 30) {
+          throw new Error(`Assertion failed: attempt ${attemptId} unit ${uIdx} engagement score is ${score.value}, expected 30 within valid range [0, 30]`)
         }
         if (score.status !== 'calculated') {
           throw new Error(`Assertion failed: attempt ${attemptId} unit ${uIdx} score status is ${score.status}, expected calculated`)
         }
         if (score.direction !== 'higher_is_better') {
           throw new Error(`Assertion failed: attempt ${attemptId} unit ${uIdx} direction is ${score.direction}, expected higher_is_better`)
+        }
+        if (u.interpretations && !Array.isArray(u.interpretations)) {
+          throw new Error(`Assertion failed: attempt ${attemptId} unit ${uIdx} interpretations must be an array`)
         }
         totalUnitsVerified++
       }
@@ -315,7 +318,7 @@ async function runBenchmark(vuCount: number, workerConcurrency = 8) {
     })
   )
 
-  console.log(`✅ Phase 4 Done: 100% Verified ${submitResults.length} attempts, ${totalUnitsVerified} unit reports all engagement = 30 (100% correct)`)
+  console.log(`✅ Phase 4 Done: 100% Verified ${submitResults.length} attempts, ${totalUnitsVerified} unit reports all engagement = 30 within [0, 30] (100% correct)`)
 
   await stopCompositeReportWorker(5000)
 
@@ -332,15 +335,17 @@ async function runBenchmark(vuCount: number, workerConcurrency = 8) {
 
   // Summary Metrics Table
   console.log(`\n📊 ===============================================================`)
-  console.log(`   BENCHMARK RESULTS SUMMARY: ${vuCount} VU × 240 ITEMS`)
+  console.log(`   BENCHMARK RESULTS SUMMARY: ${vuCount} VU × 240 ITEMS (SERVICE-LAYER)`)
   console.log(`=================================================================`)
   console.log(`Phase                           | p50 (ms) | p95 (ms) | p99 (ms) | max (ms)`)
   console.log(`--------------------------------+----------+----------+----------+---------`)
-  console.log(`START + Inline Def (PR X-05C)   | ${String(percentile(startLatencies, 50)).padStart(8)} | ${String(percentile(startLatencies, 95)).padStart(8)} | ${String(percentile(startLatencies, 99)).padStart(8)} | ${String(Math.max(...startLatencies)).padStart(7)}`)
-  console.log(`Submit (240 questions envelope) | ${String(percentile(submitLatencies, 50)).padStart(8)} | ${String(percentile(submitLatencies, 95)).padStart(8)} | ${String(percentile(submitLatencies, 99)).padStart(8)} | ${String(Math.max(...submitLatencies)).padStart(7)}`)
+  console.log(`Service START + Inline Def (X)  | ${String(percentile(startLatencies, 50)).padStart(8)} | ${String(percentile(startLatencies, 95)).padStart(8)} | ${String(percentile(startLatencies, 99)).padStart(8)} | ${String(Math.max(...startLatencies)).padStart(7)}`)
+  console.log(`Service Submit (240 questions)  | ${String(percentile(submitLatencies, 50)).padStart(8)} | ${String(percentile(submitLatencies, 95)).padStart(8)} | ${String(percentile(submitLatencies, 99)).padStart(8)} | ${String(Math.max(...submitLatencies)).padStart(7)}`)
   console.log(`Report READY Wait (${workerConcurrency} workers)  | ${String(percentile(reportWaitLatencies, 50)).padStart(8)} | ${String(percentile(reportWaitLatencies, 95)).padStart(8)} | ${String(percentile(reportWaitLatencies, 99)).padStart(8)} | ${String(Math.max(...reportWaitLatencies)).padStart(7)}`)
   console.log(`Report Read (Decryption)        | ${String(percentile(reportReadLatencies, 50)).padStart(8)} | ${String(percentile(reportReadLatencies, 95)).padStart(8)} | ${String(percentile(reportReadLatencies, 99)).padStart(8)} | ${String(Math.max(...reportReadLatencies)).padStart(7)}`)
   console.log(`-----------------------------------------------------------------`)
+  console.log(`* Note: Metrics isolate PostgreSQL & worker queue performance directly;`)
+  console.log(`  external HTTP proxies, network RTT, and Argon2 password hashing are excluded.`)
   console.log(`Gzip Compressed Ciphertext Size : ${sampleCipherSize} bytes (Previous uncompressed: ~46,000 bytes)`)
   console.log(`Compression Reduction Ratio     : ${((1 - sampleCipherSize / 46000) * 100).toFixed(1)}% savings`)
   console.log(`Scored Metric Value Accuracy    : engagement = ${sampleScoreValue} (expected: 30) ✅`)
