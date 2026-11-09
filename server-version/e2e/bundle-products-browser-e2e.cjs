@@ -35,6 +35,8 @@ async function completeFour(page, label) {
     if(await formal.isVisible()) { await formal.click(); green=false }
     const retry=page.getByRole('button',{name:'重新练习',exact:true})
     if(await retry.isVisible()) { await retry.click(); green=false }
+    const review=page.getByRole('button',{name:/继续下一题|查看练习结果/}).first()
+    if(await review.isVisible()) { await review.click(); green=false }
     const stimulus=page.getByRole('button',{name:'respond',exact:true})
     // Sample once: the stimulus unmounts when practice or the formal run ends.
     const visible=await stimulus.evaluateAll(elements=>elements.some(element=>element.classList.contains('bg-green-500')))
