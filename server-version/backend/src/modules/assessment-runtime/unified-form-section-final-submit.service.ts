@@ -312,15 +312,28 @@ const compositeFormFinalProductKind = async (parent: {
   return persisted.compositeAssessment.productKind
 }
 
-export const submitUnifiedCompositeFormSectionFinal = async (
+export type PreparedUnifiedCompositeFormSection = {
+  input: CompositeSectionSubmitInput
+  wholeReceipt?: WholeReceiptExecution
+  submissionId: string
+  parent: any
+  productKind: string
+  child: any
+  admission: any
+  mappedSection: any
+  normalized: any
+  payloadHash: string
+  context: any
+  factsEncrypted: any
+  slotKey: string
+  sourceDefinitionHash: string
+}
+
+export const prepareUnifiedCompositeFormSectionFinal = async (
   input: CompositeSectionSubmitInput,
   _parent?: unknown,
   selectedParent?: unknown,
-  /** When materializing from a whole receipt, the running job's lease identity
-   * rides along: the unit-snapshot enqueue becomes a read-only receipt fence
-   * and can never create or mutate the job that is being processed. */
-  wholeReceipt?: WholeReceiptExecution,
-) => {
+): Promise<PreparedUnifiedCompositeFormSection> => {
   const submissionId = validateSubmissionId(input.submissionId)
   const principalParent = await loadTrainingChildParent(input.attemptId, selectedParent)
   assertTrainingFormFinalPrincipal(principalParent, input)
@@ -365,10 +378,25 @@ export const submitUnifiedCompositeFormSectionFinal = async (
   const slotKey = admission.parent?.slotKey ?? formSectionSlotKey(mappedSection.id)
   const sourceDefinitionHash = admission.parent?.sourceDefinitionHash ?? admission.formSection!.identityHash
   void _parent
+  return {
+    input, submissionId, parent, productKind, child, admission, mappedSection, normalized,
+    payloadHash, context, factsEncrypted, slotKey, sourceDefinitionHash,
+  }
+}
 
+export const commitUnifiedCompositeFormSectionFinal = async (
+  prepared: PreparedUnifiedCompositeFormSection,
+  wholeReceipt?: WholeReceiptExecution,
+) => {
+  const {
+    input, submissionId, parent, productKind, child, admission, mappedSection, normalized,
+    payloadHash, context, factsEncrypted, slotKey, sourceDefinitionHash,
+  } = prepared
   const committed = await measureRequestPhase('final_submit_db_query', () => withCompositeFormUnitTransaction(async (tx) => {
-    await assertCurrentStudyPrincipal(tx,{attemptId:input.attemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,
-      attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash},true)
+    if (!input.userId) {
+      await assertCurrentStudyPrincipal(tx,{attemptId:input.attemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,
+        attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash},true)
+    }
     if(productKind==='ORGANIZATION_RESOURCE'){
       const {assertPrivateFormFinalCurrent}=await import('../assessment-run/educationPrivateFormExecution')
       await assertPrivateFormFinalCurrent(tx,{attemptId:input.attemptId,actorUserId:input.userId})
@@ -470,6 +498,16 @@ export const submitUnifiedCompositeFormSectionFinal = async (
   if(productKind==='ORGANIZATION_RESOURCE')return {submissionId,sectionId:input.sectionId,...committed,
     shouldFinalize:true,finalizeCompositeAttemptId:input.attemptId}
   return { submissionId, sectionId: input.sectionId, ...committed, parent: null }
+}
+
+export const submitUnifiedCompositeFormSectionFinal = async (
+  input: CompositeSectionSubmitInput,
+  _parent?: unknown,
+  selectedParent?: unknown,
+  wholeReceipt?: WholeReceiptExecution,
+) => {
+  const prepared = await prepareUnifiedCompositeFormSectionFinal(input, _parent, selectedParent)
+  return commitUnifiedCompositeFormSectionFinal({ ...prepared, wholeReceipt }, wholeReceipt)
 }
 
 const withQuestionnaireFormUnitTransaction = async <T>(callback: (tx: Prisma.TransactionClient) => Promise<T>) => (

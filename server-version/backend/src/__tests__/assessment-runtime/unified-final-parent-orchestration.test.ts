@@ -19,7 +19,11 @@ vi.mock('../../services/unitSubmitAdmission', async importOriginal => ({
 }))
 vi.mock('../../modules/cognitive/unified-final-submit.service', () => ({ submitUnifiedCognitiveSessionFinal: m.cognitive }))
 vi.mock('../../modules/scale/unified-final-submit.service', () => ({ submitUnifiedScaleAssessmentFinal: m.scale }))
-vi.mock('../../modules/assessment-runtime/unified-form-section-final-submit.service', () => ({ submitUnifiedCompositeFormSectionFinal: m.form }))
+vi.mock('../../modules/assessment-runtime/unified-form-section-final-submit.service', () => ({
+  submitUnifiedCompositeFormSectionFinal: m.form,
+  prepareUnifiedCompositeFormSectionFinal: async (input: unknown) => ({ input }),
+  commitUnifiedCompositeFormSectionFinal: async (prepared: { input: unknown }) => m.form(prepared.input),
+}))
 vi.mock('../../modules/composite/composite.service', () => ({ finalizeCompositeAttemptIfReady: m.finalize }))
 
 import { submitCognitiveSessionFinalWithContext } from '../../modules/cognitive/final-submit.service'
