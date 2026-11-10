@@ -296,7 +296,7 @@ export const assessmentRunController = {
       ) {
         const startMs = Date.now()
         try {
-          if (req.user.accountDomain === 'SCHOOL') {
+          if (req.user.accountDomain === 'SCHOOL' && started.replayed) {
             const { checkCampusCompositeAccessAuthority } = await import('../campus/campus-composite-authority')
             const allowed = await checkCampusCompositeAccessAuthority({
               attemptId: started.runtimeBindingRef,
