@@ -722,4 +722,74 @@ suite('V32-1 additive PostgreSQL migration and constraints', () => {
       progress: 100,
     })
   })
+
+  it('rejects a stale epoch after Unified form prepare, before the UNIT-gate commit', async () => {
+    const fixture = await createUnifiedFormFixture()
+    const input = {
+      attemptId: fixture.attempt.id,
+      sectionId: fixture.section.id,
+      submissionId: `v32-1-form-stale-prep-${randomUUID()}`,
+      attemptEpoch: 1,
+      definitionHash: fixture.definitionHash,
+      contextSnapshotHash: null,
+      answers: [{ formItemId: fixture.item.id, value: 'answer' }],
+      userId: fixture.userId,
+    }
+    const { prepareUnifiedCompositeFormSectionFinal, commitUnifiedCompositeFormSectionFinal } = await import('../../modules/assessment-runtime/unified-form-section-final-submit.service')
+    const prepared = await prepareUnifiedCompositeFormSectionFinal(input)
+    await db!.compositeAssessmentAttempt.update({ where: { id: fixture.attempt.id }, data: { attemptEpoch: 2 } })
+    await db!.compositeFormSectionAttempt.updateMany({ where: { attemptId: fixture.attempt.id }, data: { attemptEpoch: 2 } })
+    await expect(commitUnifiedCompositeFormSectionFinal(prepared)).rejects.toMatchObject({
+      code: 'STALE_ATTEMPT',
+      statusCode: 409,
+    })
+    expect(await db!.compositeFormSectionAttempt.findUnique({
+      where: { attemptId_sectionId: { attemptId: fixture.attempt.id, sectionId: fixture.section.id } },
+      select: { status: true, submissionId: true, attemptEpoch: true },
+    })).toMatchObject({ status: 'IN_PROGRESS', submissionId: null, attemptEpoch: 2 })
+  })
+
+  it('replays a second commit of the same prepared form payload', async () => {
+    const fixture = await createUnifiedFormFixture()
+    const input = {
+      attemptId: fixture.attempt.id,
+      sectionId: fixture.section.id,
+      submissionId: `v32-1-form-prep-replay-${randomUUID()}`,
+      attemptEpoch: 1,
+      definitionHash: fixture.definitionHash,
+      contextSnapshotHash: null,
+      answers: [{ formItemId: fixture.item.id, value: 'answer' }],
+      userId: fixture.userId,
+    }
+    const { prepareUnifiedCompositeFormSectionFinal, commitUnifiedCompositeFormSectionFinal } = await import('../../modules/assessment-runtime/unified-form-section-final-submit.service')
+    const prepared = await prepareUnifiedCompositeFormSectionFinal(input)
+    const first = await commitUnifiedCompositeFormSectionFinal(prepared)
+    expect(first.replayed).toBe(false)
+    const replayed = await commitUnifiedCompositeFormSectionFinal(prepared)
+    expect(replayed.replayed).toBe(true)
+  })
+
+  it('refuses a parent abandoned after Unified form prepare, before the UNIT-gate commit', async () => {
+    const fixture = await createUnifiedFormFixture()
+    const input = {
+      attemptId: fixture.attempt.id,
+      sectionId: fixture.section.id,
+      submissionId: `v32-1-form-prep-revoked-${randomUUID()}`,
+      attemptEpoch: 1,
+      definitionHash: fixture.definitionHash,
+      contextSnapshotHash: null,
+      answers: [{ formItemId: fixture.item.id, value: 'answer' }],
+      userId: fixture.userId,
+    }
+    const { prepareUnifiedCompositeFormSectionFinal, commitUnifiedCompositeFormSectionFinal } = await import('../../modules/assessment-runtime/unified-form-section-final-submit.service')
+    const prepared = await prepareUnifiedCompositeFormSectionFinal(input)
+    await db!.compositeAssessmentAttempt.update({ where: { id: fixture.attempt.id }, data: { status: 'ABANDONED' } })
+    await expect(commitUnifiedCompositeFormSectionFinal(prepared)).rejects.toMatchObject({
+      code: 'STALE_ATTEMPT',
+    })
+    expect(await db!.compositeFormSectionAttempt.findUnique({
+      where: { attemptId_sectionId: { attemptId: fixture.attempt.id, sectionId: fixture.section.id } },
+      select: { status: true, submissionId: true },
+    })).toMatchObject({ status: 'IN_PROGRESS', submissionId: null })
+  })
 })

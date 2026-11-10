@@ -28,7 +28,7 @@ import {
   refreshCompositeFinalOnlyProgress,
   withFinalOnlyCompletionTransaction,
 } from '../../services/questionnaireProgressService'
-import { submitUnifiedScaleAssessmentFinal } from './unified-final-submit.service'
+import { submitUnifiedScaleAssessmentFinal, prepareUnifiedScaleFinalSubmission, prepareUnifiedScaleWrite, commitPreparedUnifiedScaleAssessmentFinal } from './unified-final-submit.service'
 import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
 import { UNIFIED_SCALE_CHILD_ADMISSION_SELECT, standaloneAdmissionPersistence, type ScaleAdmissionChildRow } from './scale-admission.service'
 import { persistFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../assessment-runtime/runtime-snapshot'
@@ -604,23 +604,41 @@ export const submitCompositeScaleFinal = async (
   context: { userId?: string | null; recoveryTokenHash?: string },
   responseOptions?: { receiptOnly: true },
 ) => {
-  const result = await withUnitSubmitAdmission(async () => {
-    const child = await measureRequestPhase('final_submit_admission', () => prisma.assessment.findFirst({
-      where: { compositeAttemptId: attemptId, compositeItemId: itemId },
-      select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
-    }))
-    if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不存在', 404)
-    if (child.compositeAttemptId !== attemptId || child.compositeItemId !== itemId) {
-      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不属于当前单元', 403)
-    }
-    return submitScaleAssessmentFinalImpl({
-      ...input,
-      assessmentId: child.id,
-      userId: context.userId,
-      compositeAttemptId: attemptId,
-      recoveryTokenHash: context.recoveryTokenHash,
-    }, child, responseOptions?.receiptOnly)
-  })
+  const child = await measureRequestPhase('final_submit_admission', () => prisma.assessment.findFirst({
+    where: { compositeAttemptId: attemptId, compositeItemId: itemId },
+    select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
+  }))
+  if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不存在', 404)
+  if (child.compositeAttemptId !== attemptId || child.compositeItemId !== itemId) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不属于当前单元', 403)
+  }
+  const builtInput = {
+    ...input,
+    assessmentId: child.id,
+    userId: context.userId,
+    compositeAttemptId: attemptId,
+    recoveryTokenHash: context.recoveryTokenHash,
+  }
+  const result = child.runtimeGeneration === 'UNIFIED_V1'
+    ? await (async () => {
+      const prepared = await prepareUnifiedScaleFinalSubmission(builtInput, child)
+      const write = child.status === 'COMPLETED' ? undefined : await prepareUnifiedScaleWrite(builtInput, child, prepared)
+      const data = await withUnitSubmitAdmission(() => commitPreparedUnifiedScaleAssessmentFinal(
+        builtInput, child, prepared, undefined, undefined, responseOptions?.receiptOnly, write,
+      ))
+      const shouldFinalize = !responseOptions?.receiptOnly && Boolean(child.compositeAttemptId)
+        && shouldReconcileTrainingParent(child.compositeAttempt)
+      return {
+        ...data,
+        shouldFinalize,
+        finalizeAssessment: shouldFinalize ? child : null,
+        internalContext: {
+          compositeAttemptId: child.compositeAttemptId ?? null,
+          attemptEpoch: child.attemptEpoch,
+        },
+      }
+    })()
+    : await withUnitSubmitAdmission(() => submitScaleAssessmentFinalImpl(builtInput, child, responseOptions?.receiptOnly))
   const data = stripScaleFinalContext(await finalizeParentAfterUnitSubmit(result))
   if (!responseOptions?.receiptOnly) return data
   return { submissionId: data.submissionId, payloadHash: data.payloadHash, replayed: Boolean(data.replayed), completed: true }
