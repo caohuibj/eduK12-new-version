@@ -63,6 +63,18 @@ describe('surveyAdmissionGate and transient error resilience (X-14)', () => {
       expect(stats.options.maxWaitMs).toBe(7500)
     })
 
+    it('supports explicit maxQueue=0 without falling back to default', () => {
+      process.env.SURVEY_ADMISSION_MAX_QUEUE = '0'
+      const gate = surveyAdmissionGate()
+      const stats = gate.getStats()
+      expect(stats.options.maxQueue).toBe(0)
+    })
+
+    it('rejects invalid float for maxConcurrent with clear error', () => {
+      process.env.SURVEY_ADMISSION_MAX_CONCURRENT = '0.5'
+      expect(() => surveyAdmissionGate()).toThrow(/must be a positive integer/)
+    })
+
     it('returns the same singleton instance until reset', () => {
       const gate1 = surveyAdmissionGate()
       const gate2 = surveyAdmissionGate()

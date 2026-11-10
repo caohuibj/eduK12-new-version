@@ -55,6 +55,18 @@ describe('runStartGate admission and busy mapping', () => {
     expect(stats.options.maxWaitMs).toBe(8000)
   })
 
+  it('supports explicit maxQueue=0 without falling back to default', () => {
+    process.env.RUN_START_MAX_QUEUE = '0'
+    const gate = runStartGate()
+    const stats = gate.getStats()
+    expect(stats.options.maxQueue).toBe(0)
+  })
+
+  it('rejects invalid float for maxConcurrent with clear error', () => {
+    process.env.RUN_START_MAX_CONCURRENT = '0.5'
+    expect(() => runStartGate()).toThrow(/must be a positive integer/)
+  })
+
   it('maps queue overflow rejection to AssessmentStartBusyError with queue_full diagnostic', async () => {
     const testGate = new BoundedAdmissionGate({
       name: 'test_gate_overflow',

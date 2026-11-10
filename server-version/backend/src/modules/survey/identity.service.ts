@@ -4,8 +4,9 @@ import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { allocateResearchFlowOnAdmission } from './flow.assignment'
-import { BoundedAdmissionGate } from '../../services/boundedAdmissionGate'
-import { defaultStartAdmissionBound } from '../../config/databasePool'
+import { surveyAdmissionGate, resetSurveyAdmissionGateForTests } from './survey-admission-gate'
+
+export { surveyAdmissionGate, resetSurveyAdmissionGateForTests }
 
 type Tx=Prisma.TransactionClient
 export class ResearchIdentityError extends Error {
@@ -64,35 +65,6 @@ async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:st
   if(wave.quotaStarts!==null&&wave.startsCount>=wave.quotaStarts)
     return fail('研究名额已用尽，请勿领取无法启动的研究编号')
   return wave
-}
-
-const envPositive = (name: string, fallback: number): number => {
-  const raw = Number(process.env[name])
-  return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : fallback
-}
-
-let surveyGateInstance: BoundedAdmissionGate | null = null
-
-export const resetSurveyAdmissionGateForTests = (): void => {
-  surveyGateInstance = null
-}
-
-export const surveyAdmissionGate = (): BoundedAdmissionGate => {
-  if (!surveyGateInstance) {
-    surveyGateInstance = new BoundedAdmissionGate({
-      name: 'survey_admission',
-      maxConcurrent: envPositive(
-        'SURVEY_ADMISSION_MAX_CONCURRENT',
-        envPositive('TRAINING_START_MAX_CONCURRENT', defaultStartAdmissionBound(process.env.DATABASE_URL)),
-      ),
-      maxQueue: envPositive('SURVEY_ADMISSION_MAX_QUEUE', envPositive('TRAINING_START_MAX_QUEUE', 300)),
-      maxWaitMs: envPositive('SURVEY_ADMISSION_MAX_WAIT_MS', envPositive('TRAINING_START_MAX_WAIT_MS', 15000)),
-      retryAfterSeconds: 1,
-      busyCode: 'SURVEY_ADMISSION_BUSY',
-      busyMessage: '研究参与请求繁忙，请稍后重试',
-    })
-  }
-  return surveyGateInstance
 }
 
 /** Initial LINKED enrollment atomically claims exactly one Wave Attempt.

@@ -4,8 +4,9 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import {
   createLinkedResearchIdentity,recoverLinkedResearchIdentity,
-  freshUnlinkedSession,hashResearchCredential,surveyAdmissionGate,
+  freshUnlinkedSession,hashResearchCredential,
 } from './identity.service'
+import { surveyAdmissionGate } from './survey-admission-gate'
 import { SurveyWaveError } from './waves.service'
 import type { ResearchFrozenPublication } from './publication.service'
 import { allocateResearchFlowOnAdmission } from './flow.assignment'

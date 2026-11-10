@@ -8,7 +8,7 @@ import { Prisma } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { classifyStartTransaction, isAssessmentStartBusyError, AssessmentStartBusyError, rolledBackStartReason, rethrowGateBusyAsStartBusy } from '../composite/start-transient'
-import { BoundedAdmissionGate } from '../../services/boundedAdmissionGate'
+import { BoundedAdmissionGate, configuredInteger } from '../../services/boundedAdmissionGate'
 import { defaultStartAdmissionBound } from '../../config/databasePool'
 import { startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
 import {resolvePublishedTeacherForm,teacherFormResourceRef,
@@ -53,9 +53,21 @@ export class RunStartExecutionError extends Error {
   }
 }
 
-const envPositive = (name: string, fallback: number): number => {
-  const raw = Number(process.env[name])
-  return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : fallback
+const resolveBound = (
+  explicitName: string,
+  fallbackName: string,
+  defaultVal: number,
+  allowZero = false,
+): number => {
+  const explicitRaw = process.env[explicitName]
+  if (explicitRaw !== undefined && explicitRaw.trim() !== '') {
+    return configuredInteger(explicitName, defaultVal, allowZero)
+  }
+  const fallbackRaw = process.env[fallbackName]
+  if (fallbackRaw !== undefined && fallbackRaw.trim() !== '') {
+    return configuredInteger(fallbackName, defaultVal, allowZero)
+  }
+  return defaultVal
 }
 
 let runStartGateInstance: BoundedAdmissionGate | null = null
@@ -66,14 +78,31 @@ export const resetRunStartGateForTests = (): void => {
 
 export const runStartGate = (): BoundedAdmissionGate => {
   if (!runStartGateInstance) {
+    const defaultConcurrent = defaultStartAdmissionBound(process.env.DATABASE_URL)
+    const maxConcurrent = resolveBound(
+      'RUN_START_MAX_CONCURRENT',
+      'TRAINING_START_MAX_CONCURRENT',
+      defaultConcurrent,
+      false,
+    )
+    const maxQueue = resolveBound(
+      'RUN_START_MAX_QUEUE',
+      'TRAINING_START_MAX_QUEUE',
+      300,
+      true,
+    )
+    const maxWaitMs = resolveBound(
+      'RUN_START_MAX_WAIT_MS',
+      'TRAINING_START_MAX_WAIT_MS',
+      15000,
+      false,
+    )
+
     runStartGateInstance = new BoundedAdmissionGate({
       name: 'run_start_admission',
-      maxConcurrent: envPositive(
-        'RUN_START_MAX_CONCURRENT',
-        envPositive('TRAINING_START_MAX_CONCURRENT', defaultStartAdmissionBound(process.env.DATABASE_URL)),
-      ),
-      maxQueue: envPositive('RUN_START_MAX_QUEUE', envPositive('TRAINING_START_MAX_QUEUE', 300)),
-      maxWaitMs: envPositive('RUN_START_MAX_WAIT_MS', envPositive('TRAINING_START_MAX_WAIT_MS', 15000)),
+      maxConcurrent,
+      maxQueue,
+      maxWaitMs,
       retryAfterSeconds: 1,
       busyCode: 'ASSESSMENT_START_BUSY',
       busyMessage: '测评开始请求繁忙，请稍后重试',
