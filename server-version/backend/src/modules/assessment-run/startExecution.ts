@@ -87,7 +87,10 @@ const attachBindingInTransaction = async (tx: Tx, input: {
   claim: RunStartClaimRecord
   binding: RunRuntimeBinding
 }): Promise<void> => {
-  await lockExecutionEnvelope(tx, input.executionId)
+  await lockExecutionEnvelope(tx, input.executionId, {
+    organizationId: input.claim.organizationId,
+    runId: input.claim.runId,
+  })
   const claims = await tx.$queryRaw<Array<{ state: string; claimGeneration: number }>>`
     SELECT "state", "claim_generation" AS "claimGeneration"
     FROM "assessment_run_execution_start_claims"
@@ -160,7 +163,10 @@ const startTransactionalComposite = async (input: {
   try {
     return await classifyStartTransaction(() => prisma.$transaction(async (tx) => {
   const libraryUses=input.launch.resourceKey.startsWith('education-composition:')?await lockCompositionStartLibraryUses(tx,input):undefined
-  await lockExecutionEnvelope(tx, input.executionId)
+  const envelope = await lockExecutionEnvelope(tx, input.executionId, {
+    organizationId: input.decision.claim.organizationId,
+    runId: input.decision.claim.runId,
+  })
   const claims = await tx.$queryRaw<Array<{ state: string; claimGeneration: number }>>`
     SELECT "state", "claim_generation" AS "claimGeneration"
     FROM "assessment_run_execution_start_claims"
@@ -176,8 +182,14 @@ const startTransactionalComposite = async (input: {
     executionId: input.executionId,
     actorUserId: input.actorUserId,
     admitted: true,
+    admittedAttemptIdentity: input.decision.claim.admittedAttemptIdentity,
   })
-  await freezeRunExecutionScientificProvenanceInTransaction(tx, input.executionId)
+  // Claim tx already froze provenance on first START. Skip the freeze
+  // SELECT+early-return when the locked execution row is already frozen;
+  // recovered pre-freeze claims still backfill below.
+  if (!envelope?.scientificFrozenAt) {
+    await freezeRunExecutionScientificProvenanceInTransaction(tx, input.executionId)
+  }
 
   const existing = await tx.compositeAssessmentAttempt.findFirst({
     where: { assignmentRef: admission.assignment.assignmentId },
@@ -248,14 +260,10 @@ const startTransactionalComposite = async (input: {
   const compositionStart=admission.assignment.resourceKey.startsWith('education-composition:')?await admitCompositionStart(tx,{
     executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId},libraryUses?.uses):undefined
   if(admission.assignment.resourceKey.startsWith('private-form:'))await readPrivateFormExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId})
-  const state=await tx.$queryRaw<Array<{runStatus:string}>>`
-    SELECT r."status" AS "runStatus"
-    FROM "assessment_run_executions" e
-    JOIN "assessment_runs" r ON r."id"=e."run_id"
-      AND r."organization_id"=e."organization_id"
-    WHERE e."id"=${input.executionId}
-  `
-  if(state[0]?.runStatus!=='PUBLISHED'){
+  // assessment_runs is already SHARE-locked by lockExecutionEnvelope, and
+  // admission just projected r.status under that fence. A second SELECT
+  // cannot observe a newer CLOSE.
+  if(admission.execution.runStatus!=='PUBLISHED'){
     throw new RunStartExecutionError('RUN_NOT_STARTABLE','Run was closed after START claim',409)
   }
   const repository = createSqlRelationalAssignmentRepository(tx as any)
@@ -319,7 +327,10 @@ const startTransactionalTeacherForm = async (input:{
 }):Promise<RunStartExecutionResult>=>{
   try {
     return await classifyStartTransaction(()=>prisma.$transaction(async tx=>{
-  await lockExecutionEnvelope(tx,input.executionId)
+  const envelope=await lockExecutionEnvelope(tx,input.executionId,{
+    organizationId:input.decision.claim.organizationId,
+    runId:input.decision.claim.runId,
+  })
   const rows=await tx.$queryRaw<Array<{state:string;claimGeneration:number}>>`
     SELECT "state","claim_generation" AS "claimGeneration"
     FROM "assessment_run_execution_start_claims"
@@ -333,8 +344,11 @@ const startTransactionalTeacherForm = async (input:{
   const admission=await loadRunExecutionStartAdmission({
     tx,executionId:input.executionId,
     actorUserId:input.actorUserId,admitted:true,
+    admittedAttemptIdentity:input.decision.claim.admittedAttemptIdentity,
   })
-  await freezeRunExecutionScientificProvenanceInTransaction(tx,input.executionId)
+  if(!envelope?.scientificFrozenAt){
+    await freezeRunExecutionScientificProvenanceInTransaction(tx,input.executionId)
+  }
 
   const existing=await tx.huiteacherFormAttempt.findUnique({
     where:{runExecutionId:input.executionId},
@@ -390,12 +404,7 @@ const startTransactionalTeacherForm = async (input:{
     throw new RunStartExecutionError('RUN_START_OUTCOME_UNKNOWN','Teacher Form assignment not open',409)
   // Revoked product grants or closed events are checked under START locks.
   await assertCurrentRunStartAuthority(tx,input.executionId)
-  const runStatus=await tx.$queryRaw<Array<{status:string}>>`
-    SELECT r."status" FROM "assessment_runs" r
-    WHERE r."organization_id"=${admission.execution.organizationId}
-      AND r."id"=${admission.execution.runId}
-  `
-  if(runStatus[0]?.status!=='PUBLISHED')
+  if(admission.execution.runStatus!=='PUBLISHED')
     throw new RunStartExecutionError('RUN_NOT_STARTABLE','Teacher assessment is not published',409)
 
   const repository=createSqlRelationalAssignmentRepository(tx as any)

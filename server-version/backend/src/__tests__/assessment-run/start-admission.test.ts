@@ -145,4 +145,18 @@ it('preserves persisted legacy self identity without rewriting or widening its r
  const admitted=await loadRunExecutionStartAdmission({tx,executionId:'execution-1',actorUserId:'teacher-1',assignments,admitted:true})
  expect(admitted.attemptIdentity).toEqual(frozen)
  expect(assignments.resolveAcceptedConsent).not.toHaveBeenCalled()
+ expect(tx.$queryRaw).toHaveBeenCalledTimes(2)
+})
+
+it('reuses a caller-held admitted identity without rereading the claim row',async()=>{
+ const frozen={subjectUserId:'teacher-1',respondentUserId:'teacher-1',respondentType:'TEACHER',episodeId:'episode-1',assignmentRef:'assignment-1',consentId:'accepted-old'}
+ const execution={executionId:'execution-1',organizationId:'org-1',runId:'run-1',trackId:'track-1',executionStatus:'STARTED',runStatus:'PUBLISHED',relationalAssignmentId:'assignment-1',policyDomain:'ORGANIZATION_RUN',respondentUserId:'teacher-1',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-old'}
+ const tx={$queryRaw:vi.fn().mockResolvedValueOnce([execution])} as any
+ const assignments={findById:vi.fn().mockResolvedValue(assignment({subjectUserId:'teacher-1',respondentUserId:'teacher-1',subjectRole:'TEACHER',respondentRole:'TEACHER',relationshipKind:'SELF',perspective:'SELF_REPORT'})),resolveAcceptedConsent:vi.fn()}
+ const admitted=await loadRunExecutionStartAdmission({
+  tx,executionId:'execution-1',actorUserId:'teacher-1',assignments,admitted:true,admittedAttemptIdentity:frozen,
+ })
+ expect(admitted.attemptIdentity).toEqual(frozen)
+ expect(tx.$queryRaw).toHaveBeenCalledTimes(1)
+ expect(assignments.resolveAcceptedConsent).not.toHaveBeenCalled()
 })

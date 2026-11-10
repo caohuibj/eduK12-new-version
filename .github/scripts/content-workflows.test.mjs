@@ -406,6 +406,11 @@ test('hosted CI starts independent checks in parallel and bounds media setup wit
     'npx playwright-core install --with-deps chromium','npx prisma generate'])
     assert.ok(media.includes('timeout -k 10s 240s '+command)
       || media.includes('timeout -k 10s 120s '+command),command);
+  // FFmpeg must be genuinely available for media fixtures, not silently skipped.
+  assert.match(media,/timeout -k 10s 480s sudo -n apt-get install/);
+  assert.match(media,/Acquire::Retries=3/);
+  assert.match(media,/ffprobe -version/);
+  assert.match(media,/libvpx -deadline realtime/);
   for(const scenario of ['media2','video_core','media7','situational_video','situational_branching'])
     assert.ok(media.includes(scenario+' independent scenario'),scenario);
   assert.match(media,/ci-artifact\.mjs verify backend/);

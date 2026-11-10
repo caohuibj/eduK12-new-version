@@ -146,6 +146,7 @@ export const loadRunExecutionStartAdmission = async (input: {
   executionId: string
   actorUserId: string
   admitted?: boolean
+  admittedAttemptIdentity?: RunAttemptIdentityBinding
   assignments?: Pick<RelationalAssignmentRepository, 'findById' | 'resolveAcceptedConsent'>
 }): Promise<RunStartAdmission> => {
   const db = input.tx ?? (prisma as unknown as Tx)
@@ -201,7 +202,12 @@ export const loadRunExecutionStartAdmission = async (input: {
   }
 
   if (input.admitted) {
-    const attemptIdentity = await readAdmittedAttemptIdentity(db, input.executionId)
+    // Dispatch already locked the claim row (and holds admittedAttemptIdentity
+    // on the committed claim). Re-parse that frozen object instead of
+    // SELECTing the same claim again for admitted_attempt_identity.
+    const attemptIdentity = input.admittedAttemptIdentity
+      ? parseAdmittedAttemptIdentity(input.admittedAttemptIdentity)
+      : await readAdmittedAttemptIdentity(db, input.executionId)
     assertFrozenIdentityMatchesAssignment(attemptIdentity, assignment)
     return { execution, assignment, attemptIdentity }
   }

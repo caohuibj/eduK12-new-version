@@ -1,9 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-const { db, unified, selected } = vi.hoisted(() => ({
-  db: { assessment: { findFirst: vi.fn(), findUnique: vi.fn() }, $queryRaw: vi.fn() }, unified: vi.fn(), selected: vi.fn(),
+const { db, unified, prepared, preparedWrite, selected } = vi.hoisted(() => ({
+  db: { assessment: { findFirst: vi.fn(), findUnique: vi.fn() }, $queryRaw: vi.fn() },
+  unified: vi.fn(), prepared: vi.fn(), preparedWrite: vi.fn(), selected: vi.fn(),
 }))
 vi.mock('../../config/database', () => ({ prisma: db }))
-vi.mock('../../modules/scale/unified-final-submit.service', () => ({ submitUnifiedScaleAssessmentFinal: unified }))
+vi.mock('../../modules/scale/unified-final-submit.service', () => ({
+  submitUnifiedScaleAssessmentFinal: unified,
+  prepareUnifiedScaleFinalSubmission: prepared,
+  prepareUnifiedScaleWrite: preparedWrite,
+  commitPreparedUnifiedScaleAssessmentFinal: unified,
+}))
 vi.mock('../../modules/composite/training-variant-child-scope', async importOriginal => ({
   ...await importOriginal<typeof import('../../modules/composite/training-variant-child-scope')>(), assertTrainingChildSelected: selected,
 }))
@@ -16,6 +22,8 @@ const submit = (body: any = input) => submitCompositeScaleFinal('parent-1', 'ite
 beforeEach(() => {
   vi.resetAllMocks()
   db.assessment.findFirst.mockResolvedValue(child())
+  prepared.mockResolvedValue({ marker: 'prepared' })
+  preparedWrite.mockResolvedValue({ marker: 'write' })
   unified.mockResolvedValue({ replayed: false, assessment: {}, parent: null })
 })
 describe('Composite FINAL request-local child locator', () => {
@@ -24,7 +32,12 @@ describe('Composite FINAL request-local child locator', () => {
     await expect(submit()).resolves.toMatchObject({ replayed: false })
     expect(db.assessment.findFirst).toHaveBeenCalledExactlyOnceWith({ where: { compositeAttemptId: 'parent-1', compositeItemId: 'item-1' }, select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT })
     expect(db.assessment.findUnique).not.toHaveBeenCalled()
-    expect(unified).toHaveBeenCalledExactlyOnceWith({ ...input, assessmentId: 'child-1', compositeAttemptId: 'parent-1', userId: 'student-1', recoveryTokenHash: undefined }, located)
+    const builtInput = { ...input, assessmentId: 'child-1', compositeAttemptId: 'parent-1', userId: 'student-1', recoveryTokenHash: undefined }
+    expect(prepared).toHaveBeenCalledExactlyOnceWith(builtInput, located)
+    expect(preparedWrite).toHaveBeenCalledExactlyOnceWith(builtInput, located, { marker: 'prepared' })
+    expect(unified).toHaveBeenCalledExactlyOnceWith(
+      builtInput, located, { marker: 'prepared' }, undefined, undefined, undefined, { marker: 'write' },
+    )
   })
   it.each([{ compositeAttemptId: 'other' }, { compositeItemId: 'other' }])('rejects an out-of-scope row %j', async extra => {
     db.assessment.findFirst.mockResolvedValue(child(extra))
@@ -74,7 +87,9 @@ describe('Composite explicit receipt-only response', () => {
   it.each([false, true])('keeps initial/replayed durable identity and removes all detail %s', async replayed => {
     unified.mockResolvedValue({ submissionId: input.submissionId, payloadHash: 'hash', replayed, assessment: { private: 'detail' }, parent: { private: 'parent' } })
     const output = await submitCompositeScaleFinal('parent-1', 'item-1', input, { userId: 'student-1' }, { receiptOnly: true })
-    expect(unified.mock.calls[0].slice(2)).toEqual([undefined, undefined, true])
+    expect(unified.mock.calls[0].slice(2)).toEqual([
+      { marker: 'prepared' }, undefined, undefined, true, { marker: 'write' },
+    ])
     expect(output).toEqual({ submissionId: input.submissionId, payloadHash: 'hash', replayed, completed: true })
     expect(db.$queryRaw).not.toHaveBeenCalled()
   })

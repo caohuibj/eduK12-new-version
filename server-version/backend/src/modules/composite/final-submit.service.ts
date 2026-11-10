@@ -667,9 +667,28 @@ const submitCompositeFormSectionFinalImpl = async (input: SectionSubmitInput) =>
   }
 }
 
-/** UNIT gate covers form persist only; composite aggregate finalizes after release. */
+/** UNIT gate covers form persist only; composite aggregate finalizes after release.
+ * Unified admission/definition/hash/encrypt run before the gate; the transaction
+ * still re-checks epoch, frozen admission, replay identity and revocation. */
 export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput): Promise<any> => {
-  const result = await withUnitSubmitAdmission(() => submitCompositeFormSectionFinalImpl(input))
+  const route = await measureRequestPhase('final_submit_admission', () => prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: input.attemptId },
+    select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, userId: true, recoveryTokenHash: true, runtimeGeneration: true,
+      compositeAssessment: { select: { ...TRAINING_VARIANT_DEFINITION_MARKER_SELECT, productKind: true, bundleInstance: true } } },
+  }))
+  const result = route?.runtimeGeneration === 'UNIFIED_V1'
+    ? await (async () => {
+      if (!route) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
+      assertTrainingFormFinalPrincipal(route, input)
+      const selectedParent = await assertTrainingSectionSelected(input.attemptId, input.sectionId, { parent: route })
+      const { prepareUnifiedCompositeFormSectionFinal, commitUnifiedCompositeFormSectionFinal } = await import('../assessment-runtime/unified-form-section-final-submit.service')
+      const prepared = await prepareUnifiedCompositeFormSectionFinal(input, route.compositeAssessment?.bundleInstance, selectedParent)
+      const committed = await withUnitSubmitAdmission(() => commitUnifiedCompositeFormSectionFinal(prepared))
+      return shouldReconcileTrainingParent(route)
+        ? { ...committed, shouldFinalize: true, finalizeCompositeAttemptId: input.attemptId }
+        : committed
+    })()
+    : await withUnitSubmitAdmission(() => submitCompositeFormSectionFinalImpl(input))
   if (!result || typeof result !== 'object' || !('shouldFinalize' in result)) return result
   const { shouldFinalize, finalizeCompositeAttemptId, ...response } = result as any
   const parent = shouldFinalize && finalizeCompositeAttemptId
