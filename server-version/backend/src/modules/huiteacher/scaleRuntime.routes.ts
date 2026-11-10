@@ -12,6 +12,7 @@ import { asyncHandler } from '../../middleware/asyncHandler'
 import { success,notFound } from '../../utils/response'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
 import { startAssessmentRunExecution } from '../assessment-run/startExecution'
+import { isAssessmentStartBusyError } from '../composite/start-transient'
 import {readTeacherPersonalChanges} from '../reporting/teacher-personal-changes.service'
 import { readTeacherPersonalScaleReport } from './scalePersonalReport.service'
 import { compositeController } from '../composite/composite.controller'
@@ -27,6 +28,10 @@ const wrap=(work:(req:Request)=>Promise<unknown>)=>asyncHandler(async(req,res)=>
     if(e instanceof ZodError)return res.status(400).json({
       code:'HUITEACHER_SCALE_INPUT_INVALID',message:'教师个人测评参数无效',data:null,
     })
+    if(isAssessmentStartBusyError(e)){
+      res.setHeader('Retry-After',String(e.retryAfterSeconds))
+      return res.status(503).json({code:e.code,message:e.message,data:null})
+    }
     const known=e as {statusCode?:number;code?:string}
     if(known&&typeof known.statusCode==='number'
       &&known.statusCode>=400&&known.statusCode<500)

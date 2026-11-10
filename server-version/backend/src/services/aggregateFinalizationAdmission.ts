@@ -13,9 +13,9 @@ import { QuestionnaireCompletionAdmissionBusyError } from './questionnaireComple
  */
 export const aggregateFinalizationAdmission = new BoundedAdmissionGate({
   name: 'aggregate_finalization',
-  maxConcurrent: configuredInteger('AGGREGATE_FINALIZATION_ADMISSION_LIMIT', 3),
-  maxQueue: configuredInteger('AGGREGATE_FINALIZATION_ADMISSION_QUEUE', 4, true),
-  maxWaitMs: configuredInteger('AGGREGATE_FINALIZATION_ADMISSION_TIMEOUT_MS', 250),
+  maxConcurrent: configuredInteger('AGGREGATE_FINALIZATION_ADMISSION_LIMIT', 8),
+  maxQueue: configuredInteger('AGGREGATE_FINALIZATION_ADMISSION_QUEUE', 64, true),
+  maxWaitMs: configuredInteger('AGGREGATE_FINALIZATION_ADMISSION_TIMEOUT_MS', 1500),
   retryAfterSeconds: configuredInteger('AGGREGATE_FINALIZATION_RETRY_AFTER_SECONDS', 1),
   // Keep COMPLETION_BUSY so existing GET/completion clients retry uniformly.
   busyCode: 'COMPLETION_BUSY',

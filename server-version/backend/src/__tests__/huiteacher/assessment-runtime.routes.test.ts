@@ -29,6 +29,7 @@ vi.mock('../../modules/situational/situational-final-submit.service',()=>({submi
 vi.mock('../../modules/situational/situational-video.controller',()=>({situationalVideoController:{embeddedAuthenticated:mocks.media}}))
 
 import {createTeacherAssessmentRuntimeRouter,projectTeacherCognitiveRuntime,projectTeacherSituationalRuntime} from '../../modules/huiteacher/assessmentRuntime.routes'
+import {AssessmentStartBusyError} from '../../modules/composite/start-transient'
 import {createTeacherAssessmentAccess} from '../../modules/huiteacher/assessmentRuntime.access'
 import {EducationAssessmentSourceError} from '../../modules/education-tools/assessment-resource.repository'
 import {draftEducationAssessmentEntry} from '../../modules/education-tools/assessment-resource.contract'
@@ -201,6 +202,14 @@ describe('Teacher assessment runtime synthetic HTTP boundary',()=>{
   expect((await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{})).status).toBe(200)
   expect(mocks.start).toHaveBeenCalledWith({executionId:baseline.executionId,actorUserId:actor})
   expect(source.assertUse.mock.calls.map(call=>call[1].purpose)).toEqual(['START','BOUND_COLLECTION'])
+ })
+ it('maps START admission busy to 503 with Retry-After',async()=>{
+  row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null}
+  mocks.start.mockRejectedValue(new AssessmentStartBusyError('ADMISSION_QUEUE_FULL'))
+  const res=await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{})
+  expect(res.status).toBe(503)
+  expect(res.headers.get('retry-after')).toBe('1')
+  expect(res.body).toEqual({code:'ASSESSMENT_START_BUSY',message:'综合测评开始请求繁忙，请稍后重试',data:null})
  })
  it('projects SJT resume and FINAL as runner state plus completion, with no report',async()=>{
   const response=await request(sjtPath)

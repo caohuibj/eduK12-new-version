@@ -5,6 +5,7 @@ import { authenticateHuiteacher } from '../../middleware/auth'
 import { prisma } from '../../config/database'
 import { success } from '../../utils/response'
 import { startAssessmentRunExecution } from '../assessment-run/startExecution'
+import { isAssessmentStartBusyError } from '../composite/start-transient'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 import {
   readOwnHuiteacherFormTask,submitOwnHuiteacherFormFinal,HuiteacherFinalError,
@@ -25,6 +26,10 @@ const respond=(task:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
     if(e instanceof ZodError)return res.status(400).json({
       code:'HUITEACHER_TASK_INPUT_INVALID',message:'任务参数格式不合法',data:null,
     })
+    if(isAssessmentStartBusyError(e)){
+      res.setHeader('Retry-After',String(e.retryAfterSeconds))
+      return res.status(503).json({code:e.code,message:e.message,data:null})
+    }
     if(e instanceof HuiteacherFinalError)return res.status(e.statusCode).json({
       code:e.code,message:'当前测评无法完成此操作，请核验任务身份和状态',data:null,
     })
