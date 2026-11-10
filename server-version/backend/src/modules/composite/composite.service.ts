@@ -3725,7 +3725,15 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
       const attempt = await classifyStartTransaction(async () => {
         try {
           return await trainingStartGate().run(() => prisma.$transaction(async (tx: Db) => {
-        if (composite.productKind === 'QUESTIONNAIRE' && composite.deliveryMode !== 'LEGACY') {
+        // Per-user admission: QUESTIONNAIRE (non-LEGACY delivery) and authenticated
+        // LEGACY_COMPOSITE share FOR SHARE + (compositeId,userId) advisory lock.
+        // Cross-user START can proceed in parallel; archive/close still take FOR UPDATE
+        // and wait for SHARE readers. Token/anonymous, restart, and other product kinds
+        // keep the exclusive publication row lock.
+        if (
+          (composite.productKind === 'QUESTIONNAIRE' && composite.deliveryMode !== 'LEGACY')
+          || (composite.productKind === 'LEGACY_COMPOSITE' && Boolean(userId))
+        ) {
           await lockAuthenticatedAdmission(tx, compositeId, userId)
         } else {
           await tx.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`
