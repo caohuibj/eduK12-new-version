@@ -74,7 +74,7 @@ export type UnifiedScaleFinalSubmitInput = {
 export type UnifiedScaleAdmission = ScaleAdmissionChildRow
 
 const assertPrincipal = async (child: ScaleAdmissionChildRow, admission: VersionedFrozenUnitAdmission, input: UnifiedScaleFinalSubmitInput, receipt?:AcceptedStudyReceipt): Promise<void> => {
-  if(await assertCurrentStudyPrincipal(prisma,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,
+  if(await assertStudyPrincipalIfAnonymous(prisma,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,
     attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash,receipt,unit:input}))return
   if (input.userId && (child.userId === input.userId || admission.principal.userId === input.userId)) return
   if (input.questionnaireSessionId && admission.principal.questionnaireSessionId === input.questionnaireSessionId) {
@@ -263,7 +263,7 @@ export const prepareUnifiedScaleFinalSubmission = async (
 }
 
 type PreparedScaleSubmission = Awaited<ReturnType<typeof prepareUnifiedScaleFinalSubmission>>
-const prepareUnifiedScaleWrite = async (
+export const prepareUnifiedScaleWrite = async (
   input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, prepared: PreparedScaleSubmission,
   wholeReceipt?: WholeReceiptExecution, referenceDb?: FrozenReferenceDb,
 ) => {
@@ -311,11 +311,23 @@ const prepareUnifiedScaleWrite = async (
   return { timingEncrypted, result, canonical: envelope, compactFact: compactFact as ScaleFactRecord | null, persistedProvenance, encryptedAnswers, encrypted, completedAt }
 }
 
-export const submitUnifiedScaleAssessmentFinal = async (
-  input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, wholeReceipt?: WholeReceiptExecution, referenceDb?: FrozenReferenceDb,
+
+/** Authenticated Training/School principals are not anonymous-study bindings.
+ * The helper would only run a discarded lookup and return false. Anonymous
+ * recovery still takes the existing locked binding check. */
+const assertStudyPrincipalIfAnonymous = async (
+  db: Parameters<typeof assertCurrentStudyPrincipal>[0],
+  input: Parameters<typeof assertCurrentStudyPrincipal>[1],
+  lock = false,
+) => (input.userId ? false : assertCurrentStudyPrincipal(db, input, lock))
+
+export const commitPreparedUnifiedScaleAssessmentFinal = async (
+  input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, prepared: PreparedScaleSubmission,
+  wholeReceipt?: WholeReceiptExecution, referenceDb?: FrozenReferenceDb,
   receiptOnly = false,
+  write?: Awaited<ReturnType<typeof prepareUnifiedScaleWrite>>,
 ) => {
-  const { submissionId, admission, snapshot, answers, payloadHash, timing } = await prepareUnifiedScaleFinalSubmission(input, child, wholeReceipt?.acceptedAtMs, wholeReceipt?.studyReceipt)
+  const { submissionId, admission, snapshot, answers, payloadHash, timing } = prepared
   const responseRuntime = { assessmentId: child.id, attemptEpoch: child.attemptEpoch,
     compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
     encrypted: child.runtimeSnapshotEncrypted, runtime: snapshot }
@@ -323,9 +335,9 @@ export const submitUnifiedScaleAssessmentFinal = async (
   if (child.status === 'COMPLETED') {
     const replay = assertSubmissionReplay(child, submissionId, payloadHash)
     if (replay === 'replay') {
-      if (requiresTrainingFlowFinalLock(child.compositeAttemptId, child.compositeAttempt) || await assertCurrentStudyPrincipal(prisma,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash,receipt:wholeReceipt?.studyReceipt,unit:input})) {
+      if (requiresTrainingFlowFinalLock(child.compositeAttemptId, child.compositeAttempt) || await assertStudyPrincipalIfAnonymous(prisma,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash,receipt:wholeReceipt?.studyReceipt,unit:input})) {
         await withFinalOnlyCompletionTransaction(async tx => {
-          await assertCurrentStudyPrincipal(tx,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash,receipt:wholeReceipt?.studyReceipt,unit:input},true)
+          await assertStudyPrincipalIfAnonymous(tx,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash,receipt:wholeReceipt?.studyReceipt,unit:input},true)
           const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
           assertFlowFinal(true)
         })
@@ -340,7 +352,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
     }
   }
 
-  const { timingEncrypted, result, compactFact, persistedProvenance, encryptedAnswers, encrypted, completedAt } = await prepareUnifiedScaleWrite(
+  const { timingEncrypted, result, compactFact, persistedProvenance, encryptedAnswers, encrypted, completedAt } = write ?? await prepareUnifiedScaleWrite(
     input, child, { submissionId, admission, snapshot, answers, payloadHash, timing }, wholeReceipt, referenceDb)
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
@@ -351,7 +363,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
       const {assertPrivateFormFinalCurrent}=await import('../assessment-run/educationPrivateFormExecution')
       await assertPrivateFormFinalCurrent(tx,{attemptId:child.compositeAttemptId!,actorUserId:input.userId})
     }
-    await assertCurrentStudyPrincipal(tx,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash,receipt:wholeReceipt?.studyReceipt,unit:input},true)
+    await assertStudyPrincipalIfAnonymous(tx,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash,receipt:wholeReceipt?.studyReceipt,unit:input},true)
     const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
     const current = await tx.assessment.findUnique({
       where: { id: input.assessmentId },
@@ -475,6 +487,17 @@ export const submitUnifiedScaleAssessmentFinal = async (
   }
 }
 
+export const submitUnifiedScaleAssessmentFinal = async (
+  input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, wholeReceipt?: WholeReceiptExecution, referenceDb?: FrozenReferenceDb,
+  receiptOnly = false,
+) => {
+  const prepared = await prepareUnifiedScaleFinalSubmission(input, child, wholeReceipt?.acceptedAtMs, wholeReceipt?.studyReceipt)
+  const write = child.status === 'COMPLETED'
+    ? undefined
+    : await prepareUnifiedScaleWrite(input, child, prepared, wholeReceipt, referenceDb)
+  return commitPreparedUnifiedScaleAssessmentFinal(input, child, prepared, wholeReceipt, referenceDb, receiptOnly, write)
+}
+
 /** All scoring/encryption is outside a short, any-size collection transaction.
  * Ordered child locks precede the job/parent lock, matching the old path.
  * An old partial receipt is replayed, never rescored or overwritten.
@@ -504,7 +527,7 @@ export const submitUnifiedScaleCollectionBatch = async (
   return withFinalOnlyCompletionTransaction(async tx => {
     // New study admissions always lock parent -> accepted job -> child. The
     // historical batch lock order remains untouched for unbound protocols.
-    for(const unit of prepared)await assertCurrentStudyPrincipal(tx,{attemptId:unit.child.compositeAttemptId,userId:unit.input.userId,
+    for(const unit of prepared)await assertStudyPrincipalIfAnonymous(tx,{attemptId:unit.child.compositeAttemptId,userId:unit.input.userId,
       recoveryTokenHash:unit.input.recoveryTokenHash,attemptEpoch:unit.input.attemptEpoch,
       frozenHash:unit.data.admission.principal.recoveryTokenHash,receipt:execution.studyReceipt,unit:unit.input},true)
     const rows = await tx.$queryRaw<Array<{

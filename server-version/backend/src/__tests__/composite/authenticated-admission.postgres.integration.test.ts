@@ -29,6 +29,21 @@ async function fixture() {
   await db.compositeAssessment.update({ where: { id }, data: { status: 'PUBLISHED', publishedAt: new Date() } })
   return id
 }
+async function legacyFixture() {
+  const id = prefix + '-' + publications.length
+  publications.push(id)
+  const row = await db.compositeAssessment.create({ data: {
+    id, code: id, name: 'Synthetic legacy concurrent admission', createdBy: teacher,
+    productKind: 'LEGACY_COMPOSITE', status: 'DRAFT', maxAttempts: 1, courseId,
+    formSections: { create: { title: 'Synthetic form', position: 0, contextSection: false } },
+  }, include: { formSections: true } })
+  await db.compositeAssessmentItem.create({ data: {
+    compositeAssessmentId: id, type: 'FORM', position: 0, required: true,
+    formType: 'text_input', formLabel: 'Synthetic answer', formSectionId: row.formSections[0].id, formSectionPosition: 0,
+  } })
+  await db.compositeAssessment.update({ where: { id }, data: { status: 'PUBLISHED', publishedAt: new Date() } })
+  return id
+}
 // Several CUSTOM_DESCRIPTIVE Scale children: parent START admits them all at
 // once; children are created without repeating that admission per item.
 async function scaleFixture(count = 3) {
@@ -135,6 +150,53 @@ suite('authenticated admission lock boundaries (real isolated PostgreSQL)', () =
   }, 60000)
   it('keeps archive behind admitted readers and refuses a new start after archive commits', async () => {
     const id = await fixture(), ready = deferred(), release = deferred(), updateStarted = deferred()
+    const held = db.$transaction(async tx => {
+      await lockAuthenticatedAdmission(tx,id,a); ready.resolve(); await release.promise
+    }, { timeout: 10000 })
+    await ready.promise
+    let pid = 0
+    const closing = db.$transaction(async tx => {
+      const rows = await tx.$queryRaw<Array<{pid:number}>>`SELECT pg_backend_pid() AS pid`
+      pid=rows[0].pid; updateStarted.resolve()
+      await tx.compositeAssessment.update({ where: { id }, data: { status: 'ARCHIVED' } })
+    }, { timeout: 10000 })
+    await updateStarted.promise
+    try {
+      let blocked = false
+      for (let attempt=0;attempt<30;attempt++) {
+        const [row] = await db.$queryRaw<Array<{blocked:boolean}>>`SELECT cardinality(pg_blocking_pids(${pid}::int))>0 AS blocked`
+        if (row.blocked) { blocked=true;break }
+        await new Promise(resolve => setTimeout(resolve,10))
+      }
+      expect(blocked).toBe(true)
+    } finally { release.resolve(); await held; await closing }
+    await expect(runtime.startUserAttempt(b,id)).rejects.toMatchObject({ statusCode: 400 })
+  })
+
+  it('admits a different student on LEGACY_COMPOSITE while the first student owns its admission transaction', async () => {
+    const id = await legacyFixture(), ready = deferred(), release = deferred()
+    const held = db.$transaction(async tx => {
+      await lockAuthenticatedAdmission(tx,id,a); ready.resolve(); await release.promise
+    }, { timeout: 10000 })
+    await ready.promise
+    let timer: ReturnType<typeof setTimeout> | undefined
+    try {
+      const started = await Promise.race([runtime.startUserAttempt(b,id),new Promise<never>((_,reject) => {
+        timer = setTimeout(() => reject(new Error('Different student blocked behind a publication writer lock')),4000)
+      })])
+      expect(started.attempt).toMatchObject({ status: 'IN_PROGRESS' })
+    } finally { if (timer) clearTimeout(timer); release.resolve(); await held }
+  })
+  it('serializes duplicate LEGACY_COMPOSITE starts for one student and retains maxAttempts', async () => {
+    const id = await legacyFixture()
+    const results = await Promise.all(Array.from({ length: 4 },() => runtime.startUserAttempt(a,id)))
+    expect(new Set(results.map(row => row.attempt.id)).size).toBe(1)
+    expect(await db.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: id, userId: a } })).toBe(1)
+    await db.compositeAssessmentAttempt.update({ where: { id: results[0].attempt.id }, data: { status: 'COMPLETED' } })
+    await expect(runtime.startUserAttempt(a,id)).rejects.toMatchObject({ statusCode: 409 })
+  })
+  it('keeps LEGACY_COMPOSITE archive behind admitted readers and refuses a new start after archive commits', async () => {
+    const id = await legacyFixture(), ready = deferred(), release = deferred(), updateStarted = deferred()
     const held = db.$transaction(async tx => {
       await lockAuthenticatedAdmission(tx,id,a); ready.resolve(); await release.promise
     }, { timeout: 10000 })
