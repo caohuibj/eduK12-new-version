@@ -4,6 +4,8 @@ import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { allocateResearchFlowOnAdmission } from './flow.assignment'
+import { BoundedAdmissionGate } from '../../services/boundedAdmissionGate'
+import { defaultStartAdmissionBound } from '../../config/databasePool'
 
 type Tx=Prisma.TransactionClient
 export class ResearchIdentityError extends Error {
@@ -64,6 +66,35 @@ async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:st
   return wave
 }
 
+const envPositive = (name: string, fallback: number): number => {
+  const raw = Number(process.env[name])
+  return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : fallback
+}
+
+let surveyGateInstance: BoundedAdmissionGate | null = null
+
+export const resetSurveyAdmissionGateForTests = (): void => {
+  surveyGateInstance = null
+}
+
+export const surveyAdmissionGate = (): BoundedAdmissionGate => {
+  if (!surveyGateInstance) {
+    surveyGateInstance = new BoundedAdmissionGate({
+      name: 'survey_admission',
+      maxConcurrent: envPositive(
+        'SURVEY_ADMISSION_MAX_CONCURRENT',
+        envPositive('TRAINING_START_MAX_CONCURRENT', defaultStartAdmissionBound(process.env.DATABASE_URL)),
+      ),
+      maxQueue: envPositive('SURVEY_ADMISSION_MAX_QUEUE', envPositive('TRAINING_START_MAX_QUEUE', 300)),
+      maxWaitMs: envPositive('SURVEY_ADMISSION_MAX_WAIT_MS', envPositive('TRAINING_START_MAX_WAIT_MS', 15000)),
+      retryAfterSeconds: 1,
+      busyCode: 'SURVEY_ADMISSION_BUSY',
+      busyMessage: '研究参与请求繁忙，请稍后重试',
+    })
+  }
+  return surveyGateInstance
+}
+
 /** Initial LINKED enrollment atomically claims exactly one Wave Attempt.
  * The first subsequent START recovers it; issuing unstartable identities is
  * prohibited. This follows the contract that quota counts parent Attempts.
@@ -78,53 +109,55 @@ export async function createLinkedResearchIdentity(input:{
   const memorable=fullCode?{prefix:generatedCodeLookup(input.projectId,fullCode),suffix:fullCode}:input.memorable
   let secret=opaque()
   const participantId=randomUUID(),researchCode=code(),attemptId=randomUUID()
-  await prisma.$transaction(async tx=>{
-    const wave=await activePublicWave(tx,input.projectId,input.waveId,input.entryToken,input.generatedCode?'SELF_CODE':memorable?'MEMORABLE_CODE':'PERSONAL_LINK')
-    if(input.consentVersion!==wave.consentVersion)
-      return fail('研究说明已经更新，请重新确认')
-    let codeRowId:string|undefined
-    if(memorable){
-      if(input.generatedCode){
-        const existing=await tx.surveyParticipantCode.findUnique({where:{projectId_prefix:{projectId:input.projectId,prefix:memorable.prefix}}})
-        if(existing)throw new ResearchIdentityError(503,'编码领取暂未完成，请重试。')
-        await tx.surveyParticipantCode.create({data:{id:randomUUID(),projectId:input.projectId,prefix:memorable.prefix}})
+  return await surveyAdmissionGate().run(async () => {
+    await prisma.$transaction(async tx=>{
+      const wave=await activePublicWave(tx,input.projectId,input.waveId,input.entryToken,input.generatedCode?'SELF_CODE':memorable?'MEMORABLE_CODE':'PERSONAL_LINK')
+      if(input.consentVersion!==wave.consentVersion)
+        return fail('研究说明已经更新，请重新确认')
+      let codeRowId:string|undefined
+      if(memorable){
+        if(input.generatedCode){
+          const existing=await tx.surveyParticipantCode.findUnique({where:{projectId_prefix:{projectId:input.projectId,prefix:memorable.prefix}}})
+          if(existing)throw new ResearchIdentityError(503,'编码领取暂未完成，请重试。')
+          await tx.surveyParticipantCode.create({data:{id:randomUUID(),projectId:input.projectId,prefix:memorable.prefix}})
+        }
+        const rows=await tx.$queryRaw<Array<{id:string;participantId:string|null;credentialVersion:number}>>`
+          SELECT id,participant_id AS "participantId",credential_version AS "credentialVersion"
+          FROM survey_participant_codes WHERE project_id=${input.projectId} AND prefix=${memorable.prefix} FOR UPDATE`
+        const row=rows[0]
+        if(!row||row.participantId)throw new ResearchIdentityError(409,'编号不可用于首次参加，请核对编号或使用已有完整编码继续。')
+        codeRowId=row.id
+        secret=await memorableCredential(input.projectId,memorable.prefix,memorable.suffix,row.credentialVersion)
       }
-      const rows=await tx.$queryRaw<Array<{id:string;participantId:string|null;credentialVersion:number}>>`
-        SELECT id,participant_id AS "participantId",credential_version AS "credentialVersion"
-        FROM survey_participant_codes WHERE project_id=${input.projectId} AND prefix=${memorable.prefix} FOR UPDATE`
-      const row=rows[0]
-      if(!row||row.participantId)throw new ResearchIdentityError(409,'编号不可用于首次参加，请核对编号或使用已有完整编码继续。')
-      codeRowId=row.id
-      secret=await memorableCredential(input.projectId,memorable.prefix,memorable.suffix,row.credentialVersion)
-    }
-    const claimed=await tx.surveyWave.updateMany({
-      where:{id:input.waveId,projectId:input.projectId,status:'OPEN',
-        startsCount:wave.startsCount},
-      data:{startsCount:{increment:1}},
+      const claimed=await tx.surveyWave.updateMany({
+        where:{id:input.waveId,projectId:input.projectId,status:'OPEN',
+          startsCount:wave.startsCount},
+        data:{startsCount:{increment:1}},
+      })
+      if(claimed.count!==1)return fail('研究名额出现并发竞争，请重新领取')
+      await tx.surveyParticipant.create({data:{
+        id:participantId,projectId:input.projectId,researchCode,
+        credentialHash:sha256(secret),consentVersion:input.consentVersion,
+        status:'ACTIVE',
+      }})
+      if(codeRowId)await tx.surveyParticipantCode.update({where:{id:codeRowId},data:{participantId,updatedAt:new Date()}})
+      await tx.surveyWaveAttempt.create({data:{
+        id:attemptId,projectId:input.projectId,waveId:input.waveId,
+        participantId,status:'STARTED',
+      }})
+      await tx.surveyConsent.create({data:{
+        id:randomUUID(),projectId:input.projectId,waveId:input.waveId,
+        participantId,attemptId,consentVersion:input.consentVersion,accepted:true,
+      }})
+      await allocateResearchFlowOnAdmission(tx,{
+        publicationId:wave.publicationId!,projectId:input.projectId,waveId:input.waveId,
+        attemptId,participantId,researchCode,accessCredential:secret,
+      })
+      await bindSurveyAttemptContent(tx,{projectId:input.projectId,waveId:input.waveId,attemptId,
+        publicationId:wave.publicationId!,newAttempt:true})
     })
-    if(claimed.count!==1)return fail('研究名额出现并发竞争，请重新领取')
-    await tx.surveyParticipant.create({data:{
-      id:participantId,projectId:input.projectId,researchCode,
-      credentialHash:sha256(secret),consentVersion:input.consentVersion,
-      status:'ACTIVE',
-    }})
-    if(codeRowId)await tx.surveyParticipantCode.update({where:{id:codeRowId},data:{participantId,updatedAt:new Date()}})
-    await tx.surveyWaveAttempt.create({data:{
-      id:attemptId,projectId:input.projectId,waveId:input.waveId,
-      participantId,status:'STARTED',
-    }})
-    await tx.surveyConsent.create({data:{
-      id:randomUUID(),projectId:input.projectId,waveId:input.waveId,
-      participantId,attemptId,consentVersion:input.consentVersion,accepted:true,
-    }})
-    await allocateResearchFlowOnAdmission(tx,{
-      publicationId:wave.publicationId!,projectId:input.projectId,waveId:input.waveId,
-      attemptId,participantId,researchCode,accessCredential:secret,
-    })
-    await bindSurveyAttemptContent(tx,{projectId:input.projectId,waveId:input.waveId,attemptId,
-      publicationId:wave.publicationId!,newAttempt:true})
+    return {researchCode,accessCredential:secret,attemptId,...(fullCode?{fullCode}:{})}
   })
-  return {researchCode,accessCredential:secret,attemptId,...(fullCode?{fullCode}:{})}
 }
 
 /** Recovery never accepts the publicly displayable research code alone. */
