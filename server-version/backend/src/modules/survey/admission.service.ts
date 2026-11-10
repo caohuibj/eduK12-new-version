@@ -6,6 +6,7 @@ import {
   createLinkedResearchIdentity,recoverLinkedResearchIdentity,
   freshUnlinkedSession,hashResearchCredential,
 } from './identity.service'
+import { surveyAdmissionGate } from './survey-admission-gate'
 import { SurveyWaveError } from './waves.service'
 import type { ResearchFrozenPublication } from './publication.service'
 import { allocateResearchFlowOnAdmission } from './flow.assignment'
@@ -21,7 +22,7 @@ const enabled=()=>{
 const publicIdFormat=/^[a-f0-9-]{36}$/i
 const secretPattern=/^[A-Za-z0-9_-]{43}$/
 const codePattern=/^R-[A-Z0-9]{8,32}$/
-async function projectPublic(tx:Tx,publicId:string){
+async function projectPublic(tx:Tx | typeof prisma,publicId:string){
   if(!publicIdFormat.test(publicId))blocked('研究入口无效')
   const project=await tx.surveyProject.findFirst({where:{publicId},
     select:{id:true,title:true,description:true,collectionMode:true,status:true,participantIdentityMode:true,participantCodeLabel:true,participantCodeInstructions:true}})
@@ -170,7 +171,7 @@ export async function startLinkedWave(input:{
     projectId:project.id,researchCode:input.researchCode,
     accessCredential:input.accessCredential,
   })
-  return prisma.$transaction(async tx=>{
+  return await surveyAdmissionGate().run(() => prisma.$transaction(async tx=>{
     const wave=await openWaveLocked(tx,project.id,input.waveId,true)
     // Project-scoped credential remains valid at the moment of admission.
     // Revocation cannot commit between the admission credential check and
@@ -211,7 +212,7 @@ export async function startLinkedWave(input:{
     })
     await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:row.id,publicationId:wave.publicationId!,newAttempt:true})
     return {attemptId:row.id,waveId:wave.id,status:'STARTED',recovered:false}
-  })
+  }))
 }
 export async function startSingleUnlinkedWave(input:{
   publicId:string;waveId:string;entryToken:string;consentVersion:number;consent:boolean;
@@ -234,7 +235,7 @@ export async function startSingleUnlinkedWave(input:{
   const operationKeyHash=legacy?null:hashResearchCredential(input.operationKey!)
   const sessionHash=hashResearchCredential(legacy?serverSession!.accessCredential:input.accessCredential!)
   const bearer=legacy?serverSession!.accessCredential:input.accessCredential!
-  return prisma.$transaction(async tx=>{
+  return await surveyAdmissionGate().run(() => prisma.$transaction(async tx=>{
     const wave=await openWaveLocked(tx,project.id,input.waveId,false)
     await validateEntry(tx,project.id,wave.id,input.entryToken)
     // Replay first, before any quota is claimed: the same operation identity
@@ -273,21 +274,28 @@ export async function startSingleUnlinkedWave(input:{
     await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:row.id,publicationId:wave.publicationId!,newAttempt:true})
     return {attemptId:row.id,waveId:wave.id,status:'STARTED',
       recovered:false,accessCredential:bearer}
-  })
+  }))
 }
 type SurveyAttemptProof={publicId:string;attemptId:string;researchCode?:string;accessCredential:string}
 type VerifiedSurveyAttempt={attemptId:string;projectId:string;waveId:string;participantId:string|null;
   status:string;publicationId:string;definitionDigest:string;
   compiledSnapshot:ResearchFrozenPublication;generalText:string;finishUntil:Date|null;
   hardStopAt:Date|null}
+const withSurveyReadClient = async <T>(action: (client: Tx | typeof prisma) => Promise<T>): Promise<T> => {
+  if (typeof (prisma as any).surveyProject?.findFirst === 'function') {
+    return action(prisma)
+  }
+  return prisma.$transaction(tx => action(tx))
+}
+
 /** Read the current bearer and frozen-version locator. Only readers that need
  * the definition outside a later authoritative transaction select its payload. */
 async function readVerifiedSurveyAttempt(input:SurveyAttemptProof,includeSnapshot:boolean){
   enabled()
   if(!secretPattern.test(input.accessCredential))blocked()
-  const project=await prisma.$transaction(tx=>projectPublic(tx,input.publicId))
-  return prisma.$transaction(async tx=>{
-    const attempt=await tx.surveyWaveAttempt.findFirst({where:{
+  return withSurveyReadClient(async client => {
+    const project=await projectPublic(client,input.publicId)
+    const attempt=await client.surveyWaveAttempt.findFirst({where:{
       id:input.attemptId,projectId:project.id,
     },select:{id:true,waveId:true,participantId:true,status:true,sessionHash:true,
       wave:{select:{generalText:true,finishUntil:true,hardStopAt:true,

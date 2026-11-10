@@ -6,6 +6,7 @@ import {joinMemorableStudy,recoverMemorableIdentity,completeMemorableReset,joinG
 import {memorableCodeRateLimit} from './memorable-code.rate'
 import {BoundedAdmissionBusyError} from '../../services/boundedAdmissionGate'
 import {isQuestionnaireCompletionAdmissionBusyError} from '../../services/questionnaireCompletionAdmission'
+import {isAssessmentStartBusyError} from '../composite/start-transient'
 import {authorizeSurveyMaterial} from './material.authorization'
 import {serveSurveyMaterial} from './material.delivery'
 import {SurveyMediaError} from './media.references'
@@ -63,11 +64,38 @@ const submission=proof.extend({submissionId:z.string().min(16).max(200),
   answers:z.record(z.string(), z.record(z.string(), z.unknown())),
   itemTimings:z.record(z.string(), z.record(z.string(), z.unknown())).optional(),
   presentation:z.object({shownBlocks:z.array(z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)).max(70)}).strict().optional()}).strict()
+const P2028_ROLLED_BACK=/Unable to start a transaction in the given time|expired transaction/i
+const ROLLED_BACK_SQLSTATES=new Set(['40001','40P01','55P03'])
+
+export const isTransientSurveyDatabaseError=(error:unknown):boolean=>{
+  const candidate=error as {code?:unknown;message?:unknown;meta?:{code?:unknown}}|null
+  if(!candidate||typeof candidate!=='object')return false
+  if(candidate.code==='P2024'||candidate.code==='P2034')return true
+  if(candidate.code==='P2028'&&typeof candidate.message==='string'&&P2028_ROLLED_BACK.test(candidate.message))return true
+  const sqlState=typeof candidate.meta?.code==='string'?candidate.meta.code:typeof candidate.code==='string'?candidate.code:null
+  return Boolean(sqlState&&ROLLED_BACK_SQLSTATES.has(sqlState))
+}
+
 const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try{return success(res,await action(req))}
   catch(e){
     if(isQuestionnaireCompletionAdmissionBusyError(e))return next(e)
-    if(e instanceof BoundedAdmissionBusyError)return error(res,'编码验证繁忙，请稍后再试',-1,503)
+    if(isAssessmentStartBusyError(e)){
+      res.setHeader('Retry-After',String(e.retryAfterSeconds))
+      return res.status(503).json({code:'SURVEY_ADMISSION_BUSY',message:e.message,data:null})
+    }
+    if(e instanceof BoundedAdmissionBusyError){
+      res.setHeader('Retry-After',String(e.retryAfterSeconds))
+      return res.status(503).json({code:e.code||'SURVEY_ADMISSION_BUSY',message:e.message||'研究参与请求繁忙，请稍后重试',data:null})
+    }
+    if(isTransientSurveyDatabaseError(e)){
+      res.setHeader('Retry-After','1')
+      return res.status(503).json({code:'SURVEY_ADMISSION_BUSY',message:'研究参与请求繁忙，请稍后重试',data:null})
+    }
+    if(e instanceof ResearchIdentityError&&e.statusCode===503){
+      res.setHeader('Retry-After','1')
+      return res.status(503).json({code:'SURVEY_ADMISSION_BUSY',message:e.message,data:null})
+    }
     if(e instanceof SurveySituationalProtocolError)return error(res,e.code,-1,409)
     if(e instanceof z.ZodError)return error(res,'输入不合法',-1,400)
     if(e instanceof SurveyWaveError||e instanceof SurveyFinalError||e instanceof ResearchIdentityError||e instanceof SurveyCognitiveError)
