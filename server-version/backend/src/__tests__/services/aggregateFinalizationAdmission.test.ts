@@ -11,9 +11,9 @@ describe('aggregateFinalizationAdmission', () => {
     const stats = aggregateFinalizationAdmission.getStats()
     expect(stats.options.name).toBe('aggregate_finalization')
     expect(stats.options.busyCode).toBe('COMPLETION_BUSY')
-    expect(stats.options.maxConcurrent).toBe(3)
-    expect(stats.options.maxQueue).toBe(4)
-    expect(stats.options.maxWaitMs).toBe(250)
+    expect(stats.options.maxConcurrent).toBe(8)
+    expect(stats.options.maxQueue).toBe(64)
+    expect(stats.options.maxWaitMs).toBe(1500)
   })
 
   it('maps overflow to COMPLETION_BUSY for client retry', async () => {

@@ -12,6 +12,7 @@ import {isInstrumentFinalSubmitError} from '../../services/instrumentFinalSubmit
 import {isUnitSubmitAdmissionBusyError} from '../../services/unitSubmitAdmission'
 import {isQuestionnaireCompletionAdmissionBusyError,isTransientCompletionDatabaseError} from '../../services/questionnaireCompletionAdmission'
 import {startAssessmentRunExecution} from '../assessment-run/startExecution'
+import {isAssessmentStartBusyError} from '../composite/start-transient'
 import {acceptRunExecutionConsent} from '../assessment-run/consent'
 import {relationalRuntimeConsentAuthority} from '../assessment-relational/runtime-consent'
 import {compositeController} from '../composite/composite.controller'
@@ -61,6 +62,10 @@ function runtimeError(error:unknown,res:Response,next:NextFunction){
  if(isQuestionnaireCompletionAdmissionBusyError(error))return completionBusy(res,error.retryAfterSeconds)
  if(isTransientCompletionDatabaseError(error))return completionBusy(res,1)
  if(isInstrumentFinalSubmitError(error))return instrumentError(res,error.code,error.message,error.statusCode)
+ if(isAssessmentStartBusyError(error)){
+  res.setHeader('Retry-After',String(error.retryAfterSeconds))
+  return instrumentError(res,error.code,error.message,503)
+ }
  const known=error as {statusCode?:number;code?:string}
  if(known&&typeof known.statusCode==='number'&&known.statusCode>=400&&known.statusCode<500)
   return res.status(known.statusCode).json({code:known.code??'HUITEACHER_ASSESSMENT_UNAVAILABLE',message:'当前教师测评资格、资源或状态不满足要求',data:null})
