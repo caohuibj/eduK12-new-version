@@ -42,12 +42,16 @@ export class RunStartClaimError extends Error {
 
 type Tx = Prisma.TransactionClient
 
-type ExecutionLockRow = {
+export type RunExecutionLockIdentity = {
   organizationId: string
   runId: string
+}
+
+type ExecutionLockRow = RunExecutionLockIdentity & {
   runtimeBindingKind: string | null
   runtimeBindingRef: string | null
   respondentUserId: string
+  scientificFrozenAt: Date | null
 }
 
 const CLAIM_PROJECTION = `
@@ -58,23 +62,34 @@ const CLAIM_PROJECTION = `
   "admitted_attempt_identity" AS "admittedAttemptIdentity"
 `
 
-export const lockExecutionEnvelope = async (tx: Tx, executionId: string): Promise<ExecutionLockRow> => {
-  const identity = await tx.$queryRaw<Array<{ organizationId: string; runId: string }>>`
-    SELECT "organization_id" AS "organizationId", "run_id" AS "runId"
-    FROM "assessment_run_executions"
-    WHERE "id" = ${executionId}
-    LIMIT 1
-  `
-  if (!identity[0]) throw new RunStartClaimError('RUN_EXECUTION_NOT_FOUND', 'Run execution not found', 404)
+export const lockExecutionEnvelope = async (
+  tx: Tx,
+  executionId: string,
+  knownIdentity?: RunExecutionLockIdentity,
+): Promise<ExecutionLockRow> => {
+  // Dispatch already holds org/run on the committed claim. Reuse that
+  // identity so this transaction does not SELECT the same execution row
+  // once unlocked and again FOR UPDATE. Claim acquisition still reads it.
+  let identity = knownIdentity
+  if (!identity) {
+    const rows = await tx.$queryRaw<Array<RunExecutionLockIdentity>>`
+      SELECT "organization_id" AS "organizationId", "run_id" AS "runId"
+      FROM "assessment_run_executions"
+      WHERE "id" = ${executionId}
+      LIMIT 1
+    `
+    identity = rows[0]
+  }
+  if (!identity) throw new RunStartClaimError('RUN_EXECUTION_NOT_FOUND', 'Run execution not found', 404)
   // Read-only authority fences: SHARE still conflicts with lifecycle and
   // governance updates, while unrelated executions can START concurrently.
   // The execution row remains the exclusive admission/idempotency boundary.
   await tx.$queryRaw`
-    SELECT "id" FROM "organizations" WHERE "id" = ${identity[0].organizationId} FOR SHARE
+    SELECT "id" FROM "organizations" WHERE "id" = ${identity.organizationId} FOR SHARE
   `
   await tx.$queryRaw`
     SELECT "id" FROM "assessment_runs"
-    WHERE "organization_id" = ${identity[0].organizationId} AND "id" = ${identity[0].runId}
+    WHERE "organization_id" = ${identity.organizationId} AND "id" = ${identity.runId}
     FOR SHARE
   `
   // SCHOOL Activity pause/closure must serialize with START admission. This
@@ -84,8 +99,8 @@ export const lockExecutionEnvelope = async (tx: Tx, executionId: string): Promis
     SELECT a."course_id" FROM "campus_activity_runs" ar
     JOIN "campus_activities" a ON a."course_id"=ar."course_id"
       AND a."organization_id"=ar."organization_id"
-    WHERE ar."organization_id"=${identity[0].organizationId}
-      AND ar."run_id"=${identity[0].runId}
+    WHERE ar."organization_id"=${identity.organizationId}
+      AND ar."run_id"=${identity.runId}
     FOR SHARE OF a
   `
   // Teacher event/policy suspension must serialize with an admitted START
@@ -95,8 +110,8 @@ export const lockExecutionEnvelope = async (tx: Tx, executionId: string): Promis
     JOIN "huiteacher_evaluation_events" event
       ON event."organization_id"=link."organization_id"
       AND event."id"=link."event_id"
-    WHERE link."organization_id"=${identity[0].organizationId}
-      AND link."run_id"=${identity[0].runId}
+    WHERE link."organization_id"=${identity.organizationId}
+      AND link."run_id"=${identity.runId}
     FOR SHARE OF event
   `
   await tx.$queryRaw`
@@ -105,14 +120,15 @@ export const lockExecutionEnvelope = async (tx: Tx, executionId: string): Promis
     JOIN "education_product_entitlements" entitlement
       ON entitlement."organization_id"=link."organization_id"
       AND entitlement."product"='HUITEACHER'
-    WHERE link."organization_id"=${identity[0].organizationId}
-      AND link."run_id"=${identity[0].runId}
+    WHERE link."organization_id"=${identity.organizationId}
+      AND link."run_id"=${identity.runId}
     FOR SHARE OF entitlement
   `
   const rows = await tx.$queryRaw<ExecutionLockRow[]>`
     SELECT e."organization_id" AS "organizationId", e."run_id" AS "runId",
       e."runtime_binding_kind" AS "runtimeBindingKind", e."runtime_binding_ref" AS "runtimeBindingRef",
-      respondent."user_id" AS "respondentUserId"
+      respondent."user_id" AS "respondentUserId",
+      e."scientific_frozen_at" AS "scientificFrozenAt"
     FROM "assessment_run_executions" e
     JOIN "assessment_run_actor_snapshots" respondent
       ON respondent."organization_id" = e."organization_id"
@@ -122,6 +138,9 @@ export const lockExecutionEnvelope = async (tx: Tx, executionId: string): Promis
     FOR UPDATE OF e
   `
   if (!rows[0]) throw new RunStartClaimError('RUN_EXECUTION_NOT_FOUND', 'Run execution not found', 404)
+  if (rows[0].organizationId !== identity.organizationId || rows[0].runId !== identity.runId) {
+    throw new RunStartClaimError('RUN_START_ENVELOPE_IDENTITY', 'START envelope identity diverged under lock', 500)
+  }
   return rows[0]
 }
 
