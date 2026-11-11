@@ -2,7 +2,7 @@ import { encryptUnifiedRuntimePayload } from './security'
 import { REPORT_SUBMISSION_KEY_CONFLICT, REPORT_SUBMISSION_KEY_CONFLICT_MESSAGE } from '../scale/scale-final-submit-conflict'
 import { detachedWholeReceiptsEnabled } from './whole-receipt-storage'
 import { registerWholeReceiptAtomic } from './whole-receipt-atomic'
-import { markAssessmentTimeline, traceAssessmentPhase, recordAssessmentReportClaim } from '../../services/runtimeObservability'
+import { markAssessmentTimeline, traceAssessmentPhase, recordAssessmentReportClaim, tracePrismaInteractiveTransaction } from '../../services/runtimeObservability'
 import type { WholeReceiptExecution } from '../composite/whole-questionnaire.service'
 import { randomUUID } from 'node:crypto'
 import { loadFrozenActiveSlotSet } from './slot-set'
@@ -478,7 +478,7 @@ export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParen
   submissionId: string; payloadHash: string; answersEncrypted: string; acceptedAt: Date; requiredFormSlots: string[]; validationHash?: string;
 },assertCollectionAllowed?: (tx:Prisma.TransactionClient)=>Promise<void>): Promise<{ acceptedAt: Date; replayed: boolean; queueDepth?: number }> => !assertCollectionAllowed&&(detachedWholeReceiptsEnabled() || process.env.ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED === 'true')
   ? registerWholeReceiptAtomic(parent, input)
-  : traceAssessmentPhase('whole.transaction_roundtrip', () => prisma.$transaction(async tx => {
+  : tracePrismaInteractiveTransaction('whole', prisma, async (tx: Prisma.TransactionClient) => {
   markAssessmentTimeline('whole.transaction_callback_start')
   try {
   const detached = detachedWholeReceiptsEnabled()
@@ -553,7 +553,7 @@ export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParen
   if (!detached && saved.queueDepth === null) throw new QuestionnaireCompletionAdmissionBusyError('queue_full', 2)
   return { acceptedAt: input.acceptedAt, replayed: false, ...(saved.queueDepth === null ? {} : { queueDepth: saved.queueDepth }) }
   } finally { markAssessmentTimeline('whole.transaction_callback_end') }
-}, { isolationLevel: 'ReadCommitted', maxWait: 2000, timeout: 10_000 })).then(receipt => {
+}, { isolationLevel: 'ReadCommitted', maxWait: 2000, timeout: 10_000 }).then(receipt => {
   markAssessmentTimeline('whole.commit_confirmed')
   return receipt
 })
