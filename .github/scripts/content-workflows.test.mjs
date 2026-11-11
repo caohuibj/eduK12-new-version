@@ -412,11 +412,17 @@ test('hosted CI starts independent checks in parallel and bounds media setup wit
   assert.match(media,/timeout -k 10s 240s npx playwright-core install-deps chromium/);
   assert.match(media,/chromium\.launch\(\{headless:true\}\)/);
   assert.match(media,/archive\.ubuntu\.com/);
-  // FFmpeg must be genuinely available for media fixtures, not silently skipped.
-  assert.match(media,/timeout -k 10s 480s sudo -n apt-get install/);
-  assert.match(media,/Acquire::Retries=3/);
+  // Media FFmpeg must be an actual pinned executable, not an apt stall or
+  // silently skipped fake. The host can use preinstalled tools or exact npm
+  // static binaries, and the required libvpx encoder still runs for real.
+  assert.match(media,/@ffmpeg-installer\/ffmpeg@1\.1\.0/);
+  assert.match(media,/@ffprobe-installer\/ffprobe@2\.1\.2/);
+  assert.match(media,/timeout -k 10s 240s npm install/);
+  assert.match(media,/test -x "\$ffmpeg_bin"/);
+  assert.match(media,/test -x "\$ffprobe_bin"/);
   assert.match(media,/ffprobe -version/);
   assert.match(media,/libvpx -deadline realtime/);
+  assert.doesNotMatch(media,/apt-get install[^\n]*ffmpeg/);
   for(const scenario of ['media2','video_core','media7','situational_video','situational_branching'])
     assert.ok(media.includes(scenario+' independent scenario'),scenario);
   assert.match(media,/ci-artifact\.mjs verify backend/);
