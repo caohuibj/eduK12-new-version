@@ -149,13 +149,17 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
      || req.query.delivery === 'inline'
      || (req.body && typeof req.body === 'object' && ((req.body as any).delivery === 'inline' || (req.body as any).view === 'current-unit'))
    if (requestedDelivery && result.runtimeBindingRef) {
-     const currentUnit = await getAttemptState(
-       result.runtimeBindingRef,
-       { userId: req.user!.userId },
-       undefined,
-       'current-unit',
-     )
-     return { ...result, currentUnit: projectTeacherCompositeRuntime(currentUnit) }
+     try {
+       const currentUnit = await getAttemptState(
+         result.runtimeBindingRef,
+         { userId: req.user!.userId },
+         undefined,
+         'current-unit',
+       )
+       return { ...result, currentUnit: projectTeacherCompositeRuntime(currentUnit) }
+     } catch {
+       return result
+     }
    }
   }
   return result

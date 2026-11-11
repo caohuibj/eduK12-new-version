@@ -43,7 +43,7 @@ import {
 type Tx = Prisma.TransactionClient
 
 export type RunStartExecutionResult =
-  | { state: 'STARTED'; runtimeBindingKind: string; runtimeBindingRef: string; replayed: boolean; attempt?: any }
+  | { state: 'STARTED'; runtimeBindingKind: string; runtimeBindingRef: string; replayed: boolean }
   | { state: 'IN_PROGRESS'; operationKey: string }
 
 export class RunStartExecutionError extends Error {
@@ -310,12 +310,10 @@ const startTransactionalComposite = async (input: {
   if (admission.assignment.status !== 'OPEN') {
     throw new RunStartExecutionError('RUN_START_OUTCOME_UNKNOWN', 'STARTED assignment has no authoritative runtime attempt', 409)
   }
-  // Decision D-4/PR684: When the claim was newly acquired in this exact request (kind === 'ACQUIRED'),
-  // acquireRunExecutionStartClaim already verified assertCurrentRunStartAuthority under the
-  // envelope SHARE locks milliseconds ago. Re-check is only required for RECOVER (stale lease/restart).
-  if (input.decision.kind === 'RECOVER') {
-    await assertCurrentRunStartAuthority(tx, input.executionId, {accountMode:'DETECT_EDUCATION_LIBRARY'})
-  }
+  // Re-check current PR1 membership, class approval and PR2 Activity gates
+  // under the second transaction's locks before creating any attempt.
+  // Idempotent reconciliation of an already-created attempt remains above.
+  await assertCurrentRunStartAuthority(tx, input.executionId, {accountMode:'DETECT_EDUCATION_LIBRARY'})
   if (admission.assignment.resourceKey.startsWith('library-scale:')||admission.assignment.resourceKey.startsWith('private-scale:')) {
     await assertEducationLibraryExecutionSource(tx, {executionId: input.executionId, compositeId: input.launch.runtimeTargetRef})
   }
@@ -372,7 +370,7 @@ const startTransactionalComposite = async (input: {
   await markRunStartClaimCompleted(tx, { claimId: input.decision.claim.id, generation: input.decision.claim.claimGeneration })
   await assertTrainingPrivateReferenceAdmissionCurrent(tx)
   if(libraryUses)await assertEducationLibraryUses(tx,libraryUses.context,libraryUses.entryIds,{locked:libraryUses.uses,requireLocked:true})
-  return { state: 'STARTED' as const, runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: attempt.id, replayed: false, attempt }
+  return { state: 'STARTED' as const, runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: attempt.id, replayed: false }
     }))
   } catch (err) {
     if (!isAssessmentStartBusyError(err)) throw err
