@@ -159,12 +159,11 @@ export async function publicWaveInfo(waveId:string,token:string) {
 }
 export async function joinStudy(waveId:string,token:string,consent:boolean,input?:{prefix?:string;suffix?:string;generatedCode?:true}) {
   if(!consent) throw compositeBadRequest('请先确认保存身份及研究内历史关联')
-  const info=await publicWaveInfo(waveId,token)
-  if(!info.accepting)throw compositeForbidden('本波次暂不接受新加入')
-  const id=randomUUID(),displayCode=`P-${randomBytes(6).toString('hex').toUpperCase()}`
-  let credential=createStudyCredential(),fullCode:string|undefined
-
   return await studyJoinAdmissionGate().run(async () => {
+    const info=await publicWaveInfo(waveId,token)
+    if(!info.accepting)throw compositeForbidden('本波次暂不接受新加入')
+    const id=randomUUID(),displayCode=`P-${randomBytes(6).toString('hex').toUpperCase()}`
+    let credential=createStudyCredential(),fullCode:string|undefined
     const mode = info.mode ?? 'PERSONAL_LINK'
     let precomputedSecret: string | undefined
     let precomputedVersion: number | undefined

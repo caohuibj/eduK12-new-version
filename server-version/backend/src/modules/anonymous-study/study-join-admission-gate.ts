@@ -12,6 +12,7 @@ const resolveBound = (
   fallbackName: string,
   defaultVal: number,
   allowZero = false,
+  fallbackCap?: number,
 ): number => {
   const explicitRaw = process.env[explicitName]
   if (explicitRaw !== undefined && explicitRaw.trim() !== '') {
@@ -19,31 +20,35 @@ const resolveBound = (
   }
   const fallbackRaw = process.env[fallbackName]
   if (fallbackRaw !== undefined && fallbackRaw.trim() !== '') {
-    return configuredInteger(fallbackName, defaultVal, allowZero)
+    const val = configuredInteger(fallbackName, defaultVal, allowZero)
+    return fallbackCap !== undefined ? Math.min(val, fallbackCap) : val
   }
   return defaultVal
 }
 
 export const studyJoinAdmissionGate = (): BoundedAdmissionGate => {
   if (!studyJoinGateInstance) {
-    const defaultConcurrent = defaultStartAdmissionBound(process.env.DATABASE_URL)
+    const defaultConcurrent = Math.min(8, defaultStartAdmissionBound(process.env.DATABASE_URL))
     const maxConcurrent = resolveBound(
       'STUDY_JOIN_ADMISSION_MAX_CONCURRENT',
       'TRAINING_START_MAX_CONCURRENT',
       defaultConcurrent,
       false,
+      8, // Cap fallback at 8 to respect scrypt gate capacity (4 concurrent + 8 queue = 12 total)
     )
     const maxQueue = resolveBound(
       'STUDY_JOIN_ADMISSION_MAX_QUEUE',
       'TRAINING_START_MAX_QUEUE',
-      300,
+      120,
       true,
+      120,
     )
     const maxWaitMs = resolveBound(
       'STUDY_JOIN_ADMISSION_MAX_WAIT_MS',
       'TRAINING_START_MAX_WAIT_MS',
-      15000,
+      5000,
       false,
+      5000,
     )
 
     studyJoinGateInstance = new BoundedAdmissionGate({

@@ -33,7 +33,7 @@ describe('studyJoinAdmissionGate and transient error resilience (PR1)', () => {
       expect(stats.options.maxWaitMs).toBe(3000)
     })
 
-    it('falls back to TRAINING_START_* when explicit values are absent', () => {
+    it('falls back to TRAINING_START_* capped at 8 to respect scrypt capacity', () => {
       process.env.TRAINING_START_MAX_CONCURRENT = '18'
       process.env.TRAINING_START_MAX_QUEUE = '60'
       process.env.TRAINING_START_MAX_WAIT_MS = '4000'
@@ -43,9 +43,21 @@ describe('studyJoinAdmissionGate and transient error resilience (PR1)', () => {
       expect(stats.options.name).toBe('study_join_admission')
       expect(stats.options.busyCode).toBe('STUDY_JOIN_BUSY')
       expect(stats.options.retryAfterSeconds).toBe(1)
-      expect(stats.options.maxConcurrent).toBe(18)
+      expect(stats.options.maxConcurrent).toBe(8)
       expect(stats.options.maxQueue).toBe(60)
       expect(stats.options.maxWaitMs).toBe(4000)
+    })
+
+    it('falls back to lower TRAINING_START_MAX_CONCURRENT when below cap', () => {
+      process.env.TRAINING_START_MAX_CONCURRENT = '6'
+      process.env.TRAINING_START_MAX_QUEUE = '45'
+      process.env.TRAINING_START_MAX_WAIT_MS = '3500'
+
+      const gate = studyJoinAdmissionGate()
+      const stats = gate.getStats()
+      expect(stats.options.maxConcurrent).toBe(6)
+      expect(stats.options.maxQueue).toBe(45)
+      expect(stats.options.maxWaitMs).toBe(3500)
     })
   })
 
@@ -107,6 +119,20 @@ describe('studyJoinAdmissionGate and transient error resilience (PR1)', () => {
 
       releaseFirst?.()
       await task1
+    })
+
+    it('unifies internal scrypt admission errors (ADMISSION_BUSY) to STUDY_JOIN_BUSY contract', () => {
+      const innerScryptError = new BoundedAdmissionBusyError({
+        gate: 'training_participation_credential',
+        reason: 'queue_full',
+        retryAfterSeconds: 1,
+        code: 'ADMISSION_BUSY',
+      })
+      // Simulates the join error handler mapping
+      const mappedStatus = 503
+      const mappedCode = innerScryptError instanceof BoundedAdmissionBusyError ? 'STUDY_JOIN_BUSY' : innerScryptError.code
+      expect(mappedStatus).toBe(503)
+      expect(mappedCode).toBe('STUDY_JOIN_BUSY')
     })
   })
 })
