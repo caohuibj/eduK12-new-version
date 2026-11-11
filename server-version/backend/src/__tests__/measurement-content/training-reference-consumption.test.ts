@@ -67,7 +67,7 @@ describe('explicit Training reference choices and publication policy',()=>{
     {id:'composite',created_by:'teacher',status:started?'PUBLISHED':'DRAFT',product_kind:'QUESTIONNAIRE',questionnaire_type:'COURSE',public_enabled:false,published_at:started?new Date(now):null}]
    if(q.includes('FROM questionnaire_course_deliveries'))return [{composite_id:'source-composite',course_id:'course'},{composite_id:'composite',course_id:'course'}]
    if(q.includes('FROM courses'))return [{creator_id:'teacher',course_type:'TRAINING_COURSE',is_library:false}]
-   if(q.includes('FROM users'))return [{role:'TEACHER',account_domain:'TRAINING',teacher_approved:true,is_active:true,is_frozen:false,must_change_password:false,expires_at:null}]
+   if(q.includes('FROM users'))return [{role:'TEACHER',account_domain:'TRAINING',teacher_approved:true,is_active:true,is_frozen:false,must_change_password:false,expires_at:null,now:new Date(now)}]
    if(q.includes('clock_timestamp'))return [{now:new Date(now)}]
    throw new Error('unexpected private course query')
   })

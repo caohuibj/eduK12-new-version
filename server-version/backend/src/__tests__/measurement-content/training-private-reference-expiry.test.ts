@@ -9,7 +9,7 @@ function fixture(expiresAt:Date|null=new Date('2026-10-20T01:00:00Z')){
   if(q.includes('FROM composite_assessments'))return ['source','target'].map(id=>({id,created_by:'owner',status:'PUBLISHED',product_kind:'QUESTIONNAIRE',questionnaire_type:'COURSE',public_enabled:false,published_at:now}))
   if(q.includes('FROM questionnaire_course_deliveries'))return ['source','target'].map(composite_id=>({composite_id,course_id:'course'}))
   if(q.includes('FROM courses'))return [{creator_id:'owner',course_type:'TRAINING_COURSE',is_library:false}]
-  if(q.includes('FROM users'))return [{role:'TEACHER',account_domain:'TRAINING',teacher_approved:true,is_active:true,is_frozen:false,must_change_password:false,expires_at:expiresAt}]
+  if(q.includes('FROM users'))return [{role:'TEACHER',account_domain:'TRAINING',teacher_approved:true,is_active:true,is_frozen:false,must_change_password:false,expires_at:expiresAt,now}]
   if(q.includes('clock_timestamp'))return [{now}]
   throw new Error('Unexpected query: '+q)
  })}

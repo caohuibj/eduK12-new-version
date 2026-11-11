@@ -9,7 +9,7 @@ function fixture(){
   {id:'target',created_by:'teacher',status:'DRAFT',product_kind:'QUESTIONNAIRE',questionnaire_type:'COURSE',public_enabled:false,published_at:null}]
  const deliveries=[{composite_id:'source',course_id:'course'},{composite_id:'target',course_id:'course'}]
  const course={creator_id:'teacher',course_type:'TRAINING_COURSE',is_library:false}
- const principal={role:'TEACHER',account_domain:'TRAINING',teacher_approved:true,is_active:true,is_frozen:false,must_change_password:false,expires_at:null as Date|null}
+ const principal={role:'TEACHER',account_domain:'TRAINING',teacher_approved:true,is_active:true,is_frozen:false,must_change_password:false,expires_at:null as Date|null,now}
  const queries:string[]=[]
  const db={$queryRaw:vi.fn(async(sql:any)=>{
   const text=sql.strings.join('');queries.push(text)
@@ -59,5 +59,20 @@ describe('private Training aggregate references can be explicitly reused only in
   const f=fixture();f.db.$queryRaw.mockRejectedValueOnce({code:'P2010',meta:{code:'55P03'}})
   await expect(f.run()).rejects.toMatchObject({statusCode:409,message:'CONTENT_TRAINING_REFERENCE_SCOPE_BUSY_RETRY'})
   expect(f.db.$queryRaw).toHaveBeenCalledTimes(1)
+ })
+
+ it('folds clock_timestamp into the principal SHARE read instead of a second statement',async()=>{
+  const f=fixture();await expect(f.run()).resolves.toBeUndefined()
+  const userQueries=f.queries.filter(q=>q.includes('FROM users'))
+  expect(userQueries).toHaveLength(1)
+  expect(userQueries[0]).toContain('clock_timestamp()')
+  expect(userQueries[0]).toContain('FOR SHARE NOWAIT')
+  expect(f.queries.filter(q=>q.includes('clock_timestamp')).length).toBe(1)
+  expect(f.db.$queryRaw).toHaveBeenCalledTimes(5)
+ })
+ it('still denies an expired principal when the folded clock is on the same statement',async()=>{
+  const f=fixture();f.principal.expires_at=f.now
+  await expect(f.run()).rejects.toThrow('SCOPE_DENIED')
+  expect(f.queries.filter(q=>q.includes('FROM users')&&q.includes('clock_timestamp()'))).toHaveLength(1)
  })
 })
