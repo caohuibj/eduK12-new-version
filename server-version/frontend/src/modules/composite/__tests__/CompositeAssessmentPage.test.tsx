@@ -22,6 +22,15 @@ vi.mock('../../cognitive/core/recovery-credential', () => ({
   saveCognitiveRecoveryCredential: vi.fn(),
 }))
 
+vi.mock('../../../services/completionRetry', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../services/completionRetry')>()
+  return {
+    ...actual,
+    runWithCompletionRetry: <T,>(operation: () => Promise<T>, options = {}) =>
+      actual.runWithCompletionRetry(operation, { maxAttempts: 2, sleep: async () => {}, random: () => 0, ...options }),
+  }
+})
+
 import CompositeAssessmentPage from '../CompositeAssessmentPage'
 
 const renderPublicPage = () =>
@@ -370,4 +379,19 @@ it('keeps the anonymous save panel as the sole recovery presentation instead of 
  expect(screen.queryByText(credential,{exact:true})).not.toBeInTheDocument()
  expect(screen.getByText(/未提交草稿仍受本机保存规则限制/)).toHaveTextContent('ANON-DISPLAY')
  expect(mockPublicApi.start).toHaveBeenCalledTimes(1)
+})
+
+it('does not send the learner to the report page when completion stays busy and no report job exists', async () => {
+  window.history.pushState({}, '', '/public/composite/attempts/busy-attempt')
+  sessionStorage.setItem('composite:recovery:attempt:busy-attempt', 'recovery-secret')
+  const busy = Object.assign(new Error('测评完成请求繁忙，请稍后重试'), { status: 503, code: 'COMPLETION_BUSY' })
+  mockPublicApi.getAttempt.mockRejectedValue(busy)
+  render(<MemoryRouter initialEntries={['/public/composite/attempts/busy-attempt']}><Routes>
+    <Route path="/public/composite/attempts/:attemptId" element={<CompositeAssessmentPage />} />
+    <Route path="/public/composite/attempts/:attemptId/report" element={<p>报告等待页</p>} />
+  </Routes></MemoryRouter>)
+  expect(await screen.findByRole('alert')).toHaveTextContent('测评完成请求繁忙，请稍后重试')
+  expect(screen.queryByText('报告等待页')).not.toBeInTheDocument()
+  expect(mockPublicApi.getAttempt).toHaveBeenCalledTimes(2)
+  expect(mockPublicApi.getAttempt).toHaveBeenCalledWith('busy-attempt', 'current-unit')
 })

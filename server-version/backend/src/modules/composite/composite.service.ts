@@ -1,5 +1,5 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
-import { classifyStartTransaction, AssessmentStartBusyError, rethrowGateBusyAsStartBusy, isAssessmentStartBusyError } from './start-transient'
+import { classifyStartTransaction, rethrowGateBusyAsStartBusy } from './start-transient'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
@@ -5428,16 +5428,12 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
         const job = await readCompositeReportJobHeader(attemptId, runtime.attemptEpoch)
         return { ...state, allUnitsSubmitted: true, reportStatus: compositeReportJobState(job) }
       }
-      try {
-        const finalized = await finalizeCompositeAttemptIfReady(attemptId, { preloadedParent: runtime })
-        if (!finalized) return state
-        return patchCompositeStateAfterFinalize(state, finalized)
-      } catch (err: any) {
-        if (err?.code === 'COMPLETION_BUSY' || isAssessmentStartBusyError(err)) {
-          return { ...state, allUnitsSubmitted: true }
-        }
-        throw err
-      }
+      // Units being complete is not the same as the aggregate transaction
+      // committing. A busy admission must stay retryable so the client is
+      // not sent to a WAITING report page with no job and no recovery poll.
+      const finalized = await finalizeCompositeAttemptIfReady(attemptId, { preloadedParent: runtime })
+      if (!finalized) return state
+      return patchCompositeStateAfterFinalize(state, finalized)
     }
     return state
   }

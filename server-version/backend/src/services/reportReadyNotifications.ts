@@ -99,13 +99,15 @@ export const beginReportReadyWait = (attemptId: string, epoch: number, delayMs: 
   return wait
 }
 
+type PublishOutcome = 'success' | 'skipped' | 'failed'
+
 /** Advisory only: failures never change a committed receipt or report status. */
-const publishMessage = async (message: string): Promise<void> => {
-  if (!transportEnabled()) return
+const publishMessage = async (message: string): Promise<PublishOutcome> => {
+  if (!transportEnabled()) return 'skipped'
   try {
     if (!publisher?.isReady) {
       if (!publisherConnecting) {
-        if (Date.now() < publisherRetryAt) return
+        if (Date.now() < publisherRetryAt) return 'skipped'
         try { publisher?.destroy() } catch { /* already closed */ }
         const connection = client(); publisher = connection
         connection.on('error', () => { publisherRetryAt = Date.now() + 5000 })
@@ -115,17 +117,27 @@ const publishMessage = async (message: string): Promise<void> => {
           return false
         }).finally(() => { publisherConnecting = null })
       }
-      if (!await bounded(publisherConnecting)) return
+      if (!await bounded(publisherConnecting)) return 'skipped'
     }
-    if (publisher?.isReady) await publisher.publish(TOPIC, message)
-  } catch { /* timeout polling and authoritative PostgreSQL reads remain available */ }
+    if (publisher?.isReady) {
+      await publisher.publish(TOPIC, message)
+      return 'success'
+    }
+    return 'skipped'
+  } catch {
+    /* timeout polling and authoritative PostgreSQL reads remain available */
+    return 'failed'
+  }
 }
 
 export const publishReportReady = async (attemptId: string, epoch: number): Promise<void> => {
+  let outcome: PublishOutcome = 'skipped'
   try {
-    if (enabled()) await publishMessage(keyFor(attemptId, epoch))
+    if (enabled()) outcome = await publishMessage(keyFor(attemptId, epoch))
+  } catch {
+    outcome = 'failed'
   } finally {
-    if (reportQueueObsEnabled()) recordReportQueueEvent({ kind: 'publish_ready', attemptId, attemptEpoch: epoch, doneMs: Date.now() })
+    if (reportQueueObsEnabled()) recordReportQueueEvent({ kind: 'publish_ready', attemptId, attemptEpoch: epoch, doneMs: Date.now(), outcome })
   }
 }
 /** Same advisory connection/topic; neither receipts nor leases depend on delivery. */

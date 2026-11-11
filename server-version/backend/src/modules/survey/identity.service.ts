@@ -24,40 +24,18 @@ const code=()=>('R-'+randomBytes(8).toString('hex').toUpperCase())
 /** Project -> Wave -> owner/token guards are ordered consistently with
  * public START, PAUSE/CLOSE and the finalization lifecycle.
  */
-async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:string,identityMode:string){
-  if(!/^[A-Za-z0-9_-]{43}$/.test(rawEntry))return fail()
-  const projects=await tx.$queryRaw<Array<{id:string;collectionMode:string}>>`
-    SELECT id,collection_mode AS "collectionMode" FROM "survey_projects"
-    WHERE id=${projectId} AND status='ACTIVE' AND participant_identity_mode=${identityMode} FOR SHARE
-  `
-  if(!projects.length||projects[0].collectionMode!=='LINKED_WAVES')
-    return fail('研究项目当前不接受新的多波次参与者')
-  const rows=await tx.$queryRaw<Array<{
-    waveId:string;ordinal:number;allowNewParticipants:boolean;
-    consentVersion:number;startsCount:number;quotaStarts:number|null;publicationId:string|null;
-    groupIpPolicy:unknown;closesAt:Date|null
-  }>>`
-    SELECT w.id AS "waveId",w.ordinal,
-      w.allow_new_participants AS "allowNewParticipants",
-      w.consent_version AS "consentVersion",
-      w.publication_id AS "publicationId",
-      w.starts_count AS "startsCount",w.quota_starts AS "quotaStarts",w.group_ip_policy AS "groupIpPolicy",w.closes_at AS "closesAt"
-    FROM "survey_waves" w
-    JOIN "survey_entry_tokens" t ON t.wave_id=w.id AND t.project_id=w.project_id
-    JOIN "survey_projects" p ON p.id=w.project_id
-    WHERE w.id=${waveId} AND w.project_id=${projectId}
-      AND p.status='ACTIVE' AND w.status='OPEN'
-      AND w.publication_id IS NOT NULL AND w.hard_stop_at IS NULL
-      AND (w.opens_at IS NULL OR w.opens_at<=statement_timestamp())
-      AND (w.closes_at IS NULL OR w.closes_at>statement_timestamp())
-      AND t.token_hash=${sha256(rawEntry)} AND t.revoked_at IS NULL
-      AND t.expires_at>statement_timestamp()
-    FOR UPDATE OF w FOR SHARE OF t
-  `
-  const wave=rows[0]
+type PublicWave={
+  waveId:string;ordinal:number;allowNewParticipants:boolean;
+  consentVersion:number;startsCount:number;quotaStarts:number|null;publicationId:string|null;
+  groupIpPolicy:unknown;closesAt:Date|null
+}
+type WaveClient={$queryRaw:Tx['$queryRaw']}
+
+function evaluatePublicWave(wave:PublicWave|undefined):PublicWave{
   if(!wave)return fail('研究目前未开放参加')
   // statement_timestamp is fixed before a lock wait. Group recruitment must
   // recheck the real clock AFTER the Wave lock has actually been acquired.
+  // The unlocked preview uses the same clock check as an advisory only.
   if(wave.groupIpPolicy!==null&&(!wave.closesAt||wave.closesAt<=new Date()))
     return fail('集体作答的采集时间已经结束')
   if(wave.ordinal>1&&!wave.allowNewParticipants)
@@ -65,6 +43,79 @@ async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:st
   if(wave.quotaStarts!==null&&wave.startsCount>=wave.quotaStarts)
     return fail('研究名额已用尽，请勿领取无法启动的研究编号')
   return wave
+}
+
+async function loadPublicWave(client:WaveClient,projectId:string,waveId:string,rawEntry:string,identityMode:string,locked:boolean){
+  if(!/^[A-Za-z0-9_-]{43}$/.test(rawEntry))return fail()
+  const projects=locked
+    ? await client.$queryRaw<Array<{id:string;collectionMode:string}>>`
+        SELECT id,collection_mode AS "collectionMode" FROM "survey_projects"
+        WHERE id=${projectId} AND status='ACTIVE' AND participant_identity_mode=${identityMode} FOR SHARE
+      `
+    : await client.$queryRaw<Array<{id:string;collectionMode:string}>>`
+        SELECT id,collection_mode AS "collectionMode" FROM "survey_projects"
+        WHERE id=${projectId} AND status='ACTIVE' AND participant_identity_mode=${identityMode}
+      `
+  if(!projects.length||projects[0].collectionMode!=='LINKED_WAVES')
+    return fail('研究项目当前不接受新的多波次参与者')
+  const rows=locked
+    ? await client.$queryRaw<Array<PublicWave>>`
+        SELECT w.id AS "waveId",w.ordinal,
+          w.allow_new_participants AS "allowNewParticipants",
+          w.consent_version AS "consentVersion",
+          w.publication_id AS "publicationId",
+          w.starts_count AS "startsCount",w.quota_starts AS "quotaStarts",w.group_ip_policy AS "groupIpPolicy",w.closes_at AS "closesAt"
+        FROM "survey_waves" w
+        JOIN "survey_entry_tokens" t ON t.wave_id=w.id AND t.project_id=w.project_id
+        JOIN "survey_projects" p ON p.id=w.project_id
+        WHERE w.id=${waveId} AND w.project_id=${projectId}
+          AND p.status='ACTIVE' AND w.status='OPEN'
+          AND w.publication_id IS NOT NULL AND w.hard_stop_at IS NULL
+          AND (w.opens_at IS NULL OR w.opens_at<=statement_timestamp())
+          AND (w.closes_at IS NULL OR w.closes_at>statement_timestamp())
+          AND t.token_hash=${sha256(rawEntry)} AND t.revoked_at IS NULL
+          AND t.expires_at>statement_timestamp()
+        FOR UPDATE OF w FOR SHARE OF t
+      `
+    : await client.$queryRaw<Array<PublicWave>>`
+        SELECT w.id AS "waveId",w.ordinal,
+          w.allow_new_participants AS "allowNewParticipants",
+          w.consent_version AS "consentVersion",
+          w.publication_id AS "publicationId",
+          w.starts_count AS "startsCount",w.quota_starts AS "quotaStarts",w.group_ip_policy AS "groupIpPolicy",w.closes_at AS "closesAt"
+        FROM "survey_waves" w
+        JOIN "survey_entry_tokens" t ON t.wave_id=w.id AND t.project_id=w.project_id
+        JOIN "survey_projects" p ON p.id=w.project_id
+        WHERE w.id=${waveId} AND w.project_id=${projectId}
+          AND p.status='ACTIVE' AND w.status='OPEN'
+          AND w.publication_id IS NOT NULL AND w.hard_stop_at IS NULL
+          AND (w.opens_at IS NULL OR w.opens_at<=statement_timestamp())
+          AND (w.closes_at IS NULL OR w.closes_at>statement_timestamp())
+          AND t.token_hash=${sha256(rawEntry)} AND t.revoked_at IS NULL
+          AND t.expires_at>statement_timestamp()
+      `
+  return evaluatePublicWave(rows[0])
+}
+
+async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:string,identityMode:string){
+  return loadPublicWave(tx,projectId,waveId,rawEntry,identityMode,true)
+}
+
+/** Advisory unlocked precheck. The transaction still runs the locked
+ * authoritative wave, token, consent and quota rechecks. */
+async function previewPublicAdmission(input:{
+  projectId:string;waveId:string;entryToken:string;consentVersion:number;generatedCode?:true;memorable?:unknown
+}){
+  const wave=await loadPublicWave(
+    prisma,
+    input.projectId,
+    input.waveId,
+    input.entryToken,
+    input.generatedCode?'SELF_CODE':input.memorable?'MEMORABLE_CODE':'PERSONAL_LINK',
+    false,
+  )
+  if(input.consentVersion!==wave.consentVersion)
+    return fail('研究说明已经更新，请重新确认')
 }
 
 /** Initial LINKED enrollment atomically claims exactly one Wave Attempt.
@@ -97,6 +148,9 @@ export async function createLinkedResearchIdentity(input:{
     let precomputedSecret: string | undefined
     let precomputedVersion: number | undefined
     if(memorable){
+      // Cheap unlocked wave/token/consent preview first so invalid or expired
+      // admissions do not pay scrypt(N=16384). Authoritative checks stay in-tx.
+      await previewPublicAdmission(input)
       if(input.generatedCode){
         // The code row is created inside the tx below with the schema
         // default credentialVersion 0, so pre-compute with that version.
