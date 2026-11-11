@@ -54,6 +54,7 @@ export function publicStudyApi(credential='') {
     recoverCode:async(studyId:string,code:string)=>data(await client.post<StudyIdentity>(`/${encodeURIComponent(studyId)}/code/recover`,{code})),
     resetCode:async(studyId:string,resetCode:string,suffix:string)=>data(await client.post<StudyIdentity>(`/${encodeURIComponent(studyId)}/code/reset`,{resetCode,suffix})),
     home:async(studyId:string)=>data(await client.get<StudyHome>(`/${encodeURIComponent(studyId)}`)),
+    changes:async(studyId:string,attemptId:string)=>data(await client.post<PersonalChangesResponse>(`/${encodeURIComponent(studyId)}/changes`,{attemptId})),
     recover:async(studyId:string,waveId:string,opts?:{delivery?:string})=>data(await client.post<{attemptId:string;state:string;recoveryToken:string;wholeDefinition?:any}>(`/${encodeURIComponent(studyId)}/waves/${encodeURIComponent(waveId)}/recover${opts?.delivery?`?delivery=${opts.delivery}`:''}`,{})),
     start:async(studyId:string,waveId:string,opts?:{delivery?:string})=>data(await client.post<{attemptId:string;state:string;recoveryToken:string;wholeDefinition?:any}>(`/${encodeURIComponent(studyId)}/waves/${encodeURIComponent(waveId)}/start${opts?.delivery?`?delivery=${opts.delivery}`:''}`,{})),
     revoke:async(studyId:string)=>data(await client.post(`/${encodeURIComponent(studyId)}/revoke`,{})),
