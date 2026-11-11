@@ -1,4 +1,5 @@
 import {Prisma} from '@prisma/client'
+import { withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
 import type {StoredRelease} from '../measurement-content/repository'
 import {ContentReleaseError} from '../measurement-content/release'
 
@@ -14,7 +15,7 @@ const admissionExpiries=new WeakMap<object,Date>()
 export async function assertTrainingPrivateReferenceAdmissionCurrent(tx:Prisma.TransactionClient){
  const expiry=admissionExpiries.get(tx)
  if(!expiry)return
- const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
+ const [clock]=await withStartNestedQueryRawLabel('private_reference_clock', () => tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`))
  if(!clock||expiry<=clock.now)deny()
 }
 
@@ -39,31 +40,31 @@ async function assertCourseUse(tx:Prisma.TransactionClient,input:{
  const {release,ownerId,compositeId}=input,scope=release.scope
  if(release.layer!=='REFERENCE'||scope.kind!=='PRIVATE'||scope.product!=='TRAINING'||scope.ownerId!==ownerId
   ||scope.resourceId===compositeId||typeof release.provenance.candidateId!=='string'||typeof release.provenance.reviewId!=='string')deny()
- const receipts=await tx.$queryRaw<Array<{course_id:string;composite_id:string}>>(Prisma.sql`
+ const receipts=await withStartNestedQueryRawLabel('private_reference_receipts', () => tx.$queryRaw<Array<{course_id:string;composite_id:string}>>(Prisma.sql`
   SELECT course_id,composite_id FROM training_reference_requests
   WHERE operation='PUBLISH' AND release_id=${release.releaseId} AND actor_id=${ownerId}
    AND composite_id=${scope.resourceId} AND candidate_id=${release.provenance.candidateId} AND review_id=${release.provenance.reviewId}
-  FOR SHARE NOWAIT`)
+  FOR SHARE NOWAIT`))
  if(!receipts.length||receipts.some(row=>row.course_id!==receipts[0].course_id||row.composite_id!==scope.resourceId))deny()
  const courseId=receipts[0].course_id
- const tasks=await tx.$queryRaw<Array<{id:string;created_by:string;status:string;product_kind:string;questionnaire_type:string|null;course_id:string|null;public_enabled:boolean;published_at:Date|null}>>(Prisma.sql`
+ const tasks=await withStartNestedQueryRawLabel('private_reference_tasks', () => tx.$queryRaw<Array<{id:string;created_by:string;status:string;product_kind:string;questionnaire_type:string|null;course_id:string|null;public_enabled:boolean;published_at:Date|null}>>(Prisma.sql`
   SELECT id,created_by,status::text,product_kind,questionnaire_type::text,course_id,public_enabled,published_at
-  FROM composite_assessments WHERE id IN (${scope.resourceId},${compositeId}) ORDER BY id FOR SHARE NOWAIT`)
+  FROM composite_assessments WHERE id IN (${scope.resourceId},${compositeId}) ORDER BY id FOR SHARE NOWAIT`))
  const source=tasks.find(row=>row.id===scope.resourceId),target=tasks.find(row=>row.id===compositeId)
  if(tasks.length!==2||!source||!target||source.created_by!==ownerId||target.created_by!==ownerId||!source.published_at||!['PUBLISHED','ARCHIVED'].includes(source.status)
   ||!['QUESTIONNAIRE','LEGACY_COMPOSITE'].includes(source.product_kind)
   ||target.product_kind!=='QUESTIONNAIRE'||target.questionnaire_type!=='COURSE'||target.public_enabled
   ||input.draftSelection&&target.status!=='DRAFT'||!input.draftSelection&&input.currentAdmission&&target.status!=='PUBLISHED')deny()
- const deliveries=await tx.$queryRaw<Array<{composite_id:string;course_id:string}>>(Prisma.sql`
+ const deliveries=await withStartNestedQueryRawLabel('private_reference_deliveries', () => tx.$queryRaw<Array<{composite_id:string;course_id:string}>>(Prisma.sql`
   SELECT composite_id,course_id FROM questionnaire_course_deliveries
-  WHERE composite_id IN (${scope.resourceId},${compositeId}) ORDER BY composite_id,course_id FOR SHARE NOWAIT`)
+  WHERE composite_id IN (${scope.resourceId},${compositeId}) ORDER BY composite_id,course_id FOR SHARE NOWAIT`))
  const targetCourses=deliveries.filter(row=>row.composite_id===compositeId)
  if(!targetCourses.length||targetCourses.some(row=>row.course_id!==courseId)
   ||(source.product_kind==='QUESTIONNAIRE'
    ?source.questionnaire_type!=='COURSE'||!deliveries.some(row=>row.composite_id===scope.resourceId&&row.course_id===courseId)
    :source.course_id!==courseId))deny()
- const [course]=await tx.$queryRaw<Array<{creator_id:string;course_type:string;is_library:boolean}>>(Prisma.sql`
-  SELECT creator_id,course_type,is_library FROM courses WHERE id=${courseId} FOR SHARE NOWAIT`)
+ const [course]=await withStartNestedQueryRawLabel('private_reference_course', () => tx.$queryRaw<Array<{creator_id:string;course_type:string;is_library:boolean}>>(Prisma.sql`
+  SELECT creator_id,course_type,is_library FROM courses WHERE id=${courseId} FOR SHARE NOWAIT`))
  if(!course||course.creator_id!==ownerId||course.course_type!=='TRAINING_COURSE'||course.is_library)deny()
  // Ordinary scientific-grant expiry does not revoke immutable published
  // aggregate content. New use still requires the current real Training owner.
@@ -71,8 +72,8 @@ async function assertCourseUse(tx:Prisma.TransactionClient,input:{
   // Clock is an independent non-lock fact; fold it into the principal SHARE
   // so current admission is one statement. The end-of-tx fence in
   // assertTrainingPrivateReferenceAdmissionCurrent stays a later clock query.
-  const [principal]=await tx.$queryRaw<Array<{role:string;account_domain:string;teacher_approved:boolean;is_active:boolean;is_frozen:boolean;must_change_password:boolean;expires_at:Date|null;now:Date}>>(Prisma.sql`
-   SELECT role::text,account_domain,teacher_approved,is_active,is_frozen,must_change_password,expires_at,clock_timestamp() AS now FROM users WHERE id=${ownerId} FOR SHARE NOWAIT`)
+  const [principal]=await withStartNestedQueryRawLabel('private_reference_principal', () => tx.$queryRaw<Array<{role:string;account_domain:string;teacher_approved:boolean;is_active:boolean;is_frozen:boolean;must_change_password:boolean;expires_at:Date|null;now:Date}>>(Prisma.sql`
+   SELECT role::text,account_domain,teacher_approved,is_active,is_frozen,must_change_password,expires_at,clock_timestamp() AS now FROM users WHERE id=${ownerId} FOR SHARE NOWAIT`))
   if(!principal||principal.role!=='TEACHER'||!['TRAINING','LEGACY'].includes(principal.account_domain)||!principal.teacher_approved
    ||!principal.is_active||principal.is_frozen||principal.must_change_password||!principal.now||principal.expires_at&&principal.expires_at<=principal.now)deny()
   if(input.recordAdmissionExpiry&&principal.expires_at){

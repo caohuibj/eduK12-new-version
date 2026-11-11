@@ -1,3 +1,4 @@
+import { withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
 import type { Prisma } from '@prisma/client'
 
 type RawTx = Pick<Prisma.TransactionClient, '$queryRaw' | '$queryRawUnsafe'>
@@ -13,7 +14,7 @@ const heldCompositeShareLocks = new WeakMap<object, Set<string>>()
  * statement only when lockAuthenticatedAdmission already took it on this tx. */
 export async function lockCompositeAdmissionShare(tx: RawTx, compositeId: string): Promise<void> {
   if (heldCompositeShareLocks.get(tx)?.has(compositeId)) return
-  await tx.$queryRawUnsafe(COMPOSITE_SHARE_SQL, compositeId)
+  await withStartNestedQueryRawLabel('lock_share', () => tx.$queryRawUnsafe(COMPOSITE_SHARE_SQL, compositeId))
 }
 
 /** Readers may admit different students concurrently. Archive/publication
@@ -24,12 +25,12 @@ export async function lockAuthenticatedAdmission(
   compositeId: string,
   userId: string,
 ): Promise<void> {
-  await tx.$queryRawUnsafe(COMPOSITE_SHARE_SQL, compositeId)
+  await withStartNestedQueryRawLabel('lock_share', () => tx.$queryRawUnsafe(COMPOSITE_SHARE_SQL, compositeId))
   let held = heldCompositeShareLocks.get(tx)
   if (!held) heldCompositeShareLocks.set(tx, held = new Set())
   held.add(compositeId)
   // A hash collision only causes conservative extra serialization. Prefix and
   // tuple encoding keep this lock namespace separate from other advisory uses.
   const identity = JSON.stringify(['training-authenticated-admission-v1', compositeId, userId])
-  await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${identity}, 0))`
+  await withStartNestedQueryRawLabel('lock_advisory', () => tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${identity}, 0))`)
 }

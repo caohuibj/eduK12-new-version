@@ -8,7 +8,7 @@ import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import {
   markAssessmentTimeline, measureRequestPhase, traceAssessmentPhase,
   withAssessmentReportTimeline, tracePrismaInteractiveTransaction, withQueryRawLabel,
-  recordPrismaCall, requestObservabilityMiddleware, currentAssessmentTimelineKind,
+  recordPrismaCall, requestObservabilityMiddleware, currentAssessmentTimelineKind, withStartNestedQueryRawLabel,
 } from '../../services/runtimeObservability'
 const original = {
   isolated: process.env.PERF_ISOLATED_TEST_MODE,
@@ -189,4 +189,44 @@ describe('bounded technical assessment timelines', () => {
     expect(output).not.toHaveBeenCalled()
   })
 
+
+  it('nests a per-site START raw label under an in_tx bucket', async () => {
+    enabled(); const output = vi.spyOn(logger, 'info').mockImplementation(() => undefined)
+    const response = Object.assign(new EventEmitter(), { statusCode: 200 }) as any
+    const request = {
+      method: 'POST',
+      originalUrl: '/api/composite-assessments/example-composite/attempts',
+      url: '/api/composite-assessments/example-composite/attempts',
+      path: '/api/composite-assessments/example-composite/attempts',
+      baseUrl: '',
+    } as any
+    let work: Promise<void> | undefined
+    requestObservabilityMiddleware(request, response, () => {
+      work = (async () => {
+        await withQueryRawLabel('start.raw.in_tx', async () => {
+          await withStartNestedQueryRawLabel('course_facts', async () => {
+            recordPrismaCall(undefined, 'queryRaw', 3, process.hrtime.bigint() - 1_000_000n, process.hrtime.bigint())
+          })
+        })
+      })()
+    })
+    await work
+    response.emit('finish')
+    const record = JSON.parse(String(output.mock.calls[0][0]).slice('ASSESSMENT_TIMELINE '.length))
+    const names = record.events.map((event: { name: string }) => event.name)
+    expect(names).toEqual(expect.arrayContaining(['start.raw.in_tx.course_facts', 'db.raw.queryRaw']))
+    expect(JSON.stringify(record)).not.toContain('example-composite')
+  })
+
+  it('does not emit nested START raw labels when timelines are off', async () => {
+    delete process.env.PERF_ISOLATED_TEST_MODE
+    delete process.env.ASSESSMENT_TIMELINE_ENABLED
+    const output = vi.spyOn(logger, 'info').mockImplementation(() => undefined)
+    await withQueryRawLabel('start.raw.in_tx', async () => {
+      await withStartNestedQueryRawLabel('course_facts', async () => {
+        recordPrismaCall(undefined, 'queryRaw', 3, process.hrtime.bigint() - 1_000_000n, process.hrtime.bigint())
+      })
+    })
+    expect(output).not.toHaveBeenCalled()
+  })
 })

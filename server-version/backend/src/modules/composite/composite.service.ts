@@ -168,7 +168,7 @@ import {
   withFinalOnlyCompletionTransaction,
   withQuestionnaireCompletionTransaction,
 } from '../../services/questionnaireProgressService'
-import { measureRequestPhase, measureRequestPhaseSync, traceAssessmentPhase, assessmentTimelineSpan, withQueryRawLabel } from '../../services/runtimeObservability'
+import { measureRequestPhase, measureRequestPhaseSync, traceAssessmentPhase, assessmentTimelineSpan, withQueryRawLabel, withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
 import {
   buildFrozenAnalysisProtocolSnapshot,
   encryptFrozenAnalysisProtocolSnapshot,
@@ -3276,10 +3276,10 @@ const createAttempt = async (
       const courseId = userId ? composite.deliveryCourseId : (courseIds.length === 1 ? courseIds[0] : null)
       if (!courseId || !courseIds.includes(courseId) || (!userId && composite.deliveryCourseId && composite.deliveryCourseId !== courseId))
         throw compositeBadRequest('冻结策略缺少明确授权的 Training 投放课程')
-      const facts = await (db as Prisma.TransactionClient).$queryRaw<Array<{ id: string; endedAt: Date | null }>>`SELECT c.id,c.ended_at AS "endedAt"
+      const facts = await withStartNestedQueryRawLabel('course_facts', () => (db as Prisma.TransactionClient).$queryRaw<Array<{ id: string; endedAt: Date | null }>>`SELECT c.id,c.ended_at AS "endedAt"
         FROM courses c JOIN users u ON u.id=${current.createdBy}
         WHERE c.id=${courseId} AND c.course_type='TRAINING_COURSE' AND NOT c.is_library AND c.status::text='PUBLISHED'
-        AND ${trainingCreatorAuthoritySql} FOR SHARE OF c,u`
+        AND ${trainingCreatorAuthoritySql} FOR SHARE OF c,u`)
       if (facts.length !== 1 || (facts[0].endedAt && new Date(facts[0].endedAt).getTime() <= Date.now()))
         throw compositeForbidden('Training 课程已关闭或投放权限无效')
       const publicationIdentity = trainingRoundPublicationIdentity(current, courseId)
@@ -3595,7 +3595,7 @@ const createAttempt = async (
   }
   if(materialAssignment){
     await ensureTrainingFlowCurrentChildInTransaction(db as Prisma.TransactionClient,attempt.id,userId?{userId}:{recoveryTokenHash:credential!.hash})
-    await db.$executeRawUnsafe('SET CONSTRAINTS training_material_claim_scope, training_material_quota_claim_scope, training_material_binding_scope, training_material_claim_attempt_fk, training_material_binding_initial_claim_fk IMMEDIATE')
+    await withStartNestedQueryRawLabel('set_constraints', () => db.$executeRawUnsafe('SET CONSTRAINTS training_material_claim_scope, training_material_quota_claim_scope, training_material_binding_scope, training_material_claim_attempt_fk, training_material_binding_initial_claim_fk IMMEDIATE'))
   }
   await contentCandidate?.recheckSourceLicenses()
   await assertTrainingPrivateReferenceAdmissionCurrent(db as Prisma.TransactionClient)

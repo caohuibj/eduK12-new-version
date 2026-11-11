@@ -8,6 +8,7 @@ import path from 'node:path'
 import { Request, Response } from 'express'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../config/database'
+import { withStartNestedQueryRawLabel } from './runtimeObservability'
 import { config } from '../config'
 import { CourseStudentStatus, UserRole } from '../types'
 import { forbidden, notFound, unauthorized } from '../utils/response'
@@ -200,7 +201,7 @@ export const lockStoredAssetRows = async (db: AssetDatabase, assetIds: readonly 
   const ids = [...new Set(assetIds)].sort()
   if (!ids.length) return
   const lockMode = mode === 'update' ? Prisma.sql`FOR UPDATE` : Prisma.sql`FOR SHARE`
-  await db.$queryRaw(Prisma.sql`SELECT id FROM stored_assets WHERE id IN (${Prisma.join(ids)}) ORDER BY id ${lockMode}`)
+  await withStartNestedQueryRawLabel('asset_lock', () => db.$queryRaw(Prisma.sql`SELECT id FROM stored_assets WHERE id IN (${Prisma.join(ids)}) ORDER BY id ${lockMode}`))
 }
 
 /** Reuse the caller's transaction so parent facts and retention commit together. */

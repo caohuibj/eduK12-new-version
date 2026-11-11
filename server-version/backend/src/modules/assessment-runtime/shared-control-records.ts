@@ -3,6 +3,7 @@ import { readTrainingTimingSnapshot } from './training-scale-timing'
 import { encryptControlReference } from './control-reference-codec'
 import { AsyncLocalStorage } from 'node:async_hooks'
 import { prisma } from '../../config/database'
+import { withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
 import { canonicalHash, canonicalJsonBytes } from './canonical'
 import { encryptUnifiedRuntimePayload, decryptUnifiedRuntimePayload } from './security'
 import { compactAssessmentStorageEnabled } from './compact-field-codec'
@@ -46,8 +47,8 @@ const verifyBinding = (row: any) => {
 const readBinding = async (id: string, db:SharedControlDb=prisma) => {
   if (!/^[1-9][0-9]*$/.test(id) || id.length > 19) throw new Error('Frozen binding reference invalid')
   return limited(contextFor(db)?.reads, id, async () => {
-    const rows = await db.$queryRaw<any[]>`SELECT id,binding_hash AS "bindingHash",payload_encrypted AS "payloadEncrypted",plaintext_bytes AS "plaintextBytes",
-      composite_attempt_id AS "compositeAttemptId",questionnaire_assessment_id AS "questionnaireAssessmentId" FROM assessment_frozen_bindings WHERE id=${BigInt(id)}`
+    const rows = await withStartNestedQueryRawLabel('shared_control_read', () => db.$queryRaw<any[]>`SELECT id,binding_hash AS "bindingHash",payload_encrypted AS "payloadEncrypted",plaintext_bytes AS "plaintextBytes",
+      composite_attempt_id AS "compositeAttemptId",questionnaire_assessment_id AS "questionnaireAssessmentId" FROM assessment_frozen_bindings WHERE id=${BigInt(id)}`)
     if (rows.length !== 1) throw new Error('Frozen personal binding unavailable; restore it before retrying')
     const value = verifyBinding(rows[0]), context = contextFor(db)
     if (context && context.writes.size < 32) context.writes.set(rows[0].bindingHash.toString('hex'), Promise.resolve(String(rows[0].id)))
@@ -60,11 +61,11 @@ const saveBinding = async (value: ReturnType<typeof bindingBody>,db:SharedContro
   return limited(context?.writes, hash, async () => {
     const binary = Buffer.from(hash, 'hex')
     const payload = encryptUnifiedRuntimePayload({ version: 1, value })
-    let rows = await db.$queryRaw<any[]>`INSERT INTO assessment_frozen_bindings(binding_hash,composite_attempt_id,questionnaire_assessment_id,plaintext_bytes,payload_encrypted)
+    let rows = await withStartNestedQueryRawLabel('shared_control_insert', () => db.$queryRaw<any[]>`INSERT INTO assessment_frozen_bindings(binding_hash,composite_attempt_id,questionnaire_assessment_id,plaintext_bytes,payload_encrypted)
       VALUES(${binary},${value.parent.kind === 'composite' ? value.parent.id : null},${value.parent.kind === 'questionnaire' ? value.parent.id : null},${bytes.length},${payload}) ON CONFLICT(binding_hash) DO NOTHING
-      RETURNING id,binding_hash AS "bindingHash",payload_encrypted AS "payloadEncrypted",plaintext_bytes AS "plaintextBytes",composite_attempt_id AS "compositeAttemptId",questionnaire_assessment_id AS "questionnaireAssessmentId"`
-    if (!rows.length) rows = await db.$queryRaw<any[]>`SELECT id,binding_hash AS "bindingHash",payload_encrypted AS "payloadEncrypted",plaintext_bytes AS "plaintextBytes",
-      composite_attempt_id AS "compositeAttemptId",questionnaire_assessment_id AS "questionnaireAssessmentId" FROM assessment_frozen_bindings WHERE binding_hash=${binary}`
+      RETURNING id,binding_hash AS "bindingHash",payload_encrypted AS "payloadEncrypted",plaintext_bytes AS "plaintextBytes",composite_attempt_id AS "compositeAttemptId",questionnaire_assessment_id AS "questionnaireAssessmentId"`)
+    if (!rows.length) rows = await withStartNestedQueryRawLabel('shared_control_read', () => db.$queryRaw<any[]>`SELECT id,binding_hash AS "bindingHash",payload_encrypted AS "payloadEncrypted",plaintext_bytes AS "plaintextBytes",
+      composite_attempt_id AS "compositeAttemptId",questionnaire_assessment_id AS "questionnaireAssessmentId" FROM assessment_frozen_bindings WHERE binding_hash=${binary}`)
     if (rows.length !== 1) throw new Error('Frozen binding append verification failed')
     const verified = verifyBinding(rows[0])
     if (!rows[0].bindingHash.equals(binary)) throw new Error('Frozen binding append verification failed')

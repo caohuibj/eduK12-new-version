@@ -1,6 +1,7 @@
 import {Prisma,type PrismaClient} from '@prisma/client'
 import {z} from 'zod'
 import {canonicalHash} from '../../assessment-runtime/canonical'
+import { withStartNestedQueryRawLabel } from '../../../services/runtimeObservability'
 import {hashScaleDefinition,type ScaleDefinitionV2} from '../scale-definition'
 import {toolReference} from '../../survey/tool-reference'
 import {compileScalePolicy} from '../policy/compile'
@@ -86,10 +87,10 @@ export async function activateImportedContent(tx:Prisma.TransactionClient,triple
 }
 export async function readImportedPolicySource(db:PrismaClient|Prisma.TransactionClient,scaleId:string){
  if(typeof db.$queryRaw!=='function')return null
- const [native]=await db.$queryRaw<Array<{standard_source_kind:string;standard_tool_key:string;instrument_version:string;definition:unknown;definition_hash:string}>>`SELECT standard_source_kind,standard_tool_key,instrument_version,definition,definition_hash FROM scales WHERE id=${scaleId} FOR SHARE`
+ const [native]=await withStartNestedQueryRawLabel('imported_policy_scale', () => db.$queryRaw<Array<{standard_source_kind:string;standard_tool_key:string;instrument_version:string;definition:unknown;definition_hash:string}>>`SELECT standard_source_kind,standard_tool_key,instrument_version,definition,definition_hash FROM scales WHERE id=${scaleId} FOR SHARE`)
  if(!native||native.standard_source_kind!=='DB_IMPORTED')return null
- const [row]=await db.$queryRaw<Array<{axis:'CONTENT';version:string;content_hash:string;payload:unknown;source_version:string;reference:Part['reference']}>>`SELECT * FROM survey_standard_versions
-  WHERE axis='CONTENT' AND reference#>>'{metadata,databaseSource,scaleId}'=${scaleId} LIMIT 1`
+ const [row]=await withStartNestedQueryRawLabel('imported_policy_version', () => db.$queryRaw<Array<{axis:'CONTENT';version:string;content_hash:string;payload:unknown;source_version:string;reference:Part['reference']}>>`SELECT * FROM survey_standard_versions
+  WHERE axis='CONTENT' AND reference#>>'{metadata,databaseSource,scaleId}'=${scaleId} LIMIT 1`)
  if(!row)return null
  const part:Part={axis:'CONTENT',version:row.version,hash:row.content_hash,payload:row.payload,sourceVersion:row.source_version,reference:row.reference},pointer=databaseContentSource(part)!
  if(pointer.scaleId!==scaleId||pointer.toolKey!==native.standard_tool_key||pointer.instrumentVersion!==native.instrument_version||canonicalHash(native.definition)!==pointer.definitionDigest||hashScaleDefinition(native.definition as ScaleDefinitionV2)!==native.definition_hash||canonicalHash(part.payload)!==part.hash||pointer.contentHash!==part.hash||canonicalHash(part.reference.metadata)!==part.reference.metadataHash)throw new Error('IMPORTED_POLICY_SOURCE_INVALID')

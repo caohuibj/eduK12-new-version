@@ -507,6 +507,18 @@ export const withQueryRawLabel = async <T>(label: string, operation: () => Promi
 export const currentAssessmentTimelineKind = (): TechnicalTimeline['kind'] | undefined =>
   observationStorage.getStore()?.timeline?.kind
 
+/** Refine an active START raw bucket (start.raw.in_tx / start.raw.inline_definition)
+ * with a per-site suffix. No-op when flags are off or no matching outer label. */
+export const withStartNestedQueryRawLabel = async <T>(site: string, operation: () => Promise<T>): Promise<T> => {
+  if (currentAssessmentTimelineKind() !== 'start') return operation()
+  const current = observationStorage.getStore()?.queryRawLabel || ''
+  const bucket = current.startsWith('start.raw.inline_definition') ? 'start.raw.inline_definition'
+    : current.startsWith('start.raw.in_tx') ? 'start.raw.in_tx'
+    : ''
+  if (!bucket) return operation()
+  return withQueryRawLabel(`${bucket}.${site}`, operation)
+}
+
 /** Split an interactive Prisma transaction into begin/wait, callback, and commit spans. */
 export const tracePrismaInteractiveTransaction = async <T>(
   prefix: string,
