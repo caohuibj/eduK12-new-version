@@ -36,3 +36,27 @@ export const wholeDefinitionWithInlineFallback = async (
   if (usable) return { code: 0, data: inline!, message: 'OK' }
   return fallback()
 }
+
+/** Consume a Study Wave inline definition once. Broken storage/JSON is a cache miss;
+ * it must never prevent the authoritative GET fallback. */
+export const takeStoredWholeDefinition = (
+  attemptId: string,
+  storage: Pick<Storage, 'getItem' | 'removeItem'>,
+): WholeQuestionnaireDefinition | null => {
+  const key = `composite:inline-definition:${attemptId}`
+  let cached: string | null
+  try {
+    cached = storage.getItem(key)
+    storage.removeItem(key)
+  } catch {
+    return null
+  }
+  if (!cached) return null
+  try {
+    const parsed: unknown = JSON.parse(cached)
+    if (typeof parsed !== 'object' || parsed === null || !('attemptId' in parsed) || parsed.attemptId !== attemptId) return null
+    return parsed as WholeQuestionnaireDefinition
+  } catch {
+    return null
+  }
+}
