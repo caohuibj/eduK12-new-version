@@ -41,8 +41,15 @@ jobs:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
       NODE_OPTIONS: --max-old-space-size=3072
       TZ: UTC
+      # GitHub Actions mounts HOME=/github/home (owned by pwuser) while running
+      # the official Playwright image as root. Firefox requires a root-owned HOME.
+      HOME: /root
     steps:
       - uses: actions/checkout@v4
+      - name: trust exact mounted checkout in Playwright container
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git -C "$GITHUB_WORKSPACE" rev-parse --show-toplevel
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
