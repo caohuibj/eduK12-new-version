@@ -1,5 +1,5 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
-import { classifyStartTransaction, AssessmentStartBusyError, rethrowGateBusyAsStartBusy } from './start-transient'
+import { classifyStartTransaction, AssessmentStartBusyError, rethrowGateBusyAsStartBusy, isAssessmentStartBusyError } from './start-transient'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
@@ -294,7 +294,7 @@ const assertNotOrganizationResourceGenericEntry = (resource: {productKind?:strin
   if(resource.productKind==='ORGANIZATION_RESOURCE') throw compositeForbidden('组织资源仅可通过对应的组织任务访问')
 }
 
-const loadComposite = async (id: string, includeItems = false, db: Db = prisma) => {
+export const loadComposite = async (id: string, includeItems = false, db: Db = prisma) => {
   const composite = await db.compositeAssessment.findUnique({
     where: { id },
     include: {
@@ -3211,9 +3211,13 @@ const createAttempt = async (
   await lockCompositeAdmissionShare(db as Prisma.TransactionClient, composite.id)
   if (!['QUESTIONNAIRE','ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     const current=await db.compositeAssessment.findUnique({where:{id:composite.id},
-      select:{status:true,trainingContentSnapshot:true,trainingContentSnapshotHash:true}})
+      select:{status:true,trainingContentSnapshot:true,trainingContentSnapshotHash:true,updatedAt:true}})
     if(!current||current.status!=='PUBLISHED')throw compositeForbidden('测评已停止接收新作答')
-    composite={...composite,trainingContentSnapshot:current.trainingContentSnapshot,trainingContentSnapshotHash:current.trainingContentSnapshotHash}
+    if (composite._preloaded && (current.updatedAt?.getTime() !== composite.updatedAt?.getTime() || current.trainingContentSnapshotHash !== composite.trainingContentSnapshotHash)) {
+      composite = await loadComposite(composite.id, true, db)
+    } else {
+      composite={...composite,trainingContentSnapshot:current.trainingContentSnapshot,trainingContentSnapshotHash:current.trainingContentSnapshotHash}
+    }
   }
   let feedbackBinding: TrainingFeedbackBinding | null = null
   let persistenceBinding: { publicationIdentity: Record<string, unknown>; courseId: string; roundId: string | null; cutoffs: Array<Date | null> } | null = null
@@ -3236,8 +3240,11 @@ const createAttempt = async (
         personalTracking:true,personalTrackingBaselineId:true,personalTrackingOrdinal:true,
         trainingPersistencePolicy: true, trainingPersistencePolicyHash: true,
         trainingContentSnapshot:true,trainingContentSnapshotHash:true,
-        trainingFeedbackPolicy: true, trainingFeedbackPolicyHash: true } })
+        trainingFeedbackPolicy: true, trainingFeedbackPolicyHash: true, updatedAt: true } })
     if (!current || current.status !== 'PUBLISHED' || (!userId && !current.publicEnabled)) throw compositeForbidden('问卷已停止接收新作答')
+    if (composite._preloaded && (current.updatedAt?.getTime() !== composite.updatedAt?.getTime() || current.trainingContentSnapshotHash !== composite.trainingContentSnapshotHash)) {
+      composite = await loadComposite(composite.id, true, db)
+    }
     if (current.opensAt && current.opensAt.getTime() > Date.now()) throw compositeBadRequest('问卷尚未开始')
     if (current.expiresAt && current.expiresAt.getTime() <= Date.now()) throw compositeBadRequest('问卷已过期')
     // Read the publication-owned policy under the same admission lock as status.
@@ -3602,6 +3609,7 @@ export const startRelationalCompositeAttemptInTransaction = async (
     respondentUserId: string
     attemptIdentity: RelationalCompositeAttemptIdentityV1
     educationStart?: VerifiedEducationStart
+    preloadedComposite?: any
   },
 ) => {
   if (input.attemptIdentity.respondentUserId !== input.respondentUserId) {
@@ -3613,7 +3621,9 @@ export const startRelationalCompositeAttemptInTransaction = async (
   // admission it overlaps with, exactly as the previous exclusive row lock did.
   const participantKey = `user:${input.respondentUserId}`
   await lockRelationalAdmission(db, input.compositeAssessmentId, participantKey)
-  const composite = await loadComposite(input.compositeAssessmentId, true, db)
+  let composite = (input.preloadedComposite && input.preloadedComposite.id === input.compositeAssessmentId)
+    ? { ...input.preloadedComposite, _preloaded: true }
+    : await loadComposite(input.compositeAssessmentId, true, db)
   assertSupportedComposite(composite, false, false)
   if (composite.status !== 'PUBLISHED') throw compositeBadRequest('关系测评运行目标尚未发布')
   if (composite.deliveryMode === 'LEGACY') throw compositeBadRequest('关系测评必须使用 Unified FINAL_ONLY 运行时')
@@ -3635,7 +3645,7 @@ export const startRelationalCompositeAttemptInTransaction = async (
     orderBy: { attemptNo: 'desc' },
     select: { attemptNo: true },
   })
-  return createAttempt(
+  const attempt = await createAttempt(
     db,
     composite,
     input.respondentUserId,
@@ -3647,6 +3657,10 @@ export const startRelationalCompositeAttemptInTransaction = async (
     undefined,
     input.educationStart,
   )
+  if (attempt && !(attempt as any).compositeAssessment) {
+    (attempt as any).compositeAssessment = composite
+  }
+  return attempt
 }
 
 /** Field authority is verified by the product adapter in this same transaction.
@@ -5360,9 +5374,16 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
         const job = await readCompositeReportJobHeader(attemptId, runtime.attemptEpoch)
         return { ...state, allUnitsSubmitted: true, reportStatus: compositeReportJobState(job) }
       }
-      const finalized = await finalizeCompositeAttemptIfReady(attemptId, { preloadedParent: runtime })
-      if (!finalized) return state
-      return patchCompositeStateAfterFinalize(state, finalized)
+      try {
+        const finalized = await finalizeCompositeAttemptIfReady(attemptId, { preloadedParent: runtime })
+        if (!finalized) return state
+        return patchCompositeStateAfterFinalize(state, finalized)
+      } catch (err: any) {
+        if (err?.code === 'COMPLETION_BUSY' || isAssessmentStartBusyError(err)) {
+          return { ...state, allUnitsSubmitted: true }
+        }
+        throw err
+      }
     }
     return state
   }

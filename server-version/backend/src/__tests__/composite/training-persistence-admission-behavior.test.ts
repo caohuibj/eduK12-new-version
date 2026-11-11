@@ -119,7 +119,7 @@ describe('C23 persistence admission projection (schema-aware mock DB, actual sta
     expect(Object.keys(selected[0][0].select).sort()).toEqual([
       'status', 'publicEnabled', 'opensAt', 'expiresAt', 'trainingPersistencePolicy', 'trainingPersistencePolicyHash',
       'trainingFeedbackPolicy', 'trainingFeedbackPolicyHash', 'trainingContentSnapshot', 'trainingContentSnapshotHash',
-      'personalTracking', 'personalTrackingBaselineId', 'personalTrackingOrdinal',
+      'personalTracking', 'personalTrackingBaselineId', 'personalTrackingOrdinal', 'updatedAt',
     ].sort())
     if (!enabled) expect(db.$queryRaw.mock.calls.some(([query]) => query.join('').includes('FOR SHARE OF c,u'))).toBe(false)
     expect(state.order).toEqual(enabled

@@ -145,6 +145,22 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
    if(result.runtimeBindingKind!=='COMPOSITE')throw new TeacherAssessmentRuntimeError()
    // Re-read the actual persisted Run binding, not just the adapter response.
    await access.own(req.user!.userId,{executionId,attemptId:result.runtimeBindingRef})
+   const requestedDelivery = req.query.view === 'current-unit'
+     || req.query.delivery === 'inline'
+     || (req.body && typeof req.body === 'object' && ((req.body as any).delivery === 'inline' || (req.body as any).view === 'current-unit'))
+   if (requestedDelivery && result.runtimeBindingRef) {
+     try {
+       const currentUnit = await getAttemptState(
+         result.runtimeBindingRef,
+         { userId: req.user!.userId },
+         undefined,
+         'current-unit',
+       )
+       return { ...result, currentUnit: projectTeacherCompositeRuntime(currentUnit) }
+     } catch {
+       return result
+     }
+   }
   }
   return result
  }))

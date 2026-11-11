@@ -219,6 +219,7 @@ const startTransactionalComposite = async (input: {
   executionId: string
   actorUserId: string
   launch: LaunchEnvelope
+  preloadedComposite?: any
 }): Promise<RunStartExecutionResult> => {
   try {
     return await classifyStartTransaction(() => prisma.$transaction(async (tx) => {
@@ -237,13 +238,15 @@ const startTransactionalComposite = async (input: {
   if (!claim || claim.claimGeneration !== input.decision.claim.claimGeneration || !['CLAIMED', 'DISPATCHED'].includes(claim.state)) {
     throw new RunStartExecutionError('RUN_START_FENCE_LOST', 'START claim ownership changed before transactional dispatch', 409)
   }
-  const admission = await loadRunExecutionStartAdmission({
-    tx,
-    executionId: input.executionId,
-    actorUserId: input.actorUserId,
-    admitted: true,
-    admittedAttemptIdentity: input.decision.claim.admittedAttemptIdentity,
-  })
+  const admission = input.decision.kind === 'ACQUIRED'
+    ? input.decision.admission
+    : await loadRunExecutionStartAdmission({
+        tx,
+        executionId: input.executionId,
+        actorUserId: input.actorUserId,
+        admitted: true,
+        admittedAttemptIdentity: input.decision.claim.admittedAttemptIdentity,
+      })
   // Claim tx already froze provenance on first START. Skip the freeze
   // SELECT+early-return when the locked execution row is already frozen;
   // recovered pre-freeze claims still backfill below.
@@ -307,10 +310,8 @@ const startTransactionalComposite = async (input: {
   if (admission.assignment.status !== 'OPEN') {
     throw new RunStartExecutionError('RUN_START_OUTCOME_UNKNOWN', 'STARTED assignment has no authoritative runtime attempt', 409)
   }
-  // A claim can be accepted while an Activity is OPEN, then wait for the
-  // runtime transaction while the school pauses it or revokes a student.
   // Re-check current PR1 membership, class approval and PR2 Activity gates
-  // **under the second transaction's locks** before creating any attempt.
+  // under the second transaction's locks before creating any attempt.
   // Idempotent reconciliation of an already-created attempt remains above.
   await assertCurrentRunStartAuthority(tx, input.executionId, {accountMode:'DETECT_EDUCATION_LIBRARY'})
   if (admission.assignment.resourceKey.startsWith('library-scale:')||admission.assignment.resourceKey.startsWith('private-scale:')) {
@@ -357,6 +358,7 @@ const startTransactionalComposite = async (input: {
     respondentUserId: input.actorUserId,
     attemptIdentity: admission.attemptIdentity,
     educationStart: compositionStart??educationSource?.startProof,
+    preloadedComposite: input.preloadedComposite,
   })
   const changed = await tx.$executeRaw`
     UPDATE "assessment_run_executions"
@@ -627,7 +629,20 @@ export const startAssessmentRunExecution = async (input: {
         if (launch.runtimeTargetKind !== 'COMPOSITE') {
           throw new RunStartExecutionError('RUN_RUNTIME_TARGET_UNSUPPORTED', 'transactional Run adapter supports Composite runtime only', 409)
         }
-        return startTransactionalComposite({ decision, executionId: input.executionId, actorUserId: input.actorUserId, launch })
+        let preloadedComposite: any
+        try {
+          const { loadComposite } = await import('../composite/composite.service')
+          preloadedComposite = await loadComposite(launch.runtimeTargetRef, true)
+        } catch {
+          // Fallback to in-transaction load if preloading fails
+        }
+        return startTransactionalComposite({
+          decision,
+          executionId: input.executionId,
+          actorUserId: input.actorUserId,
+          launch,
+          preloadedComposite,
+        })
       }
       return recoverOrDispatchExternal({
         decision,
