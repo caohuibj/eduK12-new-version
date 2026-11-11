@@ -82,6 +82,39 @@ export async function createLinkedResearchIdentity(input:{
   let secret=opaque()
   const participantId=randomUUID(),researchCode=code(),attemptId=randomUUID()
   return await surveyAdmissionGate().run(async () => {
+    // P3: pre-compute the memorable credential OUTSIDE the join transaction.
+    // memorableCredential is scrypt(N=16384) — deliberately slow (~55-70ms) —
+    // and depends only on (projectId, prefix, suffix, credentialVersion), not
+    // on any locked state. Computing it inside the tx holds the wave-row
+    // FOR UPDATE lock for the whole scrypt and serializes all concurrent
+    // joins on it. It runs here — inside the admission gate (which bounds
+    // concurrency, so the scrypt's own 4-concurrent gate is never flooded)
+    // but before the transaction opens, so the lock is never held during
+    // the scrypt. The version is re-verified under FOR UPDATE inside the
+    // tx; if a credential reset changed it in between, the secret is
+    // recomputed there (rare path). The scrypt cost itself is unchanged —
+    // only where it runs moved — so its brute-force resistance is intact.
+    let precomputedSecret: string | undefined
+    let precomputedVersion: number | undefined
+    if(memorable){
+      if(input.generatedCode){
+        // The code row is created inside the tx below with the schema
+        // default credentialVersion 0, so pre-compute with that version.
+        // The in-tx re-verification below still guards a default change.
+        precomputedVersion=0
+        precomputedSecret=await memorableCredential(input.projectId,memorable.prefix,memorable.suffix,0)
+      }else{
+        const preRows=await prisma.$queryRaw<Array<{credentialVersion:number}>>`
+          SELECT credential_version AS "credentialVersion"
+          FROM survey_participant_codes WHERE project_id=${input.projectId} AND prefix=${memorable.prefix}`
+        if(preRows.length){
+          precomputedVersion=preRows[0].credentialVersion
+          precomputedSecret=await memorableCredential(input.projectId,memorable.prefix,memorable.suffix,precomputedVersion)
+        }
+        // No row yet: the in-tx path fails as before (409). The pre-read is
+        // advisory only; the FOR UPDATE read inside the tx is authoritative.
+      }
+    }
     await prisma.$transaction(async tx=>{
       const wave=await activePublicWave(tx,input.projectId,input.waveId,input.entryToken,input.generatedCode?'SELF_CODE':memorable?'MEMORABLE_CODE':'PERSONAL_LINK')
       if(input.consentVersion!==wave.consentVersion)
@@ -99,7 +132,15 @@ export async function createLinkedResearchIdentity(input:{
         const row=rows[0]
         if(!row||row.participantId)throw new ResearchIdentityError(409,'编号不可用于首次参加，请核对编号或使用已有完整编码继续。')
         codeRowId=row.id
-        secret=await memorableCredential(input.projectId,memorable.prefix,memorable.suffix,row.credentialVersion)
+        if(precomputedSecret!==undefined&&precomputedVersion===row.credentialVersion){
+          secret=precomputedSecret
+        }else{
+          // Credential version changed between pre-computation and lock
+          // acquisition (reset), or the row did not exist pre-tx — recompute
+          // inside the tx so the issued secret always matches the version
+          // recorded for this enrollment.
+          secret=await memorableCredential(input.projectId,memorable.prefix,memorable.suffix,row.credentialVersion)
+        }
       }
       const claimed=await tx.surveyWave.updateMany({
         where:{id:input.waveId,projectId:input.projectId,status:'OPEN',
