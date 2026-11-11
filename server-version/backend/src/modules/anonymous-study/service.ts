@@ -10,6 +10,7 @@ import { compositeExportService } from '../composite/composite-export.service'
 import { projectCompositeExportData, resolveCompositeExportProjectionBinding } from '../composite/composite-export-projection'
 
 import * as codes from './participation.crypto'
+import { studyJoinAdmissionGate } from './study-join-admission-gate'
 
 type Db = Prisma.TransactionClient
 export type ParticipationMode='PERSONAL_LINK'|'MEMORABLE_CODE'|'SELF_CODE'
@@ -158,37 +159,73 @@ export async function publicWaveInfo(waveId:string,token:string) {
 }
 export async function joinStudy(waveId:string,token:string,consent:boolean,input?:{prefix?:string;suffix?:string;generatedCode?:true}) {
   if(!consent) throw compositeBadRequest('请先确认保存身份及研究内历史关联')
-  const info=await publicWaveInfo(waveId,token)
-  if(!info.accepting)throw compositeForbidden('本波次暂不接受新加入')
-  const id=randomUUID(),displayCode=`P-${randomBytes(6).toString('hex').toUpperCase()}`
-  let credential=createStudyCredential(),fullCode:string|undefined
-  await prisma.$transaction(async tx=>{
-    await tx.$queryRaw`SELECT id FROM anonymous_studies WHERE id=${info.studyId} FOR UPDATE`
-    const w=await readWave(tx,waveId);assertAdmission(w)
-    const mode=w.mode??'PERSONAL_LINK'
-    if(mode==='PERSONAL_LINK'){
-      if(input?.prefix!==undefined||input?.suffix!==undefined||input?.generatedCode)throw compositeBadRequest('本活动使用个人链接参与')
-    }else{
-      let prefix:string,suffix:string
-      if(mode==='SELF_CODE'){
-        if(!input?.generatedCode||input.prefix!==undefined||input.suffix!==undefined)throw compositeBadRequest('请领取服务器生成的参与码')
-        fullCode=codes.generateStudyCode();prefix=codes.generatedCodeLookup(w.studyId,fullCode);suffix=fullCode
-        await tx.$executeRaw`INSERT INTO anonymous_study_codes(id,study_id,prefix) VALUES(${randomUUID()},${w.studyId},${prefix})`
-      }else{
-        prefix=codes.normalizeShortCode(input?.prefix??'');suffix=(input?.suffix??'').normalize('NFKC').trim().toUpperCase()
-        if(input?.generatedCode||!codes.validShortCode(prefix)||!/^[A-Z0-9]{4,12}$/.test(suffix))throw compositeBadRequest('请输入分配编号，并设置4–12位字母或数字秘密后缀')
-        fullCode=prefix+'-'+suffix
+  return await studyJoinAdmissionGate().run(async () => {
+    const info=await publicWaveInfo(waveId,token)
+    if(!info.accepting)throw compositeForbidden('本波次暂不接受新加入')
+    const id=randomUUID(),displayCode=`P-${randomBytes(6).toString('hex').toUpperCase()}`
+    let credential=createStudyCredential(),fullCode:string|undefined
+    const mode = info.mode ?? 'PERSONAL_LINK'
+    let precomputedSecret: string | undefined
+    let precomputedVersion: number | undefined
+    let precomputedPrefix: string | undefined
+    let precomputedSuffix: string | undefined
+
+    if (mode === 'SELF_CODE') {
+      if(!input?.generatedCode||input.prefix!==undefined||input.suffix!==undefined)throw compositeBadRequest('请领取服务器生成的参与码')
+      fullCode=codes.generateStudyCode()
+      precomputedPrefix=codes.generatedCodeLookup(info.studyId,fullCode)
+      precomputedSuffix=fullCode
+      precomputedVersion=0
+      precomputedSecret=await codes.memorableCredential(info.studyId,precomputedPrefix,precomputedSuffix,0)
+    } else if (mode === 'MEMORABLE_CODE') {
+      const pRaw=codes.normalizeShortCode(input?.prefix??'')
+      const sRaw=(input?.suffix??'').normalize('NFKC').trim().toUpperCase()
+      if(input?.generatedCode||!codes.validShortCode(pRaw)||!/^[A-Z0-9]{4,12}$/.test(sRaw))throw compositeBadRequest('请输入分配编号，并设置4–12位字母或数字秘密后缀')
+      precomputedPrefix=pRaw
+      precomputedSuffix=sRaw
+      fullCode=precomputedPrefix+'-'+precomputedSuffix
+      const preRows=await prisma.$queryRaw<Array<{credentialVersion:number}>>`
+        SELECT credential_version AS "credentialVersion"
+        FROM anonymous_study_codes WHERE study_id=${info.studyId} AND prefix=${precomputedPrefix} AND enabled`
+      if(preRows[0]) {
+        precomputedVersion=preRows[0].credentialVersion
+        precomputedSecret=await codes.memorableCredential(info.studyId,precomputedPrefix,precomputedSuffix,precomputedVersion)
       }
-      const rows=await tx.$queryRaw<Array<{id:string;participantId:string|null;version:number}>>`SELECT id,participant_id AS "participantId",credential_version AS version FROM anonymous_study_codes WHERE study_id=${w.studyId} AND prefix=${prefix} AND enabled FOR UPDATE`
-      if(!rows[0]||rows[0].participantId)throw compositeForbidden('参与编号无效或已领取，请使用完整参与码恢复')
-      credential=await codes.memorableCredential(w.studyId,prefix,suffix,rows[0].version)
-      await tx.$executeRaw`INSERT INTO anonymous_study_participants(id,study_id,credential_hash,display_code) VALUES(${id},${w.studyId},${hashRecoveryToken(credential)},${displayCode})`
-      await tx.$executeRaw`UPDATE anonymous_study_codes SET participant_id=${id} WHERE id=${rows[0].id}`
-      return
+    } else {
+      if(input?.prefix!==undefined||input?.suffix!==undefined||input?.generatedCode)throw compositeBadRequest('本活动使用个人链接参与')
     }
-    await tx.$executeRaw`INSERT INTO anonymous_study_participants(id,study_id,credential_hash,display_code) VALUES(${id},${info.studyId},${hashRecoveryToken(credential)},${displayCode})`
+
+    await prisma.$transaction(async tx=>{
+      await tx.$queryRaw`SELECT id FROM anonymous_studies WHERE id=${info.studyId} FOR UPDATE`
+      const w=await readWave(tx,waveId);assertAdmission(w)
+      const currentMode=w.mode??'PERSONAL_LINK'
+      if(currentMode==='PERSONAL_LINK'){
+        if(input?.prefix!==undefined||input?.suffix!==undefined||input?.generatedCode)throw compositeBadRequest('本活动使用个人链接参与')
+      }else{
+        let prefix:string,suffix:string
+        if(currentMode==='SELF_CODE'){
+          prefix=precomputedPrefix!
+          suffix=precomputedSuffix!
+          await tx.$executeRaw`INSERT INTO anonymous_study_codes(id,study_id,prefix) VALUES(${randomUUID()},${w.studyId},${prefix})`
+        }else{
+          prefix=precomputedPrefix!
+          suffix=precomputedSuffix!
+        }
+        const rows=await tx.$queryRaw<Array<{id:string;participantId:string|null;version:number}>>`SELECT id,participant_id AS "participantId",credential_version AS version FROM anonymous_study_codes WHERE study_id=${w.studyId} AND prefix=${prefix} AND enabled FOR UPDATE`
+        if(!rows[0]||rows[0].participantId)throw compositeForbidden('参与编号无效或已领取，请使用完整参与码恢复')
+        if(precomputedSecret!==undefined && precomputedVersion===rows[0].version){
+          credential=precomputedSecret
+        }else{
+          credential=await codes.memorableCredential(w.studyId,prefix,suffix,rows[0].version)
+        }
+        await tx.$executeRaw`INSERT INTO anonymous_study_participants(id,study_id,credential_hash,display_code) VALUES(${id},${w.studyId},${hashRecoveryToken(credential)},${displayCode})`
+        await tx.$executeRaw`UPDATE anonymous_study_codes SET participant_id=${id} WHERE id=${rows[0].id}`
+        return
+      }
+      await tx.$executeRaw`INSERT INTO anonymous_study_participants(id,study_id,credential_hash,display_code) VALUES(${id},${info.studyId},${hashRecoveryToken(credential)},${displayCode})`
+    })
+    return {studyId:info.studyId,credential,displayCode,...(fullCode?{fullCode}:{})}
   })
-  return {studyId:info.studyId,credential,displayCode,...(fullCode?{fullCode}:{})}
 }
 
 async function participant(db:Db,studyId:string,credential:string) {
