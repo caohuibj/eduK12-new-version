@@ -128,13 +128,15 @@ jobs:
       - name: prepare Chromium for seeded browser
         working-directory: server-version/backend
         run: |
-          playwright_version="$(node -p "require('playwright-core/package.json').version")"
-          deps_marker="$HOME/.cache/eduk12-ci/playwright-deps-${playwright_version}"
-          if [ ! -f "$deps_marker" ]; then
-            npx playwright-core install-deps chromium
-            touch "$deps_marker"
+          set -euo pipefail
+          # Browser cache is keyed to this exact lockfile; native libraries
+          # belong to this ephemeral runner and must be verified, not marked.
+          timeout -k 10s 180s npx playwright-core install chromium
+          if ! timeout -k 10s 30s node -e "require('playwright-core').chromium.launch({headless:true}).then(b=>b.close()).catch(e=>{console.error(e);process.exitCode=1})"; then
+            echo '::notice::Browser runtime missing; installing Chromium system dependencies'
+            timeout -k 10s 240s npx playwright-core install-deps chromium
+            timeout -k 10s 30s node -e "require('playwright-core').chromium.launch({headless:true}).then(b=>b.close()).catch(e=>{console.error(e);process.exitCode=1})"
           fi
-          npx playwright-core install chromium
       - name: frontend npm ci
         working-directory: server-version/frontend
         run: npm ci
