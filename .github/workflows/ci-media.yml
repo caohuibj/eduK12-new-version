@@ -196,18 +196,6 @@ jobs:
         path: server-version/frontend/dist
     - name: verify frontend build provenance
       run: node .github/scripts/ci-artifact.mjs verify frontend
-    # The media2 acceptance deliberately forces canvas@3.x to rebuild from
-    # source. Its native header checks are not covered by a successful npm
-    # prebuilt install, so install these prerequisites only in this lane.
-    # Fail closed if apt cannot provide them; never skip the source-build test.
-    - name: prepare Media2 Canvas source-build prerequisites (bounded)
-      if: matrix.group == 'images-video' && contains(fromJSON(inputs.selected), 'media2')
-      run: |
-        set -euo pipefail
-        if ! pkg-config --exists pixman-1 cairo pangocairo librsvg-2.0; then
-          timeout -k 10s 300s bash server-version/scripts/ci-install-canvas-deps.sh
-        fi
-        pkg-config --exists pixman-1 cairo pangocairo librsvg-2.0
     - name: media2 independent scenario
       if: matrix.group == 'images-video' && contains(fromJSON(inputs.selected), 'media2')
       uses: ./.github/actions/accept-media2
