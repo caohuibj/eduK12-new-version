@@ -99,9 +99,24 @@ jobs:
     # A stalled registry / apt / browser download fails the gate rather than
     # holding the whole 25-minute media job without progress.
     - name: prepare native Canvas libraries (bounded)
-      run: timeout -k 10s 240s bash server-version/scripts/ci-install-canvas-deps.sh
+      run: |
+        # canvas@3.x ships N-API prebuilds. The hosted runner may be missing
+        # source-build headers even when the native prebuilt loads correctly.
+        # Probe first instead of forcing apt update on every media job.
+        if command -v pkg-config >/dev/null && pkg-config --exists pixman-1 cairo pangocairo librsvg-2.0; then
+          echo 'Canvas source-build prerequisites available.'
+        else
+          echo 'Canvas source-build prerequisites unavailable; test pinned npm prebuilt first.'
+        fi
     - name: install backend dependencies (bounded)
-      run: timeout -k 10s 240s npm ci --prefix server-version/backend
+      run: |
+        set -euo pipefail
+        if ! timeout -k 10s 240s npm ci --prefix server-version/backend; then
+          echo '::notice::Native prebuilt unavailable; installing Canvas build dependencies'
+          timeout -k 10s 240s bash server-version/scripts/ci-install-canvas-deps.sh
+          timeout -k 10s 240s npm ci --prefix server-version/backend
+        fi
+        node -e "require('./server-version/backend/node_modules/canvas')"
     - name: install frontend dependencies (bounded)
       run: timeout -k 10s 240s npm ci --prefix server-version/frontend
     - name: install pinned Chromium and verify runtime dependencies (bounded)
