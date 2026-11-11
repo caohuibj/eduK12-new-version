@@ -3713,7 +3713,26 @@ const trainingStartGate = (): BoundedAdmissionGate => {
   }
   return gateInstance
 }
-export const startUserAttempt = async (userId: string, compositeId: string) => {
+const projectStartedAttempt = async (
+  attemptId: string,
+  principal: { userId?: string; recoveryTokenHash?: string },
+  wantsWholeDelivery: boolean,
+  recoveryToken: string | null,
+) => {
+  if (!wantsWholeDelivery) {
+    return { attempt: await getAttemptState(attemptId, principal), recoveryToken }
+  }
+  const parent = await prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId },
+    select: START_WHOLE_PARENT_SELECT,
+  })
+  if (!parent) throw compositeNotFound('综合测评记录不存在')
+  const attempt = await getAttemptState(attemptId, principal, undefined, 'full', parent)
+  const { startResponseWithInlineWholeDefinition } = await import('./whole-start-inline')
+  return startResponseWithInlineWholeDefinition(true, { attempt, recoveryToken }, principal, parent)
+}
+
+export const startUserAttempt = async (userId: string, compositeId: string, opts?: { wantsWholeDelivery?: boolean }) => {
   // Pure-read (write-time invariant): the student start path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
@@ -3729,7 +3748,7 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
     WHERE "composite_assessment_id" = ${compositeId} AND "user_id" = ${userId}
       AND "status" = 'IN_PROGRESS'
     ORDER BY "started_at" DESC LIMIT 1 FOR SHARE`
-  if (inProgress) return { attempt: await getAttemptState(inProgress.id, { userId }), recoveryToken: null }
+  if (inProgress) return projectStartedAttempt(inProgress.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)
 
   const isUniqueConstraintError = (err: unknown) =>
     typeof err === 'object' && err !== null && 'code' in err && (err as { code?: unknown }).code === 'P2002'
@@ -3768,7 +3787,7 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
           }, { maxWait: 10_000, timeout: 30_000 }))
         } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
       })
-      return { attempt: await getAttemptState(attempt.id, { userId }), recoveryToken: null }
+      return projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)
     } catch (err) {
       if (!isUniqueConstraintError(err) || retry === 1) throw err
     }
@@ -3984,7 +4003,7 @@ export type PublicStudyAdmission = {
   beforeAdmission: (tx: Prisma.TransactionClient) => Promise<string | null>
   afterAdmission: (tx: Prisma.TransactionClient, attemptId: string) => Promise<void>
 }
-export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string, study?: PublicStudyAdmission) => {
+export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string, study?: PublicStudyAdmission, opts?: { wantsWholeDelivery?: boolean }) => {
   const token = await findPublicToken(tokenValue)
   // Pure-read (write-time invariant): the public start path never lazily
   // repairs sections on a published composite. loadComposite already includes
@@ -3994,7 +4013,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   if (recoveryToken) {
     const recoveryTokenHash = hashRecoveryToken(recoveryToken)
     const existing = await prisma.compositeAssessmentAttempt.findFirst({ where: { accessTokenId: token.id, recoveryTokenHash } })
-    if (existing) return { attempt: await getAttemptState(existing.id, { recoveryTokenHash }), recoveryToken: null }
+    if (existing) return projectStartedAttempt(existing.id, { recoveryTokenHash }, Boolean(opts?.wantsWholeDelivery), null)
     throw compositeForbidden('恢复凭证无效')
   }
   if (!study) assertTokenWindow(token)
@@ -4020,7 +4039,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
     await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
     return admitted
   }))
-  return { attempt: await getAttemptState(attempt.id, { recoveryTokenHash: credential.hash }), recoveryToken: credential.token }
+  return projectStartedAttempt(attempt.id, { recoveryTokenHash: credential.hash }, Boolean(opts?.wantsWholeDelivery), credential.token)
 }
 
 /** Restart an anonymous attempt using only the server-issued recovery hash. */
@@ -4541,6 +4560,25 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT_NARROWED = {
 // frozen hashes, and the training variant/flow markers — so scope resolution
 // never sees UNKNOWN, and the finalize/reconcile post-processing keeps its
 // inputs.
+
+// Union of the narrowed attempt-state parent and the whole-definition parent
+// (admission-ready scale children + a few report scalars). Used only on the
+// delivery=whole START path so getAttemptState and getWholeQuestionnaireDefinition
+// share one parent read. In-tx admission rechecks and the FLOW re-read below
+// stay authoritative and are not skipped.
+export const START_WHOLE_PARENT_SELECT = {
+  ...UNIFIED_ATTEMPT_STATE_PARENT_SELECT_NARROWED,
+  progress: true,
+  aggregateInputHash: true,
+  scaleAssessments: {
+    orderBy: { startedAt: 'asc' as const },
+    select: {
+      ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
+      scale: { select: { ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT.scale.select, instruction: true } },
+    },
+  },
+} satisfies Prisma.CompositeAssessmentAttemptSelect
+export type StartWholeParent = Prisma.CompositeAssessmentAttemptGetPayload<{ select: typeof START_WHOLE_PARENT_SELECT }>
 
 export type CompositeAttemptStateView = 'full' | 'current-unit'
 
@@ -5337,7 +5375,7 @@ const patchCompositeStateAfterFinalize = (
   }
 }
 
-export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }, requestedUnit?: {itemId?:string;sectionId?:string}, view: CompositeAttemptStateView = 'full') => {
+export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }, requestedUnit?: {itemId?:string;sectionId?:string}, view: CompositeAttemptStateView = 'full', preloadedParent?: StartWholeParent | null) => {
   // Load-once: the parent row is read exactly once with the narrowed unified
   // select and shared by the unified state projection and the
   // ensure*AtDelivery steps. The narrowed shape drops only fields the
@@ -5345,10 +5383,13 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
   // the full select for every attempt — no second read for special
   // questionnaires. The legacy path (rare, pre-UNIFIED_V1 attempts)
   // re-reads through findAttempt below.
-  let runtime = await prisma.compositeAssessmentAttempt.findUnique({
+  // Optional preloadedParent is the delivery=whole START union read; it must
+  // belong to this attempt. The FLOW marker path still re-reads below.
+  if (preloadedParent && preloadedParent.id !== attemptId) throw compositeConflict('预加载的作答记录与请求不一致')
+  let runtime = (preloadedParent ?? await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
     select: UNIFIED_ATTEMPT_STATE_PARENT_SELECT_NARROWED,
-  }) as any
+  })) as any
   if (!runtime) throw compositeNotFound('综合测评记录不存在')
   if (runtime.runtimeGeneration === 'UNIFIED_V1') {
     if(trainingFlowMarkerState(runtime)==='FLOW'){
