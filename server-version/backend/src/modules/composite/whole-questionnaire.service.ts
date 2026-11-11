@@ -112,10 +112,13 @@ export const copyWholeCommittedReportParent = (parent: WholeReportParent,
 })
 
 const failure = (message: string, status = 409) => new InstrumentFinalSubmitError('STALE_ATTEMPT', message, status)
-const loadParent = async (attemptId: string, principal: Principal, preloaded?: WholeReportParent, receipt?:AcceptedStudyReceipt) => {
-  const loaded = preloaded ?? await prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: wholeParentSelect })
+const loadWholeDefinitionParent = (attemptId: string) => prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: wholeParentSelect })
+type WholeDefinitionParent = NonNullable<Awaited<ReturnType<typeof loadWholeDefinitionParent>>>
+const loadParent = async (attemptId: string, principal: Principal, preloaded?: WholeReportParent | WholeDefinitionParent | { id: string } | null, receipt?:AcceptedStudyReceipt) => {
+  if (preloaded && 'id' in preloaded && preloaded.id !== attemptId) throw failure('预加载的作答记录与请求不一致')
+  const loaded = (preloaded as WholeDefinitionParent | null | undefined) ?? await loadWholeDefinitionParent(attemptId)
   if (!loaded) throw failure('问卷作答不存在', 404)
-  let parent = loaded
+  let parent = loaded as WholeDefinitionParent
   const owned = principal.userId ? parent.userId === principal.userId
     : parent.userId === null && Boolean(principal.recoveryTokenHash && parent.recoveryTokenHash === principal.recoveryTokenHash)
   const accepted=receipt && await assertCurrentStudyPrincipal(prisma,{attemptId,userId:principal.userId,recoveryTokenHash:principal.recoveryTokenHash,attemptEpoch:parent.attemptEpoch,receipt})
@@ -219,9 +222,9 @@ export const clearWholeQuestionnaireStaticCacheForTest = () => {
 }
 
 /** Delivery only: freeze each admission once, before collecting any answers. */
-export const getWholeQuestionnaireDefinition = async (attemptId: string, principal: Principal) => withSharedControlContext(async () => {
+export const getWholeQuestionnaireDefinition = async (attemptId: string, principal: Principal, preloaded?: Parameters<typeof loadParent>[2]) => withSharedControlContext(async () => {
   if (!assessmentReportConfig().wholeSubmitEnabled) throw failure('整份交卷入口暂未开启')
-  const { parent, children, frozen } = await loadParent(attemptId, principal)
+  const { parent, children, frozen } = await loadParent(attemptId, principal, preloaded)
   if (parent.status !== 'IN_PROGRESS') throw failure('问卷已结束')
 
   // The SlotSet hash binds the frozen runtime, but the template also carries

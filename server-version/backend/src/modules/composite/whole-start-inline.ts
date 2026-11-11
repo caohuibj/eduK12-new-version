@@ -16,12 +16,14 @@ export const startResponseWithInlineWholeDefinition = async <T extends StartPayl
   wantsWholeDelivery: boolean,
   data: T,
   principal: { userId?: string; recoveryTokenHash?: string },
+  preloadedParent?: { id: string } | null,
 ): Promise<T | (T & { wholeDefinition: WholeDefinition })> => {
+  if ((data as T & { wholeDefinition?: WholeDefinition }).wholeDefinition) return data
   const attemptId = data?.attempt?.id
   if (!wantsWholeDelivery || !attemptId || data.attempt?.executionMode !== 'WHOLE_LOCAL') return data
   try {
     const { getWholeQuestionnaireDefinition } = await import('./whole-questionnaire.service')
-    const wholeDefinition = await getWholeQuestionnaireDefinition(attemptId, principal)
+    const wholeDefinition = await getWholeQuestionnaireDefinition(attemptId, principal, preloadedParent)
     return { ...data, wholeDefinition }
   } catch (error) {
     logger.info('whole definition inline delivery', { phase: 'inline_delivery', outcome: 'fallback',

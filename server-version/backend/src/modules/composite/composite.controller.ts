@@ -419,8 +419,8 @@ export const compositeController = {
   async startAttempt(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
-      const data = await service.startUserAttempt(req.user.userId, req.params.id)
       const wantsWhole = req.query.delivery === 'whole' || (req.body as { delivery?: unknown } | undefined)?.delivery === 'whole'
+      const data = await service.startUserAttempt(req.user.userId, req.params.id, { wantsWholeDelivery: wantsWhole })
       const payload = await startResponseWithInlineWholeDefinition(wantsWhole, data, { userId: req.user.userId })
       return success(res, payload, '综合测评已开始')
     } catch (err) { return handleError(res, err) }
@@ -733,7 +733,7 @@ export const compositeController = {
   async publicStart(req: Request, res: Response) {
     try {
       const input = z.object({ recoveryToken: z.string().min(20).max(200).optional() }).strict().parse(req.body || {})
-      const data = await service.startPublicAttempt(req.params.token, input.recoveryToken)
+      const data = await service.startPublicAttempt(req.params.token, input.recoveryToken, undefined, { wantsWholeDelivery: req.query.delivery === 'whole' })
       // The strict body schema stays untouched: inline delivery is requested via
       // the query channel. A fresh start must bind the definition to the newly
       // issued recovery token, a resume to the presented one.

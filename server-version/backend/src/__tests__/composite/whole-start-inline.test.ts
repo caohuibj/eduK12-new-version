@@ -18,7 +18,7 @@ describe('whole definition inline delivery with START (X-05A)', () => {
     getDefinition.mockResolvedValue(definition)
     const data = { attempt: { id: 'attempt-1', executionMode: 'WHOLE_LOCAL' }, recoveryToken: null }
     const result = await startResponseWithInlineWholeDefinition(true, data, { userId: 'user-1' })
-    expect(getDefinition).toHaveBeenCalledWith('attempt-1', { userId: 'user-1' })
+    expect(getDefinition).toHaveBeenCalledWith('attempt-1', { userId: 'user-1' }, undefined)
     expect(result).toEqual({ ...data, wholeDefinition: definition })
   })
 
@@ -35,5 +35,21 @@ describe('whole definition inline delivery with START (X-05A)', () => {
     getDefinition.mockRejectedValue(new Error('整份交卷入口暂未开启'))
     const base = { attempt: { id: 'attempt-1', executionMode: 'WHOLE_LOCAL' }, recoveryToken: null }
     await expect(startResponseWithInlineWholeDefinition(true, base, { userId: 'user-1' })).resolves.toBe(base)
+  })
+
+  it('does not reload the definition when START already attached it', async () => {
+    getDefinition.mockResolvedValue(definition)
+    const data = { attempt: { id: 'attempt-1', executionMode: 'WHOLE_LOCAL' }, recoveryToken: null, wholeDefinition: definition }
+    const result = await startResponseWithInlineWholeDefinition(true, data, { userId: 'user-1' })
+    expect(getDefinition).not.toHaveBeenCalled()
+    expect(result).toEqual(data)
+  })
+
+  it('forwards a preloaded parent into the definition entrypoint', async () => {
+    getDefinition.mockResolvedValue(definition)
+    const parent = { id: 'attempt-1' }
+    const data = { attempt: { id: 'attempt-1', executionMode: 'WHOLE_LOCAL' }, recoveryToken: null }
+    await startResponseWithInlineWholeDefinition(true, data, { userId: 'user-1' }, parent)
+    expect(getDefinition).toHaveBeenCalledWith('attempt-1', { userId: 'user-1' }, parent)
   })
 })
