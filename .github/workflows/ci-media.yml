@@ -148,6 +148,12 @@ jobs:
             @ffmpeg-installer/ffmpeg@1.1.0 @ffprobe-installer/ffprobe@2.1.2
           ffmpeg_bin="$(node -e "process.stdout.write(require(process.argv[1]).path)" "$tools_dir/node_modules/@ffmpeg-installer/ffmpeg")"
           ffprobe_bin="$(node -e "process.stdout.write(require(process.argv[1]).path)" "$tools_dir/node_modules/@ffprobe-installer/ffprobe")"
+          # npm tarball permissions differ across package platforms. Verify
+          # both pinned files exist, then restore executable bits explicitly.
+          test -f "$ffmpeg_bin"
+          test -f "$ffprobe_bin"
+          ls -l "$ffmpeg_bin" "$ffprobe_bin"
+          chmod u+x "$ffmpeg_bin" "$ffprobe_bin"
           test -x "$ffmpeg_bin"
           test -x "$ffprobe_bin"
           ln -s "$ffmpeg_bin" "$tools_dir/bin/ffmpeg"
