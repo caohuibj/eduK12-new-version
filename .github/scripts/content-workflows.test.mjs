@@ -398,14 +398,20 @@ test('hosted CI starts independent checks in parallel and bounds media setup wit
   assert.match(media,/browser-npm-\$\{\{ runner\.os \}\}/);
   assert.match(media,/browser-chromium-\$\{\{ runner\.os \}\}/);
   for(const name of ['prepare native Canvas libraries','install backend dependencies',
-    'install frontend dependencies','install pinned Chromium and system dependencies',
+    'install frontend dependencies','install pinned Chromium and verify runtime dependencies',
     'ensure FFmpeg is present','generate Prisma client']) {
     assert.ok(media.includes(name),name);
   }
-  for(const command of ['npm ci --prefix server-version/backend','npm ci --prefix server-version/frontend',
-    'npx playwright-core install --with-deps chromium','npx prisma generate'])
+  for(const command of ['npm ci --prefix server-version/backend','npm ci --prefix server-version/frontend','npx prisma generate'])
     assert.ok(media.includes('timeout -k 10s 240s '+command)
       || media.includes('timeout -k 10s 120s '+command),command);
+  // Browser binaries and host apt dependencies are independently bounded:
+  // every attempt must launch Chromium, and missing dependencies must fail
+  // closed unless the pinned Playwright install-deps succeeds.
+  assert.match(media,/timeout -k 10s 180s npx playwright-core install chromium/);
+  assert.match(media,/timeout -k 10s 240s npx playwright-core install-deps chromium/);
+  assert.match(media,/chromium\.launch\(\{headless:true\}\)/);
+  assert.match(media,/archive\.ubuntu\.com/);
   // FFmpeg must be genuinely available for media fixtures, not silently skipped.
   assert.match(media,/timeout -k 10s 480s sudo -n apt-get install/);
   assert.match(media,/Acquire::Retries=3/);
