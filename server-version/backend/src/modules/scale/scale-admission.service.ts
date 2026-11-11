@@ -29,6 +29,7 @@ import { decryptFrozenScaleRuntimeSnapshot, loadFrozenScaleRuntimeSnapshot, Froz
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { ageMonthsAt, assessmentContextKeys, type AssessmentContextValues } from '../assessment-context/context'
 import { resolveScaleStartDeployment } from './deployment/service'
+import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments, clearPreloadedActiveScaleDeployments } from './deployment/repository'
 import type { ScaleDeploymentModeV1 } from './policy/deployment'
 import { evaluateInstrumentEligibility, SCALE_ELIGIBILITY_EVALUATOR_VERSION } from './policy/eligibility'
 import type { FrozenEligibilityDecisionV1, ScalePolicyRespondentType } from './policy/types'
@@ -833,6 +834,17 @@ export const batchEnsureScaleAdmissionsAtDelivery = async (
       const context = readCompositeAttemptContext(parent)
       if (context.decryptError) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文无法读取，请联系管理员', 500)
 
+      // One deployment read for every unstored child on this tx, then
+      // createScaleAdmissionForRuntime / resolveScaleStartDeployment reuse it.
+      // Hash, epoch, slot and first-writer checks below stay authoritative.
+      const scaleIds = [...new Set(currentRows.map((row: any) => row.scale?.id).filter((id: unknown): id is string => typeof id === 'string'))]
+      if (scaleIds.length > 0 && scaleIds.length <= 50 && typeof (tx as { $queryRaw?: unknown }).$queryRaw === 'function') {
+        const deployments = await readActiveScaleDeployments(tx, scaleIds)
+        const preloaded = new Map(scaleIds.map(id => [id, deployments.get(id) ?? null]))
+        setPreloadedActiveScaleDeployments(tx, preloaded)
+      }
+
+      try {
       for (const item of unstored) {
         const current = currentById.get(item.child.id)
         if (!current || current.attemptEpoch !== parent.attemptEpoch || current.compositeAttemptId !== parent.id) {
@@ -907,6 +919,9 @@ export const batchEnsureScaleAdmissionsAtDelivery = async (
 
         const persisted = await persistAdmission(tx, current.id, assertReady(snapshot))
         txResult.set(current.id, persisted)
+      }
+      } finally {
+        clearPreloadedActiveScaleDeployments(tx)
       }
 
       return txResult
