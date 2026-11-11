@@ -1,4 +1,5 @@
 import {Prisma} from '@prisma/client'
+import {withStartNestedQueryRawLabel} from '../../services/runtimeObservability'
 import {AdminPermissionError} from '../admin-permissions/service'
 export type ToolEntryProduct='TRAINING'|'SURVEY'
 export type StandardCombinationEntryProduct=ToolEntryProduct|'SCHOOL'|'TEACHER'
@@ -52,8 +53,8 @@ export async function lockToolPolicyAdmission(tx:Prisma.TransactionClient,identi
  const held=heldLocks(tx)
  const keys=sortedKeys(identities,[product]).filter(key=>!held?.has(key))
  if(!keys.length)return
- if(keys.length===1)await tx.$executeRaw`SELECT pg_advisory_xact_lock_shared(hashtext(${keys[0]}))`
- else await tx.$executeRaw`SELECT count(pg_advisory_xact_lock_shared(hashtext(k))) FROM unnest(${keys}::text[]) WITH ORDINALITY AS t(k,n)`
+ if(keys.length===1)await withStartNestedQueryRawLabel('tool_policy_advisory', () => tx.$executeRaw`SELECT pg_advisory_xact_lock_shared(hashtext(${keys[0]}))`)
+ else await withStartNestedQueryRawLabel('tool_policy_advisory', () => tx.$executeRaw`SELECT count(pg_advisory_xact_lock_shared(hashtext(k))) FROM unnest(${keys}::text[]) WITH ORDINALITY AS t(k,n)`)
  for(const key of keys)held?.set(key,'SHARED')
 }
 /** EXCLUSIVE mutation lock, sorted key order, each key at most once per
@@ -81,8 +82,8 @@ export async function readToolPolicy(tx:Prisma.TransactionClient,identity:Policy
  return rows[0]??{decision:'PENDING',paused:false,version:0,reason:product+' 入口尚未获准'}
 }
 async function readAdmissionRow(tx:Prisma.TransactionClient,identity:PolicyIdentity,product:StandardCombinationEntryProduct){
- const rows=await tx.$queryRaw<ToolPolicy[]>(Prisma.sql`SELECT decision,paused,version,reason FROM survey_tool_policies
-  WHERE product=${product} AND resource_key=${identity.resourceKey} AND fingerprint=${identity.fingerprint} FOR SHARE`)
+ const rows=await withStartNestedQueryRawLabel<ToolPolicy[]>('tool_policy_share', () => tx.$queryRaw<ToolPolicy[]>(Prisma.sql`SELECT decision,paused,version,reason FROM survey_tool_policies
+  WHERE product=${product} AND resource_key=${identity.resourceKey} AND fingerprint=${identity.fingerprint} FOR SHARE`))
  return rows[0]??pending(product)
 }
 /** ADMISSION_READ for many identities: shared keys in one sorted statement, then
@@ -95,8 +96,8 @@ export async function prefetchToolPolicyAdmission(tx:Prisma.TransactionClient,id
  if(!missing.length)return
  const rows=missing.length===1
   ?[{resource_key:missing[0].resourceKey,fingerprint:missing[0].fingerprint,...await readAdmissionRow(tx,missing[0],product)}]
-  :await tx.$queryRaw<Array<ToolPolicy&{resource_key:string;fingerprint:string}>>(Prisma.sql`SELECT resource_key,fingerprint,decision,paused,version,reason FROM survey_tool_policies
-   WHERE product=${product} AND (resource_key,fingerprint) IN (${Prisma.join(missing.map(i=>Prisma.sql`(${i.resourceKey},${i.fingerprint})`))}) ORDER BY resource_key,fingerprint FOR SHARE`)
+  :await withStartNestedQueryRawLabel<Array<ToolPolicy&{resource_key:string;fingerprint:string}>>('tool_policy_share', () => tx.$queryRaw<Array<ToolPolicy&{resource_key:string;fingerprint:string}>>(Prisma.sql`SELECT resource_key,fingerprint,decision,paused,version,reason FROM survey_tool_policies
+   WHERE product=${product} AND (resource_key,fingerprint) IN (${Prisma.join(missing.map(i=>Prisma.sql`(${i.resourceKey},${i.fingerprint})`))}) ORDER BY resource_key,fingerprint FOR SHARE`))
  for(const i of missing){
   const r=rows.find(r=>r.resource_key===i.resourceKey&&r.fingerprint===i.fingerprint)
   cache.set(rowKey(i,product),r?{decision:r.decision,paused:r.paused,version:r.version,reason:r.reason}:pending(product))

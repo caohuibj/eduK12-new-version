@@ -4,6 +4,7 @@ import {getScaleInstrumentSource} from './onboarding/instrument-registry'
 import {scaleSourcePolicyIdentity} from './onboarding/source-snapshot'
 import {ContentReleaseError} from '../measurement-content/release'
 import { Prisma } from '@prisma/client'
+import { withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
 import { assertScaleLibraryCollectionAllowed } from '../scale-library-governance/collection-guard'
 import type {WholeReceiptExecution} from '../composite/whole-questionnaire.service'
 import type {VerifiedTrainingFlowMaterialization} from '../composite/training-flow-scope'
@@ -45,14 +46,14 @@ export async function assertTrainingScaleCollectionAllowed(tx:Prisma.Transaction
     // frozen completion contract. An unmaterialized flow unit may use only
     // the exact current candidate verified above under this same parent lock;
     // caller parent/item claims and restarted epochs cannot borrow admission.
-    bound=await tx.$queryRaw<Array<{scale_id:string;composite_item_id:string|null;attempt_epoch:number;education_source:boolean}>>(Prisma.sql`SELECT a.scale_id,a.composite_item_id,a.attempt_epoch,
+    bound=await withStartNestedQueryRawLabel<Array<{scale_id:string;composite_item_id:string|null;attempt_epoch:number;education_source:boolean}>>('collection_bound', () => tx.$queryRaw<Array<{scale_id:string;composite_item_id:string|null;attempt_epoch:number;education_source:boolean}>>(Prisma.sql`SELECT a.scale_id,a.composite_item_id,a.attempt_epoch,
       definition.product_kind='ORGANIZATION_RESOURCE' AS education_source FROM assessments a
       JOIN composite_assessment_attempts p ON p.id=a.composite_attempt_id
       JOIN composite_assessments definition ON definition.id=p.composite_assessment_id
       WHERE a.composite_attempt_id=${scope.compositeAttemptId} AND a.attempt_epoch=p.attempt_epoch
       AND a.scale_id=ANY(${ids}::text[])
       ${scope.compositeItemIds?.length?Prisma.sql`AND a.composite_item_id=ANY(${[...scope.compositeItemIds]}::text[])`:Prisma.empty}
-      FOR SHARE OF a`)
+      FOR SHARE OF a`))
     for(const row of bound)enteredIds.add(row.scale_id)
   }
   // The shared guard locks Scale rows and resolves release IDs from those locked
@@ -80,8 +81,8 @@ export async function assertTrainingScaleCollectionAllowed(tx:Prisma.Transaction
   if(collectionIds.length)await assertScaleLibraryCollectionAllowed(tx,[],collectionIds)
   const newEntryIds=collectionIds.filter(id=>!enteredIds.has(id))
   if(!newEntryIds.length)return
-  const standard=await tx.$queryRaw<Array<{code:string;instrument_version:string;instrument_class:string;library_entry_id:string|null;measurement_release_id:string|null;content_hash:string|null}>>(Prisma.sql`SELECT s.code,s.instrument_version,s.instrument_class::text,s.library_entry_id,s.measurement_release_id,r.content_hash FROM scales s LEFT JOIN measurement_content_releases r ON r.id=s.measurement_release_id
-    WHERE s.id IN (${Prisma.join(newEntryIds)}) AND (s.instrument_class='STANDARD' OR s.library_entry_id IS NOT NULL) ORDER BY s.id FOR SHARE OF s`)
+  const standard=await withStartNestedQueryRawLabel<Array<{code:string;instrument_version:string;instrument_class:string;library_entry_id:string|null;measurement_release_id:string|null;content_hash:string|null}>>('collection_standard_share', () => tx.$queryRaw<Array<{code:string;instrument_version:string;instrument_class:string;library_entry_id:string|null;measurement_release_id:string|null;content_hash:string|null}>>(Prisma.sql`SELECT s.code,s.instrument_version,s.instrument_class::text,s.library_entry_id,s.measurement_release_id,r.content_hash FROM scales s LEFT JOIN measurement_content_releases r ON r.id=s.measurement_release_id
+    WHERE s.id IN (${Prisma.join(newEntryIds)}) AND (s.instrument_class='STANDARD' OR s.library_entry_id IS NOT NULL) ORDER BY s.id FOR SHARE OF s`))
   // Shared admission locks in one sorted batch when no row needs a library
   // use-grant check. Library use-grants lock release/entry before tool policy,
   // so that set takes the batched grant path and skips the policy prefetch here.
