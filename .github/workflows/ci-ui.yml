@@ -58,6 +58,7 @@ jobs:
           # Official Playwright container sets PLAYWRIGHT_BROWSERS_PATH=/ms-playwright.
           # Do not redirect it to an empty runner temp directory.
       - name: prepare selected browser
+        shell: bash
         env:
           CI_BROWSER_ENGINE: ${{ inputs.engine }}
         run: |
