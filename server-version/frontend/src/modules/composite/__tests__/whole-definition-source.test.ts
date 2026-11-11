@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { wholeDefinitionWithInlineFallback } from '../whole-definition-source'
+import { takeStoredWholeDefinition, wholeDefinitionWithInlineFallback } from '../whole-definition-source'
 import type { WholeQuestionnaireDefinition } from '../types'
 
 const definition = (attemptId: string, overrides: Partial<WholeQuestionnaireDefinition> = {}) => ({
