@@ -137,12 +137,14 @@ export default function AnonymousStudyPage() {
     if(current!==epoch.current)return
     sessionStorage.setItem(`composite:recovery:attempt:${own.attemptId}`,own.recoveryToken)
     sessionStorage.setItem(`composite:study:return:${own.attemptId}`,`/public/studies/${sid}`)
-    if(own.wholeDefinition){
-      sessionStorage.setItem(`composite:inline-definition:${own.attemptId}`,JSON.stringify(own.wholeDefinition))
+    if(own.wholeDefinition && own.state==='IN_PROGRESS'){
+      try {
+        sessionStorage.setItem(`composite:inline-definition:${own.attemptId}`,JSON.stringify(own.wholeDefinition))
+      } catch {
+        // Storage quota/permission failures fall back to the authoritative GET.
+      }
     }
-    navigate(`/public/composite/attempts/${own.attemptId}${own.state==='COMPLETED'?'/report':''}`,{
-      state: own.wholeDefinition ? { wholeDefinition: own.wholeDefinition } : undefined,
-    })
+    navigate(`/public/composite/attempts/${own.attemptId}${own.state==='COMPLETED'?'/report':''}`)
   })
   const refreshHome=()=>act(async()=>{
     setHome(null);const current=epoch.current,own=await publicStudyApi(credential).home(sid)
@@ -150,12 +152,12 @@ export default function AnonymousStudyPage() {
   })
   const clear=()=>{
     ++epoch.current;sessionStorage.removeItem(studyIdentityKey(sid))
-    for(const wave of home?.waves ?? []) if(wave.attemptId){sessionStorage.removeItem(`composite:recovery:attempt:${wave.attemptId}`);sessionStorage.removeItem(`composite:study:return:${wave.attemptId}`)}
+    for(const wave of home?.waves ?? []) if(wave.attemptId){sessionStorage.removeItem(`composite:recovery:attempt:${wave.attemptId}`);sessionStorage.removeItem(`composite:study:return:${wave.attemptId}`);sessionStorage.removeItem(`composite:inline-definition:${wave.attemptId}`)}
     // A failed home read hides the wave list, but the same-study local grants
     // still need explicit cleanup. Other studies and standalone attempts stay.
     for(const key of Object.keys(sessionStorage))if(key.startsWith('composite:study:return:')&&sessionStorage.getItem(key)===`/public/studies/${sid}`){
       const attemptId=key.slice('composite:study:return:'.length)
-      sessionStorage.removeItem(`composite:recovery:attempt:${attemptId}`);sessionStorage.removeItem(key)
+      sessionStorage.removeItem(`composite:recovery:attempt:${attemptId}`);sessionStorage.removeItem(`composite:inline-definition:${attemptId}`);sessionStorage.removeItem(key)
     }
     setHome(null);setCredential('');setInput('');setNewCode('');setFullCode('');setError('');setBusy(false)
     if(trainingStudyLink.read(location.hash))navigate(location.pathname+location.search,{replace:true})
