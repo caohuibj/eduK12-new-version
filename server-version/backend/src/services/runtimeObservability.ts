@@ -504,6 +504,9 @@ export const withQueryRawLabel = async <T>(label: string, operation: () => Promi
   finally { observation.queryRawLabel = previous }
 }
 
+export const currentAssessmentTimelineKind = (): TechnicalTimeline['kind'] | undefined =>
+  observationStorage.getStore()?.timeline?.kind
+
 /** Split an interactive Prisma transaction into begin/wait, callback, and commit spans. */
 export const tracePrismaInteractiveTransaction = async <T>(
   prefix: string,

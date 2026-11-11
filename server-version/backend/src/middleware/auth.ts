@@ -4,7 +4,7 @@ import { AuthenticatedPrincipal, UserRole } from '../types'
 import { unauthorized, forbidden } from '../utils/response'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import { getSessionToken, getSchoolSessionToken, getSurveySessionToken, getHuiteacherSessionToken } from '../utils/authCookies'
-import { measureRequestPhase } from '../services/runtimeObservability'
+import { measureRequestPhase, withQueryRawLabel, currentAssessmentTimelineKind } from '../services/runtimeObservability'
 import { asBusinessPrincipal, loadCurrentPrincipal, toRequestPrincipal } from '../modules/organization/principal'
 import { isSessionRevoked } from '../utils/sessionRevocation'
 import { needsAdminKey, validAdminProof, ADMIN_STEP_UP_SECONDS } from '../modules/admin-permissions/security'
@@ -19,7 +19,10 @@ declare global {
 }
 
 const loadPrincipal = async (userId: string) => {
-  return measureRequestPhase('auth_account_lookup', () => loadCurrentPrincipal(userId))
+  const label = currentAssessmentTimelineKind() === 'start'
+    ? 'start.raw.pre_gate.auth_account_lookup'
+    : 'auth.raw.account_lookup'
+  return withQueryRawLabel(label, () => measureRequestPhase('auth_account_lookup', () => loadCurrentPrincipal(userId)))
 }
 
 const authenticateProduct = async (req: Request, res: Response, next: NextFunction, product: 'LEGACY' | 'SCHOOL' | 'SURVEY' | 'HUITEACHER') => {
