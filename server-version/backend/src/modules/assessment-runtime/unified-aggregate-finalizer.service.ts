@@ -318,7 +318,7 @@ const probeUnifiedParent = async (input: {
   const frozenSlots = await measureRequestPhase('aggregate.decrypt_parse', () => readFrozenSlotSet(parent))
   // Only background finalization, after canonical readiness, eagerly loads
   // payloads. One invocation-local read serves both completeness and scoring.
-  const snapshotRows = input.reportJob && process.env.ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED === 'true'
+  const snapshotRows = input.reportJob && process.env.ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED !== 'false'
     ? await loadSnapshotPayloads({ parentId: input.parentId, attemptEpoch: parent.attemptEpoch, composite: input.composite })
     : undefined
   const headers = snapshotRows ? snapshotRows.map(headerFromRow) : await loadSnapshotHeaders({

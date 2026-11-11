@@ -21,6 +21,9 @@ export const assessmentReportConfig = (env: NodeJS.ProcessEnv = process.env) => 
     leaseMs: integer('ASSESSMENT_REPORT_LEASE_MS', 30_000),
     maxAttempts: integer('ASSESSMENT_REPORT_MAX_ATTEMPTS', 8),
     maxReportBytes: integer('ASSESSMENT_REPORT_MAX_BYTES', 2 * 1024 * 1024),
+    wholeRequestContextReuseEnabled: env.ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED !== 'false',
+    snapshotBatchEnabled: env.ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED !== 'false',
+    narrowLoadEnabled: env.ASSESSMENT_REPORT_NARROW_LOAD_ENABLED !== 'false',
   }
 }
 

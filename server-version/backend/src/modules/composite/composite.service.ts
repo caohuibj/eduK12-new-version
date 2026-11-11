@@ -6492,7 +6492,7 @@ export const materializeCompositeQuestionnaireReport = async (attemptId: string,
     && committedAttempt.contextSnapshotHash === expected.contextHash
     && committedAttempt.scaleAssessments === committed.parent.scaleAssessments
     && committedAttempt.status === 'COMPLETED' && committedAttempt.aggregateInputHash
-  const attempt = reusable ? committedAttempt : process.env.ASSESSMENT_REPORT_NARROW_LOAD_ENABLED === 'true'
+  const attempt = reusable ? committedAttempt : process.env.ASSESSMENT_REPORT_NARROW_LOAD_ENABLED !== 'false'
     ? await loadCollectionReportAttempt(attemptId) : await loadAttemptWithChildren(attemptId)
   assertReportJobIdentity(attempt, expected)
   if (attempt.status !== 'COMPLETED' || !attempt.aggregateInputHash
