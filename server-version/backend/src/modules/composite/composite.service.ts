@@ -4000,7 +4000,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   if (!study) assertTokenWindow(token)
   assertCompositeWindow(token.compositeAssessment)
   const credential = study?.credential ?? createRecoveryCredential()
-  const attempt = await prisma.$transaction(async (tx) => {
+  const attempt = await classifyStartTransaction(() => prisma.$transaction(async (tx) => {
     await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
     const existingId = study ? await study.beforeAdmission(tx) : null
     if (existingId) {
@@ -4019,7 +4019,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
     if (study) await study.afterAdmission(tx, admitted.id)
     await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
     return admitted
-  })
+  }))
   return { attempt: await getAttemptState(attempt.id, { recoveryTokenHash: credential.hash }), recoveryToken: credential.token }
 }
 
