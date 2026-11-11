@@ -31,6 +31,11 @@ jobs:
   ui:
     name: ${{ inputs.engine }} frontend acceptance
     runs-on: ubuntu-24.04
+    # Exact match for ci/browser/package-lock.json. The official image includes
+    # all three browsers and their native system libraries/fonts, avoiding
+    # unreliable hosted-runner apt mirrors without skipping visual acceptance.
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
     timeout-minutes: 20
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
@@ -50,7 +55,8 @@ jobs:
         run: |
           npm ci --prefix server-version/frontend
           npm ci --prefix ci/browser
-          echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/eduk12-ci-browsers" >> "$GITHUB_ENV"
+          # Official Playwright container sets PLAYWRIGHT_BROWSERS_PATH=/ms-playwright.
+          # Do not redirect it to an empty runner temp directory.
       - name: prepare selected browser
         env:
           CI_BROWSER_ENGINE: ${{ inputs.engine }}
@@ -60,11 +66,22 @@ jobs:
             chromium|firefox|webkit) engines=("$CI_BROWSER_ENGINE") ;;
             *) exit 1 ;;
           esac
-          if [ "$RUNNER_OS" = Linux ]; then
-            node ci/browser/node_modules/playwright-core/cli.js install --with-deps "${engines[@]}"
-          else
-            node ci/browser/node_modules/playwright-core/cli.js install "${engines[@]}"
-          fi
+          # Fail closed if even one requested real engine fails to start;
+          # never bypass the browser test or rely on an apt install marker.
+          node - "${engines[@]}" <<'NODE'
+          const { chromium, firefox, webkit } = require('./ci/browser/node_modules/playwright-core')
+          const engines = { chromium, firefox, webkit }
+          ;(async () => {
+            for (const name of process.argv.slice(2)) {
+              const browser = await engines[name].launch({ headless: true })
+              try {
+                const page = await browser.newPage()
+                await page.goto('data:text/html,<title>CI Browser Smoke</title>')
+                if (await page.title() !== 'CI Browser Smoke') throw new Error(name + ' smoke failed')
+              } finally { await browser.close() }
+            }
+          })().catch(error => { console.error(error); process.exitCode = 1 })
+          NODE
       - uses: actions/download-artifact@v4
         if: (inputs.app_shell || inputs.qa_round3) && inputs.use_build_artifacts
         with:
