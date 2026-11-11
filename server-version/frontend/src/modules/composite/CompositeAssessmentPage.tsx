@@ -15,7 +15,7 @@ import {
   LockKeyhole,
 } from 'lucide-react'
 import { compositeApi, publicCompositeApi } from './api'
-import { wholeDefinitionWithInlineFallback, type InlineWholeDefinitionIdentity } from './whole-definition-source'
+import { takeStoredWholeDefinition, wholeDefinitionWithInlineFallback, type InlineWholeDefinitionIdentity } from './whole-definition-source'
 import { shouldUseWholeRunner } from './whole-runner-entry'
 import type {
   CompositeAttemptState,
@@ -107,15 +107,27 @@ const CompositeAssessmentContent: React.FC = () => {
     definition: WholeQuestionnaireDefinition
     identity: InlineWholeDefinitionIdentity
   } | null>(null)
+  // Only the latest server-confirmed Attempt state can authorize use of an
+  // inline definition. Do not construct the expected epoch/context from
+  // untrusted route state or a stored definition itself.
+  const activeAttemptIdentityRef = useRef<InlineWholeDefinitionIdentity | null>(null)
   const api = useMemo(() => {
     const base = publicMode ? publicCompositeApi(recoveryToken) : compositeApi
     return {
       ...base,
-      wholeDefinition: (attemptId: string) => {
-        const inline = inlineWholeDefinitionRef.current
+      wholeDefinition: (requestedAttemptId: string) => {
+        const fromStorage = takeStoredWholeDefinition(requestedAttemptId, window.sessionStorage)
+        const inline = inlineWholeDefinitionRef.current?.definition ?? fromStorage
         inlineWholeDefinitionRef.current = null
-        return wholeDefinitionWithInlineFallback(inline?.definition ?? null,
-          inline?.identity ?? { attemptId }, () => base.wholeDefinition(attemptId))
+        const authoritative = activeAttemptIdentityRef.current
+        const verified = authoritative?.attemptId === requestedAttemptId
+          && authoritative.attemptEpoch !== undefined
+          && authoritative.contextSnapshotHash !== undefined
+        return wholeDefinitionWithInlineFallback(
+          verified ? inline : null,
+          authoritative ?? { attemptId: '' },
+          () => base.wholeDefinition(requestedAttemptId),
+        )
       },
     }
   }, [publicMode, recoveryToken])
@@ -161,6 +173,8 @@ const CompositeAssessmentContent: React.FC = () => {
 
   const applyState = (next: CompositeAttemptState) => {
     if (pageSignal().aborted) return
+    activeAttemptIdentityRef.current = { attemptId: next.id, attemptEpoch: next.attemptEpoch,
+      contextSnapshotHash: next.contextSnapshotHash }
     setState(next)
     if (!next.trainingFlow && (next.status === 'COMPLETED' || next.allUnitsSubmitted)) {
       goReport(next.id, next.trainingPersistence?.courseId)
@@ -348,6 +362,8 @@ const CompositeAssessmentContent: React.FC = () => {
 
   useEffect(() => {
     let cancelled = false
+    activeAttemptIdentityRef.current = null
+    inlineWholeDefinitionRef.current = null
     setLoading(true)
     setState(null)
     setPublicInfo(null)
