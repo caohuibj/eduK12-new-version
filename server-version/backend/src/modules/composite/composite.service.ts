@@ -3713,7 +3713,7 @@ const trainingStartGate = (): BoundedAdmissionGate => {
   }
   return gateInstance
 }
-const projectStartedAttempt = async (
+export const projectStartedAttempt = async (
   attemptId: string,
   principal: { userId?: string; recoveryTokenHash?: string },
   wantsWholeDelivery: boolean,

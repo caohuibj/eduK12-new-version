@@ -269,11 +269,12 @@ export async function participantHome(studyId:string,credential:string) {
   await participant(prisma,studyId,credential)
   return {studyId,title:p.title,displayCode:p.displayCode,waves:rows,limitations:['身份码只用于本研究；同一研究内多次作答可关联。','历史个人报告不等于可比较的长期变化；不同测验、版本和条件不能直接作差。']}
 }
-export async function startStudyWave(studyId:string,waveId:string,credential:string) {
+export async function startStudyWave(studyId:string,waveId:string,credential:string,opts?:{wantsWholeDelivery?:boolean}) {
   const p=await participant(prisma,studyId,credential), w=await readWave(prisma,waveId)
   if(w.studyId!==studyId) return hidden()
   assertAdmission(w)
   const recovery=deriveStudyRecovery(p.id,w.id,p.generation)
+  const wantsWhole = Boolean(opts?.wantsWholeDelivery)
   const data=await composite.startPublicAttempt(waveToken(w),undefined,{
     credential:recovery,
     beforeAdmission:async tx=>{
@@ -292,11 +293,17 @@ export async function startStudyWave(studyId:string,waveId:string,credential:str
       await tx.$executeRaw`INSERT INTO anonymous_study_attempts(study_id,wave_id,participant_id,attempt_id,admission_credential_hash,admission_attempt_epoch)
         VALUES(${studyId},${waveId},${p.id},${attemptId},${recovery.hash},${parent.attemptEpoch})`
     },
-  })
+  }, { wantsWholeDelivery: wantsWhole })
   await participant(prisma,studyId,credential)
-  return {attemptId:data.attempt.id,state:data.attempt.status,recoveryToken:recovery.token}
+  const wholeDefinition = ('wholeDefinition' in data && data.wholeDefinition) ? data.wholeDefinition : undefined
+  return {
+    attemptId: data.attempt.id,
+    state: data.attempt.status,
+    recoveryToken: recovery.token,
+    ...(wholeDefinition ? { wholeDefinition } : {}),
+  }
 }
-export async function recoverStudyWave(studyId:string,waveId:string,credential:string) {
+export async function recoverStudyWave(studyId:string,waveId:string,credential:string,opts?:{wantsWholeDelivery?:boolean}) {
   const p=await participant(prisma,studyId,credential), w=await readWave(prisma,waveId)
   if(w.studyId!==studyId) return hidden()
   const rows=await prisma.$queryRaw<Array<{id:string;state:string}>>`
@@ -308,7 +315,19 @@ export async function recoverStudyWave(studyId:string,waveId:string,credential:s
   const own=await prisma.compositeAssessmentAttempt.findFirst({where:{id:rows[0].id,userId:null,recoveryTokenHash:recovery.hash},select:{id:true}})
   if(!own) return hidden()
   await participant(prisma,studyId,credential)
-  return {attemptId:own.id,state:rows[0].state,recoveryToken:recovery.token}
+  let wholeDefinition: unknown = undefined
+  if (opts?.wantsWholeDelivery) {
+    const projected = await composite.projectStartedAttempt(own.id, { recoveryTokenHash: recovery.hash }, true, recovery.token)
+    if ('wholeDefinition' in projected && projected.wholeDefinition) {
+      wholeDefinition = projected.wholeDefinition
+    }
+  }
+  return {
+    attemptId: own.id,
+    state: rows[0].state,
+    recoveryToken: recovery.token,
+    ...(wholeDefinition ? { wholeDefinition } : {}),
+  }
 }
 export async function revokeStudyIdentity(studyId:string,credential:string) {
   const p=await participant(prisma,studyId,credential)

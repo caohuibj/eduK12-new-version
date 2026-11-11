@@ -112,7 +112,31 @@ const CompositeAssessmentContent: React.FC = () => {
     return {
       ...base,
       wholeDefinition: (attemptId: string) => {
-        const inline = inlineWholeDefinitionRef.current
+        let inline = inlineWholeDefinitionRef.current
+        if (!inline) {
+          const stateDefinition = (location.state as { wholeDefinition?: WholeQuestionnaireDefinition } | null)?.wholeDefinition
+          if (stateDefinition && stateDefinition.attemptId === attemptId) {
+            inline = {
+              definition: stateDefinition,
+              identity: { attemptId, attemptEpoch: stateDefinition.attemptEpoch, contextSnapshotHash: stateDefinition.contextSnapshotHash ?? null },
+            }
+          } else {
+            const storedKey = `composite:inline-definition:${attemptId}`
+            const stored = sessionStorage.getItem(storedKey)
+            if (stored) {
+              sessionStorage.removeItem(storedKey)
+              try {
+                const parsed = JSON.parse(stored) as WholeQuestionnaireDefinition
+                if (parsed && parsed.attemptId === attemptId) {
+                  inline = {
+                    definition: parsed,
+                    identity: { attemptId, attemptEpoch: parsed.attemptEpoch, contextSnapshotHash: parsed.contextSnapshotHash ?? null },
+                  }
+                }
+              } catch {}
+            }
+          }
+        }
         inlineWholeDefinitionRef.current = null
         return wholeDefinitionWithInlineFallback(inline?.definition ?? null,
           inline?.identity ?? { attemptId }, () => base.wholeDefinition(attemptId))

@@ -131,11 +131,18 @@ export default function AnonymousStudyPage() {
   })
   const open=(wave:StudyWave)=>act(async()=>{
     const current=epoch.current
-    const own=await (wave.attemptId?publicStudyApi(credential).recover(sid,wave.id):publicStudyApi(credential).start(sid,wave.id))
+    const own=await (wave.attemptId
+      ? publicStudyApi(credential).recover(sid,wave.id,{delivery:'whole'})
+      : publicStudyApi(credential).start(sid,wave.id,{delivery:'whole'}))
     if(current!==epoch.current)return
     sessionStorage.setItem(`composite:recovery:attempt:${own.attemptId}`,own.recoveryToken)
     sessionStorage.setItem(`composite:study:return:${own.attemptId}`,`/public/studies/${sid}`)
-    navigate(`/public/composite/attempts/${own.attemptId}${own.state==='COMPLETED'?'/report':''}`)
+    if(own.wholeDefinition){
+      sessionStorage.setItem(`composite:inline-definition:${own.attemptId}`,JSON.stringify(own.wholeDefinition))
+    }
+    navigate(`/public/composite/attempts/${own.attemptId}${own.state==='COMPLETED'?'/report':''}`,{
+      state: own.wholeDefinition ? { wholeDefinition: own.wholeDefinition } : undefined,
+    })
   })
   const refreshHome=()=>act(async()=>{
     setHome(null);const current=epoch.current,own=await publicStudyApi(credential).home(sid)

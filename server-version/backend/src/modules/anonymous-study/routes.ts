@@ -96,8 +96,14 @@ publicAnonymousStudyRouter.post('/:studyId/code/reset',wrap(async(req,res)=>{
  return success(res,await service.completeParticipationReset(id.parse(req.params.studyId),body.resetCode,body.suffix))
 }))
 publicAnonymousStudyRouter.get('/:studyId',wrap(async(req,res)=>success(res,await service.participantHome(id.parse(req.params.studyId),credential(req)))))
-publicAnonymousStudyRouter.post('/:studyId/waves/:waveId/start',wrap(async(req,res)=>success(res,await service.startStudyWave(id.parse(req.params.studyId),id.parse(req.params.waveId),credential(req)))))
-publicAnonymousStudyRouter.post('/:studyId/waves/:waveId/recover',wrap(async(req,res)=>success(res,await service.recoverStudyWave(id.parse(req.params.studyId),id.parse(req.params.waveId),credential(req)))))
+publicAnonymousStudyRouter.post('/:studyId/waves/:waveId/start',wrap(async(req,res)=>{
+  const wantsWhole = req.query.delivery === 'whole' || (req.body as { delivery?: unknown } | undefined)?.delivery === 'whole'
+  return success(res,await service.startStudyWave(id.parse(req.params.studyId),id.parse(req.params.waveId),credential(req),{ wantsWholeDelivery: wantsWhole }))
+}))
+publicAnonymousStudyRouter.post('/:studyId/waves/:waveId/recover',wrap(async(req,res)=>{
+  const wantsWhole = req.query.delivery === 'whole' || (req.body as { delivery?: unknown } | undefined)?.delivery === 'whole'
+  return success(res,await service.recoverStudyWave(id.parse(req.params.studyId),id.parse(req.params.waveId),credential(req),{ wantsWholeDelivery: wantsWhole }))
+}))
 publicAnonymousStudyRouter.post('/:studyId/revoke',wrap(async(req,res)=>success(res,await service.revokeStudyIdentity(id.parse(req.params.studyId),credential(req)))))
 
 anonymousStudyRouter.get('/:studyId/research-consent',wrap(async(req,res)=>success(res,await governance.ownerStudyConsent(req.user!.userId,id.parse(req.params.studyId)))))
