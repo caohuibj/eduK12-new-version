@@ -229,4 +229,38 @@ describe('bounded technical assessment timelines', () => {
     })
     expect(output).not.toHaveBeenCalled()
   })
+
+  it('keeps concurrent raw labels isolated across Promise.all branches', async () => {
+    enabled(); const output = vi.spyOn(logger, 'info').mockImplementation(() => undefined)
+    const response = Object.assign(new EventEmitter(), { statusCode: 200 }) as any
+    const request = {
+      method: 'POST',
+      originalUrl: '/api/composite-assessments/example-composite/attempts',
+      url: '/api/composite-assessments/example-composite/attempts',
+      path: '/api/composite-assessments/example-composite/attempts',
+      baseUrl: '',
+    } as any
+    let work: Promise<void> | undefined
+    requestObservabilityMiddleware(request, response, () => {
+      work = (async () => {
+        await withQueryRawLabel('start.raw.in_tx', () => Promise.all([
+          withStartNestedQueryRawLabel('course_facts', async () => {
+            await new Promise(resolve => setTimeout(resolve, 15))
+            recordPrismaCall(undefined, 'queryRaw', 3, process.hrtime.bigint() - 1_000_000n, process.hrtime.bigint())
+          }),
+          withStartNestedQueryRawLabel('deployment', async () => {
+            await new Promise(resolve => setTimeout(resolve, 5))
+            recordPrismaCall(undefined, 'queryRaw', 3, process.hrtime.bigint() - 1_000_000n, process.hrtime.bigint())
+          }),
+        ]).then(() => undefined))
+      })()
+    })
+    await work
+    response.emit('finish')
+    const record = JSON.parse(String(output.mock.calls[0][0]).slice('ASSESSMENT_TIMELINE '.length))
+    const names = record.events.map((event: { name: string }) => event.name)
+    expect(names).toEqual(expect.arrayContaining(['start.raw.in_tx.course_facts', 'start.raw.in_tx.deployment']))
+    expect(names.filter((name: string) => name === 'start.raw.in_tx.course_facts')).toHaveLength(1)
+    expect(names.filter((name: string) => name === 'start.raw.in_tx.deployment')).toHaveLength(1)
+  })
 })

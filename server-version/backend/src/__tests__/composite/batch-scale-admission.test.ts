@@ -8,6 +8,12 @@ import { createFrozenUnitAdmission } from '../../modules/assessment-runtime/admi
 import { createFrozenScaleRuntimeSnapshot } from '../../modules/assessment-runtime/runtime-snapshot'
 import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 import { compileResearchScale } from '../../modules/survey/builder.compiler'
+import { canonicalHash } from '../../modules/assessment-runtime/canonical'
+import { getScaleInstrumentSource, getScaleInstrumentRuntimePolicy } from '../../modules/scale/onboarding/instrument-registry'
+import { hashScaleDeploymentPolicy, type ScaleDeploymentPolicy } from '../../modules/scale/policy/deployment'
+import { hashScaleDefinition } from '../../modules/scale/scale-definition'
+import { encryptAssessmentContext } from '../../modules/assessment-context/security'
+import { hashAssessmentContext } from '../../modules/assessment-context/context'
 
 describe('Scheme X Batch Scale Admission at Delivery (PR X-05C)', () => {
   const dummyParent: any = {
@@ -558,6 +564,80 @@ describe('Scheme X Batch Scale Admission at Delivery (PR X-05C)', () => {
     ])).rejects.toThrow('量表冻结单元运行时哈希不匹配')
     // FOR UPDATE batch lock + one deployment batch, not a per-scale deployment read.
     expect(mockTx.$queryRaw).toHaveBeenCalledTimes(2)
+  })
+
+  it('reuses the batched deployment read for both successful Scale admissions', async () => {
+    const key = 'academic_self_concept_biology_zh_cn'
+    const version = '1.0.0'
+    const source = getScaleInstrumentSource(key, version)!
+    const compiled = getScaleInstrumentRuntimePolicy(key, version)!
+    const policy: ScaleDeploymentPolicy = {
+      schemaVersion: 2, revision: 1, locale: 'zh-CN', territory: 'CN',
+      deploymentModes: ['COMPOSITE'], runtimePolicyHash: compiled.runtimePolicyHash,
+      localizationVersion: version, inFlightCompletion: 'FROZEN_DEADLINE',
+    }
+    const policyHash = hashScaleDeploymentPolicy(policy)
+    const runtime = {
+      schemaVersion: 2,
+      instrumentKey: key,
+      instrumentVersion: version,
+      sourceDefinitionHash: hashScaleDefinition(source.executable!.definition),
+      runtimePolicyHash: compiled.runtimePolicyHash,
+      compiledPolicy: compiled,
+      compiledRuntime: { compiledRuntimeHash: canonicalHash({ fixture: 'compiled-runtime-batch' }) },
+    } as any
+    const scaleA = { id: 'scale-a', code: key, name: 'A', instrumentVersion: version, instrumentClass: 'STANDARD' as const, status: 'PUBLISHED' }
+    const scaleB = { id: 'scale-b', code: key, name: 'B', instrumentVersion: version, instrumentClass: 'STANDARD' as const, status: 'PUBLISHED' }
+    const child = (id: string, itemId: string, scale: typeof scaleA): any => ({
+      id, compositeItemId: itemId, compositeAttemptId: 'parent-attempt-1', attemptEpoch: 1,
+      deliveryMode: 'FINAL_ONLY', scale, scaleId: scale.id, userId: 'user-1',
+      frozenAdmissionSnapshotEncrypted: null, frozenAdmissionSnapshotHash: null,
+    })
+    const slot = (itemId: string): any => ({
+      slotKey: `scale:${itemId}`, unitType: 'SCALE',
+      sourceDefinitionIdentity: { key, version, hash: runtime.sourceDefinitionHash },
+      sourceBinding: { compositeItemId: itemId, compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash },
+    })
+    const deploymentRow = (scaleId: string) => ({
+      id: `deployment-${scaleId}`, scaleId, revision: 1, status: 'ACTIVE',
+      policyJson: policy, policyHash, authorizationRefs: [],
+      createdByUserId: 'system', createdAt: new Date(), activatedAt: new Date(), retiredAt: null,
+    })
+    const sqlKinds: string[] = []
+    const mockTx = {
+      $queryRaw: vi.fn().mockImplementation(() => {
+        const index = sqlKinds.length
+        sqlKinds.push(index === 0 ? 'lock' : index === 1 ? 'deployment_batch' : 'deployment_single')
+        if (index === 0) return []
+        return [deploymentRow('scale-a'), deploymentRow('scale-b')]
+      }),
+      assessment: {
+        findMany: vi.fn().mockResolvedValue([
+          { id: 'child-a', compositeItemId: 'item-a', compositeAttemptId: 'parent-attempt-1', attemptEpoch: 1, deliveryMode: 'FINAL_ONLY', scaleId: 'scale-a', scale: scaleA, compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash, frozenAdmissionSnapshotEncrypted: null, frozenAdmissionSnapshotHash: null, userId: 'user-1' },
+          { id: 'child-b', compositeItemId: 'item-b', compositeAttemptId: 'parent-attempt-1', attemptEpoch: 1, deliveryMode: 'FINAL_ONLY', scaleId: 'scale-b', scale: scaleB, compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash, frozenAdmissionSnapshotEncrypted: null, frozenAdmissionSnapshotHash: null, userId: 'user-1' },
+        ]),
+        updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+        findUnique: vi.fn(),
+      },
+    }
+    vi.spyOn(prisma, '$transaction').mockImplementationOnce(async (callback: any) => callback(mockTx))
+    const context = { schemaVersion: 1 as const, frozenAt: '2026-11-11T00:00:00.000Z', values: { gradeLevel: '7' as const } }
+    const parent = {
+      ...dummyParent,
+      contextSnapshotEncrypted: encryptAssessmentContext(context),
+      contextSnapshotHash: hashAssessmentContext(context),
+    }
+    const result = await batchEnsureScaleAdmissionsAtDelivery(parent, [
+      { slot: slot('item-a'), child: child('child-a', 'item-a', scaleA), runtime },
+      { slot: slot('item-b'), child: child('child-b', 'item-b', scaleB), runtime },
+    ])
+    expect(result.size).toBe(2)
+    expect(result.get('child-a')?.snapshotHash).toBeTruthy()
+    expect(result.get('child-b')?.snapshotHash).toBeTruthy()
+    expect(mockTx.assessment.updateMany).toHaveBeenCalledTimes(2)
+    expect(sqlKinds.filter(kind => kind === 'deployment_batch')).toEqual(['deployment_batch'])
+    expect(sqlKinds.filter(kind => kind === 'deployment_single')).toEqual([])
+    expect(sqlKinds.filter(kind => kind === 'lock')).toHaveLength(1)
   })
 })
 

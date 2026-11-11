@@ -75,7 +75,6 @@ type CanonicalObservation = {
 type RequestObservation = {
   timeline?: TechnicalTimeline
   startedAt: bigint
-  queryRawLabel?: string
   canonical?: CanonicalObservation
   ackToClaimMs?: number
   phases: Array<{
@@ -97,6 +96,9 @@ type LabeledCounter = {
 }
 
 const observationStorage = new AsyncLocalStorage<RequestObservation>()
+/** Per-branch raw SQL label. A dedicated store keeps Promise.all branches
+ * from overwriting one shared RequestObservation.queryRawLabel. */
+const queryRawLabelStorage = new AsyncLocalStorage<string>()
 const HTTP_BUCKETS_MS = [5, 10, 25, 50, 100, 250, 500, 1_000, 2_000, 5_000, 10_000, 30_000]
 const MAX_METRIC_KEYS = 10_000
 const OTHER_ROUTE = '__other__'
@@ -496,12 +498,8 @@ export const traceAssessmentPhaseSync = <T>(name: string, operation: () => T): T
 
 /** Bucket Prisma $queryRaw / $executeRaw events under a stable START or submit label. */
 export const withQueryRawLabel = async <T>(label: string, operation: () => Promise<T>): Promise<T> => {
-  const observation = observationStorage.getStore()
-  if (!observation?.timeline) return operation()
-  const previous = observation.queryRawLabel
-  observation.queryRawLabel = label
-  try { return await operation() }
-  finally { observation.queryRawLabel = previous }
+  if (!observationStorage.getStore()?.timeline) return operation()
+  return queryRawLabelStorage.run(label, operation)
 }
 
 export const currentAssessmentTimelineKind = (): TechnicalTimeline['kind'] | undefined =>
@@ -511,7 +509,7 @@ export const currentAssessmentTimelineKind = (): TechnicalTimeline['kind'] | und
  * with a per-site suffix. No-op when flags are off or no matching outer label. */
 export const withStartNestedQueryRawLabel = async <T>(site: string, operation: () => Promise<T>): Promise<T> => {
   if (currentAssessmentTimelineKind() !== 'start') return operation()
-  const current = observationStorage.getStore()?.queryRawLabel || ''
+  const current = queryRawLabelStorage.getStore() || ''
   const bucket = current.startsWith('start.raw.inline_definition') ? 'start.raw.inline_definition'
     : current.startsWith('start.raw.in_tx') ? 'start.raw.in_tx'
     : ''
@@ -772,7 +770,7 @@ export const recordPrismaCall = (
 ): void => {
   if (startedAt && endedAt) {
     assessmentTimelineSpan(`db.${model || "raw"}.${action || "unknown"}`, startedAt, endedAt)
-    const label = observationStorage.getStore()?.queryRawLabel
+    const label = queryRawLabelStorage.getStore()
     if (label && (!model || action === 'queryRaw' || action === 'executeRaw')) {
       assessmentTimelineSpan(label, startedAt, endedAt)
     }
