@@ -84,6 +84,17 @@ jobs:
       with:
         path: ~/.cache/ms-playwright
         key: browser-chromium-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json') }}
+    # Hosted Ubuntu's Azure apt mirror intermittently fails DNS during a
+    # media job (observed in both Chromium install lanes). Use the standard
+    # Ubuntu archive mirror for this job only, without weakening any tests.
+    - name: select stable Ubuntu apt mirror for media acceptance
+      run: |
+        set -euo pipefail
+        mirrors=/etc/apt/apt-mirrors.txt
+        if [ -f "$mirrors" ] && grep -q 'azure.archive.ubuntu.com' "$mirrors"; then
+          sudo -n sed -i 's#azure.archive.ubuntu.com#archive.ubuntu.com#g' "$mirrors"
+          echo 'Media CI apt mirror: archive.ubuntu.com'
+        fi
     # Each external installation is independently observable and bounded.
     # A stalled registry / apt / browser download fails the gate rather than
     # holding the whole 25-minute media job without progress.
@@ -93,9 +104,19 @@ jobs:
       run: timeout -k 10s 240s npm ci --prefix server-version/backend
     - name: install frontend dependencies (bounded)
       run: timeout -k 10s 240s npm ci --prefix server-version/frontend
-    - name: install pinned Chromium and system dependencies (bounded)
+    - name: install pinned Chromium and verify runtime dependencies (bounded)
       working-directory: server-version/backend
-      run: timeout -k 10s 240s npx playwright-core install --with-deps chromium
+      run: |
+        set -euo pipefail
+        # A browser binary cache does not cache apt packages. Conversely,
+        # hosted runners often already contain Chromium's runtime libraries.
+        # Avoid forcing a second apt update if the pinned browser launches.
+        timeout -k 10s 180s npx playwright-core install chromium
+        if ! timeout -k 10s 30s node -e "const {chromium}=require('playwright-core'); chromium.launch({headless:true}).then(b=>b.close()).catch(e=>{console.error(e);process.exitCode=1})"; then
+          echo '::notice::Chromium runtime libraries missing; installing pinned Playwright system dependencies'
+          timeout -k 10s 240s npx playwright-core install-deps chromium
+          timeout -k 10s 30s node -e "const {chromium}=require('playwright-core'); chromium.launch({headless:true}).then(b=>b.close()).catch(e=>{console.error(e);process.exitCode=1})"
+        fi
     - name: ensure FFmpeg is present (bounded)
       run: |
         # Canvas and Playwright already refreshed apt metadata in this job.
