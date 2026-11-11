@@ -1,4 +1,5 @@
 import { Prisma, type PrismaClient } from '@prisma/client'
+import { withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { appendPublishedScaleArtifact, type PublishedScaleArtifactRef } from '../assessment-runtime/published-scale-artifact'
 import { getContentRelease } from '../measurement-content/repository'
@@ -11,9 +12,9 @@ export type LegacyBackfillReport = { composites: number; mapped: number; already
 
 /** START read: the verified artifact map for one exact legacy publication. */
 export async function loadLegacyScaleArtifactMap(db: { $queryRaw: Prisma.TransactionClient['$queryRaw'] }, compositeId: string, publicationHash: string) {
-  const rows = await db.$queryRaw<Array<{ item_id: string; artifact_hash: string; release_id: string; content_hash: string }>>(Prisma.sql`
+  const rows = await withStartNestedQueryRawLabel<Array<{ item_id: string; artifact_hash: string; release_id: string; content_hash: string }>>('legacy_scale_artifacts', () => db.$queryRaw<Array<{ item_id: string; artifact_hash: string; release_id: string; content_hash: string }>>(Prisma.sql`
     SELECT item_id, artifact_hash, release_id, content_hash FROM training_legacy_scale_artifacts
-    WHERE composite_assessment_id=${compositeId} AND publication_hash=${publicationHash}`)
+    WHERE composite_assessment_id=${compositeId} AND publication_hash=${publicationHash}`))
   return new Map<string, LegacyScaleArtifactRow>(rows.map(row => [row.item_id,
     { itemId: row.item_id, artifact: { formatVersion: 3, hash: row.artifact_hash }, releaseId: row.release_id, contentHash: row.content_hash }]))
 }

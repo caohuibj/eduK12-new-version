@@ -2,7 +2,7 @@ import { encryptUnifiedRuntimePayload } from './security'
 import { REPORT_SUBMISSION_KEY_CONFLICT, REPORT_SUBMISSION_KEY_CONFLICT_MESSAGE } from '../scale/scale-final-submit-conflict'
 import { detachedWholeReceiptsEnabled } from './whole-receipt-storage'
 import { registerWholeReceiptAtomic } from './whole-receipt-atomic'
-import { markAssessmentTimeline, traceAssessmentPhase, recordAssessmentReportClaim } from '../../services/runtimeObservability'
+import { markAssessmentTimeline, traceAssessmentPhase, recordAssessmentReportClaim, tracePrismaInteractiveTransaction } from '../../services/runtimeObservability'
 import type { WholeReceiptExecution } from '../composite/whole-questionnaire.service'
 import { randomUUID } from 'node:crypto'
 import { loadFrozenActiveSlotSet } from './slot-set'
@@ -10,6 +10,7 @@ import { evaluateCompleteness, expectedPayloadKind } from './unified-aggregate'
 import { resolveTrainingFlowScope } from '../composite/training-flow-scope'
 import { Prisma, type CompositeReportJob } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { recordReceiptCommit, recordReportQueueEvent, reportQueueObsEnabled } from '../../services/reportQueueObservability'
 import { acceptsAsyncCompositeReport, assessmentReportConfig } from '../../config/assessmentReports'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { QuestionnaireCompletionAdmissionBusyError } from '../../services/questionnaireCompletionAdmission'
@@ -306,6 +307,7 @@ export const claimCompositeReportJob = async (): Promise<CompositeReportJob | nu
   const settings = assessmentReportConfig()
   const leaseToken = randomUUID()
   const claimRequested = process.hrtime.bigint()
+  const claimWallStart = Date.now()
   const rows = await prisma.$queryRaw<Array<Omit<CompositeReportJob, 'wholeValidationEncrypted' | 'wholeValidationHash'>>>`
     UPDATE "composite_report_jobs" AS job SET
       "status" = 'PROCESSING', "lease_token" = ${leaseToken},
@@ -326,7 +328,22 @@ export const claimCompositeReportJob = async (): Promise<CompositeReportJob | nu
   const claimed = rows[0]
   // The delivery validation is not used during scoring or report generation.
   const result = claimed ? { ...claimed, wholeValidationEncrypted: null, wholeValidationHash: null } : null
-  if (result) recordAssessmentReportClaim(result, claimRequested, claimConfirmed)
+  if (result) {
+    recordAssessmentReportClaim(result, claimRequested, claimConfirmed)
+    if (reportQueueObsEnabled()) {
+      const acceptedAtMs = result.wholeAcceptedAt ? new Date(result.wholeAcceptedAt).getTime() : null
+      recordReportQueueEvent({
+        kind: 'claim',
+        attemptId: result.attemptId,
+        jobId: result.id,
+        acceptedAtMs,
+        claimQueryStartMs: claimWallStart,
+        claimQueryEndMs: Date.now(),
+        claimQueryMs: Number(claimConfirmed - claimRequested) / 1e6,
+        rows: 1,
+      })
+    }
+  }
   return result
 }
 
@@ -476,9 +493,10 @@ export const assertNoAcceptedWholeQuestionnaire = async (tx: Pick<Prisma.Transac
 
 export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParent, input: {
   submissionId: string; payloadHash: string; answersEncrypted: string; acceptedAt: Date; requiredFormSlots: string[]; validationHash?: string;
-},assertCollectionAllowed?: (tx:Prisma.TransactionClient)=>Promise<void>): Promise<{ acceptedAt: Date; replayed: boolean; queueDepth?: number }> => !assertCollectionAllowed&&(detachedWholeReceiptsEnabled() || process.env.ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED === 'true')
+},assertCollectionAllowed?: (tx:Prisma.TransactionClient)=>Promise<void>): Promise<{ acceptedAt: Date; replayed: boolean; queueDepth?: number }> => {
+  const receipt = await (!assertCollectionAllowed&&(detachedWholeReceiptsEnabled() || process.env.ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED === 'true')
   ? registerWholeReceiptAtomic(parent, input)
-  : traceAssessmentPhase('whole.transaction_roundtrip', () => prisma.$transaction(async tx => {
+  : tracePrismaInteractiveTransaction('whole', prisma, async (tx: Prisma.TransactionClient) => {
   markAssessmentTimeline('whole.transaction_callback_start')
   try {
   const detached = detachedWholeReceiptsEnabled()
@@ -553,10 +571,13 @@ export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParen
   if (!detached && saved.queueDepth === null) throw new QuestionnaireCompletionAdmissionBusyError('queue_full', 2)
   return { acceptedAt: input.acceptedAt, replayed: false, ...(saved.queueDepth === null ? {} : { queueDepth: saved.queueDepth }) }
   } finally { markAssessmentTimeline('whole.transaction_callback_end') }
-}, { isolationLevel: 'ReadCommitted', maxWait: 2000, timeout: 10_000 })).then(receipt => {
+}, { isolationLevel: 'ReadCommitted', maxWait: 2000, timeout: 10_000 }).then(receipt => {
   markAssessmentTimeline('whole.commit_confirmed')
   return receipt
-})
+}))
+  recordReceiptCommit({ attemptId: parent.id, attemptEpoch: parent.attemptEpoch, acceptedAt: receipt.acceptedAt, queueDepth: receipt.queueDepth, replayed: receipt.replayed })
+  return receipt
+}
 
 export const storeWholeQuestionnaireValidation = async (parent: BoundReportParent, encrypted: string, hash: string): Promise<void> => {
   const rows = await prisma.$queryRaw<Array<{ id: string }>>`

@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { Prisma, type PrismaClient } from '@prisma/client'
+import { withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
 import { canonicalHash, canonicalJsonString } from '../assessment-runtime/canonical'
 import { assertMeasurementDependency, assertReleaseTransition, ContentReleaseError, prepareRelease, type PreparedRelease, type ReleaseStatus } from './release'
 
@@ -24,7 +25,7 @@ const decode = (r: Row, verifyStoredDigest = true): StoredRelease => {
     publishedBy: r.published_by, publishedAt: r.published_at }
 }
 export async function getContentRelease(db: Db, releaseId: string, lockForPublication = false): Promise<StoredRelease | null> {
-  const rows = await db.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM measurement_content_releases WHERE id=${releaseId} ${lockForPublication ? Prisma.sql`FOR SHARE` : Prisma.empty}`)
+  const rows = await withStartNestedQueryRawLabel<Row[]>('content_release', () => db.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM measurement_content_releases WHERE id=${releaseId} ${lockForPublication ? Prisma.sql`FOR SHARE` : Prisma.empty}`))
   if (!rows[0]) return null
   const row = rows[0]
   return decode(row)
@@ -35,8 +36,8 @@ export async function getContentReleaseBatch(db: Db, ids: string[], lockForPubli
   const unique = [...new Set(ids)]
   if (unique.length > 1000) throw new ContentReleaseError('CONTENT_RELEASE_BATCH_LIMIT')
   if (!unique.length) return new Map()
-  const rows = await db.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM measurement_content_releases WHERE id IN (${Prisma.join(unique)})
-    ORDER BY id ${lockForPublication ? Prisma.sql`FOR SHARE` : Prisma.empty}`)
+  const rows = await withStartNestedQueryRawLabel<Row[]>('content_release_batch', () => db.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM measurement_content_releases WHERE id IN (${Prisma.join(unique)})
+    ORDER BY id ${lockForPublication ? Prisma.sql`FOR SHARE` : Prisma.empty}`))
   if (new Set(rows.map(row => row.id)).size !== rows.length || rows.some(row => !unique.includes(row.id)))
     throw new ContentReleaseError('CONTENT_RELEASE_BATCH_INVALID')
   return new Map(rows.map(row => { const value = decode(row); return [value.releaseId, value] }))

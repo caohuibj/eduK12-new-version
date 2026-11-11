@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
 import { BoundedArtifactCache } from './bounded-artifact-cache'
 import { canonicalHash, canonicalJsonBytes, retainImmutableCanonicalValue } from './canonical'
 import { decryptCompactField, encryptCompactField } from './compact-field-codec'
@@ -55,13 +56,13 @@ export const createPublicTemplateStore = (repository: PublicTemplateRepository, 
   return { saveMany, loadMany, stats: () => cache.stats() }
 }
 const repository: PublicTemplateRepository = {
-  read: hashes => hashes.length ? prisma.$queryRaw<PublicTemplateRow[]>`SELECT template_hash AS "templateHash", template_kind AS "templateKind",
-    plaintext_bytes AS "plaintextBytes", payload_encrypted AS "payloadEncrypted" FROM assessment_public_templates WHERE template_hash IN (${Prisma.join(hashes)})` : Promise.resolve([]),
+  read: hashes => hashes.length ? withStartNestedQueryRawLabel('public_template_read', () => prisma.$queryRaw<PublicTemplateRow[]>`SELECT template_hash AS "templateHash", template_kind AS "templateKind",
+    plaintext_bytes AS "plaintextBytes", payload_encrypted AS "payloadEncrypted" FROM assessment_public_templates WHERE template_hash IN (${Prisma.join(hashes)})`) : Promise.resolve([]),
   append: async rows => {
     if (!rows.length) return
-    await prisma.$executeRaw`INSERT INTO assessment_public_templates(template_hash, template_kind, plaintext_bytes, payload_encrypted)
+    await withStartNestedQueryRawLabel('public_template_append', () => prisma.$executeRaw`INSERT INTO assessment_public_templates(template_hash, template_kind, plaintext_bytes, payload_encrypted)
       VALUES ${Prisma.join(rows.map(row => Prisma.sql`(${row.templateHash}, ${row.templateKind}, ${row.plaintextBytes}, ${row.payloadEncrypted})`))}
-      ON CONFLICT (template_hash) DO NOTHING`
+      ON CONFLICT (template_hash) DO NOTHING`)
   },
 }
 export const publicTemplates = createPublicTemplateStore(repository)
@@ -74,9 +75,9 @@ export const publicTemplatesForDatabase = (db?: Pick<Prisma.TransactionClient,'$
  if(!db||db===prisma)return publicTemplates
  const known=transactionStores.get(db);if(known)return known
  const local=createPublicTemplateStore({
-  read:hashes=>hashes.length?db.$queryRaw<PublicTemplateRow[]>`SELECT template_hash AS "templateHash",template_kind AS "templateKind",plaintext_bytes AS "plaintextBytes",payload_encrypted AS "payloadEncrypted" FROM assessment_public_templates WHERE template_hash IN (${Prisma.join(hashes)})`:Promise.resolve([]),
-  append:async rows=>{if(rows.length)await db.$queryRaw`INSERT INTO assessment_public_templates(template_hash,template_kind,plaintext_bytes,payload_encrypted)
-    VALUES ${Prisma.join(rows.map(row=>Prisma.sql`(${row.templateHash},${row.templateKind},${row.plaintextBytes},${row.payloadEncrypted})`))} ON CONFLICT(template_hash) DO NOTHING RETURNING template_hash`},
+  read:hashes=>hashes.length?withStartNestedQueryRawLabel('public_template_read', () => db.$queryRaw<PublicTemplateRow[]>`SELECT template_hash AS "templateHash",template_kind AS "templateKind",plaintext_bytes AS "plaintextBytes",payload_encrypted AS "payloadEncrypted" FROM assessment_public_templates WHERE template_hash IN (${Prisma.join(hashes)})`):Promise.resolve([]),
+  append:async rows=>{if(rows.length)await withStartNestedQueryRawLabel('public_template_append', () => db.$queryRaw`INSERT INTO assessment_public_templates(template_hash,template_kind,plaintext_bytes,payload_encrypted)
+    VALUES ${Prisma.join(rows.map(row=>Prisma.sql`(${row.templateHash},${row.templateKind},${row.plaintextBytes},${row.payloadEncrypted})`))} ON CONFLICT(template_hash) DO NOTHING RETURNING template_hash`)},
  },{entries:64,bytes:2*1024*1024})
  transactionStores.set(db,local);return local
 }

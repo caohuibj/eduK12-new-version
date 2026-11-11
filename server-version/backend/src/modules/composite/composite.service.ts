@@ -168,7 +168,7 @@ import {
   withFinalOnlyCompletionTransaction,
   withQuestionnaireCompletionTransaction,
 } from '../../services/questionnaireProgressService'
-import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
+import { measureRequestPhase, measureRequestPhaseSync, traceAssessmentPhase, assessmentTimelineSpan, withQueryRawLabel, withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
 import {
   buildFrozenAnalysisProtocolSnapshot,
   encryptFrozenAnalysisProtocolSnapshot,
@@ -3276,10 +3276,10 @@ const createAttempt = async (
       const courseId = userId ? composite.deliveryCourseId : (courseIds.length === 1 ? courseIds[0] : null)
       if (!courseId || !courseIds.includes(courseId) || (!userId && composite.deliveryCourseId && composite.deliveryCourseId !== courseId))
         throw compositeBadRequest('冻结策略缺少明确授权的 Training 投放课程')
-      const facts = await (db as Prisma.TransactionClient).$queryRaw<Array<{ id: string; endedAt: Date | null }>>`SELECT c.id,c.ended_at AS "endedAt"
+      const facts = await withStartNestedQueryRawLabel('course_facts', () => (db as Prisma.TransactionClient).$queryRaw<Array<{ id: string; endedAt: Date | null }>>`SELECT c.id,c.ended_at AS "endedAt"
         FROM courses c JOIN users u ON u.id=${current.createdBy}
         WHERE c.id=${courseId} AND c.course_type='TRAINING_COURSE' AND NOT c.is_library AND c.status::text='PUBLISHED'
-        AND ${trainingCreatorAuthoritySql} FOR SHARE OF c,u`
+        AND ${trainingCreatorAuthoritySql} FOR SHARE OF c,u`)
       if (facts.length !== 1 || (facts[0].endedAt && new Date(facts[0].endedAt).getTime() <= Date.now()))
         throw compositeForbidden('Training 课程已关闭或投放权限无效')
       const publicationIdentity = trainingRoundPublicationIdentity(current, courseId)
@@ -3595,7 +3595,7 @@ const createAttempt = async (
   }
   if(materialAssignment){
     await ensureTrainingFlowCurrentChildInTransaction(db as Prisma.TransactionClient,attempt.id,userId?{userId}:{recoveryTokenHash:credential!.hash})
-    await db.$executeRawUnsafe('SET CONSTRAINTS training_material_claim_scope, training_material_quota_claim_scope, training_material_binding_scope, training_material_claim_attempt_fk, training_material_binding_initial_claim_fk IMMEDIATE')
+    await withStartNestedQueryRawLabel('set_constraints', () => db.$executeRawUnsafe('SET CONSTRAINTS training_material_claim_scope, training_material_quota_claim_scope, training_material_binding_scope, training_material_claim_attempt_fk, training_material_binding_initial_claim_fk IMMEDIATE'))
   }
   await contentCandidate?.recheckSourceLicenses()
   await assertTrainingPrivateReferenceAdmissionCurrent(db as Prisma.TransactionClient)
@@ -3736,6 +3736,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
   // Pure-read (write-time invariant): the student start path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
+  const preGateStart = process.hrtime.bigint()
   const composite = await loadComposite(compositeId, true)
   assertSupportedComposite(composite, false, false)
   await assertStudentEligibility(composite, userId)
@@ -3743,21 +3744,29 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
   // Fast resume only locks the matching attempt row, not the composite row
   // or new-START admission gate. FOR SHARE waits for a concurrent restart's
   // status UPDATE, so a retired attempt is not selected as IN_PROGRESS.
-  const [inProgress] = await prisma.$queryRaw<Array<{ id: string }>>`
+  const [inProgress] = await withQueryRawLabel('start.raw.pre_gate.in_progress', () => prisma.$queryRaw<Array<{ id: string }>>`
     SELECT "id" FROM "composite_assessment_attempts"
     WHERE "composite_assessment_id" = ${compositeId} AND "user_id" = ${userId}
       AND "status" = 'IN_PROGRESS'
-    ORDER BY "started_at" DESC LIMIT 1 FOR SHARE`
-  if (inProgress) return projectStartedAttempt(inProgress.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)
+    ORDER BY "started_at" DESC LIMIT 1 FOR SHARE`)
+  assessmentTimelineSpan('start.pre_gate_reads', preGateStart)
+  if (inProgress) return traceAssessmentPhase('start.post_gate_getAttemptState',
+    () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(inProgress.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)))
 
   const isUniqueConstraintError = (err: unknown) =>
     typeof err === 'object' && err !== null && 'code' in err && (err as { code?: unknown }).code === 'P2002'
 
+  const gateEnteredAt = process.hrtime.bigint()
   for (let retry = 0; retry < 2; retry += 1) {
     try {
       const attempt = await classifyStartTransaction(async () => {
         try {
-          return await trainingStartGate().run(() => prisma.$transaction(async (tx: Db) => {
+          return await trainingStartGate().run(async () => {
+            assessmentTimelineSpan('start.gate_wait', gateEnteredAt, process.hrtime.bigint())
+            return prisma.$transaction(async (tx: Db) => {
+        const inTxStart = process.hrtime.bigint()
+        try {
+        return await withQueryRawLabel('start.raw.in_tx', async () => {
         // Per-user admission: QUESTIONNAIRE (non-LEGACY delivery) and authenticated
         // LEGACY_COMPOSITE share FOR SHARE + (compositeId,userId) advisory lock.
         // Cross-user START can proceed in parallel; archive/close still take FOR UPDATE
@@ -3784,10 +3793,14 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
         })
         if (usage._count._all >= composite.maxAttempts) throw compositeConflict('已达到综合测评最大次数')
         return createAttempt(tx, composite, userId, null, undefined, (usage._max.attemptNo ?? 0) + 1)
-          }, { maxWait: 10_000, timeout: 30_000 }))
+        })
+        } finally { assessmentTimelineSpan('start.in_tx_admission_freeze_create', inTxStart) }
+          }, { maxWait: 10_000, timeout: 30_000 })
+          })
         } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
       })
-      return projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)
+      return traceAssessmentPhase('start.post_gate_getAttemptState',
+        () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)))
     } catch (err) {
       if (!isUniqueConstraintError(err) || retry === 1) throw err
     }

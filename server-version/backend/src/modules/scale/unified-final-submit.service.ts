@@ -25,7 +25,7 @@ import {
   InstrumentFinalSubmitError,
   validateSubmissionId,
 } from '../../services/instrumentFinalSubmit'
-import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
+import { measureRequestPhase, measureRequestPhaseSync, assessmentTimelineSpan, traceAssessmentPhase } from '../../services/runtimeObservability'
 import { missingRequiredScaleItemCodes, validateScaleAnswers, type ScaleAnswer } from './scale-scoring'
 import { buildScaleResult, type ScaleResultV2 } from './scale-result'
 import { encryptScaleAnswers, encryptScaleResult, readScaleAnswers, loadScaleAssessmentForResponse } from './scale-workflow.service'
@@ -278,7 +278,7 @@ export const prepareUnifiedScaleWrite = async (
   const inlineRaw = wholeRawParent ? null : encryptScaleAnswers(answers, persistedProvenance)
   const encryptedAnswers = compact ? makeScaleRawReference(input.attemptEpoch) : inlineRaw!
 
-  const result = await measureRequestPhase('final_submit_scoring', () => buildResult(child, snapshot, answers, admission, referenceDb))
+  const result = await traceAssessmentPhase('report.prepare.score', () => measureRequestPhase('final_submit_scoring', () => buildResult(child, snapshot, answers, admission, referenceDb)), child.id)
   const unitResult = snapshot.compiledRuntime.runtimeCapabilities.aggregateEligible
     && Boolean(child.questionnaireAssessmentId || child.compositeAttemptId)
     ? projectScaleCanonicalUnitResult({
@@ -296,7 +296,7 @@ export const prepareUnifiedScaleWrite = async (
     bundleBridge: buildScaleBundleBridge(result) }) : null
   const binding = { assessmentId: child.id, attemptEpoch: input.attemptEpoch, submissionId, payloadHash: prepared.payloadHash }
   let compactFact: ScaleFactRecord | null = null
-  const encrypted = await measureRequestPhase('final_submit_encryption', async () => {
+  const encrypted = await traceAssessmentPhase('report.prepare.encrypt', () => measureRequestPhase('final_submit_encryption', async () => {
     if (compact) {
       const stored = await prepareCompactScaleFacts({ result, itemOrder: snapshot.definition.items.map(item => item.itemCode), binding, canonical: envelope })
       compactFact = { id: child.id, attemptEpoch: input.attemptEpoch, submissionId, submissionPayloadHash: prepared.payloadHash,
@@ -305,7 +305,7 @@ export const prepareUnifiedScaleWrite = async (
       return { result: makeScaleFactsReference(input.attemptEpoch), canonicalResult: envelope ? makeCanonicalFactsReference(binding, envelope.resultHash) : null }
     }
     return { result: encryptScaleResult(result), canonicalResult: envelope ? encryptUnifiedRuntimePayload(envelope) : null }
-  })
+  }), child.id)
 
   const timingEncrypted=prepared.timing ? encryptUnifiedRuntimePayload(prepared.timing) : null
   return { timingEncrypted, result, canonical: envelope, compactFact: compactFact as ScaleFactRecord | null, persistedProvenance, encryptedAnswers, encrypted, completedAt }
@@ -515,14 +515,16 @@ export const submitUnifiedScaleCollectionBatch = async (
     write: Awaited<ReturnType<typeof prepareUnifiedScaleWrite>> | null;
   }> = []
   for (const { input, child } of units) {
-    const data = await prepareUnifiedScaleFinalSubmission(input, child, execution.acceptedAtMs, execution.studyReceipt)
+    const data = await traceAssessmentPhase('report.prepare.final_submission',
+      () => prepareUnifiedScaleFinalSubmission(input, child, execution.acceptedAtMs, execution.studyReceipt), child.id)
     if (child.compositeAttemptId !== job.attemptId || input.compositeAttemptId !== job.attemptId
       || child.questionnaireAssessmentId || input.assessmentId !== child.id || !data.admission.parent?.slotKey
       || !data.snapshot.compiledRuntime.runtimeCapabilities.aggregateEligible)
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表与冻结问卷绑定不匹配', 409)
     const replay = assertSubmissionReplay(child, data.submissionId, data.payloadHash)
     prepared.push({ input, child, data, write: replay === 'replay' && child.status === 'COMPLETED'
-      ? null : await prepareUnifiedScaleWrite(input, child, data, execution, referenceDb) })
+      ? null : await traceAssessmentPhase('report.prepare.write',
+        () => prepareUnifiedScaleWrite(input, child, data, execution, referenceDb), child.id) })
   }
   return withFinalOnlyCompletionTransaction(async tx => {
     // New study admissions always lock parent -> accepted job -> child. The
@@ -530,6 +532,7 @@ export const submitUnifiedScaleCollectionBatch = async (
     for(const unit of prepared)await assertStudyPrincipalIfAnonymous(tx,{attemptId:unit.child.compositeAttemptId,userId:unit.input.userId,
       recoveryTokenHash:unit.input.recoveryTokenHash,attemptEpoch:unit.input.attemptEpoch,
       frozenHash:unit.data.admission.principal.recoveryTokenHash,receipt:execution.studyReceipt,unit:unit.input},true)
+    const lockReadsStart = process.hrtime.bigint()
     const rows = await tx.$queryRaw<Array<{
       id: string; status: string; deliveryMode: string; runtimeGeneration: string | null; attemptEpoch: number;
       compiledRuntimeHash: string | null; frozenAdmissionSnapshotHash: string | null;
@@ -556,10 +559,12 @@ export const submitUnifiedScaleCollectionBatch = async (
         AND child."composite_attempt_id" = ${job.attemptId} AND child."attempt_epoch" = ${job.attemptEpoch}
       ORDER BY child."id" FOR UPDATE OF child
     `
+    assessmentTimelineSpan('report.units_batch.lock_reads', lockReadsStart)
     if (rows.length !== prepared.length) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表记录已变化', 409)
     // A completed parent may rebuild a report only from already committed,
     // identity-checked unit receipts. New writes still require IN_PROGRESS.
     const completedReplay = prepared.every(unit => unit.write === null)
+    const lockJobStart = process.hrtime.bigint()
     const lease = await tx.$queryRaw<Array<{ id: string }>>`
       SELECT job."id" FROM "composite_report_jobs" job
       JOIN "composite_assessment_attempts" parent ON parent."id" = job."attempt_id"
@@ -577,6 +582,7 @@ export const submitUnifiedScaleCollectionBatch = async (
         AND job."lease_expires_at" > (clock_timestamp() AT TIME ZONE 'UTC')
       FOR UPDATE OF job, parent
     `
+    assessmentTimelineSpan('report.units_batch.lock_job', lockJobStart)
     if (lease.length !== 1) throw new ReportProcessingLeaseLostError()
     const byId = new Map(rows.map(row => [row.id, row]))
     const writes = [], facts: ScaleFactRecord[] = [], snapshots: Prisma.AssessmentUnitSnapshotCreateManyInput[] = []
@@ -626,7 +632,8 @@ export const submitUnifiedScaleCollectionBatch = async (
         canonicalResultEncrypted: encrypted.canonicalResult, completedAt })
     }
     if (writes.length) {
-      await persistScaleFactRecords(tx, facts)
+      const factsStart = process.hrtime.bigint(); await persistScaleFactRecords(tx, facts); assessmentTimelineSpan('report.units_batch.facts', factsStart)
+      const batchUpdateStart = process.hrtime.bigint()
       const changed = await tx.$queryRaw<Array<{ id: string }>>`
         UPDATE "assessments" child SET "status" = 'COMPLETED', "answers" = source."answers", "result" = source."result",
           "progress" = 100, "completed_at" = source."completedAt", "total_time" = source."totalTime",
@@ -640,9 +647,12 @@ export const submitUnifiedScaleCollectionBatch = async (
           AND child."submission_id" IS NULL AND child."delivery_mode" = 'FINAL_ONLY' AND child."runtime_generation" = 'UNIFIED_V1'
         RETURNING child."id"
       `
+      assessmentTimelineSpan('report.units_batch.batch_update', batchUpdateStart)
       if (changed.length !== writes.length || new Set(changed.map(row => row.id)).size !== writes.length)
         throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表更新行数不匹配', 409)
+      const createManyStart = process.hrtime.bigint()
       const inserted = await tx.assessmentUnitSnapshot.createMany({ data: snapshots })
+      assessmentTimelineSpan('report.units_batch.createMany', createManyStart)
       if (inserted.count !== snapshots.length) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表快照行数不匹配', 409)
     }
     const fenced = await tx.$queryRaw<Array<{ id: string }>>`

@@ -1,10 +1,24 @@
+import { EventEmitter } from 'node:events'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { logger } from '../../utils/logger'
-import { markAssessmentTimeline, measureRequestPhase, traceAssessmentPhase, withAssessmentReportTimeline } from '../../services/runtimeObservability'
-const original = { isolated: process.env.PERF_ISOLATED_TEST_MODE, enabled: process.env.ASSESSMENT_TIMELINE_ENABLED }
+import { canonicalHash } from '../../modules/assessment-runtime/canonical'
+import {
+  markAssessmentTimeline, measureRequestPhase, traceAssessmentPhase,
+  withAssessmentReportTimeline, tracePrismaInteractiveTransaction, withQueryRawLabel,
+  recordPrismaCall, requestObservabilityMiddleware, currentAssessmentTimelineKind, withStartNestedQueryRawLabel,
+} from '../../services/runtimeObservability'
+const original = {
+  isolated: process.env.PERF_ISOLATED_TEST_MODE,
+  enabled: process.env.ASSESSMENT_TIMELINE_ENABLED,
+  sink: process.env.CHAIN_TIMELINE_PATH,
+}
 afterEach(() => {
   if (original.isolated === undefined) delete process.env.PERF_ISOLATED_TEST_MODE; else process.env.PERF_ISOLATED_TEST_MODE = original.isolated
   if (original.enabled === undefined) delete process.env.ASSESSMENT_TIMELINE_ENABLED; else process.env.ASSESSMENT_TIMELINE_ENABLED = original.enabled
+  if (original.sink === undefined) delete process.env.CHAIN_TIMELINE_PATH; else process.env.CHAIN_TIMELINE_PATH = original.sink
   vi.restoreAllMocks()
 })
 const enabled = () => { process.env.PERF_ISOLATED_TEST_MODE = '1'; process.env.ASSESSMENT_TIMELINE_ENABLED = 'true' }
@@ -34,6 +48,185 @@ describe('bounded technical assessment timelines', () => {
     process.env.PERF_ISOLATED_TEST_MODE = '0'; process.env.ASSESSMENT_TIMELINE_ENABLED = 'true'
     const output = vi.spyOn(logger, 'info').mockImplementation(() => undefined)
     expect(await withAssessmentReportTimeline({ attemptId: 'technical-attempt' }, async () => { markAssessmentTimeline('report.unit'); return 9 })).toBe(9)
+    expect(output).not.toHaveBeenCalled()
+  })
+
+  it('emits no timeline or canonical output when flags are off', async () => {
+    delete process.env.PERF_ISOLATED_TEST_MODE
+    delete process.env.ASSESSMENT_TIMELINE_ENABLED
+    delete process.env.CHAIN_TIMELINE_PATH
+    const output = vi.spyOn(logger, 'info').mockImplementation(() => undefined)
+    const value = { k: 'off-default' }
+    expect(canonicalHash(value)).toMatch(/^[a-f0-9]{64}$/)
+    expect(canonicalHash(value)).toBe(canonicalHash({ k: 'off-default' }))
+    expect(await withAssessmentReportTimeline({ attemptId: 'secret-attempt' }, async () => {
+      await traceAssessmentPhase('report.prepare.write', async () => 1)
+      return 'ok'
+    })).toBe('ok')
+    expect(output).not.toHaveBeenCalled()
+  })
+
+  it('splits an interactive transaction into begin_wait, callback and commit', async () => {
+    enabled(); const output = vi.spyOn(logger, 'info').mockImplementation(() => undefined)
+    const client = {
+      $transaction: async (fn: (tx: never) => Promise<unknown>) => {
+        await new Promise(resolve => setTimeout(resolve, 5))
+        const result = await fn({} as never)
+        await new Promise(resolve => setTimeout(resolve, 5))
+        return result
+      },
+    }
+    await withAssessmentReportTimeline({ attemptId: 'technical-attempt' }, async () => {
+      await tracePrismaInteractiveTransaction('whole', client, async () => {
+        await traceAssessmentPhase('whole.tx.job_upsert_lock', async () => 'locked')
+        return 'committed'
+      })
+    })
+    const record = JSON.parse(String(output.mock.calls[0][0]).slice('ASSESSMENT_TIMELINE '.length))
+    const names = record.events.map((event: { name: string }) => event.name)
+    expect(names).toEqual(expect.arrayContaining(['whole.tx.begin_wait', 'whole.tx.callback', 'whole.tx.commit', 'whole.transaction_roundtrip', 'whole.tx.job_upsert_lock']))
+    const byName = Object.fromEntries(record.events.map((event: { name: string; startNs: string; endNs: string }) => [event.name, event]))
+    expect(BigInt(byName['whole.tx.begin_wait'].endNs)).toBe(BigInt(byName['whole.tx.callback'].startNs))
+    expect(BigInt(byName['whole.tx.callback'].endNs)).toBe(BigInt(byName['whole.tx.commit'].startNs))
+    expect(record.connAcquireOrBeginMs).toBeGreaterThanOrEqual(0)
+  })
+
+  it('counts canonical normalize calls by site and duplicate object identity', async () => {
+    enabled(); const output = vi.spyOn(logger, 'info').mockImplementation(() => undefined)
+    const payload = { items: [1, 2, 3], title: 'fixture' }
+    await withAssessmentReportTimeline({ attemptId: 'technical-attempt' }, async () => {
+      canonicalHash(payload)
+      canonicalHash(payload)
+      canonicalHash({ items: [1, 2, 3], title: 'fixture' })
+    })
+    const record = JSON.parse(String(output.mock.calls[0][0]).slice('ASSESSMENT_TIMELINE '.length))
+    expect(record.canonical.totalCalls).toBeGreaterThanOrEqual(3)
+    expect(record.canonical.duplicateIdentityCalls).toBeGreaterThanOrEqual(1)
+    expect(record.canonical.uniqueSites).toBeGreaterThanOrEqual(1)
+    expect(Object.keys(record.canonical.bySite).some(site => site.includes('assessment-timeline.test'))).toBe(true)
+    expect(JSON.stringify(record)).not.toContain('technical-attempt')
+  })
+
+  it('labels queryRaw events and writes an optional sink only when enabled', async () => {
+    enabled()
+    const dir = mkdtempSync(join(tmpdir(), 'chain-timeline-'))
+    const sink = join(dir, 'timeline.jsonl')
+    process.env.CHAIN_TIMELINE_PATH = sink
+    const output = vi.spyOn(logger, 'info').mockImplementation(() => undefined)
+    await withAssessmentReportTimeline({ attemptId: 'secret-attempt-id', wholeAcceptedAt: new Date(Date.now() - 50) }, async () => {
+      await withQueryRawLabel('start.raw.post_gate', async () => {
+        recordPrismaCall(undefined, 'queryRaw', 3, process.hrtime.bigint() - 1_000_000n, process.hrtime.bigint())
+      })
+    })
+    const record = JSON.parse(String(output.mock.calls[0][0]).slice('ASSESSMENT_TIMELINE '.length))
+    expect(record.events.some((event: { name: string }) => event.name === 'start.raw.post_gate')).toBe(true)
+    expect(record.events.some((event: { name: string }) => event.name === 'db.raw.queryRaw')).toBe(true)
+    expect(JSON.stringify(record)).not.toContain('secret-attempt-id')
+    const written = readFileSync(sink, 'utf8').trim()
+    expect(written.length).toBeGreaterThan(0)
+    expect(written).not.toContain('secret-attempt-id')
+    rmSync(dir, { recursive: true, force: true })
+  })
+  it('labels the START pre-gate auth account lookup queryRaw', async () => {
+    enabled(); const output = vi.spyOn(logger, 'info').mockImplementation(() => undefined)
+    const response = Object.assign(new EventEmitter(), { statusCode: 200 }) as any
+    const request = {
+      method: 'POST',
+      originalUrl: '/api/composite-assessments/example-composite/attempts?delivery=whole',
+      url: '/api/composite-assessments/example-composite/attempts?delivery=whole',
+      path: '/api/composite-assessments/example-composite/attempts',
+      baseUrl: '',
+    } as any
+    let work: Promise<void> | undefined
+    requestObservabilityMiddleware(request, response, () => {
+      work = (async () => {
+        expect(currentAssessmentTimelineKind()).toBe('start')
+        const label = currentAssessmentTimelineKind() === 'start'
+          ? 'start.raw.pre_gate.auth_account_lookup'
+          : 'auth.raw.account_lookup'
+        await withQueryRawLabel(label, () => measureRequestPhase('auth_account_lookup', async () => {
+          recordPrismaCall(undefined, 'queryRaw', 3, process.hrtime.bigint() - 1_000_000n, process.hrtime.bigint())
+        }))
+      })()
+    })
+    await work
+    response.emit('finish')
+    const record = JSON.parse(String(output.mock.calls[0][0]).slice('ASSESSMENT_TIMELINE '.length))
+    const names = record.events.map((event: { name: string }) => event.name)
+    expect(names).toEqual(expect.arrayContaining([
+      'start.raw.pre_gate.auth_account_lookup', 'db.raw.queryRaw', 'auth_account_lookup',
+    ]))
+    expect(JSON.stringify(record)).not.toContain('example-composite')
+  })
+
+  it('leaves auth account lookup unlabeled when timelines are off', async () => {
+    delete process.env.PERF_ISOLATED_TEST_MODE
+    delete process.env.ASSESSMENT_TIMELINE_ENABLED
+    expect(currentAssessmentTimelineKind()).toBeUndefined()
+    const output = vi.spyOn(logger, 'info').mockImplementation(() => undefined)
+    const response = Object.assign(new EventEmitter(), { statusCode: 200 }) as any
+    const request = {
+      method: 'POST',
+      originalUrl: '/api/composite-assessments/example-composite/attempts',
+      url: '/api/composite-assessments/example-composite/attempts',
+      path: '/api/composite-assessments/example-composite/attempts',
+      baseUrl: '',
+    } as any
+    let work: Promise<void> | undefined
+    requestObservabilityMiddleware(request, response, () => {
+      work = (async () => {
+        expect(currentAssessmentTimelineKind()).toBeUndefined()
+        const label = currentAssessmentTimelineKind() === 'start'
+          ? 'start.raw.pre_gate.auth_account_lookup'
+          : 'auth.raw.account_lookup'
+        await withQueryRawLabel(label, () => measureRequestPhase('auth_account_lookup', async () => {
+          recordPrismaCall(undefined, 'queryRaw', 3, process.hrtime.bigint() - 1_000_000n, process.hrtime.bigint())
+        }))
+      })()
+    })
+    await work
+    response.emit('finish')
+    expect(output).not.toHaveBeenCalled()
+  })
+
+
+  it('nests a per-site START raw label under an in_tx bucket', async () => {
+    enabled(); const output = vi.spyOn(logger, 'info').mockImplementation(() => undefined)
+    const response = Object.assign(new EventEmitter(), { statusCode: 200 }) as any
+    const request = {
+      method: 'POST',
+      originalUrl: '/api/composite-assessments/example-composite/attempts',
+      url: '/api/composite-assessments/example-composite/attempts',
+      path: '/api/composite-assessments/example-composite/attempts',
+      baseUrl: '',
+    } as any
+    let work: Promise<void> | undefined
+    requestObservabilityMiddleware(request, response, () => {
+      work = (async () => {
+        await withQueryRawLabel('start.raw.in_tx', async () => {
+          await withStartNestedQueryRawLabel('course_facts', async () => {
+            recordPrismaCall(undefined, 'queryRaw', 3, process.hrtime.bigint() - 1_000_000n, process.hrtime.bigint())
+          })
+        })
+      })()
+    })
+    await work
+    response.emit('finish')
+    const record = JSON.parse(String(output.mock.calls[0][0]).slice('ASSESSMENT_TIMELINE '.length))
+    const names = record.events.map((event: { name: string }) => event.name)
+    expect(names).toEqual(expect.arrayContaining(['start.raw.in_tx.course_facts', 'db.raw.queryRaw']))
+    expect(JSON.stringify(record)).not.toContain('example-composite')
+  })
+
+  it('does not emit nested START raw labels when timelines are off', async () => {
+    delete process.env.PERF_ISOLATED_TEST_MODE
+    delete process.env.ASSESSMENT_TIMELINE_ENABLED
+    const output = vi.spyOn(logger, 'info').mockImplementation(() => undefined)
+    await withQueryRawLabel('start.raw.in_tx', async () => {
+      await withStartNestedQueryRawLabel('course_facts', async () => {
+        recordPrismaCall(undefined, 'queryRaw', 3, process.hrtime.bigint() - 1_000_000n, process.hrtime.bigint())
+      })
+    })
     expect(output).not.toHaveBeenCalled()
   })
 })

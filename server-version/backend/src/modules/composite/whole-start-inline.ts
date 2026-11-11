@@ -1,4 +1,5 @@
 import { logger } from '../../utils/logger'
+import { traceAssessmentPhase, withQueryRawLabel } from '../../services/runtimeObservability'
 
 export type StartPayloadWithAttempt = { attempt?: { id?: string; executionMode?: string } }
 type WholeDefinition = Awaited<ReturnType<typeof import('./whole-questionnaire.service').getWholeQuestionnaireDefinition>>
@@ -23,7 +24,8 @@ export const startResponseWithInlineWholeDefinition = async <T extends StartPayl
   if (!wantsWholeDelivery || !attemptId || data.attempt?.executionMode !== 'WHOLE_LOCAL') return data
   try {
     const { getWholeQuestionnaireDefinition } = await import('./whole-questionnaire.service')
-    const wholeDefinition = await getWholeQuestionnaireDefinition(attemptId, principal, preloadedParent)
+    const wholeDefinition = await traceAssessmentPhase('start.inline_whole_definition',
+      () => withQueryRawLabel('start.raw.inline_definition', () => getWholeQuestionnaireDefinition(attemptId, principal, preloadedParent)))
     return { ...data, wholeDefinition }
   } catch (error) {
     logger.info('whole definition inline delivery', { phase: 'inline_delivery', outcome: 'fallback',

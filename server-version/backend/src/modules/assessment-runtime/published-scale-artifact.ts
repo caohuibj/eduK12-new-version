@@ -1,5 +1,6 @@
 import { gzipSync, gunzipSync } from 'node:zlib'
 import { z } from 'zod'
+import { withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
 import { canonicalHash, canonicalJsonBytes, retainImmutableCanonicalValue } from './canonical'
 import { BoundedArtifactCache } from './bounded-artifact-cache'
 import { encryptUnifiedRuntimePayload, decryptUnifiedRuntimePayload } from './security'
@@ -135,8 +136,8 @@ export async function loadPublishedScaleArtifacts(db: SharedScaleArtifactDb, has
     }
   }
   if (missing.length) {
-    const rows = await db.$queryRaw<SharedScaleArtifactRecord[]>`SELECT artifact_hash AS "artifactHash", format_version AS "formatVersion",
-      plaintext_bytes AS "plaintextBytes", payload_encrypted AS "payloadEncrypted" FROM assessment_runtime_artifacts WHERE artifact_hash = ANY(${missing}::text[])`
+    const rows = await withStartNestedQueryRawLabel<SharedScaleArtifactRecord[]>('published_scale_artifacts', () => db.$queryRaw<SharedScaleArtifactRecord[]>`SELECT artifact_hash AS "artifactHash", format_version AS "formatVersion",
+      plaintext_bytes AS "plaintextBytes", payload_encrypted AS "payloadEncrypted" FROM assessment_runtime_artifacts WHERE artifact_hash = ANY(${missing}::text[])`)
     const byHash = new Map(rows.map(row => [row.artifactHash, row]))
     for (const hash of missing) {
       const row = byHash.get(hash)

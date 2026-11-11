@@ -1,5 +1,6 @@
 import { randomUUID, randomInt } from 'node:crypto'
 import { canonicalHash } from '../assessment-runtime/canonical'
+import { withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { planMaterialAllocation } from '../assessment-core/materials/allocation'
 import type { FrozenTrainingFlow } from '../assessment-core/flow/training'
@@ -43,8 +44,8 @@ export async function allocateTrainingMaterial(tx:any,attempt:any,composite:any,
   if(!courseId||!participantKey)fail()
   const groupKeysHash=canonicalHash(flow.experiment.groups.map(group=>group.groupKey).sort())
   const id=randomUUID()
-  await tx.$executeRaw`INSERT INTO training_material_experiments (id,owner_id,course_id,experiment_key,group_keys_hash) VALUES (${id},${composite.createdBy},${courseId},${flow.experiment.experimentKey},${groupKeysHash}) ON CONFLICT (owner_id,course_id,experiment_key) DO NOTHING`
-  const scopes=await tx.$queryRaw`SELECT id,group_keys_hash AS "groupKeysHash" FROM training_material_experiments WHERE owner_id=${composite.createdBy} AND course_id=${courseId} AND experiment_key=${flow.experiment.experimentKey} FOR SHARE`
+  await withStartNestedQueryRawLabel('material_experiment_insert', () => tx.$executeRaw`INSERT INTO training_material_experiments (id,owner_id,course_id,experiment_key,group_keys_hash) VALUES (${id},${composite.createdBy},${courseId},${flow.experiment.experimentKey},${groupKeysHash}) ON CONFLICT (owner_id,course_id,experiment_key) DO NOTHING`)
+  const scopes=await withStartNestedQueryRawLabel<Array<{id:string;groupKeysHash:string}>>('material_experiment_share', () => tx.$queryRaw<Array<{id:string;groupKeysHash:string}>>`SELECT id,group_keys_hash AS "groupKeysHash" FROM training_material_experiments WHERE owner_id=${composite.createdBy} AND course_id=${courseId} AND experiment_key=${flow.experiment.experimentKey} FOR SHARE`)
   const scope=scopes[0]
   if(scopes.length!==1||scope.groupKeysHash!==groupKeysHash)throw compositeConflict('同一课程实验的组键合同不一致，请使用新的明确实验标识')
   let claim:any
@@ -57,11 +58,11 @@ export async function allocateTrainingMaterial(tx:any,attempt:any,composite:any,
     // Hash collisions only serialize unrelated subjects; equality remains the
     // complete indexed experimentId/participantKey pair below.
     if(flow.experiment.linkedPolicy==='KEEP_LINKED'&&attempt.userId)
-      await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${'TRAINING_MATERIAL_KEEP_LINKED_V1:'+canonicalHash({experimentId:scope.id,participantKey})},0))`
+      await withStartNestedQueryRawLabel('material_advisory', () => tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${'TRAINING_MATERIAL_KEEP_LINKED_V1:'+canonicalHash({experimentId:scope.id,participantKey})},0))`)
     let buckets:any[]|undefined
     if(flow.quotaPolicy){
       await tx.trainingMaterialQuotaBucket.createMany({data:flow.experiment.groups.map(group=>({id:randomUUID(),compositeId:composite.id,publicationKey,configDigest:flow.flowDigest,groupKey:group.groupKey,maxAssigned:flow.quotaPolicy!.groupLimits[group.groupKey],assignedCount:0})),skipDuplicates:true})
-      buckets=await tx.$queryRaw`SELECT id,group_key AS "groupKey",max_assigned AS "maxAssigned",assigned_count AS "assignedCount" FROM training_material_quota_buckets WHERE composite_id=${composite.id} AND publication_key=${publicationKey} AND config_digest=${flow.flowDigest} ORDER BY group_key FOR UPDATE`
+      buckets=await withStartNestedQueryRawLabel('material_quota_lock', () => tx.$queryRaw`SELECT id,group_key AS "groupKey",max_assigned AS "maxAssigned",assigned_count AS "assignedCount" FROM training_material_quota_buckets WHERE composite_id=${composite.id} AND publication_key=${publicationKey} AND config_digest=${flow.flowDigest} ORDER BY group_key FOR UPDATE`)
     }
     const linked=flow.experiment.linkedPolicy==='KEEP_LINKED'&&attempt.userId
       ?await tx.trainingMaterialSubjectBinding.findUnique({where:{experimentId_participantKey:{experimentId:scope.id,participantKey}}}):null

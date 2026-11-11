@@ -3,6 +3,7 @@ import type { InstrumentAuthorizationRecordV1 } from '../../assessment-authoriza
 import { parseInstrumentAuthorizationRecord } from '../../assessment-authorization/records-schema'
 import { BoundedArtifactCache, artifactContentKey, jsonArtifactBytes } from '../../assessment-runtime/bounded-artifact-cache'
 import { retainImmutableCanonicalValue } from '../../assessment-runtime/canonical'
+import { withStartNestedQueryRawLabel } from '../../../services/runtimeObservability'
 import {
   hashScaleDeploymentPolicy,
   scaleDeploymentPolicySchema,
@@ -110,7 +111,7 @@ export const readActiveScaleDeployment = async (
   if (preloaded && preloaded.has(scaleId)) {
     return preloaded.get(scaleId) ?? null
   }
-  const rows = await db.$queryRaw<DeploymentRow[]>(Prisma.sql`
+  const rows = await withStartNestedQueryRawLabel('deployment', () => db.$queryRaw<DeploymentRow[]>(Prisma.sql`
     SELECT
       "id",
       "scale_id" AS "scaleId",
@@ -126,7 +127,7 @@ export const readActiveScaleDeployment = async (
     FROM "scale_deployment_policies"
     WHERE "scale_id" = ${scaleId} AND "status" = 'ACTIVE'
     LIMIT 1
-  `)
+  `))
   return rows[0] ? toDeployment(rows[0]) : null
 }
 
@@ -136,11 +137,11 @@ export async function readActiveScaleDeployments(db:Db,scaleIds:readonly string[
  const ids=[...new Set(scaleIds)]
  if(ids.length>50)throw new Error('Scale deployment summary page exceeds 50 identities')
  if(!ids.length)return new Map<string,StoredScaleDeploymentPolicyV1>()
- const rows=await db.$queryRaw<DeploymentRow[]>(Prisma.sql`SELECT
+ const rows=await withStartNestedQueryRawLabel('deployment_batch', () => db.$queryRaw<DeploymentRow[]>(Prisma.sql`SELECT
   id,scale_id AS "scaleId",revision,status,policy_json AS "policyJson",policy_hash AS "policyHash",
   authorization_refs AS "authorizationRefs",created_by_user_id AS "createdByUserId",
   created_at AS "createdAt",activated_at AS "activatedAt",retired_at AS "retiredAt"
-  FROM scale_deployment_policies WHERE scale_id=ANY(${ids}::text[]) AND status='ACTIVE'`)
+  FROM scale_deployment_policies WHERE scale_id=ANY(${ids}::text[]) AND status='ACTIVE'`))
  const result=new Map<string,StoredScaleDeploymentPolicyV1>()
  for(const row of rows){
   if(!ids.includes(row.scaleId)||result.has(row.scaleId))throw new Error('Scale deployment summary identity conflict')

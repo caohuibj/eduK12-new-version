@@ -1,3 +1,4 @@
+import { appendFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { AsyncLocalStorage } from 'node:async_hooks'
 import { monitorEventLoopDelay, PerformanceObserver, performance } from 'node:perf_hooks'
@@ -64,9 +65,19 @@ type Histogram = {
   bucketCounts: number[]
 }
 
+type CanonicalSiteStats = { calls: number; duplicateIdentity: number }
+type CanonicalObservation = {
+  totalCalls: number
+  duplicateIdentityCalls: number
+  bySite: Map<string, CanonicalSiteStats>
+  identity: WeakMap<object, number>
+}
 type RequestObservation = {
   timeline?: TechnicalTimeline
   startedAt: bigint
+  queryRawLabel?: string
+  canonical?: CanonicalObservation
+  ackToClaimMs?: number
   phases: Array<{
     phase: RequestObservationPhase
     durationMs: number
@@ -386,7 +397,7 @@ const dominantPhaseFor = (attribution: Map<string, number>): string => {
 }
 
 type TechnicalTimeline = {
-  kind: 'submission' | 'report'; attemptHash: string; originNs: bigint; wallStartMs: number;
+  kind: 'submission' | 'report' | 'start' | 'definition'; attemptHash: string; originNs: bigint; wallStartMs: number;
   events: Array<{ name: string; startNs: string; endNs: string; unitHash?: string }>;
   dropped: number; cpuStart: NodeJS.CpuUsage; gcStart: number; gcMsStart: number;
 }
@@ -403,20 +414,65 @@ const pushTimeline = (timeline: TechnicalTimeline | undefined, name: string, sta
   if (!/^[a-zA-Z0-9_.-]{1,100}$/.test(name)) return
   timeline.events.push({ name, startNs: start.toString(), endNs: end.toString(), ...(unitId ? { unitHash: technicalHash(unitId) } : {}) })
 }
+const TX_SPAN_PREFIXES = ['whole.transaction_roundtrip', 'start.in_tx', 'report.units_batch', 'whole.tx.', 'report.units_and_snapshot_persistence']
+const deriveTimelineDbStats = (timeline: TechnicalTimeline) => {
+  const events = timeline.events
+  const db = events.filter((event) => event.name.startsWith('db.'))
+  const prismaCallCount = db.length
+  const prismaTimeMs = db.reduce((sum, event) => sum + (Number(BigInt(event.endNs) - BigInt(event.startNs)) / 1e6), 0)
+  const txWindows = events.filter((event) => TX_SPAN_PREFIXES.some((prefix) => event.name.startsWith(prefix)))
+    .map((event) => ({ start: BigInt(event.startNs), end: BigInt(event.endNs) }))
+  const inTx = (start: bigint, end: bigint) => txWindows.some((window) => start >= window.start && end <= window.end)
+  let idleInTransactionMs = 0
+  const ordered = db.map((event) => ({ start: BigInt(event.startNs), end: BigInt(event.endNs) })).sort((a, b) => a.start < b.start ? -1 : 1)
+  for (let i = 1; i < ordered.length; i++) {
+    const gapStart = ordered[i - 1].end, gapEnd = ordered[i].start
+    if (gapEnd > gapStart && inTx(gapStart, gapEnd)) idleInTransactionMs += Number(gapEnd - gapStart) / 1e6
+  }
+  let connAcquireMs = 0
+  for (const window of txWindows) {
+    const first = ordered.find((event) => event.start >= window.start && event.start <= window.end)
+    if (first && first.start > window.start) connAcquireMs += Number(first.start - window.start) / 1e6
+  }
+  return {
+    prismaCallCount,
+    prismaTimeMs: Math.round(prismaTimeMs * 1000) / 1000,
+    idleInTransactionMs: Math.round(idleInTransactionMs * 1000) / 1000,
+    connAcquireOrBeginMs: Math.round(connAcquireMs * 1000) / 1000,
+  }
+}
+const summarizeCanonical = (observation: RequestObservation) => {
+  const canonical = observation.canonical
+  if (!canonical) return undefined
+  const bySite: Record<string, CanonicalSiteStats> = {}
+  for (const [site, stats] of canonical.bySite) bySite[site] = stats
+  return {
+    totalCalls: canonical.totalCalls,
+    duplicateIdentityCalls: canonical.duplicateIdentityCalls,
+    uniqueSites: canonical.bySite.size,
+    bySite,
+  }
+}
 const emitTimeline = (observation: RequestObservation, terminal: string): void => {
   const timeline = observation.timeline
   if (!timeline) return
   try {
     const ended = process.hrtime.bigint(), cpu = process.cpuUsage(timeline.cpuStart)
-    const record = { schemaVersion: 1, kind: timeline.kind, attemptHash: timeline.attemptHash, processId: process.pid,
+    const derived = deriveTimelineDbStats(timeline)
+    const record = { schemaVersion: 2, kind: timeline.kind, attemptHash: timeline.attemptHash, processId: process.pid,
       clock: 'node-hrtime-monotonic', originNs: timeline.originNs.toString(), wallStartMs: timeline.wallStartMs,
       endedNs: ended.toString(), wallEndMs: Date.now(), terminal,
       processCpuMsDuringWindow: (cpu.user + cpu.system) / 1000, processGcEventsDuringWindow: gcEvents - timeline.gcStart,
       processGcMsDuringWindow: gcDurationMs - timeline.gcMsStart, heapUsedBytes: process.memoryUsage().heapUsed,
-      events: timeline.events, dropped: timeline.dropped }
+      events: timeline.events, dropped: timeline.dropped, ...derived,
+      ...(observation.ackToClaimMs != null ? { ackToClaimMs: observation.ackToClaimMs } : {}),
+      ...(observation.canonical ? { canonical: summarizeCanonical(observation) } : {}) }
     const encodingStart = process.hrtime.bigint(), text = JSON.stringify(record)
     const encodingMs = Number(process.hrtime.bigint() - encodingStart) / 1e6
-    logger.info('ASSESSMENT_TIMELINE ' + text.slice(0, -1) + ',"encodingMs":' + encodingMs + '}')
+    const line = text.slice(0, -1) + ',"encodingMs":' + encodingMs + '}'
+    logger.info('ASSESSMENT_TIMELINE ' + line)
+    const sink = process.env.CHAIN_TIMELINE_PATH
+    if (sink) { try { appendFileSync(sink, line + '\n') } catch { /* diagnostics cannot change outcome */ } }
   } catch { /* Diagnostics cannot change receipt or report outcome. */ }
 }
 export const markAssessmentTimeline = (name: string, unitId?: string): void => {
@@ -437,6 +493,92 @@ export const traceAssessmentPhaseSync = <T>(name: string, operation: () => T): T
   try { return operation() }
   finally { pushTimeline(observationStorage.getStore()?.timeline, name, start, process.hrtime.bigint()) }
 }
+
+/** Bucket Prisma $queryRaw / $executeRaw events under a stable START or submit label. */
+export const withQueryRawLabel = async <T>(label: string, operation: () => Promise<T>): Promise<T> => {
+  const observation = observationStorage.getStore()
+  if (!observation?.timeline) return operation()
+  const previous = observation.queryRawLabel
+  observation.queryRawLabel = label
+  try { return await operation() }
+  finally { observation.queryRawLabel = previous }
+}
+
+export const currentAssessmentTimelineKind = (): TechnicalTimeline['kind'] | undefined =>
+  observationStorage.getStore()?.timeline?.kind
+
+/** Refine an active START raw bucket (start.raw.in_tx / start.raw.inline_definition)
+ * with a per-site suffix. No-op when flags are off or no matching outer label. */
+export const withStartNestedQueryRawLabel = async <T>(site: string, operation: () => Promise<T>): Promise<T> => {
+  if (currentAssessmentTimelineKind() !== 'start') return operation()
+  const current = observationStorage.getStore()?.queryRawLabel || ''
+  const bucket = current.startsWith('start.raw.inline_definition') ? 'start.raw.inline_definition'
+    : current.startsWith('start.raw.in_tx') ? 'start.raw.in_tx'
+    : ''
+  if (!bucket) return operation()
+  return withQueryRawLabel(`${bucket}.${site}`, operation)
+}
+
+/** Split an interactive Prisma transaction into begin/wait, callback, and commit spans. */
+export const tracePrismaInteractiveTransaction = async <T>(
+  prefix: string,
+  client: { $transaction: (...args: any[]) => Promise<any> },
+  callback: (tx: any) => Promise<T>,
+  options?: unknown,
+): Promise<T> => {
+  const started = process.hrtime.bigint()
+  let callbackStarted: bigint | undefined
+  let callbackEnded: bigint | undefined
+  try {
+    return await client.$transaction(async (tx: any) => {
+      callbackStarted = process.hrtime.bigint()
+      assessmentTimelineSpan(`${prefix}.tx.begin_wait`, started, callbackStarted)
+      try { return await callback(tx) }
+      finally { callbackEnded = process.hrtime.bigint(); assessmentTimelineSpan(`${prefix}.tx.callback`, callbackStarted, callbackEnded) }
+    }, options)
+  } finally {
+    const ended = process.hrtime.bigint()
+    if (callbackEnded) assessmentTimelineSpan(`${prefix}.tx.commit`, callbackEnded, ended)
+    assessmentTimelineSpan(`${prefix}.transaction_roundtrip`, started, ended)
+  }
+}
+
+const sanitizeCanonicalSite = (raw: string): string => {
+  const base = raw.replace(/\\/g, '/').split('/').pop() || 'unknown'
+  const cleaned = base.replace(/[^a-zA-Z0-9._:-]/g, '_').slice(0, 80)
+  return cleaned || 'unknown'
+}
+const canonicalCallSite = (): string => {
+  const stack = new Error().stack || ''
+  for (const line of stack.split('\n')) {
+    if (!line.includes('.ts') && !line.includes('.js')) continue
+    if (/canonical\.[tj]s/.test(line) || line.includes('recordCanonicalOperation') || line.includes('canonicalCallSite') || /runtimeObservability\.[tj]s/.test(line)) continue
+    const match = line.match(/\(([^)]+):(\d+):\d+\)/) || line.match(/at\s+(\S+):(\d+):\d+/)
+    if (match) return sanitizeCanonicalSite(match[1] + ':' + match[2])
+  }
+  return 'unknown'
+}
+/** Count one canonical normalize/hash when a request timeline is active. No-op otherwise. */
+export const recordCanonicalOperation = (value: unknown): void => {
+  const observation = observationStorage.getStore()
+  if (!observation?.timeline) return
+  if (!observation.canonical) {
+    observation.canonical = { totalCalls: 0, duplicateIdentityCalls: 0, bySite: new Map(), identity: new WeakMap() }
+  }
+  const stats = observation.canonical
+  stats.totalCalls += 1
+  let duplicate = false
+  if (value && typeof value === 'object') {
+    const seen = stats.identity.get(value) || 0
+    stats.identity.set(value, seen + 1)
+    if (seen > 0) { stats.duplicateIdentityCalls += 1; duplicate = true }
+  }
+  const site = canonicalCallSite()
+  const current = stats.bySite.get(site) || { calls: 0, duplicateIdentity: 0 }
+  current.calls += 1
+  if (duplicate) current.duplicateIdentity += 1
+  stats.bySite.set(site, current)
+}
 export const observeWholeMiddleware = (name: string, middleware: RequestHandler): RequestHandler => (req, res, next) => {
   if (!observationStorage.getStore()?.timeline) return middleware(req, res, next)
   const start = process.hrtime.bigint(); let done = false
@@ -445,15 +587,17 @@ export const observeWholeMiddleware = (name: string, middleware: RequestHandler)
   try { return middleware(req, res, error => { complete(); next(error) }) }
   catch (error) { complete(); next(error) }
 }
-const reportClaims = new WeakMap<object, { start: bigint; claimed: bigint; loaded: bigint }>()
+const reportClaims = new WeakMap<object, { start: bigint; claimed: bigint; loaded: bigint; wallClaimedMs: number }>()
 export const recordAssessmentReportClaim = (job: object, start: bigint, claimed: bigint, loaded = process.hrtime.bigint()): void => {
-  if (timelineEnabled()) reportClaims.set(job, { start, claimed, loaded })
+  if (timelineEnabled()) reportClaims.set(job, { start, claimed, loaded, wallClaimedMs: Date.now() })
 }
-export const withAssessmentReportTimeline = async <T>(job: { attemptId: string }, operation: () => Promise<T>): Promise<T> => {
+export const withAssessmentReportTimeline = async <T>(job: { attemptId: string; wholeAcceptedAt?: Date | null }, operation: () => Promise<T>): Promise<T> => {
   if (!timelineEnabled()) return operation()
   const timeline = newTimeline('report', job.attemptId), claim = reportClaims.get(job)
   if (claim) { pushTimeline(timeline, 'report.claim_update_roundtrip', claim.start, claim.claimed); pushTimeline(timeline, 'report.claim_payload_read', claim.claimed, claim.loaded) }
-  const observation: RequestObservation = { startedAt: timeline.originNs, phases: [], timeline }
+  const acceptedAt = job.wholeAcceptedAt ? new Date(job.wholeAcceptedAt).getTime() : NaN
+  const ackToClaimMs = claim && Number.isFinite(acceptedAt) ? Math.max(0, claim.wallClaimedMs - acceptedAt) : undefined
+  const observation: RequestObservation = { startedAt: timeline.originNs, phases: [], timeline, ...(ackToClaimMs != null ? { ackToClaimMs } : {}) }
   return observationStorage.run(observation, async () => {
     let terminal = 'returned'
     try { markAssessmentTimeline('report.processor_enter'); return await operation() }
@@ -479,6 +623,17 @@ export const wholeQuestionnaireArrival = (req: Request) => {
 /** Attach a request-scoped, non-sensitive performance context. */
 export const requestObservabilityMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   let technicalTimeline: TechnicalTimeline | undefined
+  const url = req.originalUrl || req.url || ''
+  if (timelineEnabled() && req.method === 'POST' && /\/composite-assessments\/[^/]+\/attempts\/?(\?|$)/.test(url)) {
+    const match = url.match(/\/composite-assessments\/([^/]+)\/attempts/)
+    technicalTimeline = newTimeline('start', match?.[1] || 'start')
+    pushTimeline(technicalTimeline, 'http.request_start', process.hrtime.bigint())
+  }
+  if (timelineEnabled() && req.method === 'GET' && /\/attempts\/[^/]+\/whole\/definition(?:\?|$)/.test(url)) {
+    const match = url.match(/\/attempts\/([^/]+)\/whole\/definition/)
+    technicalTimeline = newTimeline('definition', match?.[1] || 'definition')
+    pushTimeline(technicalTimeline, 'http.request_start', process.hrtime.bigint())
+  }
   if (req.method === 'POST' && /\/composite-assessments\/attempts\/[^/]+\/whole\/submit(?:\?|$)/.test(req.originalUrl || req.url)) {
     const arrival = { requestStartedAtMs: Date.now(), bodyReceivedAtMs: undefined as number | undefined }
     if (timelineEnabled()) {
@@ -615,7 +770,13 @@ export const recordPrismaCall = (
   action: string | undefined,
   durationMs: number, startedAt?: bigint, endedAt?: bigint,
 ): void => {
-  if (startedAt && endedAt) assessmentTimelineSpan(`db.${model || "raw"}.${action || "unknown"}`, startedAt, endedAt)
+  if (startedAt && endedAt) {
+    assessmentTimelineSpan(`db.${model || "raw"}.${action || "unknown"}`, startedAt, endedAt)
+    const label = observationStorage.getStore()?.queryRawLabel
+    if (label && (!model || action === 'queryRaw' || action === 'executeRaw')) {
+      assessmentTimelineSpan(label, startedAt, endedAt)
+    }
+  }
   observeLabeledHistogram(prismaCallHistograms, {
     model: model || 'raw',
     action: action || 'unknown',

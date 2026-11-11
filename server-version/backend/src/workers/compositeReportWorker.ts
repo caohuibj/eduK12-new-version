@@ -3,6 +3,7 @@ import { reportResourceClaimDecision } from '../services/assessmentResourceProte
 import { reportClaimDecision, reportPriorityClaimed, startReportClaimPriority, stopReportClaimPriority } from '../services/wholeSubmissionPriority'
 import { publishReportReady } from '../services/reportReadyNotifications'
 import { withAssessmentReportTimeline, markAssessmentTimeline, traceAssessmentPhase } from '../services/runtimeObservability'
+import { recordReportQueueEvent, reportQueueObsEnabled, sampleReportQueuePending } from '../services/reportQueueObservability'
 import type { CompositeReportJob } from '@prisma/client'
 import { prisma } from '../config/database'
 import { assessmentReportConfig } from '../config/assessmentReports'
@@ -25,6 +26,8 @@ const active = new Set<Promise<void>>()
 
 /** This processor never accepts answers, changes scoring rules or opens HTTP. */
 export const processCompositeReportJob = async (job: CompositeReportJob): Promise<void> => withAssessmentReportTimeline(job, async () => {
+  const generationStartMs = Date.now()
+  if (reportQueueObsEnabled()) recordReportQueueEvent({ kind: 'generation_start', attemptId: job.attemptId, jobId: job.id, startMs: generationStartMs })
   const settings = assessmentReportConfig()
   const heartbeat = setInterval(() => {
     void renewCompositeReportLease(job).catch(error => logger.warn('Report lease renewal failed', { jobId: job.id, error: String(error) }))
@@ -76,6 +79,10 @@ export const processCompositeReportJob = async (job: CompositeReportJob): Promis
     clearInterval(heartbeat)
   }
   const published = await traceAssessmentPhase('report.outcome_commit_roundtrip', () => finishCompositeReportJob(job, outcome))
+  if (reportQueueObsEnabled()) {
+    recordReportQueueEvent({ kind: 'generation_end', attemptId: job.attemptId, jobId: job.id, startMs: generationStartMs, endMs: Date.now() })
+    recordReportQueueEvent({ kind: 'ready_commit', attemptId: job.attemptId, jobId: job.id, outcomeKind: outcome.kind, published: Boolean(published) })
+  }
   if (published && outcome.kind === 'ready') {
     markAssessmentTimeline('report.ready_commit_confirmed')
     if (job.wholeSubmissionId) void publishReportReady(job.attemptId, job.attemptEpoch)
@@ -97,6 +104,7 @@ export const prepareCompositeReportRuntime = async (): Promise<void> => {
 
 let pumping: Promise<void> | null = null
 let wakeRequested = false
+let pollTickCount = 0
 const scheduleTick = (delayMs: number): void => {
   if (stopped) return
   if (pumping) { if (delayMs === 0) wakeRequested = true; return }
@@ -111,24 +119,63 @@ const pump = async (): Promise<void> => {
   try {
     while (!stopped && active.size < settings.workerConcurrency) {
       const resources = reportResourceClaimDecision(settings.workerConcurrency)
-      if (active.size >= resources.limit || resources.delayMs > 0) { priorityDelay = Math.max(50, resources.delayMs); break }
+      if (active.size >= resources.limit || resources.delayMs > 0) {
+        priorityDelay = Math.max(50, resources.delayMs)
+        if (reportQueueObsEnabled()) {
+          pollTickCount += 1
+          recordReportQueueEvent({ kind: 'poll_tick', tick: pollTickCount, slotsBusy: active.size, concurrency: settings.workerConcurrency,
+            claimQueryStartMs: null, claimQueryEndMs: null, rows: 0, empty: false, delayMs: priorityDelay, reason: 'priority' })
+          void sampleReportQueuePending(active.size, settings.workerConcurrency)
+        }
+        break
+      }
       const decision = reportClaimDecision(settings.workerConcurrency, active.size)
-      if (active.size >= decision.limit || decision.delayMs > 0) { priorityDelay = Math.max(50, decision.delayMs); break }
+      if (active.size >= decision.limit || decision.delayMs > 0) {
+        priorityDelay = Math.max(50, decision.delayMs)
+        if (reportQueueObsEnabled()) {
+          pollTickCount += 1
+          recordReportQueueEvent({ kind: 'poll_tick', tick: pollTickCount, slotsBusy: active.size, concurrency: settings.workerConcurrency,
+            claimQueryStartMs: null, claimQueryEndMs: null, rows: 0, empty: false, delayMs: priorityDelay, reason: 'priority' })
+          void sampleReportQueuePending(active.size, settings.workerConcurrency)
+        }
+        break
+      }
+      const claimQueryStartMs = Date.now()
       const job = await claimCompositeReportJob()
+      const claimQueryEndMs = Date.now()
+      if (reportQueueObsEnabled()) {
+        pollTickCount += 1
+        recordReportQueueEvent({ kind: 'poll_tick', tick: pollTickCount, slotsBusy: active.size, concurrency: settings.workerConcurrency,
+          claimQueryStartMs, claimQueryEndMs, rows: job ? 1 : 0, empty: !job, reason: job ? 'claimed' : 'exhausted' })
+        void sampleReportQueuePending(active.size, settings.workerConcurrency)
+      }
       if (!job) { exhausted = true; break }
       if (stopped) { await returnUnstartedCompositeReportJob(job); break }
       reportPriorityClaimed()
       const running = processCompositeReportJob(job)
         .catch(error => logger.error('Report worker operation failed; lease recovery remains enabled', { jobId: job.id, error: String(error) }))
-        .finally(() => { active.delete(running); scheduleTick(0) })
+        .finally(() => {
+          active.delete(running)
+          if (reportQueueObsEnabled()) recordReportQueueEvent({ kind: 'slot_available', slotsBusy: active.size, concurrency: assessmentReportConfig().workerConcurrency })
+          scheduleTick(0)
+        })
       active.add(running)
     }
   } catch (error) {
     exhausted = true
     logger.warn('Report outbox poll failed; will retry', { error: String(error) })
+    if (reportQueueObsEnabled()) {
+      pollTickCount += 1
+      recordReportQueueEvent({ kind: 'poll_tick', tick: pollTickCount, slotsBusy: active.size, concurrency: settings.workerConcurrency,
+        rows: 0, empty: true, reason: 'error' })
+    }
   } finally {
     // tick() clears the single-flight owner before scheduling the next pass.
     nextDelay = priorityDelay || (exhausted ? Math.max(100, settings.pollMs) : settings.pollMs)
+    if (reportQueueObsEnabled() && !exhausted && !priorityDelay && active.size >= settings.workerConcurrency) {
+      recordReportQueueEvent({ kind: 'poll_tick', tick: pollTickCount, slotsBusy: active.size, concurrency: settings.workerConcurrency,
+        rows: 0, empty: false, delayMs: 0, reason: 'full' })
+    }
   }
 }
 let nextDelay = 500

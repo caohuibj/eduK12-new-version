@@ -5,6 +5,7 @@ import { loadStoredVersionedUnitAdmission } from '../assessment-runtime/unit-adm
 import { withSerializableScaleTransaction } from './deployment/transactions'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
 import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
@@ -746,7 +747,7 @@ export const activateScaleAdmission = async (
   // admission. Reuse the same locked winner/epoch checks for both versions.
   return prisma.$transaction(
     async (tx) => {
-      await tx.$queryRaw`SELECT "id" FROM "assessments" WHERE "id" = ${row.id} FOR UPDATE`
+      await withStartNestedQueryRawLabel('unit_lock', () => tx.$queryRaw`SELECT "id" FROM "assessments" WHERE "id" = ${row.id} FOR UPDATE`)
       const current = await tx.assessment.findUnique({ where: { id: row.id }, select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT })
       if (!current || current.attemptEpoch !== row.attemptEpoch) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评轮次已改变', 409)
       const winner = await loadStoredScaleAdmission(current, tx)
@@ -818,11 +819,11 @@ export const batchEnsureScaleAdmissionsAtDelivery = async (
     async (tx) => {
       const txResult = new Map<string, VersionedFrozenUnitAdmission>()
       const unstoredIds = unstored.map(u => u.child.id)
-      await tx.$queryRaw`
+      await withStartNestedQueryRawLabel('batch_lock', () => tx.$queryRaw`
         SELECT "id" FROM "assessments"
         WHERE "id" IN (${Prisma.join(unstoredIds)})
         ORDER BY "id" FOR UPDATE
-      `
+      `)
 
       const currentRows = await tx.assessment.findMany({
         where: { id: { in: unstoredIds } },

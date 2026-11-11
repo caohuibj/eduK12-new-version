@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import { recordCanonicalOperation } from '../../services/runtimeObservability'
 
 export const CANONICAL_JSON_SHA256_V1 = 'CANONICAL_JSON_SHA256_V1' as const
 
@@ -56,6 +57,7 @@ const normalize = (value: unknown, path: string, active: WeakSet<object>): unkno
 }
 
 export const canonicalJsonString = (value: unknown): string => {
+  recordCanonicalOperation(value)
   const encoded = JSON.stringify(normalize(value, '$', new WeakSet<object>()))
   if (encoded === undefined) throw new CanonicalJsonError('value is not JSON serializable')
   return encoded
@@ -77,10 +79,12 @@ export const retainImmutableCanonicalValue = <T extends object>(value: T): T => 
   }
   freeze(value); immutableCanonical.set(value, bytes); return value
 }
-const encodedValue = (value: unknown): Buffer => (
-  process.env.ASSESSMENT_COMPILED_ARTIFACT_CACHE_ENABLED === 'true' && value && typeof value === 'object'
-    ? immutableCanonical.get(value) ?? canonicalJsonBytes(value) : canonicalJsonBytes(value)
-)
+const encodedValue = (value: unknown): Buffer => {
+  const cached = process.env.ASSESSMENT_COMPILED_ARTIFACT_CACHE_ENABLED === 'true' && value && typeof value === 'object'
+    ? immutableCanonical.get(value) : undefined
+  if (cached) { recordCanonicalOperation(value); return cached }
+  return canonicalJsonBytes(value)
+}
 export const canonicalHash = (value: unknown): string => createHash('sha256').update(encodedValue(value)).digest('hex')
 
 /** Same bytes as canonicalHash for a plain record, reusing only registered,
