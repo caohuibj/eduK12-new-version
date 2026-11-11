@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import { createClient } from 'redis'
 import { getRedisUrl } from '../config/redis'
+import { recordReportQueueEvent, reportQueueObsEnabled } from './reportQueueObservability'
 
 const ADVISORY_PREFIX = 'priority:v1:'
 const advisoryListeners = new Set<(message: string) => void>()
@@ -121,7 +122,11 @@ const publishMessage = async (message: string): Promise<void> => {
 }
 
 export const publishReportReady = async (attemptId: string, epoch: number): Promise<void> => {
-  if (enabled()) await publishMessage(keyFor(attemptId, epoch))
+  try {
+    if (enabled()) await publishMessage(keyFor(attemptId, epoch))
+  } finally {
+    if (reportQueueObsEnabled()) recordReportQueueEvent({ kind: 'publish_ready', attemptId, attemptEpoch: epoch, doneMs: Date.now() })
+  }
 }
 /** Same advisory connection/topic; neither receipts nor leases depend on delivery. */
 export const publishReportSchedulingHint = async (message: string): Promise<void> => {
