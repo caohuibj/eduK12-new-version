@@ -412,6 +412,13 @@ test('hosted CI starts independent checks in parallel and bounds media setup wit
   assert.match(media,/timeout -k 10s 240s npx playwright-core install-deps chromium/);
   assert.match(media,/chromium\.launch\(\{headless:true\}\)/);
   assert.match(media,/archive\.ubuntu\.com/);
+  // Media2 deliberately rebuilds Canvas from source after npm ci. Ensure the
+  // native headers are installed before its acceptance, without skipping it.
+  const canvasHeaders = media.indexOf('- name: prepare Media2 Canvas source-build prerequisites (bounded)');
+  const media2Acceptance = media.indexOf('- name: media2 independent scenario');
+  assert.ok(canvasHeaders >= 0 && media2Acceptance > canvasHeaders);
+  assert.match(media,/timeout -k 10s 300s bash server-version\/scripts\/ci-install-canvas-deps\.sh/);
+  assert.match(media,/pkg-config --exists pixman-1 cairo pangocairo librsvg-2\.0/);
   // Media FFmpeg must be an actual pinned executable, not an apt stall or
   // silently skipped fake. The host can use preinstalled tools or exact npm
   // static binaries, and the required libvpx encoder still runs for real.
