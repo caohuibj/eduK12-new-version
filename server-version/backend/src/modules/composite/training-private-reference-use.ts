@@ -68,11 +68,13 @@ async function assertCourseUse(tx:Prisma.TransactionClient,input:{
  // Ordinary scientific-grant expiry does not revoke immutable published
  // aggregate content. New use still requires the current real Training owner.
  if(input.currentAdmission){
-  const [principal]=await tx.$queryRaw<Array<{role:string;account_domain:string;teacher_approved:boolean;is_active:boolean;is_frozen:boolean;must_change_password:boolean;expires_at:Date|null}>>(Prisma.sql`
-   SELECT role::text,account_domain,teacher_approved,is_active,is_frozen,must_change_password,expires_at FROM users WHERE id=${ownerId} FOR SHARE NOWAIT`)
-  const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
+  // Clock is an independent non-lock fact; fold it into the principal SHARE
+  // so current admission is one statement. The end-of-tx fence in
+  // assertTrainingPrivateReferenceAdmissionCurrent stays a later clock query.
+  const [principal]=await tx.$queryRaw<Array<{role:string;account_domain:string;teacher_approved:boolean;is_active:boolean;is_frozen:boolean;must_change_password:boolean;expires_at:Date|null;now:Date}>>(Prisma.sql`
+   SELECT role::text,account_domain,teacher_approved,is_active,is_frozen,must_change_password,expires_at,clock_timestamp() AS now FROM users WHERE id=${ownerId} FOR SHARE NOWAIT`)
   if(!principal||principal.role!=='TEACHER'||!['TRAINING','LEGACY'].includes(principal.account_domain)||!principal.teacher_approved
-   ||!principal.is_active||principal.is_frozen||principal.must_change_password||!clock||principal.expires_at&&principal.expires_at<=clock.now)deny()
+   ||!principal.is_active||principal.is_frozen||principal.must_change_password||!principal.now||principal.expires_at&&principal.expires_at<=principal.now)deny()
   if(input.recordAdmissionExpiry&&principal.expires_at){
    const previous=admissionExpiries.get(tx)
    if(!previous||principal.expires_at<previous)admissionExpiries.set(tx,new Date(principal.expires_at))
