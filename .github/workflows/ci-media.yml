@@ -84,29 +84,85 @@ jobs:
       with:
         path: ~/.cache/ms-playwright
         key: browser-chromium-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json') }}
+    # Hosted Ubuntu's Azure apt mirror intermittently fails DNS during a
+    # media job (observed in both Chromium install lanes). Use the standard
+    # Ubuntu archive mirror for this job only, without weakening any tests.
+    - name: select stable Ubuntu apt mirror for media acceptance
+      run: |
+        set -euo pipefail
+        mirrors=/etc/apt/apt-mirrors.txt
+        if [ -f "$mirrors" ] && grep -q 'azure.archive.ubuntu.com' "$mirrors"; then
+          sudo -n sed -i 's#azure.archive.ubuntu.com#archive.ubuntu.com#g' "$mirrors"
+          echo 'Media CI apt mirror: archive.ubuntu.com'
+        fi
     # Each external installation is independently observable and bounded.
     # A stalled registry / apt / browser download fails the gate rather than
     # holding the whole 25-minute media job without progress.
     - name: prepare native Canvas libraries (bounded)
-      run: timeout -k 10s 240s bash server-version/scripts/ci-install-canvas-deps.sh
+      run: |
+        # canvas@3.x ships N-API prebuilds. The hosted runner may be missing
+        # source-build headers even when the native prebuilt loads correctly.
+        # Probe first instead of forcing apt update on every media job.
+        if command -v pkg-config >/dev/null && pkg-config --exists pixman-1 cairo pangocairo librsvg-2.0; then
+          echo 'Canvas source-build prerequisites available.'
+        else
+          echo 'Canvas source-build prerequisites unavailable; test pinned npm prebuilt first.'
+        fi
     - name: install backend dependencies (bounded)
-      run: timeout -k 10s 240s npm ci --prefix server-version/backend
+      run: |
+        set -euo pipefail
+        if ! timeout -k 10s 240s npm ci --prefix server-version/backend; then
+          echo '::notice::Native prebuilt unavailable; installing Canvas build dependencies'
+          timeout -k 10s 240s bash server-version/scripts/ci-install-canvas-deps.sh
+          timeout -k 10s 240s npm ci --prefix server-version/backend
+        fi
+        node -e "require('./server-version/backend/node_modules/canvas')"
     - name: install frontend dependencies (bounded)
       run: timeout -k 10s 240s npm ci --prefix server-version/frontend
-    - name: install pinned Chromium and system dependencies (bounded)
+    - name: install pinned Chromium and verify runtime dependencies (bounded)
       working-directory: server-version/backend
-      run: timeout -k 10s 240s npx playwright-core install --with-deps chromium
+      run: |
+        set -euo pipefail
+        # A browser binary cache does not cache apt packages. Conversely,
+        # hosted runners often already contain Chromium's runtime libraries.
+        # Avoid forcing a second apt update if the pinned browser launches.
+        timeout -k 10s 180s npx playwright-core install chromium
+        if ! timeout -k 10s 30s node -e "const {chromium}=require('playwright-core'); chromium.launch({headless:true}).then(b=>b.close()).catch(e=>{console.error(e);process.exitCode=1})"; then
+          echo '::notice::Chromium runtime libraries missing; installing pinned Playwright system dependencies'
+          timeout -k 10s 240s npx playwright-core install-deps chromium
+          timeout -k 10s 30s node -e "const {chromium}=require('playwright-core'); chromium.launch({headless:true}).then(b=>b.close()).catch(e=>{console.error(e);process.exitCode=1})"
+        fi
     - name: ensure FFmpeg is present (bounded)
       run: |
-        # Canvas and Playwright already refreshed apt metadata in this job.
-        # FFmpeg pulls ~60 MB / 80+ packages on fresh Ubuntu 24.04 runners;
-        # a 120s download budget repeatedly timed out before media assertions.
-        # Bound network stalls individually and allow a realistic total budget.
+        set -euo pipefail
+        # Hosted apt DNS repeatedly times out installing dozens of FFmpeg
+        # packages. When the runner has no FFmpeg, use exact-version Linux
+        # static binaries distributed by npm (already the CI's package source).
+        # These are real encoders/probers; the libvpx media smoke remains strict.
         if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
-          timeout -k 10s 480s sudo -n apt-get install -y --no-install-recommends \
-            -o Acquire::Retries=3 -o Acquire::http::Timeout=30 \
-            -o Acquire::https::Timeout=30 ffmpeg
+          test "$(uname -m)" = x86_64
+          tools_dir="$RUNNER_TEMP/eduk12-media-ffmpeg"
+          mkdir -p "$tools_dir/bin"
+          timeout -k 10s 240s npm install --prefix "$tools_dir" \
+            --no-save --no-package-lock --ignore-scripts --no-audit --no-fund \
+            @ffmpeg-installer/ffmpeg@1.1.0 @ffprobe-installer/ffprobe@2.1.2
+          ffmpeg_bin="$(node -e "process.stdout.write(require(process.argv[1]).path)" "$tools_dir/node_modules/@ffmpeg-installer/ffmpeg")"
+          ffprobe_bin="$(node -e "process.stdout.write(require(process.argv[1]).path)" "$tools_dir/node_modules/@ffprobe-installer/ffprobe")"
+          # npm tarball permissions differ across package platforms. Verify
+          # both pinned files exist, then restore executable bits explicitly.
+          test -f "$ffmpeg_bin"
+          test -f "$ffprobe_bin"
+          ls -l "$ffmpeg_bin" "$ffprobe_bin"
+          chmod u+x "$ffmpeg_bin" "$ffprobe_bin"
+          test -x "$ffmpeg_bin"
+          test -x "$ffprobe_bin"
+          ln -s "$ffmpeg_bin" "$tools_dir/bin/ffmpeg"
+          ln -s "$ffprobe_bin" "$tools_dir/bin/ffprobe"
+          echo "$tools_dir/bin" >> "$GITHUB_PATH"
+          export PATH="$tools_dir/bin:$PATH"
         fi
+        command -v ffmpeg
+        command -v ffprobe
         ffmpeg -version >/dev/null
         ffprobe -version >/dev/null
         ffmpeg -hide_banner -loglevel error -f lavfi -i testsrc2=size=16x16:rate=1:duration=1 \

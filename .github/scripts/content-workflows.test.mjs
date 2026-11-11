@@ -398,19 +398,40 @@ test('hosted CI starts independent checks in parallel and bounds media setup wit
   assert.match(media,/browser-npm-\$\{\{ runner\.os \}\}/);
   assert.match(media,/browser-chromium-\$\{\{ runner\.os \}\}/);
   for(const name of ['prepare native Canvas libraries','install backend dependencies',
-    'install frontend dependencies','install pinned Chromium and system dependencies',
+    'install frontend dependencies','install pinned Chromium and verify runtime dependencies',
     'ensure FFmpeg is present','generate Prisma client']) {
     assert.ok(media.includes(name),name);
   }
-  for(const command of ['npm ci --prefix server-version/backend','npm ci --prefix server-version/frontend',
-    'npx playwright-core install --with-deps chromium','npx prisma generate'])
+  for(const command of ['npm ci --prefix server-version/backend','npm ci --prefix server-version/frontend','npx prisma generate'])
     assert.ok(media.includes('timeout -k 10s 240s '+command)
       || media.includes('timeout -k 10s 120s '+command),command);
-  // FFmpeg must be genuinely available for media fixtures, not silently skipped.
-  assert.match(media,/timeout -k 10s 480s sudo -n apt-get install/);
-  assert.match(media,/Acquire::Retries=3/);
+  // Browser binaries and host apt dependencies are independently bounded:
+  // every attempt must launch Chromium, and missing dependencies must fail
+  // closed unless the pinned Playwright install-deps succeeds.
+  assert.match(media,/timeout -k 10s 180s npx playwright-core install chromium/);
+  assert.match(media,/timeout -k 10s 240s npx playwright-core install-deps chromium/);
+  assert.match(media,/chromium\.launch\(\{headless:true\}\)/);
+  assert.match(media,/archive\.ubuntu\.com/);
+  // Media2 still forces a real source rebuild. It uses the locked backend
+  // Dockerfile's Debian deps stage (where native headers exist), rather than
+  // relying on unavailable Ubuntu-hosted apt mirrors or skipping coverage.
+  const media2Action = fs.readFileSync(new URL('../actions/accept-media2/action.yml',import.meta.url),'utf8');
+  assert.match(media2Action,/timeout -k 10s 600s docker build --target deps -f Dockerfile/);
+  assert.match(media2Action,/npm_config_build_from_source=true npm rebuild canvas/);
+  assert.match(media2Action,/createCanvas\(2,2\)\.toBuffer/);
+  assert.match(media,/media2 independent scenario/);
+  assert.doesNotMatch(media,/prepare Media2 Canvas source-build prerequisites/);
+  // Media FFmpeg must be an actual pinned executable, not an apt stall or
+  // silently skipped fake. The host can use preinstalled tools or exact npm
+  // static binaries, and the required libvpx encoder still runs for real.
+  assert.match(media,/@ffmpeg-installer\/ffmpeg@1\.1\.0/);
+  assert.match(media,/@ffprobe-installer\/ffprobe@2\.1\.2/);
+  assert.match(media,/timeout -k 10s 240s npm install/);
+  assert.match(media,/test -x "\$ffmpeg_bin"/);
+  assert.match(media,/test -x "\$ffprobe_bin"/);
   assert.match(media,/ffprobe -version/);
   assert.match(media,/libvpx -deadline realtime/);
+  assert.doesNotMatch(media,/apt-get install[^\n]*ffmpeg/);
   for(const scenario of ['media2','video_core','media7','situational_video','situational_branching'])
     assert.ok(media.includes(scenario+' independent scenario'),scenario);
   assert.match(media,/ci-artifact\.mjs verify backend/);

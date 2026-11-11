@@ -491,7 +491,7 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   const owned = principal.userId ? parent.userId === principal.userId
     : parent.userId === null && Boolean(principal.recoveryTokenHash && parent.recoveryTokenHash === principal.recoveryTokenHash)
   if (!owned) throw failure('无权限操作此问卷', 403)
-  if (process.env.ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED === 'true' && principal.userId) {
+  if (process.env.ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED !== 'false' && principal.userId) {
     // The shared fresh header is read INSIDE the existing submit admission.
     // Consent remains live; no middleware preloads heavy receipt data before it.
     const { relationalRuntimeConsentAuthority } = await import('../assessment-relational/runtime-consent')

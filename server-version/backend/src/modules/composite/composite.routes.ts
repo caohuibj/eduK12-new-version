@@ -63,8 +63,8 @@ const relationalFinalConsentGuard = async (req: Request, res: Response, next: Ne
   }
 }
 
-const relationalWholeFinalConsentGuard = (req: Request, res: Response, next: NextFunction) => {
-  if (process.env.ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED === 'true') return next()
+export const relationalWholeFinalConsentGuard = (req: Request, res: Response, next: NextFunction) => {
+  if (process.env.ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED !== 'false') return next()
   return relationalFinalConsentGuard(req, res, next)
 }
 

@@ -14,7 +14,7 @@ import {createCanonicalUnitResultEnvelope,projectScaleCanonicalUnitResult} from 
 import {finalizeCompositeAttemptUnifiedIfReady} from '../../modules/assessment-runtime/unified-aggregate-finalizer.service'
 
 beforeEach(()=>{
- vi.clearAllMocks();vi.stubEnv('DATA_ENCRYPTION_KEY','e'.repeat(64));vi.stubEnv('ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED','true')
+ vi.clearAllMocks();vi.stubEnv('DATA_ENCRYPTION_KEY','e'.repeat(64))
  getRelease.mockReset();db.compositeAssessmentAttempt.update.mockReset()
  db.compositeAssessmentAttempt.updateMany.mockResolvedValue({count:1});db.$transaction.mockImplementation(async operation=>operation(db))
 })
@@ -49,6 +49,14 @@ describe('selected variant aggregate finalization',()=>{
   expect(db.assessmentUnitSnapshot.findMany).toHaveBeenCalledTimes(1)
   const select=db.compositeAssessmentAttempt.findUnique.mock.calls[0][0].select
   expect(select).toMatchObject({participantKey:true,trainingVariantAllocationEncrypted:true,trainingVariantAllocationHash:true,compositeAssessment:{select:{publishedAt:true,trainingVariantFrozen:true,trainingVariantDigest:true,items:{select:{scaleId:true,cognitiveAssignmentId:true,situationalInstrumentKey:true,formDefinition:true}}}}})
+ })
+ it('falls back to separate snapshot header query when batch is disabled via false',async()=>{
+  vi.stubEnv('ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED','false')
+  const f=fixture()
+  const result=await finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent,f.reportJob)
+  expect(result).toMatchObject({status:'COMPLETED'})
+  const snapshotQuery=db.assessmentUnitSnapshot.findMany.mock.calls[0][0]
+  expect(snapshotQuery.select.collectionFactsEncrypted).toBeUndefined()
  })
  it('reuses an already verified committed selected graph without a second union load',async()=>{
   const f=fixture(),projected=await applyTrainingAttemptScope(f.parent)

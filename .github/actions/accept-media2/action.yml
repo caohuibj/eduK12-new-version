@@ -9,8 +9,20 @@ runs:
   - name: verify canvas source-build fallback
     working-directory: server-version/backend
     run: |
-      npm rebuild canvas --build-from-source
-      node -e "const { createCanvas } = require('canvas'); const image = createCanvas(2, 2).toBuffer('image/png'); if (image.length < 8) process.exit(1)"
+      set -euo pipefail
+      # The hosted Ubuntu apt mirror is unavailable; compile the SAME pinned
+      # backend canvas and dependency lock in the production Dockerfile's Debian
+      # native-build environment. Keep the job's working node_modules untouched.
+      image="eduk12-media2-canvas-source:${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+      trap 'docker image rm "$image" >/dev/null 2>&1 || true' EXIT
+      timeout -k 10s 600s docker build --target deps -f Dockerfile -t "$image" .
+      timeout -k 10s 240s docker run --rm --entrypoint bash "$image" -euo pipefail -c '
+        npm_config_build_from_source=true npm rebuild canvas
+        node -e "const {createCanvas}=require(\"canvas\"); const png=createCanvas(2,2).toBuffer(\"image/png\"); if(png.length<8) process.exit(1)"
+      '
+      # The host's pinned prebuilt Canvas must also remain functional for
+      # subsequent real backend/media browser acceptance.
+      node -e "const {createCanvas}=require('canvas'); if(createCanvas(2,2).toBuffer('image/png').length<8) process.exit(1)"
     shell: bash
   - name: prisma generate and guarded migration
     working-directory: server-version/backend
