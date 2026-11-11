@@ -12,8 +12,35 @@ const credential=(req:Request) => {
   const match=/^Bearer ([A-Za-z0-9_-]{43})$/.exec(req.get('Authorization') || '')
   return match?.[1] ?? ''
 }
+import { BoundedAdmissionBusyError } from '../../services/boundedAdmissionGate'
+import { isAssessmentStartBusyError } from '../composite/start-transient'
+
+const P2028_ROLLED_BACK=/Unable to start a transaction in the given time|expired transaction/i
+const ROLLED_BACK_SQLSTATES=new Set(['40001','40P01','55P03'])
+
+export const isTransientStudyDatabaseError=(error:unknown):boolean=>{
+  const candidate=error as {code?:unknown;message?:unknown;meta?:{code?:unknown}}|null
+  if(!candidate||typeof candidate!=='object')return false
+  if(candidate.code==='P2024'||candidate.code==='P2034')return true
+  if(candidate.code==='P2028'&&typeof candidate.message==='string'&&P2028_ROLLED_BACK.test(candidate.message))return true
+  const sqlState=typeof candidate.meta?.code==='string'?candidate.meta.code:typeof candidate.code==='string'?candidate.code:null
+  return Boolean(sqlState&&ROLLED_BACK_SQLSTATES.has(sqlState))
+}
+
 const wrap=(work:(req:Request,res:Response)=>Promise<unknown>) => async(req:Request,res:Response,next:NextFunction)=>{
   try {await work(req,res)} catch(e) {
+    if(isAssessmentStartBusyError(e)){
+      res.setHeader('Retry-After',String(e.retryAfterSeconds))
+      return res.status(503).json({code:'STUDY_JOIN_BUSY',message:e.message,data:null})
+    }
+    if(e instanceof BoundedAdmissionBusyError){
+      res.setHeader('Retry-After',String(e.retryAfterSeconds))
+      return res.status(503).json({code:e.code||'STUDY_JOIN_BUSY',message:e.message||'匿名研究加入繁忙，请稍后重试',data:null})
+    }
+    if(isTransientStudyDatabaseError(e)){
+      res.setHeader('Retry-After','1')
+      return res.status(503).json({code:'STUDY_JOIN_BUSY',message:'匿名研究加入繁忙，请稍后重试',data:null})
+    }
     if(e instanceof z.ZodError) return error(res,'请求参数无效',-1,400)
     const status=(e as {statusCode?:number}).statusCode
     if(status && status>=400 && status<500) return error(res,(e as Error).message,-1,status)
