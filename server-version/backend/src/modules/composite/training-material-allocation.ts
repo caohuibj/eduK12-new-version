@@ -45,7 +45,7 @@ export async function allocateTrainingMaterial(tx:any,attempt:any,composite:any,
   const groupKeysHash=canonicalHash(flow.experiment.groups.map(group=>group.groupKey).sort())
   const id=randomUUID()
   await withStartNestedQueryRawLabel('material_experiment_insert', () => tx.$executeRaw`INSERT INTO training_material_experiments (id,owner_id,course_id,experiment_key,group_keys_hash) VALUES (${id},${composite.createdBy},${courseId},${flow.experiment.experimentKey},${groupKeysHash}) ON CONFLICT (owner_id,course_id,experiment_key) DO NOTHING`)
-  const scopes=await withStartNestedQueryRawLabel('material_experiment_share', () => tx.$queryRaw`SELECT id,group_keys_hash AS "groupKeysHash" FROM training_material_experiments WHERE owner_id=${composite.createdBy} AND course_id=${courseId} AND experiment_key=${flow.experiment.experimentKey} FOR SHARE`)
+  const scopes=await withStartNestedQueryRawLabel<Array<{id:string;groupKeysHash:string}>>('material_experiment_share', () => tx.$queryRaw<Array<{id:string;groupKeysHash:string}>>`SELECT id,group_keys_hash AS "groupKeysHash" FROM training_material_experiments WHERE owner_id=${composite.createdBy} AND course_id=${courseId} AND experiment_key=${flow.experiment.experimentKey} FOR SHARE`)
   const scope=scopes[0]
   if(scopes.length!==1||scope.groupKeysHash!==groupKeysHash)throw compositeConflict('同一课程实验的组键合同不一致，请使用新的明确实验标识')
   let claim:any
