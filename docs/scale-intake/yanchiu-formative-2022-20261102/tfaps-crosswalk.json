@@ -1,0 +1,121 @@
+{
+  "source": "Author 2022 Traditional Chinese 57-item PDF, pages 1-2 read through Web; raw PDF bytes not obtained by local GET (503).",
+  "normalizationForChineseFingerprint": "NFKC, remove whitespace, remove terminal U+3002. No question text redistributed.",
+  "priorTFAPSCommit": "21d8cece647002e2cba9a36632954330db2a00c6",
+  "questionnaireRecallPeriod": "past six months",
+  "priorTFAPSExactRecallPeriodVerified": false,
+  "practiceAnchors": "1-6 frequency; exact within-language anchor identity pending standalone TFAPS form",
+  "rows": [
+    {
+      "questionnaireItem": 1,
+      "tfapsItem": 1,
+      "dimension": "TdFA",
+      "englishTFAPSReferenceSHA256": "356463c57b39a72418ce6af6d4da681e424264b8e468e7a341781f7ae569d966",
+      "zhQuestionnaireTextSHA256": "986499edd9eb021dc0a14511119415ac97393506c38b3be83be64b34e3c68432",
+      "comparison": "SEMANTIC_SAME_SOURCE_SUPPORTED_NOT_EXACT_LANGUAGE_VERSION",
+      "exactEnglishToEnglishComparison": "PENDING_EN_2022_PDF",
+      "exactChineseToChineseComparison": "PENDING_AUTHOR_TFAPS_ZH_FORM",
+      "notes": "Q1 has a timing nuance relative to the English TFAPS wording; do not silently equate."
+    },
+    {
+      "questionnaireItem": 2,
+      "tfapsItem": 2,
+      "dimension": "TdFA",
+      "englishTFAPSReferenceSHA256": "db8479ec14e23ca00d5fb16c917c313edbdefcc26e6c13b57991e302ca31adfb",
+      "zhQuestionnaireTextSHA256": "a546f1ee1cba89ed57958b159e7457c8888adfbf76e05567352f726cc8a0e5c8",
+      "comparison": "SEMANTIC_SAME_SOURCE_SUPPORTED_NOT_EXACT_LANGUAGE_VERSION",
+      "exactEnglishToEnglishComparison": "PENDING_EN_2022_PDF",
+      "exactChineseToChineseComparison": "PENDING_AUTHOR_TFAPS_ZH_FORM",
+      "notes": "Chinese wording maps to the same strategy; this is not proof of translation equivalence."
+    },
+    {
+      "questionnaireItem": 3,
+      "tfapsItem": 3,
+      "dimension": "TdFA",
+      "englishTFAPSReferenceSHA256": "ad1aefca0655b3874025d53a36d640154e6da96027ef7567eb7ede999c33d572",
+      "zhQuestionnaireTextSHA256": "aaa0e546bf959872a33d66ed46922326532beccb2aeb2308cd3a7a6090087ce7",
+      "comparison": "SEMANTIC_SAME_SOURCE_SUPPORTED_NOT_EXACT_LANGUAGE_VERSION",
+      "exactEnglishToEnglishComparison": "PENDING_EN_2022_PDF",
+      "exactChineseToChineseComparison": "PENDING_AUTHOR_TFAPS_ZH_FORM",
+      "notes": "Chinese wording maps to the same strategy; this is not proof of translation equivalence."
+    },
+    {
+      "questionnaireItem": 4,
+      "tfapsItem": 4,
+      "dimension": "TdFA",
+      "englishTFAPSReferenceSHA256": "bf2f701a898aa5b2382201cbbaaf1f7f4855a5a45cfa66c86304e28038d96735",
+      "zhQuestionnaireTextSHA256": "b7ab6511462e8780d658f52d3535729ee830f83ab8c3aeee2c95a948fe273367",
+      "comparison": "SEMANTIC_SAME_SOURCE_SUPPORTED_NOT_EXACT_LANGUAGE_VERSION",
+      "exactEnglishToEnglishComparison": "PENDING_EN_2022_PDF",
+      "exactChineseToChineseComparison": "PENDING_AUTHOR_TFAPS_ZH_FORM",
+      "notes": "Chinese wording maps to the same strategy; this is not proof of translation equivalence."
+    },
+    {
+      "questionnaireItem": 5,
+      "tfapsItem": 5,
+      "dimension": "TdFA",
+      "englishTFAPSReferenceSHA256": "964cd01e259fb1b9f773845eabe804275b6e0a076e3d6ca9fbc9d6f85816a15e",
+      "zhQuestionnaireTextSHA256": "1427fdfa6975b7756312933db7aa3724ed6c4ca064e95e7bfca44698dc7ed9ca",
+      "comparison": "SEMANTIC_SAME_SOURCE_SUPPORTED_NOT_EXACT_LANGUAGE_VERSION",
+      "exactEnglishToEnglishComparison": "PENDING_EN_2022_PDF",
+      "exactChineseToChineseComparison": "PENDING_AUTHOR_TFAPS_ZH_FORM",
+      "notes": "Chinese wording maps to the same strategy; this is not proof of translation equivalence."
+    },
+    {
+      "questionnaireItem": 6,
+      "tfapsItem": 6,
+      "dimension": "TdFA",
+      "englishTFAPSReferenceSHA256": "3d1fb76438d259fdcf41d24c87e3bb94ef9ddd43b74d8a871aae7e05fd94f048",
+      "zhQuestionnaireTextSHA256": "4ca23832c0f79bf187af6a8391d3ca473f71945047f7a45bcf983ef0bf97daa9",
+      "comparison": "SEMANTIC_SAME_SOURCE_SUPPORTED_NOT_EXACT_LANGUAGE_VERSION",
+      "exactEnglishToEnglishComparison": "PENDING_EN_2022_PDF",
+      "exactChineseToChineseComparison": "PENDING_AUTHOR_TFAPS_ZH_FORM",
+      "notes": "Chinese wording maps to the same strategy; this is not proof of translation equivalence."
+    },
+    {
+      "questionnaireItem": 7,
+      "tfapsItem": 7,
+      "dimension": "SdFA",
+      "englishTFAPSReferenceSHA256": "46a2f838cee50718a89125e3aed3ea2b0174e43a3cfc52d11f497ee99d542044",
+      "zhQuestionnaireTextSHA256": "63c72fdffe55290315c465192b280fd0dd2f4d244defa46d7cc6cf38dc96d391",
+      "comparison": "SEMANTIC_SAME_SOURCE_SUPPORTED_NOT_EXACT_LANGUAGE_VERSION",
+      "exactEnglishToEnglishComparison": "PENDING_EN_2022_PDF",
+      "exactChineseToChineseComparison": "PENDING_AUTHOR_TFAPS_ZH_FORM",
+      "notes": "Chinese wording maps to the same strategy; this is not proof of translation equivalence."
+    },
+    {
+      "questionnaireItem": 8,
+      "tfapsItem": 8,
+      "dimension": "SdFA",
+      "englishTFAPSReferenceSHA256": "2e53628448f016448430264e23a798d996be6001a28ea15ef2c6db29cb571945",
+      "zhQuestionnaireTextSHA256": "2140e40df336b614261c37512a267396b158001f67c3360b5aa147e7d42f1d3a",
+      "comparison": "SEMANTIC_SAME_SOURCE_SUPPORTED_NOT_EXACT_LANGUAGE_VERSION",
+      "exactEnglishToEnglishComparison": "PENDING_EN_2022_PDF",
+      "exactChineseToChineseComparison": "PENDING_AUTHOR_TFAPS_ZH_FORM",
+      "notes": "Chinese wording maps to the same strategy; this is not proof of translation equivalence."
+    },
+    {
+      "questionnaireItem": 9,
+      "tfapsItem": 9,
+      "dimension": "SdFA",
+      "englishTFAPSReferenceSHA256": "13eaa4d9b1cbd5bced7b069481028b8266040369ed30a87c54d29c357118f86d",
+      "zhQuestionnaireTextSHA256": "7ee6d239e2a747e43f393e8f9b323d5127ccb1778c3c4ef79bb8fa9bd4d00552",
+      "comparison": "SEMANTIC_SAME_SOURCE_SUPPORTED_NOT_EXACT_LANGUAGE_VERSION",
+      "exactEnglishToEnglishComparison": "PENDING_EN_2022_PDF",
+      "exactChineseToChineseComparison": "PENDING_AUTHOR_TFAPS_ZH_FORM",
+      "notes": "Chinese wording maps to the same strategy; this is not proof of translation equivalence."
+    },
+    {
+      "questionnaireItem": 10,
+      "tfapsItem": 10,
+      "dimension": "SdFA",
+      "englishTFAPSReferenceSHA256": "d667cc5c5f4b4ba6cd76c7b5843c06f1f9f51185fbfbb41e8debdc29c3d4a60c",
+      "zhQuestionnaireTextSHA256": "98bf12e7bf5ccaf2a44cfe4ba585c16b5bec94d1a5bd6b5d82b98f33c46098c5",
+      "comparison": "SEMANTIC_SAME_SOURCE_SUPPORTED_NOT_EXACT_LANGUAGE_VERSION",
+      "exactEnglishToEnglishComparison": "PENDING_EN_2022_PDF",
+      "exactChineseToChineseComparison": "PENDING_AUTHOR_TFAPS_ZH_FORM",
+      "notes": "Chinese wording maps to the same strategy; this is not proof of translation equivalence."
+    }
+  ],
+  "decision": "NO_DUPLICATE_PRACTICE_REGISTRATION; reference an existing exact same-language TFAPS version only after exact wording/instruction/anchor verification. No runtime TFAPS version exists in prior local delivery."
+}
