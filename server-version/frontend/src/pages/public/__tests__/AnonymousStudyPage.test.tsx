@@ -1,5 +1,5 @@
 import {beforeEach,expect,it,vi} from 'vitest'
-import {fireEvent,render,screen,waitFor,within} from '@testing-library/react'
+import {act,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import {Link,MemoryRouter,Route,Routes} from 'react-router-dom'
 import AnonymousStudyPage from '../AnonymousStudyPage'
 const api=vi.hoisted(()=>({capability:vi.fn(),info:vi.fn(),participationInfo:vi.fn(),recoverCode:vi.fn(),resetCode:vi.fn(),join:vi.fn(),home:vi.fn(),start:vi.fn(),recover:vi.fn(),revoke:vi.fn(),researchConsent:vi.fn(),acceptResearchConsent:vi.fn(),requestResearchWithdrawal:vi.fn()}))
@@ -308,4 +308,66 @@ it('explicitly clears a failed fragment recovery locally without revoking or enr
  expect(sessionStorage.getItem('composite:recovery:attempt:other-attempt')).toBe('other-child-proof')
  expect(sessionStorage.getItem('composite:study:return:other-attempt')).toBe('/public/studies/other')
  expect(api.revoke).not.toHaveBeenCalled();expect(api.join).not.toHaveBeenCalled()
+})
+
+const joinBusyError=()=>Object.assign(new Error('匿名研究加入繁忙，请稍后重试'),{status:503,code:'STUDY_JOIN_BUSY',retryAfterMs:1000})
+
+it('retries a busy join once and shows the claimed identity',async()=>{
+ api.join.mockRejectedValueOnce(joinBusyError()).mockResolvedValueOnce({studyId:'s',credential:'FULL-CREDENTIAL',displayCode:'P-DISPLAY'})
+ show();await screen.findByText('One')
+ fireEvent.click(screen.getByRole('checkbox'))
+ try{
+  vi.useFakeTimers({toFake:['setTimeout','clearTimeout']})
+  fireEvent.click(screen.getByRole('button',{name:'创建研究内身份码'}))
+  await act(async()=>{await vi.advanceTimersByTimeAsync(35000)})
+ }finally{vi.useRealTimers()}
+ expect(await screen.findByText('FULL-CREDENTIAL')).toBeInTheDocument()
+ expect(api.join).toHaveBeenCalledTimes(2)
+ expect(sessionStorage.getItem('anonymous-study:identity:s')).toBe('FULL-CREDENTIAL')
+})
+
+it('shows the busy error after three busy joins and never attempts a fourth',async()=>{
+ api.join.mockRejectedValueOnce(joinBusyError()).mockRejectedValueOnce(joinBusyError()).mockRejectedValueOnce(joinBusyError())
+ show();await screen.findByText('One')
+ fireEvent.click(screen.getByRole('checkbox'))
+ try{
+  vi.useFakeTimers({toFake:['setTimeout','clearTimeout']})
+  fireEvent.click(screen.getByRole('button',{name:'创建研究内身份码'}))
+  await act(async()=>{await vi.advanceTimersByTimeAsync(35000)})
+ }finally{vi.useRealTimers()}
+ expect(await screen.findByRole('alert')).toHaveTextContent('匿名研究加入繁忙，请稍后重试')
+ expect(api.join).toHaveBeenCalledTimes(3)
+})
+
+it('recovers the claimed identity when a retry hits already-claimed',async()=>{
+ api.info.mockResolvedValue({studyId:'s',studyTitle:'Research',title:'One',accepting:true,mode:'MEMORABLE_CODE',label:'分配编号',instructions:''})
+ api.join.mockRejectedValueOnce(Object.assign(new Error('网络请求失败'),{status:0})).mockRejectedValueOnce(Object.assign(new Error('参与编号无效或已领取，请使用完整参与码恢复'),{status:403,code:-1}))
+ api.recoverCode.mockResolvedValue({studyId:'s',credential:'a'.repeat(43),displayCode:'P-DISPLAY'})
+ show();await screen.findByText('One')
+ fireEvent.click(screen.getByRole('checkbox'))
+ fireEvent.change(screen.getByLabelText('分配编号'),{target:{value:'001'}})
+ fireEvent.change(screen.getByLabelText('自己设置的后缀'),{target:{value:'abcd'}})
+ fireEvent.change(screen.getByLabelText('再次确认后缀'),{target:{value:'abcd'}})
+ try{
+  vi.useFakeTimers({toFake:['setTimeout','clearTimeout']})
+  fireEvent.click(screen.getByRole('button',{name:'确认研究编码'}))
+  await act(async()=>{await vi.advanceTimersByTimeAsync(35000)})
+ }finally{vi.useRealTimers()}
+ expect(api.join).toHaveBeenCalledTimes(2)
+ expect(api.recoverCode).toHaveBeenCalledWith('s','001-ABCD')
+ expect(await screen.findByRole('button',{name:'查看本次个人报告'})).toBeInTheDocument()
+ expect(sessionStorage.getItem('anonymous-study:identity:s')).toBe('a'.repeat(43))
+})
+
+it('never retries a 400 or 404 join failure',async()=>{
+ api.join.mockRejectedValueOnce(Object.assign(new Error('请输入分配编号，并设置4–12位字母或数字秘密后缀'),{status:400,code:-1})).mockRejectedValueOnce(Object.assign(new Error('综合测评不存在'),{status:404,code:-1}))
+ show();await screen.findByText('One')
+ fireEvent.click(screen.getByRole('checkbox'))
+ const button=screen.getByRole('button',{name:'创建研究内身份码'})
+ fireEvent.click(button)
+ expect(await screen.findByRole('alert')).toHaveTextContent('请输入分配编号')
+ expect(api.join).toHaveBeenCalledTimes(1)
+ fireEvent.click(button)
+ expect(await screen.findByRole('alert')).toHaveTextContent('综合测评不存在')
+ expect(api.join).toHaveBeenCalledTimes(2)
 })
