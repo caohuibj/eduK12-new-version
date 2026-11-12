@@ -53,10 +53,25 @@ export type RequestObservationPhase =
   | 'aggregate.persist'
   | 'aggregate.cas_loser'
   | 'response'
+  | 'anonymous.start.pre_gate_ms'
+  | 'anonymous.start.gate_wait_ms'
+  | 'anonymous.start.gate_slot_ms'
+  | 'anonymous.start.tx_wall_ms'
+  | 'anonymous.start.post_gate_ms'
+  | 'anonymous.start.db_lock_wait_ms'
+  | 'anonymous.start.tx_acquisition_wait_ms'
 
 /** Explicitly opt into count-only SQL events on an isolated test instance. */
 export const sqlEventCollectionEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => (
   env.PERF_ISOLATED_TEST_MODE === '1' && env.PERF_SQL_EVENT_COUNT === '1'
+)
+
+/** Opt into fine-grained anonymous START diagnostics (FOR UPDATE lock wait
+ * + transaction connection-acquisition wait). Default off. Short-term
+ * enablement only; routine anonymous START phase timers are always on and
+ * are not affected by this flag. */
+export const anonymousStartDiagnosticEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => (
+  env.ANONYMOUS_START_DIAGNOSTIC_ENABLED === 'true'
 )
 
 type Histogram = {

@@ -169,7 +169,7 @@ import {
   withFinalOnlyCompletionTransaction,
   withQuestionnaireCompletionTransaction,
 } from '../../services/questionnaireProgressService'
-import { measureRequestPhase, measureRequestPhaseSync, traceAssessmentPhase, assessmentTimelineSpan, withQueryRawLabel, withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
+import { measureRequestPhase, measureRequestPhaseSync, traceAssessmentPhase, assessmentTimelineSpan, withQueryRawLabel, withStartNestedQueryRawLabel, recordRequestPhase, anonymousStartDiagnosticEnabled, type RequestObservationPhase } from '../../services/runtimeObservability'
 import {
   buildFrozenAnalysisProtocolSnapshot,
   encryptFrozenAnalysisProtocolSnapshot,
@@ -4017,7 +4017,27 @@ export type PublicStudyAdmission = {
   beforeAdmission: (tx: Prisma.TransactionClient) => Promise<string | null>
   afterAdmission: (tx: Prisma.TransactionClient, attemptId: string) => Promise<void>
 }
+/** Anonymous START two-tier observability (2026-11-12).
+ * Routine phases are recorded into the request observation on every call
+ * (Prometheus ptool_assessment_phase_duration_seconds histogram with
+ * {phase, route} labels + diagnostic timeline when active). Diagnostic
+ * phases are recorded only when ANONYMOUS_START_DIAGNOSTIC_ENABLED=true
+ * (default off). All labels are fixed low-cardinality strings — never
+ * Attempt ID, user ID, Token, answers, or DB params. Timing uses the
+ * monotonic clock (process.hrtime.bigint). Containment: http_total ⊃
+ * pre_gate + gate_wait + gate_slot + post_gate; gate_slot ⊃ tx_wall;
+ * tx_wall ⊃ db_lock_wait (diagnostic). No behavior change: these calls
+ * are side-effect-free measurements around the existing steps. */
+const recordAnonymousStartPhase = (phase: RequestObservationPhase, start: bigint, end: bigint): void => {
+  recordRequestPhase(phase, Number(end - start) / 1_000_000, start, end)
+}
+const recordAnonymousStartDiagnosticPhase = (phase: RequestObservationPhase, start: bigint, end: bigint): void => {
+  if (!anonymousStartDiagnosticEnabled()) return
+  recordRequestPhase(phase, Number(end - start) / 1_000_000, start, end)
+}
+
 export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string, study?: PublicStudyAdmission, opts?: { wantsWholeDelivery?: boolean }) => {
+  const startAt = process.hrtime.bigint()
   const token = await findPublicToken(tokenValue)
   // Pure-read (write-time invariant): the public start path never lazily
   // repairs sections on a published composite. loadComposite already includes
@@ -4027,44 +4047,82 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   if (recoveryToken) {
     const recoveryTokenHash = hashRecoveryToken(recoveryToken)
     const existing = await prisma.compositeAssessmentAttempt.findFirst({ where: { accessTokenId: token.id, recoveryTokenHash } })
-    if (existing) return projectStartedAttempt(existing.id, { recoveryTokenHash }, Boolean(opts?.wantsWholeDelivery), null)
+    if (existing) {
+      // Recovery fast path: no gate, no transaction. Record pre_gate (up to
+      // the recovery lookup) and post_gate (response assembly); never record
+      // a zero gate_wait/gate_slot/tx_wall for a resumed attempt.
+      recordAnonymousStartPhase('anonymous.start.pre_gate_ms', startAt, process.hrtime.bigint())
+      const postGateAt = process.hrtime.bigint()
+      try {
+        return await projectStartedAttempt(existing.id, { recoveryTokenHash }, Boolean(opts?.wantsWholeDelivery), null)
+      } finally {
+        recordAnonymousStartPhase('anonymous.start.post_gate_ms', postGateAt, process.hrtime.bigint())
+      }
+    }
     throw compositeForbidden('恢复凭证无效')
   }
   if (!study) assertTokenWindow(token)
   assertCompositeWindow(token.compositeAssessment)
   const credential = study?.credential ?? createRecoveryCredential()
+  // Pre-gate ends just before the admission gate.
+  recordAnonymousStartPhase('anonymous.start.pre_gate_ms', startAt, process.hrtime.bigint())
   // Same queueing discipline as the authenticated Training START: bursts wait
   // in the gate (holding no DB connection) instead of hitting the pool and
   // the exclusive composite row lock directly. Resume paths never reach
   // here: the recovery-token fast path above and recoverStudyWave return
   // without opening a START transaction.
+  const gateEnteredAt = process.hrtime.bigint()
   const attempt = await classifyStartTransaction(async () => {
     try {
       return await anonymousStartAdmissionGate().run(async () => {
-        return prisma.$transaction(async (tx) => {
-    await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
-    const existingId = study ? await study.beforeAdmission(tx) : null
-    if (existingId) {
-      const existing = await tx.compositeAssessmentAttempt.findUnique({where:{id:existingId}})
-      if (!existing || existing.userId !== null || existing.accessTokenId !== token.id || existing.recoveryTokenHash !== credential.hash) throw compositeForbidden('研究作答记录不可恢复')
-      return existing
-    }
-    assertTokenWindow(token)
-    const roundCourseId=await assertTrainingTokenRound(tx,token)
-    const claimed = await tx.compositeAssessmentAccessToken.updateMany({
-      where: { id: token.id, isActive: true, expiresAt: { gt: new Date() }, OR: [{ maxUses: 0 }, { usedCount: { lt: token.maxUses } }] },
-      data: { usedCount: { increment: 1 } },
-    })
-    if (claimed.count !== 1) throw compositeConflict('公开链接已达到最大参与次数')
-    const admitted = await createAttempt(tx, roundCourseId?{...composite,deliveryCourseId:roundCourseId}:composite, null, token.id, credential)
-    if (study) await study.afterAdmission(tx, admitted.id)
-    await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
-    return admitted
-        })
+        const gateAdmittedAt = process.hrtime.bigint()
+        recordAnonymousStartPhase('anonymous.start.gate_wait_ms', gateEnteredAt, gateAdmittedAt)
+        const txCallAt = process.hrtime.bigint()
+        try {
+          return await prisma.$transaction(async (tx) => {
+            const txCallbackAt = process.hrtime.bigint()
+            // Diagnostic: time to acquire a DB connection + BEGIN for the tx.
+            recordAnonymousStartDiagnosticPhase('anonymous.start.tx_acquisition_wait_ms', txCallAt, txCallbackAt)
+            const lockAt = process.hrtime.bigint()
+            await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
+            // Diagnostic: FOR UPDATE duration. A single-row PK lookup executes
+            // fast once the lock is held, so this is dominated by lock wait.
+            recordAnonymousStartDiagnosticPhase('anonymous.start.db_lock_wait_ms', lockAt, process.hrtime.bigint())
+            const existingId = study ? await study.beforeAdmission(tx) : null
+            if (existingId) {
+              const existing = await tx.compositeAssessmentAttempt.findUnique({where:{id:existingId}})
+              if (!existing || existing.userId !== null || existing.accessTokenId !== token.id || existing.recoveryTokenHash !== credential.hash) throw compositeForbidden('研究作答记录不可恢复')
+              return existing
+            }
+            assertTokenWindow(token)
+            const roundCourseId=await assertTrainingTokenRound(tx,token)
+            const claimed = await tx.compositeAssessmentAccessToken.updateMany({
+              where: { id: token.id, isActive: true, expiresAt: { gt: new Date() }, OR: [{ maxUses: 0 }, { usedCount: { lt: token.maxUses } }] },
+              data: { usedCount: { increment: 1 } },
+            })
+            if (claimed.count !== 1) throw compositeConflict('公开链接已达到最大参与次数')
+            const admitted = await createAttempt(tx, roundCourseId?{...composite,deliveryCourseId:roundCourseId}:composite, null, token.id, credential)
+            if (study) await study.afterAdmission(tx, admitted.id)
+            await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
+            return admitted
+          })
+        } finally {
+          // tx_wall and gate_slot both end when the transaction settles.
+          // gate_slot ⊃ tx_wall; they are nearly equal here because the gate
+          // callback is exactly the transaction.
+          const settledAt = process.hrtime.bigint()
+          recordAnonymousStartPhase('anonymous.start.tx_wall_ms', txCallAt, settledAt)
+          recordAnonymousStartPhase('anonymous.start.gate_slot_ms', gateAdmittedAt, settledAt)
+        }
       })
     } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
   })
-  return projectStartedAttempt(attempt.id, { recoveryTokenHash: credential.hash }, Boolean(opts?.wantsWholeDelivery), credential.token)
+  const postGateAt = process.hrtime.bigint()
+  try {
+    return await projectStartedAttempt(attempt.id, { recoveryTokenHash: credential.hash }, Boolean(opts?.wantsWholeDelivery), credential.token)
+  } finally {
+    recordAnonymousStartPhase('anonymous.start.post_gate_ms', postGateAt, process.hrtime.bigint())
+  }
 }
 
 /** Restart an anonymous attempt using only the server-issued recovery hash. */
