@@ -233,7 +233,32 @@ describe('Teacher assessment runtime synthetic HTTP boundary',()=>{
   mocks.start.mockImplementation(async()=>{row={...baseline};return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:false}})
   expect((await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{})).status).toBe(200)
   expect(mocks.start).toHaveBeenCalledWith({executionId:baseline.executionId,actorUserId:actor})
-  expect(source.assertUse.mock.calls.map(call=>call[1].purpose)).toEqual(['START','BOUND_COLLECTION'])
+  expect(source.assertUse.mock.calls.map(call=>call[1].purpose)).toEqual(['START'])
+  const binding=mocks.query.mock.calls.map(call=>call[0]).filter((query:{sql:string})=>
+   typeof query.sql==='string'&&query.sql.includes('SELECT e.id')&&query.sql.includes("e.status='STARTED'")&&!query.sql.includes('AS "executionId"'))
+  expect(binding).toHaveLength(1)
+  expect(binding[0].sql).toContain('e.runtime_binding_ref=')
+  expect(binding[0].sql).toContain('parent.id=')
+  expect(binding[0].values).toEqual(expect.arrayContaining([actor,baseline.executionId,attempt]))
+  expect(mocks.parent).not.toHaveBeenCalled()
+ })
+ it('rejects new intake when the persisted Run binding does not match the adapter response',async()=>{
+  row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null}
+  const foreign=id(99)
+  mocks.start.mockImplementation(async()=>{return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:foreign,replayed:false}})
+  const response=await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{delivery:'inline'})
+  expect(response.status).toBe(404)
+  expect(response.body).toEqual({code:'HUITEACHER_ASSESSMENT_UNAVAILABLE',message:'当前教师测评资格、资源或状态不满足要求',data:null})
+  expect(mocks.start).toHaveBeenCalledTimes(1)
+  expect(mocks.parent).not.toHaveBeenCalled()
+  expect(mocks.parentConsent).not.toHaveBeenCalled()
+ })
+ it('rejects new assessment intake when source use is revoked before START',async()=>{
+  row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null}
+  source.assertUse.mockRejectedValue({statusCode:403,code:'SOURCE_GRANT_REVOKED'})
+  const response=await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{delivery:'inline'})
+  expect(response.status).toBe(403)
+  expect(mocks.start).not.toHaveBeenCalled()
   expect(mocks.parent).not.toHaveBeenCalled()
  })
  it('still attaches projected currentUnit on new assessment intake when inline delivery is requested',async()=>{
@@ -242,9 +267,17 @@ describe('Teacher assessment runtime synthetic HTTP boundary',()=>{
   mocks.parent.mockResolvedValue(raw)
   mocks.start.mockImplementation(async()=>{row={...baseline};return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:false}})
   const response=await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{view:'current-unit'})
+  const read=await request(parentPath)
   expect(response.status).toBe(200)
   expect(response.body.data).toMatchObject({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:false})
   expect(response.body.data.currentUnit).toEqual({id:attempt,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',currentItem:null})
+  const strip=(value:unknown):unknown=>{
+   if(Array.isArray(value))return value.map(strip)
+   if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value as Record<string,unknown>)
+    .filter(([key])=>!/id$/i.test(key)&&key!=='runtimeBindingRef').map(([key,item])=>[key,strip(item)]))
+   return value
+  }
+  expect(strip(response.body.data.currentUnit)).toEqual(strip(read.body.data))
   expect(mocks.start).toHaveBeenCalledTimes(1)
  })
  it('returns the plain new-intake payload when current-unit projection throws',async()=>{

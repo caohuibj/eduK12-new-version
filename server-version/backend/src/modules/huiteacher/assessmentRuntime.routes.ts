@@ -30,7 +30,7 @@ import {situationalFinalSubmitSchema} from '../situational/situational-final-sub
 import {submitSituationalAttemptFinal} from '../situational/situational-final-submit.service'
 import {situationalVideoController} from '../situational/situational-video.controller'
 import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
-import {createTeacherAssessmentAccess,TeacherAssessmentRuntimeError,type TeacherAssessmentSourceAccess,type TeacherSourceIdentity,type TeacherRuntimeDb} from './assessmentRuntime.access'
+import {assertPersistedTeacherRunBinding,createTeacherAssessmentAccess,TeacherAssessmentRuntimeError,type TeacherAssessmentSourceAccess,type TeacherSourceIdentity,type TeacherRuntimeDb} from './assessmentRuntime.access'
 
 const uuid=z.string().guid()
 const pick=(value:Record<string,unknown>,keys:readonly string[])=>Object.fromEntries(keys.filter(key=>key in value).map(key=>[key,value[key]]))
@@ -145,7 +145,6 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
     attemptId:proof.task.runtimeBindingRef,
     actorUserId:req.user!.userId,
     authorize:async({attemptId,actorUserId})=>{
-     await access.own(actorUserId,{attemptId})
      await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId)
     },
     project:projectTeacherCompositeRuntime,
@@ -154,15 +153,14 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   const result=await startAssessmentRunExecution({executionId,actorUserId:req.user!.userId})
   if(result.state==='STARTED'){
    if(result.runtimeBindingKind!=='COMPOSITE')throw new TeacherAssessmentRuntimeError()
-   // Re-read the actual persisted Run binding, not just the adapter response.
-   await access.own(req.user!.userId,{executionId,attemptId:result.runtimeBindingRef})
+   // Re-read the actual persisted Run binding, not just the adapter response, without replaying full access.own.
+   await assertPersistedTeacherRunBinding(db,req.user!.userId,{executionId,attemptId:result.runtimeBindingRef})
    return attachTeacherInlineCurrentUnit({
     requested:requestedTeacherInlineCurrentUnit(req),
     started:result,
     attemptId:result.runtimeBindingRef,
     actorUserId:req.user!.userId,
     authorize:async({attemptId,actorUserId})=>{
-     await access.own(actorUserId,{attemptId})
      await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId)
     },
     project:projectTeacherCompositeRuntime,
