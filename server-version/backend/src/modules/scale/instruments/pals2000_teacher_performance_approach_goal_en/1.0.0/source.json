@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "pals2000_teacher_performance_approach_goal_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "PALS2000｜学生感知教师成绩趋近目标｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "abbreviation": "PALS2000",
+      "instrumentFamily": "PALS 2000 / teacher_goals / English metadata only"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "学生感知教师成绩趋近目标；学生更感到教师强调成绩比较和展示能力；不是教师质量分。只登记原版来源，不提供可施测内容。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "pals2000_teacher_performance_approach_goal_en",
+        "family:PALS2000",
+        "version:manual_2000",
+        "subscale:teacher_performance_approach_goal",
+        "respondent:student",
+        "evaluation_target:teacher",
+        "student_evaluation:yes",
+        "language:en",
+        "stage:grade4_plus_domain_adaptation_separate",
+        "age:not_inferred_from_grade",
+        "source:University_of_Michigan",
+        "rights:licensing_agreement_pending",
+        "availability:catalog_only",
+        "research:PILOT"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "OBSERVER"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "populationNotes": "原手册该表描述统计样本：美国高中九年级；不构成中国学段或年龄常模。手册不建议三年级及以下使用；一般措辞与中学分学科改写应分开版本，本候选只登记原英文定义页，未生成分学科或中文版。",
+      "gradeRange": {
+        "minGrade": 4,
+        "maxGrade": 12
+      }
+    },
+    "administration": {
+      "itemCount": 3,
+      "estimatedMinutes": 1,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "原手册一般课堂/本学年语境；此处不提供指导语或施测",
+      "requiredTraining": true,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "源定义页印刷页15 / PDF第19页；该页局部题号，未包含在示例学生问卷中。",
+        "每子量表独立登记；原版/修订版、学生/教师、语言与学科版本不得合并。",
+        "estimatedMinutes仅按每三题约一分钟的编辑规划占位，未实测、非手册时长，不得作为已验证负担。",
+        "背景字段和开放回答走无计分FORM，不进入此量表。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "用于来源核查与本地候选准备；尚无本地施测、翻译或公开再分发授权证据。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "官方2000年英文手册元数据；中文名称和说明为编辑性资料，不是题文翻译。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "仅源英文元数据；无已验证中文版或已冻结的施测语言版本。"
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "PALS 2000 official manual — 学生感知教师成绩趋近目标",
+      "citation": "Midgley et al. (2000), University of Michigan. Definition printed p.15; PDF page 19; sample appendix PDF pp.73–74. SHA256 dc27657aa1ff7bc3eda64e6d8e683ba973912fc4bbe054ff07d5366d94b49301. Licensing: https://public.websites.umich.edu/~pals/manuals.html",
+      "url": "https://public.websites.umich.edu/~pals/pals/PALS%202000_V13Word97.pdf",
+      "publicationYear": 2000
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "学生感知教师成绩趋近目标"
+      ],
+      "limitations": [
+        "仅元数据；没有题文、选项、指导语、可执行计分或个体报告。",
+        "官方许可页指向需完成的Flintbox协议；未取得研究使用、翻译、电子施测或公开再分发授权。",
+        "原手册描述统计与alpha不是本地常模；不设好坏分界、教师排名或跨工具总分。",
+        "学生报告、教师群体汇总、教师自评按实际接收者分别设计；目录与报告草稿不赋予结果可见权限。",
+        "手册脚注4/5：教师目标三维与课堂目标结构三维不用于同一分析；作为二选一方案，不提供联合总分或联合分析组卷。"
+      ],
+      "disclaimer": "候选待审；不可施测。计分/报告草稿不等于已发布C/P/R；未入开发库或生产库。"
+    },
+    "blockers": [
+      "PALS_LICENSING_AGREEMENT_NOT_OBTAINED",
+      "EXECUTABLE_CONTENT_NOT_PREPARED"
+    ]
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "STUDENT_REPORT"
+      }
+    ]
+  }
+}

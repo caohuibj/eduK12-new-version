@@ -1,0 +1,58 @@
+[
+  {
+    "formKey": "pals2000_student_context_en",
+    "name": "PALS2000｜学生背景事实表｜四年级起｜学生填答（英文项目自编候选）",
+    "source": "PROJECT_AUTHORED_CONTEXT_FORM; official manual p.4 mentions a demographic cover sheet but does not supply its fields",
+    "language": "en",
+    "contentVersion": "draft-1",
+    "scoringParameterVersion": null,
+    "reportVersion": null,
+    "questionCount": 5,
+    "definitionFile": "pals2000_student_context_en.form.json",
+    "importFormat": "CSV",
+    "importFile": "pals2000_student_context_en.import.txt",
+    "score": null,
+    "status": "PREPARED_NOT_IMPORTED",
+    "report": "Completion acknowledgement and respondent-authorized factual display only; no scores or psychological interpretation",
+    "visibility": "Existing publication, respondent and report-receiver authorization; no automatic teacher access to individual or open answers",
+    "tags": [
+      "family:PALS2000",
+      "respondent:student",
+      "evaluation_target:learning_context",
+      "language:en",
+      "source:project_authored",
+      "rights:project_authored_context_only",
+      "research:PILOT",
+      "scoring:none",
+      "age:not_inferred_from_grade"
+    ]
+  },
+  {
+    "formKey": "pals2000_teacher_context_en",
+    "name": "PALS2000｜教师教学背景事实表｜小学至高中｜教师填答（英文项目自编候选）",
+    "source": "PROJECT_AUTHORED_CONTEXT_FORM; official manual p.4 mentions a demographic cover sheet but does not supply its fields",
+    "language": "en",
+    "contentVersion": "draft-1",
+    "scoringParameterVersion": null,
+    "reportVersion": null,
+    "questionCount": 5,
+    "definitionFile": "pals2000_teacher_context_en.form.json",
+    "importFormat": "CSV",
+    "importFile": "pals2000_teacher_context_en.import.txt",
+    "score": null,
+    "status": "PREPARED_NOT_IMPORTED",
+    "report": "Completion acknowledgement and respondent-authorized factual display only; no scores or psychological interpretation",
+    "visibility": "Existing publication, respondent and report-receiver authorization; no automatic teacher access to individual or open answers",
+    "tags": [
+      "family:PALS2000",
+      "respondent:teacher",
+      "evaluation_target:learning_context",
+      "language:en",
+      "source:project_authored",
+      "rights:project_authored_context_only",
+      "research:PILOT",
+      "scoring:none",
+      "age:not_inferred_from_grade"
+    ]
+  }
+]
