@@ -1,5 +1,6 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
 import { classifyStartTransaction, rethrowGateBusyAsStartBusy } from './start-transient'
+import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
@@ -4032,7 +4033,15 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   if (!study) assertTokenWindow(token)
   assertCompositeWindow(token.compositeAssessment)
   const credential = study?.credential ?? createRecoveryCredential()
-  const attempt = await classifyStartTransaction(() => prisma.$transaction(async (tx) => {
+  // Same queueing discipline as the authenticated Training START: bursts wait
+  // in the gate (holding no DB connection) instead of hitting the pool and
+  // the exclusive composite row lock directly. Resume paths never reach
+  // here: the recovery-token fast path above and recoverStudyWave return
+  // without opening a START transaction.
+  const attempt = await classifyStartTransaction(async () => {
+    try {
+      return await anonymousStartAdmissionGate().run(async () => {
+        return prisma.$transaction(async (tx) => {
     await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
     const existingId = study ? await study.beforeAdmission(tx) : null
     if (existingId) {
@@ -4051,7 +4060,10 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
     if (study) await study.afterAdmission(tx, admitted.id)
     await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
     return admitted
-  }))
+        })
+      })
+    } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
+  })
   return projectStartedAttempt(attempt.id, { recoveryTokenHash: credential.hash }, Boolean(opts?.wantsWholeDelivery), credential.token)
 }
 
@@ -4095,7 +4107,10 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
   if (!composite.publicEnabled || composite.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
   const credential = { ...createRecoveryCredential(), participantKey:existing.participantKey, anonymousCode:existing.anonymousCode! }
 
-  const next = await prisma.$transaction(async (tx: Db) => {
+  // Same transient mapping as restartUserAttempt: a rolled-back transaction
+  // (pool wait / tx expiry / write conflict / lock conflict) surfaces as the
+  // retryable 503 ASSESSMENT_START_BUSY instead of escaping as a 500.
+  const next = await classifyStartTransaction(() => prisma.$transaction(async (tx: Db) => {
     await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
     const tokens=await tx.$queryRaw<Array<{isActive:boolean;expiresAt:Date;trainingRoundId:string|null}>>`SELECT is_active AS "isActive",expires_at AS "expiresAt",training_round_id AS "trainingRoundId" FROM composite_assessment_access_tokens WHERE id=${existing.accessTokenId} AND composite_assessment_id=${composite.id} FOR UPDATE`
     if(tokens.length!==1||!tokens[0].isActive||new Date(tokens[0].expiresAt).getTime()<=Date.now())throw compositeForbidden('公开链接已失效')
@@ -4142,7 +4157,7 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
       undefined,
       materialRestartClaim(current,composite),
     )
-  })
+  }))
   return { attempt: await getAttemptState(next.id, { recoveryTokenHash: credential.hash }), recoveryToken: credential.token }
 }
 
