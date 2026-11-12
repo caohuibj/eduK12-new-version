@@ -5,22 +5,18 @@ import { normalizeApiError } from '../../utils/normalizeApiError'
 import { finalDraftCapacityRetryDelayMs } from '../../services/persistence/finalDraftCapacityRetry'
 
 /**
- * Anonymous join is single-shot elsewhere; only a busy admission gate or a
- * lost response may be retried. A 503 means nothing was claimed (gate
- * rejection never enters the handler; an in-transaction transient error rolls
- * back), so re-sending the same join is safe. Total deadline bounds the wait
- * when Retry-After is large; 429 is deliberately NOT retried here — its
- * Retry-After can be ~15 minutes, so the user sees the error instead.
+ * Only retry a server-confirmed join admission rejection, which cannot
+ * create a participant. Do NOT automatically resend on network errors or
+ * timeouts: PERSONAL_LINK and SELF_CODE lack a client-stable join identity,
+ * so a committed claim with a lost response would create a second identity.
+ * Rate-limit 429 and other 4xx failures are never retried.
  */
 const JOIN_BUSY_MAX_ATTEMPTS = 3
 const JOIN_BUSY_TOTAL_DEADLINE_MS = 60_000
-/** Exact server message for "code already claimed" (anonymous-study/service.ts). */
-const ALREADY_CLAIMED_MESSAGE = '参与编号无效或已领取，请使用完整参与码恢复'
 
 const isJoinBusyRetryable = (error: unknown): boolean => {
   const normalized = normalizeApiError(error)
-  if (normalized.status === 503 && String(normalized.code ?? '') === 'STUDY_JOIN_BUSY') return true
-  return normalized.status === 0 || normalized.status === 408
+  return normalized.status === 503 && String(normalized.code ?? '') === 'STUDY_JOIN_BUSY'
 }
 
 import {PersonalParticipationLink} from '../../components/participation/PersonalParticipationLink'
@@ -137,39 +133,25 @@ export default function AnonymousStudyPage() {
   })
   const join=(memorable?:MemorableEnrollment)=>act(async()=>{
     if(!consent)throw new Error('请先确认研究内关联说明')
-    const startedAt=Date.now()
+    // One epoch and one payload for the whole logical join, including backoff.
+    const current=epoch.current,startedAt=Date.now()
+    const mode=memorable??(info?.mode==='SELF_CODE'?{generatedCode:true}:undefined)
     for(let attempt=1;;attempt+=1){
-      const current=epoch.current
+      if(current!==epoch.current)return
       try{
-        const joined=await publicStudyApi().join(waveId,token,memorable??(info?.mode==='SELF_CODE'?{generatedCode:true}:undefined))
+        const joined=await publicStudyApi().join(waveId,token,mode)
         if(current!==epoch.current)return
         sessionStorage.setItem(studyIdentityKey(joined.studyId),joined.credential);setCredential(joined.credential);setNewCode(joined.credential);setFullCode(joined.fullCode??'')
         return
       }catch(error){
         if(current!==epoch.current)return
+        if(!isJoinBusyRetryable(error)||attempt>=JOIN_BUSY_MAX_ATTEMPTS)throw error
         const normalized=normalizeApiError(error)
-        // A lost response after a successful claim surfaces as 403 on the
-        // next attempt: the code is already taken. Never re-join; recover the
-        // claimed identity with the full code the user already holds
-        // (MEMORABLE_CODE only — the client knows prefix + suffix). Only
-        // after a previous attempt, so a first-attempt 403 (code claimed by
-        // someone else, or wave closed) still shows its own message. If the
-        // recovery itself fails, surface the original 403.
-        if(attempt>1&&normalized.status===403&&normalized.message===ALREADY_CLAIMED_MESSAGE&&memorable){
-          try{
-            const recovered=await publicStudyApi().recoverCode(sid,`${memorable.prefix}-${memorable.suffix}`)
-            if(current!==epoch.current)return
-            const own=await publicStudyApi(recovered.credential).home(sid)
-            if(current!==epoch.current)return
-            sessionStorage.setItem(studyIdentityKey(sid),recovered.credential);setCredential(recovered.credential);setHome(own)
-            navigate(`/public/studies/${sid}`,{replace:true})
-            return
-          }catch{
-            throw error
-          }
-        }
-        if(!isJoinBusyRetryable(error)||attempt>=JOIN_BUSY_MAX_ATTEMPTS||Date.now()-startedAt>=JOIN_BUSY_TOTAL_DEADLINE_MS)throw error
-        await new Promise((resolve)=>setTimeout(resolve,finalDraftCapacityRetryDelayMs(attempt,normalized.retryAfterMs)))
+        const delay=finalDraftCapacityRetryDelayMs(attempt,normalized.retryAfterMs)
+        // Do not start an additional request after the retry deadline.
+        if(Date.now()-startedAt+delay>=JOIN_BUSY_TOTAL_DEADLINE_MS)throw error
+        await new Promise((resolve)=>setTimeout(resolve,delay))
+        if(current!==epoch.current)return
       }
     }
   })

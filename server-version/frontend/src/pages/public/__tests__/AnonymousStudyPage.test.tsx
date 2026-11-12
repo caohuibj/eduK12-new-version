@@ -339,24 +339,41 @@ it('shows the busy error after three busy joins and never attempts a fourth',asy
  expect(api.join).toHaveBeenCalledTimes(3)
 })
 
-it('recovers the claimed identity when a retry hits already-claimed',async()=>{
- api.info.mockResolvedValue({studyId:'s',studyTitle:'Research',title:'One',accepting:true,mode:'MEMORABLE_CODE',label:'分配编号',instructions:''})
- api.join.mockRejectedValueOnce(Object.assign(new Error('网络请求失败'),{status:0})).mockRejectedValueOnce(Object.assign(new Error('参与编号无效或已领取，请使用完整参与码恢复'),{status:403,code:-1}))
- api.recoverCode.mockResolvedValue({studyId:'s',credential:'a'.repeat(43),displayCode:'P-DISPLAY'})
+it.each([0,408])('does not retry an ambiguous join response (status %s)',async status=>{
+ api.join.mockRejectedValueOnce(Object.assign(new Error('请求结果尚未确认，请核对身份或联系发布方'),{status}))
  show();await screen.findByText('One')
  fireEvent.click(screen.getByRole('checkbox'))
- fireEvent.change(screen.getByLabelText('分配编号'),{target:{value:'001'}})
- fireEvent.change(screen.getByLabelText('自己设置的后缀'),{target:{value:'abcd'}})
- fireEvent.change(screen.getByLabelText('再次确认后缀'),{target:{value:'abcd'}})
+ fireEvent.click(screen.getByRole('button',{name:'创建研究内身份码'}))
+ expect(await screen.findByRole('alert')).toHaveTextContent('请求结果尚未确认')
+ expect(api.join).toHaveBeenCalledTimes(1)
+})
+
+it.each([{status:429,code:'STUDY_JOIN_BUSY'},{status:503,code:'OTHER_BUSY'}])(
+ 'never retries unrelated status/code %o',async ({status,code})=>{
+ api.join.mockRejectedValueOnce(Object.assign(new Error('当前无法加入'),{status,code}))
+ show();await screen.findByText('One')
+ fireEvent.click(screen.getByRole('checkbox'))
+ fireEvent.click(screen.getByRole('button',{name:'创建研究内身份码'}))
+ expect(await screen.findByRole('alert')).toHaveTextContent('当前无法加入')
+ expect(api.join).toHaveBeenCalledTimes(1)
+})
+
+it('cancels the pending busy retry after navigating away',async()=>{
+ api.join.mockRejectedValueOnce(joinBusyError()).mockResolvedValueOnce({studyId:'s',credential:'SHOULD-NOT-BE-STORED'})
+ show();await screen.findByText('One')
+ fireEvent.click(screen.getByRole('checkbox'))
  try{
   vi.useFakeTimers({toFake:['setTimeout','clearTimeout']})
-  fireEvent.click(screen.getByRole('button',{name:'确认研究编码'}))
-  await act(async()=>{await vi.advanceTimersByTimeAsync(35000)})
+  await act(async()=>{
+   fireEvent.click(screen.getByRole('button',{name:'创建研究内身份码'}))
+   await Promise.resolve()
+  })
+  expect(api.join).toHaveBeenCalledTimes(1)
+  fireEvent.click(screen.getByRole('link',{name:'换研究'}))
+  await act(async()=>{await vi.advanceTimersByTimeAsync(35_000)})
  }finally{vi.useRealTimers()}
- expect(api.join).toHaveBeenCalledTimes(2)
- expect(api.recoverCode).toHaveBeenCalledWith('s','001-ABCD')
- expect(await screen.findByRole('button',{name:'查看本次个人报告'})).toBeInTheDocument()
- expect(sessionStorage.getItem('anonymous-study:identity:s')).toBe('a'.repeat(43))
+ expect(api.join).toHaveBeenCalledTimes(1)
+ expect(sessionStorage.getItem('anonymous-study:identity:s')).toBeNull()
 })
 
 it('never retries a 400 or 404 join failure',async()=>{
