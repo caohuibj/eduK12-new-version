@@ -195,6 +195,27 @@ describe('Teacher assessment runtime synthetic HTTP boundary',()=>{
   const response=await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{})
   expect(response.body.data).toEqual({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:true})
   expect(mocks.start).not.toHaveBeenCalled();expect(mocks.parentConsent).toHaveBeenCalledWith(attempt,actor)
+  expect(mocks.parent).not.toHaveBeenCalled()
+ })
+ it('attaches projected currentUnit on assessment resume when inline delivery is requested',async()=>{
+  const raw={id:attempt,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',currentItem:null,trainingPersistence:{attemptId:'training'},checkpointDefinitionHash:'c'.repeat(64),answers:[{secret:'kept'}]}
+  mocks.parent.mockResolvedValue(raw)
+  const started=await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{delivery:'inline'})
+  const read=await request(parentPath)
+  expect(started.status).toBe(200)
+  expect(mocks.start).not.toHaveBeenCalled()
+  expect(started.body.data).toEqual({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:true,currentUnit:read.body.data})
+  expect(started.body.data.currentUnit).not.toHaveProperty('trainingPersistence')
+  expect(started.body.data.currentUnit).not.toHaveProperty('checkpointDefinitionHash')
+  expect(started.body.data.currentUnit.answers).toEqual([{secret:'kept'}])
+  expect(mocks.parent).toHaveBeenCalledWith(attempt,{userId:actor},undefined,'current-unit')
+ })
+ it('returns the plain assessment resume payload when current-unit projection throws',async()=>{
+  mocks.parent.mockRejectedValue(new Error('projection failed'))
+  const response=await request('/run-executions/'+baseline.executionId+'/start-assessment?delivery=inline','POST',{})
+  expect(response.status).toBe(200)
+  expect(response.body.data).toEqual({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:true})
+  expect(mocks.start).not.toHaveBeenCalled()
  })
  it('uses canonical START and then verifies its persisted exact binding',async()=>{
   row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null}
@@ -202,6 +223,27 @@ describe('Teacher assessment runtime synthetic HTTP boundary',()=>{
   expect((await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{})).status).toBe(200)
   expect(mocks.start).toHaveBeenCalledWith({executionId:baseline.executionId,actorUserId:actor})
   expect(source.assertUse.mock.calls.map(call=>call[1].purpose)).toEqual(['START','BOUND_COLLECTION'])
+  expect(mocks.parent).not.toHaveBeenCalled()
+ })
+ it('still attaches projected currentUnit on new assessment intake when inline delivery is requested',async()=>{
+  row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null}
+  const raw={id:attempt,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',currentItem:null,trainingPersistence:{secret:true}}
+  mocks.parent.mockResolvedValue(raw)
+  mocks.start.mockImplementation(async()=>{row={...baseline};return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:false}})
+  const response=await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{view:'current-unit'})
+  expect(response.status).toBe(200)
+  expect(response.body.data).toMatchObject({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:false})
+  expect(response.body.data.currentUnit).toEqual({id:attempt,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',currentItem:null})
+  expect(mocks.start).toHaveBeenCalledTimes(1)
+ })
+ it('returns the plain new-intake payload when current-unit projection throws',async()=>{
+  row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null}
+  mocks.parent.mockRejectedValue(new Error('projection failed'))
+  mocks.start.mockImplementation(async()=>{row={...baseline};return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:false}})
+  const response=await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{delivery:'inline'})
+  expect(response.status).toBe(200)
+  expect(response.body.data).toEqual({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:false})
+  expect(mocks.start).toHaveBeenCalledTimes(1)
  })
  it('maps START admission busy to 503 with Retry-After',async()=>{
   row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null}

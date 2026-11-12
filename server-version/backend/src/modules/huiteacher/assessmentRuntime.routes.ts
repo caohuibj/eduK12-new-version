@@ -17,6 +17,7 @@ import {acceptRunExecutionConsent} from '../assessment-run/consent'
 import {relationalRuntimeConsentAuthority} from '../assessment-relational/runtime-consent'
 import {compositeController} from '../composite/composite.controller'
 import {getAttemptState} from '../composite/composite.service'
+import {attachTeacherInlineCurrentUnit,requestedTeacherInlineCurrentUnit} from './inlineCurrentUnit'
 import {compositeImageController} from '../composite/composite-image.controller'
 import {compositeVideoController} from '../composite/composite-video.controller'
 import {getSession} from '../cognitive/session.service'
@@ -138,29 +139,26 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   // All current product/source/actor/consent checks still run on subsequent reads.
   if(proof.task.runtimeBindingRef){
    await relationalRuntimeConsentAuthority.assertCompositeFinal(proof.task.runtimeBindingRef,req.user!.userId)
-   return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:proof.task.runtimeBindingRef,replayed:true}
+   return attachTeacherInlineCurrentUnit({
+    requested:requestedTeacherInlineCurrentUnit(req),
+    started:{state:'STARTED' as const,runtimeBindingKind:'COMPOSITE' as const,runtimeBindingRef:proof.task.runtimeBindingRef,replayed:true as const},
+    attemptId:proof.task.runtimeBindingRef,
+    actorUserId:req.user!.userId,
+    project:projectTeacherCompositeRuntime,
+   })
   }
   const result=await startAssessmentRunExecution({executionId,actorUserId:req.user!.userId})
   if(result.state==='STARTED'){
    if(result.runtimeBindingKind!=='COMPOSITE')throw new TeacherAssessmentRuntimeError()
    // Re-read the actual persisted Run binding, not just the adapter response.
    await access.own(req.user!.userId,{executionId,attemptId:result.runtimeBindingRef})
-   const requestedDelivery = req.query.view === 'current-unit'
-     || req.query.delivery === 'inline'
-     || (req.body && typeof req.body === 'object' && ((req.body as any).delivery === 'inline' || (req.body as any).view === 'current-unit'))
-   if (requestedDelivery && result.runtimeBindingRef) {
-     try {
-       const currentUnit = await getAttemptState(
-         result.runtimeBindingRef,
-         { userId: req.user!.userId },
-         undefined,
-         'current-unit',
-       )
-       return { ...result, currentUnit: projectTeacherCompositeRuntime(currentUnit) }
-     } catch {
-       return result
-     }
-   }
+   return attachTeacherInlineCurrentUnit({
+    requested:requestedTeacherInlineCurrentUnit(req),
+    started:result,
+    attemptId:result.runtimeBindingRef,
+    actorUserId:req.user!.userId,
+    project:projectTeacherCompositeRuntime,
+   })
   }
   return result
  }))

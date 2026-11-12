@@ -35,10 +35,45 @@ describe('Teacher bound Scale continuation',()=>{
     expect(screen.queryByRole('button',{name:/进入本人自评|继续已有自评/})).not.toBeInTheDocument()
     expect(api.mock.calls.some(([path])=>path.endsWith('/start-scale'))).toBe(false)
   })
+  it('renders directly from inline currentUnit without a secondary GET current-unit request',async()=>{
+    const api=vi.fn(async(path:string,_method='GET',payload?:unknown)=>{
+      if(path==='/my-scale-tasks')return {list:[{...task,status:'ASSIGNED',runStatus:'PUBLISHED',runtimeBindingRef:null}]}
+      if(path.endsWith('/start-scale')){
+        expect(payload).toEqual({delivery:'inline'})
+        return {
+          state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'new-attempt',
+          currentUnit:{id:'new-attempt',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:{id:'scale-item',type:'SCALE'}},
+        }
+      }
+      throw Error('Unexpected secondary request '+path)
+    })
+    render(<HuiteacherMyScaleTasks api={api as Parameters<typeof HuiteacherMyScaleTasks>[0]['api']}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'进入本人自评'}))
+    await screen.findByText('已有自评作答界面')
+    expect(api.mock.calls.some(([path])=>String(path).includes('view=current-unit'))).toBe(false)
+  })
   it('keeps the ordinary PUBLISHED new START flow',async()=>{
     const api=client({status:'ASSIGNED',runStatus:'PUBLISHED',runtimeBindingRef:null})
     fireEvent.click(await screen.findByRole('button',{name:'进入本人自评'}))
-    await waitFor(()=>expect(api).toHaveBeenCalledWith('/run-executions/execution/start-scale','POST',{}))
+    await waitFor(()=>expect(api).toHaveBeenCalledWith('/run-executions/execution/start-scale','POST',{delivery:'inline'}))
+    await screen.findByText('已有自评作答界面')
+    expect(api).toHaveBeenCalledWith('/composite-attempts/new-attempt?view=current-unit')
+  })
+  it('still GETs current-unit when inline currentUnit does not match the attempt',async()=>{
+    const api=vi.fn(async(path:string,_method='GET',payload?:unknown)=>{
+      if(path==='/my-scale-tasks')return {list:[{...task,status:'ASSIGNED',runStatus:'PUBLISHED',runtimeBindingRef:null}]}
+      if(path.endsWith('/start-scale')){
+        expect(payload).toEqual({delivery:'inline'})
+        return {
+          state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'new-attempt',
+          currentUnit:{id:'other-attempt',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:{id:'scale-item',type:'SCALE'}},
+        }
+      }
+      if(path==='/composite-attempts/new-attempt?view=current-unit')return {id:'new-attempt',status:'IN_PROGRESS',currentItem:{id:'scale-item',type:'SCALE'}}
+      throw Error('Unexpected path '+path)
+    })
+    render(<HuiteacherMyScaleTasks api={api as Parameters<typeof HuiteacherMyScaleTasks>[0]['api']}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'进入本人自评'}))
     await screen.findByText('已有自评作答界面')
     expect(api).toHaveBeenCalledWith('/composite-attempts/new-attempt?view=current-unit')
   })

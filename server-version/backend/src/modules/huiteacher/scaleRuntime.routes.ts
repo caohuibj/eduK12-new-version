@@ -18,6 +18,7 @@ import { readTeacherPersonalScaleReport } from './scalePersonalReport.service'
 import { compositeController } from '../composite/composite.controller'
 import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
+import { attachTeacherInlineCurrentUnit, requestedTeacherInlineCurrentUnit } from './inlineCurrentUnit'
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
@@ -235,7 +236,15 @@ router.post('/run-executions/:executionId/start-scale',
     })
     if(result.state==='STARTED'&&result.runtimeBindingKind!=='COMPOSITE')
       throw new Error('Expected canonical Scale Composite binding')
-    return result
+    if(result.state!=='STARTED')return result
+    // GET /composite-attempts/:id returns getAttemptState unchanged.
+    return attachTeacherInlineCurrentUnit({
+      requested:requestedTeacherInlineCurrentUnit(req),
+      started:result,
+      attemptId:result.runtimeBindingRef,
+      actorUserId:req.user!.userId,
+      project:state=>state,
+    })
   }))
 router.get('/composite-attempts/:attemptId',
   authenticateHuiteacher,requireScaleAttempt,compositeController.getAttempt)
