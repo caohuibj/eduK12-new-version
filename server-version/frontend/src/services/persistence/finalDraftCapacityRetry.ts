@@ -10,9 +10,12 @@ const BASE_DELAY_MS = 1_000
 /** High safety cap — still honor larger Retry-After up to this bound. */
 const SAFETY_CAP_MS = 30_000
 
-/** Whitelist: 503/502/504, known busy codes, or network failures only. */
+/** Whitelist: 503/502/504, known busy codes, or network failures only.
+ * Every HTTP 4xx is excluded before any busy-code match. */
 export const isFinalDraftCapacityRetryable = (error: unknown): boolean => {
   const normalized = normalizeApiError(error)
+  // Every 4xx is never retried, even if the body also carries a busy code.
+  if (typeof normalized.status === 'number' && normalized.status >= 400 && normalized.status <= 499) return false
   const code = String(normalized.code ?? '')
   if (BUSY_CODES.has(code)) return true
   if (normalized.status === 502 || normalized.status === 503 || normalized.status === 504) return true

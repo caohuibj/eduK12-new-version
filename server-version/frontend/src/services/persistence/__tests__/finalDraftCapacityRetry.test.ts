@@ -16,6 +16,17 @@ describe('finalDraftCapacityRetry', () => {
     // Gate-E A1: public limiter 429 must NOT enter FinalDraft capacity retry.
     expect(isFinalDraftCapacityRetryable({ status: 429 })).toBe(false)
     expect(isFinalDraftCapacityRetryable({ status: 429, code: 'RATE_LIMITED' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 429, code: 'ADMISSION_BUSY' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 409, code: 'ADMISSION_BUSY' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 409, code: 'ASSESSMENT_SUBMIT_BUSY' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 400, code: 'ADMISSION_BUSY' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 401, code: 'ADMISSION_BUSY' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 413, code: 'ADMISSION_BUSY' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 403, code: 'ADMISSION_BUSY' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 404, code: 'ASSESSMENT_SUBMIT_BUSY' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 422, code: 'ADMISSION_BUSY' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 422, code: 'ASSESSMENT_SUBMIT_BUSY' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 503, code: 'ADMISSION_BUSY' })).toBe(true)
   })
 
   it('uses Retry-After as a floor and grows with attempt + jitter', () => {
@@ -56,5 +67,46 @@ describe('finalDraftCapacityRetry', () => {
     const delayMs = onRetry.mock.calls[0]?.[0]?.delayMs
     expect(typeof delayMs).toBe('number')
     expect(delayMs).toBeGreaterThanOrEqual(1000)
+  })
+
+  it('does not retry 4xx even when the body carries a busy code', async () => {
+    for (const error of [
+      { status: 429, code: 'ADMISSION_BUSY', retryAfterMs: 10 },
+      { status: 409, code: 'ADMISSION_BUSY' },
+      { status: 403, code: 'ADMISSION_BUSY' },
+      { status: 404, code: 'ASSESSMENT_SUBMIT_BUSY' },
+      { status: 422, code: 'ADMISSION_BUSY' },
+      { status: 422, code: 'ASSESSMENT_SUBMIT_BUSY' },
+    ]) {
+      const operation = vi.fn().mockRejectedValue(error)
+      const sleep = vi.fn(async () => undefined)
+      await expect(runFinalDraftCapacityRetry({
+        maxAttempts: 4,
+        operation,
+        sleep,
+        random: () => 0,
+      })).rejects.toEqual(error)
+      expect(operation).toHaveBeenCalledTimes(1)
+      expect(sleep).not.toHaveBeenCalled()
+      operation.mockReset()
+    }
+  })
+
+  it('retries a lost network response with the same operation and accepts the idempotent replay', async () => {
+    const sealed = { submissionId: 'sub-1', operationKey: 'op-1', answers: { q1: 'yes' } }
+    const operation = vi.fn()
+      .mockRejectedValueOnce({ status: null, message: 'Network Error', retryable: true })
+      .mockResolvedValueOnce({ ok: true, idempotent: true, submissionId: sealed.submissionId })
+    const sleep = vi.fn(async () => undefined)
+    await expect(runFinalDraftCapacityRetry({
+      maxAttempts: 4,
+      operation: async () => operation(sealed),
+      sleep,
+      random: () => 0,
+    })).resolves.toEqual({ ok: true, idempotent: true, submissionId: 'sub-1' })
+    expect(operation).toHaveBeenCalledTimes(2)
+    expect(operation.mock.calls[0][0]).toBe(sealed)
+    expect(operation.mock.calls[1][0]).toBe(sealed)
+    expect(operation.mock.calls[0][0]).toEqual(operation.mock.calls[1][0])
   })
 })

@@ -18,6 +18,7 @@ import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
 import type { ProfessionalAnswer } from './ProfessionalFormAnswer'
 import {hasSelectedOther} from './FormChoiceExtras'
 import {saveLocalSurveyDraft,restoreLocalSurveyDraftEnvelope,clearLocalSurveyDraft,type SurveyFinalSubmission} from './local-answer-draft'
+import {runFinalDraftCapacityRetry} from '../services/persistence/finalDraftCapacityRetry'
 import {SurveyTimedScale} from './SurveyTimedScale'
 import {SurveyScaleTimingTracker,sealSurveyScaleTimings,
   type SurveyWaveScaleTimings} from './survey-scale-timing'
@@ -426,6 +427,15 @@ export default function SurveyPublicApp(){
       if(target)revealAnswer(target.unit,target.itemKey)
     }finally{setBusy(false);setBusyLabel('')}
   }
+  // Same path and body on every attempt. 400/401/409/413/429 are not retried.
+  async function postWithCapacityRetry<T>(path:string,body:unknown):Promise<T>{
+    const result=await runFinalDraftCapacityRetry({
+      onRetry:()=>{setError('提交繁忙，正在自动重试…')},
+      operation:()=>publicApi<T>(path,'POST',body),
+    })
+    setError('')
+    return result
+  }
   const recoverWithoutInvitation=()=>void run(async()=>{
     // Existing participant rights do not depend on an unexpired invitation.
     // This explicit fallback retains the ordinary, unscoped rate limit.
@@ -617,15 +627,16 @@ export default function SurveyPublicApp(){
     }
     if(info?.project.collectionMode==='LINKED_WAVES'){
       if(!researchCode||!accessCredential)throw new Error('请先使用你的专属链接进入，或首次参加。')
-      const started=await publicApi<{attemptId:string}>(base+'/waves/'+wave.id+'/start','POST',{
+      const started=await postWithCapacityRetry<{attemptId:string}>(base+'/waves/'+wave.id+'/start',{
         researchCode:researchCode.trim().toUpperCase(),accessCredential:accessCredential.trim(),
         consent:true,consentVersion:wave.consentVersion,
       })
       await loadTask(started.attemptId,researchCode.trim().toUpperCase(),accessCredential.trim())
     }else{
+      // Mint the operation identity once. A 503 must repeat it; clear only after START succeeds.
       const startIdentity=ensureUnlinkedStartIdentity(publicId,wave.id)
-      const started=await publicApi<{attemptId:string;accessCredential:string}>(
-        base+'/waves/'+wave.id+'/start-unlinked','POST',{
+      const started=await postWithCapacityRetry<{attemptId:string;accessCredential:string}>(
+        base+'/waves/'+wave.id+'/start-unlinked',{
           entryToken,consent:true,consentVersion:wave.consentVersion,
           operationKey:startIdentity.operationKey,accessCredential:startIdentity.accessCredential,
         })
@@ -882,7 +893,7 @@ export default function SurveyPublicApp(){
     const sealed=finalRequest.current
     if(sealed.attemptId!==attemptId)throw new Error('提交所属作答已变化，请重新读取本轮')
     let final:FinalResponse
-    try{final=await publicApi<FinalResponse>(sealed.path,'POST',sealed.body)}
+    try{final=await postWithCapacityRetry<FinalResponse>(sealed.path,sealed.body)}
     catch(e){
       // Only an explicit validation rejection proves this request did not commit.
       // Ambiguous network/server failures must keep the exact request for retry.
