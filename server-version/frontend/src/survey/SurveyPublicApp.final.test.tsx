@@ -747,6 +747,38 @@ describe('Survey sealed capacity retry',()=>{
   })
 
   it.each([
+    [429,'ADMISSION_BUSY'],
+    [429,'SURVEY_ADMISSION_BUSY'],
+    [409,'ADMISSION_BUSY'],
+    [409,'ASSESSMENT_SUBMIT_BUSY'],
+  ] as const)('does not auto-retry FINAL %s even when the body carries %s',async(status,code)=>{
+    finalReply=()=>Promise.resolve({
+      ok:false,status,json:async()=>({code,message:'本次提交被拒绝',data:null}),
+    } as Response)
+    await openTask()
+    now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    await screen.findByText('本次提交被拒绝')
+    expect(finalCalls).toHaveLength(1)
+  })
+
+  it('retries a lost FINAL response with the same sealed body and accepts the idempotent replay',async()=>{
+    let calls=0
+    finalReply=()=>{
+      calls+=1
+      if(calls===1)return Promise.reject(new TypeError('Failed to fetch'))
+      return response(firstSuccess({idempotent:true}))
+    }
+    await openTask()
+    now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    await exhaustCapacityRetry()
+    await screen.findByText('感谢参与')
+    expect(finalCalls.length).toBe(2)
+    expect(finalCalls[0].submissionId).toBe(finalCalls[1].submissionId)
+    expect(finalCalls[1]).toEqual(finalCalls[0])
+    expect(screen.queryByText(/重复|冲突/)).toBeNull()
+  })
+
+  it.each([
     [400,false],
     [401,true],
     [409,true],
