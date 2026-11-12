@@ -10,6 +10,7 @@ import {hashRecoveryToken} from '../../services/anonymousAccess'
 import {publicAnonymousStudyRouter} from '../../modules/anonymous-study/routes'
 import {csrfProtection} from '../../middleware/csrf'
 import {publicAssessmentRateLimiters} from '../../middleware/publicAssessmentRateLimit'
+import {anonymousStartAdmissionGate,resetAnonymousStartAdmissionGateForTests} from '../../modules/anonymous-study/study-start-admission-gate'
 const suite=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL')?describe:describe.skip
 suite('anonymous research identity and exact-wave PostgreSQL',()=>{
  let owner:string,other:string,cid:string,itemId:string
@@ -156,6 +157,37 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
    expect((await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:second.attempt.id}})).status).toBe('IN_PROGRESS')
   } finally {
    await prisma.compositeAssessment.update({where:{id:cid},data:{maxAttempts:1}})
+  }
+ },60000)
+ it('anonymous START goes through the admission gate: a held gate surfaces retryable 503, not a pool wait',async()=>{
+  // Pin the gate to a single slot with no queue, hold that slot with a dummy
+  // task, then start: the pre-gate reads succeed against the real DB, and the
+  // gate rejection must surface as ASSESSMENT_START_BUSY (503 + Retry-After),
+  // the same contract as the authenticated Training START. Restores the gate
+  // afterwards so later tests in this file are unaffected.
+  const savedConcurrent=process.env.ANONYMOUS_START_MAX_CONCURRENT
+  const savedQueue=process.env.ANONYMOUS_START_MAX_QUEUE
+  const savedWait=process.env.ANONYMOUS_START_MAX_WAIT_MS
+  process.env.ANONYMOUS_START_MAX_CONCURRENT='1'
+  process.env.ANONYMOUS_START_MAX_QUEUE='0'
+  process.env.ANONYMOUS_START_MAX_WAIT_MS='15000'
+  resetAnonymousStartAdmissionGateForTests()
+  const gate=anonymousStartAdmissionGate()
+  let releaseGate:(()=>void)|undefined
+  const held=new Promise<void>(resolve=>{releaseGate=resolve})
+  const holder=gate.run(()=>held)
+  try {
+   const t=await token()
+   await expect(composite.startPublicAttempt(t.token)).rejects.toMatchObject({code:'ASSESSMENT_START_BUSY',statusCode:503})
+   // The rejected start must not have claimed the token or created an attempt.
+   expect((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})).usedCount).toBe(0)
+  } finally {
+   releaseGate?.()
+   await holder
+   if(savedConcurrent===undefined)delete process.env.ANONYMOUS_START_MAX_CONCURRENT;else process.env.ANONYMOUS_START_MAX_CONCURRENT=savedConcurrent
+   if(savedQueue===undefined)delete process.env.ANONYMOUS_START_MAX_QUEUE;else process.env.ANONYMOUS_START_MAX_QUEUE=savedQueue
+   if(savedWait===undefined)delete process.env.ANONYMOUS_START_MAX_WAIT_MS;else process.env.ANONYMOUS_START_MAX_WAIT_MS=savedWait
+   resetAnonymousStartAdmissionGateForTests()
   }
  },60000)
 })

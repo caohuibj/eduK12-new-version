@@ -1,5 +1,6 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
 import { classifyStartTransaction, rethrowGateBusyAsStartBusy } from './start-transient'
+import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
@@ -4032,7 +4033,15 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   if (!study) assertTokenWindow(token)
   assertCompositeWindow(token.compositeAssessment)
   const credential = study?.credential ?? createRecoveryCredential()
-  const attempt = await classifyStartTransaction(() => prisma.$transaction(async (tx) => {
+  // Same queueing discipline as the authenticated Training START: bursts wait
+  // in the gate (holding no DB connection) instead of hitting the pool and
+  // the exclusive composite row lock directly. Resume paths never reach
+  // here: the recovery-token fast path above and recoverStudyWave return
+  // without opening a START transaction.
+  const attempt = await classifyStartTransaction(async () => {
+    try {
+      return await anonymousStartAdmissionGate().run(async () => {
+        return prisma.$transaction(async (tx) => {
     await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
     const existingId = study ? await study.beforeAdmission(tx) : null
     if (existingId) {
@@ -4051,7 +4060,10 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
     if (study) await study.afterAdmission(tx, admitted.id)
     await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
     return admitted
-  }))
+        })
+      })
+    } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
+  })
   return projectStartedAttempt(attempt.id, { recoveryTokenHash: credential.hash }, Boolean(opts?.wantsWholeDelivery), credential.token)
 }
 
