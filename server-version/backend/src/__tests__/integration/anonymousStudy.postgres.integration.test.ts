@@ -1,5 +1,6 @@
 import {randomUUID} from 'node:crypto'
-import {beforeAll,afterAll,describe,expect,it} from 'vitest'
+import {EventEmitter} from 'node:events'
+import {beforeAll,afterAll,describe,expect,it,vi} from 'vitest'
 import express from 'express'
 import {prisma} from '../../config/database'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from './integration-env'
@@ -11,7 +12,23 @@ import {publicAnonymousStudyRouter} from '../../modules/anonymous-study/routes'
 import {csrfProtection} from '../../middleware/csrf'
 import {publicAssessmentRateLimiters} from '../../middleware/publicAssessmentRateLimit'
 import {anonymousStartAdmissionGate,resetAnonymousStartAdmissionGateForTests} from '../../modules/anonymous-study/study-start-admission-gate'
+import {requestObservabilityMiddleware,resetRuntimeObservabilityForTests,runtimeMetricLines} from '../../services/runtimeObservability'
 const suite=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL')?describe:describe.skip
+const phaseCount = (phase:string):number => {
+ const prefix=`ptool_assessment_phase_duration_seconds_count{phase="${phase}",route="`
+ return runtimeMetricLines().filter(line=>line.startsWith(prefix))
+  .reduce((sum,line)=>sum+Number(line.slice(line.lastIndexOf(' ')+1)),0)
+}
+const observedPublicStart = async <T>(run:()=>Promise<T>):Promise<T> => {
+ const request={method:'POST',path:'/api/public/anonymous-studies/waves/example/start',
+  baseUrl:'',route:{path:'/api/public/anonymous-studies/waves/:waveId/start'}} as any
+ const response=Object.assign(new EventEmitter(),{statusCode:200}) as any
+ let started!:Promise<T>
+ requestObservabilityMiddleware(request,response,()=>{started=run()})
+ try{return await started}
+ catch(error){response.statusCode=503;throw error}
+ finally{response.emit('finish')}
+}
 suite('anonymous research identity and exact-wave PostgreSQL',()=>{
  let owner:string,other:string,cid:string,itemId:string
  beforeAll(async()=>{
@@ -178,7 +195,12 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   const holder=gate.run(()=>held)
   try {
    const t=await token()
-   await expect(composite.startPublicAttempt(t.token)).rejects.toMatchObject({code:'ASSESSMENT_START_BUSY',statusCode:503})
+   const preGateBefore=phaseCount('anonymous.start.pre_gate_ms')
+   const admittedBefore=phaseCount('anonymous.start.gate_wait_ms')
+   await expect(observedPublicStart(()=>composite.startPublicAttempt(t.token))).rejects.toMatchObject({code:'ASSESSMENT_START_BUSY',statusCode:503})
+   expect(phaseCount('anonymous.start.pre_gate_ms')).toBe(preGateBefore+1)
+   // Queue rejections never enter the gate, so they have no admitted-wait span.
+   expect(phaseCount('anonymous.start.gate_wait_ms')).toBe(admittedBefore)
    // The rejected start must not have claimed the token or created an attempt.
    expect((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})).usedCount).toBe(0)
   } finally {
@@ -188,6 +210,63 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
    if(savedQueue===undefined)delete process.env.ANONYMOUS_START_MAX_QUEUE;else process.env.ANONYMOUS_START_MAX_QUEUE=savedQueue
    if(savedWait===undefined)delete process.env.ANONYMOUS_START_MAX_WAIT_MS;else process.env.ANONYMOUS_START_MAX_WAIT_MS=savedWait
    resetAnonymousStartAdmissionGateForTests()
+  }
+ },60000)
+
+ it('anonymous START service spans distinguish new attempt from recovery',async()=>{
+  const priorFlag=process.env.ANONYMOUS_START_DIAGNOSTIC_ENABLED
+  process.env.ANONYMOUS_START_DIAGNOSTIC_ENABLED='true'
+  resetRuntimeObservabilityForTests()
+  try{
+   const t=await token()
+   const created=await observedPublicStart(()=>composite.startPublicAttempt(t.token))
+   expect(created.attempt.id).toBeTruthy()
+   for(const name of ['pre_gate_ms','gate_wait_ms','gate_slot_ms','tx_wall_ms','post_gate_ms','tx_acquisition_wait_ms','composite_for_update_query_ms']){
+    expect(phaseCount('anonymous.start.'+name)).toBe(1)
+   }
+   expect(phaseCount('anonymous.start.tx_acquisition_failed_ms')).toBe(0)
+   expect(phaseCount('anonymous.start.composite_for_update_query_failed_ms')).toBe(0)
+   const resumed=await observedPublicStart(()=>composite.startPublicAttempt(t.token,created.recoveryToken!))
+   expect(resumed.attempt.id).toBe(created.attempt.id)
+   expect(phaseCount('anonymous.start.pre_gate_ms')).toBe(2)
+   expect(phaseCount('anonymous.start.post_gate_ms')).toBe(2)
+   for(const name of ['gate_wait_ms','gate_slot_ms','tx_wall_ms'])expect(phaseCount('anonymous.start.'+name)).toBe(1)
+  }finally{
+   if(priorFlag===undefined)delete process.env.ANONYMOUS_START_DIAGNOSTIC_ENABLED
+   else process.env.ANONYMOUS_START_DIAGNOSTIC_ENABLED=priorFlag
+  }
+ },60000)
+ it('anonymous START captures failed transaction acquisition and failed FOR UPDATE query',async()=>{
+  const priorFlag=process.env.ANONYMOUS_START_DIAGNOSTIC_ENABLED
+  process.env.ANONYMOUS_START_DIAGNOSTIC_ENABLED='true'
+  resetRuntimeObservabilityForTests()
+  try{
+   const tokenBeforeCallback=await token()
+   const acquireSpy=vi.spyOn(prisma as any,'$transaction').mockImplementationOnce(
+    async()=>{throw new Error('simulated transaction acquisition failure')},
+   )
+   try{
+    await expect(observedPublicStart(()=>composite.startPublicAttempt(tokenBeforeCallback.token))).rejects.toThrow('simulated transaction acquisition failure')
+   }finally{acquireSpy.mockRestore()}
+   expect(phaseCount('anonymous.start.tx_acquisition_failed_ms')).toBe(1)
+   expect(phaseCount('anonymous.start.tx_acquisition_wait_ms')).toBe(0)
+   expect(phaseCount('anonymous.start.tx_wall_ms')).toBe(1)
+   expect(phaseCount('anonymous.start.gate_slot_ms')).toBe(1)
+   const tokenLockFailure=await token()
+   const lockSpy=vi.spyOn(prisma as any,'$transaction').mockImplementationOnce(
+    async(callback:any)=>callback({$queryRaw:async()=>{throw new Error('simulated FOR UPDATE failure')}}),
+   )
+   try{
+    await expect(observedPublicStart(()=>composite.startPublicAttempt(tokenLockFailure.token))).rejects.toThrow('simulated FOR UPDATE failure')
+   }finally{lockSpy.mockRestore()}
+   expect(phaseCount('anonymous.start.composite_for_update_query_failed_ms')).toBe(1)
+   expect(phaseCount('anonymous.start.composite_for_update_query_ms')).toBe(0)
+   expect(phaseCount('anonymous.start.tx_acquisition_wait_ms')).toBe(1)
+   expect(phaseCount('anonymous.start.tx_wall_ms')).toBe(2)
+   expect(phaseCount('anonymous.start.gate_slot_ms')).toBe(2)
+  }finally{
+   if(priorFlag===undefined)delete process.env.ANONYMOUS_START_DIAGNOSTIC_ENABLED
+   else process.env.ANONYMOUS_START_DIAGNOSTIC_ENABLED=priorFlag
   }
  },60000)
 })
