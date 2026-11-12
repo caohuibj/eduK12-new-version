@@ -40,6 +40,9 @@ describe('Survey parent collection prefetches SURVEY tool-policy admission',()=>
       {resourceKey:'b',fingerprint:'v1'},
     ],'SURVEY')
     expect(order).toEqual(['prefetch','paused'])
+    const known=mocks.paused.mock.calls[0][2] as Map<string,{resourceKey:string;fingerprint:string}>
+    expect([...known.keys()].sort()).toEqual(['a','b'])
+    expect(known.get('a')).toEqual({resourceKey:'a',fingerprint:'v1'})
     expect(tx.$queryRaw).not.toHaveBeenCalled()
   })
   it('still admits a publication with no prefetchable identities',async()=>{

@@ -175,6 +175,114 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   await revokeToolGrant(manager,afterStop.grant.id)
   await expect(afterStop.start()).rejects.toMatchObject({statusCode:403})
  },60_000)
+ it('interleaves a full START transaction with revocation and pause without deadlock or late admission',async()=>{
+  const pkg=registry.packages[1]
+  const openPublished=async()=>{
+   const submitted=await submitGovernedSource(system,{requestId:randomUUID(),source:{kind:'SJT',sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion},version:'full-start-'+randomUUID(),title:'Synthetic full START race',report:null,reference:{}},proof)
+   await approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',allowedProducts:['SURVEY'],reason:'Synthetic full START approval'},proof)
+   const grant=await grantCatalogSource(manager,owner,{kind:'SJT',sourceId:'survey-tool:'+submitted.id,sourceVersion:submitted.hash})
+   const projectId=randomUUID()
+   await db.surveyProject.create({data:{id:projectId,ownerUserId:owner,title:'Synthetic full START project',collectionMode:'SINGLE_UNLINKED'}})
+   const draft=await importCatalogDraft(owner,projectId,grant.id,{requestId:randomUUID(),instrumentKey:'native',title:'Frozen full START native'})
+   const wave=await createWave(owner,projectId,{requestId:randomUUID(),title:'Synthetic full START',consentText:'Synthetic prefetch consent without human participants.',generalText:'Synthetic',instrumentIds:[draft.id],allowNewParticipants:true})
+   await prepareWave(owner,projectId,wave.id,wave.revision)
+   const prepared=await getWave(owner,projectId,wave.id)
+   const opened=await openWave(owner,projectId,wave.id,prepared.revision)
+   const snapshot=(await db.surveyPublication.findUniqueOrThrow({where:{id:opened.publicationId!}})).compiledSnapshot as unknown as ResearchFrozenPublication
+   const start=()=>startSingleUnlinkedWave({...surveyStartKeys('governed-full-start'),publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true})
+   return {submitted,grant,snapshot,start,waveId:wave.id}
+  }
+  const awaitLockWait=async()=>{
+   let waiting=false
+   for(let i=0;i<40&&!waiting;i++){
+    const rows=await db.$queryRaw<Array<{waiting:boolean}>>`SELECT EXISTS(
+      SELECT 1 FROM pg_stat_activity
+      WHERE datname=current_database() AND wait_event_type='Lock'
+        AND pid<>pg_backend_pid() AND query NOT LIKE '%pg_stat_activity%'
+    ) AS waiting`
+    waiting=rows[0].waiting
+    if(!waiting)await new Promise(resolve=>setTimeout(resolve,25))
+   }
+   expect(waiting).toBe(true)
+  }
+  const releaseIdOf=(snapshot:ResearchFrozenPublication)=>{
+   const id=snapshot.units[0]?.measurementRelease?.releaseId
+   if(typeof id!=='string')throw new Error('publication has no measurementRelease.releaseId')
+   return id
+  }
+  const hold=async(lock:(tx:typeof db)=>Promise<unknown>)=>{
+   let release!:()=>void,locked!:()=>void
+   const ready=new Promise<void>(resolve=>{locked=resolve}),gate=new Promise<void>(resolve=>{release=resolve})
+   const running=db.$transaction(async tx=>{
+    await lock(tx)
+    locked();await gate
+   },{timeout:15_000,maxWait:5_000})
+   await ready
+   return {running,release}
+  }
+
+  // START blocked on the wave row before collection; revoke commits first; START is denied.
+  const earlyRevoke=await openPublished()
+  const earlyRevokeHold=await hold(tx=>tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${earlyRevoke.waveId} FOR UPDATE`)
+  const earlyRevokeStart=earlyRevoke.start()
+  try{await awaitLockWait()}catch(error){earlyRevokeHold.release();throw error}
+  await expect(revokeToolGrant(manager,earlyRevoke.grant.id)).resolves.toBeTruthy()
+  earlyRevokeHold.release()
+  await expect(earlyRevokeStart).rejects.toMatchObject({statusCode:403})
+  await expect(earlyRevokeHold.running).resolves.toBeUndefined()
+
+  // Same early lock order with a policy pause; START is denied with 409.
+  const earlyPause=await openPublished()
+  const earlyPolicy=await db.$queryRaw<Array<{version:number}>>`SELECT version FROM survey_tool_policies WHERE product='SURVEY' AND resource_key=${'governed-release:'+earlyPause.submitted.id} AND fingerprint=${earlyPause.submitted.hash}`
+  const earlyPauseHold=await hold(tx=>tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${earlyPause.waveId} FOR UPDATE`)
+  const earlyPauseStart=earlyPause.start()
+  try{await awaitLockWait()}catch(error){earlyPauseHold.release();throw error}
+  await expect(changeSurveyToolPolicy(manager,{
+   resourceKey:'governed-release:'+earlyPause.submitted.id,fingerprint:earlyPause.submitted.hash,
+   expectedVersion:earlyPolicy[0].version,decision:'APPROVED',paused:true,reason:'Synthetic full START pause',
+  })).resolves.toBeTruthy()
+  earlyPauseHold.release()
+  await expect(earlyPauseStart).rejects.toMatchObject({statusCode:409})
+  await expect(earlyPauseHold.running).resolves.toBeUndefined()
+
+  // START has passed collection and is blocked on the later content-release FOR SHARE.
+  // Revoke waits; after release, START commits first (200) and revoke then succeeds. No late admission.
+  const lateRevoke=await openPublished()
+  const lateRevokeHold=await hold(tx=>tx.$queryRaw`SELECT id FROM measurement_content_releases WHERE id=${releaseIdOf(lateRevoke.snapshot)} FOR UPDATE`)
+  const lateRevokeStart=lateRevoke.start()
+  try{await awaitLockWait()}catch(error){lateRevokeHold.release();throw error}
+  const lateRevokeStop=revokeToolGrant(manager,lateRevoke.grant.id)
+  try{await awaitLockWait()}catch(error){lateRevokeHold.release();throw error}
+  let startSettled=false
+  lateRevokeStart.finally(()=>{startSettled=true})
+  await new Promise(resolve=>setTimeout(resolve,50))
+  expect(startSettled).toBe(false)
+  lateRevokeHold.release()
+  await expect(lateRevokeStart).resolves.toMatchObject({status:'STARTED',recovered:false})
+  await expect(lateRevokeStop).resolves.toBeTruthy()
+  await expect(lateRevokeHold.running).resolves.toBeUndefined()
+  await expect(lateRevoke.start()).rejects.toMatchObject({statusCode:403})
+
+  const latePause=await openPublished()
+  const latePolicy=await db.$queryRaw<Array<{version:number}>>`SELECT version FROM survey_tool_policies WHERE product='SURVEY' AND resource_key=${'governed-release:'+latePause.submitted.id} AND fingerprint=${latePause.submitted.hash}`
+  const latePauseHold=await hold(tx=>tx.$queryRaw`SELECT id FROM measurement_content_releases WHERE id=${releaseIdOf(latePause.snapshot)} FOR UPDATE`)
+  const latePauseStart=latePause.start()
+  try{await awaitLockWait()}catch(error){latePauseHold.release();throw error}
+  const latePauseStop=changeSurveyToolPolicy(manager,{
+   resourceKey:'governed-release:'+latePause.submitted.id,fingerprint:latePause.submitted.hash,
+   expectedVersion:latePolicy[0].version,decision:'APPROVED',paused:true,reason:'Synthetic full START pause after collection',
+  })
+  try{await awaitLockWait()}catch(error){latePauseHold.release();throw error}
+  let pauseStartSettled=false
+  latePauseStart.finally(()=>{pauseStartSettled=true})
+  await new Promise(resolve=>setTimeout(resolve,50))
+  expect(pauseStartSettled).toBe(false)
+  latePauseHold.release()
+  await expect(latePauseStart).resolves.toMatchObject({status:'STARTED',recovered:false})
+  await expect(latePauseStop).resolves.toBeTruthy()
+  await expect(latePauseHold.running).resolves.toBeUndefined()
+  await expect(latePause.start()).rejects.toMatchObject({statusCode:409})
+ },90_000)
  it('qualifies a real synthetic V2 author release and preserves concurrent child replay plus the configured report',async()=>{
 
   const template={...structuredClone(sjtNativeStagedTemplate),instrumentKey:'synthetic-author-governed-'+randomUUID()},compiled=compileSjtTemplate(template)

@@ -9,15 +9,18 @@ import type {CatalogSourceSnapshot} from './catalog.sources'
  * An existing Attempt resumes, checkpoints and finalizes its frozen binding. */
 export async function assertSurveyScaleCollectionAllowed(tx:Prisma.TransactionClient,snapshot:ResearchFrozenPublication){
   const identities:Array<Awaited<ReturnType<typeof snapshotPolicyIdentity>>>=[]
+  const knownIdentities=new Map<string,Awaited<ReturnType<typeof snapshotPolicyIdentity>>>()
   for(const unit of snapshot.units){
     const p=unit.sourceProvenance,ref=p?.source as CatalogSourceSnapshot['ref']|undefined
     if(!p||!ref)continue
     // Library use-grants lock release/entry before tool policy, matching Training.
     if(typeof p.libraryEntryId==='string')continue
-    identities.push(await snapshotPolicyIdentity(tx,{ref,provenance:p,definitionDigest:unit.sourceDigest} as CatalogSourceSnapshot))
+    const identity=await snapshotPolicyIdentity(tx,{ref,provenance:p,definitionDigest:unit.sourceDigest} as CatalogSourceSnapshot)
+    identities.push(identity)
+    knownIdentities.set(unit.draftId,identity)
   }
   await prefetchToolPolicyAdmission(tx,identities,'SURVEY')
-  await assertSurveyPublicationNotPaused(tx,snapshot)
+  await assertSurveyPublicationNotPaused(tx,snapshot,knownIdentities)
   const scales=snapshot.units.filter(unit=>unit.kind==='SCALE')
   if(!scales.length)return
   const ids=scales.flatMap(unit=>{
