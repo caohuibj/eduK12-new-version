@@ -4107,7 +4107,10 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
   if (!composite.publicEnabled || composite.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
   const credential = { ...createRecoveryCredential(), participantKey:existing.participantKey, anonymousCode:existing.anonymousCode! }
 
-  const next = await prisma.$transaction(async (tx: Db) => {
+  // Same transient mapping as restartUserAttempt: a rolled-back transaction
+  // (pool wait / tx expiry / write conflict / lock conflict) surfaces as the
+  // retryable 503 ASSESSMENT_START_BUSY instead of escaping as a 500.
+  const next = await classifyStartTransaction(() => prisma.$transaction(async (tx: Db) => {
     await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
     const tokens=await tx.$queryRaw<Array<{isActive:boolean;expiresAt:Date;trainingRoundId:string|null}>>`SELECT is_active AS "isActive",expires_at AS "expiresAt",training_round_id AS "trainingRoundId" FROM composite_assessment_access_tokens WHERE id=${existing.accessTokenId} AND composite_assessment_id=${composite.id} FOR UPDATE`
     if(tokens.length!==1||!tokens[0].isActive||new Date(tokens[0].expiresAt).getTime()<=Date.now())throw compositeForbidden('公开链接已失效')
@@ -4154,7 +4157,7 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
       undefined,
       materialRestartClaim(current,composite),
     )
-  })
+  }))
   return { attempt: await getAttemptState(next.id, { recoveryTokenHash: credential.hash }), recoveryToken: credential.token }
 }
 
