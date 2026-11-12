@@ -1,0 +1,278 @@
+{
+  "requestId": "92a9c56a-33e2-5383-adb5-b13c1da1ecd6",
+  "toolKey": "css_t_lu2023_praise_en",
+  "version": "0.1.0",
+  "title": "CSS-T／CSAS｜表扬与鼓励（无计分）｜教师自评｜LU2023-EN·小学",
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "css_t_praise_en",
+        "title": "CSS-T／CSAS｜表扬与鼓励（无计分）｜教师自评｜LU2023-EN·小学",
+        "description": "Source: Dierendonck (2023), doi:10.3389/feduc.2023.1281431, Supplementary Table S2, items 27–31; CSS-T original item authors: Reddy, Dudek, Fabiano & Peters (2015), doi:10.1037/spq0000110. CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Subset grouped as printed; no efficacy/quality score or independent-administered scale validation claimed. Original English item wording reproduced as printed in S2; Luxembourg data were collected in French, so this English digital Form does not inherit French psychometric evidence. For each practice, select the frequency that fits your experience. You may skip a question. No score will be calculated.",
+        "questions": [
+          {
+            "itemKey": "css_t_s2_27_en",
+            "type": "LIKERT",
+            "prompt": "Increases frequency of praise when teaching new skills.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "f1",
+                "label": "1 — never"
+              },
+              {
+                "optionKey": "f2",
+                "label": "2 — rarely"
+              },
+              {
+                "optionKey": "f3",
+                "label": "3 — sometimes"
+              },
+              {
+                "optionKey": "f4",
+                "label": "4 — regularly"
+              },
+              {
+                "optionKey": "f5",
+                "label": "5 — frequently"
+              },
+              {
+                "optionKey": "f6",
+                "label": "6 — very frequently"
+              },
+              {
+                "optionKey": "f7",
+                "label": "7 — systematically"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "css_t_s2_28_en",
+            "type": "LIKERT",
+            "prompt": "Verbally praises or rewards students for following rules.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "f1",
+                "label": "1 — never"
+              },
+              {
+                "optionKey": "f2",
+                "label": "2 — rarely"
+              },
+              {
+                "optionKey": "f3",
+                "label": "3 — sometimes"
+              },
+              {
+                "optionKey": "f4",
+                "label": "4 — regularly"
+              },
+              {
+                "optionKey": "f5",
+                "label": "5 — frequently"
+              },
+              {
+                "optionKey": "f6",
+                "label": "6 — very frequently"
+              },
+              {
+                "optionKey": "f7",
+                "label": "7 — systematically"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "css_t_s2_29_en",
+            "type": "LIKERT",
+            "prompt": "Nonverbally praises students (e.g., smiles, nods, winks) for following rules.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "f1",
+                "label": "1 — never"
+              },
+              {
+                "optionKey": "f2",
+                "label": "2 — rarely"
+              },
+              {
+                "optionKey": "f3",
+                "label": "3 — sometimes"
+              },
+              {
+                "optionKey": "f4",
+                "label": "4 — regularly"
+              },
+              {
+                "optionKey": "f5",
+                "label": "5 — frequently"
+              },
+              {
+                "optionKey": "f6",
+                "label": "6 — very frequently"
+              },
+              {
+                "optionKey": "f7",
+                "label": "7 — systematically"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "css_t_s2_30_en",
+            "type": "LIKERT",
+            "prompt": "Uses positive consequences or rewards following appropriate behavior.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "f1",
+                "label": "1 — never"
+              },
+              {
+                "optionKey": "f2",
+                "label": "2 — rarely"
+              },
+              {
+                "optionKey": "f3",
+                "label": "3 — sometimes"
+              },
+              {
+                "optionKey": "f4",
+                "label": "4 — regularly"
+              },
+              {
+                "optionKey": "f5",
+                "label": "5 — frequently"
+              },
+              {
+                "optionKey": "f6",
+                "label": "6 — very frequently"
+              },
+              {
+                "optionKey": "f7",
+                "label": "7 — systematically"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "css_t_s2_31_en",
+            "type": "LIKERT",
+            "prompt": "Uses an enthusiastic tone of voice when issuing praise.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "f1",
+                "label": "1 — never"
+              },
+              {
+                "optionKey": "f2",
+                "label": "2 — rarely"
+              },
+              {
+                "optionKey": "f3",
+                "label": "3 — sometimes"
+              },
+              {
+                "optionKey": "f4",
+                "label": "4 — regularly"
+              },
+              {
+                "optionKey": "f5",
+                "label": "5 — frequently"
+              },
+              {
+                "optionKey": "f6",
+                "label": "6 — very frequently"
+              },
+              {
+                "optionKey": "f7",
+                "label": "7 — systematically"
+              }
+            ],
+            "rows": []
+          }
+        ]
+      }
+    ]
+  },
+  "statement": "来自公开许可论文补充表S2的原生无计分Form加工候选；非平台原创题本。保留作者、来源、语言、频率版本及项目改动；不作教师绩效排名，不混用原CSAS实际/应当差分。",
+  "classificationTags": [
+    "population:teacher",
+    "response:self",
+    "use:research",
+    "use:not_diagnostic",
+    "language_validation:maturity_pilot",
+    "language_validation:content_en"
+  ],
+  "reference": {
+    "tags": [
+      "family:css_t_csas",
+      "role:teacher_self",
+      "stage:elementary",
+      "language:en",
+      "source_version:lu2023_frequency49",
+      "use:developmental_reflection",
+      "state:pilot",
+      "scoring:none"
+    ],
+    "source": {
+      "title": "CSS-T actual-frequency adaptation, Luxembourg 2023, Table S2",
+      "url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2023.1281431/full",
+      "attachmentUrl": "https://public-pages-files-2025.frontiersin.org/articles/1281431/file/Table_1.docx/1281431_supplementary-materials_tables_1_docx/2",
+      "attachmentSha256": "2f66cfe95b203e774ad670313ff33a4972ecb0db44bbec7be54d01462424451b",
+      "sourceItemIds": [
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "locale": "en",
+      "sourceRole": "teacher_self",
+      "officialEdition": "Dierendonck 2023 actual-frequency study adaptation, not current commercial CSAS",
+      "originalAuthors": [
+        "Linda A. Reddy",
+        "Christopher M. Dudek",
+        "Gregory A. Fabiano",
+        "Stephanie Peters"
+      ],
+      "adaptationAuthor": "Christophe Dierendonck"
+    },
+    "rights": {
+      "license": "CC-BY-4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "basis": "Frontiers article and S2 supplement; no separate prohibiting notice found in inspected DOCX",
+      "commercialCsasLicenseClaimed": false
+    },
+    "adaptation": {
+      "grouping": "Eight original S2 groups; module-only administration is descriptive, not claimed validated independent-scale administration",
+      "questionWording": "Verbatim S2, trimmed cell-edge whitespace only",
+      "responseLabels": "S2 English labels with ordinal display prefixes",
+      "missing": "Optional and explicit refusal permitted in this no-score digital Form; not the paper model missing-data estimator",
+      "knownTextDefectItem35": false,
+      "noStudentVersion": true
+    },
+    "scoring": {
+      "status": "NONE",
+      "parameters": null,
+      "report": null,
+      "reason": "Paper uses model-estimated ESEM factor scores. Scoring coefficients, individual administration/missing rules and original actual/ideal manual not supplied; no unit-weight mean or latent factor approximation invented. This is not due to absent norms or stand-alone validation."
+    },
+    "evidence": {
+      "sourceStudy": "French elementary teachers in Luxembourg; not current digital Form validation",
+      "sourceFactorCompositeReliability": 0.712,
+      "preventionManagementWeak": false
+    },
+    "intendedUse": "Teacher-led developmental reflection on reported practice frequency; never teacher quality/accountability ranking or diagnosis"
+  }
+}
