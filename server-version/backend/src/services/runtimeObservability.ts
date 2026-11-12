@@ -58,8 +58,8 @@ export type RequestObservationPhase =
   | 'anonymous.start.gate_slot_ms'
   | 'anonymous.start.tx_wall_ms'
   | 'anonymous.start.post_gate_ms'
-  | 'anonymous.start.composite_for_update_query_ms'
-  | 'anonymous.start.composite_for_update_query_failed_ms'
+  | 'anonymous.start.composite_admission_lock_ms'
+  | 'anonymous.start.composite_admission_lock_failed_ms'
   | 'anonymous.start.tx_acquisition_wait_ms'
   | 'anonymous.start.tx_acquisition_failed_ms'
 
@@ -68,8 +68,9 @@ export const sqlEventCollectionEnabled = (env: NodeJS.ProcessEnv = process.env):
   env.PERF_ISOLATED_TEST_MODE === '1' && env.PERF_SQL_EVENT_COUNT === '1'
 )
 
-/** Opt into fine-grained anonymous START diagnostics (FOR UPDATE statement
- * roundtrip + transaction acquisition, with separate failed-path samples).
+/** Opt into fine-grained anonymous START diagnostics (admission-lock
+ * acquisition roundtrip — composite SHARE + per-participant advisory — +
+ * transaction acquisition, with separate failed-path samples).
  * Neither roundtrip is an isolated PostgreSQL row-lock wait measurement.
  * Default off; routine anonymous START timers remain always on. */
 export const anonymousStartDiagnosticEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => (
