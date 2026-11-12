@@ -135,7 +135,7 @@ export default function AnonymousStudyPage() {
     if(!consent)throw new Error('请先确认研究内关联说明')
     // One epoch and one payload for the whole logical join, including backoff.
     const current=epoch.current,startedAt=Date.now()
-    const mode=memorable??(info?.mode==='SELF_CODE'?{generatedCode:true}:undefined)
+    const mode=memorable??(info?.mode==='SELF_CODE'?{generatedCode:true as const}:undefined)
     for(let attempt=1;;attempt+=1){
       if(current!==epoch.current)return
       try{
