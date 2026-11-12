@@ -27,13 +27,28 @@ describe('three-part structural admission', () => {
 
   it('retains report language, respondent, metric coverage and duplicate-band structural failures', () => {
     const definition = source().executable!.definition
-    definition.report.audienceContract!.locale = 'en'
+    definition.report.audienceContract!.locale = 'not a locale'
     definition.report.interpretations[0].bands.push({ key: 'repeated', label: '区间', summary: '说明', guidance: [] }, { key: 'repeated', label: '区间', summary: '说明', guidance: [] })
     const messages = validateAudienceReport(definition).map(issue => issue.message)
     expect(messages).toEqual(expect.arrayContaining(['AUDIENCE_LANGUAGE_QC_REQUIRED', 'REPORT_BAND_KEYS_DUPLICATE']))
     definition.report.interpretations = []
     expect(validateAudienceReport(definition).some(issue => issue.message === 'REPORT_SCORE_COVERAGE_REQUIRED')).toBe(true)
     expect(validateScaleDefinition(definition, { forPublish: true }).issues.some(issue => issue.message === 'REPORT_SCORE_COVERAGE_REQUIRED')).toBe(true)
+  })
+
+  it('accepts a separately declared report locale while preserving questionnaire language and frozen measurement', () => {
+    const next = source()
+    const definition = next.executable!.definition
+    expect(definition.versionAxes!.locale).toBe('zh-CN')
+    expect(next.localization!.targetLocale).toBe('zh-CN')
+    const initialScore = JSON.stringify(definition.scoring)
+    definition.report.audienceContract!.locale = 'en'
+    expect(scaleDefinitionSchema.safeParse(definition).success).toBe(true)
+    expect(validateAudienceReport(definition)).toEqual([])
+    expect(validateScaleInstrumentSource(next).issues.filter(issue => issue.severity === 'error')).toEqual([])
+    expect(JSON.stringify(definition.scoring)).toBe(initialScore)
+    expect(definition.versionAxes!.locale).toBe('zh-CN')
+    expect(next.instruction!.language).toBe('zh-CN')
   })
 
   it('keeps a malformed report candidate discoverable while refusing its selected executable and runtime policy', () => {
