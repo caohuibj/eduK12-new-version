@@ -59,6 +59,17 @@ describe('studyJoinAdmissionGate and transient error resilience (PR1)', () => {
       expect(stats.options.maxQueue).toBe(45)
       expect(stats.options.maxWaitMs).toBe(3500)
     })
+
+    it('uses widened defaults (queue 500, wait 30000ms) when no env vars are set', () => {
+      // A single anonymous questionnaire never exceeds 500 total responses,
+      // so a 500-student burst from one NAT must queue in the gate instead
+      // of 503ing. (maxConcurrent is not asserted: it derives from the pool.)
+      const gate = studyJoinAdmissionGate()
+      const stats = gate.getStats()
+      expect(stats.options.name).toBe('study_join_admission')
+      expect(stats.options.maxQueue).toBe(500)
+      expect(stats.options.maxWaitMs).toBe(30000)
+    })
   })
 
   describe('isTransientStudyDatabaseError', () => {
