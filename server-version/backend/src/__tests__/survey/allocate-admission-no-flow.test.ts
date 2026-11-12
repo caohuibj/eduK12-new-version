@@ -10,6 +10,17 @@ describe('allocateResearchFlowOnAdmission snapshot load',()=>{
     expect(tx.$queryRaw).toHaveBeenCalledTimes(1)
     expect(findFirst).not.toHaveBeenCalled()
   })
+  it('uses JSON-aware flow presence: absent and JSON null both skip fat reads',async()=>{
+    const absent=vi.fn(async()=>[{definition_digest:'ab'.repeat(32),has_flow:false}])
+    const tx={$queryRaw:absent,surveyPublication:{findFirst:vi.fn()}}
+    await expect(allocateResearchFlowOnAdmission(tx as never,input)).resolves.toBeUndefined()
+    expect(tx.surveyPublication.findFirst).not.toHaveBeenCalled()
+    const sql=String((absent.mock.calls[0] as unknown as [TemplateStringsArray])[0].join(' '))
+    expect(sql).toContain("jsonb_typeof(publication.compiled_snapshot->'flow') <> 'null'")
+    expect(sql).toContain('COALESCE')
+    // A JSON null and a missing key both map to has_flow=false in PostgreSQL,
+    // rather than the old IS NOT NULL check that misclassified JSON null.
+  })
   it('loads compiledSnapshot when a flow exists and no prepared snapshot matches',async()=>{
     const findFirst=vi.fn(async()=>null)
     const tx={$queryRaw:vi.fn(async()=>[{definition_digest:'ab'.repeat(32),has_flow:true}]),surveyPublication:{findFirst}}

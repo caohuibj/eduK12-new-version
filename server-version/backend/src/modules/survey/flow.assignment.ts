@@ -194,7 +194,7 @@ export async function allocateResearchFlowOnAdmission(tx:Prisma.TransactionClien
   preparedSnapshot?:ResearchFrozenPublication
 }){
   const visible=await tx.$queryRaw<Array<{definition_digest:string;has_flow:boolean}>>`
-    SELECT publication.definition_digest,(publication.compiled_snapshot->'flow') IS NOT NULL AS has_flow
+    SELECT publication.definition_digest,COALESCE(jsonb_typeof(publication.compiled_snapshot->'flow') <> 'null',false) AS has_flow
     FROM survey_publications publication
     WHERE publication.id=${input.publicationId} AND publication.project_id=${input.projectId}`
   if(visible.length!==1)fail('研究入场时冻结发布定义不可访问')

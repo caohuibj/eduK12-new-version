@@ -80,6 +80,15 @@ describe('prepared publication digest skips the locked snapshot rehash',()=>{
       expect(f.tx.$executeRaw).not.toHaveBeenCalled()
     }
   })
+  it('ignores a prepared snapshot from another publication, rereads locked source',async()=>{
+    const f=fixture()
+    hashProbe.snapshotHashes=0
+    await expect(f.run({preparedDigest:{publicationId:'different-publication',snapshotDigest:f.digest},
+      preparedSnapshot:f.frozen})).resolves.toBeUndefined()
+    expect(hashProbe.snapshotHashes).toBe(1)
+    expect(f.tx.$queryRaw).toHaveBeenCalledTimes(1)
+    expect(f.saved().definitionDigest).toBe(f.digest)
+  })
   it('hashes the snapshot once and binds when preparedDigest is omitted',async()=>{
     const f=fixture()
     await expect(f.run()).resolves.toBeUndefined()

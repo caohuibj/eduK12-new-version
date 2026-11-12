@@ -109,16 +109,45 @@ export async function getPublicResearchInfo(publicId:string,entryToken?:string){
         consentText:disclosedSurveyConsent(wave.consentText,{measurementNotice})}))}
   })
 }
-async function preparePublicationDigest(projectId:string,waveId:string):Promise<{
+type PreparedPublication={
   preparedDigest:PreparedSurveyPublicationDigest;preparedSnapshot:ResearchFrozenPublication
-}|undefined>{
-  // Preview is outside the wave lock. A missing row or snapshot omits both values;
-  // admission then reads and hashes under the lock. Hash the raw Prisma value.
-  const wave=await prisma.surveyWave?.findFirst?.({where:{id:waveId,projectId},
-    select:{publicationId:true,publication:{select:{id:true,compiledSnapshot:true}}}})
-  if(!wave?.publicationId||!wave.publication?.compiledSnapshot)return undefined
-  const snapshot=wave.publication.compiledSnapshot as unknown as ResearchFrozenPublication
-  return {preparedDigest:{publicationId:wave.publication.id,snapshotDigest:canonicalHash(snapshot)},preparedSnapshot:snapshot}
+}
+// Deduplicate ONLY concurrent immutable-publication reads, never credentials,
+// identities or mutable wave/admission state. No result remains cached after
+// the in-flight read finishes. Bound distinct waves to avoid a pre-gate stampede.
+const publicationPreparationInFlight=new Map<string,Promise<PreparedPublication|undefined>>()
+const MAX_IN_FLIGHT_PUBLICATION_PREPARATIONS=32
+async function preparePublicationDigest(projectId:string,waveId:string):Promise<PreparedPublication|undefined>{
+  const key=JSON.stringify([projectId,waveId])
+  const pending=publicationPreparationInFlight.get(key)
+  if(pending)return pending
+  // Over capacity: skip the optimization and keep the original locked read/hash.
+  if(publicationPreparationInFlight.size>=MAX_IN_FLIGHT_PUBLICATION_PREPARATIONS)return undefined
+  const task=(async():Promise<PreparedPublication|undefined>=>{
+    // The snapshot is immutable in PostgreSQL (survey_publication_frozen).
+    // Wave publication ID + digest are checked again in the locked transaction;
+    // a changed binding falls back to the authoritative snapshot read.
+    const wave=await prisma.surveyWave?.findFirst?.({where:{id:waveId,projectId},
+      select:{publicationId:true,publication:{select:{id:true,compiledSnapshot:true}}}})
+    if(!wave?.publicationId||!wave.publication?.compiledSnapshot)return undefined
+    const snapshot=wave.publication.compiledSnapshot as unknown as ResearchFrozenPublication
+    return {preparedDigest:{publicationId:wave.publication.id,snapshotDigest:canonicalHash(snapshot)},preparedSnapshot:snapshot}
+  })()
+  publicationPreparationInFlight.set(key,task)
+  try{return await task}finally{
+    if(publicationPreparationInFlight.get(key)===task)publicationPreparationInFlight.delete(key)
+  }
+}
+// Preliminary, cheap unlinked recruitment-token proof: a failed token must
+// never cause a large snapshot read/hash outside the admission gate. This is
+// NOT authoritative admission; validateEntry still runs inside the Wave lock.
+async function mayPrepareUnlinkedPublication(projectId:string,waveId:string,raw:string):Promise<boolean>{
+  if(!secretPattern.test(raw))return false
+  const entry=await prisma.surveyEntryToken.findFirst({where:{
+    projectId,waveId,tokenHash:hashResearchCredential(raw),
+    revokedAt:null,expiresAt:{gt:new Date()},
+  },select:{id:true}})
+  return Boolean(entry)
 }
 /** Opt-in pseudonymous T1 or late-join only, using a separate high-entropy
  * recruitment bearer. The private participant secret is shown only once.
@@ -247,7 +276,10 @@ export async function startSingleUnlinkedWave(input:{
   const operationKeyHash=legacy?null:hashResearchCredential(input.operationKey!)
   const sessionHash=hashResearchCredential(legacy?serverSession!.accessCredential:input.accessCredential!)
   const bearer=legacy?serverSession!.accessCredential:input.accessCredential!
-  const prepared=await preparePublicationDigest(project.id,input.waveId)
+  // Reject heavy pre-gate work for invalid/expired credentials while keeping
+  // the existing in-transaction validation and error precedence unchanged.
+  const canPrepare=await mayPrepareUnlinkedPublication(project.id,input.waveId,input.entryToken)
+  const prepared=canPrepare?await preparePublicationDigest(project.id,input.waveId):undefined
   return await surveyAdmissionGate().run(() => prisma.$transaction(async tx=>{
     const wave=await openWaveLocked(tx,project.id,input.waveId,false)
     await validateEntry(tx,project.id,wave.id,input.entryToken)
