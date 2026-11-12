@@ -26,7 +26,7 @@ beforeEach(()=>{
     if(url.endsWith('/info'))return response({project:{name:'混合研究',description:'说明',collectionMode:'SINGLE_UNLINKED',status:'OPEN'},waves:[]})
     if(url.endsWith('/task'))return response(task)
     if(url.endsWith('/final')){
-      finals.push(JSON.parse(String(init?.body)));if(failFirst&&finals.length===1)throw new Error('结果尚不确定')
+      finals.push(JSON.parse(String(init?.body)));if(failFirst&&finals.length<=4)throw new Error('结果尚不确定')
       return response({attemptId:aid,status:'COMPLETED',idempotent:false,receiptId:'receipt',completedAt:'2026-10-17T00:00:00Z',generalReceipt:{text:'可信回执',disclaimer:'说明',completedAt:'2026-10-17T00:00:00Z'}})
     }
     if(url.endsWith('/withdraw-data'))return response({status:'WITHDRAWN'})
@@ -34,7 +34,15 @@ beforeEach(()=>{
     throw new Error('Unexpected '+url)
   }))
 })
+async function exhaustCapacityRetry(action:()=>void){
+  vi.useFakeTimers({toFake:['setTimeout','clearTimeout']})
+  try{
+    await act(async()=>{action()})
+    for(let step=0;step<6;step+=1)await act(async()=>{await vi.advanceTimersByTimeAsync(30_000)})
+  }finally{vi.useRealTimers()}
+}
 afterEach(()=>{
+  vi.useRealTimers()
   vi.unstubAllGlobals();vi.restoreAllMocks()
   if(originalScrollIntoView)HTMLElement.prototype.scrollIntoView=originalScrollIntoView
   else delete (HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView
@@ -88,7 +96,7 @@ describe('Survey parent/child boundary and feedback',()=>{
     expect(screen.queryByRole('button',{name:'上一部分'})).toBeNull();expect(screen.queryByRole('button',{name:'提交本轮正式回答'})).toBeNull()
     fireEvent.click(screen.getByRole('button',{name:'模拟子结果确认'}));expect(finals).toHaveLength(0)
     expect(screen.queryByRole('button',{name:'上一部分'})).toBeNull();expect(screen.queryByRole('radio',{name:'不符合'})).toBeNull()
-    fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'}))
+    await exhaustCapacityRetry(()=>fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'})))
     await screen.findByText('结果尚不确定');expect(finals[0].answers).toEqual({form:{q:'yes'},cog:{}})
     expect(finals[0].cognitiveReferences).toHaveLength(1)
     fireEvent.click(screen.getByRole('button',{name:'重试原提交'}));await screen.findByText('感谢参与，问卷已提交')

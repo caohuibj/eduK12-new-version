@@ -45,7 +45,7 @@ async function recover(){
   await screen.findByRole('button',{name:'停止后续研究参与并撤销未来访问权限（已收集数据不自动删除）'})
 }
 beforeEach(()=>{sessionStorage.clear();window.history.replaceState(null,'',`/r/${pid}`)})
-afterEach(()=>{vi.unstubAllGlobals();vi.restoreAllMocks()})
+afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();vi.restoreAllMocks()})
 describe('scoped same-IP participant discovery',()=>{
   it('requires a new consent choice when invitation discovery changes the consent version',async()=>{
     const api=fixture({ordinaryToken:true,singleGroup:true});render(<SurveyPublicApp/>)
@@ -215,5 +215,131 @@ describe('scoped same-IP participant discovery',()=>{
     expect(screen.getByRole('button',{name:'持原有研究凭证申请数据撤回（包括已撤销访问者）'})).toBeEnabled()
     await recover()
     expect(api.enterBodies()).toEqual([{researchCode:'R-EXAMPLE',accessCredential:'secret'}])
+  })
+})
+
+describe('Survey START capacity retry',()=>{
+  const waveId='start-wave'
+  const attemptId='22222222-2222-4222-8222-222222222222'
+  const identityKey=`huisurvey:v1:start-identity:${pid}:${waveId}`
+  const secret='s'.repeat(43)
+  const wave={id:waveId,title:'开始轮',ordinal:1,status:'OPEN',consentText:'请先阅读参与说明',consentVersion:4,
+    opensAt:null,closesAt:null,allowNewParticipants:true}
+  const startedTask={attemptId,waveId,status:'STARTED',definitionDigest:'d'.repeat(64),reportMode:'GENERAL_ONLY',
+    units:[{kind:'FORM',instrumentKey:'form',title:'问卷',pages:[{pageKey:'page',title:'页',questions:[
+      {itemKey:'q',type:'SHORT_TEXT',prompt:'本次感受',required:false,options:[]},
+    ]}]}]}
+  const http=(status:number,data:unknown,message='ok',code?:string)=>Promise.resolve({
+    ok:status<400,status,json:async()=>({code:code??(status<400?0:status),message,data}),
+  } as Response)
+  async function exhaustCapacityRetry(action:()=>void){
+    vi.useFakeTimers({toFake:['setTimeout','clearTimeout']})
+    try{
+      await act(async()=>{action()})
+      for(let step=0;step<6;step+=1)await act(async()=>{await vi.advanceTimersByTimeAsync(30_000)})
+    }finally{vi.useRealTimers()}
+  }
+  async function openLinkedStart(){
+    render(<SurveyPublicApp/>)
+    const summary=await screen.findByText('使用旧编号和恢复凭证')
+    if(!summary.parentElement?.hasAttribute('open'))fireEvent.click(summary)
+    fireEvent.change(screen.getByLabelText('研究编号'),{target:{value:'R-ABCDEFGH'}})
+    fireEvent.change(screen.getByLabelText('私密恢复凭证'),{target:{value:secret}})
+    fireEvent.click(screen.getByRole('button',{name:'读取我的波次任务'}))
+    fireEvent.click(await screen.findByRole('button',{name:'查看参与说明'}))
+    fireEvent.click(screen.getByRole('checkbox',{name:/我已阅读并同意/}))
+  }
+  const linkedBody={researchCode:'R-ABCDEFGH',accessCredential:secret,consent:true,consentVersion:4}
+
+  it('retries unlinked START after 503 with one stable operation identity',async()=>{
+    window.history.replaceState(null,'',`/r/${pid}#entry=${token}`)
+    const starts:Record<string,unknown>[]=[]
+    vi.stubGlobal('fetch',vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>{
+      const url=String(input)
+      if(url.endsWith('/info'))return http(200,{project:{name:'匿名研究',description:'说明',collectionMode:'SINGLE_UNLINKED',status:'OPEN'},waves:[wave]})
+      if(url.endsWith('/start-unlinked')){
+        const body=JSON.parse(String(init?.body)) as Record<string,unknown>
+        starts.push(body)
+        const stored=sessionStorage.getItem(identityKey)
+        expect(stored).not.toBeNull()
+        const saved=JSON.parse(stored!) as {operationKey:string;accessCredential:string}
+        expect(body).toEqual({entryToken:token,consent:true,consentVersion:4,
+          operationKey:saved.operationKey,accessCredential:saved.accessCredential})
+        if(starts.length===1)return http(503,null,'研究参与请求繁忙，请稍后重试','SURVEY_ADMISSION_BUSY')
+        return http(200,{attemptId,accessCredential:'c'.repeat(43)})
+      }
+      if(url.endsWith('/task'))return http(200,startedTask)
+      throw new Error('Unexpected '+url)
+    }))
+    render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('checkbox',{name:'我已阅读以上说明，自愿参加本次问卷。'}))
+    await exhaustCapacityRetry(()=>fireEvent.click(screen.getByRole('button',{name:'开始填写问卷'})))
+    await screen.findByLabelText('本次感受')
+    expect(starts).toHaveLength(2)
+    expect(JSON.stringify(starts[1])).toBe(JSON.stringify(starts[0]))
+    expect(sessionStorage.getItem(identityKey)).toBeNull()
+    expect(vi.mocked(fetch).mock.calls.filter(([url])=>String(url).endsWith('/task'))).toHaveLength(1)
+  })
+
+  it('does not retry unlinked START on 409 or clear its operation identity',async()=>{
+    window.history.replaceState(null,'',`/r/${pid}#entry=${token}`)
+    const starts:Record<string,unknown>[]=[]
+    vi.stubGlobal('fetch',vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>{
+      const url=String(input)
+      if(url.endsWith('/info'))return http(200,{project:{name:'匿名研究',description:'说明',collectionMode:'SINGLE_UNLINKED',status:'OPEN'},waves:[wave]})
+      if(url.endsWith('/start-unlinked')){
+        const body=JSON.parse(String(init?.body)) as Record<string,unknown>
+        starts.push(body)
+        return http(409,null,'本轮已经开始','CONFLICT')
+      }
+      throw new Error('Unexpected '+url)
+    }))
+    render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('checkbox',{name:'我已阅读以上说明，自愿参加本次问卷。'}))
+    fireEvent.click(screen.getByRole('button',{name:'开始填写问卷'}))
+    await screen.findByText('本轮已经开始')
+    expect(starts).toHaveLength(1)
+    expect(JSON.parse(sessionStorage.getItem(identityKey)!).operationKey).toBe(starts[0].operationKey)
+    expect(vi.mocked(fetch).mock.calls.filter(([url])=>String(url).endsWith('/task'))).toHaveLength(0)
+  })
+
+  it('retries linked START after 503 with the same body',async()=>{
+    const starts:Record<string,unknown>[]=[]
+    vi.stubGlobal('fetch',vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>{
+      const url=String(input)
+      if(url.endsWith('/info'))return http(200,{project:{name:'追踪研究',description:'说明',collectionMode:'LINKED_WAVES',status:'OPEN'},waves:[wave]})
+      if(url.endsWith('/enter'))return http(200,{waves:[wave]})
+      if(url.endsWith('/start')){
+        starts.push(JSON.parse(String(init?.body)) as Record<string,unknown>)
+        if(starts.length===1)return http(503,null,'研究参与请求繁忙，请稍后重试','SURVEY_ADMISSION_BUSY')
+        return http(200,{attemptId})
+      }
+      if(url.endsWith('/task'))return http(200,startedTask)
+      throw new Error('Unexpected '+url)
+    }))
+    await openLinkedStart()
+    await exhaustCapacityRetry(()=>fireEvent.click(screen.getByRole('button',{name:'开始填写问卷'})))
+    await screen.findByLabelText('本次感受')
+    expect(starts).toEqual([linkedBody,linkedBody])
+    expect(vi.mocked(fetch).mock.calls.filter(([url])=>String(url).endsWith('/task'))).toHaveLength(1)
+  })
+
+  it('does not retry linked START on 409',async()=>{
+    const starts:Record<string,unknown>[]=[]
+    vi.stubGlobal('fetch',vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>{
+      const url=String(input)
+      if(url.endsWith('/info'))return http(200,{project:{name:'追踪研究',description:'说明',collectionMode:'LINKED_WAVES',status:'OPEN'},waves:[wave]})
+      if(url.endsWith('/enter'))return http(200,{waves:[wave]})
+      if(url.endsWith('/start')){
+        starts.push(JSON.parse(String(init?.body)) as Record<string,unknown>)
+        return http(409,null,'本轮已经开始','CONFLICT')
+      }
+      throw new Error('Unexpected '+url)
+    }))
+    await openLinkedStart()
+    fireEvent.click(screen.getByRole('button',{name:'开始填写问卷'}))
+    await screen.findByText('本轮已经开始')
+    expect(starts).toEqual([linkedBody])
+    expect(vi.mocked(fetch).mock.calls.filter(([url])=>String(url).endsWith('/task'))).toHaveLength(0)
   })
 })
