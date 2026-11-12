@@ -58,18 +58,20 @@ export type RequestObservationPhase =
   | 'anonymous.start.gate_slot_ms'
   | 'anonymous.start.tx_wall_ms'
   | 'anonymous.start.post_gate_ms'
-  | 'anonymous.start.db_lock_wait_ms'
+  | 'anonymous.start.composite_for_update_query_ms'
+  | 'anonymous.start.composite_for_update_query_failed_ms'
   | 'anonymous.start.tx_acquisition_wait_ms'
+  | 'anonymous.start.tx_acquisition_failed_ms'
 
 /** Explicitly opt into count-only SQL events on an isolated test instance. */
 export const sqlEventCollectionEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => (
   env.PERF_ISOLATED_TEST_MODE === '1' && env.PERF_SQL_EVENT_COUNT === '1'
 )
 
-/** Opt into fine-grained anonymous START diagnostics (FOR UPDATE lock wait
- * + transaction connection-acquisition wait). Default off. Short-term
- * enablement only; routine anonymous START phase timers are always on and
- * are not affected by this flag. */
+/** Opt into fine-grained anonymous START diagnostics (FOR UPDATE statement
+ * roundtrip + transaction acquisition, with separate failed-path samples).
+ * Neither roundtrip is an isolated PostgreSQL row-lock wait measurement.
+ * Default off; routine anonymous START timers remain always on. */
 export const anonymousStartDiagnosticEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => (
   env.ANONYMOUS_START_DIAGNOSTIC_ENABLED === 'true'
 )
@@ -77,6 +79,7 @@ export const anonymousStartDiagnosticEnabled = (env: NodeJS.ProcessEnv = process
 type Histogram = {
   count: number
   sumMs: number
+  bucketBoundsMs: readonly number[]
   bucketCounts: number[]
 }
 
@@ -115,6 +118,12 @@ const observationStorage = new AsyncLocalStorage<RequestObservation>()
  * from overwriting one shared RequestObservation.queryRawLabel. */
 const queryRawLabelStorage = new AsyncLocalStorage<string>()
 const HTTP_BUCKETS_MS = [5, 10, 25, 50, 100, 250, 500, 1_000, 2_000, 5_000, 10_000, 30_000]
+// Only anonymous START phases need to distinguish ~3s from ~4s gate occupancy.
+// Keep all other histogram families and phases on their established buckets.
+const ANONYMOUS_START_BUCKETS_MS = [
+  ...HTTP_BUCKETS_MS.slice(0, 9), 2_500, 3_000, 3_500, 4_000, 4_500,
+  ...HTTP_BUCKETS_MS.slice(9),
+]
 const MAX_METRIC_KEYS = 10_000
 const OTHER_ROUTE = '__other__'
 const finiteMilliseconds = (value: number): number => Number.isFinite(value) && value >= 0 ? value : 0
@@ -172,17 +181,18 @@ const keyFor = (labels: Record<string, string>): string => (
   Object.entries(labels).map(([key, value]) => `${key}\u0000${value}`).join('\u0001')
 )
 
-const createHistogram = (): Histogram => ({
+const createHistogram = (bucketBoundsMs: readonly number[] = HTTP_BUCKETS_MS): Histogram => ({
   count: 0,
   sumMs: 0,
-  bucketCounts: HTTP_BUCKETS_MS.map(() => 0),
+  bucketBoundsMs,
+  bucketCounts: bucketBoundsMs.map(() => 0),
 })
 
 const observeHistogram = (histogram: Histogram, durationMs: number): void => {
   const safeDurationMs = Number.isFinite(durationMs) && durationMs >= 0 ? durationMs : 0
   histogram.count += 1
   histogram.sumMs += safeDurationMs
-  HTTP_BUCKETS_MS.forEach((upperBound, index) => {
+  histogram.bucketBoundsMs.forEach((upperBound, index) => {
     if (safeDurationMs <= upperBound) histogram.bucketCounts[index] += 1
   })
 }
@@ -190,6 +200,7 @@ const observeHistogram = (histogram: Histogram, durationMs: number): void => {
 const boundedHistogram = (
   store: Map<string, LabeledHistogram>,
   labels: Record<string, string>,
+  bucketBoundsMs: readonly number[] = HTTP_BUCKETS_MS,
 ): Histogram => {
   const key = keyFor(labels)
   const current = store.get(key)
@@ -203,12 +214,12 @@ const boundedHistogram = (
     const otherKey = keyFor(otherLabels)
     const other = store.get(otherKey)
     if (other) return other.histogram
-    const entry = { labels: otherLabels, histogram: createHistogram() }
+    const entry = { labels: otherLabels, histogram: createHistogram(bucketBoundsMs) }
     store.set(otherKey, entry)
     return entry.histogram
   }
 
-  const entry = { labels, histogram: createHistogram() }
+  const entry = { labels, histogram: createHistogram(bucketBoundsMs) }
   store.set(key, entry)
   return entry.histogram
 }
@@ -218,7 +229,9 @@ const observeLabeledHistogram = (
   labels: Record<string, string>,
   durationMs: number,
 ): void => {
-  observeHistogram(boundedHistogram(store, labels), durationMs)
+  const buckets = store === phaseHistograms && labels.phase?.startsWith('anonymous.start.')
+    ? ANONYMOUS_START_BUCKETS_MS : HTTP_BUCKETS_MS
+  observeHistogram(boundedHistogram(store, labels, buckets), durationMs)
 }
 
 const boundedCounter = (
@@ -816,7 +829,7 @@ const histogramLines = (
 ): string[] => {
   const lines: string[] = []
   for (const { labels, histogram } of entries.values()) {
-    for (const [index, upperBoundMs] of HTTP_BUCKETS_MS.entries()) {
+    for (const [index, upperBoundMs] of histogram.bucketBoundsMs.entries()) {
       lines.push(`${metricName}_bucket{${labelsText(labels, { le: String(upperBoundMs / 1_000) })}} ${histogram.bucketCounts[index]}`)
     }
     lines.push(`${metricName}_bucket{${labelsText(labels, { le: '+Inf' })}} ${histogram.count}`)

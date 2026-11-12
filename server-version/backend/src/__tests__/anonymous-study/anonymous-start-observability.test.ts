@@ -19,8 +19,10 @@ const ROUTINE_PHASES = [
 ] as const
 
 const DIAGNOSTIC_PHASES = [
-  'anonymous.start.db_lock_wait_ms',
+  'anonymous.start.composite_for_update_query_ms',
+  'anonymous.start.composite_for_update_query_failed_ms',
   'anonymous.start.tx_acquisition_wait_ms',
+  'anonymous.start.tx_acquisition_failed_ms',
 ] as const
 
 /** Run work inside a request observation, then finalize the response so the
@@ -94,12 +96,12 @@ describe('anonymous START observability (two-tier)', () => {
     await runInObservation('/api/public/anonymous-studies/waves/abc123def456/start', async () => {
       const start = process.hrtime.bigint()
       if (anonymousStartDiagnosticEnabled()) {
-        recordRequestPhase('anonymous.start.db_lock_wait_ms', 5, start, start)
+        recordRequestPhase('anonymous.start.composite_for_update_query_ms', 5, start, start)
         recordRequestPhase('anonymous.start.tx_acquisition_wait_ms', 3, start, start)
       }
     })
     let metrics = metricText()
-    expect(metrics).not.toContain('anonymous.start.db_lock_wait_ms')
+    expect(metrics).not.toContain('anonymous.start.composite_for_update_query_ms')
     expect(metrics).not.toContain('anonymous.start.tx_acquisition_wait_ms')
 
     // Flag on: diagnostic phases are recorded.
@@ -108,16 +110,27 @@ describe('anonymous START observability (two-tier)', () => {
     await runInObservation('/api/public/anonymous-studies/waves/abc123def456/start', async () => {
       const start = process.hrtime.bigint()
       if (anonymousStartDiagnosticEnabled()) {
-        recordRequestPhase('anonymous.start.db_lock_wait_ms', 5, start, start)
+        recordRequestPhase('anonymous.start.composite_for_update_query_ms', 5, start, start)
         recordRequestPhase('anonymous.start.tx_acquisition_wait_ms', 3, start, start)
       }
     })
     metrics = metricText()
     expect(metrics).toMatch(
-      /ptool_assessment_phase_duration_seconds_count\{phase="anonymous\.start\.db_lock_wait_ms",route="[^"]+"\} 1/,
+      /ptool_assessment_phase_duration_seconds_count\{phase="anonymous\.start\.composite_for_update_query_ms",route="[^"]+"\} 1/,
     )
     expect(metrics).toMatch(
       /ptool_assessment_phase_duration_seconds_count\{phase="anonymous\.start\.tx_acquisition_wait_ms",route="[^"]+"\} 1/,
     )
+  })
+  it('adds precise 2.5–4.5s buckets only for anonymous START phases', async () => {
+    await runInObservation('/api/public/anonymous-studies/waves/abc123def456/start', () => {
+      const stamp = process.hrtime.bigint()
+      recordRequestPhase('anonymous.start.gate_slot_ms', 3_200, stamp, stamp)
+      recordRequestPhase('response', 3_200, stamp, stamp)
+    })
+    const metrics = metricText(), route = '/api/:unmatched'
+    expect(metrics).toContain(`ptool_assessment_phase_duration_seconds_bucket{phase="anonymous.start.gate_slot_ms",route="${route}",le="3"} 0`)
+    expect(metrics).toContain(`ptool_assessment_phase_duration_seconds_bucket{phase="anonymous.start.gate_slot_ms",route="${route}",le="3.5"} 1`)
+    expect(metrics).not.toContain(`ptool_assessment_phase_duration_seconds_bucket{phase="response",route="${route}",le="3.5"}`)
   })
 })

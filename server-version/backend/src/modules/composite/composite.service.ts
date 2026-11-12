@@ -4026,7 +4026,8 @@ export type PublicStudyAdmission = {
  * Attempt ID, user ID, Token, answers, or DB params. Timing uses the
  * monotonic clock (process.hrtime.bigint). Containment: http_total ⊃
  * pre_gate + gate_wait + gate_slot + post_gate; gate_slot ⊃ tx_wall;
- * tx_wall ⊃ db_lock_wait (diagnostic). No behavior change: these calls
+ * tx_wall ⊃ composite_for_update_query (diagnostic). The query roundtrip
+ * is not a PostgreSQL lock-wait measurement. No behavior change: these calls
  * are side-effect-free measurements around the existing steps. */
 const recordAnonymousStartPhase = (phase: RequestObservationPhase, start: bigint, end: bigint): void => {
   recordRequestPhase(phase, Number(end - start) / 1_000_000, start, end)
@@ -4078,16 +4079,29 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
         const gateAdmittedAt = process.hrtime.bigint()
         recordAnonymousStartPhase('anonymous.start.gate_wait_ms', gateEnteredAt, gateAdmittedAt)
         const txCallAt = process.hrtime.bigint()
+        let txCallbackEntered = false
         try {
           return await prisma.$transaction(async (tx) => {
+            txCallbackEntered = true
             const txCallbackAt = process.hrtime.bigint()
-            // Diagnostic: time to acquire a DB connection + BEGIN for the tx.
+            // Successful connection acquisition and BEGIN. Failures before
+            // callback entry have a separate terminal interval below.
             recordAnonymousStartDiagnosticPhase('anonymous.start.tx_acquisition_wait_ms', txCallAt, txCallbackAt)
             const lockAt = process.hrtime.bigint()
-            await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
-            // Diagnostic: FOR UPDATE duration. A single-row PK lookup executes
-            // fast once the lock is held, so this is dominated by lock wait.
-            recordAnonymousStartDiagnosticPhase('anonymous.start.db_lock_wait_ms', lockAt, process.hrtime.bigint())
+            let lockQuerySucceeded = false
+            try {
+              await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
+              lockQuerySucceeded = true
+            } finally {
+              // This is the SQL roundtrip, NOT isolated PostgreSQL lock wait.
+              // Record failed and timed-out statements in their own series.
+              recordAnonymousStartDiagnosticPhase(
+                lockQuerySucceeded
+                  ? 'anonymous.start.composite_for_update_query_ms'
+                  : 'anonymous.start.composite_for_update_query_failed_ms',
+                lockAt, process.hrtime.bigint(),
+              )
+            }
             const existingId = study ? await study.beforeAdmission(tx) : null
             if (existingId) {
               const existing = await tx.compositeAssessmentAttempt.findUnique({where:{id:existingId}})
@@ -4111,6 +4125,11 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
           // gate_slot ⊃ tx_wall; they are nearly equal here because the gate
           // callback is exactly the transaction.
           const settledAt = process.hrtime.bigint()
+          if (!txCallbackEntered) {
+            // May include pre-callback errors other than connection waiting.
+            // Separate failures prevent silently excluding P2028/pool timeouts.
+            recordAnonymousStartDiagnosticPhase('anonymous.start.tx_acquisition_failed_ms', txCallAt, settledAt)
+          }
           recordAnonymousStartPhase('anonymous.start.tx_wall_ms', txCallAt, settledAt)
           recordAnonymousStartPhase('anonymous.start.gate_slot_ms', gateAdmittedAt, settledAt)
         }
