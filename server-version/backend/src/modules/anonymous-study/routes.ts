@@ -73,18 +73,19 @@ publicAnonymousStudyRouter.use(noStore)
 // every join), the scrypt verification cost, and the join admission gate.
 // Code recover/reset keep the tighter 30 budget: they are single-student
 // actions and a code-guessing surface.
-// Join rate limit: 500 requests / 15 min / IP, counting only SUCCESSFUL joins.
-// skipFailedRequests (express-rate-limit v8) decrements the counter after a
-// 4xx/5xx response finishes, so a gate-rejected 503 STUDY_JOIN_BUSY (or a
-// 429/409) does not consume the budget. The budget is the product invariant
-// "one anonymous questionnaire never exceeds 500 total responses", and a
-// retried 503 is the same student, not a new one. Without this, a 500-student
-// burst from one NAT overflows the join gate, the frontend retries the 503s
-// (#704), and the retries exhaust the 500 budget before the last students
-// ever join (observed 2026-11-12: 254/500 in, the rest waited out full
-// 15-min windows on 429). The gate still bounds the expensive work (scrypt
-// + DB tx); a 503 is a cheap rejection. Exported for tests (resetKey/getKey).
-export const anonymousJoinRateLimit = rateLimit({windowMs:15*60*1000,limit:500,standardHeaders:'draft-7',legacyHeaders:false,skipFailedRequests:true})
+// Join rate limit: 500 / 15min / IP. Only retryable STUDY_JOIN_BUSY 503
+// responses are exempt: malformed input, denied codes and unrelated failures
+// must still consume a finite guessing/abuse budget. The 503 exemption lets
+// legitimate school-NAT retries survive queue admission without exhausting
+// the join budget; all expensive join work remains bounded by the gate.
+// express-rate-limit >=8.7.2 is required for correct window-boundary
+// decrement accounting with skipFailedRequests + the default MemoryStore.
+// requestWasSuccessful is used exclusively to select the 503 exemption.
+export const anonymousJoinRateLimit = rateLimit({
+  windowMs:15*60*1000,limit:500,standardHeaders:'draft-7',legacyHeaders:false,
+  skipFailedRequests:true,
+  requestWasSuccessful:(_req,res)=>!(res.statusCode===503 && res.locals.studyJoinRetryableBusy===true),
+})
 publicAnonymousStudyRouter.use(['/waves/:waveId/join'], anonymousJoinRateLimit)
 publicAnonymousStudyRouter.use(['/:studyId/code/recover','/:studyId/code/reset'],
  rateLimit({windowMs:15*60*1000,limit:30,standardHeaders:'draft-7',legacyHeaders:false}))
@@ -98,6 +99,7 @@ publicAnonymousStudyRouter.post('/waves/:waveId/join',wrap(async(req,res)=>{
     return success(res,await service.joinStudy(id.parse(req.params.waveId),body.token,body.consent,body))
   } catch(e) {
     if(e instanceof BoundedAdmissionBusyError || isTransientStudyDatabaseError(e)){
+      res.locals.studyJoinRetryableBusy=true
       res.setHeader('Retry-After',String((e as {retryAfterSeconds?:number}).retryAfterSeconds || 1))
       return res.status(503).json({code:'STUDY_JOIN_BUSY',message:'匿名研究加入繁忙，请稍后重试',data:null})
     }

@@ -112,4 +112,25 @@ describe('anonymous join per-IP rate limit (500 / 15 min)', () => {
     })
     expect(retry.status).toBe(200)
   }, 60000)
+
+  it('counts malformed and forbidden joins so failed code guesses remain bounded', async () => {
+    await ready
+    const port = (server.address() as { port: number }).port
+    const url = `http://127.0.0.1:${port}/api/public/anonymous-studies/waves/${randomUUID()}/join`
+    anonymousJoinRateLimit.resetKey('127.0.0.1')
+    const malformed = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: 'short', consent: true }),
+    })
+    expect(malformed.status).toBe(400)
+    joinStudy.mockRejectedValueOnce(Object.assign(new Error('forbidden'), { statusCode: 403 }))
+    const denied = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: 'x'.repeat(32), consent: true }),
+    })
+    expect(denied.status).toBe(403)
+    expect((await anonymousJoinRateLimit.getKey('127.0.0.1'))?.totalHits).toBe(2)
+  }, 60000)
 })
