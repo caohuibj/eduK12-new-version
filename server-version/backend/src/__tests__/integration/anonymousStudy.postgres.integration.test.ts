@@ -254,7 +254,9 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
    expect(phaseCount('anonymous.start.gate_slot_ms')).toBe(1)
    const tokenLockFailure=await token()
    const lockSpy=vi.spyOn(prisma as any,'$transaction').mockImplementationOnce(
-    async(callback:any)=>callback({$queryRaw:async()=>{throw new Error('simulated admission lock failure')}}),
+    // The new anonymous admission takes its first SHARE lock through
+    // $queryRawUnsafe. Inject failure at that actual call boundary.
+    async(callback:any)=>callback({$queryRawUnsafe:async()=>{throw new Error('simulated admission lock failure')}}),
    )
    try{
     await expect(observedPublicStart(()=>composite.startPublicAttempt(tokenLockFailure.token))).rejects.toThrow('simulated admission lock failure')

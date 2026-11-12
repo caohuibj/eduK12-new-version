@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from '../integration/integration-env'
-import { lockAuthenticatedAdmission } from '../../modules/composite/authenticated-admission-lock'
+import { lockAnonymousAdmission, lockAuthenticatedAdmission } from '../../modules/composite/authenticated-admission-lock'
 
 const url = integrationDatabaseUrl('AUTHENTICATED_ADMISSION_TEST_DATABASE_URL')
 const suite = url ? describe : describe.skip
@@ -219,4 +219,95 @@ suite('authenticated admission lock boundaries (real isolated PostgreSQL)', () =
     } finally { release.resolve(); await held; await closing }
     await expect(runtime.startUserAttempt(b,id)).rejects.toMatchObject({ statusCode: 400 })
   })
+
+  it('anonymous locks admit distinct participants concurrently on the same Composite', async () => {
+    const id = await fixture(), ready = deferred(), release = deferred()
+    const held = db.$transaction(async tx => {
+      await lockAnonymousAdmission(tx, id, 'participant-a')
+      ready.resolve()
+      await release.promise
+    }, { timeout: 15000 })
+    await ready.promise
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const other = db.$transaction(async tx => {
+      await lockAnonymousAdmission(tx, id, 'participant-b')
+    }, { timeout: 10000 })
+    try {
+      await Promise.race([other, new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error('Different anonymous participant blocked by Composite lock')), 4000)
+      })])
+    } finally {
+      if (timer) clearTimeout(timer)
+      release.resolve()
+      await held
+      await other.catch(() => undefined)
+    }
+  }, 30000)
+
+  it('anonymous locks serialize the same participant without blocking the entire Composite', async () => {
+    const id = await fixture(), ready = deferred(), release = deferred(), competing = deferred()
+    const held = db.$transaction(async tx => {
+      await lockAnonymousAdmission(tx, id, 'participant-same')
+      ready.resolve()
+      await release.promise
+    }, { timeout: 15000 })
+    await ready.promise
+    let competingPid = 0
+    const contender = db.$transaction(async tx => {
+      const rows = await tx.$queryRaw<Array<{ pid: number }>>`SELECT pg_backend_pid() AS pid`
+      competingPid = rows[0].pid
+      competing.resolve()
+      await lockAnonymousAdmission(tx, id, 'participant-same')
+    }, { timeout: 15000 })
+    await competing.promise
+    try {
+      let blocked = false
+      for (let attempt = 0; attempt < 60; attempt++) {
+        const [row] = await db.$queryRaw<Array<{ blocked: boolean }>>`
+          SELECT cardinality(pg_blocking_pids(${competingPid}::int)) > 0 AS blocked
+        `
+        if (row.blocked) { blocked = true; break }
+        await new Promise(resolve => setTimeout(resolve, 20))
+      }
+      expect(blocked).toBe(true)
+    } finally {
+      release.resolve()
+      await held
+      await contender
+    }
+  }, 30000)
+
+  it('anonymous SHARE holds publication archive until the admission transaction settles', async () => {
+    const id = await fixture(), ready = deferred(), release = deferred(), writerStarted = deferred()
+    const held = db.$transaction(async tx => {
+      await lockAnonymousAdmission(tx, id, 'participant-archive')
+      ready.resolve()
+      await release.promise
+    }, { timeout: 15000 })
+    await ready.promise
+    let writerPid = 0
+    const archiving = db.$transaction(async tx => {
+      const [backend] = await tx.$queryRaw<Array<{ pid: number }>>`SELECT pg_backend_pid() AS pid`
+      writerPid = backend.pid
+      writerStarted.resolve()
+      await tx.compositeAssessment.update({ where: { id }, data: { status: 'ARCHIVED' } })
+    }, { timeout: 15000 })
+    await writerStarted.promise
+    try {
+      let blocked = false
+      for (let attempt = 0; attempt < 60; attempt++) {
+        const [row] = await db.$queryRaw<Array<{ blocked: boolean }>>`
+          SELECT cardinality(pg_blocking_pids(${writerPid}::int)) > 0 AS blocked
+        `
+        if (row.blocked) { blocked = true; break }
+        await new Promise(resolve => setTimeout(resolve, 20))
+      }
+      expect(blocked).toBe(true)
+    } finally {
+      release.resolve()
+      await held
+      await archiving
+    }
+    await expect(runtime.startUserAttempt(b, id)).rejects.toMatchObject({ statusCode: 400 })
+  }, 30000)
 })
