@@ -7,7 +7,8 @@ import {readPrivateFormRuntimeResource} from '../education-tools/private-tool.fo
 import {relationalEntryToRunPolicy,type RunResourcePolicy} from './resourceAuthority'
 import {lockExecutionEnvelope} from './startClaim'
 import {assertCurrentRunStartAuthority} from './startAuthority'
-import {readCompositionExecutionSource,assertCompositionCollection} from './educationCompositionExecution'
+import {readCompositionExecutionSource,assertCompositionCollection,type FrozenCompositionIdentity} from './educationCompositionExecution'
+import {privateToolFail} from '../education-tools/private-tool.contracts'
 
 export class PrivateFormExecutionError extends Error {
  constructor(public readonly code:string,public readonly statusCode=409){super('私有表单的任务或固定版本不匹配');this.name='PrivateFormExecutionError'}
@@ -68,10 +69,53 @@ export async function assertPrivateFormParentSource(parentId:string,db:Prisma.Tr
  if(composition)return readCompositionExecutionSource(db,{assignmentRef:parent.assignmentRef,parentAttemptId:parent.id,actorUserId:parent.userId,compositeId:parent.compositeAssessmentId})
  return readPrivateFormExecutionSource(db,{assignmentRef:parent.assignmentRef,parentAttemptId:parent.id,actorUserId:parent.userId,compositeId:parent.compositeAssessmentId})
 }
+export type PreparedPrivateFormFinalEvidence={
+ kind:'COMPOSITION'|'PRIVATE_FORM'
+ attemptId:string
+ actorUserId:string
+ assignmentRef:string
+ compositeId:string
+ executionId:string
+ policyHash:string
+ key:string
+ version:string
+ respondentUserId:string
+ bindingKind:string|null
+ bindingRef:string|null
+ identity?:FrozenCompositionIdentity
+}
+
+/** Request-local fat source / frozen-policy / tool-policy reads for School and
+ * Teacher UNIT FINAL. Runs before withUnitSubmitAdmission; not a cross-request cache.
+ * Field Invitation and unrelated parents return null. */
+export async function preparePrivateFormFinalEvidence(attemptId:string,actorUserId:string|null|undefined,db:Prisma.TransactionClient|typeof prisma=prisma):Promise<PreparedPrivateFormFinalEvidence|null>{
+ if(!actorUserId)return null
+ const parent=await db.compositeAssessmentAttempt.findUnique({where:{id:attemptId},select:{id:true,userId:true,assignmentRef:true,compositeAssessmentId:true,
+  compositeAssessment:{select:{creationKey:true}}}})
+ if(!parent)return null
+ if(parent.compositeAssessment.creationKey?.endsWith(':TEACHER:EXPERT_REPORT:2.0.0'))return null
+ const composition=parent.compositeAssessment.creationKey?.startsWith('education-composition:')
+ if(!composition&&!parent.compositeAssessment.creationKey?.startsWith('private-form:'))return null
+ if(parent.userId!==actorUserId||!parent.assignmentRef)return null
+ const [execution]=await db.$queryRaw<Array<{id:string}>>`SELECT id FROM assessment_run_executions WHERE relational_assignment_id=${parent.assignmentRef}`
+ if(!execution)return null
+ if(composition){
+  const source=await readCompositionExecutionSource(db,{executionId:execution.id,parentAttemptId:parent.id,actorUserId,compositeId:parent.compositeAssessmentId})
+  return {kind:'COMPOSITION',attemptId:parent.id,actorUserId,assignmentRef:parent.assignmentRef,compositeId:parent.compositeAssessmentId,
+   executionId:source.executionId,policyHash:source.policyHash,key:source.key,version:source.version,respondentUserId:source.respondentUserId,
+   bindingKind:source.bindingKind,bindingRef:source.bindingRef,identity:source.identity}
+ }
+ const source=await readPrivateFormExecutionSource(db,{executionId:execution.id,parentAttemptId:parent.id,actorUserId,compositeId:parent.compositeAssessmentId})
+ return {kind:'PRIVATE_FORM',attemptId:parent.id,actorUserId,assignmentRef:parent.assignmentRef,compositeId:parent.compositeAssessmentId,
+  executionId:source.executionId,policyHash:source.policyHash,key:source.key,version:source.version,respondentUserId:source.respondentUserId,
+  bindingKind:source.bindingKind,bindingRef:source.bindingRef}
+}
+
 /** Called BEFORE parent/section locks in the actual FINAL transaction. It uses
  * existing org -> Run -> execution fences and server-verified query-time account
- * checks; it never takes a user SHARE after org or consults author privileges. */
-export async function assertPrivateFormFinalCurrent(tx:Prisma.TransactionClient,input:{attemptId:string;actorUserId:string|null|undefined}){
+ * checks; it never takes a user SHARE after org or consults author privileges.
+ * Prepared evidence only skips fat source reloads after a locked hash compare. */
+export async function assertPrivateFormFinalCurrent(tx:Prisma.TransactionClient,input:{attemptId:string;actorUserId:string|null|undefined},prepared?:PreparedPrivateFormFinalEvidence|null){
  const parent=await tx.compositeAssessmentAttempt.findUnique({where:{id:input.attemptId},select:{id:true,userId:true,assignmentRef:true,compositeAssessmentId:true,
   compositeAssessment:{select:{creationKey:true}}}})
  if(!parent)return
@@ -84,14 +128,60 @@ export async function assertPrivateFormFinalCurrent(tx:Prisma.TransactionClient,
  const composition=parent?.compositeAssessment.creationKey?.startsWith('education-composition:')
  if(!composition&&!parent?.compositeAssessment.creationKey?.startsWith('private-form:'))return
  if(!input.actorUserId||parent.userId!==input.actorUserId||!parent.assignmentRef)fail()
- const [execution]=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM assessment_run_executions WHERE relational_assignment_id=${parent.assignmentRef}`
+ if(prepared){
+  const usable=prepared.attemptId===parent.id&&prepared.actorUserId===input.actorUserId&&prepared.assignmentRef===parent.assignmentRef
+   &&prepared.compositeId===parent.compositeAssessmentId
+   &&((composition&&prepared.kind==='COMPOSITION'&&prepared.identity)
+    ||(!composition&&prepared.kind==='PRIVATE_FORM'))
+  if(!usable){if(composition)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID');else fail()}
+ }
+ const executionId=prepared?.executionId
+ const execution=executionId?{id:executionId}:(await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM assessment_run_executions WHERE relational_assignment_id=${parent.assignmentRef}`)[0]
  if(!execution)fail()
+ if(prepared&&prepared.executionId!==execution.id){if(composition)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID');else fail()}
  await lockExecutionEnvelope(tx,execution.id)
- if(composition){
+ if(prepared){
+  if(composition){
+   const [locked]=await tx.$queryRaw<Array<{policyHash:string;key:string;version:string;status:string;runStatus:string;assignmentStatus:string;assignmentRef:string;respondentUserId:string;bindingKind:string|null;bindingRef:string|null}>>(Prisma.sql`
+    SELECT t.resource_policy_hash AS "policyHash",t.resource_key AS key,t.resource_version AS version,e.status,
+     r.status AS "runStatus",a.status AS "assignmentStatus",a.id AS "assignmentRef",a.respondent_user_id AS "respondentUserId",
+     e.runtime_binding_kind AS "bindingKind",e.runtime_binding_ref AS "bindingRef"
+    FROM assessment_run_executions e JOIN assessment_runs r ON r.id=e.run_id AND r.organization_id=e.organization_id
+    JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
+    JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id
+    WHERE e.id=${execution.id}`)
+   if(!locked||locked.policyHash!==prepared.policyHash||locked.key!==prepared.key||locked.version!==prepared.version
+    ||!['PUBLISHED','CLOSED'].includes(locked.runStatus)||!['ASSIGNED','STARTED','COMPLETED'].includes(locked.status)
+    ||!['OPEN','STARTED','COMPLETED'].includes(locked.assignmentStatus)||locked.respondentUserId!==input.actorUserId
+    ||locked.assignmentRef!==parent.assignmentRef||locked.bindingKind!=='COMPOSITE'||locked.bindingRef!==parent.id)
+    privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
+   await assertCompositionCollection(tx,prepared.identity!,'BOUND_COLLECTION',true)
+  }else{
+   const [locked]=await tx.$queryRaw<Array<{policyHash:string;key:string;version:string;school:boolean;teacher:boolean;assignmentStatus:string;respondentUserId:string;runStatus:string;executionStatus:string;bindingKind:string|null;bindingRef:string|null}>>(Prisma.sql`
+    SELECT t.resource_policy_hash AS "policyHash",t.resource_key AS key,t.resource_version AS version,
+     EXISTS(SELECT 1 FROM campus_activity_runs s WHERE s.organization_id=e.organization_id AND s.run_id=e.run_id) AS school,
+     EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h WHERE h.organization_id=e.organization_id AND h.run_id=e.run_id) AS teacher,
+     a.status AS "assignmentStatus",a.respondent_user_id AS "respondentUserId",r.status AS "runStatus",e.status AS "executionStatus",
+     e.runtime_binding_kind AS "bindingKind",e.runtime_binding_ref AS "bindingRef"
+    FROM assessment_run_executions e JOIN assessment_runs r ON r.id=e.run_id AND r.organization_id=e.organization_id
+    JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
+    JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id
+    WHERE e.id=${execution.id}`)
+   if(!locked||locked.version!=='1.0.0'||locked.school===locked.teacher||['REVOKED','EXPIRED'].includes(locked.assignmentStatus)
+    ||locked.respondentUserId!==input.actorUserId)fail()
+   if(!['PUBLISHED','CLOSED'].includes(locked.runStatus)||!['ASSIGNED','STARTED','COMPLETED'].includes(locked.executionStatus))fail('PRIVATE_FORM_TASK_NOT_COLLECTABLE')
+   if(locked.policyHash!==prepared.policyHash||locked.key!==prepared.key||locked.bindingKind!=='COMPOSITE'||locked.bindingRef!==parent.id)fail()
+  }
+  await assertCurrentRunStartAuthority(tx,execution.id,{accountMode:'DETECT_EDUCATION_LIBRARY',operation:'BOUND_FINAL',
+   preparedPrivateFormLocator:{executionId:execution.id,policyHash:prepared.policyHash}})
+ }else if(composition){
   const source=await readCompositionExecutionSource(tx,{executionId:execution.id,parentAttemptId:parent.id,actorUserId:input.actorUserId,compositeId:parent.compositeAssessmentId})
   await assertCompositionCollection(tx,source.identity,'BOUND_COLLECTION',true)
- }else await readPrivateFormExecutionSource(tx,{executionId:execution.id,parentAttemptId:parent.id,actorUserId:input.actorUserId,compositeId:parent.compositeAssessmentId})
- await assertCurrentRunStartAuthority(tx,execution.id,{accountMode:'DETECT_EDUCATION_LIBRARY',operation:'BOUND_FINAL'})
+  await assertCurrentRunStartAuthority(tx,execution.id,{accountMode:'DETECT_EDUCATION_LIBRARY',operation:'BOUND_FINAL'})
+ }else{
+  await readPrivateFormExecutionSource(tx,{executionId:execution.id,parentAttemptId:parent.id,actorUserId:input.actorUserId,compositeId:parent.compositeAssessmentId})
+  await assertCurrentRunStartAuthority(tx,execution.id,{accountMode:'DETECT_EDUCATION_LIBRARY',operation:'BOUND_FINAL'})
+ }
  await createRelationalRuntimeConsentAuthority({db:tx as any,assignments:createSqlRelationalAssignmentRepository(tx as any)})
   .assertCompositeFinal(input.attemptId,input.actorUserId)
 }

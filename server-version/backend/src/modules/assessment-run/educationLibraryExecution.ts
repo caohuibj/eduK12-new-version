@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client'
+import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { readEducationScaleExecutionSource } from './educationScaleExecutionSource'
 import { ScaleLibraryError } from '../scale-library-governance/contracts'
@@ -49,7 +50,53 @@ export async function assertEducationLibraryExecutionSource(tx: Prisma.Transacti
  * contract, like exact STANDARD Training sources. This is not new admission or
  * actor authorization. Only the persisted Run/assignment/current child binding
  * can qualify; callers cannot opt in with an entry or skip-stop flag. */
-export async function educationFrozenScaleCompletionIds(tx:Prisma.TransactionClient,parentId:string,scaleIds:readonly string[],itemIds:readonly string[]){
+export type PreparedEducationFrozenScaleEvidence={
+ executionId:string
+ compositeId:string
+ scaleId:string
+ itemId:string
+ key:string
+ version:string
+ policyHash:string
+}
+
+/** Request-local HISTORY source read for education frozen scale completion.
+ * The UNIT-gated path still FOR SHARE locks the parent/execution/child and
+ * rechecks key/version/policyHash before skipping readBoundEducationSource. */
+export async function prepareEducationFrozenScaleEvidence(parentId:string,scaleIds:readonly string[],itemIds:readonly string[],db:Prisma.TransactionClient|typeof prisma=prisma):Promise<PreparedEducationFrozenScaleEvidence[]>{
+ if(!itemIds.length)return []
+ const rows=await db.$queryRaw<Array<{executionId:string;compositeId:string;scaleId:string;itemId:string}>>(Prisma.sql`
+  SELECT e.id AS "executionId",p.composite_assessment_id AS "compositeId",c.scale_id AS "scaleId",c.composite_item_id AS "itemId"
+  FROM composite_assessment_attempts p
+  JOIN composite_assessments definition ON definition.id=p.composite_assessment_id AND definition.product_kind='ORGANIZATION_RESOURCE'
+  JOIN assessment_run_executions e ON e.runtime_binding_kind='COMPOSITE' AND e.runtime_binding_ref=p.id
+   AND e.relational_assignment_id=p.assignment_ref AND e.status='STARTED' AND e.started_at IS NOT NULL
+  JOIN assessment_run_tracks t ON t.id=e.track_id AND t.organization_id=e.organization_id AND t.run_id=e.run_id
+   AND t.resource_family='SCALE' AND (t.resource_key LIKE 'library-scale:%' OR t.resource_key LIKE 'private-scale:%')
+  JOIN assessments c ON c.composite_attempt_id=p.id AND c.attempt_epoch=p.attempt_epoch
+  WHERE p.id=${parentId} AND p.status='IN_PROGRESS' AND p.delivery_mode='FINAL_ONLY'
+   AND c.delivery_mode='FINAL_ONLY' AND c.runtime_generation='UNIFIED_V1'
+   AND c.status='IN_PROGRESS' AND c.runtime_snapshot_encrypted IS NOT NULL
+   AND c.scale_id=ANY(${[...scaleIds]}::text[]) AND c.composite_item_id=ANY(${[...itemIds]}::text[])
+ `)
+ const prepared:PreparedEducationFrozenScaleEvidence[]=[]
+ for(const row of rows){
+  const source=await readBoundEducationSource(db,{executionId:row.executionId,compositeId:row.compositeId},'HISTORY')
+  if(source.scaleId!==row.scaleId||source.compositeItemId!==row.itemId)
+   throw new ScaleLibraryError(409,'EDUCATION_LIBRARY_COMPLETION_BINDING_MISMATCH')
+  const [track]=await db.$queryRaw<Array<{key:string;version:string;policyHash:string}>>(Prisma.sql`
+   SELECT t.resource_key AS key,t.resource_version AS version,t.resource_policy_hash AS "policyHash"
+   FROM assessment_run_executions e JOIN assessment_run_tracks t
+    ON t.id=e.track_id AND t.organization_id=e.organization_id AND t.run_id=e.run_id
+   WHERE e.id=${row.executionId}`)
+  if(!track) throw new ScaleLibraryError(409,'EDUCATION_LIBRARY_COMPLETION_BINDING_MISMATCH')
+  prepared.push({executionId:row.executionId,compositeId:row.compositeId,scaleId:row.scaleId,itemId:row.itemId,
+   key:track.key,version:track.version,policyHash:track.policyHash})
+ }
+ return prepared
+}
+
+export async function educationFrozenScaleCompletionIds(tx:Prisma.TransactionClient,parentId:string,scaleIds:readonly string[],itemIds:readonly string[],prepared?:PreparedEducationFrozenScaleEvidence[]|null){
  if(!itemIds.length)return new Set<string>()
  const rows=await tx.$queryRaw<Array<{executionId:string;compositeId:string;scaleId:string;itemId:string}>>(Prisma.sql`
   SELECT e.id AS "executionId",p.composite_assessment_id AS "compositeId",c.scale_id AS "scaleId",c.composite_item_id AS "itemId"
@@ -68,6 +115,18 @@ export async function educationFrozenScaleCompletionIds(tx:Prisma.TransactionCli
  `)
  const ids=new Set<string>()
  for(const row of rows){
+  const match=prepared?.find(item=>item.executionId===row.executionId&&item.compositeId===row.compositeId&&item.scaleId===row.scaleId&&item.itemId===row.itemId)
+  if(match){
+   const [locked]=await tx.$queryRaw<Array<{key:string;version:string;policyHash:string}>>(Prisma.sql`
+    SELECT t.resource_key AS key,t.resource_version AS version,t.resource_policy_hash AS "policyHash"
+    FROM assessment_run_executions e JOIN assessment_run_tracks t
+     ON t.id=e.track_id AND t.organization_id=e.organization_id AND t.run_id=e.run_id
+    WHERE e.id=${row.executionId}`)
+   if(!locked||locked.key!==match.key||locked.version!==match.version||locked.policyHash!==match.policyHash)
+    throw new ScaleLibraryError(409,'EDUCATION_LIBRARY_COMPLETION_BINDING_MISMATCH')
+   ids.add(row.scaleId)
+   continue
+  }
   // HISTORY here reads immutable identity only. Completion eligibility comes
   // from the locked persisted execution above, not from this read purpose.
   const source=await readBoundEducationSource(tx,{executionId:row.executionId,compositeId:row.compositeId},'HISTORY')
