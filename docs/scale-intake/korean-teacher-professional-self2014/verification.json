@@ -1,0 +1,126 @@
+{
+  "status": "PASS_METADATA_AND_NO_RUNTIME_BOUNDARIES_ONLY",
+  "initialBase": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "localResult": {
+    "status": "PASS_METADATA_TAG_AND_NO_RUNTIME_BOUNDARIES",
+    "variants": 2,
+    "plannedDomainCounts": [
+      5,
+      6
+    ],
+    "reportDraftCases": 6,
+    "sharedTag": "family:ktpd2014",
+    "persistedTags": 0,
+    "nativeScales": 0,
+    "nativeForms": 0,
+    "scoringExecutions": 0,
+    "databaseImports": 0,
+    "node": "v24.19.0"
+  },
+  "checks": {
+    "jsonParse": "PASS",
+    "existingTagFilter": "PASS_2_VARIANTS",
+    "versionDomainCounts": "PASS_5_AND_6_AUTHOR_ABSTRACT_FACTS_ONLY",
+    "noInventedItemKeysCountsScoringOrVersions": "PASS",
+    "reportExamples": "PASS_6_DRAFTS_NO_NUMERIC",
+    "runtimeSchema": "NOT_RUN_NO_NATIVE_PAYLOAD",
+    "scoringBoundaries": "NOT_RUN_MISSING_ORIGINAL_ITEMS_OPTIONS_KEY",
+    "nativeReportRendering": "NOT_RUN_NO_DEFINITION",
+    "isolatedDatabaseImport": "NOT_RUN_MISSING_ORIGINAL_ITEMS",
+    "formalCI": "NOT_RUN",
+    "independentHumanReview": "NOT_PERFORMED",
+    "rawDiffScope": "PASS_SCALE_NOTES_ONLY_NOT_SELECTED_LIGHT"
+  },
+  "localEnvironment": "Node24.19.0; below repository24.21.0 engine. Metadata exploration only, not formal qualification. No dependency install or lock change.",
+  "sourceAccessLimits": [
+    "KCI direct access returned web-firewall block; cached bibliography/abstract only",
+    "Publishing society403",
+    "earticle purchase/institutional login; no purchase/sign-in",
+    "DOI/other distributor fetch unavailable or metadata only"
+  ],
+  "toolingHistory": [
+    {
+      "action": "initial public metadata fetch helper",
+      "result": "NOT_EXECUTED_MODULE_NOT_FOUND_requests",
+      "resolution": "Used installed curl for one ordinary KCI request, received actual firewall message; no access-control workaround."
+    }
+  ],
+  "mutationBoundary": {
+    "registeredInstruments": 0,
+    "nativeScales": 0,
+    "nativeForms": 0,
+    "combinations": 0,
+    "persistedTags": 0,
+    "databaseImports": 0,
+    "productionTouched": false,
+    "deployment": false,
+    "authorizationCreated": false
+  },
+  "scope": {
+    "base": "6cad86d8f721a45a47a91290edf1523519d1d239",
+    "pathCount": 7,
+    "entries": [
+      {
+        "file": "docs/scale-intake/korean-teacher-professional-self2014/README.md",
+        "oldMode": "000000",
+        "newMode": "100644",
+        "status": "A"
+      },
+      {
+        "file": "docs/scale-intake/korean-teacher-professional-self2014/dedup.json",
+        "oldMode": "000000",
+        "newMode": "100644",
+        "status": "A"
+      },
+      {
+        "file": "docs/scale-intake/korean-teacher-professional-self2014/material-request.md",
+        "oldMode": "000000",
+        "newMode": "100644",
+        "status": "A"
+      },
+      {
+        "file": "docs/scale-intake/korean-teacher-professional-self2014/sources.json",
+        "oldMode": "000000",
+        "newMode": "100644",
+        "status": "A"
+      },
+      {
+        "file": "docs/scale-intake/korean-teacher-professional-self2014/teacher-report-drafts.json",
+        "oldMode": "000000",
+        "newMode": "100644",
+        "status": "A"
+      },
+      {
+        "file": "docs/scale-intake/korean-teacher-professional-self2014/verification.json",
+        "oldMode": "000000",
+        "newMode": "100644",
+        "status": "A"
+      },
+      {
+        "file": "docs/scale-intake/korean-teacher-professional-self2014/version-and-split-plan.json",
+        "oldMode": "000000",
+        "newMode": "100644",
+        "status": "A"
+      }
+    ],
+    "classification": {
+      "maintenance": false,
+      "documentation": false,
+      "content": true,
+      "frontend": false,
+      "presentation": false,
+      "domains": [
+        "scale"
+      ],
+      "backend_focus": "full",
+      "cognitive_intake_light": false,
+      "cognitive_intake_plan": null,
+      "scale_intake_light": false,
+      "frontend_affected": false,
+      "backend_modules": false,
+      "frontend_test": false
+    },
+    "selectedNativeSources": 0
+  },
+  "ciPlan": "Notes-only source dossier, no native sources; existing scale-content broad route is not selected light. Keep skip-ci pending coordinator exact-candidate review; do not start full application/tool tests or count skip as pass."
+}

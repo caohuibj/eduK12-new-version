@@ -1,0 +1,47 @@
+{
+  "base": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "mainSourceJson": 235,
+  "mainInstrumentModules": 258,
+  "mainHits": [],
+  "openPRs": 54,
+  "openPrPaths": 6477,
+  "openPrSourceContentsRead": 673,
+  "openPrSourceHits": [],
+  "errors": [],
+  "queryBasis": "exact Korean/English title, DOI/KCI id, selected author names/romanization; no original item text acquired so item-level matching NOT_PERFORMED",
+  "productionDb": "NOT_QUERIED",
+  "administratorCustomTools": "NOT_QUERIED",
+  "latestMainDelta": {
+    "base": "6cad86d8f721a45a47a91290edf1523519d1d239",
+    "addedOrChangedSourcesRead": 20,
+    "sourceJsonCount": 245,
+    "instrumentModuleCount": 268,
+    "hits": [],
+    "errors": []
+  },
+  "latestPrDelta": {
+    "totalOpenPRs": 56,
+    "newOrChangedHeads": [
+      {
+        "pr": 576,
+        "head": "45d337d2d3a45ce0c8437bbb66a3513a919149d4"
+      },
+      {
+        "pr": 575,
+        "head": "427bda1c8068a922b81fe8b0a1ea12fd8f0ad7c8"
+      },
+      {
+        "pr": 574,
+        "head": "f374eab5d0963770f9c31837a96a1a636183338a"
+      },
+      {
+        "pr": 541,
+        "head": "1c52bd020441814092ee5314491c7655f82050bc"
+      }
+    ],
+    "pathsRead": 72,
+    "sourceContentsRead": 40,
+    "hits": [],
+    "errors": []
+  }
+}
