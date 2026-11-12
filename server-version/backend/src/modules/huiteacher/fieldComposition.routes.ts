@@ -8,6 +8,7 @@ import {FieldCompositionError,currentFieldComposition} from './fieldComposition.
 import {prisma} from '../../config/database'
 import {getAttemptState} from '../composite/composite.service'
 import {projectTeacherCompositeRuntime} from './assessmentRuntime.routes'
+import {attachTeacherInlineCurrentUnit,requestedTeacherInlineCurrentUnit} from './inlineCurrentUnit'
 import {compositeController} from '../composite/composite.controller'
 import {compositeImageController} from '../composite/composite-image.controller'
 import {compositeVideoController} from '../composite/composite-video.controller'
@@ -31,9 +32,21 @@ const wrap=(task:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
  try{return success(res,await task(req))}catch(error){return failure(error,res)}
 })
 router.get('/invitations/:invitationId',wrap(req=>readInvitedFieldComposition({invitationId:uuid.parse(req.params.invitationId),actorUserId:req.user!.userId})))
-router.post('/invitations/:invitationId/start',wrap(req=>{
- z.object({}).strict().parse(req.body)
- return startInvitedFieldComposition({invitationId:uuid.parse(req.params.invitationId),actorUserId:req.user!.userId})
+const startBody=z.object({
+ delivery:z.literal('inline').optional(),
+ view:z.literal('current-unit').optional(),
+}).strict()
+router.post('/invitations/:invitationId/start',wrap(async req=>{
+ startBody.parse(req.body)
+ const started=await startInvitedFieldComposition({invitationId:uuid.parse(req.params.invitationId),actorUserId:req.user!.userId})
+ return attachTeacherInlineCurrentUnit({
+  requested:requestedTeacherInlineCurrentUnit(req),
+  started,
+  attemptId:started.attemptId,
+  actorUserId:req.user!.userId,
+  authorize:({attemptId,actorUserId})=>currentFieldComposition(prisma,{attemptId,actorUserId}),
+  project:projectTeacherCompositeRuntime,
+ })
 }))
 const parent='/assessment-composite-attempts/:attemptId'
 router.use(parent,(req,res,next)=>{

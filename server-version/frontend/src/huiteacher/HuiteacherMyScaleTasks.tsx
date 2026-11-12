@@ -19,10 +19,11 @@ type Task={
   resourceKey:string;title:string;runStatus:string
 }
 type Start={state:'STARTED'|'IN_PROGRESS'|'WITHHELD';
-  runtimeBindingKind?:string;runtimeBindingRef?:string}
+  runtimeBindingKind?:string;runtimeBindingRef?:string;currentUnit?:CompositeAttemptState}
 
 export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{api:Api}&AssessmentListPresentation){
   const [taskRows,setTasks]=useState<Task[]>([])
+  const [cursor,setCursor]=useState<string|null>(null)
   const [session,setSession]=useState<{api:Api;selected:Task;attempt:CompositeAttemptState}|null>(null)
   const currentApi=useRef(api),sessionRef=useRef(session),sessionEpoch=useRef(0)
   currentApi.current=api;sessionRef.current=session
@@ -74,15 +75,20 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
   const listReady=listCurrent&&listState.loaded
   const tasks=listReady?taskRows:[]
   useEffect(()=>{onListStateChange?.({pending:listPending,error:Boolean(listError),count:tasks.length})},[onListStateChange,listPending,listError,tasks.length])
-  const refresh=useCallback(async()=>{
+  const refresh=useCallback(async(appendCursor?:string)=>{
     if(listSource.current.api!==api||listSource.current.endpoint!=='/my-scale-tasks')return
     const request=++listRequest.current
     const valid=()=>request===listRequest.current&&listSource.current.api===api&&listSource.current.endpoint==='/my-scale-tasks'
+    if(!appendCursor)setCursor(null)
     setListState(old=>({api,endpoint:'/my-scale-tasks',pending:true,error:'',loaded:old.api===api&&old.endpoint==='/my-scale-tasks'&&old.loaded}))
     try{
-      const data=await api<{list:Task[]}>('/my-scale-tasks')
+      const data=await api<{list:Task[];nextCursor?:string|null;truncated?:boolean}>(
+        '/my-scale-tasks'+(appendCursor?'?cursor='+encodeURIComponent(appendCursor):''))
       if(!valid())return
-      setTasks(data.list)
+      // Missing nextCursor (older servers that only set truncated) means this page is the last one.
+      const next=typeof data.nextCursor==='string'&&data.nextCursor?data.nextCursor:null
+      setTasks(old=>appendCursor?[...old,...data.list.filter(row=>!old.some(value=>value.executionId===row.executionId))]:data.list)
+      setCursor(next)
       setListState({api,endpoint:'/my-scale-tasks',pending:false,error:'',loaded:true})
     }catch(error){
       if(valid())setListState(old=>({...old,pending:false,error:error instanceof Error?error.message:'任务列表读取失败，请重试。'}))
@@ -116,9 +122,10 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
       throw new Error('任务已结束，不能建立新的作答。')
     }
     let attemptId=item.runtimeBindingRef
+    let inline:CompositeAttemptState|undefined
     if(!attemptId){
       const started=await api<Start>(
-        '/run-executions/'+item.executionId+'/start-scale','POST',{})
+        '/run-executions/'+item.executionId+'/start-scale','POST',{delivery:'inline'})
       if(!valid())return
       if(started.state==='IN_PROGRESS'){
         setMessage('正式测评正在建立，请刷新任务后继续。')
@@ -129,8 +136,11 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
         ||!started.runtimeBindingRef)
         throw new Error('当前未找到获授权的教师自评运行记录')
       attemptId=started.runtimeBindingRef
+      if(started.currentUnit&&started.currentUnit.id===attemptId&&started.currentUnit.deliveryMode==='FINAL_ONLY'){
+        inline=started.currentUnit
+      }
     }
-    const value=await load(attemptId)
+    const value=inline??await load(attemptId)
     if(!valid())return
     if(value.status==='COMPLETED'){sessionRef.current=null;setSession(null);confirmCompleted(item);showReport(item);void refresh()}
     else setSession({api,selected:item,attempt:value})
@@ -193,6 +203,7 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
         </div>
 
       </article>)}</div>}
+    {listCurrent&&cursor&&<button type="button" disabled={listPending} onClick={()=>void refresh(cursor)}>加载更多Scale任务</button>}
     {visibleFeedback&&<TeacherAssessmentPage kind="feedback" title={visibleFeedback.task.title} onBack={()=>setFeedback(null)}>
       <EducationTaskFeedback key={visibleFeedback.task.executionId} api={api} entry="TEACHER"
         executionId={visibleFeedback.task.executionId} title={visibleFeedback.task.title}

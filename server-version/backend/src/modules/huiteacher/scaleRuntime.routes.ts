@@ -9,8 +9,9 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { authenticateHuiteacher } from '../../middleware/auth'
 import { asyncHandler } from '../../middleware/asyncHandler'
-import { success,notFound } from '../../utils/response'
+import { success,notFound,error } from '../../utils/response'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
+import { canonicalCursorTimestamp,decodeRunTaskCursor,encodeRunTaskCursor,type RunTaskCursor } from '../assessment-run/productRead'
 import { startAssessmentRunExecution } from '../assessment-run/startExecution'
 import { isAssessmentStartBusyError } from '../composite/start-transient'
 import {readTeacherPersonalChanges} from '../reporting/teacher-personal-changes.service'
@@ -18,6 +19,7 @@ import { readTeacherPersonalScaleReport } from './scalePersonalReport.service'
 import { compositeController } from '../composite/composite.controller'
 import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
+import { attachTeacherInlineCurrentUnit, requestedTeacherInlineCurrentUnit } from './inlineCurrentUnit'
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
@@ -99,30 +101,57 @@ async function ownScaleExecution(input:{actorUserId:string;executionId?:string;a
   }))return null
   return row
 }
+/** Same authority the GET /composite-attempts/:attemptId middleware uses. */
+async function authorizeCurrentScaleAttempt(input:{
+  actorUserId:string
+  accountDomain?:string
+  attemptId:string
+  itemId?:string
+}){
+  if(input.accountDomain!=='SCHOOL')throw new Error('HUITEACHER_SCALE_ATTEMPT_UNAVAILABLE')
+  const proof=await ownScaleExecution({
+    actorUserId:input.actorUserId,attemptId:input.attemptId,itemId:input.itemId,
+  })
+  if(!proof)throw new Error('HUITEACHER_SCALE_ATTEMPT_UNAVAILABLE')
+  const scope=await resolveEducationProductMemberScope({
+    actorUserId:input.actorUserId,
+    organizationId:proof.organizationId,product:'HUITEACHER',
+  })
+  if(!scope)throw new Error('HUITEACHER_SCALE_ATTEMPT_UNAVAILABLE')
+  return proof
+}
 async function requireScaleAttempt(req:Request,res:Response,next:NextFunction){
   try{
     const attemptId=uuid.parse(req.params.attemptId)
-    if(!req.user||req.user.accountDomain!=='SCHOOL')
-      return notFound(res,'教师测评记录不存在')
-    const proof=await ownScaleExecution({
-      actorUserId:req.user.userId,attemptId,itemId:req.params.itemId,
+    if(!req.user)return notFound(res,'教师测评记录不存在')
+    await authorizeCurrentScaleAttempt({
+      actorUserId:req.user.userId,accountDomain:req.user.accountDomain,
+      attemptId,itemId:req.params.itemId,
     })
-    if(!proof)return notFound(res,'教师测评记录不存在')
-    const scope=await resolveEducationProductMemberScope({
-      actorUserId:req.user.userId,
-      organizationId:proof.organizationId,product:'HUITEACHER',
-    })
-    if(!scope)return notFound(res,'教师测评记录不存在')
     next()
-  }catch(e){next(e)}
+  }catch(e){
+    if(e instanceof Error&&e.message==='HUITEACHER_SCALE_ATTEMPT_UNAVAILABLE')
+      return notFound(res,'教师测评记录不存在')
+    next(e)
+  }
 }
-export async function listOwnTeacherScaleTasks(userId:string){
+export async function listOwnTeacherScaleTasks(userId:string,cursor?:RunTaskCursor){
+  const limit=100
+  // Same microsecond bookmark as respondent run tasks. A Date truncates to
+  // milliseconds and drops the other rows inserted in that same transaction.
+  const cursorCreatedAt=cursor?canonicalCursorTimestamp(cursor.createdAt):null
+  if(cursor&&(cursorCreatedAt===null||!cursor.id))throw new Error('RUN_TASK_CURSOR_INVALID')
+  const cursorScope=cursorCreatedAt
+    ?Prisma.sql`AND (e."created_at", e."id") < (${cursorCreatedAt}::timestamptz, ${cursor!.id})`
+    :Prisma.empty
   const rows=await prisma.$queryRaw<Array<{
+    createdAtMicros:string
     executionId:string;eventId:string;eventTitle:string;runId:string;
     organizationId:string;status:string;runtimeBindingRef:string|null;
     resourceKey:string;title:string;runStatus:string
-  }>>`
-    SELECT e."id" AS "executionId",event."id" AS "eventId",
+  }>>(Prisma.sql`
+    SELECT to_char(e."created_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros",
+      e."id" AS "executionId",event."id" AS "eventId",
       event."title" AS "eventTitle",
       e."run_id" AS "runId",e."organization_id" AS "organizationId",
       e."status",e."runtime_binding_ref" AS "runtimeBindingRef",
@@ -211,13 +240,39 @@ export async function listOwnTeacherScaleTasks(userId:string){
     AND ((track."resource_key" NOT LIKE 'library-scale:%' AND track."resource_key" NOT LIKE 'private-scale:%') OR CASE WHEN e."status"='COMPLETED'
         THEN ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`, 'REPORT_READ')}
         ELSE ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)} END)
-    ORDER BY e."created_at" DESC,e."id" DESC LIMIT 101
-  `
-  return {list:rows.slice(0,100),truncated:rows.length>100}
+    ${cursorScope}
+    ORDER BY e."created_at" DESC,e."id" DESC LIMIT ${limit + 1}
+  `)
+  const page=rows.slice(0,limit)
+  const hasMore=rows.length>limit
+  const last=page[page.length-1]
+  return {
+    list:page.map(({createdAtMicros:_createdAtMicros,...task})=>task),
+    truncated:hasMore,
+    nextCursor:hasMore&&last?{createdAt:last.createdAtMicros,id:last.executionId}:null,
+  }
 }
 router.post('/scale-tasks/:executionId/changes',authenticateHuiteacher,wrap(req=>readTeacherPersonalChanges({actorUserId:req.user!.userId,executionId:uuid.parse(req.params.executionId)})))
-router.get('/my-scale-tasks',authenticateHuiteacher,wrap(async req=>
-  listOwnTeacherScaleTasks(req.user!.userId)))
+router.get('/my-scale-tasks',authenticateHuiteacher,asyncHandler(async(req,res)=>{
+  // Decode before the query. wrap() would turn RUN_TASK_CURSOR_INVALID into 500,
+  // and a forged timestamp must never reach PostgreSQL's ::timestamptz cast.
+  const parsed=z.object({cursor:z.string().max(500).optional()}).safeParse(req.query)
+  if(!parsed.success)return error(res,'任务游标无效',-1,400)
+  let cursor:RunTaskCursor|undefined
+  try{cursor=decodeRunTaskCursor(parsed.data.cursor)}
+  catch{return error(res,'任务游标无效',-1,400)}
+  try{
+    const result=await listOwnTeacherScaleTasks(req.user!.userId,cursor)
+    return success(res,{
+      ...result,
+      nextCursor:result.nextCursor?encodeRunTaskCursor(result.nextCursor):null,
+    })
+  }catch(e){
+    if(e instanceof Error&&e.message==='RUN_TASK_CURSOR_INVALID')
+      return error(res,'任务游标无效',-1,400)
+    throw e
+  }
+}))
 router.post('/run-executions/:executionId/start-scale',
   authenticateHuiteacher,wrap(async req=>{
     const executionId=uuid.parse(req.params.executionId)
@@ -235,7 +290,18 @@ router.post('/run-executions/:executionId/start-scale',
     })
     if(result.state==='STARTED'&&result.runtimeBindingKind!=='COMPOSITE')
       throw new Error('Expected canonical Scale Composite binding')
-    return result
+    if(result.state!=='STARTED')return result
+    // GET /composite-attempts/:id returns getAttemptState unchanged.
+    return attachTeacherInlineCurrentUnit({
+      requested:requestedTeacherInlineCurrentUnit(req),
+      started:result,
+      attemptId:result.runtimeBindingRef,
+      actorUserId:req.user!.userId,
+      authorize:({attemptId,actorUserId})=>authorizeCurrentScaleAttempt({
+        actorUserId,accountDomain:req.user!.accountDomain,attemptId,
+      }),
+      project:state=>state,
+    })
   }))
 router.get('/composite-attempts/:attemptId',
   authenticateHuiteacher,requireScaleAttempt,compositeController.getAttempt)

@@ -39,7 +39,7 @@ describe('Expert task host consumes the existing canonical Scale/Form runner',()
  it('starts only the invitation, forwards unchanged native submissions and records completion after exact receipts',async()=>{
   const {api}=fixture(),progress=vi.fn(),exit=vi.fn();render(<HuiteacherFieldQuestionnaire api={api} invitationId="invitation" task={task} onProgress={progress} onExit={exit}/>)
   fireEvent.click(screen.getByRole('button',{name:'开始或恢复本次观察问卷'}));await screen.findByText('Native SCALE')
-  expect(api).toHaveBeenCalledWith('/field-assessments/invitations/invitation/start','POST',{},undefined)
+  expect(api).toHaveBeenCalledWith('/field-assessments/invitations/invitation/start','POST',{delivery:'inline'},undefined)
   fireEvent.click(screen.getByRole('button',{name:'提交原生单元'}));await screen.findByText('Native FORM_SECTION')
   expect(api).toHaveBeenCalledWith(parent+'/items/scale/scale/submit?response=receipt','POST',payload,undefined)
   expect(progress).toHaveBeenLastCalledWith({attemptId:'parent',completed:false,writing:false})
@@ -60,6 +60,33 @@ describe('Expert task host consumes the existing canonical Scale/Form runner',()
   f.setMalformed(false);fireEvent.click(screen.getByRole('button',{name:'提交原生单元'}));await screen.findByText('Native FORM_SECTION')
   const submissions=f.api.mock.calls.filter(([path])=>path.includes('/scale/submit'))
   expect(submissions).toHaveLength(3);expect(submissions.every(([,method,body])=>method==='POST'&&body===payload)).toBe(true)
+ })
+ it('renders directly from inline currentUnit without a secondary GET current-unit request',async()=>{
+  const api=vi.fn(async(path:string,_method?:string,body?:unknown)=>{
+   if(path==='/field-assessments/invitations/invitation/start'){
+    expect(body).toEqual({delivery:'inline'})
+    return {attemptId:'parent',currentUnit:{id:'parent',status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',attemptEpoch:1,currentItem:{id:'scale',type:'SCALE'}}}
+   }
+   throw Error('Unexpected secondary request '+path)
+  })
+  render(<HuiteacherFieldQuestionnaire api={api as EducationReportApi} invitationId="invitation" task={task} onProgress={()=>{}} onExit={()=>{}}/>)
+  fireEvent.click(screen.getByRole('button',{name:'开始或恢复本次观察问卷'}))
+  await screen.findByText('Native SCALE')
+  expect(api.mock.calls.some(([path])=>String(path).includes('view=current-unit'))).toBe(false)
+ })
+ it('still GETs current-unit when inline currentUnit does not match the attempt',async()=>{
+  const api=vi.fn(async(path:string,_method?:string,body?:unknown)=>{
+   if(path==='/field-assessments/invitations/invitation/start'){
+    expect(body).toEqual({delivery:'inline'})
+    return {attemptId:'parent',currentUnit:{id:'other',status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',currentItem:{id:'scale',type:'SCALE'}}}
+   }
+   if(path===parent+'?view=current-unit')return {id:'parent',status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',attemptEpoch:1,currentItem:{id:'form',formSectionId:'section',type:'FORM_SECTION'}}
+   throw Error('Unexpected '+path)
+  })
+  render(<HuiteacherFieldQuestionnaire api={api as EducationReportApi} invitationId="invitation" task={task} onProgress={()=>{}} onExit={()=>{}}/>)
+  fireEvent.click(screen.getByRole('button',{name:'开始或恢复本次观察问卷'}))
+  await screen.findByText('Native FORM_SECTION')
+  expect(api).toHaveBeenCalledWith(parent+'?view=current-unit',undefined,undefined,undefined)
  })
  it('resumes the actual parent and rejects another parent or unit before a transport write',async()=>{
   const {api}=fixture();render(<HuiteacherFieldQuestionnaire api={api} invitationId="invitation" task={{...task,attemptId:'parent'}} onProgress={()=>{}} onExit={()=>{}}/>)
