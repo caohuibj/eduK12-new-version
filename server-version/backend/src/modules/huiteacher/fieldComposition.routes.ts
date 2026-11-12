@@ -44,6 +44,7 @@ router.post('/invitations/:invitationId/start',wrap(async req=>{
   started,
   attemptId:started.attemptId,
   actorUserId:req.user!.userId,
+  authorize:({attemptId,actorUserId})=>currentFieldComposition(prisma,{attemptId,actorUserId}),
   project:projectTeacherCompositeRuntime,
  })
 }))

@@ -144,6 +144,10 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
     started:{state:'STARTED' as const,runtimeBindingKind:'COMPOSITE' as const,runtimeBindingRef:proof.task.runtimeBindingRef,replayed:true as const},
     attemptId:proof.task.runtimeBindingRef,
     actorUserId:req.user!.userId,
+    authorize:async({attemptId,actorUserId})=>{
+     await access.own(actorUserId,{attemptId})
+     await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId)
+    },
     project:projectTeacherCompositeRuntime,
    })
   }
@@ -157,6 +161,10 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
     started:result,
     attemptId:result.runtimeBindingRef,
     actorUserId:req.user!.userId,
+    authorize:async({attemptId,actorUserId})=>{
+     await access.own(actorUserId,{attemptId})
+     await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId)
+    },
     project:projectTeacherCompositeRuntime,
    })
   }

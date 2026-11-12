@@ -109,6 +109,11 @@ router.post('/run-executions/:executionId/start-private-form',authenticateHuitea
   started:result,
   attemptId:result.runtimeBindingRef,
   actorUserId:req.user!.userId,
+  authorize:async({attemptId,actorUserId})=>{
+   const row=await own(actorUserId,{attemptId})
+   if(!row)throw new Error('HUITEACHER_PRIVATE_FORM_ATTEMPT_UNAVAILABLE')
+   return row
+  },
   project:state=>state,
  })
 }))
