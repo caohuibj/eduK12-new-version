@@ -23,6 +23,7 @@ type Start={state:'STARTED'|'IN_PROGRESS'|'WITHHELD';
 
 export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{api:Api}&AssessmentListPresentation){
   const [taskRows,setTasks]=useState<Task[]>([])
+  const [cursor,setCursor]=useState<string|null>(null)
   const [session,setSession]=useState<{api:Api;selected:Task;attempt:CompositeAttemptState}|null>(null)
   const currentApi=useRef(api),sessionRef=useRef(session),sessionEpoch=useRef(0)
   currentApi.current=api;sessionRef.current=session
@@ -74,15 +75,20 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
   const listReady=listCurrent&&listState.loaded
   const tasks=listReady?taskRows:[]
   useEffect(()=>{onListStateChange?.({pending:listPending,error:Boolean(listError),count:tasks.length})},[onListStateChange,listPending,listError,tasks.length])
-  const refresh=useCallback(async()=>{
+  const refresh=useCallback(async(appendCursor?:string)=>{
     if(listSource.current.api!==api||listSource.current.endpoint!=='/my-scale-tasks')return
     const request=++listRequest.current
     const valid=()=>request===listRequest.current&&listSource.current.api===api&&listSource.current.endpoint==='/my-scale-tasks'
+    if(!appendCursor)setCursor(null)
     setListState(old=>({api,endpoint:'/my-scale-tasks',pending:true,error:'',loaded:old.api===api&&old.endpoint==='/my-scale-tasks'&&old.loaded}))
     try{
-      const data=await api<{list:Task[]}>('/my-scale-tasks')
+      const data=await api<{list:Task[];nextCursor?:string|null;truncated?:boolean}>(
+        '/my-scale-tasks'+(appendCursor?'?cursor='+encodeURIComponent(appendCursor):''))
       if(!valid())return
-      setTasks(data.list)
+      // Missing nextCursor (older servers that only set truncated) means this page is the last one.
+      const next=typeof data.nextCursor==='string'&&data.nextCursor?data.nextCursor:null
+      setTasks(old=>appendCursor?[...old,...data.list.filter(row=>!old.some(value=>value.executionId===row.executionId))]:data.list)
+      setCursor(next)
       setListState({api,endpoint:'/my-scale-tasks',pending:false,error:'',loaded:true})
     }catch(error){
       if(valid())setListState(old=>({...old,pending:false,error:error instanceof Error?error.message:'任务列表读取失败，请重试。'}))
@@ -197,6 +203,7 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
         </div>
 
       </article>)}</div>}
+    {listCurrent&&cursor&&<button type="button" disabled={listPending} onClick={()=>void refresh(cursor)}>加载更多Scale任务</button>}
     {visibleFeedback&&<TeacherAssessmentPage kind="feedback" title={visibleFeedback.task.title} onBack={()=>setFeedback(null)}>
       <EducationTaskFeedback key={visibleFeedback.task.executionId} api={api} entry="TEACHER"
         executionId={visibleFeedback.task.executionId} title={visibleFeedback.task.title}

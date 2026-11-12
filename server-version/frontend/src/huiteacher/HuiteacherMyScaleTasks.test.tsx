@@ -126,6 +126,41 @@ it('requests only a receipt from the existing Teacher scale submission endpoint'
  expect(api).toHaveBeenCalledWith('/composite-attempts/existing-attempt/items/scale-item/scale/submit?response=receipt','POST',payload)
 })
 
+it('appends the next Scale page from the opaque cursor and keeps the first page',async()=>{
+  const nextCursor='opaque+cursor/2'
+  const page=(from:number,count:number)=>Array.from({length:count},(_,index)=>({
+    ...task,executionId:'execution-'+(from+index),title:'Scale任务 '+(from+index),runtimeBindingRef:'attempt-'+(from+index),
+  }))
+  const api=vi.fn(async(path:string)=>{
+    if(path==='/my-scale-tasks')return {list:page(0,100),truncated:true,nextCursor}
+    if(path==='/my-scale-tasks?cursor='+encodeURIComponent(nextCursor))return {list:page(100,2),truncated:false,nextCursor:null}
+    throw Error('Unexpected path '+path)
+  })
+  render(<HuiteacherMyScaleTasks api={api as Parameters<typeof HuiteacherMyScaleTasks>[0]['api']}/>)
+  expect(await screen.findByText('Scale任务 0')).toBeInTheDocument()
+  expect(screen.getByText('Scale任务 99')).toBeInTheDocument()
+  expect(api.mock.calls[0]).toEqual(['/my-scale-tasks'])
+  fireEvent.click(screen.getByRole('button',{name:'加载更多Scale任务'}))
+  expect(await screen.findByText('Scale任务 100')).toBeInTheDocument()
+  expect(screen.getByText('Scale任务 101')).toBeInTheDocument()
+  expect(screen.getByText('Scale任务 0')).toBeInTheDocument()
+  expect(screen.getByText('Scale任务 99')).toBeInTheDocument()
+  expect(api.mock.calls[1][0]).toBe('/my-scale-tasks?cursor='+encodeURIComponent(nextCursor))
+  expect(new URL(String(api.mock.calls[1][0]),'https://fixture.invalid').searchParams.get('cursor')).toBe(nextCursor)
+  expect(screen.queryByRole('button',{name:'加载更多Scale任务'})).not.toBeInTheDocument()
+})
+
+it('keeps the first page when an older server reports truncation without a cursor',async()=>{
+  const api=vi.fn(async(path:string)=>{
+    if(path==='/my-scale-tasks')return {list:[{...task,title:'仅第一页'}],truncated:true}
+    throw Error('Unexpected path '+path)
+  })
+  render(<HuiteacherMyScaleTasks api={api as Parameters<typeof HuiteacherMyScaleTasks>[0]['api']}/>)
+  expect(await screen.findByText('仅第一页')).toBeInTheDocument()
+  expect(screen.queryByRole('button',{name:'加载更多Scale任务'})).not.toBeInTheDocument()
+  expect(api.mock.calls).toEqual([['/my-scale-tasks']])
+})
+
 it('opens feedback from completed parent reload while a list refresh stays pending, without duplicate completion reads',async()=>{
  let parentReads=0,lists=0
  const api=vi.fn(async(path:string)=>{
