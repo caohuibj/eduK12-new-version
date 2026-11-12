@@ -1,0 +1,499 @@
+{
+  "recordType": "research_handoff_not_backend_payload",
+  "family": "Cultivate",
+  "wave": "CPS 2026–27 / SY27",
+  "sourceLanguage": "en",
+  "retrievedOn": "2026-11-02",
+  "sourceUrl": "https://uchicagoimpact.org/sites/default/files/SY27_CPS_Cultivate_Codebook_FINAL.pdf",
+  "sourcePdfSha256": "6396e19ade910c11b8a92f433afc91c27a649d5074fc3c3354c145dc93feac8f",
+  "manualUrl": "https://uchicagoimpact.org/sites/default/files/CPS%20SY27%20Cultivate%20Survey%20Manual.pdf",
+  "manualPdfSha256": "3381ce12055376f4614c0508ee158e1e4ec7bcbbbd59e95be0b023918a5c3641",
+  "baseSha": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "licenseStatus": "CC_BY_NC_3_0_STATED_EXPLICIT_PERMISSION_SCOPE_UNCONFIRMED",
+  "children": [
+    {
+      "key": "cultivate_sy27_meaningful_work_en",
+      "name": "Cultivate｜有意义的学习任务｜5–12年级｜学生填答",
+      "sourceBlock": 2,
+      "sourceItemIds": [
+        "Q02_01",
+        "Q02_02",
+        "Q02_03",
+        "Q02_04",
+        "Q02_05"
+      ],
+      "itemCount": 5,
+      "kind": "SCALE_CANDIDATE",
+      "mappingStatus": "PROVISIONAL_SEMANTIC_MAPPING",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY"
+    },
+    {
+      "key": "cultivate_sy27_learning_goals_en",
+      "name": "Cultivate｜学习目标｜5–12年级｜学生填答",
+      "sourceBlock": 3,
+      "sourceItemIds": [
+        "Q03_01",
+        "Q03_02",
+        "Q03_03",
+        "Q03_04"
+      ],
+      "itemCount": 4,
+      "kind": "SCALE_CANDIDATE",
+      "mappingStatus": "PROVISIONAL_SEMANTIC_MAPPING",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY"
+    },
+    {
+      "key": "cultivate_sy27_well_organized_classroom_en",
+      "name": "Cultivate｜课堂组织｜5–12年级｜学生填答",
+      "sourceBlock": 4,
+      "sourceItemIds": [
+        "Q04_01",
+        "Q04_02",
+        "Q04_03",
+        "Q04_04"
+      ],
+      "itemCount": 4,
+      "kind": "SCALE_CANDIDATE",
+      "mappingStatus": "PROVISIONAL_SEMANTIC_MAPPING",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY"
+    },
+    {
+      "key": "cultivate_sy27_supportive_teaching_en",
+      "name": "Cultivate｜支持性教学｜5–12年级｜学生填答",
+      "sourceBlock": 5,
+      "sourceItemIds": [
+        "Q05_01",
+        "Q05_02",
+        "Q05_03",
+        "Q05_04",
+        "Q05_05"
+      ],
+      "itemCount": 5,
+      "kind": "SCALE_CANDIDATE",
+      "mappingStatus": "PROVISIONAL_SEMANTIC_MAPPING",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY"
+    },
+    {
+      "key": "cultivate_sy27_feedback_for_growth_en",
+      "name": "Cultivate｜促进成长的反馈｜5–12年级｜学生填答",
+      "sourceBlock": 6,
+      "sourceItemIds": [
+        "Q06_01",
+        "Q06_02",
+        "Q06_03",
+        "Q06_04",
+        "Q06_05"
+      ],
+      "itemCount": 5,
+      "kind": "SCALE_CANDIDATE",
+      "mappingStatus": "PROVISIONAL_SEMANTIC_MAPPING",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY"
+    },
+    {
+      "key": "cultivate_sy27_classroom_community_en",
+      "name": "Cultivate｜课堂共同体｜5–12年级｜学生填答",
+      "sourceBlock": 7,
+      "sourceItemIds": [
+        "Q07_01",
+        "Q07_02",
+        "Q07_03",
+        "Q07_04",
+        "Q07_05",
+        "Q07_06"
+      ],
+      "itemCount": 6,
+      "kind": "SCALE_CANDIDATE",
+      "mappingStatus": "PROVISIONAL_SEMANTIC_MAPPING",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY"
+    },
+    {
+      "key": "cultivate_sy27_student_voice_en",
+      "name": "Cultivate｜学生声音｜5–12年级｜学生填答",
+      "sourceBlock": 8,
+      "sourceItemIds": [
+        "Q08_01",
+        "Q08_02",
+        "Q08_03"
+      ],
+      "itemCount": 3,
+      "kind": "SCALE_CANDIDATE",
+      "mappingStatus": "PROVISIONAL_SEMANTIC_MAPPING",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY"
+    },
+    {
+      "key": "cultivate_sy27_teacher_caring_en",
+      "name": "Cultivate｜教师关怀｜5–12年级｜学生填答",
+      "sourceBlock": 9,
+      "sourceItemIds": [
+        "Q09_01",
+        "Q09_02",
+        "Q09_03",
+        "Q09_04"
+      ],
+      "itemCount": 4,
+      "kind": "SCALE_CANDIDATE",
+      "mappingStatus": "PROVISIONAL_SEMANTIC_MAPPING",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY"
+    },
+    {
+      "key": "cultivate_sy27_affirming_identities_en",
+      "name": "Cultivate｜身份认同支持｜5–12年级｜学生填答",
+      "sourceBlock": 10,
+      "sourceItemIds": [
+        "Q10_01",
+        "Q10_02",
+        "Q10_03",
+        "Q10_04"
+      ],
+      "itemCount": 4,
+      "kind": "SCALE_CANDIDATE",
+      "mappingStatus": "PROVISIONAL_SEMANTIC_MAPPING",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY"
+    },
+    {
+      "key": "cultivate_sy27_subject_context_en",
+      "name": "Cultivate｜课程背景｜5–12年级｜学生填答",
+      "sourceBlock": 1,
+      "sourceItemIds": [
+        "Q01"
+      ],
+      "itemCount": 1,
+      "kind": "UNSCORED_FORM_CANDIDATE",
+      "descriptionType": "FACTUAL",
+      "page": 2,
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "DOCUMENTED_ONLY_NO_NATIVE_PAYLOAD",
+      "evaluationTarget": "classroom"
+    },
+    {
+      "key": "cultivate_sy27_beliefs_q11_en",
+      "name": "Cultivate｜学习信念 Q11｜5–12年级｜学生填答",
+      "sourceBlock": 11,
+      "sourceItemIds": [
+        "Q11_01",
+        "Q11_02",
+        "Q11_03"
+      ],
+      "itemCount": 3,
+      "kind": "UNSCORED_FORM_CANDIDATE",
+      "descriptionType": "DESCRIPTIVE",
+      "page": 4,
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "DOCUMENTED_ONLY_NO_NATIVE_PAYLOAD",
+      "evaluationTarget": "classroom"
+    },
+    {
+      "key": "cultivate_sy27_beliefs_q12_en",
+      "name": "Cultivate｜学习信念 Q12｜5–12年级｜学生填答",
+      "sourceBlock": 12,
+      "sourceItemIds": [
+        "Q12_01",
+        "Q12_02",
+        "Q12_03"
+      ],
+      "itemCount": 3,
+      "kind": "UNSCORED_FORM_CANDIDATE",
+      "descriptionType": "DESCRIPTIVE",
+      "page": 5,
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "DOCUMENTED_ONLY_NO_NATIVE_PAYLOAD",
+      "evaluationTarget": "classroom"
+    },
+    {
+      "key": "cultivate_sy27_beliefs_q13_en",
+      "name": "Cultivate｜学习信念 Q13｜5–12年级｜学生填答",
+      "sourceBlock": 13,
+      "sourceItemIds": [
+        "Q13_01",
+        "Q13_02",
+        "Q13_03"
+      ],
+      "itemCount": 3,
+      "kind": "UNSCORED_FORM_CANDIDATE",
+      "descriptionType": "DESCRIPTIVE",
+      "page": 5,
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "DOCUMENTED_ONLY_NO_NATIVE_PAYLOAD",
+      "evaluationTarget": "classroom"
+    },
+    {
+      "key": "cultivate_sy27_beliefs_q14_en",
+      "name": "Cultivate｜学习信念 Q14｜5–12年级｜学生填答",
+      "sourceBlock": 14,
+      "sourceItemIds": [
+        "Q14_01",
+        "Q14_02"
+      ],
+      "itemCount": 2,
+      "kind": "UNSCORED_FORM_CANDIDATE",
+      "descriptionType": "DESCRIPTIVE",
+      "page": 5,
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "DOCUMENTED_ONLY_NO_NATIVE_PAYLOAD",
+      "evaluationTarget": "classroom"
+    },
+    {
+      "key": "cultivate_sy27_beliefs_q15_en",
+      "name": "Cultivate｜学习信念 Q15｜5–12年级｜学生填答",
+      "sourceBlock": 15,
+      "sourceItemIds": [
+        "Q15_01",
+        "Q15_02",
+        "Q15_03"
+      ],
+      "itemCount": 3,
+      "kind": "UNSCORED_FORM_CANDIDATE",
+      "descriptionType": "DESCRIPTIVE",
+      "page": 5,
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "DOCUMENTED_ONLY_NO_NATIVE_PAYLOAD",
+      "evaluationTarget": "classroom"
+    },
+    {
+      "key": "cultivate_sy27_beliefs_q16_en",
+      "name": "Cultivate｜学习信念 Q16｜5–12年级｜学生填答",
+      "sourceBlock": 16,
+      "sourceItemIds": [
+        "Q16_01",
+        "Q16_02",
+        "Q16_03"
+      ],
+      "itemCount": 3,
+      "kind": "UNSCORED_FORM_CANDIDATE",
+      "descriptionType": "DESCRIPTIVE",
+      "page": 5,
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "DOCUMENTED_ONLY_NO_NATIVE_PAYLOAD",
+      "evaluationTarget": "classroom"
+    },
+    {
+      "key": "cultivate_sy27_strategies_q17_en",
+      "name": "Cultivate｜学习策略 Q17｜5–12年级｜学生填答",
+      "sourceBlock": 17,
+      "sourceItemIds": [
+        "Q17_01",
+        "Q17_02"
+      ],
+      "itemCount": 2,
+      "kind": "UNSCORED_FORM_CANDIDATE",
+      "descriptionType": "DESCRIPTIVE",
+      "page": 5,
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "DOCUMENTED_ONLY_NO_NATIVE_PAYLOAD",
+      "evaluationTarget": "classroom"
+    },
+    {
+      "key": "cultivate_sy27_strategies_q18_en",
+      "name": "Cultivate｜学习策略 Q18｜5–12年级｜学生填答",
+      "sourceBlock": 18,
+      "sourceItemIds": [
+        "Q18_01",
+        "Q18_02"
+      ],
+      "itemCount": 2,
+      "kind": "UNSCORED_FORM_CANDIDATE",
+      "descriptionType": "DESCRIPTIVE",
+      "page": 5,
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "DOCUMENTED_ONLY_NO_NATIVE_PAYLOAD",
+      "evaluationTarget": "classroom"
+    },
+    {
+      "key": "cultivate_sy27_beliefs_q19_en",
+      "name": "Cultivate｜学习信念 Q19｜5–12年级｜学生填答",
+      "sourceBlock": 19,
+      "sourceItemIds": [
+        "Q19_01",
+        "Q19_02"
+      ],
+      "itemCount": 2,
+      "kind": "UNSCORED_FORM_CANDIDATE",
+      "descriptionType": "DESCRIPTIVE",
+      "page": 6,
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "DOCUMENTED_ONLY_NO_NATIVE_PAYLOAD",
+      "evaluationTarget": "classroom"
+    },
+    {
+      "key": "cultivate_sy27_motivation_q20_en",
+      "name": "Cultivate｜学习动机 Q20｜5–12年级｜学生填答",
+      "sourceBlock": 20,
+      "sourceItemIds": [
+        "Q20"
+      ],
+      "itemCount": 1,
+      "kind": "UNSCORED_FORM_CANDIDATE",
+      "descriptionType": "DESCRIPTIVE",
+      "page": 6,
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "DOCUMENTED_ONLY_NO_NATIVE_PAYLOAD",
+      "evaluationTarget": "classroom"
+    },
+    {
+      "key": "cultivate_sy27_test_classroom_q21_en",
+      "name": "Cultivate｜课堂 TEST 题块 Q21｜5–12年级｜学生填答",
+      "sourceBlock": 21,
+      "sourceItemIds": [
+        "Q21_01",
+        "Q21_02",
+        "Q21_03",
+        "Q21_04"
+      ],
+      "itemCount": 4,
+      "kind": "UNSCORED_FORM_CANDIDATE",
+      "descriptionType": "TEST_DESCRIPTIVE",
+      "page": 6,
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "DOCUMENTED_ONLY_NO_NATIVE_PAYLOAD",
+      "evaluationTarget": "classroom"
+    },
+    {
+      "key": "cultivate_sy27_feedback_impact_q22_en",
+      "name": "Cultivate｜反馈用途预期 Q22｜5–12年级｜学生填答",
+      "sourceBlock": 22,
+      "sourceItemIds": [
+        "Q22_01"
+      ],
+      "itemCount": 1,
+      "kind": "UNSCORED_FORM_CANDIDATE",
+      "descriptionType": "DESCRIPTIVE",
+      "page": 6,
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "DOCUMENTED_ONLY_NO_NATIVE_PAYLOAD",
+      "evaluationTarget": "classroom"
+    },
+    {
+      "key": "cultivate_sy27_test_school_voice_q23_en",
+      "name": "Cultivate｜学校 TEST 题块 Q23｜5–12年级｜学生填答",
+      "sourceBlock": 23,
+      "sourceItemIds": [
+        "Q23_01",
+        "Q23_02",
+        "Q23_03",
+        "Q23_04",
+        "Q23_05"
+      ],
+      "itemCount": 5,
+      "kind": "UNSCORED_FORM_CANDIDATE",
+      "descriptionType": "TEST_DESCRIPTIVE",
+      "page": 6,
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "status": "DOCUMENTED_ONLY_NO_NATIVE_PAYLOAD",
+      "evaluationTarget": "school"
+    }
+  ],
+  "ordinaryCompositeCandidate": {
+    "key": "cultivate_sy27_original_order_en",
+    "nativePayloadCreated": false,
+    "sourceOrder": [
+      "cultivate_sy27_subject_context_en",
+      "cultivate_sy27_meaningful_work_en",
+      "cultivate_sy27_learning_goals_en",
+      "cultivate_sy27_well_organized_classroom_en",
+      "cultivate_sy27_supportive_teaching_en",
+      "cultivate_sy27_feedback_for_growth_en",
+      "cultivate_sy27_classroom_community_en",
+      "cultivate_sy27_student_voice_en",
+      "cultivate_sy27_teacher_caring_en",
+      "cultivate_sy27_affirming_identities_en",
+      "cultivate_sy27_beliefs_q11_en",
+      "cultivate_sy27_beliefs_q12_en",
+      "cultivate_sy27_beliefs_q13_en",
+      "cultivate_sy27_beliefs_q14_en",
+      "cultivate_sy27_beliefs_q15_en",
+      "cultivate_sy27_beliefs_q16_en",
+      "cultivate_sy27_strategies_q17_en",
+      "cultivate_sy27_strategies_q18_en",
+      "cultivate_sy27_beliefs_q19_en",
+      "cultivate_sy27_motivation_q20_en",
+      "cultivate_sy27_test_classroom_q21_en",
+      "cultivate_sy27_feedback_impact_q22_en",
+      "cultivate_sy27_test_school_voice_q23_en"
+    ],
+    "preserveOriginalTargetAndRouting": true,
+    "crossToolTotalScore": false
+  },
+  "databaseStatus": "NOT_IMPORTED_CATALOG_ONLY",
+  "productionDedupStatus": "NOT_CHECKED",
+  "resolutionFollowup": {
+    "document": "resolution-20261102.md",
+    "sourceCompleteness": "Q1-Q23 / 75 answer units complete",
+    "permissionInterpretation": "Explicit CC BY-NC3.0 grant supports defined noncommercial school-improvement/research use; no standalone authorization letter is universally required. Actual EduK12 use facts remain unspecified; extra permission for commercial use and any unresolved custom approval scope must be confirmed as applicable.",
+    "privateNativePreparation": {
+      "forms": 23,
+      "answerUnits": 75,
+      "answerChecks": 179,
+      "status": "PASS_SCHEMA_AND_RUNTIME",
+      "originalItemTextInGit": false,
+      "databaseImports": 0,
+      "mapping": "digital-mapping.json",
+      "validation": "private-native-validation.json"
+    },
+    "officialScoring": "Not obtained; not a blocker for unscored Form",
+    "requiredNextFact": "project purpose, commercial/fee bundle, audience, redistribution and translation scope"
+  }
+}
