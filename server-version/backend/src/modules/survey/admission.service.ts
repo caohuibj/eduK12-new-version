@@ -10,7 +10,7 @@ import { surveyAdmissionGate } from './survey-admission-gate'
 import { SurveyWaveError } from './waves.service'
 import type { ResearchFrozenPublication } from './publication.service'
 import { allocateResearchFlowOnAdmission } from './flow.assignment'
-import {bindSurveyAttemptContent} from './content-binding.service'
+import {bindSurveyAttemptContent,type PreparedSurveyPublicationDigest} from './content-binding.service'
 import { canonicalHash } from '../assessment-runtime/canonical'
 
 type Tx=Prisma.TransactionClient
@@ -109,6 +109,17 @@ export async function getPublicResearchInfo(publicId:string,entryToken?:string){
         consentText:disclosedSurveyConsent(wave.consentText,{measurementNotice})}))}
   })
 }
+async function preparePublicationDigest(projectId:string,waveId:string):Promise<{
+  preparedDigest:PreparedSurveyPublicationDigest;preparedSnapshot:ResearchFrozenPublication
+}|undefined>{
+  // Preview is outside the wave lock. A missing row or snapshot omits both values;
+  // admission then reads and hashes under the lock. Hash the raw Prisma value.
+  const wave=await prisma.surveyWave?.findFirst?.({where:{id:waveId,projectId},
+    select:{publicationId:true,publication:{select:{id:true,compiledSnapshot:true}}}})
+  if(!wave?.publicationId||!wave.publication?.compiledSnapshot)return undefined
+  const snapshot=wave.publication.compiledSnapshot as unknown as ResearchFrozenPublication
+  return {preparedDigest:{publicationId:wave.publication.id,snapshotDigest:canonicalHash(snapshot)},preparedSnapshot:snapshot}
+}
 /** Opt-in pseudonymous T1 or late-join only, using a separate high-entropy
  * recruitment bearer. The private participant secret is shown only once.
  */
@@ -171,6 +182,7 @@ export async function startLinkedWave(input:{
     projectId:project.id,researchCode:input.researchCode,
     accessCredential:input.accessCredential,
   })
+  const prepared=await preparePublicationDigest(project.id,input.waveId)
   return await surveyAdmissionGate().run(() => prisma.$transaction(async tx=>{
     const wave=await openWaveLocked(tx,project.id,input.waveId,true)
     // Project-scoped credential remains valid at the moment of admission.
@@ -191,7 +203,7 @@ export async function startLinkedWave(input:{
       projectId:project.id,waveId:wave.id,participantId:identity.participantId,
     }})
     if(previous){
-      await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:previous.id,publicationId:wave.publicationId!,newAttempt:false})
+      await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:previous.id,publicationId:wave.publicationId!,newAttempt:false,...(prepared??{})})
       return {attemptId:previous.id,waveId:wave.id,status:previous.status,recovered:true}
     }
     if(!hasQuota(wave))blocked('本波次参与名额已用尽')
@@ -208,9 +220,9 @@ export async function startLinkedWave(input:{
     await allocateResearchFlowOnAdmission(tx,{
       publicationId:wave.publicationId!,projectId:project.id,waveId:wave.id,
       attemptId:row.id,participantId:identity.participantId,
-      researchCode:input.researchCode,accessCredential:input.accessCredential,
+      researchCode:input.researchCode,accessCredential:input.accessCredential,...(prepared??{}),
     })
-    await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:row.id,publicationId:wave.publicationId!,newAttempt:true})
+    await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:row.id,publicationId:wave.publicationId!,newAttempt:true,...(prepared??{})})
     return {attemptId:row.id,waveId:wave.id,status:'STARTED',recovered:false}
   }))
 }
@@ -235,6 +247,7 @@ export async function startSingleUnlinkedWave(input:{
   const operationKeyHash=legacy?null:hashResearchCredential(input.operationKey!)
   const sessionHash=hashResearchCredential(legacy?serverSession!.accessCredential:input.accessCredential!)
   const bearer=legacy?serverSession!.accessCredential:input.accessCredential!
+  const prepared=await preparePublicationDigest(project.id,input.waveId)
   return await surveyAdmissionGate().run(() => prisma.$transaction(async tx=>{
     const wave=await openWaveLocked(tx,project.id,input.waveId,false)
     await validateEntry(tx,project.id,wave.id,input.entryToken)
@@ -252,7 +265,7 @@ export async function startSingleUnlinkedWave(input:{
       }})
       if(previous){
         if(previous.sessionHash!==sessionHash)blocked('开始凭证与本轮记录不匹配')
-        await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:previous.id,publicationId:wave.publicationId!,newAttempt:false})
+        await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:previous.id,publicationId:wave.publicationId!,newAttempt:false,...(prepared??{})})
         return {attemptId:previous.id,waveId:wave.id,status:previous.status,recovered:true,accessCredential:bearer}
       }
     }
@@ -269,9 +282,9 @@ export async function startSingleUnlinkedWave(input:{
     }})
     await allocateResearchFlowOnAdmission(tx,{
       publicationId:wave.publicationId!,projectId:project.id,waveId:wave.id,
-      attemptId:row.id,participantId:null,accessCredential:bearer,
+      attemptId:row.id,participantId:null,accessCredential:bearer,...(prepared??{}),
     })
-    await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:row.id,publicationId:wave.publicationId!,newAttempt:true})
+    await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:row.id,publicationId:wave.publicationId!,newAttempt:true,...(prepared??{})})
     return {attemptId:row.id,waveId:wave.id,status:'STARTED',
       recovered:false,accessCredential:bearer}
   }))
