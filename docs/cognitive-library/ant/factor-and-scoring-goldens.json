@@ -1,0 +1,1296 @@
+{
+  "oracle_status": "design fixtures, not task execution results",
+  "cells": [
+    {
+      "cell_id": "none:neutral:up:left",
+      "cue": "none",
+      "flanker": "neutral",
+      "location": "up",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "line",
+        "line",
+        "left",
+        "line",
+        "line"
+      ],
+      "cue_centers": [],
+      "synthetic_correct_rt_ms": 500
+    },
+    {
+      "cell_id": "none:neutral:up:right",
+      "cue": "none",
+      "flanker": "neutral",
+      "location": "up",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "line",
+        "line",
+        "right",
+        "line",
+        "line"
+      ],
+      "cue_centers": [],
+      "synthetic_correct_rt_ms": 500
+    },
+    {
+      "cell_id": "none:neutral:down:left",
+      "cue": "none",
+      "flanker": "neutral",
+      "location": "down",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "line",
+        "line",
+        "left",
+        "line",
+        "line"
+      ],
+      "cue_centers": [],
+      "synthetic_correct_rt_ms": 500
+    },
+    {
+      "cell_id": "none:neutral:down:right",
+      "cue": "none",
+      "flanker": "neutral",
+      "location": "down",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "line",
+        "line",
+        "right",
+        "line",
+        "line"
+      ],
+      "cue_centers": [],
+      "synthetic_correct_rt_ms": 500
+    },
+    {
+      "cell_id": "none:congruent:up:left",
+      "cue": "none",
+      "flanker": "congruent",
+      "location": "up",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "left",
+        "left",
+        "left",
+        "left",
+        "left"
+      ],
+      "cue_centers": [],
+      "synthetic_correct_rt_ms": 510
+    },
+    {
+      "cell_id": "none:congruent:up:right",
+      "cue": "none",
+      "flanker": "congruent",
+      "location": "up",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "right",
+        "right",
+        "right",
+        "right",
+        "right"
+      ],
+      "cue_centers": [],
+      "synthetic_correct_rt_ms": 510
+    },
+    {
+      "cell_id": "none:congruent:down:left",
+      "cue": "none",
+      "flanker": "congruent",
+      "location": "down",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "left",
+        "left",
+        "left",
+        "left",
+        "left"
+      ],
+      "cue_centers": [],
+      "synthetic_correct_rt_ms": 510
+    },
+    {
+      "cell_id": "none:congruent:down:right",
+      "cue": "none",
+      "flanker": "congruent",
+      "location": "down",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "right",
+        "right",
+        "right",
+        "right",
+        "right"
+      ],
+      "cue_centers": [],
+      "synthetic_correct_rt_ms": 510
+    },
+    {
+      "cell_id": "none:incongruent:up:left",
+      "cue": "none",
+      "flanker": "incongruent",
+      "location": "up",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "right",
+        "right",
+        "left",
+        "right",
+        "right"
+      ],
+      "cue_centers": [],
+      "synthetic_correct_rt_ms": 580
+    },
+    {
+      "cell_id": "none:incongruent:up:right",
+      "cue": "none",
+      "flanker": "incongruent",
+      "location": "up",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "left",
+        "left",
+        "right",
+        "left",
+        "left"
+      ],
+      "cue_centers": [],
+      "synthetic_correct_rt_ms": 580
+    },
+    {
+      "cell_id": "none:incongruent:down:left",
+      "cue": "none",
+      "flanker": "incongruent",
+      "location": "down",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "right",
+        "right",
+        "left",
+        "right",
+        "right"
+      ],
+      "cue_centers": [],
+      "synthetic_correct_rt_ms": 580
+    },
+    {
+      "cell_id": "none:incongruent:down:right",
+      "cue": "none",
+      "flanker": "incongruent",
+      "location": "down",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "left",
+        "left",
+        "right",
+        "left",
+        "left"
+      ],
+      "cue_centers": [],
+      "synthetic_correct_rt_ms": 580
+    },
+    {
+      "cell_id": "center:neutral:up:left",
+      "cue": "center",
+      "flanker": "neutral",
+      "location": "up",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "line",
+        "line",
+        "left",
+        "line",
+        "line"
+      ],
+      "cue_centers": [
+        [
+          0,
+          0
+        ]
+      ],
+      "synthetic_correct_rt_ms": 460
+    },
+    {
+      "cell_id": "center:neutral:up:right",
+      "cue": "center",
+      "flanker": "neutral",
+      "location": "up",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "line",
+        "line",
+        "right",
+        "line",
+        "line"
+      ],
+      "cue_centers": [
+        [
+          0,
+          0
+        ]
+      ],
+      "synthetic_correct_rt_ms": 460
+    },
+    {
+      "cell_id": "center:neutral:down:left",
+      "cue": "center",
+      "flanker": "neutral",
+      "location": "down",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "line",
+        "line",
+        "left",
+        "line",
+        "line"
+      ],
+      "cue_centers": [
+        [
+          0,
+          0
+        ]
+      ],
+      "synthetic_correct_rt_ms": 460
+    },
+    {
+      "cell_id": "center:neutral:down:right",
+      "cue": "center",
+      "flanker": "neutral",
+      "location": "down",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "line",
+        "line",
+        "right",
+        "line",
+        "line"
+      ],
+      "cue_centers": [
+        [
+          0,
+          0
+        ]
+      ],
+      "synthetic_correct_rt_ms": 460
+    },
+    {
+      "cell_id": "center:congruent:up:left",
+      "cue": "center",
+      "flanker": "congruent",
+      "location": "up",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "left",
+        "left",
+        "left",
+        "left",
+        "left"
+      ],
+      "cue_centers": [
+        [
+          0,
+          0
+        ]
+      ],
+      "synthetic_correct_rt_ms": 470
+    },
+    {
+      "cell_id": "center:congruent:up:right",
+      "cue": "center",
+      "flanker": "congruent",
+      "location": "up",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "right",
+        "right",
+        "right",
+        "right",
+        "right"
+      ],
+      "cue_centers": [
+        [
+          0,
+          0
+        ]
+      ],
+      "synthetic_correct_rt_ms": 470
+    },
+    {
+      "cell_id": "center:congruent:down:left",
+      "cue": "center",
+      "flanker": "congruent",
+      "location": "down",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "left",
+        "left",
+        "left",
+        "left",
+        "left"
+      ],
+      "cue_centers": [
+        [
+          0,
+          0
+        ]
+      ],
+      "synthetic_correct_rt_ms": 470
+    },
+    {
+      "cell_id": "center:congruent:down:right",
+      "cue": "center",
+      "flanker": "congruent",
+      "location": "down",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "right",
+        "right",
+        "right",
+        "right",
+        "right"
+      ],
+      "cue_centers": [
+        [
+          0,
+          0
+        ]
+      ],
+      "synthetic_correct_rt_ms": 470
+    },
+    {
+      "cell_id": "center:incongruent:up:left",
+      "cue": "center",
+      "flanker": "incongruent",
+      "location": "up",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "right",
+        "right",
+        "left",
+        "right",
+        "right"
+      ],
+      "cue_centers": [
+        [
+          0,
+          0
+        ]
+      ],
+      "synthetic_correct_rt_ms": 540
+    },
+    {
+      "cell_id": "center:incongruent:up:right",
+      "cue": "center",
+      "flanker": "incongruent",
+      "location": "up",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "left",
+        "left",
+        "right",
+        "left",
+        "left"
+      ],
+      "cue_centers": [
+        [
+          0,
+          0
+        ]
+      ],
+      "synthetic_correct_rt_ms": 540
+    },
+    {
+      "cell_id": "center:incongruent:down:left",
+      "cue": "center",
+      "flanker": "incongruent",
+      "location": "down",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "right",
+        "right",
+        "left",
+        "right",
+        "right"
+      ],
+      "cue_centers": [
+        [
+          0,
+          0
+        ]
+      ],
+      "synthetic_correct_rt_ms": 540
+    },
+    {
+      "cell_id": "center:incongruent:down:right",
+      "cue": "center",
+      "flanker": "incongruent",
+      "location": "down",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "left",
+        "left",
+        "right",
+        "left",
+        "left"
+      ],
+      "cue_centers": [
+        [
+          0,
+          0
+        ]
+      ],
+      "synthetic_correct_rt_ms": 540
+    },
+    {
+      "cell_id": "double:neutral:up:left",
+      "cue": "double",
+      "flanker": "neutral",
+      "location": "up",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "line",
+        "line",
+        "left",
+        "line",
+        "line"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ],
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 400
+    },
+    {
+      "cell_id": "double:neutral:up:right",
+      "cue": "double",
+      "flanker": "neutral",
+      "location": "up",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "line",
+        "line",
+        "right",
+        "line",
+        "line"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ],
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 400
+    },
+    {
+      "cell_id": "double:neutral:down:left",
+      "cue": "double",
+      "flanker": "neutral",
+      "location": "down",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "line",
+        "line",
+        "left",
+        "line",
+        "line"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ],
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 400
+    },
+    {
+      "cell_id": "double:neutral:down:right",
+      "cue": "double",
+      "flanker": "neutral",
+      "location": "down",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "line",
+        "line",
+        "right",
+        "line",
+        "line"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ],
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 400
+    },
+    {
+      "cell_id": "double:congruent:up:left",
+      "cue": "double",
+      "flanker": "congruent",
+      "location": "up",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "left",
+        "left",
+        "left",
+        "left",
+        "left"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ],
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 410
+    },
+    {
+      "cell_id": "double:congruent:up:right",
+      "cue": "double",
+      "flanker": "congruent",
+      "location": "up",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "right",
+        "right",
+        "right",
+        "right",
+        "right"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ],
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 410
+    },
+    {
+      "cell_id": "double:congruent:down:left",
+      "cue": "double",
+      "flanker": "congruent",
+      "location": "down",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "left",
+        "left",
+        "left",
+        "left",
+        "left"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ],
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 410
+    },
+    {
+      "cell_id": "double:congruent:down:right",
+      "cue": "double",
+      "flanker": "congruent",
+      "location": "down",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "right",
+        "right",
+        "right",
+        "right",
+        "right"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ],
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 410
+    },
+    {
+      "cell_id": "double:incongruent:up:left",
+      "cue": "double",
+      "flanker": "incongruent",
+      "location": "up",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "right",
+        "right",
+        "left",
+        "right",
+        "right"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ],
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 480
+    },
+    {
+      "cell_id": "double:incongruent:up:right",
+      "cue": "double",
+      "flanker": "incongruent",
+      "location": "up",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "left",
+        "left",
+        "right",
+        "left",
+        "left"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ],
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 480
+    },
+    {
+      "cell_id": "double:incongruent:down:left",
+      "cue": "double",
+      "flanker": "incongruent",
+      "location": "down",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "right",
+        "right",
+        "left",
+        "right",
+        "right"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ],
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 480
+    },
+    {
+      "cell_id": "double:incongruent:down:right",
+      "cue": "double",
+      "flanker": "incongruent",
+      "location": "down",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "left",
+        "left",
+        "right",
+        "left",
+        "left"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ],
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 480
+    },
+    {
+      "cell_id": "spatial:neutral:up:left",
+      "cue": "spatial",
+      "flanker": "neutral",
+      "location": "up",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "line",
+        "line",
+        "left",
+        "line",
+        "line"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 420
+    },
+    {
+      "cell_id": "spatial:neutral:up:right",
+      "cue": "spatial",
+      "flanker": "neutral",
+      "location": "up",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "line",
+        "line",
+        "right",
+        "line",
+        "line"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 420
+    },
+    {
+      "cell_id": "spatial:neutral:down:left",
+      "cue": "spatial",
+      "flanker": "neutral",
+      "location": "down",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "line",
+        "line",
+        "left",
+        "line",
+        "line"
+      ],
+      "cue_centers": [
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 420
+    },
+    {
+      "cell_id": "spatial:neutral:down:right",
+      "cue": "spatial",
+      "flanker": "neutral",
+      "location": "down",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "line",
+        "line",
+        "right",
+        "line",
+        "line"
+      ],
+      "cue_centers": [
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 420
+    },
+    {
+      "cell_id": "spatial:congruent:up:left",
+      "cue": "spatial",
+      "flanker": "congruent",
+      "location": "up",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "left",
+        "left",
+        "left",
+        "left",
+        "left"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 430
+    },
+    {
+      "cell_id": "spatial:congruent:up:right",
+      "cue": "spatial",
+      "flanker": "congruent",
+      "location": "up",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "right",
+        "right",
+        "right",
+        "right",
+        "right"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 430
+    },
+    {
+      "cell_id": "spatial:congruent:down:left",
+      "cue": "spatial",
+      "flanker": "congruent",
+      "location": "down",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "left",
+        "left",
+        "left",
+        "left",
+        "left"
+      ],
+      "cue_centers": [
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 430
+    },
+    {
+      "cell_id": "spatial:congruent:down:right",
+      "cue": "spatial",
+      "flanker": "congruent",
+      "location": "down",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "right",
+        "right",
+        "right",
+        "right",
+        "right"
+      ],
+      "cue_centers": [
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 430
+    },
+    {
+      "cell_id": "spatial:incongruent:up:left",
+      "cue": "spatial",
+      "flanker": "incongruent",
+      "location": "up",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "right",
+        "right",
+        "left",
+        "right",
+        "right"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 500
+    },
+    {
+      "cell_id": "spatial:incongruent:up:right",
+      "cue": "spatial",
+      "flanker": "incongruent",
+      "location": "up",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "left",
+        "left",
+        "right",
+        "left",
+        "left"
+      ],
+      "cue_centers": [
+        [
+          0,
+          -1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 500
+    },
+    {
+      "cell_id": "spatial:incongruent:down:left",
+      "cue": "spatial",
+      "flanker": "incongruent",
+      "location": "down",
+      "direction": "left",
+      "correct_key": "ArrowLeft",
+      "elements": [
+        "right",
+        "right",
+        "left",
+        "right",
+        "right"
+      ],
+      "cue_centers": [
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 500
+    },
+    {
+      "cell_id": "spatial:incongruent:down:right",
+      "cue": "spatial",
+      "flanker": "incongruent",
+      "location": "down",
+      "direction": "right",
+      "correct_key": "ArrowRight",
+      "elements": [
+        "left",
+        "left",
+        "right",
+        "left",
+        "left"
+      ],
+      "cue_centers": [
+        [
+          0,
+          1.06
+        ]
+      ],
+      "synthetic_correct_rt_ms": 500
+    }
+  ],
+  "practice_cells": [
+    "none:neutral:up:left",
+    "none:neutral:down:right",
+    "none:congruent:up:right",
+    "none:congruent:down:left",
+    "none:incongruent:up:left",
+    "none:incongruent:down:right",
+    "center:neutral:up:right",
+    "center:neutral:down:left",
+    "center:congruent:up:left",
+    "center:congruent:down:right",
+    "center:incongruent:up:right",
+    "center:incongruent:down:left",
+    "double:neutral:up:left",
+    "double:neutral:down:right",
+    "double:congruent:up:right",
+    "double:congruent:down:left",
+    "double:incongruent:up:left",
+    "double:incongruent:down:right",
+    "spatial:neutral:up:right",
+    "spatial:neutral:down:left",
+    "spatial:congruent:up:left",
+    "spatial:congruent:down:right",
+    "spatial:incongruent:up:right",
+    "spatial:incongruent:down:left"
+  ],
+  "formal_blocks": 3,
+  "each_cell_per_block": 2,
+  "expected_formal_count": 288,
+  "expected_practice_count": 24,
+  "expected_marginals": {
+    "cue": 72,
+    "flanker": 96,
+    "location": 144,
+    "direction": 144,
+    "cue_flanker": 24
+  },
+  "synthetic_all_correct_effects_ms": {
+    "alerting_none_minus_double": 100,
+    "orienting_center_minus_spatial": 40,
+    "conflict_incongruent_minus_congruent": 70
+  },
+  "denominator_fixture": {
+    "correct": 2,
+    "wrong": 1,
+    "omission": 1,
+    "technical_invalid": 1,
+    "behavioral_denominator": 4,
+    "accuracy": 0.5,
+    "error_rate": 0.25,
+    "omission_rate": 0.25,
+    "technical_invalid_total": 1
+  },
+  "empty_cell_rule": "primary balanced network effects needing that cell return null; not zero",
+  "boundary_cases": [
+    {
+      "record_origin": "native_v0.2",
+      "rt_ms": null,
+      "elapsed_target_ms": 1700,
+      "key": null,
+      "behavior": "omission",
+      "include_rt": false
+    },
+    {
+      "rt_ms": 0,
+      "key": "correct",
+      "behavior": "correct_with_nonpositive_rt_flag",
+      "include_rt": false
+    },
+    {
+      "rt_ms": 1699.9,
+      "key": "correct",
+      "behavior": "correct",
+      "include_rt": true
+    },
+    {
+      "rt_ms": 1700,
+      "key": "correct",
+      "behavior": "late_omission",
+      "include_rt": false
+    },
+    {
+      "rt_ms": 500,
+      "key": "wrong",
+      "behavior": "wrong",
+      "include_rt": false
+    },
+    {
+      "rt_ms": 500,
+      "key": "correct",
+      "focus_lost": true,
+      "behavior": "technical_invalid",
+      "include_rt": false
+    }
+  ],
+  "timing_fixtures": [
+    {
+      "first_fixation_ms": 400,
+      "response_ms": 500,
+      "post_fixation_ms": 2600,
+      "nominal_total_ms": 4000
+    },
+    {
+      "first_fixation_ms": 1599,
+      "response_ms": 1699,
+      "post_fixation_ms": 202,
+      "nominal_total_ms": 4000
+    },
+    {
+      "first_fixation_ms": 400,
+      "response_ms": null,
+      "elapsed_target_ms": 1700,
+      "post_fixation_ms": 1400,
+      "nominal_total_ms": 4000
+    },
+    {
+      "first_fixation_ms": 1599,
+      "response_ms": null,
+      "elapsed_target_ms": 1700,
+      "post_fixation_ms": 201,
+      "nominal_total_ms": 4000
+    }
+  ],
+  "version": "0.2",
+  "legacy_normalization_cases": [
+    {
+      "record_origin": "legacy_import",
+      "legacy_rt_ms": -1,
+      "intact_timeout_confirmed": true,
+      "normalized_rt_ms": null,
+      "elapsed_target_ms": 1700,
+      "behavior": "omission",
+      "include_rt": false
+    },
+    {
+      "record_origin": "native_v0.2",
+      "rt_ms": -1,
+      "behavior": "technical_invalid_negative_native_rt",
+      "include_rt": false
+    }
+  ],
+  "unequal_n_oracle": {
+    "none_cells": [
+      {
+        "cell": "none:neutral:up:left",
+        "mean_ms": 600,
+        "n": 3
+      },
+      {
+        "cells": "other 11 none cells",
+        "mean_ms": 400,
+        "n_per_cell": 1,
+        "cell_count": 11
+      }
+    ],
+    "double_cells": {
+      "cell_count": 12,
+      "mean_ms": 400,
+      "n_per_cell": 1
+    },
+    "primary_equal_cell_alerting_ms": {
+      "numerator": 50,
+      "denominator": 3
+    },
+    "secondary_pooled_alerting_ms": {
+      "numerator": 300,
+      "denominator": 7
+    },
+    "pooled_is_not_primary": true
+  },
+  "effect_dependencies": {
+    "alerting": {
+      "cues": [
+        "none",
+        "double"
+      ],
+      "flankers": [
+        "neutral",
+        "congruent",
+        "incongruent"
+      ],
+      "required_cells": 24
+    },
+    "orienting": {
+      "cues": [
+        "center",
+        "spatial"
+      ],
+      "flankers": [
+        "neutral",
+        "congruent",
+        "incongruent"
+      ],
+      "required_cells": 24
+    },
+    "conflict": {
+      "cues": [
+        "none",
+        "center",
+        "double",
+        "spatial"
+      ],
+      "flankers": [
+        "congruent",
+        "incongruent"
+      ],
+      "required_cells": 32
+    }
+  },
+  "missing_cell_dependency_oracles": [
+    {
+      "baseline": "synthetic_all_correct_effects_ms",
+      "missing_cells": [
+        "none:neutral:up:left"
+      ],
+      "expected_ms": {
+        "alerting": null,
+        "orienting": 40,
+        "conflict": 70
+      },
+      "missing_dependency_flags": {
+        "alerting": [
+          "none:neutral:up:left"
+        ],
+        "orienting": [],
+        "conflict": []
+      }
+    },
+    {
+      "baseline": "synthetic_all_correct_effects_ms",
+      "missing_cells": [
+        "center:neutral:up:left"
+      ],
+      "expected_ms": {
+        "alerting": 100,
+        "orienting": null,
+        "conflict": 70
+      },
+      "missing_dependency_flags": {
+        "alerting": [],
+        "orienting": [
+          "center:neutral:up:left"
+        ],
+        "conflict": []
+      }
+    }
+  ]
+}
