@@ -1,0 +1,111 @@
+{
+  "requestId": "865570a7-7418-5fae-a990-bd03d6da05b9",
+  "toolKey": "pisa2022_st270_usa_en_student_form",
+  "version": "1.0.0",
+  "title": "PISA 2022｜数学教师支持｜中学15岁目标群体｜学生填答（美国英文）｜无计分描述表单",
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "r8c6fb6442ca24420da8a7b7f",
+        "title": "PISA 2022｜数学教师支持｜中学15岁目标群体｜学生填答（美国英文）｜无计分描述表单",
+        "questions": [
+          {
+            "itemKey": "r4d09c8630cdf9ab7dd1e007b",
+            "type": "MATRIX",
+            "prompt": "How often do these things happen in your mathematics lessons? (Please select one response in each row.)",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "r8d5bf4c22c004a4297e13396",
+                "label": "Every lesson"
+              },
+              {
+                "optionKey": "r4e664c1192e1c2582c02ccee",
+                "label": "Most lessons"
+              },
+              {
+                "optionKey": "r92df33562b703e702d1256d6",
+                "label": "Some lessons"
+              },
+              {
+                "optionKey": "r636d065fada65bb5882c63f3",
+                "label": "Never or almost never"
+              }
+            ],
+            "rows": [
+              {
+                "rowKey": "re1e67d261c19a8024e82d25e",
+                "label": "The teacher shows an interest in every student's learning."
+              },
+              {
+                "rowKey": "r10bea82bd617676b953a3c71",
+                "label": "The teacher gives extra help when students need it."
+              },
+              {
+                "rowKey": "r43b4b1233a03f383a0c5288f",
+                "label": "The teacher helps students with their learning."
+              },
+              {
+                "rowKey": "r4ff435ebee305a5bbdd8d0dc",
+                "label": "The teacher continues teaching until the students understand."
+              }
+            ]
+          }
+        ],
+        "description": "OECD (2022), PISA 2022 national questionnaires, United States, Main Survey, student questionnaire, https://www.oecd.org/content/dam/oecd/en/data/datasets/pisa/pisa-2022-datasets/national-versions-pisa-2022-datasets/United%20States.zip. English source text reused under OECD Terms and Conditions section 1.2 (pre-1 July 2024 OECD written content; subject to any actual third-party or specific notice). This is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries. This is a local descriptive extraction, not an official PISA administration. No scores are calculated. You may leave a response blank. https://www.oecd.org/en/about/terms-conditions.html"
+      }
+    ]
+  },
+  "classificationTags": [
+    "response:self",
+    "use:research"
+  ],
+  "statement": "Source-derived English digital adaptation of OECD PISA 2022 USA Main Survey selected classroom questionnaire block under OECD written-content terms §1.2; source authorship remains OECD/national source, not the submitting administrator. Descriptive categorical Form only, no WLE or translated items.",
+  "reference": {
+    "familyTag": "mother:PISA_2022",
+    "locale": "en-US",
+    "respondent": "student",
+    "sourceBlock": "ST270",
+    "sourceItems": [
+      "ST270Q01JA",
+      "ST270Q02JA",
+      "ST270Q03JA",
+      "ST270Q04JA"
+    ],
+    "sourceItemToRow": {
+      "ST270Q01JA": {
+        "itemKey": "r4d09c8630cdf9ab7dd1e007b",
+        "rowKey": "re1e67d261c19a8024e82d25e"
+      },
+      "ST270Q02JA": {
+        "itemKey": "r4d09c8630cdf9ab7dd1e007b",
+        "rowKey": "r10bea82bd617676b953a3c71"
+      },
+      "ST270Q03JA": {
+        "itemKey": "r4d09c8630cdf9ab7dd1e007b",
+        "rowKey": "r43b4b1233a03f383a0c5288f"
+      },
+      "ST270Q04JA": {
+        "itemKey": "r4d09c8630cdf9ab7dd1e007b",
+        "rowKey": "r4ff435ebee305a5bbdd8d0dc"
+      }
+    },
+    "sourceUrl": "https://www.oecd.org/content/dam/oecd/en/data/datasets/pisa/pisa-2022-datasets/national-versions-pisa-2022-datasets/United%20States.zip",
+    "sourceMember": "USA/eng-USA_United States-Student_Questionnaire_MS22.pdf",
+    "sourceMemberSha256": "baf0191c8da494801063dce61922d8a7fbbabee81ba559b943f5fb2d224ee6f2",
+    "nationalSourceUrl": "https://nces.ed.gov/surveys/pisa/pisa2022/questionnaires/P22_StuQ-USA.html",
+    "licenseBasis": "https://www.oecd.org/en/about/terms-conditions.html §1.2",
+    "attribution": "OECD (2022), PISA 2022 national questionnaires, United States, Main Survey, student questionnaire, https://www.oecd.org/content/dam/oecd/en/data/datasets/pisa/pisa-2022-datasets/national-versions-pisa-2022-datasets/United%20States.zip. English source text reused under OECD Terms and Conditions section 1.2 (pre-1 July 2024 OECD written content; subject to any actual third-party or specific notice). This is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries. This is a local descriptive extraction, not an official PISA administration. No scores are calculated. You may leave a response blank. https://www.oecd.org/en/about/terms-conditions.html",
+    "digitalChanges": [
+      "One intact source block per MATRIX; original English prompts/options/rows retained",
+      "Original source row and option keys retained; optional missing responses, no recoding/imputation",
+      "Page title and source/adaptation notice added; no official NCES privacy/OMB text copied"
+    ],
+    "noOfficialWle": true,
+    "scoringParameters": null,
+    "runtimeReport": null,
+    "studentAndTeacherDisclosure": "Existing authorization/anonymous aggregation/minimum group size/release rules only; no new access grant",
+    "tagsNote": "familyTag and source role/locale retained as reference annotations; classificationTags includes only existing allowed dictionary IDs, no new tag engine."
+  }
+}

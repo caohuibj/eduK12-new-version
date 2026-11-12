@@ -1,0 +1,2 @@
+type,prompt,required,options,rows
+MATRIX,How often do these things happen in your mathematics lessons? (Please select one response in each row.),False,Every lesson||Most lessons||Some lessons||Never or almost never,The teacher shows an interest in every student's learning.||The teacher gives extra help when students need it.||The teacher helps students with their learning.||The teacher continues teaching until the students understand.
