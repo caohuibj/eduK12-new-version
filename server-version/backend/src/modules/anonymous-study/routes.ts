@@ -73,8 +73,20 @@ publicAnonymousStudyRouter.use(noStore)
 // every join), the scrypt verification cost, and the join admission gate.
 // Code recover/reset keep the tighter 30 budget: they are single-student
 // actions and a code-guessing surface.
-publicAnonymousStudyRouter.use(['/waves/:waveId/join'],
- rateLimit({windowMs:15*60*1000,limit:500,standardHeaders:'draft-7',legacyHeaders:false}))
+// Join rate limit: 500 / 15min / IP. Only retryable STUDY_JOIN_BUSY 503
+// responses are exempt: malformed input, denied codes and unrelated failures
+// must still consume a finite guessing/abuse budget. The 503 exemption lets
+// legitimate school-NAT retries survive queue admission without exhausting
+// the join budget; all expensive join work remains bounded by the gate.
+// express-rate-limit >=8.7.2 is required for correct window-boundary
+// decrement accounting with skipFailedRequests + the default MemoryStore.
+// requestWasSuccessful is used exclusively to select the 503 exemption.
+export const anonymousJoinRateLimit = rateLimit({
+  windowMs:15*60*1000,limit:500,standardHeaders:'draft-7',legacyHeaders:false,
+  skipFailedRequests:true,
+  requestWasSuccessful:(_req,res)=>!(res.statusCode===503 && res.locals.studyJoinRetryableBusy===true),
+})
+publicAnonymousStudyRouter.use(['/waves/:waveId/join'], anonymousJoinRateLimit)
 publicAnonymousStudyRouter.use(['/:studyId/code/recover','/:studyId/code/reset'],
  rateLimit({windowMs:15*60*1000,limit:30,standardHeaders:'draft-7',legacyHeaders:false}))
 publicAnonymousStudyRouter.post('/waves/:waveId/info',wrap(async(req,res)=>{
@@ -87,6 +99,7 @@ publicAnonymousStudyRouter.post('/waves/:waveId/join',wrap(async(req,res)=>{
     return success(res,await service.joinStudy(id.parse(req.params.waveId),body.token,body.consent,body))
   } catch(e) {
     if(e instanceof BoundedAdmissionBusyError || isTransientStudyDatabaseError(e)){
+      res.locals.studyJoinRetryableBusy=true
       res.setHeader('Retry-After',String((e as {retryAfterSeconds?:number}).retryAfterSeconds || 1))
       return res.status(503).json({code:'STUDY_JOIN_BUSY',message:'匿名研究加入繁忙，请稍后重试',data:null})
     }
