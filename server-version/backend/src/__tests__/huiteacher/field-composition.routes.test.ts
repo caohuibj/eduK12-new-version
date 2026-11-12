@@ -51,6 +51,48 @@ describe('Expert field routes retain their own invitation and evidence authority
   expect((await request('/field-assessments/invitations/'+invitation+'/start',{body:{}})).status).toBe(200)
   expect(m.start).toHaveBeenCalledWith({invitationId:invitation,actorUserId:actor})
  })
+ it('keeps empty START plain, attaches inline currentUnit in the GET shape, and rejects other body fields',async()=>{
+  const startPath='/field-assessments/invitations/'+invitation+'/start'
+  const raw={id:attempt,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',currentItem:null,answers:[{secret:'not delivered'}],trainingPersistence:{attemptId:'training'},checkpointDefinitionHash:'c'.repeat(64)}
+  m.parent.mockResolvedValue(raw)
+  const plain=await request(startPath,{body:{}})
+  expect(plain.status).toBe(200)
+  expect(plain.value.data).toEqual({attemptId:attempt})
+  expect(m.parent).not.toHaveBeenCalled()
+  const inline=await request(startPath,{body:{delivery:'inline'}})
+  expect(inline.status).toBe(200)
+  expect(m.parent).toHaveBeenCalledWith(attempt,{userId:actor},undefined,'current-unit')
+  const read=await request('/field-assessments/assessment-composite-attempts/'+attempt)
+  expect(read.status).toBe(200)
+  expect(inline.value.data.currentUnit).toEqual(read.value.data)
+  expect(inline.value.data).toMatchObject({attemptId:attempt})
+  expect(inline.value.data.currentUnit).not.toHaveProperty('trainingPersistence')
+  m.parent.mockRejectedValueOnce(new Error('projection failed'))
+  const fallback=await request(startPath,{body:{view:'current-unit'}})
+  expect(fallback.status).toBe(200)
+  expect(fallback.value.data).toEqual({attemptId:attempt})
+  const started=m.start.mock.calls.length
+  expect((await request(startPath,{body:{delivery:'inline',extra:true}})).status).toBe(400)
+  expect((await request(startPath,{body:{delivery:'whole'}})).status).toBe(400)
+  expect((await request(startPath,{body:{view:'full'}})).status).toBe(400)
+  expect(m.start).toHaveBeenCalledTimes(started)
+  const viaQuery=await request(startPath+'?delivery=inline',{body:{}})
+  expect(viaQuery.status).toBe(200)
+  expect(viaQuery.value.data.currentUnit).toEqual(read.value.data)
+ })
+ it('omits currentUnit on inline START when field authority is revoked after admission',async()=>{
+  const startPath='/field-assessments/invitations/'+invitation+'/start'
+  m.current.mockRejectedValue(new FieldCompositionError('HUITEACHER_FIELD_QUESTIONNAIRE_UNAVAILABLE',403))
+  const inline=await request(startPath,{body:{delivery:'inline'}})
+  expect(inline.status).toBe(200)
+  expect(inline.value.data).toEqual({attemptId:attempt})
+  expect(inline.value.data).not.toHaveProperty('currentUnit')
+  expect(m.start).toHaveBeenCalledWith({invitationId:invitation,actorUserId:actor})
+  expect(m.current).toHaveBeenCalledWith(expect.anything(),{attemptId:attempt,actorUserId:actor})
+  expect(m.parent).not.toHaveBeenCalled()
+  const denied=await request('/field-assessments/assessment-composite-attempts/'+attempt)
+  expect(denied.status).toBe(403)
+ })
  it('checks exact field parent/current grant before state, stored material and FINAL and returns explicit revocation errors',async()=>{
   const path='/field-assessments/assessment-composite-attempts/'+attempt
   m.current.mockRejectedValue(new FieldCompositionError('HUITEACHER_FIELD_QUESTIONNAIRE_UNAVAILABLE',403))
