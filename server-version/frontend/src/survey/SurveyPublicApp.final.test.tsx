@@ -38,6 +38,16 @@ async function openTask(){
   return view
 }
 const submit=()=>fireEvent.click(screen.getByRole('button',{name:/^(提交本轮正式回答|重试原提交)$/}))
+const busy503=(message='研究参与请求繁忙，请稍后重试')=>Promise.resolve({
+  ok:false,status:503,json:async()=>({code:'SURVEY_ADMISSION_BUSY',message,data:null}),
+} as Response)
+async function exhaustCapacityRetry(action:()=>void=submit){
+  vi.useFakeTimers({toFake:['setTimeout','clearTimeout']})
+  try{
+    await act(async()=>{action()})
+    for(let step=0;step<6;step+=1)await act(async()=>{await vi.advanceTimersByTimeAsync(30_000)})
+  }finally{vi.useRealTimers()}
+}
 beforeEach(()=>{
   HTMLElement.prototype.scrollIntoView=vi.fn()
   sessionStorage.clear()
@@ -65,6 +75,7 @@ beforeEach(()=>{
   }))
 })
 afterEach(()=>{
+  vi.useRealTimers()
   vi.restoreAllMocks();vi.unstubAllGlobals()
   if(originalScrollIntoView)HTMLElement.prototype.scrollIntoView=originalScrollIntoView
   else delete (HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView
@@ -155,7 +166,8 @@ describe('Survey first-success GENERAL receipt consumption',()=>{
   it('reauthorizes GENERAL after an ambiguous retry even if that retry creates the first FINAL',async()=>{
     finalReply=()=>Promise.reject(new Error('结果未知'))
     await openTask()
-    fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    await exhaustCapacityRetry()
     await screen.findByRole('alert')
     finalReply=()=>response(firstSuccess())
     submit();await screen.findByText('感谢参与')
@@ -166,12 +178,15 @@ describe('Survey first-success GENERAL receipt consumption',()=>{
   it.each([400,403,409,503])('does not display receipt data from a rejected FINAL (%s)',async(status)=>{
     finalReply=()=>response(firstSuccess(),status,'本次提交被拒绝')
     await openTask()
-    fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    if(status===503)await exhaustCapacityRetry()
+    else submit()
     await screen.findByText('本次提交被拒绝')
     expect(screen.queryByText(receiptText)).toBeNull()
     expect(screen.queryByRole('heading',{name:'本轮回答已完成'})).toBeNull()
     expect(generalCalls()).toHaveLength(0)
     expect(sessionStorage.getItem(draftKey)).not.toBeNull()
+    expect(finalCalls).toHaveLength(status===503?4:1)
     if(status===400)expect(screen.getByRole('radio',{name:'不同意'})).toBeEnabled()
     else expect(screen.getByRole('radio',{name:'不同意'})).toBeDisabled()
   })
@@ -196,7 +211,8 @@ describe('Survey first-success GENERAL receipt consumption',()=>{
   it('reauthorizes GENERAL for a restored sealed retry instead of using its embedded receipt',async()=>{
     finalReply=()=>Promise.reject(new Error('结果未知'))
     const view=await openTask()
-    fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    await exhaustCapacityRetry()
     await screen.findByRole('alert');view.unmount()
     finalReply=()=>response(firstSuccess())
     await openTask()
@@ -307,7 +323,8 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
       blocks:[{blockKey:'end',kind:'END',termination:'SCREEN_OUT'}]}}
     const view=render(<SurveyPublicApp/>)
     fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
-    fireEvent.click(await screen.findByRole('button',{name:'完成资格筛选'}))
+    await screen.findByRole('button',{name:'完成资格筛选'})
+    await exhaustCapacityRetry(()=>fireEvent.click(screen.getByRole('button',{name:'完成资格筛选'})))
     await screen.findByRole('alert')
     expect(JSON.parse(sessionStorage.getItem(draftKey)!).finalSubmission.screenOut).toBe(true)
     view.unmount()
@@ -319,7 +336,7 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
     expect(sessionStorage.getItem(`huisurvey:v1:single:${publicId}`)).toBeNull()
     expect(screen.queryByRole('button',{name:'提交本轮正式回答'})).toBeNull()
     expect(screen.queryByRole('button',{name:'完成资格筛选'})).toBeNull()
-    expect(screenOutCalls).toBe(1)
+    expect(screenOutCalls).toBe(4)
     expect(finalCalls).toHaveLength(0)
     expect(vi.mocked(fetch).mock.calls.filter(([url])=>String(url).endsWith('/general'))).toHaveLength(0)
   })
@@ -392,17 +409,22 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
     fireEvent.click(screen.getByRole('button',{name:'下一部分'}))
     fireEvent.change(screen.getByRole('textbox',{name:'补充回答'}),{target:{value:'保留原回答'}})
     sanitize.mockClear();seal.mockClear()
-    submit();await screen.findByRole('alert')
+    await exhaustCapacityRetry()
+    await screen.findByRole('alert')
     expect(sanitize).toHaveBeenCalledTimes(1)
     expect(seal).toHaveBeenCalledTimes(1)
     expect(finalCalls[0].answers).toEqual({scale:{q1:'yes'},form:{text:'保留原回答'}})
     expect(finalCalls[0].itemTimings).toHaveProperty('scale')
+    expect(finalCalls.length).toBeGreaterThan(1)
+    expect(finalCalls.every(body=>JSON.stringify(body)===JSON.stringify(finalCalls[0]))).toBe(true)
     sanitize.mockClear();seal.mockClear()
-    now=9000;submit()
-    await waitFor(()=>expect(finalCalls).toHaveLength(2))
+    const attempts=finalCalls.length
+    now=9000
+    await exhaustCapacityRetry()
+    expect(finalCalls).toHaveLength(attempts*2)
     expect(sanitize).not.toHaveBeenCalled()
     expect(seal).not.toHaveBeenCalled()
-    expect(finalCalls[1]).toEqual(finalCalls[0])
+    expect(finalCalls[attempts]).toEqual(finalCalls[0])
   })
   it('restores a completed projection without draft parsing, fresh submission identity, or duplicate cleanup',async()=>{
     const cleanup=vi.spyOn(cognitiveLocal,'clearSurveyCognitiveSessions')
@@ -424,30 +446,35 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
   it('retries exact sealed answers and timing after an uncertain response',async()=>{
     finalReply=()=>Promise.reject(new Error('网络中断'))
     await openTask()
-    now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    await exhaustCapacityRetry()
     await screen.findByRole('alert')
-    expect(finalCalls).toHaveLength(1)
+    expect(finalCalls.length).toBeGreaterThan(1)
+    expect(finalCalls.every(body=>JSON.stringify(body)===JSON.stringify(finalCalls[0]))).toBe(true)
     expect(screen.getByRole('button',{name:'重试原提交'})).toBeEnabled()
     expect(screen.getByText(/本次答案已封存，尚未确认提交结果/)).toBeInTheDocument()
+    const attempts=finalCalls.length
     now=9000
-    submit()
-    await waitFor(()=>expect(finalCalls).toHaveLength(2))
-    expect(finalCalls[1]).toEqual(finalCalls[0])
+    await exhaustCapacityRetry()
+    expect(finalCalls).toHaveLength(attempts*2)
+    expect(finalCalls[attempts]).toEqual(finalCalls[0])
     expect(screen.getByRole('radio',{name:'不同意'})).toBeDisabled()
   })
   it.each(['Failed to fetch','Load failed','NetworkError when attempting to fetch resource.'])(
     'explains native network failure %s while retaining the exact sealed retry',async nativeMessage=>{
-      let calls=0
-      finalReply=()=>++calls===1?Promise.reject(new TypeError(nativeMessage)):response(firstSuccess())
+      finalReply=()=>Promise.reject(new TypeError(nativeMessage))
       await openTask()
-      now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+      now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+      await exhaustCapacityRetry()
       expect(await screen.findByRole('alert')).toHaveTextContent('网络连接未完成，服务器结果尚未确认。请检查网络，并按页面提示核对或重试。')
+      expect(finalCalls.length).toBeGreaterThan(1)
+      expect(finalCalls.every(body=>JSON.stringify(body)===JSON.stringify(finalCalls[0]))).toBe(true)
       expect(screen.getByRole('button',{name:'重试原提交'})).toBeEnabled()
       expect(screen.getByRole('radio',{name:'不同意'})).toBeDisabled()
+      finalReply=()=>response(firstSuccess())
       now=9000;submit()
       await screen.findByText('感谢参与')
-      expect(finalCalls).toHaveLength(2)
-      expect(finalCalls[1]).toEqual(finalCalls[0])
+      expect(finalCalls[finalCalls.length-1]).toEqual(finalCalls[0])
     })
   it('keeps completion authoritative when General fails and retries only the receipt',async()=>{
     generalReply=()=>Promise.reject(new Error('回执暂不可用'))
@@ -532,7 +559,8 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
   it('retains the exact sealed request through background events and a STARTED reload',async()=>{
     finalReply=()=>Promise.reject(new Error('结果未知'))
     const view=await openTask()
-    now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    await exhaustCapacityRetry()
     await screen.findByRole('alert')
     const original=structuredClone(finalCalls[0])
     now=9000;fireEvent(window,new Event('pagehide'))
@@ -551,13 +579,16 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
   it('reconciles an uncertain submission as completed on reload without another FINAL',async()=>{
     finalReply=()=>Promise.reject(new Error('结果未知'))
     const view=await openTask()
-    now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    await exhaustCapacityRetry()
     await screen.findByRole('alert');view.unmount()
+    const failedAttempts=finalCalls.length
+    expect(failedAttempts).toBeGreaterThan(1)
     taskValue={...taskValue,status:'COMPLETED'}
     render(<SurveyPublicApp/>)
     fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
     await screen.findByText('感谢参与')
-    expect(finalCalls).toHaveLength(1)
+    expect(finalCalls).toHaveLength(failedAttempts)
     expect(sessionStorage.getItem(draftKey)).toBeNull()
   })
   it('keeps legitimate answer edits before the first FINAL',async()=>{
@@ -588,7 +619,8 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
     fireEvent.click(screen.getByRole('button',{name:'下一部分'}))
     fireEvent.click(screen.getByRole('radio',{name:'不同意'}))
     finalReply=()=>Promise.reject(new Error('结果未知'))
-    submit();await screen.findByRole('alert');view.unmount()
+    await exhaustCapacityRetry()
+    await screen.findByRole('alert');view.unmount()
     const original=structuredClone(finalCalls[0])
     await openTask()
     expect(screen.getByRole('button',{name:'下一部分'})).toBeDisabled()
@@ -660,6 +692,82 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
     expect(finalCalls[0].itemTimings).toMatchObject({scale:{q1:{activeTimeMs:3000}}})
   })
 
+})
+
+describe('Survey sealed capacity retry',()=>{
+  it('retries a sealed FINAL after SURVEY_ADMISSION_BUSY and shows the receipt',async()=>{
+    const seal=vi.spyOn(scaleTiming,'sealSurveyScaleTimings')
+    finalReply=body=>{
+      const saved=JSON.parse(sessionStorage.getItem(draftKey)!)
+      expect(saved.finalSubmission.submissionId).toBe(body.submissionId)
+      expect(saved.finalSubmission.screenOut).toBe(false)
+      if(finalCalls.length===1)return busy503()
+      expect(JSON.stringify(body)).toBe(JSON.stringify(finalCalls[0]))
+      return response(firstSuccess())
+    }
+    await openTask()
+    now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    seal.mockClear()
+    await exhaustCapacityRetry()
+    await screen.findByText(receiptText)
+    expect(finalCalls.length).toBeGreaterThan(1)
+    expect(finalCalls.every(body=>JSON.stringify(body)===JSON.stringify(finalCalls[0]))).toBe(true)
+    expect(seal).toHaveBeenCalledTimes(1)
+    expect(generalCalls()).toHaveLength(0)
+    expect(sessionStorage.getItem(draftKey)).toBeNull()
+  })
+
+  it('retries a sealed screen-out after 503 with the same body',async()=>{
+    const screenOuts:Record<string,unknown>[]=[]
+    const original=vi.mocked(fetch).getMockImplementation()!
+    vi.mocked(fetch).mockImplementation((input,init)=>{
+      if(String(input).endsWith('/screen-out')){
+        const body=JSON.parse(String(init?.body)) as Record<string,unknown>
+        screenOuts.push(body)
+        const saved=JSON.parse(sessionStorage.getItem(draftKey)!)
+        expect(saved.finalSubmission.screenOut).toBe(true)
+        expect(saved.finalSubmission.submissionId).toBe(body.submissionId)
+        if(screenOuts.length===1)return busy503()
+        expect(JSON.stringify(body)).toBe(JSON.stringify(screenOuts[0]))
+        return response({status:'SCREENED_OUT'})
+      }
+      return original(input,init)
+    })
+    taskOverrides={units:[],flow:{schemaVersion:1,flowDigest:'b'.repeat(64),embeddedData:[],
+      blocks:[{blockKey:'end',kind:'END',termination:'SCREEN_OUT'}]}}
+    render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    await screen.findByRole('button',{name:'完成资格筛选'})
+    await exhaustCapacityRetry(()=>fireEvent.click(screen.getByRole('button',{name:'完成资格筛选'})))
+    await screen.findByRole('heading',{name:'本轮资格筛选已结束'})
+    expect(screenOuts.length).toBeGreaterThan(1)
+    expect(screenOuts.every(body=>JSON.stringify(body)===JSON.stringify(screenOuts[0]))).toBe(true)
+    expect(finalCalls).toHaveLength(0)
+    expect(sessionStorage.getItem(draftKey)).toBeNull()
+  })
+
+  it.each([
+    [400,false],
+    [401,true],
+    [409,true],
+    [413,false],
+    [429,true],
+  ] as const)('does not auto-retry FINAL status %s',async(status,keepSealed)=>{
+    finalReply=()=>response(null,status,'本次提交被拒绝')
+    await openTask()
+    now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    await screen.findByText('本次提交被拒绝')
+    expect(finalCalls).toHaveLength(1)
+    if(keepSealed){
+      expect(screen.getByRole('radio',{name:'不同意'})).toBeDisabled()
+      expect(screen.getByRole('button',{name:'重试原提交'})).toBeEnabled()
+      expect(JSON.parse(sessionStorage.getItem(draftKey)!).finalSubmission.submissionId).toBe(finalCalls[0].submissionId)
+    }else{
+      expect(screen.getByRole('radio',{name:'不同意'})).toBeEnabled()
+      expect(screen.getByRole('button',{name:'提交本轮正式回答'})).toBeEnabled()
+      expect(JSON.parse(sessionStorage.getItem(draftKey)!).finalSubmission).toBeUndefined()
+    }
+  })
 })
 
 

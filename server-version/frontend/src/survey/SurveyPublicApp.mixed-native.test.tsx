@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react'
-import { fireEvent,render,screen,waitFor } from '@testing-library/react'
+import { act,fireEvent,render,screen,waitFor } from '@testing-library/react'
 import { afterEach,beforeEach,describe,expect,it,vi } from 'vitest'
 import SurveyPublicApp from './SurveyPublicApp'
 import type { SurveyCognitiveUnit } from './SurveyCognitiveUnit'
@@ -73,7 +73,7 @@ beforeEach(()=>{
     }
     if(url.endsWith('/final')){
       finals.push(JSON.parse(String(init?.body)))
-      if(failFirstFinal&&finals.length===1)return Promise.reject(new Error('整轮提交结果尚不确定'))
+      if(failFirstFinal&&finals.length<=4)return Promise.reject(new Error('整轮提交结果尚不确定'))
       return response({attemptId,status:'COMPLETED',idempotent:false,receiptId:'receipt',completedAt:'2026-10-24T00:00:00Z',
         generalReceipt:{text:'混合研究可信回执',disclaimer:'一般说明',completedAt:'2026-10-24T00:00:00Z'}})
     }
@@ -81,7 +81,15 @@ beforeEach(()=>{
     throw new Error('Unexpected '+url)
   }))
 })
+async function exhaustCapacityRetry(action:()=>void){
+  vi.useFakeTimers({toFake:['setTimeout','clearTimeout']})
+  try{
+    await act(async()=>{action()})
+    for(let step=0;step<6;step+=1)await act(async()=>{await vi.advanceTimersByTimeAsync(30_000)})
+  }finally{vi.useRealTimers()}
+}
 afterEach(()=>{
+  vi.useRealTimers()
   vi.unstubAllGlobals();vi.restoreAllMocks()
   if(originalScrollIntoView)HTMLElement.prototype.scrollIntoView=originalScrollIntoView
   else delete (HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView
@@ -162,9 +170,10 @@ describe('Survey static mixed native SJT and cognitive parent boundary',()=>{
     }
     expect(screen.queryByRole('button',{name:'上一部分'})).toBeNull()
     expect(screen.getByRole('button',{name:'提交本轮正式回答'})).toBeEnabled()
-    fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'}))
+    await exhaustCapacityRetry(()=>fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'})))
     await screen.findByText('整轮提交结果尚不确定')
-    expect(finals).toHaveLength(1);expectExactReferences(finals[0])
+    expect(finals).toHaveLength(4);expectExactReferences(finals[0])
+    expect(finals.every(body=>JSON.stringify(body)===JSON.stringify(finals[0]))).toBe(true)
     const saved=JSON.parse(sessionStorage.getItem(draftKey)!)
     expect(saved.finalSubmission.cognitiveReferences).toEqual([cognitiveReference])
     expect(saved.finalSubmission.situationalReferences).toEqual([nativeReference])
@@ -176,9 +185,9 @@ describe('Survey static mixed native SJT and cognitive parent boundary',()=>{
     await waitFor(()=>expect(screen.getByRole('button',{name:'重试原提交'})).toBeEnabled())
     fireEvent.click(screen.getByRole('button',{name:'重试原提交'}))
     await screen.findByText('感谢参与，问卷已提交')
-    expect(finals).toHaveLength(2)
-    expect(finals[1]).toEqual({...finals[0],accessCredential:currentCredential})
-    expectExactReferences(finals[1]);expect(sessionStorage.getItem(draftKey)).toBeNull()
+    expect(finals).toHaveLength(5)
+    expect(finals[4]).toEqual({...finals[0],accessCredential:currentCredential})
+    expectExactReferences(finals[4]);expect(sessionStorage.getItem(draftKey)).toBeNull()
   })
 
   it.each(orders)('recovers %s from authorized cognitive metadata and a reread native receipt',async(order)=>{
