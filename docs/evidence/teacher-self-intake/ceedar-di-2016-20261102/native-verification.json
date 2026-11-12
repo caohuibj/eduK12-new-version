@@ -1,0 +1,222 @@
+{
+  "status": "PASS",
+  "baseCommit": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "database": "eduk12_form_intake_test_75c4a63a56dd",
+  "databaseHost": "127.0.0.1",
+  "node": "v24.21.0",
+  "receipts": [
+    {
+      "toolKey": "ceedar_di2016_environment_teacher_en",
+      "version": "0.1.0",
+      "formId": "c8b0e928-a88a-491b-b71d-1d80b538e443",
+      "state": "SUBMITTED",
+      "approvedBy": null,
+      "definitionDigest": "7d10588cec84093451f46b1413106291e73cd7f40bdbfbc64a5f2e3c77b45015",
+      "snapshotHash": "f18f73062d9f276403a0578c887890e9ff51df7dd510cf4f3c67c08da72a47d2",
+      "sourceFileSha256": "e03833e386d1023b6b355ebfba2291c53c55b4b79edeb40ea37423d190e1b768",
+      "questions": 13,
+      "parametersVersion": null,
+      "reportVersion": null,
+      "trialCreated": false,
+      "nativeHttpSaveReadback": true,
+      "csvParserAndBuilder": true,
+      "scenarios": [
+        {
+          "situation": "normal",
+          "normalizedFields": 13,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "difficulty",
+          "normalizedFields": 13,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "insufficient",
+          "normalizedFields": 0,
+          "missingFields": 13,
+          "score": null
+        }
+      ]
+    },
+    {
+      "toolKey": "ceedar_di2016_goals_teacher_en",
+      "version": "0.1.0",
+      "formId": "c9ad597b-39d5-4f62-8ccd-c496550aa69d",
+      "state": "SUBMITTED",
+      "approvedBy": null,
+      "definitionDigest": "15812e7b6419f1c0651b20cbb7f38bd4211fde4320560e6c5a50828108b3e210",
+      "snapshotHash": "2047aaf6a4b2d0988ba8b1585f089ab3655b029a2a9185f6a2b695ee9d1c9dde",
+      "sourceFileSha256": "bc1de0cebde4ee012dcf95ed0bebc6777aa130d92ab587376ce85dfd224472af",
+      "questions": 7,
+      "parametersVersion": null,
+      "reportVersion": null,
+      "trialCreated": false,
+      "nativeHttpSaveReadback": true,
+      "csvParserAndBuilder": true,
+      "scenarios": [
+        {
+          "situation": "normal",
+          "normalizedFields": 7,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "difficulty",
+          "normalizedFields": 7,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "insufficient",
+          "normalizedFields": 0,
+          "missingFields": 7,
+          "score": null
+        }
+      ]
+    },
+    {
+      "toolKey": "ceedar_di2016_assessment_teacher_en",
+      "version": "0.1.0",
+      "formId": "ab568601-1084-4494-b7fc-f2a7a106f838",
+      "state": "SUBMITTED",
+      "approvedBy": null,
+      "definitionDigest": "c14e2191a95a5c8ab515341bd5492ed7e0c04f5d6bcf75490fdae6209f5e0b15",
+      "snapshotHash": "bfbb3ad64dda0a8de06b412b449eee3eb70ddcd04a2bed5095fce1247ebcca55",
+      "sourceFileSha256": "cd10f21199ac78903ab57f6688d3beb396e1535affc5bcad9ae0587102b8e6d0",
+      "questions": 15,
+      "parametersVersion": null,
+      "reportVersion": null,
+      "trialCreated": false,
+      "nativeHttpSaveReadback": true,
+      "csvParserAndBuilder": true,
+      "scenarios": [
+        {
+          "situation": "normal",
+          "normalizedFields": 15,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "difficulty",
+          "normalizedFields": 15,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "insufficient",
+          "normalizedFields": 0,
+          "missingFields": 15,
+          "score": null
+        }
+      ]
+    },
+    {
+      "toolKey": "ceedar_di2016_grouping_teacher_en",
+      "version": "0.1.0",
+      "formId": "28c5cfec-a6d1-407e-902a-f2219e1df06a",
+      "state": "SUBMITTED",
+      "approvedBy": null,
+      "definitionDigest": "2213970a9c444029e9af66597438a709d6211e6419c0e8608f9bf44803bd231a",
+      "snapshotHash": "8b676992228e72595525b423d0a3670e8108b8ad9ff4d3d6809e256b3eeb02bf",
+      "sourceFileSha256": "367a50bdaece593a3443287f82d12e8423892f258c49b3b46277ebd5f383a7cd",
+      "questions": 21,
+      "parametersVersion": null,
+      "reportVersion": null,
+      "trialCreated": false,
+      "nativeHttpSaveReadback": true,
+      "csvParserAndBuilder": true,
+      "scenarios": [
+        {
+          "situation": "normal",
+          "normalizedFields": 21,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "difficulty",
+          "normalizedFields": 21,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "insufficient",
+          "normalizedFields": 0,
+          "missingFields": 21,
+          "score": null
+        }
+      ]
+    },
+    {
+      "toolKey": "ceedar_di2016_action_plan_teacher_en",
+      "version": "0.1.0",
+      "formId": "34e8181e-f653-492d-a076-633604964a4b",
+      "state": "SUBMITTED",
+      "approvedBy": null,
+      "definitionDigest": "1dc3c116542856625f5315e8d4896ad273ec52e2b16b3600d99932671c02d14a",
+      "snapshotHash": "8d8453672d17b427c910cce8ec9b5762a0779f8f4fca6ae31f574f5d1d57484e",
+      "sourceFileSha256": "453b9d0fb2981d039f753d3b530b4d4ac03aa2f35de8233959e8ce772e59111e",
+      "questions": 3,
+      "parametersVersion": null,
+      "reportVersion": null,
+      "trialCreated": false,
+      "nativeHttpSaveReadback": true,
+      "csvParserAndBuilder": true,
+      "scenarios": [
+        {
+          "situation": "normal",
+          "normalizedFields": 3,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "difficulty",
+          "normalizedFields": 3,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "insufficient",
+          "normalizedFields": 0,
+          "missingFields": 3,
+          "score": null
+        }
+      ]
+    }
+  ],
+  "sharedFamilyTag": "family:ceedar_di",
+  "sharedFamilyMetadataQueryCount": 5,
+  "rights": "COURSE_USE_ONLY_BROADER_PLATFORM_USE_PENDING",
+  "controlledTagCatalogQuery": "license:redistribution_restricted + exact tool key PASS",
+  "customFamilyUiFacet": "NOT_REGISTERED; metadata grouping only",
+  "authorizationChecks": {
+    "anonymous": 401,
+    "ordinaryAdmin": 403
+  },
+  "boundaries": {
+    "environment": "TASK_OWNED_ISOLATED_DB",
+    "originalFinDiItemsPrivatelyStaged": true,
+    "production": false,
+    "publicOnline": false,
+    "humanApproval": false,
+    "scoredReports": false
+  },
+  "licensingBoundary": "Private technical staging only, not a course deployment or public redistribution approval; original item-bearing snapshots stay in task-owned local database and /tmp; publication and ONLINE remain pending",
+  "setup": "Existing Prisma schema migrations applied once to a new disposable task database; no app build or full test suite",
+  "manualTallySemantics": {
+    "perPrinciple": 3,
+    "sourceRatedEvidence": [
+      10,
+      4,
+      12,
+      18
+    ],
+    "automaticallyCalculated": false,
+    "crossFieldConsistencyValidated": false,
+    "clinicalOrTeachingQualityScore": false,
+    "missingIsZero": false
+  },
+  "sourceSnapshotFilesNotPublic": true
+}

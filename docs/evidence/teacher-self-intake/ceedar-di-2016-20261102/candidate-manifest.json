@@ -1,0 +1,587 @@
+{
+  "motherTool": "CEEDAR-hosted FIN DI Self-Assessment",
+  "motherTag": "family:ceedar_di",
+  "sourceIdentity": "FIN DOCX metadata modified 2016-10-16; source publication date not proven",
+  "status": "PRIVATE_NATIVE_FORMS_ISOLATED_SUBMITTED_PUBLIC_RIGHTS_PENDING",
+  "scales": 0,
+  "forms": [
+    {
+      "toolKey": "ceedar_di2016_environment_teacher_en",
+      "title": "CEEDAR DI｜响应性学习环境｜教师自评｜英语2016来源／项目草稿0.1.0",
+      "kind": "FORM",
+      "contentVersion": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "responseFieldCount": 13,
+      "ratedEvidenceCount": 10,
+      "manualTallyFields": 3,
+      "manualTallyAutoCalculated": false,
+      "indicatorNumbers": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "sourcePdfPages": [
+        3
+      ],
+      "tags": [
+        "family:ceedar_di",
+        "role:teacher_self",
+        "stage:prek12",
+        "language:en",
+        "version:source_2016_10_16",
+        "use:developmental_reflection",
+        "research:PILOT",
+        "rights:course_use_only_broader_use_pending",
+        "topic:environment"
+      ],
+      "definitionFile": "ceedar_di2016_environment_teacher_en.form.json",
+      "definitionFileSha256": "ea3872b6a80112a659c2e6a458f13d1d6f10fac23e4f68ee5d61bd796afb1849",
+      "rights": "COURSE_PERMISSION_FOUND_PLATFORM_REDISTRIBUTION_PENDING",
+      "installation": "ISOLATED_SUBMITTED_NOT_APPROVED_NOT_ONLINE",
+      "scoring": "NONE",
+      "sourceMap": [
+        {
+          "itemKey": "di_i01_e01",
+          "indicator": 1,
+          "element": 1,
+          "docxTableRowIndex0": 2,
+          "promptSha256": "7cd5d38b280e702c7cb34502dbbe4f1b9be949a9d6557a05f17f679d56ec1128",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i01_e02",
+          "indicator": 1,
+          "element": 2,
+          "docxTableRowIndex0": 3,
+          "promptSha256": "4e5c370ea2a2918ecb9fb1735eee4228ea2cc78c870063215124ea7297661a7c",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i01_e03",
+          "indicator": 1,
+          "element": 3,
+          "docxTableRowIndex0": 4,
+          "promptSha256": "1ccf919016f1a955358560997094e7a38a1e9192731fbd5f117850326f5a9763",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i01_e04",
+          "indicator": 1,
+          "element": 4,
+          "docxTableRowIndex0": 5,
+          "promptSha256": "57678d2718b89fae3ad2220aa8a6cb42443637b181019a0f6dcab0fd1382f6e9",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i01_e05",
+          "indicator": 1,
+          "element": 5,
+          "docxTableRowIndex0": 6,
+          "promptSha256": "9e192a5925bacb0aa5f1c45c8470ea7d6a1d6be7051ecbb5d50fe41978562ab0",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i01_e06",
+          "indicator": 1,
+          "element": 6,
+          "docxTableRowIndex0": 7,
+          "promptSha256": "c6add14362eab83ff65d0f614adf2ece2e3985e42d8e73b5a49edf5c5319c417",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i02_e01",
+          "indicator": 2,
+          "element": 1,
+          "docxTableRowIndex0": 8,
+          "promptSha256": "6075deb78a724e9bb9d0ebb6d703613c8569d651a5fc97102403a6e0a3bc4948",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i03_e01",
+          "indicator": 3,
+          "element": 1,
+          "docxTableRowIndex0": 9,
+          "promptSha256": "2d20d00752035b893178caf7b508cdad947445805df721e5714952451283081e",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i04_e01",
+          "indicator": 4,
+          "element": 1,
+          "docxTableRowIndex0": 10,
+          "promptSha256": "7c83ea58f3517837e6f123246ed3b6914aae563e3a811bbcca95517daacf42b2",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i04_e02",
+          "indicator": 4,
+          "element": 2,
+          "docxTableRowIndex0": 11,
+          "promptSha256": "009dce67a63c1b478407f77b5312b177fc9d9e6c251e6d7956da0816e62bf864",
+          "examplesInsidePromptNotSeparateQuestions": true
+        }
+      ],
+      "manualTallySourceTableRowIndex0": 12
+    },
+    {
+      "toolKey": "ceedar_di2016_goals_teacher_en",
+      "title": "CEEDAR DI｜学习目标清晰度｜教师自评｜英语2016来源／项目草稿0.1.0",
+      "kind": "FORM",
+      "contentVersion": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "responseFieldCount": 7,
+      "ratedEvidenceCount": 4,
+      "manualTallyFields": 3,
+      "manualTallyAutoCalculated": false,
+      "indicatorNumbers": [
+        5,
+        6
+      ],
+      "sourcePdfPages": [
+        4
+      ],
+      "tags": [
+        "family:ceedar_di",
+        "role:teacher_self",
+        "stage:prek12",
+        "language:en",
+        "version:source_2016_10_16",
+        "use:developmental_reflection",
+        "research:PILOT",
+        "rights:course_use_only_broader_use_pending",
+        "topic:goals"
+      ],
+      "definitionFile": "ceedar_di2016_goals_teacher_en.form.json",
+      "definitionFileSha256": "60eb7c51327258a2c33602a0c5b5c0bde341bf55bdb8b7c0f685a295fe13fe1a",
+      "rights": "COURSE_PERMISSION_FOUND_PLATFORM_REDISTRIBUTION_PENDING",
+      "installation": "ISOLATED_SUBMITTED_NOT_APPROVED_NOT_ONLINE",
+      "scoring": "NONE",
+      "sourceMap": [
+        {
+          "itemKey": "di_i05_e01",
+          "indicator": 5,
+          "element": 1,
+          "docxTableRowIndex0": 15,
+          "promptSha256": "ffc4731734a4250beda9fa15df590588595d6b6864701b6ef953b901d56d9dc2",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i05_e02",
+          "indicator": 5,
+          "element": 2,
+          "docxTableRowIndex0": 16,
+          "promptSha256": "1c7f6260a9f966fc0df96bde88af46311a2355ff45f2fe75dba99cc30d8bc2a9",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i06_e01",
+          "indicator": 6,
+          "element": 1,
+          "docxTableRowIndex0": 17,
+          "promptSha256": "dddeace52787d3d56c523d38b16e3fb38466f4b1a1591df96571b4ff86c917fe",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i06_e02",
+          "indicator": 6,
+          "element": 2,
+          "docxTableRowIndex0": 18,
+          "promptSha256": "3c09bd6f84830ee61e7edb180254c4c3671a4180d7f15209e5daf728f060f6c0",
+          "examplesInsidePromptNotSeparateQuestions": true
+        }
+      ],
+      "manualTallySourceTableRowIndex0": 19
+    },
+    {
+      "toolKey": "ceedar_di2016_assessment_teacher_en",
+      "title": "CEEDAR DI｜持续评价与调整｜教师自评｜英语2016来源／项目草稿0.1.0",
+      "kind": "FORM",
+      "contentVersion": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "responseFieldCount": 15,
+      "ratedEvidenceCount": 12,
+      "manualTallyFields": 3,
+      "manualTallyAutoCalculated": false,
+      "indicatorNumbers": [
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "sourcePdfPages": [
+        4,
+        5
+      ],
+      "tags": [
+        "family:ceedar_di",
+        "role:teacher_self",
+        "stage:prek12",
+        "language:en",
+        "version:source_2016_10_16",
+        "use:developmental_reflection",
+        "research:PILOT",
+        "rights:course_use_only_broader_use_pending",
+        "topic:assessment"
+      ],
+      "definitionFile": "ceedar_di2016_assessment_teacher_en.form.json",
+      "definitionFileSha256": "973590af77829e146fb4664eeb596a73767936ff605af2bd6d8b8a05296a3019",
+      "rights": "COURSE_PERMISSION_FOUND_PLATFORM_REDISTRIBUTION_PENDING",
+      "installation": "ISOLATED_SUBMITTED_NOT_APPROVED_NOT_ONLINE",
+      "scoring": "NONE",
+      "sourceMap": [
+        {
+          "itemKey": "di_i07_e01",
+          "indicator": 7,
+          "element": 1,
+          "docxTableRowIndex0": 21,
+          "promptSha256": "576d0ce435bae12b97dab971cba559067a2a76d83c587662f8f4c02550eb2898",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i07_e02",
+          "indicator": 7,
+          "element": 2,
+          "docxTableRowIndex0": 22,
+          "promptSha256": "13c91c2d08dda3633496897302d3567ee481ba64e3ea3a046153981f0e8307c1",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i07_e03",
+          "indicator": 7,
+          "element": 3,
+          "docxTableRowIndex0": 23,
+          "promptSha256": "b0e5e942e20e1097e03521930ab027bce3e362713bbfe57b4318297e8991b889",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i08_e01",
+          "indicator": 8,
+          "element": 1,
+          "docxTableRowIndex0": 24,
+          "promptSha256": "069f291f408c146063792e7f5158e35f962fdbfdfd3354ec92354832c147e5ce",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i08_e02",
+          "indicator": 8,
+          "element": 2,
+          "docxTableRowIndex0": 25,
+          "promptSha256": "022b470d2c4e15a38f927ea8a81178e6c09a8d919a059f300facc2ea98d73ede",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i08_e03",
+          "indicator": 8,
+          "element": 3,
+          "docxTableRowIndex0": 26,
+          "promptSha256": "e63ac8aaa293f45345e09fa51c746b8c512518ca00adc516a4508582459545ef",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i09_e01",
+          "indicator": 9,
+          "element": 1,
+          "docxTableRowIndex0": 29,
+          "promptSha256": "c6dc79c863067641e5c5ef1c6feddeaca540cf86ce4f910731c5ec9621130e7a",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i09_e02",
+          "indicator": 9,
+          "element": 2,
+          "docxTableRowIndex0": 30,
+          "promptSha256": "b6b0a9b2081c4db1745c259dc6d2d01a0bb3acedf3c2ffa11ee6986ef9c9e5b3",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i09_e03",
+          "indicator": 9,
+          "element": 3,
+          "docxTableRowIndex0": 31,
+          "promptSha256": "5c53bc5e30665f0718399dcb8f1ed36a72baa785165daa940b6f4911b27929f9",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i10_e01",
+          "indicator": 10,
+          "element": 1,
+          "docxTableRowIndex0": 33,
+          "promptSha256": "37e3b8cd58187f6cfe4bbe32919bb16fe9252f8a76bb4203aee987beaa321512",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i10_e02",
+          "indicator": 10,
+          "element": 2,
+          "docxTableRowIndex0": 34,
+          "promptSha256": "7e058f7c64376627ac486182c2eafa8c4e57f1a0aef6db0b1a8aef7f8a97f19f",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i11_e01",
+          "indicator": 11,
+          "element": 1,
+          "docxTableRowIndex0": 35,
+          "promptSha256": "1345b31fbb05192847686ea751d7a8ecd79e7f4a577bb24672765cc0ddbe3922",
+          "examplesInsidePromptNotSeparateQuestions": true
+        }
+      ],
+      "manualTallySourceTableRowIndex0": 36
+    },
+    {
+      "toolKey": "ceedar_di2016_grouping_teacher_en",
+      "title": "CEEDAR DI｜灵活分组与尊重性任务｜教师自评｜英语2016来源／项目草稿0.1.0",
+      "kind": "FORM",
+      "contentVersion": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "responseFieldCount": 21,
+      "ratedEvidenceCount": 18,
+      "manualTallyFields": 3,
+      "manualTallyAutoCalculated": false,
+      "indicatorNumbers": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "sourcePdfPages": [
+        6,
+        7
+      ],
+      "tags": [
+        "family:ceedar_di",
+        "role:teacher_self",
+        "stage:prek12",
+        "language:en",
+        "version:source_2016_10_16",
+        "use:developmental_reflection",
+        "research:PILOT",
+        "rights:course_use_only_broader_use_pending",
+        "topic:grouping"
+      ],
+      "definitionFile": "ceedar_di2016_grouping_teacher_en.form.json",
+      "definitionFileSha256": "88e356ad6b6962de5681d3e042d8a39ace1bff9f123e2b8cc47fd99c1fd290ea",
+      "rights": "COURSE_PERMISSION_FOUND_PLATFORM_REDISTRIBUTION_PENDING",
+      "installation": "ISOLATED_SUBMITTED_NOT_APPROVED_NOT_ONLINE",
+      "scoring": "NONE",
+      "sourceMap": [
+        {
+          "itemKey": "di_i12_e01",
+          "indicator": 12,
+          "element": 1,
+          "docxTableRowIndex0": 39,
+          "promptSha256": "6502c5c82a2b1ff5f1aec9468cbe83449f8bb1b77796f0434002e99b103c7a48",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i12_e02",
+          "indicator": 12,
+          "element": 2,
+          "docxTableRowIndex0": 40,
+          "promptSha256": "9b60289ad3a946efb32df36bcd76565d097ca65e785b404699cbf8764cff1419",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i12_e03",
+          "indicator": 12,
+          "element": 3,
+          "docxTableRowIndex0": 41,
+          "promptSha256": "b7f67fc2c9744d131842b59d0f72d2d8255b10a1ada709d4fc95524950ebac24",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i12_e04",
+          "indicator": 12,
+          "element": 4,
+          "docxTableRowIndex0": 42,
+          "promptSha256": "4dd66a2a6bb821d08d829dcb3f6bc6c6260490b970d79ad463a2b568e963f807",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i13_e01",
+          "indicator": 13,
+          "element": 1,
+          "docxTableRowIndex0": 43,
+          "promptSha256": "04235f6972b0470710002c9b33e0a5d3bb4373d19674f6f267bc36ddfb2ef4ab",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i14_e01",
+          "indicator": 14,
+          "element": 1,
+          "docxTableRowIndex0": 44,
+          "promptSha256": "8b62e08b92e19f8d3f42273ce73973e19eb0848f60b8c00d72cb7dff68212606",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i14_e02",
+          "indicator": 14,
+          "element": 2,
+          "docxTableRowIndex0": 45,
+          "promptSha256": "d9b582547cfeda4eff3954858d8205b54a90347b00c6c254eb2aff80a3c0fa4e",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i14_e03",
+          "indicator": 14,
+          "element": 3,
+          "docxTableRowIndex0": 46,
+          "promptSha256": "e8f5f18514b8bff2b5e8bad27bd05c8183940709a5d4d035b41265b0f88987dc",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i14_e04",
+          "indicator": 14,
+          "element": 4,
+          "docxTableRowIndex0": 47,
+          "promptSha256": "c378a230f1783a1079e503540449a7b3d25f3d93c27253c6d11f650cd30d1b5e",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i14_e05",
+          "indicator": 14,
+          "element": 5,
+          "docxTableRowIndex0": 48,
+          "promptSha256": "079b007690ba9d81b8e7be7dbeda8b8d7ee5d06208a7a2583b3977da3f1f1b83",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i14_e06",
+          "indicator": 14,
+          "element": 6,
+          "docxTableRowIndex0": 49,
+          "promptSha256": "82670803459d0451eafa6c01066173ac61a72b7b1618d07da3759d2a43e2e98b",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i15_e01",
+          "indicator": 15,
+          "element": 1,
+          "docxTableRowIndex0": 52,
+          "promptSha256": "b920520e8142dc3dd50ab261b749bf6f8737e5fc64f4c2e668ed9a1c60459112",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i16_e01",
+          "indicator": 16,
+          "element": 1,
+          "docxTableRowIndex0": 54,
+          "promptSha256": "d0239ea31ef2cabb21b5df8436973cff0fd2e7277076fd8b67b95659e3899f3e",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i17_e01",
+          "indicator": 17,
+          "element": 1,
+          "docxTableRowIndex0": 55,
+          "promptSha256": "733eea127ab541c07be88ba7661918b7c253295d6b091638eae55d7773111e8a",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i18_e01",
+          "indicator": 18,
+          "element": 1,
+          "docxTableRowIndex0": 56,
+          "promptSha256": "dd37bfd7928cfa8a6fc3915d78bfbe050134b0bebe8ad908fba1e1a7a8620987",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i18_e02",
+          "indicator": 18,
+          "element": 2,
+          "docxTableRowIndex0": 57,
+          "promptSha256": "9c032e02cee1a640b2f963e0937aad5917e4d8c3ba507c5fb386b13154303e8c",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i19_e01",
+          "indicator": 19,
+          "element": 1,
+          "docxTableRowIndex0": 58,
+          "promptSha256": "15103236e2ccd730640046152692a61e12d56d3ac428c1b7cc3cfba7c0641577",
+          "examplesInsidePromptNotSeparateQuestions": true
+        },
+        {
+          "itemKey": "di_i20_e01",
+          "indicator": 20,
+          "element": 1,
+          "docxTableRowIndex0": 59,
+          "promptSha256": "1a04c7a383ca2c89ab8560a66cd4204b046d211c55baf8fe582219547748071c",
+          "examplesInsidePromptNotSeparateQuestions": true
+        }
+      ],
+      "manualTallySourceTableRowIndex0": 60
+    },
+    {
+      "toolKey": "ceedar_di2016_action_plan_teacher_en",
+      "title": "CEEDAR DI｜目标与后续行动｜教师自评｜英语2016来源／项目草稿0.1.0",
+      "kind": "FORM",
+      "contentVersion": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "responseFieldCount": 3,
+      "indicatorNumbers": [],
+      "sourcePdfPages": [
+        8
+      ],
+      "tags": [
+        "family:ceedar_di",
+        "role:teacher_self",
+        "stage:prek12",
+        "language:en",
+        "version:source_2016_10_16",
+        "use:developmental_reflection",
+        "research:PILOT",
+        "rights:course_use_only_broader_use_pending",
+        "topic:action_plan"
+      ],
+      "definitionFile": "ceedar_di2016_action_plan_teacher_en.form.json",
+      "definitionFileSha256": "25f74d735ccdfceeb14b64e4b2022a7eaf4955fc6fc8de0ee8d8e7014b4c3ffc",
+      "rights": "COURSE_PERMISSION_FOUND_PLATFORM_REDISTRIBUTION_PENDING",
+      "installation": "ISOLATED_SUBMITTED_NOT_APPROVED_NOT_ONLINE",
+      "scoring": "NONE",
+      "sourceMap": [
+        {
+          "itemKey": "targeted_indicators",
+          "docxTableRowIndex0": 61,
+          "promptSha256": "2dbea5eb199f744d83e4457948af2245ddaf4020c925e0ee3e049b86f79591ae"
+        },
+        {
+          "itemKey": "next_steps",
+          "docxTableRowIndex0": 61,
+          "promptSha256": "a46fa01073ac70f0b00a79c0a3e182f621bbf47346e583c269aa55f91226edda"
+        },
+        {
+          "itemKey": "comments",
+          "docxTableRowIndex0": 61,
+          "promptSha256": "200d647d1164db13dd484eeb713c1b6623bafb879cdd7058546354ae552f805e"
+        }
+      ]
+    }
+  ],
+  "originalItemTextIncluded": false,
+  "publicSubmittablePayloadIncluded": false,
+  "ordinaryCombination": {
+    "purpose": "Preserve original four-principle sequence plus action plan; no total",
+    "orderedToolKeys": [
+      "ceedar_di2016_environment_teacher_en",
+      "ceedar_di2016_goals_teacher_en",
+      "ceedar_di2016_assessment_teacher_en",
+      "ceedar_di2016_grouping_teacher_en",
+      "ceedar_di2016_action_plan_teacher_en"
+    ],
+    "created": false
+  },
+  "productionDuplicateAudit": "NOT_EXECUTED"
+}
