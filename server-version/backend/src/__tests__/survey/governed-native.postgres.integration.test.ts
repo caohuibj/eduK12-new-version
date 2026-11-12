@@ -56,7 +56,7 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   await db.surveyMfaCredential.create({data:{userId:owner,enabled:true,secretCipher:'synthetic-only'}})
   registry.packages=[compileSjtNativeV1Fixture().package,createSjtNativeStagedPackage()].map(p=>({...p,releaseStatus:'PUBLISHED'}))
  })
- afterAll(async()=>{await (await import('../../config/queue')).closeQueues(true);await db.$disconnect();vi.unstubAllEnvs()})
+ afterAll(async()=>{await (await import('../../config/queue')).closeQueues(true);await db.$disconnect();vi.unstubAllEnvs()},30_000)
  it('stops only the revoked exact researcher grant, retaining a completed native child and serializing stop with collection',async()=>{
   const pkg=registry.packages[1],submitted=await submitGovernedSource(system,{requestId:randomUUID(),source:{kind:'SJT',sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion},version:'scope-'+randomUUID(),title:'Synthetic scoped stop',report:null,reference:{}},proof)
   await approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',allowedProducts:['SURVEY'],reason:'Synthetic scope approval'},proof)
@@ -104,7 +104,79 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   await expect(db.$transaction(tx=>assertSurveyScaleCollectionAllowed(tx,other.snapshot))).rejects.toMatchObject({statusCode:403})
   expect((await submitResearchFinal(other.parent)).status).toBe('COMPLETED')
  },60000)
+ it('keeps prefetch START and grant revocation or policy pause deadlock-free, and denies START that commits after the stop',async()=>{
+  const pkg=registry.packages[1]
+  const openPublished=async()=>{
+   const submitted=await submitGovernedSource(system,{requestId:randomUUID(),source:{kind:'SJT',sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion},version:'prefetch-'+randomUUID(),title:'Synthetic prefetch race',report:null,reference:{}},proof)
+   await approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',allowedProducts:['SURVEY'],reason:'Synthetic prefetch approval'},proof)
+   const grant=await grantCatalogSource(manager,owner,{kind:'SJT',sourceId:'survey-tool:'+submitted.id,sourceVersion:submitted.hash})
+   const projectId=randomUUID()
+   await db.surveyProject.create({data:{id:projectId,ownerUserId:owner,title:'Synthetic prefetch project',collectionMode:'SINGLE_UNLINKED'}})
+   const draft=await importCatalogDraft(owner,projectId,grant.id,{requestId:randomUUID(),instrumentKey:'native',title:'Frozen prefetch native'})
+   const wave=await createWave(owner,projectId,{requestId:randomUUID(),title:'Synthetic prefetch',consentText:'Synthetic prefetch consent without human participants.',generalText:'Synthetic',instrumentIds:[draft.id],allowNewParticipants:true})
+   await prepareWave(owner,projectId,wave.id,wave.revision)
+   const prepared=await getWave(owner,projectId,wave.id)
+   const opened=await openWave(owner,projectId,wave.id,prepared.revision)
+   const snapshot=(await db.surveyPublication.findUniqueOrThrow({where:{id:opened.publicationId!}})).compiledSnapshot as unknown as ResearchFrozenPublication
+   const start=()=>startSingleUnlinkedWave({...surveyStartKeys('governed-prefetch'),publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true})
+   return {submitted,grant,snapshot,start}
+  }
+  const awaitLockWait=async()=>{
+   let waiting=false
+   for(let i=0;i<40&&!waiting;i++){
+    const rows=await db.$queryRaw<Array<{waiting:boolean}>>`SELECT EXISTS(
+      SELECT 1 FROM pg_stat_activity
+      WHERE datname=current_database() AND wait_event_type='Lock'
+        AND pid<>pg_backend_pid() AND query NOT LIKE '%pg_stat_activity%'
+    ) AS waiting`
+    waiting=rows[0].waiting
+    if(!waiting)await new Promise(resolve=>setTimeout(resolve,25))
+   }
+   expect(waiting).toBe(true)
+  }
+
+  const grantRace=await openPublished()
+  let release!:()=>void,locked!:()=>void
+  const ready=new Promise<void>(resolve=>{locked=resolve}),hold=new Promise<void>(resolve=>{release=resolve})
+  const collection=db.$transaction(async tx=>{
+   await assertSurveyScaleCollectionAllowed(tx,grantRace.snapshot)
+   locked();await hold
+  },{timeout:15_000,maxWait:5_000})
+  await ready
+  const revoke=revokeToolGrant(manager,grantRace.grant.id)
+  try{
+   await awaitLockWait()
+  }finally{release()}
+  await expect(collection).resolves.toBeUndefined()
+  await expect(revoke).resolves.toBeTruthy()
+  await expect(grantRace.start()).rejects.toMatchObject({statusCode:403})
+
+  const pauseRace=await openPublished()
+  const policy=await db.$queryRaw<Array<{version:number}>>`SELECT version FROM survey_tool_policies WHERE product='SURVEY' AND resource_key=${'governed-release:'+pauseRace.submitted.id} AND fingerprint=${pauseRace.submitted.hash}`
+  let releasePause!:()=>void,lockedPause!:()=>void
+  const readyPause=new Promise<void>(resolve=>{lockedPause=resolve}),holdPause=new Promise<void>(resolve=>{releasePause=resolve})
+  const pauseCollection=db.$transaction(async tx=>{
+   await assertSurveyScaleCollectionAllowed(tx,pauseRace.snapshot)
+   lockedPause();await holdPause
+  },{timeout:15_000,maxWait:5_000})
+  await readyPause
+  const pause=changeSurveyToolPolicy(manager,{
+   resourceKey:'governed-release:'+pauseRace.submitted.id,fingerprint:pauseRace.submitted.hash,
+   expectedVersion:policy[0].version,decision:'APPROVED',paused:true,reason:'Synthetic prefetch pause',
+  })
+  try{
+   await awaitLockWait()
+  }finally{releasePause()}
+  await expect(pauseCollection).resolves.toBeUndefined()
+  await expect(pause).resolves.toBeTruthy()
+  await expect(pauseRace.start()).rejects.toMatchObject({statusCode:409})
+
+  const afterStop=await openPublished()
+  await revokeToolGrant(manager,afterStop.grant.id)
+  await expect(afterStop.start()).rejects.toMatchObject({statusCode:403})
+ },60_000)
  it('qualifies a real synthetic V2 author release and preserves concurrent child replay plus the configured report',async()=>{
+
   const template={...structuredClone(sjtNativeStagedTemplate),instrumentKey:'synthetic-author-governed-'+randomUUID()},compiled=compileSjtTemplate(template)
   const draft=await createSjtDraft({userId:manager,admin:false},template,{authorizationPolicy:null})
   await requestSjtReview({userId:manager,admin:false},draft.id,draft.revision,draft.contentDigest)
