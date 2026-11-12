@@ -43,7 +43,7 @@ export async function assertSurveyToolPolicy(tx:Prisma.TransactionClient,identit
 }
 /** Fresh new-parent admission only. Frozen execution and report/data authority
  * have separate boundaries; never call this on an existing Attempt's writes. */
-export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClient,snapshot:ResearchFrozenPublication){
+export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClient,snapshot:ResearchFrozenPublication,knownIdentities?:ReadonlyMap<string,PolicyIdentity>){
  await assertFrozenPackageAdmissions(tx,snapshot)
  const typedUses=await readFrozenSurveyStandardUses(tx,snapshot.projectId,snapshot.units)
  const checkedSjtAuthorities=new Set<string>()
@@ -95,7 +95,7 @@ export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClie
    const [release]=await tx.$queryRaw<Array<{state:string;combination_hash:string}>>`SELECT state,combination_hash FROM survey_standard_releases WHERE id=${p.surveyStandardReleaseId} FOR SHARE`
    if(release?.state!=='ONLINE'||release.combination_hash!==ref.sourceVersion)throw new AdminPermissionError(409,'冻结批准组合已撤下，停止新入场；已入场作答按原冻结规则完成')
   }
-  const identity=await snapshotPolicyIdentity(tx,{ref,provenance:p,definitionDigest:unit.sourceDigest} as CatalogSourceSnapshot)
+  const identity=knownIdentities?.get(unit.draftId)??await snapshotPolicyIdentity(tx,{ref,provenance:p,definitionDigest:unit.sourceDigest} as CatalogSourceSnapshot)
   await assertSurveyToolPolicy(tx,identity,false)
  }
  // Check the original issuer's current expiry AFTER later source/policy waits.
