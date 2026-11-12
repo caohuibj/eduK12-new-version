@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "pages": [
+    {
+      "pageKey": "action_review_page",
+      "title": "行动与回顾计划",
+      "description": "这是一份可跳过任意问题的个人反思记录。它没有分数，不用于判断教学优劣。可以只记录一件事，并选择一个需要支持的小步骤。",
+      "questions": [
+        {
+          "itemKey": "plan_focus",
+          "type": "SINGLE",
+          "prompt": "这次计划想关注什么？",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "practice_student_centered_discipline",
+              "label": "支持学习的规则与纪律"
+            },
+            {
+              "optionKey": "practice_teacher_language",
+              "label": "教师表达与回应"
+            },
+            {
+              "optionKey": "practice_responsibility_choice",
+              "label": "责任与选择"
+            },
+            {
+              "optionKey": "practice_warmth_support",
+              "label": "温暖与支持"
+            },
+            {
+              "optionKey": "practice_cooperative_learning",
+              "label": "合作学习"
+            },
+            {
+              "optionKey": "practice_classroom_discussions",
+              "label": "课堂讨论"
+            },
+            {
+              "optionKey": "practice_self_assessment_reflection",
+              "label": "学习中的自评与反思"
+            },
+            {
+              "optionKey": "practice_balanced_instruction",
+              "label": "多种教学方式的安排"
+            },
+            {
+              "optionKey": "practice_academic_press_expectations",
+              "label": "学习挑战与期望"
+            },
+            {
+              "optionKey": "practice_competence_building",
+              "label": "示范、练习与反馈支持"
+            },
+            {
+              "optionKey": "competency_self_awareness",
+              "label": "自我觉察"
+            },
+            {
+              "optionKey": "competency_self_management",
+              "label": "自我管理与情绪调节"
+            },
+            {
+              "optionKey": "competency_social_awareness",
+              "label": "理解他人和情境"
+            },
+            {
+              "optionKey": "competency_relationship_skills",
+              "label": "关系与沟通"
+            },
+            {
+              "optionKey": "competency_responsible_decision",
+              "label": "负责任的决策"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "plan_step",
+          "type": "LONG_TEXT",
+          "prompt": "选择一个你能尝试的小步骤，写清准备在什么情境中做什么。",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "plan_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "尝试后，你准备记录哪一种具体变化或片段，帮助自己回看？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "plan_support",
+          "type": "LONG_TEXT",
+          "prompt": "尝试这一步需要哪些时间、资源或他人的协助？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "plan_review_window",
+          "type": "SHORT_TEXT",
+          "prompt": "你希望什么时候回看这次尝试？可以写一个方便自己的时间。",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 160
+        },
+        {
+          "itemKey": "plan_followup",
+          "type": "LONG_TEXT",
+          "prompt": "回看时再填写：实际发生了什么？你想保留、调整，还是暂缓这一步？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        }
+      ]
+    }
+  ]
+}
