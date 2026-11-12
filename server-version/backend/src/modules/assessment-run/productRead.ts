@@ -189,7 +189,7 @@ const MICROSECOND_CURSOR_TIMESTAMP = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.(\
  * HTTP 500 instead of the promised 400 for a bad cursor. The microsecond
  * digits are kept verbatim (never rebuilt from a Date). Year 0000 is also
  * rejected: PostgreSQL's timestamptz range starts at year 0001. */
-function canonicalCursorTimestamp(value: unknown): string | null {
+export function canonicalCursorTimestamp(value: unknown): string | null {
   if (typeof value !== 'string') return null
   const match = MICROSECOND_CURSOR_TIMESTAMP.exec(value)
   if (!match) return null

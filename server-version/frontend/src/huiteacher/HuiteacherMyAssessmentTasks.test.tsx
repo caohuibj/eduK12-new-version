@@ -81,6 +81,37 @@ describe('Teacher participant host with synthetic runtime DTOs',()=>{
   fireEvent.click(screen.getByRole('button',{name:'返回任务列表'}));fireEvent.click(screen.getByRole('button',{name:'查看完成状态'}))
   await screen.findByText('本次测评已完成');expect(onCompleted).toHaveBeenCalledTimes(1)
  })
+ it('renders directly from inline currentUnit without a secondary GET current-unit request',async()=>{
+  const api=vi.fn(async(path:string,_method='GET',payload?:unknown)=>{
+   if(path.startsWith('/my-assessment-tasks'))return {list:[{...task,status:'ASSIGNED',runtimeBindingRef:null,consentRequired:false}],nextCursor:null}
+   if(path.endsWith('/start-assessment')){
+    expect(payload).toEqual({delivery:'inline'})
+    return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent',currentUnit:state('SCALE')}
+   }
+   throw new Error('unexpected secondary path '+path)
+  })
+  render(<HuiteacherMyAssessmentTasks api={api as EducationReportApi} actorKey="teacher"/>)
+  fireEvent.click(await screen.findByRole('button',{name:'开始测评'}))
+  fireEvent.click(screen.getByRole('button',{name:'开始或继续测评'}))
+  await screen.findByText('共享单元：SCALE')
+  expect(api.mock.calls.some(call=>String(call[0]).includes('view=current-unit'))).toBe(false)
+ })
+ it('still GETs current-unit when inline currentUnit is missing or does not match',async()=>{
+  const api=vi.fn(async(path:string,_method='GET',payload?:unknown)=>{
+   if(path.startsWith('/my-assessment-tasks'))return {list:[{...task,status:'ASSIGNED',runtimeBindingRef:null,consentRequired:false}],nextCursor:null}
+   if(path.endsWith('/start-assessment')){
+    expect(payload).toEqual({delivery:'inline'})
+    return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent',currentUnit:{...state('SCALE'),id:'other-parent'}}
+   }
+   if(path==='/assessment-composite-attempts/parent?view=current-unit')return state('COGNITIVE')
+   throw new Error('unexpected synthetic path '+path)
+  })
+  render(<HuiteacherMyAssessmentTasks api={api as EducationReportApi} actorKey="teacher"/>)
+  fireEvent.click(await screen.findByRole('button',{name:'开始测评'}))
+  fireEvent.click(screen.getByRole('button',{name:'开始或继续测评'}))
+  await screen.findByText('共享单元：COGNITIVE')
+  expect(api).toHaveBeenCalledWith('/assessment-composite-attempts/parent?view=current-unit')
+ })
  it('collects the actual assigned consent before first canonical START',async()=>{
   const api=fixture([state('COGNITIVE')],[{...task,status:'ASSIGNED',runtimeBindingRef:null,consentRequired:true,consentPurpose:'合成用途',consentVisibility:'仅授权范围'}])
   render(<HuiteacherMyAssessmentTasks api={api as EducationReportApi} actorKey="teacher"/>)

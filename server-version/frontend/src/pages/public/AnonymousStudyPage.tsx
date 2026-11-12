@@ -1,6 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { publicStudyApi, studyIdentityKey, type AcceptResearchConsent, type RequestResearchWithdrawal, type ResearchParticipation, type StudyEntry, type StudyHome, type StudyWave } from '../../api/anonymousStudy'
+import { normalizeApiError } from '../../utils/normalizeApiError'
+import { finalDraftCapacityRetryDelayMs } from '../../services/persistence/finalDraftCapacityRetry'
+
+/**
+ * Only retry a server-confirmed join admission rejection, which cannot
+ * create a participant. Do NOT automatically resend on network errors or
+ * timeouts: PERSONAL_LINK and SELF_CODE lack a client-stable join identity,
+ * so a committed claim with a lost response would create a second identity.
+ * Rate-limit 429 and other 4xx failures are never retried.
+ */
+const JOIN_BUSY_MAX_ATTEMPTS = 3
+const JOIN_BUSY_TOTAL_DEADLINE_MS = 60_000
+
+const isJoinBusyRetryable = (error: unknown): boolean => {
+  const normalized = normalizeApiError(error)
+  return normalized.status === 503 && String(normalized.code ?? '') === 'STUDY_JOIN_BUSY'
+}
 
 import {PersonalParticipationLink} from '../../components/participation/PersonalParticipationLink'
 import {ParticipationCodeSetup,ParticipationCodeSaved,ParticipationCodeRecovery,type MemorableEnrollment} from '../../components/participation/ParticipationCode'
@@ -116,9 +133,27 @@ export default function AnonymousStudyPage() {
   })
   const join=(memorable?:MemorableEnrollment)=>act(async()=>{
     if(!consent)throw new Error('请先确认研究内关联说明')
-    const current=epoch.current, joined=await publicStudyApi().join(waveId,token,memorable??(info?.mode==='SELF_CODE'?{generatedCode:true}:undefined))
-    if(current!==epoch.current)return
-    sessionStorage.setItem(studyIdentityKey(joined.studyId),joined.credential);setCredential(joined.credential);setNewCode(joined.credential);setFullCode(joined.fullCode??'')
+    // One epoch and one payload for the whole logical join, including backoff.
+    const current=epoch.current,startedAt=Date.now()
+    const mode=memorable??(info?.mode==='SELF_CODE'?{generatedCode:true as const}:undefined)
+    for(let attempt=1;;attempt+=1){
+      if(current!==epoch.current)return
+      try{
+        const joined=await publicStudyApi().join(waveId,token,mode)
+        if(current!==epoch.current)return
+        sessionStorage.setItem(studyIdentityKey(joined.studyId),joined.credential);setCredential(joined.credential);setNewCode(joined.credential);setFullCode(joined.fullCode??'')
+        return
+      }catch(error){
+        if(current!==epoch.current)return
+        if(!isJoinBusyRetryable(error)||attempt>=JOIN_BUSY_MAX_ATTEMPTS)throw error
+        const normalized=normalizeApiError(error)
+        const delay=finalDraftCapacityRetryDelayMs(attempt,normalized.retryAfterMs)
+        // Do not start an additional request after the retry deadline.
+        if(Date.now()-startedAt+delay>=JOIN_BUSY_TOTAL_DEADLINE_MS)throw error
+        await new Promise((resolve)=>setTimeout(resolve,delay))
+        if(current!==epoch.current)return
+      }
+    }
   })
   const recoverCode=(code:string,resetSuffix?:string)=>act(async()=>{
     const current=epoch.current

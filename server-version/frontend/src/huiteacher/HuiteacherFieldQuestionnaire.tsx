@@ -19,11 +19,14 @@ export function HuiteacherFieldQuestionnaire({api,invitationId,task,onProgress,o
  const media=useMemo(()=>attempt?.currentItem?createTeacherAssessmentMediaTransport(fieldApi,attempt.id,attempt.currentItem):undefined,[fieldApi,attempt])
  useEffect(()=>{callback.current(latest.current)},[attempt,busy])
  useEffect(()=>()=>callback.current({...latest.current,writing:false}),[])
- const read=async(id:string,token:number)=>{
-  const state=await fieldApi<CompositeAttemptState>(teacherAssessmentParentPath(id)+'?view=current-unit')
+ const accept=(id:string,state:CompositeAttemptState,token:number)=>{
   if(!alive.current||generation.current!==token)return
   if(state.id!==id||state.deliveryMode!=='FINAL_ONLY'||!['IN_PROGRESS','COMPLETED'].includes(state.status))throw Error('现场作答与当前固定问卷不匹配')
   setAttempt(state)
+ }
+ const read=async(id:string,token:number)=>{
+  const state=await fieldApi<CompositeAttemptState>(teacherAssessmentParentPath(id)+'?view=current-unit')
+  accept(id,state,token)
  }
  useEffect(()=>{
   alive.current=true;const token=++generation.current;pending.current=false;setBusy(false);setAttempt(null);setError('')
@@ -41,8 +44,11 @@ export function HuiteacherFieldQuestionnaire({api,invitationId,task,onProgress,o
   finally{if(alive.current&&token===generation.current){pending.current=false;setBusy(false)}}
  }
  const start=()=>{void action(async token=>{
-  const result=await fieldApi<{attemptId:string}>('/invitations/'+encodeURIComponent(invitationId)+'/start','POST',{})
-  if(alive.current&&token===generation.current)await read(result.attemptId,token)
+  const result=await fieldApi<{attemptId:string;currentUnit?:CompositeAttemptState}>('/invitations/'+encodeURIComponent(invitationId)+'/start','POST',{delivery:'inline'})
+  if(!(alive.current&&token===generation.current))return
+  const inline=result.currentUnit
+  if(inline&&inline.id===result.attemptId&&inline.deliveryMode==='FINAL_ONLY')accept(result.attemptId,inline,token)
+  else await read(result.attemptId,token)
  }).catch(()=>undefined)}
  const reload=async()=>{if(attempt)await action(token=>read(attempt.id,token))}
  const submit=async(id:string,unitId:string,kind:'scale'|'form',payload:unknown)=>{
