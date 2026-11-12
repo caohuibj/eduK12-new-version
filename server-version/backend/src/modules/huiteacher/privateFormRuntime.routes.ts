@@ -14,6 +14,7 @@ import {startAssessmentRunExecution} from '../assessment-run/startExecution'
 import {resolveEducationProductMemberScope} from '../organization/educationProductAccess'
 import {relationalRuntimeConsentAuthority} from '../assessment-relational/runtime-consent'
 import {compositeController} from '../composite/composite.controller'
+import {attachTeacherInlineCurrentUnit,requestedTeacherInlineCurrentUnit} from './inlineCurrentUnit'
 
 const router=Router(),uuid=z.string().guid()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
@@ -101,7 +102,20 @@ router.post('/run-executions/:executionId/start-private-form',authenticateHuitea
  if(!task||!['ASSIGNED','STARTED'].includes(task.status))return {state:'WITHHELD' as const}
  const result=await startAssessmentRunExecution({executionId,actorUserId:req.user!.userId})
  if(result.state==='STARTED'&&result.runtimeBindingKind!=='COMPOSITE')throw new Error('Private Form requires its exact Composite runtime')
- return result
+ if(result.state!=='STARTED')return result
+ // GET /private-form-composite-attempts/:id returns getAttemptState unchanged.
+ return attachTeacherInlineCurrentUnit({
+  requested:requestedTeacherInlineCurrentUnit(req),
+  started:result,
+  attemptId:result.runtimeBindingRef,
+  actorUserId:req.user!.userId,
+  authorize:async({attemptId,actorUserId})=>{
+   const row=await own(actorUserId,{attemptId})
+   if(!row)throw new Error('HUITEACHER_PRIVATE_FORM_ATTEMPT_UNAVAILABLE')
+   return row
+  },
+  project:state=>state,
+ })
 }))
 router.get('/private-form-composite-attempts/:attemptId',authenticateHuiteacher,requireAttempt,compositeController.getAttempt)
 router.get('/private-form-composite-attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content',authenticateHuiteacher,requireAttempt,compositeImageController.authenticatedFormImage)

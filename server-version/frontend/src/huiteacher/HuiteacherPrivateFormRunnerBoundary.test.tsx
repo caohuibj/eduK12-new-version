@@ -17,12 +17,41 @@ describe('Teacher private form consumer fail-closed boundaries',()=>{
   expect(state.items[0].type).toBe('FORM');expect(state.units[0].type).toBe('FORM_SECTION')
  })
 
+ it('renders directly from inline currentUnit without a secondary GET current-unit request',async()=>{
+  const api=vi.fn(async(path:string,_method?:string,payload?:unknown)=>{
+   if(path==='/my-private-form-tasks')return {list:[task]}
+   if(path.endsWith('/start-private-form')){
+    expect(payload).toEqual({delivery:'inline'})
+    return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt',currentUnit:{...state,deliveryMode:'FINAL_ONLY'}}
+   }
+   throw Error('Unexpected secondary request '+path)
+  })
+  render(<HuiteacherMyPrivateFormTasks api={api as PrivateToolApi} actorKey="author"/>)
+  fireEvent.click(await screen.findByRole('button',{name:'打开本人表单'}))
+  await screen.findByText('表单运行器 attempt')
+  expect(api.mock.calls.some(([path])=>String(path).includes('view=current-unit'))).toBe(false)
+ })
+ it('still GETs current-unit when inline currentUnit does not match the attempt',async()=>{
+  const api=vi.fn(async(path:string,_method?:string,payload?:unknown)=>{
+   if(path==='/my-private-form-tasks')return {list:[task]}
+   if(path.endsWith('/start-private-form')){
+    expect(payload).toEqual({delivery:'inline'})
+    return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt',currentUnit:{...state,id:'other',deliveryMode:'FINAL_ONLY'}}
+   }
+   if(path==='/private-form-composite-attempts/attempt?view=current-unit')return state
+   throw Error('Unexpected '+path)
+  })
+  render(<HuiteacherMyPrivateFormTasks api={api as PrivateToolApi} actorKey="author"/>)
+  fireEvent.click(await screen.findByRole('button',{name:'打开本人表单'}))
+  await screen.findByText('表单运行器 attempt')
+  expect(api).toHaveBeenCalledWith('/private-form-composite-attempts/attempt?view=current-unit')
+ })
  it.each(['WITHHELD','IN_PROGRESS'])('does not mount or claim success for a %s start result',async outcome=>{
   const api=vi.fn(async(path:string)=>path==='/my-private-form-tasks'?{list:[task]}:{state:outcome,runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'must-not-read'})
   render(<HuiteacherMyPrivateFormTasks api={api as PrivateToolApi} actorKey="author"/>)
   fireEvent.click(await screen.findByRole('button',{name:'打开本人表单'}))
   await screen.findByText(outcome==='WITHHELD'?'当前未获准打开此表单任务，请刷新任务列表核对。':'表单任务正在建立，请刷新任务后继续，不要重复开始。')
-  expect(api).toHaveBeenCalledWith('/run-executions/execution/start-private-form','POST',{})
+  expect(api).toHaveBeenCalledWith('/run-executions/execution/start-private-form','POST',{delivery:'inline'})
   expect(api.mock.calls.some(([path])=>path.includes('composite-attempts'))).toBe(false)
   expect(screen.queryByText(/表单运行器/)).not.toBeInTheDocument();expect(screen.queryByText('已完成正式提交')).not.toBeInTheDocument()
  })

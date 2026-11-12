@@ -19,6 +19,7 @@ import { readTeacherPersonalScaleReport } from './scalePersonalReport.service'
 import { compositeController } from '../composite/composite.controller'
 import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
+import { attachTeacherInlineCurrentUnit, requestedTeacherInlineCurrentUnit } from './inlineCurrentUnit'
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
@@ -100,22 +101,39 @@ async function ownScaleExecution(input:{actorUserId:string;executionId?:string;a
   }))return null
   return row
 }
+/** Same authority the GET /composite-attempts/:attemptId middleware uses. */
+async function authorizeCurrentScaleAttempt(input:{
+  actorUserId:string
+  accountDomain?:string
+  attemptId:string
+  itemId?:string
+}){
+  if(input.accountDomain!=='SCHOOL')throw new Error('HUITEACHER_SCALE_ATTEMPT_UNAVAILABLE')
+  const proof=await ownScaleExecution({
+    actorUserId:input.actorUserId,attemptId:input.attemptId,itemId:input.itemId,
+  })
+  if(!proof)throw new Error('HUITEACHER_SCALE_ATTEMPT_UNAVAILABLE')
+  const scope=await resolveEducationProductMemberScope({
+    actorUserId:input.actorUserId,
+    organizationId:proof.organizationId,product:'HUITEACHER',
+  })
+  if(!scope)throw new Error('HUITEACHER_SCALE_ATTEMPT_UNAVAILABLE')
+  return proof
+}
 async function requireScaleAttempt(req:Request,res:Response,next:NextFunction){
   try{
     const attemptId=uuid.parse(req.params.attemptId)
-    if(!req.user||req.user.accountDomain!=='SCHOOL')
-      return notFound(res,'教师测评记录不存在')
-    const proof=await ownScaleExecution({
-      actorUserId:req.user.userId,attemptId,itemId:req.params.itemId,
+    if(!req.user)return notFound(res,'教师测评记录不存在')
+    await authorizeCurrentScaleAttempt({
+      actorUserId:req.user.userId,accountDomain:req.user.accountDomain,
+      attemptId,itemId:req.params.itemId,
     })
-    if(!proof)return notFound(res,'教师测评记录不存在')
-    const scope=await resolveEducationProductMemberScope({
-      actorUserId:req.user.userId,
-      organizationId:proof.organizationId,product:'HUITEACHER',
-    })
-    if(!scope)return notFound(res,'教师测评记录不存在')
     next()
-  }catch(e){next(e)}
+  }catch(e){
+    if(e instanceof Error&&e.message==='HUITEACHER_SCALE_ATTEMPT_UNAVAILABLE')
+      return notFound(res,'教师测评记录不存在')
+    next(e)
+  }
 }
 export async function listOwnTeacherScaleTasks(userId:string,cursor?:RunTaskCursor){
   const limit=100
@@ -272,7 +290,18 @@ router.post('/run-executions/:executionId/start-scale',
     })
     if(result.state==='STARTED'&&result.runtimeBindingKind!=='COMPOSITE')
       throw new Error('Expected canonical Scale Composite binding')
-    return result
+    if(result.state!=='STARTED')return result
+    // GET /composite-attempts/:id returns getAttemptState unchanged.
+    return attachTeacherInlineCurrentUnit({
+      requested:requestedTeacherInlineCurrentUnit(req),
+      started:result,
+      attemptId:result.runtimeBindingRef,
+      actorUserId:req.user!.userId,
+      authorize:({attemptId,actorUserId})=>authorizeCurrentScaleAttempt({
+        actorUserId,accountDomain:req.user!.accountDomain,attemptId,
+      }),
+      project:state=>state,
+    })
   }))
 router.get('/composite-attempts/:attemptId',
   authenticateHuiteacher,requireScaleAttempt,compositeController.getAttempt)

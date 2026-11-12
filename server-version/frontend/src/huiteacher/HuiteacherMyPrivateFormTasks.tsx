@@ -9,7 +9,7 @@ import type {CompositeAttemptState} from '../modules/composite/types'
 
 type Api=<T>(path:string,method?:string,payload?:unknown,options?:{responseType?:'blob'})=>Promise<T>
 type Task={executionId:string;runId:string;organizationId:string;eventId:string;eventTitle:string;formTitle:string;status:string;runStatus:string;eventStatus:string;runtimeBindingKind:string|null;runtimeBindingRef:string|null}
-type Start={state:'STARTED'|'IN_PROGRESS'|'WITHHELD';runtimeBindingKind?:string;runtimeBindingRef?:string}
+type Start={state:'STARTED'|'IN_PROGRESS'|'WITHHELD';runtimeBindingKind?:string;runtimeBindingRef?:string;currentUnit?:CompositeAttemptState}
 const canOpen=(task:Task)=>['ASSIGNED','STARTED'].includes(task.status)&&task.eventStatus==='OPEN'&&(task.runStatus==='PUBLISHED'||(task.runStatus==='CLOSED'&&task.status==='STARTED'&&task.runtimeBindingKind==='COMPOSITE'&&Boolean(task.runtimeBindingRef)))
 const attemptPath=(id:string)=>'/private-form-composite-attempts/'+encodeURIComponent(id)
 function assertAttempt(state:CompositeAttemptState,id:string){
@@ -89,28 +89,34 @@ function PrivateFormSession({api,actorKey,unified=false,onListStateChange}:{api:
   try{await action(valid)}catch(error){if(valid())setMessage(error instanceof Error?error.message:'表单操作未完成，请重试读取。')}
   finally{if(valid()){locked.current=false;setBusy(false)}}
  }
- const read=async(task:Task,id:string,valid:()=>boolean)=>{
-  const state=await api<CompositeAttemptState>(attemptPath(id)+'?view=current-unit')
+ const accept=(task:Task,id:string,state:CompositeAttemptState,valid:()=>boolean)=>{
   if(!valid())return
   assertAttempt(state,id)
   setActive({api,task,attempt:state})
   if(state.status==='COMPLETED'){setCompleted(old=>Array.from(new Set([...old,task.executionId])));setMessage('本次表单已正式提交。表单不计算量表分数，也不新增个人报告读取权。');void refresh()}
  }
+ const read=async(task:Task,id:string,valid:()=>boolean)=>{
+  const state=await api<CompositeAttemptState>(attemptPath(id)+'?view=current-unit')
+  accept(task,id,state,valid)
+ }
  const open=(task:Task)=>void work(async valid=>{
   if(!canOpen(task)||completed.includes(task.executionId))throw Error('任务当前不接受新的作答；已收尾任务仅可继续获准的已有作答。')
   setActive(null)
   let id=task.runtimeBindingRef
+  let inline:CompositeAttemptState|undefined
   if(id&&task.runtimeBindingKind!=='COMPOSITE')throw Error('此任务不是受控的私有表单运行记录。')
   if(!id){
-   const result=await api<Start>('/run-executions/'+encodeURIComponent(task.executionId)+'/start-private-form','POST',{})
+   const result=await api<Start>('/run-executions/'+encodeURIComponent(task.executionId)+'/start-private-form','POST',{delivery:'inline'})
    if(!valid())return
    if(result.state==='IN_PROGRESS'){setMessage('表单任务正在建立，请刷新任务后继续，不要重复开始。');return}
    if(result.state!=='STARTED'||result.runtimeBindingKind!=='COMPOSITE'||!result.runtimeBindingRef)throw Error('当前未获准打开此表单任务，请刷新任务列表核对。')
    id=result.runtimeBindingRef
+   if(result.currentUnit&&result.currentUnit.id===id&&result.currentUnit.deliveryMode==='FINAL_ONLY')inline=result.currentUnit
   }
   const bound={...task,status:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:id}
   setActive({api,task:bound,attempt:null})
-  await read(bound,id,valid)
+  if(inline)accept(bound,id,inline,valid)
+  else await read(bound,id,valid)
  })
  const reload=async()=>{
   const source=activeRef.current

@@ -19,7 +19,7 @@ type Task={
   resourceKey:string;title:string;runStatus:string
 }
 type Start={state:'STARTED'|'IN_PROGRESS'|'WITHHELD';
-  runtimeBindingKind?:string;runtimeBindingRef?:string}
+  runtimeBindingKind?:string;runtimeBindingRef?:string;currentUnit?:CompositeAttemptState}
 
 export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{api:Api}&AssessmentListPresentation){
   const [taskRows,setTasks]=useState<Task[]>([])
@@ -122,9 +122,10 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
       throw new Error('任务已结束，不能建立新的作答。')
     }
     let attemptId=item.runtimeBindingRef
+    let inline:CompositeAttemptState|undefined
     if(!attemptId){
       const started=await api<Start>(
-        '/run-executions/'+item.executionId+'/start-scale','POST',{})
+        '/run-executions/'+item.executionId+'/start-scale','POST',{delivery:'inline'})
       if(!valid())return
       if(started.state==='IN_PROGRESS'){
         setMessage('正式测评正在建立，请刷新任务后继续。')
@@ -135,8 +136,11 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
         ||!started.runtimeBindingRef)
         throw new Error('当前未找到获授权的教师自评运行记录')
       attemptId=started.runtimeBindingRef
+      if(started.currentUnit&&started.currentUnit.id===attemptId&&started.currentUnit.deliveryMode==='FINAL_ONLY'){
+        inline=started.currentUnit
+      }
     }
-    const value=await load(attemptId)
+    const value=inline??await load(attemptId)
     if(!valid())return
     if(value.status==='COMPLETED'){sessionRef.current=null;setSession(null);confirmCompleted(item);showReport(item);void refresh()}
     else setSession({api,selected:item,attempt:value})
