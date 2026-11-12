@@ -27,14 +27,26 @@ describe('strict governed proof still owns fresh policy and source grant gates',
   expect(strict).toHaveBeenCalledTimes(1);expect(tx.$queryRaw).toHaveBeenCalledTimes(1)
  })
  it('checks non-Scale collection freshly on every call',async()=>{
-  const tx={$queryRaw:vi.fn().mockResolvedValueOnce([{id:'grant'}]).mockResolvedValueOnce([])}
+  let grants=1
+  const tx={$executeRaw:vi.fn().mockResolvedValue(1),$queryRaw:vi.fn(async(q:any)=>{
+   const sql=Array.isArray(q)?q.join('?'):String(q?.sql??q)
+   if(/survey_tool_policies/.test(sql))return [{decision:'APPROVED',paused:false,version:1,reason:'ok'}]
+   if(grants--)return [{id:'grant'}]
+   return []
+  })}
   await assertSurveyScaleCollectionAllowed(tx as never,publication)
   await expect(assertSurveyScaleCollectionAllowed(tx as never,publication)).rejects.toMatchObject({statusCode:403})
   expect(strict).toHaveBeenCalledTimes(2)
  })
  it('rejects a withdrawn exact standard combination even with an active source grant',async()=>{
   const p={...publication,units:[{...publication.units[0],sourceProvenance:{sourceGrantId:'grant',surveyStandardReleaseId:'standard',source:{kind:'SCALE',sourceId:'standard',sourceVersion:'exact-hash'}}}]} as ResearchFrozenPublication
-  const tx={$queryRaw:vi.fn().mockResolvedValueOnce([{id:'grant'}]).mockResolvedValueOnce([{state:'WITHDRAWN',combination_hash:'exact-hash'}])}
+  const tx={$executeRaw:vi.fn().mockResolvedValue(1),$queryRaw:vi.fn(async(q:any)=>{
+   const sql=Array.isArray(q)?q.join('?'):String(q?.sql??q)
+   if(/survey_tool_policies/.test(sql))return [{decision:'APPROVED',paused:false,version:1,reason:'ok'}]
+   if(/survey_tool_grants/.test(sql))return [{id:'grant'}]
+   if(/survey_standard_releases/.test(sql))return [{state:'WITHDRAWN',combination_hash:'exact-hash'}]
+   return []
+  })}
   await expect(assertSurveyScaleCollectionAllowed(tx as never,p)).rejects.toMatchObject({statusCode:409})
  })
  it('uses only the immutable original draft grant for a pre-reference publication',async()=>{
