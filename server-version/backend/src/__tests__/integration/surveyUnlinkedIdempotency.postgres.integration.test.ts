@@ -259,10 +259,20 @@ suite('anonymous SINGLE_UNLINKED START idempotency on real PostgreSQL', () => {
 
   it('unlimited-quota waves stay idempotent for one identity', async () => {
     const k = keys('unlimited')
+    // Other tests legitimately create distinct attempts on this unlimited wave;
+    // assert this operation adds exactly one, regardless of prior fixtures.
+    const before = await db.surveyWaveAttempt.count({ where: { waveId: waveUnlimited } })
     const first = await start({ publicId: projectB, waveId: waveUnlimited, entryToken: entryUnlimited, ...k })
+    expect(first.recovered).toBe(false)
+    const afterFirst = await db.surveyWaveAttempt.count({ where: { waveId: waveUnlimited } })
+    expect(afterFirst).toBe(before + 1)
     const replay = await start({ publicId: projectB, waveId: waveUnlimited, entryToken: entryUnlimited, ...k })
     expect(replay.attemptId).toBe(first.attemptId)
-    expect(await db.surveyWaveAttempt.count({ where: { waveId: waveUnlimited } })).toBe(1)
+    expect(replay.recovered).toBe(true)
+    expect(await db.surveyWaveAttempt.count({ where: { waveId: waveUnlimited } })).toBe(afterFirst)
+    expect(await db.surveyWaveAttempt.count({ where: {
+      waveId: waveUnlimited, operationKeyHash: hashResearchCredential(k.operationKey),
+    } })).toBe(1)
   }, 60000)
 
   it('legacy rows without an operation key are unaffected (linked-mode regression)', async () => {
