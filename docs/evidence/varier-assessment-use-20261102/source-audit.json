@@ -1,0 +1,130 @@
+{
+  "recordType": "passive_source_research_not_runtime_content",
+  "motherTool": "Varier assessment use and usefulness",
+  "referenceId": "A13",
+  "researchRecordVersion": "1.0.0",
+  "doi": "10.1080/10627197.2024.2316907",
+  "title": "Use and Usefulness of Assessments to Inform Instruction: Developing a K-12 Classroom Teacher Assessment Practice Measure",
+  "authors": [
+    "Divya Varier",
+    "Marvin G. Powell",
+    "Stephanie Dodman",
+    "Samantha T. Ives",
+    "Elizabeth DeMulder",
+    "Jenice L. View"
+  ],
+  "journal": "Educational Assessment",
+  "year": 2024,
+  "volume": 29,
+  "issue": 1,
+  "pages": "36–57",
+  "base": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "finalItemCount": null,
+  "originalSubscaleMap": null,
+  "sourceQuestionnaireObtained": false,
+  "originalResponseAnchors": null,
+  "scoring": {
+    "reverseItems": null,
+    "missingRule": null,
+    "range": null,
+    "direction": null,
+    "norms": null
+  },
+  "plannedTags": [
+    "family:varier_assessment_use",
+    "role:teacher_self",
+    "school_stage:k12",
+    "language:en",
+    "edition:2024",
+    "use:research",
+    "maturity:PILOT",
+    "availability:missing_questionnaire",
+    "rights:unconfirmed"
+  ],
+  "tagsStatus": "Planning only; existing tags field after real identity/version is verified. No tag engine or library row created.",
+  "sources": [
+    {
+      "url": "https://doi.org/10.1080/10627197.2024.2316907",
+      "role": "original publication",
+      "status": "Publisher full HTML 403; indexed Table 1 caption observed only. Table text/CSV/appendix not obtained."
+    },
+    {
+      "url": "https://www.researchgate.net/publication/380428502_Use_and_Usefulness_of_Assessments_to_Inform_Instruction_Developing_a_K-12_Classroom_Teacher_Assessment_Practice_Measure",
+      "role": "original author-profile publication",
+      "status": "Actual page read: no full text available; author-copy request offered. Request not sent."
+    },
+    {
+      "url": "https://cehd.gmu.edu/people/faculty/sdodman/",
+      "role": "coauthor institution",
+      "status": "Original citation listed as in press, no manuscript link for this record."
+    },
+    {
+      "url": "https://api.crossref.org/works/10.1080/10627197.2024.2316907",
+      "role": "DOI metadata",
+      "status": "Actual metadata read; no license field; publisher PDF link is similarity-checking metadata, not reuse authorization."
+    },
+    {
+      "url": "https://api.openalex.org/works/https://doi.org/10.1080/10627197.2024.2316907",
+      "role": "discovery cross-check",
+      "status": "Observed closed OA status and no repository full text. This is not proof that no lawful copy exists anywhere."
+    },
+    {
+      "url": "https://www.mdpi.com/2227-7102/14/11/1183",
+      "role": "related later primary article; DOI 10.3390/educsci14111183",
+      "status": "Official publisher 429 and XML unavailable; publisher-provided full text read on ResearchGate. Section 7.1 gives partial usefulness evidence, no complete item appendix."
+    },
+    {
+      "url": "https://www.researchgate.net/publication/385358826_The_Relationship_Between_Teachers%27_Equity_Orientation_and_Instructional_Usefulness_of_Assessments_of_and_for_Learning",
+      "role": "publisher-provided related original article",
+      "status": "Publisher-provided article HTML accessed; methods section 7.1 read and appendix/supplementary full-text searches returned no matches; CC BY 4.0 article notice read. Not the original questionnaire license."
+    }
+  ],
+  "relatedArticleEvidence": {
+    "usefulnessOnly": true,
+    "standardizedAoLItemsInLaterStudy": 5,
+    "aflAalItemsInLaterStudy": 8,
+    "completeQuestionnairePrinted": false,
+    "originalFinalItemCountInferred": false,
+    "frequencyAnchorsVerified": false,
+    "warning": "Later-study item counts/anchors do not establish original final questionnaire, frequency version, item wording, scoring, or redistribution rights.",
+    "evidenceLocation": "Education Sciences 14(11),1183, section 7.1, page 7 of 16"
+  },
+  "missing": [
+    "Original Table 1 complete numbered items and any supplemental appendix/final questionnaire",
+    "Original instructions, reference period, both frequency and usefulness response anchors, non-applicability codes",
+    "Original final retained item-to-subscale map; reverse keys, missing rules, scoring and direction or confirmation that no score is defined",
+    "Permission for questionnaire extraction, electronic administration, translation and public redistribution in intended platform scope"
+  ],
+  "deduplication": {
+    "repositoryBase": "25d812d1f024bcc375b738235dd400654c679ff4",
+    "allTrackedFilesSearched": true,
+    "keywords": [
+      "2316907",
+      "Varier",
+      "use and usefulness",
+      "instructional usefulness",
+      "Classroom Teacher Assessment Use"
+    ],
+    "matchingExistingSourceOrInstrument": 0,
+    "openPrSearch": "\"2316907\" OR \"Varier\" OR \"Use and Usefulness\"",
+    "matchingOpenPr": 0,
+    "itemLevelDeduplication": "NOT_POSSIBLE_WITHOUT_QUESTIONNAIRE",
+    "productionAndAdminCustomLibraryChecked": false,
+    "trackedFileCount": 13922
+  },
+  "nativeScaleCount": 0,
+  "nativeFormCount": 0,
+  "nativeCombinationCount": 0,
+  "registeredInstrumentCount": 0,
+  "versions": {
+    "content": null,
+    "parameters": null,
+    "report": null
+  },
+  "databases": {
+    "isolated": "NOT_RUN_NO_QUESTIONNAIRE",
+    "development": "NOT_IMPORTED",
+    "production": "NOT_ACCESSED"
+  },
+  "license": "UNCONFIRMED for original questionnaire. No restricted original text included. Related article CC BY does not automatically license its cited questionnaire. No terms accepted or author contact sent."
+}
