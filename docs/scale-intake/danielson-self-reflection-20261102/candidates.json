@@ -1,0 +1,370 @@
+{
+  "documentType": "RESEARCH_METADATA_NOT_NATIVE_IMPORT",
+  "baseCommit": "3818f2b399e805ec0cbcad803b832ad4ec4fbc02",
+  "familyTag": "family:danielson_fft",
+  "nativeFormCandidates": 3,
+  "referenceOnlyRecords": 3,
+  "records": [
+    {
+      "candidateId": "danielson_fft_ie_reflection_teacher_self_en_revision_pending",
+      "name": "Danielson FFT｜Intellectual Engagement 自我反思｜教师自评｜英文·修订待核",
+      "metadataRevision": "2026-11-02.1",
+      "author": "Charlotte Danielson / The Danielson Group (exact companion credits pending original)",
+      "sourceTitle": "FFT: INTELLECTUAL ENGAGEMENT SELF-ASSESSMENT AND REFLECTION TOOL",
+      "sourceUrl": "https://danielsongroup.org/resources/fft-intellectual-engagement-self-assessment-and-reflection-tool/",
+      "sourceVersion": null,
+      "sourceStatus": "CURRENT_COMPANION_RESOURCE",
+      "fullTextObtained": false,
+      "accessStatus": "LOGIN_OR_REGISTRATION_REQUIRED",
+      "intendedNativeType": "UNSCORED_FORM_IF_AUTHORIZED",
+      "role": "TEACHER_SELF",
+      "language": "en",
+      "schoolStage": "UNSPECIFIED_IN_RETRIEVED_PRODUCT_METADATA",
+      "tags": [
+        "family:danielson_fft",
+        "role:teacher_self",
+        "population:teacher",
+        "stage:school_unspecified",
+        "language:en",
+        "version:revision_pending",
+        "use:professional_reflection",
+        "license:written_platform_authorization_required",
+        "availability:metadata_only"
+      ],
+      "itemCodes": null,
+      "itemCount": null,
+      "responseOptions": null,
+      "originalSubscales": null,
+      "versions": {
+        "C": null,
+        "P": null,
+        "R": null
+      },
+      "nativeRegistered": false,
+      "developmentDatabaseImported": false,
+      "productionDatabaseImported": false,
+      "scoring": {
+        "enabled": false,
+        "reverseItems": null,
+        "missingRule": null,
+        "range": null,
+        "direction": null,
+        "norms": null,
+        "totalScoreAllowed": false
+      },
+      "rights": {
+        "status": "PLATFORM_WRITTEN_AUTHORIZATION_NOT_SUPPLIED",
+        "downloadedPdfIndividualUseOnly": true,
+        "registrationSubmitted": false,
+        "agreementAccepted": false,
+        "fullTextRedistributionPermitted": false,
+        "sourceItemsIncluded": false
+      },
+      "blockers": [
+        "NO_COMPLETE_AUTHORIZED_SOURCE",
+        "NO_WRITTEN_PLATFORM_REUSE_AUTHORIZATION"
+      ]
+    },
+    {
+      "candidateId": "danielson_fft_tic_reflection_teacher_self_en_revision_pending",
+      "name": "Danielson FFT｜Teaching Important Content 自我反思｜教师自评｜英文·修订待核",
+      "metadataRevision": "2026-11-02.1",
+      "author": "Charlotte Danielson / The Danielson Group (exact companion credits pending original)",
+      "sourceTitle": "TEACHING IMPORTANT CONTENT: SELF-ASSESSMENT AND REFLECTION PROTOCOL",
+      "sourceUrl": "https://danielsongroup.org/resources/teaching-important-content-self-assessment-reflection-protocol/",
+      "sourceVersion": null,
+      "sourceStatus": "CURRENT_COMPANION_RESOURCE",
+      "fullTextObtained": false,
+      "accessStatus": "LOGIN_OR_REGISTRATION_REQUIRED",
+      "intendedNativeType": "UNSCORED_FORM_IF_AUTHORIZED",
+      "role": "TEACHER_SELF",
+      "language": "en",
+      "schoolStage": "UNSPECIFIED_IN_RETRIEVED_PRODUCT_METADATA",
+      "tags": [
+        "family:danielson_fft",
+        "role:teacher_self",
+        "population:teacher",
+        "stage:school_unspecified",
+        "language:en",
+        "version:revision_pending",
+        "use:professional_reflection",
+        "license:written_platform_authorization_required",
+        "availability:metadata_only"
+      ],
+      "itemCodes": null,
+      "itemCount": null,
+      "responseOptions": null,
+      "originalSubscales": null,
+      "versions": {
+        "C": null,
+        "P": null,
+        "R": null
+      },
+      "nativeRegistered": false,
+      "developmentDatabaseImported": false,
+      "productionDatabaseImported": false,
+      "scoring": {
+        "enabled": false,
+        "reverseItems": null,
+        "missingRule": null,
+        "range": null,
+        "direction": null,
+        "norms": null,
+        "totalScoreAllowed": false
+      },
+      "rights": {
+        "status": "PLATFORM_WRITTEN_AUTHORIZATION_NOT_SUPPLIED",
+        "downloadedPdfIndividualUseOnly": true,
+        "registrationSubmitted": false,
+        "agreementAccepted": false,
+        "fullTextRedistributionPermitted": false,
+        "sourceItemsIncluded": false
+      },
+      "blockers": [
+        "NO_COMPLETE_AUTHORIZED_SOURCE",
+        "NO_WRITTEN_PLATFORM_REUSE_AUTHORIZATION"
+      ]
+    },
+    {
+      "candidateId": "danielson_fft_ie_reflection_teacher_self_es_revision_pending",
+      "name": "Danielson FFT｜Intellectual Engagement 自我反思｜教师自评｜西班牙语·修订待核",
+      "metadataRevision": "2026-11-02.1",
+      "author": "Charlotte Danielson / The Danielson Group (exact companion credits pending original)",
+      "sourceTitle": "SPANISH VERSION: FFT: INTELLECTUAL ENGAGEMENT SELF-ASSESSMENT AND REFLECTION TOOL",
+      "sourceUrl": "https://danielsongroup.org/resources/spanish-version-fft-intellectual-engagement-self-assessment-and-reflection-tool/",
+      "sourceVersion": null,
+      "sourceStatus": "CURRENT_COMPANION_RESOURCE",
+      "fullTextObtained": false,
+      "accessStatus": "LOGIN_OR_REGISTRATION_REQUIRED",
+      "intendedNativeType": "UNSCORED_FORM_IF_AUTHORIZED",
+      "role": "TEACHER_SELF",
+      "language": "es",
+      "schoolStage": "UNSPECIFIED_IN_RETRIEVED_PRODUCT_METADATA",
+      "tags": [
+        "family:danielson_fft",
+        "role:teacher_self",
+        "population:teacher",
+        "stage:school_unspecified",
+        "language:es",
+        "version:revision_pending",
+        "use:professional_reflection",
+        "license:written_platform_authorization_required",
+        "availability:metadata_only"
+      ],
+      "itemCodes": null,
+      "itemCount": null,
+      "responseOptions": null,
+      "originalSubscales": null,
+      "versions": {
+        "C": null,
+        "P": null,
+        "R": null
+      },
+      "nativeRegistered": false,
+      "developmentDatabaseImported": false,
+      "productionDatabaseImported": false,
+      "scoring": {
+        "enabled": false,
+        "reverseItems": null,
+        "missingRule": null,
+        "range": null,
+        "direction": null,
+        "norms": null,
+        "totalScoreAllowed": false
+      },
+      "rights": {
+        "status": "PLATFORM_WRITTEN_AUTHORIZATION_NOT_SUPPLIED",
+        "downloadedPdfIndividualUseOnly": true,
+        "registrationSubmitted": false,
+        "agreementAccepted": false,
+        "fullTextRedistributionPermitted": false,
+        "sourceItemsIncluded": false
+      },
+      "blockers": [
+        "NO_COMPLETE_AUTHORIZED_SOURCE",
+        "NO_WRITTEN_PLATFORM_REUSE_AUTHORIZATION"
+      ]
+    },
+    {
+      "candidateId": "danielson_fft_2022_guide_reference_en",
+      "name": "Danielson FFT｜2022 正式指南｜参考资源｜英文",
+      "metadataRevision": "2026-11-02.1",
+      "author": "Charlotte Danielson / The Danielson Group (exact companion credits pending original)",
+      "sourceTitle": "2022 Framework for Teaching Guide",
+      "sourceUrl": "https://danielsongroup.org/resources/2022-framework-for-teaching-guide/",
+      "sourceVersion": "2022",
+      "sourceStatus": "FORMAL_GUIDE_LISTED_CURRENTLY",
+      "fullTextObtained": false,
+      "accessStatus": "LOGIN_OR_REGISTRATION_REQUIRED",
+      "intendedNativeType": "REFERENCE_NOT_SELF_SCORE",
+      "role": "REFERENCE",
+      "language": "en",
+      "schoolStage": "UNSPECIFIED_IN_RETRIEVED_PRODUCT_METADATA",
+      "tags": [
+        "family:danielson_fft",
+        "role:reference",
+        "population:teacher",
+        "stage:school_unspecified",
+        "language:en",
+        "version:2022",
+        "use:professional_reflection",
+        "license:written_platform_authorization_required",
+        "availability:metadata_only"
+      ],
+      "itemCodes": null,
+      "itemCount": null,
+      "responseOptions": null,
+      "originalSubscales": null,
+      "versions": {
+        "C": null,
+        "P": null,
+        "R": null
+      },
+      "nativeRegistered": false,
+      "developmentDatabaseImported": false,
+      "productionDatabaseImported": false,
+      "scoring": {
+        "enabled": false,
+        "reverseItems": null,
+        "missingRule": null,
+        "range": null,
+        "direction": null,
+        "norms": null,
+        "totalScoreAllowed": false
+      },
+      "rights": {
+        "status": "PLATFORM_WRITTEN_AUTHORIZATION_NOT_SUPPLIED",
+        "downloadedPdfIndividualUseOnly": true,
+        "registrationSubmitted": false,
+        "agreementAccepted": false,
+        "fullTextRedistributionPermitted": false,
+        "sourceItemsIncluded": false
+      },
+      "blockers": [
+        "NO_COMPLETE_AUTHORIZED_SOURCE",
+        "NO_WRITTEN_PLATFORM_REUSE_AUTHORIZATION"
+      ]
+    },
+    {
+      "candidateId": "danielson_fft_3ed_reference_en",
+      "name": "Danielson FFT｜Enhancing Professional Practice 第三版｜参考资源｜英文",
+      "metadataRevision": "2026-11-02.1",
+      "author": "Charlotte Danielson / The Danielson Group (exact companion credits pending original)",
+      "sourceTitle": "Enhancing Professional Practice: The Framework for Teaching, 3rd Edition",
+      "sourceUrl": "https://danielsongroup.org/the-framework-for-teaching/",
+      "sourceVersion": "3rd edition",
+      "sourceStatus": "FORMAL_BOOK_LISTED_CURRENTLY",
+      "fullTextObtained": false,
+      "accessStatus": "PURCHASE_OR_LICENSE_REQUIRED",
+      "intendedNativeType": "REFERENCE_NOT_SELF_SCORE",
+      "role": "REFERENCE",
+      "language": "en",
+      "schoolStage": "UNSPECIFIED_IN_RETRIEVED_PRODUCT_METADATA",
+      "tags": [
+        "family:danielson_fft",
+        "role:reference",
+        "population:teacher",
+        "stage:school_unspecified",
+        "language:en",
+        "version:3rd_edition",
+        "use:professional_reflection",
+        "license:written_platform_authorization_required",
+        "availability:metadata_only"
+      ],
+      "itemCodes": null,
+      "itemCount": null,
+      "responseOptions": null,
+      "originalSubscales": null,
+      "versions": {
+        "C": null,
+        "P": null,
+        "R": null
+      },
+      "nativeRegistered": false,
+      "developmentDatabaseImported": false,
+      "productionDatabaseImported": false,
+      "scoring": {
+        "enabled": false,
+        "reverseItems": null,
+        "missingRule": null,
+        "range": null,
+        "direction": null,
+        "norms": null,
+        "totalScoreAllowed": false
+      },
+      "rights": {
+        "status": "PLATFORM_WRITTEN_AUTHORIZATION_NOT_SUPPLIED",
+        "downloadedPdfIndividualUseOnly": true,
+        "registrationSubmitted": false,
+        "agreementAccepted": false,
+        "fullTextRedistributionPermitted": false,
+        "sourceItemsIncluded": false
+      },
+      "blockers": [
+        "NO_COMPLETE_AUTHORIZED_SOURCE",
+        "NO_WRITTEN_PLATFORM_REUSE_AUTHORIZATION"
+      ]
+    },
+    {
+      "candidateId": "danielson_fft_20220628_draft_reference_en",
+      "name": "Danielson FFT｜2022-06-28 历史草案｜参考资源｜英文",
+      "metadataRevision": "2026-11-02.1",
+      "author": "Charlotte Danielson / The Danielson Group (exact companion credits pending original)",
+      "sourceTitle": "The Framework for Teaching — June 28, 2022 draft",
+      "sourceUrl": "https://danielsongroup.org/wp-content/uploads/2022/06/2022-Framework-for-Teaching_Draft_June-28-2022-.pdf",
+      "sourceVersion": "2022-06-28 draft",
+      "sourceStatus": "HISTORICAL_DRAFT_NOT_CURRENT",
+      "fullTextObtained": false,
+      "accessStatus": "WEB_READER_CONTENT_LENGTH_LIMIT",
+      "intendedNativeType": "EXCLUDED_HISTORICAL_REFERENCE",
+      "role": "REFERENCE",
+      "language": "en",
+      "schoolStage": "UNSPECIFIED_IN_RETRIEVED_PRODUCT_METADATA",
+      "tags": [
+        "family:danielson_fft",
+        "role:reference",
+        "population:teacher",
+        "stage:school_unspecified",
+        "language:en",
+        "version:2022-06-28_draft",
+        "use:professional_reflection",
+        "license:written_platform_authorization_required",
+        "availability:metadata_only"
+      ],
+      "itemCodes": null,
+      "itemCount": null,
+      "responseOptions": null,
+      "originalSubscales": null,
+      "versions": {
+        "C": null,
+        "P": null,
+        "R": null
+      },
+      "nativeRegistered": false,
+      "developmentDatabaseImported": false,
+      "productionDatabaseImported": false,
+      "scoring": {
+        "enabled": false,
+        "reverseItems": null,
+        "missingRule": null,
+        "range": null,
+        "direction": null,
+        "norms": null,
+        "totalScoreAllowed": false
+      },
+      "rights": {
+        "status": "PLATFORM_WRITTEN_AUTHORIZATION_NOT_SUPPLIED",
+        "downloadedPdfIndividualUseOnly": true,
+        "registrationSubmitted": false,
+        "agreementAccepted": false,
+        "fullTextRedistributionPermitted": false,
+        "sourceItemsIncluded": false
+      },
+      "blockers": [
+        "NO_COMPLETE_AUTHORIZED_SOURCE",
+        "NO_WRITTEN_PLATFORM_REUSE_AUTHORIZATION",
+        "HISTORICAL_DRAFT_NOT_CURRENT_FORMAL_RESOURCE"
+      ]
+    }
+  ]
+}
