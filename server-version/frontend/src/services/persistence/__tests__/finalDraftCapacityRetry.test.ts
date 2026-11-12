@@ -22,6 +22,10 @@ describe('finalDraftCapacityRetry', () => {
     expect(isFinalDraftCapacityRetryable({ status: 400, code: 'ADMISSION_BUSY' })).toBe(false)
     expect(isFinalDraftCapacityRetryable({ status: 401, code: 'ADMISSION_BUSY' })).toBe(false)
     expect(isFinalDraftCapacityRetryable({ status: 413, code: 'ADMISSION_BUSY' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 403, code: 'ADMISSION_BUSY' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 404, code: 'ASSESSMENT_SUBMIT_BUSY' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 422, code: 'ADMISSION_BUSY' })).toBe(false)
+    expect(isFinalDraftCapacityRetryable({ status: 422, code: 'ASSESSMENT_SUBMIT_BUSY' })).toBe(false)
     expect(isFinalDraftCapacityRetryable({ status: 503, code: 'ADMISSION_BUSY' })).toBe(true)
   })
 
@@ -65,10 +69,14 @@ describe('finalDraftCapacityRetry', () => {
     expect(delayMs).toBeGreaterThanOrEqual(1000)
   })
 
-  it('does not retry 429 or 409 even when the body carries a busy code', async () => {
+  it('does not retry 4xx even when the body carries a busy code', async () => {
     for (const error of [
       { status: 429, code: 'ADMISSION_BUSY', retryAfterMs: 10 },
       { status: 409, code: 'ADMISSION_BUSY' },
+      { status: 403, code: 'ADMISSION_BUSY' },
+      { status: 404, code: 'ASSESSMENT_SUBMIT_BUSY' },
+      { status: 422, code: 'ADMISSION_BUSY' },
+      { status: 422, code: 'ASSESSMENT_SUBMIT_BUSY' },
     ]) {
       const operation = vi.fn().mockRejectedValue(error)
       const sleep = vi.fn(async () => undefined)

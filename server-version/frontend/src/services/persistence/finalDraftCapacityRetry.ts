@@ -6,18 +6,16 @@ const BUSY_CODES = new Set([
   'ADMISSION_BUSY',
 ])
 
-/** These statuses are never retried, even if the body also carries a busy code. */
-const NON_RETRYABLE_STATUSES = new Set([400, 401, 409, 413, 429])
-
 const BASE_DELAY_MS = 1_000
 /** High safety cap — still honor larger Retry-After up to this bound. */
 const SAFETY_CAP_MS = 30_000
 
 /** Whitelist: 503/502/504, known busy codes, or network failures only.
- * 400/401/409/413/429 are excluded before any busy-code match. */
+ * Every HTTP 4xx is excluded before any busy-code match. */
 export const isFinalDraftCapacityRetryable = (error: unknown): boolean => {
   const normalized = normalizeApiError(error)
-  if (normalized.status !== null && NON_RETRYABLE_STATUSES.has(normalized.status)) return false
+  // Every 4xx is never retried, even if the body also carries a busy code.
+  if (typeof normalized.status === 'number' && normalized.status >= 400 && normalized.status <= 499) return false
   const code = String(normalized.code ?? '')
   if (BUSY_CODES.has(code)) return true
   if (normalized.status === 502 || normalized.status === 503 || normalized.status === 504) return true
