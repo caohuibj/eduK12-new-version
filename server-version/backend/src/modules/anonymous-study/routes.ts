@@ -2,7 +2,6 @@ import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod'
 import { rateLimit } from 'express-rate-limit'
 import { authenticate, requireTeacher } from '../../middleware/auth'
-import { hashRecoveryToken } from '../../services/anonymousAccess'
 import { success, error } from '../../utils/response'
 import * as service from './service'
 import * as governance from './governance'
@@ -59,10 +58,13 @@ anonymousStudyRouter.get('/:studyId/waves/:waveId/export.csv',wrap(async(req,res
   res.type('text/csv').send(csv)
 }))
 export const publicAnonymousStudyRouter=Router()
-publicAnonymousStudyRouter.use(noStore,rateLimit({windowMs:15*60*1000,limit:150,standardHeaders:'draft-7',legacyHeaders:false,
-  validate:{keyGeneratorIpFallback:false},keyGenerator:req=>hashRecoveryToken(credential(req) || req.ip || 'unknown')}))
-// Always retain an IP budget for code guesses, independently of attacker-supplied
-// bearer headers. The shared scrypt admission gate separately bounds CPU work.
+publicAnonymousStudyRouter.use(noStore)
+// NOTE (2026-11-12, user decision): the router-level 150 req / 15 min / IP budget
+// was intentionally removed here. It capped one school NAT IP at ~75 students /
+// 15 min (the real page calls info + join per student, 2 IP-keyed requests each),
+// which blocked the "500 joins behind one NAT" goal. A replacement protection
+// method is TBD by the user and is NOT part of this change. Per-endpoint limits
+// (join 30 on main, code recover/reset 30) and the join admission gate remain.
 publicAnonymousStudyRouter.use(['/waves/:waveId/join','/:studyId/code/recover','/:studyId/code/reset'],
  rateLimit({windowMs:15*60*1000,limit:30,standardHeaders:'draft-7',legacyHeaders:false}))
 publicAnonymousStudyRouter.post('/waves/:waveId/info',wrap(async(req,res)=>{
