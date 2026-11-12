@@ -26,4 +26,6 @@ export async function changeOwnPassword(userId: string | undefined, oldPassword:
     data: { passwordHash, tokenVersion: { increment: 1 }, mustChangePassword: false },
   })
   if (updated.count !== 1) throw new PasswordChangeError('账号状态已改变，请重新登录', false, 409)
+  const { invalidatePrincipalCache } = await import('../middleware/auth')
+  invalidatePrincipalCache(userId)
 }

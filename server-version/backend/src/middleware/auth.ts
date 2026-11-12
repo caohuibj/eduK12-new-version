@@ -5,7 +5,7 @@ import { unauthorized, forbidden } from '../utils/response'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import { getSessionToken, getSchoolSessionToken, getSurveySessionToken, getHuiteacherSessionToken } from '../utils/authCookies'
 import { measureRequestPhase, withQueryRawLabel, currentAssessmentTimelineKind } from '../services/runtimeObservability'
-import { asBusinessPrincipal, loadCurrentPrincipal, toRequestPrincipal } from '../modules/organization/principal'
+import { asBusinessPrincipal, loadCurrentPrincipal, toRequestPrincipal, type CurrentPrincipal } from '../modules/organization/principal'
 import { isSessionRevoked } from '../utils/sessionRevocation'
 import { needsAdminKey, validAdminProof, ADMIN_STEP_UP_SECONDS } from '../modules/admin-permissions/security'
 
@@ -18,11 +18,68 @@ declare global {
   }
 }
 
-const loadPrincipal = async (userId: string) => {
+interface CachedPrincipal {
+  principal: CurrentPrincipal | null
+  expiresAt: number
+}
+
+const principalCache = new Map<string, CachedPrincipal>()
+
+export const getPrincipalCacheSize = (): number => principalCache.size
+
+export const invalidatePrincipalCache = (userId?: string): void => {
+  if (userId) {
+    principalCache.delete(userId)
+  } else {
+    principalCache.clear()
+  }
+}
+
+const getPrincipalCacheTtlMs = (): number => {
+  const envVal = process.env.AUTH_PRINCIPAL_CACHE_TTL_MS
+  if (envVal !== undefined) {
+    const parsed = Number(envVal)
+    return Number.isSafeInteger(parsed) && parsed >= 0 ? parsed : 15_000
+  }
+  return process.env.NODE_ENV === 'test' ? 0 : 15_000
+}
+
+const getPrincipalCacheMaxEntries = (): number => {
+  const envVal = Number(process.env.AUTH_PRINCIPAL_CACHE_MAX_ENTRIES)
+  return Number.isSafeInteger(envVal) && envVal > 0 ? envVal : 5_000
+}
+
+export const loadPrincipal = async (userId: string, bypassCache = false): Promise<CurrentPrincipal | null> => {
+  const ttl = getPrincipalCacheTtlMs()
+  const now = Date.now()
+
+  if (!bypassCache && ttl > 0) {
+    const cached = principalCache.get(userId)
+    if (cached) {
+      if (now < cached.expiresAt) {
+        principalCache.delete(userId)
+        principalCache.set(userId, cached)
+        return cached.principal
+      }
+      principalCache.delete(userId)
+    }
+  }
+
   const label = currentAssessmentTimelineKind() === 'start'
     ? 'start.raw.pre_gate.auth_account_lookup'
     : 'auth.raw.account_lookup'
-  return withQueryRawLabel(label, () => measureRequestPhase('auth_account_lookup', () => loadCurrentPrincipal(userId)))
+  const principal = await withQueryRawLabel(label, () => measureRequestPhase('auth_account_lookup', () => loadCurrentPrincipal(userId)))
+
+  if (ttl > 0) {
+    const maxEntries = getPrincipalCacheMaxEntries()
+    if (principalCache.size >= maxEntries) {
+      const oldestKey = principalCache.keys().next().value
+      if (oldestKey) principalCache.delete(oldestKey)
+    }
+    principalCache.set(userId, { principal, expiresAt: now + ttl })
+  }
+
+  return principal
 }
 
 const authenticateProduct = async (req: Request, res: Response, next: NextFunction, product: 'LEGACY' | 'SCHOOL' | 'SURVEY' | 'HUITEACHER') => {
@@ -44,14 +101,21 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
       return res.status(503).json({ code: -1, message: '会话状态暂不可用，请稍后重试' })
     }
 
-    const principal = await loadPrincipal(payload.userId)
-    const rejection = inactiveAccountMessage(principal)
+    let principal = await loadPrincipal(payload.userId)
+    let rejection = inactiveAccountMessage(principal)
     if (rejection) {
       return unauthorized(res, rejection)
     }
 
     if (payload.tokenVersion !== principal!.tokenVersion) {
-      return unauthorized(res, '认证令牌已失效，请重新登录')
+      principal = await loadPrincipal(payload.userId, true)
+      rejection = inactiveAccountMessage(principal)
+      if (rejection) {
+        return unauthorized(res, rejection)
+      }
+      if (payload.tokenVersion !== principal!.tokenVersion) {
+        return unauthorized(res, '认证令牌已失效，请重新登录')
+      }
     }
     const management = needsAdminKey(principal!) && ['LEGACY','TRAINING'].includes(principal!.accountDomain)
     if (management && !validAdminProof(payload)) return unauthorized(res, '请完成管理员双因素登录')
@@ -168,7 +232,10 @@ export const optionalAuthenticate = async (req: Request, res: Response, next: Ne
           return res.status(503).json({ code: -1, message: '会话状态暂不可用，请稍后重试' })
         }
         if (revoked !== true) {
-          const principal = await loadPrincipal(payload.userId)
+          let principal = await loadPrincipal(payload.userId)
+          if (principal && payload.tokenVersion !== principal.tokenVersion) {
+            principal = await loadPrincipal(payload.userId, true)
+          }
           if (!inactiveAccountMessage(principal) && payload.tokenVersion === principal!.tokenVersion && ['LEGACY','TRAINING'].includes(principal!.accountDomain) && (payload.accountDomain === undefined || ['LEGACY','TRAINING'].includes(payload.accountDomain))
             && (!needsAdminKey(principal!) || validAdminProof(payload))) {
             req.user = toRequestPrincipal(principal!)
