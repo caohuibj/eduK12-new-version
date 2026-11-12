@@ -39,14 +39,19 @@ interface CachedCourse {
 }
 
 const courseCache = new Map<string, CachedCourse>()
+const inFlightCourseQueries = new Map<string, Promise<CachedCourse['data']>>()
+let courseCacheGeneration = 0
 
 export const getCourseLookupCacheSize = (): number => courseCache.size
 
 export const invalidateCourseLookupCache = (courseCode?: string): void => {
+  courseCacheGeneration++
   if (courseCode) {
     courseCache.delete(courseCode)
+    inFlightCourseQueries.delete(courseCode)
   } else {
     courseCache.clear()
+    inFlightCourseQueries.clear()
   }
 }
 
@@ -71,27 +76,43 @@ export const findCachedCourse = async (code: string) => {
     }
   }
 
-  const course = await prisma.course.findUnique({
-    where: { courseCode: code },
-    select: {
-      id: true,
-      title: true,
-      status: true,
-      endedAt: true,
-      isRecruiting: true,
-      isLibrary: true,
-    },
-  })
-
+  // Use the exact persisted code as the key; this lookup is case sensitive.
+  // Coalesce cold-start requests but never retain a failed query or a null result.
   if (ttl > 0) {
-    if (courseCache.size >= 1000) {
-      const oldest = courseCache.keys().next().value
-      if (oldest) courseCache.delete(oldest)
-    }
-    courseCache.set(code, { data: course, expiresAt: now + ttl })
+    const pending = inFlightCourseQueries.get(code)
+    if (pending) return pending
   }
-
-  return course
+  const generation = courseCacheGeneration
+  const query = async (): Promise<CachedCourse['data']> => {
+    const course = await prisma.course.findUnique({
+      where: { courseCode: code },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        endedAt: true,
+        isRecruiting: true,
+        isLibrary: true,
+      },
+    })
+    if (ttl > 0 && course && generation === courseCacheGeneration) {
+      if (courseCache.size >= 1000) {
+        const oldest = courseCache.keys().next().value
+        if (oldest) courseCache.delete(oldest)
+      }
+      courseCache.set(code, { data: course, expiresAt: Date.now() + ttl })
+    }
+    return course
+  }
+  // Bound untrusted distinct-code concurrency; overflow performs the original read.
+  if (ttl === 0 || inFlightCourseQueries.size >= 1000) return query()
+  const pending = query()
+  inFlightCourseQueries.set(code, pending)
+  try {
+    return await pending
+  } finally {
+    if (inFlightCourseQueries.get(code) === pending) inFlightCourseQueries.delete(code)
+  }
 }
 
 const codeSchema = z.object({ code: z.string().trim().min(1).max(128) }).strict()

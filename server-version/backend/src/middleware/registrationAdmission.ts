@@ -29,13 +29,18 @@ export const registrationRateLimit: RequestHandler = async (req, res, next) => {
     consumedKeys.push(key)
     if (!result.allowed) { res.setHeader('Retry-After', String(result.retryAfterSeconds)); res.status(429).json({ code: -1, message: '注册请求过于频繁，请稍后重试' }); return }
   }
-  res.once('finish', () => {
-    if (res.statusCode === 503) {
-      for (const key of consumedKeys) {
-        void cacheService.refundRateLimit(key)
-      }
+  // Express Response supports once; some minimal middleware test doubles do not.
+  // A finish callback must refund the set of consumed keys at most once.
+  let refunded = false
+  const onFinish = () => {
+    if (refunded || res.statusCode !== 503) return
+    refunded = true
+    for (const key of consumedKeys) {
+      void cacheService.refundRateLimit(key).catch(() => {})
     }
-  })
+  }
+  if (typeof res.once === 'function') res.once('finish', onFinish)
+  else if (typeof res.on === 'function') res.on('finish', onFinish)
   next()
 }
 const registrationGate = new BoundedAdmissionGate({ name: 'registration', maxConcurrent: configuredInteger('REGISTRATION_MAX_CONCURRENT', 2), maxQueue: configuredInteger('REGISTRATION_MAX_QUEUE', 16, true), maxWaitMs: configuredInteger('REGISTRATION_MAX_WAIT_MS', 3000), retryAfterSeconds: 2 })

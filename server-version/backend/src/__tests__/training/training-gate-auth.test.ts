@@ -101,6 +101,25 @@ describe('PR-A: Training Gate & Auth Optimizations', () => {
       expect(m.queryRaw).toHaveBeenCalledTimes(1)
     })
 
+    it('does not cache platform admins, business admins or MFA-required principals', async () => {
+      process.env.AUTH_PRINCIPAL_CACHE_TTL_MS = '15000'
+      const privileged = [
+        { ...mockPrincipalRow[0], platformRole: 'SYSTEM_ADMIN' },
+        { ...mockPrincipalRow[0], role: UserRole.ADMIN },
+        { ...mockPrincipalRow[0], needsMfa: true },
+        { ...mockPrincipalRow[0], entryGrants: [{ entry: 'TRAINING', version: 1 }] },
+      ]
+      for (const row of privileged) {
+        invalidatePrincipalCache()
+        m.queryRaw.mockClear()
+        m.queryRaw.mockResolvedValue([row])
+        await loadPrincipal(row.id)
+        await loadPrincipal(row.id)
+        expect(m.queryRaw).toHaveBeenCalledTimes(2)
+        expect(getPrincipalCacheSize()).toBe(0)
+      }
+    })
+
     it('invalidates cache by userId and queries DB afresh', async () => {
       process.env.AUTH_PRINCIPAL_CACHE_TTL_MS = '15000'
       m.queryRaw.mockResolvedValue(mockPrincipalRow)
@@ -221,6 +240,42 @@ describe('PR-A: Training Gate & Auth Optimizations', () => {
       const c2 = await findCachedCourse('GZ85ENTQN83X')
       expect(c2).toEqual(mockCourse)
       expect(m.courseFindUnique).toHaveBeenCalledTimes(1)
+    })
+
+    it('single-flights 200 concurrent cold course lookups, without caching missing codes', async () => {
+      process.env.TRAINING_COURSE_CACHE_TTL_MS = '30000'
+      let release: (value: typeof mockCourse) => void = () => {}
+      m.courseFindUnique.mockImplementationOnce(() => new Promise(resolve => { release = resolve }))
+      const lookups = Array.from({ length: 200 }, () => findCachedCourse('cold-course'))
+      expect(m.courseFindUnique).toHaveBeenCalledTimes(1)
+      release(mockCourse)
+      const results = await Promise.all(lookups)
+      expect(results).toHaveLength(200)
+      expect(results.every(course => course?.id === mockCourse.id)).toBe(true)
+      expect(m.courseFindUnique).toHaveBeenCalledTimes(1)
+      expect(getCourseLookupCacheSize()).toBe(1)
+      m.courseFindUnique.mockResolvedValueOnce(null).mockResolvedValueOnce(null)
+      expect(await findCachedCourse('missing-code')).toBeNull()
+      expect(await findCachedCourse('missing-code')).toBeNull()
+      expect(m.courseFindUnique).toHaveBeenCalledTimes(3)
+      expect(getCourseLookupCacheSize()).toBe(1)
+    })
+
+    it('cleans up rejected and invalidated in-flight course reads', async () => {
+      process.env.TRAINING_COURSE_CACHE_TTL_MS = '30000'
+      m.courseFindUnique.mockRejectedValueOnce(new Error('temporary lookup failure'))
+      await expect(findCachedCourse('retryable-code')).rejects.toThrow('temporary lookup failure')
+      m.courseFindUnique.mockResolvedValueOnce(mockCourse)
+      await expect(findCachedCourse('retryable-code')).resolves.toEqual(mockCourse)
+      expect(m.courseFindUnique).toHaveBeenCalledTimes(2)
+      let release: (value: typeof mockCourse) => void = () => {}
+      m.courseFindUnique.mockImplementationOnce(() => new Promise(resolve => { release = resolve }))
+      const pending = findCachedCourse('invalidated-code')
+      invalidateCourseLookupCache('invalidated-code')
+      release(mockCourse)
+      await expect(pending).resolves.toEqual(mockCourse)
+      // A query started before invalidation cannot repopulate the cleared cache.
+      expect(getCourseLookupCacheSize()).toBe(1)
     })
 
     it('invalidates course cache on demand', async () => {

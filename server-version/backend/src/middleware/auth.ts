@@ -70,13 +70,20 @@ export const loadPrincipal = async (userId: string, bypassCache = false): Promis
     : 'auth.raw.account_lookup'
   const principal = await withQueryRawLabel(label, () => measureRequestPhase('auth_account_lookup', () => loadCurrentPrincipal(userId)))
 
-  if (ttl > 0) {
+  // Use the actual CurrentPrincipal fields; there is no isSystemAdmin property.
+  // Elevated users pay the authoritative lookup cost on every request.
+  const cacheable = principal !== null
+    && principal.platformRole !== 'SYSTEM_ADMIN'
+    && principal.role !== UserRole.ADMIN
+    && principal.needsMfa !== true
+    && !(principal.entryGrants?.length)
+  if (ttl > 0 && cacheable) {
     const maxEntries = getPrincipalCacheMaxEntries()
     if (principalCache.size >= maxEntries) {
       const oldestKey = principalCache.keys().next().value
       if (oldestKey) principalCache.delete(oldestKey)
     }
-    principalCache.set(userId, { principal, expiresAt: now + ttl })
+    principalCache.set(userId, { principal, expiresAt: Date.now() + ttl })
   }
 
   return principal
