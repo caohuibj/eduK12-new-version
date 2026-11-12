@@ -63,7 +63,17 @@ publicAnonymousStudyRouter.use(noStore,rateLimit({windowMs:15*60*1000,limit:150,
   validate:{keyGeneratorIpFallback:false},keyGenerator:req=>hashRecoveryToken(credential(req) || req.ip || 'unknown')}))
 // Always retain an IP budget for code guesses, independently of attacker-supplied
 // bearer headers. The shared scrypt admission gate separately bounds CPU work.
-publicAnonymousStudyRouter.use(['/waves/:waveId/join','/:studyId/code/recover','/:studyId/code/reset'],
+// Join bursts from one school NAT IP are legitimate class traffic: a single
+// anonymous questionnaire will never exceed 500 total responses, so 500 joins
+// per 15 minutes covers the maximum expected load even if every respondent
+// shares one NAT IP. The per-IP guessing budget rises from 30 to 500; the
+// remaining compensating controls are the long random wave token (required on
+// every join), the scrypt verification cost, and the join admission gate.
+// Code recover/reset keep the tighter 30 budget: they are single-student
+// actions and a code-guessing surface.
+publicAnonymousStudyRouter.use(['/waves/:waveId/join'],
+ rateLimit({windowMs:15*60*1000,limit:500,standardHeaders:'draft-7',legacyHeaders:false}))
+publicAnonymousStudyRouter.use(['/:studyId/code/recover','/:studyId/code/reset'],
  rateLimit({windowMs:15*60*1000,limit:30,standardHeaders:'draft-7',legacyHeaders:false}))
 publicAnonymousStudyRouter.post('/waves/:waveId/info',wrap(async(req,res)=>{
   const body=z.object({token:z.string().min(20).max(200)}).strict().parse(req.body)
