@@ -36,7 +36,7 @@ export const registrationRateLimit: RequestHandler = async (req, res, next) => {
     if (refunded || res.statusCode !== 503) return
     refunded = true
     for (const key of consumedKeys) {
-      void cacheService.refundRateLimit(key).catch(() => {})
+      void cacheService.refundRateLimit(key)
     }
   }
   if (typeof res.once === 'function') res.once('finish', onFinish)
