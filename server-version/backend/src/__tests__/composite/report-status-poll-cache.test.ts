@@ -68,7 +68,7 @@ afterEach(() => {
 })
 
 describe('participant report-status poll cache', () => {
-  it('reuses an authorized status within TTL and still authorizes the next poll', async () => {
+  it('reuses an authorized status within TTL with zero DB queries on the next poll', async () => {
     useJob('READY', 'COMPLETED')
     const first = await getCompositeReportStatus(attemptId, owner)
     expect(first.reportStatus.state).toBe('READY')
@@ -97,7 +97,8 @@ describe('participant report-status poll cache', () => {
     expect(second).not.toBe(first)
     expect(statusSnapshotLoads()).toHaveLength(1)
     expect(db.compositeReportJob.findUnique).toHaveBeenCalledTimes(1)
-    expect(authLoads().length).toBe(auths + 1)
+    // Cache-first with an in-memory owner match: no new auth query either.
+    expect(authLoads().length).toBe(auths)
   })
 
   it('rejects a different user or recovery token without returning the cached payload', async () => {
@@ -106,6 +107,7 @@ describe('participant report-status poll cache', () => {
     expect(readReportStatusPollCache(attemptId)).toMatchObject({ reportStatus: { state: 'READY' }, attemptId })
     const snaps = statusSnapshotLoads().length
     const jobs = db.compositeReportJob.findUnique.mock.calls.length
+    const auths = authLoads().length
     await expect(getCompositeReportStatus(attemptId, { userId: 'other-student' })).rejects.toMatchObject({
       statusCode: 403, message: '无权限查看此综合测评记录',
     })
@@ -114,6 +116,9 @@ describe('participant report-status poll cache', () => {
     })
     expect(statusSnapshotLoads()).toHaveLength(snaps)
     expect(db.compositeReportJob.findUnique).toHaveBeenCalledTimes(jobs)
+    // Owner mismatch never serves the cache: each request falls back to the DB
+    // auth check and is rejected there.
+    expect(authLoads().length).toBe(auths + 2)
     expect(cached.reportStatus.state).toBe('READY')
 
     clearReportStatusPollCacheForTest()
@@ -127,7 +132,7 @@ describe('participant report-status poll cache', () => {
     expect(readReportStatusPollCache(attemptId)).toMatchObject({ reportStatus: { state: 'READY' } })
   })
 
-  it('expires PENDING and PROCESSING after 300ms, and READY after 60s', async () => {
+  it('expires PENDING and PROCESSING after 2000ms, and READY after 60s', async () => {
     let now = 1_000_000
     setReportStatusPollCacheNowForTest(() => now)
     for (const status of ['PENDING', 'PROCESSING'] as const) {
@@ -138,7 +143,7 @@ describe('participant report-status poll cache', () => {
       useJob(status)
       await getCompositeReportStatus(attemptId, owner)
       expect(statusSnapshotLoads()).toHaveLength(1)
-      now += 299
+      now += 1999
       await getCompositeReportStatus(attemptId, owner)
       expect(statusSnapshotLoads()).toHaveLength(1)
       now += 1

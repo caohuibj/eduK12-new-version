@@ -611,6 +611,8 @@ describe('Scheme X Batch Scale Admission at Delivery (PR X-05C)', () => {
         if (index === 0) return []
         return [deploymentRow('scale-a'), deploymentRow('scale-b')]
       }),
+      // Batched persist: one CASE UPDATE writes both rows (count 2).
+      $executeRaw: vi.fn().mockResolvedValue(2),
       assessment: {
         findMany: vi.fn().mockResolvedValue([
           { id: 'child-a', compositeItemId: 'item-a', compositeAttemptId: 'parent-attempt-1', attemptEpoch: 1, deliveryMode: 'FINAL_ONLY', scaleId: 'scale-a', scale: scaleA, compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash, frozenAdmissionSnapshotEncrypted: null, frozenAdmissionSnapshotHash: null, userId: 'user-1' },
@@ -634,7 +636,9 @@ describe('Scheme X Batch Scale Admission at Delivery (PR X-05C)', () => {
     expect(result.size).toBe(2)
     expect(result.get('child-a')?.snapshotHash).toBeTruthy()
     expect(result.get('child-b')?.snapshotHash).toBeTruthy()
-    expect(mockTx.assessment.updateMany).toHaveBeenCalledTimes(2)
+    // One batched CASE UPDATE replaces the per-child updateMany calls.
+    expect(mockTx.$executeRaw).toHaveBeenCalledTimes(1)
+    expect(mockTx.assessment.updateMany).toHaveBeenCalledTimes(0)
     expect(sqlKinds.filter(kind => kind === 'deployment_batch')).toEqual(['deployment_batch'])
     expect(sqlKinds.filter(kind => kind === 'deployment_single')).toEqual([])
     expect(sqlKinds.filter(kind => kind === 'lock')).toHaveLength(1)

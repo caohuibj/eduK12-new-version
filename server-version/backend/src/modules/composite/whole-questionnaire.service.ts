@@ -5,6 +5,7 @@ import { withSharedControlContext, storeSharedWholeValidation, loadSharedWholeVa
 import { compactAssessmentStorageEnabled } from '../assessment-runtime/compact-field-codec'
 import { packWholeRawEnvelope, unpackWholeRawEnvelope } from '../assessment-runtime/compact-raw'
 import { rememberWholeReportFeedbackHint, readWholeReportFeedbackHint, type ReportFeedbackProfile } from '../../services/reportFeedbackHints'
+import { rememberSealedWholeReceipt, readSealedWholeReceipt } from '../../services/sealedWholeReceiptCache'
 import { markAssessmentTimeline, assessmentTimelineSpan, traceAssessmentPhase, traceAssessmentPhaseSync } from '../../services/runtimeObservability'
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
@@ -520,16 +521,21 @@ const replaySealedWholeReceipt = async (
 /** One HTTP body, one durable encrypted answer envelope, one transactional job. */
 export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQuestionnaireSubmitInput, principal: Principal,
   receivedAtMs = Date.now()) => {
-  // A sealed ordinary receipt replays before the whole_submit slot. Anything else
-  // falls through; the gate re-reads the header and keeps its own 403.
-  const sealed = await loadWholeSubmissionContext(attemptId)
-  const sealedPrior = sealed?.prior
-  if (sealed && sealedPrior?.wholeSubmissionId) {
-    const parent = sealed.parent
-    if (ownsWholeAttempt(parent, principal) && !hasTrainingVariantMetadata(parent)
-      && input.attemptEpoch === parent.attemptEpoch && input.slotSetHash === parent.frozenActiveSlotSetHash) {
-      return replaySealedWholeReceipt(attemptId, input, principal, parent, sealedPrior)
-    }
+  // In-memory sealed-receipt short-circuit. A normal first-time submit has no
+  // cached receipt and enters the gate with ZERO pre-gate DB queries; the gate
+  // re-reads the header exactly once and keeps its own 403. A retry of a receipt
+  // sealed by this process replays here with no DB read at all (ownership,
+  // epoch, slot-set, variant and payload are all checked in memory; a different
+  // submission id or payload still conflicts 409). A receipt sealed by another
+  // process (or before a restart) is not in this cache and replays in-gate.
+  const cachedSealed = readSealedWholeReceipt(attemptId)
+  if (cachedSealed && !cachedSealed.hasTrainingVariant
+    && input.attemptEpoch === cachedSealed.attemptEpoch && input.slotSetHash === cachedSealed.frozenActiveSlotSetHash
+    && ownsWholeAttempt(cachedSealed, principal)) {
+    const canonical = traceAssessmentPhaseSync('whole.payload_hash', () => prepareCanonicalSubmission(logicalPayload(attemptId, input, cachedSealed.timingSnapshotHash)))
+    assertCanonicalSubmissionPayloadSize(canonical, 1536 * 1024, '整份问卷')
+    if (cachedSealed.submissionId !== input.submissionId || cachedSealed.payloadHash !== canonical.hash) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '已收到不同的整份交卷内容', 409)
+    return receiptResponse(attemptId, input.submissionId, canonical.hash, cachedSealed.acceptedAt, true, readWholeReportFeedbackHint(attemptId, input.submissionId).profile)
   }
   const admissionStarted = process.hrtime.bigint()
   return withWholeSubmitAdmission(async () => {
@@ -607,6 +613,16 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
     // Business decision: attempts already started may finish after an
     // emergency stop. Every selected child was admitted by this attempt's
     // START, so no collection re-check here; new STARTs stay blocked.
+  })
+  // Remember a fresh seal so a lost-ACK retry replays from memory with no DB
+  // read. Replays return above (in-gate) or via the pre-gate cache and never
+  // reach this write; a restarted process simply has an empty cache.
+  if (!receipt.replayed) rememberSealedWholeReceipt(attemptId, {
+    submissionId: input.submissionId, payloadHash: canonical.hash, acceptedAt: receipt.acceptedAt,
+    ...(timingSnapshotHash ? { timingSnapshotHash } : {}),
+    userId: parent.userId, recoveryTokenHash: parent.recoveryTokenHash,
+    attemptEpoch: parent.attemptEpoch, frozenActiveSlotSetHash: parent.frozenActiveSlotSetHash,
+    hasTrainingVariant: hasTrainingVariantMetadata(parent),
   })
   const feedback = rememberWholeReportFeedbackHint(attemptId, input.submissionId, detachedWholeReceiptsEnabled() && !receipt.replayed ? recordWholeReceiptStored() : receipt.queueDepth)
   return receiptResponse(attemptId, input.submissionId, canonical.hash, receipt.acceptedAt, receipt.replayed, feedback.profile)

@@ -3,15 +3,26 @@
  *
  * Not Redis, and not the encrypted report body cache. Keyed by attemptId
  * only: this endpoint's status payload is not a per-user projection.
- * Callers authorize before every read or write. The teacher status path
- * must not use this cache; its payload must not include participantFeedback.
+ * Each entry carries its owner's identity, so a poll can be authorized
+ * in memory before any database read: on a cache hit with a matching
+ * owner the status is returned with ZERO database queries. Only a cache
+ * miss (or an owner mismatch) falls back to the database auth check.
+ * The teacher status path must not use this cache; its payload must not
+ * include participantFeedback.
  *
- * PENDING and PROCESSING live for 300ms. READY lives for 60s. FAILED,
- * WAITING, and every other state are not stored, and are never stored as READY.
+ * PENDING and PROCESSING live for 2000ms (longer than the frontend's
+ * ~400ms minimum poll interval and the harness's ~2000ms interval, so
+ * repeated polls during report generation hit the cache instead of the
+ * database). READY lives for 60s. FAILED, WAITING, and every other state
+ * are not stored, and are never stored as READY.
+ *
+ * The Report Worker actively invalidates an entry when it commits a READY
+ * report in the same process, so READY is visible with zero delay there;
+ * across processes the PENDING TTL bounds staleness instead.
  */
 
 const MAX_ENTRIES = 256
-const PENDING_TTL_MS = 300
+const PENDING_TTL_MS = 2000
 const READY_TTL_MS = 60_000
 
 export const REPORT_STATUS_POLL_CACHE_CAP = MAX_ENTRIES
@@ -20,11 +31,29 @@ export const REPORT_STATUS_POLL_READY_TTL_MS = READY_TTL_MS
 
 type CacheableState = 'PENDING' | 'PROCESSING' | 'READY'
 
+/** Identity needed to authorize a cached poll in memory, without a DB read. */
+export type ReportStatusPollCacheOwner = {
+  userId: string | null
+  recoveryTokenHash: string | null
+}
+
+/** Minimal parent identity returned with a cache hit (callers only use .status). */
+export type ReportStatusPollCacheParent = {
+  id: string
+  userId: string | null
+  recoveryTokenHash: string | null
+  attemptEpoch: number
+  asyncReportEpoch: number
+  compositeAssessment: { id: string; productKind: string | null }
+}
+
 type CacheEntry = {
   expiresAt: number
   /** State that selected the TTL. Never FAILED, WAITING, or anything else. */
   state: CacheableState
   value: unknown
+  owner: ReportStatusPollCacheOwner
+  parent: ReportStatusPollCacheParent
 }
 
 const entries = new Map<string, CacheEntry>()
@@ -94,10 +123,14 @@ const evictOverflow = () => {
 }
 
 /**
- * Clone of the cached payload, or null on miss / expiry.
- * The caller must already have authorized this attempt.
+ * Full cached entry (payload + owner + parent identity), or null on miss / expiry.
+ * The caller authorizes the entry in memory via isReportStatusPollCacheOwner.
  */
-export function readReportStatusPollCache<T>(attemptId: string): T | null {
+export function readReportStatusPollCacheEntry<T>(attemptId: string): {
+  value: T
+  owner: ReportStatusPollCacheOwner
+  parent: ReportStatusPollCacheParent
+} | null {
   const entry = entries.get(attemptId)
   if (!entry) return null
   if (entry.expiresAt <= currentTimeMs()) {
@@ -107,7 +140,35 @@ export function readReportStatusPollCache<T>(attemptId: string): T | null {
   // Map order is insertion order; reinsert so this key is most recently used.
   entries.delete(attemptId)
   entries.set(attemptId, entry)
-  return cloneValue(entry.value) as T
+  return { value: cloneValue(entry.value) as T, owner: { ...entry.owner }, parent: cloneValue(entry.parent) }
+}
+
+/**
+ * Clone of the cached payload, or null on miss / expiry.
+ * Prefer readReportStatusPollCacheEntry when the caller also needs the owner.
+ */
+export function readReportStatusPollCache<T>(attemptId: string): T | null {
+  return readReportStatusPollCacheEntry<T>(attemptId)?.value ?? null
+}
+
+/**
+ * In-memory ownership check for a cached entry. Mirrors
+ * authorizeReportParticipant's ownership rule (without the composite-support
+ * check, which already passed when the entry was written). A non-owner must
+ * never be served a cached payload; they fall back to the DB auth check.
+ */
+export function isReportStatusPollCacheOwner(
+  owner: ReportStatusPollCacheOwner,
+  context: { userId?: string; recoveryTokenHash?: string },
+): boolean {
+  return context.userId
+    ? owner.userId === context.userId
+    : Boolean(context.recoveryTokenHash && owner.userId === null && owner.recoveryTokenHash === context.recoveryTokenHash)
+}
+
+/** Drop one attempt's cached poll entry, e.g. when its report becomes READY. */
+export function invalidateReportStatusPollCache(attemptId: string): void {
+  entries.delete(attemptId)
 }
 
 /**
@@ -117,8 +178,9 @@ export function readReportStatusPollCache<T>(attemptId: string): T | null {
  * PROCESSING, and READY are stored. FAILED, WAITING, and any other state are
  * dropped, including any previous entry, so they cannot be served later as READY.
  * A payload whose own report status disagrees with `state` is not stored.
+ * `parent` supplies the owner + minimal parent identity stored with the entry.
  */
-export function writeReportStatusPollCache<T>(attemptId: string, value: T, state: string): void {
+export function writeReportStatusPollCache<T>(attemptId: string, value: T, state: string, parent: ReportStatusPollCacheParent): void {
   const cacheable = cacheableState(state)
   const ownStatus = payloadReportState(value)
   if (!cacheable || (ownStatus !== null && (ownStatus !== state || !cacheableState(ownStatus)))) {
@@ -131,6 +193,8 @@ export function writeReportStatusPollCache<T>(attemptId: string, value: T, state
     expiresAt: currentTimeMs() + ttlForState(cacheable),
     state: cacheable,
     value: cloneValue(value),
+    owner: { userId: parent.userId, recoveryTokenHash: parent.recoveryTokenHash },
+    parent: cloneValue(parent),
   })
   evictOverflow()
 }
