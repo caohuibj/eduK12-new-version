@@ -16,6 +16,9 @@ import { startUserAttempt } from '../../modules/composite/composite.service'
 
 // Generated Prisma model metadata, rather than an invented fixture field list.
 const definitionFields = new Set(Prisma.dmmf.datamodel.models.find(model => model.name === 'CompositeAssessment')!.fields.map(field => field.name))
+// New START performs an id+hash+updatedAt identity lookup before the locked publication reads.
+const isStartIdentitySelect = (select: Record<string, unknown>) =>
+  Object.keys(select).length === 3 && select.id === true && select.updatedAt === true && select.trainingContentSnapshotHash === true
 const immediate = { schemaVersion: 1, mode: 'IMMEDIATE' }
 const retention = { schemaVersion: 1, checkpoint: { enabled: true, ttlHours: 6 }, localCognitive: null }
 function configure(feedback: boolean, persistence: boolean) {
@@ -64,7 +67,7 @@ beforeEach(() => {
   })
   db.compositeAssessment.findUnique.mockImplementation(async ({ select }) => {
     if (!select) return { ...state.publication }
-    state.order.push(select.questionnaireCourses ? 'configured-select' : 'header-select')
+    state.order.push(isStartIdentitySelect(select) ? 'identity-select' : select.questionnaireCourses ? 'configured-select' : 'header-select')
     const row = { ...state.publication, ...state.locked }
     const result: Record<string, unknown> = {}
     for (const field of Object.keys(select)) {
@@ -98,12 +101,14 @@ describe('Training configured-policy admission projection (mock DB, actual start
       expect(data.trainingFeedbackSnapshotHash).toBe(canonicalHash(data.trainingFeedbackSnapshot))
     }
     if (persistence) expect(data.trainingPersistenceSnapshotHash).toBe(canonicalHash(data.trainingPersistenceSnapshot))
-    const selected = db.compositeAssessment.findUnique.mock.calls.filter(([args]) => args.select)
+    const selects = db.compositeAssessment.findUnique.mock.calls.filter(([args]) => args.select)
+    expect(selects.filter(([args]) => isStartIdentitySelect(args.select))).toHaveLength(1)
+    const selected = selects.filter(([args]) => !isStartIdentitySelect(args.select))
     expect(selected).toHaveLength(feedback || persistence ? 2 : 1)
     for (const [args] of selected) expect(args.select).not.toHaveProperty('deliveryMode')
     expect(state.order).toEqual(feedback || persistence
-      ? ['publication-lock', 'header-select', 'configured-select', 'course-lock', 'insert']
-      : ['publication-lock', 'header-select', 'insert'])
+      ? ['identity-select', 'publication-lock', 'header-select', 'configured-select', 'course-lock', 'insert']
+      : ['identity-select', 'publication-lock', 'header-select', 'insert'])
   })
   it.each([[true, false], [false, true], [true, true]])('retains explicit runtime LEGACY rejection (feedback=%s persistence=%s)', async (feedback, persistence) => {
     configure(feedback, persistence)
