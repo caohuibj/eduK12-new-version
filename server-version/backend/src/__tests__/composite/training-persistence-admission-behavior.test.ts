@@ -123,9 +123,11 @@ describe('C23 persistence admission projection (schema-aware mock DB, actual sta
     for (const [args] of selected) expect(args.select).not.toHaveProperty('deliveryMode')
     expect(Object.keys(selected[0][0].select).sort()).toEqual([
       'status', 'publicEnabled', 'opensAt', 'expiresAt', 'trainingPersistencePolicy', 'trainingPersistencePolicyHash',
-      'trainingFeedbackPolicy', 'trainingFeedbackPolicyHash', 'trainingContentSnapshot', 'trainingContentSnapshotHash',
+      'trainingFeedbackPolicy', 'trainingFeedbackPolicyHash', 'trainingContentSnapshotHash',
       'personalTracking', 'personalTrackingBaselineId', 'personalTrackingOrdinal', 'updatedAt',
     ].sort())
+    // A preloaded, version-matched START must *not* read the ciphertext blob again in-tx.
+    expect(selected[0][0].select).not.toHaveProperty('trainingContentSnapshot')
     if (!enabled) expect(db.$queryRaw.mock.calls.some(([query]) => query.join('').includes('FOR SHARE OF c,u'))).toBe(false)
     expect(state.order).toEqual(enabled
       ? ['identity-select', 'publication-lock', 'header-select', 'configured-select', 'course-lock', 'insert']
