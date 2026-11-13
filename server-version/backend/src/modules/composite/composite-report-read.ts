@@ -51,7 +51,7 @@ const reportStatusInstant = (value: unknown): Date | null => {
   return new Date(/(?:Z|[+-]\d\d:\d\d)$/.test(text) ? text : text + 'Z')
 }
 
-/** Narrow status snapshot. `job` is undefined when the caller must use the header lookup. */
+/** Current owner, epoch and job in one statement; never cache participant status. */
 export const readReportStatusPollSnapshot = async (attemptId: string): Promise<{ parent: any, job: ReportStatusPollJob | null } | null> => {
   {
     const rows = await prisma.$queryRaw<Array<{ parent: any, job: ReportStatusPollJob | null }>>`
