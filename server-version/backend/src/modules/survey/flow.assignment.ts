@@ -185,19 +185,42 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
 /** Admit first, allocate inside the same transaction before returning the
  * participant's admission receipt. This makes group quotas meaningful before
  * question presentation; failed reservations roll back the whole admission.
+ * No-flow publications return after a jsonb existence check, without loading compiledSnapshot.
  */
 export async function allocateResearchFlowOnAdmission(tx:Prisma.TransactionClient,input:{
   publicationId:string;projectId:string;waveId:string;attemptId:string;
   participantId:string|null;researchCode?:string;accessCredential:string;
+  preparedDigest?:{publicationId:string;snapshotDigest:string}
+  preparedSnapshot?:ResearchFrozenPublication
 }){
-  const publication=await tx.surveyPublication.findFirst({where:{
-    id:input.publicationId,projectId:input.projectId,
-  },select:{definitionDigest:true,compiledSnapshot:true}})
-  if(!publication)fail('研究入场时冻结发布定义不可访问')
-  const snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication
-  if(!snapshot.flow)return
-  if(snapshot.projectId!==input.projectId||snapshot.waveId!==input.waveId||
-    canonicalHash(JSON.parse(JSON.stringify(snapshot)))!==publication.definitionDigest)
+  const visible=await tx.$queryRaw<Array<{definition_digest:string;has_flow:boolean}>>`
+    SELECT publication.definition_digest,COALESCE(jsonb_typeof(publication.compiled_snapshot->'flow') <> 'null',false) AS has_flow
+    FROM survey_publications publication
+    WHERE publication.id=${input.publicationId} AND publication.project_id=${input.projectId}`
+  if(visible.length!==1)fail('研究入场时冻结发布定义不可访问')
+  if(!visible[0].has_flow)return
+  const prepared=input.preparedDigest,preparedSnapshot=input.preparedSnapshot
+  let snapshot:ResearchFrozenPublication
+  if(prepared&&preparedSnapshot?.flow&&prepared.publicationId===input.publicationId
+    &&prepared.snapshotDigest===visible[0].definition_digest){
+    snapshot=preparedSnapshot
+  }else{
+    const publication=await tx.surveyPublication.findFirst({where:{
+      id:input.publicationId,projectId:input.projectId,
+    },select:{definitionDigest:true,compiledSnapshot:true}})
+    if(!publication)fail('研究入场时冻结发布定义不可访问')
+    const loaded=publication.compiledSnapshot as unknown as ResearchFrozenPublication
+    if(!loaded?.flow)return
+    if(loaded.projectId!==input.projectId||loaded.waveId!==input.waveId||
+      canonicalHash(JSON.parse(JSON.stringify(loaded)))!==publication.definitionDigest)
+      fail('研究入场时冻结发布定义未通过摘要校验')
+    snapshot=loaded
+  }
+  if(snapshot.projectId!==input.projectId||snapshot.waveId!==input.waveId)
     fail('研究入场时冻结发布定义未通过摘要校验')
-  await ensureSurveyFlowAssignment(tx,{...input,snapshot})
+  await ensureSurveyFlowAssignment(tx,{
+    projectId:input.projectId,waveId:input.waveId,attemptId:input.attemptId,
+    participantId:input.participantId,researchCode:input.researchCode,
+    accessCredential:input.accessCredential,snapshot,
+  })
 }

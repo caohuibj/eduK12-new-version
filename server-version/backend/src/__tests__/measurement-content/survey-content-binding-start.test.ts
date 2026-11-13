@@ -1,6 +1,7 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
-const m=vi.hoisted(()=>({bind:vi.fn(),allocate:vi.fn(),transaction:vi.fn()}))
-vi.mock('../../config/database',()=>({prisma:{$transaction:m.transaction}}))
+const m=vi.hoisted(()=>({bind:vi.fn(),allocate:vi.fn(),transaction:vi.fn(),preflightToken:vi.fn()}))
+vi.mock('../../config/database',()=>({prisma:{$transaction:m.transaction,
+  surveyEntryToken:{findFirst:m.preflightToken}}}))
 vi.mock('../../modules/survey/content-binding.service',()=>({bindSurveyAttemptContent:m.bind}))
 vi.mock('../../modules/survey/flow.assignment',()=>({allocateResearchFlowOnAdmission:m.allocate}))
 vi.mock('../../modules/survey/identity.service',()=>({recoverLinkedResearchIdentity:vi.fn(async()=>({participantId:'person'})),
@@ -10,6 +11,9 @@ const publicId='11111111-1111-4111-8111-111111111111'
 let tx:any
 beforeEach(()=>{
   vi.resetAllMocks();vi.stubEnv('SURVEY_WORKSPACE_ENABLED','true');vi.stubEnv('SURVEY_PUBLICATION_ENABLED','true')
+  // Production performs a lightweight, non-authoritative preflight before
+  // the locked token check. Model that independent Prisma delegate explicitly.
+  m.preflightToken.mockResolvedValue({id:'entry'})
   tx={surveyProject:{findFirst:vi.fn(async()=>({id:'project'}))},
     $queryRaw:vi.fn(async(query:{strings?:string[]}|TemplateStringsArray)=>{
       const sql=('strings' in query?query.strings:query as TemplateStringsArray)!.join(' ')
@@ -31,6 +35,10 @@ describe('actual Survey START binding integration',()=>{
     tx.$queryRaw.mockImplementation(async(query:TemplateStringsArray)=>query.join(' ').includes('"owner_user_id"')
       ?[{ownerUserId:'owner',status:'ACTIVE',collectionMode:'SINGLE_UNLINKED'}]:[{id:'owner'}])
     const result=await startSingleUnlinkedWave({publicId,waveId:'wave',entryToken:'a'.repeat(43),consent:true,consentVersion:1,operationKey:'k'.repeat(43),accessCredential:'c'.repeat(43)})
+    expect(m.preflightToken).toHaveBeenCalledOnce()
+    // The preflight is an optimization; the authoritative token lookup stays
+    // in the admission transaction, and allocation precedes binding.
+    expect(tx.surveyEntryToken.findFirst).toHaveBeenCalledOnce()
     expect(m.allocate.mock.invocationCallOrder[0]).toBeLessThan(m.bind.mock.invocationCallOrder[0])
     expect(m.bind.mock.calls[0][1]).toEqual({projectId:'project',waveId:'wave',attemptId:'attempt',publicationId:'publication',newAttempt:true})
     expect(result).toEqual({attemptId:'attempt',waveId:'wave',status:'STARTED',recovered:false,accessCredential:'c'.repeat(43)})

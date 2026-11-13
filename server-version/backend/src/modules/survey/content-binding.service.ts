@@ -25,7 +25,7 @@ export type SurveyAttemptContentBinding=z.infer<typeof surveyAttemptContentBindi
 function fail():never{throw new SurveyWaveError(409,'研究作答的冻结内容绑定缺失、变更或已不可用')}
 type Scope={projectId:string;waveId:string;attemptId:string;publicationId:string}
 type Row={status:string;content_binding_cipher:string|null;content_binding_hash:string|null;flow_assignment_cipher:string|null;
-  owner_id:string;definition_digest:string;compiled_snapshot:ResearchFrozenPublication}
+  owner_id:string;definition_digest:string;compiled_snapshot?:ResearchFrozenPublication}
 
 /** Pure immutable receipt validation; null is explicit pre-binding legacy data.
  * selectedSnapshot must already be the server-verified assigned publication.
@@ -55,22 +55,41 @@ export function decodeSurveyAttemptContentBinding(input:Scope&{definitionDigest:
   return binding
 }
 
+export type PreparedSurveyPublicationDigest={publicationId:string;snapshotDigest:string}
+
 /** Called only after current admission credential/owner checks, under existing Project/Wave/credential locks (new Attempt rows are transaction-owned). New attempts bind once; legacy recovery is never backfilled.
  * Raw SQL isolates these additive fields until the private Prisma client is generated.
  * No payload or private template is returned to participant DTOs.
+ * Optional preparedDigest/preparedSnapshot are request-local and computed before the wave lock.
+ * When the locked publication id and definition_digest match and preparedSnapshot is present, the locked read omits compiled_snapshot and does not rehash it.
+ * Otherwise compiled_snapshot is read under the same FOR SHARE and rehashed. The binding stores the locked definition_digest.
  */
-export async function bindSurveyAttemptContent(tx:Prisma.TransactionClient,input:Scope&{newAttempt:boolean}):Promise<void>{
-  const rows=await tx.$queryRaw<Row[]>(Prisma.sql`SELECT attempt.status,attempt.content_binding_cipher,attempt.content_binding_hash,
-    attempt.flow_assignment_cipher,project.owner_user_id AS owner_id,publication.definition_digest,publication.compiled_snapshot
-    FROM survey_wave_attempts attempt JOIN survey_projects project ON project.id=attempt.project_id
+export async function bindSurveyAttemptContent(tx:Prisma.TransactionClient,input:Scope&{newAttempt:boolean;preparedDigest?:PreparedSurveyPublicationDigest;preparedSnapshot?:ResearchFrozenPublication}):Promise<void>{
+  const prepared=input.preparedDigest
+  const skipSnapshotRead=!!prepared&&!!input.preparedSnapshot&&prepared.publicationId===input.publicationId
+  const lockedFrom=Prisma.sql`FROM survey_wave_attempts attempt JOIN survey_projects project ON project.id=attempt.project_id
     JOIN survey_waves wave ON wave.id=attempt.wave_id AND wave.project_id=attempt.project_id
     JOIN survey_publications publication ON publication.id=wave.publication_id AND publication.project_id=project.id
     WHERE attempt.id=${input.attemptId} AND attempt.project_id=${input.projectId} AND attempt.wave_id=${input.waveId}
-      AND publication.id=${input.publicationId} FOR SHARE OF project,wave,publication`)
+      AND publication.id=${input.publicationId} FOR SHARE OF project,wave,publication`
+  const rows=await tx.$queryRaw<Row[]>(skipSnapshotRead
+    ? Prisma.sql`SELECT attempt.status,attempt.content_binding_cipher,attempt.content_binding_hash,
+      attempt.flow_assignment_cipher,project.owner_user_id AS owner_id,publication.definition_digest ${lockedFrom}`
+    : Prisma.sql`SELECT attempt.status,attempt.content_binding_cipher,attempt.content_binding_hash,
+      attempt.flow_assignment_cipher,project.owner_user_id AS owner_id,publication.definition_digest,publication.compiled_snapshot ${lockedFrom}`)
   if(rows.length!==1)fail()
-  const row=rows[0],snapshot=row.compiled_snapshot
-  if(snapshot.projectId!==input.projectId||snapshot.waveId!==input.waveId||snapshot.runtimeStatus!=='SURVEY_FINAL_V1'
-    ||canonicalHash(snapshot)!==row.definition_digest)fail()
+  const row=rows[0]
+  const digestMatches=!!prepared&&prepared.publicationId===input.publicationId&&prepared.snapshotDigest===row.definition_digest
+  const usePrepared=digestMatches&&!!input.preparedSnapshot
+  let snapshot:ResearchFrozenPublication|undefined=usePrepared?input.preparedSnapshot:row.compiled_snapshot
+  if(!usePrepared&&(skipSnapshotRead||!snapshot)){
+    const loaded=await tx.$queryRaw<Array<{compiled_snapshot:ResearchFrozenPublication|null}>>(Prisma.sql`SELECT publication.compiled_snapshot ${lockedFrom}`)
+    const compiled=loaded[0]?.compiled_snapshot
+    if(loaded.length!==1||!compiled)fail()
+    snapshot=compiled
+  }
+  if(!snapshot||snapshot.projectId!==input.projectId||snapshot.waveId!==input.waveId||snapshot.runtimeStatus!=='SURVEY_FINAL_V1'
+    ||(!usePrepared&&canonicalHash(snapshot)!==row.definition_digest))fail()
   if(Boolean(row.content_binding_cipher)!==Boolean(row.content_binding_hash))fail()
   const assignment=row.flow_assignment_cipher?decryptUnifiedRuntimePayload<SurveyFlowAssignment>(row.flow_assignment_cipher):null
   const selected=assignedSurveySnapshot(snapshot,assignment)

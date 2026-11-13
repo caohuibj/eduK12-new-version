@@ -121,6 +121,50 @@ suite('anonymous SINGLE_UNLINKED START idempotency on real PostgreSQL', () => {
     await (await import('../../config/queue')).closeQueues(true)
     await db.$disconnect()
   })
+  it('invalid unlinked entry token never triggers large publication prefetch',async()=>{
+    const delegate=db.surveyWave as any
+    const querySpy=vi.spyOn(delegate,'findFirst')
+    try{
+      await expect(start({publicId:projectB,waveId:waveUnlimited,
+        entryToken:secret43('invalid-recruitment'),...keys('bad-token')}))
+        .rejects.toMatchObject({statusCode:403})
+      const prefetched=querySpy.mock.calls.filter(([arg]:any[])=>Boolean(arg?.select?.publication?.select?.compiledSnapshot))
+      expect(prefetched).toHaveLength(0)
+    }finally{querySpy.mockRestore()}
+  },60000)
+
+  it('valid concurrent starts single-flight immutable snapshot prefetch and preserve distinct attempts',async()=>{
+    const delegate=db.surveyWave as any
+    const original=delegate.findFirst.bind(delegate)
+    let fatReads=0
+    const querySpy=vi.spyOn(delegate,'findFirst').mockImplementation(async(arg:any)=>{
+      if(arg?.select?.publication?.select?.compiledSnapshot){
+        fatReads++
+        // Deliberate delay keeps all concurrent callers behind one in-flight
+        // read; it does not hold the admission gate or a database connection.
+        await new Promise(resolve=>setTimeout(resolve,200))
+      }
+      return original(arg)
+    })
+    try{
+      const inputs=Array.from({length:6},(_,i)=>({
+        publicId:projectB,waveId:waveUnlimited,entryToken:entryUnlimited,...keys('singleflight-'+i),
+      }))
+      const started=await Promise.all(inputs.map(input=>start(input)))
+      expect(new Set(started.map(x=>x.attemptId)).size).toBe(inputs.length)
+      expect(started.every(x=>x.recovered===false)).toBe(true)
+      expect(fatReads).toBe(1)
+    }finally{querySpy.mockRestore()}
+  },60000)
+
+  it('actual PostgreSQL treats missing and JSON-null flow as no flow',async()=>{
+    const rows=await db.$queryRaw<Array<{present:boolean}>>`
+      SELECT COALESCE(jsonb_typeof(snapshot->'flow') <> 'null',false) AS present
+      FROM (VALUES ('{}'::jsonb),('{"flow":null}'::jsonb),
+        ('{"flow":{"flowDigest":"x"}}'::jsonb)) AS entry(snapshot)`
+    expect(rows.map(row=>row.present)).toEqual([false,false,true])
+  },60000)
+
 
   it('first start admits one attempt and consumes quota once', async () => {
     const k = keys('first')
@@ -215,10 +259,20 @@ suite('anonymous SINGLE_UNLINKED START idempotency on real PostgreSQL', () => {
 
   it('unlimited-quota waves stay idempotent for one identity', async () => {
     const k = keys('unlimited')
+    // Other tests legitimately create distinct attempts on this unlimited wave;
+    // assert this operation adds exactly one, regardless of prior fixtures.
+    const before = await db.surveyWaveAttempt.count({ where: { waveId: waveUnlimited } })
     const first = await start({ publicId: projectB, waveId: waveUnlimited, entryToken: entryUnlimited, ...k })
+    expect(first.recovered).toBe(false)
+    const afterFirst = await db.surveyWaveAttempt.count({ where: { waveId: waveUnlimited } })
+    expect(afterFirst).toBe(before + 1)
     const replay = await start({ publicId: projectB, waveId: waveUnlimited, entryToken: entryUnlimited, ...k })
     expect(replay.attemptId).toBe(first.attemptId)
-    expect(await db.surveyWaveAttempt.count({ where: { waveId: waveUnlimited } })).toBe(1)
+    expect(replay.recovered).toBe(true)
+    expect(await db.surveyWaveAttempt.count({ where: { waveId: waveUnlimited } })).toBe(afterFirst)
+    expect(await db.surveyWaveAttempt.count({ where: {
+      waveId: waveUnlimited, operationKeyHash: hashResearchCredential(k.operationKey),
+    } })).toBe(1)
   }, 60000)
 
   it('legacy rows without an operation key are unaffected (linked-mode regression)', async () => {
