@@ -40,6 +40,17 @@ export class BoundedTtlCache<V> {
 export const startReadsCache = new BoundedTtlCache<unknown>(START_READ_CACHE_TTL_MS, START_READ_CACHE_MAX_ENTRIES)
 export const startCompositeCache = new BoundedTtlCache<unknown>(START_READ_CACHE_TTL_MS, START_READ_CACHE_MAX_ENTRIES)
 
+/**
+ * EXEC-START-01: process-local cache for the GET /api/composite-assessments/available
+ * template list. The cached value is the SHARED publication template list only
+ * (PUBLISHED + ARCHIVED composites, all courses, no per-user filter) — the
+ * per-user course memberships and attempt rows are still read fresh on every
+ * request and merged in memory, so a student's own attempt state is never
+ * stale. TTL 30s bounds template staleness (publish/archive) to one poll
+ * window; the in-tx admission rechecks are untouched.
+ */
+export const availableTemplateCache = new BoundedTtlCache<unknown>(START_READ_CACHE_TTL_MS, 8)
+
 export const publicationReadKey = (id: string, snapshotHash: string | null | undefined, updatedAt?: Date | string | null) => {
   const stamp = updatedAt instanceof Date ? String(updatedAt.getTime()) : updatedAt ? String(new Date(updatedAt).getTime()) : ''
   return `${id}:${snapshotHash ?? ''}:${stamp}`
@@ -48,4 +59,5 @@ export const publicationReadKey = (id: string, snapshotHash: string | null | und
 export const resetStartReadCachesForTests = () => {
   startReadsCache.clear()
   startCompositeCache.clear()
+  availableTemplateCache.clear()
 }
