@@ -17,6 +17,9 @@ import { startUserAttempt } from '../../modules/composite/composite.service'
 
 // Generated Prisma model metadata, rather than an invented fixture field list.
 const definitionFields = new Set(Prisma.dmmf.datamodel.models.find(model => model.name === 'CompositeAssessment')!.fields.map(field => field.name))
+// New START performs an id+hash+updatedAt identity lookup before the locked publication reads.
+const isStartIdentitySelect = (select: Record<string, unknown>) =>
+  Object.keys(select).length === 3 && select.id === true && select.updatedAt === true && select.trainingContentSnapshotHash === true
 function configure(checkpoint: boolean, localCognitive: boolean) {
   const policy: TrainingPersistencePolicy | null = checkpoint || localCognitive ? {
     schemaVersion: 1,
@@ -69,7 +72,7 @@ beforeEach(() => {
   })
   db.compositeAssessment.findUnique.mockImplementation(async ({ select }) => {
     if (!select) return { ...state.publication, ...state.runtimeOverrides }
-    state.order.push(select.questionnaireCourses ? 'configured-select' : 'header-select')
+    state.order.push(isStartIdentitySelect(select) ? 'identity-select' : select.questionnaireCourses ? 'configured-select' : 'header-select')
     const row = { ...state.publication, ...state.locked }
     const result: Record<string, unknown> = {}
     for (const field of Object.keys(select)) {
@@ -113,7 +116,9 @@ describe('C23 persistence admission projection (schema-aware mock DB, actual sta
       expect(data).not.toHaveProperty('trainingPersistenceSnapshot')
       expect(data).not.toHaveProperty('trainingPersistenceSnapshotHash')
     }
-    const selected = db.compositeAssessment.findUnique.mock.calls.filter(([args]) => args.select)
+    const selects = db.compositeAssessment.findUnique.mock.calls.filter(([args]) => args.select)
+    expect(selects.filter(([args]) => isStartIdentitySelect(args.select))).toHaveLength(1)
+    const selected = selects.filter(([args]) => !isStartIdentitySelect(args.select))
     expect(selected).toHaveLength(enabled ? 2 : 1)
     for (const [args] of selected) expect(args.select).not.toHaveProperty('deliveryMode')
     expect(Object.keys(selected[0][0].select).sort()).toEqual([
@@ -123,8 +128,8 @@ describe('C23 persistence admission projection (schema-aware mock DB, actual sta
     ].sort())
     if (!enabled) expect(db.$queryRaw.mock.calls.some(([query]) => query.join('').includes('FOR SHARE OF c,u'))).toBe(false)
     expect(state.order).toEqual(enabled
-      ? ['publication-lock', 'header-select', 'configured-select', 'course-lock', 'insert']
-      : ['publication-lock', 'header-select', 'insert'])
+      ? ['identity-select', 'publication-lock', 'header-select', 'configured-select', 'course-lock', 'insert']
+      : ['identity-select', 'publication-lock', 'header-select', 'insert'])
   })
   it.each([[true, false], [false, true], [true, true]])('retains explicit runtime LEGACY rejection (checkpoint=%s localCognitive=%s)', async (checkpoint, localCognitive) => {
     configure(checkpoint, localCognitive)
