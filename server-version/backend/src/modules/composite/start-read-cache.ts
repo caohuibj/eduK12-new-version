@@ -50,6 +50,8 @@ export class BoundedTtlCache<V> {
 
 export const startReadsCache = new BoundedTtlCache<unknown>(START_READ_CACHE_TTL_MS, START_READ_CACHE_MAX_ENTRIES)
 export const startCompositeCache = new BoundedTtlCache<unknown>(START_READ_CACHE_TTL_MS, START_READ_CACHE_MAX_ENTRIES)
+// Shared PUBLISHED+ARCHIVED template superset; participant rows are never cached.
+export const availableTemplateCache = new BoundedTtlCache<unknown>(START_READ_CACHE_TTL_MS, 2)
 
 export const publicationReadKey = (id: string, snapshotHash: string | null | undefined, updatedAt?: Date | string | null) => {
   const stamp = updatedAt instanceof Date ? String(updatedAt.getTime()) : updatedAt ? String(new Date(updatedAt).getTime()) : ''
@@ -59,4 +61,5 @@ export const publicationReadKey = (id: string, snapshotHash: string | null | und
 export const resetStartReadCachesForTests = () => {
   startReadsCache.clear()
   startCompositeCache.clear()
+  availableTemplateCache.clear()
 }
