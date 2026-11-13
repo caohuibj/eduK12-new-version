@@ -31,7 +31,7 @@ type PoolOptions = {
 export const createPasswordVerificationPool = (options: PoolOptions) => {
   const maxQueue = options.maxQueue ?? 32
   const timeoutMs = options.timeoutMs ?? 10000
-  if (!Number.isInteger(options.size) || options.size < 1 || options.size > 8 ||
+  if (!Number.isInteger(options.size) || options.size < 1 || options.size > 32 ||
       !Number.isInteger(maxQueue) || maxQueue < 0 ||
       !Number.isInteger(timeoutMs) || timeoutMs < 1) throw new Error('Invalid password pool configuration')
   const slots: Array<Slot | undefined> = Array(options.size).fill(undefined)
@@ -131,10 +131,11 @@ export const createPasswordVerificationPool = (options: PoolOptions) => {
 export type PasswordVerificationPool = ReturnType<typeof createPasswordVerificationPool>
 let defaultPool: PasswordVerificationPool | undefined
 
-/** Default-off deployment option. Same bcryptjs algorithm and existing hashes. */
+/** Default 8 workers outside tests; set LOGIN_PASSWORD_WORKERS=0 to opt out.
+ * This changes scheduling only, not bcryptjs algorithm, cost or existing hashes. */
 export const passwordVerificationPool = (): PasswordVerificationPool | undefined => {
-  const raw = process.env.LOGIN_PASSWORD_WORKERS ?? '0'
-  if (!/^[0-8]$/.test(raw)) throw new Error('Invalid LOGIN_PASSWORD_WORKERS')
+  const raw = process.env.LOGIN_PASSWORD_WORKERS ?? (process.env.NODE_ENV === 'test' ? '0' : '8')
+  if (!/^(?:[0-9]|[12][0-9]|3[0-2])$/.test(raw)) throw new Error('Invalid LOGIN_PASSWORD_WORKERS')
   const size = Number(raw)
   if (size === 0) return undefined
   return defaultPool ??= createPasswordVerificationPool({ size })

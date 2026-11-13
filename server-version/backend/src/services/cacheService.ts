@@ -88,6 +88,14 @@ local ttl = redis.call('TTL', KEYS[1])
 return { count, ttl }
 `
 
+const REFUND_RATE_LIMIT_SCRIPT = `
+local count = redis.call('GET', KEYS[1])
+if count and tonumber(count) > 0 then
+  return redis.call('DECR', KEYS[1])
+end
+return 0
+`
+
 const SEMAPHORE_ACQUIRE_SCRIPT = `
 local clock = redis.call('TIME')
 local now_ms = tonumber(clock[1]) * 1000 + math.floor(tonumber(clock[2]) / 1000)
@@ -322,6 +330,22 @@ class CacheService {
       }
     } catch {
       return null
+    }
+  }
+
+  /**
+   * Refund one rate-limit token (e.g. when downstream service responds with 503 Busy).
+   * Safe decrement: will not decrease below 0.
+   */
+  async refundRateLimit(key: string): Promise<void> {
+    if (!this.isConnected || !this.client) return
+    try {
+      await this.client.eval(REFUND_RATE_LIMIT_SCRIPT, {
+        keys: [key],
+        arguments: [],
+      })
+    } catch {
+      // Best effort refund
     }
   }
 

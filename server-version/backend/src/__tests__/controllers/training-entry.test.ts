@@ -7,7 +7,7 @@ vi.mock('../../utils/authCookies', () => ({ setSessionCookie: m.cookie, clearSes
 vi.mock('../../middleware/loginRateLimit', () => ({ recordLoginFailure: m.failure, clearLoginFailures: m.clear, withLoginPasswordVerification: (fn: () => unknown) => fn(), withLoginAccountLookup: (fn: () => unknown) => fn() }))
 vi.mock('../../middleware/registrationAdmission', () => ({ registrationRateLimit: m.rate }))
 vi.mock('../../utils/logger', () => ({ logger: { error: vi.fn() } }))
-import { trainingLogin, resolveTrainingCode, trainingCodeRateLimit } from '../../modules/training/auth'
+import { trainingLogin, resolveTrainingCode, trainingCodeRateLimit, invalidateCourseLookupCache } from '../../modules/training/auth'
 const account = { id: 'u', username: 'u', role: 'STUDENT', accountDomain: 'TRAINING', isActive: true, isFrozen: false, expiresAt: null, teacherApproved: true, passwordHash: 'hash', tokenVersion: 3 }
 const response = () => {
   const res: any = { locals: {}, statusCode: 200, setHeader: vi.fn() }
@@ -16,7 +16,7 @@ const response = () => {
   return res
 }
 beforeEach(() => {
-  vi.resetAllMocks(); m.user.mockResolvedValue(account); m.compare.mockResolvedValue(true)
+  vi.resetAllMocks(); invalidateCourseLookupCache(); m.user.mockResolvedValue(account); m.compare.mockResolvedValue(true)
   m.principal.mockImplementation(async () => {
     const current = await m.user.mock.results.at(-1)?.value
     return current ? [{ ...current, platformRole: 'STANDARD', entryGrants: [] }] : []
