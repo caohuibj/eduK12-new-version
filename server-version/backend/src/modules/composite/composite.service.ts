@@ -1,7 +1,7 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
 import { classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
 import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
-import { publicationReadKey, startCompositeCache } from './start-read-cache'
+import { availableTemplateCache, publicationReadKey, startCompositeCache } from './start-read-cache'
 import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments } from '../scale/deployment/repository'
 import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
@@ -2529,28 +2529,29 @@ const loadSummaryMarkerPresence = async (ids: string[]) => {
  * re-reading. It must never carry caller-supplied course ids. Composite rows
  * still require a non-library course below, so the result is identical.
  */
-export const listAvailableForStudent = async (userId: string, now = Date.now(), courseId?: string, summary = false, authorizedCourseIds?: string[]) => {
-  // Catalog consumers opt in; older detail consumers keep their original response.
-  const courseIds = authorizedCourseIds
-    ? authorizedCourseIds.filter((id) => !courseId || id === courseId)
-    : (await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, ...(courseId ? { courseId } : {}) }, select: { courseId: true } })).map((item) => item.courseId)
-  if (!courseIds.length) return []
-  const list = await prisma.compositeAssessment.findMany({
-    // Publication governs new starts. Archived deliveries remain discoverable
-    // only for this student's existing work, within their current course scope.
-    where: { AND: [{ OR: [
-      { status: 'PUBLISHED' },
-      { status: 'ARCHIVED', attempts: { some: { userId, status: { in: ['IN_PROGRESS', 'COMPLETED'] } } } },
-    ] }],
-    // While the cognitive module is off, a product with a COGNITIVE item is
-    // listed only if this student already has an attempt (any status). This is
-    // the in-memory `supportedList` rule below, pushed into SQL so the catalog
-    // is not materialized just to be dropped; the in-memory rule stays as-is.
-    ...(config.cognitiveModuleEnabled ? {} : { NOT: { items: { some: { type: 'COGNITIVE' } }, attempts: { none: { userId } } } }),
-    OR: [
-      { productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId: { in: courseIds }, course: { isLibrary: false } },
-      { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds }, course: { isLibrary: false } } } },
-    ] },
+/**
+ * EXEC-START-01: cached shared template list for GET /available.
+ * The cached query is the PUBLISHED + ARCHIVED publication superset across
+ * ALL courses with NO per-user filter (no course, no attempt, no cognitive
+ * rule). The per-user parts — course membership, attempt rows, and the
+ * ARCHIVED/COGNITIVE rules that depend on them — are applied in memory on
+ * every request, so a student's own attempt state is never stale. The select
+ * matches the old per-request findMany plus `courseId`, `questionnaireType`
+ * and `questionnaireCourses` (needed to apply the course rule in memory;
+ * SQL could filter on columns it did not select, in-memory code cannot).
+ * Keyed by the summary flag because the select differs; TTL 30s bounds
+ * template staleness (publish/archive) to one poll window.
+ */
+const loadAvailableTemplateList = async (summary: boolean): Promise<any[]> => {
+  const key = summary ? 'available-template:summary' : 'available-template:detail'
+  const cached = availableTemplateCache.get(key) as any[] | undefined
+  if (cached) return cached
+  return availableTemplateCache.singleFlight(key, async () => {
+    // Recheck after joining another caller's cold miss; only one query per process.
+    const cachedAfterLock = availableTemplateCache.get(key) as any[] | undefined
+    if (cachedAfterLock) return cachedAfterLock
+    const list = await prisma.compositeAssessment.findMany({
+    where: { status: { in: ['PUBLISHED', 'ARCHIVED'] } },
     orderBy: { publishedAt: 'desc' },
     select: {
       id: true,
@@ -2569,7 +2570,13 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       // Detail still loads every marker: a missing property is UNKNOWN, not legacy.
       // Summary asks only for presence, so the Json bodies are never parsed.
       ...(summary ? {} : { trainingVariantFrozen: true, ...TRAINING_FLOW_DEFINITION_SELECT }),
+      courseId: true,
+      questionnaireType: true,
       course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
+      // Course rule for QUESTIONNAIRE products lives on this join; the
+      // per-request query filtered it in SQL, the cached superset carries
+      // it so the rule can be applied in memory instead.
+      questionnaireCourses: { select: { courseId: true, course: { select: { isLibrary: true } } } },
       items: summary ? false : {
         orderBy: { position: 'asc' as const },
         select: {
@@ -2584,7 +2591,43 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       formSections: summary ? false : { orderBy: { position: 'asc' as const }, include: { items: { select: { id: true, contextKey: true } } } },
     },
   })
-  const ids = list.map((item) => item.id)
+    availableTemplateCache.set(key, list)
+    return list
+  })
+}
+
+/** In-memory replica of the old findMany course OR-branch. A composite is
+ * visible only through a non-library course the student belongs to:
+ * LEGACY/ASSESSMENT_BUNDLE via its direct course, QUESTIONNAIRE/COURSE via
+ * one of its questionnaireCourses. Any other productKind/questionnaireType
+ * combination matches neither branch and is excluded, exactly as in SQL. */
+const filterAvailableTemplateByCourse = (list: any[], courseIds: string[]): any[] => {
+  if (!courseIds.length) return []
+  const allowed = new Set(courseIds)
+  return list.filter((item: any) => {
+    if (item.productKind === 'LEGACY_COMPOSITE' || item.productKind === 'ASSESSMENT_BUNDLE') {
+      return Boolean(item.courseId && allowed.has(item.courseId) && item.course?.isLibrary === false)
+    }
+    if (item.productKind === 'QUESTIONNAIRE' && item.questionnaireType === 'COURSE') {
+      return (item.questionnaireCourses ?? []).some((entry: any) => allowed.has(entry.courseId) && entry.course?.isLibrary === false)
+    }
+    return false
+  })
+}
+
+export const listAvailableForStudent = async (userId: string, now = Date.now(), courseId?: string, summary = false, authorizedCourseIds?: string[]) => {
+  // Catalog consumers opt in; older detail consumers keep their original response.
+  const courseIds = authorizedCourseIds
+    ? authorizedCourseIds.filter((id) => !courseId || id === courseId)
+    : (await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, ...(courseId ? { courseId } : {}) }, select: { courseId: true } })).map((item) => item.courseId)
+  if (!courseIds.length) return []
+  // EXEC-START-01: the shared template list is cached (30s); only the
+  // per-user course membership (above) and attempt rows (below) are read
+  // fresh. The course rule is applied in memory; the status rule follows
+  // once the fresh attempts are loaded.
+  const templateList = await loadAvailableTemplateList(summary)
+  const candidates = filterAvailableTemplateByCourse(templateList, courseIds)
+  const ids = candidates.map((item) => item.id)
   const [attemptRows, markerPresence] = await Promise.all([
     prisma.compositeAssessmentAttempt.findMany({
       where: { userId, compositeAssessmentId: { in: ids } },
@@ -2606,6 +2649,17 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
     }),
     summary ? loadSummaryMarkerPresence(ids) : Promise.resolve(new Map<string, SummaryMarkerPresence>()),
   ])
+  // Publication governs new starts. Archived deliveries remain discoverable
+  // only for this student's existing work, within their current course scope.
+  // (In-memory replica of the old SQL status OR-branch, using the freshly
+  // loaded attempts. The cognitive NOT-branch stays where it was: the
+  // in-memory `supportedList` rule below.)
+  const hasLiveAttempt = new Set(
+    attemptRows
+      .filter((row) => row.status === 'IN_PROGRESS' || row.status === 'COMPLETED')
+      .map((row) => row.compositeAssessmentId),
+  )
+  const list = candidates.filter((item) => item.status === 'PUBLISHED' || (item.status === 'ARCHIVED' && hasLiveAttempt.has(item.id)))
   const attempts = attemptRows.map(({ cognitiveSessions, ...attempt }) => ({ ...attempt,
     admissionPaused: !config.cognitiveModuleEnabled && cognitiveSessions?.some(session => session.status === 'IN_PROGRESS' && !session.frozenAdmissionSnapshotHash),
   }))
