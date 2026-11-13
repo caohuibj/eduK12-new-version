@@ -16,6 +16,7 @@ vi.mock('../../modules/composite/report-package-label', async importOriginal => 
   return { ...actual, getFrozenPackageSlotLabels: vi.fn(actual.getFrozenPackageSlotLabels) }
 })
 import { listAvailableForStudent } from '../../modules/composite/composite.service'
+import { resetStartReadCachesForTests } from '../../modules/composite/start-read-cache'
 import { config } from '../../config'
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { getFrozenPackageSlotLabels } from '../../modules/composite/report-package-label'
@@ -35,6 +36,9 @@ const fixture = (override: Record<string, unknown> = {}) => ({
   id: 'assessment', code: 'SYNTHETIC', name: '合成组合', productKind: 'ASSESSMENT_BUNDLE',
   description: null, instruction: '合成说明', status: 'PUBLISHED', maxAttempts: 3,
   opensAt: null, expiresAt: null,
+  courseId: 'course',
+  questionnaireType: null,
+  questionnaireCourses: [],
   course: { id: 'course', title: '合成课程', courseCode: 'C', isLibrary: false },
   trainingVariantFrozen: null, trainingFlowDraft: null, trainingFlowFrozen: null, trainingFlowDigest: null,
   reportPackageKey: 'synthetic', reportPackageVersion: '1', reportPackageSnapshotEncrypted: frozen,
@@ -59,6 +63,10 @@ const project = (row: Record<string, any>, select: Record<string, any>) => Objec
 let source: ReturnType<typeof fixture>[]
 beforeEach(() => {
   vi.clearAllMocks()
+  // EXEC-START-01: the template list is cached process-locally (30s TTL) and
+  // keyed only by the summary flag, so clear it between cases or later cases
+  // would see an earlier case's fixture rows.
+  resetStartReadCachesForTests()
   source = [fixture()]
   db.courseStudent.findMany.mockResolvedValue([{ courseId: 'course' }])
   db.compositeAssessmentAttempt.findMany.mockResolvedValue([])
@@ -278,5 +286,37 @@ describe('opt-in student catalog summary', () => {
     } finally {
       config.cognitiveModuleEnabled = true
     }
+  })
+})
+
+describe('available shared template cache isolation', () => {
+  it('coalesces a static template query but reloads each student attempt history', async () => {
+    db.compositeAssessmentAttempt.findMany
+      .mockResolvedValueOnce([{ id: 'active-a', compositeAssessmentId: 'assessment', status: 'IN_PROGRESS', progress: 2, taskSatisfaction: null, cognitiveSessions: [] }])
+      .mockResolvedValueOnce([])
+    const a = await listAvailableForStudent('student-a')
+    const b = await listAvailableForStudent('student-b')
+    expect(db.compositeAssessment.findMany).toHaveBeenCalledTimes(1)
+    expect(db.compositeAssessmentAttempt.findMany).toHaveBeenCalledTimes(2)
+    expect(a[0]).toMatchObject({ canContinue: true, canStartNewAttempt: false })
+    expect(b[0]).toMatchObject({ canContinue: false, canStartNewAttempt: true })
+  })
+
+  it('shows ARCHIVED only to a student with live or completed history', async () => {
+    source = [fixture({ status: 'ARCHIVED' })]
+    db.compositeAssessmentAttempt.findMany
+      .mockResolvedValueOnce([{ id: 'archived-attempt', compositeAssessmentId: 'assessment', status: 'COMPLETED', progress: 100, taskSatisfaction: null, cognitiveSessions: [] }])
+      .mockResolvedValueOnce([])
+    const owner = await listAvailableForStudent('student-a')
+    const other = await listAvailableForStudent('student-b')
+    expect(owner).toHaveLength(1)
+    expect(other).toHaveLength(0)
+    expect(db.compositeAssessment.findMany).toHaveBeenCalledTimes(1)
+  })
+
+  it('shares a single in-flight cold template request across concurrent students', async () => {
+    await Promise.all(Array.from({ length: 20 }, (_, i) => listAvailableForStudent('student-' + i)))
+    expect(db.compositeAssessment.findMany).toHaveBeenCalledTimes(1)
+    expect(db.compositeAssessmentAttempt.findMany).toHaveBeenCalledTimes(20)
   })
 })
