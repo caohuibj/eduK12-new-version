@@ -75,6 +75,8 @@ export const loadPrincipal = async (userId: string, bypassCache = false): Promis
   const cacheable = principal !== null
     && principal.platformRole !== 'SYSTEM_ADMIN'
     && principal.role !== UserRole.ADMIN
+    // Training legacy ADMIN is projected as STUDENT but retains businessRole=ADMIN.
+    && principal.businessRole !== UserRole.ADMIN
     && principal.needsMfa !== true
     && !(principal.entryGrants?.length)
   if (ttl > 0 && cacheable) {
