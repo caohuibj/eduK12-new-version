@@ -221,11 +221,11 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
    const t=await token()
    const created=await observedPublicStart(()=>composite.startPublicAttempt(t.token))
    expect(created.attempt.id).toBeTruthy()
-   for(const name of ['pre_gate_ms','gate_wait_ms','gate_slot_ms','tx_wall_ms','post_gate_ms','tx_acquisition_wait_ms','composite_for_update_query_ms']){
+   for(const name of ['pre_gate_ms','gate_wait_ms','gate_slot_ms','tx_wall_ms','post_gate_ms','tx_acquisition_wait_ms','composite_admission_lock_ms']){
     expect(phaseCount('anonymous.start.'+name)).toBe(1)
    }
    expect(phaseCount('anonymous.start.tx_acquisition_failed_ms')).toBe(0)
-   expect(phaseCount('anonymous.start.composite_for_update_query_failed_ms')).toBe(0)
+   expect(phaseCount('anonymous.start.composite_admission_lock_failed_ms')).toBe(0)
    const resumed=await observedPublicStart(()=>composite.startPublicAttempt(t.token,created.recoveryToken!))
    expect(resumed.attempt.id).toBe(created.attempt.id)
    expect(phaseCount('anonymous.start.pre_gate_ms')).toBe(2)
@@ -236,7 +236,7 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
    else process.env.ANONYMOUS_START_DIAGNOSTIC_ENABLED=priorFlag
   }
  },60000)
- it('anonymous START captures failed transaction acquisition and failed FOR UPDATE query',async()=>{
+ it('anonymous START captures failed transaction acquisition and failed admission lock',async()=>{
   const priorFlag=process.env.ANONYMOUS_START_DIAGNOSTIC_ENABLED
   process.env.ANONYMOUS_START_DIAGNOSTIC_ENABLED='true'
   resetRuntimeObservabilityForTests()
@@ -254,13 +254,15 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
    expect(phaseCount('anonymous.start.gate_slot_ms')).toBe(1)
    const tokenLockFailure=await token()
    const lockSpy=vi.spyOn(prisma as any,'$transaction').mockImplementationOnce(
-    async(callback:any)=>callback({$queryRaw:async()=>{throw new Error('simulated FOR UPDATE failure')}}),
+    // The new anonymous admission takes its first SHARE lock through
+    // $queryRawUnsafe. Inject failure at that actual call boundary.
+    async(callback:any)=>callback({$queryRawUnsafe:async()=>{throw new Error('simulated admission lock failure')}}),
    )
    try{
-    await expect(observedPublicStart(()=>composite.startPublicAttempt(tokenLockFailure.token))).rejects.toThrow('simulated FOR UPDATE failure')
+    await expect(observedPublicStart(()=>composite.startPublicAttempt(tokenLockFailure.token))).rejects.toThrow('simulated admission lock failure')
    }finally{lockSpy.mockRestore()}
-   expect(phaseCount('anonymous.start.composite_for_update_query_failed_ms')).toBe(1)
-   expect(phaseCount('anonymous.start.composite_for_update_query_ms')).toBe(0)
+   expect(phaseCount('anonymous.start.composite_admission_lock_failed_ms')).toBe(1)
+   expect(phaseCount('anonymous.start.composite_admission_lock_ms')).toBe(0)
    expect(phaseCount('anonymous.start.tx_acquisition_wait_ms')).toBe(1)
    expect(phaseCount('anonymous.start.tx_wall_ms')).toBe(2)
    expect(phaseCount('anonymous.start.gate_slot_ms')).toBe(2)

@@ -116,6 +116,20 @@ export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId
   ${input.cursor?Prisma.sql`AND (e.created_at,e.id)<(${input.cursor.createdAt}::timestamptz,${input.cursor.executionId}::text)`:Prisma.empty}
  ORDER BY e.created_at DESC,e.id DESC LIMIT ${input.limit}`)
 }
+export async function assertPersistedTeacherRunBinding(db:TeacherRuntimeDb,actorUserId:string,input:{executionId:string;attemptId:string}):Promise<void>{
+ const rows=await db.$queryRaw<Array<{id:string}>>(Prisma.sql`
+ SELECT e.id
+ FROM assessment_run_executions e
+ JOIN assessment_run_actor_snapshots respondent ON respondent.id=e.respondent_actor_snapshot_id AND respondent.organization_id=e.organization_id AND respondent.run_id=e.run_id AND respondent.user_id=${actorUserId}
+ JOIN composite_assessment_attempts parent ON parent.id=e.runtime_binding_ref AND e.runtime_binding_kind='COMPOSITE' AND parent.user_id=${actorUserId} AND parent.respondent_user_id=${actorUserId}
+ WHERE e.id=${input.executionId}
+  AND e.status='STARTED'
+  AND e.runtime_binding_kind='COMPOSITE'
+  AND e.runtime_binding_ref=${input.attemptId}
+  AND parent.id=${input.attemptId}
+ LIMIT 1`)
+ if(rows.length!==1)fail()
+}
 function taskDto(row:Row,title:string):TeacherAssessmentTask{
  const {executionId,organizationId,runId,eventId,eventTitle,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility}=row
  return {executionId,organizationId,runId,eventId,eventTitle,title,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility,

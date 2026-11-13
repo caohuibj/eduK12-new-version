@@ -19,8 +19,8 @@ const ROUTINE_PHASES = [
 ] as const
 
 const DIAGNOSTIC_PHASES = [
-  'anonymous.start.composite_for_update_query_ms',
-  'anonymous.start.composite_for_update_query_failed_ms',
+  'anonymous.start.composite_admission_lock_ms',
+  'anonymous.start.composite_admission_lock_failed_ms',
   'anonymous.start.tx_acquisition_wait_ms',
   'anonymous.start.tx_acquisition_failed_ms',
 ] as const
@@ -96,12 +96,12 @@ describe('anonymous START observability (two-tier)', () => {
     await runInObservation('/api/public/anonymous-studies/waves/abc123def456/start', async () => {
       const start = process.hrtime.bigint()
       if (anonymousStartDiagnosticEnabled()) {
-        recordRequestPhase('anonymous.start.composite_for_update_query_ms', 5, start, start)
+        recordRequestPhase('anonymous.start.composite_admission_lock_ms', 5, start, start)
         recordRequestPhase('anonymous.start.tx_acquisition_wait_ms', 3, start, start)
       }
     })
     let metrics = metricText()
-    expect(metrics).not.toContain('anonymous.start.composite_for_update_query_ms')
+    expect(metrics).not.toContain('anonymous.start.composite_admission_lock_ms')
     expect(metrics).not.toContain('anonymous.start.tx_acquisition_wait_ms')
 
     // Flag on: diagnostic phases are recorded.
@@ -110,13 +110,13 @@ describe('anonymous START observability (two-tier)', () => {
     await runInObservation('/api/public/anonymous-studies/waves/abc123def456/start', async () => {
       const start = process.hrtime.bigint()
       if (anonymousStartDiagnosticEnabled()) {
-        recordRequestPhase('anonymous.start.composite_for_update_query_ms', 5, start, start)
+        recordRequestPhase('anonymous.start.composite_admission_lock_ms', 5, start, start)
         recordRequestPhase('anonymous.start.tx_acquisition_wait_ms', 3, start, start)
       }
     })
     metrics = metricText()
     expect(metrics).toMatch(
-      /ptool_assessment_phase_duration_seconds_count\{phase="anonymous\.start\.composite_for_update_query_ms",route="[^"]+"\} 1/,
+      /ptool_assessment_phase_duration_seconds_count\{phase="anonymous\.start\.composite_admission_lock_ms",route="[^"]+"\} 1/,
     )
     expect(metrics).toMatch(
       /ptool_assessment_phase_duration_seconds_count\{phase="anonymous\.start\.tx_acquisition_wait_ms",route="[^"]+"\} 1/,

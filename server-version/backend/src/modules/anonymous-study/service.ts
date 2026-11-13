@@ -277,6 +277,7 @@ export async function startStudyWave(studyId:string,waveId:string,credential:str
   const wantsWhole = Boolean(opts?.wantsWholeDelivery)
   const data=await composite.startPublicAttempt(waveToken(w),undefined,{
     credential:recovery,
+    participantId:p.id,
     beforeAdmission:async tx=>{
       // Lock study first, then identity: close and withdrawal serialize with start.
       await tx.$queryRaw`SELECT id FROM anonymous_studies WHERE id=${studyId} FOR UPDATE`

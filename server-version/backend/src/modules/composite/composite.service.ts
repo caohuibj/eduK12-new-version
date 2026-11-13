@@ -11,7 +11,7 @@ import {resolveEducationAssessmentSituationalItems} from '../education-tools/ass
 import {readEducationSjtSources} from '../education-tools/native-source.sjt'
 import {admitEducationNativeCognitive} from '../education-tools/native-source.cognitive'
 import { emptyOptionalReportRelations, OPTIONAL_REPORT_RELATION_COUNTS } from './composite-report-read-plan'
-import { lockAuthenticatedAdmission, lockCompositeAdmissionShare } from './authenticated-admission-lock'
+import { lockAnonymousAdmission, lockAuthenticatedAdmission, lockCompositeAdmissionShare } from './authenticated-admission-lock'
 import { lockRelationalAdmission } from './relational-admission-lock'
 import { BoundedAdmissionGate } from '../../services/boundedAdmissionGate'
 import { defaultStartAdmissionBound } from '../../config/databasePool'
@@ -4014,6 +4014,11 @@ export const getPublicCompositeInfo = async (tokenValue: string, db: Db = prisma
 // alter scoring, respondent role, content, or final submission semantics.
 export type PublicStudyAdmission = {
   credential: ReturnType<typeof createRecoveryCredential>
+  /** Participant identity for the per-participant advisory lock in
+   * startPublicAttempt. Resolved pre-transaction by the study flow
+   * (startStudyWave); absent for the plain anonymous token path, which has
+   * no participant identity and therefore takes no advisory lock. */
+  participantId?: string
   beforeAdmission: (tx: Prisma.TransactionClient) => Promise<string | null>
   afterAdmission: (tx: Prisma.TransactionClient, attemptId: string) => Promise<void>
 }
@@ -4026,7 +4031,7 @@ export type PublicStudyAdmission = {
  * Attempt ID, user ID, Token, answers, or DB params. Timing uses the
  * monotonic clock (process.hrtime.bigint). Containment: http_total ⊃
  * pre_gate + gate_wait + gate_slot + post_gate; gate_slot ⊃ tx_wall;
- * tx_wall ⊃ composite_for_update_query (diagnostic). The query roundtrip
+ * tx_wall ⊃ composite_admission_lock (diagnostic). The query roundtrip
  * is not a PostgreSQL lock-wait measurement. No behavior change: these calls
  * are side-effect-free measurements around the existing steps. */
 const recordAnonymousStartPhase = (phase: RequestObservationPhase, start: bigint, end: bigint): void => {
@@ -4069,7 +4074,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   recordAnonymousStartPhase('anonymous.start.pre_gate_ms', startAt, process.hrtime.bigint())
   // Same queueing discipline as the authenticated Training START: bursts wait
   // in the gate (holding no DB connection) instead of hitting the pool and
-  // the exclusive composite row lock directly. Resume paths never reach
+  // the composite row lock directly. Resume paths never reach
   // here: the recovery-token fast path above and recoverStudyWave return
   // without opening a START transaction.
   const gateEnteredAt = process.hrtime.bigint()
@@ -4087,18 +4092,25 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
             // Successful connection acquisition and BEGIN. Failures before
             // callback entry have a separate terminal interval below.
             recordAnonymousStartDiagnosticPhase('anonymous.start.tx_acquisition_wait_ms', txCallAt, txCallbackAt)
+            // Anonymous admission lock: composite SHARE + per-participant
+            // advisory (see lockAnonymousAdmission for the ordering). This
+            // replaces the exclusive FOR UPDATE that serialized every
+            // START for the same questionnaire (measured 2026-11-12: the
+            // FOR UPDATE roundtrip was 92% of tx_wall, p50 4,034ms at
+            // 200 VU). The study FOR UPDATE in beforeAdmission is
+            // unchanged: close and withdrawal still serialize with start.
             const lockAt = process.hrtime.bigint()
             let lockQuerySucceeded = false
             try {
-              await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
+              await lockAnonymousAdmission(tx, composite.id, study?.participantId)
               lockQuerySucceeded = true
             } finally {
               // This is the SQL roundtrip, NOT isolated PostgreSQL lock wait.
               // Record failed and timed-out statements in their own series.
               recordAnonymousStartDiagnosticPhase(
                 lockQuerySucceeded
-                  ? 'anonymous.start.composite_for_update_query_ms'
-                  : 'anonymous.start.composite_for_update_query_failed_ms',
+                  ? 'anonymous.start.composite_admission_lock_ms'
+                  : 'anonymous.start.composite_admission_lock_failed_ms',
                 lockAt, process.hrtime.bigint(),
               )
             }
