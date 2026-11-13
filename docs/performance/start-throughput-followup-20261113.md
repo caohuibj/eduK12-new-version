@@ -15,7 +15,7 @@ Base: main `1ff8d4bcb` (merged #723). Selectively reuse #721 `488ab853f`, #722 `
 | Report-status 5s TTL | Retain one authoritative SQL. Q=1-h describes query counts, not permission/Epoch correctness. A cached Epoch key cannot reveal the current Epoch; worker-local invalidation misses other API processes, and 5s PENDING can delay READY. |
 | Worker 12 | Code default and Compose fallback become 12; preserve explicit overrides and align env example. This is the requested candidate setting, not a newly measured optimum. |
 | Inline parent | Supply the transaction's exact parent/children only for newly created eligible attempts. Existing/resumed attempts never fabricate fresh state. |
-| Sealed receipt | Reuse #722's bounded 5-minute cache; check owner, epoch, slot-set, submission and payload hash. Cache miss adds no query, but first submission still performs required header/seal work. Variants and relational/consent-bound seals retain authority checks; the latter are excluded from cache population. |
+| Sealed receipt | **Excluded from the merge candidate after formal CI.** The cross-request zero-SQL replay shortcut did not revalidate live parent epoch/variant/authorization; backend regression showed stale receipts accepted after reset. Retain #723's in-gate authoritative replay and idempotency. |
 
 ## Configuration
 
@@ -48,3 +48,10 @@ Controlled performance qualification and formal CI remain separate follow-up wor
 ### Merge gate
 
 The requested next step is an ordinary, non-skipped GitHub Actions run on the exact candidate HEAD. Merge only if the repository's required checks, including `merge gate / ready PR`, pass; this documentation-only commit starts that validation without changing runtime behavior.
+
+## Formal CI fixes (release candidate)
+
+- Restored #723's transactional Whole receipt replay instead of the process-local sealed-receipt shortcut: preserve live attempt epoch and variant-scoped authority after reset. Removed its module and shortcut-only tests.
+- In production the 30s shared Available template cache remains enabled by default; `COMPOSITE_AVAILABLE_CACHE_ENABLED=false` restores the original per-student SQL for emergency rollback. In `NODE_ENV=test`, the test harness defaults to the original read because its fixtures directly mutate publication rows; the dedicated cache suite opts in explicitly to verify single-flight and per-student isolation.
+- Updated the strict text fixture for the START private-reference final fence: the check still executes before returning from the transaction, even when an in-memory projection carrier is attached after the fence.
+- Earlier CI attempt 43408467420 identified these issues; the final HEAD must run a fresh complete CI and pass `merge gate / ready PR` before merging. No production deployment is part of this PR.
