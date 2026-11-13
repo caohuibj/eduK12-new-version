@@ -5,6 +5,7 @@ import { withSharedControlContext, storeSharedWholeValidation, loadSharedWholeVa
 import { compactAssessmentStorageEnabled } from '../assessment-runtime/compact-field-codec'
 import { packWholeRawEnvelope, unpackWholeRawEnvelope } from '../assessment-runtime/compact-raw'
 import { rememberWholeReportFeedbackHint, readWholeReportFeedbackHint, type ReportFeedbackProfile } from '../../services/reportFeedbackHints'
+import { rememberSealedWholeReceipt, readSealedWholeReceipt } from '../../services/sealedWholeReceiptCache'
 import { markAssessmentTimeline, assessmentTimelineSpan, traceAssessmentPhase, traceAssessmentPhaseSync } from '../../services/runtimeObservability'
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
@@ -479,24 +480,74 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
   return { parent, prior }
 }
 
+const ownsWholeAttempt = (parent: { userId: string | null; recoveryTokenHash: string | null }, principal: Principal) => (
+  principal.userId ? parent.userId === principal.userId
+    : parent.userId === null && Boolean(principal.recoveryTokenHash && parent.recoveryTokenHash === principal.recoveryTokenHash)
+)
+
+const assertWholeSubmitConsent = async (attemptId: string, principal: Principal, parent: WholeSubmissionHeader) => {
+  if (process.env.ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED !== 'false' && principal.userId) {
+    const { relationalRuntimeConsentAuthority } = await import('../assessment-relational/runtime-consent')
+    await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId, principal.userId, parent)
+  }
+}
+
+const prepareWholeSubmissionCanonical = (attemptId: string, input: WholeQuestionnaireSubmitInput, parent: WholeSubmissionHeader) => {
+  const timingSnapshot=readTrainingTimingSnapshot(parent.trainingTimingSnapshot)
+  if(timingSnapshot&&timingSnapshot.attemptEpoch!==parent.attemptEpoch)throw failure('计时冻结版本不匹配')
+  const timingSnapshotHash=timingSnapshot?.snapshotHash
+  const canonical = traceAssessmentPhaseSync('whole.payload_hash', () => prepareCanonicalSubmission(logicalPayload(attemptId, input,timingSnapshotHash)))
+  assertCanonicalSubmissionPayloadSize(canonical, 1536 * 1024, '整份问卷')
+  return { timingSnapshotHash, canonical }
+}
+
+/** Accepted-receipt replay. The pre-gate path and the in-gate branch both call this.
+ * The gate already asserted consent before epoch and variant checks, so it passes
+ * consentAsserted to avoid a second live check. */
+const replaySealedWholeReceipt = async (
+  attemptId: string,
+  input: WholeQuestionnaireSubmitInput,
+  principal: Principal,
+  parent: WholeSubmissionHeader,
+  prior: WholeQuestionnaireReceipt,
+  consentAsserted = false,
+) => {
+  if (!consentAsserted) await assertWholeSubmitConsent(attemptId, principal, parent)
+  const { canonical } = prepareWholeSubmissionCanonical(attemptId, input, parent)
+  if (prior.wholeSubmissionId !== input.submissionId || prior.wholePayloadHash !== canonical.hash) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '已收到不同的整份交卷内容', 409)
+  return receiptResponse(attemptId, input.submissionId, canonical.hash, prior.wholeAcceptedAt!, true, readWholeReportFeedbackHint(attemptId, input.submissionId).profile)
+}
+
 /** One HTTP body, one durable encrypted answer envelope, one transactional job. */
 export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQuestionnaireSubmitInput, principal: Principal,
   receivedAtMs = Date.now()) => {
+  // In-memory sealed-receipt short-circuit. A normal first-time submit has no
+  // cached receipt and enters the gate with ZERO pre-gate DB queries; the gate
+  // re-reads the header exactly once and keeps its own 403. A retry of a receipt
+  // sealed by this process replays here with no DB read at all (ownership,
+  // epoch, slot-set, variant and payload are all checked in memory; a different
+  // submission id or payload still conflicts 409). A receipt sealed by another
+  // process (or before a restart) is not in this cache and replays in-gate.
+  const cachedSealed = readSealedWholeReceipt(attemptId)
+  if (cachedSealed && !cachedSealed.hasTrainingVariant
+    && input.attemptEpoch === cachedSealed.attemptEpoch && input.slotSetHash === cachedSealed.frozenActiveSlotSetHash
+    && ownsWholeAttempt(cachedSealed, principal)) {
+    const canonical = traceAssessmentPhaseSync('whole.payload_hash', () => prepareCanonicalSubmission(logicalPayload(attemptId, input, cachedSealed.timingSnapshotHash)))
+    assertCanonicalSubmissionPayloadSize(canonical, 1536 * 1024, '整份问卷')
+    if (cachedSealed.submissionId !== input.submissionId || cachedSealed.payloadHash !== canonical.hash) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '已收到不同的整份交卷内容', 409)
+    return receiptResponse(attemptId, input.submissionId, canonical.hash, cachedSealed.acceptedAt, true, readWholeReportFeedbackHint(attemptId, input.submissionId).profile)
+  }
   const admissionStarted = process.hrtime.bigint()
   return withWholeSubmitAdmission(async () => {
   assessmentTimelineSpan('whole.admission_wait', admissionStarted)
   const context = await traceAssessmentPhase('whole.owner_header_query', () => loadWholeSubmissionContext(attemptId))
   const parent = context?.parent
   if (!parent) throw failure('问卷作答不存在', 404)
-  const owned = principal.userId ? parent.userId === principal.userId
-    : parent.userId === null && Boolean(principal.recoveryTokenHash && parent.recoveryTokenHash === principal.recoveryTokenHash)
+  const owned = ownsWholeAttempt(parent, principal)
   if (!owned) throw failure('无权限操作此问卷', 403)
-  if (process.env.ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED !== 'false' && principal.userId) {
-    // The shared fresh header is read INSIDE the existing submit admission.
-    // Consent remains live; no middleware preloads heavy receipt data before it.
-    const { relationalRuntimeConsentAuthority } = await import('../assessment-relational/runtime-consent')
-    await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId, principal.userId, parent)
-  }
+  // The shared fresh header is read INSIDE the existing submit admission.
+  // Consent remains live; no middleware preloads heavy receipt data before it.
+  await assertWholeSubmitConsent(attemptId, principal, parent)
   if (input.attemptEpoch !== parent.attemptEpoch || input.slotSetHash !== parent.frozenActiveSlotSetHash) throw failure('交卷版本与当前问卷不匹配')
   // A cached validation manifest is scientific data, never allocation authority.
   // Check all partial markers before receipt replay or registration; ordinary
@@ -510,11 +561,6 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
     assertReportJobIdentity(verifiedParent.parent, { attemptEpoch: parent.attemptEpoch,
       slotSetHash: parent.frozenActiveSlotSetHash!, contextHash: parent.contextSnapshotHash })
   }
-  const timingSnapshot=readTrainingTimingSnapshot(parent.trainingTimingSnapshot)
-  if(timingSnapshot&&timingSnapshot.attemptEpoch!==parent.attemptEpoch)throw failure('计时冻结版本不匹配')
-  const timingSnapshotHash=timingSnapshot?.snapshotHash
-  const canonical = traceAssessmentPhaseSync('whole.payload_hash', () => prepareCanonicalSubmission(logicalPayload(attemptId, input,timingSnapshotHash)))
-  assertCanonicalSubmissionPayloadSize(canonical, 1536 * 1024, '整份问卷')
   const prior = context!.prior
   if (prior?.wholeSubmissionId) {
     // X-04A: the accepted receipt replays before the context comparison, because
@@ -522,9 +568,9 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
     // (context sections commit at worker time) and a lost-ACK retry must still
     // replay. Epoch, slot-set and variant authorization above still bind every
     // replay; same id + different payload hash conflicts.
-    if (prior.wholeSubmissionId !== input.submissionId || prior.wholePayloadHash !== canonical.hash) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '已收到不同的整份交卷内容', 409)
-    return receiptResponse(attemptId, input.submissionId, canonical.hash, prior.wholeAcceptedAt!, true, readWholeReportFeedbackHint(attemptId, input.submissionId).profile)
+    return replaySealedWholeReceipt(attemptId, input, principal, parent, prior, true)
   }
+  const { timingSnapshotHash, canonical } = prepareWholeSubmissionCanonical(attemptId, input, parent)
   // The context hash is the only receipt-binding component whole Form
   // materialization can advance; compare it for fresh submissions only.
   if (input.contextSnapshotHash !== parent.contextSnapshotHash) throw failure('交卷版本与当前问卷不匹配')
@@ -567,6 +613,17 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
     // Business decision: attempts already started may finish after an
     // emergency stop. Every selected child was admitted by this attempt's
     // START, so no collection re-check here; new STARTs stay blocked.
+  })
+  // Remember a fresh seal so a lost-ACK retry replays from memory with no DB
+  // read. Replays return above (in-gate) or via the pre-gate cache and never
+  // reach this write; a restarted process simply has an empty cache.
+  if (!receipt.replayed && !parent.assignmentRef && !parent.consentId
+    && parent.compositeAssessment.productKind === 'QUESTIONNAIRE') rememberSealedWholeReceipt(attemptId, {
+    submissionId: input.submissionId, payloadHash: canonical.hash, acceptedAt: receipt.acceptedAt,
+    ...(timingSnapshotHash ? { timingSnapshotHash } : {}),
+    userId: parent.userId, recoveryTokenHash: parent.recoveryTokenHash,
+    attemptEpoch: parent.attemptEpoch, frozenActiveSlotSetHash: parent.frozenActiveSlotSetHash,
+    hasTrainingVariant: hasTrainingVariantMetadata(parent),
   })
   const feedback = rememberWholeReportFeedbackHint(attemptId, input.submissionId, detachedWholeReceiptsEnabled() && !receipt.replayed ? recordWholeReceiptStored() : receipt.queueDepth)
   return receiptResponse(attemptId, input.submissionId, canonical.hash, receipt.acceptedAt, receipt.replayed, feedback.profile)
