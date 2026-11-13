@@ -111,9 +111,11 @@ suite('Survey START prepared-publication behavior on real PostgreSQL',()=>{
         // Published Waves are immutable through the public write path. Temporarily
         // disable only that guard in this disposable integration DB to model a
         // stale/corrupt publication pointer arriving between the pre-read and lock.
-        await db.$executeRaw`ALTER TABLE "survey_waves" DISABLE TRIGGER "survey_wave_published_guard"`
-        try{await db.surveyWave.update({where:{id:f.waveId},data:{publicationId:badPublicationId}})}
-        finally{await db.$executeRaw`ALTER TABLE "survey_waves" ENABLE TRIGGER "survey_wave_published_guard"`}
+        await db.$transaction(async tx=>{
+          await tx.$executeRaw`ALTER TABLE "survey_waves" DISABLE TRIGGER "survey_wave_published_guard"`
+          try{await tx.surveyWave.update({where:{id:f.waveId},data:{publicationId:badPublicationId}})}
+          finally{await tx.$executeRaw`ALTER TABLE "survey_waves" ENABLE TRIGGER "survey_wave_published_guard"`}
+        })
       }
       return row
     })
