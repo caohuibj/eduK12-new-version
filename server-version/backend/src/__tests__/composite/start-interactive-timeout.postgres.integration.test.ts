@@ -1,6 +1,6 @@
 import {afterAll,beforeAll,describe,expect,it} from 'vitest'
 import {PrismaClient} from '@prisma/client'
-import {START_INTERACTIVE_TRANSACTION} from '../../modules/composite/start-transient'
+import {START_INTERACTIVE_TRANSACTION,rolledBackStartReason} from '../../modules/composite/start-transient'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integration/integration-env'
 
 // Proves the START interactive timeout (15s) lets a transaction that exceeds
@@ -19,10 +19,12 @@ suite('START interactive transaction timeout (real PostgreSQL)',()=>{
 
   it('Prisma default 5s timeout rolls back a 6s in-tx sleep with P2028',async()=>{
     const started=Date.now()
-    await expect(client.$transaction(async(tx)=>{
+    const error=await client.$transaction(async(tx)=>{
       await tx.$executeRaw`SELECT pg_sleep(6)`
       return 1
-    })).rejects.toMatchObject({code:'P2028'})
+    }).then(()=>null,error=>error)
+    expect(error).toMatchObject({code:'P2028'})
+    expect(rolledBackStartReason(error)).toBe('P2028')
     const elapsed=Date.now()-started
     expect(elapsed).toBeGreaterThan(4500)
     expect(elapsed).toBeLessThan(10_000)

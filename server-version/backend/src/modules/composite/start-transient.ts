@@ -9,11 +9,13 @@
  * site ever wraps non-transactional writes before the transaction, this
  * classification must be revisited for that site. */
 const ROLLED_BACK_SQLSTATES=new Set(['40001','40P01','55P03'])
-// START classifyStartTransaction only wraps a single $transaction, so a thrown
-// P2028 means the interactive transaction did not commit successfully and the
-// client may safely retry. A missing or non-P2028 code whose message is
-// "Transaction not found" or "Transaction API error" is the same outcome: a
-// wrapper or retry exhaustion dropped the Prisma code.
+// P2028 alone does not establish rollback: committed, missing and otherwise
+// unknown transaction states must retain the original error. Only explicit
+// acquisition failures and expired/rolled-back transactions qualify.
+const knownP2028Rollback = (message: string) =>
+ /unable to start a transaction in the given time/i.test(message)
+ || /(?:commit|query) cannot be executed on an expired transaction/i.test(message)
+ || /transaction already closed[^\n]*last state: ['"]?rolledback/i.test(message)
 
 // Prisma's default interactive timeout is 5000 ms; measured anonymous START tx_wall p50 sits on that red line and is then killed with P2028. maxWait is connection-acquisition before BEGIN (same 10s already used by Training START).
 export const START_INTERACTIVE_TRANSACTION={maxWait:10_000,timeout:15_000} as const
@@ -48,14 +50,16 @@ export const isAssessmentStartBusyError=(error:unknown):error is AssessmentStart
 
 /** Stable reason for a rolled-back transaction, or null when it is not known to be one. */
 export function rolledBackStartReason(error:unknown):string|null{
- const e=error as {code?:unknown;message?:unknown;meta?:{code?:unknown}}|null
+ const e=error as {code?:unknown;message?:unknown;meta?:{code?:unknown;error?:unknown}}|null
  if(!e||typeof e!=='object')return null
  if(e.code==='P2034')return 'P2034'
  if(e.code==='P2024')return 'P2024'
- if(e.code==='P2028')return 'P2028'
+ if(e.code==='P2028'){
+  const messages=[e.message,e.meta?.error].filter((value):value is string=>typeof value==='string')
+  return messages.some(knownP2028Rollback)?'P2028':null
+ }
  const sqlState=typeof e.meta?.code==='string'?e.meta.code:typeof e.code==='string'?e.code:null
  if(sqlState&&ROLLED_BACK_SQLSTATES.has(sqlState))return sqlState
- if(typeof e.message==='string'&&/Transaction not found|Transaction API error/i.test(e.message))return 'P2028'
  return null
 }
 

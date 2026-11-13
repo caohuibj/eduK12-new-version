@@ -3,7 +3,7 @@ import {beforeEach,describe,expect,it,vi} from 'vitest'
 const m=vi.hoisted(()=>({start:vi.fn(),restart:vi.fn()}))
 vi.mock('../../modules/composite/composite.service',async orig=>({...(await orig() as object),startUserAttempt:m.start,restartUserAttempt:m.restart}))
 import {compositeController} from '../../modules/composite/composite.controller'
-import {AssessmentStartBusyError,rethrowGateBusyAsStartBusy} from '../../modules/composite/start-transient'
+import {rethrowGateBusyAsStartBusy} from '../../modules/composite/start-transient'
 import {BoundedAdmissionBusyError} from '../../services/boundedAdmissionGate'
 import {AssessmentStartBusyError,classifyStartTransaction,rolledBackStartReason,START_INTERACTIVE_TRANSACTION} from '../../modules/composite/start-transient'
 
@@ -25,7 +25,7 @@ const notRolledBack=[
  ['plain',new Error('boom')],
  ['null',null],
 ] as const
-const alsoRolledBack=[
+const ambiguousTransactions=[
  ['P2028 not found',known('P2028','Transaction not found. Transaction API error: Transaction not found.')],
  ['P2028 other API',known('P2028','Transaction API error: Transaction already closed: A query cannot be executed on a committed transaction.')],
  ['P2028 no message',Object.assign(new Error(''),{code:'P2028',message:undefined})],
@@ -73,7 +73,10 @@ describe('START transient rollback classification',()=>{
  beforeEach(()=>{m.start.mockReset();m.restart.mockReset()})
  it('START interactive transaction uses 10s maxWait and 15s timeout',()=>{expect(START_INTERACTIVE_TRANSACTION).toEqual({maxWait:10_000,timeout:15_000})})
  it.each(rolledBack)('%s is a known rollback',(_n,err,reason)=>{expect(rolledBackStartReason(err)).toBe(reason)})
- it.each(alsoRolledBack)('%s is a known P2028 rollback',(_n,err)=>{expect(rolledBackStartReason(err)).toBe('P2028')})
+ it.each(ambiguousTransactions)('%s retains its unknown commit outcome',async(_n,err)=>{
+  expect(rolledBackStartReason(err)).toBeNull()
+  await expect(classifyStartTransaction(()=>Promise.reject(err))).rejects.toBe(err)
+ })
  it.each(notRolledBack)('%s is not reclassified',(_n,err)=>{expect(rolledBackStartReason(err)).toBeNull()})
  it('wraps exactly one attempt and never retries',async()=>{
   const run=vi.fn().mockRejectedValue(rolledBack[0][1])
@@ -99,14 +102,16 @@ describe('START transient rollback classification',()=>{
   await compositeController.restartAttempt(req,res)
   expect(res.statusCode).toBe(503);expect(res.body.code).toBe('ASSESSMENT_START_BUSY')
  })
- it('P2028 Transaction not found reaches the controller as 503 with Retry-After and a safe body',async()=>{
-  m.start.mockImplementation(()=>classifyStartTransaction(()=>Promise.reject(alsoRolledBack[0][1])))
+ it.each(ambiguousTransactions)('%s is not advertised as safe START retry',async(_n,err)=>{
+  m.start.mockImplementation(()=>classifyStartTransaction(()=>Promise.reject(err)))
   const res=fakeRes()
   await compositeController.startAttempt(req,res)
-  expect(res.statusCode).toBe(503)
-  expect(res.headers['Retry-After']).toBe('1')
-  expect(res.body).toEqual({code:'ASSESSMENT_START_BUSY',message:'综合测评开始请求繁忙，请稍后重试',data:null})
-  expect(JSON.stringify(res.body)).not.toMatch(/Transaction not found|P2028|Transaction API/)
+  expect(res.statusCode).toBe(500)
+  expect(res.headers['Retry-After']).toBeUndefined()
+  expect(res.body.message).toBe('服务器内部错误')
+ })
+ it('accepts the explicit engine rollback reason carried in Prisma meta',()=>{
+  expect(rolledBackStartReason(known('P2028','Transaction API error',{error:'Transaction already closed: A query cannot be executed on an expired transaction.'}))).toBe('P2028')
  })
  it('a unique-constraint error is not remapped to START busy',async()=>{
   m.start.mockImplementation(()=>classifyStartTransaction(()=>Promise.reject(notRolledBack[0][1])))
