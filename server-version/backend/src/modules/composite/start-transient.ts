@@ -9,16 +9,23 @@
  * site ever wraps non-transactional writes before the transaction, this
  * classification must be revisited for that site. */
 const ROLLED_BACK_SQLSTATES=new Set(['40001','40P01','55P03'])
-// P2028 is a family of interactive-transaction API errors. Only these two are
-// known rollbacks: maxWait expired before BEGIN, or the engine expired the tx.
-const P2028_ROLLED_BACK=/Unable to start a transaction in the given time|expired transaction/i
+// P2028 alone does not establish rollback: committed, missing and otherwise
+// unknown transaction states must retain the original error. Only explicit
+// acquisition failures and expired/rolled-back transactions qualify.
+const knownP2028Rollback = (message: string) =>
+ /unable to start a transaction in the given time/i.test(message)
+ || /(?:commit|query) cannot be executed on an expired transaction/i.test(message)
+ || /transaction already closed[^\n]*last state: ['"]?rolledback/i.test(message)
+
+// Prisma's default interactive timeout is 5000 ms; measured anonymous START tx_wall p50 sits on that red line and is then killed with P2028. maxWait is connection-acquisition before BEGIN (same 10s already used by Training START).
+export const START_INTERACTIVE_TRANSACTION={maxWait:10_000,timeout:15_000} as const
 
 export const ASSESSMENT_START_BUSY='ASSESSMENT_START_BUSY'
 export type StartBusyDiagnostic='pool_wait'|'transaction_expired'|'queue_full'|'queue_timeout'|'write_conflict'|'other'
 const diagnosticFrom=(reason:string,original?:string):StartBusyDiagnostic=>{
  if(reason==='ADMISSION_QUEUE_FULL')return 'queue_full'
  if(reason==='ADMISSION_WAIT_TIMEOUT')return 'queue_timeout'
- if(reason==='P2028')return /unable to start a transaction/i.test(original??'')?'pool_wait':/expired transaction/i.test(original??'')?'transaction_expired':'other'
+ if(reason==='P2028')return /unable to start a transaction/i.test(original??'')?'pool_wait':/expired transaction|Transaction not found/i.test(original??'')?'transaction_expired':'other'
  if(reason==='P2024')return 'pool_wait'
  if(reason==='P2034')return 'write_conflict'
  return 'other'
@@ -43,13 +50,17 @@ export const isAssessmentStartBusyError=(error:unknown):error is AssessmentStart
 
 /** Stable reason for a rolled-back transaction, or null when it is not known to be one. */
 export function rolledBackStartReason(error:unknown):string|null{
- const e=error as {code?:unknown;message?:unknown;meta?:{code?:unknown}}|null
+ const e=error as {code?:unknown;message?:unknown;meta?:{code?:unknown;error?:unknown}}|null
  if(!e||typeof e!=='object')return null
  if(e.code==='P2034')return 'P2034'
  if(e.code==='P2024')return 'P2024'
- if(e.code==='P2028')return typeof e.message==='string'&&P2028_ROLLED_BACK.test(e.message)?'P2028':null
+ if(e.code==='P2028'){
+  const messages=[e.message,e.meta?.error].filter((value):value is string=>typeof value==='string')
+  return messages.some(knownP2028Rollback)?'P2028':null
+ }
  const sqlState=typeof e.meta?.code==='string'?e.meta.code:typeof e.code==='string'?e.code:null
- return sqlState&&ROLLED_BACK_SQLSTATES.has(sqlState)?sqlState:null
+ if(sqlState&&ROLLED_BACK_SQLSTATES.has(sqlState))return sqlState
+ return null
 }
 
 /** Run exactly one START transaction attempt; no retry is added here. */

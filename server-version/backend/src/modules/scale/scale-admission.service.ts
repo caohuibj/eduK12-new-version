@@ -2,6 +2,7 @@ import {stableStudyAdmissionHash} from '../anonymous-study/admission-principal'
 import { assertTrainingChildSelected, loadTrainingChildAdmissionParent, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
 import {readTrainingTimingSnapshot,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { loadStoredVersionedUnitAdmission } from '../assessment-runtime/unit-admission'
+import { storeSharedUnitAdmission } from '../assessment-runtime/shared-control-records'
 import { withSerializableScaleTransaction } from './deployment/transactions'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -497,6 +498,83 @@ const persistAdmission = async <T extends VersionedFrozenUnitAdmission>(
   })
 )
 
+/**
+ * Batch variant of persistAdmission for whole-questionnaire delivery.
+ * N unstored children used to pay N serial assessment.updateMany calls
+ * (8 per 300-item whole/definition, 9.0/completer together with the one
+ * START post-gate write — verified in the 200 VU Training timeline:
+ * 1608 updateMany over 201 definition records, exactly 8 each, plus 1
+ * per START record). The snapshots differ per child (own scale, slot and
+ * identity binding), so a single Prisma updateMany cannot express the
+ * write; instead one raw UPDATE with per-row CASE branches writes every
+ * row in a single round-trip, guarded by the same
+ * frozenAdmissionSnapshotHash IS NULL first-writer rule. The affected-row
+ * count proves the common case (count === N means every row was written
+ * by this call — the batch FOR UPDATE lock serializes competing writers);
+ * only when fewer rows were written does it re-read once and resolve
+ * each loser with the same read-back + identity-binding validation as
+ * persistVersionedAdmissionOnce.
+ */
+const persistAdmissionsBatch = async (
+  db: Db,
+  items: Array<{ assessmentId: string; snapshot: VersionedFrozenUnitAdmission }>,
+): Promise<Map<string, VersionedFrozenUnitAdmission>> => {
+  const result = new Map<string, VersionedFrozenUnitAdmission>()
+  if (items.length === 0) return result
+  // Same shared-storage payload per child as persistVersionedAdmissionOnce.
+  const persisted: Array<{ assessmentId: string; snapshot: VersionedFrozenUnitAdmission; encrypted: string; hash: string }> = []
+  for (const item of items) {
+    persisted.push({
+      assessmentId: item.assessmentId,
+      snapshot: item.snapshot,
+      encrypted: await storeSharedUnitAdmission(item.snapshot, db),
+      hash: item.snapshot.snapshotHash,
+    })
+  }
+  const ids = persisted.map((entry) => entry.assessmentId)
+  const written = await db.$executeRaw`
+    UPDATE "assessments"
+    SET "frozen_admission_snapshot_encrypted" = CASE "id"
+        ${Prisma.join(persisted.map((entry) => Prisma.sql`WHEN ${entry.assessmentId} THEN ${entry.encrypted}`), ' ')}
+      END,
+      "frozen_admission_snapshot_hash" = CASE "id"
+        ${Prisma.join(persisted.map((entry) => Prisma.sql`WHEN ${entry.assessmentId} THEN ${entry.hash}`), ' ')}
+      END
+    WHERE "id" IN (${Prisma.join(ids)})
+      AND "frozen_admission_snapshot_hash" IS NULL
+  `
+  if (written === items.length) {
+    for (const entry of persisted) result.set(entry.assessmentId, entry.snapshot)
+    return result
+  }
+  const rows = await db.assessment.findMany({
+    where: { id: { in: ids } },
+    select: { id: true, frozenAdmissionSnapshotEncrypted: true, frozenAdmissionSnapshotHash: true },
+  })
+  const rowById = new Map(rows.map((row) => [row.id, row]))
+  for (const entry of persisted) {
+    const row = rowById.get(entry.assessmentId)
+    if (!row) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
+    // Lost the first-writer race: same read-back + identity-binding
+    // validation as persistVersionedAdmissionOnce.
+    const stored = await loadStoredVersionedUnitAdmission(row, '量表准入快照无法读取，请重启后重新作答', db)
+    if (!stored) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表准入快照无法读取，请重启后重新作答', 409)
+    if (stored.schemaVersion !== entry.snapshot.schemaVersion) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入快照版本冲突', 409)
+    }
+    if (stored.attemptEpoch !== entry.snapshot.attemptEpoch
+      || stored.contextSnapshotHash !== entry.snapshot.contextSnapshotHash
+      || JSON.stringify(stored.principal) !== JSON.stringify(entry.snapshot.principal)
+      || JSON.stringify(stored.parent) !== JSON.stringify(entry.snapshot.parent)
+      || (stored.schemaVersion === 2 && entry.snapshot.schemaVersion === 2
+        && stored.scalePolicy?.eligibility.identityBindingHash !== entry.snapshot.scalePolicy?.eligibility.identityBindingHash)) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入并发冻结绑定冲突', 409)
+    }
+    result.set(entry.assessmentId, stored)
+  }
+  return result
+}
+
 export const assertAdmissionParentBinding = (
   child: Pick<ScaleAdmissionChildRow, 'questionnaireAssessmentId' | 'compositeAttemptId'>,
   admission: VersionedFrozenUnitAdmission,
@@ -846,6 +924,7 @@ export const batchEnsureScaleAdmissionsAtDelivery = async (
       }
 
       try {
+      const toPersist: Array<{ assessmentId: string; snapshot: VersionedFrozenUnitAdmission }> = []
       for (const item of unstored) {
         const current = currentById.get(item.child.id)
         if (!current || current.attemptEpoch !== parent.attemptEpoch || current.compositeAttemptId !== parent.id) {
@@ -918,9 +997,12 @@ export const batchEnsureScaleAdmissionsAtDelivery = async (
           legacyRequiresContext,
         })
 
-        const persisted = await persistAdmission(tx, current.id, assertReady(snapshot))
-        txResult.set(current.id, persisted)
+        // Collect the snapshot; all unstored children are persisted in one
+        // batched write below instead of one updateMany per child.
+        toPersist.push({ assessmentId: current.id, snapshot: assertReady(snapshot) })
       }
+      const batchPersisted = await persistAdmissionsBatch(tx, toPersist)
+      for (const [id, admission] of batchPersisted) txResult.set(id, admission)
       } finally {
         clearPreloadedActiveScaleDeployments(tx)
       }

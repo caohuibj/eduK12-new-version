@@ -49,10 +49,11 @@ export async function lockAuthenticatedAdmission(
  *
  * Lock order (deadlock avoidance, consistent across all START paths):
  * composite SHARE first, then the per-participant advisory, then (inside
- * the study beforeAdmission) the study FOR UPDATE and the participant
- * FOR UPDATE. A transaction never holds a study/participant row lock
- * without already holding the composite SHARE, so no lock-order cycle
- * exists. The advisory namespace ('anonymous-admission-v1') is distinct
+ * the study beforeAdmission) the study FOR SHARE and the participant
+ * FOR SHARE. Close and withdrawal keep study/participant FOR UPDATE and
+ * wait for these readers. A transaction never holds a study/participant
+ * row lock without already holding the composite SHARE, so no lock-order
+ * cycle exists. The advisory namespace ('anonymous-admission-v1') is distinct
  * from Training's ('training-authenticated-admission-v1') so the two
  * cannot collide.
  *

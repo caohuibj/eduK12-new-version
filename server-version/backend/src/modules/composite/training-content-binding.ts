@@ -332,7 +332,7 @@ function assertScope(release:Stored,source:Unit['source']){
 
 /** New START binds exact publication pointers. Historical null/null remains
  * legacy; recovery uses the already stored attempt binding, never this selector. */
-export async function prepareTrainingContentAttemptBinding(db:Prisma.TransactionClient,input:{compositeId:string;attemptId:string;epoch:number;snapshot:unknown;snapshotHash:string|null|undefined;scaleArtifacts?:Map<string,PublishedScaleArtifact>;composite:{id:string;createdBy?:string|null;items:any[]};resolvedSituational:Map<string,ResolvedSituationalRelease>;educationComposition?:EducationCompositionPolicyBinding}){
+export async function prepareTrainingContentAttemptBinding(db:Prisma.TransactionClient,input:{compositeId:string;attemptId:string;epoch:number;snapshot:unknown;snapshotHash:string|null|undefined;scaleArtifacts?:Map<string,PublishedScaleArtifact>;prefetchedReleases?:Map<string,import('../measurement-content/repository').StoredRelease>;composite:{id:string;createdBy?:string|null;items:any[]};resolvedSituational:Map<string,ResolvedSituationalRelease>;educationComposition?:EducationCompositionPolicyBinding}){
   if(input.snapshot==null&&input.snapshotHash==null)return null
   if(!input.snapshot||!input.snapshotHash)fail('SNAPSHOT_INVALID')
   const parsed=trainingContentSnapshotSchema.safeParse(input.snapshot)
@@ -387,7 +387,10 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
   // rows are content-immutable (DB trigger); the only runtime status change is
   // PUBLISHED->RETIRED, which must not block new STARTs (REVOKED still fails).
   // Each row's stored digest is re-verified on decode.
-  const prefetched=await getContentReleaseBatch(db,snapshot.units.filter(unit=>!unit.source.standardCombination&&unit.source.kind!=='STATIC_SJT_REGISTRY').map(unit=>unit.measurement.releaseId),false)
+  const releaseIds=snapshot.units.filter(unit=>!unit.source.standardCombination&&unit.source.kind!=='STATIC_SJT_REGISTRY').map(unit=>unit.measurement.releaseId)
+  const prefetched=input.prefetchedReleases&&releaseIds.every(id=>!id||input.prefetchedReleases!.has(id))
+    ?input.prefetchedReleases
+    :await getContentReleaseBatch(db,releaseIds,false)
   const libraryRequests=snapshot.units.flatMap(unit=>{
     if(!unit.source.libraryEntryId||unit.source.standardCombination)return []
     const release=prefetched.get(unit.measurement.releaseId)
@@ -452,7 +455,7 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
  * snapshot's unit.artifact or a v1 publication's insert-only legacy map. Units
  * without one keep today's live-compile path. Missing or tampered artifacts
  * fail closed; never re-derived from the live Scale row. */
-export async function resolveTrainingScaleArtifacts(db:Prisma.TransactionClient,input:{compositeId:string;snapshot:unknown;snapshotHash:string|null|undefined;educationComposition?:unknown}):Promise<Map<string,PublishedScaleArtifact>>{
+export async function resolveTrainingScaleArtifacts(db:Prisma.TransactionClient,input:{compositeId:string;snapshot:unknown;snapshotHash:string|null|undefined;educationComposition?:unknown;legacyArtifactMap?:Map<string,import('./training-legacy-scale-artifacts').LegacyScaleArtifactRow>}):Promise<Map<string,PublishedScaleArtifact>>{
   const out=new Map<string,PublishedScaleArtifact>()
   if(input.snapshot==null||!input.snapshotHash)return out
   const parsed=trainingContentSnapshotSchema.safeParse(input.snapshot)
@@ -469,7 +472,7 @@ export async function resolveTrainingScaleArtifacts(db:Prisma.TransactionClient,
   }
   const needsLegacyLookup=snapshot.schemaVersion===1||snapshot.units.some(unit=>unit.family==='SCALE'&&unit.source.kind==='SCALE'&&!unit.artifact)
   if(needsLegacyLookup&&typeof (db as any).$queryRaw==='function'){
-    const rows=await loadLegacyScaleArtifactMap(db,input.compositeId,input.snapshotHash)
+    const rows=input.legacyArtifactMap??await loadLegacyScaleArtifactMap(db,input.compositeId,input.snapshotHash)
     if(rows.size>0){
       for(const row of rows.values()){
         const unit=units.get(row.itemId)

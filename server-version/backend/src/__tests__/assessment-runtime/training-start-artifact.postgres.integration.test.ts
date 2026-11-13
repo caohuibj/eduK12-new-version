@@ -1,7 +1,7 @@
 import {grantLibraryUseFixture} from '../fixtures/library-distribution'
 import {randomUUID} from 'node:crypto'
 import {PrismaClient} from '@prisma/client'
-import {afterAll,beforeAll,describe,expect,it} from 'vitest'
+import {afterAll,beforeAll,describe,expect,it,vi} from 'vitest'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integration/integration-env'
 import {publishContentRelease} from '../../modules/measurement-content/repository'
 import {scaleMeasurementRelease} from '../../modules/measurement-content/scale'
@@ -73,6 +73,45 @@ suite('3b-2 START uses the published Scale artifact / real isolated PostgreSQL',
   v2=trainingContentSnapshotSchema.parse(published.trainingContentSnapshot)
  },120000)
  afterAll(async()=>{if(db){await(await import('../../config/queue')).closeQueues(true);await db.$disconnect()}})
+ it('does not reuse an ACTIVE deployment for the next START after retirement',async()=>{
+  const {preloadScaleDeploymentsForStart}=await service()
+  const {readActiveScaleDeployment}=await import('../../modules/scale/deployment/repository')
+  const {hashScaleDeploymentPolicy}=await import('../../modules/scale/policy/deployment')
+  const policy={schemaVersion:2 as const,revision:1,locale:'zh-CN',territory:'CN',deploymentModes:['QUESTIONNAIRE' as const],runtimePolicyHash:canonicalHash({fixture:true}),inFlightCompletion:'FROZEN_DEADLINE' as const}
+  const deployment=await db.scaleDeploymentPolicy.create({data:{id:randomUUID(),scaleId:wrapperId,revision:1,status:'ACTIVE',policyJson:policy,policyHash:hashScaleDeploymentPolicy(policy),createdByUserId:teacher,activatedAt:new Date()}})
+  const composite={items:[{type:'SCALE',scaleId:wrapperId},{type:'SCALE',scaleId:wrapperId}]}
+  await db.$transaction(async tx=>{
+   await preloadScaleDeploymentsForStart(tx,composite)
+   expect((await readActiveScaleDeployment(tx,wrapperId))?.id).toBe(deployment.id)
+  })
+  await db.scaleDeploymentPolicy.update({where:{id:deployment.id},data:{status:'RETIRED',retiredAt:new Date()}})
+  await db.$transaction(async tx=>{
+   await preloadScaleDeploymentsForStart(tx,composite)
+   expect(await readActiveScaleDeployment(tx,wrapperId)).toBeNull()
+  })
+ })
+ it('uses the complete locked publication when its version changes after prefetch',async()=>{
+  const c=await sibling(legacyOf),who=await student()
+  const next={...v2,compositeId:c.id,units:v2.units.map((unit:any)=>({...unit,itemId:c.itemId}))}
+  const hash=canonicalHash(next)
+  const {prisma}=await import('../../config/database')
+  const transaction=prisma.$transaction.bind(prisma)
+  const spy=vi.spyOn(prisma,'$transaction').mockImplementationOnce((async(callback:any,options:any)=>{
+   // The pre-gate read has completed. Commit a newer publication before admission takes its lock.
+   await db.$transaction(async tx=>{
+    await tx.$executeRawUnsafe('ALTER TABLE composite_assessments DISABLE TRIGGER training_content_publication_guard')
+    await tx.$executeRaw`UPDATE composite_assessments SET training_content_snapshot=${JSON.stringify(next)}::jsonb,training_content_snapshot_hash=${hash},updated_at=now() WHERE id=${c.id}`
+    await tx.$executeRawUnsafe('ALTER TABLE composite_assessments ENABLE TRIGGER training_content_publication_guard')
+   })
+   return transaction(callback,options)
+  }) as any)
+  try{
+   const result=await (await service()).startUserAttempt(who,c.id)
+   const frozen=await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:result.attempt.id}})
+   expect(frozen.trainingContentBinding).toMatchObject({publicationHash:hash,units:[{itemId:c.itemId}]})
+   expect(await db.assessment.count({where:{compositeAttemptId:result.attempt.id}})).toBe(1)
+  }finally{spy.mockRestore()}
+ })
  it('v2 START freezes exactly the published artifact content, with live reference bindings',async()=>{
   const hash=v2.units[0].artifact.hash,artifact=(await loadPublishedScaleArtifacts(db,[hash])).get(hash)!
   const runtime=await start(published.id)

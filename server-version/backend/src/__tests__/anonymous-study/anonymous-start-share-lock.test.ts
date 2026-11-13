@@ -65,9 +65,20 @@ describe('anonymous START admission lock (SHARE + per-participant advisory)', ()
     // "FOR UPDATE`"; the word also appears in explanatory comments, which
     // do not issue a lock.
     expect(body).not.toContain('FOR UPDATE`')
-    // The study/participant row locks in beforeAdmission are unchanged and
-    // live in the study module, not in startPublicAttempt.
+    // The study/participant row locks live in startStudyWave.beforeAdmission,
+    // not in startPublicAttempt; they are now FOR SHARE (see below).
     expect(body).toContain('study.beforeAdmission(tx)')
+  })
+
+  it('startStudyWave beforeAdmission takes study and participant FOR SHARE, not FOR UPDATE', () => {
+    const source = readFileSync('src/modules/anonymous-study/service.ts', 'utf8')
+    const body = source.slice(source.indexOf('export async function startStudyWave'), source.indexOf('export async function recoverStudyWave'))
+    expect(body).toContain('FROM anonymous_studies WHERE id=${studyId} FOR SHARE')
+    expect(body).toContain('FROM anonymous_study_participants WHERE id=${p.id} FOR SHARE')
+    expect(body).not.toContain('FOR UPDATE`')
+    // close/withdrawal keep exclusive locks outside this function.
+    const close = source.slice(source.indexOf('export async function revokeStudyIdentity'))
+    expect(close).toContain('FROM anonymous_study_participants WHERE id=${p.id} FOR UPDATE')
   })
 
   it('startStudyWave passes the pre-transaction participant id to the admission', () => {
