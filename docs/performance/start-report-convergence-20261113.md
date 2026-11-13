@@ -71,3 +71,11 @@ Both concrete correctness findings are accepted, with bounded fixes:
 - **Formal CI and 150/200 VU accepted as remaining final qualification:** local tests do not replace formal checks. Keep Draft and skip-CI commits until the performance candidate is frozen; no full CI is used for local diagnosis. No main merge or production deployment.
 
 Fresh follow-up evidence: batch suite 15 passed (then the four modified persistence cases alone rechecked query counts); transient/controller suite 40 passed; direct START claim/recovery consumers 22 passed; PostgreSQL status SQL 3 passed; actual default-timeout error classification 1 passed (the unchanged 15s success case intentionally filtered out and its earlier result retained); `tsc --noEmit` passed. No unrelated regression reruns. The review's Drive file link also redirects to Google sign-in here, so its package contents/latest-file claim remain unverified in this chat.
+
+## Release qualification update — 2026-11-13 JST
+
+Independent review used the connected Google Drive archive folder, including the #721 Training 150 VU ABBA, the stacked #721+#722 150 VU ABBA, and the latest #722 Part 3 150/200 VU ABBA. The newer `eduK12-PR721-fixed-branch-20261113.tar.gz` is a **source-code revision archive**, not a new load-test result. No archive in the listed folder benchmarks **this exact #723 HEAD**.
+
+The prior-load evidence supports keeping the Scale Admission CASE UPDATE (Assessment.updateMany ~9→1 per completer), while rejecting the older participant status cache's excess reads and the unproven Worker-12 default. On #722 Part 3, 150 VU completed 150/150 in every ABBA round with no reliable overall E2E benefit; at 200 VU, 21–34 START-gate 503s remained per round. These observations neither demonstrate a new #723 regression nor establish #723's performance benefit.
+
+The selective code fixes and targeted PostgreSQL regressions are complete; no new feature work is proposed. **Release gates are still required:** formal CI on a non-skipped final HEAD, then matched main-vs-#723 150/200 VU Training E2E and a minimal fixed-total mixed-load contention check. Do not claim completion or merge readiness from prior-PR benchmarks. This note accompanies a non-skipped documentation commit to request official CI on the frozen candidate; it does not modify runtime behavior.
