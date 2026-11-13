@@ -3,6 +3,7 @@ import { getContentReleaseBatch, type StoredRelease } from '../measurement-conte
 import { loadLegacyScaleArtifactMap, type LegacyScaleArtifactRow } from './training-legacy-scale-artifacts'
 import { trainingContentSnapshotSchema } from './training-content-binding'
 import { ContentReleaseError } from '../measurement-content/release'
+import { publicationReadKey, startReadsCache, startCompositeCache } from './start-read-cache'
 
 type RawClient = { $queryRaw: Prisma.TransactionClient['$queryRaw'] }
 
@@ -29,8 +30,18 @@ export function snapshotMeasurementReleaseIds(snapshot: unknown): string[] {
     .filter(Boolean))]
 }
 
-export async function prefetchStartReads(db: RawClient, composite: { id: string; trainingContentSnapshot?: unknown; trainingContentSnapshotHash?: string | null }): Promise<PrefetchedStartReads> {
+const cloneStartReads=(bag:PrefetchedStartReads):PrefetchedStartReads=>({
+  compositeId:bag.compositeId,
+  snapshotHash:bag.snapshotHash,
+  releases:new Map(bag.releases),
+  legacyArtifacts:new Map(bag.legacyArtifacts),
+})
+
+export async function prefetchStartReads(db: RawClient, composite: { id: string; trainingContentSnapshot?: unknown; trainingContentSnapshotHash?: string | null; updatedAt?: Date | string | null }): Promise<PrefetchedStartReads> {
   const snapshotHash = composite.trainingContentSnapshotHash ?? null
+  const key = publicationReadKey(composite.id, snapshotHash, composite.updatedAt ?? null)
+  const cached = startReadsCache.get(key) as PrefetchedStartReads | undefined
+  if (cached && cached.compositeId === composite.id && cached.snapshotHash === snapshotHash) return cloneStartReads(cached)
   const releaseIds = snapshotMeasurementReleaseIds(composite.trainingContentSnapshot)
   const releases = releaseIds.length
     ? await getContentReleaseBatch(db as Prisma.TransactionClient, releaseIds, false)
@@ -38,7 +49,9 @@ export async function prefetchStartReads(db: RawClient, composite: { id: string;
   const legacyArtifacts = snapshotHash
     ? await loadLegacyScaleArtifactMap(db, composite.id, snapshotHash)
     : new Map<string, LegacyScaleArtifactRow>()
-  return { compositeId: composite.id, snapshotHash, releases, legacyArtifacts }
+  const bag = { compositeId: composite.id, snapshotHash, releases, legacyArtifacts }
+  startReadsCache.set(key, cloneStartReads(bag))
+  return bag
 }
 
 export async function preloadStartComposite<T extends { id: string; trainingContentSnapshot?: unknown; trainingContentSnapshotHash?: string | null }>(db: RawClient, composite: T): Promise<T & { _preloaded: true; _startReads: PrefetchedStartReads }> {

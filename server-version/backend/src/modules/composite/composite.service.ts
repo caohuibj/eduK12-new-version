@@ -1,6 +1,7 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
 import { classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
 import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
+import { publicationReadKey, startCompositeCache } from './start-read-cache'
 import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
@@ -335,6 +336,38 @@ export const loadComposite = async (id: string, includeItems = false, db: Db = p
   })
   if (!composite) throw compositeNotFound()
   return includeItems?inheritTrainingTrackingSources(db as Prisma.TransactionClient,composite):composite as any
+}
+
+/** START-only: cheap identity read, then reuse a process-local 30s cache of the
+ * fat publication tree keyed on id+snapshotHash+updatedAt. A published-version
+ * change misses the cache. preloadStartComposite still hoists release/artifact
+ * reads (themselves identity-keyed and TTL-bounded). */
+const cloneCachedStartComposite = (cached: any) => ({
+  ...cached,
+  ...(Array.isArray(cached.items) ? { items: cached.items.slice() } : {}),
+  ...(Array.isArray(cached.formSections) ? { formSections: cached.formSections.slice() } : {}),
+  ...(Array.isArray(cached.questionnaireCourses) ? { questionnaireCourses: cached.questionnaireCourses.slice() } : {}),
+})
+
+export const loadStartComposite = async (id: string, db: Db = prisma) => {
+  const identity = await db.compositeAssessment.findUnique({
+    where: { id },
+    select: { id: true, updatedAt: true, trainingContentSnapshotHash: true },
+  })
+  if (!identity) throw compositeNotFound()
+  const key = publicationReadKey(identity.id, identity.trainingContentSnapshotHash, identity.updatedAt)
+  const cached = startCompositeCache.get(key) as { id: string; trainingContentSnapshotHash?: string | null; updatedAt?: Date } | undefined
+  if (cached && cached.id === identity.id
+      && cached.trainingContentSnapshotHash === identity.trainingContentSnapshotHash
+      && cached.updatedAt?.getTime() === identity.updatedAt.getTime()) {
+    return preloadStartComposite(db, cloneCachedStartComposite(cached))
+  }
+  const loaded = await loadComposite(id, true, db)
+  if (loaded.updatedAt?.getTime() === identity.updatedAt.getTime()
+      && loaded.trainingContentSnapshotHash === identity.trainingContentSnapshotHash) {
+    startCompositeCache.set(key, loaded)
+  }
+  return preloadStartComposite(db, loaded)
 }
 
 const validateCourse = async (
@@ -3751,7 +3784,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
   const preGateStart = process.hrtime.bigint()
-  const composite = await preloadStartComposite(prisma, await loadComposite(compositeId, true))
+  const composite = await loadStartComposite(compositeId)
   assertSupportedComposite(composite, false, false)
   await assertStudentEligibility(composite, userId)
 
@@ -3855,7 +3888,7 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
   // Pure-read (write-time invariant): the student restart path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
-  const composite = await preloadStartComposite(prisma, await loadComposite(existing.compositeAssessmentId, true))
+  const composite = await loadStartComposite(existing.compositeAssessmentId)
   assertSupportedComposite(composite)
   await assertStudentEligibility(composite, userId)
 
@@ -4061,7 +4094,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   // Pure-read (write-time invariant): the public start path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
-  const composite = await preloadStartComposite(prisma, await loadComposite(token.compositeAssessment.id, true))
+  const composite = await loadStartComposite(token.compositeAssessment.id)
   if (study && (composite.trainingVariantFrozen != null || composite.trainingFlowFrozen != null)) throw compositeBadRequest('概率分卷暂不支持匿名研究组合')
   if (recoveryToken) {
     const recoveryTokenHash = hashRecoveryToken(recoveryToken)
@@ -4204,7 +4237,7 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
   // Pure-read (write-time invariant): the public restart path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
-  const composite = await preloadStartComposite(prisma, await loadComposite(existing.compositeAssessmentId, true))
+  const composite = await loadStartComposite(existing.compositeAssessmentId)
   assertSupportedComposite(composite)
   if (!composite.publicEnabled || composite.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
   const credential = { ...createRecoveryCredential(), participantKey:existing.participantKey, anonymousCode:existing.anonymousCode! }

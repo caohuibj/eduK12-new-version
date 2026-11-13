@@ -1,5 +1,5 @@
 import {readFileSync} from 'node:fs'
-import {describe,expect,it,vi} from 'vitest'
+import {beforeEach,describe,expect,it,vi} from 'vitest'
 import {ContentReleaseError} from '../../modules/measurement-content/release'
 import {
   asPreloadedComposite,
@@ -9,12 +9,14 @@ import {
   startReadsIfCurrent,
   type PrefetchedStartReads,
 } from '../../modules/composite/start-read-prefetch'
+import {resetStartReadCachesForTests} from '../../modules/composite/start-read-cache'
 
 const release=(id:string,contentHash='hash-'+id,status='PUBLISHED')=>({
   releaseId:id,contentHash,status,
 } as any)
 
 describe('hoisted START read-only checks',()=>{
+  beforeEach(()=>resetStartReadCachesForTests())
   it('extracts unlocked measurement release ids the same way as the in-tx batch (skips standard and static SJT)',()=>{
     const ids=snapshotMeasurementReleaseIds({
       schemaVersion:2,compositeId:'c1',units:[
@@ -82,7 +84,7 @@ describe('hoisted START read-only checks',()=>{
       const start=source.indexOf(fn)
       expect(start).toBeGreaterThan(-1)
       const body=source.slice(start,start+2500)
-      expect(body,fn).toMatch(/preloadStartComposite\(prisma, await loadComposite/)
+      expect(body,fn).toMatch(/loadStartComposite\(/)
     }
   })
 

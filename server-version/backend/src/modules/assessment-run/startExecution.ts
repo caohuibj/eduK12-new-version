@@ -631,8 +631,8 @@ export const startAssessmentRunExecution = async (input: {
         }
         let preloadedComposite: any
         try {
-          const { loadComposite } = await import('../composite/composite.service')
-          preloadedComposite = await loadComposite(launch.runtimeTargetRef, true)
+          const { loadStartComposite } = await import('../composite/composite.service')
+          preloadedComposite = await loadStartComposite(launch.runtimeTargetRef)
         } catch {
           // Fallback to in-transaction load if preloading fails
         }
