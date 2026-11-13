@@ -555,10 +555,6 @@ const persistAdmissionsBatch = async (
   for (const entry of persisted) {
     const row = rowById.get(entry.assessmentId)
     if (!row) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
-    if (row.frozenAdmissionSnapshotHash === entry.hash) {
-      result.set(entry.assessmentId, entry.snapshot)
-      continue
-    }
     // Lost the first-writer race: same read-back + identity-binding
     // validation as persistVersionedAdmissionOnce.
     const stored = await loadStoredVersionedUnitAdmission(row, '量表准入快照无法读取，请重启后重新作答', db)

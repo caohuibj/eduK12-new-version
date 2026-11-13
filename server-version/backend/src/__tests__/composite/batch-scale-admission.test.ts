@@ -566,7 +566,7 @@ describe('Scheme X Batch Scale Admission at Delivery (PR X-05C)', () => {
     expect(mockTx.$queryRaw).toHaveBeenCalledTimes(2)
   })
 
-  it('reuses the batched deployment read for both successful Scale admissions', async () => {
+  it.each(['all-written', 'valid-conflict', 'missing-ciphertext', 'corrupt-ciphertext'])('validates batched admission persistence: %s', async (outcome) => {
     const key = 'academic_self_concept_biology_zh_cn'
     const version = '1.0.0'
     const source = getScaleInstrumentSource(key, version)!
@@ -604,6 +604,7 @@ describe('Scheme X Batch Scale Admission at Delivery (PR X-05C)', () => {
       createdByUserId: 'system', createdAt: new Date(), activatedAt: new Date(), retiredAt: null,
     })
     const sqlKinds: string[] = []
+    let storedRows: any[] = []
     const mockTx = {
       $queryRaw: vi.fn().mockImplementation(() => {
         const index = sqlKinds.length
@@ -611,10 +612,18 @@ describe('Scheme X Batch Scale Admission at Delivery (PR X-05C)', () => {
         if (index === 0) return []
         return [deploymentRow('scale-a'), deploymentRow('scale-b')]
       }),
-      // Batched persist: one CASE UPDATE writes both rows (count 2).
-      $executeRaw: vi.fn().mockResolvedValue(2),
+      $executeRaw: vi.fn().mockImplementation((_strings: unknown, ciphertexts: any, hashes: any) => {
+        storedRows = [0, 2].map(index => ({
+          id: ciphertexts.values[index],
+          frozenAdmissionSnapshotEncrypted: ciphertexts.values[index + 1],
+          frozenAdmissionSnapshotHash: hashes.values[index + 1],
+        }))
+        if (outcome === 'missing-ciphertext') storedRows[1].frozenAdmissionSnapshotEncrypted = null
+        if (outcome === 'corrupt-ciphertext') storedRows[1].frozenAdmissionSnapshotEncrypted = 'corrupted-ciphertext'
+        return outcome === 'all-written' ? 2 : 1
+      }),
       assessment: {
-        findMany: vi.fn().mockResolvedValue([
+        findMany: vi.fn().mockImplementation(async () => storedRows).mockResolvedValueOnce([
           { id: 'child-a', compositeItemId: 'item-a', compositeAttemptId: 'parent-attempt-1', attemptEpoch: 1, deliveryMode: 'FINAL_ONLY', scaleId: 'scale-a', scale: scaleA, compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash, frozenAdmissionSnapshotEncrypted: null, frozenAdmissionSnapshotHash: null, userId: 'user-1' },
           { id: 'child-b', compositeItemId: 'item-b', compositeAttemptId: 'parent-attempt-1', attemptEpoch: 1, deliveryMode: 'FINAL_ONLY', scaleId: 'scale-b', scale: scaleB, compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash, frozenAdmissionSnapshotEncrypted: null, frozenAdmissionSnapshotHash: null, userId: 'user-1' },
         ]),
@@ -629,15 +638,22 @@ describe('Scheme X Batch Scale Admission at Delivery (PR X-05C)', () => {
       contextSnapshotEncrypted: encryptAssessmentContext(context),
       contextSnapshotHash: hashAssessmentContext(context),
     }
-    const result = await batchEnsureScaleAdmissionsAtDelivery(parent, [
+    const operation = batchEnsureScaleAdmissionsAtDelivery(parent, [
       { slot: slot('item-a'), child: child('child-a', 'item-a', scaleA), runtime },
       { slot: slot('item-b'), child: child('child-b', 'item-b', scaleB), runtime },
     ])
+    if (outcome === 'missing-ciphertext' || outcome === 'corrupt-ciphertext') {
+      await expect(operation).rejects.toMatchObject({ code: 'STALE_ATTEMPT', statusCode: 409 })
+      expect(mockTx.$executeRaw).toHaveBeenCalledTimes(1)
+      return
+    }
+    const result = await operation
     expect(result.size).toBe(2)
     expect(result.get('child-a')?.snapshotHash).toBeTruthy()
     expect(result.get('child-b')?.snapshotHash).toBeTruthy()
     // One batched CASE UPDATE replaces the per-child updateMany calls.
     expect(mockTx.$executeRaw).toHaveBeenCalledTimes(1)
+    expect(mockTx.assessment.findMany).toHaveBeenCalledTimes(outcome === 'all-written' ? 1 : 2)
     expect(mockTx.assessment.updateMany).toHaveBeenCalledTimes(0)
     expect(sqlKinds.filter(kind => kind === 'deployment_batch')).toEqual(['deployment_batch'])
     expect(sqlKinds.filter(kind => kind === 'deployment_single')).toEqual([])
