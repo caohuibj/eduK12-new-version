@@ -174,3 +174,24 @@ it.each([null, '2026-10-19T00:00:00Z'])('preserves compact status completed date
   const view = await getCompositeReportView('attempt-1', { userId: 'student-1' })
   expect(view.generation.reportStatus.completedAt).toEqual(date ? new Date(date) : null)
 })
+
+
+describe('authoritative participant status polls', () => {
+  it('reads ownership and job once per poll and observes replacement epochs immediately', async () => {
+    state.parent.asyncReportEpoch = state.parent.attemptEpoch
+    state.job = readyFeedbackJob(state.parent)
+    expect((await getCompositeReportStatus('attempt-1', { userId: 'student-1' })).reportStatus.state).toBe('READY')
+    state.parent.attemptEpoch += 1
+    state.parent.asyncReportEpoch = state.parent.attemptEpoch
+    state.parent.status = 'IN_PROGRESS'
+    state.job = { ...readyFeedbackJob(state.parent), status: 'PENDING', id: 'replacement-job' }
+    const next = await getCompositeReportStatus('attempt-1', { userId: 'student-1' })
+    expect(next).toMatchObject({ attemptEpoch: state.parent.attemptEpoch, reportStatus: { state: 'PENDING', jobId: 'replacement-job' } })
+    expect(db.$queryRaw).toHaveBeenCalledTimes(2)
+    expect(db.compositeAssessmentAttempt.findUnique).not.toHaveBeenCalled()
+    expect(db.compositeReportJob.findUnique).not.toHaveBeenCalled()
+    state.parent.userId = 'different-student'
+    await expect(getCompositeReportStatus('attempt-1', { userId: 'student-1' })).rejects.toThrow()
+    expect(db.$queryRaw).toHaveBeenCalledTimes(3)
+  })
+})

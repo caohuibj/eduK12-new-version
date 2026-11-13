@@ -68,7 +68,7 @@ import { preloadStoredScaleResults } from '../assessment-runtime/compact-assessm
 import { loadPackageAnalysisForAttempt } from './composite-analysis-snapshot.service'
 import { assertTrainingVariantReportScope, canStoreCompactCompositeReport, encryptCompactCompositeReport, decryptCompactCompositeReport, preloadCompactCompositeReportReads, type CompactReportReadDependencies } from './compact-composite-report'
 import { loadScaleAnswers } from '../scale/scale-workflow.service'
-import { readCompositeReportStatusContext } from './composite-report-read'
+import { readCompositeReportStatusContext, readReportStatusPollSnapshot } from './composite-report-read'
 import type { WholeQuestionnaireReportContext } from './whole-questionnaire.service'
 import { prepareReportReadyNotifications, beginReportReadyWait, reportReadyWaitAvailable, reportReadyNotificationSequence, REPORT_READY_MAX_WAIT_MS } from '../../services/reportReadyNotifications'
 import { readWholeReportFeedbackHint } from '../../services/reportFeedbackHints'
@@ -6433,10 +6433,12 @@ const reportStatusForHeader = async (parent: any, joinedJob?: Awaited<ReturnType
 
 const readParticipantReportStatus = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string },
   options: { waitMs?: number; signal?: AbortSignal } = {}, compactView = false) => {
-  const compact = compactView || process.env.ASSESSMENT_REPORT_COMPACT_READ_ENABLED === 'true'
+  // One authoritative joined read supplies both ownership and current job identity.
+  const compact = true
+  const readStatus = compactView ? readCompositeReportStatusContext : readReportStatusPollSnapshot
   if (compact || options.waitMs) await prepareReportReadyNotifications()
   const sequence = reportReadyNotificationSequence()
-  const loaded = compact ? await readCompositeReportStatusContext(attemptId) : null
+  const loaded = compact ? await readStatus(attemptId) : null
   const parent = compact ? loaded?.parent : await loadReportReadHeader(attemptId)
   if (!parent) throw compositeNotFound('综合测评记录不存在')
   authorizeReportParticipant(parent, context)
@@ -6450,7 +6452,7 @@ const readParticipantReportStatus = async (attemptId: string, context: { userId?
     const result = await wait.done
     if (options.signal?.aborted) return { parent, status }
     // Fresh authorization AND status share one DB snapshot after a hint/timeout.
-    const refreshed = compact ? await readCompositeReportStatusContext(attemptId) : null
+    const refreshed = compact ? await readStatus(attemptId) : null
     const current = compact ? refreshed?.parent : await loadReportReadHeader(attemptId)
     if (!current) throw compositeNotFound('综合测评记录不存在')
     authorizeReportParticipant(current, context)
