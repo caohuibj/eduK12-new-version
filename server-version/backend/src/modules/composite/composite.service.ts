@@ -351,6 +351,11 @@ export const loadStartComposite = async (id: string, db: Db = prisma) => {
     select: { id: true, updatedAt: true, trainingContentSnapshotHash: true },
   })
   if (!identity) throw compositeNotFound()
+  // Related live Scale edits need not change a legacy composite timestamp.
+  // Only frozen publication identities may reuse the shared tree cache.
+  if (!identity.trainingContentSnapshotHash) {
+    return preloadStartComposite(db, await loadComposite(id, true, db))
+  }
   const key = publicationReadKey(identity.id, identity.trainingContentSnapshotHash, identity.updatedAt)
   const cached = startCompositeCache.get(key) as { id: string; trainingContentSnapshotHash?: string | null; updatedAt?: Date } | undefined
   if (cached && cached.id === identity.id
