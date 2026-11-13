@@ -59,3 +59,15 @@ Pending: read latest package, run same-environment main/candidate 150 VU twice w
 1. Latest Drive package/Runbook and corresponding raw baseline evidence have not been read.
 2. Controlled 150/200 VU E2E and mixed load, including actual pool/process budget and worker selection, remain unexecuted.
 3. Exact-candidate review and selected formal CI remain outstanding; no production merge recommendation until these pass.
+
+## Review disposition (follow-up to 8c900995d)
+
+Both concrete correctness findings are accepted, with bounded fixes:
+
+- **P1 accepted:** the partial-write readback must decode and verify durable admission content even when its stored hash equals the proposed hash. Removed the hash-only shortcut; existing schema/Epoch/principal/parent/identity binding comparisons remain. The all-written path still uses one CASE UPDATE without extra readback. Tests cover all-written, valid conflict, missing ciphertext and corrupt ciphertext under matching hash fields; normal versus conflict query counts are asserted.
+- **P2 accepted:** a P2028 code or generic Transaction API error is insufficient proof of rollback. Only explicit acquisition failure, an expired transaction operation or explicit RolledBack engine state qualifies. A committed transaction, Transaction not found, empty P2028 and ambiguous wrapper errors are preserved without Retry-After. No automatic retry or new recovery mechanism is added; existing claim recovery tests remain authoritative.
+- **Joined SQL regression accepted:** new real-PostgreSQL tests exercise PENDING/PROCESSING/READY/FAILED, current user/anonymous ownership, epoch filtering, disabled async generation and one SQL per poll. Report bodies are deliberately opaque and never read by this endpoint. First run failed at fixture construction because the synthetic PENDING row omitted the existing budget invariant. Corrected only fixture budget/lease/READY fields; the subsequent 3/3 passed with constraints intact.
+- **Measurement-first post-gate recommendation accepted:** no speculative projection rewrite, extra cache or Gate/Worker widening. Review's statements about latency are hypotheses pending controlled load data, not new performance evidence.
+- **Formal CI and 150/200 VU accepted as remaining final qualification:** local tests do not replace formal checks. Keep Draft and skip-CI commits until the performance candidate is frozen; no full CI is used for local diagnosis. No main merge or production deployment.
+
+Fresh follow-up evidence: batch suite 15 passed (then the four modified persistence cases alone rechecked query counts); transient/controller suite 40 passed; direct START claim/recovery consumers 22 passed; PostgreSQL status SQL 3 passed; actual default-timeout error classification 1 passed (the unchanged 15s success case intentionally filtered out and its earlier result retained); `tsc --noEmit` passed. No unrelated regression reruns. The review's Drive file link also redirects to Google sign-in here, so its package contents/latest-file claim remain unverified in this chat.
