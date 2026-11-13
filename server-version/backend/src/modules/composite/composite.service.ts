@@ -4143,8 +4143,8 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
             // replaces the exclusive FOR UPDATE that serialized every
             // START for the same questionnaire (measured 2026-11-12: the
             // FOR UPDATE roundtrip was 92% of tx_wall, p50 4,034ms at
-            // 200 VU). The study FOR UPDATE in beforeAdmission is
-            // unchanged: close and withdrawal still serialize with start.
+            // 200 VU). The study/participant locks in beforeAdmission are
+            // FOR SHARE; close and withdrawal still take FOR UPDATE and wait.
             const lockAt = process.hrtime.bigint()
             let lockQuerySucceeded = false
             try {

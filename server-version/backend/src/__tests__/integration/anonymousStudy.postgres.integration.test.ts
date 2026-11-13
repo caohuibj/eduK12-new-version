@@ -271,4 +271,20 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
    else process.env.ANONYMOUS_START_DIAGNOSTIC_ENABLED=priorFlag
   }
  },60000)
+
+ it('does not oversell token maxUses when concurrent study STARTs only take FOR SHARE',async()=>{
+  const maxUses=3
+  const s=await study.createStudy(owner,'Share quota')
+  const t=await token(maxUses)
+  const w=await study.addWave(owner,'TEACHER',s.id,{compositeId:cid,tokenId:t.id,title:'Share quota wave'})
+  const participants=await Promise.all(Array.from({length:8},()=>study.joinStudy(w.id,t.token,true)))
+  const results=await Promise.all(participants.map(p=>study.startStudyWave(s.id,w.id,p.credential).then(v=>({ok:true as const,v})).catch(e=>({ok:false as const,e}))))
+  const succeeded=results.filter(r=>r.ok)
+  const rejected=results.filter(r=>!r.ok)
+  const used=(await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})).usedCount
+  expect(succeeded).toHaveLength(maxUses)
+  expect(used).toBe(maxUses)
+  expect(rejected).toHaveLength(participants.length-maxUses)
+  expect(rejected.every(r=>((r as {e:any}).e?.statusCode===409)||((r as {e:any}).e?.code==='ASSESSMENT_START_BUSY'))).toBe(true)
+ })
 })
