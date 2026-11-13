@@ -498,6 +498,43 @@ export const submitUnifiedScaleAssessmentFinal = async (
   return commitPreparedUnifiedScaleAssessmentFinal(input, child, prepared, wholeReceipt, referenceDb, receiptOnly, write)
 }
 
+export type CompletedAssessmentBatchWrite = {
+  id: string
+  answers: unknown
+  result: unknown
+  completedAt: string
+  totalTime: number
+  submissionId: string
+  payloadHash: string
+  timingEncrypted: string | null
+}
+
+/** One jsonb_to_recordset UPDATE. The WHERE admits only IN_PROGRESS rows with a null submission, so already-COMPLETED children stay untouched. */
+export const updateCompletedAssessmentsBatch = async (
+  tx: Prisma.TransactionClient,
+  input: { attemptId: string; attemptEpoch: number; writes: CompletedAssessmentBatchWrite[] },
+) => {
+  const { attemptId, attemptEpoch, writes } = input
+  const batchUpdateStart = process.hrtime.bigint()
+  const changed = await tx.$queryRaw<Array<{ id: string }>>`
+        UPDATE "assessments" child SET "status" = 'COMPLETED', "answers" = source."answers", "result" = source."result",
+          "progress" = 100, "completed_at" = source."completedAt", "total_time" = source."totalTime",
+          "submission_id" = source."submissionId", "submission_payload_hash" = source."payloadHash",
+          "submission_completed_at" = source."completedAt", "timing_encrypted" = source."timingEncrypted"
+        FROM jsonb_to_recordset(${JSON.stringify(writes)}::jsonb) AS source(
+          "id" text, "answers" jsonb, "result" jsonb, "completedAt" timestamp,
+          "totalTime" integer, "submissionId" text, "payloadHash" text, "timingEncrypted" text)
+        WHERE child."id" = source."id" AND child."composite_attempt_id" = ${attemptId}
+          AND child."attempt_epoch" = ${attemptEpoch} AND child."status" = 'IN_PROGRESS'
+          AND child."submission_id" IS NULL AND child."delivery_mode" = 'FINAL_ONLY' AND child."runtime_generation" = 'UNIFIED_V1'
+        RETURNING child."id"
+      `
+  assessmentTimelineSpan('report.units_batch.batch_update', batchUpdateStart)
+  if (changed.length !== writes.length || new Set(changed.map(row => row.id)).size !== writes.length)
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表更新行数不匹配', 409)
+  return changed
+}
+
 /** All scoring/encryption is outside a short, any-size collection transaction.
  * Ordered child locks precede the job/parent lock, matching the old path.
  * An old partial receipt is replayed, never rescored or overwritten.
@@ -585,7 +622,7 @@ export const submitUnifiedScaleCollectionBatch = async (
     assessmentTimelineSpan('report.units_batch.lock_job', lockJobStart)
     if (lease.length !== 1) throw new ReportProcessingLeaseLostError()
     const byId = new Map(rows.map(row => [row.id, row]))
-    const writes = [], facts: ScaleFactRecord[] = [], snapshots: Prisma.AssessmentUnitSnapshotCreateManyInput[] = []
+    const writes: CompletedAssessmentBatchWrite[] = [], facts: ScaleFactRecord[] = [], snapshots: Prisma.AssessmentUnitSnapshotCreateManyInput[] = []
     // PR-1 fix: the collection guard's receipt fence requires parent.status =
     // 'IN_PROGRESS', but the batch lease above explicitly allows a COMPLETED
     // parent for a full completedReplay (all units already submitted, report
@@ -633,23 +670,7 @@ export const submitUnifiedScaleCollectionBatch = async (
     }
     if (writes.length) {
       const factsStart = process.hrtime.bigint(); await persistScaleFactRecords(tx, facts); assessmentTimelineSpan('report.units_batch.facts', factsStart)
-      const batchUpdateStart = process.hrtime.bigint()
-      const changed = await tx.$queryRaw<Array<{ id: string }>>`
-        UPDATE "assessments" child SET "status" = 'COMPLETED', "answers" = source."answers", "result" = source."result",
-          "progress" = 100, "completed_at" = source."completedAt", "total_time" = source."totalTime",
-          "submission_id" = source."submissionId", "submission_payload_hash" = source."payloadHash",
-          "submission_completed_at" = source."completedAt", "timing_encrypted" = source."timingEncrypted"
-        FROM jsonb_to_recordset(${JSON.stringify(writes)}::jsonb) AS source(
-          "id" text, "answers" jsonb, "result" jsonb, "completedAt" timestamp,
-          "totalTime" integer, "submissionId" text, "payloadHash" text, "timingEncrypted" text)
-        WHERE child."id" = source."id" AND child."composite_attempt_id" = ${job.attemptId}
-          AND child."attempt_epoch" = ${job.attemptEpoch} AND child."status" = 'IN_PROGRESS'
-          AND child."submission_id" IS NULL AND child."delivery_mode" = 'FINAL_ONLY' AND child."runtime_generation" = 'UNIFIED_V1'
-        RETURNING child."id"
-      `
-      assessmentTimelineSpan('report.units_batch.batch_update', batchUpdateStart)
-      if (changed.length !== writes.length || new Set(changed.map(row => row.id)).size !== writes.length)
-        throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表更新行数不匹配', 409)
+      await updateCompletedAssessmentsBatch(tx, { attemptId: job.attemptId, attemptEpoch: job.attemptEpoch, writes })
       const createManyStart = process.hrtime.bigint()
       const inserted = await tx.assessmentUnitSnapshot.createMany({ data: snapshots })
       assessmentTimelineSpan('report.units_batch.createMany', createManyStart)

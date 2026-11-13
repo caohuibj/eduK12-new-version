@@ -16,6 +16,7 @@ import { feedbackAttempt, readyFeedbackJob } from '../fixtures/training-feedback
 import { encryptCompositeCollectionReport } from '../../modules/composite/composite-report-cache'
 import { getReport, getPartialReport, getAnalysisExportForParticipant, getDefaultPackageAnalysisSnapshot, retryBundleForParticipant,
   getCompositeReportStatus, getCompositeReportStatusForTeacher, getReportForTeacher } from '../../modules/composite/composite.service'
+import { clearReportStatusPollCacheForTest } from '../../modules/composite/report-status-poll-cache'
 const setCache = () => {
   state.parent.asyncReportEpoch = state.parent.attemptEpoch
   const binding = { attemptId: state.parent.id, attemptEpoch: state.parent.attemptEpoch, slotSetHash: state.parent.frozenActiveSlotSetHash,
@@ -24,6 +25,7 @@ const setCache = () => {
     assessmentId: 'composite-1', name: 'Training', unitReports: [], backgroundValues: [{ label: 'fixture', value: 'PRIVATE_RESULT' }] }, binding) }
 }
 beforeEach(() => {
+  clearReportStatusPollCacheForTest()
   vi.resetAllMocks(); vi.stubEnv('DATA_ENCRYPTION_KEY', 'a'.repeat(64)); vi.stubEnv('DATA_PSEUDONYM_KEY', 'b'.repeat(64))
   vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED', 'false'); vi.stubEnv('ASSESSMENT_REPORT_COMPACT_READ_ENABLED', 'false')
   vi.stubEnv('ASSESSMENT_COMPACT_FACTS_ENABLED', 'false'); vi.stubEnv('ASSESSMENT_SHARED_CONTROL_ENABLED', 'false')

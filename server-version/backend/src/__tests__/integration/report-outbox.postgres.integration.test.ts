@@ -5,6 +5,7 @@ import { once } from 'node:events'
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { PrismaClient, type CompositeReportJob } from '@prisma/client'
 import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integration-env'
+import { setReportStatusPollCacheNowForTest } from '../../modules/composite/report-status-poll-cache'
 
 const url = integrationDatabaseUrl('REPORT_OUTBOX_INTEGRATION_DATABASE_URL')
 const suite = url ? describe : describe.skip
@@ -656,7 +657,12 @@ suite('durable report outbox on isolated PostgreSQL', () => {
       expect(small).not.toHaveProperty('wholeAnswersEncrypted')
       expect(small).not.toHaveProperty('wholeValidationEncrypted')
       expect((await service.getReport(f.parent.id, { userId: f.participant.id })).unitReports).toHaveLength(2)
-      expect((await service.getCompositeReportStatus(f.parent.id, { userId: f.participant.id })).reportStatus.completedAt).toBeInstanceOf(Date)
+      // The earlier status read cached PENDING for 300ms. Step the poll clock
+      // forward so this read sees the finished job instead of that window.
+      setReportStatusPollCacheNowForTest(Date.now() + 1_000)
+      try {
+        expect((await service.getCompositeReportStatus(f.parent.id, { userId: f.participant.id })).reportStatus.completedAt).toBeInstanceOf(Date)
+      } finally { setReportStatusPollCacheNowForTest(null) }
       await db.compositeAssessmentAttempt.update({ where: { id: f.parent.id }, data: { userId: null, recoveryTokenHash: randomUUID() } })
       await expect(service.getCompositeReportStatus(f.parent.id, { userId: f.participant.id })).rejects.toMatchObject({ statusCode: 403 })
       await expect(service.getCompositeReportStatus('missing-status-fixture', { userId: f.participant.id })).rejects.toMatchObject({ statusCode: 404 })

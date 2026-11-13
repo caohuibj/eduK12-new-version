@@ -36,6 +36,12 @@ describe('PR3: Whole submit context reuse and report defaults', () => {
       expect(config.narrowLoadEnabled).toBe(false)
     })
 
+    it('defaults report worker concurrency to 12 and still honors the env override', () => {
+      delete process.env.ASSESSMENT_REPORT_WORKER_CONCURRENCY
+      expect(assessmentReportConfig({ ...process.env }).workerConcurrency).toBe(12)
+      expect(assessmentReportConfig({ ...process.env, ASSESSMENT_REPORT_WORKER_CONCURRENCY: '8' }).workerConcurrency).toBe(8)
+    })
+
     it('accepts explicit true values without changing behavior', () => {
       process.env.ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED = 'true'
       process.env.ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED = 'true'

@@ -2,6 +2,7 @@ import { isScaleSubmissionKeyConflictError, REPORT_SUBMISSION_KEY_CONFLICT } fro
 import { reportResourceClaimDecision } from '../services/assessmentResourceProtection'
 import { reportClaimDecision, reportPriorityClaimed, startReportClaimPriority, stopReportClaimPriority } from '../services/wholeSubmissionPriority'
 import { publishReportReady } from '../services/reportReadyNotifications'
+import { invalidateReportStatusPollCache } from '../modules/composite/report-status-poll-cache'
 import { withAssessmentReportTimeline, markAssessmentTimeline, traceAssessmentPhase } from '../services/runtimeObservability'
 import { recordReportQueueEvent, reportQueueObsEnabled, sampleReportQueuePending } from '../services/reportQueueObservability'
 import type { CompositeReportJob } from '@prisma/client'
@@ -86,6 +87,15 @@ export const processCompositeReportJob = async (job: CompositeReportJob): Promis
   if (published && outcome.kind === 'ready') {
     markAssessmentTimeline('report.ready_commit_confirmed')
     if (job.wholeSubmissionId) void publishReportReady(job.attemptId, job.attemptEpoch)
+  }
+  // Active poll-cache invalidation for a same-process worker: a committed
+  // terminal outcome makes any cached PENDING/PROCESSING stale, so drop it
+  // and let the next poll re-read. In the standard separate-process
+  // deployment the backend's own cache is unaffected (the PENDING TTL
+  // bounds that staleness instead); this call is still the correct hook
+  // for any deployment that runs the worker in-process.
+  if (published && (outcome.kind === 'ready' || outcome.kind === 'failed' || outcome.kind === 'cancelled')) {
+    invalidateReportStatusPollCache(job.attemptId)
   }
 })
 

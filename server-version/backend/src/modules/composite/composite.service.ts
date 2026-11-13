@@ -68,7 +68,8 @@ import { preloadStoredScaleResults } from '../assessment-runtime/compact-assessm
 import { loadPackageAnalysisForAttempt } from './composite-analysis-snapshot.service'
 import { assertTrainingVariantReportScope, canStoreCompactCompositeReport, encryptCompactCompositeReport, decryptCompactCompositeReport, preloadCompactCompositeReportReads, type CompactReportReadDependencies } from './compact-composite-report'
 import { loadScaleAnswers } from '../scale/scale-workflow.service'
-import { readCompositeReportStatusContext } from './composite-report-read'
+import { readCompositeReportStatusContext, readReportStatusPollSnapshot } from './composite-report-read'
+import { readReportStatusPollCacheEntry, isReportStatusPollCacheOwner, writeReportStatusPollCache, type ReportStatusPollCacheParent } from './report-status-poll-cache'
 import type { WholeQuestionnaireReportContext } from './whole-questionnaire.service'
 import { prepareReportReadyNotifications, beginReportReadyWait, reportReadyWaitAvailable, reportReadyNotificationSequence, REPORT_READY_MAX_WAIT_MS } from '../../services/reportReadyNotifications'
 import { readWholeReportFeedbackHint } from '../../services/reportFeedbackHints'
@@ -6431,8 +6432,70 @@ const reportStatusForHeader = async (parent: any, joinedJob?: Awaited<ReturnType
   }
 }
 
+type ParticipantReportStatus = Awaited<ReturnType<typeof reportStatusForHeader>>
+
+const rememberPolledReportStatus = <T extends ParticipantReportStatus>(attemptId: string, status: T, parent: {
+  id: string; userId?: string | null; recoveryTokenHash?: string | null; attemptEpoch: number; asyncReportEpoch: number;
+  compositeAssessmentId?: string; compositeAssessment?: { id?: string; productKind?: string | null } | null;
+}): T => {
+  const cacheParent: ReportStatusPollCacheParent = {
+    id: parent.id, userId: parent.userId ?? null, recoveryTokenHash: parent.recoveryTokenHash ?? null,
+    attemptEpoch: parent.attemptEpoch, asyncReportEpoch: parent.asyncReportEpoch,
+    compositeAssessment: {
+      id: parent.compositeAssessment?.id ?? parent.compositeAssessmentId ?? '',
+      productKind: parent.compositeAssessment?.productKind ?? null,
+    },
+  }
+  writeReportStatusPollCache(attemptId, status, status.reportStatus.state, cacheParent)
+  return status
+}
+
+/** Participant status polls. A cache hit with a matching owner answers first, with zero DB queries. */
+const readPolledParticipantReportStatus = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string },
+  options: { waitMs?: number; signal?: AbortSignal } = {}) => {
+  const compact = process.env.ASSESSMENT_REPORT_COMPACT_READ_ENABLED === 'true'
+  if (compact || options.waitMs) await prepareReportReadyNotifications()
+  const sequence = reportReadyNotificationSequence()
+  // waitMs must not answer from a cached PENDING/PROCESSING. Only the no-wait poll may.
+  // Cache first: the entry carries its owner, so a matching owner is authorized
+  // in memory and the poll returns without any database query. On a miss (or an
+  // owner mismatch) the single header read below serves BOTH the authorization
+  // check and the status snapshot: one findUnique, not a separate auth query
+  // plus a snapshot query. The snapshot select already carries userId /
+  // recoveryTokenHash / compositeAssessment.id+productKind, which is everything
+  // authorizeReportParticipant reads, so no second query is needed.
+  if (!options.waitMs) {
+    const cached = readReportStatusPollCacheEntry<ParticipantReportStatus>(attemptId)
+    if (cached && isReportStatusPollCacheOwner(cached.owner, context)) return { parent: cached.parent, status: cached.value }
+  }
+  const loaded = await readReportStatusPollSnapshot(attemptId)
+  const parent = loaded?.parent
+  if (!parent) throw compositeNotFound('综合测评记录不存在')
+  authorizeReportParticipant(parent, context)
+  if (!compact && parent.asyncReportEpoch === parent.attemptEpoch) await prepareReportReadyNotifications()
+  const wait = beginReportReadyWait(attemptId, parent.attemptEpoch, options.waitMs ?? 0, options.signal, sequence)
+  try {
+    const status = await reportStatusForHeader(parent, loaded!.job)
+    if (!wait || !status.wholeSubmissionReceived || !['PENDING', 'PROCESSING'].includes(status.reportStatus.state)) {
+      const finalStatus = options.waitMs && !wait ? { ...status, feedbackWaitMs: 0 } : status
+      return { parent, status: rememberPolledReportStatus(attemptId, finalStatus, parent) }
+    }
+    const result = await wait.done
+    if (options.signal?.aborted) return { parent, status }
+    // Fresh authorization AND status share one DB snapshot after a hint/timeout.
+    const refreshed = await readReportStatusPollSnapshot(attemptId)
+    const current = refreshed?.parent
+    if (!current) throw compositeNotFound('综合测评记录不存在')
+    authorizeReportParticipant(current, context)
+    const authoritative = await reportStatusForHeader(current, refreshed!.job)
+    const finalStatus = result === 'unavailable' ? { ...authoritative, feedbackWaitMs: 0 } : authoritative
+    return { parent: current, status: rememberPolledReportStatus(attemptId, finalStatus, current) }
+  } finally { wait?.cancel() }
+}
+
 const readParticipantReportStatus = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string },
   options: { waitMs?: number; signal?: AbortSignal } = {}, compactView = false) => {
+  if (!compactView) return readPolledParticipantReportStatus(attemptId, context, options)
   const compact = compactView || process.env.ASSESSMENT_REPORT_COMPACT_READ_ENABLED === 'true'
   if (compact || options.waitMs) await prepareReportReadyNotifications()
   const sequence = reportReadyNotificationSequence()
