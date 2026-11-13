@@ -14,14 +14,14 @@ const credential=(req:Request) => {
 import { BoundedAdmissionBusyError } from '../../services/boundedAdmissionGate'
 import { isAssessmentStartBusyError } from '../composite/start-transient'
 
-const P2028_ROLLED_BACK=/Unable to start a transaction in the given time|expired transaction/i
 const ROLLED_BACK_SQLSTATES=new Set(['40001','40P01','55P03'])
 
 export const isTransientStudyDatabaseError=(error:unknown):boolean=>{
   const candidate=error as {code?:unknown;message?:unknown;meta?:{code?:unknown}}|null
   if(!candidate||typeof candidate!=='object')return false
   if(candidate.code==='P2024'||candidate.code==='P2034')return true
-  if(candidate.code==='P2028'&&typeof candidate.message==='string'&&P2028_ROLLED_BACK.test(candidate.message))return true
+  if(candidate.code==='P2028')return true
+  if(typeof candidate.message==='string'&&/Transaction not found|Transaction API error/i.test(candidate.message))return true
   const sqlState=typeof candidate.meta?.code==='string'?candidate.meta.code:typeof candidate.code==='string'?candidate.code:null
   return Boolean(sqlState&&ROLLED_BACK_SQLSTATES.has(sqlState))
 }

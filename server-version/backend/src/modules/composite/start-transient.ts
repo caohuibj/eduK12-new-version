@@ -9,16 +9,18 @@
  * site ever wraps non-transactional writes before the transaction, this
  * classification must be revisited for that site. */
 const ROLLED_BACK_SQLSTATES=new Set(['40001','40P01','55P03'])
-// P2028 is a family of interactive-transaction API errors. Only these two are
-// known rollbacks: maxWait expired before BEGIN, or the engine expired the tx.
-const P2028_ROLLED_BACK=/Unable to start a transaction in the given time|expired transaction/i
+// START classifyStartTransaction only wraps a single $transaction, so a thrown
+// P2028 means the interactive transaction did not commit successfully and the
+// client may safely retry. A missing or non-P2028 code whose message is
+// "Transaction not found" or "Transaction API error" is the same outcome: a
+// wrapper or retry exhaustion dropped the Prisma code.
 
 export const ASSESSMENT_START_BUSY='ASSESSMENT_START_BUSY'
 export type StartBusyDiagnostic='pool_wait'|'transaction_expired'|'queue_full'|'queue_timeout'|'write_conflict'|'other'
 const diagnosticFrom=(reason:string,original?:string):StartBusyDiagnostic=>{
  if(reason==='ADMISSION_QUEUE_FULL')return 'queue_full'
  if(reason==='ADMISSION_WAIT_TIMEOUT')return 'queue_timeout'
- if(reason==='P2028')return /unable to start a transaction/i.test(original??'')?'pool_wait':/expired transaction/i.test(original??'')?'transaction_expired':'other'
+ if(reason==='P2028')return /unable to start a transaction/i.test(original??'')?'pool_wait':/expired transaction|Transaction not found/i.test(original??'')?'transaction_expired':'other'
  if(reason==='P2024')return 'pool_wait'
  if(reason==='P2034')return 'write_conflict'
  return 'other'
@@ -47,9 +49,11 @@ export function rolledBackStartReason(error:unknown):string|null{
  if(!e||typeof e!=='object')return null
  if(e.code==='P2034')return 'P2034'
  if(e.code==='P2024')return 'P2024'
- if(e.code==='P2028')return typeof e.message==='string'&&P2028_ROLLED_BACK.test(e.message)?'P2028':null
+ if(e.code==='P2028')return 'P2028'
  const sqlState=typeof e.meta?.code==='string'?e.meta.code:typeof e.code==='string'?e.code:null
- return sqlState&&ROLLED_BACK_SQLSTATES.has(sqlState)?sqlState:null
+ if(sqlState&&ROLLED_BACK_SQLSTATES.has(sqlState))return sqlState
+ if(typeof e.message==='string'&&/Transaction not found|Transaction API error/i.test(e.message))return 'P2028'
+ return null
 }
 
 /** Run exactly one START transaction attempt; no retry is added here. */
