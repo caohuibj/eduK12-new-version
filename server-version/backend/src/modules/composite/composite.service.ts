@@ -2609,8 +2609,67 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
   // per-user course membership (above) and attempt rows (below) are read
   // fresh. The course rule is applied in memory; the status rule follows
   // once the fresh attempts are loaded.
-  const templateList = await loadAvailableTemplateList(summary)
-  const candidates = filterAvailableTemplateByCourse(templateList, courseIds)
+  // Synthetic tests and seeded browser acceptance create/modify publications
+  // directly in the database; do not reuse process-local catalog entries there.
+  // In runtime environments the shared template cache stays enabled by default,
+  // with an explicit opt-out for emergency rollback without changing START.
+  const cacheFlag = process.env.COMPOSITE_AVAILABLE_CACHE_ENABLED
+  const useSharedCatalog = cacheFlag === 'true' || (cacheFlag !== 'false' && process.env.NODE_ENV !== 'test')
+  const templateList = useSharedCatalog
+    ? await loadAvailableTemplateList(summary)
+    : await (async () => {
+    const result = await prisma.compositeAssessment.findMany({
+    // Publication governs new starts. Archived deliveries remain discoverable
+    // only for this student's existing work, within their current course scope.
+    where: { AND: [{ OR: [
+      { status: 'PUBLISHED' },
+      { status: 'ARCHIVED', attempts: { some: { userId, status: { in: ['IN_PROGRESS', 'COMPLETED'] } } } },
+    ] }],
+    // While the cognitive module is off, a product with a COGNITIVE item is
+    // listed only if this student already has an attempt (any status). This is
+    // the in-memory `supportedList` rule below, pushed into SQL so the catalog
+    // is not materialized just to be dropped; the in-memory rule stays as-is.
+    ...(config.cognitiveModuleEnabled ? {} : { NOT: { items: { some: { type: 'COGNITIVE' } }, attempts: { none: { userId } } } }),
+    OR: [
+      { productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId: { in: courseIds }, course: { isLibrary: false } },
+      { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds }, course: { isLibrary: false } } } },
+    ] },
+    orderBy: { publishedAt: 'desc' },
+    select: {
+      id: true,
+      productKind: true,
+      code: true,
+      name: true,
+      description: true,
+      instruction: !summary,
+      status: true,
+      opensAt: true,
+      expiresAt: true,
+      maxAttempts: true,
+      reportPackageKey: true,
+      reportPackageVersion: true,
+      reportPackageSnapshotEncrypted: !summary,
+      // Detail still loads every marker: a missing property is UNKNOWN, not legacy.
+      // Summary asks only for presence, so the Json bodies are never parsed.
+      ...(summary ? {} : { trainingVariantFrozen: true, ...TRAINING_FLOW_DEFINITION_SELECT }),
+      course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
+      items: summary ? false : {
+        orderBy: { position: 'asc' as const },
+        select: {
+          id: true,
+          type: true,
+          position: true,
+          scale: { select: { name: true } },
+          cognitiveAssignment: { select: { title: true } },
+          formLabel: true,
+        },
+      },
+      formSections: summary ? false : { orderBy: { position: 'asc' as const }, include: { items: { select: { id: true, contextKey: true } } } },
+    },
+  })
+      return result
+    })()
+  const candidates = useSharedCatalog ? filterAvailableTemplateByCourse(templateList, courseIds) : templateList
   const ids = candidates.map((item) => item.id)
   const [attemptRows, markerPresence] = await Promise.all([
     prisma.compositeAssessmentAttempt.findMany({
