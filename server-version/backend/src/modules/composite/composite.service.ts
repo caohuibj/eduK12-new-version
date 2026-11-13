@@ -3269,6 +3269,49 @@ const freezeEducationLibraryScaleUnit = async (db: Db, item: any, libraryUnit: a
   return runtime
 }
 
+/**
+ * EXEC-START-02 (FIX 2): preload the ACTIVE deployment rows for this
+ * composite's distinct scales into the transaction's preload map, sourcing
+ * them from the process-local scaleDeploymentCache (30s TTL) and loading
+ * only the misses in one batched read. resolveScaleStartDeployment then
+ * hits the per-tx preload instead of reading the deployment row once per
+ * scale per START. The deployment row is immutable once ACTIVE (a new
+ * revision is a new row); the resolution itself (policy compilation, mode
+ * evaluation, allowNewStarts) still runs fresh every time, so only the row
+ * read is cached. A cached null means "no active deployment" and is a real
+ * hit — readActiveScaleDeployment returns null from the preload instead of
+ * querying. Best-effort: any preload failure falls through to the normal
+ * per-scale reads (the callers re-read on a preload miss).
+ */
+const preloadScaleDeploymentsForStart = async (db: Db, composite: any): Promise<void> => {
+  try {
+    const scaleIds: string[] = [...new Set(
+      (composite.items ?? [])
+        .filter((item: any) => item.type === 'SCALE' && typeof item.scaleId === 'string')
+        .map((item: any) => item.scaleId as string),
+    )] as string[]
+    if (scaleIds.length === 0) return
+    const preloaded = new Map<string, StoredScaleDeploymentPolicyV1 | null>()
+    const missing: string[] = []
+    for (const scaleId of scaleIds) {
+      const hit = scaleDeploymentCache.get(scaleId) as StoredScaleDeploymentPolicyV1 | null | undefined
+      if (hit !== undefined) preloaded.set(scaleId, hit)
+      else missing.push(scaleId)
+    }
+    if (missing.length > 0) {
+      const loaded = await readActiveScaleDeployments(db, missing)
+      for (const scaleId of missing) {
+        const row = loaded.get(scaleId) ?? null
+        scaleDeploymentCache.set(scaleId, row)
+        preloaded.set(scaleId, row)
+      }
+    }
+    setPreloadedActiveScaleDeployments(db, preloaded)
+  } catch {
+    // Best-effort: fall through to the normal per-scale deployment reads.
+  }
+}
+
 const createAttempt = async (
   db: Db,
   composite: any,
@@ -3597,6 +3640,11 @@ const createAttempt = async (
   // inside this one transaction only. Each START re-validates live scale
   // admission; nothing here survives to the next attempt.
   const scaleFreezeMemo = createScaleFreezeMemo()
+  // EXEC-START-02 (FIX 2): preload the ACTIVE deployment rows for this
+  // composite's scales (process-local cache, one batched read on miss) so
+  // the per-scale freeze below hits the per-tx preload instead of reading
+  // the deployment row once per scale.
+  await preloadScaleDeploymentsForStart(db, composite)
   const precomputedActiveSlotSet = await precomputeScaleOnlyActiveSlotSet(db, { finalOnly, flowEnabled, composite, attemptEpoch, contentCandidate, prepared, formSections, scaleFreezeMemo })
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
@@ -3810,6 +3858,77 @@ const trainingStartGate = (): BoundedAdmissionGate => {
   }
   return gateInstance
 }
+/**
+ * EXEC-START-POST: in-memory state projection for a freshly created START.
+ * The attempt row was just created in-gate, the composite was loaded
+ * pre-gate, and the scale children were captured in-gate (one cheap in-tx
+ * read). Projecting from those — instead of re-reading the parent, the
+ * snapshot headers and the current-unit child, then activating the current
+ * unit's admission in its own transaction — removes all 10 post-gate DB
+ * operations (4,029–4,376ms at 150 VU, 7,400ms at 200 VU, 82% pool wait).
+ * The current unit's admission activation is deferred, not dropped: the
+ * whole-definition path batch-activates every unstored unit (including the
+ * first), and the unit-submit path ensures admission at submit time. The
+ * only DTO difference is SCALE trainingTiming, which is omitted until the
+ * admission exists (it is absent for untimed scales).
+ * Best-effort only: returns null whenever the fast path does not apply, and
+ * the caller falls back to projectStartedAttempt (always correct). The fast
+ * path performs no write, so falling back after a null/throw is safe.
+ * Not applicable (fall back): whole-delivery (inline) STARTs — the inline
+ * definition load needs a full WholeDefinitionParent with relations; the
+ * idempotent-hit and fast-resume paths — their children were not captured
+ * in-gate; FLOW markers, variants, and composites with a required
+ * COGNITIVE / SITUATIONAL unit — their runner payloads need DB reads.
+ */
+const projectFreshStartedAttempt = async (
+  attempt: any,
+  composite: any,
+  scaleChildren: any[],
+  principal: { userId?: string; recoveryTokenHash?: string },
+  recoveryToken: string | null,
+): Promise<{ attempt: any; recoveryToken: string | null } | null> => {
+  try {
+    // Authorization: only the creator may project their own fresh attempt.
+    const authorized = principal.userId
+      ? attempt.userId === principal.userId
+      : Boolean(principal.recoveryTokenHash && attempt.userId === null && attempt.recoveryTokenHash === principal.recoveryTokenHash)
+    if (!authorized) return null
+    // Only a fully frozen FINAL_ONLY attempt can be projected in memory.
+    if (attempt.runtimeGeneration !== 'UNIFIED_V1' || attempt.deliveryMode !== 'FINAL_ONLY') return null
+    if (!attempt.frozenActiveSlotSetEncrypted || !attempt.frozenActiveSlotSetHash) return null
+    if (attempt.status !== 'IN_PROGRESS') return null
+    const parent = {
+      ...attempt,
+      compositeAssessment: composite,
+      scaleAssessments: scaleChildren.map((child: any) => ({ id: child.id, compositeItemId: child.compositeItemId })),
+      cognitiveSessions: [],
+      situationalAttempts: [],
+      formSectionAttempts: [],
+    }
+    // FLOW markers re-read through ensureTrainingFlowCurrentChild; variants
+    // validate their allocation against stored child rows. Neither is
+    // projectable from the in-gate snapshot — fall back to the DB path.
+    if (trainingFlowMarkerState(parent) === 'FLOW') return null
+    if (composite.trainingVariantFrozen != null || composite.trainingVariantDigest != null
+      || attempt.trainingVariantAllocationEncrypted != null || attempt.trainingVariantAllocationHash != null) return null
+    const projected = await applyTrainingAttemptScope(parent)
+    // COGNITIVE / SITUATIONAL first units need their child rows and
+    // delivery-time activation (DB reads); the fast path only captured
+    // SCALE children. Fall back so their runner payloads stay exact.
+    const scopedItems: any[] = projected.compositeAssessment?.items ?? []
+    if (scopedItems.some((item: any) => item.required && (item.type === 'COGNITIVE' || item.type === 'SITUATIONAL'))) return null
+    const state = await getUnifiedCompositeAttemptState(projected, principal, 'full', {
+      snapshots: [],
+      scaleChildById: new Map(scaleChildren.map((child: any) => [child.id, child])),
+      skipCurrentUnitActivation: true,
+    })
+    return { attempt: state, recoveryToken }
+  } catch {
+    // Best-effort: any projection failure falls back to the DB path.
+    return null
+  }
+}
+
 export const projectStartedAttempt = async (
   attemptId: string,
   principal: { userId?: string; recoveryTokenHash?: string },
@@ -3889,15 +4008,42 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
           _max: { attemptNo: true },
         })
         if (usage._count._all >= composite.maxAttempts) throw compositeConflict('已达到综合测评最大次数')
-        return createAttempt(tx, composite, userId, null, undefined, (usage._max.attemptNo ?? 0) + 1)
+        const created = await createAttempt(tx, composite, userId, null, undefined, (usage._max.attemptNo ?? 0) + 1)
+        // EXEC-START-POST: capture the freshly created scale children
+        // in-gate so the post-gate state projection is pure in-memory.
+        // One cheap in-tx read (the tx already holds a connection, so no
+        // pool wait) replaces the 10 post-gate re-reads. The payload columns
+        // are dropped for fresh children, matching the projection's own
+        // child select; the scale text comes from the child row.
+        const freshScaleChildren = await tx.assessment.findMany({
+          where: { compositeAttemptId: created.id },
+          select: {
+            ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
+            compositeAttempt: false,
+            answers: false,
+            result: false,
+            scale: { select: { ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT.scale.select, description: true, instruction: true } },
+          },
+        })
+        ;(created as any)._freshScaleChildren = freshScaleChildren
+        return created
         })
         } finally { assessmentTimelineSpan('start.in_tx_admission_freeze_create', inTxStart) }
           }, { maxWait: 10_000, timeout: 30_000 })
           })
         } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
       })
+      // EXEC-START-POST: project the fresh attempt in memory (zero
+      // post-gate queries). The fast path returns null whenever it does
+      // not apply (inline delivery, FLOW, variant, COGNITIVE/SITUATIONAL,
+      // or any projection failure) and the caller falls back to the DB
+      // path, which stays authoritative.
+      const freshScaleChildren = (attempt as any)._freshScaleChildren as any[] | undefined
+      const projected = !opts?.wantsWholeDelivery && freshScaleChildren
+        ? await projectFreshStartedAttempt(attempt, composite, freshScaleChildren, { userId }, null)
+        : null
       return traceAssessmentPhase('start.post_gate_getAttemptState',
-        () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)))
+        () => withQueryRawLabel('start.raw.post_gate', async () => projected ?? projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)))
     } catch (err) {
       if (!isUniqueConstraintError(err) || retry === 1) throw err
     }
@@ -4820,10 +4966,29 @@ const cachedCompositeDefinitionHash = (attempt: any, sections: any[]): string =>
   return hash
 }
 
+/**
+ * EXEC-START-POST: preloaded inputs for the fresh-START in-memory projection.
+ * A fresh attempt has no snapshot rows, its scale children were just created
+ * in-gate, and its current-unit admission is deferred to the definition /
+ * submit path (which batch-activates unstored units). Supplying these lets
+ * getUnifiedCompositeAttemptState project without any post-gate DB read.
+ * skipCurrentUnitActivation applies ONLY to the FORM_SECTION and SCALE
+ * branches (their DTOs carry no admission payload except SCALE's optional
+ * trainingTiming); COGNITIVE / SITUATIONAL branches keep their normal
+ * delivery-time activation. Callers must fall back to the DB path when the
+ * attempt is a FLOW marker, a variant, or a whole-delivery (inline) START.
+ */
+type UnifiedStatePreload = {
+  snapshots: Array<{ slotKey: string; terminalState: string }>
+  scaleChildById: Map<string, any>
+  skipCurrentUnitActivation: boolean
+}
+
 const getUnifiedCompositeAttemptState = async (
   attempt: any,
   context: { userId?: string; recoveryTokenHash?: string },
   view: CompositeAttemptStateView = 'full',
+  preloaded?: UnifiedStatePreload,
 ) => {
   const attemptId = attempt.id
   const authorized = context.userId
@@ -4858,7 +5023,9 @@ const getUnifiedCompositeAttemptState = async (
 
   // Progress is closed over the frozen slot set and terminal headers only.
   // No answer, result, trial, or encrypted participant payload is selected.
-  const snapshotRows = await prisma.assessmentUnitSnapshot.findMany({
+  // EXEC-START-POST: a fresh attempt has no snapshots yet; the caller passes
+  // the empty list so this read is skipped entirely.
+  const snapshotRows = preloaded?.snapshots ?? await prisma.assessmentUnitSnapshot.findMany({
     where: { compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch },
     select: { slotKey: true, terminalState: true },
   })
@@ -4940,7 +5107,12 @@ const getUnifiedCompositeAttemptState = async (
   if (currentUnit?.type === 'FORM_SECTION') {
     const section = formSections.find((candidate: any) => candidate.id === currentUnit.id)
     if (section) {
-      await ensureCompositeFormAdmissionAtDelivery(attempt.id, compositeFormSectionRuntimeDefinition(currentUnit.section), attempt)
+      // EXEC-START-POST: the form currentItem carries no admission payload
+      // (the ensure call only activates it). A fresh START defers activation
+      // to the definition / submit path, which batch-activates unstored units.
+      if (!preloaded?.skipCurrentUnitActivation) {
+        await ensureCompositeFormAdmissionAtDelivery(attempt.id, compositeFormSectionRuntimeDefinition(currentUnit.section), attempt)
+      }
       currentItem = {
         id: section.id,
         type: 'FORM_SECTION',
@@ -4972,7 +5144,9 @@ const getUnifiedCompositeAttemptState = async (
     // longer carries the scale description/instruction, so the current
     // unit's scale text comes from this child row (same scale row).
     const slotCompleted = headerByKey.get(slot.slotKey)?.terminalState === 'COMPLETED'
-    const child = await prisma.assessment.findUnique({
+    // EXEC-START-POST: the child row was captured in-gate (one cheap in-tx
+    // read); reuse it instead of re-reading the authoritative child row.
+    const child = preloaded?.scaleChildById.get(summary.id) ?? await prisma.assessment.findUnique({
       where: { id: summary.id },
       select: {
         ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
@@ -4990,14 +5164,19 @@ const getUnifiedCompositeAttemptState = async (
         || runtime.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
         || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
       ) throw new Error('Scale runtime identity mismatch')
-      const admission=await ensureScaleAdmissionAtDelivery(child.id, attempt, child)
+      // EXEC-START-POST: a fresh START defers the current unit's admission
+      // activation to the definition / submit path (which batch-activates
+      // unstored units). The DTO then omits trainingTiming, exactly as the
+      // pre-activation state would; the runtime identity above is still
+      // validated against the frozen snapshot.
+      const admission = preloaded?.skipCurrentUnitActivation ? null : await ensureScaleAdmissionAtDelivery(child.id, attempt, child)
       currentItem = {
         id: item.id,
         type: 'SCALE',
         position: item.position,
         required: item.required,
         scaleAssessmentId: child.id,
-        ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
+        ...(admission?.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
         definitionHash: runtime.legacyDefinitionHash,
         presentationMode: runtime.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE',
         answers: [],
