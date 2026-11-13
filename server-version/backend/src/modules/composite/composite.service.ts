@@ -1,5 +1,6 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
 import { classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
+import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
 import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
@@ -3212,12 +3213,16 @@ const createAttempt = async (
   await lockCompositeAdmissionShare(db as Prisma.TransactionClient, composite.id)
   if (!['QUESTIONNAIRE','ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     const current=await db.compositeAssessment.findUnique({where:{id:composite.id},
-      select:{status:true,trainingContentSnapshot:true,trainingContentSnapshotHash:true,updatedAt:true}})
+      select:composite._preloaded
+        ?{status:true,trainingContentSnapshotHash:true,updatedAt:true}
+        :{status:true,trainingContentSnapshot:true,trainingContentSnapshotHash:true,updatedAt:true}})
     if(!current||current.status!=='PUBLISHED')throw compositeForbidden('测评已停止接收新作答')
     if (composite._preloaded && (current.updatedAt?.getTime() !== composite.updatedAt?.getTime() || current.trainingContentSnapshotHash !== composite.trainingContentSnapshotHash)) {
       composite = await loadComposite(composite.id, true, db)
-    } else {
+    } else if(!composite._preloaded) {
       composite={...composite,trainingContentSnapshot:current.trainingContentSnapshot,trainingContentSnapshotHash:current.trainingContentSnapshotHash}
+    } else {
+      composite={...composite,trainingContentSnapshotHash:current.trainingContentSnapshotHash}
     }
   }
   let feedbackBinding: TrainingFeedbackBinding | null = null
@@ -3240,7 +3245,8 @@ const createAttempt = async (
       select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,
         personalTracking:true,personalTrackingBaselineId:true,personalTrackingOrdinal:true,
         trainingPersistencePolicy: true, trainingPersistencePolicyHash: true,
-        trainingContentSnapshot:true,trainingContentSnapshotHash:true,
+        ...(composite._preloaded?{}:{trainingContentSnapshot:true}),
+        trainingContentSnapshotHash:true,
         trainingFeedbackPolicy: true, trainingFeedbackPolicyHash: true, updatedAt: true } })
     if (!current || current.status !== 'PUBLISHED' || (!userId && !current.publicEnabled)) throw compositeForbidden('问卷已停止接收新作答')
     if (composite._preloaded && (current.updatedAt?.getTime() !== composite.updatedAt?.getTime() || current.trainingContentSnapshotHash !== composite.trainingContentSnapshotHash)) {
@@ -3249,7 +3255,10 @@ const createAttempt = async (
     if (current.opensAt && current.opensAt.getTime() > Date.now()) throw compositeBadRequest('问卷尚未开始')
     if (current.expiresAt && current.expiresAt.getTime() <= Date.now()) throw compositeBadRequest('问卷已过期')
     // Read the publication-owned policy under the same admission lock as status.
-    composite = { ...composite, trainingContentSnapshot:current.trainingContentSnapshot,trainingContentSnapshotHash:current.trainingContentSnapshotHash,
+    // The preloaded snapshot blob is reused when the in-tx hash/updatedAt recheck matches.
+    composite = { ...composite, trainingContentSnapshot:composite._preloaded&&current.updatedAt?.getTime()===composite.updatedAt?.getTime()&&current.trainingContentSnapshotHash===composite.trainingContentSnapshotHash
+        ?composite.trainingContentSnapshot:current.trainingContentSnapshot,
+      trainingContentSnapshotHash:current.trainingContentSnapshotHash,
       personalTracking:current.personalTracking,personalTrackingBaselineId:current.personalTrackingBaselineId,personalTrackingOrdinal:current.personalTrackingOrdinal,
       trainingPersistencePolicy: current.trainingPersistencePolicy,
       trainingPersistencePolicyHash: current.trainingPersistencePolicyHash,
@@ -3379,8 +3388,11 @@ const createAttempt = async (
     // Anonymous entry obtains the same unique persisted delivery, never a client hint.
     composite.deliveryCourseId = compositeSjtGrantScope(composite)!.courseId
   }
+  const startReads=startReadsIfCurrent(composite)
+  if(startReads)await recheckPrefetchedReleases(db as Prisma.TransactionClient,startReads.releases)
   const trainingScaleArtifacts=await resolveTrainingScaleArtifacts(db as Prisma.TransactionClient,{compositeId:composite.id,
-    snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,educationComposition})
+    snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,educationComposition,
+    legacyArtifactMap:startReads?.legacyArtifacts})
   for(const item of composite.items){const artifact=trainingScaleArtifacts.get(item.id);if(artifact&&item.type==='SCALE')publishedScaleArtifactByItem.set(item,artifact)}
   if (prepared) {
     try {
@@ -3450,6 +3462,7 @@ const createAttempt = async (
     compositeId:composite.id,attemptId:newAttemptId,epoch:attemptEpoch,
     snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,
     composite,resolvedSituational:situationalReleases,educationComposition,scaleArtifacts:trainingScaleArtifacts,
+    prefetchedReleases:startReads?.releases,
   })
   let variantAllocation: ReturnType<typeof createWeightedVariantAllocation> | null = null
   if (variantEnabled) {
@@ -3738,7 +3751,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
   const preGateStart = process.hrtime.bigint()
-  const composite = await loadComposite(compositeId, true)
+  const composite = await preloadStartComposite(prisma, await loadComposite(compositeId, true))
   assertSupportedComposite(composite, false, false)
   await assertStudentEligibility(composite, userId)
 
@@ -3842,7 +3855,7 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
   // Pure-read (write-time invariant): the student restart path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
-  const composite = await loadComposite(existing.compositeAssessmentId, true)
+  const composite = await preloadStartComposite(prisma, await loadComposite(existing.compositeAssessmentId, true))
   assertSupportedComposite(composite)
   await assertStudentEligibility(composite, userId)
 
@@ -4048,7 +4061,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   // Pure-read (write-time invariant): the public start path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
-  const composite = await loadComposite(token.compositeAssessment.id, true)
+  const composite = await preloadStartComposite(prisma, await loadComposite(token.compositeAssessment.id, true))
   if (study && (composite.trainingVariantFrozen != null || composite.trainingFlowFrozen != null)) throw compositeBadRequest('概率分卷暂不支持匿名研究组合')
   if (recoveryToken) {
     const recoveryTokenHash = hashRecoveryToken(recoveryToken)
@@ -4191,7 +4204,7 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
   // Pure-read (write-time invariant): the public restart path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
-  const composite = await loadComposite(existing.compositeAssessmentId, true)
+  const composite = await preloadStartComposite(prisma, await loadComposite(existing.compositeAssessmentId, true))
   assertSupportedComposite(composite)
   if (!composite.publicEnabled || composite.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
   const credential = { ...createRecoveryCredential(), participantKey:existing.participantKey, anonymousCode:existing.anonymousCode! }
