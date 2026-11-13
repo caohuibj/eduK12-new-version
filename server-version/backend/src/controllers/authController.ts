@@ -80,9 +80,16 @@ export const authController = {
         && (!current.expiresAt || current.expiresAt > new Date())
         && (current.role !== UserRole.TEACHER || current.teacherApproved)
       )
-      const matches = await withLoginPasswordVerification(() =>
-        comparePassword(password, usable ? current!.passwordHash : LOGIN_DUMMY_HASH)
-      )
+      let matches = false
+      if (res.locals?.trainingEntrance && !usable) {
+        const fakeDelayMs = 35 + Math.floor(Math.random() * 26)
+        await new Promise(resolve => setTimeout(resolve, fakeDelayMs))
+        matches = false
+      } else {
+        matches = await withLoginPasswordVerification(() =>
+          comparePassword(password, usable ? current!.passwordHash : LOGIN_DUMMY_HASH)
+        )
+      }
       // Recheck expiry after queued hashing; dummy success must stay a failure.
       const user = usable && matches && (!current!.expiresAt || current!.expiresAt > new Date()) ? current : null
       if (!user || !['LEGACY','TRAINING'].includes(user.accountDomain)) return failedLogin()
@@ -446,6 +453,10 @@ export const authController = {
     // change the account-wide tokenVersion on an ordinary logout.
     if (!await revokeCurrentSession(getSessionToken(req))) {
       return res.status(503).json({ code: -1, message: '退出暂不可用，请稍后重试' })
+    }
+    if (req.user?.userId) {
+      const { invalidatePrincipalCache } = await import('../middleware/auth')
+      invalidatePrincipalCache(req.user.userId)
     }
     clearSessionCookie(req, res)
     return success(res, null, '已退出登录')

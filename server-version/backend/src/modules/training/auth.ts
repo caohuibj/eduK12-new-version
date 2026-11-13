@@ -26,6 +26,95 @@ export const trainingCodeRateLimit: RequestHandler = async (req, res, next) => {
   }
 }
 
+interface CachedCourse {
+  data: {
+    id: string
+    title: string
+    status: any
+    endedAt: Date | null
+    isRecruiting: boolean
+    isLibrary: boolean
+  } | null
+  expiresAt: number
+}
+
+const courseCache = new Map<string, CachedCourse>()
+const inFlightCourseQueries = new Map<string, Promise<CachedCourse['data']>>()
+let courseCacheGeneration = 0
+
+export const getCourseLookupCacheSize = (): number => courseCache.size
+
+export const invalidateCourseLookupCache = (courseCode?: string): void => {
+  courseCacheGeneration++
+  if (courseCode) {
+    courseCache.delete(courseCode)
+    inFlightCourseQueries.delete(courseCode)
+  } else {
+    courseCache.clear()
+    inFlightCourseQueries.clear()
+  }
+}
+
+const getCourseCacheTtlMs = (): number => {
+  const envVal = process.env.TRAINING_COURSE_CACHE_TTL_MS
+  if (envVal !== undefined) {
+    const parsed = Number(envVal)
+    return Number.isSafeInteger(parsed) && parsed >= 0 ? parsed : 30_000
+  }
+  return process.env.NODE_ENV === 'test' ? 0 : 30_000
+}
+
+export const findCachedCourse = async (code: string) => {
+  const ttl = getCourseCacheTtlMs()
+  const now = Date.now()
+
+  if (ttl > 0) {
+    const cached = courseCache.get(code)
+    if (cached) {
+      if (now < cached.expiresAt) return cached.data
+      courseCache.delete(code)
+    }
+  }
+
+  // Use the exact persisted code as the key; this lookup is case sensitive.
+  // Coalesce cold-start requests but never retain a failed query or a null result.
+  if (ttl > 0) {
+    const pending = inFlightCourseQueries.get(code)
+    if (pending) return pending
+  }
+  const generation = courseCacheGeneration
+  const query = async (): Promise<CachedCourse['data']> => {
+    const course = await prisma.course.findUnique({
+      where: { courseCode: code },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        endedAt: true,
+        isRecruiting: true,
+        isLibrary: true,
+      },
+    })
+    if (ttl > 0 && course && generation === courseCacheGeneration) {
+      if (courseCache.size >= 1000) {
+        const oldest = courseCache.keys().next().value
+        if (oldest) courseCache.delete(oldest)
+      }
+      courseCache.set(code, { data: course, expiresAt: Date.now() + ttl })
+    }
+    return course
+  }
+  // Bound untrusted distinct-code concurrency; overflow performs the original read.
+  if (ttl === 0 || inFlightCourseQueries.size >= 1000) return query()
+  const pending = query()
+  inFlightCourseQueries.set(code, pending)
+  try {
+    return await pending
+  } finally {
+    if (inFlightCourseQueries.get(code) === pending) inFlightCourseQueries.delete(code)
+  }
+}
+
 const codeSchema = z.object({ code: z.string().trim().min(1).max(128) }).strict()
 export const resolveTrainingCode: RequestHandler = async (req, res, next) => {
   const parsed = codeSchema.safeParse(req.body)
@@ -36,9 +125,7 @@ export const resolveTrainingCode: RequestHandler = async (req, res, next) => {
     // Old course codes remain exact lookup keys. Teacher codes use their
     // original uppercase normalization. Never infer a role from length/prefix.
     const [course, teacher] = await Promise.all([
-      prisma.course.findUnique({ where: { courseCode: code }, select: {
-        id: true, title: true, status: true, endedAt: true, isRecruiting: true, isLibrary: true,
-      } }),
+      findCachedCourse(code),
       prisma.teacherCode.findUnique({ where: { code: code.toUpperCase() }, select: {
         isActive: true, expiresAt: true, usedCount: true, maxUses: true,
       } }),

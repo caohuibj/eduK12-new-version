@@ -21,11 +21,26 @@ export const registrationRateLimit: RequestHandler = async (req, res, next) => {
   if (req.body?.teacherCode !== undefined) budgets.push(['teacher', normalized(req.body.teacherCode), registrationBudgets.teacherCode])
   if (req.body?.activationCode !== undefined) budgets.push(['campus-code', normalized(req.body.activationCode), registrationBudgets.resource])
   if (req.body?.inviteCode !== undefined) budgets.push(['campus-staff-invite', normalized(req.body.inviteCode), registrationBudgets.resource])
+  const consumedKeys: string[] = []
   for (const [kind, value, limit] of budgets) {
-    const result = await cacheService.consumeRateLimit(`ratelimit:registration:${kind}:${digest(value)}`, limit, 900)
+    const key = `ratelimit:registration:${kind}:${digest(value)}`
+    const result = await cacheService.consumeRateLimit(key, limit, 900)
     if (!result) { res.setHeader('Retry-After', '2'); res.status(503).json({ code: -1, message: '注册服务暂时不可用，请稍后重试' }); return }
+    consumedKeys.push(key)
     if (!result.allowed) { res.setHeader('Retry-After', String(result.retryAfterSeconds)); res.status(429).json({ code: -1, message: '注册请求过于频繁，请稍后重试' }); return }
   }
+  // Express Response supports once; some minimal middleware test doubles do not.
+  // A finish callback must refund the set of consumed keys at most once.
+  let refunded = false
+  const onFinish = () => {
+    if (refunded || res.statusCode !== 503) return
+    refunded = true
+    for (const key of consumedKeys) {
+      void cacheService.refundRateLimit(key)
+    }
+  }
+  if (typeof res.once === 'function') res.once('finish', onFinish)
+  else if (typeof res.on === 'function') res.on('finish', onFinish)
   next()
 }
 const registrationGate = new BoundedAdmissionGate({ name: 'registration', maxConcurrent: configuredInteger('REGISTRATION_MAX_CONCURRENT', 2), maxQueue: configuredInteger('REGISTRATION_MAX_QUEUE', 16, true), maxWaitMs: configuredInteger('REGISTRATION_MAX_WAIT_MS', 3000), retryAfterSeconds: 2 })

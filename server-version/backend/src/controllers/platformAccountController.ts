@@ -43,6 +43,9 @@ export async function resetPasswordForPlatformAdmin(req: Request, res: Response,
           targetUserId: target.id,
           passwordHash,
         })
+        // This handles the current API process; no cross-instance invalidation is claimed.
+        const { invalidatePrincipalCache } = await import('../middleware/auth')
+        invalidatePrincipalCache(target.id)
 
         return success(
           res,

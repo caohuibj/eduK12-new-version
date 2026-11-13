@@ -37,13 +37,13 @@ export const isWholeSubmitAdmissionBusyError = (
  * Process-local WHOLE submit admission.
  *
  * Dedicated admission gate for Scheme X whole questionnaire ingestion:
- * Default 32 concurrency, 64 queue, 1000ms timeout for light encrypted envelope ingestion.
+ * Default 32 concurrency, 300 queue, 10000ms timeout for light encrypted envelope ingestion.
  */
 export const wholeSubmitAdmission = new BoundedAdmissionGate({
   name: 'whole_submit',
   maxConcurrent: configuredInteger('WHOLE_SUBMIT_ADMISSION_LIMIT', 32),
-  maxQueue: configuredInteger('WHOLE_SUBMIT_ADMISSION_QUEUE', 64, true),
-  maxWaitMs: configuredInteger('WHOLE_SUBMIT_ADMISSION_TIMEOUT_MS', 1000),
+  maxQueue: configuredInteger('WHOLE_SUBMIT_ADMISSION_QUEUE', 300, true),
+  maxWaitMs: configuredInteger('WHOLE_SUBMIT_ADMISSION_TIMEOUT_MS', 10000),
   retryAfterSeconds: configuredInteger('WHOLE_SUBMIT_RETRY_AFTER_SECONDS', 1),
   busyCode: WHOLE_SUBMIT_BUSY_CODE,
   busyMessage: '整卷提交繁忙，请稍后重试',

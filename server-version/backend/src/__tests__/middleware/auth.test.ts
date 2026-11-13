@@ -13,7 +13,11 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 vi.mock('../../utils/jwt', () => ({ verifyToken: mockVerifyToken }))
 vi.mock('../../utils/sessionRevocation', () => ({ isSessionRevoked: mockRevoked }))
 
-import { authenticate, authenticateSchool, authenticateHuiteacher, authenticateSurvey, optionalAuthenticate, requireSelfOrAdmin, requireStudent } from '../../middleware/auth'
+import { authenticate, authenticateSchool, authenticateHuiteacher, authenticateSurvey, optionalAuthenticate, requireSelfOrAdmin, requireStudent, invalidatePrincipalCache } from '../../middleware/auth'
+
+beforeEach(() => {
+  invalidatePrincipalCache()
+})
 
 const payload = { userId: 'user-1', username: 'u1', role: UserRole.STUDENT, tokenVersion: 0 }
 
