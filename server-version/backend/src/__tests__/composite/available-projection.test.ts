@@ -60,6 +60,7 @@ const project = (row: Record<string, any>, select: Record<string, any>) => Objec
   }))
 let source: ReturnType<typeof fixture>[]
 beforeEach(() => {
+  vi.stubEnv('COMPOSITE_AVAILABLE_CACHE_ENABLED', 'true')
   resetStartReadCachesForTests()
   vi.clearAllMocks()
   source = [fixture()]
