@@ -5,8 +5,9 @@ import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integrat
 
 // Proves the START interactive timeout (15s) lets a transaction that exceeds
 // Prisma's default 5s timeout complete, and that the default still fails.
-// Opt-in via START_TX_TIMEOUT_DATABASE_URL on an isolated loopback test DB.
-const url=integrationDatabaseUrl('START_TX_TIMEOUT_DATABASE_URL')
+// Opt-in via START_TX_TIMEOUT_DATABASE_URL, or the existing CI release-integration URL.
+// requireIsolatedReleaseDatabase still enforces exact loopback DATABASE_URL equality.
+const url=integrationDatabaseUrl('START_TX_TIMEOUT_DATABASE_URL','RELEASE_INTEGRATION_DATABASE_URL')
 const suite=url?describe:describe.skip
 
 suite('START interactive transaction timeout (real PostgreSQL)',()=>{
