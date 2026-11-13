@@ -16,7 +16,11 @@ export const assessmentReportConfig = (env: NodeJS.ProcessEnv = process.env) => 
     wholeSubmitEnabled: whole === 'true',
     courseIds: new Set((env.ASSESSMENT_REPORT_ASYNC_COURSE_IDS ?? '').split(',').map(value => value.trim()).filter(Boolean)),
     maxPending: integer('ASSESSMENT_REPORT_MAX_PENDING', 200),
-    workerConcurrency: integer('ASSESSMENT_REPORT_WORKER_CONCURRENCY', 1),
+    // Default 12 (was 1 in code, 6 in .env.example / prior load tests). Env still overrides.
+    // Pre-serialized plaintext report JSON is not stored: composite_report_jobs only has
+    // report_encrypted (ciphertext). A raw JSON column would need a migration, which this
+    // change does not add. GET .../report keeps today's decrypt + project + JSON.stringify path.
+    workerConcurrency: integer('ASSESSMENT_REPORT_WORKER_CONCURRENCY', 12),
     pollMs: integer('ASSESSMENT_REPORT_POLL_MS', 500),
     leaseMs: integer('ASSESSMENT_REPORT_LEASE_MS', 30_000),
     maxAttempts: integer('ASSESSMENT_REPORT_MAX_ATTEMPTS', 8),
