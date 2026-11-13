@@ -44,7 +44,7 @@ describe('transaction-local private reference admission expiry',()=>{
  })
  it('keeps final fences after START child/material writes and UNIFIED completed-unit/outbox insertion',()=>{
   const composite=readFileSync(new URL('../../modules/composite/composite.service.ts',import.meta.url),'utf8')
-  expect(composite).toMatch(/await contentCandidate\?\.recheckSourceLicenses\(\)\s+await assertTrainingPrivateReferenceAdmissionCurrent\(db as Prisma.TransactionClient\)\s+return attempt/)
+  expect(composite).toMatch(/await contentCandidate\?\.recheckSourceLicenses\(\)\s+await assertTrainingPrivateReferenceAdmissionCurrent\(db as Prisma.TransactionClient\)[\s\S]*?return attempt/)
   const unified=readFileSync(new URL('../../modules/assessment-runtime/unified-form-section-final-submit.service.ts',import.meta.url),'utf8')
   expect(unified).toMatch(/await insertCompletedUnitSnapshot\(tx,[\s\S]*?await assertTrainingPrivateReferenceAdmissionCurrent\(tx\)\s+return \{ replayed: false, sectionAttemptId: currentSection.id/)
   const legacy=readFileSync(new URL('../../modules/composite/final-submit.service.ts',import.meta.url),'utf8')

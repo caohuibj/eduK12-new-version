@@ -77,3 +77,12 @@ describe('PR3: Whole submit context reuse and report defaults', () => {
     })
   })
 })
+
+
+describe('report worker concurrency defaults',()=>{
+ it('defaults to 12 and preserves explicit per-environment overrides',()=>{
+  expect(assessmentReportConfig({}).workerConcurrency).toBe(12)
+  expect(assessmentReportConfig({ASSESSMENT_REPORT_WORKER_CONCURRENCY:'6'}).workerConcurrency).toBe(6)
+  expect(assessmentReportConfig({ASSESSMENT_REPORT_WORKER_CONCURRENCY:'8'}).workerConcurrency).toBe(8)
+ })
+})

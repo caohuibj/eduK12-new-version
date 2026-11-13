@@ -70,3 +70,8 @@ export const defaultStartAdmissionBound = (
   databaseUrl: string | undefined,
   env: NodeJS.ProcessEnv = process.env,
 ): number => Math.max(1, Math.floor(effectivePrismaPoolSize(databaseUrl, env) * 0.75))
+
+/** Reserve API pool headroom for Definition/Submit when an old explicit START
+ * limit exceeds the current pool budget. This is a cap, not reserved sockets. */
+export const boundedTrainingStartConcurrency = (requested: number, databaseUrl = process.env.DATABASE_URL, env: NodeJS.ProcessEnv = process.env): number =>
+  Math.max(1, Math.min(requested, Math.floor(effectivePrismaPoolSize(databaseUrl, env) * 0.6)))
