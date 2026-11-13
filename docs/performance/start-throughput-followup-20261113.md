@@ -1,6 +1,6 @@
 # START throughput follow-up to #723
 
-Base: main `1ff8d4bcb` (merged #723). Selectively reuse #721 `488ab853f`, #722 `5f4614077`, and #720's fresh-parent reuse idea. Every commit and PR title uses `[skip ci]`; no CI activation, main merge or deployment.
+Base: main `1ff8d4bcb` (merged #723). Selectively reuse #721 `488ab853f`, #722 `5f4614077`, and #720's fresh-parent reuse idea. The candidate was initially held as Draft without formal CI. It is now Ready for Review and a full required-CI pass is requested before any merge. Deployment remains out of scope.
 
 ## Document implementation decisions
 
@@ -37,3 +37,14 @@ The supplied ABBA/arrival-rate summaries motivate this candidate. Their raw Driv
 - Final fixed-code `tsc --noEmit`: passed (exit 0).
 
 Controlled performance qualification and formal CI remain separate follow-up work. Measure Available+START+Definition+Submit+READY totals, failures/retries, Gate wait/service time and actual pool wait under matched processes/pools/polling. No numerical speedup is established by the correctness tests.
+
+## Arrival-rate qualification provided for the candidate
+
+- With identical stated gate/pool configuration (Prisma pool 40, START 20/100/5000, Submit 12/100/5000), the reported 10/s × 30s trial completed 295/300 (98.3%) versus 272/300 (90.7%) for the comparison; pool-wait sum dropped from 189,995ms to 3,457ms. Report READY p50 grew from 9,407ms to 12,091ms.
+- At 20/s × 30s, the reported candidate completed 542/600 (90.3%) versus 473/600 (78.8%); pool-wait sum dropped from 732,472ms to 30,114ms, but 58 START admission rejections remained.
+- These are **user-supplied matched-configuration observations, not a fully isolated causal A/B**: the comparison runs used different database warm-up/rebuild histories. The candidate is not demonstrated to sustain 10/s indefinitely, nor to complete 100% of a 1,500-person burst.
+- Archives: [10/s candidate](https://drive.google.com/file/d/1hNlXw1IGAcnJWf7bTPY0tp7OzslQi2c3/view), [20/s candidate](https://drive.google.com/file/d/1B5QL_QUuH_T6wKfjrpxSUIdN2o3qwRli/view).
+
+### Merge gate
+
+The requested next step is an ordinary, non-skipped GitHub Actions run on the exact candidate HEAD. Merge only if the repository's required checks, including `merge gate / ready PR`, pass; this documentation-only commit starts that validation without changing runtime behavior.
