@@ -5,7 +5,7 @@ vi.mock('../../modules/composite/composite.service',async orig=>({...(await orig
 import {compositeController} from '../../modules/composite/composite.controller'
 import {AssessmentStartBusyError,rethrowGateBusyAsStartBusy} from '../../modules/composite/start-transient'
 import {BoundedAdmissionBusyError} from '../../services/boundedAdmissionGate'
-import {AssessmentStartBusyError,classifyStartTransaction,rolledBackStartReason} from '../../modules/composite/start-transient'
+import {AssessmentStartBusyError,classifyStartTransaction,rolledBackStartReason,START_INTERACTIVE_TRANSACTION} from '../../modules/composite/start-transient'
 
 const known=(code:string,message='raw internal detail: relation secret_table',meta?:Record<string,unknown>)=>
  new Prisma.PrismaClientKnownRequestError(message,{code,clientVersion:'5.22.0',meta})
@@ -20,12 +20,17 @@ const rolledBack=[
  ['bare sqlstate',Object.assign(new Error('x'),{code:'40P01'}),'40P01'],
 ] as const
 const notRolledBack=[
- ['P2028 other',known('P2028','Transaction API error: Transaction already closed: A query cannot be executed on a committed transaction.')],
- ['P2028 no message',Object.assign(new Error(''),{code:'P2028',message:undefined})],
  ['P2002',known('P2002','Unique constraint')],
  ['raw other',known('P2010','Raw query failed',{code:'23505'})],
  ['plain',new Error('boom')],
  ['null',null],
+] as const
+const alsoRolledBack=[
+ ['P2028 not found',known('P2028','Transaction not found. Transaction API error: Transaction not found.')],
+ ['P2028 other API',known('P2028','Transaction API error: Transaction already closed: A query cannot be executed on a committed transaction.')],
+ ['P2028 no message',Object.assign(new Error(''),{code:'P2028',message:undefined})],
+ ['wrapped not found',Object.assign(new Error('Transaction not found'),{code:'UNKNOWN'})],
+ ['wrapped API error',new Error('Transaction API error: retry exhausted')],
 ] as const
 function fakeRes(){
  const res:any={headers:{} as Record<string,string>,statusCode:200,body:undefined}
@@ -66,7 +71,9 @@ describe('gate-busy wiring (queue_full / timeout -> 503 contract)',()=>{
 })
 describe('START transient rollback classification',()=>{
  beforeEach(()=>{m.start.mockReset();m.restart.mockReset()})
+ it('START interactive transaction uses 10s maxWait and 15s timeout',()=>{expect(START_INTERACTIVE_TRANSACTION).toEqual({maxWait:10_000,timeout:15_000})})
  it.each(rolledBack)('%s is a known rollback',(_n,err,reason)=>{expect(rolledBackStartReason(err)).toBe(reason)})
+ it.each(alsoRolledBack)('%s is a known P2028 rollback',(_n,err)=>{expect(rolledBackStartReason(err)).toBe('P2028')})
  it.each(notRolledBack)('%s is not reclassified',(_n,err)=>{expect(rolledBackStartReason(err)).toBeNull()})
  it('wraps exactly one attempt and never retries',async()=>{
   const run=vi.fn().mockRejectedValue(rolledBack[0][1])
@@ -92,7 +99,16 @@ describe('START transient rollback classification',()=>{
   await compositeController.restartAttempt(req,res)
   expect(res.statusCode).toBe(503);expect(res.body.code).toBe('ASSESSMENT_START_BUSY')
  })
- it('an unclassified P2028 keeps the generic 500 without leaking its message',async()=>{
+ it('P2028 Transaction not found reaches the controller as 503 with Retry-After and a safe body',async()=>{
+  m.start.mockImplementation(()=>classifyStartTransaction(()=>Promise.reject(alsoRolledBack[0][1])))
+  const res=fakeRes()
+  await compositeController.startAttempt(req,res)
+  expect(res.statusCode).toBe(503)
+  expect(res.headers['Retry-After']).toBe('1')
+  expect(res.body).toEqual({code:'ASSESSMENT_START_BUSY',message:'综合测评开始请求繁忙，请稍后重试',data:null})
+  expect(JSON.stringify(res.body)).not.toMatch(/Transaction not found|P2028|Transaction API/)
+ })
+ it('a unique-constraint error is not remapped to START busy',async()=>{
   m.start.mockImplementation(()=>classifyStartTransaction(()=>Promise.reject(notRolledBack[0][1])))
   const res=fakeRes()
   await compositeController.startAttempt(req,res)
