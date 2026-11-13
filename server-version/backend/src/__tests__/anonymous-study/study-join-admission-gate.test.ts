@@ -88,6 +88,9 @@ describe('studyJoinAdmissionGate and transient error resilience (PR1)', () => {
           message: 'Unable to start a transaction in the given time',
         }),
       ).toBe(true)
+      expect(isTransientStudyDatabaseError({ code: 'P2028' })).toBe(true)
+      expect(isTransientStudyDatabaseError({ message: 'Transaction not found' })).toBe(true)
+      expect(isTransientStudyDatabaseError({ message: 'Transaction API error: retry exhausted' })).toBe(true)
     })
 
     it('detects retryable SQL states (40001, 40P01, 55P03)', () => {

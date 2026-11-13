@@ -1,5 +1,8 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
-import { classifyStartTransaction, rethrowGateBusyAsStartBusy } from './start-transient'
+import { classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
+import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
+import { availableTemplateCache, publicationReadKey, scaleDeploymentCache, startCompositeCache } from './start-read-cache'
+import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments, type StoredScaleDeploymentPolicyV1 } from '../scale/deployment/repository'
 import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
@@ -334,6 +337,38 @@ export const loadComposite = async (id: string, includeItems = false, db: Db = p
   })
   if (!composite) throw compositeNotFound()
   return includeItems?inheritTrainingTrackingSources(db as Prisma.TransactionClient,composite):composite as any
+}
+
+/** START-only: cheap identity read, then reuse a process-local 30s cache of the
+ * fat publication tree keyed on id+snapshotHash+updatedAt. A published-version
+ * change misses the cache. preloadStartComposite still hoists release/artifact
+ * reads (themselves identity-keyed and TTL-bounded). */
+const cloneCachedStartComposite = (cached: any) => ({
+  ...cached,
+  ...(Array.isArray(cached.items) ? { items: cached.items.slice() } : {}),
+  ...(Array.isArray(cached.formSections) ? { formSections: cached.formSections.slice() } : {}),
+  ...(Array.isArray(cached.questionnaireCourses) ? { questionnaireCourses: cached.questionnaireCourses.slice() } : {}),
+})
+
+export const loadStartComposite = async (id: string, db: Db = prisma) => {
+  const identity = await db.compositeAssessment.findUnique({
+    where: { id },
+    select: { id: true, updatedAt: true, trainingContentSnapshotHash: true },
+  })
+  if (!identity) throw compositeNotFound()
+  const key = publicationReadKey(identity.id, identity.trainingContentSnapshotHash, identity.updatedAt)
+  const cached = startCompositeCache.get(key) as { id: string; trainingContentSnapshotHash?: string | null; updatedAt?: Date } | undefined
+  if (cached && cached.id === identity.id
+      && cached.trainingContentSnapshotHash === identity.trainingContentSnapshotHash
+      && cached.updatedAt?.getTime() === identity.updatedAt.getTime()) {
+    return preloadStartComposite(db, cloneCachedStartComposite(cached))
+  }
+  const loaded = await loadComposite(id, true, db)
+  if (loaded.updatedAt?.getTime() === identity.updatedAt.getTime()
+      && loaded.trainingContentSnapshotHash === identity.trainingContentSnapshotHash) {
+    startCompositeCache.set(key, loaded)
+  }
+  return preloadStartComposite(db, loaded)
 }
 
 const validateCourse = async (
@@ -2491,28 +2526,25 @@ const loadSummaryMarkerPresence = async (ids: string[]) => {
  * re-reading. It must never carry caller-supplied course ids. Composite rows
  * still require a non-library course below, so the result is identical.
  */
-export const listAvailableForStudent = async (userId: string, now = Date.now(), courseId?: string, summary = false, authorizedCourseIds?: string[]) => {
-  // Catalog consumers opt in; older detail consumers keep their original response.
-  const courseIds = authorizedCourseIds
-    ? authorizedCourseIds.filter((id) => !courseId || id === courseId)
-    : (await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, ...(courseId ? { courseId } : {}) }, select: { courseId: true } })).map((item) => item.courseId)
-  if (!courseIds.length) return []
+/**
+ * EXEC-START-01: cached shared template list for GET /available.
+ * The cached query is the PUBLISHED + ARCHIVED publication superset across
+ * ALL courses with NO per-user filter (no course, no attempt, no cognitive
+ * rule). The per-user parts — course membership, attempt rows, and the
+ * ARCHIVED/COGNITIVE rules that depend on them — are applied in memory on
+ * every request, so a student's own attempt state is never stale. The select
+ * matches the old per-request findMany plus `courseId`, `questionnaireType`
+ * and `questionnaireCourses` (needed to apply the course rule in memory;
+ * SQL could filter on columns it did not select, in-memory code cannot).
+ * Keyed by the summary flag because the select differs; TTL 30s bounds
+ * template staleness (publish/archive) to one poll window.
+ */
+const loadAvailableTemplateList = async (summary: boolean): Promise<any[]> => {
+  const key = summary ? 'available-template:summary' : 'available-template:detail'
+  const cached = availableTemplateCache.get(key) as any[] | undefined
+  if (cached) return cached
   const list = await prisma.compositeAssessment.findMany({
-    // Publication governs new starts. Archived deliveries remain discoverable
-    // only for this student's existing work, within their current course scope.
-    where: { AND: [{ OR: [
-      { status: 'PUBLISHED' },
-      { status: 'ARCHIVED', attempts: { some: { userId, status: { in: ['IN_PROGRESS', 'COMPLETED'] } } } },
-    ] }],
-    // While the cognitive module is off, a product with a COGNITIVE item is
-    // listed only if this student already has an attempt (any status). This is
-    // the in-memory `supportedList` rule below, pushed into SQL so the catalog
-    // is not materialized just to be dropped; the in-memory rule stays as-is.
-    ...(config.cognitiveModuleEnabled ? {} : { NOT: { items: { some: { type: 'COGNITIVE' } }, attempts: { none: { userId } } } }),
-    OR: [
-      { productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId: { in: courseIds }, course: { isLibrary: false } },
-      { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds }, course: { isLibrary: false } } } },
-    ] },
+    where: { status: { in: ['PUBLISHED', 'ARCHIVED'] } },
     orderBy: { publishedAt: 'desc' },
     select: {
       id: true,
@@ -2531,7 +2563,13 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       // Detail still loads every marker: a missing property is UNKNOWN, not legacy.
       // Summary asks only for presence, so the Json bodies are never parsed.
       ...(summary ? {} : { trainingVariantFrozen: true, ...TRAINING_FLOW_DEFINITION_SELECT }),
+      courseId: true,
+      questionnaireType: true,
       course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
+      // Course rule for QUESTIONNAIRE products lives on this join; the
+      // per-request query filtered it in SQL, the cached superset carries
+      // it so the rule can be applied in memory instead.
+      questionnaireCourses: { select: { courseId: true, course: { select: { isLibrary: true } } } },
       items: summary ? false : {
         orderBy: { position: 'asc' as const },
         select: {
@@ -2546,7 +2584,42 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       formSections: summary ? false : { orderBy: { position: 'asc' as const }, include: { items: { select: { id: true, contextKey: true } } } },
     },
   })
-  const ids = list.map((item) => item.id)
+  availableTemplateCache.set(key, list)
+  return list
+}
+
+/** In-memory replica of the old findMany course OR-branch. A composite is
+ * visible only through a non-library course the student belongs to:
+ * LEGACY/ASSESSMENT_BUNDLE via its direct course, QUESTIONNAIRE/COURSE via
+ * one of its questionnaireCourses. Any other productKind/questionnaireType
+ * combination matches neither branch and is excluded, exactly as in SQL. */
+const filterAvailableTemplateByCourse = (list: any[], courseIds: string[]): any[] => {
+  if (!courseIds.length) return []
+  const allowed = new Set(courseIds)
+  return list.filter((item: any) => {
+    if (item.productKind === 'LEGACY_COMPOSITE' || item.productKind === 'ASSESSMENT_BUNDLE') {
+      return Boolean(item.courseId && allowed.has(item.courseId) && item.course?.isLibrary === false)
+    }
+    if (item.productKind === 'QUESTIONNAIRE' && item.questionnaireType === 'COURSE') {
+      return (item.questionnaireCourses ?? []).some((entry: any) => allowed.has(entry.courseId) && entry.course?.isLibrary === false)
+    }
+    return false
+  })
+}
+
+export const listAvailableForStudent = async (userId: string, now = Date.now(), courseId?: string, summary = false, authorizedCourseIds?: string[]) => {
+  // Catalog consumers opt in; older detail consumers keep their original response.
+  const courseIds = authorizedCourseIds
+    ? authorizedCourseIds.filter((id) => !courseId || id === courseId)
+    : (await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, ...(courseId ? { courseId } : {}) }, select: { courseId: true } })).map((item) => item.courseId)
+  if (!courseIds.length) return []
+  // EXEC-START-01: the shared template list is cached (30s); only the
+  // per-user course membership (above) and attempt rows (below) are read
+  // fresh. The course rule is applied in memory; the status rule follows
+  // once the fresh attempts are loaded.
+  const templateList = await loadAvailableTemplateList(summary)
+  const candidates = filterAvailableTemplateByCourse(templateList, courseIds)
+  const ids = candidates.map((item) => item.id)
   const [attemptRows, markerPresence] = await Promise.all([
     prisma.compositeAssessmentAttempt.findMany({
       where: { userId, compositeAssessmentId: { in: ids } },
@@ -2568,6 +2641,17 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
     }),
     summary ? loadSummaryMarkerPresence(ids) : Promise.resolve(new Map<string, SummaryMarkerPresence>()),
   ])
+  // Publication governs new starts. Archived deliveries remain discoverable
+  // only for this student's existing work, within their current course scope.
+  // (In-memory replica of the old SQL status OR-branch, using the freshly
+  // loaded attempts. The cognitive NOT-branch stays where it was: the
+  // in-memory `supportedList` rule below.)
+  const hasLiveAttempt = new Set(
+    attemptRows
+      .filter((row) => row.status === 'IN_PROGRESS' || row.status === 'COMPLETED')
+      .map((row) => row.compositeAssessmentId),
+  )
+  const list = candidates.filter((item) => item.status === 'PUBLISHED' || (item.status === 'ARCHIVED' && hasLiveAttempt.has(item.id)))
   const attempts = attemptRows.map(({ cognitiveSessions, ...attempt }) => ({ ...attempt,
     admissionPaused: !config.cognitiveModuleEnabled && cognitiveSessions?.some(session => session.status === 'IN_PROGRESS' && !session.frozenAdmissionSnapshotHash),
   }))
@@ -3185,6 +3269,49 @@ const freezeEducationLibraryScaleUnit = async (db: Db, item: any, libraryUnit: a
   return runtime
 }
 
+/**
+ * EXEC-START-02 (FIX 2): preload the ACTIVE deployment rows for this
+ * composite's distinct scales into the transaction's preload map, sourcing
+ * them from the process-local scaleDeploymentCache (30s TTL) and loading
+ * only the misses in one batched read. resolveScaleStartDeployment then
+ * hits the per-tx preload instead of reading the deployment row once per
+ * scale per START. The deployment row is immutable once ACTIVE (a new
+ * revision is a new row); the resolution itself (policy compilation, mode
+ * evaluation, allowNewStarts) still runs fresh every time, so only the row
+ * read is cached. A cached null means "no active deployment" and is a real
+ * hit — readActiveScaleDeployment returns null from the preload instead of
+ * querying. Best-effort: any preload failure falls through to the normal
+ * per-scale reads (the callers re-read on a preload miss).
+ */
+const preloadScaleDeploymentsForStart = async (db: Db, composite: any): Promise<void> => {
+  try {
+    const scaleIds: string[] = [...new Set(
+      (composite.items ?? [])
+        .filter((item: any) => item.type === 'SCALE' && typeof item.scaleId === 'string')
+        .map((item: any) => item.scaleId as string),
+    )] as string[]
+    if (scaleIds.length === 0) return
+    const preloaded = new Map<string, StoredScaleDeploymentPolicyV1 | null>()
+    const missing: string[] = []
+    for (const scaleId of scaleIds) {
+      const hit = scaleDeploymentCache.get(scaleId) as StoredScaleDeploymentPolicyV1 | null | undefined
+      if (hit !== undefined) preloaded.set(scaleId, hit)
+      else missing.push(scaleId)
+    }
+    if (missing.length > 0) {
+      const loaded = await readActiveScaleDeployments(db, missing)
+      for (const scaleId of missing) {
+        const row = loaded.get(scaleId) ?? null
+        scaleDeploymentCache.set(scaleId, row)
+        preloaded.set(scaleId, row)
+      }
+    }
+    setPreloadedActiveScaleDeployments(db, preloaded)
+  } catch {
+    // Best-effort: fall through to the normal per-scale deployment reads.
+  }
+}
+
 const createAttempt = async (
   db: Db,
   composite: any,
@@ -3212,12 +3339,16 @@ const createAttempt = async (
   await lockCompositeAdmissionShare(db as Prisma.TransactionClient, composite.id)
   if (!['QUESTIONNAIRE','ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     const current=await db.compositeAssessment.findUnique({where:{id:composite.id},
-      select:{status:true,trainingContentSnapshot:true,trainingContentSnapshotHash:true,updatedAt:true}})
+      select:composite._preloaded
+        ?{status:true,trainingContentSnapshotHash:true,updatedAt:true}
+        :{status:true,trainingContentSnapshot:true,trainingContentSnapshotHash:true,updatedAt:true}})
     if(!current||current.status!=='PUBLISHED')throw compositeForbidden('测评已停止接收新作答')
     if (composite._preloaded && (current.updatedAt?.getTime() !== composite.updatedAt?.getTime() || current.trainingContentSnapshotHash !== composite.trainingContentSnapshotHash)) {
       composite = await loadComposite(composite.id, true, db)
-    } else {
+    } else if(!composite._preloaded) {
       composite={...composite,trainingContentSnapshot:current.trainingContentSnapshot,trainingContentSnapshotHash:current.trainingContentSnapshotHash}
+    } else {
+      composite={...composite,trainingContentSnapshotHash:current.trainingContentSnapshotHash}
     }
   }
   let feedbackBinding: TrainingFeedbackBinding | null = null
@@ -3240,7 +3371,8 @@ const createAttempt = async (
       select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,
         personalTracking:true,personalTrackingBaselineId:true,personalTrackingOrdinal:true,
         trainingPersistencePolicy: true, trainingPersistencePolicyHash: true,
-        trainingContentSnapshot:true,trainingContentSnapshotHash:true,
+        ...(composite._preloaded?{}:{trainingContentSnapshot:true}),
+        trainingContentSnapshotHash:true,
         trainingFeedbackPolicy: true, trainingFeedbackPolicyHash: true, updatedAt: true } })
     if (!current || current.status !== 'PUBLISHED' || (!userId && !current.publicEnabled)) throw compositeForbidden('问卷已停止接收新作答')
     if (composite._preloaded && (current.updatedAt?.getTime() !== composite.updatedAt?.getTime() || current.trainingContentSnapshotHash !== composite.trainingContentSnapshotHash)) {
@@ -3249,7 +3381,10 @@ const createAttempt = async (
     if (current.opensAt && current.opensAt.getTime() > Date.now()) throw compositeBadRequest('问卷尚未开始')
     if (current.expiresAt && current.expiresAt.getTime() <= Date.now()) throw compositeBadRequest('问卷已过期')
     // Read the publication-owned policy under the same admission lock as status.
-    composite = { ...composite, trainingContentSnapshot:current.trainingContentSnapshot,trainingContentSnapshotHash:current.trainingContentSnapshotHash,
+    // The preloaded snapshot blob is reused when the in-tx hash/updatedAt recheck matches.
+    composite = { ...composite, trainingContentSnapshot:composite._preloaded&&current.updatedAt?.getTime()===composite.updatedAt?.getTime()&&current.trainingContentSnapshotHash===composite.trainingContentSnapshotHash
+        ?composite.trainingContentSnapshot:current.trainingContentSnapshot,
+      trainingContentSnapshotHash:current.trainingContentSnapshotHash,
       personalTracking:current.personalTracking,personalTrackingBaselineId:current.personalTrackingBaselineId,personalTrackingOrdinal:current.personalTrackingOrdinal,
       trainingPersistencePolicy: current.trainingPersistencePolicy,
       trainingPersistencePolicyHash: current.trainingPersistencePolicyHash,
@@ -3379,8 +3514,11 @@ const createAttempt = async (
     // Anonymous entry obtains the same unique persisted delivery, never a client hint.
     composite.deliveryCourseId = compositeSjtGrantScope(composite)!.courseId
   }
+  const startReads=startReadsIfCurrent(composite)
+  if(startReads)await recheckPrefetchedReleases(db as Prisma.TransactionClient,startReads.releases)
   const trainingScaleArtifacts=await resolveTrainingScaleArtifacts(db as Prisma.TransactionClient,{compositeId:composite.id,
-    snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,educationComposition})
+    snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,educationComposition,
+    legacyArtifactMap:startReads?.legacyArtifacts})
   for(const item of composite.items){const artifact=trainingScaleArtifacts.get(item.id);if(artifact&&item.type==='SCALE')publishedScaleArtifactByItem.set(item,artifact)}
   if (prepared) {
     try {
@@ -3450,6 +3588,7 @@ const createAttempt = async (
     compositeId:composite.id,attemptId:newAttemptId,epoch:attemptEpoch,
     snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,
     composite,resolvedSituational:situationalReleases,educationComposition,scaleArtifacts:trainingScaleArtifacts,
+    prefetchedReleases:startReads?.releases,
   })
   let variantAllocation: ReturnType<typeof createWeightedVariantAllocation> | null = null
   if (variantEnabled) {
@@ -3501,6 +3640,11 @@ const createAttempt = async (
   // inside this one transaction only. Each START re-validates live scale
   // admission; nothing here survives to the next attempt.
   const scaleFreezeMemo = createScaleFreezeMemo()
+  // EXEC-START-02 (FIX 2): preload the ACTIVE deployment rows for this
+  // composite's scales (process-local cache, one batched read on miss) so
+  // the per-scale freeze below hits the per-tx preload instead of reading
+  // the deployment row once per scale.
+  await preloadScaleDeploymentsForStart(db, composite)
   const precomputedActiveSlotSet = await precomputeScaleOnlyActiveSlotSet(db, { finalOnly, flowEnabled, composite, attemptEpoch, contentCandidate, prepared, formSections, scaleFreezeMemo })
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
@@ -3714,6 +3858,77 @@ const trainingStartGate = (): BoundedAdmissionGate => {
   }
   return gateInstance
 }
+/**
+ * EXEC-START-POST: in-memory state projection for a freshly created START.
+ * The attempt row was just created in-gate, the composite was loaded
+ * pre-gate, and the scale children were captured in-gate (one cheap in-tx
+ * read). Projecting from those — instead of re-reading the parent, the
+ * snapshot headers and the current-unit child, then activating the current
+ * unit's admission in its own transaction — removes all 10 post-gate DB
+ * operations (4,029–4,376ms at 150 VU, 7,400ms at 200 VU, 82% pool wait).
+ * The current unit's admission activation is deferred, not dropped: the
+ * whole-definition path batch-activates every unstored unit (including the
+ * first), and the unit-submit path ensures admission at submit time. The
+ * only DTO difference is SCALE trainingTiming, which is omitted until the
+ * admission exists (it is absent for untimed scales).
+ * Best-effort only: returns null whenever the fast path does not apply, and
+ * the caller falls back to projectStartedAttempt (always correct). The fast
+ * path performs no write, so falling back after a null/throw is safe.
+ * Not applicable (fall back): whole-delivery (inline) STARTs — the inline
+ * definition load needs a full WholeDefinitionParent with relations; the
+ * idempotent-hit and fast-resume paths — their children were not captured
+ * in-gate; FLOW markers, variants, and composites with a required
+ * COGNITIVE / SITUATIONAL unit — their runner payloads need DB reads.
+ */
+const projectFreshStartedAttempt = async (
+  attempt: any,
+  composite: any,
+  scaleChildren: any[],
+  principal: { userId?: string; recoveryTokenHash?: string },
+  recoveryToken: string | null,
+): Promise<{ attempt: any; recoveryToken: string | null } | null> => {
+  try {
+    // Authorization: only the creator may project their own fresh attempt.
+    const authorized = principal.userId
+      ? attempt.userId === principal.userId
+      : Boolean(principal.recoveryTokenHash && attempt.userId === null && attempt.recoveryTokenHash === principal.recoveryTokenHash)
+    if (!authorized) return null
+    // Only a fully frozen FINAL_ONLY attempt can be projected in memory.
+    if (attempt.runtimeGeneration !== 'UNIFIED_V1' || attempt.deliveryMode !== 'FINAL_ONLY') return null
+    if (!attempt.frozenActiveSlotSetEncrypted || !attempt.frozenActiveSlotSetHash) return null
+    if (attempt.status !== 'IN_PROGRESS') return null
+    const parent = {
+      ...attempt,
+      compositeAssessment: composite,
+      scaleAssessments: scaleChildren.map((child: any) => ({ id: child.id, compositeItemId: child.compositeItemId })),
+      cognitiveSessions: [],
+      situationalAttempts: [],
+      formSectionAttempts: [],
+    }
+    // FLOW markers re-read through ensureTrainingFlowCurrentChild; variants
+    // validate their allocation against stored child rows. Neither is
+    // projectable from the in-gate snapshot — fall back to the DB path.
+    if (trainingFlowMarkerState(parent) === 'FLOW') return null
+    if (composite.trainingVariantFrozen != null || composite.trainingVariantDigest != null
+      || attempt.trainingVariantAllocationEncrypted != null || attempt.trainingVariantAllocationHash != null) return null
+    const projected = await applyTrainingAttemptScope(parent)
+    // COGNITIVE / SITUATIONAL first units need their child rows and
+    // delivery-time activation (DB reads); the fast path only captured
+    // SCALE children. Fall back so their runner payloads stay exact.
+    const scopedItems: any[] = projected.compositeAssessment?.items ?? []
+    if (scopedItems.some((item: any) => item.required && (item.type === 'COGNITIVE' || item.type === 'SITUATIONAL'))) return null
+    const state = await getUnifiedCompositeAttemptState(projected, principal, 'full', {
+      snapshots: [],
+      scaleChildById: new Map(scaleChildren.map((child: any) => [child.id, child])),
+      skipCurrentUnitActivation: true,
+    })
+    return { attempt: state, recoveryToken }
+  } catch {
+    // Best-effort: any projection failure falls back to the DB path.
+    return null
+  }
+}
+
 export const projectStartedAttempt = async (
   attemptId: string,
   principal: { userId?: string; recoveryTokenHash?: string },
@@ -3738,7 +3953,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
   const preGateStart = process.hrtime.bigint()
-  const composite = await loadComposite(compositeId, true)
+  const composite = await loadStartComposite(compositeId)
   assertSupportedComposite(composite, false, false)
   await assertStudentEligibility(composite, userId)
 
@@ -3793,15 +4008,42 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
           _max: { attemptNo: true },
         })
         if (usage._count._all >= composite.maxAttempts) throw compositeConflict('已达到综合测评最大次数')
-        return createAttempt(tx, composite, userId, null, undefined, (usage._max.attemptNo ?? 0) + 1)
+        const created = await createAttempt(tx, composite, userId, null, undefined, (usage._max.attemptNo ?? 0) + 1)
+        // EXEC-START-POST: capture the freshly created scale children
+        // in-gate so the post-gate state projection is pure in-memory.
+        // One cheap in-tx read (the tx already holds a connection, so no
+        // pool wait) replaces the 10 post-gate re-reads. The payload columns
+        // are dropped for fresh children, matching the projection's own
+        // child select; the scale text comes from the child row.
+        const freshScaleChildren = await tx.assessment.findMany({
+          where: { compositeAttemptId: created.id },
+          select: {
+            ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
+            compositeAttempt: false,
+            answers: false,
+            result: false,
+            scale: { select: { ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT.scale.select, description: true, instruction: true } },
+          },
+        })
+        ;(created as any)._freshScaleChildren = freshScaleChildren
+        return created
         })
         } finally { assessmentTimelineSpan('start.in_tx_admission_freeze_create', inTxStart) }
           }, { maxWait: 10_000, timeout: 30_000 })
           })
         } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
       })
+      // EXEC-START-POST: project the fresh attempt in memory (zero
+      // post-gate queries). The fast path returns null whenever it does
+      // not apply (inline delivery, FLOW, variant, COGNITIVE/SITUATIONAL,
+      // or any projection failure) and the caller falls back to the DB
+      // path, which stays authoritative.
+      const freshScaleChildren = (attempt as any)._freshScaleChildren as any[] | undefined
+      const projected = !opts?.wantsWholeDelivery && freshScaleChildren
+        ? await projectFreshStartedAttempt(attempt, composite, freshScaleChildren, { userId }, null)
+        : null
       return traceAssessmentPhase('start.post_gate_getAttemptState',
-        () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)))
+        () => withQueryRawLabel('start.raw.post_gate', async () => projected ?? projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)))
     } catch (err) {
       if (!isUniqueConstraintError(err) || retry === 1) throw err
     }
@@ -3842,7 +4084,7 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
   // Pure-read (write-time invariant): the student restart path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
-  const composite = await loadComposite(existing.compositeAssessmentId, true)
+  const composite = await loadStartComposite(existing.compositeAssessmentId)
   assertSupportedComposite(composite)
   await assertStudentEligibility(composite, userId)
 
@@ -3890,7 +4132,7 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
       undefined,
       materialRestartClaim(current,composite),
     )
-  }))
+  }, START_INTERACTIVE_TRANSACTION))
   return { attempt: await getAttemptState(next.id, { userId }), recoveryToken: null }
 }
 
@@ -4048,7 +4290,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   // Pure-read (write-time invariant): the public start path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
-  const composite = await loadComposite(token.compositeAssessment.id, true)
+  const composite = await loadStartComposite(token.compositeAssessment.id)
   if (study && (composite.trainingVariantFrozen != null || composite.trainingFlowFrozen != null)) throw compositeBadRequest('概率分卷暂不支持匿名研究组合')
   if (recoveryToken) {
     const recoveryTokenHash = hashRecoveryToken(recoveryToken)
@@ -4097,8 +4339,8 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
             // replaces the exclusive FOR UPDATE that serialized every
             // START for the same questionnaire (measured 2026-11-12: the
             // FOR UPDATE roundtrip was 92% of tx_wall, p50 4,034ms at
-            // 200 VU). The study FOR UPDATE in beforeAdmission is
-            // unchanged: close and withdrawal still serialize with start.
+            // 200 VU). The study/participant locks in beforeAdmission are
+            // FOR SHARE; close and withdrawal still take FOR UPDATE and wait.
             const lockAt = process.hrtime.bigint()
             let lockQuerySucceeded = false
             try {
@@ -4131,7 +4373,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
             if (study) await study.afterAdmission(tx, admitted.id)
             await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
             return admitted
-          })
+          }, START_INTERACTIVE_TRANSACTION)
         } finally {
           // tx_wall and gate_slot both end when the transaction settles.
           // gate_slot ⊃ tx_wall; they are nearly equal here because the gate
@@ -4191,7 +4433,7 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
   // Pure-read (write-time invariant): the public restart path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
-  const composite = await loadComposite(existing.compositeAssessmentId, true)
+  const composite = await loadStartComposite(existing.compositeAssessmentId)
   assertSupportedComposite(composite)
   if (!composite.publicEnabled || composite.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
   const credential = { ...createRecoveryCredential(), participantKey:existing.participantKey, anonymousCode:existing.anonymousCode! }
@@ -4246,7 +4488,7 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
       undefined,
       materialRestartClaim(current,composite),
     )
-  }))
+  }, START_INTERACTIVE_TRANSACTION))
   return { attempt: await getAttemptState(next.id, { recoveryTokenHash: credential.hash }), recoveryToken: credential.token }
 }
 
@@ -4724,10 +4966,29 @@ const cachedCompositeDefinitionHash = (attempt: any, sections: any[]): string =>
   return hash
 }
 
+/**
+ * EXEC-START-POST: preloaded inputs for the fresh-START in-memory projection.
+ * A fresh attempt has no snapshot rows, its scale children were just created
+ * in-gate, and its current-unit admission is deferred to the definition /
+ * submit path (which batch-activates unstored units). Supplying these lets
+ * getUnifiedCompositeAttemptState project without any post-gate DB read.
+ * skipCurrentUnitActivation applies ONLY to the FORM_SECTION and SCALE
+ * branches (their DTOs carry no admission payload except SCALE's optional
+ * trainingTiming); COGNITIVE / SITUATIONAL branches keep their normal
+ * delivery-time activation. Callers must fall back to the DB path when the
+ * attempt is a FLOW marker, a variant, or a whole-delivery (inline) START.
+ */
+type UnifiedStatePreload = {
+  snapshots: Array<{ slotKey: string; terminalState: string }>
+  scaleChildById: Map<string, any>
+  skipCurrentUnitActivation: boolean
+}
+
 const getUnifiedCompositeAttemptState = async (
   attempt: any,
   context: { userId?: string; recoveryTokenHash?: string },
   view: CompositeAttemptStateView = 'full',
+  preloaded?: UnifiedStatePreload,
 ) => {
   const attemptId = attempt.id
   const authorized = context.userId
@@ -4762,7 +5023,9 @@ const getUnifiedCompositeAttemptState = async (
 
   // Progress is closed over the frozen slot set and terminal headers only.
   // No answer, result, trial, or encrypted participant payload is selected.
-  const snapshotRows = await prisma.assessmentUnitSnapshot.findMany({
+  // EXEC-START-POST: a fresh attempt has no snapshots yet; the caller passes
+  // the empty list so this read is skipped entirely.
+  const snapshotRows = preloaded?.snapshots ?? await prisma.assessmentUnitSnapshot.findMany({
     where: { compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch },
     select: { slotKey: true, terminalState: true },
   })
@@ -4844,7 +5107,12 @@ const getUnifiedCompositeAttemptState = async (
   if (currentUnit?.type === 'FORM_SECTION') {
     const section = formSections.find((candidate: any) => candidate.id === currentUnit.id)
     if (section) {
-      await ensureCompositeFormAdmissionAtDelivery(attempt.id, compositeFormSectionRuntimeDefinition(currentUnit.section), attempt)
+      // EXEC-START-POST: the form currentItem carries no admission payload
+      // (the ensure call only activates it). A fresh START defers activation
+      // to the definition / submit path, which batch-activates unstored units.
+      if (!preloaded?.skipCurrentUnitActivation) {
+        await ensureCompositeFormAdmissionAtDelivery(attempt.id, compositeFormSectionRuntimeDefinition(currentUnit.section), attempt)
+      }
       currentItem = {
         id: section.id,
         type: 'FORM_SECTION',
@@ -4876,7 +5144,9 @@ const getUnifiedCompositeAttemptState = async (
     // longer carries the scale description/instruction, so the current
     // unit's scale text comes from this child row (same scale row).
     const slotCompleted = headerByKey.get(slot.slotKey)?.terminalState === 'COMPLETED'
-    const child = await prisma.assessment.findUnique({
+    // EXEC-START-POST: the child row was captured in-gate (one cheap in-tx
+    // read); reuse it instead of re-reading the authoritative child row.
+    const child = preloaded?.scaleChildById.get(summary.id) ?? await prisma.assessment.findUnique({
       where: { id: summary.id },
       select: {
         ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
@@ -4894,14 +5164,19 @@ const getUnifiedCompositeAttemptState = async (
         || runtime.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
         || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
       ) throw new Error('Scale runtime identity mismatch')
-      const admission=await ensureScaleAdmissionAtDelivery(child.id, attempt, child)
+      // EXEC-START-POST: a fresh START defers the current unit's admission
+      // activation to the definition / submit path (which batch-activates
+      // unstored units). The DTO then omits trainingTiming, exactly as the
+      // pre-activation state would; the runtime identity above is still
+      // validated against the frozen snapshot.
+      const admission = preloaded?.skipCurrentUnitActivation ? null : await ensureScaleAdmissionAtDelivery(child.id, attempt, child)
       currentItem = {
         id: item.id,
         type: 'SCALE',
         position: item.position,
         required: item.required,
         scaleAssessmentId: child.id,
-        ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
+        ...(admission?.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
         definitionHash: runtime.legacyDefinitionHash,
         presentationMode: runtime.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE',
         answers: [],

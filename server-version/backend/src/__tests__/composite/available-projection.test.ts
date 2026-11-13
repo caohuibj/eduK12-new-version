@@ -16,6 +16,7 @@ vi.mock('../../modules/composite/report-package-label', async importOriginal => 
   return { ...actual, getFrozenPackageSlotLabels: vi.fn(actual.getFrozenPackageSlotLabels) }
 })
 import { listAvailableForStudent } from '../../modules/composite/composite.service'
+import { resetStartReadCachesForTests } from '../../modules/composite/start-read-cache'
 import { config } from '../../config'
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { getFrozenPackageSlotLabels } from '../../modules/composite/report-package-label'
@@ -35,6 +36,9 @@ const fixture = (override: Record<string, unknown> = {}) => ({
   id: 'assessment', code: 'SYNTHETIC', name: '合成组合', productKind: 'ASSESSMENT_BUNDLE',
   description: null, instruction: '合成说明', status: 'PUBLISHED', maxAttempts: 3,
   opensAt: null, expiresAt: null,
+  courseId: 'course',
+  questionnaireType: null,
+  questionnaireCourses: [],
   course: { id: 'course', title: '合成课程', courseCode: 'C', isLibrary: false },
   trainingVariantFrozen: null, trainingFlowDraft: null, trainingFlowFrozen: null, trainingFlowDigest: null,
   reportPackageKey: 'synthetic', reportPackageVersion: '1', reportPackageSnapshotEncrypted: frozen,
@@ -59,6 +63,10 @@ const project = (row: Record<string, any>, select: Record<string, any>) => Objec
 let source: ReturnType<typeof fixture>[]
 beforeEach(() => {
   vi.clearAllMocks()
+  // EXEC-START-01: the template list is cached process-locally (30s TTL) and
+  // keyed only by the summary flag, so clear it between cases or later cases
+  // would see an earlier case's fixture rows.
+  resetStartReadCachesForTests()
   source = [fixture()]
   db.courseStudent.findMany.mockResolvedValue([{ courseId: 'course' }])
   db.compositeAssessmentAttempt.findMany.mockResolvedValue([])

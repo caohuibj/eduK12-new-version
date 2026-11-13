@@ -279,9 +279,11 @@ export async function startStudyWave(studyId:string,waveId:string,credential:str
     credential:recovery,
     participantId:p.id,
     beforeAdmission:async tx=>{
-      // Lock study first, then identity: close and withdrawal serialize with start.
-      await tx.$queryRaw`SELECT id FROM anonymous_studies WHERE id=${studyId} FOR UPDATE`
-      await tx.$queryRaw`SELECT id FROM anonymous_study_participants WHERE id=${p.id} FOR UPDATE`
+      // Study then identity, both FOR SHARE: close and withdrawal still take
+      // FOR UPDATE and wait for these readers. Token usedCount stays a CAS
+      // updateMany, so a shared study row lock cannot oversell maxUses.
+      await tx.$queryRaw`SELECT id FROM anonymous_studies WHERE id=${studyId} FOR SHARE`
+      await tx.$queryRaw`SELECT id FROM anonymous_study_participants WHERE id=${p.id} FOR SHARE`
       const current=await participant(tx,studyId,credential)
       if(current.id!==p.id||current.generation!==p.generation) return hidden()
       assertAdmission(await readWave(tx,waveId))
