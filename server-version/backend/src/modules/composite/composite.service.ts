@@ -2702,7 +2702,9 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       .filter((row) => row.status === 'IN_PROGRESS' || row.status === 'COMPLETED')
       .map((row) => row.compositeAssessmentId),
   )
-  const list = candidates.filter((item) => item.status === 'PUBLISHED' || (item.status === 'ARCHIVED' && hasLiveAttempt.has(item.id)))
+  // The original SQL fallback already filters publication status; only the shared
+  // superset needs this per-student in-memory status pass.
+  const list = useSharedCatalog ? candidates.filter((item) => item.status === 'PUBLISHED' || (item.status === 'ARCHIVED' && hasLiveAttempt.has(item.id))) : candidates
   const attempts = attemptRows.map(({ cognitiveSessions, ...attempt }) => ({ ...attempt,
     admissionPaused: !config.cognitiveModuleEnabled && cognitiveSessions?.some(session => session.status === 'IN_PROGRESS' && !session.frozenAdmissionSnapshotHash),
   }))
