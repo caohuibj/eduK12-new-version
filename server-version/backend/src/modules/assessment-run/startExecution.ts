@@ -7,7 +7,7 @@ import {assertTrainingPrivateReferenceAdmissionCurrent} from '../composite/train
 import { Prisma } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
-import { classifyStartTransaction, isAssessmentStartBusyError, AssessmentStartBusyError, rolledBackStartReason, rethrowGateBusyAsStartBusy } from '../composite/start-transient'
+import { classifyStartTransaction, isAssessmentStartBusyError, AssessmentStartBusyError, rolledBackStartReason, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from '../composite/start-transient'
 import { BoundedAdmissionGate, configuredInteger } from '../../services/boundedAdmissionGate'
 import { defaultStartAdmissionBound } from '../../config/databasePool'
 import { startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
@@ -371,7 +371,7 @@ const startTransactionalComposite = async (input: {
   await assertTrainingPrivateReferenceAdmissionCurrent(tx)
   if(libraryUses)await assertEducationLibraryUses(tx,libraryUses.context,libraryUses.entryIds,{locked:libraryUses.uses,requireLocked:true})
   return { state: 'STARTED' as const, runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: attempt.id, replayed: false }
-    }))
+    }, START_INTERACTIVE_TRANSACTION))
   } catch (err) {
     if (!isAssessmentStartBusyError(err)) throw err
     throw await releaseClaimAfterRolledBackDispatch(input.decision.claim, err)
@@ -514,7 +514,7 @@ const startTransactionalTeacherForm = async (input:{
   })
   return {state:'STARTED' as const,runtimeBindingKind:TEACHER_FORM_RUNTIME_KIND,
     runtimeBindingRef:attempt.id,replayed:false}
-    }))
+    }, START_INTERACTIVE_TRANSACTION))
   } catch (err) {
     if (!isAssessmentStartBusyError(err)) throw err
     throw await releaseClaimAfterRolledBackDispatch(input.decision.claim, err)

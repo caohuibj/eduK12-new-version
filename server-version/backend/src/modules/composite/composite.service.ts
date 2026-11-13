@@ -1,5 +1,5 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
-import { classifyStartTransaction, rethrowGateBusyAsStartBusy } from './start-transient'
+import { classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
 import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
@@ -3890,7 +3890,7 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
       undefined,
       materialRestartClaim(current,composite),
     )
-  }))
+  }, START_INTERACTIVE_TRANSACTION))
   return { attempt: await getAttemptState(next.id, { userId }), recoveryToken: null }
 }
 
@@ -4131,7 +4131,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
             if (study) await study.afterAdmission(tx, admitted.id)
             await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
             return admitted
-          })
+          }, START_INTERACTIVE_TRANSACTION)
         } finally {
           // tx_wall and gate_slot both end when the transaction settles.
           // gate_slot ⊃ tx_wall; they are nearly equal here because the gate
@@ -4246,7 +4246,7 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
       undefined,
       materialRestartClaim(current,composite),
     )
-  }))
+  }, START_INTERACTIVE_TRANSACTION))
   return { attempt: await getAttemptState(next.id, { recoveryTokenHash: credential.hash }), recoveryToken: credential.token }
 }
 

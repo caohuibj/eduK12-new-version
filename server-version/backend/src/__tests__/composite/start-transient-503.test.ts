@@ -5,7 +5,7 @@ vi.mock('../../modules/composite/composite.service',async orig=>({...(await orig
 import {compositeController} from '../../modules/composite/composite.controller'
 import {AssessmentStartBusyError,rethrowGateBusyAsStartBusy} from '../../modules/composite/start-transient'
 import {BoundedAdmissionBusyError} from '../../services/boundedAdmissionGate'
-import {AssessmentStartBusyError,classifyStartTransaction,rolledBackStartReason} from '../../modules/composite/start-transient'
+import {AssessmentStartBusyError,classifyStartTransaction,rolledBackStartReason,START_INTERACTIVE_TRANSACTION} from '../../modules/composite/start-transient'
 
 const known=(code:string,message='raw internal detail: relation secret_table',meta?:Record<string,unknown>)=>
  new Prisma.PrismaClientKnownRequestError(message,{code,clientVersion:'5.22.0',meta})
@@ -71,6 +71,7 @@ describe('gate-busy wiring (queue_full / timeout -> 503 contract)',()=>{
 })
 describe('START transient rollback classification',()=>{
  beforeEach(()=>{m.start.mockReset();m.restart.mockReset()})
+ it('START interactive transaction uses 10s maxWait and 15s timeout',()=>{expect(START_INTERACTIVE_TRANSACTION).toEqual({maxWait:10_000,timeout:15_000})})
  it.each(rolledBack)('%s is a known rollback',(_n,err,reason)=>{expect(rolledBackStartReason(err)).toBe(reason)})
  it.each(alsoRolledBack)('%s is a known P2028 rollback',(_n,err)=>{expect(rolledBackStartReason(err)).toBe('P2028')})
  it.each(notRolledBack)('%s is not reclassified',(_n,err)=>{expect(rolledBackStartReason(err)).toBeNull()})

@@ -15,6 +15,9 @@ const ROLLED_BACK_SQLSTATES=new Set(['40001','40P01','55P03'])
 // "Transaction not found" or "Transaction API error" is the same outcome: a
 // wrapper or retry exhaustion dropped the Prisma code.
 
+// Prisma's default interactive timeout is 5000 ms; measured anonymous START tx_wall p50 sits on that red line and is then killed with P2028. maxWait is connection-acquisition before BEGIN (same 10s already used by Training START).
+export const START_INTERACTIVE_TRANSACTION={maxWait:10_000,timeout:15_000} as const
+
 export const ASSESSMENT_START_BUSY='ASSESSMENT_START_BUSY'
 export type StartBusyDiagnostic='pool_wait'|'transaction_expired'|'queue_full'|'queue_timeout'|'write_conflict'|'other'
 const diagnosticFrom=(reason:string,original?:string):StartBusyDiagnostic=>{
