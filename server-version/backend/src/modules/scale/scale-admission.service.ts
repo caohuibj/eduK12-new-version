@@ -234,13 +234,23 @@ export const readScaleAdmissionRuntime = (
   return runtime
 }
 
+const runtimeByCompiledHash = new Map<string, VersionedFrozenScaleRuntimeSnapshot>()
+
+export const clearScaleAdmissionRuntimeCacheForTest = () => {
+  runtimeByCompiledHash.clear()
+}
+
 // Request-local row memo includes no shared authorization decision. Failed
 // lookups are retryable; a changed ciphertext never reuses an earlier result.
 const pendingRuntimeByChild = new WeakMap<object, { encrypted: string; promise: Promise<VersionedFrozenScaleRuntimeSnapshot> }>()
 export const loadScaleAdmissionRuntime = async (
-  row: Pick<ScaleAdmissionChildRow, 'runtimeSnapshotEncrypted'>,
+  row: Pick<ScaleAdmissionChildRow, 'runtimeSnapshotEncrypted'> & { compiledRuntimeHash?: string | null },
   db?: import('../assessment-runtime/shared-scale-runtime').SharedScaleArtifactDb,
 ): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
+  if (row.compiledRuntimeHash) {
+    const fromHash = runtimeByCompiledHash.get(row.compiledRuntimeHash)
+    if (fromHash) return fromHash
+  }
   const encrypted = row.runtimeSnapshotEncrypted
   if (!encrypted) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时不可用，请联系管理员恢复', 409)
   const known = runtimeByChild.get(row)
@@ -251,6 +261,13 @@ export const loadScaleAdmissionRuntime = async (
     try {
       const runtime = await loadFrozenScaleRuntimeSnapshot(encrypted, db)
       if (row.runtimeSnapshotEncrypted === encrypted) runtimeByChild.set(row, { encrypted, runtime })
+      if (runtime?.compiledRuntime?.compiledRuntimeHash) {
+        if (runtimeByCompiledHash.size >= 128) {
+          const oldest = runtimeByCompiledHash.keys().next().value
+          if (oldest) runtimeByCompiledHash.delete(oldest)
+        }
+        runtimeByCompiledHash.set(runtime.compiledRuntime.compiledRuntimeHash, runtime)
+      }
       return runtime
     } catch (error) {
       if (error instanceof FrozenRuntimeStorageUnavailableError) throw error

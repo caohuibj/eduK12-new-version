@@ -10,9 +10,14 @@ const COMPOSITE_SHARE_SQL = 'SELECT "id" FROM "composite_assessments" WHERE "id"
 // always take the lock.
 const heldCompositeShareLocks = new WeakMap<object, Set<string>>()
 
+const shouldSkipCompositeShareLock = (): boolean =>
+  process.env.TRAINING_SKIP_COMPOSITE_SHARE_LOCK === 'true' || process.env.TRAINING_SKIP_COMPOSITE_SHARE_LOCK === '1'
+
 /** Parent START and publication stop/archive serialize on this row. Skips the
- * statement only when lockAuthenticatedAdmission already took it on this tx. */
+ * statement only when lockAuthenticatedAdmission already took it on this tx,
+ * or when TRAINING_SKIP_COMPOSITE_SHARE_LOCK is enabled. */
 export async function lockCompositeAdmissionShare(tx: RawTx, compositeId: string): Promise<void> {
+  if (shouldSkipCompositeShareLock()) return
   if (heldCompositeShareLocks.get(tx)?.has(compositeId)) return
   await withStartNestedQueryRawLabel('lock_share', () => tx.$queryRawUnsafe(COMPOSITE_SHARE_SQL, compositeId))
 }
@@ -25,10 +30,12 @@ export async function lockAuthenticatedAdmission(
   compositeId: string,
   userId: string,
 ): Promise<void> {
-  await withStartNestedQueryRawLabel('lock_share', () => tx.$queryRawUnsafe(COMPOSITE_SHARE_SQL, compositeId))
-  let held = heldCompositeShareLocks.get(tx)
-  if (!held) heldCompositeShareLocks.set(tx, held = new Set())
-  held.add(compositeId)
+  if (!shouldSkipCompositeShareLock()) {
+    await withStartNestedQueryRawLabel('lock_share', () => tx.$queryRawUnsafe(COMPOSITE_SHARE_SQL, compositeId))
+    let held = heldCompositeShareLocks.get(tx)
+    if (!held) heldCompositeShareLocks.set(tx, held = new Set())
+    held.add(compositeId)
+  }
   // A hash collision only causes conservative extra serialization. Prefix and
   // tuple encoding keep this lock namespace separate from other advisory uses.
   const identity = JSON.stringify(['training-authenticated-admission-v1', compositeId, userId])
@@ -66,10 +73,12 @@ export async function lockAnonymousAdmission(
   compositeId: string,
   participantId?: string,
 ): Promise<void> {
-  await withStartNestedQueryRawLabel('lock_share', () => tx.$queryRawUnsafe(COMPOSITE_SHARE_SQL, compositeId))
-  let held = heldCompositeShareLocks.get(tx)
-  if (!held) heldCompositeShareLocks.set(tx, held = new Set())
-  held.add(compositeId)
+  if (!shouldSkipCompositeShareLock()) {
+    await withStartNestedQueryRawLabel('lock_share', () => tx.$queryRawUnsafe(COMPOSITE_SHARE_SQL, compositeId))
+    let held = heldCompositeShareLocks.get(tx)
+    if (!held) heldCompositeShareLocks.set(tx, held = new Set())
+    held.add(compositeId)
+  }
   if (!participantId) return
   // A hash collision only causes conservative extra serialization. Prefix and
   // tuple encoding keep this lock namespace separate from other advisory uses.

@@ -295,7 +295,40 @@ const assertNotOrganizationResourceGenericEntry = (resource: {productKind?:strin
   if(resource.productKind==='ORGANIZATION_RESOURCE') throw compositeForbidden('组织资源仅可通过对应的组织任务访问')
 }
 
+type CachedCompositeDefinition = {
+  composite: any
+  expiresAt: number
+}
+const compositeDefinitionCache = new Map<string, CachedCompositeDefinition>()
+const MAX_COMPOSITE_DEFINITION_CACHE_SIZE = 500
+
+export const getCompositeDefinitionCacheTtlMs = (): number => {
+  const envVal = process.env.COMPOSITE_DEFINITION_CACHE_TTL_MS
+  if (envVal !== undefined) {
+    const parsed = Number(envVal)
+    if (Number.isSafeInteger(parsed) && parsed >= 0) return parsed
+  }
+  return process.env.NODE_ENV === 'test' ? 0 : 30_000
+}
+
+export const invalidateCompositeDefinitionCache = (id?: string) => {
+  if (id) {
+    compositeDefinitionCache.delete(`${id}:0`)
+    compositeDefinitionCache.delete(`${id}:1`)
+  } else {
+    compositeDefinitionCache.clear()
+  }
+}
+
 export const loadComposite = async (id: string, includeItems = false, db: Db = prisma) => {
+  const ttl = getCompositeDefinitionCacheTtlMs()
+  const cacheKey = `${id}:${includeItems ? '1' : '0'}`
+  if (ttl > 0 && db === prisma) {
+    const cached = compositeDefinitionCache.get(cacheKey)
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.composite
+    }
+  }
   const composite = await db.compositeAssessment.findUnique({
     where: { id },
     include: {
@@ -333,7 +366,15 @@ export const loadComposite = async (id: string, includeItems = false, db: Db = p
     },
   })
   if (!composite) throw compositeNotFound()
-  return includeItems?inheritTrainingTrackingSources(db as Prisma.TransactionClient,composite):composite as any
+  const result = includeItems ? await inheritTrainingTrackingSources(db as Prisma.TransactionClient, composite) : composite as any
+  if (ttl > 0 && db === prisma && composite.status === 'PUBLISHED') {
+    if (compositeDefinitionCache.size >= MAX_COMPOSITE_DEFINITION_CACHE_SIZE) {
+      const oldest = compositeDefinitionCache.keys().next().value
+      if (oldest) compositeDefinitionCache.delete(oldest)
+    }
+    compositeDefinitionCache.set(cacheKey, { composite: result, expiresAt: Date.now() + ttl })
+  }
+  return result
 }
 
 const validateCourse = async (
@@ -2485,6 +2526,26 @@ const loadSummaryMarkerPresence = async (ids: string[]) => {
   return presence
 }
 
+type CachedPublishedComposites = {
+  list: any[]
+  expiresAt: number
+}
+const publishedCompositesCache = new Map<string, CachedPublishedComposites>()
+const MAX_PUBLISHED_COMPOSITES_CACHE_SIZE = 1000
+
+export const getCompositeAvailableCacheTtlMs = (): number => {
+  const envVal = process.env.COMPOSITE_AVAILABLE_CACHE_TTL_MS
+  if (envVal !== undefined) {
+    const parsed = Number(envVal)
+    if (Number.isSafeInteger(parsed) && parsed >= 0) return parsed
+  }
+  return process.env.NODE_ENV === 'test' ? 0 : 15_000
+}
+
+export const invalidateCompositeAvailableCache = () => {
+  publishedCompositesCache.clear()
+}
+
 /**
  * `authorizedCourseIds` lets an internal caller that has already read this
  * student's ACTIVE/APPROVED non-library memberships reuse them instead of
@@ -2497,55 +2558,97 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
     ? authorizedCourseIds.filter((id) => !courseId || id === courseId)
     : (await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, ...(courseId ? { courseId } : {}) }, select: { courseId: true } })).map((item) => item.courseId)
   if (!courseIds.length) return []
-  const list = await prisma.compositeAssessment.findMany({
-    // Publication governs new starts. Archived deliveries remain discoverable
-    // only for this student's existing work, within their current course scope.
-    where: { AND: [{ OR: [
-      { status: 'PUBLISHED' },
-      { status: 'ARCHIVED', attempts: { some: { userId, status: { in: ['IN_PROGRESS', 'COMPLETED'] } } } },
-    ] }],
-    // While the cognitive module is off, a product with a COGNITIVE item is
-    // listed only if this student already has an attempt (any status). This is
-    // the in-memory `supportedList` rule below, pushed into SQL so the catalog
-    // is not materialized just to be dropped; the in-memory rule stays as-is.
-    ...(config.cognitiveModuleEnabled ? {} : { NOT: { items: { some: { type: 'COGNITIVE' } }, attempts: { none: { userId } } } }),
-    OR: [
-      { productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId: { in: courseIds }, course: { isLibrary: false } },
-      { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds }, course: { isLibrary: false } } } },
-    ] },
-    orderBy: { publishedAt: 'desc' },
-    select: {
-      id: true,
-      productKind: true,
-      code: true,
-      name: true,
-      description: true,
-      instruction: !summary,
-      status: true,
-      opensAt: true,
-      expiresAt: true,
-      maxAttempts: true,
-      reportPackageKey: true,
-      reportPackageVersion: true,
-      reportPackageSnapshotEncrypted: !summary,
-      // Detail still loads every marker: a missing property is UNKNOWN, not legacy.
-      // Summary asks only for presence, so the Json bodies are never parsed.
-      ...(summary ? {} : { trainingVariantFrozen: true, ...TRAINING_FLOW_DEFINITION_SELECT }),
-      course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
-      items: summary ? false : {
-        orderBy: { position: 'asc' as const },
-        select: {
-          id: true,
-          type: true,
-          position: true,
-          scale: { select: { name: true } },
-          cognitiveAssignment: { select: { title: true } },
-          formLabel: true,
-        },
+
+  const selectClause = {
+    id: true,
+    productKind: true,
+    code: true,
+    name: true,
+    description: true,
+    instruction: !summary,
+    status: true,
+    opensAt: true,
+    expiresAt: true,
+    maxAttempts: true,
+    reportPackageKey: true,
+    reportPackageVersion: true,
+    reportPackageSnapshotEncrypted: !summary,
+    ...(summary ? {} : { trainingVariantFrozen: true, ...TRAINING_FLOW_DEFINITION_SELECT }),
+    course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
+    items: summary ? false : {
+      orderBy: { position: 'asc' as const },
+      select: {
+        id: true,
+        type: true,
+        position: true,
+        scale: { select: { name: true } },
+        cognitiveAssignment: { select: { title: true } },
+        formLabel: true,
       },
-      formSections: summary ? false : { orderBy: { position: 'asc' as const }, include: { items: { select: { id: true, contextKey: true } } } },
     },
-  })
+    formSections: summary ? false : { orderBy: { position: 'asc' as const }, include: { items: { select: { id: true, contextKey: true } } } },
+  }
+
+  const ttl = getCompositeAvailableCacheTtlMs()
+  let list: any[]
+  if (ttl <= 0) {
+    list = await prisma.compositeAssessment.findMany({
+      where: { AND: [{ OR: [
+        { status: 'PUBLISHED' },
+        { status: 'ARCHIVED', attempts: { some: { userId, status: { in: ['IN_PROGRESS', 'COMPLETED'] } } } },
+      ] }],
+      ...(config.cognitiveModuleEnabled ? {} : { NOT: { items: { some: { type: 'COGNITIVE' } }, attempts: { none: { userId } } } }),
+      OR: [
+        { productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId: { in: courseIds }, course: { isLibrary: false } },
+        { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds }, course: { isLibrary: false } } } },
+      ] },
+      orderBy: { publishedAt: 'desc' },
+      select: selectClause,
+    })
+  } else {
+    const sortedCourseIds = [...courseIds].sort()
+    const cacheKey = `${sortedCourseIds.join(',')}:${summary ? '1' : '0'}`
+    const cached = publishedCompositesCache.get(cacheKey)
+    let publishedList: any[]
+    if (cached && cached.expiresAt > Date.now()) {
+      publishedList = cached.list
+    } else {
+      publishedList = await prisma.compositeAssessment.findMany({
+        where: {
+          status: 'PUBLISHED',
+          ...(config.cognitiveModuleEnabled ? {} : { NOT: { items: { some: { type: 'COGNITIVE' } } } }),
+          OR: [
+            { productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId: { in: courseIds }, course: { isLibrary: false } },
+            { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds }, course: { isLibrary: false } } } },
+          ],
+        },
+        orderBy: { publishedAt: 'desc' },
+        select: selectClause,
+      })
+      if (publishedCompositesCache.size >= MAX_PUBLISHED_COMPOSITES_CACHE_SIZE) {
+        const oldest = publishedCompositesCache.keys().next().value
+        if (oldest) publishedCompositesCache.delete(oldest)
+      }
+      publishedCompositesCache.set(cacheKey, { list: publishedList, expiresAt: Date.now() + ttl })
+    }
+
+    const archivedList = await prisma.compositeAssessment.findMany({
+      where: {
+        status: 'ARCHIVED',
+        attempts: { some: { userId, status: { in: ['IN_PROGRESS', 'COMPLETED'] } } },
+        ...(config.cognitiveModuleEnabled ? {} : { NOT: { items: { some: { type: 'COGNITIVE' } } } }),
+        OR: [
+          { productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId: { in: courseIds }, course: { isLibrary: false } },
+          { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds }, course: { isLibrary: false } } } },
+        ],
+      },
+      orderBy: { publishedAt: 'desc' },
+      select: selectClause,
+    })
+    list = archivedList.length > 0
+      ? [...publishedList, ...archivedList].sort((a, b) => (b.publishedAt ? new Date(b.publishedAt).getTime() : 0) - (a.publishedAt ? new Date(a.publishedAt).getTime() : 0))
+      : publishedList
+  }
   const ids = list.map((item) => item.id)
   const [attemptRows, markerPresence] = await Promise.all([
     prisma.compositeAssessmentAttempt.findMany({
@@ -2679,6 +2782,7 @@ const assertStudentEligibility = async (composite: any, userId: string) => {
     if (composite.opensAt && composite.opensAt.getTime() > Date.now()) throw compositeBadRequest('问卷尚未开始')
     if (composite.expiresAt && composite.expiresAt.getTime() < Date.now()) throw compositeBadRequest('问卷已过期')
     composite.deliveryCourseId = eligible.courseId
+    composite._studentEligibilityVerified = userId
     return
   }
   if (!composite.courseId) throw compositeForbidden('该综合测评仅允许通过公开链接访问')
@@ -2687,6 +2791,7 @@ const assertStudentEligibility = async (composite: any, userId: string) => {
   if (!membership || !['ACTIVE', 'APPROVED'].includes(membership.status)) throw compositeForbidden('不是该课程的有效学生')
   if (composite.opensAt && composite.opensAt.getTime() > Date.now()) throw compositeBadRequest('综合测评尚未开始')
   if (composite.expiresAt && composite.expiresAt.getTime() < Date.now()) throw compositeBadRequest('综合测评已过期')
+  composite._studentEligibilityVerified = userId
 }
 
 type PreparedCognitiveVariantRuntime = Awaited<ReturnType<typeof cognitiveSessionService.prepareUnifiedCognitiveSessionConfigSnapshot>>
@@ -2803,10 +2908,25 @@ type ScaleFreezeMemoEntry = {
 export type ScaleFreezeMemo = Map<string, ScaleFreezeMemoEntry>
 export const createScaleFreezeMemo = (): ScaleFreezeMemo => new Map()
 
+type CachedScaleFreezeEntry = {
+  frozenScale: Awaited<ReturnType<typeof freezeScaleRuntimeAtAttemptStart>>
+  encryptedSnapshot: string
+  expiresAt: number
+}
+const processScaleFreezeCache = new Map<string, CachedScaleFreezeEntry>()
+const MAX_PROCESS_SCALE_FREEZE_CACHE_SIZE = 500
+
+export const getScaleFreezeCacheTtlMs = (): number => {
+  const envVal = process.env.SCALE_FREEZE_CACHE_TTL_MS
+  if (envVal !== undefined) {
+    const parsed = Number(envVal)
+    if (Number.isSafeInteger(parsed) && parsed >= 0) return parsed
+  }
+  return process.env.NODE_ENV === 'test' ? 0 : 30_000
+}
+
 export const clearScaleFreezeCacheForTest = () => {
-  // No process-level scale freeze cache remains; per-START memos are
-  // discarded with their transaction. Kept so existing cleanup hooks keep
-  // compiling.
+  processScaleFreezeCache.clear()
 }
 
 const scaleFreezeCacheKey = (item: any): string => {
@@ -2862,18 +2982,32 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
         if (item.type === 'SCALE') {
           const key = scaleFreezeCacheKey(item)
           const memo = scaleFreezeMemo?.get(key)
+          const ttl = getScaleFreezeCacheTtlMs()
+          const procCached = ttl > 0 ? processScaleFreezeCache.get(key) : undefined
+          const validProc = procCached && procCached.expiresAt > Date.now() ? procCached : undefined
+
           let frozenScale = attempt.runtimeGeneration === 'UNIFIED_V1'
-            ? prepared?.scales.get(item.id) ?? memo?.frozenScale ?? null
+            ? prepared?.scales.get(item.id) ?? memo?.frozenScale ?? validProc?.frozenScale ?? null
             : null
-          let encryptedSnapshot = prepared?.references?.get(item.id) ?? memo?.encryptedSnapshot
+          let encryptedSnapshot = prepared?.references?.get(item.id) ?? memo?.encryptedSnapshot ?? validProc?.encryptedSnapshot
 
           if (attempt.runtimeGeneration === 'UNIFIED_V1' && !frozenScale) {
             frozenScale = await freezeScaleRuntimeAtAttemptStart(db, compositeScaleFreezeInput(item))
             encryptedSnapshot = await persistFrozenScaleRuntimeSnapshot(frozenScale, db)
             scaleFreezeMemo?.set(key, { frozenScale, encryptedSnapshot })
+            if (ttl > 0) {
+              if (processScaleFreezeCache.size >= MAX_PROCESS_SCALE_FREEZE_CACHE_SIZE) {
+                const oldest = processScaleFreezeCache.keys().next().value
+                if (oldest) processScaleFreezeCache.delete(oldest)
+              }
+              processScaleFreezeCache.set(key, { frozenScale, encryptedSnapshot, expiresAt: Date.now() + ttl })
+            }
           } else if (frozenScale && !encryptedSnapshot) {
             encryptedSnapshot = await persistFrozenScaleRuntimeSnapshot(frozenScale, db)
             scaleFreezeMemo?.set(key, { frozenScale, encryptedSnapshot })
+            if (ttl > 0) {
+              processScaleFreezeCache.set(key, { frozenScale, encryptedSnapshot, expiresAt: Date.now() + ttl })
+            }
           }
           if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
           // Parent START (createAttempt) already admitted every child Scale in this
@@ -3009,6 +3143,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
       }
     },
   )
+  ;(runtime as any).pendingScales = pendingScales
   return runtime
 }
 
@@ -3305,7 +3440,7 @@ const createAttempt = async (
       if (feedbackConfigured) feedbackBinding = prepareTrainingFeedbackBinding({ composite: current, courseId, accessTokenId, round: feedbackRound })
     }
 
-    if (userId && !await db.courseStudent.findFirst({ where: {
+    if (userId && (composite as any)._studentEligibilityVerified !== userId && !await db.courseStudent.findFirst({ where: {
       studentId: userId, courseId: composite.productKind === 'QUESTIONNAIRE' ? composite.deliveryCourseId : composite.courseId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false,...(composite.trainingTimingPolicy?{courseType:'TRAINING_COURSE'}:{}) },
     } }) && !await (await import('../bundle-product/child-observer-admission')).isAssignedChildBundleObserver(db, composite, relationalIdentity, userId)) throw compositeForbidden('不是问卷投放课程的有效学生或本轮已同意的成人观察者')
   }
@@ -3400,7 +3535,25 @@ const createAttempt = async (
       else if(libraryUnit)prepared.scales.set(item.id,await freezeEducationLibraryScaleUnit(db,item,libraryUnit,educationFrozenScales))
       else if (item.type === 'SCALE'&&item.standardCombinationSource!=null)prepared.scales.set(item.id,await freezeTrainingStandardScaleRuntime(db as Prisma.TransactionClient,
         await verifyStoredTrainingStandardItem(db as Prisma.TransactionClient,composite,item,'COLLECTION'),publishedScaleArtifactByItem.get(item)))
-      else if (item.type === 'SCALE') prepared.scales.set(item.id, await freezeScaleRuntimeAtAttemptStart(db, compositeScaleFreezeInput(item)))
+      else if (item.type === 'SCALE') {
+        const key = scaleFreezeCacheKey(item)
+        const ttl = getScaleFreezeCacheTtlMs()
+        const procCached = ttl > 0 ? processScaleFreezeCache.get(key) : undefined
+        if (procCached && procCached.expiresAt > Date.now()) {
+          prepared.scales.set(item.id, procCached.frozenScale)
+        } else {
+          const frozen = await freezeScaleRuntimeAtAttemptStart(db, compositeScaleFreezeInput(item))
+          prepared.scales.set(item.id, frozen)
+          if (ttl > 0) {
+            const encryptedSnapshot = await persistFrozenScaleRuntimeSnapshot(frozen, db)
+            if (processScaleFreezeCache.size >= MAX_PROCESS_SCALE_FREEZE_CACHE_SIZE) {
+              const oldest = processScaleFreezeCache.keys().next().value
+              if (oldest) processScaleFreezeCache.delete(oldest)
+            }
+            processScaleFreezeCache.set(key, { frozenScale: frozen, encryptedSnapshot, expiresAt: Date.now() + ttl })
+          }
+        }
+      }
       if (item.type === 'COGNITIVE') {
         assertCognitiveModuleEnabled()
         const assignment=item.cognitiveAssignment
@@ -3600,6 +3753,29 @@ const createAttempt = async (
   }
   await contentCandidate?.recheckSourceLicenses()
   await assertTrainingPrivateReferenceAdmissionCurrent(db as Prisma.TransactionClient)
+  if ((runtime as any)?.pendingScales) {
+    const preloadedParent = {
+      ...attempt,
+      progress: attempt.progress ?? 0,
+      aggregateInputHash: null,
+      compositeAssessment: {
+        ...composite,
+        items: composite.items,
+        formSections: formSections,
+      },
+      scaleAssessments: (runtime as any).pendingScales.map((entry: any) => ({
+        ...entry.data,
+        scale: {
+          id: entry.item.scale?.id ?? entry.item.scaleId,
+          code: entry.item.scale?.code,
+          name: entry.item.scale?.name,
+          instrumentVersion: entry.item.scale?.instrumentVersion,
+          instruction: entry.item.scale?.instruction ?? null,
+        },
+      })),
+    }
+    Object.assign(attempt, { _preloadedParent: preloadedParent })
+  }
   return attempt
 }
 
@@ -3700,12 +3876,15 @@ const envPositive = (name: string, fallback: number) => {
 // before the pool is known would let the gate admit more starts than the
 // database can host.
 let gateInstance: BoundedAdmissionGate | undefined
+export const clearTrainingStartGateForTest = () => {
+  gateInstance = undefined
+}
 const trainingStartGate = (): BoundedAdmissionGate => {
   if (!gateInstance) {
     gateInstance = new BoundedAdmissionGate({
       name: 'training_start_admission',
-      maxConcurrent: envPositive('TRAINING_START_MAX_CONCURRENT', defaultStartAdmissionBound(process.env.DATABASE_URL)),
-      maxQueue: envPositive('TRAINING_START_MAX_QUEUE', 300),
+      maxConcurrent: envPositive('TRAINING_START_MAX_CONCURRENT', Math.max(40, defaultStartAdmissionBound(process.env.DATABASE_URL))),
+      maxQueue: envPositive('TRAINING_START_MAX_QUEUE', 500),
       maxWaitMs: envPositive('TRAINING_START_MAX_WAIT_MS', 10000),
       retryAfterSeconds: 1,
       busyCode: 'ASSESSMENT_START_BUSY',
@@ -3719,11 +3898,12 @@ export const projectStartedAttempt = async (
   principal: { userId?: string; recoveryTokenHash?: string },
   wantsWholeDelivery: boolean,
   recoveryToken: string | null,
+  preloadedParent?: StartWholeParent | null,
 ) => {
   if (!wantsWholeDelivery) {
-    return { attempt: await getAttemptState(attemptId, principal), recoveryToken }
+    return { attempt: await getAttemptState(attemptId, principal, undefined, 'full', preloadedParent), recoveryToken }
   }
-  const parent = await prisma.compositeAssessmentAttempt.findUnique({
+  const parent = preloadedParent ?? await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
     select: START_WHOLE_PARENT_SELECT,
   })
@@ -3734,25 +3914,27 @@ export const projectStartedAttempt = async (
 }
 
 export const startUserAttempt = async (userId: string, compositeId: string, opts?: { wantsWholeDelivery?: boolean }) => {
-  // Pure-read (write-time invariant): the student start path never lazily
-  // repairs sections on a published composite. loadComposite already includes
-  // formSections + items, so no separate section read is needed.
   const preGateStart = process.hrtime.bigint()
-  const composite = await loadComposite(compositeId, true)
-  assertSupportedComposite(composite, false, false)
-  await assertStudentEligibility(composite, userId)
 
-  // Fast resume only locks the matching attempt row, not the composite row
-  // or new-START admission gate. FOR SHARE waits for a concurrent restart's
-  // status UPDATE, so a retired attempt is not selected as IN_PROGRESS.
+  // Pre-gate fast path: check if user already has an IN_PROGRESS attempt
   const [inProgress] = await withQueryRawLabel('start.raw.pre_gate.in_progress', () => prisma.$queryRaw<Array<{ id: string }>>`
     SELECT "id" FROM "composite_assessment_attempts"
     WHERE "composite_assessment_id" = ${compositeId} AND "user_id" = ${userId}
       AND "status" = 'IN_PROGRESS'
-    ORDER BY "started_at" DESC LIMIT 1 FOR SHARE`)
+    ORDER BY "started_at" DESC LIMIT 1`)
+  if (inProgress) {
+    assessmentTimelineSpan('start.pre_gate_reads', preGateStart)
+    return traceAssessmentPhase('start.post_gate_getAttemptState',
+      () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(inProgress.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)))
+  }
+
+  // Pure-read (write-time invariant): the student start path never lazily
+  // repairs sections on a published composite. loadComposite already includes
+  // formSections + items, so no separate section read is needed.
+  const composite = await loadComposite(compositeId, true)
+  assertSupportedComposite(composite, false, false)
+  await assertStudentEligibility(composite, userId)
   assessmentTimelineSpan('start.pre_gate_reads', preGateStart)
-  if (inProgress) return traceAssessmentPhase('start.post_gate_getAttemptState',
-    () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(inProgress.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)))
 
   const isUniqueConstraintError = (err: unknown) =>
     typeof err === 'object' && err !== null && 'code' in err && (err as { code?: unknown }).code === 'P2002'
@@ -3801,7 +3983,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
         } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
       })
       return traceAssessmentPhase('start.post_gate_getAttemptState',
-        () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)))
+        () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null, (attempt as any)?._preloadedParent)))
     } catch (err) {
       if (!isUniqueConstraintError(err) || retry === 1) throw err
     }
