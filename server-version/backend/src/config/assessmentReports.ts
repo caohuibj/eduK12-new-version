@@ -16,7 +16,7 @@ export const assessmentReportConfig = (env: NodeJS.ProcessEnv = process.env) => 
     wholeSubmitEnabled: whole === 'true',
     courseIds: new Set((env.ASSESSMENT_REPORT_ASYNC_COURSE_IDS ?? '').split(',').map(value => value.trim()).filter(Boolean)),
     maxPending: integer('ASSESSMENT_REPORT_MAX_PENDING', 200),
-    workerConcurrency: integer('ASSESSMENT_REPORT_WORKER_CONCURRENCY', 1),
+    workerConcurrency: integer('ASSESSMENT_REPORT_WORKER_CONCURRENCY', 12),
     pollMs: integer('ASSESSMENT_REPORT_POLL_MS', 500),
     leaseMs: integer('ASSESSMENT_REPORT_LEASE_MS', 30_000),
     maxAttempts: integer('ASSESSMENT_REPORT_MAX_ATTEMPTS', 8),
