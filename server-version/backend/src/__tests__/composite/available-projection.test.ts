@@ -16,6 +16,7 @@ vi.mock('../../modules/composite/report-package-label', async importOriginal => 
   return { ...actual, getFrozenPackageSlotLabels: vi.fn(actual.getFrozenPackageSlotLabels) }
 })
 import { listAvailableForStudent } from '../../modules/composite/composite.service'
+import { resetStartReadCachesForTests } from '../../modules/composite/start-read-cache'
 import { config } from '../../config'
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { getFrozenPackageSlotLabels } from '../../modules/composite/report-package-label'
@@ -32,6 +33,7 @@ const frozen = encryptCognitivePayload({ snapshotVersion: 1, packageKey: 'synthe
   packageDefinition: { slots: [{ position: 0, label: '冻结认知名称' }, { position: 2, label: '冻结量表名称' }] },
   analysisProtocolSnapshot: { synthetic: true } })
 const fixture = (override: Record<string, unknown> = {}) => ({
+  courseId: 'course', questionnaireCourses: [{courseId:'course',course:{isLibrary:false}}],
   id: 'assessment', code: 'SYNTHETIC', name: '合成组合', productKind: 'ASSESSMENT_BUNDLE',
   description: null, instruction: '合成说明', status: 'PUBLISHED', maxAttempts: 3,
   opensAt: null, expiresAt: null,
@@ -58,6 +60,7 @@ const project = (row: Record<string, any>, select: Record<string, any>) => Objec
   }))
 let source: ReturnType<typeof fixture>[]
 beforeEach(() => {
+  resetStartReadCachesForTests()
   vi.clearAllMocks()
   source = [fixture()]
   db.courseStudent.findMany.mockResolvedValue([{ courseId: 'course' }])
@@ -279,4 +282,28 @@ describe('opt-in student catalog summary', () => {
       config.cognitiveModuleEnabled = true
     }
   })
+})
+
+
+describe('shared Available templates with live participant state',()=>{
+ it('coalesces 150 cold catalog reads while reading current memberships and attempts separately',async()=>{
+  const rows=await Promise.all(Array.from({length:150},(_,i)=>listAvailableForStudent('student-'+i)))
+  expect(rows.every(row=>row.length===1)).toBe(true)
+  expect(db.compositeAssessment.findMany).toHaveBeenCalledTimes(1)
+  expect(db.courseStudent.findMany).toHaveBeenCalledTimes(150)
+  expect(db.compositeAssessmentAttempt.findMany).toHaveBeenCalledTimes(150)
+ })
+ it('keeps archived Cognitive history visible only to its current member with an existing attempt',async()=>{
+  const enabled=config.cognitiveModuleEnabled
+  config.cognitiveModuleEnabled=false
+  try{
+   source=[fixture({status:'ARCHIVED'})]
+   expect(await listAvailableForStudent('student')).toEqual([])
+   db.compositeAssessmentAttempt.findMany.mockResolvedValue([{id:'historical',compositeAssessmentId:'assessment',status:'COMPLETED',cognitiveSessions:[]}])
+   expect(await listAvailableForStudent('student')).toHaveLength(1)
+   db.courseStudent.findMany.mockResolvedValue([])
+   expect(await listAvailableForStudent('student')).toEqual([])
+   expect(db.compositeAssessment.findMany).toHaveBeenCalledTimes(1)
+  }finally{config.cognitiveModuleEnabled=enabled}
+ })
 })
