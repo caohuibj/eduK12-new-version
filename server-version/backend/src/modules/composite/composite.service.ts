@@ -2544,12 +2544,14 @@ const loadSummaryMarkerPresence = async (ids: string[]) => {
  */
 const loadAvailableTemplateList = async (summary: boolean): Promise<any[]> => {
   const key = summary ? 'available-template:summary' : 'available-template:detail'
-  const cached = availableTemplateCache.get(key) as any[] | undefined
+  // Emergency opt-out while retaining the existing per-student query contract.
+  const enabled = process.env.COMPOSITE_AVAILABLE_CACHE_ENABLED !== 'false'
+  const cached = enabled ? availableTemplateCache.get(key) as any[] | undefined : undefined
   if (cached) return cached
-  return availableTemplateCache.singleFlight(key, async () => {
-    // Recheck after joining another caller's cold miss; only one query per process.
-    const cachedAfterLock = availableTemplateCache.get(key) as any[] | undefined
-    if (cachedAfterLock) return cachedAfterLock
+  const fetchTemplates = async () => {
+    // A second request may have populated this key while the cold load was pending.
+    const hit = enabled ? availableTemplateCache.get(key) as any[] | undefined : undefined
+    if (hit) return hit
     const list = await prisma.compositeAssessment.findMany({
     where: { status: { in: ['PUBLISHED', 'ARCHIVED'] } },
     orderBy: { publishedAt: 'desc' },
@@ -2591,9 +2593,10 @@ const loadAvailableTemplateList = async (summary: boolean): Promise<any[]> => {
       formSections: summary ? false : { orderBy: { position: 'asc' as const }, include: { items: { select: { id: true, contextKey: true } } } },
     },
   })
-    availableTemplateCache.set(key, list)
+    if (enabled) availableTemplateCache.set(key, list)
     return list
-  })
+  }
+  return enabled ? availableTemplateCache.singleFlight(key, fetchTemplates) : fetchTemplates()
 }
 
 /** In-memory replica of the old findMany course OR-branch. A composite is
