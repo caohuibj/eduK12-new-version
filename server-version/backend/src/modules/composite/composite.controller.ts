@@ -423,7 +423,7 @@ export const compositeController = {
       const data = await service.startUserAttempt(req.user.userId, req.params.id, { wantsWholeDelivery: wantsWhole })
       const payload = await startResponseWithInlineWholeDefinition(wantsWhole, data, { userId: req.user.userId })
       return success(res, payload, '综合测评已开始')
-    } catch (err) { return handleError(res, err) }
+    } catch (err) { return handleStartError(res, err) }
   },
 
   async restartAttempt(req: Request, res: Response) {
@@ -431,7 +431,7 @@ export const compositeController = {
       if (!req.user) return unauthorized(res)
       const data = await service.restartUserAttempt(req.user.userId, req.params.attemptId)
       return success(res, data, '综合测评已重启')
-    } catch (err) { return handleError(res, err) }
+    } catch (err) { return handleStartError(res, err) }
   },
 
   async getAttempt(req: Request, res: Response) {
@@ -741,14 +741,14 @@ export const compositeController = {
       const payload = await startResponseWithInlineWholeDefinition(req.query.delivery === 'whole', data,
         principalToken ? { recoveryTokenHash: hashRecoveryToken(principalToken) } : {})
       return success(res, payload, data.recoveryToken ? '匿名综合测评已开始，请保存恢复凭证' : '已恢复综合测评')
-    } catch (err) { return handleError(res, err) }
+    } catch (err) { return handleStartError(res, err) }
   },
 
   async publicRestart(req: Request, res: Response) {
     try {
       const data = await service.restartPublicAttempt(req.params.attemptId, hashRecoveryToken(recoveryFromRequest(req)))
       return success(res, data, '匿名综合测评已重启')
-    } catch (err) { return handleError(res, err) }
+    } catch (err) { return handleStartError(res, err) }
   },
 
   async publicAttempt(req: Request, res: Response) {
@@ -927,6 +927,14 @@ export const compositeController = {
 const recoveryFromBody = (req: Request): string => {
   const parsed = publicRecoverySchema.parse({ recoveryToken: req.body?.recoveryToken })
   return parsed.recoveryToken
+}
+
+const handleStartError = (res: Response, err: unknown): Response => {
+  if (isInstrumentFinalSubmitError(err) && err.code === 'INSTRUMENT_NOT_AVAILABLE' && err.statusCode === 503) {
+    res.setHeader('Retry-After', '30')
+    return instrumentError(res, err.code, err.message, err.statusCode)
+  }
+  return handleError(res, err)
 }
 
 const handleError = (res: Response, err: unknown): Response => {
