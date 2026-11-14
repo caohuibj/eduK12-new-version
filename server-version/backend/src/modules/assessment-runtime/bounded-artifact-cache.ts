@@ -81,6 +81,10 @@ export class BoundedArtifactCache<T> {
     }
     this.values.set(key, { value, charge }); this.bytes += charge
   }
+  clear(): void {
+    this.values.clear()
+    this.bytes = 0
+  }
   stats() { return { entries: this.values.size, bytes: this.bytes, maxEntries: this.maxEntries,
     maxBytes: this.maxBytes, hits: this.hits, misses: this.misses } }
 }

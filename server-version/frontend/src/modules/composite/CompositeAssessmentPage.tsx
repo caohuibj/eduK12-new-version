@@ -15,7 +15,13 @@ import {
   LockKeyhole,
 } from 'lucide-react'
 import { compositeApi, publicCompositeApi } from './api'
-import { takeStoredWholeDefinition, wholeDefinitionWithInlineFallback, type InlineWholeDefinitionIdentity } from './whole-definition-source'
+import {
+  assembleInlineWholePayload,
+  cacheWholeQuestionnaireTemplate,
+  takeStoredWholeDefinition,
+  wholeDefinitionWithInlineFallback,
+  type InlineWholeDefinitionIdentity,
+} from './whole-definition-source'
 import { shouldUseWholeRunner } from './whole-runner-entry'
 import type {
   CompositeAttemptState,
@@ -122,6 +128,7 @@ const CompositeAssessmentContent: React.FC = () => {
       ...base,
       wholeDefinition: (requestedAttemptId: string) => {
         const fromStorage = takeStoredWholeDefinition(requestedAttemptId, window.sessionStorage)
+        if (fromStorage) cacheWholeQuestionnaireTemplate(fromStorage)
         const inline = inlineWholeDefinitionRef.current?.definition ?? fromStorage
         inlineWholeDefinitionRef.current = null
         const authoritative = activeAttemptIdentityRef.current
@@ -246,7 +253,7 @@ const CompositeAssessmentContent: React.FC = () => {
         if (!isCurrent()) return
         if (response.code !== 0 || !response.data)
           throw new Error(response.message || '无法开始匿名综合测评')
-        const inlineWhole = response.data.wholeDefinition ?? null
+        const inlineWhole = assembleInlineWholePayload(response.data)
         inlineWholeDefinitionRef.current = inlineWhole ? {
           definition: inlineWhole,
           identity: { attemptId: response.data.attempt.id,
@@ -289,7 +296,7 @@ const CompositeAssessmentContent: React.FC = () => {
         if (!isCurrent()) return
         if (response.code !== 0 || !response.data)
           throw new Error(response.message || '无法开始综合测评')
-        const inlineWhole = response.data.wholeDefinition ?? null
+        const inlineWhole = assembleInlineWholePayload(response.data)
         inlineWholeDefinitionRef.current = inlineWhole ? {
           definition: inlineWhole,
           identity: { attemptId: response.data.attempt.id,

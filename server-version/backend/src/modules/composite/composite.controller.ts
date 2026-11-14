@@ -100,19 +100,73 @@ const sendAnalysisExport = async (
   return res.status(200).send(file.body)
 }
 
+const parseKnownTemplateHashes = (req: Request): ReadonlySet<string> | undefined => {
+  const rawHeader = req.headers['x-whole-template-hash']
+  const rawQuery = req.query.knownTemplateHash
+  const parts: string[] = []
+  for (const source of [rawHeader, rawQuery]) {
+    if (typeof source === 'string') {
+      for (const token of source.split(',')) {
+        const trimmed = token.trim().toLowerCase()
+        if (/^[a-f0-9]{64}$/.test(trimmed)) parts.push(trimmed)
+      }
+    } else if (Array.isArray(source)) {
+      for (const item of source) {
+        if (typeof item !== 'string') continue
+        for (const token of item.split(',')) {
+          const trimmed = token.trim().toLowerCase()
+          if (/^[a-f0-9]{64}$/.test(trimmed)) parts.push(trimmed)
+        }
+      }
+    }
+    if (parts.length >= 8) break
+  }
+  return parts.length > 0 ? new Set(parts.slice(0, 8)) : undefined
+}
+
+async function handleWholeDefinition(req: Request, res: Response, publicMode: boolean) {
+  try {
+    const principal = publicMode
+      ? { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }
+      : { userId: req.user!.userId }
+    const knownTemplateHashes = parseKnownTemplateHashes(req)
+    if (knownTemplateHashes) {
+      const { getWholeQuestionnaireDelivery } = await import('./whole-questionnaire.service')
+      const delivered = await getWholeQuestionnaireDelivery(req.params.attemptId, principal, { knownTemplateHashes })
+      return success(res, delivered.mode === 'binding' ? { wholeBinding: delivered.binding } : delivered.definition)
+    }
+    const { getWholeQuestionnaireDefinition } = await import('./whole-questionnaire.service')
+    return success(res, await getWholeQuestionnaireDefinition(req.params.attemptId, principal))
+  } catch (err) { return handleError(res, err) }
+}
+
+async function handleWholeTemplate(req: Request, res: Response, publicMode: boolean) {
+  try {
+    const principal = publicMode
+      ? { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }
+      : { userId: req.user!.userId }
+    const { getWholeQuestionnaireTemplate } = await import('./whole-questionnaire.service')
+    const template = await getWholeQuestionnaireTemplate(req.params.attemptId, req.params.templateHash, principal)
+    const etag = `"${template.templateHash}"`
+    res.setHeader('ETag', etag)
+    res.setHeader('Cache-Control', 'private, max-age=3600')
+    res.setHeader('Vary', publicMode ? 'X-Recovery-Token' : 'Authorization')
+    const ifNoneMatch = req.headers['if-none-match']
+    if (typeof ifNoneMatch === 'string' && ifNoneMatch.split(',').map(v => v.trim()).includes(etag)) {
+      return res.status(304).end()
+    }
+    return success(res, template)
+  } catch (err) {
+    if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
+    return handleError(res, err)
+  }
+}
+
 export const compositeController = {
-  async wholeDefinition(req: Request, res: Response) {
-    try {
-      const { getWholeQuestionnaireDefinition } = await import('./whole-questionnaire.service')
-      return success(res, await getWholeQuestionnaireDefinition(req.params.attemptId, { userId: req.user!.userId }))
-    } catch (err) { return handleError(res, err) }
-  },
-  async publicWholeDefinition(req: Request, res: Response) {
-    try {
-      const { getWholeQuestionnaireDefinition } = await import('./whole-questionnaire.service')
-      return success(res, await getWholeQuestionnaireDefinition(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }))
-    } catch (err) { return handleError(res, err) }
-  },
+  async wholeDefinition(req: Request, res: Response) { return handleWholeDefinition(req, res, false) },
+  async publicWholeDefinition(req: Request, res: Response) { return handleWholeDefinition(req, res, true) },
+  async wholeTemplate(req: Request, res: Response) { return handleWholeTemplate(req, res, false) },
+  async publicWholeTemplate(req: Request, res: Response) { return handleWholeTemplate(req, res, true) },
   async wholeReceipt(req: Request, res: Response) { return handleWholeReceipt(req, res, false) },
   async publicWholeReceipt(req: Request, res: Response) { return handleWholeReceipt(req, res, true) },
   async wholeSubmit(req: Request, res: Response) { return handleWholeSubmit(req, res, false) },
@@ -420,8 +474,9 @@ export const compositeController = {
     try {
       if (!req.user) return unauthorized(res)
       const wantsWhole = req.query.delivery === 'whole' || (req.body as { delivery?: unknown } | undefined)?.delivery === 'whole'
-      const data = await service.startUserAttempt(req.user.userId, req.params.id, { wantsWholeDelivery: wantsWhole })
-      const payload = await startResponseWithInlineWholeDefinition(wantsWhole, data, { userId: req.user.userId })
+      const knownTemplateHashes = wantsWhole ? parseKnownTemplateHashes(req) : undefined
+      const data = await service.startUserAttempt(req.user.userId, req.params.id, { wantsWholeDelivery: wantsWhole, knownTemplateHashes })
+      const payload = await startResponseWithInlineWholeDefinition(wantsWhole, data, { userId: req.user.userId }, undefined, knownTemplateHashes)
       return success(res, payload, '综合测评已开始')
     } catch (err) { return handleStartError(res, err) }
   },
@@ -733,13 +788,15 @@ export const compositeController = {
   async publicStart(req: Request, res: Response) {
     try {
       const input = z.object({ recoveryToken: z.string().min(20).max(200).optional() }).strict().parse(req.body || {})
-      const data = await service.startPublicAttempt(req.params.token, input.recoveryToken, undefined, { wantsWholeDelivery: req.query.delivery === 'whole' })
+      const wantsWhole = req.query.delivery === 'whole'
+      const knownTemplateHashes = wantsWhole ? parseKnownTemplateHashes(req) : undefined
+      const data = await service.startPublicAttempt(req.params.token, input.recoveryToken, undefined, { wantsWholeDelivery: wantsWhole, knownTemplateHashes })
       // The strict body schema stays untouched: inline delivery is requested via
       // the query channel. A fresh start must bind the definition to the newly
       // issued recovery token, a resume to the presented one.
       const principalToken = data.recoveryToken ?? input.recoveryToken
-      const payload = await startResponseWithInlineWholeDefinition(req.query.delivery === 'whole', data,
-        principalToken ? { recoveryTokenHash: hashRecoveryToken(principalToken) } : {})
+      const payload = await startResponseWithInlineWholeDefinition(wantsWhole, data,
+        principalToken ? { recoveryTokenHash: hashRecoveryToken(principalToken) } : {}, undefined, knownTemplateHashes)
       return success(res, payload, data.recoveryToken ? '匿名综合测评已开始，请保存恢复凭证' : '已恢复综合测评')
     } catch (err) { return handleStartError(res, err) }
   },

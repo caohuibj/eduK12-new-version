@@ -15,6 +15,7 @@ router.put('/attempts/:attemptId/checkpoint', trainingCheckpointHandler(true,'sa
 router.delete('/attempts/:attemptId/checkpoint', trainingCheckpointHandler(true,'clear'))
 router.get('/attempts/:attemptId', compositeController.publicAttempt)
 router.get('/attempts/:attemptId/whole/definition', compositeController.publicWholeDefinition)
+router.get('/attempts/:attemptId/whole/template/:templateHash', compositeController.publicWholeTemplate)
 router.get('/attempts/:attemptId/whole/receipt', compositeController.publicWholeReceipt)
 router.post('/attempts/:attemptId/whole/submit', compositeController.publicWholeSubmit)
 router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', compositeImageController.publicFormImage)

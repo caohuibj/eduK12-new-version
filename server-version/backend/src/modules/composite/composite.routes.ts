@@ -74,6 +74,7 @@ router.put('/attempts/:attemptId/checkpoint', authenticate, respondentAttemptAcc
 router.delete('/attempts/:attemptId/checkpoint', authenticate, respondentAttemptAccess, trainingCheckpointHandler(false,'clear'))
 router.get('/attempts/:attemptId', authenticate, respondentAttemptAccess, compositeController.getAttempt)
 router.get('/attempts/:attemptId/whole/definition', authenticate, respondentAttemptAccess, compositeController.wholeDefinition)
+router.get('/attempts/:attemptId/whole/template/:templateHash', authenticate, respondentAttemptAccess, compositeController.wholeTemplate)
 router.get('/attempts/:attemptId/whole/receipt', authenticate, respondentAttemptAccess, compositeController.wholeReceipt)
 router.post('/attempts/:attemptId/whole/submit', observeWholeMiddleware('whole.identity_auth', authenticate), authenticatedWholeSubmissionPriority, observeWholeMiddleware('whole.respondent_gate', respondentAttemptAccess), observeWholeMiddleware('whole.relational_consent', relationalWholeFinalConsentGuard), compositeController.wholeSubmit)
 router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', authenticate, respondentAttemptAccess, compositeImageController.authenticatedFormImage)

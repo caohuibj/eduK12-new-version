@@ -235,6 +235,15 @@ export const readScaleAdmissionRuntime = (
   return runtime
 }
 
+export const seedScaleAdmissionRuntime = (
+  row: Pick<ScaleAdmissionChildRow, 'runtimeSnapshotEncrypted'>,
+  runtime: VersionedFrozenScaleRuntimeSnapshot,
+): void => {
+  if (typeof row.runtimeSnapshotEncrypted === 'string' && row.runtimeSnapshotEncrypted.length > 0) {
+    runtimeByChild.set(row, { encrypted: row.runtimeSnapshotEncrypted, runtime })
+  }
+}
+
 // Request-local row memo includes no shared authorization decision. Failed
 // lookups are retryable; a changed ciphertext never reuses an earlier result.
 const pendingRuntimeByChild = new WeakMap<object, { encrypted: string; promise: Promise<VersionedFrozenScaleRuntimeSnapshot> }>()

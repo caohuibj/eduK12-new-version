@@ -1,6 +1,8 @@
 import {acceptedStudyReceipt,assertCurrentStudyPrincipal,type AcceptedStudyReceipt} from '../anonymous-study/admission-principal'
 import { applyTrainingAttemptScope, hasTrainingVariantMetadata } from './training-variant-scope'
 import {readTrainingTimingSnapshot,normalizeTrainingScaleTiming,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
+import { BoundedArtifactCache } from '../assessment-runtime/bounded-artifact-cache'
+import { publicTemplateHash } from '../assessment-runtime/public-templates'
 import { withSharedControlContext, storeSharedWholeValidation, loadSharedWholeValidation } from '../assessment-runtime/shared-control-records'
 import { compactAssessmentStorageEnabled } from '../assessment-runtime/compact-field-codec'
 import { packWholeRawEnvelope, unpackWholeRawEnvelope } from '../assessment-runtime/compact-raw'
@@ -12,7 +14,7 @@ import type { CompositeReportJob, Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { acceptsAsyncCompositeReport, assessmentReportConfig } from '../../config/assessmentReports'
 import { finalScaleSubmitSchema } from '../../services/scale-final-submit.schema'
-import { InstrumentFinalSubmitError, assertCanonicalSubmissionPayloadSize, prepareCanonicalSubmission } from '../../services/instrumentFinalSubmit'
+import { InstrumentFinalSubmitError, assertCanonicalSubmissionPayloadSize, prepareCanonicalSubmission, stableSubmissionJson } from '../../services/instrumentFinalSubmit'
 import { withWholeSubmitAdmission } from '../../services/wholeSubmitAdmission'
 import { loadFrozenActiveSlotSet, formSectionSlotKey } from '../assessment-runtime/slot-set'
 import { encryptUnifiedRuntimePayload, decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
@@ -196,156 +198,324 @@ const ensureWholeRules = async (attemptId: string, principal: Principal, manifes
 
 type StaticQuestionnaireUnitTemplate = {
   itemId: string
+  itemIdJson: string
   scaleId: string
   scaleName: string
   instrumentVersion: string
   instruction: string | null
   definitionHash: string
+  definitionHashJson: string
   presentationMode: 'ONE_BY_ONE' | 'ALL_AT_ONCE'
   runnerDefinition: ReturnType<typeof runnerDefinition>
+  staticDeliveryUnit: {
+    itemId: string
+    definitionHash: string
+    presentationMode: 'ONE_BY_ONE' | 'ALL_AT_ONCE'
+    scale: {
+      id: string
+      name: string
+      instruction: string | null
+      instrumentVersion: string
+      definition: ReturnType<typeof runnerDefinition>
+    }
+  }
   rule: { rulesHash: string } | { items: Array<{ itemCode: string; required: boolean; values: Array<string | number> }> }
   ruleItems: Array<{ itemCode: string; required: boolean; values: Array<string | number> }>
+  canonicalRuleV1KeyValue: string
+  canonicalRuleV2KeyValue: string
+}
+
+export type WholeQuestionnaireTemplateDto = {
+  templateHash: string
+  slotSetHash: string
+  formSections: Array<any>
+  units: Array<StaticQuestionnaireUnitTemplate['staticDeliveryUnit']>
+}
+
+export type WholeQuestionnaireBindingDto = {
+  attemptId: string
+  attemptEpoch: number
+  slotSetHash: string
+  contextSnapshotHash: string | null
+  templateHash: string
+  units: Array<{
+    itemId: string
+    scaleAssessmentId: string
+    definitionHash: string
+    presentationMode: 'ONE_BY_ONE' | 'ALL_AT_ONCE'
+    trainingTiming?: TrainingTimingSnapshot
+  }>
 }
 
 type StaticQuestionnaireTemplate = {
+  templateHash: string
+  slotSetHash: string
+  displayKey: string
   formSections: Array<any>
   validationFormSections?: Array<any>
   requiredFormSlots: string[]
+  canonicalRequiredFormSlotsJson: string
+  canonicalValidationFormSectionsJson: string | null
   unitTemplates: StaticQuestionnaireUnitTemplate[]
+  validationPlanByKey: Map<string, { plan: unknown; hash: string }>
+  templateDto: WholeQuestionnaireTemplateDto
 }
 
-const staticQuestionnaireTemplateCache = new Map<string, StaticQuestionnaireTemplate>()
-const MAX_STATIC_QUESTIONNAIRE_TEMPLATES = 128
+const MAX_STATIC_QUESTIONNAIRE_TEMPLATES = 64
+const MAX_STATIC_QUESTIONNAIRE_TEMPLATE_BYTES = 16 * 1024 * 1024
+const staticQuestionnaireTemplateCache = new BoundedArtifactCache<StaticQuestionnaireTemplate>(
+  MAX_STATIC_QUESTIONNAIRE_TEMPLATES,
+  MAX_STATIC_QUESTIONNAIRE_TEMPLATE_BYTES,
+)
+const staticTemplateCacheKeyByHash = new Map<string, string>()
 
 export const clearWholeQuestionnaireStaticCacheForTest = () => {
   staticQuestionnaireTemplateCache.clear()
+  staticTemplateCacheKeyByHash.clear()
 }
 
-/** Delivery only: freeze each admission once, before collecting any answers. */
-export const getWholeQuestionnaireDefinition = async (attemptId: string, principal: Principal, preloaded?: Parameters<typeof loadParent>[2]) => withSharedControlContext(async () => {
-  if (!assessmentReportConfig().wholeSubmitEnabled) throw failure('整份交卷入口暂未开启')
-  const { parent, children, frozen } = await loadParent(attemptId, principal, preloaded)
-  if (parent.status !== 'IN_PROGRESS') throw failure('问卷已结束')
+const serializeWholeManifestUnit = (
+  tmpl: StaticQuestionnaireUnitTemplate,
+  assessmentId: string,
+  admissionHash: string,
+  deadlineMs: number | null,
+  schemaVersion: 1 | 2,
+  trainingTiming?: TrainingTimingSnapshot,
+): string => {
+  if (deadlineMs !== null && !Number.isFinite(deadlineMs)) {
+    throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '提交数据包含无效数字', 400)
+  }
+  const parts: string[] = [
+    `"admissionHash":${JSON.stringify(admissionHash)}`,
+    `"assessmentId":${JSON.stringify(assessmentId)}`,
+    `"deadlineMs":${deadlineMs === null ? 'null' : JSON.stringify(deadlineMs)}`,
+    `"definitionHash":${tmpl.definitionHashJson}`,
+    `"itemId":${tmpl.itemIdJson}`,
+    schemaVersion === 2 ? tmpl.canonicalRuleV2KeyValue : tmpl.canonicalRuleV1KeyValue,
+  ]
+  if (trainingTiming !== undefined) {
+    parts.push(`"trainingTiming":${stableSubmissionJson(trainingTiming)}`)
+  }
+  return `{${parts.join(',')}}`
+}
 
+export const computeWholeValidationHashFromTemplate = (
+  binding: WholeValidationManifest['binding'],
+  schemaVersion: 1 | 2,
+  template: Pick<StaticQuestionnaireTemplate, 'canonicalRequiredFormSlotsJson' | 'canonicalValidationFormSectionsJson'>,
+  units: Array<{
+    tmpl: StaticQuestionnaireUnitTemplate
+    assessmentId: string
+    admissionHash: string
+    deadlineMs: number | null
+    trainingTiming?: TrainingTimingSnapshot
+  }>,
+): string => {
+  const hash = createHash('sha256')
+  hash.update(`{"binding":${stableSubmissionJson(binding)}`)
+  if (template.canonicalValidationFormSectionsJson !== null) {
+    hash.update(`,"formSections":${template.canonicalValidationFormSectionsJson}`)
+  }
+  hash.update(`,"requiredFormSlots":${template.canonicalRequiredFormSlotsJson}`)
+  hash.update(`,"schemaVersion":${schemaVersion},"units":[`)
+  for (let i = 0; i < units.length; i++) {
+    if (i > 0) hash.update(',')
+    const u = units[i]
+    hash.update(serializeWholeManifestUnit(u.tmpl, u.assessmentId, u.admissionHash, u.deadlineMs, schemaVersion, u.trainingTiming))
+  }
+  hash.update(']}')
+  return hash.digest('hex')
+}
+
+const buildScaleDisplayKey = (
+  scaleAssessments: Array<{ compositeItemId: string | null; scale: { id: string; name: string | null; instruction: string | null } }>,
+): string =>
+  scaleAssessments
+    .map(row => [row.compositeItemId, row.scale.id, row.scale.name ?? '', row.scale.instruction ?? ''].join('\u0000'))
+    .sort()
+    .join('\u0001')
+
+const getOrBuildStaticTemplate = (
+  parent: Awaited<ReturnType<typeof loadParent>>['parent'],
+  children: Awaited<ReturnType<typeof loadParent>>['children'],
+  frozen: Awaited<ReturnType<typeof loadParent>>['frozen'],
+): StaticQuestionnaireTemplate => {
   // The SlotSet hash binds the frozen runtime, but the template also carries
   // scaleName / scale.instruction from the live scale row, which the SlotSet
   // hash does not cover. Include them in the key so an in-place scale rename
   // or instruction edit invalidates the cached display template instead of
   // serving the previous wording.
-  const displayKey = children
-    .map(({ child }: any) => [child.compositeItemId, child.scale.id, child.scale.name ?? '', child.scale.instruction ?? ''].join('\u0000'))
-    .sort()
-    .join('\u0001')
+  const displayKey = buildScaleDisplayKey(children.map(({ child }: any) => child))
   const templateCacheKey = `${parent.frozenActiveSlotSetHash!}\u0002${displayKey}`
   let template = staticQuestionnaireTemplateCache.get(templateCacheKey)
-  if (!template) {
-    const rawSections = [...(parent.compositeAssessment.formSections || [])]
-    rawSections.sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
-    // Server-side boundary for the context exclusion (X-04A review): the DTO's
-    // executionMode=STEPPED alone cannot constrain direct API callers, so whole
-    // delivery refuses context-bearing composites exactly like the eligibility
-    // contract does. Their frozen context hash feeds downstream admission and
-    // dynamic item projection and must commit through the stepped flow.
-    if (rawSections.some((sec: any) => compositeSectionHasContext(sec))) {
-      throw failure('含人口学上下文区段的问卷暂不支持整份交卷')
+  if (template) return template
+
+  const rawSections = [...(parent.compositeAssessment.formSections || [])]
+  rawSections.sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
+  // Server-side boundary for the context exclusion (X-04A review): the DTO's
+  // executionMode=STEPPED alone cannot constrain direct API callers, so whole
+  // delivery refuses context-bearing composites exactly like the eligibility
+  // contract does. Their frozen context hash feeds downstream admission and
+  // dynamic item projection and must commit through the stepped flow.
+  if (rawSections.some((sec: any) => compositeSectionHasContext(sec))) {
+    throw failure('含人口学上下文区段的问卷暂不支持整份交卷')
+  }
+  const formSections = rawSections.map((sec: any) => {
+    const runtimeDef = compositeFormSectionRuntimeDefinition(sec)
+    const definitionHash = formSectionIdentityHash(runtimeDef)
+    const items = [...(sec.items || [])]
+      .sort((left: any, right: any) => (left.formSectionPosition ?? left.position) - (right.formSectionPosition ?? right.position))
+      .map((item: any) => ({
+        id: item.id,
+        formType: item.formType,
+        formLabel: item.formLabel,
+        formPlaceholder: item.formPlaceholder ?? null,
+        required: item.required !== false,
+        formOptions: item.formOptions ?? null,
+        ...(item.formDefinition != null ? { formDefinition: publicTrainingFormDefinition(item.formDefinition) } : {}),
+        ...(item.formPolicy != null ? { formPolicy: item.formPolicy } : {}),
+        contextKey: item.contextKey ?? null,
+        position: item.position,
+        formSectionPosition: item.formSectionPosition ?? null,
+      }))
+    return {
+      id: sec.id,
+      title: sec.title,
+      description: sec.description ?? null,
+      position: sec.position,
+      contextSection: compositeSectionHasContext(sec),
+      definitionHash,
+      items,
     }
-    const formSections = rawSections.map((sec: any) => {
-      const runtimeDef = compositeFormSectionRuntimeDefinition(sec)
-      const definitionHash = formSectionIdentityHash(runtimeDef)
-      const items = [...(sec.items || [])]
-        .sort((left: any, right: any) => (left.formSectionPosition ?? left.position) - (right.formSectionPosition ?? right.position))
-        .map((item: any) => ({
-          id: item.id,
-          formType: item.formType,
-          formLabel: item.formLabel,
-          formPlaceholder: item.formPlaceholder ?? null,
-          required: item.required !== false,
-          formOptions: item.formOptions ?? null,
-          ...(item.formDefinition != null ? { formDefinition: publicTrainingFormDefinition(item.formDefinition) } : {}),
-          ...(item.formPolicy != null ? { formPolicy: item.formPolicy } : {}),
-          contextKey: item.contextKey ?? null,
-          position: item.position,
-          formSectionPosition: item.formSectionPosition ?? null,
-        }))
-      return {
-        id: sec.id,
-        title: sec.title,
-        description: sec.description ?? null,
-        position: sec.position,
-        contextSection: compositeSectionHasContext(sec),
-        definitionHash,
-        items,
-      }
-    })
-    const requiredFormSlots = frozen.slots.filter(slot => slot.required && slot.unitType === 'FORM_SECTION').map(slot => slot.slotKey)
-    const unitTemplates: StaticQuestionnaireUnitTemplate[] = []
-    for (const { child, runtime } of children) {
-      const sets = new Map(runtime.definition.responseSets.map(set => [set.key, set.options.map(option => option.value)]))
-      const ruleItems = runtime.definition.items.map(item => ({ itemCode: item.itemCode, required: Boolean(item.required), values: sets.get(item.responseSetKey)! }))
-      const compiled = compileWholeRules(runtime.legacyDefinitionHash, ruleItems)
-      const rule = compiled && wholeRules.has(compiled.hash) ? { rulesHash: compiled.hash } : { items: ruleItems }
-      unitTemplates.push({
+  })
+  const requiredFormSlots = frozen.slots.filter(slot => slot.required && slot.unitType === 'FORM_SECTION').map(slot => slot.slotKey)
+  const unitTemplates: StaticQuestionnaireUnitTemplate[] = []
+  for (const { child, runtime } of children) {
+    const sets = new Map(runtime.definition.responseSets.map(set => [set.key, set.options.map(option => option.value)]))
+    const ruleItems = runtime.definition.items.map(item => ({ itemCode: item.itemCode, required: Boolean(item.required), values: sets.get(item.responseSetKey)! }))
+    const compiled = compileWholeRules(runtime.legacyDefinitionHash, ruleItems)
+    const rule = compiled && wholeRules.has(compiled.hash) ? { rulesHash: compiled.hash } : { items: ruleItems }
+    const presentationMode = runtime.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE'
+    const instruction = runtime.instruction !== undefined ? runtime.instruction?.text ?? null : child.scale.instruction
+    const builtRunnerDef = runnerDefinition(runtime.definition)
+    const canonicalRuleV1KeyValue = `"items":${stableSubmissionJson(ruleItems)}`
+    const canonicalRuleV2KeyValue = 'rulesHash' in rule
+      ? `"rulesHash":${JSON.stringify(rule.rulesHash)}`
+      : canonicalRuleV1KeyValue
+    unitTemplates.push({
+      itemId: child.compositeItemId!,
+      itemIdJson: JSON.stringify(child.compositeItemId!),
+      scaleId: child.scale.id,
+      scaleName: child.scale.name,
+      instrumentVersion: child.scale.instrumentVersion,
+      instruction,
+      definitionHash: runtime.legacyDefinitionHash,
+      definitionHashJson: JSON.stringify(runtime.legacyDefinitionHash),
+      presentationMode,
+      runnerDefinition: builtRunnerDef,
+      staticDeliveryUnit: {
         itemId: child.compositeItemId!,
-        scaleId: child.scale.id,
-        scaleName: child.scale.name,
-        instrumentVersion: child.scale.instrumentVersion,
-        instruction: runtime.instruction !== undefined ? runtime.instruction?.text ?? null : child.scale.instruction,
         definitionHash: runtime.legacyDefinitionHash,
-        presentationMode: runtime.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE',
-        runnerDefinition: runnerDefinition(runtime.definition),
-        rule,
-        ruleItems,
-      })
-    }
-    const positions = new Map(parent.compositeAssessment.items.map(item => [item.id, item.position]))
-    unitTemplates.sort((left, right) => (positions.get(left.itemId) ?? 0) - (positions.get(right.itemId) ?? 0))
-    template = {
+        presentationMode,
+        scale: {
+          id: child.scale.id,
+          name: child.scale.name,
+          instruction,
+          instrumentVersion: child.scale.instrumentVersion,
+          definition: builtRunnerDef,
+        },
+      },
+      rule,
+      ruleItems,
+      canonicalRuleV1KeyValue,
+      canonicalRuleV2KeyValue,
+    })
+  }
+  const positions = new Map(parent.compositeAssessment.items.map(item => [item.id, item.position]))
+  unitTemplates.sort((left, right) => (positions.get(left.itemId) ?? 0) - (positions.get(right.itemId) ?? 0))
+  const validationFormSections = formSections.length > 0 ? formSections.map(sec => ({
+    sectionId: sec.id,
+    definitionHash: sec.definitionHash,
+    items: sec.items.map(item => ({
+      id: item.id,
+      required: item.required !== false,
+      formType: item.formType,
+    })),
+  })) : undefined
+  const templateCore = {
+    slotSetHash: parent.frozenActiveSlotSetHash!,
+    formSections,
+    units: unitTemplates.map(tmpl => tmpl.staticDeliveryUnit),
+  }
+  const serializedCore = stableSubmissionJson(templateCore)
+  const templateHash = createHash('sha256').update(serializedCore).digest('hex')
+  template = {
+    templateHash,
+    slotSetHash: parent.frozenActiveSlotSetHash!,
+    displayKey,
+    formSections,
+    requiredFormSlots,
+    canonicalRequiredFormSlotsJson: stableSubmissionJson(requiredFormSlots),
+    canonicalValidationFormSectionsJson: validationFormSections ? stableSubmissionJson(validationFormSections) : null,
+    unitTemplates,
+    validationFormSections,
+    validationPlanByKey: new Map(),
+    templateDto: {
+      templateHash,
+      slotSetHash: parent.frozenActiveSlotSetHash!,
       formSections,
-      requiredFormSlots,
-      unitTemplates,
-      validationFormSections: formSections.length > 0 ? formSections.map(sec => ({
-        sectionId: sec.id,
-        definitionHash: sec.definitionHash,
-        items: sec.items.map(item => ({
-          id: item.id,
-          required: item.required !== false,
-          formType: item.formType,
-        })),
-      })) : undefined,
+      units: templateCore.units,
+    },
+  }
+  const charge = Buffer.byteLength(serializedCore, 'utf8') * 3 + 4096
+  staticQuestionnaireTemplateCache.set(templateCacheKey, template, charge)
+  if (staticQuestionnaireTemplateCache.get(templateCacheKey)) {
+    if (staticTemplateCacheKeyByHash.size >= MAX_STATIC_QUESTIONNAIRE_TEMPLATES * 4) {
+      const oldest = staticTemplateCacheKeyByHash.keys().next().value
+      if (oldest) staticTemplateCacheKeyByHash.delete(oldest)
     }
-    if (staticQuestionnaireTemplateCache.size >= MAX_STATIC_QUESTIONNAIRE_TEMPLATES) {
-      const oldest = staticQuestionnaireTemplateCache.keys().next().value
-      if (oldest) staticQuestionnaireTemplateCache.delete(oldest)
-    }
-    staticQuestionnaireTemplateCache.set(templateCacheKey, template)
+    staticTemplateCacheKeyByHash.set(templateHash, templateCacheKey)
+  }
+  return template
+}
+
+const deliverWholeQuestionnaire = async (
+  attemptId: string,
+  principal: Principal,
+  options?: { preloaded?: Parameters<typeof loadParent>[2]; knownTemplateHashes?: ReadonlySet<string> },
+): Promise<
+  | { mode: 'definition'; definition: WholeQuestionnaireTemplateDto & { attemptId: string; attemptEpoch: number; contextSnapshotHash: string | null; units: any[] } }
+  | { mode: 'binding'; binding: WholeQuestionnaireBindingDto }
+> => {
+  if (!assessmentReportConfig().wholeSubmitEnabled) throw failure('整份交卷入口暂未开启')
+  const { parent, children, frozen } = await loadParent(attemptId, principal, options?.preloaded)
+  if (parent.status !== 'IN_PROGRESS') throw failure('问卷已结束')
+
+  const template = getOrBuildStaticTemplate(parent, children, frozen)
+  const schemaVersion: 1 | 2 = process.env.ASSESSMENT_WHOLE_COMPACT_MANIFEST_ENABLED === 'true' ? 2 : 1
+  const binding: WholeValidationManifest['binding'] = {
+    attemptId: parent.id,
+    attemptEpoch: parent.attemptEpoch,
+    slotSetHash: parent.frozenActiveSlotSetHash!,
+    contextHash: parent.contextSnapshotHash,
+    userId: parent.userId,
+    recoveryTokenHash: parent.recoveryTokenHash,
   }
 
-  const manifest: WholeValidationManifest = {
-    schemaVersion: process.env.ASSESSMENT_WHOLE_COMPACT_MANIFEST_ENABLED === 'true' ? 2 : 1,
-    binding: {
-      attemptId: parent.id,
-      attemptEpoch: parent.attemptEpoch,
-      slotSetHash: parent.frozenActiveSlotSetHash!,
-      contextHash: parent.contextSnapshotHash,
-      userId: parent.userId,
-      recoveryTokenHash: parent.recoveryTokenHash,
-    },
-    requiredFormSlots: template.requiredFormSlots,
-    units: [],
-    ...(template.validationFormSections ? { formSections: template.validationFormSections } : {}),
-  }
-  const units: any[] = []
   const admissions = await batchEnsureScaleAdmissionsAtDelivery(parent, children)
   const childByItemId = new Map(children.map(c => [c.child.compositeItemId!, c]))
-
-  for (const tmpl of template.unitTemplates) {
+  const verifiedEntries = template.unitTemplates.map((tmpl) => {
     const entry = childByItemId.get(tmpl.itemId)
     if (!entry) throw failure('量表冻结记录不完整')
     const { child, runtime } = entry
     if (child.status !== 'IN_PROGRESS') throw failure('已分量表交卷，不能改为整份交卷')
     const admission = admissions.get(child.id)
     if (!admission) throw failure('量表准入初始化失败')
-    await assertUnifiedScaleDelivery({
+    return { tmpl, child, runtime, admission }
+  })
+
+  await Promise.all(verifiedEntries.map(({ child, runtime, admission }) =>
+    assertUnifiedScaleDelivery({
       assessmentId: child.id,
       compositeAttemptId: attemptId,
       submissionId: 'whole-delivery-validation',
@@ -354,42 +524,195 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
       contextSnapshotHash: parent.contextSnapshotHash,
       answers: [],
       ...principal,
-    }, child, admission, runtime)
-    const rule = manifest.schemaVersion === 2 ? tmpl.rule : { items: tmpl.ruleItems }
-    manifest.units.push({
-      itemId: tmpl.itemId,
-      assessmentId: child.id,
-      definitionHash: tmpl.definitionHash,
-      ...(admission.trainingTiming ? { trainingTiming: admission.trainingTiming } : {}),
-      admissionHash: admission.snapshotHash,
-      deadlineMs: admission.schemaVersion === 2 && admission.scalePolicy?.deployment?.completionDeadline
-        ? Date.parse(admission.scalePolicy.deployment.completionDeadline) : null,
-      ...rule,
-    })
-    units.push({
-      itemId: tmpl.itemId,
-      scaleAssessmentId: child.id,
-      definitionHash: tmpl.definitionHash,
-      presentationMode: tmpl.presentationMode,
-      ...(admission.trainingTiming ? { trainingTiming: admission.trainingTiming } : {}),
-      scale: {
-        id: tmpl.scaleId,
-        name: tmpl.scaleName,
-        instruction: tmpl.instruction,
-        instrumentVersion: tmpl.instrumentVersion,
-        definition: tmpl.runnerDefinition,
+    }, child, admission, runtime),
+  ))
+
+  const resolvedUnits = verifiedEntries.map(({ tmpl, child, admission }) => ({
+    tmpl,
+    child,
+    assessmentId: child.id,
+    admission,
+    admissionHash: admission.snapshotHash,
+    trainingTiming: admission.trainingTiming,
+    deadlineMs: admission.schemaVersion === 2 && admission.scalePolicy?.deployment?.completionDeadline
+      ? Date.parse(admission.scalePolicy.deployment.completionDeadline) : null,
+  }))
+
+  const allDeadlinesNull = resolvedUnits.every(u => u.deadlineMs === null)
+  const planCacheKey = allDeadlinesNull
+    ? `${schemaVersion}:null`
+    : `${schemaVersion}:${resolvedUnits.map(u => String(u.deadlineMs)).join(',')}`
+  let precomputedPlan = template.validationPlanByKey.get(planCacheKey)
+  if (!precomputedPlan) {
+    const plan: any = {
+      schemaVersion,
+      requiredFormSlots: template.requiredFormSlots,
+      units: resolvedUnits.map(u => ({
+        itemId: u.tmpl.itemId,
+        definitionHash: u.tmpl.definitionHash,
+        deadlineMs: u.deadlineMs,
+        ...(schemaVersion === 2 ? u.tmpl.rule : { items: u.tmpl.ruleItems }),
+      })),
+    }
+    if (template.validationFormSections && template.validationFormSections.length > 0) {
+      plan.formSections = template.validationFormSections
+    }
+    precomputedPlan = {
+      plan,
+      hash: publicTemplateHash('WHOLE_VALIDATION_PLAN', plan),
+    }
+    if (template.validationPlanByKey.size >= 8) {
+      const oldest = template.validationPlanByKey.keys().next().value
+      if (oldest) template.validationPlanByKey.delete(oldest)
+    }
+    template.validationPlanByKey.set(planCacheKey, precomputedPlan)
+  }
+
+  const manifest: WholeValidationManifest = {
+    schemaVersion,
+    binding,
+    requiredFormSlots: template.requiredFormSlots,
+    units: resolvedUnits.map(u => ({
+      itemId: u.tmpl.itemId,
+      assessmentId: u.assessmentId,
+      definitionHash: u.tmpl.definitionHash,
+      ...(u.trainingTiming ? { trainingTiming: u.trainingTiming } : {}),
+      admissionHash: u.admissionHash,
+      deadlineMs: u.deadlineMs,
+      ...(schemaVersion === 2 ? u.tmpl.rule : { items: u.tmpl.ruleItems }),
+    })),
+    ...(template.validationFormSections ? { formSections: template.validationFormSections } : {}),
+  }
+
+  const validationHash = computeWholeValidationHashFromTemplate(binding, schemaVersion, template, resolvedUnits)
+  await storeWholeQuestionnaireValidation(
+    parent,
+    await storeSharedWholeValidation(manifest, precomputedPlan),
+    validationHash,
+  )
+
+  if (options?.knownTemplateHashes?.has(template.templateHash)) {
+    return {
+      mode: 'binding',
+      binding: {
+        attemptId,
+        attemptEpoch: parent.attemptEpoch,
+        slotSetHash: parent.frozenActiveSlotSetHash!,
+        contextSnapshotHash: parent.contextSnapshotHash,
+        templateHash: template.templateHash,
+        units: resolvedUnits.map(({ tmpl, child, admission }) => ({
+          itemId: tmpl.itemId,
+          scaleAssessmentId: child.id,
+          definitionHash: tmpl.definitionHash,
+          presentationMode: tmpl.presentationMode,
+          ...(admission.trainingTiming ? { trainingTiming: admission.trainingTiming } : {}),
+        })),
+      },
+    }
+  }
+
+  return {
+    mode: 'definition',
+    definition: {
+      attemptId,
+      attemptEpoch: parent.attemptEpoch,
+      slotSetHash: parent.frozenActiveSlotSetHash!,
+      contextSnapshotHash: parent.contextSnapshotHash,
+      templateHash: template.templateHash,
+      units: resolvedUnits.map(({ tmpl, child, admission }) => ({
+        ...tmpl.staticDeliveryUnit,
+        scaleAssessmentId: child.id,
+        ...(admission.trainingTiming ? { trainingTiming: admission.trainingTiming } : {}),
+      })),
+      formSections: template.formSections,
+    },
+  }
+}
+
+/** Delivery only: freeze each admission once, before collecting any answers. */
+export const getWholeQuestionnaireDefinition = async (attemptId: string, principal: Principal, preloaded?: Parameters<typeof loadParent>[2]) => withSharedControlContext(async () => {
+  const result = await deliverWholeQuestionnaire(attemptId, principal, { preloaded })
+  if (result.mode !== 'definition') throw failure('问卷定义生成失败')
+  return result.definition
+})
+
+export const getWholeQuestionnaireDelivery = async (
+  attemptId: string,
+  principal: Principal,
+  options?: { preloaded?: Parameters<typeof loadParent>[2]; knownTemplateHashes?: ReadonlySet<string> },
+) => withSharedControlContext(() => deliverWholeQuestionnaire(attemptId, principal, options))
+
+export const getWholeQuestionnaireTemplate = async (
+  attemptId: string,
+  templateHash: string,
+  principal: Principal,
+): Promise<WholeQuestionnaireTemplateDto> => withSharedControlContext(async () => {
+  if (!assessmentReportConfig().wholeSubmitEnabled) throw failure('整份交卷入口暂未开启')
+  if (!/^[a-f0-9]{64}$/.test(templateHash)) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '问卷模板哈希格式无效', 400)
+  }
+
+  const cachedKey = staticTemplateCacheKeyByHash.get(templateHash)
+  const cached = cachedKey ? staticQuestionnaireTemplateCache.get(cachedKey) : undefined
+  if (cached && cached.templateHash === templateHash) {
+    const attemptRow = await prisma.compositeAssessmentAttempt.findUnique({
+      where: { id: attemptId },
+      select: {
+        id: true,
+        userId: true,
+        recoveryTokenHash: true,
+        status: true,
+        attemptEpoch: true,
+        asyncReportEpoch: true,
+        deliveryMode: true,
+        runtimeGeneration: true,
+        frozenActiveSlotSetHash: true,
+        trainingFlowSnapshotHash: true,
+        compositeAssessment: {
+          select: {
+            trainingFlowFrozen: true,
+            trainingVariantFrozen: true,
+            trainingVariantDigest: true,
+          },
+        },
+        scaleAssessments: {
+          select: {
+            compositeItemId: true,
+            scale: { select: { id: true, name: true, instruction: true } },
+          },
+        },
       },
     })
+    if (!attemptRow) throw failure('问卷作答不存在', 404)
+    const owned = principal.userId ? attemptRow.userId === principal.userId
+      : attemptRow.userId === null && Boolean(principal.recoveryTokenHash && attemptRow.recoveryTokenHash === principal.recoveryTokenHash)
+    if (
+      owned
+      && attemptRow.deliveryMode === 'FINAL_ONLY'
+      && attemptRow.runtimeGeneration === 'UNIFIED_V1'
+      && attemptRow.trainingFlowSnapshotHash == null
+      && attemptRow.compositeAssessment.trainingFlowFrozen == null
+      && attemptRow.compositeAssessment.trainingVariantFrozen == null
+      && attemptRow.compositeAssessment.trainingVariantDigest == null
+      && attemptRow.asyncReportEpoch === attemptRow.attemptEpoch
+    ) {
+      if (attemptRow.status !== 'IN_PROGRESS') throw failure('问卷已结束')
+      if (
+        attemptRow.frozenActiveSlotSetHash === cached.slotSetHash
+        && buildScaleDisplayKey(attemptRow.scaleAssessments) === cached.displayKey
+      ) {
+        return cached.templateDto
+      }
+    }
   }
-  await storeWholeQuestionnaireValidation(parent, await storeSharedWholeValidation(manifest), prepareCanonicalSubmission(manifest).hash)
-  return {
-    attemptId,
-    attemptEpoch: parent.attemptEpoch,
-    slotSetHash: parent.frozenActiveSlotSetHash,
-    contextSnapshotHash: parent.contextSnapshotHash,
-    units,
-    formSections: template.formSections,
+
+  const { parent, children, frozen } = await loadParent(attemptId, principal)
+  if (parent.status !== 'IN_PROGRESS') throw failure('问卷已结束')
+  const template = getOrBuildStaticTemplate(parent, children, frozen)
+  if (template.templateHash !== templateHash) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '问卷模板版本已更新，请重新获取', 409)
   }
+  return template.templateDto
 })
 
 const logicalPayload = (attemptId: string, input: WholeQuestionnaireSubmitInput, timingSnapshotHash?:string) => ({

@@ -155,10 +155,14 @@ export const encryptFrozenActiveSlotSet = (value: FrozenActiveSlotSetV1): string
 const verifiedSlotPlans = new BoundedArtifactCache<FrozenActiveSlotSetV1>(128, 4 * 1024 * 1024)
 const verifiedSlotCiphers = new BoundedArtifactCache<string>(512, 512 * 1024)
 export const frozenSlotPlanCacheStats = () => ({ plans: verifiedSlotPlans.stats(), ciphers: verifiedSlotCiphers.stats() })
+const slotCipherCacheKey = (value: string): string => {
+  const keyIdentity = createHash('sha256').update(process.env.DATA_ENCRYPTION_KEY ?? '').digest('hex')
+  return createHash('sha256').update(keyIdentity).update(':').update(value).digest('hex')
+}
+
 export const decryptFrozenActiveSlotSet = (value: string): FrozenActiveSlotSetV1 => {
   if (!compactAssessmentStorageEnabled()) return parseFrozenActiveSlotSet(decryptUnifiedRuntimePayload<unknown>(value))
-  const keyIdentity = createHash('sha256').update(process.env.DATA_ENCRYPTION_KEY ?? '').digest('hex')
-  const cipherKey = createHash('sha256').update(keyIdentity).update(':').update(value).digest('hex')
+  const cipherKey = slotCipherCacheKey(value)
   const knownHash = verifiedSlotCiphers.get(cipherKey)
   if (knownHash) { const known = verifiedSlotPlans.get(knownHash); if (known) return known }
   const decoded = decryptUnifiedRuntimePayload<unknown>(value)
@@ -184,17 +188,29 @@ const sharedSlotContentIndex=new BoundedArtifactCache<string>(128,64*1024)
 export const loadFrozenActiveSlotSet = async (value: string, db?:SharedControlDb): Promise<FrozenActiveSlotSetV1> => {
   // Legacy ciphertext keeps the existing verified-cipher fast path.
   if(!isControlReferenceField(value))return decryptFrozenActiveSlotSet(value)
+  const cipherKey = !db && compactAssessmentStorageEnabled() ? slotCipherCacheKey(value) : null
+  if (cipherKey) {
+    const knownByCipher = verifiedSlotCiphers.get(cipherKey)
+    if (knownByCipher) {
+      const knownPlan = verifiedSlotPlans.get(knownByCipher)
+      if (knownPlan) return knownPlan
+    }
+  }
   const ref=decryptUnifiedRuntimePayload<any>(value)
   if(ref?.k!=='FSP2'||typeof ref.p!=='string'||!/^[a-f0-9]{64}$/.test(ref.p)||!Number.isSafeInteger(ref.e)||ref.e<1||Object.keys(ref).some(k=>!['k','p','e'].includes(k)))throw new Error('Frozen slot reference invalid')
   // An operation-local store can see uncommitted rows. Do not publish those
   // values into the process-wide existence cache if the transaction rolls back.
   if(db)return retainImmutableCanonicalValue(parseFrozenActiveSlotSet(await loadSharedSlotPlan(value,ref,db)))
   const key=ref.p+':'+ref.e,knownHash=sharedSlotContentIndex.get(key),known=knownHash?verifiedSlotPlans.get(knownHash):undefined
-  if(known)return known
+  if(known){
+    if(cipherKey)verifiedSlotCiphers.set(cipherKey,known.snapshotHash,512)
+    return known
+  }
   const decoded=await loadSharedSlotPlan(value,ref),parsed=parseFrozenActiveSlotSet(decoded)
   retainImmutableCanonicalValue(parsed)
   verifiedSlotPlans.set(parsed.snapshotHash,parsed,canonicalJsonBytes(parsed).length*6+512)
   sharedSlotContentIndex.set(key,parsed.snapshotHash,key.length*2+256)
+  if(cipherKey&&verifiedSlotPlans.get(parsed.snapshotHash))verifiedSlotCiphers.set(cipherKey,parsed.snapshotHash,512)
   return parsed
 }
 
