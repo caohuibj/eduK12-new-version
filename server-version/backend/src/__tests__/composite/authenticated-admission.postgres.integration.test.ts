@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from '../integration/integration-env'
 import { lockAnonymousAdmission, lockAuthenticatedAdmission } from '../../modules/composite/authenticated-admission-lock'
 
@@ -115,6 +115,16 @@ suite('authenticated admission lock boundaries (real isolated PostgreSQL)', () =
     expect(await db.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: id, userId: a } })).toBe(1)
     await db.compositeAssessmentAttempt.update({ where: { id: results[0].attempt.id }, data: { status: 'COMPLETED' } })
     await expect(runtime.startUserAttempt(a,id)).rejects.toMatchObject({ statusCode: 409 })
+  })
+  it('keeps form-only START outside the scale resource guard', async () => {
+    const id = await fixture()
+    const protection = await import('../../services/assessmentResourceProtection')
+    const guard = vi.spyOn(protection, 'assertAssessmentStartResources').mockImplementation(() => { throw new Error('scale guard called') })
+    try {
+      const result = await runtime.startUserAttempt(a, id)
+      expect(result.attempt.status).toBe('IN_PROGRESS')
+      expect(guard).not.toHaveBeenCalled()
+    } finally { guard.mockRestore() }
   })
   it('replays one multi-scale START: same attempt, one quota decision, one child per Scale', async () => {
     const { id, scales } = await scaleFixture(3)

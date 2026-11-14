@@ -12,7 +12,7 @@ const StudentLogin: React.FC = () => {
   const authLink = useAuthLinks()
   const training = isTrainingHost()
   const completeLogin = useLoginReturn()
-  const { login } = useAuth()
+  const { login, loginRetryMessage } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
@@ -86,7 +86,7 @@ const StudentLogin: React.FC = () => {
           {loading ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span>登录中...</span>
+              <span role="status">{loginRetryMessage || '登录中...'}</span>
             </>
           ) : (
             <span>登录</span>

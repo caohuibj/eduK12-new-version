@@ -1,6 +1,7 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
 import { classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
 import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
+import { assertAssessmentStartResources } from '../../services/assessmentResourceProtection'
 import { availableTemplateCache, publicationReadKey, startCompositeCache } from './start-read-cache'
 import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments } from '../scale/deployment/repository'
 import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
@@ -3992,6 +3993,14 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
   assessmentTimelineSpan('start.pre_gate_reads', preGateStart)
   if (inProgress) return traceAssessmentPhase('start.post_gate_getAttemptState',
     () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(inProgress.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)))
+
+  // For a new ordinary, scale-only questionnaire, avoid occupying a gate slot
+  // or opening a transaction when the same freeze would already be protected.
+  // Keep the in-transaction checks: host pressure may change after this read.
+  if (isOrdinaryQuestionnaireStart(composite) && composite.items.length > 0
+      && composite.items.every((item: any) => item.required && item.type === 'SCALE')) {
+    assertAssessmentStartResources()
+  }
 
   const isUniqueConstraintError = (err: unknown) =>
     typeof err === 'object' && err !== null && 'code' in err && (err as { code?: unknown }).code === 'P2002'

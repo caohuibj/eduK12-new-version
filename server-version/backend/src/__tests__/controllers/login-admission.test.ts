@@ -18,6 +18,7 @@ vi.mock('../../middleware/loginRateLimit', () => ({
 }))
 vi.mock('../../utils/logger', () => ({ logger: { error: vi.fn() } }))
 import { authController } from '../../controllers/authController'
+import { BoundedAdmissionBusyError } from '../../services/boundedAdmissionGate'
 
 const user = { id: 'student', username: 'student', role: 'STUDENT', accountDomain: 'TRAINING', passwordHash: 'test-hash',
   isActive: true, isFrozen: false, expiresAt: null, tokenVersion: 1, mustChangePassword: false }
@@ -45,6 +46,33 @@ beforeEach(() => {
 })
 
 describe('bounded login execution and failure classification', () => {
+  it.each(['LOGIN_VERIFY_BUSY', 'LOGIN_LOOKUP_BUSY'])('returns a safe retry signal for %s before creating a session', async (code) => {
+    const busy = new BoundedAdmissionBusyError({ gate: 'login-test', reason: 'queue_full', retryAfterSeconds: 1, code })
+    if (code === 'LOGIN_LOOKUP_BUSY') mocks.withLoginAccountLookup.mockRejectedValue(busy)
+    else mocks.withLoginPasswordVerification.mockRejectedValue(busy)
+    const res = response()
+    res.locals = { trainingEntrance: true }
+    await authController.login(request(), res)
+    expect(res.code).toBe(503)
+    expect(res.setHeader).toHaveBeenCalledWith('Retry-After', '1')
+    expect(res.json).toHaveBeenCalledWith({ code, message: '登录服务繁忙，请稍后重试' })
+    expect(mocks.generateToken).not.toHaveBeenCalled()
+    expect(mocks.setSessionCookie).not.toHaveBeenCalled()
+    expect(mocks.recordLoginFailure).not.toHaveBeenCalled()
+  })
+
+  it.each(['LOGIN_VERIFY_BUSY', 'LOGIN_LOOKUP_BUSY'])('keeps the general login error contract for %s', async (code) => {
+    const busy = new BoundedAdmissionBusyError({ gate: 'login-test', reason: 'queue_full', retryAfterSeconds: 1, code })
+    if (code === 'LOGIN_LOOKUP_BUSY') mocks.withLoginAccountLookup.mockRejectedValue(busy)
+    else mocks.withLoginPasswordVerification.mockRejectedValue(busy)
+    const res = response()
+    await authController.login(request(), res)
+    expect(res.code).toBe(503)
+    expect(res.json).toHaveBeenCalledWith({ code: -1, message: '登录服务暂时不可用，请稍后再试' })
+    if (code === 'LOGIN_VERIFY_BUSY') expect(res.setHeader).toHaveBeenCalledWith('Retry-After', '1')
+    else expect(res.setHeader).not.toHaveBeenCalled()
+  })
+
   it('reads current account authority through account lookup gate before password admission', async () => {
     let admitPassword!: () => void
     const passwordAdmitted = new Promise<void>((resolve) => { admitPassword = resolve })

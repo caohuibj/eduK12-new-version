@@ -78,7 +78,7 @@ describe('START transient rollback classification',()=>{
   const res=fakeRes()
   await compositeController.startAttempt(req,res)
   expect(res.statusCode).toBe(503)
-  expect(res.headers['Retry-After']).toBe('30')
+  expect(res.headers['Retry-After']).toBe('10')
   expect(res.body).toEqual({code:'INSTRUMENT_NOT_AVAILABLE',message,data:null})
   expect(m.start).toHaveBeenCalledTimes(1)
  })
@@ -93,7 +93,7 @@ describe('START transient rollback classification',()=>{
   await compositeController.publicRestart({params:{attemptId:'a1'},headers:{'x-recovery-token':'a'.repeat(24)}} as any,publicRestartRes)
   for(const res of [restartRes,publicRes,publicRestartRes]){
    expect(res.statusCode).toBe(503)
-   expect(res.headers['Retry-After']).toBe('30')
+   expect(res.headers['Retry-After']).toBe('10')
    expect(res.body).toEqual({code:'INSTRUMENT_NOT_AVAILABLE',message,data:null})
   }
  })

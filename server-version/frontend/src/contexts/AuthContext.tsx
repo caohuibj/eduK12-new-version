@@ -9,6 +9,9 @@ import React, {
   type ReactNode,
 } from 'react'
 import { authApi, type LoginRequest, type AdminMfaInput } from '../api/auth'
+import { isTrainingHost } from '../training/context'
+import { isTrainingBusy, runTrainingRetry, TrainingRetryCancelledError } from '../services/trainingBusyRetry'
+import { normalizeApiError } from '../utils/normalizeApiError'
 import {
   clearReauthReturn,
   isAuthPath,
@@ -26,6 +29,7 @@ interface AuthContextType {
   clearReauthentication: () => void
   isAuthenticated: boolean
   isLoading: boolean
+  loginRetryMessage: string | null
   login: (username: string, password: string, expectedRole?: LoginRequest['expectedRole'], entrance?: 'admin', mfa?: AdminMfaInput) => Promise<User | undefined>
   setAuthenticatedUser: (userData: User) => void
   logout: () => Promise<void>
@@ -44,6 +48,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     readReauthReturn,
   )
   const [isLoading, setIsLoading] = useState(true)
+  const [loginRetryMessage, setLoginRetryMessage] = useState<string | null>(null)
   const [identityGeneration, setIdentityGeneration] = useState(0)
   const userRef = useRef(user)
   userRef.current = user
@@ -253,11 +258,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const login = async (username: string, password: string, expectedRole?: LoginRequest['expectedRole'], entrance?: 'admin', mfa?: AdminMfaInput) => {
     const requestEpoch = ++authEpochRef.current
     localLoginPending.current = requestEpoch
+    setLoginRetryMessage(null)
     try {
       await authApi.csrf()
       if (requestEpoch !== authEpochRef.current) return
       const data = { username, password, ...(expectedRole ? { expectedRole } : {}) }
-      const response = await (entrance ? mfa ? authApi.login(data, entrance, mfa) : authApi.login(data, entrance) : authApi.login(data))
+      const requestLogin = () => entrance ? mfa ? authApi.login(data, entrance, mfa) : authApi.login(data, entrance) : authApi.login(data)
+      const response = !entrance && isTrainingHost()
+        ? await runTrainingRetry(requestLogin, (cause) => isTrainingBusy(cause, ['LOGIN_VERIFY_BUSY', 'LOGIN_LOOKUP_BUSY'])
+          ? { kind: 'retry', retryAfterMs: normalizeApiError(cause).retryAfterMs }
+          : { kind: 'stop' }, {
+          isCurrent: () => requestEpoch === authEpochRef.current,
+          onRetry: (delayMs) => setLoginRetryMessage(`登录繁忙，${Math.ceil(delayMs / 1000)} 秒后自动重试。`),
+        })
+        : await requestLogin()
       if (requestEpoch !== authEpochRef.current) return
       if (response.code === 0 && response.data) {
         lastAuthTransitionAtRef.current = Date.now()
@@ -268,9 +282,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       } else {
         throw new Error(response.message || '登录失败')
       }
+    } catch (error) {
+      if (error instanceof TrainingRetryCancelledError && requestEpoch !== authEpochRef.current) return
+      throw error
     } finally {
-      if (localLoginPending.current === requestEpoch)
+      if (localLoginPending.current === requestEpoch) {
         localLoginPending.current = null
+        setLoginRetryMessage(null)
+      }
     }
   }
 
@@ -312,6 +331,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         clearReauthentication,
         isAuthenticated: !!user,
         isLoading,
+        loginRetryMessage,
         login,
         setAuthenticatedUser,
         logout,

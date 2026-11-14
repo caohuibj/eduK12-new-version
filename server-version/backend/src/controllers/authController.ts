@@ -142,8 +142,13 @@ export const authController = {
     } catch (err) {
       if (err instanceof AdminPermissionError) return error(res, err.message, -1, err.statusCode)
       logger.error('登录错误', err)
-      if (isBoundedAdmissionBusyError(err) && err.code === 'LOGIN_VERIFY_BUSY') {
-        res.setHeader('Retry-After', String(err.retryAfterSeconds))
+      if (isBoundedAdmissionBusyError(err) && (err.code === 'LOGIN_VERIFY_BUSY' || err.code === 'LOGIN_LOOKUP_BUSY')) {
+        if (err.code === 'LOGIN_VERIFY_BUSY' || res.locals?.trainingEntrance) {
+          res.setHeader('Retry-After', String(err.retryAfterSeconds))
+        }
+        if (res.locals?.trainingEntrance) {
+          return res.status(503).json({ code: err.code, message: '登录服务繁忙，请稍后重试' })
+        }
       }
       return res.status(503).json({ code: -1, message: '登录服务暂时不可用，请稍后再试' })
     }
