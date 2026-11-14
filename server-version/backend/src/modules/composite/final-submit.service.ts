@@ -683,7 +683,9 @@ export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput)
       const selectedParent = await assertTrainingSectionSelected(input.attemptId, input.sectionId, { parent: route })
       const { prepareUnifiedCompositeFormSectionFinal, commitUnifiedCompositeFormSectionFinal } = await import('../assessment-runtime/unified-form-section-final-submit.service')
       const prepared = await prepareUnifiedCompositeFormSectionFinal(input, route.compositeAssessment?.bundleInstance, selectedParent)
-      const committed = await withUnitSubmitAdmission(() => commitUnifiedCompositeFormSectionFinal(prepared))
+      const {preparePrivateFormFinalEvidence} = await import('../assessment-run/educationPrivateFormExecution')
+      const privateFormFinalEvidence = await preparePrivateFormFinalEvidence(input.attemptId, input.userId)
+      const committed = await withUnitSubmitAdmission(() => commitUnifiedCompositeFormSectionFinal(prepared, undefined, privateFormFinalEvidence))
       return shouldReconcileTrainingParent(route)
         ? { ...committed, shouldFinalize: true, finalizeCompositeAttemptId: input.attemptId }
         : committed

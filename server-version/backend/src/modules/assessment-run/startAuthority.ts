@@ -7,13 +7,28 @@ import { currentRunPopulationAuthoritySql } from './currentPopulationAuthority'
 import { RunStartAdmissionError } from './startAdmission'
 
 /** Called with Organization SHARE -> Run SHARE -> Execution UPDATE held. */
-export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClient, executionId: string, options?: { accountMode: 'DETECT_EDUCATION_LIBRARY'; operation?:'BOUND_FINAL' }): Promise<void> => {
+export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClient, executionId: string, options?: { accountMode: 'DETECT_EDUCATION_LIBRARY'; operation?:'BOUND_FINAL'; preparedPrivateFormLocator?: { executionId: string; policyHash: string } }): Promise<void> => {
   const fail = (code: string) => { throw new RunStartAdmissionError(code, 'current Run START authority is no longer valid', 403) }
   // Verified public-library and author-private executions use query-time account checks. Do not acquire a
   // user lock after org: account-reset writers acquire user UPDATE before org.
   // This server-only mode is never accepted from a request, and actual legacy
   // tracks retain the old lock even when a caller requests detection.
-  const library = options?.accountMode === 'DETECT_EDUCATION_LIBRARY' ? await tx.$queryRaw<Array<{id:string;privateForm:boolean}>>`
+  const preparedLocator = options?.preparedPrivateFormLocator
+  const usePreparedLibrary = options?.accountMode === 'DETECT_EDUCATION_LIBRARY'
+    && options?.operation === 'BOUND_FINAL'
+    && preparedLocator?.executionId === executionId
+  let library: Array<{id:string;privateForm:boolean}> = []
+  if (usePreparedLibrary) {
+    const [locked] = await tx.$queryRaw<Array<{id:string;privateForm:boolean;policyHash:string}>>`
+      SELECT e.id,((t.resource_family='FORM' AND t.resource_key LIKE 'private-form:%') OR
+       t.resource_key LIKE 'education-composition:%') AS "privateForm", t.resource_policy_hash AS "policyHash"
+      FROM assessment_run_executions e JOIN assessment_run_tracks t
+        ON t.id=e.track_id AND t.organization_id=e.organization_id AND t.run_id=e.run_id
+      WHERE e.id=${executionId}`
+    if (!locked?.privateForm || locked.policyHash !== preparedLocator!.policyHash) fail('RUN_BOUND_FINAL_SOURCE_REQUIRED')
+    library = [{id: locked.id, privateForm: true}]
+  } else {
+    library = options?.accountMode === 'DETECT_EDUCATION_LIBRARY' ? await tx.$queryRaw<Array<{id:string;privateForm:boolean}>>`
     SELECT e.id,((t.resource_family='FORM' AND t.resource_key LIKE 'private-form:%') OR
      t.resource_key LIKE 'education-composition:%') AS "privateForm" FROM assessment_run_executions e JOIN assessment_run_tracks t
       ON t.id=e.track_id AND t.organization_id=e.organization_id AND t.run_id=e.run_id
@@ -51,6 +66,7 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
        AND EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links teacher WHERE teacher.organization_id=e.organization_id AND teacher.run_id=e.run_id)
        AND NOT EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id)))
   ` : []
+  }
   if(options?.operation==='BOUND_FINAL'&&!library[0]?.privateForm)fail('RUN_BOUND_FINAL_SOURCE_REQUIRED')
   // Account mutation conflicts with these shared fences. Do not evaluate expiry
   // against this statement's start time: acquiring a row lock can wait past it.

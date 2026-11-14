@@ -259,7 +259,15 @@ export const prepareUnifiedScaleFinalSubmission = async (
     && referenceTimeMs > Date.parse(admission.scalePolicy.deployment.completionDeadline)) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '本轮测评已超过冻结完成期限，请重新开始', 409)
   }
-  return { submissionId, admission, snapshot, answers, payloadHash, timing }
+  const {preparePrivateFormFinalEvidence} = await import('../assessment-run/educationPrivateFormExecution')
+  const privateFormFinalEvidence = child.compositeAttemptId
+    ? await preparePrivateFormFinalEvidence(child.compositeAttemptId, input.userId)
+    : null
+  const frozenScaleEvidence = child.compositeAttemptId && child.scaleId && child.compositeItemId
+    ? await (await import('../assessment-run/educationLibraryExecution')).prepareEducationFrozenScaleEvidence(
+        child.compositeAttemptId, [child.scaleId], [child.compositeItemId])
+    : null
+  return { submissionId, admission, snapshot, answers, payloadHash, timing, privateFormFinalEvidence, frozenScaleEvidence }
 }
 
 type PreparedScaleSubmission = Awaited<ReturnType<typeof prepareUnifiedScaleFinalSubmission>>
@@ -353,7 +361,7 @@ export const commitPreparedUnifiedScaleAssessmentFinal = async (
   }
 
   const { timingEncrypted, result, compactFact, persistedProvenance, encryptedAnswers, encrypted, completedAt } = write ?? await prepareUnifiedScaleWrite(
-    input, child, { submissionId, admission, snapshot, answers, payloadHash, timing }, wholeReceipt, referenceDb)
+    input, child, { submissionId, admission, snapshot, answers, payloadHash, timing, privateFormFinalEvidence: prepared.privateFormFinalEvidence, frozenScaleEvidence: prepared.frozenScaleEvidence }, wholeReceipt, referenceDb)
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
     if(child.compositeAttempt?.compositeAssessment?.creationKey?.startsWith('education-composition:')){
@@ -361,7 +369,7 @@ export const commitPreparedUnifiedScaleAssessmentFinal = async (
       // Acquire org -> Run -> execution before the native child UPDATE lock;
       // old Survey/Training finals do not gain an extra source/authority query.
       const {assertPrivateFormFinalCurrent}=await import('../assessment-run/educationPrivateFormExecution')
-      await assertPrivateFormFinalCurrent(tx,{attemptId:child.compositeAttemptId!,actorUserId:input.userId})
+      await assertPrivateFormFinalCurrent(tx,{attemptId:child.compositeAttemptId!,actorUserId:input.userId}, prepared.privateFormFinalEvidence)
     }
     await assertStudyPrincipalIfAnonymous(tx,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash,receipt:wholeReceipt?.studyReceipt,unit:input},true)
     const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
@@ -388,7 +396,7 @@ export const commitPreparedUnifiedScaleAssessmentFinal = async (
     // Current epoch and frozen runtime/admission are locked and checked above.
     // Existing standalone FINAL keeps emergency collection policy, not new-entry policy.
     if(child.compositeAttemptId){
-      await assertTrainingScaleCollectionAllowed(tx, [child.scaleId],{compositeAttemptId:child.compositeAttemptId,compositeAttemptEpoch:input.attemptEpoch,compositeItemIds:child.compositeItemId?[child.compositeItemId]:[],acceptedReceipt:wholeReceipt})
+      await assertTrainingScaleCollectionAllowed(tx, [child.scaleId],{compositeAttemptId:child.compositeAttemptId,compositeAttemptEpoch:input.attemptEpoch,compositeItemIds:child.compositeItemId?[child.compositeItemId]:[],acceptedReceipt:wholeReceipt,preparedFrozenScaleEvidence:prepared.frozenScaleEvidence})
     }else await assertScaleLibraryCollectionAllowed(tx,[],[child.scaleId])
     assertFlowFinal(false)
     const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())
