@@ -111,14 +111,24 @@ export const loadSharedSlotPlan = async (encrypted: string, decoded?:unknown, db
   return { ...unsigned, snapshotHash: canonicalHash(unsigned) }
 }
 
-export const storeSharedWholeValidation = async (manifest: any): Promise<string> => {
+export const storeSharedWholeValidation = async (
+  manifest: any,
+  precomputedPlan?: { plan: unknown; hash: string },
+): Promise<string> => {
   if (!sharedControlWritesEnabled()) return encryptUnifiedRuntimePayload(manifest)
-  const plan: any = { schemaVersion: manifest.schemaVersion, requiredFormSlots: manifest.requiredFormSlots,
-    units: manifest.units.map((u: any) => Object.fromEntries(Object.entries(u).filter(([k]) => !['assessmentId','admissionHash','trainingTiming'].includes(k)))) }
-  if (manifest.formSections && manifest.formSections.length > 0) {
-    plan.formSections = manifest.formSections
-  }
-  const [p] = await publicTemplates.saveMany([{ kind: 'WHOLE_VALIDATION_PLAN', value: plan }])
+  const plan: any = precomputedPlan ? precomputedPlan.plan : (() => {
+    const next: any = { schemaVersion: manifest.schemaVersion, requiredFormSlots: manifest.requiredFormSlots,
+      units: manifest.units.map((u: any) => Object.fromEntries(Object.entries(u).filter(([k]) => !['assessmentId','admissionHash','trainingTiming'].includes(k)))) }
+    if (manifest.formSections && manifest.formSections.length > 0) {
+      next.formSections = manifest.formSections
+    }
+    return next
+  })()
+  const [p] = await publicTemplates.saveMany([
+    precomputedPlan
+      ? { kind: 'WHOLE_VALIDATION_PLAN', value: plan, precomputedHash: precomputedPlan.hash }
+      : { kind: 'WHOLE_VALIDATION_PLAN', value: plan },
+  ])
   return encryptControlReference({ k: 'WVP2', p, b: manifest.binding, u: manifest.units.map((u: any) => [u.assessmentId, u.admissionHash, ...(u.trainingTiming ? [u.trainingTiming] : [])]) })
 }
 export const loadSharedWholeValidation = async <T>(encrypted: string): Promise<T> => {

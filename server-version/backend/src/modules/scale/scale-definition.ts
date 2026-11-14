@@ -1,4 +1,5 @@
 import {materialListSchema,publicMaterial} from '../assessment-media/material'
+import { hasImmutableCanonicalValue } from '../assessment-runtime/canonical'
 import { rawScoreFeedbackSchema, rawScoreFeedbackBindingIssues } from './raw-score-feedback'
 import { validateAudienceReport } from './library/audience-report-gate'
 import { createHash } from 'node:crypto'
@@ -563,13 +564,43 @@ export const responseSetForItem = (definition: ScaleDefinitionV2, item: ScaleIte
   return responseSet
 }
 
-export const runnerDefinition = (definition: ScaleDefinitionV2) => ({
-  schemaVersion: definition.schemaVersion,
-  respondentType: definition.respondentType,
-  display: definition.display,
-  items: [...definition.items].sort((left, right) => left.sortOrder - right.sortOrder).map(({ attentionTarget: _target, purpose: _purpose, ...item }) => ({
-    ...item,
-    ...(item.materials?{materials:item.materials.map(publicMaterial)}:{}),
-    options: responseSetForItem(definition, item).options.map(({ value, label }) => ({ value, label })),
-  })),
-})
+const cachedRunnerDefinitions = new WeakMap<ScaleDefinitionV2, {
+  schemaVersion: ScaleDefinitionV2['schemaVersion']
+  respondentType: ScaleDefinitionV2['respondentType']
+  display: ScaleDefinitionV2['display']
+  items: any[]
+}>()
+
+const buildRunnerDefinition = (definition: ScaleDefinitionV2) => {
+  const responseSetsByKey = new Map<string, ScaleResponseSet>()
+  for (const responseSet of definition.responseSets ?? []) {
+    responseSetsByKey.set(responseSet.key, responseSet)
+  }
+  return {
+    schemaVersion: definition.schemaVersion,
+    respondentType: definition.respondentType,
+    display: definition.display,
+    items: [...definition.items].sort((left, right) => left.sortOrder - right.sortOrder).map(({ attentionTarget: _target, purpose: _purpose, ...item }) => {
+      const responseSet = responseSetsByKey.get(item.responseSetKey)
+      if (!responseSet) throw new Error(`响应集不存在：${item.responseSetKey}`)
+      return {
+        ...item,
+        ...(item.materials ? { materials: item.materials.map(publicMaterial) } : {}),
+        options: responseSet.options.map(({ value, label }) => ({ value, label })),
+      }
+    }),
+  }
+}
+
+export const runnerDefinition = (definition: ScaleDefinitionV2) => {
+  if (!hasImmutableCanonicalValue(definition)) return buildRunnerDefinition(definition)
+  let cached = cachedRunnerDefinitions.get(definition)
+  if (!cached) {
+    cached = buildRunnerDefinition(definition)
+    cachedRunnerDefinitions.set(definition, cached)
+  }
+  return {
+    ...cached,
+    items: [...cached.items],
+  }
+}

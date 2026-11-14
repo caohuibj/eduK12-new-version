@@ -65,7 +65,7 @@ import {decodeTrainingFinalReceipt} from './training-content-final'
 import {freezeTrainingTimingSnapshot,readTrainingTimingPolicy} from '../assessment-runtime/training-scale-timing'
 import { isWholeLocalEligible } from './whole-local-eligibility'
 import { typedFormPresentation } from '../reporting/typed-form-presentation'
-import { sharedControlWritesEnabled } from '../assessment-runtime/shared-control-records'
+import { sharedControlWritesEnabled, withSharedControlContext } from '../assessment-runtime/shared-control-records'
 import { readCommittedScaleFacts } from '../assessment-runtime/scale-fact-records'
 import { resolveStoredScaleResult } from '../assessment-runtime/compact-assessment-storage'
 import { preloadStoredScaleResults } from '../assessment-runtime/compact-assessment-storage'
@@ -90,6 +90,18 @@ import { Prisma, UserRole } from '@prisma/client'
 import { trainingCreatorAuthoritySql } from '../admin-permissions/training-authority'
 import { prisma } from '../../config/database'
 const defaultPrisma = prisma
+const freshScaleRuntimeByChild = new WeakMap<object, VersionedFrozenScaleRuntimeSnapshot>()
+
+const seedFreshScaleChildren = (children?: any[]) => {
+  if (!children?.length) return
+  for (const child of children) {
+    const frozenScale = freshScaleRuntimeByChild.get(child)
+    if (frozenScale) {
+      seedScaleAdmissionRuntime(child, frozenScale)
+      freshScaleRuntimeByChild.delete(child)
+    }
+  }
+}
 import { config } from '../../config'
 import { MAX_TOKEN_USES } from '../../constants'
 import { publicAccessExpiryWithinPolicy } from '../../services/publicAccessPolicy'
@@ -126,7 +138,7 @@ import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-def
 import { resolveFrozenScaleInstructionForScale } from '../scale/onboarding/instrument-registry'
 import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
 import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
-import { ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
+import { ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime, seedScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
 import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota, isTrainingTaskCourse, usesScopedTrainingQuota } from '../cognitive/attempt-quota'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
@@ -218,6 +230,7 @@ import {
   persistFrozenScaleRuntimeSnapshot,
   freezeScaleRuntimeAtAttemptStart,
   withPreloadedScaleStartFreeze,
+  type VersionedFrozenScaleRuntimeSnapshot,
 } from '../assessment-runtime/runtime-snapshot'
 import { compiledBundleRuntimeHashForSnapshot, evaluateCompleteness, type AggregateSnapshotHeader } from '../assessment-runtime/unified-aggregate'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
@@ -3150,11 +3163,15 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
   // Reuse the exact input rows only after createMany succeeded. No child
   // reread is needed for the fresh, untimed whole projection.
   if (pendingScales.length === requiredScaleItems.length && pendingScales.length > 0) {
-    Object.defineProperty(runtime, '_freshScaleChildren', { value: pendingScales.map(entry => ({
-      ...entry.data, questionnaireAssessmentId: null,
-      frozenAdmissionSnapshotEncrypted: null, frozenAdmissionSnapshotHash: null,
-      scale: entry.item.scale,
-    })) })
+    Object.defineProperty(runtime, '_freshScaleChildren', { value: pendingScales.map(entry => {
+      const child = {
+        ...entry.data, questionnaireAssessmentId: null,
+        frozenAdmissionSnapshotEncrypted: null, frozenAdmissionSnapshotHash: null,
+        scale: entry.item.scale,
+      }
+      if (entry.frozenScale) freshScaleRuntimeByChild.set(child, entry.frozenScale)
+      return child
+    }) })
   }
   return runtime
 }
@@ -3953,27 +3970,52 @@ export const projectFreshStartedAttempt = async (
   }
 }
 
+const buildWholeStartPreload = (attempt: any, children: any[] | undefined, source: any) => {
+  if (!children || !source) return { parent: undefined, preloadedState: undefined }
+  const parent = {
+    ...attempt,
+    compositeAssessment: source,
+    scaleAssessments: children,
+    cognitiveSessions: [],
+    situationalAttempts: [],
+    formSectionAttempts: [],
+  }
+  const hasNonScaleUnit = (source.items ?? []).some((item: any) => item.required && (item.type === 'COGNITIVE' || item.type === 'SITUATIONAL'))
+  const preloadedState: UnifiedStatePreload | undefined = !hasNonScaleUnit && !attempt.trainingTimingSnapshot && !source.trainingTimingPolicy
+    ? {
+        snapshots: [],
+        scaleChildById: new Map(children.map((child: any) => [child.id, child])),
+        skipCurrentUnitActivation: true,
+      }
+    : undefined
+  return { parent, preloadedState }
+}
+
 export const projectStartedAttempt = async (
   attemptId: string,
   principal: { userId?: string; recoveryTokenHash?: string },
   wantsWholeDelivery: boolean,
   recoveryToken: string | null,
   preloadedParent?: Parameters<typeof getAttemptState>[4],
+  preloadedState?: UnifiedStatePreload,
+  knownTemplateHashes?: ReadonlySet<string>,
 ) => {
   if (!wantsWholeDelivery) {
     return { attempt: await getAttemptState(attemptId, principal), recoveryToken }
   }
-  const parent = preloadedParent ?? await prisma.compositeAssessmentAttempt.findUnique({
-    where: { id: attemptId },
-    select: START_WHOLE_PARENT_SELECT,
+  return withSharedControlContext(async () => {
+    const parent = preloadedParent ?? await prisma.compositeAssessmentAttempt.findUnique({
+      where: { id: attemptId },
+      select: START_WHOLE_PARENT_SELECT,
+    })
+    if (!parent) throw compositeNotFound('综合测评记录不存在')
+    const attempt = await getAttemptState(attemptId, principal, undefined, 'full', parent, preloadedState)
+    const { startResponseWithInlineWholeDefinition } = await import('./whole-start-inline')
+    return startResponseWithInlineWholeDefinition(true, { attempt, recoveryToken }, principal, parent, knownTemplateHashes)
   })
-  if (!parent) throw compositeNotFound('综合测评记录不存在')
-  const attempt = await getAttemptState(attemptId, principal, undefined, 'full', parent)
-  const { startResponseWithInlineWholeDefinition } = await import('./whole-start-inline')
-  return startResponseWithInlineWholeDefinition(true, { attempt, recoveryToken }, principal, parent)
 }
 
-export const startUserAttempt = async (userId: string, compositeId: string, opts?: { wantsWholeDelivery?: boolean }) => {
+export const startUserAttempt = async (userId: string, compositeId: string, opts?: { wantsWholeDelivery?: boolean; knownTemplateHashes?: ReadonlySet<string> }) => {
   // Pure-read (write-time invariant): the student start path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
@@ -3992,7 +4034,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
     ORDER BY "started_at" DESC LIMIT 1 FOR SHARE`)
   assessmentTimelineSpan('start.pre_gate_reads', preGateStart)
   if (inProgress) return traceAssessmentPhase('start.post_gate_getAttemptState',
-    () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(inProgress.id, { userId }, Boolean(opts?.wantsWholeDelivery), null)))
+    () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(inProgress.id, { userId }, Boolean(opts?.wantsWholeDelivery), null, undefined, undefined, opts?.knownTemplateHashes)))
 
   // For a new ordinary, scale-only questionnaire, avoid occupying a gate slot
   // or opening a transaction when the same freeze would already be protected.
@@ -4050,15 +4092,15 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
       })
       const children = (attempt as any)._freshScaleChildren as any[] | undefined
       const source = (attempt as any)._startComposite
+      seedFreshScaleChildren(children)
       return traceAssessmentPhase('start.post_gate_getAttemptState',
         () => withQueryRawLabel('start.raw.post_gate', async () => {
           const projected = children && !opts?.wantsWholeDelivery
             ? await projectFreshStartedAttempt(attempt, source, children, { userId }, null) : null
-          const parent = children && opts?.wantsWholeDelivery ? {
-            ...attempt, compositeAssessment: source, scaleAssessments: children,
-            cognitiveSessions: [], situationalAttempts: [], formSectionAttempts: [],
-          } : undefined
-          return projected ?? projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null, parent)
+          const { parent, preloadedState } = opts?.wantsWholeDelivery
+            ? buildWholeStartPreload(attempt, children, source)
+            : { parent: undefined, preloadedState: undefined }
+          return projected ?? projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null, parent, preloadedState, opts?.knownTemplateHashes)
         }))
     } catch (err) {
       if (!isUniqueConstraintError(err) || retry === 1) throw err
@@ -4300,7 +4342,7 @@ const recordAnonymousStartDiagnosticPhase = (phase: RequestObservationPhase, sta
   recordRequestPhase(phase, Number(end - start) / 1_000_000, start, end)
 }
 
-export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string, study?: PublicStudyAdmission, opts?: { wantsWholeDelivery?: boolean }) => {
+export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string, study?: PublicStudyAdmission, opts?: { wantsWholeDelivery?: boolean; knownTemplateHashes?: ReadonlySet<string> }) => {
   const startAt = process.hrtime.bigint()
   const token = await findPublicToken(tokenValue)
   // Pure-read (write-time invariant): the public start path never lazily
@@ -4318,7 +4360,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
       recordAnonymousStartPhase('anonymous.start.pre_gate_ms', startAt, process.hrtime.bigint())
       const postGateAt = process.hrtime.bigint()
       try {
-        return await projectStartedAttempt(existing.id, { recoveryTokenHash }, Boolean(opts?.wantsWholeDelivery), null)
+        return await projectStartedAttempt(existing.id, { recoveryTokenHash }, Boolean(opts?.wantsWholeDelivery), null, undefined, undefined, opts?.knownTemplateHashes)
       } finally {
         recordAnonymousStartPhase('anonymous.start.post_gate_ms', postGateAt, process.hrtime.bigint())
       }
@@ -4408,7 +4450,13 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   })
   const postGateAt = process.hrtime.bigint()
   try {
-    return await projectStartedAttempt(attempt.id, { recoveryTokenHash: credential.hash }, Boolean(opts?.wantsWholeDelivery), credential.token)
+    const children = (attempt as any)._freshScaleChildren as any[] | undefined
+    const source = (attempt as any)._startComposite
+    seedFreshScaleChildren(children)
+    const { parent, preloadedState } = opts?.wantsWholeDelivery
+      ? buildWholeStartPreload(attempt, children, source)
+      : { parent: undefined, preloadedState: undefined }
+    return await projectStartedAttempt(attempt.id, { recoveryTokenHash: credential.hash }, Boolean(opts?.wantsWholeDelivery), credential.token, parent, preloadedState, opts?.knownTemplateHashes)
   } finally {
     recordAnonymousStartPhase('anonymous.start.post_gate_ms', postGateAt, process.hrtime.bigint())
   }
@@ -5771,7 +5819,14 @@ const patchCompositeStateAfterFinalize = (
   }
 }
 
-export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }, requestedUnit?: {itemId?:string;sectionId?:string}, view: CompositeAttemptStateView = 'full', preloadedParent?: StartWholeParent | null) => {
+export const getAttemptState = async (
+  attemptId: string,
+  context: { userId?: string; recoveryTokenHash?: string },
+  requestedUnit?: {itemId?:string;sectionId?:string},
+  view: CompositeAttemptStateView = 'full',
+  preloadedParent?: StartWholeParent | null,
+  preloadedState?: UnifiedStatePreload,
+) => {
   // Load-once: the parent row is read exactly once with the narrowed unified
   // select and shared by the unified state projection and the
   // ensure*AtDelivery steps. The narrowed shape drops only fields the
@@ -5788,9 +5843,11 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
   })) as any
   if (!runtime) throw compositeNotFound('综合测评记录不存在')
   if (runtime.runtimeGeneration === 'UNIFIED_V1') {
+    let usedPreloadedParent = Boolean(preloadedParent)
     if(trainingFlowMarkerState(runtime)==='FLOW'){
       await ensureTrainingFlowCurrentChild(attemptId,context)
       runtime=await prisma.compositeAssessmentAttempt.findUnique({where:{id:attemptId},select:UNIFIED_ATTEMPT_STATE_PARENT_SELECT})
+      usedPreloadedParent = false
     }
     if(requestedUnit){
       const authorized=context.userId?runtime.userId===context.userId:Boolean(context.recoveryTokenHash&&runtime.userId===null&&runtime.recoveryTokenHash===context.recoveryTokenHash)
@@ -5798,7 +5855,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       const scope=await resolveTrainingAttemptScope(runtime)
       if((requestedUnit.itemId&&!scope.itemIds.has(requestedUnit.itemId))||(requestedUnit.sectionId&&!scope.sectionIds.has(requestedUnit.sectionId)))throw compositeForbidden('此内容未分配给当前作答')
     }
-    const state = await getUnifiedCompositeAttemptState(runtime, context, view)
+    const state = await getUnifiedCompositeAttemptState(runtime, context, view, usedPreloadedParent ? preloadedState : undefined)
     // An authorized reread repairs a completion projection that failed after
     // canonical FINAL committed, without creating or resubmitting an attempt.
     if (state.status === 'COMPLETED' && runtime.assignmentRef) {

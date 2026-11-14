@@ -173,11 +173,42 @@ export interface WholeQuestionnaireFormSection {
   items: WholeQuestionnaireFormSectionItem[]
 }
 
+export interface WholeQuestionnaireTemplateUnit {
+  itemId: string
+  definitionHash: string
+  presentationMode?: 'ONE_BY_ONE' | 'ALL_AT_ONCE'
+  scale: CompositeScale
+  position?: number
+}
+
+export interface WholeQuestionnaireTemplate {
+  templateHash: string
+  slotSetHash: string
+  formSections?: WholeQuestionnaireFormSection[]
+  units: WholeQuestionnaireTemplateUnit[]
+}
+
+export interface WholeQuestionnaireBinding {
+  attemptId: string
+  attemptEpoch: number
+  slotSetHash: string
+  contextSnapshotHash: string | null
+  templateHash: string
+  units: Array<{
+    itemId: string
+    scaleAssessmentId: string
+    definitionHash: string
+    presentationMode?: 'ONE_BY_ONE' | 'ALL_AT_ONCE'
+    trainingTiming?: TrainingTimingBinding
+  }>
+}
+
 export interface WholeQuestionnaireDefinition {
   attemptId: string
   attemptEpoch: number
   slotSetHash: string
   contextSnapshotHash: string | null
+  templateHash?: string
   units: Array<{ presentationMode?: 'ONE_BY_ONE' | 'ALL_AT_ONCE'; trainingTiming?:TrainingTimingBinding; itemId: string; scaleAssessmentId: string; definitionHash: string; scale: CompositeScale; position?: number }>
   formSections?: WholeQuestionnaireFormSection[]
 }

@@ -1,6 +1,22 @@
-import { describe, expect, it, vi } from 'vitest'
-import { takeStoredWholeDefinition, wholeDefinitionWithInlineFallback } from '../whole-definition-source'
-import type { WholeQuestionnaireDefinition } from '../types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  applyWholeTemplateBinding,
+  assembleInlineWholePayload,
+  cacheWholeQuestionnaireTemplate,
+  clearWholeQuestionnaireTemplateCacheForTest,
+  evictCachedWholeQuestionnaireTemplate,
+  getCachedWholeQuestionnaireTemplate,
+  getKnownWholeTemplateHashes,
+  isWholeQuestionnaireBinding,
+  resolveWholeDefinitionPayload,
+  takeStoredWholeDefinition,
+  wholeDefinitionWithInlineFallback,
+} from '../whole-definition-source'
+import type {
+  WholeQuestionnaireBinding,
+  WholeQuestionnaireDefinition,
+  WholeQuestionnaireTemplate,
+} from '../types'
 
 const definition = (attemptId: string, overrides: Partial<WholeQuestionnaireDefinition> = {}) => ({
   attemptId, attemptEpoch: 1, slotSetHash: 'a'.repeat(64), contextSnapshotHash: null,
@@ -95,5 +111,165 @@ describe('Study Wave inline definition one-time storage', () => {
     expect(result.data).toBe(fresh)
     expect(fallback).toHaveBeenCalledOnce()
     expect(values.has(key)).toBe(false)
+  })
+})
+
+describe('whole template caching & binding assembly', () => {
+  const createMemoryStorage = () => {
+    const store = new Map<string, string>()
+    return {
+      store,
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => { store.set(k, v) },
+      removeItem: (k: string) => { store.delete(k) },
+    }
+  }
+
+  const hashA = '1'.repeat(64)
+  const hashB = '2'.repeat(64)
+  const slotHash = 'a'.repeat(64)
+  const defHash = 'b'.repeat(64)
+
+  const makeTemplate = (templateHash = hashA, slotSetHash = slotHash): WholeQuestionnaireTemplate => ({
+    templateHash,
+    slotSetHash,
+    formSections: [],
+    units: [{
+      itemId: 'u1',
+      definitionHash: defHash,
+      presentationMode: 'ONE_BY_ONE',
+      scale: {
+        id: 's1',
+        name: 'Scale 1',
+        instruction: 'Read carefully',
+        definition: {
+          schemaVersion: 2,
+          respondentType: 'STUDENT',
+          display: { randomizeItems: false },
+          items: [{
+            itemCode: 'q1',
+            content: 'Question 1',
+            type: 'SINGLE_CHOICE',
+            required: true,
+            sortOrder: 1,
+            responseSetKey: 'r',
+            randomizeOptions: false,
+            options: [{ value: 1, label: 'Yes' }],
+          }],
+        },
+      },
+    }],
+  })
+
+  const timingFixture = {
+    schemaVersion: 1 as const,
+    contract: 'BROWSER_ACTIVE_SCALE_V1' as const,
+    snapshotHash: 'c'.repeat(64),
+  }
+
+  const makeBinding = (overrides: Partial<WholeQuestionnaireBinding> = {}): WholeQuestionnaireBinding => ({
+    attemptId: 'attempt-student-2',
+    attemptEpoch: 1,
+    slotSetHash: slotHash,
+    contextSnapshotHash: null,
+    templateHash: hashA,
+    units: [{
+      itemId: 'u1',
+      scaleAssessmentId: 'scale-child-student-2',
+      definitionHash: defHash,
+      presentationMode: 'ALL_AT_ONCE',
+      trainingTiming: timingFixture,
+    }],
+    ...overrides,
+  })
+
+  beforeEach(() => {
+    clearWholeQuestionnaireTemplateCacheForTest()
+  })
+
+  it('caches templates without per-user fields and reports known hashes most-recent-first', () => {
+    const storage = createMemoryStorage()
+    const full1 = definition('attempt-1', { templateHash: hashA })
+    const full2 = definition('attempt-2', { templateHash: hashB })
+
+    const cached1 = cacheWholeQuestionnaireTemplate(full1, storage)
+    expect(cached1).not.toBeNull()
+    expect((cached1!.units[0] as unknown as Record<string, unknown>).scaleAssessmentId).toBeUndefined()
+
+    cacheWholeQuestionnaireTemplate(full2, storage)
+    expect(getKnownWholeTemplateHashes(storage)).toEqual([hashB, hashA])
+    expect(getCachedWholeQuestionnaireTemplate(hashA, storage)?.templateHash).toBe(hashA)
+    expect(getKnownWholeTemplateHashes(storage, 1)).toEqual([hashA])
+  })
+
+  it('assembles a binding with a matching template and rejects drift or corrupt bindings', () => {
+    const template = makeTemplate()
+    const assembled = applyWholeTemplateBinding(template, makeBinding())
+    expect(assembled).toMatchObject({
+      attemptId: 'attempt-student-2',
+      attemptEpoch: 1,
+      slotSetHash: slotHash,
+      templateHash: hashA,
+      units: [{
+        itemId: 'u1',
+        scaleAssessmentId: 'scale-child-student-2',
+        definitionHash: defHash,
+        presentationMode: 'ALL_AT_ONCE',
+        trainingTiming: timingFixture,
+        scale: template.units[0]!.scale,
+      }],
+    })
+
+    expect(applyWholeTemplateBinding(template, makeBinding({ templateHash: hashB }))).toBeNull()
+    expect(applyWholeTemplateBinding(template, makeBinding({ slotSetHash: '9'.repeat(64) }))).toBeNull()
+    expect(applyWholeTemplateBinding(template, makeBinding({
+      units: [{ itemId: 'u1', scaleAssessmentId: 's2', definitionHash: 'f'.repeat(64) }],
+    }))).toBeNull()
+    expect(applyWholeTemplateBinding(template, makeBinding({ units: [] }))).toBeNull()
+  })
+
+  it('resolves binding from cache, fetches template on miss, and falls back on fetch failure', async () => {
+    const storage = createMemoryStorage()
+    const template = makeTemplate()
+    const binding = makeBinding()
+    const fetchTemplate = vi.fn().mockResolvedValue({ code: 0, message: 'OK', data: template })
+    const fallbackDef = definition('attempt-student-2', { templateHash: hashB })
+    const fallback = vi.fn().mockResolvedValue({ code: 0, message: 'OK', data: fallbackDef })
+
+    // 1. Cache miss -> fetchTemplate
+    const fromFetch = await resolveWholeDefinitionPayload({ wholeBinding: binding }, fetchTemplate, fallback, storage)
+    expect(fromFetch.data?.attemptId).toBe('attempt-student-2')
+    expect(fromFetch.data?.units[0]?.scaleAssessmentId).toBe('scale-child-student-2')
+    expect(fetchTemplate).toHaveBeenCalledWith(hashA)
+    expect(fallback).not.toHaveBeenCalled()
+
+    // 2. Subsequent call hits memory/storage cache -> zero extra network calls
+    fetchTemplate.mockClear()
+    const fromCache = await resolveWholeDefinitionPayload({ wholeBinding: binding }, fetchTemplate, fallback, storage)
+    expect(fromCache.data?.units[0]?.scaleAssessmentId).toBe('scale-child-student-2')
+    expect(fetchTemplate).not.toHaveBeenCalled()
+    expect(fallback).not.toHaveBeenCalled()
+
+    // 3. Evicted + fetchTemplate failure -> falls back to full definition GET
+    evictCachedWholeQuestionnaireTemplate(hashA, storage)
+    fetchTemplate.mockRejectedValueOnce(new Error('409 Stale template'))
+    const fromFallback = await resolveWholeDefinitionPayload({ wholeBinding: binding }, fetchTemplate, fallback, storage)
+    expect(fromFallback.data).toBe(fallbackDef)
+    expect(fallback).toHaveBeenCalledOnce()
+    expect(getCachedWholeQuestionnaireTemplate(hashB, storage)).not.toBeNull()
+  })
+
+  it('survives storage quota failures gracefully and assembles inline bindings', () => {
+    const failingStorage = {
+      getItem: () => null,
+      setItem: () => { throw new Error('QuotaExceededError') },
+      removeItem: () => { throw new Error('SecurityError') },
+    }
+    const inlineDef = definition('attempt-1', { templateHash: hashA })
+    expect(isWholeQuestionnaireBinding(inlineDef)).toBe(false)
+    expect(isWholeQuestionnaireBinding(makeBinding())).toBe(true)
+    expect(assembleInlineWholePayload({ wholeDefinition: inlineDef }, failingStorage)).toBe(inlineDef)
+    const inlineBound = assembleInlineWholePayload({ wholeBinding: makeBinding() }, failingStorage)
+    expect(inlineBound?.units[0]?.scaleAssessmentId).toBe('scale-child-student-2')
   })
 })

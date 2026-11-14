@@ -1,24 +1,85 @@
+import apiClient, { sessionFetch } from '../../api/client'
 import type { PublicDeliveryCreateInput } from '../../api/publicDelivery'
 import type { WholeReceiptLookup } from './receipt-recovery'
-import type { CompositeReportStatus, CompositeReportView, WholeQuestionnaireDefinition, WholeQuestionnaireInput, WholeQuestionnaireReceipt } from './types'
-import apiClient, { sessionFetch } from '../../api/client'
 import type {
   AnalysisProtocolCatalog,
   AnalysisProtocolSelection,
-  ReportPackageCatalog,
-  ReportPackageProfile,
+  CompositeAnalysisExportDownload,
+  CompositeAnalysisExportFormat,
   CompositeAttemptState,
-  CompositeMutationAck,
   CompositeLibraryTemplate,
+  CompositeMutationAck,
+  CompositePublicAccessToken,
   CompositePublicInfo,
   CompositeReport,
+  CompositeReportStatus,
+  CompositeReportView,
   CompositeSnapshotMetadata,
   CompositeTeacherAttemptsResponse,
   CompositeTeacherListItem,
-  CompositeAnalysisExportDownload,
-  CompositeAnalysisExportFormat,
-  CompositePublicAccessToken,
+  ReportPackageCatalog,
+  ReportPackageProfile,
+  WholeQuestionnaireBinding,
+  WholeQuestionnaireDefinition,
+  WholeQuestionnaireInput,
+  WholeQuestionnaireReceipt,
+  WholeQuestionnaireTemplate,
 } from './types'
+import { getKnownWholeTemplateHashes, resolveWholeDefinitionPayload } from './whole-definition-source'
+
+type WholeDefinitionWirePayload =
+  | WholeQuestionnaireDefinition
+  | { wholeBinding: WholeQuestionnaireBinding }
+
+const knownWholeTemplateHeader = (): { 'X-Whole-Template-Hash': string } | undefined => {
+  const hashes = getKnownWholeTemplateHashes()
+  return hashes.length > 0 ? { 'X-Whole-Template-Hash': hashes.join(',') } : undefined
+}
+
+const fetchWholeDefinitionWithTemplate = async (
+  baseUrl: string,
+  extraHeaders?: Record<string, string>,
+): ReturnType<typeof resolveWholeDefinitionPayload> => {
+  const defUrl = `${baseUrl}/definition`
+  const knownHeaders = knownWholeTemplateHeader()
+  const mergedHeaders = knownHeaders || extraHeaders
+    ? { ...(extraHeaders ?? {}), ...(knownHeaders ?? {}) }
+    : undefined
+  const response = mergedHeaders
+    ? await apiClient.get<WholeDefinitionWirePayload>(defUrl, { headers: mergedHeaders })
+    : await apiClient.get<WholeDefinitionWirePayload>(defUrl)
+  if (response.code !== 0 || !response.data) {
+    return response as unknown as Awaited<ReturnType<typeof resolveWholeDefinitionPayload>>
+  }
+  return resolveWholeDefinitionPayload(
+    response.data,
+    (templateHash) => {
+      const tmplUrl = `${baseUrl}/template/${encodeURIComponent(templateHash)}`
+      return extraHeaders
+        ? apiClient.get<WholeQuestionnaireTemplate>(tmplUrl, { headers: extraHeaders })
+        : apiClient.get<WholeQuestionnaireTemplate>(tmplUrl)
+    },
+    () => (extraHeaders
+      ? apiClient.get<WholeQuestionnaireDefinition>(defUrl, { headers: extraHeaders })
+      : apiClient.get<WholeQuestionnaireDefinition>(defUrl)),
+  )
+}
+
+const postWholeStart = <TRecovery extends string | null>(
+  url: string,
+  body: Record<string, unknown>,
+) => {
+  type StartPayload = {
+    attempt: CompositeAttemptState
+    recoveryToken: TRecovery
+    wholeDefinition?: WholeQuestionnaireDefinition
+    wholeBinding?: WholeQuestionnaireBinding
+  }
+  const knownHeaders = knownWholeTemplateHeader()
+  return knownHeaders
+    ? apiClient.post<StartPayload>(url, body, { headers: knownHeaders })
+    : apiClient.post<StartPayload>(url, body)
+}
 
 export const compositeAnalysisExportPath = (
   compositeId: string,
@@ -105,7 +166,7 @@ export const compositeApi = {
   disableToken: (id: string, tokenId: string) => apiClient.delete(`/composite-assessments/${id}/public-tokens/${tokenId}`),
   exportData: (id: string, input: { detail: 'summary' | 'full'; format: 'csv' | 'sav' | 'zip'; anonymize?: boolean; courseId?: string }, requestKey?: string) => apiClient.post<any>(`/composite-assessments/${id}/export`, input, { headers: { 'X-Export-Request-Key': requestKey } }),
   listAvailable: () => apiClient.get<{ list: Array<Record<string, unknown>> }>('/composite-assessments/available', { params: { view: 'summary' } }),
-  start: (assessmentId: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: null; wholeDefinition?: WholeQuestionnaireDefinition }>(`/composite-assessments/${assessmentId}/attempts`, { delivery: 'whole' }),
+  start: (assessmentId: string) => postWholeStart<null>(`/composite-assessments/${assessmentId}/attempts`, { delivery: 'whole' }),
   restart: (attemptId: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: null }>(`/composite-assessments/attempts/${attemptId}/restart`),
   getAttempt: (attemptId: string, view: 'full' | 'current-unit' = 'full') => apiClient.get<CompositeAttemptState>(`/composite-assessments/attempts/${attemptId}${view === 'current-unit' ? '?view=current-unit' : ''}`),
   freezeContext: (attemptId: string) => apiClient.post<{ status: 'frozen'; frozenAt: string }>(`/composite-assessments/attempts/${attemptId}/context/freeze`, {}),
@@ -115,7 +176,9 @@ export const compositeApi = {
   formAnswer: (attemptId: string, itemId: string, value: string) => apiClient.post<CompositeMutationAck>(`/composite-assessments/attempts/${attemptId}/items/${itemId}/form-answer`, { itemId, value }),
   submitFinalFormSection: (attemptId: string, sectionId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ formItemId: string; value: import("../../components/questionnaire/FormPlayer").FormPlayerValue; otherText?: string }> }) => apiClient.post<any>(`/composite-assessments/attempts/${attemptId}/form-sections/${sectionId}/submit`, input),
   submitFinalScale: (attemptId: string, itemId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ itemCode: string; responseValue: string | number; responseTimeMs?: number }> }, options?: { response: 'receipt' }) => apiClient.post<any>(`/composite-assessments/attempts/${attemptId}/items/${itemId}/scale/submit${options?.response === 'receipt' ? '?response=receipt' : ''}`, input),
-  wholeDefinition: (attemptId: string) => apiClient.get<WholeQuestionnaireDefinition>(`/composite-assessments/attempts/${attemptId}/whole/definition`),
+  wholeTemplate: (attemptId: string, templateHash: string) =>
+    apiClient.get<WholeQuestionnaireTemplate>(`/composite-assessments/attempts/${attemptId}/whole/template/${encodeURIComponent(templateHash)}`),
+  wholeDefinition: (attemptId: string) => fetchWholeDefinitionWithTemplate(`/composite-assessments/attempts/${attemptId}/whole`),
   wholeReceipt: (attemptId: string, submissionId: string, attemptEpoch: number) => apiClient.get<WholeReceiptLookup>(`/composite-assessments/attempts/${attemptId}/whole/receipt?submissionId=${encodeURIComponent(submissionId)}&attemptEpoch=${attemptEpoch}`),
   submitWhole: (attemptId: string, input: WholeQuestionnaireInput) => apiClient.post<WholeQuestionnaireReceipt>(`/composite-assessments/attempts/${attemptId}/whole/submit`, input),
   reportStatus: (attemptId: string, waitMs = 0, signal?: AbortSignal) => apiClient.get<CompositeReportStatus>(`/composite-assessments/attempts/${attemptId}/report-status`, { params: { waitMs }, signal }),
@@ -158,7 +221,7 @@ export const compositeApi = {
 
 export const publicCompositeApi = (recoveryToken: string) => ({
   info: (token: string) => apiClient.get<CompositePublicInfo>(`/public/composite-assessments/${token}`),
-  start: (token: string, resumeToken?: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: string | null; wholeDefinition?: WholeQuestionnaireDefinition }>(`/public/composite-assessments/${token}/start?delivery=whole`, resumeToken ? { recoveryToken: resumeToken } : {}),
+  start: (token: string, resumeToken?: string) => postWholeStart<string | null>(`/public/composite-assessments/${token}/start?delivery=whole`, resumeToken ? { recoveryToken: resumeToken } : {}),
   restart: (attemptId: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: string | null }>(`/public/composite-assessments/attempts/${attemptId}/restart`, {}, { headers: { 'X-Recovery-Token': recoveryToken } }),
   getAttempt: (attemptId: string, view: 'full' | 'current-unit' = 'full') => apiClient.get<CompositeAttemptState>(`/public/composite-assessments/attempts/${attemptId}${view === 'current-unit' ? '?view=current-unit' : ''}`, { headers: { 'X-Recovery-Token': recoveryToken } }),
   freezeContext: (attemptId: string) => apiClient.post<{ status: 'frozen'; frozenAt: string }>(`/public/composite-assessments/attempts/${attemptId}/context/freeze`, {}, { headers: { 'X-Recovery-Token': recoveryToken } }),
@@ -168,7 +231,9 @@ export const publicCompositeApi = (recoveryToken: string) => ({
   formAnswer: (attemptId: string, itemId: string, value: string) => apiClient.post<CompositeMutationAck>(`/public/composite-assessments/attempts/${attemptId}/items/${itemId}/form-answer`, { itemId, value, recoveryToken }),
   submitFinalFormSection: (attemptId: string, sectionId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ formItemId: string; value: import("../../components/questionnaire/FormPlayer").FormPlayerValue; otherText?: string }> }) => apiClient.post<any>(`/public/composite-assessments/attempts/${attemptId}/form-sections/${sectionId}/submit`, input, { headers: { 'X-Recovery-Token': recoveryToken } }),
   submitFinalScale: (attemptId: string, itemId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ itemCode: string; responseValue: string | number; responseTimeMs?: number }> }, options?: { response: 'receipt' }) => apiClient.post<any>(`/public/composite-assessments/attempts/${attemptId}/items/${itemId}/scale/submit${options?.response === 'receipt' ? '?response=receipt' : ''}`, input, { headers: { 'X-Recovery-Token': recoveryToken } }),
-  wholeDefinition: (attemptId: string) => apiClient.get<WholeQuestionnaireDefinition>(`/public/composite-assessments/attempts/${attemptId}/whole/definition`, { headers: { 'X-Recovery-Token': recoveryToken } }),
+  wholeTemplate: (attemptId: string, templateHash: string) =>
+    apiClient.get<WholeQuestionnaireTemplate>(`/public/composite-assessments/attempts/${attemptId}/whole/template/${encodeURIComponent(templateHash)}`, { headers: { 'X-Recovery-Token': recoveryToken } }),
+  wholeDefinition: (attemptId: string) => fetchWholeDefinitionWithTemplate(`/public/composite-assessments/attempts/${attemptId}/whole`, { 'X-Recovery-Token': recoveryToken }),
   wholeReceipt: (attemptId: string, submissionId: string, attemptEpoch: number) => apiClient.get<WholeReceiptLookup>(`/public/composite-assessments/attempts/${attemptId}/whole/receipt?submissionId=${encodeURIComponent(submissionId)}&attemptEpoch=${attemptEpoch}`, { headers: { 'X-Recovery-Token': recoveryToken } }),
   submitWhole: (attemptId: string, input: WholeQuestionnaireInput) => apiClient.post<WholeQuestionnaireReceipt>(`/public/composite-assessments/attempts/${attemptId}/whole/submit`, input, { headers: { 'X-Recovery-Token': recoveryToken } }),
   reportStatus: (attemptId: string, waitMs = 0, signal?: AbortSignal) => apiClient.get<CompositeReportStatus>(`/public/composite-assessments/attempts/${attemptId}/report-status`, { headers: { 'X-Recovery-Token': recoveryToken }, params: { waitMs }, signal }),

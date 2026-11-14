@@ -11,6 +11,7 @@ export interface PublicTemplateRepository { read(hashes: string[]): Promise<Publ
 const MAX_BYTES = 2 * 1024 * 1024
 const kinds = new Set<PublicTemplateKind>(['SCALE_RESULT_BASE', 'SCALE_REFERENCE', 'SCALE_INTERPRETATION', 'SCALE_CAVEATS', 'SCALE_CANONICAL_LAYOUT', 'COMPOSITE_REPORT_LAYOUT', 'UNIT_ADMISSION_PLAN', 'FROZEN_SLOT_PLAN', 'WHOLE_VALIDATION_PLAN', 'COGNITIVE_PROFILE_CONFIGURATION'])
 const hashOf = (kind: PublicTemplateKind, value: unknown) => canonicalHash({ storageVersion: 1, kind, value })
+export const publicTemplateHash = hashOf
 export const createPublicTemplateStore = (repository: PublicTemplateRepository, limits = {entries:512,bytes:8*1024*1024}) => {
   // Public scientific content only. No personal results or access decisions.
   const cache = new BoundedArtifactCache<{ kind: PublicTemplateKind; value: any }>(limits.entries, limits.bytes)
@@ -24,10 +25,17 @@ export const createPublicTemplateStore = (repository: PublicTemplateRepository, 
     cache.set(row.templateHash, { kind: row.templateKind, value }, row.plaintextBytes * 6 + row.payloadEncrypted.length * 2 + 512)
     return { kind: row.templateKind, value }
   }
-  const saveMany = async (values: Array<{ kind: PublicTemplateKind; value: unknown }>): Promise<string[]> => {
+  const saveMany = async (values: Array<{ kind: PublicTemplateKind; value: unknown; precomputedHash?: string }>): Promise<string[]> => {
     const pending = new Map<string, PublicTemplateRow>()
-    const hashes = values.map(({ kind, value }) => {
+    const hashes = values.map(({ kind, value, precomputedHash }) => {
       if (!kinds.has(kind)) throw new Error('Unsupported public template kind')
+      if (precomputedHash && /^[a-f0-9]{64}$/.test(precomputedHash)) {
+        const known = cache.get(precomputedHash)
+        if (known) {
+          if (known.kind !== kind) throw new Error('Public template kind mismatch')
+          return precomputedHash
+        }
+      }
       const bytes = canonicalJsonBytes(value), hash = hashOf(kind, value)
       if (bytes.length < 1 || bytes.length > MAX_BYTES) throw new Error('Public template size limit')
       const known = cache.get(hash)

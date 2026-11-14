@@ -3,6 +3,7 @@ import { traceAssessmentPhase, withQueryRawLabel } from '../../services/runtimeO
 
 export type StartPayloadWithAttempt = { attempt?: { id?: string; executionMode?: string } }
 type WholeDefinition = Awaited<ReturnType<typeof import('./whole-questionnaire.service').getWholeQuestionnaireDefinition>>
+type WholeBinding = import('./whole-questionnaire.service').WholeQuestionnaireBindingDto
 
 /** X-05A: deliver the whole questionnaire definition inline with the START
  * response when the client asks for it (delivery=whole) and the started
@@ -18,11 +19,26 @@ export const startResponseWithInlineWholeDefinition = async <T extends StartPayl
   data: T,
   principal: { userId?: string; recoveryTokenHash?: string },
   preloadedParent?: { id: string } | null,
-): Promise<T | (T & { wholeDefinition: WholeDefinition })> => {
-  if ((data as T & { wholeDefinition?: WholeDefinition }).wholeDefinition) return data
+  knownTemplateHashes?: ReadonlySet<string>,
+): Promise<T | (T & { wholeDefinition: WholeDefinition }) | (T & { wholeBinding: WholeBinding })> => {
+  if ((data as T & { wholeDefinition?: WholeDefinition; wholeBinding?: WholeBinding }).wholeDefinition
+    || (data as T & { wholeBinding?: WholeBinding }).wholeBinding) {
+    return data
+  }
   const attemptId = data?.attempt?.id
   if (!wantsWholeDelivery || !attemptId || data.attempt?.executionMode !== 'WHOLE_LOCAL') return data
   try {
+    if (knownTemplateHashes && knownTemplateHashes.size > 0) {
+      const { getWholeQuestionnaireDelivery } = await import('./whole-questionnaire.service')
+      const delivered = await traceAssessmentPhase('start.inline_whole_definition',
+        () => withQueryRawLabel('start.raw.inline_definition', () => getWholeQuestionnaireDelivery(attemptId, principal, {
+          preloaded: preloadedParent,
+          knownTemplateHashes,
+        })))
+      return delivered.mode === 'binding'
+        ? { ...data, wholeBinding: delivered.binding }
+        : { ...data, wholeDefinition: delivered.definition }
+    }
     const { getWholeQuestionnaireDefinition } = await import('./whole-questionnaire.service')
     const wholeDefinition = await traceAssessmentPhase('start.inline_whole_definition',
       () => withQueryRawLabel('start.raw.inline_definition', () => getWholeQuestionnaireDefinition(attemptId, principal, preloadedParent)))
