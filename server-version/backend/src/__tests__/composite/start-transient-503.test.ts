@@ -1,8 +1,9 @@
 import {Prisma} from '@prisma/client'
 import {beforeEach,describe,expect,it,vi} from 'vitest'
-const m=vi.hoisted(()=>({start:vi.fn(),restart:vi.fn()}))
-vi.mock('../../modules/composite/composite.service',async orig=>({...(await orig() as object),startUserAttempt:m.start,restartUserAttempt:m.restart}))
+const m=vi.hoisted(()=>({start:vi.fn(),restart:vi.fn(),publicStart:vi.fn(),publicRestart:vi.fn()}))
+vi.mock('../../modules/composite/composite.service',async orig=>({...(await orig() as object),startUserAttempt:m.start,restartUserAttempt:m.restart,startPublicAttempt:m.publicStart,restartPublicAttempt:m.publicRestart}))
 import {compositeController} from '../../modules/composite/composite.controller'
+import {InstrumentFinalSubmitError} from '../../services/instrumentFinalSubmit'
 import {rethrowGateBusyAsStartBusy} from '../../modules/composite/start-transient'
 import {BoundedAdmissionBusyError} from '../../services/boundedAdmissionGate'
 import {AssessmentStartBusyError,classifyStartTransaction,rolledBackStartReason,START_INTERACTIVE_TRANSACTION} from '../../modules/composite/start-transient'
@@ -70,7 +71,44 @@ describe('gate-busy wiring (queue_full / timeout -> 503 contract)',()=>{
  })
 })
 describe('START transient rollback classification',()=>{
- beforeEach(()=>{m.start.mockReset();m.restart.mockReset()})
+ beforeEach(()=>{m.start.mockReset();m.restart.mockReset();m.publicStart.mockReset();m.publicRestart.mockReset()})
+ it('returns resource protection as a retryable 503 for authenticated START',async()=>{
+  const message='系统繁忙，请稍后开始测评；已经提交的答案不受影响。'
+  m.start.mockRejectedValue(new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE',message,503))
+  const res=fakeRes()
+  await compositeController.startAttempt(req,res)
+  expect(res.statusCode).toBe(503)
+  expect(res.headers['Retry-After']).toBe('30')
+  expect(res.body).toEqual({code:'INSTRUMENT_NOT_AVAILABLE',message,data:null})
+  expect(m.start).toHaveBeenCalledTimes(1)
+ })
+ it('returns the same protection response for authenticated RESTART and public START/RESTART',async()=>{
+  const message='系统繁忙，请稍后开始测评；已经提交的答案不受影响。'
+  m.restart.mockRejectedValue(new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE',message,503))
+  m.publicStart.mockRejectedValue(new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE',message,503))
+  m.publicRestart.mockRejectedValue(new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE',message,503))
+  const restartRes=fakeRes(),publicRes=fakeRes(),publicRestartRes=fakeRes()
+  await compositeController.restartAttempt(req,restartRes)
+  await compositeController.publicStart({params:{token:'synthetic'},query:{},body:{}} as any,publicRes)
+  await compositeController.publicRestart({params:{attemptId:'a1'},headers:{'x-recovery-token':'a'.repeat(24)}} as any,publicRestartRes)
+  for(const res of [restartRes,publicRes,publicRestartRes]){
+   expect(res.statusCode).toBe(503)
+   expect(res.headers['Retry-After']).toBe('30')
+   expect(res.body).toEqual({code:'INSTRUMENT_NOT_AVAILABLE',message,data:null})
+  }
+ })
+ it('does not treat other unavailable statuses or unrelated 503 errors as resource protection',async()=>{
+  const res404=fakeRes(),resUnknown=fakeRes()
+  m.start.mockRejectedValueOnce(new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE','不可用',404))
+   .mockRejectedValueOnce(Object.assign(new Error('internal detail'),{statusCode:503}))
+  await compositeController.startAttempt(req,res404)
+  await compositeController.startAttempt(req,resUnknown)
+  expect(res404.statusCode).toBe(404)
+  expect(res404.headers['Retry-After']).toBeUndefined()
+  expect(resUnknown.statusCode).toBe(500)
+  expect(resUnknown.headers['Retry-After']).toBeUndefined()
+  expect(resUnknown.body.message).toBe('服务器内部错误')
+ })
  it('START interactive transaction uses 10s maxWait and 15s timeout',()=>{expect(START_INTERACTIVE_TRANSACTION).toEqual({maxWait:10_000,timeout:15_000})})
  it.each(rolledBack)('%s is a known rollback',(_n,err,reason)=>{expect(rolledBackStartReason(err)).toBe(reason)})
  it.each(ambiguousTransactions)('%s retains its unknown commit outcome',async(_n,err)=>{
