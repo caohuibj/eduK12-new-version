@@ -33,6 +33,8 @@ import {
 import FinalCompositeAssessment from '../../components/FinalCompositeAssessment'
 import WholeCompositeQuestionnaire from '../../components/WholeCompositeQuestionnaire'
 import { normalizeApiError } from '../../utils/normalizeApiError'
+import { isTrainingHost } from '../../training/context'
+import { startTrainingWithRecovery } from './training-start-recovery'
 
 const tokenKey = (token: string) => `composite:recovery:token:${token}`
 const attemptKey = (attemptId: string) =>
@@ -63,8 +65,11 @@ const CompositeAssessmentContent: React.FC = () => {
   const childTask = relationalMode && new URLSearchParams(location.search).get('returnTo') === '/relational/child-control'
   const relationalReturn = childTask ? '/relational/child-control' : organizationTask ? '/my-assessments' : '/relational/tasks'
   const token = params.token || ''
+  const routeKeyRef = useRef(location.pathname)
+  routeKeyRef.current = location.pathname
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [retryMessage, setRetryMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [existingReportId, setExistingReportId] = useState<string | null>(null)
   const [state, setState] = useState<CompositeAttemptState | null>(null)
@@ -222,9 +227,12 @@ const CompositeAssessmentContent: React.FC = () => {
   const start = async (resumeToken?: string) => {
     const signal = pageSignal()
     if (signal.aborted) return
+    const routeKey = routeKeyRef.current
+    const isCurrent = () => !signal.aborted && routeKeyRef.current === routeKey
     try {
       setSubmitting(true)
       setError(null)
+      setRetryMessage(null)
       setExistingReportId(null)
       if (publicMode) {
         const credential =
@@ -235,7 +243,7 @@ const CompositeAssessmentContent: React.FC = () => {
           token,
           credential || undefined,
         )
-        if (signal.aborted) return
+        if (!isCurrent()) return
         if (response.code !== 0 || !response.data)
           throw new Error(response.message || '无法开始匿名综合测评')
         const inlineWhole = response.data.wholeDefinition ?? null
@@ -265,8 +273,20 @@ const CompositeAssessmentContent: React.FC = () => {
         if (response.data.recoveryToken)
           setNewRecoveryToken(response.data.recoveryToken)
       } else {
-        const response = await compositeApi.start(params.assessmentId || '')
-        if (signal.aborted) return
+        const assessmentId = params.assessmentId || ''
+        const response = !relationalMode && isTrainingHost()
+          ? await startTrainingWithRecovery({
+            assessmentId,
+            start: () => compositeApi.start(assessmentId),
+            listAvailable: () => compositeApi.listAvailable(),
+            getAttempt: (id) => compositeApi.getAttempt(id),
+          }, {
+            signal,
+            isCurrent,
+            onRetry: (delayMs) => setRetryMessage(`暂未进入测评，${Math.ceil(delayMs / 1000)} 秒后自动重试，请稍候。`),
+          })
+          : await compositeApi.start(assessmentId)
+        if (!isCurrent()) return
         if (response.code !== 0 || !response.data)
           throw new Error(response.message || '无法开始综合测评')
         const inlineWhole = response.data.wholeDefinition ?? null
@@ -284,7 +304,7 @@ const CompositeAssessmentContent: React.FC = () => {
         }
       }
     } catch (err) {
-      if (signal.aborted) return
+      if (!isCurrent()) return
       const message =
         (err as { message?: string }).message || '无法开始综合测评'
       setError(message)
@@ -307,8 +327,11 @@ const CompositeAssessmentContent: React.FC = () => {
         }
       }
     } finally {
-      setSubmitting(false)
-      setLoading(false)
+      if (isCurrent()) {
+        setRetryMessage(null)
+        setSubmitting(false)
+        setLoading(false)
+      }
     }
   }
 
@@ -365,6 +388,8 @@ const CompositeAssessmentContent: React.FC = () => {
     activeAttemptIdentityRef.current = null
     inlineWholeDefinitionRef.current = null
     setLoading(true)
+    setSubmitting(false)
+    setRetryMessage(null)
     setState(null)
     setPublicInfo(null)
     setError(null)
@@ -530,7 +555,7 @@ const CompositeAssessmentContent: React.FC = () => {
   }
 
   if (loading && publicMode) return <section className="mx-auto max-w-xl rounded-xl border bg-white p-8" aria-label="正在恢复匿名测评"><p role="status">正在核对本次作答与恢复凭据，请稍候…</p><p className="mt-2 text-sm text-gray-600">无需学员账号登录；这不会自动创建另一份作答。</p></section>
-  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">加载中...</div>
+  if (loading) return <div role="status" className="flex items-center justify-center h-64 text-gray-500">{retryMessage || '加载中...'}</div>
 
   if (publicMode && !state) {
     return (
@@ -575,12 +600,13 @@ const CompositeAssessmentContent: React.FC = () => {
 
   if (!state) return <ProductPage width="reading"><ProductStatus
     kind="warning"
+    announce={retryMessage ? 'polite' : 'off'}
     title={error?.includes('最大次数') ? '本次测评的参与次数已用尽' : '暂时无法进入测评'}
     actions={<><Link className="hui-button hui-button--secondary" to={relationalMode ? relationalReturn : learner.enabled ? learner.backHref : '/student'}>{learner.enabled ? learner.backLabel : '返回任务列表'}</Link>
       {existingReportId && <ProductButton variant="primary" onClick={() => goReport(existingReportId)}>查看已有结果</ProductButton>}
-      {!error?.includes('最大次数') && <ProductButton onClick={() => params.attemptId ? void loadAttempt(params.attemptId) : void start()}>重新加载</ProductButton>}
+      {!error?.includes('最大次数') && <ProductButton disabled={submitting} onClick={() => params.attemptId ? void loadAttempt(params.attemptId) : void start()}>重新加载</ProductButton>}
     </>}
-  >{error || '综合测评不存在或不可访问'}{error?.includes('最大次数') && !existingReportId && <p>已有结果可从课程详情中查看。</p>}</ProductStatus></ProductPage>
+  >{retryMessage || error || '综合测评不存在或不可访问'}{error?.includes('最大次数') && !existingReportId && <p>已有结果可从课程详情中查看。</p>}</ProductStatus></ProductPage>
 
   if (state.status === 'COMPLETED' && !state.trainingFlow) {
     return <div className="card p-8 max-w-xl mx-auto text-center"><CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" /><h1 className="text-2xl font-bold mb-3">{state.taskSatisfied === false ? '已交卷，任务未达成' : state.productKind === 'QUESTIONNAIRE' ? '问卷已完成' : '综合测评已完成'}</h1>{state.taskSatisfied === false && <p className="mb-3 text-sm text-gray-600">作答已保存并计入次数，可查看本次个人报告。</p>}<button onClick={() => goReport(state.id)} className="btn-primary">{relationalMode ? '返回关系测评' : '查看个人报告'}</button></div>

@@ -6,6 +6,8 @@ import {getWholeQuestionnaireDefinition} from '../../modules/composite/whole-que
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integration/integration-env'
 import {compileResearchScale} from '../../modules/survey/builder.compiler'
 import {hashScaleDefinition} from '../../modules/scale/scale-definition'
+import * as resourceProtection from '../../services/assessmentResourceProtection'
+import {InstrumentFinalSubmitError} from '../../services/instrumentFinalSubmit'
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
 
 suite('fresh untimed whole START projection / PostgreSQL',()=>{
@@ -60,6 +62,25 @@ suite('fresh untimed whole START projection / PostgreSQL',()=>{
   expect(await db.assessment.count({where:{compositeAttemptId:parent.id,frozenAdmissionSnapshotHash:{not:null}}})).toBe(9)
   await db.courseStudent.update({where:{courseId_studentId:{courseId,studentId:students[0]}},data:{status:'PENDING'}})
   await expect(startUserAttempt(students[0],compositeId)).rejects.toMatchObject({statusCode:403})
+ },60000)
+ it('resumes an existing attempt but rejects a protected new start before its transaction',async()=>{
+  await db.courseStudent.update({where:{courseId_studentId:{courseId,studentId:students[0]}},data:{status:'ACTIVE'}})
+  await startUserAttempt(students[0],compositeId)
+  const existing=await db.compositeAssessmentAttempt.findFirstOrThrow({where:{userId:students[0],compositeAssessmentId:compositeId,status:'IN_PROGRESS'}})
+  const guard=vi.spyOn(resourceProtection,'assertAssessmentStartResources').mockImplementation(()=>{
+   throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE','繁忙',503)
+  })
+  const transaction=vi.spyOn(db,'$transaction')
+  try{
+   const resumed=await startUserAttempt(students[0],compositeId)
+   expect(resumed.attempt.id).toBe(existing.id)
+   expect(guard).not.toHaveBeenCalled()
+   transaction.mockClear()
+   await expect(startUserAttempt(students[1],compositeId)).rejects.toMatchObject({code:'INSTRUMENT_NOT_AVAILABLE',statusCode:503})
+   expect(guard).toHaveBeenCalledOnce()
+   expect(transaction).not.toHaveBeenCalled()
+   expect(await db.compositeAssessmentAttempt.count({where:{userId:students[1],compositeAssessmentId:compositeId}})).toBe(0)
+  }finally{guard.mockRestore();transaction.mockRestore()}
  },60000)
  it('reuses the freshly-created authoritative parent for inline Whole Definition',async()=>{
   const parentRead=vi.spyOn(db.compositeAssessmentAttempt,'findUnique')

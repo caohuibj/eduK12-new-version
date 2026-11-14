@@ -3,14 +3,16 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Link, MemoryRouter, Route, Routes } from 'react-router-dom'
 
-const { mockPublicApi, mockCompositeApi } = vi.hoisted(() => ({
+const { mockPublicApi, mockCompositeApi, mockTrainingHost, mockTrainingSleep } = vi.hoisted(() => ({
   mockPublicApi: {
     info: vi.fn(),
     start: vi.fn(),
     getAttempt: vi.fn(),
     restart: vi.fn(),
   },
-  mockCompositeApi: { start: vi.fn(), listAvailable: vi.fn() },
+  mockCompositeApi: { start: vi.fn(), listAvailable: vi.fn(), getAttempt: vi.fn() },
+  mockTrainingHost: vi.fn(),
+  mockTrainingSleep: vi.fn(),
 }))
 
 vi.mock('../api', () => ({
@@ -21,6 +23,16 @@ vi.mock('../api', () => ({
 vi.mock('../../cognitive/core/recovery-credential', () => ({
   saveCognitiveRecoveryCredential: vi.fn(),
 }))
+
+vi.mock('../../../training/context', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../../training/context')>()),
+  isTrainingHost: mockTrainingHost,
+}))
+vi.mock('../../../services/trainingBusyRetry', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../services/trainingBusyRetry')>()
+  return { ...actual, runTrainingRetry: <T,>(operation: () => Promise<T>, decide: Parameters<typeof actual.runTrainingRetry<T>>[1], options: Parameters<typeof actual.runTrainingRetry<T>>[2]) =>
+    actual.runTrainingRetry(operation, decide, { ...options, random: () => 0, sleep: mockTrainingSleep }) }
+})
 
 vi.mock('../../../services/completionRetry', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../../services/completionRetry')>()
@@ -47,6 +59,11 @@ const renderPublicPage = () =>
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockCompositeApi.start.mockReset()
+  mockCompositeApi.listAvailable.mockReset()
+  mockCompositeApi.getAttempt.mockReset()
+  mockTrainingHost.mockReturnValue(false)
+  mockTrainingSleep.mockResolvedValue(undefined)
   window.history.pushState({}, '', '/public/composite/token-1')
   window.sessionStorage.clear()
   mockPublicApi.info.mockResolvedValue({
@@ -62,6 +79,45 @@ beforeEach(() => {
       items: [],
     },
   })
+})
+
+it('shows the server busy delay while retrying an authenticated training start', async () => {
+  let resume!: () => void
+  mockTrainingHost.mockReturnValue(true)
+  mockTrainingSleep.mockImplementation(() => new Promise<void>((resolve) => { resume = resolve }))
+  mockCompositeApi.start.mockRejectedValueOnce({ status: 503, code: 'INSTRUMENT_NOT_AVAILABLE', retryAfterMs: 10_000 })
+    .mockResolvedValueOnce({ code: 0, message: 'ok', data: { attempt: { id: 'done', status: 'COMPLETED' }, recoveryToken: null } })
+  render(<MemoryRouter initialEntries={['/student/composite/c1']}><Routes>
+    <Route path="/student/composite/:assessmentId" element={<CompositeAssessmentPage />} />
+    <Route path="/student/composite/attempts/:attemptId/report" element={<p>已有报告</p>} />
+  </Routes></MemoryRouter>)
+  expect(await screen.findByText(/10 秒后自动重试/)).toBeInTheDocument()
+  expect(mockCompositeApi.start).toHaveBeenCalledTimes(1)
+  await act(async () => resume())
+  expect(await screen.findByText('已有报告')).toBeInTheDocument()
+  expect(mockCompositeApi.start).toHaveBeenCalledTimes(2)
+})
+
+it('does not retry the previous assessment after the learner switches routes', async () => {
+  let resume!: () => void
+  mockTrainingHost.mockReturnValue(true)
+  mockTrainingSleep.mockImplementation(() => new Promise<void>((resolve) => { resume = resolve }))
+  mockCompositeApi.start.mockImplementation((id: string) => id === 'c1'
+    ? Promise.reject({ status: 503, code: 'INSTRUMENT_NOT_AVAILABLE', retryAfterMs: 10_000 })
+    : Promise.resolve({ code: 0, message: 'ok', data: { attempt: { id: 'done', status: 'COMPLETED' }, recoveryToken: null } }))
+  render(<MemoryRouter initialEntries={['/student/composite/c1']}>
+    <Link to="/student/composite/c2">切换测评</Link>
+    <Routes>
+      <Route path="/student/composite/:assessmentId" element={<CompositeAssessmentPage />} />
+      <Route path="/student/composite/attempts/:attemptId/report" element={<p>新测评结果</p>} />
+    </Routes>
+  </MemoryRouter>)
+  await screen.findByText(/10 秒后自动重试/)
+  fireEvent.click(screen.getByRole('link', { name: '切换测评' }))
+  expect(await screen.findByText('新测评结果')).toBeInTheDocument()
+  await act(async () => resume())
+  expect(mockCompositeApi.start.mock.calls.filter(([id]) => id === 'c1')).toHaveLength(1)
+  expect(mockCompositeApi.start.mock.calls.filter(([id]) => id === 'c2')).toHaveLength(1)
 })
 
 describe('CompositeAssessmentPage public entry', () => {
