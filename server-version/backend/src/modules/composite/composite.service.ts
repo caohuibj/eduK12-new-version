@@ -368,21 +368,43 @@ const startCompositeIdentity = async (id: string, db: Db = prisma) => {
   return identity
 }
 
-/** Cached classification read: identity + the shared publication tree WITHOUT
- * the per-request structuredClone. Read-only — callers must not mutate the
- * returned cached tree. cached is null on legacy composites (no snapshot hash)
- * and on cache misses. */
-export const loadStartCompositeCached = async (id: string, db: Db = prisma) => {
-  const identity = await startCompositeIdentity(id, db)
-  if (!identity.trainingContentSnapshotHash) return { identity, cached: null as any | null }
-  const key = publicationReadKey(identity.id, identity.trainingContentSnapshotHash, identity.updatedAt)
-  const cached = startCompositeCache.get(key) as { id: string; trainingContentSnapshotHash?: string | null; updatedAt?: Date } | undefined
-  if (cached && cached.id === identity.id
-      && cached.trainingContentSnapshotHash === identity.trainingContentSnapshotHash
-      && cached.updatedAt?.getTime() === identity.updatedAt.getTime()) {
-    return { identity, cached }
-  }
-  return { identity, cached: null as any | null }
+/** START-only scalar classification read: eligibility, product support and the
+ * resource-gate predicate need only publication scalars + item descriptors —
+ * never scale.definition or formSections — so the fat publication tree (and its
+ * structuredClone) is loaded only after a START passes these cheap checks.
+ * assertStudentEligibility may attach deliveryCourseId to this fresh,
+ * per-request object; callers carry it over to the fat publication. */
+const loadStartCompositeMetadata = async (id: string, db: Db = prisma) => {
+  const metadata = await db.compositeAssessment.findUnique({
+    where: { id },
+    select: {
+      productKind: true,
+      status: true,
+      questionnaireType: true,
+      courseId: true,
+      opensAt: true,
+      expiresAt: true,
+      trainingFlowFrozen: true,
+      trainingVariantFrozen: true,
+      reportPackageKey: true,
+      analysisProtocolKey: true,
+      trainingTimingPolicy: true,
+      course: { select: { isLibrary: true } },
+      questionnaireCourses: { select: { courseId: true } },
+      items: {
+        orderBy: { position: 'asc' as const },
+        select: {
+          type: true,
+          required: true,
+          standardCombinationSource: true,
+          situationalInstrumentKey: true,
+          situationalInstrumentVersion: true,
+        },
+      },
+    },
+  })
+  if (!metadata) throw compositeNotFound()
+  return metadata as typeof metadata & { deliveryCourseId?: string | null }
 }
 
 export const loadStartComposite = async (id: string, db: Db = prisma) => {
@@ -4040,15 +4062,12 @@ export const projectStartedAttempt = async (
 }
 
 export const startUserAttempt = async (userId: string, compositeId: string, opts?: { wantsWholeDelivery?: boolean; knownTemplateHashes?: ReadonlySet<string> }) => {
-  // Pure-read (write-time invariant): the student start path never lazily
-  // repairs sections on a published composite. loadComposite already includes
-  // formSections + items, so no separate section read is needed.
-  // Fast resume FIRST: the FOR SHARE query needs only compositeId + userId, so
-  // recovering an IN_PROGRESS attempt must not pay the fat publication load
-  // (structuredClone of the whole tree) nor be blocked by the resource gate.
-  // A resumed attempt continues one that was already admitted at its original
-  // start, so the eligibility re-check below does not apply to it.
+  // Check scalar eligibility/classification first so resumes and 503 rejects
+  // skip the fat publication load and its structuredClone.
   const preGateStart = process.hrtime.bigint()
+  const metadata = await loadStartCompositeMetadata(compositeId)
+  assertSupportedComposite(metadata, false, false)
+  await assertStudentEligibility(metadata, userId)
   const [inProgress] = await withQueryRawLabel('start.raw.pre_gate.in_progress', () => prisma.$queryRaw<Array<{ id: string }>>`
     SELECT "id" FROM "composite_assessment_attempts"
     WHERE "composite_assessment_id" = ${compositeId} AND "user_id" = ${userId}
@@ -4058,16 +4077,13 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
   if (inProgress) return traceAssessmentPhase('start.post_gate_getAttemptState',
     () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(inProgress.id, { userId }, Boolean(opts?.wantsWholeDelivery), null, undefined, undefined, opts?.knownTemplateHashes, false)))
 
-  // Resource gate BEFORE the fat publication load: under host memory/CPU
-  // pressure, reject NEW starts before the structuredClone of the whole tree
-  // and the eligibility read. Gate now applies to every new authenticated
-  // START regardless of product kind — host memory is a shared, host-wide
-  // budget. The in-transaction checks below still re-evaluate under the
-  // freeze because host pressure may change between this read and the freeze.
-  assertAssessmentStartResources()
+  if (isOrdinaryQuestionnaireStart(metadata) && metadata.items.length > 0
+      && metadata.items.every((item: any) => item.required && item.type === 'SCALE')) {
+    assertAssessmentStartResources()
+  }
+
   const composite = await loadStartComposite(compositeId)
-  assertSupportedComposite(composite, false, false)
-  await assertStudentEligibility(composite, userId)
+  if (metadata.deliveryCourseId) (composite as any).deliveryCourseId = metadata.deliveryCourseId
 
   const isUniqueConstraintError = (err: unknown) =>
     typeof err === 'object' && err !== null && 'code' in err && (err as { code?: unknown }).code === 'P2002'

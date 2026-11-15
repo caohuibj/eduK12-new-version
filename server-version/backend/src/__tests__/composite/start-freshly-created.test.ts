@@ -94,6 +94,7 @@ import {
 } from '../../modules/composite/composite.service'
 import { hashRecoveryToken } from '../../services/anonymousAccess'
 import { hashPublicAccessToken } from '../../services/publicAccessTokenCrypto'
+import * as assessmentResourceProtection from '../../services/assessmentResourceProtection'
 
 describe('START freshlyCreated server distinction', () => {
   const compositeRow = {
@@ -285,6 +286,44 @@ describe('START freshlyCreated server distinction', () => {
       recoveryToken: null,
       attempt: { id: 'attempt-reused' },
     })
+  })
+
+  it('fast-fails ordinary scale-only START on 503 resource gate before fat composite load or transaction', async () => {
+    mocks.prisma.$queryRaw.mockResolvedValueOnce([])
+    const busyError = Object.assign(new Error('系统繁忙'), { statusCode: 503, code: 'INSTRUMENT_NOT_AVAILABLE' })
+    const gateSpy = vi.spyOn(assessmentResourceProtection, 'assertAssessmentStartResources')
+      .mockImplementationOnce(() => { throw busyError })
+    try {
+      await expect(startUserAttempt('user-1', 'comp-1', { wantsWholeDelivery: true })).rejects.toBe(busyError)
+      expect(gateSpy).toHaveBeenCalledTimes(1)
+      expect(mocks.prisma.compositeAssessment.findUnique).toHaveBeenCalledTimes(1)
+      expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+    } finally {
+      gateSpy.mockRestore()
+    }
+  })
+
+  it('enforces live eligibility before fast-resume and skips resource gate plus fat load when fast-resuming', async () => {
+    const gateSpy = vi.spyOn(assessmentResourceProtection, 'assertAssessmentStartResources')
+    try {
+      mocks.prisma.$queryRaw.mockResolvedValueOnce([{ id: 'attempt-reused' }])
+      const resumed = await startUserAttempt('user-1', 'comp-1', { wantsWholeDelivery: true })
+      expect(resumed).toMatchObject({ freshlyCreated: false, attempt: { id: 'attempt-reused' } })
+      expect(gateSpy).not.toHaveBeenCalled()
+      expect(mocks.prisma.compositeAssessment.findUnique).toHaveBeenCalledTimes(1)
+
+      vi.clearAllMocks()
+      mocks.prisma.compositeAssessment.findUnique.mockResolvedValueOnce(compositeRow)
+      mocks.prisma.courseStudent.findFirst.mockResolvedValueOnce(null)
+      mocks.prisma.$queryRaw.mockResolvedValueOnce([{ id: 'attempt-reused' }])
+      await expect(startUserAttempt('user-1', 'comp-1', { wantsWholeDelivery: true }))
+        .rejects.toMatchObject({ statusCode: 403 })
+      expect(gateSpy).not.toHaveBeenCalled()
+      expect(mocks.prisma.$queryRaw).not.toHaveBeenCalled()
+      expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+    } finally {
+      gateSpy.mockRestore()
+    }
   })
 
   it('marks public recovery-token startPublicAttempt resume as freshlyCreated: false', async () => {
