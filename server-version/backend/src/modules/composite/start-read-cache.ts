@@ -6,6 +6,10 @@
 
 export const START_READ_CACHE_TTL_MS = 120_000
 export const START_READ_CACHE_MAX_ENTRIES = 256
+// availableTemplateCache keys are NOT publication-versioned: keep its TTL at the
+// original 30s budget so newly published/archived questionnaires surface in the
+// /available listing within the same visibility window as before (PR #730 review).
+export const AVAILABLE_TEMPLATE_CACHE_TTL_MS = 30_000
 
 export class BoundedTtlCache<V> {
   private readonly map = new Map<string, { value: V; expiresAt: number }>()
@@ -51,7 +55,7 @@ export class BoundedTtlCache<V> {
 export const startReadsCache = new BoundedTtlCache<unknown>(START_READ_CACHE_TTL_MS, START_READ_CACHE_MAX_ENTRIES)
 export const startCompositeCache = new BoundedTtlCache<unknown>(START_READ_CACHE_TTL_MS, START_READ_CACHE_MAX_ENTRIES)
 
-export const availableTemplateCache = new BoundedTtlCache<unknown>(START_READ_CACHE_TTL_MS, 8)
+export const availableTemplateCache = new BoundedTtlCache<unknown>(AVAILABLE_TEMPLATE_CACHE_TTL_MS, 8)
 
 export const publicationReadKey = (id: string, snapshotHash: string | null | undefined, updatedAt?: Date | string | null) => {
   const stamp = updatedAt instanceof Date ? String(updatedAt.getTime()) : updatedAt ? String(new Date(updatedAt).getTime()) : ''
