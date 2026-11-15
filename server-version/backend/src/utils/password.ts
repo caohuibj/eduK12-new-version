@@ -13,7 +13,7 @@ export const isValidPassword = (password: string): boolean => {
 }
 
 export const hashPassword = async (password: string): Promise<string> => {
-  return nativeBcryptHash(password, 10)
+  return nativeBcryptHash(password, { cost: 10 })
 }
 
 export const comparePassword = async (password: string, hash: string): Promise<boolean> => {
