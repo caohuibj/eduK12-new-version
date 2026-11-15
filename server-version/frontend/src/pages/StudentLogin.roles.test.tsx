@@ -33,7 +33,12 @@ describe('learner login entrance', () => {
     renderLogin()
     await submit('trainer-test')
     expect(await screen.findByRole('alert')).toHaveTextContent('此账号不是学员账号')
-    expect(mocks.login).toHaveBeenCalledWith({ username: 'trainer-test', password: 'test-password-1', expectedRole: 'STUDENT' })
+    expect(mocks.login).toHaveBeenCalledExactlyOnceWith(
+      { username: 'trainer-test', password: 'test-password-1', expectedRole: 'STUDENT' },
+      undefined,
+      undefined,
+      { signal: expect.any(AbortSignal) },
+    )
     expect(screen.getByRole('heading', { name: '学员登录' })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: '培训师管理页面' })).not.toBeInTheDocument()
   })
