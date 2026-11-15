@@ -1,38 +1,76 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { startTrainingWithRecovery } from '../training-start-recovery'
+import { TrainingRetryCancelledError, TrainingRetryTimeoutError } from '../../../services/trainingBusyRetry'
 
 const networkFailure = () => Object.assign(new Error('network failed'), { name: 'AxiosError', retryable: true })
-const response = (id: string) => ({ code: 0, message: 'ok', data: { attempt: { id, status: 'IN_PROGRESS' }, recoveryToken: null } })
-const available = (attempt: unknown, canStartNewAttempt = false) => ({ code: 0, message: 'ok', data: { list: [{ id: 'questionnaire', attempt, canStartNewAttempt, canContinue: Boolean(attempt && typeof attempt === 'object' && 'status' in attempt && attempt.status === 'IN_PROGRESS') }] } })
+const response = (id: string, freshlyCreated = true) => ({
+  code: 0,
+  message: 'ok',
+  data: { attempt: { id, status: 'IN_PROGRESS' }, recoveryToken: null, freshlyCreated },
+})
+const available = (attempt: unknown, canStartNewAttempt = false) => ({
+  code: 0,
+  message: 'ok',
+  data: {
+    list: [{
+      id: 'questionnaire',
+      attempt,
+      canStartNewAttempt,
+      canContinue: Boolean(attempt && typeof attempt === 'object' && 'status' in attempt && attempt.status === 'IN_PROGRESS'),
+    }],
+  },
+})
 const options = { random: () => 0, sleep: async () => {} }
 
 describe('authenticated training START recovery', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('honors explicit busy responses without looking up or duplicating an attempt', async () => {
     const start = vi.fn().mockRejectedValueOnce({ status: 503, code: 'INSTRUMENT_NOT_AVAILABLE', retryAfterMs: 10_000 }).mockResolvedValue(response('a1'))
     const listAvailable = vi.fn()
     const sleep = vi.fn(async () => {})
     const result = await startTrainingWithRecovery({ assessmentId: 'questionnaire', start, listAvailable, getAttempt: vi.fn() } as any, { random: () => 0.5, sleep })
-    expect(result.data.attempt.id).toBe('a1')
+    expect(result.source).toBe('start-response')
+    expect(result.response.data.attempt.id).toBe('a1')
     expect(start).toHaveBeenCalledTimes(2)
     expect(listAvailable).not.toHaveBeenCalled()
     expect(sleep).toHaveBeenCalledWith(12_000, undefined)
   })
 
-  it('recovers an in-progress attempt after a lost response without another START', async () => {
+  it('recovers an in-progress attempt after a lost response without another START and tags recovered source', async () => {
     const start = vi.fn().mockRejectedValue(networkFailure())
     const listAvailable = vi.fn().mockResolvedValue(available({ id: 'a1', status: 'IN_PROGRESS' }))
     const getAttempt = vi.fn().mockResolvedValue({ code: 0, message: 'ok', data: { id: 'a1', status: 'IN_PROGRESS' } })
     const result = await startTrainingWithRecovery({ assessmentId: 'questionnaire', start, listAvailable, getAttempt } as any, options)
-    expect(result.data.attempt.id).toBe('a1')
+    expect(result.source).toBe('recovered-existing')
+    expect(result.response.data.freshlyCreated).toBe(false)
+    expect(result.response.data.attempt.id).toBe('a1')
     expect(start).toHaveBeenCalledOnce()
-    expect(getAttempt).toHaveBeenCalledWith('a1')
+    expect(getAttempt).toHaveBeenCalledWith('a1', expect.any(AbortSignal))
+  })
+
+  it('recovers an in-progress attempt after START request timeout without issuing another START', async () => {
+    const start = vi.fn().mockRejectedValue(new TrainingRetryTimeoutError())
+    const listAvailable = vi.fn().mockResolvedValue(available({ id: 'a-timeout', status: 'IN_PROGRESS' }))
+    const getAttempt = vi.fn().mockResolvedValue({ code: 0, message: 'ok', data: { id: 'a-timeout', status: 'IN_PROGRESS' } })
+    const result = await startTrainingWithRecovery({ assessmentId: 'questionnaire', start, listAvailable, getAttempt } as any, options)
+    expect(result.source).toBe('recovered-existing')
+    expect(result.response.data.freshlyCreated).toBe(false)
+    expect(result.response.data.attempt.id).toBe('a-timeout')
+    expect(start).toHaveBeenCalledOnce()
+    expect(listAvailable).toHaveBeenCalledWith(expect.any(AbortSignal))
+    expect(getAttempt).toHaveBeenCalledWith('a-timeout', expect.any(AbortSignal))
   })
 
   it('retries a lost response only after a successful read establishes that a new start is allowed', async () => {
-    const start = vi.fn().mockRejectedValueOnce(networkFailure()).mockResolvedValue(response('a2'))
+    const start = vi.fn().mockRejectedValueOnce(networkFailure()).mockResolvedValue(response('a2', true))
     const listAvailable = vi.fn().mockResolvedValue(available(null, true))
     const result = await startTrainingWithRecovery({ assessmentId: 'questionnaire', start, listAvailable, getAttempt: vi.fn() } as any, options)
-    expect(result.data.attempt.id).toBe('a2')
+    expect(result.source).toBe('start-response')
+    expect(result.response.data.freshlyCreated).toBe(true)
+    expect(result.response.data.attempt.id).toBe('a2')
     expect(start).toHaveBeenCalledTimes(2)
     expect(listAvailable).toHaveBeenCalledOnce()
   })
@@ -58,5 +96,77 @@ describe('authenticated training START recovery', () => {
       expect(start).toHaveBeenCalledOnce()
       expect(listAvailable).not.toHaveBeenCalled()
     }
+  })
+
+  it('stops recovery immediately when aborted by the caller signal', async () => {
+    const controller = new AbortController()
+    const start = vi.fn(() => {
+      controller.abort()
+      return Promise.reject(networkFailure())
+    })
+    const listAvailable = vi.fn()
+    await expect(
+      startTrainingWithRecovery({ assessmentId: 'questionnaire', start, listAvailable, getAttempt: vi.fn() } as any, { ...options, signal: controller.signal }),
+    ).rejects.toBeInstanceOf(TrainingRetryCancelledError)
+    expect(start).toHaveBeenCalledOnce()
+    expect(listAvailable).not.toHaveBeenCalled()
+  })
+
+  it('shares the remaining 35s deadline across listAvailable and getAttempt instead of granting each 10s', async () => {
+    vi.useFakeTimers()
+    let getAttemptSignal: AbortSignal | undefined
+    const start = vi.fn(() => new Promise<ReturnType<typeof response>>(() => {}))
+    const listAvailable = vi.fn(() => new Promise<ReturnType<typeof available>>((resolve) => {
+      setTimeout(() => resolve(available({ id: 'a-shared', status: 'IN_PROGRESS' })), 8_000)
+    }))
+    const getAttempt = vi.fn((_id: string, signal?: AbortSignal) => {
+      getAttemptSignal = signal
+      return new Promise<never>(() => {})
+    })
+
+    const promise = startTrainingWithRecovery(
+      { assessmentId: 'questionnaire', start, listAvailable, getAttempt } as any,
+      { requestTimeoutMs: 25_000, maxTotalWaitMs: 35_000 },
+    )
+    const caught = promise.catch((err) => err)
+
+    // 25s START timeout leaves 10s total recovery budget.
+    await vi.advanceTimersByTimeAsync(25_000)
+    expect(listAvailable).toHaveBeenCalledOnce()
+    expect(getAttempt).not.toHaveBeenCalled()
+
+    // Step 1 (/available) consumes 8s -> only 2s remain for getAttempt.
+    await vi.advanceTimersByTimeAsync(8_000)
+    expect(getAttempt).toHaveBeenCalledOnce()
+    expect(getAttemptSignal?.aborted).toBe(false)
+
+    // At 35s total (+2s), getAttempt must abort instead of waiting another 10s (43s).
+    await vi.advanceTimersByTimeAsync(2_000)
+    expect(getAttemptSignal?.aborted).toBe(true)
+
+    const result = await caught
+    expect(result).toBeInstanceOf(TrainingRetryTimeoutError)
+  })
+
+  it('skips getAttempt if listAvailable consumes the entire remaining 35s budget', async () => {
+    vi.useFakeTimers()
+    const start = vi.fn(() => new Promise<ReturnType<typeof response>>(() => {}))
+    const listAvailable = vi.fn(() => new Promise<ReturnType<typeof available>>((resolve) => {
+      setTimeout(() => resolve(available({ id: 'a-full', status: 'IN_PROGRESS' })), 10_000)
+    }))
+    const getAttempt = vi.fn()
+
+    const promise = startTrainingWithRecovery(
+      { assessmentId: 'questionnaire', start, listAvailable, getAttempt } as any,
+      { requestTimeoutMs: 25_000, maxTotalWaitMs: 35_000 },
+    )
+    const caught = promise.catch((err) => err)
+
+    await vi.advanceTimersByTimeAsync(25_000)
+    await vi.advanceTimersByTimeAsync(10_000)
+
+    const result = await caught
+    expect(result).toBeInstanceOf(TrainingRetryTimeoutError)
+    expect(getAttempt).not.toHaveBeenCalled()
   })
 })

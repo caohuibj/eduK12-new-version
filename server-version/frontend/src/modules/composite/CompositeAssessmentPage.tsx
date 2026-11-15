@@ -249,6 +249,7 @@ const CompositeAssessmentContent: React.FC = () => {
         const response = await publicCompositeApi(credential).start(
           token,
           credential || undefined,
+          signal,
         )
         if (!isCurrent()) return
         if (response.code !== 0 || !response.data)
@@ -269,7 +270,7 @@ const CompositeAssessmentContent: React.FC = () => {
         if (response.data.attempt.status === 'COMPLETED' && !response.data.attempt.trainingFlow)
           goReport(response.data.attempt.id)
         else {
-          setIsFreshStart(true)
+          setIsFreshStart(response.data.freshlyCreated === true)
           applyState(
             await freezeBeforeMeasurement(
               response.data.attempt,
@@ -281,18 +282,24 @@ const CompositeAssessmentContent: React.FC = () => {
           setNewRecoveryToken(response.data.recoveryToken)
       } else {
         const assessmentId = params.assessmentId || ''
-        const response = !relationalMode && isTrainingHost()
-          ? await startTrainingWithRecovery({
+        let response: Awaited<ReturnType<typeof compositeApi.start>>
+        let startSource: 'start-response' | 'recovered-existing' = 'start-response'
+        if (!relationalMode && isTrainingHost()) {
+          const result = await startTrainingWithRecovery({
             assessmentId,
-            start: () => compositeApi.start(assessmentId),
-            listAvailable: () => compositeApi.listAvailable(),
-            getAttempt: (id) => compositeApi.getAttempt(id),
+            start: (attemptSignal) => compositeApi.start(assessmentId, attemptSignal),
+            listAvailable: (attemptSignal) => compositeApi.listAvailable(attemptSignal),
+            getAttempt: (id, attemptSignal) => compositeApi.getAttempt(id, 'full', attemptSignal),
           }, {
             signal,
             isCurrent,
             onRetry: (delayMs) => setRetryMessage(`暂未进入测评，${Math.ceil(delayMs / 1000)} 秒后自动重试，请稍候。`),
           })
-          : await compositeApi.start(assessmentId)
+          response = result.response
+          startSource = result.source
+        } else {
+          response = await compositeApi.start(assessmentId, signal)
+        }
         if (!isCurrent()) return
         if (response.code !== 0 || !response.data)
           throw new Error(response.message || '无法开始综合测评')
@@ -306,7 +313,7 @@ const CompositeAssessmentContent: React.FC = () => {
         if (response.data.attempt.status === 'COMPLETED' && !response.data.attempt.trainingFlow)
           goReport(response.data.attempt.id)
         else {
-          setIsFreshStart(true)
+          setIsFreshStart(startSource === 'start-response' && response.data.freshlyCreated === true)
           applyState(await freezeBeforeMeasurement(response.data.attempt))
         }
       }

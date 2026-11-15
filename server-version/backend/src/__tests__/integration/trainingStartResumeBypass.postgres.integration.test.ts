@@ -118,6 +118,8 @@ suite('Training START resume bypasses the admission gate (real PostgreSQL)', () 
 
   it('returns the same attempt while the gate is occupied, without a second attempt or quota use', async () => {
     const first = await startUserAttempt(a, compositeId)
+    // A new START is fresh; bypassing the gate to resume the same attempt is not.
+    expect(first.freshlyCreated).toBe(true)
     let release!: () => void
     let bStart: Promise<unknown> | undefined
     let resumedRaw: Promise<unknown> | undefined
@@ -156,7 +158,8 @@ suite('Training START resume bypasses the admission gate (real PostgreSQL)', () 
       const elapsed = Date.now() - t0
       expect(bDone).toBe(false)
       expect(elapsed).toBeLessThan(5000)
-      expect(resumed).toEqual(first)
+      expect(resumed.freshlyCreated).toBe(false)
+      expect(resumed).toEqual({ ...first, freshlyCreated: false })
       expect(await db.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: compositeId, userId: a } })).toBe(1)
     } finally {
       release()

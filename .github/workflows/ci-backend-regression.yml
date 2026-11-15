@@ -749,6 +749,10 @@ jobs:
           src/__tests__/survey/research-final.contract.test.ts
           src/__tests__/survey/research-builder.contract.test.ts
           src/__tests__/survey/research-analytics.contract.test.ts
+          src/__tests__/composite/whole-template-delivery.test.ts
+          src/__tests__/composite/whole-template-runtime-cache.test.ts
+          src/__tests__/composite/whole-template-http.test.ts
+          src/__tests__/composite/start-freshly-created.test.ts
       - name: preserve complete and original regression reports
         if: always()
         uses: actions/upload-artifact@v4

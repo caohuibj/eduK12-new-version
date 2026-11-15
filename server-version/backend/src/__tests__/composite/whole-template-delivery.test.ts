@@ -342,4 +342,179 @@ describe('whole template split delivery & controller guard contracts', () => {
       getWholeQuestionnaireTemplate('attempt-1', initialHash, { userId: 'student-1' }),
     ).rejects.toMatchObject({ statusCode: 409 })
   })
+
+  it('bounds anonymous 9-unit delivery validation concurrency to <= 2 while keeping authenticated validation parallel', async () => {
+    const unitCount = 9
+    const createNineUnitFixture = (opts: {
+      attemptId: string
+      userId: string | null
+      recoveryTokenHash: string | null
+    }) => {
+      const slotSet = createFrozenActiveSlotSet({
+        schemaVersion: 1,
+        runtimeGeneration: 'UNIFIED_V1',
+        attemptEpoch: 1,
+        slots: Array.from({ length: unitCount }, (_, i) => ({
+          slotKey: `scale:comp-item-${i}`,
+          unitType: 'SCALE' as const,
+          required: true,
+          sourceDefinitionIdentity: {
+            key: runtime.instrumentKey,
+            version: runtime.instrumentVersion,
+            hash: runtime.sourceDefinitionHash,
+          },
+          sourceBinding: {
+            scaleCode: `adexi_v1_${i}`,
+            compositeItemId: `comp-item-${i}`,
+            compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash,
+          },
+        })),
+      })
+      return {
+        frozen: slotSet,
+        parent: {
+          id: opts.attemptId,
+          userId: opts.userId,
+          recoveryTokenHash: opts.recoveryTokenHash,
+          status: 'IN_PROGRESS',
+          progress: 0,
+          completedAt: null,
+          attemptEpoch: 1,
+          asyncReportEpoch: 1,
+          deliveryMode: 'FINAL_ONLY',
+          runtimeGeneration: 'UNIFIED_V1',
+          taskSatisfaction: null,
+          frozenActiveSlotSetHash: slotSet.snapshotHash,
+          frozenActiveSlotSetEncrypted: `enc-slots:${slotSet.snapshotHash}`,
+          contextSnapshotHash: null,
+          contextSnapshotEncrypted: null,
+          aggregateInputHash: null,
+          assignmentRef: null,
+          deliveryCourseId: null,
+          trainingTimingSnapshot: null,
+          participantKey: null,
+          trainingVariantAllocationEncrypted: null,
+          trainingVariantAllocationHash: null,
+          trainingFlowSnapshotEncrypted: null,
+          trainingFlowSnapshotHash: null,
+          trainingFlowPathEncrypted: null,
+          trainingFlowPathHash: null,
+          compositeAssessment: {
+            id: 'comp-9',
+            productKind: 'STANDARD',
+            reportPackageKey: null,
+            analysisProtocolKey: null,
+            creationKey: null,
+            publishedAt: new Date('2026-11-14T00:00:00.000Z'),
+            trainingVariantDraft: null,
+            trainingVariantFrozen: null,
+            trainingFlowDraft: null,
+            trainingFlowFrozen: null,
+            trainingFlowDigest: null,
+            trainingVariantDigest: null,
+            items: Array.from({ length: unitCount }, (_, i) => ({
+              id: `comp-item-${i}`,
+              position: i,
+              presentationMode: 'ONE_BY_ONE',
+            })),
+            formSections: [],
+          },
+          scaleAssessments: Array.from({ length: unitCount }, (_, i) => ({
+            id: `${opts.attemptId}-child-${i}`,
+            userId: opts.userId,
+            status: 'IN_PROGRESS',
+            compositeItemId: `comp-item-${i}`,
+            attemptEpoch: 1,
+            runtimeGeneration: 'UNIFIED_V1',
+            deliveryMode: 'FINAL_ONLY',
+            runtimeSnapshotEncrypted: `enc-runtime-${i}`,
+            compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash,
+            frozenAdmissionSnapshotEncrypted: `enc-adm-${i}`,
+            frozenAdmissionSnapshotHash: createHash('sha256').update(`${opts.attemptId}-${i}`).digest('hex'),
+            scale: {
+              id: `scale-master-${i}`,
+              code: `adexi_v1_${i}`,
+              name: `ADEXI Scale ${i}`,
+              instruction: 'Choose carefully',
+              instrumentVersion: '2.0.0',
+            },
+          })),
+        },
+      }
+    }
+
+    const anonHash = createHash('sha256').update('anon-secret').digest('hex')
+    const anonFixture = createNineUnitFixture({
+      attemptId: 'attempt-anon-9',
+      userId: null,
+      recoveryTokenHash: anonHash,
+    })
+    const authFixture = createNineUnitFixture({
+      attemptId: 'attempt-auth-9',
+      userId: 'student-9',
+      recoveryTokenHash: null,
+    })
+
+    mockFindUnique.mockImplementation(async ({ where }: any) => {
+      if (where.id === anonFixture.parent.id) return anonFixture.parent
+      if (where.id === authFixture.parent.id) return authFixture.parent
+      return null
+    })
+    mockLoadSlotSet.mockImplementation(async (enc: string) => {
+      if (enc.endsWith(anonFixture.frozen.snapshotHash)) return anonFixture.frozen
+      if (enc.endsWith(authFixture.frozen.snapshotHash)) return authFixture.frozen
+      throw new Error('missing slot set')
+    })
+
+    // Anonymous path: hold deferred promises to measure peak in-flight concurrency
+    let inFlight = 0
+    let maxAnonInFlight = 0
+    const pendingAnon: Array<() => void> = []
+    mockAssertDelivery.mockImplementation(() => {
+      inFlight += 1
+      maxAnonInFlight = Math.max(maxAnonInFlight, inFlight)
+      return new Promise<void>((resolve) => {
+        pendingAnon.push(() => {
+          inFlight -= 1
+          resolve()
+        })
+      })
+    })
+
+    const anonPromise = getWholeQuestionnaireDelivery('attempt-anon-9', { recoveryTokenHash: anonHash })
+    for (let step = 0; step < unitCount; step += 1) {
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(maxAnonInFlight).toBeLessThanOrEqual(2)
+      while (pendingAnon.length > 0) {
+        pendingAnon.shift()!()
+      }
+    }
+    const anonResult = await anonPromise
+    expect(anonResult.mode).toBe('definition')
+    expect(mockAssertDelivery).toHaveBeenCalledTimes(unitCount)
+    expect(maxAnonInFlight).toBe(2)
+
+    // Authenticated path: preserves full parallel Promise.all validation
+    mockAssertDelivery.mockClear()
+    inFlight = 0
+    let maxAuthInFlight = 0
+    const pendingAuth: Array<() => void> = []
+    mockAssertDelivery.mockImplementation(() => {
+      inFlight += 1
+      maxAuthInFlight = Math.max(maxAuthInFlight, inFlight)
+      return new Promise<void>((resolve) => {
+        pendingAuth.push(() => {
+          inFlight -= 1
+          resolve()
+        })
+      })
+    })
+    const authPromise = getWholeQuestionnaireDelivery('attempt-auth-9', { userId: 'student-9' })
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(maxAuthInFlight).toBe(unitCount)
+    while (pendingAuth.length > 0) pendingAuth.shift()!()
+    const authResult = await authPromise
+    expect(authResult.mode).toBe('definition')
+    expect(mockAssertDelivery).toHaveBeenCalledTimes(unitCount)
+  })
 })

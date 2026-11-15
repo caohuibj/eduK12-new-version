@@ -1,8 +1,17 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { normalizeApiError as normalizeClientError } from '../../api/client'
-import { isTrainingBusy, runTrainingRetry, trainingRetryDelayMs, TrainingRetryCancelledError } from '../trainingBusyRetry'
+import {
+  isTrainingBusy,
+  runTrainingRetry,
+  trainingRetryDelayMs,
+  TrainingRetryCancelledError,
+  TrainingRetryTimeoutError,
+} from '../trainingBusyRetry'
 
 describe('training busy retries', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
   it('adds jitter after the server delay and recognizes only explicit busy responses', () => {
     expect(trainingRetryDelayMs(10_000, () => 0)).toBe(10_000)
     expect(trainingRetryDelayMs(10_000, () => 1)).toBe(14_000)
@@ -57,5 +66,86 @@ describe('training busy retries', () => {
     const sleep = vi.fn(async () => { current = false })
     await expect(runTrainingRetry(operation, () => ({ kind: 'retry' }), { sleep, isCurrent: () => current })).rejects.toBeInstanceOf(TrainingRetryCancelledError)
     expect(operation).toHaveBeenCalledOnce()
+  })
+
+  it('aborts hung promises within per-attempt timeout and enforces the 35s total budget', async () => {
+    vi.useFakeTimers()
+    const attemptSignals: AbortSignal[] = []
+    const operation = vi.fn((signal: AbortSignal) => {
+      attemptSignals.push(signal)
+      return new Promise<string>(() => {})
+    })
+    const decide = vi.fn(() => ({ kind: 'retry' as const, retryAfterMs: 1_000 }))
+
+    const retryPromise = runTrainingRetry(operation, decide, {
+      random: () => 0,
+      requestTimeoutMs: 25_000,
+      maxTotalWaitMs: 35_000,
+    })
+    const caught = retryPromise.catch((err) => err)
+
+    // Attempt 1 hangs for 25_000ms -> timeout aborts signal[0], then 1_000ms retry sleep -> attempt 2 gets remaining 9_000ms
+    await vi.advanceTimersByTimeAsync(25_000)
+    expect(operation).toHaveBeenCalledTimes(1)
+    expect(attemptSignals[0]?.aborted).toBe(true)
+
+    await vi.advanceTimersByTimeAsync(1_000)
+    expect(operation).toHaveBeenCalledTimes(2)
+    expect(attemptSignals[1]?.aborted).toBe(false)
+
+    // Remaining budget from 35_000ms total is 9_000ms (25_000 + 1_000 + 9_000)
+    await vi.advanceTimersByTimeAsync(9_000)
+    expect(attemptSignals[1]?.aborted).toBe(true)
+
+    const result = await caught
+    expect(result).toBeInstanceOf(TrainingRetryTimeoutError)
+    expect(operation).toHaveBeenCalledTimes(2)
+  })
+
+  it('cancels an in-flight hung request via AbortSignal without sending follow-up retries', async () => {
+    vi.useFakeTimers()
+    const outer = new AbortController()
+    const seenSignals: AbortSignal[] = []
+    const operation = vi.fn((signal: AbortSignal) => {
+      seenSignals.push(signal)
+      return new Promise<string>(() => {})
+    })
+    const decide = vi.fn(() => ({ kind: 'retry' as const, retryAfterMs: 1_000 }))
+
+    const promise = runTrainingRetry(operation, decide, { signal: outer.signal })
+    const caught = promise.catch((err) => err)
+
+    await vi.advanceTimersByTimeAsync(500)
+    outer.abort()
+    await vi.advanceTimersByTimeAsync(0)
+
+    const err = await caught
+    expect(err).toBeInstanceOf(TrainingRetryCancelledError)
+    expect(seenSignals).toHaveLength(1)
+    expect(seenSignals[0]?.aborted).toBe(true)
+    expect(decide).not.toHaveBeenCalled()
+    expect(operation).toHaveBeenCalledTimes(1)
+  })
+
+  it('provides live getRemainingWaitMs that reflects time elapsed inside decide', async () => {
+    let time = 0
+    const samples: number[] = []
+    const operation = vi.fn(async () => {
+      time = 25_000
+      throw new TrainingRetryTimeoutError()
+    })
+
+    await expect(runTrainingRetry(
+      operation,
+      async (_err, ctx) => {
+        samples.push(ctx.remainingWaitMs, ctx.getRemainingWaitMs())
+        time = 33_000
+        samples.push(ctx.getRemainingWaitMs())
+        return { kind: 'stop' }
+      },
+      { now: () => time, maxTotalWaitMs: 35_000, requestTimeoutMs: 25_000 },
+    )).rejects.toBeInstanceOf(TrainingRetryTimeoutError)
+
+    expect(samples).toEqual([10_000, 10_000, 2_000])
   })
 })

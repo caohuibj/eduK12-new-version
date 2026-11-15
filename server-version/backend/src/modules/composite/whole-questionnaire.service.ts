@@ -479,6 +479,28 @@ const getOrBuildStaticTemplate = (
   return template
 }
 
+const ANONYMOUS_DELIVERY_VALIDATION_CONCURRENCY = 2
+
+/**
+ * Bound in-flight promises per request without extra runtime dependencies.
+ * JavaScript single-threaded turns make incrementing nextIndex before await atomic.
+ */
+const runWithConcurrencyLimit = async <T>(
+  items: readonly T[],
+  limit: number,
+  worker: (item: T) => Promise<void>,
+): Promise<void> => {
+  if (items.length === 0) return
+  const workerCount = Math.max(1, Math.min(limit, items.length))
+  let nextIndex = 0
+  await Promise.all(Array.from({ length: workerCount }, async () => {
+    while (nextIndex < items.length) {
+      const current = items[nextIndex++]!
+      await worker(current)
+    }
+  }))
+}
+
 const deliverWholeQuestionnaire = async (
   attemptId: string,
   principal: Principal,
@@ -514,7 +536,7 @@ const deliverWholeQuestionnaire = async (
     return { tmpl, child, runtime, admission }
   })
 
-  await Promise.all(verifiedEntries.map(({ child, runtime, admission }) =>
+  const validateEntry = ({ child, runtime, admission }: (typeof verifiedEntries)[number]) =>
     assertUnifiedScaleDelivery({
       assessmentId: child.id,
       compositeAttemptId: attemptId,
@@ -524,8 +546,15 @@ const deliverWholeQuestionnaire = async (
       contextSnapshotHash: parent.contextSnapshotHash,
       answers: [],
       ...principal,
-    }, child, admission, runtime),
-  ))
+    }, child, admission, runtime)
+
+  if (principal.userId) {
+    await Promise.all(verifiedEntries.map(validateEntry))
+  } else {
+    // Anonymous validation runs per-unit $queryRaw principal binding checks;
+    // keep DB concurrency bounded without slowing down authenticated students.
+    await runWithConcurrencyLimit(verifiedEntries, ANONYMOUS_DELIVERY_VALIDATION_CONCURRENCY, validateEntry)
+  }
 
   const resolvedUnits = verifiedEntries.map(({ tmpl, child, admission }) => ({
     tmpl,

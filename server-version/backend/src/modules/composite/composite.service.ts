@@ -3802,6 +3802,7 @@ const createAttempt = async (
     Object.defineProperty(attempt, '_startComposite', { value: composite })
     Object.defineProperty(attempt, '_freshScaleChildren', { value: children })
   }
+  Object.defineProperty(attempt, '_freshlyCreatedAttempt', { value: true })
   return attempt
 }
 
@@ -3922,7 +3923,7 @@ export const projectFreshStartedAttempt = async (
   scaleChildren: any[],
   principal: { userId?: string; recoveryTokenHash?: string },
   recoveryToken: string | null,
-): Promise<{ attempt: any; recoveryToken: string | null } | null> => {
+): Promise<{ attempt: any; recoveryToken: string | null; freshlyCreated: true } | null> => {
   try {
     if (!assessmentReportConfig().wholeSubmitEnabled || composite.reportPackageKey || composite.analysisProtocolKey
       || composite.productKind !== 'QUESTIONNAIRE' || composite.trainingTimingPolicy != null
@@ -3963,7 +3964,7 @@ export const projectFreshStartedAttempt = async (
       scaleChildById: new Map(scaleChildren.map((child: any) => [child.id, child])),
       skipCurrentUnitActivation: true,
     })
-    return state.executionMode === 'WHOLE_LOCAL' ? { attempt: state, recoveryToken } : null
+    return state.executionMode === 'WHOLE_LOCAL' ? { attempt: state, recoveryToken, freshlyCreated: true as const } : null
   } catch {
     // Best-effort: any projection failure falls back to the DB path.
     return null
@@ -3999,9 +4000,10 @@ export const projectStartedAttempt = async (
   preloadedParent?: Parameters<typeof getAttemptState>[4],
   preloadedState?: UnifiedStatePreload,
   knownTemplateHashes?: ReadonlySet<string>,
+  freshlyCreated = false,
 ) => {
   if (!wantsWholeDelivery) {
-    return { attempt: await getAttemptState(attemptId, principal), recoveryToken }
+    return { attempt: await getAttemptState(attemptId, principal), recoveryToken, freshlyCreated }
   }
   return withSharedControlContext(async () => {
     const parent = preloadedParent ?? await prisma.compositeAssessmentAttempt.findUnique({
@@ -4011,7 +4013,7 @@ export const projectStartedAttempt = async (
     if (!parent) throw compositeNotFound('综合测评记录不存在')
     const attempt = await getAttemptState(attemptId, principal, undefined, 'full', parent, preloadedState)
     const { startResponseWithInlineWholeDefinition } = await import('./whole-start-inline')
-    return startResponseWithInlineWholeDefinition(true, { attempt, recoveryToken }, principal, parent, knownTemplateHashes)
+    return startResponseWithInlineWholeDefinition(true, { attempt, recoveryToken, freshlyCreated }, principal, parent, knownTemplateHashes)
   })
 }
 
@@ -4034,7 +4036,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
     ORDER BY "started_at" DESC LIMIT 1 FOR SHARE`)
   assessmentTimelineSpan('start.pre_gate_reads', preGateStart)
   if (inProgress) return traceAssessmentPhase('start.post_gate_getAttemptState',
-    () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(inProgress.id, { userId }, Boolean(opts?.wantsWholeDelivery), null, undefined, undefined, opts?.knownTemplateHashes)))
+    () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(inProgress.id, { userId }, Boolean(opts?.wantsWholeDelivery), null, undefined, undefined, opts?.knownTemplateHashes, false)))
 
   // For a new ordinary, scale-only questionnaire, avoid occupying a gate slot
   // or opening a transaction when the same freeze would already be protected.
@@ -4090,6 +4092,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
           })
         } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
       })
+      const freshlyCreated = Boolean((attempt as any)._freshlyCreatedAttempt)
       const children = (attempt as any)._freshScaleChildren as any[] | undefined
       const source = (attempt as any)._startComposite
       seedFreshScaleChildren(children)
@@ -4100,7 +4103,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
           const { parent, preloadedState } = opts?.wantsWholeDelivery
             ? buildWholeStartPreload(attempt, children, source)
             : { parent: undefined, preloadedState: undefined }
-          return projected ?? projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null, parent, preloadedState, opts?.knownTemplateHashes)
+          return projected ?? projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null, parent, preloadedState, opts?.knownTemplateHashes, freshlyCreated)
         }))
     } catch (err) {
       if (!isUniqueConstraintError(err) || retry === 1) throw err
@@ -4360,7 +4363,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
       recordAnonymousStartPhase('anonymous.start.pre_gate_ms', startAt, process.hrtime.bigint())
       const postGateAt = process.hrtime.bigint()
       try {
-        return await projectStartedAttempt(existing.id, { recoveryTokenHash }, Boolean(opts?.wantsWholeDelivery), null, undefined, undefined, opts?.knownTemplateHashes)
+        return await projectStartedAttempt(existing.id, { recoveryTokenHash }, Boolean(opts?.wantsWholeDelivery), null, undefined, undefined, opts?.knownTemplateHashes, false)
       } finally {
         recordAnonymousStartPhase('anonymous.start.post_gate_ms', postGateAt, process.hrtime.bigint())
       }
@@ -4450,13 +4453,14 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   })
   const postGateAt = process.hrtime.bigint()
   try {
+    const freshlyCreated = Boolean((attempt as any)._freshlyCreatedAttempt)
     const children = (attempt as any)._freshScaleChildren as any[] | undefined
     const source = (attempt as any)._startComposite
     seedFreshScaleChildren(children)
     const { parent, preloadedState } = opts?.wantsWholeDelivery
       ? buildWholeStartPreload(attempt, children, source)
       : { parent: undefined, preloadedState: undefined }
-    return await projectStartedAttempt(attempt.id, { recoveryTokenHash: credential.hash }, Boolean(opts?.wantsWholeDelivery), credential.token, parent, preloadedState, opts?.knownTemplateHashes)
+    return await projectStartedAttempt(attempt.id, { recoveryTokenHash: credential.hash }, Boolean(opts?.wantsWholeDelivery), credential.token, parent, preloadedState, opts?.knownTemplateHashes, freshlyCreated)
   } finally {
     recordAnonymousStartPhase('anonymous.start.post_gate_ms', postGateAt, process.hrtime.bigint())
   }
