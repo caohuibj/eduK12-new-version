@@ -40,13 +40,9 @@ const isConfirmedSignedOutMeError = (error: unknown): boolean => {
   const rawData =
     ('response' in error ? (error as { response?: { data?: unknown } }).response?.data : undefined) ??
     ('data' in error ? (error as { data?: unknown }).data : undefined)
-  if (typeof rawData === 'string') return false
-  if (rawData && typeof rawData === 'object') {
-    const envelope = rawData as { code?: unknown; data?: unknown }
-    if (envelope.code === 0) return false
-    if (envelope.data !== undefined && envelope.data !== null) return false
-  }
-  return true
+  if (!rawData || typeof rawData !== 'object' || Array.isArray(rawData)) return false
+  const envelope = rawData as { code?: unknown; data?: unknown }
+  return envelope.code === -1 && envelope.data === null
 }
 
 interface AuthContextType {
@@ -325,12 +321,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       }
       const data = { username, password, ...(expectedRole ? { expectedRole } : {}) }
       const requestLogin = (attemptSignal?: AbortSignal) => {
-        const config = attemptSignal ? { signal: attemptSignal } : undefined
+        // Only the training entrance needs bounded transport retries. Preserve
+        // the legacy argument shape for unrelated login flows.
+        if (attemptSignal) return authApi.login(data, undefined, undefined, { signal: attemptSignal })
         return entrance
-          ? mfa
-            ? authApi.login(data, entrance, mfa, config)
-            : authApi.login(data, entrance, undefined, config)
-          : authApi.login(data, undefined, undefined, config)
+          ? mfa ? authApi.login(data, entrance, mfa) : authApi.login(data, entrance)
+          : authApi.login(data)
       }
       const response = trainingLogin
         ? await runTrainingRetry<Awaited<ReturnType<typeof authApi.login>>>(
@@ -377,7 +373,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             onRetry: (delayMs) => setLoginRetryMessage(`登录繁忙，${Math.ceil(delayMs / 1000)} 秒后自动重试。`),
           },
         )
-        : await requestLogin(loginController.signal)
+        : await requestLogin()
       if (!isCurrent()) return
       if (response.code === 0 && response.data) {
         lastAuthTransitionAtRef.current = Date.now()
