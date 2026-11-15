@@ -5,6 +5,14 @@ import { InstrumentFinalSubmitError } from './instrumentFinalSubmit'
 import { logger } from '../utils/logger'
 export type AssessmentResourceSample = { at: number; availableBytes: number | null; cpuPercent: number | null }
 export type ResourceClaimDecision = { mode: 'normal' | 'limited' | 'protected'; limit: number; delayMs: number; reason: string | null }
+
+// Only the typed START resource-gate rejection is safe to fail fast during
+// scale precomputation. Other HTTP 503s may be transient and must retain the
+// existing in-transaction fallback.
+export const isAssessmentStartResourceGateError = (error: unknown): error is InstrumentFinalSubmitError =>
+  error instanceof InstrumentFinalSubmitError
+  && error.code === 'INSTRUMENT_NOT_AVAILABLE'
+  && error.statusCode === 503
 const enabled = () => process.env.ASSESSMENT_RESOURCE_PROTECTION_ENABLED === 'true'
 const MiB = 1024 * 1024
 // host_cpu spikes recede in 2-3s (R1/R2 measured); configurable so the value can
