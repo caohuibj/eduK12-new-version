@@ -55,6 +55,17 @@ export class BoundedTtlCache<V> {
 export const startReadsCache = new BoundedTtlCache<unknown>(START_READ_CACHE_TTL_MS, START_READ_CACHE_MAX_ENTRIES)
 export const startCompositeCache = new BoundedTtlCache<unknown>(START_READ_CACHE_TTL_MS, START_READ_CACHE_MAX_ENTRIES)
 
+// START scalar metadata (classification + eligibility fields). TTL is ZERO:
+// the cache is used purely as a single-flight deduper for CONCURRENT retry
+// bursts of a rejection storm (every in-flight VU reads the same publication
+// scalars — one query per concurrent wave instead of one per attempt), with
+// zero staleness: a fresh attempt always reads live publication state, so
+// archive/republish/eligibility semantics are byte-identical to the uncached
+// path. The in-tx admission lock, publication re-read and course-student
+// re-check in createAttempt remain authoritative race guards.
+export const START_METADATA_CACHE_TTL_MS = 0
+export const startMetadataCache = new BoundedTtlCache<unknown>(START_METADATA_CACHE_TTL_MS, START_READ_CACHE_MAX_ENTRIES)
+
 export const availableTemplateCache = new BoundedTtlCache<unknown>(AVAILABLE_TEMPLATE_CACHE_TTL_MS, 8)
 
 export const publicationReadKey = (id: string, snapshotHash: string | null | undefined, updatedAt?: Date | string | null) => {
@@ -64,6 +75,7 @@ export const publicationReadKey = (id: string, snapshotHash: string | null | und
 
 export const resetStartReadCachesForTests = () => {
   availableTemplateCache.clear()
+  startMetadataCache.clear()
   startReadsCache.clear()
   startCompositeCache.clear()
 }
