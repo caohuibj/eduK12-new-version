@@ -13,6 +13,7 @@ const { db, state, inserted } = vi.hoisted(() => ({
 }))
 vi.mock('../../config/database', () => ({ prisma: db }))
 import { startUserAttempt } from '../../modules/composite/composite.service'
+import { resetStartReadCachesForTests } from '../../modules/composite/start-read-cache'
 
 // Generated Prisma model metadata, rather than an invented fixture field list.
 const definitionFields = new Set(Prisma.dmmf.datamodel.models.find(model => model.name === 'CompositeAssessment')!.fields.map(field => field.name))
@@ -33,6 +34,7 @@ function configure(feedback: boolean, persistence: boolean) {
   })
 }
 beforeEach(() => {
+  resetStartReadCachesForTests()
   vi.resetAllMocks(); vi.stubEnv('DATA_ENCRYPTION_KEY', 'a'.repeat(64)); vi.stubEnv('DATA_PSEUDONYM_KEY', 'b'.repeat(64))
   state.order = []; state.locked = {}
   state.publication = {
@@ -105,7 +107,9 @@ describe('Training configured-policy admission projection (mock DB, actual start
     }
     if (persistence) expect(data.trainingPersistenceSnapshotHash).toBe(canonicalHash(data.trainingPersistenceSnapshot))
     const selects = db.compositeAssessment.findUnique.mock.calls.filter(([args]) => args.select)
-    expect(selects.filter(([args]) => isStartIdentitySelect(args.select))).toHaveLength(1)
+    // The scalar metadata read is passed through as the known identity, so the
+    // separate identity-select inside loadStartComposite is gone (PR #731 follow-up).
+    expect(selects.filter(([args]) => isStartIdentitySelect(args.select))).toHaveLength(0)
     const metadataReads = selects.filter(([args]) => isStartMetadataSelect(args.select))
     expect(metadataReads).toHaveLength(1)
     expect(metadataReads[0][0].select).not.toHaveProperty('formSections')
@@ -114,8 +118,8 @@ describe('Training configured-policy admission projection (mock DB, actual start
     expect(selected).toHaveLength(feedback || persistence ? 2 : 1)
     for (const [args] of selected) expect(args.select).not.toHaveProperty('deliveryMode')
     expect(state.order).toEqual(feedback || persistence
-      ? ['metadata-select', 'identity-select', 'publication-lock', 'header-select', 'configured-select', 'course-lock', 'insert']
-      : ['metadata-select', 'identity-select', 'publication-lock', 'header-select', 'insert'])
+      ? ['metadata-select', 'publication-lock', 'header-select', 'configured-select', 'course-lock', 'insert']
+      : ['metadata-select', 'publication-lock', 'header-select', 'insert'])
   })
   it.each([[true, false], [false, true], [true, true]])('retains explicit runtime LEGACY rejection (feedback=%s persistence=%s)', async (feedback, persistence) => {
     configure(feedback, persistence)

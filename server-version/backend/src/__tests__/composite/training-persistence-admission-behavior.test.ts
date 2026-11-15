@@ -14,6 +14,7 @@ const { db, state, inserted } = vi.hoisted(() => ({
 }))
 vi.mock('../../config/database', () => ({ prisma: db }))
 import { startUserAttempt } from '../../modules/composite/composite.service'
+import { resetStartReadCachesForTests } from '../../modules/composite/start-read-cache'
 
 // Generated Prisma model metadata, rather than an invented fixture field list.
 const definitionFields = new Set(Prisma.dmmf.datamodel.models.find(model => model.name === 'CompositeAssessment')!.fields.map(field => field.name))
@@ -35,6 +36,7 @@ function configure(checkpoint: boolean, localCognitive: boolean) {
   })
 }
 beforeEach(() => {
+  resetStartReadCachesForTests()
   vi.resetAllMocks(); vi.stubEnv('DATA_ENCRYPTION_KEY', 'a'.repeat(64)); vi.stubEnv('DATA_PSEUDONYM_KEY', 'b'.repeat(64))
   state.order = []; state.locked = {}; state.runtimeOverrides = {}
   state.publication = {
@@ -120,7 +122,7 @@ describe('C23 persistence admission projection (schema-aware mock DB, actual sta
       expect(data).not.toHaveProperty('trainingPersistenceSnapshotHash')
     }
     const selects = db.compositeAssessment.findUnique.mock.calls.filter(([args]) => args.select)
-    expect(selects.filter(([args]) => isStartIdentitySelect(args.select))).toHaveLength(1)
+    expect(selects.filter(([args]) => isStartIdentitySelect(args.select))).toHaveLength(0)
     const metadataReads = selects.filter(([args]) => isStartMetadataSelect(args.select))
     expect(metadataReads).toHaveLength(1)
     expect(metadataReads[0][0].select).not.toHaveProperty('formSections')
@@ -137,8 +139,8 @@ describe('C23 persistence admission projection (schema-aware mock DB, actual sta
     expect(selected[0][0].select).not.toHaveProperty('trainingContentSnapshot')
     if (!enabled) expect(db.$queryRaw.mock.calls.some(([query]) => query.join('').includes('FOR SHARE OF c,u'))).toBe(false)
     expect(state.order).toEqual(enabled
-      ? ['metadata-select', 'identity-select', 'publication-lock', 'header-select', 'configured-select', 'course-lock', 'insert']
-      : ['metadata-select', 'identity-select', 'publication-lock', 'header-select', 'insert'])
+      ? ['metadata-select', 'publication-lock', 'header-select', 'configured-select', 'course-lock', 'insert']
+      : ['metadata-select', 'publication-lock', 'header-select', 'insert'])
   })
   it.each([[true, false], [false, true], [true, true]])('retains explicit runtime LEGACY rejection (checkpoint=%s localCognitive=%s)', async (checkpoint, localCognitive) => {
     configure(checkpoint, localCognitive)

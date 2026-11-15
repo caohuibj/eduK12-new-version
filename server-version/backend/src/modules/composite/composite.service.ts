@@ -2,7 +2,7 @@ import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifac
 import { classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
 import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
 import { assertAssessmentStartResources } from '../../services/assessmentResourceProtection'
-import { availableTemplateCache, publicationReadKey, startCompositeCache } from './start-read-cache'
+import { availableTemplateCache, publicationReadKey, startCompositeCache, startMetadataCache } from './start-read-cache'
 import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments } from '../scale/deployment/repository'
 import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
@@ -374,7 +374,7 @@ const startCompositeIdentity = async (id: string, db: Db = prisma) => {
  * structuredClone) is loaded only after a START passes these cheap checks.
  * assertStudentEligibility may attach deliveryCourseId to this fresh,
  * per-request object; callers carry it over to the fat publication. */
-const loadStartCompositeMetadata = async (id: string, db: Db = prisma) => {
+const loadStartCompositeMetadataRaw = async (id: string, db: Db = prisma) => {
   const metadata = await db.compositeAssessment.findUnique({
     where: { id },
     select: {
@@ -389,6 +389,8 @@ const loadStartCompositeMetadata = async (id: string, db: Db = prisma) => {
       reportPackageKey: true,
       analysisProtocolKey: true,
       trainingTimingPolicy: true,
+      updatedAt: true,
+      trainingContentSnapshotHash: true,
       course: { select: { isLibrary: true } },
       questionnaireCourses: { select: { courseId: true } },
       items: {
@@ -407,8 +409,32 @@ const loadStartCompositeMetadata = async (id: string, db: Db = prisma) => {
   return metadata as typeof metadata & { deliveryCourseId?: string | null }
 }
 
-export const loadStartComposite = async (id: string, db: Db = prisma) => {
-  const identity = await startCompositeIdentity(id, db)
+type StartCompositeMetadata = Awaited<ReturnType<typeof loadStartCompositeMetadataRaw>>
+
+const loadStartCompositeMetadata = async (id: string, db: Db = prisma) => {
+  // Short-TTL cache (see start-read-cache.ts): rejection-storm retries all read
+  // the same publication scalars, so bursts dedupe to one query per window.
+  // Returns a shallow copy — downstream helpers (assertStudentEligibility)
+  // attach deliveryCourseId to the returned object per request. The in-tx
+  // admission lock, publication re-read and course-student re-check in
+  // createAttempt remain authoritative for archive/republish/eligibility races.
+  const cached = startMetadataCache.get(id) as StartCompositeMetadata | undefined
+  if (cached) return { ...cached, items: [...cached.items] } as StartCompositeMetadata
+  const metadata = await loadStartCompositeMetadataRaw(id, db)
+  startMetadataCache.set(id, metadata)
+  return { ...metadata, items: [...metadata.items] } as StartCompositeMetadata
+}
+
+export const loadStartComposite = async (
+  id: string,
+  db: Db = prisma,
+  knownIdentity?: { updatedAt: Date; trainingContentSnapshotHash: string | null },
+) => {
+  // Callers that already read the scalar metadata can pass its identity
+  // through, skipping this duplicate findUnique on the admitted-START path.
+  const identity = knownIdentity
+    ? { id, updatedAt: knownIdentity.updatedAt, trainingContentSnapshotHash: knownIdentity.trainingContentSnapshotHash }
+    : await startCompositeIdentity(id, db)
   // Related live Scale edits need not change a legacy composite timestamp.
   // Only frozen publication identities may reuse the shared tree cache.
   if (!identity.trainingContentSnapshotHash) {
@@ -418,12 +444,12 @@ export const loadStartComposite = async (id: string, db: Db = prisma) => {
   const cached = startCompositeCache.get(key) as { id: string; trainingContentSnapshotHash?: string | null; updatedAt?: Date } | undefined
   if (cached && cached.id === identity.id
       && cached.trainingContentSnapshotHash === identity.trainingContentSnapshotHash
-      && cached.updatedAt?.getTime() === identity.updatedAt.getTime()) {
+      && cached.updatedAt?.getTime() === identity.updatedAt?.getTime()) {
     return preloadStartComposite(db, cloneCachedStartComposite(cached))
   }
   const loaded = await startCompositeCache.singleFlight(key, async () => {
     const value = await loadComposite(identity.id, true, db)
-    if (value.updatedAt?.getTime() === identity.updatedAt.getTime()
+    if (value.updatedAt?.getTime() === identity.updatedAt?.getTime()
         && value.trainingContentSnapshotHash === identity.trainingContentSnapshotHash) {
       startCompositeCache.set(key, value)
     }
@@ -4082,7 +4108,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
     assertAssessmentStartResources()
   }
 
-  const composite = await loadStartComposite(compositeId)
+  const composite = await loadStartComposite(compositeId, prisma, metadata)
   if (metadata.deliveryCourseId) (composite as any).deliveryCourseId = metadata.deliveryCourseId
 
   const isUniqueConstraintError = (err: unknown) =>

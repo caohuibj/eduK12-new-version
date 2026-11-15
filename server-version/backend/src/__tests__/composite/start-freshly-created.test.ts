@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { resetStartReadCachesForTests } from '../../modules/composite/start-read-cache'
 import { createFrozenActiveSlotSet } from '../../modules/assessment-runtime/slot-set'
 
 const slotSet = createFrozenActiveSlotSet({
@@ -59,12 +60,20 @@ vi.mock('../../modules/composite/start-read-prefetch', () => ({
   startReadsIfCurrent: () => undefined,
   recheckPrefetchedReleases: vi.fn(),
 }))
-vi.mock('../../modules/composite/start-read-cache', () => ({
-  cloneCachedStartComposite: (x: unknown) => x,
-  getCachedStartComposite: () => undefined,
-  setCachedStartComposite: vi.fn(),
-  resetStartReadCachesForTests: mocks.resetStartReadCaches,
-}))
+vi.mock('../../modules/composite/start-read-cache', async (orig) => {
+  const real = await orig() as Record<string, unknown>
+  return {
+    ...real,
+    cloneCachedStartComposite: (x: unknown) => x,
+    getCachedStartComposite: () => undefined,
+    setCachedStartComposite: vi.fn(),
+    // keep the real clear so the metadata/TTL caches reset between tests
+    resetStartReadCachesForTests: (...args: unknown[]) => {
+      mocks.resetStartReadCaches(...(args as []))
+      return (real as { resetStartReadCachesForTests: (...a: unknown[]) => void }).resetStartReadCachesForTests(...(args as []))
+    },
+  }
+})
 vi.mock('../../modules/assessment-runtime/shared-control-records', () => ({
   withSharedControlContext: async <T,>(fn: () => Promise<T>) => fn(),
   seedSharedScaleChildren: vi.fn(),
@@ -182,6 +191,8 @@ describe('START freshlyCreated server distinction', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    resetStartReadCachesForTests()
+    mocks.resetStartReadCaches()
     vi.stubEnv('ASSESSMENT_WHOLE_SUBMIT_ENABLED', 'true')
     mocks.loadFrozenActiveSlotSet.mockResolvedValue(slotSet)
     mocks.loadScaleAdmissionRuntime.mockResolvedValue({

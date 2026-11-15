@@ -55,6 +55,15 @@ export class BoundedTtlCache<V> {
 export const startReadsCache = new BoundedTtlCache<unknown>(START_READ_CACHE_TTL_MS, START_READ_CACHE_MAX_ENTRIES)
 export const startCompositeCache = new BoundedTtlCache<unknown>(START_READ_CACHE_TTL_MS, START_READ_CACHE_MAX_ENTRIES)
 
+// START scalar metadata (classification + eligibility fields). Short TTL:
+// dedupes the concurrent-retry bursts of a rejection storm (every retrying VU
+// reads the same publication scalars) while keeping the staleness window far
+// tighter than the 120s fat-tree cache above. The in-tx admission lock,
+// publication re-read and course-student re-check in createAttempt remain
+// authoritative for archive/republish/eligibility races.
+export const START_METADATA_CACHE_TTL_MS = 2_000
+export const startMetadataCache = new BoundedTtlCache<unknown>(START_METADATA_CACHE_TTL_MS, START_READ_CACHE_MAX_ENTRIES)
+
 export const availableTemplateCache = new BoundedTtlCache<unknown>(AVAILABLE_TEMPLATE_CACHE_TTL_MS, 8)
 
 export const publicationReadKey = (id: string, snapshotHash: string | null | undefined, updatedAt?: Date | string | null) => {
@@ -64,6 +73,7 @@ export const publicationReadKey = (id: string, snapshotHash: string | null | und
 
 export const resetStartReadCachesForTests = () => {
   availableTemplateCache.clear()
+  startMetadataCache.clear()
   startReadsCache.clear()
   startCompositeCache.clear()
 }
