@@ -857,10 +857,18 @@ const schedulingLagTimer = setInterval(() => {
 schedulingLagTimer.unref()
 export const runtimeEventLoopDelayMs = (): number => schedulingLagMs
 
+let lastEventLoopUtilization: ReturnType<typeof performance.eventLoopUtilization> | undefined
+
 export const runtimeMetricLines = (): string[] => {
   const memory = safeMemoryUsage()
   const cpu = process.cpuUsage()
-  const eventLoopUtilization = performance.eventLoopUtilization()
+  const currentEventLoopUtilization = performance.eventLoopUtilization()
+  // Delta since the previous scrape: a no-arg call returns the cumulative
+  // average since process start, which idles toward zero and hides bursts.
+  const eventLoopUtilization = lastEventLoopUtilization
+    ? performance.eventLoopUtilization(lastEventLoopUtilization, currentEventLoopUtilization)
+    : currentEventLoopUtilization
+  lastEventLoopUtilization = currentEventLoopUtilization
   const delayP50Ms = finiteMilliseconds(eventLoopDelay.percentile(50) / 1_000_000)
   const delayP95Ms = finiteMilliseconds(eventLoopDelay.percentile(95) / 1_000_000)
   const delayP99Ms = finiteMilliseconds(eventLoopDelay.percentile(99) / 1_000_000)
@@ -877,15 +885,15 @@ export const runtimeMetricLines = (): string[] => {
     '# HELP ptool_nodejs_active_requests Current in-flight HTTP requests.',
     '# TYPE ptool_nodejs_active_requests gauge',
     `ptool_nodejs_active_requests ${activeRequests}`,
-    '# HELP ptool_nodejs_event_loop_utilization Event-loop utilization ratio.',
+    '# HELP ptool_nodejs_event_loop_utilization Event-loop utilization ratio since the previous scrape.',
     '# TYPE ptool_nodejs_event_loop_utilization gauge',
     `ptool_nodejs_event_loop_utilization ${eventLoopUtilization.utilization}`,
     '# HELP ptool_nodejs_event_loop_active_seconds_total Cumulative event-loop active time.',
     '# TYPE ptool_nodejs_event_loop_active_seconds_total counter',
-    `ptool_nodejs_event_loop_active_seconds_total ${eventLoopUtilization.active / 1_000}`,
+    `ptool_nodejs_event_loop_active_seconds_total ${currentEventLoopUtilization.active / 1_000}`,
     '# HELP ptool_nodejs_event_loop_idle_seconds_total Cumulative event-loop idle time.',
     '# TYPE ptool_nodejs_event_loop_idle_seconds_total counter',
-    `ptool_nodejs_event_loop_idle_seconds_total ${eventLoopUtilization.idle / 1_000}`,
+    `ptool_nodejs_event_loop_idle_seconds_total ${currentEventLoopUtilization.idle / 1_000}`,
     '# HELP ptool_nodejs_event_loop_delay_seconds Event-loop delay observed since the previous scrape.',
     '# TYPE ptool_nodejs_event_loop_delay_seconds gauge',
     `ptool_nodejs_event_loop_delay_seconds{quantile="0.5"} ${delayP50Ms / 1_000}`,
@@ -977,6 +985,7 @@ export const runtimeMetricLines = (): string[] => {
 
 /** Test-only reset for the process-local metric registry. */
 export const resetRuntimeObservabilityForTests = (): void => {
+  lastEventLoopUtilization = undefined
   httpRequestHistograms.clear()
   phaseHistograms.clear()
   prismaCallHistograms.clear()
