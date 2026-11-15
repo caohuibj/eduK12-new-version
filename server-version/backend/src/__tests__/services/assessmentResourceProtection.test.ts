@@ -9,7 +9,7 @@ describe('bounded background resource protection', () => {
       new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', 'busy', 503)
     )).toBe(true)
     expect(isAssessmentStartResourceGateError(
-      new InstrumentFinalSubmitError('OTHER_BUSY', 'busy', 503)
+      new InstrumentFinalSubmitError('STALE_ATTEMPT', 'busy', 503)
     )).toBe(false)
     expect(isAssessmentStartResourceGateError(
       new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', 'unavailable', 404)
