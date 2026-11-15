@@ -359,16 +359,38 @@ export const loadComposite = async (id: string, includeItems = false, db: Db = p
  * reads (themselves identity-keyed and TTL-bounded). */
 const cloneCachedStartComposite = (cached: any) => structuredClone(cached)
 
-export const loadStartComposite = async (id: string, db: Db = prisma) => {
+const startCompositeIdentity = async (id: string, db: Db = prisma) => {
   const identity = await db.compositeAssessment.findUnique({
     where: { id },
     select: { id: true, updatedAt: true, trainingContentSnapshotHash: true },
   })
   if (!identity) throw compositeNotFound()
+  return identity
+}
+
+/** Cached classification read: identity + the shared publication tree WITHOUT
+ * the per-request structuredClone. Read-only — callers must not mutate the
+ * returned cached tree. cached is null on legacy composites (no snapshot hash)
+ * and on cache misses. */
+export const loadStartCompositeCached = async (id: string, db: Db = prisma) => {
+  const identity = await startCompositeIdentity(id, db)
+  if (!identity.trainingContentSnapshotHash) return { identity, cached: null as any | null }
+  const key = publicationReadKey(identity.id, identity.trainingContentSnapshotHash, identity.updatedAt)
+  const cached = startCompositeCache.get(key) as { id: string; trainingContentSnapshotHash?: string | null; updatedAt?: Date } | undefined
+  if (cached && cached.id === identity.id
+      && cached.trainingContentSnapshotHash === identity.trainingContentSnapshotHash
+      && cached.updatedAt?.getTime() === identity.updatedAt.getTime()) {
+    return { identity, cached }
+  }
+  return { identity, cached: null as any | null }
+}
+
+export const loadStartComposite = async (id: string, db: Db = prisma) => {
+  const identity = await startCompositeIdentity(id, db)
   // Related live Scale edits need not change a legacy composite timestamp.
   // Only frozen publication identities may reuse the shared tree cache.
   if (!identity.trainingContentSnapshotHash) {
-    return preloadStartComposite(db, await loadComposite(id, true, db))
+    return preloadStartComposite(db, await loadComposite(identity.id, true, db))
   }
   const key = publicationReadKey(identity.id, identity.trainingContentSnapshotHash, identity.updatedAt)
   const cached = startCompositeCache.get(key) as { id: string; trainingContentSnapshotHash?: string | null; updatedAt?: Date } | undefined
@@ -378,7 +400,7 @@ export const loadStartComposite = async (id: string, db: Db = prisma) => {
     return preloadStartComposite(db, cloneCachedStartComposite(cached))
   }
   const loaded = await startCompositeCache.singleFlight(key, async () => {
-    const value = await loadComposite(id, true, db)
+    const value = await loadComposite(identity.id, true, db)
     if (value.updatedAt?.getTime() === identity.updatedAt.getTime()
         && value.trainingContentSnapshotHash === identity.trainingContentSnapshotHash) {
       startCompositeCache.set(key, value)
@@ -4021,14 +4043,12 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
   // Pure-read (write-time invariant): the student start path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
+  // Fast resume FIRST: the FOR SHARE query needs only compositeId + userId, so
+  // recovering an IN_PROGRESS attempt must not pay the fat publication load
+  // (structuredClone of the whole tree) nor be blocked by the resource gate.
+  // A resumed attempt continues one that was already admitted at its original
+  // start, so the eligibility re-check below does not apply to it.
   const preGateStart = process.hrtime.bigint()
-  const composite = await loadStartComposite(compositeId)
-  assertSupportedComposite(composite, false, false)
-  await assertStudentEligibility(composite, userId)
-
-  // Fast resume only locks the matching attempt row, not the composite row
-  // or new-START admission gate. FOR SHARE waits for a concurrent restart's
-  // status UPDATE, so a retired attempt is not selected as IN_PROGRESS.
   const [inProgress] = await withQueryRawLabel('start.raw.pre_gate.in_progress', () => prisma.$queryRaw<Array<{ id: string }>>`
     SELECT "id" FROM "composite_assessment_attempts"
     WHERE "composite_assessment_id" = ${compositeId} AND "user_id" = ${userId}
@@ -4038,13 +4058,16 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
   if (inProgress) return traceAssessmentPhase('start.post_gate_getAttemptState',
     () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(inProgress.id, { userId }, Boolean(opts?.wantsWholeDelivery), null, undefined, undefined, opts?.knownTemplateHashes, false)))
 
-  // For a new ordinary, scale-only questionnaire, avoid occupying a gate slot
-  // or opening a transaction when the same freeze would already be protected.
-  // Keep the in-transaction checks: host pressure may change after this read.
-  if (isOrdinaryQuestionnaireStart(composite) && composite.items.length > 0
-      && composite.items.every((item: any) => item.required && item.type === 'SCALE')) {
-    assertAssessmentStartResources()
-  }
+  // Resource gate BEFORE the fat publication load: under host memory/CPU
+  // pressure, reject NEW starts before the structuredClone of the whole tree
+  // and the eligibility read. Gate now applies to every new authenticated
+  // START regardless of product kind — host memory is a shared, host-wide
+  // budget. The in-transaction checks below still re-evaluate under the
+  // freeze because host pressure may change between this read and the freeze.
+  assertAssessmentStartResources()
+  const composite = await loadStartComposite(compositeId)
+  assertSupportedComposite(composite, false, false)
+  await assertStudentEligibility(composite, userId)
 
   const isUniqueConstraintError = (err: unknown) =>
     typeof err === 'object' && err !== null && 'code' in err && (err as { code?: unknown }).code === 'P2002'

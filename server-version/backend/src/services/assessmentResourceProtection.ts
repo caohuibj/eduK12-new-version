@@ -46,7 +46,7 @@ export class AssessmentResourceProtection {
     if (this.memoryProtected || this.cpuProtected) return { mode: 'protected', limit: 0, delayMs: 1000,
       reason: this.memoryProtected ? 'host_memory' : 'host_cpu' }
     if (value.cpuPercent === null) return { mode: 'limited', limit: Math.min(1, concurrency), delayMs: 0, reason: 'cpu_observation_unavailable' }
-    if (value.availableBytes < 768 * MiB) return { mode: 'limited', limit: Math.min(1, concurrency), delayMs: 0, reason: 'memory_headroom' }
+    if (value.availableBytes < 768 * MiB) return { mode: 'limited', limit: Math.min(3, concurrency), delayMs: 0, reason: 'memory_headroom' }
     return { mode: 'normal', limit: concurrency, delayMs: 0, reason: null }
   }
 }

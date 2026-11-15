@@ -293,6 +293,8 @@ const CompositeAssessmentContent: React.FC = () => {
           }, {
             signal,
             isCurrent,
+            maxAttempts: 5,
+            maxTotalWaitMs: 60_000,
             onRetry: (delayMs) => setRetryMessage(`暂未进入测评，${Math.ceil(delayMs / 1000)} 秒后自动重试，请稍候。`),
           })
           response = result.response
