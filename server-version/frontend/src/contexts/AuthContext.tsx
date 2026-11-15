@@ -303,14 +303,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     const loginStartedAt = Date.now()
     try {
       if (trainingLogin) {
-        await runWithTrainingTimeout(
-          (csrfSignal) => authApi.csrf({ signal: csrfSignal }),
-          {
-            timeoutMs: Math.min(TRAINING_CSRF_TIMEOUT_MS, TRAINING_RETRY_TOTAL_WAIT_MS),
-            signal: loginController.signal,
-            isCurrent,
-          },
-        )
+        // Bounded csrf retry: transient timeouts/transport failures get up to two
+        // attempts inside the same login budget instead of aborting the login.
+        for (let csrfAttempt = 1; ; csrfAttempt += 1) {
+          try {
+            await runWithTrainingTimeout(
+              (csrfSignal) => authApi.csrf({ signal: csrfSignal }),
+              {
+                timeoutMs: Math.min(TRAINING_CSRF_TIMEOUT_MS, TRAINING_RETRY_TOTAL_WAIT_MS),
+                signal: loginController.signal,
+                isCurrent,
+              },
+            )
+            break
+          } catch (csrfErr) {
+            const remainingMs = TRAINING_RETRY_TOTAL_WAIT_MS - Math.max(0, Date.now() - loginStartedAt)
+            const transient = csrfErr instanceof TrainingRetryTimeoutError ||
+              (csrfErr as { code?: unknown })?.code === 'ECONNABORTED'
+            if (csrfAttempt >= 2 || !transient || remainingMs <= 0 || !isCurrent()) throw csrfErr
+            await new Promise((resolve) => setTimeout(resolve, 300 + Math.floor(Math.random() * 400)))
+            if (!isCurrent()) throw csrfErr
+          }
+        }
       } else {
         await authApi.csrf({ signal: loginController.signal })
       }

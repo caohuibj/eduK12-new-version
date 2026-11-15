@@ -38,7 +38,21 @@ export const createPasswordVerificationPool = (options: PoolOptions) => {
   const queue: Job[] = []
   let nextId = 0
   let closed = false
-  const error = () => new Error('Password verification unavailable')
+  // Distinct duck-typed admission-busy error: isBoundedAdmissionBusyError() in
+  // authController maps this to HTTP 503 { code: 'LOGIN_VERIFY_BUSY',
+  // Retry-After: 2 } so bounded frontend/pressure retries stay engaged instead
+  // of fail-fast on code -1.
+  const error = (): Error => {
+    const e = new Error('Password verification unavailable') as Error & {
+      code: string
+      retryAfterSeconds: number
+      reason: string
+    }
+    e.code = 'LOGIN_VERIFY_BUSY'
+    e.retryAfterSeconds = 2
+    e.reason = 'password_verification_pool'
+    return e
+  }
   const rejectQueued = () => {
     for (const job of queue.splice(0)) job.reject(error())
   }
@@ -48,7 +62,13 @@ export const createPasswordVerificationPool = (options: PoolOptions) => {
     clearTimeout(slot.timer)
     slot.job?.reject(error())
     slot.job = undefined
-    rejectQueued()
+    // Starvation guard: flush the queue only when no surviving slot can ever
+    // drain it (single-slot pool whose worker died). Multi-slot pools keep the
+    // queue so the surviving slots continue serving it; a former unconditional
+    // rejectQueued() here cascaded one stuck slot into rejecting every queued
+    // login (authController then answered code -1 and clients fail-fasted).
+    const aliveElsewhere = slots.some(other => Boolean(other))
+    if (!aliveElsewhere) rejectQueued()
     void slot.worker.terminate()
     // Replacement is lazy, on a later request, so a broken worker cannot cause
     // an unbounded restart loop. Authentication never falls back on failure.
@@ -67,7 +87,7 @@ export const createPasswordVerificationPool = (options: PoolOptions) => {
   const makeSlot = (index: number): Slot => {
     const worker = (options.workerFactory ?? ((source, settings) => new Worker(source, settings)))(
       workerSource,
-      { eval: true, workerData: { modulePath: require.resolve('bcryptjs') }, env: {}, name: 'password-verification' },
+      { eval: true, workerData: { modulePath: require.resolve('@node-rs/bcrypt') }, env: {}, name: 'password-verification' },
     )
     const slot: Slot = { worker }
     slots[index] = slot

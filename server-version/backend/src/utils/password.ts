@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs'
+import { compare as nativeBcryptCompare, hash as nativeBcryptHash } from '@node-rs/bcrypt'
 import { randomInt } from 'node:crypto'
 import { passwordVerificationPool } from '../services/passwordVerificationPool'
 
@@ -13,12 +13,12 @@ export const isValidPassword = (password: string): boolean => {
 }
 
 export const hashPassword = async (password: string): Promise<string> => {
-  return bcrypt.hash(password, 10)
+  return nativeBcryptHash(password, 10)
 }
 
 export const comparePassword = async (password: string, hash: string): Promise<boolean> => {
   const pool = passwordVerificationPool()
-  return pool ? pool.compare(password, hash) : bcrypt.compare(password, hash)
+  return pool ? pool.compare(password, hash) : nativeBcryptCompare(password, hash)
 }
 
 /**

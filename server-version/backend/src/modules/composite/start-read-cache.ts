@@ -4,7 +4,7 @@
  * status/hash/revocation rechecks in createAttempt remain authoritative;
  * a stale entry cannot admit a wrong start. Not Redis, not cross-process. */
 
-export const START_READ_CACHE_TTL_MS = 30_000
+export const START_READ_CACHE_TTL_MS = 120_000
 export const START_READ_CACHE_MAX_ENTRIES = 256
 
 export class BoundedTtlCache<V> {
