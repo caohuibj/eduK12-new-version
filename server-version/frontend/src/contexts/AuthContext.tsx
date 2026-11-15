@@ -10,7 +10,13 @@ import React, {
 } from 'react'
 import { authApi, type LoginRequest, type AdminMfaInput } from '../api/auth'
 import { isTrainingHost } from '../training/context'
-import { isTrainingBusy, runTrainingRetry, TrainingRetryCancelledError } from '../services/trainingBusyRetry'
+import {
+  isTrainingBusy,
+  isTrainingUncertainRequestError,
+  runTrainingRetry,
+  runWithTrainingTimeout,
+  TrainingRetryCancelledError,
+} from '../services/trainingBusyRetry'
 import { normalizeApiError } from '../utils/normalizeApiError'
 import {
   clearReauthReturn,
@@ -56,6 +62,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const lastAuthTransitionAtRef = useRef(0)
   const sessionChannel = useRef<BroadcastChannel | null>(null)
   const localLoginPending = useRef<number | null>(null)
+  const unmountAbortRef = useRef<AbortController | null>(null)
+  const loginAbortRef = useRef<AbortController | null>(null)
+  const abortActiveLogin = useCallback(() => {
+    loginAbortRef.current?.abort()
+    loginAbortRef.current = null
+  }, [])
   const renderEpoch = authEpochRef.current
   const notifySessionChanged = () => {
     // Only a change nonce is shared: never credentials, identity or tokens.
@@ -241,38 +253,83 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         else if (event.data?.type === AUTH_SESSION_SIGNAL && typeof event.data.nonce === 'string' && event.data.nonce.length > 0 && event.data.nonce.length <= 128) changed(event.data.nonce)
       }
     }
+    const unmountController = new AbortController()
+    unmountAbortRef.current = unmountController
     window.addEventListener('storage', storageChanged)
     window.addEventListener('focus', focus)
     document.addEventListener('visibilitychange', visible)
     void validateSession(false, true)
     return () => {
       alive = false
+      unmountController.abort()
+      abortActiveLogin()
       window.removeEventListener('storage', storageChanged)
       window.removeEventListener('focus', focus)
       document.removeEventListener('visibilitychange', visible)
       sessionChannel.current?.close()
       sessionChannel.current = null
     }
-  }, [replaceIdentity])
+  }, [abortActiveLogin, replaceIdentity])
 
   const login = async (username: string, password: string, expectedRole?: LoginRequest['expectedRole'], entrance?: 'admin', mfa?: AdminMfaInput) => {
+    abortActiveLogin()
     const requestEpoch = ++authEpochRef.current
+    const loginController = new AbortController()
+    if (unmountAbortRef.current?.signal.aborted) {
+      loginController.abort()
+    }
+    loginAbortRef.current = loginController
     localLoginPending.current = requestEpoch
     setLoginRetryMessage(null)
+    const isCurrent = () => requestEpoch === authEpochRef.current && !loginController.signal.aborted
     try {
-      await authApi.csrf()
-      if (requestEpoch !== authEpochRef.current) return
+      await authApi.csrf({ signal: loginController.signal })
+      if (!isCurrent()) return
       const data = { username, password, ...(expectedRole ? { expectedRole } : {}) }
-      const requestLogin = () => entrance ? mfa ? authApi.login(data, entrance, mfa) : authApi.login(data, entrance) : authApi.login(data)
+      const requestLogin = (attemptSignal?: AbortSignal) => {
+        const config = attemptSignal ? { signal: attemptSignal } : undefined
+        return entrance
+          ? mfa
+            ? authApi.login(data, entrance, mfa, config)
+            : authApi.login(data, entrance, undefined, config)
+          : authApi.login(data, undefined, undefined, config)
+      }
       const response = !entrance && isTrainingHost()
-        ? await runTrainingRetry(requestLogin, (cause) => isTrainingBusy(cause, ['LOGIN_VERIFY_BUSY', 'LOGIN_LOOKUP_BUSY'])
-          ? { kind: 'retry', retryAfterMs: normalizeApiError(cause).retryAfterMs }
-          : { kind: 'stop' }, {
-          isCurrent: () => requestEpoch === authEpochRef.current,
-          onRetry: (delayMs) => setLoginRetryMessage(`登录繁忙，${Math.ceil(delayMs / 1000)} 秒后自动重试。`),
-        })
-        : await requestLogin()
-      if (requestEpoch !== authEpochRef.current) return
+        ? await runTrainingRetry<Awaited<ReturnType<typeof authApi.login>>>(
+          (attemptSignal) => requestLogin(attemptSignal),
+          async (cause, context) => {
+            if (isTrainingBusy(cause, ['LOGIN_VERIFY_BUSY', 'LOGIN_LOOKUP_BUSY'])) {
+              return { kind: 'retry', retryAfterMs: normalizeApiError(cause).retryAfterMs }
+            }
+            if (!isTrainingUncertainRequestError(cause) || context.remainingWaitMs <= 0) {
+              return { kind: 'stop' }
+            }
+            try {
+              const sessionCheck = await runWithTrainingTimeout(
+                (meSignal) => authApi.me({ signal: meSignal }),
+                { timeoutMs: Math.min(10_000, context.remainingWaitMs), signal: loginController.signal, isCurrent },
+              )
+              if (sessionCheck.code === 0 && sessionCheck.data?.username === username) {
+                return {
+                  kind: 'return',
+                  value: { code: 0, message: sessionCheck.message || 'OK', data: { user: sessionCheck.data } },
+                }
+              }
+              // Only retry password login when /auth/me positively confirms no session exists.
+              return sessionCheck.code !== 0 ? { kind: 'retry', retryAfterMs: 1_000 } : { kind: 'stop' }
+            } catch (checkErr) {
+              if (checkErr instanceof TrainingRetryCancelledError) throw checkErr
+              return { kind: 'stop' }
+            }
+          },
+          {
+            signal: loginController.signal,
+            isCurrent,
+            onRetry: (delayMs) => setLoginRetryMessage(`登录繁忙，${Math.ceil(delayMs / 1000)} 秒后自动重试。`),
+          },
+        )
+        : await requestLogin(loginController.signal)
+      if (!isCurrent()) return
       if (response.code === 0 && response.data) {
         lastAuthTransitionAtRef.current = Date.now()
         replaceIdentity(response.data.user)
@@ -283,9 +340,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         throw new Error(response.message || '登录失败')
       }
     } catch (error) {
-      if (error instanceof TrainingRetryCancelledError && requestEpoch !== authEpochRef.current) return
+      if (error instanceof TrainingRetryCancelledError && !isCurrent()) return
       throw error
     } finally {
+      if (loginAbortRef.current === loginController) {
+        loginAbortRef.current = null
+      }
       if (localLoginPending.current === requestEpoch) {
         localLoginPending.current = null
         setLoginRetryMessage(null)
@@ -294,6 +354,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }
 
   const setAuthenticatedUser = (userData: User) => {
+    abortActiveLogin()
     authEpochRef.current += 1
     lastAuthTransitionAtRef.current = Date.now()
     replaceIdentity(userData)
@@ -307,6 +368,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       renderEpoch !== authEpochRef.current
     )
       return
+    abortActiveLogin()
     const requestEpoch = ++authEpochRef.current
     lastAuthTransitionAtRef.current = Date.now()
     try {

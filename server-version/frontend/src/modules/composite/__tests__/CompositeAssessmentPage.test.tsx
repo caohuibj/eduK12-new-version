@@ -9,8 +9,18 @@ const { mockPublicApi, mockCompositeApi, mockTrainingHost, mockTrainingSleep } =
     start: vi.fn(),
     getAttempt: vi.fn(),
     restart: vi.fn(),
+    wholeDefinition: vi.fn(),
+    reportStatus: vi.fn(),
+    submitWhole: vi.fn(),
   },
-  mockCompositeApi: { start: vi.fn(), listAvailable: vi.fn(), getAttempt: vi.fn() },
+  mockCompositeApi: {
+    start: vi.fn(),
+    listAvailable: vi.fn(),
+    getAttempt: vi.fn(),
+    wholeDefinition: vi.fn(),
+    reportStatus: vi.fn(),
+    submitWhole: vi.fn(),
+  },
   mockTrainingHost: vi.fn(),
   mockTrainingSleep: vi.fn(),
 }))
@@ -30,7 +40,7 @@ vi.mock('../../../training/context', async (importOriginal) => ({
 }))
 vi.mock('../../../services/trainingBusyRetry', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../../services/trainingBusyRetry')>()
-  return { ...actual, runTrainingRetry: <T,>(operation: () => Promise<T>, decide: Parameters<typeof actual.runTrainingRetry<T>>[1], options: Parameters<typeof actual.runTrainingRetry<T>>[2]) =>
+  return { ...actual, runTrainingRetry: <T,>(operation: (signal: AbortSignal) => Promise<T>, decide: Parameters<typeof actual.runTrainingRetry<T>>[1], options: Parameters<typeof actual.runTrainingRetry<T>>[2]) =>
     actual.runTrainingRetry(operation, decide, { ...options, random: () => 0, sleep: mockTrainingSleep }) }
 })
 
@@ -62,6 +72,12 @@ beforeEach(() => {
   mockCompositeApi.start.mockReset()
   mockCompositeApi.listAvailable.mockReset()
   mockCompositeApi.getAttempt.mockReset()
+  mockCompositeApi.wholeDefinition.mockReset()
+  mockCompositeApi.reportStatus.mockReset()
+  mockCompositeApi.submitWhole.mockReset()
+  mockPublicApi.wholeDefinition.mockReset()
+  mockPublicApi.reportStatus.mockReset()
+  mockPublicApi.submitWhole.mockReset()
   mockTrainingHost.mockReturnValue(false)
   mockTrainingSleep.mockResolvedValue(undefined)
   window.history.pushState({}, '', '/public/composite/token-1')
@@ -162,7 +178,7 @@ describe('CompositeAssessmentPage public entry', () => {
     const user = userEvent.setup()
     await user.type(screen.getByPlaceholderText('粘贴保存时获得的恢复凭证（可选）'), 'saved-recovery')
     await user.click(screen.getByRole('button', { name: '继续作答' }))
-    await waitFor(() => expect(mockPublicApi.start).toHaveBeenCalledWith('token-1', 'saved-recovery'))
+    await waitFor(() => expect(mockPublicApi.start).toHaveBeenCalledWith('token-1', 'saved-recovery', expect.any(AbortSignal)))
   })
   it('makes study identity selection discoverable from a bound ordinary link', async () => {
     mockPublicApi.info.mockResolvedValue({ code: 0, data: { name: '波次测评', studyEntryPath: '/public/studies/waves/wave/token-1' } })
@@ -206,7 +222,7 @@ describe('CompositeAssessmentPage public entry', () => {
 
     await user.click(screen.getByRole('button', { name: /开始匿名测评/ }))
     await waitFor(() => expect(mockPublicApi.start).toHaveBeenCalledTimes(1))
-    expect(mockPublicApi.start).toHaveBeenCalledWith('token-1', undefined)
+    expect(mockPublicApi.start).toHaveBeenCalledWith('token-1', undefined, expect.any(AbortSignal))
   })
 })
 
@@ -298,7 +314,7 @@ it('does not redirect to a completed attempt after the participant leaves the pa
       </Routes>
     </MemoryRouter>,
   )
-  await waitFor(() => expect(mockCompositeApi.start).toHaveBeenCalledWith('c1'))
+  await waitFor(() => expect(mockCompositeApi.start).toHaveBeenCalledWith('c1', expect.any(AbortSignal)))
   fireEvent.click(screen.getByText('离开测评'))
   await act(async () =>
     finish({ code: 0, data: { attempt: { id: 'old', status: 'COMPLETED' } } }),
@@ -421,7 +437,7 @@ it('masks the anonymous recovery input and retains it after an uncertain entry f
  await act(async()=>{reject(new Error('temporary network failure'))})
  expect(await screen.findByRole('alert')).toHaveTextContent('请保留原恢复凭据')
  expect(field).toHaveValue('original-recovery-proof')
- expect(mockPublicApi.start).toHaveBeenCalledWith('token-1','original-recovery-proof')
+ expect(mockPublicApi.start).toHaveBeenCalledWith('token-1','original-recovery-proof', expect.any(AbortSignal))
  expect(mockPublicApi.start).toHaveBeenCalledTimes(1)
 })
 it('keeps the anonymous save panel as the sole recovery presentation instead of a duplicate raw secret',async()=>{
@@ -450,4 +466,229 @@ it('does not send the learner to the report page when completion stays busy and 
   expect(screen.queryByText('报告等待页')).not.toBeInTheDocument()
   expect(mockPublicApi.getAttempt).toHaveBeenCalledTimes(2)
   expect(mockPublicApi.getAttempt).toHaveBeenCalledWith('busy-attempt', 'current-unit')
+})
+
+describe('WHOLE_LOCAL fresh-start vs existing attempt recovery (P1 #727)', () => {
+  const wholeAttempt = (id: string, overrides: Record<string, unknown> = {}) => ({
+    id,
+    assessmentId: 'c-whole',
+    name: '整卷测试问卷',
+    instruction: null,
+    status: 'IN_PROGRESS',
+    productKind: 'QUESTIONNAIRE',
+    deliveryMode: 'FINAL_ONLY',
+    executionMode: 'WHOLE_LOCAL',
+    attemptEpoch: 1,
+    progress: 0,
+    completedItems: 0,
+    totalItems: 1,
+    currentIndex: 0,
+    items: [],
+    currentItem: null,
+    ...overrides,
+  })
+
+  const wholeDef = (attemptId: string) => ({
+    attemptId,
+    attemptEpoch: 1,
+    slotSetHash: 's'.repeat(64),
+    contextSnapshotHash: 'context',
+    units: [{
+      itemId: 'item-1',
+      scaleAssessmentId: `child-${attemptId}`,
+      definitionHash: 'def-1',
+      scale: {
+        id: 'scale-1',
+        name: '量表 1',
+        definition: {
+          schemaVersion: 2,
+          respondentType: 'participant_self_report',
+          display: { randomizeItems: false },
+          items: [{
+            itemCode: 'q1',
+            content: '第 1 题',
+            type: 'single',
+            required: true,
+            sortOrder: 0,
+            responseSetKey: 'r',
+            randomizeOptions: false,
+            options: [{ value: 1, label: '选项一' }],
+          }],
+        },
+      },
+    }],
+  })
+
+  it('checks reportStatus and blocks Q1 when HTTP 200 START reuses an existing attempt with PROCESSING whole receipt', async () => {
+    const attemptId = 'attempt-auth-reused-200'
+    mockTrainingHost.mockReturnValue(true)
+    mockCompositeApi.start.mockResolvedValueOnce({
+      code: 0,
+      message: 'ok',
+      data: {
+        attempt: wholeAttempt(attemptId),
+        recoveryToken: null,
+        freshlyCreated: false,
+      },
+    })
+    mockCompositeApi.reportStatus.mockResolvedValueOnce({
+      code: 0,
+      message: 'ok',
+      data: {
+        wholeSubmissionReceived: true,
+        wholeSubmissionId: 'sub-existing',
+        reportStatus: {
+          state: 'PROCESSING',
+          jobId: 'job-1',
+          retryAfterSeconds: 3,
+          errorCode: null,
+          completedAt: null,
+        },
+      },
+    })
+
+    render(<MemoryRouter initialEntries={['/student/composite/c-whole']}><Routes>
+      <Route path="/student/composite/:assessmentId" element={<CompositeAssessmentPage />} />
+    </Routes></MemoryRouter>)
+
+    expect(await screen.findByRole('heading', { name: '交卷成功' })).toBeInTheDocument()
+    expect(screen.queryByText(/整卷第 1/)).not.toBeInTheDocument()
+    expect(mockCompositeApi.reportStatus).toHaveBeenCalledWith(attemptId)
+    expect(mockCompositeApi.wholeDefinition).not.toHaveBeenCalled()
+  })
+
+  it('checks reportStatus when recovered after a lost START response even if whole submission is already processing', async () => {
+    const attemptId = 'attempt-auth-recovered-lost'
+    mockTrainingHost.mockReturnValue(true)
+    mockCompositeApi.start.mockRejectedValueOnce({
+      name: 'AxiosError',
+      status: null,
+      retryable: true,
+      message: 'Network Error',
+    })
+    mockCompositeApi.listAvailable.mockResolvedValueOnce({
+      code: 0,
+      message: 'ok',
+      data: {
+        list: [{
+          id: 'c-whole',
+          canContinue: true,
+          canStartNewAttempt: false,
+          attempt: { id: attemptId, status: 'IN_PROGRESS' },
+        }],
+      },
+    })
+    mockCompositeApi.getAttempt.mockResolvedValueOnce({
+      code: 0,
+      message: 'ok',
+      data: wholeAttempt(attemptId),
+    })
+    mockCompositeApi.reportStatus.mockResolvedValueOnce({
+      code: 0,
+      message: 'ok',
+      data: {
+        wholeSubmissionReceived: true,
+        wholeSubmissionId: 'sub-lost-start',
+        reportStatus: {
+          state: 'PROCESSING',
+          jobId: 'job-2',
+          retryAfterSeconds: 3,
+          errorCode: null,
+          completedAt: null,
+        },
+      },
+    })
+
+    render(<MemoryRouter initialEntries={['/student/composite/c-whole']}><Routes>
+      <Route path="/student/composite/:assessmentId" element={<CompositeAssessmentPage />} />
+    </Routes></MemoryRouter>)
+
+    expect(await screen.findByRole('heading', { name: '交卷成功' })).toBeInTheDocument()
+    expect(screen.queryByText(/整卷第 1/)).not.toBeInTheDocument()
+    expect(mockCompositeApi.reportStatus).toHaveBeenCalledWith(attemptId)
+    expect(mockCompositeApi.wholeDefinition).not.toHaveBeenCalled()
+  })
+
+  it('skips reportStatus and renders Q1 only when authenticated START confirms freshlyCreated: true', async () => {
+    const attemptId = 'attempt-auth-fresh-1'
+    mockTrainingHost.mockReturnValue(true)
+    mockCompositeApi.start.mockResolvedValueOnce({
+      code: 0,
+      message: 'ok',
+      data: {
+        attempt: wholeAttempt(attemptId),
+        recoveryToken: null,
+        freshlyCreated: true,
+      },
+    })
+    mockCompositeApi.wholeDefinition.mockResolvedValueOnce({
+      code: 0,
+      message: 'ok',
+      data: wholeDef(attemptId),
+    })
+
+    render(<MemoryRouter initialEntries={['/student/composite/c-whole']}><Routes>
+      <Route path="/student/composite/:assessmentId" element={<CompositeAssessmentPage />} />
+    </Routes></MemoryRouter>)
+
+    expect(await screen.findByText('整卷第 1 / 1 题')).toBeInTheDocument()
+    expect(mockCompositeApi.reportStatus).not.toHaveBeenCalled()
+    expect(mockCompositeApi.wholeDefinition).toHaveBeenCalledWith(attemptId)
+  })
+
+  it('skips reportStatus on public START with freshlyCreated: true, but enforces it when resuming existing attempt', async () => {
+    const freshId = 'public-whole-fresh-1'
+    mockPublicApi.info.mockResolvedValue({ code: 0, data: { name: '公开整卷', items: [] } })
+    mockPublicApi.start.mockResolvedValueOnce({
+      code: 0,
+      data: {
+        recoveryToken: 'r'.repeat(43),
+        freshlyCreated: true,
+        attempt: wholeAttempt(freshId),
+      },
+    })
+    mockPublicApi.wholeDefinition.mockResolvedValueOnce({
+      code: 0,
+      message: 'ok',
+      data: wholeDef(freshId),
+    })
+
+    const first = renderPublicPage()
+    fireEvent.click(await screen.findByRole('button', { name: '开始匿名测评' }))
+    expect(await screen.findByText('整卷第 1 / 1 题')).toBeInTheDocument()
+    expect(mockPublicApi.reportStatus).not.toHaveBeenCalled()
+    first.unmount()
+
+    window.sessionStorage.clear()
+    const reusedId = 'public-whole-reused-2'
+    mockPublicApi.start.mockResolvedValueOnce({
+      code: 0,
+      data: {
+        recoveryToken: null,
+        freshlyCreated: false,
+        attempt: wholeAttempt(reusedId),
+      },
+    })
+    mockPublicApi.reportStatus.mockResolvedValueOnce({
+      code: 0,
+      message: 'ok',
+      data: {
+        wholeSubmissionReceived: true,
+        wholeSubmissionId: 'sub-public-reused',
+        reportStatus: {
+          state: 'PROCESSING',
+          jobId: 'job-pub',
+          retryAfterSeconds: 3,
+          errorCode: null,
+          completedAt: null,
+        },
+      },
+    })
+
+    renderPublicPage()
+    fireEvent.click(await screen.findByRole('button', { name: '开始匿名测评' }))
+    expect(await screen.findByRole('heading', { name: '交卷成功' })).toBeInTheDocument()
+    expect(mockPublicApi.reportStatus).toHaveBeenCalledWith(reusedId)
+    expect(mockPublicApi.wholeDefinition).toHaveBeenCalledTimes(1)
+  })
 })

@@ -147,14 +147,10 @@ async function handleWholeTemplate(req: Request, res: Response, publicMode: bool
       : { userId: req.user!.userId }
     const { getWholeQuestionnaireTemplate } = await import('./whole-questionnaire.service')
     const template = await getWholeQuestionnaireTemplate(req.params.attemptId, req.params.templateHash, principal)
-    const etag = `"${template.templateHash}"`
-    res.setHeader('ETag', etag)
-    res.setHeader('Cache-Control', 'private, max-age=3600')
-    res.setHeader('Vary', publicMode ? 'X-Recovery-Token' : 'Authorization')
-    const ifNoneMatch = req.headers['if-none-match']
-    if (typeof ifNoneMatch === 'string' && ifNoneMatch.split(',').map(v => v.trim()).includes(etag)) {
-      return res.status(304).end()
-    }
+    // Authenticated requests carry identity in HttpOnly cookies rather than an
+    // Authorization header, and cross-user template reuse is handled in app
+    // memory; keep HTTP responses non-cacheable like peer attempt reads.
+    res.setHeader('Cache-Control', 'private, no-store')
     return success(res, template)
   } catch (err) {
     if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)

@@ -43,6 +43,7 @@ suite('fresh untimed whole START projection / PostgreSQL',()=>{
  afterAll(async()=>{vi.unstubAllEnvs();await(await import('../../config/queue')).closeQueues(true);await db.$disconnect()})
  it('projects from fresh rows without post-gate reads, and Definition freezes all nine admissions',async()=>{
   const result=await startUserAttempt(students[0],compositeId)
+  expect(result.freshlyCreated).toBe(true)
   expect(result.attempt.executionMode).toBe('WHOLE_LOCAL')
   const parent=await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:result.attempt.id}})
   const composite=await loadComposite(compositeId,true)
@@ -74,6 +75,7 @@ suite('fresh untimed whole START projection / PostgreSQL',()=>{
   try{
    const resumed=await startUserAttempt(students[0],compositeId)
    expect(resumed.attempt.id).toBe(existing.id)
+   expect(resumed.freshlyCreated).toBe(false)
    expect(guard).not.toHaveBeenCalled()
    transaction.mockClear()
    await expect(startUserAttempt(students[1],compositeId)).rejects.toMatchObject({code:'INSTRUMENT_NOT_AVAILABLE',statusCode:503})
@@ -86,8 +88,12 @@ suite('fresh untimed whole START projection / PostgreSQL',()=>{
   const parentRead=vi.spyOn(db.compositeAssessmentAttempt,'findUnique')
   try{
    const result=await startUserAttempt(students[1],compositeId,{wantsWholeDelivery:true})
+   expect(result.freshlyCreated).toBe(true)
    expect((result as any).wholeDefinition?.units).toHaveLength(9)
    expect(parentRead).not.toHaveBeenCalled()
+   const reused=await startUserAttempt(students[1],compositeId,{wantsWholeDelivery:true})
+   expect(reused.attempt.id).toBe(result.attempt.id)
+   expect(reused.freshlyCreated).toBe(false)
    const previous=await db.assessment.findFirstOrThrow({where:{compositeAttempt:{userId:students[0],compositeAssessmentId:compositeId}}})
    const current=await db.assessment.findFirstOrThrow({where:{compositeAttemptId:result.attempt.id,scaleId:previous.scaleId}})
    expect(current.runtimeSnapshotEncrypted).not.toBe(previous.runtimeSnapshotEncrypted)
