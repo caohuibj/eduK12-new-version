@@ -3375,7 +3375,15 @@ const precomputeScaleOnlyActiveSlotSet = async (db: Db, input: {
         const frozen = await freezeScaleRuntimeAtAttemptStart(db, compositeScaleFreezeInput(item))
         const encrypted = await persistFrozenScaleRuntimeSnapshot(frozen, db)
         input.scaleFreezeMemo?.set(key, { frozenScale: frozen, encryptedSnapshot: encrypted })
-      } catch {
+      } catch (err) {
+        // Resource-gate rejections (503 INSTRUMENT_NOT_AVAILABLE) are
+        // deterministic for this request — the same freeze would fail inside
+        // the transaction after the attempt row is written, rolling the whole
+        // INSERT back. Rethrow so the START fails fast with the real error
+        // and the client retries against the Retry-After hint. Other
+        // precompute failures keep the fallback-to-transaction path.
+        const gate = err as { code?: string; statusCode?: number }
+        if (gate?.code === 'INSTRUMENT_NOT_AVAILABLE' || gate?.statusCode === 503) throw err
         return null
       }
     }
