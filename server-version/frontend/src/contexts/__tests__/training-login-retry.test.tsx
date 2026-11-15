@@ -157,6 +157,16 @@ describe('training login busy recovery', () => {
       message: 'Request failed with status code 401',
       response: { status: 401, data: '<html><body>401 Unauthorized</body></html>' },
     })],
+    ['HTTP 401 with no response body', normalizeClientError({
+      name: 'AxiosError',
+      message: 'Request failed with status code 401',
+      response: { status: 401 },
+    })],
+    ['HTTP 401 with noncanonical JSON envelope', normalizeClientError({
+      name: 'AxiosError',
+      message: 'Request failed with status code 401',
+      response: { status: 401, data: { error: 'Unauthorized' } },
+    })],
   ])('stops without re-POSTing login when /auth/me fails with %s', async (_label, err) => {
     mocks.sleep.mockResolvedValue(undefined)
     mocks.login.mockRejectedValueOnce(new TrainingRetryTimeoutError())
