@@ -40,12 +40,13 @@ export const startTrainingWithRecovery = (
       return { kind: 'retry', retryAfterMs: normalized.retryAfterMs }
     }
     if (!isTrainingUncertainRequestError(error)) return { kind: 'stop' }
-    if (context.remainingWaitMs <= 0) return { kind: 'stop' }
+    const availableBudgetMs = context.getRemainingWaitMs()
+    if (availableBudgetMs <= 0) return { kind: 'stop' }
 
     try {
       const available = await runWithTrainingTimeout(
         (signal) => deps.listAvailable(signal),
-        { timeoutMs: Math.min(10_000, context.remainingWaitMs), signal: options.signal, isCurrent: options.isCurrent },
+        { timeoutMs: Math.min(10_000, availableBudgetMs), signal: options.signal, isCurrent: options.isCurrent },
       )
       if (available.code !== 0 || !available.data) return { kind: 'stop' }
       const item = available.data.list.find((entry) => entry.id === deps.assessmentId)
@@ -54,9 +55,11 @@ export const startTrainingWithRecovery = (
       if (attempt && typeof attempt === 'object' && 'status' in attempt && attempt.status === 'IN_PROGRESS'
           && 'id' in attempt && typeof attempt.id === 'string') {
         if (item.canContinue !== true) return { kind: 'stop' }
+        const attemptBudgetMs = context.getRemainingWaitMs()
+        if (attemptBudgetMs <= 0) return { kind: 'stop' }
         const recovered = await runWithTrainingTimeout(
           (signal) => deps.getAttempt(attempt.id as string, signal),
-          { timeoutMs: Math.min(10_000, context.remainingWaitMs), signal: options.signal, isCurrent: options.isCurrent },
+          { timeoutMs: Math.min(10_000, attemptBudgetMs), signal: options.signal, isCurrent: options.isCurrent },
         )
         if (recovered.code !== 0 || !recovered.data || recovered.data.id !== attempt.id
             || recovered.data.status !== 'IN_PROGRESS') return { kind: 'stop' }

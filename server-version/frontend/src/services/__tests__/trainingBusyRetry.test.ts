@@ -126,4 +126,26 @@ describe('training busy retries', () => {
     expect(decide).not.toHaveBeenCalled()
     expect(operation).toHaveBeenCalledTimes(1)
   })
+
+  it('provides live getRemainingWaitMs that reflects time elapsed inside decide', async () => {
+    let time = 0
+    const samples: number[] = []
+    const operation = vi.fn(async () => {
+      time = 25_000
+      throw new TrainingRetryTimeoutError()
+    })
+
+    await expect(runTrainingRetry(
+      operation,
+      async (_err, ctx) => {
+        samples.push(ctx.remainingWaitMs, ctx.getRemainingWaitMs())
+        time = 33_000
+        samples.push(ctx.getRemainingWaitMs())
+        return { kind: 'stop' }
+      },
+      { now: () => time, maxTotalWaitMs: 35_000, requestTimeoutMs: 25_000 },
+    )).rejects.toBeInstanceOf(TrainingRetryTimeoutError)
+
+    expect(samples).toEqual([10_000, 10_000, 2_000])
+  })
 })

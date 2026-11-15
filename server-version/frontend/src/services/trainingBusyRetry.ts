@@ -28,6 +28,8 @@ export type RetryDecision<T> =
 
 export type TrainingRetryDecisionContext = {
   remainingWaitMs: number
+  /** Re-evaluated against the attempt's deadline so multi-step recovery calls share the remaining budget. */
+  getRemainingWaitMs: () => number
 }
 
 export type TrainingRetryOptions = {
@@ -206,8 +208,9 @@ export const runTrainingRetry = async <T>(
       })
     } catch (error) {
       checkCurrent()
-      const remainingWaitMs = Math.max(0, maxTotalWaitMs - elapsed())
-      const decision = await decide(error, { remainingWaitMs })
+      const getRemainingWaitMs = () => Math.max(0, maxTotalWaitMs - elapsed())
+      const remainingWaitMs = getRemainingWaitMs()
+      const decision = await decide(error, { remainingWaitMs, getRemainingWaitMs })
       checkCurrent()
       if (decision.kind === 'return') return decision.value
       if (decision.kind === 'stop' || attempt >= maxAttempts) throw error

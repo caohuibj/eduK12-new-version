@@ -15,7 +15,9 @@ import {
   isTrainingUncertainRequestError,
   runTrainingRetry,
   runWithTrainingTimeout,
+  TRAINING_RETRY_TOTAL_WAIT_MS,
   TrainingRetryCancelledError,
+  TrainingRetryTimeoutError,
 } from '../services/trainingBusyRetry'
 import { normalizeApiError } from '../utils/normalizeApiError'
 import {
@@ -27,6 +29,25 @@ import {
 } from '../components/app-shell/access'
 import type { User } from '../types'
 import {userForAccountView,type AccountView} from '../admin/accountView'
+
+const TRAINING_CSRF_TIMEOUT_MS = 10_000
+
+/** Confirm /auth/me positively reported an unauthenticated backend 401 envelope rather than a gateway/HTML failure. */
+const isConfirmedSignedOutMeError = (error: unknown): boolean => {
+  if (!error || typeof error !== 'object') return false
+  const normalized = normalizeApiError(error)
+  if (normalized.status !== 401) return false
+  const rawData =
+    ('response' in error ? (error as { response?: { data?: unknown } }).response?.data : undefined) ??
+    ('data' in error ? (error as { data?: unknown }).data : undefined)
+  if (typeof rawData === 'string') return false
+  if (rawData && typeof rawData === 'object') {
+    const envelope = rawData as { code?: unknown; data?: unknown }
+    if (envelope.code === 0) return false
+    if (envelope.data !== undefined && envelope.data !== null) return false
+  }
+  return true
+}
 
 interface AuthContextType {
   user: User | null
@@ -282,9 +303,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     localLoginPending.current = requestEpoch
     setLoginRetryMessage(null)
     const isCurrent = () => requestEpoch === authEpochRef.current && !loginController.signal.aborted
+    const trainingLogin = !entrance && isTrainingHost()
+    const loginStartedAt = Date.now()
     try {
-      await authApi.csrf({ signal: loginController.signal })
+      if (trainingLogin) {
+        await runWithTrainingTimeout(
+          (csrfSignal) => authApi.csrf({ signal: csrfSignal }),
+          {
+            timeoutMs: Math.min(TRAINING_CSRF_TIMEOUT_MS, TRAINING_RETRY_TOTAL_WAIT_MS),
+            signal: loginController.signal,
+            isCurrent,
+          },
+        )
+      } else {
+        await authApi.csrf({ signal: loginController.signal })
+      }
       if (!isCurrent()) return
+      const remainingLoginBudgetMs = Math.max(0, TRAINING_RETRY_TOTAL_WAIT_MS - Math.max(0, Date.now() - loginStartedAt))
+      if (trainingLogin && remainingLoginBudgetMs <= 0) {
+        throw new TrainingRetryTimeoutError()
+      }
       const data = { username, password, ...(expectedRole ? { expectedRole } : {}) }
       const requestLogin = (attemptSignal?: AbortSignal) => {
         const config = attemptSignal ? { signal: attemptSignal } : undefined
@@ -294,35 +332,46 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             : authApi.login(data, entrance, undefined, config)
           : authApi.login(data, undefined, undefined, config)
       }
-      const response = !entrance && isTrainingHost()
+      const response = trainingLogin
         ? await runTrainingRetry<Awaited<ReturnType<typeof authApi.login>>>(
           (attemptSignal) => requestLogin(attemptSignal),
           async (cause, context) => {
             if (isTrainingBusy(cause, ['LOGIN_VERIFY_BUSY', 'LOGIN_LOOKUP_BUSY'])) {
               return { kind: 'retry', retryAfterMs: normalizeApiError(cause).retryAfterMs }
             }
-            if (!isTrainingUncertainRequestError(cause) || context.remainingWaitMs <= 0) {
+            if (!isTrainingUncertainRequestError(cause)) {
+              return { kind: 'stop' }
+            }
+            const meBudgetMs = context.getRemainingWaitMs()
+            if (meBudgetMs <= 0) {
               return { kind: 'stop' }
             }
             try {
               const sessionCheck = await runWithTrainingTimeout(
                 (meSignal) => authApi.me({ signal: meSignal }),
-                { timeoutMs: Math.min(10_000, context.remainingWaitMs), signal: loginController.signal, isCurrent },
+                { timeoutMs: Math.min(10_000, meBudgetMs), signal: loginController.signal, isCurrent },
               )
-              if (sessionCheck.code === 0 && sessionCheck.data?.username === username) {
-                return {
-                  kind: 'return',
-                  value: { code: 0, message: sessionCheck.message || 'OK', data: { user: sessionCheck.data } },
+              if (sessionCheck.code === 0) {
+                if (sessionCheck.data?.username === username) {
+                  return {
+                    kind: 'return',
+                    value: { code: 0, message: sessionCheck.message || 'OK', data: { user: sessionCheck.data } },
+                  }
                 }
+                // Do not switch accounts or re-POST credentials on an unexpected identity.
+                return { kind: 'stop' }
               }
-              // Only retry password login when /auth/me positively confirms no session exists.
-              return sessionCheck.code !== 0 ? { kind: 'retry', retryAfterMs: 1_000 } : { kind: 'stop' }
+              return sessionCheck.data == null ? { kind: 'retry', retryAfterMs: 1_000 } : { kind: 'stop' }
             } catch (checkErr) {
               if (checkErr instanceof TrainingRetryCancelledError) throw checkErr
-              return { kind: 'stop' }
+              // Backend /auth/me throws HTTP 401 when no valid session exists; retry only then.
+              return isConfirmedSignedOutMeError(checkErr)
+                ? { kind: 'retry', retryAfterMs: 1_000 }
+                : { kind: 'stop' }
             }
           },
           {
+            maxTotalWaitMs: remainingLoginBudgetMs,
             signal: loginController.signal,
             isCurrent,
             onRetry: (delayMs) => setLoginRetryMessage(`登录繁忙，${Math.ceil(delayMs / 1000)} 秒后自动重试。`),
