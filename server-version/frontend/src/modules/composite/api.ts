@@ -176,7 +176,10 @@ export const compositeApi = {
   listAvailable: (signal?: AbortSignal) => apiClient.get<{ list: Array<Record<string, unknown>> }>('/composite-assessments/available', signal ? { params: { view: 'summary' }, signal } : { params: { view: 'summary' } }),
   start: (assessmentId: string, signal?: AbortSignal) => postWholeStart<null>(`/composite-assessments/${assessmentId}/attempts`, { delivery: 'whole' }, signal),
   restart: (attemptId: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: null }>(`/composite-assessments/attempts/${attemptId}/restart`),
-  getAttempt: (attemptId: string, view: 'full' | 'current-unit' = 'full', signal?: AbortSignal) => apiClient.get<CompositeAttemptState>(`/composite-assessments/attempts/${attemptId}${view === 'current-unit' ? '?view=current-unit' : ''}`, signal ? { signal } : undefined),
+  getAttempt: (attemptId: string, view: 'full' | 'current-unit' = 'full', signal?: AbortSignal) => {
+    const url = `/composite-assessments/attempts/${attemptId}${view === 'current-unit' ? '?view=current-unit' : ''}`
+    return signal ? apiClient.get<CompositeAttemptState>(url, { signal }) : apiClient.get<CompositeAttemptState>(url)
+  },
   freezeContext: (attemptId: string) => apiClient.post<{ status: 'frozen'; frozenAt: string }>(`/composite-assessments/attempts/${attemptId}/context/freeze`, {}),
   save: (attemptId: string, draft?: { itemId: string; value: string }) => apiClient.post(`/composite-assessments/attempts/${attemptId}/save`, draft || {}),
   scaleAnswer: (attemptId: string, itemId: string, item: { itemCode: string; responseValue: string | number; responseTimeMs?: number }) => apiClient.post<CompositeMutationAck>(`/composite-assessments/attempts/${attemptId}/items/${itemId}/scale/answer`, item),
