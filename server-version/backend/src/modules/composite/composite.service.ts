@@ -359,16 +359,60 @@ export const loadComposite = async (id: string, includeItems = false, db: Db = p
  * reads (themselves identity-keyed and TTL-bounded). */
 const cloneCachedStartComposite = (cached: any) => structuredClone(cached)
 
-export const loadStartComposite = async (id: string, db: Db = prisma) => {
+const startCompositeIdentity = async (id: string, db: Db = prisma) => {
   const identity = await db.compositeAssessment.findUnique({
     where: { id },
     select: { id: true, updatedAt: true, trainingContentSnapshotHash: true },
   })
   if (!identity) throw compositeNotFound()
+  return identity
+}
+
+/** START-only scalar classification read: eligibility, product support and the
+ * resource-gate predicate need only publication scalars + item descriptors —
+ * never scale.definition or formSections — so the fat publication tree (and its
+ * structuredClone) is loaded only after a START passes these cheap checks.
+ * assertStudentEligibility may attach deliveryCourseId to this fresh,
+ * per-request object; callers carry it over to the fat publication. */
+const loadStartCompositeMetadata = async (id: string, db: Db = prisma) => {
+  const metadata = await db.compositeAssessment.findUnique({
+    where: { id },
+    select: {
+      productKind: true,
+      status: true,
+      questionnaireType: true,
+      courseId: true,
+      opensAt: true,
+      expiresAt: true,
+      trainingFlowFrozen: true,
+      trainingVariantFrozen: true,
+      reportPackageKey: true,
+      analysisProtocolKey: true,
+      trainingTimingPolicy: true,
+      course: { select: { isLibrary: true } },
+      questionnaireCourses: { select: { courseId: true } },
+      items: {
+        orderBy: { position: 'asc' as const },
+        select: {
+          type: true,
+          required: true,
+          standardCombinationSource: true,
+          situationalInstrumentKey: true,
+          situationalInstrumentVersion: true,
+        },
+      },
+    },
+  })
+  if (!metadata) throw compositeNotFound()
+  return metadata as typeof metadata & { deliveryCourseId?: string | null }
+}
+
+export const loadStartComposite = async (id: string, db: Db = prisma) => {
+  const identity = await startCompositeIdentity(id, db)
   // Related live Scale edits need not change a legacy composite timestamp.
   // Only frozen publication identities may reuse the shared tree cache.
   if (!identity.trainingContentSnapshotHash) {
-    return preloadStartComposite(db, await loadComposite(id, true, db))
+    return preloadStartComposite(db, await loadComposite(identity.id, true, db))
   }
   const key = publicationReadKey(identity.id, identity.trainingContentSnapshotHash, identity.updatedAt)
   const cached = startCompositeCache.get(key) as { id: string; trainingContentSnapshotHash?: string | null; updatedAt?: Date } | undefined
@@ -378,7 +422,7 @@ export const loadStartComposite = async (id: string, db: Db = prisma) => {
     return preloadStartComposite(db, cloneCachedStartComposite(cached))
   }
   const loaded = await startCompositeCache.singleFlight(key, async () => {
-    const value = await loadComposite(id, true, db)
+    const value = await loadComposite(identity.id, true, db)
     if (value.updatedAt?.getTime() === identity.updatedAt.getTime()
         && value.trainingContentSnapshotHash === identity.trainingContentSnapshotHash) {
       startCompositeCache.set(key, value)
@@ -4018,17 +4062,12 @@ export const projectStartedAttempt = async (
 }
 
 export const startUserAttempt = async (userId: string, compositeId: string, opts?: { wantsWholeDelivery?: boolean; knownTemplateHashes?: ReadonlySet<string> }) => {
-  // Pure-read (write-time invariant): the student start path never lazily
-  // repairs sections on a published composite. loadComposite already includes
-  // formSections + items, so no separate section read is needed.
+  // Check scalar eligibility/classification first so resumes and 503 rejects
+  // skip the fat publication load and its structuredClone.
   const preGateStart = process.hrtime.bigint()
-  const composite = await loadStartComposite(compositeId)
-  assertSupportedComposite(composite, false, false)
-  await assertStudentEligibility(composite, userId)
-
-  // Fast resume only locks the matching attempt row, not the composite row
-  // or new-START admission gate. FOR SHARE waits for a concurrent restart's
-  // status UPDATE, so a retired attempt is not selected as IN_PROGRESS.
+  const metadata = await loadStartCompositeMetadata(compositeId)
+  assertSupportedComposite(metadata, false, false)
+  await assertStudentEligibility(metadata, userId)
   const [inProgress] = await withQueryRawLabel('start.raw.pre_gate.in_progress', () => prisma.$queryRaw<Array<{ id: string }>>`
     SELECT "id" FROM "composite_assessment_attempts"
     WHERE "composite_assessment_id" = ${compositeId} AND "user_id" = ${userId}
@@ -4038,13 +4077,13 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
   if (inProgress) return traceAssessmentPhase('start.post_gate_getAttemptState',
     () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(inProgress.id, { userId }, Boolean(opts?.wantsWholeDelivery), null, undefined, undefined, opts?.knownTemplateHashes, false)))
 
-  // For a new ordinary, scale-only questionnaire, avoid occupying a gate slot
-  // or opening a transaction when the same freeze would already be protected.
-  // Keep the in-transaction checks: host pressure may change after this read.
-  if (isOrdinaryQuestionnaireStart(composite) && composite.items.length > 0
-      && composite.items.every((item: any) => item.required && item.type === 'SCALE')) {
+  if (isOrdinaryQuestionnaireStart(metadata) && metadata.items.length > 0
+      && metadata.items.every((item: any) => item.required && item.type === 'SCALE')) {
     assertAssessmentStartResources()
   }
+
+  const composite = await loadStartComposite(compositeId)
+  if (metadata.deliveryCourseId) (composite as any).deliveryCourseId = metadata.deliveryCourseId
 
   const isUniqueConstraintError = (err: unknown) =>
     typeof err === 'object' && err !== null && 'code' in err && (err as { code?: unknown }).code === 'P2002'

@@ -114,6 +114,25 @@ it('shows the server busy delay while retrying an authenticated training start',
   expect(mockCompositeApi.start).toHaveBeenCalledTimes(2)
 })
 
+it('retries up to a 5th authenticated training start attempt across 4 server-busy 10s responses', async () => {
+  mockTrainingHost.mockReturnValue(true)
+  const busy503 = { status: 503, code: 'INSTRUMENT_NOT_AVAILABLE', retryAfterMs: 10_000 }
+  mockCompositeApi.start
+    .mockRejectedValueOnce(busy503)
+    .mockRejectedValueOnce(busy503)
+    .mockRejectedValueOnce(busy503)
+    .mockRejectedValueOnce(busy503)
+    .mockResolvedValueOnce({ code: 0, message: 'ok', data: { attempt: { id: 'done-5', status: 'COMPLETED' }, recoveryToken: null } })
+  render(<MemoryRouter initialEntries={['/student/composite/c1']}><Routes>
+    <Route path="/student/composite/:assessmentId" element={<CompositeAssessmentPage />} />
+    <Route path="/student/composite/attempts/:attemptId/report" element={<p>已有报告</p>} />
+  </Routes></MemoryRouter>)
+  expect(await screen.findByText('已有报告')).toBeInTheDocument()
+  expect(mockCompositeApi.start).toHaveBeenCalledTimes(5)
+  expect(mockTrainingSleep).toHaveBeenCalledTimes(4)
+  expect(mockTrainingSleep).toHaveBeenCalledWith(10_000, expect.any(AbortSignal))
+})
+
 it('does not retry the previous assessment after the learner switches routes', async () => {
   let resume!: () => void
   mockTrainingHost.mockReturnValue(true)
