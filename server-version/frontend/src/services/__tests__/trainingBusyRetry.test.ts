@@ -127,6 +127,52 @@ describe('training busy retries', () => {
     expect(operation).toHaveBeenCalledTimes(1)
   })
 
+
+  it('enforces the 60s total START budget across a timed-out request and jittered 10s retry', async () => {
+    vi.useFakeTimers()
+    const requests: AbortSignal[] = []
+    const operation = vi.fn((signal: AbortSignal) => {
+      requests.push(signal)
+      return new Promise<string>(() => {})
+    })
+    const promise = runTrainingRetry(operation, () => ({ kind: 'retry' as const, retryAfterMs: 10_000 }), {
+      maxAttempts: 5,
+      maxTotalWaitMs: 60_000,
+      requestTimeoutMs: 25_000,
+      random: () => 1,
+    })
+    const caught = promise.catch(error => error)
+
+    await vi.advanceTimersByTimeAsync(25_000)
+    expect(requests[0]?.aborted).toBe(true)
+    await vi.advanceTimersByTimeAsync(14_000)
+    expect(operation).toHaveBeenCalledTimes(2)
+    expect(requests[1]?.aborted).toBe(false)
+    await vi.advanceTimersByTimeAsync(21_000)
+    expect(requests[1]?.aborted).toBe(true)
+    expect(await caught).toBeInstanceOf(TrainingRetryTimeoutError)
+    expect(operation).toHaveBeenCalledTimes(2)
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
+  it('cancels during a memory-pressure Retry-After sleep without starting another request', async () => {
+    vi.useFakeTimers()
+    const outer = new AbortController()
+    const busy = { status: 503, code: 'INSTRUMENT_NOT_AVAILABLE', retryAfterMs: 10_000 }
+    const operation = vi.fn().mockRejectedValue(busy)
+    const promise = runTrainingRetry(operation, () => ({ kind: 'retry' as const, retryAfterMs: 10_000 }), {
+      maxAttempts: 5, maxTotalWaitMs: 60_000, random: () => 0, signal: outer.signal,
+    })
+    const caught = promise.catch(error => error)
+    await vi.advanceTimersByTimeAsync(1_000)
+    expect(operation).toHaveBeenCalledOnce()
+    outer.abort()
+    expect(await caught).toBeInstanceOf(TrainingRetryCancelledError)
+    await vi.advanceTimersByTimeAsync(12_000)
+    expect(operation).toHaveBeenCalledOnce()
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
   it('provides live getRemainingWaitMs that reflects time elapsed inside decide', async () => {
     let time = 0
     const samples: number[] = []
