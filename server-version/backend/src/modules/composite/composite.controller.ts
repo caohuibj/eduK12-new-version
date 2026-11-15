@@ -984,7 +984,8 @@ const recoveryFromBody = (req: Request): string => {
 
 const handleStartError = (res: Response, err: unknown): Response => {
   if (isInstrumentFinalSubmitError(err) && err.code === 'INSTRUMENT_NOT_AVAILABLE' && err.statusCode === 503) {
-    res.setHeader('Retry-After', '10')
+    const preferred = (err as { preferredRetryAfterSeconds?: number }).preferredRetryAfterSeconds
+    res.setHeader('Retry-After', String(preferred ?? 10))
     return instrumentError(res, err.code, err.message, err.statusCode)
   }
   return handleError(res, err)

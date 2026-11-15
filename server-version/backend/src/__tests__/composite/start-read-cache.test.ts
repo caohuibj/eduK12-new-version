@@ -4,6 +4,7 @@ import {
   BoundedTtlCache,
   publicationReadKey,
   resetStartReadCachesForTests,
+  AVAILABLE_TEMPLATE_CACHE_TTL_MS,
   START_READ_CACHE_MAX_ENTRIES,
   START_READ_CACHE_TTL_MS,
   startReadsCache,
@@ -26,8 +27,9 @@ describe('process-local START read cache',()=>{
     expect(await cache.singleFlight('version-b',async()=>43)).toBe(43)
   })
 
-  it('exports a 30s TTL and a bounded entry cap',()=>{
-    expect(START_READ_CACHE_TTL_MS).toBe(30_000)
+  it('exports a 120s publication-read TTL, the 30s available-template visibility budget, and a bounded entry cap',()=>{
+    expect(START_READ_CACHE_TTL_MS).toBe(120_000)
+    expect(AVAILABLE_TEMPLATE_CACHE_TTL_MS).toBe(30_000)
     expect(START_READ_CACHE_MAX_ENTRIES).toBe(256)
   })
 

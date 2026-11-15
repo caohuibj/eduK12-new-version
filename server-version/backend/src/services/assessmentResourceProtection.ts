@@ -1,11 +1,15 @@
 import { readFileSync } from 'node:fs'
 import { performance } from 'node:perf_hooks'
+import { configuredInteger } from './boundedAdmissionGate'
 import { InstrumentFinalSubmitError } from './instrumentFinalSubmit'
 import { logger } from '../utils/logger'
 export type AssessmentResourceSample = { at: number; availableBytes: number | null; cpuPercent: number | null }
 export type ResourceClaimDecision = { mode: 'normal' | 'limited' | 'protected'; limit: number; delayMs: number; reason: string | null }
 const enabled = () => process.env.ASSESSMENT_RESOURCE_PROTECTION_ENABLED === 'true'
 const MiB = 1024 * 1024
+// host_cpu spikes recede in 2-3s (R1/R2 measured); configurable so the value can
+// be rolled back to 10 without a redeploy if R3 shows retry-window collisions.
+const HOST_CPU_RETRY_AFTER_SECONDS = configuredInteger('ASSESSMENT_HOST_CPU_RETRY_AFTER_SECONDS', 3)
 let sample: AssessmentResourceSample | null = null
 let previousCpu: { total: number; idle: number } | null = null
 export const sampleAssessmentHostResources = (): AssessmentResourceSample => {
@@ -64,6 +68,13 @@ export const assertAssessmentStartResources = (): void => {
   const value = sampleAssessmentHostResources()
   const decision = policy.decision(value, 1)
   if ((value.availableBytes !== null && value.availableBytes < 700 * MiB) || decision.reason === 'host_cpu') {
-    throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '系统繁忙，请稍后开始测评；已经提交的答案不受影响。', 503)
+    // CPU spikes recede within 2-3s (R1/R2 measured); only the memory path needs
+    // the long 10s window for GC/reclaim. The hint is read by the composite
+    // controller when setting Retry-After.
+    const err = new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '系统繁忙，请稍后开始测评；已经提交的答案不受影响。', 503)
+    if (decision.reason === 'host_cpu' && (value.availableBytes === null || value.availableBytes >= 700 * MiB)) {
+      ;(err as { preferredRetryAfterSeconds?: number }).preferredRetryAfterSeconds = HOST_CPU_RETRY_AFTER_SECONDS
+    }
+    throw err
   }
 }

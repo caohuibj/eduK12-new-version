@@ -66,6 +66,7 @@
     "education:teacher-bootstrap": "tsx src/scripts/education-teacher-bootstrap.ts"
   },
   "dependencies": {
+    "@node-rs/bcrypt": "^2.0.0",
     "@node-rs/jieba": "^2.0.1",
     "@prisma/client": "^5.22.0",
     "@simplewebauthn/server": "14.0.3",
