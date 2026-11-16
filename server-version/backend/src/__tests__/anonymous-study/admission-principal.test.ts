@@ -3,7 +3,7 @@ const {db,state}=vi.hoisted(()=>({db:{$queryRaw:vi.fn(),$transaction:vi.fn()},st
 vi.mock('../../config/database',()=>({prisma:db}))
 vi.mock('../../modules/assessment-runtime/security',()=>({decryptUnifiedRuntimePayload:()=>state.envelope}))
 vi.mock('../../modules/assessment-runtime/compact-raw',()=>({unpackWholeRawEnvelope:(x:unknown)=>x}))
-import {acceptedStudyReceipt,assertCurrentStudyPrincipal,stableStudyAdmissionHash} from '../../modules/anonymous-study/admission-principal'
+import {acceptedStudyReceipt,assertCurrentStudyPrincipal,stableStudyAdmissionHash,withStudyPrincipalReadBatch} from '../../modules/anonymous-study/admission-principal'
 const original='1'.repeat(64),fresh='2'.repeat(64)
 const input=()=>({attemptId:'parent',attemptEpoch:1,recoveryTokenHash:fresh,frozenHash:original})
 const unit={assessmentId:'child',submissionId:'unit-submission',attemptEpoch:1,definitionHash:'definition',contextSnapshotHash:null,answers:[]}
@@ -65,5 +65,46 @@ describe('immutable study principal and fresh credential overlay',()=>{
  it('cannot mint capability for a missing/expired lease or mismatched envelope',async()=>{
   state.lease=false;await expect(acceptedStudyReceipt(job(),state.envelope)).rejects.toThrow()
   state.lease=true;state.envelope.binding.attemptId='other';await expect(acceptedStudyReceipt(job(),state.envelope)).rejects.toThrow()
+ })
+ it('shares only the current delivery binding and checks it again before returning',async()=>{
+  await withStudyPrincipalReadBatch(db as any,async()=>{
+   expect(await Promise.all(Array.from({length:9},()=>assertCurrentStudyPrincipal(db as any,input())))).toEqual(Array(9).fill(true))
+  })
+  expect(db.$queryRaw.mock.calls.filter(call=>text(call[0]).includes('FROM anonymous_study_attempts'))).toHaveLength(2)
+  await assertCurrentStudyPrincipal(db as any,input())
+  expect(db.$queryRaw.mock.calls.filter(call=>text(call[0]).includes('FROM anonymous_study_attempts'))).toHaveLength(3)
+ })
+ it('fails delivery if participant is revoked before the final recheck',async()=>{
+  await expect(withStudyPrincipalReadBatch(db as any,async()=>{
+   expect(await assertCurrentStudyPrincipal(db as any,input())).toBe(true)
+   state.binding.participantStatus='REVOKED'
+  })).rejects.toMatchObject({statusCode:403})
+ })
+ it('does not reuse a pre-lock binding when a credential is reset',async()=>{
+  await expect(withStudyPrincipalReadBatch(db as any,async()=>{
+   expect(await assertCurrentStudyPrincipal(db as any,input())).toBe(true)
+   state.binding.currentHash=null
+   await assertCurrentStudyPrincipal(db as any,input(),true)
+  })).rejects.toMatchObject({statusCode:403})
+ })
+ it('does not share a binding across separate delivery operations or databases',async()=>{
+  await withStudyPrincipalReadBatch(db as any,()=>assertCurrentStudyPrincipal(db as any,input()))
+  state.binding=null
+  await withStudyPrincipalReadBatch(db as any,async()=>expect(await assertCurrentStudyPrincipal(db as any,input())).toBe(false))
+  expect(db.$queryRaw.mock.calls.filter(call=>text(call[0]).includes('FROM anonymous_study_attempts'))).toHaveLength(4)
+  const other={$queryRaw:vi.fn().mockResolvedValue([])}
+  await withStudyPrincipalReadBatch(db as any,async()=>{
+   await assertCurrentStudyPrincipal(other as any,input())
+   await assertCurrentStudyPrincipal(other as any,input())
+  })
+  expect(other.$queryRaw).toHaveBeenCalledTimes(2)
+ })
+ it('rejects an attempt becoming study-bound during delivery',async()=>{
+  const saved=state.binding
+  state.binding=null
+  await expect(withStudyPrincipalReadBatch(db as any,async()=>{
+   expect(await assertCurrentStudyPrincipal(db as any,input())).toBe(false)
+   state.binding=saved
+  })).rejects.toMatchObject({statusCode:403})
  })
 })

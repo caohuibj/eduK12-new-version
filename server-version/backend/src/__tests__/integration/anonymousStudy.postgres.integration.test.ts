@@ -8,6 +8,7 @@ import * as study from '../../modules/anonymous-study/service'
 import * as composite from '../../modules/composite/composite.service'
 import {ensureCompositeFormSections,submitCompositeFormSectionFinal} from '../../modules/composite/final-submit.service'
 import {hashRecoveryToken} from '../../services/anonymousAccess'
+import {assertCurrentStudyPrincipal,withStudyPrincipalReadBatch} from '../../modules/anonymous-study/admission-principal'
 import {publicAnonymousStudyRouter} from '../../modules/anonymous-study/routes'
 import {csrfProtection} from '../../middleware/csrf'
 import {publicAssessmentRateLimiters} from '../../middleware/publicAssessmentRateLimit'
@@ -286,5 +287,18 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   expect(used).toBe(maxUses)
   expect(rejected).toHaveLength(participants.length-maxUses)
   expect(rejected.every(r=>((r as {e:any}).e?.statusCode===409)||((r as {e:any}).e?.code==='ASSESSMENT_START_BUSY'))).toBe(true)
+ })
+ it('rechecks a real study binding after a revocation during a batched read',async()=>{
+  const s=await study.createStudy(owner,'Batch revalidation')
+  const t=await token()
+  const w=await study.addWave(owner,'TEACHER',s.id,{compositeId:cid,tokenId:t.id,title:'Wave'})
+  const p=await study.joinStudy(w.id,t.token,true)
+  const a=await study.startStudyWave(s.id,w.id,p.credential)
+  const hash=hashRecoveryToken(a.recoveryToken)
+  const input={attemptId:a.attemptId,attemptEpoch:1,recoveryTokenHash:hash,frozenHash:hash}
+  await expect(withStudyPrincipalReadBatch(prisma,async()=>{
+   expect(await Promise.all(Array.from({length:9},()=>assertCurrentStudyPrincipal(prisma,input)))).toEqual(Array(9).fill(true))
+   await study.revokeStudyIdentity(s.id,p.credential)
+  })).rejects.toMatchObject({statusCode:403})
  })
 })
