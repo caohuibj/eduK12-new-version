@@ -99,6 +99,22 @@ describe('immutable study principal and fresh credential overlay',()=>{
   })
   expect(other.$queryRaw).toHaveBeenCalledTimes(2)
  })
+ it('does not retain authorization in a detached continuation after the scope completes',async()=>{
+  let resume!:()=>void
+  const ready=new Promise<void>(resolve=>{resume=resolve})
+  let late!:Promise<boolean>
+  await withStudyPrincipalReadBatch(db as any,async()=>{
+   expect(await assertCurrentStudyPrincipal(db as any,input())).toBe(true)
+   // This callback inherits the scope, but is deliberately not awaited by it.
+   late=ready.then(()=>assertCurrentStudyPrincipal(db as any,input()))
+  })
+  const reads=()=>db.$queryRaw.mock.calls.filter(call=>text(call[0]).includes('FROM anonymous_study_attempts')).length
+  expect(reads()).toBe(2)
+  state.binding.currentHash=null
+  resume()
+  await expect(late).rejects.toMatchObject({statusCode:403})
+  expect(reads()).toBe(3)
+ })
  it('rejects an attempt becoming study-bound during delivery',async()=>{
   const saved=state.binding
   state.binding=null

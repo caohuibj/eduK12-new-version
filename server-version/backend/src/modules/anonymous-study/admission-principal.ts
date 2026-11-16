@@ -72,27 +72,37 @@ export async function acceptedStudyReceipt(job:CompositeReportJob,raw:{schemaVer
  return cap
 }
 export type StudyPrincipalInput={attemptId?:string|null;userId?:string|null;recoveryTokenHash?:string;attemptEpoch:number;frozenHash?:string|null;receipt?:AcceptedStudyReceipt;unit?:ReceiptUnit}
-type PrincipalReadScope={db:Db;bindings:Map<string,Promise<Binding|null>>;checked:Array<{input:StudyPrincipalInput;bound:boolean}>;verifying:boolean}
+type PrincipalReadScope={db:Db;bindings:Map<string,Promise<Binding|null>>;checked:Array<{input:StudyPrincipalInput;bound:boolean}>;verifying:boolean;active:boolean}
 const principalReadScope=new AsyncLocalStorage<PrincipalReadScope>()
 /** A single delivery operation may share the same live binding read among its
  * units. Re-read and validate every input before returning; no authorization
  * result survives the operation or crosses databases/transactions. */
 export async function withStudyPrincipalReadBatch<T>(db:Db,run:()=>Promise<T>):Promise<T>{
- const scope:PrincipalReadScope={db,bindings:new Map(),checked:[],verifying:false}
+ const scope:PrincipalReadScope={db,bindings:new Map(),checked:[],verifying:false,active:true}
  return principalReadScope.run(scope,async()=>{
-  const result=await run()
-  scope.verifying=true
-  scope.bindings.clear()
-  for(const entry of scope.checked){
-   const current=await assertCurrentStudyPrincipal(db,entry.input)
-   if(current!==entry.bound)fail()
+  try {
+   const result=await run()
+   // One fresh binding snapshot per attempt is reused across the final
+   // per-input checks. This does not replace transactional locked checks.
+   scope.verifying=true
+   scope.bindings.clear()
+   for(const entry of scope.checked){
+    const current=await assertCurrentStudyPrincipal(db,entry.input)
+    if(current!==entry.bound)fail()
+   }
+   return result
+  } finally {
+   // AsyncLocalStorage can outlive the caller via a detached continuation.
+   // Closed or failed operations must never retain a reusable identity read.
+   scope.active=false
+   scope.bindings.clear()
+   scope.checked.length=0
   }
-  return result
  })
 }
 async function principalBinding(db:Db,attemptId:string,lock:boolean):Promise<Binding|null>{
  const scope=principalReadScope.getStore()
- if(!scope||scope.db!==db||lock)return binding(db,attemptId)
+ if(!scope||!scope.active||scope.db!==db||lock)return binding(db,attemptId)
  let pending=scope.bindings.get(attemptId)
  if(!pending){pending=binding(db,attemptId);scope.bindings.set(attemptId,pending)}
  return pending
@@ -103,7 +113,7 @@ export async function assertCurrentStudyPrincipal(db:Db,input:StudyPrincipalInpu
  if(!input.attemptId)return false
  const scope=principalReadScope.getStore()
  const remember=(bound:boolean)=>{
-  if(scope&&scope.db===db&&!scope.verifying&&!lock)scope.checked.push({input:{...input},bound})
+  if(scope?.active&&scope.db===db&&!scope.verifying&&!lock)scope.checked.push({input:{...input},bound})
   return bound
  }
  let row=await principalBinding(db,input.attemptId,lock)
