@@ -1,8 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { AssessmentResourceProtection, isAssessmentStartResourceGateError, configuredMemoryRetryAfterSeconds } from '../../services/assessmentResourceProtection'
+import {
+  AssessmentResourceProtection,
+  configuredLowMemoryTrickleConfig,
+  configuredMemoryRetryAfterSeconds,
+  isAssessmentStartResourceGateError,
+  resetAssessmentResourceProtectionForTests,
+  runWithLowMemoryTrickleAdmission,
+} from '../../services/assessmentResourceProtection'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 const MiB = 1024 * 1024
-const value = (at: number, available = 1500, cpu = 30) => ({ at, availableBytes: available * MiB, cpuPercent: cpu })
+const value = (at: number, available = 1500, cpu: number | null = 30) => ({ at, availableBytes: available * MiB, cpuPercent: cpu })
 describe('memory retry hint configuration', () => {
   afterEach(() => vi.unstubAllEnvs())
   it('defaults to ten seconds and accepts the bounded endpoints', () => {
@@ -56,5 +63,139 @@ describe('bounded background resource protection', () => {
     expect(p.decision({ at: 1500, availableBytes: 1500 * MiB, cpuPercent: null }, 2, 1500)).toMatchObject({ mode: 'limited', limit: 1, delayMs: 0 })
     expect(p.decision(value(2000, 1500, 80), 2, 2000).limit).toBe(2)
     expect(p.decision(value(2000), 2, 8000)).toMatchObject({ mode: 'limited', limit: 1, reason: 'observation_unavailable' })
+  })
+})
+
+describe('low-memory START trickle configuration and state machine', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    resetAssessmentResourceProtectionForTests()
+  })
+
+  it('provides conservative defaults and derives releaseMiB from floorMiB when unset', () => {
+    expect(configuredLowMemoryTrickleConfig()).toEqual({
+      floorMiB: 650,
+      releaseMiB: 670,
+      maxCpuPercent: 80,
+      maxConcurrent: 1,
+      maxQueue: 1,
+      maxWaitMs: 2000,
+    })
+
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_FLOOR_MIB', '690')
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT', '0')
+    expect(configuredLowMemoryTrickleConfig()).toMatchObject({
+      floorMiB: 690,
+      releaseMiB: 700,
+      maxConcurrent: 0,
+    })
+  })
+
+  it('validates bounds for all trickle configuration variables', () => {
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_FLOOR_MIB', '511')
+    expect(() => configuredLowMemoryTrickleConfig()).toThrow(/FLOOR_MIB/)
+    vi.unstubAllEnvs()
+
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_FLOOR_MIB', '700')
+    expect(() => configuredLowMemoryTrickleConfig()).toThrow(/FLOOR_MIB/)
+    vi.unstubAllEnvs()
+
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_FLOOR_MIB', '660')
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_RELEASE_MIB', '659')
+    expect(() => configuredLowMemoryTrickleConfig()).toThrow(/RELEASE_MIB/)
+    vi.unstubAllEnvs()
+
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_RELEASE_MIB', '701')
+    expect(() => configuredLowMemoryTrickleConfig()).toThrow(/RELEASE_MIB/)
+    vi.unstubAllEnvs()
+
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_MAX_CPU_PERCENT', '95')
+    expect(() => configuredLowMemoryTrickleConfig()).toThrow(/MAX_CPU_PERCENT/)
+    vi.unstubAllEnvs()
+
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT', '11')
+    expect(() => configuredLowMemoryTrickleConfig()).toThrow(/MAX_CONCURRENT/)
+    vi.unstubAllEnvs()
+
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_MAX_QUEUE', '21')
+    expect(() => configuredLowMemoryTrickleConfig()).toThrow(/MAX_QUEUE/)
+    vi.unstubAllEnvs()
+
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_MAX_WAIT_MS', '99')
+    expect(() => configuredLowMemoryTrickleConfig()).toThrow(/MAX_WAIT_MS/)
+  })
+
+  it('enforces hysteresis across floor and release thresholds and crisis latch up to 700 MiB', () => {
+    const p = new AssessmentResourceProtection()
+    const cfg = configuredLowMemoryTrickleConfig()
+
+    expect(p.startAdmissionDecision(value(0, 700, 90), 0, cfg)).toEqual({ action: 'allow', reason: null, retryHint: null })
+    expect(p.startAdmissionDecision(value(1000, 660, 20), 1000, cfg)).toEqual({
+      action: 'trickle',
+      reason: 'low_memory_trickle',
+      retryHint: null,
+    })
+
+    // Dropping below 650 latches trickle rejection until >= 670
+    expect(p.startAdmissionDecision(value(2000, 649, 10), 2000, cfg)).toMatchObject({
+      action: 'reject_memory',
+      reason: 'host_memory',
+      retryHint: 'memory',
+    })
+    expect(p.startAdmissionDecision(value(3000, 669, 10), 3000, cfg)).toMatchObject({
+      action: 'reject_memory',
+      reason: 'host_memory',
+    })
+    expect(p.startAdmissionDecision(value(4000, 670, 10), 4000, cfg)).toEqual({
+      action: 'trickle',
+      reason: 'low_memory_trickle',
+      retryHint: null,
+    })
+
+    // Crisis latch (< 512 MiB) keeps rejecting until >= 700 MiB even above releaseMiB
+    expect(p.startAdmissionDecision(value(5000, 500, 10), 5000, cfg)).toMatchObject({ action: 'reject_memory', reason: 'host_memory' })
+    expect(p.startAdmissionDecision(value(6000, 680, 10), 6000, cfg)).toMatchObject({ action: 'reject_memory', reason: 'host_memory' })
+    expect(p.startAdmissionDecision(value(7000, 700, 10), 7000, cfg)).toEqual({ action: 'allow', reason: null, retryHint: null })
+  })
+
+  it('rejects trickle when CPU is busy, unavailable, latched high, or telemetry is stale/missing', () => {
+    const p = new AssessmentResourceProtection()
+    const cfg = configuredLowMemoryTrickleConfig()
+
+    expect(p.startAdmissionDecision(value(0, 660, 80), 0, cfg).action).toBe('trickle')
+    expect(p.startAdmissionDecision(value(1000, 660, 81), 1000, cfg)).toMatchObject({
+      action: 'reject_memory',
+      reason: 'low_memory_cpu_busy',
+      retryHint: 'memory',
+    })
+    expect(p.startAdmissionDecision(value(2000, 660, null), 2000, cfg)).toMatchObject({
+      action: 'reject_memory',
+      reason: 'cpu_observation_unavailable',
+      retryHint: 'memory',
+    })
+    expect(p.startAdmissionDecision({ at: 3000, availableBytes: null, cpuPercent: 10 }, 3000, cfg)).toMatchObject({
+      action: 'reject_memory',
+      reason: 'observation_unavailable',
+    })
+    expect(p.startAdmissionDecision(value(3000, 750, 10), 9000, cfg)).toMatchObject({
+      action: 'reject_memory',
+      reason: 'observation_unavailable',
+    })
+
+    p.reset()
+    expect(p.startAdmissionDecision(value(0, 750, 96), 0, cfg).action).toBe('allow')
+    expect(p.startAdmissionDecision(value(1000, 750, 96), 1000, cfg)).toEqual({
+      action: 'reject_cpu',
+      reason: 'host_cpu',
+      retryHint: 'cpu',
+    })
+  })
+
+  it('bypasses host sampling completely when resource protection is disabled', async () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'false')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+    const operation = vi.fn().mockResolvedValue('ok')
+    await expect(runWithLowMemoryTrickleAdmission(operation)).resolves.toBe('ok')
+    expect(operation).toHaveBeenCalledTimes(1)
   })
 })

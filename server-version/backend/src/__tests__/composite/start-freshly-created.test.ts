@@ -395,4 +395,26 @@ describe('START freshlyCreated server distinction', () => {
       attempt: { id: 'attempt-reused' },
     })
   })
+
+  it('delegates scale-only startUserAttempt through runWithLowMemoryTrickleAdmission when trickle is enabled', async () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+    mocks.prisma.$queryRaw.mockReset()
+    mocks.prisma.$queryRaw.mockResolvedValue([])
+    const busyError = Object.assign(new Error('系统繁忙'), { statusCode: 503, code: 'INSTRUMENT_NOT_AVAILABLE' })
+    const directSpy = vi.spyOn(assessmentResourceProtection, 'assertAssessmentStartResources')
+    const trickleSpy = vi.spyOn(assessmentResourceProtection, 'runWithLowMemoryTrickleAdmission')
+      .mockRejectedValueOnce(busyError)
+    try {
+      await expect(startUserAttempt('user-1', 'comp-1', { wantsWholeDelivery: true })).rejects.toBe(busyError)
+      expect(trickleSpy).toHaveBeenCalledTimes(1)
+      expect(directSpy).not.toHaveBeenCalled()
+      expect(mocks.prisma.compositeAssessment.findUnique).toHaveBeenCalledTimes(1)
+      expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+    } finally {
+      trickleSpy.mockRestore()
+      directSpy.mockRestore()
+      vi.unstubAllEnvs()
+    }
+  })
 })
