@@ -43,6 +43,12 @@ class ReadinessGateTest(unittest.TestCase):
         gate = ReadinessGate(0)
         self.assertEqual(gate.observe(sample(0, outstanding=False)), 'WAIT')
 
+    def test_malformed_metrics_never_pass(self):
+        gate = ReadinessGate(0)
+        for t in range(6):
+            self.assertEqual(gate.observe(Sample(t, 'invalid', False, True, 0)), 'WAIT')
+        self.assertEqual(gate.observe(Sample(float('nan'), None, None, None, None)), 'NOT_READY')
+
 
 if __name__ == '__main__':
     unittest.main()

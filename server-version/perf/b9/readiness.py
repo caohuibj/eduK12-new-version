@@ -40,7 +40,8 @@ class ReadinessGate:
     def observe(self, sample: Sample) -> str:
         if self.finished:
             return self.finished
-        if (not isfinite(sample.at) or sample.at < self.started_at
+        if (not isinstance(sample.at, (int, float)) or isinstance(sample.at, bool)
+                or not isfinite(sample.at) or sample.at < self.started_at
                 or (self.last_at is not None and sample.at <= self.last_at)):
             self.finished = 'NOT_READY'
             return self.finished
@@ -50,13 +51,16 @@ class ReadinessGate:
         if self.last_at is not None and sample.at - self.last_at > self.max_gap_seconds:
             self.first_good = None
         self.last_at = sample.at
-        good = (sample.memory_available_bytes is not None
+        good = (isinstance(sample.memory_available_bytes, int)
+                and not isinstance(sample.memory_available_bytes, bool)
                 and sample.memory_available_bytes >= self.memory_bytes
-                and sample.cpu_percent is not None and isfinite(sample.cpu_percent)
+                and isinstance(sample.cpu_percent, (int, float))
+                and not isinstance(sample.cpu_percent, bool) and isfinite(sample.cpu_percent)
                 and 0 <= sample.cpu_percent < self.cpu_below
                 and sample.services_healthy is True
-                and sample.outstanding_requests == 0
-                and not isinstance(sample.outstanding_requests, bool))
+                and isinstance(sample.outstanding_requests, int)
+                and not isinstance(sample.outstanding_requests, bool)
+                and sample.outstanding_requests == 0)
         if not good:
             self.first_good = None
             return 'WAIT'
