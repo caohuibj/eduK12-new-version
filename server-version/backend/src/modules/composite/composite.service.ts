@@ -1,7 +1,7 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
 import { classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
 import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
-import { assertAssessmentStartResources, isAssessmentStartResourceGateError } from '../../services/assessmentResourceProtection'
+import { assertAnonymousStartCriticalMemory, assertAssessmentStartResources, isAssessmentStartResourceGateError } from '../../services/assessmentResourceProtection'
 import { availableTemplateCache, publicationReadKey, startCompositeCache, startMetadataCache } from './start-read-cache'
 import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments } from '../scale/deployment/repository'
 import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
@@ -4453,30 +4453,35 @@ const recordAnonymousStartDiagnosticPhase = (phase: RequestObservationPhase, sta
 export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string, study?: PublicStudyAdmission, opts?: { wantsWholeDelivery?: boolean; knownTemplateHashes?: ReadonlySet<string> }) => {
   const startAt = process.hrtime.bigint()
   const token = await findPublicToken(tokenValue)
-  // Pure-read (write-time invariant): the public start path never lazily
-  // repairs sections on a published composite. loadComposite already includes
-  // formSections + items, so no separate section read is needed.
-  // Study admission also classifies flow/variant before its transaction;
-  // retain its later identity read rather than widening that race window.
-  const composite = await loadStartComposite(token.compositeAssessment.id, prisma, study ? undefined : token.compositeAssessment)
-  if (study && (composite.trainingVariantFrozen != null || composite.trainingFlowFrozen != null)) throw compositeBadRequest('概率分卷暂不支持匿名研究组合')
+  // A recovery proof is checked using the narrow attempt index lookup BEFORE
+  // any publication tree/preload. Merely supplying an unverified token must
+  // never bypass the optional low-memory guard and trigger an expensive read.
+  // This remains a read/resume, not a new admission or quota claim.
   if (recoveryToken) {
     const recoveryTokenHash = hashRecoveryToken(recoveryToken)
-    const existing = await prisma.compositeAssessmentAttempt.findFirst({ where: { accessTokenId: token.id, recoveryTokenHash } })
-    if (existing) {
-      // Recovery fast path: no gate, no transaction. Record pre_gate (up to
-      // the recovery lookup) and post_gate (response assembly); never record
-      // a zero gate_wait/gate_slot/tx_wall for a resumed attempt.
-      recordAnonymousStartPhase('anonymous.start.pre_gate_ms', startAt, process.hrtime.bigint())
-      const postGateAt = process.hrtime.bigint()
-      try {
-        return await projectStartedAttempt(existing.id, { recoveryTokenHash }, Boolean(opts?.wantsWholeDelivery), null, undefined, undefined, opts?.knownTemplateHashes, false)
-      } finally {
-        recordAnonymousStartPhase('anonymous.start.post_gate_ms', postGateAt, process.hrtime.bigint())
-      }
+    const existing = await prisma.compositeAssessmentAttempt.findFirst({
+      where: { accessTokenId: token.id, recoveryTokenHash, userId: null },
+    })
+    if (!existing) throw compositeForbidden('恢复凭证无效')
+    recordAnonymousStartPhase('anonymous.start.pre_gate_ms', startAt, process.hrtime.bigint())
+    const postGateAt = process.hrtime.bigint()
+    try {
+      return await projectStartedAttempt(existing.id, { recoveryTokenHash }, Boolean(opts?.wantsWholeDelivery), null, undefined, undefined, opts?.knownTemplateHashes, false)
+    } finally {
+      recordAnonymousStartPhase('anonymous.start.post_gate_ms', postGateAt, process.hrtime.bigint())
     }
-    throw compositeForbidden('恢复凭证无效')
   }
+  if (!study) {
+    assertTokenWindow(token)
+    assertCompositeWindow(token.compositeAssessment)
+    // Reject new plain public STARTs before loading/cloning the publication
+    // graph. Study admissions retain their independent in-transaction check.
+    assertAnonymousStartCriticalMemory()
+  }
+  // Preserve #740's publication identity reuse for ordinary new STARTs; study
+  // START still reads its identity later to keep its original race boundary.
+  const composite = await loadStartComposite(token.compositeAssessment.id, prisma, study ? undefined : token.compositeAssessment)
+  if (study && (composite.trainingVariantFrozen != null || composite.trainingFlowFrozen != null)) throw compositeBadRequest('概率分卷暂不支持匿名研究组合')
   if (!study) assertTokenWindow(token)
   assertCompositeWindow(token.compositeAssessment)
   const credential = study?.credential ?? createRecoveryCredential()
