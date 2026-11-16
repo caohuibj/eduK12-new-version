@@ -1,5 +1,6 @@
 import { EventEmitter } from 'node:events'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   measureRequestPhase,
   measureRequestPhaseSync,
@@ -22,6 +23,29 @@ const metricText = () => runtimeMetricLines().join('\n')
 describe('runtime observability', () => {
   beforeEach(() => {
     resetRuntimeObservabilityForTests()
+  })
+
+  it('reports short-window ELU and samples memory once per metrics collection', () => {
+    // The argument order matters even when a reversed delta yields the same
+    // utilization ratio: active/idle differences must remain nonnegative.
+    const source = readFileSync(new URL('../../services/runtimeObservability.ts', import.meta.url), 'utf8')
+    expect(source).toContain('performance.eventLoopUtilization(currentEventLoopUtilization, lastEventLoopUtilization)')
+
+    const memorySpy = vi.spyOn(process, 'memoryUsage')
+    try {
+      const lines = runtimeMetricLines()
+      expect(memorySpy).toHaveBeenCalledTimes(1)
+      const metric = (name: string) => Number(lines.find(line => line.startsWith(name + ' '))?.split(' ')[1])
+      const external = metric('process_external_memory_bytes')
+      const arrayBuffers = metric('process_array_buffers_bytes')
+      expect(Number.isFinite(external)).toBe(true)
+      expect(arrayBuffers).toBeGreaterThanOrEqual(0)
+      expect(external).toBeGreaterThanOrEqual(arrayBuffers) // arrayBuffers is part of external
+      expect(metric('ptool_nodejs_event_loop_utilization')).toBeGreaterThanOrEqual(0)
+      expect(metric('ptool_nodejs_event_loop_utilization')).toBeLessThanOrEqual(1)
+    } finally {
+      memorySpy.mockRestore()
+    }
   })
 
   it('records request totals and named phases without retaining unmatched path values', async () => {

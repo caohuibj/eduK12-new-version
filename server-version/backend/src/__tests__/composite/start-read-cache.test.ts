@@ -27,6 +27,18 @@ describe('process-local START read cache',()=>{
     expect(await cache.singleFlight('version-b',async()=>43)).toBe(43)
   })
 
+  it('single-flights same-wave metadata with zero TTL, then fetches fresh on the next wave',async()=>{
+    const cache=new BoundedTtlCache<{ version: number }>(0,4)
+    let resolve!: (value: { version: number }) => void
+    const load=vi.fn(()=>new Promise<{ version: number }>(r=>{resolve=r}))
+    const first=Array.from({length:50},()=>cache.singleFlight('composite-1',load))
+    expect(load).toHaveBeenCalledTimes(1)
+    resolve({ version: 1 })
+    expect((await Promise.all(first)).every(value=>value.version===1)).toBe(true)
+    expect(cache.get('composite-1')).toBeUndefined()
+    await expect(cache.singleFlight('composite-1',async()=>({ version: 2 }))).resolves.toEqual({ version: 2 })
+  })
+
   it('exports a 120s publication-read TTL, the 30s available-template visibility budget, and a bounded entry cap',()=>{
     expect(START_READ_CACHE_TTL_MS).toBe(120_000)
     expect(AVAILABLE_TEMPLATE_CACHE_TTL_MS).toBe(30_000)
