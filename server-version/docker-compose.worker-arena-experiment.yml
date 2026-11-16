@@ -1,0 +1,12 @@
+# Optional final overlay for the three production worker services. Do not add
+# this to a deployment until a controlled A/B and rollback are authorized.
+services:
+  worker:
+    environment:
+      MALLOC_ARENA_MAX: "2"
+  report-worker-2:
+    environment:
+      MALLOC_ARENA_MAX: "2"
+  report-worker-3:
+    environment:
+      MALLOC_ARENA_MAX: "2"
