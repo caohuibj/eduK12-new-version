@@ -365,6 +365,7 @@ describe('START freshlyCreated server distinction', () => {
   })
 
   it('marks public recovery-token startPublicAttempt resume as freshlyCreated: false', async () => {
+    const criticalSpy = vi.spyOn(assessmentResourceProtection, 'assertAnonymousStartCriticalMemory')
     const recoveryToken = 'r'.repeat(43)
     const tokenValue = 'public-token-1'
     mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({
@@ -394,5 +395,43 @@ describe('START freshlyCreated server distinction', () => {
       recoveryToken: null,
       attempt: { id: 'attempt-reused' },
     })
+    expect(criticalSpy).not.toHaveBeenCalled()
+    criticalSpy.mockRestore()
+  })
+
+  it('rejects a new plain public start before opening a transaction when the optional guard rejects', async () => {
+    const tokenValue = 'public-token-1'
+    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({
+      id: 'tok-1', tokenHash: hashPublicAccessToken(tokenValue), isActive: true,
+      expiresAt: new Date('2030-01-01T00:00:00Z'), maxUses: 0, usedCount: 0,
+      compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
+    })
+    const busy=Object.assign(new Error('busy'),{code:'INSTRUMENT_NOT_AVAILABLE',statusCode:503})
+    const criticalSpy=vi.spyOn(assessmentResourceProtection,'assertAnonymousStartCriticalMemory').mockImplementation(()=>{throw busy})
+    try {
+      await expect(startPublicAttempt(tokenValue)).rejects.toBe(busy)
+      expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+    } finally { criticalSpy.mockRestore() }
+  })
+
+  it('leaves study resume eligible for its existing in-transaction recovery path', async () => {
+    const tokenValue='public-token-1', recoveryToken='r'.repeat(43), hash=hashRecoveryToken(recoveryToken)
+    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({
+      id:'tok-1',tokenHash:hashPublicAccessToken(tokenValue),isActive:true,
+      expiresAt:new Date('2030-01-01T00:00:00Z'),maxUses:0,usedCount:1,
+      compositeAssessment:{id:'comp-1',status:'PUBLISHED',publicEnabled:true,opensAt:null,expiresAt:null},
+    })
+    mocks.prisma.$transaction.mockImplementation(async (fn:any)=>fn(mocks.prisma))
+    mocks.prisma.compositeAssessmentAttempt.findUnique
+      .mockResolvedValueOnce({id:'attempt-reused',userId:null,accessTokenId:'tok-1',recoveryTokenHash:hash})
+      .mockResolvedValue(makeAttemptRow({userId:null,recoveryTokenHash:hash}))
+    const criticalSpy=vi.spyOn(assessmentResourceProtection,'assertAnonymousStartCriticalMemory').mockImplementation(()=>{throw new Error('unexpected guard')})
+    try {
+      const study:any={credential:{token:recoveryToken,hash},participantId:'p1',beforeAdmission:async()=> 'attempt-reused',afterAdmission:vi.fn()}
+      const result=await startPublicAttempt(tokenValue,undefined,study,{wantsWholeDelivery:true})
+      expect(result.attempt.id).toBe('attempt-reused')
+      expect(criticalSpy).not.toHaveBeenCalled()
+      expect(study.afterAdmission).not.toHaveBeenCalled()
+    } finally { criticalSpy.mockRestore() }
   })
 })

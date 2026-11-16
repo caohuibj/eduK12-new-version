@@ -1,7 +1,7 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
 import { classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
 import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
-import { assertAssessmentStartResources, isAssessmentStartResourceGateError } from '../../services/assessmentResourceProtection'
+import { assertAssessmentStartResources, assertAnonymousStartCriticalMemory, isAssessmentStartResourceGateError } from '../../services/assessmentResourceProtection'
 import { availableTemplateCache, publicationReadKey, startCompositeCache, startMetadataCache } from './start-read-cache'
 import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments } from '../scale/deployment/repository'
 import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
@@ -4447,6 +4447,9 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   }
   if (!study) assertTokenWindow(token)
   assertCompositeWindow(token.compositeAssessment)
+  // Recovery returned above. Study admission may also resume an existing
+  // participant inside the transaction and must not be rejected here.
+  if (!study) assertAnonymousStartCriticalMemory()
   const credential = study?.credential ?? createRecoveryCredential()
   // Pre-gate ends just before the admission gate.
   recordAnonymousStartPhase('anonymous.start.pre_gate_ms', startAt, process.hrtime.bigint())

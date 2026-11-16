@@ -69,6 +69,18 @@ export const reportResourceClaimDecision = (concurrency: number): ResourceClaimD
   }
   return decision
 }
+/** Optional early refusal for a new plain public START. Study admission may
+ * resolve an existing attempt inside its transaction and is excluded by the
+ * caller. The in-transaction freeze guard remains authoritative. */
+export const anonymousStartCriticalMemory = (availableBytes:number|null):boolean =>
+  availableBytes === null || !Number.isFinite(availableBytes) || availableBytes < 650 * MiB
+
+export const assertAnonymousStartCriticalMemory = ():void => {
+  if (!enabled() || process.env.ASSESSMENT_ANONYMOUS_EARLY_MEMORY_GUARD_ENABLED !== 'true') return
+  if (anonymousStartCriticalMemory(sampleAssessmentHostResources().availableBytes)) {
+    throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '系统繁忙，请稍后开始测评；已经提交的答案不受影响。', 503)
+  }
+}
 /** Only creation of NEW frozen runtimes is guarded. Existing durable answers,
  * retries and report reads retain their normal persistence/recovery paths. */
 export const assertAssessmentStartResources = (): void => {

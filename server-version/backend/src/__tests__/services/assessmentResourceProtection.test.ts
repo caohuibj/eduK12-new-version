@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { AssessmentResourceProtection, isAssessmentStartResourceGateError } from '../../services/assessmentResourceProtection'
+import { AssessmentResourceProtection, anonymousStartCriticalMemory, isAssessmentStartResourceGateError } from '../../services/assessmentResourceProtection'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 const MiB = 1024 * 1024
 const value = (at: number, available = 1500, cpu = 30) => ({ at, availableBytes: available * MiB, cpuPercent: cpu })
 describe('bounded background resource protection', () => {
+  it('treats less than 650 MiB or an unavailable memory observation as critical for the optional public START precheck', () => {
+    expect(anonymousStartCriticalMemory(650 * MiB)).toBe(false)
+    expect(anonymousStartCriticalMemory(650 * MiB - 1)).toBe(true)
+    expect(anonymousStartCriticalMemory(null)).toBe(true)
+    expect(anonymousStartCriticalMemory(Number.NaN)).toBe(true)
+  })
   it('only treats a typed 503 INSTRUMENT_NOT_AVAILABLE as a precompute fail-fast', () => {
     expect(isAssessmentStartResourceGateError(
       new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', 'busy', 503)
