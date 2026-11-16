@@ -4286,6 +4286,8 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
       compositeAssessment: {
         select: {
           id: true,
+          updatedAt: true,
+          trainingContentSnapshotHash: true,
           productKind: true,
           publicEnabled: true,
           status: true,
@@ -4307,6 +4309,8 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
         compositeAssessment: {
           select: {
             id: true,
+            updatedAt: true,
+            trainingContentSnapshotHash: true,
             productKind: true,
           publicEnabled: true,
             status: true,
@@ -4328,6 +4332,32 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
   return token as any
 }
 
+// Public discovery needs presentation, not scale definitions. Keep form items
+// complete because they are returned to the client. Tracking publications use
+// the full loader: it verifies and inherits frozen baseline source identities.
+const loadPublicCompositeInfo = async (id: string, db: Db) => {
+  const current = await db.compositeAssessment.findUnique({
+    where: { id },
+    select: {
+      id: true, name: true, description: true, instruction: true, maxAttempts: true,
+      personalTracking: true, personalTrackingBaselineId: true,
+      trainingVariantFrozen: true, ...TRAINING_FLOW_DEFINITION_SELECT,
+      reportPackageKey: true, reportPackageVersion: true, reportPackageSnapshotEncrypted: true,
+      items: { orderBy: { position: 'asc' }, select: {
+        id: true, type: true, position: true, formLabel: true,
+        scale: { select: { name: true } }, cognitiveAssignment: { select: { title: true } },
+      } },
+      formSections: { orderBy: { position: 'asc' }, include: {
+        items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }] },
+      } },
+    },
+  })
+  if (!current) throw compositeNotFound()
+  if (current.personalTracking != null)
+    return loadComposite(id, true, db)
+  return current
+}
+
 export const getPublicCompositeInfo = async (tokenValue: string, db: Db = prisma) => {
   const token = await findPublicToken(tokenValue, db)
   assertSupportedComposite(token.compositeAssessment)
@@ -4336,9 +4366,9 @@ export const getPublicCompositeInfo = async (tokenValue: string, db: Db = prisma
   const composite = token.compositeAssessment
   assertCompositeWindow(composite)
   // Pure-read (write-time invariant): the public info path never lazily
-  // repairs sections on a published composite. loadComposite already includes
-  // formSections + items, so no separate section read is needed.
-  const current = await loadComposite(composite.id, true, db)
+  // repairs sections on a published composite; discovery does not need the
+  // large scale-definition tree used by actual START.
+  const current = await loadPublicCompositeInfo(composite.id, db)
   const packageSlotLabels = getFrozenPackageSlotLabels(current)
   const units = [
     ...current.items
@@ -4426,7 +4456,9 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   // Pure-read (write-time invariant): the public start path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
-  const composite = await loadStartComposite(token.compositeAssessment.id)
+  // Study admission also classifies flow/variant before its transaction;
+  // retain its later identity read rather than widening that race window.
+  const composite = await loadStartComposite(token.compositeAssessment.id, prisma, study ? undefined : token.compositeAssessment)
   if (study && (composite.trainingVariantFrozen != null || composite.trainingFlowFrozen != null)) throw compositeBadRequest('概率分卷暂不支持匿名研究组合')
   if (recoveryToken) {
     const recoveryTokenHash = hashRecoveryToken(recoveryToken)
@@ -4500,14 +4532,16 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
             }
             assertTokenWindow(token)
             const roundCourseId=await assertTrainingTokenRound(tx,token)
+            const admitted = await createAttempt(tx, roundCourseId?{...composite,deliveryCourseId:roundCourseId}:composite, null, token.id, credential)
+            if (study) await study.afterAdmission(tx, admitted.id)
+            await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
+            // Claim last to shorten the token-row lock. A revoked, expired or
+            // exhausted token rolls back the attempt and study binding together.
             const claimed = await tx.compositeAssessmentAccessToken.updateMany({
               where: { id: token.id, isActive: true, expiresAt: { gt: new Date() }, OR: [{ maxUses: 0 }, { usedCount: { lt: token.maxUses } }] },
               data: { usedCount: { increment: 1 } },
             })
             if (claimed.count !== 1) throw compositeConflict('公开链接已达到最大参与次数')
-            const admitted = await createAttempt(tx, roundCourseId?{...composite,deliveryCourseId:roundCourseId}:composite, null, token.id, credential)
-            if (study) await study.afterAdmission(tx, admitted.id)
-            await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
             return admitted
           }, START_INTERACTIVE_TRANSACTION)
         } finally {

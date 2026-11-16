@@ -98,6 +98,7 @@ vi.mock('../../modules/training-materials/service', async (orig) => ({
 import {
   projectFreshStartedAttempt,
   projectStartedAttempt,
+  getPublicCompositeInfo,
   startPublicAttempt,
   startUserAttempt,
 } from '../../modules/composite/composite.service'
@@ -374,7 +375,7 @@ describe('START freshlyCreated server distinction', () => {
       expiresAt: new Date('2030-01-01T00:00:00Z'),
       maxUses: 0,
       usedCount: 1,
-      compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
+      compositeAssessment: { id: 'comp-1', updatedAt: new Date('2026-11-14T00:00:00Z'), trainingContentSnapshotHash: null, status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
     })
     mocks.prisma.compositeAssessmentAttempt.findFirst.mockResolvedValue({
       id: 'attempt-reused',
@@ -394,5 +395,35 @@ describe('START freshlyCreated server distinction', () => {
       recoveryToken: null,
       attempt: { id: 'attempt-reused' },
     })
+    // The token lookup already carried the identity: no extra scalar read.
+    expect(mocks.prisma.compositeAssessment.findUnique).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns fresh public presentation without loading scale definitions', async () => {
+    const tokenValue = 'public-token-1'
+    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({
+      id: 'tok-1', tokenHash: hashPublicAccessToken(tokenValue), isActive: true,
+      expiresAt: new Date('2030-01-01T00:00:00Z'), maxUses: 10, usedCount: 1,
+      compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
+    })
+    mocks.prisma.$queryRaw.mockResolvedValue([])
+    const info = await getPublicCompositeInfo(tokenValue)
+    expect(info.items).toEqual([{ type: 'SCALE', position: 0, label: 'ADEXI' }])
+    expect(info.units).toEqual([{ type: 'scale', id: 'item-1', position: 0, label: 'ADEXI', itemCount: 1, contextSection: false }])
+    const args = mocks.prisma.compositeAssessment.findUnique.mock.calls[0][0]
+    expect(args.select.items.select.scale).toEqual({ select: { name: true } })
+    expect(args.select.formSections.include.items).toBeDefined()
+    expect(args.select.items.select.scale.select.definition).toBeUndefined()
+    mocks.prisma.compositeAssessment.findUnique.mockResolvedValueOnce({
+      ...compositeRow, items: [{ ...compositeRow.items[0], scale: { name: 'updated label' } }],
+    })
+    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValueOnce({
+      id: 'tok-1', tokenHash: hashPublicAccessToken(tokenValue), isActive: true,
+      expiresAt: new Date('2030-01-01T00:00:00Z'), maxUses: 10, usedCount: 2,
+      compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
+    })
+    const next = await getPublicCompositeInfo(tokenValue)
+    expect(next.usedCount).toBe(2)
+    expect(next.items[0].label).toBe('updated label')
   })
 })
