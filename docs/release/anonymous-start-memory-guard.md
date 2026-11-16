@@ -13,7 +13,8 @@ ordinary public-link START receives the existing retryable resource 503 if host
   transaction. Rejected new plain public STARTs skip both publication tree
   cloning/preloading and database attempt creation, though token lookup still
   executes so invalid/expired tokens continue returning 403/409.
-- **Bypassed paths**: Recovery-token resumes bypass the check. Anonymous study
+- **Recovery-proof boundary**: The attempt lookup validates a presented recovery token *before* loading/cloning the full publication. Invalid or forged recovery tokens return 403 without the heavy publication read or a creation transaction; a verified recovery returns its durable attempt without the new-START memory guard. The existing publication eligibility check and resume behavior for expired/disabled links are preserved.
+- **Bypassed paths**: Verified recovery-token resumes bypass the check. Anonymous study
   admissions also bypass it because their existing-attempt lookup runs inside
   the admission transaction.
 - **Sample freshness boundary**: `sampleAssessmentHostResources()` caches each

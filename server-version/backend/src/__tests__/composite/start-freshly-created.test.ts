@@ -98,6 +98,7 @@ vi.mock('../../modules/training-materials/service', async (orig) => ({
 import {
   projectFreshStartedAttempt,
   projectStartedAttempt,
+  getPublicCompositeInfo,
   startPublicAttempt,
   startUserAttempt,
 } from '../../modules/composite/composite.service'
@@ -365,7 +366,6 @@ describe('START freshlyCreated server distinction', () => {
   })
 
   it('marks public recovery-token startPublicAttempt resume as freshlyCreated: false', async () => {
-    const criticalSpy = vi.spyOn(assessmentResourceProtection, 'assertAnonymousStartCriticalMemory')
     const recoveryToken = 'r'.repeat(43)
     const tokenValue = 'public-token-1'
     mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({
@@ -375,7 +375,7 @@ describe('START freshlyCreated server distinction', () => {
       expiresAt: new Date('2030-01-01T00:00:00Z'),
       maxUses: 0,
       usedCount: 1,
-      compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
+      compositeAssessment: { id: 'comp-1', updatedAt: new Date('2026-11-14T00:00:00Z'), trainingContentSnapshotHash: null, status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
     })
     mocks.prisma.compositeAssessmentAttempt.findFirst.mockResolvedValue({
       id: 'attempt-reused',
@@ -395,8 +395,81 @@ describe('START freshlyCreated server distinction', () => {
       recoveryToken: null,
       attempt: { id: 'attempt-reused' },
     })
-    expect(criticalSpy).not.toHaveBeenCalled()
-    criticalSpy.mockRestore()
+    // The verified recovery returns without loading the publication tree.
+    expect(mocks.prisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
+    expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+  })
+
+  it('returns fresh public presentation without loading scale definitions', async () => {
+    const tokenValue = 'public-token-1'
+    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({
+      id: 'tok-1', tokenHash: hashPublicAccessToken(tokenValue), isActive: true,
+      expiresAt: new Date('2030-01-01T00:00:00Z'), maxUses: 10, usedCount: 1,
+      compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
+    })
+    mocks.prisma.$queryRaw.mockResolvedValue([])
+    const info = await getPublicCompositeInfo(tokenValue)
+    expect(info.items).toEqual([{ type: 'SCALE', position: 0, label: 'ADEXI' }])
+    expect(info.units).toEqual([{ type: 'scale', id: 'item-1', position: 0, label: 'ADEXI', itemCount: 1, contextSection: false }])
+    const args = mocks.prisma.compositeAssessment.findUnique.mock.calls[0][0]
+    expect(args.select.items.select.scale).toEqual({ select: { name: true } })
+    expect(args.select.formSections.include.items).toBeDefined()
+    expect(args.select.items.select.scale.select.definition).toBeUndefined()
+    mocks.prisma.compositeAssessment.findUnique.mockResolvedValueOnce({
+      ...compositeRow, items: [{ ...compositeRow.items[0], scale: { name: 'updated label' } }],
+    })
+    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValueOnce({
+      id: 'tok-1', tokenHash: hashPublicAccessToken(tokenValue), isActive: true,
+      expiresAt: new Date('2030-01-01T00:00:00Z'), maxUses: 10, usedCount: 2,
+      compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
+    })
+    const next = await getPublicCompositeInfo(tokenValue)
+    expect(next.usedCount).toBe(2)
+    expect(next.items[0].label).toBe('updated label')
+  })
+  it('rejects a forged recovery proof before publication preload, admission, or memory sampling', async () => {
+    const tokenValue = 'public-token-1', recoveryToken = 'x'.repeat(43)
+    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({
+      id: 'tok-1', tokenHash: hashPublicAccessToken(tokenValue), isActive: true,
+      expiresAt: new Date('2030-01-01T00:00:00Z'), maxUses: 0, usedCount: 1,
+      compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
+    })
+    mocks.prisma.compositeAssessmentAttempt.findFirst.mockResolvedValue(null)
+    const guard = vi.spyOn(assessmentResourceProtection, 'assertAnonymousStartCriticalMemory')
+    try {
+      await expect(startPublicAttempt(tokenValue, recoveryToken)).rejects.toMatchObject({ statusCode: 403 })
+      expect(mocks.prisma.compositeAssessmentAttempt.findFirst).toHaveBeenCalledWith({
+        where: { accessTokenId: 'tok-1', recoveryTokenHash: hashRecoveryToken(recoveryToken), userId: null },
+      })
+      expect(mocks.prisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
+      expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+      expect(guard).not.toHaveBeenCalled()
+    } finally { guard.mockRestore() }
+  })
+
+  it('keeps a verified anonymous resume eligible when its link has expired or been disabled', async () => {
+    const tokenValue = 'public-token-1', recoveryToken = 'r'.repeat(43)
+    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({
+      id: 'tok-1', tokenHash: hashPublicAccessToken(tokenValue), isActive: false,
+      expiresAt: new Date('2020-01-01T00:00:00Z'), maxUses: 1, usedCount: 1,
+      compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
+    })
+    mocks.prisma.compositeAssessmentAttempt.findFirst.mockResolvedValue({
+      id: 'attempt-reused', userId: null, accessTokenId: 'tok-1',
+      recoveryTokenHash: hashRecoveryToken(recoveryToken),
+    })
+    mocks.prisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(
+      makeAttemptRow({ userId: null, recoveryTokenHash: hashRecoveryToken(recoveryToken) }),
+    )
+    const guard = vi.spyOn(assessmentResourceProtection, 'assertAnonymousStartCriticalMemory')
+      .mockImplementation(() => { throw new Error('verified resume must not hit new-start memory guard') })
+    try {
+      const resumed = await startPublicAttempt(tokenValue, recoveryToken, undefined, { wantsWholeDelivery: true })
+      expect(resumed).toMatchObject({ freshlyCreated: false, attempt: { id: 'attempt-reused' } })
+      expect(guard).not.toHaveBeenCalled()
+      expect(mocks.prisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
+      expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+    } finally { guard.mockRestore() }
   })
 
   it('rejects a new plain public start before loadStartComposite or transaction when the optional guard rejects, after token window validation', async () => {

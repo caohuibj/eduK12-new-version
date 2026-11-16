@@ -11,6 +11,7 @@ const state = vi.hoisted(() => ({
   prisma: {
     compositeAssessmentAccessToken: { findUnique: vi.fn() },
     compositeAssessment: { findUnique: vi.fn() },
+    compositeAssessmentAttempt: { findFirst: vi.fn() },
     $transaction: vi.fn(),
   },
 }))
@@ -130,4 +131,26 @@ describe('public START host-memory sampling to HTTP response', () => {
     expect(state.prisma.compositeAssessment.findUnique).toHaveBeenCalledTimes(1)
     expect(res.statusCode).not.toBe(503)
   }, 20_000)
+  it('rejects a forged recovery token with 403 before full publication loading, regardless of low host memory', async () => {
+    state.availableKiB = 649 * 1024
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_ANONYMOUS_EARLY_MEMORY_GUARD_ENABLED', 'true')
+    vi.resetModules()
+    const tokenValue = seedValidToken()
+    state.prisma.compositeAssessmentAttempt.findFirst.mockResolvedValue(null)
+    const { compositeController } = await import('../../modules/composite/composite.controller')
+    const res = fakeRes()
+    await compositeController.publicStart({
+      params: { token: tokenValue },
+      body: { recoveryToken: 'x'.repeat(43) },
+      query: {},
+    } as any, res)
+    expect(res.statusCode).toBe(403)
+    expect(res.headers['Retry-After']).toBeUndefined()
+    expect(state.prisma.compositeAssessmentAttempt.findFirst).toHaveBeenCalledTimes(1)
+    expect(state.prisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
+    expect(state.prisma.$transaction).not.toHaveBeenCalled()
+    expect(state.meminfoReads).toBe(0)
+  }, 20_000)
+
 })
