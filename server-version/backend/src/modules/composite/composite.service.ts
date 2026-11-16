@@ -1,7 +1,7 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
 import { classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
 import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
-import { assertAssessmentStartResources } from '../../services/assessmentResourceProtection'
+import { assertAssessmentStartResources, isAssessmentStartResourceGateError } from '../../services/assessmentResourceProtection'
 import { availableTemplateCache, publicationReadKey, startCompositeCache, startMetadataCache } from './start-read-cache'
 import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments } from '../scale/deployment/repository'
 import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
@@ -418,10 +418,13 @@ const loadStartCompositeMetadata = async (id: string, db: Db = prisma) => {
   // attach deliveryCourseId to the returned object per request. The in-tx
   // admission lock, publication re-read and course-student re-check in
   // createAttempt remain authoritative for archive/republish/eligibility races.
-  const cached = startMetadataCache.get(id) as StartCompositeMetadata | undefined
-  if (cached) return { ...cached, items: [...cached.items] } as StartCompositeMetadata
-  const metadata = await loadStartCompositeMetadataRaw(id, db)
-  startMetadataCache.set(id, metadata)
+  // Coalesce only concurrent reads; TTL=0 deliberately avoids reusing a
+  // completed publication/eligibility snapshot on a later START.
+  const metadata = await startMetadataCache.singleFlight(
+    id, () => loadStartCompositeMetadataRaw(id, db),
+  ) as StartCompositeMetadata
+  // assertStudentEligibility may attach a per-student deliveryCourseId.
+  // Never mutate the shared in-flight result.
   return { ...metadata, items: [...metadata.items] } as StartCompositeMetadata
 }
 
@@ -3382,8 +3385,7 @@ const precomputeScaleOnlyActiveSlotSet = async (db: Db, input: {
         // INSERT back. Rethrow so the START fails fast with the real error
         // and the client retries against the Retry-After hint. Other
         // precompute failures keep the fallback-to-transaction path.
-        const gate = err as { code?: string; statusCode?: number }
-        if (gate?.code === 'INSTRUMENT_NOT_AVAILABLE' || gate?.statusCode === 503) throw err
+        if (isAssessmentStartResourceGateError(err)) throw err
         return null
       }
     }
