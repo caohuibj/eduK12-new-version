@@ -4423,6 +4423,13 @@ const recordAnonymousStartDiagnosticPhase = (phase: RequestObservationPhase, sta
 export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string, study?: PublicStudyAdmission, opts?: { wantsWholeDelivery?: boolean; knownTemplateHashes?: ReadonlySet<string> }) => {
   const startAt = process.hrtime.bigint()
   const token = await findPublicToken(tokenValue)
+  if (!recoveryToken && !study) {
+    assertTokenWindow(token)
+    assertCompositeWindow(token.compositeAssessment)
+    // Reject new plain public starts before loadStartComposite so critical
+    // memory protection skips the fat publication clone/preload as well as the tx.
+    assertAnonymousStartCriticalMemory()
+  }
   // Pure-read (write-time invariant): the public start path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
@@ -4447,9 +4454,6 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   }
   if (!study) assertTokenWindow(token)
   assertCompositeWindow(token.compositeAssessment)
-  // Recovery returned above. Study admission may also resume an existing
-  // participant inside the transaction and must not be rejected here.
-  if (!study) assertAnonymousStartCriticalMemory()
   const credential = study?.credential ?? createRecoveryCredential()
   // Pre-gate ends just before the admission gate.
   recordAnonymousStartPhase('anonymous.start.pre_gate_ms', startAt, process.hrtime.bigint())

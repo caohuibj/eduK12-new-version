@@ -399,7 +399,7 @@ describe('START freshlyCreated server distinction', () => {
     criticalSpy.mockRestore()
   })
 
-  it('rejects a new plain public start before opening a transaction when the optional guard rejects', async () => {
+  it('rejects a new plain public start before loadStartComposite or transaction when the optional guard rejects, after token window validation', async () => {
     const tokenValue = 'public-token-1'
     mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({
       id: 'tok-1', tokenHash: hashPublicAccessToken(tokenValue), isActive: true,
@@ -410,7 +410,17 @@ describe('START freshlyCreated server distinction', () => {
     const criticalSpy=vi.spyOn(assessmentResourceProtection,'assertAnonymousStartCriticalMemory').mockImplementation(()=>{throw busy})
     try {
       await expect(startPublicAttempt(tokenValue)).rejects.toBe(busy)
+      expect(mocks.prisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
       expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+
+      // Exhausted quota must still fail with 409 rather than being masked as 503.
+      mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValueOnce({
+        id: 'tok-1', tokenHash: hashPublicAccessToken(tokenValue), isActive: true,
+        expiresAt: new Date('2030-01-01T00:00:00Z'), maxUses: 1, usedCount: 1,
+        compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
+      })
+      await expect(startPublicAttempt(tokenValue)).rejects.toMatchObject({ statusCode: 409 })
+      expect(criticalSpy).toHaveBeenCalledTimes(1)
     } finally { criticalSpy.mockRestore() }
   })
 
