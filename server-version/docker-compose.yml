@@ -155,7 +155,7 @@ x-app-environment: &app-environment
 
 services:
   postgres:
-    cpus: ${POSTGRES_CPUS:-1.0}
+    cpus: ${POSTGRES_CPUS:-1.5}
     mem_limit: ${POSTGRES_MEM_LIMIT:-1024m}
     command: ["postgres", "-c", "shared_buffers=${POSTGRES_SHARED_BUFFERS:-256MB}", "-c", "work_mem=${POSTGRES_WORK_MEM:-4MB}", "-c", "maintenance_work_mem=${POSTGRES_MAINTENANCE_WORK_MEM:-64MB}", "-c", "max_connections=${POSTGRES_MAX_CONNECTIONS:-80}"]
     image: postgres:16.15-bookworm
@@ -175,7 +175,7 @@ services:
     # 默认不发布 Host port（仅容器内网可达）
 
   redis:
-    cpus: ${REDIS_CPUS:-0.25}
+    cpus: ${REDIS_CPUS:-0.5}
     mem_limit: ${REDIS_MEM_LIMIT:-256m}
     image: redis:7.4.11-bookworm
     container_name: ptool-redis
@@ -191,7 +191,7 @@ services:
     # 默认不发布 Host port
 
   backend:
-    cpus: ${BACKEND_CPUS:-1.25}
+    cpus: ${BACKEND_CPUS:-2.0}
     mem_limit: ${BACKEND_MEM_LIMIT:-1024m}
     image: server-version-backend:latest
     build:
@@ -260,7 +260,7 @@ services:
   # process's Prisma pool with transcode/export.
   worker:
     # Allow reports to borrow idle CPU; API/DB retain higher shares on contention.
-    cpus: ${WORKER_CPUS:-0.75}
+    cpus: ${WORKER_CPUS:-1.0}
     cpu_shares: ${WORKER_CPU_SHARES:-512}
     mem_limit: ${WORKER_MEM_LIMIT:-768m}
     # Must exceed the worker's internal shutdown budget (30s, WORKER_SHUTDOWN_TIMEOUT_SECONDS):
@@ -277,6 +277,7 @@ services:
     environment:
       <<: *app-environment
       NODE_OPTIONS: --max-old-space-size=${WORKER_NODE_HEAP_MB:-192} --max-semi-space-size=${WORKER_NODE_SEMI_SPACE_MB:-16}
+      MALLOC_ARENA_MAX: ${WORKER_MALLOC_ARENA_MAX:-2}
       BACKGROUND_WORKERS_ENABLED: "true"
       PRISMA_CONNECTION_POOL_SIZE: ${WORKER_PRISMA_CONNECTION_POOL_SIZE:-4}
     volumes:
