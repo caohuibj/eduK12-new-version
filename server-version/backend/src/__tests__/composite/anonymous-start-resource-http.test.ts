@@ -11,9 +11,9 @@ vi.mock('node:fs', async (importOriginal) => {
       if (path === '/proc/meminfo') {
         host.meminfoReads += 1
         if (host.missing) throw new Error('missing synthetic MemAvailable')
-        return 'MemAvailable: 614400 kB\\n'
+        return 'MemAvailable: 614400 kB\n'
       }
-      if (path === '/proc/stat') return 'cpu  100 0 100 900 0 0 0 0\\n'
+      if (path === '/proc/stat') return 'cpu  100 0 100 900 0 0 0 0\n'
       return (actual.readFileSync as (...params: unknown[]) => unknown)(path, ...args)
     }) as typeof actual.readFileSync,
   }
