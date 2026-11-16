@@ -287,4 +287,77 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   expect(rejected).toHaveLength(participants.length-maxUses)
   expect(rejected.every(r=>((r as {e:any}).e?.statusCode===409)||((r as {e:any}).e?.code==='ASSESSMENT_START_BUSY'))).toBe(true)
  })
+ it('rolls back losing plain-link starts and never oversells the last uses',async()=>{
+  const t=await token(3)
+  const results=await Promise.allSettled(Array.from({length:8},()=>composite.startPublicAttempt(t.token)))
+  expect(results.filter(result=>result.status==='fulfilled')).toHaveLength(3)
+  const failures=results.filter(result=>result.status==='rejected') as PromiseRejectedResult[]
+  expect(failures).toHaveLength(5)
+  expect(failures.every(result=>result.reason?.statusCode===409)).toBe(true)
+  expect((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})).usedCount).toBe(3)
+  expect(await prisma.compositeAssessmentAttempt.count({where:{accessTokenId:t.id}})).toBe(3)
+ })
+ it('honors the live token quota when its maximum is lowered during the final claim',async()=>{
+  const t=await token(3)
+  const first=await composite.startPublicAttempt(t.token)
+  expect(first.attempt.id).toBeTruthy()
+  let locked!:()=>void, release!:()=>void
+  const hasLock=new Promise<void>(resolve=>{locked=resolve})
+  const canChange=new Promise<void>(resolve=>{release=resolve})
+  const locker=prisma.$transaction(async tx=>{
+   await tx.$queryRaw`SELECT id FROM composite_assessment_access_tokens WHERE id=${t.id} FOR UPDATE`
+   locked()
+   await canChange
+   await tx.compositeAssessmentAccessToken.update({where:{id:t.id},data:{maxUses:1}})
+  },{timeout:15000})
+  await hasLock
+  const second=composite.startPublicAttempt(t.token).then(()=>null,error=>error)
+  let observed=false
+  try{
+   for(let i=0;i<100;i++){
+    const rows=await prisma.$queryRaw<Array<{waiting:boolean}>>`SELECT EXISTS (
+      SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND pid<>pg_backend_pid() AND wait_event_type='Lock'
+    ) AS waiting`
+    if(rows[0]?.waiting){observed=true;break}
+    await new Promise(resolve=>setTimeout(resolve,20))
+   }
+  }finally{release()}
+  await locker
+  const error=await second
+  expect(observed).toBe(true)
+  expect(error?.statusCode).toBe(409)
+  const current=await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})
+  expect(current).toMatchObject({maxUses:1,usedCount:1})
+  expect(await prisma.compositeAssessmentAttempt.count({where:{accessTokenId:t.id}})).toBe(1)
+ },20000)
+ it('rolls back a start when its link is revoked while admission waits',async()=>{
+  const t=await token(1)
+  let locked!:()=>void, release!:()=>void
+  const hasLock=new Promise<void>(resolve=>{locked=resolve})
+  const canRevoke=new Promise<void>(resolve=>{release=resolve})
+  const locker=prisma.$transaction(async tx=>{
+   await tx.$queryRaw`SELECT id FROM composite_assessment_access_tokens WHERE id=${t.id} FOR UPDATE`
+   locked()
+   await canRevoke
+   await tx.compositeAssessmentAccessToken.update({where:{id:t.id},data:{isActive:false}})
+  },{timeout:15000})
+  await hasLock
+  const start=composite.startPublicAttempt(t.token).then(()=>null,error=>error)
+  let observed=false
+  try{
+   for(let i=0;i<100;i++){
+    const rows=await prisma.$queryRaw<Array<{waiting:boolean}>>`SELECT EXISTS (
+      SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND pid<>pg_backend_pid() AND wait_event_type='Lock'
+    ) AS waiting`
+    if(rows[0]?.waiting){observed=true;break}
+    await new Promise(resolve=>setTimeout(resolve,20))
+   }
+  }finally{release()}
+  await locker
+  const error=await start
+  expect(observed).toBe(true)
+  expect(error?.statusCode).toBe(409)
+  expect((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})).usedCount).toBe(0)
+  expect(await prisma.compositeAssessmentAttempt.count({where:{accessTokenId:t.id}})).toBe(0)
+ },20000)
 })
