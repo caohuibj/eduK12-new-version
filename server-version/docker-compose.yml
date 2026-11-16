@@ -66,10 +66,11 @@ x-app-environment: &app-environment
   QUESTIONNAIRE_COMPLETION_ADMISSION_QUEUE: ${QUESTIONNAIRE_COMPLETION_ADMISSION_QUEUE:-64}
   QUESTIONNAIRE_COMPLETION_ADMISSION_TIMEOUT_MS: ${QUESTIONNAIRE_COMPLETION_ADMISSION_TIMEOUT_MS:-1500}
   QUESTIONNAIRE_COMPLETION_RETRY_AFTER_SECONDS: ${QUESTIONNAIRE_COMPLETION_RETRY_AFTER_SECONDS:-1}
-  # Assessment host protection, low-memory trickle (#743), and whole-submit admission envelope.
+  # Assessment host protection, #743 low-memory trickle (disabled by default;
+  # enable explicitly only in production override), and whole-submit admission envelope.
   ASSESSMENT_RESOURCE_PROTECTION_ENABLED: ${ASSESSMENT_RESOURCE_PROTECTION_ENABLED:-true}
   ASSESSMENT_HOST_CPU_RETRY_AFTER_SECONDS: ${ASSESSMENT_HOST_CPU_RETRY_AFTER_SECONDS:-10}
-  ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED: ${ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED:-true}
+  ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED: ${ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED:-false}
   ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT: ${ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT:-1}
   ASSESSMENT_START_LOW_MEMORY_MAX_CPU_PERCENT: ${ASSESSMENT_START_LOW_MEMORY_MAX_CPU_PERCENT:-85}
   ASSESSMENT_ANONYMOUS_EARLY_MEMORY_GUARD_ENABLED: ${ASSESSMENT_ANONYMOUS_EARLY_MEMORY_GUARD_ENABLED:-true}
@@ -155,7 +156,7 @@ x-app-environment: &app-environment
 
 services:
   postgres:
-    cpus: ${POSTGRES_CPUS:-1.5}
+    cpus: ${POSTGRES_CPUS:-1.0}
     mem_limit: ${POSTGRES_MEM_LIMIT:-1024m}
     command: ["postgres", "-c", "shared_buffers=${POSTGRES_SHARED_BUFFERS:-256MB}", "-c", "work_mem=${POSTGRES_WORK_MEM:-4MB}", "-c", "maintenance_work_mem=${POSTGRES_MAINTENANCE_WORK_MEM:-64MB}", "-c", "max_connections=${POSTGRES_MAX_CONNECTIONS:-80}"]
     image: postgres:16.15-bookworm
@@ -191,7 +192,7 @@ services:
     # 默认不发布 Host port
 
   backend:
-    cpus: ${BACKEND_CPUS:-2.0}
+    cpus: ${BACKEND_CPUS:-1.25}
     mem_limit: ${BACKEND_MEM_LIMIT:-1024m}
     image: server-version-backend:latest
     build:
@@ -260,7 +261,7 @@ services:
   # process's Prisma pool with transcode/export.
   worker:
     # Allow reports to borrow idle CPU; API/DB retain higher shares on contention.
-    cpus: ${WORKER_CPUS:-1.0}
+    cpus: ${WORKER_CPUS:-0.75}
     cpu_shares: ${WORKER_CPU_SHARES:-512}
     mem_limit: ${WORKER_MEM_LIMIT:-768m}
     # Must exceed the worker's internal shutdown budget (30s, WORKER_SHUTDOWN_TIMEOUT_SECONDS):

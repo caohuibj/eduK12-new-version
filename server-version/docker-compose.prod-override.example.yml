@@ -1,0 +1,286 @@
+# ============================================================
+# eduK12 / PTool — Verified 4C4G Production Compose Override Example (Secret-Free)
+#
+# Preserves the live production dual-backend + dual-worker topology validated on
+# 2026-11-16 (`01687312c-43806777313`) without credentials, tokens, or keys:
+#   - Dual APIs: `backend` (cpus=2.0, 896m, heap=512M, low-mem trickle=1)
+#             + `backend-2` (cpus=2.5, 640m, heap=384M, low-mem trickle=0)
+#   - Dual Workers: `worker` (cpus=1.0, 640m) + `report-worker-2` (cpus=1.0, 384m)
+#     each at `ASSESSMENT_REPORT_WORKER_CONCURRENCY=3`, `MALLOC_ARENA_MAX=2`
+#     (`report-worker-3` retired)
+#   - `#743` low-memory trickle is enabled ONLY in this production profile, keeping
+#     `server-version/docker-compose.yml` default-off for other environments.
+#
+# Validate expansion (supply operator `.env` secrets via environment):
+#   docker compose -f docker-compose.yml -f docker-compose.prod-override.example.yml config
+# ============================================================
+
+x-prod-shared-env: &prod-shared-env
+  NODE_ENV: production
+  PORT: "3000"
+  DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
+  PRISMA_CONNECTION_POOL_SIZE: ${PRISMA_CONNECTION_POOL_SIZE:-10}
+  PRISMA_POOL_TIMEOUT: ${PRISMA_POOL_TIMEOUT:-30}
+  JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+  JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+  COOKIE_SECURE: ${COOKIE_SECURE:?COOKIE_SECURE must be set explicitly}
+  DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:?DATA_ENCRYPTION_KEY must be set}
+  ASSESSMENT_CONTEXT_HASH_KEY: ${ASSESSMENT_CONTEXT_HASH_KEY:-}
+  BUNDLE_PRODUCTS_ENABLED: ${BUNDLE_PRODUCTS_ENABLED:-false}
+  BUNDLE_REVIEW_SIGNING_KEY: ${BUNDLE_REVIEW_SIGNING_KEY:-}
+  COGNITIVE_MODULE_ENABLED: ${COGNITIVE_MODULE_ENABLED:-true}
+  DATA_PSEUDONYM_KEY: ${DATA_PSEUDONYM_KEY}
+  REDIS_URL: redis://redis:6379
+  SOCKET_REDIS_REQUIRED: "true"
+  UPLOAD_DIR: /app/uploads
+  EXPORT_DIR: /app/exports
+  CREDENTIAL_HANDOFF_DIR: /app/.local
+  CREDENTIAL_HANDOFF_TTL_HOURS: ${CREDENTIAL_HANDOFF_TTL_HOURS:-24}
+  ASSET_STORAGE_PROVIDER: ${ASSET_STORAGE_PROVIDER:-cos}
+  ASSET_MIGRATION_COMPLETE: ${ASSET_MIGRATION_COMPLETE:?ASSET_MIGRATION_COMPLETE must be set}
+  ASSET_SIGNING_SECRET: ${ASSET_SIGNING_SECRET:?ASSET_SIGNING_SECRET must be set}
+  COS_SECRET_ID: ${COS_SECRET_ID:-}
+  COS_SECRET_KEY: ${COS_SECRET_KEY:-}
+  COS_BUCKET: ${COS_BUCKET:-}
+  COS_REGION: ${COS_REGION:-}
+  COS_DOMAIN: ${COS_DOMAIN:-}
+  CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN must be set to an explicit HTTPS origin}
+  TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-2}
+  SURVEY_PUBLIC_IP_LIMIT: ${SURVEY_PUBLIC_IP_LIMIT:-5000}
+  SURVEY_PUBLIC_WINDOW_SECONDS: ${SURVEY_PUBLIC_WINDOW_SECONDS:-900}
+  PUBLIC_CHECKIN_UPLOAD_IP_LIMIT: ${PUBLIC_CHECKIN_UPLOAD_IP_LIMIT:-1800}
+  PUBLIC_CHECKIN_UPLOAD_TOKEN_LIMIT: ${PUBLIC_CHECKIN_UPLOAD_TOKEN_LIMIT:-600}
+  PUBLIC_CHECKIN_SUBMIT_IP_LIMIT: ${PUBLIC_CHECKIN_SUBMIT_IP_LIMIT:-600}
+  PUBLIC_CHECKIN_SUBMIT_TOKEN_LIMIT: ${PUBLIC_CHECKIN_SUBMIT_TOKEN_LIMIT:-120}
+  # Assessment protection, #743 trickle, whole-submit, and async reporting flags
+  ASSESSMENT_RESOURCE_PROTECTION_ENABLED: "true"
+  ASSESSMENT_HOST_CPU_RETRY_AFTER_SECONDS: "10"
+  ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED: "true"
+  ASSESSMENT_START_LOW_MEMORY_MAX_CPU_PERCENT: "85"
+  ASSESSMENT_ANONYMOUS_EARLY_MEMORY_GUARD_ENABLED: "true"
+  ASSESSMENT_COMPILED_ARTIFACT_CACHE_ENABLED: "true"
+  ASSESSMENT_FROZEN_ARTIFACT_CACHE_ENABLED: "true"
+  ASSESSMENT_COMPACT_FACTS_ENABLED: "true"
+  ASSESSMENT_COMPACT_VERIFY_WRITES: "false"
+  ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED: "true"
+  ASSESSMENT_SHARED_CONTROL_ENABLED: "true"
+  ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED: "true"
+  ASSESSMENT_TIMELINE_ENABLED: "false"
+  ASSESSMENT_WHOLE_SUBMIT_ENABLED: "true"
+  ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED: "true"
+  ASSESSMENT_WHOLE_COMPACT_MANIFEST_ENABLED: "true"
+  ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED: "true"
+  ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED: "true"
+  ASSESSMENT_REPORT_ASYNC_ENABLED: "true"
+  ASSESSMENT_REPORT_ASYNC_COURSE_IDS: ""
+  ASSESSMENT_REPORT_ATOMIC_FINISH_ENABLED: "true"
+  ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED: "true"
+  ASSESSMENT_REPORT_COMPACT_READ_ENABLED: "true"
+  ASSESSMENT_REPORT_CONTEXT_REUSE_ENABLED: "true"
+  ASSESSMENT_REPORT_NARROW_LOAD_ENABLED: "true"
+  ASSESSMENT_REPORT_READY_WAIT_ENABLED: "true"
+  ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED: "true"
+  ASSESSMENT_REPORT_SUBMISSION_PRIORITY_ENABLED: "false"
+  ASSESSMENT_REPORT_MAX_PENDING: "600"
+  ASSESSMENT_REPORT_POLL_MS: "50"
+  ASSESSMENT_REPORT_LEASE_MS: "30000"
+  ASSESSMENT_REPORT_MAX_ATTEMPTS: "8"
+  ASSESSMENT_REPORT_MAX_BYTES: "2097152"
+  WHOLE_SUBMIT_ADMISSION_LIMIT: "10"
+  WHOLE_SUBMIT_ADMISSION_TIMEOUT_MS: "10000"
+  UNIT_SUBMIT_ADMISSION_LIMIT: "7"
+  UNIT_SUBMIT_ADMISSION_QUEUE: "128"
+  UNIT_SUBMIT_ADMISSION_TIMEOUT_MS: "5000"
+  UNIT_SUBMIT_RETRY_AFTER_SECONDS: "1"
+  AGGREGATE_FINALIZATION_ADMISSION_LIMIT: "3"
+  AGGREGATE_FINALIZATION_ADMISSION_QUEUE: "4"
+  AGGREGATE_FINALIZATION_ADMISSION_TIMEOUT_MS: "250"
+  AGGREGATE_FINALIZATION_RETRY_AFTER_SECONDS: "1"
+  QUESTIONNAIRE_COMPLETION_ADMISSION_LIMIT: "8"
+  QUESTIONNAIRE_COMPLETION_ADMISSION_QUEUE: "64"
+  QUESTIONNAIRE_COMPLETION_ADMISSION_TIMEOUT_MS: "1500"
+  QUESTIONNAIRE_COMPLETION_RETRY_AFTER_SECONDS: "1"
+  PUBLIC_ASSESSMENT_EXPECTED_CLASS_SIZE: "60"
+  PUBLIC_ASSESSMENT_EXPECTED_START_TOKEN_AUDIENCE: ${PUBLIC_ASSESSMENT_EXPECTED_START_TOKEN_AUDIENCE:-500}
+  PUBLIC_ASSESSMENT_GETS_PER_STUDENT: "40"
+  PUBLIC_ASSESSMENT_FINALS_PER_STUDENT: "8"
+  PUBLIC_ASSESSMENT_NAT_SHARE_FACTOR: "50"
+  PUBLIC_ASSESSMENT_WINDOW_MS: "900000"
+  POW_MAX_ACTIVE_CHALLENGES: "12000"
+  LOGIN_IP_REQUEST_LIMIT: "3000"
+  LOGIN_PASSWORD_MAX_CONCURRENT: ${LOGIN_PASSWORD_MAX_CONCURRENT:-4}
+  LOGIN_PASSWORD_MAX_QUEUE: ${LOGIN_PASSWORD_MAX_QUEUE:-32}
+  LOGIN_PASSWORD_MAX_WAIT_MS: ${LOGIN_PASSWORD_MAX_WAIT_MS:-30000}
+  LOGIN_PASSWORD_WORKERS: ${LOGIN_PASSWORD_WORKERS:-0}
+  PASSWORD_CHANGE_REQUEST_LIMIT: "10"
+  REGISTRATION_GLOBAL_LIMIT: "6000"
+  REGISTRATION_IP_LIMIT: "3000"
+  REGISTRATION_RESOURCE_LIMIT: "3000"
+  REGISTRATION_MAX_CONCURRENT: "2"
+  REGISTRATION_MAX_QUEUE: "16"
+  REGISTRATION_MAX_WAIT_MS: "3000"
+  REGISTRATION_ACCOUNT_LIMIT: "10"
+  REGISTRATION_TEACHER_CODE_LIMIT: "120"
+  UPLOAD_MAX_CONCURRENT: "2"
+  UPLOAD_REQUEST_LIMIT: "30"
+  UPLOAD_BYTE_BUDGET: "629145600"
+  UPLOAD_IMAGE_MAX_PIXELS: "16000000"
+  EXPORT_CONCURRENCY: "1"
+  EXPORT_MAX_BYTES: "52428800"
+  EXPORT_MAX_FIELDS: "2000"
+  EXPORT_MAX_RECORDS: "10000"
+  EXPORT_MAX_TRIALS: "100000"
+  EXPORT_RETENTION_HOURS: "24"
+  EXPORT_TIMEOUT: "1800"
+  IMAGE_CONCURRENCY: "1"
+  IMAGE_TIMEOUT: "30"
+  HEAVY_PROCESSING_ENABLED: "false"
+  HEAVY_MAINTENANCE_IDLE_CONFIRMED: "false"
+  VIDEO_PROCESSING_ENABLED: "false"
+  VIDEO_MAINTENANCE_IDLE_CONFIRMED: "false"
+  VIDEO_LOW_POWER_MODE: "true"
+  VIDEO_RESOLUTION: "480p"
+  VIDEO_PRESET: "veryfast"
+  VIDEO_CRF: "26"
+  VIDEO_BITRATE: "800k"
+  VIDEO_AUDIO_BITRATE: "96k"
+  VIDEO_SMART_COMPRESSION: "true"
+  VIDEO_CONCURRENCY: "1"
+  VIDEO_TIMEOUT: "1800"
+  VIDEO_URL_BYTE_BUDGET: "19327352832"
+  VIDEO_URL_GLOBAL_BYTE_BUDGET: "77309411328"
+  VIDEO_URL_MAX_PENDING: "4"
+  VIDEO_URL_MAX_PRINCIPAL_PENDING: "2"
+  VIDEO_URL_MAX_PRINCIPAL_STORED_BYTES: "8589934592"
+  VIDEO_URL_MAX_STORED_BYTES: "34359738368"
+  VIDEO_URL_MIN_FREE_BYTES: "5368709120"
+  WORKER_SHUTDOWN_TIMEOUT_SECONDS: "30"
+
+x-prod-api-hardening: &prod-api-hardening
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  read_only: true
+  tmpfs:
+    - /tmp:size=256m,mode=1777
+
+x-prod-app-volumes: &prod-app-volumes
+  - uploads_data:/app/uploads
+  - exports_data:/app/exports
+  - credential_handoff_data:/app/.local
+
+x-prod-app-depends-on: &prod-app-depends-on
+  postgres:
+    condition: service_healthy
+  redis:
+    condition: service_healthy
+  backend-volume-init:
+    condition: service_completed_successfully
+
+services:
+  postgres:
+    cpus: 1.5
+    cpu_shares: 1024
+    mem_limit: 1024m
+    memswap_limit: 1472m
+    command:
+      - postgres
+      - -c
+      - shared_buffers=192MB
+      - -c
+      - work_mem=4MB
+      - -c
+      - maintenance_work_mem=64MB
+      - -c
+      - max_connections=80
+
+  redis:
+    cpus: 0.5
+    mem_limit: 192m
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - 96mb
+      - --maxmemory-policy
+      - noeviction
+
+  backend:
+    <<: *prod-api-hardening
+    cpus: 2.0
+    cpu_shares: 1024
+    mem_limit: 896m
+    environment:
+      <<: *prod-shared-env
+      BACKGROUND_WORKERS_ENABLED: "false"
+      NODE_OPTIONS: "--max-old-space-size=512 --max-semi-space-size=16"
+      MALLOC_ARENA_MAX: "2"
+      ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT: "1"
+      ASSESSMENT_REPORT_COMPRESSION_ENABLED: "false"
+
+  backend-2:
+    <<: *prod-api-hardening
+    image: server-version-backend:latest
+    command: ["node", "dist/index.js"]
+    cpus: 2.5
+    cpu_shares: 1024
+    mem_limit: 640m
+    environment:
+      <<: *prod-shared-env
+      BACKGROUND_WORKERS_ENABLED: "false"
+      NODE_OPTIONS: "--max-old-space-size=384 --max-semi-space-size=16"
+      MALLOC_ARENA_MAX: "2"
+      ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT: "0"
+      ASSESSMENT_REPORT_COMPRESSION_ENABLED: "false"
+    ports:
+      - "127.0.0.1:${BACKEND_2_HOST_PORT:-18081}:3000"
+    volumes: *prod-app-volumes
+    depends_on: *prod-app-depends-on
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  worker:
+    <<: *prod-api-hardening
+    cpus: 1.0
+    cpu_shares: 256
+    mem_limit: 640m
+    stop_grace_period: 45s
+    environment:
+      <<: *prod-shared-env
+      BACKGROUND_WORKERS_ENABLED: "true"
+      PRISMA_CONNECTION_POOL_SIZE: "4"
+      NODE_OPTIONS: "--max-old-space-size=192 --max-semi-space-size=16"
+      MALLOC_ARENA_MAX: "2"
+      ASSESSMENT_REPORT_WORKER_CONCURRENCY: "3"
+      ASSESSMENT_REPORT_COMPRESSION_ENABLED: "true"
+
+  report-worker-2:
+    <<: *prod-api-hardening
+    image: server-version-backend:latest
+    command: ["node", "dist/workers/main.js"]
+    cpus: 1.0
+    cpu_shares: 256
+    mem_limit: 384m
+    stop_grace_period: 45s
+    environment:
+      <<: *prod-shared-env
+      BACKGROUND_WORKERS_ENABLED: "true"
+      PRISMA_CONNECTION_POOL_SIZE: "4"
+      NODE_OPTIONS: "--max-old-space-size=192 --max-semi-space-size=16"
+      MALLOC_ARENA_MAX: "2"
+      ASSESSMENT_REPORT_WORKER_CONCURRENCY: "3"
+      ASSESSMENT_REPORT_COMPRESSION_ENABLED: "true"
+    volumes: *prod-app-volumes
+    depends_on: *prod-app-depends-on
+    restart: unless-stopped
+
+  frontend:
+    cpus: 0.5
+    mem_limit: 128m

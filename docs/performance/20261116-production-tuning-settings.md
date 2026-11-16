@@ -29,16 +29,24 @@
    - Server-level `proxy_buffer_size 16k;`, `proxy_buffers 16 16k;`, `proxy_busy_buffers_size 32k;`, `client_body_buffer_size 64k;` (eliminated all `proxy_temp` and `client_temp` disk buffer spills for ~142 KB `START` responses and ~18.8 KB `whole/submit` payloads)
    - Extended `location ~ ^/api/(public/)?composite-assessments/attempts/[^/]+/(whole/(definition|submit)|report-status|report)$` (`proxy_next_upstream off`)
 
-### Layer 2 — Compose CPU Quotas & Assessment Protection Flags (`server-version/docker-compose.yml` / `.env.example`)
+### Layer 2 — Base Compose Contract vs Production Dual-Backend Override
 
-- `frontend.cpus`: `0.25` → `0.5` (eliminated CFS throttling across `eduk12-prod-frontend`, previously `1,683` periods / `125.2s`)
-- `ASSESSMENT_RESOURCE_PROTECTION_ENABLED=true`
-- `ASSESSMENT_HOST_CPU_RETRY_AFTER_SECONDS=10` (replaces `8` and the regressive `6` trial; fits cleanly inside the 5-attempt / 60s retry budget while spacing CPU saturation retries)
-- `ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED=true` with `ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT=1` (`backend`) / `0` (`backend-2` via compose override) and `ASSESSMENT_START_LOW_MEMORY_MAX_CPU_PERCENT=85`
-- `ASSESSMENT_ANONYMOUS_EARLY_MEMORY_GUARD_ENABLED=true`
-- `WHOLE_SUBMIT_ADMISSION_LIMIT=10`, `WHOLE_SUBMIT_ADMISSION_TIMEOUT_MS=10000`
+1. **Base Compose & Env Defaults (`server-version/docker-compose.yml` & `.env.example`)**
+   - Preserves `#743` (`docs/release/low-memory-trickle-admission.md`) default-off contract: `ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED=false`, preventing non-production single-node deployments from inheriting low-memory trickle unexpectedly.
+   - Keeps single-node CPU defaults within the `<= 4.0` `prelaunch-resource-preflight.mjs` envelope (`postgres=1.0`, `redis=0.5`, `backend=1.25`, `worker=0.75`, `frontend=0.5`, sum `4.00`) while removing `redis` and `frontend` CFS throttling.
+   - Sets shared protection defaults (`ASSESSMENT_RESOURCE_PROTECTION_ENABLED=true`, `ASSESSMENT_HOST_CPU_RETRY_AFTER_SECONDS=10`, `ASSESSMENT_ANONYMOUS_EARLY_MEMORY_GUARD_ENABLED=true`, `WHOLE_SUBMIT_ADMISSION_LIMIT=10`, `WHOLE_SUBMIT_ADMISSION_TIMEOUT_MS=10000`, `WORKER_MALLOC_ARENA_MAX=2`).
 
-### Layer 3 — CPU Rebalancing & Worker/Memory Consolidation
+2. **Verified Production Override (`server-version/docker-compose.prod-override.example.yml`, secret-free)**
+   - Codifies the exact dual-backend + dual-worker production topology without passwords, tokens, or keys:
+     - `backend`: `cpus=2.0`, `mem_limit=896m`, `NODE_OPTIONS="--max-old-space-size=512 --max-semi-space-size=16"`, `ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED=true`, **`ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT=1`**, `ASSESSMENT_START_LOW_MEMORY_MAX_CPU_PERCENT=85`, `MALLOC_ARENA_MAX=2`
+     - `backend-2`: `cpus=2.5`, `mem_limit=640m`, `NODE_OPTIONS="--max-old-space-size=384 --max-semi-space-size=16"`, `ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED=true`, **`ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT=0`** (host-wide serial trickle across dual backends), `MALLOC_ARENA_MAX=2`, loopback port `127.0.0.1:18081:3000`
+     - `worker`: `cpus=1.0`, `cpu_shares=256`, `mem_limit=640m`, `ASSESSMENT_REPORT_WORKER_CONCURRENCY=3`, `MALLOC_ARENA_MAX=2`
+     - `report-worker-2`: `cpus=1.0`, `cpu_shares=256`, `mem_limit=384m`, `ASSESSMENT_REPORT_WORKER_CONCURRENCY=3`, `MALLOC_ARENA_MAX=2`
+     - `postgres`: `cpus=1.5`, `mem_limit=1024m`, `memswap_limit=1472m`, `shared_buffers=192MB`, `max_connections=80`
+     - `redis`: `cpus=0.5`, `mem_limit=192m`, `--maxmemory 96mb --maxmemory-policy noeviction`
+     - `frontend`: `cpus=0.5`, `mem_limit=128m` (set `FRONTEND_HTTP_PORT=18080` in `.env` when behind host Nginx TLS)
+
+### Layer 3 — CPU Rebalancing & Worker/Memory Consolidation Notes
 
 1. **Eliminated Redis & Postgres CFS Throttling (`server-version/docker-compose.yml`, `.env.example`, prod override)**
    - `redis.cpus`: `0.25` → `0.5` (previously `761,225` throttled periods / `60,120.4s` cumulative; dropped to `0` new throttles during 150 VU + soak)
