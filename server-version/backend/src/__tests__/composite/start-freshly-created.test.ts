@@ -299,6 +299,33 @@ describe('START freshlyCreated server distinction', () => {
     })
   })
 
+  it('single-flights 50 concurrent START metadata reads without serving stale later waves', async () => {
+    let releaseMetadata!: (value: typeof compositeRow) => void
+    const pendingMetadata = new Promise<typeof compositeRow>(resolve => { releaseMetadata = resolve })
+    mocks.prisma.compositeAssessment.findUnique.mockReturnValue(pendingMetadata)
+    mocks.prisma.$queryRaw.mockResolvedValue([])
+    const busyError = Object.assign(new Error('系统繁忙'), { statusCode: 503, code: 'INSTRUMENT_NOT_AVAILABLE' })
+    const gateSpy = vi.spyOn(assessmentResourceProtection, 'assertAssessmentStartResources')
+      .mockImplementation(() => { throw busyError })
+    try {
+      const starts = Array.from({ length: 50 }, (_, i) => startUserAttempt(`user-${i}`, 'comp-1'))
+      // One DB metadata read is in flight; followers must await the same promise.
+      expect(mocks.prisma.compositeAssessment.findUnique).toHaveBeenCalledTimes(1)
+      releaseMetadata(compositeRow)
+      const outcomes = await Promise.allSettled(starts)
+      expect(outcomes.every(outcome => outcome.status === 'rejected' && outcome.reason === busyError)).toBe(true)
+      expect(mocks.prisma.compositeAssessment.findUnique).toHaveBeenCalledTimes(1)
+      expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+
+      // The completed wave is not cached: a later request must fetch live metadata.
+      mocks.prisma.compositeAssessment.findUnique.mockResolvedValue(compositeRow)
+      await expect(startUserAttempt('user-next', 'comp-1')).rejects.toBe(busyError)
+      expect(mocks.prisma.compositeAssessment.findUnique).toHaveBeenCalledTimes(2)
+    } finally {
+      gateSpy.mockRestore()
+    }
+  })
+
   it('fast-fails ordinary scale-only START on 503 resource gate before fat composite load or transaction', async () => {
     mocks.prisma.$queryRaw.mockResolvedValueOnce([])
     const busyError = Object.assign(new Error('系统繁忙'), { statusCode: 503, code: 'INSTRUMENT_NOT_AVAILABLE' })

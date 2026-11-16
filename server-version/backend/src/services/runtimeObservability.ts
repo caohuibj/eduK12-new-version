@@ -861,13 +861,12 @@ let lastEventLoopUtilization: ReturnType<typeof performance.eventLoopUtilization
 
 export const runtimeMetricLines = (): string[] => {
   const memory = safeMemoryUsage()
-  const fullMemory = process.memoryUsage()
   const cpu = process.cpuUsage()
   const currentEventLoopUtilization = performance.eventLoopUtilization()
   // Delta since the previous scrape: a no-arg call returns the cumulative
   // average since process start, which idles toward zero and hides bursts.
   const eventLoopUtilization = lastEventLoopUtilization
-    ? performance.eventLoopUtilization(lastEventLoopUtilization, currentEventLoopUtilization)
+    ? performance.eventLoopUtilization(currentEventLoopUtilization, lastEventLoopUtilization)
     : currentEventLoopUtilization
   lastEventLoopUtilization = currentEventLoopUtilization
   const delayP50Ms = finiteMilliseconds(eventLoopDelay.percentile(50) / 1_000_000)
@@ -883,12 +882,12 @@ export const runtimeMetricLines = (): string[] => {
     '# HELP process_cpu_seconds_total Cumulative process CPU time across all requests.',
     '# TYPE process_cpu_seconds_total counter',
     `process_cpu_seconds_total ${(cpu.user + cpu.system) / 1_000_000}`,
-    '# HELP process_external_memory_bytes V8 external (native) memory not tracked by the JS heap.',
+    '# HELP process_external_memory_bytes V8-tracked external memory (includes arrayBuffers; do not add both).',
     '# TYPE process_external_memory_bytes gauge',
-    `process_external_memory_bytes ${fullMemory.external}`,
+    `process_external_memory_bytes ${memory?.external ?? 0}`,
     '# HELP process_array_buffers_bytes Memory used by ArrayBuffer and SharedArrayBuffer allocations.',
     '# TYPE process_array_buffers_bytes gauge',
-    `process_array_buffers_bytes ${fullMemory.arrayBuffers}`,
+    `process_array_buffers_bytes ${memory?.arrayBuffers ?? 0}`,
     '# HELP ptool_nodejs_active_requests Current in-flight HTTP requests.',
     '# TYPE ptool_nodejs_active_requests gauge',
     `ptool_nodejs_active_requests ${activeRequests}`,
