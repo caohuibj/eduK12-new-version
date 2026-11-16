@@ -99,6 +99,7 @@ import {
   projectFreshStartedAttempt,
   projectStartedAttempt,
   getPublicCompositeInfo,
+  restartUserAttempt,
   startPublicAttempt,
   startUserAttempt,
 } from '../../modules/composite/composite.service'
@@ -516,5 +517,90 @@ describe('START freshlyCreated server distinction', () => {
       expect(criticalSpy).not.toHaveBeenCalled()
       expect(study.afterAdmission).not.toHaveBeenCalled()
     } finally { criticalSpy.mockRestore() }
+  })
+
+  it('delegates scale-only startUserAttempt through runWithLowMemoryTrickleAdmission when trickle is enabled', async () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+    mocks.prisma.$queryRaw.mockReset()
+    mocks.prisma.$queryRaw.mockResolvedValue([])
+    const busyError = Object.assign(new Error('系统繁忙'), { statusCode: 503, code: 'INSTRUMENT_NOT_AVAILABLE' })
+    const directSpy = vi.spyOn(assessmentResourceProtection, 'assertAssessmentStartResources')
+    const trickleSpy = vi.spyOn(assessmentResourceProtection, 'runWithLowMemoryTrickleAdmission')
+      .mockRejectedValueOnce(busyError)
+    try {
+      await expect(startUserAttempt('user-1', 'comp-1', { wantsWholeDelivery: true })).rejects.toBe(busyError)
+      expect(trickleSpy).toHaveBeenCalledTimes(1)
+      expect(directSpy).not.toHaveBeenCalled()
+      expect(mocks.prisma.compositeAssessment.findUnique).toHaveBeenCalledTimes(1)
+      expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+    } finally {
+      trickleSpy.mockRestore()
+      directSpy.mockRestore()
+      vi.unstubAllEnvs()
+    }
+  })
+
+  it('does not route fast-resume, non-scale-only start, public start, or restart through runWithLowMemoryTrickleAdmission', async () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+    const trickleSpy = vi.spyOn(assessmentResourceProtection, 'runWithLowMemoryTrickleAdmission')
+      .mockImplementation(() => { throw new Error('unexpected trickle admission call') })
+    try {
+      // 1) Fast-resume START skips trickle gate
+      mocks.prisma.$queryRaw.mockReset()
+      mocks.prisma.$queryRaw.mockResolvedValueOnce([{ id: 'attempt-reused' }])
+      const resumed = await startUserAttempt('user-1', 'comp-1', { wantsWholeDelivery: true })
+      expect(resumed).toMatchObject({ freshlyCreated: false, attempt: { id: 'attempt-reused' } })
+
+      // 2) Non-scale-only START (has FORM_SECTION) bypasses scale trickle gate and proceeds straight to TX path
+      mocks.prisma.$queryRaw.mockReset()
+      mocks.prisma.$queryRaw.mockResolvedValue([])
+      mocks.prisma.compositeAssessment.findUnique.mockResolvedValue({
+        ...compositeRow,
+        items: [{ id: 'item-form', type: 'FORM_SECTION', position: 0, required: true, scaleId: null, scale: null }],
+        formSections: [{ id: 'sec-1', title: 'Form', position: 0, items: [] }],
+      })
+      mocks.prisma.$transaction.mockRejectedValueOnce(new Error('reached-tx-without-trickle'))
+      await expect(startUserAttempt('user-1', 'comp-1')).rejects.toThrow('reached-tx-without-trickle')
+
+      // 3) Restart path never enters trickle admission
+      mocks.prisma.compositeAssessmentAttempt.findUnique.mockResolvedValueOnce({
+        id: 'attempt-1',
+        userId: 'user-1',
+        compositeAssessmentId: 'comp-1',
+      })
+      mocks.prisma.compositeAssessment.findUnique.mockResolvedValue(compositeRow)
+      mocks.prisma.$transaction.mockRejectedValueOnce(new Error('restart-reached-tx-without-trickle'))
+      await expect(restartUserAttempt('user-1', 'attempt-1')).rejects.toThrow('restart-reached-tx-without-trickle')
+
+      // 4) Public recovery resume never enters trickle admission
+      const recoveryToken = 'r'.repeat(43)
+      mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValueOnce({
+        id: 'tok-1',
+        tokenHash: hashPublicAccessToken('public-token-1'),
+        isActive: true,
+        expiresAt: new Date('2030-01-01T00:00:00Z'),
+        maxUses: 0,
+        usedCount: 1,
+        compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
+      })
+      mocks.prisma.compositeAssessmentAttempt.findFirst.mockResolvedValueOnce({
+        id: 'attempt-reused',
+        userId: null,
+        accessTokenId: 'tok-1',
+        recoveryTokenHash: hashRecoveryToken(recoveryToken),
+      })
+      mocks.prisma.compositeAssessmentAttempt.findUnique.mockResolvedValueOnce(
+        makeAttemptRow({ userId: null, recoveryTokenHash: hashRecoveryToken(recoveryToken) }),
+      )
+      await expect(startPublicAttempt('public-token-1', recoveryToken, undefined, { wantsWholeDelivery: true }))
+        .resolves.toMatchObject({ freshlyCreated: false })
+
+      expect(trickleSpy).not.toHaveBeenCalled()
+    } finally {
+      trickleSpy.mockRestore()
+      vi.unstubAllEnvs()
+    }
   })
 })

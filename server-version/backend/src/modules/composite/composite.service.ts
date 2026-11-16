@@ -1,7 +1,13 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
 import { classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
 import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
-import { assertAnonymousStartCriticalMemory, assertAssessmentStartResources, isAssessmentStartResourceGateError } from '../../services/assessmentResourceProtection'
+import {
+  assertAnonymousStartCriticalMemory,
+  assertAssessmentStartResources,
+  isAssessmentStartResourceGateError,
+  isLowMemoryTrickleEnabled,
+  runWithLowMemoryTrickleAdmission,
+} from '../../services/assessmentResourceProtection'
 import { availableTemplateCache, publicationReadKey, startCompositeCache, startMetadataCache } from './start-read-cache'
 import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments } from '../scale/deployment/repository'
 import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
@@ -4113,79 +4119,86 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
   if (inProgress) return traceAssessmentPhase('start.post_gate_getAttemptState',
     () => withQueryRawLabel('start.raw.post_gate', () => projectStartedAttempt(inProgress.id, { userId }, Boolean(opts?.wantsWholeDelivery), null, undefined, undefined, opts?.knownTemplateHashes, false)))
 
-  if (isOrdinaryQuestionnaireStart(metadata) && metadata.items.length > 0
-      && metadata.items.every((item: any) => item.required && item.type === 'SCALE')) {
-    assertAssessmentStartResources()
-  }
+  const scaleOnlyStart = isOrdinaryQuestionnaireStart(metadata) && metadata.items.length > 0
+    && metadata.items.every((item: any) => item.required && item.type === 'SCALE')
 
-  const composite = await loadStartComposite(compositeId, prisma, metadata)
-  if (metadata.deliveryCourseId) (composite as any).deliveryCourseId = metadata.deliveryCourseId
+  const executeStart = async () => {
+    const composite = await loadStartComposite(compositeId, prisma, metadata)
+    if (metadata.deliveryCourseId) (composite as any).deliveryCourseId = metadata.deliveryCourseId
 
-  const isUniqueConstraintError = (err: unknown) =>
-    typeof err === 'object' && err !== null && 'code' in err && (err as { code?: unknown }).code === 'P2002'
+    const isUniqueConstraintError = (err: unknown) =>
+      typeof err === 'object' && err !== null && 'code' in err && (err as { code?: unknown }).code === 'P2002'
 
-  const gateEnteredAt = process.hrtime.bigint()
-  for (let retry = 0; retry < 2; retry += 1) {
-    try {
-      const attempt = await classifyStartTransaction(async () => {
-        try {
-          return await trainingStartGate().run(async () => {
-            assessmentTimelineSpan('start.gate_wait', gateEnteredAt, process.hrtime.bigint())
-            return prisma.$transaction(async (tx: Db) => {
-        const inTxStart = process.hrtime.bigint()
-        try {
-        return await withQueryRawLabel('start.raw.in_tx', async () => {
-        // Per-user admission: QUESTIONNAIRE (non-LEGACY delivery) and authenticated
-        // LEGACY_COMPOSITE share FOR SHARE + (compositeId,userId) advisory lock.
-        // Cross-user START can proceed in parallel; archive/close still take FOR UPDATE
-        // and wait for SHARE readers. Token/anonymous, restart, and other product kinds
-        // keep the exclusive publication row lock.
-        if (
-          (composite.productKind === 'QUESTIONNAIRE' && composite.deliveryMode !== 'LEGACY')
-          || (composite.productKind === 'LEGACY_COMPOSITE' && Boolean(userId))
-        ) {
-          await lockAuthenticatedAdmission(tx, compositeId, userId)
-        } else {
-          await tx.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`
-        }
-        const existing = await tx.compositeAssessmentAttempt.findFirst({
-          where: { compositeAssessmentId: compositeId, userId, status: 'IN_PROGRESS' },
-          orderBy: { startedAt: 'desc' },
-        })
-        if (existing) return existing
-
-        const usage = await tx.compositeAssessmentAttempt.aggregate({
-          where: { compositeAssessmentId: compositeId, userId },
-          _count: { _all: true },
-          _max: { attemptNo: true },
-        })
-        if (usage._count._all >= composite.maxAttempts) throw compositeConflict('已达到综合测评最大次数')
-        return createAttempt(tx, composite, userId, null, undefined, (usage._max.attemptNo ?? 0) + 1)
-        })
-        } finally { assessmentTimelineSpan('start.in_tx_admission_freeze_create', inTxStart) }
-          }, { maxWait: 10_000, timeout: 30_000 })
+    const gateEnteredAt = process.hrtime.bigint()
+    for (let retry = 0; retry < 2; retry += 1) {
+      try {
+        const attempt = await classifyStartTransaction(async () => {
+          try {
+            return await trainingStartGate().run(async () => {
+              assessmentTimelineSpan('start.gate_wait', gateEnteredAt, process.hrtime.bigint())
+              return prisma.$transaction(async (tx: Db) => {
+          const inTxStart = process.hrtime.bigint()
+          try {
+          return await withQueryRawLabel('start.raw.in_tx', async () => {
+          // Per-user admission: QUESTIONNAIRE (non-LEGACY delivery) and authenticated
+          // LEGACY_COMPOSITE share FOR SHARE + (compositeId,userId) advisory lock.
+          // Cross-user START can proceed in parallel; archive/close still take FOR UPDATE
+          // and wait for SHARE readers. Token/anonymous, restart, and other product kinds
+          // keep the exclusive publication row lock.
+          if (
+            (composite.productKind === 'QUESTIONNAIRE' && composite.deliveryMode !== 'LEGACY')
+            || (composite.productKind === 'LEGACY_COMPOSITE' && Boolean(userId))
+          ) {
+            await lockAuthenticatedAdmission(tx, compositeId, userId)
+          } else {
+            await tx.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`
+          }
+          const existing = await tx.compositeAssessmentAttempt.findFirst({
+            where: { compositeAssessmentId: compositeId, userId, status: 'IN_PROGRESS' },
+            orderBy: { startedAt: 'desc' },
           })
-        } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
-      })
-      const freshlyCreated = Boolean((attempt as any)._freshlyCreatedAttempt)
-      const children = (attempt as any)._freshScaleChildren as any[] | undefined
-      const source = (attempt as any)._startComposite
-      seedFreshScaleChildren(children)
-      return traceAssessmentPhase('start.post_gate_getAttemptState',
-        () => withQueryRawLabel('start.raw.post_gate', async () => {
-          const projected = children && !opts?.wantsWholeDelivery
-            ? await projectFreshStartedAttempt(attempt, source, children, { userId }, null) : null
-          const { parent, preloadedState } = opts?.wantsWholeDelivery
-            ? buildWholeStartPreload(attempt, children, source)
-            : { parent: undefined, preloadedState: undefined }
-          return projected ?? projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null, parent, preloadedState, opts?.knownTemplateHashes, freshlyCreated)
-        }))
-    } catch (err) {
-      if (!isUniqueConstraintError(err) || retry === 1) throw err
+          if (existing) return existing
+
+          const usage = await tx.compositeAssessmentAttempt.aggregate({
+            where: { compositeAssessmentId: compositeId, userId },
+            _count: { _all: true },
+            _max: { attemptNo: true },
+          })
+          if (usage._count._all >= composite.maxAttempts) throw compositeConflict('已达到综合测评最大次数')
+          return createAttempt(tx, composite, userId, null, undefined, (usage._max.attemptNo ?? 0) + 1)
+          })
+          } finally { assessmentTimelineSpan('start.in_tx_admission_freeze_create', inTxStart) }
+            }, { maxWait: 10_000, timeout: 30_000 })
+            })
+          } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
+        })
+        const freshlyCreated = Boolean((attempt as any)._freshlyCreatedAttempt)
+        const children = (attempt as any)._freshScaleChildren as any[] | undefined
+        const source = (attempt as any)._startComposite
+        seedFreshScaleChildren(children)
+        return traceAssessmentPhase('start.post_gate_getAttemptState',
+          () => withQueryRawLabel('start.raw.post_gate', async () => {
+            const projected = children && !opts?.wantsWholeDelivery
+              ? await projectFreshStartedAttempt(attempt, source, children, { userId }, null) : null
+            const { parent, preloadedState } = opts?.wantsWholeDelivery
+              ? buildWholeStartPreload(attempt, children, source)
+              : { parent: undefined, preloadedState: undefined }
+            return projected ?? projectStartedAttempt(attempt.id, { userId }, Boolean(opts?.wantsWholeDelivery), null, parent, preloadedState, opts?.knownTemplateHashes, freshlyCreated)
+          }))
+      } catch (err) {
+        if (!isUniqueConstraintError(err) || retry === 1) throw err
+      }
     }
+
+    throw compositeConflict('无法创建综合测评记录，请稍后重试')
   }
 
-  throw compositeConflict('无法创建综合测评记录，请稍后重试')
+  if (!scaleOnlyStart) return executeStart()
+  if (!isLowMemoryTrickleEnabled()) {
+    assertAssessmentStartResources()
+    return executeStart()
+  }
+  return runWithLowMemoryTrickleAdmission(executeStart)
 }
 
 /**
