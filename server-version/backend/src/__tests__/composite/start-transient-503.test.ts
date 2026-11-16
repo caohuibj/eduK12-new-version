@@ -82,6 +82,14 @@ describe('START transient rollback classification',()=>{
   expect(res.body).toEqual({code:'INSTRUMENT_NOT_AVAILABLE',message,data:null})
   expect(m.start).toHaveBeenCalledTimes(1)
  })
+ it.each([['memory',8],['cpu',6]])('preserves the %s resource retry hint in the START response',async(_reason,seconds)=>{
+  const busy=Object.assign(new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE','系统繁忙',503),{preferredRetryAfterSeconds:seconds})
+  m.start.mockRejectedValue(busy)
+  const res=fakeRes()
+  await compositeController.startAttempt(req,res)
+  expect(res.statusCode).toBe(503)
+  expect(res.headers['Retry-After']).toBe(String(seconds))
+ })
  it('returns the same protection response for authenticated RESTART and public START/RESTART',async()=>{
   const message='系统繁忙，请稍后开始测评；已经提交的答案不受影响。'
   m.restart.mockRejectedValue(new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE',message,503))
