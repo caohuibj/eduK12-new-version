@@ -1,4 +1,4 @@
-import {assertCurrentStudyPrincipal,type AcceptedStudyReceipt} from '../anonymous-study/admission-principal'
+import {assertCurrentStudyPrincipal,withStudyPrincipalReadBatch,type AcceptedStudyReceipt} from '../anonymous-study/admission-principal'
 import { lockTrainingFlowFinalAdmission, requiresTrainingFlowFinalLock } from '../composite/training-variant-child-scope'
 import {normalizeTrainingScaleTiming} from '../assessment-runtime/training-scale-timing'
 import { rethrowScaleSubmissionIdConflict, rethrowConfirmedScaleBatchSubmissionConflict } from './scale-final-submit-conflict'
@@ -514,7 +514,7 @@ export const submitUnifiedScaleCollectionBatch = async (
     data: Awaited<ReturnType<typeof prepareUnifiedScaleFinalSubmission>>;
     write: Awaited<ReturnType<typeof prepareUnifiedScaleWrite>> | null;
   }> = []
-  for (const { input, child } of units) {
+  const prepareUnits = async () => { for (const { input, child } of units) {
     const data = await traceAssessmentPhase('report.prepare.final_submission',
       () => prepareUnifiedScaleFinalSubmission(input, child, execution.acceptedAtMs, execution.studyReceipt), child.id)
     if (child.compositeAttemptId !== job.attemptId || input.compositeAttemptId !== job.attemptId
@@ -525,7 +525,13 @@ export const submitUnifiedScaleCollectionBatch = async (
     prepared.push({ input, child, data, write: replay === 'replay' && child.status === 'COMPLETED'
       ? null : await traceAssessmentPhase('report.prepare.write',
         () => prepareUnifiedScaleWrite(input, child, data, execution, referenceDb), child.id) })
-  }
+  } }
+  // Plain anonymous whole-report preparation can share a fresh binding read.
+  // Receipt-backed studies retain their per-unit lease checks; the following
+  // completion transaction always performs its existing locked checks.
+  if (!execution.studyReceipt && units.every(({input})=>!input.userId))
+    await withStudyPrincipalReadBatch(prisma, prepareUnits)
+  else await prepareUnits()
   return withFinalOnlyCompletionTransaction(async tx => {
     // New study admissions always lock parent -> accepted job -> child. The
     // historical batch lock order remains untouched for unbound protocols.

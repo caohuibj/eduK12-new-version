@@ -1,4 +1,5 @@
 import type {Prisma,CompositeReportJob} from '@prisma/client'
+import {AsyncLocalStorage} from 'node:async_hooks'
 import {prisma} from '../../config/database'
 import {InstrumentFinalSubmitError} from '../../services/instrumentFinalSubmit'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -71,15 +72,55 @@ export async function acceptedStudyReceipt(job:CompositeReportJob,raw:{schemaVer
  return cap
 }
 export type StudyPrincipalInput={attemptId?:string|null;userId?:string|null;recoveryTokenHash?:string;attemptEpoch:number;frozenHash?:string|null;receipt?:AcceptedStudyReceipt;unit?:ReceiptUnit}
+type PrincipalReadScope={db:Db;bindings:Map<string,Promise<Binding|null>>;checked:Array<{input:StudyPrincipalInput;bound:boolean}>;verifying:boolean;active:boolean}
+const principalReadScope=new AsyncLocalStorage<PrincipalReadScope>()
+/** A single delivery operation may share the same live binding read among its
+ * units. Re-read and validate every input before returning; no authorization
+ * result survives the operation or crosses databases/transactions. */
+export async function withStudyPrincipalReadBatch<T>(db:Db,run:()=>Promise<T>):Promise<T>{
+ const scope:PrincipalReadScope={db,bindings:new Map(),checked:[],verifying:false,active:true}
+ return principalReadScope.run(scope,async()=>{
+  try {
+   const result=await run()
+   // One fresh binding snapshot per attempt is reused across the final
+   // per-input checks. This does not replace transactional locked checks.
+   scope.verifying=true
+   scope.bindings.clear()
+   for(const entry of scope.checked){
+    const current=await assertCurrentStudyPrincipal(db,entry.input)
+    if(current!==entry.bound)fail()
+   }
+   return result
+  } finally {
+   // AsyncLocalStorage can outlive the caller via a detached continuation.
+   // Closed or failed operations must never retain a reusable identity read.
+   scope.active=false
+   scope.bindings.clear()
+   scope.checked.length=0
+  }
+ })
+}
+async function principalBinding(db:Db,attemptId:string,lock:boolean):Promise<Binding|null>{
+ const scope=principalReadScope.getStore()
+ if(!scope||!scope.active||scope.db!==db||lock)return binding(db,attemptId)
+ let pending=scope.bindings.get(attemptId)
+ if(!pending){pending=binding(db,attemptId);scope.bindings.set(attemptId,pending)}
+ return pending
+}
 /** A bound path is checked before the legacy hash equality branch, including when
  * an OLD proof still equals the frozen principal. Never rewrite the input proof. */
 export async function assertCurrentStudyPrincipal(db:Db,input:StudyPrincipalInput,lock=false):Promise<boolean>{
  if(!input.attemptId)return false
- let row=await binding(db,input.attemptId)
- if(!row?.hash)return false // historical rows keep their original protocol, never reset/backfilled
+ const scope=principalReadScope.getStore()
+ const remember=(bound:boolean)=>{
+  if(scope?.active&&scope.db===db&&!scope.verifying&&!lock)scope.checked.push({input:{...input},bound})
+  return bound
+ }
+ let row=await principalBinding(db,input.attemptId,lock)
+ if(!row?.hash)return remember(false) // historical rows keep their original protocol, never reset/backfilled
  if(lock){
   await db.$queryRaw`SELECT id FROM composite_assessment_attempts WHERE id=${input.attemptId} FOR UPDATE`
-  row=await binding(db,input.attemptId)
+  row=await principalBinding(db,input.attemptId,true)
  }
  if(!row?.hash||!row.scopeValid||row.userId!==null||input.userId||row.epoch!==row.currentEpoch||row.epoch!==input.attemptEpoch||row.participantStatus!=='ACTIVE')fail()
  if(input.frozenHash!==undefined&&input.frozenHash!==row.hash)fail()
@@ -89,5 +130,5 @@ export async function assertCurrentStudyPrincipal(db:Db,input:StudyPrincipalInpu
   if(input.unit&&receiptUnits.get(cap)?.get(input.unit.assessmentId)!==unitIdentity(input.unit))fail()
   await verifyReceipt(db,cap,lock)
  }else if(!input.recoveryTokenHash||input.recoveryTokenHash!==row.currentHash)fail()
- return true
+ return remember(true)
 }
