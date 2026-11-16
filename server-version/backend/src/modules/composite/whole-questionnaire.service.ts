@@ -1,4 +1,4 @@
-import {acceptedStudyReceipt,assertCurrentStudyPrincipal,type AcceptedStudyReceipt} from '../anonymous-study/admission-principal'
+import {acceptedStudyReceipt,assertCurrentStudyPrincipal,withStudyPrincipalReadBatch,type AcceptedStudyReceipt} from '../anonymous-study/admission-principal'
 import { applyTrainingAttemptScope, hasTrainingVariantMetadata } from './training-variant-scope'
 import {readTrainingTimingSnapshot,normalizeTrainingScaleTiming,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { BoundedArtifactCache } from '../assessment-runtime/bounded-artifact-cache'
@@ -551,9 +551,10 @@ const deliverWholeQuestionnaire = async (
   if (principal.userId) {
     await Promise.all(verifiedEntries.map(validateEntry))
   } else {
-    // Anonymous validation runs per-unit $queryRaw principal binding checks;
-    // keep DB concurrency bounded without slowing down authenticated students.
-    await runWithConcurrencyLimit(verifiedEntries, ANONYMOUS_DELIVERY_VALIDATION_CONCURRENCY, validateEntry)
+    // Share only the in-request binding read; every unit still validates its
+    // own frozen identity, and a fresh binding is checked before delivery.
+    await withStudyPrincipalReadBatch(prisma, () =>
+      runWithConcurrencyLimit(verifiedEntries, ANONYMOUS_DELIVERY_VALIDATION_CONCURRENCY, validateEntry))
   }
 
   const resolvedUnits = verifiedEntries.map(({ tmpl, child, admission }) => ({

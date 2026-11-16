@@ -32,6 +32,7 @@ vi.mock('node:fs', async (importOriginal) => {
 
 import {
   assertAssessmentStartResources,
+  reportResourceClaimDecision,
   resetAssessmentResourceProtectionForTests,
   runWithLowMemoryTrickleAdmission,
   sampleAssessmentHostResources,
@@ -196,5 +197,139 @@ describe('runWithLowMemoryTrickleAdmission runtime gate & ALS permit', () => {
     const opNormal = vi.fn().mockResolvedValue('normal-ok')
     await expect(runWithLowMemoryTrickleAdmission(opNormal)).resolves.toBe('normal-ok')
     expect(opNormal).toHaveBeenCalledTimes(1)
+  })
+
+  it('revokes ALS trickle permit in finally after normal completion, timer continuations, and error exits', async () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+
+    // 1) Normal return: un-awaited continuation captured inside op must fail closed once op resolves
+    let triggerDetachedPromise!: () => void
+    let detachedPromise!: Promise<void>
+    let detachedTimerPromise!: Promise<void>
+    await runWithLowMemoryTrickleAdmission(async () => {
+      assertAssessmentStartResources()
+      detachedPromise = new Promise<void>(resolve => { triggerDetachedPromise = resolve })
+        .then(() => { assertAssessmentStartResources() })
+      detachedTimerPromise = new Promise<void>((resolve, reject) => {
+        setTimeout(() => {
+          try {
+            assertAssessmentStartResources()
+            resolve()
+          } catch (err) {
+            reject(err)
+          }
+        }, 25)
+      })
+      return 'done'
+    })
+
+    triggerDetachedPromise()
+    await expect(detachedPromise).rejects.toMatchObject({
+      code: 'INSTRUMENT_NOT_AVAILABLE',
+      statusCode: 503,
+      preferredRetryAfterSeconds: 10,
+    })
+    await expect(detachedTimerPromise).rejects.toMatchObject({
+      code: 'INSTRUMENT_NOT_AVAILABLE',
+      statusCode: 503,
+      preferredRetryAfterSeconds: 10,
+    })
+
+    // 2) Exception / rejection: permit revokes AND slot releases for the next request
+    let triggerErrContinuation!: () => void
+    let errContinuation!: Promise<void>
+    await expect(runWithLowMemoryTrickleAdmission(async () => {
+      assertAssessmentStartResources()
+      errContinuation = new Promise<void>(resolve => { triggerErrContinuation = resolve })
+        .then(() => { assertAssessmentStartResources() })
+      throw new Error('tx failed')
+    })).rejects.toThrow('tx failed')
+
+    triggerErrContinuation()
+    await expect(errContinuation).rejects.toMatchObject({
+      code: 'INSTRUMENT_NOT_AVAILABLE',
+      statusCode: 503,
+      preferredRetryAfterSeconds: 10,
+    })
+
+    await expect(runWithLowMemoryTrickleAdmission(async () => {
+      assertAssessmentStartResources()
+      return 'slot-reusable'
+    })).resolves.toBe('slot-reusable')
+  })
+
+  it('forces live MemAvailable refresh (<1000ms) after queue wait while keeping the 1s CPU delta window intact', async () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT', '1')
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_MAX_QUEUE', '1')
+
+    // Case A: sub-second memory stay/slight rise (660 -> 665 MiB in +200ms) MUST keep prior 20% CPU rather than zeroing /proc/stat delta to null
+    const gateA = deferred<void>()
+    let opAEntered = false
+    const pA = runWithLowMemoryTrickleAdmission(async () => {
+      opAEntered = true
+      await gateA.promise
+      return 'a'
+    })
+    await vi.waitFor(() => expect(opAEntered).toBe(true))
+
+    const pB = runWithLowMemoryTrickleAdmission(async () => {
+      assertAssessmentStartResources()
+      return 'b'
+    })
+
+    clock += 200
+    proc.availKiB = 665 * 1024
+    gateA.resolve()
+    await expect(pA).resolves.toBe('a')
+    await expect(pB).resolves.toBe('b')
+
+    // Case B: sub-second memory drop (665 -> 649 MiB in +200ms while waiting in queue) MUST fail closed before operation()
+    const gateC = deferred<void>()
+    let opCEntered = false
+    const pC = runWithLowMemoryTrickleAdmission(async () => {
+      opCEntered = true
+      await gateC.promise
+      return 'c'
+    })
+    await vi.waitFor(() => expect(opCEntered).toBe(true))
+
+    const opD = vi.fn().mockResolvedValue('d')
+    const pD = runWithLowMemoryTrickleAdmission(opD)
+
+    clock += 200
+    proc.availKiB = 649 * 1024
+    gateC.resolve()
+    await expect(pC).resolves.toBe('c')
+    await expect(pD).rejects.toMatchObject({
+      code: 'INSTRUMENT_NOT_AVAILABLE',
+      statusCode: 503,
+      preferredRetryAfterSeconds: 10,
+    })
+    expect(opD).not.toHaveBeenCalled()
+  })
+
+  it('keeps background reportResourceClaimDecision isolated and rejects unauthorized callers under 700 MiB', async () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+
+    const gate = deferred<void>()
+    let entered = false
+    const p = runWithLowMemoryTrickleAdmission(async () => {
+      entered = true
+      await gate.promise
+      return 'ok'
+    })
+    await vi.waitFor(() => expect(entered).toBe(true))
+
+    // Simultaneous un-gated caller (representing anonymous, restart, non-scale-only freeze, or background paths) stays blocked
+    expect(() => assertAssessmentStartResources()).toThrow(/系统繁忙/)
+    // Claim concurrency telemetry remains limited for <768 MiB and is unaffected by the trickle permit
+    expect(reportResourceClaimDecision(4)).toMatchObject({ mode: 'limited', limit: 1, reason: 'memory_headroom' })
+
+    gate.resolve()
+    await expect(p).resolves.toBe('ok')
   })
 })

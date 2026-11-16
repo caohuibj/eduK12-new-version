@@ -2,6 +2,7 @@ import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifac
 import { classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
 import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
 import {
+  assertAnonymousStartCriticalMemory,
   assertAssessmentStartResources,
   isAssessmentStartResourceGateError,
   isLowMemoryTrickleEnabled,
@@ -4298,6 +4299,8 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
       compositeAssessment: {
         select: {
           id: true,
+          updatedAt: true,
+          trainingContentSnapshotHash: true,
           productKind: true,
           publicEnabled: true,
           status: true,
@@ -4319,6 +4322,8 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
         compositeAssessment: {
           select: {
             id: true,
+            updatedAt: true,
+            trainingContentSnapshotHash: true,
             productKind: true,
           publicEnabled: true,
             status: true,
@@ -4340,6 +4345,32 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
   return token as any
 }
 
+// Public discovery needs presentation, not scale definitions. Keep form items
+// complete because they are returned to the client. Tracking publications use
+// the full loader: it verifies and inherits frozen baseline source identities.
+const loadPublicCompositeInfo = async (id: string, db: Db) => {
+  const current = await db.compositeAssessment.findUnique({
+    where: { id },
+    select: {
+      id: true, name: true, description: true, instruction: true, maxAttempts: true,
+      personalTracking: true, personalTrackingBaselineId: true,
+      trainingVariantFrozen: true, ...TRAINING_FLOW_DEFINITION_SELECT,
+      reportPackageKey: true, reportPackageVersion: true, reportPackageSnapshotEncrypted: true,
+      items: { orderBy: { position: 'asc' }, select: {
+        id: true, type: true, position: true, formLabel: true,
+        scale: { select: { name: true } }, cognitiveAssignment: { select: { title: true } },
+      } },
+      formSections: { orderBy: { position: 'asc' }, include: {
+        items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }] },
+      } },
+    },
+  })
+  if (!current) throw compositeNotFound()
+  if (current.personalTracking != null)
+    return loadComposite(id, true, db)
+  return current
+}
+
 export const getPublicCompositeInfo = async (tokenValue: string, db: Db = prisma) => {
   const token = await findPublicToken(tokenValue, db)
   assertSupportedComposite(token.compositeAssessment)
@@ -4348,9 +4379,9 @@ export const getPublicCompositeInfo = async (tokenValue: string, db: Db = prisma
   const composite = token.compositeAssessment
   assertCompositeWindow(composite)
   // Pure-read (write-time invariant): the public info path never lazily
-  // repairs sections on a published composite. loadComposite already includes
-  // formSections + items, so no separate section read is needed.
-  const current = await loadComposite(composite.id, true, db)
+  // repairs sections on a published composite; discovery does not need the
+  // large scale-definition tree used by actual START.
+  const current = await loadPublicCompositeInfo(composite.id, db)
   const packageSlotLabels = getFrozenPackageSlotLabels(current)
   const units = [
     ...current.items
@@ -4435,28 +4466,35 @@ const recordAnonymousStartDiagnosticPhase = (phase: RequestObservationPhase, sta
 export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string, study?: PublicStudyAdmission, opts?: { wantsWholeDelivery?: boolean; knownTemplateHashes?: ReadonlySet<string> }) => {
   const startAt = process.hrtime.bigint()
   const token = await findPublicToken(tokenValue)
-  // Pure-read (write-time invariant): the public start path never lazily
-  // repairs sections on a published composite. loadComposite already includes
-  // formSections + items, so no separate section read is needed.
-  const composite = await loadStartComposite(token.compositeAssessment.id)
-  if (study && (composite.trainingVariantFrozen != null || composite.trainingFlowFrozen != null)) throw compositeBadRequest('概率分卷暂不支持匿名研究组合')
+  // A recovery proof is checked using the narrow attempt index lookup BEFORE
+  // any publication tree/preload. Merely supplying an unverified token must
+  // never bypass the optional low-memory guard and trigger an expensive read.
+  // This remains a read/resume, not a new admission or quota claim.
   if (recoveryToken) {
     const recoveryTokenHash = hashRecoveryToken(recoveryToken)
-    const existing = await prisma.compositeAssessmentAttempt.findFirst({ where: { accessTokenId: token.id, recoveryTokenHash } })
-    if (existing) {
-      // Recovery fast path: no gate, no transaction. Record pre_gate (up to
-      // the recovery lookup) and post_gate (response assembly); never record
-      // a zero gate_wait/gate_slot/tx_wall for a resumed attempt.
-      recordAnonymousStartPhase('anonymous.start.pre_gate_ms', startAt, process.hrtime.bigint())
-      const postGateAt = process.hrtime.bigint()
-      try {
-        return await projectStartedAttempt(existing.id, { recoveryTokenHash }, Boolean(opts?.wantsWholeDelivery), null, undefined, undefined, opts?.knownTemplateHashes, false)
-      } finally {
-        recordAnonymousStartPhase('anonymous.start.post_gate_ms', postGateAt, process.hrtime.bigint())
-      }
+    const existing = await prisma.compositeAssessmentAttempt.findFirst({
+      where: { accessTokenId: token.id, recoveryTokenHash, userId: null },
+    })
+    if (!existing) throw compositeForbidden('恢复凭证无效')
+    recordAnonymousStartPhase('anonymous.start.pre_gate_ms', startAt, process.hrtime.bigint())
+    const postGateAt = process.hrtime.bigint()
+    try {
+      return await projectStartedAttempt(existing.id, { recoveryTokenHash }, Boolean(opts?.wantsWholeDelivery), null, undefined, undefined, opts?.knownTemplateHashes, false)
+    } finally {
+      recordAnonymousStartPhase('anonymous.start.post_gate_ms', postGateAt, process.hrtime.bigint())
     }
-    throw compositeForbidden('恢复凭证无效')
   }
+  if (!study) {
+    assertTokenWindow(token)
+    assertCompositeWindow(token.compositeAssessment)
+    // Reject new plain public STARTs before loading/cloning the publication
+    // graph. Study admissions retain their independent in-transaction check.
+    assertAnonymousStartCriticalMemory()
+  }
+  // Preserve #740's publication identity reuse for ordinary new STARTs; study
+  // START still reads its identity later to keep its original race boundary.
+  const composite = await loadStartComposite(token.compositeAssessment.id, prisma, study ? undefined : token.compositeAssessment)
+  if (study && (composite.trainingVariantFrozen != null || composite.trainingFlowFrozen != null)) throw compositeBadRequest('概率分卷暂不支持匿名研究组合')
   if (!study) assertTokenWindow(token)
   assertCompositeWindow(token.compositeAssessment)
   const credential = study?.credential ?? createRecoveryCredential()
@@ -4512,14 +4550,23 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
             }
             assertTokenWindow(token)
             const roundCourseId=await assertTrainingTokenRound(tx,token)
-            const claimed = await tx.compositeAssessmentAccessToken.updateMany({
-              where: { id: token.id, isActive: true, expiresAt: { gt: new Date() }, OR: [{ maxUses: 0 }, { usedCount: { lt: token.maxUses } }] },
-              data: { usedCount: { increment: 1 } },
-            })
-            if (claimed.count !== 1) throw compositeConflict('公开链接已达到最大参与次数')
             const admitted = await createAttempt(tx, roundCourseId?{...composite,deliveryCourseId:roundCourseId}:composite, null, token.id, credential)
             if (study) await study.afterAdmission(tx, admitted.id)
             await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
+            // Claim last to shorten the token-row lock. A revoked, expired or
+            // exhausted token rolls back the attempt and study binding together.
+            // Compare the LIVE row with itself, never against the pre-gate
+            // token.maxUses snapshot. The UPDATE row lock serializes competing
+            // claims and the database clock checks expiry at the final claim.
+            const claimed = await tx.$queryRaw<Array<{ id: string }>>`
+              UPDATE composite_assessment_access_tokens
+              SET used_count = used_count + 1
+              WHERE id = ${token.id} AND is_active = TRUE
+                AND expires_at > (clock_timestamp() AT TIME ZONE 'UTC')
+                AND (max_uses = 0 OR used_count < max_uses)
+              RETURNING id
+            `
+            if (claimed.length !== 1) throw compositeConflict('公开链接已达到最大参与次数')
             return admitted
           }, START_INTERACTIVE_TRANSACTION)
         } finally {

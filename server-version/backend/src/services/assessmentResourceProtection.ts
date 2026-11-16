@@ -4,7 +4,12 @@ import { performance } from 'node:perf_hooks'
 import { BoundedAdmissionBusyError, BoundedAdmissionGate, configuredInteger } from './boundedAdmissionGate'
 import { InstrumentFinalSubmitError } from './instrumentFinalSubmit'
 import { logger } from '../utils/logger'
-export type AssessmentResourceSample = { at: number; availableBytes: number | null; cpuPercent: number | null }
+export type AssessmentResourceSample = {
+  at: number
+  availableBytes: number | null
+  cpuPercent: number | null
+  cpuAt?: number
+}
 export type ResourceClaimDecision = { mode: 'normal' | 'limited' | 'protected'; limit: number; delayMs: number; reason: string | null }
 export type LowMemoryTrickleConfig = {
   floorMiB: number
@@ -90,38 +95,64 @@ if (isLowMemoryTrickleEnabled()) {
   configuredLowMemoryTrickleConfig()
 }
 let sample: AssessmentResourceSample | null = null
+let memSampleAt = -Infinity
+let cpuSampleAt = -Infinity
 let previousCpu: { total: number; idle: number } | null = null
-export const sampleAssessmentHostResources = (): AssessmentResourceSample => {
+export const sampleAssessmentHostResources = (options?: { forceMemoryRefresh?: boolean }): AssessmentResourceSample => {
   const at = performance.now()
-  if (sample && at - sample.at < 1000) return sample
-  let availableBytes: number | null = null, cpuPercent: number | null = null
-  try {
-    const memory = /^MemAvailable:\s+(\d+)\s+kB$/m.exec(readFileSync('/proc/meminfo', 'utf8'))
-    if (memory) availableBytes = Number(memory[1]) * 1024
-    const times = readFileSync('/proc/stat', 'utf8').split('\n')[0].trim().split(/\s+/).slice(1, 9).map(Number)
-    if (times.length === 8 && times.every(Number.isFinite)) {
-      const total = times.reduce((a, v) => a + v, 0), idle = times[3] + times[4]
-      if (previousCpu && total > previousCpu.total) cpuPercent = Math.max(0, Math.min(100, 100 * (1 - (idle - previousCpu.idle) / (total - previousCpu.total))))
-      previousCpu = { total, idle }
-    }
-  } catch { /* Missing observation narrows concurrency; it never loses a receipt. */ }
-  return (sample = { at, availableBytes, cpuPercent })
+  const needsMemory = Boolean(options?.forceMemoryRefresh) || !sample || at - memSampleAt >= 1000
+  const needsCpu = !sample || at - cpuSampleAt >= 1000
+  if (!needsMemory && !needsCpu && sample) return sample
+
+  let availableBytes = sample?.availableBytes ?? null
+  let cpuPercent = sample?.cpuPercent ?? null
+  let nextCpuSampleAt = cpuSampleAt
+
+  if (needsMemory) {
+    availableBytes = null
+    try {
+      const memory = /^MemAvailable:\s+(\d+)\s+kB$/m.exec(readFileSync('/proc/meminfo', 'utf8'))
+      if (memory) availableBytes = Number(memory[1]) * 1024
+    } catch { /* Missing observation narrows concurrency; it never loses a receipt. */ }
+    memSampleAt = at
+  }
+
+  if (needsCpu) {
+    cpuPercent = null
+    try {
+      const times = readFileSync('/proc/stat', 'utf8').split('\n')[0].trim().split(/\s+/).slice(1, 9).map(Number)
+      if (times.length === 8 && times.every(Number.isFinite)) {
+        const total = times.reduce((a, v) => a + v, 0), idle = times[3] + times[4]
+        if (previousCpu && total > previousCpu.total) cpuPercent = Math.max(0, Math.min(100, 100 * (1 - (idle - previousCpu.idle) / (total - previousCpu.total))))
+        previousCpu = { total, idle }
+      }
+    } catch { /* Missing observation narrows concurrency; it never loses a receipt. */ }
+    cpuSampleAt = at
+    nextCpuSampleAt = at
+  }
+
+  return (sample = { at, availableBytes, cpuPercent, cpuAt: nextCpuSampleAt })
 }
 export class AssessmentResourceProtection {
   private lastAt = -Infinity
+  private lastCpuAt = -Infinity
   private lastTrickleAt = -Infinity
   private highCpu = 0
   private memoryProtected = false
   private cpuProtected = false
   private trickleMemoryProtected = false
   private syncSampleState(value: AssessmentResourceSample, trickleConfig?: LowMemoryTrickleConfig): void {
-    if (value.at !== this.lastAt) {
-      this.lastAt = value.at
+    const cpuAt = value.cpuAt ?? value.at
+    if (cpuAt !== this.lastCpuAt) {
+      this.lastCpuAt = cpuAt
       this.highCpu = value.cpuPercent !== null && value.cpuPercent >= 95 ? this.highCpu + 1 : 0
-      if (value.availableBytes !== null && value.availableBytes < 512 * MiB) this.memoryProtected = true
-      if (value.availableBytes !== null && value.availableBytes >= 700 * MiB) this.memoryProtected = false
       if (this.highCpu >= 2) this.cpuProtected = true
       if (value.cpuPercent === null || value.cpuPercent <= 85) this.cpuProtected = false
+    }
+    if (value.at !== this.lastAt) {
+      this.lastAt = value.at
+      if (value.availableBytes !== null && value.availableBytes < 512 * MiB) this.memoryProtected = true
+      if (value.availableBytes !== null && value.availableBytes >= 700 * MiB) this.memoryProtected = false
     }
     if (trickleConfig && value.at !== this.lastTrickleAt) {
       this.lastTrickleAt = value.at
@@ -135,6 +166,7 @@ export class AssessmentResourceProtection {
   }
   reset(): void {
     this.lastAt = -Infinity
+    this.lastCpuAt = -Infinity
     this.lastTrickleAt = -Infinity
     this.highCpu = 0
     this.memoryProtected = false
@@ -190,7 +222,7 @@ let trickleGateCache: {
   maxWaitMs: number
   gate: BoundedAdmissionGate
 } | null = null
-const lowMemoryTrickleContext = new AsyncLocalStorage<{ hasTricklePermit: boolean }>()
+const lowMemoryTrickleContext = new AsyncLocalStorage<{ active: boolean }>()
 
 const buildStartResourceError = (retryHint: 'memory' | 'cpu'): InstrumentFinalSubmitError => {
   const err = new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '系统繁忙，请稍后开始测评；已经提交的答案不受影响。', 503)
@@ -247,6 +279,8 @@ const getLowMemoryTrickleGate = (config: LowMemoryTrickleConfig): BoundedAdmissi
 
 export const resetAssessmentResourceProtectionForTests = (): void => {
   sample = null
+  memSampleAt = -Infinity
+  cpuSampleAt = -Infinity
   previousCpu = null
   policy.reset()
   previousMode = ''
@@ -267,12 +301,27 @@ export const reportResourceClaimDecision = (concurrency: number): ResourceClaimD
   return decision
 }
 
+/** Optional early refusal for a new plain public START. Study admission may
+ * resolve an existing attempt inside its transaction and is excluded by the
+ * caller. The in-transaction freeze guard remains authoritative. */
+export const anonymousStartCriticalMemory = (availableBytes:number|null):boolean =>
+  availableBytes === null || !Number.isFinite(availableBytes) || availableBytes < 650 * MiB
+
+export const assertAnonymousStartCriticalMemory = ():void => {
+  if (!enabled() || process.env.ASSESSMENT_ANONYMOUS_EARLY_MEMORY_GUARD_ENABLED !== 'true') return
+  if (anonymousStartCriticalMemory(sampleAssessmentHostResources().availableBytes)) {
+    const err = new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '系统繁忙，请稍后开始测评；已经提交的答案不受影响。', 503)
+    ;(err as { preferredRetryAfterSeconds?: number }).preferredRetryAfterSeconds = HOST_MEMORY_RETRY_AFTER_SECONDS
+    throw err
+  }
+}
+
 /** Opt-in low-memory trickle admission for START. Outside [floor, 700) MiB,
  * it fast-passes (>=700 MiB) or fast-fails (<floor MiB) before heavy loads.
- * Inside [floor, 700) MiB with idle CPU, it bounds concurrent allocations and
- * marks the async execution context with an explicit trickle permit so the
- * in-transaction runtime freeze guard allows the admitted request while still
- * blocking un-gated burst arrivals. */
+ * Inside [floor, 700) MiB with idle CPU, it bounds concurrent allocations,
+ * refreshes live MemAvailable on gate-slot acquisition without disturbing the
+ * 1s /proc/stat CPU window, and scopes a revocable trickle permit strictly to
+ * the active slot lifetime. */
 export const runWithLowMemoryTrickleAdmission = async <T>(operation: () => Promise<T>): Promise<T> => {
   if (!enabled()) return operation()
   if (!isLowMemoryTrickleEnabled()) {
@@ -293,7 +342,7 @@ export const runWithLowMemoryTrickleAdmission = async <T>(operation: () => Promi
   }
   try {
     return await gate.run(async () => {
-      const fresh = sampleAssessmentHostResources()
+      const fresh = sampleAssessmentHostResources({ forceMemoryRefresh: true })
       const recheck = policy.startAdmissionDecision(fresh, performance.now(), config)
       logStartAdmissionTransition(recheck, fresh)
       if (recheck.action === 'reject_memory' || recheck.action === 'reject_cpu') {
@@ -302,7 +351,14 @@ export const runWithLowMemoryTrickleAdmission = async <T>(operation: () => Promi
       if (recheck.action === 'allow') {
         return operation()
       }
-      return lowMemoryTrickleContext.run({ hasTricklePermit: true }, operation)
+      const permit = { active: true }
+      return await lowMemoryTrickleContext.run(permit, async () => {
+        try {
+          return await operation()
+        } finally {
+          permit.active = false
+        }
+      })
     })
   } catch (error) {
     if (error instanceof BoundedAdmissionBusyError) {
@@ -316,13 +372,17 @@ export const runWithLowMemoryTrickleAdmission = async <T>(operation: () => Promi
  * retries and report reads retain their normal persistence/recovery paths. */
 export const assertAssessmentStartResources = (): void => {
   if (!enabled()) return
-  const value = sampleAssessmentHostResources()
-  if (isLowMemoryTrickleEnabled()) {
+  const permit = lowMemoryTrickleContext.getStore()
+  const trickleEnabled = isLowMemoryTrickleEnabled()
+  const value = sampleAssessmentHostResources(
+    trickleEnabled && permit?.active === true ? { forceMemoryRefresh: true } : undefined,
+  )
+  if (trickleEnabled) {
     const config = configuredLowMemoryTrickleConfig()
     const decision = policy.startAdmissionDecision(value, performance.now(), config)
     logStartAdmissionTransition(decision, value)
     if (decision.action === 'allow') return
-    if (decision.action === 'trickle' && lowMemoryTrickleContext.getStore()?.hasTricklePermit === true) return
+    if (decision.action === 'trickle' && permit?.active === true) return
     throw buildStartResourceError(decision.retryHint ?? 'memory')
   }
   const decision = policy.decision(value, 1)

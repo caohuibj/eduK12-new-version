@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   AssessmentResourceProtection,
+  anonymousStartCriticalMemory,
   configuredLowMemoryTrickleConfig,
   configuredMemoryRetryAfterSeconds,
   isAssessmentStartResourceGateError,
@@ -27,6 +28,12 @@ describe('memory retry hint configuration', () => {
 })
 
 describe('bounded background resource protection', () => {
+  it('treats less than 650 MiB or an unavailable memory observation as critical for the optional public START precheck', () => {
+    expect(anonymousStartCriticalMemory(650 * MiB)).toBe(false)
+    expect(anonymousStartCriticalMemory(650 * MiB - 1)).toBe(true)
+    expect(anonymousStartCriticalMemory(null)).toBe(true)
+    expect(anonymousStartCriticalMemory(Number.NaN)).toBe(true)
+  })
   it('only treats a typed 503 INSTRUMENT_NOT_AVAILABLE as a precompute fail-fast', () => {
     expect(isAssessmentStartResourceGateError(
       new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', 'busy', 503)
@@ -184,7 +191,14 @@ describe('low-memory START trickle configuration and state machine', () => {
 
     p.reset()
     expect(p.startAdmissionDecision(value(0, 750, 96), 0, cfg).action).toBe('allow')
-    expect(p.startAdmissionDecision(value(1000, 750, 96), 1000, cfg)).toEqual({
+    // Memory-only refresh carrying the same cpuAt timestamp must not double-count a single high-CPU sample
+    expect(p.startAdmissionDecision({ at: 200, cpuAt: 0, availableBytes: 660 * MiB, cpuPercent: 96 }, 200, cfg)).toMatchObject({
+      action: 'reject_memory',
+      reason: 'low_memory_cpu_busy',
+    })
+    expect(p.startAdmissionDecision(value(1000, 750, 80), 1000, cfg).action).toBe('allow')
+    expect(p.startAdmissionDecision(value(2000, 750, 96), 2000, cfg).action).toBe('allow')
+    expect(p.startAdmissionDecision(value(3000, 750, 96), 3000, cfg)).toEqual({
       action: 'reject_cpu',
       reason: 'host_cpu',
       retryHint: 'cpu',
