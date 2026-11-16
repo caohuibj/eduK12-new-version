@@ -12,6 +12,31 @@ describe('training busy retries', () => {
   afterEach(() => {
     vi.useRealTimers()
   })
+  it('allows at most five START attempts within the 60 second budget', async () => {
+    let time = 0
+    const busy = { status: 503, code: 'INSTRUMENT_NOT_AVAILABLE' }
+    const operation = vi.fn().mockRejectedValue(busy)
+    const sleep = vi.fn(async (delay: number) => { time += delay })
+    await expect(runTrainingRetry(operation, () => ({ kind: 'retry', retryAfterMs: 8_000 }), {
+      maxAttempts: 5, maxTotalWaitMs: 60_000, random: () => 0, now: () => time, sleep,
+    })).rejects.toBe(busy)
+    expect(operation).toHaveBeenCalledTimes(5)
+    expect(sleep).toHaveBeenCalledTimes(4)
+    expect(time).toBe(32_000)
+  })
+
+  it('stops before a fifth attempt when request time and Retry-After exhaust the budget', async () => {
+    let time = 0
+    const busy = { status: 503, code: 'INSTRUMENT_NOT_AVAILABLE' }
+    const operation = vi.fn(async () => { time += 9_000; throw busy })
+    const sleep = vi.fn(async (delay: number) => { time += delay })
+    await expect(runTrainingRetry(operation, () => ({ kind: 'retry', retryAfterMs: 8_000 }), {
+      maxAttempts: 5, maxTotalWaitMs: 60_000, random: () => 0, now: () => time, sleep,
+    })).rejects.toBe(busy)
+    expect(operation).toHaveBeenCalledTimes(4)
+    expect(sleep).toHaveBeenCalledTimes(3)
+    expect(time).toBe(60_000)
+  })
   it('adds jitter after the server delay and recognizes only explicit busy responses', () => {
     expect(trainingRetryDelayMs(10_000, () => 0)).toBe(10_000)
     expect(trainingRetryDelayMs(10_000, () => 1)).toBe(14_000)

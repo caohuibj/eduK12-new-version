@@ -4537,11 +4537,18 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
             await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
             // Claim last to shorten the token-row lock. A revoked, expired or
             // exhausted token rolls back the attempt and study binding together.
-            const claimed = await tx.compositeAssessmentAccessToken.updateMany({
-              where: { id: token.id, isActive: true, expiresAt: { gt: new Date() }, OR: [{ maxUses: 0 }, { usedCount: { lt: token.maxUses } }] },
-              data: { usedCount: { increment: 1 } },
-            })
-            if (claimed.count !== 1) throw compositeConflict('公开链接已达到最大参与次数')
+            // Compare the LIVE row with itself, never against the pre-gate
+            // token.maxUses snapshot. The UPDATE row lock serializes competing
+            // claims and the database clock checks expiry at the final claim.
+            const claimed = await tx.$queryRaw<Array<{ id: string }>>`
+              UPDATE composite_assessment_access_tokens
+              SET used_count = used_count + 1
+              WHERE id = ${token.id} AND is_active = TRUE
+                AND expires_at > (clock_timestamp() AT TIME ZONE 'UTC')
+                AND (max_uses = 0 OR used_count < max_uses)
+              RETURNING id
+            `
+            if (claimed.length !== 1) throw compositeConflict('公开链接已达到最大参与次数')
             return admitted
           }, START_INTERACTIVE_TRANSACTION)
         } finally {

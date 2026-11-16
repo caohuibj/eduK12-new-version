@@ -297,6 +297,39 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   expect((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})).usedCount).toBe(3)
   expect(await prisma.compositeAssessmentAttempt.count({where:{accessTokenId:t.id}})).toBe(3)
  })
+ it('honors the live token quota when its maximum is lowered during the final claim',async()=>{
+  const t=await token(3)
+  const first=await composite.startPublicAttempt(t.token)
+  expect(first.attempt.id).toBeTruthy()
+  let locked!:()=>void, release!:()=>void
+  const hasLock=new Promise<void>(resolve=>{locked=resolve})
+  const canChange=new Promise<void>(resolve=>{release=resolve})
+  const locker=prisma.$transaction(async tx=>{
+   await tx.$queryRaw`SELECT id FROM composite_assessment_access_tokens WHERE id=${t.id} FOR UPDATE`
+   locked()
+   await canChange
+   await tx.compositeAssessmentAccessToken.update({where:{id:t.id},data:{maxUses:1}})
+  },{timeout:15000})
+  await hasLock
+  const second=composite.startPublicAttempt(t.token).then(()=>null,error=>error)
+  let observed=false
+  try{
+   for(let i=0;i<100;i++){
+    const rows=await prisma.$queryRaw<Array<{waiting:boolean}>>`SELECT EXISTS (
+      SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND pid<>pg_backend_pid() AND wait_event_type='Lock'
+    ) AS waiting`
+    if(rows[0]?.waiting){observed=true;break}
+    await new Promise(resolve=>setTimeout(resolve,20))
+   }
+  }finally{release()}
+  await locker
+  const error=await second
+  expect(observed).toBe(true)
+  expect(error?.statusCode).toBe(409)
+  const current=await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})
+  expect(current).toMatchObject({maxUses:1,usedCount:1})
+  expect(await prisma.compositeAssessmentAttempt.count({where:{accessTokenId:t.id}})).toBe(1)
+ },20000)
  it('rolls back a start when its link is revoked while admission waits',async()=>{
   const t=await token(1)
   let locked!:()=>void, release!:()=>void
