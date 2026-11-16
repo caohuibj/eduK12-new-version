@@ -1,8 +1,24 @@
-import { describe, expect, it } from 'vitest'
-import { AssessmentResourceProtection, anonymousStartCriticalMemory, isAssessmentStartResourceGateError } from '../../services/assessmentResourceProtection'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { AssessmentResourceProtection, anonymousStartCriticalMemory, isAssessmentStartResourceGateError, configuredMemoryRetryAfterSeconds } from '../../services/assessmentResourceProtection'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 const MiB = 1024 * 1024
 const value = (at: number, available = 1500, cpu = 30) => ({ at, availableBytes: available * MiB, cpuPercent: cpu })
+describe('memory retry hint configuration', () => {
+  afterEach(() => vi.unstubAllEnvs())
+  it('defaults to ten seconds and accepts the bounded endpoints', () => {
+    vi.stubEnv('ASSESSMENT_HOST_MEMORY_RETRY_AFTER_SECONDS', '')
+    expect(configuredMemoryRetryAfterSeconds()).toBe(10)
+    for (const n of [1, 8, 60]) {
+      vi.stubEnv('ASSESSMENT_HOST_MEMORY_RETRY_AFTER_SECONDS', String(n))
+      expect(configuredMemoryRetryAfterSeconds()).toBe(n)
+    }
+  })
+  it.each(['0', '-1', '61', '1.5', 'NaN', 'Infinity'])('rejects invalid value %s', raw => {
+    vi.stubEnv('ASSESSMENT_HOST_MEMORY_RETRY_AFTER_SECONDS', raw)
+    expect(() => configuredMemoryRetryAfterSeconds()).toThrow()
+  })
+})
+
 describe('bounded background resource protection', () => {
   it('treats less than 650 MiB or an unavailable memory observation as critical for the optional public START precheck', () => {
     expect(anonymousStartCriticalMemory(650 * MiB)).toBe(false)

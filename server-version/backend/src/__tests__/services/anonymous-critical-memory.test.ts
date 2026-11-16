@@ -35,7 +35,7 @@ describe('optional anonymous memory guard',()=>{
     vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED','true')
     vi.stubEnv('ASSESSMENT_ANONYMOUS_EARLY_MEMORY_GUARD_ENABLED','true')
     state.availableKiB=649*1024
-    expect(()=>assertAnonymousStartCriticalMemory()).toThrow(expect.objectContaining({code:'INSTRUMENT_NOT_AVAILABLE',statusCode:503}))
+    expect(()=>assertAnonymousStartCriticalMemory()).toThrow(expect.objectContaining({code:'INSTRUMENT_NOT_AVAILABLE',statusCode:503,preferredRetryAfterSeconds:10}))
     state.now+=2000;state.availableKiB=650*1024
     expect(()=>assertAnonymousStartCriticalMemory()).not.toThrow()
   })
