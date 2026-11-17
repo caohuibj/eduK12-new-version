@@ -56,6 +56,16 @@ export const compositeFormSectionVideoPresentations = (definition: unknown): Ass
   })
 }
 
+/** Definition must already match the frozen Form slot identity. */
+export const compositeFormOptionVideoPresentation = (
+  definition: { items: Array<{ id: string; formOptions: unknown }> },
+  itemId: string,
+  optionIndex: number,
+): AssessmentVideoPresentationV1 | null => {
+  const item = definition.items.find(candidate => candidate.id === itemId)
+  return item ? optionVideoPresentationAt(item.formOptions, optionIndex) : null
+}
+
 export const frozenFormOptionVideoPresentation = (
   admission: FrozenUnitAdmissionV1,
   itemId: string,

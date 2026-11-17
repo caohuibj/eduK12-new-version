@@ -20,6 +20,7 @@ vi.mock('../../modules/assessment-runtime/whole-form-materialization.service', (
 import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 import { prepareCanonicalSubmission } from '../../services/instrumentFinalSubmit'
 import { clearWholeValidationRulesForTest, submitWholeQuestionnaire } from '../../modules/composite/whole-questionnaire.service'
+import { formSectionSlotKey } from '../../modules/assessment-runtime/slot-set'
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -34,12 +35,12 @@ beforeEach(() => {
 })
 
 describe('education whole consent', () => {
-  it('checks consent once when request-context reuse is off', async () => {
+  it('rejects missing required Forms and checks consent once per request', async () => {
     const definitionHash = 'd'.repeat(64)
     const manifest = {
       schemaVersion: 1 as const,
       binding: { attemptId: 'parent', attemptEpoch: 1, slotSetHash: 'a'.repeat(64), contextHash: null, userId: 'user', recoveryTokenHash: null },
-      requiredFormSlots: ['form:section'],
+      requiredFormSlots: [formSectionSlotKey('section')],
       units: [],
       formSections: [{ sectionId: 'section', definitionHash, items: [{ id: 'field', required: false, formType: 'text_input' }] }],
     }
@@ -67,14 +68,24 @@ describe('education whole consent', () => {
       submissionId: 'education-form-only-1', attemptEpoch: 1, slotSetHash: 'a'.repeat(64), contextSnapshotHash: null,
       units: [], formAnswers: [{ sectionId: 'section', definitionHash, answers: [] }],
     }
+    const originalValidation = { encrypted: header.wholeValidationEncrypted, hash: header.wholeValidationHash }
+    const incompleteManifest = { ...manifest, requiredFormSlots: [...manifest.requiredFormSlots, formSectionSlotKey('missing-section')] }
+    header.wholeValidationEncrypted = encryptUnifiedRuntimePayload(incompleteManifest)
+    header.wholeValidationHash = prepareCanonicalSubmission(incompleteManifest).hash
+    await expect(submitWholeQuestionnaire('parent', input, { userId: 'user' }))
+      .rejects.toThrow('整份问卷缺少必需表单区段')
+    expect(mocks.register).not.toHaveBeenCalled()
+    header.wholeValidationEncrypted = originalValidation.encrypted
+    header.wholeValidationHash = originalValidation.hash
+
     const first = await submitWholeQuestionnaire('parent', input, { userId: 'user' })
     expect(first).toMatchObject({ status: 'ACCEPTED', replayed: false })
-    expect(consent).toHaveBeenCalledTimes(1)
+    expect(consent).toHaveBeenCalledTimes(2)
     expect(mocks.register.mock.calls[0][1].rejectPriorUnitSnapshots).toBe(true)
     header.wholeSubmissionId = input.submissionId
     header.wholePayloadHash = first.payloadHash
     mocks.db.$queryRaw.mockResolvedValue([header])
     await expect(submitWholeQuestionnaire('parent', input, { userId: 'user' })).resolves.toMatchObject({ status: 'ACCEPTED', replayed: true })
-    expect(consent).toHaveBeenCalledTimes(2)
+    expect(consent).toHaveBeenCalledTimes(3)
   })
 })

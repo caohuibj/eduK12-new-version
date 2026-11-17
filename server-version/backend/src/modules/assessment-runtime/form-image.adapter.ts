@@ -169,6 +169,21 @@ export const retainFrozenFormAdmissionImages = async (
   db,
 })
 
+/** Only call with a catalog Form whose identity has been verified against the
+ * parent's frozen slot set. Later Whole sections need no admission writes. */
+export const serveCompositeFormDefinitionImage = async (
+  definition: unknown,
+  assetId: string,
+  res: Response,
+  db?: AssetDatabase,
+): Promise<void> => {
+  const material = compositeFormSectionMaterialReferences(definition).find(ref => ref.assetId === assetId)
+  if (material) { await serveAssessmentMaterial(material, res, db); return }
+  const reference = findFrozenAssessmentAssetReference(compositeFormSectionImageReferences(definition), assetId)
+  if (!reference) throw new Error('Assessment image is not referenced by the frozen Form section')
+  await serveAssessmentImageContent({ reference, res, db })
+}
+
 export const serveFrozenFormSectionImage = async (input: {
   admission: FrozenUnitAdmissionV1
   assetId: string

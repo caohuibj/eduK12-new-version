@@ -897,6 +897,13 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   if(manifest.units.some(unit=>unit.trainingTiming?.snapshotHash!==timingSnapshotHash))throw failure('计时策略与整卷准入不匹配')
   await traceAssessmentPhase('whole.validation_rules_resolve', () => ensureWholeRules(attemptId, principal, manifest, verifiedParent))
   const prepared = traceAssessmentPhaseSync('whole.integrity_check', () => prepareFromWholeManifest(input, manifest, principal, receivedAtMs))
+  const coveredFormSlots = new Set(prepared.formAnswers.map(f => formSectionSlotKey(f.sectionId)))
+  const remainingRequiredFormSlots = manifest.requiredFormSlots.filter(key => !coveredFormSlots.has(key))
+  // An education Whole receipt must cover every frozen required Form section.
+  // Training may have separately committed context Forms before its Whole receipt.
+  if (isEducationWholeAttempt(parent) && remainingRequiredFormSlots.length > 0) {
+    throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '整份问卷缺少必需表单区段', 409)
+  }
   if (prepared.formAnswers.length > 0) {
     // X-04A: deterministic Form validation at receipt time, through the same
     // frozen-admission chain the worker will use — an answer class the worker
@@ -908,8 +915,6 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
     ...(timingSnapshotHash?{timingSnapshotHash}:{}),respondentUserId: parent.userId, recoveryTokenHash: parent.recoveryTokenHash,
     units: prepared.units,
     ...(prepared.formAnswers.length > 0 ? { formAnswers: prepared.formAnswers } : {}) }))
-  const coveredFormSlots = new Set(prepared.formAnswers.map(f => formSectionSlotKey(f.sectionId)))
-  const remainingRequiredFormSlots = manifest.requiredFormSlots.filter(k => !coveredFormSlots.has(k))
   const receipt = await registerWholeQuestionnaireReceipt(parent, {
     submissionId: input.submissionId, payloadHash: canonical.hash, answersEncrypted: encrypted, acceptedAt: new Date(receivedAtMs),
     requiredFormSlots: remainingRequiredFormSlots, validationHash: prior.wholeValidationHash,
