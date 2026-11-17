@@ -65,7 +65,7 @@ export async function closeStudy(userId:string,studyId:string) {
 export async function addWave(userId:string,role:UserRole,studyId:string, input:{compositeId:string;tokenId:string;title:string}) {
   // Both the study and underlying public delivery must belong to this publisher.
   const token=await composite.revealAccessToken(userId,role,input.compositeId,input.tokenId)
-  await composite.getPublicCompositeInfo(token.token)
+  await composite.assertPublicCompositeAdmission(token.token)
   return prisma.$transaction(tx=>insertWave(tx,userId,studyId,input,randomUUID(),token.token))
 }
 async function insertWave(tx:Db,userId:string,studyId:string,input:{compositeId:string;tokenId:string;title:string},id:string,token:string) {
@@ -122,7 +122,7 @@ export async function createWaveWithLink(userId:string,role:UserRole,studyId:str
       return {id:input.requestId,studyId,title:row.title,ordinal:row.ordinal,tokenId:row.tokenId,entryPath:`/public/studies/waves/${input.requestId}/${encodeURIComponent(token)}`}
     }
     const token=await composite.createAccessTokenForComposite(userId,role,input.compositeId,expiresAt,input.maxUses,tx)
-    await composite.getPublicCompositeInfo(token.token,tx)
+    await composite.assertPublicCompositeAdmission(token.token,tx)
     return insertWave(tx,userId,studyId,{compositeId:input.compositeId,tokenId:token.id,title:input.title},input.requestId,token.token)
   })
 }
@@ -149,7 +149,7 @@ export async function publicWaveInfo(waveId:string,token:string) {
   const w=await readWave(prisma,waveId)
   if(hashRecoveryToken(token)!==hashRecoveryToken(waveToken(w))) return hidden()
   let accepting=true
-  try {assertAdmission(w);await composite.getPublicCompositeInfo(token)} catch(e) {
+  try {assertAdmission(w);await composite.assertPublicCompositeAdmission(token)} catch(e) {
     const status=(e as {statusCode?:number}).statusCode
     if(!status || status<400 || status>=500)throw e
     accepting=false
@@ -269,7 +269,7 @@ export async function participantHome(studyId:string,credential:string) {
   await participant(prisma,studyId,credential)
   return {studyId,title:p.title,displayCode:p.displayCode,waves:rows,limitations:['身份码只用于本研究；同一研究内多次作答可关联。','历史个人报告不等于可比较的长期变化；不同测验、版本和条件不能直接作差。']}
 }
-export async function startStudyWave(studyId:string,waveId:string,credential:string,opts?:{wantsWholeDelivery?:boolean}) {
+export async function startStudyWave(studyId:string,waveId:string,credential:string,opts?:{wantsWholeDelivery?:boolean;knownTemplateHashes?:ReadonlySet<string>}) {
   const p=await participant(prisma,studyId,credential), w=await readWave(prisma,waveId)
   if(w.studyId!==studyId) return hidden()
   assertAdmission(w)
@@ -296,17 +296,19 @@ export async function startStudyWave(studyId:string,waveId:string,credential:str
       await tx.$executeRaw`INSERT INTO anonymous_study_attempts(study_id,wave_id,participant_id,attempt_id,admission_credential_hash,admission_attempt_epoch)
         VALUES(${studyId},${waveId},${p.id},${attemptId},${recovery.hash},${parent.attemptEpoch})`
     },
-  }, { wantsWholeDelivery: wantsWhole })
+  }, { wantsWholeDelivery: wantsWhole, knownTemplateHashes: opts?.knownTemplateHashes })
   await participant(prisma,studyId,credential)
   const wholeDefinition = ('wholeDefinition' in data && data.wholeDefinition) ? data.wholeDefinition : undefined
+  const wholeBinding = ('wholeBinding' in data && data.wholeBinding) ? data.wholeBinding : undefined
   return {
     attemptId: data.attempt.id,
     state: data.attempt.status,
     recoveryToken: recovery.token,
     ...(wholeDefinition ? { wholeDefinition } : {}),
+    ...(wholeBinding ? { wholeBinding } : {}),
   }
 }
-export async function recoverStudyWave(studyId:string,waveId:string,credential:string,opts?:{wantsWholeDelivery?:boolean}) {
+export async function recoverStudyWave(studyId:string,waveId:string,credential:string,opts?:{wantsWholeDelivery?:boolean;knownTemplateHashes?:ReadonlySet<string>}) {
   const p=await participant(prisma,studyId,credential), w=await readWave(prisma,waveId)
   if(w.studyId!==studyId) return hidden()
   const rows=await prisma.$queryRaw<Array<{id:string;state:string}>>`
@@ -319,10 +321,14 @@ export async function recoverStudyWave(studyId:string,waveId:string,credential:s
   if(!own) return hidden()
   await participant(prisma,studyId,credential)
   let wholeDefinition: unknown = undefined
+  let wholeBinding: unknown = undefined
   if (opts?.wantsWholeDelivery) {
-    const projected = await composite.projectStartedAttempt(own.id, { recoveryTokenHash: recovery.hash }, true, recovery.token)
+    const projected = await composite.projectStartedAttempt(own.id, { recoveryTokenHash: recovery.hash }, true, recovery.token, undefined, undefined, opts?.knownTemplateHashes)
     if ('wholeDefinition' in projected && projected.wholeDefinition) {
       wholeDefinition = projected.wholeDefinition
+    }
+    if ('wholeBinding' in projected && projected.wholeBinding) {
+      wholeBinding = projected.wholeBinding
     }
   }
   return {
@@ -330,6 +336,7 @@ export async function recoverStudyWave(studyId:string,waveId:string,credential:s
     state: rows[0].state,
     recoveryToken: recovery.token,
     ...(wholeDefinition ? { wholeDefinition } : {}),
+    ...(wholeBinding ? { wholeBinding } : {}),
   }
 }
 export async function revokeStudyIdentity(studyId:string,credential:string) {

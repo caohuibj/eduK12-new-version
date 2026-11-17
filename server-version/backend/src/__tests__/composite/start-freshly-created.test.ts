@@ -98,6 +98,7 @@ vi.mock('../../modules/training-materials/service', async (orig) => ({
 import {
   projectFreshStartedAttempt,
   projectStartedAttempt,
+  assertPublicCompositeAdmission,
   getPublicCompositeInfo,
   restartUserAttempt,
   startPublicAttempt,
@@ -427,6 +428,22 @@ describe('START freshlyCreated server distinction', () => {
     const next = await getPublicCompositeInfo(tokenValue)
     expect(next.usedCount).toBe(2)
     expect(next.items[0].label).toBe('updated label')
+  })
+
+  it('checks study admission without the presentation load, and still rejects an exhausted token', async () => {
+    const tokenValue = 'public-token-1'
+    const openToken = {
+      id: 'tok-1', tokenHash: hashPublicAccessToken(tokenValue), isActive: true,
+      expiresAt: new Date('2030-01-01T00:00:00Z'), maxUses: 10, usedCount: 1,
+      compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null, personalTracking: null },
+    }
+    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue(openToken)
+    await assertPublicCompositeAdmission(tokenValue)
+    expect(mocks.prisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
+    expect(mocks.prisma.$queryRaw).not.toHaveBeenCalled()
+    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({ ...openToken, maxUses: 1, usedCount: 1 })
+    await expect(assertPublicCompositeAdmission(tokenValue)).rejects.toMatchObject({ statusCode: 409 })
+    expect(mocks.prisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
   })
   it('rejects a forged recovery proof before publication preload, admission, or memory sampling', async () => {
     const tokenValue = 'public-token-1', recoveryToken = 'x'.repeat(43)
