@@ -6,7 +6,11 @@ import { createFinalDraftMeta, finalDraftStore } from '../../services/persistenc
 import type { CompositeAttemptState, WholeQuestionnaireDefinition, WholeQuestionnaireInput } from '../../modules/composite/types'
 const { retry } = vi.hoisted(() => ({ retry: vi.fn() }))
 vi.mock('../../services/persistence/finalDraftCapacityRetry', () => ({ runFinalDraftCapacityRetry: retry }))
-vi.mock('../../modules/assessment-media/AssessmentImageGate', () => ({ default: ({ children }: { children: ReactNode }) => children }))
+vi.mock('../../modules/assessment-media/AssessmentImageGate', () => ({ default: ({ children, items, loadAsset }: { children: ReactNode; items?: Array<{ asset?: { assetId?: string } }>; loadAsset?: (id: string) => Promise<Blob> }) => {
+  const assetId = items?.[0]?.asset?.assetId
+  if (assetId && loadAsset) void loadAsset(assetId)
+  return children
+} }))
 vi.mock('../../modules/assessment-media/ScaleFormVideoGate', () => ({ default: ({ children }: { children: ReactNode }) => children }))
 const key = wholeDraftKey('whole-attempt', 1)
 const definition = (counts = [100, 30, 30, 5, 5, 9, 35, 4]): WholeQuestionnaireDefinition => ({ attemptId: 'whole-attempt', attemptEpoch: 1, slotSetHash: 's'.repeat(64), contextSnapshotHash: 'context',
@@ -31,6 +35,19 @@ beforeEach(() => { vi.clearAllMocks(); retry.mockImplementation(async ({ operati
 afterEach(async () => { await finalDraftStore.delete(key); for (let i = 0; i < 8; i++) await finalDraftStore.delete(`composite-scale:child-${i}`) })
 
 describe('whole questionnaire durable browser submission', () => {
+  it('shows the stepped fallback for an all-at-once unit and loads a form option image', async () => {
+    render(<WholeCompositeQuestionnaire state={{ ...state, currentItem: { id: 'unit', type: 'SCALE', position: 0, required: true, presentationMode: 'ALL_AT_ONCE' } }} api={api()} fallback={<p>旧单元作答</p>} onCompleted={vi.fn()} onExit={vi.fn()} />)
+    expect(screen.getByText('旧单元作答')).toBeTruthy()
+    const image = { asset: { assetId: 'asset-1', contentHash: 'c'.repeat(64), mimeType: 'image/png' }, altText: '选项图', order: 0 }
+    const formDefinition = { attemptId: 'whole-attempt', attemptEpoch: 1, slotSetHash: 's'.repeat(64), contextSnapshotHash: null, units: [], formSections: [{ id: 'section', title: '表单', description: null, contextSection: false, definitionHash: 'd'.repeat(16), items: [{ id: 'field', formType: 'single_choice', formLabel: '带图选项', formPlaceholder: null, required: false, formOptions: [{ value: 'a', label: '甲', images: [image] }] }] }] }
+    const loadFormImage = vi.fn(async () => new Blob())
+    const client = api()
+    client.wholeDefinition.mockResolvedValue({ code: 0, data: formDefinition })
+    render(<WholeCompositeQuestionnaire state={{ ...state, isFreshStart: true } as CompositeAttemptState} isFreshStart api={client} educationMedia={{ loadScaleImage: vi.fn(), loadScaleVideo: vi.fn(), loadFormImage, loadFormVideo: vi.fn() }} fallback={<p>旧单元作答</p>} onCompleted={vi.fn()} onExit={vi.fn()} />)
+    await screen.findByText('带图选项')
+    await waitFor(() => expect(loadFormImage).toHaveBeenCalledWith('section', 'asset-1'))
+  })
+
   it('restores 218 answers with repeated question codes, sends one HTTP body, and clears only after the durable receipt', async () => {
     const d = definition(), client = api(), completed = vi.fn()
     await seed(d)

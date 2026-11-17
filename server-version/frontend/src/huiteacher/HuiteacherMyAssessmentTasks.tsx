@@ -142,6 +142,22 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
  const situational=useMemo(()=>parentId&&child?.type==='SITUATIONAL'&&child.situationalAttemptId
   ?createTeacherSituationalClient(api,parentId,child.id,child.situationalAttemptId):null,[api,parentId,child])
  const media=useMemo(()=>attempt?.currentItem?createTeacherAssessmentMediaTransport(api,attempt.id,attempt.currentItem):undefined,[api,attempt])
+ const wholeApi=useMemo(()=>attempt?{
+  wholeDefinition:async(id:string)=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole')}),
+  submitWhole:async(id:string,input:WholeQuestionnaireInput)=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole/submit','POST',input)}),
+  wholeReceipt:async(id:string,submissionId:string,attemptEpoch:number)=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole/receipt?submissionId='+encodeURIComponent(submissionId)+'&attemptEpoch='+attemptEpoch)}),
+  reportStatus:async(id:string)=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole/progress')}),
+ }:null,[api,attempt?.id])
+ const educationMedia=useMemo(()=>{
+  if(!attempt)return undefined
+  const root=teacherAssessmentParentPath(attempt.id)
+  return {
+   loadScaleImage:(itemId:string,assetId:string)=>api<Blob>(root+'/items/'+encodeURIComponent(itemId)+'/scale/assets/'+encodeURIComponent(assetId)+'/content','GET',undefined,{responseType:'blob'}),
+   loadScaleVideo:(itemId:string,itemCode:string)=>api<AssessmentVideoCapabilitySources>(root+'/items/'+encodeURIComponent(itemId)+'/scale/items/'+encodeURIComponent(itemCode)+'/video-capability','POST',{}),
+   loadFormImage:(sectionId:string,assetId:string)=>api<Blob>(root+'/form-sections/'+encodeURIComponent(sectionId)+'/assets/'+encodeURIComponent(assetId)+'/content','GET',undefined,{responseType:'blob'}),
+   loadFormVideo:(sectionId:string,itemId:string,optionIndex:number)=>api<AssessmentVideoCapabilitySources>(root+'/form-sections/'+encodeURIComponent(sectionId)+'/items/'+encodeURIComponent(itemId)+'/options/'+optionIndex+'/video-capability','POST',{}),
+  }
+ },[api,attempt])
  const submit=async(id:string,unitId:string,type:'scale'|'form',payload:unknown)=>{
   const source=active.current,token=generation.current
   if(!source?.attempt||source.attempt.id!==id||source.completion||source.child
@@ -159,6 +175,11 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
   if(item.type==='COGNITIVE'&&!item.cognitiveSession?.sessionId||item.type==='SITUATIONAL'&&!item.situationalAttemptId){setError('当前子测评缺少冻结运行记录');return}
   setSession({...source,child:item})
  }
+ const stepped=attempt?<FinalCompositeAssessment key={attempt.id+':'+(attempt.currentItem?.id??'')} state={attempt} campusMode mediaTransport={media}
+  submitScale={(id,itemId,input)=>submit(id,itemId,'scale',input)}
+  submitFormSection={(id,sectionId,input)=>submit(id,sectionId,'form',input)}
+  onReload={reload} onCompleted={()=>{void execute(valid=>load(session.task,attempt.id,valid))}} onExit={leave}
+  onEnterCognitive={enterChild} onEnterSituational={enterChild}/>:null
  return <section className={unified?'ht-assessment-source':'ht-panel'} aria-label={unified?undefined:student?'学生评教普通问卷':'教师认知情境与组合测评'}>
   {!unified&&<h2>我的测评任务</h2>}
   {!unified&&list.pending&&<p role="status">正在读取任务…</p>}
@@ -187,26 +208,12 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
      child?.type==='SITUATIONAL'&&child.situationalAttemptId&&attempt&&situational?
       <MemoryRouter key={actorKey+':'+child.situationalAttemptId}><SituationalRunner host={{attemptId:child.situationalAttemptId,parentAttemptId:attempt.id,
        compositeItemId:child.id,instructionsSummary:'作答说明',client:situational,onCompleted:childFinished}}/></MemoryRouter>:
-     attempt?.executionMode==='WHOLE_LOCAL'&&!child?<WholeCompositeQuestionnaire state={attempt} fallback={null} onExit={leave}
+     attempt?.executionMode==='WHOLE_LOCAL'&&!child&&wholeApi&&educationMedia?<WholeCompositeQuestionnaire state={attempt} fallback={stepped} api={wholeApi} educationMedia={educationMedia} onExit={leave}
       acceptedNotice="答案已保存，正在处理。完成状态以服务器确认的测评记录为准，交卷回执不会开放个人报告。"
       acceptedAction="查看完成状态"
       committedMessage="答案已保存，正在处理。请勿重复交卷。"
-      educationMedia={{
-        loadScaleImage:(itemId,assetId)=>api<Blob>(teacherAssessmentParentPath(attempt.id)+'/items/'+encodeURIComponent(itemId)+'/scale/assets/'+encodeURIComponent(assetId)+'/content','GET',undefined,{responseType:'blob'}),
-        loadScaleVideo:(itemId,itemCode)=>api<AssessmentVideoCapabilitySources>(teacherAssessmentParentPath(attempt.id)+'/items/'+encodeURIComponent(itemId)+'/scale/items/'+encodeURIComponent(itemCode)+'/video-capability','POST',{}),
-      }}
-      api={{
-        wholeDefinition:async id=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole')}),
-        submitWhole:async(id,input:WholeQuestionnaireInput)=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole/submit','POST',input)}),
-        wholeReceipt:async(id,submissionId,attemptEpoch)=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole/receipt?submissionId='+encodeURIComponent(submissionId)+'&attemptEpoch='+attemptEpoch)}),
-        reportStatus:async id=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole/progress')}),
-      }}
       onCompleted={()=>{void reload()}}
-    />:attempt?<FinalCompositeAssessment key={attempt.id+':'+(attempt.currentItem?.id??'')} state={attempt} campusMode mediaTransport={media}
-      submitScale={(id,itemId,input)=>submit(id,itemId,'scale',input)}
-      submitFormSection={(id,sectionId,input)=>submit(id,sectionId,'form',input)}
-      onReload={reload} onCompleted={()=>{void execute(valid=>load(session.task,attempt.id,valid))}} onExit={leave}
-      onEnterCognitive={enterChild} onEnterSituational={enterChild}/>:
+    />:stepped??
      <div><h3>{session.task.title}</h3>
       {session.task.consentRequired&&!session.task.runtimeBindingRef&&<div>
        <p>用途：{session.task.consentPurpose??'本次正式测评'}</p><p>可见性：{session.task.consentVisibility??'按任务授权范围'}</p>

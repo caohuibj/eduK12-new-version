@@ -9,9 +9,10 @@ import { sessionFetch } from '../api/client'
 import type { ApiResponse } from '../types'
 import type { CompositeAttemptState, CompositeReportStatus, WholeQuestionnaireDefinition, WholeQuestionnaireInput, WholeQuestionnaireReceipt, WholeQuestionnaireFormSection, WholeQuestionnaireFormSectionItem } from '../modules/composite/types'
 import AssessmentImageGate from '../modules/assessment-media/AssessmentImageGate'
+import FormOptionVideoGroupGate from '../modules/assessment-media/FormOptionVideoGroupGate'
 import ScaleFormVideoGate from '../modules/assessment-media/ScaleFormVideoGate'
-import { assessmentImageItems } from '../modules/assessment-media/adapter'
-import { scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
+import { assessmentImageItems, assessmentOptionImageItems } from '../modules/assessment-media/adapter'
+import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
 import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
 import { readScaleDeviceInputProvenance, resolveScaleDeviceInputProvenance, type DeviceInputProvenanceV1 } from '../modules/scale/device-input-provenance'
 import { createFinalDraftMeta, finalDraftStore, type FinalDraftMeta } from '../services/persistence/finalDraftStore'
@@ -25,6 +26,7 @@ import { FormPlayer, type FormPlayerValue } from './questionnaire/FormPlayer'
 import { useLocalDraftSaveQueue } from './questionnaire/useLocalDraftSaveQueue'
 import type { CompositeScaleRunnerItem } from '../modules/composite/types'
 import type { AssessmentVideoCapabilitySources } from '../modules/assessment-media/types'
+import type { PublicMaterial } from '../modules/assessment-media/material'
 
 export interface WholeQuestionnaireApi {
   wholeReceipt?: (id: string, submissionId: string, attemptEpoch: number) => Promise<ApiResponse<WholeReceiptLookup>>
@@ -35,6 +37,8 @@ export interface WholeQuestionnaireApi {
 type EducationWholeMedia = {
   loadScaleImage: (itemId: string, assetId: string) => Promise<Blob>
   loadScaleVideo: (itemId: string, itemCode: string) => Promise<AssessmentVideoCapabilitySources>
+  loadFormImage: (sectionId: string, assetId: string) => Promise<Blob>
+  loadFormVideo: (sectionId: string, itemId: string, optionIndex: number) => Promise<AssessmentVideoCapabilitySources>
 }
 type Props = { state: CompositeAttemptState; api: WholeQuestionnaireApi; publicMode?: boolean; recoveryToken?: string; isFreshStart?: boolean; fallback: ReactNode; onExit: () => void; onCompleted: () => void; educationMedia?: EducationWholeMedia; acceptedNotice?: string; acceptedAction?: string; committedMessage?: string }
 type Answer = { responseValue?: string | number; value?: unknown; responseTimeMs?: number; changeCount?: number; otherText?: string }
@@ -87,15 +91,15 @@ function parseFormOptions(
   formDef?: WholeQuestionnaireFormSectionItem['formDefinition']
 ): Array<{ value: string; label: string }> {
   if (formDef && (formDef as any).options && Array.isArray((formDef as any).options) && (formDef as any).options.length > 0) {
-    return (formDef as any).options.map((o: any) => ({ value: String(o.optionKey ?? o.value ?? ''), label: String(o.label ?? '') }))
+    return (formDef as any).options.map((o: any) => ({ value: String(o.optionKey ?? o.value ?? ''), label: String(o.label ?? ''), ...(o.images !== undefined ? { images: o.images } : {}), ...(o.video !== undefined ? { video: o.video } : {}) }))
   }
   if (Array.isArray(rawOptions)) {
-    return rawOptions.map((o: any) => ({ value: String(o.value ?? o.optionKey ?? ''), label: String(o.label ?? '') }))
+    return rawOptions.map((o: any) => ({ value: String(o.value ?? o.optionKey ?? ''), label: String(o.label ?? ''), ...(o.images !== undefined ? { images: o.images } : {}), ...(o.video !== undefined ? { video: o.video } : {}) }))
   }
   if (typeof rawOptions === 'string') {
     try {
       const parsed = JSON.parse(rawOptions)
-      if (Array.isArray(parsed)) return parsed.map((o: any) => ({ value: String(o.value ?? o.optionKey ?? ''), label: String(o.label ?? '') }))
+      if (Array.isArray(parsed)) return parsed.map((o: any) => ({ value: String(o.value ?? o.optionKey ?? ''), label: String(o.label ?? ''), ...(o.images !== undefined ? { images: o.images } : {}), ...(o.video !== undefined ? { video: o.video } : {}) }))
     } catch { /* ignore */ }
   }
   return []
@@ -455,6 +459,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   const unitPath = current && current.kind === 'SCALE' ? `${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(current.unit.itemId)}/scale` : ''
   const loadImage = useCallback(async (assetId: string) => {
     if (educationMedia && current?.kind === 'SCALE') return educationMedia.loadScaleImage(current.unit.itemId, assetId)
+    if (educationMedia && current?.kind === 'FORM') return educationMedia.loadFormImage(current.section.id, assetId)
     const response = await sessionFetch(`${unitPath}/assets/${encodeURIComponent(assetId)}/content`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken || '' } } : undefined)
     if (!response.ok) throw new Error(`视觉内容加载失败 (${response.status})`)
     return response.blob()
@@ -538,7 +543,9 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
               </AssessmentImageGate>
             </>
           ) : (
-            <FormPlayer
+            (() => {
+              const options = parseFormOptions(current.item.formOptions, current.item.formDefinition)
+              const player = <FormPlayer
               scopeKey={`${draftKey}:${current.section.id}:${checkpointRestoreGeneration}`}
               autoAdvance={isTrainingHost() && !publicMode}
               item={{
@@ -550,7 +557,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
                 formDefinition: current.item.formDefinition,
                 formPolicy: current.item.formPolicy as any,
               }}
-              options={parseFormOptions(current.item.formOptions, current.item.formDefinition)}
+              options={options}
               value={answers[wholeFormAnswerKey(current.section.id, current.item.id)]?.value as FormPlayerValue}
               otherText={answers[wholeFormAnswerKey(current.section.id, current.item.id)]?.otherText}
               onOtherTextChange={text => saveFormOtherText(current.section.id, current.item.id, text)}
@@ -566,6 +573,17 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
               submitLabel="提交整份问卷"
               submitting={busy}
             />
+              if (!educationMedia) return player
+              const materials = (current.item.formDefinition as { materials?: PublicMaterial[] } | null | undefined)?.materials
+              return <>
+                <TrainingMaterials items={materials} loadAsset={loadImage}/>
+                <AssessmentImageGate items={assessmentOptionImageItems(options)} loadAsset={loadImage} disabled={busy}>
+                  <FormOptionVideoGroupGate entries={formOptionVideoPresentations(options)} loadSources={entry => educationMedia.loadFormVideo(current.section.id, current.item.id, entry.optionIndex)}>
+                    {player}
+                  </FormOptionVideoGroupGate>
+                </AssessmentImageGate>
+              </>
+            })()
           )}
         </div> : <button type="button" className="btn-secondary min-h-11" onClick={() => setLoadRound(prior => prior + 1)}>重新加载整卷草稿</button>}
   </AssessmentShell>

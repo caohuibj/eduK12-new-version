@@ -45,6 +45,14 @@ async function open(){await screen.findByText(task.title);fireEvent.click(screen
 function deferred<T>(){let resolve!:(value:T)=>void;const promise=new Promise<T>(yes=>{resolve=yes});return {promise,resolve}}
 
 describe('Teacher participant host with synthetic runtime DTOs',()=>{
+  it('returns an all-at-once whole unit to the existing stepped runner',async()=>{
+    const current={...item('SCALE'),presentationMode:'ALL_AT_ONCE' as const}
+    const whole={...state('SCALE'),executionMode:'WHOLE_LOCAL' as const,currentItem:current}
+    render(<HuiteacherMyAssessmentTasks api={fixture([whole]) as EducationReportApi} actorKey="teacher"/>)
+    await open()
+    expect(await screen.findByText('共享单元：SCALE')).toBeTruthy()
+  })
+
  it('runs Cognitive, SJT, Scale and Form transports and completes only after a fresh parent COMPLETED',async()=>{
   const api=fixture([state('COGNITIVE'),state('SITUATIONAL'),state('SCALE'),state('FORM_SECTION'),state(null,'COMPLETED')]),onCompleted=vi.fn()
   render(<HuiteacherMyAssessmentTasks api={api as EducationReportApi} actorKey="teacher" onCompleted={onCompleted} renderFeedback={completion=><p>授权反馈入口：{completion.executionId}</p>}/>)
