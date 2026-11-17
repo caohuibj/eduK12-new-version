@@ -10,7 +10,8 @@ import { prisma } from '../../config/database'
 import { classifyStartTransaction, isAssessmentStartBusyError, AssessmentStartBusyError, rolledBackStartReason, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from '../composite/start-transient'
 import { BoundedAdmissionGate, configuredInteger } from '../../services/boundedAdmissionGate'
 import { defaultStartAdmissionBound } from '../../config/databasePool'
-import { startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
+import { buildWholeStartPreload, startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
+import { isAssessmentStartResourceConstrained, runWithLowMemoryTrickleAdmission } from '../../services/assessmentResourceProtection'
 import {resolvePublishedTeacherForm,teacherFormResourceRef,
   TEACHER_FORM_RUNTIME_KIND} from '../huiteacher/formRunResource'
 import {studentFormResourceId,assertStudentFormRunUse} from '../huiteacher/studentFormResource'
@@ -370,7 +371,19 @@ const startTransactionalComposite = async (input: {
   await markRunStartClaimCompleted(tx, { claimId: input.decision.claim.id, generation: input.decision.claim.claimGeneration })
   await assertTrainingPrivateReferenceAdmissionCurrent(tx)
   if(libraryUses)await assertEducationLibraryUses(tx,libraryUses.context,libraryUses.entryIds,{locked:libraryUses.uses,requireLocked:true})
-  return { state: 'STARTED' as const, runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: attempt.id, replayed: false }
+  const result: RunStartExecutionResult = {
+    state: 'STARTED',
+    runtimeBindingKind: 'COMPOSITE',
+    runtimeBindingRef: attempt.id,
+    replayed: false,
+  }
+  const sourceComposite = (attempt as any)._startComposite
+  if (sourceComposite) {
+    Object.defineProperty(result, '_educationWholePreload', {
+      value: buildWholeStartPreload(attempt, (attempt as any)._freshScaleChildren, sourceComposite),
+    })
+  }
+  return result
     }, START_INTERACTIVE_TRANSACTION))
   } catch (err) {
     if (!isAssessmentStartBusyError(err)) throw err
@@ -577,82 +590,126 @@ const recoverOrDispatchExternal = async (input: {
   }
 }
 
+const readExistingBoundExecution = async (
+  executionId: string,
+  actorUserId: string,
+): Promise<RunStartExecutionResult | null> => {
+  const rows = await prisma.$queryRaw<Array<{
+    runtimeBindingKind: string | null
+    runtimeBindingRef: string | null
+    respondentUserId: string
+  }>>`
+    SELECT e."runtime_binding_kind" AS "runtimeBindingKind",
+      e."runtime_binding_ref" AS "runtimeBindingRef",
+      respondent."user_id" AS "respondentUserId"
+    FROM "assessment_run_executions" e
+    JOIN "assessment_run_actor_snapshots" respondent
+      ON respondent."organization_id" = e."organization_id"
+      AND respondent."run_id" = e."run_id"
+      AND respondent."id" = e."respondent_actor_snapshot_id"
+    WHERE e."id" = ${executionId}
+    LIMIT 1
+  `
+  const row = rows[0]
+  if (row && row.respondentUserId === actorUserId && row.runtimeBindingKind && row.runtimeBindingRef) {
+    return {
+      state: 'STARTED',
+      runtimeBindingKind: row.runtimeBindingKind,
+      runtimeBindingRef: row.runtimeBindingRef,
+      replayed: true,
+    }
+  }
+  return null
+}
+
 export const startAssessmentRunExecution = async (input: {
   executionId: string
   actorUserId: string
   resourceRegistry?: RunResourceAuthorityRegistry
   runtimeAdapters?: RunRuntimeAdapterRegistry
 }): Promise<RunStartExecutionResult> => {
-  try {
-    return await runStartGate().run(async () => {
-      // The claim transaction is the first durable step of a Run START. Its own
-      // rolled-back outcomes (P2028 maxWait, serialization/deadlock/lock-timeout)
-      // leave no claim, audit or provenance rows behind, so they share the same
-      // safe-retry 503 contract as the runtime dispatch transaction.
-      const decision = await classifyStartTransaction(() => acquireRunExecutionStartClaim({ executionId: input.executionId, actorUserId: input.actorUserId, resourceRegistry: input.resourceRegistry }))
-      if (decision.kind === 'BOUND') {
-        return {
-          state: 'STARTED',
-          runtimeBindingKind: decision.runtimeBindingKind,
-          runtimeBindingRef: decision.runtimeBindingRef,
-          replayed: true,
+  const executeRunStart = async (): Promise<RunStartExecutionResult> => {
+    try {
+      return await runStartGate().run(async () => {
+        // The claim transaction is the first durable step of a Run START. Its own
+        // rolled-back outcomes (P2028 maxWait, serialization/deadlock/lock-timeout)
+        // leave no claim, audit or provenance rows behind, so they share the same
+        // safe-retry 503 contract as the runtime dispatch transaction.
+        const decision = await classifyStartTransaction(() => acquireRunExecutionStartClaim({ executionId: input.executionId, actorUserId: input.actorUserId, resourceRegistry: input.resourceRegistry }))
+        if (decision.kind === 'BOUND') {
+          return {
+            state: 'STARTED',
+            runtimeBindingKind: decision.runtimeBindingKind,
+            runtimeBindingRef: decision.runtimeBindingRef,
+            replayed: true,
+          }
         }
-      }
-      if (decision.kind === 'IN_PROGRESS') return { state: 'IN_PROGRESS', operationKey: decision.claim.operationKey }
-      if (decision.kind === 'ABORTED') throw new RunStartExecutionError('RUN_START_ABORTED', 'Run START was aborted by lifecycle arbitration', 409)
+        if (decision.kind === 'IN_PROGRESS') return { state: 'IN_PROGRESS', operationKey: decision.claim.operationKey }
+        if (decision.kind === 'ABORTED') throw new RunStartExecutionError('RUN_START_ABORTED', 'Run START was aborted by lifecycle arbitration', 409)
 
-      // The claim transaction already committed, so a pool timeout on this
-      // non-transactional read is NOT covered by the single-transaction safety
-      // condition of rolledBackStartReason — but the retry still provably
-      // recovers the same attempt: nothing from the dispatch committed
-      // (dispatch never started), the claim is undispatched, and the existing
-      // lease-release helper shortens the CLAIMED claim's lease so the retry
-      // takes over through the generation CAS with the same operationKey and
-      // frozen admission (or, when the lease cannot be shortened, reports the
-      // real remaining wait instead of a blind 1s retry). Without the release,
-      // the retry would hit IN_PROGRESS until the 30s lease expires.
-      let launch: LaunchEnvelope
-      try {
-        launch = await readLaunchEnvelope(prisma, input.executionId)
-      } catch (err) {
-        const reason = rolledBackStartReason(err)
-        if (!reason) throw err
-        throw await releaseClaimAfterRolledBackDispatch(decision.claim, new AssessmentStartBusyError(reason))
-      }
-      const resourceRegistry = input.resourceRegistry ?? productionRunResourceAuthorityRegistry
-      const resourceAdapter = resourceRegistry.assertStartSupported(launch.family)
-      if (resourceAdapter.capabilities.transactionMode === 'TRANSACTIONAL_DB') {
-        if (launch.runtimeTargetKind===TEACHER_FORM_RUNTIME_KIND&&launch.family==='FORM')
-          return startTransactionalTeacherForm({
-            decision,executionId:input.executionId,actorUserId:input.actorUserId,launch,
-          })
-        if (launch.runtimeTargetKind !== 'COMPOSITE') {
-          throw new RunStartExecutionError('RUN_RUNTIME_TARGET_UNSUPPORTED', 'transactional Run adapter supports Composite runtime only', 409)
-        }
-        let preloadedComposite: any
+        // The claim transaction already committed, so a pool timeout on this
+        // non-transactional read is NOT covered by the single-transaction safety
+        // condition of rolledBackStartReason — but the retry still provably
+        // recovers the same attempt: nothing from the dispatch committed
+        // (dispatch never started), the claim is undispatched, and the existing
+        // lease-release helper shortens the CLAIMED claim's lease so the retry
+        // takes over through the generation CAS with the same operationKey and
+        // frozen admission (or, when the lease cannot be shortened, reports the
+        // real remaining wait instead of a blind 1s retry). Without the release,
+        // the retry would hit IN_PROGRESS until the 30s lease expires.
+        let launch: LaunchEnvelope
         try {
-          const { loadStartComposite } = await import('../composite/composite.service')
-          preloadedComposite = await loadStartComposite(launch.runtimeTargetRef)
-        } catch {
-          // Fallback to in-transaction load if preloading fails
+          launch = await readLaunchEnvelope(prisma, input.executionId)
+        } catch (err) {
+          const reason = rolledBackStartReason(err)
+          if (!reason) throw err
+          throw await releaseClaimAfterRolledBackDispatch(decision.claim, new AssessmentStartBusyError(reason))
         }
-        return startTransactionalComposite({
+        const resourceRegistry = input.resourceRegistry ?? productionRunResourceAuthorityRegistry
+        const resourceAdapter = resourceRegistry.assertStartSupported(launch.family)
+        if (resourceAdapter.capabilities.transactionMode === 'TRANSACTIONAL_DB') {
+          if (launch.runtimeTargetKind===TEACHER_FORM_RUNTIME_KIND&&launch.family==='FORM')
+            return startTransactionalTeacherForm({
+              decision,executionId:input.executionId,actorUserId:input.actorUserId,launch,
+            })
+          if (launch.runtimeTargetKind !== 'COMPOSITE') {
+            throw new RunStartExecutionError('RUN_RUNTIME_TARGET_UNSUPPORTED', 'transactional Run adapter supports Composite runtime only', 409)
+          }
+          let preloadedComposite: any
+          try {
+            const { loadStartComposite } = await import('../composite/composite.service')
+            preloadedComposite = await loadStartComposite(launch.runtimeTargetRef)
+          } catch {
+            // Fallback to in-transaction load if preloading fails
+          }
+          return startTransactionalComposite({
+            decision,
+            executionId: input.executionId,
+            actorUserId: input.actorUserId,
+            launch,
+            preloadedComposite,
+          })
+        }
+        return recoverOrDispatchExternal({
           decision,
           executionId: input.executionId,
           actorUserId: input.actorUserId,
           launch,
-          preloadedComposite,
+          runtimeAdapters: input.runtimeAdapters ?? productionRunRuntimeAdapterRegistry,
         })
-      }
-      return recoverOrDispatchExternal({
-        decision,
-        executionId: input.executionId,
-        actorUserId: input.actorUserId,
-        launch,
-        runtimeAdapters: input.runtimeAdapters ?? productionRunRuntimeAdapterRegistry,
       })
-    })
-  } catch (err) {
-    throw rethrowGateBusyAsStartBusy(err)
+    } catch (err) {
+      throw rethrowGateBusyAsStartBusy(err)
+    }
   }
+
+  // Already-bound replays never allocate a new frozen runtime and bypass
+  // low-memory trickle/rejection (Decision D-1/D-3); new starts consult the
+  // host resource guard before claim TX1, publication loads, and dispatch TX2.
+  if (isAssessmentStartResourceConstrained()) {
+    const bound = await readExistingBoundExecution(input.executionId, input.actorUserId)
+    if (bound) return bound
+    return runWithLowMemoryTrickleAdmission(executeRunStart)
+  }
+  return executeRunStart()
 }

@@ -3240,8 +3240,9 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
     },
   )
   // Reuse the exact input rows only after createMany succeeded. No child
-  // reread is needed for the fresh, untimed whole projection.
-  if (pendingScales.length === requiredScaleItems.length && pendingScales.length > 0) {
+  // reread is needed for the fresh, untimed whole projection (including
+  // Form-only composites where requiredScaleItems is empty).
+  if (pendingScales.length === requiredScaleItems.length) {
     Object.defineProperty(runtime, '_freshScaleChildren', { value: pendingScales.map(entry => {
       const child = {
         ...entry.data, questionnaireAssessmentId: null,
@@ -3865,14 +3866,17 @@ const createAttempt = async (
         definitionHash: formSectionIdentityHash(compositeFormSectionRuntimeDefinition(section)),
       })),
     })
+    const frozenActiveSlotSetEncrypted = await storeFrozenActiveSlotSet(frozenActiveSlotSet, db)
     await db.compositeAssessmentAttempt.update({
       where: { id: attempt.id },
       data: {
         ...(flowCandidate ? (()=>{const snapshot={...flowCandidate.snapshot,...(materialAssignment?{schemaVersion:2,materialAssignment}:{}),slotSetHash:frozenActiveSlotSet.snapshotHash};return {trainingFlowSnapshotEncrypted:encryptUnifiedRuntimePayload(snapshot),trainingFlowSnapshotHash:canonicalHash(snapshot)}})():{}),
-        frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet, db),
+        frozenActiveSlotSetEncrypted,
         frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
       },
     })
+    attempt.frozenActiveSlotSetEncrypted = frozenActiveSlotSetEncrypted
+    attempt.frozenActiveSlotSetHash = frozenActiveSlotSet.snapshotHash
   }
   if(materialAssignment){
     await ensureTrainingFlowCurrentChildInTransaction(db as Prisma.TransactionClient,attempt.id,userId?{userId}:{recoveryTokenHash:credential!.hash})
@@ -3881,9 +3885,14 @@ const createAttempt = async (
   await contentCandidate?.recheckSourceLicenses()
   await assertTrainingPrivateReferenceAdmissionCurrent(db as Prisma.TransactionClient)
   const children = (runtime as any)._freshScaleChildren
+  const wholePreloadEligibleProduct = composite.productKind === 'QUESTIONNAIRE'
+    || (composite.productKind === 'ORGANIZATION_RESOURCE' && !composite.reportPackageKey && !composite.analysisProtocolKey)
   if (children && assessmentReportConfig().wholeSubmitEnabled && attempt.frozenActiveSlotSetHash
-    && composite.productKind === 'QUESTIONNAIRE' && composite.trainingTimingPolicy == null
-    && attempt.trainingTimingSnapshot == null && !formSections.length && composite.items.every((item:any)=>item.type === 'SCALE')
+    && wholePreloadEligibleProduct && composite.trainingTimingPolicy == null
+    && attempt.trainingTimingSnapshot == null
+    && composite.items.every((item: any) => item.type === 'SCALE' || item.type === 'FORM')
+    && !formSections.some((section: any) => compositeSectionHasContext(section))
+    && !composite.items.some((item: any) => item.type === 'FORM' && Boolean(item.contextKey))
     && composite.trainingVariantFrozen == null && composite.trainingVariantDigest == null && !flowEnabled) {
     Object.defineProperty(attempt, '_startComposite', { value: composite })
     Object.defineProperty(attempt, '_freshScaleChildren', { value: children })
@@ -4057,7 +4066,7 @@ export const projectFreshStartedAttempt = async (
   }
 }
 
-const buildWholeStartPreload = (attempt: any, children: any[] | undefined, source: any) => {
+export const buildWholeStartPreload = (attempt: any, children: any[] | undefined, source: any) => {
   if (!children || !source) return { parent: undefined, preloadedState: undefined }
   const parent = {
     ...attempt,

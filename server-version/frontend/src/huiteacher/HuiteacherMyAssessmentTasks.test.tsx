@@ -4,6 +4,7 @@ import type {EducationReportApi} from '../components/education-tools/EducationSc
 import type {CompositeAttemptState,CompositeCurrentItem} from '../modules/composite/types'
 import {HuiteacherMyAssessmentTasks} from './HuiteacherMyAssessmentTasks'
 import type {TeacherAssessmentTask} from './assessmentRuntime.client'
+import {clearWholeQuestionnaireTemplateCacheForTest} from '../modules/composite/whole-definition-source'
 
 vi.mock('./TeacherAssessmentPage',()=>({TeacherAssessmentPage:({children}:{children:React.ReactNode})=><>{children}</>}))
 vi.mock('../components/FinalCompositeAssessment',()=>({default:(props:{state:CompositeAttemptState;onEnterCognitive:(item:CompositeCurrentItem)=>void;
@@ -181,5 +182,42 @@ describe('Teacher participant host with synthetic runtime DTOs',()=>{
   await screen.findByText('合成进度读取失败');expect(onCompleted).not.toHaveBeenCalled()
   fireEvent.click(screen.getByRole('button',{name:'重新核对任务进度'}));await screen.findByText('共享单元：COGNITIVE')
   expect(api.mock.calls.some(call=>call[0].includes('/submit'))).toBe(false)
+ })
+ it('renders WHOLE_LOCAL fresh start-assessment from inline wholeDefinition without /whole or /whole/progress and advertises knownTemplateHash',async()=>{
+  clearWholeQuestionnaireTemplateCacheForTest()
+  const templateHash='a'.repeat(64)
+  const slotSetHash='b'.repeat(64)
+  const assigned:TeacherAssessmentTask={...task,status:'ASSIGNED',runtimeBindingRef:null,consentRequired:false}
+  const wholeDef={
+   attemptId:'parent',attemptEpoch:1,slotSetHash,contextSnapshotHash:null,templateHash,
+   units:[{itemId:'unit-1',scaleAssessmentId:'scale-1',definitionHash:'d'.repeat(64),scale:{id:'s-1',name:'教师整卷量表',
+    definition:{schemaVersion:2,respondentType:'participant_self_report',display:{randomizeItems:false},
+     items:[{itemCode:'q1',content:'教师整卷第一题',type:'single',required:true,sortOrder:0,responseSetKey:'r',randomizeOptions:false,options:[{value:1,label:'同意'}]}]}}}],
+  }
+  const api=vi.fn(async(path:string)=>{
+   if(path.startsWith('/my-assessment-tasks'))return {list:[assigned],nextCursor:null}
+   if(path.includes('/start-assessment'))return {
+    state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent',replayed:false,freshlyCreated:true,
+    currentUnit:{...state('SCALE'),attemptEpoch:1,contextSnapshotHash:null,executionMode:'WHOLE_LOCAL'},
+    wholeDefinition:wholeDef,
+   }
+   throw new Error('unexpected GET after inline teacher whole START: '+path)
+  })
+  try{
+   render(<HuiteacherMyAssessmentTasks api={api as EducationReportApi} actorKey="teacher"/>)
+   fireEvent.click(await screen.findByRole('button',{name:'开始测评'}))
+   fireEvent.click(screen.getByRole('button',{name:'开始或继续测评'}))
+   expect(await screen.findByText('教师整卷第一题')).toBeInTheDocument()
+   expect(api.mock.calls.map(c=>c[0])).toEqual(['/my-assessment-tasks','/run-executions/execution/start-assessment'])
+
+   cleanup()
+   render(<HuiteacherMyAssessmentTasks api={api as EducationReportApi} actorKey="teacher"/>)
+   fireEvent.click(await screen.findByRole('button',{name:'开始测评'}))
+   fireEvent.click(screen.getByRole('button',{name:'开始或继续测评'}))
+   await screen.findByText('教师整卷第一题')
+   expect(api.mock.calls[api.mock.calls.length - 1]?.[0]).toBe(`/run-executions/execution/start-assessment?knownTemplateHash=${templateHash}`)
+  }finally{
+   clearWholeQuestionnaireTemplateCacheForTest()
+  }
  })
 })

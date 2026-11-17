@@ -13,6 +13,8 @@ import {isUnitSubmitAdmissionBusyError} from '../../services/unitSubmitAdmission
 import {isQuestionnaireCompletionAdmissionBusyError,isTransientCompletionDatabaseError} from '../../services/questionnaireCompletionAdmission'
 import {startAssessmentRunExecution} from '../assessment-run/startExecution'
 import {isAssessmentStartBusyError} from '../composite/start-transient'
+import {isAssessmentStartResourceGateError} from '../../services/assessmentResourceProtection'
+import {parseKnownTemplateHashes} from '../composite/whole-start-inline'
 import {acceptRunExecutionConsent} from '../assessment-run/consent'
 import {relationalRuntimeConsentAuthority} from '../assessment-relational/runtime-consent'
 import {compositeController} from '../composite/composite.controller'
@@ -62,6 +64,11 @@ function runtimeError(error:unknown,res:Response,next:NextFunction){
  if(isUnitSubmitAdmissionBusyError(error))return assessmentSubmitBusy(res,error.retryAfterSeconds)
  if(isQuestionnaireCompletionAdmissionBusyError(error))return completionBusy(res,error.retryAfterSeconds)
  if(isTransientCompletionDatabaseError(error))return completionBusy(res,1)
+ if(isAssessmentStartResourceGateError(error)){
+  const preferred=(error as {preferredRetryAfterSeconds?:number}).preferredRetryAfterSeconds
+  res.setHeader('Retry-After',String(preferred??10))
+  return instrumentError(res,error.code,error.message,error.statusCode)
+ }
  if(isInstrumentFinalSubmitError(error))return instrumentError(res,error.code,error.message,error.statusCode)
  if(isAssessmentStartBusyError(error)){
   res.setHeader('Retry-After',String(error.retryAfterSeconds))
@@ -137,6 +144,7 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   const executionId=uuid.parse(req.params.executionId),proof=await access.own(req.user!.userId,{executionId})
   // Resume the exact durable binding without re-running new-intake admission.
   // All current product/source/actor/consent checks still run on subsequent reads.
+  const knownTemplateHashes=parseKnownTemplateHashes(req)
   if(proof.task.runtimeBindingRef){
    await relationalRuntimeConsentAuthority.assertCompositeFinal(proof.task.runtimeBindingRef,req.user!.userId)
    return attachTeacherInlineCurrentUnit({
@@ -144,6 +152,8 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
     started:{state:'STARTED' as const,runtimeBindingKind:'COMPOSITE' as const,runtimeBindingRef:proof.task.runtimeBindingRef,replayed:true as const},
     attemptId:proof.task.runtimeBindingRef,
     actorUserId:req.user!.userId,
+    freshlyCreated:false,
+    knownTemplateHashes,
     authorize:async({attemptId,actorUserId})=>{
      await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId)
     },
@@ -160,6 +170,8 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
     started:result,
     attemptId:result.runtimeBindingRef,
     actorUserId:req.user!.userId,
+    freshlyCreated:!result.replayed,
+    knownTemplateHashes,
     authorize:async({attemptId,actorUserId})=>{
      await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId)
     },

@@ -368,6 +368,21 @@ export const runWithLowMemoryTrickleAdmission = async <T>(operation: () => Promi
   }
 }
 
+/** Fast pre-gate check so callers can keep already-bound replays outside the
+ * resource wrapper while rejecting or trickling constrained NEW starts before
+ * pool checkout, locks, or publication loads. */
+export const isAssessmentStartResourceConstrained = (): boolean => {
+  if (!enabled()) return false
+  const value = sampleAssessmentHostResources()
+  if (isLowMemoryTrickleEnabled()) {
+    return policy.startAdmissionDecision(value, performance.now(), configuredLowMemoryTrickleConfig()).action !== 'allow'
+  }
+  const decision = policy.decision(value, 1)
+  return decision.mode === 'protected'
+    || decision.reason === 'observation_unavailable'
+    || (value.availableBytes !== null && value.availableBytes < 700 * MiB)
+}
+
 /** Only creation of NEW frozen runtimes is guarded. Existing durable answers,
  * retries and report reads retain their normal persistence/recovery paths. */
 export const assertAssessmentStartResources = (): void => {

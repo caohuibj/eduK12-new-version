@@ -44,7 +44,8 @@ import {
   isTransientCompletionDatabaseError,
 } from '../../services/questionnaireCompletionAdmission'
 import { isUnitSubmitAdmissionBusyError } from '../../services/unitSubmitAdmission'
-import { startResponseWithInlineWholeDefinition } from './whole-start-inline'
+import { parseKnownTemplateHashes, startResponseWithInlineWholeDefinition } from './whole-start-inline'
+export { parseKnownTemplateHashes }
 import { isWholeSubmitAdmissionBusyError } from '../../services/wholeSubmitAdmission'
 import {
   loadEmbeddedSituationalAttemptRuntime,
@@ -98,30 +99,6 @@ const sendAnalysisExport = async (
   res.setHeader('Content-Disposition', `attachment; filename="${file.fileName}"`)
   res.setHeader('Content-Length', String(file.body.length))
   return res.status(200).send(file.body)
-}
-
-export const parseKnownTemplateHashes = (req: Request): ReadonlySet<string> | undefined => {
-  const rawHeader = req.headers['x-whole-template-hash']
-  const rawQuery = req.query.knownTemplateHash
-  const parts: string[] = []
-  for (const source of [rawHeader, rawQuery]) {
-    if (typeof source === 'string') {
-      for (const token of source.split(',')) {
-        const trimmed = token.trim().toLowerCase()
-        if (/^[a-f0-9]{64}$/.test(trimmed)) parts.push(trimmed)
-      }
-    } else if (Array.isArray(source)) {
-      for (const item of source) {
-        if (typeof item !== 'string') continue
-        for (const token of item.split(',')) {
-          const trimmed = token.trim().toLowerCase()
-          if (/^[a-f0-9]{64}$/.test(trimmed)) parts.push(trimmed)
-        }
-      }
-    }
-    if (parts.length >= 8) break
-  }
-  return parts.length > 0 ? new Set(parts.slice(0, 8)) : undefined
 }
 
 async function handleWholeDefinition(req: Request, res: Response, publicMode: boolean) {

@@ -6,7 +6,7 @@ const mocks=vi.hoisted(()=>{
  // Synthetic, process-local fixture key. No external key or service is used.
  process.env.DATA_ENCRYPTION_KEY='b'.repeat(64)
  return {query:vi.fn(),principal:vi.fn(),start:vi.fn(),consent:vi.fn(),parent:vi.fn(),cognitive:vi.fn(),cognitiveFinal:vi.fn(),
-  parentConsent:vi.fn(),childConsent:vi.fn(),sjt:vi.fn(),sjtFinal:vi.fn(),formFinal:vi.fn(),scaleFinal:vi.fn(),media:vi.fn()}
+  parentConsent:vi.fn(),childConsent:vi.fn(),sjt:vi.fn(),sjtFinal:vi.fn(),formFinal:vi.fn(),scaleFinal:vi.fn(),media:vi.fn(),wholeDelivery:vi.fn()}
 })
 vi.mock('../../config/database',()=>({prisma:{$queryRaw:mocks.query}}))
 vi.mock('../../modules/organization/principal',async original=>({...await original<object>(),loadCurrentPrincipal:mocks.principal}))
@@ -17,6 +17,7 @@ vi.mock('../../modules/assessment-run/startExecution',()=>({startAssessmentRunEx
 vi.mock('../../modules/assessment-run/consent',()=>({acceptRunExecutionConsent:mocks.consent}))
 vi.mock('../../modules/assessment-relational/runtime-consent',()=>({relationalRuntimeConsentAuthority:{assertCompositeFinal:mocks.parentConsent,assertCognitiveFinal:mocks.childConsent}}))
 vi.mock('../../modules/composite/composite.service',()=>({getAttemptState:mocks.parent}))
+vi.mock('../../modules/composite/whole-questionnaire.service',()=>({getWholeQuestionnaireDelivery:mocks.wholeDelivery,getWholeQuestionnaireDefinition:vi.fn()}))
 vi.mock('../../modules/composite/composite.controller',()=>({compositeController:{submitFinalFormSection:mocks.formFinal,submitFinalScale:mocks.scaleFinal,embeddedSituationalAsset:mocks.media,wholeDefinition:mocks.media,wholeTemplate:mocks.media,wholeReceipt:mocks.media,wholeSubmit:mocks.media,educationWholeProgress:mocks.media}}))
 vi.mock('../../modules/composite/composite-image.controller',()=>({compositeImageController:{authenticatedFormImage:mocks.media,authenticatedScaleImage:mocks.media,educationFormImage:mocks.media,educationScaleImage:mocks.media}}))
 vi.mock('../../modules/composite/composite-video.controller',()=>({compositeVideoController:{authenticatedFormVideo:mocks.media,authenticatedScaleVideo:mocks.media,educationFormVideo:mocks.media,educationScaleVideo:mocks.media}}))
@@ -30,6 +31,7 @@ vi.mock('../../modules/situational/situational-video.controller',()=>({situation
 
 import {createTeacherAssessmentRuntimeRouter,projectTeacherCognitiveRuntime,projectTeacherSituationalRuntime} from '../../modules/huiteacher/assessmentRuntime.routes'
 import {AssessmentStartBusyError} from '../../modules/composite/start-transient'
+import {InstrumentFinalSubmitError} from '../../services/instrumentFinalSubmit'
 import {createTeacherAssessmentAccess} from '../../modules/huiteacher/assessmentRuntime.access'
 import {EducationAssessmentSourceError} from '../../modules/education-tools/assessment-resource.repository'
 import {draftEducationAssessmentEntry} from '../../modules/education-tools/assessment-resource.contract'
@@ -307,6 +309,32 @@ describe('Teacher assessment runtime synthetic HTTP boundary',()=>{
   expect(res.status).toBe(503)
   expect(res.headers.get('retry-after')).toBe('1')
   expect(res.body).toEqual({code:'ASSESSMENT_START_BUSY',message:'综合测评开始请求繁忙，请稍后重试',data:null})
+ })
+ it('maps resource-gate 503 on Teacher START to 503 with preferred Retry-After',async()=>{
+  row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null}
+  const err=new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE','系统繁忙，请稍后开始测评；已经提交的答案不受影响。',503)
+  ;(err as {preferredRetryAfterSeconds?:number}).preferredRetryAfterSeconds=3
+  mocks.start.mockRejectedValue(err)
+  const res=await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{})
+  expect(res.status).toBe(503)
+  expect(res.headers.get('retry-after')).toBe('3')
+  expect(res.body).toEqual({code:'INSTRUMENT_NOT_AVAILABLE',message:'系统繁忙，请稍后开始测评；已经提交的答案不受影响。',data:null})
+ })
+ it('attaches freshlyCreated and wholeBinding on WHOLE_LOCAL inline START with knownTemplateHash',async()=>{
+  const templateHash='c'.repeat(64)
+  row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null}
+  const startedResult={state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:false}
+  const preloadedParent={id:attempt}
+  const preloadedState={snapshots:[],scaleChildById:new Map(),skipCurrentUnitActivation:true}
+  Object.defineProperty(startedResult,'_educationWholePreload',{value:{parent:preloadedParent,preloadedState}})
+  mocks.start.mockImplementation(async()=>{row={...baseline};return startedResult})
+  mocks.parent.mockResolvedValue({id:attempt,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',executionMode:'WHOLE_LOCAL',currentItem:null})
+  mocks.wholeDelivery.mockResolvedValue({mode:'binding',binding:{attemptId:attempt,attemptEpoch:1,slotSetHash:'d'.repeat(64),contextSnapshotHash:null,templateHash,units:[]}})
+  const res=await request('/run-executions/'+baseline.executionId+'/start-assessment?knownTemplateHash='+templateHash,'POST',{delivery:'inline'})
+  expect(res.status).toBe(200)
+  expect(mocks.parent).toHaveBeenCalledWith(attempt,{userId:actor},undefined,'current-unit',preloadedParent,preloadedState)
+  expect(mocks.wholeDelivery).toHaveBeenCalledWith(attempt,{userId:actor},{preloaded:preloadedParent,knownTemplateHashes:new Set([templateHash])})
+  expect(res.body.data).toMatchObject({state:'STARTED',runtimeBindingRef:attempt,freshlyCreated:true,wholeBinding:{attemptId:attempt,templateHash}})
  })
  it('projects SJT resume and FINAL as runner state plus completion, with no report',async()=>{
   const response=await request(sjtPath)

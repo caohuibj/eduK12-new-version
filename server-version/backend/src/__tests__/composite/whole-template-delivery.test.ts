@@ -517,4 +517,22 @@ describe('whole template split delivery & controller guard contracts', () => {
     expect(authResult.mode).toBe('definition')
     expect(mockAssertDelivery).toHaveBeenCalledTimes(unitCount)
   })
+
+  it('hits the template cache fast-path for freshly started ORGANIZATION_RESOURCE education attempts with asyncReportEpoch=null', async () => {
+    vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED', 'true')
+    const edu = createFixtureAttempt({ attemptId: 'attempt-edu-1', userId: 'teacher-1', childScaleId: 'child-edu-1' })
+    edu.parent.asyncReportEpoch = null as unknown as number
+    edu.parent.assignmentRef = 'assignment-edu-1'
+    edu.parent.compositeAssessment.productKind = 'ORGANIZATION_RESOURCE'
+    mockFindUnique.mockResolvedValue(edu.parent)
+    mockLoadSlotSet.mockResolvedValue(edu.frozen)
+
+    const delivered = await getWholeQuestionnaireDelivery('attempt-edu-1', { userId: 'teacher-1' })
+    if (delivered.mode !== 'definition') throw new Error('expected definition')
+
+    mockLoadSlotSet.mockClear()
+    const cachedDto = await getWholeQuestionnaireTemplate('attempt-edu-1', delivered.definition.templateHash, { userId: 'teacher-1' })
+    expect(cachedDto.templateHash).toBe(delivered.definition.templateHash)
+    expect(mockLoadSlotSet).not.toHaveBeenCalled()
+  })
 })

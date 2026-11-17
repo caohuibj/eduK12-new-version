@@ -1,7 +1,8 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
-const m=vi.hoisted(()=>({start:vi.fn(),parent:vi.fn(),getAttemptState:vi.fn(),campusAccess:vi.fn()}))
+const m=vi.hoisted(()=>({start:vi.fn(),parent:vi.fn(),getAttemptState:vi.fn(),campusAccess:vi.fn(),wholeDelivery:vi.fn()}))
 vi.mock('../../modules/assessment-run/startExecution',()=>({startAssessmentRunExecution:m.start}))
 vi.mock('../../modules/composite/composite.service',()=>({getAttemptState:m.getAttemptState}))
+vi.mock('../../modules/composite/whole-questionnaire.service',()=>({getWholeQuestionnaireDelivery:m.wholeDelivery,getWholeQuestionnaireDefinition:vi.fn()}))
 vi.mock('../../modules/campus/campus-composite-authority',()=>({checkCampusCompositeAccessAuthority:m.campusAccess}))
 vi.mock('../../modules/assessment-run/resourceBoundary',()=>({
   assertRunExecutionParent:m.parent,
@@ -12,6 +13,7 @@ import {Prisma} from '@prisma/client'
 import {assessmentRunController as runController} from '../../modules/assessment-run/run.controller'
 import {errorHandler} from '../../middleware/errorHandler'
 import {AssessmentStartBusyError,classifyStartTransaction} from '../../modules/composite/start-transient'
+import {InstrumentFinalSubmitError} from '../../services/instrumentFinalSubmit'
 import {logger} from '../../utils/logger'
 
 function fakeRes(){
@@ -146,6 +148,40 @@ describe('Run START transient rollback → 503 ASSESSMENT_START_BUSY',()=>{
     expect(res.body.data.currentUnit).toEqual({id:'attempt-valid',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS'})
     expect(m.campusAccess).toHaveBeenCalledWith({attemptId:'attempt-valid',userId:'student-valid'})
     expect(m.getAttemptState).toHaveBeenCalledWith('attempt-valid',{userId:'student-valid'},undefined,'current-unit')
+  })
+
+  it('maps resource-gate 503 to HTTP 503 with preferred Retry-After',async()=>{
+    const resourceErr=new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE','系统繁忙，请稍后开始测评；已经提交的答案不受影响。',503)
+    ;(resourceErr as {preferredRetryAfterSeconds?:number}).preferredRetryAfterSeconds=10
+    m.start.mockRejectedValue(resourceErr)
+    const res=fakeRes()
+    await runController.startExecution(req,res)
+    expect(res.statusCode).toBe(503)
+    expect(res.headers['Retry-After']).toBe('10')
+    expect(res.body).toEqual({code:'INSTRUMENT_NOT_AVAILABLE',message:'系统繁忙，请稍后开始测评；已经提交的答案不受影响。',data:null})
+  })
+
+  it('reuses _educationWholePreload and attaches freshlyCreated + wholeBinding for WHOLE_LOCAL START',async()=>{
+    const templateHash='a'.repeat(64)
+    const preloadedParent={id:'attempt-whole'}
+    const preloadedState={snapshots:[],scaleChildById:new Map(),skipCurrentUnitActivation:true}
+    const startedResult={state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-whole',replayed:false}
+    Object.defineProperty(startedResult,'_educationWholePreload',{value:{parent:preloadedParent,preloadedState}})
+    m.start.mockResolvedValue(startedResult)
+    m.getAttemptState.mockResolvedValue({id:'attempt-whole',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',executionMode:'WHOLE_LOCAL',currentItem:null})
+    m.wholeDelivery.mockResolvedValue({mode:'binding',binding:{attemptId:'attempt-whole',attemptEpoch:1,slotSetHash:'b'.repeat(64),contextSnapshotHash:null,templateHash,units:[]}})
+
+    const res=fakeRes()
+    await runController.startExecution({...req,body:{delivery:'inline'},query:{knownTemplateHash:templateHash}},res)
+    expect(res.statusCode).toBe(200)
+    expect(m.getAttemptState).toHaveBeenCalledWith('attempt-whole',{userId:'student-1'},undefined,'current-unit',preloadedParent,preloadedState)
+    expect(m.wholeDelivery).toHaveBeenCalledWith('attempt-whole',{userId:'student-1'},{preloaded:preloadedParent,knownTemplateHashes:new Set([templateHash])})
+    expect(res.body.data).toMatchObject({
+      state:'STARTED',
+      runtimeBindingRef:'attempt-whole',
+      freshlyCreated:true,
+      wholeBinding:{attemptId:'attempt-whole',templateHash},
+    })
   })
 })
 
