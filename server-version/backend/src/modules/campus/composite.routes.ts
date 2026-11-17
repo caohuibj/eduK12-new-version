@@ -212,6 +212,16 @@ router.post(campusCognitivePrefix+'/submit',
 
 router.get('/composite-attempts/:attemptId',authenticateSchool,campusCompositeAccess,
   compositeController.getAttempt)
+router.get('/composite-attempts/:attemptId/whole',authenticateSchool,campusCompositeAccess,
+  compositeController.wholeDefinition)
+router.get('/composite-attempts/:attemptId/whole/template/:templateHash',authenticateSchool,campusCompositeAccess,
+  compositeController.wholeTemplate)
+router.get('/composite-attempts/:attemptId/whole/receipt',authenticateSchool,campusCompositeAccess,
+  compositeController.wholeReceipt)
+router.get('/composite-attempts/:attemptId/whole/progress',authenticateSchool,campusCompositeAccess,
+  compositeController.educationWholeProgress)
+router.post('/composite-attempts/:attemptId/whole/submit',authenticateSchool,campusCompositeAccess,
+  compositeController.wholeSubmit)
 router.get('/composite-attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content',
   authenticateSchool,campusCompositeAccess,compositeImageController.authenticatedFormImage)
 router.get('/composite-attempts/:attemptId/items/:itemId/scale/assets/:assetId/content',

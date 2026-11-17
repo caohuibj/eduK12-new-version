@@ -39,11 +39,11 @@ describe('isWholeLocalEligible', () => {
     })).toBe(true)
   })
 
-  it('returns false for Form-only linear questionnaires (whole submit requires a Scale unit)', () => {
+  it('returns true for a linear Form-only questionnaire', () => {
     expect(isWholeLocalEligible({
       items: [{ type: 'FORM', position: 1 }, { type: 'FORM', position: 2 }],
       formSections: [{ id: 'sec-1' }],
-    })).toBe(false)
+    })).toBe(true)
   })
 
   it('returns false when candidate has Cognitive items', () => {

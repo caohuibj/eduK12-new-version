@@ -15,7 +15,7 @@ vi.mock('../../modules/organization/educationProductAccess',()=>({resolveEducati
 vi.mock('../../modules/assessment-run/startExecution',()=>({startAssessmentRunExecution:m.start}))
 vi.mock('../../modules/composite/composite.service',()=>({getAttemptState:m.parent}))
 vi.mock('../../modules/assessment-relational/runtime-consent',()=>({relationalRuntimeConsentAuthority:{assertCompositeFinal:vi.fn(),assertCognitiveFinal:vi.fn()}}))
-vi.mock('../../modules/composite/composite.controller',()=>({compositeController:{getAttempt:m.getAttempt,submitFinalScale:vi.fn(),submitFinalFormSection:vi.fn()}}))
+vi.mock('../../modules/composite/composite.controller',()=>({compositeController:{getAttempt:m.getAttempt,submitFinalScale:vi.fn(),submitFinalFormSection:vi.fn(),wholeDefinition:vi.fn(),wholeTemplate:vi.fn(),wholeReceipt:vi.fn(),wholeSubmit:vi.fn(),educationWholeProgress:vi.fn()}}))
 vi.mock('../../modules/composite/composite-image.controller',()=>({compositeImageController:{authenticatedScaleImage:vi.fn()}}))
 vi.mock('../../modules/composite/composite-video.controller',()=>({compositeVideoController:{authenticatedScaleVideo:vi.fn()}}))
 

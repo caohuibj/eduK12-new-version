@@ -5499,7 +5499,7 @@ const getUnifiedCompositeAttemptState = async (
     trainingFlowSnapshotHash: attempt.trainingFlowSnapshotHash ?? attempt.compositeAssessment?.trainingFlowSnapshotHash,
   })
   const wholeSubmitFeatureEnabled = Boolean(assessmentReportConfig().wholeSubmitEnabled)
-  const hasPartialScaleSubmissions = units.some((unit: any) => unit.type === 'SCALE' && unitCompleted(unit))
+  const hasPartialScaleSubmissions = units.some((unit: any) => (unit.type === 'SCALE' || unit.type === 'FORM') && unitCompleted(unit))
   const canIngestWholeLocal = wholeSubmitFeatureEnabled && !hasPartialScaleSubmissions
   const executionMode = (isEligible && canIngestWholeLocal) ? ('WHOLE_LOCAL' as const) : ('STEPPED' as const)
   return {

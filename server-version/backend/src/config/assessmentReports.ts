@@ -41,3 +41,20 @@ export const acceptsAsyncCompositeReport = (parent: {
     && !parent.compositeAssessment.reportPackageKey && !parent.compositeAssessment.analysisProtocolKey
     && (config.courseIds.size === 0 || Boolean(parent.deliveryCourseId && config.courseIds.has(parent.deliveryCourseId)))
 }
+
+/** School/Teacher frozen runs share the receipt and answer materialization.
+ * They do not enroll in the training questionnaire report. */
+export const acceptsEducationWholeMaterialization = (parent: {
+  runtimeGeneration?: string | null
+  deliveryMode?: string
+  assignmentRef?: string | null
+  compositeAssessment?: { productKind?: string; reportPackageKey?: string | null; analysisProtocolKey?: string | null }
+}, env: NodeJS.ProcessEnv = process.env): boolean => {
+  const config = assessmentReportConfig(env)
+  return config.enabled && config.wholeSubmitEnabled
+    && parent.runtimeGeneration === 'UNIFIED_V1'
+    && parent.deliveryMode === 'FINAL_ONLY'
+    && typeof parent.assignmentRef === 'string' && parent.assignmentRef.length > 0
+    && parent.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE'
+    && !parent.compositeAssessment.reportPackageKey && !parent.compositeAssessment.analysisProtocolKey
+}
