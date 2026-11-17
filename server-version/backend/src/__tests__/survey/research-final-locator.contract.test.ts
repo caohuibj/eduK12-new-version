@@ -1,7 +1,7 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
 import {randomUUID} from 'node:crypto'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
-import {verifiedSurveyAttempt,verifiedSurveyFinalLocator} from '../../modules/survey/admission.service'
+import {resetSurveyPublicationCachesForTests,verifiedSurveyAttempt,verifiedSurveyFinalLocator} from '../../modules/survey/admission.service'
 const mocks=vi.hoisted(()=>({find:vi.fn(),project:vi.fn(),recover:vi.fn()}))
 vi.mock('../../config/database',()=>({prisma:{$transaction:async(fn:any)=>fn({
   surveyProject:{findFirst:mocks.project},surveyWaveAttempt:{findFirst:mocks.find},
@@ -10,7 +10,7 @@ vi.mock('../../modules/survey/identity.service',()=>({hashResearchCredential:()=
 const proof={publicId:randomUUID(),attemptId:randomUUID(),accessCredential:'a'.repeat(43)}
 let attempt:any
 beforeEach(()=>{
- vi.clearAllMocks();process.env.SURVEY_WORKSPACE_ENABLED='true';process.env.SURVEY_PUBLICATION_ENABLED='true'
+ vi.clearAllMocks();resetSurveyPublicationCachesForTests();process.env.SURVEY_WORKSPACE_ENABLED='true';process.env.SURVEY_PUBLICATION_ENABLED='true'
  const compiledSnapshot={runtimeStatus:'SURVEY_FINAL_V1',units:[]}
  attempt={id:proof.attemptId,waveId:'wave',participantId:null,status:'STARTED',sessionHash:'hash',wave:{
   generalText:'thanks',finishUntil:new Date(),hardStopAt:null,publication:{id:'publication',compiledSnapshot,definitionDigest:canonicalHash(compiledSnapshot)}}}
@@ -25,10 +25,17 @@ describe('Survey FINAL preflight metadata projection',()=>{
   expect(result).not.toHaveProperty('compiledSnapshot')
   expect(mocks.find.mock.calls[0][0].select.wave.select.publication.select.compiledSnapshot).toBe(false)
  })
- it('full task/read callers still select and verify their complete snapshot',async()=>{
-  expect((await verifiedSurveyAttempt(proof)).compiledSnapshot).toEqual(attempt.wave.publication.compiledSnapshot)
-  expect(mocks.find.mock.calls[0][0].select.wave.select.publication.select.compiledSnapshot).toBe(true)
+ it('reuses a verified snapshot for the same publication digest and rechecks a changed digest',async()=>{
+  const first=await verifiedSurveyAttempt(proof)
+  expect(first.compiledSnapshot).toEqual(attempt.wave.publication.compiledSnapshot)
+  const loaded=mocks.find.mock.calls.find(call=>call[0].select.wave.select.publication.select.compiledSnapshot===true)
+  expect(loaded).toBeTruthy()
+  mocks.find.mockClear()
   attempt.wave.publication.compiledSnapshot.units.push({corrupt:true})
+  const second=await verifiedSurveyAttempt(proof)
+  expect(second.compiledSnapshot).toBe(first.compiledSnapshot)
+  expect(mocks.find.mock.calls.every(call=>call[0].select.wave.select.publication.select.compiledSnapshot!==true)).toBe(true)
+  attempt.wave.publication.definitionDigest='changed'
   await expect(verifiedSurveyAttempt(proof)).rejects.toMatchObject({statusCode:403})
  })
  it('rejects a wrong unlinked credential, unknown project and unavailable publication',async()=>{

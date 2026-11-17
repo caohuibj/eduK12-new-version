@@ -2,7 +2,7 @@ import {beforeEach,describe,expect,it,vi} from 'vitest'
 vi.mock('../../modules/survey/admission.service',()=>({verifiedSurveyAttempt:vi.fn()}))
 vi.mock('../../modules/survey/flow.assignment',()=>({assignedSurveySnapshot:vi.fn(snapshot=>snapshot),ensureSurveyFlowAssignment:vi.fn()}))
 vi.mock('../../modules/survey/cognitive.service',()=>({readSurveyCognitiveProgressFromVerifiedAttempt:vi.fn()}))
-import {getOwnResearchTask} from '../../modules/survey/task.public'
+import {getOwnResearchTask,resetPublicSurveyUnitCacheForTests} from '../../modules/survey/task.public'
 import {verifiedSurveyAttempt} from '../../modules/survey/admission.service'
 import type {CatalogScalePresentation} from '../../modules/survey/catalog-scale.presentation'
 
@@ -12,7 +12,7 @@ function own(display:unknown){
   vi.mocked(verifiedSurveyAttempt).mockResolvedValue({status:'STARTED',attemptId:'attempt',waveId:'wave',definitionDigest:'digest',compiledSnapshot:{units:[{kind:'SCALE',instrumentKey:'scale',title:'合成量表',displayDefinition:display}]}} as never)
 }
 function catalog():CatalogScalePresentation{return {schemaVersion:1,runtime:'CANONICAL_SCALE_V1',presentationMode:'ONE_BY_ONE',respondentType:'participant_self_report',randomizeItems:false,responseOptions:options,items:[{itemKey:'i1',prompt:'合成题',required:true,reverse:false,dimensionKeys:['d'],responseOptions:options.map(o=>({...o})),randomizeOptions:false}]}}
-beforeEach(()=>vi.clearAllMocks())
+beforeEach(()=>{vi.clearAllMocks();resetPublicSurveyUnitCacheForTests()})
 describe('Survey public shared response options',()=>{
   it('omits repeated native options without leaking private scores or dimensions',async()=>{
     own({schemaVersion:1,presentationMode:'ONE_BY_ONE',respondentType:'participant_self_report',responseOptions:options,dimensions:[{dimensionKey:'d',label:'合成',direction:'descriptive'}],aggregation:'mean',items:[{itemKey:'i1',prompt:'合成题',required:true,reverse:true,dimensionKeys:['d']}]})
@@ -36,6 +36,16 @@ describe('Survey public shared response options',()=>{
     if(difference==='length')item.responseOptions.pop()
     own(display);const task=await getOwnResearchTask(proof)
     expect(task.units[0].items![0].responseOptions).toEqual(item.responseOptions.map(({optionKey,label})=>({optionKey,label})))
+  })
+  it('reuses one public projection for the same frozen source digest',async()=>{
+    const display=catalog()
+    vi.mocked(verifiedSurveyAttempt).mockResolvedValue({status:'STARTED',attemptId:'attempt',waveId:'wave',definitionDigest:'digest',compiledSnapshot:{units:[{kind:'SCALE',instrumentKey:'scale',title:'合成量表',draftId:'draft',sourceDigest:'source-digest',displayDefinition:display}]}} as never)
+    const first=await getOwnResearchTask(proof)
+    const second=await getOwnResearchTask(proof)
+    expect(second.units[0]).toBe(first.units[0])
+    vi.mocked(verifiedSurveyAttempt).mockResolvedValue({status:'STARTED',attemptId:'attempt',waveId:'wave',definitionDigest:'digest',compiledSnapshot:{units:[{kind:'SCALE',instrumentKey:'scale',title:'合成量表',displayDefinition:display}]}} as never)
+    const uncached=await getOwnResearchTask(proof)
+    expect(uncached.units[0]).not.toBe(first.units[0])
   })
   it('never projects a task when current participant proof is rejected',async()=>{
     vi.mocked(verifiedSurveyAttempt).mockRejectedValue(new Error('revoked'))

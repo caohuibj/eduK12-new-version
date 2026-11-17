@@ -18,7 +18,7 @@ vi.mock('../../modules/assessment-runtime/canonical',async importOriginal=>{
 import { prisma as db } from '../../config/database'
 import { integrationDatabaseUrl } from './integration-env'
 import { hashResearchCredential } from '../../modules/survey/identity.service'
-import { joinLinkedStudy,startLinkedWave,startSingleUnlinkedWave } from '../../modules/survey/admission.service'
+import { joinLinkedStudy,resetSurveyPublicationCachesForTests,startLinkedWave,startSingleUnlinkedWave } from '../../modules/survey/admission.service'
 
 const DB_URL=integrationDatabaseUrl('SURVEY_IDEMPOTENCY_INTEGRATION_DATABASE_URL','PR26_INTEGRATION_DATABASE_URL','COGNITIVE_INTEGRATION_DB_URL')
 const suite=DB_URL?describe:describe.skip
@@ -38,6 +38,7 @@ function resetProbes(){
   hashProbe.inTransaction=false
   hashProbe.snapshotHashesInside=0
   hashProbe.snapshotHashesOutside=0
+  resetSurveyPublicationCachesForTests()
 }
 function observeTransactions(){
   const original=db.$transaction.bind(db)
@@ -152,8 +153,8 @@ suite('Survey START prepared-publication behavior on real PostgreSQL',()=>{
       expect(hashProbe.snapshotHashesInside).toBe(0)
       const replay=await startSingleUnlinkedWave(input)
       expect(replay).toMatchObject({attemptId:first.attemptId,recovered:true})
-      expect(prefetchReads).toBe(2) // one verified pre-read per request; no second hash under the lock
-      expect(hashProbe.snapshotHashesOutside).toBe(2)
+      expect(prefetchReads).toBe(1) // the replay reuses the cached immutable prepare
+      expect(hashProbe.snapshotHashesOutside).toBe(1)
       expect(hashProbe.snapshotHashesInside).toBe(0)
       const attempt=await db.surveyWaveAttempt.findFirstOrThrow({where:{waveId:f.waveId}})
       expect(attempt.operationKeyHash).toBe(hashResearchCredential(operationKey))
@@ -185,8 +186,8 @@ suite('Survey START prepared-publication behavior on real PostgreSQL',()=>{
       expect(hashProbe.snapshotHashesInside).toBe(0)
       const replay=await startLinkedWave(input)
       expect(replay).toMatchObject({attemptId:first.attemptId,recovered:true})
-      expect(prefetchReads).toBe(2)
-      expect(hashProbe.snapshotHashesOutside).toBe(2)
+      expect(prefetchReads).toBe(1)
+      expect(hashProbe.snapshotHashesOutside).toBe(1)
       expect(hashProbe.snapshotHashesInside).toBe(0)
       expect((await db.surveyWave.findUniqueOrThrow({where:{id:f.waveId}})).startsCount).toBe(1)
       expect(await db.surveyWaveAttempt.count({where:{waveId:f.waveId}})).toBe(1)
