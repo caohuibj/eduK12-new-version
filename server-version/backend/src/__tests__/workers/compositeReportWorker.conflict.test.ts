@@ -5,7 +5,10 @@ import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit
 import { ScaleSubmissionKeyConflictError, REPORT_SUBMISSION_KEY_CONFLICT } from '../../modules/scale/scale-final-submit-conflict'
 const h = vi.hoisted(() => ({ parent: vi.fn(), whole: vi.fn(), finish: vi.fn(), finalize: vi.fn(), materialize: vi.fn(), publish: vi.fn() }))
 vi.mock('../../config/database', () => ({ prisma: { compositeAssessmentAttempt: { findUnique: h.parent } } }))
-vi.mock('../../config/assessmentReports', () => ({ assessmentReportConfig: () => ({ workerConcurrency: 1, leaseMs: 30000, maxAttempts: 8 }) }))
+vi.mock('../../config/assessmentReports', async () => {
+  const actual = await vi.importActual<typeof import('../../config/assessmentReports')>('../../config/assessmentReports')
+  return { ...actual, assessmentReportConfig: () => ({ workerConcurrency: 1, leaseMs: 30000, maxAttempts: 8 }) }
+})
 vi.mock('../../utils/logger', () => ({ logger: { warn: vi.fn(), error: vi.fn(), info: vi.fn() } }))
 vi.mock('../../services/reportReadyNotifications', () => ({ publishReportReady: h.publish }))
 vi.mock('../../modules/composite/composite.service', () => ({ finalizeCompositeAttemptIfReady: h.finalize, materializeCompositeQuestionnaireReport: h.materialize }))

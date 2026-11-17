@@ -12,7 +12,7 @@ import { createHash } from 'node:crypto'
 import { z } from 'zod'
 import type { CompositeReportJob, Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { acceptsAsyncCompositeReport, assessmentReportConfig } from '../../config/assessmentReports'
+import { acceptsAsyncCompositeReport, acceptsEducationWholeMaterialization, isEducationWholeAttempt, assessmentReportConfig } from '../../config/assessmentReports'
 import { finalScaleSubmitSchema } from '../../services/scale-final-submit.schema'
 import { InstrumentFinalSubmitError, assertCanonicalSubmissionPayloadSize, prepareCanonicalSubmission, stableSubmissionJson } from '../../services/instrumentFinalSubmit'
 import { withWholeSubmitAdmission } from '../../services/wholeSubmitAdmission'
@@ -49,9 +49,9 @@ const formSectionAnswerSchema = z.object({
 export const wholeQuestionnaireSubmitSchema = z.object({
   submissionId: z.string().min(16).max(200), attemptEpoch: z.number().int().min(1),
   slotSetHash: z.string().regex(/^[a-f0-9]{64}$/), contextSnapshotHash: z.string().max(200).nullable(),
-  units: z.array(unitSchema).min(1).max(32),
+  units: z.array(unitSchema).max(32),
   formAnswers: z.array(formSectionAnswerSchema).optional(),
-}).strict()
+}).strict().refine(value => value.units.length > 0 || (value.formAnswers?.length ?? 0) > 0, { message: '整份问卷没有可提交的内容' })
 export type WholeQuestionnaireSubmitInput = z.infer<typeof wholeQuestionnaireSubmitSchema>
 type Principal = { userId?: string; recoveryTokenHash?: string }
 export type WholeReceiptExecution = { submissionId: string; payloadHash: string; leaseToken: string; acceptedAtMs: number; studyReceipt?:AcceptedStudyReceipt }
@@ -127,14 +127,15 @@ const loadParent = async (attemptId: string, principal: Principal, preloaded?: W
   if (!accepted && !owned) throw failure('无权限操作此问卷', 403)
   if(parent.trainingFlowSnapshotHash!=null||parent.compositeAssessment.trainingFlowFrozen!=null)throw failure('条件流程必须按当前工具逐项提交')
   parent = await applyTrainingAttemptScope(parent) as typeof loaded
-  if (parent.asyncReportEpoch !== parent.attemptEpoch && !acceptsAsyncCompositeReport(parent)) throw failure('此问卷尚未启用整份交卷')
+  if (parent.asyncReportEpoch !== parent.attemptEpoch && !acceptsAsyncCompositeReport(parent) && !acceptsEducationWholeMaterialization(parent)) throw failure('此问卷尚未启用整份交卷')
   if (!parent.frozenActiveSlotSetEncrypted || !parent.frozenActiveSlotSetHash) throw failure('问卷冻结内容缺失')
   const frozen = await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted)
   if (frozen.snapshotHash !== parent.frozenActiveSlotSetHash || frozen.attemptEpoch !== parent.attemptEpoch) throw failure('问卷冻结版本已改变')
   // Cognitive and situational tasks retain their own timed delivery protocols.
   if (frozen.slots.some(slot => slot.required && !['SCALE', 'FORM_SECTION'].includes(slot.unitType))) throw failure('整份交卷仅适用于量表问卷')
   const slots = frozen.slots.filter(slot => slot.required && slot.unitType === 'SCALE')
-  if (!slots.length || slots.length > 32) throw failure('整份交卷的量表数量无效')
+  const formSlots = frozen.slots.filter(slot => slot.required && slot.unitType === 'FORM_SECTION')
+  if (slots.length > 32 || (slots.length === 0 && formSlots.length === 0)) throw failure('整份交卷的量表数量无效')
   const children = (await Promise.all(slots.map(async slot => {
     const child = parent.scaleAssessments.find(row => row.compositeItemId === slot.sourceBinding.compositeItemId)
     if (!child || child.attemptEpoch !== parent.attemptEpoch || child.runtimeGeneration !== 'UNIFIED_V1') throw failure('量表冻结记录不完整')
@@ -844,9 +845,9 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   const owned = principal.userId ? parent.userId === principal.userId
     : parent.userId === null && Boolean(principal.recoveryTokenHash && parent.recoveryTokenHash === principal.recoveryTokenHash)
   if (!owned) throw failure('无权限操作此问卷', 403)
-  if (process.env.ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED !== 'false' && principal.userId) {
-    // The shared fresh header is read INSIDE the existing submit admission.
-    // Consent remains live; no middleware preloads heavy receipt data before it.
+  // Education routes do not repeat this check in middleware. Training keeps the
+  // reuse switch because its router already runs the consent guard.
+  if (principal.userId && (isEducationWholeAttempt(parent) || process.env.ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED !== 'false')) {
     const { relationalRuntimeConsentAuthority } = await import('../assessment-relational/runtime-consent')
     await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId, principal.userId, parent)
   }
@@ -885,7 +886,7 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   if (!settings.wholeSubmitEnabled || (!settings.enabled && parent.asyncReportEpoch !== parent.attemptEpoch)) {
     throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '整卷接收暂时暂停，本机封存答案已保留；稍后可用原交卷标识继续确认。', 503)
   }
-  if (parent.asyncReportEpoch !== parent.attemptEpoch && !acceptsAsyncCompositeReport(parent)) throw failure('此问卷尚未启用整份交卷')
+  if (parent.asyncReportEpoch !== parent.attemptEpoch && !acceptsAsyncCompositeReport(parent) && !acceptsEducationWholeMaterialization(parent)) throw failure('此问卷尚未启用整份交卷')
   if (parent.status !== 'IN_PROGRESS' || !prior?.wholeValidationEncrypted || !prior.wholeValidationHash) throw failure('问卷尚未完整交付或已结束')
   await traceAssessmentPhase('whole.storage_admission', admitWholeReceiptStorage)
   const manifest = await traceAssessmentPhase('whole.manifest_decrypt', () => loadSharedWholeValidation<WholeValidationManifest>(prior.wholeValidationEncrypted!))
@@ -904,19 +905,23 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   }
   const encrypted = traceAssessmentPhaseSync('whole.envelope_encrypt', () => encryptWholeRawPayload({ schemaVersion: 1, binding: { attemptId, attemptEpoch: input.attemptEpoch,
     slotSetHash: input.slotSetHash, contextHash: input.contextSnapshotHash }, payloadHash: canonical.hash,
-    ...(timingSnapshotHash?{timingSnapshotHash}:{}),units: prepared.units,
+    ...(timingSnapshotHash?{timingSnapshotHash}:{}),respondentUserId: parent.userId, recoveryTokenHash: parent.recoveryTokenHash,
+    units: prepared.units,
     ...(prepared.formAnswers.length > 0 ? { formAnswers: prepared.formAnswers } : {}) }))
   const coveredFormSlots = new Set(prepared.formAnswers.map(f => formSectionSlotKey(f.sectionId)))
   const remainingRequiredFormSlots = manifest.requiredFormSlots.filter(k => !coveredFormSlots.has(k))
   const receipt = await registerWholeQuestionnaireReceipt(parent, {
     submissionId: input.submissionId, payloadHash: canonical.hash, answersEncrypted: encrypted, acceptedAt: new Date(receivedAtMs),
     requiredFormSlots: remainingRequiredFormSlots, validationHash: prior.wholeValidationHash,
+    rejectPriorUnitSnapshots: isEducationWholeAttempt(parent),
   },async tx=>{
     // Resolve every selected real child in this same receipt transaction,
     // including ordinary questionnaires. A previously accepted replay returned above.
-    const children=await tx.assessment.findMany({where:{id:{in:prepared.units.map(unit=>unit.assessmentId)},compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,
-      compositeItemId:{in:prepared.units.map(unit=>unit.itemId)}},select:{id:true,scaleId:true,compositeItemId:true}})
-    if(children.length!==prepared.units.length||children.some(child=>!prepared.units.some(unit=>unit.assessmentId===child.id&&unit.itemId===child.compositeItemId)))throw failure('整卷工具来源已变化')
+    if(prepared.units.length){
+      const children=await tx.assessment.findMany({where:{id:{in:prepared.units.map(unit=>unit.assessmentId)},compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,
+        compositeItemId:{in:prepared.units.map(unit=>unit.itemId)}},select:{id:true,scaleId:true,compositeItemId:true}})
+      if(children.length!==prepared.units.length||children.some(child=>!prepared.units.some(unit=>unit.assessmentId===child.id&&unit.itemId===child.compositeItemId)))throw failure('整卷工具来源已变化')
+    }
     // Business decision: attempts already started may finish after an
     // emergency stop. Every selected child was admitted by this attempt's
     // START, so no collection re-check here; new STARTs stay blocked.
@@ -924,6 +929,27 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   const feedback = rememberWholeReportFeedbackHint(attemptId, input.submissionId, detachedWholeReceiptsEnabled() && !receipt.replayed ? recordWholeReceiptStored() : receipt.queueDepth)
   return receiptResponse(attemptId, input.submissionId, canonical.hash, receipt.acceptedAt, receipt.replayed, feedback.profile)
 })
+}
+
+/** Completion poll for an education whole receipt. It does not project a report. */
+export const readEducationWholeProgress = async (attemptId: string, userId: string) => {
+  const parent = await prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId },
+    select: { id: true, userId: true, status: true, attemptEpoch: true, assignmentRef: true,
+      compositeAssessment: { select: { productKind: true } } },
+  })
+  if (!parent || parent.userId !== userId || !parent.assignmentRef || parent.compositeAssessment.productKind !== 'ORGANIZATION_RESOURCE') {
+    throw failure('无权限操作此问卷', 403)
+  }
+  const job = await prisma.compositeReportJob.findUnique({
+    where: { attemptId_attemptEpoch: { attemptId, attemptEpoch: parent.attemptEpoch } },
+    select: { wholeSubmissionId: true, status: true },
+  })
+  return {
+    attemptId, attemptEpoch: parent.attemptEpoch, status: parent.status,
+    wholeSubmissionReceived: Boolean(job?.wholeSubmissionId),
+    reportStatus: { state: parent.status === 'COMPLETED' ? 'READY' as const : job?.status ?? 'WAITING' },
+  }
 }
 
 /** Consumes only the committed envelope; a crash replays the same child ids. */
@@ -935,7 +961,8 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
   if (!job.leaseToken || receipt.status !== 'PROCESSING' || !receipt.wholeAnswersEncrypted || !receipt.wholeAcceptedAt) throw failure('整份交卷处理租约已改变')
   const execution: WholeReceiptExecution = { submissionId: receipt.wholeSubmissionId, payloadHash: receipt.wholePayloadHash!, leaseToken: job.leaseToken, acceptedAtMs: receipt.wholeAcceptedAt.getTime() }
   const envelope = unpackWholeRawEnvelope(decryptUnifiedRuntimePayload<{ schemaVersion: number; binding: { attemptId: string; attemptEpoch: number; slotSetHash: string; contextHash: string | null };
-    timingSnapshotHash?:string; payloadHash: string; units: Array<Parameters<typeof submitUnifiedScaleAssessmentFinal>[0] & { itemId: string }>;
+    timingSnapshotHash?:string; payloadHash: string; respondentUserId?: string | null; recoveryTokenHash?: string | null;
+    units: Array<Parameters<typeof submitUnifiedScaleAssessmentFinal>[0] & { itemId: string }>;
     formAnswers?: Array<{ sectionId: string; definitionHash: string; answers: Array<{ formItemId: string; value: unknown; otherText?: string }> }>;
   }>(receipt.wholeAnswersEncrypted))
   if (envelope.schemaVersion !== 1 || envelope.binding.attemptId !== job.attemptId || envelope.binding.attemptEpoch !== job.attemptEpoch
@@ -957,7 +984,10 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
       } : {}),
     },envelope.timingSnapshotHash)).hash !== receipt.wholePayloadHash) throw failure('整份答案封存内容无法验证')
   execution.studyReceipt=await acceptedStudyReceipt(job,envelope)
-  const principal = envelope.units[0]?.userId ? { userId: envelope.units[0].userId } : { recoveryTokenHash: envelope.units[0]?.recoveryTokenHash }
+  const principal = envelope.units[0]?.userId ? { userId: envelope.units[0].userId }
+    : envelope.units[0]?.recoveryTokenHash ? { recoveryTokenHash: envelope.units[0].recoveryTokenHash }
+    : envelope.respondentUserId ? { userId: envelope.respondentUserId }
+    : { recoveryTokenHash: envelope.recoveryTokenHash ?? undefined }
   const reuseCommitted = process.env.ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED !== 'false'
   const { parent, children, frozen, reportParent } = await traceAssessmentPhase('report.frozen_context_load', async () => {
     const reportParent = reuseCommitted ? await prisma.compositeAssessmentAttempt.findUnique({
@@ -968,7 +998,7 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
   })
   assertReportJobIdentity(parent, { attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextHash: job.contextHash })
   if (children.length !== envelope.units.length) throw failure('整份交卷单元数量不匹配')
-  const referenceDb = await traceAssessmentPhase('report.reference_batch', () => preloadFrozenReferenceDb(prisma as any, children.map(({ runtime }) => ({
+  const referenceDb = children.length === 0 ? null : await traceAssessmentPhase('report.reference_batch', () => preloadFrozenReferenceDb(prisma as any, children.map(({ runtime }) => ({
     instrumentType: 'SCALE' as const, instrumentKey: runtime.instrumentKey, bindings: runtime.referenceBindings,
   }))))
   const childrenById = new Map(children.map(candidate => [candidate.child.id, candidate]))
@@ -984,11 +1014,15 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
   // parent lock into one pass for all scale units. The flag remains only as an
   // explicit opt-out ('false'); an unset flag no longer falls back to the
   // per-unit loop.
-  if (process.env.ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED !== 'false') {
-    committedScales = await traceAssessmentPhase('report.units_batch', () => submitUnifiedScaleCollectionBatch(job, units, execution, referenceDb))
-  } else {
-    for (const unit of units) await traceAssessmentPhase('report.unit',
-      () => submitUnifiedScaleAssessmentFinal(unit.input, unit.child, execution, referenceDb), unit.input.itemId)
+  if (units.length > 0) {
+    if (!referenceDb) throw failure('整份交卷量表参照缺失')
+    const references = referenceDb
+    if (process.env.ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED !== 'false') {
+      committedScales = await traceAssessmentPhase('report.units_batch', () => submitUnifiedScaleCollectionBatch(job, units, execution, references))
+    } else {
+      for (const unit of units) await traceAssessmentPhase('report.unit',
+        () => submitUnifiedScaleAssessmentFinal(unit.input, unit.child, execution, references), unit.input.itemId)
+    }
   }
   if (envelope.formAnswers && envelope.formAnswers.length > 0) {
     // X-04A: whole-envelope Form sections materialize through the same

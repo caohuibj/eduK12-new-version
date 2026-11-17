@@ -166,6 +166,12 @@ export const compositeController = {
   async wholeReceipt(req: Request, res: Response) { return handleWholeReceipt(req, res, false) },
   async publicWholeReceipt(req: Request, res: Response) { return handleWholeReceipt(req, res, true) },
   async wholeSubmit(req: Request, res: Response) { return handleWholeSubmit(req, res, false) },
+  async educationWholeProgress(req: Request, res: Response) {
+    try {
+      const { readEducationWholeProgress } = await import('./whole-questionnaire.service')
+      return success(res, await readEducationWholeProgress(req.params.attemptId, req.user!.userId))
+    } catch (err) { return handleError(res, err) }
+  },
   async publicWholeSubmit(req: Request, res: Response) { return handleWholeSubmit(req, res, true) },
 
   async reportStatus(req: Request, res: Response) {

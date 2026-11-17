@@ -12,7 +12,7 @@ vi.mock('../../modules/huiteacher/fieldComposition.service',()=>({readInvitedFie
 vi.mock('../../modules/huiteacher/fieldForm.service',async()=>{const {FieldCompositionError}=await import('../../modules/huiteacher/fieldComposition.authority');return {HuiteacherFieldFormError:FieldCompositionError,readSubmittedHuiteacherFieldFormEvidence:m.evidence,readInvitedHuiteacherFieldForm:m.read,readManagerHuiteacherFieldForm:m.read,bindHuiteacherFieldForm:m.start}})
 vi.mock('../../modules/organization/educationProductAccess',()=>({resolveEducationProductMemberScope:m.admin}))
 vi.mock('../../modules/composite/composite.service',()=>({getAttemptState:m.parent}))
-vi.mock('../../modules/composite/composite.controller',()=>({compositeController:{submitFinalScale:m.final,submitFinalFormSection:m.final}}))
+vi.mock('../../modules/composite/composite.controller',()=>({compositeController:{submitFinalScale:m.final,submitFinalFormSection:m.final,wholeDefinition:vi.fn(),wholeTemplate:vi.fn(),wholeReceipt:vi.fn(),wholeSubmit:vi.fn(),educationWholeProgress:vi.fn()}}))
 vi.mock('../../modules/composite/composite-image.controller',()=>({compositeImageController:{authenticatedFormImage:m.media,authenticatedScaleImage:m.media}}))
 vi.mock('../../modules/composite/composite-video.controller',()=>({compositeVideoController:{authenticatedFormVideo:m.media,authenticatedScaleVideo:m.media}}))
 import router from '../../modules/huiteacher/fieldComposition.routes'

@@ -41,3 +41,27 @@ export const acceptsAsyncCompositeReport = (parent: {
     && !parent.compositeAssessment.reportPackageKey && !parent.compositeAssessment.analysisProtocolKey
     && (config.courseIds.size === 0 || Boolean(parent.deliveryCourseId && config.courseIds.has(parent.deliveryCourseId)))
 }
+
+type EducationWholeIdentity = {
+  runtimeGeneration?: string | null
+  deliveryMode?: string
+  assignmentRef?: string | null
+  compositeAssessment?: { productKind?: string; reportPackageKey?: string | null; analysisProtocolKey?: string | null }
+}
+
+/** Persisted School/Teacher identity. Independent of the admission flags so a
+ * receipt already accepted stays an education materialization if those flags
+ * are later turned off. */
+export const isEducationWholeAttempt = (parent: EducationWholeIdentity): boolean => (
+  parent.runtimeGeneration === 'UNIFIED_V1'
+  && parent.deliveryMode === 'FINAL_ONLY'
+  && typeof parent.assignmentRef === 'string' && parent.assignmentRef.length > 0
+  && parent.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE'
+  && !parent.compositeAssessment.reportPackageKey && !parent.compositeAssessment.analysisProtocolKey
+)
+
+/** New education whole admission. Existing receipts use isEducationWholeAttempt. */
+export const acceptsEducationWholeMaterialization = (parent: EducationWholeIdentity, env: NodeJS.ProcessEnv = process.env): boolean => {
+  const config = assessmentReportConfig(env)
+  return config.enabled && config.wholeSubmitEnabled && isEducationWholeAttempt(parent)
+}

@@ -7,7 +7,7 @@ import { QuestionnaireCompletionAdmissionBusyError } from '../../services/questi
 import { markAssessmentTimeline, traceAssessmentPhase } from '../../services/runtimeObservability'
 
 type Parent = { id: string; attemptEpoch: number; frozenActiveSlotSetHash: string | null; contextSnapshotHash: string | null }
-type Input = { submissionId: string; payloadHash: string; answersEncrypted: string; acceptedAt: Date; requiredFormSlots: string[]; validationHash?: string }
+type Input = { submissionId: string; payloadHash: string; answersEncrypted: string; acceptedAt: Date; requiredFormSlots: string[]; validationHash?: string; rejectPriorUnitSnapshots?: boolean }
 /**
  * A single implicit PostgreSQL transaction. Every write depends on the locked,
  * eligible parent/job and, for legacy submissions only, a reserved permit; no JS callback runs while the
@@ -45,16 +45,16 @@ export const registerWholeReceiptAtomic = async (parent: Parent, input: Input) =
         AND NOT EXISTS (
           SELECT 1 FROM "assessment_unit_snapshots" AS s
           WHERE s."composite_attempt_id" = ${parent.id} AND s."attempt_epoch" = ${parent.attemptEpoch}
-            AND s."unit_type" <> 'FORM_SECTION'
+            AND (${Boolean(input.rejectPriorUnitSnapshots)} OR s."unit_type" <> 'FORM_SECTION')
         )
-        AND NOT EXISTS (
+        AND (${Boolean(input.rejectPriorUnitSnapshots)} OR NOT EXISTS (
           SELECT 1 FROM jsonb_array_elements_text(${JSON.stringify(input.requiredFormSlots)}::jsonb) AS required("key")
           WHERE NOT EXISTS (
             SELECT 1 FROM "assessment_unit_snapshots" AS s
             WHERE s."composite_attempt_id" = ${parent.id} AND s."attempt_epoch" = ${parent.attemptEpoch}
               AND s."slot_key" = required."key" AND s."terminal_state" = 'COMPLETED'
           )
-        )
+        ))
     ), reserved AS (
       ${reservation}
     ), parent_saved AS (

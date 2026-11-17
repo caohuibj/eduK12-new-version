@@ -48,12 +48,16 @@ export function isWholeLocalEligible(candidate?: WholeLocalEligibilityCandidate 
   if (hasContextDependency) {
     return false
   }
-  // Form-only questionnaires stay stepped: the whole-submit protocol is bound
-  // to at least one Scale unit (units.min(1) on the submit schema, and the
-  // receipt principal derives from a Scale child), matching the delivery
-  // endpoint's "整份交卷的量表数量无效" constraint.
-  if (!candidate.items.some(item => item.type === 'SCALE')) {
-    return false
-  }
   return true
+}
+
+/** Client mode follows the same admission the submit path will enforce. */
+export function wholeLocalExecutionMode(input: {
+  shapeEligible: boolean
+  admissionOpen: boolean
+  units: Array<{ type: string; completed: boolean }>
+}): 'WHOLE_LOCAL' | 'STEPPED' {
+  const partialFinal = input.units.some(unit =>
+    (unit.type === 'SCALE' || unit.type === 'FORM_SECTION') && unit.completed)
+  return input.shapeEligible && input.admissionOpen && !partialFinal ? 'WHOLE_LOCAL' : 'STEPPED'
 }

@@ -13,7 +13,7 @@ vi.mock('../../modules/admin-permissions/security',()=>({needsAdminKey:()=>false
 vi.mock('../../modules/assessment-run/educationCompositionExecution',()=>({readFrozenCompositionIdentity:m.identity,assertCompositionCollection:m.collection}))
 vi.mock('../../modules/assessment-relational/runtime-consent',()=>({relationalRuntimeConsentAuthority:{assertCompositeFinal:m.consent}}))
 vi.mock('../../modules/composite/composite.service',()=>({getAttemptState:m.parent}))
-vi.mock('../../modules/composite/composite.controller',()=>({compositeController:{submitFinalScale:m.final,submitFinalFormSection:m.final,embeddedSituationalAsset:m.final}}))
+vi.mock('../../modules/composite/composite.controller',()=>({compositeController:{submitFinalScale:m.final,submitFinalFormSection:m.final,embeddedSituationalAsset:m.final,wholeDefinition:vi.fn(),wholeTemplate:vi.fn(),wholeReceipt:vi.fn(),wholeSubmit:vi.fn(),educationWholeProgress:vi.fn()}}))
 import {createTeacherAssessmentRuntimeRouter} from '../../modules/huiteacher/assessmentRuntime.routes'
 import {generateToken} from '../../utils/jwt'
 import type {UserRole} from '../../types'

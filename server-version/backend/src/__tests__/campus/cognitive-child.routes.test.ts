@@ -19,7 +19,8 @@ vi.mock('../../middleware/auth',()=>({
 vi.mock('../../modules/composite/composite.controller',()=>({compositeController:{
   getAttempt:vi.fn(),submitFinalFormSection:vi.fn(),submitFinalScale:vi.fn(),
   getEmbeddedSituational:vi.fn(),embeddedSituationalAsset:vi.fn(),
-  submitEmbeddedSituational:vi.fn(),
+  submitEmbeddedSituational:vi.fn(),wholeDefinition:vi.fn(),wholeTemplate:vi.fn(),
+  wholeReceipt:vi.fn(),wholeSubmit:vi.fn(),educationWholeProgress:vi.fn(),
 }}))
 vi.mock('../../modules/composite/composite-image.controller',()=>({compositeImageController:{
   authenticatedFormImage:vi.fn(),authenticatedScaleImage:vi.fn(),

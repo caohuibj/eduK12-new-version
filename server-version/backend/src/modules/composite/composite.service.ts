@@ -69,7 +69,7 @@ import {withTrainingTimingReport} from './training-timing-report'
 import {readTrainingContentReports} from './training-content-report'
 import {decodeTrainingFinalReceipt} from './training-content-final'
 import {freezeTrainingTimingSnapshot,readTrainingTimingPolicy} from '../assessment-runtime/training-scale-timing'
-import { isWholeLocalEligible } from './whole-local-eligibility'
+import { isWholeLocalEligible, wholeLocalExecutionMode } from './whole-local-eligibility'
 import { typedFormPresentation } from '../reporting/typed-form-presentation'
 import { sharedControlWritesEnabled, withSharedControlContext } from '../assessment-runtime/shared-control-records'
 import { readCommittedScaleFacts } from '../assessment-runtime/scale-fact-records'
@@ -83,7 +83,7 @@ import type { WholeQuestionnaireReportContext } from './whole-questionnaire.serv
 import { prepareReportReadyNotifications, beginReportReadyWait, reportReadyWaitAvailable, reportReadyNotificationSequence, REPORT_READY_MAX_WAIT_MS } from '../../services/reportReadyNotifications'
 import { readWholeReportFeedbackHint } from '../../services/reportFeedbackHints'
 import { assertNoAcceptedWholeQuestionnaire } from '../assessment-runtime/report-outbox.service'
-import { assessmentReportConfig } from '../../config/assessmentReports'
+import { acceptsAsyncCompositeReport, acceptsEducationWholeMaterialization, assessmentReportConfig } from '../../config/assessmentReports'
 import { assertReportJobIdentity, compositeReportJobState, readCompositeReportMaterialization, readCompositeReportJobHeader, retryCompositeReport, REPORT_PARENT_SELECT, type ReportJobIdentity } from '../assessment-runtime/report-outbox.service'
 import { encryptCompositeCollectionReport, decryptCompositeCollectionReport } from './composite-report-cache'
 import { assertCognitiveProductEligible, assertCognitiveNewAdmissionEnabled } from '../cognitive/product-eligibility'
@@ -5498,10 +5498,11 @@ const getUnifiedCompositeAttemptState = async (
     trainingFlowDigest: attempt.compositeAssessment?.trainingFlowDigest,
     trainingFlowSnapshotHash: attempt.trainingFlowSnapshotHash ?? attempt.compositeAssessment?.trainingFlowSnapshotHash,
   })
-  const wholeSubmitFeatureEnabled = Boolean(assessmentReportConfig().wholeSubmitEnabled)
-  const hasPartialScaleSubmissions = units.some((unit: any) => unit.type === 'SCALE' && unitCompleted(unit))
-  const canIngestWholeLocal = wholeSubmitFeatureEnabled && !hasPartialScaleSubmissions
-  const executionMode = (isEligible && canIngestWholeLocal) ? ('WHOLE_LOCAL' as const) : ('STEPPED' as const)
+  const executionMode = wholeLocalExecutionMode({
+    shapeEligible: isEligible,
+    admissionOpen: assessmentReportConfig().wholeSubmitEnabled && (acceptsAsyncCompositeReport(attempt) || acceptsEducationWholeMaterialization(attempt)),
+    units: units.map((unit: any) => ({ type: unit.type, completed: unitCompleted(unit) })),
+  })
   return {
     id: attempt.id,
     executionMode,

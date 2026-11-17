@@ -252,6 +252,7 @@ describe('START freshlyCreated server distinction', () => {
   })
 
   it('returns freshlyCreated: true from projectFreshStartedAttempt', async () => {
+    vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED', 'true')
     const result = await projectFreshStartedAttempt(
       makeAttemptRow({ id: 'attempt-fresh' }),
       compositeRow,

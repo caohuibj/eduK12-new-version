@@ -1,7 +1,7 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
 const query=vi.hoisted(()=>vi.fn())
 vi.mock('../../config/database',()=>({prisma:{$queryRaw:query}}))
-vi.mock('../../modules/composite/composite.controller',()=>({compositeController:{getAttempt:vi.fn(),submitFinalFormSection:vi.fn()}}))
+vi.mock('../../modules/composite/composite.controller',()=>({compositeController:{getAttempt:vi.fn(),submitFinalFormSection:vi.fn(),wholeDefinition:vi.fn(),wholeTemplate:vi.fn(),wholeReceipt:vi.fn(),wholeSubmit:vi.fn(),educationWholeProgress:vi.fn()}}))
 import {listOwnTeacherPrivateFormTaskPage,listOwnTeacherPrivateFormTasks} from '../../modules/huiteacher/privateFormRuntime.routes'
 const actor='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222'
 const rows=Array.from({length:102},(_,index)=>({executionId:'33333333-3333-4333-8333-'+String(102-index).padStart(12,'0'),

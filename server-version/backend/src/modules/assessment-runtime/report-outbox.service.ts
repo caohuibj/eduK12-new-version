@@ -491,8 +491,12 @@ export const assertNoAcceptedWholeQuestionnaire = async (tx: Pick<Prisma.Transac
   if (rows.length) throw new InstrumentFinalSubmitError('SUBMISSION_ALREADY_IN_PROGRESS', '整份问卷已可靠接收，请查看报告进度，不能重启或重新交卷', 409)
 }
 
+/** Training may already have completed context forms. Education whole does not. */
+export const educationWholeBlocksPriorSnapshots = (headers: Array<{ unitType: string }>) => headers.length > 0
+
 export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParent, input: {
   submissionId: string; payloadHash: string; answersEncrypted: string; acceptedAt: Date; requiredFormSlots: string[]; validationHash?: string;
+  rejectPriorUnitSnapshots?: boolean
 },assertCollectionAllowed?: (tx:Prisma.TransactionClient)=>Promise<void>): Promise<{ acceptedAt: Date; replayed: boolean; queueDepth?: number }> => {
   const receipt = await (!assertCollectionAllowed&&(detachedWholeReceiptsEnabled() || process.env.ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED === 'true')
   ? registerWholeReceiptAtomic(parent, input)
@@ -529,9 +533,11 @@ export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParen
     where: { compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch },
     select: { slotKey: true, unitType: true, terminalState: true },
   }))
-  if (headers.some(row => row.unitType !== 'FORM_SECTION')
+  if (input.rejectPriorUnitSnapshots ? educationWholeBlocksPriorSnapshots(headers) : headers.some(row => row.unitType !== 'FORM_SECTION')
     || input.requiredFormSlots.some(key => !headers.some(row => row.slotKey === key && row.terminalState === 'COMPLETED'))) {
-    throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '请先完成必要背景信息；已分量表交卷的作答不能改为整份交卷', 409)
+    throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', input.rejectPriorUnitSnapshots
+      ? '已分步提交的作答不能改为整份交卷'
+      : '请先完成必要背景信息；已分量表交卷的作答不能改为整份交卷', 409)
   }
   // Detached RAW/tasks do not touch or wait on the legacy shared budget. The
   // callback route preserves the same storage semantics as atomic acceptance.
