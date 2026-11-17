@@ -11,7 +11,7 @@ import { resolveTrainingFlowScope } from '../composite/training-flow-scope'
 import { Prisma, type CompositeReportJob } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { recordReceiptCommit, recordReportQueueEvent, reportQueueObsEnabled } from '../../services/reportQueueObservability'
-import { acceptsAsyncCompositeReport, acceptsEducationWholeMaterialization, assessmentReportConfig } from '../../config/assessmentReports'
+import { acceptsAsyncCompositeReport, assessmentReportConfig } from '../../config/assessmentReports'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { QuestionnaireCompletionAdmissionBusyError } from '../../services/questionnaireCompletionAdmission'
 
@@ -137,7 +137,7 @@ export const enqueueCompositeReportForUnit = async (
     })
   }
   if (!parent) return null
-  const asyncEligible=parent.asyncReportEpoch===parent.attemptEpoch||acceptsAsyncCompositeReport(parent)||acceptsEducationWholeMaterialization(parent)
+  const asyncEligible=parent.asyncReportEpoch===parent.attemptEpoch||acceptsAsyncCompositeReport(parent)
   if(!hasTrainingFlow(parent)&&!asyncEligible)return null
   if (parent.status !== 'IN_PROGRESS' || parent.attemptEpoch !== input.attemptEpoch || !parent.frozenActiveSlotSetHash) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '报告任务与交卷版本不匹配', 409)
