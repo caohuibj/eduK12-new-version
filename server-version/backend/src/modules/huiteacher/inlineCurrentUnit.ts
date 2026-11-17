@@ -1,4 +1,5 @@
 import {getAttemptState} from '../composite/composite.service'
+import {attachEducationInlineWhole} from '../composite/whole-start-inline'
 
 type AttemptState=Awaited<ReturnType<typeof getAttemptState>>
 export type TeacherInlineCurrentUnitRequest={
@@ -21,14 +22,32 @@ export async function attachTeacherInlineCurrentUnit<T extends object,U>(input:{
  started:T
  attemptId?:string|null
  actorUserId:string
+ freshlyCreated?:boolean
+ knownTemplateHashes?:ReadonlySet<string>
  authorize:(input:{attemptId:string;actorUserId:string})=>Promise<unknown>
  project:(state:AttemptState)=>U
 }):Promise<T|(T&{currentUnit:U})>{
  if(!input.requested||!input.attemptId)return input.started
  try{
   await input.authorize({attemptId:input.attemptId,actorUserId:input.actorUserId})
-  const state=await getAttemptState(input.attemptId,{userId:input.actorUserId},undefined,'current-unit')
-  return {...input.started,currentUnit:input.project(state)}
+  const preloaded=(input.started as {
+   _educationWholePreload?:{
+    parent?:Parameters<typeof getAttemptState>[4]
+    preloadedState?:Parameters<typeof getAttemptState>[5]
+   }
+  })._educationWholePreload
+  const state=preloaded?.parent
+   ?await getAttemptState(input.attemptId,{userId:input.actorUserId},undefined,'current-unit',preloaded.parent,preloaded.preloadedState)
+   :await getAttemptState(input.attemptId,{userId:input.actorUserId},undefined,'current-unit')
+  const projected=input.project(state)
+  const inlineWhole=await attachEducationInlineWhole({
+   currentUnit:projected as {id?:string;executionMode?:string},
+   userId:input.actorUserId,
+   freshlyCreated:Boolean(input.freshlyCreated),
+   preloadedParent:preloaded?.parent,
+   knownTemplateHashes:input.knownTemplateHashes,
+  })
+  return {...input.started,currentUnit:projected,...(inlineWhole??{})}
  }catch{
   return input.started
  }

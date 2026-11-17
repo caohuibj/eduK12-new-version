@@ -8,22 +8,37 @@ export class RunResourceBoundaryError extends Error {
   }
 }
 
+export type RunStartPreflight = {
+  runtimeBindingKind: string | null
+  runtimeBindingRef: string | null
+  respondentUserId: string
+}
+
+/** One existing School parent read also supplies the bound replay hint.
+ * START still locks and checks authority inside its canonical admission. */
 export const assertRunExecutionParent = async (input: {
   organizationId: string
   runId: string
   executionId: string
-}): Promise<void> => {
-  const rows = await prisma.$queryRaw<Array<{ id: string }>>`
-    SELECT "id"
-    FROM "assessment_run_executions"
-    WHERE "organization_id" = ${input.organizationId}
-      AND "run_id" = ${input.runId}
-      AND "id" = ${input.executionId}
+}): Promise<RunStartPreflight> => {
+  const rows = await prisma.$queryRaw<RunStartPreflight[]>`
+    SELECT e."runtime_binding_kind" AS "runtimeBindingKind",
+      e."runtime_binding_ref" AS "runtimeBindingRef",
+      respondent."user_id" AS "respondentUserId"
+    FROM "assessment_run_executions" e
+    JOIN "assessment_run_actor_snapshots" respondent
+      ON respondent."organization_id" = e."organization_id"
+      AND respondent."run_id" = e."run_id"
+      AND respondent."id" = e."respondent_actor_snapshot_id"
+    WHERE e."organization_id" = ${input.organizationId}
+      AND e."run_id" = ${input.runId}
+      AND e."id" = ${input.executionId}
     LIMIT 1
   `
   if (!rows[0]) {
     throw new RunResourceBoundaryError('RUN_EXECUTION_NOT_FOUND', 'Run execution not found in parent resource', 404)
   }
+  return rows[0]
 }
 
 /**

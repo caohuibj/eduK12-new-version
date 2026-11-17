@@ -695,12 +695,16 @@ export const getWholeQuestionnaireTemplate = async (
         status: true,
         attemptEpoch: true,
         asyncReportEpoch: true,
+        assignmentRef: true,
         deliveryMode: true,
         runtimeGeneration: true,
         frozenActiveSlotSetHash: true,
         trainingFlowSnapshotHash: true,
         compositeAssessment: {
           select: {
+            productKind: true,
+            reportPackageKey: true,
+            analysisProtocolKey: true,
             trainingFlowFrozen: true,
             trainingVariantFrozen: true,
             trainingVariantDigest: true,
@@ -717,6 +721,9 @@ export const getWholeQuestionnaireTemplate = async (
     if (!attemptRow) throw failure('问卷作答不存在', 404)
     const owned = principal.userId ? attemptRow.userId === principal.userId
       : attemptRow.userId === null && Boolean(principal.recoveryTokenHash && attemptRow.recoveryTokenHash === principal.recoveryTokenHash)
+    const wholeEligible = attemptRow.asyncReportEpoch === attemptRow.attemptEpoch
+      || acceptsAsyncCompositeReport(attemptRow)
+      || acceptsEducationWholeMaterialization(attemptRow)
     if (
       owned
       && attemptRow.deliveryMode === 'FINAL_ONLY'
@@ -725,7 +732,7 @@ export const getWholeQuestionnaireTemplate = async (
       && attemptRow.compositeAssessment.trainingFlowFrozen == null
       && attemptRow.compositeAssessment.trainingVariantFrozen == null
       && attemptRow.compositeAssessment.trainingVariantDigest == null
-      && attemptRow.asyncReportEpoch === attemptRow.attemptEpoch
+      && wholeEligible
     ) {
       if (attemptRow.status !== 'IN_PROGRESS') throw failure('问卷已结束')
       if (

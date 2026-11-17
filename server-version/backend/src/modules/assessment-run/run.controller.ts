@@ -6,6 +6,8 @@ import {prisma} from '../../config/database'
 import {listEducationLibraryResourcePage} from '../scale-library-governance/education-catalog'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
 import { isAssessmentStartBusyError } from '../composite/start-transient'
+import { isAssessmentStartResourceGateError } from '../../services/assessmentResourceProtection'
+import { attachEducationInlineWhole, parseKnownTemplateHashes } from '../composite/whole-start-inline'
 import { acceptRunExecutionConsent } from './consent'
 import {educationTrackingSelectionSchema} from '../reporting/education-personal-tracking'
 import { z } from 'zod'
@@ -69,6 +71,12 @@ const listRunSchema = z.object({
 
 const fail = (res: Response, err: unknown) => {
   if (err instanceof RelationalAssessmentError) return error(res, err.message, -1, 409)
+  // START host memory/CPU protection: preserve Retry-After for safe client retry.
+  if (isAssessmentStartResourceGateError(err)) {
+    const preferred = (err as { preferredRetryAfterSeconds?: number }).preferredRetryAfterSeconds
+    res.setHeader('Retry-After', String(preferred ?? 10))
+    return instrumentError(res, err.code, err.message, err.statusCode)
+  }
   // START transaction rolled back on a transient DB outcome: safe to retry.
   if (isAssessmentStartBusyError(err)) {
     res.setHeader('Retry-After', String(err.retryAfterSeconds))
@@ -275,7 +283,7 @@ export const assessmentRunController = {
   async startExecution(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     try {
-      await assertRunExecutionParent({
+      const startPreflight = await assertRunExecutionParent({
         organizationId: req.params.organizationId,
         runId: req.params.runId,
         executionId: req.params.executionId,
@@ -283,6 +291,7 @@ export const assessmentRunController = {
       const started = await startAssessmentRunExecution({
         executionId: req.params.executionId,
         actorUserId: req.user.userId,
+        ...(startPreflight ? { startPreflight } : {}),
       })
       const requestedDelivery = req.query.view === 'current-unit'
         || req.query.delivery === 'inline'
@@ -308,17 +317,39 @@ export const assessmentRunController = {
               return success(res, started)
             }
           }
+          const preloaded = (started as {
+            _educationWholePreload?: {
+              parent?: Parameters<typeof import('../composite/composite.service').getAttemptState>[4]
+              preloadedState?: Parameters<typeof import('../composite/composite.service').getAttemptState>[5]
+            }
+          })._educationWholePreload
           const { getAttemptState } = await import('../composite/composite.service')
-          const currentUnit = await getAttemptState(
-            started.runtimeBindingRef,
-            { userId: req.user.userId },
-            undefined,
-            'current-unit',
-          )
+          const currentUnit = preloaded?.parent
+            ? await getAttemptState(
+                started.runtimeBindingRef,
+                { userId: req.user.userId },
+                undefined,
+                'current-unit',
+                preloaded.parent,
+                preloaded.preloadedState,
+              )
+            : await getAttemptState(
+                started.runtimeBindingRef,
+                { userId: req.user.userId },
+                undefined,
+                'current-unit',
+              )
+          const inlineWhole = await attachEducationInlineWhole({
+            currentUnit,
+            userId: req.user.userId,
+            freshlyCreated: (started as { _freshlyCreatedAttempt?: boolean })._freshlyCreatedAttempt === true,
+            preloadedParent: preloaded?.parent,
+            knownTemplateHashes: parseKnownTemplateHashes(req),
+          })
           const wallTimeMs = Date.now() - startMs
           const { logger } = await import('../../utils/logger')
           logger.info('assessment-run inline delivery', { phase: 'inline_delivery', outcome: 'success', wallTimeMs })
-          return success(res, { ...started, currentUnit })
+          return success(res, { ...started, currentUnit, ...(inlineWhole ?? {}) })
         } catch (projectionErr: any) {
           // Failure outside the committed transaction falls back to plain started result.
           const wallTimeMs = Date.now() - startMs

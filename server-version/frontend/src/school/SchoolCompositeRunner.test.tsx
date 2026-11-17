@@ -1,6 +1,7 @@
-import {describe,expect,it,vi} from 'vitest'
-import {act,fireEvent,render,screen,waitFor} from '@testing-library/react'
-import type {SchoolApi} from './SchoolRecovery'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import type { SchoolApi } from './SchoolRecovery'
+import { clearWholeQuestionnaireTemplateCacheForTest } from '../modules/composite/whole-definition-source'
 
 const m=vi.hoisted(()=>({entry:vi.fn(),cognitive:vi.fn(),presentation:vi.fn()}))
 vi.mock('../components/FinalCompositeAssessment',()=>({
@@ -294,4 +295,42 @@ it('renders directly from inline currentUnit delivery without initiating seconda
  await waitFor(()=>expect(container.querySelector('.hs-school-task-runner--answer')).toBeTruthy())
  expect(api).toHaveBeenCalledTimes(1)
  expect(api.mock.calls[0][0]).toBe('/organizations/school-a/activities/campus-act-1/runs/run-1/executions/execution-1/start')
+})
+
+it('renders WHOLE_LOCAL fresh START from inline wholeDefinition with zero extra /whole or /whole/progress requests and advertises knownTemplateHash on next start',async()=>{
+ clearWholeQuestionnaireTemplateCacheForTest()
+ const templateHash='f'.repeat(64)
+ const slotSetHash='e'.repeat(64)
+ const wholeDef={
+  attemptId:'parent-attempt-whole-1',attemptEpoch:1,slotSetHash,contextSnapshotHash:null,templateHash,
+  units:[{itemId:'unit-1',scaleAssessmentId:'scale-1',definitionHash:'d'.repeat(64),scale:{id:'s-1',name:'校园线性量表',
+   definition:{schemaVersion:2,respondentType:'participant_self_report',display:{randomizeItems:false},
+    items:[{itemCode:'q1',content:'校园整卷第一题',type:'single',required:true,sortOrder:0,responseSetKey:'r',randomizeOptions:false,options:[{value:1,label:'是'}]}]}}}],
+ }
+ const calls:string[]=[]
+ const api=vi.fn(async(path:string,method='GET')=>{
+  calls.push(`${method} ${path}`)
+  if(path.includes('/start')&&method==='POST'){
+   return {
+    state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-attempt-whole-1',replayed:false,freshlyCreated:true,
+    currentUnit:{id:'parent-attempt-whole-1',attemptEpoch:1,contextSnapshotHash:null,deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',executionMode:'WHOLE_LOCAL',items:[],currentItem:{id:'unit-1',type:'SCALE',position:0,required:true,presentationMode:'ONE_BY_ONE'}},
+    wholeDefinition:wholeDef,
+   }
+  }
+  throw new Error('Unexpected GET after inline whole START: '+path)
+ })
+ try{
+  render(<SchoolCompositeRunner api={api as unknown as SchoolApi} title="学生整卷" execution={execution} onExit={vi.fn()} onFinished={vi.fn()}/>)
+  fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+  expect(await screen.findByText('校园整卷第一题')).toBeInTheDocument()
+  expect(calls).toEqual(['POST /organizations/school-a/activities/campus-act-1/runs/run-1/executions/execution-1/start'])
+
+  cleanup()
+  render(<SchoolCompositeRunner api={api as unknown as SchoolApi} title="学生整卷" execution={{...execution,executionId:'execution-2'}} onExit={vi.fn()} onFinished={vi.fn()}/>)
+  fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+  await screen.findByText('校园整卷第一题')
+  expect(calls[1]).toBe(`POST /organizations/school-a/activities/campus-act-1/runs/run-1/executions/execution-2/start?knownTemplateHash=${templateHash}`)
+ }finally{
+  clearWholeQuestionnaireTemplateCacheForTest()
+ }
 })

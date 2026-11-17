@@ -5,9 +5,17 @@ import {SchoolTaskHelp} from './SchoolTaskHelp'
 import { MemoryRouter } from 'react-router-dom'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
 import WholeCompositeQuestionnaire from '../components/WholeCompositeQuestionnaire'
-import type { CompositeReportStatus, WholeQuestionnaireDefinition, WholeQuestionnaireInput, WholeQuestionnaireReceipt } from '../modules/composite/types'
+import type { CompositeReportStatus, WholeQuestionnaireInput, WholeQuestionnaireReceipt, WholeQuestionnaireDefinition } from '../modules/composite/types'
 import type { WholeReceiptLookup } from '../modules/composite/receipt-recovery'
 import type { WholeQuestionnaireApi } from '../components/WholeCompositeQuestionnaire'
+import {
+  captureEducationInlineWhole,
+  educationAttemptIdentity,
+  fetchEducationWholeDefinition,
+  withKnownWholeTemplateQuery,
+  type EducationInlineWholePayload,
+} from '../modules/composite/education-whole-client'
+import type { InlineWholeDefinitionIdentity } from '../modules/composite/whole-definition-source'
 const CognitiveRunner=deferredPage(async()=>({default:(await import('../modules/cognitive/pages/CognitiveRunner')).CognitiveRunner}))
 import type { CognitiveSessionApi } from '../modules/cognitive/api'
 import type { CognitiveSession } from '../modules/cognitive/types'
@@ -33,7 +41,13 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
   const currentIdentity=useRef<typeof identity|null>(identity);currentIdentity.current=identity
   const completion=useRef<string|null>(null),onParentCompletedRef=useRef(onParentCompleted)
   onParentCompletedRef.current=onParentCompleted
-  useEffect(()=>{currentIdentity.current=identity;completion.current=null;return()=>{currentIdentity.current=null}},[identity])
+  const inlineWholeRef=useRef<{attemptId:string;definition:WholeQuestionnaireDefinition}|null>(null)
+  const activeIdentityRef=useRef<InlineWholeDefinitionIdentity|null>(null)
+  const [freshStart,setFreshStart]=useState(false)
+  useEffect(()=>{
+    currentIdentity.current=identity;completion.current=null;inlineWholeRef.current=null;activeIdentityRef.current=null;setFreshStart(false)
+    return()=>{currentIdentity.current=null}
+  },[identity])
   const panelRef=useRef<HTMLElement>(null)
   useEffect(()=>{
     panelRef.current?.focus({preventScroll:true})
@@ -52,10 +66,13 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
   const prefix=`/organizations/${execution.organizationId}/activities/${execution.courseId}/runs/${execution.runId}/executions/${execution.executionId}`
   const wrapped=<T,>(data:T):ApiResponse<T>=>({code:0,message:'成功',data})
   const load=useCallback(async(id:string)=>{
+    inlineWholeRef.current=null
+    setFreshStart(false)
     const result=await api<CompositeAttemptState>('/composite-attempts/'+encodeURIComponent(id)+'?view=current-unit')
     if(currentIdentity.current!==identity)return
     if(result.id!==id)throw new Error('测评记录与当前任务不一致，请重新读取。')
     if(result.deliveryMode!=='FINAL_ONLY')throw new Error('不支持通过校园入口重启历史旧版测评')
+    activeIdentityRef.current=educationAttemptIdentity(result)
     setState(result)
     if(result.status==='COMPLETED'){
       setDone(true)
@@ -63,7 +80,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
     }
   },[api,identity,observer])
   const start=async()=>{
-    setBusy(true);setError('')
+    setBusy(true);setError('');inlineWholeRef.current=null;setFreshStart(false)
     try{
       // Only the respondent may accept a frozen observer Run consent; a
       // student's/guardian's activity association never implies consent.
@@ -75,7 +92,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
       if(currentIdentity.current!==identity)return
       const result=await api<{
         state:'STARTED'|'IN_PROGRESS';runtimeBindingKind?:string;runtimeBindingRef?:string;currentUnit?:CompositeAttemptState
-      }>(prefix+'/start','POST',{delivery:'inline'})
+      } & EducationInlineWholePayload>(withKnownWholeTemplateQuery(prefix+'/start'),'POST',{delivery:'inline'})
       if(result.state==='IN_PROGRESS'){
         setError('启动请求正在确认中，请重新核对；请勿重复开启另一份测评。')
         return
@@ -84,6 +101,10 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
         ||!result.runtimeBindingRef)throw new Error('正式测评尚未提供安全的 Composite 执行实例')
       if(result.currentUnit&&result.currentUnit.id===result.runtimeBindingRef&&result.currentUnit.deliveryMode==='FINAL_ONLY'){
         if(currentIdentity.current!==identity)return
+        activeIdentityRef.current=educationAttemptIdentity(result.currentUnit)
+        const inline=captureEducationInlineWhole(result)
+        inlineWholeRef.current=inline?{attemptId:result.currentUnit.id,definition:inline}:null
+        setFreshStart(Boolean(result.freshlyCreated))
         setState(result.currentUnit)
         if(result.currentUnit.status==='COMPLETED'){
           setDone(true)
@@ -170,7 +191,19 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
   const consentVisibility=observer&&execution.consentVisibility&&observerVisibility[execution.consentVisibility]
     ||execution.consentVisibility||'仅限经授权人员'
   const wholeApi=useMemo(():WholeQuestionnaireApi=>({
-    wholeDefinition:async(id:string)=>wrapped(await api<WholeQuestionnaireDefinition>('/composite-attempts/'+encodeURIComponent(id)+'/whole')),
+    wholeDefinition:(id:string)=>fetchEducationWholeDefinition({
+      attemptId:id,
+      attemptBasePath:'/composite-attempts/'+encodeURIComponent(id),
+      consumeInline:(attemptId)=>{
+        const pending=inlineWholeRef.current
+        inlineWholeRef.current=null
+        return {
+          inline:pending&&pending.attemptId===attemptId?pending.definition:null,
+          identity:activeIdentityRef.current,
+        }
+      },
+      get:<T,>(path:string)=>api<T>(path),
+    }),
     submitWhole:async(id:string,input:WholeQuestionnaireInput)=>wrapped(await api<WholeQuestionnaireReceipt>('/composite-attempts/'+encodeURIComponent(id)+'/whole/submit','POST',input)),
     wholeReceipt:async(id:string,submissionId:string,attemptEpoch:number)=>wrapped(await api<WholeReceiptLookup>('/composite-attempts/'+encodeURIComponent(id)+'/whole/receipt?submissionId='+encodeURIComponent(submissionId)+'&attemptEpoch='+attemptEpoch)),
     reportStatus:async(id:string)=>wrapped(await api<CompositeReportStatus>('/composite-attempts/'+encodeURIComponent(id)+'/whole/progress')),
@@ -256,7 +289,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
           client:situationalClient,onCompleted:()=>{void childFinished()},
         }}/>
       </MemoryRouter>:
-    state?.executionMode==='WHOLE_LOCAL'&&!child?<WholeCompositeQuestionnaire state={state} fallback={stepped} api={wholeApi} educationMedia={educationMedia} onExit={onExit}
+    state?.executionMode==='WHOLE_LOCAL'&&!child?<WholeCompositeQuestionnaire state={state} isFreshStart={freshStart} fallback={stepped} api={wholeApi} educationMedia={educationMedia} onExit={onExit}
       acceptedNotice="答案已保存，正在处理。完成状态以服务器确认的测评记录为准，交卷回执不会开放个人报告。"
       acceptedAction="查看完成状态"
       committedMessage="答案已保存，正在处理。请勿重复交卷。"

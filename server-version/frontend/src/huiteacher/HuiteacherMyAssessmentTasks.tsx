@@ -15,6 +15,9 @@ import {TeacherAssessmentPage} from './TeacherAssessmentPage'
 import {assessmentStatus,type AssessmentListPresentation} from './assessmentTaskPresentation'
 import {createTeacherCognitiveClient,createTeacherSituationalClient,createTeacherAssessmentMediaTransport,
  teacherAssessmentParentPath,type TeacherAssessmentTask,type TeacherAssessmentCompletion} from './assessmentRuntime.client'
+import {captureEducationInlineWhole,educationAttemptIdentity,fetchEducationWholeDefinition,
+ withKnownWholeTemplateQuery,type EducationInlineWholePayload} from '../modules/composite/education-whole-client'
+import type {InlineWholeDefinitionIdentity} from '../modules/composite/whole-definition-source'
 
 export type TeacherAssessmentRuntimeProps={
  api:EducationReportApi;actorKey:string;student?:boolean;
@@ -35,7 +38,10 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
  const [list,setList]=useState({pending:true,error:'',loaded:false})
  const [session,setSession]=useState<Session|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('')
  const [accepted,setAccepted]=useState(false)
+ const [freshStart,setFreshStart]=useState(false)
  const generation=useRef(0),listGeneration=useRef(0),active=useRef(session),apiRef=useRef(api)
+ const inlineWholeRef=useRef<{attemptId:string;definition:WholeQuestionnaireDefinition}|null>(null)
+ const activeIdentityRef=useRef<InlineWholeDefinitionIdentity|null>(null)
  const completed=useRef(new Set<string>()),completionCallback=useRef(onCompleted)
  active.current=session;apiRef.current=api;completionCallback.current=onCompleted
  const panel=useRef<HTMLDivElement>(null)
@@ -61,7 +67,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
  useEffect(()=>onListStateChange?.({pending:list.pending,error:!!list.error,count:rows.length}),[onListStateChange,list.pending,list.error,rows.length])
  const activeExecutionId=session?.task.executionId
  useEffect(()=>{if(activeExecutionId){panel.current?.focus({preventScroll:true});panel.current?.scrollIntoView?.({block:'start'})}},[activeExecutionId])
- const leave=()=>{generation.current++;active.current=null;setSession(null);setBusy(false);setError('');setAccepted(false)}
+ const leave=()=>{generation.current++;active.current=null;inlineWholeRef.current=null;activeIdentityRef.current=null;setFreshStart(false);setSession(null);setBusy(false);setError('');setAccepted(false)}
  const execute=async(work:(valid:()=>boolean)=>Promise<void>)=>{
   if(!mounted.current||apiRef.current!==api)return
   const token=++generation.current
@@ -70,10 +76,11 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
   try{await work(valid)}catch(reason){if(valid())setError(reason instanceof Error?reason.message:'测评暂不可读取，请重试')}
   finally{if(valid())setBusy(false)}
  }
- const accept=(task:TeacherAssessmentTask,attemptId:string,state:CompositeAttemptState,valid:()=>boolean)=>{
+ const accept=(task:TeacherAssessmentTask,attemptId:string,state:CompositeAttemptState,valid:()=>boolean,inline?:{definition:WholeQuestionnaireDefinition|null;freshlyCreated:boolean})=>{
   if(!valid())return
   if(state.id!==attemptId||state.deliveryMode!=='FINAL_ONLY')throw new Error('测评记录与当前冻结任务不一致')
   if(state.status==='COMPLETED'){
+   inlineWholeRef.current=null;activeIdentityRef.current=null;setFreshStart(false)
    const completion={executionId:task.executionId,attemptId:state.id,...(task.mode?{mode:task.mode}:{})},key=completion.executionId+':'+completion.attemptId
    setSession({task,attempt:state,child:null,completion})
    setRows(old=>old.map(row=>row.executionId===task.executionId?{...row,status:'COMPLETED'}:row))
@@ -82,16 +89,20 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
    if(!completed.current.has(key)){completed.current.add(key);completionCallback.current?.(completion)}
   }else{
    if(state.status!=='IN_PROGRESS')throw new Error('当前测评已结束，不能继续作答')
+   activeIdentityRef.current=educationAttemptIdentity(state)
+   inlineWholeRef.current=inline?.definition?{attemptId:state.id,definition:inline.definition}:null
+   setFreshStart(Boolean(inline?.freshlyCreated))
    setSession({task,attempt:state,child:null,completion:null})
   }
  }
  const load=async(task:TeacherAssessmentTask,attemptId:string,valid:()=>boolean)=>{
+  inlineWholeRef.current=null;setFreshStart(false)
   const state=await api<CompositeAttemptState>(teacherAssessmentParentPath(attemptId)+'?view=current-unit')
   accept(task,attemptId,state,valid)
  }
  const open=(task:TeacherAssessmentTask)=>{
   if(active.current||busy)return
-  generation.current++;setAccepted(false);setError('')
+  generation.current++;inlineWholeRef.current=null;activeIdentityRef.current=null;setFreshStart(false);setAccepted(false);setError('')
   const next={task,attempt:null,child:null,completion:null};active.current=next;setSession(next)
   if(task.runtimeBindingRef)void execute(valid=>load(task,task.runtimeBindingRef!,valid))
  }
@@ -106,8 +117,8 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
     await api('/run-executions/'+encodeURIComponent(task.executionId)+'/assessment-consent/accept','POST',{})
     if(!valid())return
    }
-   const result=await api<{state:string;runtimeBindingKind?:string;runtimeBindingRef?:string;currentUnit?:CompositeAttemptState}>(
-    '/run-executions/'+encodeURIComponent(task.executionId)+'/start-assessment','POST',{delivery:'inline'})
+   const result=await api<{state:string;runtimeBindingKind?:string;runtimeBindingRef?:string;currentUnit?:CompositeAttemptState} & EducationInlineWholePayload>(
+    withKnownWholeTemplateQuery('/run-executions/'+encodeURIComponent(task.executionId)+'/start-assessment'),'POST',{delivery:'inline'})
    if(!valid())return
    if(result.state==='IN_PROGRESS')throw new Error('测评正在建立，请稍后重新核对同一任务')
    if(result.state!=='STARTED'||result.runtimeBindingKind!=='COMPOSITE'||!result.runtimeBindingRef)throw new Error('当前任务尚无获授权的正式运行记录')
@@ -121,7 +132,10 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
    active.current=startedSession;setSession(startedSession)
    const inline=result.currentUnit
    if(inline&&inline.id===result.runtimeBindingRef&&inline.deliveryMode==='FINAL_ONLY'){
-    accept(startedTask,result.runtimeBindingRef,inline,valid)
+    accept(startedTask,result.runtimeBindingRef,inline,valid,{
+     definition:captureEducationInlineWhole(result),
+     freshlyCreated:Boolean(result.freshlyCreated),
+    })
    }else{
     await load(startedTask,result.runtimeBindingRef,valid)
    }
@@ -145,7 +159,19 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
   ?createTeacherSituationalClient(api,parentId,child.id,child.situationalAttemptId):null,[api,parentId,child])
  const media=useMemo(()=>attempt?.currentItem?createTeacherAssessmentMediaTransport(api,attempt.id,attempt.currentItem):undefined,[api,attempt])
  const wholeApi=useMemo(():WholeQuestionnaireApi|null=>attempt?{
-  wholeDefinition:async(id:string)=>({code:0,message:'成功',data:await api<WholeQuestionnaireDefinition>(teacherAssessmentParentPath(id)+'/whole')}),
+  wholeDefinition:(id:string)=>fetchEducationWholeDefinition({
+   attemptId:id,
+   attemptBasePath:teacherAssessmentParentPath(id),
+   consumeInline:(attemptId)=>{
+    const pending=inlineWholeRef.current
+    inlineWholeRef.current=null
+    return {
+     inline:pending&&pending.attemptId===attemptId?pending.definition:null,
+     identity:activeIdentityRef.current,
+    }
+   },
+   get:<T,>(path:string)=>api<T>(path),
+  }),
   submitWhole:async(id:string,input:WholeQuestionnaireInput)=>({code:0,message:'成功',data:await api<WholeQuestionnaireReceipt>(teacherAssessmentParentPath(id)+'/whole/submit','POST',input)}),
   wholeReceipt:async(id:string,submissionId:string,attemptEpoch:number)=>({code:0,message:'成功',data:await api<WholeReceiptLookup>(teacherAssessmentParentPath(id)+'/whole/receipt?submissionId='+encodeURIComponent(submissionId)+'&attemptEpoch='+attemptEpoch)}),
   reportStatus:async(id:string)=>({code:0,message:'成功',data:await api<CompositeReportStatus>(teacherAssessmentParentPath(id)+'/whole/progress')}),
@@ -210,7 +236,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
      child?.type==='SITUATIONAL'&&child.situationalAttemptId&&attempt&&situational?
       <MemoryRouter key={actorKey+':'+child.situationalAttemptId}><SituationalRunner host={{attemptId:child.situationalAttemptId,parentAttemptId:attempt.id,
        compositeItemId:child.id,instructionsSummary:'作答说明',client:situational,onCompleted:childFinished}}/></MemoryRouter>:
-     attempt?.executionMode==='WHOLE_LOCAL'&&!child&&wholeApi&&educationMedia?<WholeCompositeQuestionnaire state={attempt} fallback={stepped} api={wholeApi} educationMedia={educationMedia} onExit={leave}
+     attempt?.executionMode==='WHOLE_LOCAL'&&!child&&wholeApi&&educationMedia?<WholeCompositeQuestionnaire state={attempt} isFreshStart={freshStart} fallback={stepped} api={wholeApi} educationMedia={educationMedia} onExit={leave}
       acceptedNotice="答案已保存，正在处理。完成状态以服务器确认的测评记录为准，交卷回执不会开放个人报告。"
       acceptedAction="查看完成状态"
       committedMessage="答案已保存，正在处理。请勿重复交卷。"

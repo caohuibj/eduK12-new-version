@@ -6,6 +6,8 @@ import {assertEducationCognitiveOriginalUse} from '../education-tools/native-sou
 import {isStudentComposition,validStudentCompositionPolicy} from '../huiteacher/studentComposition.policy'
 import {studentEvaluationTrackConfigSql} from '../huiteacher/studentCompositionResource'
 import {Prisma} from '@prisma/client'
+import {prisma} from '../../config/database'
+import {BoundedTtlCache,START_READ_CACHE_MAX_ENTRIES,START_READ_CACHE_TTL_MS} from '../composite/start-read-cache'
 import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {authorizePrivateTool} from '../education-tools/private-tool.access'
@@ -41,23 +43,16 @@ const manifestSchema=z.array(z.object({blockId:z.string().guid(),kind:z.enum(['S
 const unitsSchema=z.array(z.object({itemId:z.string(),family:z.enum(['SCALE','COGNITIVE','SJT']).default('SCALE'),scaleId:z.string().nullable(),versionId:z.string().guid(),contentHash:z.string(),
  releaseId:z.string().guid(),definitionHash:z.string(),measurementHash:z.string(),native:educationNativeDescriptorSchema.optional()}).strict()).max(50)
 
-/** Frozen policy comes from an actual server-loaded Run track. The DB seal and
- * immutable version/children prove content correspondence; this reader checks
- * only the independent header anchors and bounded references, never full source
- * definitions, stimuli, report bodies or full snapshot hashes. No author rights. */
-export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResourcePolicy;policyHash:string;organizationId:string;key:string;version:string}){
- const policy=input.policy,binding=educationCompositionPolicyBindingSchema.parse(policy.educationComposition),origin=binding.origin
- if(origin.variantKey==='TEACHER:EXPERT_REPORT')privateToolFail('PRIVATE_COMPOSITION_FIELD_INVITATION_REQUIRED',400)
- const variant=educationCompositionVariant(origin)
- const group=origin.variantKey===(origin.entry==='SCHOOL'?'STUDENT:SELF':'TEACHER:SELF')&&policy.analysisMode==='COHORT_AGGREGATE'
-  &&policy.resultDisclosure?.policyKey==='EDUCATION_SELF_GROUP_V2'
- if(input.version!=='1.0.0'||policy.version!==input.version||policy.family!=='BUNDLE'||policy.key!==input.key
-  ||educationCompositionKey(origin)!==input.key||origin.organizationId!==input.organizationId||canonicalHash(policy)!==input.policyHash
-  ||policy.runtimeLaunchTarget?.kind!=='COMPOSITE'||policy.scientificMaturity!=='PILOT'
-  ||(isStudentComposition(origin)?!validStudentCompositionPolicy(policy):!group&&(policy.analysisMode!=='INDIVIDUAL_ONLY'||policy.minimumRespondents!==null))
-  ||canonicalHash([policy.subjectRoles,policy.respondentRoles,policy.relationshipKinds,policy.perspectives])
-   !==canonicalHash([[variant.subjectRole],[variant.respondentRole],variant.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'),[variant.perspective]]))
-  privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
+const frozenCompositionIdentityCache=new BoundedTtlCache<Omit<Awaited<ReturnType<typeof loadFrozenCompositionIdentityRow>>,never>>(
+ START_READ_CACHE_TTL_MS,
+ START_READ_CACHE_MAX_ENTRIES,
+)
+export const resetEducationCompositionIdentityCacheForTests=()=>{frozenCompositionIdentityCache.clear()}
+
+async function loadFrozenCompositionIdentityRow(tx:Tx,input:{
+ policy:RunResourcePolicy;origin:z.infer<typeof educationCompositionPolicyBindingSchema>['origin'];
+ binding:z.infer<typeof educationCompositionPolicyBindingSchema>;key:string;
+}){
  const [row]=await tx.$queryRaw<Array<{title:string;manifest:unknown;units:unknown;groupReporting?:unknown;publicBindings?:unknown}>>(Prisma.sql`SELECT c.name AS title,original.definition->'groupReporting' AS "groupReporting",
   (SELECT COALESCE(jsonb_agg((b->'source')-ARRAY['kind','profile']),'[]'::jsonb) FROM jsonb_array_elements(original.definition->'blocks') b
    WHERE b#>>'{source,provider}' IN ('STANDARD_SCALE','COGNITIVE_CONFIG') AND b->'source'?'selectedBinding') AS "publicBindings",
@@ -76,18 +71,62 @@ export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResou
    'contentHash',u#>>'{measurement,contentHash}','releaseId',u#>>'{measurement,releaseId}','definitionHash',COALESCE(u#>>'{source,educationStandard,nativeDefinitionHash}',u#>>'{source,educationLibrary,nativeDefinitionHash}',s.definition_hash,u#>>'{source,educationNative,contentHash}'),
    'measurementHash',u#>>'{measurement,measurementHash}')||CASE WHEN u#>'{source,educationNative}' IS NOT NULL THEN jsonb_build_object('native',u#>'{source,educationNative}') ELSE '{}'::jsonb END),'[]'::jsonb)
    FROM jsonb_array_elements(c.training_content_snapshot->'units') u LEFT JOIN scales s ON u->>'family'='SCALE' AND s.id=u#>>'{source,id}') AS units
-  FROM composite_assessments c JOIN education_private_tool_versions original ON original.id=${origin.versionId}
-   AND original.content_hash=${origin.contentHash} AND original.entry=${origin.entry} AND original.kind='COMPOSITION'
-   AND original.organization_id=${origin.organizationId} AND original.owner_user_id=${origin.ownerUserId}
-  WHERE c.id=${policy.runtimeLaunchTarget.ref} AND c.creation_key=${input.key}
-   AND c.creation_hash=${canonicalHash(origin)} AND c.training_content_snapshot_hash=${binding.manifestHash}
-   AND c.created_by=${origin.ownerUserId} AND c.status='PUBLISHED' AND c.published_at IS NOT NULL
+  FROM composite_assessments c JOIN education_private_tool_versions original ON original.id=${input.origin.versionId}
+   AND original.content_hash=${input.origin.contentHash} AND original.entry=${input.origin.entry} AND original.kind='COMPOSITION'
+   AND original.organization_id=${input.origin.organizationId} AND original.owner_user_id=${input.origin.ownerUserId}
+  WHERE c.id=${input.policy.runtimeLaunchTarget!.ref} AND c.creation_key=${input.key}
+   AND c.creation_hash=${canonicalHash(input.origin)} AND c.training_content_snapshot_hash=${input.binding.manifestHash}
+   AND c.created_by=${input.origin.ownerUserId} AND c.status='PUBLISHED' AND c.published_at IS NOT NULL
    AND c.product_kind='ORGANIZATION_RESOURCE' AND NOT c.public_enabled AND NOT c.copyable`)
  if(!row)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
- if(group)assertSchoolCompositionGroupIdentity(policy,row.groupReporting)
- else if(row.groupReporting!=null)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
- return {kind:'COMPOSITION' as const,origin,compositeId:policy.runtimeLaunchTarget.ref,title:row.title,policy,binding,
-  manifest:manifestSchema.parse(row.manifest),units:unitsSchema.parse(row.units),selectedBindings:readSelectedSourceBindings(row.publicBindings??[]),identityOnly:true as const}
+ return {
+  title:row.title,
+  groupReporting:row.groupReporting,
+  manifest:manifestSchema.parse(row.manifest),
+  units:unitsSchema.parse(row.units),
+  selectedBindings:readSelectedSourceBindings(row.publicBindings??[]),
+ }
+}
+
+/** Frozen policy comes from an actual server-loaded Run track. The DB seal and
+ * immutable version/children prove content correspondence; this reader checks
+ * only the independent header anchors and bounded references, never full source
+ * definitions, stimuli, report bodies or full snapshot hashes. No author rights. */
+export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResourcePolicy;policyHash:string;organizationId:string;key:string;version:string}){
+ const policy=input.policy,binding=educationCompositionPolicyBindingSchema.parse(policy.educationComposition),origin=binding.origin
+ if(origin.variantKey==='TEACHER:EXPERT_REPORT')privateToolFail('PRIVATE_COMPOSITION_FIELD_INVITATION_REQUIRED',400)
+ const variant=educationCompositionVariant(origin)
+ const group=origin.variantKey===(origin.entry==='SCHOOL'?'STUDENT:SELF':'TEACHER:SELF')&&policy.analysisMode==='COHORT_AGGREGATE'
+  &&policy.resultDisclosure?.policyKey==='EDUCATION_SELF_GROUP_V2'
+ if(input.version!=='1.0.0'||policy.version!==input.version||policy.family!=='BUNDLE'||policy.key!==input.key
+  ||educationCompositionKey(origin)!==input.key||origin.organizationId!==input.organizationId||canonicalHash(policy)!==input.policyHash
+  ||policy.runtimeLaunchTarget?.kind!=='COMPOSITE'||policy.scientificMaturity!=='PILOT'
+  ||(isStudentComposition(origin)?!validStudentCompositionPolicy(policy):!group&&(policy.analysisMode!=='INDIVIDUAL_ONLY'||policy.minimumRespondents!==null))
+  ||canonicalHash([policy.subjectRoles,policy.respondentRoles,policy.relationshipKinds,policy.perspectives])
+   !==canonicalHash([[variant.subjectRole],[variant.respondentRole],variant.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'),[variant.perspective]]))
+  privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
+ const canUseCache=tx===(prisma as unknown as Tx)
+ const cacheKey=`${input.organizationId}:${input.key}:${input.version}:${input.policyHash}:${binding.manifestHash}:${policy.runtimeLaunchTarget.ref}`
+ let parsed=canUseCache?frozenCompositionIdentityCache.get(cacheKey):undefined
+ if(parsed){
+  // Publication status stays live on every cache hit.
+  const [live]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT c.id FROM composite_assessments c
+   WHERE c.id=${policy.runtimeLaunchTarget.ref} AND c.training_content_snapshot_hash=${binding.manifestHash}
+    AND c.status='PUBLISHED' AND c.published_at IS NOT NULL AND NOT c.public_enabled AND NOT c.copyable LIMIT 1`)
+  if(!live)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
+ }else{
+  parsed=canUseCache
+   ?await frozenCompositionIdentityCache.singleFlight(cacheKey,async()=>{
+     const value=await loadFrozenCompositionIdentityRow(tx,{policy,origin,binding,key:input.key})
+     frozenCompositionIdentityCache.set(cacheKey,value)
+     return value
+    })
+   :await loadFrozenCompositionIdentityRow(tx,{policy,origin,binding,key:input.key})
+ }
+ if(group)assertSchoolCompositionGroupIdentity(policy,parsed.groupReporting)
+ else if(parsed.groupReporting!=null)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
+ return {kind:'COMPOSITION' as const,origin,compositeId:policy.runtimeLaunchTarget.ref,title:parsed.title,policy,binding,
+  manifest:parsed.manifest,units:parsed.units,selectedBindings:parsed.selectedBindings,identityOnly:true as const}
 }
 export type FrozenCompositionIdentity=Awaited<ReturnType<typeof readFrozenCompositionIdentity>>
 
