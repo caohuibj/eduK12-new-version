@@ -100,7 +100,7 @@ const sendAnalysisExport = async (
   return res.status(200).send(file.body)
 }
 
-const parseKnownTemplateHashes = (req: Request): ReadonlySet<string> | undefined => {
+export const parseKnownTemplateHashes = (req: Request): ReadonlySet<string> | undefined => {
   const rawHeader = req.headers['x-whole-template-hash']
   const rawQuery = req.query.knownTemplateHash
   const parts: string[] = []

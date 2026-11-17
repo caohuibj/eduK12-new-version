@@ -4302,6 +4302,7 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
           updatedAt: true,
           trainingContentSnapshotHash: true,
           productKind: true,
+          personalTracking: true,
           publicEnabled: true,
           status: true,
           opensAt: true,
@@ -4325,6 +4326,7 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
             updatedAt: true,
             trainingContentSnapshotHash: true,
             productKind: true,
+            personalTracking: true,
           publicEnabled: true,
             status: true,
             opensAt: true,
@@ -4369,6 +4371,22 @@ const loadPublicCompositeInfo = async (id: string, db: Db) => {
   if (current.personalTracking != null)
     return loadComposite(id, true, db)
   return current
+}
+
+/** Admission oracle for anonymous-study wave create, info, and join.
+ * Same token, window, and training-round checks as public info. Skips the
+ * presentation graph, slot-label decrypt, and study-wave probe. A
+ * personal-tracking publication still runs loadComposite so a bad baseline
+ * is rejected the same way the info path rejects it. */
+export const assertPublicCompositeAdmission = async (tokenValue: string, db: Db = prisma) => {
+  const token = await findPublicToken(tokenValue, db)
+  assertSupportedComposite(token.compositeAssessment)
+  assertTokenWindow(token)
+  await assertTrainingTokenRound(db as Prisma.TransactionClient, token)
+  assertCompositeWindow(token.compositeAssessment)
+  if (token.compositeAssessment.personalTracking != null) {
+    await loadComposite(token.compositeAssessment.id, true, db)
+  }
 }
 
 export const getPublicCompositeInfo = async (tokenValue: string, db: Db = prisma) => {

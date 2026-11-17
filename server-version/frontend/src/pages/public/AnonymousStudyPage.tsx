@@ -23,7 +23,7 @@ import {PersonalParticipationLink} from '../../components/participation/Personal
 import {ParticipationCodeSetup,ParticipationCodeSaved,ParticipationCodeRecovery,type MemorableEnrollment} from '../../components/participation/ParticipationCode'
 import {trainingStudyLink} from '../../components/participation/training-participation-link'
 import {TrainingPersonalChanges} from '../../modules/composite/TrainingPersonalChanges'
-import {cacheWholeQuestionnaireTemplate} from '../../modules/composite/whole-definition-source'
+import {assembleInlineWholePayload} from '../../modules/composite/whole-definition-source'
 
 function ResearchConsentPanel({studyId,credential}:{studyId:string;credential:string}) {
   const [research,setResearch]=useState<ResearchParticipation|null>(null)
@@ -173,10 +173,10 @@ export default function AnonymousStudyPage() {
     if(current!==epoch.current)return
     sessionStorage.setItem(`composite:recovery:attempt:${own.attemptId}`,own.recoveryToken)
     sessionStorage.setItem(`composite:study:return:${own.attemptId}`,`/public/studies/${sid}`)
-    if(own.wholeDefinition && own.state==='IN_PROGRESS'){
-      cacheWholeQuestionnaireTemplate(own.wholeDefinition)
+    const inlineWhole = assembleInlineWholePayload(own)
+    if(inlineWhole && own.state==='IN_PROGRESS'){
       try {
-        sessionStorage.setItem(`composite:inline-definition:${own.attemptId}`,JSON.stringify(own.wholeDefinition))
+        sessionStorage.setItem(`composite:inline-definition:${own.attemptId}`,JSON.stringify(inlineWhole))
       } catch {
         // Storage quota/permission failures fall back to the authoritative GET.
       }

@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { rateLimit } from 'express-rate-limit'
 import { authenticate, requireTeacher } from '../../middleware/auth'
 import { success, error } from '../../utils/response'
+import { parseKnownTemplateHashes } from '../composite/composite.controller'
 import * as service from './service'
 import * as governance from './governance'
 
@@ -123,11 +124,11 @@ publicAnonymousStudyRouter.post('/:studyId/code/reset',wrap(async(req,res)=>{
 publicAnonymousStudyRouter.get('/:studyId',wrap(async(req,res)=>success(res,await service.participantHome(id.parse(req.params.studyId),credential(req)))))
 publicAnonymousStudyRouter.post('/:studyId/waves/:waveId/start',wrap(async(req,res)=>{
   const wantsWhole = req.query.delivery === 'whole' || (req.body as { delivery?: unknown } | undefined)?.delivery === 'whole'
-  return success(res,await service.startStudyWave(id.parse(req.params.studyId),id.parse(req.params.waveId),credential(req),{ wantsWholeDelivery: wantsWhole }))
+  return success(res,await service.startStudyWave(id.parse(req.params.studyId),id.parse(req.params.waveId),credential(req),{ wantsWholeDelivery: wantsWhole, knownTemplateHashes: parseKnownTemplateHashes(req) }))
 }))
 publicAnonymousStudyRouter.post('/:studyId/waves/:waveId/recover',wrap(async(req,res)=>{
   const wantsWhole = req.query.delivery === 'whole' || (req.body as { delivery?: unknown } | undefined)?.delivery === 'whole'
-  return success(res,await service.recoverStudyWave(id.parse(req.params.studyId),id.parse(req.params.waveId),credential(req),{ wantsWholeDelivery: wantsWhole }))
+  return success(res,await service.recoverStudyWave(id.parse(req.params.studyId),id.parse(req.params.waveId),credential(req),{ wantsWholeDelivery: wantsWhole, knownTemplateHashes: parseKnownTemplateHashes(req) }))
 }))
 publicAnonymousStudyRouter.post('/:studyId/revoke',wrap(async(req,res)=>success(res,await service.revokeStudyIdentity(id.parse(req.params.studyId),credential(req)))))
 

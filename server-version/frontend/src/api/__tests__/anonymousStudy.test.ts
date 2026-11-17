@@ -1,11 +1,12 @@
 import {afterEach,beforeEach,expect,it,vi} from 'vitest'
 import {anonymousStudyApi,publicStudyApi} from '../anonymousStudy'
+import {cacheWholeQuestionnaireTemplate,clearWholeQuestionnaireTemplateCacheForTest} from '../../modules/composite/whole-definition-source'
 const owner=vi.hoisted(()=>({get:vi.fn(),post:vi.fn()}))
 vi.mock('../client',()=>({default:owner}))
 const version={id:'11111111-1111-4111-8111-111111111111',studyId:'study',version:1,body:'Immutable research consent body from the server.',bodyHash:'body-hash',publishedAt:'2026-10-18T12:00:00.000Z',scope:{purpose:'Research purpose',dataCategories:['FORM'] as const,waveCoverage:'EXISTING_AND_FUTURE'},scopeId:'study',scopeHash:'scope-hash'}
 const participation={version,acceptedVersion:null,acceptance:null,state:'UNKNOWN',revision:0,eligible:false,reason:null}
-beforeEach(()=>{vi.resetAllMocks()})
-afterEach(()=>{vi.unstubAllGlobals()})
+beforeEach(()=>{vi.resetAllMocks();clearWholeQuestionnaireTemplateCacheForTest()})
+afterEach(()=>{vi.unstubAllGlobals();clearWholeQuestionnaireTemplateCacheForTest()})
 
 it('publishes exact owner scope and CAS/version payload through authenticated management routes',async()=>{
  owner.get.mockResolvedValue({code:0,message:'ok',data:{version}});owner.post.mockResolvedValue({code:0,message:'ok',data:version})
@@ -36,6 +37,18 @@ it('rejects revoked capability or owner authorization failures without manufactu
  await expect(anonymousStudyApi.researchConsent('study')).rejects.toThrow('Forbidden')
  vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:false,status:403,headers:new Headers(),clone:()=>({json:async()=>({code:-1,message:'Identity revoked'})})}))
  await expect(publicStudyApi('revoked').researchConsent('study')).rejects.toMatchObject({status:403,message:'Identity revoked'})
+})
+
+it('sends a known whole-template hash on study start and omits it when the cache is empty',async()=>{
+ const fetchMock=vi.fn().mockResolvedValue({ok:true,status:200,json:vi.fn().mockResolvedValue({code:0,message:'ok',data:{attemptId:'attempt',state:'IN_PROGRESS',recoveryToken:'r'.repeat(43)}})})
+ vi.stubGlobal('fetch',fetchMock)
+ const api=publicStudyApi('c'.repeat(43))
+ await api.start('study','wave',{delivery:'whole'})
+ expect(new Headers(fetchMock.mock.calls[0][1].headers).get('X-Whole-Template-Hash')).toBeNull()
+ cacheWholeQuestionnaireTemplate({attemptId:'previous',attemptEpoch:1,slotSetHash:'b'.repeat(64),contextSnapshotHash:null,templateHash:'a'.repeat(64),formSections:[],units:[{itemId:'item-1',scaleAssessmentId:'scale-1',definitionHash:'c'.repeat(64),presentationMode:'ONE_BY_ONE',scale:{id:'scale',name:'Scale',instruction:null,instrumentVersion:'1',definition:{items:[{itemCode:'q1',required:true,responseSetKey:'r'}]}}}]} as never)
+ await api.recover('study','wave',{delivery:'whole'})
+ expect(new Headers(fetchMock.mock.calls[1][1].headers).get('X-Whole-Template-Hash')).toBe('a'.repeat(64))
+ expect(fetchMock.mock.calls[1][0]).toContain('/waves/wave/recover?delivery=whole')
 })
 
 it('uses explicit page and revision-bound owner withdrawal review routes',async()=>{
