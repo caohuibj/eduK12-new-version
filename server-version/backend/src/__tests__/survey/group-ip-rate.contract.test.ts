@@ -5,7 +5,7 @@ vi.mock('../../config/database',()=>({prisma:{$queryRaw:vi.fn()}}))
 vi.mock('../../modules/survey/identity.service',()=>({hashResearchCredential:(s:string)=>createHash('sha256').update(s).digest('hex')}))
 import { prisma } from '../../config/database'
 import { BoundedAdmissionGate } from '../../services/boundedAdmissionGate'
-import { createSurveyPublicRateLimiter,surveyGroupRateScope,lookupSurveyGroupRateScope } from '../../modules/survey/public-rate.middleware'
+import { createSurveyPublicRateLimiter,surveyGroupRateScope,lookupSurveyGroupRateScope,resetSurveyGroupRateCacheForTests } from '../../modules/survey/public-rate.middleware'
 const publicId='d1c8c1eb-4e08-4387-ad04-141faac2cae4',waveId='4d639ebc-c5e4-47ee-9f15-27c3f66410f1',attemptId='10000000-0000-0000-0000-000000000001'
 const credential='a'.repeat(43),researchCode='R-ABCDEFGH'
 const request=(tail='waves/'+waveId+'/start',body:unknown={researchCode,accessCredential:credential},method='POST')=>({method,path:'/r/'+publicId+'/'+tail,body}) as Request
@@ -14,7 +14,7 @@ const response=()=>{
   r.status.mockReturnValue(r);r.json.mockReturnValue(r)
   return r as unknown as Response&typeof r
 }
-afterEach(()=>vi.clearAllMocks())
+afterEach(()=>{vi.clearAllMocks();resetSurveyGroupRateCacheForTests()})
 describe('Group IP request eligibility is scoped, bounded and never mutation authority',()=>{
   it('does not query absent/malformed proof, unknown endpoint or project-wide privacy actions',async()=>{
     const lookup=vi.fn(async()=>true),standard=vi.fn(),middleware=createSurveyPublicRateLimiter({lookup,standard})
@@ -34,6 +34,27 @@ describe('Group IP request eligibility is scoped, bounded and never mutation aut
     expect(surveyGroupRateScope(request('enter',{waveId,researchCode,accessCredential:credential}))).toMatchObject({waveId,researchCode})
     expect(surveyGroupRateScope(request('attempts/'+attemptId+'/task',{entryToken:credential}))).toBeNull()
     expect(surveyGroupRateScope(request('attempts/'+attemptId+'/cognitive/go/start',{accessCredential:credential}))).toMatchObject({attemptId,slotKey:'go'})
+  })
+  it('recognizes situational start and report-images as the same attempt proof',()=>{
+    const child='20000000-0000-0000-0000-000000000002',asset='30000000-0000-0000-0000-000000000003'
+    for(const tail of ['attempts/'+attemptId+'/situational/go/start','attempts/'+attemptId+'/report-images/'+asset,
+      'attempts/'+attemptId+'/situational/go/'+child+'/read','attempts/'+attemptId+'/situational/go/'+child+'/final',
+      'attempts/'+attemptId+'/situational/go/'+child+'/images/'+asset,
+      'attempts/'+attemptId+'/scale-media/instrument_key/item-key/video-capabilities']){
+      const scope=surveyGroupRateScope(request(tail))
+      expect(scope).toMatchObject({publicId,attemptId,researchCode,credentialHash:expect.any(String)})
+      expect(scope).not.toHaveProperty('slotKey');expect(scope).not.toHaveProperty('sessionId')
+      expect(JSON.stringify(scope)).not.toContain(credential)
+    }
+    expect(surveyGroupRateScope(request('attempts/'+attemptId+'/arbitrary'))).toBeNull()
+    expect(surveyGroupRateScope(request('attempts/'+attemptId+'/situational/go/not-a-uuid/read'))).toBeNull()
+  })
+  it('reuses one confirmed policy lookup for the same attempt proof',async()=>{
+    vi.mocked(prisma.$queryRaw).mockResolvedValue([{id:waveId}])
+    const scope=surveyGroupRateScope(request())!
+    expect(await lookupSurveyGroupRateScope(scope)).toBe(true)
+    expect(await lookupSurveyGroupRateScope(scope)).toBe(true)
+    expect(prisma.$queryRaw).toHaveBeenCalledTimes(1)
   })
   it('only database-confirmed scope skips the original Redis budget',async()=>{
     const lookup=vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true),standard=vi.fn(),next=vi.fn()
