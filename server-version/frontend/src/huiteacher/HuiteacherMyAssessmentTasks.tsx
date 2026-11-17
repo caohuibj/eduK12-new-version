@@ -3,9 +3,11 @@ import {deferredPage} from '../components/page-loading/deferredPage'
 import {useCallback,useEffect,useMemo,useRef,useState,type ReactNode} from 'react'
 import {MemoryRouter} from 'react-router-dom'
 const FinalCompositeAssessment=deferredPage(()=>import('../components/FinalCompositeAssessment'))
+const WholeCompositeQuestionnaire=deferredPage(()=>import('../components/WholeCompositeQuestionnaire'))
 const CognitiveRunner=deferredPage(async()=>({default:(await import('../modules/cognitive/pages/CognitiveRunner')).CognitiveRunner}))
 const SituationalRunner=deferredPage(()=>import('../modules/situational/pages/SituationalRunner'))
-import type {CompositeAttemptState,CompositeCurrentItem} from '../modules/composite/types'
+import type {CompositeAttemptState,CompositeCurrentItem,WholeQuestionnaireInput} from '../modules/composite/types'
+import type {AssessmentVideoCapabilitySources} from '../modules/assessment-media/types'
 import type {EducationReportApi} from '../components/education-tools/EducationScalePersonalReport'
 import {TeacherAssessmentPage} from './TeacherAssessmentPage'
 import {assessmentStatus,type AssessmentListPresentation} from './assessmentTaskPresentation'
@@ -185,7 +187,22 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
      child?.type==='SITUATIONAL'&&child.situationalAttemptId&&attempt&&situational?
       <MemoryRouter key={actorKey+':'+child.situationalAttemptId}><SituationalRunner host={{attemptId:child.situationalAttemptId,parentAttemptId:attempt.id,
        compositeItemId:child.id,instructionsSummary:'作答说明',client:situational,onCompleted:childFinished}}/></MemoryRouter>:
-     attempt?<FinalCompositeAssessment key={attempt.id+':'+(attempt.currentItem?.id??'')} state={attempt} campusMode mediaTransport={media}
+     attempt?.executionMode==='WHOLE_LOCAL'&&!child?<WholeCompositeQuestionnaire state={attempt} fallback={null} onExit={leave}
+      acceptedNotice="答案已保存，正在处理。完成状态以服务器确认的测评记录为准，交卷回执不会开放个人报告。"
+      acceptedAction="查看完成状态"
+      committedMessage="答案已保存，正在处理。请勿重复交卷。"
+      educationMedia={{
+        loadScaleImage:(itemId,assetId)=>api<Blob>(teacherAssessmentParentPath(attempt.id)+'/items/'+encodeURIComponent(itemId)+'/scale/assets/'+encodeURIComponent(assetId)+'/content','GET',undefined,{responseType:'blob'}),
+        loadScaleVideo:(itemId,itemCode)=>api<AssessmentVideoCapabilitySources>(teacherAssessmentParentPath(attempt.id)+'/items/'+encodeURIComponent(itemId)+'/scale/items/'+encodeURIComponent(itemCode)+'/video-capability','POST',{}),
+      }}
+      api={{
+        wholeDefinition:async id=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole')}),
+        submitWhole:async(id,input:WholeQuestionnaireInput)=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole/submit','POST',input)}),
+        wholeReceipt:async(id,submissionId,attemptEpoch)=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole/receipt?submissionId='+encodeURIComponent(submissionId)+'&attemptEpoch='+attemptEpoch)}),
+        reportStatus:async id=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole/progress')}),
+      }}
+      onCompleted={()=>{void reload()}}
+    />:attempt?<FinalCompositeAssessment key={attempt.id+':'+(attempt.currentItem?.id??'')} state={attempt} campusMode mediaTransport={media}
       submitScale={(id,itemId,input)=>submit(id,itemId,'scale',input)}
       submitFormSection={(id,sectionId,input)=>submit(id,sectionId,'form',input)}
       onReload={reload} onCompleted={()=>{void execute(valid=>load(session.task,attempt.id,valid))}} onExit={leave}

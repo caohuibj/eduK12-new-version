@@ -24,6 +24,7 @@ import ScalePlayer from './questionnaire/ScalePlayer'
 import { FormPlayer, type FormPlayerValue } from './questionnaire/FormPlayer'
 import { useLocalDraftSaveQueue } from './questionnaire/useLocalDraftSaveQueue'
 import type { CompositeScaleRunnerItem } from '../modules/composite/types'
+import type { AssessmentVideoCapabilitySources } from '../modules/assessment-media/types'
 
 export interface WholeQuestionnaireApi {
   wholeReceipt?: (id: string, submissionId: string, attemptEpoch: number) => Promise<ApiResponse<WholeReceiptLookup>>
@@ -31,7 +32,11 @@ export interface WholeQuestionnaireApi {
   submitWhole: (id: string, input: WholeQuestionnaireInput) => Promise<ApiResponse<WholeQuestionnaireReceipt>>
   reportStatus: (id: string) => Promise<ApiResponse<CompositeReportStatus>>
 }
-type Props = { state: CompositeAttemptState; api: WholeQuestionnaireApi; publicMode?: boolean; recoveryToken?: string; isFreshStart?: boolean; fallback: ReactNode; onExit: () => void; onCompleted: () => void }
+type EducationWholeMedia = {
+  loadScaleImage: (itemId: string, assetId: string) => Promise<Blob>
+  loadScaleVideo: (itemId: string, itemCode: string) => Promise<AssessmentVideoCapabilitySources>
+}
+type Props = { state: CompositeAttemptState; api: WholeQuestionnaireApi; publicMode?: boolean; recoveryToken?: string; isFreshStart?: boolean; fallback: ReactNode; onExit: () => void; onCompleted: () => void; educationMedia?: EducationWholeMedia; acceptedNotice?: string; acceptedAction?: string; committedMessage?: string }
 type Answer = { responseValue?: string | number; value?: unknown; responseTimeMs?: number; changeCount?: number; otherText?: string }
 export const wholeDraftKey = (id: string, epoch: number) => `composite-whole:${id}:${epoch}`
 export const wholeAnswerKey = (itemId: string, itemCode: string) => JSON.stringify([itemId, itemCode])
@@ -96,7 +101,7 @@ function parseFormOptions(
   return []
 }
 
-function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, recoveryToken, isFreshStart = false, fallback, onExit, onCompleted }: Props) {
+function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, recoveryToken, isFreshStart = false, fallback, onExit, onCompleted, educationMedia, acceptedNotice = '答案已保存。可以离开页面，稍后查看报告；报告失败不需要重新交卷。', acceptedAction = '查看报告进度', committedMessage }: Props) {
   const draftKey = wholeDraftKey(state.id, state.attemptEpoch ?? 1)
   const [definition, setDefinition] = useState<WholeQuestionnaireDefinition | null>(null)
   const [meta, setMeta] = useState<FinalDraftMeta | null>(null)
@@ -449,17 +454,18 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   }
   const unitPath = current && current.kind === 'SCALE' ? `${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(current.unit.itemId)}/scale` : ''
   const loadImage = useCallback(async (assetId: string) => {
+    if (educationMedia && current?.kind === 'SCALE') return educationMedia.loadScaleImage(current.unit.itemId, assetId)
     const response = await sessionFetch(`${unitPath}/assets/${encodeURIComponent(assetId)}/content`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken || '' } } : undefined)
     if (!response.ok) throw new Error(`视觉内容加载失败 (${response.status})`)
     return response.blob()
-  }, [unitPath, publicMode, recoveryToken])
+  }, [unitPath, publicMode, recoveryToken, educationMedia, current])
   if (useFallback) return <>{fallback}</>
   if (loading) return <p role="status" className="p-6 text-slate-600">正在恢复整卷本机草稿…</p>
   return <AssessmentShell title={state.name} eyebrow="问卷" instructionsSummary={isTrainingHost() ? '作答说明' : undefined}
     instructions={<div className="space-y-2">{state.instruction ? <p>{state.instruction}</p> : null}<p>整卷答案保存在当前浏览器，最后一次提交。请使用同一浏览器继续未提交的草稿。</p></div>}
     progress={definition ? { kind: 'count', completed: Object.keys(answers).length, total: questions.length, label: '整卷作答进度' } : undefined}
     saveStatus={local.status}
-    submissionStatus={accepted ? { state: 'committed', message: publicMode ? '整份问卷已可靠保存。报告按生成状态和开放权限显示，无需再次交卷。' : '整份问卷已可靠保存，正在生成报告。' } : busy ? { state: 'submitting', message: submitElapsedSeconds >= 8 ? `已等待 ${submitElapsedSeconds} 秒，正在确认服务器保存；请勿关闭，本机草稿仍保留。` : '正在提交并确认保存…' } : locked ? { state: 'pending', message: '整卷已封存，重试将使用相同内容。' } : { state: 'ready' }}
+    submissionStatus={accepted ? { state: 'committed', message: committedMessage ?? (publicMode ? '整份问卷已可靠保存。报告按生成状态和开放权限显示，无需再次交卷。' : '整份问卷已可靠保存，正在生成报告。') } : busy ? { state: 'submitting', message: submitElapsedSeconds >= 8 ? `已等待 ${submitElapsedSeconds} 秒，正在确认服务器保存；请勿关闭，本机草稿仍保留。` : '正在提交并确认保存…' } : locked ? { state: 'pending', message: '整卷已封存，重试将使用相同内容。' } : { state: 'ready' }}
     actions={<button type="button" className="btn-secondary min-h-11" disabled={busy || checkpointBusy} onClick={() => void saveAndExit()}>保存并退出</button>}>
     {definition && meta && !accepted ? <TrainingCheckpointPanel policy={state.trainingPersistence} definitionHash={state.checkpointDefinitionHash} publicMode={publicMode} recoveryToken={recoveryToken}
       disabled={busy || meta.status !== 'DRAFT' || !!meta.sealedSubmission} onBusy={setCheckpointBusy}
@@ -512,7 +518,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       }}/>:null}
     {error ? <p role="alert" className="mb-4 text-red-700">{error}</p> : null}
     {publicMode && recoveryToken ? <p className="mb-4 text-sm text-gray-600">请在页面上方保存本次匿名作答的恢复链接。链接不包含未提交答案，本机草稿或已保存的临时进度仍按各自有效期恢复。</p> : null}
-    {accepted ? <div className="space-y-4"><h2 className="text-xl font-semibold">交卷成功</h2><p>答案已保存。可以离开页面，稍后查看报告；报告失败不需要重新交卷。</p><button className="btn-primary min-h-11" type="button" onClick={onCompleted}>查看报告进度</button></div>
+    {accepted ? <div className="space-y-4"><h2 className="text-xl font-semibold">交卷成功</h2><p>{acceptedNotice}</p><button className="btn-primary min-h-11" type="button" onClick={onCompleted}>{acceptedAction}</button></div>
       : meta?.sealedSubmission ? <div className="space-y-4"><p>整卷已封存，本机草稿会保留到服务器确认保存。</p><button type="button" className="btn-primary min-h-11" disabled={busy || meta.status === 'CONFLICT'} onClick={() => void submit()}>重试并确认整卷提交</button></div>
         : current ? <div id={publicMode ? `training-anonymous-whole-required:${state.id}` : undefined} tabIndex={publicMode ? -1 : undefined} className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
           <h2 className="mb-3 text-xl font-semibold">{current.title}</h2>
@@ -522,7 +528,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
             <>
               <TrainingMaterials items={current.question.materials} loadAsset={loadImage}/>
               <AssessmentImageGate items={assessmentImageItems((current.question as { images?: unknown }).images)} loadAsset={loadImage} disabled={busy}>
-                <ScaleFormVideoGate presentation={scaleItemVideoPresentation(current.question)} loadSources={() => requestAssessmentVideoCapabilities(`${unitPath}/items/${encodeURIComponent(current.question.itemCode)}/video-capability`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken || '' } } : undefined)}>
+                <ScaleFormVideoGate presentation={scaleItemVideoPresentation(current.question)} loadSources={() => educationMedia ? educationMedia.loadScaleVideo(current.unit.itemId, current.question.itemCode) : requestAssessmentVideoCapabilities(`${unitPath}/items/${encodeURIComponent(current.question.itemCode)}/video-capability`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken || '' } } : undefined)}>
                   {(()=>{const player=(<ScalePlayer scopeKey={`${draftKey}:${current.unit.itemId}:${checkpointRestoreGeneration}`} autoAdvance={isTrainingHost() && !publicMode} item={current.question} value={answers[wholeAnswerKey(current.unit.itemId, current.question.itemCode)]?.responseValue}
                     answerDisabled={locked || busy} navigationDisabled={busy} submitDisabled={busy || meta?.status === 'CONFLICT'}
                     position={index + 1} total={questions.length} onChange={saveAnswer} onPrevious={() => setIndex(prior => Math.max(0, prior - 1))}

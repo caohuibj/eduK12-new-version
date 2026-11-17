@@ -4,6 +4,8 @@ import {ArrowLeft,CircleCheck} from 'lucide-react'
 import {SchoolTaskHelp} from './SchoolTaskHelp'
 import { MemoryRouter } from 'react-router-dom'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
+import WholeCompositeQuestionnaire from '../components/WholeCompositeQuestionnaire'
+import type { WholeQuestionnaireInput } from '../modules/composite/types'
 const CognitiveRunner=deferredPage(async()=>({default:(await import('../modules/cognitive/pages/CognitiveRunner')).CognitiveRunner}))
 import type { CognitiveSessionApi } from '../modules/cognitive/api'
 import type { CognitiveSession } from '../modules/cognitive/types'
@@ -208,7 +210,22 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
           client:situationalClient,onCompleted:()=>{void childFinished()},
         }}/>
       </MemoryRouter>:
-    state?<FinalCompositeAssessment
+    state?.executionMode==='WHOLE_LOCAL'&&!child?<WholeCompositeQuestionnaire state={state} fallback={null} onExit={onExit}
+      acceptedNotice="答案已保存，正在处理。完成状态以服务器确认的测评记录为准，交卷回执不会开放个人报告。"
+      acceptedAction="查看完成状态"
+      committedMessage="答案已保存，正在处理。请勿重复交卷。"
+      educationMedia={{
+        loadScaleImage:(itemId,assetId)=>api<Blob>(runApi('/items/'+encodeURIComponent(itemId)+'/scale/assets/'+encodeURIComponent(assetId)+'/content'),'GET',undefined,{responseType:'blob'}),
+        loadScaleVideo:(itemId,itemCode)=>api<AssessmentVideoCapabilitySources>(runApi('/items/'+encodeURIComponent(itemId)+'/scale/items/'+encodeURIComponent(itemCode)+'/video-capability'),'POST',{}),
+      }}
+      api={{
+        wholeDefinition:async id=>wrapped(await api('/composite-attempts/'+encodeURIComponent(id)+'/whole')),
+        submitWhole:async(id,input:WholeQuestionnaireInput)=>wrapped(await api('/composite-attempts/'+encodeURIComponent(id)+'/whole/submit','POST',input)),
+        wholeReceipt:async(id,submissionId,attemptEpoch)=>wrapped(await api('/composite-attempts/'+encodeURIComponent(id)+'/whole/receipt?submissionId='+encodeURIComponent(submissionId)+'&attemptEpoch='+attemptEpoch)),
+        reportStatus:async id=>wrapped(await api('/composite-attempts/'+encodeURIComponent(id)+'/whole/progress')),
+      }}
+      onCompleted={()=>{void load(state.id)}}
+    />:state?<FinalCompositeAssessment
       state={state}
       campusMode
       instructionsSummary={ordinaryAnswer?'作答说明':undefined}
