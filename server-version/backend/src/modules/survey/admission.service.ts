@@ -12,6 +12,7 @@ import type { ResearchFrozenPublication } from './publication.service'
 import { allocateResearchFlowOnAdmission } from './flow.assignment'
 import {bindSurveyAttemptContent,type PreparedSurveyPublicationDigest} from './content-binding.service'
 import { canonicalHash } from '../assessment-runtime/canonical'
+import { BoundedTtlCache } from '../composite/start-read-cache'
 
 type Tx=Prisma.TransactionClient
 function blocked(message='研究准入或个人凭证无效'): never {throw new SurveyWaveError(403,message)}
@@ -112,13 +113,27 @@ export async function getPublicResearchInfo(publicId:string,entryToken?:string){
 type PreparedPublication={
   preparedDigest:PreparedSurveyPublicationDigest;preparedSnapshot:ResearchFrozenPublication
 }
-// Deduplicate ONLY concurrent immutable-publication reads, never credentials,
-// identities or mutable wave/admission state. No result remains cached after
-// the in-flight read finishes. Bound distinct waves to avoid a pre-gate stampede.
+// Cache only an immutable publication snapshot that already hashed to its
+// digest. Credentials, identities, and mutable wave/admission state stay live.
+// Bound distinct waves so a pre-gate stampede cannot grow without limit.
 const publicationPreparationInFlight=new Map<string,Promise<PreparedPublication|undefined>>()
+const preparedPublicationCache=new BoundedTtlCache<PreparedPublication>(120_000,32)
+const verifiedPublicationCache=new BoundedTtlCache<ResearchFrozenPublication>(120_000,64)
 const MAX_IN_FLIGHT_PUBLICATION_PREPARATIONS=32
-async function preparePublicationDigest(projectId:string,waveId:string):Promise<PreparedPublication|undefined>{
+function freezeDeep(value:unknown):void{
+  if(!value||typeof value!=='object'||Object.isFrozen(value))return
+  Object.freeze(value)
+  for(const child of Object.values(value as Record<string,unknown>))freezeDeep(child)
+}
+export function resetSurveyPublicationCachesForTests(){
+  preparedPublicationCache.clear()
+  verifiedPublicationCache.clear()
+  publicationPreparationInFlight.clear()
+}
+export async function preparePublicationDigest(projectId:string,waveId:string):Promise<PreparedPublication|undefined>{
   const key=JSON.stringify([projectId,waveId])
+  const cached=preparedPublicationCache.get(key)
+  if(cached)return cached
   const pending=publicationPreparationInFlight.get(key)
   if(pending)return pending
   // Over capacity: skip the optimization and keep the original locked read/hash.
@@ -131,7 +146,9 @@ async function preparePublicationDigest(projectId:string,waveId:string):Promise<
       select:{publicationId:true,publication:{select:{id:true,compiledSnapshot:true}}}})
     if(!wave?.publicationId||!wave.publication?.compiledSnapshot)return undefined
     const snapshot=wave.publication.compiledSnapshot as unknown as ResearchFrozenPublication
-    return {preparedDigest:{publicationId:wave.publication.id,snapshotDigest:canonicalHash(snapshot)},preparedSnapshot:snapshot}
+    const prepared={preparedDigest:{publicationId:wave.publication.id,snapshotDigest:canonicalHash(snapshot)},preparedSnapshot:snapshot}
+    preparedPublicationCache.set(key,prepared)
+    return prepared
   })()
   publicationPreparationInFlight.set(key,task)
   try{return await task}finally{
@@ -344,7 +361,7 @@ async function readVerifiedSurveyAttempt(input:SurveyAttemptProof,includeSnapsho
       id:input.attemptId,projectId:project.id,
     },select:{id:true,waveId:true,participantId:true,status:true,sessionHash:true,
       wave:{select:{generalText:true,finishUntil:true,hardStopAt:true,
-        publication:{select:{id:true,definitionDigest:true,compiledSnapshot:includeSnapshot}}}}}})
+        publication:{select:{id:true,definitionDigest:true,compiledSnapshot:false}}}}}})
     if(!attempt||!attempt.wave.publication)blocked()
     if(attempt.participantId){
       if(!input.researchCode)blocked()
@@ -354,10 +371,25 @@ async function readVerifiedSurveyAttempt(input:SurveyAttemptProof,includeSnapsho
       if(linked.participantId!==attempt.participantId)blocked()
     }else if(attempt.sessionHash!==hashResearchCredential(input.accessCredential))blocked()
     const pub=attempt.wave.publication
-    const snapshot=includeSnapshot?pub!.compiledSnapshot as unknown as ResearchFrozenPublication:undefined
-    if(includeSnapshot&&(snapshot?.runtimeStatus!=='SURVEY_FINAL_V1'
-      ||canonicalHash(JSON.parse(JSON.stringify(snapshot)))!==pub!.definitionDigest))
-      blocked('研究冻结定义不可用')
+    let snapshot:ResearchFrozenPublication|undefined
+    if(includeSnapshot){
+      const cacheKey=`${pub.id}:${pub.definitionDigest}`
+      const cached=verifiedPublicationCache.get(cacheKey)
+      if(cached)snapshot=cached
+      else{
+        const loaded=await client.surveyWaveAttempt.findFirst({where:{
+          id:input.attemptId,projectId:project.id,
+        },select:{wave:{select:{publication:{select:{compiledSnapshot:true}}}}}})
+        const raw=loaded?.wave.publication?.compiledSnapshot as unknown as ResearchFrozenPublication|undefined
+        const normalized=raw?JSON.parse(JSON.stringify(raw)) as ResearchFrozenPublication:undefined
+        if(!normalized||normalized.runtimeStatus!=='SURVEY_FINAL_V1'
+          ||canonicalHash(normalized)!==pub.definitionDigest)
+          blocked('研究冻结定义不可用')
+        freezeDeep(normalized)
+        verifiedPublicationCache.set(cacheKey,normalized)
+        snapshot=normalized
+      }
+    }
     return {attemptId:attempt.id,projectId:project.id,waveId:attempt.waveId,
       participantId:attempt.participantId,status:attempt.status,
       publicationId:pub!.id,definitionDigest:pub!.definitionDigest,compiledSnapshot:snapshot,

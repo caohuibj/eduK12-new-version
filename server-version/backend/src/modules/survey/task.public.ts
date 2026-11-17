@@ -7,6 +7,7 @@ import { surveySjtScenes } from './sjt-structure'
 import { parseFrozenSurveyCognitive } from './cognitive.definition'
 import { assertSurveyDraft, type FormDraft, type AnySjtDraft } from './builder.definition'
 import { verifiedSurveyAttempt } from './admission.service'
+import { BoundedTtlCache } from '../composite/start-read-cache'
 import { prisma } from '../../config/database'
 import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
 import { buildSurveyFlowPublicProjection } from './flow.runtime'
@@ -22,6 +23,31 @@ export function projectPublicSurveyImage(image:SurveyFrozenImage|undefined){
 /** No public API may return authored score rules, dimension contributions or
  * frozen private result snapshots. Only the participant's task projection.
  */
+const publicSurveyUnitCache=new BoundedTtlCache<object>(120_000,256)
+function freezeDeep(value:unknown):void{
+  if(!value||typeof value!=='object'||Object.isFrozen(value))return
+  Object.freeze(value)
+  for(const child of Object.values(value as Record<string,unknown>))freezeDeep(child)
+}
+function publicSurveyUnitKey(definitionDigest:string,unit:{sourceDigest?:unknown;draftId?:unknown;kind?:unknown;instrumentKey?:unknown}){
+  if(typeof unit.sourceDigest!=='string'||!unit.sourceDigest||typeof unit.draftId!=='string'||!unit.draftId)return ''
+  if(typeof unit.kind!=='string'||typeof unit.instrumentKey!=='string')return ''
+  return `${definitionDigest}:${unit.draftId}:${unit.sourceDigest}:${unit.kind}:${unit.instrumentKey}`
+}
+function rememberPublicSurveyUnit<T extends object>(definitionDigest:string,unit:{sourceDigest?:unknown;draftId?:unknown;kind?:unknown;instrumentKey?:unknown},project:()=>T):T{
+  const key=publicSurveyUnitKey(definitionDigest,unit)
+  if(key){
+    const hit=publicSurveyUnitCache.get(key) as T|undefined
+    if(hit)return hit
+  }
+  const projected=project()
+  if(key){
+    freezeDeep(projected)
+    publicSurveyUnitCache.set(key,projected)
+  }
+  return projected
+}
+export function resetPublicSurveyUnitCacheForTests(){publicSurveyUnitCache.clear()}
 export async function getOwnResearchTask(input:{
   publicId:string;attemptId:string;researchCode?:string;accessCredential:string
 }){
@@ -43,10 +69,11 @@ export async function getOwnResearchTask(input:{
       accessCredential:input.accessCredential,snapshot:own.compiledSnapshot,
     })):null
   const selected=assignedSurveySnapshot(own.compiledSnapshot,assignment)
-  const units=selected.units.map(unit=>{
+  const units=selected.units.map(unit=>rememberPublicSurveyUnit(own.definitionDigest,unit,()=>{
     if(unit.kind==='SJT'||unit.executionProtocol!==undefined)surveySituationalExecutionProtocol(unit)
     // Validate the same list once per selected unit; the public allowlist still
-    // strips private rights notes and no definition is cached across requests.
+    // strips private rights notes. A unit with sourceDigest may reuse that
+    // projection. Attempt status, flow, and cognitive progress stay uncached.
     const materials=materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)
     const publicMaterials=materials?.length?{materials:materials.map(publicMaterial)}:{}
     if(unit.kind==='FORM'){
@@ -118,7 +145,7 @@ export async function getOwnResearchTask(input:{
     return {kind:'SJT',schemaVersion:2,instrumentKey:unit.instrumentKey,title:unit.title,...publicMaterials,
       orderPolicy:'FIXED',scenes}
 
-  })
+  }))
   const cognitiveProgress=own.status==='STARTED'&&selected.units.some(unit=>unit.kind==='COGNITIVE'||unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)
     ?await readSurveyCognitiveProgressFromVerifiedAttempt(input,own):null
   return {attemptId:own.attemptId,waveId:own.waveId,status:own.status,
