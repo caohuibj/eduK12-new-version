@@ -5,9 +5,12 @@ ordinary scale-only `START` keeps the strict `< 700 MiB` host-memory gate unchan
 
 When both `ASSESSMENT_RESOURCE_PROTECTION_ENABLED=true` and
 `ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED=true` are set explicitly in the backend
-deployment profile, `startUserAttempt` splits host memory below `700 MiB` into
-two tiers while preserving fail-closed protection under CPU saturation or missing
-host telemetry:
+deployment profile, scale-only `startUserAttempt` and a **new plain public**
+`startPublicAttempt` split host memory below `700 MiB` into two tiers while
+preserving fail-closed protection under CPU saturation or missing host
+telemetry. Verified anonymous recovery and anonymous-study admission do not
+enter the trickle wrapper: study may still resolve an existing attempt inside
+its transaction, and the freeze guard stays authoritative there.
 
 - **`>= 700 MiB` (`allow`)**: Normal admission without acquiring the low-memory
   trickle queue (subject to the existing two-sample `>= 95%` host CPU latch).

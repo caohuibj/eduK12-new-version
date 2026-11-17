@@ -21,12 +21,17 @@ ordinary public-link START receives the existing retryable resource 503 if host
   `/proc/meminfo` and `/proc/stat` read for up to `1000 ms` (`at - sample.at < 1000`).
   If reading host telemetry fails or produces a non-finite value, the guard fails
   closed with 503.
-- **Transactional freeze guard & 650–699 MiB note**: The existing in-transaction
-  freeze guard (`runtime-snapshot.ts` → `assertAssessmentStartResources()`, default
-  `< 700 MiB`) remains unchanged and authoritative. `650 MiB` is a conservative
-  opt-in floor rather than a proven optimum, and does not enforce cross-instance
-  concurrency or replace a dedicated low-memory trickle policy in the
-  `650–699 MiB` band.
+- **Transactional freeze guard**: `runtime-snapshot.ts` →
+  `assertAssessmentStartResources()` remains the in-transaction authority.
+- **Before the publication load**: a new plain public START runs that same gate
+  up front when trickle is off, so a `< 700 MiB` or latched host-CPU refusal
+  does not load the composite, enter the admission queue, or open a transaction.
+  The optional `650 MiB` / missing-sample guard still runs first and is the only
+  fail-closed path for missing telemetry while trickle is off.
+- **Trickle on**: `ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED=true` replaces those two
+  pre-checks with `runWithLowMemoryTrickleAdmission` for new plain public STARTs
+  (see `docs/release/low-memory-trickle-admission.md`). The hardcoded `650 MiB`
+  guard is not applied ahead of a configured trickle floor.
 
 This is an opt-in experiment. Confirm both variables match across all API
 instances, retain the previous profile and compare matching workloads and
