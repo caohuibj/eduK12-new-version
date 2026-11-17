@@ -180,11 +180,11 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
  router.post(parent+'/whole/submit',wholeBound,compositeController.wholeSubmit)
  router.get(parent,attemptAccess,wrapped(async req=>projectTeacherCompositeRuntime(
   await getAttemptState(req.params.attemptId,{userId:req.user!.userId},undefined,'current-unit'))))
- router.get(parent+'/form-sections/:sectionId/assets/:assetId/content',childAccess('FORM_SECTION'),compositeImageController.authenticatedFormImage)
- router.post(parent+'/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability',childAccess('FORM_SECTION'),compositeVideoController.authenticatedFormVideo)
+ router.get(parent+'/form-sections/:sectionId/assets/:assetId/content',childAccess('FORM_SECTION'),compositeImageController.educationFormImage)
+ router.post(parent+'/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability',childAccess('FORM_SECTION'),compositeVideoController.educationFormVideo)
  router.post(parent+'/form-sections/:sectionId/submit',childAccess('FORM_SECTION'),finalConsent,compositeController.submitFinalFormSection)
- router.get(parent+'/items/:itemId/scale/assets/:assetId/content',childAccess('SCALE'),compositeImageController.authenticatedScaleImage)
- router.post(parent+'/items/:itemId/scale/items/:itemCode/video-capability',childAccess('SCALE'),compositeVideoController.authenticatedScaleVideo)
+ router.get(parent+'/items/:itemId/scale/assets/:assetId/content',childAccess('SCALE'),compositeImageController.educationScaleImage)
+ router.post(parent+'/items/:itemId/scale/items/:itemCode/video-capability',childAccess('SCALE'),compositeVideoController.educationScaleVideo)
  // A receipt cannot authorize a Scale report. Preserve canonical FINAL and its
  // busy/replay protocol while forcing the existing lightweight response form.
  router.post(parent+'/items/:itemId/scale/submit',childAccess('SCALE'),finalConsent,(req,res,next)=>{
