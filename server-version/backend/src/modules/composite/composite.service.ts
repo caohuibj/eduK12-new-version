@@ -4487,10 +4487,13 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   if (!study) {
     assertTokenWindow(token)
     assertCompositeWindow(token.compositeAssessment)
-    // Reject new plain public STARTs before loading/cloning the publication
-    // graph. Study admissions retain their independent in-transaction check.
-    assertAnonymousStartCriticalMemory()
   }
+  // New plain public STARTs consult the existing resource gate before the
+  // publication load, admission queue, pool checkout, and attempt insert.
+  // Verified recovery already returned above. Study admission can still
+  // resolve an existing attempt inside the transaction, so it stays outside
+  // this pre-check; freeze remains the in-transaction authority for everyone.
+  const executePublicAdmission = async () => {
   // Preserve #740's publication identity reuse for ordinary new STARTs; study
   // START still reads its identity later to keep its original race boundary.
   const composite = await loadStartComposite(token.compositeAssessment.id, prisma, study ? undefined : token.compositeAssessment)
@@ -4598,6 +4601,16 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   } finally {
     recordAnonymousStartPhase('anonymous.start.post_gate_ms', postGateAt, process.hrtime.bigint())
   }
+  }
+  if (!study) {
+    // Trickle owns the [floor, 700) band and the in-transaction permit.
+    // When it is off, the optional <650 / missing-sample guard still runs,
+    // then the same <700 / CPU gate the freeze uses — both before any load.
+    if (isLowMemoryTrickleEnabled()) return runWithLowMemoryTrickleAdmission(executePublicAdmission)
+    assertAnonymousStartCriticalMemory()
+    assertAssessmentStartResources()
+  }
+  return executePublicAdmission()
 }
 
 /** Restart an anonymous attempt using only the server-issued recovery hash. */
