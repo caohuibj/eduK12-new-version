@@ -11,6 +11,7 @@ import {
   publishedFormMediaOwner,
   retainFormSectionImages,
   serveFrozenFormSectionImage,
+  serveCompositeFormDefinitionImage,
 } from '../assessment-runtime/form-image.adapter'
 import {
   compositeFormSectionVideoPresentations,
@@ -19,6 +20,7 @@ import {
 import { loadFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { serveFrozenScaleAssessmentImage } from '../scale/scale-image.adapter'
 import * as service from './composite.service'
+import { isEducationWholeMediaUnit, loadEducationWholeFormMediaDefinition } from './education-whole-media'
 
 const recoveryHashFromRequest = (req: Request): string | null => {
   const value = req.headers['x-recovery-token']
@@ -94,44 +96,46 @@ const authorizedState = async (req: Request, publicMode: boolean) => {
   return service.getAttemptState(req.params.attemptId, { recoveryTokenHash }, requestedUnit)
 }
 
-const serveScaleImage = async (req: Request, res: Response, publicMode: boolean) => {
+const serveScaleImage = async (req: Request, res: Response, publicMode: boolean, educationWhole = false) => {
   const state = await authorizedState(req, publicMode)
   if (!state) return unauthorized(res, publicMode ? '缺少有效恢复凭证' : '未登录')
-  if (state.currentItem?.type !== 'SCALE' || state.currentItem.id !== req.params.itemId || !state.currentItem.scaleAssessmentId) {
-    return notFound(res, '当前冻结量表单元不存在')
-  }
+  const currentChildId = state.currentItem?.type === 'SCALE' && state.currentItem.id === req.params.itemId
+    ? state.currentItem.scaleAssessmentId : undefined
+  const wholeUnit = educationWhole && isEducationWholeMediaUnit(state, 'SCALE', req.params.itemId)
+  if (!currentChildId && !wholeUnit) return notFound(res, '当前冻结量表单元不存在')
   const child = await prisma.assessment.findFirst({
     where: {
-      id: state.currentItem.scaleAssessmentId,
+      ...(currentChildId ? { id: currentChildId } : { attemptEpoch: state.attemptEpoch, runtimeGeneration: 'UNIFIED_V1' }),
       compositeAttemptId: req.params.attemptId,
       compositeItemId: req.params.itemId,
     },
     select: { id: true, runtimeSnapshotEncrypted: true },
   })
   if (!child?.runtimeSnapshotEncrypted) return notFound(res, '量表冻结内容不可用')
-  const snapshot = (await loadFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted))
+  const snapshot = await loadFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
   await serveFrozenScaleAssessmentImage({ snapshot, assetId: req.params.assetId, res })
   return undefined
 }
 
-const serveFormImage = async (req: Request, res: Response, publicMode: boolean) => {
+const serveFormImage = async (req: Request, res: Response, publicMode: boolean, educationWhole = false) => {
   const state = await authorizedState(req, publicMode)
   if (!state) return unauthorized(res, publicMode ? '缺少有效恢复凭证' : '未登录')
-  if (state.currentItem?.type !== 'FORM_SECTION' || state.currentItem.id !== req.params.sectionId) {
-    return notFound(res, '当前冻结表单区段不存在')
-  }
+  const currentUnit = state.currentItem?.type === 'FORM_SECTION' && state.currentItem.id === req.params.sectionId
+  const wholeUnit = educationWhole && isEducationWholeMediaUnit(state, 'FORM_SECTION', req.params.sectionId)
+  if (!currentUnit && !wholeUnit) return notFound(res, '当前冻结表单区段不存在')
   const child = await prisma.compositeFormSectionAttempt.findUnique({
     where: { attemptId_sectionId: { attemptId: req.params.attemptId, sectionId: req.params.sectionId } },
     select: { frozenAdmissionSnapshotEncrypted: true, frozenAdmissionSnapshotHash: true },
   })
-  if (!child) return notFound(res, '表单区段冻结记录不存在')
-  const admission = await loadStoredFormAdmission(child)
-  if (!admission) return notFound(res, '表单区段冻结内容不可用')
-  await serveFrozenFormSectionImage({
-    admission,
-    assetId: req.params.assetId,
-    res,
-  })
+  const admission = child ? await loadStoredFormAdmission(child) : null
+  if (admission) {
+    await serveFrozenFormSectionImage({ admission, assetId: req.params.assetId, res })
+    return undefined
+  }
+  if (!wholeUnit) return notFound(res, '表单区段冻结内容不可用')
+  const definition = await loadEducationWholeFormMediaDefinition(state, req.params.sectionId)
+  if (!definition) return notFound(res, '表单区段冻结定义不匹配')
+  await serveCompositeFormDefinitionImage(definition, req.params.assetId, res)
   return undefined
 }
 
@@ -146,6 +150,11 @@ export const compositeImageController = {
       return error(res, cause instanceof Error ? cause.message : '量表图片加载失败')
     }
   },
+  async educationScaleImage(req: Request, res: Response) {
+    try { return await serveScaleImage(req, res, false, true) } catch (cause) {
+      return error(res, cause instanceof Error ? cause.message : '量表图片加载失败')
+    }
+  },
   async publicScaleImage(req: Request, res: Response) {
     try { return await serveScaleImage(req, res, true) } catch (cause) {
       return error(res, cause instanceof Error ? cause.message : '量表图片加载失败')
@@ -153,6 +162,11 @@ export const compositeImageController = {
   },
   async authenticatedFormImage(req: Request, res: Response) {
     try { return await serveFormImage(req, res, false) } catch (cause) {
+      return error(res, cause instanceof Error ? cause.message : '表单图片加载失败')
+    }
+  },
+  async educationFormImage(req: Request, res: Response) {
+    try { return await serveFormImage(req, res, false, true) } catch (cause) {
       return error(res, cause instanceof Error ? cause.message : '表单图片加载失败')
     }
   },
