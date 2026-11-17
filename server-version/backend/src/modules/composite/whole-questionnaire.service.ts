@@ -913,6 +913,7 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   const receipt = await registerWholeQuestionnaireReceipt(parent, {
     submissionId: input.submissionId, payloadHash: canonical.hash, answersEncrypted: encrypted, acceptedAt: new Date(receivedAtMs),
     requiredFormSlots: remainingRequiredFormSlots, validationHash: prior.wholeValidationHash,
+    rejectPriorUnitSnapshots: isEducationWholeAttempt(parent),
   },async tx=>{
     // Resolve every selected real child in this same receipt transaction,
     // including ordinary questionnaires. A previously accepted replay returned above.
