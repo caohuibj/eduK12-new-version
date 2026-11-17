@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
 import { BoundedAdmissionGate } from '../../services/boundedAdmissionGate'
+import { BoundedTtlCache } from '../composite/start-read-cache'
 import { hashResearchCredential } from './identity.service'
 import { surveyPublicRateLimits } from './public-rate.config'
 
@@ -32,13 +33,27 @@ export function surveyGroupRateScope(req:Pick<Request,'method'|'path'|'body'>):S
   if(wave)return researchCode?{publicId,waveId:wave[1],credentialHash:credential,researchCode,linked:true}:null
   const attempt=path.match(new RegExp('^attempts/('+uuid+')/(.+)$'))
   if(!attempt)return null
-  const action=attempt[2]
+  const action=attempt[2],key='[a-z][a-z0-9_-]{0,79}'
   const simple=/^(task|final|screen-out|general|withdraw-data|checkpoint\/(read|save|clear))$/.test(action)
-    ||new RegExp('^(?:images|materials|report-materials)/'+uuid+'$').test(action)
+    ||new RegExp('^(?:images|materials|report-materials|report-images)/'+uuid+'$').test(action)
+    ||new RegExp('^situational/'+key+'/(?:start|'+uuid+'/(?:read|final|images/'+uuid+'))$').test(action)
+    ||new RegExp('^scale-media/'+key+'/'+key+'/video-capabilities$').test(action)
   const cognitive=action.match(new RegExp('^cognitive/([a-z][a-z0-9_-]{0,79})/(?:('+uuid+')/(read|interrupt|restart|final)|(start))$'))
   if(!simple&&!cognitive)return null
   return {publicId,attemptId:attempt[1],credentialHash:credential,researchCode,
     ...(cognitive?{slotKey:cognitive[1],...(cognitive[2]?{sessionId:cognitive[2]}:{})}:{})}
+}
+/** Positive eligibility only, keyed by proof hashes — never a raw secret.
+ * A revoked credential or closed wave can skip the IP budget for at most 60s. */
+const groupRateCache=new BoundedTtlCache<true>(60_000,2048)
+const groupRateInflight=new Map<string,Promise<boolean>>()
+function surveyGroupRateCacheKey(scope:Scope):string{
+  return [scope.publicId,scope.waveId??'',scope.attemptId??'',scope.entryHash??'',scope.credentialHash??'',
+    scope.researchCode??'',scope.linked===undefined?'':String(scope.linked),scope.slotKey??'',scope.sessionId??''].join('\0')
+}
+export function resetSurveyGroupRateCacheForTests(){
+  groupRateCache.clear()
+  groupRateInflight.clear()
 }
 /** The result is solely IP-budget eligibility, never reusable mutation authority.
  * One narrow indexed query; no private definition payload is read. The migration
@@ -46,6 +61,18 @@ export function surveyGroupRateScope(req:Pick<Request,'method'|'path'|'body'>):S
  * published IDs/policy cannot change. Do not replace that database invariant.
  * Every handler retains its existing identity, consent, source and locked-window checks. */
 export async function lookupSurveyGroupRateScope(scope:Scope):Promise<boolean>{
+  const key=surveyGroupRateCacheKey(scope)
+  if(groupRateCache.get(key))return true
+  const pending=groupRateInflight.get(key)
+  if(pending)return pending
+  const task=readSurveyGroupRateScope(scope).then(ok=>{
+    if(ok)groupRateCache.set(key,true)
+    return ok
+  }).finally(()=>{if(groupRateInflight.get(key)===task)groupRateInflight.delete(key)})
+  groupRateInflight.set(key,task)
+  return task
+}
+async function readSurveyGroupRateScope(scope:Scope):Promise<boolean>{
   const entry=scope.entryHash?Prisma.sql`EXISTS (SELECT 1 FROM survey_entry_tokens t
     WHERE t.wave_id=w.id AND t.project_id=p.id AND t.token_hash=${scope.entryHash}
       AND t.revoked_at IS NULL AND t.expires_at>statement_timestamp())`:Prisma.sql`TRUE`
@@ -85,10 +112,11 @@ export async function lookupSurveyGroupRateScope(scope:Scope):Promise<boolean>{
   return rows.length===1
 }
 const policyGate=new BoundedAdmissionGate({name:'survey_group_ip_policy',maxConcurrent:4,
-  maxQueue:8,maxWaitMs:250,retryAfterSeconds:1})
+  maxQueue:512,maxWaitMs:2000,retryAfterSeconds:1})
 /** The response deadline NEVER releases a live SQL slot. At most four actual
  * lookups can remain outstanding in this process, including timed-out callers.
- * Queued operations expire in the existing gate before they can execute. */
+ * Queued operations expire in the existing gate before they can execute.
+ * A cached positive proof skips the gate. */
 export function createSurveyPublicRateLimiter(options:{
   lookup?:(scope:Scope)=>Promise<boolean>;gate?:BoundedAdmissionGate;responseTimeoutMs?:number;
   standard?:RequestHandler
@@ -98,6 +126,10 @@ export function createSurveyPublicRateLimiter(options:{
   return async(req,res,next)=>{
     const scope=surveyGroupRateScope(req)
     if(!scope){await standard(req,res,next);return}
+    if(groupRateCache.get(surveyGroupRateCacheKey(scope))){
+      if(res.headersSent||res.writableEnded||res.destroyed)return
+      next();return
+    }
     let timer:ReturnType<typeof setTimeout>|undefined
     let eligible=false
     try{
