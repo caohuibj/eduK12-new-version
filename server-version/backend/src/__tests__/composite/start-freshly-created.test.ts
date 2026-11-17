@@ -541,7 +541,55 @@ describe('START freshlyCreated server distinction', () => {
     }
   })
 
-  it('does not route fast-resume, non-scale-only start, public start, or restart through runWithLowMemoryTrickleAdmission', async () => {
+  it('routes a new plain public START through low-memory trickle before publication load', async () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+    const tokenValue = 'public-token-1'
+    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({
+      id: 'tok-1', tokenHash: hashPublicAccessToken(tokenValue), isActive: true,
+      expiresAt: new Date('2030-01-01T00:00:00Z'), maxUses: 0, usedCount: 0,
+      compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
+    })
+    const busyError = Object.assign(new Error('系统繁忙'), { statusCode: 503, code: 'INSTRUMENT_NOT_AVAILABLE' })
+    const criticalSpy = vi.spyOn(assessmentResourceProtection, 'assertAnonymousStartCriticalMemory')
+    const trickleSpy = vi.spyOn(assessmentResourceProtection, 'runWithLowMemoryTrickleAdmission')
+      .mockRejectedValueOnce(busyError)
+    try {
+      await expect(startPublicAttempt(tokenValue)).rejects.toBe(busyError)
+      expect(trickleSpy).toHaveBeenCalledTimes(1)
+      expect(criticalSpy).not.toHaveBeenCalled()
+      expect(mocks.prisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
+      expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+    } finally {
+      trickleSpy.mockRestore()
+      criticalSpy.mockRestore()
+      vi.unstubAllEnvs()
+    }
+  })
+
+  it('rejects a new plain public START on the authoritative resource gate before publication load when trickle is off', async () => {
+    const tokenValue = 'public-token-1'
+    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({
+      id: 'tok-1', tokenHash: hashPublicAccessToken(tokenValue), isActive: true,
+      expiresAt: new Date('2030-01-01T00:00:00Z'), maxUses: 0, usedCount: 0,
+      compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
+    })
+    const busy = Object.assign(new Error('系统繁忙'), { statusCode: 503, code: 'INSTRUMENT_NOT_AVAILABLE' })
+    const criticalSpy = vi.spyOn(assessmentResourceProtection, 'assertAnonymousStartCriticalMemory').mockImplementation(() => {})
+    const gateSpy = vi.spyOn(assessmentResourceProtection, 'assertAssessmentStartResources').mockImplementation(() => { throw busy })
+    try {
+      await expect(startPublicAttempt(tokenValue)).rejects.toBe(busy)
+      expect(criticalSpy).toHaveBeenCalledTimes(1)
+      expect(gateSpy).toHaveBeenCalledTimes(1)
+      expect(mocks.prisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
+      expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+    } finally {
+      criticalSpy.mockRestore()
+      gateSpy.mockRestore()
+    }
+  })
+
+  it('does not route fast-resume, non-scale-only start, public recovery, study, or restart through runWithLowMemoryTrickleAdmission', async () => {
     vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
     vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
     const trickleSpy = vi.spyOn(assessmentResourceProtection, 'runWithLowMemoryTrickleAdmission')
@@ -596,6 +644,28 @@ describe('START freshlyCreated server distinction', () => {
       )
       await expect(startPublicAttempt('public-token-1', recoveryToken, undefined, { wantsWholeDelivery: true }))
         .resolves.toMatchObject({ freshlyCreated: false })
+
+      // 5) Anonymous study admission stays outside trickle so an existing attempt can resume.
+      const studyRecovery = 's'.repeat(43)
+      const studyHash = hashRecoveryToken(studyRecovery)
+      mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({
+        id: 'tok-1', tokenHash: hashPublicAccessToken('public-token-1'), isActive: true,
+        expiresAt: new Date('2030-01-01T00:00:00Z'), maxUses: 0, usedCount: 1,
+        compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null },
+      })
+      mocks.prisma.compositeAssessment.findUnique.mockResolvedValue(compositeRow)
+      mocks.prisma.$transaction.mockImplementation(async (fn: any) => fn(mocks.prisma))
+      mocks.prisma.compositeAssessmentAttempt.findUnique
+        .mockResolvedValueOnce({ id: 'attempt-reused', userId: null, accessTokenId: 'tok-1', recoveryTokenHash: studyHash })
+        .mockResolvedValue(makeAttemptRow({ userId: null, recoveryTokenHash: studyHash }))
+      const study: any = {
+        credential: { token: studyRecovery, hash: studyHash },
+        participantId: 'p1',
+        beforeAdmission: async () => 'attempt-reused',
+        afterAdmission: vi.fn(),
+      }
+      await expect(startPublicAttempt('public-token-1', undefined, study, { wantsWholeDelivery: true }))
+        .resolves.toMatchObject({ attempt: { id: 'attempt-reused' } })
 
       expect(trickleSpy).not.toHaveBeenCalled()
     } finally {
