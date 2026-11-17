@@ -147,7 +147,9 @@ export class AssessmentResourceProtection {
       this.lastCpuAt = cpuAt
       this.highCpu = value.cpuPercent !== null && value.cpuPercent >= 95 ? this.highCpu + 1 : 0
       if (this.highCpu >= 2) this.cpuProtected = true
-      if (value.cpuPercent === null || value.cpuPercent <= 85) this.cpuProtected = false
+      // A 95% CPU spike must not strand START admission while the host settles
+      // at a healthy 86–90%; keep the two-sample trip point unchanged.
+      if (value.cpuPercent === null || value.cpuPercent <= 90) this.cpuProtected = false
     }
     if (value.at !== this.lastAt) {
       this.lastAt = value.at
