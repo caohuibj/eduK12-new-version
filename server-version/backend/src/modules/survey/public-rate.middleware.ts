@@ -112,11 +112,12 @@ async function readSurveyGroupRateScope(scope:Scope):Promise<boolean>{
   return rows.length===1
 }
 const policyGate=new BoundedAdmissionGate({name:'survey_group_ip_policy',maxConcurrent:4,
-  maxQueue:512,maxWaitMs:2000,retryAfterSeconds:1})
-/** The response deadline NEVER releases a live SQL slot. At most four actual
- * lookups can remain outstanding in this process, including timed-out callers.
- * Queued operations expire in the existing gate before they can execute.
- * A cached positive proof skips the gate. */
+  maxQueue:8,maxWaitMs:250,retryAfterSeconds:1})
+/** Four live SQL slots do not get faster by holding a longer queue. Distinct
+ * credentials that miss the cache fall back to the ordinary IP budget quickly
+ * instead of waiting out the response deadline and then being limited anyway.
+ * The response deadline NEVER releases a live SQL slot. A cached positive
+ * proof skips this gate. */
 export function createSurveyPublicRateLimiter(options:{
   lookup?:(scope:Scope)=>Promise<boolean>;gate?:BoundedAdmissionGate;responseTimeoutMs?:number;
   standard?:RequestHandler
