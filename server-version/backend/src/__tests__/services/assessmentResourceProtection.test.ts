@@ -62,6 +62,14 @@ describe('bounded background resource protection', () => {
     expect(p.decision(value(2000, 710), 2, 2000)).toMatchObject({ mode: 'limited', limit: 1, delayMs: 0 })
     expect(p.decision(value(3000, 900), 2, 3000).limit).toBe(2)
   })
+  it('releases the CPU latch at 90% but not at 91%, without changing the 95% trip point', () => {
+    const p = new AssessmentResourceProtection()
+    expect(p.decision(value(0, 1500, 95), 2, 0).limit).toBe(2)
+    expect(p.decision(value(1000, 1500, 96), 2, 1000).limit).toBe(0)
+    expect(p.decision(value(2000, 1500, 91), 2, 2000).limit).toBe(0)
+    expect(p.decision(value(3000, 1500, 90), 2, 3000).limit).toBe(2)
+    expect(p.decision(value(4000, 1500, 94), 2, 4000).limit).toBe(2)
+  })
   it('requires distinct high CPU samples, recovers, and never permanently blocks on stale telemetry', () => {
     const p = new AssessmentResourceProtection()
     expect(p.decision(value(0, 1500, 98), 2, 0).limit).toBe(2)

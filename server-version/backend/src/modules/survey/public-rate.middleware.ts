@@ -47,6 +47,35 @@ export function surveyGroupRateScope(req:Pick<Request,'method'|'path'|'body'>):S
  * A revoked credential or closed wave can skip the IP budget for at most 60s. */
 const groupRateCache=new BoundedTtlCache<true>(60_000,2048)
 const groupRateInflight=new Map<string,Promise<boolean>>()
+// Most research projects have no active group-IP wave. Cache only the
+// public-project-level presence probe (2s; activation may occur at any time).
+// Positive presence never authorizes an exemption: the existing credential,
+// frozen policy, and wave/attempt checks still run in lookupSurveyGroupRateScope.
+const groupPolicyPresenceCache=new BoundedTtlCache<boolean>(2_000,256)
+
+async function hasActiveGroupIpWave(publicId:string):Promise<boolean>{
+  const cached=groupPolicyPresenceCache.get(publicId)
+  if(cached!==undefined)return cached
+  return groupPolicyPresenceCache.singleFlight(publicId,async()=>{
+    const rows=await prisma.$queryRaw<Array<{id:string}>>`
+      SELECT w.id FROM survey_projects p
+      JOIN survey_waves w ON w.project_id=p.id
+      JOIN survey_publications pub ON pub.id=w.publication_id AND pub.project_id=p.id
+      WHERE p.public_id=${publicId}
+        AND w.group_ip_activated_at IS NOT NULL
+        AND w.opens_at=w.group_ip_activated_at AND w.opens_at<=statement_timestamp()
+        AND w.closes_at>statement_timestamp() AND w.finish_until>statement_timestamp()
+        AND w.closes_at<=w.group_ip_activated_at+interval '48 hours'
+        AND w.finish_until<=w.closes_at
+        AND w.group_ip_policy IS NOT NULL
+        AND w.group_ip_policy->>'schemaVersion'='1'
+        AND pub.purpose='RESEARCH_ONLY'
+      LIMIT 1`
+    const active=rows.length>0
+    groupPolicyPresenceCache.set(publicId,active)
+    return active
+  })
+}
 function surveyGroupRateCacheKey(scope:Scope):string{
   return [scope.publicId,scope.waveId??'',scope.attemptId??'',scope.entryHash??'',scope.credentialHash??'',
     scope.researchCode??'',scope.linked===undefined?'':String(scope.linked),scope.slotKey??'',scope.sessionId??''].join('\0')
@@ -54,6 +83,7 @@ function surveyGroupRateCacheKey(scope:Scope):string{
 export function resetSurveyGroupRateCacheForTests(){
   groupRateCache.clear()
   groupRateInflight.clear()
+  groupPolicyPresenceCache.clear()
 }
 /** The result is solely IP-budget eligibility, never reusable mutation authority.
  * One narrow indexed query; no private definition payload is read. The migration
@@ -120,10 +150,11 @@ const policyGate=new BoundedAdmissionGate({name:'survey_group_ip_policy',maxConc
  * proof skips this gate. */
 export function createSurveyPublicRateLimiter(options:{
   lookup?:(scope:Scope)=>Promise<boolean>;gate?:BoundedAdmissionGate;responseTimeoutMs?:number;
-  standard?:RequestHandler
+  standard?:RequestHandler;hasActiveGroupWave?:(publicId:string)=>Promise<boolean>
 }={}):RequestHandler{
   const standard=options.standard??createRedisRateLimiter({name:'survey-public-entry',...surveyPublicRateLimits()})
   const lookup=options.lookup??lookupSurveyGroupRateScope,gate=options.gate??policyGate
+  const hasActive=options.hasActiveGroupWave??hasActiveGroupIpWave
   return async(req,res,next)=>{
     const scope=surveyGroupRateScope(req)
     if(!scope){await standard(req,res,next);return}
@@ -131,10 +162,19 @@ export function createSurveyPublicRateLimiter(options:{
       if(res.headersSent||res.writableEnded||res.destroyed)return
       next();return
     }
+    // No eligible group wave: do not queue or query the per-credential policy.
+    // Positive/unknown presence still uses the original bounded, authoritative
+    // scope lookup before any Redis budget is consumed.
+    if(groupPolicyPresenceCache.get(scope.publicId)===false){
+      await standard(req,res,next);return
+    }
     let timer:ReturnType<typeof setTimeout>|undefined
     let eligible=false
     try{
-      eligible=await Promise.race([gate.run(()=>lookup(scope)),new Promise<never>((_,reject)=>{
+      eligible=await Promise.race([gate.run(async()=>{
+        if(!await hasActive(scope.publicId))return false
+        return lookup(scope)
+      }),new Promise<never>((_,reject)=>{
         timer=setTimeout(()=>reject(new Error('Survey policy response deadline')),options.responseTimeoutMs??2000)
         timer.unref?.()
       })])

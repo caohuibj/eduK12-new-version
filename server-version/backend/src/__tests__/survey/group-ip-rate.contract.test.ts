@@ -17,7 +17,7 @@ const response=()=>{
 afterEach(()=>{vi.clearAllMocks();resetSurveyGroupRateCacheForTests()})
 describe('Group IP request eligibility is scoped, bounded and never mutation authority',()=>{
   it('does not query absent/malformed proof, unknown endpoint or project-wide privacy actions',async()=>{
-    const lookup=vi.fn(async()=>true),standard=vi.fn(),middleware=createSurveyPublicRateLimiter({lookup,standard})
+    const lookup=vi.fn(async()=>true),standard=vi.fn(),middleware=createSurveyPublicRateLimiter({hasActiveGroupWave:async()=>true,lookup,standard})
     for(const req of [request('info',undefined,'GET'),request('info',{}),request('info',{groupIp:true}),
       request('enter',{researchCode,accessCredential:credential}),request('withdraw-linked'),request('revoke-access'),
       request('waves/'+waveId+'/arbitrary'),request('attempts/'+attemptId+'/arbitrary'),
@@ -58,7 +58,7 @@ describe('Group IP request eligibility is scoped, bounded and never mutation aut
   })
   it('only database-confirmed scope skips the original Redis budget',async()=>{
     const lookup=vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true),standard=vi.fn(),next=vi.fn()
-    const middleware=createSurveyPublicRateLimiter({lookup,standard})
+    const middleware=createSurveyPublicRateLimiter({hasActiveGroupWave:async()=>true,lookup,standard})
     await middleware(request(),response(),next);expect(standard).toHaveBeenCalledTimes(1);expect(next).not.toHaveBeenCalled()
     await middleware(request(),response(),next);expect(standard).toHaveBeenCalledTimes(1);expect(next).toHaveBeenCalledTimes(1)
     expect(JSON.stringify(lookup.mock.calls)).not.toContain(credential)
@@ -74,10 +74,43 @@ describe('Group IP request eligibility is scoped, bounded and never mutation aut
     expect(text).not.toContain('SELECT pub.compiled_snapshot')
     expect(prisma.$queryRaw).toHaveBeenCalledTimes(1)
   })
+  it('coalesces no-policy presence probes and never performs per-credential policy SQL for ordinary waves',async()=>{
+    vi.mocked(prisma.$queryRaw).mockResolvedValue([])
+    const standard=vi.fn((_req,_res,next)=>next()),next=vi.fn()
+    const gate=new BoundedAdmissionGate({name:'ordinary_group_presence',maxConcurrent:8,maxQueue:8,maxWaitMs:250})
+    const middleware=createSurveyPublicRateLimiter({standard,gate})
+    await Promise.all(Array.from({length:8},(_,i)=>
+      middleware(request(i%2===0?'waves/'+waveId+'/start':'attempts/'+attemptId+'/task'),response(),next)))
+    expect(prisma.$queryRaw).toHaveBeenCalledTimes(1)
+    expect(standard).toHaveBeenCalledTimes(8)
+    expect(next).toHaveBeenCalledTimes(8)
+    await middleware(request(),response(),next)
+    expect(prisma.$queryRaw).toHaveBeenCalledTimes(1)
+    const sql=vi.mocked(prisma.$queryRaw).mock.calls[0][0] as unknown as string[]
+    expect(sql.join('?')).not.toContain('survey_participants')
+    expect(sql.join('?')).not.toContain('survey_entry_tokens')
+  })
+  it('rechecks newly activated group waves after the short negative cache expires',async()=>{
+    const now=Date.now(),clock=vi.spyOn(Date,'now').mockReturnValue(now)
+    try{
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([]).mockResolvedValue([{id:waveId}])
+      const standard=vi.fn(),next=vi.fn()
+      const middleware=createSurveyPublicRateLimiter({standard})
+      await middleware(request(),response(),next)
+      expect(standard).toHaveBeenCalledTimes(1)
+      clock.mockReturnValue(now+2_001)
+      await middleware(request(),response(),next)
+      expect(prisma.$queryRaw).toHaveBeenCalledTimes(3)
+      expect(next).toHaveBeenCalledTimes(1)
+      expect(standard).toHaveBeenCalledTimes(1)
+      await middleware(request(),response(),next)
+      expect(prisma.$queryRaw).toHaveBeenCalledTimes(3)
+    }finally{clock.mockRestore()}
+  })
   it('holds timed-out live SQL slots and expires queued work before execution',async()=>{
     const gate=new BoundedAdmissionGate({name:'group_contract_timeout',maxConcurrent:2,maxQueue:2,maxWaitMs:15})
     const releases:Array<(v:boolean)=>void>=[],lookup=vi.fn(()=>new Promise<boolean>(resolve=>releases.push(resolve)))
-    const middleware=createSurveyPublicRateLimiter({lookup,gate,responseTimeoutMs:60,standard:vi.fn((_req,res)=>res.status(429).json({limited:true}))})
+    const middleware=createSurveyPublicRateLimiter({hasActiveGroupWave:async()=>true,lookup,gate,responseTimeoutMs:60,standard:vi.fn((_req,res)=>res.status(429).json({limited:true}))})
     const replies=[response(),response(),response(),response()],next=vi.fn()
     await Promise.all(replies.map(res=>middleware(request(),res,next)))
     expect(lookup).toHaveBeenCalledTimes(2);expect(gate.getStats()).toMatchObject({active:2,queued:0})
@@ -94,7 +127,7 @@ describe('Group IP request eligibility is scoped, bounded and never mutation aut
     const res=response(),next=vi.fn(),unhandled=vi.fn()
     process.on('unhandledRejection',unhandled)
     try{
-      await createSurveyPublicRateLimiter({lookup,gate,responseTimeoutMs:10,standard:vi.fn((_req,res)=>res.status(429).json({limited:true}))})(request(),res,next)
+      await createSurveyPublicRateLimiter({hasActiveGroupWave:async()=>true,lookup,gate,responseTimeoutMs:10,standard:vi.fn((_req,res)=>res.status(429).json({limited:true}))})(request(),res,next)
       expect(res.status).toHaveBeenCalledWith(429);expect(gate.getStats().active).toBe(1)
       rejectQuery(new Error('late database rejection'));await new Promise(resolve=>setTimeout(resolve,5))
       expect(gate.getStats().active).toBe(0);expect(unhandled).not.toHaveBeenCalled()
@@ -104,16 +137,16 @@ describe('Group IP request eligibility is scoped, bounded and never mutation aut
   it('does not write after disconnect, applies the ordinary limit without granting an unproven exemption',async()=>{
     const closed=response();closed.destroyed=true
     const closedNext=vi.fn()
-    await createSurveyPublicRateLimiter({lookup:async()=>true,standard:vi.fn()})(request(),closed,closedNext)
+    await createSurveyPublicRateLimiter({hasActiveGroupWave:async()=>true,lookup:async()=>true,standard:vi.fn()})(request(),closed,closedNext)
     expect(closed.json).not.toHaveBeenCalled();expect(closedNext).not.toHaveBeenCalled()
     const failed=response(),next=vi.fn(),standard=vi.fn((_req,res)=>res.status(429).json({limited:true}))
-    await createSurveyPublicRateLimiter({lookup:async()=>{throw new Error('offline')},standard})(request(),failed,next)
+    await createSurveyPublicRateLimiter({hasActiveGroupWave:async()=>true,lookup:async()=>{throw new Error('offline')},standard})(request(),failed,next)
     expect(failed.status).toHaveBeenCalledWith(429)
     expect(standard).toHaveBeenCalledTimes(1);expect(next).not.toHaveBeenCalled()
   })
   it('does not bypass or repeat a failed ordinary Redis decision',async()=>{
     const standard=vi.fn((_req,res)=>res.status(503).json({code:-1})),next=vi.fn(),res=response()
-    await createSurveyPublicRateLimiter({lookup:async()=>{throw new Error('policy unavailable')},standard})(request(),res,next)
+    await createSurveyPublicRateLimiter({hasActiveGroupWave:async()=>true,lookup:async()=>{throw new Error('policy unavailable')},standard})(request(),res,next)
     expect(standard).toHaveBeenCalledTimes(1);expect(res.status).toHaveBeenCalledWith(503)
     expect(next).not.toHaveBeenCalled()
   })
