@@ -23,10 +23,10 @@ vi.mock('../../modules/composite/composite.controller',()=>({compositeController
   wholeReceipt:vi.fn(),wholeSubmit:vi.fn(),educationWholeProgress:vi.fn(),
 }}))
 vi.mock('../../modules/composite/composite-image.controller',()=>({compositeImageController:{
-  authenticatedFormImage:vi.fn(),authenticatedScaleImage:vi.fn(),
+  authenticatedFormImage:vi.fn(),authenticatedScaleImage:vi.fn(),educationFormImage:vi.fn(),educationScaleImage:vi.fn(),
 }}))
 vi.mock('../../modules/composite/composite-video.controller',()=>({compositeVideoController:{
-  authenticatedFormVideo:vi.fn(),authenticatedScaleVideo:vi.fn(),
+  authenticatedFormVideo:vi.fn(),authenticatedScaleVideo:vi.fn(),educationFormVideo:vi.fn(),educationScaleVideo:vi.fn(),
 }}))
 vi.mock('../../modules/situational/situational-video.controller',()=>({situationalVideoController:{
   embeddedAuthenticated:vi.fn(),
