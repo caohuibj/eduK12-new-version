@@ -50,3 +50,14 @@ export function isWholeLocalEligible(candidate?: WholeLocalEligibilityCandidate 
   }
   return true
 }
+
+/** Client mode follows the same admission the submit path will enforce. */
+export function wholeLocalExecutionMode(input: {
+  shapeEligible: boolean
+  admissionOpen: boolean
+  units: Array<{ type: string; completed: boolean }>
+}): 'WHOLE_LOCAL' | 'STEPPED' {
+  const partialFinal = input.units.some(unit =>
+    (unit.type === 'SCALE' || unit.type === 'FORM_SECTION') && unit.completed)
+  return input.shapeEligible && input.admissionOpen && !partialFinal ? 'WHOLE_LOCAL' : 'STEPPED'
+}

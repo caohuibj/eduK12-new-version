@@ -6,7 +6,7 @@ import { withAssessmentReportTimeline, markAssessmentTimeline, traceAssessmentPh
 import { recordReportQueueEvent, reportQueueObsEnabled, sampleReportQueuePending } from '../services/reportQueueObservability'
 import type { CompositeReportJob } from '@prisma/client'
 import { prisma } from '../config/database'
-import { acceptsEducationWholeMaterialization, assessmentReportConfig } from '../config/assessmentReports'
+import { assessmentReportConfig, isEducationWholeAttempt } from '../config/assessmentReports'
 import { encryptUnifiedRuntimePayload } from '../modules/assessment-runtime/security'
 import { logger } from '../utils/logger'
 import { isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
@@ -56,7 +56,7 @@ export const processCompositeReportJob = async (job: CompositeReportJob): Promis
         reportJob: { attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextHash: job.contextHash },
       }))
       if (whole && result?.status !== 'COMPLETED') throw new Error('WHOLE_QUESTIONNAIRE_CANONICAL_NOT_COMPLETE')
-      educationMaterialized = acceptsEducationWholeMaterialization(parent)
+      educationMaterialized = isEducationWholeAttempt(parent)
       if (result?.status !== 'COMPLETED') outcome = { kind: 'waiting' }
       else if (educationMaterialized) {
         const aggregateInputHash = result.aggregateInputHash ?? parent.aggregateInputHash

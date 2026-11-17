@@ -42,19 +42,26 @@ export const acceptsAsyncCompositeReport = (parent: {
     && (config.courseIds.size === 0 || Boolean(parent.deliveryCourseId && config.courseIds.has(parent.deliveryCourseId)))
 }
 
-/** School/Teacher frozen runs share the receipt and answer materialization.
- * They do not enroll in the training questionnaire report. */
-export const acceptsEducationWholeMaterialization = (parent: {
+type EducationWholeIdentity = {
   runtimeGeneration?: string | null
   deliveryMode?: string
   assignmentRef?: string | null
   compositeAssessment?: { productKind?: string; reportPackageKey?: string | null; analysisProtocolKey?: string | null }
-}, env: NodeJS.ProcessEnv = process.env): boolean => {
+}
+
+/** Persisted School/Teacher identity. Independent of the admission flags so a
+ * receipt already accepted stays an education materialization if those flags
+ * are later turned off. */
+export const isEducationWholeAttempt = (parent: EducationWholeIdentity): boolean => (
+  parent.runtimeGeneration === 'UNIFIED_V1'
+  && parent.deliveryMode === 'FINAL_ONLY'
+  && typeof parent.assignmentRef === 'string' && parent.assignmentRef.length > 0
+  && parent.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE'
+  && !parent.compositeAssessment.reportPackageKey && !parent.compositeAssessment.analysisProtocolKey
+)
+
+/** New education whole admission. Existing receipts use isEducationWholeAttempt. */
+export const acceptsEducationWholeMaterialization = (parent: EducationWholeIdentity, env: NodeJS.ProcessEnv = process.env): boolean => {
   const config = assessmentReportConfig(env)
-  return config.enabled && config.wholeSubmitEnabled
-    && parent.runtimeGeneration === 'UNIFIED_V1'
-    && parent.deliveryMode === 'FINAL_ONLY'
-    && typeof parent.assignmentRef === 'string' && parent.assignmentRef.length > 0
-    && parent.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE'
-    && !parent.compositeAssessment.reportPackageKey && !parent.compositeAssessment.analysisProtocolKey
+  return config.enabled && config.wholeSubmitEnabled && isEducationWholeAttempt(parent)
 }

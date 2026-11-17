@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { acceptsAsyncCompositeReport, acceptsEducationWholeMaterialization } from '../../config/assessmentReports'
+import { acceptsAsyncCompositeReport, acceptsEducationWholeMaterialization, isEducationWholeAttempt } from '../../config/assessmentReports'
+import { wholeLocalExecutionMode } from '../../modules/composite/whole-local-eligibility'
 import { wholeQuestionnaireSubmitSchema } from '../../modules/composite/whole-questionnaire.service'
 
 const education = {
@@ -14,6 +15,18 @@ describe('education whole admission', () => {
     expect(acceptsAsyncCompositeReport(education, env)).toBe(false)
     expect(acceptsEducationWholeMaterialization({ ...education, assignmentRef: null }, env)).toBe(false)
     expect(acceptsEducationWholeMaterialization(education, { ...env, ASSESSMENT_WHOLE_SUBMIT_ENABLED: 'false' })).toBe(false)
+    expect(isEducationWholeAttempt(education)).toBe(true)
+    expect(acceptsEducationWholeMaterialization(education, { ...env, ASSESSMENT_REPORT_ASYNC_ENABLED: 'false', ASSESSMENT_WHOLE_SUBMIT_ENABLED: 'false' })).toBe(false)
+    expect(isEducationWholeAttempt(education)).toBe(true)
+  })
+
+  it('keeps a partially submitted form on the stepped path and requires admission to be open', () => {
+    const open = { shapeEligible: true, admissionOpen: true }
+    expect(wholeLocalExecutionMode({ ...open, units: [{ type: 'FORM_SECTION', completed: true }] })).toBe('STEPPED')
+    expect(wholeLocalExecutionMode({ ...open, units: [{ type: 'SCALE', completed: true }, { type: 'FORM_SECTION', completed: false }] })).toBe('STEPPED')
+    expect(wholeLocalExecutionMode({ ...open, units: [{ type: 'FORM', completed: true }] })).toBe('WHOLE_LOCAL')
+    expect(wholeLocalExecutionMode({ shapeEligible: true, admissionOpen: false, units: [{ type: 'SCALE', completed: false }] })).toBe('STEPPED')
+    expect(wholeLocalExecutionMode({ ...open, units: [{ type: 'FORM_SECTION', completed: false }] })).toBe('WHOLE_LOCAL')
   })
 
   it('accepts a form-only envelope and rejects an empty one', () => {
