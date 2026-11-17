@@ -160,7 +160,11 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
     project:projectTeacherCompositeRuntime,
    })
   }
-  const result=await startAssessmentRunExecution({executionId,actorUserId:req.user!.userId})
+  const result=await startAssessmentRunExecution({
+   executionId,actorUserId:req.user!.userId,
+   // access.own already established this execution has no persisted binding.
+   startPreflight:{runtimeBindingKind:null,runtimeBindingRef:null,respondentUserId:req.user!.userId},
+  })
   if(result.state==='STARTED'){
    if(result.runtimeBindingKind!=='COMPOSITE')throw new TeacherAssessmentRuntimeError()
    // Re-read the actual persisted Run binding, not just the adapter response, without replaying full access.own.
@@ -170,7 +174,7 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
     started:result,
     attemptId:result.runtimeBindingRef,
     actorUserId:req.user!.userId,
-    freshlyCreated:!result.replayed,
+    freshlyCreated:(result as {_freshlyCreatedAttempt?:boolean})._freshlyCreatedAttempt===true,
     knownTemplateHashes,
     authorize:async({attemptId,actorUserId})=>{
      await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId)

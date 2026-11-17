@@ -11,6 +11,7 @@ import { classifyStartTransaction, isAssessmentStartBusyError, AssessmentStartBu
 import { BoundedAdmissionGate, configuredInteger } from '../../services/boundedAdmissionGate'
 import { defaultStartAdmissionBound } from '../../config/databasePool'
 import { buildWholeStartPreload, startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
+import type { RunStartPreflight } from './resourceBoundary'
 import { isAssessmentStartResourceConstrained, runWithLowMemoryTrickleAdmission } from '../../services/assessmentResourceProtection'
 import {resolvePublishedTeacherForm,teacherFormResourceRef,
   TEACHER_FORM_RUNTIME_KIND} from '../huiteacher/formRunResource'
@@ -377,6 +378,11 @@ const startTransactionalComposite = async (input: {
     runtimeBindingRef: attempt.id,
     replayed: false,
   }
+  // A committed Run START may reuse an earlier attempt even when its Run binding
+  // was missing. replayed:false alone does not establish a new Whole attempt.
+  Object.defineProperty(result, '_freshlyCreatedAttempt', {
+    value: (attempt as { _freshlyCreatedAttempt?: boolean })._freshlyCreatedAttempt === true,
+  })
   const sourceComposite = (attempt as any)._startComposite
   if (sourceComposite) {
     Object.defineProperty(result, '_educationWholePreload', {
@@ -590,6 +596,21 @@ const recoverOrDispatchExternal = async (input: {
   }
 }
 
+const boundResultFromPreflight = (
+  row: RunStartPreflight | undefined,
+  actorUserId: string,
+): RunStartExecutionResult | null => {
+  if (row && row.respondentUserId === actorUserId && row.runtimeBindingKind && row.runtimeBindingRef) {
+    return {
+      state: 'STARTED',
+      runtimeBindingKind: row.runtimeBindingKind,
+      runtimeBindingRef: row.runtimeBindingRef,
+      replayed: true,
+    }
+  }
+  return null
+}
+
 const readExistingBoundExecution = async (
   executionId: string,
   actorUserId: string,
@@ -610,16 +631,7 @@ const readExistingBoundExecution = async (
     WHERE e."id" = ${executionId}
     LIMIT 1
   `
-  const row = rows[0]
-  if (row && row.respondentUserId === actorUserId && row.runtimeBindingKind && row.runtimeBindingRef) {
-    return {
-      state: 'STARTED',
-      runtimeBindingKind: row.runtimeBindingKind,
-      runtimeBindingRef: row.runtimeBindingRef,
-      replayed: true,
-    }
-  }
-  return null
+  return boundResultFromPreflight(rows[0], actorUserId)
 }
 
 export const startAssessmentRunExecution = async (input: {
@@ -627,6 +639,9 @@ export const startAssessmentRunExecution = async (input: {
   actorUserId: string
   resourceRegistry?: RunResourceAuthorityRegistry
   runtimeAdapters?: RunRuntimeAdapterRegistry
+  /** Trusted result of an already-performed School/Teacher access read.
+   * Prevents an extra SQL roundtrip during constrained pre-gate admission. */
+  startPreflight?: RunStartPreflight
 }): Promise<RunStartExecutionResult> => {
   const executeRunStart = async (): Promise<RunStartExecutionResult> => {
     try {
@@ -707,7 +722,9 @@ export const startAssessmentRunExecution = async (input: {
   // low-memory trickle/rejection (Decision D-1/D-3); new starts consult the
   // host resource guard before claim TX1, publication loads, and dispatch TX2.
   if (isAssessmentStartResourceConstrained()) {
-    const bound = await readExistingBoundExecution(input.executionId, input.actorUserId)
+    const bound = input.startPreflight
+      ? boundResultFromPreflight(input.startPreflight, input.actorUserId)
+      : await readExistingBoundExecution(input.executionId, input.actorUserId)
     if (bound) return bound
     return runWithLowMemoryTrickleAdmission(executeRunStart)
   }

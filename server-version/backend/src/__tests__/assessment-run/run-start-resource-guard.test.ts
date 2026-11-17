@@ -89,6 +89,27 @@ describe('assessment-run pre-gate resource protection & composition identity cac
     expect(m.acquireClaim).not.toHaveBeenCalled()
   })
 
+  it('skips the redundant pre-gate SQL when School/Teacher already read the binding', async () => {
+    m.constrained.mockReturnValue(true)
+    const busyErr = new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '系统繁忙', 503)
+    m.trickle.mockRejectedValue(busyErr)
+    await expect(startAssessmentRunExecution({
+      executionId: uuid(10), actorUserId: uuid(1),
+      startPreflight: { runtimeBindingKind: null, runtimeBindingRef: null, respondentUserId: uuid(1) },
+    })).rejects.toBe(busyErr)
+    expect(m.queryRaw).not.toHaveBeenCalled()
+    expect(m.acquireClaim).not.toHaveBeenCalled()
+
+    await expect(startAssessmentRunExecution({
+      executionId: uuid(10), actorUserId: uuid(1),
+      startPreflight: { runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: uuid(99), respondentUserId: uuid(1) },
+    })).resolves.toEqual({
+      state: 'STARTED', runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: uuid(99), replayed: true,
+    })
+    expect(m.queryRaw).not.toHaveBeenCalled()
+    expect(m.trickle).toHaveBeenCalledTimes(1)
+  })
+
   it('caches immutable frozen composition identity on prisma reads while keeping live status checks authoritative', async () => {
     const orgId = uuid(3)
     const ownerId = uuid(4)

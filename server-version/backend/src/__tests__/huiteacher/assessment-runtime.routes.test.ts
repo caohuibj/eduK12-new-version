@@ -234,7 +234,10 @@ describe('Teacher assessment runtime synthetic HTTP boundary',()=>{
   row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null}
   mocks.start.mockImplementation(async()=>{row={...baseline};return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:false}})
   expect((await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{})).status).toBe(200)
-  expect(mocks.start).toHaveBeenCalledWith({executionId:baseline.executionId,actorUserId:actor})
+  expect(mocks.start).toHaveBeenCalledWith({
+   executionId:baseline.executionId,actorUserId:actor,
+   startPreflight:{runtimeBindingKind:null,runtimeBindingRef:null,respondentUserId:actor},
+  })
   expect(source.assertUse.mock.calls.map(call=>call[1].purpose)).toEqual(['START'])
   const binding=mocks.query.mock.calls.map(call=>call[0]).filter((query:{sql:string})=>
    typeof query.sql==='string'&&query.sql.includes('SELECT e.id')&&query.sql.includes("e.status='STARTED'")&&!query.sql.includes('AS "executionId"'))
@@ -320,6 +323,14 @@ describe('Teacher assessment runtime synthetic HTTP boundary',()=>{
   expect(res.headers.get('retry-after')).toBe('3')
   expect(res.body).toEqual({code:'INSTRUMENT_NOT_AVAILABLE',message:'系统繁忙，请稍后开始测评；已经提交的答案不受影响。',data:null})
  })
+ it('does not mark a recovered attempt fresh after an unbound Run dispatch',async()=>{
+  row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null}
+  mocks.parent.mockResolvedValue({id:attempt,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',executionMode:'WHOLE_LOCAL'})
+  mocks.start.mockImplementation(async()=>{row={...baseline};return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:false}})
+  const res=await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{delivery:'inline'})
+  expect(res.status).toBe(200)
+  expect(res.body.data.freshlyCreated).toBe(false)
+ })
  it('attaches freshlyCreated and wholeBinding on WHOLE_LOCAL inline START with knownTemplateHash',async()=>{
   const templateHash='c'.repeat(64)
   row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null}
@@ -327,6 +338,7 @@ describe('Teacher assessment runtime synthetic HTTP boundary',()=>{
   const preloadedParent={id:attempt}
   const preloadedState={snapshots:[],scaleChildById:new Map(),skipCurrentUnitActivation:true}
   Object.defineProperty(startedResult,'_educationWholePreload',{value:{parent:preloadedParent,preloadedState}})
+  Object.defineProperty(startedResult,'_freshlyCreatedAttempt',{value:true})
   mocks.start.mockImplementation(async()=>{row={...baseline};return startedResult})
   mocks.parent.mockResolvedValue({id:attempt,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',executionMode:'WHOLE_LOCAL',currentItem:null})
   mocks.wholeDelivery.mockResolvedValue({mode:'binding',binding:{attemptId:attempt,attemptEpoch:1,slotSetHash:'d'.repeat(64),contextSnapshotHash:null,templateHash,units:[]}})

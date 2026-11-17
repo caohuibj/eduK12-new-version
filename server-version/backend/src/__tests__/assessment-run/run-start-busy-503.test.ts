@@ -161,12 +161,31 @@ describe('Run START transient rollback → 503 ASSESSMENT_START_BUSY',()=>{
     expect(res.body).toEqual({code:'INSTRUMENT_NOT_AVAILABLE',message:'系统繁忙，请稍后开始测评；已经提交的答案不受影响。',data:null})
   })
 
+  it('passes the existing School parent query to pre-gate admission without a second read',async()=>{
+    const preflight={runtimeBindingKind:null,runtimeBindingRef:null,respondentUserId:'student-1'}
+    m.parent.mockResolvedValue(preflight)
+    m.start.mockRejectedValue(new AssessmentStartBusyError('ADMISSION_QUEUE_FULL'))
+    await runController.startExecution(req,fakeRes())
+    expect(m.start).toHaveBeenCalledWith({executionId:'exec-1',actorUserId:'student-1',startPreflight:preflight})
+  })
+
+  it('keeps recovered Whole attempts non-fresh even when Run START returns replayed:false',async()=>{
+    m.start.mockResolvedValue({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-recovered',replayed:false})
+    m.getAttemptState.mockResolvedValue({id:'attempt-recovered',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',executionMode:'WHOLE_LOCAL'})
+    const res=fakeRes()
+    await runController.startExecution({...req,body:{delivery:'inline'}},res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.freshlyCreated).toBe(false)
+    expect(res.body.data.runtimeBindingRef).toBe('attempt-recovered')
+  })
+
   it('reuses _educationWholePreload and attaches freshlyCreated + wholeBinding for WHOLE_LOCAL START',async()=>{
     const templateHash='a'.repeat(64)
     const preloadedParent={id:'attempt-whole'}
     const preloadedState={snapshots:[],scaleChildById:new Map(),skipCurrentUnitActivation:true}
     const startedResult={state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'attempt-whole',replayed:false}
     Object.defineProperty(startedResult,'_educationWholePreload',{value:{parent:preloadedParent,preloadedState}})
+    Object.defineProperty(startedResult,'_freshlyCreatedAttempt',{value:true})
     m.start.mockResolvedValue(startedResult)
     m.getAttemptState.mockResolvedValue({id:'attempt-whole',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',executionMode:'WHOLE_LOCAL',currentItem:null})
     m.wholeDelivery.mockResolvedValue({mode:'binding',binding:{attemptId:'attempt-whole',attemptEpoch:1,slotSetHash:'b'.repeat(64),contextSnapshotHash:null,templateHash,units:[]}})

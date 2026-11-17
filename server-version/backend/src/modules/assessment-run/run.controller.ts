@@ -283,7 +283,7 @@ export const assessmentRunController = {
   async startExecution(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     try {
-      await assertRunExecutionParent({
+      const startPreflight = await assertRunExecutionParent({
         organizationId: req.params.organizationId,
         runId: req.params.runId,
         executionId: req.params.executionId,
@@ -291,6 +291,7 @@ export const assessmentRunController = {
       const started = await startAssessmentRunExecution({
         executionId: req.params.executionId,
         actorUserId: req.user.userId,
+        ...(startPreflight ? { startPreflight } : {}),
       })
       const requestedDelivery = req.query.view === 'current-unit'
         || req.query.delivery === 'inline'
@@ -341,7 +342,7 @@ export const assessmentRunController = {
           const inlineWhole = await attachEducationInlineWhole({
             currentUnit,
             userId: req.user.userId,
-            freshlyCreated: !started.replayed,
+            freshlyCreated: (started as { _freshlyCreatedAttempt?: boolean })._freshlyCreatedAttempt === true,
             preloadedParent: preloaded?.parent,
             knownTemplateHashes: parseKnownTemplateHashes(req),
           })
