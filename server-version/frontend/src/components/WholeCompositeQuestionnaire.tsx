@@ -9,9 +9,10 @@ import { sessionFetch } from '../api/client'
 import type { ApiResponse } from '../types'
 import type { CompositeAttemptState, CompositeReportStatus, WholeQuestionnaireDefinition, WholeQuestionnaireInput, WholeQuestionnaireReceipt, WholeQuestionnaireFormSection, WholeQuestionnaireFormSectionItem } from '../modules/composite/types'
 import AssessmentImageGate from '../modules/assessment-media/AssessmentImageGate'
+import FormOptionVideoGroupGate from '../modules/assessment-media/FormOptionVideoGroupGate'
 import ScaleFormVideoGate from '../modules/assessment-media/ScaleFormVideoGate'
-import { assessmentImageItems } from '../modules/assessment-media/adapter'
-import { scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
+import { assessmentImageItems, assessmentOptionImageItems } from '../modules/assessment-media/adapter'
+import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
 import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
 import { readScaleDeviceInputProvenance, resolveScaleDeviceInputProvenance, type DeviceInputProvenanceV1 } from '../modules/scale/device-input-provenance'
 import { createFinalDraftMeta, finalDraftStore, type FinalDraftMeta } from '../services/persistence/finalDraftStore'
@@ -24,6 +25,8 @@ import ScalePlayer from './questionnaire/ScalePlayer'
 import { FormPlayer, type FormPlayerValue } from './questionnaire/FormPlayer'
 import { useLocalDraftSaveQueue } from './questionnaire/useLocalDraftSaveQueue'
 import type { CompositeScaleRunnerItem } from '../modules/composite/types'
+import type { AssessmentVideoCapabilitySources } from '../modules/assessment-media/types'
+import type { PublicMaterial } from '../modules/assessment-media/material'
 
 export interface WholeQuestionnaireApi {
   wholeReceipt?: (id: string, submissionId: string, attemptEpoch: number) => Promise<ApiResponse<WholeReceiptLookup>>
@@ -31,7 +34,13 @@ export interface WholeQuestionnaireApi {
   submitWhole: (id: string, input: WholeQuestionnaireInput) => Promise<ApiResponse<WholeQuestionnaireReceipt>>
   reportStatus: (id: string) => Promise<ApiResponse<CompositeReportStatus>>
 }
-type Props = { state: CompositeAttemptState; api: WholeQuestionnaireApi; publicMode?: boolean; recoveryToken?: string; isFreshStart?: boolean; fallback: ReactNode; onExit: () => void; onCompleted: () => void }
+type EducationWholeMedia = {
+  loadScaleImage: (itemId: string, assetId: string) => Promise<Blob>
+  loadScaleVideo: (itemId: string, itemCode: string) => Promise<AssessmentVideoCapabilitySources>
+  loadFormImage: (sectionId: string, assetId: string) => Promise<Blob>
+  loadFormVideo: (sectionId: string, itemId: string, optionIndex: number) => Promise<AssessmentVideoCapabilitySources>
+}
+type Props = { state: CompositeAttemptState; api: WholeQuestionnaireApi; publicMode?: boolean; recoveryToken?: string; isFreshStart?: boolean; fallback: ReactNode; onExit: () => void; onCompleted: () => void; educationMedia?: EducationWholeMedia; acceptedNotice?: string; acceptedAction?: string; committedMessage?: string }
 type Answer = { responseValue?: string | number; value?: unknown; responseTimeMs?: number; changeCount?: number; otherText?: string }
 export const wholeDraftKey = (id: string, epoch: number) => `composite-whole:${id}:${epoch}`
 export const wholeAnswerKey = (itemId: string, itemCode: string) => JSON.stringify([itemId, itemCode])
@@ -82,21 +91,21 @@ function parseFormOptions(
   formDef?: WholeQuestionnaireFormSectionItem['formDefinition']
 ): Array<{ value: string; label: string }> {
   if (formDef && (formDef as any).options && Array.isArray((formDef as any).options) && (formDef as any).options.length > 0) {
-    return (formDef as any).options.map((o: any) => ({ value: String(o.optionKey ?? o.value ?? ''), label: String(o.label ?? '') }))
+    return (formDef as any).options.map((o: any) => ({ value: String(o.optionKey ?? o.value ?? ''), label: String(o.label ?? ''), ...(o.images !== undefined ? { images: o.images } : {}), ...(o.video !== undefined ? { video: o.video } : {}) }))
   }
   if (Array.isArray(rawOptions)) {
-    return rawOptions.map((o: any) => ({ value: String(o.value ?? o.optionKey ?? ''), label: String(o.label ?? '') }))
+    return rawOptions.map((o: any) => ({ value: String(o.value ?? o.optionKey ?? ''), label: String(o.label ?? ''), ...(o.images !== undefined ? { images: o.images } : {}), ...(o.video !== undefined ? { video: o.video } : {}) }))
   }
   if (typeof rawOptions === 'string') {
     try {
       const parsed = JSON.parse(rawOptions)
-      if (Array.isArray(parsed)) return parsed.map((o: any) => ({ value: String(o.value ?? o.optionKey ?? ''), label: String(o.label ?? '') }))
+      if (Array.isArray(parsed)) return parsed.map((o: any) => ({ value: String(o.value ?? o.optionKey ?? ''), label: String(o.label ?? ''), ...(o.images !== undefined ? { images: o.images } : {}), ...(o.video !== undefined ? { video: o.video } : {}) }))
     } catch { /* ignore */ }
   }
   return []
 }
 
-function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, recoveryToken, isFreshStart = false, fallback, onExit, onCompleted }: Props) {
+function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, recoveryToken, isFreshStart = false, fallback, onExit, onCompleted, educationMedia, acceptedNotice = '答案已保存。可以离开页面，稍后查看报告；报告失败不需要重新交卷。', acceptedAction = '查看报告进度', committedMessage }: Props) {
   const draftKey = wholeDraftKey(state.id, state.attemptEpoch ?? 1)
   const [definition, setDefinition] = useState<WholeQuestionnaireDefinition | null>(null)
   const [meta, setMeta] = useState<FinalDraftMeta | null>(null)
@@ -109,6 +118,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   const [checkpointRestoreGeneration, setCheckpointRestoreGeneration] = useState(0)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [progressNote, setProgressNote] = useState<string | null>(null)
   const [loadRound, setLoadRound] = useState(0)
   const [submitStartedAt, setSubmitStartedAt] = useState<number | null>(null)
   const [submitElapsedSeconds, setSubmitElapsedSeconds] = useState(0)
@@ -124,14 +134,20 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       | { kind: 'SCALE'; unit: WholeQuestionnaireDefinition['units'][number]; position: number }
       | { kind: 'FORM'; section: WholeQuestionnaireFormSection; position: number }
 
+    const frozenOrder = (kind: 'FORM' | 'SCALE', id: string) => {
+      const index = state.units?.findIndex(unit => kind === 'FORM'
+        ? unit.type === 'FORM_SECTION' && (unit.formSectionId === id || unit.id === id)
+        : unit.type !== 'FORM_SECTION' && (unit.itemId === id || unit.id === id))
+      return index !== undefined && index >= 0 ? index : null
+    }
     const blocks: Block[] = []
     if (definition.formSections) {
       for (const [sIndex, section] of definition.formSections.entries()) {
-        blocks.push({ kind: 'FORM', section, position: section.position ?? sIndex })
+        blocks.push({ kind: 'FORM', section, position: frozenOrder('FORM', section.id) ?? section.position ?? sIndex })
       }
     }
     for (const [uIndex, unit] of (definition.units || []).entries()) {
-      blocks.push({ kind: 'SCALE', unit, position: unit.position ?? (1000 + uIndex) })
+      blocks.push({ kind: 'SCALE', unit, position: frozenOrder('SCALE', unit.itemId) ?? unit.position ?? (1000 + uIndex) })
     }
     blocks.sort((a, b) => a.position - b.position)
 
@@ -160,7 +176,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       }
     }
     return result
-  }, [definition])
+  }, [definition, state.units])
   const current = questions[index]
   const locked = checkpointBusy || Boolean(meta && (meta.status !== 'DRAFT' || meta.sealedSubmission))
   useEffect(() => { questionStart.current = Date.now() }, [index, draftKey])
@@ -449,17 +465,19 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   }
   const unitPath = current && current.kind === 'SCALE' ? `${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(current.unit.itemId)}/scale` : ''
   const loadImage = useCallback(async (assetId: string) => {
+    if (educationMedia && current?.kind === 'SCALE') return educationMedia.loadScaleImage(current.unit.itemId, assetId)
+    if (educationMedia && current?.kind === 'FORM') return educationMedia.loadFormImage(current.section.id, assetId)
     const response = await sessionFetch(`${unitPath}/assets/${encodeURIComponent(assetId)}/content`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken || '' } } : undefined)
     if (!response.ok) throw new Error(`视觉内容加载失败 (${response.status})`)
     return response.blob()
-  }, [unitPath, publicMode, recoveryToken])
+  }, [unitPath, publicMode, recoveryToken, educationMedia, current])
   if (useFallback) return <>{fallback}</>
   if (loading) return <p role="status" className="p-6 text-slate-600">正在恢复整卷本机草稿…</p>
   return <AssessmentShell title={state.name} eyebrow="问卷" instructionsSummary={isTrainingHost() ? '作答说明' : undefined}
     instructions={<div className="space-y-2">{state.instruction ? <p>{state.instruction}</p> : null}<p>整卷答案保存在当前浏览器，最后一次提交。请使用同一浏览器继续未提交的草稿。</p></div>}
     progress={definition ? { kind: 'count', completed: Object.keys(answers).length, total: questions.length, label: '整卷作答进度' } : undefined}
     saveStatus={local.status}
-    submissionStatus={accepted ? { state: 'committed', message: publicMode ? '整份问卷已可靠保存。报告按生成状态和开放权限显示，无需再次交卷。' : '整份问卷已可靠保存，正在生成报告。' } : busy ? { state: 'submitting', message: submitElapsedSeconds >= 8 ? `已等待 ${submitElapsedSeconds} 秒，正在确认服务器保存；请勿关闭，本机草稿仍保留。` : '正在提交并确认保存…' } : locked ? { state: 'pending', message: '整卷已封存，重试将使用相同内容。' } : { state: 'ready' }}
+    submissionStatus={accepted ? { state: 'committed', message: committedMessage ?? (publicMode ? '整份问卷已可靠保存。报告按生成状态和开放权限显示，无需再次交卷。' : '整份问卷已可靠保存，正在生成报告。') } : busy ? { state: 'submitting', message: submitElapsedSeconds >= 8 ? `已等待 ${submitElapsedSeconds} 秒，正在确认服务器保存；请勿关闭，本机草稿仍保留。` : '正在提交并确认保存…' } : locked ? { state: 'pending', message: '整卷已封存，重试将使用相同内容。' } : { state: 'ready' }}
     actions={<button type="button" className="btn-secondary min-h-11" disabled={busy || checkpointBusy} onClick={() => void saveAndExit()}>保存并退出</button>}>
     {definition && meta && !accepted ? <TrainingCheckpointPanel policy={state.trainingPersistence} definitionHash={state.checkpointDefinitionHash} publicMode={publicMode} recoveryToken={recoveryToken}
       disabled={busy || meta.status !== 'DRAFT' || !!meta.sealedSubmission} onBusy={setCheckpointBusy}
@@ -512,7 +530,21 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       }}/>:null}
     {error ? <p role="alert" className="mb-4 text-red-700">{error}</p> : null}
     {publicMode && recoveryToken ? <p className="mb-4 text-sm text-gray-600">请在页面上方保存本次匿名作答的恢复链接。链接不包含未提交答案，本机草稿或已保存的临时进度仍按各自有效期恢复。</p> : null}
-    {accepted ? <div className="space-y-4"><h2 className="text-xl font-semibold">交卷成功</h2><p>答案已保存。可以离开页面，稍后查看报告；报告失败不需要重新交卷。</p><button className="btn-primary min-h-11" type="button" onClick={onCompleted}>查看报告进度</button></div>
+    {accepted ? <div className="space-y-4"><h2 className="text-xl font-semibold">交卷成功</h2><p>{acceptedNotice}</p>{progressNote ? <p role="status">{progressNote}</p> : null}<button className="btn-primary min-h-11" type="button" disabled={busy} onClick={() => {
+      if (!educationMedia) { onCompleted(); return }
+      void (async () => {
+        setBusy(true)
+        try {
+          const status = await api.reportStatus(state.id)
+          const data = status.data as { status?: string; reportStatus?: { state?: string } } | undefined
+          if (status.code !== 0 || !data) throw responseError(status)
+          if (data.status === 'COMPLETED' || data.reportStatus?.state === 'READY') { onCompleted(); return }
+          if (data.reportStatus?.state === 'FAILED') { setProgressNote('答案已保存，但后台处理失败。请稍后再次查看，不要重新交卷。'); return }
+          setProgressNote('答案已保存，仍在处理。可以稍后再次查看，不必重新交卷。')
+        } catch (cause) { setProgressNote(normalizeApiError(cause).message) }
+        finally { setBusy(false) }
+      })()
+    }}>{acceptedAction}</button></div>
       : meta?.sealedSubmission ? <div className="space-y-4"><p>整卷已封存，本机草稿会保留到服务器确认保存。</p><button type="button" className="btn-primary min-h-11" disabled={busy || meta.status === 'CONFLICT'} onClick={() => void submit()}>重试并确认整卷提交</button></div>
         : current ? <div id={publicMode ? `training-anonymous-whole-required:${state.id}` : undefined} tabIndex={publicMode ? -1 : undefined} className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
           <h2 className="mb-3 text-xl font-semibold">{current.title}</h2>
@@ -522,7 +554,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
             <>
               <TrainingMaterials items={current.question.materials} loadAsset={loadImage}/>
               <AssessmentImageGate items={assessmentImageItems((current.question as { images?: unknown }).images)} loadAsset={loadImage} disabled={busy}>
-                <ScaleFormVideoGate presentation={scaleItemVideoPresentation(current.question)} loadSources={() => requestAssessmentVideoCapabilities(`${unitPath}/items/${encodeURIComponent(current.question.itemCode)}/video-capability`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken || '' } } : undefined)}>
+                <ScaleFormVideoGate presentation={scaleItemVideoPresentation(current.question)} loadSources={() => educationMedia ? educationMedia.loadScaleVideo(current.unit.itemId, current.question.itemCode) : requestAssessmentVideoCapabilities(`${unitPath}/items/${encodeURIComponent(current.question.itemCode)}/video-capability`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken || '' } } : undefined)}>
                   {(()=>{const player=(<ScalePlayer scopeKey={`${draftKey}:${current.unit.itemId}:${checkpointRestoreGeneration}`} autoAdvance={isTrainingHost() && !publicMode} item={current.question} value={answers[wholeAnswerKey(current.unit.itemId, current.question.itemCode)]?.responseValue}
                     answerDisabled={locked || busy} navigationDisabled={busy} submitDisabled={busy || meta?.status === 'CONFLICT'}
                     position={index + 1} total={questions.length} onChange={saveAnswer} onPrevious={() => setIndex(prior => Math.max(0, prior - 1))}
@@ -532,7 +564,9 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
               </AssessmentImageGate>
             </>
           ) : (
-            <FormPlayer
+            (() => {
+              const options = parseFormOptions(current.item.formOptions, current.item.formDefinition)
+              const player = <FormPlayer
               scopeKey={`${draftKey}:${current.section.id}:${checkpointRestoreGeneration}`}
               autoAdvance={isTrainingHost() && !publicMode}
               item={{
@@ -544,7 +578,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
                 formDefinition: current.item.formDefinition,
                 formPolicy: current.item.formPolicy as any,
               }}
-              options={parseFormOptions(current.item.formOptions, current.item.formDefinition)}
+              options={options}
               value={answers[wholeFormAnswerKey(current.section.id, current.item.id)]?.value as FormPlayerValue}
               otherText={answers[wholeFormAnswerKey(current.section.id, current.item.id)]?.otherText}
               onOtherTextChange={text => saveFormOtherText(current.section.id, current.item.id, text)}
@@ -560,6 +594,17 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
               submitLabel="提交整份问卷"
               submitting={busy}
             />
+              if (!educationMedia) return player
+              const materials = (current.item.formDefinition as { materials?: PublicMaterial[] } | null | undefined)?.materials
+              return <>
+                <TrainingMaterials items={materials} loadAsset={loadImage}/>
+                <AssessmentImageGate items={assessmentOptionImageItems(options)} loadAsset={loadImage} disabled={busy}>
+                  <FormOptionVideoGroupGate entries={formOptionVideoPresentations(options)} loadSources={entry => educationMedia.loadFormVideo(current.section.id, current.item.id, entry.optionIndex)}>
+                    {player}
+                  </FormOptionVideoGroupGate>
+                </AssessmentImageGate>
+              </>
+            })()
           )}
         </div> : <button type="button" className="btn-secondary min-h-11" onClick={() => setLoadRound(prior => prior + 1)}>重新加载整卷草稿</button>}
   </AssessmentShell>

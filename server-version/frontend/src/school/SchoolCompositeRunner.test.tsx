@@ -48,6 +48,16 @@ const parentRead=parentPath+'?view=current-unit'
 const childPath=parentPath+'/items/slot-cognitive-1/cognitive/cognitive-session-1'
 
 describe('Huischool Cognitive task uses only school-bound Composite FINAL endpoints',()=>{
+  it('returns an all-at-once whole unit to the existing stepped runner',async()=>{
+    const api=vi.fn(async(path:string,method='GET')=>{
+      if(path.endsWith('/start')&&method==='POST')return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-attempt-1',currentUnit:{id:'parent-attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',executionMode:'WHOLE_LOCAL',currentItem:{id:'scale',type:'SCALE',position:0,required:true,presentationMode:'ALL_AT_ONCE'}}}
+      throw Error('unexpected campus call: '+path)
+    })
+    render(<SchoolCompositeRunner api={api as unknown as SchoolApi} execution={execution} onExit={vi.fn()} onFinished={vi.fn()}/>)
+    fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+    expect(await screen.findByRole('button',{name:'进入冻结认知子测评'})).toBeTruthy()
+  })
+
   it('loads existing frozen slot and returns to parent after FINAl without training credentials',async()=>{
     m.entry.mockReturnValue({id:'slot-cognitive-1',type:'COGNITIVE',
       cognitiveSession:{sessionId:'cognitive-session-1'}})

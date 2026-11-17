@@ -4,6 +4,10 @@ import {ArrowLeft,CircleCheck} from 'lucide-react'
 import {SchoolTaskHelp} from './SchoolTaskHelp'
 import { MemoryRouter } from 'react-router-dom'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
+import WholeCompositeQuestionnaire from '../components/WholeCompositeQuestionnaire'
+import type { CompositeReportStatus, WholeQuestionnaireDefinition, WholeQuestionnaireInput, WholeQuestionnaireReceipt } from '../modules/composite/types'
+import type { WholeReceiptLookup } from '../modules/composite/receipt-recovery'
+import type { WholeQuestionnaireApi } from '../components/WholeCompositeQuestionnaire'
 const CognitiveRunner=deferredPage(async()=>({default:(await import('../modules/cognitive/pages/CognitiveRunner')).CognitiveRunner}))
 import type { CognitiveSessionApi } from '../modules/cognitive/api'
 import type { CognitiveSession } from '../modules/cognitive/types'
@@ -91,7 +95,6 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
     }catch(e){setError(e instanceof Error?e.message:'测评暂时不能开始')}
     finally{setBusy(false)}
   }
-  const runApi=(s:string)=>'/composite-attempts/'+encodeURIComponent(state?.id||'')+s
   const videoLoader=useCallback(async(url:string)=>{
     if(!url.startsWith('/api/campus/'))throw new Error('不允许使用培训版测评媒体')
     return api<AssessmentVideoCapabilitySources>(url.slice('/api/campus'.length),'POST',{})
@@ -166,6 +169,51 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
   }
   const consentVisibility=observer&&execution.consentVisibility&&observerVisibility[execution.consentVisibility]
     ||execution.consentVisibility||'仅限经授权人员'
+  const wholeApi=useMemo(():WholeQuestionnaireApi=>({
+    wholeDefinition:async(id:string)=>wrapped(await api<WholeQuestionnaireDefinition>('/composite-attempts/'+encodeURIComponent(id)+'/whole')),
+    submitWhole:async(id:string,input:WholeQuestionnaireInput)=>wrapped(await api<WholeQuestionnaireReceipt>('/composite-attempts/'+encodeURIComponent(id)+'/whole/submit','POST',input)),
+    wholeReceipt:async(id:string,submissionId:string,attemptEpoch:number)=>wrapped(await api<WholeReceiptLookup>('/composite-attempts/'+encodeURIComponent(id)+'/whole/receipt?submissionId='+encodeURIComponent(submissionId)+'&attemptEpoch='+attemptEpoch)),
+    reportStatus:async(id:string)=>wrapped(await api<CompositeReportStatus>('/composite-attempts/'+encodeURIComponent(id)+'/whole/progress')),
+  }),[api])
+  const educationMedia=useMemo(()=>{
+    const root='/composite-attempts/'+encodeURIComponent(state?.id||'')
+    return {
+      loadScaleImage:(itemId:string,assetId:string)=>api<Blob>(root+'/items/'+encodeURIComponent(itemId)+'/scale/assets/'+encodeURIComponent(assetId)+'/content','GET',undefined,{responseType:'blob'}),
+      loadScaleVideo:(itemId:string,itemCode:string)=>api<AssessmentVideoCapabilitySources>(root+'/items/'+encodeURIComponent(itemId)+'/scale/items/'+encodeURIComponent(itemCode)+'/video-capability','POST',{}),
+      loadFormImage:(sectionId:string,assetId:string)=>api<Blob>(root+'/form-sections/'+encodeURIComponent(sectionId)+'/assets/'+encodeURIComponent(assetId)+'/content','GET',undefined,{responseType:'blob'}),
+      loadFormVideo:(sectionId:string,itemId:string,optionIndex:number)=>api<AssessmentVideoCapabilitySources>(root+'/form-sections/'+encodeURIComponent(sectionId)+'/items/'+encodeURIComponent(itemId)+'/options/'+optionIndex+'/video-capability','POST',{}),
+    }
+  },[api,state?.id])
+  const stepped=state?<FinalCompositeAssessment
+      state={state}
+      campusMode
+      instructionsSummary={ordinaryAnswer?'作答说明':undefined}
+      instructionsAppendix={observerAnswer?<><p>返回任务不会提交当前作答。已提交的结果保留；尚未提交的内容可能无法保留。</p><p>完成测评不会自动向家长或普通教师开放学生个人心理报告。</p></>:undefined}
+      campusVideoLoader={videoLoader}
+      submitFormSection={async(_id,sectionId,input)=>{
+        return wrapped(await api('/composite-attempts/'+encodeURIComponent(state.id)+'/form-sections/'+encodeURIComponent(sectionId)+'/submit','POST',input))
+      }}
+      submitScale={async(_id,itemId,input)=>{
+        return wrapped(await api('/composite-attempts/'+encodeURIComponent(state.id)+'/items/'+encodeURIComponent(itemId)+'/scale/submit?response=receipt','POST',input))
+      }}
+      onReload={()=>load(state.id)}
+      onExit={onExit}
+      onCompleted={()=>{if(state.status==='COMPLETED')setDone(true)}}
+      onEnterCognitive={item=>{
+        if(!item.cognitiveSession?.sessionId){
+          setError('认知子测评缺少经过冻结的会话，请联系学校')
+          return
+        }
+        setChild(item)
+      }}
+      onEnterSituational={item=>{
+        if(!item.situationalAttemptId){
+          setError('嵌入情境测评缺少冻结实例，请联系学校')
+          return
+        }
+        setChild(item)
+      }}
+    />:null
 
   return <section data-school-child={title?child?.type:undefined} className={"hs-panel hs-runner"+(observerReady?' hs-observer-runner--ready':'')+(observerComplete?' hs-observer-runner--done':'')+(title&&child?' hs-school-task-runner--child':'')+(ordinaryAnswer?' hs-school-task-runner--answer':'')+(observerAnswer?' hs-observer-runner--answer':'')+(title?" hs-school-task-runner"+(!state&&!done?" hs-school-task-runner--ready":""):"")} ref={panelRef} tabIndex={-1} aria-label="校园任务作答"
     onMouseOut={observerAnswer?event=>{const details=(event.target as Element).closest<HTMLDetailsElement>('details.assessment-instructions');if(details&&!details.contains(event.relatedTarget as Node|null))details.open=false}:undefined}
@@ -208,38 +256,12 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
           client:situationalClient,onCompleted:()=>{void childFinished()},
         }}/>
       </MemoryRouter>:
-    state?<FinalCompositeAssessment
-      state={state}
-      campusMode
-      instructionsSummary={ordinaryAnswer?'作答说明':undefined}
-      instructionsAppendix={observerAnswer?<><p>返回任务不会提交当前作答。已提交的结果保留；尚未提交的内容可能无法保留。</p><p>完成测评不会自动向家长或普通教师开放学生个人心理报告。</p></>:undefined}
-      campusVideoLoader={videoLoader}
-      submitFormSection={async(_id,sectionId,input)=>{
-        return wrapped(await api(runApi('/form-sections/'+encodeURIComponent(sectionId)+'/submit'),
-          'POST',input))
-      }}
-      submitScale={async(_id,itemId,input)=>{
-        return wrapped(await api(runApi('/items/'+encodeURIComponent(itemId)+'/scale/submit?response=receipt'),
-          'POST',input))
-      }}
-      onReload={()=>load(state.id)}
-      onExit={onExit}
-      onCompleted={()=>{if(state.status==='COMPLETED')setDone(true)}}
-      onEnterCognitive={item=>{
-        if(!item.cognitiveSession?.sessionId){
-          setError('认知子测评缺少经过冻结的会话，请联系学校')
-          return
-        }
-        setChild(item)
-      }}
-      onEnterSituational={item=>{
-        if(!item.situationalAttemptId){
-          setError('嵌入情境测评缺少冻结实例，请联系学校')
-          return
-        }
-        setChild(item)
-      }}
-    />:<div className="hs-school-task-launch">
+    state?.executionMode==='WHOLE_LOCAL'&&!child?<WholeCompositeQuestionnaire state={state} fallback={stepped} api={wholeApi} educationMedia={educationMedia} onExit={onExit}
+      acceptedNotice="答案已保存，正在处理。完成状态以服务器确认的测评记录为准，交卷回执不会开放个人报告。"
+      acceptedAction="查看完成状态"
+      committedMessage="答案已保存，正在处理。请勿重复交卷。"
+      onCompleted={()=>{void load(state.id)}}
+    />:stepped??<div className="hs-school-task-launch">
       {observerReady&&<p className="hs-observer-ready-prompt">确认任务后，开始或继续本次测评。</p>}
       {needsAdmissionConsent&&<div className="hs-panel hs-runner-consent">
         <h3>{observer?'测评知情同意':'本次受控观察测评的知情同意'}</h3>
