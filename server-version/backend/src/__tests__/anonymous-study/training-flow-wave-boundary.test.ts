@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '@prisma/client'
-const { db, composite }=vi.hoisted(()=>({db:{$queryRaw:vi.fn(),$executeRaw:vi.fn(),$transaction:vi.fn(),compositeAssessment:{findUnique:vi.fn()}},composite:{revealAccessToken:vi.fn(),getPublicCompositeInfo:vi.fn(),createAccessTokenForComposite:vi.fn()}}))
+const { db, composite }=vi.hoisted(()=>({db:{$queryRaw:vi.fn(),$executeRaw:vi.fn(),$transaction:vi.fn(),compositeAssessment:{findUnique:vi.fn()}},composite:{revealAccessToken:vi.fn(),getPublicCompositeInfo:vi.fn(),assertPublicCompositeAdmission:vi.fn(),createAccessTokenForComposite:vi.fn()}}))
 vi.mock('../../config/database',()=>({prisma:db}))
 vi.mock('../../modules/composite/composite.service',()=>composite)
 vi.mock('../../modules/composite/composite-export.service',()=>({compositeExportService:{}}))

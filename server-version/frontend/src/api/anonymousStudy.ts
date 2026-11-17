@@ -1,5 +1,7 @@
 import apiClient from './client'
 import { createPublicCapabilityClient } from './publicCapabilityClient'
+import { getKnownWholeTemplateHashes } from '../modules/composite/whole-definition-source'
+import type { WholeQuestionnaireBinding, WholeQuestionnaireDefinition } from '../modules/composite/types'
 import type { ApiResponse } from '../types'
 import type {PersonalChangesResponse} from '../modules/reporting/PersonalChangesReport'
 const data=<T>(response:ApiResponse<T>):T=>{if(response.code!==0 || !response.data)throw new Error(response.message || '研究访问失败');return response.data}
@@ -45,6 +47,13 @@ export const anonymousStudyApi={
   researchWithdrawals:async(studyId:string,page=1)=>data(await apiClient.get<{list:ResearchWithdrawal[];page:number;pageSize:number}>(`/anonymous-studies/${encodeURIComponent(studyId)}/research-withdrawals?page=${page}`)),
   reviewResearchWithdrawal:async(studyId:string,participantId:string,input:ReviewResearchWithdrawal)=>data(await apiClient.post<{state:'EXCLUDED';revision:number}>(`/anonymous-studies/${encodeURIComponent(studyId)}/participants/${encodeURIComponent(participantId)}/research-withdrawal/review`,input)),
 }
+type StudyWaveDelivery = { attemptId: string; state: string; recoveryToken: string; wholeDefinition?: WholeQuestionnaireDefinition; wholeBinding?: WholeQuestionnaireBinding }
+const studyWavePath = (studyId: string, waveId: string, action: 'start' | 'recover', delivery?: string) =>
+  `/${encodeURIComponent(studyId)}/waves/${encodeURIComponent(waveId)}/${action}${delivery ? `?delivery=${delivery}` : ''}`
+const knownWholeTemplateInit = (): RequestInit | undefined => {
+  const hashes = getKnownWholeTemplateHashes()
+  return hashes.length > 0 ? { headers: { 'X-Whole-Template-Hash': hashes.join(',') } } : undefined
+}
 export function publicStudyApi(credential='') {
   const client=createPublicCapabilityClient(credential,{baseUrl:'/api/public/anonymous-studies'})
   return {
@@ -55,8 +64,8 @@ export function publicStudyApi(credential='') {
     resetCode:async(studyId:string,resetCode:string,suffix:string)=>data(await client.post<StudyIdentity>(`/${encodeURIComponent(studyId)}/code/reset`,{resetCode,suffix})),
     home:async(studyId:string)=>data(await client.get<StudyHome>(`/${encodeURIComponent(studyId)}`)),
     changes:async(studyId:string,attemptId:string)=>data(await client.post<PersonalChangesResponse>(`/${encodeURIComponent(studyId)}/changes`,{attemptId})),
-    recover:async(studyId:string,waveId:string,opts?:{delivery?:string})=>data(await client.post<{attemptId:string;state:string;recoveryToken:string;wholeDefinition?:any}>(`/${encodeURIComponent(studyId)}/waves/${encodeURIComponent(waveId)}/recover${opts?.delivery?`?delivery=${opts.delivery}`:''}`,{})),
-    start:async(studyId:string,waveId:string,opts?:{delivery?:string})=>data(await client.post<{attemptId:string;state:string;recoveryToken:string;wholeDefinition?:any}>(`/${encodeURIComponent(studyId)}/waves/${encodeURIComponent(waveId)}/start${opts?.delivery?`?delivery=${opts.delivery}`:''}`,{})),
+    recover:async(studyId:string,waveId:string,opts?:{delivery?:string})=>data(await client.post<StudyWaveDelivery>(studyWavePath(studyId,waveId,'recover',opts?.delivery),{},knownWholeTemplateInit())),
+    start:async(studyId:string,waveId:string,opts?:{delivery?:string})=>data(await client.post<StudyWaveDelivery>(studyWavePath(studyId,waveId,'start',opts?.delivery),{},knownWholeTemplateInit())),
     revoke:async(studyId:string)=>data(await client.post(`/${encodeURIComponent(studyId)}/revoke`,{})),
     researchConsent:async(studyId:string)=>data(await client.get<ResearchParticipation>(`/${encodeURIComponent(studyId)}/research-consent`)),
     acceptResearchConsent:async(studyId:string,input:AcceptResearchConsent)=>data(await client.post<ResearchParticipation>(`/${encodeURIComponent(studyId)}/research-consent/accept`,input)),
