@@ -223,13 +223,13 @@ router.get('/composite-attempts/:attemptId/whole/progress',authenticateSchool,ca
 router.post('/composite-attempts/:attemptId/whole/submit',authenticateSchool,campusCompositeAccess,
   compositeController.wholeSubmit)
 router.get('/composite-attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content',
-  authenticateSchool,campusCompositeAccess,compositeImageController.authenticatedFormImage)
+  authenticateSchool,campusCompositeAccess,compositeImageController.educationFormImage)
 router.get('/composite-attempts/:attemptId/items/:itemId/scale/assets/:assetId/content',
-  authenticateSchool,campusCompositeAccess,compositeImageController.authenticatedScaleImage)
+  authenticateSchool,campusCompositeAccess,compositeImageController.educationScaleImage)
 router.post('/composite-attempts/:attemptId/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability',
-  authenticateSchool,campusCompositeAccess,compositeVideoController.authenticatedFormVideo)
+  authenticateSchool,campusCompositeAccess,compositeVideoController.educationFormVideo)
 router.post('/composite-attempts/:attemptId/items/:itemId/scale/items/:itemCode/video-capability',
-  authenticateSchool,campusCompositeAccess,compositeVideoController.authenticatedScaleVideo)
+  authenticateSchool,campusCompositeAccess,compositeVideoController.educationScaleVideo)
 router.post('/composite-attempts/:attemptId/form-sections/:sectionId/submit',
   authenticateSchool,campusCompositeAccess,campusFinalConsent,
   compositeController.submitFinalFormSection)
