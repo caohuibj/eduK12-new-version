@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { acceptsAsyncCompositeReport, acceptsEducationWholeMaterialization, isEducationWholeAttempt } from '../../config/assessmentReports'
+import { educationWholeBlocksPriorSnapshots } from '../../modules/assessment-runtime/report-outbox.service'
 import { wholeLocalExecutionMode } from '../../modules/composite/whole-local-eligibility'
 import { wholeQuestionnaireSubmitSchema } from '../../modules/composite/whole-questionnaire.service'
 
@@ -27,6 +28,12 @@ describe('education whole admission', () => {
     expect(wholeLocalExecutionMode({ ...open, units: [{ type: 'FORM', completed: true }] })).toBe('WHOLE_LOCAL')
     expect(wholeLocalExecutionMode({ shapeEligible: true, admissionOpen: false, units: [{ type: 'SCALE', completed: false }] })).toBe('STEPPED')
     expect(wholeLocalExecutionMode({ ...open, units: [{ type: 'FORM_SECTION', completed: false }] })).toBe('WHOLE_LOCAL')
+  })
+
+  it('rejects an education whole receipt after any stepped unit snapshot', () => {
+    expect(educationWholeBlocksPriorSnapshots([{ unitType: 'FORM_SECTION' }])).toBe(true)
+    expect(educationWholeBlocksPriorSnapshots([{ unitType: 'SCALE' }])).toBe(true)
+    expect(educationWholeBlocksPriorSnapshots([])).toBe(false)
   })
 
   it('accepts a form-only envelope and rejects an empty one', () => {

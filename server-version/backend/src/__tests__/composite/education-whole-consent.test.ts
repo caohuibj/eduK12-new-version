@@ -70,6 +70,7 @@ describe('education whole consent', () => {
     const first = await submitWholeQuestionnaire('parent', input, { userId: 'user' })
     expect(first).toMatchObject({ status: 'ACCEPTED', replayed: false })
     expect(consent).toHaveBeenCalledTimes(1)
+    expect(mocks.register.mock.calls[0][1].rejectPriorUnitSnapshots).toBe(true)
     header.wholeSubmissionId = input.submissionId
     header.wholePayloadHash = first.payloadHash
     mocks.db.$queryRaw.mockResolvedValue([header])
