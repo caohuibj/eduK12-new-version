@@ -41,7 +41,7 @@ describe('whole questionnaire durable browser submission', () => {
     ordered.units[1].scale.name = '量表丙'
     delete (ordered.units[0] as { position?: number }).position
     delete (ordered.units[1] as { position?: number }).position
-    ordered.formSections = [{ id: 'form-b', title: '表单乙', description: null, position: 0, contextSection: false, definitionHash: 'd'.repeat(16), items: [{ id: 'field', formType: 'text', formLabel: '填空', formPlaceholder: null, required: false, formOptions: null }] }]
+    ordered.formSections = [{ id: 'form-b', title: '表单乙', description: null, position: 0, contextSection: false, definitionHash: 'd'.repeat(16), items: [{ id: 'field', formType: 'text', formLabel: '填空', formPlaceholder: null, required: false, formOptions: null, contextKey: null }] }]
     const client = api()
     client.wholeDefinition.mockResolvedValue({ code: 0, data: ordered })
     const frozen = { ...state, units: [

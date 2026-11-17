@@ -6,7 +6,9 @@ const FinalCompositeAssessment=deferredPage(()=>import('../components/FinalCompo
 const WholeCompositeQuestionnaire=deferredPage(()=>import('../components/WholeCompositeQuestionnaire'))
 const CognitiveRunner=deferredPage(async()=>({default:(await import('../modules/cognitive/pages/CognitiveRunner')).CognitiveRunner}))
 const SituationalRunner=deferredPage(()=>import('../modules/situational/pages/SituationalRunner'))
-import type {CompositeAttemptState,CompositeCurrentItem,WholeQuestionnaireInput} from '../modules/composite/types'
+import type {CompositeAttemptState,CompositeCurrentItem,CompositeReportStatus,WholeQuestionnaireDefinition,WholeQuestionnaireInput,WholeQuestionnaireReceipt} from '../modules/composite/types'
+import type {WholeReceiptLookup} from '../modules/composite/receipt-recovery'
+import type {WholeQuestionnaireApi} from '../components/WholeCompositeQuestionnaire'
 import type {AssessmentVideoCapabilitySources} from '../modules/assessment-media/types'
 import type {EducationReportApi} from '../components/education-tools/EducationScalePersonalReport'
 import {TeacherAssessmentPage} from './TeacherAssessmentPage'
@@ -142,11 +144,11 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
  const situational=useMemo(()=>parentId&&child?.type==='SITUATIONAL'&&child.situationalAttemptId
   ?createTeacherSituationalClient(api,parentId,child.id,child.situationalAttemptId):null,[api,parentId,child])
  const media=useMemo(()=>attempt?.currentItem?createTeacherAssessmentMediaTransport(api,attempt.id,attempt.currentItem):undefined,[api,attempt])
- const wholeApi=useMemo(()=>attempt?{
-  wholeDefinition:async(id:string)=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole')}),
-  submitWhole:async(id:string,input:WholeQuestionnaireInput)=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole/submit','POST',input)}),
-  wholeReceipt:async(id:string,submissionId:string,attemptEpoch:number)=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole/receipt?submissionId='+encodeURIComponent(submissionId)+'&attemptEpoch='+attemptEpoch)}),
-  reportStatus:async(id:string)=>({code:0,message:'成功',data:await api(teacherAssessmentParentPath(id)+'/whole/progress')}),
+ const wholeApi=useMemo(():WholeQuestionnaireApi|null=>attempt?{
+  wholeDefinition:async(id:string)=>({code:0,message:'成功',data:await api<WholeQuestionnaireDefinition>(teacherAssessmentParentPath(id)+'/whole')}),
+  submitWhole:async(id:string,input:WholeQuestionnaireInput)=>({code:0,message:'成功',data:await api<WholeQuestionnaireReceipt>(teacherAssessmentParentPath(id)+'/whole/submit','POST',input)}),
+  wholeReceipt:async(id:string,submissionId:string,attemptEpoch:number)=>({code:0,message:'成功',data:await api<WholeReceiptLookup>(teacherAssessmentParentPath(id)+'/whole/receipt?submissionId='+encodeURIComponent(submissionId)+'&attemptEpoch='+attemptEpoch)}),
+  reportStatus:async(id:string)=>({code:0,message:'成功',data:await api<CompositeReportStatus>(teacherAssessmentParentPath(id)+'/whole/progress')}),
  }:null,[api,attempt?.id])
  const educationMedia=useMemo(()=>{
   if(!attempt)return undefined
