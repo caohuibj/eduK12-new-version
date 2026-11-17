@@ -35,6 +35,32 @@ beforeEach(() => { vi.clearAllMocks(); retry.mockImplementation(async ({ operati
 afterEach(async () => { await finalDraftStore.delete(key); for (let i = 0; i < 8; i++) await finalDraftStore.delete(`composite-scale:child-${i}`) })
 
 describe('whole questionnaire durable browser submission', () => {
+  it('keeps frozen scale and form order and shows a failed worker without resubmitting', async () => {
+    const ordered = definition([1, 1])
+    ordered.units[0].scale.name = '量表甲'
+    ordered.units[1].scale.name = '量表丙'
+    delete (ordered.units[0] as { position?: number }).position
+    delete (ordered.units[1] as { position?: number }).position
+    ordered.formSections = [{ id: 'form-b', title: '表单乙', description: null, position: 0, contextSection: false, definitionHash: 'd'.repeat(16), items: [{ id: 'field', formType: 'text', formLabel: '填空', formPlaceholder: null, required: false, formOptions: null }] }]
+    const client = api()
+    client.wholeDefinition.mockResolvedValue({ code: 0, data: ordered })
+    const frozen = { ...state, units: [
+      { id: 'a', type: 'SCALE' as const, position: 2, required: true, label: '甲', completed: false, index: 0, itemId: 'unit-0' },
+      { id: 'form-b', type: 'FORM_SECTION' as const, position: 0, required: true, label: '乙', completed: false, index: 1, formSectionId: 'form-b' },
+      { id: 'c', type: 'SCALE' as const, position: 1, required: true, label: '丙', completed: false, index: 2, itemId: 'unit-1' },
+    ] }
+    render(<WholeCompositeQuestionnaire state={frozen} isFreshStart api={client} educationMedia={{ loadScaleImage: vi.fn(), loadScaleVideo: vi.fn(), loadFormImage: vi.fn(), loadFormVideo: vi.fn() }} fallback={<p>旧单元作答</p>} onCompleted={vi.fn()} onExit={vi.fn()} />)
+    expect(await screen.findByRole('heading', { name: '量表甲' })).toBeTruthy()
+    const failed = api()
+    failed.reportStatus.mockResolvedValueOnce({ code: 0, data: { wholeSubmissionReceived: true, reportStatus: { state: 'PENDING' } } })
+      .mockResolvedValueOnce({ code: 0, data: { status: 'IN_PROGRESS', wholeSubmissionReceived: true, reportStatus: { state: 'FAILED' } } })
+    const media = { loadScaleImage: vi.fn(), loadScaleVideo: vi.fn(), loadFormImage: vi.fn(), loadFormVideo: vi.fn() }
+    render(<WholeCompositeQuestionnaire state={frozen} api={failed} educationMedia={media} acceptedAction="查看完成状态" fallback={<p>旧单元作答</p>} onCompleted={vi.fn()} onExit={vi.fn()} />)
+    fireEvent.click(await screen.findByRole('button', { name: '查看完成状态' }))
+    expect(await screen.findByText('答案已保存，但后台处理失败。请稍后再次查看，不要重新交卷。')).toBeTruthy()
+    expect(failed.submitWhole).not.toHaveBeenCalled()
+  })
+
   it('shows the stepped fallback for an all-at-once unit and loads a form option image', async () => {
     render(<WholeCompositeQuestionnaire state={{ ...state, currentItem: { id: 'unit', type: 'SCALE', position: 0, required: true, presentationMode: 'ALL_AT_ONCE' } }} api={api()} fallback={<p>旧单元作答</p>} onCompleted={vi.fn()} onExit={vi.fn()} />)
     expect(screen.getByText('旧单元作答')).toBeTruthy()

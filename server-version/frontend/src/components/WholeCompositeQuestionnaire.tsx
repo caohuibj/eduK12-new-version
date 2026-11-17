@@ -118,6 +118,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   const [checkpointRestoreGeneration, setCheckpointRestoreGeneration] = useState(0)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [progressNote, setProgressNote] = useState<string | null>(null)
   const [loadRound, setLoadRound] = useState(0)
   const [submitStartedAt, setSubmitStartedAt] = useState<number | null>(null)
   const [submitElapsedSeconds, setSubmitElapsedSeconds] = useState(0)
@@ -133,14 +134,20 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       | { kind: 'SCALE'; unit: WholeQuestionnaireDefinition['units'][number]; position: number }
       | { kind: 'FORM'; section: WholeQuestionnaireFormSection; position: number }
 
+    const frozenOrder = (kind: 'FORM' | 'SCALE', id: string) => {
+      const index = state.units?.findIndex(unit => kind === 'FORM'
+        ? unit.type === 'FORM_SECTION' && (unit.formSectionId === id || unit.id === id)
+        : unit.type !== 'FORM_SECTION' && (unit.itemId === id || unit.id === id))
+      return index !== undefined && index >= 0 ? index : null
+    }
     const blocks: Block[] = []
     if (definition.formSections) {
       for (const [sIndex, section] of definition.formSections.entries()) {
-        blocks.push({ kind: 'FORM', section, position: section.position ?? sIndex })
+        blocks.push({ kind: 'FORM', section, position: frozenOrder('FORM', section.id) ?? section.position ?? sIndex })
       }
     }
     for (const [uIndex, unit] of (definition.units || []).entries()) {
-      blocks.push({ kind: 'SCALE', unit, position: unit.position ?? (1000 + uIndex) })
+      blocks.push({ kind: 'SCALE', unit, position: frozenOrder('SCALE', unit.itemId) ?? unit.position ?? (1000 + uIndex) })
     }
     blocks.sort((a, b) => a.position - b.position)
 
@@ -169,7 +176,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       }
     }
     return result
-  }, [definition])
+  }, [definition, state.units])
   const current = questions[index]
   const locked = checkpointBusy || Boolean(meta && (meta.status !== 'DRAFT' || meta.sealedSubmission))
   useEffect(() => { questionStart.current = Date.now() }, [index, draftKey])
@@ -523,7 +530,21 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       }}/>:null}
     {error ? <p role="alert" className="mb-4 text-red-700">{error}</p> : null}
     {publicMode && recoveryToken ? <p className="mb-4 text-sm text-gray-600">请在页面上方保存本次匿名作答的恢复链接。链接不包含未提交答案，本机草稿或已保存的临时进度仍按各自有效期恢复。</p> : null}
-    {accepted ? <div className="space-y-4"><h2 className="text-xl font-semibold">交卷成功</h2><p>{acceptedNotice}</p><button className="btn-primary min-h-11" type="button" onClick={onCompleted}>{acceptedAction}</button></div>
+    {accepted ? <div className="space-y-4"><h2 className="text-xl font-semibold">交卷成功</h2><p>{acceptedNotice}</p>{progressNote ? <p role="status">{progressNote}</p> : null}<button className="btn-primary min-h-11" type="button" disabled={busy} onClick={() => {
+      if (!educationMedia) { onCompleted(); return }
+      void (async () => {
+        setBusy(true)
+        try {
+          const status = await api.reportStatus(state.id)
+          const data = status.data as { status?: string; reportStatus?: { state?: string } } | undefined
+          if (status.code !== 0 || !data) throw responseError(status)
+          if (data.status === 'COMPLETED' || data.reportStatus?.state === 'READY') { onCompleted(); return }
+          if (data.reportStatus?.state === 'FAILED') { setProgressNote('答案已保存，但后台处理失败。请稍后再次查看，不要重新交卷。'); return }
+          setProgressNote('答案已保存，仍在处理。可以稍后再次查看，不必重新交卷。')
+        } catch (cause) { setProgressNote(normalizeApiError(cause).message) }
+        finally { setBusy(false) }
+      })()
+    }}>{acceptedAction}</button></div>
       : meta?.sealedSubmission ? <div className="space-y-4"><p>整卷已封存，本机草稿会保留到服务器确认保存。</p><button type="button" className="btn-primary min-h-11" disabled={busy || meta.status === 'CONFLICT'} onClick={() => void submit()}>重试并确认整卷提交</button></div>
         : current ? <div id={publicMode ? `training-anonymous-whole-required:${state.id}` : undefined} tabIndex={publicMode ? -1 : undefined} className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
           <h2 className="mb-3 text-xl font-semibold">{current.title}</h2>
