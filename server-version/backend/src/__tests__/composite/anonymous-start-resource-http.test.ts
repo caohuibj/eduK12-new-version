@@ -8,6 +8,8 @@ const state = vi.hoisted(() => ({
   meminfoReads: 0,
   missing: false,
   availableKiB: 649 * 1024,
+  cpuUser: 100,
+  cpuIdle: 900,
   prisma: {
     compositeAssessmentAccessToken: { findUnique: vi.fn() },
     compositeAssessment: { findUnique: vi.fn() },
@@ -26,7 +28,7 @@ vi.mock('node:fs', async (importOriginal) => {
         if (state.missing) throw new Error('missing synthetic MemAvailable')
         return `MemAvailable: ${state.availableKiB} kB\n`
       }
-      if (path === '/proc/stat') return 'cpu  100 0 100 900 0 0 0 0\n'
+      if (path === '/proc/stat') return `cpu  ${state.cpuUser} 0 0 ${state.cpuIdle} 0 0 0 0\n`
       return (actual.readFileSync as (...params: unknown[]) => unknown)(path, ...args)
     }) as typeof actual.readFileSync,
   }
@@ -67,6 +69,8 @@ describe('public START host-memory sampling to HTTP response', () => {
     vi.clearAllMocks()
     state.missing = false
     state.availableKiB = 649 * 1024
+    state.cpuUser = 100
+    state.cpuIdle = 900
     state.meminfoReads = 0
     vi.resetModules()
   })
@@ -94,10 +98,28 @@ describe('public START host-memory sampling to HTTP response', () => {
     expect(res.statusCode).toBe(503)
     expect(res.headers['Retry-After']).toBe(tc.expectedRetryAfter)
     expect(res.body).toMatchObject({ code: 'INSTRUMENT_NOT_AVAILABLE', data: null })
+  }, 40_000)
+
+  it('rejects 650 MiB before loadStartComposite because the freeze gate is under 700 MiB', async () => {
+    state.availableKiB = 650 * 1024
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_ANONYMOUS_EARLY_MEMORY_GUARD_ENABLED', 'true')
+    vi.resetModules()
+
+    const tokenValue = seedValidToken()
+    const { compositeController } = await import('../../modules/composite/composite.controller')
+    const res = fakeRes()
+    await compositeController.publicStart({ params: { token: tokenValue }, body: {}, query: {} } as any, res)
+
+    expect(state.meminfoReads).toBeGreaterThan(0)
+    expect(state.prisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
+    expect(state.prisma.$transaction).not.toHaveBeenCalled()
+    expect(res.statusCode).toBe(503)
+    expect(res.headers['Retry-After']).toBe('10')
   }, 20_000)
 
-  it('allows exact 650 MiB threshold past the early guard to loadStartComposite', async () => {
-    state.availableKiB = 650 * 1024
+  it('allows exact 700 MiB past the pre-load gates to loadStartComposite', async () => {
+    state.availableKiB = 700 * 1024
     vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
     vi.stubEnv('ASSESSMENT_ANONYMOUS_EARLY_MEMORY_GUARD_ENABLED', 'true')
     vi.resetModules()
@@ -115,10 +137,26 @@ describe('public START host-memory sampling to HTTP response', () => {
     expect(res.statusCode).not.toBe(503)
   }, 20_000)
 
-  it('keeps default-off behavior at 649 MiB unless the opt-in guard flag is enabled', async () => {
+  it('still applies the under-700 pre-load gate when the optional 650 guard is off', async () => {
     state.availableKiB = 649 * 1024
     vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
     vi.stubEnv('ASSESSMENT_ANONYMOUS_EARLY_MEMORY_GUARD_ENABLED', '')
+    vi.resetModules()
+
+    const tokenValue = seedValidToken()
+    const { compositeController } = await import('../../modules/composite/composite.controller')
+    const res = fakeRes()
+    await compositeController.publicStart({ params: { token: tokenValue }, body: {}, query: {} } as any, res)
+
+    expect(state.prisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
+    expect(state.prisma.$transaction).not.toHaveBeenCalled()
+    expect(res.statusCode).toBe(503)
+  }, 20_000)
+
+  it('reaches loadStartComposite at 649 MiB only when resource protection is disabled', async () => {
+    state.availableKiB = 649 * 1024
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'false')
+    vi.stubEnv('ASSESSMENT_ANONYMOUS_EARLY_MEMORY_GUARD_ENABLED', 'true')
     vi.resetModules()
 
     const tokenValue = seedValidToken()
@@ -130,6 +168,48 @@ describe('public START host-memory sampling to HTTP response', () => {
 
     expect(state.prisma.compositeAssessment.findUnique).toHaveBeenCalledTimes(1)
     expect(res.statusCode).not.toBe(503)
+  }, 20_000)
+
+  it('admits a 660 MiB plain public START through trickle before load, and rejects below the floor', async () => {
+    state.availableKiB = 660 * 1024
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_ANONYMOUS_EARLY_MEMORY_GUARD_ENABLED', 'true')
+    vi.resetModules()
+    const { performance } = await import('node:perf_hooks')
+    const { resetAssessmentResourceProtectionForTests, sampleAssessmentHostResources } = await import('../../services/assessmentResourceProtection')
+    resetAssessmentResourceProtectionForTests()
+    let clock = 1_000
+    const nowSpy = vi.spyOn(performance, 'now').mockImplementation(() => clock)
+    try {
+      sampleAssessmentHostResources()
+      clock += 1_500
+      state.cpuUser += 200
+      state.cpuIdle += 800
+
+      const tokenValue = seedValidToken()
+      const sentinel = Object.assign(new Error('reached loadStartComposite'), { statusCode: 499 })
+      state.prisma.compositeAssessment.findUnique.mockRejectedValueOnce(sentinel)
+      const { compositeController } = await import('../../modules/composite/composite.controller')
+      const admitted = fakeRes()
+      await compositeController.publicStart({ params: { token: tokenValue }, body: {}, query: {} } as any, admitted)
+      expect(state.prisma.compositeAssessment.findUnique).toHaveBeenCalledTimes(1)
+      expect(state.prisma.$transaction).not.toHaveBeenCalled()
+      expect(admitted.statusCode).not.toBe(503)
+
+      state.availableKiB = 640 * 1024
+      clock += 1_500
+      state.cpuUser += 200
+      state.cpuIdle += 800
+      const rejected = fakeRes()
+      await compositeController.publicStart({ params: { token: tokenValue }, body: {}, query: {} } as any, rejected)
+      expect(rejected.statusCode).toBe(503)
+      expect(rejected.headers['Retry-After']).toBe('10')
+      expect(state.prisma.compositeAssessment.findUnique).toHaveBeenCalledTimes(1)
+      expect(state.prisma.$transaction).not.toHaveBeenCalled()
+    } finally {
+      nowSpy.mockRestore()
+    }
   }, 20_000)
   it('rejects a forged recovery token with 403 before full publication loading, regardless of low host memory', async () => {
     state.availableKiB = 649 * 1024

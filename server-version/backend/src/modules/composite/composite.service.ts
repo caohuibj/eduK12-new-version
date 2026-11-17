@@ -4302,6 +4302,7 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
           updatedAt: true,
           trainingContentSnapshotHash: true,
           productKind: true,
+          personalTracking: true,
           publicEnabled: true,
           status: true,
           opensAt: true,
@@ -4325,6 +4326,7 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
             updatedAt: true,
             trainingContentSnapshotHash: true,
             productKind: true,
+            personalTracking: true,
           publicEnabled: true,
             status: true,
             opensAt: true,
@@ -4369,6 +4371,22 @@ const loadPublicCompositeInfo = async (id: string, db: Db) => {
   if (current.personalTracking != null)
     return loadComposite(id, true, db)
   return current
+}
+
+/** Admission oracle for anonymous-study wave create, info, and join.
+ * Same token, window, and training-round checks as public info. Skips the
+ * presentation graph, slot-label decrypt, and study-wave probe. A
+ * personal-tracking publication still runs loadComposite so a bad baseline
+ * is rejected the same way the info path rejects it. */
+export const assertPublicCompositeAdmission = async (tokenValue: string, db: Db = prisma) => {
+  const token = await findPublicToken(tokenValue, db)
+  assertSupportedComposite(token.compositeAssessment)
+  assertTokenWindow(token)
+  await assertTrainingTokenRound(db as Prisma.TransactionClient, token)
+  assertCompositeWindow(token.compositeAssessment)
+  if (token.compositeAssessment.personalTracking != null) {
+    await loadComposite(token.compositeAssessment.id, true, db)
+  }
 }
 
 export const getPublicCompositeInfo = async (tokenValue: string, db: Db = prisma) => {
@@ -4487,10 +4505,13 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   if (!study) {
     assertTokenWindow(token)
     assertCompositeWindow(token.compositeAssessment)
-    // Reject new plain public STARTs before loading/cloning the publication
-    // graph. Study admissions retain their independent in-transaction check.
-    assertAnonymousStartCriticalMemory()
   }
+  // New plain public STARTs consult the existing resource gate before the
+  // publication load, admission queue, pool checkout, and attempt insert.
+  // Verified recovery already returned above. Study admission can still
+  // resolve an existing attempt inside the transaction, so it stays outside
+  // this pre-check; freeze remains the in-transaction authority for everyone.
+  const executePublicAdmission = async () => {
   // Preserve #740's publication identity reuse for ordinary new STARTs; study
   // START still reads its identity later to keep its original race boundary.
   const composite = await loadStartComposite(token.compositeAssessment.id, prisma, study ? undefined : token.compositeAssessment)
@@ -4598,6 +4619,16 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   } finally {
     recordAnonymousStartPhase('anonymous.start.post_gate_ms', postGateAt, process.hrtime.bigint())
   }
+  }
+  if (!study) {
+    // Trickle owns the [floor, 700) band and the in-transaction permit.
+    // When it is off, the optional <650 / missing-sample guard still runs,
+    // then the same <700 / CPU gate the freeze uses — both before any load.
+    if (isLowMemoryTrickleEnabled()) return runWithLowMemoryTrickleAdmission(executePublicAdmission)
+    assertAnonymousStartCriticalMemory()
+    assertAssessmentStartResources()
+  }
+  return executePublicAdmission()
 }
 
 /** Restart an anonymous attempt using only the server-issued recovery hash. */
