@@ -20,6 +20,7 @@ vi.mock('../../modules/assessment-runtime/whole-form-materialization.service', (
 import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 import { prepareCanonicalSubmission } from '../../services/instrumentFinalSubmit'
 import { clearWholeValidationRulesForTest, submitWholeQuestionnaire } from '../../modules/composite/whole-questionnaire.service'
+import { formSectionSlotKey } from '../../modules/assessment-runtime/slot-set'
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -39,7 +40,7 @@ describe('education whole consent', () => {
     const manifest = {
       schemaVersion: 1 as const,
       binding: { attemptId: 'parent', attemptEpoch: 1, slotSetHash: 'a'.repeat(64), contextHash: null, userId: 'user', recoveryTokenHash: null },
-      requiredFormSlots: ['form:section'],
+      requiredFormSlots: [formSectionSlotKey('section')],
       units: [],
       formSections: [{ sectionId: 'section', definitionHash, items: [{ id: 'field', required: false, formType: 'text_input' }] }],
     }
@@ -68,7 +69,7 @@ describe('education whole consent', () => {
       units: [], formAnswers: [{ sectionId: 'section', definitionHash, answers: [] }],
     }
     const originalValidation = { encrypted: header.wholeValidationEncrypted, hash: header.wholeValidationHash }
-    const incompleteManifest = { ...manifest, requiredFormSlots: [...manifest.requiredFormSlots, 'form:missing-section'] }
+    const incompleteManifest = { ...manifest, requiredFormSlots: [...manifest.requiredFormSlots, formSectionSlotKey('missing-section')] }
     header.wholeValidationEncrypted = encryptUnifiedRuntimePayload(incompleteManifest)
     header.wholeValidationHash = prepareCanonicalSubmission(incompleteManifest).hash
     await expect(submitWholeQuestionnaire('parent', input, { userId: 'user' }))
