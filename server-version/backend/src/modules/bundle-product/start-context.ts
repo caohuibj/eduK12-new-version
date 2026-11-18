@@ -40,15 +40,13 @@ type BundleParentShape = {
   compositeAssessment: { productKind?: string }
 }
 type FrozenFormFacts = {
-  active: { snapshotHash: string; attemptEpoch: number; slots: Array<{ unitType: string; slotKey: string }> }
-  rows: Array<{ slotKey: string; compositeAttemptId: string; attemptEpoch: number; unitType: string; terminalState: string; payloadKind: string; sourceDefinitionHash: string; collectionFactsEncrypted: string | null; completedAt: Date }>
   values: Record<string, unknown>
   contextFacts: BundleContextFactsV1
 }
 export type BundleScaleStartParentContext = {
   parent: BundleParentShape
-  frozen: ReturnType<typeof readFrozenBundleProductionDefinition>
-  bindings: BundleBindings
+  frozen: ReturnType<typeof readInstance>['frozen']
+  bindings: ReturnType<typeof readInstance>['bindings']
   /** Parent-level frozen FORM slot set, collection fact rows and derived
    * values/facts. Resolved once per delivery on the first mapped unit and
    * memoized; the integrity checks keep their original order and semantics. */
@@ -69,13 +67,13 @@ export async function loadBundleScaleStartParentContext(db: PrismaClient | Prism
   const { frozen, bindings } = readInstance(instance)
   let memo: Promise<FrozenFormFacts> | undefined
   return {
-    parent: { id: parent.id, attemptEpoch: parent.attemptEpoch,
-      frozenActiveSlotSetEncrypted: parent.frozenActiveSlotSetEncrypted, frozenActiveSlotSetHash: parent.frozenActiveSlotSetHash },
+    parent,
     frozen, bindings,
     resolvedFacts() {
-      memo ??= (async () => {
-        if (!parent.frozenActiveSlotSetEncrypted) invalid('START 缺少冻结 FORM 槽位')
-        const active = await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted, db)
+      return memo ??= (async () => {
+        const encryptedSlotSet = parent.frozenActiveSlotSetEncrypted
+        if (!encryptedSlotSet) invalid('START 缺少冻结 FORM 槽位')
+        const active = await loadFrozenActiveSlotSet(encryptedSlotSet, db)
         if (active.snapshotHash !== parent.frozenActiveSlotSetHash || active.attemptEpoch !== parent.attemptEpoch) invalid('START FORM 槽位轮次不匹配')
         const forms = active.slots.filter(s => s.unitType === 'FORM_SECTION')
         const rows = await db.assessmentUnitSnapshot.findMany({ where: { compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch, slotKey: { in: forms.map(s => s.slotKey) } } })
@@ -90,9 +88,8 @@ export async function loadBundleScaleStartParentContext(db: PrismaClient | Prism
         const values = contextValues(bindings.context, facts)
         const contextFacts = buildBundleContextFactsFromValues({ definition: frozen.contextDefinition!, values,
           frozenAt: rows.length ? new Date(Math.max(...rows.map(r => r.completedAt.getTime()))).toISOString() : undefined })
-        return { active: { snapshotHash: active.snapshotHash, attemptEpoch: active.attemptEpoch, slots: active.slots }, rows, values, contextFacts }
+        return { values, contextFacts }
       })()
-      return memo
     },
   }
 }
@@ -106,7 +103,7 @@ export async function resolveBundleScaleStartForItem(parentCtx: BundleScaleStart
   const mapping = slot!.admissionContext
   if (!mapping) return undefined
   validateBundleStartContextMappings(parentCtx.frozen.bundleSnapshot.bundleDefinition, parentCtx.frozen.contextDefinition)
-  const { active, rows, values, contextFacts } = await parentCtx.resolvedFacts()
+  const { values, contextFacts } = await parentCtx.resolvedFacts()
   for (const requirement of mapping.requirements) {
     const value = values[requirement.contextKey]
     if (value === undefined || value === null || typeof value === 'string' && !value.trim() || requirement.allowedValues && !requirement.allowedValues.includes(value as string | number | boolean)) invalid('背景信息不满足此量表声明的测量情境')

@@ -951,7 +951,7 @@ export const batchEnsureScaleAdmissionsAtDelivery = async (
       // userId, so N identical binding reads collapse to one. Logged-in units
       // return the parent hash without a read. A rejected resolution is shared
       // by every awaiting unit and rolls the delivery back exactly as before.
-      let admissionHashPromise: Promise<string> | undefined
+      let admissionHashPromise: Promise<string | null> | undefined
       const admissionHashFor = (current: { userId: string | null }) => {
         const userId = current.userId ?? parent.userId
         if (userId) return Promise.resolve(parent.recoveryTokenHash)
