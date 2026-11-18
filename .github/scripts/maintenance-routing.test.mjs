@@ -98,7 +98,7 @@ test('normal scheduler runs maintenance for pure attachment changes and keeps ap
         run: ${routingInstall}`),'routing tools keep the existing qualification guards');
   assert.doesNotMatch(lane.replace(routingInstall,''),/npm ci|DATABASE_URL|COS_SECRET|BACKUP_ENCRYPTION_KEY/);
   for(const name of ['ci-backend','ci-frontend'])
-    assert.match(source(name),/npm audit --audit-level=high/);
+    assert.match(source(name),/node \"\$GITHUB_WORKSPACE\/\.github\/scripts\/audit-high-with-exception\.mjs\"/);
 });
 
 import { execFileSync } from 'node:child_process';
