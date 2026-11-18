@@ -52,13 +52,11 @@ export async function checkCampusCompositeAccessDetails(input: {
   const consentFreeFinalReady = row.attemptUserId === input.userId
     && row.assignmentRespondentId === input.userId
     && (row.assignmentStatus === 'STARTED' || row.assignmentStatus === 'COMPLETED')
-    && (row.assignmentStatus === 'COMPLETED' || (
-      row.assignmentConsentId === null
-      && row.attemptConsentId === null
-      && !(row.assignmentPolicyDomain === 'ORGANIZATION_RUN' && (
-        row.respondentRole === 'PARENT'
-        || Boolean(row.visibilityPolicyKey?.startsWith('observer_'))
-      ))
+    && row.assignmentConsentId === null
+    && row.attemptConsentId === null
+    && !(row.assignmentPolicyDomain === 'ORGANIZATION_RUN' && (
+      row.respondentRole === 'PARENT'
+      || Boolean(row.visibilityPolicyKey?.startsWith('observer_'))
     ))
   return { allowed: true, consentFreeFinalReady }
 }

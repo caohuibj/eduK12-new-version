@@ -236,15 +236,7 @@ const isEducationResourceParent = (parent: {
 const finalizeLinkedParent = async (assessment: any): Promise<void> => {
   if (assessment.compositeAttemptId) {
     const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-    const preloadedParent = assessment.compositeAttempt
-      && assessment.compositeAttempt.id === assessment.compositeAttemptId
-      && 'runtimeGeneration' in assessment.compositeAttempt
-      ? {
-          ...assessment.compositeAttempt,
-          status: 'IN_PROGRESS',
-        }
-      : undefined
-    await finalizeCompositeAttemptIfReady(assessment.compositeAttemptId, preloadedParent ? { preloadedParent } : undefined)
+    await finalizeCompositeAttemptIfReady(assessment.compositeAttemptId)
   }
   if (assessment.questionnaireAssessmentId) {
     const { finalizeQuestionnaireAttemptIfReady } = await import('../../services/questionnaire-form-section.service')
