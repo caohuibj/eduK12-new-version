@@ -9,7 +9,7 @@ vi.mock('../../modules/education-tools/private-tool.form-runtime-resources',()=>
 vi.mock('../../modules/assessment-run/startClaim',()=>({lockExecutionEnvelope:mocked.lock}))
 vi.mock('../../modules/assessment-run/startAuthority',()=>({assertCurrentRunStartAuthority:mocked.authority}))
 vi.mock('../../config/database',()=>({prisma:{compositeFormSection:{findFirst:mocked.section}}}))
-import {readPrivateFormExecutionSource,assertPrivateFormFinalCurrent,assertPrivateFormSectionOwnership} from '../../modules/assessment-run/educationPrivateFormExecution'
+import {readPrivateFormExecutionSource,assertPrivateFormFinalCurrent,assertPrivateFormSectionOwnership,preparePrivateFormFinalEvidence} from '../../modules/assessment-run/educationPrivateFormExecution'
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
 const origin=privateFormOriginSchema.parse({schemaVersion:1,adapterVersion:'1.0.0',kind:'AUTHOR_PRIVATE_FORM',entry:'SCHOOL',
  organizationId:id(1),ownerUserId:id(2),toolId:id(3),versionId:id(4),contentHash:'a'.repeat(64),variantKey:'STUDENT:SELF'})
@@ -49,5 +49,41 @@ describe('Exact private FORM source and actual FINAL authority',()=>{
   mocked.section.mockResolvedValue(null)
   await expect(assertPrivateFormSectionOwnership(id(7),id(50))).rejects.toMatchObject({code:'PRIVATE_FORM_SECTION_NOT_FOUND',statusCode:404})
   expect(mocked.section).toHaveBeenCalledWith({where:{id:id(50),compositeAssessment:{attempts:{some:{id:id(7)}}}},select:{id:true}})
+ })
+
+ it('prepares private-form source evidence outside the UNIT transaction',async()=>{
+  const tx=db();tx.$queryRaw.mockResolvedValueOnce([{id:id(9)}]).mockResolvedValueOnce([row()])
+  const evidence=await preparePrivateFormFinalEvidence(id(7),id(6),tx as any)
+  expect(evidence).toMatchObject({kind:'PRIVATE_FORM',attemptId:id(7),executionId:id(9),policyHash:canonicalHash(policy),assignmentRef:id(8)})
+  expect(mocked.lock).not.toHaveBeenCalled()
+  expect(mocked.read).toHaveBeenCalled()
+ })
+ it('skips the fat private-form source reload when prepared policy hash matches the locked row',async()=>{
+  const evidence={kind:'PRIVATE_FORM' as const,attemptId:id(7),actorUserId:id(6),assignmentRef:id(8),compositeId:id(5),
+   executionId:id(9),policyHash:canonicalHash(policy),key:privateFormResourceKey(origin),version:'1.0.0',
+   respondentUserId:id(6),bindingKind:'COMPOSITE' as const,bindingRef:id(7)}
+  const tx=db();tx.$queryRaw.mockResolvedValueOnce([row()])
+  await assertPrivateFormFinalCurrent(tx as any,{attemptId:id(7),actorUserId:id(6)},evidence)
+  expect(mocked.lock).toHaveBeenCalledWith(tx,id(9))
+  expect(mocked.read).not.toHaveBeenCalled()
+  expect(mocked.authority).toHaveBeenCalledWith(tx,id(9),{accountMode:'DETECT_EDUCATION_LIBRARY',operation:'BOUND_FINAL',
+   preparedPrivateFormLocator:{executionId:id(9),policyHash:canonicalHash(policy)}})
+  expect(mocked.lock.mock.invocationCallOrder[0]).toBeLessThan(mocked.authority.mock.invocationCallOrder[0])
+ })
+ it('fails closed on a prepared policy-hash mismatch and does not write or skip authority by falling back',async()=>{
+  const evidence={kind:'PRIVATE_FORM' as const,attemptId:id(7),actorUserId:id(6),assignmentRef:id(8),compositeId:id(5),
+   executionId:id(9),policyHash:canonicalHash(policy),key:privateFormResourceKey(origin),version:'1.0.0',
+   respondentUserId:id(6),bindingKind:'COMPOSITE' as const,bindingRef:id(7)}
+  const tx=db();tx.$queryRaw.mockResolvedValueOnce([{...row(),policyHash:'0'.repeat(64)}])
+  await expect(assertPrivateFormFinalCurrent(tx as any,{attemptId:id(7),actorUserId:id(6)},evidence)).rejects.toMatchObject({code:'PRIVATE_FORM_EXECUTION_BINDING_INVALID'})
+  expect(mocked.lock).toHaveBeenCalled()
+  expect(mocked.read).not.toHaveBeenCalled()
+  expect(mocked.authority).not.toHaveBeenCalled()
+ })
+ it('keeps today\'s in-tx fat read when prepared evidence is omitted',async()=>{
+  const tx=db();tx.$queryRaw.mockResolvedValueOnce([{id:id(9)}]).mockResolvedValueOnce([row()])
+  await assertPrivateFormFinalCurrent(tx as any,{attemptId:id(7),actorUserId:id(6)})
+  expect(mocked.read).toHaveBeenCalled()
+  expect(mocked.authority).toHaveBeenCalledWith(tx,id(9),{accountMode:'DETECT_EDUCATION_LIBRARY',operation:'BOUND_FINAL'})
  })
 })

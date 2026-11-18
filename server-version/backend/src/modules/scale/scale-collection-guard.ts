@@ -23,6 +23,8 @@ export type TrainingCollectionScope={
   verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization
   compositeAttemptEpoch?:number
   acceptedReceipt?:WholeReceiptExecution
+  /** Pre-gate education frozen-scale source evidence; rechecked under FOR SHARE. */
+  preparedFrozenScaleEvidence?:import('../assessment-run/educationLibraryExecution').PreparedEducationFrozenScaleEvidence[]|null
 }
 export async function assertTrainingScaleCollectionAllowed(tx:Prisma.TransactionClient,scaleIds:string[],scope:TrainingCollectionScope={}){
   const ids=[...new Set(scaleIds)].sort()
@@ -59,7 +61,7 @@ export async function assertTrainingScaleCollectionAllowed(tx:Prisma.Transaction
   // The shared guard locks Scale rows and resolves release IDs from those locked
   // rows, so an explicit legacy conversion cannot race a stale pre-lock read.
   const educationIds=scope.compositeAttemptId && bound.some(row=>row.education_source) && !scope.acceptedReceipt && !scope.verifiedFlowMaterialization
-    ? await (await import('../assessment-run/educationLibraryExecution')).educationFrozenScaleCompletionIds(tx,scope.compositeAttemptId,ids,scope.compositeItemIds??[])
+    ? await (await import('../assessment-run/educationLibraryExecution')).educationFrozenScaleCompletionIds(tx,scope.compositeAttemptId,ids,scope.compositeItemIds??[],scope.preparedFrozenScaleEvidence)
     : new Set<string>()
   const collectionIds=ids.filter(id=>!exactStandardIds.has(id)&&!educationIds.has(id))
   if(scope.acceptedReceipt){

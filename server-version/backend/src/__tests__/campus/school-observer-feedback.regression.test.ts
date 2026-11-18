@@ -14,7 +14,7 @@ import {join} from 'node:path'
 
 const f=vi.hoisted(()=>({query:vi.fn(),findChild:vi.fn(),admission:null as any,runtime:null as any,child:null as any,parent:null as any,
  feedback:vi.fn(),consent:vi.fn(),official:vi.fn(),requests:[] as string[]}))
-vi.mock('../../config/database',()=>({prisma:{$queryRaw:f.query,assessment:{findFirst:f.findChild}}}))
+vi.mock('../../config/database',()=>({prisma:{$queryRaw:f.query,assessment:{findFirst:f.findChild},compositeAssessmentAttempt:{findUnique:vi.fn().mockResolvedValue(null)}}}))
 vi.mock('../../middleware/auth',()=>({authenticateSchool:(req:any,_res:any,next:any)=>{
  req.user={userId:'observer',username:'synthetic',role:req.headers['x-review-role']??'PARENT',accountDomain:'SCHOOL'};next()
 }}))
@@ -119,6 +119,7 @@ describe('School observer enforced receipt and feedback routing regression (mock
    if(sql.includes('SELECT perspective, analysis_mode'))return [{perspective:'OBSERVER_REPORT',analysisMode:'INDIVIDUAL_ONLY'}]
    if(sql.includes('course.title AS "activityTitle"'))return [{executionId,runId:'run',organizationId:'school',activityId:'activity',activityTitle:'Synthetic activity',studentUserId:'rated-student'}]
    if(sql.includes('SELECT e."id" FROM "assessment_run_executions"'))return [{id:executionId}]
+   if(sql.includes('c.scale_id AS "scaleId"')&&sql.includes("definition.product_kind='ORGANIZATION_RESOURCE'"))return []
    throw Error('Unexpected database fixture query: '+sql.slice(0,220))
   })
  })

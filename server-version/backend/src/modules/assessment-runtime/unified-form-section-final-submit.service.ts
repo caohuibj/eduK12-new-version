@@ -387,6 +387,7 @@ export const prepareUnifiedCompositeFormSectionFinal = async (
 export const commitUnifiedCompositeFormSectionFinal = async (
   prepared: PreparedUnifiedCompositeFormSection,
   wholeReceipt?: WholeReceiptExecution,
+  privateFormFinalEvidence?: import('../assessment-run/educationPrivateFormExecution').PreparedPrivateFormFinalEvidence | null,
 ) => {
   const {
     input, submissionId, parent, productKind, child, admission, mappedSection, normalized,
@@ -399,7 +400,7 @@ export const commitUnifiedCompositeFormSectionFinal = async (
     }
     if(productKind==='ORGANIZATION_RESOURCE'){
       const {assertPrivateFormFinalCurrent}=await import('../assessment-run/educationPrivateFormExecution')
-      await assertPrivateFormFinalCurrent(tx,{attemptId:input.attemptId,actorUserId:input.userId})
+      await assertPrivateFormFinalCurrent(tx,{attemptId:input.attemptId,actorUserId:input.userId}, privateFormFinalEvidence)
     }
     const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, {
       attemptId: input.attemptId, parent, attemptEpoch: input.attemptEpoch, sectionId: input.sectionId, sourceAttemptId: child.id, submissionId,
