@@ -251,7 +251,7 @@ export async function listAssignedRunTasks(userId: string, options?: {
   if (options?.cursor && (cursorCreatedAt === null || !options.cursor.id))
     throw new Error('RUN_TASK_CURSOR_INVALID')
   const actorOrgsSql = options?.organizationIds
-    ? Prisma.sql`(SELECT DISTINCT unnest(ARRAY[${Prisma.join(options.organizationIds)}]::text[]) AS "organization_id")`
+    ? Prisma.sql`(SELECT DISTINCT unnest(${options.organizationIds}::text[]) AS "organization_id")`
     : Prisma.sql`(
         SELECT DISTINCT m."organization_id"
         FROM "organization_memberships" m
@@ -263,13 +263,13 @@ export async function listAssignedRunTasks(userId: string, options?: {
         WHERE psr."parent_user_id" = ${userId}
       )`
   const respondentRunScope=options?.runIds
-    ? Prisma.sql`AND respondent."run_id" IN (${Prisma.join(options.runIds)})`
+    ? Prisma.sql`AND respondent."run_id" = ANY(${options.runIds}::text[])`
     : Prisma.empty
   const runScope=options?.runIds
-    ? Prisma.sql`AND r."id" IN (${Prisma.join(options.runIds)})`
+    ? Prisma.sql`AND r."id" = ANY(${options.runIds}::text[])`
     : Prisma.empty
   const executionScope=options?.executionIds
-    ? Prisma.sql`AND e."id" IN (${Prisma.join(options.executionIds)})`
+    ? Prisma.sql`AND e."id" = ANY(${options.executionIds}::text[])`
     : Prisma.empty
   const cursorScope=cursorCreatedAt
     ? Prisma.sql`AND (e."created_at", e."id") < (${cursorCreatedAt}::timestamptz, ${options!.cursor!.id})`

@@ -48,6 +48,8 @@ vi.mock('../../modules/cognitive-analysis', async () => {
 
 import { withBoundedPlannerRead } from '../../modules/assessment-run/plannerBound'
 import { listAssignedRunTasks } from '../../modules/assessment-run/productRead'
+import { checkCampusCompositeAccessAuthority } from '../../modules/campus/campus-composite-authority'
+import { readRespondentRunSummary } from '../../modules/reporting/respondentSummary'
 import teacherScaleRouter, { listOwnTeacherScaleTasks } from '../../modules/huiteacher/scaleRuntime.routes'
 import teacherPrivateFormRouter from '../../modules/huiteacher/privateFormRuntime.routes'
 import teacherFormRouter from '../../modules/huiteacher/formRuntime.routes'
@@ -67,6 +69,36 @@ import { logger } from '../../utils/logger'
 const EXEC_ID = '11111111-1111-4111-8111-111111111111'
 const USER_ID = '22222222-2222-4222-8222-222222222222'
 const PUBLIC_ID = '33333333-3333-4333-8333-333333333333'
+
+function isPrismaSqlObject(value: unknown): value is { strings: ReadonlyArray<string>; values: ReadonlyArray<unknown> } {
+  return Boolean(
+    value
+    && typeof value === 'object'
+    && Array.isArray((value as any).strings)
+    && Array.isArray((value as any).values),
+  )
+}
+
+function renderInterpolatedSql(strings: ReadonlyArray<string>, values: ReadonlyArray<unknown>): string {
+  let out = strings[0] ?? ''
+  for (let i = 0; i < values.length; i++) {
+    const val = values[i]
+    out += isPrismaSqlObject(val) ? renderInterpolatedSql(val.strings, val.values) : '?'
+    out += strings[i + 1] ?? ''
+  }
+  return out
+}
+
+function flattenQueryRawCall(call: ReadonlyArray<unknown>): string {
+  const first = call[0]
+  if (Array.isArray(first) && 'raw' in first) {
+    return renderInterpolatedSql(first as unknown as ReadonlyArray<string>, call.slice(1))
+  }
+  if (isPrismaSqlObject(first)) {
+    return renderInterpolatedSql(first.strings, first.values)
+  }
+  return sqlText(first)
+}
 
 function sqlText(arg: unknown): string {
   if (typeof arg === 'string') return arg
@@ -130,7 +162,7 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     vi.unstubAllEnvs()
   })
 
-  it('applies transaction-local join/from collapse bounds and falls back cleanly for bare mocks', async () => {
+  it('applies transaction-local join/from collapse and custom-plan bounds and falls back cleanly for bare mocks', async () => {
     dbMocks.queryRaw.mockResolvedValueOnce(['bounded'])
     const result = await withBoundedPlannerRead(
       {
@@ -144,6 +176,7 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     expect(dbMocks.executeRaw.mock.calls.map(call => sqlText(call[0]))).toEqual([
       'SET LOCAL join_collapse_limit = 1',
       'SET LOCAL from_collapse_limit = 1',
+      'SET LOCAL plan_cache_mode = force_custom_plan',
     ])
 
     const bareQuery = vi.fn().mockResolvedValueOnce(['bare'])
@@ -155,7 +188,7 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     expect(bareQuery).toHaveBeenCalledTimes(1)
   })
 
-  it('scopes listAssignedRunTasks by organizationIds and expands boundCompositeContinuationSql only once', async () => {
+  it('scopes listAssignedRunTasks via fixed-arity text[] parameters and expands boundCompositeContinuationSql only once', async () => {
     expect(await listAssignedRunTasks(USER_ID, { organizationIds: [] })).toEqual({
       list: [],
       truncated: false,
@@ -163,26 +196,57 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     })
     expect(dbMocks.queryRaw).not.toHaveBeenCalled()
 
-    dbMocks.queryRaw.mockResolvedValueOnce([])
+    dbMocks.queryRaw.mockResolvedValueOnce([]).mockResolvedValueOnce([])
     await listAssignedRunTasks(USER_ID, {
       organizationIds: ['org-school-1'],
       runIds: ['run-1'],
+      executionIds: ['exec-1'],
+      preserveBoundSchoolContinuation: true,
+    })
+    await listAssignedRunTasks(USER_ID, {
+      organizationIds: ['org-school-1', 'org-school-2', 'org-school-3'],
+      runIds: ['run-1', 'run-2', 'run-3', 'run-4'],
+      executionIds: ['exec-1', 'exec-2', 'exec-3'],
       preserveBoundSchoolContinuation: true,
     })
 
-    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(2)
-    const callSql = dbMocks.queryRaw.mock.calls[0].map(sqlText).join(' ')
-    expect(callSql).toContain('unnest(ARRAY[')
-    expect(callSql).toContain('respondent."run_id" IN (')
+    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(6)
+    const firstSql = flattenQueryRawCall(dbMocks.queryRaw.mock.calls[0])
+    const secondSql = flattenQueryRawCall(dbMocks.queryRaw.mock.calls[1])
+    // Varying array cardinalities MUST produce the exact same prepared SQL template.
+    expect(secondSql).toBe(firstSql)
+    expect(firstSql).toContain('unnest(?::text[])')
+    expect(firstSql).toContain('respondent."run_id" = ANY(?::text[])')
+    expect(firstSql).toContain('r."id" = ANY(?::text[])')
+    expect(firstSql).toContain('e."id" = ANY(?::text[])')
     // Previously expanded 3 times across SELECT, CASE WHEN, and WHERE; now materialized once via LATERAL.
-    expect(callSql.match(/FROM "assessment_run_executions" bound_execution/g)).toHaveLength(1)
+    expect(firstSql.match(/FROM "assessment_run_executions" bound_execution/g)).toHaveLength(1)
+  })
+
+  it('bounds checkCampusCompositeAccessAuthority and standalone readRespondentRunSummary while preserving supplied tx db', async () => {
+    dbMocks.queryRaw.mockResolvedValueOnce([{ id: EXEC_ID }])
+    await expect(checkCampusCompositeAccessAuthority({ attemptId: 'att-1', userId: USER_ID })).resolves.toBe(true)
+    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(3)
+
+    dbMocks.executeRaw.mockClear()
+    dbMocks.queryRaw.mockResolvedValueOnce([])
+    await expect(readRespondentRunSummary(USER_ID, EXEC_ID)).rejects.toMatchObject({ statusCode: 404 })
+    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(3)
+
+    dbMocks.executeRaw.mockClear()
+    const suppliedTxQuery = vi.fn().mockResolvedValueOnce([])
+    await expect(
+      readRespondentRunSummary(USER_ID, EXEC_ID, { disclosureOnly: true, db: { $queryRaw: suppliedTxQuery } as any }),
+    ).rejects.toMatchObject({ statusCode: 404 })
+    expect(suppliedTxQuery).toHaveBeenCalledTimes(1)
+    expect(dbMocks.executeRaw).not.toHaveBeenCalled()
   })
 
   it('drives listOwnTeacherScaleTasks from actor memberships and deduplicates collection population SQL', async () => {
     dbMocks.queryRaw.mockResolvedValueOnce([])
     await listOwnTeacherScaleTasks(USER_ID)
 
-    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(2)
+    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(3)
     const sql = sqlText(dbMocks.queryRaw.mock.calls[0][0])
     expect(sql.indexOf('FROM "users" current_actor')).toBeLessThan(sql.indexOf('JOIN "assessment_run_executions" e'))
     // Previously expanded 3 times (2 COLLECTION + 1 REPORT_READ); now 1 COLLECTION via LATERAL + 1 REPORT_READ.
@@ -383,6 +447,8 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     const baseCompose = readFileSync(resolve(process.cwd(), '../docker-compose.yml'), 'utf8')
     const prodOverride = readFileSync(resolve(process.cwd(), '../docker-compose.prod-override.example.yml'), 'utf8')
     expect(baseCompose).toContain('jit=off')
+    expect(baseCompose).toContain('plan_cache_mode=force_custom_plan')
     expect(prodOverride).toContain('jit=off')
+    expect(prodOverride).toContain('plan_cache_mode=force_custom_plan')
   })
 })

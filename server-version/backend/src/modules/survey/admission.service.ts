@@ -90,7 +90,7 @@ async function loadMeasurementNotices(client:Tx|typeof prisma,projectId:string,p
     const notices=await client.$queryRaw<Array<{id:string;measurementNotice:unknown}>>`
       SELECT p.id, p.compiled_snapshot->'measurementNotice' AS "measurementNotice"
       FROM survey_publications p
-      WHERE p.project_id=${projectId} AND p.id IN (${Prisma.join(missingIds)})
+      WHERE p.project_id=${projectId} AND p.id = ANY(${missingIds}::text[])
     `
     const byId=new Map(notices.map(row=>[row.id,row.measurementNotice]))
     for(const id of missingIds){

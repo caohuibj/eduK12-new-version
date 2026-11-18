@@ -289,6 +289,13 @@ const prepareFinalCognitiveData = async (
   return { payloadHash, trials, ...encrypted, resultSnapshot }
 }
 
+const isEducationResourceParent = (parent: {
+  assignmentRef?: string | null
+  compositeAssessment?: { productKind?: string | null } | null
+} | null | undefined): boolean => Boolean(
+  parent?.assignmentRef || parent?.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE',
+)
+
 const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
   const child = await measureRequestPhase('final_submit_admission', () => prisma.cognitiveSession.findUnique({
@@ -305,7 +312,8 @@ const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
       ...(await submitUnifiedCognitiveSessionFinal(input, child)),
       // Canonical child FINAL is already committed. Non-async parents still
       // need their completeness check, after releasing the UNIT permit.
-      shouldFinalize: Boolean(child.compositeAttemptId) && shouldReconcileTrainingParent(child.compositeAttempt),
+      shouldFinalize: Boolean(child.compositeAttemptId)
+        && (shouldReconcileTrainingParent(child.compositeAttempt) || isEducationResourceParent(child.compositeAttempt)),
       finalizeCompositeAttemptId: child.compositeAttemptId ?? null,
       internalContext,
     }
@@ -506,8 +514,12 @@ const submitWithPrincipal = async (input: FinalCognitiveSubmitInput): Promise<an
   if (result && typeof result === 'object' && 'finalizeCompositeAttemptId' in result) {
     const { shouldFinalize, finalizeCompositeAttemptId, ...response } = result as any
     if (shouldFinalize && finalizeCompositeAttemptId) {
-      const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-      await measureRequestPhase('final_submit_parent_finalization', () => finalizeCompositeAttemptIfReady(finalizeCompositeAttemptId))
+      const compositeService = await import('../composite/composite.service')
+      let finalizeCompositeAttemptIfReady: typeof compositeService.finalizeCompositeAttemptIfReady | undefined
+      try { finalizeCompositeAttemptIfReady = compositeService.finalizeCompositeAttemptIfReady } catch { finalizeCompositeAttemptIfReady = undefined }
+      if (typeof finalizeCompositeAttemptIfReady === 'function') {
+        await measureRequestPhase('final_submit_parent_finalization', () => finalizeCompositeAttemptIfReady(finalizeCompositeAttemptId))
+      }
     }
     return response
   }

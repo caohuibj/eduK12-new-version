@@ -7,11 +7,13 @@ export type PlannerBoundReadDb = {
 }
 
 /**
- * Bound PostgreSQL's planner search space on wide current-authority task and
- * execution reads so nested EXISTS gates (`currentRunPopulationAuthoritySql`,
- * `boundCompositeContinuationSql`, `completedSchoolOrdinaryFeedbackSql`) stay
- * correlated index subplans instead of triggering semi-join pull-up / GEQO
- * ~97 MiB per-backend MemoryContext bloat.
+ * Bound PostgreSQL's planner search space and prevent generic-plan caching on
+ * wide current-authority task and execution reads so nested EXISTS gates
+ * (`currentRunPopulationAuthoritySql`, `boundCompositeContinuationSql`,
+ * `completedSchoolOrdinaryFeedbackSql`) stay correlated index subplans instead
+ * of triggering semi-join pull-up / GEQO ~97 MiB per-backend MemoryContext
+ * bloat or pinning ~2 MiB `CachedPlan` allocations in `CacheMemoryContext`
+ * after repeated prepared-statement executions.
  *
  * Callers MUST order outer FROM/JOIN clauses from selective actor/execution
  * indexes outward. Falls back directly to `db` when unit tests supply a bare
@@ -25,6 +27,7 @@ export async function withBoundedPlannerRead<T>(
     return db.$transaction(async tx => {
       await tx.$executeRaw`SET LOCAL join_collapse_limit = 1`
       await tx.$executeRaw`SET LOCAL from_collapse_limit = 1`
+      await tx.$executeRaw`SET LOCAL plan_cache_mode = force_custom_plan`
       return action(tx)
     })
   }

@@ -226,10 +226,21 @@ const parentProgressUpdate = async (tx: Prisma.TransactionClient, assessment: an
   return null
 }
 
+const isEducationResourceParent = (parent: {
+  assignmentRef?: string | null
+  compositeAssessment?: { productKind?: string | null } | null
+} | null | undefined): boolean => Boolean(
+  parent?.assignmentRef || parent?.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE',
+)
+
 const finalizeLinkedParent = async (assessment: any): Promise<void> => {
   if (assessment.compositeAttemptId) {
-    const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-    await finalizeCompositeAttemptIfReady(assessment.compositeAttemptId)
+    const compositeService = await import('../composite/composite.service')
+    let finalizeCompositeAttemptIfReady: typeof compositeService.finalizeCompositeAttemptIfReady | undefined
+    try { finalizeCompositeAttemptIfReady = compositeService.finalizeCompositeAttemptIfReady } catch { finalizeCompositeAttemptIfReady = undefined }
+    if (typeof finalizeCompositeAttemptIfReady === 'function') {
+      await finalizeCompositeAttemptIfReady(assessment.compositeAttemptId)
+    }
   }
   if (assessment.questionnaireAssessmentId) {
     const { finalizeQuestionnaireAttemptIfReady } = await import('../../services/questionnaire-form-section.service')
@@ -256,8 +267,9 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, loca
     const data = receiptOnly
       ? await submitUnifiedScaleAssessmentFinal(input, child, undefined, undefined, true)
       : await submitUnifiedScaleAssessmentFinal(input, child)
-    const shouldFinalize = !receiptOnly && Boolean(child.compositeAttemptId)
-      && shouldReconcileTrainingParent(child.compositeAttempt)
+    const shouldFinalize = Boolean(child.compositeAttemptId)
+      && (isEducationResourceParent(child.compositeAttempt)
+        || (!receiptOnly && shouldReconcileTrainingParent(child.compositeAttempt)))
     return {
       ...data,
       shouldFinalize,
@@ -626,8 +638,9 @@ export const submitCompositeScaleFinal = async (
       const data = await withUnitSubmitAdmission(() => commitPreparedUnifiedScaleAssessmentFinal(
         builtInput, child, prepared, undefined, undefined, responseOptions?.receiptOnly, write,
       ))
-      const shouldFinalize = !responseOptions?.receiptOnly && Boolean(child.compositeAttemptId)
-        && shouldReconcileTrainingParent(child.compositeAttempt)
+      const shouldFinalize = Boolean(child.compositeAttemptId)
+        && (isEducationResourceParent(child.compositeAttempt)
+          || (!responseOptions?.receiptOnly && shouldReconcileTrainingParent(child.compositeAttempt)))
       return {
         ...data,
         shouldFinalize,

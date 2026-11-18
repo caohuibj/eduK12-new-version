@@ -125,7 +125,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
       FROM "campus_activity_runs" ar
       JOIN "campus_activities" a ON a."course_id"=ar."course_id" AND a."status"='OPEN'
       JOIN "assessment_runs" r ON r."id"=ar."run_id" AND r."status" IN ('PUBLISHED','CLOSED')
-      WHERE ar."course_id" IN (${ids.length?Prisma.join(ids):Prisma.sql`NULL`})
+      WHERE ar."course_id" = ANY(${ids}::text[])
     `,
   ])
   const assigned=await listAssignedRunTasks(actor.userId,{

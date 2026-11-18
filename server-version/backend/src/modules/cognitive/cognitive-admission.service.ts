@@ -24,7 +24,14 @@ export const UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT = {
   userId: true,
   compositeAttemptId: true,
   compositeItemId: true,
-  compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT },
+  compositeAttempt: { select: {
+    ...TRAINING_VARIANT_PARENT_MARKER_SELECT,
+    assignmentRef: true,
+    compositeAssessment: { select: {
+      ...TRAINING_VARIANT_PARENT_MARKER_SELECT.compositeAssessment.select,
+      productKind: true,
+    } },
+  } },
   recoveryTokenHash: true,
   testType: true,
   attemptNo: true,
