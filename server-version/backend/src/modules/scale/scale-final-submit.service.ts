@@ -264,6 +264,7 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, loca
       ? await submitUnifiedScaleAssessmentFinal(input, child, undefined, undefined, true)
       : await submitUnifiedScaleAssessmentFinal(input, child)
     const shouldFinalize = Boolean(child.compositeAttemptId)
+      && child.compositeAttempt?.status !== 'COMPLETED'
       && (isEducationResourceParent(child.compositeAttempt)
         || (!receiptOnly && shouldReconcileTrainingParent(child.compositeAttempt)))
     return {
@@ -635,6 +636,7 @@ export const submitCompositeScaleFinal = async (
         builtInput, child, prepared, undefined, undefined, responseOptions?.receiptOnly, write,
       ))
       const shouldFinalize = Boolean(child.compositeAttemptId)
+        && child.compositeAttempt?.status !== 'COMPLETED'
         && (isEducationResourceParent(child.compositeAttempt)
           || (!responseOptions?.receiptOnly && shouldReconcileTrainingParent(child.compositeAttempt)))
       return {

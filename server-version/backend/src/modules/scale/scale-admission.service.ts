@@ -65,6 +65,7 @@ export const UNIFIED_SCALE_CHILD_ADMISSION_SELECT = {
   compositeItemId: true,
   compositeAttempt: { select: {
     ...TRAINING_VARIANT_PARENT_MARKER_SELECT,
+    status: true,
     assignmentRef: true,
     compositeAssessment: { select: {
       ...TRAINING_VARIANT_PARENT_MARKER_SELECT.compositeAssessment.select,
