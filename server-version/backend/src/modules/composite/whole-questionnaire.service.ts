@@ -783,8 +783,8 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
   const rows = await prisma.$queryRaw<Array<Omit<WholeSubmissionHeader, 'compositeAssessment'> & {
     productKind: WholeSubmissionHeader['compositeAssessment']['productKind'];
     reportPackageKey: string | null; analysisProtocolKey: string | null;
-    trainingFlowDraft: Prisma.JsonValue;trainingFlowFrozen:Prisma.JsonValue;trainingFlowDigest:string|null;
-    trainingVariantDraft: unknown; trainingVariantFrozen: unknown; trainingVariantDigest: string | null;
+    hasFlowDraft: boolean; hasFlowFrozen: boolean; trainingFlowDigest: string | null;
+    hasVariantDraft: boolean; hasVariantFrozen: boolean; trainingVariantDigest: string | null;
     jobId: string | null; jobStatus: string | null; leaseToken: string | null;
     wholeSubmissionId: string | null; wholePayloadHash: string | null; wholeAcceptedAt: Date | null;
     wholeValidationEncrypted: string | null; wholeValidationHash: string | null;
@@ -813,10 +813,12 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
       parent."recovery_token_hash" AS "recoveryTokenHash",
       product."product_kind" AS "productKind", product."report_package_key" AS "reportPackageKey",
       product."analysis_protocol_key" AS "analysisProtocolKey",
-      product."training_variant_draft" AS "trainingVariantDraft",
-      product."training_variant_frozen" AS "trainingVariantFrozen",
+      (product."training_variant_draft" IS NOT NULL) AS "hasVariantDraft",
+      (product."training_variant_frozen" IS NOT NULL) AS "hasVariantFrozen",
       product."training_variant_digest" AS "trainingVariantDigest",
-      product."training_flow_draft" AS "trainingFlowDraft", product."training_flow_frozen" AS "trainingFlowFrozen", product."training_flow_digest" AS "trainingFlowDigest",
+      (product."training_flow_draft" IS NOT NULL) AS "hasFlowDraft",
+      (product."training_flow_frozen" IS NOT NULL) AS "hasFlowFrozen",
+      product."training_flow_digest" AS "trainingFlowDigest",
       job."id" AS "jobId", job."status" AS "jobStatus", job."lease_token" AS "leaseToken",
       job."whole_submission_id" AS "wholeSubmissionId", job."whole_payload_hash" AS "wholePayloadHash",
       job."whole_accepted_at" AS "wholeAcceptedAt",
@@ -830,8 +832,8 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
   if (!row) return null
   const parent: WholeSubmissionHeader = { ...row, compositeAssessment: {
     productKind: row.productKind, reportPackageKey: row.reportPackageKey, analysisProtocolKey: row.analysisProtocolKey,
-    trainingFlowDraft:row.trainingFlowDraft,trainingFlowFrozen:row.trainingFlowFrozen,trainingFlowDigest:row.trainingFlowDigest,
-    trainingVariantDraft: row.trainingVariantDraft, trainingVariantFrozen: row.trainingVariantFrozen, trainingVariantDigest: row.trainingVariantDigest,
+    trainingFlowDraft: row.hasFlowDraft ? {} : null, trainingFlowFrozen: row.hasFlowFrozen ? {} : null, trainingFlowDigest: row.trainingFlowDigest,
+    trainingVariantDraft: row.hasVariantDraft ? {} : null, trainingVariantFrozen: row.hasVariantFrozen ? {} : null, trainingVariantDigest: row.trainingVariantDigest,
   } }
   const prior: WholeQuestionnaireReceipt | null = row.jobId ? {
     id: row.jobId, status: row.jobStatus!, leaseToken: row.leaseToken, wholeSubmissionId: row.wholeSubmissionId,
@@ -985,7 +987,8 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
   }>(receipt.wholeAnswersEncrypted))
   if (envelope.schemaVersion !== 1 || envelope.binding.attemptId !== job.attemptId || envelope.binding.attemptEpoch !== job.attemptEpoch
     || envelope.binding.slotSetHash !== job.slotSetHash || envelope.binding.contextHash !== job.contextHash
-    || envelope.payloadHash !== receipt.wholePayloadHash || prepareCanonicalSubmission(logicalPayload(job.attemptId, { submissionId: receipt.wholeSubmissionId,
+    || envelope.payloadHash !== receipt.wholePayloadHash
+    || (process.env.ASSESSMENT_WHOLE_WORKER_REHASH_ENABLED === 'true' && prepareCanonicalSubmission(logicalPayload(job.attemptId, { submissionId: receipt.wholeSubmissionId,
       attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextSnapshotHash: job.contextHash,
       units: envelope.units.map(unit => ({ itemId: unit.itemId, definitionHash: unit.definitionHash, answers: unit.answers,
         ...(unit.itemTimings!==undefined ? {itemTimings:unit.itemTimings} : {}),
@@ -1000,7 +1003,7 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
             ...(ans.otherText !== undefined ? { otherText: ans.otherText } : {}) })),
         })),
       } : {}),
-    },envelope.timingSnapshotHash)).hash !== receipt.wholePayloadHash) throw failure('整份答案封存内容无法验证')
+    },envelope.timingSnapshotHash)).hash !== receipt.wholePayloadHash)) throw failure('整份答案封存内容无法验证')
   execution.studyReceipt=await acceptedStudyReceipt(job,envelope)
   const principal = envelope.units[0]?.userId ? { userId: envelope.units[0].userId }
     : envelope.units[0]?.recoveryTokenHash ? { recoveryTokenHash: envelope.units[0].recoveryTokenHash }
