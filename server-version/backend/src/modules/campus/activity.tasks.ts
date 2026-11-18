@@ -44,7 +44,7 @@ export async function addCampusActivityTask(input:{
 
 type CampusActivityForStudent={courseId:string;organizationId:string;title:string}
 export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:{
-  page:number;pageSize:number;activityId?:string
+  page:number;pageSize:number;activityId?:string;kind?:'MEASUREMENT'
   /** Keyset bookmark for the Run-task portion only (same contract as the
    * /inbox reader): assignments and check-ins stay complete within the
    * authorized activity set, while Run tasks past the former hard 100-execution
@@ -54,87 +54,96 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
   if(actor.accountDomain!=='SCHOOL'||actor.role!=='STUDENT')deny('CAMPUS_STUDENT_REQUIRED',403)
   // Membership, admission and current class/student assignment are all live
   // authority, checked before any task title/content is returned.
-  const activityRows=await withBoundedPlannerRead(prisma, client => client.$queryRaw<CampusActivityForStudent[]>`
-    SELECT DISTINCT a."course_id" AS "courseId",a."organization_id" AS "organizationId",
-      course."title"
-    FROM "users" u
-    JOIN "organization_memberships" m ON m."user_id"=u."id"
-      AND m."valid_from"<=statement_timestamp()
-      AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
-    JOIN "organizations" o ON o."id"=m."organization_id" AND o."status"='ACTIVE' AND o."product_domain"='SCHOOL'
-    JOIN "education_product_entitlements" ent ON ent."organization_id"=o."id"
-      AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
-    JOIN "organization_persona_grants" pg
-      ON pg."organization_id"=m."organization_id"
-      AND pg."membership_id"=m."id" AND pg."persona"='STUDENT'
-      AND pg."revoked_at" IS NULL AND pg."granted_at"<=statement_timestamp()
-    JOIN "campus_student_enrollments" e ON e."user_id"=m."user_id"
-      AND e."organization_id"=m."organization_id" AND e."status"='APPROVED'
-    JOIN "campus_class_admissions" ca ON ca."class_unit_id"=e."class_unit_id"
-      AND ca."organization_id"=e."organization_id" AND ca."status"='APPROVED'
-    JOIN "organization_student_class_assignments" sc
-      ON sc."membership_id"=m."id" AND sc."organization_id"=m."organization_id"
-      AND sc."class_unit_id"=e."class_unit_id"
-      AND sc."valid_from"<=statement_timestamp()
-      AND (sc."valid_until" IS NULL OR sc."valid_until">statement_timestamp())
-    JOIN "campus_activity_participants" p ON p."organization_id"=m."organization_id"
-      AND p."membership_id"=m."id" AND p."status"='ACTIVE'
-    JOIN "campus_activities" a ON a."course_id"=p."course_id"
-      AND a."organization_id"=p."organization_id" AND a."status"='OPEN'
-    JOIN "courses" course ON course."id"=a."course_id" AND course."course_type"='CAMPUS_ACTIVITY'
-    WHERE u."id"=${actor.userId}
-      AND u."account_domain"='SCHOOL'
-      AND u."role"='STUDENT' AND u."is_active"=TRUE
-      AND u."is_frozen"=FALSE AND u."must_change_password"=FALSE
-      AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
-        WHERE d."organization_id"=o."id" AND d."user_id"=${actor.userId}
-          AND d."lifted_at" IS NULL
-          AND d."permission" IN ('*','EDUCATION_ACCESS','HUISCHOOL_ACCESS','ACTIVITY_READ','RUN_START'))
-      -- A directed activityId lookup filters in the database: an in-memory
-      -- filter after LIMIT 201 would wrongly hide an authorized activity that
-      -- sorts beyond the first 201 rows.
-      ${input.activityId?Prisma.sql`AND a."course_id"=${input.activityId}`:Prisma.empty}
-    ORDER BY a."course_id" LIMIT 201
-  `)
-  const authorized=activityRows
-  const ids=authorized.map(a=>a.courseId)
-  if(!ids.length)return {list:[],total:0,page:input.page,hasMore:false,truncated:activityRows.length>200,nextRunCursor:null as RunTaskCursor|null}
-  // Later Run-task batches consume neither assignments nor check-ins: skip
-  // those two reads entirely instead of fetching and discarding them.
-  type AssignmentRow={id:string;courseId:string;title:string;deadline:Date|null;tags:string[];submissions:Array<{status:string}>}
-  type CheckinRow={id:string;courseId:string;title:string;endTime:Date|null;submissions:Array<{id:string}>}
-  const assignmentReads:Promise<AssignmentRow[]>=input.runCursor
-    ?Promise.resolve([])
-    :prisma.assignment.findMany({
-      where:{courseId:{in:ids},status:'PUBLISHED'},
-      select:{id:true,courseId:true,title:true,deadline:true,tags:true,
-        submissions:{where:{studentId:actor.userId},select:{status:true}}},
-    })
-  const checkinReads:Promise<CheckinRow[]>=input.runCursor
-    ?Promise.resolve([])
-    :prisma.checkin.findMany({
-      where:{courseId:{in:ids}},
-      select:{id:true,courseId:true,title:true,endTime:true,
-        submissions:{where:{studentId:actor.userId},select:{id:true}}},
-    })
-  const [assignments,checkins,linkedRuns]=await Promise.all([
-    assignmentReads,
-    checkinReads,
-    prisma.$queryRaw<Array<{courseId:string;runId:string}>>`
+  const { activityRows, linkedRuns, assigned } = await withBoundedPlannerRead(prisma, async client => {
+    const activityRows = await client.$queryRaw<CampusActivityForStudent[]>`
+      SELECT DISTINCT a."course_id" AS "courseId",a."organization_id" AS "organizationId",
+        course."title"
+      FROM "users" u
+      JOIN "organization_memberships" m ON m."user_id"=u."id"
+        AND m."valid_from"<=statement_timestamp()
+        AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+      JOIN "organizations" o ON o."id"=m."organization_id" AND o."status"='ACTIVE' AND o."product_domain"='SCHOOL'
+      JOIN "education_product_entitlements" ent ON ent."organization_id"=o."id"
+        AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
+      JOIN "organization_persona_grants" pg
+        ON pg."organization_id"=m."organization_id"
+        AND pg."membership_id"=m."id" AND pg."persona"='STUDENT'
+        AND pg."revoked_at" IS NULL AND pg."granted_at"<=statement_timestamp()
+      JOIN "campus_student_enrollments" e ON e."user_id"=m."user_id"
+        AND e."organization_id"=m."organization_id" AND e."status"='APPROVED'
+      JOIN "campus_class_admissions" ca ON ca."class_unit_id"=e."class_unit_id"
+        AND ca."organization_id"=e."organization_id" AND ca."status"='APPROVED'
+      JOIN "organization_student_class_assignments" sc
+        ON sc."membership_id"=m."id" AND sc."organization_id"=m."organization_id"
+        AND sc."class_unit_id"=e."class_unit_id"
+        AND sc."valid_from"<=statement_timestamp()
+        AND (sc."valid_until" IS NULL OR sc."valid_until">statement_timestamp())
+      JOIN "campus_activity_participants" p ON p."organization_id"=m."organization_id"
+        AND p."membership_id"=m."id" AND p."status"='ACTIVE'
+      JOIN "campus_activities" a ON a."course_id"=p."course_id"
+        AND a."organization_id"=p."organization_id" AND a."status"='OPEN'
+      JOIN "courses" course ON course."id"=a."course_id" AND course."course_type"='CAMPUS_ACTIVITY'
+      WHERE u."id"=${actor.userId}
+        AND u."account_domain"='SCHOOL'
+        AND u."role"='STUDENT' AND u."is_active"=TRUE
+        AND u."is_frozen"=FALSE AND u."must_change_password"=FALSE
+        AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
+          WHERE d."organization_id"=o."id" AND d."user_id"=${actor.userId}
+            AND d."lifted_at" IS NULL
+            AND d."permission" IN ('*','EDUCATION_ACCESS','HUISCHOOL_ACCESS','ACTIVITY_READ','RUN_START'))
+        -- A directed activityId lookup filters in the database: an in-memory
+        -- filter after LIMIT 201 would wrongly hide an authorized activity that
+        -- sorts beyond the first 201 rows.
+        ${input.activityId?Prisma.sql`AND a."course_id"=${input.activityId}`:Prisma.empty}
+      ORDER BY a."course_id" LIMIT 201
+    `
+    const ids = activityRows.map(a => a.courseId)
+    if (!ids.length) {
+      return {
+        activityRows,
+        linkedRuns: [] as Array<{ courseId: string; runId: string }>,
+        assigned: { list: [], truncated: false, nextCursor: null as RunTaskCursor | null },
+      }
+    }
+    const linkedRuns = await client.$queryRaw<Array<{ courseId: string; runId: string }>>`
       SELECT ar."course_id" AS "courseId", ar."run_id" AS "runId"
       FROM "campus_activity_runs" ar
       JOIN "campus_activities" a ON a."course_id"=ar."course_id" AND a."status"='OPEN'
       JOIN "assessment_runs" r ON r."id"=ar."run_id" AND r."status" IN ('PUBLISHED','CLOSED')
       WHERE ar."course_id" = ANY(${ids}::text[])
-    `,
-  ])
-  const assigned=await listAssignedRunTasks(actor.userId,{
-    organizationIds:[...new Set(authorized.map(a=>a.organizationId))],
-    runIds:linkedRuns.map(link=>link.runId),
-    preserveBoundSchoolContinuation:true,
-    populationProductScope:'CAMPUS_ONLY',
-    cursor:input.runCursor,
+    `
+    const assigned = await listAssignedRunTasks(actor.userId, {
+      organizationIds: [...new Set(activityRows.map(a => a.organizationId))],
+      runIds: linkedRuns.map(link => link.runId),
+      preserveBoundSchoolContinuation: true,
+      populationProductScope: 'CAMPUS_ONLY',
+      cursor: input.runCursor,
+      db: client,
+    })
+    return { activityRows, linkedRuns, assigned }
   })
+  const authorized=activityRows
+  const ids=authorized.map(a=>a.courseId)
+  if(!ids.length)return {list:[],total:0,page:input.page,hasMore:false,truncated:activityRows.length>200,nextRunCursor:null as RunTaskCursor|null}
+  // Later Run-task batches or MEASUREMENT-only queries consume neither assignments
+  // nor check-ins: skip those two reads entirely instead of fetching and discarding them.
+  type AssignmentRow={id:string;courseId:string;title:string;deadline:Date|null;tags:string[];submissions:Array<{status:string}>}
+  type CheckinRow={id:string;courseId:string;title:string;endTime:Date|null;submissions:Array<{id:string}>}
+  const skipContentTasks = Boolean(input.runCursor) || input.kind === 'MEASUREMENT'
+  const [assignments, checkins] = skipContentTasks
+    ? [[] as AssignmentRow[], [] as CheckinRow[]]
+    : await Promise.all([
+        prisma.assignment.findMany({
+          where:{courseId:{in:ids},status:'PUBLISHED'},
+          select:{id:true,courseId:true,title:true,deadline:true,tags:true,
+            submissions:{where:{studentId:actor.userId},select:{status:true}}},
+        }),
+        prisma.checkin.findMany({
+          where:{courseId:{in:ids}},
+          select:{id:true,courseId:true,title:true,endTime:true,
+            submissions:{where:{studentId:actor.userId},select:{id:true}}},
+        }),
+      ])
   const runMap=new Map(linkedRuns.map(r=>[r.runId,r.courseId]))
   const activityMap=new Map(authorized.map(a=>[a.courseId,a]))
   const tasks:Array<{

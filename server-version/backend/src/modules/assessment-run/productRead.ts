@@ -2,7 +2,7 @@ import { boundCompositeContinuationSql } from './boundCompositeContinuation'
 import { Prisma } from '@prisma/client'
 import { currentRunPopulationAuthoritySql, type RunPopulationProductScope } from './currentPopulationAuthority'
 import {completedSchoolOrdinaryFeedbackSql} from './completedSchoolFeedback'
-import { withBoundedPlannerRead } from './plannerBound'
+import { withBoundedPlannerRead, type PlannerBoundReadDb } from './plannerBound'
 import { prisma } from '../../config/database'
 import { AssessmentRunRepositoryError, type AssessmentRunStatus } from './repository'
 
@@ -239,6 +239,8 @@ export async function listAssignedRunTasks(userId: string, options?: {
   includeCompletedSchoolFeedback?: boolean
   /** Explicit product scope when caller already constrained runIds to one product's link table. */
   populationProductScope?: RunPopulationProductScope
+  /** Optional already-bounded read client to avoid opening a second transaction. */
+  db?: Pick<PlannerBoundReadDb, '$queryRaw'>
 }) {
   if(options?.organizationIds && options.organizationIds.length===0) return { list:[], truncated:false, nextCursor:null as RunTaskCursor | null }
   if(options?.runIds && options.runIds.length===0) return { list:[], truncated:false, nextCursor:null as RunTaskCursor | null }
@@ -294,7 +296,7 @@ export async function listAssignedRunTasks(userId: string, options?: {
   const completedSchoolFeedback=options?.includeCompletedSchoolFeedback
     ? completedSchoolOrdinaryFeedbackSql(Prisma.sql`e."id"`,userId)
     : Prisma.sql`FALSE`
-  const list = await withBoundedPlannerRead(prisma, client => client.$queryRaw<Array<{
+  const runQuery = (client: Pick<PlannerBoundReadDb, '$queryRaw'>) => client.$queryRaw<Array<{
     __boundSchoolContinuation: boolean; createdAtMicros: string;
     executionId: string; organizationId: string; runId: string; runName: string;
     subjectUserId: string; subjectRole: string; subjectName: string; respondentRole: string; relationship: string; perspective: string; deadline: Date | null;
@@ -350,7 +352,8 @@ export async function listAssignedRunTasks(userId: string, options?: {
           AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START')))
         OR ${completedSchoolFeedback})
     ORDER BY e."created_at" DESC, e."id" DESC LIMIT ${limit + 1}
-  `)
+  `
+  const list = options?.db ? await runQuery(options.db) : await withBoundedPlannerRead(prisma, runQuery)
   const page = list.slice(0, limit)
   const last = page[page.length - 1]
   return {

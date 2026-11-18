@@ -64,13 +64,11 @@ describe('education personal report reader orchestration (mock storage)', () => 
     expect(m.project.mock.calls[0][0]).not.toHaveProperty('binding')
     expect(m.project.mock.calls[0][0].persistedFacts.finalUnit).toMatchObject({ slotKey: 'scale:item-1', sourceSubmissionId: 'submission-1' })
     expect(m.query).toHaveBeenCalledTimes(2)
-    expect(m.execute).toHaveBeenCalledTimes(3)
+    expect(m.execute).toHaveBeenCalledTimes(1)
     expect(m.execute.mock.calls.map((c: any) => c[0].join(''))).toEqual([
-      'SET LOCAL join_collapse_limit = 1',
-      'SET LOCAL from_collapse_limit = 1',
-      'SET LOCAL plan_cache_mode = force_custom_plan',
+      "SELECT set_config('join_collapse_limit', '1', true), set_config('from_collapse_limit', '1', true), set_config('plan_cache_mode', 'force_custom_plan', true)",
     ])
-    expect(m.execute.mock.invocationCallOrder[2]).toBeLessThan(m.query.mock.invocationCallOrder[0])
+    expect(m.execute.mock.invocationCallOrder[0]).toBeLessThan(m.query.mock.invocationCallOrder[0])
   })
   it('rechecks access after asynchronous result reads', async () => {
     m.query.mockReset().mockResolvedValueOnce([own]).mockResolvedValueOnce([])

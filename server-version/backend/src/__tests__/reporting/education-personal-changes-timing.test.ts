@@ -31,11 +31,11 @@ it('gates native education feedback by its frozen opening time before snapshot r
   if(sql.includes('personal_changes_snapshots->>')){hashes.push(values[0]);return [{cipher:null}]}
   return []
  })
- const nonPlannerWrites=()=>m.execute.mock.calls.filter((c:any)=>!String(c[0]?.join?.('')??'').startsWith('SET LOCAL '))
+ const nonPlannerWrites=()=>m.execute.mock.calls.filter((c:any)=>{const s=String(c[0]?.join?.('')??'');return !s.startsWith('SET LOCAL ')&&!s.includes("set_config('join_collapse_limit'")})
  const input={actorUserId:actor,executionId:waves[1].id}
  expect((await readTeacherPersonalChanges(input)).status).toBe('WAITING')
  expect(nonPlannerWrites()).toHaveLength(0)
- expect(m.execute).toHaveBeenCalledTimes(3)
+ expect(m.execute).toHaveBeenCalledTimes(1)
  vi.setSystemTime(new Date('2026-11-02T08:00:00Z'))
  const opened=await readTeacherPersonalChanges(input);expect(opened.status).toBe('AVAILABLE')
  expect((opened as any).metrics[0].points.map((p:any)=>p.value)).toEqual([300,290])

@@ -82,9 +82,7 @@ describe('education execution purpose and account-lock boundary',()=>{
    [{valid:true,denied:false}],[],[{kind:'SELF',ref:null,facts:{}}],[{accountsCurrent:true,populationCurrent:true,intakeOpen:true,[field]:false}]])
   await expect(assertCurrentRunStartAuthority(p.tx,'execution',{accountMode:'DETECT_EDUCATION_LIBRARY'})).rejects.toMatchObject({code:field==='accountsCurrent'?'RUN_ACCOUNT_INACTIVE':'RUN_ACTOR_AUTHORITY_REVOKED'})
   expect(p.controls).toEqual([
-    'SET LOCAL join_collapse_limit = 1',
-    'SET LOCAL from_collapse_limit = 1',
-    'SET LOCAL plan_cache_mode = force_custom_plan',
+    "SELECT set_config('join_collapse_limit', '1', true), set_config('from_collapse_limit', '1', true), set_config('plan_cache_mode', 'force_custom_plan', true)",
   ])
   expect(p.sql.at(-1)).toContain('statement_timestamp()')
   expect(p.sql.at(-1)).toContain('populationCurrent')
