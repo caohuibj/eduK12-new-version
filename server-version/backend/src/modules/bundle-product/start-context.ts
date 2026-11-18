@@ -72,7 +72,7 @@ export async function loadBundleScaleStartParentContext(db: PrismaClient | Prism
     resolvedFacts() {
       return memo ??= (async () => {
         const encryptedSlotSet = parent.frozenActiveSlotSetEncrypted
-        if (!encryptedSlotSet) invalid('START 缺少冻结 FORM 槽位')
+        if (!encryptedSlotSet) return invalid('START 缺少冻结 FORM 槽位')
         const active = await loadFrozenActiveSlotSet(encryptedSlotSet, db)
         if (active.snapshotHash !== parent.frozenActiveSlotSetHash || active.attemptEpoch !== parent.attemptEpoch) invalid('START FORM 槽位轮次不匹配')
         const forms = active.slots.filter(s => s.unitType === 'FORM_SECTION')
