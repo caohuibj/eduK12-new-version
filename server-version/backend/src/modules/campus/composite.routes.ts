@@ -57,15 +57,23 @@ async function campusCompositeAccess(req:Request,res:Response,next:NextFunction)
     const attemptId=req.params.attemptId
     if(!req.user||req.user.accountDomain!=='SCHOOL'||!attemptId)
       return notFound(res,'当前校园测评不可访问')
-    const { checkCampusCompositeAccessAuthority } = await import('./campus-composite-authority')
-    const allowed = await checkCampusCompositeAccessAuthority({ attemptId, userId: req.user.userId })
-    if(!allowed)return notFound(res,'当前校园测评不可访问')
+    const authorityModule = await import('./campus-composite-authority')
+    const access = typeof authorityModule.checkCampusCompositeAccessDetails === 'function'
+      ? await authorityModule.checkCampusCompositeAccessDetails({ attemptId, userId: req.user.userId })
+      : { allowed: await authorityModule.checkCampusCompositeAccessAuthority({ attemptId, userId: req.user.userId }) }
+    if(!access.allowed)return notFound(res,'当前校园测评不可访问')
+    if(access.consentFreeFinalReady&&res.locals&&typeof res.locals==='object'){
+      (res.locals as Record<string,unknown>).campusConsentFreeFinalReady=true
+    }
     return next()
   }catch(error){return next(error)}
 }
 async function campusFinalConsent(req:Request,res:Response,next:NextFunction){
   try{
     if(!req.user)return notFound(res)
+    if((res.locals as {campusConsentFreeFinalReady?:boolean}|undefined)?.campusConsentFreeFinalReady===true){
+      return next()
+    }
     await relationalRuntimeConsentAuthority.assertCompositeFinal(
       req.params.attemptId,req.user.userId)
     next()

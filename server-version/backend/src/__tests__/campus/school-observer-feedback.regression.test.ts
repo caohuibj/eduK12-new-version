@@ -12,7 +12,7 @@ import type {Server} from 'node:http'
 import {writeFileSync} from 'node:fs'
 import {join} from 'node:path'
 
-const f=vi.hoisted(()=>({query:vi.fn(),findChild:vi.fn(),admission:null as any,runtime:null as any,child:null as any,parent:null as any,
+const f=vi.hoisted(()=>({query:vi.fn(),findChild:vi.fn(),admission:null as any,runtime:null as any,child:null as any,parent:null as any,accessRow:null as any,
  feedback:vi.fn(),consent:vi.fn(),official:vi.fn(),requests:[] as string[]}))
 vi.mock('../../config/database',()=>({prisma:{$queryRaw:f.query,assessment:{findFirst:f.findChild}}}))
 vi.mock('../../middleware/auth',()=>({authenticateSchool:(req:any,_res:any,next:any)=>{
@@ -111,6 +111,7 @@ describe('School observer enforced receipt and feedback routing regression (mock
  afterAll(async()=>{server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()))})
  beforeEach(()=>{
   vi.clearAllMocks();f.requests=[]
+  f.accessRow={id:executionId,attemptUserId:'observer',attemptConsentId:'consent-1',assignmentRespondentId:'observer',assignmentStatus:'COMPLETED',assignmentConsentId:'consent-1',assignmentPolicyDomain:'ORGANIZATION_RUN',respondentRole:'PARENT',visibilityPolicyKey:'observer_private'}
   f.feedback.mockResolvedValue(completion);f.consent.mockResolvedValue(undefined);f.findChild.mockImplementation(async()=>f.child)
   f.official.mockResolvedValue({list:[task],truncated:false})
   f.query.mockImplementation(async(query:any)=>{
@@ -118,12 +119,13 @@ describe('School observer enforced receipt and feedback routing regression (mock
    if(sql.includes('AS parent')&&sql.includes('composite_assessment_attempts'))return [{parent:f.parent,job:null}]
    if(sql.includes('SELECT perspective, analysis_mode'))return [{perspective:'OBSERVER_REPORT',analysisMode:'INDIVIDUAL_ONLY'}]
    if(sql.includes('course.title AS "activityTitle"'))return [{executionId,runId:'run',organizationId:'school',activityId:'activity',activityTitle:'Synthetic activity',studentUserId:'rated-student'}]
-   if(sql.includes('SELECT e."id" FROM "assessment_run_executions"'))return [{id:executionId}]
+   if(sql.includes('FROM "assessment_run_executions" e')&&sql.includes('campus_activity_runs'))return [f.accessRow]
    throw Error('Unexpected database fixture query: '+sql.slice(0,220))
   })
  })
  it.each(['PARENT','TEACHER'] as const)('%s completed replay must not expose results forbidden by the ordinary observer ceiling',async role=>{
   await prepare(role)
+  f.accessRow={...f.accessRow,respondentRole:role}
   const receipt=await request(feedbackPath,role)
   expect(receipt).toMatchObject({status:200,body:{data:{state:'COMPLETION_ONLY'}}})
   const actual=await request(scalePath,role,body);save('school-observer-'+role.toLowerCase()+'-default-final-response.json',{source:process.env.A_REVIEW_CANDIDATE_SHA??'source-hashed-working-tree',mockBoundaries:['database','session','current population','consent','stored admission/runtime read'],ordinaryFeedback:receipt,final:actual})
@@ -132,6 +134,7 @@ describe('School observer enforced receipt and feedback routing regression (mock
   expect(actual.body.data).not.toHaveProperty('assessment')
   expect(JSON.stringify(actual.body.data)).not.toMatch(/Synthetic sensitive score|itemScores|interpretations/)
   expect(actual.body.data.assessment?.report?.scores,'The report-first DTO must also respect the ordinary observer NONE ceiling').toBeUndefined()
+  expect(f.consent).toHaveBeenCalledWith('parent-attempt','observer')
  })
  it('receipt query is a working positive control without changing the submitted scientific payload',async()=>{
   await prepare()
@@ -139,6 +142,19 @@ describe('School observer enforced receipt and feedback routing regression (mock
   expect(actual).toMatchObject({status:200,body:{data:{completed:true,replayed:true}}})
   expect(actual.body.data).not.toHaveProperty('assessment')
   expect(JSON.stringify(actual.body.data)).not.toMatch(/Synthetic sensitive score|itemScores|interpretations/)
+  expect(f.consent).toHaveBeenCalledWith('parent-attempt','observer')
+ })
+ it('consent-free student self-report skips duplicate assertCompositeFinal while observer_ policy still enforces it',async()=>{
+  await prepare('TEACHER')
+  f.accessRow={id:executionId,attemptUserId:'observer',attemptConsentId:null,assignmentRespondentId:'observer',assignmentStatus:'STARTED',assignmentConsentId:null,assignmentPolicyDomain:'ORGANIZATION_RUN',respondentRole:'STUDENT',visibilityPolicyKey:'self_only'}
+  const selfActual=await request(scalePath+'?response=receipt','STUDENT',body)
+  expect(selfActual.status).toBe(200)
+  expect(f.consent).not.toHaveBeenCalled()
+
+  f.accessRow={...f.accessRow,respondentRole:'TEACHER',visibilityPolicyKey:'observer_private'}
+  const observerActual=await request(scalePath+'?response=receipt','TEACHER',body)
+  expect(observerActual.status).toBe(200)
+  expect(f.consent).toHaveBeenCalledWith('parent-attempt','observer')
  })
  it('ADMIN with an actual assigned TEACHER task must be allowed through the feedback respondent guard',async()=>{
   await prepare('TEACHER')
