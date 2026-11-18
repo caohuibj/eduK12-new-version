@@ -1,6 +1,6 @@
 import { boundCompositeContinuationSql } from './boundCompositeContinuation'
 import { Prisma } from '@prisma/client'
-import { currentRunPopulationAuthoritySql } from './currentPopulationAuthority'
+import { currentRunPopulationAuthoritySql, type RunPopulationProductScope } from './currentPopulationAuthority'
 import {completedSchoolOrdinaryFeedbackSql} from './completedSchoolFeedback'
 import { withBoundedPlannerRead } from './plannerBound'
 import { prisma } from '../../config/database'
@@ -237,6 +237,8 @@ export async function listAssignedRunTasks(userId: string, options?: {
   preserveBoundSchoolContinuation?: boolean
   /** Own completed ordinary observer feedback; does not authorize collection. */
   includeCompletedSchoolFeedback?: boolean
+  /** Explicit product scope when caller already constrained runIds to one product's link table. */
+  populationProductScope?: RunPopulationProductScope
 }) {
   if(options?.organizationIds && options.organizationIds.length===0) return { list:[], truncated:false, nextCursor:null as RunTaskCursor | null }
   if(options?.runIds && options.runIds.length===0) return { list:[], truncated:false, nextCursor:null as RunTaskCursor | null }
@@ -342,7 +344,7 @@ export async function listAssignedRunTasks(userId: string, options?: {
       ${executionScope}
       ${cursorScope}
       AND ((${closedScope}
-      AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`, 'COLLECTION', options?.preserveBoundSchoolContinuation ? 'CAMPUS_ONLY' : 'ALL')}
+      AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`, 'COLLECTION', options?.populationProductScope ?? 'ALL')}
       AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
         WHERE d."organization_id" = e."organization_id" AND d."user_id" = ${userId}
           AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START')))

@@ -132,6 +132,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
     organizationIds:[...new Set(authorized.map(a=>a.organizationId))],
     runIds:linkedRuns.map(link=>link.runId),
     preserveBoundSchoolContinuation:true,
+    populationProductScope:'CAMPUS_ONLY',
     cursor:input.runCursor,
   })
   const runMap=new Map(linkedRuns.map(r=>[r.runId,r.courseId]))
@@ -270,7 +271,7 @@ export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal,curs
   `)
   const indexed=links.slice(0,100)
   if(!indexed.length)return {list:[],truncated:links.length>100,nextCursor:null as RunTaskCursor|null}
-  const tasks=await listAssignedRunTasks(actor.userId,{organizationIds:[...new Set(indexed.map(l=>l.organizationId))],runIds:indexed.map(l=>l.runId),preserveBoundSchoolContinuation:true,includeCompletedSchoolFeedback:true})
+  const tasks=await listAssignedRunTasks(actor.userId,{organizationIds:[...new Set(indexed.map(l=>l.organizationId))],runIds:indexed.map(l=>l.runId),preserveBoundSchoolContinuation:true,includeCompletedSchoolFeedback:true,populationProductScope:'CAMPUS_ONLY'})
   const byRun=new Map(indexed.map(l=>[l.runId,l]))
   const list=tasks.list.filter(t=>byRun.has(t.runId)).map(t=>{
     const activity=byRun.get(t.runId)!

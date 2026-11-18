@@ -138,7 +138,7 @@ suite('Teacher personal longitudinal native Run',()=>{
 
 
 const manager=await edu(),teacher=await edu(),school=await teacherSchool(manager.id)
-const membership=await db.organizationMembership.create({data:{id:randomUUID(),organizationId:school.id,userId:teacher.id,orgRole:'MEMBER'}})
+const membership=await db.organizationMembership.create({data:{id:randomUUID(),organizationId:school.id,userId:teacher.id,orgRole:'MEMBER',validFrom:new Date(Date.now()-60_000)}})
 await db.organizationPersonaGrant.create({data:{id:randomUUID(),organizationId:school.id,membershipId:membership.id,persona:'TEACHER',grantedByUserId:manager.id}})
 await changeTeacherScaleLicense({organizationId:school.id,resourceId:resource.id,actorUserId:entryAdmin.id,action:'GRANT'})
 const target=await createHuiteacherTarget({organizationId:school.id,actorUserId:manager.id,kind:'ORGANIZATION',name:'Synthetic longitudinal Teachers'})
