@@ -377,12 +377,19 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
       AND "state" IN ('CLAIMED','DISPATCHED')
   `
   if (Number(dispatched) !== 1) throw new RunStartExecutionError('RUN_START_FENCE_LOST', 'START claim fence lost before transactional runtime start', 409)
+  let preloadedComposite = input.preloadedComposite
+  if (!preloadedComposite && typeof (tx as any)?.compositeAssessment?.findUnique === 'function') {
+    const compositeModule = await import('../composite/composite.service')
+    if (typeof compositeModule.loadStartComposite === 'function') {
+      preloadedComposite = await compositeModule.loadStartComposite(input.launch.runtimeTargetRef, tx as any)
+    }
+  }
   const attempt = await startRelationalCompositeAttemptInTransaction(tx as any, {
     compositeAssessmentId: input.launch.runtimeTargetRef,
     respondentUserId: input.actorUserId,
     attemptIdentity: admission.attemptIdentity,
     educationStart: compositionStart??educationSource?.startProof,
-    preloadedComposite: input.preloadedComposite,
+    preloadedComposite,
   })
   const changed = await tx.$executeRaw`
     UPDATE "assessment_run_executions"
@@ -738,19 +745,11 @@ export const startAssessmentRunExecution = async (input: {
               if (launch.runtimeTargetKind !== 'COMPOSITE') {
                 throw new RunStartExecutionError('RUN_RUNTIME_TARGET_UNSUPPORTED', 'transactional Run adapter supports Composite runtime only', 409)
               }
-              let preloadedComposite: any
-              try {
-                const { loadStartComposite } = await import('../composite/composite.service')
-                preloadedComposite = await loadStartComposite(launch.runtimeTargetRef, inlineContext.tx as any)
-              } catch {
-                // Fallback to in-transaction load if preloading fails
-              }
               return executeTransactionalCompositeInTx(inlineContext.tx, {
                 decision: inlineDecision,
                 executionId: input.executionId,
                 actorUserId: input.actorUserId,
                 launch,
-                preloadedComposite,
                 inlineContext,
               })
             },
@@ -798,11 +797,17 @@ export const startAssessmentRunExecution = async (input: {
             throw new RunStartExecutionError('RUN_RUNTIME_TARGET_UNSUPPORTED', 'transactional Run adapter supports Composite runtime only', 409)
           }
           let preloadedComposite: any
-          try {
-            const { loadStartComposite } = await import('../composite/composite.service')
-            preloadedComposite = await loadStartComposite(launch.runtimeTargetRef)
-          } catch {
-            // Fallback to in-transaction load if preloading fails
+          if (typeof (prisma as any)?.compositeAssessment?.findUnique === 'function') {
+            try {
+              const compositeModule = await import('../composite/composite.service')
+              if (typeof compositeModule.loadStartComposite === 'function') {
+                preloadedComposite = await compositeModule.loadStartComposite(launch.runtimeTargetRef)
+              }
+            } catch (err) {
+              const reason = rolledBackStartReason(err)
+              if (!reason) throw err
+              throw await releaseClaimAfterRolledBackDispatch(decision.claim, new AssessmentStartBusyError(reason))
+            }
           }
           return startTransactionalComposite({
             decision,
