@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client'
 import { boundCompositeContinuationSql } from '../assessment-run/boundCompositeContinuation'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
 import {completedSchoolOrdinaryFeedbackSql} from '../assessment-run/completedSchoolFeedback'
+import { withBoundedPlannerRead } from '../assessment-run/plannerBound'
 import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
 import { listAssignedRunTasks, type RunTaskCursor } from '../assessment-run/productRead'
@@ -25,35 +26,37 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, o
   if(actor.accountDomain!=='SCHOOL'||!['TEACHER','ADMIN'].includes(actor.role))
     throw new CampusActivityError('CAMPUS_TEACHER_REQUIRED',403)
   const cursorScope=cursor?Prisma.sql`AND (e.created_at, e.id) < (${cursor.createdAt}::timestamptz, ${cursor.id})`:Prisma.empty
-  const candidates=await prisma.$queryRaw<EligibleTeacherExecution[]>`
+  const candidates=await withBoundedPlannerRead(prisma, client => client.$queryRaw<EligibleTeacherExecution[]>`
     SELECT e.id AS "executionId",e.run_id AS "runId",
       to_char(e.created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros",
       ar.organization_id AS "organizationId",ar.course_id AS "activityId",
       course.title AS "activityTitle",s.user_id AS "studentUserId"
-    FROM assessment_run_executions e
-    JOIN assessment_run_actor_snapshots r ON r.organization_id=e.organization_id
-      AND r.run_id=e.run_id AND r.id=e.respondent_actor_snapshot_id
-      AND r.user_id=${actor.userId} AND r.actor_role='TEACHER' AND r.provenance_kind='ORG_MEMBER'
-    JOIN assessment_run_actor_snapshots s ON s.organization_id=e.organization_id
-      AND s.run_id=e.run_id AND s.id=e.subject_actor_snapshot_id
-      AND s.actor_role='STUDENT' AND s.provenance_kind='ORG_MEMBER'
-    JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id
-      AND a.relationship_kind='CLASS_TEACHER_STUDENT' AND a.policy_domain='ORGANIZATION_RUN'
-    JOIN campus_activity_runs ar ON ar.organization_id=e.organization_id AND ar.run_id=e.run_id
-    JOIN campus_activities activity ON activity.organization_id=ar.organization_id
-      AND activity.course_id=ar.course_id
-    JOIN courses course ON course.id=activity.course_id AND course.course_type='CAMPUS_ACTIVITY'
-    JOIN organizations org ON org.id=ar.organization_id AND org.status='ACTIVE' AND org.product_domain='SCHOOL'
+    FROM organizations org
     JOIN education_product_entitlements ent ON ent.organization_id=org.id
       AND ent.product='HUISCHOOL' AND ent.status='ACTIVE'
-    JOIN assessment_runs run ON run.id=e.run_id AND run.organization_id=e.organization_id
+    JOIN users teacher_user ON teacher_user.id=${actor.userId} AND teacher_user.account_domain='SCHOOL'
+      AND teacher_user.is_active=TRUE AND teacher_user.is_frozen=FALSE
+    JOIN assessment_run_actor_snapshots r ON r.organization_id=org.id
+      AND r.user_id=${actor.userId} AND r.actor_role='TEACHER' AND r.provenance_kind='ORG_MEMBER'
     JOIN organization_memberships teacher ON teacher.id=r.membership_id
-      AND teacher.organization_id=e.organization_id AND teacher.user_id=${actor.userId}
+      AND teacher.organization_id=r.organization_id AND teacher.user_id=${actor.userId}
       AND teacher.valid_from<=statement_timestamp()
       AND (teacher.valid_until IS NULL OR teacher.valid_until>statement_timestamp())
     JOIN organization_persona_grants teacher_role ON teacher_role.organization_id=teacher.organization_id
       AND teacher_role.membership_id=teacher.id AND teacher_role.persona='TEACHER'
       AND teacher_role.revoked_at IS NULL
+    JOIN assessment_run_executions e ON e.respondent_actor_snapshot_id=r.id
+      AND e.organization_id=r.organization_id AND e.run_id=r.run_id
+    JOIN assessment_runs run ON run.id=e.run_id AND run.organization_id=e.organization_id
+    JOIN campus_activity_runs ar ON ar.organization_id=e.organization_id AND ar.run_id=e.run_id
+    JOIN campus_activities activity ON activity.organization_id=ar.organization_id
+      AND activity.course_id=ar.course_id
+    JOIN courses course ON course.id=activity.course_id AND course.course_type='CAMPUS_ACTIVITY'
+    JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id
+      AND a.relationship_kind='CLASS_TEACHER_STUDENT' AND a.policy_domain='ORGANIZATION_RUN'
+    JOIN assessment_run_actor_snapshots s ON s.organization_id=e.organization_id
+      AND s.run_id=e.run_id AND s.id=e.subject_actor_snapshot_id
+      AND s.actor_role='STUDENT' AND s.provenance_kind='ORG_MEMBER'
     JOIN organization_memberships student ON student.id=s.membership_id
       AND student.organization_id=e.organization_id AND student.user_id=s.user_id
       AND student.valid_from<=statement_timestamp()
@@ -61,11 +64,9 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, o
     JOIN organization_persona_grants student_role ON student_role.organization_id=student.organization_id
       AND student_role.membership_id=student.id AND student_role.persona='STUDENT'
       AND student_role.revoked_at IS NULL
-    JOIN users teacher_user ON teacher_user.id=teacher.user_id AND teacher_user.account_domain='SCHOOL'
-      AND teacher_user.is_active=TRUE AND teacher_user.is_frozen=FALSE
     JOIN users student_user ON student_user.id=student.user_id AND student_user.account_domain='SCHOOL'
       AND student_user.is_active=TRUE AND student_user.is_frozen=FALSE
-    WHERE org.id=${organizationId} AND EXISTS (
+    WHERE org.id=${organizationId} AND org.status='ACTIVE' AND org.product_domain='SCHOOL' AND EXISTS (
       SELECT 1 FROM campus_student_enrollments enrollment
       JOIN campus_class_admissions admission ON admission.organization_id=enrollment.organization_id
         AND admission.class_unit_id=enrollment.class_unit_id AND admission.status='APPROVED'
@@ -95,7 +96,7 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, o
        OR ${completedSchoolOrdinaryFeedbackSql(Prisma.sql`e.id`,actor.userId)})
       ${cursorScope}
     ORDER BY e.created_at DESC,e.id DESC LIMIT 101
-  `
+  `)
   const allowed=candidates.slice(0,100)
   if(!allowed.length)return {list:[],truncated:candidates.length>100,nextCursor:null as RunTaskCursor|null}
   const official=await listAssignedRunTasks(actor.userId,{

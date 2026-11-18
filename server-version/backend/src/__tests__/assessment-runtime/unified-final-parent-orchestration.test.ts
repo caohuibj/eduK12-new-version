@@ -6,7 +6,11 @@ const m = vi.hoisted(() => {
   return {
     unitActive: false, events: [] as string[],
     cognitive: vi.fn(), scale: vi.fn(), form: vi.fn(), finalize: vi.fn(),
-    db: { cognitiveSession: { findUnique: vi.fn() }, assessment: { findUnique: vi.fn() }, compositeAssessmentAttempt: { findUnique: vi.fn() } },
+    db: {
+      cognitiveSession: { findUnique: vi.fn() },
+      assessment: { findUnique: vi.fn(), findFirst: vi.fn() },
+      compositeAssessmentAttempt: { findUnique: vi.fn() },
+    },
   }
 })
 vi.mock('../../config/database', () => ({ prisma: m.db }))
@@ -18,7 +22,12 @@ vi.mock('../../services/unitSubmitAdmission', async importOriginal => ({
   },
 }))
 vi.mock('../../modules/cognitive/unified-final-submit.service', () => ({ submitUnifiedCognitiveSessionFinal: m.cognitive }))
-vi.mock('../../modules/scale/unified-final-submit.service', () => ({ submitUnifiedScaleAssessmentFinal: m.scale }))
+vi.mock('../../modules/scale/unified-final-submit.service', () => ({
+  submitUnifiedScaleAssessmentFinal: m.scale,
+  prepareUnifiedScaleFinalSubmission: async () => ({ prepared: true }),
+  prepareUnifiedScaleWrite: async () => ({ write: true }),
+  commitPreparedUnifiedScaleAssessmentFinal: m.scale,
+}))
 vi.mock('../../modules/assessment-runtime/unified-form-section-final-submit.service', () => ({
   submitUnifiedCompositeFormSectionFinal: m.form,
   prepareUnifiedCompositeFormSectionFinal: async (input: unknown) => ({ input }),
@@ -27,7 +36,7 @@ vi.mock('../../modules/assessment-runtime/unified-form-section-final-submit.serv
 vi.mock('../../modules/composite/composite.service', () => ({ finalizeCompositeAttemptIfReady: m.finalize }))
 
 import { submitCognitiveSessionFinalWithContext } from '../../modules/cognitive/final-submit.service'
-import { submitScaleAssessmentFinalWithContext } from '../../modules/scale/scale-final-submit.service'
+import { submitCompositeScaleFinal, submitScaleAssessmentFinalWithContext } from '../../modules/scale/scale-final-submit.service'
 import { submitCompositeFormSectionFinal } from '../../modules/composite/final-submit.service'
 
 const submissionId = '64000000-0000-4000-8000-000000000001'
@@ -98,5 +107,88 @@ describe('Unified child FINAL completes its parent without a runner reread', () 
     m.finalize.mockResolvedValue({ status: 'IN_PROGRESS', progress: 50, completedAt: null })
     const result = await adapters[2].submit()
     expect(result.parent).toMatchObject({ status: 'IN_PROGRESS', progress: 50 })
+  })
+  it.each(adapters)('$name reconciles an ORGANIZATION_RESOURCE / assignmentRef parent without training feedback markers', async adapter => {
+    const educationChild = {
+      ...child(),
+      compositeAttempt: {
+        trainingFeedbackSnapshotHash: null,
+        assignmentRef: 'assign-edu-1',
+        compositeAssessment: { productKind: 'ORGANIZATION_RESOURCE' },
+      },
+    }
+    m.db.cognitiveSession.findUnique.mockResolvedValue(educationChild)
+    m.db.assessment.findUnique.mockResolvedValue(educationChild)
+    m.db.compositeAssessmentAttempt.findUnique.mockResolvedValue({
+      id: 'parent',
+      userId: 'owner',
+      assignmentRef: 'assign-edu-1',
+      runtimeGeneration: 'UNIFIED_V1',
+      trainingFeedbackSnapshotHash: null,
+      trainingVariantAllocationEncrypted: null,
+      trainingVariantAllocationHash: null,
+      trainingFlowSnapshotEncrypted: null,
+      trainingFlowSnapshotHash: null,
+      trainingFlowPathEncrypted: null,
+      trainingFlowPathHash: null,
+      compositeAssessment: {
+        productKind: 'ORGANIZATION_RESOURCE',
+        creationKey: null,
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
+      },
+    })
+    await adapter.submit()
+    expect(m.events).toEqual(['unit-enter', 'child-committed', 'unit-release', 'parent-check'])
+    expect(m.finalize).toHaveBeenCalledExactlyOnceWith('parent')
+  })
+  it('reconciles School receiptOnly scale submit after permit release while keeping response strictly receipt-only', async () => {
+    m.scale.mockImplementation(async () => {
+      expect(m.unitActive).toBe(true)
+      m.events.push('child-committed')
+      return {
+        submissionId,
+        payloadHash: 'hash-1',
+        replayed: false,
+        assessment: { leakedScore: 99 },
+        parent: { leakedParent: true },
+      }
+    })
+    m.db.assessment.findFirst.mockResolvedValue({
+      ...child(),
+      compositeItemId: 'item-1',
+      status: 'IN_PROGRESS',
+      compositeAttempt: {
+        trainingFeedbackSnapshotHash: null,
+        assignmentRef: 'assign-school-1',
+        compositeAssessment: { productKind: 'ORGANIZATION_RESOURCE' },
+      },
+    })
+    const output = await submitCompositeScaleFinal(
+      'parent',
+      'item-1',
+      { ...input, answers: [] },
+      { userId: 'owner' },
+      { receiptOnly: true },
+    )
+    expect(m.events).toEqual(['unit-enter', 'child-committed', 'unit-release', 'parent-check'])
+    expect(m.finalize).toHaveBeenCalledExactlyOnceWith('parent')
+    expect(output).toEqual({ submissionId, payloadHash: 'hash-1', replayed: false, completed: true })
+
+    // Non-education receiptOnly parent stays untouched
+    m.events = []
+    m.finalize.mockClear()
+    m.db.assessment.findFirst.mockResolvedValue({
+      ...child(),
+      compositeItemId: 'item-1',
+      status: 'IN_PROGRESS',
+      compositeAttempt: { trainingFeedbackSnapshotHash: 'frozen-feedback', assignmentRef: null, compositeAssessment: { productKind: 'COMPOSITE_ASSESSMENT' } },
+    })
+    await submitCompositeScaleFinal('parent', 'item-1', { ...input, answers: [] }, { userId: 'owner' }, { receiptOnly: true })
+    expect(m.finalize).not.toHaveBeenCalled()
   })
 })

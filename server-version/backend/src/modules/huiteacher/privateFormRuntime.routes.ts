@@ -7,10 +7,13 @@ import {authenticateHuiteacher} from '../../middleware/auth'
 import {asyncHandler} from '../../middleware/asyncHandler'
 import {success,notFound} from '../../utils/response'
 import {currentRunPopulationAuthoritySql} from '../assessment-run/currentPopulationAuthority'
+import {withBoundedPlannerRead} from '../assessment-run/plannerBound'
 import {privateFormTrackIdentitySql} from '../assessment-run/educationPrivateFormIdentitySql'
 import {boundCompositeContinuationSql} from '../assessment-run/boundCompositeContinuation'
 import {readPrivateFormExecutionSource} from '../assessment-run/educationPrivateFormExecution'
 import {startAssessmentRunExecution} from '../assessment-run/startExecution'
+import {isAssessmentStartBusyError} from '../composite/start-transient'
+import {isAssessmentStartResourceGateError} from '../../services/assessmentResourceProtection'
 import {resolveEducationProductMemberScope} from '../organization/educationProductAccess'
 import {relationalRuntimeConsentAuthority} from '../assessment-relational/runtime-consent'
 import {compositeController} from '../composite/composite.controller'
@@ -21,6 +24,16 @@ router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 const wrap=(work:(req:Request)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
  try{return success(res,await work(req))}catch(error){
   if(error instanceof ZodError)return res.status(400).json({code:'HUITEACHER_PRIVATE_FORM_INPUT_INVALID',message:'表单任务参数无效',data:null})
+  if(isAssessmentStartResourceGateError(error)){
+   const preferred=(error as {preferredRetryAfterSeconds?:number}).preferredRetryAfterSeconds
+   const retryAfter=typeof preferred==='number'&&Number.isFinite(preferred)&&preferred>0?Math.ceil(preferred):10
+   res.setHeader('Retry-After',String(retryAfter))
+   return res.status(error.statusCode).json({code:error.code,message:error.message,data:null})
+  }
+  if(isAssessmentStartBusyError(error)){
+   res.setHeader('Retry-After',String(error.retryAfterSeconds))
+   return res.status(503).json({code:error.code,message:error.message,data:null})
+  }
   const e=error as {code?:string;statusCode?:number;message?:string}
   if(typeof e.statusCode==='number'&&e.statusCode>=400&&e.statusCode<500)return res.status(e.statusCode).json({code:e.code??'HUITEACHER_PRIVATE_FORM_UNAVAILABLE',message:e.message??'表单任务不可用',data:null})
   throw error
@@ -44,19 +57,21 @@ function decodeCursor(value:string,actorUserId:string):TaskCursor{
 const withoutCursor=({cursorCreatedAt:_cursor,...task}:TaskRow):Task=>task
 /** Every page uses the same current actor/source authority predicates as exact task access. */
 async function queryOwnTasks(actorUserId:string,filter:{executionId?:string;attemptId?:string;cursor?:TaskCursor;limit:number}){
- return prisma.$queryRaw<TaskRow[]>(Prisma.sql`
+ return withBoundedPlannerRead(prisma, client => client.$queryRaw<TaskRow[]>(Prisma.sql`
   SELECT e.id AS "executionId",e.run_id AS "runId",e.organization_id AS "organizationId",event.id AS "eventId",
    event.title AS "eventTitle",event.status AS "eventStatus",c.name AS "formTitle",e.status,r.status AS "runStatus",
    e.runtime_binding_kind AS "runtimeBindingKind",e.runtime_binding_ref AS "runtimeBindingRef",
    to_char(e.created_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "cursorCreatedAt"
-  FROM assessment_run_executions e JOIN assessment_runs r ON r.id=e.run_id AND r.organization_id=e.organization_id
+  FROM relational_assessment_assignments a
+  JOIN assessment_run_executions e ON e.relational_assignment_id=a.id
+  JOIN assessment_runs r ON r.id=e.run_id AND r.organization_id=e.organization_id
   JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
+   AND a.resource_kind=t.resource_family AND a.resource_key=t.resource_key AND a.resource_version=t.resource_version
   JOIN huiteacher_evaluation_run_links link ON link.run_id=e.run_id AND link.organization_id=e.organization_id
   JOIN huiteacher_evaluation_events event ON event.id=link.event_id AND event.organization_id=link.organization_id
-  JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
-   AND a.resource_kind=t.resource_family AND a.resource_key=t.resource_key AND a.resource_version=t.resource_version
   JOIN composite_assessments c ON c.creation_key=t.resource_key
   WHERE a.respondent_user_id=${actorUserId} AND a.subject_user_id=${actorUserId}
+   AND a.policy_domain='ORGANIZATION_RUN'
    AND a.relationship_kind='SELF' AND a.respondent_role='TEACHER' AND a.subject_role='TEACHER'
    AND a.status NOT IN ('REVOKED','EXPIRED') AND e.status IN ('ASSIGNED','STARTED','COMPLETED')
    AND ${privateFormTrackIdentitySql({track:Prisma.sql`t`,organizationId:Prisma.sql`e.organization_id`,product:'TEACHER'})}
@@ -69,7 +84,7 @@ async function queryOwnTasks(actorUserId:string,filter:{executionId?:string;atte
    ${filter?.executionId?Prisma.sql`AND e.id=${filter.executionId}`:Prisma.empty}
    ${filter?.attemptId?Prisma.sql`AND e.runtime_binding_kind='COMPOSITE' AND e.runtime_binding_ref=${filter.attemptId}`:Prisma.empty}
   ${filter.cursor?Prisma.sql`AND (e.created_at,e.id)<(${filter.cursor.createdAt}::timestamptz,${filter.cursor.executionId}::text)`:Prisma.empty}
-  ORDER BY e.created_at DESC,e.id DESC LIMIT ${filter.limit}`)
+  ORDER BY e.created_at DESC,e.id DESC LIMIT ${filter.limit}`))
 }
 /** Existing exact execution/attempt callers keep their array contract and authority checks. */
 export async function listOwnTeacherPrivateFormTasks(actorUserId:string,filter?:{executionId?:string;attemptId?:string}){

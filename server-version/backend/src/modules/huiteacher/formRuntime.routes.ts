@@ -5,7 +5,9 @@ import { authenticateHuiteacher } from '../../middleware/auth'
 import { prisma } from '../../config/database'
 import { success } from '../../utils/response'
 import { startAssessmentRunExecution } from '../assessment-run/startExecution'
+import { withBoundedPlannerRead } from '../assessment-run/plannerBound'
 import { isAssessmentStartBusyError } from '../composite/start-transient'
+import { isAssessmentStartResourceGateError } from '../../services/assessmentResourceProtection'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 import {
   readOwnHuiteacherFormTask,submitOwnHuiteacherFormFinal,HuiteacherFinalError,
@@ -26,6 +28,12 @@ const respond=(task:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
     if(e instanceof ZodError)return res.status(400).json({
       code:'HUITEACHER_TASK_INPUT_INVALID',message:'任务参数格式不合法',data:null,
     })
+    if(isAssessmentStartResourceGateError(e)){
+      const preferred=(e as {preferredRetryAfterSeconds?:number}).preferredRetryAfterSeconds
+      const retryAfter=typeof preferred==='number'&&Number.isFinite(preferred)&&preferred>0?Math.ceil(preferred):10
+      res.setHeader('Retry-After',String(retryAfter))
+      return res.status(e.statusCode).json({code:e.code,message:e.message,data:null})
+    }
     if(isAssessmentStartBusyError(e)){
       res.setHeader('Retry-After',String(e.retryAfterSeconds))
       return res.status(503).json({code:e.code,message:e.message,data:null})
@@ -46,7 +54,7 @@ const respond=(task:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
  */
 router.get('/my-form-tasks',authenticateHuiteacher,respond(async req=>{
   const actorId=req.user!.userId
-  const rows=await prisma.$queryRaw<Array<{
+  const rows=await withBoundedPlannerRead(prisma, client => client.$queryRaw<Array<{
     executionId:string;runId:string;organizationId:string;
     eventId:string;eventTitle:string;formId:string;formTitle:string;
     status:string;runtimeBindingKind:string|null;runtimeBindingRef:string|null
@@ -57,12 +65,23 @@ router.get('/my-form-tasks',authenticateHuiteacher,respond(async req=>{
       form."id" AS "formId",form."title" AS "formTitle",
       execution."status",execution."runtime_binding_kind" AS "runtimeBindingKind",
       execution."runtime_binding_ref" AS "runtimeBindingRef"
-    FROM "assessment_run_executions" execution
+    FROM "organization_memberships" m
+    JOIN "organization_persona_grants" persona
+      ON persona."organization_id"=m."organization_id"
+      AND persona."membership_id"=m."id"
+      AND persona."persona"='TEACHER' AND persona."revoked_at" IS NULL
+    JOIN "organizations" org ON org."id"=m."organization_id"
+      AND org."status"='ACTIVE'
+    JOIN "education_product_entitlements" entitlement
+      ON entitlement."organization_id"=org."id"
+      AND entitlement."product"='HUITEACHER' AND entitlement."status"='ACTIVE'
     JOIN "assessment_run_actor_snapshots" respondent
-      ON respondent."organization_id"=execution."organization_id"
-      AND respondent."run_id"=execution."run_id"
-      AND respondent."id"=execution."respondent_actor_snapshot_id"
+      ON respondent."organization_id"=org."id"
       AND respondent."user_id"=${actorId} AND respondent."actor_role"='TEACHER'
+    JOIN "assessment_run_executions" execution
+      ON execution."respondent_actor_snapshot_id"=respondent."id"
+      AND execution."organization_id"=respondent."organization_id"
+      AND execution."run_id"=respondent."run_id"
     JOIN "assessment_run_actor_snapshots" subject
       ON subject."id"=execution."subject_actor_snapshot_id"
       AND subject."user_id"=${actorId} AND subject."actor_role"='TEACHER'
@@ -81,21 +100,10 @@ router.get('/my-form-tasks',authenticateHuiteacher,respond(async req=>{
       ON event."organization_id"=link."organization_id"
       AND event."id"=link."event_id"
       AND event."status" IN ('OPEN','CLOSED')
-    JOIN "education_product_entitlements" entitlement
-      ON entitlement."organization_id"=execution."organization_id"
-      AND entitlement."product"='HUITEACHER' AND entitlement."status"='ACTIVE'
-    JOIN "organizations" org ON org."id"=execution."organization_id"
-      AND org."status"='ACTIVE'
-    JOIN "organization_memberships" m
-      ON m."organization_id"=org."id"
-      AND m."user_id"=${actorId}
+    WHERE m."user_id"=${actorId}
       AND m."valid_from"<=statement_timestamp()
       AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
-    JOIN "organization_persona_grants" persona
-      ON persona."organization_id"=m."organization_id"
-      AND persona."membership_id"=m."id"
-      AND persona."persona"='TEACHER' AND persona."revoked_at" IS NULL
-    WHERE execution."status" IN ('ASSIGNED','STARTED','COMPLETED')
+      AND execution."status" IN ('ASSIGNED','STARTED','COMPLETED')
       AND NOT EXISTS(
         SELECT 1 FROM "organization_access_denies" deny
         WHERE deny."organization_id"=org."id"
@@ -104,7 +112,7 @@ router.get('/my-form-tasks',authenticateHuiteacher,respond(async req=>{
       )
     ORDER BY execution."created_at" DESC,execution."id" DESC
     LIMIT 101
-  `
+  `)
   return {list:rows.slice(0,100),truncated:rows.length>100}
 }))
 
@@ -117,7 +125,7 @@ router.get('/my-student-evaluations',authenticateHuiteacher,respond(async req=>{
     throw new HuiteacherFinalError('HUITEACHER_STUDENT_FEEDBACK_DISABLED',404)
   if(req.user!.role!=='STUDENT')throw new HuiteacherFinalError('HUITEACHER_STUDENT_ONLY',403)
   const actorId=req.user!.userId
-  const rows=await prisma.$queryRaw<Array<{
+  const rows=await withBoundedPlannerRead(prisma, client => client.$queryRaw<Array<{
     executionId:string;runId:string;organizationId:string;
     eventId:string;eventTitle:string;teacherName:string;
     formId:string;formTitle:string;deadline:Date|null;
@@ -131,7 +139,25 @@ router.get('/my-student-evaluations',authenticateHuiteacher,respond(async req=>{
       run."intake_deadline" AS "deadline",
       execution."status",execution."runtime_binding_kind" AS "runtimeBindingKind",
       execution."runtime_binding_ref" AS "runtimeBindingRef"
-    FROM "assessment_run_executions" execution
+    FROM "organization_memberships" member
+    JOIN "organization_persona_grants" persona
+      ON persona."organization_id"=member."organization_id"
+      AND persona."membership_id"=member."id"
+      AND persona."persona"='STUDENT' AND persona."revoked_at" IS NULL
+    JOIN "organizations" org
+      ON org."id"=member."organization_id" AND org."status"='ACTIVE'
+      AND org."product_domain"='SCHOOL'
+    JOIN "education_product_entitlements" product
+      ON product."organization_id"=org."id"
+      AND product."product"='HUITEACHER' AND product."status"='ACTIVE'
+    JOIN "assessment_run_actor_snapshots" respondent
+      ON respondent."organization_id"=org."id"
+      AND respondent."user_id"=${actorId}
+      AND respondent."actor_role"='STUDENT'
+    JOIN "assessment_run_executions" execution
+      ON execution."respondent_actor_snapshot_id"=respondent."id"
+      AND execution."organization_id"=respondent."organization_id"
+      AND execution."run_id"=respondent."run_id"
     JOIN "assessment_runs" run ON run."id"=execution."run_id"
       AND run."organization_id"=execution."organization_id"
       AND run."status" IN ('PUBLISHED','CLOSED')
@@ -158,12 +184,6 @@ router.get('/my-student-evaluations',authenticateHuiteacher,respond(async req=>{
     JOIN "huiteacher_form_instruments" form
       ON form."id"=cfg."form_id" AND form."organization_id"=cfg."organization_id"
       AND form."status"='PUBLISHED'
-    JOIN "assessment_run_actor_snapshots" respondent
-      ON respondent."id"=execution."respondent_actor_snapshot_id"
-      AND respondent."organization_id"=execution."organization_id"
-      AND respondent."run_id"=execution."run_id"
-      AND respondent."user_id"=${actorId}
-      AND respondent."actor_role"='STUDENT'
     JOIN "assessment_run_actor_snapshots" subject
       ON subject."id"=execution."subject_actor_snapshot_id"
       AND subject."organization_id"=execution."organization_id"
@@ -175,21 +195,10 @@ router.get('/my-student-evaluations',authenticateHuiteacher,respond(async req=>{
       AND relation."relationship_kind"='CLASS_TEACHER_STUDENT'
       AND relation."snapshot_payload"->'facts'->>'staffClassAssignmentId'=cfg."staff_assignment_id"
       AND relation."snapshot_payload"->'facts'->>'classUnitId'=cfg."class_unit_id"
-    JOIN "education_product_entitlements" product
-      ON product."organization_id"=execution."organization_id"
-      AND product."product"='HUITEACHER' AND product."status"='ACTIVE'
-    JOIN "organizations" org
-      ON org."id"=execution."organization_id" AND org."status"='ACTIVE'
-      AND org."product_domain"='SCHOOL'
-    JOIN "organization_memberships" member ON member."organization_id"=org."id"
-      AND member."user_id"=${actorId}
+    WHERE member."user_id"=${actorId}
       AND member."valid_from"<=statement_timestamp()
       AND (member."valid_until" IS NULL OR member."valid_until">statement_timestamp())
-    JOIN "organization_persona_grants" persona
-      ON persona."organization_id"=member."organization_id"
-      AND persona."membership_id"=member."id"
-      AND persona."persona"='STUDENT' AND persona."revoked_at" IS NULL
-    WHERE execution."status" IN ('ASSIGNED','STARTED','COMPLETED')
+      AND execution."status" IN ('ASSIGNED','STARTED','COMPLETED')
       AND (
         execution."status"='COMPLETED'
         OR EXISTS (
@@ -214,7 +223,7 @@ router.get('/my-student-evaluations',authenticateHuiteacher,respond(async req=>{
           AND deny."lifted_at" IS NULL
           AND deny."permission" IN ('*','EDUCATION_ACCESS','HUITEACHER_ACCESS','RUN_START'))
     ORDER BY execution."created_at" DESC,execution."id" DESC LIMIT 101
-  `
+  `)
   return {list:rows.slice(0,100),truncated:rows.length>100}
 }))
 

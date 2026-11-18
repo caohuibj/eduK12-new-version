@@ -2,6 +2,7 @@ import { boundCompositeContinuationSql } from './boundCompositeContinuation'
 import { Prisma } from '@prisma/client'
 import { currentRunPopulationAuthoritySql } from './currentPopulationAuthority'
 import {completedSchoolOrdinaryFeedbackSql} from './completedSchoolFeedback'
+import { withBoundedPlannerRead } from './plannerBound'
 import { prisma } from '../../config/database'
 import { AssessmentRunRepositoryError, type AssessmentRunStatus } from './repository'
 
@@ -222,6 +223,7 @@ export function decodeRunTaskCursor(value: unknown): RunTaskCursor | undefined {
 
 /** Exact respondent tasks with their assigned subject; no peer respondents, answers or scores. */
 export async function listAssignedRunTasks(userId: string, options?: {
+  organizationIds?: string[]
   runIds?: string[]
   /** DB-side allowlist: only these executions are returned. The teacher task
    * list uses it so non-eligible executions cannot consume the reader's
@@ -236,6 +238,7 @@ export async function listAssignedRunTasks(userId: string, options?: {
   /** Own completed ordinary observer feedback; does not authorize collection. */
   includeCompletedSchoolFeedback?: boolean
 }) {
+  if(options?.organizationIds && options.organizationIds.length===0) return { list:[], truncated:false, nextCursor:null as RunTaskCursor | null }
   if(options?.runIds && options.runIds.length===0) return { list:[], truncated:false, nextCursor:null as RunTaskCursor | null }
   if(options?.executionIds && options.executionIds.length===0) return { list:[], truncated:false, nextCursor:null as RunTaskCursor | null }
   const limit = Math.min(100, Math.max(1, Math.floor(options?.limit ?? 100)))
@@ -247,11 +250,26 @@ export async function listAssignedRunTasks(userId: string, options?: {
   const cursorCreatedAt = options?.cursor ? canonicalCursorTimestamp(options.cursor.createdAt) : null
   if (options?.cursor && (cursorCreatedAt === null || !options.cursor.id))
     throw new Error('RUN_TASK_CURSOR_INVALID')
+  const actorOrgsSql = options?.organizationIds
+    ? Prisma.sql`(SELECT DISTINCT unnest(${options.organizationIds}::text[]) AS "organization_id")`
+    : Prisma.sql`(
+        SELECT DISTINCT m."organization_id"
+        FROM "organization_memberships" m
+        WHERE m."user_id" = ${userId}
+        UNION
+        SELECT DISTINCT child."organization_id"
+        FROM "parent_student_relationships" psr
+        JOIN "organization_memberships" child ON child."user_id" = psr."student_user_id"
+        WHERE psr."parent_user_id" = ${userId}
+      )`
+  const respondentRunScope=options?.runIds
+    ? Prisma.sql`AND respondent."run_id" = ANY(${options.runIds}::text[])`
+    : Prisma.empty
   const runScope=options?.runIds
-    ? Prisma.sql`AND r."id" IN (${Prisma.join(options.runIds)})`
+    ? Prisma.sql`AND r."id" = ANY(${options.runIds}::text[])`
     : Prisma.empty
   const executionScope=options?.executionIds
-    ? Prisma.sql`AND e."id" IN (${Prisma.join(options.executionIds)})`
+    ? Prisma.sql`AND e."id" = ANY(${options.executionIds}::text[])`
     : Prisma.empty
   const cursorScope=cursorCreatedAt
     ? Prisma.sql`AND (e."created_at", e."id") < (${cursorCreatedAt}::timestamptz, ${options!.cursor!.id})`
@@ -264,17 +282,17 @@ export async function listAssignedRunTasks(userId: string, options?: {
       AND NOT EXISTS (SELECT 1 FROM "huiteacher_evaluation_run_links" h
         WHERE h."organization_id"=e."organization_id" AND h."run_id"=e."run_id"))`
     : Prisma.sql`FALSE`
-  const schoolContinuation = options?.preserveBoundSchoolContinuation
-    ? Prisma.sql`(${schoolScope} AND r."status" IN ('PUBLISHED','CLOSED')
+  const schoolContinuationExpr = options?.preserveBoundSchoolContinuation
+    ? Prisma.sql`(school_scope."inSchoolScope" AND r."status" IN ('PUBLISHED','CLOSED')
       AND ${boundCompositeContinuationSql(Prisma.sql`e."id"`, userId)})`
     : Prisma.sql`FALSE`
   const closedScope = options?.preserveBoundSchoolContinuation
-    ? Prisma.sql`(r."status" <> 'CLOSED' OR NOT ${schoolScope} OR ${schoolContinuation})`
+    ? Prisma.sql`(r."status" <> 'CLOSED' OR NOT school_scope."inSchoolScope" OR school_cont."boundContinuation")`
     : Prisma.sql`TRUE`
   const completedSchoolFeedback=options?.includeCompletedSchoolFeedback
     ? completedSchoolOrdinaryFeedbackSql(Prisma.sql`e."id"`,userId)
     : Prisma.sql`FALSE`
-  const list = await prisma.$queryRaw<Array<{
+  const list = await withBoundedPlannerRead(prisma, client => client.$queryRaw<Array<{
     __boundSchoolContinuation: boolean; createdAtMicros: string;
     executionId: string; organizationId: string; runId: string; runName: string;
     subjectUserId: string; subjectRole: string; subjectName: string; respondentRole: string; relationship: string; perspective: string; deadline: Date | null;
@@ -282,7 +300,7 @@ export async function listAssignedRunTasks(userId: string, options?: {
     resourceFamily: string; resourceKey: string; resourceVersion: string;
     governedReport: boolean; reportAttemptId: string | null; consentRequired: boolean; consentPurpose: string | null; consentVisibility: string | null;
   }>>`
-    SELECT ${schoolContinuation} AS "__boundSchoolContinuation",
+    SELECT school_cont."boundContinuation" AS "__boundSchoolContinuation",
       to_char(e."created_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros",
       e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",
       r."name" AS "runName", r."status" AS "runStatus", r."intake_deadline" AS "deadline",
@@ -292,7 +310,7 @@ export async function listAssignedRunTasks(userId: string, options?: {
       CASE WHEN ca."status" = 'COMPLETED' THEN 'COMPLETED'
         WHEN r."status" = 'CANCELLED' THEN 'CANCELLED'
         WHEN e."status" IN ('REVOKED', 'EXPIRED', 'CANCELLED', 'COMPLETED') THEN e."status"
-        WHEN ${schoolContinuation} AND r."status" IN ('PUBLISHED','CLOSED') THEN 'STARTED'
+        WHEN school_cont."boundContinuation" AND r."status" IN ('PUBLISHED','CLOSED') THEN 'STARTED'
         WHEN r."status" = 'CLOSED' OR r."intake_deadline" <= statement_timestamp() THEN 'EXPIRED'
         ELSE e."status" END AS "status",
       c."state" AS "claimState", t."resource_family" AS "resourceFamily",
@@ -302,18 +320,23 @@ export async function listAssignedRunTasks(userId: string, options?: {
       CASE WHEN ca."status" = 'COMPLETED' AND a."analysis_mode" = 'INDIVIDUAL_ONLY'
         AND a."perspective" <> 'RELATIONAL_EXPERIENCE' AND NOT (t."frozen_resource_policy" ? 'resultDisclosure')
         THEN ca."id" ELSE NULL END AS "reportAttemptId"
-    FROM "assessment_run_executions" e
-    JOIN "assessment_run_actor_snapshots" respondent ON respondent."id" = e."respondent_actor_snapshot_id"
-      AND respondent."organization_id" = e."organization_id" AND respondent."run_id" = e."run_id"
-    JOIN "assessment_run_actor_snapshots" subject ON subject."id" = e."subject_actor_snapshot_id" AND subject."organization_id" = e."organization_id"
-    JOIN "users" subject_user ON subject_user."id" = subject."user_id"
+    FROM ${actorOrgsSql} actor_orgs
+    JOIN "assessment_run_actor_snapshots" respondent ON respondent."organization_id" = actor_orgs."organization_id"
+      AND respondent."user_id" = ${userId}
+      ${respondentRunScope}
+    JOIN "assessment_run_executions" e ON e."respondent_actor_snapshot_id" = respondent."id"
+      AND e."organization_id" = respondent."organization_id" AND e."run_id" = respondent."run_id"
     JOIN "assessment_runs" r ON r."id" = e."run_id" AND r."organization_id" = e."organization_id"
     JOIN "assessment_run_tracks" t ON t."id" = e."track_id" AND t."organization_id" = e."organization_id"
+    JOIN "assessment_run_actor_snapshots" subject ON subject."id" = e."subject_actor_snapshot_id" AND subject."organization_id" = e."organization_id"
+    JOIN "users" subject_user ON subject_user."id" = subject."user_id"
     LEFT JOIN "assessment_run_execution_start_claims" c ON c."execution_id" = e."id"
     LEFT JOIN "relational_assessment_assignments" a ON a."id" = e."relational_assignment_id"
     LEFT JOIN "composite_assessment_attempts" ca ON e."runtime_binding_kind" = 'COMPOSITE'
       AND ca."id" = e."runtime_binding_ref" AND ca."user_id" = ${userId}
     LEFT JOIN "assessment_attempt_consents" consent ON consent."id" = a."consent_id"
+    CROSS JOIN LATERAL (SELECT ${schoolScope} AS "inSchoolScope" OFFSET 0) school_scope
+    CROSS JOIN LATERAL (SELECT ${schoolContinuationExpr} AS "boundContinuation" OFFSET 0) school_cont
     WHERE respondent."user_id" = ${userId}
       ${runScope}
       ${executionScope}
@@ -325,7 +348,7 @@ export async function listAssignedRunTasks(userId: string, options?: {
           AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START')))
         OR ${completedSchoolFeedback})
     ORDER BY e."created_at" DESC, e."id" DESC LIMIT ${limit + 1}
-  `
+  `)
   const page = list.slice(0, limit)
   const last = page[page.length - 1]
   return {

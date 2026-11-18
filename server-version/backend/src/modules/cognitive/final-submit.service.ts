@@ -289,6 +289,13 @@ const prepareFinalCognitiveData = async (
   return { payloadHash, trials, ...encrypted, resultSnapshot }
 }
 
+const isEducationResourceParent = (parent: {
+  assignmentRef?: string | null
+  compositeAssessment?: { productKind?: string | null } | null
+} | null | undefined): boolean => Boolean(
+  parent?.assignmentRef || parent?.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE',
+)
+
 const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
   const submissionId = validateSubmissionId(input.submissionId)
   const child = await measureRequestPhase('final_submit_admission', () => prisma.cognitiveSession.findUnique({
@@ -305,7 +312,8 @@ const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
       ...(await submitUnifiedCognitiveSessionFinal(input, child)),
       // Canonical child FINAL is already committed. Non-async parents still
       // need their completeness check, after releasing the UNIT permit.
-      shouldFinalize: Boolean(child.compositeAttemptId) && shouldReconcileTrainingParent(child.compositeAttempt),
+      shouldFinalize: Boolean(child.compositeAttemptId)
+        && (shouldReconcileTrainingParent(child.compositeAttempt) || isEducationResourceParent(child.compositeAttempt)),
       finalizeCompositeAttemptId: child.compositeAttemptId ?? null,
       internalContext,
     }

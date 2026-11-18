@@ -2,6 +2,13 @@ import {
   getReportPackageDefinition,
   readFrozenReportPackageSnapshot,
 } from '../cognitive-analysis'
+import { BoundedTtlCache } from './start-read-cache'
+
+const frozenPackageSlotLabelCache = new BoundedTtlCache<ReadonlyArray<[number, string]>>(120_000, 128)
+
+export const resetFrozenPackageSlotLabelCacheForTests = (): void => {
+  frozenPackageSlotLabelCache.clear()
+}
 
 /**
  * Package instances expose labels from their frozen definition.  A materialized
@@ -11,7 +18,16 @@ import {
 export const getFrozenPackageSlotLabels = (composite: any): Map<number, string> => {
   if (!composite?.reportPackageKey || !composite?.reportPackageVersion) return new Map()
 
+  const cacheKey = typeof composite.reportPackageSnapshotEncrypted === 'string' && composite.reportPackageSnapshotEncrypted
+    ? `${process.env.DATA_ENCRYPTION_KEY?.slice(0, 8) ?? ''}\0${composite.reportPackageKey}\0${composite.reportPackageVersion}\0${composite.reportPackageSnapshotEncrypted}`
+    : null
+  if (cacheKey) {
+    const cached = frozenPackageSlotLabelCache.get(cacheKey)
+    if (cached) return new Map(cached)
+  }
+
   let definition: any = null
+  let fromEncryptedSnapshot = false
   if (composite.reportPackageSnapshotEncrypted) {
     try {
       const snapshot = readFrozenReportPackageSnapshot(composite.reportPackageSnapshotEncrypted)
@@ -20,6 +36,7 @@ export const getFrozenPackageSlotLabels = (composite: any): Map<number, string> 
         && snapshot.packageVersion === composite.reportPackageVersion
       ) {
         definition = snapshot.packageDefinition
+        fromEncryptedSnapshot = true
       }
     } catch {
       // Publish/copy reject malformed snapshots.  Drafts without a snapshot
@@ -34,11 +51,13 @@ export const getFrozenPackageSlotLabels = (composite: any): Map<number, string> 
     }
   }
 
-  return new Map(
-    (definition?.slots ?? [])
-      .filter((slot: any) => Number.isInteger(slot.position) && typeof slot.label === 'string')
-      .map((slot: any) => [slot.position, slot.label] as [number, string]),
-  )
+  const entries: ReadonlyArray<[number, string]> = (definition?.slots ?? [])
+    .filter((slot: any) => Number.isInteger(slot.position) && typeof slot.label === 'string')
+    .map((slot: any) => [slot.position, slot.label] as [number, string])
+  if (cacheKey && fromEncryptedSnapshot) {
+    frozenPackageSlotLabelCache.set(cacheKey, entries)
+  }
+  return new Map(entries)
 }
 
 export const resolveCompositeItemLabel = (item: any, packageSlotLabels = new Map<number, string>()) =>

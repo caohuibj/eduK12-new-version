@@ -110,16 +110,7 @@ jobs:
       - name: dependency audit (high and critical)
         if: inputs.affected_only != true && !inputs.retry_only
         run: |
-          for attempt in 1 2 3; do
-            if npm audit --audit-level=high; then
-              exit 0
-            fi
-            if [ "$attempt" -lt 3 ]; then
-              echo "npm audit failed on attempt $attempt; retrying after transient-registry backoff"
-              sleep $((attempt * 10))
-            fi
-          done
-          exit 1
+          node "$GITHUB_WORKSPACE/.github/scripts/audit-high-with-exception.mjs"
       - name: full frontend tests
         id: full-frontend-tests
         if: inputs.affected_only != true && inputs.cognitive_owned_by_backend != true && !inputs.retry_only

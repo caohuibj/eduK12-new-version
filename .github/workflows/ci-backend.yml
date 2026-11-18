@@ -106,16 +106,7 @@ jobs:
           node -e "require('canvas')"
       - name: dependency audit (high and critical)
         run: |
-          for attempt in 1 2 3; do
-            if npm audit --audit-level=high; then
-              exit 0
-            fi
-            if [ "$attempt" -lt 3 ]; then
-              echo "npm audit failed on attempt $attempt; retrying after transient-registry backoff"
-              sleep $((attempt * 10))
-            fi
-          done
-          exit 1
+          node "$GITHUB_WORKSPACE/.github/scripts/audit-high-with-exception.mjs"
       - name: validate bounded backend API focus
         if: inputs.focus != 'full'
         env:

@@ -226,6 +226,13 @@ const parentProgressUpdate = async (tx: Prisma.TransactionClient, assessment: an
   return null
 }
 
+const isEducationResourceParent = (parent: {
+  assignmentRef?: string | null
+  compositeAssessment?: { productKind?: string | null } | null
+} | null | undefined): boolean => Boolean(
+  parent?.assignmentRef || parent?.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE',
+)
+
 const finalizeLinkedParent = async (assessment: any): Promise<void> => {
   if (assessment.compositeAttemptId) {
     const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
@@ -256,8 +263,10 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, loca
     const data = receiptOnly
       ? await submitUnifiedScaleAssessmentFinal(input, child, undefined, undefined, true)
       : await submitUnifiedScaleAssessmentFinal(input, child)
-    const shouldFinalize = !receiptOnly && Boolean(child.compositeAttemptId)
-      && shouldReconcileTrainingParent(child.compositeAttempt)
+    const shouldFinalize = Boolean(child.compositeAttemptId)
+      && child.compositeAttempt?.status !== 'COMPLETED'
+      && (isEducationResourceParent(child.compositeAttempt)
+        || (!receiptOnly && shouldReconcileTrainingParent(child.compositeAttempt)))
     return {
       ...data,
       shouldFinalize,
@@ -626,8 +635,10 @@ export const submitCompositeScaleFinal = async (
       const data = await withUnitSubmitAdmission(() => commitPreparedUnifiedScaleAssessmentFinal(
         builtInput, child, prepared, undefined, undefined, responseOptions?.receiptOnly, write,
       ))
-      const shouldFinalize = !responseOptions?.receiptOnly && Boolean(child.compositeAttemptId)
-        && shouldReconcileTrainingParent(child.compositeAttempt)
+      const shouldFinalize = Boolean(child.compositeAttemptId)
+        && child.compositeAttempt?.status !== 'COMPLETED'
+        && (isEducationResourceParent(child.compositeAttempt)
+          || (!responseOptions?.receiptOnly && shouldReconcileTrainingParent(child.compositeAttempt)))
       return {
         ...data,
         shouldFinalize,

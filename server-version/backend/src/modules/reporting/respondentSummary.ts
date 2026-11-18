@@ -1,6 +1,7 @@
 import {isSelfGroupV2Entry} from '../assessment-policy/self-group-contract'
 import { Prisma } from '@prisma/client'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
+import { withBoundedPlannerRead, type PlannerBoundReadDb } from '../assessment-run/plannerBound'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { projectAudienceResult, validateResultDisclosureContract } from '../assessment-policy/result-disclosure'
@@ -20,7 +21,7 @@ export function readRespondentRunSummary(userId:string,executionId:string,option
  * Existing two-argument callers are unchanged. */
 export async function readRespondentRunSummary(userId: string, executionId: string, options?:RespondentDisclosureOptions) {
   const db=options?.db??prisma
-  const readOwn = () => db.$queryRaw<Array<{ organizationId: string; runId: string; trackId: string; subjectUserId: string; relationship: string; perspective: any; family: string; key: string; version: string; policy: any; hash: string }>>`
+  const queryOwn = (client: Pick<PlannerBoundReadDb, '$queryRaw'>) => client.$queryRaw<Array<{ organizationId: string; runId: string; trackId: string; subjectUserId: string; relationship: string; perspective: any; family: string; key: string; version: string; policy: any; hash: string }>>`
     SELECT e.organization_id AS "organizationId",e.run_id AS "runId",e.track_id AS "trackId",s.user_id AS "subjectUserId",
       a.relationship_kind AS relationship,a.perspective,t.resource_family AS family,t.resource_key AS key,t.resource_version AS version,
       t.frozen_resource_policy AS policy,t.resource_policy_hash AS hash
@@ -51,6 +52,7 @@ export async function readRespondentRunSummary(userId: string, executionId: stri
       AND NOT EXISTS(SELECT 1 FROM organization_access_denies d WHERE d.organization_id=e.organization_id AND d.user_id=${userId}
         AND d.lifted_at IS NULL AND d.permission IN ('*','REPORT_READ','PARTICIPANT_REPORT_READ'))
   `
+  const readOwn = () => options?.db ? queryOwn(options.db) : withBoundedPlannerRead(prisma, queryOwn)
   const row = (await readOwn())[0]
   if (!row?.policy?.resultDisclosure || canonicalHash(row.policy) !== row.hash) return hidden()
   const entry = await resolveHistoricalRelationalEntry({resourceKind:row.family as any,resourceKey:row.key,resourceVersion:row.version},db)

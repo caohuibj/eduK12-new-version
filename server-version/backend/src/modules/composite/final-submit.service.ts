@@ -673,7 +673,7 @@ const submitCompositeFormSectionFinalImpl = async (input: SectionSubmitInput) =>
 export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput): Promise<any> => {
   const route = await measureRequestPhase('final_submit_admission', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: input.attemptId },
-    select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, userId: true, recoveryTokenHash: true, runtimeGeneration: true,
+    select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, assignmentRef: true, userId: true, recoveryTokenHash: true, runtimeGeneration: true,
       compositeAssessment: { select: { ...TRAINING_VARIANT_DEFINITION_MARKER_SELECT, productKind: true, bundleInstance: true } } },
   }))
   const result = route?.runtimeGeneration === 'UNIFIED_V1'
@@ -684,7 +684,7 @@ export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput)
       const { prepareUnifiedCompositeFormSectionFinal, commitUnifiedCompositeFormSectionFinal } = await import('../assessment-runtime/unified-form-section-final-submit.service')
       const prepared = await prepareUnifiedCompositeFormSectionFinal(input, route.compositeAssessment?.bundleInstance, selectedParent)
       const committed = await withUnitSubmitAdmission(() => commitUnifiedCompositeFormSectionFinal(prepared))
-      return shouldReconcileTrainingParent(route)
+      return (shouldReconcileTrainingParent(route) || Boolean(route.assignmentRef) || route.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE')
         ? { ...committed, shouldFinalize: true, finalizeCompositeAttemptId: input.attemptId }
         : committed
     })()

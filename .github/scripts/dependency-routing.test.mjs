@@ -194,7 +194,7 @@ test('automatic dependency route shares unchanged components and cannot start br
   assert.match(job(ci,'maintenance'),/outputs\.scenario == 'dependencies'/);
   assert.match(ci,/dependency-routing\.test\.mjs/);
   assert.match(source('ci-maintenance'),/dependency-routing\.test\.mjs/);
-  for(const name of ['ci-backend','ci-frontend']) assert.match(source(name),/npm audit --audit-level=high/);
+  for(const name of ['ci-backend','ci-frontend']) assert.match(source(name),/node \"\$GITHUB_WORKSPACE\/\.github\/scripts\/audit-high-with-exception\.mjs\"/);
   assert.match(source('ci-images'),/CRITICAL,HIGH|HIGH,CRITICAL/);
   const plan=runnerPlan({profile:'speed',scenario:'dependencies',os:'darwin',macEnabled:true,freeBytes:10*1024**3});
   assert.deepEqual(plan.regression_runner,['ubuntu-24.04']);assert.equal(plan.visual_hosted,false);
