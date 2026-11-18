@@ -35,11 +35,31 @@ export function validateBundleStartContextMappings(definition: AssessmentBundleD
   if (birthKeys.size > 1) invalid('同一 Bundle 只能声明一个本人出生年月字段')
 }
 
-/** First START only, after parent authorization. Read accepted FORM facts, never drafts. */
-export async function loadBundleScaleStartContext(db: PrismaClient | Prisma.TransactionClient, parent: {
+type BundleParentShape = {
   id: string; attemptEpoch: number; frozenActiveSlotSetEncrypted: string | null; frozenActiveSlotSetHash: string | null
   compositeAssessment: { productKind?: string }
-}, itemId: string, instrumentKey: string, instrumentVersion: string, demographicContext: AssessmentContextValues | null): Promise<BundleScaleStartContext | undefined> {
+}
+type FrozenFormFacts = {
+  active: { snapshotHash: string; attemptEpoch: number; slots: Array<{ unitType: string; slotKey: string }> }
+  rows: Array<{ slotKey: string; compositeAttemptId: string; attemptEpoch: number; unitType: string; terminalState: string; payloadKind: string; sourceDefinitionHash: string; collectionFactsEncrypted: string | null; completedAt: Date }>
+  values: Record<string, unknown>
+  contextFacts: BundleContextFactsV1
+}
+export type BundleScaleStartParentContext = {
+  parent: BundleParentShape
+  frozen: ReturnType<typeof readFrozenBundleProductionDefinition>
+  bindings: BundleBindings
+  /** Parent-level frozen FORM slot set, collection fact rows and derived
+   * values/facts. Resolved once per delivery on the first mapped unit and
+   * memoized; the integrity checks keep their original order and semantics. */
+  resolvedFacts(): Promise<FrozenFormFacts>
+}
+
+/** Parent-level half of the Bundle START context: one instance read and one
+ * parsed frozen definition per delivery. Callers split the per-unit slot and
+ * mapping resolution into resolveBundleScaleStartForItem so N units share one
+ * instance/FORM-fact read instead of repeating identical parent queries. */
+export async function loadBundleScaleStartParentContext(db: PrismaClient | Prisma.TransactionClient, parent: BundleParentShape): Promise<BundleScaleStartParentContext | undefined> {
   if (!['ASSESSMENT_BUNDLE', 'ORGANIZATION_RESOURCE'].includes(parent.compositeAssessment.productKind ?? '')) return undefined
   const instance = await db.bundleInstance.findFirst({ where: { composite: { attempts: { some: { id: parent.id, attemptEpoch: parent.attemptEpoch } } } } })
   if (!instance) {
@@ -47,35 +67,53 @@ export async function loadBundleScaleStartContext(db: PrismaClient | Prisma.Tran
     return undefined
   }
   const { frozen, bindings } = readInstance(instance)
-  const binding = bindings.slots.find(s => s.itemId === itemId && s.unitType === 'SCALE')
-  const slot = frozen.bundleSnapshot.bundleDefinition.slots.find(s => s.slotKey === binding?.slotKey && s.unitType === 'SCALE')
+  let memo: Promise<FrozenFormFacts> | undefined
+  return {
+    parent: { id: parent.id, attemptEpoch: parent.attemptEpoch,
+      frozenActiveSlotSetEncrypted: parent.frozenActiveSlotSetEncrypted, frozenActiveSlotSetHash: parent.frozenActiveSlotSetHash },
+    frozen, bindings,
+    resolvedFacts() {
+      memo ??= (async () => {
+        if (!parent.frozenActiveSlotSetEncrypted) invalid('START 缺少冻结 FORM 槽位')
+        const active = await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted, db)
+        if (active.snapshotHash !== parent.frozenActiveSlotSetHash || active.attemptEpoch !== parent.attemptEpoch) invalid('START FORM 槽位轮次不匹配')
+        const forms = active.slots.filter(s => s.unitType === 'FORM_SECTION')
+        const rows = await db.assessmentUnitSnapshot.findMany({ where: { compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch, slotKey: { in: forms.map(s => s.slotKey) } } })
+        const facts = forms.flatMap(form => {
+          const matches = rows.filter(row => row.slotKey === form.slotKey)
+          const row = matches[0]
+          if (matches.length !== 1 || row.compositeAttemptId !== parent.id || row.attemptEpoch !== parent.attemptEpoch || row.unitType !== 'FORM_SECTION' || row.terminalState !== 'COMPLETED' || row.payloadKind !== 'COLLECTION_FACTS' || row.sourceDefinitionHash !== form.sourceDefinitionIdentity.hash || !row.collectionFactsEncrypted) invalid('请先完成此 Bundle 必需的背景信息')
+          const payload = readFormSectionCollectionFacts(decryptUnifiedRuntimePayload(row.collectionFactsEncrypted!))
+          if (payload.sectionKey !== form.sourceBinding.sectionId) invalid('START FORM 区段身份不匹配')
+          return payload.items
+        })
+        const values = contextValues(bindings.context, facts)
+        const contextFacts = buildBundleContextFactsFromValues({ definition: frozen.contextDefinition!, values,
+          frozenAt: rows.length ? new Date(Math.max(...rows.map(r => r.completedAt.getTime()))).toISOString() : undefined })
+        return { active: { snapshotHash: active.snapshotHash, attemptEpoch: active.attemptEpoch, slots: active.slots }, rows, values, contextFacts }
+      })()
+      return memo
+    },
+  }
+}
+
+/** Per-unit half: slot identity, admission-context mapping and the personal
+ * demographic checks. Pure CPU against the parent context; no parent query. */
+export async function resolveBundleScaleStartForItem(parentCtx: BundleScaleStartParentContext, itemId: string, instrumentKey: string, instrumentVersion: string, demographicContext: AssessmentContextValues | null): Promise<BundleScaleStartContext | undefined> {
+  const binding = parentCtx.bindings.slots.find(s => s.itemId === itemId && s.unitType === 'SCALE')
+  const slot = parentCtx.frozen.bundleSnapshot.bundleDefinition.slots.find(s => s.slotKey === binding?.slotKey && s.unitType === 'SCALE')
   if (!slot || slot.instrumentKey !== instrumentKey || slot.instrumentVersion !== instrumentVersion) invalid('START 量表与冻结 Bundle 槽位不匹配')
   const mapping = slot!.admissionContext
   if (!mapping) return undefined
-  validateBundleStartContextMappings(frozen.bundleSnapshot.bundleDefinition, frozen.contextDefinition)
-  if (!parent.frozenActiveSlotSetEncrypted) invalid('START 缺少冻结 FORM 槽位')
-  const active = await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted!, db)
-  if (active.snapshotHash !== parent.frozenActiveSlotSetHash || active.attemptEpoch !== parent.attemptEpoch) invalid('START FORM 槽位轮次不匹配')
-  const forms = active.slots.filter(s => s.unitType === 'FORM_SECTION')
-  const rows = await db.assessmentUnitSnapshot.findMany({ where: { compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch, slotKey: { in: forms.map(s => s.slotKey) } } })
-  const facts = forms.flatMap(form => {
-    const matches = rows.filter(row => row.slotKey === form.slotKey)
-    const row = matches[0]
-    if (matches.length !== 1 || row.compositeAttemptId !== parent.id || row.attemptEpoch !== parent.attemptEpoch || row.unitType !== 'FORM_SECTION' || row.terminalState !== 'COMPLETED' || row.payloadKind !== 'COLLECTION_FACTS' || row.sourceDefinitionHash !== form.sourceDefinitionIdentity.hash || !row.collectionFactsEncrypted) invalid('请先完成此 Bundle 必需的背景信息')
-    const payload = readFormSectionCollectionFacts(decryptUnifiedRuntimePayload(row.collectionFactsEncrypted!))
-    if (payload.sectionKey !== form.sourceBinding.sectionId) invalid('START FORM 区段身份不匹配')
-    return payload.items
-  })
-  const values = contextValues(bindings.context, facts)
-  const contextFacts = buildBundleContextFactsFromValues({ definition: frozen.contextDefinition!, values,
-    frozenAt: rows.length ? new Date(Math.max(...rows.map(r => r.completedAt.getTime()))).toISOString() : undefined })
+  validateBundleStartContextMappings(parentCtx.frozen.bundleSnapshot.bundleDefinition, parentCtx.frozen.contextDefinition)
+  const { active, rows, values, contextFacts } = await parentCtx.resolvedFacts()
   for (const requirement of mapping.requirements) {
     const value = values[requirement.contextKey]
     if (value === undefined || value === null || typeof value === 'string' && !value.trim() || requirement.allowedValues && !requirement.allowedValues.includes(value as string | number | boolean)) invalid('背景信息不满足此量表声明的测量情境')
   }
   if (mapping.birthYearMonthContextKey && (!demographicContext?.birthYearMonth || demographicContext.birthYearMonth !== values[mapping.birthYearMonthContextKey])) invalid('请先通过既有出生年月上下文完成年龄确认')
   if (mapping.birthYearMonthContextKey) {
-    const population=frozen.bundleSnapshot.bundleDefinition.population
+    const population=parentCtx.frozen.bundleSnapshot.bundleDefinition.population
     if (population.subjectMinAgeYears!==undefined || population.subjectMaxAgeYears!==undefined) {
       const months=demographicContext?.ageMonthsAtFreeze
       if (typeof months!=='number' || !Number.isInteger(months) || months<0) invalid('出生年月上下文缺少已冻结的年龄事实')
@@ -84,4 +122,12 @@ export async function loadBundleScaleStartContext(db: PrismaClient | Prisma.Tran
     }
   }
   return { assessmentContext: mapping.assessmentContext, facts: contextFacts }
+}
+
+/** Single-unit convenience path: parent resolution + one item resolution.
+ * Batch deliveries call the two halves directly so the parent queries run once. */
+export async function loadBundleScaleStartContext(db: PrismaClient | Prisma.TransactionClient, parent: BundleParentShape & { compositeAssessment: { productKind?: string } }, itemId: string, instrumentKey: string, instrumentVersion: string, demographicContext: AssessmentContextValues | null): Promise<BundleScaleStartContext | undefined> {
+  const parentCtx = await loadBundleScaleStartParentContext(db, parent)
+  if (!parentCtx) return undefined
+  return resolveBundleScaleStartForItem(parentCtx, itemId, instrumentKey, instrumentVersion, demographicContext)
 }
