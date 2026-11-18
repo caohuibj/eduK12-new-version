@@ -1,6 +1,7 @@
 import { boundCompositeContinuationSql } from '../assessment-run/boundCompositeContinuation'
 import {completedSchoolOrdinaryFeedbackSql} from '../assessment-run/completedSchoolFeedback'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
+import { withBoundedPlannerRead } from '../assessment-run/plannerBound'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
@@ -53,38 +54,38 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
   if(actor.accountDomain!=='SCHOOL'||actor.role!=='STUDENT')deny('CAMPUS_STUDENT_REQUIRED',403)
   // Membership, admission and current class/student assignment are all live
   // authority, checked before any task title/content is returned.
-  const activityRows=await prisma.$queryRaw<CampusActivityForStudent[]>`
+  const activityRows=await withBoundedPlannerRead(prisma, client => client.$queryRaw<CampusActivityForStudent[]>`
     SELECT DISTINCT a."course_id" AS "courseId",a."organization_id" AS "organizationId",
       course."title"
-    FROM "campus_activity_participants" p
-    JOIN "campus_activities" a ON a."course_id"=p."course_id"
-      AND a."organization_id"=p."organization_id" AND a."status"='OPEN'
-    JOIN "courses" course ON course."id"=a."course_id" AND course."course_type"='CAMPUS_ACTIVITY'
-    JOIN "organizations" o ON o."id"=a."organization_id" AND o."status"='ACTIVE' AND o."product_domain"='SCHOOL'
-    JOIN "education_product_entitlements" ent ON ent."organization_id"=o."id"
-      AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
-    JOIN "organization_memberships" m ON m."id"=p."membership_id"
-      AND m."organization_id"=p."organization_id"
-      AND m."user_id"=${actor.userId}
+    FROM "users" u
+    JOIN "organization_memberships" m ON m."user_id"=u."id"
       AND m."valid_from"<=statement_timestamp()
       AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
-    JOIN "campus_student_enrollments" e ON e."user_id"=m."user_id"
-      AND e."organization_id"=m."organization_id" AND e."status"='APPROVED'
-    JOIN "campus_class_admissions" ca ON ca."class_unit_id"=e."class_unit_id"
-      AND ca."organization_id"=e."organization_id" AND ca."status"='APPROVED'
+    JOIN "organizations" o ON o."id"=m."organization_id" AND o."status"='ACTIVE' AND o."product_domain"='SCHOOL'
+    JOIN "education_product_entitlements" ent ON ent."organization_id"=o."id"
+      AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
     JOIN "organization_persona_grants" pg
       ON pg."organization_id"=m."organization_id"
       AND pg."membership_id"=m."id" AND pg."persona"='STUDENT'
       AND pg."revoked_at" IS NULL AND pg."granted_at"<=statement_timestamp()
-    JOIN "users" u ON u."id"=m."user_id" AND u."account_domain"='SCHOOL'
-      AND u."role"='STUDENT' AND u."is_active"=TRUE
-      AND u."is_frozen"=FALSE AND u."must_change_password"=FALSE
+    JOIN "campus_student_enrollments" e ON e."user_id"=m."user_id"
+      AND e."organization_id"=m."organization_id" AND e."status"='APPROVED'
+    JOIN "campus_class_admissions" ca ON ca."class_unit_id"=e."class_unit_id"
+      AND ca."organization_id"=e."organization_id" AND ca."status"='APPROVED'
     JOIN "organization_student_class_assignments" sc
       ON sc."membership_id"=m."id" AND sc."organization_id"=m."organization_id"
       AND sc."class_unit_id"=e."class_unit_id"
       AND sc."valid_from"<=statement_timestamp()
       AND (sc."valid_until" IS NULL OR sc."valid_until">statement_timestamp())
-    WHERE p."status"='ACTIVE'
+    JOIN "campus_activity_participants" p ON p."organization_id"=m."organization_id"
+      AND p."membership_id"=m."id" AND p."status"='ACTIVE'
+    JOIN "campus_activities" a ON a."course_id"=p."course_id"
+      AND a."organization_id"=p."organization_id" AND a."status"='OPEN'
+    JOIN "courses" course ON course."id"=a."course_id" AND course."course_type"='CAMPUS_ACTIVITY'
+    WHERE u."id"=${actor.userId}
+      AND u."account_domain"='SCHOOL'
+      AND u."role"='STUDENT' AND u."is_active"=TRUE
+      AND u."is_frozen"=FALSE AND u."must_change_password"=FALSE
       AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
         WHERE d."organization_id"=o."id" AND d."user_id"=${actor.userId}
           AND d."lifted_at" IS NULL
@@ -94,7 +95,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
       -- sorts beyond the first 201 rows.
       ${input.activityId?Prisma.sql`AND a."course_id"=${input.activityId}`:Prisma.empty}
     ORDER BY a."course_id" LIMIT 201
-  `
+  `)
   const authorized=activityRows
   const ids=authorized.map(a=>a.courseId)
   if(!ids.length)return {list:[],total:0,page:input.page,hasMore:false,truncated:activityRows.length>200,nextRunCursor:null as RunTaskCursor|null}
@@ -128,6 +129,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
     `,
   ])
   const assigned=await listAssignedRunTasks(actor.userId,{
+    organizationIds:[...new Set(authorized.map(a=>a.organizationId))],
     runIds:linkedRuns.map(link=>link.runId),
     preserveBoundSchoolContinuation:true,
     cursor:input.runCursor,
@@ -202,53 +204,73 @@ export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal,curs
   if(actor.accountDomain!=='SCHOOL'||actor.role!=='PARENT')
     deny('CAMPUS_PARENT_REQUIRED',403)
   const cursorScope=cursor?Prisma.sql`AND (ar."created_at", ar."run_id") < (${cursor.createdAt}::timestamptz, ${cursor.id})`:Prisma.empty
-  const links=await prisma.$queryRaw<Array<{
+  const links=await withBoundedPlannerRead(prisma, client => client.$queryRaw<Array<{
     organizationId:string;courseId:string;runId:string;activityTitle:string;createdAtMicros:string
   }>>`
     SELECT ar."organization_id" AS "organizationId",
       ar."course_id" AS "courseId",ar."run_id" AS "runId",
       to_char(ar."created_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros",
       course."title" AS "activityTitle"
-    FROM "campus_activity_runs" ar
-    JOIN "campus_activities" a ON a."course_id"=ar."course_id"
-      AND a."organization_id"=ar."organization_id"
+    FROM (
+      SELECT DISTINCT child."organization_id"
+      FROM "parent_student_relationships" psr
+      JOIN "organization_memberships" child ON child."user_id"=psr."student_user_id"
+      WHERE psr."parent_user_id"=${actor.userId}
+        AND psr."status"='ACTIVE' AND psr."approved_at" IS NOT NULL
+    ) parent_orgs
+    JOIN "organizations" o ON o."id"=parent_orgs."organization_id"
+      AND o."product_domain"='SCHOOL' AND o."status"='ACTIVE'
+    JOIN "campus_activities" a ON a."organization_id"=o."id"
+    JOIN "campus_activity_runs" ar ON ar."organization_id"=a."organization_id"
+      AND ar."course_id"=a."course_id"
     JOIN "courses" course ON course."id"=a."course_id"
       AND course."course_type"='CAMPUS_ACTIVITY'
-    JOIN "organizations" o ON o."id"=ar."organization_id"
-      AND o."product_domain"='SCHOOL' AND o."status"='ACTIVE'
     JOIN "assessment_runs" r ON r."id"=ar."run_id"
       AND r."organization_id"=ar."organization_id"
     -- The whole disjunction is parenthesized so the keyset cursorScope below
     -- AND-joins at the top level; unparenthesized, AND would bind inside the
     -- second branch only and the cursor would never advance page 1's rows.
     WHERE (((a."status"='OPEN' AND (r."status"='PUBLISHED' OR (r."status"='CLOSED' AND EXISTS (
-        SELECT 1 FROM "assessment_run_executions" eligible
-        WHERE eligible."organization_id"=r."organization_id" AND eligible."run_id"=r."id"
+        SELECT 1 FROM "assessment_run_actor_snapshots" eligible_respondent
+        JOIN "assessment_run_executions" eligible
+          ON eligible."respondent_actor_snapshot_id"=eligible_respondent."id"
+          AND eligible."organization_id"=eligible_respondent."organization_id"
+          AND eligible."run_id"=eligible_respondent."run_id"
+        WHERE eligible_respondent."organization_id"=r."organization_id"
+          AND eligible_respondent."user_id"=${actor.userId}
+          AND eligible_respondent."run_id"=r."id"
           AND ${boundCompositeContinuationSql(Prisma.sql`eligible."id"`,actor.userId)}
           AND ${currentRunPopulationAuthoritySql(Prisma.sql`eligible."id"`)}
       )))) AND EXISTS (
       SELECT 1 FROM "parent_student_relationships" link
-      JOIN "campus_student_enrollments" e ON e."user_id"=link."student_user_id"
-        AND e."organization_id"=ar."organization_id" AND e."status"='APPROVED'
-      JOIN "campus_activity_participants" selected ON selected."course_id"=ar."course_id"
-        AND selected."organization_id"=ar."organization_id" AND selected."status"='ACTIVE'
-      JOIN "organization_memberships" m ON m."id"=selected."membership_id"
-        AND m."organization_id"=ar."organization_id"
+      JOIN "organization_memberships" m ON m."organization_id"=ar."organization_id"
         AND m."user_id"=link."student_user_id"
         AND m."valid_from"<=statement_timestamp()
         AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+      JOIN "campus_student_enrollments" e ON e."user_id"=link."student_user_id"
+        AND e."organization_id"=ar."organization_id" AND e."status"='APPROVED'
+      JOIN "campus_activity_participants" selected ON selected."course_id"=ar."course_id"
+        AND selected."organization_id"=ar."organization_id"
+        AND selected."membership_id"=m."id" AND selected."status"='ACTIVE'
       WHERE link."parent_user_id"=${actor.userId}
         AND link."status"='ACTIVE' AND link."approved_at" IS NOT NULL
         AND link."revoked_at" IS NULL
-    )) OR EXISTS (SELECT 1 FROM assessment_run_executions history_execution
-      WHERE history_execution.organization_id=ar.organization_id AND history_execution.run_id=ar.run_id
-        AND ${completedSchoolOrdinaryFeedbackSql(Prisma.sql`history_execution.id`,actor.userId)}))
+    )) OR EXISTS (
+      SELECT 1 FROM "assessment_run_actor_snapshots" history_respondent
+      JOIN "assessment_run_executions" history_execution
+        ON history_execution."respondent_actor_snapshot_id"=history_respondent."id"
+        AND history_execution."organization_id"=history_respondent."organization_id"
+        AND history_execution."run_id"=history_respondent."run_id"
+      WHERE history_respondent."organization_id"=ar."organization_id"
+        AND history_respondent."user_id"=${actor.userId}
+        AND history_respondent."run_id"=ar."run_id"
+        AND ${completedSchoolOrdinaryFeedbackSql(Prisma.sql`history_execution."id"`,actor.userId)}))
       ${cursorScope}
     ORDER BY ar."created_at" DESC, ar."run_id" DESC LIMIT 101
-  `
+  `)
   const indexed=links.slice(0,100)
   if(!indexed.length)return {list:[],truncated:links.length>100,nextCursor:null as RunTaskCursor|null}
-  const tasks=await listAssignedRunTasks(actor.userId,{runIds:indexed.map(l=>l.runId),preserveBoundSchoolContinuation:true,includeCompletedSchoolFeedback:true})
+  const tasks=await listAssignedRunTasks(actor.userId,{organizationIds:[...new Set(indexed.map(l=>l.organizationId))],runIds:indexed.map(l=>l.runId),preserveBoundSchoolContinuation:true,includeCompletedSchoolFeedback:true})
   const byRun=new Map(indexed.map(l=>[l.runId,l]))
   const list=tasks.list.filter(t=>byRun.has(t.runId)).map(t=>{
     const activity=byRun.get(t.runId)!

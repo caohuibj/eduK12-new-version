@@ -2,11 +2,21 @@ import { Request, Response, NextFunction } from 'express'
 import { error, instrumentError, completionBusy } from '../utils/response'
 import { logger } from '../utils/logger'
 import { isAssessmentStartBusyError } from '../modules/composite/start-transient'
+import { isAssessmentStartResourceGateError } from '../services/assessmentResourceProtection'
 
 export const errorHandler = (err: any, req: Request & { requestId?: string }, res: Response, _next: NextFunction) => {
   // Only the shared completion boundary classifies transient DB failures.
   // Preserve its safe retry contract in routes without a local busy mapper.
   if (err?.code === 'COMPLETION_BUSY') return completionBusy(res, err.retryAfterSeconds)
+  // Host CPU / memory resource gates reject START before admission; preserve 503 + Retry-After.
+  if (isAssessmentStartResourceGateError(err)) {
+    const preferred = (err as { preferredRetryAfterSeconds?: number }).preferredRetryAfterSeconds
+    const retryAfter = typeof preferred === 'number' && Number.isFinite(preferred) && preferred > 0
+      ? Math.ceil(preferred)
+      : 10
+    res.setHeader('Retry-After', String(retryAfter))
+    return instrumentError(res, err.code, err.message, err.statusCode)
+  }
   // A Run START transaction that rolled back before committing is safe to retry.
   if (isAssessmentStartBusyError(err)) {
     res.setHeader('Retry-After', String(err.retryAfterSeconds))

@@ -11,9 +11,11 @@ import { authenticateHuiteacher } from '../../middleware/auth'
 import { asyncHandler } from '../../middleware/asyncHandler'
 import { success,notFound,error } from '../../utils/response'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
+import { withBoundedPlannerRead } from '../assessment-run/plannerBound'
 import { canonicalCursorTimestamp,decodeRunTaskCursor,encodeRunTaskCursor,type RunTaskCursor } from '../assessment-run/productRead'
 import { startAssessmentRunExecution } from '../assessment-run/startExecution'
 import { isAssessmentStartBusyError } from '../composite/start-transient'
+import { isAssessmentStartResourceGateError } from '../../services/assessmentResourceProtection'
 import {readTeacherPersonalChanges} from '../reporting/teacher-personal-changes.service'
 import { readTeacherPersonalScaleReport } from './scalePersonalReport.service'
 import { compositeController } from '../composite/composite.controller'
@@ -30,6 +32,12 @@ const wrap=(work:(req:Request)=>Promise<unknown>)=>asyncHandler(async(req,res)=>
     if(e instanceof ZodError)return res.status(400).json({
       code:'HUITEACHER_SCALE_INPUT_INVALID',message:'教师个人测评参数无效',data:null,
     })
+    if(isAssessmentStartResourceGateError(e)){
+      const preferred=(e as {preferredRetryAfterSeconds?:number}).preferredRetryAfterSeconds
+      const retryAfter=typeof preferred==='number'&&Number.isFinite(preferred)&&preferred>0?Math.ceil(preferred):10
+      res.setHeader('Retry-After',String(retryAfter))
+      return res.status(e.statusCode).json({code:e.code,message:e.message,data:null})
+    }
     if(isAssessmentStartBusyError(e)){
       res.setHeader('Retry-After',String(e.retryAfterSeconds))
       return res.status(503).json({code:e.code,message:e.message,data:null})
@@ -52,7 +60,12 @@ async function ownScaleExecution(input:{actorUserId:string;executionId?:string;a
     ?Prisma.sql`AND execution."id"=${input.executionId}`
     :Prisma.sql`AND execution."runtime_binding_kind"='COMPOSITE'
       AND execution."runtime_binding_ref"=${input.attemptId??''}`
-  const rows=await prisma.$queryRaw<Allowed[]>(Prisma.sql`
+  const populationGate=input.purpose==='REPORT_READ'
+    ?Prisma.sql`CASE WHEN (track."resource_key" LIKE 'library-scale:%' OR track."resource_key" LIKE 'private-scale:%')
+      THEN ${currentRunPopulationAuthoritySql(Prisma.sql`execution."id"`, 'REPORT_READ')}
+      ELSE ${currentRunPopulationAuthoritySql(Prisma.sql`execution."id"`)} END`
+    :currentRunPopulationAuthoritySql(Prisma.sql`execution."id"`)
+  const rows=await withBoundedPlannerRead(prisma, client => client.$queryRaw<Allowed[]>(Prisma.sql`
     SELECT execution."id" AS "executionId",
       execution."organization_id" AS "organizationId",
       execution."run_id" AS "runId",
@@ -88,12 +101,10 @@ async function ownScaleExecution(input:{actorUserId:string;executionId?:string;a
     JOIN "huiteacher_evaluation_run_links" link
       ON link."organization_id"=execution."organization_id"
       AND link."run_id"=execution."run_id"
-    WHERE CASE WHEN (track."resource_key" LIKE 'library-scale:%' OR track."resource_key" LIKE 'private-scale:%') AND ${input.purpose === 'REPORT_READ'}
-      THEN ${currentRunPopulationAuthoritySql(Prisma.sql`execution."id"`, 'REPORT_READ')}
-      ELSE ${currentRunPopulationAuthoritySql(Prisma.sql`execution."id"`)} END
+    WHERE ${populationGate}
       ${executionFilter}
     LIMIT 1
-  `)
+  `))
   const row=rows[0]
   if(!row)return null
   if((row.resourceKey.startsWith('library-scale:')||row.resourceKey.startsWith('private-scale:')) && !await teacherLibraryExecutionBindingMatches(prisma,{
@@ -144,7 +155,7 @@ export async function listOwnTeacherScaleTasks(userId:string,cursor?:RunTaskCurs
   const cursorScope=cursorCreatedAt
     ?Prisma.sql`AND (e."created_at", e."id") < (${cursorCreatedAt}::timestamptz, ${cursor!.id})`
     :Prisma.empty
-  const rows=await prisma.$queryRaw<Array<{
+  const rows=await withBoundedPlannerRead(prisma, client => client.$queryRaw<Array<{
     createdAtMicros:string
     executionId:string;eventId:string;eventTitle:string;runId:string;
     organizationId:string;status:string;runtimeBindingRef:string|null;
@@ -158,10 +169,42 @@ export async function listOwnTeacherScaleTasks(userId:string,cursor?:RunTaskCurs
       track."resource_key" AS "resourceKey",
       registered."entry"->>'title' AS "title",
       run."status" AS "runStatus"
-    FROM "assessment_run_executions" e
+    FROM "users" current_actor
+    JOIN "organization_memberships" m
+      ON m."user_id"=current_actor."id"
+      AND m."valid_from"<=statement_timestamp()
+      AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+    JOIN "organization_persona_grants" persona
+      ON persona."organization_id"=m."organization_id"
+      AND persona."membership_id"=m."id"
+      AND persona."persona"='TEACHER' AND persona."revoked_at" IS NULL
+    JOIN "organizations" org ON org."id"=m."organization_id"
+      AND org."status"='ACTIVE' AND org."product_domain"='SCHOOL'
+    JOIN "education_product_entitlements" entitlement
+      ON entitlement."organization_id"=org."id"
+      AND entitlement."product"='HUITEACHER' AND entitlement."status"='ACTIVE'
+    JOIN "assessment_run_actor_snapshots" respondent
+      ON respondent."organization_id"=org."id"
+      AND respondent."user_id"=${userId}
+      AND respondent."actor_role"='TEACHER'
+    JOIN "assessment_run_executions" e
+      ON e."respondent_actor_snapshot_id"=respondent."id"
+      AND e."organization_id"=respondent."organization_id"
+      AND e."run_id"=respondent."run_id"
+    JOIN "assessment_run_actor_snapshots" subject
+      ON subject."organization_id"=e."organization_id"
+      AND subject."run_id"=e."run_id"
+      AND subject."id"=e."subject_actor_snapshot_id"
+      AND subject."actor_role"='TEACHER' AND subject."user_id"=${userId}
     JOIN "assessment_runs" run ON run."organization_id"=e."organization_id"
       AND run."id"=e."run_id"
       AND run."status" IN ('PUBLISHED','CLOSED')
+    JOIN "huiteacher_evaluation_run_links" link
+      ON link."organization_id"=e."organization_id"
+      AND link."run_id"=e."run_id"
+    JOIN "huiteacher_evaluation_events" event
+      ON event."organization_id"=link."organization_id"
+      AND event."id"=link."event_id" AND event."status" IN ('OPEN','CLOSED')
     JOIN "assessment_run_tracks" track
       ON track."organization_id"=e."organization_id"
       AND track."run_id"=e."run_id" AND track."id"=e."track_id"
@@ -174,47 +217,25 @@ export async function listOwnTeacherScaleTasks(userId:string,cursor?:RunTaskCurs
       ON registered."resource_key"=track."resource_key"
       AND registered."resource_version"=track."resource_version"
       AND registered."status" IN ('PUBLISHED','RETIRED')
-    JOIN "users" current_actor
-      ON current_actor."id"=${userId}
+    CROSS JOIN LATERAL (
+      SELECT (
+        CASE WHEN e."status"<>'COMPLETED'
+          AND (run."status"='CLOSED' OR track."resource_key" LIKE 'library-scale:%' OR track."resource_key" LIKE 'private-scale:%')
+        THEN ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)}
+        ELSE FALSE END
+      ) AS "collectionAuthority"
+      OFFSET 0
+    ) pop_auth
+    WHERE current_actor."id"=${userId}
       AND current_actor."account_domain"='SCHOOL'
       AND current_actor."role" IN ('TEACHER','ADMIN')
       AND current_actor."teacher_approved"=TRUE
       AND current_actor."is_active"=TRUE AND current_actor."is_frozen"=FALSE
-    JOIN "assessment_run_actor_snapshots" respondent
-      ON respondent."organization_id"=e."organization_id"
-      AND respondent."run_id"=e."run_id"
-      AND respondent."id"=e."respondent_actor_snapshot_id"
-      AND respondent."actor_role"='TEACHER'
-      AND respondent."user_id"=${userId}
-    JOIN "assessment_run_actor_snapshots" subject
-      ON subject."organization_id"=e."organization_id"
-      AND subject."run_id"=e."run_id"
-      AND subject."id"=e."subject_actor_snapshot_id"
-      AND subject."actor_role"='TEACHER' AND subject."user_id"=${userId}
-    JOIN "huiteacher_evaluation_run_links" link
-      ON link."organization_id"=e."organization_id"
-      AND link."run_id"=e."run_id"
-    JOIN "huiteacher_evaluation_events" event
-      ON event."organization_id"=link."organization_id"
-      AND event."id"=link."event_id" AND event."status" IN ('OPEN','CLOSED')
-    JOIN "education_product_entitlements" entitlement
-      ON entitlement."organization_id"=e."organization_id"
-      AND entitlement."product"='HUITEACHER' AND entitlement."status"='ACTIVE'
-    JOIN "organizations" org ON org."id"=e."organization_id"
-      AND org."status"='ACTIVE' AND org."product_domain"='SCHOOL'
-    JOIN "organization_memberships" m
-      ON m."organization_id"=org."id" AND m."user_id"=${userId}
-      AND m."valid_from"<=statement_timestamp()
-      AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
-    JOIN "organization_persona_grants" persona
-      ON persona."organization_id"=m."organization_id"
-      AND persona."membership_id"=m."id"
-      AND persona."persona"='TEACHER' AND persona."revoked_at" IS NULL
-    WHERE e."status" IN ('ASSIGNED','STARTED','COMPLETED')
+      AND e."status" IN ('ASSIGNED','STARTED','COMPLETED')
       AND (e."status"='COMPLETED' OR
         (event."status"='OPEN' AND (run."status"='PUBLISHED'
           OR (run."status"='CLOSED' AND ${boundCompositeContinuationSql(Prisma.sql`e."id"`,userId)}
-            AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)}))
+            AND pop_auth."collectionAuthority"))
           AND registered."status"='PUBLISHED'
           AND (EXISTS (
             SELECT 1 FROM "education_teacher_scale_licenses" license
@@ -239,10 +260,10 @@ export async function listOwnTeacherScaleTasks(userId:string,cursor?:RunTaskCurs
       )
     AND ((track."resource_key" NOT LIKE 'library-scale:%' AND track."resource_key" NOT LIKE 'private-scale:%') OR CASE WHEN e."status"='COMPLETED'
         THEN ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`, 'REPORT_READ')}
-        ELSE ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)} END)
+        ELSE pop_auth."collectionAuthority" END)
     ${cursorScope}
     ORDER BY e."created_at" DESC,e."id" DESC LIMIT ${limit + 1}
-  `)
+  `))
   const page=rows.slice(0,limit)
   const hasMore=rows.length>limit
   const last=page[page.length-1]

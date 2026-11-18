@@ -194,6 +194,8 @@ services:
       - maintenance_work_mem=64MB
       - -c
       - max_connections=80
+      - -c
+      - jit=off
 
   redis:
     cpus: 0.5

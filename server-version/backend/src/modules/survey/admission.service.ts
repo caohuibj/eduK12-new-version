@@ -70,20 +70,40 @@ const claimQuota=async(tx:Tx,waveId:string,startsCount:number)=>{
 }
 type ConsentWaveProjection={
   id:string;title:string;ordinal:number;status:string;consentText:string;consentVersion:number;
-  opensAt:Date|null;closesAt:Date|null;allowNewParticipants:boolean;measurementNotice:unknown;
+  opensAt:Date|null;closesAt:Date|null;allowNewParticipants:boolean;publicationId:string;
   groupIpPolicy:unknown;groupIpActivatedAt:Date|null
 }
 // Read only the frozen public disclosure, never the full private compiled
-// snapshot. The joined projection keeps the prior single wave-list query.
+// snapshot. Cache measurementNotice by immutable publicationId so warm info
+// reads do not open a transaction or detoast survey_publications.compiled_snapshot.
 const consentWaveColumns=Prisma.sql`w.id,w.title,w.ordinal,w.status,
   w.consent_text AS "consentText",w.consent_version AS "consentVersion",
   w.opens_at AS "opensAt",w.closes_at AS "closesAt",
   w.allow_new_participants AS "allowNewParticipants",
   w.group_ip_policy AS "groupIpPolicy",w.group_ip_activated_at AS "groupIpActivatedAt",
-  p.compiled_snapshot->'measurementNotice' AS "measurementNotice"`
+  w.publication_id AS "publicationId"`
+const measurementNoticeCache=new BoundedTtlCache<{value:unknown}>(120_000,64)
+async function loadMeasurementNotices(client:Tx|typeof prisma,projectId:string,publicationIds:ReadonlyArray<string>){
+  const uniqueIds=[...new Set(publicationIds)]
+  const missingIds=uniqueIds.filter(id=>measurementNoticeCache.get(`${projectId}:${id}`)===undefined)
+  if(missingIds.length>0){
+    const notices=await client.$queryRaw<Array<{id:string;measurementNotice:unknown}>>`
+      SELECT p.id, p.compiled_snapshot->'measurementNotice' AS "measurementNotice"
+      FROM survey_publications p
+      WHERE p.project_id=${projectId} AND p.id IN (${Prisma.join(missingIds)})
+    `
+    const byId=new Map(notices.map(row=>[row.id,row.measurementNotice]))
+    for(const id of missingIds){
+      const notice=byId.get(id)??null
+      freezeDeep(notice)
+      measurementNoticeCache.set(`${projectId}:${id}`,{value:notice})
+    }
+  }
+  return (publicationId:string)=>measurementNoticeCache.get(`${projectId}:${publicationId}`)?.value??null
+}
 export async function getPublicResearchInfo(publicId:string,entryToken?:string){
   enabled()
-  return prisma.$transaction(async tx=>{
+  return withSurveyReadClient(async tx=>{
     const project=await projectPublic(tx,publicId)
     const now=new Date()
     let scopeWaveId:string|undefined
@@ -97,17 +117,19 @@ export async function getPublicResearchInfo(publicId:string,entryToken?:string){
     }
     const waves=project.status==='ACTIVE'?await tx.$queryRaw<ConsentWaveProjection[]>`
       SELECT ${consentWaveColumns} FROM survey_waves w
-      LEFT JOIN survey_publications p ON p.id=w.publication_id AND p.project_id=w.project_id
       WHERE w.project_id=${project.id} AND w.status='OPEN' AND w.publication_id IS NOT NULL
         AND w.hard_stop_at IS NULL AND (w.opens_at IS NULL OR w.opens_at<=${now})
         AND (w.closes_at IS NULL OR w.closes_at>${now})
         ${scopeWaveId?Prisma.sql`AND w.id=${scopeWaveId}`:Prisma.empty}
       ORDER BY w.ordinal ASC LIMIT 100`:[]
+    const noticeFor=await loadMeasurementNotices(tx,project.id,waves.map(w=>w.publicationId))
     return {scopeWaveId:scopeWaveId??null,project:{name:project.title,description:project.description,
       collectionMode:project.collectionMode,status:project.status,participantIdentityMode:project.participantIdentityMode,
       participantCodeLabel:project.participantCodeLabel,participantCodeInstructions:project.participantCodeInstructions},
-      waves:waves.map(({measurementNotice,...wave})=>({...wave,
-        consentText:disclosedSurveyConsent(wave.consentText,{measurementNotice})}))}
+      waves:waves.map(({publicationId,...wave})=>({...wave,
+        consentText:disclosedSurveyConsent(wave.consentText,{
+          measurementNotice:noticeFor(publicationId),
+        })}))}
   })
 }
 type PreparedPublication={
@@ -128,6 +150,7 @@ function freezeDeep(value:unknown):void{
 export function resetSurveyPublicationCachesForTests(){
   preparedPublicationCache.clear()
   verifiedPublicationCache.clear()
+  measurementNoticeCache.clear()
   publicationPreparationInFlight.clear()
 }
 export async function preparePublicationDigest(projectId:string,waveId:string):Promise<PreparedPublication|undefined>{
@@ -187,34 +210,36 @@ export async function listOwnLinkedWaves(input:{
   publicId:string;researchCode:string;accessCredential:string;waveId?:string
 }){
   enabled()
-  const project=await prisma.$transaction(tx=>projectPublic(tx,input.publicId))
-  if(project.collectionMode!=='LINKED_WAVES')blocked('此项目没有稳定的研究编号')
-  const identity=await recoverLinkedResearchIdentity({
-    projectId:project.id,researchCode:input.researchCode,
-    accessCredential:input.accessCredential,
+  return withSurveyReadClient(async client=>{
+    const project=await projectPublic(client,input.publicId)
+    if(project.collectionMode!=='LINKED_WAVES')blocked('此项目没有稳定的研究编号')
+    const identity=await recoverLinkedResearchIdentity({
+      projectId:project.id,researchCode:input.researchCode,
+      accessCredential:input.accessCredential,
+    })
+    const waves=await client.$queryRaw<ConsentWaveProjection[]>`
+      SELECT ${consentWaveColumns} FROM survey_waves w
+      WHERE w.project_id=${project.id} AND w.publication_id IS NOT NULL
+        AND w.status IN ('OPEN','PAUSED','CLOSED')
+        ${input.waveId?Prisma.sql`AND w.id=${input.waveId}`:Prisma.empty}
+      ORDER BY w.ordinal ASC LIMIT 100`
+    const attempts=await client.surveyWaveAttempt.findMany({where:{
+      projectId:project.id,participantId:identity.participantId,
+      ...(input.waveId?{waveId:input.waveId}:{}),
+    },select:{id:true,waveId:true,status:true,completedAt:true}})
+    const state=new Map(attempts.map(a=>[a.waveId,a]))
+    const now=new Date()
+    // Freezing a T2/T3 Publication is not consent to reveal future-wave
+    // titles or disclosures. Only the current open Wave or own history appears.
+    const visible=waves.filter(w=>state.has(w.id)||
+      (project.status==='ACTIVE'&&w.status==='OPEN'
+        &&(!w.opensAt||w.opensAt<=now)&&(!w.closesAt||w.closesAt>now)))
+    const noticeFor=await loadMeasurementNotices(client,project.id,visible.map(w=>w.publicationId))
+    return {collectionMode:'LINKED_WAVES',waves:visible.map(({publicationId,...w})=>({
+      ...w,consentText:disclosedSurveyConsent(w.consentText,{measurementNotice:noticeFor(publicationId)}),
+      attempt:state.get(w.id)||null,
+    }))}
   })
-  const waves=await prisma.$queryRaw<ConsentWaveProjection[]>`
-    SELECT ${consentWaveColumns} FROM survey_waves w
-    LEFT JOIN survey_publications p ON p.id=w.publication_id AND p.project_id=w.project_id
-    WHERE w.project_id=${project.id} AND w.publication_id IS NOT NULL
-      AND w.status IN ('OPEN','PAUSED','CLOSED')
-      ${input.waveId?Prisma.sql`AND w.id=${input.waveId}`:Prisma.empty}
-    ORDER BY w.ordinal ASC LIMIT 100`
-  const attempts=await prisma.surveyWaveAttempt.findMany({where:{
-    projectId:project.id,participantId:identity.participantId,
-    ...(input.waveId?{waveId:input.waveId}:{}),
-  },select:{id:true,waveId:true,status:true,completedAt:true}})
-  const state=new Map(attempts.map(a=>[a.waveId,a]))
-  const now=new Date()
-  // Freezing a T2/T3 Publication is not consent to reveal future-wave
-  // titles or disclosures. Only the current open Wave or own history appears.
-  const visible=waves.filter(w=>state.has(w.id)||
-    (project.status==='ACTIVE'&&w.status==='OPEN'
-      &&(!w.opensAt||w.opensAt<=now)&&(!w.closesAt||w.closesAt>now)))
-  return {collectionMode:'LINKED_WAVES',waves:visible.map(({measurementNotice,...w})=>({
-    ...w,consentText:disclosedSurveyConsent(w.consentText,{measurementNotice}),
-    attempt:state.get(w.id)||null,
-  }))}
 }
 export async function startLinkedWave(input:{
   publicId:string;waveId:string;researchCode:string;
@@ -343,7 +368,7 @@ type VerifiedSurveyAttempt={attemptId:string;projectId:string;waveId:string;part
   status:string;publicationId:string;definitionDigest:string;
   compiledSnapshot:ResearchFrozenPublication;generalText:string;finishUntil:Date|null;
   hardStopAt:Date|null}
-const withSurveyReadClient = async <T>(action: (client: Tx | typeof prisma) => Promise<T>): Promise<T> => {
+async function withSurveyReadClient<T>(action: (client: Tx | typeof prisma) => Promise<T>): Promise<T> {
   if (typeof (prisma as any).surveyProject?.findFirst === 'function') {
     return action(prisma)
   }
