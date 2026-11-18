@@ -693,12 +693,8 @@ export const submitCompositeFormSectionFinal = async (input: SectionSubmitInput)
   const { shouldFinalize, finalizeCompositeAttemptId, ...response } = result as any
   const parent = shouldFinalize && finalizeCompositeAttemptId
     ? await measureRequestPhase('final_submit_parent_finalization', async () => {
-      const compositeService = await import('./composite.service')
-      let finalizeCompositeAttemptIfReady: typeof compositeService.finalizeCompositeAttemptIfReady | undefined
-      try { finalizeCompositeAttemptIfReady = compositeService.finalizeCompositeAttemptIfReady } catch { finalizeCompositeAttemptIfReady = undefined }
-      return typeof finalizeCompositeAttemptIfReady === 'function'
-        ? finalizeCompositeAttemptIfReady(finalizeCompositeAttemptId)
-        : { status: 'IN_PROGRESS', progress: response.progress ?? 0, completedAt: null }
+      const { finalizeCompositeAttemptIfReady } = await import('./composite.service')
+      return finalizeCompositeAttemptIfReady(finalizeCompositeAttemptId)
     })
     : { status: 'IN_PROGRESS', progress: response.progress ?? 0, completedAt: null }
   return { ...response, parent }

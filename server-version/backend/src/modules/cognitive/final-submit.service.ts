@@ -514,12 +514,8 @@ const submitWithPrincipal = async (input: FinalCognitiveSubmitInput): Promise<an
   if (result && typeof result === 'object' && 'finalizeCompositeAttemptId' in result) {
     const { shouldFinalize, finalizeCompositeAttemptId, ...response } = result as any
     if (shouldFinalize && finalizeCompositeAttemptId) {
-      const compositeService = await import('../composite/composite.service')
-      let finalizeCompositeAttemptIfReady: typeof compositeService.finalizeCompositeAttemptIfReady | undefined
-      try { finalizeCompositeAttemptIfReady = compositeService.finalizeCompositeAttemptIfReady } catch { finalizeCompositeAttemptIfReady = undefined }
-      if (typeof finalizeCompositeAttemptIfReady === 'function') {
-        await measureRequestPhase('final_submit_parent_finalization', () => finalizeCompositeAttemptIfReady(finalizeCompositeAttemptId))
-      }
+      const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
+      await measureRequestPhase('final_submit_parent_finalization', () => finalizeCompositeAttemptIfReady(finalizeCompositeAttemptId))
     }
     return response
   }

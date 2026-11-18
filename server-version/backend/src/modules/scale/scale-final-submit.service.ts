@@ -235,12 +235,8 @@ const isEducationResourceParent = (parent: {
 
 const finalizeLinkedParent = async (assessment: any): Promise<void> => {
   if (assessment.compositeAttemptId) {
-    const compositeService = await import('../composite/composite.service')
-    let finalizeCompositeAttemptIfReady: typeof compositeService.finalizeCompositeAttemptIfReady | undefined
-    try { finalizeCompositeAttemptIfReady = compositeService.finalizeCompositeAttemptIfReady } catch { finalizeCompositeAttemptIfReady = undefined }
-    if (typeof finalizeCompositeAttemptIfReady === 'function') {
-      await finalizeCompositeAttemptIfReady(assessment.compositeAttemptId)
-    }
+    const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
+    await finalizeCompositeAttemptIfReady(assessment.compositeAttemptId)
   }
   if (assessment.questionnaireAssessmentId) {
     const { finalizeQuestionnaireAttemptIfReady } = await import('../../services/questionnaire-form-section.service')

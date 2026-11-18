@@ -196,8 +196,6 @@ services:
       - max_connections=80
       - -c
       - jit=off
-      - -c
-      - plan_cache_mode=force_custom_plan
 
   redis:
     cpus: 0.5
