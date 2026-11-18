@@ -75,7 +75,7 @@ async function queryOwnTasks(actorUserId:string,filter:{executionId?:string;atte
    AND a.relationship_kind='SELF' AND a.respondent_role='TEACHER' AND a.subject_role='TEACHER'
    AND a.status NOT IN ('REVOKED','EXPIRED') AND e.status IN ('ASSIGNED','STARTED','COMPLETED')
    AND ${privateFormTrackIdentitySql({track:Prisma.sql`t`,organizationId:Prisma.sql`e.organization_id`,product:'TEACHER'})}
-   AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`)}
+   AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`, 'COLLECTION', 'HUITEACHER_ONLY')}
    AND (r.status='PUBLISHED' OR (r.status='CLOSED' AND e.status='STARTED' AND ${boundCompositeContinuationSql(Prisma.sql`e.id`,actorUserId)})
     OR (r.status='CLOSED' AND e.status='COMPLETED' AND e.runtime_binding_kind='COMPOSITE'
       AND EXISTS(SELECT 1 FROM composite_assessment_attempts completed_parent

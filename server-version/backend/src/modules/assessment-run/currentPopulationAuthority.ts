@@ -5,24 +5,19 @@ import { Prisma } from '@prisma/client'
 import {studentEvaluationTrackConfigSql} from '../huiteacher/studentCompositionResource'
 import { currentRunActorAuthoritySql, currentWindowSql, type RunAuthorityPurpose } from './currentActorAuthority'
 
-/** Shared current population gate. Intake deadlines do not remove own history.
- * executionId is a static SQL expression supplied by the caller, never user SQL.
- */
-export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql, purpose: RunAuthorityPurpose = 'COLLECTION'): Prisma.Sql => Prisma.sql`
- EXISTS (
-  SELECT 1 FROM assessment_run_executions x JOIN organizations org ON org.id=x.organization_id
-  JOIN assessment_run_relationship_snapshots relation ON relation.id=x.relationship_snapshot_id
-  JOIN assessment_run_actor_snapshots subject ON subject.id=x.subject_actor_snapshot_id
-  JOIN assessment_run_actor_snapshots respondent ON respondent.id=x.respondent_actor_snapshot_id
-  WHERE x.id=${executionId} AND org.status='ACTIVE'
-   AND NOT EXISTS (
-    SELECT 1 FROM assessment_run_actor_snapshots actor
-    WHERE actor.id IN (x.subject_actor_snapshot_id,x.respondent_actor_snapshot_id)
-      AND NOT (${currentRunActorAuthoritySql({ userId: Prisma.sql`actor.user_id`, organizationId: Prisma.sql`org.id`,
-        provenance: Prisma.sql`actor.provenance_kind`, membershipId: Prisma.sql`actor.membership_id`,
-        personaGrantId: Prisma.sql`actor.snapshot_payload->>'personaGrantId'`, role: Prisma.sql`actor.actor_role` }, purpose)})
-   )
-   AND (relation.relationship_kind='SELF'
+export type RunPopulationProductScope = 'ALL' | 'CAMPUS_ONLY' | 'HUITEACHER_ONLY'
+
+const relationshipAuthoritySql = (productScope: RunPopulationProductScope): Prisma.Sql =>
+  productScope === 'HUITEACHER_ONLY'
+    ? Prisma.sql`(relation.relationship_kind='SELF'
+    OR (relation.relationship_kind IN ('CLASS_TEACHER_STUDENT','COURSE_TEACHER_STUDENT') AND EXISTS (
+     SELECT 1 FROM organization_student_class_assignments student_class JOIN organization_staff_class_assignments staff_class
+      ON staff_class.organization_id=student_class.organization_id AND staff_class.class_unit_id=student_class.class_unit_id
+     WHERE student_class.id=relation.snapshot_payload->'facts'->>'studentClassAssignmentId'
+      AND staff_class.id=relation.snapshot_payload->'facts'->>'staffClassAssignmentId'
+      AND student_class.organization_id=org.id AND ${currentWindowSql(Prisma.sql`student_class`)} AND ${currentWindowSql(Prisma.sql`staff_class`)}
+    )))`
+    : Prisma.sql`(relation.relationship_kind='SELF'
     OR (relation.relationship_kind='PARENT_CHILD' AND EXISTS (
      SELECT 1 FROM parent_student_relationships parent_link WHERE parent_link.id=relation.relationship_ref
       AND parent_link.status='ACTIVE' AND parent_link.approved_at IS NOT NULL
@@ -63,15 +58,9 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql, purpos
       AND staff_class.id=relation.snapshot_payload->'facts'->>'staffClassAssignmentId'
       AND student_class.organization_id=org.id AND ${currentWindowSql(Prisma.sql`student_class`)} AND ${currentWindowSql(Prisma.sql`staff_class`)}
     ))
-   )
-   -- A campus respondent may only use a published Run while its Activity is
-   -- OPEN and every STUDENT actor remains independently approved and selected.
-   -- No original training Run is affected by this product-domain predicate.
-   -- Shared education identity does not imply that every School-domain Run
-   -- belongs to Huischool. Teacher Form Runs use a different authorized event
-   -- and must not depend on psychology enrollment or a Campus Activity.
-   AND (org.product_domain<>'SCHOOL' OR (
-    EXISTS(
+   )`
+
+const huiteacherPopulationBranchSql = (purpose: RunAuthorityPurpose): Prisma.Sql => Prisma.sql`EXISTS(
       SELECT 1 FROM huiteacher_evaluation_run_links h
       JOIN huiteacher_evaluation_events event
         ON event.organization_id=h.organization_id AND event.id=h.event_id
@@ -184,9 +173,9 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql, purpos
           )
         )
         )
-    )
-   ) OR (
-    NOT EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h
+    )`
+
+const campusPopulationBranchSql = (purpose: RunAuthorityPurpose): Prisma.Sql => Prisma.sql`NOT EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h
       WHERE h.organization_id=org.id AND h.run_id=x.run_id)
     AND NOT EXISTS(SELECT 1 FROM assessment_run_tracks school_ordinary
       WHERE school_ordinary.id=x.track_id AND school_ordinary.organization_id=x.organization_id
@@ -253,8 +242,46 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql, purpos
       JOIN users actor_user ON actor_user.id=foreign_actor.user_id
       WHERE foreign_actor.id IN (x.subject_actor_snapshot_id,x.respondent_actor_snapshot_id)
         AND actor_user.account_domain<>'SCHOOL'
-    )
-   ))
+    )`
+
+const domainPopulationAuthoritySql = (
+  purpose: RunAuthorityPurpose,
+  productScope: RunPopulationProductScope,
+): Prisma.Sql => {
+  if (productScope === 'CAMPUS_ONLY') {
+    return Prisma.sql`org.product_domain='SCHOOL' AND (${campusPopulationBranchSql(purpose)})`
+  }
+  if (productScope === 'HUITEACHER_ONLY') {
+    return Prisma.sql`org.product_domain='SCHOOL'
+    AND NOT EXISTS(SELECT 1 FROM campus_activity_runs school_excl WHERE school_excl.organization_id=org.id AND school_excl.run_id=x.run_id)
+    AND ${huiteacherPopulationBranchSql(purpose)}`
+  }
+  return Prisma.sql`(org.product_domain<>'SCHOOL' OR (${huiteacherPopulationBranchSql(purpose)} OR (${campusPopulationBranchSql(purpose)})))`
+}
+
+/** Shared current population gate. Intake deadlines do not remove own history.
+ * executionId is a static SQL expression supplied by the caller, never user SQL.
+ */
+export const currentRunPopulationAuthoritySql = (
+  executionId: Prisma.Sql,
+  purpose: RunAuthorityPurpose = 'COLLECTION',
+  productScope: RunPopulationProductScope = 'ALL',
+): Prisma.Sql => Prisma.sql`
+ EXISTS (
+  SELECT 1 FROM assessment_run_executions x JOIN organizations org ON org.id=x.organization_id
+  JOIN assessment_run_relationship_snapshots relation ON relation.id=x.relationship_snapshot_id
+  JOIN assessment_run_actor_snapshots subject ON subject.id=x.subject_actor_snapshot_id
+  JOIN assessment_run_actor_snapshots respondent ON respondent.id=x.respondent_actor_snapshot_id
+  WHERE x.id=${executionId} AND org.status='ACTIVE'
+   AND NOT EXISTS (
+    SELECT 1 FROM assessment_run_actor_snapshots actor
+    WHERE actor.id IN (x.subject_actor_snapshot_id,x.respondent_actor_snapshot_id)
+      AND NOT (${currentRunActorAuthoritySql({ userId: Prisma.sql`actor.user_id`, organizationId: Prisma.sql`org.id`,
+        provenance: Prisma.sql`actor.provenance_kind`, membershipId: Prisma.sql`actor.membership_id`,
+        personaGrantId: Prisma.sql`actor.snapshot_payload->>'personaGrantId'`, role: Prisma.sql`actor.actor_role` }, purpose)})
+   )
+   AND ${relationshipAuthoritySql(productScope)}
+   AND ${domainPopulationAuthoritySql(purpose, productScope)}
    AND (relation.snapshot_payload->'facts'->>'courseId' IS NULL OR EXISTS (
     SELECT 1 FROM courses course JOIN course_students student ON student.course_id=course.id AND student.status IN ('ACTIVE','APPROVED')
     WHERE course.id=relation.snapshot_payload->'facts'->>'courseId' AND course.status='PUBLISHED' AND course.ended_at IS NULL

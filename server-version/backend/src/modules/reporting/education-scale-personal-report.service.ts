@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
+import { applyBoundedPlannerControls } from '../assessment-run/plannerBound'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 import { readEducationScaleExecutionSource } from '../assessment-run/educationScaleExecutionSource'
 import { validateResultDisclosureContract } from '../assessment-policy/result-disclosure'
@@ -67,7 +68,7 @@ export async function readEducationRespondentScaleReport(input: EducationPersona
     // One execution ID anchors the explicit joins. Bound planner search only
     // inside this report transaction; PostgreSQL restores the pooled session
     // setting at commit/rollback. Keep both current-authority reads unchanged.
-    await tx.$executeRaw`SET LOCAL join_collapse_limit = 1`
+    await applyBoundedPlannerControls(tx)
     const own = await readOwn(tx, input)
     if (!own || !(own.resourceKey.startsWith('library-scale:') || own.resourceKey.startsWith('private-scale:'))) return null
     if (canonicalHash(own.policy) !== own.policyHash) return hidden()

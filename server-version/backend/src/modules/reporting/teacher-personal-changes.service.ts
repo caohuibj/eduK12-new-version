@@ -5,6 +5,7 @@ import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {currentRunPopulationAuthoritySql} from '../assessment-run/currentPopulationAuthority'
+import {applyBoundedPlannerControls} from '../assessment-run/plannerBound'
 import {resolveHistoricalRelationalEntry} from '../assessment-run/registeredResources'
 import {resolveEducationProductMemberScope} from '../organization/educationProductAccess'
 import {validateResultDisclosureContract} from '../assessment-policy/result-disclosure'
@@ -19,6 +20,7 @@ const denied=():never=>reportingFail('REPORT_NOT_FOUND','本人变化报告不�
 export async function readEducationPersonalChanges(input:{actorUserId:string;executionId:string;entry:'SCHOOL'|'TEACHER'}){
  const role=input.entry==='SCHOOL'?'STUDENT':'TEACHER'
  return prisma.$transaction(async tx=>{
+  await applyBoundedPlannerControls(tx)
   type Wave={id:string;organizationId:string;runId:string;trackId:string;ordinal:number;baselineId:string;tracking:unknown;assignmentId:string;policy:any;policyHash:string;family:any;key:string;version:string;episodeId:string}
   const read=(baselineId?:string)=>tx.$queryRaw<Wave[]>(Prisma.sql`
    SELECT e.id,e.organization_id AS "organizationId",e.run_id AS "runId",e.track_id AS "trackId",run.personal_tracking_ordinal AS ordinal,
@@ -35,7 +37,7 @@ export async function readEducationPersonalChanges(input:{actorUserId:string;exe
     AND ${input.entry==='SCHOOL'?Prisma.sql`person.role='STUDENT'`:Prisma.sql`person.role IN ('TEACHER','ADMIN') AND person.teacher_approved`}
    WHERE ${input.entry==='SCHOOL'?Prisma.sql`EXISTS(SELECT 1 FROM campus_activity_runs link WHERE link.organization_id=e.organization_id AND link.run_id=e.run_id)`:Prisma.sql`EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links link WHERE link.organization_id=e.organization_id AND link.run_id=e.run_id)`}
     AND (run.personal_tracking IS NULL OR run.personal_tracking->>'entry'=${input.entry})
-    AND e.status NOT IN ('REVOKED','CANCELLED') AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`,'REPORT_READ')}
+    AND e.status NOT IN ('REVOKED','CANCELLED') AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`,'REPORT_READ',input.entry==='SCHOOL'?'CAMPUS_ONLY':'HUITEACHER_ONLY')}
     AND NOT EXISTS(SELECT 1 FROM organization_access_denies d WHERE d.organization_id=e.organization_id AND d.user_id=${input.actorUserId} AND d.lifted_at IS NULL AND d.permission IN ('*','REPORT_READ','PARTICIPANT_REPORT_READ'))
     AND ${baselineId?Prisma.sql`run.personal_tracking_baseline_id=${baselineId} AND EXISTS(SELECT 1 FROM jsonb_array_elements(run.personal_tracking->'bindings') chosen WHERE chosen->>'trackId'=e.track_id)`:Prisma.sql`e.id=${input.executionId}`}
    ORDER BY run.personal_tracking_ordinal,e.id LIMIT 101`)

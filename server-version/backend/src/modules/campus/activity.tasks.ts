@@ -240,7 +240,7 @@ export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal,curs
           AND eligible_respondent."user_id"=${actor.userId}
           AND eligible_respondent."run_id"=r."id"
           AND ${boundCompositeContinuationSql(Prisma.sql`eligible."id"`,actor.userId)}
-          AND ${currentRunPopulationAuthoritySql(Prisma.sql`eligible."id"`)}
+          AND ${currentRunPopulationAuthoritySql(Prisma.sql`eligible."id"`, 'COLLECTION', 'CAMPUS_ONLY')}
       )))) AND EXISTS (
       SELECT 1 FROM "parent_student_relationships" link
       JOIN "organization_memberships" m ON m."organization_id"=ar."organization_id"

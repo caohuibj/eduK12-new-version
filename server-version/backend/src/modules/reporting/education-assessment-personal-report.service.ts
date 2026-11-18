@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
+import { applyBoundedPlannerControls } from '../assessment-run/plannerBound'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 import { educationAssessmentResourceKey, type EducationAssessmentOrigin } from '../education-tools/assessment-resource.contract'
 import type { RelationalProductEntryV1 } from '../assessment-relational/product-registry'
@@ -79,7 +80,7 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
     // As in the Scale self-report reader, the exact execution anchors these
     // explicit joins. Bound planning in this transaction only; keep both
     // current-authority reads and restore the pooled setting on exit.
-    await tx.$executeRaw`SET LOCAL join_collapse_limit = 1`
+    await applyBoundedPlannerControls(tx)
     const own=await readOwn(tx,input)
     if(!own)return null
     if(canonicalHash(own.policy)!==own.policyHash)hidden()

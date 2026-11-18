@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { logger } from '../../utils/logger'
+import { type RunPopulationProductScope } from './currentPopulationAuthority'
 import { assertCurrentRunStartAuthority } from './startAuthority'
 import { freezeRunExecutionScientificProvenanceInTransaction } from './scientificProvenance'
 import { loadRunExecutionStartAdmission, type RunAttemptIdentityBinding, type RunStartAdmission } from './startAdmission'
@@ -45,13 +46,21 @@ type Tx = Prisma.TransactionClient
 export type RunExecutionLockIdentity = {
   organizationId: string
   runId: string
+  hasCampusActivity?: boolean
+  hasHuiteacherLink?: boolean
 }
 
-type ExecutionLockRow = RunExecutionLockIdentity & {
+export type ExecutionLockRow = RunExecutionLockIdentity & {
   runtimeBindingKind: string | null
   runtimeBindingRef: string | null
   respondentUserId: string
   scientificFrozenAt: Date | null
+}
+
+export const resolveProductScopeFromLock = (identity: RunExecutionLockIdentity): RunPopulationProductScope => {
+  if (identity.hasCampusActivity === true && identity.hasHuiteacherLink === false) return 'CAMPUS_ONLY'
+  if (identity.hasHuiteacherLink === true && identity.hasCampusActivity === false) return 'HUITEACHER_ONLY'
+  return 'ALL'
 }
 
 const CLAIM_PROJECTION = `
@@ -73,9 +82,17 @@ export const lockExecutionEnvelope = async (
   let identity = knownIdentity
   if (!identity) {
     const rows = await tx.$queryRaw<Array<RunExecutionLockIdentity>>`
-      SELECT "organization_id" AS "organizationId", "run_id" AS "runId"
-      FROM "assessment_run_executions"
-      WHERE "id" = ${executionId}
+      SELECT e."organization_id" AS "organizationId", e."run_id" AS "runId",
+        EXISTS (
+          SELECT 1 FROM "campus_activity_runs" ar
+          WHERE ar."organization_id" = e."organization_id" AND ar."run_id" = e."run_id"
+        ) AS "hasCampusActivity",
+        EXISTS (
+          SELECT 1 FROM "huiteacher_evaluation_run_links" link
+          WHERE link."organization_id" = e."organization_id" AND link."run_id" = e."run_id"
+        ) AS "hasHuiteacherLink"
+      FROM "assessment_run_executions" e
+      WHERE e."id" = ${executionId}
       LIMIT 1
     `
     identity = rows[0]
@@ -95,35 +112,39 @@ export const lockExecutionEnvelope = async (
   // SCHOOL Activity pause/closure must serialize with START admission. This
   // SHARE lock conflicts with Activity's FOR UPDATE transition lock; current
   // population is rechecked under these fences after any wait.
-  await tx.$queryRaw`
-    SELECT a."course_id" FROM "campus_activity_runs" ar
-    JOIN "campus_activities" a ON a."course_id"=ar."course_id"
-      AND a."organization_id"=ar."organization_id"
-    WHERE ar."organization_id"=${identity.organizationId}
-      AND ar."run_id"=${identity.runId}
-    FOR SHARE OF a
-  `
+  if (identity.hasCampusActivity !== false) {
+    await tx.$queryRaw`
+      SELECT a."course_id" FROM "campus_activity_runs" ar
+      JOIN "campus_activities" a ON a."course_id"=ar."course_id"
+        AND a."organization_id"=ar."organization_id"
+      WHERE ar."organization_id"=${identity.organizationId}
+        AND ar."run_id"=${identity.runId}
+      FOR SHARE OF a
+    `
+  }
   // Teacher event/policy suspension must serialize with an admitted START
   // under the same Organization/Run/Execution lock order.
-  await tx.$queryRaw`
-    SELECT event."id" FROM "huiteacher_evaluation_run_links" link
-    JOIN "huiteacher_evaluation_events" event
-      ON event."organization_id"=link."organization_id"
-      AND event."id"=link."event_id"
-    WHERE link."organization_id"=${identity.organizationId}
-      AND link."run_id"=${identity.runId}
-    FOR SHARE OF event
-  `
-  await tx.$queryRaw`
-    SELECT entitlement."organization_id"
-    FROM "huiteacher_evaluation_run_links" link
-    JOIN "education_product_entitlements" entitlement
-      ON entitlement."organization_id"=link."organization_id"
-      AND entitlement."product"='HUITEACHER'
-    WHERE link."organization_id"=${identity.organizationId}
-      AND link."run_id"=${identity.runId}
-    FOR SHARE OF entitlement
-  `
+  if (identity.hasHuiteacherLink !== false) {
+    await tx.$queryRaw`
+      SELECT event."id" FROM "huiteacher_evaluation_run_links" link
+      JOIN "huiteacher_evaluation_events" event
+        ON event."organization_id"=link."organization_id"
+        AND event."id"=link."event_id"
+      WHERE link."organization_id"=${identity.organizationId}
+        AND link."run_id"=${identity.runId}
+      FOR SHARE OF event
+    `
+    await tx.$queryRaw`
+      SELECT entitlement."organization_id"
+      FROM "huiteacher_evaluation_run_links" link
+      JOIN "education_product_entitlements" entitlement
+        ON entitlement."organization_id"=link."organization_id"
+        AND entitlement."product"='HUITEACHER'
+      WHERE link."organization_id"=${identity.organizationId}
+        AND link."run_id"=${identity.runId}
+      FOR SHARE OF entitlement
+    `
+  }
   const rows = await tx.$queryRaw<ExecutionLockRow[]>`
     SELECT e."organization_id" AS "organizationId", e."run_id" AS "runId",
       e."runtime_binding_kind" AS "runtimeBindingKind", e."runtime_binding_ref" AS "runtimeBindingRef",
@@ -141,7 +162,11 @@ export const lockExecutionEnvelope = async (
   if (rows[0].organizationId !== identity.organizationId || rows[0].runId !== identity.runId) {
     throw new RunStartClaimError('RUN_START_ENVELOPE_IDENTITY', 'START envelope identity diverged under lock', 500)
   }
-  return rows[0]
+  return {
+    ...rows[0],
+    ...(identity.hasCampusActivity !== undefined ? { hasCampusActivity: identity.hasCampusActivity } : {}),
+    ...(identity.hasHuiteacherLink !== undefined ? { hasHuiteacherLink: identity.hasHuiteacherLink } : {}),
+  }
 }
 
 const lockClaim = async (tx: Tx, executionId: string): Promise<RunStartClaimRecord | null> => {
@@ -161,12 +186,34 @@ const dbNow = async (tx: Tx): Promise<Date> => {
 
 const leaseAt = (now: Date, leaseMs: number): Date => new Date(now.getTime() + leaseMs)
 
-export const acquireRunExecutionStartClaim = async (input: {
+export type TransactionalStartDispatchContext = {
+  tx: Tx
+  claim: RunStartClaimRecord
+  admission: RunStartAdmission
+  execution: ExecutionLockRow
+  productScope: RunPopulationProductScope
+}
+
+export async function acquireRunExecutionStartClaim(input: {
   executionId: string
   actorUserId: string
   leaseMs?: number
   resourceRegistry?: RunResourceAuthorityRegistry
-}): Promise<RunStartClaimDecision> => {
+}): Promise<RunStartClaimDecision>
+export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
+  executionId: string
+  actorUserId: string
+  leaseMs?: number
+  resourceRegistry?: RunResourceAuthorityRegistry
+  transactionalDispatch?: (ctx: TransactionalStartDispatchContext) => Promise<TInlineResult | null>
+}): Promise<RunStartClaimDecision | { kind: 'COMPLETED_INLINE'; result: TInlineResult }>
+export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
+  executionId: string
+  actorUserId: string
+  leaseMs?: number
+  resourceRegistry?: RunResourceAuthorityRegistry
+  transactionalDispatch?: (ctx: TransactionalStartDispatchContext) => Promise<TInlineResult | null>
+}): Promise<RunStartClaimDecision | { kind: 'COMPLETED_INLINE'; result: TInlineResult }> {
   const leaseMs = input.leaseMs ?? 30_000
   if (!Number.isInteger(leaseMs) || leaseMs < 1_000 || leaseMs > 5 * 60_000) {
     throw new RunStartClaimError('RUN_START_LEASE_INVALID', 'START claim lease must be between 1s and 5m', 400)
@@ -194,9 +241,15 @@ export const acquireRunExecutionStartClaim = async (input: {
       }
     }
 
+    const productScope = resolveProductScopeFromLock(execution)
     const existing = await lockClaim(tx, input.executionId)
     if (existing?.state === 'ABORTED') return { kind: 'ABORTED' as const, claim: existing }
-    if (!existing) await assertCurrentRunStartAuthority(tx, input.executionId, {accountMode:'DETECT_EDUCATION_LIBRARY'})
+    if (!existing) {
+      await assertCurrentRunStartAuthority(tx, input.executionId, {
+        accountMode: 'DETECT_EDUCATION_LIBRARY',
+        productScope,
+      })
+    }
     const admission = await loadRunExecutionStartAdmission({
       tx,
       executionId: input.executionId,
@@ -226,6 +279,18 @@ export const acquireRunExecutionStartClaim = async (input: {
           'AssessmentRunExecution', ${input.executionId}, ${id},
           ${JSON.stringify({ operationKey, assignmentId: admission.assignment.assignmentId, attemptIdentity: admission.attemptIdentity })}::jsonb)
       `
+      if (input.transactionalDispatch) {
+        const inlineResult = await input.transactionalDispatch({
+          tx,
+          claim: rows[0],
+          admission,
+          execution,
+          productScope,
+        })
+        if (inlineResult !== null) {
+          return { kind: 'COMPLETED_INLINE' as const, result: inlineResult }
+        }
+      }
       return { kind: 'ACQUIRED' as const, claim: rows[0], admission }
     }
 

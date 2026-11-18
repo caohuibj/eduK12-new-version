@@ -138,18 +138,38 @@ export class AssessmentResourceProtection {
   private lastCpuAt = -Infinity
   private lastTrickleAt = -Infinity
   private highCpu = 0
+  private cpuProtectedSamples = 0
+  private lastCpuProtectedReleaseAt = -Infinity
+  private sustainedCpuEpisodes = 0
+  private cpuRejectSequence = 0
   private memoryProtected = false
   private cpuProtected = false
   private trickleMemoryProtected = false
   private syncSampleState(value: AssessmentResourceSample, trickleConfig?: LowMemoryTrickleConfig): void {
     const cpuAt = value.cpuAt ?? value.at
     if (cpuAt !== this.lastCpuAt) {
+      const wasCpuProtected = this.cpuProtected
       this.lastCpuAt = cpuAt
       this.highCpu = value.cpuPercent !== null && value.cpuPercent >= 95 ? this.highCpu + 1 : 0
       if (this.highCpu >= 2) this.cpuProtected = true
       // A 95% CPU spike must not strand START admission while the host settles
       // at a healthy 86–90%; keep the two-sample trip point unchanged.
       if (value.cpuPercent === null || value.cpuPercent <= 90) this.cpuProtected = false
+      if (!wasCpuProtected && this.cpuProtected) {
+        if (cpuAt - this.lastCpuProtectedReleaseAt <= 8_000) {
+          this.sustainedCpuEpisodes = Math.min(3, this.sustainedCpuEpisodes + 1)
+        } else {
+          this.sustainedCpuEpisodes = 0
+        }
+        this.cpuProtectedSamples = 1
+      } else if (wasCpuProtected && this.cpuProtected) {
+        this.cpuProtectedSamples += 1
+      } else if (wasCpuProtected && !this.cpuProtected) {
+        this.lastCpuProtectedReleaseAt = cpuAt
+        this.cpuProtectedSamples = 0
+      } else if (!this.cpuProtected && cpuAt - this.lastCpuProtectedReleaseAt > 8_000) {
+        this.sustainedCpuEpisodes = 0
+      }
     }
     if (value.at !== this.lastAt) {
       this.lastAt = value.at
@@ -171,9 +191,24 @@ export class AssessmentResourceProtection {
     this.lastCpuAt = -Infinity
     this.lastTrickleAt = -Infinity
     this.highCpu = 0
+    this.cpuProtectedSamples = 0
+    this.lastCpuProtectedReleaseAt = -Infinity
+    this.sustainedCpuEpisodes = 0
+    this.cpuRejectSequence = 0
     this.memoryProtected = false
     this.cpuProtected = false
     this.trickleMemoryProtected = false
+  }
+  recommendedCpuRetryAfterSeconds(baseSeconds = HOST_CPU_RETRY_AFTER_SECONDS): number {
+    const durationSeverity = this.cpuProtectedSamples >= 6 ? 2 : this.cpuProtectedSamples >= 3 ? 1 : 0
+    const severity = Math.max(this.sustainedCpuEpisodes, durationSeverity)
+    if (severity === 0) return baseSeconds
+    if (severity === 1) {
+      const spread = this.cpuRejectSequence++ % 3
+      return Math.min(30, baseSeconds * 2 + spread)
+    }
+    const spread = this.cpuRejectSequence++ % 4
+    return Math.min(30, baseSeconds * 3 + spread)
   }
   decision(value: AssessmentResourceSample, concurrency: number, now = performance.now()): ResourceClaimDecision {
     this.syncSampleState(value)
@@ -229,7 +264,9 @@ const lowMemoryTrickleContext = new AsyncLocalStorage<{ active: boolean }>()
 const buildStartResourceError = (retryHint: 'memory' | 'cpu'): InstrumentFinalSubmitError => {
   const err = new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '系统繁忙，请稍后开始测评；已经提交的答案不受影响。', 503)
   ;(err as { preferredRetryAfterSeconds?: number }).preferredRetryAfterSeconds =
-    retryHint === 'cpu' ? HOST_CPU_RETRY_AFTER_SECONDS : HOST_MEMORY_RETRY_AFTER_SECONDS
+    retryHint === 'cpu'
+      ? policy.recommendedCpuRetryAfterSeconds(HOST_CPU_RETRY_AFTER_SECONDS)
+      : HOST_MEMORY_RETRY_AFTER_SECONDS
   return err
 }
 

@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks'
 import { randomUUID } from 'node:crypto'
 import { performance } from 'node:perf_hooks'
 import type { RequestHandler } from 'express'
@@ -150,6 +151,8 @@ const schedulePressure = (delay = COALESCE_MS): void => {
   scheduledAt = deadline
   publishTimer = setTimeout(() => { void emitPressure() }, Math.max(0, deadline - now())); publishTimer.unref()
 }
+const activeSubmissionPressureScope = new AsyncLocalStorage<{ tracked: boolean }>()
+
 export const authenticatedWholeSubmissionPriority: RequestHandler = (req, res, next) => {
   // Authentication can finish after a client/proxy has already closed the
   // response. Such finish/close events will not be replayed to late listeners.
@@ -170,7 +173,24 @@ export const authenticatedWholeSubmissionPriority: RequestHandler = (req, res, n
   if (closed()) ended()
   // On entry this is a timer, never a Redis operation per submission.
   schedulePressure(pressure.snapshot(runtimeEventLoopDelayMs()).busy ? 0 : COALESCE_MS)
-  return next()
+  return activeSubmissionPressureScope.run({ tracked: true }, () => next())
+}
+
+/** Track verified public/education whole-questionnaire submissions so report
+ * workers yield CPU and DB pool slots during anonymous or school bursts without
+ * exposing unauthenticated routes to pre-auth pressure spoofing. */
+export const trackVerifiedWholeSubmissionPressure = async <T>(operation: () => Promise<T>): Promise<T> => {
+  if (!enabled() || activeSubmissionPressureScope.getStore()?.tracked) {
+    return operation()
+  }
+  const finish = pressure.begin()
+  schedulePressure(pressure.snapshot(runtimeEventLoopDelayMs()).busy ? 0 : COALESCE_MS)
+  try {
+    return await activeSubmissionPressureScope.run({ tracked: true }, operation)
+  } finally {
+    finish()
+    schedulePressure()
+  }
 }
 export const prepareWholeSubmissionPriority = (): void => {
   if (!enabled() || publisherActive) return

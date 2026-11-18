@@ -5,7 +5,7 @@ const h = vi.hoisted(() => ({ publish: vi.fn().mockResolvedValue(undefined) }))
 vi.mock('../../services/reportReadyNotifications', () => ({ publishReportSchedulingHint: h.publish, onReportSchedulingHint: vi.fn(), prepareReportReadyNotifications: vi.fn() }))
 vi.mock('../../services/runtimeObservability', () => ({ runtimeEventLoopDelayMs: () => 0 }))
 vi.mock('../../utils/logger', () => ({ logger: { info: vi.fn() } }))
-import { authenticatedWholeSubmissionPriority } from '../../services/wholeSubmissionPriority'
+import { authenticatedWholeSubmissionPriority, trackVerifiedWholeSubmissionPressure } from '../../services/wholeSubmissionPriority'
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 afterEach(() => vi.unstubAllEnvs())
 describe('coalesced pressure transport', () => {
@@ -29,5 +29,34 @@ describe('coalesced pressure transport', () => {
     vi.stubEnv('ASSESSMENT_REPORT_SUBMISSION_PRIORITY_ENABLED', 'true'); h.publish.mockClear()
     for (let n = 0; n < 20; n++) authenticatedWholeSubmissionPriority({} as Request, new EventEmitter() as Response, vi.fn())
     await sleep(130); expect(h.publish).not.toHaveBeenCalled()
+  })
+
+  it('tracks verified public/education whole submissions and avoids double-counting middleware-wrapped requests', async () => {
+    vi.stubEnv('ASSESSMENT_REPORT_SUBMISSION_PRIORITY_ENABLED', 'true'); h.publish.mockClear()
+    let releaseBatch!: () => void
+    const hold = new Promise<void>(resolve => { releaseBatch = resolve })
+    const tasks = Array.from({ length: 6 }, () => trackVerifiedWholeSubmissionPressure(() => hold))
+    await sleep(35)
+    expect(h.publish).toHaveBeenCalledTimes(1)
+    expect(JSON.parse(h.publish.mock.calls[0][0])).toMatchObject({ busy: true, active: 6 })
+    releaseBatch()
+    await Promise.all(tasks)
+    await sleep(350)
+    expect(JSON.parse(h.publish.mock.calls.at(-1)![0]).busy).toBe(false)
+
+    // Nested inside authenticatedWholeSubmissionPriority -> active stays 1, not 2 (<4 threshold, so no busy publish)
+    h.publish.mockClear()
+    const req = { user: { userId: 'u-1' } } as Request
+    const res = new EventEmitter() as Response
+    let innerDone = false
+    authenticatedWholeSubmissionPriority(req, res, () => {
+      void trackVerifiedWholeSubmissionPressure(async () => {
+        await sleep(20)
+        innerDone = true
+      }).then(() => res.emit('finish'))
+    })
+    await sleep(160)
+    expect(innerDone).toBe(true)
+    expect(h.publish).not.toHaveBeenCalled()
   })
 })

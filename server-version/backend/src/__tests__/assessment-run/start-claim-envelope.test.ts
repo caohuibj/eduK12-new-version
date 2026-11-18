@@ -43,4 +43,29 @@ describe('lockExecutionEnvelope known identity', () => {
     await expect(lockExecutionEnvelope(tx, 'exec-1', { organizationId: 'org-1', runId: 'run-1' }))
       .rejects.toMatchObject({ code: 'RUN_START_ENVELOPE_IDENTITY', statusCode: 500 })
   })
+
+  it('skips irrelevant cross-product FOR SHARE queries when link flags are false', async () => {
+    const schoolTx = { $queryRaw: vi.fn() } as any
+    schoolTx.$queryRaw
+      .mockResolvedValueOnce([{ organizationId: 'org-1', runId: 'run-1', hasCampusActivity: true, hasHuiteacherLink: false }])
+      .mockResolvedValueOnce([]) // org FOR SHARE
+      .mockResolvedValueOnce([]) // run FOR SHARE
+      .mockResolvedValueOnce([]) // campus_activities FOR SHARE
+      .mockResolvedValueOnce([lockedRow]) // execution FOR UPDATE
+    const schoolRow = await lockExecutionEnvelope(schoolTx, 'exec-school')
+    expect(schoolTx.$queryRaw).toHaveBeenCalledTimes(5)
+    expect(schoolRow).toMatchObject({ hasCampusActivity: true, hasHuiteacherLink: false })
+
+    const teacherTx = { $queryRaw: vi.fn() } as any
+    teacherTx.$queryRaw
+      .mockResolvedValueOnce([{ organizationId: 'org-1', runId: 'run-1', hasCampusActivity: false, hasHuiteacherLink: true }])
+      .mockResolvedValueOnce([]) // org FOR SHARE
+      .mockResolvedValueOnce([]) // run FOR SHARE
+      .mockResolvedValueOnce([]) // huiteacher_evaluation_events FOR SHARE
+      .mockResolvedValueOnce([]) // education_product_entitlements FOR SHARE
+      .mockResolvedValueOnce([lockedRow]) // execution FOR UPDATE
+    const teacherRow = await lockExecutionEnvelope(teacherTx, 'exec-teacher')
+    expect(teacherTx.$queryRaw).toHaveBeenCalledTimes(6)
+    expect(teacherRow).toMatchObject({ hasCampusActivity: false, hasHuiteacherLink: true })
+  })
 })

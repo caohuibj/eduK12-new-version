@@ -3,11 +3,16 @@ import {educationCompositionTrackIdentitySql} from './educationCompositionIdenti
 import {privateScaleRegistryIdentitySql} from './educationPrivateScaleIdentitySql'
 import { Prisma } from '@prisma/client'
 import { currentWindowSql } from './currentActorAuthority'
-import { currentRunPopulationAuthoritySql } from './currentPopulationAuthority'
+import { currentRunPopulationAuthoritySql, type RunPopulationProductScope } from './currentPopulationAuthority'
+import { applyBoundedPlannerControls } from './plannerBound'
 import { RunStartAdmissionError } from './startAdmission'
 
 /** Called with Organization SHARE -> Run SHARE -> Execution UPDATE held. */
-export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClient, executionId: string, options?: { accountMode: 'DETECT_EDUCATION_LIBRARY'; operation?:'BOUND_FINAL' }): Promise<void> => {
+export const assertCurrentRunStartAuthority = async (
+  tx: Prisma.TransactionClient,
+  executionId: string,
+  options?: { accountMode?: 'DETECT_EDUCATION_LIBRARY'; operation?: 'BOUND_FINAL'; productScope?: RunPopulationProductScope },
+): Promise<void> => {
   const fail = (code: string) => { throw new RunStartAdmissionError(code, 'current Run START authority is no longer valid', 403) }
   // Verified public-library and author-private executions use query-time account checks. Do not acquire a
   // user lock after org: account-reset writers acquire user UPDATE before org.
@@ -200,9 +205,9 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
   // Reuse the existing education-report planner bound for this exact-ID
   // population gate. Transaction-local only; current authority and time checks
   // remain fresh, and PostgreSQL restores the pooled setting on transaction end.
-  await tx.$executeRaw`SET LOCAL join_collapse_limit = 1`
+  await applyBoundedPlannerControls(tx)
   const windows = await tx.$queryRaw<Array<{ intakeOpen: boolean; accountsCurrent: boolean; populationCurrent: boolean }>>`
-    SELECT ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)} AS "populationCurrent", (r."intake_deadline" IS NULL OR r."intake_deadline" > statement_timestamp()) AS "intakeOpen",
+    SELECT ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`, 'COLLECTION', options?.productScope ?? 'ALL')} AS "populationCurrent", (r."intake_deadline" IS NULL OR r."intake_deadline" > statement_timestamp()) AS "intakeOpen",
       NOT EXISTS (
         SELECT 1 FROM "assessment_run_actor_snapshots" a JOIN "users" u ON u."id"=a."user_id"
         WHERE a."id" IN (e."subject_actor_snapshot_id", e."respondent_actor_snapshot_id")

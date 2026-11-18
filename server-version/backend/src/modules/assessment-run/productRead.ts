@@ -342,7 +342,7 @@ export async function listAssignedRunTasks(userId: string, options?: {
       ${executionScope}
       ${cursorScope}
       AND ((${closedScope}
-      AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)}
+      AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`, 'COLLECTION', options?.preserveBoundSchoolContinuation ? 'CAMPUS_ONLY' : 'ALL')}
       AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
         WHERE d."organization_id" = e."organization_id" AND d."user_id" = ${userId}
           AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START')))

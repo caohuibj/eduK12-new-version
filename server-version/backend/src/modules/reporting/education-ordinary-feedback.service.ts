@@ -6,6 +6,7 @@ import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {currentRunPopulationAuthoritySql} from '../assessment-run/currentPopulationAuthority'
+import {applyBoundedPlannerControls} from '../assessment-run/plannerBound'
 import {readFrozenCompositionIdentity} from '../assessment-run/educationCompositionExecution'
 import type {RunResourcePolicy} from '../assessment-run/resourceAuthority'
 import type {ResultDisclosureContractV1} from '../assessment-policy/result-disclosure'
@@ -72,7 +73,7 @@ export const readTeacherOrdinaryFeedback=(input:Input)=>readOrdinaryFeedback({..
 export const readSchoolOrdinaryFeedback=(input:Input)=>readOrdinaryFeedback({...input,entry:'SCHOOL'})
 async function readOrdinaryFeedback(input:ScopedInput){
  return prisma.$transaction(async tx=>{
-  await tx.$executeRaw`SET LOCAL join_collapse_limit = 1`
+  await applyBoundedPlannerControls(tx)
   const own=await readOwn(tx,input,true)
   if(!own)hidden()
   const identity=await readFrozenCompositionIdentity(tx,own)
