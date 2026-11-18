@@ -53,8 +53,8 @@ export async function loadCurrentPrincipal(userId: string, db: Pick<Prisma.Trans
       "is_frozen" AS "isFrozen",
       "expires_at" AS "expiresAt",
       "teacher_approved" AS "teacherApproved",
-      COALESCE((SELECT json_agg(json_build_object('entry', g."entry", 'version', g."version") ORDER BY g."entry")
-        FROM "admin_entry_grants" g WHERE g."user_id"="users"."id" AND g."revoked_at" IS NULL), '[]'::json) AS "entryGrants",
+      CASE WHEN "users"."account_domain" IN ('LEGACY','TRAINING') THEN COALESCE((SELECT json_agg(json_build_object('entry', g."entry", 'version', g."version") ORDER BY g."entry")
+        FROM "admin_entry_grants" g WHERE g."user_id"="users"."id" AND g."revoked_at" IS NULL), '[]'::json) ELSE '[]'::json END AS "entryGrants",
       CASE WHEN "users"."account_domain"='SCHOOL' THEN (
         "users"."role"::text='ADMIN' OR "users"."platform_role"::text='SYSTEM_ADMIN'
         OR EXISTS (

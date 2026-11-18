@@ -50,4 +50,13 @@ describe('Private execution scientific baseline bypasses no generic security gua
   expect(await freezeRunExecutionScientificProvenanceInTransaction(frozen.db as any,'execution',frozen.registry as any)).toMatchObject({scientificProvenanceHash:'fixed'})
   expect(frozen.db.$queryRaw).toHaveBeenCalledTimes(1);expect(m.source).not.toHaveBeenCalled()
  })
+ it('reuses locked envelope link flags and timestamp to skip duplicate EXISTS and transaction_timestamp queries',async()=>{
+  const now=new Date('2026-11-18T10:00:00Z')
+  const db={$queryRaw:vi.fn().mockResolvedValueOnce([row]).mockResolvedValueOnce([{scientificMaturity:'PILOT'}])}
+  const registry={resolveExact:vi.fn()}
+  expect(await freezeRunExecutionScientificProvenanceInTransaction(db as any,'execution',registry as any,{
+   organizationId:origin.organizationId,hasCampusActivity:true,hasHuiteacherLink:false,now,alreadyLocked:true,
+  })).toMatchObject({scientificMaturity:'PILOT'})
+  expect(db.$queryRaw).toHaveBeenCalledTimes(2)
+ })
 })

@@ -137,24 +137,33 @@ async function currentSchoolExecution(req:import('express').Request,res:import('
     // Parent and student respondents must both authenticate as SCHOOL; the
     // canonical Run start path then checks exact frozen respondent + consent
     // and live Activity, class and relationship population within its txn.
-    const rows=await prisma.$queryRaw<Array<{allowed:boolean}>>`
-      SELECT EXISTS(
-        SELECT 1 FROM "campus_activity_runs" ar
-        JOIN "campus_activities" a ON a."course_id"=ar."course_id"
-          AND a."organization_id"=ar."organization_id" AND a."status"='OPEN'
-        JOIN "assessment_run_executions" e ON e."run_id"=ar."run_id"
-          AND e."organization_id"=ar."organization_id"
-        JOIN "assessment_run_actor_snapshots" respondent
-          ON respondent."id"=e."respondent_actor_snapshot_id"
-          AND respondent."run_id"=e."run_id"
-        WHERE ar."organization_id"=${p.data.organizationId}
-          AND ar."course_id"=${p.data.courseId}
-          AND ar."run_id"=${p.data.runId}
-          AND e."id"=${p.data.executionId}
-          AND respondent."user_id"=${req.user.userId}
-      ) AS "allowed"
+    const rows=await prisma.$queryRaw<Array<{
+      runtimeBindingKind:string|null
+      runtimeBindingRef:string|null
+      respondentUserId:string
+    }>>`
+      SELECT e."runtime_binding_kind" AS "runtimeBindingKind",
+        e."runtime_binding_ref" AS "runtimeBindingRef",
+        respondent."user_id" AS "respondentUserId"
+      FROM "campus_activity_runs" ar
+      JOIN "campus_activities" a ON a."course_id"=ar."course_id"
+        AND a."organization_id"=ar."organization_id" AND a."status"='OPEN'
+      JOIN "assessment_run_executions" e ON e."run_id"=ar."run_id"
+        AND e."organization_id"=ar."organization_id"
+      JOIN "assessment_run_actor_snapshots" respondent
+        ON respondent."id"=e."respondent_actor_snapshot_id"
+        AND respondent."run_id"=e."run_id"
+      WHERE ar."organization_id"=${p.data.organizationId}
+        AND ar."course_id"=${p.data.courseId}
+        AND ar."run_id"=${p.data.runId}
+        AND e."id"=${p.data.executionId}
+        AND respondent."user_id"=${req.user.userId}
+      LIMIT 1
     `
-    if(!rows[0]?.allowed)return notFound(res,'测评任务不可访问')
+    if(!rows[0])return notFound(res,'测评任务不可访问')
+    if(res.locals&&typeof res.locals==='object'){
+      (res.locals as Record<string,unknown>).startPreflight=rows[0]
+    }
     next()
   }catch(err){next(err)}
 }

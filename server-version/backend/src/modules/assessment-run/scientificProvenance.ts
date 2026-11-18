@@ -1,7 +1,7 @@
 import {assertEducationAssessmentExecutionSource} from './educationAssessmentExecution'
 import {readPrivateFormExecutionSource} from './educationPrivateFormExecution'
 import {readFrozenCompositionIdentity} from './educationCompositionExecution'
-import {readEducationScaleExecutionSource} from './educationScaleExecutionSource'
+import {readEducationScaleExecutionSource, type EducationScaleExecutionSource} from './educationScaleExecutionSource'
 import { relationalEntryToRunPolicy, productionRunResourceAuthorityRegistry, type RunResourceAuthorityRegistry, type RunResourceFamily, type RunResourcePolicy } from './resourceAuthority'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -36,53 +36,123 @@ export class RunScientificProvenanceError extends Error {
 
 const MATURITIES = new Set<RunScientificMaturity>(['PILOT', 'RESEARCH_READY', 'RESEARCH_GRADE'])
 
-export const freezeRunExecutionScientificProvenanceInTransaction = async (
-  tx: Tx,
-  executionId: string,
-  registry: RunResourceAuthorityRegistry = productionRunResourceAuthorityRegistry,
-): Promise<FrozenRunScientificRecord> => {
-  const rows = await tx.$queryRaw<Array<{
-    organizationId:string
-    school:boolean
-    teacher:boolean
+export type ScientificProvenanceKnownLockContext = {
+  organizationId: string
+  hasCampusActivity?: boolean
+  hasHuiteacherLink?: boolean
+  now?: Date
+  alreadyLocked?: boolean
+}
+
+export type FrozenRunScientificDetails = {
+  record: FrozenRunScientificRecord
+  track: {
+    organizationId: string
+    school: boolean
+    teacher: boolean
     resourceFamily: string
     resourceKey: string
     resourceVersion: string
     resourcePolicyHash: string | null
     frozenResourcePolicy: unknown | null
-    scientificMaturity: RunScientificMaturity | null
-    scientificProvenance: FrozenRunScientificProvenanceV1 | null
-    scientificProvenanceHash: string | null
-    scientificFrozenAt: Date | null
-  }>>`
-    SELECT e."organization_id" AS "organizationId",
-      EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id) AS school,
-      EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links teacher WHERE teacher.organization_id=e.organization_id AND teacher.run_id=e.run_id) AS teacher,
-      t."resource_family" AS "resourceFamily", t."resource_key" AS "resourceKey",
-      t."resource_version" AS "resourceVersion", t."resource_policy_hash" AS "resourcePolicyHash",
-      t."frozen_resource_policy" AS "frozenResourcePolicy", e."scientific_maturity" AS "scientificMaturity",
-      e."scientific_provenance" AS "scientificProvenance",
-      e."scientific_provenance_hash" AS "scientificProvenanceHash",
-      e."scientific_frozen_at" AS "scientificFrozenAt"
-    FROM "assessment_run_executions" e
-    JOIN "assessment_run_tracks" t
-      ON t."organization_id" = e."organization_id" AND t."run_id" = e."run_id" AND t."id" = e."track_id"
-    WHERE e."id" = ${executionId}
-    FOR UPDATE OF e
-  `
+  }
+  educationScaleSource?: EducationScaleExecutionSource
+}
+
+export const freezeRunExecutionScientificProvenanceWithDetailsInTransaction = async (
+  tx: Tx,
+  executionId: string,
+  registry: RunResourceAuthorityRegistry = productionRunResourceAuthorityRegistry,
+  knownContext?: ScientificProvenanceKnownLockContext,
+): Promise<FrozenRunScientificDetails> => {
+  const hasKnownLinks = knownContext?.alreadyLocked === true
+    && typeof knownContext.hasCampusActivity === 'boolean'
+    && typeof knownContext.hasHuiteacherLink === 'boolean'
+  const rows = hasKnownLinks
+    ? (await tx.$queryRaw<Array<{
+        organizationId: string
+        resourceFamily: string
+        resourceKey: string
+        resourceVersion: string
+        resourcePolicyHash: string | null
+        frozenResourcePolicy: unknown | null
+        scientificMaturity: RunScientificMaturity | null
+        scientificProvenance: FrozenRunScientificProvenanceV1 | null
+        scientificProvenanceHash: string | null
+        scientificFrozenAt: Date | null
+      }>>`
+        SELECT e."organization_id" AS "organizationId",
+          t."resource_family" AS "resourceFamily", t."resource_key" AS "resourceKey",
+          t."resource_version" AS "resourceVersion", t."resource_policy_hash" AS "resourcePolicyHash",
+          t."frozen_resource_policy" AS "frozenResourcePolicy", e."scientific_maturity" AS "scientificMaturity",
+          e."scientific_provenance" AS "scientificProvenance",
+          e."scientific_provenance_hash" AS "scientificProvenanceHash",
+          e."scientific_frozen_at" AS "scientificFrozenAt"
+        FROM "assessment_run_executions" e
+        JOIN "assessment_run_tracks" t
+          ON t."organization_id" = e."organization_id" AND t."run_id" = e."run_id" AND t."id" = e."track_id"
+        WHERE e."id" = ${executionId}
+      `).map(r => ({
+        ...r,
+        school: knownContext!.hasCampusActivity!,
+        teacher: knownContext!.hasHuiteacherLink!,
+      }))
+    : await tx.$queryRaw<Array<{
+        organizationId:string
+        school:boolean
+        teacher:boolean
+        resourceFamily: string
+        resourceKey: string
+        resourceVersion: string
+        resourcePolicyHash: string | null
+        frozenResourcePolicy: unknown | null
+        scientificMaturity: RunScientificMaturity | null
+        scientificProvenance: FrozenRunScientificProvenanceV1 | null
+        scientificProvenanceHash: string | null
+        scientificFrozenAt: Date | null
+      }>>`
+        SELECT e."organization_id" AS "organizationId",
+          EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id) AS school,
+          EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links teacher WHERE teacher.organization_id=e.organization_id AND teacher.run_id=e.run_id) AS teacher,
+          t."resource_family" AS "resourceFamily", t."resource_key" AS "resourceKey",
+          t."resource_version" AS "resourceVersion", t."resource_policy_hash" AS "resourcePolicyHash",
+          t."frozen_resource_policy" AS "frozenResourcePolicy", e."scientific_maturity" AS "scientificMaturity",
+          e."scientific_provenance" AS "scientificProvenance",
+          e."scientific_provenance_hash" AS "scientificProvenanceHash",
+          e."scientific_frozen_at" AS "scientificFrozenAt"
+        FROM "assessment_run_executions" e
+        JOIN "assessment_run_tracks" t
+          ON t."organization_id" = e."organization_id" AND t."run_id" = e."run_id" AND t."id" = e."track_id"
+        WHERE e."id" = ${executionId}
+        FOR UPDATE OF e
+      `
   const row = rows[0]
   if (!row) throw new RunScientificProvenanceError('RUN_EXECUTION_NOT_FOUND', 'Run execution not found', 404)
+  const trackSummary = {
+    organizationId: row.organizationId,
+    school: row.school,
+    teacher: row.teacher,
+    resourceFamily: row.resourceFamily,
+    resourceKey: row.resourceKey,
+    resourceVersion: row.resourceVersion,
+    resourcePolicyHash: row.resourcePolicyHash,
+    frozenResourcePolicy: row.frozenResourcePolicy,
+  }
   if (row.scientificMaturity && row.scientificProvenance && row.scientificProvenanceHash && row.scientificFrozenAt) {
     return {
-      scientificMaturity: row.scientificMaturity,
-      scientificProvenance: row.scientificProvenance,
-      scientificProvenanceHash: row.scientificProvenanceHash,
-      scientificFrozenAt: row.scientificFrozenAt,
+      record: {
+        scientificMaturity: row.scientificMaturity,
+        scientificProvenance: row.scientificProvenance,
+        scientificProvenanceHash: row.scientificProvenanceHash,
+        scientificFrozenAt: row.scientificFrozenAt,
+      },
+      track: trackSummary,
     }
   }
   if (!row.resourcePolicyHash || !row.frozenResourcePolicy || typeof row.frozenResourcePolicy !== 'object') {
     throw new RunScientificProvenanceError('RUN_RESOURCE_POLICY_NOT_FROZEN', 'Run resource policy must be frozen before START', 409)
   }
+  let educationScaleSource: EducationScaleExecutionSource | undefined
   // Private resources intentionally cannot enter the generic registry. Derive
   // their baseline only from the exact immutable version bound to this real
   // product execution, not author roles or a caller-supplied trusted flag.
@@ -100,6 +170,7 @@ export const freezeRunExecutionScientificProvenanceInTransaction = async (
     if(source.sourceKind!=='AUTHOR_PRIVATE'||canonicalHash(row.frozenResourcePolicy)!==row.resourcePolicyHash
       ||canonicalHash(policy)!==row.resourcePolicyHash)
       throw new RunScientificProvenanceError('RUN_PRIVATE_SOURCE_POLICY_MISMATCH','Private Scale source differs from the published frozen policy')
+    educationScaleSource = source
     return policy
   })() : row.resourceKey.startsWith('education-assessment:') ? await (async()=>{
     const frozen=row.frozenResourcePolicy as RunResourcePolicy
@@ -120,8 +191,8 @@ export const freezeRunExecutionScientificProvenanceInTransaction = async (
     scientificMaturity: maturity as RunScientificMaturity,
   }
   const hash = canonicalHash(provenance)
-  const nowRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`
-  const frozenAt = nowRows[0].now
+  const frozenAt = knownContext?.now
+    ?? (await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`)[0].now
   const payload = JSON.stringify(provenance)
   const updated = await tx.$queryRaw<FrozenRunScientificRecord[]>`
     UPDATE "assessment_run_executions"
@@ -139,8 +210,17 @@ export const freezeRunExecutionScientificProvenanceInTransaction = async (
   if (!updated[0]) {
     throw new RunScientificProvenanceError('RUN_SCIENCE_FREEZE_CONFLICT', 'scientific provenance changed concurrently', 409)
   }
-  return updated[0]
+  return { record: updated[0], track: trackSummary, educationScaleSource }
 }
+
+export const freezeRunExecutionScientificProvenanceInTransaction = async (
+  tx: Tx,
+  executionId: string,
+  registry: RunResourceAuthorityRegistry = productionRunResourceAuthorityRegistry,
+  knownContext?: ScientificProvenanceKnownLockContext,
+): Promise<FrozenRunScientificRecord> => (
+  await freezeRunExecutionScientificProvenanceWithDetailsInTransaction(tx, executionId, registry, knownContext)
+).record
 
 export const freezeRunExecutionScientificProvenance = (
   executionId: string,

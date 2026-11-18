@@ -76,6 +76,25 @@ router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(async (req
 
     await clearLoginFailures(req)
     const u = match.user
+    if (u.platformRole === 'STANDARD') {
+      const { primePrincipalCache } = await import('../../middleware/auth')
+      primePrincipalCache({
+        userId: u.id,
+        username: u.username,
+        accountDomain: 'SCHOOL',
+        role: u.role,
+        businessRole: u.role,
+        platformRole: 'STANDARD',
+        tokenVersion: u.tokenVersion,
+        mustChangePassword: u.mustChangePassword,
+        isActive: u.isActive,
+        isFrozen: u.isFrozen,
+        expiresAt: u.expiresAt ?? null,
+        teacherApproved: Boolean(u.teacherApproved),
+        entryGrants: [],
+        needsMfa: false,
+      })
+    }
     const token = generateToken({
       accountDomain: 'SCHOOL',
       userId: u.id,

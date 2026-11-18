@@ -22,6 +22,7 @@ import {
   assertCurrentRunManagerBoundary,
   assertCurrentRunPublisherBoundary,
   assertRunExecutionParent,
+  type RunStartPreflight,
 } from './resourceBoundary'
 import { relationalProductRegistry } from '../assessment-relational/product-registry'
 import { listReleasedRegisteredResourcePage } from './registeredResources'
@@ -275,7 +276,9 @@ export const assessmentRunController = {
   async acceptConsent(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     try {
-      await assertRunExecutionParent({ organizationId: req.params.organizationId, runId: req.params.runId, executionId: req.params.executionId })
+      if (!(res.locals as { startPreflight?: RunStartPreflight } | undefined)?.startPreflight) {
+        await assertRunExecutionParent({ organizationId: req.params.organizationId, runId: req.params.runId, executionId: req.params.executionId })
+      }
       return success(res, await acceptRunExecutionConsent({ executionId: req.params.executionId, actorUserId: req.user.userId }))
     } catch (err) { return fail(res, err) }
   },
@@ -283,11 +286,12 @@ export const assessmentRunController = {
   async startExecution(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     try {
-      const startPreflight = await assertRunExecutionParent({
-        organizationId: req.params.organizationId,
-        runId: req.params.runId,
-        executionId: req.params.executionId,
-      })
+      const startPreflight = (res.locals as { startPreflight?: RunStartPreflight } | undefined)?.startPreflight
+        ?? await assertRunExecutionParent({
+          organizationId: req.params.organizationId,
+          runId: req.params.runId,
+          executionId: req.params.executionId,
+        })
       const started = await startAssessmentRunExecution({
         executionId: req.params.executionId,
         actorUserId: req.user.userId,

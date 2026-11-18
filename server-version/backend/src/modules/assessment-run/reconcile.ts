@@ -106,11 +106,22 @@ export const reconcileRunExecutionByRuntimeBinding = async (input: {
   runtimeBindingKind: string
   runtimeBindingRef: string
 }): Promise<RunReconciliationResult | null> => {
-  const rows = await prisma.$queryRaw<Array<{ id: string }>>`
-    SELECT "id" FROM "assessment_run_executions"
-    WHERE "runtime_binding_kind" = ${input.runtimeBindingKind}
-      AND "runtime_binding_ref" = ${input.runtimeBindingRef}
-    LIMIT 1
-  `
-  return rows[0] ? reconcileRunExecutionFromRuntime(rows[0].id) : null
+  if (typeof (prisma as any)?.$transaction !== 'function') {
+    const rows = await prisma.$queryRaw<Array<{ id: string }>>`
+      SELECT "id" FROM "assessment_run_executions"
+      WHERE "runtime_binding_kind" = ${input.runtimeBindingKind}
+        AND "runtime_binding_ref" = ${input.runtimeBindingRef}
+      LIMIT 1
+    `
+    return rows[0] ? reconcileRunExecutionFromRuntime(rows[0].id) : null
+  }
+  return prisma.$transaction(async (tx) => {
+    const rows = await tx.$queryRaw<Array<{ id: string }>>`
+      SELECT "id" FROM "assessment_run_executions"
+      WHERE "runtime_binding_kind" = ${input.runtimeBindingKind}
+        AND "runtime_binding_ref" = ${input.runtimeBindingRef}
+      LIMIT 1
+    `
+    return rows[0] ? reconcileRunExecutionFromRuntimeInTransaction(tx, rows[0].id) : null
+  })
 }
