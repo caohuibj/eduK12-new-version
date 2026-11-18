@@ -8,7 +8,7 @@ import { createFormSectionCollectionFacts } from '../../modules/assessment-runti
 import { parseDeclarativePackage } from '../../modules/assessment-bundle/onboarding/contract'
 import { packageEntry } from '../../modules/assessment-bundle/onboarding/catalog'
 import { freezeBundleProductionDefinition } from '../../modules/bundle-product/definition-provider'
-import { bundleBirthYearMonthForm, loadBundleScaleStartContext, validateBundleStartContextMappings } from '../../modules/bundle-product/start-context'
+import { bundleBirthYearMonthForm, loadBundleScaleStartContext, loadBundleScaleStartParentContext, resolveBundleScaleStartForItem, validateBundleStartContextMappings } from '../../modules/bundle-product/start-context'
 import { createScaleAdmissionForRuntime } from '../../modules/scale/scale-admission.service'
 import { parseFrozenUnitAdmissionV2 } from '../../modules/assessment-runtime/admission-snapshot-v2'
 
@@ -118,6 +118,21 @@ describe('source-owned course context into Scale START (synthetic persistence)',
     expect(old.contextValues).toEqual(demographic)
     f.parent.compositeAssessment.productKind = 'QUESTIONNAIRE'; f.db.bundleInstance.findFirst.mockClear()
     expect(await f.read()).toBeUndefined(); expect(f.db.bundleInstance.findFirst).not.toHaveBeenCalled()
+  })
+  it('resolves the parent bundle context once for batch deliveries (N units share one instance/FORM read)', async () => {
+    const f = fixture()
+    const parentCtx = await loadBundleScaleStartParentContext(f.db as never, f.parent)
+    expect(parentCtx).toBeTruthy()
+    const first = await resolveBundleScaleStartForItem(parentCtx, 'scale-item', 'unknown_scale', '1.0.0', demographic)
+    expect(first?.assessmentContext).toBe(scene)
+    const findFirst0 = f.db.bundleInstance.findFirst.mock.calls.length
+    const findMany0 = f.db.assessmentUnitSnapshot.findMany.mock.calls.length
+    for (let i = 0; i < 8; i++) {
+      const ctx = await resolveBundleScaleStartForItem(parentCtx, 'scale-item', 'unknown_scale', '1.0.0', demographic)
+      expect(ctx?.assessmentContext).toBe(scene)
+    }
+    expect(f.db.bundleInstance.findFirst.mock.calls.length).toBe(findFirst0)
+    expect(f.db.assessmentUnitSnapshot.findMany.mock.calls.length).toBe(findMany0)
   })
   it('rejects undeclared, optional or wrongly typed source context references', () => {
     const f = fixture()

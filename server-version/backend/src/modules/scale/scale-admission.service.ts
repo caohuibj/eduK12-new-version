@@ -35,7 +35,7 @@ import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments, clearPr
 import type { ScaleDeploymentModeV1 } from './policy/deployment'
 import { evaluateInstrumentEligibility, SCALE_ELIGIBILITY_EVALUATOR_VERSION } from './policy/eligibility'
 import type { FrozenEligibilityDecisionV1, ScalePolicyRespondentType } from './policy/types'
-import { loadBundleScaleStartContext, type BundleScaleStartContext } from '../bundle-product/start-context'
+import { loadBundleScaleStartContext, loadBundleScaleStartParentContext, resolveBundleScaleStartForItem, type BundleScaleStartContext, type BundleScaleStartParentContext } from '../bundle-product/start-context'
 
 const COMPILED_RUNTIME_HASH = /^[0-9a-f]{64}$/
 type Db = PrismaClient | Prisma.TransactionClient
@@ -939,6 +939,26 @@ export const batchEnsureScaleAdmissionsAtDelivery = async (
         setPreloadedActiveScaleDeployments(tx, preloaded)
       }
 
+      // One Bundle parent resolution per delivery: the instance read, frozen
+      // parse and FORM-fact loads are identical for every unstored unit of the
+      // same parent attempt. Per-unit slot/mapping checks stay in
+      // resolveBundleScaleStartForItem. First use keeps the original error
+      // ordering; the memoized promise shares one outcome across units.
+      let parentBundleContext: Promise<BundleScaleStartParentContext | undefined> | undefined
+      const bundleParentFor = () => (parentBundleContext ??= loadBundleScaleStartParentContext(tx, parent))
+      // One anonymous admission-identity resolution per delivery: every unit
+      // passes the same parent attempt and (for anonymous attempts) a null
+      // userId, so N identical binding reads collapse to one. Logged-in units
+      // return the parent hash without a read. A rejected resolution is shared
+      // by every awaiting unit and rolls the delivery back exactly as before.
+      let admissionHashPromise: Promise<string | null> | undefined
+      const admissionHashFor = (current: { userId: string | null }) => {
+        const userId = current.userId ?? parent.userId
+        if (userId) return Promise.resolve(parent.recoveryTokenHash)
+        admissionHashPromise ??= stableStudyAdmissionHash(tx, parent.id, parent.recoveryTokenHash, userId)
+        return admissionHashPromise
+      }
+
       try {
       const toPersist: Array<{ assessmentId: string; snapshot: VersionedFrozenUnitAdmission }> = []
       for (const item of unstored) {
@@ -967,21 +987,18 @@ export const batchEnsureScaleAdmissionsAtDelivery = async (
           throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结单元运行时哈希不匹配', 409)
         }
 
-        const bundleContext = await loadBundleScaleStartContext(
-          tx,
-          parent,
-          current.compositeItemId,
-          current.scale.code,
-          current.scale.instrumentVersion,
-          context.context?.values ?? null,
-        )
+        const parentCtx = await bundleParentFor()
+        const bundleContext = parentCtx
+          ? await resolveBundleScaleStartForItem(
+              parentCtx,
+              current.compositeItemId,
+              current.scale.code,
+              current.scale.instrumentVersion,
+              context.context?.values ?? null,
+            )
+          : undefined
 
-        const recoveryTokenHash = await stableStudyAdmissionHash(
-          tx,
-          parent.id,
-          parent.recoveryTokenHash,
-          current.userId ?? parent.userId,
-        )
+        const recoveryTokenHash = await admissionHashFor(current)
 
         const snapshot = await createScaleAdmissionForRuntime({
           db: tx,
