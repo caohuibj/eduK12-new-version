@@ -18,7 +18,7 @@ export async function checkCampusCompositeAccessAuthority(input: {
     WHERE e."runtime_binding_kind"='COMPOSITE'
       AND e."runtime_binding_ref"=${input.attemptId}
       AND respondent."user_id"=${input.userId}
-      AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)}
+      AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`, 'COLLECTION', 'CAMPUS_ONLY')}
     LIMIT 1
   `))
   return rows.length > 0

@@ -81,9 +81,30 @@ describe('education execution purpose and account-lock boundary',()=>{
   const p=accountProbe([[{id:'execution'}],[{valid:true}],[{organizationId:'org',active:true}],
    [{valid:true,denied:false}],[],[{kind:'SELF',ref:null,facts:{}}],[{accountsCurrent:true,populationCurrent:true,intakeOpen:true,[field]:false}]])
   await expect(assertCurrentRunStartAuthority(p.tx,'execution',{accountMode:'DETECT_EDUCATION_LIBRARY'})).rejects.toMatchObject({code:field==='accountsCurrent'?'RUN_ACCOUNT_INACTIVE':'RUN_ACTOR_AUTHORITY_REVOKED'})
-  expect(p.controls).toEqual(['SET LOCAL join_collapse_limit = 1'])
+  expect(p.controls).toEqual([
+    'SET LOCAL join_collapse_limit = 1',
+    'SET LOCAL from_collapse_limit = 1',
+    'SET LOCAL plan_cache_mode = force_custom_plan',
+  ])
   expect(p.sql.at(-1)).toContain('statement_timestamp()')
   expect(p.sql.at(-1)).toContain('populationCurrent')
+ })
+
+ it('prunes cross-product branches when CAMPUS_ONLY or HUITEACHER_ONLY scope is supplied while preserving mutual exclusion',()=>{
+  const campusSql=currentRunPopulationAuthoritySql(Prisma.sql`e.id`,'COLLECTION','CAMPUS_ONLY').sql
+  expect(campusSql).toContain("org.product_domain='SCHOOL'")
+  expect(campusSql).toContain('NOT EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h')
+  expect(campusSql).toContain('campus_activity_runs')
+  expect(campusSql).not.toContain('huiteacher_evaluation_events')
+  expect(campusSql).not.toContain('huiteacher_student_eval_configs')
+
+  const teacherSql=currentRunPopulationAuthoritySql(Prisma.sql`e.id`,'COLLECTION','HUITEACHER_ONLY').sql
+  expect(teacherSql).toContain("org.product_domain='SCHOOL'")
+  expect(teacherSql).toContain('NOT EXISTS(SELECT 1 FROM campus_activity_runs school_excl')
+  expect(teacherSql).toContain('huiteacher_evaluation_events')
+  expect(teacherSql).not.toContain('campus_student_enrollments')
+  expect(teacherSql).not.toContain('campus_peer_consents')
+  expect(teacherSql).not.toContain('organization_counselor_client_relationships')
  })
 
 })

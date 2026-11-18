@@ -62,9 +62,9 @@ async function ownScaleExecution(input:{actorUserId:string;executionId?:string;a
       AND execution."runtime_binding_ref"=${input.attemptId??''}`
   const populationGate=input.purpose==='REPORT_READ'
     ?Prisma.sql`CASE WHEN (track."resource_key" LIKE 'library-scale:%' OR track."resource_key" LIKE 'private-scale:%')
-      THEN ${currentRunPopulationAuthoritySql(Prisma.sql`execution."id"`, 'REPORT_READ')}
-      ELSE ${currentRunPopulationAuthoritySql(Prisma.sql`execution."id"`)} END`
-    :currentRunPopulationAuthoritySql(Prisma.sql`execution."id"`)
+      THEN ${currentRunPopulationAuthoritySql(Prisma.sql`execution."id"`, 'REPORT_READ', 'HUITEACHER_ONLY')}
+      ELSE ${currentRunPopulationAuthoritySql(Prisma.sql`execution."id"`, 'COLLECTION', 'HUITEACHER_ONLY')} END`
+    :currentRunPopulationAuthoritySql(Prisma.sql`execution."id"`, 'COLLECTION', 'HUITEACHER_ONLY')
   const rows=await withBoundedPlannerRead(prisma, client => client.$queryRaw<Allowed[]>(Prisma.sql`
     SELECT execution."id" AS "executionId",
       execution."organization_id" AS "organizationId",
@@ -221,7 +221,7 @@ export async function listOwnTeacherScaleTasks(userId:string,cursor?:RunTaskCurs
       SELECT (
         CASE WHEN e."status"<>'COMPLETED'
           AND (run."status"='CLOSED' OR track."resource_key" LIKE 'library-scale:%' OR track."resource_key" LIKE 'private-scale:%')
-        THEN ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)}
+        THEN ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`, 'COLLECTION', 'HUITEACHER_ONLY')}
         ELSE FALSE END
       ) AS "collectionAuthority"
       OFFSET 0
@@ -259,7 +259,7 @@ export async function listOwnTeacherScaleTasks(userId:string,cursor?:RunTaskCurs
               OR track."resource_key" LIKE 'private-scale:TEACHER:%:TEACHER:SELF')))
       )
     AND ((track."resource_key" NOT LIKE 'library-scale:%' AND track."resource_key" NOT LIKE 'private-scale:%') OR CASE WHEN e."status"='COMPLETED'
-        THEN ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`, 'REPORT_READ')}
+        THEN ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`, 'REPORT_READ', 'HUITEACHER_ONLY')}
         ELSE pop_auth."collectionAuthority" END)
     ${cursorScope}
     ORDER BY e."created_at" DESC,e."id" DESC LIMIT ${limit + 1}

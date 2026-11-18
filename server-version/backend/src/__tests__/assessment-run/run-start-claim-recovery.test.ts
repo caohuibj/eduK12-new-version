@@ -164,4 +164,13 @@ describe('Run START claim recovery',()=>{
     await expect(startAssessmentRunExecution({executionId:'exec-1',actorUserId:'u1'})).rejects.toBe(boom)
     expect(m.release).not.toHaveBeenCalled()
   })
+
+  it('returns single-transaction COMPLETED_INLINE result without opening a second transaction or post-claim read',async()=>{
+    const inlineResult={state:'STARTED' as const,runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'att-inline',replayed:false}
+    m.acquire.mockResolvedValueOnce({kind:'COMPLETED_INLINE',result:inlineResult})
+    await expect(startAssessmentRunExecution({executionId:'exec-1',actorUserId:'u1'})).resolves.toEqual(inlineResult)
+    expect(m.raw).not.toHaveBeenCalled()
+    expect(m.tx).not.toHaveBeenCalled()
+    expect(m.release).not.toHaveBeenCalled()
+  })
 })

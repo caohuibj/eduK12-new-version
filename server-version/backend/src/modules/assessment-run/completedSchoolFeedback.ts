@@ -32,5 +32,5 @@ export const completedSchoolOrdinaryFeedbackSql=(executionId:Prisma.Sql,userId:s
   AND parent.composite_assessment_id=track.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}'
   AND parent.delivery_mode='FINAL_ONLY' AND parent.runtime_generation='UNIFIED_V1'
  WHERE history.id=${executionId} AND history.status='COMPLETED' AND history.runtime_binding_kind='COMPOSITE'
-  AND ${currentRunPopulationAuthoritySql(Prisma.sql`history.id`,'REPORT_READ')}
+  AND ${currentRunPopulationAuthoritySql(Prisma.sql`history.id`,'REPORT_READ','CAMPUS_ONLY')}
 )`

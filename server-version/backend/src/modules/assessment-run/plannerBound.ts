@@ -19,15 +19,22 @@ export type PlannerBoundReadDb = {
  * indexes outward. Falls back directly to `db` when unit tests supply a bare
  * `{ $queryRaw }` mock without `$transaction`.
  */
+export async function applyBoundedPlannerControls(
+  tx: Pick<PlannerBoundReadDb, '$executeRaw'>,
+): Promise<void> {
+  if (typeof tx.$executeRaw !== 'function') return
+  await tx.$executeRaw`SET LOCAL join_collapse_limit = 1`
+  await tx.$executeRaw`SET LOCAL from_collapse_limit = 1`
+  await tx.$executeRaw`SET LOCAL plan_cache_mode = force_custom_plan`
+}
+
 export async function withBoundedPlannerRead<T>(
   db: PlannerBoundReadDb,
   action: (client: Pick<PlannerBoundReadDb, '$queryRaw'>) => Promise<T>,
 ): Promise<T> {
   if (typeof db.$transaction === 'function') {
     return db.$transaction(async tx => {
-      await tx.$executeRaw`SET LOCAL join_collapse_limit = 1`
-      await tx.$executeRaw`SET LOCAL from_collapse_limit = 1`
-      await tx.$executeRaw`SET LOCAL plan_cache_mode = force_custom_plan`
+      await applyBoundedPlannerControls(tx)
       return action(tx)
     })
   }

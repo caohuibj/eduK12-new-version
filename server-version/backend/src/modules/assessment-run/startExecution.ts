@@ -30,8 +30,10 @@ import {
   markRunStartDispatchIntent,
   markRunStartUnknown,
   releaseRolledBackRunStartClaim,
+  resolveProductScopeFromLock,
   type RunStartClaimDecision,
   type RunStartClaimRecord,
+  type TransactionalStartDispatchContext,
 } from './startClaim'
 import { loadRunExecutionStartAdmission } from './startAdmission'
 import { assertCurrentRunStartAuthority } from './startAuthority'
@@ -148,20 +150,23 @@ const attachBindingInTransaction = async (tx: Tx, input: {
   executionId: string
   claim: RunStartClaimRecord
   binding: RunRuntimeBinding
+  alreadyLocked?: boolean
 }): Promise<void> => {
-  await lockExecutionEnvelope(tx, input.executionId, {
-    organizationId: input.claim.organizationId,
-    runId: input.claim.runId,
-  })
-  const claims = await tx.$queryRaw<Array<{ state: string; claimGeneration: number }>>`
-    SELECT "state", "claim_generation" AS "claimGeneration"
-    FROM "assessment_run_execution_start_claims"
-    WHERE "id" = ${input.claim.id} AND "execution_id" = ${input.executionId}
-    FOR UPDATE
-  `
-  const claim = claims[0]
-  if (!claim || claim.claimGeneration !== input.claim.claimGeneration || !['DISPATCHED', 'UNKNOWN'].includes(claim.state)) {
-    throw new RunStartExecutionError('RUN_START_FENCE_LOST', 'START claim ownership changed before runtime binding', 409)
+  if (!input.alreadyLocked) {
+    await lockExecutionEnvelope(tx, input.executionId, {
+      organizationId: input.claim.organizationId,
+      runId: input.claim.runId,
+    })
+    const claims = await tx.$queryRaw<Array<{ state: string; claimGeneration: number }>>`
+      SELECT "state", "claim_generation" AS "claimGeneration"
+      FROM "assessment_run_execution_start_claims"
+      WHERE "id" = ${input.claim.id} AND "execution_id" = ${input.executionId}
+      FOR UPDATE
+    `
+    const claim = claims[0]
+    if (!claim || claim.claimGeneration !== input.claim.claimGeneration || !['DISPATCHED', 'UNKNOWN'].includes(claim.state)) {
+      throw new RunStartExecutionError('RUN_START_FENCE_LOST', 'START claim ownership changed before runtime binding', 409)
+    }
   }
   const executions = await tx.$queryRaw<Array<{ relationalAssignmentId: string | null; runtimeBindingRef: string | null }>>`
     SELECT "relational_assignment_id" AS "relationalAssignmentId", "runtime_binding_ref" AS "runtimeBindingRef"
@@ -216,31 +221,42 @@ const releaseClaimAfterRolledBackDispatch = async (
   return new AssessmentStartBusyError(err.reason, Math.min(Math.ceil(remainingMs / 1000), 30))
 }
 
-const startTransactionalComposite = async (input: {
+const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   decision: Extract<RunStartClaimDecision, { kind: 'ACQUIRED' | 'RECOVER' }>
   executionId: string
   actorUserId: string
   launch: LaunchEnvelope
   preloadedComposite?: any
+  inlineContext?: TransactionalStartDispatchContext
 }): Promise<RunStartExecutionResult> => {
-  try {
-    return await classifyStartTransaction(() => prisma.$transaction(async (tx) => {
-  const libraryUses=input.launch.resourceKey.startsWith('education-composition:')?await lockCompositionStartLibraryUses(tx,input):undefined
-  const envelope = await lockExecutionEnvelope(tx, input.executionId, {
-    organizationId: input.decision.claim.organizationId,
-    runId: input.decision.claim.runId,
-  })
-  const claims = await tx.$queryRaw<Array<{ state: string; claimGeneration: number }>>`
-    SELECT "state", "claim_generation" AS "claimGeneration"
-    FROM "assessment_run_execution_start_claims"
-    WHERE "id" = ${input.decision.claim.id} AND "execution_id" = ${input.executionId}
-    FOR UPDATE
-  `
-  const claim = claims[0]
-  if (!claim || claim.claimGeneration !== input.decision.claim.claimGeneration || !['CLAIMED', 'DISPATCHED'].includes(claim.state)) {
-    throw new RunStartExecutionError('RUN_START_FENCE_LOST', 'START claim ownership changed before transactional dispatch', 409)
+  const inline = Boolean(input.inlineContext)
+  const libraryUses = !inline && input.launch.resourceKey.startsWith('education-composition:')
+    ? await lockCompositionStartLibraryUses(tx, input)
+    : undefined
+  const envelope = inline
+    ? input.inlineContext!.execution
+    : await lockExecutionEnvelope(tx, input.executionId, {
+        organizationId: input.decision.claim.organizationId,
+        runId: input.decision.claim.runId,
+      })
+  const productScope = inline
+    ? input.inlineContext!.productScope
+    : resolveProductScopeFromLock(envelope)
+  if (!inline) {
+    const claims = await tx.$queryRaw<Array<{ state: string; claimGeneration: number }>>`
+      SELECT "state", "claim_generation" AS "claimGeneration"
+      FROM "assessment_run_execution_start_claims"
+      WHERE "id" = ${input.decision.claim.id} AND "execution_id" = ${input.executionId}
+      FOR UPDATE
+    `
+    const claim = claims[0]
+    if (!claim || claim.claimGeneration !== input.decision.claim.claimGeneration || !['CLAIMED', 'DISPATCHED'].includes(claim.state)) {
+      throw new RunStartExecutionError('RUN_START_FENCE_LOST', 'START claim ownership changed before transactional dispatch', 409)
+    }
   }
-  const admission = input.decision.kind === 'ACQUIRED'
+  const admission = inline
+    ? input.inlineContext!.admission
+    : input.decision.kind === 'ACQUIRED'
     ? input.decision.admission
     : await loadRunExecutionStartAdmission({
         tx,
@@ -252,7 +268,7 @@ const startTransactionalComposite = async (input: {
   // Claim tx already froze provenance on first START. Skip the freeze
   // SELECT+early-return when the locked execution row is already frozen;
   // recovered pre-freeze claims still backfill below.
-  if (!envelope?.scientificFrozenAt) {
+  if (!inline && !envelope?.scientificFrozenAt) {
     await freezeRunExecutionScientificProvenanceInTransaction(tx, input.executionId)
   }
 
@@ -305,6 +321,7 @@ const startTransactionalComposite = async (input: {
       executionId: input.executionId,
       claim: input.decision.claim,
       binding: { runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: existing.id },
+      alreadyLocked: inline,
     })
     return { state: 'STARTED' as const, runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: existing.id, replayed: true }
   }
@@ -312,10 +329,15 @@ const startTransactionalComposite = async (input: {
   if (admission.assignment.status !== 'OPEN') {
     throw new RunStartExecutionError('RUN_START_OUTCOME_UNKNOWN', 'STARTED assignment has no authoritative runtime attempt', 409)
   }
-  // Re-check current PR1 membership, class approval and PR2 Activity gates
-  // under the second transaction's locks before creating any attempt.
-  // Idempotent reconciliation of an already-created attempt remains above.
-  await assertCurrentRunStartAuthority(tx, input.executionId, {accountMode:'DETECT_EDUCATION_LIBRARY'})
+  // When executing in a separate second transaction, re-check current PR1/PR2
+  // gates under TX2's locks; inline single-transaction dispatch already holds
+  // those exact locks and verified current authority in acquireRunExecutionStartClaim.
+  if (!inline) {
+    await assertCurrentRunStartAuthority(tx, input.executionId, {
+      accountMode: 'DETECT_EDUCATION_LIBRARY',
+      productScope,
+    })
+  }
   if (admission.assignment.resourceKey.startsWith('library-scale:')||admission.assignment.resourceKey.startsWith('private-scale:')) {
     await assertEducationLibraryExecutionSource(tx, {executionId: input.executionId, compositeId: input.launch.runtimeTargetRef})
   }
@@ -355,12 +377,19 @@ const startTransactionalComposite = async (input: {
       AND "state" IN ('CLAIMED','DISPATCHED')
   `
   if (Number(dispatched) !== 1) throw new RunStartExecutionError('RUN_START_FENCE_LOST', 'START claim fence lost before transactional runtime start', 409)
+  let preloadedComposite = input.preloadedComposite
+  if (!preloadedComposite && typeof (tx as any)?.compositeAssessment?.findUnique === 'function') {
+    const compositeModule = await import('../composite/composite.service')
+    if (typeof compositeModule.loadStartComposite === 'function') {
+      preloadedComposite = await compositeModule.loadStartComposite(input.launch.runtimeTargetRef, tx as any)
+    }
+  }
   const attempt = await startRelationalCompositeAttemptInTransaction(tx as any, {
     compositeAssessmentId: input.launch.runtimeTargetRef,
     respondentUserId: input.actorUserId,
     attemptIdentity: admission.attemptIdentity,
     educationStart: compositionStart??educationSource?.startProof,
-    preloadedComposite: input.preloadedComposite,
+    preloadedComposite,
   })
   const changed = await tx.$executeRaw`
     UPDATE "assessment_run_executions"
@@ -390,7 +419,19 @@ const startTransactionalComposite = async (input: {
     })
   }
   return result
-    }, START_INTERACTIVE_TRANSACTION))
+}
+
+const startTransactionalComposite = async (input: {
+  decision: Extract<RunStartClaimDecision, { kind: 'ACQUIRED' | 'RECOVER' }>
+  executionId: string
+  actorUserId: string
+  launch: LaunchEnvelope
+  preloadedComposite?: any
+}): Promise<RunStartExecutionResult> => {
+  try {
+    return await classifyStartTransaction(() =>
+      prisma.$transaction((tx) => executeTransactionalCompositeInTx(tx, input), START_INTERACTIVE_TRANSACTION),
+    )
   } catch (err) {
     if (!isAssessmentStartBusyError(err)) throw err
     throw await releaseClaimAfterRolledBackDispatch(input.decision.claim, err)
@@ -402,32 +443,43 @@ const startTransactionalComposite = async (input: {
  * This is a transactional FORM V2 runtime adapter, not a Survey Researcher
  * attempt, a Composite Form-section approximation, or a second assignment.
  */
-const startTransactionalTeacherForm = async (input:{
-  decision:Extract<RunStartClaimDecision,{kind:'ACQUIRED'|'RECOVER'}>
-  executionId:string;actorUserId:string;launch:LaunchEnvelope
-}):Promise<RunStartExecutionResult>=>{
-  try {
-    return await classifyStartTransaction(()=>prisma.$transaction(async tx=>{
-  const envelope=await lockExecutionEnvelope(tx,input.executionId,{
-    organizationId:input.decision.claim.organizationId,
-    runId:input.decision.claim.runId,
-  })
-  const rows=await tx.$queryRaw<Array<{state:string;claimGeneration:number}>>`
-    SELECT "state","claim_generation" AS "claimGeneration"
-    FROM "assessment_run_execution_start_claims"
-    WHERE "id"=${input.decision.claim.id} AND "execution_id"=${input.executionId}
-    FOR UPDATE
-  `
-  const claim=rows[0]
-  if(!claim||claim.claimGeneration!==input.decision.claim.claimGeneration
-    ||!['CLAIMED','DISPATCHED'].includes(claim.state))
-    throw new RunStartExecutionError('RUN_START_FENCE_LOST','Teacher Form START ownership changed',409)
-  const admission=await loadRunExecutionStartAdmission({
-    tx,executionId:input.executionId,
-    actorUserId:input.actorUserId,admitted:true,
-    admittedAttemptIdentity:input.decision.claim.admittedAttemptIdentity,
-  })
-  if(!envelope?.scientificFrozenAt){
+const executeTransactionalTeacherFormInTx = async (tx: Tx, input: {
+  decision: Extract<RunStartClaimDecision, { kind: 'ACQUIRED' | 'RECOVER' }>
+  executionId: string
+  actorUserId: string
+  launch: LaunchEnvelope
+  inlineContext?: TransactionalStartDispatchContext
+}): Promise<RunStartExecutionResult> => {
+  const inline = Boolean(input.inlineContext)
+  const envelope = inline
+    ? input.inlineContext!.execution
+    : await lockExecutionEnvelope(tx, input.executionId, {
+        organizationId: input.decision.claim.organizationId,
+        runId: input.decision.claim.runId,
+      })
+  const productScope = inline
+    ? input.inlineContext!.productScope
+    : resolveProductScopeFromLock(envelope)
+  if (!inline) {
+    const rows=await tx.$queryRaw<Array<{state:string;claimGeneration:number}>>`
+      SELECT "state","claim_generation" AS "claimGeneration"
+      FROM "assessment_run_execution_start_claims"
+      WHERE "id"=${input.decision.claim.id} AND "execution_id"=${input.executionId}
+      FOR UPDATE
+    `
+    const claim=rows[0]
+    if(!claim||claim.claimGeneration!==input.decision.claim.claimGeneration
+      ||!['CLAIMED','DISPATCHED'].includes(claim.state))
+      throw new RunStartExecutionError('RUN_START_FENCE_LOST','Teacher Form START ownership changed',409)
+  }
+  const admission = inline
+    ? input.inlineContext!.admission
+    : await loadRunExecutionStartAdmission({
+        tx,executionId:input.executionId,
+        actorUserId:input.actorUserId,admitted:true,
+        admittedAttemptIdentity:input.decision.claim.admittedAttemptIdentity,
+      })
+  if(!inline && !envelope?.scientificFrozenAt){
     await freezeRunExecutionScientificProvenanceInTransaction(tx,input.executionId)
   }
 
@@ -477,6 +529,7 @@ const startTransactionalTeacherForm = async (input:{
     await attachBindingInTransaction(tx,{
       executionId:input.executionId,claim:input.decision.claim,
       binding:{runtimeBindingKind:TEACHER_FORM_RUNTIME_KIND,runtimeBindingRef:existing.id},
+      alreadyLocked:inline,
     })
     return {state:'STARTED' as const,runtimeBindingKind:TEACHER_FORM_RUNTIME_KIND,
       runtimeBindingRef:existing.id,replayed:true}
@@ -484,7 +537,9 @@ const startTransactionalTeacherForm = async (input:{
   if(admission.assignment.status!=='OPEN')
     throw new RunStartExecutionError('RUN_START_OUTCOME_UNKNOWN','Teacher Form assignment not open',409)
   // Revoked product grants or closed events are checked under START locks.
-  await assertCurrentRunStartAuthority(tx,input.executionId)
+  if (!inline) {
+    await assertCurrentRunStartAuthority(tx, input.executionId, { productScope })
+  }
   if(admission.execution.runStatus!=='PUBLISHED')
     throw new RunStartExecutionError('RUN_NOT_STARTABLE','Teacher assessment is not published',409)
 
@@ -533,7 +588,17 @@ const startTransactionalTeacherForm = async (input:{
   })
   return {state:'STARTED' as const,runtimeBindingKind:TEACHER_FORM_RUNTIME_KIND,
     runtimeBindingRef:attempt.id,replayed:false}
-    }, START_INTERACTIVE_TRANSACTION))
+}
+
+const startTransactionalTeacherForm = async (input:{
+  decision:Extract<RunStartClaimDecision,{kind:'ACQUIRED'|'RECOVER'}>
+  executionId:string;actorUserId:string;launch:LaunchEnvelope
+}):Promise<RunStartExecutionResult>=>{
+  try {
+    return await classifyStartTransaction(()=>prisma.$transaction(
+      tx => executeTransactionalTeacherFormInTx(tx, input),
+      START_INTERACTIVE_TRANSACTION,
+    ))
   } catch (err) {
     if (!isAssessmentStartBusyError(err)) throw err
     throw await releaseClaimAfterRolledBackDispatch(input.decision.claim, err)
@@ -650,7 +715,49 @@ export const startAssessmentRunExecution = async (input: {
         // rolled-back outcomes (P2028 maxWait, serialization/deadlock/lock-timeout)
         // leave no claim, audit or provenance rows behind, so they share the same
         // safe-retry 503 contract as the runtime dispatch transaction.
-        const decision = await classifyStartTransaction(() => acquireRunExecutionStartClaim({ executionId: input.executionId, actorUserId: input.actorUserId, resourceRegistry: input.resourceRegistry }))
+        const resourceRegistry = input.resourceRegistry ?? productionRunResourceAuthorityRegistry
+        const decision = await classifyStartTransaction(() =>
+          acquireRunExecutionStartClaim({
+            executionId: input.executionId,
+            actorUserId: input.actorUserId,
+            resourceRegistry: input.resourceRegistry,
+            transactionalDispatch: async (inlineContext: TransactionalStartDispatchContext) => {
+              const launch = await readLaunchEnvelope(inlineContext.tx, input.executionId)
+              // Composition START must lock library uses BEFORE Organization/Run/Execution;
+              // let it commit the claim and take the two-phase lock-ordered path below.
+              if (launch.resourceKey.startsWith('education-composition:')) return null
+              const resourceAdapter = resourceRegistry.assertStartSupported(launch.family)
+              if (resourceAdapter.capabilities.transactionMode !== 'TRANSACTIONAL_DB') return null
+              const inlineDecision = {
+                kind: 'ACQUIRED' as const,
+                claim: inlineContext.claim,
+                admission: inlineContext.admission,
+              }
+              if (launch.runtimeTargetKind === TEACHER_FORM_RUNTIME_KIND && launch.family === 'FORM') {
+                return executeTransactionalTeacherFormInTx(inlineContext.tx, {
+                  decision: inlineDecision,
+                  executionId: input.executionId,
+                  actorUserId: input.actorUserId,
+                  launch,
+                  inlineContext,
+                })
+              }
+              if (launch.runtimeTargetKind !== 'COMPOSITE') {
+                throw new RunStartExecutionError('RUN_RUNTIME_TARGET_UNSUPPORTED', 'transactional Run adapter supports Composite runtime only', 409)
+              }
+              return executeTransactionalCompositeInTx(inlineContext.tx, {
+                decision: inlineDecision,
+                executionId: input.executionId,
+                actorUserId: input.actorUserId,
+                launch,
+                inlineContext,
+              })
+            },
+          }),
+        )
+        if (decision.kind === 'COMPLETED_INLINE') {
+          return decision.result
+        }
         if (decision.kind === 'BOUND') {
           return {
             state: 'STARTED',
@@ -680,7 +787,6 @@ export const startAssessmentRunExecution = async (input: {
           if (!reason) throw err
           throw await releaseClaimAfterRolledBackDispatch(decision.claim, new AssessmentStartBusyError(reason))
         }
-        const resourceRegistry = input.resourceRegistry ?? productionRunResourceAuthorityRegistry
         const resourceAdapter = resourceRegistry.assertStartSupported(launch.family)
         if (resourceAdapter.capabilities.transactionMode === 'TRANSACTIONAL_DB') {
           if (launch.runtimeTargetKind===TEACHER_FORM_RUNTIME_KIND&&launch.family==='FORM')
@@ -691,11 +797,17 @@ export const startAssessmentRunExecution = async (input: {
             throw new RunStartExecutionError('RUN_RUNTIME_TARGET_UNSUPPORTED', 'transactional Run adapter supports Composite runtime only', 409)
           }
           let preloadedComposite: any
-          try {
-            const { loadStartComposite } = await import('../composite/composite.service')
-            preloadedComposite = await loadStartComposite(launch.runtimeTargetRef)
-          } catch {
-            // Fallback to in-transaction load if preloading fails
+          if (typeof (prisma as any)?.compositeAssessment?.findUnique === 'function') {
+            try {
+              const compositeModule = await import('../composite/composite.service')
+              if (typeof compositeModule.loadStartComposite === 'function') {
+                preloadedComposite = await compositeModule.loadStartComposite(launch.runtimeTargetRef)
+              }
+            } catch (err) {
+              const reason = rolledBackStartReason(err)
+              if (!reason) throw err
+              throw await releaseClaimAfterRolledBackDispatch(decision.claim, new AssessmentStartBusyError(reason))
+            }
           }
           return startTransactionalComposite({
             decision,

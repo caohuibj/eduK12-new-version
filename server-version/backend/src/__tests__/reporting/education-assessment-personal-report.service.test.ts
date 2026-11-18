@@ -44,9 +44,13 @@ describe('education respondent multi-tool report service (mock DB boundary, real
     expect(data).toMatchObject({kind:'EDUCATION_ASSESSMENT_PERSONAL_REPORT',state:'READY',reports:[{status:'READY'},{status:'READY'}]})
     expect(f.assertSourceAuthority).toHaveBeenCalledTimes(2)
     expect(m.query).toHaveBeenCalledTimes(2)
-    expect(m.execute).toHaveBeenCalledTimes(1)
-    expect(m.execute.mock.calls[0][0].join('')).toBe('SET LOCAL join_collapse_limit = 1')
-    expect(m.execute.mock.invocationCallOrder[0]).toBeLessThan(m.query.mock.invocationCallOrder[0])
+    expect(m.execute).toHaveBeenCalledTimes(3)
+    expect(m.execute.mock.calls.map((c: any) => c[0].join(''))).toEqual([
+      'SET LOCAL join_collapse_limit = 1',
+      'SET LOCAL from_collapse_limit = 1',
+      'SET LOCAL plan_cache_mode = force_custom_plan',
+    ])
+    expect(m.execute.mock.invocationCallOrder[2]).toBeLessThan(m.query.mock.invocationCallOrder[0])
     expect(m.summary).toHaveBeenCalledWith('self','execution',{disclosureOnly:true,db:expect.objectContaining({$queryRaw:m.query})})
     expect(m.units).toHaveBeenCalledTimes(1)
     const sql=m.query.mock.calls[0][0].strings.join(' ')

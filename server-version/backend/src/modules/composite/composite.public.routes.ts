@@ -6,8 +6,10 @@ import { compositeImageController } from './composite-image.controller'
 import { compositeVideoController } from './composite-video.controller'
 import { situationalVideoController } from '../situational/situational-video.controller'
 import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
+import { prepareWholeSubmissionPriority } from '../../services/wholeSubmissionPriority'
 
 const router = Router()
+prepareWholeSubmissionPriority()
 router.use(sharedControlRequestContext)
 
 router.get('/attempts/:attemptId/checkpoint', trainingCheckpointHandler(true,'read'))

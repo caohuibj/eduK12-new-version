@@ -16,6 +16,7 @@ import { acceptsAsyncCompositeReport, acceptsEducationWholeMaterialization, isEd
 import { finalScaleSubmitSchema } from '../../services/scale-final-submit.schema'
 import { InstrumentFinalSubmitError, assertCanonicalSubmissionPayloadSize, prepareCanonicalSubmission, stableSubmissionJson } from '../../services/instrumentFinalSubmit'
 import { withWholeSubmitAdmission } from '../../services/wholeSubmitAdmission'
+import * as wholeSubmissionPriority from '../../services/wholeSubmissionPriority'
 import { loadFrozenActiveSlotSet, formSectionSlotKey } from '../assessment-runtime/slot-set'
 import { encryptUnifiedRuntimePayload, decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { admitWholeReceiptStorage, recordWholeReceiptStored, detachedWholeReceiptsEnabled } from '../assessment-runtime/whole-receipt-storage'
@@ -852,6 +853,10 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   const owned = principal.userId ? parent.userId === principal.userId
     : parent.userId === null && Boolean(principal.recoveryTokenHash && parent.recoveryTokenHash === principal.recoveryTokenHash)
   if (!owned) throw failure('无权限操作此问卷', 403)
+  const runWithPressure = typeof wholeSubmissionPriority.trackVerifiedWholeSubmissionPressure === 'function'
+    ? wholeSubmissionPriority.trackVerifiedWholeSubmissionPressure
+    : async <T>(op: () => Promise<T>): Promise<T> => op()
+  return runWithPressure(async () => {
   // Education routes do not repeat this check in middleware. Training keeps the
   // reuse switch because its router already runs the consent guard.
   if (principal.userId && (isEducationWholeAttempt(parent) || process.env.ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED !== 'false')) {
@@ -940,6 +945,7 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   })
   const feedback = rememberWholeReportFeedbackHint(attemptId, input.submissionId, detachedWholeReceiptsEnabled() && !receipt.replayed ? recordWholeReceiptStored() : receipt.queueDepth)
   return receiptResponse(attemptId, input.submissionId, canonical.hash, receipt.acceptedAt, receipt.replayed, feedback.profile)
+  })
 })
 }
 

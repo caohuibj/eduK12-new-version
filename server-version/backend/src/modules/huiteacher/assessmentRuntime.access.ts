@@ -106,7 +106,7 @@ export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId
   AND t.resource_family IN ('COGNITIVE','SITUATIONAL','BUNDLE') AND t.resource_version IN ('1.0.0','2.0.0')
   AND (t.resource_key LIKE 'education-assessment:TEACHER:%' OR t.resource_key LIKE 'education-composition:TEACHER:%')
   AND NOT EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id)
-  AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`)}
+  AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`, 'COLLECTION', 'HUITEACHER_ONLY')}
   AND ((e.status='ASSIGNED' AND a.status='OPEN' AND r.status='PUBLISHED' AND event.status='OPEN'
     AND e.runtime_binding_kind IS NULL AND e.runtime_binding_ref IS NULL)
    OR (e.status='STARTED' AND a.status='STARTED' AND parent.status='IN_PROGRESS' AND event.status='OPEN'

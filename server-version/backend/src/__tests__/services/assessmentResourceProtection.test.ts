@@ -220,4 +220,37 @@ describe('low-memory START trickle configuration and state machine', () => {
     await expect(runWithLowMemoryTrickleAdmission(operation)).resolves.toBe('ok')
     expect(operation).toHaveBeenCalledTimes(1)
   })
+
+  it('keeps base CPU Retry-After on initial burst trip and steps up with spread under sustained CPU overload', () => {
+    const p = new AssessmentResourceProtection()
+    const cfg = configuredLowMemoryTrickleConfig()
+
+    // Initial two-sample burst trip -> base 3s
+    p.startAdmissionDecision(value(0, 1200, 96), 0, cfg)
+    p.startAdmissionDecision(value(1000, 1200, 97), 1000, cfg)
+    expect(p.recommendedCpuRetryAfterSeconds(3)).toBe(3)
+    p.startAdmissionDecision(value(2000, 1200, 96), 2000, cfg)
+    expect(p.recommendedCpuRetryAfterSeconds(3)).toBe(3)
+
+    // Sustained (>=3 protected samples) -> steps up to 6..8s with deterministic spread
+    p.startAdmissionDecision(value(3000, 1200, 97), 3000, cfg)
+    expect([
+      p.recommendedCpuRetryAfterSeconds(3),
+      p.recommendedCpuRetryAfterSeconds(3),
+      p.recommendedCpuRetryAfterSeconds(3),
+    ]).toEqual([6, 7, 8])
+
+    // Brief dip to 90% and quick re-trip within 8s -> maintains/escalates backoff
+    p.startAdmissionDecision(value(4000, 1200, 90), 4000, cfg)
+    p.startAdmissionDecision(value(5000, 1200, 96), 5000, cfg)
+    p.startAdmissionDecision(value(6000, 1200, 96), 6000, cfg)
+    expect(p.recommendedCpuRetryAfterSeconds(3)).toBeGreaterThanOrEqual(6)
+
+    // Extended quiet window (>8s) resets sustained episode state back to burst base
+    p.startAdmissionDecision(value(7000, 1200, 60), 7000, cfg)
+    p.startAdmissionDecision(value(16000, 1200, 60), 16000, cfg)
+    p.startAdmissionDecision(value(17000, 1200, 96), 17000, cfg)
+    p.startAdmissionDecision(value(18000, 1200, 96), 18000, cfg)
+    expect(p.recommendedCpuRetryAfterSeconds(3)).toBe(3)
+  })
 })
