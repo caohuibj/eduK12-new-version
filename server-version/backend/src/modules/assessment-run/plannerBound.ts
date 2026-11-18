@@ -23,9 +23,7 @@ export async function applyBoundedPlannerControls(
   tx: Pick<PlannerBoundReadDb, '$executeRaw'>,
 ): Promise<void> {
   if (typeof tx.$executeRaw !== 'function') return
-  await tx.$executeRaw`SET LOCAL join_collapse_limit = 1`
-  await tx.$executeRaw`SET LOCAL from_collapse_limit = 1`
-  await tx.$executeRaw`SET LOCAL plan_cache_mode = force_custom_plan`
+  await tx.$executeRaw`SELECT set_config('join_collapse_limit', '1', true), set_config('from_collapse_limit', '1', true), set_config('plan_cache_mode', 'force_custom_plan', true)`
 }
 
 export async function withBoundedPlannerRead<T>(

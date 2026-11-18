@@ -174,9 +174,7 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     )
     expect(result).toEqual(['bounded'])
     expect(dbMocks.executeRaw.mock.calls.map(call => sqlText(call[0]))).toEqual([
-      'SET LOCAL join_collapse_limit = 1',
-      'SET LOCAL from_collapse_limit = 1',
-      'SET LOCAL plan_cache_mode = force_custom_plan',
+      "SELECT set_config('join_collapse_limit', '1', true), set_config('from_collapse_limit', '1', true), set_config('plan_cache_mode', 'force_custom_plan', true)",
     ])
 
     const bareQuery = vi.fn().mockResolvedValueOnce(['bare'])
@@ -210,7 +208,7 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
       preserveBoundSchoolContinuation: true,
     })
 
-    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(6)
+    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(2)
     const firstSql = flattenQueryRawCall(dbMocks.queryRaw.mock.calls[0])
     const secondSql = flattenQueryRawCall(dbMocks.queryRaw.mock.calls[1])
     // Varying array cardinalities MUST produce the exact same prepared SQL template.
@@ -226,12 +224,12 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
   it('bounds checkCampusCompositeAccessAuthority and standalone readRespondentRunSummary while preserving supplied tx db', async () => {
     dbMocks.queryRaw.mockResolvedValueOnce([{ id: EXEC_ID }])
     await expect(checkCampusCompositeAccessAuthority({ attemptId: 'att-1', userId: USER_ID })).resolves.toBe(true)
-    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(3)
+    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(1)
 
     dbMocks.executeRaw.mockClear()
     dbMocks.queryRaw.mockResolvedValueOnce([])
     await expect(readRespondentRunSummary(USER_ID, EXEC_ID)).rejects.toMatchObject({ statusCode: 404 })
-    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(3)
+    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(1)
 
     dbMocks.executeRaw.mockClear()
     const suppliedTxQuery = vi.fn().mockResolvedValueOnce([])
@@ -246,7 +244,7 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     dbMocks.queryRaw.mockResolvedValueOnce([])
     await listOwnTeacherScaleTasks(USER_ID)
 
-    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(3)
+    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(1)
     const sql = sqlText(dbMocks.queryRaw.mock.calls[0][0])
     expect(sql.indexOf('FROM "users" current_actor')).toBeLessThan(sql.indexOf('JOIN "assessment_run_executions" e'))
     // Previously expanded 3 times (2 COLLECTION + 1 REPORT_READ); now 1 COLLECTION via LATERAL + 1 REPORT_READ.
@@ -454,6 +452,6 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     expect(prodOverride).toContain('jit=off')
     expect(prodOverride).not.toContain('plan_cache_mode=force_custom_plan')
     const scopedPlanner = readFileSync(resolve(process.cwd(), 'src/modules/assessment-run/plannerBound.ts'), 'utf8')
-    expect(scopedPlanner).toContain('SET LOCAL plan_cache_mode = force_custom_plan')
+    expect(scopedPlanner).toContain("set_config('plan_cache_mode', 'force_custom_plan', true)")
   })
 })

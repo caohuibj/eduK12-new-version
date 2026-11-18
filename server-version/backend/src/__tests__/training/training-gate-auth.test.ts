@@ -45,7 +45,7 @@ vi.mock('../../utils/sessionRevocation', () => ({
   isSessionRevoked: vi.fn().mockResolvedValue(false),
 }))
 
-import { loadPrincipal, invalidatePrincipalCache, getPrincipalCacheSize, authenticate } from '../../middleware/auth'
+import { loadPrincipal, primePrincipalCache, invalidatePrincipalCache, getPrincipalCacheSize, authenticate } from '../../middleware/auth'
 import { passwordVerificationPool } from '../../services/passwordVerificationPool'
 import { loginPasswordVerificationAdmission } from '../../middleware/loginRateLimit'
 import { wholeSubmitAdmission } from '../../services/wholeSubmitAdmission'
@@ -99,6 +99,49 @@ describe('PR-A: Training Gate & Auth Optimizations', () => {
       const p2 = await loadPrincipal('student-001')
       expect(p2).toEqual(p1)
       expect(m.queryRaw).toHaveBeenCalledTimes(1)
+    })
+
+    it('primes principal cache from verified non-MFA login without caching privileged roles', async () => {
+      process.env.AUTH_PRINCIPAL_CACHE_TTL_MS = '15000'
+      primePrincipalCache({
+        userId: 'school-stu-1',
+        username: 'stu1',
+        accountDomain: 'SCHOOL',
+        role: UserRole.STUDENT,
+        businessRole: UserRole.STUDENT,
+        platformRole: 'STANDARD',
+        tokenVersion: 1,
+        mustChangePassword: false,
+        isActive: true,
+        isFrozen: false,
+        expiresAt: null,
+        teacherApproved: false,
+        entryGrants: [],
+        needsMfa: false,
+      })
+      expect(getPrincipalCacheSize()).toBe(1)
+      const cached = await loadPrincipal('school-stu-1')
+      expect(cached?.userId).toBe('school-stu-1')
+      expect(m.queryRaw).not.toHaveBeenCalled()
+
+      invalidatePrincipalCache()
+      primePrincipalCache({
+        userId: 'school-admin-1',
+        username: 'adm1',
+        accountDomain: 'SCHOOL',
+        role: UserRole.ADMIN,
+        businessRole: UserRole.ADMIN,
+        platformRole: 'STANDARD',
+        tokenVersion: 1,
+        mustChangePassword: false,
+        isActive: true,
+        isFrozen: false,
+        expiresAt: null,
+        teacherApproved: true,
+        entryGrants: [],
+        needsMfa: true,
+      })
+      expect(getPrincipalCacheSize()).toBe(0)
     })
 
     it('does not cache platform admins, business admins or MFA-required principals', async () => {

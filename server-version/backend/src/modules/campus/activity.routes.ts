@@ -154,6 +154,7 @@ router.get('/my/activity-tasks',authenticateSchool,wrap(async(req,res)=>{
     page:z.coerce.number().int().min(1).default(1),
     pageSize:z.coerce.number().int().min(1).max(100).default(25),
     activityId:uuid.optional(),
+    kind:z.enum(['MEASUREMENT']).optional(),
     runCursor:z.string().max(500).optional(),
   }).parse(req.query)
   let runCursor

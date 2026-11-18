@@ -35,6 +35,24 @@ export const invalidatePrincipalCache = (userId?: string): void => {
   }
 }
 
+export const primePrincipalCache = (principal: CurrentPrincipal | null): void => {
+  const ttl = getPrincipalCacheTtlMs()
+  if (ttl <= 0 || principal === null) return
+  const cacheable = principal.platformRole !== 'SYSTEM_ADMIN'
+    && principal.role !== UserRole.ADMIN
+    && principal.businessRole !== UserRole.ADMIN
+    && principal.needsMfa !== true
+    && !(principal.entryGrants?.length)
+  if (!cacheable) return
+  const maxEntries = getPrincipalCacheMaxEntries()
+  if (principalCache.size >= maxEntries && !principalCache.has(principal.userId)) {
+    const oldestKey = principalCache.keys().next().value
+    if (oldestKey) principalCache.delete(oldestKey)
+  }
+  principalCache.delete(principal.userId)
+  principalCache.set(principal.userId, { principal, expiresAt: Date.now() + ttl })
+}
+
 const getPrincipalCacheTtlMs = (): number => {
   const envVal = process.env.AUTH_PRINCIPAL_CACHE_TTL_MS
   if (envVal !== undefined) {

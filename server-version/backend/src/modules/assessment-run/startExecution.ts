@@ -122,6 +122,21 @@ type LaunchEnvelope = {
   runtimeTargetRef: string
 }
 
+const parseLaunchEnvelopeFromTrack = (row: {
+  family: RunResourceFamily
+  resourceKey: string
+  frozenResourcePolicy: unknown
+} | undefined): LaunchEnvelope => {
+  if (!row || !row.frozenResourcePolicy || typeof row.frozenResourcePolicy !== 'object') {
+    throw new RunStartExecutionError('RUN_RESOURCE_POLICY_NOT_FROZEN', 'Run execution has no frozen resource policy', 409)
+  }
+  const launch = (row.frozenResourcePolicy as Record<string, any>).runtimeLaunchTarget
+  if (!launch || typeof launch.kind !== 'string' || typeof launch.ref !== 'string' || !launch.ref.trim()) {
+    throw new RunStartExecutionError('RUN_RUNTIME_TARGET_MISSING', 'frozen Run resource has no runtime target', 409)
+  }
+  return { family: row.family, resourceKey: row.resourceKey, runtimeTargetKind: launch.kind, runtimeTargetRef: launch.ref }
+}
+
 const readLaunchEnvelope = async (db: Tx | typeof prisma, executionId: string): Promise<LaunchEnvelope> => {
   const rows = await db.$queryRaw<Array<{
     family: RunResourceFamily
@@ -135,15 +150,7 @@ const readLaunchEnvelope = async (db: Tx | typeof prisma, executionId: string): 
     WHERE e."id" = ${executionId}
     LIMIT 1
   `
-  const row = rows[0]
-  if (!row || !row.frozenResourcePolicy || typeof row.frozenResourcePolicy !== 'object') {
-    throw new RunStartExecutionError('RUN_RESOURCE_POLICY_NOT_FROZEN', 'Run execution has no frozen resource policy', 409)
-  }
-  const launch = (row.frozenResourcePolicy as Record<string, any>).runtimeLaunchTarget
-  if (!launch || typeof launch.kind !== 'string' || typeof launch.ref !== 'string' || !launch.ref.trim()) {
-    throw new RunStartExecutionError('RUN_RUNTIME_TARGET_MISSING', 'frozen Run resource has no runtime target', 409)
-  }
-  return { family: row.family,resourceKey:row.resourceKey, runtimeTargetKind: launch.kind, runtimeTargetRef: launch.ref }
+  return parseLaunchEnvelopeFromTrack(rows[0])
 }
 
 const attachBindingInTransaction = async (tx: Tx, input: {
@@ -339,7 +346,35 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
     })
   }
   if (admission.assignment.resourceKey.startsWith('library-scale:')||admission.assignment.resourceKey.startsWith('private-scale:')) {
-    await assertEducationLibraryExecutionSource(tx, {executionId: input.executionId, compositeId: input.launch.runtimeTargetRef})
+    const inlineTrack = input.inlineContext?.scientificDetails?.track
+    const knownInTx = inlineTrack
+      && inlineTrack.resourceFamily === 'SCALE'
+      && inlineTrack.frozenResourcePolicy
+      && typeof inlineTrack.frozenResourcePolicy === 'object'
+      && typeof inlineTrack.resourcePolicyHash === 'string'
+      && admission.assignment.policyDomain === 'ORGANIZATION_RUN'
+      && admission.assignment.resourceKind === inlineTrack.resourceFamily
+      && admission.assignment.resourceKey === inlineTrack.resourceKey
+      && admission.assignment.resourceVersion === inlineTrack.resourceVersion
+      ? {
+          organizationId: inlineTrack.organizationId,
+          key: inlineTrack.resourceKey,
+          version: inlineTrack.resourceVersion,
+          policy: inlineTrack.frozenResourcePolicy as any,
+          policyHash: inlineTrack.resourcePolicyHash,
+          school: inlineTrack.school,
+          teacher: inlineTrack.teacher,
+          subjectRole: admission.assignment.subjectRole,
+          respondentRole: admission.assignment.respondentRole,
+          relationship: admission.assignment.relationshipKind,
+          source: input.inlineContext?.scientificDetails?.educationScaleSource,
+        }
+      : undefined
+    await assertEducationLibraryExecutionSource(tx, {
+      executionId: input.executionId,
+      compositeId: input.launch.runtimeTargetRef,
+      knownInTx,
+    })
   }
   const educationSource=admission.assignment.resourceKey.startsWith('education-assessment:')?await assertEducationAssessmentExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,purpose:'NEW_START'}):undefined
   const compositionStart=admission.assignment.resourceKey.startsWith('education-composition:')?await admitCompositionStart(tx,{
@@ -368,8 +403,8 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
       throw new RunStartExecutionError('RUN_RUNTIME_BINDING_MISMATCH', 'current assignment or consent differs from frozen Run admission', 409)
     }
   }
-  const nowRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`
-  const now = nowRows[0].now
+  const now = input.inlineContext?.now
+    ?? (await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`)[0].now
   const dispatched = await tx.$executeRaw`
     UPDATE "assessment_run_execution_start_claims"
     SET "state" = 'DISPATCHED', "dispatched_at" = COALESCE("dispatched_at", ${now}), "updated_at" = ${now}
@@ -722,7 +757,14 @@ export const startAssessmentRunExecution = async (input: {
             actorUserId: input.actorUserId,
             resourceRegistry: input.resourceRegistry,
             transactionalDispatch: async (inlineContext: TransactionalStartDispatchContext) => {
-              const launch = await readLaunchEnvelope(inlineContext.tx, input.executionId)
+              const inlineTrack = inlineContext.scientificDetails?.track
+              const launch = inlineTrack
+                ? parseLaunchEnvelopeFromTrack({
+                    family: inlineTrack.resourceFamily as RunResourceFamily,
+                    resourceKey: inlineTrack.resourceKey,
+                    frozenResourcePolicy: inlineTrack.frozenResourcePolicy,
+                  })
+                : await readLaunchEnvelope(inlineContext.tx, input.executionId)
               // Composition START must lock library uses BEFORE Organization/Run/Execution;
               // let it commit the claim and take the two-phase lock-ordered path below.
               if (launch.resourceKey.startsWith('education-composition:')) return null

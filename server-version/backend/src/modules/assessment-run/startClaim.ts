@@ -5,7 +5,7 @@ import { prisma } from '../../config/database'
 import { logger } from '../../utils/logger'
 import { type RunPopulationProductScope } from './currentPopulationAuthority'
 import { assertCurrentRunStartAuthority } from './startAuthority'
-import { freezeRunExecutionScientificProvenanceInTransaction } from './scientificProvenance'
+import { freezeRunExecutionScientificProvenanceWithDetailsInTransaction, type FrozenRunScientificDetails } from './scientificProvenance'
 import { loadRunExecutionStartAdmission, type RunAttemptIdentityBinding, type RunStartAdmission } from './startAdmission'
 
 export type RunStartClaimState = 'CLAIMED' | 'DISPATCHED' | 'COMPLETED' | 'ABORTED' | 'UNKNOWN'
@@ -192,6 +192,8 @@ export type TransactionalStartDispatchContext = {
   admission: RunStartAdmission
   execution: ExecutionLockRow
   productScope: RunPopulationProductScope
+  now?: Date
+  scientificDetails?: FrozenRunScientificDetails
 }
 
 export async function acquireRunExecutionStartClaim(input: {
@@ -259,7 +261,18 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
     const now = await dbNow(tx)
     const leaseUntil = leaseAt(now, leaseMs)
     if (!existing) {
-      await freezeRunExecutionScientificProvenanceInTransaction(tx, input.executionId, input.resourceRegistry)
+      const scientificDetails = await freezeRunExecutionScientificProvenanceWithDetailsInTransaction(
+        tx,
+        input.executionId,
+        input.resourceRegistry,
+        {
+          organizationId: execution.organizationId,
+          hasCampusActivity: execution.hasCampusActivity,
+          hasHuiteacherLink: execution.hasHuiteacherLink,
+          now,
+          alreadyLocked: true,
+        },
+      )
       const id = randomUUID()
       const operationKey = `run-start:${input.executionId}:${randomUUID()}`
       const rows = await tx.$queryRaw<RunStartClaimRecord[]>`
@@ -286,6 +299,8 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
           admission,
           execution,
           productScope,
+          now,
+          scientificDetails,
         })
         if (inlineResult !== null) {
           return { kind: 'COMPLETED_INLINE' as const, result: inlineResult }
