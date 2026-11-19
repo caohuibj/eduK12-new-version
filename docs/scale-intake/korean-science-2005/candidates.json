@@ -1,0 +1,193 @@
+{
+  "documentType": "RESEARCH_METADATA_NOT_NATIVE_IMPORT",
+  "checkedAt": "2026-11-02",
+  "motherToolId": "ksse2005",
+  "metadataRevision": "2026-11-02.1",
+  "publicationYear": 2005,
+  "sourceLanguage": "ko",
+  "respondent": "TEACHER_SELF",
+  "intendedReportRecipient": "TEACHER",
+  "originalSample": {
+    "count": 220,
+    "school": "middle_school",
+    "subject": "science",
+    "region": "Seoul and Gyeonggi, Republic of Korea",
+    "isNormForCurrentPlatform": false
+  },
+  "name": "韩国科学教师自评2005｜专业成长领域目录｜教师自评｜韩文原版",
+  "tags": [
+    "family:ksse2005",
+    "role:teacher_self",
+    "subject:science",
+    "school:secondary",
+    "language:ko",
+    "version:2005",
+    "purpose:professional_growth",
+    "status:research_candidate",
+    "license:unresolved"
+  ],
+  "registeredNativeCount": 0,
+  "isolatedDatabaseImportCount": 0,
+  "productionDatabaseImportCount": 0,
+  "versions": {
+    "content": null,
+    "scoringParameters": null,
+    "report": null
+  },
+  "publishedInstrumentItemCount": 77,
+  "publishedExampleItemCount": 12,
+  "fullFinalItemBankObtained": false,
+  "distinctFrom": {
+    "sourceDoi": "10.1163/23641177-BJA10012",
+    "publicationYear": 2020,
+    "itemCount": 54,
+    "familyTag": "family:kstc2020",
+    "pullRequest": 572,
+    "itemsMayBeBorrowed": false
+  },
+  "candidateDomains": [
+    {
+      "reservedCandidateId": "ksse2005_subject_knowledge_teacher_ko",
+      "name": "韩国科学教师自评2005｜学科知识｜教师自评｜韩文原版",
+      "originalDomainName": "교과 지식",
+      "publishedDomainItemCount": 14,
+      "countEvidence": "Table 5, p.741",
+      "appendixExampleItemNumbers": [
+        1,
+        12
+      ],
+      "completeDomainItemsObtained": false,
+      "exactFinalItemMappingVerified": false,
+      "nativeType": "UNDECIDED_SCALE_OR_UNSCORED_FORM",
+      "status": "SOURCE_AND_RIGHTS_INCOMPLETE",
+      "nativeRegistered": false,
+      "standaloneAdministrationValidityEstablished": false
+    },
+    {
+      "reservedCandidateId": "ksse2005_teaching_strategies_teacher_ko",
+      "name": "韩国科学教师自评2005｜教学策略｜教师自评｜韩文原版",
+      "originalDomainName": "교수 전략",
+      "publishedDomainItemCount": 17,
+      "countEvidence": "Table 5, p.741",
+      "appendixExampleItemNumbers": [
+        20,
+        26
+      ],
+      "completeDomainItemsObtained": false,
+      "exactFinalItemMappingVerified": false,
+      "nativeType": "UNDECIDED_SCALE_OR_UNSCORED_FORM",
+      "status": "SOURCE_AND_RIGHTS_INCOMPLETE",
+      "nativeRegistered": false,
+      "standaloneAdministrationValidityEstablished": false
+    },
+    {
+      "reservedCandidateId": "ksse2005_teaching_skills_teacher_ko",
+      "name": "韩国科学教师自评2005｜教学技能｜教师自评｜韩文原版",
+      "originalDomainName": "교수 기술",
+      "publishedDomainItemCount": 9,
+      "countEvidence": "Table 5, p.741",
+      "appendixExampleItemNumbers": [
+        35,
+        40
+      ],
+      "completeDomainItemsObtained": false,
+      "exactFinalItemMappingVerified": false,
+      "nativeType": "UNDECIDED_SCALE_OR_UNSCORED_FORM",
+      "status": "SOURCE_AND_RIGHTS_INCOMPLETE",
+      "nativeRegistered": false,
+      "standaloneAdministrationValidityEstablished": false
+    },
+    {
+      "reservedCandidateId": "ksse2005_laboratory_management_teacher_ko",
+      "name": "韩国科学教师自评2005｜实验室管理｜教师自评｜韩文原版",
+      "originalDomainName": "실험실 경영",
+      "publishedDomainItemCount": 10,
+      "countEvidence": "Table 5, p.741",
+      "appendixExampleItemNumbers": [
+        43,
+        50
+      ],
+      "completeDomainItemsObtained": false,
+      "exactFinalItemMappingVerified": false,
+      "nativeType": "UNDECIDED_SCALE_OR_UNSCORED_FORM",
+      "status": "SOURCE_AND_RIGHTS_INCOMPLETE",
+      "nativeRegistered": false,
+      "standaloneAdministrationValidityEstablished": false
+    },
+    {
+      "reservedCandidateId": "ksse2005_assessment_teacher_ko",
+      "name": "韩国科学教师自评2005｜评价｜教师自评｜韩文原版",
+      "originalDomainName": "평가",
+      "publishedDomainItemCount": 15,
+      "countEvidence": "Table 5, p.741",
+      "appendixExampleItemNumbers": [
+        57,
+        65
+      ],
+      "completeDomainItemsObtained": false,
+      "exactFinalItemMappingVerified": false,
+      "nativeType": "UNDECIDED_SCALE_OR_UNSCORED_FORM",
+      "status": "SOURCE_AND_RIGHTS_INCOMPLETE",
+      "nativeRegistered": false,
+      "standaloneAdministrationValidityEstablished": false
+    },
+    {
+      "reservedCandidateId": "ksse2005_professional_development_teacher_ko",
+      "name": "韩国科学教师自评2005｜专业发展｜教师自评｜韩文原版",
+      "originalDomainName": "전문성",
+      "publishedDomainItemCount": 12,
+      "countEvidence": "Table 5, p.741",
+      "appendixExampleItemNumbers": [
+        70,
+        73
+      ],
+      "completeDomainItemsObtained": false,
+      "exactFinalItemMappingVerified": false,
+      "nativeType": "UNDECIDED_SCALE_OR_UNSCORED_FORM",
+      "status": "SOURCE_AND_RIGHTS_INCOMPLETE",
+      "nativeRegistered": false,
+      "standaloneAdministrationValidityEstablished": false
+    }
+  ],
+  "scoring": {
+    "status": "UNRESOLVED_PRINTED_DIRECTION_CONFLICT",
+    "points": 5,
+    "bodyDirection": "Higher scores described as more positive self-evaluation, pp.743-744",
+    "appendixPrintedAnchors": "Strong disagreement printed as 5 and strong agreement as 1, p.745; intermediate positions 4/3/2",
+    "reverseItems": null,
+    "missingRule": null,
+    "scoreRange": null,
+    "aggregationFormulaVerified": false,
+    "numericReportEnabled": false,
+    "crossToolTotalAllowed": false
+  },
+  "optionalComposite": {
+    "status": "NOT_CREATED_NO_NATIVE_CHILDREN",
+    "kind": "ORDINARY_COMPOSITE_IF_LATER_AVAILABLE",
+    "candidateIds": [
+      "ksse2005_subject_knowledge_teacher_ko",
+      "ksse2005_teaching_strategies_teacher_ko",
+      "ksse2005_teaching_skills_teacher_ko",
+      "ksse2005_laboratory_management_teacher_ko",
+      "ksse2005_assessment_teacher_ko",
+      "ksse2005_professional_development_teacher_ko"
+    ],
+    "crossToolTotal": false
+  },
+  "rights": {
+    "status": "PLATFORM_REUSE_AND_REDISTRIBUTION_NOT_ESTABLISHED",
+    "copyrightRegistry": "https://copyright.oak.go.kr/search/copyInfo.do?jourCopySeq=356",
+    "registryListsCcLicense": false,
+    "articleSpecificGrantObtained": false,
+    "itemTextPublished": false,
+    "scanOrOcrPublished": false,
+    "licenseAgreementAccepted": false
+  },
+  "blockers": [
+    "FINAL_77_ITEM_QUESTIONNAIRE_NOT_INCLUDED_IN_RETRIEVED_PAPER",
+    "PLATFORM_ELECTRONIC_USE_TRANSLATION_REDISTRIBUTION_SCOPE_UNCONFIRMED",
+    "SCORING_DIRECTION_CONFLICT_FOR_SCORED_VARIANTS",
+    "PRODUCTION_AND_ADMIN_CREATED_DUPLICATES_NOT_CHECKED"
+  ],
+  "formBoundary": "Missing norms, scoring or standalone administration evidence alone does not block a lawful unscored Form. Here the complete final item text and reuse rights are missing; 12 examples are not a validated short form."
+}
