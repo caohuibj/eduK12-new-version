@@ -61,3 +61,25 @@ test('bad upload fixture fails locally and resource sampling stops without hangi
  const report=await runMixedLoad({baseUrl:'http://127.0.0.1:1',operations:[{id:'1',category:'image-abuse',steps:[{...step,bodyFile:'/nonexistent/prelaunch-fixture',headers:{'Content-Type':'multipart/form-data; boundary=fixed'}}]}]},{concurrency:1,deadlineMs:1000,metricsUrl:'http://127.0.0.1:1/metrics'})
  assert.equal(report.fixtureErrors,1);assert.equal(report.logicalFailed,1);assert.equal(report.attempts,0);assert.ok(report.elapsedAndDrainMs<1000)
 })
+test('recovers an already-accepted submission via step.recover after client read timeout without re-posting',async()=>{
+ let postCalls=0, recoverCalls=0
+ await serve(async(req,res)=>{
+  if(req.url==='/final'){
+   postCalls++
+   await new Promise(r=>setTimeout(r,150))
+   res.end(JSON.stringify({status:'FINAL'}))
+  } else if(req.url==='/whole/receipt'){
+   recoverCalls++
+   res.end(JSON.stringify({status:recoverCalls===1?'NOT_RECEIVED':'ACCEPTED'}))
+  }
+ },async(baseUrl)=>{
+  const report=await runMixedLoad({baseUrl,operations:[{id:'1',category:'whole-timeout-recover',steps:[{
+   ...step,
+   recover:{path:'/whole/receipt',expect:{status:200,path:'status',equals:'ACCEPTED'}},
+  }]}]},{concurrency:1,timeoutMs:80,deadlineMs:2000})
+  assert.equal(report.logicalCompleted,1)
+  assert.equal(report.recoveredAfterTimeout,1)
+  assert.equal(postCalls,1)
+  assert.equal(recoverCalls,2)
+ })
+})

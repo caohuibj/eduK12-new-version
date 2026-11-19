@@ -4,7 +4,14 @@ import { TrainingCheckpointPanel } from '../modules/composite/TrainingCheckpoint
 import {TrainingTimingBoundary,restoreTrainingTiming} from '../modules/scale/TrainingTimingBoundary'
 import {SurveyScaleTimingTracker,sealObservedScaleTimings} from '../modules/scale/item-timing'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { readMatchingWholeReceipt, rememberWholeReceipt, isRecoverableReceiptError, type WholeReceiptLookup } from '../modules/composite/receipt-recovery'
+import {
+  confirmWholeReceiptAfterUncertainSubmit,
+  isRecoverableReceiptError,
+  readMatchingWholeReceipt,
+  recoverMatchingWholeReceiptSafe,
+  rememberWholeReceipt,
+  type WholeReceiptLookup,
+} from '../modules/composite/receipt-recovery'
 import { sessionFetch } from '../api/client'
 import type { ApiResponse } from '../types'
 import type { CompositeAttemptState, CompositeReportStatus, WholeQuestionnaireDefinition, WholeQuestionnaireInput, WholeQuestionnaireReceipt, WholeQuestionnaireFormSection, WholeQuestionnaireFormSectionItem } from '../modules/composite/types'
@@ -426,31 +433,47 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       })
       if (!sealed) throw new Error('本地整卷草稿不存在，请重新加载')
       setMeta(sealed.meta)
-      const result = await runFinalDraftCapacityRetry({ operation: async () => {
-        const lookup = api.wholeReceipt ? () => api.wholeReceipt!(state.id, sealed.payload.submissionId, sealed.payload.attemptEpoch) : undefined
-        if (meta.sealedSubmission) {
-          const recovered = await readMatchingWholeReceipt(lookup, state.id, sealed.payload.submissionId)
-          if (recovered) return recovered
-        }
-        let response: ApiResponse<WholeQuestionnaireReceipt>
-        try {
-          response = await api.submitWhole(state.id, sealed.payload)
-          if (response.code !== 0 || !response.data) throw responseError(response)
-        } catch (cause) {
-          if (isRecoverableReceiptError(cause)) {
-            const recovered = await readMatchingWholeReceipt(lookup, state.id, sealed.payload.submissionId)
+      const hadPriorSealedSubmission = Boolean(meta.sealedSubmission)
+      const lookup = api.wholeReceipt ? () => api.wholeReceipt!(state.id, sealed.payload.submissionId, sealed.payload.attemptEpoch) : undefined
+      let result: WholeQuestionnaireReceipt
+      try {
+        result = await runFinalDraftCapacityRetry({ operation: async (attempt) => {
+          // On retries (after timeout/503/network uncertainty) or when resuming
+          // a previously sealed draft, check GET /whole/receipt first so an
+          // already-committed server receipt is recovered without re-uploading.
+          if (attempt > 1 || hadPriorSealedSubmission) {
+            const recovered = await recoverMatchingWholeReceiptSafe(lookup, state.id, sealed.payload.submissionId)
             if (recovered) return recovered
           }
-          throw cause
-        }
-        const receipt = response.data
-        if (receipt.status !== 'ACCEPTED' || receipt.attemptId !== state.id || receipt.submissionId !== sealed.payload.submissionId || !receipt.payloadHash) throw new Error('未收到匹配的持久化交卷回执，草稿已保留。')
-        return receipt
-      }, onRetry: async ({ error: cause }) => {
-        const pending = await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', { code: String(normalizeApiError(cause).code ?? 'ASSESSMENT_SUBMIT_BUSY'), message: normalizeApiError(cause).message })
-        if (pending) setMeta(pending)
-        setError('服务器繁忙或网络中断，正在重试同一份整卷；答案已保留。')
-      } })
+          let response: ApiResponse<WholeQuestionnaireReceipt>
+          try {
+            response = await api.submitWhole(state.id, sealed.payload)
+            if (response.code !== 0 || !response.data) throw responseError(response)
+          } catch (cause) {
+            if (isRecoverableReceiptError(cause)) {
+              const recovered = await recoverMatchingWholeReceiptSafe(lookup, state.id, sealed.payload.submissionId)
+              if (recovered) return recovered
+            }
+            throw cause
+          }
+          const receipt = response.data
+          if (receipt.status !== 'ACCEPTED' || receipt.attemptId !== state.id || receipt.submissionId !== sealed.payload.submissionId || !receipt.payloadHash) throw new Error('未收到匹配的持久化交卷回执，草稿已保留。')
+          return receipt
+        }, onRetry: async ({ error: cause }) => {
+          const pending = await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', { code: String(normalizeApiError(cause).code ?? 'ASSESSMENT_SUBMIT_BUSY'), message: normalizeApiError(cause).message })
+          if (pending) setMeta(pending)
+          setError('服务器繁忙或网络中断，正在确认并重试同一份整卷；答案已保留。')
+        } })
+      } catch (cause) {
+        // Final bounded confirmation probe after the retry loop finishes on a
+        // timeout/uncertain error so a late server commit right after the 25s
+        // client read timeout is still recovered as ACCEPTED.
+        const lateRecovered = isRecoverableReceiptError(cause)
+          ? await confirmWholeReceiptAfterUncertainSubmit(lookup, state.id, sealed.payload.submissionId)
+          : null
+        if (!lateRecovered) throw cause
+        result = lateRecovered
+      }
       confirmed = true; setAccepted(true); rememberWholeReceipt(result)
       try { sessionStorage.setItem(`composite:whole-receipt:${state.id}`, JSON.stringify(result)) } catch { /* The server receipt is already durable. */ }
       await finalDraftStore.setStatus(draftKey, 'COMPLETED')

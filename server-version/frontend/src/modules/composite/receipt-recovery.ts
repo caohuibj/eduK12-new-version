@@ -7,11 +7,29 @@ export const readMatchingWholeReceipt = async (read: (() => Promise<ApiResponse<
   attemptId: string, submissionId: string): Promise<WholeQuestionnaireReceipt | null> => {
   if (!read) return null
   const response = await read()
-  if (response.code !== 0 || !response.data) throw new Error(response.message || '交卷回执暂时无法确认；原草稿已保留。')
+  if (response.code !== 0 || !response.data) {
+    throw Object.assign(new Error(response.message || '交卷回执暂时无法确认；原草稿已保留。'), {
+      code: response.code,
+      status: typeof response.code === 'number' && response.code >= 400 && response.code <= 599 ? response.code : undefined,
+      retryable: true,
+    })
+  }
   const receipt = response.data
-  if (receipt.attemptId !== attemptId || receipt.submissionId !== submissionId) throw new Error('交卷回执不匹配，原草稿已保留。')
+  if (receipt.attemptId !== attemptId || receipt.submissionId !== submissionId) {
+    throw Object.assign(new Error('交卷回执不匹配，原草稿已保留。'), {
+      status: 409,
+      code: 'SUBMISSION_PAYLOAD_CONFLICT',
+      retryable: false,
+    })
+  }
   if (receipt.status === 'NOT_RECEIVED') return null
-  if (receipt.status !== 'ACCEPTED' || !receipt.payloadHash) throw new Error('交卷回执不完整，原草稿已保留。')
+  if (receipt.status !== 'ACCEPTED' || !receipt.payloadHash) {
+    throw Object.assign(new Error('交卷回执不完整，原草稿已保留。'), {
+      status: 409,
+      code: 'SUBMISSION_PAYLOAD_CONFLICT',
+      retryable: false,
+    })
+  }
   return receipt
 }
 export const rememberWholeReceipt = (receipt: WholeQuestionnaireReceipt) => {
@@ -24,7 +42,53 @@ export const rememberWholeReceipt = (receipt: WholeQuestionnaireReceipt) => {
 }
 export const isRecoverableReceiptError = (cause: unknown) => {
   const error = normalizeApiError(cause)
-  return !error.status || [408,429,500,502,503,504].includes(error.status)
+  if (error.status !== null) return [408, 429, 500, 502, 503, 504].includes(error.status)
+  return error.retryable
+}
+/**
+ * Probe GET /whole/receipt without letting a transient network/5xx/timeout
+ * error mask the original submit error or abort capacity retries. Deterministic
+ * conflicts (409 mismatched submissionId, 403/404, malformed receipt) still
+ * surface immediately.
+ */
+export const recoverMatchingWholeReceiptSafe = async (
+  read: (() => Promise<ApiResponse<WholeReceiptLookup>>) | undefined,
+  attemptId: string,
+  submissionId: string,
+): Promise<WholeQuestionnaireReceipt | null> => {
+  if (!read) return null
+  try {
+    return await readMatchingWholeReceipt(read, attemptId, submissionId)
+  } catch (cause) {
+    if (isRecoverableReceiptError(cause)) return null
+    throw cause
+  }
+}
+/**
+ * Bounded post-timeout receipt confirmation. When the final POST /whole/submit
+ * times out right before the server commits, one delayed GET /whole/receipt
+ * probe catches the already-durable receipt without re-uploading the payload.
+ */
+export const confirmWholeReceiptAfterUncertainSubmit = async (
+  read: (() => Promise<ApiResponse<WholeReceiptLookup>>) | undefined,
+  attemptId: string,
+  submissionId: string,
+  options: {
+    maxProbes?: number
+    delayMs?: number
+    sleep?: (ms: number) => Promise<void>
+  } = {},
+): Promise<WholeQuestionnaireReceipt | null> => {
+  if (!read) return null
+  const maxProbes = Math.max(1, options.maxProbes ?? 2)
+  const delayMs = Math.max(0, options.delayMs ?? 1_500)
+  const sleep = options.sleep ?? ((ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms)))
+  for (let probe = 0; probe < maxProbes; probe += 1) {
+    if (probe > 0 && delayMs > 0) await sleep(delayMs)
+    const recovered = await recoverMatchingWholeReceiptSafe(read, attemptId, submissionId)
+    if (recovered) return recovered
+  }
+  return null
 }
 /** Read-only retries only; callers keep their bounded polling budget and recovery link. */
 export const withReportReadRecovery = async <T>(read: () => Promise<T>, signal: AbortSignal,

@@ -143,6 +143,11 @@ const downloadAnalysisExport = async (
   }
 }
 
+/** Bounded per-attempt timeout for whole-questionnaire submit & receipt lookup
+ * so stalled TCP sockets enter receipt recovery instead of hanging indefinitely. */
+export const WHOLE_SUBMIT_REQUEST_TIMEOUT_MS = 25_000
+export const WHOLE_RECEIPT_LOOKUP_TIMEOUT_MS = 10_000
+
 export const compositeApi = {
   list: () => apiClient.get<{ list: CompositeTeacherListItem[] }>('/composite-assessments'),
   listAnalysisProtocols: () => apiClient.get<AnalysisProtocolCatalog>('/composite-assessments/analysis-protocols'),
@@ -190,8 +195,8 @@ export const compositeApi = {
   wholeTemplate: (attemptId: string, templateHash: string) =>
     apiClient.get<WholeQuestionnaireTemplate>(`/composite-assessments/attempts/${attemptId}/whole/template/${encodeURIComponent(templateHash)}`),
   wholeDefinition: (attemptId: string) => fetchWholeDefinitionWithTemplate(`/composite-assessments/attempts/${attemptId}/whole`),
-  wholeReceipt: (attemptId: string, submissionId: string, attemptEpoch: number) => apiClient.get<WholeReceiptLookup>(`/composite-assessments/attempts/${attemptId}/whole/receipt?submissionId=${encodeURIComponent(submissionId)}&attemptEpoch=${attemptEpoch}`),
-  submitWhole: (attemptId: string, input: WholeQuestionnaireInput) => apiClient.post<WholeQuestionnaireReceipt>(`/composite-assessments/attempts/${attemptId}/whole/submit`, input),
+  wholeReceipt: (attemptId: string, submissionId: string, attemptEpoch: number) => apiClient.get<WholeReceiptLookup>(`/composite-assessments/attempts/${attemptId}/whole/receipt?submissionId=${encodeURIComponent(submissionId)}&attemptEpoch=${attemptEpoch}`, { timeout: WHOLE_RECEIPT_LOOKUP_TIMEOUT_MS }),
+  submitWhole: (attemptId: string, input: WholeQuestionnaireInput) => apiClient.post<WholeQuestionnaireReceipt>(`/composite-assessments/attempts/${attemptId}/whole/submit`, input, { timeout: WHOLE_SUBMIT_REQUEST_TIMEOUT_MS }),
   reportStatus: (attemptId: string, waitMs = 0, signal?: AbortSignal) => apiClient.get<CompositeReportStatus>(`/composite-assessments/attempts/${attemptId}/report-status`, { params: { waitMs }, signal }),
   reportView: (attemptId: string, waitMs = 0, signal?: AbortSignal) => apiClient.get<CompositeReportView>(`/composite-assessments/attempts/${attemptId}/report`, { params: { view: 'combined', waitMs }, signal }),
   retryReport: (attemptId: string) => apiClient.post<CompositeReportStatus>(`/composite-assessments/attempts/${attemptId}/report-retry`, {}),
@@ -245,8 +250,8 @@ export const publicCompositeApi = (recoveryToken: string) => ({
   wholeTemplate: (attemptId: string, templateHash: string) =>
     apiClient.get<WholeQuestionnaireTemplate>(`/public/composite-assessments/attempts/${attemptId}/whole/template/${encodeURIComponent(templateHash)}`, { headers: { 'X-Recovery-Token': recoveryToken } }),
   wholeDefinition: (attemptId: string) => fetchWholeDefinitionWithTemplate(`/public/composite-assessments/attempts/${attemptId}/whole`, { 'X-Recovery-Token': recoveryToken }),
-  wholeReceipt: (attemptId: string, submissionId: string, attemptEpoch: number) => apiClient.get<WholeReceiptLookup>(`/public/composite-assessments/attempts/${attemptId}/whole/receipt?submissionId=${encodeURIComponent(submissionId)}&attemptEpoch=${attemptEpoch}`, { headers: { 'X-Recovery-Token': recoveryToken } }),
-  submitWhole: (attemptId: string, input: WholeQuestionnaireInput) => apiClient.post<WholeQuestionnaireReceipt>(`/public/composite-assessments/attempts/${attemptId}/whole/submit`, input, { headers: { 'X-Recovery-Token': recoveryToken } }),
+  wholeReceipt: (attemptId: string, submissionId: string, attemptEpoch: number) => apiClient.get<WholeReceiptLookup>(`/public/composite-assessments/attempts/${attemptId}/whole/receipt?submissionId=${encodeURIComponent(submissionId)}&attemptEpoch=${attemptEpoch}`, { headers: { 'X-Recovery-Token': recoveryToken }, timeout: WHOLE_RECEIPT_LOOKUP_TIMEOUT_MS }),
+  submitWhole: (attemptId: string, input: WholeQuestionnaireInput) => apiClient.post<WholeQuestionnaireReceipt>(`/public/composite-assessments/attempts/${attemptId}/whole/submit`, input, { headers: { 'X-Recovery-Token': recoveryToken }, timeout: WHOLE_SUBMIT_REQUEST_TIMEOUT_MS }),
   reportStatus: (attemptId: string, waitMs = 0, signal?: AbortSignal) => apiClient.get<CompositeReportStatus>(`/public/composite-assessments/attempts/${attemptId}/report-status`, { headers: { 'X-Recovery-Token': recoveryToken }, params: { waitMs }, signal }),
   reportView: (attemptId: string, waitMs = 0, signal?: AbortSignal) => apiClient.get<CompositeReportView>(`/public/composite-assessments/attempts/${attemptId}/report`, { headers: { 'X-Recovery-Token': recoveryToken }, params: { view: 'combined', waitMs }, signal }),
   retryReport: (attemptId: string) => apiClient.post<CompositeReportStatus>(`/public/composite-assessments/attempts/${attemptId}/report-retry`, {}, { headers: { 'X-Recovery-Token': recoveryToken } }),

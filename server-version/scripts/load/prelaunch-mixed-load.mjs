@@ -24,13 +24,13 @@ export function validateFixture(fixture) {
     if (!/^[a-z0-9-]{1,60}$/.test(op.category)) throw new Error('Category must be a non-sensitive fixed label')
     if (!Array.isArray(op.steps) || !op.steps.length || op.steps.length > 20) throw new Error('Provide 1..20 steps')
     for (const step of op.steps) {
-      for (const request of [step, ...(step.confirm ? [step.confirm] : [])]) {
+      for (const request of [step, ...(step.recover ? [step.recover] : []), ...(step.confirm ? [step.confirm] : [])]) {
         const url = new URL(request.path, origin)
         if (url.origin !== origin.origin || url.username || url.password) throw new Error('Requests must stay on the fixture origin')
         if (!request.expect || !positive(request.expect.status, 599) || request.expect.status < 100) throw new Error('Every request needs an explicit status expectation')
         if (request.expect.status >= 200 && request.expect.status < 300 && !request.expect.path && !positive(request.expect.minBytes, 104857600)) throw new Error('Success requires an application-level assertion, not HTTP acknowledgement alone')
       }
-      if (step.retrySafe !== true && (step.discardFirstResponse || step.confirm)) throw new Error('Recovery scenarios require a replay-safe frozen request')
+      if (step.retrySafe !== true && (step.discardFirstResponse || step.confirm || step.recover)) throw new Error('Recovery scenarios require a replay-safe frozen request')
     }
   }
   return fixture
@@ -87,7 +87,7 @@ export async function runMixedLoad(input, supplied = {}) {
   const end = options.started + options.deadlineMs
   const attemptLatency=[]; const logicalLatency=[]; const categories={}; const statusCounts={}; const samples=[]
   let cursor=0, complete=0, unexpected5xx=0, intendedBusy503=0, networkErrors=0, discardedResponses=0, failure=0, fixtureErrors=0, expectedDependency503=0
-  let confirmationPollAttempts=0, retryAttempts=0
+  let confirmationPollAttempts=0, retryAttempts=0, recoveredAfterTimeout=0
   let stopped=false
   const sampling = (options.containers.length || options.metricsUrl) ? (async () => {
     while (!stopped) {
@@ -96,6 +96,33 @@ export async function runMixedLoad(input, supplied = {}) {
       for(let waited=0;!stopped && waited<options.sampleMs;waited+=100) await delay(Math.min(100,options.sampleMs-waited))
     }
   })() : Promise.resolve()
+  async function tryRecoverOnce(recoverRequest) {
+    if (!recoverRequest || performance.now() >= end) return false
+    const url = new URL(recoverRequest.path, fixture.baseUrl)
+    const headers = { ...recoverRequest.headers }
+    const started = performance.now()
+    confirmationPollAttempts++
+    try {
+      const raw = await fetch(url, {
+        method: recoverRequest.method || 'GET',
+        headers,
+        redirect: 'error',
+        signal: AbortSignal.timeout(Math.max(1, Math.min(options.timeoutMs, Math.ceil(end - performance.now())))),
+      })
+      statusCounts[raw.status] = (statusCounts[raw.status] || 0) + 1
+      const response = { status: raw.status, ...await boundedJson(raw, Boolean(recoverRequest.expect.minBytes) && raw.status === recoverRequest.expect.status) }
+      if (matches(response, recoverRequest.expect)) {
+        recoveredAfterTimeout++
+        return true
+      }
+      return false
+    } catch {
+      networkErrors++
+      return false
+    } finally {
+      attemptLatency.push(performance.now() - started)
+    }
+  }
   async function requestUntil(request, retrySafe, discard=false, poll=false) {
     const url = new URL(request.path, fixture.baseUrl)
     let body
@@ -110,9 +137,11 @@ export async function runMixedLoad(input, supplied = {}) {
     // These exact bytes/headers are reused; this harness never invents new idempotency keys.
     const headers = {...request.headers}; if(body && !request.bodyFile && !Object.keys(headers).some(key=>key.toLowerCase()==='content-type')) headers['Content-Type']='application/json'
     let responseDiscarded=false
+    let uncertainOutcome=false
     for(let attempt=0;attempt<options.maxAttempts && performance.now()<end;attempt++) {
+      if (attempt > 0 && uncertainOutcome && request.recover && await tryRecoverOnce(request.recover)) return true
       if(poll)confirmationPollAttempts++;else if(attempt>0)retryAttempts++
-      const started=performance.now(); let response; let waitMs=100
+      const started=performance.now(); let response; let waitMs=100; let shouldRecoverNow=false
       try {
         const raw = await fetch(url,{method:request.method || 'GET', headers, body, redirect:'error', signal:AbortSignal.timeout(Math.max(1,Math.min(options.timeoutMs,Math.ceil(end-performance.now()))))})
         statusCounts[raw.status]=(statusCounts[raw.status] || 0)+1
@@ -124,19 +153,23 @@ export async function runMixedLoad(input, supplied = {}) {
         response={status:raw.status,...await boundedJson(raw,Boolean(request.expect.minBytes) && raw.status===request.expect.status)}
         const busy=raw.status === 503 && request.busy && at(response.body,request.busy.path) === request.busy.equals && Boolean(retryHeader)
         const dependency=raw.status===503 && request.unavailable && at(response.body,request.unavailable.path)===request.unavailable.equals && Boolean(retryHeader)
+        const uncertainStatus = raw.status === 408 || raw.status === 502 || raw.status === 504
         if(raw.status===503 && busy) intendedBusy503++
         else if(dependency)expectedDependency503++
         else if(raw.status>=500) unexpected5xx++
-        if(discard && !responseDiscarded && matches(response,request.expect)) { discardedResponses++; responseDiscarded=true; response=null }
+        if(discard && !responseDiscarded && matches(response,request.expect)) { discardedResponses++; responseDiscarded=true; response=null; uncertainOutcome=true; shouldRecoverNow=true }
         else if(matches(response,request.expect)) return true
         else if(poll && raw.status>=200 && raw.status<300 && request.pending && at(response.body,request.pending.path)===request.pending.equals) { /* status not completed yet */ }
+        else if(retrySafe && uncertainStatus) { uncertainOutcome=true; shouldRecoverNow=true }
         else if(!retrySafe || (raw.status!==429 && !busy && !dependency)) return false
-      } catch { networkErrors++; if(!retrySafe) return false }
+      } catch { networkErrors++; if(!retrySafe) return false; uncertainOutcome=true; shouldRecoverNow=true }
       finally { attemptLatency.push(performance.now()-started) }
+      if (shouldRecoverNow && request.recover && await tryRecoverOnce(request.recover)) return true
       if (!retrySafe) return false
       const remaining=end-performance.now(); if(remaining<=0) break
       await delay(Math.min(waitMs*Math.min(5,1+attempt/10),30000,remaining))
     }
+    if (uncertainOutcome && request.recover && await tryRecoverOnce(request.recover)) return true
     return false
   }
   await Promise.all(Array.from({length:Math.min(options.concurrency,fixture.operations.length)},async()=>{
@@ -156,7 +189,7 @@ export async function runMixedLoad(input, supplied = {}) {
   return {version:1, targetLabel:options.targetLabel || 'unspecified', capacityCertified:false,
     concurrency:options.concurrency, logicalTotal:fixture.operations.length, logicalCompleted:complete, logicalFailed:failure,
     eventualSuccessRate:complete/fixture.operations.length, attempts:attemptLatency.length,
-    confirmationPollAttempts,retryAttempts,
+    confirmationPollAttempts,retryAttempts,recoveredAfterTimeout,
     retryAmplification:(attemptLatency.length-confirmationPollAttempts)/fixture.operations.reduce((n,op)=>n+op.steps.length,0),
     statusCounts,intendedBusy503,expectedDependency503,unexpected5xx,networkErrors,discardedResponses,fixtureErrors,
     attemptLatencyMs:quantiles(attemptLatency),logicalLatencyMs:quantiles(logicalLatency),
