@@ -144,7 +144,7 @@ import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-def
 import { resolveFrozenScaleInstructionForScale } from '../scale/onboarding/instrument-registry'
 import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
 import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
-import { ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime, prepareBatchScaleAdmissionsAtCreate, seedScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
+import { ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime, seedScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
 import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota, isTrainingTaskCourse, usesScopedTrainingQuota } from '../cognitive/attempt-quota'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
@@ -3223,7 +3223,6 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
         }
       }
       if (pendingScales.length > 0) {
-        await prepareBatchScaleAdmissionsAtCreate({ db, attempt, composite, pendingScales })
         await db.assessment.createMany({ data: pendingScales.map((entry) => entry.data) })
         for (const entry of pendingScales) {
           if (entry.frozenScale) {
@@ -3247,8 +3246,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
     Object.defineProperty(runtime, '_freshScaleChildren', { value: pendingScales.map(entry => {
       const child = {
         ...entry.data, questionnaireAssessmentId: null,
-        frozenAdmissionSnapshotEncrypted: (entry.data.frozenAdmissionSnapshotEncrypted as string | null | undefined) ?? null,
-        frozenAdmissionSnapshotHash: (entry.data.frozenAdmissionSnapshotHash as string | null | undefined) ?? null,
+        frozenAdmissionSnapshotEncrypted: null, frozenAdmissionSnapshotHash: null,
         scale: entry.item.scale,
       }
       if (entry.frozenScale) freshScaleRuntimeByChild.set(child, entry.frozenScale)
