@@ -1,4 +1,4 @@
-import {assertCurrentStudyPrincipal,withStudyPrincipalReadBatch,type AcceptedStudyReceipt} from '../anonymous-study/admission-principal'
+import {assertCurrentStudyPrincipal,assertStudyReceiptBatch,withStudyPrincipalReadBatch,type AcceptedStudyReceipt} from '../anonymous-study/admission-principal'
 import { lockTrainingFlowFinalAdmission, requiresTrainingFlowFinalLock } from '../composite/training-variant-child-scope'
 import {normalizeTrainingScaleTiming} from '../assessment-runtime/training-scale-timing'
 import { rethrowScaleSubmissionIdConflict, rethrowConfirmedScaleBatchSubmissionConflict } from './scale-final-submit-conflict'
@@ -535,9 +535,11 @@ export const submitUnifiedScaleCollectionBatch = async (
   return withFinalOnlyCompletionTransaction(async tx => {
     // New study admissions always lock parent -> accepted job -> child. The
     // historical batch lock order remains untouched for unbound protocols.
-    for(const unit of prepared)await assertStudyPrincipalIfAnonymous(tx,{attemptId:unit.child.compositeAttemptId,userId:unit.input.userId,
+    const principalInputs=prepared.map(unit=>({attemptId:unit.child.compositeAttemptId,userId:unit.input.userId,
       recoveryTokenHash:unit.input.recoveryTokenHash,attemptEpoch:unit.input.attemptEpoch,
-      frozenHash:unit.data.admission.principal.recoveryTokenHash,receipt:execution.studyReceipt,unit:unit.input},true)
+      frozenHash:unit.data.admission.principal.recoveryTokenHash,receipt:execution.studyReceipt,unit:unit.input}))
+    if(execution.studyReceipt)await assertStudyReceiptBatch(tx,principalInputs,execution.studyReceipt)
+    else for(const input of principalInputs)await assertStudyPrincipalIfAnonymous(tx,input,true)
     const lockReadsStart = process.hrtime.bigint()
     const rows = await tx.$queryRaw<Array<{
       id: string; status: string; deliveryMode: string; runtimeGeneration: string | null; attemptEpoch: number;

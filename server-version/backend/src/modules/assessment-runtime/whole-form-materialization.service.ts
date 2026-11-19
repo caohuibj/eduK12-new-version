@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import type { CompositeReportJob } from '@prisma/client'
+import type { CompositeReportJob, Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import {
@@ -49,11 +49,16 @@ export const verifyWholeFormSectionsAtReceipt = async (
   attemptId: string,
   sections: WholeFormAnswerSection[],
 ) => {
+  if (sections.length === 0) return
+  const sectionIds = [...new Set(sections.map(section => section.sectionId))]
+  const storedRows = await prisma.compositeFormSectionAttempt.findMany({
+    where: { attemptId, sectionId: { in: sectionIds } },
+    select: { sectionId: true, frozenAdmissionSnapshotEncrypted: true, frozenAdmissionSnapshotHash: true },
+  })
+  const storedBySection = new Map(storedRows.map(row => [row.sectionId, row]))
+  let catalogBySection: Map<string, Prisma.CompositeFormSectionGetPayload<{ include: { items: true } }>> | undefined
   for (const section of sections) {
-    const stored = await prisma.compositeFormSectionAttempt.findUnique({
-      where: { attemptId_sectionId: { attemptId, sectionId: section.sectionId } },
-      select: { frozenAdmissionSnapshotEncrypted: true, frozenAdmissionSnapshotHash: true },
-    })
+    const stored = storedBySection.get(section.sectionId)
     let definition: CompositeSection | undefined
     let identityHash: string | undefined
     // The async reader resolves both storage formats: the legacy encrypted
@@ -66,10 +71,14 @@ export const verifyWholeFormSectionsAtReceipt = async (
       identityHash = admission.formSection.identityHash
       definition = loadCompositeFormDefinition(admission)
     } else {
-      const row = await prisma.compositeFormSection.findUnique({
-        where: { id: section.sectionId },
-        include: { items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }] } },
-      })
+      if (!catalogBySection) {
+        const rows = await prisma.compositeFormSection.findMany({
+          where: { id: { in: sectionIds } },
+          include: { items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }] } },
+        })
+        catalogBySection = new Map(rows.map(row => [row.id, row]))
+      }
+      const row = catalogBySection.get(section.sectionId)
       if (!row) throw formSectionFailure('表单区段不存在', 404)
       definition = mapCompositeSection(row)
       identityHash = formSectionIdentityHash(definition)

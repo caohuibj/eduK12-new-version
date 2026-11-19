@@ -775,7 +775,7 @@ const receiptResponse = (attemptId: string, submissionId: string, payloadHash: s
 
 type WholeSubmissionHeader = Prisma.CompositeAssessmentAttemptGetPayload<{
   select: typeof REPORT_PARENT_SELECT & { userId: true; recoveryTokenHash: true };
-}> & { consentId: string | null;trainingTimingSnapshot:unknown;hasStandardCombination:boolean;
+}> & { consentId: string | null;trainingTimingSnapshot:unknown;
   trainingVariantAllocationEncrypted: string | null; trainingVariantAllocationHash: string | null;
   compositeAssessment: { trainingVariantDraft: unknown; trainingVariantFrozen: unknown; trainingVariantDigest: string | null } }
 /** One fresh read of ownership, product eligibility and the current receipt. */
@@ -807,8 +807,6 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
       parent."training_flow_path_encrypted" AS "trainingFlowPathEncrypted", parent."training_flow_path_hash" AS "trainingFlowPathHash",
       parent."training_variant_allocation_encrypted" AS "trainingVariantAllocationEncrypted",
       parent."training_variant_allocation_hash" AS "trainingVariantAllocationHash",
-      (EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=product.id AND i.standard_combination_source IS NOT NULL)
-       OR jsonb_path_exists(COALESCE(parent.training_content_binding,'{}'::jsonb),'$.units[*].source.standardCombination')) AS "hasStandardCombination",
       parent."user_id" AS "userId",
       parent."recovery_token_hash" AS "recoveryTokenHash",
       product."product_kind" AS "productKind", product."report_package_key" AS "reportPackageKey",

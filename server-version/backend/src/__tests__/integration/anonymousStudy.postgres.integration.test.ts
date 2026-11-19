@@ -11,7 +11,7 @@ import {hashRecoveryToken} from '../../services/anonymousAccess'
 import {publicAnonymousStudyRouter} from '../../modules/anonymous-study/routes'
 import {csrfProtection} from '../../middleware/csrf'
 import {publicAssessmentRateLimiters} from '../../middleware/publicAssessmentRateLimit'
-import {assertCurrentStudyPrincipal,withStudyPrincipalReadBatch} from '../../modules/anonymous-study/admission-principal'
+import {acceptedStudyReceipt,assertCurrentStudyPrincipal,assertStudyReceiptBatch,withStudyPrincipalReadBatch} from '../../modules/anonymous-study/admission-principal'
 import {anonymousStartAdmissionGate,resetAnonymousStartAdmissionGateForTests} from '../../modules/anonymous-study/study-start-admission-gate'
 import {requestObservabilityMiddleware,resetRuntimeObservabilityForTests,runtimeMetricLines} from '../../services/runtimeObservability'
 const suite=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL')?describe:describe.skip
@@ -374,4 +374,55 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
    await study.revokeStudyIdentity(s.id,p.credential)
   })).rejects.toMatchObject({statusCode:403})
  })
+ it('validates a batch against a real locked study receipt and rejects an expired lease',async()=>{
+  const s=await study.createStudy(owner,'Receipt batch')
+  const t=await token()
+  const w=await study.addWave(owner,'TEACHER',s.id,{compositeId:cid,tokenId:t.id,title:'Wave'})
+  const p=await study.joinStudy(w.id,t.token,true)
+  const a=await study.startStudyWave(s.id,w.id,p.credential)
+  const parent=await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:a.attemptId}})
+  if(!parent.frozenActiveSlotSetHash)throw new Error('START did not freeze a slot set')
+  await prisma.compositeAssessmentAttempt.update({where:{id:a.attemptId},data:{asyncReportEpoch:parent.attemptEpoch}})
+  const acceptedAt=new Date()
+  const job=await prisma.compositeReportJob.create({data:{attemptId:a.attemptId,attemptEpoch:parent.attemptEpoch,
+   slotSetHash:parent.frozenActiveSlotSetHash,contextHash:parent.contextSnapshotHash,status:'PROCESSING',
+   requestedRevision:1,claimedRevision:1,leaseToken:randomUUID(),leaseExpiresAt:new Date(Date.now()+60000),
+   wholeSubmissionId:randomUUID(),wholePayloadHash:'p'.repeat(64),wholeAnswersEncrypted:'synthetic',wholeAcceptedAt:acceptedAt}})
+  const units=Array.from({length:2},(_,i)=>({assessmentId:randomUUID(),submissionId:randomUUID(),attemptEpoch:parent.attemptEpoch,
+   definitionHash:'d'.repeat(64),contextSnapshotHash:parent.contextSnapshotHash,answers:[i]}))
+  const cap=await acceptedStudyReceipt(job,{schemaVersion:1,binding:{attemptId:a.attemptId,attemptEpoch:parent.attemptEpoch,
+   slotSetHash:parent.frozenActiveSlotSetHash,contextHash:parent.contextSnapshotHash},payloadHash:job.wholePayloadHash!,units})
+  if(!cap)throw new Error('study receipt was not created')
+  const inputs=units.map(unit=>({attemptId:a.attemptId,attemptEpoch:parent.attemptEpoch,
+   frozenHash:hashRecoveryToken(a.recoveryToken),receipt:cap,unit}))
+  await prisma.$transaction(tx=>assertStudyReceiptBatch(tx,inputs,cap))
+  await expect(prisma.$transaction(tx=>assertStudyReceiptBatch(tx,[{...inputs[0],unit:{...units[0],answers:['changed']}}],cap))).rejects.toThrow()
+  await prisma.compositeReportJob.update({where:{id:job.id},data:{leaseExpiresAt:new Date(Date.now()-1000)}})
+  await expect(prisma.$transaction(tx=>assertStudyReceiptBatch(tx,inputs,cap))).rejects.toThrow()
+  await prisma.compositeReportJob.update({where:{id:job.id},data:{leaseExpiresAt:new Date(Date.now()+60000)}})
+  let locked!:()=>void, release!:()=>void
+  const hasLock=new Promise<void>(resolve=>{locked=resolve})
+  const canFinish=new Promise<void>(resolve=>{release=resolve})
+  const worker=prisma.$transaction(async tx=>{
+   await assertStudyReceiptBatch(tx,inputs,cap)
+   locked()
+   await canFinish
+  },{timeout:15000})
+  await hasLock
+  const revoke=study.revokeStudyIdentity(s.id,p.credential)
+  let waited=false
+  try{
+   for(let i=0;i<100;i++){
+    const rows=await prisma.$queryRaw<Array<{waiting:boolean}>>`SELECT EXISTS (
+      SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND pid<>pg_backend_pid() AND wait_event_type='Lock'
+    ) AS waiting`
+    if(rows[0]?.waiting){waited=true;break}
+    await new Promise(resolve=>setTimeout(resolve,20))
+   }
+  }finally{release()}
+  await worker
+  await revoke
+  expect(waited).toBe(true)
+  await expect(prisma.$transaction(tx=>assertStudyReceiptBatch(tx,inputs,cap))).rejects.toThrow()
+ },20000)
 })

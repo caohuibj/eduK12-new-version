@@ -47,6 +47,7 @@ export type BundleScaleStartParentContext = {
   parent: BundleParentShape
   frozen: ReturnType<typeof readInstance>['frozen']
   bindings: ReturnType<typeof readInstance>['bindings']
+  validateMappings(): void
   /** Parent-level frozen FORM slot set, collection fact rows and derived
    * values/facts. Resolved once per delivery on the first mapped unit and
    * memoized; the integrity checks keep their original order and semantics. */
@@ -66,9 +67,15 @@ export async function loadBundleScaleStartParentContext(db: PrismaClient | Prism
   }
   const { frozen, bindings } = readInstance(instance)
   let memo: Promise<FrozenFormFacts> | undefined
+  let mappingsValidated = false
   return {
     parent,
     frozen, bindings,
+    validateMappings() {
+      if (mappingsValidated) return
+      validateBundleStartContextMappings(frozen.bundleSnapshot.bundleDefinition, frozen.contextDefinition)
+      mappingsValidated = true
+    },
     resolvedFacts() {
       return memo ??= (async () => {
         const encryptedSlotSet = parent.frozenActiveSlotSetEncrypted
@@ -102,7 +109,7 @@ export async function resolveBundleScaleStartForItem(parentCtx: BundleScaleStart
   if (!slot || slot.instrumentKey !== instrumentKey || slot.instrumentVersion !== instrumentVersion) invalid('START 量表与冻结 Bundle 槽位不匹配')
   const mapping = slot!.admissionContext
   if (!mapping) return undefined
-  validateBundleStartContextMappings(parentCtx.frozen.bundleSnapshot.bundleDefinition, parentCtx.frozen.contextDefinition)
+  parentCtx.validateMappings()
   const { values, contextFacts } = await parentCtx.resolvedFacts()
   for (const requirement of mapping.requirements) {
     const value = values[requirement.contextKey]
