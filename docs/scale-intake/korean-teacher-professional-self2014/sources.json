@@ -1,0 +1,102 @@
+{
+  "motherTool": "韩国教师专业发展自评准则研究2014（项目识别名；不是已核韩国官方国家标准）",
+  "originalTitle": "교사전문성을 위한 자기평가 준거 개발 연구",
+  "englishTitle": "A Study of Developing Self-Evaluation Criterion for Teacher Professional Development",
+  "authors": [
+    "김지선",
+    "김혁동",
+    "이원재",
+    "이동배"
+  ],
+  "journal": "한국교원교육연구 / The Journal of Korean Teacher Education",
+  "year": 2014,
+  "volume": 31,
+  "issue": 4,
+  "pages": "167–196",
+  "doi": "10.24211/tjkte.2014.31.4.167",
+  "kciId": "ART001939079",
+  "publisher": "한국교원교육학회",
+  "status": "MISSING_ORIGINAL_ITEM_TABLES_AND_PROTOCOL",
+  "researchLead": {
+    "url": "https://docs.google.com/document/d/18JsjVIUbKNmNYOljL6FHzgzmFvP7keRPMLmMzeIK5y0/edit",
+    "section": "B06 / R19",
+    "read": true,
+    "status": "SECONDARY_LEAD_ONLY",
+    "note": "研究报告本身明确摘要可核，原题未取得。"
+  },
+  "accessLog": [
+    {
+      "url": "https://www.kci.go.kr/kciportal/landing/article.kci?arti_id=ART001939079",
+      "role": "original KCI bibliographic/abstract record",
+      "read": "PUBLIC_METADATA_AND_BILINGUAL_ABSTRACT",
+      "fullTextAcquired": false,
+      "result": "Cached web record readable. Direct current request returned web-firewall blocked message; no bypass attempted. The visible PDF label did not provide a retrievable public full-text link.",
+      "rightsEvidence": "Copyright © 한국교원교육학회. No explicit open-content redistribution/translation license verified."
+    },
+    {
+      "url": "https://m.earticle.net/Article/A237472",
+      "role": "publisher distributor record",
+      "read": "PUBLIC_METADATA_ABSTRACT_CONTENTS",
+      "fullTextAcquired": false,
+      "result": "Full text offered for purchase or institutional login. No purchase, sign-in, subscription or terms acceptance."
+    },
+    {
+      "url": "https://www.ksste.or.kr/",
+      "role": "publishing society",
+      "read": "FAILED_403",
+      "fullTextAcquired": false,
+      "result": "Official society homepage returned403 in web tool. No protected download attempted."
+    },
+    {
+      "url": "https://doi.org/10.24211/tjkte.2014.31.4.167",
+      "role": "persistent original identifier",
+      "read": "TOOL_FETCH_ERROR",
+      "fullTextAcquired": false,
+      "result": "DOI could not be fetched by web tool; metadata verified on KCI."
+    },
+    {
+      "url": "https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE11354702",
+      "role": "distributor index",
+      "read": "PUBLIC_METADATA_INTERFACE",
+      "fullTextAcquired": false,
+      "result": "Login/institution-authenticated access interface; no article item table obtained. Not a reuse license."
+    },
+    {
+      "url": "https://scholar.kyobobook.co.kr/article/detail/4050025710062",
+      "role": "secondary distributor index",
+      "read": "SEARCH_METADATA_ONLY_DIRECT_FETCH_UNAVAILABLE",
+      "fullTextAcquired": false,
+      "result": "Indexed abstract aligns with original KCI. Direct page unavailable in web tool."
+    },
+    {
+      "url": "https://sam.riss.kr/findThesisAnalysis.do?controlNo=100262011&docType=A",
+      "role": "bibliographic cross-check",
+      "read": "PUBLIC_METADATA",
+      "fullTextAcquired": false,
+      "result": "Korean30-page journal article metadata, library/distributor information. No source questionnaire obtained."
+    }
+  ],
+  "copyright": {
+    "holderAsDisplayed": "한국교원교육학회",
+    "license": "NOT_ESTABLISHED",
+    "publicFullItemRedistribution": "NOT_ESTABLISHED",
+    "electronicAdministration": "NOT_ESTABLISHED",
+    "translationAdaptation": "NOT_ESTABLISHED",
+    "automatedScoring": "NOT_ESTABLISHED",
+    "authorizationCreated": false
+  },
+  "retrievalSearches": "Exact Korean/English title, DOI, author combination, PDF/HWP, society, institutional and author-related leads. Other downloadable results only cite the study or concern a different instrument; not substituted.",
+  "confirmedOnly": {
+    "primaryTeachers": {
+      "itemCount": 50,
+      "domainCount": 5,
+      "studySample": 1438
+    },
+    "secondaryTeachers": {
+      "itemCount": 51,
+      "domainCount": 6,
+      "studySample": 1727
+    },
+    "evidenceLevel": "AUTHOR_ABSTRACT_ONLY; no independent review of paper factor/item tables, coefficients or scoring"
+  }
+}

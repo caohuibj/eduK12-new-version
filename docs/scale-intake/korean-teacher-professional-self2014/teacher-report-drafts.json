@@ -1,0 +1,101 @@
+{
+  "status": "EDITORIAL_DRAFTS_ONLY_NO_REPORT_ENGINE_BINDING",
+  "studentVersion": "NOT_APPLICABLE_NO_NATIVE_STUDENT_SOURCE_ACQUIRED",
+  "numericReportGenerated": false,
+  "drafts": [
+    {
+      "versionRef": "kr_tpd_self2014_primary_ko",
+      "status": "ORIGINAL_PROJECT_EDITORIAL_DRAFT_NOT_RENDERED_OR_SCORED",
+      "respondent": "teacher_self",
+      "receiver": "same_teacher_respondent",
+      "language": "zh-CN",
+      "languageStatus": "Project Chinese reporting draft; not translated questionnaire or validated Chinese version.",
+      "visibleWhen": "Only if existing result/run authorization permits the same teacher respondent to receive their own results. No new permission or disclosure is granted.",
+      "otherRecipients": "No automatic individual/raw/sensitive answer disclosure to colleagues, managers, students or researchers. Existing anonymity/publication/minimum-group rules unchanged.",
+      "cases": [
+        {
+          "case": "normal_self_reflection",
+          "basis": "Hypothetical qualitative self-description; no numeric or normative threshold.",
+          "copy": "这份回顾帮助你整理自己的专业成长经历，不评定教师好坏，也不能代表一节课的实际质量。若你能举出某一领域的具体例子，可以记录做法、当时条件和后续观察，选择一项值得继续尝试的做法。",
+          "microActions": [
+            "选一个最近的工作片段，写下做法与可观察证据。",
+            "下次保留一项做法，再回看学生参与或工作协作是否有变化。"
+          ],
+          "numericScore": null
+        },
+        {
+          "case": "difficulty_or_support_need",
+          "basis": "Hypothetical self-described difficulty; not low-score labeling or inferred character deficit.",
+          "copy": "有些领域暂时缺少把握，可能与时间、资源、岗位任务或支持条件有关，不能据此认定你能力差或品格有问题。先选择一件可控的小事；需要制度或资源支持的部分，可以向可信同事或适当负责人表达具体需要。",
+          "microActions": [
+            "从一个困难片段中找出可调整的一步和暂时无法独自改变的条件。",
+            "约一次简短交流，请可信同事帮助观察或讨论一项具体做法。"
+          ],
+          "numericScore": null
+        },
+        {
+          "case": "insufficient_evidence",
+          "basis": "Actual current intake: original items/options/scoring unavailable. No administered responses exist.",
+          "copy": "目前没有正式题本和计分协议，不能生成这个工具的分数或个人结论。即使以后收到部分回答，也不能把空白算作零或推断专业水平；是否计分及如何呈现缺失，须按核实后的原协议处理。",
+          "microActions": [],
+          "numericScore": null,
+          "interpretationGenerated": false
+        }
+      ],
+      "prohibited": [
+        "diagnosis",
+        "teacher/character ranking",
+        "single-lesson quality inference",
+        "cross-stage or cross-tool total",
+        "treating growth/self-confidence/values as observed teaching effectiveness"
+      ]
+    },
+    {
+      "versionRef": "kr_tpd_self2014_secondary_ko",
+      "status": "ORIGINAL_PROJECT_EDITORIAL_DRAFT_NOT_RENDERED_OR_SCORED",
+      "respondent": "teacher_self",
+      "receiver": "same_teacher_respondent",
+      "language": "zh-CN",
+      "languageStatus": "Project Chinese reporting draft; not translated questionnaire or validated Chinese version.",
+      "visibleWhen": "Only if existing result/run authorization permits the same teacher respondent to receive their own results. No new permission or disclosure is granted.",
+      "otherRecipients": "No automatic individual/raw/sensitive answer disclosure to colleagues, managers, students or researchers. Existing anonymity/publication/minimum-group rules unchanged.",
+      "cases": [
+        {
+          "case": "normal_self_reflection",
+          "basis": "Hypothetical qualitative self-description; no numeric or normative threshold.",
+          "copy": "这份回顾帮助你整理自己的专业成长经历，不评定教师好坏，也不能代表一节课的实际质量。若你能举出某一领域的具体例子，可以记录做法、当时条件和后续观察，选择一项值得继续尝试的做法。",
+          "microActions": [
+            "选一个最近的工作片段，写下做法与可观察证据。",
+            "下次保留一项做法，再回看学生参与或工作协作是否有变化。"
+          ],
+          "numericScore": null
+        },
+        {
+          "case": "difficulty_or_support_need",
+          "basis": "Hypothetical self-described difficulty; not low-score labeling or inferred character deficit.",
+          "copy": "有些领域暂时缺少把握，可能与时间、资源、岗位任务或支持条件有关，不能据此认定你能力差或品格有问题。先选择一件可控的小事；需要制度或资源支持的部分，可以向可信同事或适当负责人表达具体需要。",
+          "microActions": [
+            "从一个困难片段中找出可调整的一步和暂时无法独自改变的条件。",
+            "约一次简短交流，请可信同事帮助观察或讨论一项具体做法。"
+          ],
+          "numericScore": null
+        },
+        {
+          "case": "insufficient_evidence",
+          "basis": "Actual current intake: original items/options/scoring unavailable. No administered responses exist.",
+          "copy": "目前没有正式题本和计分协议，不能生成这个工具的分数或个人结论。即使以后收到部分回答，也不能把空白算作零或推断专业水平；是否计分及如何呈现缺失，须按核实后的原协议处理。",
+          "microActions": [],
+          "numericScore": null,
+          "interpretationGenerated": false
+        }
+      ],
+      "prohibited": [
+        "diagnosis",
+        "teacher/character ranking",
+        "single-lesson quality inference",
+        "cross-stage or cross-tool total",
+        "treating growth/self-confidence/values as observed teaching effectiveness"
+      ]
+    }
+  ]
+}
