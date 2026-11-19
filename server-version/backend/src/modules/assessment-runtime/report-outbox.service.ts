@@ -586,6 +586,10 @@ export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParen
 }
 
 export const storeWholeQuestionnaireValidation = async (parent: BoundReportParent, encrypted: string, hash: string): Promise<void> => {
+  // Same-hash repeated deliveries (refresh/resume/replay) skip the encrypted
+  // rewrite entirely: the UPDATE is skipped via IS DISTINCT FROM, and the
+  // zero-row outcome is then classified — identical persisted content is an
+  // idempotent success, anything else keeps the original stale-attempt 409.
   const rows = await prisma.$queryRaw<Array<{ id: string }>>`
     INSERT INTO "composite_report_jobs" (
       "id", "attempt_id", "attempt_epoch", "slot_set_hash", "context_hash", "status", "budget_held", "requested_revision",
@@ -598,7 +602,23 @@ export const storeWholeQuestionnaireValidation = async (parent: BoundReportParen
       AND "composite_report_jobs"."context_hash" IS NOT DISTINCT FROM EXCLUDED."context_hash"
       AND "composite_report_jobs"."whole_submission_id" IS NULL
       AND "composite_report_jobs"."status" = 'WAITING' AND "composite_report_jobs"."budget_held" = false
+      AND "composite_report_jobs"."whole_validation_hash" IS DISTINCT FROM EXCLUDED."whole_validation_hash"
     RETURNING "id"
   `
-  if (!rows.length) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷已经交卷或冻结准备已变化', 409)
+  if (rows.length) return
+  // Zero rows: the conflict branch was skipped. Idempotent success requires the
+  // exact persisted content (same hash), the same binding, and a still-writable
+  // WAITING job — otherwise the original stale-attempt semantics stand.
+  const existing = await prisma.$queryRaw<Array<{ id: string }>>`
+    SELECT "id" FROM "composite_report_jobs"
+    WHERE "attempt_id" = ${parent.id} AND "attempt_epoch" = ${parent.attemptEpoch}
+      AND "slot_set_hash" = ${parent.frozenActiveSlotSetHash}
+      AND "context_hash" IS NOT DISTINCT FROM ${parent.contextSnapshotHash}
+      AND "whole_validation_hash" = ${hash}
+      AND "whole_submission_id" IS NULL
+      AND "status" = 'WAITING' AND "budget_held" = false
+    LIMIT 1
+  `
+  if (existing.length) return
+  throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷已经交卷或冻结准备已变化', 409)
 }
