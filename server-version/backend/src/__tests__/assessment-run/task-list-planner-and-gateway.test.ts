@@ -219,6 +219,9 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     expect(firstSql).toContain('e."id" = ANY(?::text[])')
     // Previously expanded 3 times across SELECT, CASE WHEN, and WHERE; now materialized once via LATERAL.
     expect(firstSql.match(/FROM "assessment_run_executions" bound_execution/g)).toHaveLength(1)
+    // Short-circuit 8-table continuation join unless row is STARTED COMPOSITE with binding.
+    expect(firstSql).toContain('e."status" = \'STARTED\'')
+    expect(firstSql).toContain('e."runtime_binding_ref" IS NOT NULL')
   })
 
   it('omits unused subject and claim joins only from School student task reads', async () => {

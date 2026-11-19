@@ -9,7 +9,7 @@ import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { classifyStartTransaction, isAssessmentStartBusyError, AssessmentStartBusyError, rolledBackStartReason, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from '../composite/start-transient'
 import { BoundedAdmissionGate, configuredInteger } from '../../services/boundedAdmissionGate'
-import { defaultStartAdmissionBound } from '../../config/databasePool'
+import { defaultRunStartAdmissionBound } from '../../config/databasePool'
 import { buildWholeStartPreload, startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
 import type { RunStartPreflight } from './resourceBoundary'
 import { isAssessmentStartResourceConstrained, runWithLowMemoryTrickleAdmission } from '../../services/assessmentResourceProtection'
@@ -82,7 +82,7 @@ export const resetRunStartGateForTests = (): void => {
 
 export const runStartGate = (): BoundedAdmissionGate => {
   if (!runStartGateInstance) {
-    const defaultConcurrent = defaultStartAdmissionBound(process.env.DATABASE_URL)
+    const defaultConcurrent = defaultRunStartAdmissionBound(process.env.DATABASE_URL)
     const maxConcurrent = resolveBound(
       'RUN_START_MAX_CONCURRENT',
       'TRAINING_START_MAX_CONCURRENT',

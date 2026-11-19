@@ -105,17 +105,28 @@ export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResou
   ||canonicalHash([policy.subjectRoles,policy.respondentRoles,policy.relationshipKinds,policy.perspectives])
    !==canonicalHash([[variant.subjectRole],[variant.respondentRole],variant.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'),[variant.perspective]]))
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
- const canUseCache=tx===(prisma as unknown as Tx)
+ const isRootClient=tx===(prisma as unknown as Tx)
  const cacheKey=`${input.organizationId}:${input.key}:${input.version}:${input.policyHash}:${binding.manifestHash}:${policy.runtimeLaunchTarget.ref}`
- let parsed=canUseCache?frozenCompositionIdentityCache.get(cacheKey):undefined
- if(parsed){
-  // Publication status stays live on every cache hit.
+ const originHash=canonicalHash(origin)
+ const cached=frozenCompositionIdentityCache.get(cacheKey)
+ let parsed:NonNullable<typeof cached>
+ if(cached){
+  // Live publication and source anchors stay verified on caller's tx; only the
+  // heavy 8-table manifest/units JSON expansion is served from cache.
   const [live]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT c.id FROM composite_assessments c
-   WHERE c.id=${policy.runtimeLaunchTarget.ref} AND c.training_content_snapshot_hash=${binding.manifestHash}
-    AND c.status='PUBLISHED' AND c.published_at IS NOT NULL AND NOT c.public_enabled AND NOT c.copyable LIMIT 1`)
+   JOIN education_private_tool_versions original ON original.id=${origin.versionId}
+    AND original.content_hash=${origin.contentHash} AND original.entry=${origin.entry} AND original.kind='COMPOSITION'
+    AND original.organization_id=${origin.organizationId} AND original.owner_user_id=${origin.ownerUserId}
+   WHERE c.id=${policy.runtimeLaunchTarget.ref} AND c.creation_key=${input.key}
+    AND c.creation_hash=${originHash} AND c.training_content_snapshot_hash=${binding.manifestHash}
+    AND c.created_by=${origin.ownerUserId} AND c.status='PUBLISHED' AND c.published_at IS NOT NULL
+    AND c.product_kind='ORGANIZATION_RESOURCE' AND NOT c.public_enabled AND NOT c.copyable LIMIT 1`)
   if(!live)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
+  parsed=cached
  }else{
-  parsed=canUseCache
+  // Populate global cache only from non-transactional root reads so a rolled-back
+  // transaction can never leave uncommitted composition state in memory.
+  parsed=isRootClient
    ?await frozenCompositionIdentityCache.singleFlight(cacheKey,async()=>{
      const value=await loadFrozenCompositionIdentityRow(tx,{policy,origin,binding,key:input.key})
      frozenCompositionIdentityCache.set(cacheKey,value)
