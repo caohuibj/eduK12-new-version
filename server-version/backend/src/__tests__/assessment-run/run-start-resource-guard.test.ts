@@ -187,7 +187,8 @@ describe('assessment-run pre-gate resource protection & composition identity cac
     const second = await readFrozenCompositionIdentity(prisma, { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' })
     expect(second).toEqual(first)
     expect(m.queryRaw).toHaveBeenCalledTimes(2)
-    expect(m.queryRaw.mock.calls[1][0].sql).not.toContain('education_private_tool_versions')
+    expect(m.queryRaw.mock.calls[1][0].sql).not.toContain('jsonb_array_elements')
+    expect(m.queryRaw.mock.calls[1][0].sql).toContain('education_private_tool_versions')
     expect(m.queryRaw.mock.calls[1][0].sql).toContain("c.status='PUBLISHED'")
 
     // 3. Retired/unpublished composite -> still fails closed on cache hit
@@ -196,7 +197,7 @@ describe('assessment-run pre-gate resource protection & composition identity cac
       .rejects.toMatchObject({ code: 'PRIVATE_COMPOSITION_EXECUTION_INVALID', statusCode: 409 })
   })
 
-  it('shares frozen composition identity cache safely across distinct transaction clients', async () => {
+  it('never writes global cache from scoped transactions, and re-verifies full source anchors on cross-tx hits', async () => {
     const orgId = uuid(23)
     const ownerId = uuid(24)
     const toolId = uuid(26)
@@ -260,16 +261,38 @@ describe('assessment-run pre-gate resource protection & composition identity cac
         measurementHash: '4'.repeat(64),
       }],
     }
-    const tx1Query = vi.fn().mockResolvedValueOnce([row])
-    const tx2Query = vi.fn().mockResolvedValueOnce([{ id: compositeId }])
+    const rolledBackTxQuery = vi.fn().mockResolvedValueOnce([row])
+    const txAfterRollbackQuery = vi.fn().mockResolvedValueOnce([row])
 
-    const first = await readFrozenCompositionIdentity({ $queryRaw: tx1Query } as any, { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' })
-    const second = await readFrozenCompositionIdentity({ $queryRaw: tx2Query } as any, { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' })
-    expect(second).toEqual(first)
-    expect(tx1Query).toHaveBeenCalledTimes(1)
-    expect(tx2Query).toHaveBeenCalledTimes(1)
-    expect(tx1Query.mock.calls[0][0].sql).toContain('education_private_tool_versions')
-    expect(tx2Query.mock.calls[0][0].sql).not.toContain('education_private_tool_versions')
-    expect(tx2Query.mock.calls[0][0].sql).toContain("c.status='PUBLISHED'")
+    // Cold reads inside transactions do not populate process-wide cache in case tx rolls back.
+    const txOnly = await readFrozenCompositionIdentity({ $queryRaw: rolledBackTxQuery } as any, { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' })
+    await readFrozenCompositionIdentity({ $queryRaw: txAfterRollbackQuery } as any, { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' })
+    expect(txAfterRollbackQuery.mock.calls[0][0].sql).toContain('jsonb_array_elements')
+
+    // Root prisma read populates cache safely; subsequent tx hits skip manifest expansion while rechecking full anchors.
+    const rootSpy = vi.spyOn(prisma, '$queryRaw').mockResolvedValueOnce([row] as any)
+    try {
+      const fromRoot = await readFrozenCompositionIdentity(prisma, { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' })
+      expect(fromRoot).toEqual(txOnly)
+      expect(rootSpy).toHaveBeenCalledTimes(1)
+    } finally {
+      rootSpy.mockRestore()
+    }
+
+    const warmTxQuery = vi.fn().mockResolvedValueOnce([{ id: compositeId }])
+    const fromWarmTx = await readFrozenCompositionIdentity({ $queryRaw: warmTxQuery } as any, { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' })
+    expect(fromWarmTx).toEqual(txOnly)
+    expect(warmTxQuery).toHaveBeenCalledTimes(1)
+    const warmSql = warmTxQuery.mock.calls[0][0].sql as string
+    expect(warmSql).not.toContain('jsonb_array_elements')
+    expect(warmSql).toContain('education_private_tool_versions')
+    expect(warmSql).toContain('c.creation_key=')
+    expect(warmSql).toContain('c.creation_hash=')
+    expect(warmSql).toContain('c.created_by=')
+    expect(warmSql).toContain("c.status='PUBLISHED'")
+
+    const revokedTxQuery = vi.fn().mockResolvedValueOnce([])
+    await expect(readFrozenCompositionIdentity({ $queryRaw: revokedTxQuery } as any, { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' }))
+      .rejects.toMatchObject({ code: 'PRIVATE_COMPOSITION_EXECUTION_INVALID', statusCode: 409 })
   })
 })
