@@ -3909,6 +3909,10 @@ export const startRelationalCompositeAttemptInTransaction = async (
     attemptIdentity: RelationalCompositeAttemptIdentityV1
     educationStart?: VerifiedEducationStart
     preloadedComposite?: any
+    /** True only when the caller already checked for an attempt with this
+     * assignmentRef inside the same transaction while holding the exclusive
+     * execution lock (preventing any concurrent attempt creation for the same assignment). */
+    knownNoExistingAssignmentAttempt?: boolean
   },
 ) => {
   if (input.attemptIdentity.respondentUserId !== input.respondentUserId) {
@@ -3928,10 +3932,12 @@ export const startRelationalCompositeAttemptInTransaction = async (
   if (composite.deliveryMode === 'LEGACY') throw compositeBadRequest('关系测评必须使用 Unified FINAL_ONLY 运行时')
   if (composite.course?.isLibrary) throw compositeBadRequest('库课程综合测评不能作为关系测评运行目标')
 
-  const existing = await db.compositeAssessmentAttempt.findFirst({
-    where: { assignmentRef: input.attemptIdentity.assignmentRef },
-    orderBy: { startedAt: 'desc' },
-  })
+  const existing = input.knownNoExistingAssignmentAttempt
+    ? null
+    : await db.compositeAssessmentAttempt.findFirst({
+        where: { assignmentRef: input.attemptIdentity.assignmentRef },
+        orderBy: { startedAt: 'desc' },
+      })
   if (existing) {
     if (existing.userId !== input.respondentUserId || existing.compositeAssessmentId !== input.compositeAssessmentId) {
       throw compositeConflict('关系测评 assignmentRef 已绑定到其他运行记录')

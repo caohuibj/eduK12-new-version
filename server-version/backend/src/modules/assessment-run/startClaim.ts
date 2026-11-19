@@ -4,8 +4,14 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { logger } from '../../utils/logger'
 import { type RunPopulationProductScope } from './currentPopulationAuthority'
-import { assertCurrentRunStartAuthority } from './startAuthority'
-import { freezeRunExecutionScientificProvenanceWithDetailsInTransaction, type FrozenRunScientificDetails } from './scientificProvenance'
+import type { RelationalAssignmentRow } from '../assessment-relational/repository'
+import { assertCurrentRunStartAuthority, type StartAuthorityKnownEnvelope } from './startAuthority'
+import {
+  freezeRunExecutionScientificProvenanceWithDetailsInTransaction,
+  type FrozenRunScientificDetails,
+  type FrozenRunScientificProvenanceV1,
+  type RunScientificMaturity,
+} from './scientificProvenance'
 import { loadRunExecutionStartAdmission, type RunAttemptIdentityBinding, type RunStartAdmission } from './startAdmission'
 
 export type RunStartClaimState = 'CLAIMED' | 'DISPATCHED' | 'COMPLETED' | 'ABORTED' | 'UNKNOWN'
@@ -61,6 +67,84 @@ export type ExecutionLockRow = RunExecutionLockIdentity & {
   runtimeBindingRef: string | null
   respondentUserId: string
   scientificFrozenAt: Date | null
+  // Pre-projected same-lock fields to eliminate redundant in-tx SELECTs
+  // across startAuthority, startAdmission, scientificProvenance, and dbNow.
+  intakeDeadline?: Date | null
+  orgStatus?: string
+  orgProductDomain?: string
+  subjectActorSnapshotId?: string
+  respondentActorSnapshotId?: string
+  subjectUserId?: string
+  subjectRole?: string
+  subjectProvenance?: string
+  subjectMembershipId?: string | null
+  subjectPersonaGrantId?: string | null
+  respondentRole?: string
+  respondentProvenance?: string
+  respondentMembershipId?: string | null
+  respondentPersonaGrantId?: string | null
+  relationshipKind?: string
+  relationshipRef?: string | null
+  relationshipCourseId?: string | null
+  relationshipStudentClassAssignmentId?: string | null
+  relationshipStaffClassAssignmentId?: string | null
+  relationshipClassUnitId?: string | null
+  trackResourceFamily?: string
+  trackResourceKey?: string
+  trackResourceVersion?: string
+  trackResourcePolicyHash?: string | null
+  trackFrozenResourcePolicy?: unknown | null
+  scientificMaturity?: RunScientificMaturity | null
+  scientificProvenance?: FrozenRunScientificProvenanceV1 | null
+  scientificProvenanceHash?: string | null
+  txNow?: Date
+  assignmentRow?: RelationalAssignmentRow | null
+}
+
+const toStartAuthorityKnownEnvelope = (row: ExecutionLockRow): StartAuthorityKnownEnvelope | undefined => {
+  if (
+    !row.orgStatus || !row.orgProductDomain
+    || !row.subjectActorSnapshotId || !row.respondentActorSnapshotId
+    || !row.subjectUserId || !row.subjectRole || !row.subjectProvenance
+    || !row.respondentRole || !row.respondentProvenance
+    || !row.relationshipKind
+    || !row.trackResourceFamily || !row.trackResourceKey || !row.trackResourceVersion
+  ) {
+    return undefined
+  }
+  return {
+    executionId: row.executionId,
+    organizationId: row.organizationId,
+    runId: row.runId,
+    trackId: row.trackId,
+    executionStatus: row.executionStatus,
+    orgStatus: row.orgStatus,
+    orgProductDomain: row.orgProductDomain,
+    subjectActorSnapshotId: row.subjectActorSnapshotId,
+    respondentActorSnapshotId: row.respondentActorSnapshotId,
+    subjectUserId: row.subjectUserId,
+    subjectRole: row.subjectRole,
+    subjectProvenance: row.subjectProvenance,
+    subjectMembershipId: row.subjectMembershipId ?? null,
+    subjectPersonaGrantId: row.subjectPersonaGrantId ?? null,
+    respondentUserId: row.respondentUserId,
+    respondentRole: row.respondentRole,
+    respondentProvenance: row.respondentProvenance,
+    respondentMembershipId: row.respondentMembershipId ?? null,
+    respondentPersonaGrantId: row.respondentPersonaGrantId ?? null,
+    relationshipKind: row.relationshipKind,
+    relationshipRef: row.relationshipRef ?? null,
+    relationshipCourseId: row.relationshipCourseId ?? null,
+    relationshipStudentClassAssignmentId: row.relationshipStudentClassAssignmentId ?? null,
+    relationshipStaffClassAssignmentId: row.relationshipStaffClassAssignmentId ?? null,
+    relationshipClassUnitId: row.relationshipClassUnitId ?? null,
+    trackResourceFamily: row.trackResourceFamily,
+    trackResourceKey: row.trackResourceKey,
+    trackResourceVersion: row.trackResourceVersion,
+    intakeDeadline: row.intakeDeadline ?? null,
+    hasCampusActivity: row.hasCampusActivity,
+    hasHuiteacherLink: row.hasHuiteacherLink,
+  }
 }
 
 export const resolveProductScopeFromLock = (identity: RunExecutionLockIdentity): RunPopulationProductScope => {
@@ -174,15 +258,82 @@ export const lockExecutionEnvelope = async (
     SELECT e."organization_id" AS "organizationId", e."run_id" AS "runId",
       e."id" AS "executionId", e."track_id" AS "trackId",
       e."status" AS "executionStatus", r."status" AS "runStatus",
+      r."intake_deadline" AS "intakeDeadline",
+      o."status" AS "orgStatus", o."product_domain" AS "orgProductDomain",
       e."relational_assignment_id" AS "relationalAssignmentId",
       a."policy_domain" AS "policyDomain",
       e."runtime_binding_kind" AS "runtimeBindingKind", e."runtime_binding_ref" AS "runtimeBindingRef",
+      e."subject_actor_snapshot_id" AS "subjectActorSnapshotId",
+      e."respondent_actor_snapshot_id" AS "respondentActorSnapshotId",
+      subject."user_id" AS "subjectUserId",
+      subject."actor_role" AS "subjectRole",
+      subject."provenance_kind" AS "subjectProvenance",
+      subject."membership_id" AS "subjectMembershipId",
+      subject."snapshot_payload"->>'personaGrantId' AS "subjectPersonaGrantId",
       respondent."user_id" AS "respondentUserId",
-      e."scientific_frozen_at" AS "scientificFrozenAt"
+      respondent."actor_role" AS "respondentRole",
+      respondent."provenance_kind" AS "respondentProvenance",
+      respondent."membership_id" AS "respondentMembershipId",
+      respondent."snapshot_payload"->>'personaGrantId' AS "respondentPersonaGrantId",
+      relation."relationship_kind" AS "relationshipKind",
+      relation."relationship_ref" AS "relationshipRef",
+      relation."snapshot_payload"->'facts'->>'courseId' AS "relationshipCourseId",
+      relation."snapshot_payload"->'facts'->>'studentClassAssignmentId' AS "relationshipStudentClassAssignmentId",
+      relation."snapshot_payload"->'facts'->>'staffClassAssignmentId' AS "relationshipStaffClassAssignmentId",
+      relation."snapshot_payload"->'facts'->>'classUnitId' AS "relationshipClassUnitId",
+      t."resource_family" AS "trackResourceFamily",
+      t."resource_key" AS "trackResourceKey",
+      t."resource_version" AS "trackResourceVersion",
+      t."resource_policy_hash" AS "trackResourcePolicyHash",
+      t."frozen_resource_policy" AS "trackFrozenResourcePolicy",
+      e."scientific_maturity" AS "scientificMaturity",
+      e."scientific_provenance" AS "scientificProvenance",
+      e."scientific_provenance_hash" AS "scientificProvenanceHash",
+      e."scientific_frozen_at" AS "scientificFrozenAt",
+      transaction_timestamp() AS "txNow",
+      CASE WHEN a."id" IS NULL THEN NULL ELSE jsonb_build_object(
+        'id', a."id",
+        'episodeId', a."episode_id",
+        'subjectUserId', a."subject_user_id",
+        'subjectRole', a."subject_role",
+        'respondentUserId', a."respondent_user_id",
+        'respondentRole', a."respondent_role",
+        'createdByUserId', a."created_by_user_id",
+        'relationshipKind', a."relationship_kind",
+        'relationshipRef', a."relationship_ref",
+        'relationshipSnapshotJson', a."relationship_snapshot_json",
+        'relationshipSnapshotHash', a."relationship_snapshot_hash",
+        'perspective', a."perspective",
+        'resourceKind', a."resource_kind",
+        'resourceKey', a."resource_key",
+        'resourceVersion', a."resource_version",
+        'applicabilityHash', a."applicability_hash",
+        'analysisMode', a."analysis_mode",
+        'minimumRespondents', a."minimum_respondents",
+        'consentId', a."consent_id",
+        'visibilityPolicyKey', a."visibility_policy_key",
+        'policyDomain', a."policy_domain",
+        'status', a."status",
+        'createdAt', to_char(a."created_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+        'startedAt', CASE WHEN a."started_at" IS NULL THEN NULL ELSE to_char(a."started_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') END,
+        'completedAt', CASE WHEN a."completed_at" IS NULL THEN NULL ELSE to_char(a."completed_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') END,
+        'revokedAt', CASE WHEN a."revoked_at" IS NULL THEN NULL ELSE to_char(a."revoked_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') END
+      ) END AS "assignmentRow"
     FROM "assessment_run_executions" e
+    JOIN "organizations" o ON o."id" = e."organization_id"
     JOIN "assessment_runs" r
       ON r."organization_id" = e."organization_id"
       AND r."id" = e."run_id"
+    JOIN "assessment_run_tracks" t
+      ON t."organization_id" = e."organization_id"
+      AND t."run_id" = e."run_id"
+      AND t."id" = e."track_id"
+    JOIN "assessment_run_relationship_snapshots" relation
+      ON relation."id" = e."relationship_snapshot_id"
+    JOIN "assessment_run_actor_snapshots" subject
+      ON subject."organization_id" = e."organization_id"
+      AND subject."run_id" = e."run_id"
+      AND subject."id" = e."subject_actor_snapshot_id"
     JOIN "assessment_run_actor_snapshots" respondent
       ON respondent."organization_id" = e."organization_id"
       AND respondent."run_id" = e."run_id"
@@ -280,12 +431,16 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
     }
 
     const productScope = resolveProductScopeFromLock(execution)
+    // Must execute as a separate statement AFTER `FOR UPDATE OF e` acquires the
+    // execution lock so READ COMMITTED takes a fresh snapshot and sees any claim
+    // committed by a concurrent START holder that did not mutate `e`.
     const existing = await lockClaim(tx, input.executionId)
     if (existing?.state === 'ABORTED') return { kind: 'ABORTED' as const, claim: existing }
     if (!existing) {
       await assertCurrentRunStartAuthority(tx, input.executionId, {
         accountMode: 'DETECT_EDUCATION_LIBRARY',
         productScope,
+        knownEnvelope: toStartAuthorityKnownEnvelope(execution),
       })
     }
     const admission = await loadRunExecutionStartAdmission({
@@ -294,10 +449,25 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
       actorUserId: input.actorUserId,
       admitted: Boolean(existing),
       knownExecution: execution,
+      knownAssignmentRow: existing ? undefined : execution.assignmentRow,
     })
-    const now = await dbNow(tx)
+    const now = execution.txNow ?? await dbNow(tx)
     const leaseUntil = leaseAt(now, leaseMs)
     if (!existing) {
+      const knownScientificRow = execution.trackResourceFamily && execution.trackResourceKey && execution.trackResourceVersion
+        ? {
+            organizationId: execution.organizationId,
+            resourceFamily: execution.trackResourceFamily,
+            resourceKey: execution.trackResourceKey,
+            resourceVersion: execution.trackResourceVersion,
+            resourcePolicyHash: execution.trackResourcePolicyHash ?? null,
+            frozenResourcePolicy: execution.trackFrozenResourcePolicy ?? null,
+            scientificMaturity: execution.scientificMaturity ?? null,
+            scientificProvenance: execution.scientificProvenance ?? null,
+            scientificProvenanceHash: execution.scientificProvenanceHash ?? null,
+            scientificFrozenAt: execution.scientificFrozenAt ?? null,
+          }
+        : undefined
       const scientificDetails = await freezeRunExecutionScientificProvenanceWithDetailsInTransaction(
         tx,
         input.executionId,
@@ -308,26 +478,30 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
           hasHuiteacherLink: execution.hasHuiteacherLink,
           now,
           alreadyLocked: true,
+          ...(knownScientificRow ? { knownRow: knownScientificRow } : {}),
         },
       )
       const id = randomUUID()
       const operationKey = `run-start:${input.executionId}:${randomUUID()}`
       const rows = await tx.$queryRaw<RunStartClaimRecord[]>`
-        INSERT INTO "assessment_run_execution_start_claims" (
-          "id", "organization_id", "run_id", "execution_id", "operation_key", "claim_generation",
-          "state", "claimed_at", "lease_until", "admitted_attempt_identity", "updated_at"
-        ) VALUES (
-          ${id}, ${admission.execution.organizationId}, ${admission.execution.runId}, ${input.executionId},
-          ${operationKey}, 1, 'CLAIMED', ${now}, ${leaseUntil}, ${JSON.stringify(admission.attemptIdentity)}::jsonb, ${now}
+        WITH inserted_claim AS (
+          INSERT INTO "assessment_run_execution_start_claims" (
+            "id", "organization_id", "run_id", "execution_id", "operation_key", "claim_generation",
+            "state", "claimed_at", "lease_until", "admitted_attempt_identity", "updated_at"
+          ) VALUES (
+            ${id}, ${admission.execution.organizationId}, ${admission.execution.runId}, ${input.executionId},
+            ${operationKey}, 1, 'CLAIMED', ${now}, ${leaseUntil}, ${JSON.stringify(admission.attemptIdentity)}::jsonb, ${now}
+          )
+          RETURNING ${Prisma.raw(CLAIM_PROJECTION)}
+        ),
+        inserted_audit AS (
+          INSERT INTO "organization_governance_audits"
+            ("id", "organization_id", "actor_user_id", "action", "target_type", "target_id", "domain_event_id", "payload")
+          VALUES (${randomUUID()}, ${execution.organizationId}, ${input.actorUserId}, 'ASSESSMENT_RUN_START_ADMITTED',
+            'AssessmentRunExecution', ${input.executionId}, ${id},
+            ${JSON.stringify({ operationKey, assignmentId: admission.assignment.assignmentId, attemptIdentity: admission.attemptIdentity })}::jsonb)
         )
-        RETURNING ${Prisma.raw(CLAIM_PROJECTION)}
-      `
-      await tx.$executeRaw`
-        INSERT INTO "organization_governance_audits"
-          ("id", "organization_id", "actor_user_id", "action", "target_type", "target_id", "domain_event_id", "payload")
-        VALUES (${randomUUID()}, ${execution.organizationId}, ${input.actorUserId}, 'ASSESSMENT_RUN_START_ADMITTED',
-          'AssessmentRunExecution', ${input.executionId}, ${id},
-          ${JSON.stringify({ operationKey, assignmentId: admission.assignment.assignmentId, attemptIdentity: admission.attemptIdentity })}::jsonb)
+        SELECT * FROM inserted_claim
       `
       if (input.transactionalDispatch) {
         const inlineResult = await input.transactionalDispatch({

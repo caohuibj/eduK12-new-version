@@ -89,8 +89,16 @@ export const createRelationalAssessmentService = (repository: RelationalAssignme
       return repository.listForRespondent(respondentUserId)
     },
 
-    async start(input: { assignmentId: string; actorUserId: string; startedAt?: string }) {
-      const assignment = await requireAssignment(input.assignmentId)
+    async start(input: {
+      assignmentId: string
+      actorUserId: string
+      startedAt?: string
+      /** Optional same-transaction already-loaded assignment under the caller's execution lock. */
+      knownAssignment?: RelationalAssignmentRecordV1
+    }) {
+      const assignment = input.knownAssignment && input.knownAssignment.assignmentId === input.assignmentId
+        ? input.knownAssignment
+        : await requireAssignment(input.assignmentId)
       const resolvedConsent = assignment.consentId
         ? await repository.resolveAcceptedConsent(assignment)
         : null
