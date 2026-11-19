@@ -1,0 +1,41 @@
+{
+  "base": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "sourceMaterialStatus": "QUESTIONNAIRE_FULL_TEXT_NOT_OBTAINED",
+  "actualImport": {
+    "nativeScale": 0,
+    "nativeForm": 0,
+    "catalogOnly": 0,
+    "databaseWrites": 0
+  },
+  "checks": {
+    "dossierJson": "PASS",
+    "crossFileMetadata": "PASS",
+    "actualDiffScope": "PASS"
+  },
+  "notRun": [
+    "Native schema/import/scoring/report/isolated database tests: no complete native payload, not counted as PASS",
+    "Full-item and production/admin dedup",
+    "Complete Chinese/English source equivalence",
+    "Rights approval",
+    "Independent human review",
+    "Frontend/backend builds, browser, full platform tests",
+    "Merge, production writes, publication, deployment"
+  ],
+  "ciPreflight": {
+    "component": "Passive source/dedup/split/report-editor evidence only, within one docs/evidence directory",
+    "requiredRoute": "Existing documentation lightweight route, subject to exact Git diff classification",
+    "primaryLocation": "Local JSON/evidence consistency; official PR documentation check only if Draft creation succeeds",
+    "history": "Previously read actual Notion CI checklist through Qiang connection in this conversation; reuse CI-020 exact SHA/route/real execution and CI-004 scope boundaries. No old shared-parser failure rerun.",
+    "budget": "Local under one minute; official lightweight CI expected under about five minutes. No unrelated checks.",
+    "independentReview": "Pending main coordinator review, not fabricated",
+    "base": "25d812d1f024bcc375b738235dd400654c679ff4",
+    "headAndTree": "Read back after commit; not predicted in self-referential content"
+  },
+  "actualClassification": {
+    "files": 7,
+    "documentation": true,
+    "content": false,
+    "frontend": false,
+    "scaleIntakeLight": false
+  }
+}
