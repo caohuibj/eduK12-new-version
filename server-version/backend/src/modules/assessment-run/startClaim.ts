@@ -255,7 +255,8 @@ export const lockExecutionEnvelope = async (
     `
   }
   const rows = await tx.$queryRaw<ExecutionLockRow[]>`
-    SELECT e."organization_id" AS "organizationId", e."run_id" AS "runId",
+    SELECT /* lockExecutionEnvelope: assessment_run_executions */
+      e."organization_id" AS "organizationId", e."run_id" AS "runId",
       e."id" AS "executionId", e."track_id" AS "trackId",
       e."status" AS "executionStatus", r."status" AS "runStatus",
       r."intake_deadline" AS "intakeDeadline",
