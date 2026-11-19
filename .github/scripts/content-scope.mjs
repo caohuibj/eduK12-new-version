@@ -258,6 +258,25 @@ export function classifyChanges(entries, forceFull = false, readers = {}) {
   };
 }
 
+/** Narrow CI-only admission. Changes to CI routers, YAML, or mixed sources retain full CI. */
+export function ciToolingScenario(entries) {
+  if (!Array.isArray(entries) || entries.length === 0) return null;
+  if (!entries.every(e => e && typeof e.file === 'string'
+    && e.status === 'M' && e.oldMode === '100644' && e.newMode === '100644'
+    && !/[\\\x00-\x1f\x7f]/.test(e.file)
+    && e.file.split('/').every(part => part && part !== '.' && part !== '..'))) return null;
+  const files=entries.map(e=>e.file);
+  const regression=new Set([
+    '.github/scripts/backend-regression-selection.mjs',
+    '.github/scripts/backend-regression-reports.mjs',
+    '.github/scripts/backend-regression-reports.test.mjs',
+  ]);
+  if (files.every(file=>regression.has(file))) return 'ci-regression';
+  if (files.every(file=>/^\.github\/scripts\/[A-Za-z0-9-]+\.test\.mjs$/.test(file)))
+    return 'ci-unit';
+  return null;
+}
+
 // Explain escalation using the same allowlists and metadata as admission.
 export function platformReasons(entries, forceFull = false) {
   if (forceFull) return [{reason:'explicit-full-request'}];
@@ -359,22 +378,26 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const product=event!=='workflow_dispatch'&&!full&&cognitiveProductPlan(changedEntries(base),base,head,productRead(head),productRead(base));
   if(product){emit(cognitiveProductOutputs(product));process.exit(0);}
   const backendUnit = event === 'pull_request' && !full && unitOnly(entries);
-  const scenario = catalogDiscovery ? 'catalog-discovery' : cognitiveMixed ? 'platform' : copy ? 'homepage-copy' : releaseTools ? 'release-tooling' : backendUnit ? 'backend-unit' : dependencies ? 'dependencies' : backendModules ? 'backend' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
-    : result.presentation ? 'presentation' : frontendTest ? 'frontend-test' : frontend ? 'frontend' : 'platform';
+  const ciTooling = event === 'pull_request' && !full ? ciToolingScenario(entries) : null;
+  // Router/gate changes must prove the full platform topology, never just release-tools.
+  const controlFiles=new Set(['.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml']);
+  const criticalCiControl=event === 'pull_request' && entries.some(({file})=>controlFiles.has(file));
+  const scenario = criticalCiControl ? 'platform' : ciTooling || (catalogDiscovery ? 'catalog-discovery' : cognitiveMixed ? 'platform' : copy ? 'homepage-copy' : releaseTools ? 'release-tooling' : backendUnit ? 'backend-unit' : dependencies ? 'dependencies' : backendModules ? 'backend' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
+    : result.presentation ? 'presentation' : frontendTest ? 'frontend-test' : frontend ? 'frontend' : 'platform');
   // Local pages are covered by related tests and one frontend build. The broad
   // student/** visual inventory does not require every platform browser fixture.
   const selectedAcceptance = acceptanceFor(files);
-  const acceptance = catalogDiscovery || result.presentation || result.cognitive_intake_light || affectedFrontend || backendModules || copy || frontendTest || backendUnit || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
+  const acceptance = ciTooling || catalogDiscovery || result.presentation || result.cognitive_intake_light || affectedFrontend || backendModules || copy || frontendTest || backendUnit || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
     for (const key of Object.keys(acceptance)) acceptance[key] = true;
   const plan = runnerPlan({ profile:process.env.CI_RUNNER_PROFILE || 'hosted', scenario });
   const mediaSelection = ['media2','video_core','media7','situational_video','situational_branching'].filter(key => acceptance[key]);
   const uiRequired = acceptance.app_shell || acceptance.canonical_visual;
-  const frontendBuild = dependencies || frontend && !affectedFrontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
-  const codeql = catalogDiscovery || Boolean(copy?.sast) || releaseTools || dependencies || backendModules || scenario === 'platform' || frontend
-    || (result.content && contentCodeqlRequired(entries,declarationReaders(base)));
+  const frontendBuild = !ciTooling && (dependencies || frontend && !affectedFrontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0);
+  const codeql = !ciTooling && (catalogDiscovery || Boolean(copy?.sast) || releaseTools || dependencies || backendModules || scenario === 'platform' || frontend
+    || (result.content && contentCodeqlRequired(entries,declarationReaders(base))));
   const release = event === 'workflow_dispatch' || full ? null : applicationPlan(base, head);
-  const output = { authoring_polish:catalogDiscovery&&authoringPolishScope(entries), student_discovery:catalogDiscovery&&studentDiscoveryScope(entries,{readHeadFile:file=>gitContent('HEAD',file),readBaseFile:file=>gitContent(base,file)}), backend_focus:result.backend_focus||'full', bundle_family:catalogDiscovery&&bundleFamilyScope(entries), bundle_runtime:catalogDiscovery&&bundleRuntimeScope(entries), homepage_copy_plan:JSON.stringify(copy), application_route:copy ? 'homepage-copy' : backendUnit ? 'backend-unit' : release && release.route !== 'C' ? release.route : 'legacy', release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
+  const output = { authoring_polish:catalogDiscovery&&authoringPolishScope(entries), student_discovery:catalogDiscovery&&studentDiscoveryScope(entries,{readHeadFile:file=>gitContent('HEAD',file),readBaseFile:file=>gitContent(base,file)}), backend_focus:result.backend_focus||'full', bundle_family:catalogDiscovery&&bundleFamilyScope(entries), bundle_runtime:catalogDiscovery&&bundleRuntimeScope(entries), homepage_copy_plan:JSON.stringify(copy), application_route:ciTooling || criticalCiControl ? 'legacy' : copy ? 'homepage-copy' : backendUnit ? 'backend-unit' : release && release.route !== 'C' ? release.route : 'legacy', release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
     documentation: result.documentation, diff_base:base, codeql, scenario, image_build:imageBuild, frontend_affected:affectedFrontend||catalogDiscovery,
     dependencies_frontend_only:frontendDependencies,
     frontend_build:catalogDiscovery?false:frontendBuild, ui_required:uiRequired,
