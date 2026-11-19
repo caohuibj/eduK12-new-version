@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "accres_ais_2019_en_us_teacher_self",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "ACCReS｜信息与支持获取｜教师自评｜美国英文35题版分区",
+      "abbreviation": "ACCReS-AIS",
+      "instrumentFamily": "ACCReS / 2019 downloadable instrument / 2024 scoring guide / en-US / teacher self-report"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "Accessing Information and Support；原35题ACCReS第25–35题，共11题。教师对实践、理解或支持获取的自陈；不等同已观察的教学质量。仅来源目录候选；内部原生无分表单已另行准备，公开题文再分发范围尚未确认。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:accres",
+        "role:teacher_self",
+        "respondent:SELF",
+        "population:teacher",
+        "school_stage:K12",
+        "language:en-US",
+        "country:USA",
+        "source_version:2019-instrument_2024-guide",
+        "purpose:teacher_development",
+        "status:PILOT",
+        "rights:redistribution_unconfirmed",
+        "availability:catalog_only",
+        "administration:original_35_item_context"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原研究为美国K–12教师样本，非学生自评；无官方成人年龄上下界。语言/制度/文化情境不自动等同中国；不宣称已验证中文版。"
+    },
+    "administration": {
+      "itemCount": 11,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "未新增回忆窗口；按原题本关于日常教学行为与想法的指导语。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留原英文题文、六档同意选项及35题母工具原顺序；原指导语和文化定义必须随原组卷保留。",
+        "分区是内容组织；拆分独立施测不是已验证短版。",
+        "预计时间为编辑估计，未实测。",
+        "2024指南以各题群体同意比例作发展讨论；不编造个人维度均分、总分、反向键、缺失插补或常模。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "开发团队初步验证不能证明本项目独立分区版或中国情境等值；待权利范围审核。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en-US",
+    "targetLocale": "en-US",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Development-team downloadable ACCReS Word instrument (2019 footer), cross-checked with the instrument in the 2024-cited PDF guide.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "原英文保留；中文名称和反馈草稿为项目编辑说明，不是经验证的中文版。"
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "ACCReS Instrument and Scoring Guide; development-team downloadable Word instrument",
+      "citation": "Fallon, L. M., Cathcart, S. C., Johnson, A. H., Minami, T., O’Keeffe, B. V., & Sugai, G. (2019). Assessment of Culturally and Contextually Relevant Supports (ACCReS). Unpublished instrument, University of Massachusetts Boston. The guide recommends the same authors (2024). Development paper: Fallon et al. (2023), Assessment for Effective Intervention, 48(2), 100–112. https://doi.org/10.1177/15345084221111338",
+      "url": "https://www.lindsayfallon.com/accres-study",
+      "publicationYear": 2019
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "信息与支持获取"
+      ],
+      "limitations": [
+        "35-item original form context; not independently validated as a standalone short form.",
+        "The guide specifies group response percentages and within-section item prioritization, not teacher rankings.",
+        "The 2023 paper uses 0–5 response codes; the downloadable instrument and 2024 guide display 1–6. No silent coding conversion or raw-score formula is implemented.",
+        "No individual scoring formula, reverse key or missing-response policy was established from the retrieved guide. No executable scale, score report, norms, cutoffs or cross-tool total.",
+        "Teacher self-report feedback describes perceived practices, understanding and access to support. It does not demonstrate actual teaching quality or label an educator."
+      ],
+      "disclaimer": "仅目录候选，不可施测。内部FORM只保存原始类别，无评分参数或分数报告；示例文案是面向教师本人的发展性说明，沿既有接收者授权。"
+    },
+    "blockers": [
+      "Public download does not establish redistribution, commercial platform, derivative translation or external digital administration rights; scope remains unconfirmed.",
+      "Native no-score forms are private isolated DRAFT preparation, not installed in the public development library or production.",
+      "Individual scalar scoring instructions remain unresolved; group item-percentage guidance must not be substituted with individual means.",
+      "Production database/admin-created instrument deduplication is not performed."
+    ]
+  }
+}
