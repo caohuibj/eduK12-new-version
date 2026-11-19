@@ -158,9 +158,21 @@ suite('Run START claim recovery on real PostgreSQL', () => {
     expect(afterRelease.lease.getTime()).toBeLessThanOrEqual(Date.now() + 2000)
     expect(afterRelease.lease.getTime()).toBeLessThan(before.lease.getTime() - 10000)
 
-    // The retry: existing generation CAS takes over and the full START completes.
-    const started = await startAssessmentRunExecution({ executionId, actorUserId: respondent })
-    if (started.state !== 'STARTED') throw new Error(`expected STARTED, got ${started.state}`)
+    // A recovered claim reuses the one speculative publication instead of
+    // loading it twice on the second-transaction dispatch path.
+    const [track] = await db.$queryRaw<Array<{ target: string }>>`
+      SELECT t.frozen_resource_policy #>> '{runtimeLaunchTarget,ref}' AS target
+      FROM assessment_run_executions e JOIN assessment_run_tracks t ON t.id=e.track_id
+      WHERE e.id=${executionId}`
+    const preload = vi.spyOn(compositeService, 'loadStartComposite')
+    let started: Awaited<ReturnType<typeof startAssessmentRunExecution>> | undefined
+    try {
+      started = await startAssessmentRunExecution({ executionId, actorUserId: respondent,
+        startPreflight: { respondentUserId: respondent, runtimeBindingKind: null,
+          runtimeBindingRef: null, preloadCompositeId: track.target } })
+      expect(preload).toHaveBeenCalledExactlyOnceWith(track.target)
+    } finally { preload.mockRestore() }
+    if (!started || started.state !== 'STARTED') throw new Error(`expected STARTED, got ${started?.state}`)
     const finalRow = await claimRow(d1.claim.id)
     expect(finalRow.state).toBe('COMPLETED')
     expect(finalRow.gen).toBe(d1.claim.claimGeneration + 1)
@@ -206,12 +218,15 @@ suite('Run START claim recovery on real PostgreSQL', () => {
         startPreflight: { respondentUserId: userIds[6], runtimeBindingKind: null,
           runtimeBindingRef: null, preloadCompositeId: randomUUID() } })
       expect(other.state).toBe('STARTED')
-      const failure = new Error('synthetic preparation failure')
-      preload.mockRejectedValueOnce(failure)
-      await expect(startAssessmentRunExecution({ executionId: execIds[8], actorUserId: userIds[8],
+      // A transient failure before admission is not authoritative. The
+      // in-transaction loader retries and can still create the one valid attempt.
+      preload.mockRejectedValueOnce(new Error('synthetic preparation failure'))
+      const recovered = await startAssessmentRunExecution({ executionId: execIds[8], actorUserId: userIds[8],
         startPreflight: { respondentUserId: userIds[8], runtimeBindingKind: null,
-          runtimeBindingRef: null, preloadCompositeId: track.target } })).rejects.toBe(failure)
-      expect(await db.compositeAssessmentAttempt.count({where:{compositeAssessmentId:track.target,userId:userIds[8]}})).toBe(0)
+          runtimeBindingRef: null, preloadCompositeId: track.target } })
+      expect(recovered.state).toBe('STARTED')
+      expect(preload).toHaveBeenCalledWith(track.target, expect.anything())
+      expect(await db.compositeAssessmentAttempt.count({where:{compositeAssessmentId:track.target,userId:userIds[8]}})).toBe(1)
     } finally { preload.mockRestore() }
   }, 120000)
 

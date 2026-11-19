@@ -234,7 +234,6 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   actorUserId: string
   launch: LaunchEnvelope
   preloadedComposite?: any
-  preloadFailure?: { error: unknown }
   inlineContext?: TransactionalStartDispatchContext
 }): Promise<RunStartExecutionResult> => {
   const inline = Boolean(input.inlineContext)
@@ -415,7 +414,6 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   `
   if (Number(dispatched) !== 1) throw new RunStartExecutionError('RUN_START_FENCE_LOST', 'START claim fence lost before transactional runtime start', 409)
   let preloadedComposite = input.preloadedComposite
-  if (!preloadedComposite && input.preloadFailure) throw input.preloadFailure.error
   if (!preloadedComposite && typeof (tx as any)?.compositeAssessment?.findUnique === 'function') {
     const compositeModule = await import('../composite/composite.service')
     if (typeof compositeModule.loadStartComposite === 'function') {
@@ -752,14 +750,15 @@ export const startAssessmentRunExecution = async (input: {
         // The School route already identified this respondent and a frozen
         // track target. Prepare its publication before opening the claim
         // transaction; admission and the locked track remain authoritative.
-        // Defer any preparation error until that same target is actually
-        // needed, preserving replay and authorization outcomes.
+        // A speculative preload failure is only a cache miss; the locked
+        // START path retries its actual target without changing replay or authority.
         const candidate = input.startPreflight?.respondentUserId === input.actorUserId
           && !input.startPreflight.runtimeBindingRef && !input.resourceRegistry
           ? input.startPreflight.preloadCompositeId : null
         const preparation = candidate
-          ? await import('../composite/composite.service').then(module => module.loadStartComposite(candidate))
-              .then(value => ({ value, failure: null }), error => ({ value: null, failure: { error } }))
+          ? await import('../composite/composite.service')
+              .then(module => module.loadStartComposite(candidate))
+              .catch(() => null)
           : null
         // The claim transaction is the first durable step of a Run START. Its own
         // rolled-back outcomes (P2028 maxWait, serialization/deadlock/lock-timeout)
@@ -807,10 +806,8 @@ export const startAssessmentRunExecution = async (input: {
                 executionId: input.executionId,
                 actorUserId: input.actorUserId,
                 launch,
-                ...(candidate === launch.runtimeTargetRef && preparation?.value?.trainingContentSnapshotHash
-                  ? { preloadedComposite: preparation.value } : {}),
-                ...(candidate === launch.runtimeTargetRef && preparation?.failure
-                  ? { preloadFailure: preparation.failure } : {}),
+                ...(candidate === launch.runtimeTargetRef && preparation?.trainingContentSnapshotHash
+                  ? { preloadedComposite: preparation } : {}),
                 inlineContext,
               })
             },
@@ -857,8 +854,9 @@ export const startAssessmentRunExecution = async (input: {
           if (launch.runtimeTargetKind !== 'COMPOSITE') {
             throw new RunStartExecutionError('RUN_RUNTIME_TARGET_UNSUPPORTED', 'transactional Run adapter supports Composite runtime only', 409)
           }
-          let preloadedComposite: any
-          if (typeof (prisma as any)?.compositeAssessment?.findUnique === 'function') {
+          let preloadedComposite: any = candidate === launch.runtimeTargetRef
+            && preparation?.trainingContentSnapshotHash ? preparation : undefined
+          if (!preloadedComposite && typeof (prisma as any)?.compositeAssessment?.findUnique === 'function') {
             try {
               const compositeModule = await import('../composite/composite.service')
               if (typeof compositeModule.loadStartComposite === 'function') {
