@@ -304,7 +304,9 @@ async function readAssignedRunTasks<Student extends boolean>(userId: string, opt
     ? Prisma.sql`AND (e."created_at", e."id") < (${cursorCreatedAt}::timestamptz, ${options!.cursor!.id})`
     : Prisma.empty
   const schoolScope = options?.preserveBoundSchoolContinuation
-    ? Prisma.sql`(EXISTS (SELECT 1 FROM "campus_activity_runs" ar
+    ? Prisma.sql`((r."status" = 'CLOSED'
+        OR (e."status" = 'STARTED' AND e."runtime_binding_kind" = 'COMPOSITE' AND e."runtime_binding_ref" IS NOT NULL))
+      AND EXISTS (SELECT 1 FROM "campus_activity_runs" ar
         JOIN "campus_activities" activity ON activity."organization_id"=ar."organization_id"
           AND activity."course_id"=ar."course_id" AND activity."status"='OPEN'
         WHERE ar."organization_id"=e."organization_id" AND ar."run_id"=e."run_id")
@@ -312,7 +314,10 @@ async function readAssignedRunTasks<Student extends boolean>(userId: string, opt
         WHERE h."organization_id"=e."organization_id" AND h."run_id"=e."run_id"))`
     : Prisma.sql`FALSE`
   const schoolContinuationExpr = options?.preserveBoundSchoolContinuation
-    ? Prisma.sql`(school_scope."inSchoolScope" AND r."status" IN ('PUBLISHED','CLOSED')
+    ? Prisma.sql`(e."status" = 'STARTED'
+      AND e."runtime_binding_kind" = 'COMPOSITE'
+      AND e."runtime_binding_ref" IS NOT NULL
+      AND school_scope."inSchoolScope" AND r."status" IN ('PUBLISHED','CLOSED')
       AND ${boundCompositeContinuationSql(Prisma.sql`e."id"`, userId)})`
     : Prisma.sql`FALSE`
   const closedScope = options?.preserveBoundSchoolContinuation
