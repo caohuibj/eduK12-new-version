@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 
 import { prisma } from '../../config/database'
-import { batchEnsureScaleAdmissionsAtDelivery } from '../../modules/scale/scale-admission.service'
+import { batchEnsureScaleAdmissionsAtDelivery, seedScaleAdmissionRuntime } from '../../modules/scale/scale-admission.service'
 import { createFrozenUnitAdmission } from '../../modules/assessment-runtime/admission-snapshot'
 import { createFrozenScaleRuntimeSnapshot } from '../../modules/assessment-runtime/runtime-snapshot'
 import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
@@ -432,6 +432,10 @@ describe('Scheme X Batch Scale Admission at Delivery (PR X-05C)', () => {
       requiresContext: false,
     })
     const encryptedAdmission = encryptUnifiedRuntimePayload(validAdmission)
+    // The START path already resolved this runtime on the original child.
+    // A synthetic non-decryptable token proves the locked row can reuse that
+    // verified request-local result only when its ciphertext is unchanged.
+    const encryptedRuntime = 'already-resolved-synthetic-runtime'
 
     const mockChild: any = {
       id: 'child-1',
@@ -442,7 +446,9 @@ describe('Scheme X Batch Scale Admission at Delivery (PR X-05C)', () => {
       scale,
       frozenAdmissionSnapshotEncrypted: null,
       frozenAdmissionSnapshotHash: null,
+      runtimeSnapshotEncrypted: encryptedRuntime,
     }
+    seedScaleAdmissionRuntime(mockChild, validRuntime)
 
     const mockSlot: any = {
       slotKey: 'scale:item-1',
@@ -465,7 +471,7 @@ describe('Scheme X Batch Scale Admission at Delivery (PR X-05C)', () => {
             scale,
             frozenAdmissionSnapshotEncrypted: encryptedAdmission,
             frozenAdmissionSnapshotHash: validAdmission.snapshotHash,
-            runtimeSnapshotEncrypted: encryptUnifiedRuntimePayload(validRuntime),
+            runtimeSnapshotEncrypted: encryptedRuntime,
             runtimeGeneration: 'UNIFIED_V1',
             userId: 'user-1',
             compiledRuntimeHash: validRuntime.compiledRuntime.compiledRuntimeHash,
@@ -482,6 +488,12 @@ describe('Scheme X Batch Scale Admission at Delivery (PR X-05C)', () => {
 
     expect(result.size).toBe(1)
     expect(result.get('child-1')).toEqual(validAdmission)
+    const [lockedRow] = await mockTx.assessment.findMany.mock.results[0].value
+    mockTx.assessment.findMany.mockResolvedValueOnce([{ ...lockedRow, runtimeSnapshotEncrypted: 'changed-runtime' }])
+    vi.spyOn(prisma, '$transaction').mockImplementationOnce(async (callback: any) => callback(mockTx))
+    await expect(batchEnsureScaleAdmissionsAtDelivery(dummyParent, [
+      { slot: mockSlot, child: mockChild, runtime: validRuntime },
+    ])).rejects.toThrow()
   })
 
   it('rejects in transaction when compiled runtime hash does not match the frozen slot', async () => {

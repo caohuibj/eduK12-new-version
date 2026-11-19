@@ -234,6 +234,7 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   actorUserId: string
   launch: LaunchEnvelope
   preloadedComposite?: any
+  preloadFailure?: { error: unknown }
   inlineContext?: TransactionalStartDispatchContext
 }): Promise<RunStartExecutionResult> => {
   const inline = Boolean(input.inlineContext)
@@ -414,6 +415,7 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   `
   if (Number(dispatched) !== 1) throw new RunStartExecutionError('RUN_START_FENCE_LOST', 'START claim fence lost before transactional runtime start', 409)
   let preloadedComposite = input.preloadedComposite
+  if (!preloadedComposite && input.preloadFailure) throw input.preloadFailure.error
   if (!preloadedComposite && typeof (tx as any)?.compositeAssessment?.findUnique === 'function') {
     const compositeModule = await import('../composite/composite.service')
     if (typeof compositeModule.loadStartComposite === 'function') {
@@ -747,6 +749,18 @@ export const startAssessmentRunExecution = async (input: {
   const executeRunStart = async (): Promise<RunStartExecutionResult> => {
     try {
       return await runStartGate().run(async () => {
+        // The School route already identified this respondent and a frozen
+        // track target. Prepare its publication before opening the claim
+        // transaction; admission and the locked track remain authoritative.
+        // Defer any preparation error until that same target is actually
+        // needed, preserving replay and authorization outcomes.
+        const candidate = input.startPreflight?.respondentUserId === input.actorUserId
+          && !input.startPreflight.runtimeBindingRef && !input.resourceRegistry
+          ? input.startPreflight.preloadCompositeId : null
+        const preparation = candidate
+          ? await import('../composite/composite.service').then(module => module.loadStartComposite(candidate))
+              .then(value => ({ value, failure: null }), error => ({ value: null, failure: { error } }))
+          : null
         // The claim transaction is the first durable step of a Run START. Its own
         // rolled-back outcomes (P2028 maxWait, serialization/deadlock/lock-timeout)
         // leave no claim, audit or provenance rows behind, so they share the same
@@ -793,6 +807,10 @@ export const startAssessmentRunExecution = async (input: {
                 executionId: input.executionId,
                 actorUserId: input.actorUserId,
                 launch,
+                ...(candidate === launch.runtimeTargetRef && preparation?.value?.trainingContentSnapshotHash
+                  ? { preloadedComposite: preparation.value } : {}),
+                ...(candidate === launch.runtimeTargetRef && preparation?.failure
+                  ? { preloadFailure: preparation.failure } : {}),
                 inlineContext,
               })
             },

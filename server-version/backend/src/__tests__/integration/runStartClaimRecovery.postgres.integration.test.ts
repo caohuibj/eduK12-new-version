@@ -1,5 +1,5 @@
 import {randomUUID} from 'node:crypto'
-import {afterAll,beforeAll,describe,expect,it} from 'vitest'
+import {afterAll,beforeAll,describe,expect,it,vi} from 'vitest'
 import {prisma as db} from '../../config/database'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from './integration-env'
 import {createCustomScaleDefinition,hashScaleDefinition} from '../../modules/scale/scale-definition'
@@ -18,6 +18,7 @@ import {
   abortUndispatchedRunStartClaim,
 } from '../../modules/assessment-run/startClaim'
 import {startAssessmentRunExecution} from '../../modules/assessment-run/startExecution'
+import * as compositeService from '../../modules/composite/composite.service'
 
 /**
  * Real-PostgreSQL verification of the Run START claim recovery protocol: a
@@ -182,6 +183,59 @@ suite('Run START claim recovery on real PostgreSQL', () => {
     expect(await db.compositeAssessmentAttempt.count({
       where: { compositeAssessmentId: attempt.compositeAssessmentId, userId: respondent },
     })).toBe(1)
+  }, 120000)
+
+  it('preloads the frozen target before admission and ignores a mismatched candidate', async () => {
+    const [executionId, respondent] = [execIds[5], userIds[5]]
+    const [track] = await db.$queryRaw<Array<{target: string; hash: string | null}>>`
+      SELECT t.frozen_resource_policy #>> '{runtimeLaunchTarget,ref}' AS target,
+        c.training_content_snapshot_hash AS hash
+      FROM assessment_run_executions e JOIN assessment_run_tracks t ON t.id=e.track_id
+      JOIN composite_assessments c ON c.id=t.frozen_resource_policy #>> '{runtimeLaunchTarget,ref}'
+      WHERE e.id=${executionId}`
+    expect(track.hash).toBeTruthy()
+    const preload = vi.spyOn(compositeService, 'loadStartComposite')
+    try {
+      const result = await startAssessmentRunExecution({ executionId, actorUserId: respondent,
+        startPreflight: { respondentUserId: respondent, runtimeBindingKind: null,
+          runtimeBindingRef: null, preloadCompositeId: track.target } })
+      expect(result.state).toBe('STARTED')
+      expect(preload).toHaveBeenCalledWith(track.target)
+      expect(preload).toHaveBeenCalledTimes(1)
+      const other = await startAssessmentRunExecution({ executionId: execIds[6], actorUserId: userIds[6],
+        startPreflight: { respondentUserId: userIds[6], runtimeBindingKind: null,
+          runtimeBindingRef: null, preloadCompositeId: randomUUID() } })
+      expect(other.state).toBe('STARTED')
+      const failure = new Error('synthetic preparation failure')
+      preload.mockRejectedValueOnce(failure)
+      await expect(startAssessmentRunExecution({ executionId: execIds[8], actorUserId: userIds[8],
+        startPreflight: { respondentUserId: userIds[8], runtimeBindingKind: null,
+          runtimeBindingRef: null, preloadCompositeId: track.target } })).rejects.toBe(failure)
+      expect(await db.compositeAssessmentAttempt.count({where:{compositeAssessmentId:track.target,userId:userIds[8]}})).toBe(0)
+    } finally { preload.mockRestore() }
+  }, 120000)
+
+  it('rejects a target closed after preparation and before transactional admission', async () => {
+    const [executionId, respondent] = [execIds[7], userIds[7]]
+    const [track] = await db.$queryRaw<Array<{target: string}>>`
+      SELECT t.frozen_resource_policy #>> '{runtimeLaunchTarget,ref}' AS target
+      FROM assessment_run_executions e JOIN assessment_run_tracks t ON t.id=e.track_id
+      WHERE e.id=${executionId}`
+    const original = compositeService.loadStartComposite
+    const preload = vi.spyOn(compositeService, 'loadStartComposite').mockImplementationOnce(async (...args) => {
+      const candidate = await original(...args)
+      await db.compositeAssessment.update({ where: { id: track.target }, data: { status: 'ARCHIVED' } })
+      return candidate
+    })
+    try {
+      await expect(startAssessmentRunExecution({ executionId, actorUserId: respondent,
+        startPreflight: { respondentUserId: respondent, runtimeBindingKind: null,
+          runtimeBindingRef: null, preloadCompositeId: track.target } })).rejects.toThrow()
+      expect(await db.compositeAssessmentAttempt.count({where:{compositeAssessmentId:track.target,userId:respondent}})).toBe(0)
+    } finally {
+      preload.mockRestore()
+      await db.compositeAssessment.update({ where: { id: track.target }, data: { status: 'PUBLISHED' } })
+    }
   }, 120000)
 
   it('release never touches DISPATCHED or UNKNOWN claims', async () => {

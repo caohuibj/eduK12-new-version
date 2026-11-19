@@ -12,6 +12,8 @@ export type RunStartPreflight = {
   runtimeBindingKind: string | null
   runtimeBindingRef: string | null
   respondentUserId: string
+  /** Candidate only; the frozen track in the admission transaction remains authoritative. */
+  preloadCompositeId?: string | null
 }
 
 /** One existing School parent read also supplies the bound replay hint.
