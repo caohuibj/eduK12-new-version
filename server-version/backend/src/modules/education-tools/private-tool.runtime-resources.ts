@@ -8,14 +8,97 @@ import {authorizePrivateTool} from './private-tool.access'
 import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
 import {privateScaleCode,privateScaleResourceKey,privateScaleRuntimeInput,privateScaleRuntimeOriginSchema,privateScaleVariant,type PrivateScaleRuntimeOrigin} from './private-tool.runtime-origin'
 import {readPrivateScaleVersionIdentity,privateScaleMeasurementInput,readPrivateRuntimeScaleSource} from './private-tool.runtime-source'
+import {privateToolImageReferences} from './private-tool.media-definition'
 import {privateScaleResourceEntry} from './private-tool.runtime-policy'
 import {parseSchoolPrivateGroupSelection} from './school-private-group-selection'
 import {schoolPrivateScaleGroupChoice} from './school-private-group-source'
 type Tx=Prisma.TransactionClient
 type Row={resource_key:string;resource_version:string;scale_id:string;composite_id:string;definition_hash:string;entry:unknown;entry_hash:string;status:string}
+type PrivateScaleRuntimeResult={
+ origin:PrivateScaleRuntimeOrigin;scaleId:string;compositeId:string;compositeItemId:string;
+ sourceDefinitionHash:string;resourceEntry:ReturnType<typeof privateScaleResourceEntry>;
+ identityOnly:true;canPublish:false;
+}
+type CachedPrivateScaleSource={
+ entryHash:string;definitionHash:string;scaleId:string;compositeId:string;compositeItemId:string;
+ trainingContentSnapshotHash:string;versionId:string;releaseId:string;releaseHash:string;
+ contentHash:string;ownerUserId:string;organizationId:string;entry:string;toolId:string;
+ result:PrivateScaleRuntimeResult;
+}
+const PRIVATE_SCALE_CACHE_MAX=512
+const verifiedPrivateScaleCache=new Map<string,CachedPrivateScaleSource>()
+const cachePrivateScaleSource=(key:string,entry:CachedPrivateScaleSource)=>{
+ if(verifiedPrivateScaleCache.has(key))verifiedPrivateScaleCache.delete(key)
+ verifiedPrivateScaleCache.set(key,entry)
+ if(verifiedPrivateScaleCache.size>PRIVATE_SCALE_CACHE_MAX){
+  const oldest=verifiedPrivateScaleCache.keys().next().value
+  if(oldest!==undefined)verifiedPrivateScaleCache.delete(oldest)
+ }
+}
+export function clearVerifiedPrivateScaleSourceCache(){verifiedPrivateScaleCache.clear()}
 /** Read identity only for an existing execution/history. These modes never
  * authorize a caller: actual task/report access remains the caller's obligation. */
 export async function readPrivateScaleRuntimeResource(tx:Tx,input:{key:string;version:'1.0.0'|'2.0.0';purpose:'NEW_USE'|'EXISTING_EXECUTION'|'HISTORY';context?:PrivateToolContext}){
+ const cacheKey=`${input.key}|${input.version}`
+ if(input.purpose!=='NEW_USE'){
+  const cached=verifiedPrivateScaleCache.get(cacheKey)
+  if(cached){
+   // Live in-transaction FOR SHARE anchor across every table validated by the
+   // full path. Any drift or status change evicts the cache and falls back to
+   // full verification so error codes and immutability checks remain exact.
+   const [anchor]=await tx.$queryRaw<Array<{matched:boolean}>>(Prisma.sql`
+    SELECT (
+     r.status='PUBLISHED'
+     AND r.entry_hash=${cached.entryHash}
+     AND r.definition_hash=${cached.definitionHash}
+     AND r.scale_id=${cached.scaleId}
+     AND r.composite_id=${cached.compositeId}
+     AND s.code=${'education-private-scale:'+cached.versionId}
+     AND s.creator_id=${cached.ownerUserId}
+     AND s.library_entry_id IS NULL
+     AND s.status='PUBLISHED'
+     AND s.visibility='COURSE'
+     AND s.instrument_class='CUSTOM_DESCRIPTIVE'
+     AND s.instrument_version='1.0.0'
+     AND s.definition_hash=${cached.definitionHash}
+     AND s.measurement_release_id=${cached.releaseId}
+     AND v.kind='SCALE'
+     AND v.entry=${cached.entry}
+     AND v.organization_id=${cached.organizationId}
+     AND v.owner_user_id=${cached.ownerUserId}
+     AND v.tool_id=${cached.toolId}
+     AND v.content_hash=${cached.contentHash}
+     AND mr.layer='MEASUREMENT'
+     AND mr.family='SCALE'
+     AND mr.status<>'REVOKED'
+     AND mr.content_hash=${cached.releaseHash}
+     AND c.product_kind='ORGANIZATION_RESOURCE'
+     AND NOT c.public_enabled
+     AND NOT c.copyable
+     AND c.status='PUBLISHED'
+     AND c.created_by=${cached.ownerUserId}
+     AND c.training_content_snapshot_hash=${cached.trainingContentSnapshotHash}
+     AND (SELECT count(*)::int FROM composite_assessment_items ci
+          WHERE ci.composite_assessment_id=c.id)=1
+     AND EXISTS (SELECT 1 FROM composite_assessment_items ci
+          WHERE ci.composite_assessment_id=c.id AND ci.id=${cached.compositeItemId}
+            AND ci.scale_id=s.id AND ci.type='SCALE' AND ci.position=0 AND ci.required=TRUE)
+    ) AS matched
+    FROM registered_assessment_resources r
+    JOIN scales s ON s.id=r.scale_id
+    JOIN education_private_tool_versions v ON v.id=${cached.versionId}
+    JOIN measurement_content_releases mr ON mr.id=${cached.releaseId}
+    JOIN composite_assessments c ON c.id=r.composite_id
+    WHERE r.resource_key=${input.key} AND r.resource_version=${input.version}
+    FOR SHARE OF r
+   `)
+   if(anchor?.matched){
+    cachePrivateScaleSource(cacheKey,cached)
+    return cached.result
+   }
+   verifiedPrivateScaleCache.delete(cacheKey)
+  }
+ }
  const [row]=await tx.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM registered_assessment_resources
   WHERE resource_key=${input.key} AND resource_version=${input.version} FOR SHARE`)
  if(!row||!row.resource_key.startsWith('private-scale:')||row.status!=='PUBLISHED'||canonicalHash(row.entry)!==row.entry_hash)
@@ -51,8 +134,18 @@ export async function readPrivateScaleRuntimeResource(tx:Tx,input:{key:string;ve
   privateToolFail('PRIVATE_TOOL_RUNTIME_COMPOSITE_INVALID')
  const entry=privateScaleResourceEntry(origin,v.title,source.definition,composite.id)
  if(canonicalHash(entry)!==row.entry_hash)privateToolFail('PRIVATE_TOOL_RUNTIME_POLICY_INVALID')
- return {origin,scaleId:scale.id,compositeId:composite.id,compositeItemId:composite.items[0].id,
+ const result:PrivateScaleRuntimeResult={origin,scaleId:scale.id,compositeId:composite.id,compositeItemId:composite.items[0].id,
   sourceDefinitionHash:canonicalHash(source.definition),resourceEntry:entry,identityOnly:true as const,canPublish:false as const}
+ if(composite.trainingContentSnapshotHash&&privateToolImageReferences('SCALE',source.definition).all.length===0){
+  cachePrivateScaleSource(cacheKey,{
+   entryHash:row.entry_hash,definitionHash:row.definition_hash,scaleId:scale.id,compositeId:composite.id,
+   compositeItemId:composite.items[0].id,trainingContentSnapshotHash:composite.trainingContentSnapshotHash,
+   versionId:origin.versionId,releaseId:origin.releaseId,releaseHash:origin.releaseHash,
+   contentHash:origin.contentHash,ownerUserId:origin.ownerUserId,organizationId:origin.organizationId,
+   entry:origin.entry,toolId:origin.toolId,result,
+  })
+ }
+ return result
 }
 /** INTERNAL PREPARATION ONLY. This creates no activity/track, no shared grant,
  * and gives no publication/report right. Future activity callers must separately
