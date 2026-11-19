@@ -1,7 +1,7 @@
 import { encryptUnifiedRuntimePayload } from './security'
 import { REPORT_SUBMISSION_KEY_CONFLICT, REPORT_SUBMISSION_KEY_CONFLICT_MESSAGE } from '../scale/scale-final-submit-conflict'
 import { detachedWholeReceiptsEnabled } from './whole-receipt-storage'
-import { registerWholeReceiptAtomic } from './whole-receipt-atomic'
+import { registerWholeReceiptAtomic, type ExpectedWholeChild } from './whole-receipt-atomic'
 import { markAssessmentTimeline, traceAssessmentPhase, recordAssessmentReportClaim, tracePrismaInteractiveTransaction } from '../../services/runtimeObservability'
 import type { WholeReceiptExecution } from '../composite/whole-questionnaire.service'
 import { randomUUID } from 'node:crypto'
@@ -496,7 +496,7 @@ export const educationWholeBlocksPriorSnapshots = (headers: Array<{ unitType: st
 
 export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParent, input: {
   submissionId: string; payloadHash: string; answersEncrypted: string; acceptedAt: Date; requiredFormSlots: string[]; validationHash?: string;
-  rejectPriorUnitSnapshots?: boolean
+  rejectPriorUnitSnapshots?: boolean; expectedChildren?: ExpectedWholeChild[];
 },assertCollectionAllowed?: (tx:Prisma.TransactionClient)=>Promise<void>): Promise<{ acceptedAt: Date; replayed: boolean; queueDepth?: number }> => {
   const receipt = await (!assertCollectionAllowed&&(detachedWholeReceiptsEnabled() || process.env.ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED === 'true')
   ? registerWholeReceiptAtomic(parent, input)
@@ -526,9 +526,24 @@ export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParen
   if (input.validationHash != null && job.wholeValidationHash !== input.validationHash) {
     throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '整卷交付校验已变化', 409)
   }
-  // Collection policy is checked in the SAME transaction as durable RAW
-  // acceptance. A previously accepted receipt returns above without new use.
+  // Collection policy and child bindings are checked in the SAME transaction as
+  // durable RAW acceptance. A previously accepted receipt returns above.
   if(assertCollectionAllowed)await assertCollectionAllowed(tx)
+  if (input.expectedChildren?.length) {
+    const children = await tx.assessment.findMany({
+      where: {
+        id: { in: input.expectedChildren.map(unit => unit.assessmentId) },
+        compositeAttemptId: parent.id,
+        attemptEpoch: parent.attemptEpoch,
+        compositeItemId: { in: input.expectedChildren.map(unit => unit.itemId) },
+      },
+      select: { id: true, compositeItemId: true },
+    })
+    if (children.length !== input.expectedChildren.length
+      || children.some(child => !input.expectedChildren!.some(unit => unit.assessmentId === child.id && unit.itemId === child.compositeItemId))) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '整卷工具来源已变化', 409)
+    }
+  }
   const headers = await traceAssessmentPhase('whole.tx.snapshot_headers', () => tx.assessmentUnitSnapshot.findMany({
     where: { compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch },
     select: { slotKey: true, unitType: true, terminalState: true },

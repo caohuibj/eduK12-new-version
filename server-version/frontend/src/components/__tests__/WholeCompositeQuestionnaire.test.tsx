@@ -175,6 +175,28 @@ describe('whole questionnaire durable browser submission', () => {
     expect(saved.submissionId).toBe('whole-browser-sealed-submission'); expect(saved.answers).toBeUndefined()
   })
 
+  it('recovers via GET /whole/receipt before re-posting on retry after a 25s read timeout', async () => {
+    const d = definition([1, 1]), client = api(), completed = vi.fn()
+    client.wholeDefinition.mockResolvedValue({ code: 0, data: d })
+    const lookup = vi.fn()
+      // Immediate probe after Attempt 1 timeout: server still finishing commit
+      .mockResolvedValueOnce({ code: 0, message: 'ok', data: { status: 'NOT_RECEIVED' as const, attemptId: 'whole-attempt', submissionId: 'whole-browser-sealed-submission' } })
+      // Pre-POST probe at start of Attempt 2: server committed during backoff!
+      .mockResolvedValueOnce({ code: 0, message: 'ok', data: { status: 'ACCEPTED' as const, attemptId: 'whole-attempt', submissionId: 'whole-browser-sealed-submission', payloadHash: 'h'.repeat(64), acceptedAt: '2026-10-15T00:00:00Z', committedAt: '2026-10-15T00:00:01Z', replayed: true } })
+    Object.assign(client, { wholeReceipt: lookup })
+    client.submitWhole.mockRejectedValueOnce(Object.assign(new Error('timeout of 25000ms exceeded'), { code: 'ECONNABORTED', retryable: true }))
+    retry.mockImplementationOnce(async ({ operation }) => {
+      try { return await operation(1) } catch { return await operation(2) }
+    })
+    await seed(d); view(client, completed); await lastQuestion(2)
+    fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
+    await waitFor(() => expect(completed).toHaveBeenCalledTimes(1))
+    // Attempt 2 recovered via GET /whole/receipt without re-posting the payload!
+    expect(client.submitWhole).toHaveBeenCalledTimes(1)
+    expect(lookup).toHaveBeenCalledTimes(2)
+    expect(await finalDraftStore.get(key)).toBeNull()
+  })
+
   it('seamlessly renders mixed Form + Scale questionnaire, transitions with 0 HTTP calls, and submits unified payload', async () => {
     const mixedDef: WholeQuestionnaireDefinition = {
       attemptId: 'whole-attempt',

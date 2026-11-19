@@ -8,8 +8,10 @@ import {
 describe('finalDraftCapacityRetry', () => {
   it('whitelists capacity/network failures only', () => {
     expect(isFinalDraftCapacityRetryable({ status: 503, code: 'ASSESSMENT_SUBMIT_BUSY' })).toBe(true)
+    expect(isFinalDraftCapacityRetryable({ status: 408 })).toBe(true)
     expect(isFinalDraftCapacityRetryable({ status: 502 })).toBe(true)
     expect(isFinalDraftCapacityRetryable({ status: 504 })).toBe(true)
+    expect(isFinalDraftCapacityRetryable({ status: null, code: 'ECONNABORTED', message: 'timeout of 25000ms exceeded', retryable: true })).toBe(true)
     expect(isFinalDraftCapacityRetryable({ status: null, message: 'Network Error', retryable: true })).toBe(true)
     expect(isFinalDraftCapacityRetryable({ status: 409, code: 'STALE_ATTEMPT' })).toBe(false)
     expect(isFinalDraftCapacityRetryable({ status: 400, code: 'SUBMISSION_PAYLOAD_CONFLICT' })).toBe(false)

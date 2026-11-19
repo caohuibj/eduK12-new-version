@@ -24,7 +24,11 @@ export const recoverWholeQuestionnaireReceipt = async (attemptId: string, submis
   if (row.epoch !== attemptEpoch) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '交卷版本已变化，请保留原草稿核对', 409)
   if (!row.wholeSubmissionId) return { status: 'NOT_RECEIVED' as const, attemptId, submissionId }
   if (row.wholeSubmissionId !== submissionId) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '当前作答保存了另一交卷标识', 409)
-  if (!row.payloadHash || !row.acceptedAt || !row.slotHash || row.slotHash !== row.jobSlot || row.contextHash !== row.jobContext) {
+  // X-04A parity: worker-side Form materialization may advance the parent's
+  // context_snapshot_hash after durable receipt acceptance, so an accepted
+  // receipt recovers by attemptEpoch + slot_set_hash + submissionId without
+  // failing a post-materialization context hash comparison.
+  if (!row.payloadHash || !row.acceptedAt || !row.slotHash || row.slotHash !== row.jobSlot) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '交卷冻结绑定不一致，请保留原草稿核对', 409)
   }
   return { status: 'ACCEPTED' as const, attemptId, submissionId, payloadHash: row.payloadHash,

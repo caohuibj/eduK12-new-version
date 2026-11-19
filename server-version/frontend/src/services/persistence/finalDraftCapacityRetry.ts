@@ -10,11 +10,14 @@ const BASE_DELAY_MS = 1_000
 /** High safety cap — still honor larger Retry-After up to this bound. */
 const SAFETY_CAP_MS = 30_000
 
-/** Whitelist: 503/502/504, known busy codes, or network failures only.
- * Every HTTP 4xx is excluded before any busy-code match. */
+/** Whitelist: 408/502/503/504, known busy codes, or network/timeout failures only.
+ * Every non-408 HTTP 4xx is excluded before any busy-code match. */
 export const isFinalDraftCapacityRetryable = (error: unknown): boolean => {
   const normalized = normalizeApiError(error)
-  // Every 4xx is never retried, even if the body also carries a busy code.
+  // HTTP 408 (Request Timeout) is an uncertain transport/proxy timeout and is
+  // safe to recover/retry with the same sealed submissionId. All other 4xx
+  // (400/401/403/404/409/413/422/429) are never retried.
+  if (normalized.status === 408) return true
   if (typeof normalized.status === 'number' && normalized.status >= 400 && normalized.status <= 499) return false
   const code = String(normalized.code ?? '')
   if (BUSY_CODES.has(code)) return true
