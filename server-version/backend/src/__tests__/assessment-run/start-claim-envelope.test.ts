@@ -68,4 +68,16 @@ describe('lockExecutionEnvelope known identity', () => {
     expect(teacherTx.$queryRaw).toHaveBeenCalledTimes(6)
     expect(teacherRow).toMatchObject({ hasCampusActivity: false, hasHuiteacherLink: true })
   })
+
+  it('derives authoritative link flags inside the FOR SHARE run query when caller passes only org and run', async () => {
+    const tx = { $queryRaw: vi.fn() } as any
+    tx.$queryRaw
+      .mockResolvedValueOnce([]) // org FOR SHARE
+      .mockResolvedValueOnce([{ id: 'run-1', hasCampusActivity: true, hasHuiteacherLink: false }]) // run FOR SHARE + live EXISTS flags
+      .mockResolvedValueOnce([]) // campus_activities FOR SHARE
+      .mockResolvedValueOnce([lockedRow]) // execution FOR UPDATE
+    const row = await lockExecutionEnvelope(tx, 'exec-school', { organizationId: 'org-1', runId: 'run-1' })
+    expect(tx.$queryRaw).toHaveBeenCalledTimes(4)
+    expect(row).toMatchObject({ hasCampusActivity: true, hasHuiteacherLink: false })
+  })
 })

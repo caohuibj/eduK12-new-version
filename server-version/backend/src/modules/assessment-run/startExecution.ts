@@ -271,6 +271,7 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
         actorUserId: input.actorUserId,
         admitted: true,
         admittedAttemptIdentity: input.decision.claim.admittedAttemptIdentity,
+        knownExecution: envelope,
       })
   // Claim tx already froze provenance on first START. Skip the freeze
   // SELECT+early-return when the locked execution row is already frozen;
@@ -406,13 +407,15 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   }
   const now = input.inlineContext?.now
     ?? (await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`)[0].now
-  const dispatched = await tx.$executeRaw`
-    UPDATE "assessment_run_execution_start_claims"
-    SET "state" = 'DISPATCHED', "dispatched_at" = COALESCE("dispatched_at", ${now}), "updated_at" = ${now}
-    WHERE "id" = ${input.decision.claim.id} AND "claim_generation" = ${input.decision.claim.claimGeneration}
-      AND "state" IN ('CLAIMED','DISPATCHED')
-  `
-  if (Number(dispatched) !== 1) throw new RunStartExecutionError('RUN_START_FENCE_LOST', 'START claim fence lost before transactional runtime start', 409)
+  if (!inline) {
+    const dispatched = await tx.$executeRaw`
+      UPDATE "assessment_run_execution_start_claims"
+      SET "state" = 'DISPATCHED', "dispatched_at" = COALESCE("dispatched_at", ${now}), "updated_at" = ${now}
+      WHERE "id" = ${input.decision.claim.id} AND "claim_generation" = ${input.decision.claim.claimGeneration}
+        AND "state" IN ('CLAIMED','DISPATCHED')
+    `
+    if (Number(dispatched) !== 1) throw new RunStartExecutionError('RUN_START_FENCE_LOST', 'START claim fence lost before transactional runtime start', 409)
+  }
   let preloadedComposite = input.preloadedComposite
   if (!preloadedComposite && typeof (tx as any)?.compositeAssessment?.findUnique === 'function') {
     const compositeModule = await import('../composite/composite.service')
@@ -434,7 +437,7 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
     WHERE "id" = ${input.executionId} AND "runtime_binding_ref" IS NULL
   `
   if (Number(changed) !== 1) throw new RunStartExecutionError('RUN_RUNTIME_BIND_CONFLICT', 'runtime binding changed concurrently', 409)
-  await markRunStartClaimCompleted(tx, { claimId: input.decision.claim.id, generation: input.decision.claim.claimGeneration, now })
+  await markRunStartClaimCompleted(tx, { claimId: input.decision.claim.id, generation: input.decision.claim.claimGeneration, now, allowClaimedInline: inline })
   await assertTrainingPrivateReferenceAdmissionCurrent(tx)
   if(libraryUses)await assertEducationLibraryUses(tx,libraryUses.context,libraryUses.entryIds,{locked:libraryUses.uses,requireLocked:true})
   const result: RunStartExecutionResult = {
@@ -514,6 +517,7 @@ const executeTransactionalTeacherFormInTx = async (tx: Tx, input: {
         tx,executionId:input.executionId,
         actorUserId:input.actorUserId,admitted:true,
         admittedAttemptIdentity:input.decision.claim.admittedAttemptIdentity,
+        knownExecution:envelope,
       })
   if(!inline && !envelope?.scientificFrozenAt){
     await freezeRunExecutionScientificProvenanceInTransaction(tx,input.executionId)
@@ -596,17 +600,19 @@ const executeTransactionalTeacherFormInTx = async (tx: Tx, input: {
     definitionDigest:form.definitionDigest,status:'STARTED',
   }})
   const nowRows=await tx.$queryRaw<Array<{now:Date}>>`SELECT transaction_timestamp() AS "now"`
-  const dispatched=await tx.$executeRaw`
-    UPDATE "assessment_run_execution_start_claims"
-    SET "state"='DISPATCHED',
-      "dispatched_at"=COALESCE("dispatched_at",${nowRows[0].now}),
-      "updated_at"=${nowRows[0].now}
-    WHERE "id"=${input.decision.claim.id}
-      AND "claim_generation"=${input.decision.claim.claimGeneration}
-      AND "state" IN ('CLAIMED','DISPATCHED')
-  `
-  if(Number(dispatched)!==1)
-    throw new RunStartExecutionError('RUN_START_FENCE_LOST','Teacher Form start claim was lost',409)
+  if(!inline){
+    const dispatched=await tx.$executeRaw`
+      UPDATE "assessment_run_execution_start_claims"
+      SET "state"='DISPATCHED',
+        "dispatched_at"=COALESCE("dispatched_at",${nowRows[0].now}),
+        "updated_at"=${nowRows[0].now}
+      WHERE "id"=${input.decision.claim.id}
+        AND "claim_generation"=${input.decision.claim.claimGeneration}
+        AND "state" IN ('CLAIMED','DISPATCHED')
+    `
+    if(Number(dispatched)!==1)
+      throw new RunStartExecutionError('RUN_START_FENCE_LOST','Teacher Form start claim was lost',409)
+  }
   // No second runtime mutation: Run owns assignment and START state.
   const bound=await tx.$executeRaw`
     UPDATE "assessment_run_executions"
@@ -621,6 +627,7 @@ const executeTransactionalTeacherFormInTx = async (tx: Tx, input: {
     throw new RunStartExecutionError('RUN_RUNTIME_BIND_CONFLICT','Teacher Form runtime binding conflict',409)
   await markRunStartClaimCompleted(tx,{
     claimId:input.decision.claim.id,generation:input.decision.claim.claimGeneration,
+    now:nowRows[0].now,allowClaimedInline:inline,
   })
   return {state:'STARTED' as const,runtimeBindingKind:TEACHER_FORM_RUNTIME_KIND,
     runtimeBindingRef:attempt.id,replayed:false}
@@ -765,11 +772,20 @@ export const startAssessmentRunExecution = async (input: {
         // leave no claim, audit or provenance rows behind, so they share the same
         // safe-retry 503 contract as the runtime dispatch transaction.
         const resourceRegistry = input.resourceRegistry ?? productionRunResourceAuthorityRegistry
+        const knownIdentity = input.startPreflight?.respondentUserId === input.actorUserId
+          && input.startPreflight.organizationId
+          && input.startPreflight.runId
+          ? {
+              organizationId: input.startPreflight.organizationId,
+              runId: input.startPreflight.runId,
+            }
+          : undefined
         const decision = await classifyStartTransaction(() =>
           acquireRunExecutionStartClaim({
             executionId: input.executionId,
             actorUserId: input.actorUserId,
             resourceRegistry: input.resourceRegistry,
+            ...(knownIdentity ? { knownIdentity } : {}),
             transactionalDispatch: async (inlineContext: TransactionalStartDispatchContext) => {
               const inlineTrack = inlineContext.scientificDetails?.track
               const launch = inlineTrack
