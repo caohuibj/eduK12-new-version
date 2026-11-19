@@ -747,6 +747,19 @@ export const startAssessmentRunExecution = async (input: {
   const executeRunStart = async (): Promise<RunStartExecutionResult> => {
     try {
       return await runStartGate().run(async () => {
+        // The School route already identified this respondent and a frozen
+        // track target. Prepare its publication before opening the claim
+        // transaction; admission and the locked track remain authoritative.
+        // A speculative preload failure is only a cache miss; the locked
+        // START path retries its actual target without changing replay or authority.
+        const candidate = input.startPreflight?.respondentUserId === input.actorUserId
+          && !input.startPreflight.runtimeBindingRef && !input.resourceRegistry
+          ? input.startPreflight.preloadCompositeId : null
+        const preparation = candidate
+          ? await import('../composite/composite.service')
+              .then(module => module.loadStartComposite(candidate))
+              .catch(() => null)
+          : null
         // The claim transaction is the first durable step of a Run START. Its own
         // rolled-back outcomes (P2028 maxWait, serialization/deadlock/lock-timeout)
         // leave no claim, audit or provenance rows behind, so they share the same
@@ -793,6 +806,8 @@ export const startAssessmentRunExecution = async (input: {
                 executionId: input.executionId,
                 actorUserId: input.actorUserId,
                 launch,
+                ...(candidate === launch.runtimeTargetRef && preparation?.trainingContentSnapshotHash
+                  ? { preloadedComposite: preparation } : {}),
                 inlineContext,
               })
             },
@@ -839,8 +854,9 @@ export const startAssessmentRunExecution = async (input: {
           if (launch.runtimeTargetKind !== 'COMPOSITE') {
             throw new RunStartExecutionError('RUN_RUNTIME_TARGET_UNSUPPORTED', 'transactional Run adapter supports Composite runtime only', 409)
           }
-          let preloadedComposite: any
-          if (typeof (prisma as any)?.compositeAssessment?.findUnique === 'function') {
+          let preloadedComposite: any = candidate === launch.runtimeTargetRef
+            && preparation?.trainingContentSnapshotHash ? preparation : undefined
+          if (!preloadedComposite && typeof (prisma as any)?.compositeAssessment?.findUnique === 'function') {
             try {
               const compositeModule = await import('../composite/composite.service')
               if (typeof compositeModule.loadStartComposite === 'function') {

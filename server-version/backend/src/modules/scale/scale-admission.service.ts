@@ -632,6 +632,7 @@ const validateStoredAgainstRuntime = async (
   stored: VersionedFrozenUnitAdmission,
   referenceTimeMs = Date.now(),
   db?: import('../assessment-runtime/shared-scale-runtime').SharedScaleArtifactDb,
+  preloadedRuntime?: VersionedFrozenScaleRuntimeSnapshot,
 ): Promise<VersionedFrozenUnitAdmission> => {
   assertAdmissionParentBinding(row, stored)
   if (stored.attemptEpoch !== row.attemptEpoch || stored.scale?.id !== row.scale.id
@@ -639,7 +640,7 @@ const validateStoredAgainstRuntime = async (
     || (stored.principal.userId !== null && row.userId !== null && stored.principal.userId !== row.userId)) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结准入身份或轮次不匹配', 409)
   }
-  const runtime = (await loadScaleAdmissionRuntime(row, db))
+  const runtime = preloadedRuntime ?? await loadScaleAdmissionRuntime(row, db)
   if (runtime.schemaVersion !== stored.schemaVersion) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表运行时与准入快照版本不匹配', 409)
   }
@@ -975,7 +976,13 @@ export const batchEnsureScaleAdmissionsAtDelivery = async (
 
         const winner = await loadStoredScaleAdmission(current, tx)
         if (winner) {
-          txResult.set(current.id, await validateStoredAgainstRuntime(current, winner, referenceTimeMs, tx))
+          // A competing delivery can publish an admission while this request
+          // waits on the child lock. Reuse the already verified runtime only
+          // when the locked row still has the identical frozen ciphertext.
+          const cached = runtimeByChild.get(item.child)
+          const runtime = cached?.encrypted === current.runtimeSnapshotEncrypted
+            && cached.encrypted === item.child.runtimeSnapshotEncrypted ? cached.runtime : undefined
+          txResult.set(current.id, await validateStoredAgainstRuntime(current, winner, referenceTimeMs, tx, runtime))
           continue
         }
 

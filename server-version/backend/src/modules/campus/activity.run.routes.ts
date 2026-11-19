@@ -141,10 +141,17 @@ async function currentSchoolExecution(req:import('express').Request,res:import('
       runtimeBindingKind:string|null
       runtimeBindingRef:string|null
       respondentUserId:string
+      preloadCompositeId:string|null
     }>>`
       SELECT e."runtime_binding_kind" AS "runtimeBindingKind",
         e."runtime_binding_ref" AS "runtimeBindingRef",
-        respondent."user_id" AS "respondentUserId"
+        respondent."user_id" AS "respondentUserId",
+        CASE WHEN t."frozen_resource_policy" #>> '{runtimeLaunchTarget,kind}' = 'COMPOSITE'
+          AND t."resource_key" NOT LIKE 'education-composition:%'
+          AND EXISTS (SELECT 1 FROM "composite_assessments" candidate
+            WHERE candidate."id" = t."frozen_resource_policy" #>> '{runtimeLaunchTarget,ref}'
+              AND candidate."training_content_snapshot_hash" IS NOT NULL)
+          THEN t."frozen_resource_policy" #>> '{runtimeLaunchTarget,ref}' ELSE NULL END AS "preloadCompositeId"
       FROM "campus_activity_runs" ar
       JOIN "campus_activities" a ON a."course_id"=ar."course_id"
         AND a."organization_id"=ar."organization_id" AND a."status"='OPEN'
@@ -153,6 +160,8 @@ async function currentSchoolExecution(req:import('express').Request,res:import('
       JOIN "assessment_run_actor_snapshots" respondent
         ON respondent."id"=e."respondent_actor_snapshot_id"
         AND respondent."run_id"=e."run_id"
+      JOIN "assessment_run_tracks" t ON t."organization_id"=e."organization_id"
+        AND t."run_id"=e."run_id" AND t."id"=e."track_id"
       WHERE ar."organization_id"=${p.data.organizationId}
         AND ar."course_id"=${p.data.courseId}
         AND ar."run_id"=${p.data.runId}

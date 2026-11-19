@@ -5,6 +5,7 @@ const m=vi.hoisted(()=>({
   release:vi.fn(),
   lockEnvelope:vi.fn(),
   relationalStart:vi.fn(),
+  preload:vi.fn(),
   tx:vi.fn(),
   raw:vi.fn(),
   rawExec:vi.fn(),
@@ -18,6 +19,7 @@ vi.mock('../../modules/assessment-run/startClaim',async orig=>({
 vi.mock('../../modules/composite/composite.service',async orig=>({
   ...(await orig<object>()),
   startRelationalCompositeAttemptInTransaction:m.relationalStart,
+  loadStartComposite:m.preload,
 }))
 vi.mock('../../config/database',()=>({
   prisma:{$transaction:m.tx,$queryRaw:m.raw,$executeRaw:m.rawExec},
@@ -50,7 +52,7 @@ const envelopeRow=(kind='COMPOSITE',family='SCALE')=>([{
 describe('Run START claim recovery',()=>{
   beforeEach(()=>{
     m.acquire.mockReset();m.release.mockReset();m.lockEnvelope.mockReset()
-    m.relationalStart.mockReset();m.tx.mockReset();m.raw.mockReset();m.rawExec.mockReset()
+    m.relationalStart.mockReset();m.preload.mockReset();m.tx.mockReset();m.raw.mockReset();m.rawExec.mockReset()
     vi.spyOn(logger,'warn').mockImplementation(()=>{})
   })
 
@@ -172,5 +174,25 @@ describe('Run START claim recovery',()=>{
     expect(m.raw).not.toHaveBeenCalled()
     expect(m.tx).not.toHaveBeenCalled()
     expect(m.release).not.toHaveBeenCalled()
+  })
+
+  it('does not let a failed speculative preload change an already-bound replay',async()=>{
+    m.preload.mockRejectedValueOnce(new Error('preload failed'))
+    m.acquire.mockResolvedValueOnce({kind:'BOUND',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'existing'})
+    const result=await startAssessmentRunExecution({executionId:'exec-1',actorUserId:'u1',startPreflight:{
+      runtimeBindingKind:null,runtimeBindingRef:null,respondentUserId:'u1',preloadCompositeId:'composite-1',
+    }})
+    expect(result).toEqual({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'existing',replayed:true})
+    expect(m.preload).toHaveBeenCalledExactlyOnceWith('composite-1')
+    expect(m.preload.mock.invocationCallOrder[0]).toBeLessThan(m.acquire.mock.invocationCallOrder[0])
+  })
+
+  it('does not prepare a candidate for another respondent',async()=>{
+    const denied=new Error('actor denied')
+    m.acquire.mockRejectedValueOnce(denied)
+    await expect(startAssessmentRunExecution({executionId:'exec-1',actorUserId:'u1',startPreflight:{
+      runtimeBindingKind:null,runtimeBindingRef:null,respondentUserId:'other',preloadCompositeId:'composite-1',
+    }})).rejects.toBe(denied)
+    expect(m.preload).not.toHaveBeenCalled()
   })
 })
