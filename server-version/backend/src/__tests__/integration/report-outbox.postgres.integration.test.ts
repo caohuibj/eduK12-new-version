@@ -758,18 +758,45 @@ suite('durable report outbox on isolated PostgreSQL', () => {
     vi.stubEnv('ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED', 'true')
     const f = await fixture(3), { whole, input } = await wholeInput(f)
     const shared = (await import('../../config/database')).prisma, query = vi.spyOn(shared, '$queryRaw')
+    const txSpy = vi.spyOn(shared, '$transaction')
     const parentReads = vi.spyOn(shared.compositeAssessmentAttempt, 'findUnique')
     try {
       await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
       const statements=query.mock.calls.map(args=>{const sql=args[0] as any;return sql?.sql??(Array.isArray(sql)?sql.join('?'):String(sql))})
-      // Receipt initialization and current collection authority are separate
-      // work; neither may cause the consent header to be loaded again.
+      // Receipt initialization and child-unit verification run inside one
+      // single-statement atomic SQL receipt (zero interactive $transaction)
+      // without reloading the consent header.
       expect(statements.filter(sql=>/^\s*SELECT\b/.test(sql)&&sql.includes('"composite_assessment_attempts"'))).toHaveLength(1)
-      expect(statements.filter(sql=>/^\s*WITH\s+parent_cas\s+AS\b/.test(sql))).toHaveLength(1)
+      expect(statements.filter(sql=>/^\s*WITH\s+job_locked\s+AS\s+MATERIALIZED\b/.test(sql))).toHaveLength(1)
+      expect(txSpy).not.toHaveBeenCalled()
       expect(parentReads).not.toHaveBeenCalled()
       await processJob(await claim()); expect((await service.getReport(f.parent.id, { userId: f.participant.id })).unitReports).toHaveLength(3)
       expect(await budget()).toBe(0)
-    } finally { query.mockRestore(); parentReads.mockRestore(); vi.stubEnv('ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED', priorAtomic || '') }
+    } finally { query.mockRestore(); txSpy.mockRestore(); parentReads.mockRestore(); vi.stubEnv('ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED', priorAtomic || '') }
+  })
+
+  it('atomic whole receipt rejects tampered child bindings without writing receipt or budget and recovers after worker context advance', async () => {
+    vi.stubEnv('ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED', 'true')
+    const f = await fixture(2), { whole, input } = await wholeInput(f)
+    const { recoverWholeQuestionnaireReceipt: recover } = await import('../../modules/composite/whole-receipt-recovery')
+    // Tamper one child row's attemptEpoch so the atomic child verification must reject it.
+    const child = await db.assessment.findFirstOrThrow({ where: { compositeAttemptId: f.parent.id } })
+    await db.assessment.update({ where: { id: child.id }, data: { attemptEpoch: 99 } })
+    await expect(whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id }))
+      .rejects.toMatchObject({ code: 'STALE_ATTEMPT', message: '整卷工具来源已变化' })
+    expect((await outbox.readCompositeReportJob(f.parent.id, 1))!.wholeSubmissionId).toBeNull()
+    expect(await budget()).toBe(0)
+
+    // Restore child binding and verify single-statement atomic acceptance succeeds.
+    await db.assessment.update({ where: { id: child.id }, data: { attemptEpoch: 1 } })
+    const accepted = await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+    expect(accepted.status).toBe('ACCEPTED')
+    // Simulate worker-side Form materialization advancing parent context_snapshot_hash (X-04A):
+    // timeout receipt recovery via GET /whole/receipt must still return ACCEPTED.
+    await db.compositeAssessmentAttempt.update({ where: { id: f.parent.id }, data: { contextSnapshotHash: 'f'.repeat(64) } })
+    expect(await recover(f.parent.id, input.submissionId, 1, { userId: f.participant.id }))
+      .toMatchObject({ status: 'ACCEPTED', payloadHash: accepted.payloadHash, replayed: true })
   })
   it('keeps the atomic fence if the parent changes after the admission-owned header read', async () => {
     vi.stubEnv('ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED', 'true')

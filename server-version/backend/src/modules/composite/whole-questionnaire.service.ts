@@ -944,21 +944,16 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
     ...(timingSnapshotHash?{timingSnapshotHash}:{}),respondentUserId: parent.userId, recoveryTokenHash: parent.recoveryTokenHash,
     units: prepared.units,
     ...(prepared.formAnswers.length > 0 ? { formAnswers: prepared.formAnswers } : {}) }))
+  // Resolve every selected real child inside the same receipt SQL statement
+  // (single-statement atomic receipt when detached/atomic mode is active;
+  // identical fallback check inside the interactive transaction otherwise).
+  // Business decision: attempts already started may finish after an emergency
+  // stop, so no collection re-check runs here; new STARTs remain blocked.
   const receipt = await registerWholeQuestionnaireReceipt(parent, {
     submissionId: input.submissionId, payloadHash: canonical.hash, answersEncrypted: encrypted, acceptedAt: new Date(receivedAtMs),
     requiredFormSlots: remainingRequiredFormSlots, validationHash: prior.wholeValidationHash,
     rejectPriorUnitSnapshots: isEducationWholeAttempt(parent),
-  },async tx=>{
-    // Resolve every selected real child in this same receipt transaction,
-    // including ordinary questionnaires. A previously accepted replay returned above.
-    if(prepared.units.length){
-      const children=await tx.assessment.findMany({where:{id:{in:prepared.units.map(unit=>unit.assessmentId)},compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,
-        compositeItemId:{in:prepared.units.map(unit=>unit.itemId)}},select:{id:true,scaleId:true,compositeItemId:true}})
-      if(children.length!==prepared.units.length||children.some(child=>!prepared.units.some(unit=>unit.assessmentId===child.id&&unit.itemId===child.compositeItemId)))throw failure('整卷工具来源已变化')
-    }
-    // Business decision: attempts already started may finish after an
-    // emergency stop. Every selected child was admitted by this attempt's
-    // START, so no collection re-check here; new STARTs stay blocked.
+    expectedChildren: prepared.units.map(unit => ({ assessmentId: unit.assessmentId, itemId: unit.itemId })),
   })
   const feedback = rememberWholeReportFeedbackHint(attemptId, input.submissionId, detachedWholeReceiptsEnabled() && !receipt.replayed ? recordWholeReceiptStored() : receipt.queueDepth)
   return receiptResponse(attemptId, input.submissionId, canonical.hash, receipt.acceptedAt, receipt.replayed, feedback.profile)

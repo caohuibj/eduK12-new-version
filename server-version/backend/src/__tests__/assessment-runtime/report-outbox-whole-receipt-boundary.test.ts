@@ -109,4 +109,21 @@ describe('collection callback keeps durable receipt storage semantics',()=>{
   await expect(registerWholeQuestionnaireReceipt(parent,input,async()=>{throw stop})).rejects.toBe(stop)
   expect(tx.assessmentUnitSnapshot.findMany).not.toHaveBeenCalled();expect(state.statements).toHaveLength(1);expect(state.budgetAccesses).toBe(0)
  })
+ it('routes expectedChildren directly to single-statement registerWholeReceiptAtomic when no custom callback is supplied',async()=>{
+  const expectedChildren=[{assessmentId:'child-1',itemId:'item-1'},{assessmentId:'child-2',itemId:'item-2'}]
+  mocks.atomic.mockResolvedValueOnce({acceptedAt,replayed:false})
+  await expect(registerWholeQuestionnaireReceipt(parent,{...input,expectedChildren})).resolves.toEqual({acceptedAt,replayed:false})
+  expect(mocks.atomic).toHaveBeenCalledExactlyOnceWith(parent,{...input,expectedChildren})
+  expect(mocks.db.$transaction).not.toHaveBeenCalled()
+ })
+ it('still enforces expectedChildren on the interactive fallback path when atomic receipt is disabled',async()=>{
+  vi.stubEnv('ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED','false')
+  vi.stubEnv('ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED','false')
+  const {tx,state}=callbackTransaction()
+  tx.assessment={findMany:vi.fn().mockResolvedValue([{id:'child-1',compositeItemId:'wrong-item'}])}
+  await expect(registerWholeQuestionnaireReceipt(parent,{...input,expectedChildren:[{assessmentId:'child-1',itemId:'item-1'}]})).rejects.toMatchObject({code:'STALE_ATTEMPT',message:'整卷工具来源已变化'})
+  expect(mocks.atomic).not.toHaveBeenCalled()
+  expect(tx.assessmentUnitSnapshot.findMany).not.toHaveBeenCalled()
+  expect(state.statements).toHaveLength(1)
+ })
 })

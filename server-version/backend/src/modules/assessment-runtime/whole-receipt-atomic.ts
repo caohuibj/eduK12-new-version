@@ -7,15 +7,28 @@ import { QuestionnaireCompletionAdmissionBusyError } from '../../services/questi
 import { markAssessmentTimeline, traceAssessmentPhase } from '../../services/runtimeObservability'
 
 type Parent = { id: string; attemptEpoch: number; frozenActiveSlotSetHash: string | null; contextSnapshotHash: string | null }
-type Input = { submissionId: string; payloadHash: string; answersEncrypted: string; acceptedAt: Date; requiredFormSlots: string[]; validationHash?: string; rejectPriorUnitSnapshots?: boolean }
+export type ExpectedWholeChild = { assessmentId: string; itemId: string }
+type Input = {
+  submissionId: string
+  payloadHash: string
+  answersEncrypted: string
+  acceptedAt: Date
+  requiredFormSlots: string[]
+  validationHash?: string
+  rejectPriorUnitSnapshots?: boolean
+  expectedChildren?: ExpectedWholeChild[]
+}
 /**
  * A single implicit PostgreSQL transaction. Every write depends on the locked,
- * eligible parent/job and, for legacy submissions only, a reserved permit; no JS callback runs while the
- * shared budget row is held. SQL failure rolls back the entire statement.
+ * eligible parent/job, verified child scale bindings, and, for legacy
+ * submissions only, a reserved permit; no JS callback runs while the shared
+ * budget row is held. SQL failure rolls back the entire statement.
  * Delivery has already persisted the WAITING job and verified manifest.
  */
 export const registerWholeReceiptAtomic = async (parent: Parent, input: Input) => {
   const detached = detachedWholeReceiptsEnabled()
+  const expectedChildren = input.expectedChildren ?? []
+  const expectedChildrenJson = JSON.stringify(expectedChildren)
   // Answers and their durable task share one commit independently of legacy report permits.
   const reservation = detached ? Prisma.sql`SELECT NULL::integer AS "pending" FROM eligible LIMIT 1`
     : Prisma.sql`UPDATE "composite_report_queue_budget" SET "pending" = "pending" + 1
@@ -31,18 +44,30 @@ export const registerWholeReceiptAtomic = async (parent: Parent, input: Input) =
         AND job."slot_set_hash" = ${parent.frozenActiveSlotSetHash}
         AND job."context_hash" IS NOT DISTINCT FROM ${parent.contextSnapshotHash}
       FOR UPDATE
+    ), validation_ok AS MATERIALIZED (
+      SELECT job."id" FROM job_locked AS job
+      WHERE job."whole_submission_id" IS NULL AND job."status" = 'WAITING' AND NOT job."budget_held"
+        AND (${input.validationHash ?? null}::text IS NULL OR job."whole_validation_hash" = ${input.validationHash ?? null})
     ), parent_locked AS MATERIALIZED (
-      SELECT p."id" FROM "composite_assessment_attempts" AS p, job_locked AS job
+      SELECT p."id" FROM "composite_assessment_attempts" AS p, validation_ok
       WHERE p."id" = ${parent.id} AND p."status" = 'IN_PROGRESS'
         AND p."attempt_epoch" = ${parent.attemptEpoch}
         AND p."frozen_active_slot_set_hash" = ${parent.frozenActiveSlotSetHash}
         AND p."context_snapshot_hash" IS NOT DISTINCT FROM ${parent.contextSnapshotHash}
-        AND job."whole_submission_id" IS NULL AND job."status" = 'WAITING' AND NOT job."budget_held"
       FOR UPDATE OF p
+    ), children_verified AS MATERIALIZED (
+      SELECT parent_locked."id" FROM parent_locked
+      WHERE ${expectedChildren.length === 0}
+        OR (
+          SELECT count(DISTINCT a."id")::int
+          FROM "assessments" AS a
+          JOIN jsonb_to_recordset(${expectedChildrenJson}::jsonb) AS expected("assessmentId" text, "itemId" text)
+            ON a."id" = expected."assessmentId" AND a."composite_item_id" = expected."itemId"
+          WHERE a."composite_attempt_id" = ${parent.id} AND a."attempt_epoch" = ${parent.attemptEpoch}
+        ) = ${expectedChildren.length}
     ), eligible AS MATERIALIZED (
-      SELECT job."id" FROM job_locked AS job, parent_locked
-      WHERE (${input.validationHash ?? null}::text IS NULL OR job."whole_validation_hash" = ${input.validationHash ?? null})
-        AND NOT EXISTS (
+      SELECT validation_ok."id" FROM validation_ok, children_verified
+      WHERE NOT EXISTS (
           SELECT 1 FROM "assessment_unit_snapshots" AS s
           WHERE s."composite_attempt_id" = ${parent.id} AND s."attempt_epoch" = ${parent.attemptEpoch}
             AND (${Boolean(input.rejectPriorUnitSnapshots)} OR s."unit_type" <> 'FORM_SECTION')
@@ -72,7 +97,9 @@ export const registerWholeReceiptAtomic = async (parent: Parent, input: Input) =
     SELECT CASE
       WHEN job."whole_submission_id" IS NOT NULL THEN 'REPLAY'
       WHEN job."status" <> 'WAITING' OR job."budget_held" THEN 'BUSY'
+      WHEN NOT EXISTS (SELECT 1 FROM validation_ok) THEN 'VALIDATION_CONFLICT'
       WHEN NOT EXISTS (SELECT 1 FROM parent_locked) THEN 'STALE'
+      WHEN NOT EXISTS (SELECT 1 FROM children_verified) THEN 'CHILDREN_MISMATCH'
       WHEN NOT EXISTS (SELECT 1 FROM eligible) THEN 'INCOMPLETE'
       WHEN NOT EXISTS (SELECT 1 FROM reserved) THEN 'FULL'
       WHEN NOT EXISTS (SELECT 1 FROM receipt_saved) THEN 'INVARIANT'
@@ -95,7 +122,13 @@ export const registerWholeReceiptAtomic = async (parent: Parent, input: Input) =
     return { acceptedAt: row.acceptedAt!, replayed: true }
   }
   if (row.outcome === 'FULL' || row.outcome === 'BUSY') throw new QuestionnaireCompletionAdmissionBusyError('queue_full', 2)
-  if (row.outcome === 'INCOMPLETE') throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '必要背景信息或整卷交付状态不完整', 409)
+  if (row.outcome === 'VALIDATION_CONFLICT') throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '整卷交付校验已变化', 409)
+  if (row.outcome === 'CHILDREN_MISMATCH') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '整卷工具来源已变化', 409)
+  if (row.outcome === 'INCOMPLETE') {
+    throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', input.rejectPriorUnitSnapshots
+      ? '已分步提交的作答不能改为整份交卷'
+      : '必要背景信息或整卷交付状态不完整', 409)
+  }
   if (row.outcome !== 'ACCEPTED' || !row.acceptedAt || (!detached && !row.queueDepth)) throw new Error('Atomic whole receipt invariant violated')
   markAssessmentTimeline('whole.commit_confirmed')
   return { acceptedAt: row.acceptedAt, replayed: false, ...(row.queueDepth === null ? {} : { queueDepth: row.queueDepth }) }
