@@ -6,7 +6,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
 import { lockAndAssertCampusActivityEditor, CampusActivityError } from './activity.service'
-import { listAssignedRunTasks, type RunTaskCursor } from '../assessment-run/productRead'
+import { listAssignedRunTasks, listSchoolStudentRunTasks, type RunTaskCursor } from '../assessment-run/productRead'
 
 const deny=(code:string,status=409):never=>{throw new CampusActivityError(code,status)}
 export type CampusTaskType='ASSIGNMENT'|'READING'|'CHECKIN'
@@ -112,7 +112,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
       JOIN "assessment_runs" r ON r."id"=ar."run_id" AND r."status" IN ('PUBLISHED','CLOSED')
       WHERE ar."course_id" = ANY(${ids}::text[])
     `
-    const assigned = await listAssignedRunTasks(actor.userId, {
+    const assigned = await listSchoolStudentRunTasks(actor.userId, {
       organizationIds: [...new Set(activityRows.map(a => a.organizationId))],
       runIds: linkedRuns.map(link => link.runId),
       preserveBoundSchoolContinuation: true,

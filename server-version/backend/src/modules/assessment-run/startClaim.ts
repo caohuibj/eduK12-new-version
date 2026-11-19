@@ -371,9 +371,9 @@ export const markRunStartUnknown = async (input: {
 
 export const markRunStartClaimCompleted = async (
   tx: Tx,
-  input: { claimId: string; generation: number },
+  input: { claimId: string; generation: number; now?: Date },
 ): Promise<void> => {
-  const now = await dbNow(tx)
+  const now = input.now ?? await dbNow(tx)
   const changed = await tx.$executeRaw`
     UPDATE "assessment_run_execution_start_claims"
     SET "state" = 'COMPLETED', "completed_at" = ${now}, "unknown_at" = NULL, "updated_at" = ${now}

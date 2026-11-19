@@ -158,6 +158,7 @@ const attachBindingInTransaction = async (tx: Tx, input: {
   claim: RunStartClaimRecord
   binding: RunRuntimeBinding
   alreadyLocked?: boolean
+  now?: Date
 }): Promise<void> => {
   if (!input.alreadyLocked) {
     await lockExecutionEnvelope(tx, input.executionId, {
@@ -189,8 +190,7 @@ const attachBindingInTransaction = async (tx: Tx, input: {
   if (!execution.relationalAssignmentId) {
     throw new RunStartExecutionError('RUN_ASSIGNMENT_MISSING', 'Run execution has no relational assignment', 409)
   }
-  const nowRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`
-  const now = nowRows[0].now
+  const now = input.now ?? (await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`)[0].now
   const changed = await tx.$executeRaw`
     UPDATE "assessment_run_executions"
     SET "runtime_binding_kind" = ${input.binding.runtimeBindingKind},
@@ -204,7 +204,7 @@ const attachBindingInTransaction = async (tx: Tx, input: {
     SET "status" = 'STARTED', "started_at" = COALESCE("started_at", ${now}), "updated_at" = ${now}
     WHERE "id" = ${execution.relationalAssignmentId} AND "status" = 'OPEN' AND "policy_domain" = 'ORGANIZATION_RUN'
   `
-  await markRunStartClaimCompleted(tx, { claimId: input.claim.id, generation: input.claim.claimGeneration })
+  await markRunStartClaimCompleted(tx, { claimId: input.claim.id, generation: input.claim.claimGeneration, now })
 }
 
 /** The runtime dispatch transaction rolled back with a known-safe outcome:
@@ -317,8 +317,8 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
     if (admission.assignment.status !== 'STARTED') {
       throw new RunStartExecutionError('RUN_START_OUTCOME_UNKNOWN', 'runtime attempt exists without a STARTED Run assignment', 409)
     }
-    const nowRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`
-    const now = nowRows[0].now
+    const now = input.inlineContext?.now
+      ?? (await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`)[0].now
     await tx.$executeRaw`
       UPDATE "assessment_run_execution_start_claims"
       SET "state" = 'DISPATCHED', "dispatched_at" = COALESCE("dispatched_at", ${now}), "updated_at" = ${now}
@@ -329,6 +329,7 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
       claim: input.decision.claim,
       binding: { runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: existing.id },
       alreadyLocked: inline,
+      now,
     })
     return { state: 'STARTED' as const, runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: existing.id, replayed: true }
   }
@@ -433,7 +434,7 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
     WHERE "id" = ${input.executionId} AND "runtime_binding_ref" IS NULL
   `
   if (Number(changed) !== 1) throw new RunStartExecutionError('RUN_RUNTIME_BIND_CONFLICT', 'runtime binding changed concurrently', 409)
-  await markRunStartClaimCompleted(tx, { claimId: input.decision.claim.id, generation: input.decision.claim.claimGeneration })
+  await markRunStartClaimCompleted(tx, { claimId: input.decision.claim.id, generation: input.decision.claim.claimGeneration, now })
   await assertTrainingPrivateReferenceAdmissionCurrent(tx)
   if(libraryUses)await assertEducationLibraryUses(tx,libraryUses.context,libraryUses.entryIds,{locked:libraryUses.uses,requireLocked:true})
   const result: RunStartExecutionResult = {
