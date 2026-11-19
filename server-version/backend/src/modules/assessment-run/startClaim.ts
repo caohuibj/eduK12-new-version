@@ -110,15 +110,34 @@ export const lockExecutionEnvelope = async (
   await tx.$queryRaw`
     SELECT "id" FROM "organizations" WHERE "id" = ${identity.organizationId} FOR SHARE
   `
-  await tx.$queryRaw`
-    SELECT "id" FROM "assessment_runs"
-    WHERE "organization_id" = ${identity.organizationId} AND "id" = ${identity.runId}
-    FOR SHARE
-  `
+  const needLinkFlags = identity.hasCampusActivity === undefined || identity.hasHuiteacherLink === undefined
+  const runRows = needLinkFlags
+    ? await tx.$queryRaw<Array<{ id: string; hasCampusActivity?: boolean; hasHuiteacherLink?: boolean }>>`
+        SELECT r."id",
+          EXISTS (
+            SELECT 1 FROM "campus_activity_runs" ar
+            WHERE ar."organization_id" = r."organization_id" AND ar."run_id" = r."id"
+          ) AS "hasCampusActivity",
+          EXISTS (
+            SELECT 1 FROM "huiteacher_evaluation_run_links" link
+            WHERE link."organization_id" = r."organization_id" AND link."run_id" = r."id"
+          ) AS "hasHuiteacherLink"
+        FROM "assessment_runs" r
+        WHERE r."organization_id" = ${identity.organizationId} AND r."id" = ${identity.runId}
+        FOR SHARE OF r
+      `
+    : await tx.$queryRaw<Array<{ id: string }>>`
+        SELECT "id" FROM "assessment_runs"
+        WHERE "organization_id" = ${identity.organizationId} AND "id" = ${identity.runId}
+        FOR SHARE
+      `
+  const runRow = runRows[0] as { id: string; hasCampusActivity?: boolean; hasHuiteacherLink?: boolean } | undefined
+  const hasCampusActivity = identity.hasCampusActivity ?? runRow?.hasCampusActivity
+  const hasHuiteacherLink = identity.hasHuiteacherLink ?? runRow?.hasHuiteacherLink
   // SCHOOL Activity pause/closure must serialize with START admission. This
   // SHARE lock conflicts with Activity's FOR UPDATE transition lock; current
   // population is rechecked under these fences after any wait.
-  if (identity.hasCampusActivity !== false) {
+  if (hasCampusActivity !== false) {
     await tx.$queryRaw`
       SELECT a."course_id" FROM "campus_activity_runs" ar
       JOIN "campus_activities" a ON a."course_id"=ar."course_id"
@@ -130,7 +149,7 @@ export const lockExecutionEnvelope = async (
   }
   // Teacher event/policy suspension must serialize with an admitted START
   // under the same Organization/Run/Execution lock order.
-  if (identity.hasHuiteacherLink !== false) {
+  if (hasHuiteacherLink !== false) {
     await tx.$queryRaw`
       SELECT event."id" FROM "huiteacher_evaluation_run_links" link
       JOIN "huiteacher_evaluation_events" event
@@ -179,8 +198,8 @@ export const lockExecutionEnvelope = async (
   }
   return {
     ...rows[0],
-    ...(identity.hasCampusActivity !== undefined ? { hasCampusActivity: identity.hasCampusActivity } : {}),
-    ...(identity.hasHuiteacherLink !== undefined ? { hasHuiteacherLink: identity.hasHuiteacherLink } : {}),
+    ...(hasCampusActivity !== undefined ? { hasCampusActivity } : {}),
+    ...(hasHuiteacherLink !== undefined ? { hasHuiteacherLink } : {}),
   }
 }
 

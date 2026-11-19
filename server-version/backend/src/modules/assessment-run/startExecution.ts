@@ -778,8 +778,6 @@ export const startAssessmentRunExecution = async (input: {
           ? {
               organizationId: input.startPreflight.organizationId,
               runId: input.startPreflight.runId,
-              ...(typeof input.startPreflight.hasCampusActivity === 'boolean' ? { hasCampusActivity: input.startPreflight.hasCampusActivity } : {}),
-              ...(typeof input.startPreflight.hasHuiteacherLink === 'boolean' ? { hasHuiteacherLink: input.startPreflight.hasHuiteacherLink } : {}),
             }
           : undefined
         const decision = await classifyStartTransaction(() =>

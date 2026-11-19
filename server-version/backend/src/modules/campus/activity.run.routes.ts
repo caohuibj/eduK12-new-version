@@ -144,20 +144,12 @@ async function currentSchoolExecution(req:import('express').Request,res:import('
       preloadCompositeId:string|null
       organizationId:string
       runId:string
-      hasCampusActivity:boolean
-      hasHuiteacherLink:boolean
     }>>`
       SELECT e."runtime_binding_kind" AS "runtimeBindingKind",
         e."runtime_binding_ref" AS "runtimeBindingRef",
         respondent."user_id" AS "respondentUserId",
         e."organization_id" AS "organizationId",
         e."run_id" AS "runId",
-        TRUE AS "hasCampusActivity",
-        EXISTS (
-          SELECT 1 FROM "huiteacher_evaluation_run_links" link
-          WHERE link."organization_id" = e."organization_id"
-            AND link."run_id" = e."run_id"
-        ) AS "hasHuiteacherLink",
         CASE WHEN t."frozen_resource_policy" #>> '{runtimeLaunchTarget,kind}' = 'COMPOSITE'
           AND t."resource_key" NOT LIKE 'education-composition:%'
           AND EXISTS (SELECT 1 FROM "composite_assessments" candidate

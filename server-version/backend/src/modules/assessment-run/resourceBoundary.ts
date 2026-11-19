@@ -16,8 +16,6 @@ export type RunStartPreflight = {
   preloadCompositeId?: string | null
   organizationId?: string
   runId?: string
-  hasCampusActivity?: boolean
-  hasHuiteacherLink?: boolean
 }
 
 /** One existing School parent read also supplies the bound replay hint.

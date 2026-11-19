@@ -32,13 +32,13 @@ const fail=():never=>{throw new TeacherAssessmentRuntimeError()}
 export type TeacherAssessmentTask={
  executionId:string;organizationId:string;runId:string;eventId:string;eventTitle:string;title:string;
  family:'COGNITIVE'|'SITUATIONAL'|'BUNDLE';status:'ASSIGNED'|'STARTED'|'COMPLETED';runStatus:string;
- runtimeBindingRef:string|null;preloadCompositeId?:string|null;hasCampusActivity?:boolean;hasHuiteacherLink?:boolean;consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
+ runtimeBindingRef:string|null;consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
  mode:'COMPOSITION'|'PACKAGE_REFERENCE'|'TOOL'
  teacherName?:string
 }
 type Row=Omit<TeacherAssessmentTask,'title'|'mode'>&{
  resourceKey:string;resourceVersion:string;policy:RunResourcePolicy;policyHash:string;
- assignmentId:string;episodeId:string;bindingKind:string|null;cursorCreatedAt:string;
+ assignmentId:string;episodeId:string;bindingKind:string|null;preloadCompositeId?:string|null;cursorCreatedAt:string;
  attemptEpoch:number|null;frozenSlotSet:string|null;frozenSlotSetHash:string|null
 }
 const uuid=z.string().guid()
@@ -61,14 +61,12 @@ export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId
  return withBoundedPlannerRead(db, client => client.$queryRaw<Row[]>(Prisma.sql`
  SELECT e.id AS "executionId",e.organization_id AS "organizationId",e.run_id AS "runId",event.id AS "eventId",
   event.title AS "eventTitle",${student?Prisma.sql`student_target.name`:Prisma.sql`NULL::text`} AS "teacherName",t.resource_family AS family,e.status,r.status AS "runStatus",e.runtime_binding_ref AS "runtimeBindingRef",
-  EXISTS (SELECT 1 FROM campus_activity_runs car WHERE car.organization_id = e.organization_id AND car.run_id = e.run_id) AS "hasCampusActivity",
-  TRUE AS "hasHuiteacherLink",
-  CASE WHEN t.frozen_resource_policy #>> '{runtimeLaunchTarget,kind}' = 'COMPOSITE'
+  ${input.executionId?Prisma.sql`CASE WHEN t.frozen_resource_policy #>> '{runtimeLaunchTarget,kind}' = 'COMPOSITE'
     AND t.resource_key NOT LIKE 'education-composition:%'
     AND EXISTS (SELECT 1 FROM composite_assessments candidate
       WHERE candidate.id = t.frozen_resource_policy #>> '{runtimeLaunchTarget,ref}'
         AND candidate.training_content_snapshot_hash IS NOT NULL)
-    THEN t.frozen_resource_policy #>> '{runtimeLaunchTarget,ref}' ELSE NULL END AS "preloadCompositeId",
+    THEN t.frozen_resource_policy #>> '{runtimeLaunchTarget,ref}' ELSE NULL END AS "preloadCompositeId",`:Prisma.empty}
   t.resource_key AS "resourceKey",t.resource_version AS "resourceVersion",t.frozen_resource_policy AS policy,t.resource_policy_hash AS "policyHash",
   a.id AS "assignmentId",a.episode_id AS "episodeId",e.runtime_binding_kind AS "bindingKind",
   parent.attempt_epoch AS "attemptEpoch",parent.frozen_active_slot_set_encrypted AS "frozenSlotSet",parent.frozen_active_slot_set_hash AS "frozenSlotSetHash",
@@ -141,12 +139,20 @@ export async function assertPersistedTeacherRunBinding(db:TeacherRuntimeDb,actor
  if(rows.length!==1)fail()
 }
 function taskDto(row:Row,title:string):TeacherAssessmentTask{
- const {executionId,organizationId,runId,eventId,eventTitle,family,status,runStatus,runtimeBindingRef,preloadCompositeId,hasCampusActivity,hasHuiteacherLink,consentRequired,consentPurpose,consentVisibility}=row
+ const {executionId,organizationId,runId,eventId,eventTitle,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility}=row
  return {executionId,organizationId,runId,eventId,eventTitle,title,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility,
-  ...(typeof preloadCompositeId==='string'?{preloadCompositeId}:{}),
-  ...(typeof hasCampusActivity==='boolean'?{hasCampusActivity}:{}),
-  ...(typeof hasHuiteacherLink==='boolean'?{hasHuiteacherLink}:{}),
   ...(row.teacherName?{teacherName:row.teacherName}:{}),mode:row.resourceKey.startsWith('education-composition:')?'COMPOSITION':family==='BUNDLE'?'PACKAGE_REFERENCE':'TOOL'}
+}
+function startPreflightForRow(row:Row,actorUserId:string){
+ if(!Object.prototype.hasOwnProperty.call(row,'preloadCompositeId'))return undefined
+ return {
+  runtimeBindingKind:null,
+  runtimeBindingRef:null,
+  respondentUserId:actorUserId,
+  organizationId:row.organizationId,
+  runId:row.runId,
+  ...(typeof row.preloadCompositeId==='string'?{preloadCompositeId:row.preloadCompositeId}:{}),
+ }
 }
 export function createTeacherAssessmentAccess<Identity extends TeacherSourceIdentity>(db:TeacherRuntimeDb,source:TeacherAssessmentSourceAccess<Identity>,audience:TeacherAssessmentAudience='TEACHER_SELF'){
  const authorize=async(row:Row,actorUserId:string)=>{
@@ -157,6 +163,7 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
    if(identity.origin.entry!=='TEACHER'||identity.origin.variantKey!==(audience==='STUDENT_EVALUATION'?'TEACHER:STUDENT_REPORT':'TEACHER:SELF'))fail()
    if(row.status!=='COMPLETED')await assertCompositionCollection(db,identity,row.status==='ASSIGNED'?'NEW_START':'BOUND_COLLECTION')
    return {task:taskDto(row,identity.title),identity,row,runtimeCompositeId:identity.compositeId,
+    startPreflight:startPreflightForRow(row,actorUserId),
     units:identity.units.map(unit=>({itemId:unit.itemId,family:unit.family}))}
   }
   if(audience==='STUDENT_EVALUATION')fail()
@@ -173,7 +180,7 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
    ||(a.analysisMode!=='INDIVIDUAL_ONLY'||a.minimumRespondents!==null)&&!isSelfGroupV2Entry(entry))fail()
   const purpose:TeacherRuntimePurpose=row.status==='ASSIGNED'?'START':row.status==='COMPLETED'?'HISTORY_READ':'BOUND_COLLECTION'
   await source.assertUse(db,{identity,executionId:row.executionId,actorUserId,purpose})
-  return {task:taskDto(row,entry.title),identity,row,runtimeCompositeId:origin.runtimeCompositeId,units:origin.units}
+  return {task:taskDto(row,entry.title),identity,row,runtimeCompositeId:origin.runtimeCompositeId,units:origin.units,startPreflight:startPreflightForRow(row,actorUserId)}
  }
  const own=async(actorUserId:string,input:{executionId?:string;attemptId?:string})=>{
   if(!input.executionId&&!input.attemptId)fail()

@@ -388,8 +388,8 @@ describe('Teacher assessment runtime synthetic HTTP boundary',()=>{
    await expect(access.page(actor)).rejects.toBe(failure)
   }
  })
- it('forwards Teacher startPreflight preloadCompositeId and lock identity when projected by SQL',async()=>{
-  row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null,preloadCompositeId:origin.runtimeCompositeId,hasCampusActivity:false,hasHuiteacherLink:true}
+ it('forwards Teacher startPreflight preloadCompositeId and lock identity when projected by own()',async()=>{
+  row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null,preloadCompositeId:origin.runtimeCompositeId}
   mocks.start.mockImplementation(async()=>{row={...baseline};return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:false}})
   expect((await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{})).status).toBe(200)
   expect(mocks.start).toHaveBeenCalledWith({
@@ -398,9 +398,15 @@ describe('Teacher assessment runtime synthetic HTTP boundary',()=>{
     runtimeBindingKind:null,runtimeBindingRef:null,respondentUserId:actor,
     preloadCompositeId:origin.runtimeCompositeId,
     organizationId:baseline.organizationId,runId:baseline.runId,
-    hasCampusActivity:false,hasHuiteacherLink:true,
    },
   })
+ })
+ it('does not query or expose preloadCompositeId on generic Teacher task pagination',async()=>{
+  const db={$queryRaw:vi.fn().mockResolvedValue([{...baseline}])}
+  const page=await createTeacherAssessmentAccess(db as never,source).page(actor,{pageSize:1})
+  const sql=db.$queryRaw.mock.calls[0][0].sql as string
+  expect(sql).not.toContain('preloadCompositeId')
+  expect(page.list[0]).not.toHaveProperty('preloadCompositeId')
  })
  it('projects completed children to completion-only responses',()=>{
   expect(projectTeacherCognitiveRuntime({...cognitivePayload,status:'COMPLETED'})).toEqual(expect.objectContaining({status:'COMPLETED',feedbackDeferred:true}))

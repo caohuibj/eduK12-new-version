@@ -203,12 +203,12 @@ describe('Run START claim recovery',()=>{
       executionId:'exec-1',actorUserId:'u1',
       startPreflight:{
         runtimeBindingKind:null,runtimeBindingRef:null,respondentUserId:'u1',
-        organizationId:'org-1',runId:'run-1',hasCampusActivity:true,hasHuiteacherLink:false,
+        organizationId:'org-1',runId:'run-1',
       },
     })
     expect(m.acquire).toHaveBeenCalledWith(expect.objectContaining({
       executionId:'exec-1',actorUserId:'u1',
-      knownIdentity:{organizationId:'org-1',runId:'run-1',hasCampusActivity:true,hasHuiteacherLink:false},
+      knownIdentity:{organizationId:'org-1',runId:'run-1'},
     }))
     m.acquire.mockReset()
     m.acquire.mockResolvedValueOnce({kind:'COMPLETED_INLINE',result:inlineResult})
@@ -216,7 +216,7 @@ describe('Run START claim recovery',()=>{
       executionId:'exec-1',actorUserId:'u1',
       startPreflight:{
         runtimeBindingKind:null,runtimeBindingRef:null,respondentUserId:'other-user',
-        organizationId:'org-1',runId:'run-1',hasCampusActivity:true,hasHuiteacherLink:false,
+        organizationId:'org-1',runId:'run-1',
       },
     })
     expect(m.acquire.mock.calls[0][0].knownIdentity).toBeUndefined()
