@@ -175,6 +175,40 @@ const huiteacherPopulationBranchSql = (purpose: RunAuthorityPurpose): Prisma.Sql
         )
     )`
 
+const campusStudentActorCurrentSql = (
+  alias: 'subject' | 'respondent',
+  purpose: RunAuthorityPurpose,
+): Prisma.Sql => {
+  const membershipId = Prisma.raw(`${alias}.membership_id`)
+  const userId = Prisma.raw(`${alias}.user_id`)
+  const actorRole = Prisma.raw(`${alias}.actor_role`)
+  return Prisma.sql`(${actorRole}<>'STUDENT' OR EXISTS(
+    SELECT 1 FROM campus_activity_runs ar
+    JOIN campus_activities activity ON activity.course_id=ar.course_id
+      AND activity.organization_id=ar.organization_id AND ${purpose === 'REPORT_READ' ? Prisma.sql`(activity.status IN ('OPEN','PAUSED','CLOSED') AND x.status='COMPLETED')` : Prisma.sql`activity.status='OPEN'`}
+    JOIN campus_activity_participants member ON member.course_id=ar.course_id
+      AND member.organization_id=ar.organization_id AND member.status='ACTIVE'
+      AND member.membership_id=${membershipId}
+    JOIN organization_memberships membership ON membership.id=member.membership_id
+      AND membership.organization_id=member.organization_id
+      AND membership.user_id=${userId}
+      AND ${currentWindowSql(Prisma.sql`membership`)}
+    JOIN campus_student_enrollments enrollment ON enrollment.user_id=${userId}
+      AND enrollment.organization_id=member.organization_id AND enrollment.status='APPROVED'
+    JOIN campus_class_admissions admission ON admission.organization_id=enrollment.organization_id
+      AND admission.class_unit_id=enrollment.class_unit_id AND admission.status='APPROVED'
+    JOIN organization_student_class_assignments class_assignment
+      ON class_assignment.organization_id=member.organization_id
+      AND class_assignment.membership_id=member.membership_id
+      AND class_assignment.class_unit_id=enrollment.class_unit_id
+      AND ${currentWindowSql(Prisma.sql`class_assignment`)}
+    JOIN users campus_student ON campus_student.id=${userId}
+      AND campus_student.account_domain='SCHOOL'
+      AND campus_student.is_active=TRUE AND campus_student.is_frozen=FALSE
+    WHERE ar.organization_id=org.id AND ar.run_id=x.run_id
+  ))`
+}
+
 const campusPopulationBranchSql = (purpose: RunAuthorityPurpose): Prisma.Sql => Prisma.sql`NOT EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h
       WHERE h.organization_id=org.id AND h.run_id=x.run_id)
     AND NOT EXISTS(SELECT 1 FROM assessment_run_tracks school_ordinary
@@ -203,46 +237,12 @@ const campusPopulationBranchSql = (purpose: RunAuthorityPurpose): Prisma.Sql => 
         AND activity.organization_id=ar.organization_id
       WHERE ar.organization_id=org.id AND ar.run_id=x.run_id
         AND ${purpose === 'REPORT_READ' ? Prisma.sql`(activity.status IN ('OPEN','PAUSED','CLOSED') AND x.status='COMPLETED')` : Prisma.sql`activity.status='OPEN'`})
-    AND EXISTS(
-      SELECT 1 FROM assessment_run_actor_snapshots student_actor
-      WHERE student_actor.id IN (x.subject_actor_snapshot_id,x.respondent_actor_snapshot_id)
-        AND student_actor.actor_role='STUDENT')
-    AND NOT EXISTS(
-      SELECT 1 FROM assessment_run_actor_snapshots student_actor
-      WHERE student_actor.id IN (x.subject_actor_snapshot_id,x.respondent_actor_snapshot_id)
-        AND student_actor.actor_role='STUDENT'
-        AND NOT EXISTS(
-          SELECT 1 FROM campus_activity_runs ar
-          JOIN campus_activities activity ON activity.course_id=ar.course_id
-            AND activity.organization_id=ar.organization_id AND ${purpose === 'REPORT_READ' ? Prisma.sql`(activity.status IN ('OPEN','PAUSED','CLOSED') AND x.status='COMPLETED')` : Prisma.sql`activity.status='OPEN'`}
-          JOIN campus_activity_participants member ON member.course_id=ar.course_id
-            AND member.organization_id=ar.organization_id AND member.status='ACTIVE'
-            AND member.membership_id=student_actor.membership_id
-          JOIN organization_memberships membership ON membership.id=member.membership_id
-            AND membership.organization_id=member.organization_id
-            AND membership.user_id=student_actor.user_id
-            AND ${currentWindowSql(Prisma.sql`membership`)}
-          JOIN campus_student_enrollments enrollment ON enrollment.user_id=student_actor.user_id
-            AND enrollment.organization_id=member.organization_id AND enrollment.status='APPROVED'
-          JOIN campus_class_admissions admission ON admission.organization_id=enrollment.organization_id
-            AND admission.class_unit_id=enrollment.class_unit_id AND admission.status='APPROVED'
-          JOIN organization_student_class_assignments class_assignment
-            ON class_assignment.organization_id=member.organization_id
-            AND class_assignment.membership_id=member.membership_id
-            AND class_assignment.class_unit_id=enrollment.class_unit_id
-            AND ${currentWindowSql(Prisma.sql`class_assignment`)}
-          JOIN users campus_student ON campus_student.id=student_actor.user_id
-            AND campus_student.account_domain='SCHOOL'
-            AND campus_student.is_active=TRUE AND campus_student.is_frozen=FALSE
-          WHERE ar.organization_id=org.id AND ar.run_id=x.run_id
-        )
-    )
-    AND NOT EXISTS(
-      SELECT 1 FROM assessment_run_actor_snapshots foreign_actor
-      JOIN users actor_user ON actor_user.id=foreign_actor.user_id
-      WHERE foreign_actor.id IN (x.subject_actor_snapshot_id,x.respondent_actor_snapshot_id)
-        AND actor_user.account_domain<>'SCHOOL'
-    )`
+    AND (subject.actor_role='STUDENT' OR respondent.actor_role='STUDENT')
+    AND ${campusStudentActorCurrentSql('subject', purpose)}
+    AND (x.respondent_actor_snapshot_id=x.subject_actor_snapshot_id OR ${campusStudentActorCurrentSql('respondent', purpose)})
+    AND EXISTS(SELECT 1 FROM users actor_user WHERE actor_user.id=subject.user_id AND actor_user.account_domain='SCHOOL')
+    AND (x.respondent_actor_snapshot_id=x.subject_actor_snapshot_id OR respondent.user_id=subject.user_id
+      OR EXISTS(SELECT 1 FROM users actor_user WHERE actor_user.id=respondent.user_id AND actor_user.account_domain='SCHOOL'))`
 
 const domainPopulationAuthoritySql = (
   purpose: RunAuthorityPurpose,
@@ -259,6 +259,18 @@ const domainPopulationAuthoritySql = (
   return Prisma.sql`(org.product_domain<>'SCHOOL' OR (${huiteacherPopulationBranchSql(purpose)} OR (${campusPopulationBranchSql(purpose)})))`
 }
 
+const actorPopulationAuthoritySql = (
+  alias: 'subject' | 'respondent',
+  purpose: RunAuthorityPurpose,
+): Prisma.Sql => currentRunActorAuthoritySql({
+  userId: Prisma.raw(`${alias}.user_id`),
+  organizationId: Prisma.sql`org.id`,
+  provenance: Prisma.raw(`${alias}.provenance_kind`),
+  membershipId: Prisma.raw(`${alias}.membership_id`),
+  personaGrantId: Prisma.raw(`${alias}.snapshot_payload->>'personaGrantId'`),
+  role: Prisma.raw(`${alias}.actor_role`),
+}, purpose)
+
 /** Shared current population gate. Intake deadlines do not remove own history.
  * executionId is a static SQL expression supplied by the caller, never user SQL.
  */
@@ -273,13 +285,8 @@ export const currentRunPopulationAuthoritySql = (
   JOIN assessment_run_actor_snapshots subject ON subject.id=x.subject_actor_snapshot_id
   JOIN assessment_run_actor_snapshots respondent ON respondent.id=x.respondent_actor_snapshot_id
   WHERE x.id=${executionId} AND org.status='ACTIVE'
-   AND NOT EXISTS (
-    SELECT 1 FROM assessment_run_actor_snapshots actor
-    WHERE actor.id IN (x.subject_actor_snapshot_id,x.respondent_actor_snapshot_id)
-      AND NOT (${currentRunActorAuthoritySql({ userId: Prisma.sql`actor.user_id`, organizationId: Prisma.sql`org.id`,
-        provenance: Prisma.sql`actor.provenance_kind`, membershipId: Prisma.sql`actor.membership_id`,
-        personaGrantId: Prisma.sql`actor.snapshot_payload->>'personaGrantId'`, role: Prisma.sql`actor.actor_role` }, purpose)})
-   )
+   AND ${actorPopulationAuthoritySql('subject', purpose)}
+   AND (x.respondent_actor_snapshot_id=x.subject_actor_snapshot_id OR ${actorPopulationAuthoritySql('respondent', purpose)})
    AND ${relationshipAuthoritySql(productScope)}
    AND ${domainPopulationAuthoritySql(purpose, productScope)}
    AND (relation.snapshot_payload->'facts'->>'courseId' IS NULL OR EXISTS (
