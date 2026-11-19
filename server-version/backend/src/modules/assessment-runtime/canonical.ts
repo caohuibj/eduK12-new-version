@@ -116,6 +116,12 @@ const serializeCanonical = (value: unknown, pathStack: Array<string | number>, a
       let out = '['
       for (let i = 0; i < len; i++) {
         if (i > 0) out += ','
+        // Array.map skips absent indices; JSON.stringify of the normalized
+        // array emits null for each hole. Inherited numeric indices still count.
+        if (!(i in obj)) {
+          out += 'null'
+          continue
+        }
         pathStack.push(i)
         out += serializeCanonical(obj[i], pathStack, active)
         pathStack.pop()

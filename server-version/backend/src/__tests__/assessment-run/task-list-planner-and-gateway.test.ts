@@ -240,9 +240,14 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
   })
 
   it('bounds checkCampusCompositeAccessAuthority and standalone readRespondentRunSummary while preserving supplied tx db', async () => {
-    dbMocks.queryRaw.mockResolvedValueOnce([{ id: EXEC_ID }])
+    dbMocks.queryRaw.mockResolvedValueOnce([{
+      executionId: EXEC_ID, orgStatus: 'ACTIVE', orgProductDomain: 'SCHOOL',
+      relationshipKind: 'PARENT_CHILD',
+    }]).mockResolvedValueOnce([{ allowed: true }])
     await expect(checkCampusCompositeAccessAuthority({ attemptId: 'att-1', userId: USER_ID })).resolves.toBe(true)
+    // Non-SELF shapes still use bounded-planner full population validation.
     expect(dbMocks.executeRaw).toHaveBeenCalledTimes(1)
+    expect(dbMocks.queryRaw).toHaveBeenCalledTimes(2)
 
     dbMocks.executeRaw.mockClear()
     dbMocks.queryRaw.mockResolvedValueOnce([])
@@ -258,15 +263,24 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     expect(dbMocks.executeRaw).not.toHaveBeenCalled()
   })
 
-  it('drives listOwnTeacherScaleTasks from actor memberships and deduplicates collection population SQL', async () => {
-    dbMocks.queryRaw.mockResolvedValueOnce([])
+  it('drives listOwnTeacherScaleTasks from live actor memberships into flat population-scoped SQL', async () => {
+    dbMocks.queryRaw.mockResolvedValueOnce([{
+      organizationId: 'school', membershipId: 'teacher-member', personaGrantId: 'teacher-grant',
+      usableForPopulation: true, hasRunStartDeny: false, hasReportReadDeny: false,
+    }]).mockResolvedValueOnce([])
     await listOwnTeacherScaleTasks(USER_ID)
 
-    expect(dbMocks.executeRaw).toHaveBeenCalledTimes(1)
-    const sql = sqlText(dbMocks.queryRaw.mock.calls[0][0])
-    expect(sql.indexOf('FROM "users" current_actor')).toBeLessThan(sql.indexOf('JOIN "assessment_run_executions" e'))
-    // Previously expanded 3 times (2 COLLECTION + 1 REPORT_READ); now 1 COLLECTION via LATERAL + 1 REPORT_READ.
-    expect(sql.match(/SELECT 1 FROM assessment_run_executions x JOIN organizations org/g)).toHaveLength(2)
+    expect(dbMocks.executeRaw).not.toHaveBeenCalled()
+    expect(dbMocks.queryRaw).toHaveBeenCalledTimes(2)
+    const membershipSql = flattenQueryRawCall(dbMocks.queryRaw.mock.calls[0])
+    const taskSql = flattenQueryRawCall(dbMocks.queryRaw.mock.calls[1])
+    expect(membershipSql).toContain('FROM "users" current_actor')
+    expect(membershipSql).toContain('"organization_persona_grants" persona')
+    expect(membershipSql).toContain('organization_access_denies')
+    expect(taskSql).toContain('JOIN "assessment_run_executions" e')
+    expect(taskSql).toContain('"collectionTupleOk"')
+    expect(taskSql).toContain('"reportTupleOk"')
+    expect(taskSql).not.toContain('SELECT 1 FROM assessment_run_executions x JOIN organizations org')
   })
 
   it('maps START resource-gate 503 errors with Retry-After in errorHandler and all Teacher START routes', async () => {
@@ -300,6 +314,8 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
 
     dbMocks.startRunExecution.mockRejectedValue(cpuGateError)
     dbMocks.queryRaw.mockResolvedValue([{
+      allowed: true, orgStatus: 'ACTIVE', orgProductDomain: 'SCHOOL',
+      relationshipKind: 'PARENT_CHILD',
       executionId: EXEC_ID,
       organizationId: 'org-1',
       runId: 'run-1',

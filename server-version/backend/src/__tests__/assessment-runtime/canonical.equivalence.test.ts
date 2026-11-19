@@ -57,7 +57,12 @@ describe('canonicalJsonString streaming serializer equivalence', () => {
     nullProto['b'] = 'bee'
     nullProto['a'] = 'aye'
 
+    const sparse = new Array<unknown>(3)
+    sparse[0] = 1
+    sparse[2] = 3
     const samples: unknown[] = [
+      sparse,
+      new Array<unknown>(2),
       null,
       true,
       false,

@@ -51,6 +51,18 @@ const item='00000000-0000-4000-8000-000000000002'
 const session='00000000-0000-4000-8000-000000000003'
 const prefix=`/composite-attempts/${attempt}/items/${item}/cognitive/${session}`
 const schoolHeaders={'x-school-user':'student-A','x-role':'STUDENT'}
+const authorizedSchoolExecution = {
+  executionId: 'school-execution', organizationId: 'school', runId: 'school-run',
+  trackId: 'cognitive-track', executionStatus: 'STARTED',
+  orgStatus: 'ACTIVE', orgProductDomain: 'SCHOOL',
+  subjectActorSnapshotId: 'student-snapshot', respondentActorSnapshotId: 'student-snapshot',
+  subjectUserId: 'student-A', respondentUserId: 'student-A',
+  subjectRole: 'STUDENT', subjectProvenance: 'ORG_MEMBER',
+  subjectMembershipId: 'student-member', subjectPersonaGrantId: 'student-grant',
+  relationshipKind: 'SELF', relationshipCourseId: null,
+  trackResourceFamily: 'COGNITIVE', trackResourceKey: 'school-cognitive',
+  trackResourceVersion: '1.0.0',
+}
 let origin:string,server:Server
 async function request(path:string,method='GET',body?:unknown,headers:Record<string,string>={}){
   return fetch(origin+'/api/campus'+path,{method,
@@ -76,9 +88,15 @@ describe('SCHOOL frozen Composite Cognitive child / FINAL-only',()=>{
   })
   beforeEach(()=>{
     vi.clearAllMocks()
-    // First authoritative SQL: parent Composite -> current Run/Activity;
-    // second SQL: exact Cognitive child / slot / current student SELF.
-    m.query.mockResolvedValue([{id:'allowed'}])
+    // Exact Run envelope -> live student SELF population -> frozen Cognitive child.
+    m.query.mockImplementation(async (query:any)=>{
+      const sql=typeof query==='string'?query:query?.sql??query?.strings?.join('')??''
+      if(sql.includes('AS "executionId"')&&sql.includes('FROM "assessment_run_executions" e'))
+        return [authorizedSchoolExecution]
+      if(sql.includes('cognitive_sessions child'))return [{id:'allowed'}]
+      if(sql.includes('AS "allowed"'))return [{allowed:true}]
+      return [{id:'allowed'}]
+    })
     m.get.mockResolvedValue({sessionId:session,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',
       definitionHash:'a'.repeat(64),config:{trialCount:10}})
     m.submit.mockResolvedValue({data:{replayed:false,response:{result:{score:900}}},
@@ -94,10 +112,11 @@ describe('SCHOOL frozen Composite Cognitive child / FINAL-only',()=>{
       {'x-role':'PARENT'},
       {'x-role':'TEACHER'},
     ])expect((await request(prefix,'GET',undefined,headers)).status).toBe(404)
-    m.query.mockReset().mockResolvedValueOnce([{id:'parent'}]).mockResolvedValueOnce([])
+    m.query.mockReset().mockResolvedValueOnce([authorizedSchoolExecution])
+      .mockResolvedValueOnce([{allowed:true}]).mockResolvedValueOnce([])
     expect((await request(prefix)).status).toBe(404)
     expect(m.get).not.toHaveBeenCalled()
-    const sql=m.query.mock.calls[1][0].strings.join('')
+    const sql=m.query.mock.calls[2][0].strings.join('')
     for(const requirement of [
       'cognitive_sessions child','composite_assessment_attempts parent',
       'composite_assessment_items slot','assessment_run_executions execution',
