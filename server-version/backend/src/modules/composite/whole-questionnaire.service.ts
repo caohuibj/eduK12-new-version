@@ -150,16 +150,29 @@ const loadParent = async (attemptId: string, principal: Principal, preloaded?: W
 
 type WholeRuleItem = { itemCode: string; required: boolean; values: Array<string | number> }
 type WholeRules = { hash: string; definitionHash: string; items: WholeRuleItem[];
+  itemCodes: readonly string[];
   byItem: Map<string, { required: boolean; values: Set<string> }>; bytes: number }
 const wholeRules = new Map<string, WholeRules>()
 let wholeRulesBytes = 0
 const MAX_WHOLE_RULES = 128, MAX_WHOLE_RULE_BYTES = 8 * 1024 * 1024
+const verifiedWholeValidationHashes = new BoundedArtifactCache<string>(2048, 256 * 1024)
+const wholeValidationCacheKey = (encrypted: string): string => createHash('sha256').update(encrypted).digest('hex')
+const rememberVerifiedWholeValidationHash = (encrypted: string, hash: string): void => {
+  if (encrypted.length >= 48 && /^[a-f0-9]{64}$/.test(hash)) {
+    verifiedWholeValidationHashes.set(wholeValidationCacheKey(encrypted), hash, 160)
+  }
+}
+const readVerifiedWholeValidationHash = (encrypted: string): string | undefined => (
+  encrypted.length >= 48 ? verifiedWholeValidationHashes.get(wholeValidationCacheKey(encrypted)) : undefined
+)
 const compileWholeRules = (definitionHash: string, items: WholeRuleItem[]): WholeRules => {
   const canonical = prepareCanonicalSubmission({ definitionHash, items })
   const known = wholeRules.get(canonical.hash)
   if (known) return known
   const frozenItems = items.map(item => Object.freeze({ ...item, values: Object.freeze([...item.values]) as unknown as Array<string | number> }))
+  const itemCodes = Object.freeze(items.map(item => item.itemCode))
   const plan: WholeRules = { hash: canonical.hash, definitionHash, items: Object.freeze(frozenItems) as unknown as WholeRuleItem[],
+    itemCodes,
     byItem: new Map(items.map(item => [item.itemCode, { required: item.required,
       values: new Set(item.values.map(value => typeof value + ':' + String(value))) }])), bytes: canonical.bytes }
   if (plan.bytes > MAX_WHOLE_RULE_BYTES) return plan
@@ -173,6 +186,7 @@ const compileWholeRules = (definitionHash: string, items: WholeRuleItem[]): Whol
 export const clearWholeValidationRulesForTest = () => {
   if (process.env.NODE_ENV !== 'test') throw new Error('Test-only rule-cache reset')
   wholeRules.clear(); wholeRulesBytes = 0
+  verifiedWholeValidationHashes.clear()
 }
 const rulesFor = (unit: WholeValidationManifest['units'][number]): WholeRules => {
   const plan = unit.rulesHash ? wholeRules.get(unit.rulesHash) : unit.items ? compileWholeRules(unit.definitionHash, unit.items) : undefined
@@ -617,9 +631,11 @@ const deliverWholeQuestionnaire = async (
   }
 
   const validationHash = computeWholeValidationHashFromTemplate(binding, schemaVersion, template, resolvedUnits)
+  const encryptedValidation = await storeSharedWholeValidation(manifest, precomputedPlan)
+  rememberVerifiedWholeValidationHash(encryptedValidation, validationHash)
   await storeWholeQuestionnaireValidation(
     parent,
-    await storeSharedWholeValidation(manifest, precomputedPlan),
+    encryptedValidation,
     validationHash,
   )
 
@@ -900,10 +916,13 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   if (parent.status !== 'IN_PROGRESS' || !prior?.wholeValidationEncrypted || !prior.wholeValidationHash) throw failure('问卷尚未完整交付或已结束')
   await traceAssessmentPhase('whole.storage_admission', admitWholeReceiptStorage)
   const manifest = await traceAssessmentPhase('whole.manifest_decrypt', () => loadSharedWholeValidation<WholeValidationManifest>(prior.wholeValidationEncrypted!))
-  if ((manifest.schemaVersion !== 1 && manifest.schemaVersion !== 2) || prepareCanonicalSubmission(manifest).hash !== prior.wholeValidationHash
+  const cachedManifestHash = readVerifiedWholeValidationHash(prior.wholeValidationEncrypted!)
+  const manifestHash = cachedManifestHash ?? prepareCanonicalSubmission(manifest).hash
+  if ((manifest.schemaVersion !== 1 && manifest.schemaVersion !== 2) || manifestHash !== prior.wholeValidationHash
     || manifest.binding.attemptId !== parent.id || manifest.binding.attemptEpoch !== parent.attemptEpoch
     || manifest.binding.slotSetHash !== parent.frozenActiveSlotSetHash || manifest.binding.contextHash !== parent.contextSnapshotHash
     || manifest.binding.userId !== parent.userId || manifest.binding.recoveryTokenHash !== parent.recoveryTokenHash) throw failure('问卷交付校验与当前作答绑定不匹配')
+  if (!cachedManifestHash) rememberVerifiedWholeValidationHash(prior.wholeValidationEncrypted!, manifestHash)
   if(manifest.units.some(unit=>unit.trainingTiming?.snapshotHash!==timingSnapshotHash))throw failure('计时策略与整卷准入不匹配')
   await traceAssessmentPhase('whole.validation_rules_resolve', () => ensureWholeRules(attemptId, principal, manifest, verifiedParent))
   const prepared = traceAssessmentPhaseSync('whole.integrity_check', () => prepareFromWholeManifest(input, manifest, principal, receivedAtMs))
@@ -1103,7 +1122,9 @@ const prepareFromWholeManifest = (input: WholeQuestionnaireSubmitInput, manifest
       answers.set(answer.itemCode, answer)
     }
     if (plan.items.some(item => item.required && !answers.has(item.itemCode))) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '问卷有必答题未完成', 409)
-    normalizeTrainingScaleTiming(unit.trainingTiming,plan.items.map(item=>item.itemCode),[...answers.keys()],sent.itemTimings)
+    if (unit.trainingTiming || sent.itemTimings !== undefined) {
+      normalizeTrainingScaleTiming(unit.trainingTiming, plan.itemCodes, [...answers.keys()], sent.itemTimings)
+    }
     preparedUnits.push({ ...sent, assessmentId: unit.assessmentId, compositeAttemptId: manifest.binding.attemptId,
       submissionId: childSubmissionId(input.submissionId, unit.itemId), attemptEpoch: input.attemptEpoch,
       contextSnapshotHash: input.contextSnapshotHash, ...principal,

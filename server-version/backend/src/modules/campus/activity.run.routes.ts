@@ -142,10 +142,14 @@ async function currentSchoolExecution(req:import('express').Request,res:import('
       runtimeBindingRef:string|null
       respondentUserId:string
       preloadCompositeId:string|null
+      organizationId:string
+      runId:string
     }>>`
       SELECT e."runtime_binding_kind" AS "runtimeBindingKind",
         e."runtime_binding_ref" AS "runtimeBindingRef",
         respondent."user_id" AS "respondentUserId",
+        e."organization_id" AS "organizationId",
+        e."run_id" AS "runId",
         CASE WHEN t."frozen_resource_policy" #>> '{runtimeLaunchTarget,kind}' = 'COMPOSITE'
           AND t."resource_key" NOT LIKE 'education-composition:%'
           AND EXISTS (SELECT 1 FROM "composite_assessments" candidate

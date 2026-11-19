@@ -902,7 +902,7 @@ export const batchEnsureScaleAdmissionsAtDelivery = async (
   for (const item of children) {
     const stored = await loadStoredScaleAdmission(item.child)
     if (stored) {
-      result.set(item.child.id, await validateStoredAgainstRuntime(item.child, stored, referenceTimeMs))
+      result.set(item.child.id, await validateStoredAgainstRuntime(item.child, stored, referenceTimeMs, undefined, item.runtime))
     } else {
       unstored.push(item)
     }
