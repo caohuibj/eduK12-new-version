@@ -270,6 +270,12 @@ suite('BOUND Run replay governance interleave (real PostgreSQL)', () => {
     // COMPLETED (attachBindingInTransaction calls markRunStartClaimCompleted).
     // A DISPATCHED claim here would mean the completion step did not run.
     expect(claim.state).toBe('COMPLETED')
+    const timestamps = (await db.$queryRaw<Array<{ same: boolean }>>`
+      SELECT e.started_at = c.completed_at AS same
+      FROM assessment_run_executions e
+      JOIN assessment_run_execution_start_claims c ON c.execution_id = e.id
+      WHERE e.id = ${exec.executionId}`)[0]
+    expect(timestamps.same).toBe(true)
     // Second call must take the tx1 BOUND fast path with the same binding.
     const replay = await startAssessmentRunExecution({ executionId: exec.executionId, actorUserId: exec.actorUserId })
     if (replay.state !== 'STARTED') throw new Error(`expected STARTED replay, got ${replay.state}`)

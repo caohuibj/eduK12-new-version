@@ -47,7 +47,7 @@ vi.mock('../../modules/cognitive-analysis', async () => {
 })
 
 import { withBoundedPlannerRead } from '../../modules/assessment-run/plannerBound'
-import { listAssignedRunTasks } from '../../modules/assessment-run/productRead'
+import { listAssignedRunTasks, listSchoolStudentRunTasks } from '../../modules/assessment-run/productRead'
 import { checkCampusCompositeAccessAuthority } from '../../modules/campus/campus-composite-authority'
 import { readRespondentRunSummary } from '../../modules/reporting/respondentSummary'
 import teacherScaleRouter, { listOwnTeacherScaleTasks } from '../../modules/huiteacher/scaleRuntime.routes'
@@ -219,6 +219,21 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     expect(firstSql).toContain('e."id" = ANY(?::text[])')
     // Previously expanded 3 times across SELECT, CASE WHEN, and WHERE; now materialized once via LATERAL.
     expect(firstSql.match(/FROM "assessment_run_executions" bound_execution/g)).toHaveLength(1)
+  })
+
+  it('omits unused subject and claim joins only from School student task reads', async () => {
+    dbMocks.queryRaw.mockResolvedValue([])
+    const options = { organizationIds: ['org-school-1'], runIds: ['run-1'],
+      preserveBoundSchoolContinuation: true, populationProductScope: 'CAMPUS_ONLY' as const }
+    await listSchoolStudentRunTasks(USER_ID, options)
+    await listAssignedRunTasks(USER_ID, options)
+    const studentSql = flattenQueryRawCall(dbMocks.queryRaw.mock.calls[0])
+    const generalSql = flattenQueryRawCall(dbMocks.queryRaw.mock.calls[1])
+    expect(studentSql).not.toContain('JOIN "users" subject_user')
+    expect(studentSql).not.toContain('LEFT JOIN "assessment_run_execution_start_claims" c')
+    expect(generalSql).toContain('JOIN "users" subject_user')
+    expect(generalSql).toContain('LEFT JOIN "assessment_run_execution_start_claims" c')
+    expect(studentSql).toContain('assessment_run_relationship_snapshots')
   })
 
   it('bounds checkCampusCompositeAccessAuthority and standalone readRespondentRunSummary while preserving supplied tx db', async () => {

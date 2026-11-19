@@ -17,7 +17,7 @@ import { listCampusTeacherRunTasks } from '../../modules/campus/teacher-tasks'
 import { addAssessmentRunTrackDraft } from '../../modules/assessment-run/repository'
 import { publishAssessmentRun } from '../../modules/assessment-run/publish'
 import { closeAssessmentRun } from '../../modules/assessment-run/lifecycle'
-import { listAssignedRunTasks } from '../../modules/assessment-run/productRead'
+import { listAssignedRunTasks, listSchoolStudentRunTasks } from '../../modules/assessment-run/productRead'
 import { boundCompositeContinuationSql } from '../../modules/assessment-run/boundCompositeContinuation'
 import { createSqlRelationalAssignmentRepository } from '../../modules/assessment-relational/repository'
 import { relationalRuntimeConsentAuthority } from '../../modules/assessment-relational/runtime-consent'
@@ -261,6 +261,20 @@ suite('School bound continuation directory (real PostgreSQL, synthetic persisted
     const scoped = await listAssignedRunTasks(f.student.userId, {
       runIds: f.runIds, preserveBoundSchoolContinuation: true,
     })
+    const studentOptions = { runIds: f.runIds, organizationIds: [f.organizationId],
+      preserveBoundSchoolContinuation: true, populationProductScope: 'CAMPUS_ONLY' as const }
+    const fullStudentTasks = await listAssignedRunTasks(f.student.userId, studentOptions)
+    const narrowStudentTasks = await listSchoolStudentRunTasks(f.student.userId, studentOptions)
+    expect(narrowStudentTasks.truncated).toBe(fullStudentTasks.truncated)
+    expect(narrowStudentTasks.nextCursor).toEqual(fullStudentTasks.nextCursor)
+    expect(narrowStudentTasks.list).toEqual(fullStudentTasks.list.map(task => ({
+      executionId: task.executionId, organizationId: task.organizationId, runId: task.runId,
+      runName: task.runName, deadline: task.deadline, status: task.status,
+      resourceFamily: task.resourceFamily, resourceKey: task.resourceKey,
+      consentRequired: task.consentRequired, consentPurpose: task.consentPurpose,
+      consentVisibility: task.consentVisibility,
+      ...(task.canResumeExisting ? { canResumeExisting: true } : {}),
+    })))
     expect(defaultTasks.list.find(task => task.executionId === id('revoked'))?.status).toBe('REVOKED')
     expect(defaultTasks.list.find(task => task.executionId === id('expired'))?.status).toBe('EXPIRED')
     for (const key of ['wrongtarget', 'wrongassignment', 'revoked', 'expired']) {

@@ -222,7 +222,7 @@ export function decodeRunTaskCursor(value: unknown): RunTaskCursor | undefined {
 }
 
 /** Exact respondent tasks with their assigned subject; no peer respondents, answers or scores. */
-export async function listAssignedRunTasks(userId: string, options?: {
+type AssignedRunTaskOptions = {
   organizationIds?: string[]
   runIds?: string[]
   /** DB-side allowlist: only these executions are returned. The teacher task
@@ -241,7 +241,32 @@ export async function listAssignedRunTasks(userId: string, options?: {
   populationProductScope?: RunPopulationProductScope
   /** Optional already-bounded read client to avoid opening a second transaction. */
   db?: Pick<PlannerBoundReadDb, '$queryRaw'>
-}) {
+}
+
+type StudentRunTaskRow = {
+  __boundSchoolContinuation: boolean; createdAtMicros: string;
+  executionId: string; organizationId: string; runId: string; runName: string;
+  deadline: Date | null; status: string; resourceFamily: string; resourceKey: string;
+  consentRequired: boolean; consentPurpose: string | null; consentVisibility: string | null;
+}
+type GeneralRunTaskDetails = {
+  subjectUserId: string; subjectRole: string; subjectName: string; respondentRole: string;
+  relationship: string; perspective: string; runStatus: string; claimState: string | null;
+  resourceVersion: string; governedReport: boolean; reportAttemptId: string | null;
+}
+
+export async function listAssignedRunTasks(userId: string, options?: AssignedRunTaskOptions) {
+  return readAssignedRunTasks(userId, options, false)
+}
+
+/** Student activity lists need no subject names, claim state or report metadata.
+ * Execution -> subject and subject -> user are non-null foreign keys, so their
+ * output-only joins do not filter rows. Live authority is still checked below. */
+export async function listSchoolStudentRunTasks(userId: string, options: AssignedRunTaskOptions) {
+  return readAssignedRunTasks(userId, options, true)
+}
+
+async function readAssignedRunTasks<Student extends boolean>(userId: string, options: AssignedRunTaskOptions | undefined, student: Student) {
   if(options?.organizationIds && options.organizationIds.length===0) return { list:[], truncated:false, nextCursor:null as RunTaskCursor | null }
   if(options?.runIds && options.runIds.length===0) return { list:[], truncated:false, nextCursor:null as RunTaskCursor | null }
   if(options?.executionIds && options.executionIds.length===0) return { list:[], truncated:false, nextCursor:null as RunTaskCursor | null }
@@ -296,34 +321,29 @@ export async function listAssignedRunTasks(userId: string, options?: {
   const completedSchoolFeedback=options?.includeCompletedSchoolFeedback
     ? completedSchoolOrdinaryFeedbackSql(Prisma.sql`e."id"`,userId)
     : Prisma.sql`FALSE`
-  const runQuery = (client: Pick<PlannerBoundReadDb, '$queryRaw'>) => client.$queryRaw<Array<{
-    __boundSchoolContinuation: boolean; createdAtMicros: string;
-    executionId: string; organizationId: string; runId: string; runName: string;
-    subjectUserId: string; subjectRole: string; subjectName: string; respondentRole: string; relationship: string; perspective: string; deadline: Date | null;
-    runStatus: string; status: string; claimState: string | null;
-    resourceFamily: string; resourceKey: string; resourceVersion: string;
-    governedReport: boolean; reportAttemptId: string | null; consentRequired: boolean; consentPurpose: string | null; consentVisibility: string | null;
-  }>>`
+  const runQuery = (client: Pick<PlannerBoundReadDb, '$queryRaw'>) => client.$queryRaw<Array<StudentRunTaskRow & (Student extends true ? object : GeneralRunTaskDetails)>>`
     SELECT school_cont."boundContinuation" AS "__boundSchoolContinuation",
       to_char(e."created_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros",
       e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",
-      r."name" AS "runName", r."status" AS "runStatus", r."intake_deadline" AS "deadline",
+      r."name" AS "runName", r."intake_deadline" AS "deadline",
+      ${student ? Prisma.empty : Prisma.sql`
+      r."status" AS "runStatus",
       subject."user_id" AS "subjectUserId", subject."actor_role" AS "subjectRole", subject_user."username" AS "subjectName", respondent."actor_role" AS "respondentRole",
       a."relationship_kind" AS "relationship", a."perspective" AS "perspective",
-      (t."frozen_resource_policy" ? 'resultDisclosure') AS "governedReport",
+      (t."frozen_resource_policy" ? 'resultDisclosure') AS "governedReport",`}
       CASE WHEN ca."status" = 'COMPLETED' THEN 'COMPLETED'
         WHEN r."status" = 'CANCELLED' THEN 'CANCELLED'
         WHEN e."status" IN ('REVOKED', 'EXPIRED', 'CANCELLED', 'COMPLETED') THEN e."status"
         WHEN school_cont."boundContinuation" AND r."status" IN ('PUBLISHED','CLOSED') THEN 'STARTED'
         WHEN r."status" = 'CLOSED' OR r."intake_deadline" <= statement_timestamp() THEN 'EXPIRED'
         ELSE e."status" END AS "status",
-      c."state" AS "claimState", t."resource_family" AS "resourceFamily",
-      t."resource_key" AS "resourceKey", t."resource_version" AS "resourceVersion",
+      t."resource_family" AS "resourceFamily", t."resource_key" AS "resourceKey",
       (a."consent_id" IS NOT NULL) AS "consentRequired",
-      consent."purpose" AS "consentPurpose", consent."visibility_scope" AS "consentVisibility",
+      consent."purpose" AS "consentPurpose", consent."visibility_scope" AS "consentVisibility"
+      ${student ? Prisma.empty : Prisma.sql`, c."state" AS "claimState", t."resource_version" AS "resourceVersion",
       CASE WHEN ca."status" = 'COMPLETED' AND a."analysis_mode" = 'INDIVIDUAL_ONLY'
         AND a."perspective" <> 'RELATIONAL_EXPERIENCE' AND NOT (t."frozen_resource_policy" ? 'resultDisclosure')
-        THEN ca."id" ELSE NULL END AS "reportAttemptId"
+        THEN ca."id" ELSE NULL END AS "reportAttemptId"`}
     FROM ${actorOrgsSql} actor_orgs
     JOIN "assessment_run_actor_snapshots" respondent ON respondent."organization_id" = actor_orgs."organization_id"
       AND respondent."user_id" = ${userId}
@@ -332,9 +352,10 @@ export async function listAssignedRunTasks(userId: string, options?: {
       AND e."organization_id" = respondent."organization_id" AND e."run_id" = respondent."run_id"
     JOIN "assessment_runs" r ON r."id" = e."run_id" AND r."organization_id" = e."organization_id"
     JOIN "assessment_run_tracks" t ON t."id" = e."track_id" AND t."organization_id" = e."organization_id"
+    ${student ? Prisma.empty : Prisma.sql`
     JOIN "assessment_run_actor_snapshots" subject ON subject."id" = e."subject_actor_snapshot_id" AND subject."organization_id" = e."organization_id"
     JOIN "users" subject_user ON subject_user."id" = subject."user_id"
-    LEFT JOIN "assessment_run_execution_start_claims" c ON c."execution_id" = e."id"
+    LEFT JOIN "assessment_run_execution_start_claims" c ON c."execution_id" = e."id"`}
     LEFT JOIN "relational_assessment_assignments" a ON a."id" = e."relational_assignment_id"
     LEFT JOIN "composite_assessment_attempts" ca ON e."runtime_binding_kind" = 'COMPOSITE'
       AND ca."id" = e."runtime_binding_ref" AND ca."user_id" = ${userId}
