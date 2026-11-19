@@ -399,7 +399,7 @@ const CompositeReportContent: React.FC = () => {
       title={singleLearnerTitle || report.name}
       description={(trainingFormOnlyReport || (singleLearnerUnit && report.reportState !== 'PARTIAL')) ? undefined : report.reportState === 'PARTIAL' ? '作答尚未全部完成。这里只读展示已完成单项的冻结结果，不生成整体报告。' : report.productKind === 'ASSESSMENT_BUNDLE' ? '综合报告结合各项冻结结果，以下同时保留单项反馈。' : '以下按内容顺序展示各项测评的独立结果。'}
       facts={compactLearnerReport ? [] : facts}
-      status={trainingFormOnlyReport
+      status={trainingFormOnlyReport && !submittedNotSatisfied
         ? { kind: 'success', title: '已提交' }
         : compactLearnerReport && !submittedNotSatisfied ? undefined : { kind: submittedNotSatisfied ? 'info' : 'success', title: submittedNotSatisfied ? '已交卷，任务未达成' : '已提交', description: submittedNotSatisfied ? '本次作答已保存并计入作答次数；任务条件未达成，仍可查看本次报告。' : '本次作答已提交，测评结果如下。' }}
       backAction={<button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">{learner.enabled ? learner.backLabel : '返回'}</button>}
