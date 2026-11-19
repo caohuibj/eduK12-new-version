@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 
 import { prisma } from '../../config/database'
-import { batchEnsureScaleAdmissionsAtDelivery, seedScaleAdmissionRuntime } from '../../modules/scale/scale-admission.service'
+import { batchEnsureScaleAdmissionsAtDelivery, prepareBatchScaleAdmissionsAtCreate, seedScaleAdmissionRuntime } from '../../modules/scale/scale-admission.service'
 import { createFrozenUnitAdmission } from '../../modules/assessment-runtime/admission-snapshot'
 import { createFrozenScaleRuntimeSnapshot } from '../../modules/assessment-runtime/runtime-snapshot'
 import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
@@ -670,6 +670,88 @@ describe('Scheme X Batch Scale Admission at Delivery (PR X-05C)', () => {
     expect(sqlKinds.filter(kind => kind === 'deployment_batch')).toEqual(['deployment_batch'])
     expect(sqlKinds.filter(kind => kind === 'deployment_single')).toEqual([])
     expect(sqlKinds.filter(kind => kind === 'lock')).toHaveLength(1)
+  })
+
+  it('prepareBatchScaleAdmissionsAtCreate populates admissions before createMany so batchEnsureScaleAdmissionsAtDelivery skips its transaction', async () => {
+    const scale = {
+      id: 'scale-pre-1',
+      code: 's1',
+      name: 'SampleScale',
+      instrumentVersion: '1',
+      instrumentClass: 'CUSTOM_DESCRIPTIVE' as const,
+      status: 'PUBLISHED',
+    }
+    const validRuntime = createFrozenScaleRuntimeSnapshot({
+      instrumentKey: 's1',
+      instrumentVersion: '1',
+      definition: sampleDefinition,
+    })
+    const encryptedRuntime = encryptUnifiedRuntimePayload(validRuntime)
+    const entry = {
+      id: 'child-pre-1',
+      item: { id: 'item-pre-1', scaleId: scale.id, scale },
+      frozenScale: validRuntime,
+      data: {
+        id: 'child-pre-1',
+        userId: 'user-1',
+        scaleId: scale.id,
+        compositeItemId: 'item-pre-1',
+        compositeAttemptId: 'parent-attempt-1',
+        attemptEpoch: 1,
+        deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
+        runtimeSnapshotEncrypted: encryptedRuntime,
+        compiledRuntimeHash: validRuntime.compiledRuntime.compiledRuntimeHash,
+        subjectUserId: 'user-1',
+        respondentUserId: 'user-1',
+        respondentType: 'SELF',
+      } as Record<string, unknown>,
+    }
+
+    await prepareBatchScaleAdmissionsAtCreate({
+      db: {} as any,
+      attempt: {
+        id: 'parent-attempt-1',
+        userId: 'user-1',
+        recoveryTokenHash: null,
+        deliveryMode: 'FINAL_ONLY',
+        attemptEpoch: 1,
+        contextSnapshotHash: null,
+      },
+      composite: { productKind: 'QUESTIONNAIRE', formSections: [] },
+      pendingScales: [entry],
+    })
+
+    expect(typeof entry.data.frozenAdmissionSnapshotEncrypted).toBe('string')
+    expect(entry.data.frozenAdmissionSnapshotHash).toMatch(/^[a-f0-9]{64}$/)
+
+    const txSpy = vi.spyOn(prisma, '$transaction')
+    txSpy.mockClear()
+    const freshChild: any = {
+      ...entry.data,
+      questionnaireAssessmentId: null,
+      scale,
+    }
+    seedScaleAdmissionRuntime(freshChild, validRuntime)
+    const slot = {
+      slotKey: 'scale:item-pre-1',
+      unitType: 'SCALE',
+      required: true,
+      sourceDefinitionIdentity: { key: 's1', version: '1', hash: validRuntime.sourceDefinitionHash },
+      sourceBinding: { compositeItemId: 'item-pre-1', scaleId: 'scale-pre-1', compiledRuntimeHash: validRuntime.compiledRuntime.compiledRuntimeHash },
+    }
+    const map = await batchEnsureScaleAdmissionsAtDelivery(dummyParent, [{ slot: slot as any, child: freshChild, runtime: validRuntime }])
+    expect(map.size).toBe(1)
+    expect(txSpy).not.toHaveBeenCalled()
+
+    const skippedEntry = { ...entry, data: { ...entry.data, userId: null, frozenAdmissionSnapshotEncrypted: null, frozenAdmissionSnapshotHash: null } }
+    await prepareBatchScaleAdmissionsAtCreate({
+      db: {} as any,
+      attempt: { id: 'parent-anon', userId: null, recoveryTokenHash: 'rec', deliveryMode: 'FINAL_ONLY', attemptEpoch: 1, contextSnapshotHash: null },
+      composite: { productKind: 'QUESTIONNAIRE', formSections: [] },
+      pendingScales: [skippedEntry],
+    })
+    expect(skippedEntry.data.frozenAdmissionSnapshotEncrypted).toBeNull()
   })
 })
 

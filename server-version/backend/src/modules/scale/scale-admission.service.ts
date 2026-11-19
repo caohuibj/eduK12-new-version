@@ -31,7 +31,7 @@ import { decryptFrozenScaleRuntimeSnapshot, loadFrozenScaleRuntimeSnapshot, Froz
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { ageMonthsAt, assessmentContextKeys, type AssessmentContextValues } from '../assessment-context/context'
 import { resolveScaleStartDeployment } from './deployment/service'
-import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments, clearPreloadedActiveScaleDeployments } from './deployment/repository'
+import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments, clearPreloadedActiveScaleDeployments, hasPreloadedActiveScaleDeployments } from './deployment/repository'
 import type { ScaleDeploymentModeV1 } from './policy/deployment'
 import { evaluateInstrumentEligibility, SCALE_ELIGIBILITY_EVALUATOR_VERSION } from './policy/eligibility'
 import type { FrozenEligibilityDecisionV1, ScalePolicyRespondentType } from './policy/types'
@@ -902,7 +902,7 @@ export const batchEnsureScaleAdmissionsAtDelivery = async (
   for (const item of children) {
     const stored = await loadStoredScaleAdmission(item.child)
     if (stored) {
-      result.set(item.child.id, await validateStoredAgainstRuntime(item.child, stored, referenceTimeMs))
+      result.set(item.child.id, await validateStoredAgainstRuntime(item.child, stored, referenceTimeMs, undefined, item.runtime))
     } else {
       unstored.push(item)
     }
@@ -1061,5 +1061,132 @@ export const batchEnsureScaleAdmissionsAtDelivery = async (
   }
 
   return result
+}
+
+export type ScaleAdmissionCreateEntry = {
+  id: string
+  item: {
+    id: string
+    scaleId?: string | null
+    scale?: Partial<ScaleAdmissionChildRow['scale']> | null
+  }
+  frozenScale: VersionedFrozenScaleRuntimeSnapshot | null
+  data: Record<string, unknown>
+}
+
+/**
+ * Pre-populates frozen scale admissions during START child creation for
+ * context-free FINAL_ONLY logged-in questionnaires so immediate delivery hits
+ * batchEnsureScaleAdmissionsAtDelivery's zero-transaction fast path.
+ */
+export const prepareBatchScaleAdmissionsAtCreate = async (input: {
+  db: Db
+  attempt: {
+    id: string
+    userId: string | null
+    recoveryTokenHash: string | null
+    deliveryMode: string
+    attemptEpoch: number
+    contextSnapshotHash: string | null
+    trainingTimingSnapshot?: unknown
+  }
+  composite: {
+    productKind?: string
+    formSections?: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>
+  }
+  pendingScales: ScaleAdmissionCreateEntry[]
+}): Promise<void> => {
+  const { db, attempt, composite, pendingScales } = input
+  if (pendingScales.length === 0) return
+  if (attempt.deliveryMode !== 'FINAL_ONLY') return
+  if (!attempt.userId) return
+  if (attempt.contextSnapshotHash) return
+  if (composite.formSections && hasContextSection(composite.formSections)) return
+  if (['ASSESSMENT_BUNDLE', 'ORGANIZATION_RESOURCE'].includes(composite.productKind ?? '')) return
+
+  const eligible = pendingScales.filter((entry) => (
+    entry.data.runtimeGeneration === 'UNIFIED_V1'
+    && entry.data.deliveryMode === 'FINAL_ONLY'
+    && typeof entry.data.attemptEpoch === 'number'
+    && Boolean((entry.data.userId as string | null | undefined) ?? attempt.userId)
+    && Boolean(entry.frozenScale)
+    && typeof entry.item.scale?.id === 'string'
+    && typeof entry.item.scale?.code === 'string'
+    && typeof entry.item.scale?.name === 'string'
+    && typeof entry.item.scale?.instrumentVersion === 'string'
+    && (entry.frozenScale!.schemaVersion === 1 || !policyRequiresContext(entry.frozenScale!))
+  ))
+  if (eligible.length === 0) return
+
+  const v2ScaleIds = [...new Set(
+    eligible
+      .filter((entry) => entry.frozenScale!.schemaVersion === 2)
+      .map((entry) => entry.item.scale!.id as string),
+  )]
+  const hasQueryRaw = typeof (db as { $queryRaw?: unknown }).$queryRaw === 'function'
+  const shouldPreloadDeployments = v2ScaleIds.length > 0 && v2ScaleIds.length <= 50 && hasQueryRaw
+    && !hasPreloadedActiveScaleDeployments(db, v2ScaleIds)
+  if (shouldPreloadDeployments) {
+    const deployments = await readActiveScaleDeployments(db, v2ScaleIds)
+    const preloaded = new Map(v2ScaleIds.map((id) => [id, deployments.get(id) ?? null]))
+    setPreloadedActiveScaleDeployments(db, preloaded)
+  }
+
+  const trainingTiming = attempt.trainingTimingSnapshot
+    ? readTrainingTimingSnapshot(attempt.trainingTimingSnapshot) ?? undefined
+    : undefined
+  try {
+    for (const entry of eligible) {
+      const frozenScale = entry.frozenScale!
+      const rawScale = entry.item.scale!
+      const scale: ScaleAdmissionChildRow['scale'] = {
+        id: rawScale.id!,
+        code: rawScale.code!,
+        name: rawScale.name!,
+        instrumentVersion: rawScale.instrumentVersion!,
+        instrumentClass: rawScale.instrumentClass === 'STANDARD' ? 'STANDARD' : 'CUSTOM_DESCRIPTIVE',
+        status: rawScale.status ?? 'PUBLISHED',
+      }
+      if (frozenScale.instrumentKey !== scale.code || frozenScale.instrumentVersion !== scale.instrumentVersion) continue
+      try {
+        const snapshot = await createScaleAdmissionForRuntime({
+          db,
+          attemptEpoch: entry.data.attemptEpoch as number,
+          scale,
+          principal: {
+            userId: (entry.data.userId as string | null | undefined) ?? attempt.userId,
+            questionnaireSessionId: null,
+            recoveryTokenHash: attempt.recoveryTokenHash ?? null,
+          },
+          parent: {
+            kind: 'composite',
+            parentId: attempt.id,
+            slotKey: compositeItemSlotKey(entry.item.id, 'SCALE'),
+            sourceDefinitionHash: frozenScale.sourceDefinitionHash,
+            compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
+          },
+          runtime: frozenScale,
+          requestedMode: 'COMPOSITE',
+          ...(trainingTiming ? { trainingTiming } : {}),
+          contextSnapshotHash: null,
+          contextValues: null,
+          contextFrozenAt: null,
+          contextSubjectUserId: null,
+          respondentType: (entry.data.respondentType as string | null | undefined) ?? null,
+          subjectUserId: (entry.data.subjectUserId as string | null | undefined) ?? null,
+          respondentUserId: (entry.data.respondentUserId as string | null | undefined) ?? null,
+          legacyRequiresContext: false,
+        })
+        if (snapshot.governance.status !== 'READY') continue
+        entry.data.frozenAdmissionSnapshotEncrypted = await storeSharedUnitAdmission(snapshot, db)
+        entry.data.frozenAdmissionSnapshotHash = snapshot.snapshotHash
+      } catch (error) {
+        if (error instanceof InstrumentFinalSubmitError) continue
+        throw error
+      }
+    }
+  } finally {
+    if (shouldPreloadDeployments) clearPreloadedActiveScaleDeployments(db)
+  }
 }
 
