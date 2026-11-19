@@ -16,7 +16,7 @@ export class RunStartAdmissionError extends Error {
 
 type Tx = Prisma.TransactionClient
 
-type ExecutionAdmissionRow = {
+export type ExecutionAdmissionRow = {
   executionId: string
   organizationId: string
   runId: string
@@ -148,9 +148,18 @@ export const loadRunExecutionStartAdmission = async (input: {
   admitted?: boolean
   admittedAttemptIdentity?: RunAttemptIdentityBinding
   assignments?: Pick<RelationalAssignmentRepository, 'findById' | 'resolveAcceptedConsent'>
+  knownExecution?: ExecutionAdmissionRow
 }): Promise<RunStartAdmission> => {
   const db = input.tx ?? (prisma as unknown as Tx)
-  const rows = await db.$queryRaw<ExecutionAdmissionRow[]>`
+  const execution = (
+    input.knownExecution
+    && input.knownExecution.executionId === input.executionId
+    && typeof input.knownExecution.trackId === 'string'
+    && typeof input.knownExecution.executionStatus === 'string'
+    && typeof input.knownExecution.runStatus === 'string'
+  )
+    ? input.knownExecution
+    : (await db.$queryRaw<ExecutionAdmissionRow[]>`
     SELECT e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",
       e."track_id" AS "trackId", e."status" AS "executionStatus", r."status" AS "runStatus",
       e."relational_assignment_id" AS "relationalAssignmentId", ra."policy_domain" AS "policyDomain",
@@ -167,8 +176,7 @@ export const loadRunExecutionStartAdmission = async (input: {
       ON ra."id" = e."relational_assignment_id"
     WHERE e."id" = ${input.executionId}
     LIMIT 1
-  `
-  const execution = rows[0]
+  `)[0]
   if (!execution) throw new RunStartAdmissionError('RUN_EXECUTION_NOT_FOUND', 'Run execution not found', 404)
   if (execution.respondentUserId !== input.actorUserId) {
     throw new RunStartAdmissionError('RUN_EXECUTION_ACTOR', 'only the frozen respondent may start this Run execution', 403)

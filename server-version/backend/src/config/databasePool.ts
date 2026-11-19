@@ -63,6 +63,8 @@ export const effectivePrismaPoolSize = (
   return DEFAULT_PRISMA_CONNECTION_POOL_SIZE
 }
 
+export const DEFAULT_RUN_START_MAX_CONCURRENT = 8
+
 /** Default bound for the bounded Training START admission gate: at most 3/4 of
  * the effective pool, reserving the remainder for every other business that
  * shares the database. An explicit TRAINING_START_MAX_CONCURRENT overrides. */
@@ -70,6 +72,15 @@ export const defaultStartAdmissionBound = (
   databaseUrl: string | undefined,
   env: NodeJS.ProcessEnv = process.env,
 ): number => Math.max(1, Math.floor(effectivePrismaPoolSize(databaseUrl, env) * 0.75))
+
+/** Run START acquires multi-table row locks and authority checks inside a
+ * write transaction. Keep the implicit per-instance default capped even when
+ * PRISMA_CONNECTION_POOL_SIZE is raised for lightweight reads/submits so dual
+ * backends do not oversubscribe PostgreSQL memory; explicit envs still win. */
+export const defaultRunStartAdmissionBound = (
+  databaseUrl: string | undefined,
+  env: NodeJS.ProcessEnv = process.env,
+): number => Math.min(defaultStartAdmissionBound(databaseUrl, env), DEFAULT_RUN_START_MAX_CONCURRENT)
 
 /** Reserve API pool headroom for Definition/Submit when an old explicit START
  * limit exceeds the current pool budget. This is a cap, not reserved sockets. */
