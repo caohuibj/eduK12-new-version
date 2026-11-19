@@ -122,3 +122,44 @@ test('worker stop grace must exceed the internal shutdown budget by 15s',()=>{
  invalid.services.worker.stop_grace_period='soon'
  assert.throws(()=>inspectResourceContract(invalid),/Invalid worker stop_grace_period/)
 })
+
+test('rejects DATABASE_URL vs Prisma env pool mismatches and trickle maxConcurrent=0 black holes across backend replicas',()=>{
+ const mismatch=fixture()
+ mismatch.services.backend.environment.DATABASE_URL='postgresql://u:secret@db/app?connection_limit=20'
+ mismatch.services.backend.environment.PRISMA_CONNECTION_POOL_SIZE='10'
+ assert.throws(()=>inspectResourceContract(mismatch),/DATABASE_URL connection_limit \(20\) disagrees with PRISMA_CONNECTION_POOL_SIZE \(10\)/)
+
+ const timeoutMismatch=fixture()
+ timeoutMismatch.services.worker.environment.DATABASE_URL='postgresql://u:secret@db/app?pool_timeout=15'
+ timeoutMismatch.services.worker.environment.PRISMA_POOL_TIMEOUT='30'
+ assert.throws(()=>inspectResourceContract(timeoutMismatch),/DATABASE_URL pool_timeout \(15\) disagrees with PRISMA_POOL_TIMEOUT \(30\)/)
+
+ const aligned=fixture()
+ aligned.services.backend.environment.DATABASE_URL='postgresql://u:secret@db/app?connection_limit=10&pool_timeout=30'
+ assert.equal(inspectResourceContract(aligned).services.backend.prismaPool,10)
+
+ const blackHole=fixture()
+ blackHole.services.backend.environment.ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED='true'
+ blackHole.services.backend.environment.ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT='0'
+ assert.throws(()=>inspectResourceContract(blackHole),/ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT/)
+
+ const replicaBlackHole=fixture()
+ replicaBlackHole.services.backend.cpus=0.9
+ replicaBlackHole.services.backend.mem_limit=536870912
+ replicaBlackHole.services.backend.environment.NODE_OPTIONS='--max-old-space-size=256'
+ replicaBlackHole.services['backend-2']={
+  cpus:0.85,
+  mem_limit:536870912,
+  environment:{
+   ...replicaBlackHole.services.backend.environment,
+   ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED:'true',
+   ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT:'0',
+  },
+ }
+ assert.throws(()=>inspectResourceContract(replicaBlackHole),/backend-2 ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED=true/)
+
+ replicaBlackHole.services['backend-2'].environment.ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT='4'
+ const replicaReport=inspectResourceContract(replicaBlackHole)
+ assert.equal(replicaReport.services['backend-2'].prismaPool,10)
+ assert.equal(replicaReport.maximumConfiguredAppConnections,28)
+})

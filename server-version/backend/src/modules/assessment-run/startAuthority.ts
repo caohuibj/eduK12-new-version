@@ -3,17 +3,182 @@ import {educationCompositionTrackIdentitySql} from './educationCompositionIdenti
 import {privateScaleRegistryIdentitySql} from './educationPrivateScaleIdentitySql'
 import { Prisma } from '@prisma/client'
 import { currentWindowSql } from './currentActorAuthority'
-import { currentRunPopulationAuthoritySql, type RunPopulationProductScope } from './currentPopulationAuthority'
+import {
+  buildDecomposedSingleExecutionAuthoritySql,
+  currentRunPopulationAuthoritySql,
+  type RunPopulationProductScope,
+  type SingleExecutionAuthorityEnvelope,
+} from './currentPopulationAuthority'
 import { applyBoundedPlannerControls } from './plannerBound'
 import { RunStartAdmissionError } from './startAdmission'
+
+export type StartAuthorityKnownEnvelope = SingleExecutionAuthorityEnvelope & {
+  intakeDeadline: Date | null
+  hasCampusActivity?: boolean
+  hasHuiteacherLink?: boolean
+}
+
+const buildTargetedEducationLibrarySql = (envelope: StartAuthorityKnownEnvelope): Prisma.Sql | null => {
+  const key = envelope.trackResourceKey
+  const isSchoolOnly = envelope.hasCampusActivity === true && envelope.hasHuiteacherLink === false
+  const isTeacherOnly = envelope.hasHuiteacherLink === true && envelope.hasCampusActivity === false
+  if (key.startsWith('education-composition:')) {
+    if (!isSchoolOnly && !isTeacherOnly) return null
+    return Prisma.sql`EXISTS (
+      SELECT 1 FROM assessment_run_tracks t
+      WHERE t.id = ${envelope.trackId}
+        AND t.organization_id = ${envelope.organizationId}
+        AND t.run_id = ${envelope.runId}
+        AND ${educationCompositionTrackIdentitySql({
+          track: Prisma.sql`t`,
+          organizationId: Prisma.sql`${envelope.organizationId}`,
+          product: isSchoolOnly ? 'SCHOOL' : 'TEACHER',
+        })}
+    )`
+  }
+  if (key.startsWith('education-assessment:')) {
+    if (!isSchoolOnly && !isTeacherOnly) return null
+    const product = isSchoolOnly ? 'SCHOOL' : 'TEACHER'
+    return Prisma.sql`EXISTS (
+      SELECT 1 FROM assessment_run_tracks t
+      JOIN education_assessment_deliveries delivery
+        ON delivery.organization_id = t.organization_id
+        AND delivery.family = t.resource_family
+        AND delivery.product = ${product}
+        AND t.resource_version = '1.0.0'
+        AND t.resource_key = ('education-assessment:' || delivery.product || ':' || delivery.organization_id || ':' || delivery.id)
+        AND delivery.runtime_composite_id = t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}'
+        AND delivery.status IN ('PUBLISHED', 'RETIRED')
+      WHERE t.id = ${envelope.trackId}
+        AND t.organization_id = ${envelope.organizationId}
+        AND t.run_id = ${envelope.runId}
+    )`
+  }
+  if (envelope.trackResourceFamily === 'SCALE' && key.startsWith('library-scale:')) {
+    return Prisma.sql`EXISTS (
+      SELECT 1 FROM registered_assessment_resources r
+      WHERE r.resource_key = ${envelope.trackResourceKey}
+        AND r.resource_version = ${envelope.trackResourceVersion}
+        AND r.entry->'libraryOrigin'->>'product' IN ('SCHOOL', 'TEACHER')
+    )`
+  }
+  if (envelope.trackResourceFamily === 'SCALE' && key.startsWith('private-scale:')) {
+    if (!isSchoolOnly && !isTeacherOnly) return null
+    return Prisma.sql`EXISTS (
+      SELECT 1 FROM registered_assessment_resources r
+      WHERE r.resource_key = ${envelope.trackResourceKey}
+        AND r.resource_version = ${envelope.trackResourceVersion}
+        AND ${privateScaleRegistryIdentitySql({
+          registered: Prisma.sql`r`,
+          organizationId: Prisma.sql`${envelope.organizationId}`,
+          product: isSchoolOnly ? 'SCHOOL' : 'TEACHER',
+        })}
+    )`
+  }
+  if (key.startsWith('private-form:')) {
+    if (!isSchoolOnly && !isTeacherOnly) return null
+    return Prisma.sql`EXISTS (
+      SELECT 1 FROM assessment_run_tracks t
+      WHERE t.id = ${envelope.trackId}
+        AND t.organization_id = ${envelope.organizationId}
+        AND t.run_id = ${envelope.runId}
+        AND ${privateFormTrackIdentitySql({
+          track: Prisma.sql`t`,
+          organizationId: Prisma.sql`${envelope.organizationId}`,
+          product: isSchoolOnly ? 'SCHOOL' : 'TEACHER',
+        })}
+    )`
+  }
+  return null
+}
 
 /** Called with Organization SHARE -> Run SHARE -> Execution UPDATE held. */
 export const assertCurrentRunStartAuthority = async (
   tx: Prisma.TransactionClient,
   executionId: string,
-  options?: { accountMode?: 'DETECT_EDUCATION_LIBRARY'; operation?: 'BOUND_FINAL'; productScope?: RunPopulationProductScope },
+  options?: {
+    accountMode?: 'DETECT_EDUCATION_LIBRARY'
+    operation?: 'BOUND_FINAL'
+    productScope?: RunPopulationProductScope
+    knownEnvelope?: StartAuthorityKnownEnvelope
+  },
 ): Promise<void> => {
   const fail = (code: string) => { throw new RunStartAdmissionError(code, 'current Run START authority is no longer valid', 403) }
+  const productScope = options?.productScope ?? 'ALL'
+  const known = options?.knownEnvelope
+
+  // Single-statement flat fast path for already-locked education library /
+  // private SELF executions. Because DETECT_EDUCATION_LIBRARY takes no user
+  // row lock and SELF takes no relationship row lock, all authority fences
+  // (org/run/activity-or-event/execution) were already acquired before this
+  // statement starts, preserving the lock-then-statement_timestamp() contract
+  // while eliminating 7 sequential queries + force_custom_plan re-planning.
+  if (
+    known
+    && options?.accountMode === 'DETECT_EDUCATION_LIBRARY'
+    && options?.operation !== 'BOUND_FINAL'
+    && known.subjectActorSnapshotId === known.respondentActorSnapshotId
+    && known.relationshipKind === 'SELF'
+    && known.relationshipCourseId === null
+    && known.subjectProvenance === 'ORG_MEMBER'
+    && (productScope === 'CAMPUS_ONLY' || productScope === 'HUITEACHER_ONLY')
+  ) {
+    const librarySql = buildTargetedEducationLibrarySql(known)
+    const decomposedPopSql = buildDecomposedSingleExecutionAuthoritySql(known, 'COLLECTION', productScope)
+    if (librarySql && decomposedPopSql) {
+      const fastRows = await tx.$queryRaw<Array<{
+        isLibrary: boolean
+        userValid: boolean
+        accountNotExpired: boolean
+        actorValid: boolean
+        actorDenied: boolean
+        populationCurrent: boolean
+        intakeOpen: boolean
+      }>>`
+        SELECT
+          (${librarySql}) AS "isLibrary",
+          (u."is_active" AND NOT u."is_frozen" AND NOT u."must_change_password"
+            AND (u."role" <> 'TEACHER' OR u."teacher_approved")) AS "userValid",
+          (u."expires_at" IS NULL OR u."expires_at" > statement_timestamp()) AS "accountNotExpired",
+          EXISTS (
+            SELECT 1 FROM "organization_memberships" m
+            JOIN "organization_persona_grants" pg
+              ON pg."membership_id" = m."id" AND pg."organization_id" = m."organization_id"
+            WHERE m."id" = ${known.subjectMembershipId}
+              AND m."user_id" = u."id"
+              AND m."organization_id" = ${known.organizationId}
+              AND ${currentWindowSql(Prisma.sql`m`)}
+              AND pg."id" = ${known.subjectPersonaGrantId}
+              AND pg."persona" = ${known.subjectRole}
+              AND pg."revoked_at" IS NULL
+          ) AS "actorValid",
+          EXISTS (
+            SELECT 1 FROM "organization_access_denies" d
+            WHERE d."organization_id" = ${known.organizationId}
+              AND d."user_id" = u."id"
+              AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START')
+          ) AS "actorDenied",
+          (${decomposedPopSql}) AS "populationCurrent",
+          (${known.intakeDeadline === null
+            ? Prisma.sql`TRUE`
+            : Prisma.sql`${known.intakeDeadline} > statement_timestamp()`}) AS "intakeOpen"
+        FROM "users" u
+        WHERE u."id" = ${known.subjectUserId}
+        LIMIT 1
+      `
+      const fast = fastRows[0]
+      if (!fast) fail('RUN_ACCOUNT_INACTIVE')
+      if (fast.isLibrary) {
+        if (!fast.userValid) fail('RUN_ACCOUNT_INACTIVE')
+        if (known.orgStatus !== 'ACTIVE') fail('ORGANIZATION_SUSPENDED')
+        if (!fast.actorValid || fast.actorDenied) fail('RUN_ACTOR_AUTHORITY_REVOKED')
+        if (!fast.accountNotExpired) fail('RUN_ACCOUNT_INACTIVE')
+        if (!fast.populationCurrent) fail('RUN_ACTOR_AUTHORITY_REVOKED')
+        if (!fast.intakeOpen) fail('RUN_INTAKE_CLOSED')
+        return
+      }
+    }
+  }
   // Verified public-library and author-private executions use query-time account checks. Do not acquire a
   // user lock after org: account-reset writers acquire user UPDATE before org.
   // This server-only mode is never accepted from a request, and actual legacy
@@ -202,12 +367,17 @@ export const assertCurrentRunStartAuthority = async (
   // A separate statement is essential here: statement_timestamp() is fixed at
   // the beginning of its statement, not the end of a lock wait. All authority
   // fences are now held; this is the time-window admission decision.
-  // Reuse the existing education-report planner bound for this exact-ID
-  // population gate. Transaction-local only; current authority and time checks
-  // remain fresh, and PostgreSQL restores the pooled setting on transaction end.
-  await applyBoundedPlannerControls(tx)
+  // Use the decomposed flat population expression when knownEnvelope qualifies
+  // (generic-plan cacheable, no force_custom_plan), falling back to the bounded
+  // planner path for rare shapes or direct callers without knownEnvelope.
+  const decomposedWindowPopSql = known
+    ? buildDecomposedSingleExecutionAuthoritySql(known, 'COLLECTION', productScope)
+    : null
+  if (!decomposedWindowPopSql) {
+    await applyBoundedPlannerControls(tx)
+  }
   const windows = await tx.$queryRaw<Array<{ intakeOpen: boolean; accountsCurrent: boolean; populationCurrent: boolean }>>`
-    SELECT ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`, 'COLLECTION', options?.productScope ?? 'ALL')} AS "populationCurrent", (r."intake_deadline" IS NULL OR r."intake_deadline" > statement_timestamp()) AS "intakeOpen",
+    SELECT ${decomposedWindowPopSql ?? currentRunPopulationAuthoritySql(Prisma.sql`e."id"`, 'COLLECTION', productScope)} AS "populationCurrent", (r."intake_deadline" IS NULL OR r."intake_deadline" > statement_timestamp()) AS "intakeOpen",
       NOT EXISTS (
         SELECT 1 FROM "assessment_run_actor_snapshots" a JOIN "users" u ON u."id"=a."user_id"
         WHERE a."id" IN (e."subject_actor_snapshot_id", e."respondent_actor_snapshot_id")

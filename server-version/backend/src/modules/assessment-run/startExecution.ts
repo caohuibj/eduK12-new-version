@@ -31,6 +31,7 @@ import {
   markRunStartUnknown,
   releaseRolledBackRunStartClaim,
   resolveProductScopeFromLock,
+  RunStartClaimError,
   type RunStartClaimDecision,
   type RunStartClaimRecord,
   type TransactionalStartDispatchContext,
@@ -390,7 +391,11 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   }
   const repository = createSqlRelationalAssignmentRepository(tx as any)
   const relational = createRelationalAssessmentService(repository)
-  const started = await relational.start({ assignmentId: admission.assignment.assignmentId, actorUserId: input.actorUserId })
+  const started = await relational.start({
+    assignmentId: admission.assignment.assignmentId,
+    actorUserId: input.actorUserId,
+    ...(inline ? { knownAssignment: admission.assignment } : {}),
+  })
   // The claim freezes runtime identity before this transaction. The relational
   // transition still checks current assignment/consent authority, but its legacy
   // occupational respondent mapping must not replace that admitted identity.
@@ -429,15 +434,48 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
     attemptIdentity: admission.attemptIdentity,
     educationStart: compositionStart??educationSource?.startProof,
     preloadedComposite,
+    knownNoExistingAssignmentAttempt: true,
   })
-  const changed = await tx.$executeRaw`
-    UPDATE "assessment_run_executions"
-    SET "runtime_binding_kind" = 'COMPOSITE', "runtime_binding_ref" = ${attempt.id},
-        "status" = 'STARTED', "started_at" = COALESCE("started_at", ${now}), "updated_at" = ${now}
-    WHERE "id" = ${input.executionId} AND "runtime_binding_ref" IS NULL
-  `
-  if (Number(changed) !== 1) throw new RunStartExecutionError('RUN_RUNTIME_BIND_CONFLICT', 'runtime binding changed concurrently', 409)
-  await markRunStartClaimCompleted(tx, { claimId: input.decision.claim.id, generation: input.decision.claim.claimGeneration, now, allowClaimedInline: inline })
+  if (inline) {
+    // Coalesce execution binding + inline claim completion into one roundtrip.
+    const boundRows = await tx.$queryRaw<Array<{ execChanged: number; claimChanged: number }>>`
+      WITH updated_exec AS (
+        UPDATE "assessment_run_executions"
+        SET "runtime_binding_kind" = 'COMPOSITE', "runtime_binding_ref" = ${attempt.id},
+            "status" = 'STARTED', "started_at" = COALESCE("started_at", ${now}), "updated_at" = ${now}
+        WHERE "id" = ${input.executionId} AND "runtime_binding_ref" IS NULL
+        RETURNING "id"
+      ),
+      updated_claim AS (
+        UPDATE "assessment_run_execution_start_claims"
+        SET "state" = 'COMPLETED',
+            "dispatched_at" = COALESCE("dispatched_at", ${now}),
+            "completed_at" = ${now},
+            "unknown_at" = NULL,
+            "updated_at" = ${now}
+        WHERE "id" = ${input.decision.claim.id}
+          AND "claim_generation" = ${input.decision.claim.claimGeneration}
+          AND "state" IN ('CLAIMED', 'DISPATCHED', 'UNKNOWN')
+          AND EXISTS (SELECT 1 FROM updated_exec)
+        RETURNING "id"
+      )
+      SELECT
+        (SELECT count(*)::int FROM updated_exec) AS "execChanged",
+        (SELECT count(*)::int FROM updated_claim) AS "claimChanged"
+    `
+    const bound = boundRows[0]
+    if (!bound || bound.execChanged !== 1) throw new RunStartExecutionError('RUN_RUNTIME_BIND_CONFLICT', 'runtime binding changed concurrently', 409)
+    if (bound.claimChanged !== 1) throw new RunStartClaimError('RUN_START_FENCE_LOST', 'START claim fence lost before completion', 409)
+  } else {
+    const changed = await tx.$executeRaw`
+      UPDATE "assessment_run_executions"
+      SET "runtime_binding_kind" = 'COMPOSITE', "runtime_binding_ref" = ${attempt.id},
+          "status" = 'STARTED', "started_at" = COALESCE("started_at", ${now}), "updated_at" = ${now}
+      WHERE "id" = ${input.executionId} AND "runtime_binding_ref" IS NULL
+    `
+    if (Number(changed) !== 1) throw new RunStartExecutionError('RUN_RUNTIME_BIND_CONFLICT', 'runtime binding changed concurrently', 409)
+    await markRunStartClaimCompleted(tx, { claimId: input.decision.claim.id, generation: input.decision.claim.claimGeneration, now, allowClaimedInline: inline })
+  }
   await assertTrainingPrivateReferenceAdmissionCurrent(tx)
   if(libraryUses)await assertEducationLibraryUses(tx,libraryUses.context,libraryUses.entryIds,{locked:libraryUses.uses,requireLocked:true})
   const result: RunStartExecutionResult = {

@@ -23,6 +23,29 @@ const sourceInput=z.object({product:educationLibraryProduct,resourceKey:z.string
 type ResourceRow={id:string;resource_key:string;resource_version:string;scale_id:string;definition_hash:string;
   composite_id:string;entry:EducationLibraryResourceEntry;entry_hash:string;status:string;
   created_by_user_id:string;reviewed_by_user_id:string|null;reviewed_at:Date|null;published_at:Date|null}
+type EducationLibraryRegisteredResult=EducationLibraryOrigin & {
+  scaleId:string;compositeId:string;compositeItemId:string;
+  resultDisclosure:NonNullable<EducationLibraryResourceEntry['resultDisclosure']>;
+  resourceEntry:EducationLibraryResourceEntry;libraryStatus:string;identityOnly:true;
+}
+type CachedEducationLibrarySource={
+  product:EducationLibraryOrigin['product'];entryHash:string;definitionHash:string;
+  scaleId:string;compositeId:string;compositeItemId:string;trainingContentSnapshotHash:string;
+  entryId:string;releaseId:string;contentHash:string;approvedSnapshotHash:string;
+  instrumentVersion:string;group:boolean;
+  baseResult:Omit<EducationLibraryRegisteredResult,'libraryStatus'>;
+}
+const LIBRARY_SCALE_CACHE_MAX=512
+const verifiedEducationLibraryCache=new Map<string,CachedEducationLibrarySource>()
+const cacheEducationLibrarySource=(key:string,entry:CachedEducationLibrarySource)=>{
+  if(verifiedEducationLibraryCache.has(key))verifiedEducationLibraryCache.delete(key)
+  verifiedEducationLibraryCache.set(key,entry)
+  if(verifiedEducationLibraryCache.size>LIBRARY_SCALE_CACHE_MAX){
+    const oldest=verifiedEducationLibraryCache.keys().next().value
+    if(oldest!==undefined)verifiedEducationLibraryCache.delete(oldest)
+  }
+}
+export function clearVerifiedEducationLibrarySourceCache(){verifiedEducationLibraryCache.clear()}
 
 /** Runtime allocation projection only. Never rewrite the approved declaration
  * or its contract hash; unsupported approved pairs may be adapted in the future. */
@@ -58,6 +81,67 @@ export async function lockEducationLibraryOrganization(tx:Prisma.TransactionClie
  */
 export async function readEducationLibraryRegisteredSource(tx:Prisma.TransactionClient,raw:{product:EducationLibraryOrigin['product'];resourceKey:string;resourceVersion:string;purpose:'NEW_USE'|'EXISTING_EXECUTION'|'HISTORY'}){
   const input=sourceInput.parse(raw)
+  const cacheKey=`${input.product}|${input.resourceKey}|${input.resourceVersion}`
+  if(input.purpose!=='NEW_USE'){
+    const cached=verifiedEducationLibraryCache.get(cacheKey)
+    if(cached){
+      // Single-roundtrip live FOR SHARE anchor across all verified tables in
+      // canonical lock order (registered -> entry/submission -> scale -> composite).
+      // Any mutation or status drift evicts and falls back to full verification.
+      const [anchor]=await tx.$queryRaw<Array<{matched:boolean;libraryStatus:string}>>(Prisma.sql`
+        SELECT e.status AS "libraryStatus", (
+          (r.status='PUBLISHED' OR (${cached.group} AND ${input.purpose==='HISTORY'} AND r.status='RETIRED'))
+          AND r.entry_hash=${cached.entryHash}
+          AND r.definition_hash=${cached.definitionHash}
+          AND r.scale_id=${cached.scaleId}
+          AND r.composite_id=${cached.compositeId}
+          AND (NOT ${cached.group} OR (
+            r.reviewed_by_user_id IS NOT NULL AND r.reviewed_at IS NOT NULL AND r.published_at IS NOT NULL
+            AND r.reviewed_by_user_id<>r.created_by_user_id AND r.reviewed_by_user_id<>s.creator_id
+          ))
+          AND sub.status='APPROVED'
+          AND sub.snapshot_hash=${cached.approvedSnapshotHash}
+          AND cardinality(sub.dependency_release_ids)=0
+          AND e.release_id=${cached.releaseId}
+          AND s.code=${'library:'+cached.entryId}
+          AND s.library_entry_id=e.id
+          AND s.creator_id=sub.author_id
+          AND s.instrument_class='CUSTOM_DESCRIPTIVE'
+          AND s.status='PUBLISHED'
+          AND s.definition_hash=${cached.definitionHash}
+          AND s.measurement_release_id=${cached.releaseId}
+          AND s.instrument_version=${cached.instrumentVersion}
+          AND mr.layer='MEASUREMENT'
+          AND mr.family='SCALE'
+          AND mr.content_hash=${cached.contentHash}
+          AND mr.content->>'instrumentVersion'=s.instrument_version
+          AND c.product_kind='ORGANIZATION_RESOURCE'
+          AND NOT c.public_enabled
+          AND c.status='PUBLISHED'
+          AND c.training_content_snapshot_hash=${cached.trainingContentSnapshotHash}
+          AND (SELECT count(*)::int FROM composite_assessment_items ci
+               WHERE ci.composite_assessment_id=c.id)=1
+          AND EXISTS (SELECT 1 FROM composite_assessment_items ci
+               WHERE ci.composite_assessment_id=c.id AND ci.id=${cached.compositeItemId}
+                 AND ci.type='SCALE' AND ci.scale_id=s.id)
+        ) AS matched
+        FROM registered_assessment_resources r
+        JOIN scale_library_entries e ON e.id=${cached.entryId}
+        JOIN scale_library_submissions sub ON sub.id=e.submission_id
+        JOIN scales s ON s.id=r.scale_id
+        JOIN measurement_content_releases mr ON mr.id=${cached.releaseId}
+        JOIN composite_assessments c ON c.id=r.composite_id
+        WHERE r.resource_key=${input.resourceKey} AND r.resource_version=${input.resourceVersion}
+        FOR SHARE OF r, e, sub, s, c
+      `)
+      if(anchor?.matched){
+        if(input.purpose!=='HISTORY')await assertScaleLibraryCollectionAllowed(tx,[cached.releaseId])
+        cacheEducationLibrarySource(cacheKey,cached)
+        return {...cached.baseResult,libraryStatus:anchor.libraryStatus}
+      }
+      verifiedEducationLibraryCache.delete(cacheKey)
+    }
+  }
   const [row]=await tx.$queryRaw<ResourceRow[]>(Prisma.sql`SELECT * FROM registered_assessment_resources
     WHERE resource_key=${input.resourceKey} AND resource_version=${input.resourceVersion} FOR SHARE`)
   if(!row||canonicalHash(row.entry)!==row.entry_hash)fail('EDUCATION_LIBRARY_REGISTERED_IDENTITY_MISMATCH')
@@ -101,8 +185,20 @@ export async function readEducationLibraryRegisteredSource(tx:Prisma.Transaction
   const expected=educationLibraryResourceEntry({origin,variant,title:submission.snapshot.title,definition:source.definition,compositeId:composite.id,
     ...(group?{disclosure:row.entry.resultDisclosure}:{})})
   if(canonicalHash(expected)!==row.entry_hash)fail('EDUCATION_LIBRARY_REGISTERED_POLICY_MISMATCH')
-  return {...origin,scaleId:scale.id,compositeId:composite.id,compositeItemId:composite.items[0].id,
-    resultDisclosure:expected.resultDisclosure!,resourceEntry:expected,libraryStatus:entry.status,identityOnly:true as const}
+  const baseResult={...origin,scaleId:scale.id,compositeId:composite.id,compositeItemId:composite.items[0].id,
+    resultDisclosure:expected.resultDisclosure!,resourceEntry:expected,identityOnly:true as const}
+  if(composite.trainingContentSnapshotHash&&origin.dependencies.length===0
+    &&submission.snapshot.mediaManifest&&submission.snapshot.mediaManifest.items.length===0){
+    cacheEducationLibrarySource(cacheKey,{
+      product:input.product,entryHash:row.entry_hash,definitionHash:row.definition_hash,
+      scaleId:scale.id,compositeId:composite.id,compositeItemId:composite.items[0].id,
+      trainingContentSnapshotHash:composite.trainingContentSnapshotHash,
+      entryId:origin.entryId,releaseId:origin.releaseId,contentHash:origin.contentHash,
+      approvedSnapshotHash:origin.approvedSnapshotHash,instrumentVersion:scale.instrumentVersion,
+      group,baseResult,
+    })
+  }
+  return {...baseResult,libraryStatus:entry.status}
 }
 
 /** Publication authority, never a report-reader token. Caller supplies its

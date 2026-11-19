@@ -16,7 +16,7 @@ export interface RelationalSqlClient {
   $queryRawUnsafe<T = unknown>(query: string, ...values: unknown[]): Promise<T>
 }
 
-type AssignmentRow = {
+export type RelationalAssignmentRow = {
   id: string
   episodeId: string
   subjectUserId: string
@@ -39,11 +39,12 @@ type AssignmentRow = {
   visibilityPolicyKey: string
   policyDomain: RelationalPolicyDomainV1
   status: RelationalAssignmentStatusV1
-  createdAt: Date
-  startedAt: Date | null
-  completedAt: Date | null
-  revokedAt: Date | null
+  createdAt: Date | string
+  startedAt: Date | string | null
+  completedAt: Date | string | null
+  revokedAt: Date | string | null
 }
+type AssignmentRow = RelationalAssignmentRow
 
 type ConsentRow = {
   id: string
@@ -113,7 +114,8 @@ const SELECT_CONSENT = `
   FROM assessment_attempt_consents
 `
 
-const iso = (value: Date | null): string | null => value ? value.toISOString() : null
+const iso = (value: Date | string | null): string | null => value ? (typeof value === 'string' ? value : value.toISOString()) : null
+const isoRequired = (value: Date | string): string => typeof value === 'string' ? value : value.toISOString()
 
 const validateFrozenAnalysisContract = (row: AssignmentRow): {
   applicabilityHash: string
@@ -140,7 +142,7 @@ const validateFrozenAnalysisContract = (row: AssignmentRow): {
   }
 }
 
-const toRecord = (row: AssignmentRow): RelationalAssignmentRecordV1 => {
+export const toRelationalAssignmentRecord = (row: AssignmentRow): RelationalAssignmentRecordV1 => {
   const analysis = validateFrozenAnalysisContract(row)
   return {
     assignmentId: row.id,
@@ -165,12 +167,13 @@ const toRecord = (row: AssignmentRow): RelationalAssignmentRecordV1 => {
     visibilityPolicyKey: row.visibilityPolicyKey,
     policyDomain: row.policyDomain,
     status: row.status,
-    createdAt: row.createdAt.toISOString(),
+    createdAt: isoRequired(row.createdAt),
     startedAt: iso(row.startedAt),
     completedAt: iso(row.completedAt),
     revokedAt: iso(row.revokedAt),
   }
 }
+const toRecord = toRelationalAssignmentRecord
 
 const expectedConsentRespondentType = (assignment: RelationalAssignmentRecordV1): string | null => {
   if (assignment.relationshipKind === 'SELF') return 'SELF'

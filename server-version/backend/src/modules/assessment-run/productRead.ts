@@ -2,7 +2,10 @@ import { boundCompositeContinuationSql } from './boundCompositeContinuation'
 import { Prisma } from '@prisma/client'
 import { currentRunPopulationAuthoritySql, type RunPopulationProductScope } from './currentPopulationAuthority'
 import {completedSchoolOrdinaryFeedbackSql} from './completedSchoolFeedback'
-import { withBoundedPlannerRead, type PlannerBoundReadDb } from './plannerBound'
+import { educationCompositionTrackIdentitySql } from './educationCompositionIdentitySql'
+import { privateFormTrackIdentitySql } from './educationPrivateFormIdentitySql'
+import { privateScaleRegistryIdentitySql } from './educationPrivateScaleIdentitySql'
+import { applyBoundedPlannerControls, withBoundedPlannerRead, type PlannerBoundReadDb } from './plannerBound'
 import { prisma } from '../../config/database'
 import { AssessmentRunRepositoryError, type AssessmentRunStatus } from './repository'
 
@@ -221,6 +224,16 @@ export function decodeRunTaskCursor(value: unknown): RunTaskCursor | undefined {
   return { createdAt, id }
 }
 
+export type VerifiedCampusStudentRunScope = {
+  /** Exact `organizationId|runId|membershipId|personaGrantId` keys verified in
+   * the same snapshot as live active SCHOOL student + membership + persona +
+   * enrollment + class admission + class assignment + active activity member +
+   * open activity + non-huiteacher run + non-expired account + no denies. */
+  verifiedTupleKeys: string[]
+  /** Exact `organizationId|runId` keys verified as open campus runs with no huiteacher link. */
+  openSchoolRunKeys: string[]
+}
+
 /** Exact respondent tasks with their assigned subject; no peer respondents, answers or scores. */
 type AssignedRunTaskOptions = {
   organizationIds?: string[]
@@ -239,8 +252,10 @@ type AssignedRunTaskOptions = {
   includeCompletedSchoolFeedback?: boolean
   /** Explicit product scope when caller already constrained runIds to one product's link table. */
   populationProductScope?: RunPopulationProductScope
+  /** Same-snapshot verified School student scope to skip redundant per-row 18-table authority subqueries. */
+  verifiedCampusStudent?: VerifiedCampusStudentRunScope
   /** Optional already-bounded read client to avoid opening a second transaction. */
-  db?: Pick<PlannerBoundReadDb, '$queryRaw'>
+  db?: Pick<PlannerBoundReadDb, '$queryRaw'> & Partial<Pick<PlannerBoundReadDb, '$executeRaw'>>
 }
 
 type StudentRunTaskRow = {
@@ -379,7 +394,140 @@ async function readAssignedRunTasks<Student extends boolean>(userId: string, opt
         OR ${completedSchoolFeedback})
     ORDER BY e."created_at" DESC, e."id" DESC LIMIT ${limit + 1}
   `
-  const list = options?.db ? await runQuery(options.db) : await withBoundedPlannerRead(prisma, runQuery)
+  const canUseVerifiedCampusFastPath = student
+    && Boolean(options?.verifiedCampusStudent)
+    && options?.populationProductScope === 'CAMPUS_ONLY'
+    && !options?.includeCompletedSchoolFeedback
+    && Boolean(options?.db)
+  let list: Array<StudentRunTaskRow & (Student extends true ? object : GeneralRunTaskDetails)>
+  if (canUseVerifiedCampusFastPath) {
+    const verified = options!.verifiedCampusStudent!
+    const tupleKeys = verified.verifiedTupleKeys
+    const openSchoolRunKeys = verified.openSchoolRunKeys
+    const fastSchoolScope = options?.preserveBoundSchoolContinuation
+      ? Prisma.sql`((r."status" = 'CLOSED'
+          OR (e."status" = 'STARTED' AND e."runtime_binding_kind" = 'COMPOSITE' AND e."runtime_binding_ref" IS NOT NULL))
+        AND (e."organization_id" || '|' || e."run_id") = ANY(${openSchoolRunKeys}::text[]))`
+      : Prisma.sql`FALSE`
+    const fastBoundContinuation = options?.preserveBoundSchoolContinuation
+      ? Prisma.sql`(e."status" = 'STARTED'
+        AND e."runtime_binding_kind" = 'COMPOSITE'
+        AND e."runtime_binding_ref" IS NOT NULL
+        AND school_scope."inSchoolScope"
+        AND r."status" IN ('PUBLISHED','CLOSED')
+        AND t."frozen_resource_policy"->'runtimeLaunchTarget'->>'kind' = 'COMPOSITE'
+        AND a."id" IS NOT NULL
+        AND a."status" = 'STARTED'
+        AND a."policy_domain" = 'ORGANIZATION_RUN'
+        AND a."respondent_user_id" = ${userId}
+        AND a."subject_user_id" = ${userId}
+        AND a."resource_kind" = t."resource_family"
+        AND a."resource_key" = t."resource_key"
+        AND a."resource_version" = t."resource_version"
+        AND ca."id" IS NOT NULL
+        AND ca."assignment_ref" = a."id"
+        AND ca."user_id" = ${userId}
+        AND ca."respondent_user_id" = ${userId}
+        AND ca."subject_user_id" = a."subject_user_id"
+        AND ca."episode_id" = a."episode_id"
+        AND ca."status" = 'IN_PROGRESS'
+        AND ca."composite_assessment_id" = t."frozen_resource_policy"->'runtimeLaunchTarget'->>'ref'
+        AND ((a."consent_id" IS NULL AND ca."consent_id" IS NULL)
+          OR EXISTS (
+            SELECT 1 FROM "assessment_attempt_consents" issued
+            JOIN "assessment_attempt_consents" accepted ON accepted."id" = ca."consent_id"
+              AND accepted."accepted_at" IS NOT NULL AND accepted."revoked_at" IS NULL
+              AND accepted."subject_user_id" = issued."subject_user_id"
+              AND accepted."respondent_user_id" = issued."respondent_user_id"
+              AND ((issued."accepted_at" IS NOT NULL AND accepted."id" = issued."id")
+                OR (issued."accepted_at" IS NULL AND accepted."prior_consent_id" = issued."id"))
+            WHERE issued."id" = a."consent_id" AND issued."prior_consent_id" IS NULL
+              AND issued."revoked_at" IS NULL
+              AND issued."subject_user_id" = a."subject_user_id"
+              AND issued."respondent_user_id" = a."respondent_user_id"
+          )))`
+      : Prisma.sql`FALSE`
+    const fastClosedScope = options?.preserveBoundSchoolContinuation
+      ? Prisma.sql`(r."status" <> 'CLOSED' OR NOT school_scope."inSchoolScope" OR school_cont."boundContinuation")`
+      : Prisma.sql`TRUE`
+    const fastTrackValid = Prisma.sql`(
+      (t."resource_key" NOT LIKE 'education-composition:%'
+        OR ${educationCompositionTrackIdentitySql({ track: Prisma.sql`t`, organizationId: Prisma.sql`e."organization_id"`, product: 'SCHOOL' })})
+      AND (t."resource_family" <> 'SCALE' OR EXISTS (
+        SELECT 1 FROM "registered_assessment_resources" registered
+        WHERE registered."resource_key" = t."resource_key"
+          AND registered."resource_version" = t."resource_version"
+          AND ((registered."resource_key" LIKE 'library-scale:%:SCHOOL:%'
+            AND registered."entry"->'libraryOrigin'->>'product' = 'SCHOOL')
+            OR ${privateScaleRegistryIdentitySql({ registered: Prisma.sql`registered`, organizationId: Prisma.sql`e."organization_id"`, product: 'SCHOOL' })})
+          AND registered."entry"->'applicability'->>'resourceKind' = 'SCALE'
+      ))
+      AND (t."resource_family" <> 'FORM' OR t."resource_key" NOT LIKE 'private-form:%'
+        OR ${privateFormTrackIdentitySql({ track: Prisma.sql`t`, organizationId: Prisma.sql`e."organization_id"`, product: 'SCHOOL' })})
+    )`
+    // Flat, plan-cache-friendly query: reuses the same-snapshot verified student
+    // membership/enrollment/activity/deny proof for SELF executions, and flags
+    // any non-SELF or unverified candidate row for exact fallback evaluation.
+    const fastRows = await options!.db!.$queryRaw<Array<StudentRunTaskRow & { __needsFallback: boolean }>>`
+      SELECT (NOT fast_path."selfVerified") AS "__needsFallback",
+        school_cont."boundContinuation" AS "__boundSchoolContinuation",
+        to_char(e."created_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros",
+        e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",
+        r."name" AS "runName", r."intake_deadline" AS "deadline",
+        CASE WHEN ca."status" = 'COMPLETED' THEN 'COMPLETED'
+          WHEN r."status" = 'CANCELLED' THEN 'CANCELLED'
+          WHEN e."status" IN ('REVOKED', 'EXPIRED', 'CANCELLED', 'COMPLETED') THEN e."status"
+          WHEN school_cont."boundContinuation" AND r."status" IN ('PUBLISHED','CLOSED') THEN 'STARTED'
+          WHEN r."status" = 'CLOSED' OR r."intake_deadline" <= statement_timestamp() THEN 'EXPIRED'
+          ELSE e."status" END AS "status",
+        t."resource_family" AS "resourceFamily", t."resource_key" AS "resourceKey",
+        (a."consent_id" IS NOT NULL) AS "consentRequired",
+        consent."purpose" AS "consentPurpose", consent."visibility_scope" AS "consentVisibility"
+      FROM ${actorOrgsSql} actor_orgs
+      JOIN "assessment_run_actor_snapshots" respondent ON respondent."organization_id" = actor_orgs."organization_id"
+        AND respondent."user_id" = ${userId}
+        ${respondentRunScope}
+      JOIN "assessment_run_executions" e ON e."respondent_actor_snapshot_id" = respondent."id"
+        AND e."organization_id" = respondent."organization_id" AND e."run_id" = respondent."run_id"
+      JOIN "assessment_runs" r ON r."id" = e."run_id" AND r."organization_id" = e."organization_id"
+      JOIN "assessment_run_tracks" t ON t."id" = e."track_id" AND t."organization_id" = e."organization_id"
+      JOIN "assessment_run_relationship_snapshots" relation ON relation."id" = e."relationship_snapshot_id"
+      LEFT JOIN "relational_assessment_assignments" a ON a."id" = e."relational_assignment_id"
+      LEFT JOIN "composite_assessment_attempts" ca ON e."runtime_binding_kind" = 'COMPOSITE'
+        AND ca."id" = e."runtime_binding_ref" AND ca."user_id" = ${userId}
+      LEFT JOIN "assessment_attempt_consents" consent ON consent."id" = a."consent_id"
+      CROSS JOIN LATERAL (
+        SELECT (
+          e."subject_actor_snapshot_id" = e."respondent_actor_snapshot_id"
+          AND relation."relationship_kind" = 'SELF'
+          AND relation."snapshot_payload"->'facts'->>'courseId' IS NULL
+          AND respondent."provenance_kind" = 'ORG_MEMBER'
+          AND respondent."actor_role" = 'STUDENT'
+          AND respondent."membership_id" IS NOT NULL
+          AND respondent."snapshot_payload"->>'personaGrantId' IS NOT NULL
+          AND (e."organization_id" || '|' || e."run_id" || '|' || respondent."membership_id" || '|' || (respondent."snapshot_payload"->>'personaGrantId')) = ANY(${tupleKeys}::text[])
+        ) AS "selfVerified"
+      ) fast_path
+      CROSS JOIN LATERAL (SELECT ${fastSchoolScope} AS "inSchoolScope") school_scope
+      CROSS JOIN LATERAL (SELECT ${fastBoundContinuation} AS "boundContinuation") school_cont
+      WHERE respondent."user_id" = ${userId}
+        ${runScope}
+        ${executionScope}
+        ${cursorScope}
+        AND (NOT fast_path."selfVerified" OR (${fastClosedScope} AND ${fastTrackValid}))
+      ORDER BY e."created_at" DESC, e."id" DESC LIMIT ${limit + 1}
+    `
+    if (fastRows.some(row => row.__needsFallback)) {
+      if (typeof options!.db!.$executeRaw === 'function') {
+        await applyBoundedPlannerControls(options!.db! as Pick<PlannerBoundReadDb, '$executeRaw'>)
+      }
+      list = await runQuery(options!.db!)
+    } else {
+      list = fastRows.map(({ __needsFallback: _needsFallback, ...row }) => row) as Array<StudentRunTaskRow & (Student extends true ? object : GeneralRunTaskDetails)>
+    }
+  } else {
+    list = options?.db ? await runQuery(options.db) : await withBoundedPlannerRead(prisma, runQuery)
+  }
   const page = list.slice(0, limit)
   const last = page[page.length - 1]
   return {

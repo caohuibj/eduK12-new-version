@@ -3,9 +3,41 @@ import {educationCompositionTrackIdentitySql} from './educationCompositionIdenti
 import {privateScaleRegistryIdentitySql} from './educationPrivateScaleIdentitySql'
 import { Prisma } from '@prisma/client'
 import {studentEvaluationTrackConfigSql} from '../huiteacher/studentCompositionResource'
-import { currentRunActorAuthoritySql, currentWindowSql, type RunAuthorityPurpose } from './currentActorAuthority'
+import { currentRunActorAuthoritySql, currentWindowSql, usableRunAccountSql, type RunAuthorityPurpose } from './currentActorAuthority'
+import { applyBoundedPlannerControls, withBoundedPlannerRead, type PlannerBoundReadDb } from './plannerBound'
 
 export type RunPopulationProductScope = 'ALL' | 'CAMPUS_ONLY' | 'HUITEACHER_ONLY'
+
+export type SingleExecutionAuthorityEnvelope = {
+  executionId: string
+  organizationId: string
+  runId: string
+  trackId: string
+  executionStatus: string
+  orgStatus: string
+  orgProductDomain: string
+  subjectActorSnapshotId: string
+  respondentActorSnapshotId: string
+  subjectUserId: string
+  subjectRole: string
+  subjectProvenance: string
+  subjectMembershipId: string | null
+  subjectPersonaGrantId: string | null
+  respondentUserId: string
+  respondentRole: string
+  respondentProvenance: string
+  respondentMembershipId: string | null
+  respondentPersonaGrantId: string | null
+  relationshipKind: string
+  relationshipRef: string | null
+  relationshipCourseId: string | null
+  relationshipStudentClassAssignmentId: string | null
+  relationshipStaffClassAssignmentId: string | null
+  relationshipClassUnitId: string | null
+  trackResourceFamily: string
+  trackResourceKey: string
+  trackResourceVersion: string
+}
 
 const relationshipAuthoritySql = (productScope: RunPopulationProductScope): Prisma.Sql =>
   productScope === 'HUITEACHER_ONLY'
@@ -297,3 +329,479 @@ export const currentRunPopulationAuthoritySql = (
    ))
  )
 `
+
+const TEACHER_INDIVIDUAL_SCALE_PREFIX = 'teacher-scale:'
+const TEACHER_INDIVIDUAL_SCALE_SUFFIX = ':INDIVIDUAL'
+const isTeacherIndividualScaleKey = (key: string): boolean =>
+  key.startsWith(TEACHER_INDIVIDUAL_SCALE_PREFIX)
+  && key.endsWith(TEACHER_INDIVIDUAL_SCALE_SUFFIX)
+  && key.length >= TEACHER_INDIVIDUAL_SCALE_PREFIX.length + TEACHER_INDIVIDUAL_SCALE_SUFFIX.length
+
+/**
+ * Decompose the 18-table `currentRunPopulationAuthoritySql` into a flat,
+ * scope-and-relationship-specialized boolean SQL expression for a single known
+ * execution envelope. Returns `null` for rare shapes (observer/peer/parent/ALL
+ * /course-scoped) so callers fall back to `currentRunPopulationAuthoritySql`.
+ *
+ * Because each decomposed branch touches only 5-7 PK/unique-indexed tables with
+ * no multi-product disjunctions, PostgreSQL reuses cached generic plans instead
+ * of forcing `force_custom_plan` re-planning on every request.
+ */
+export const buildDecomposedSingleExecutionAuthoritySql = (
+  envelope: SingleExecutionAuthorityEnvelope,
+  purpose: RunAuthorityPurpose = 'COLLECTION',
+  productScope: RunPopulationProductScope = 'ALL',
+): Prisma.Sql | null => {
+  if (envelope.orgStatus !== 'ACTIVE') return Prisma.sql`FALSE`
+  if ((productScope === 'CAMPUS_ONLY' || productScope === 'HUITEACHER_ONLY') && envelope.orgProductDomain !== 'SCHOOL') {
+    return Prisma.sql`FALSE`
+  }
+
+  const sameActor = envelope.subjectActorSnapshotId === envelope.respondentActorSnapshotId
+  const actorDenySql = purpose === 'REPORT_READ'
+    ? Prisma.sql`deny.permission IN ('*','REPORT_READ','PARTICIPANT_REPORT_READ')`
+    : Prisma.sql`deny.permission IN ('*','RUN_START')`
+  const teacherDenySql = purpose === 'REPORT_READ'
+    ? Prisma.sql`deny.permission IN ('*','EDUCATION_ACCESS','HUITEACHER_ACCESS','REPORT_READ','PARTICIPANT_REPORT_READ')`
+    : Prisma.sql`deny.permission IN ('*','EDUCATION_ACCESS','HUITEACHER_ACCESS','RUN_START')`
+
+  // Fast Path 1: School Student SELF (CAMPUS_ONLY)
+  if (
+    productScope === 'CAMPUS_ONLY'
+    && sameActor
+    && envelope.relationshipKind === 'SELF'
+    && envelope.relationshipCourseId === null
+    && envelope.subjectRole === 'STUDENT'
+    && envelope.subjectProvenance === 'ORG_MEMBER'
+  ) {
+    if (!envelope.subjectMembershipId || !envelope.subjectPersonaGrantId) return Prisma.sql`FALSE`
+    if (purpose === 'REPORT_READ' && envelope.executionStatus !== 'COMPLETED') return Prisma.sql`FALSE`
+    const clauses: Prisma.Sql[] = [
+      Prisma.sql`EXISTS (
+        SELECT 1 FROM organizations org
+        JOIN users current_account ON current_account.id = ${envelope.subjectUserId}
+        JOIN organization_memberships member
+          ON member.id = ${envelope.subjectMembershipId}
+          AND member.user_id = current_account.id
+          AND member.organization_id = org.id
+          AND ${currentWindowSql(Prisma.sql`member`)}
+        JOIN organization_persona_grants persona
+          ON persona.id = ${envelope.subjectPersonaGrantId}
+          AND persona.organization_id = member.organization_id
+          AND persona.membership_id = member.id
+          AND persona.persona = 'STUDENT'
+          AND persona.granted_at <= statement_timestamp()
+          AND persona.revoked_at IS NULL
+        WHERE org.id = ${envelope.organizationId}
+          AND org.status = 'ACTIVE'
+          AND org.product_domain = 'SCHOOL'
+          AND current_account.account_domain = 'SCHOOL'
+          AND ${usableRunAccountSql(Prisma.sql`current_account`)}
+          AND NOT EXISTS (
+            SELECT 1 FROM organization_access_denies deny
+            WHERE deny.organization_id = org.id
+              AND deny.user_id = current_account.id
+              AND deny.lifted_at IS NULL
+              AND ${actorDenySql}
+          )
+      )`,
+      Prisma.sql`NOT EXISTS (
+        SELECT 1 FROM huiteacher_evaluation_run_links h
+        WHERE h.organization_id = ${envelope.organizationId} AND h.run_id = ${envelope.runId}
+      )`,
+      Prisma.sql`EXISTS (
+        SELECT 1 FROM campus_activity_runs ar
+        JOIN campus_activities activity
+          ON activity.course_id = ar.course_id
+          AND activity.organization_id = ar.organization_id
+          AND ${purpose === 'REPORT_READ'
+            ? Prisma.sql`activity.status IN ('OPEN','PAUSED','CLOSED')`
+            : Prisma.sql`activity.status = 'OPEN'`}
+        JOIN campus_activity_participants member
+          ON member.course_id = ar.course_id
+          AND member.organization_id = ar.organization_id
+          AND member.status = 'ACTIVE'
+          AND member.membership_id = ${envelope.subjectMembershipId}
+        JOIN campus_student_enrollments enrollment
+          ON enrollment.user_id = ${envelope.subjectUserId}
+          AND enrollment.organization_id = ar.organization_id
+          AND enrollment.status = 'APPROVED'
+        JOIN campus_class_admissions admission
+          ON admission.organization_id = enrollment.organization_id
+          AND admission.class_unit_id = enrollment.class_unit_id
+          AND admission.status = 'APPROVED'
+        JOIN organization_student_class_assignments class_assignment
+          ON class_assignment.organization_id = ar.organization_id
+          AND class_assignment.membership_id = ${envelope.subjectMembershipId}
+          AND class_assignment.class_unit_id = enrollment.class_unit_id
+          AND ${currentWindowSql(Prisma.sql`class_assignment`)}
+        WHERE ar.organization_id = ${envelope.organizationId} AND ar.run_id = ${envelope.runId}
+      )`,
+    ]
+    if (envelope.trackResourceKey.startsWith('education-composition:')) {
+      clauses.push(Prisma.sql`EXISTS (
+        SELECT 1 FROM assessment_run_tracks school_ordinary
+        WHERE school_ordinary.id = ${envelope.trackId}
+          AND school_ordinary.organization_id = ${envelope.organizationId}
+          AND school_ordinary.run_id = ${envelope.runId}
+          AND ${educationCompositionTrackIdentitySql({
+            track: Prisma.sql`school_ordinary`,
+            organizationId: Prisma.sql`${envelope.organizationId}`,
+            product: 'SCHOOL',
+          })}
+      )`)
+    }
+    if (purpose !== 'REPORT_READ' && envelope.trackResourceFamily === 'SCALE') {
+      clauses.push(Prisma.sql`EXISTS (
+        SELECT 1 FROM registered_assessment_resources registered
+        WHERE registered.resource_key = ${envelope.trackResourceKey}
+          AND registered.resource_version = ${envelope.trackResourceVersion}
+          AND ((registered.resource_key LIKE 'library-scale:%:SCHOOL:%'
+            AND registered.entry->'libraryOrigin'->>'product' = 'SCHOOL')
+            OR ${privateScaleRegistryIdentitySql({
+              registered: Prisma.sql`registered`,
+              organizationId: Prisma.sql`${envelope.organizationId}`,
+              product: 'SCHOOL',
+            })})
+          AND registered.entry->'applicability'->>'resourceKind' = 'SCALE'
+      )`)
+    }
+    if (envelope.trackResourceFamily === 'FORM' && envelope.trackResourceKey.startsWith('private-form:')) {
+      clauses.push(Prisma.sql`EXISTS (
+        SELECT 1 FROM assessment_run_tracks school_form
+        WHERE school_form.id = ${envelope.trackId}
+          AND school_form.organization_id = ${envelope.organizationId}
+          AND school_form.run_id = ${envelope.runId}
+          AND ${privateFormTrackIdentitySql({
+            track: Prisma.sql`school_form`,
+            organizationId: Prisma.sql`${envelope.organizationId}`,
+            product: 'SCHOOL',
+          })}
+      )`)
+    }
+    return Prisma.sql`(${Prisma.join(clauses, ' AND ')})`
+  }
+
+  // Fast Path 2: Teacher SELF (HUITEACHER_ONLY)
+  if (
+    productScope === 'HUITEACHER_ONLY'
+    && sameActor
+    && envelope.relationshipKind === 'SELF'
+    && envelope.relationshipCourseId === null
+    && envelope.subjectRole === 'TEACHER'
+    && envelope.subjectProvenance === 'ORG_MEMBER'
+  ) {
+    if (!envelope.subjectMembershipId || !envelope.subjectPersonaGrantId) return Prisma.sql`FALSE`
+    const clauses: Prisma.Sql[] = [
+      Prisma.sql`EXISTS (
+        SELECT 1 FROM organizations org
+        JOIN users current_account ON current_account.id = ${envelope.subjectUserId}
+        JOIN organization_memberships member
+          ON member.id = ${envelope.subjectMembershipId}
+          AND member.user_id = current_account.id
+          AND member.organization_id = org.id
+          AND ${currentWindowSql(Prisma.sql`member`)}
+        JOIN organization_persona_grants persona
+          ON persona.id = ${envelope.subjectPersonaGrantId}
+          AND persona.organization_id = member.organization_id
+          AND persona.membership_id = member.id
+          AND persona.persona = 'TEACHER'
+          AND persona.granted_at <= statement_timestamp()
+          AND persona.revoked_at IS NULL
+        WHERE org.id = ${envelope.organizationId}
+          AND org.status = 'ACTIVE'
+          AND org.product_domain = 'SCHOOL'
+          AND current_account.account_domain = 'SCHOOL'
+          AND ${usableRunAccountSql(Prisma.sql`current_account`)}
+          AND NOT EXISTS (
+            SELECT 1 FROM organization_access_denies deny
+            WHERE deny.organization_id = org.id
+              AND deny.user_id = current_account.id
+              AND deny.lifted_at IS NULL
+              AND ${teacherDenySql}
+          )
+      )`,
+      Prisma.sql`NOT EXISTS (
+        SELECT 1 FROM campus_activity_runs school_excl
+        WHERE school_excl.organization_id = ${envelope.organizationId} AND school_excl.run_id = ${envelope.runId}
+      )`,
+      Prisma.sql`EXISTS (
+        SELECT 1 FROM huiteacher_evaluation_run_links h
+        JOIN huiteacher_evaluation_events event
+          ON event.organization_id = h.organization_id
+          AND event.id = h.event_id
+          AND event.status IN ('OPEN', 'CLOSED')
+          AND (event.status = 'OPEN' OR ${envelope.executionStatus} = 'COMPLETED')
+        JOIN education_product_entitlements entitlement
+          ON entitlement.organization_id = h.organization_id
+          AND entitlement.product = 'HUITEACHER'
+          AND entitlement.status = 'ACTIVE'
+        WHERE h.organization_id = ${envelope.organizationId} AND h.run_id = ${envelope.runId}
+      )`,
+    ]
+    if (envelope.trackResourceKey.startsWith('education-composition:')) {
+      clauses.push(Prisma.sql`EXISTS (
+        SELECT 1 FROM assessment_run_tracks ordinary_track
+        WHERE ordinary_track.id = ${envelope.trackId}
+          AND ordinary_track.organization_id = ${envelope.organizationId}
+          AND ordinary_track.run_id = ${envelope.runId}
+          AND ${educationCompositionTrackIdentitySql({
+            track: Prisma.sql`ordinary_track`,
+            organizationId: Prisma.sql`${envelope.organizationId}`,
+            product: 'TEACHER',
+          })}
+      )`)
+    }
+    if (envelope.trackResourceKey.startsWith('private-form:')) {
+      clauses.push(Prisma.sql`EXISTS (
+        SELECT 1 FROM assessment_run_tracks private_form_track
+        WHERE private_form_track.id = ${envelope.trackId}
+          AND private_form_track.organization_id = ${envelope.organizationId}
+          AND private_form_track.run_id = ${envelope.runId}
+          AND ${privateFormTrackIdentitySql({
+            track: Prisma.sql`private_form_track`,
+            organizationId: Prisma.sql`${envelope.organizationId}`,
+            product: 'TEACHER',
+          })}
+      )`)
+    }
+    if (envelope.trackResourceKey.startsWith('private-scale:')) {
+      clauses.push(Prisma.sql`EXISTS (
+        SELECT 1 FROM registered_assessment_resources private_registered
+        WHERE private_registered.resource_key = ${envelope.trackResourceKey}
+          AND private_registered.resource_version = ${envelope.trackResourceVersion}
+          AND ${privateScaleRegistryIdentitySql({
+            registered: Prisma.sql`private_registered`,
+            organizationId: Prisma.sql`${envelope.organizationId}`,
+            product: 'TEACHER',
+          })}
+      )`)
+    }
+    if (
+      envelope.trackResourceFamily === 'SCALE'
+      && isTeacherIndividualScaleKey(envelope.trackResourceKey)
+      && envelope.executionStatus !== 'COMPLETED'
+    ) {
+      clauses.push(Prisma.sql`EXISTS (
+        SELECT 1 FROM registered_assessment_resources registered
+        JOIN education_teacher_scale_licenses license
+          ON license.resource_id = registered.id
+          AND license.organization_id = ${envelope.organizationId}
+          AND license.status = 'ACTIVE'
+        WHERE registered.resource_key = ${envelope.trackResourceKey}
+          AND registered.resource_version = ${envelope.trackResourceVersion}
+          AND registered.status = 'PUBLISHED'
+      )`)
+    }
+    return Prisma.sql`(${Prisma.join(clauses, ' AND ')})`
+  }
+
+  // Fast Path 3: Student evaluates Teacher (HUITEACHER_ONLY + CLASS_TEACHER_STUDENT)
+  if (
+    productScope === 'HUITEACHER_ONLY'
+    && envelope.relationshipKind === 'CLASS_TEACHER_STUDENT'
+    && envelope.relationshipCourseId === null
+    && envelope.subjectRole === 'TEACHER'
+    && envelope.respondentRole === 'STUDENT'
+    && envelope.subjectProvenance === 'ORG_MEMBER'
+    && envelope.respondentProvenance === 'ORG_MEMBER'
+  ) {
+    if (
+      !envelope.subjectMembershipId || !envelope.subjectPersonaGrantId
+      || !envelope.respondentMembershipId || !envelope.respondentPersonaGrantId
+      || !envelope.relationshipStudentClassAssignmentId
+      || !envelope.relationshipStaffClassAssignmentId
+      || !envelope.relationshipClassUnitId
+    ) return Prisma.sql`FALSE`
+    return Prisma.sql`(
+      EXISTS (
+        SELECT 1 FROM organizations org
+        JOIN users teacher_subject ON teacher_subject.id = ${envelope.subjectUserId}
+        JOIN organization_memberships member
+          ON member.id = ${envelope.subjectMembershipId}
+          AND member.user_id = teacher_subject.id
+          AND member.organization_id = org.id
+          AND ${currentWindowSql(Prisma.sql`member`)}
+        JOIN organization_persona_grants persona
+          ON persona.id = ${envelope.subjectPersonaGrantId}
+          AND persona.organization_id = member.organization_id
+          AND persona.membership_id = member.id
+          AND persona.persona = 'TEACHER'
+          AND persona.granted_at <= statement_timestamp()
+          AND persona.revoked_at IS NULL
+        WHERE org.id = ${envelope.organizationId}
+          AND org.status = 'ACTIVE'
+          AND org.product_domain = 'SCHOOL'
+          AND teacher_subject.account_domain = 'SCHOOL'
+          AND teacher_subject.role IN ('TEACHER', 'ADMIN')
+          AND ${usableRunAccountSql(Prisma.sql`teacher_subject`)}
+          AND NOT EXISTS (
+            SELECT 1 FROM organization_access_denies deny
+            WHERE deny.organization_id = org.id
+              AND deny.user_id = teacher_subject.id
+              AND deny.lifted_at IS NULL
+              AND ${actorDenySql}
+          )
+      )
+      AND EXISTS (
+        SELECT 1 FROM users student_respondent
+        JOIN organization_memberships member
+          ON member.id = ${envelope.respondentMembershipId}
+          AND member.user_id = student_respondent.id
+          AND member.organization_id = ${envelope.organizationId}
+          AND ${currentWindowSql(Prisma.sql`member`)}
+        JOIN organization_persona_grants persona
+          ON persona.id = ${envelope.respondentPersonaGrantId}
+          AND persona.organization_id = member.organization_id
+          AND persona.membership_id = member.id
+          AND persona.persona = 'STUDENT'
+          AND persona.granted_at <= statement_timestamp()
+          AND persona.revoked_at IS NULL
+        WHERE student_respondent.id = ${envelope.respondentUserId}
+          AND student_respondent.account_domain = 'SCHOOL'
+          AND student_respondent.role = 'STUDENT'
+          AND ${usableRunAccountSql(Prisma.sql`student_respondent`)}
+          AND NOT EXISTS (
+            SELECT 1 FROM organization_access_denies deny
+            WHERE deny.organization_id = ${envelope.organizationId}
+              AND deny.user_id = student_respondent.id
+              AND deny.lifted_at IS NULL
+              AND ${teacherDenySql}
+          )
+      )
+      AND NOT EXISTS (
+        SELECT 1 FROM campus_activity_runs school_excl
+        WHERE school_excl.organization_id = ${envelope.organizationId} AND school_excl.run_id = ${envelope.runId}
+      )
+      AND EXISTS (
+        SELECT 1 FROM huiteacher_evaluation_run_links h
+        JOIN huiteacher_evaluation_events event
+          ON event.organization_id = h.organization_id
+          AND event.id = h.event_id
+          AND event.status IN ('OPEN', 'CLOSED')
+          AND (event.status = 'OPEN' OR ${envelope.executionStatus} = 'COMPLETED')
+        JOIN education_product_entitlements entitlement
+          ON entitlement.organization_id = h.organization_id
+          AND entitlement.product = 'HUITEACHER'
+          AND entitlement.status = 'ACTIVE'
+        JOIN huiteacher_student_eval_configs cfg
+          ON cfg.organization_id = h.organization_id
+          AND cfg.event_id = h.event_id
+          AND cfg.class_unit_id = ${envelope.relationshipClassUnitId}
+          AND cfg.staff_assignment_id = ${envelope.relationshipStaffClassAssignmentId}
+        JOIN assessment_run_tracks track
+          ON track.organization_id = h.organization_id
+          AND track.run_id = h.run_id
+          AND track.id = ${envelope.trackId}
+          AND ${studentEvaluationTrackConfigSql(Prisma.sql`track`, Prisma.sql`cfg`)}
+        JOIN huiteacher_evaluation_targets target
+          ON target.organization_id = cfg.organization_id
+          AND target.id = event.target_id
+          AND target.kind = 'PERSON'
+          AND target.subject_user_id = ${envelope.subjectUserId}
+        JOIN organization_staff_class_assignments staff
+          ON staff.id = cfg.staff_assignment_id
+          AND staff.organization_id = cfg.organization_id
+          AND staff.class_unit_id = cfg.class_unit_id
+          AND staff.staff_role IN ('TEACHING', 'HOMEROOM')
+          AND ${currentWindowSql(Prisma.sql`staff`)}
+        JOIN organization_student_class_assignments placement
+          ON placement.id = ${envelope.relationshipStudentClassAssignmentId}
+          AND placement.organization_id = cfg.organization_id
+          AND placement.class_unit_id = cfg.class_unit_id
+          AND placement.membership_id = ${envelope.respondentMembershipId}
+          AND ${currentWindowSql(Prisma.sql`placement`)}
+        WHERE h.organization_id = ${envelope.organizationId} AND h.run_id = ${envelope.runId}
+      )
+    )`
+  }
+
+  return null
+}
+
+/** Load the single-execution structural envelope via primary key for flat authority evaluation. */
+export const loadSingleExecutionAuthorityEnvelope = async (
+  db: Pick<PlannerBoundReadDb, '$queryRaw'>,
+  executionId: string,
+): Promise<SingleExecutionAuthorityEnvelope | null> => {
+  const rows = await db.$queryRaw<SingleExecutionAuthorityEnvelope[]>(Prisma.sql`
+    SELECT e.id AS "executionId",
+      e.organization_id AS "organizationId",
+      e.run_id AS "runId",
+      e.track_id AS "trackId",
+      e.status AS "executionStatus",
+      org.status AS "orgStatus",
+      org.product_domain AS "orgProductDomain",
+      e.subject_actor_snapshot_id AS "subjectActorSnapshotId",
+      e.respondent_actor_snapshot_id AS "respondentActorSnapshotId",
+      subject.user_id AS "subjectUserId",
+      subject.actor_role AS "subjectRole",
+      subject.provenance_kind AS "subjectProvenance",
+      subject.membership_id AS "subjectMembershipId",
+      subject.snapshot_payload->>'personaGrantId' AS "subjectPersonaGrantId",
+      respondent.user_id AS "respondentUserId",
+      respondent.actor_role AS "respondentRole",
+      respondent.provenance_kind AS "respondentProvenance",
+      respondent.membership_id AS "respondentMembershipId",
+      respondent.snapshot_payload->>'personaGrantId' AS "respondentPersonaGrantId",
+      relation.relationship_kind AS "relationshipKind",
+      relation.relationship_ref AS "relationshipRef",
+      relation.snapshot_payload->'facts'->>'courseId' AS "relationshipCourseId",
+      relation.snapshot_payload->'facts'->>'studentClassAssignmentId' AS "relationshipStudentClassAssignmentId",
+      relation.snapshot_payload->'facts'->>'staffClassAssignmentId' AS "relationshipStaffClassAssignmentId",
+      relation.snapshot_payload->'facts'->>'classUnitId' AS "relationshipClassUnitId",
+      t.resource_family AS "trackResourceFamily",
+      t.resource_key AS "trackResourceKey",
+      t.resource_version AS "trackResourceVersion"
+    FROM assessment_run_executions e
+    JOIN organizations org ON org.id = e.organization_id
+    JOIN assessment_run_tracks t
+      ON t.id = e.track_id AND t.organization_id = e.organization_id AND t.run_id = e.run_id
+    JOIN assessment_run_relationship_snapshots relation ON relation.id = e.relationship_snapshot_id
+    JOIN assessment_run_actor_snapshots subject ON subject.id = e.subject_actor_snapshot_id
+    JOIN assessment_run_actor_snapshots respondent ON respondent.id = e.respondent_actor_snapshot_id
+    WHERE e.id = ${executionId}
+    LIMIT 1
+  `)
+  return rows[0] ?? null
+}
+
+/**
+ * Evaluate current Run population authority for one execution using the flat,
+ * plan-cache-friendly decomposed path when applicable, falling back to the
+ * full bounded-planner `currentRunPopulationAuthoritySql` for rare shapes.
+ */
+export const checkSingleExecutionPopulationAuthority = async (
+  db: PlannerBoundReadDb,
+  input: {
+    executionId: string
+    envelope?: SingleExecutionAuthorityEnvelope | null
+    purpose?: RunAuthorityPurpose
+    productScope?: RunPopulationProductScope
+  },
+): Promise<boolean> => {
+  const purpose = input.purpose ?? 'COLLECTION'
+  const productScope = input.productScope ?? 'ALL'
+  const envelope = input.envelope !== undefined
+    ? input.envelope
+    : await loadSingleExecutionAuthorityEnvelope(db, input.executionId)
+  if (!envelope) return false
+  const decomposed = buildDecomposedSingleExecutionAuthoritySql(envelope, purpose, productScope)
+  if (decomposed) {
+    const rows = await db.$queryRaw<Array<{ allowed: boolean }>>(Prisma.sql`SELECT ${decomposed} AS "allowed"`)
+    return rows[0]?.allowed === true
+  }
+  const runFallback = async (client: Pick<PlannerBoundReadDb, '$queryRaw'>) => {
+    const rows = await client.$queryRaw<Array<{ allowed: boolean }>>(Prisma.sql`
+      SELECT ${currentRunPopulationAuthoritySql(Prisma.sql`${input.executionId}`, purpose, productScope)} AS "allowed"
+    `)
+    return rows[0]?.allowed === true
+  }
+  if (typeof db.$transaction === 'function') {
+    return withBoundedPlannerRead(db, runFallback)
+  }
+  if (typeof db.$executeRaw === 'function') {
+    await applyBoundedPlannerControls(db as Pick<PlannerBoundReadDb, '$executeRaw'>)
+  }
+  return runFallback(db)
+}

@@ -42,6 +42,19 @@ export type ScientificProvenanceKnownLockContext = {
   hasHuiteacherLink?: boolean
   now?: Date
   alreadyLocked?: boolean
+  /** Optional same-transaction pre-projected execution + track fields from lockExecutionEnvelope. */
+  knownRow?: {
+    organizationId: string
+    resourceFamily: string
+    resourceKey: string
+    resourceVersion: string
+    resourcePolicyHash: string | null
+    frozenResourcePolicy: unknown | null
+    scientificMaturity: RunScientificMaturity | null
+    scientificProvenance: FrozenRunScientificProvenanceV1 | null
+    scientificProvenanceHash: string | null
+    scientificFrozenAt: Date | null
+  }
 }
 
 export type FrozenRunScientificDetails = {
@@ -68,7 +81,13 @@ export const freezeRunExecutionScientificProvenanceWithDetailsInTransaction = as
   const hasKnownLinks = knownContext?.alreadyLocked === true
     && typeof knownContext.hasCampusActivity === 'boolean'
     && typeof knownContext.hasHuiteacherLink === 'boolean'
-  const rows = hasKnownLinks
+  const rows = hasKnownLinks && knownContext?.knownRow
+    ? [{
+        ...knownContext.knownRow,
+        school: knownContext.hasCampusActivity!,
+        teacher: knownContext.hasHuiteacherLink!,
+      }]
+    : hasKnownLinks
     ? (await tx.$queryRaw<Array<{
         organizationId: string
         resourceFamily: string

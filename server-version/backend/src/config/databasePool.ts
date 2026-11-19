@@ -39,6 +39,51 @@ export const buildDatabaseUrl = (
   return url.toString()
 }
 
+export type DatabasePoolConfigConflict = {
+  parameter: 'connection_limit' | 'pool_timeout'
+  urlValue: number
+  envName: 'PRISMA_CONNECTION_POOL_SIZE' | 'PRISMA_POOL_TIMEOUT'
+  envValue: number
+}
+
+/**
+ * Detect silent overrides where DATABASE_URL explicitly pins connection_limit
+ * or pool_timeout to a different value than PRISMA_CONNECTION_POOL_SIZE /
+ * PRISMA_POOL_TIMEOUT. buildDatabaseUrl preserves DATABASE_URL precedence, so
+ * callers use this check to fail fast in preflight or warn loudly at startup.
+ */
+export const detectDatabasePoolConfigConflicts = (
+  databaseUrl: string | undefined,
+  env: NodeJS.ProcessEnv = process.env,
+): DatabasePoolConfigConflict[] => {
+  if (!databaseUrl) return []
+  let url: URL
+  try { url = new URL(databaseUrl) } catch { return [] }
+  const conflicts: DatabasePoolConfigConflict[] = []
+  const pairs: Array<{
+    parameter: 'connection_limit' | 'pool_timeout'
+    envName: 'PRISMA_CONNECTION_POOL_SIZE' | 'PRISMA_POOL_TIMEOUT'
+  }> = [
+    { parameter: 'connection_limit', envName: 'PRISMA_CONNECTION_POOL_SIZE' },
+    { parameter: 'pool_timeout', envName: 'PRISMA_POOL_TIMEOUT' },
+  ]
+  for (const { parameter, envName } of pairs) {
+    const rawUrl = url.searchParams.get(parameter)
+    const rawEnv = env[envName]
+    if (rawUrl === null || rawEnv === undefined || rawEnv.trim() === '') continue
+    const urlValue = Number(rawUrl)
+    const envValue = Number(rawEnv)
+    if (
+      Number.isSafeInteger(urlValue) && urlValue >= 1 && urlValue <= 1000
+      && Number.isSafeInteger(envValue) && envValue >= 1 && envValue <= 1000
+      && urlValue !== envValue
+    ) {
+      conflicts.push({ parameter, urlValue, envName, envValue })
+    }
+  }
+  return conflicts
+}
+
 /** Effective Prisma connection pool size for the CURRENT database URL, using
  * the exact same precedence as buildDatabaseUrl: an explicit connection_limit
  * in DATABASE_URL wins, then PRISMA_CONNECTION_POOL_SIZE, then the default. */

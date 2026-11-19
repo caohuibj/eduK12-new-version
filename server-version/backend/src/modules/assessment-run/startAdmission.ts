@@ -3,7 +3,9 @@ import { prisma } from '../../config/database'
 import type { RespondentTypeV1 } from '../assessment-identity/types'
 import {
   createSqlRelationalAssignmentRepository,
+  toRelationalAssignmentRecord,
   type RelationalAssignmentRepository,
+  type RelationalAssignmentRow,
 } from '../assessment-relational/repository'
 import type { RelationalAssignmentRecordV1 } from '../assessment-relational/types'
 
@@ -149,6 +151,10 @@ export const loadRunExecutionStartAdmission = async (input: {
   admittedAttemptIdentity?: RunAttemptIdentityBinding
   assignments?: Pick<RelationalAssignmentRepository, 'findById' | 'resolveAcceptedConsent'>
   knownExecution?: ExecutionAdmissionRow
+  /** Optional same-transaction assignment already projected under the execution lock. */
+  knownAssignment?: RelationalAssignmentRecordV1
+  /** Optional same-transaction raw assignment row projected under the execution lock. */
+  knownAssignmentRow?: RelationalAssignmentRow | null
 }): Promise<RunStartAdmission> => {
   const db = input.tx ?? (prisma as unknown as Tx)
   const execution = (
@@ -196,7 +202,11 @@ export const loadRunExecutionStartAdmission = async (input: {
 
   const assignmentRepository = input.assignments
     ?? createSqlRelationalAssignmentRepository(db as any)
-  const assignment = await assignmentRepository.findById(execution.relationalAssignmentId)
+  const assignment = input.knownAssignment && input.knownAssignment.assignmentId === execution.relationalAssignmentId
+    ? input.knownAssignment
+    : input.knownAssignmentRow && input.knownAssignmentRow.id === execution.relationalAssignmentId
+      ? toRelationalAssignmentRecord(input.knownAssignmentRow)
+      : await assignmentRepository.findById(execution.relationalAssignmentId)
   if (!assignment) throw new RunStartAdmissionError('RUN_ASSIGNMENT_MISSING', 'Run assignment does not exist', 409)
   if (assignment.respondentUserId !== input.actorUserId) {
     throw new RunStartAdmissionError('RUN_EXECUTION_ACTOR', 'assignment respondent does not match frozen Run respondent', 403)

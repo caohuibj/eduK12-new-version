@@ -3,7 +3,11 @@ import { Prisma } from '@prisma/client'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { prisma as db } from '../../config/database'
 import { currentRunActorAuthoritySql, currentWindowSql, type RunAuthorityPurpose } from '../../modules/assessment-run/currentActorAuthority'
-import { currentRunPopulationAuthoritySql, type RunPopulationProductScope } from '../../modules/assessment-run/currentPopulationAuthority'
+import {
+  checkSingleExecutionPopulationAuthority,
+  currentRunPopulationAuthoritySql,
+  type RunPopulationProductScope,
+} from '../../modules/assessment-run/currentPopulationAuthority'
 import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integration-env'
 import { grantSyntheticHuischoolProduct } from './educationProductFixture'
 
@@ -176,6 +180,12 @@ const assertEquivalent = async (
     expect(pair.newCampus, `${executionId} ${purpose} campus student clause`).toBe(pair.oldCampus)
     for (const scope of scopes) {
       const actual = await evaluateNew(executionId, purpose, scope)
+      const decomposed = await checkSingleExecutionPopulationAuthority(db, {
+        executionId,
+        purpose,
+        productScope: scope,
+      })
+      expect(decomposed, `${executionId} ${purpose}:${scope} decomposed equivalence`).toBe(actual)
       const key = `${purpose}:${scope}` as const
       if (expected && key in expected) {
         expect(actual, `${executionId} ${key}`).toBe(expected[key])
