@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { logger } from '../utils/logger'
-import { buildDatabaseUrl } from './databasePool'
+import { buildDatabaseUrl, detectDatabasePoolConfigConflicts } from './databasePool'
 import { recordPrismaCall, recordPrismaError, recordPrismaSqlEvent, sqlEventCollectionEnabled } from '../services/runtimeObservability'
 
 const globalForPrisma = globalThis as unknown as {
@@ -10,8 +10,14 @@ const globalForPrisma = globalThis as unknown as {
 
 // 连接池配置 - 运行时把环境变量合并进 Prisma datasource URL。
 // 已显式配置在 DATABASE_URL 中的参数优先，避免部署脚本被静默覆盖。
-export { buildDatabaseUrl } from './databasePool'
+export { buildDatabaseUrl, detectDatabasePoolConfigConflicts } from './databasePool'
 
+const poolConflicts = detectDatabasePoolConfigConflicts(process.env.DATABASE_URL)
+if (poolConflicts.length > 0 && process.env.NODE_ENV !== 'test') {
+  logger.warn('[Prisma] DATABASE_URL pool parameters override env vars', {
+    conflicts: poolConflicts,
+  })
+}
 const databaseUrl = buildDatabaseUrl(process.env.DATABASE_URL)
 // Test collection is explicit and records counts/durations only. Never emit
 // SQL text or parameters in production metrics.

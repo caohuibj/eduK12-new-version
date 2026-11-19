@@ -39,26 +39,40 @@ const optionalAssessmentCaps = new Set([
 export function inspectResourceContract(compose, {capacity=false}={}) {
  const services=compose.services || {};const result={capacityCertified:false,services:{}}
  let cpu=0,memory=0,pools=0
- for(const name of ['postgres','redis','backend','worker','frontend']) {
+ const extraBackends=Object.keys(services).filter(name=>/^backend-\d+$/.test(name)).sort()
+ const inspectedServices=['postgres','redis','backend',...extraBackends,'worker','frontend']
+ for(const name of inspectedServices) {
+  const isBackend=name==='backend' || /^backend-\d+$/.test(name)
   const service=services[name];if(!service)throw new Error(`Missing ${name}`)
   const cpus=Number(service.cpus);if(!Number.isFinite(cpus)||cpus<=0||cpus>4)throw new Error(`Invalid ${name} CPU`)
   const bytes=size(service.mem_limit);cpu+=cpus;memory+=bytes
   result.services[name]={cpus,memoryMiB:bytes/1048576}
   const ports=service.ports || []
   if(['postgres','redis','worker'].includes(name) && ports.length)throw new Error(`Forbidden ${name} host exposure`)
-  if(name==='backend' && ports.length && !capacity)throw new Error('Forbidden API host exposure')
+  if(isBackend && ports.length && !capacity)throw new Error('Forbidden API host exposure')
   if(ports.some(port=>port.host_ip!=='127.0.0.1' && port.host_ip!=='::1'))throw new Error('Public host exposure requires an independently reviewed TLS ingress')
-  if(['backend','worker'].includes(name)) {
+  if(isBackend || name==='worker') {
    const env=service.environment || {}
    const origin=new URL(env.CORS_ORIGIN)
    if(origin.protocol!=='https:' || origin.origin!==env.CORS_ORIGIN)throw new Error('Production acceptance requires an exact HTTPS CORS origin')
    if(String(env.COOKIE_SECURE)!=='true')throw new Error('HTTPS requires secure cookies')
    integer(env.TRUST_PROXY_HOPS,'TRUST_PROXY_HOPS',1,10)
    if(String(env.ASSET_MIGRATION_COMPLETE)!=='true')throw new Error('Asset migration must be complete')
-   if(name==='backend' && String(env.BACKGROUND_WORKERS_ENABLED)!=='false')throw new Error('API must not consume worker jobs')
+   if(isBackend && String(env.BACKGROUND_WORKERS_ENABLED)!=='false')throw new Error('API must not consume worker jobs')
    const db=new URL(env.DATABASE_URL)
-   const pool=integer(db.searchParams.has('connection_limit') ? db.searchParams.get('connection_limit') : env.PRISMA_CONNECTION_POOL_SIZE,'Prisma pool',1,1000)
-   integer(db.searchParams.has('pool_timeout') ? db.searchParams.get('pool_timeout') : env.PRISMA_POOL_TIMEOUT,'Prisma timeout',1,1000)
+   const urlPool=db.searchParams.has('connection_limit') ? integer(db.searchParams.get('connection_limit'),'DATABASE_URL connection_limit',1,1000) : null
+   const envPool=env.PRISMA_CONNECTION_POOL_SIZE!==undefined && String(env.PRISMA_CONNECTION_POOL_SIZE).trim()!=='' ? integer(env.PRISMA_CONNECTION_POOL_SIZE,'PRISMA_CONNECTION_POOL_SIZE',1,1000) : null
+   if(urlPool!==null && envPool!==null && urlPool!==envPool)throw new Error(`${name} DATABASE_URL connection_limit (${urlPool}) disagrees with PRISMA_CONNECTION_POOL_SIZE (${envPool})`)
+   const pool=urlPool ?? envPool ?? integer(undefined,'Prisma pool',1,1000)
+   const urlTimeout=db.searchParams.has('pool_timeout') ? integer(db.searchParams.get('pool_timeout'),'DATABASE_URL pool_timeout',1,1000) : null
+   const envTimeout=env.PRISMA_POOL_TIMEOUT!==undefined && String(env.PRISMA_POOL_TIMEOUT).trim()!=='' ? integer(env.PRISMA_POOL_TIMEOUT,'PRISMA_POOL_TIMEOUT',1,1000) : null
+   if(urlTimeout!==null && envTimeout!==null && urlTimeout!==envTimeout)throw new Error(`${name} DATABASE_URL pool_timeout (${urlTimeout}) disagrees with PRISMA_POOL_TIMEOUT (${envTimeout})`)
+   if(urlTimeout===null && envTimeout===null)integer(undefined,'Prisma timeout',1,1000)
+   if(isBackend && String(env.ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED)==='true') {
+    const trickleMax=env.ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT===undefined || String(env.ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT).trim()===''
+     ? 1 : Number(env.ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT)
+    if(!Number.isSafeInteger(trickleMax) || trickleMax<1 || trickleMax>10)throw new Error(`${name} ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED=true requires ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT in 1..10`)
+   }
    const heapMatches=[...String(env.NODE_OPTIONS).matchAll(/--max-old-space-size=(\d+)/g)]
    if(heapMatches.length!==1)throw new Error(`Explicit ${name} heap required`)
    const heap=integer(heapMatches[0][1],'Node heap',1,4096)
