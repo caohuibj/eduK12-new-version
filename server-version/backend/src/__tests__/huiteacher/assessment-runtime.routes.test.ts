@@ -388,6 +388,20 @@ describe('Teacher assessment runtime synthetic HTTP boundary',()=>{
    await expect(access.page(actor)).rejects.toBe(failure)
   }
  })
+ it('forwards Teacher startPreflight preloadCompositeId and lock identity when projected by SQL',async()=>{
+  row={...baseline,status:'ASSIGNED',runtimeBindingRef:null,bindingKind:null,preloadCompositeId:origin.runtimeCompositeId,hasCampusActivity:false,hasHuiteacherLink:true}
+  mocks.start.mockImplementation(async()=>{row={...baseline};return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:false}})
+  expect((await request('/run-executions/'+baseline.executionId+'/start-assessment','POST',{})).status).toBe(200)
+  expect(mocks.start).toHaveBeenCalledWith({
+   executionId:baseline.executionId,actorUserId:actor,
+   startPreflight:{
+    runtimeBindingKind:null,runtimeBindingRef:null,respondentUserId:actor,
+    preloadCompositeId:origin.runtimeCompositeId,
+    organizationId:baseline.organizationId,runId:baseline.runId,
+    hasCampusActivity:false,hasHuiteacherLink:true,
+   },
+  })
+ })
  it('projects completed children to completion-only responses',()=>{
   expect(projectTeacherCognitiveRuntime({...cognitivePayload,status:'COMPLETED'})).toEqual(expect.objectContaining({status:'COMPLETED',feedbackDeferred:true}))
   expect(projectTeacherCognitiveRuntime({...cognitivePayload,status:'COMPLETED'})).not.toHaveProperty('config')

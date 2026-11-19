@@ -195,4 +195,44 @@ describe('Run START claim recovery',()=>{
     }})).rejects.toBe(denied)
     expect(m.preload).not.toHaveBeenCalled()
   })
+
+  it('forwards lock identity from trusted startPreflight into acquireRunExecutionStartClaim only for matching respondent',async()=>{
+    const inlineResult={state:'STARTED' as const,runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'att-inline',replayed:false}
+    m.acquire.mockResolvedValueOnce({kind:'COMPLETED_INLINE',result:inlineResult})
+    await startAssessmentRunExecution({
+      executionId:'exec-1',actorUserId:'u1',
+      startPreflight:{
+        runtimeBindingKind:null,runtimeBindingRef:null,respondentUserId:'u1',
+        organizationId:'org-1',runId:'run-1',hasCampusActivity:true,hasHuiteacherLink:false,
+      },
+    })
+    expect(m.acquire).toHaveBeenCalledWith(expect.objectContaining({
+      executionId:'exec-1',actorUserId:'u1',
+      knownIdentity:{organizationId:'org-1',runId:'run-1',hasCampusActivity:true,hasHuiteacherLink:false},
+    }))
+    m.acquire.mockReset()
+    m.acquire.mockResolvedValueOnce({kind:'COMPLETED_INLINE',result:inlineResult})
+    await startAssessmentRunExecution({
+      executionId:'exec-1',actorUserId:'u1',
+      startPreflight:{
+        runtimeBindingKind:null,runtimeBindingRef:null,respondentUserId:'other-user',
+        organizationId:'org-1',runId:'run-1',hasCampusActivity:true,hasHuiteacherLink:false,
+      },
+    })
+    expect(m.acquire.mock.calls[0][0].knownIdentity).toBeUndefined()
+  })
+
+  it('markRunStartClaimCompleted accepts CLAIMED only when allowClaimedInline is true',async()=>{
+    const exec=vi.fn().mockResolvedValue(1)
+    const sqlText=(call:unknown)=>Array.isArray(call)?call.join(''):String((call as {strings?:readonly string[]})?.strings?.join('')??call)
+    await realStartClaimModule.markRunStartClaimCompleted({$executeRaw:exec} as never,{
+      claimId:'c1',generation:1,now:new Date('2026-11-19T00:00:00Z'),allowClaimedInline:true,
+    })
+    expect(sqlText(exec.mock.calls[0][0])).toContain("'CLAIMED','DISPATCHED','UNKNOWN'")
+    exec.mockReset();exec.mockResolvedValue(0)
+    await expect(realStartClaimModule.markRunStartClaimCompleted({$executeRaw:exec} as never,{
+      claimId:'c1',generation:1,now:new Date('2026-11-19T00:00:00Z'),
+    })).rejects.toThrow('START claim ownership fence was lost')
+    expect(sqlText(exec.mock.calls[0][0])).toContain("'DISPATCHED','UNKNOWN'")
+  })
 })

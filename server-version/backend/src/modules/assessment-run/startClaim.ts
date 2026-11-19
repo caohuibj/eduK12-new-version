@@ -51,6 +51,12 @@ export type RunExecutionLockIdentity = {
 }
 
 export type ExecutionLockRow = RunExecutionLockIdentity & {
+  executionId: string
+  trackId: string
+  executionStatus: string
+  runStatus: string
+  relationalAssignmentId: string | null
+  policyDomain: string | null
   runtimeBindingKind: string | null
   runtimeBindingRef: string | null
   respondentUserId: string
@@ -147,14 +153,23 @@ export const lockExecutionEnvelope = async (
   }
   const rows = await tx.$queryRaw<ExecutionLockRow[]>`
     SELECT e."organization_id" AS "organizationId", e."run_id" AS "runId",
+      e."id" AS "executionId", e."track_id" AS "trackId",
+      e."status" AS "executionStatus", r."status" AS "runStatus",
+      e."relational_assignment_id" AS "relationalAssignmentId",
+      a."policy_domain" AS "policyDomain",
       e."runtime_binding_kind" AS "runtimeBindingKind", e."runtime_binding_ref" AS "runtimeBindingRef",
       respondent."user_id" AS "respondentUserId",
       e."scientific_frozen_at" AS "scientificFrozenAt"
     FROM "assessment_run_executions" e
+    JOIN "assessment_runs" r
+      ON r."organization_id" = e."organization_id"
+      AND r."id" = e."run_id"
     JOIN "assessment_run_actor_snapshots" respondent
       ON respondent."organization_id" = e."organization_id"
       AND respondent."run_id" = e."run_id"
       AND respondent."id" = e."respondent_actor_snapshot_id"
+    LEFT JOIN "relational_assessment_assignments" a
+      ON a."id" = e."relational_assignment_id"
     WHERE e."id" = ${executionId}
     FOR UPDATE OF e
   `
@@ -207,6 +222,7 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
   actorUserId: string
   leaseMs?: number
   resourceRegistry?: RunResourceAuthorityRegistry
+  knownIdentity?: RunExecutionLockIdentity
   transactionalDispatch?: (ctx: TransactionalStartDispatchContext) => Promise<TInlineResult | null>
 }): Promise<RunStartClaimDecision | { kind: 'COMPLETED_INLINE'; result: TInlineResult }>
 export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
@@ -214,6 +230,7 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
   actorUserId: string
   leaseMs?: number
   resourceRegistry?: RunResourceAuthorityRegistry
+  knownIdentity?: RunExecutionLockIdentity
   transactionalDispatch?: (ctx: TransactionalStartDispatchContext) => Promise<TInlineResult | null>
 }): Promise<RunStartClaimDecision | { kind: 'COMPLETED_INLINE'; result: TInlineResult }> {
   const leaseMs = input.leaseMs ?? 30_000
@@ -222,7 +239,7 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
   }
 
   return prisma.$transaction(async (tx) => {
-    const execution = await lockExecutionEnvelope(tx, input.executionId)
+    const execution = await lockExecutionEnvelope(tx, input.executionId, input.knownIdentity)
     if (execution.respondentUserId !== input.actorUserId) {
       throw new RunStartClaimError('RUN_EXECUTION_ACTOR', 'only the frozen respondent may own START', 403)
     }
@@ -257,6 +274,7 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
       executionId: input.executionId,
       actorUserId: input.actorUserId,
       admitted: Boolean(existing),
+      knownExecution: execution,
     })
     const now = await dbNow(tx)
     const leaseUntil = leaseAt(now, leaseMs)
@@ -371,14 +389,24 @@ export const markRunStartUnknown = async (input: {
 
 export const markRunStartClaimCompleted = async (
   tx: Tx,
-  input: { claimId: string; generation: number; now?: Date },
+  input: { claimId: string; generation: number; now?: Date; allowClaimedInline?: boolean },
 ): Promise<void> => {
   const now = input.now ?? await dbNow(tx)
-  const changed = await tx.$executeRaw`
-    UPDATE "assessment_run_execution_start_claims"
-    SET "state" = 'COMPLETED', "completed_at" = ${now}, "unknown_at" = NULL, "updated_at" = ${now}
-    WHERE "id" = ${input.claimId} AND "claim_generation" = ${input.generation} AND "state" IN ('DISPATCHED','UNKNOWN')
-  `
+  const changed = input.allowClaimedInline
+    ? await tx.$executeRaw`
+        UPDATE "assessment_run_execution_start_claims"
+        SET "state" = 'COMPLETED',
+            "dispatched_at" = COALESCE("dispatched_at", ${now}),
+            "completed_at" = ${now},
+            "unknown_at" = NULL,
+            "updated_at" = ${now}
+        WHERE "id" = ${input.claimId} AND "claim_generation" = ${input.generation} AND "state" IN ('CLAIMED','DISPATCHED','UNKNOWN')
+      `
+    : await tx.$executeRaw`
+        UPDATE "assessment_run_execution_start_claims"
+        SET "state" = 'COMPLETED', "completed_at" = ${now}, "unknown_at" = NULL, "updated_at" = ${now}
+        WHERE "id" = ${input.claimId} AND "claim_generation" = ${input.generation} AND "state" IN ('DISPATCHED','UNKNOWN')
+      `
   if (Number(changed) !== 1) throw new RunStartClaimError('RUN_START_FENCE_LOST', 'START claim ownership fence was lost', 409)
 }
 

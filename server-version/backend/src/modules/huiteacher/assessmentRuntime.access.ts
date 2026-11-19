@@ -32,7 +32,7 @@ const fail=():never=>{throw new TeacherAssessmentRuntimeError()}
 export type TeacherAssessmentTask={
  executionId:string;organizationId:string;runId:string;eventId:string;eventTitle:string;title:string;
  family:'COGNITIVE'|'SITUATIONAL'|'BUNDLE';status:'ASSIGNED'|'STARTED'|'COMPLETED';runStatus:string;
- runtimeBindingRef:string|null;consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
+ runtimeBindingRef:string|null;preloadCompositeId?:string|null;hasCampusActivity?:boolean;hasHuiteacherLink?:boolean;consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
  mode:'COMPOSITION'|'PACKAGE_REFERENCE'|'TOOL'
  teacherName?:string
 }
@@ -61,6 +61,14 @@ export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId
  return withBoundedPlannerRead(db, client => client.$queryRaw<Row[]>(Prisma.sql`
  SELECT e.id AS "executionId",e.organization_id AS "organizationId",e.run_id AS "runId",event.id AS "eventId",
   event.title AS "eventTitle",${student?Prisma.sql`student_target.name`:Prisma.sql`NULL::text`} AS "teacherName",t.resource_family AS family,e.status,r.status AS "runStatus",e.runtime_binding_ref AS "runtimeBindingRef",
+  EXISTS (SELECT 1 FROM campus_activity_runs car WHERE car.organization_id = e.organization_id AND car.run_id = e.run_id) AS "hasCampusActivity",
+  TRUE AS "hasHuiteacherLink",
+  CASE WHEN t.frozen_resource_policy #>> '{runtimeLaunchTarget,kind}' = 'COMPOSITE'
+    AND t.resource_key NOT LIKE 'education-composition:%'
+    AND EXISTS (SELECT 1 FROM composite_assessments candidate
+      WHERE candidate.id = t.frozen_resource_policy #>> '{runtimeLaunchTarget,ref}'
+        AND candidate.training_content_snapshot_hash IS NOT NULL)
+    THEN t.frozen_resource_policy #>> '{runtimeLaunchTarget,ref}' ELSE NULL END AS "preloadCompositeId",
   t.resource_key AS "resourceKey",t.resource_version AS "resourceVersion",t.frozen_resource_policy AS policy,t.resource_policy_hash AS "policyHash",
   a.id AS "assignmentId",a.episode_id AS "episodeId",e.runtime_binding_kind AS "bindingKind",
   parent.attempt_epoch AS "attemptEpoch",parent.frozen_active_slot_set_encrypted AS "frozenSlotSet",parent.frozen_active_slot_set_hash AS "frozenSlotSetHash",
@@ -133,8 +141,11 @@ export async function assertPersistedTeacherRunBinding(db:TeacherRuntimeDb,actor
  if(rows.length!==1)fail()
 }
 function taskDto(row:Row,title:string):TeacherAssessmentTask{
- const {executionId,organizationId,runId,eventId,eventTitle,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility}=row
+ const {executionId,organizationId,runId,eventId,eventTitle,family,status,runStatus,runtimeBindingRef,preloadCompositeId,hasCampusActivity,hasHuiteacherLink,consentRequired,consentPurpose,consentVisibility}=row
  return {executionId,organizationId,runId,eventId,eventTitle,title,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility,
+  ...(typeof preloadCompositeId==='string'?{preloadCompositeId}:{}),
+  ...(typeof hasCampusActivity==='boolean'?{hasCampusActivity}:{}),
+  ...(typeof hasHuiteacherLink==='boolean'?{hasHuiteacherLink}:{}),
   ...(row.teacherName?{teacherName:row.teacherName}:{}),mode:row.resourceKey.startsWith('education-composition:')?'COMPOSITION':family==='BUNDLE'?'PACKAGE_REFERENCE':'TOOL'}
 }
 export function createTeacherAssessmentAccess<Identity extends TeacherSourceIdentity>(db:TeacherRuntimeDb,source:TeacherAssessmentSourceAccess<Identity>,audience:TeacherAssessmentAudience='TEACHER_SELF'){

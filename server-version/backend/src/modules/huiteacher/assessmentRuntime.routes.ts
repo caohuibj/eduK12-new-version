@@ -163,7 +163,18 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   const result=await startAssessmentRunExecution({
    executionId,actorUserId:req.user!.userId,
    // access.own already established this execution has no persisted binding.
-   startPreflight:{runtimeBindingKind:null,runtimeBindingRef:null,respondentUserId:req.user!.userId},
+   startPreflight:{
+    runtimeBindingKind:null,
+    runtimeBindingRef:null,
+    respondentUserId:req.user!.userId,
+    ...(proof.task.preloadCompositeId?{preloadCompositeId:proof.task.preloadCompositeId}:{}),
+    ...(typeof proof.task.hasHuiteacherLink==='boolean'?{
+     organizationId:proof.task.organizationId,
+     runId:proof.task.runId,
+     hasCampusActivity:proof.task.hasCampusActivity??false,
+     hasHuiteacherLink:proof.task.hasHuiteacherLink,
+    }:{}),
+   },
   })
   if(result.state==='STARTED'){
    if(result.runtimeBindingKind!=='COMPOSITE')throw new TeacherAssessmentRuntimeError()

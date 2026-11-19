@@ -14,6 +14,10 @@ export type RunStartPreflight = {
   respondentUserId: string
   /** Candidate only; the frozen track in the admission transaction remains authoritative. */
   preloadCompositeId?: string | null
+  organizationId?: string
+  runId?: string
+  hasCampusActivity?: boolean
+  hasHuiteacherLink?: boolean
 }
 
 /** One existing School parent read also supplies the bound replay hint.
