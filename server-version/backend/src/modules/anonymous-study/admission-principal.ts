@@ -107,6 +107,24 @@ async function principalBinding(db:Db,attemptId:string,lock:boolean):Promise<Bin
  if(!pending){pending=binding(db,attemptId);scope.bindings.set(attemptId,pending)}
  return pending
 }
+/** Validate a single accepted Whole receipt against one locked parent and job.
+ * Every unit remains bound to its own immutable receipt identity. */
+export async function assertStudyReceiptBatch(db:Db,inputs:StudyPrincipalInput[],receipt:AcceptedStudyReceipt):Promise<void>{
+ if(inputs.length===0)return
+ const attemptId=receipt.attemptId
+ let row=await binding(db,attemptId)
+ if(!row?.hash)fail()
+ await db.$queryRaw`SELECT id FROM composite_assessment_attempts WHERE id=${attemptId} FOR UPDATE`
+ row=await binding(db,attemptId)
+ if(!row?.hash||!row.scopeValid||row.userId!==null||row.epoch!==row.currentEpoch||row.participantStatus!=='ACTIVE')fail()
+ if(!acceptedReceipts.has(receipt)||receipt.attemptId!==row.attemptId||receipt.epoch!==row.epoch||receipt.slotSetHash!==row.slotSetHash||receipt.contextHash!==row.contextHash)fail()
+ for(const input of inputs){
+  if(input.attemptId!==attemptId||input.userId||input.attemptEpoch!==row.epoch||input.receipt!==receipt)fail()
+  if(input.frozenHash!==undefined&&input.frozenHash!==row.hash)fail()
+  if(!input.unit||receiptUnits.get(receipt)?.get(input.unit.assessmentId)!==unitIdentity(input.unit))fail()
+ }
+ await verifyReceipt(db,receipt,true)
+}
 /** A bound path is checked before the legacy hash equality branch, including when
  * an OLD proof still equals the frozen principal. Never rewrite the input proof. */
 export async function assertCurrentStudyPrincipal(db:Db,input:StudyPrincipalInput,lock=false):Promise<boolean>{

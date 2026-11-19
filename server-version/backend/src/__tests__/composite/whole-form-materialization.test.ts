@@ -41,7 +41,7 @@ const principal = { userId: 'student-1' }
 beforeEach(() => {
   vi.clearAllMocks()
   ;(prisma as any).$queryRaw = vi.fn().mockResolvedValue([{ id: 'job-1' }])
-  ;(prisma as any).compositeFormSectionAttempt = { findUnique: vi.fn().mockResolvedValue(null) }
+  ;(prisma as any).compositeFormSectionAttempt = { findMany: vi.fn().mockResolvedValue([]) }
   ;(prisma as any).compositeFormSection = { findUnique: vi.fn(), findMany: vi.fn() }
 })
 
@@ -124,10 +124,11 @@ describe('whole Form materialization (X-04A)', () => {
   })
 
   it('receipt validation reuses the authoritative normalization against the stored admission', async () => {
-    ;(prisma.compositeFormSectionAttempt as any).findUnique.mockResolvedValue({
+    ;(prisma.compositeFormSectionAttempt as any).findMany.mockResolvedValue([{
+      sectionId: 'sec-1',
       frozenAdmissionSnapshotEncrypted: 'enc', frozenAdmissionSnapshotHash: 'hash',
       admission: { formSection: { kind: 'composite', id: 'sec-1', identityHash: definitionHash }, definition: sectionDefinition },
-    })
+    }])
     await verifyWholeFormSectionsAtReceipt('attempt-1', [
       { sectionId: 'sec-1', definitionHash, answers: [{ formItemId: 'f-1', value: '  保留答案  ' }] },
     ])
@@ -140,8 +141,8 @@ describe('whole Form materialization (X-04A)', () => {
     const { mapCompositeSection } = await import('../../modules/assessment-runtime/form-section-definition')
     const { formSectionIdentityHash } = await import('../../modules/assessment-runtime/attempt-runtime')
     const catalogHash = formSectionIdentityHash(mapCompositeSection(sectionDefinition))
-    ;(prisma.compositeFormSectionAttempt as any).findUnique.mockResolvedValue(null)
-    ;(prisma.compositeFormSection as any).findUnique.mockResolvedValue(sectionDefinition)
+    ;(prisma.compositeFormSectionAttempt as any).findMany.mockResolvedValue([])
+    ;(prisma.compositeFormSection as any).findMany.mockResolvedValue([sectionDefinition])
     await verifyWholeFormSectionsAtReceipt('attempt-1', [
       { sectionId: 'sec-1', definitionHash: catalogHash, answers: [{ formItemId: 'f-1', value: 'x' }] },
     ])
@@ -150,11 +151,31 @@ describe('whole Form materialization (X-04A)', () => {
     ])).rejects.toMatchObject({ code: 'STALE_ATTEMPT' })
   })
 
-  it('receipt validation rejects answer classes the worker could not materialize', async () => {
-    ;(prisma.compositeFormSectionAttempt as any).findUnique.mockResolvedValue({
+  it('validates mixed frozen and catalog sections with one read of each kind', async () => {
+    const { mapCompositeSection } = await import('../../modules/assessment-runtime/form-section-definition')
+    const { formSectionIdentityHash } = await import('../../modules/assessment-runtime/attempt-runtime')
+    const catalogSection = { ...sectionDefinition, id: 'sec-2' }
+    const catalogHash = formSectionIdentityHash(mapCompositeSection(catalogSection))
+    ;(prisma.compositeFormSectionAttempt as any).findMany.mockResolvedValue([{
+      sectionId: 'sec-1',
       frozenAdmissionSnapshotEncrypted: 'enc', frozenAdmissionSnapshotHash: 'hash',
       admission: { formSection: { kind: 'composite', id: 'sec-1', identityHash: definitionHash }, definition: sectionDefinition },
-    })
+    }])
+    ;(prisma.compositeFormSection as any).findMany.mockResolvedValue([catalogSection])
+    await verifyWholeFormSectionsAtReceipt('attempt-1', [
+      { sectionId: 'sec-1', definitionHash, answers: [{ formItemId: 'f-1', value: 'x' }] },
+      { sectionId: 'sec-2', definitionHash: catalogHash, answers: [{ formItemId: 'f-1', value: 'y' }] },
+    ])
+    expect(prisma.compositeFormSectionAttempt.findMany).toHaveBeenCalledTimes(1)
+    expect(prisma.compositeFormSection.findMany).toHaveBeenCalledTimes(1)
+  })
+
+  it('receipt validation rejects answer classes the worker could not materialize', async () => {
+    ;(prisma.compositeFormSectionAttempt as any).findMany.mockResolvedValue([{
+      sectionId: 'sec-1',
+      frozenAdmissionSnapshotEncrypted: 'enc', frozenAdmissionSnapshotHash: 'hash',
+      admission: { formSection: { kind: 'composite', id: 'sec-1', identityHash: definitionHash }, definition: sectionDefinition },
+    }])
     const sections = (answers: unknown[]) => [{ sectionId: 'sec-1', definitionHash, answers }] as any
     // Unknown item, duplicate item, missing required, otherText without policy.
     await expect(verifyWholeFormSectionsAtReceipt('attempt-1', sections([{ formItemId: 'ghost', value: 'x' }]))).rejects.toMatchObject({ code: 'FORM_ANSWER_INVALID' })

@@ -3,7 +3,7 @@ const {db,state}=vi.hoisted(()=>({db:{$queryRaw:vi.fn(),$transaction:vi.fn()},st
 vi.mock('../../config/database',()=>({prisma:db}))
 vi.mock('../../modules/assessment-runtime/security',()=>({decryptUnifiedRuntimePayload:()=>state.envelope}))
 vi.mock('../../modules/assessment-runtime/compact-raw',()=>({unpackWholeRawEnvelope:(x:unknown)=>x}))
-import {acceptedStudyReceipt,assertCurrentStudyPrincipal,stableStudyAdmissionHash,withStudyPrincipalReadBatch} from '../../modules/anonymous-study/admission-principal'
+import {acceptedStudyReceipt,assertCurrentStudyPrincipal,assertStudyReceiptBatch,stableStudyAdmissionHash,withStudyPrincipalReadBatch} from '../../modules/anonymous-study/admission-principal'
 const original='1'.repeat(64),fresh='2'.repeat(64)
 const input=()=>({attemptId:'parent',attemptEpoch:1,recoveryTokenHash:fresh,frozenHash:original})
 const unit={assessmentId:'child',submissionId:'unit-submission',attemptEpoch:1,definitionHash:'definition',contextSnapshotHash:null,answers:[]}
@@ -61,6 +61,23 @@ describe('immutable study principal and fresh credential overlay',()=>{
   const cap=await acceptedStudyReceipt(job(),state.envelope)
   await expect(assertCurrentStudyPrincipal(db as any,{...input(),receipt:cap,unit:{...unit,answers:['changed']}})).rejects.toThrow()
   state.lease=false;await expect(assertCurrentStudyPrincipal(db as any,{...input(),receipt:cap,unit},true)).rejects.toThrow()
+ })
+ it('checks a receipt batch under one parent lock and rejects altered units or leases',async()=>{
+  const second={...unit,assessmentId:'child-2',submissionId:'unit-2'}
+  state.envelope.units=[unit,second]
+  const cap=await acceptedStudyReceipt(job(),state.envelope)
+  db.$queryRaw.mockClear()
+  const requests=[unit,second].map(item=>({...input(),receipt:cap,unit:item}))
+  await assertStudyReceiptBatch(db as any,requests,cap!)
+  expect(db.$queryRaw).toHaveBeenCalledTimes(4)
+  await expect(assertStudyReceiptBatch(db as any,[requests[0],{...requests[1],unit:{...second,answers:['changed']}}],cap!)).rejects.toThrow()
+  await expect(assertStudyReceiptBatch(db as any,[{...requests[0],attemptEpoch:2}],cap!)).rejects.toThrow()
+  await expect(assertStudyReceiptBatch(db as any,[{...requests[0],attemptId:'other'}],cap!)).rejects.toThrow()
+  state.binding.participantStatus='REVOKED'
+  await expect(assertStudyReceiptBatch(db as any,requests,cap!)).rejects.toThrow()
+  state.binding.participantStatus='ACTIVE'
+  state.lease=false
+  await expect(assertStudyReceiptBatch(db as any,requests,cap!)).rejects.toThrow()
  })
  it('cannot mint capability for a missing/expired lease or mismatched envelope',async()=>{
   state.lease=false;await expect(acceptedStudyReceipt(job(),state.envelope)).rejects.toThrow()
