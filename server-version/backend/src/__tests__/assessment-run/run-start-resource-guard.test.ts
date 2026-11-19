@@ -195,4 +195,81 @@ describe('assessment-run pre-gate resource protection & composition identity cac
     await expect(readFrozenCompositionIdentity(prisma, { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' }))
       .rejects.toMatchObject({ code: 'PRIVATE_COMPOSITION_EXECUTION_INVALID', statusCode: 409 })
   })
+
+  it('shares frozen composition identity cache safely across distinct transaction clients', async () => {
+    const orgId = uuid(23)
+    const ownerId = uuid(24)
+    const toolId = uuid(26)
+    const versionId = uuid(25)
+    const compositeId = uuid(27)
+    const origin = {
+      schemaVersion: 1 as const,
+      adapterVersion: '1.0.0' as const,
+      mode: 'COMPOSITION' as const,
+      entry: 'SCHOOL' as const,
+      variantKey: 'STUDENT:SELF' as const,
+      organizationId: orgId,
+      ownerUserId: ownerId,
+      toolId,
+      versionId,
+      contentHash: 'f'.repeat(64),
+    }
+    const key = `education-composition:SCHOOL:${versionId}:STUDENT:SELF:1.0.0`
+    const policy = {
+      family: 'BUNDLE' as const,
+      key,
+      version: '1.0.0',
+      subjectRoles: ['STUDENT'],
+      respondentRoles: ['STUDENT'],
+      relationshipKinds: ['SELF'],
+      perspectives: ['SELF_REPORT'],
+      analysisMode: 'INDIVIDUAL_ONLY',
+      minimumRespondents: null,
+      visibilityPolicyKey: 'PRIVATE_RESPONDENT',
+      runtimeLaunchTarget: { kind: 'COMPOSITE' as const, ref: compositeId },
+      scientificMaturity: 'PILOT' as const,
+      educationComposition: {
+        origin,
+        manifestHash: '1'.repeat(64),
+        unitReports: [],
+      },
+    }
+    const policyHash = canonicalHash(policy)
+    const row = {
+      title: 'Tx Cached School Composition',
+      groupReporting: null,
+      publicBindings: [],
+      manifest: [{
+        blockId: uuid(31),
+        kind: 'SCALE' as const,
+        versionId: uuid(32),
+        sourceProvider: 'STANDARD_SCALE' as const,
+        contentHash: '2'.repeat(64),
+        itemIds: [uuid(33)],
+        sectionIds: [],
+        title: 'Scale B',
+      }],
+      units: [{
+        itemId: uuid(33),
+        family: 'SCALE' as const,
+        scaleId: uuid(34),
+        versionId: uuid(32),
+        contentHash: '2'.repeat(64),
+        releaseId: uuid(35),
+        definitionHash: '3'.repeat(64),
+        measurementHash: '4'.repeat(64),
+      }],
+    }
+    const tx1Query = vi.fn().mockResolvedValueOnce([row])
+    const tx2Query = vi.fn().mockResolvedValueOnce([{ id: compositeId }])
+
+    const first = await readFrozenCompositionIdentity({ $queryRaw: tx1Query } as any, { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' })
+    const second = await readFrozenCompositionIdentity({ $queryRaw: tx2Query } as any, { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' })
+    expect(second).toEqual(first)
+    expect(tx1Query).toHaveBeenCalledTimes(1)
+    expect(tx2Query).toHaveBeenCalledTimes(1)
+    expect(tx1Query.mock.calls[0][0].sql).toContain('education_private_tool_versions')
+    expect(tx2Query.mock.calls[0][0].sql).not.toContain('education_private_tool_versions')
+    expect(tx2Query.mock.calls[0][0].sql).toContain("c.status='PUBLISHED'")
+  })
 })

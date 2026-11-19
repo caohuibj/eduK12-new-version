@@ -93,6 +93,7 @@ describe('education execution purpose and account-lock boundary',()=>{
   expect(campusSql).toContain("org.product_domain='SCHOOL'")
   expect(campusSql).toContain('NOT EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h')
   expect(campusSql).toContain('campus_activity_runs')
+  expect(campusSql).toContain('x.respondent_actor_snapshot_id=x.subject_actor_snapshot_id')
   expect(campusSql).not.toContain('huiteacher_evaluation_events')
   expect(campusSql).not.toContain('huiteacher_student_eval_configs')
 

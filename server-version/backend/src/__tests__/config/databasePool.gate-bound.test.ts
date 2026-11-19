@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { boundedTrainingStartConcurrency, defaultStartAdmissionBound, effectivePrismaPoolSize } from '../../config/databasePool'
+import { boundedTrainingStartConcurrency, DEFAULT_RUN_START_MAX_CONCURRENT, defaultRunStartAdmissionBound, defaultStartAdmissionBound, effectivePrismaPoolSize } from '../../config/databasePool'
 
 describe('bounded START admission default bound vs effective pool', () => {
   it('with no explicit pool configuration the bound stays inside the default pool', () => {
@@ -24,6 +24,11 @@ describe('bounded START admission default bound vs effective pool', () => {
 
   it('the bound reserves connections for other business (3/4 of the pool)', () => {
     expect(defaultStartAdmissionBound('postgresql://u:p@127.0.0.1:5568/db?connection_limit=24&schema=public', {})).toBe(18)
+  })
+
+  it('caps implicit Run START default concurrency on large pools so multi-table lock transactions do not exhaust Postgres memory', () => {
+    expect(defaultRunStartAdmissionBound('postgresql://u:p@127.0.0.1:5568/db?schema=public', {})).toBe(7)
+    expect(defaultRunStartAdmissionBound('postgresql://u:p@127.0.0.1:5568/db?schema=public', { PRISMA_CONNECTION_POOL_SIZE: '25' })).toBe(DEFAULT_RUN_START_MAX_CONCURRENT)
   })
 })
 

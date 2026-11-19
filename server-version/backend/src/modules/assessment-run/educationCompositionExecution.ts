@@ -105,23 +105,31 @@ export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResou
   ||canonicalHash([policy.subjectRoles,policy.respondentRoles,policy.relationshipKinds,policy.perspectives])
    !==canonicalHash([[variant.subjectRole],[variant.respondentRole],variant.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'),[variant.perspective]]))
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
- const canUseCache=tx===(prisma as unknown as Tx)
+ const isRootClient=tx===(prisma as unknown as Tx)
  const cacheKey=`${input.organizationId}:${input.key}:${input.version}:${input.policyHash}:${binding.manifestHash}:${policy.runtimeLaunchTarget.ref}`
- let parsed=canUseCache?frozenCompositionIdentityCache.get(cacheKey):undefined
- if(parsed){
+ const cached=frozenCompositionIdentityCache.get(cacheKey)
+ let parsed:NonNullable<typeof cached>
+ if(cached){
   // Publication status stays live on every cache hit.
   const [live]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT c.id FROM composite_assessments c
    WHERE c.id=${policy.runtimeLaunchTarget.ref} AND c.training_content_snapshot_hash=${binding.manifestHash}
     AND c.status='PUBLISHED' AND c.published_at IS NOT NULL AND NOT c.public_enabled AND NOT c.copyable LIMIT 1`)
   if(!live)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
+  parsed=cached
  }else{
-  parsed=canUseCache
+  // Cache reads work across transactions because each hit re-verifies live
+  // publication on caller's `tx`. Only coalesce cold loads on root `prisma` so
+  // concurrent callers never await another caller's transaction client.
+  parsed=isRootClient
    ?await frozenCompositionIdentityCache.singleFlight(cacheKey,async()=>{
      const value=await loadFrozenCompositionIdentityRow(tx,{policy,origin,binding,key:input.key})
      frozenCompositionIdentityCache.set(cacheKey,value)
      return value
     })
-   :await loadFrozenCompositionIdentityRow(tx,{policy,origin,binding,key:input.key})
+   :await loadFrozenCompositionIdentityRow(tx,{policy,origin,binding,key:input.key}).then(value=>{
+     frozenCompositionIdentityCache.set(cacheKey,value)
+     return value
+    })
  }
  if(group)assertSchoolCompositionGroupIdentity(policy,parsed.groupReporting)
  else if(parsed.groupReporting!=null)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
