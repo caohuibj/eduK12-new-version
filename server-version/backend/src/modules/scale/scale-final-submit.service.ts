@@ -233,15 +233,17 @@ const isEducationResourceParent = (parent: {
   parent?.assignmentRef || parent?.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE',
 )
 
-const finalizeLinkedParent = async (assessment: any): Promise<void> => {
+const finalizeLinkedParent = async (assessment: any): Promise<{ status?: string } | null> => {
+  let finalized: { status?: string } | null = null
   if (assessment.compositeAttemptId) {
     const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-    await finalizeCompositeAttemptIfReady(assessment.compositeAttemptId)
+    finalized = (await finalizeCompositeAttemptIfReady(assessment.compositeAttemptId)) ?? null
   }
   if (assessment.questionnaireAssessmentId) {
     const { finalizeQuestionnaireAttemptIfReady } = await import('../../services/questionnaire-form-section.service')
     await finalizeQuestionnaireAttemptIfReady(assessment.questionnaireAssessmentId)
   }
+  return finalized
 }
 
 const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, locatedChild?: ScaleAdmissionChildRow,
@@ -515,11 +517,16 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, loca
 /** UNIT gate covers persist/score only; parent aggregate runs after release. */
 const finalizeParentAfterUnitSubmit = async <T>(result: T): Promise<Omit<T, 'shouldFinalize' | 'finalizeAssessment'>> => {
   const record = result as T & { shouldFinalize?: boolean; finalizeAssessment?: unknown }
+  let finalizedParentStatus: string | undefined
   if (record?.shouldFinalize && record.finalizeAssessment) {
-    await measureRequestPhase('final_submit_parent_finalization', () => finalizeLinkedParent(record.finalizeAssessment))
+    const finalized = await measureRequestPhase('final_submit_parent_finalization', () => finalizeLinkedParent(record.finalizeAssessment))
+    finalizedParentStatus = finalized?.status
   }
   if (result && typeof result === 'object') {
     const { shouldFinalize: _s, finalizeAssessment: _f, ...rest } = record as any
+    if (finalizedParentStatus) {
+      Object.defineProperty(rest, '_finalizedParentStatus', { value: finalizedParentStatus })
+    }
     return rest
   }
   return result as Omit<T, 'shouldFinalize' | 'finalizeAssessment'>
@@ -650,9 +657,28 @@ export const submitCompositeScaleFinal = async (
       }
     })()
     : await withUnitSubmitAdmission(() => submitScaleAssessmentFinalImpl(builtInput, child, responseOptions?.receiptOnly))
-  const data = stripScaleFinalContext(await finalizeParentAfterUnitSubmit(result))
+  const finalized = await finalizeParentAfterUnitSubmit(result)
+  const finalizedParentStatus = (finalized as { _finalizedParentStatus?: string })._finalizedParentStatus
+  const data = stripScaleFinalContext(finalized)
   if (!responseOptions?.receiptOnly) return data
-  return { submissionId: data.submissionId, payloadHash: data.payloadHash, replayed: Boolean(data.replayed), completed: true }
+  const receipt = { submissionId: data.submissionId, payloadHash: data.payloadHash, replayed: Boolean(data.replayed), completed: true as const }
+  const parent = child.compositeAttempt as {
+    status?: string
+    asyncReportEpoch?: number | null
+    trainingFeedbackSnapshotHash?: string | null
+    compositeAssessment?: { productKind?: string | null; trainingFeedbackPolicyHash?: string | null } | null
+  } | null | undefined
+  if (
+    parent
+    && parent.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE'
+    && parent.asyncReportEpoch === null
+    && parent.trainingFeedbackSnapshotHash === null
+    && parent.compositeAssessment.trainingFeedbackPolicyHash === null
+    && (parent.status === 'COMPLETED' || finalizedParentStatus === 'COMPLETED')
+  ) {
+    Object.defineProperty(receipt, '_receiptFeedbackConfirmedNotDeferred', { value: true })
+  }
+  return receipt
 }
 
 /**

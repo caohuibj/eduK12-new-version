@@ -67,10 +67,13 @@ export const UNIFIED_SCALE_CHILD_ADMISSION_SELECT = {
     ...TRAINING_VARIANT_PARENT_MARKER_SELECT,
     status: true,
     assignmentRef: true,
+    asyncReportEpoch: true,
+    trainingFeedbackSnapshotHash: true,
     compositeAssessment: { select: {
       ...TRAINING_VARIANT_PARENT_MARKER_SELECT.compositeAssessment.select,
       creationKey: true,
       productKind: true,
+      trainingFeedbackPolicyHash: true,
     } },
   } },
   scaleId: true,

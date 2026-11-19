@@ -53,11 +53,23 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
 }) {
   if(actor.accountDomain!=='SCHOOL'||actor.role!=='STUDENT')deny('CAMPUS_STUDENT_REQUIRED',403)
   // Membership, admission and current class/student assignment are all live
-  // authority, checked before any task title/content is returned.
-  const { activityRows, linkedRuns, assigned } = await withBoundedPlannerRead(prisma, async client => {
-    const activityRows = await client.$queryRaw<CampusActivityForStudent[]>`
-      SELECT DISTINCT a."course_id" AS "courseId",a."organization_id" AS "organizationId",
-        course."title"
+  // authority, checked before any task title/content is returned. Use a single
+  // REPEATABLE READ snapshot so Query 1 (student eligibility), Query 2 (open
+  // activities & linked runs), and Query 3 (Run tasks) observe an identical
+  // authority state without forcing PostgreSQL to re-plan 18-table nested
+  // EXISTS gates per row under force_custom_plan.
+  const { activityRows, linkedRuns, assigned } = await prisma.$transaction(async client => {
+    const memberships = await client.$queryRaw<Array<{
+      organizationId: string
+      membershipId: string
+      personaGrantId: string
+      accountNotExpired: boolean
+    }>>`
+      SELECT DISTINCT
+        m."organization_id" AS "organizationId",
+        m."id" AS "membershipId",
+        pg."id" AS "personaGrantId",
+        (u."expires_at" IS NULL OR u."expires_at" > statement_timestamp()) AS "accountNotExpired"
       FROM "users" u
       JOIN "organization_memberships" m ON m."user_id"=u."id"
         AND m."valid_from"<=statement_timestamp()
@@ -78,11 +90,6 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
         AND sc."class_unit_id"=e."class_unit_id"
         AND sc."valid_from"<=statement_timestamp()
         AND (sc."valid_until" IS NULL OR sc."valid_until">statement_timestamp())
-      JOIN "campus_activity_participants" p ON p."organization_id"=m."organization_id"
-        AND p."membership_id"=m."id" AND p."status"='ACTIVE'
-      JOIN "campus_activities" a ON a."course_id"=p."course_id"
-        AND a."organization_id"=p."organization_id" AND a."status"='OPEN'
-      JOIN "courses" course ON course."id"=a."course_id" AND course."course_type"='CAMPUS_ACTIVITY'
       WHERE u."id"=${actor.userId}
         AND u."account_domain"='SCHOOL'
         AND u."role"='STUDENT' AND u."is_active"=TRUE
@@ -91,12 +98,37 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
           WHERE d."organization_id"=o."id" AND d."user_id"=${actor.userId}
             AND d."lifted_at" IS NULL
             AND d."permission" IN ('*','EDUCATION_ACCESS','HUISCHOOL_ACCESS','ACTIVITY_READ','RUN_START'))
+    `
+    if (!memberships.length) {
+      return {
+        activityRows: [] as CampusActivityForStudent[],
+        linkedRuns: [] as Array<{ courseId: string; runId: string }>,
+        assigned: { list: [], truncated: false, nextCursor: null as RunTaskCursor | null },
+      }
+    }
+    const organizationIds = [...new Set(memberships.map(m => m.organizationId))]
+    const membershipIds = [...new Set(memberships.map(m => m.membershipId))]
+    const orgMembershipKeys = [...new Set(memberships.map(m => `${m.organizationId}|${m.membershipId}`))]
+    const activityWithMembers = await client.$queryRaw<Array<CampusActivityForStudent & { membershipIds: string[] }>>`
+      SELECT a."course_id" AS "courseId", a."organization_id" AS "organizationId",
+        course."title",
+        array_agg(DISTINCT p."membership_id") AS "membershipIds"
+      FROM "campus_activity_participants" p
+      JOIN "campus_activities" a ON a."course_id"=p."course_id"
+        AND a."organization_id"=p."organization_id" AND a."status"='OPEN'
+      JOIN "courses" course ON course."id"=a."course_id" AND course."course_type"='CAMPUS_ACTIVITY'
+      WHERE p."organization_id" = ANY(${organizationIds}::text[])
+        AND p."membership_id" = ANY(${membershipIds}::text[])
+        AND p."status"='ACTIVE'
+        AND (p."organization_id" || '|' || p."membership_id") = ANY(${orgMembershipKeys}::text[])
         -- A directed activityId lookup filters in the database: an in-memory
         -- filter after LIMIT 201 would wrongly hide an authorized activity that
         -- sorts beyond the first 201 rows.
         ${input.activityId?Prisma.sql`AND a."course_id"=${input.activityId}`:Prisma.empty}
+      GROUP BY a."course_id", a."organization_id", course."title"
       ORDER BY a."course_id" LIMIT 201
     `
+    const activityRows: CampusActivityForStudent[] = activityWithMembers.map(({ membershipIds: _m, ...row }) => row)
     const ids = activityRows.map(a => a.courseId)
     if (!ids.length) {
       return {
@@ -105,23 +137,60 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
         assigned: { list: [], truncated: false, nextCursor: null as RunTaskCursor | null },
       }
     }
-    const linkedRuns = await client.$queryRaw<Array<{ courseId: string; runId: string }>>`
-      SELECT ar."course_id" AS "courseId", ar."run_id" AS "runId"
+    const linkedRunRows = await client.$queryRaw<Array<{
+      courseId: string
+      runId: string
+      organizationId: string
+      hasHuiteacherLink: boolean
+    }>>`
+      SELECT ar."course_id" AS "courseId", ar."run_id" AS "runId",
+        ar."organization_id" AS "organizationId",
+        EXISTS (
+          SELECT 1 FROM "huiteacher_evaluation_run_links" h
+          WHERE h."organization_id"=ar."organization_id" AND h."run_id"=ar."run_id"
+        ) AS "hasHuiteacherLink"
       FROM "campus_activity_runs" ar
       JOIN "campus_activities" a ON a."course_id"=ar."course_id" AND a."status"='OPEN'
       JOIN "assessment_runs" r ON r."id"=ar."run_id" AND r."status" IN ('PUBLISHED','CLOSED')
       WHERE ar."course_id" = ANY(${ids}::text[])
     `
+    const linkedRuns = linkedRunRows.map(({ courseId, runId }) => ({ courseId, runId }))
+    const grantsByOrgMembership = new Map<string, Array<{ personaGrantId: string; accountNotExpired: boolean }>>()
+    for (const m of memberships) {
+      const key = `${m.organizationId}|${m.membershipId}`
+      const bucket = grantsByOrgMembership.get(key)
+      if (bucket) bucket.push({ personaGrantId: m.personaGrantId, accountNotExpired: m.accountNotExpired })
+      else grantsByOrgMembership.set(key, [{ personaGrantId: m.personaGrantId, accountNotExpired: m.accountNotExpired }])
+    }
+    const activityMembershipMap = new Map(activityWithMembers.map(a => [a.courseId, a.membershipIds]))
+    const verifiedTupleSet = new Set<string>()
+    const openSchoolRunSet = new Set<string>()
+    for (const link of linkedRunRows) {
+      if (link.hasHuiteacherLink) continue
+      openSchoolRunSet.add(`${link.organizationId}|${link.runId}`)
+      const activeMemberships = activityMembershipMap.get(link.courseId) ?? []
+      for (const membershipId of activeMemberships) {
+        for (const grant of grantsByOrgMembership.get(`${link.organizationId}|${membershipId}`) ?? []) {
+          if (grant.accountNotExpired) {
+            verifiedTupleSet.add(`${link.organizationId}|${link.runId}|${membershipId}|${grant.personaGrantId}`)
+          }
+        }
+      }
+    }
     const assigned = await listSchoolStudentRunTasks(actor.userId, {
       organizationIds: [...new Set(activityRows.map(a => a.organizationId))],
       runIds: linkedRuns.map(link => link.runId),
       preserveBoundSchoolContinuation: true,
       populationProductScope: 'CAMPUS_ONLY',
+      verifiedCampusStudent: {
+        verifiedTupleKeys: [...verifiedTupleSet],
+        openSchoolRunKeys: [...openSchoolRunSet],
+      },
       cursor: input.runCursor,
       db: client,
     })
     return { activityRows, linkedRuns, assigned }
-  })
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead })
   const authorized=activityRows
   const ids=authorized.map(a=>a.courseId)
   if(!ids.length)return {list:[],total:0,page:input.page,hasMore:false,truncated:activityRows.length>200,nextRunCursor:null as RunTaskCursor|null}

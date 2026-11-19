@@ -75,6 +75,21 @@ export const projectRelationalUnitFinalResponse = async <T extends Record<string
   completed: true
   feedbackDeferred?: true
 }> => {
+  // Receipt-only completion of a finished ORGANIZATION_RESOURCE attempt without
+  // any Training feedback policy already has completion-only shape and
+  // feedbackDeferred = false; skip the redundant DB feedback/disposition lookup.
+  if (
+    compositeAttemptId
+    && (data as { _receiptFeedbackConfirmedNotDeferred?: boolean })._receiptFeedbackConfirmedNotDeferred === true
+    && data.completed === true
+  ) {
+    return {
+      ...(typeof data.submissionId === 'string' ? { submissionId: data.submissionId } : {}),
+      ...(typeof data.payloadHash === 'string' ? { payloadHash: data.payloadHash } : {}),
+      replayed: Boolean(data.replayed),
+      completed: true,
+    }
+  }
   const loaded = compositeAttemptId ? await readCompositeParticipantFeedbackContext(compositeAttemptId, db) : null
   const disposition = await resolveRelationalCompositeResultDisposition(compositeAttemptId, db, loaded?.parent ?? null)
   const disclosure = disclosureFromRelationalDisposition({
