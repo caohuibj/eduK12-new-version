@@ -165,7 +165,7 @@ const prepareScale = (input: { instrumentKey: string; instrumentVersion: string;
 
 import { getCachedPublishedScaleArtifact, getPublishedScaleArtifactHash, type PublishedScaleArtifact } from './published-scale-artifact'
 import { isPublishedSharedScaleRuntimeReference, reconstructPublishedSharedScaleRuntimeSync } from './shared-scale-runtime'
-import { clearPreloadedActiveScaleDeployments, readActiveScaleDeployments, setPreloadedActiveScaleDeployments } from '../scale/deployment/repository'
+import { clearPreloadedActiveScaleDeployments, hasPreloadedActiveScaleDeployments, readActiveScaleDeployments, setPreloadedActiveScaleDeployments } from '../scale/deployment/repository'
 
 const snapshotPublishedArtifactHash = new WeakMap<VersionedFrozenScaleRuntimeSnapshot, string>()
 export const getSnapshotPublishedArtifactHash = (snapshot: VersionedFrozenScaleRuntimeSnapshot): string | undefined => (
@@ -218,6 +218,7 @@ export const withPreloadedScaleStartFreeze = async <T>(
     standardSourceKind: true,
     standardToolKey: true,
   }
+  let setDeploymentsHere = false
   try {
     const orClauses: Array<Record<string, unknown>> = []
     if (scaleIds.length > 0) orClauses.push({ id: { in: scaleIds } })
@@ -241,23 +242,25 @@ export const withPreloadedScaleStartFreeze = async <T>(
     }
     preloadedScaleFreezeContexts.set(db, { scalesById, scalesByCode, importedScalesByToolVersion })
     const allScaleIds = [...scalesById.keys()]
-    if (allScaleIds.length > 0 && allScaleIds.length <= 50 && typeof (db as any).$queryRaw === 'function') {
+    if (allScaleIds.length > 0 && allScaleIds.length <= 50 && typeof (db as any).$queryRaw === 'function'
+      && !hasPreloadedActiveScaleDeployments(db as any, allScaleIds)) {
       const deployments = await readActiveScaleDeployments(db as any, allScaleIds)
       const deploymentMap = new Map<string, import('../scale/deployment/repository').StoredScaleDeploymentPolicyV1 | null>()
       for (const id of allScaleIds) {
         deploymentMap.set(id, deployments.get(id) ?? null)
       }
       setPreloadedActiveScaleDeployments(db as any, deploymentMap)
+      setDeploymentsHere = true
     }
   } catch {
     preloadedScaleFreezeContexts.delete(db)
-    clearPreloadedActiveScaleDeployments(db as any)
+    if (setDeploymentsHere) clearPreloadedActiveScaleDeployments(db as any)
   }
   try {
     return await work()
   } finally {
     preloadedScaleFreezeContexts.delete(db)
-    clearPreloadedActiveScaleDeployments(db as any)
+    if (setDeploymentsHere) clearPreloadedActiveScaleDeployments(db as any)
   }
 }
 

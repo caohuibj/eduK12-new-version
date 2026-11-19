@@ -57,6 +57,15 @@ export const setPreloadedActiveScaleDeployments = (
   }
 }
 
+export const hasPreloadedActiveScaleDeployments = (
+  db: Db,
+  scaleIds: readonly string[],
+): boolean => {
+  const preloaded = db && typeof db === 'object' ? preloadedActiveScaleDeployments.get(db) : undefined
+  if (!preloaded) return false
+  return scaleIds.every((id) => preloaded.has(id))
+}
+
 export const clearPreloadedActiveScaleDeployments = (db: Db): void => {
   if (db && typeof db === 'object') {
     preloadedActiveScaleDeployments.delete(db)
