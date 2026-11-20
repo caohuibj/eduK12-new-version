@@ -1,5 +1,5 @@
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
-import { AssessmentStartBusyError, classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
+import { ANONYMOUS_START_DEFERRED, AssessmentStartBusyError, classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
 import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
 import {
   assertAnonymousStartCriticalMemory,
@@ -11,7 +11,7 @@ import {
 import { availableTemplateCache, publicationReadKey, startCompositeCache, startMetadataCache } from './start-read-cache'
 import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments } from '../scale/deployment/repository'
 import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
-import { anonymousWholeSubmitQueued } from '../../services/wholeSubmissionPriority'
+import { anonymousStartPressureRampEnabled, deferAnonymousStartForWholeQueue } from '../../services/wholeSubmissionPriority'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
@@ -4630,8 +4630,8 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   }
   const plainTrainingStart = !study && token.compositeAssessment.productKind === 'QUESTIONNAIRE'
   const yieldToQueuedWholeSubmits = () => {
-    if (plainTrainingStart && anonymousWholeSubmitQueued()) {
-      throw new AssessmentStartBusyError('WHOLE_SUBMIT_QUEUE_PRESSURE')
+    if (plainTrainingStart && deferAnonymousStartForWholeQueue()) {
+      throw new AssessmentStartBusyError(anonymousStartPressureRampEnabled() ? ANONYMOUS_START_DEFERRED : 'WHOLE_SUBMIT_QUEUE_PRESSURE')
     }
   }
   if (!study) {
