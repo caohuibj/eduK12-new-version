@@ -3241,8 +3241,9 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
           })
           if (frozenScale) {
             if (educationProduct && !verifiedFlowMaterialization && requiredScaleItems.length === 1 && child.runtimeSnapshotEncrypted) {
-              freshEducationScaleChild = { ...child, scale: item.scale }
-              freshScaleRuntimeByChild.set(freshEducationScaleChild, frozenScale)
+              const projectedChild = { ...child, scale: item.scale }
+              freshScaleRuntimeByChild.set(projectedChild, frozenScale)
+              freshEducationScaleChild = projectedChild
             }
             await retainFrozenScaleAssessmentImages({ assessmentId: child.id, snapshot: frozenScale, db })
             runtime.scales.push({
