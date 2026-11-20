@@ -516,9 +516,20 @@ const stableValue = (value: unknown): unknown => {
   return value
 }
 
-export const hashScaleDefinition = (definition: ScaleDefinitionV2): string => (
+const computeScaleDefinitionHash = (definition: ScaleDefinitionV2): string => (
   createHash('sha256').update(JSON.stringify(stableValue(definition.versionAxes ? { schemaVersion: definition.schemaVersion, versionAxes: definition.versionAxes, respondentType: definition.respondentType, display: definition.display, responseSets: definition.responseSets, items: definition.items, scoring: definition.scoring } : definition))).digest('hex')
 )
+
+const cachedScaleDefinitionHashes = new WeakMap<ScaleDefinitionV2, string>()
+
+export const hashScaleDefinition = (definition: ScaleDefinitionV2): string => {
+  if (!hasImmutableCanonicalValue(definition)) return computeScaleDefinitionHash(definition)
+  const cached = cachedScaleDefinitionHashes.get(definition)
+  if (cached !== undefined) return cached
+  const computed = computeScaleDefinitionHash(definition)
+  cachedScaleDefinitionHashes.set(definition, computed)
+  return computed
+}
 
 export const createCustomScaleDefinition = (): ScaleDefinitionV2 => ({
   schemaVersion: 2,

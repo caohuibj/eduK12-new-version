@@ -271,8 +271,9 @@ export const prepareUnifiedScaleWrite = async (
   // The child row is already loaded by the final-submit admission path. Resolve
   // stored provenance and build the encrypted answer envelope before entering
   // the completion transaction; the transaction must only adjudicate and persist.
-  const storedProvenance = (await loadScaleAnswers(child.answers, child)).deviceInputProvenance
-  const persistedProvenance = input.deviceInputProvenance ?? storedProvenance
+  const persistedProvenance = input.deviceInputProvenance !== undefined
+    ? input.deviceInputProvenance
+    : (await loadScaleAnswers(child.answers, child)).deviceInputProvenance
   const compact = compactAssessmentStorageEnabled()
   const wholeRawParent = compact && wholeReceipt ? child.compositeAttemptId : null
   const inlineRaw = wholeRawParent ? null : encryptScaleAnswers(answers, persistedProvenance)
