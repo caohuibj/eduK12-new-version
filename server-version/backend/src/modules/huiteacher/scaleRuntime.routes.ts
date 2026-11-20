@@ -485,7 +485,57 @@ export async function listOwnTeacherScaleTasks(userId:string,cursor?:RunTaskCurs
           .filter(m => m.usableForPopulation && !m.hasReportReadDeny)
           .map(m => `${m.organizationId}|${m.membershipId}|${m.personaGrantId}`),
       )]
+      // Materialize actor-first candidate executions before joining org-wide
+      // evaluation events and registries so PostgreSQL cannot invert the plan
+      // across every open run in the organization.
       const fastRows = await client.$queryRaw<Array<TeacherScaleTaskRow & { __needsFallback: boolean }>>(Prisma.sql`
+        WITH candidate_execs AS MATERIALIZED (
+          SELECT
+            e."id",
+            e."organization_id",
+            e."run_id",
+            e."track_id",
+            e."subject_actor_snapshot_id",
+            e."respondent_actor_snapshot_id",
+            e."relationship_snapshot_id",
+            e."relational_assignment_id",
+            e."status",
+            e."runtime_binding_kind",
+            e."runtime_binding_ref",
+            e."created_at",
+            respondent."provenance_kind" AS "respondentProvenanceKind",
+            respondent."membership_id" AS "respondentMembershipId",
+            respondent."snapshot_payload" AS "respondentSnapshotPayload",
+            run."status" AS "runStatus",
+            track."resource_family" AS "resourceFamily",
+            track."resource_key" AS "resourceKey",
+            track."resource_version" AS "resourceVersion",
+            track."frozen_resource_policy" AS "frozenResourcePolicy"
+          FROM "assessment_run_actor_snapshots" respondent
+          JOIN "assessment_run_executions" e
+            ON e."respondent_actor_snapshot_id"=respondent."id"
+            AND e."organization_id"=respondent."organization_id"
+            AND e."run_id"=respondent."run_id"
+          JOIN "assessment_runs" run ON run."organization_id"=e."organization_id"
+            AND run."id"=e."run_id"
+            AND run."status" IN ('PUBLISHED','CLOSED')
+          JOIN "assessment_run_tracks" track
+            ON track."organization_id"=e."organization_id"
+            AND track."run_id"=e."run_id" AND track."id"=e."track_id"
+            AND track."resource_family"='SCALE'
+            AND ((track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL' OR track."resource_key" LIKE 'teacher-scale:%:GROUP')
+              OR track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF'
+              OR track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF:GROUP'
+              OR track."resource_key" LIKE 'private-scale:TEACHER:%:TEACHER:SELF')
+          WHERE respondent."organization_id"=ANY(${orgIds}::text[])
+            AND respondent."user_id"=${userId}
+            AND respondent."actor_role"='TEACHER'
+            AND e."status" IN ('ASSIGNED','STARTED','COMPLETED')
+            AND (NOT (e."organization_id"=ANY(${runStartDeniedOrgIds}::text[]))
+              OR (e."status"='COMPLETED' AND (track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF'
+                OR track."resource_key" LIKE 'private-scale:TEACHER:%:TEACHER:SELF')))
+            ${cursorScope}
+        )
         SELECT
           (pop."needsPopAuth" AND NOT pop."selfShape") AS "__needsFallback",
           to_char(e."created_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros",
@@ -493,39 +543,24 @@ export async function listOwnTeacherScaleTasks(userId:string,cursor?:RunTaskCurs
           event."title" AS "eventTitle",
           e."run_id" AS "runId",e."organization_id" AS "organizationId",
           e."status",e."runtime_binding_ref" AS "runtimeBindingRef",
-          track."resource_key" AS "resourceKey",
+          e."resourceKey" AS "resourceKey",
           registered."entry"->>'title' AS "title",
-          run."status" AS "runStatus"
-        FROM "assessment_run_actor_snapshots" respondent
-        JOIN "assessment_run_executions" e
-          ON e."respondent_actor_snapshot_id"=respondent."id"
-          AND e."organization_id"=respondent."organization_id"
-          AND e."run_id"=respondent."run_id"
+          e."runStatus" AS "runStatus"
+        FROM candidate_execs e
         JOIN "assessment_run_actor_snapshots" subject
           ON subject."organization_id"=e."organization_id"
           AND subject."run_id"=e."run_id"
           AND subject."id"=e."subject_actor_snapshot_id"
           AND subject."actor_role"='TEACHER' AND subject."user_id"=${userId}
-        JOIN "assessment_runs" run ON run."organization_id"=e."organization_id"
-          AND run."id"=e."run_id"
-          AND run."status" IN ('PUBLISHED','CLOSED')
         JOIN "huiteacher_evaluation_run_links" link
           ON link."organization_id"=e."organization_id"
           AND link."run_id"=e."run_id"
         JOIN "huiteacher_evaluation_events" event
           ON event."organization_id"=link."organization_id"
           AND event."id"=link."event_id" AND event."status" IN ('OPEN','CLOSED')
-        JOIN "assessment_run_tracks" track
-          ON track."organization_id"=e."organization_id"
-          AND track."run_id"=e."run_id" AND track."id"=e."track_id"
-          AND track."resource_family"='SCALE'
-          AND ((track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL' OR track."resource_key" LIKE 'teacher-scale:%:GROUP')
-            OR track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF'
-            OR track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF:GROUP'
-            OR track."resource_key" LIKE 'private-scale:TEACHER:%:TEACHER:SELF')
         JOIN "registered_assessment_resources" registered
-          ON registered."resource_key"=track."resource_key"
-          AND registered."resource_version"=track."resource_version"
+          ON registered."resource_key"=e."resourceKey"
+          AND registered."resource_version"=e."resourceVersion"
           AND registered."status" IN ('PUBLISHED','RETIRED')
         JOIN "assessment_run_relationship_snapshots" relation
           ON relation."id"=e."relationship_snapshot_id"
@@ -534,29 +569,29 @@ export async function listOwnTeacherScaleTasks(userId:string,cursor?:RunTaskCurs
           ON e."runtime_binding_kind"='COMPOSITE' AND ca."id"=e."runtime_binding_ref" AND ca."user_id"=${userId}
         CROSS JOIN LATERAL (
           SELECT
-            (track."resource_key" LIKE 'library-scale:%'
-              OR track."resource_key" LIKE 'private-scale:%'
-              OR (e."status"<>'COMPLETED' AND run."status"='CLOSED')) AS "needsPopAuth",
+            (e."resourceKey" LIKE 'library-scale:%'
+              OR e."resourceKey" LIKE 'private-scale:%'
+              OR (e."status"<>'COMPLETED' AND e."runStatus"='CLOSED')) AS "needsPopAuth",
             (e."subject_actor_snapshot_id"=e."respondent_actor_snapshot_id"
               AND relation."relationship_kind"='SELF'
               AND relation."snapshot_payload"->'facts'->>'courseId' IS NULL
-              AND respondent."provenance_kind"='ORG_MEMBER') AS "selfShape",
-            (respondent."membership_id" IS NOT NULL
-              AND respondent."snapshot_payload"->>'personaGrantId' IS NOT NULL
-              AND (e."organization_id" || '|' || respondent."membership_id" || '|' || (respondent."snapshot_payload"->>'personaGrantId')) = ANY(${collectionTupleKeys}::text[])) AS "collectionTupleOk",
-            (respondent."membership_id" IS NOT NULL
-              AND respondent."snapshot_payload"->>'personaGrantId' IS NOT NULL
-              AND (e."organization_id" || '|' || respondent."membership_id" || '|' || (respondent."snapshot_payload"->>'personaGrantId')) = ANY(${reportTupleKeys}::text[])) AS "reportTupleOk",
+              AND e."respondentProvenanceKind"='ORG_MEMBER') AS "selfShape",
+            (e."respondentMembershipId" IS NOT NULL
+              AND e."respondentSnapshotPayload"->>'personaGrantId' IS NOT NULL
+              AND (e."organization_id" || '|' || e."respondentMembershipId" || '|' || (e."respondentSnapshotPayload"->>'personaGrantId')) = ANY(${collectionTupleKeys}::text[])) AS "collectionTupleOk",
+            (e."respondentMembershipId" IS NOT NULL
+              AND e."respondentSnapshotPayload"->>'personaGrantId' IS NOT NULL
+              AND (e."organization_id" || '|' || e."respondentMembershipId" || '|' || (e."respondentSnapshotPayload"->>'personaGrantId')) = ANY(${reportTupleKeys}::text[])) AS "reportTupleOk",
             (e."status"='STARTED' AND e."runtime_binding_kind"='COMPOSITE'
-              AND track."frozen_resource_policy"->'runtimeLaunchTarget'->>'kind'='COMPOSITE'
+              AND e."frozenResourcePolicy"->'runtimeLaunchTarget'->>'kind'='COMPOSITE'
               AND a."id" IS NOT NULL AND a."status"='STARTED' AND a."policy_domain"='ORGANIZATION_RUN'
               AND a."respondent_user_id"=${userId} AND a."subject_user_id"=${userId}
-              AND a."resource_kind"=track."resource_family" AND a."resource_key"=track."resource_key" AND a."resource_version"=track."resource_version"
+              AND a."resource_kind"=e."resourceFamily" AND a."resource_key"=e."resourceKey" AND a."resource_version"=e."resourceVersion"
               AND ca."id" IS NOT NULL AND ca."assignment_ref"=a."id"
               AND ca."user_id"=${userId} AND ca."respondent_user_id"=${userId}
               AND ca."subject_user_id"=a."subject_user_id" AND ca."episode_id"=a."episode_id"
               AND ca."status"='IN_PROGRESS'
-              AND ca."composite_assessment_id"=track."frozen_resource_policy"->'runtimeLaunchTarget'->>'ref'
+              AND ca."composite_assessment_id"=e."frozenResourcePolicy"->'runtimeLaunchTarget'->>'ref'
               AND ((a."consent_id" IS NULL AND ca."consent_id" IS NULL)
                 OR EXISTS (
                   SELECT 1 FROM "assessment_attempt_consents" issued
@@ -572,20 +607,13 @@ export async function listOwnTeacherScaleTasks(userId:string,cursor?:RunTaskCurs
                     AND issued."respondent_user_id"=a."respondent_user_id"
                 ))) AS "boundContinuation"
         ) pop
-        WHERE respondent."organization_id"=ANY(${orgIds}::text[])
-          AND respondent."user_id"=${userId}
-          AND respondent."actor_role"='TEACHER'
-          AND e."status" IN ('ASSIGNED','STARTED','COMPLETED')
-          AND (NOT (e."organization_id"=ANY(${runStartDeniedOrgIds}::text[]))
-            OR (e."status"='COMPLETED' AND (track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF'
-              OR track."resource_key" LIKE 'private-scale:TEACHER:%:TEACHER:SELF')))
-          AND (
+        WHERE (
             (pop."needsPopAuth" AND NOT pop."selfShape")
             OR (
               (e."status"='COMPLETED' OR (
                 event."status"='OPEN'
-                AND (run."status"='PUBLISHED'
-                  OR (run."status"='CLOSED' AND pop."boundContinuation" AND pop."collectionTupleOk"
+                AND (e."runStatus"='PUBLISHED'
+                  OR (e."runStatus"='CLOSED' AND pop."boundContinuation" AND pop."collectionTupleOk"
                     AND NOT EXISTS(SELECT 1 FROM "campus_activity_runs" c WHERE c."organization_id"=e."organization_id" AND c."run_id"=e."run_id")))
                 AND registered."status"='PUBLISHED'
                 AND (EXISTS (
@@ -593,16 +621,16 @@ export async function listOwnTeacherScaleTasks(userId:string,cursor?:RunTaskCurs
                   WHERE license."organization_id"=e."organization_id"
                     AND license."resource_id"=registered."id"
                     AND license."status"='ACTIVE'
-                ) OR (track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF'
+                ) OR (e."resourceKey" LIKE 'library-scale:%:TEACHER:TEACHER:SELF'
                   AND registered."entry"->'libraryOrigin'->>'product'='TEACHER'
                   AND registered."entry"->'libraryOrigin'->>'variantKey'='TEACHER:SELF')
                 OR ${privateScaleRegistryIdentitySql({registered:Prisma.sql`registered`,organizationId:Prisma.sql`e.organization_id`,product:'TEACHER'})})
               ))
               AND (
-                (track."resource_key" NOT LIKE 'library-scale:%' AND track."resource_key" NOT LIKE 'private-scale:%')
+                (e."resourceKey" NOT LIKE 'library-scale:%' AND e."resourceKey" NOT LIKE 'private-scale:%')
                 OR (
                   NOT EXISTS(SELECT 1 FROM "campus_activity_runs" c WHERE c."organization_id"=e."organization_id" AND c."run_id"=e."run_id")
-                  AND (track."resource_key" NOT LIKE 'private-scale:%'
+                  AND (e."resourceKey" NOT LIKE 'private-scale:%'
                     OR ${privateScaleRegistryIdentitySql({registered:Prisma.sql`registered`,organizationId:Prisma.sql`e.organization_id`,product:'TEACHER'})})
                   AND CASE WHEN e."status"='COMPLETED'
                     THEN pop."reportTupleOk"
@@ -611,7 +639,6 @@ export async function listOwnTeacherScaleTasks(userId:string,cursor?:RunTaskCurs
               )
             )
           )
-          ${cursorScope}
         ORDER BY e."created_at" DESC,e."id" DESC LIMIT ${limit + 1}
       `)
       if (fastRows.some(row => row.__needsFallback)) {
