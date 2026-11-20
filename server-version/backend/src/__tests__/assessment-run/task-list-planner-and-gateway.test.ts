@@ -277,6 +277,8 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     expect(membershipSql).toContain('FROM "users" current_actor')
     expect(membershipSql).toContain('"organization_persona_grants" persona')
     expect(membershipSql).toContain('organization_access_denies')
+    expect(taskSql).toContain('WITH candidate_execs AS MATERIALIZED')
+    expect(taskSql).toContain('FROM candidate_execs e')
     expect(taskSql).toContain('JOIN "assessment_run_executions" e')
     expect(taskSql).toContain('"collectionTupleOk"')
     expect(taskSql).toContain('"reportTupleOk"')
