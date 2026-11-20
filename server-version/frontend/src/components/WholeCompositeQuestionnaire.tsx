@@ -453,6 +453,9 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       const lookup = read ? () => read(state.id, sealed.payload.submissionId, sealed.payload.attemptEpoch) : undefined
       const result = await runFinalDraftCapacityRetry({
         operation: async attempt => {
+          // Without a receipt endpoint, a sealed or uncertain submission must
+          // never be uploaded again: there is no way to establish absence.
+          if (!lookup && (attempt > 1 || meta.sealedSubmission)) throw receiptUnconfirmedError()
           if (lookup && (attempt > 1 || meta.sealedSubmission)) {
             // Automatic retries already saw two negative reads after the last POST.
             const recovered = attempt > 1
@@ -468,7 +471,8 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
             if (receipt.status !== 'ACCEPTED' || receipt.attemptId !== state.id || receipt.submissionId !== sealed.payload.submissionId || !receipt.payloadHash) throw receiptUnconfirmedError()
             return receipt
           } catch (cause) {
-            if (lookup && isRecoverableReceiptError(cause)) {
+            if (isRecoverableReceiptError(cause)) {
+              if (!lookup) throw receiptUnconfirmedError()
               const recovered = await confirmWholeReceiptAfterUncertainSubmit(lookup, state.id, sealed.payload.submissionId)
               if (recovered.status === 'ACCEPTED') return recovered
               if (recovered.status === 'UNKNOWN') throw receiptUnconfirmedError()
