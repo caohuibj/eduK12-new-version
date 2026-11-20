@@ -5,11 +5,14 @@ import {
   scaleDefinitionSchema,
   type ScaleAggregation,
   type ScaleDefinitionV2,
+  type ScaleItemDefinition,
   type ScaleMissingPolicy,
+  type ScaleResponseOption,
   type ScaleResponseValue,
   type ScaleScoreDefinition,
   type ScaleTransform,
 } from './scale-definition'
+import { hasImmutableCanonicalValue, retainImmutableCanonicalValue } from '../assessment-runtime/canonical'
 import { SPANE_SCORER_KEY, spane12BalanceScorer } from './packages/spane12-balance-scorer'
 
 /** A persisted answer. The response value is deliberately not a score. */
@@ -231,14 +234,75 @@ const normalizeAnswers = (answers: ScaleAnswer[] | Record<string, ScaleResponseV
     : Object.entries(answers).map(([itemCode, responseValue]) => ({ itemCode, responseValue }))
 )
 
-const validateAnswers = (definition: ScaleDefinitionV2, answers: ScaleAnswer[]): Map<string, ScaleAnswer> => {
+interface CompiledScaleItemPlan {
+  item: ScaleItemDefinition
+  isContentItem: boolean
+  optionByValueKey: Map<string, ScaleResponseOption> | null
+  responseScores: number[]
+  transform: ScaleTransform
+}
+
+interface CompiledScaleScoringPlan {
+  parsed: ScaleDefinitionV2
+  itemPlans: Map<string, CompiledScaleItemPlan>
+  scoreRanges: Map<string, ScaleScoreRange>
+  expectedItemsByScoreKey: Map<string, string[]>
+}
+
+const compiledScaleItemPlans = new WeakMap<ScaleDefinitionV2, Map<string, CompiledScaleItemPlan>>()
+const compiledScaleScoringPlans = new WeakMap<ScaleDefinitionV2, CompiledScaleScoringPlan>()
+
+const buildScaleItemPlans = (definition: ScaleDefinitionV2): Map<string, CompiledScaleItemPlan> => {
+  const responseSetsByKey = new Map(definition.responseSets.map((set) => [set.key, set]))
+  const rulesByItemCode = new Map((definition.scoring?.itemRules ?? []).map((rule) => [rule.itemCode, rule]))
+  const plans = new Map<string, CompiledScaleItemPlan>()
+  for (const item of definition.items) {
+    const responseSet = responseSetsByKey.get(item.responseSetKey)
+    let optionByValueKey: Map<string, ScaleResponseOption> | null = null
+    let responseScores: number[] = []
+    if (responseSet) {
+      optionByValueKey = new Map<string, ScaleResponseOption>()
+      responseScores = responseSet.options.map((option) => {
+        const key = responseValueKey(option.value)
+        if (!optionByValueKey!.has(key)) optionByValueKey!.set(key, option)
+        return option.score
+      })
+    }
+    const rule = rulesByItemCode.get(item.itemCode)
+    plans.set(item.itemCode, {
+      item,
+      isContentItem: isScaleContentItem(item),
+      optionByValueKey,
+      responseScores,
+      transform: rule?.transform ?? { type: 'identity' },
+    })
+  }
+  return plans
+}
+
+const getCompiledScaleItemPlans = (definition: ScaleDefinitionV2): Map<string, CompiledScaleItemPlan> => {
+  if (!hasImmutableCanonicalValue(definition)) return buildScaleItemPlans(definition)
+  let cached = compiledScaleItemPlans.get(definition)
+  if (!cached) {
+    cached = buildScaleItemPlans(definition)
+    compiledScaleItemPlans.set(definition, cached)
+  }
+  return cached
+}
+
+const validateAnswers = (
+  definition: ScaleDefinitionV2,
+  answers: ScaleAnswer[],
+  precompiledItems?: Map<string, CompiledScaleItemPlan>,
+): Map<string, ScaleAnswer> => {
   const issues: ScaleAnswerIssue[] = []
-  const items = new Map(definition.items.map((item) => [item.itemCode, item]))
+  const items = precompiledItems ?? getCompiledScaleItemPlans(definition)
   const answerByItem = new Map<string, ScaleAnswer>()
 
   answers.forEach((answer, index) => {
     const path = `answers.${index}`
-    if (!items.has(answer.itemCode)) {
+    const itemPlan = items.get(answer.itemCode)
+    if (!itemPlan) {
       issues.push({ path: `${path}.itemCode`, message: `题目不存在：${answer.itemCode}` })
       return
     }
@@ -252,10 +316,12 @@ const validateAnswers = (definition: ScaleDefinitionV2, answers: ScaleAnswer[]):
     if (answer.changeCount !== undefined && (!Number.isInteger(answer.changeCount) || answer.changeCount < 0)) {
       issues.push({ path: `${path}.changeCount`, message: 'changeCount 必须是非负整数' })
     }
-    const item = items.get(answer.itemCode)
-    if (!item) return
-    const responseSet = responseSetForItem(definition, item)
-    if (!responseSet.options.some((option) => sameResponseValue(option.value, answer.responseValue))) {
+    if (!itemPlan.optionByValueKey) {
+      responseSetForItem(definition, itemPlan.item)
+      return
+    }
+    const matchedOption = itemPlan.optionByValueKey.get(responseValueKey(answer.responseValue))
+    if (!matchedOption || !sameResponseValue(matchedOption.value, answer.responseValue)) {
       issues.push({ path: `${path}.responseValue`, message: `响应值不属于题目 ${answer.itemCode} 的响应集` })
     }
     answerByItem.set(answer.itemCode, answer)
@@ -265,22 +331,28 @@ const validateAnswers = (definition: ScaleDefinitionV2, answers: ScaleAnswer[]):
   return answerByItem
 }
 
-const scoreItems = (definition: ScaleDefinitionV2, answers: Map<string, ScaleAnswer>): ScoredItem[] => {
-  const rules = new Map(definition.scoring.itemRules.map((rule) => [rule.itemCode, rule]))
+const scoreItems = (
+  definition: ScaleDefinitionV2,
+  answers: Map<string, ScaleAnswer>,
+  precompiledItems?: Map<string, CompiledScaleItemPlan>,
+): ScoredItem[] => {
+  const itemPlans = precompiledItems ?? getCompiledScaleItemPlans(definition)
   return definition.items.flatMap((item) => {
-    if (!isScaleContentItem(item)) return []
+    const itemPlan = itemPlans.get(item.itemCode)
+    if (!itemPlan || !itemPlan.isContentItem) return []
     const answer = answers.get(item.itemCode)
     if (!answer) return []
-    const responseSet = responseSetForItem(definition, item)
-    const option = responseSet.options.find((candidate) => sameResponseValue(candidate.value, answer.responseValue))
-    if (!option) return []
-    const rule = rules.get(item.itemCode)
-    const responseScores = responseSet.options.map((candidate) => candidate.score)
+    if (!itemPlan.optionByValueKey) {
+      responseSetForItem(definition, item)
+      return []
+    }
+    const option = itemPlan.optionByValueKey.get(responseValueKey(answer.responseValue))
+    if (!option || !sameResponseValue(option.value, answer.responseValue)) return []
     return [{
       itemCode: item.itemCode,
       responseValue: answer.responseValue,
       baseScore: option.score,
-      score: transformScore(rule?.transform ?? { type: 'identity' }, option.score, responseScores),
+      score: transformScore(itemPlan.transform, option.score, itemPlan.responseScores),
       // Omit undefined optionals — canonicalHash rejects undefined keys (Bundle bridge).
       ...(answer.responseTimeMs === undefined ? {} : { responseTimeMs: answer.responseTimeMs }),
       ...(answer.answeredAt === undefined ? {} : { answeredAt: answer.answeredAt }),
@@ -307,8 +379,8 @@ const makeScore = (
   canonical: score.canonical,
   displayPrecision: score.displayPrecision,
   value,
-  range,
-  expectedItems,
+  range: range ? { min: range.min, max: range.max } : null,
+  expectedItems: [...expectedItems],
   answeredItems,
   status,
   prorated,
@@ -365,9 +437,10 @@ const calculateScore = (
   scoredItems: Map<string, ScoredItem>,
   calculated: Map<string, ScaleScoreValue>,
   scoreRanges: Map<string, ScaleScoreRange>,
+  precompiledExpectedItems?: string[],
 ): ScoreCalculation => {
   if (score.source.type === 'items') return calculateItemScore(definition, score, scoredItems)
-  const expectedItems = expectedItemsFor(definition, score)
+  const expectedItems = precompiledExpectedItems ?? expectedItemsFor(definition, score)
   const sourceScores = score.source.scores
   const components = sourceScores.map((component) => calculated.get(component.scoreKey))
   const answeredItems = components
@@ -430,6 +503,7 @@ const validateCustomScorerOutput = (
   definition: ScaleDefinitionV2,
   output: ScaleCustomScorerOutput,
   fallbackQuality: ScaleQuality,
+  expectedItemsByScoreKey?: Map<string, string[]>,
 ): ScaleScoringOutput => {
   if (!output || !Array.isArray(output.scores)) throw new Error('custom scorer 必须返回 scores 数组')
 
@@ -463,7 +537,7 @@ const validateCustomScorerOutput = (
       throw new Error(`custom scorer 的 ${definitionScore.key} range 与 definition 不一致`)
     }
 
-    const expectedItems = expectedItemsFor(definition, definitionScore)
+    const expectedItems = expectedItemsByScoreKey?.get(definitionScore.key) ?? expectedItemsFor(definition, definitionScore)
     const answerSet = new Set(candidate.answeredItems)
     if (candidate.answeredItems.some((itemCode) => !expectedItems.includes(itemCode))) {
       throw new Error(`custom scorer 的 ${definitionScore.key} answeredItems 超出 score 来源`)
@@ -496,7 +570,7 @@ const validateCustomScorerOutput = (
   return { itemScores: [], scores: scorerScores, quality: { status: quality.status, flags: [...new Set(quality.flags)] } }
 }
 
-export const calculateScoreRanges = (definition: ScaleDefinitionV2): Map<string, ScaleScoreRange> => {
+const computeScoreRanges = (definition: ScaleDefinitionV2): Map<string, ScaleScoreRange> => {
   const ranges = itemRanges(definition)
   const scoreRanges = new Map<string, ScaleScoreRange>()
   const pending = new Set(definition.scoring.scores.map((score) => score.key))
@@ -514,20 +588,69 @@ export const calculateScoreRanges = (definition: ScaleDefinitionV2): Map<string,
   return scoreRanges
 }
 
+const cachedScoreRanges = new WeakMap<ScaleDefinitionV2, Map<string, ScaleScoreRange>>()
+
+export const calculateScoreRanges = (definition: ScaleDefinitionV2): Map<string, ScaleScoreRange> => {
+  if (!hasImmutableCanonicalValue(definition)) return computeScoreRanges(definition)
+  let cached = compiledScaleScoringPlans.get(definition)?.scoreRanges ?? cachedScoreRanges.get(definition)
+  if (!cached) {
+    cached = computeScoreRanges(definition)
+    cachedScoreRanges.set(definition, cached)
+  }
+  const cloned = new Map<string, ScaleScoreRange>()
+  for (const [key, range] of cached.entries()) {
+    cloned.set(key, { min: range.min, max: range.max })
+  }
+  return cloned
+}
+
+const assertNoScoredQualityItems = (parsed: ScaleDefinitionV2): void => {
+  // Fail closed even if a caller bypasses authoring validation. Non-scoring answers
+  // stay in raw storage, never in a scoring denominator or a custom scorer.
+  const qualityCodes = new Set(parsed.items.filter(item => !isScaleContentItem(item)).map(item => item.itemCode))
+  if (qualityCodes.size && (parsed.scoring.scorerKey || parsed.scoring.scores.some(score => score.source.type === 'items' && score.source.items.some(item => qualityCodes.has(item.itemCode))))) {
+    throw new Error(parsed.items.some(item => item.purpose === 'UNSCORED' && qualityCodes.has(item.itemCode)) ? '不计分附加题不能纳入计分' : '质量题不能纳入计分')
+  }
+}
+
+const buildScaleScoringPlan = (parsed: ScaleDefinitionV2): CompiledScaleScoringPlan => {
+  assertNoScoredQualityItems(parsed)
+  const itemPlans = getCompiledScaleItemPlans(parsed)
+  const scoreRanges = cachedScoreRanges.get(parsed) ?? computeScoreRanges(parsed)
+  const expectedItemsByScoreKey = new Map(
+    parsed.scoring.scores.map((score) => [score.key, expectedItemsFor(parsed, score)]),
+  )
+  return { parsed, itemPlans, scoreRanges, expectedItemsByScoreKey }
+}
+
+const getCompiledScaleScoringPlan = (definitionInput: ScaleDefinitionV2): CompiledScaleScoringPlan => {
+  if (!hasImmutableCanonicalValue(definitionInput)) {
+    const parsed = scaleDefinitionSchema.parse(definitionInput)
+    return buildScaleScoringPlan(parsed)
+  }
+  const existing = compiledScaleScoringPlans.get(definitionInput)
+  if (existing) return existing
+  const parsed = scaleDefinitionSchema.parse(definitionInput)
+  retainImmutableCanonicalValue(parsed)
+  const plan = buildScaleScoringPlan(parsed)
+  compiledScaleScoringPlans.set(definitionInput, plan)
+  compiledScaleScoringPlans.set(parsed, plan)
+  compiledScaleItemPlans.set(definitionInput, plan.itemPlans)
+  compiledScaleItemPlans.set(parsed, plan.itemPlans)
+  cachedScoreRanges.set(definitionInput, plan.scoreRanges)
+  cachedScoreRanges.set(parsed, plan.scoreRanges)
+  return plan
+}
+
 export const scoreScale = (
   definitionInput: ScaleDefinitionV2,
   inputAnswers: ScaleAnswer[] | Record<string, ScaleResponseValue>,
 ): ScaleScoringOutput => {
-  const parsed = scaleDefinitionSchema.parse(definitionInput)
-  // Fail closed even if a caller bypasses authoring validation. Non-scoring answers
-  // stay in raw storage, never in a scoring denominator or a custom scorer.
-  const qualityCodes = new Set(parsed.items.filter(item => !isScaleContentItem(item)).map(item => item.itemCode))
-  if (qualityCodes.size && (parsed.scoring.scorerKey || parsed.scoring.scores.some(score => score.source.type === 'items' && score.source.items.some(item => qualityCodes.has(item.itemCode))))) throw new Error(parsed.items.some(item => item.purpose === 'UNSCORED' && qualityCodes.has(item.itemCode)) ? '不计分附加题不能纳入计分' : '质量题不能纳入计分')
+  const { parsed, itemPlans, scoreRanges, expectedItemsByScoreKey } = getCompiledScaleScoringPlan(definitionInput)
   const answers = normalizeAnswers(inputAnswers)
-  const answerByItem = validateAnswers(parsed, answers)
-  const scoredItems = scoreItems(parsed, answerByItem)
+  const answerByItem = validateAnswers(parsed, answers, itemPlans)
+  const scoredItems = scoreItems(parsed, answerByItem, itemPlans)
   const scoredItemByCode = new Map(scoredItems.map((item) => [item.itemCode, item]))
-  const scoreRanges = calculateScoreRanges(parsed)
   const calculated = new Map<string, ScaleScoreValue>()
   const flags: ScaleQuality['flags'] = []
   const pending = new Set(parsed.scoring.scores.map((score) => score.key))
@@ -537,8 +660,8 @@ export const scoreScale = (
     parsed.scoring.scores.forEach((score) => {
       if (!pending.has(score.key)) return
       if (score.source.type === 'scores' && score.source.scores.some((component) => !calculated.has(component.scoreKey))) return
-      const expectedItems = expectedItemsFor(parsed, score)
-      const calculation = calculateScore(parsed, score, scoredItemByCode, calculated, scoreRanges)
+      const expectedItems = expectedItemsByScoreKey.get(score.key) ?? expectedItemsFor(parsed, score)
+      const calculation = calculateScore(parsed, score, scoredItemByCode, calculated, scoreRanges, expectedItems)
       const range = scoreRanges.get(score.key) ?? null
       const result = makeScore(parsed, score, calculation.value, range, expectedItems, calculation.answeredItems, calculation.status, calculation.prorated)
       calculated.set(score.key, result)
@@ -556,7 +679,8 @@ export const scoreScale = (
 
   parsed.scoring.scores.forEach((score) => {
     if (!calculated.has(score.key)) {
-      calculated.set(score.key, makeScore(parsed, score, null, scoreRanges.get(score.key) ?? null, expectedItemsFor(parsed, score), [], 'not_calculable', false))
+      const expectedItems = expectedItemsByScoreKey.get(score.key) ?? expectedItemsFor(parsed, score)
+      calculated.set(score.key, makeScore(parsed, score, null, scoreRanges.get(score.key) ?? null, expectedItems, [], 'not_calculable', false))
       addFlag(flags, 'score_not_calculable')
     }
   })
@@ -573,7 +697,7 @@ export const scoreScale = (
     const scorer = customScorerRegistry.get(parsed.scoring.scorerKey)
     if (!scorer) throw new Error(`未注册的 scorerKey：${parsed.scoring.scorerKey}`)
     const custom = scorer({ definition: parsed, answers, itemScores: scoredItems })
-    const validated = validateCustomScorerOutput(parsed, custom, { status: qualityStatus, flags })
+    const validated = validateCustomScorerOutput(parsed, custom, { status: qualityStatus, flags }, expectedItemsByScoreKey)
     return { ...validated, itemScores: scoredItems }
   }
 

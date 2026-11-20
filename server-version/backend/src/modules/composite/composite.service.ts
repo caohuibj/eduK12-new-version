@@ -4697,10 +4697,12 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
     const children = (attempt as any)._freshScaleChildren as any[] | undefined
     const source = (attempt as any)._startComposite
     seedFreshScaleChildren(children)
+    const projected = children && !opts?.wantsWholeDelivery
+      ? await projectFreshStartedAttempt(attempt, source, children, { recoveryTokenHash: credential.hash }, credential.token) : null
     const { parent, preloadedState } = opts?.wantsWholeDelivery
       ? buildWholeStartPreload(attempt, children, source)
       : { parent: undefined, preloadedState: undefined }
-    return await projectStartedAttempt(attempt.id, { recoveryTokenHash: credential.hash }, Boolean(opts?.wantsWholeDelivery), credential.token, parent, preloadedState, opts?.knownTemplateHashes, freshlyCreated)
+    return projected ?? await projectStartedAttempt(attempt.id, { recoveryTokenHash: credential.hash }, Boolean(opts?.wantsWholeDelivery), credential.token, parent, preloadedState, opts?.knownTemplateHashes, freshlyCreated)
   } finally {
     recordAnonymousStartPhase('anonymous.start.post_gate_ms', postGateAt, process.hrtime.bigint())
   }

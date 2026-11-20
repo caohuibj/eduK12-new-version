@@ -1099,12 +1099,13 @@ const isFormValueEmpty = (val: unknown) => {
 }
 
 const prepareFromWholeManifest = (input: WholeQuestionnaireSubmitInput, manifest: WholeValidationManifest, principal: Principal, receivedAtMs: number) => {
-  if (input.units.length !== manifest.units.length || new Set(input.units.map(unit => unit.itemId)).size !== input.units.length) throw failure('问卷量表缺失或重复', 400)
+  const sentUnitsById = new Map(input.units.map(unit => [unit.itemId, unit]))
+  if (input.units.length !== manifest.units.length || sentUnitsById.size !== input.units.length) throw failure('问卷量表缺失或重复', 400)
   const timingEntries=input.units.flatMap(unit=>Object.entries(unit.itemTimings??{}))
   if(timingEntries.length>3000||Buffer.byteLength(JSON.stringify(timingEntries),'utf8')>400000)throw failure('整卷计时超过3000题或400KB预算',400)
   const preparedUnits = []
   for (const unit of manifest.units) {
-    const sent = input.units.find(candidate => candidate.itemId === unit.itemId)
+    const sent = sentUnitsById.get(unit.itemId)
     if (!sent || sent.definitionHash !== unit.definitionHash || (unit.deadlineMs !== null && receivedAtMs > unit.deadlineMs)) throw failure('量表冻结版本或完成期限不匹配')
     const plan = rulesFor(unit)
     const items = plan.byItem
