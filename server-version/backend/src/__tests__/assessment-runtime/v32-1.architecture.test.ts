@@ -97,9 +97,12 @@ describe('Unified runtime architecture boundaries', () => {
     const encryptedAnswers = scale.indexOf('const encryptedAnswers =')
     expect(encryptedAnswers).toBeGreaterThan(-1)
     expect(encryptedAnswers).toBeLessThan(transactionStart)
-    const provenance = scale.indexOf('const storedProvenance = (await loadScaleAnswers(child.answers, child)).deviceInputProvenance')
+    const provenance = scale.indexOf('const persistedProvenance =')
     expect(provenance).toBeGreaterThan(-1)
     expect(provenance).toBeLessThan(transactionStart)
+    const preparation = scale.slice(provenance, encryptedAnswers)
+    expect(preparation).toContain('input.deviceInputProvenance !== undefined')
+    expect(preparation).toContain('loadScaleAnswers(child.answers, child)')
     expect(transactionBody).not.toContain('loadScaleAnswers')
   })
 
