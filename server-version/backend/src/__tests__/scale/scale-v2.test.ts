@@ -11,6 +11,7 @@ import {
   type ScaleDirection,
 } from '../../modules/scale/scale-definition'
 import {
+  calculateScoreRanges,
   validateScaleAnswers,
   registerScaleCustomScorer,
   missingRequiredScaleItemCodes,
@@ -19,7 +20,7 @@ import {
 } from '../../modules/scale/scale-scoring'
 import { buildScaleResult } from '../../modules/scale/scale-result'
 import { buildScaleBundleBridge } from '../../modules/assessment-bundle/sources'
-import { canonicalHash } from '../../modules/assessment-runtime/canonical'
+import { canonicalHash, retainImmutableCanonicalValue } from '../../modules/assessment-runtime/canonical'
 import { readScaleResult, scaleAssessmentForResponse, scaleDefinitionFromRecord } from '../../modules/scale/scale-workflow.service'
 
 const makeDefinition = (): ScaleDefinitionV2 => ({
@@ -479,5 +480,26 @@ describe('standard ScalePackageV2 release gate', () => {
       expect.objectContaining({ key: 'working_memory', value: 45, range: { min: 9, max: 45 } }),
       expect.objectContaining({ key: 'inhibition', value: 25, range: { min: 5, max: 25 } }),
     ])
+  })
+
+  it('reuses WeakMap-compiled scale scoring plans and definition hashes for immutable canonical definitions without leaking mutable return references', () => {
+    const frozenDef = retainImmutableCanonicalValue(structuredClone(ADEXI_V2_PACKAGE.definition))
+    const hashA = hashScaleDefinition(frozenDef)
+    const hashB = hashScaleDefinition(frozenDef)
+    expect(hashA).toBe(hashB)
+
+    const rangesA = calculateScoreRanges(frozenDef)
+    rangesA.get('working_memory')!.min = -999
+    const rangesB = calculateScoreRanges(frozenDef)
+    expect(rangesB.get('working_memory')).toEqual({ min: 9, max: 45 })
+
+    validateScaleAnswers(frozenDef, ADEXI_V2_PACKAGE.goldenCases[1].answers)
+    const scoredA = scoreScale(frozenDef, ADEXI_V2_PACKAGE.goldenCases[1].answers)
+    scoredA.scores[0].range!.min = -123
+    scoredA.scores[0].expectedItems.push('mutated_item')
+
+    const scoredB = scoreScale(frozenDef, ADEXI_V2_PACKAGE.goldenCases[1].answers)
+    expect(scoredB.scores[0].range).toEqual({ min: 9, max: 45 })
+    expect(scoredB.scores[0].expectedItems).not.toContain('mutated_item')
   })
 })
