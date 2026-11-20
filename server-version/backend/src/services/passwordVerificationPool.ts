@@ -163,10 +163,10 @@ export const createPasswordVerificationPool = (options: PoolOptions) => {
 export type PasswordVerificationPool = ReturnType<typeof createPasswordVerificationPool>
 let defaultPool: PasswordVerificationPool | undefined
 
-/** Default 8 workers outside tests; set LOGIN_PASSWORD_WORKERS=0 to opt out.
+/** Default 4 workers outside tests; set LOGIN_PASSWORD_WORKERS=0 to opt out.
  * This changes scheduling only, not bcryptjs algorithm, cost or existing hashes. */
 export const passwordVerificationPool = (): PasswordVerificationPool | undefined => {
-  const raw = process.env.LOGIN_PASSWORD_WORKERS ?? (process.env.NODE_ENV === 'test' ? '0' : '8')
+  const raw = process.env.LOGIN_PASSWORD_WORKERS ?? (process.env.NODE_ENV === 'test' ? '0' : '4')
   if (!/^(?:[0-9]|[12][0-9]|3[0-2])$/.test(raw)) throw new Error('Invalid LOGIN_PASSWORD_WORKERS')
   const size = Number(raw)
   if (size === 0) return undefined
