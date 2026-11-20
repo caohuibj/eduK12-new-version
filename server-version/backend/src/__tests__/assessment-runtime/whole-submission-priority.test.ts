@@ -70,6 +70,22 @@ describe('bounded whole-submission priority', () => {
     send(3, 120); expect(policy.decision(2)).toMatchObject({ mode: 'minimum', limit: 1, delayMs: 0 })
     send(4, 20); expect(policy.decision(2).limit).toBe(2)
   })
+  it('uses real Whole queue pressure with a responsive API and still restores idle Worker slots', () => {
+    let at = 0
+    const policy = new ReportClaimPriority(() => at, true)
+    const send = (seq: number, queued: boolean, busy = true) => policy.receive(JSON.stringify({
+      v: 1, kind: 'pressure', source, seq, busy, queued, active: busy ? 8 : 0, lagMs: 3,
+    }))
+    send(1, true)
+    expect(policy.decision(2)).toMatchObject({ mode: 'yield', limit: 0 })
+    at = 1400; send(2, true)
+    at = 2100; send(3, true)
+    expect(policy.decision(2)).toMatchObject({ mode: 'minimum', limit: 1, delayMs: 0 })
+    policy.receive(JSON.stringify({ v: 1, kind: 'control', enabled: false, ttlMs: 500 }))
+    expect(policy.decision(2)).toMatchObject({ mode: 'disabled', limit: 2 })
+    at = 2700; send(4, false, false)
+    expect(policy.decision(2)).toMatchObject({ mode: 'normal', limit: 2 })
+  })
   it('bounds repeated burst protection and never cancels a running task', () => {
     let at = 0; const policy = new ReportClaimPriority(() => at)
     policy.receive(hint()); expect(policy.decision(2).mode).toBe('yield')

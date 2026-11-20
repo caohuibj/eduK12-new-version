@@ -18,8 +18,8 @@ let processJob: typeof import('../../workers/compositeReportWorker')['processCom
 const users: string[] = [], scales: string[] = [], composites: string[] = [], attempts: string[] = []
 const cognitiveConfigs: string[] = [], cognitiveAssignments: string[] = []
 
-const fixture = async (units = 1) => {
-  const f = await createReportOutboxFixture(db, units)
+const fixture = async (units = 1, options?: Parameters<typeof createReportOutboxFixture>[3]) => {
+  const f = await createReportOutboxFixture(db, units, 0, options)
   users.push(f.owner.id, f.participant.id); composites.push(f.composite.id)
   attempts.push(f.parent.id); scales.push(...f.scaleIds)
   return f
@@ -264,13 +264,29 @@ suite('durable report outbox on isolated PostgreSQL', () => {
   })
   const wholeInput = async (f: Awaited<ReturnType<typeof fixture>>) => {
     const whole = await import('../../modules/composite/whole-questionnaire.service')
-    const definition = await whole.getWholeQuestionnaireDefinition(f.parent.id, { userId: f.participant.id })
+    const definition = await whole.getWholeQuestionnaireDefinition(f.parent.id, f.parent.recoveryTokenHash
+      ? { recoveryTokenHash: f.parent.recoveryTokenHash } : { userId: f.participant.id })
     const children = await db.assessment.findMany({ where: { compositeAttemptId: f.parent.id }, select: { id: true, compositeItemId: true } })
     return { whole, input: { submissionId: 'whole-fixture-' + randomUUID(), attemptEpoch: 1,
       slotSetHash: definition.slotSetHash!, contextSnapshotHash: definition.contextSnapshotHash,
       units: definition.units.map(unit => ({ itemId: unit.itemId, definitionHash: unit.definitionHash,
         answers: f.inputs.find(input => input.assessmentId === children.find(row => row.compositeItemId === unit.itemId)!.id)!.answers })) } }
   }
+
+  it('ACKs 303 anonymous answers once, replays the same hash and produces a READY report', async () => {
+    vi.stubEnv('ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_WHOLE_COMPACT_MANIFEST_ENABLED', 'true')
+    const recoveryTokenHash = randomUUID().replaceAll('-', '').repeat(2)
+    const f = await fixture(9, { itemsPerUnit: [34,34,34,34,34,34,33,33,33], recoveryTokenHash })
+    const { whole, input } = await wholeInput(f)
+    expect(input.units.flatMap(unit => unit.answers)).toHaveLength(303)
+    const receipts = await Promise.all([0, 1].map(() => whole.submitWholeQuestionnaire(f.parent.id, input, { recoveryTokenHash })))
+    expect(receipts.filter(receipt => !receipt.replayed)).toHaveLength(1)
+    expect(new Set(receipts.map(receipt => receipt.payloadHash)).size).toBe(1)
+    expect(await outbox.readWholeQuestionnaireReceipt(f.parent.id, 1)).toMatchObject({ wholePayloadHash: receipts[0].payloadHash })
+    await processJob(await claim())
+    expect(await outbox.readCompositeReportJob(f.parent.id, 1)).toMatchObject({ status: 'READY' })
+  })
 
   it('ACKs one complete answer envelope before scoring, then materializes the full report', async () => {
     const f = await fixture(3), { whole, input } = await wholeInput(f)

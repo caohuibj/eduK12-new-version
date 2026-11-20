@@ -889,6 +889,7 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
 export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQuestionnaireSubmitInput, principal: Principal,
   receivedAtMs = Date.now()) => {
   const admissionStarted = process.hrtime.bigint()
+  const anonymous = !principal.userId && Boolean(principal.recoveryTokenHash)
   return withWholeSubmitAdmission(async () => {
   assessmentTimelineSpan('whole.admission_wait', admissionStarted)
   const context = await traceAssessmentPhase('whole.owner_header_query', () => loadWholeSubmissionContext(attemptId))
@@ -899,7 +900,7 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   if (!owned) throw failure('无权限操作此问卷', 403)
   const runWithPressure = typeof wholeSubmissionPriority.trackVerifiedWholeSubmissionPressure === 'function'
     ? wholeSubmissionPriority.trackVerifiedWholeSubmissionPressure
-    : async <T>(op: () => Promise<T>): Promise<T> => op()
+    : async <T>(op: () => Promise<T>, _anonymous: boolean): Promise<T> => op()
   return runWithPressure(async () => {
   // Education routes do not repeat this check in middleware. Training keeps the
   // reuse switch because its router already runs the consent guard.
@@ -988,8 +989,8 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   })
   const feedback = rememberWholeReportFeedbackHint(attemptId, input.submissionId, detachedWholeReceiptsEnabled() && !receipt.replayed ? recordWholeReceiptStored() : receipt.queueDepth)
   return receiptResponse(attemptId, input.submissionId, canonical.hash, receipt.acceptedAt, receipt.replayed, feedback.profile)
-  })
-})
+  }, anonymous && parent.compositeAssessment.productKind === 'QUESTIONNAIRE')
+  }, anonymous)
 }
 
 /** Completion poll for an education whole receipt. It does not project a report. */

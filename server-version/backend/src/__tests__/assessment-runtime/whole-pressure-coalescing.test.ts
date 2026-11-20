@@ -3,9 +3,12 @@ import type { Request, Response } from 'express'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 const h = vi.hoisted(() => ({ publish: vi.fn().mockResolvedValue(undefined) }))
 vi.mock('../../services/reportReadyNotifications', () => ({ publishReportSchedulingHint: h.publish, onReportSchedulingHint: vi.fn(), prepareReportReadyNotifications: vi.fn() }))
-vi.mock('../../services/runtimeObservability', () => ({ runtimeEventLoopDelayMs: () => 0 }))
+vi.mock('../../services/runtimeObservability', async original => ({
+  ...await original<object>(), runtimeEventLoopDelayMs: () => 0,
+}))
 vi.mock('../../utils/logger', () => ({ logger: { info: vi.fn() } }))
-import { authenticatedWholeSubmissionPriority, trackVerifiedWholeSubmissionPressure } from '../../services/wholeSubmissionPriority'
+import { wholeSubmitAdmission, withWholeSubmitAdmission } from '../../services/wholeSubmitAdmission'
+import { anonymousWholeSubmitQueued, authenticatedWholeSubmissionPriority, trackVerifiedWholeSubmissionPressure } from '../../services/wholeSubmissionPriority'
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 afterEach(() => vi.unstubAllEnvs())
 describe('coalesced pressure transport', () => {
@@ -29,6 +32,31 @@ describe('coalesced pressure transport', () => {
     vi.stubEnv('ASSESSMENT_REPORT_SUBMISSION_PRIORITY_ENABLED', 'true'); h.publish.mockClear()
     for (let n = 0; n < 20; n++) authenticatedWholeSubmissionPriority({} as Request, new EventEmitter() as Response, vi.fn())
     await sleep(130); expect(h.publish).not.toHaveBeenCalled()
+  })
+
+  it('expires an anonymous queue wait before DB work and reports pressure only with a verified submit', async () => {
+    vi.stubEnv('ASSESSMENT_REPORT_SUBMISSION_PRIORITY_ENABLED', 'true')
+    let unblock!: () => void
+    const held = new Promise<void>(resolve => { unblock = resolve })
+    const { maxConcurrent, retryAfterSeconds } = wholeSubmitAdmission.getStats().options
+    const occupying = Array.from({ length: maxConcurrent }, () => withWholeSubmitAdmission(() => held))
+    const operation = vi.fn(async () => 'accepted')
+    const queued = withWholeSubmitAdmission(operation, true)
+    const outcome = expect(queued).rejects.toMatchObject({ code: 'ASSESSMENT_SUBMIT_BUSY', reason: 'timeout', retryAfterSeconds })
+    const before = anonymousWholeSubmitQueued()
+    const tracked = trackVerifiedWholeSubmissionPressure(() => held, true)
+    const during = anonymousWholeSubmitQueued()
+    try {
+      expect(before).toBe(false)
+      expect(during).toBe(true)
+      await outcome
+      expect(operation).not.toHaveBeenCalled()
+      expect(anonymousWholeSubmitQueued()).toBe(false)
+    } finally {
+      unblock()
+      await Promise.all([...occupying, tracked])
+      await sleep(350)
+    }
   })
 
   it('tracks verified public/education whole submissions and avoids double-counting middleware-wrapped requests', async () => {

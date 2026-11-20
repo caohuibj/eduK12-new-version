@@ -8,7 +8,7 @@ import { freezeCompositeActiveSlotSet, formSectionIdentityHash } from '../../mod
 import { compositeFormSectionRuntimeDefinition } from '../../modules/composite/composite.service'
 
 export const createReportOutboxFixture = async (db: PrismaClient, units = 1, formSections = 0,
-  options: { contextSection?: boolean } = {}) => {
+  options: { contextSection?: boolean; itemsPerUnit?: readonly number[]; recoveryTokenHash?: string } = {}) => {
   const suffix = randomUUID().slice(0, 8)
   const owner = await db.user.create({ data: { username: 'report-owner-' + suffix, passwordHash: 'synthetic-unused', role: 'TEACHER' } })
   const participant = await db.user.create({ data: { username: 'report-participant-' + suffix, passwordHash: 'synthetic-unused', role: 'STUDENT' } })
@@ -18,11 +18,12 @@ export const createReportOutboxFixture = async (db: PrismaClient, units = 1, for
   } })
   const unitsData = []
   for (let index = 0; index < units; index++) {
-    const definition = scaleDefinitionFor(3, 'report-item-' + suffix + '-' + index)
+    const itemCount = options.itemsPerUnit?.[index] ?? 3
+    const definition = scaleDefinitionFor(itemCount, 'report-item-' + suffix + '-' + index)
     const scale = await db.scale.create({ data: {
       code: 'report-scale-' + suffix + '-' + index, name: 'Synthetic scale', creatorId: owner.id,
       visibility: 'PUBLIC', status: 'PUBLISHED', instrumentClass: 'CUSTOM_DESCRIPTIVE', instrumentVersion: '2.0.0',
-      definition: definition as any, definitionHash: hashScaleDefinition(definition), itemCount: 3, dimensionCount: 1,
+      definition: definition as any, definitionHash: hashScaleDefinition(definition), itemCount, dimensionCount: 1,
     } })
     const runtime = createFrozenScaleRuntimeSnapshot({ instrumentKey: scale.code, instrumentVersion: scale.instrumentVersion, definition })
     const item = await db.compositeAssessmentItem.create({ data: { compositeAssessmentId: composite.id, type: 'SCALE', position: index, required: true, scaleId: scale.id } })
@@ -82,14 +83,15 @@ export const createReportOutboxFixture = async (db: PrismaClient, units = 1, for
     sectionId: section.section.id, definitionHash: section.definitionHash,
   })) })
   const parent = await db.compositeAssessmentAttempt.create({ data: {
-    compositeAssessmentId: composite.id, userId: participant.id, participantKey: 'report-principal-' + suffix,
+    compositeAssessmentId: composite.id, userId: options.recoveryTokenHash ? null : participant.id,
+    recoveryTokenHash: options.recoveryTokenHash, participantKey: 'report-principal-' + suffix,
     deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
     frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(slots), frozenActiveSlotSetHash: slots.snapshotHash,
   } })
   const inputs = []
   for (const unit of unitsData) {
     const child = await db.assessment.create({ data: {
-      scaleId: unit.scale.id, userId: participant.id, compositeAttemptId: parent.id, compositeItemId: unit.item.id,
+      scaleId: unit.scale.id, userId: parent.userId, compositeAttemptId: parent.id, compositeItemId: unit.item.id,
       deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
       runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(unit.runtime), compiledRuntimeHash: unit.runtime.compiledRuntime.compiledRuntimeHash,
     } })
