@@ -58,103 +58,181 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
   // activities & linked runs), and Query 3 (Run tasks) observe an identical
   // authority state without forcing PostgreSQL to re-plan 18-table nested
   // EXISTS gates per row under force_custom_plan.
-  const { activityRows, linkedRuns, assigned } = await prisma.$transaction(async client => {
+  // Later Run-task batches or MEASUREMENT-only queries consume neither assignments
+  // nor check-ins: skip those two reads entirely instead of fetching and discarding them.
+  const skipContentTasks = Boolean(input.runCursor) || input.kind === 'MEASUREMENT'
+  type CoalescedAssignmentRow = {
+    id: string
+    courseId: string
+    title: string
+    deadline: Date | string | null
+    tags: string[]
+    complete: boolean
+  }
+  type CoalescedCheckinRow = {
+    id: string
+    courseId: string
+    title: string
+    endTime: Date | string | null
+    complete: boolean
+  }
+  const { activityRows, linkedRuns, assignments, checkins, assigned } = await prisma.$transaction(async client => {
     const memberships = await client.$queryRaw<Array<{
       organizationId: string
       membershipId: string
       personaGrantId: string
       accountNotExpired: boolean
     }>>`
+      WITH actor_grants AS MATERIALIZED (
+        SELECT
+          m."user_id" AS "userId",
+          m."organization_id" AS "organizationId",
+          m."id" AS "membershipId",
+          pg."id" AS "personaGrantId",
+          (u."expires_at" IS NULL OR u."expires_at" > statement_timestamp()) AS "accountNotExpired"
+        FROM "users" u
+        JOIN "organization_memberships" m ON m."user_id"=u."id"
+          AND m."valid_from"<=statement_timestamp()
+          AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+        JOIN "organizations" o ON o."id"=m."organization_id" AND o."status"='ACTIVE' AND o."product_domain"='SCHOOL'
+        JOIN "education_product_entitlements" ent ON ent."organization_id"=o."id"
+          AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
+        JOIN "organization_persona_grants" pg
+          ON pg."organization_id"=m."organization_id"
+          AND pg."membership_id"=m."id" AND pg."persona"='STUDENT'
+          AND pg."revoked_at" IS NULL AND pg."granted_at"<=statement_timestamp()
+        WHERE u."id"=${actor.userId}
+          AND u."account_domain"='SCHOOL'
+          AND u."role"='STUDENT' AND u."is_active"=TRUE
+          AND u."is_frozen"=FALSE AND u."must_change_password"=FALSE
+          AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
+            WHERE d."organization_id"=o."id" AND d."user_id"=${actor.userId}
+              AND d."lifted_at" IS NULL
+              AND d."permission" IN ('*','EDUCATION_ACCESS','HUISCHOOL_ACCESS','ACTIVITY_READ','RUN_START'))
+      )
       SELECT DISTINCT
-        m."organization_id" AS "organizationId",
-        m."id" AS "membershipId",
-        pg."id" AS "personaGrantId",
-        (u."expires_at" IS NULL OR u."expires_at" > statement_timestamp()) AS "accountNotExpired"
-      FROM "users" u
-      JOIN "organization_memberships" m ON m."user_id"=u."id"
-        AND m."valid_from"<=statement_timestamp()
-        AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
-      JOIN "organizations" o ON o."id"=m."organization_id" AND o."status"='ACTIVE' AND o."product_domain"='SCHOOL'
-      JOIN "education_product_entitlements" ent ON ent."organization_id"=o."id"
-        AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
-      JOIN "organization_persona_grants" pg
-        ON pg."organization_id"=m."organization_id"
-        AND pg."membership_id"=m."id" AND pg."persona"='STUDENT'
-        AND pg."revoked_at" IS NULL AND pg."granted_at"<=statement_timestamp()
-      JOIN "campus_student_enrollments" e ON e."user_id"=m."user_id"
-        AND e."organization_id"=m."organization_id" AND e."status"='APPROVED'
+        ag."organizationId",
+        ag."membershipId",
+        ag."personaGrantId",
+        ag."accountNotExpired"
+      FROM actor_grants ag
+      JOIN "campus_student_enrollments" e ON e."user_id"=ag."userId"
+        AND e."organization_id"=ag."organizationId" AND e."status"='APPROVED'
       JOIN "campus_class_admissions" ca ON ca."class_unit_id"=e."class_unit_id"
         AND ca."organization_id"=e."organization_id" AND ca."status"='APPROVED'
       JOIN "organization_student_class_assignments" sc
-        ON sc."membership_id"=m."id" AND sc."organization_id"=m."organization_id"
+        ON sc."membership_id"=ag."membershipId" AND sc."organization_id"=ag."organizationId"
         AND sc."class_unit_id"=e."class_unit_id"
         AND sc."valid_from"<=statement_timestamp()
         AND (sc."valid_until" IS NULL OR sc."valid_until">statement_timestamp())
-      WHERE u."id"=${actor.userId}
-        AND u."account_domain"='SCHOOL'
-        AND u."role"='STUDENT' AND u."is_active"=TRUE
-        AND u."is_frozen"=FALSE AND u."must_change_password"=FALSE
-        AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
-          WHERE d."organization_id"=o."id" AND d."user_id"=${actor.userId}
-            AND d."lifted_at" IS NULL
-            AND d."permission" IN ('*','EDUCATION_ACCESS','HUISCHOOL_ACCESS','ACTIVITY_READ','RUN_START'))
     `
     if (!memberships.length) {
       return {
         activityRows: [] as CampusActivityForStudent[],
         linkedRuns: [] as Array<{ courseId: string; runId: string }>,
+        assignments: [] as CoalescedAssignmentRow[],
+        checkins: [] as CoalescedCheckinRow[],
         assigned: { list: [], truncated: false, nextCursor: null as RunTaskCursor | null },
       }
     }
     const organizationIds = [...new Set(memberships.map(m => m.organizationId))]
     const membershipIds = [...new Set(memberships.map(m => m.membershipId))]
     const orgMembershipKeys = [...new Set(memberships.map(m => `${m.organizationId}|${m.membershipId}`))]
-    const activityWithMembers = await client.$queryRaw<Array<CampusActivityForStudent & { membershipIds: string[] }>>`
-      SELECT a."course_id" AS "courseId", a."organization_id" AS "organizationId",
-        course."title",
-        array_agg(DISTINCT p."membership_id") AS "membershipIds"
-      FROM "campus_activity_participants" p
-      JOIN "campus_activities" a ON a."course_id"=p."course_id"
-        AND a."organization_id"=p."organization_id" AND a."status"='OPEN'
-      JOIN "courses" course ON course."id"=a."course_id" AND course."course_type"='CAMPUS_ACTIVITY'
-      WHERE p."organization_id" = ANY(${organizationIds}::text[])
-        AND p."membership_id" = ANY(${membershipIds}::text[])
-        AND p."status"='ACTIVE'
-        AND (p."organization_id" || '|' || p."membership_id") = ANY(${orgMembershipKeys}::text[])
-        -- A directed activityId lookup filters in the database: an in-memory
-        -- filter after LIMIT 201 would wrongly hide an authorized activity that
-        -- sorts beyond the first 201 rows.
-        ${input.activityId?Prisma.sql`AND a."course_id"=${input.activityId}`:Prisma.empty}
-      GROUP BY a."course_id", a."organization_id", course."title"
-      ORDER BY a."course_id" LIMIT 201
+    const coalescedActivityAndRuns = await client.$queryRaw<Array<{
+      activities: Array<CampusActivityForStudent & { membershipIds: string[] }> | null
+      linkedRuns: Array<{
+        courseId: string
+        runId: string
+        organizationId: string
+        hasHuiteacherLink: boolean
+      }> | null
+      assignments: CoalescedAssignmentRow[] | null
+      checkins: CoalescedCheckinRow[] | null
+    }>>`
+      WITH activities AS MATERIALIZED (
+        SELECT a."course_id" AS "courseId", a."organization_id" AS "organizationId",
+          course."title",
+          array_agg(DISTINCT p."membership_id") AS "membershipIds"
+        FROM "campus_activity_participants" p
+        JOIN "campus_activities" a ON a."course_id"=p."course_id"
+          AND a."organization_id"=p."organization_id" AND a."status"='OPEN'
+        JOIN "courses" course ON course."id"=a."course_id" AND course."course_type"='CAMPUS_ACTIVITY'
+        WHERE p."organization_id" = ANY(${organizationIds}::text[])
+          AND p."membership_id" = ANY(${membershipIds}::text[])
+          AND p."status"='ACTIVE'
+          AND (p."organization_id" || '|' || p."membership_id") = ANY(${orgMembershipKeys}::text[])
+          -- A directed activityId lookup filters in the database: an in-memory
+          -- filter after LIMIT 201 would wrongly hide an authorized activity that
+          -- sorts beyond the first 201 rows.
+          ${input.activityId?Prisma.sql`AND a."course_id"=${input.activityId}`:Prisma.empty}
+        GROUP BY a."course_id", a."organization_id", course."title"
+        ORDER BY a."course_id" LIMIT 201
+      ),
+      linked_runs AS MATERIALIZED (
+        SELECT ar."course_id" AS "courseId", ar."run_id" AS "runId",
+          ar."organization_id" AS "organizationId",
+          EXISTS (
+            SELECT 1 FROM "huiteacher_evaluation_run_links" h
+            WHERE h."organization_id"=ar."organization_id" AND h."run_id"=ar."run_id"
+          ) AS "hasHuiteacherLink"
+        FROM activities act
+        JOIN "campus_activity_runs" ar ON ar."course_id"=act."courseId"
+        JOIN "assessment_runs" r ON r."id"=ar."run_id" AND r."status" IN ('PUBLISHED','CLOSED')
+      ),
+      activity_assignments AS MATERIALIZED (
+        SELECT
+          asg."id",
+          asg."course_id" AS "courseId",
+          asg."title",
+          asg."deadline",
+          COALESCE(asg."tags", ARRAY[]::text[]) AS "tags",
+          EXISTS (
+            SELECT 1 FROM "submissions" sub
+            WHERE sub."assignment_id"=asg."id"
+              AND sub."student_id"=${actor.userId}
+              AND sub."status" IN ('SUBMITTED','GRADED')
+          ) AS "complete"
+        FROM activities act
+        JOIN "assignments" asg ON asg."course_id"=act."courseId" AND asg."status"='PUBLISHED'
+        WHERE ${!skipContentTasks}
+      ),
+      activity_checkins AS MATERIALIZED (
+        SELECT
+          chk."id",
+          chk."course_id" AS "courseId",
+          chk."title",
+          chk."end_time" AS "endTime",
+          EXISTS (
+            SELECT 1 FROM "checkin_submissions" csub
+            WHERE csub."checkin_id"=chk."id"
+              AND csub."student_id"=${actor.userId}
+          ) AS "complete"
+        FROM activities act
+        JOIN "checkins" chk ON chk."course_id"=act."courseId"
+        WHERE ${!skipContentTasks}
+      )
+      SELECT
+        COALESCE((SELECT jsonb_agg(to_jsonb(a) ORDER BY a."courseId") FROM activities a), '[]'::jsonb) AS "activities",
+        COALESCE((SELECT jsonb_agg(to_jsonb(lr)) FROM linked_runs lr), '[]'::jsonb) AS "linkedRuns",
+        COALESCE((SELECT jsonb_agg(to_jsonb(asg)) FROM activity_assignments asg), '[]'::jsonb) AS "assignments",
+        COALESCE((SELECT jsonb_agg(to_jsonb(chk)) FROM activity_checkins chk), '[]'::jsonb) AS "checkins"
     `
+    const activityWithMembers = coalescedActivityAndRuns[0]?.activities ?? []
     const activityRows: CampusActivityForStudent[] = activityWithMembers.map(({ membershipIds: _m, ...row }) => row)
     const ids = activityRows.map(a => a.courseId)
     if (!ids.length) {
       return {
         activityRows,
         linkedRuns: [] as Array<{ courseId: string; runId: string }>,
+        assignments: [] as CoalescedAssignmentRow[],
+        checkins: [] as CoalescedCheckinRow[],
         assigned: { list: [], truncated: false, nextCursor: null as RunTaskCursor | null },
       }
     }
-    const linkedRunRows = await client.$queryRaw<Array<{
-      courseId: string
-      runId: string
-      organizationId: string
-      hasHuiteacherLink: boolean
-    }>>`
-      SELECT ar."course_id" AS "courseId", ar."run_id" AS "runId",
-        ar."organization_id" AS "organizationId",
-        EXISTS (
-          SELECT 1 FROM "huiteacher_evaluation_run_links" h
-          WHERE h."organization_id"=ar."organization_id" AND h."run_id"=ar."run_id"
-        ) AS "hasHuiteacherLink"
-      FROM "campus_activity_runs" ar
-      JOIN "campus_activities" a ON a."course_id"=ar."course_id" AND a."status"='OPEN'
-      JOIN "assessment_runs" r ON r."id"=ar."run_id" AND r."status" IN ('PUBLISHED','CLOSED')
-      WHERE ar."course_id" = ANY(${ids}::text[])
-    `
+    const linkedRunRows = coalescedActivityAndRuns[0]?.linkedRuns ?? []
     const linkedRuns = linkedRunRows.map(({ courseId, runId }) => ({ courseId, runId }))
+    const assignments = coalescedActivityAndRuns[0]?.assignments ?? []
+    const checkins = coalescedActivityAndRuns[0]?.checkins ?? []
     const grantsByOrgMembership = new Map<string, Array<{ personaGrantId: string; accountNotExpired: boolean }>>()
     for (const m of memberships) {
       const key = `${m.organizationId}|${m.membershipId}`
@@ -189,30 +267,11 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
       cursor: input.runCursor,
       db: client,
     })
-    return { activityRows, linkedRuns, assigned }
+    return { activityRows, linkedRuns, assignments, checkins, assigned }
   }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead })
   const authorized=activityRows
   const ids=authorized.map(a=>a.courseId)
   if(!ids.length)return {list:[],total:0,page:input.page,hasMore:false,truncated:activityRows.length>200,nextRunCursor:null as RunTaskCursor|null}
-  // Later Run-task batches or MEASUREMENT-only queries consume neither assignments
-  // nor check-ins: skip those two reads entirely instead of fetching and discarding them.
-  type AssignmentRow={id:string;courseId:string;title:string;deadline:Date|null;tags:string[];submissions:Array<{status:string}>}
-  type CheckinRow={id:string;courseId:string;title:string;endTime:Date|null;submissions:Array<{id:string}>}
-  const skipContentTasks = Boolean(input.runCursor) || input.kind === 'MEASUREMENT'
-  const [assignments, checkins] = skipContentTasks
-    ? [[] as AssignmentRow[], [] as CheckinRow[]]
-    : await Promise.all([
-        prisma.assignment.findMany({
-          where:{courseId:{in:ids},status:'PUBLISHED'},
-          select:{id:true,courseId:true,title:true,deadline:true,tags:true,
-            submissions:{where:{studentId:actor.userId},select:{status:true}}},
-        }),
-        prisma.checkin.findMany({
-          where:{courseId:{in:ids}},
-          select:{id:true,courseId:true,title:true,endTime:true,
-            submissions:{where:{studentId:actor.userId},select:{id:true}}},
-        }),
-      ])
   const runMap=new Map(linkedRuns.map(r=>[r.runId,r.courseId]))
   const activityMap=new Map(authorized.map(a=>[a.courseId,a]))
   const tasks:Array<{
@@ -224,21 +283,24 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
   for(const t of assignments){
     const activity=activityMap.get(t.courseId)
     if(!activity)continue
-    const complete=t.submissions.some(s=>s.status==='SUBMITTED'||s.status==='GRADED')
-    const expired=Boolean(t.deadline&&t.deadline<=new Date())
+    const complete=Boolean(t.complete)
+    const deadlineDate=t.deadline?new Date(t.deadline):null
+    const expired=Boolean(deadlineDate&&deadlineDate<=new Date())
     tasks.push({id:t.id,activityId:t.courseId,activityTitle:activity.title,
-      kind:t.tags.includes('CAMPUS_READING')?'READING':'ASSIGNMENT',
+      kind:(t.tags??[]).includes('CAMPUS_READING')?'READING':'ASSIGNMENT',
       title:t.title,status:complete?'COMPLETED':expired?'EXPIRED':'PENDING',
-      deadline:t.deadline?.toISOString()??null,
+      deadline:deadlineDate?.toISOString()??null,
       href:expired&&!complete?null:`/activities/${t.courseId}/assignments/${t.id}`})
   }
   for(const t of checkins){
     const activity=activityMap.get(t.courseId)
     if(!activity)continue
-    const complete=t.submissions.length>0,expired=Boolean(t.endTime&&t.endTime<=new Date())
+    const complete=Boolean(t.complete)
+    const endTimeDate=t.endTime?new Date(t.endTime):null
+    const expired=Boolean(endTimeDate&&endTimeDate<=new Date())
     tasks.push({id:t.id,activityId:t.courseId,activityTitle:activity.title,
       kind:'CHECKIN',title:t.title,status:complete?'COMPLETED':expired?'EXPIRED':'PENDING',
-      deadline:t.endTime?.toISOString()??null,
+      deadline:endTimeDate?.toISOString()??null,
       href:expired&&!complete?null:`/activities/${t.courseId}/checkins/${t.id}`})
   }
   for(const e of assigned.list){

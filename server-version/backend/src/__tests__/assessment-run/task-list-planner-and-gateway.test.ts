@@ -64,6 +64,11 @@ import {
   getPublicResearchInfo,
   resetSurveyPublicationCachesForTests,
 } from '../../modules/survey/admission.service'
+import { listCampusStudentTasks } from '../../modules/campus/activity.tasks'
+import { reconcileRunExecutionByRuntimeBinding } from '../../modules/assessment-run/reconcile'
+import { cloneCachedStartComposite, loadStartComposite } from '../../modules/composite/composite.service'
+import { resetStartReadCachesForTests } from '../../modules/composite/start-read-cache'
+import { hasImmutableCanonicalValue } from '../../modules/assessment-runtime/canonical'
 import { logger } from '../../utils/logger'
 
 const EXEC_ID = '11111111-1111-4111-8111-111111111111'
@@ -489,5 +494,159 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     expect(prodOverride).not.toContain('plan_cache_mode=force_custom_plan')
     const scopedPlanner = readFileSync(resolve(process.cwd(), 'src/modules/assessment-run/plannerBound.ts'), 'utf8')
     expect(scopedPlanner).toContain("set_config('plan_cache_mode', 'force_custom_plan', true)")
+  })
+
+  it('coalesces School listCampusStudentTasks activities and linked_runs into one CTE query with actor_grants materialization', async () => {
+    const queries: string[] = []
+    dbMocks.queryRaw.mockImplementation(async (...args: unknown[]) => {
+      const sql = flattenQueryRawCall(args)
+      queries.push(sql)
+      if (sql.includes('WITH actor_grants AS MATERIALIZED')) {
+        return [{
+          organizationId: 'org-1',
+          membershipId: 'mem-1',
+          personaGrantId: 'pg-1',
+          accountNotExpired: true,
+        }]
+      }
+      if (sql.includes('WITH activities AS MATERIALIZED') && sql.includes('linked_runs AS MATERIALIZED')) {
+        return [{
+          activities: [{
+            courseId: 'course-1',
+            organizationId: 'org-1',
+            title: 'Activity 1',
+            membershipIds: ['mem-1'],
+          }],
+          linkedRuns: [{
+            courseId: 'course-1',
+            runId: 'run-1',
+            organizationId: 'org-1',
+            hasHuiteacherLink: false,
+          }],
+          assignments: [{
+            id: 'asg-1',
+            courseId: 'course-1',
+            title: 'Assignment 1',
+            deadline: '2026-12-01T00:00:00.000Z',
+            tags: [],
+            complete: false,
+          }],
+          checkins: [],
+        }]
+      }
+      return []
+    })
+
+    const result = await listCampusStudentTasks(
+      { userId: USER_ID, role: 'STUDENT' as any, accountDomain: 'SCHOOL' as any } as any,
+      { page: 1, pageSize: 20 },
+    )
+    expect(result.list).toHaveLength(1)
+    expect(result.list[0]?.id).toBe('asg-1')
+    expect(queries.some(q => q.includes('WITH actor_grants AS MATERIALIZED'))).toBe(true)
+    expect(queries.some(q => q.includes('WITH activities AS MATERIALIZED') && q.includes('linked_runs AS MATERIALIZED') && q.includes('activity_assignments AS MATERIALIZED'))).toBe(true)
+  })
+
+  it('coalesces reconcileRunExecutionByRuntimeBinding lock and dual completion updates into 3 queries instead of 5', async () => {
+    const completedAt = new Date('2026-11-20T00:00:00.000Z')
+    const queries: string[] = []
+    dbMocks.queryRaw.mockImplementation(async (...args: unknown[]) => {
+      const sql = flattenQueryRawCall(args)
+      queries.push(sql)
+      if (sql.includes('FROM "assessment_run_executions"') && sql.includes('FOR UPDATE')) {
+        return [{
+          id: EXEC_ID,
+          status: 'IN_PROGRESS',
+          completedAt: null,
+          relationalAssignmentId: 'rel-1',
+          runtimeBindingKind: 'COMPOSITE',
+          runtimeBindingRef: 'att-1',
+        }]
+      }
+      if (sql.includes('FROM "composite_assessment_attempts"') && sql.includes('FOR UPDATE')) {
+        return [{
+          status: 'COMPLETED',
+          completedAt,
+          assignmentRef: 'rel-1',
+        }]
+      }
+      if (sql.includes('WITH updated_exec AS') && sql.includes('updated_rel AS')) {
+        return [{ changed: 1 }]
+      }
+      return []
+    })
+
+    const res = await reconcileRunExecutionByRuntimeBinding({
+      runtimeBindingKind: 'COMPOSITE',
+      runtimeBindingRef: 'att-1',
+    })
+    expect(res).toEqual({ state: 'COMPLETED', completedAt, replayed: false })
+    expect(queries).toHaveLength(3)
+    expect(queries[2]).toContain('WITH updated_exec AS')
+    expect(queries[2]).toContain('updated_rel AS')
+  })
+
+  it('freezes and retains inner scale definitions on loadStartComposite while isolating outer envelope mutations in cloneCachedStartComposite', async () => {
+    resetStartReadCachesForTests()
+    const updatedAt = new Date('2026-11-20T00:00:00.000Z')
+    const scaleDefinition = {
+      schemaVersion: 2,
+      respondentType: 'SELF',
+      display: {},
+      responseSets: [{ key: 'rs1', options: [{ value: 1, label: 'A', score: 1 }, { value: 2, label: 'B', score: 2 }] }],
+      items: [{ itemCode: 'q1', content: 'Q1', type: 'single', required: true, sortOrder: 1, responseSetKey: 'rs1', randomizeOptions: false }],
+      scoring: { itemRules: [], scores: [] },
+    }
+    const snapshot = { schemaVersion: 2, compositeId: 'comp-1', units: [] }
+    const db = {
+      $queryRaw: vi.fn(async () => []),
+      compositeAssessment: {
+        findUnique: vi.fn(async () => ({
+          id: 'comp-1',
+          updatedAt,
+          trainingContentSnapshotHash: 'hash-1',
+          trainingContentSnapshot: snapshot,
+          personalTracking: null,
+          questionnaireCourses: [{ courseId: 'c-1', course: { id: 'c-1', title: 'Course 1' } }],
+          creator: { id: 'u-1', role: 'TEACHER' },
+          course: { id: 'c-1', title: 'Course 1', courseCode: 'C1', isLibrary: false },
+          items: [{
+            id: 'item-1',
+            type: 'SCALE',
+            scale: {
+              id: 'scale-1',
+              code: 'S1',
+              definition: scaleDefinition,
+            },
+            cognitiveAssignment: null,
+          }],
+          formSections: [{ id: 'sec-1', items: [{ id: 'fi-1' }] }],
+        })),
+      },
+    }
+
+    const first: any = await loadStartComposite('comp-1', db as any, {
+      updatedAt,
+      trainingContentSnapshotHash: 'hash-1',
+    })
+    const second: any = await loadStartComposite('comp-1', db as any, {
+      updatedAt,
+      trainingContentSnapshotHash: 'hash-1',
+    })
+
+    expect(db.compositeAssessment.findUnique).toHaveBeenCalledTimes(1)
+    // Inner immutable ASTs are registered with retainImmutableCanonicalValue and shared by reference
+    expect(hasImmutableCanonicalValue(first.items[0].scale.definition)).toBe(true)
+    expect(Object.isFrozen(first.items[0].scale.definition)).toBe(true)
+    expect(first.items[0].scale.definition).toBe(second.items[0].scale.definition)
+    expect(first.trainingContentSnapshot).toBe(second.trainingContentSnapshot)
+    // Outer mutable envelopes are isolated per request
+    expect(first).not.toBe(second)
+    expect(first.items).not.toBe(second.items)
+    expect(first.items[0]).not.toBe(second.items[0])
+    expect(first.items[0].scale).not.toBe(second.items[0].scale)
+    first.deliveryCourseId = 'mutated-course'
+    expect(second.deliveryCourseId).toBeUndefined()
+    expect(cloneCachedStartComposite(null)).toBeNull()
   })
 })
