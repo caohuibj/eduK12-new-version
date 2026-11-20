@@ -70,6 +70,7 @@ import { cleanupExpiredSubmissionIdempotencyReceipts } from './utils/submissionI
 import { recordRequestPhase, requestObservabilityMiddleware, recordNodeRequestCallback, runtimeMetricLines } from './services/runtimeObservability'
 import { postgresActivityMetricLines } from './services/postgresActivityMetrics'
 import { effectiveRuntimeResourceConfig } from './config/runtimeResources'
+import { warmPasswordVerificationPool } from './services/passwordVerificationPool'
 
 // 导入路由
 import legacyArchiveRoutes from './modules/legacy-archive/routes'
@@ -586,6 +587,7 @@ const startServer = async (): Promise<void> => {
     const onListening = () => {
       server.off('error', onError)
       serverListening = true
+      warmPasswordVerificationPool()
       logger.info(`🚀 Server running on port ${config.port}`)
       logger.info(`📁 Upload directory: ${config.uploadDir}`)
       logger.info(`📁 Upload directory absolute: ${require('path').resolve(config.uploadDir)}`)

@@ -18,8 +18,8 @@ const activeAccounts = new Map<string, symbol>()
 
 export const loginPasswordVerificationAdmission = new BoundedAdmissionGate({
   name: 'login_password_verify',
-  maxConcurrent: configuredInteger('LOGIN_PASSWORD_MAX_CONCURRENT', 16),
-  maxQueue: configuredInteger('LOGIN_PASSWORD_MAX_QUEUE', 512, true),
+  maxConcurrent: configuredInteger('LOGIN_PASSWORD_MAX_CONCURRENT', 8),
+  maxQueue: configuredInteger('LOGIN_PASSWORD_MAX_QUEUE', 256, true),
   maxWaitMs: configuredInteger('LOGIN_PASSWORD_MAX_WAIT_MS', 30_000),
   retryAfterSeconds: 1,
   busyCode: 'LOGIN_VERIFY_BUSY',
@@ -84,6 +84,7 @@ export const loginRateLimit = async (req: Request, res: Response, next: NextFunc
   }
 
   const context = getLoginRateLimitContext(req, typeof req.body?.username === 'string' ? req.body.username : undefined)
+  // Preserve a cheap first-stage IP rejection under brute-force traffic.
   const ipWindow = await cacheService.consumeRateLimit(context.ipKey, ingressRequestLimit, WINDOW_SECONDS)
   if (!ipWindow) {
     res.status(503).json({ code: -1, message: '登录服务暂时不可用，请稍后再试' })
@@ -141,6 +142,8 @@ export const recordLoginFailure = async (req: Request): Promise<LoginFailureBudg
 export const clearLoginFailures = async (req: Request): Promise<void> => {
   const request = req as Request & { loginRateLimitContext?: LoginRateLimitContext }
   const context = request.loginRateLimitContext || getLoginRateLimitContext(req, typeof req.body?.username === 'string' ? req.body.username : undefined)
+  // A second backend can record failures after this request's initial read.
+  // Always clear both buckets on success, matching the previous behavior.
   await Promise.all([
     cacheService.del(context.failureKey),
     cacheService.del(context.globalFailureKey),

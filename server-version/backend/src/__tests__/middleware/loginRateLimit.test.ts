@@ -212,4 +212,31 @@ describe('login Redis rate limits', () => {
     expect(success).toHaveBeenCalledOnce()
   })
 
+  it('rejects an exhausted IP before reading account failure state', async () => {
+    mockCacheService.consumeRateLimit.mockResolvedValueOnce({ allowed: false, remaining: 0, retryAfterSeconds: 40 })
+    const res = makeRes()
+    const next = vi.fn()
+    await loginRateLimit(makeReq(), res, next)
+    expect(res.statusCode).toBe(429)
+    expect(res.setHeader).toHaveBeenCalledWith('Retry-After', '40')
+    expect(next).not.toHaveBeenCalled()
+    expect(mockCacheService.getRateLimitState).not.toHaveBeenCalled()
+  })
+
+  it('always clears both failure buckets after a clean initial read, even if another request fails later', async () => {
+    const req = makeReq('198.51.100.10', 'shared-user')
+    const next = vi.fn()
+    mockCacheService.getRateLimitState.mockResolvedValue({ count: 0, retryAfterSeconds: 0 })
+    await loginRateLimit(req, makeRes(), next)
+    expect(next).toHaveBeenCalledOnce()
+
+    // Simulates another backend writing a failure after this request read zero.
+    await recordLoginFailure(makeReq('198.51.100.11', 'shared-user'))
+    await clearLoginFailures(req)
+
+    expect(mockCacheService.del).toHaveBeenCalledTimes(2)
+    expect(mockCacheService.del).toHaveBeenCalledWith(req.loginRateLimitContext.failureKey)
+    expect(mockCacheService.del).toHaveBeenCalledWith(req.loginRateLimitContext.globalFailureKey)
+  })
+
 })

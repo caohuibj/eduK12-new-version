@@ -217,7 +217,9 @@ class CacheService {
    * 删除缓存
    */
   async del(key: string): Promise<void> {
-    this.cacheWriteEpoch += 1
+    if (!key.startsWith('auth:login:')) {
+      this.cacheWriteEpoch += 1
+    }
     if (!this.isConnected || !this.client) {
       return
     }
@@ -407,13 +409,16 @@ class CacheService {
   async getRateLimitState(key: string): Promise<RateLimitState | null> {
     if (!this.isConnected || !this.client) return null
     try {
-      const [value, ttl] = await Promise.all([
-        this.client.get(key),
-        this.client.ttl(key),
-      ])
+      const value = await this.client.get(key)
+      if (value === null || value === undefined) {
+        return { count: 0, retryAfterSeconds: 0 }
+      }
       const count = Number(value || 0)
+      if (!Number.isFinite(count) || count < 0) return null
+      if (count === 0) return { count: 0, retryAfterSeconds: 0 }
+      const ttl = await this.client.ttl(key)
       const retryAfterSeconds = Number(ttl)
-      if (!Number.isFinite(count) || count < 0 || !Number.isFinite(retryAfterSeconds)) return null
+      if (!Number.isFinite(retryAfterSeconds)) return null
       return { count, retryAfterSeconds: retryAfterSeconds > 0 ? retryAfterSeconds : 0 }
     } catch {
       return null

@@ -254,9 +254,9 @@ describe('PR-A: Training Gate & Auth Optimizations', () => {
       expect(() => passwordVerificationPool()).toThrow('Invalid LOGIN_PASSWORD_WORKERS')
     })
 
-    it('defaults login_password_verify admission gate maxConcurrent to 16', () => {
+    it('defaults login_password_verify admission gate maxConcurrent to 8', () => {
       const stats = loginPasswordVerificationAdmission.getStats()
-      expect(stats.options.maxConcurrent).toBe(16)
+      expect(stats.options.maxConcurrent).toBe(8)
       expect(stats.options.maxWaitMs).toBe(30_000)
     })
   })

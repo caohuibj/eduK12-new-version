@@ -103,5 +103,21 @@ describe('password verification threads', () => {
     await rejected
     await expect(pool.compare('password', 'hash')).rejects.toThrow('unavailable')
   })
+
+  it('pre-warms worker slots on warm() and reuses them without respawning', { timeout: 15_000 }, async () => {
+    let spawned = 0
+    const pool = create({
+      size: 2,
+      workerFactory: (source, options) => {
+        spawned += 1
+        return new Worker(source, options)
+      },
+    })
+    pool.warm()
+    expect(spawned).toBe(2)
+    const hash = await bcrypt.hash('WarmPoolPass123!', 10)
+    expect(await Promise.all([pool.compare('WarmPoolPass123!', hash), pool.compare('wrong', hash)])).toEqual([true, false])
+    expect(spawned).toBe(2)
+  })
 })
 

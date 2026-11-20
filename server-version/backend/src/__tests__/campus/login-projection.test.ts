@@ -50,4 +50,10 @@ describe('School login projection matches me without private fields',()=>{
   await call('/login','post')
   expect(events).toEqual(['db_find','gate_enter','gate_exit'])
  })
+ it('skips password verification gate for missing accounts to protect bcrypt workers',async()=>{
+  state.find.mockResolvedValueOnce(null)
+  const body=await call('/login','post')
+  expect(body.code).toBe(-1)
+  expect(state.gate).not.toHaveBeenCalled()
+ })
 })
