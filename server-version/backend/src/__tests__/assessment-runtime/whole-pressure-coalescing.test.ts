@@ -64,8 +64,9 @@ describe('coalesced pressure transport', () => {
     let releaseBatch!: () => void
     const hold = new Promise<void>(resolve => { releaseBatch = resolve })
     const tasks = Array.from({ length: 6 }, () => trackVerifiedWholeSubmissionPressure(() => hold))
-    await sleep(35)
-    expect(h.publish).toHaveBeenCalledTimes(1)
+    // Pressure hints are coalesced and throttled; the prior test's quiet hint
+    // may still be inside the shared publisher's 100ms interval on CI.
+    await vi.waitFor(() => expect(h.publish).toHaveBeenCalledTimes(1), { timeout: 1000, interval: 10 })
     expect(JSON.parse(h.publish.mock.calls[0][0])).toMatchObject({ busy: true, active: 6 })
     releaseBatch()
     await Promise.all(tasks)
