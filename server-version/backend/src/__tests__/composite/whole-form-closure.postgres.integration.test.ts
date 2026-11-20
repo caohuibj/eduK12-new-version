@@ -101,6 +101,14 @@ suite('mixed Scale+Form whole submission closure (X-04A)', () => {
     const accepted = await whole.submitWholeQuestionnaire(f.parent.id, wholeInput, { userId: f.participant.id })
     expect(accepted).toMatchObject({ status: 'ACCEPTED', replayed: false })
 
+    // Sharded CI shares this disposable database with unrelated outbox fixtures.
+    // Make this fixture's accepted job first in the REAL global claim queue;
+    // do not alter another fixture's status, lease, or budget.
+    await prisma.compositeReportJob.update({
+      where: { attemptId_attemptEpoch: { attemptId: f.parent.id, attemptEpoch: definition.attemptEpoch } },
+      data: { nextAttemptAt: new Date('1970-01-01T00:00:00.000Z') },
+    })
+
     // Worker: claim then process through the real composite report worker.
     const claim = async () => {
       const job = await (await import('../../modules/assessment-runtime/report-outbox.service')).claimCompositeReportJob()
