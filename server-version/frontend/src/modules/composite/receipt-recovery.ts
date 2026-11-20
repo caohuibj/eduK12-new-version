@@ -3,9 +3,10 @@ import type { WholeQuestionnaireReceipt } from './types'
 import { normalizeApiError } from '../../utils/normalizeApiError'
 import { completionRetryDelayMs, isCompletionBusyError } from '../../services/completionRetry'
 export type WholeReceiptLookup = WholeQuestionnaireReceipt | { status: 'NOT_RECEIVED'; attemptId: string; submissionId: string }
-export const readMatchingWholeReceipt = async (read: (() => Promise<ApiResponse<WholeReceiptLookup>>) | undefined,
-  attemptId: string, submissionId: string): Promise<WholeQuestionnaireReceipt | null> => {
-  if (!read) return null
+type WholeReceiptProbe = WholeReceiptLookup | { status: 'UNKNOWN' }
+type ReadWholeReceipt = () => Promise<ApiResponse<WholeReceiptLookup>>
+
+const readMatchingWholeReceipt = async (read: ReadWholeReceipt, attemptId: string, submissionId: string): Promise<WholeReceiptLookup> => {
   const response = await read()
   if (response.code !== 0 || !response.data) {
     throw Object.assign(new Error(response.message || '交卷回执暂时无法确认；原草稿已保留。'), {
@@ -22,7 +23,7 @@ export const readMatchingWholeReceipt = async (read: (() => Promise<ApiResponse<
       retryable: false,
     })
   }
-  if (receipt.status === 'NOT_RECEIVED') return null
+  if (receipt.status === 'NOT_RECEIVED') return receipt
   if (receipt.status !== 'ACCEPTED' || !receipt.payloadHash) {
     throw Object.assign(new Error('交卷回执不完整，原草稿已保留。'), {
       status: 409,
@@ -45,50 +46,37 @@ export const isRecoverableReceiptError = (cause: unknown) => {
   if (error.status !== null) return [408, 429, 500, 502, 503, 504].includes(error.status)
   return error.retryable
 }
-/**
- * Probe GET /whole/receipt without letting a transient network/5xx/timeout
- * error mask the original submit error or abort capacity retries. Deterministic
- * conflicts (409 mismatched submissionId, 403/404, malformed receipt) still
- * surface immediately.
- */
+/** A failed read gives no evidence about whether the POST was saved. */
 export const recoverMatchingWholeReceiptSafe = async (
-  read: (() => Promise<ApiResponse<WholeReceiptLookup>>) | undefined,
+  read: ReadWholeReceipt,
   attemptId: string,
   submissionId: string,
-): Promise<WholeQuestionnaireReceipt | null> => {
-  if (!read) return null
+): Promise<WholeReceiptProbe> => {
   try {
     return await readMatchingWholeReceipt(read, attemptId, submissionId)
   } catch (cause) {
-    if (isRecoverableReceiptError(cause)) return null
+    if (isRecoverableReceiptError(cause)) return { status: 'UNKNOWN' }
     throw cause
   }
 }
-/**
- * Bounded post-timeout receipt confirmation. When the final POST /whole/submit
- * times out right before the server commits, one delayed GET /whole/receipt
- * probe catches the already-durable receipt without re-uploading the payload.
- */
+
+/** Require two negative reads separated in time before replaying a sealed POST.
+ * A POST that outlives both reads still uses the original idempotency key. */
 export const confirmWholeReceiptAfterUncertainSubmit = async (
-  read: (() => Promise<ApiResponse<WholeReceiptLookup>>) | undefined,
+  read: ReadWholeReceipt,
   attemptId: string,
   submissionId: string,
   options: {
-    maxProbes?: number
-    delayMs?: number
     sleep?: (ms: number) => Promise<void>
   } = {},
-): Promise<WholeQuestionnaireReceipt | null> => {
-  if (!read) return null
-  const maxProbes = Math.max(1, options.maxProbes ?? 2)
-  const delayMs = Math.max(0, options.delayMs ?? 1_500)
-  const sleep = options.sleep ?? ((ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms)))
-  for (let probe = 0; probe < maxProbes; probe += 1) {
-    if (probe > 0 && delayMs > 0) await sleep(delayMs)
-    const recovered = await recoverMatchingWholeReceiptSafe(read, attemptId, submissionId)
-    if (recovered) return recovered
-  }
-  return null
+): Promise<WholeReceiptProbe> => {
+  const first = await recoverMatchingWholeReceiptSafe(read, attemptId, submissionId)
+  if (first.status === 'ACCEPTED') return first
+  const sleep = options.sleep ?? (ms => new Promise<void>(resolve => setTimeout(resolve, ms)))
+  await sleep(1_500)
+  const second = await recoverMatchingWholeReceiptSafe(read, attemptId, submissionId)
+  if (second.status === 'ACCEPTED') return second
+  return first.status === 'NOT_RECEIVED' && second.status === 'NOT_RECEIVED' ? second : { status: 'UNKNOWN' }
 }
 /** Read-only retries only; callers keep their bounded polling budget and recovery link. */
 export const withReportReadRecovery = async <T>(read: () => Promise<T>, signal: AbortSignal,

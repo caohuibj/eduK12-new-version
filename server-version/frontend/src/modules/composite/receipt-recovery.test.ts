@@ -1,16 +1,15 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
   confirmWholeReceiptAfterUncertainSubmit,
-  readMatchingWholeReceipt,
   recoverMatchingWholeReceiptSafe,
   withReportReadRecovery,
 } from './receipt-recovery'
 describe('receipt and report recovery', () => {
   it('confirms only an owner-bound matching saved receipt and distinguishes not received', async () => {
     const read = vi.fn(async () => ({ code: 0, message: 'ok', data: { status: 'ACCEPTED' as const, attemptId: 'a', submissionId: 's', payloadHash: 'hash', acceptedAt: '', committedAt: '', replayed: true } }))
-    expect((await readMatchingWholeReceipt(read, 'a', 's'))?.payloadHash).toBe('hash')
-    await expect(readMatchingWholeReceipt(read, 'a', 'changed')).rejects.toThrow('不匹配')
-    expect(await readMatchingWholeReceipt(async () => ({ code: 0, message: 'ok', data: { status: 'NOT_RECEIVED', attemptId: 'a', submissionId: 's' } }), 'a', 's')).toBeNull()
+    expect(await recoverMatchingWholeReceiptSafe(read, 'a', 's')).toMatchObject({ status: 'ACCEPTED', payloadHash: 'hash' })
+    await expect(recoverMatchingWholeReceiptSafe(read, 'a', 'changed')).rejects.toThrow('不匹配')
+    expect(await recoverMatchingWholeReceiptSafe(async () => ({ code: 0, message: 'ok', data: { status: 'NOT_RECEIVED', attemptId: 'a', submissionId: 's' } }), 'a', 's')).toMatchObject({ status: 'NOT_RECEIVED' })
   })
   it('honors the server Retry-After during transient read recovery', async () => {
     const read = vi.fn().mockRejectedValueOnce(Object.assign(new Error('busy'), { status: 503, retryAfterMs: 5000 })).mockResolvedValue('ready')
@@ -33,7 +32,7 @@ describe('receipt and report recovery', () => {
   })
   it('swallows transient lookup failures in safe recovery while preserving deterministic 409 conflicts', async () => {
     const transient = vi.fn().mockRejectedValueOnce(Object.assign(new Error('timeout'), { code: 'ECONNABORTED', retryable: true }))
-    expect(await recoverMatchingWholeReceiptSafe(transient, 'a', 's')).toBeNull()
+    expect(await recoverMatchingWholeReceiptSafe(transient, 'a', 's')).toEqual({ status: 'UNKNOWN' })
     const conflict = vi.fn().mockRejectedValueOnce(Object.assign(new Error('different submission'), { status: 409, code: 'SUBMISSION_PAYLOAD_CONFLICT', retryable: false }))
     await expect(recoverMatchingWholeReceiptSafe(conflict, 'a', 's')).rejects.toThrow('different submission')
     const mismatch = vi.fn(async () => ({ code: 0, message: 'ok', data: { status: 'ACCEPTED' as const, attemptId: 'a', submissionId: 'other', payloadHash: 'hash', acceptedAt: '', committedAt: '', replayed: true } }))
@@ -44,9 +43,18 @@ describe('receipt and report recovery', () => {
       .mockResolvedValueOnce({ code: 0, message: 'ok', data: { status: 'NOT_RECEIVED' as const, attemptId: 'a', submissionId: 's' } })
       .mockResolvedValueOnce({ code: 0, message: 'ok', data: { status: 'ACCEPTED' as const, attemptId: 'a', submissionId: 's', payloadHash: 'hash', acceptedAt: 't', committedAt: 't', replayed: true } })
     const sleep = vi.fn(async (_ms: number) => {})
-    const recovered = await confirmWholeReceiptAfterUncertainSubmit(read, 'a', 's', { maxProbes: 2, delayMs: 1500, sleep })
-    expect(recovered?.payloadHash).toBe('hash')
+    const recovered = await confirmWholeReceiptAfterUncertainSubmit(read, 'a', 's', { sleep })
+    expect(recovered).toMatchObject({ status: 'ACCEPTED', payloadHash: 'hash' })
     expect(read).toHaveBeenCalledTimes(2)
     expect(sleep).toHaveBeenCalledExactlyOnceWith(1500)
+  })
+  it('requires both reads to confirm absence before replaying a sealed POST', async () => {
+    const absent = { code: 0, message: 'ok', data: { status: 'NOT_RECEIVED' as const, attemptId: 'a', submissionId: 's' } }
+    const read = vi.fn().mockResolvedValueOnce(absent).mockRejectedValueOnce(new TypeError('lookup unavailable'))
+    const sleep = vi.fn(async (_ms: number) => {})
+    expect(await confirmWholeReceiptAfterUncertainSubmit(read, 'a', 's', { sleep })).toEqual({ status: 'UNKNOWN' })
+    read.mockReset().mockResolvedValue(absent)
+    expect(await confirmWholeReceiptAfterUncertainSubmit(read, 'a', 's', { sleep })).toEqual(absent.data)
+    expect(read).toHaveBeenCalledTimes(2)
   })
 })

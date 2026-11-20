@@ -7,7 +7,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import {
   confirmWholeReceiptAfterUncertainSubmit,
   isRecoverableReceiptError,
-  readMatchingWholeReceipt,
   recoverMatchingWholeReceiptSafe,
   rememberWholeReceipt,
   type WholeReceiptLookup,
@@ -52,6 +51,10 @@ type Answer = { responseValue?: string | number; value?: unknown; responseTimeMs
 export const wholeDraftKey = (id: string, epoch: number) => `composite-whole:${id}:${epoch}`
 export const wholeAnswerKey = (itemId: string, itemCode: string) => JSON.stringify([itemId, itemCode])
 export const wholeFormAnswerKey = (sectionId: string, formItemId: string) => `form:${sectionId}:${formItemId}`
+const WHOLE_RECEIPT_UNCONFIRMED = 'WHOLE_RECEIPT_UNCONFIRMED'
+const receiptUnconfirmedError = () => Object.assign(new Error('暂时无法确认服务器是否收到答案，本机草稿已保留。'), {
+  code: WHOLE_RECEIPT_UNCONFIRMED, retryable: false,
+})
 const responseError = (response: ApiResponse<unknown>) => Object.assign(new Error(response.message || '问卷请求失败'), {
   code: response.code, status: typeof response.code === 'number' ? response.code : undefined,
 })
@@ -119,6 +122,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   const [answers, setAnswers] = useState<Record<string, Answer>>({})
   const [index, setIndex] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [receiptCheck, setReceiptCheck] = useState<'checking' | 'unknown' | null>(null)
   const [useFallback, setUseFallback] = useState(false)
   const [accepted, setAccepted] = useState(false)
   const [checkpointBusy, setCheckpointBusy] = useState(false)
@@ -198,18 +202,30 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   useEffect(() => {
     let cancelled = false
     const initialize = async () => {
-      setLoading(true); setError(null); setUseFallback(false); setAccepted(false)
+      setLoading(true); setError(null); setUseFallback(false); setAccepted(false); setReceiptCheck(null)
       try {
         const existing = await finalDraftStore.get(draftKey)
         if (cancelled) return
         // A sealed request can be confirmed even with new enrollment disabled.
         if (existing?.sealedSubmission) {
           setMeta(existing)
-          const receipt = await readMatchingWholeReceipt(api.wholeReceipt
-            ? () => api.wholeReceipt!(state.id, existing.submissionId, existing.attemptEpoch) : undefined, state.id, existing.submissionId)
-          if (receipt) {
-            rememberWholeReceipt(receipt); setAccepted(true)
-            await finalDraftStore.setStatus(draftKey, 'COMPLETED'); await finalDraftStore.delete(draftKey)
+          const read = api.wholeReceipt
+          if (!read) return
+          setReceiptCheck('checking')
+          setLoading(false)
+          try {
+            const receipt = await recoverMatchingWholeReceiptSafe(
+              () => read(state.id, existing.submissionId, existing.attemptEpoch), state.id, existing.submissionId,
+            )
+            if (cancelled) return
+            if (receipt.status === 'ACCEPTED') {
+              rememberWholeReceipt(receipt); setAccepted(true)
+              await finalDraftStore.setStatus(draftKey, 'COMPLETED'); await finalDraftStore.delete(draftKey)
+            }
+            if (!cancelled) setReceiptCheck(receipt.status === 'UNKNOWN' ? 'unknown' : null)
+          } catch (cause) {
+            if (!cancelled) setReceiptCheck(null)
+            throw cause
           }
           return
         }
@@ -352,7 +368,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   }
 
   const submit = async () => {
-    if (!meta || submitting.current || busy || checkpointBusy || accepted || meta.status === 'CONFLICT') return
+    if (!meta || submitting.current || busy || checkpointBusy || receiptCheck === 'checking' || accepted || meta.status === 'CONFLICT') return
     if (!meta.sealedSubmission) {
       const missing = questions.findIndex(q => {
         if (q.kind === 'SCALE') {
@@ -433,47 +449,40 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       })
       if (!sealed) throw new Error('本地整卷草稿不存在，请重新加载')
       setMeta(sealed.meta)
-      const hadPriorSealedSubmission = Boolean(meta.sealedSubmission)
-      const lookup = api.wholeReceipt ? () => api.wholeReceipt!(state.id, sealed.payload.submissionId, sealed.payload.attemptEpoch) : undefined
-      let result: WholeQuestionnaireReceipt
-      try {
-        result = await runFinalDraftCapacityRetry({ operation: async (attempt) => {
-          // On retries (after timeout/503/network uncertainty) or when resuming
-          // a previously sealed draft, check GET /whole/receipt first so an
-          // already-committed server receipt is recovered without re-uploading.
-          if (attempt > 1 || hadPriorSealedSubmission) {
-            const recovered = await recoverMatchingWholeReceiptSafe(lookup, state.id, sealed.payload.submissionId)
-            if (recovered) return recovered
+      const read = api.wholeReceipt
+      const lookup = read ? () => read(state.id, sealed.payload.submissionId, sealed.payload.attemptEpoch) : undefined
+      const result = await runFinalDraftCapacityRetry({
+        operation: async attempt => {
+          if (lookup && (attempt > 1 || meta.sealedSubmission)) {
+            // Automatic retries already saw two negative reads after the last POST.
+            const recovered = attempt > 1
+              ? await recoverMatchingWholeReceiptSafe(lookup, state.id, sealed.payload.submissionId)
+              : await confirmWholeReceiptAfterUncertainSubmit(lookup, state.id, sealed.payload.submissionId)
+            if (recovered.status === 'ACCEPTED') return recovered
+            if (recovered.status === 'UNKNOWN') throw receiptUnconfirmedError()
           }
-          let response: ApiResponse<WholeQuestionnaireReceipt>
           try {
-            response = await api.submitWhole(state.id, sealed.payload)
+            const response = await api.submitWhole(state.id, sealed.payload)
             if (response.code !== 0 || !response.data) throw responseError(response)
+            const receipt = response.data
+            if (receipt.status !== 'ACCEPTED' || receipt.attemptId !== state.id || receipt.submissionId !== sealed.payload.submissionId || !receipt.payloadHash) throw receiptUnconfirmedError()
+            return receipt
           } catch (cause) {
-            if (isRecoverableReceiptError(cause)) {
-              const recovered = await recoverMatchingWholeReceiptSafe(lookup, state.id, sealed.payload.submissionId)
-              if (recovered) return recovered
+            if (lookup && isRecoverableReceiptError(cause)) {
+              const recovered = await confirmWholeReceiptAfterUncertainSubmit(lookup, state.id, sealed.payload.submissionId)
+              if (recovered.status === 'ACCEPTED') return recovered
+              if (recovered.status === 'UNKNOWN') throw receiptUnconfirmedError()
             }
             throw cause
           }
-          const receipt = response.data
-          if (receipt.status !== 'ACCEPTED' || receipt.attemptId !== state.id || receipt.submissionId !== sealed.payload.submissionId || !receipt.payloadHash) throw new Error('未收到匹配的持久化交卷回执，草稿已保留。')
-          return receipt
-        }, onRetry: async ({ error: cause }) => {
+        },
+        onRetry: async ({ error: cause }) => {
           const pending = await finalDraftStore.setStatus(draftKey, 'RETRY_PENDING', { code: String(normalizeApiError(cause).code ?? 'ASSESSMENT_SUBMIT_BUSY'), message: normalizeApiError(cause).message })
           if (pending) setMeta(pending)
           setError('服务器繁忙或网络中断，正在确认并重试同一份整卷；答案已保留。')
-        } })
-      } catch (cause) {
-        // Final bounded confirmation probe after the retry loop finishes on a
-        // timeout/uncertain error so a late server commit right after the 25s
-        // client read timeout is still recovered as ACCEPTED.
-        const lateRecovered = isRecoverableReceiptError(cause)
-          ? await confirmWholeReceiptAfterUncertainSubmit(lookup, state.id, sealed.payload.submissionId)
-          : null
-        if (!lateRecovered) throw cause
-        result = lateRecovered
-      }
+        },
+      })
+      setReceiptCheck(null)
       confirmed = true; setAccepted(true); rememberWholeReceipt(result)
       try { sessionStorage.setItem(`composite:whole-receipt:${state.id}`, JSON.stringify(result)) } catch { /* The server receipt is already durable. */ }
       await finalDraftStore.setStatus(draftKey, 'COMPLETED')
@@ -483,7 +492,9 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       if (confirmed) { setError('交卷已保存。报告页面暂未打开，请点击查看报告，无需重新交卷。'); return }
       const next = await recordFinalSubmissionFailure(draftKey, cause, meta.submissionId).catch(() => null)
       if (next) setMeta(next)
-      setError(normalizeApiError(cause).message)
+      const failure = normalizeApiError(cause)
+      setReceiptCheck(failure.code === WHOLE_RECEIPT_UNCONFIRMED ? 'unknown' : null)
+      setError(failure.code === WHOLE_RECEIPT_UNCONFIRMED ? null : failure.message)
     } finally { submitting.current = false; setBusy(false); setSubmitStartedAt(null) }
   }
   const unitPath = current && current.kind === 'SCALE' ? `${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(current.unit.itemId)}/scale` : ''
@@ -568,7 +579,14 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
         finally { setBusy(false) }
       })()
     }}>{acceptedAction}</button></div>
-      : meta?.sealedSubmission ? <div className="space-y-4"><p>整卷已封存，本机草稿会保留到服务器确认保存。</p><button type="button" className="btn-primary min-h-11" disabled={busy || meta.status === 'CONFLICT'} onClick={() => void submit()}>重试并确认整卷提交</button></div>
+      : meta?.sealedSubmission ? <div className="space-y-4">
+        <p role="status">{receiptCheck === 'checking' ? '正在查询交卷回执，本机草稿已保留。'
+          : receiptCheck === 'unknown' ? '暂时无法确认服务器是否收到答案，本机草稿已保留。'
+          : '整卷已封存，本机草稿会保留到服务器确认保存。'}</p>
+        <button type="button" className="btn-primary min-h-11" disabled={busy || receiptCheck === 'checking' || meta.status === 'CONFLICT'} onClick={() => void submit()}>
+          {receiptCheck ? '再次确认交卷状态' : '重试并确认整卷提交'}
+        </button>
+      </div>
         : current ? <div id={publicMode ? `training-anonymous-whole-required:${state.id}` : undefined} tabIndex={publicMode ? -1 : undefined} className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
           <h2 className="mb-3 text-xl font-semibold">{current.title}</h2>
           {current.instruction ? <p className="mb-4 whitespace-pre-wrap text-slate-600">{current.instruction}</p> : null}
