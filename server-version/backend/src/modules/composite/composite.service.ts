@@ -71,7 +71,7 @@ import {decodeTrainingFinalReceipt} from './training-content-final'
 import {freezeTrainingTimingSnapshot,readTrainingTimingPolicy} from '../assessment-runtime/training-scale-timing'
 import { isWholeLocalEligible, wholeLocalExecutionMode } from './whole-local-eligibility'
 import { typedFormPresentation } from '../reporting/typed-form-presentation'
-import { sharedControlWritesEnabled, withSharedControlContext } from '../assessment-runtime/shared-control-records'
+import { sharedControlWritesEnabled, storeSharedUnitAdmission, withSharedControlContext } from '../assessment-runtime/shared-control-records'
 import { readCommittedScaleFacts } from '../assessment-runtime/scale-fact-records'
 import { resolveStoredScaleResult } from '../assessment-runtime/compact-assessment-storage'
 import { preloadStoredScaleResults } from '../assessment-runtime/compact-assessment-storage'
@@ -144,7 +144,7 @@ import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-def
 import { resolveFrozenScaleInstructionForScale } from '../scale/onboarding/instrument-registry'
 import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
 import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
-import { ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime, seedScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
+import { createScaleAdmissionForRuntime, ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime, seedScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
 import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota, isTrainingTaskCourse, usesScopedTrainingQuota } from '../cognitive/attempt-quota'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
@@ -3122,7 +3122,7 @@ const getEmptyScaleAnswersCiphertext = (): string => {
   return cachedEmptyScaleAnswersCiphertext
 }
 
-const createChildRecords = async (db: Db, attempt: any, composite: {productKind:string}, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>, prepared?: PreparedVariantRuntimes, verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization,educationProduct?:'SCHOOL'|'TEACHER',educationAttempt?:VerifiedEducationAttempt,scaleFreezeMemo?: ScaleFreezeMemo) => {
+const createChildRecords = async (db: Db, attempt: any, composite: {productKind:string}, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>, prepared?: PreparedVariantRuntimes, verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization,educationProduct?:'SCHOOL'|'TEACHER',educationAttempt?:VerifiedEducationAttempt,scaleFreezeMemo?: ScaleFreezeMemo, startAdmissionSlot?: FrozenActiveSlotV1) => {
   // Prisma create/findUnique parent rows contain scalar fields only. Product
   // policy comes from the caller's already-loaded server-owned composite.
   // A composition may reference several sources in different orders. Always
@@ -3218,6 +3218,23 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
             })
             continue
           }
+          const admission = startAdmissionSlot && frozenScale && userId
+            ? await createScaleAdmissionForRuntime({
+                db, attemptEpoch: attempt.attemptEpoch, scale: item.scale, runtime: frozenScale,
+                principal: { userId, questionnaireSessionId: null, recoveryTokenHash: null },
+                parent: {
+                  kind: 'composite', parentId: attempt.id, slotKey: startAdmissionSlot.slotKey,
+                  sourceDefinitionHash: startAdmissionSlot.sourceDefinitionIdentity.hash,
+                  compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
+                },
+                requestedMode: 'COMPOSITE', contextSnapshotHash: null, contextValues: null,
+                contextFrozenAt: null, respondentType: attempt.respondentType,
+                subjectUserId: attempt.subjectUserId, respondentUserId: attempt.respondentUserId,
+              })
+            : undefined
+          if (admission && admission.governance.status !== 'READY') {
+            throw compositeConflict(admission.governance.holdReason ?? '当前量表不满足准入条件')
+          }
           const child = await db.assessment.create({
             data: {
               scaleId: item.scaleId,
@@ -3232,6 +3249,10 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
               subjectUserId: attempt.subjectUserId ?? userId,
               respondentUserId: attempt.respondentUserId ?? userId,
               respondentType: attempt.respondentType ?? 'SELF',
+              ...(admission ? {
+                frozenAdmissionSnapshotEncrypted: await storeSharedUnitAdmission(admission, db),
+                frozenAdmissionSnapshotHash: admission.snapshotHash,
+              } : {}),
               ...(frozenScale ? {
                 runtimeGeneration: 'UNIFIED_V1' as const,
                 runtimeSnapshotEncrypted: encryptedSnapshot ?? (await persistFrozenScaleRuntimeSnapshot(frozenScale, db)),
@@ -3240,7 +3261,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
             },
           })
           if (frozenScale) {
-            if (educationProduct && !verifiedFlowMaterialization && requiredScaleItems.length === 1 && child.runtimeSnapshotEncrypted) {
+            if ((educationProduct || startAdmissionSlot) && !verifiedFlowMaterialization && requiredScaleItems.length === 1 && child.runtimeSnapshotEncrypted) {
               const projectedChild = { ...child, scale: item.scale }
               freshScaleRuntimeByChild.set(projectedChild, frozenScale)
               freshEducationScaleChild = projectedChild
@@ -3486,7 +3507,7 @@ const precomputeScaleOnlyActiveSlotSet = async (db: Db, input: {
     cognitive: [], situational: [],
     formSections: input.formSections.map((section: any) => ({ sectionId: section.id, definitionHash: formSectionIdentityHash(compositeFormSectionRuntimeDefinition(section)) })),
   })
-  return { encrypted: await storeFrozenActiveSlotSet(slotSet, db), snapshotHash: slotSet.snapshotHash }
+  return { encrypted: await storeFrozenActiveSlotSet(slotSet, db), slotSet }
 }
 
 const freezeEducationLibraryScaleUnit = async (db: Db, item: any, libraryUnit: any, educationFrozenScales: Map<string, any>) => {
@@ -3898,7 +3919,7 @@ const createAttempt = async (
       progress,
       ...(precomputedActiveSlotSet ? {
         frozenActiveSlotSetEncrypted: precomputedActiveSlotSet.encrypted,
-        frozenActiveSlotSetHash: precomputedActiveSlotSet.snapshotHash,
+        frozenActiveSlotSetHash: precomputedActiveSlotSet.slotSet.snapshotHash,
       } : {}),
     },
   })
@@ -3927,7 +3948,20 @@ const createAttempt = async (
   // schemaVersion !== 2); ordinary questionnaires have no flow.
   const materialAssignment = isOrdinaryQuestionnaire ? null : await allocateTrainingMaterial(db,attempt,composite,restartMaterialClaimId)
   const flowCandidate = flowEnabled ? await freezeTrainingFlowCandidates(db,attempt,composite,prepared!,situationalReleases) : null
-  const runtime = flowCandidate?.runtime ?? await createChildRecords(db, attempt, composite, composite.items, userId, formSections, situationalReleases, prepared,undefined,educationProduct,educationStart?bindVerifiedEducationAttempt(educationStart,db,attempt):undefined,scaleFreezeMemo)
+  // A verified Run with one Scale and no context-producing units can persist
+  // admission on the initial child INSERT. The publication, slot and live
+  // deployment were admitted in this transaction before the child exists.
+  const startAdmissionSlot = composite.productKind === 'ORGANIZATION_RESOURCE' && relationalIdentity && userId
+    && !trainingTimingSnapshot && !bundleRuntimeHash && !packageSnapshot && !composite.analysisProtocolKey
+    && composite.items.length === 1 && formSections.length === 0
+    && precomputedActiveSlotSet?.slotSet.slots.length === 1
+    && precomputedActiveSlotSet.slotSet.slots[0].unitType === 'SCALE'
+    ? precomputedActiveSlotSet.slotSet.slots[0] : undefined
+  const runtime = flowCandidate?.runtime ?? await createChildRecords(
+    db, attempt, composite, composite.items, userId, formSections, situationalReleases, prepared, undefined,
+    educationProduct, educationStart ? bindVerifiedEducationAttempt(educationStart, db, attempt) : undefined,
+    scaleFreezeMemo, startAdmissionSlot,
+  )
   if (finalOnly && !precomputedActiveSlotSet) {
     const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
       attemptEpoch,
@@ -6022,9 +6056,10 @@ export const finalizeCompositeAttemptIfReady = async (attemptId: string, options
   reportJob?: ReportJobIdentity
   preloadedParent?: any
   committedGraph?: any
+  committedScale?: import('../assessment-runtime/unified-aggregate-finalizer.service').CommittedEducationScale
 } = {}): Promise<{ status: string; progress: number; completedAt: Date | null;
   aggregateInputHash?: string; totalTime?: number } | null | undefined> => {
-  const route = options.preloadedParent ?? await prisma.compositeAssessmentAttempt.findUnique({
+  const route = options.preloadedParent ?? options.committedScale?.parent ?? await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
     select: { ...REPORT_PARENT_SELECT, startedAt: true, completedItems: true,
       trainingTimingSnapshot: true,
@@ -6039,7 +6074,9 @@ export const finalizeCompositeAttemptIfReady = async (attemptId: string, options
   let result
   if (route?.runtimeGeneration === 'UNIFIED_V1') {
     const { finalizeCompositeAttemptUnifiedIfReady } = await import('../assessment-runtime/unified-aggregate-finalizer.service')
-    result = await finalizeCompositeAttemptUnifiedIfReady(attemptId, route, options.reportJob, options.committedGraph)
+    result = options.committedScale
+      ? await finalizeCompositeAttemptUnifiedIfReady(attemptId, route, options.reportJob, options.committedGraph, options.committedScale)
+      : await finalizeCompositeAttemptUnifiedIfReady(attemptId, route, options.reportJob, options.committedGraph)
   } else if (!route || route.deliveryMode !== 'FINAL_ONLY') {
     result = await finalizeCompositeAttemptLegacyIfReady(attemptId)
   } else {
@@ -6050,9 +6087,17 @@ export const finalizeCompositeAttemptIfReady = async (attemptId: string, options
   }
   // The canonical runtime commits first. Reconcile outside its transaction to
   // preserve the Run -> runtime lock order. Repeated FINAL/GET repairs any lag.
-  if (result?.status === 'COMPLETED' && route?.assignmentRef) {
+  if (result?.status === 'COMPLETED' && route?.assignmentRef && !('_runReconciled' in result)) {
     const { reconcileRelationalCompositeCompletion } = await import('../assessment-relational/runtime-completion')
-    await reconcileRelationalCompositeCompletion(attemptId)
+    if ('_committedScaleCompletion' in result && result.completedAt) {
+      // The synchronous aggregate already committed this exact terminal time.
+      // Reconcile under the Execution lock without rereading the terminal parent.
+      await reconcileRelationalCompositeCompletion(attemptId, {
+        id: attemptId, status: 'COMPLETED', completedAt: result.completedAt, assignmentRef: route.assignmentRef,
+      })
+    } else {
+      await reconcileRelationalCompositeCompletion(attemptId)
+    }
   }
   return result
 }

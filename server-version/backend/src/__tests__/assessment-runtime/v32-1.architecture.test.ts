@@ -86,7 +86,7 @@ describe('Unified runtime architecture boundaries', () => {
   it('keeps Scale answer encryption and provenance resolution outside completion transaction', () => {
     const scale = source('modules/scale/unified-final-submit.service.ts')
     const transactionStart = scale.indexOf('const committed = await withFinalOnlyCompletionTransaction')
-    const transactionEnd = scale.indexOf('\n  })\n  return {', transactionStart)
+    const transactionEnd = scale.indexOf('\n  })\n', transactionStart)
     expect(transactionStart).toBeGreaterThan(-1)
     expect(transactionEnd).toBeGreaterThan(transactionStart)
     const transactionBody = scale.slice(transactionStart, transactionEnd)

@@ -24,9 +24,17 @@ type LockedRunExecutionRow = {
   runtimeBindingRef: string | null
 }
 
-const reconcileLockedRunExecutionInTransaction = async (
+export type CompletedCompositeRunSource = {
+  id: string
+  status: 'COMPLETED'
+  completedAt: Date
+  assignmentRef: string
+}
+
+export const reconcileLockedRunExecutionInTransaction = async (
   tx: Tx,
   execution: LockedRunExecutionRow | undefined,
+  completingComposite?: CompletedCompositeRunSource,
 ): Promise<RunReconciliationResult> => {
   if (!execution) throw new RunReconciliationError('RUN_EXECUTION_NOT_FOUND', 'Run execution not found', 404)
   if (execution.status === 'COMPLETED' && execution.completedAt) {
@@ -39,7 +47,10 @@ const reconcileLockedRunExecutionInTransaction = async (
   // Teacher Form FINAL is committed atomically to the canonical Run and
   // relational assignment; this adapter remains available for read-side
   // reconciliation when a caller sees an in-progress execution.
-  const attempts=execution.runtimeBindingKind==='HUITEACHER_FORM_V2'
+  const attempts = completingComposite
+    && execution.runtimeBindingKind === 'COMPOSITE' && execution.runtimeBindingRef === completingComposite.id
+    ? [completingComposite]
+    : execution.runtimeBindingKind==='HUITEACHER_FORM_V2'
     ? await tx.$queryRaw<Array<{
       status:string;completedAt:Date|null;assignmentRef:string|null
     }>>`
@@ -144,7 +155,7 @@ export const reconcileRunExecutionFromRuntime = (
 export const reconcileRunExecutionByRuntimeBinding = async (input: {
   runtimeBindingKind: string
   runtimeBindingRef: string
-}): Promise<RunReconciliationResult | null> => {
+}, completingComposite?: CompletedCompositeRunSource): Promise<RunReconciliationResult | null> => {
   if (typeof (prisma as any)?.$transaction !== 'function') {
     const rows = await prisma.$queryRaw<Array<{ id: string }>>`
       SELECT "id" FROM "assessment_run_executions"
@@ -155,15 +166,23 @@ export const reconcileRunExecutionByRuntimeBinding = async (input: {
     return rows[0] ? reconcileRunExecutionFromRuntime(rows[0].id) : null
   }
   return prisma.$transaction(async (tx) => {
-    const rows = await tx.$queryRaw<LockedRunExecutionRow[]>`
-      SELECT "id", "status", "completed_at" AS "completedAt", "relational_assignment_id" AS "relationalAssignmentId",
-        "runtime_binding_kind" AS "runtimeBindingKind", "runtime_binding_ref" AS "runtimeBindingRef"
-      FROM "assessment_run_executions"
-      WHERE "runtime_binding_kind" = ${input.runtimeBindingKind}
-        AND "runtime_binding_ref" = ${input.runtimeBindingRef}
-      LIMIT 1
-      FOR UPDATE
-    `
-    return rows[0] ? reconcileLockedRunExecutionInTransaction(tx, rows[0]) : null
+    const locked = await lockRunExecutionByRuntimeBinding(tx, input)
+    return locked ? reconcileLockedRunExecutionInTransaction(tx, locked, completingComposite) : null
   })
+}
+
+export const lockRunExecutionByRuntimeBinding = async (tx: Tx, input: {
+  runtimeBindingKind: string
+  runtimeBindingRef: string
+}): Promise<LockedRunExecutionRow | undefined> => {
+  const rows = await tx.$queryRaw<LockedRunExecutionRow[]>`
+    SELECT "id", "status", "completed_at" AS "completedAt", "relational_assignment_id" AS "relationalAssignmentId",
+      "runtime_binding_kind" AS "runtimeBindingKind", "runtime_binding_ref" AS "runtimeBindingRef"
+    FROM "assessment_run_executions"
+    WHERE "runtime_binding_kind" = ${input.runtimeBindingKind}
+      AND "runtime_binding_ref" = ${input.runtimeBindingRef}
+    LIMIT 1
+    FOR UPDATE
+  `
+  return rows[0]
 }

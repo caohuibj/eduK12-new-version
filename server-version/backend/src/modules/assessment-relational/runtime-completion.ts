@@ -1,9 +1,12 @@
 import { prisma } from '../../config/database'
-import { reconcileRunExecutionByRuntimeBinding } from '../assessment-run/reconcile'
+import { reconcileRunExecutionByRuntimeBinding, type CompletedCompositeRunSource } from '../assessment-run/reconcile'
 
 /** Project authoritative completion into the owning assignment domain. */
-export async function reconcileRelationalCompositeCompletion(attemptId: string): Promise<void> {
-  const run = await reconcileRunExecutionByRuntimeBinding({ runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: attemptId })
+export async function reconcileRelationalCompositeCompletion(attemptId: string, completed?: CompletedCompositeRunSource): Promise<void> {
+  const binding = { runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: attemptId }
+  const run = completed
+    ? await reconcileRunExecutionByRuntimeBinding(binding, completed)
+    : await reconcileRunExecutionByRuntimeBinding(binding)
   if (run) return
   // Legacy assignments have no Run execution. Require the entire frozen actor
   // and episode binding; never route an Organization assignment through here.

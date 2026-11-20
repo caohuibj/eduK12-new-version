@@ -7,7 +7,8 @@ import { compactAssessmentStorageEnabled } from '../assessment-runtime/compact-f
 import { prepareCompactScaleFacts } from '../assessment-runtime/compact-scale-facts'
 import { makeCanonicalFactsReference } from '../assessment-runtime/compact-assessment-storage'
 import { makeScaleFactsReference, makeScaleRawReference, persistScaleFactRecords, attachCommittedScaleFacts, type ScaleFactRecord } from '../assessment-runtime/scale-fact-records'
-import { ReportProcessingLeaseLostError } from '../assessment-runtime/report-outbox.service'
+import type { CommittedEducationScale } from '../assessment-runtime/unified-aggregate-finalizer.service'
+import { ReportProcessingLeaseLostError, type SynchronousScaleParent } from '../assessment-runtime/report-outbox.service'
 import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import type { WholeReceiptExecution } from '../composite/whole-questionnaire.service'
@@ -322,12 +323,21 @@ const assertStudyPrincipalIfAnonymous = async (
   lock = false,
 ) => (input.userId ? false : assertCurrentStudyPrincipal(db, input, lock))
 
+type UnifiedScaleFinalResponse = {
+  submissionId: string
+  payloadHash: string
+  replayed: boolean
+  assessment: Awaited<ReturnType<typeof loadScaleAssessmentForResponse>> | null
+  parent: null
+  _committedScale?: CommittedEducationScale
+}
+
 export const commitPreparedUnifiedScaleAssessmentFinal = async (
   input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, prepared: PreparedScaleSubmission,
   wholeReceipt?: WholeReceiptExecution, referenceDb?: FrozenReferenceDb,
   receiptOnly = false,
   write?: Awaited<ReturnType<typeof prepareUnifiedScaleWrite>>,
-) => {
+): Promise<UnifiedScaleFinalResponse> => {
   const { submissionId, admission, snapshot, answers, payloadHash, timing } = prepared
   const responseRuntime = { assessmentId: child.id, attemptEpoch: child.attemptEpoch,
     compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
@@ -353,7 +363,7 @@ export const commitPreparedUnifiedScaleAssessmentFinal = async (
     }
   }
 
-  const { timingEncrypted, result, compactFact, persistedProvenance, encryptedAnswers, encrypted, completedAt } = write ?? await prepareUnifiedScaleWrite(
+  const { timingEncrypted, result, canonical, compactFact, persistedProvenance, encryptedAnswers, encrypted, completedAt } = write ?? await prepareUnifiedScaleWrite(
     input, child, { submissionId, admission, snapshot, answers, payloadHash, timing }, wholeReceipt, referenceDb)
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
@@ -368,7 +378,8 @@ export const commitPreparedUnifiedScaleAssessmentFinal = async (
     const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
     const current = await tx.assessment.findUnique({
       where: { id: input.assessmentId },
-      select: { ...txAdmissionSelect, runtimeSnapshotEncrypted: !(wholeReceipt || receiptOnly) },
+      select: { ...txAdmissionSelect, runtimeSnapshotEncrypted: !(wholeReceipt || receiptOnly),
+        answers: !(wholeReceipt || receiptOnly), result: !(wholeReceipt || receiptOnly) },
     })
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
     assertFinalOnly(current.deliveryMode)
@@ -383,7 +394,7 @@ export const commitPreparedUnifiedScaleAssessmentFinal = async (
     const replay = assertSubmissionReplay(current, submissionId, payloadHash)
     if (replay === 'replay' && current.status === 'COMPLETED') {
       assertFlowFinal(true)
-      return { replayed: true, current }
+      return { replayed: true as const, current }
     }
     if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评已结束', 409)
     // Current epoch and frozen runtime/admission are locked and checked above.
@@ -425,6 +436,7 @@ export const commitPreparedUnifiedScaleAssessmentFinal = async (
     }).catch(rethrowScaleSubmissionIdConflict)
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评状态已变化，请重试', 409)
     const slotKey = admission.parent?.slotKey
+    let committedScale: CommittedEducationScale | undefined
     if (encrypted.canonicalResult && current.questionnaireAssessmentId) {
       if (!slotKey) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
       await insertCompletedUnitSnapshot(tx as Prisma.TransactionClient, {
@@ -444,8 +456,12 @@ export const commitPreparedUnifiedScaleAssessmentFinal = async (
       })
     } else if (encrypted.canonicalResult && current.compositeAttemptId) {
       if (!slotKey) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
-      await insertCompletedUnitSnapshot(tx as Prisma.TransactionClient, {
+      let synchronousParent: SynchronousScaleParent | undefined
+      const captureEducationParent = !wholeReceipt && canonical && input.userId && child.compositeAttempt?.assignmentRef
+        && child.compositeAttempt.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE'
+      const persistedSnapshot = await insertCompletedUnitSnapshot(tx as Prisma.TransactionClient, {
         wholeReceipt,
+        ...(captureEducationParent ? { onSynchronousScaleParent: (parent) => { synchronousParent = parent } } : {}),
         compositeAttemptId: current.compositeAttemptId,
         attemptEpoch: input.attemptEpoch,
         slotKey,
@@ -459,9 +475,11 @@ export const commitPreparedUnifiedScaleAssessmentFinal = async (
         canonicalResultEncrypted: encrypted.canonicalResult,
         completedAt,
       })
+      if (synchronousParent && canonical) committedScale = { parent: synchronousParent, snapshot: persistedSnapshot, canonical }
     }
     return {
-      replayed: false,
+      replayed: false as const,
+      committedScale,
       current: {
         ...current,
         scale: child.scale,
@@ -479,13 +497,17 @@ export const commitPreparedUnifiedScaleAssessmentFinal = async (
       },
     }
   })
-  return {
+  const response = {
     submissionId,
     payloadHash,
     replayed: committed.replayed,
     assessment: wholeReceipt || receiptOnly ? null : await loadScaleAssessmentForResponse({ ...committed.current, scale: child.scale }, {}, undefined, responseRuntime),
     parent: null,
   }
+  // Only the committed writer can provide this carrier to parent finalization.
+  const carrier = !committed.replayed ? committed.committedScale : undefined
+  if (carrier) Object.defineProperty(response, '_committedScale', { value: carrier })
+  return response
 }
 
 export const submitUnifiedScaleAssessmentFinal = async (
