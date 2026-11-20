@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeAll } from 'vitest'
 process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 import {
   wholeQuestionnaireSubmitSchema,
+  prepareWholeSubmissionPayload,
   submitWholeQuestionnaire,
   processWholeQuestionnaireAnswers,
 } from '../../modules/composite/whole-questionnaire.service'
@@ -54,6 +55,26 @@ describe('Scheme X Unified Whole Questionnaire Submit & Encrypted Ingestion (PR 
       expect(parsed.data.formAnswers?.length).toBe(1)
       expect(parsed.data.formAnswers?.[0].answers[0].value).toBe('张三')
     }
+  })
+
+  it('preserves the legacy receipt hash and byte count for 303 reordered answers', () => {
+    const units = Array.from({ length: 9 }, (_, unit) => ({
+      itemId: `unit-${unit}`,
+      definitionHash: 'd'.repeat(64),
+      answers: Array.from({ length: unit < 6 ? 34 : 33 }, (_, i) => ({
+        itemCode: `题-${i}`,
+        responseValue: i % 2 ? i : '选项\n✅',
+        ...(i % 3 === 0 ? { changeCount: i, responseTimeMs: i + 0.5 } : {}),
+      })).reverse(),
+    })).reverse()
+    const input = wholeQuestionnaireSubmitSchema.parse({ submissionId: 'same-durable-submission-id',
+      attemptEpoch: 1, slotSetHash: 'f'.repeat(64), contextSnapshotHash: null, units })
+    const legacy = prepareCanonicalSubmission({ attemptId: 'attempt', attemptEpoch: 1,
+      slotSetHash: input.slotSetHash, contextSnapshotHash: null,
+      units: [...input.units].sort((a, b) => a.itemId.localeCompare(b.itemId)).map(unit => ({ ...unit,
+        answers: [...unit.answers].sort((a, b) => a.itemCode.localeCompare(b.itemCode)) })) })
+    expect(prepareWholeSubmissionPayload('attempt', input, undefined, true)).toEqual({ bytes: legacy.bytes, hash: legacy.hash })
+    expect(input.units).toEqual(units)
   })
 
   it('rejects invalid or missing required fields in submission schema', () => {

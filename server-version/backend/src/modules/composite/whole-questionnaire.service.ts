@@ -149,9 +149,10 @@ const loadParent = async (attemptId: string, principal: Principal, preloaded?: W
 }
 
 type WholeRuleItem = { itemCode: string; required: boolean; values: Array<string | number> }
-type WholeRules = { hash: string; definitionHash: string; items: WholeRuleItem[];
+type WholeRules = { hash: string; definitionHash: string;
   itemCodes: readonly string[];
-  byItem: Map<string, { required: boolean; values: Set<string> }>; bytes: number }
+  byItem: Map<string, { position: number; required: boolean; values: Set<string> }>;
+  requiredCount: number; bytes: number }
 const wholeRules = new Map<string, WholeRules>()
 let wholeRulesBytes = 0
 const MAX_WHOLE_RULES = 128, MAX_WHOLE_RULE_BYTES = 8 * 1024 * 1024
@@ -169,12 +170,12 @@ const compileWholeRules = (definitionHash: string, items: WholeRuleItem[]): Whol
   const canonical = prepareCanonicalSubmission({ definitionHash, items })
   const known = wholeRules.get(canonical.hash)
   if (known) return known
-  const frozenItems = items.map(item => Object.freeze({ ...item, values: Object.freeze([...item.values]) as unknown as Array<string | number> }))
   const itemCodes = Object.freeze(items.map(item => item.itemCode))
-  const plan: WholeRules = { hash: canonical.hash, definitionHash, items: Object.freeze(frozenItems) as unknown as WholeRuleItem[],
+  const plan: WholeRules = { hash: canonical.hash, definitionHash,
     itemCodes,
-    byItem: new Map(items.map(item => [item.itemCode, { required: item.required,
-      values: new Set(item.values.map(value => typeof value + ':' + String(value))) }])), bytes: canonical.bytes }
+    byItem: new Map(items.map((item, position) => [item.itemCode, { position, required: item.required,
+      values: new Set(item.values.map(value => typeof value + ':' + String(value))) }])),
+    requiredCount: items.filter(item => item.required).length, bytes: canonical.bytes }
   if (plan.bytes > MAX_WHOLE_RULE_BYTES) return plan
   while (wholeRules.size >= MAX_WHOLE_RULES || wholeRulesBytes + plan.bytes > MAX_WHOLE_RULE_BYTES) {
     const oldest = wholeRules.keys().next().value!
@@ -188,28 +189,27 @@ export const clearWholeValidationRulesForTest = () => {
   wholeRules.clear(); wholeRulesBytes = 0
   verifiedWholeValidationHashes.clear()
 }
-const rulesFor = (unit: WholeValidationManifest['units'][number]): WholeRules => {
-  const plan = unit.rulesHash ? wholeRules.get(unit.rulesHash) : unit.items ? compileWholeRules(unit.definitionHash, unit.items) : undefined
-  if (!plan || plan.definitionHash !== unit.definitionHash) throw failure('冻结的整卷校验规则不可用')
-  return plan
-}
 const ensureWholeRules = async (attemptId: string, principal: Principal, manifest: WholeValidationManifest,
-  verifiedParent?: Awaited<ReturnType<typeof loadParent>>) => {
-  if (manifest.schemaVersion !== 2 || manifest.units.every(unit => Boolean(unit.items || (unit.rulesHash && wholeRules.has(unit.rulesHash))))) return
-  // Redis/local-cache loss is harmless: reconstruct once from the persisted,
-  // frozen admissions and validate every rule hash. Never require resubmission.
-  const { parent, children } = verifiedParent ?? await loadParent(attemptId, principal)
-  assertReportJobIdentity(parent, manifest.binding)
-  for (const unit of manifest.units) {
-    if (unit.items) continue
-    const found = children.find(({ child }) => child.id === unit.assessmentId && child.compositeItemId === unit.itemId)
+  verifiedParent?: Awaited<ReturnType<typeof loadParent>>): Promise<WholeRules[]> => {
+  const cached = manifest.units.map(unit => unit.rulesHash ? wholeRules.get(unit.rulesHash) : undefined)
+  // Keep the exact in-memory plans for this request even if recovering one
+  // cold unit evicts a different plan from the bounded process cache.
+  const needsFrozenRuntime = manifest.schemaVersion === 2 && manifest.units.some((unit, i) => !unit.items && !cached[i])
+  const frozen = needsFrozenRuntime ? verifiedParent ?? await loadParent(attemptId, principal) : undefined
+  if (frozen) assertReportJobIdentity(frozen.parent, manifest.binding)
+  return manifest.units.map((unit, i) => {
+    const known = cached[i]
+    if (known?.definitionHash === unit.definitionHash) return known
+    if (unit.items && !unit.rulesHash) return compileWholeRules(unit.definitionHash, unit.items)
+    const found = frozen?.children.find(({ child }) => child.id === unit.assessmentId && child.compositeItemId === unit.itemId)
     if (!found || found.runtime.legacyDefinitionHash !== unit.definitionHash) throw failure('整卷校验规则冻结绑定冲突')
     const sets = new Map(found.runtime.definition.responseSets.map(set => [set.key, set.options.map(option => option.value)]))
     const plan = compileWholeRules(unit.definitionHash, found.runtime.definition.items.map(item => ({
       itemCode: item.itemCode, required: Boolean(item.required), values: sets.get(item.responseSetKey)!,
     })))
     if (plan.hash !== unit.rulesHash) throw failure('整卷校验规则内容哈希冲突')
-  }
+    return plan
+  })
 }
 
 type StaticQuestionnaireUnitTemplate = {
@@ -770,11 +770,21 @@ export const getWholeQuestionnaireTemplate = async (
   return template.templateDto
 })
 
+// Preserve the canonical order used by stableSubmissionJson. A consecutive
+// client list already in that order can be serialized without copying it.
+const sortedBy = <T>(rows: T[], key: (row: T) => string): T[] => {
+  for (let i = 1; i < rows.length; i++) {
+    if (key(rows[i - 1]).localeCompare(key(rows[i])) > 0) return [...rows].sort((left, right) => key(left).localeCompare(key(right)))
+  }
+  return rows
+}
 const logicalPayload = (attemptId: string, input: WholeQuestionnaireSubmitInput, timingSnapshotHash?:string) => ({
   ...(timingSnapshotHash ? {trainingTimingSnapshotHash:timingSnapshotHash} : {}),
   attemptId, attemptEpoch: input.attemptEpoch, slotSetHash: input.slotSetHash, contextSnapshotHash: input.contextSnapshotHash,
-  units: [...input.units].sort((a, b) => a.itemId.localeCompare(b.itemId)).map(unit => ({ ...unit,
-    answers: [...unit.answers].sort((a, b) => a.itemCode.localeCompare(b.itemCode)) })),
+  units: sortedBy(input.units, unit => unit.itemId).map(unit => {
+    const answers = sortedBy(unit.answers, answer => answer.itemCode)
+    return answers === unit.answers ? unit : { ...unit, answers }
+  }),
   ...(input.formAnswers && input.formAnswers.length > 0 ? {
     formAnswers: [...input.formAnswers].sort((a, b) => a.sectionId.localeCompare(b.sectionId)).map(section => ({
       ...section,
@@ -782,6 +792,25 @@ const logicalPayload = (attemptId: string, input: WholeQuestionnaireSubmitInput,
     }))
   } : {}),
 })
+const ordinaryWholePayloadKeys = [
+  'attemptId', 'attemptEpoch', 'slotSetHash', 'contextSnapshotHash', 'units',
+  'itemId', 'definitionHash', 'answers', 'itemCode', 'responseValue', 'responseTimeMs', 'changeCount',
+].sort((left, right) => left.localeCompare(right))
+
+export const prepareWholeSubmissionPayload = (attemptId: string, input: WholeQuestionnaireSubmitInput,
+  timingSnapshotHash?: string, anonymous = false) => {
+  const logical = logicalPayload(attemptId, input, timingSnapshotHash)
+  if (anonymous && !timingSnapshotHash && !input.formAnswers?.length
+    && input.units.every(unit => unit.itemTimings === undefined && unit.deviceInputProvenance === undefined)) {
+    // The strict Whole/Scale schemas allow only these fields in ordinary Scale
+    // units. Serialize the same ordered properties without rebuilding every
+    // answer as a new object. Historical stored envelopes use the general path.
+    const json = JSON.stringify(logical, ordinaryWholePayloadKeys)
+    return { bytes: Buffer.byteLength(json, 'utf8'), hash: createHash('sha256').update(json, 'utf8').digest('hex') }
+  }
+  const { bytes, hash } = prepareCanonicalSubmission(logical)
+  return { bytes, hash }
+}
 const childSubmissionId = (submissionId: string, itemId: string) => 'whole-' + createHash('sha256').update(submissionId + '/' + itemId).digest('hex')
 const receiptResponse = (attemptId: string, submissionId: string, payloadHash: string, acceptedAt: Date, replayed: boolean, feedbackPollProfile: ReportFeedbackProfile = 'QUEUED') => ({
   attemptId, submissionId, payloadHash, acceptedAt, committedAt: new Date(), replayed,
@@ -834,7 +863,8 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
       job."id" AS "jobId", job."status" AS "jobStatus", job."lease_token" AS "leaseToken",
       job."whole_submission_id" AS "wholeSubmissionId", job."whole_payload_hash" AS "wholePayloadHash",
       job."whole_accepted_at" AS "wholeAcceptedAt",
-      job."whole_validation_encrypted" AS "wholeValidationEncrypted", job."whole_validation_hash" AS "wholeValidationHash"
+      CASE WHEN job."whole_submission_id" IS NULL THEN job."whole_validation_encrypted" END AS "wholeValidationEncrypted",
+      CASE WHEN job."whole_submission_id" IS NULL THEN job."whole_validation_hash" END AS "wholeValidationHash"
     FROM "composite_assessment_attempts" AS parent
     JOIN "composite_assessments" AS product ON product."id" = parent."composite_assessment_id"
     LEFT JOIN "composite_report_jobs" AS job ON job."attempt_id" = parent."id" AND job."attempt_epoch" = parent."attempt_epoch"
@@ -893,7 +923,8 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   const timingSnapshot=readTrainingTimingSnapshot(parent.trainingTimingSnapshot)
   if(timingSnapshot&&timingSnapshot.attemptEpoch!==parent.attemptEpoch)throw failure('计时冻结版本不匹配')
   const timingSnapshotHash=timingSnapshot?.snapshotHash
-  const canonical = traceAssessmentPhaseSync('whole.payload_hash', () => prepareCanonicalSubmission(logicalPayload(attemptId, input,timingSnapshotHash)))
+  const canonical = traceAssessmentPhaseSync('whole.payload_hash', () => prepareWholeSubmissionPayload(attemptId, input, timingSnapshotHash,
+    parent.userId === null && parent.compositeAssessment.productKind === 'QUESTIONNAIRE'))
   assertCanonicalSubmissionPayloadSize(canonical, 1536 * 1024, '整份问卷')
   const prior = context!.prior
   if (prior?.wholeSubmissionId) {
@@ -924,8 +955,8 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
     || manifest.binding.userId !== parent.userId || manifest.binding.recoveryTokenHash !== parent.recoveryTokenHash) throw failure('问卷交付校验与当前作答绑定不匹配')
   if (!cachedManifestHash) rememberVerifiedWholeValidationHash(prior.wholeValidationEncrypted!, manifestHash)
   if(manifest.units.some(unit=>unit.trainingTiming?.snapshotHash!==timingSnapshotHash))throw failure('计时策略与整卷准入不匹配')
-  await traceAssessmentPhase('whole.validation_rules_resolve', () => ensureWholeRules(attemptId, principal, manifest, verifiedParent))
-  const prepared = traceAssessmentPhaseSync('whole.integrity_check', () => prepareFromWholeManifest(input, manifest, principal, receivedAtMs))
+  const rules = await traceAssessmentPhase('whole.validation_rules_resolve', () => ensureWholeRules(attemptId, principal, manifest, verifiedParent))
+  const prepared = traceAssessmentPhaseSync('whole.integrity_check', () => prepareFromWholeManifest(input, manifest, rules, principal, receivedAtMs))
   const coveredFormSlots = new Set(prepared.formAnswers.map(f => formSectionSlotKey(f.sectionId)))
   const remainingRequiredFormSlots = manifest.requiredFormSlots.filter(key => !coveredFormSlots.has(key))
   // An education Whole receipt must cover every frozen required Form section.
@@ -1098,33 +1129,38 @@ const isFormValueEmpty = (val: unknown) => {
   return false
 }
 
-const prepareFromWholeManifest = (input: WholeQuestionnaireSubmitInput, manifest: WholeValidationManifest, principal: Principal, receivedAtMs: number) => {
+const prepareFromWholeManifest = (input: WholeQuestionnaireSubmitInput, manifest: WholeValidationManifest, rules: WholeRules[], principal: Principal, receivedAtMs: number) => {
   const sentUnitsById = new Map(input.units.map(unit => [unit.itemId, unit]))
   if (input.units.length !== manifest.units.length || sentUnitsById.size !== input.units.length) throw failure('问卷量表缺失或重复', 400)
-  const timingEntries=input.units.flatMap(unit=>Object.entries(unit.itemTimings??{}))
-  if(timingEntries.length>3000||Buffer.byteLength(JSON.stringify(timingEntries),'utf8')>400000)throw failure('整卷计时超过3000题或400KB预算',400)
+  if (input.units.some(unit => unit.itemTimings !== undefined)) {
+    const entries = input.units.flatMap(unit => Object.entries(unit.itemTimings ?? {}))
+    if (entries.length > 3000 || Buffer.byteLength(JSON.stringify(entries), 'utf8') > 400000) {
+      throw failure('整卷计时超过3000题或400KB预算', 400)
+    }
+  }
   const preparedUnits = []
-  for (const unit of manifest.units) {
+  for (const [index, unit] of manifest.units.entries()) {
     const sent = sentUnitsById.get(unit.itemId)
     if (!sent || sent.definitionHash !== unit.definitionHash || (unit.deadlineMs !== null && receivedAtMs > unit.deadlineMs)) throw failure('量表冻结版本或完成期限不匹配')
-    const plan = rulesFor(unit)
-    const items = plan.byItem
-    const answers = new Map<string, typeof sent.answers[number]>()
+    const plan = rules[index]
+    const orderedAnswers = new Array<typeof sent.answers[number]>(plan.itemCodes.length)
+    let requiredRemaining = plan.requiredCount
     for (const answer of sent.answers) {
-      const item = items.get(answer.itemCode)
-      if (!item || answers.has(answer.itemCode) || !item.values.has(responseKey(answer.responseValue))) {
+      const item = plan.byItem.get(answer.itemCode)
+      if (!item || orderedAnswers[item.position] !== undefined || !item.values.has(responseKey(answer.responseValue))) {
         throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '问卷答案包含重复题目、未知题目或无效选项', 400)
       }
-      answers.set(answer.itemCode, answer)
+      orderedAnswers[item.position] = answer
+      if (item.required) requiredRemaining--
     }
-    if (plan.items.some(item => item.required && !answers.has(item.itemCode))) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '问卷有必答题未完成', 409)
+    if (requiredRemaining > 0) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '问卷有必答题未完成', 409)
     if (unit.trainingTiming || sent.itemTimings !== undefined) {
-      normalizeTrainingScaleTiming(unit.trainingTiming, plan.itemCodes, [...answers.keys()], sent.itemTimings)
+      normalizeTrainingScaleTiming(unit.trainingTiming, plan.itemCodes, sent.answers.map(answer => answer.itemCode), sent.itemTimings)
     }
     preparedUnits.push({ ...sent, assessmentId: unit.assessmentId, compositeAttemptId: manifest.binding.attemptId,
       submissionId: childSubmissionId(input.submissionId, unit.itemId), attemptEpoch: input.attemptEpoch,
       contextSnapshotHash: input.contextSnapshotHash, ...principal,
-      answers: plan.items.flatMap(item => answers.has(item.itemCode) ? [answers.get(item.itemCode)!] : []) })
+      answers: sent.answers.length === orderedAnswers.length ? orderedAnswers : orderedAnswers.filter(Boolean) })
   }
 
   const preparedForms: Array<{
