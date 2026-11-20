@@ -15,7 +15,6 @@ from evidence import require
 
 WORKFLOW = ".github/workflows/ci-images.yml"
 SERVICES = ("backend", "frontend")
-SCAN_STEPS = {f"scan {service} image (high and critical)" for service in SERVICES}
 
 
 def git_object(value):
@@ -51,12 +50,12 @@ def pr_tree(source, run_id, checkout):
     return tree
 
 
-def export(out, ci_run, ci_checkout):
+def export(out, ci_run, ci_checkout, services):
     source = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
     tree = subprocess.check_output(["git", "rev-parse", "HEAD^{tree}"], text=True).strip()
     out.mkdir()
     images = {}
-    for service in SERVICES:
+    for service in services:
         image = os.environ[f"{service.upper()}_IMAGE"]
         require(re.fullmatch(r"sha256:[0-9a-f]{64}", image) is not None, "Invalid image ID")
         archive = out / f"{service}.tar"
@@ -69,7 +68,7 @@ def export(out, ci_run, ci_checkout):
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 
 
-def verify(archive, artifact_id, image_run, tool_sha, source):
+def verify(archive, artifact_id, image_run, tool_sha, source, services):
     run = api(f"actions/runs/{image_run}")
     require(run["path"] == WORKFLOW and run["event"] == "workflow_dispatch"
             and run["head_sha"] == git_object(tool_sha)
@@ -81,7 +80,8 @@ def verify(archive, artifact_id, image_run, tool_sha, source):
     job_name = "production image build and scan"
     succeeded(jobs, {job_name})
     job = next(job for job in jobs if job["name"] == job_name)
-    succeeded(job["steps"], SCAN_STEPS | {
+    scans = {f"scan {service} image (high and critical)" for service in services}
+    succeeded(job["steps"], scans | {
         "Verify release CI and check out the exact source",
         "Pin the images that will be scanned and exported",
         "Upload scanned release images",
@@ -92,13 +92,13 @@ def verify(archive, artifact_id, image_run, tool_sha, source):
             and artifact["digest"] == f"sha256:{filehash(archive)}",
             "Official image artifact source or digest mismatch")
     with zipfile.ZipFile(archive) as zipped:
-        expected = {"manifest.json", *(f"{service}.tar" for service in SERVICES)}
+        expected = {"manifest.json", *(f"{service}.tar" for service in services)}
         require(set(zipped.namelist()) == expected and len(zipped.namelist()) == len(expected),
                 "Unexpected artifact files")
         manifest = json.loads(zipped.read("manifest.json"))
         require((manifest["source"], manifest["imageRun"], manifest["attempt"], manifest["toolSha"])
                 == (source, image_run, attempt, tool_sha), "Artifact manifest does not match run")
-        require(set(manifest["images"]) == set(SERVICES), "Unexpected image components")
+        require(set(manifest["images"]) == set(services), "Unexpected image components")
         for service, image in manifest["images"].items():
             require(re.fullmatch(r"sha256:[0-9a-f]{64}", image["id"]) is not None,
                     "Invalid scanned image ID")
@@ -129,15 +129,18 @@ def main():
     check.add_argument("image_run", type=int)
     check.add_argument("tool_sha")
     check.add_argument("source")
+    for command in (pack, check):
+        command.add_argument("--backend-only", action="store_true")
     args = cli.parse_args()
+    services = ("backend",) if getattr(args, "backend_only", False) else SERVICES
     if args.command == "source":
         require(api("commits/main")["sha"] == git_object(args.source), "Source is not current main")
         print(pr_tree(args.source, args.ci_run, args.ci_checkout))
     elif args.command == "export":
-        export(args.out, args.ci_run, args.ci_checkout)
+        export(args.out, args.ci_run, args.ci_checkout, services)
     else:
         print(json.dumps(verify(args.archive, args.artifact_id, args.image_run,
-                                args.tool_sha, args.source), indent=2))
+                                args.tool_sha, args.source, services), indent=2))
 
 
 if __name__ == "__main__":

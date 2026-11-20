@@ -115,10 +115,9 @@ jobs:
           RELEASE_CI_RUN: ${{ inputs.release_ci_run }}
           RELEASE_CI_CHECKOUT: ${{ inputs.release_ci_checkout }}
           FRONTEND_ONLY: ${{ inputs.frontend_only }}
-          BACKEND_ONLY: ${{ inputs.backend_only }}
         run: |
           set -euo pipefail
-          test "$FRONTEND_ONLY" = false && test "$BACKEND_ONLY" = false
+          test "$FRONTEND_ONLY" = false
           cp server-version/scripts/release/c_service_package.py "$RUNNER_TEMP/"
           export PYTHONPATH="$GITHUB_WORKSPACE/server-version/scripts/release"
           python3 -B "$RUNNER_TEMP/c_service_package.py" source \
@@ -205,9 +204,13 @@ jobs:
       - name: Pin the images that will be scanned and exported
         id: release-images
         if: github.event_name == 'workflow_dispatch' && inputs.release_source_sha != ''
+        env:
+          BACKEND_ONLY: ${{ inputs.backend_only }}
         run: |
           set -euo pipefail
-          for service in backend frontend; do
+          services=(backend)
+          if [[ "$BACKEND_ONLY" != true ]]; then services+=(frontend); fi
+          for service in "${services[@]}"; do
             id=$(docker image inspect --format '{{.Id}}' "server-version-$service:latest")
             [[ "$id" =~ ^sha256:[a-f0-9]{64}$ ]]
             echo "$service=$id" >> "$GITHUB_OUTPUT"
@@ -245,10 +248,14 @@ jobs:
           RELEASE_CI_CHECKOUT: ${{ inputs.release_ci_checkout }}
           BACKEND_IMAGE: ${{ steps.release-images.outputs.backend }}
           FRONTEND_IMAGE: ${{ steps.release-images.outputs.frontend }}
+          BACKEND_ONLY: ${{ inputs.backend_only }}
         run: |
+          set -euo pipefail
           export PYTHONPATH="$GITHUB_WORKSPACE/server-version/scripts/release"
+          scope=()
+          if [[ "$BACKEND_ONLY" = true ]]; then scope+=(--backend-only); fi
           python3 -B "$RUNNER_TEMP/c_service_package.py" export \
-            "$RUNNER_TEMP/c-service-release" "$RELEASE_CI_RUN" "$RELEASE_CI_CHECKOUT"
+            "$RUNNER_TEMP/c-service-release" "$RELEASE_CI_RUN" "$RELEASE_CI_CHECKOUT" "${scope[@]}"
       - name: Upload scanned release images
         if: github.event_name == 'workflow_dispatch' && inputs.release_source_sha != ''
         uses: actions/upload-artifact@v4
