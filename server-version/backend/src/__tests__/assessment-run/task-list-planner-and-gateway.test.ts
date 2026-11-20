@@ -546,6 +546,15 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     expect(result.list[0]?.id).toBe('asg-1')
     expect(queries.some(q => q.includes('WITH actor_grants AS MATERIALIZED'))).toBe(true)
     expect(queries.some(q => q.includes('WITH activities AS MATERIALIZED') && q.includes('linked_runs AS MATERIALIZED') && q.includes('activity_assignments AS MATERIALIZED'))).toBe(true)
+
+    queries.length = 0
+    await listCampusStudentTasks(
+      { userId: USER_ID, role: 'STUDENT' as any, accountDomain: 'SCHOOL' as any } as any,
+      { page: 1, pageSize: 20, kind: 'MEASUREMENT' },
+    )
+    const measurementSql = queries.find(q => q.includes('linked_runs AS MATERIALIZED'))
+    expect(measurementSql).toBeDefined()
+    expect(measurementSql).not.toMatch(/activity_assignments|activity_checkins|"submissions"|"checkin_submissions"/)
   })
 
   it('coalesces reconcileRunExecutionByRuntimeBinding lock and dual completion updates into 3 queries instead of 5', async () => {

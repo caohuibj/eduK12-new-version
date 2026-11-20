@@ -26,6 +26,8 @@ describe('lockExecutionEnvelope known identity', () => {
     shareThenLock(tx)
     const row = await lockExecutionEnvelope(tx, 'exec-1', { organizationId: 'org-1', runId: 'run-1' })
     expect(tx.$queryRaw).toHaveBeenCalledTimes(6)
+    const lockSql = tx.$queryRaw.mock.calls[5][0].join('?')
+    expect(lockSql).toMatch(/WITH target_exec AS MATERIALIZED \([\s\S]*WHERE e\."id" = \?[\s\S]*FOR UPDATE OF e[\s\S]*\)\s+SELECT/)
     expect(row.scientificFrozenAt).toEqual(lockedRow.scientificFrozenAt)
   })
 

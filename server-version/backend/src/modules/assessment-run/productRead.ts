@@ -465,10 +465,29 @@ async function readAssignedRunTasks<Student extends boolean>(userId: string, opt
       AND (t."resource_family" <> 'FORM' OR t."resource_key" NOT LIKE 'private-form:%'
         OR ${privateFormTrackIdentitySql({ track: Prisma.sql`t`, organizationId: Prisma.sql`e."organization_id"`, product: 'SCHOOL' })})
     )`
-    // Flat, plan-cache-friendly query: reuses the same-snapshot verified student
-    // membership/enrollment/activity/deny proof for SELF executions, and flags
-    // any non-SELF or unverified candidate row for exact fallback evaluation.
+    // Narrow the same-snapshot candidate set before checking continuation and
+    // track policy. Page only after those checks and preserve exact fallback
+    // evaluation for candidates outside the verified SELF scope.
     const fastRows = await options!.db!.$queryRaw<Array<StudentRunTaskRow & { __needsFallback: boolean }>>`
+      WITH candidate_execs AS MATERIALIZED (
+        SELECT e."id", e."organization_id", e."run_id", e."track_id", e."status",
+          e."relationship_snapshot_id", e."relational_assignment_id", e."created_at",
+          e."subject_actor_snapshot_id", e."respondent_actor_snapshot_id",
+          e."runtime_binding_kind", e."runtime_binding_ref",
+          respondent."provenance_kind" AS "respondentProvenance",
+          respondent."actor_role" AS "respondentRole",
+          respondent."membership_id" AS "respondentMembershipId",
+          respondent."snapshot_payload"->>'personaGrantId' AS "respondentPersonaGrantId"
+        FROM ${actorOrgsSql} actor_orgs
+        JOIN "assessment_run_actor_snapshots" respondent ON respondent."organization_id" = actor_orgs."organization_id"
+          AND respondent."user_id" = ${userId}
+          ${respondentRunScope}
+        JOIN "assessment_run_executions" e ON e."respondent_actor_snapshot_id" = respondent."id"
+          AND e."organization_id" = respondent."organization_id" AND e."run_id" = respondent."run_id"
+        WHERE respondent."user_id" = ${userId}
+          ${executionScope}
+          ${cursorScope}
+      )
       SELECT (NOT fast_path."selfVerified") AS "__needsFallback",
         school_cont."boundContinuation" AS "__boundSchoolContinuation",
         to_char(e."created_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros",
@@ -483,12 +502,7 @@ async function readAssignedRunTasks<Student extends boolean>(userId: string, opt
         t."resource_family" AS "resourceFamily", t."resource_key" AS "resourceKey",
         (a."consent_id" IS NOT NULL) AS "consentRequired",
         consent."purpose" AS "consentPurpose", consent."visibility_scope" AS "consentVisibility"
-      FROM ${actorOrgsSql} actor_orgs
-      JOIN "assessment_run_actor_snapshots" respondent ON respondent."organization_id" = actor_orgs."organization_id"
-        AND respondent."user_id" = ${userId}
-        ${respondentRunScope}
-      JOIN "assessment_run_executions" e ON e."respondent_actor_snapshot_id" = respondent."id"
-        AND e."organization_id" = respondent."organization_id" AND e."run_id" = respondent."run_id"
+      FROM candidate_execs e
       JOIN "assessment_runs" r ON r."id" = e."run_id" AND r."organization_id" = e."organization_id"
       JOIN "assessment_run_tracks" t ON t."id" = e."track_id" AND t."organization_id" = e."organization_id"
       JOIN "assessment_run_relationship_snapshots" relation ON relation."id" = e."relationship_snapshot_id"
@@ -501,20 +515,17 @@ async function readAssignedRunTasks<Student extends boolean>(userId: string, opt
           e."subject_actor_snapshot_id" = e."respondent_actor_snapshot_id"
           AND relation."relationship_kind" = 'SELF'
           AND relation."snapshot_payload"->'facts'->>'courseId' IS NULL
-          AND respondent."provenance_kind" = 'ORG_MEMBER'
-          AND respondent."actor_role" = 'STUDENT'
-          AND respondent."membership_id" IS NOT NULL
-          AND respondent."snapshot_payload"->>'personaGrantId' IS NOT NULL
-          AND (e."organization_id" || '|' || e."run_id" || '|' || respondent."membership_id" || '|' || (respondent."snapshot_payload"->>'personaGrantId')) = ANY(${tupleKeys}::text[])
+          AND e."respondentProvenance" = 'ORG_MEMBER'
+          AND e."respondentRole" = 'STUDENT'
+          AND e."respondentMembershipId" IS NOT NULL
+          AND e."respondentPersonaGrantId" IS NOT NULL
+          AND (e."organization_id" || '|' || e."run_id" || '|' || e."respondentMembershipId" || '|' || e."respondentPersonaGrantId") = ANY(${tupleKeys}::text[])
         ) AS "selfVerified"
       ) fast_path
       CROSS JOIN LATERAL (SELECT ${fastSchoolScope} AS "inSchoolScope") school_scope
       CROSS JOIN LATERAL (SELECT ${fastBoundContinuation} AS "boundContinuation") school_cont
-      WHERE respondent."user_id" = ${userId}
+      WHERE (NOT fast_path."selfVerified" OR (${fastClosedScope} AND ${fastTrackValid}))
         ${runScope}
-        ${executionScope}
-        ${cursorScope}
-        AND (NOT fast_path."selfVerified" OR (${fastClosedScope} AND ${fastTrackValid}))
       ORDER BY e."created_at" DESC, e."id" DESC LIMIT ${limit + 1}
     `
     if (fastRows.some(row => row.__needsFallback)) {

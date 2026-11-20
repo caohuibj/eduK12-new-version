@@ -4,7 +4,7 @@ import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
 import type {UserRole} from '../../types'
 
 const m=vi.hoisted(()=>({
-  query:vi.fn(),principal:vi.fn(),scope:vi.fn(),start:vi.fn(),parent:vi.fn(),getAttempt:vi.fn(),
+  query:vi.fn(),principal:vi.fn(),scope:vi.fn(),start:vi.fn(),parent:vi.fn(),getAttempt:vi.fn(),consent:vi.fn(),
 }))
 vi.mock('../../config/database',()=>({prisma:{$queryRaw:m.query}}))
 vi.mock('../../modules/organization/principal',async original=>({...await original<object>(),loadCurrentPrincipal:m.principal}))
@@ -14,7 +14,7 @@ vi.mock('../../modules/admin-permissions/security',()=>({needsAdminKey:()=>false
 vi.mock('../../modules/organization/educationProductAccess',()=>({resolveEducationProductMemberScope:m.scope}))
 vi.mock('../../modules/assessment-run/startExecution',()=>({startAssessmentRunExecution:m.start}))
 vi.mock('../../modules/composite/composite.service',()=>({getAttemptState:m.parent}))
-vi.mock('../../modules/assessment-relational/runtime-consent',()=>({relationalRuntimeConsentAuthority:{assertCompositeFinal:vi.fn(),assertCognitiveFinal:vi.fn()}}))
+vi.mock('../../modules/assessment-relational/runtime-consent',()=>({relationalRuntimeConsentAuthority:{assertCompositeFinal:m.consent,assertCognitiveFinal:vi.fn()}}))
 vi.mock('../../modules/composite/composite.controller',()=>({compositeController:{getAttempt:m.getAttempt,submitFinalScale:vi.fn(),submitFinalFormSection:vi.fn(),wholeDefinition:vi.fn(),wholeTemplate:vi.fn(),wholeReceipt:vi.fn(),wholeSubmit:vi.fn(),educationWholeProgress:vi.fn()}}))
 vi.mock('../../modules/composite/composite-image.controller',()=>({compositeImageController:{authenticatedScaleImage:vi.fn()}}))
 vi.mock('../../modules/composite/composite-video.controller',()=>({compositeVideoController:{authenticatedScaleVideo:vi.fn()}}))
@@ -73,6 +73,22 @@ describe('Teacher Scale START inline currentUnit reuses GET authority',()=>{
     const read=await request('/composite-attempts/'+attempt)
     expect(read.status).toBe(200)
     expect(read.value.data).toEqual(currentUnit)
+  })
+
+  it('uses the freshly committed consent header and still checks consent before projecting',async()=>{
+    const parent={id:attempt,userId:actor,assignmentRef:id(12),consentId:null}
+    const result={state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:attempt,replayed:false}
+    Object.defineProperties(result,{
+      _freshlyCreatedAttempt:{value:true},
+      _educationWholePreload:{value:{parent}},
+    })
+    m.start.mockResolvedValueOnce(result)
+    m.consent.mockRejectedValueOnce(new Error('assignment revoked'))
+    const started=await request('/run-executions/'+execution+'/start-scale',{delivery:'inline'})
+    expect(started.status).toBe(200)
+    expect(started.value.data).toEqual(result)
+    expect(m.consent).toHaveBeenCalledWith(attempt,actor,parent)
+    expect(m.parent).not.toHaveBeenCalled()
   })
 
   it('omits currentUnit when scale authority is revoked after START commits',async()=>{
