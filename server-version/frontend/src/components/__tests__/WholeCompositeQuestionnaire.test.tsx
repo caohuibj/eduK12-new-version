@@ -103,14 +103,17 @@ describe('whole questionnaire durable browser submission', () => {
     client.submitWhole.mockRejectedValueOnce(Object.assign(new Error('busy'), { status: 503, code: 'COMPLETION_BUSY' }))
     await lastQuestion(218)
     fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
-    await waitFor(() => expect(screen.getByRole('button', { name: '重试并确认整卷提交' })).not.toBeDisabled())
+    await waitFor(() => expect(screen.getByRole('button', { name: '再次确认交卷状态' })).not.toBeDisabled())
     const sealed = (await finalDraftStore.get(key))!.sealedSubmission!.payload
     expect((await finalDraftStore.get(key))!.status).toBe('RETRY_PENDING')
     first.unmount()
+    Object.assign(client, { wholeReceipt: vi.fn(async (attemptId: string, submissionId: string) => ({
+      code: 0, data: { status: 'NOT_RECEIVED' as const, attemptId, submissionId },
+    })) })
     client.wholeDefinition.mockClear(); client.reportStatus.mockClear(); client.wholeDefinition.mockRejectedValue(Object.assign(new Error('enrollment disabled'), { status: 409 }))
     view(client)
     fireEvent.click(await screen.findByRole('button', { name: '重试并确认整卷提交' }))
-    await screen.findByRole('heading', { name: '交卷成功' })
+    await screen.findByRole('heading', { name: '交卷成功' }, { timeout: 3_000 })
     expect(client.wholeDefinition).not.toHaveBeenCalled(); expect(client.reportStatus).not.toHaveBeenCalled()
     expect(client.submitWhole.mock.calls[1][1]).toEqual(sealed)
     expect(await finalDraftStore.get(key)).toBeNull()
@@ -124,15 +127,18 @@ describe('whole questionnaire durable browser submission', () => {
     client.submitWhole.mockRejectedValueOnce(Object.assign(new Error('busy'), { status: 503, code: 'COMPLETION_BUSY' }))
     await lastQuestion(2)
     fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
-    await waitFor(() => expect(screen.getByRole('button', { name: '重试并确认整卷提交' })).not.toBeDisabled())
+    await waitFor(() => expect(screen.getByRole('button', { name: '再次确认交卷状态' })).not.toBeDisabled())
     const sealed = (await finalDraftStore.get(key))!.sealedSubmission!.payload
     expect((sealed as WholeQuestionnaireInput).units[0].itemTimings).toBeDefined()
     expect((await finalDraftStore.get(key))!.status).toBe('RETRY_PENDING')
     first.unmount()
+    Object.assign(client, { wholeReceipt: vi.fn(async (attemptId: string, submissionId: string) => ({
+      code: 0, data: { status: 'NOT_RECEIVED' as const, attemptId, submissionId },
+    })) })
     client.wholeDefinition.mockClear(); client.reportStatus.mockClear(); client.wholeDefinition.mockRejectedValue(Object.assign(new Error('enrollment disabled'), { status: 409 }))
     view(client)
     fireEvent.click(await screen.findByRole('button', { name: '重试并确认整卷提交' }))
-    await screen.findByRole('heading', { name: '交卷成功' })
+    await screen.findByRole('heading', { name: '交卷成功' }, { timeout: 3_000 })
     expect(client.wholeDefinition).not.toHaveBeenCalled(); expect(client.reportStatus).not.toHaveBeenCalled()
     expect(client.submitWhole.mock.calls[1][1]).toEqual(sealed)
     expect(await finalDraftStore.get(key)).toBeNull()
@@ -159,6 +165,25 @@ describe('whole questionnaire durable browser submission', () => {
     expect(await finalDraftStore.get(key)).toBeNull()
     expect(screen.queryByRole('button', { name: '重试并确认整卷提交' })).not.toBeInTheDocument()
   })
+  it('does not auto-retry or manually replay an uncertain POST without receipt lookup', async () => {
+    const d = definition([1, 1]), client = api()
+    client.wholeDefinition.mockResolvedValue({ code: 0, data: d })
+    client.submitWhole.mockRejectedValueOnce(new TypeError('response lost'))
+    retry.mockImplementationOnce(async options => {
+      const { runFinalDraftCapacityRetry } = await vi.importActual<typeof import('../../services/persistence/finalDraftCapacityRetry')>('../../services/persistence/finalDraftCapacityRetry')
+      return runFinalDraftCapacityRetry({ ...options, sleep: async () => {} })
+    })
+    await seed(d); view(client); await lastQuestion(2)
+    fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
+    await screen.findByText('暂时无法确认服务器是否收到答案，本机草稿已保留。')
+    expect(client.submitWhole).toHaveBeenCalledTimes(1)
+    const sealed = (await finalDraftStore.get(key))!.sealedSubmission!.payload
+    fireEvent.click(screen.getByRole('button', { name: '再次确认交卷状态' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: '再次确认交卷状态' })).not.toBeDisabled())
+    expect(client.submitWhole).toHaveBeenCalledTimes(1)
+    expect((await finalDraftStore.get(key))?.sealedSubmission?.payload).toEqual(sealed)
+  })
+
   it('recovers a lost POST response by its original submission identity without resubmitting answers', async () => {
     const d = definition([1, 1]), client = api(), completed = vi.fn()
     client.wholeDefinition.mockResolvedValue({ code: 0, data: d })
@@ -175,25 +200,83 @@ describe('whole questionnaire durable browser submission', () => {
     expect(saved.submissionId).toBe('whole-browser-sealed-submission'); expect(saved.answers).toBeUndefined()
   })
 
-  it('recovers via GET /whole/receipt before re-posting on retry after a 25s read timeout', async () => {
+  it('recovers a late commit after an initial NOT_RECEIVED without re-posting', async () => {
     const d = definition([1, 1]), client = api(), completed = vi.fn()
     client.wholeDefinition.mockResolvedValue({ code: 0, data: d })
     const lookup = vi.fn()
       // Immediate probe after Attempt 1 timeout: server still finishing commit
       .mockResolvedValueOnce({ code: 0, message: 'ok', data: { status: 'NOT_RECEIVED' as const, attemptId: 'whole-attempt', submissionId: 'whole-browser-sealed-submission' } })
-      // Pre-POST probe at start of Attempt 2: server committed during backoff!
+      // Delayed confirmation: server committed during the wait.
       .mockResolvedValueOnce({ code: 0, message: 'ok', data: { status: 'ACCEPTED' as const, attemptId: 'whole-attempt', submissionId: 'whole-browser-sealed-submission', payloadHash: 'h'.repeat(64), acceptedAt: '2026-10-15T00:00:00Z', committedAt: '2026-10-15T00:00:01Z', replayed: true } })
     Object.assign(client, { wholeReceipt: lookup })
     client.submitWhole.mockRejectedValueOnce(Object.assign(new Error('timeout of 25000ms exceeded'), { code: 'ECONNABORTED', retryable: true }))
-    retry.mockImplementationOnce(async ({ operation }) => {
-      try { return await operation(1) } catch { return await operation(2) }
-    })
     await seed(d); view(client, completed); await lastQuestion(2)
     fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
-    await waitFor(() => expect(completed).toHaveBeenCalledTimes(1))
-    // Attempt 2 recovered via GET /whole/receipt without re-posting the payload!
+    await waitFor(() => expect(completed).toHaveBeenCalledTimes(1), { timeout: 3_000 })
+    // A single negative read cannot authorize another POST.
     expect(client.submitWhole).toHaveBeenCalledTimes(1)
     expect(lookup).toHaveBeenCalledTimes(2)
+    expect(await finalDraftStore.get(key)).toBeNull()
+  })
+
+  it('retains the sealed answers and only rechecks when receipt reads are unavailable, including after refresh', async () => {
+    const d = definition([1, 1]), client = api(), completed = vi.fn()
+    client.wholeDefinition.mockResolvedValue({ code: 0, data: d })
+    const unavailable = Object.assign(new Error('read unavailable'), { status: 503 })
+    const lookup = vi.fn().mockRejectedValue(unavailable)
+    const withReceipt = { ...client, wholeReceipt: lookup }
+    client.submitWhole.mockRejectedValueOnce(new TypeError('response lost'))
+    retry.mockImplementationOnce(async options => {
+      const { runFinalDraftCapacityRetry } = await vi.importActual<typeof import('../../services/persistence/finalDraftCapacityRetry')>('../../services/persistence/finalDraftCapacityRetry')
+      return runFinalDraftCapacityRetry({ ...options, sleep: async () => {} })
+    })
+    await seed(d); const beforeRefresh = view(withReceipt, completed); await lastQuestion(2)
+    fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
+    await screen.findByText('暂时无法确认服务器是否收到答案，本机草稿已保留。', {}, { timeout: 3_000 })
+    expect(lookup).toHaveBeenCalledTimes(2)
+    expect(client.submitWhole).toHaveBeenCalledTimes(1)
+    expect(completed).not.toHaveBeenCalled()
+    const sealed = (await finalDraftStore.get(key))!.sealedSubmission!.payload
+
+    beforeRefresh.unmount()
+    client.wholeDefinition.mockClear(); client.reportStatus.mockClear()
+    let finishLookup!: () => void
+    lookup.mockImplementationOnce(() => new Promise((_resolve, reject) => { finishLookup = () => reject(unavailable) }))
+    view(withReceipt, completed)
+    expect(await screen.findByText('正在查询交卷回执，本机草稿已保留。')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '再次确认交卷状态' })).toBeDisabled()
+    await act(async () => finishLookup())
+    await screen.findByText('暂时无法确认服务器是否收到答案，本机草稿已保留。')
+    expect((await finalDraftStore.get(key))?.sealedSubmission?.payload).toEqual(sealed)
+    expect(client.wholeDefinition).not.toHaveBeenCalled()
+    expect(client.reportStatus).not.toHaveBeenCalled()
+    expect(client.submitWhole).toHaveBeenCalledTimes(1)
+
+    lookup.mockResolvedValueOnce({ code: 0, data: { status: 'ACCEPTED', attemptId: state.id,
+      submissionId: 'whole-browser-sealed-submission', payloadHash: 'h'.repeat(64) } })
+    fireEvent.click(screen.getByRole('button', { name: '再次确认交卷状态' }))
+    await waitFor(() => expect(completed).toHaveBeenCalledTimes(1))
+    expect(client.submitWhole).toHaveBeenCalledTimes(1)
+    expect(await finalDraftStore.get(key)).toBeNull()
+  })
+
+  it('replays the same sealed body after confirmed absence and a final pre-replay lookup', async () => {
+    const d = definition([1, 1]), client = api(), completed = vi.fn()
+    client.wholeDefinition.mockResolvedValue({ code: 0, data: d })
+    const lookup = vi.fn(async (attemptId: string, submissionId: string) => ({ code: 0, message: 'ok',
+      data: { status: 'NOT_RECEIVED' as const, attemptId, submissionId },
+    }))
+    client.submitWhole.mockRejectedValueOnce(Object.assign(new Error('upstream timeout'), { status: 504 }))
+    retry.mockImplementationOnce(async options => {
+      const { runFinalDraftCapacityRetry } = await vi.importActual<typeof import('../../services/persistence/finalDraftCapacityRetry')>('../../services/persistence/finalDraftCapacityRetry')
+      return runFinalDraftCapacityRetry({ ...options, sleep: async () => {} })
+    })
+    await seed(d); view({ ...client, wholeReceipt: lookup }, completed); await lastQuestion(2)
+    fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
+    await waitFor(() => expect(completed).toHaveBeenCalledTimes(1), { timeout: 3_000 })
+    expect(lookup).toHaveBeenCalledTimes(3)
+    expect(client.submitWhole).toHaveBeenCalledTimes(2)
+    expect(client.submitWhole.mock.calls[1]).toEqual(client.submitWhole.mock.calls[0])
     expect(await finalDraftStore.get(key)).toBeNull()
   })
 
