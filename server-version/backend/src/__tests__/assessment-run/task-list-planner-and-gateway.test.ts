@@ -69,6 +69,7 @@ import { reconcileRunExecutionByRuntimeBinding } from '../../modules/assessment-
 import { cloneCachedStartComposite, loadStartComposite } from '../../modules/composite/composite.service'
 import { resetStartReadCachesForTests } from '../../modules/composite/start-read-cache'
 import { hasImmutableCanonicalValue } from '../../modules/assessment-runtime/canonical'
+import { projectRelationalUnitFinalResponse } from '../../modules/assessment-relational/result-authority'
 import { logger } from '../../utils/logger'
 
 const EXEC_ID = '11111111-1111-4111-8111-111111111111'
@@ -570,7 +571,7 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
           assignmentRef: 'rel-1',
         }]
       }
-      if (sql.includes('WITH updated_exec AS') && sql.includes('updated_rel AS')) {
+      if (sql.includes('WITH valid_rel AS') && sql.includes('updated_exec AS') && sql.includes('updated_rel AS')) {
         return [{ changed: 1 }]
       }
       return []
@@ -582,11 +583,46 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     })
     expect(res).toEqual({ state: 'COMPLETED', completedAt, replayed: false })
     expect(queries).toHaveLength(3)
-    expect(queries[2]).toContain('WITH updated_exec AS')
+    expect(queries[2]).toContain('WITH valid_rel AS')
+    expect(queries[2]).toContain('updated_exec AS')
     expect(queries[2]).toContain('updated_rel AS')
+    expect(queries[2]).toContain('EXISTS (SELECT 1 FROM valid_rel)')
+
+    // When valid_rel fails (e.g. relational assignment missing, wrong status, or mismatched completed_at),
+    // updated_exec updates 0 rows and reconcileRunExecutionByRuntimeBinding rejects with RUN_RECONCILIATION_CONFLICT.
+    dbMocks.queryRaw.mockImplementation(async (...args: unknown[]) => {
+      const sql = flattenQueryRawCall(args)
+      if (sql.includes('FROM "assessment_run_executions"') && sql.includes('FOR UPDATE')) {
+        return [{
+          id: EXEC_ID,
+          status: 'IN_PROGRESS',
+          completedAt: null,
+          relationalAssignmentId: 'rel-invalid',
+          runtimeBindingKind: 'COMPOSITE',
+          runtimeBindingRef: 'att-1',
+        }]
+      }
+      if (sql.includes('FROM "composite_assessment_attempts"') && sql.includes('FOR UPDATE')) {
+        return [{
+          status: 'COMPLETED',
+          completedAt,
+          assignmentRef: 'rel-invalid',
+        }]
+      }
+      if (sql.includes('WITH valid_rel AS')) {
+        return [{ changed: 0 }]
+      }
+      return []
+    })
+    await expect(
+      reconcileRunExecutionByRuntimeBinding({
+        runtimeBindingKind: 'COMPOSITE',
+        runtimeBindingRef: 'att-1',
+      }),
+    ).rejects.toMatchObject({ code: 'RUN_RECONCILIATION_CONFLICT', statusCode: 409 })
   })
 
-  it('freezes and retains inner scale definitions on loadStartComposite while isolating outer envelope mutations in cloneCachedStartComposite', async () => {
+  it('freezes and retains inner scale definitions on loadStartComposite while isolating outer envelope and all non-frozen nested JSON mutations in cloneCachedStartComposite', async () => {
     resetStartReadCachesForTests()
     const updatedAt = new Date('2026-11-20T00:00:00.000Z')
     const scaleDefinition = {
@@ -607,6 +643,7 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
           trainingContentSnapshotHash: 'hash-1',
           trainingContentSnapshot: snapshot,
           personalTracking: null,
+          trainingVariantFrozen: { groups: [{ weight: 100, selectedItemIds: ['item-1'] }] },
           questionnaireCourses: [{ courseId: 'c-1', course: { id: 'c-1', title: 'Course 1' } }],
           creator: { id: 'u-1', role: 'TEACHER' },
           course: { id: 'c-1', title: 'Course 1', courseCode: 'C1', isLibrary: false },
@@ -618,9 +655,12 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
               code: 'S1',
               definition: scaleDefinition,
             },
-            cognitiveAssignment: null,
+            cognitiveAssignment: {
+              id: 'ca-1',
+              config: { id: 'cfg-1', parameters: { trials: 20, nested: { speed: 1 } } },
+            },
           }],
-          formSections: [{ id: 'sec-1', items: [{ id: 'fi-1' }] }],
+          formSections: [{ id: 'sec-1', items: [{ id: 'fi-1', formOptions: ['opt-a', 'opt-b'] }] }],
         })),
       },
     }
@@ -640,13 +680,76 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     expect(Object.isFrozen(first.items[0].scale.definition)).toBe(true)
     expect(first.items[0].scale.definition).toBe(second.items[0].scale.definition)
     expect(first.trainingContentSnapshot).toBe(second.trainingContentSnapshot)
-    // Outer mutable envelopes are isolated per request
+    // Outer mutable envelopes and all non-frozen nested JSON trees are deep-isolated per request
     expect(first).not.toBe(second)
     expect(first.items).not.toBe(second.items)
     expect(first.items[0]).not.toBe(second.items[0])
     expect(first.items[0].scale).not.toBe(second.items[0].scale)
     first.deliveryCourseId = 'mutated-course'
+    first.trainingVariantFrozen.groups[0].weight = 50
+    first.items[0].cognitiveAssignment.config.parameters.trials = 999
+    first.items[0].cognitiveAssignment.config.parameters.nested.speed = 99
+    first.formSections[0].items[0].formOptions.push('mutated-opt')
+
     expect(second.deliveryCourseId).toBeUndefined()
+    expect(second.trainingVariantFrozen.groups[0].weight).toBe(100)
+    expect(second.items[0].cognitiveAssignment.config.parameters.trials).toBe(20)
+    expect(second.items[0].cognitiveAssignment.config.parameters.nested.speed).toBe(1)
+    expect(second.formSections[0].items[0].formOptions).toEqual(['opt-a', 'opt-b'])
+
+    // Verify personalTracking and fallback isolation when scale.definition or trainingContentSnapshot
+    // is NOT frozen (e.g., if canonical encoding threw due to non-canonical NaN/undefined)
+    const unfrozenFallback = {
+      personalTracking: { rules: [{ weight: 1 }] },
+      trainingContentSnapshot: { nonCanonical: Number.NaN, nested: { a: 1 } },
+      items: [{ scale: { definition: { nonCanonical: Number.NaN, nested: { b: 2 } } } }],
+    }
+    const fallbackA = cloneCachedStartComposite(unfrozenFallback)
+    const fallbackB = cloneCachedStartComposite(unfrozenFallback)
+    fallbackA.personalTracking.rules[0].weight = 2
+    fallbackA.trainingContentSnapshot.nested.a = 99
+    fallbackA.items[0].scale.definition.nested.b = 88
+    expect(fallbackB.personalTracking.rules[0].weight).toBe(1)
+    expect(fallbackB.trainingContentSnapshot.nested.a).toBe(1)
+    expect(fallbackB.items[0].scale.definition.nested.b).toBe(2)
     expect(cloneCachedStartComposite(null)).toBeNull()
+  })
+
+  it('anchors checkCampusCompositeAccessDetails with WITH target_exec AS MATERIALIZED and skips redundant feedback context reads on preloaded non-receipt Teacher submits', async () => {
+    dbMocks.queryRaw.mockResolvedValueOnce([{
+      executionId: EXEC_ID,
+      orgStatus: 'ACTIVE',
+      orgProductDomain: 'SCHOOL',
+      relationshipKind: 'PARENT_CHILD',
+    }]).mockResolvedValueOnce([{ allowed: true }])
+    await expect(checkCampusCompositeAccessAuthority({ attemptId: 'att-1', userId: USER_ID })).resolves.toBe(true)
+    const accessSql = flattenQueryRawCall(dbMocks.queryRaw.mock.calls[0])
+    expect(accessSql).toContain('WITH target_exec AS MATERIALIZED')
+
+    // Non-receipt Teacher scale submit with _preloadedRelationalFeedbackParent
+    // only queries relational_assessment_assignments once (skipping composite_assessment_attempts & composite_report_jobs).
+    const mockDb = {
+      $queryRaw: vi.fn().mockResolvedValueOnce([{
+        perspective: 'SELF_REPORT',
+        analysisMode: 'INDIVIDUAL_ONLY',
+      }]),
+      compositeAssessmentAttempt: { findUnique: vi.fn() },
+      compositeReportJob: { findUnique: vi.fn() },
+    }
+    const payload: Record<string, unknown> = {
+      submissionId: 'sub-1',
+      payloadHash: 'hash-1',
+      replayed: false,
+      completed: true,
+      result: { totalScore: 10 },
+    }
+    Object.defineProperty(payload, '_preloadedRelationalFeedbackParent', {
+      value: { assignmentRef: 'rel-1', respondentType: 'TEACHER' },
+    })
+    const projected = await projectRelationalUnitFinalResponse('att-teacher-1', payload, mockDb)
+    expect(projected).toBe(payload)
+    expect(mockDb.compositeAssessmentAttempt.findUnique).not.toHaveBeenCalled()
+    expect(mockDb.compositeReportJob.findUnique).not.toHaveBeenCalled()
+    expect(mockDb.$queryRaw).toHaveBeenCalledTimes(1)
   })
 })

@@ -79,12 +79,29 @@ const reconcileLockedRunExecutionInTransaction = async (
 
   // Coalesce canonical Run execution completion and relational assignment
   // completion into a single atomic CTE roundtrip (Survey-style single-statement
-  // completion write).
+  // completion write). Gate updated_exec on valid_rel so assessment_run_executions
+  // only transitions to COMPLETED when its bound ORGANIZATION_RUN relational
+  // assignment is either STARTED (and transitioned to COMPLETED in updated_rel)
+  // or already COMPLETED with the exact same completion timestamp (e.g., when
+  // finalizeCompositeAttemptUnifiedIfReady committed the assignment update first).
   const writeRows = await tx.$queryRaw<Array<{ changed: number }>>`
-    WITH updated_exec AS (
+    WITH valid_rel AS (
+      SELECT "id", "status"
+      FROM "relational_assessment_assignments"
+      WHERE "id" = ${execution.relationalAssignmentId}
+        AND "policy_domain" = 'ORGANIZATION_RUN'
+        AND (
+          "status" = 'STARTED'
+          OR ("status" = 'COMPLETED' AND "completed_at" = ${attempt.completedAt})
+        )
+      FOR UPDATE
+    ),
+    updated_exec AS (
       UPDATE "assessment_run_executions"
       SET "status" = 'COMPLETED', "completed_at" = ${attempt.completedAt}, "updated_at" = transaction_timestamp()
-      WHERE "id" = ${execution.id} AND "status" <> 'COMPLETED'
+      WHERE "id" = ${execution.id}
+        AND "status" <> 'COMPLETED'
+        AND EXISTS (SELECT 1 FROM valid_rel)
       RETURNING "id"
     ),
     updated_rel AS (

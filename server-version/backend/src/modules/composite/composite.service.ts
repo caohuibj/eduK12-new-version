@@ -43,7 +43,7 @@ import { isLoadedCompositeParticipantFeedbackDeferred, trainingFeedbackReportRea
 import { freezeTrainingPersistenceSnapshot, readTrainingPersistencePolicy, trainingPersistenceMetadata } from './training-persistence.policy'
 import { trainingRoundPublicationIdentity, prepareTrainingPublicRound, assertTrainingTokenRound, publicRoundMetadata, trainingRoundSelect, type TrainingRoundInput } from './training-public-round'
 import { allocateTrainingMaterial, materialRestartClaim } from './training-material-allocation'
-import { canonicalHash, retainImmutableCanonicalValue } from '../assessment-runtime/canonical'
+import { canonicalHash, hasImmutableCanonicalValue, retainImmutableCanonicalValue } from '../assessment-runtime/canonical'
 import { assertStandardItemsVerifiedByContentBinding } from './training-start-child-admission'
 import { resolveTrainingFlowScopeForMaterialization, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers, TRAINING_FLOW_DEFINITION_SELECT, type VerifiedTrainingFlowMaterialization } from './training-flow-scope'
 import { buildTrainingFlowUnits } from './training-flow-definition'
@@ -394,47 +394,44 @@ const prepareCachedStartComposite = <T>(composite: T): T => {
   return composite
 }
 
+const isSafelyFrozenSharedAst = (value: unknown): value is object =>
+  Boolean(value && typeof value === 'object' && hasImmutableCanonicalValue(value) && Object.isFrozen(value))
+
+const cloneItemForStartComposite = (item: any) => {
+  if (!item || typeof item !== 'object') return item
+  const clonedItem: Record<string, any> = {}
+  for (const [key, val] of Object.entries(item)) {
+    if (key === 'scale' && val && typeof val === 'object') {
+      const scaleRecord = val as Record<string, any>
+      const clonedScale: Record<string, any> = {}
+      for (const [sKey, sVal] of Object.entries(scaleRecord)) {
+        if (sKey === 'definition') {
+          clonedScale.definition = isSafelyFrozenSharedAst(sVal) ? sVal : structuredClone(sVal)
+        } else {
+          clonedScale[sKey] = sVal && typeof sVal === 'object' ? structuredClone(sVal) : sVal
+        }
+      }
+      clonedItem.scale = clonedScale
+    } else {
+      clonedItem[key] = val && typeof val === 'object' ? structuredClone(val) : val
+    }
+  }
+  return clonedItem
+}
+
 export const cloneCachedStartComposite = (cached: any) => {
   if (!cached || typeof cached !== 'object') return cached
-  return {
-    ...cached,
-    ...(cached.creator && typeof cached.creator === 'object' ? { creator: { ...cached.creator } } : {}),
-    ...(cached.course && typeof cached.course === 'object' ? { course: { ...cached.course } } : {}),
-    ...(Array.isArray(cached.questionnaireCourses)
-      ? {
-          questionnaireCourses: cached.questionnaireCourses.map((entry: any) => ({
-            ...entry,
-            ...(entry?.course && typeof entry.course === 'object' ? { course: { ...entry.course } } : {}),
-          })),
-        }
-      : {}),
-    ...(Array.isArray(cached.items)
-      ? {
-          items: cached.items.map((item: any) => ({
-            ...item,
-            ...(item?.scale && typeof item.scale === 'object' ? { scale: { ...item.scale } } : {}),
-            ...(item?.cognitiveAssignment && typeof item.cognitiveAssignment === 'object'
-              ? {
-                  cognitiveAssignment: {
-                    ...item.cognitiveAssignment,
-                    ...(item.cognitiveAssignment.config && typeof item.cognitiveAssignment.config === 'object'
-                      ? { config: { ...item.cognitiveAssignment.config } }
-                      : {}),
-                  },
-                }
-              : {}),
-          })),
-        }
-      : {}),
-    ...(Array.isArray(cached.formSections)
-      ? {
-          formSections: cached.formSections.map((section: any) => ({
-            ...section,
-            ...(Array.isArray(section?.items) ? { items: section.items.map((fi: any) => ({ ...fi })) } : {}),
-          })),
-        }
-      : {}),
+  const out: Record<string, any> = {}
+  for (const [key, val] of Object.entries(cached)) {
+    if (key === 'trainingContentSnapshot') {
+      out.trainingContentSnapshot = isSafelyFrozenSharedAst(val) ? val : structuredClone(val)
+    } else if (key === 'items' && Array.isArray(val)) {
+      out.items = val.map(cloneItemForStartComposite)
+    } else {
+      out[key] = val && typeof val === 'object' ? structuredClone(val) : val
+    }
   }
+  return out
 }
 
 const startCompositeIdentity = async (id: string, db: Db = prisma) => {
@@ -4146,6 +4143,7 @@ export const projectFreshStartedAttempt = async (
 
 export const buildWholeStartPreload = (attempt: any, children: any[] | undefined, source: any) => {
   if (!children || !source) return { parent: undefined, preloadedState: undefined }
+  seedFreshScaleChildren(children)
   const parent = {
     ...attempt,
     compositeAssessment: source,
