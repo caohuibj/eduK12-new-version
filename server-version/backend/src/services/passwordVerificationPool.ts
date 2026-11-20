@@ -29,7 +29,7 @@ type PoolOptions = {
 }
 
 export const createPasswordVerificationPool = (options: PoolOptions) => {
-  const maxQueue = options.maxQueue ?? 32
+  const maxQueue = options.maxQueue ?? Math.max(32, options.size * 8)
   const timeoutMs = options.timeoutMs ?? 10000
   if (!Number.isInteger(options.size) || options.size < 1 || options.size > 32 ||
       !Number.isInteger(maxQueue) || maxQueue < 0 ||
@@ -115,6 +115,18 @@ export const createPasswordVerificationPool = (options: PoolOptions) => {
     return slot
   }
   return {
+    warm(): void {
+      if (closed) return
+      for (let i = 0; i < slots.length; i += 1) {
+        if (!slots[i]) {
+          try {
+            makeSlot(i)
+          } catch {
+            // Best-effort warmup; compare() will surface worker errors lazily.
+          }
+        }
+      }
+    },
     compare(password: string, hash: string): Promise<boolean> {
       if (closed) return Promise.reject(error())
       return new Promise((resolve, reject) => {
@@ -159,5 +171,9 @@ export const passwordVerificationPool = (): PasswordVerificationPool | undefined
   const size = Number(raw)
   if (size === 0) return undefined
   return defaultPool ??= createPasswordVerificationPool({ size })
+}
+
+export const warmPasswordVerificationPool = (): void => {
+  passwordVerificationPool()?.warm()
 }
 

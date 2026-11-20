@@ -212,4 +212,21 @@ describe('login Redis rate limits', () => {
     expect(success).toHaveBeenCalledOnce()
   })
 
+  it('skips redundant Redis DEL on clearLoginFailures when loginRateLimit observed zero failures', async () => {
+    mockCacheService.getRateLimitState.mockResolvedValue({ count: 0, retryAfterSeconds: 0 })
+    const req = makeReq('198.51.100.10', 'clean-user')
+    await loginRateLimit(req, makeRes(), vi.fn())
+    await clearLoginFailures(req)
+    expect(mockCacheService.del).not.toHaveBeenCalled()
+
+    const dirtyReq = makeReq('198.51.100.10', 'dirty-user')
+    mockCacheService.getRateLimitState.mockImplementation(async (key: string) => (
+      key.endsWith(':global') ? { count: 2, retryAfterSeconds: 600 } : { count: 0, retryAfterSeconds: 0 }
+    ))
+    await loginRateLimit(dirtyReq, makeRes(), vi.fn())
+    await clearLoginFailures(dirtyReq)
+    expect(mockCacheService.del).toHaveBeenCalledTimes(1)
+    expect(mockCacheService.del).toHaveBeenCalledWith(dirtyReq.loginRateLimitContext.globalFailureKey)
+  })
+
 })

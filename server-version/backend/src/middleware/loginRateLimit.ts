@@ -49,6 +49,8 @@ export interface LoginRateLimitContext {
   ipKey: string
   globalFailureLimited?: boolean
   credentialFailed?: boolean
+  hasAccountIpFailures?: boolean
+  hasAccountGlobalFailures?: boolean
 }
 
 export interface LoginFailureBudgetResult {
@@ -84,7 +86,13 @@ export const loginRateLimit = async (req: Request, res: Response, next: NextFunc
   }
 
   const context = getLoginRateLimitContext(req, typeof req.body?.username === 'string' ? req.body.username : undefined)
-  const ipWindow = await cacheService.consumeRateLimit(context.ipKey, ingressRequestLimit, WINDOW_SECONDS)
+  // Run IP budget consumption and account failure state reads in one parallel
+  // Redis roundtrip instead of two sequential hops while preserving error precedence.
+  const [ipWindow, accountIpFailures, accountGlobalFailures] = await Promise.all([
+    cacheService.consumeRateLimit(context.ipKey, ingressRequestLimit, WINDOW_SECONDS),
+    cacheService.getRateLimitState(context.failureKey),
+    cacheService.getRateLimitState(context.globalFailureKey),
+  ])
   if (!ipWindow) {
     res.status(503).json({ code: -1, message: '登录服务暂时不可用，请稍后再试' })
     return
@@ -97,10 +105,6 @@ export const loginRateLimit = async (req: Request, res: Response, next: NextFunc
 
   // A single source may not brute-force one account indefinitely. This scope
   // cannot globally lock the account because another IP has an independent key.
-  const [accountIpFailures, accountGlobalFailures] = await Promise.all([
-    cacheService.getRateLimitState(context.failureKey),
-    cacheService.getRateLimitState(context.globalFailureKey),
-  ])
   if (!accountIpFailures || !accountGlobalFailures) {
     res.status(503).json({ code: -1, message: '登录服务暂时不可用，请稍后再试' })
     return
@@ -113,6 +117,8 @@ export const loginRateLimit = async (req: Request, res: Response, next: NextFunc
 
   // A distributed attack activates a short real verification throttle, not
   // a fifteen-minute account lockout. The wrapper owns its operation lifetime.
+  context.hasAccountIpFailures = accountIpFailures.count > 0
+  context.hasAccountGlobalFailures = accountGlobalFailures.count > 0
   context.globalFailureLimited = accountGlobalFailures.count >= ACCOUNT_GLOBAL_FAILURE_LIMIT
   ;(req as Request & { loginRateLimitContext?: LoginRateLimitContext }).loginRateLimitContext = context
   next()
@@ -127,6 +133,8 @@ export const recordLoginFailure = async (req: Request): Promise<LoginFailureBudg
   ])
   if (!accountIp || !accountGlobal) return null
   context.credentialFailed = true
+  context.hasAccountIpFailures = true
+  context.hasAccountGlobalFailures = true
   context.globalFailureLimited ||= !accountGlobal.allowed
   request.loginRateLimitContext = context
   return {
@@ -141,10 +149,16 @@ export const recordLoginFailure = async (req: Request): Promise<LoginFailureBudg
 export const clearLoginFailures = async (req: Request): Promise<void> => {
   const request = req as Request & { loginRateLimitContext?: LoginRateLimitContext }
   const context = request.loginRateLimitContext || getLoginRateLimitContext(req, typeof req.body?.username === 'string' ? req.body.username : undefined)
-  await Promise.all([
-    cacheService.del(context.failureKey),
-    cacheService.del(context.globalFailureKey),
-  ])
+  const deletions: Array<Promise<void>> = []
+  if (context.hasAccountIpFailures !== false) {
+    deletions.push(cacheService.del(context.failureKey))
+  }
+  if (context.hasAccountGlobalFailures !== false) {
+    deletions.push(cacheService.del(context.globalFailureKey))
+  }
+  if (deletions.length > 0) {
+    await Promise.all(deletions)
+  }
 }
 
 /** At most one live login operation per account, without queueing same-account

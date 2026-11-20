@@ -5,7 +5,7 @@ import { comparePassword, hashPassword, isValidPassword, PASSWORD_MAX_LENGTH } f
 import { generateToken } from '../../utils/jwt'
 import { success, unauthorized, forbidden } from '../../utils/response'
 import { issueHuiteacherCsrfToken, setHuiteacherSessionCookie, clearHuiteacherSessionCookie, getHuiteacherSessionToken } from '../../utils/authCookies'
-import { authenticateHuiteacher } from '../../middleware/auth'
+import { authenticateHuiteacher, primePrincipalCache } from '../../middleware/auth'
 import { revokeCurrentSession } from '../../utils/sessionRevocation'
 import { createMfaAttemptRateLimiter } from '../../middleware/mfaAttemptRateLimit'
 import { passwordChangeRateLimit, withPasswordChangeAdmission } from '../../middleware/passwordChangeAdmission'
@@ -30,7 +30,6 @@ const changeSchema = z.object({
   oldPassword: z.string().min(1).max(PASSWORD_MAX_LENGTH),
   newPassword: z.string().min(8).max(PASSWORD_MAX_LENGTH).refine(isValidPassword),
 }).strict()
-const DUMMY_HASH = '$2a$10$fuhNGsB2Z5/iwZtxlw1usOIb5sbX2OzkV/cccQJRbkSpHu2ZPql.a'
 const router = Router()
 router.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next() })
 
@@ -52,16 +51,43 @@ router.post('/login',loginRateLimit,withLoginAccountFailureThrottle(async(req,re
     const normalizedLogin=parsed.data.username.toLowerCase()
     const account=await withLoginAccountLookup(()=>
       prisma.campusAccount.findUnique({
-        where:{normalizedLogin},include:{user:true},
+        where:{normalizedLogin},
+        select:{
+          userId:true,
+          loginName:true,
+          user:{
+            select:{
+              id:true,
+              username:true,
+              accountDomain:true,
+              role:true,
+              platformRole:true,
+              passwordHash:true,
+              tokenVersion:true,
+              mustChangePassword:true,
+              isActive:true,
+              isFrozen:true,
+              expiresAt:true,
+              teacherApproved:true,
+            },
+          },
+        },
       })
     )
     const user=account?.user
     const usable=!!user && user.accountDomain==='SCHOOL' && user.isActive && !user.isFrozen
       && (!user.expiresAt || user.expiresAt>new Date())
-    const ok=await withLoginPasswordVerification(()=>
-      comparePassword(parsed.data.password,usable?user!.passwordHash:DUMMY_HASH)
-    )
-    const match=usable&&ok&&user!.isActive&&!user!.isFrozen?account:null
+    let ok=false
+    if(!usable){
+      const fakeDelayMs=35+Math.floor(Math.random()*26)
+      await new Promise(resolve=>setTimeout(resolve,fakeDelayMs))
+      ok=false
+    }else{
+      ok=await withLoginPasswordVerification(()=>
+        comparePassword(parsed.data.password,user!.passwordHash)
+      )
+    }
+    const match=usable&&ok&&user!.isActive&&!user!.isFrozen&&(!user!.expiresAt||user!.expiresAt>new Date())?account:null
     if(!match)return failedLogin(req,res)
     if(await schoolAccountNeedsMfa(match.userId)){
       const state=await beginSchoolMfaChallenge(req,res,match.userId,match.user.tokenVersion)
@@ -71,8 +97,7 @@ router.post('/login',loginRateLimit,withLoginAccountFailureThrottle(async(req,re
     await clearLoginFailures(req)
     const u=match.user
     if(u.platformRole==='STANDARD'){
-      const {primePrincipalCache}=await import('../../middleware/auth')
-      primePrincipalCache({
+      primePrincipalCache?.({
         userId:u.id,
         username:u.username,
         accountDomain:'SCHOOL',
@@ -96,6 +121,10 @@ router.post('/login',loginRateLimit,withLoginAccountFailureThrottle(async(req,re
     }))
     return success(res,{user:{id:u.id,username:match.loginName,role:u.role},product:'HUITEACHER'},'登录成功')
   }catch(cause:unknown){
+    if(isBoundedAdmissionBusyError(cause) && (cause.code==='LOGIN_VERIFY_BUSY' || cause.code==='LOGIN_LOOKUP_BUSY')){
+      res.setHeader('Retry-After',String(cause.retryAfterSeconds))
+      return res.status(503).json({code:cause.code,message:'登录服务繁忙，请稍后重试',data:null})
+    }
     if(isBoundedAdmissionBusyError(cause))res.setHeader('Retry-After',String(cause.retryAfterSeconds))
     return res.status(503).json({code:-1,message:'教育身份服务暂时不可用',data:null})
   }

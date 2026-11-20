@@ -59,37 +59,35 @@ function validStep(secret:Buffer,otp:string,lastUsedStep:bigint):number|null {
 
 // Current DB facts, not legacy User.role in a JWT, determine mandatory MFA.
 // Ordinary school teachers and parents are not automatically privileged.
-export async function schoolAccountNeedsMfa(userId:string):Promise<boolean> {  const rows=await prisma.$queryRaw<Array<{required:boolean}>>`
+export async function schoolAccountNeedsMfa(userId:string):Promise<boolean> {
+  const rows=await prisma.$queryRaw<Array<{required:boolean}>>`
+    WITH active_memberships AS MATERIALIZED (
+      SELECT m."id", m."organization_id", m."org_role"
+      FROM "organization_memberships" m
+      JOIN "organizations" o ON o."id"=m."organization_id" AND o."status"='ACTIVE'
+      WHERE m."user_id"=${userId}
+        AND m."valid_from"<=statement_timestamp()
+        AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+    )
     SELECT (
       u."role"::text='ADMIN' OR u."platform_role"::text='SYSTEM_ADMIN'
       OR EXISTS (
-        SELECT 1 FROM "organization_memberships" m JOIN "organizations" o
-          ON o."id"=m."organization_id" AND o."status"='ACTIVE'
-        WHERE m."user_id"=u."id" AND m."valid_from"<=statement_timestamp()
-          AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
-          AND m."org_role"='ORG_ADMIN'
+        SELECT 1 FROM active_memberships m
+        WHERE m."org_role"='ORG_ADMIN'
       )
       OR EXISTS (
-        SELECT 1 FROM "education_product_role_grants" r
-        JOIN "organization_memberships" member ON member."id"=r."membership_id"
-          AND member."organization_id"=r."organization_id"
-          AND member."valid_from"<=statement_timestamp()
-          AND (member."valid_until" IS NULL OR member."valid_until">statement_timestamp())
-        JOIN "education_product_entitlements" entitlement
-          ON entitlement."organization_id"=r."organization_id"
-          AND entitlement."product"=r."product" AND entitlement."status"='ACTIVE'
-        JOIN "organizations" organization ON organization."id"=r."organization_id"
-          AND organization."status"='ACTIVE'
-        WHERE member."user_id"=u."id"
+        SELECT 1 FROM active_memberships m
+        JOIN "education_product_role_grants" r
+          ON r."membership_id"=m."id" AND r."organization_id"=m."organization_id"
           AND r."role"='PRODUCT_ADMIN' AND r."revoked_at" IS NULL
+        JOIN "education_product_entitlements" entitlement
+          ON entitlement."organization_id"=m."organization_id"
+          AND entitlement."product"=r."product" AND entitlement."status"='ACTIVE'
       )
       OR EXISTS (
-        SELECT 1 FROM "organization_capability_grants" c
-        JOIN "organization_memberships" m ON m."id"=c."membership_id"
-          AND m."valid_from"<=statement_timestamp()
-          AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
-        JOIN "organizations" o ON o."id"=m."organization_id" AND o."status"='ACTIVE'
-        WHERE m."user_id"=u."id" AND c."revoked_at" IS NULL
+        SELECT 1 FROM active_memberships m
+        JOIN "organization_capability_grants" c
+          ON c."membership_id"=m."id" AND c."revoked_at" IS NULL
           AND c."capability" IN ('PSYCHOLOGY_STAFF','PARENT_REPORT_DISCLOSURE','REPORT_MEMBER_EXPORT','REPORT_EXPORT')
       )
     ) AS "required"
