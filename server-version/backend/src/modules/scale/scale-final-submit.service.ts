@@ -660,22 +660,35 @@ export const submitCompositeScaleFinal = async (
   const finalized = await finalizeParentAfterUnitSubmit(result)
   const finalizedParentStatus = (finalized as { _finalizedParentStatus?: string })._finalizedParentStatus
   const data = stripScaleFinalContext(finalized)
-  if (!responseOptions?.receiptOnly) return data
-  const receipt = { submissionId: data.submissionId, payloadHash: data.payloadHash, replayed: Boolean(data.replayed), completed: true as const }
   const parent = child.compositeAttempt as {
     status?: string
+    assignmentRef?: string | null
+    respondentType?: string | null
     asyncReportEpoch?: number | null
     trainingFeedbackSnapshotHash?: string | null
     compositeAssessment?: { productKind?: string | null; trainingFeedbackPolicyHash?: string | null } | null
   } | null | undefined
-  if (
+  const feedbackConfirmedNotDeferred = Boolean(
     parent
     && parent.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE'
     && parent.asyncReportEpoch === null
     && parent.trainingFeedbackSnapshotHash === null
     && parent.compositeAssessment.trainingFeedbackPolicyHash === null
-    && (parent.status === 'COMPLETED' || finalizedParentStatus === 'COMPLETED')
-  ) {
+    && (parent.status === 'COMPLETED' || finalizedParentStatus === 'COMPLETED'),
+  )
+  if (!responseOptions?.receiptOnly) {
+    if (feedbackConfirmedNotDeferred && data && typeof data === 'object') {
+      Object.defineProperty(data, '_preloadedRelationalFeedbackParent', {
+        value: {
+          assignmentRef: parent?.assignmentRef ?? null,
+          respondentType: parent?.respondentType ?? null,
+        },
+      })
+    }
+    return data
+  }
+  const receipt = { submissionId: data.submissionId, payloadHash: data.payloadHash, replayed: Boolean(data.replayed), completed: true as const }
+  if (feedbackConfirmedNotDeferred) {
     Object.defineProperty(receipt, '_receiptFeedbackConfirmedNotDeferred', { value: true })
   }
   return receipt

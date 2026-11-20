@@ -69,6 +69,7 @@ import { reconcileRunExecutionByRuntimeBinding } from '../../modules/assessment-
 import { cloneCachedStartComposite, loadStartComposite } from '../../modules/composite/composite.service'
 import { resetStartReadCachesForTests } from '../../modules/composite/start-read-cache'
 import { hasImmutableCanonicalValue } from '../../modules/assessment-runtime/canonical'
+import { projectRelationalUnitFinalResponse } from '../../modules/assessment-relational/result-authority'
 import { logger } from '../../utils/logger'
 
 const EXEC_ID = '11111111-1111-4111-8111-111111111111'
@@ -648,5 +649,43 @@ describe('Task-list planner bounds, 503 resource-gate transport, info caches, an
     first.deliveryCourseId = 'mutated-course'
     expect(second.deliveryCourseId).toBeUndefined()
     expect(cloneCachedStartComposite(null)).toBeNull()
+  })
+
+  it('anchors checkCampusCompositeAccessDetails with WITH target_exec AS MATERIALIZED and skips redundant feedback context reads on preloaded non-receipt Teacher submits', async () => {
+    dbMocks.queryRaw.mockResolvedValueOnce([{
+      executionId: EXEC_ID,
+      orgStatus: 'ACTIVE',
+      orgProductDomain: 'SCHOOL',
+      relationshipKind: 'PARENT_CHILD',
+    }]).mockResolvedValueOnce([{ allowed: true }])
+    await expect(checkCampusCompositeAccessAuthority({ attemptId: 'att-1', userId: USER_ID })).resolves.toBe(true)
+    const accessSql = flattenQueryRawCall(dbMocks.queryRaw.mock.calls[0])
+    expect(accessSql).toContain('WITH target_exec AS MATERIALIZED')
+
+    // Non-receipt Teacher scale submit with _preloadedRelationalFeedbackParent
+    // only queries relational_assessment_assignments once (skipping composite_assessment_attempts & composite_report_jobs).
+    const mockDb = {
+      $queryRaw: vi.fn().mockResolvedValueOnce([{
+        perspective: 'SELF_REPORT',
+        analysisMode: 'INDIVIDUAL_ONLY',
+      }]),
+      compositeAssessmentAttempt: { findUnique: vi.fn() },
+      compositeReportJob: { findUnique: vi.fn() },
+    }
+    const payload: Record<string, unknown> = {
+      submissionId: 'sub-1',
+      payloadHash: 'hash-1',
+      replayed: false,
+      completed: true,
+      result: { totalScore: 10 },
+    }
+    Object.defineProperty(payload, '_preloadedRelationalFeedbackParent', {
+      value: { assignmentRef: 'rel-1', respondentType: 'TEACHER' },
+    })
+    const projected = await projectRelationalUnitFinalResponse('att-teacher-1', payload, mockDb)
+    expect(projected).toBe(payload)
+    expect(mockDb.compositeAssessmentAttempt.findUnique).not.toHaveBeenCalled()
+    expect(mockDb.compositeReportJob.findUnique).not.toHaveBeenCalled()
+    expect(mockDb.$queryRaw).toHaveBeenCalledTimes(1)
   })
 })
