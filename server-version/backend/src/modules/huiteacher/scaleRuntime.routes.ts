@@ -709,17 +709,29 @@ router.post('/run-executions/:executionId/start-scale',
     if(result.state==='STARTED'&&result.runtimeBindingKind!=='COMPOSITE')
       throw new Error('Expected canonical Scale Composite binding')
     if(result.state!=='STARTED')return result
+    const freshlyCreated=(result as {_freshlyCreatedAttempt?:boolean})._freshlyCreatedAttempt===true
     // GET /composite-attempts/:id returns getAttemptState unchanged.
     return attachTeacherInlineCurrentUnit({
       requested:requestedTeacherInlineCurrentUnit(req),
       started:result,
       attemptId:result.runtimeBindingRef,
       actorUserId:req.user!.userId,
-      freshlyCreated:(result as {_freshlyCreatedAttempt?:boolean})._freshlyCreatedAttempt===true,
+      freshlyCreated,
       knownTemplateHashes:parseKnownTemplateHashes(req),
-      authorize:({attemptId,actorUserId})=>authorizeCurrentScaleAttempt({
-        actorUserId,accountDomain:req.user!.accountDomain,attemptId,
-      }),
+      authorize:async({attemptId,actorUserId})=>{
+        // For a freshly created attempt in this same request, ownScaleExecution
+        // and startAssessmentRunExecution just verified live execution authority.
+        // Avoid repeating the 3-query ownScaleExecution check post-commit while
+        // still enforcing consent checks when not proven consent-free.
+        if(freshlyCreated&&!result.replayed&&attemptId===result.runtimeBindingRef){
+          if(selected.consentFreeFinalReady===true)return
+          await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId)
+          return
+        }
+        await authorizeCurrentScaleAttempt({
+          actorUserId,accountDomain:req.user!.accountDomain,attemptId,
+        })
+      },
       project:state=>state,
     })
   }))

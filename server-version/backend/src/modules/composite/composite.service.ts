@@ -43,7 +43,7 @@ import { isLoadedCompositeParticipantFeedbackDeferred, trainingFeedbackReportRea
 import { freezeTrainingPersistenceSnapshot, readTrainingPersistencePolicy, trainingPersistenceMetadata } from './training-persistence.policy'
 import { trainingRoundPublicationIdentity, prepareTrainingPublicRound, assertTrainingTokenRound, publicRoundMetadata, trainingRoundSelect, type TrainingRoundInput } from './training-public-round'
 import { allocateTrainingMaterial, materialRestartClaim } from './training-material-allocation'
-import { canonicalHash } from '../assessment-runtime/canonical'
+import { canonicalHash, retainImmutableCanonicalValue } from '../assessment-runtime/canonical'
 import { assertStandardItemsVerifiedByContentBinding } from './training-start-child-admission'
 import { resolveTrainingFlowScopeForMaterialization, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers, TRAINING_FLOW_DEFINITION_SELECT, type VerifiedTrainingFlowMaterialization } from './training-flow-scope'
 import { buildTrainingFlowUnits } from './training-flow-definition'
@@ -362,8 +362,80 @@ export const loadComposite = async (id: string, includeItems = false, db: Db = p
 /** START-only: cheap identity read, then reuse a process-local 30s cache of the
  * fat publication tree keyed on id+snapshotHash+updatedAt. A published-version
  * change misses the cache. preloadStartComposite still hoists release/artifact
- * reads (themselves identity-keyed and TTL-bounded). */
-const cloneCachedStartComposite = (cached: any) => structuredClone(cached)
+ * reads (themselves identity-keyed and TTL-bounded).
+ *
+ * Survey-style immutable payload sharing: heavy inner scale definitions and
+ * frozen publication snapshots are deeply frozen and registered with
+ * retainImmutableCanonicalValue once when cached, while cloneCachedStartComposite
+ * shallow-clones only the outer mutable envelope so per-request properties
+ * (deliveryCourseId, _preloaded, _startReads, WeakMap item keys) remain isolated
+ * and downstream WeakMap caches (runnerDefinition, hashScaleDefinition) hit in O(1). */
+const prepareCachedStartComposite = <T>(composite: T): T => {
+  if (!composite || typeof composite !== 'object') return composite
+  const record = composite as Record<string, any>
+  if (Array.isArray(record.items)) {
+    for (const item of record.items) {
+      if (item?.scale?.definition && typeof item.scale.definition === 'object') {
+        try {
+          retainImmutableCanonicalValue(item.scale.definition)
+        } catch {
+          // Non-canonical JSON definition falls back safely.
+        }
+      }
+    }
+  }
+  if (record.trainingContentSnapshot && typeof record.trainingContentSnapshot === 'object') {
+    try {
+      retainImmutableCanonicalValue(record.trainingContentSnapshot)
+    } catch {
+      // Non-canonical snapshot falls back safely.
+    }
+  }
+  return composite
+}
+
+export const cloneCachedStartComposite = (cached: any) => {
+  if (!cached || typeof cached !== 'object') return cached
+  return {
+    ...cached,
+    ...(cached.creator && typeof cached.creator === 'object' ? { creator: { ...cached.creator } } : {}),
+    ...(cached.course && typeof cached.course === 'object' ? { course: { ...cached.course } } : {}),
+    ...(Array.isArray(cached.questionnaireCourses)
+      ? {
+          questionnaireCourses: cached.questionnaireCourses.map((entry: any) => ({
+            ...entry,
+            ...(entry?.course && typeof entry.course === 'object' ? { course: { ...entry.course } } : {}),
+          })),
+        }
+      : {}),
+    ...(Array.isArray(cached.items)
+      ? {
+          items: cached.items.map((item: any) => ({
+            ...item,
+            ...(item?.scale && typeof item.scale === 'object' ? { scale: { ...item.scale } } : {}),
+            ...(item?.cognitiveAssignment && typeof item.cognitiveAssignment === 'object'
+              ? {
+                  cognitiveAssignment: {
+                    ...item.cognitiveAssignment,
+                    ...(item.cognitiveAssignment.config && typeof item.cognitiveAssignment.config === 'object'
+                      ? { config: { ...item.cognitiveAssignment.config } }
+                      : {}),
+                  },
+                }
+              : {}),
+          })),
+        }
+      : {}),
+    ...(Array.isArray(cached.formSections)
+      ? {
+          formSections: cached.formSections.map((section: any) => ({
+            ...section,
+            ...(Array.isArray(section?.items) ? { items: section.items.map((fi: any) => ({ ...fi })) } : {}),
+          })),
+        }
+      : {}),
+  }
+}
 
 const startCompositeIdentity = async (id: string, db: Db = prisma) => {
   const identity = await db.compositeAssessment.findUnique({
@@ -457,7 +529,7 @@ export const loadStartComposite = async (
     return preloadStartComposite(db, cloneCachedStartComposite(cached))
   }
   const loaded = await startCompositeCache.singleFlight(key, async () => {
-    const value = await loadComposite(identity.id, true, db)
+    const value = prepareCachedStartComposite(await loadComposite(identity.id, true, db))
     if (value.updatedAt?.getTime() === identity.updatedAt?.getTime()
         && value.trainingContentSnapshotHash === identity.trainingContentSnapshotHash) {
       startCompositeCache.set(key, value)

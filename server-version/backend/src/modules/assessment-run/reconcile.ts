@@ -15,24 +15,19 @@ export type RunReconciliationResult =
   | { state: 'IN_PROGRESS' }
   | { state: 'NOT_STARTED' }
 
-export const reconcileRunExecutionFromRuntimeInTransaction = async (
+type LockedRunExecutionRow = {
+  id: string
+  status: string
+  completedAt: Date | null
+  relationalAssignmentId: string | null
+  runtimeBindingKind: string | null
+  runtimeBindingRef: string | null
+}
+
+const reconcileLockedRunExecutionInTransaction = async (
   tx: Tx,
-  executionId: string,
+  execution: LockedRunExecutionRow | undefined,
 ): Promise<RunReconciliationResult> => {
-  const rows = await tx.$queryRaw<Array<{
-    status: string
-    completedAt: Date | null
-    relationalAssignmentId: string | null
-    runtimeBindingKind: string | null
-    runtimeBindingRef: string | null
-  }>>`
-    SELECT "status", "completed_at" AS "completedAt", "relational_assignment_id" AS "relationalAssignmentId",
-      "runtime_binding_kind" AS "runtimeBindingKind", "runtime_binding_ref" AS "runtimeBindingRef"
-    FROM "assessment_run_executions"
-    WHERE "id" = ${executionId}
-    FOR UPDATE
-  `
-  const execution = rows[0]
   if (!execution) throw new RunReconciliationError('RUN_EXECUTION_NOT_FOUND', 'Run execution not found', 404)
   if (execution.status === 'COMPLETED' && execution.completedAt) {
     return { state: 'COMPLETED', completedAt: execution.completedAt, replayed: true }
@@ -58,7 +53,7 @@ export const reconcileRunExecutionFromRuntimeInTransaction = async (
           AND e."runtime_binding_kind"='HUITEACHER_FORM_V2'
           AND e."runtime_binding_ref"=form."id"
         WHERE form."id"=${execution.runtimeBindingRef}
-          AND e."id"=${executionId}
+          AND e."id"=${execution.id}
         FOR UPDATE OF form
       `
     : await tx.$queryRaw<Array<{
@@ -82,18 +77,45 @@ export const reconcileRunExecutionFromRuntimeInTransaction = async (
     throw new RunReconciliationError('RUN_ASSIGNMENT_MISSING', 'Run execution has no relational assignment', 409)
   }
 
-  const changed = await tx.$executeRaw`
-    UPDATE "assessment_run_executions"
-    SET "status" = 'COMPLETED', "completed_at" = ${attempt.completedAt}, "updated_at" = transaction_timestamp()
-    WHERE "id" = ${executionId} AND "status" <> 'COMPLETED'
+  // Coalesce canonical Run execution completion and relational assignment
+  // completion into a single atomic CTE roundtrip (Survey-style single-statement
+  // completion write).
+  const writeRows = await tx.$queryRaw<Array<{ changed: number }>>`
+    WITH updated_exec AS (
+      UPDATE "assessment_run_executions"
+      SET "status" = 'COMPLETED', "completed_at" = ${attempt.completedAt}, "updated_at" = transaction_timestamp()
+      WHERE "id" = ${execution.id} AND "status" <> 'COMPLETED'
+      RETURNING "id"
+    ),
+    updated_rel AS (
+      UPDATE "relational_assessment_assignments"
+      SET "status" = 'COMPLETED', "completed_at" = ${attempt.completedAt}, "updated_at" = transaction_timestamp()
+      WHERE "id" = ${execution.relationalAssignmentId}
+        AND "status" = 'STARTED'
+        AND "policy_domain" = 'ORGANIZATION_RUN'
+        AND EXISTS (SELECT 1 FROM updated_exec)
+      RETURNING "id"
+    )
+    SELECT (SELECT count(*)::int FROM updated_exec) AS "changed"
   `
-  if (Number(changed) !== 1) throw new RunReconciliationError('RUN_RECONCILIATION_CONFLICT', 'Run completion changed concurrently', 409)
-  await tx.$executeRaw`
-    UPDATE "relational_assessment_assignments"
-    SET "status" = 'COMPLETED', "completed_at" = ${attempt.completedAt}, "updated_at" = transaction_timestamp()
-    WHERE "id" = ${execution.relationalAssignmentId} AND "status" = 'STARTED' AND "policy_domain" = 'ORGANIZATION_RUN'
-  `
+  if (Number(writeRows[0]?.changed ?? 0) !== 1) {
+    throw new RunReconciliationError('RUN_RECONCILIATION_CONFLICT', 'Run completion changed concurrently', 409)
+  }
   return { state: 'COMPLETED', completedAt: attempt.completedAt, replayed: false }
+}
+
+export const reconcileRunExecutionFromRuntimeInTransaction = async (
+  tx: Tx,
+  executionId: string,
+): Promise<RunReconciliationResult> => {
+  const rows = await tx.$queryRaw<LockedRunExecutionRow[]>`
+    SELECT "id", "status", "completed_at" AS "completedAt", "relational_assignment_id" AS "relationalAssignmentId",
+      "runtime_binding_kind" AS "runtimeBindingKind", "runtime_binding_ref" AS "runtimeBindingRef"
+    FROM "assessment_run_executions"
+    WHERE "id" = ${executionId}
+    FOR UPDATE
+  `
+  return reconcileLockedRunExecutionInTransaction(tx, rows[0])
 }
 
 export const reconcileRunExecutionFromRuntime = (
@@ -116,12 +138,15 @@ export const reconcileRunExecutionByRuntimeBinding = async (input: {
     return rows[0] ? reconcileRunExecutionFromRuntime(rows[0].id) : null
   }
   return prisma.$transaction(async (tx) => {
-    const rows = await tx.$queryRaw<Array<{ id: string }>>`
-      SELECT "id" FROM "assessment_run_executions"
+    const rows = await tx.$queryRaw<LockedRunExecutionRow[]>`
+      SELECT "id", "status", "completed_at" AS "completedAt", "relational_assignment_id" AS "relationalAssignmentId",
+        "runtime_binding_kind" AS "runtimeBindingKind", "runtime_binding_ref" AS "runtimeBindingRef"
+      FROM "assessment_run_executions"
       WHERE "runtime_binding_kind" = ${input.runtimeBindingKind}
         AND "runtime_binding_ref" = ${input.runtimeBindingRef}
       LIMIT 1
+      FOR UPDATE
     `
-    return rows[0] ? reconcileRunExecutionFromRuntimeInTransaction(tx, rows[0].id) : null
+    return rows[0] ? reconcileLockedRunExecutionInTransaction(tx, rows[0]) : null
   })
 }
