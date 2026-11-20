@@ -3,7 +3,9 @@ import type { Request, Response } from 'express'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 const h = vi.hoisted(() => ({ publish: vi.fn().mockResolvedValue(undefined) }))
 vi.mock('../../services/reportReadyNotifications', () => ({ publishReportSchedulingHint: h.publish, onReportSchedulingHint: vi.fn(), prepareReportReadyNotifications: vi.fn() }))
-vi.mock('../../services/runtimeObservability', () => ({ runtimeEventLoopDelayMs: () => 0 }))
+vi.mock('../../services/runtimeObservability', async original => ({
+  ...await original<object>(), runtimeEventLoopDelayMs: () => 0,
+}))
 vi.mock('../../utils/logger', () => ({ logger: { info: vi.fn() } }))
 import { authenticatedWholeSubmissionPriority } from '../../services/wholeSubmissionPriority'
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
