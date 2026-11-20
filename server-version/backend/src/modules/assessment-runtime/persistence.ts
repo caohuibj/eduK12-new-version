@@ -1,5 +1,5 @@
 import type { WholeReceiptExecution } from '../composite/whole-questionnaire.service'
-import { enqueueCompositeReportForUnit } from './report-outbox.service'
+import { enqueueCompositeReportForUnit, type SynchronousScaleParent } from './report-outbox.service'
 import type { Prisma } from '@prisma/client'
 import { decryptUnifiedRuntimePayload } from './security'
 import { parseCanonicalUnitResultEnvelope, type CanonicalUnitResultEnvelopeV1 } from './unit-result'
@@ -8,6 +8,7 @@ export type AssessmentUnitSnapshotPayloadKind = 'UNIT_RESULT' | 'COLLECTION_FACT
 
 export interface CompletedUnitSnapshotInput {
   wholeReceipt?: WholeReceiptExecution
+  onSynchronousScaleParent?: (parent: SynchronousScaleParent) => void
   questionnaireAssessmentId?: string
   compositeAttemptId?: string
   attemptEpoch: number

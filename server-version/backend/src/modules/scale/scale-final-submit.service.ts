@@ -1,3 +1,4 @@
+import type { CommittedEducationScale } from '../assessment-runtime/unified-aggregate-finalizer.service'
 import { withSharedControlContext } from '../assessment-runtime/shared-control-records'
 import { canStartLibraryCourseScale } from './scale-access'
 import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
@@ -234,11 +235,13 @@ const isEducationResourceParent = (parent: {
   parent?.assignmentRef || parent?.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE',
 )
 
-const finalizeLinkedParent = async (assessment: any): Promise<{ status?: string } | null> => {
+const finalizeLinkedParent = async (assessment: any, committedScale?: CommittedEducationScale): Promise<{ status?: string } | null> => {
   let finalized: { status?: string } | null = null
   if (assessment.compositeAttemptId) {
     const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-    finalized = (await finalizeCompositeAttemptIfReady(assessment.compositeAttemptId)) ?? null
+    finalized = (await (committedScale
+      ? finalizeCompositeAttemptIfReady(assessment.compositeAttemptId, { committedScale })
+      : finalizeCompositeAttemptIfReady(assessment.compositeAttemptId))) ?? null
   }
   if (assessment.questionnaireAssessmentId) {
     const { finalizeQuestionnaireAttemptIfReady } = await import('../../services/questionnaire-form-section.service')
@@ -274,6 +277,7 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, loca
       ...data,
       shouldFinalize,
       finalizeAssessment: shouldFinalize ? child : null,
+      committedScale: data._committedScale,
       internalContext: {
         compositeAttemptId: child.compositeAttemptId ?? null,
         attemptEpoch: child.attemptEpoch,
@@ -517,14 +521,14 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, loca
 
 /** UNIT gate covers persist/score only; parent aggregate runs after release. */
 const finalizeParentAfterUnitSubmit = async <T>(result: T): Promise<Omit<T, 'shouldFinalize' | 'finalizeAssessment'>> => {
-  const record = result as T & { shouldFinalize?: boolean; finalizeAssessment?: unknown }
+  const record = result as T & { shouldFinalize?: boolean; finalizeAssessment?: unknown; committedScale?: CommittedEducationScale }
   let finalizedParentStatus: string | undefined
   if (record?.shouldFinalize && record.finalizeAssessment) {
-    const finalized = await measureRequestPhase('final_submit_parent_finalization', () => finalizeLinkedParent(record.finalizeAssessment))
+    const finalized = await measureRequestPhase('final_submit_parent_finalization', () => finalizeLinkedParent(record.finalizeAssessment, record.committedScale))
     finalizedParentStatus = finalized?.status
   }
   if (result && typeof result === 'object') {
-    const { shouldFinalize: _s, finalizeAssessment: _f, ...rest } = record as any
+    const { shouldFinalize: _s, finalizeAssessment: _f, committedScale: _c, ...rest } = record as any
     if (finalizedParentStatus) {
       Object.defineProperty(rest, '_finalizedParentStatus', { value: finalizedParentStatus })
     }
@@ -651,6 +655,7 @@ export const submitCompositeScaleFinal = async (
         ...data,
         shouldFinalize,
         finalizeAssessment: shouldFinalize ? child : null,
+        committedScale: data._committedScale,
         internalContext: {
           compositeAttemptId: child.compositeAttemptId ?? null,
           attemptEpoch: child.attemptEpoch,

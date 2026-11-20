@@ -1,3 +1,4 @@
+import { lockRunExecutionByRuntimeBinding, reconcileLockedRunExecutionInTransaction } from '../assessment-run/reconcile'
 import {isNativeBundleComposite} from '../bundle-product/runtime'
 import {prepareTrainingFinalReceipt} from '../composite/training-content-final'
 import { applyTrainingAttemptScope } from '../composite/training-variant-scope'
@@ -8,9 +9,9 @@ import { mapCompositeSection } from './form-section-definition'
 import { compactAssessmentStorageEnabled } from './compact-field-codec'
 import { encryptCompactQuestionnaireReport } from '../reporting/compact-questionnaire-report'
 import { loadStoredCanonicalUnitResults } from './compact-assessment-storage'
-import { assertReportJobIdentity, type ReportJobIdentity } from './report-outbox.service'
+import { assertReportJobIdentity, type ReportJobIdentity, type SynchronousScaleParent } from './report-outbox.service'
 import { compiledHashFromInstance as bundleRuntimeHash } from '../bundle-product/runtime'
-import { Prisma } from '@prisma/client'
+import { Prisma, type AssessmentUnitSnapshot } from '@prisma/client'
 import { prisma } from '../../config/database'
 import {
   readCompositeAttemptContext,
@@ -358,6 +359,8 @@ type CanonicalPayload = {
 }
 
 type CompletionResult = {
+  _runReconciled?: true
+  _committedScaleCompletion?: true
   taskSatisfaction?: string | null
   status: string
   progress: number
@@ -1111,7 +1114,45 @@ const finalizeTrainingFlowCompositeUnified = async (attemptId: string, expected:
   }, { isolationLevel: 'ReadCommitted' }))
 )
 
-const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity, preloadedGraph?: any): Promise<CompletionResult | null> => {
+export type CommittedEducationScale = {
+  parent: SynchronousScaleParent
+  snapshot: AssessmentUnitSnapshot
+  canonical: CanonicalUnitResultEnvelopeV1
+}
+
+const finalizeCommittedEducationScale = async ({ parent, snapshot, canonical }: CommittedEducationScale): Promise<CompletionResult | null> => {
+  const definition = parent.compositeAssessment
+  if (!parent.assignmentRef || parent.asyncReportEpoch === parent.attemptEpoch
+    || definition.productKind !== 'ORGANIZATION_RESOURCE'
+    || parent.compiledBundleRuntimeHash !== null || definition.reportPackageKey !== null
+    || definition.reportPackageVersion !== null || definition.reportPackageProfile !== null
+    || definition.reportPackageSnapshotEncrypted !== null || definition.analysisProtocolKey !== null
+    || definition.trainingVariantDigest !== null || parent.trainingVariantAllocationHash !== null) return null
+
+  const frozenSlots = await measureRequestPhase('aggregate.decrypt_parse', () => readFrozenSlotSet(parent))
+  const [slot] = frozenSlots.slots
+  if (frozenSlots.slots.length !== 1 || !slot?.required || slot.unitType !== 'SCALE') return null
+  if (snapshot.compositeAttemptId !== parent.id) throw aggregateInputError('量表快照不属于当前作答')
+  validateSnapshotHeader(snapshot, slot, parent.attemptEpoch)
+  validateCanonicalPayload({ row: snapshot, slot, envelope: canonical, contextHash: parent.contextSnapshotHash })
+  const header = headerFromRow(snapshot)
+  const aggregateInputHash = buildAggregateInputHash({
+    attemptEpoch: parent.attemptEpoch, contextHash: parent.contextSnapshotHash, compiledBundleRuntimeHash: null,
+    entries: [{ slotKey: header.slotKey, terminalState: header.terminalState, payloadKind: header.payloadKind, resultHash: canonical.resultHash }],
+  })
+  const completed = await persistCompositeCompletion({
+    parent, frozenSlots, headers: [header], contextHash: parent.contextSnapshotHash,
+    compiledBundleRuntimeHash: null, aggregateInputHash, taskSatisfaction: null,
+    verifiedPayloads: [{ header: snapshot, envelope: canonical }], packageAnalysis: null, payloadEncrypted: null,
+    // Content interpretation takes additional release locks. Keep its Run
+    // projection after commit, outside the release lock sequence.
+    reconcileRun: parent.trainingContentBinding === null && parent.trainingContentBindingHash === null,
+  })
+  Object.defineProperty(completed, '_committedScaleCompletion', { value: true })
+  return completed
+}
+
+const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity, preloadedGraph?: any, committedScale?: CommittedEducationScale): Promise<CompletionResult | null> => {
   const route = preloadedParent ?? await measureRequestPhase('aggregate.parent_probe_db', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId }, select: compositeParentHeaderSelect,
   }))
@@ -1120,6 +1161,10 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
     route.trainingFlowPathEncrypted, route.trainingFlowPathHash].some(value => value != null)) {
     return finalizeTrainingFlowCompositeUnified(attemptId, reportJob ?? { attemptEpoch: route.attemptEpoch,
       slotSetHash: route.frozenActiveSlotSetHash as string, contextHash: route.contextSnapshotHash })
+  }
+  if (!reportJob && committedScale?.parent === route && route.id === attemptId && route.status === 'IN_PROGRESS') {
+    const completed = await finalizeCommittedEducationScale(committedScale)
+    if (completed) return completed
   }
   const probe = await probeUnifiedParent({ parentId: attemptId, composite: true, preloadedParent: route, reportJob })
   if (probe.kind === 'missing') return null
@@ -1249,12 +1294,17 @@ const persistCompositeCompletion = async (input: {
   aggregateInputHash: string
   packageAnalysis: { analysis: any } | null
   payloadEncrypted: string | null
+  reconcileRun?: boolean
 }): Promise<CompletionResult> => {
   const fallbackCompletedAt = new Date()
   const completedAt = maxRequiredSnapshotCompletedAt(input.frozenSlots.slots, input.headers, fallbackCompletedAt)
   try {
     return await measureRequestPhase('aggregate.persist', () => prisma.$transaction(async (tx) => {
-      // CAS-first: claim parent completion before durable analysis snapshot write.
+      // Maintain Execution → Parent → Assignment when writing both terminal
+      // states in one transaction. The Child has already committed.
+      const execution = input.reconcileRun ? await lockRunExecutionByRuntimeBinding(tx, {
+        runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: input.parent.id,
+      }) : undefined
       const updated = await tx.compositeAssessmentAttempt.updateMany({
         where: parentGuard(input.parent),
         data: {
@@ -1343,8 +1393,15 @@ const persistCompositeCompletion = async (input: {
           update: {},
         })
       }
-      return { status: 'COMPLETED', progress: 100, completedAt, aggregateInputHash: input.aggregateInputHash, taskSatisfaction:input.taskSatisfaction,
+      const result: CompletionResult = { status: 'COMPLETED', progress: 100, completedAt, aggregateInputHash: input.aggregateInputHash, taskSatisfaction:input.taskSatisfaction,
         totalTime: Math.max(0, completedAt.getTime() - new Date(input.parent.startedAt).getTime()) }
+      if (execution) {
+        await reconcileLockedRunExecutionInTransaction(tx, execution, {
+          id: input.parent.id, status: 'COMPLETED', completedAt, assignmentRef: input.parent.assignmentRef,
+        })
+        Object.defineProperty(result, '_runReconciled', { value: true })
+      }
+      return result
     }, { isolationLevel: 'ReadCommitted' }))
   } catch (error) {
     if (error instanceof AggregateCasLost) {
@@ -1559,10 +1616,10 @@ const persistQuestionnaireCompletion = async (input: {
   }
 }
 
-export const finalizeCompositeAttemptUnifiedIfReady = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity, preloadedGraph?: any) => (
+export const finalizeCompositeAttemptUnifiedIfReady = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity, preloadedGraph?: any, committedScale?: CommittedEducationScale) => (
   withAggregateFinalizationAdmission(async () => {
     try {
-      return await finalizeCompositeUnifiedImpl(attemptId, preloadedParent, reportJob, preloadedGraph)
+      return await finalizeCompositeUnifiedImpl(attemptId, preloadedParent, reportJob, preloadedGraph, committedScale)
     } catch (error) {
       if (error instanceof InstrumentFinalSubmitError) throw error
       if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1, 'aggregate_finalization')
