@@ -193,16 +193,30 @@ export async function allocateResearchFlowOnAdmission(tx:Prisma.TransactionClien
   preparedDigest?:{publicationId:string;snapshotDigest:string}
   preparedSnapshot?:ResearchFrozenPublication
 }){
-  const visible=await tx.$queryRaw<Array<{definition_digest:string;has_flow:boolean}>>`
-    SELECT publication.definition_digest,COALESCE(jsonb_typeof(publication.compiled_snapshot->'flow') <> 'null',false) AS has_flow
-    FROM survey_publications publication
-    WHERE publication.id=${input.publicationId} AND publication.project_id=${input.projectId}`
-  if(visible.length!==1)fail('研究入场时冻结发布定义不可访问')
-  if(!visible[0].has_flow)return
   const prepared=input.preparedDigest,preparedSnapshot=input.preparedSnapshot
+  const hasMatchingPreparedPublication=Boolean(prepared&&preparedSnapshot&&prepared.publicationId===input.publicationId)
+  // When a pre-gate prepared snapshot is present for this publicationId, read
+  // only the scalar definition_digest without detoasting compiled_snapshot->'flow'
+  // inside the Wave lock; if the locked digest matches prepared.snapshotDigest,
+  // preparedSnapshot.flow already determines flow presence authoritatively.
+  const visible=hasMatchingPreparedPublication
+    ?await tx.$queryRaw<Array<{definition_digest:string;has_flow?:boolean}>>`
+      SELECT publication.definition_digest
+      FROM survey_publications publication
+      WHERE publication.id=${input.publicationId} AND publication.project_id=${input.projectId}`
+    :await tx.$queryRaw<Array<{definition_digest:string;has_flow:boolean}>>`
+      SELECT publication.definition_digest,COALESCE(jsonb_typeof(publication.compiled_snapshot->'flow') <> 'null',false) AS has_flow
+      FROM survey_publications publication
+      WHERE publication.id=${input.publicationId} AND publication.project_id=${input.projectId}`
+  if(visible.length!==1)fail('研究入场时冻结发布定义不可访问')
+  const digestMatchesPrepared=hasMatchingPreparedPublication&&prepared!.snapshotDigest===visible[0].definition_digest
+  if(digestMatchesPrepared){
+    if(!preparedSnapshot!.flow)return
+  }else if(visible[0].has_flow===false){
+    return
+  }
   let snapshot:ResearchFrozenPublication
-  if(prepared&&preparedSnapshot?.flow&&prepared.publicationId===input.publicationId
-    &&prepared.snapshotDigest===visible[0].definition_digest){
+  if(digestMatchesPrepared&&preparedSnapshot?.flow){
     snapshot=preparedSnapshot
   }else{
     const publication=await tx.surveyPublication.findFirst({where:{

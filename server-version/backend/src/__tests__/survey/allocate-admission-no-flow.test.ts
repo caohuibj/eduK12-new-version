@@ -40,5 +40,19 @@ describe('allocateResearchFlowOnAdmission snapshot load',()=>{
       preparedSnapshot:{projectId:'project',waveId:'wave',flow:{flowDigest:'flow'}} as never,
     })).rejects.toThrow('locked flow read')
     expect(findFirst).not.toHaveBeenCalled()
+    const sql=String((tx.$queryRaw.mock.calls[0] as unknown as [TemplateStringsArray])[0].join(' '))
+    expect(sql).not.toContain('compiled_snapshot')
+  })
+  it('skips compiled_snapshot TOAST probe and returns immediately when preparedSnapshot has no flow and digest matches',async()=>{
+    const findFirst=vi.fn()
+    const tx={$queryRaw:vi.fn(async()=>[{definition_digest:'d'.repeat(64)}]),surveyPublication:{findFirst}}
+    await expect(allocateResearchFlowOnAdmission(tx as never,{...input,
+      preparedDigest:{publicationId:'publication',snapshotDigest:'d'.repeat(64)},
+      preparedSnapshot:{projectId:'project',waveId:'wave'} as never,
+    })).resolves.toBeUndefined()
+    expect(tx.$queryRaw).toHaveBeenCalledTimes(1)
+    const sql=String((tx.$queryRaw.mock.calls[0] as unknown as [TemplateStringsArray])[0].join(' '))
+    expect(sql).not.toContain('compiled_snapshot')
+    expect(findFirst).not.toHaveBeenCalled()
   })
 })
