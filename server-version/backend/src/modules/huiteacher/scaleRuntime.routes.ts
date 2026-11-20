@@ -24,7 +24,7 @@ import { isAssessmentStartResourceGateError } from '../../services/assessmentRes
 import {readTeacherPersonalChanges} from '../reporting/teacher-personal-changes.service'
 import { readTeacherPersonalScaleReport } from './scalePersonalReport.service'
 import { compositeController } from '../composite/composite.controller'
-import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
+import { relationalRuntimeConsentAuthority, type RuntimeConsentHeader } from '../assessment-relational/runtime-consent'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 import { attachTeacherInlineCurrentUnit, requestedTeacherInlineCurrentUnit } from './inlineCurrentUnit'
 
@@ -749,7 +749,13 @@ router.post('/run-executions/:executionId/start-scale',
         // still enforcing consent checks when not proven consent-free.
         if(freshlyCreated&&!result.replayed&&attemptId===result.runtimeBindingRef){
           if(selected.consentFreeFinalReady===true)return
-          await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId)
+          const parent=(result as {_educationWholePreload?:{parent?:RuntimeConsentHeader}})._educationWholePreload?.parent
+          if(parent?.id===attemptId&&parent.userId===actorUserId
+            &&typeof parent.assignmentRef==='string'&&(parent.consentId===null||typeof parent.consentId==='string')){
+            await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId,parent)
+          }else{
+            await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId)
+          }
           return
         }
         await authorizeCurrentScaleAttempt({

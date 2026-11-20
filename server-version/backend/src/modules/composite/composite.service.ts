@@ -3152,6 +3152,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
   const requiredScaleItems = items.filter((item: any) => item.required && item.type === 'SCALE')
   const canBatchScales = !verifiedFlowMaterialization && requiredScaleItems.length > 1 && typeof (db.assessment as any)?.createMany === 'function'
   const pendingScales: Array<{ id: string; item: any; frozenScale: Awaited<ReturnType<typeof freezeScaleRuntimeAtAttemptStart>> | null; data: Record<string, unknown> }> = []
+  let freshEducationScaleChild: object | undefined
   await withPreloadedScaleStartFreeze(
     db,
     requiredScaleItems.map((item: any) => ({ scaleId: item.scaleId, code: item.scale?.code, instrumentVersion: item.scale?.instrumentVersion })),
@@ -3239,6 +3240,10 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
             },
           })
           if (frozenScale) {
+            if (educationProduct && !verifiedFlowMaterialization && requiredScaleItems.length === 1 && child.runtimeSnapshotEncrypted) {
+              freshEducationScaleChild = { ...child, scale: item.scale }
+              freshScaleRuntimeByChild.set(freshEducationScaleChild, frozenScale)
+            }
             await retainFrozenScaleAssessmentImages({ assessmentId: child.id, snapshot: frozenScale, db })
             runtime.scales.push({
               compositeItemId: item.id,
@@ -3308,10 +3313,10 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
       }
     },
   )
-  // Reuse the exact input rows only after createMany succeeded. No child
-  // reread is needed for the fresh, untimed whole projection (including
-  // Form-only composites where requiredScaleItems is empty).
-  if (pendingScales.length === requiredScaleItems.length) {
+  // Reuse the persisted single child or the exact rows accepted by createMany.
+  if (freshEducationScaleChild) {
+    Object.defineProperty(runtime, '_freshScaleChildren', { value: [freshEducationScaleChild] })
+  } else if (pendingScales.length === requiredScaleItems.length) {
     Object.defineProperty(runtime, '_freshScaleChildren', { value: pendingScales.map(entry => {
       const child = {
         ...entry.data, questionnaireAssessmentId: null,
@@ -4141,7 +4146,7 @@ export const projectFreshStartedAttempt = async (
   }
 }
 
-export const buildWholeStartPreload = (attempt: any, children: any[] | undefined, source: any) => {
+export const buildWholeStartPreload = (attempt: any, children: any[] | undefined, source: any, skipCurrentUnitActivation = true) => {
   if (!children || !source) return { parent: undefined, preloadedState: undefined }
   seedFreshScaleChildren(children)
   const parent = {
@@ -4157,7 +4162,7 @@ export const buildWholeStartPreload = (attempt: any, children: any[] | undefined
     ? {
         snapshots: [],
         scaleChildById: new Map(children.map((child: any) => [child.id, child])),
-        skipCurrentUnitActivation: true,
+        skipCurrentUnitActivation,
       }
     : undefined
   return { parent, preloadedState }

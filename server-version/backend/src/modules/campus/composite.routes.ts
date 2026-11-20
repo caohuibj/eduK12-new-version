@@ -1,3 +1,4 @@
+import { checkCampusCompositeAccessDetails } from './campus-composite-authority'
 import { Router, type Request,type Response,type NextFunction } from 'express'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -57,10 +58,7 @@ async function campusCompositeAccess(req:Request,res:Response,next:NextFunction)
     const attemptId=req.params.attemptId
     if(!req.user||req.user.accountDomain!=='SCHOOL'||!attemptId)
       return notFound(res,'当前校园测评不可访问')
-    const authorityModule = await import('./campus-composite-authority')
-    const access = typeof authorityModule.checkCampusCompositeAccessDetails === 'function'
-      ? await authorityModule.checkCampusCompositeAccessDetails({ attemptId, userId: req.user.userId })
-      : { allowed: await authorityModule.checkCampusCompositeAccessAuthority({ attemptId, userId: req.user.userId }) }
+    const access = await checkCampusCompositeAccessDetails({ attemptId, userId: req.user.userId })
     if(!access.allowed)return notFound(res,'当前校园测评不可访问')
     if(access.consentFreeFinalReady&&res.locals&&typeof res.locals==='object'){
       (res.locals as Record<string,unknown>).campusConsentFreeFinalReady=true

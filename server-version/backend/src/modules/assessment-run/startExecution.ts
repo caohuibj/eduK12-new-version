@@ -490,9 +490,11 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
     value: (attempt as { _freshlyCreatedAttempt?: boolean })._freshlyCreatedAttempt === true,
   })
   const sourceComposite = (attempt as any)._startComposite
+  const children = (attempt as any)._freshScaleChildren as object[] | undefined
   if (sourceComposite) {
+    // A fresh single Scale still activates admission at current-unit delivery.
     Object.defineProperty(result, '_educationWholePreload', {
-      value: buildWholeStartPreload(attempt, (attempt as any)._freshScaleChildren, sourceComposite),
+      value: buildWholeStartPreload(attempt, children, sourceComposite, children?.length !== 1),
     })
   }
   return result

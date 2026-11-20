@@ -178,7 +178,8 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
         FROM activities act
         JOIN "campus_activity_runs" ar ON ar."course_id"=act."courseId"
         JOIN "assessment_runs" r ON r."id"=ar."run_id" AND r."status" IN ('PUBLISHED','CLOSED')
-      ),
+      )
+      ${skipContentTasks ? Prisma.empty : Prisma.sql`,
       activity_assignments AS MATERIALIZED (
         SELECT
           asg."id",
@@ -194,7 +195,6 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
           ) AS "complete"
         FROM activities act
         JOIN "assignments" asg ON asg."course_id"=act."courseId" AND asg."status"='PUBLISHED'
-        WHERE ${!skipContentTasks}
       ),
       activity_checkins AS MATERIALIZED (
         SELECT
@@ -209,13 +209,14 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
           ) AS "complete"
         FROM activities act
         JOIN "checkins" chk ON chk."course_id"=act."courseId"
-        WHERE ${!skipContentTasks}
-      )
+      )`}
       SELECT
         COALESCE((SELECT jsonb_agg(to_jsonb(a) ORDER BY a."courseId") FROM activities a), '[]'::jsonb) AS "activities",
         COALESCE((SELECT jsonb_agg(to_jsonb(lr)) FROM linked_runs lr), '[]'::jsonb) AS "linkedRuns",
-        COALESCE((SELECT jsonb_agg(to_jsonb(asg)) FROM activity_assignments asg), '[]'::jsonb) AS "assignments",
-        COALESCE((SELECT jsonb_agg(to_jsonb(chk)) FROM activity_checkins chk), '[]'::jsonb) AS "checkins"
+        ${skipContentTasks ? Prisma.sql`'[]'::jsonb AS "assignments", '[]'::jsonb AS "checkins"` : Prisma.sql`
+          COALESCE((SELECT jsonb_agg(to_jsonb(asg)) FROM activity_assignments asg), '[]'::jsonb) AS "assignments",
+          COALESCE((SELECT jsonb_agg(to_jsonb(chk)) FROM activity_checkins chk), '[]'::jsonb) AS "checkins"
+        `}
     `
     const activityWithMembers = coalescedActivityAndRuns[0]?.activities ?? []
     const activityRows: CampusActivityForStudent[] = activityWithMembers.map(({ membershipIds: _m, ...row }) => row)

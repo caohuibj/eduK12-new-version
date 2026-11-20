@@ -316,9 +316,12 @@ const probeUnifiedParent = async (input: {
   if (parent.status !== 'IN_PROGRESS') return { kind: 'terminal', result: terminalFromParent(parent) }
 
   const frozenSlots = await measureRequestPhase('aggregate.decrypt_parse', () => readFrozenSlotSet(parent))
-  // Only background finalization, after canonical readiness, eagerly loads
-  // payloads. One invocation-local read serves both completeness and scoring.
-  const snapshotRows = input.reportJob && process.env.ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED !== 'false'
+  // After the synchronous single-Scale submit commits, completeness and
+  // scoring can share one database read just as report workers do. Multi-unit
+  // synchronous submissions still check lightweight headers before payloads.
+  const singleRelationalScale = input.composite && Boolean(parent.assignmentRef)
+    && frozenSlots.slots.length === 1 && frozenSlots.slots[0]?.unitType === 'SCALE'
+  const snapshotRows = (input.reportJob || singleRelationalScale) && process.env.ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED !== 'false'
     ? await loadSnapshotPayloads({ parentId: input.parentId, attemptEpoch: parent.attemptEpoch, composite: input.composite })
     : undefined
   const headers = snapshotRows ? snapshotRows.map(headerFromRow) : await loadSnapshotHeaders({

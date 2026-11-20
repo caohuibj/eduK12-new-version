@@ -255,6 +255,11 @@ export const lockExecutionEnvelope = async (
     `
   }
   const rows = await tx.$queryRaw<ExecutionLockRow[]>`
+    WITH target_exec AS MATERIALIZED (
+      SELECT e.* FROM "assessment_run_executions" e
+      WHERE e."id" = ${executionId}
+      FOR UPDATE OF e
+    )
     SELECT /* lockExecutionEnvelope: assessment_run_executions */
       e."organization_id" AS "organizationId", e."run_id" AS "runId",
       e."id" AS "executionId", e."track_id" AS "trackId",
@@ -320,7 +325,7 @@ export const lockExecutionEnvelope = async (
         'completedAt', CASE WHEN a."completed_at" IS NULL THEN NULL ELSE to_char(a."completed_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') END,
         'revokedAt', CASE WHEN a."revoked_at" IS NULL THEN NULL ELSE to_char(a."revoked_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') END
       ) END AS "assignmentRow"
-    FROM "assessment_run_executions" e
+    FROM target_exec e
     JOIN "organizations" o ON o."id" = e."organization_id"
     JOIN "assessment_runs" r
       ON r."organization_id" = e."organization_id"
@@ -341,8 +346,6 @@ export const lockExecutionEnvelope = async (
       AND respondent."id" = e."respondent_actor_snapshot_id"
     LEFT JOIN "relational_assessment_assignments" a
       ON a."id" = e."relational_assignment_id"
-    WHERE e."id" = ${executionId}
-    FOR UPDATE OF e
   `
   if (!rows[0]) throw new RunStartClaimError('RUN_EXECUTION_NOT_FOUND', 'Run execution not found', 404)
   if (rows[0].organizationId !== identity.organizationId || rows[0].runId !== identity.runId) {

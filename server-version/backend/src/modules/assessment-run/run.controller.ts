@@ -1,3 +1,4 @@
+import { withSharedControlContext } from '../assessment-runtime/shared-control-records'
 import {catalogDiscoveryQueryFields,catalogTagFacets,matchesCatalogDiscovery,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import { RELATIONAL_RESOURCE_KINDS } from '../assessment-relational/types'
 import {addPrivateScaleRunTrack,addPrivateFormRunTrack,addPrivateCompositionRunTrack} from '../education-tools/private-tool.run-adapter'
@@ -321,39 +322,43 @@ export const assessmentRunController = {
               return success(res, started)
             }
           }
-          const preloaded = (started as {
-            _educationWholePreload?: {
-              parent?: Parameters<typeof import('../composite/composite.service').getAttemptState>[4]
-              preloadedState?: Parameters<typeof import('../composite/composite.service').getAttemptState>[5]
-            }
-          })._educationWholePreload
-          const { getAttemptState } = await import('../composite/composite.service')
-          const currentUnit = preloaded?.parent
-            ? await getAttemptState(
-                started.runtimeBindingRef,
-                { userId: req.user.userId },
-                undefined,
-                'current-unit',
-                preloaded.parent,
-                preloaded.preloadedState,
-              )
-            : await getAttemptState(
-                started.runtimeBindingRef,
-                { userId: req.user.userId },
-                undefined,
-                'current-unit',
-              )
-          const inlineWhole = await attachEducationInlineWhole({
-            currentUnit,
-            userId: req.user.userId,
-            freshlyCreated: (started as { _freshlyCreatedAttempt?: boolean })._freshlyCreatedAttempt === true,
-            preloadedParent: preloaded?.parent,
-            knownTemplateHashes: parseKnownTemplateHashes(req),
+          const attemptId = started.runtimeBindingRef
+          const { userId } = req.user
+          return await withSharedControlContext(async () => {
+            const preloaded = (started as {
+              _educationWholePreload?: {
+                parent?: Parameters<typeof import('../composite/composite.service').getAttemptState>[4]
+                preloadedState?: Parameters<typeof import('../composite/composite.service').getAttemptState>[5]
+              }
+            })._educationWholePreload
+            const { getAttemptState } = await import('../composite/composite.service')
+            const currentUnit = preloaded?.parent
+              ? await getAttemptState(
+                  attemptId,
+                  { userId: userId },
+                  undefined,
+                  'current-unit',
+                  preloaded.parent,
+                  preloaded.preloadedState,
+                )
+              : await getAttemptState(
+                  attemptId,
+                  { userId: userId },
+                  undefined,
+                  'current-unit',
+                )
+            const inlineWhole = await attachEducationInlineWhole({
+              currentUnit,
+              userId: userId,
+              freshlyCreated: (started as { _freshlyCreatedAttempt?: boolean })._freshlyCreatedAttempt === true,
+              preloadedParent: preloaded?.parent,
+              knownTemplateHashes: parseKnownTemplateHashes(req),
+            })
+            const wallTimeMs = Date.now() - startMs
+            const { logger } = await import('../../utils/logger')
+            logger.info('assessment-run inline delivery', { phase: 'inline_delivery', outcome: 'success', wallTimeMs })
+            return success(res, { ...started, currentUnit, ...(inlineWhole ?? {}) })
           })
-          const wallTimeMs = Date.now() - startMs
-          const { logger } = await import('../../utils/logger')
-          logger.info('assessment-run inline delivery', { phase: 'inline_delivery', outcome: 'success', wallTimeMs })
-          return success(res, { ...started, currentUnit, ...(inlineWhole ?? {}) })
         } catch (projectionErr: any) {
           // Failure outside the committed transaction falls back to plain started result.
           const wallTimeMs = Date.now() - startMs

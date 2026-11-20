@@ -1,3 +1,4 @@
+import { withSharedControlContext } from '../assessment-runtime/shared-control-records'
 import { canStartLibraryCourseScale } from './scale-access'
 import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
@@ -619,7 +620,7 @@ export const submitCompositeScaleFinal = async (
   input: Omit<FinalScaleSubmitInput, 'assessmentId' | 'userId' | 'compositeAttemptId' | 'questionnaireSessionId'>,
   context: { userId?: string | null; recoveryTokenHash?: string },
   responseOptions?: { receiptOnly: true },
-) => {
+) => withSharedControlContext(async () => {
   const child = await measureRequestPhase('final_submit_admission', () => prisma.assessment.findFirst({
     where: { compositeAttemptId: attemptId, compositeItemId: itemId },
     select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
@@ -692,7 +693,7 @@ export const submitCompositeScaleFinal = async (
     Object.defineProperty(receipt, '_receiptFeedbackConfirmedNotDeferred', { value: true })
   }
   return receipt
-}
+})
 
 /**
  * Restart a standalone in-progress assessment without deleting its answers.
