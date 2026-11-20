@@ -1,3 +1,4 @@
+import { StrictMode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -55,8 +56,8 @@ vi.mock('../../../services/completionRetry', async (importOriginal) => {
 
 import CompositeAssessmentPage from '../CompositeAssessmentPage'
 
-const renderPublicPage = () =>
-  render(
+const renderPublicPage = (strict = false) => {
+  const page = (
     <MemoryRouter initialEntries={['/public/composite/token-1']}>
       <Routes>
         <Route
@@ -64,8 +65,10 @@ const renderPublicPage = () =>
           element={<CompositeAssessmentPage />}
         />
       </Routes>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
+  return render(strict ? <StrictMode>{page}</StrictMode> : page)
+}
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -536,6 +539,45 @@ describe('WHOLE_LOCAL fresh-start vs existing attempt recovery (P1 #727)', () =>
         },
       },
     }],
+  })
+
+  it.each([false, true])('uses the authorized inline START definition through runner initialization (strict=%s)', async strict => {
+    const id = 'inline-public-whole'
+    mockPublicApi.info.mockResolvedValue({ code: 0, data: { name: '公开整卷', items: [] } })
+    mockPublicApi.start.mockResolvedValueOnce({
+      code: 0, message: 'ok',
+      data: {
+        attempt: wholeAttempt(id, { contextSnapshotHash: 'context' }),
+        recoveryToken: 'r'.repeat(43),
+        freshlyCreated: true,
+        wholeDefinition: wholeDef(id),
+      },
+    })
+    mockPublicApi.wholeDefinition.mockResolvedValue({ code: 0, message: 'ok', data: wholeDef(id) })
+    renderPublicPage(strict)
+    fireEvent.click(await screen.findByRole('button', { name: '开始匿名测评' }))
+    expect(await screen.findByText('整卷第 1 / 1 题')).toBeInTheDocument()
+    expect(mockPublicApi.wholeDefinition).not.toHaveBeenCalled()
+    expect(mockPublicApi.reportStatus).not.toHaveBeenCalled()
+  })
+
+  it('fetches the authoritative definition when the inline epoch mismatches START', async () => {
+    const id = 'inline-public-stale'
+    mockPublicApi.info.mockResolvedValue({ code: 0, data: { name: '公开整卷', items: [] } })
+    mockPublicApi.start.mockResolvedValueOnce({
+      code: 0, message: 'ok',
+      data: {
+        attempt: wholeAttempt(id, { contextSnapshotHash: 'context' }),
+        recoveryToken: 'r'.repeat(43),
+        freshlyCreated: true,
+        wholeDefinition: { ...wholeDef(id), attemptEpoch: 2 },
+      },
+    })
+    mockPublicApi.wholeDefinition.mockResolvedValueOnce({ code: 0, message: 'ok', data: wholeDef(id) })
+    renderPublicPage()
+    fireEvent.click(await screen.findByRole('button', { name: '开始匿名测评' }))
+    expect(await screen.findByText('整卷第 1 / 1 题')).toBeInTheDocument()
+    expect(mockPublicApi.wholeDefinition).toHaveBeenCalledExactlyOnceWith(id)
   })
 
   it('checks reportStatus and blocks Q1 when HTTP 200 START reuses an existing attempt with PROCESSING whole receipt', async () => {
