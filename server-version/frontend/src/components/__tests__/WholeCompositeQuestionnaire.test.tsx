@@ -103,14 +103,17 @@ describe('whole questionnaire durable browser submission', () => {
     client.submitWhole.mockRejectedValueOnce(Object.assign(new Error('busy'), { status: 503, code: 'COMPLETION_BUSY' }))
     await lastQuestion(218)
     fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
-    await waitFor(() => expect(screen.getByRole('button', { name: '重试并确认整卷提交' })).not.toBeDisabled())
+    await waitFor(() => expect(screen.getByRole('button', { name: '再次确认交卷状态' })).not.toBeDisabled())
     const sealed = (await finalDraftStore.get(key))!.sealedSubmission!.payload
     expect((await finalDraftStore.get(key))!.status).toBe('RETRY_PENDING')
     first.unmount()
+    Object.assign(client, { wholeReceipt: vi.fn(async (attemptId: string, submissionId: string) => ({
+      code: 0, data: { status: 'NOT_RECEIVED' as const, attemptId, submissionId },
+    })) })
     client.wholeDefinition.mockClear(); client.reportStatus.mockClear(); client.wholeDefinition.mockRejectedValue(Object.assign(new Error('enrollment disabled'), { status: 409 }))
     view(client)
     fireEvent.click(await screen.findByRole('button', { name: '重试并确认整卷提交' }))
-    await screen.findByRole('heading', { name: '交卷成功' })
+    await screen.findByRole('heading', { name: '交卷成功' }, {}, { timeout: 3_000 })
     expect(client.wholeDefinition).not.toHaveBeenCalled(); expect(client.reportStatus).not.toHaveBeenCalled()
     expect(client.submitWhole.mock.calls[1][1]).toEqual(sealed)
     expect(await finalDraftStore.get(key)).toBeNull()
@@ -124,15 +127,18 @@ describe('whole questionnaire durable browser submission', () => {
     client.submitWhole.mockRejectedValueOnce(Object.assign(new Error('busy'), { status: 503, code: 'COMPLETION_BUSY' }))
     await lastQuestion(2)
     fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
-    await waitFor(() => expect(screen.getByRole('button', { name: '重试并确认整卷提交' })).not.toBeDisabled())
+    await waitFor(() => expect(screen.getByRole('button', { name: '再次确认交卷状态' })).not.toBeDisabled())
     const sealed = (await finalDraftStore.get(key))!.sealedSubmission!.payload
     expect((sealed as WholeQuestionnaireInput).units[0].itemTimings).toBeDefined()
     expect((await finalDraftStore.get(key))!.status).toBe('RETRY_PENDING')
     first.unmount()
+    Object.assign(client, { wholeReceipt: vi.fn(async (attemptId: string, submissionId: string) => ({
+      code: 0, data: { status: 'NOT_RECEIVED' as const, attemptId, submissionId },
+    })) })
     client.wholeDefinition.mockClear(); client.reportStatus.mockClear(); client.wholeDefinition.mockRejectedValue(Object.assign(new Error('enrollment disabled'), { status: 409 }))
     view(client)
     fireEvent.click(await screen.findByRole('button', { name: '重试并确认整卷提交' }))
-    await screen.findByRole('heading', { name: '交卷成功' })
+    await screen.findByRole('heading', { name: '交卷成功' }, {}, { timeout: 3_000 })
     expect(client.wholeDefinition).not.toHaveBeenCalled(); expect(client.reportStatus).not.toHaveBeenCalled()
     expect(client.submitWhole.mock.calls[1][1]).toEqual(sealed)
     expect(await finalDraftStore.get(key)).toBeNull()
@@ -159,6 +165,25 @@ describe('whole questionnaire durable browser submission', () => {
     expect(await finalDraftStore.get(key)).toBeNull()
     expect(screen.queryByRole('button', { name: '重试并确认整卷提交' })).not.toBeInTheDocument()
   })
+  it('does not auto-retry or manually replay an uncertain POST without receipt lookup', async () => {
+    const d = definition([1, 1]), client = api()
+    client.wholeDefinition.mockResolvedValue({ code: 0, data: d })
+    client.submitWhole.mockRejectedValueOnce(new TypeError('response lost'))
+    retry.mockImplementationOnce(async options => {
+      const { runFinalDraftCapacityRetry } = await vi.importActual<typeof import('../../services/persistence/finalDraftCapacityRetry')>('../../services/persistence/finalDraftCapacityRetry')
+      return runFinalDraftCapacityRetry({ ...options, sleep: async () => {} })
+    })
+    await seed(d); view(client); await lastQuestion(2)
+    fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
+    await screen.findByText('暂时无法确认服务器是否收到答案，本机草稿已保留。')
+    expect(client.submitWhole).toHaveBeenCalledTimes(1)
+    const sealed = (await finalDraftStore.get(key))!.sealedSubmission!.payload
+    fireEvent.click(screen.getByRole('button', { name: '再次确认交卷状态' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: '再次确认交卷状态' })).not.toBeDisabled())
+    expect(client.submitWhole).toHaveBeenCalledTimes(1)
+    expect((await finalDraftStore.get(key))?.sealedSubmission?.payload).toEqual(sealed)
+  })
+
   it('recovers a lost POST response by its original submission identity without resubmitting answers', async () => {
     const d = definition([1, 1]), client = api(), completed = vi.fn()
     client.wholeDefinition.mockResolvedValue({ code: 0, data: d })
