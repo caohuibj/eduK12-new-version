@@ -4146,6 +4146,7 @@ export const projectFreshStartedAttempt = async (
 
 export const buildWholeStartPreload = (attempt: any, children: any[] | undefined, source: any) => {
   if (!children || !source) return { parent: undefined, preloadedState: undefined }
+  seedFreshScaleChildren(children)
   const parent = {
     ...attempt,
     compositeAssessment: source,

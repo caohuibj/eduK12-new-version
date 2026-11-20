@@ -90,14 +90,25 @@ export const projectRelationalUnitFinalResponse = async <T extends Record<string
       completed: true,
     }
   }
-  const loaded = compositeAttemptId ? await readCompositeParticipantFeedbackContext(compositeAttemptId, db) : null
-  const disposition = await resolveRelationalCompositeResultDisposition(compositeAttemptId, db, loaded?.parent ?? null)
+  const preloadedFeedbackParent = compositeAttemptId
+    ? (data as { _preloadedRelationalFeedbackParent?: FrozenRelationalAttemptIdentity })._preloadedRelationalFeedbackParent
+    : undefined
+  const loaded = compositeAttemptId && !preloadedFeedbackParent
+    ? await readCompositeParticipantFeedbackContext(compositeAttemptId, db)
+    : null
+  const disposition = await resolveRelationalCompositeResultDisposition(
+    compositeAttemptId,
+    db,
+    preloadedFeedbackParent ?? loaded?.parent ?? null,
+  )
   const disclosure = disclosureFromRelationalDisposition({
     disposition,
     audience: 'RESPONDENT',
     policyKey: 'frozen-relational-final-v1',
   })
-  const feedbackDeferred = Boolean(compositeAttemptId) && await isLoadedCompositeParticipantFeedbackDeferred(loaded?.parent, db, loaded?.job ?? null)
+  const feedbackDeferred = Boolean(compositeAttemptId)
+    && !preloadedFeedbackParent
+    && await isLoadedCompositeParticipantFeedbackDeferred(loaded?.parent, db, loaded?.job ?? null)
   if (disclosure.mode !== 'COMPLETION_ONLY' && !feedbackDeferred) return data
   return {
     ...(typeof data.submissionId === 'string' ? { submissionId: data.submissionId } : {}),
