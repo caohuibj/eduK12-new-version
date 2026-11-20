@@ -108,16 +108,9 @@ const CompositeAssessmentContent: React.FC = () => {
     && state?.trainingPersistence?.localCognitive?.enabled === true
     && state?.currentItem?.type === 'COGNITIVE'
     && state.currentItem.cognitiveSession?.sessionId === recoveryHint.get('sessionId')
-  // X-05A: the START response may carry the whole questionnaire definition
-  // inline (delivery=whole, WHOLE_LOCAL attempts only). It is consumed exactly
-  // once by the runner's definition fetch; every other path re-fetches via the
-  // authoritative GET endpoint. The inline payload must additionally match the
-  // started attempt's frozen identity (epoch + context hash) before it is
-  // served; slot-set drift is fenced by the runner's draft meta identity.
-  const inlineWholeDefinitionRef = useRef<{
-    definition: WholeQuestionnaireDefinition
-    identity: InlineWholeDefinitionIdentity
-  } | null>(null)
+  // Retain inline delivery only for the server-confirmed START snapshot.
+  // Reinitializing the runner with that snapshot should not trigger a GET.
+  const inlineWholeDefinitionRef = useRef<WholeQuestionnaireDefinition | null>(null)
   // Only the latest server-confirmed Attempt state can authorize use of an
   // inline definition. Do not construct the expected epoch/context from
   // untrusted route state or a stored definition itself.
@@ -127,16 +120,17 @@ const CompositeAssessmentContent: React.FC = () => {
     return {
       ...base,
       wholeDefinition: (requestedAttemptId: string) => {
-        const fromStorage = takeStoredWholeDefinition(requestedAttemptId, window.sessionStorage)
-        if (fromStorage) cacheWholeQuestionnaireTemplate(fromStorage)
-        const inline = inlineWholeDefinitionRef.current?.definition ?? fromStorage
-        inlineWholeDefinitionRef.current = null
         const authoritative = activeAttemptIdentityRef.current
         const verified = authoritative?.attemptId === requestedAttemptId
           && authoritative.attemptEpoch !== undefined
           && authoritative.contextSnapshotHash !== undefined
+        let inline = verified ? inlineWholeDefinitionRef.current : null
+        if (verified && !inline) {
+          inline = takeStoredWholeDefinition(requestedAttemptId, window.sessionStorage)
+          if (inline) cacheWholeQuestionnaireTemplate(inline)
+        }
         return wholeDefinitionWithInlineFallback(
-          verified ? inline : null,
+          inline,
           authoritative ?? { attemptId: '' },
           () => base.wholeDefinition(requestedAttemptId),
         )
@@ -183,8 +177,9 @@ const CompositeAssessmentContent: React.FC = () => {
     )
   }
 
-  const applyState = (next: CompositeAttemptState) => {
+  const applyState = (next: CompositeAttemptState, startDefinition: WholeQuestionnaireDefinition | null = null) => {
     if (pageSignal().aborted) return
+    inlineWholeDefinitionRef.current = startDefinition
     activeAttemptIdentityRef.current = { attemptId: next.id, attemptEpoch: next.attemptEpoch,
       contextSnapshotHash: next.contextSnapshotHash }
     setState(next)
@@ -254,13 +249,6 @@ const CompositeAssessmentContent: React.FC = () => {
         if (!isCurrent()) return
         if (response.code !== 0 || !response.data)
           throw new Error(response.message || '无法开始匿名综合测评')
-        const inlineWhole = assembleInlineWholePayload(response.data)
-        inlineWholeDefinitionRef.current = inlineWhole ? {
-          definition: inlineWhole,
-          identity: { attemptId: response.data.attempt.id,
-            attemptEpoch: response.data.attempt.attemptEpoch,
-            contextSnapshotHash: response.data.attempt.contextSnapshotHash ?? null },
-        } : null
         const returnedCredential = response.data.recoveryToken || credential
         if (returnedCredential) {
           setRecoveryToken(returnedCredential)
@@ -276,6 +264,7 @@ const CompositeAssessmentContent: React.FC = () => {
               response.data.attempt,
               returnedCredential,
             ),
+            assembleInlineWholePayload(response.data),
           )
         }
         if (response.data.recoveryToken)
@@ -305,18 +294,11 @@ const CompositeAssessmentContent: React.FC = () => {
         if (!isCurrent()) return
         if (response.code !== 0 || !response.data)
           throw new Error(response.message || '无法开始综合测评')
-        const inlineWhole = assembleInlineWholePayload(response.data)
-        inlineWholeDefinitionRef.current = inlineWhole ? {
-          definition: inlineWhole,
-          identity: { attemptId: response.data.attempt.id,
-            attemptEpoch: response.data.attempt.attemptEpoch,
-            contextSnapshotHash: response.data.attempt.contextSnapshotHash ?? null },
-        } : null
         if (response.data.attempt.status === 'COMPLETED' && !response.data.attempt.trainingFlow)
           goReport(response.data.attempt.id)
         else {
           setIsFreshStart(startSource === 'start-response' && response.data.freshlyCreated === true)
-          applyState(await freezeBeforeMeasurement(response.data.attempt))
+          applyState(await freezeBeforeMeasurement(response.data.attempt), assembleInlineWholePayload(response.data))
         }
       }
     } catch (err) {
