@@ -26,6 +26,22 @@ export const REPORT_PARENT_SELECT = {
     trainingFlowDraft: true, trainingFlowFrozen: true, trainingFlowDigest: true } },
 } as const
 
+const synchronousScaleParentSelect = {
+  ...REPORT_PARENT_SELECT,
+  startedAt: true, compiledBundleRuntimeHash: true, compositeAssessmentId: true,
+  frozenActiveSlotSetEncrypted: true, contextSnapshotEncrypted: true,
+  trainingVariantAllocationHash: true,
+  trainingContentBinding: true, trainingContentBindingHash: true,
+  trainingReferenceBinding: true, trainingReferenceBindingHash: true,
+  compositeAssessment: { select: {
+    ...REPORT_PARENT_SELECT.compositeAssessment.select,
+    id: true, createdBy: true, reportPackageVersion: true, reportPackageProfile: true,
+    reportPackageSnapshotEncrypted: true, trainingVariantDigest: true,
+  } },
+} as const satisfies Prisma.CompositeAssessmentAttemptSelect
+
+export type SynchronousScaleParent = Prisma.CompositeAssessmentAttemptGetPayload<{ select: typeof synchronousScaleParentSelect }>
+
 /** A lost processing lease never cancels an already accepted answer receipt. */
 export class ReportProcessingLeaseLostError extends Error {
   constructor() { super('REPORT_PROCESSING_LEASE_LOST'); this.name = 'ReportProcessingLeaseLostError' }
@@ -88,7 +104,8 @@ const releaseBudget = async (tx: Prisma.TransactionClient): Promise<void> => {
 /** Called AFTER the canonical snapshot insert, in its SAME transaction. */
 export const enqueueCompositeReportForUnit = async (
   tx: Prisma.TransactionClient,
-  input: { compositeAttemptId?: string; attemptEpoch: number; wholeReceipt?: WholeReceiptExecution },
+  input: { compositeAttemptId?: string; attemptEpoch: number; wholeReceipt?: WholeReceiptExecution;
+    onSynchronousScaleParent?: (parent: SynchronousScaleParent) => void },
 ): Promise<string | null> => {
   if (!input.compositeAttemptId) return null
   if (input.wholeReceipt) {
@@ -123,11 +140,12 @@ export const enqueueCompositeReportForUnit = async (
   // This only trims a projection, never the fresh parent or eligibility check.
   // Enrolled jobs and flow advancement remain active when new enrollment is off.
   const enrollmentExplicitlyOff = () => (process.env.ASSESSMENT_REPORT_ASYNC_ENABLED ?? 'false') === 'false'
-  const omitDefinition = enrollmentExplicitlyOff()
+  const omitDefinition = !input.onSynchronousScaleParent && enrollmentExplicitlyOff()
   let parent: any = await tx.compositeAssessmentAttempt.findUnique({
-    where: { id: input.compositeAttemptId }, select: { ...REPORT_PARENT_SELECT,
-      compositeAssessment: omitDefinition ? false : REPORT_PARENT_SELECT.compositeAssessment,
-      frozenActiveSlotSetEncrypted: true },
+    where: { id: input.compositeAttemptId }, select: input.onSynchronousScaleParent ? synchronousScaleParentSelect : {
+      ...REPORT_PARENT_SELECT, compositeAssessment: omitDefinition ? false : REPORT_PARENT_SELECT.compositeAssessment,
+      frozenActiveSlotSetEncrypted: true,
+    },
   })
   // Normally process configuration is stable. Preserve eligibility if an embedded
   // host changes it while the database read is pending, without caching authority.
@@ -138,7 +156,10 @@ export const enqueueCompositeReportForUnit = async (
   }
   if (!parent) return null
   const asyncEligible=parent.asyncReportEpoch===parent.attemptEpoch||acceptsAsyncCompositeReport(parent)
-  if(!hasTrainingFlow(parent)&&!asyncEligible)return null
+  if (!hasTrainingFlow(parent) && !asyncEligible) {
+    if (parent.status === 'IN_PROGRESS' && parent.attemptEpoch === input.attemptEpoch) input.onSynchronousScaleParent?.(parent)
+    return null
+  }
   if (parent.status !== 'IN_PROGRESS' || parent.attemptEpoch !== input.attemptEpoch || !parent.frozenActiveSlotSetHash) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '报告任务与交卷版本不匹配', 409)
   }

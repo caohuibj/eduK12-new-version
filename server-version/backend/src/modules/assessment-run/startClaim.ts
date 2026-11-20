@@ -191,30 +191,26 @@ export const lockExecutionEnvelope = async (
   // Read-only authority fences: SHARE still conflicts with lifecycle and
   // governance updates, while unrelated executions can START concurrently.
   // The execution row remains the exclusive admission/idempotency boundary.
-  await tx.$queryRaw`
-    SELECT "id" FROM "organizations" WHERE "id" = ${identity.organizationId} FOR SHARE
-  `
   const needLinkFlags = identity.hasCampusActivity === undefined || identity.hasHuiteacherLink === undefined
-  const runRows = needLinkFlags
-    ? await tx.$queryRaw<Array<{ id: string; hasCampusActivity?: boolean; hasHuiteacherLink?: boolean }>>`
-        SELECT r."id",
-          EXISTS (
-            SELECT 1 FROM "campus_activity_runs" ar
-            WHERE ar."organization_id" = r."organization_id" AND ar."run_id" = r."id"
-          ) AS "hasCampusActivity",
-          EXISTS (
-            SELECT 1 FROM "huiteacher_evaluation_run_links" link
-            WHERE link."organization_id" = r."organization_id" AND link."run_id" = r."id"
-          ) AS "hasHuiteacherLink"
-        FROM "assessment_runs" r
-        WHERE r."organization_id" = ${identity.organizationId} AND r."id" = ${identity.runId}
-        FOR SHARE OF r
-      `
-    : await tx.$queryRaw<Array<{ id: string }>>`
-        SELECT "id" FROM "assessment_runs"
-        WHERE "organization_id" = ${identity.organizationId} AND "id" = ${identity.runId}
-        FOR SHARE
-      `
+  // The Run row lock depends on the id emitted by the organization row lock.
+  // Keep product policy fences in subsequent statements for fresh reads.
+  const runRows = await tx.$queryRaw<Array<{ id: string; hasCampusActivity?: boolean; hasHuiteacherLink?: boolean }>>`
+    WITH locked_org AS MATERIALIZED (
+      SELECT "id" FROM "organizations" WHERE "id" = ${identity.organizationId} FOR SHARE
+    )
+    SELECT r.*
+    FROM locked_org o
+    CROSS JOIN LATERAL (
+      SELECT r."id" ${needLinkFlags ? Prisma.sql`,
+        EXISTS (SELECT 1 FROM "campus_activity_runs" ar
+          WHERE ar."organization_id" = r."organization_id" AND ar."run_id" = r."id") AS "hasCampusActivity",
+        EXISTS (SELECT 1 FROM "huiteacher_evaluation_run_links" link
+          WHERE link."organization_id" = r."organization_id" AND link."run_id" = r."id") AS "hasHuiteacherLink"` : Prisma.empty}
+      FROM "assessment_runs" r
+      WHERE r."organization_id" = o."id" AND r."id" = ${identity.runId}
+      FOR SHARE OF r
+    ) r
+  `
   const runRow = runRows[0] as { id: string; hasCampusActivity?: boolean; hasHuiteacherLink?: boolean } | undefined
   const hasCampusActivity = identity.hasCampusActivity ?? runRow?.hasCampusActivity
   const hasHuiteacherLink = identity.hasHuiteacherLink ?? runRow?.hasHuiteacherLink
