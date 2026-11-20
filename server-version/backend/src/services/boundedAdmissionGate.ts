@@ -78,6 +78,7 @@ type QueuedOperation<T> = {
   resolve: (value: T | PromiseLike<T>) => void
   reject: (reason?: unknown) => void
   timer: ReturnType<typeof setTimeout>
+  deadline?: number
 }
 
 /**
@@ -134,7 +135,7 @@ export class BoundedAdmissionGate {
     }
   }
 
-  run<T>(operation: () => Promise<T>): Promise<T> {
+  run<T>(operation: () => Promise<T>, maxQueueWaitMs?: number): Promise<T> {
     if (this.active < this.options.maxConcurrent) return this.execute(operation)
     if (this.queue.length >= this.options.maxQueue) {
       this.rejectBusy('queue_full')
@@ -146,6 +147,8 @@ export class BoundedAdmissionGate {
       entry.operation = AsyncResource.bind(operation)
       entry.resolve = resolve
       entry.reject = reject
+      const waitMs = Math.min(maxQueueWaitMs ?? this.options.maxWaitMs, this.options.maxWaitMs)
+      if (maxQueueWaitMs !== undefined) entry.deadline = performance.now() + waitMs
       entry.timer = setTimeout(() => {
         const index = this.queue.indexOf(entry as QueuedOperation<unknown>)
         if (index < 0) return
@@ -153,7 +156,7 @@ export class BoundedAdmissionGate {
         this.rejectBusy('timeout')
         this.publishState()
         reject(this.busyError('timeout'))
-      }, this.options.maxWaitMs)
+      }, waitMs)
       this.queue.push(entry as QueuedOperation<unknown>)
       this.publishState()
     })
@@ -190,6 +193,12 @@ export class BoundedAdmissionGate {
     while (this.active < this.options.maxConcurrent && this.queue.length > 0) {
       const entry = this.queue.shift()!
       clearTimeout(entry.timer)
+      // A busy event loop can delay the timer until after the slot releases.
+      if (entry.deadline !== undefined && performance.now() >= entry.deadline) {
+        this.rejectBusy('timeout')
+        entry.reject(this.busyError('timeout'))
+        continue
+      }
       this.execute(entry.operation).then(entry.resolve, entry.reject)
     }
   }

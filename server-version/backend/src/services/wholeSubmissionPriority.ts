@@ -5,6 +5,7 @@ import type { RequestHandler } from 'express'
 import { onReportSchedulingHint, prepareReportReadyNotifications, publishReportSchedulingHint } from './reportReadyNotifications'
 import { runtimeEventLoopDelayMs } from './runtimeObservability'
 import { logger } from '../utils/logger'
+import { wholeSubmitAdmission } from './wholeSubmitAdmission'
 
 const enabled = () => process.env.ASSESSMENT_REPORT_SUBMISSION_PRIORITY_ENABLED === 'true'
 const now = () => performance.now()
@@ -15,7 +16,7 @@ const MAX_YIELD_MS = 2000
 const YIELD_COOLDOWN_MS = 10000
 const RECOVERY_MS = 300
 
-type Hint = { source: string; seq: number; active: number; busy: boolean; lagMs: number; expires: number }
+type Hint = { source: string; seq: number; active: number; busy: boolean; lagMs: number; queued: boolean; expires: number }
 export type ClaimDecision = { mode: 'normal' | 'yield' | 'minimum' | 'recover' | 'sustained' | 'disabled'; limit: number; delayMs: number; sources: number }
 
 /** Process-local advisory state. No answer, authorization, budget or lease authority. */
@@ -52,7 +53,7 @@ export class ReportClaimPriority {
     if (!prior && this.sources.size >= 32) return
     this.sources.set(value.source, { source: value.source, seq: value.seq, active: value.active, busy: value.busy,
       lagMs: typeof value.lagMs === 'number' && Number.isFinite(value.lagMs) ? Math.max(0, Math.min(60000, value.lagMs)) : 100,
-      expires: at + TTL_MS })
+      queued: value.queued === true, expires: at + TTL_MS })
   }
   decision(configuredConcurrency: number): ClaimDecision {
     const at = this.clock()
@@ -77,7 +78,7 @@ export class ReportClaimPriority {
       // A fixed claim interval caps throughput even when CPU is idle.
       // Keep one runnable task only for CURRENT high API loop delay; when the
       // API is responsive, restore existing slots without adding processes.
-      const strained = [...this.sources.values()].some(hint => hint.busy && hint.lagMs >= 80)
+      const strained = [...this.sources.values()].some(hint => hint.busy && (hint.queued || hint.lagMs >= 80))
       return { mode: strained ? 'minimum' : 'sustained', limit: strained ? Math.min(1, configuredConcurrency) : configuredConcurrency,
         delayMs: 0, sources: this.sources.size }
     }
@@ -95,22 +96,26 @@ export class ReportClaimPriority {
 /** Deterministic coalescing state, also exercised with a fake clock. */
 export class WholeSubmissionPressure {
   active = 0
+  private activeAnonymous = 0
   private lastHighPressureAt = -Infinity
   private slowUntil = 0
   private latched = false
   constructor(private readonly clock = now) {}
-  begin(): () => void {
+  get hasAnonymous(): boolean { return this.activeAnonymous > 0 }
+  begin(anonymous = false): () => void {
     const started = this.clock(); this.active++
+    if (anonymous) this.activeAnonymous++
     let ended = false
     return () => {
       if (ended) return
       ended = true; this.active = Math.max(0, this.active - 1)
+      if (anonymous) this.activeAnonymous--
       if (this.clock() - started >= 300) this.slowUntil = this.clock() + QUIET_MS
     }
   }
-  snapshot(lagMs = 0): { active: number; busy: boolean } {
+  snapshot(lagMs = 0, queued = false): { active: number; busy: boolean } {
     const at = this.clock()
-    if (this.active >= 4 || (this.active >= 2 && (lagMs >= 80 || at < this.slowUntil))) {
+    if (queued || this.active >= 4 || (this.active >= 2 && (lagMs >= 80 || at < this.slowUntil))) {
       this.latched = true; this.lastHighPressureAt = at
     }
     // Quiet means low pressure, not zero traffic. A continuous light stream
@@ -121,6 +126,9 @@ export class WholeSubmissionPressure {
   }
 }
 const pressure = new WholeSubmissionPressure()
+export const anonymousWholeSubmitQueued = (): boolean => (
+  enabled() && pressure.hasAnonymous && wholeSubmitAdmission.getStats().queued > 0
+)
 const source = randomUUID().replace(/-/g, '')
 let sequence = 0
 let publishTimer: ReturnType<typeof setTimeout> | null = null
@@ -132,12 +140,14 @@ let publisherActive = false
 const emitPressure = async (): Promise<void> => {
   publishTimer = null; scheduledAt = Infinity
   if (!enabled() || publishing) return
-  const state = pressure.snapshot(runtimeEventLoopDelayMs())
+  const lagMs = runtimeEventLoopDelayMs()
+  const queued = anonymousWholeSubmitQueued()
+  const state = pressure.snapshot(lagMs, queued)
   // No per-submission Redis operation for the normal single-person path.
   // A quiet hint is needed only to clear a previously published busy hint.
   if (!state.busy && !lastBusyPublished) return
   publishing = true; lastPublishedAt = now(); lastBusyPublished = state.busy
-  try { await publishReportSchedulingHint(JSON.stringify({ v: 1, kind: 'pressure', source, seq: ++sequence, ...state, lagMs: runtimeEventLoopDelayMs() })) }
+  try { await publishReportSchedulingHint(JSON.stringify({ v: 1, kind: 'pressure', source, seq: ++sequence, ...state, lagMs, queued })) }
   finally {
     publishing = false
     if (enabled() && (pressure.active > 0 || state.busy)) schedulePressure()
@@ -179,12 +189,12 @@ export const authenticatedWholeSubmissionPriority: RequestHandler = (req, res, n
 /** Track verified public/education whole-questionnaire submissions so report
  * workers yield CPU and DB pool slots during anonymous or school bursts without
  * exposing unauthenticated routes to pre-auth pressure spoofing. */
-export const trackVerifiedWholeSubmissionPressure = async <T>(operation: () => Promise<T>): Promise<T> => {
+export const trackVerifiedWholeSubmissionPressure = async <T>(operation: () => Promise<T>, anonymous = false): Promise<T> => {
   if (!enabled() || activeSubmissionPressureScope.getStore()?.tracked) {
     return operation()
   }
-  const finish = pressure.begin()
-  schedulePressure(pressure.snapshot(runtimeEventLoopDelayMs()).busy ? 0 : COALESCE_MS)
+  const finish = pressure.begin(anonymous)
+  schedulePressure(pressure.snapshot(runtimeEventLoopDelayMs(), anonymousWholeSubmitQueued()).busy ? 0 : COALESCE_MS)
   try {
     return await activeSubmissionPressureScope.run({ tracked: true }, operation)
   } finally {

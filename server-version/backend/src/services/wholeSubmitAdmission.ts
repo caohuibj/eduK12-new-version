@@ -50,8 +50,12 @@ export const wholeSubmitAdmission = new BoundedAdmissionGate({
 })
 
 /** Run WHOLE submit work under the dedicated 32-concurrency admission gate; normalize busy errors. */
-export const withWholeSubmitAdmission = <T>(operation: () => Promise<T>): Promise<T> => (
-  wholeSubmitAdmission.run(operation).catch((error) => {
+export const withWholeSubmitAdmission = <T>(operation: () => Promise<T>, anonymous = false): Promise<T> => (
+  wholeSubmitAdmission.run(operation, anonymous && process.env.ASSESSMENT_REPORT_SUBMISSION_PRIORITY_ENABLED === 'true'
+    // Spend at most one advertised retry interval parked in the in-process
+    // queue. The operation itself keeps its original transaction deadline.
+    ? wholeSubmitAdmission.getStats().options.retryAfterSeconds * 1000
+    : undefined).catch((error) => {
     if (error instanceof BoundedAdmissionBusyError && error.code === WHOLE_SUBMIT_BUSY_CODE) {
       throw new WholeSubmitAdmissionBusyError(error.reason, error.retryAfterSeconds)
     }
