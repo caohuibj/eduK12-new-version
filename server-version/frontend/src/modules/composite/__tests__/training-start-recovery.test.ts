@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { startTrainingWithRecovery } from '../training-start-recovery'
+import { startAnonymousTrainingWithBackoff, startTrainingWithRecovery } from '../training-start-recovery'
 import { TrainingRetryCancelledError, TrainingRetryTimeoutError } from '../../../services/trainingBusyRetry'
 
 const networkFailure = () => Object.assign(new Error('network failed'), { name: 'AxiosError', retryable: true })
@@ -168,5 +168,29 @@ describe('authenticated training START recovery', () => {
     const result = await caught
     expect(result).toBeInstanceOf(TrainingRetryTimeoutError)
     expect(getAttempt).not.toHaveBeenCalled()
+  })
+})
+
+describe('anonymous Training START backoff', () => {
+  it('retries an explicit pre-admission rejection and honors Retry-After with jitter', async () => {
+    const start = vi.fn()
+      .mockRejectedValueOnce({ status: 503, code: 'ANONYMOUS_START_DEFERRED', retryAfterMs: 2_000 })
+      .mockResolvedValue(response('anon'))
+    const sleep = vi.fn(async () => {})
+    await expect(startAnonymousTrainingWithBackoff(start, { sleep, random: () => 0.25 })).resolves.toEqual(response('anon'))
+    expect(start).toHaveBeenCalledTimes(2)
+    expect(sleep).toHaveBeenCalledExactlyOnceWith(3_000, undefined)
+  })
+
+  it.each([
+    networkFailure(),
+    new TrainingRetryTimeoutError(),
+    { status: 503, code: 'ASSESSMENT_START_BUSY' },
+  ])('does not automatically replay an outcome without the dedicated admission response', async error => {
+    const start = vi.fn().mockRejectedValue(error)
+    const sleep = vi.fn(async () => {})
+    await expect(startAnonymousTrainingWithBackoff(start, { sleep })).rejects.toBe(error)
+    expect(start).toHaveBeenCalledOnce()
+    expect(sleep).not.toHaveBeenCalled()
   })
 })

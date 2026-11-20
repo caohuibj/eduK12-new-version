@@ -77,11 +77,15 @@ export const sampleReportQueuePending = async (slotsBusy: number, concurrency: n
   pendingSampleInFlight = true
   lastPendingSampleAt = now
   try {
-    const rows = await prisma.$queryRaw<Array<{ pending: number }>>`
-      SELECT count(*)::int AS pending FROM "composite_report_jobs"
+    const rows = await prisma.$queryRaw<Array<{ pending: number; oldestAt: Date | null }>>`
+      SELECT count(*)::int AS pending,
+        min(COALESCE("whole_accepted_at", "created_at")) AS "oldestAt"
+      FROM "composite_report_jobs"
       WHERE "status" = 'PENDING' AND "next_attempt_at" <= (CURRENT_TIMESTAMP AT TIME ZONE 'UTC')
     `
-    recordReportQueueEvent({ kind: 'pending_sample', pending: rows[0]?.pending ?? 0, slotsBusy, concurrency })
+    const oldest = rows[0]?.oldestAt
+    recordReportQueueEvent({ kind: 'pending_sample', pending: rows[0]?.pending ?? 0, slotsBusy, concurrency,
+      oldestPendingMs: oldest ? Math.max(0, now - oldest.getTime()) : null })
   } catch { /* ignore */ }
   finally { pendingSampleInFlight = false }
 }

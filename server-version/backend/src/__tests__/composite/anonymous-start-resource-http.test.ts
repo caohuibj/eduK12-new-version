@@ -54,6 +54,7 @@ const seedValidToken = () => {
     usedCount: 0,
     compositeAssessment: {
       id: 'comp-1',
+      productKind: 'QUESTIONNAIRE',
       status: 'PUBLISHED',
       publicEnabled: true,
       opensAt: null,
@@ -74,6 +75,36 @@ describe('public START host-memory sampling to HTTP response', () => {
     state.meminfoReads = 0
     vi.resetModules()
   })
+
+  it('advertises an explicit pre-admission retry after a sustained verified Whole queue', async () => {
+    vi.stubEnv('ASSESSMENT_REPORT_SUBMISSION_PRIORITY_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_ANONYMOUS_START_PRESSURE_RAMP_ENABLED', 'true')
+    vi.stubEnv('WHOLE_SUBMIT_ADMISSION_LIMIT', '1')
+    const token = seedValidToken()
+    const { wholeSubmitAdmission } = await import('../../services/wholeSubmitAdmission')
+    const { trackVerifiedWholeSubmissionPressure } = await import('../../services/wholeSubmissionPriority')
+    const { compositeController } = await import('../../modules/composite/composite.controller')
+    let release!: () => void
+    const hold = new Promise<void>(resolve => { release = resolve })
+    const active = wholeSubmitAdmission.run(() => trackVerifiedWholeSubmissionPressure(() => hold, true))
+    const queued = wholeSubmitAdmission.run(async () => {})
+    const age = vi.spyOn(wholeSubmitAdmission, 'oldestQueuedWaitMs').mockReturnValue(150)
+    try {
+      await Promise.resolve()
+      const res = fakeRes()
+      await compositeController.publicStart({ params: { token }, body: {}, query: {} } as any, res)
+      expect(res.statusCode).toBe(503)
+      expect(res.headers['Retry-After']).toBe('1')
+      expect(res.body.code).toBe('ANONYMOUS_START_DEFERRED')
+      expect(state.prisma.compositeAssessmentAccessToken.findUnique).toHaveBeenCalledTimes(1)
+      expect(state.prisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
+      expect(state.prisma.$transaction).not.toHaveBeenCalled()
+    } finally {
+      age.mockRestore()
+      release()
+      await Promise.all([active, queued])
+    }
+  }, 40_000)
 
   it.each([
     { missing: false, availableKiB: 649 * 1024, retryAfter: undefined, expectedRetryAfter: '10' },

@@ -1,8 +1,25 @@
 import { describe, expect, it } from 'vitest'
-import { ReportClaimPriority, WholeSubmissionPressure } from '../../services/wholeSubmissionPriority'
+import { AnonymousStartQueuePressure, ReportClaimPriority, WholeSubmissionPressure } from '../../services/wholeSubmissionPriority'
 const source = 'a'.repeat(32)
 const hint = (seq = 1, busy = true, identity = source) => JSON.stringify({ v: 1, kind: 'pressure', source: identity, seq, busy, active: busy ? 20 : 0 })
 describe('bounded whole-submission priority', () => {
+  it('admits brief queue spikes, defers after sustained wait, and reopens after a quiet interval', () => {
+    let at = 0
+    const gate = new AnonymousStartQueuePressure(() => at)
+    expect(gate.shouldDefer(0)).toBe(false)
+    at = 90
+    expect(gate.shouldDefer(90)).toBe(false)
+    at = 100
+    expect(gate.shouldDefer(100)).toBe(true)
+    at = 160
+    expect(gate.shouldDefer(160)).toBe(true)
+    at = 459
+    expect(gate.shouldDefer(0)).toBe(true)
+    at = 460
+    expect(gate.shouldDefer(0)).toBe(false)
+    expect(gate.shouldDefer(20)).toBe(false)
+  })
+
   it('leaves normal and single-person work immediate, with idempotent in-flight release', () => {
     let at = 0; const pressure = new WholeSubmissionPressure(() => at), policy = new ReportClaimPriority(() => at)
     const end = pressure.begin(); expect(pressure.snapshot(100).busy).toBe(false)
