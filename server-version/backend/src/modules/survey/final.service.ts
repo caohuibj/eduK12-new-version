@@ -115,13 +115,24 @@ export async function submitResearchFinal(input:FinalInput){
       if(!input.researchCode)blocked('需再次提供本人研究编号与私密凭证')
       // Serialize this committed FINAL decision against REVOKE_ACCESS and
       // WITHDRAW_DATA. A cached pre-transaction credential check is insufficient.
-      await tx.$queryRaw`SELECT id FROM survey_participants
+      const lockedPeople=await tx.$queryRaw<Array<{
+        id:string
+        researchCode?:string
+        status?:string
+        credentialHash?:string|null
+        credentialRevokedAt?:Date|null
+      }>>`SELECT id, research_code AS "researchCode", status, credential_hash AS "credentialHash", credential_revoked_at AS "credentialRevokedAt"
+        FROM survey_participants
         WHERE id=${attempt.participantId} AND project_id=${known.projectId} FOR SHARE`
-      const person=await tx.surveyParticipant.findFirst({where:{
-        id:attempt.participantId,projectId:known.projectId,
-        researchCode:input.researchCode,status:'ACTIVE',
-        credentialHash:hashResearchCredential(input.accessCredential),credentialRevokedAt:null,
-      },select:{id:true}})
+      const lockedPerson=lockedPeople[0]
+      const expectedHash=hashResearchCredential(input.accessCredential)
+      const person=lockedPerson&&typeof lockedPerson.status==='string'
+        ?(lockedPerson.status==='ACTIVE'&&lockedPerson.researchCode===input.researchCode&&lockedPerson.credentialHash===expectedHash&&lockedPerson.credentialRevokedAt===null?lockedPerson:null)
+        :await tx.surveyParticipant.findFirst({where:{
+          id:attempt.participantId,projectId:known.projectId,
+          researchCode:input.researchCode,status:'ACTIVE',
+          credentialHash:expectedHash,credentialRevokedAt:null,
+        },select:{id:true}})
       if(!person)blocked('研究身份已失效')
     }else if(!snapshot.flow&&attempt.sessionHash!==hashResearchCredential(input.accessCredential))
       blocked('单次研究作答凭证已失效')

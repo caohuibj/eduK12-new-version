@@ -11,6 +11,7 @@ import { SurveyWaveError } from './waves.service'
 import type { ResearchFrozenPublication } from './publication.service'
 import { allocateResearchFlowOnAdmission } from './flow.assignment'
 import {bindSurveyAttemptContent,type PreparedSurveyPublicationDigest} from './content-binding.service'
+import { resetSurveyFinalPublicationCacheForTests } from './final.compute'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { BoundedTtlCache } from '../composite/start-read-cache'
 
@@ -38,9 +39,38 @@ async function openWaveLocked(tx:Tx,projectId:string,waveId:string,linked:boolea
   }>>`SELECT "owner_user_id" AS "ownerUserId","status","collection_mode" AS "collectionMode"
     FROM "survey_projects" WHERE "id"=${projectId} FOR SHARE`
   if(!project||project.status!=='ACTIVE')blocked('研究项目暂停或已结束')
-  await tx.$queryRaw`SELECT id FROM "survey_waves"
+  // Coalesce the Wave FOR UPDATE lock and admission column projection into one
+  // query roundtrip so the exclusive wave lock is held for fewer DB roundtrips.
+  // Fall back to tx.surveyWave.findFirst only when a unit test mock returns a
+  // bare [{ id }] lock stub without wave columns.
+  const lockedWaves=await tx.$queryRaw<Array<{
+    id:string
+    projectId?:string
+    publicationId?:string|null
+    status?:string
+    opensAt?:Date|null
+    closesAt?:Date|null
+    hardStopAt?:Date|null
+    consentVersion?:number
+    startsCount?:number
+    quotaStarts?:number|null
+  }>>`SELECT
+    id,
+    project_id AS "projectId",
+    publication_id AS "publicationId",
+    status,
+    opens_at AS "opensAt",
+    closes_at AS "closesAt",
+    hard_stop_at AS "hardStopAt",
+    consent_version AS "consentVersion",
+    starts_count AS "startsCount",
+    quota_starts AS "quotaStarts"
+  FROM "survey_waves"
     WHERE id=${waveId} AND project_id=${projectId} FOR UPDATE`
-  const wave=await tx.surveyWave.findFirst({where:{id:waveId,projectId}})
+  const lockedWave=lockedWaves[0]
+  const wave=lockedWave&&typeof lockedWave.status==='string'&&typeof lockedWave.consentVersion==='number'
+    ?(lockedWave as NonNullable<Awaited<ReturnType<typeof tx.surveyWave.findFirst>>>)
+    :await tx.surveyWave.findFirst({where:{id:waveId,projectId}})
   if(!wave||!wave.publicationId||wave.status!=='OPEN')
     blocked('研究波次尚未开放')
   const now=new Date()
@@ -87,16 +117,29 @@ async function loadMeasurementNotices(client:Tx|typeof prisma,projectId:string,p
   const uniqueIds=[...new Set(publicationIds)]
   const missingIds=uniqueIds.filter(id=>measurementNoticeCache.get(`${projectId}:${id}`)===undefined)
   if(missingIds.length>0){
-    const notices=await client.$queryRaw<Array<{id:string;measurementNotice:unknown}>>`
-      SELECT p.id, p.compiled_snapshot->'measurementNotice' AS "measurementNotice"
-      FROM survey_publications p
-      WHERE p.project_id=${projectId} AND p.id = ANY(${missingIds}::text[])
-    `
-    const byId=new Map(notices.map(row=>[row.id,row.measurementNotice]))
-    for(const id of missingIds){
-      const notice=byId.get(id)??null
-      freezeDeep(notice)
-      measurementNoticeCache.set(`${projectId}:${id}`,{value:notice})
+    const fetchNotices=async()=>{
+      const stillMissing=missingIds.filter(id=>measurementNoticeCache.get(`${projectId}:${id}`)===undefined)
+      if(!stillMissing.length)return
+      const notices=await client.$queryRaw<Array<{id:string;measurementNotice:unknown}>>`
+        SELECT p.id, p.compiled_snapshot->'measurementNotice' AS "measurementNotice"
+        FROM survey_publications p
+        WHERE p.project_id=${projectId} AND p.id = ANY(${stillMissing}::text[])
+      `
+      const byId=new Map(notices.map(row=>[row.id,row.measurementNotice]))
+      for(const id of stillMissing){
+        const notice=byId.get(id)??null
+        freezeDeep(notice)
+        measurementNoticeCache.set(`${projectId}:${id}`,{value:notice})
+      }
+    }
+    if(client===prisma){
+      const flightKey=`${projectId}:${[...missingIds].sort().join(',')}`
+      await measurementNoticeCache.singleFlight(flightKey,async()=>{
+        await fetchNotices()
+        return {value:null}
+      })
+    }else{
+      await fetchNotices()
     }
   }
   return (publicationId:string)=>measurementNoticeCache.get(`${projectId}:${publicationId}`)?.value??null
@@ -152,6 +195,7 @@ export function resetSurveyPublicationCachesForTests(){
   verifiedPublicationCache.clear()
   measurementNoticeCache.clear()
   publicationPreparationInFlight.clear()
+  resetSurveyFinalPublicationCacheForTests()
 }
 export async function preparePublicationDigest(projectId:string,waveId:string):Promise<PreparedPublication|undefined>{
   const key=JSON.stringify([projectId,waveId])
@@ -168,9 +212,14 @@ export async function preparePublicationDigest(projectId:string,waveId:string):P
     const wave=await prisma.surveyWave?.findFirst?.({where:{id:waveId,projectId},
       select:{publicationId:true,publication:{select:{id:true,compiledSnapshot:true}}}})
     if(!wave?.publicationId||!wave.publication?.compiledSnapshot)return undefined
-    const snapshot=wave.publication.compiledSnapshot as unknown as ResearchFrozenPublication
-    const prepared={preparedDigest:{publicationId:wave.publication.id,snapshotDigest:canonicalHash(snapshot)},preparedSnapshot:snapshot}
+    const snapshot=JSON.parse(JSON.stringify(wave.publication.compiledSnapshot)) as ResearchFrozenPublication
+    const snapshotDigest=canonicalHash(snapshot)
+    freezeDeep(snapshot)
+    const prepared={preparedDigest:{publicationId:wave.publication.id,snapshotDigest},preparedSnapshot:snapshot}
     preparedPublicationCache.set(key,prepared)
+    if(snapshot.runtimeStatus==='SURVEY_FINAL_V1'){
+      verifiedPublicationCache.set(`${wave.publication.id}:${snapshotDigest}`,snapshot)
+    }
     return prepared
   })()
   publicationPreparationInFlight.set(key,task)
@@ -196,7 +245,7 @@ export async function joinLinkedStudy(input:{
   publicId:string;waveId:string;entryToken:string;consentVersion:number;consent:boolean
 }){
   enabled()
-  const project=await prisma.$transaction(tx=>projectPublic(tx,input.publicId))
+  const project=await withSurveyReadClient(tx=>projectPublic(tx,input.publicId))
   if(project.collectionMode!=='LINKED_WAVES')blocked('当前项目不是多波次研究')
   if(!input.consent)blocked('必须先确认知情同意')
   // The underlying service locks public Wave and validates entry token and
@@ -248,7 +297,7 @@ export async function startLinkedWave(input:{
   enabled()
   if(!input.consent||!codePattern.test(input.researchCode)||!secretPattern.test(input.accessCredential))
     blocked('研究参与身份或知情同意不合法')
-  const project=await prisma.$transaction(tx=>projectPublic(tx,input.publicId))
+  const project=await withSurveyReadClient(tx=>projectPublic(tx,input.publicId))
   const identity=await recoverLinkedResearchIdentity({
     projectId:project.id,researchCode:input.researchCode,
     accessCredential:input.accessCredential,
@@ -261,12 +310,22 @@ export async function startLinkedWave(input:{
     // its newly allocated Attempt; preserve Project -> Wave -> Person locks.
     // Exclusive from the start: taking SHARE and later promoting to UPDATE
     // for an encrypted group assignment can deadlock across T2/T3 requests.
-    await tx.$queryRaw`SELECT id FROM survey_participants
+    const lockedParticipants=await tx.$queryRaw<Array<{
+      id:string
+      status?:string
+      credentialHash?:string|null
+      credentialRevokedAt?:Date|null
+    }>>`SELECT id, status, credential_hash AS "credentialHash", credential_revoked_at AS "credentialRevokedAt"
+      FROM survey_participants
       WHERE id=${identity.participantId} AND project_id=${project.id} FOR UPDATE`
-    const live=await tx.surveyParticipant.findFirst({where:{
-      id:identity.participantId,projectId:project.id,status:'ACTIVE',
-      credentialHash:hashResearchCredential(input.accessCredential),credentialRevokedAt:null,
-    }})
+    const lockedPerson=lockedParticipants[0]
+    const expectedCredentialHash=hashResearchCredential(input.accessCredential)
+    const live=lockedPerson&&typeof lockedPerson.status==='string'
+      ?(lockedPerson.status==='ACTIVE'&&lockedPerson.credentialHash===expectedCredentialHash&&lockedPerson.credentialRevokedAt===null?lockedPerson:null)
+      :await tx.surveyParticipant.findFirst({where:{
+        id:identity.participantId,projectId:project.id,status:'ACTIVE',
+        credentialHash:expectedCredentialHash,credentialRevokedAt:null,
+      }})
     if(!live)blocked('研究编号的私密凭证已经失效')
     if(input.consentVersion!==wave.consentVersion)
       blocked('研究说明已更新，请重新确认')
@@ -313,7 +372,7 @@ export async function startSingleUnlinkedWave(input:{
   const legacy=!input.operationKey&&!input.accessCredential
   if(!legacy&&(!secretPattern.test(input.operationKey??'')||!secretPattern.test(input.accessCredential??'')
     ||input.operationKey===input.accessCredential))blocked('开始凭证不合法')
-  const project=await prisma.$transaction(tx=>projectPublic(tx,input.publicId))
+  const project=await withSurveyReadClient(tx=>projectPublic(tx,input.publicId))
   const serverSession=legacy?freshUnlinkedSession():null
   const operationKeyHash=legacy?null:hashResearchCredential(input.operationKey!)
   const sessionHash=hashResearchCredential(legacy?serverSession!.accessCredential:input.accessCredential!)

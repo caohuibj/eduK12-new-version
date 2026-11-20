@@ -8,6 +8,7 @@ import { normalizeSurveySjtAnswers,scoreResearchSjtAnswers,SurveySjtAnswerError 
 import type { SurveyCognitiveReference } from './cognitive.definition'
 import { projectStoredMeasurement,type MeasurementResultV1 } from '../assessment-runtime/measurement-result'
 import { canonicalHash } from '../assessment-runtime/canonical'
+import { BoundedTtlCache } from '../composite/start-read-cache'
 import { scoreScale } from '../scale/scale-scoring'
 import { scoreSituationalModel } from '../situational/situation-model-resolver'
 import { deriveAuthoritativeSituationalTrajectory } from '../situational/situation-trajectory'
@@ -53,9 +54,110 @@ export interface SurveyComputedFinal {
   /** Optional browser-observed timing metadata; never used by scoring. */
   itemTimings?:SurveyScaleTimings
 }
+type CompiledFormUnitPlan = {
+  kind: 'FORM'
+  definition: FormDraft
+}
+type CompiledScaleUnitPlan = {
+  kind: 'SCALE'
+  display: ReturnType<typeof readSurveyScalePresentation>
+  allowed: ReadonlySet<string>
+  optionKeysByItem: ReadonlyMap<string, ReadonlySet<string>>
+}
+type CompiledSjtV2UnitPlan = {
+  kind: 'SJT_V2'
+  display: SjtDraftV2
+}
+type CompiledSjtV1UnitPlan = {
+  kind: 'SJT_V1'
+  display: SjtDraft
+  allowed: ReadonlySet<string>
+  channelsByQuestionKey: ReadonlyMap<string, Array<{ scene: SituationDefinitionV2['scenes'][number]; channel: SituationDefinitionV2['scenes'][number]['channels'][number] }>>
+}
+
+const formPlanByUnit = new WeakMap<object, CompiledFormUnitPlan>()
+const scalePlanByUnit = new WeakMap<object, CompiledScaleUnitPlan>()
+const sjtV2PlanByUnit = new WeakMap<object, CompiledSjtV2UnitPlan>()
+const sjtV1PlanByUnit = new WeakMap<object, CompiledSjtV1UnitPlan>()
+
+const getFormUnitPlan = (unit: ResearchFrozenUnit): CompiledFormUnitPlan => {
+  const cached = formPlanByUnit.get(unit)
+  if (cached) return cached
+  const plan: CompiledFormUnitPlan = {
+    kind: 'FORM',
+    // Legacy frozen operator/budget allowances remain exclusive to stored readers.
+    definition: assertSurveyDraft('FORM', unit.displayDefinition, true, true) as FormDraft,
+  }
+  if (Object.isFrozen(unit)) formPlanByUnit.set(unit, plan)
+  return plan
+}
+
+const getScaleUnitPlan = (unit: ResearchFrozenUnit): CompiledScaleUnitPlan => {
+  const cached = scalePlanByUnit.get(unit)
+  if (cached) return cached
+  const display = readSurveyScalePresentation(unit.displayDefinition)
+  const allowed = new Set(display.items.map(q => q.itemKey))
+  const optionKeysByItem = new Map<string, ReadonlySet<string>>(
+    display.items.map(item => [
+      item.itemKey,
+      new Set(scalePresentationOptions(display, item).map(o => o.optionKey)),
+    ]),
+  )
+  const plan: CompiledScaleUnitPlan = { kind: 'SCALE', display, allowed, optionKeysByItem }
+  if (Object.isFrozen(unit)) scalePlanByUnit.set(unit, plan)
+  return plan
+}
+
+const getSjtV2UnitPlan = (unit: ResearchFrozenUnit): CompiledSjtV2UnitPlan => {
+  const cached = sjtV2PlanByUnit.get(unit)
+  if (cached) return cached
+  const plan: CompiledSjtV2UnitPlan = {
+    kind: 'SJT_V2',
+    display: assertSurveyDraft('SJT', unit.displayDefinition, true) as SjtDraftV2,
+  }
+  if (Object.isFrozen(unit)) sjtV2PlanByUnit.set(unit, plan)
+  return plan
+}
+
+const getSjtV1UnitPlan = (unit: ResearchFrozenUnit): CompiledSjtV1UnitPlan => {
+  const cached = sjtV1PlanByUnit.get(unit)
+  if (cached) return cached
+  const display = assertSurveyDraft('SJT', unit.displayDefinition, true) as SjtDraft
+  const allowed = new Set(display.questions.map(q => q.questionKey))
+  const definition = unit.compiledDefinition as SituationDefinitionV2
+  const channelsByQuestionKey = new Map(
+    display.questions.map(q => [
+      q.questionKey,
+      definition.scenes.flatMap(scene =>
+        scene.channels
+          .filter(channel => channel.channelKey === q.questionKey)
+          .map(channel => ({ scene, channel })),
+      ),
+    ]),
+  )
+  const plan: CompiledSjtV1UnitPlan = { kind: 'SJT_V1', display, allowed, channelsByQuestionKey }
+  if (Object.isFrozen(unit)) sjtV1PlanByUnit.set(unit, plan)
+  return plan
+}
+
+const prewarmFrozenPublicationUnits = (snapshot: ResearchFrozenPublication): void => {
+  if (!Array.isArray(snapshot.units)) return
+  for (const unit of snapshot.units) {
+    try {
+      if (unit.kind === 'FORM') getFormUnitPlan(unit)
+      else if (unit.kind === 'SCALE') getScaleUnitPlan(unit)
+      else if (unit.kind === 'SJT' && unit.executionProtocol !== SURVEY_NATIVE_SJT_PROTOCOL) {
+        if ((unit.displayDefinition as { schemaVersion?: number })?.schemaVersion === 2) getSjtV2UnitPlan(unit)
+        else getSjtV1UnitPlan(unit)
+      }
+    } catch {
+      // Defer any malformed unit error to actual evaluation time so error paths stay identical.
+    }
+  }
+}
+
 const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
-  // Legacy frozen operator/budget allowances remain exclusive to stored readers.
-  const definition=assertSurveyDraft('FORM',unit.displayDefinition,true,true) as FormDraft
+  const {definition}=getFormUnitPlan(unit)
   return {instrumentKey:unit.instrumentKey,kind:'FORM',sourceDigest:unit.sourceDigest,
     scoringDigest:null,...normalizeFormAnswers(definition,answers),privateScoring:null}
 }
@@ -66,8 +168,7 @@ export function dryRunSurveyForm(definition:unknown,answers:unknown){
   return normalizeFormAnswers(normalized,safeObject(answers,'answers'))
 }
 const scaleResult=(unit:ResearchFrozenUnit,answers:AnswerMap,computeScore=true):FrozenUnitResult=>{
-  const display=readSurveyScalePresentation(unit.displayDefinition)
-  const allowed=new Set(display.items.map(q=>q.itemKey))
+  const {display,allowed,optionKeysByItem}=getScaleUnitPlan(unit)
   for(const k of Object.keys(answers))if(!allowed.has(k))invalid('answers.'+k,'无效量表题目')
   const raw:Record<string,string>={}
   const missing:MissingItem[]=[]
@@ -76,7 +177,7 @@ const scaleResult=(unit:ResearchFrozenUnit,answers:AnswerMap,computeScore=true):
     if((value===undefined||value===null||value==='')&&!item.required){
       missing.push({itemKey:item.itemKey,reason:'SHOWN_MISSING'});continue
     }
-    if(typeof value!=='string'||!scalePresentationOptions(display,item).some(o=>o.optionKey===value))
+    if(typeof value!=='string'||!optionKeysByItem.get(item.itemKey)?.has(value))
       invalid('answers.'+item.itemKey,'研究量表必须完整选择有效的响应选项')
     raw[item.itemKey]=value as string
   }
@@ -101,7 +202,7 @@ const scaleResult=(unit:ResearchFrozenUnit,answers:AnswerMap,computeScore=true):
 }
 const sjtResult=(unit:ResearchFrozenUnit,answers:AnswerMap,computeScore=true):FrozenUnitResult=>{
   if((unit.displayDefinition as {schemaVersion:number}).schemaVersion===2){
-    const display=assertSurveyDraft('SJT',unit.displayDefinition,true) as SjtDraftV2
+    const {display}=getSjtV2UnitPlan(unit)
     const definition=unit.compiledDefinition as SituationDefinitionV2
     try{
       const normalized=normalizeSurveySjtAnswers(display,definition,answers,{requireComplete:true})
@@ -121,8 +222,7 @@ const sjtResult=(unit:ResearchFrozenUnit,answers:AnswerMap,computeScore=true):Fr
       throw error
     }
   }
-  const display=assertSurveyDraft('SJT',unit.displayDefinition,true) as SjtDraft
-  const allowed=new Set(display.questions.map(q=>q.questionKey))
+  const {display,allowed,channelsByQuestionKey}=getSjtV1UnitPlan(unit)
   for(const k of Object.keys(answers))if(!allowed.has(k))invalid('answers.'+k,'无效 SJT 题目')
   const definition=unit.compiledDefinition as SituationDefinitionV2
   const responses:SituationalResponse[]=[]
@@ -132,9 +232,7 @@ const sjtResult=(unit:ResearchFrozenUnit,answers:AnswerMap,computeScore=true):Fr
     try{chosen=resolveSurveySjtAnswer(q,answers[q.questionKey])}
     catch(e){invalid('answers.'+q.questionKey,e instanceof Error?e.message:'不合法的情境选择')}
     const choice=chosen.scorerOptionKey
-    const channels=definition.scenes.flatMap(scene=>scene.channels
-      .filter(channel=>channel.channelKey===q.questionKey)
-      .map(channel=>({scene,channel})))
+    const channels=channelsByQuestionKey.get(q.questionKey)??[]
     if(choice===null||channels.length!==1)invalid('answers.'+q.questionKey,'冻结 SJT 问题定义不明确')
     responses.push({sceneKey:channels[0].scene.sceneKey,channelKey:q.questionKey,responseValue:choice})
     raw[q.questionKey]=chosen.frozenResponse
@@ -160,10 +258,38 @@ export function validateSurveyUnitAnswers(unit:ResearchFrozenUnit,answer:unknown
   // only when the reached ordinary units are committed in the parent FINAL.
   return {rawAnswers:normalized.rawAnswers,missing:normalized.missing}
 }
+type VerifiedSurveyFinalPublication = Readonly<{
+  snapshot: ResearchFrozenPublication
+  compute: (
+    input: Record<string, unknown>,
+    assignment?: SurveyFlowAssignment | null,
+    clientObservedBlocks?: readonly string[],
+    mode?: 'FINAL' | 'SCREEN_OUT',
+    itemTimings?: unknown,
+    cognitiveResults?: ReadonlyMap<string, FrozenUnitResult>,
+    nativeSituationalResults?: ReadonlyMap<string, FrozenUnitResult>,
+    contextFrozenAt?: Date,
+  ) => SurveyComputedFinal
+}>
+const verifiedFinalPublicationCache = new BoundedTtlCache<VerifiedSurveyFinalPublication>(120_000, 64)
+export function resetSurveyFinalPublicationCacheForTests(): void {
+  verifiedFinalPublicationCache.clear()
+}
 /** A request-local proof owns its frozen copy. Its compute closure is the only
  * route that can reuse this digest; callers cannot supply a trusted hash to the
  * ordinary scorer. No authorization, Attempt state or result is cached. */
 export function verifySurveyFinalPublication(snapshot:ResearchFrozenPublication,expectedDigest:string){
+  const cached = verifiedFinalPublicationCache.get(expectedDigest)
+  if (cached) {
+    let actualDigest: string
+    try {
+      actualDigest = canonicalHash(snapshot)
+    } catch {
+      actualDigest = canonicalHash(JSON.parse(JSON.stringify(snapshot)))
+    }
+    if (actualDigest !== expectedDigest) return null
+    return cached
+  }
   const frozen=JSON.parse(JSON.stringify(snapshot)) as ResearchFrozenPublication
   const definitionDigest=canonicalHash(frozen)
   if(definitionDigest!==expectedDigest)return null
@@ -173,12 +299,15 @@ export function verifySurveyFinalPublication(snapshot:ResearchFrozenPublication,
     Object.freeze(value)
   }
   freeze(frozen)
-  return Object.freeze({snapshot:frozen,
+  prewarmFrozenPublicationUnits(frozen)
+  const verified: VerifiedSurveyFinalPublication = Object.freeze({snapshot:frozen,
     compute:(input:Record<string,unknown>,assignment?:SurveyFlowAssignment|null,
       clientObservedBlocks?:readonly string[],mode:'FINAL'|'SCREEN_OUT'='FINAL',itemTimings?:unknown,
       cognitiveResults?:ReadonlyMap<string,FrozenUnitResult>,nativeSituationalResults?:ReadonlyMap<string,FrozenUnitResult>,contextFrozenAt?:Date)=>
       computeSurveyFinalFromSnapshot(frozen,input,assignment,clientObservedBlocks,mode,itemTimings,definitionDigest,cognitiveResults,nativeSituationalResults,contextFrozenAt),
   })
+  verifiedFinalPublicationCache.set(expectedDigest, verified)
+  return verified
 }
 
 export function computeSurveyFinal(snapshot:ResearchFrozenPublication,input:Record<string,unknown>,
