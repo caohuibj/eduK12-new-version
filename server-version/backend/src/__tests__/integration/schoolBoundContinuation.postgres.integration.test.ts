@@ -269,7 +269,7 @@ suite('School bound continuation directory (real PostgreSQL, synthetic persisted
     expect(narrowStudentTasks.nextCursor).toEqual(fullStudentTasks.nextCursor)
     expect(narrowStudentTasks.list).toEqual(fullStudentTasks.list.map(task => ({
       executionId: task.executionId, organizationId: task.organizationId, runId: task.runId,
-      runName: task.runName, deadline: task.deadline, status: task.status,
+      runName: task.runName, deadline: task.deadline, status: task.status, receiptOnly: false,
       resourceFamily: task.resourceFamily, resourceKey: task.resourceKey,
       consentRequired: task.consentRequired, consentPurpose: task.consentPurpose,
       consentVisibility: task.consentVisibility,
