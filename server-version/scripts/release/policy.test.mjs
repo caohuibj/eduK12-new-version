@@ -61,6 +61,11 @@ test('image build tooling requires the complete bounded diff and unchanged regul
  assert.equal(imageBuildOnly([...inputs,script,...controls]),true);
  assert.equal(toolingOnly([...inputs,script,...controls]),true);
  assert.equal(imageBuildOnly(controls),false);
+ const exporter={...regular('server-version/scripts/release/c_service_package.py'),status:'A',oldMode:'000000'};
+ assert.equal(toolingOnly([...inputs,exporter]),true);
+ assert.equal(imageBuildOnly([exporter]),true);
+ assert.equal(imageBuildOnly([...inputs,{...exporter,newMode:'100755'}]),false);
+ assert.equal(imageBuildOnly([...inputs,{...exporter,newMode:'120000'}]),false);
  for(const file of ['server-version/frontend/src/main.tsx','server-version/backend/src/modules/campus/service.ts','server-version/backend/package-lock.json','.github/release-tools/package-lock.json','server-version/backend/prisma/schema.prisma','server-version/backend/prisma/migrations/example/migration.sql','server-version/scripts/release/executor.py','server-version/docker-compose.yml','server-version/ops/nginx/nginx.production.conf','server-version/backend/src/__tests__/cognitive/product.test.ts','.github/scripts/unknown-images.mjs']){
   assert.equal(imageBuildOnly([...inputs,regular(file)]),false,file);
   assert.equal(toolingOnly([...inputs,regular(file)]),false,file);

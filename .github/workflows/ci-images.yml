@@ -29,6 +29,18 @@ on:
         default: ''
   workflow_dispatch:
     inputs:
+      release_source_sha:
+        type: string
+        default: ''
+        description: 'Exact main SHA to build, scan and export for a C service release'
+      release_ci_run:
+        type: string
+        default: ''
+        description: 'Successful PR CI run for the same source tree'
+      release_ci_checkout:
+        type: string
+        default: ''
+        description: 'PR merge checkout SHA recorded by the qualification run'
       frontend_only:
         type: boolean
         default: false
@@ -52,6 +64,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 env:
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
@@ -92,7 +105,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: ${{ inputs.cognitive_product && '0' || '1' }}
+          fetch-depth: ${{ (inputs.cognitive_product || inputs.release_source_sha != '') && '0' || '1' }}
+      - name: Verify release CI and check out the exact source
+        if: github.event_name == 'workflow_dispatch' && inputs.release_source_sha != ''
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SOURCE: ${{ inputs.release_source_sha }}
+          RELEASE_CI_RUN: ${{ inputs.release_ci_run }}
+          RELEASE_CI_CHECKOUT: ${{ inputs.release_ci_checkout }}
+          FRONTEND_ONLY: ${{ inputs.frontend_only }}
+        run: |
+          set -euo pipefail
+          test "$FRONTEND_ONLY" = false
+          cp server-version/scripts/release/c_service_package.py "$RUNNER_TEMP/"
+          export PYTHONPATH="$GITHUB_WORKSPACE/server-version/scripts/release"
+          python3 -B "$RUNNER_TEMP/c_service_package.py" source \
+            "$RELEASE_SOURCE" "$RELEASE_CI_RUN" "$RELEASE_CI_CHECKOUT"
+          git checkout --detach "$RELEASE_SOURCE"
+          test "$(git rev-parse HEAD)" = "$RELEASE_SOURCE"
       - name: check CI disk headroom
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
@@ -170,11 +201,25 @@ jobs:
       - name: verify production Nginx static asset MIME and security headers
         if: inputs.backend_only != true
         run: node scripts/frontend-nginx-static-smoke.mjs server-version-frontend:latest
+      - name: Pin the images that will be scanned and exported
+        id: release-images
+        if: github.event_name == 'workflow_dispatch' && inputs.release_source_sha != ''
+        env:
+          BACKEND_ONLY: ${{ inputs.backend_only }}
+        run: |
+          set -euo pipefail
+          services=(backend)
+          if [[ "$BACKEND_ONLY" != true ]]; then services+=(frontend); fi
+          for service in "${services[@]}"; do
+            id=$(docker image inspect --format '{{.Id}}' "server-version-$service:latest")
+            [[ "$id" =~ ^sha256:[a-f0-9]{64}$ ]]
+            echo "$service=$id" >> "$GITHUB_OUTPUT"
+          done
       - name: scan backend image (high and critical)
         if: inputs.frontend_only != true
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: server-version-backend:latest
+          image-ref: ${{ steps.release-images.outputs.backend || 'server-version-backend:latest' }}
           format: table
           exit-code: '1'
           ignore-unfixed: true
@@ -187,7 +232,7 @@ jobs:
         if: inputs.backend_only != true
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: server-version-frontend:latest
+          image-ref: ${{ steps.release-images.outputs.frontend || 'server-version-frontend:latest' }}
           format: table
           exit-code: '1'
           ignore-unfixed: true
@@ -196,3 +241,26 @@ jobs:
           cache: 'false'
           skip-setup-trivy: true
           cache-dir: ${{ steps.runner-cache.outputs.trivy_cache }}
+      - name: Export the same scanned release images
+        if: github.event_name == 'workflow_dispatch' && inputs.release_source_sha != ''
+        env:
+          RELEASE_CI_RUN: ${{ inputs.release_ci_run }}
+          RELEASE_CI_CHECKOUT: ${{ inputs.release_ci_checkout }}
+          BACKEND_IMAGE: ${{ steps.release-images.outputs.backend }}
+          FRONTEND_IMAGE: ${{ steps.release-images.outputs.frontend }}
+          BACKEND_ONLY: ${{ inputs.backend_only }}
+        run: |
+          set -euo pipefail
+          export PYTHONPATH="$GITHUB_WORKSPACE/server-version/scripts/release"
+          scope=()
+          if [[ "$BACKEND_ONLY" = true ]]; then scope+=(--backend-only); fi
+          python3 -B "$RUNNER_TEMP/c_service_package.py" export \
+            "$RUNNER_TEMP/c-service-release" "$RELEASE_CI_RUN" "$RELEASE_CI_CHECKOUT" "${scope[@]}"
+      - name: Upload scanned release images
+        if: github.event_name == 'workflow_dispatch' && inputs.release_source_sha != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: c-service-release-${{ inputs.release_source_sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/c-service-release/
+          if-no-files-found: error
+          retention-days: 3

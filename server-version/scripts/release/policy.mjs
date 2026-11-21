@@ -93,7 +93,9 @@ export const backendTestFile=file=>typeof file==='string'&&/^server-version\/bac
 const selectedCognitiveControlFiles=new Set(cognitiveIntakeToolingInputs.filter(file=>file.startsWith('server-version/backend/')));
 const selectedScaleControlFiles=new Set(['server-version/backend/scripts/scale-intake-selected-check.ts','server-version/backend/scripts/scale-intake-selected-check.test.ts']);
 const selectedSituationalControlFiles=new Set(['server-version/backend/src/scripts/situational-onboarding-check.ts']);
+const imageExportTool='server-version/scripts/release/c_service_package.py';
 const imageBuildInputs=new Set([
+ imageExportTool,
  '.github/scripts/build-ci-images.sh','.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci-images.yml',
  'server-version/frontend/Dockerfile','server-version/backend/Dockerfile',
 ]);
@@ -107,8 +109,9 @@ const imageBuildControls=new Set([
 export const imageBuildFile=file=>imageBuildInputs.has(file);
 export function imageBuildOnly(entries){
  return entries.some(e=>imageBuildFile(e.file))&&entries.every(e=>
-  (imageBuildFile(e.file)||imageBuildControls.has(e.file))&&e.status==='M'
-  &&e.oldMode===(e.file==='.github/scripts/build-ci-images.sh'?'100755':'100644')&&e.newMode===e.oldMode);
+  (imageBuildFile(e.file)||imageBuildControls.has(e.file))&&
+  (e.file===imageExportTool&&e.status==='A'&&e.oldMode==='000000'&&e.newMode==='100644'
+   ||e.status==='M'&&e.oldMode===(e.file==='.github/scripts/build-ci-images.sh'?'100755':'100644')&&e.newMode===e.oldMode));
 }
 const releaseToolFiles=new Set([
  '.github/workflows/ci-backend.yml',
