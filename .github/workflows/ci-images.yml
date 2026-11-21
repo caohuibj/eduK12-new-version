@@ -1,266 +1,75 @@
 name: CI production image step
-
 on:
-  workflow_call:
-    inputs:
-      cognitive_product:
-        type: boolean
-        default: false
-      cognitive_product_plan:
-        type: string
-        default: ''
-      catalog_discovery:
-        type: boolean
-        default: false
-      frontend_only:
-        type: boolean
-        default: false
-      backend_only:
-        type: boolean
-        default: false
-      debian_mirror:
-        type: string
-        default: deb.debian.org
-      npm_registry:
-        type: string
-        default: https://registry.npmjs.org
-      alpine_mirror:
-        type: string
-        default: ''
   workflow_dispatch:
     inputs:
       release_source_sha:
         type: string
-        default: ''
-        description: 'Exact main SHA to build, scan and export for a C service release'
+        required: true
       release_ci_run:
         type: string
-        default: ''
-        description: 'Successful PR CI run for the same source tree'
+        required: true
       release_ci_checkout:
         type: string
-        default: ''
-        description: 'PR merge checkout SHA recorded by the qualification run'
-      frontend_only:
-        type: boolean
-        default: false
-        description: 'Build/scan frontend only; leave both false for all components'
-      backend_only:
-        type: boolean
-        default: false
-        description: 'Build/scan backend and worker only'
-      debian_mirror:
-        type: string
-        default: deb.debian.org
-        description: 'Explicit Debian mirror host; retain official default unless selected'
-      npm_registry:
-        type: string
-        default: https://registry.npmjs.org
-        description: 'Explicit HTTPS npm registry for image builds'
-      alpine_mirror:
-        type: string
-        default: ''
-        description: 'Optional HTTPS Alpine repository prefix; empty retains official repositories'
-
+        required: true
 permissions:
   contents: read
   actions: read
-
-env:
-  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
-  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
-
 jobs:
-  images:
-    name: production image build and scan
-    # Production images are built in the dedicated Windows Linux slot.
-    # No backend/browser artifacts are consumed here; the merge gate requires all.
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+  ops:
+    name: build same-source migration ops image
     runs-on: ubuntu-24.04
     timeout-minutes: 45
-    env:
-      DEBIAN_MIRROR: ${{ inputs.debian_mirror || 'deb.debian.org' }}
-      NPM_REGISTRY: ${{ inputs.npm_registry || 'https://registry.npmjs.org' }}
-      ALPINE_MIRROR: ${{ inputs.alpine_mirror || '' }}
-      JWT_SECRET: ci-jwt-secret-123456789012345678901234
-      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
-      ASSET_SIGNING_SECRET: ci-asset-signing-secret-123456789012345678901234
-      ASSET_MIGRATION_COMPLETE: 'true'
-      COOKIE_SECURE: 'true'
-      DB_USER: ci-ptool
-      DB_PASSWORD: ci-ptool-password
-      DB_NAME: ptool
-      DATABASE_URL: postgresql://ci-ptool:ci-ptool-password@postgres:5432/ptool?schema=public
-      POSTGRES_EXPORTER_DATA_SOURCE_NAME: postgresql://ci-ptool:ci-ptool-password@postgres:5432/ptool?sslmode=disable
-      ADMIN_USERNAME: ci-admin
-      ADMIN_PASSWORD: ci-admin-password-2026
-      GRAFANA_PASSWORD: ci-grafana-password-2026
-      COGNITIVE_MODULE_ENABLED: 'true'
-      VITE_COGNITIVE_MODULE_ENABLED: 'true'
-      CORS_ORIGIN: https://localhost
-    defaults:
-      run:
-        working-directory: server-version
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: ${{ (inputs.cognitive_product || inputs.release_source_sha != '') && '0' || '1' }}
+          fetch-depth: 0
       - name: Verify release CI and check out the exact source
-        if: github.event_name == 'workflow_dispatch' && inputs.release_source_sha != ''
-        working-directory: .
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_SOURCE: ${{ inputs.release_source_sha }}
           RELEASE_CI_RUN: ${{ inputs.release_ci_run }}
           RELEASE_CI_CHECKOUT: ${{ inputs.release_ci_checkout }}
-          FRONTEND_ONLY: ${{ inputs.frontend_only }}
         run: |
           set -euo pipefail
-          test "$FRONTEND_ONLY" = false
           cp server-version/scripts/release/c_service_package.py "$RUNNER_TEMP/"
           export PYTHONPATH="$GITHUB_WORKSPACE/server-version/scripts/release"
-          python3 -B "$RUNNER_TEMP/c_service_package.py" source \
-            "$RELEASE_SOURCE" "$RELEASE_CI_RUN" "$RELEASE_CI_CHECKOUT"
+          python3 -B "$RUNNER_TEMP/c_service_package.py" source "$RELEASE_SOURCE" "$RELEASE_CI_RUN" "$RELEASE_CI_CHECKOUT"
           git checkout --detach "$RELEASE_SOURCE"
-          test "$(git rev-parse HEAD)" = "$RELEASE_SOURCE"
-      - name: check CI disk headroom
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - name: verify runner capacity and clean application ports
-        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
-      - name: configure runner-local Trivy cache
-        id: runner-cache
-        run: |
-          trivy_cache="$HOME/.cache/trivy"
-          trivy_bin_dir="$HOME/.local/bin/trivy-bin"
-          mkdir -p "$trivy_cache" "$trivy_bin_dir"
-          echo "trivy_cache=$trivy_cache" >> "$GITHUB_OUTPUT"
-          echo "$trivy_bin_dir" >> "$GITHUB_PATH"
-      - name: detect runner-local Trivy 0.70.0
-        id: trivy-local
-        run: |
-          trivy_bin="$HOME/.local/bin/trivy-bin/trivy"
-          if [ -x "$trivy_bin" ] && "$trivy_bin" --version 2>/dev/null | grep -q '^Version: 0\.70\.0$'; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-          fi
-      - name: install Trivy 0.70.0 once per runner
-        id: trivy-install
-        if: steps.trivy-local.outputs.ready != 'true'
-        continue-on-error: true
-        uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
-        with:
-          version: v0.70.0
-          cache: false
-      - name: fall back to a direct Trivy download when the action cannot reach the release host
-        if: steps.trivy-local.outputs.ready != 'true' && steps.trivy-install.outcome == 'failure'
-        run: |
-          set -euo pipefail
-          bin_dir="$HOME/.local/bin/trivy-bin"
-          # The setup action resolved the tag through api.github.com but failed
-          # to resolve github.com for the release asset on this runner (exit 6).
-          # Fetch the exact asset through the API host instead, with retries;
-          # the octet-stream accept header 302s to the release asset CDN.
-          asset_url="$(curl -fsSL --retry 3 --retry-delay 4 --retry-all-errors --max-time 30 https://api.github.com/repos/aquasecurity/trivy/releases/tags/v0.70.0 \
-            | python3 -c "import json,sys;print(next(a['url'] for a in json.load(sys.stdin)['assets'] if a['name']=='trivy_0.70.0_Linux-64bit.tar.gz'))" 2>/dev/null || echo "https://github.com/aquasecurity/trivy/releases/download/v0.70.0/trivy_0.70.0_Linux-64bit.tar.gz")"
-          ok=""
-          for attempt in 1 2 3; do
-            if curl -fsSL --retry 4 --retry-delay 8 --retry-all-errors --max-time 180 \
-                -H "Accept: application/octet-stream" -o /tmp/trivy-0.70.0.tar.gz "$asset_url"; then
-              ok=yes; break
-            fi
-            sleep "$((attempt * 10))"
-          done
-          [ -n "$ok" ] || { echo "Trivy fallback download failed" >&2; exit 1; }
-          tar -xzf /tmp/trivy-0.70.0.tar.gz -C "$bin_dir" trivy
-          "$bin_dir/trivy" --version | grep -q '^Version: 0\.70\.0$'
-      - name: recheck actual Cognitive product scope before selecting its compile path
-        if: inputs.cognitive_product
-        working-directory: .
+      - name: Build matching ops image
+        working-directory: server-version
+        run: docker build --target ops --tag server-version-ops:release --file backend/Dockerfile backend
+      - name: Export matching ops image and role contracts
         env:
-          COGNITIVE_PRODUCT_PLAN: ${{ inputs.cognitive_product_plan }}
-        run: node .github/scripts/cognitive-product-check.mjs plan
-      - name: validate compose
-        run: docker compose config --format json > /tmp/eduk12-compose-config.json
-      - name: assert prelaunch resource and HTTPS contract
-        run: node scripts/prelaunch-resource-preflight.mjs --compose-json /tmp/eduk12-compose-config.json
-      - name: assert API/worker isolation topology
-        run: node scripts/assert-compose-worker-topology.mjs /tmp/eduk12-compose-config.json
-      - name: validate monitoring compose
-        run: docker compose -f docker-compose.yml -f docker-compose.monitoring.yml config > /tmp/eduk12-monitoring-compose-config.yml
-      - name: build production images
-        env:
-          FRONTEND_ONLY: ${{ inputs.frontend_only }}
-          BACKEND_ONLY: ${{ inputs.backend_only }}
-          CATALOG_DISCOVERY: ${{ inputs.catalog_discovery || inputs.cognitive_product }}
-        run: bash "$GITHUB_WORKSPACE/.github/scripts/build-ci-images.sh"
-      - name: verify production Nginx static asset MIME and security headers
-        if: inputs.backend_only != true
-        run: node scripts/frontend-nginx-static-smoke.mjs server-version-frontend:latest
-      - name: Pin the images that will be scanned and exported
-        id: release-images
-        if: github.event_name == 'workflow_dispatch' && inputs.release_source_sha != ''
-        env:
-          BACKEND_ONLY: ${{ inputs.backend_only }}
-        run: |
-          set -euo pipefail
-          services=(backend)
-          if [[ "$BACKEND_ONLY" != true ]]; then services+=(frontend); fi
-          for service in "${services[@]}"; do
-            id=$(docker image inspect --format '{{.Id}}' "server-version-$service:latest")
-            [[ "$id" =~ ^sha256:[a-f0-9]{64}$ ]]
-            echo "$service=$id" >> "$GITHUB_OUTPUT"
-          done
-      - name: scan backend image (high and critical)
-        if: inputs.frontend_only != true
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: ${{ steps.release-images.outputs.backend || 'server-version-backend:latest' }}
-          format: table
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL,HIGH
-          cache: 'false'
-          skip-setup-trivy: true
-          cache-dir: ${{ steps.runner-cache.outputs.trivy_cache }}
-      - name: scan frontend image (high and critical)
-        if: inputs.backend_only != true
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: ${{ steps.release-images.outputs.frontend || 'server-version-frontend:latest' }}
-          format: table
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL,HIGH
-          cache: 'false'
-          skip-setup-trivy: true
-          cache-dir: ${{ steps.runner-cache.outputs.trivy_cache }}
-      - name: Export the same scanned release images
-        if: github.event_name == 'workflow_dispatch' && inputs.release_source_sha != ''
-        env:
+          RELEASE_SOURCE: ${{ inputs.release_source_sha }}
           RELEASE_CI_RUN: ${{ inputs.release_ci_run }}
           RELEASE_CI_CHECKOUT: ${{ inputs.release_ci_checkout }}
-          BACKEND_IMAGE: ${{ steps.release-images.outputs.backend }}
-          FRONTEND_IMAGE: ${{ steps.release-images.outputs.frontend }}
-          BACKEND_ONLY: ${{ inputs.backend_only }}
         run: |
           set -euo pipefail
-          export PYTHONPATH="$GITHUB_WORKSPACE/server-version/scripts/release"
-          scope=()
-          if [[ "$BACKEND_ONLY" = true ]]; then scope+=(--backend-only); fi
-          python3 -B "$RUNNER_TEMP/c_service_package.py" export \
-            "$RUNNER_TEMP/c-service-release" "$RELEASE_CI_RUN" "$RELEASE_CI_CHECKOUT" "${scope[@]}"
-      - name: Upload scanned release images
-        if: github.event_name == 'workflow_dispatch' && inputs.release_source_sha != ''
+          test "$(git rev-parse HEAD)" = "$RELEASE_SOURCE"
+          mkdir -p "$RUNNER_TEMP/release-ops"
+          docker save server-version-ops:release | gzip -1 > "$RUNNER_TEMP/release-ops/ops.tar.gz"
+          id=$(docker image inspect --format '{{.Id}}' server-version-ops:release)
+          container=$(docker create server-version-ops:release)
+          trap 'docker rm "$container" >/dev/null' EXIT
+          docker cp "$container:/app/scripts/runtime-role-defaults.sql" "$RUNNER_TEMP/release-ops/runtime-role-defaults.sql"
+          docker cp "$container:/app/scripts/runtime-table-policy.json" "$RUNNER_TEMP/release-ops/runtime-table-policy.json"
+          export OPS_ID="$id" OPS_OUTPUT="$RUNNER_TEMP/release-ops"
+          python3 - <<'INNER'
+          import hashlib,json,os,pathlib,subprocess
+          root=pathlib.Path(os.environ['OPS_OUTPUT'])
+          files={}
+          for path in root.iterdir():
+              digest=hashlib.sha256()
+              with path.open('rb') as stream:
+                  for chunk in iter(lambda:stream.read(1048576),b''):digest.update(chunk)
+              files[path.name]={'sha256':digest.hexdigest(),'bytes':path.stat().st_size}
+          data={'source':os.environ['RELEASE_SOURCE'],'tree':subprocess.check_output(['git','rev-parse','HEAD^{tree}'],text=True).strip(),'ciRun':int(os.environ['RELEASE_CI_RUN']),'ciCheckout':os.environ['RELEASE_CI_CHECKOUT'],'imageRun':int(os.environ['GITHUB_RUN_ID']),'attempt':int(os.environ['GITHUB_RUN_ATTEMPT']),'toolSha':os.environ['GITHUB_WORKFLOW_SHA'],'opsImage':os.environ['OPS_ID'],'files':files}
+          (root/'manifest.json').write_text(json.dumps(data,indent=2)+'\n')
+          INNER
+      - name: Upload same-source ops image
         uses: actions/upload-artifact@v4
         with:
-          name: c-service-release-${{ inputs.release_source_sha }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/c-service-release/
+          name: release-ops-${{ inputs.release_source_sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/release-ops/
           if-no-files-found: error
           retention-days: 3
