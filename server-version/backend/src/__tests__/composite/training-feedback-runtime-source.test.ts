@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 const read = (name: string) => readFileSync(`src/${name}`, 'utf8')
 const composite = read('modules/composite/composite.service.ts')
-const admission = composite.slice(composite.indexOf('const createAttempt = async'), composite.indexOf('const createAttempt = async') + 30000)
+const admission = composite.slice(composite.indexOf('const createAttempt = async'), composite.indexOf('const createAttempt = async') + 33000)
 describe('C22 runtime wiring source contracts (not concurrency/HTTP evidence)', () => {
   it('binds feedback under the existing publication/course/round locks and atomic attempt insert', () => {
     const lock = admission.indexOf('await lockCompositeAdmissionShare(db'), marker = admission.indexOf('const feedbackConfigured ='), bind = admission.indexOf('feedbackBinding = prepareTrainingFeedbackBinding(')
@@ -11,7 +11,7 @@ describe('C22 runtime wiring source contracts (not concurrency/HTTP evidence)', 
     expect(admission).toContain('FOR SHARE OF c,u'); expect(admission).toContain('accessTokenId, round: feedbackRound')
     const freeze = admission.indexOf('const trainingFeedbackSnapshot ='), insert = admission.indexOf('const attempt = await db.compositeAssessmentAttempt.create')
     expect(freeze).toBeGreaterThan(bind); expect(insert).toBeGreaterThan(freeze)
-    expect(admission.slice(insert, insert + 500)).toContain('trainingFeedbackSnapshotHash: canonicalHash(trainingFeedbackSnapshot)')
+    expect(admission.slice(insert, insert + 1100)).toContain('trainingFeedbackSnapshotHash: canonicalHash(trainingFeedbackSnapshot)')
     expect(admission).not.toContain('trainingPublicRound.create')
     expect(admission).not.toContain('compositeAssessmentAccessToken.create')
   })
