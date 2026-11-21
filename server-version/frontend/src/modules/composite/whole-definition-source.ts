@@ -391,9 +391,8 @@ export const resolveWholeDefinitionPayload = async (
 /** X-05A dual-track delivery: prefer the whole definition that arrived inline
  * with the START response, and fall back to the existing GET endpoint whenever
  * the inline payload is absent, stale (identity mismatch) or structurally
- * incomplete. The returned inline payload is consumed exactly once, so a later
- * reload always re-fetches from the authoritative endpoint. The runner keeps
- * its own second-layer validation on whatever this returns. */
+ * incomplete. The caller owns the lifetime of the START snapshot and the
+ * runner validates the delivered definition before allowing work. */
 export const wholeDefinitionWithInlineFallback = async (
   inline: WholeQuestionnaireDefinition | null | undefined,
   identity: InlineWholeDefinitionIdentity,
