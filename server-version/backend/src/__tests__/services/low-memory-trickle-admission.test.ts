@@ -384,4 +384,25 @@ describe('runWithLowMemoryTrickleAdmission runtime gate & ALS permit', () => {
     gate.resolve()
     await expect(p).resolves.toBe('ok')
   })
+
+  it('rechecks report CPU recovery without claiming under sustained CPU or changing the memory wait', () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    reportResourceClaimDecision(3)
+    advanceSample(950, 98)
+    expect(reportResourceClaimDecision(3)).toMatchObject({ mode: 'normal', limit: 3 })
+    advanceSample(950, 98)
+    const cpuPause = { mode: 'protected', limit: 0, delayMs: 250, reason: 'host_cpu' }
+    expect(reportResourceClaimDecision(3)).toMatchObject(cpuPause)
+    clock += 249
+    proc.advanceCpuPercent(97)
+    expect(reportResourceClaimDecision(3)).toMatchObject(cpuPause)
+    clock += 1
+    expect(reportResourceClaimDecision(3)).toMatchObject(cpuPause)
+    clock += 250
+    proc.advanceCpuPercent(75)
+    expect(reportResourceClaimDecision(3)).toMatchObject({ mode: 'normal', limit: 3, delayMs: 0 })
+
+    advanceSample(500, 30)
+    expect(reportResourceClaimDecision(3)).toMatchObject({ mode: 'protected', limit: 0, delayMs: 1000, reason: 'host_memory' })
+  })
 })

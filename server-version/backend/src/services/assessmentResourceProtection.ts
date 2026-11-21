@@ -99,10 +99,12 @@ let sample: AssessmentResourceSample | null = null
 let memSampleAt = -Infinity
 let cpuSampleAt = -Infinity
 let previousCpu: { total: number; idle: number } | null = null
-export const sampleAssessmentHostResources = (options?: { forceMemoryRefresh?: boolean }): AssessmentResourceSample => {
+const REPORT_CPU_RECOVERY_POLL_MS = 250
+export const sampleAssessmentHostResources = (options?: { forceMemoryRefresh?: boolean; reportCpuRecoveryProbe?: boolean }): AssessmentResourceSample => {
   const at = performance.now()
   const needsMemory = Boolean(options?.forceMemoryRefresh) || !sample || at - memSampleAt >= 1000
-  const needsCpu = !sample || at - cpuSampleAt >= 1000
+  const cpuSampleInterval = options?.reportCpuRecoveryProbe ? REPORT_CPU_RECOVERY_POLL_MS : 1000
+  const needsCpu = !sample || at - cpuSampleAt >= cpuSampleInterval
   if (!needsMemory && !needsCpu && sample) return sample
 
   let availableBytes = sample?.availableBytes ?? null
@@ -253,6 +255,7 @@ export class AssessmentResourceProtection {
 }
 const policy = new AssessmentResourceProtection()
 let previousMode = '', modeSince = performance.now()
+let reportCpuProtected = false
 let previousStartMode = '', startModeSince = performance.now()
 let trickleGateCache: {
   maxConcurrent: number
@@ -326,6 +329,7 @@ export const resetAssessmentResourceProtectionForTests = (): void => {
   policy.reset()
   previousMode = ''
   modeSince = performance.now()
+  reportCpuProtected = false
   previousStartMode = ''
   startModeSince = performance.now()
   cachedTrickleConfig = null
@@ -334,7 +338,12 @@ export const resetAssessmentResourceProtectionForTests = (): void => {
 
 export const reportResourceClaimDecision = (concurrency: number): ResourceClaimDecision => {
   if (!enabled()) return { mode: 'normal', limit: concurrency, delayMs: 0, reason: null }
-  const value = sampleAssessmentHostResources(), decision = policy.decision(value, concurrency)
+  // A protected worker still claims nothing. Recheck CPU recovery sooner so
+  // a short saturation spike does not hold all durable receipts for a full second.
+  const value = sampleAssessmentHostResources({ reportCpuRecoveryProbe: reportCpuProtected })
+  const resourceDecision = policy.decision(value, concurrency)
+  reportCpuProtected = resourceDecision.reason === 'host_cpu'
+  const decision = reportCpuProtected ? { ...resourceDecision, delayMs: REPORT_CPU_RECOVERY_POLL_MS } : resourceDecision
   if (decision.mode !== previousMode) {
     logger.info('ASSESSMENT_RESOURCE_MODE ' + JSON.stringify({ ...decision, previousMode, previousModeMs: performance.now() - modeSince, ...value }))
     previousMode = decision.mode; modeSince = performance.now()
