@@ -4,6 +4,7 @@ import { TrainingCheckpointPanel } from '../modules/composite/TrainingCheckpoint
 import {TrainingTimingBoundary,restoreTrainingTiming} from '../modules/scale/TrainingTimingBoundary'
 import {SurveyScaleTimingTracker,sealObservedScaleTimings} from '../modules/scale/item-timing'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { ReceiptOnlyConfirmation } from './ReceiptOnlyConfirmation'
 import {
   confirmWholeReceiptAfterUncertainSubmit,
   isRecoverableReceiptError,
@@ -122,6 +123,8 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   const [answers, setAnswers] = useState<Record<string, Answer>>({})
   const [index, setIndex] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [acceptedAt, setAcceptedAt] = useState<string | undefined>(state.wholeAcceptedAt)
+  const [receiptOnly, setReceiptOnly] = useState(state.receiptOnly === true)
   const [receiptCheck, setReceiptCheck] = useState<'checking' | 'unknown' | null>(null)
   const [useFallback, setUseFallback] = useState(false)
   const [accepted, setAccepted] = useState(false)
@@ -203,6 +206,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
     let cancelled = false
     const initialize = async () => {
       setLoading(true); setError(null); setUseFallback(false); setAccepted(false); setReceiptCheck(null)
+      setReceiptOnly(state.receiptOnly === true); setAcceptedAt(state.wholeAcceptedAt)
       try {
         const existing = await finalDraftStore.get(draftKey)
         if (cancelled) return
@@ -219,7 +223,8 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
             )
             if (cancelled) return
             if (receipt.status === 'ACCEPTED') {
-              rememberWholeReceipt(receipt); setAccepted(true)
+              rememberWholeReceipt(receipt); setAcceptedAt(receipt.acceptedAt); setAccepted(true)
+              if (receipt.receiptOnly) setReceiptOnly(true)
               await finalDraftStore.setStatus(draftKey, 'COMPLETED'); await finalDraftStore.delete(draftKey)
             }
             if (!cancelled) setReceiptCheck(receipt.status === 'UNKNOWN' ? 'unknown' : null)
@@ -232,9 +237,11 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
         // When opening an existing attempt (e.g. reload, cross-device, resume with recovery token),
         // always verify with the server whether a whole submission has already been accepted,
         // even if the local attempt state is still IN_PROGRESS (the worker may be generating report).
-        // Only fresh attempts directly created from a START response in the current session can safely
-        // skip this check to render Question 1 without an extra network roundtrip.
-        const canSkipStatusCheck = isFreshStart && state.status === 'IN_PROGRESS' && !state.allUnitsSubmitted && !state.reportStatus
+        // Receipt-only attempts carry acceptance in their authorized state;
+        // report-enabled attempts only skip the lookup on the fresh START.
+        if (state.receiptOnly && (state.wholeAcceptedAt || state.status === 'COMPLETED')) { setAccepted(true); return }
+        const canSkipStatusCheck = state.receiptOnly
+          || (isFreshStart && state.status === 'IN_PROGRESS' && !state.allUnitsSubmitted && !state.reportStatus)
         if (!canSkipStatusCheck) {
           const status = await api.reportStatus(state.id)
           if (status.code !== 0 || !status.data) throw responseError(status)
@@ -487,13 +494,14 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
         },
       })
       setReceiptCheck(null)
-      confirmed = true; setAccepted(true); rememberWholeReceipt(result)
+      confirmed = true; setAccepted(true); setAcceptedAt(result.acceptedAt); rememberWholeReceipt(result)
+      if (result.receiptOnly) setReceiptOnly(true)
       try { sessionStorage.setItem(`composite:whole-receipt:${state.id}`, JSON.stringify(result)) } catch { /* The server receipt is already durable. */ }
       await finalDraftStore.setStatus(draftKey, 'COMPLETED')
       await finalDraftStore.delete(draftKey)
-      onCompleted()
+      if (!state.receiptOnly && !result.receiptOnly) onCompleted()
     } catch (cause) {
-      if (confirmed) { setError('交卷已保存。报告页面暂未打开，请点击查看报告，无需重新交卷。'); return }
+      if (confirmed) { setError('交卷已保存，无需重新交卷。'); return }
       const next = await recordFinalSubmissionFailure(draftKey, cause, meta.submissionId).catch(() => null)
       if (next) setMeta(next)
       const failure = normalizeApiError(cause)
@@ -568,7 +576,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       }}/>:null}
     {error ? <p role="alert" className="mb-4 text-red-700">{error}</p> : null}
     {publicMode && recoveryToken ? <p className="mb-4 text-sm text-gray-600">请在页面上方保存本次匿名作答的恢复链接。链接不包含未提交答案，本机草稿或已保存的临时进度仍按各自有效期恢复。</p> : null}
-    {accepted ? <div className="space-y-4"><h2 className="text-xl font-semibold">交卷成功</h2><p>{acceptedNotice}</p>{progressNote ? <p role="status">{progressNote}</p> : null}<button className="btn-primary min-h-11" type="button" disabled={busy} onClick={() => {
+    {accepted && receiptOnly ? <ReceiptOnlyConfirmation acceptedAt={acceptedAt ?? state.completedAt} onExit={onExit}/> : accepted ? <div className="space-y-4"><h2 className="text-xl font-semibold">交卷成功</h2><p>{acceptedNotice}</p>{progressNote ? <p role="status">{progressNote}</p> : null}<button className="btn-primary min-h-11" type="button" disabled={busy} onClick={() => {
       if (!educationMedia) { onCompleted(); return }
       void (async () => {
         setBusy(true)

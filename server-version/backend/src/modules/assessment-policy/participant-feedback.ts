@@ -17,7 +17,7 @@ export function trainingFeedbackReportReady(parent: any, job: any): boolean {
 export async function readCompositeParticipantFeedbackContext(attemptId: string, db: any = prisma) {
   const rows = await db.$queryRaw`
     SELECT jsonb_build_object(
-      'id',p.id,'status',p.status,'attemptEpoch',p.attempt_epoch,
+      'id',p.id,'status',p.status,'attemptEpoch',p.attempt_epoch,'receiptOnly',p.receipt_only,
       'compositeAssessmentId',p.composite_assessment_id,'deliveryCourseId',p.delivery_course_id,
       'accessTokenId',p.access_token_id,'asyncReportEpoch',p.async_report_epoch,
       'frozenActiveSlotSetHash',p.frozen_active_slot_set_hash,'contextSnapshotHash',p.context_snapshot_hash,
@@ -40,7 +40,7 @@ export async function readCompositeParticipantFeedbackContext(attemptId: string,
 /** Evaluate an already authorized parent. Only a configured, completed async
  * native read without a joined job needs one bounded job-header lookup. */
 export async function isLoadedCompositeParticipantFeedbackDeferred(parent: any, db: any = prisma, joinedJob?: any): Promise<boolean> {
-  if (!parent) return true
+  if (!parent || parent.receiptOnly) return true
   const timing = evaluateTrainingFeedbackForAttempt(parent, { reportReady: true })
   if (!timing.allowed || !timing.configured || parent.asyncReportEpoch === null) return !timing.allowed
   if (parent.asyncReportEpoch !== parent.attemptEpoch) return true

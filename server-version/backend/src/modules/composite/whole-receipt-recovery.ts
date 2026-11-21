@@ -2,7 +2,7 @@ import { prisma } from '../../config/database'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 type Principal = { userId?: string; recoveryTokenHash?: string }
 export type WholeReceiptRow = {
-  id: string; userId: string | null; recoveryTokenHash: string | null; epoch: number;
+  id: string; receiptOnly?: boolean; userId: string | null; recoveryTokenHash: string | null; epoch: number;
   slotHash: string | null; jobSlot: string | null; wholeSubmissionId: string | null;
   payloadHash: string | null; acceptedAt: Date | null; state: string | null;
 }
@@ -11,7 +11,7 @@ export const recoverWholeQuestionnaireReceipt = async (
   attemptId: string, submissionId: string, attemptEpoch: number, principal: Principal, admitted?: WholeReceiptRow,
 ) => {
   const row = admitted ?? (await prisma.$queryRaw<WholeReceiptRow[]>`
-    SELECT p."id", p."user_id" AS "userId", p."recovery_token_hash" AS "recoveryTokenHash",
+    SELECT p."id", p."receipt_only" AS "receiptOnly", p."user_id" AS "userId", p."recovery_token_hash" AS "recoveryTokenHash",
       p."attempt_epoch" AS epoch, p."frozen_active_slot_set_hash" AS "slotHash",
       j."slot_set_hash" AS "jobSlot", j."whole_submission_id" AS "wholeSubmissionId",
       j."whole_payload_hash" AS "payloadHash", j."whole_accepted_at" AS "acceptedAt", j."status" AS state
@@ -35,5 +35,5 @@ export const recoverWholeQuestionnaireReceipt = async (
   }
   return { status: 'ACCEPTED' as const, attemptId, submissionId, payloadHash: row.payloadHash,
     acceptedAt: row.acceptedAt, committedAt: new Date(), replayed: true,
-    reportStatus: { state: row.state ?? 'PENDING', retryAfterSeconds: 2 } }
+    ...(row.receiptOnly ? { receiptOnly: true as const } : { reportStatus: { state: row.state ?? 'PENDING', retryAfterSeconds: 2 } }) }
 }

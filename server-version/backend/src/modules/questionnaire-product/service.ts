@@ -588,7 +588,7 @@ export async function publishMeasurementInstances(actor:Actor,id:string,raw:unkn
 }
 
 export async function publish(actor: Actor, id: string, raw: unknown) {
-  const input=revisionSchema.extend({tracking:trainingTrackingSelectionSchema.optional()}).parse(raw)
+  const input=revisionSchema.extend({tracking:trainingTrackingSelectionSchema.optional(),provideParticipantReport:z.boolean().optional()}).parse(raw)
   return mutate(actor, id, input.revision, async (tx, row) => {
     if (await tx.assessmentCompositionTemplate.findUnique({ where: { definitionId: id } })) throw compositeConflict('组合模板需要先复制为新草稿，再绑定课程或公开投放')
     if(row.trainingVariantDraft!=null)await validateTrainingVariants(tx,row)
@@ -603,7 +603,7 @@ export async function publish(actor: Actor, id: string, raw: unknown) {
       await retainFormSectionVideos({ owner: mediaOwner, presentations: compositeFormSectionVideoPresentations(definition), db: tx })
     }
     if(row.trainingTimingPolicy){readTrainingTimingPolicy(row.trainingTimingPolicy);await tx.compositeAssessment.update({where:{id},data:{trainingTimingPolicy:await timingPolicy(tx,row,true)}})}
-    await publishComposite(actor.userId, actor.role, id, tx, situational,input.tracking)
+    await publishComposite(actor.userId, actor.role, id, tx, situational,input.tracking,input.provideParticipantReport)
     await recheckMeasurementPublisherExpiry(tx,measurementPublisherExpiry)
   })
 }

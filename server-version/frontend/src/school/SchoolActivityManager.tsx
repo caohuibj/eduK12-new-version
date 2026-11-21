@@ -308,10 +308,10 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     setPreview(r)
     setNotice('仅展示人数预览，不展示任何个体心理报告或原始作答。')
   })
-  const publishRun=(tracking?:unknown)=>void execute(async()=>{
+  const publishRun=(tracking?:unknown,provideParticipantReport?:boolean)=>void execute(async()=>{
     if(!selected||!activeRun)return
     if(!window.confirm('确认测评资源、参与名单、许可与科学成熟度已经审核，正式向获批人员发布？'))return
-    await api(path+'/runs/'+activeRun.id+'/publish','POST',{expectedVersion:activeRun.version,tracking})
+    await api(path+'/runs/'+activeRun.id+'/publish','POST',{expectedVersion:activeRun.version,tracking,provideParticipantReport})
     await fetchDetail(selected.courseId)
     setActiveRun(null);setNotice('正式测评已发布。学生仍需以本人身份完成原有作答流程。')
   })

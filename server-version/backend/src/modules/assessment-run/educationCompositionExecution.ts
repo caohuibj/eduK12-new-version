@@ -222,11 +222,11 @@ export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:s
    THEN EXISTS(${liveCompositionAnchor({compositeId:known.compositeId,key:known.policy.key,
     manifestHash:known.binding.manifestHash,origin:known.origin})}) END`:Prisma.sql`NULL::boolean`
  const [row]=await tx.$queryRaw<Array<{executionId:string;organizationId:string;key:string;version:string;policy:RunResourcePolicy;policyHash:string;
-  assignmentRef:string;subjectUserId:string;respondentUserId:string;subjectRole:string;respondentRole:string;relationshipKind:string;perspective:string;
+  assignmentRef:string;subjectUserId:string;respondentUserId:string;subjectRole:string;respondentRole:string;relationshipKind:string;perspective:string;receiptOnly:boolean;
   bindingKind:string|null;bindingRef:string|null;status:string;runStatus:string;assignmentStatus:string;product:'SCHOOL'|'TEACHER';
   checkedAnchorCurrent:boolean|null}>>(Prisma.sql`
   SELECT e.id AS "executionId",e.organization_id AS "organizationId",t.resource_key AS key,t.resource_version AS version,
-   t.frozen_resource_policy AS policy,t.resource_policy_hash AS "policyHash",a.id AS "assignmentRef",a.subject_user_id AS "subjectUserId",
+   t.frozen_resource_policy AS policy,t.resource_policy_hash AS "policyHash",t.receipt_only AS "receiptOnly",a.id AS "assignmentRef",a.subject_user_id AS "subjectUserId",
    a.respondent_user_id AS "respondentUserId",a.subject_role AS "subjectRole",a.respondent_role AS "respondentRole",a.relationship_kind AS "relationshipKind",a.perspective,
    e.runtime_binding_kind AS "bindingKind",e.runtime_binding_ref AS "bindingRef",e.status,
    r.status AS "runStatus",a.status AS "assignmentStatus",CASE WHEN school.run_id IS NOT NULL THEN 'SCHOOL' ELSE 'TEACHER' END AS product,
@@ -273,7 +273,7 @@ export async function admitCompositionStart(tx:Tx,input:{executionId:string;comp
  const checkedScaleIds=await assertCompositionCollection(tx,source.identity,publishedSelfWhole?'PUBLISHED_SELF_START':'NEW_START',true,libraryUses)
  return issueVerifiedEducationStart({tx,product:source.product,compositeId:source.identity.compositeId,assignmentRef:source.assignmentRef,
   subjectUserId:source.subjectUserId,respondentUserId:source.respondentUserId,composition:source.identity.binding,
-  checkedScaleIds:new Set(checkedScaleIds)})
+  checkedScaleIds:new Set(checkedScaleIds),receiptOnly:source.receiptOnly})
 }
 
 /** Before Organization/Run/Execution locks, for this actual frozen respondent

@@ -81,7 +81,7 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
   const teacherLink = Prisma.sql`SELECT 1 FROM huiteacher_evaluation_run_links link WHERE ${sameRun}`
   return Prisma.sql`
     SELECT e.status AS "executionStatus", a.id AS "assignmentRef", p.id, p.user_id AS "userId",
-      NULL::text AS "recoveryTokenHash", p.attempt_epoch AS epoch, p.status AS "parentStatus",
+      NULL::text AS "recoveryTokenHash", p.attempt_epoch AS epoch, p.status AS "parentStatus", p.receipt_only AS "receiptOnly",
       p.frozen_active_slot_set_hash AS "slotHash", j.slot_set_hash AS "jobSlot",
       j.whole_submission_id AS "wholeSubmissionId", j.whole_payload_hash AS "payloadHash",
       j.whole_accepted_at AS "acceptedAt", j.status AS state, j.status AS "jobStatus",

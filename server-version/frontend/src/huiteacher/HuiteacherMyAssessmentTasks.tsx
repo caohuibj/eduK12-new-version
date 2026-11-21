@@ -9,6 +9,7 @@ const SituationalRunner=deferredPage(()=>import('../modules/situational/pages/Si
 import type {CompositeAttemptState,CompositeCurrentItem,CompositeReportStatus,WholeQuestionnaireDefinition,WholeQuestionnaireInput,WholeQuestionnaireReceipt} from '../modules/composite/types'
 import type {WholeReceiptLookup} from '../modules/composite/receipt-recovery'
 import type {WholeQuestionnaireApi} from '../components/WholeCompositeQuestionnaire'
+import {ReceiptOnlyConfirmation} from '../components/ReceiptOnlyConfirmation'
 import type {AssessmentVideoCapabilitySources} from '../modules/assessment-media/types'
 import type {EducationReportApi} from '../components/education-tools/EducationScalePersonalReport'
 import {TeacherAssessmentPage} from './TeacherAssessmentPage'
@@ -79,7 +80,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
  const accept=(task:TeacherAssessmentTask,attemptId:string,state:CompositeAttemptState,valid:()=>boolean,inline?:{definition:WholeQuestionnaireDefinition|null;freshlyCreated:boolean})=>{
   if(!valid())return
   if(state.id!==attemptId||state.deliveryMode!=='FINAL_ONLY')throw new Error('测评记录与当前冻结任务不一致')
-  if(state.status==='COMPLETED'){
+  if(state.status==='COMPLETED'&&!state.receiptOnly){
    inlineWholeRef.current=null;activeIdentityRef.current=null;setFreshStart(false)
    const completion={executionId:task.executionId,attemptId:state.id,...(task.mode?{mode:task.mode}:{})},key=completion.executionId+':'+completion.attemptId
    setSession({task,attempt:state,child:null,completion})
@@ -88,7 +89,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
    void refresh()
    if(!completed.current.has(key)){completed.current.add(key);completionCallback.current?.(completion)}
   }else{
-   if(state.status!=='IN_PROGRESS')throw new Error('当前测评已结束，不能继续作答')
+   if(state.status!=='IN_PROGRESS'&&state.status!=='COMPLETED')throw new Error('当前测评已结束，不能继续作答')
    activeIdentityRef.current=educationAttemptIdentity(state)
    inlineWholeRef.current=inline?.definition?{attemptId:state.id,definition:inline.definition}:null
    setFreshStart(Boolean(inline?.freshlyCreated))
@@ -230,7 +231,9 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
     {student&&session.task.teacherName&&<p>被评价教师：{session.task.teacherName}</p>}
     {error&&<p role="alert">{error}</p>}
     {busy&&<p role="status">正在核对测评状态…</p>}
-    {session.completion?<div role="status"><h3>{student?'本次评价已完成':'本次测评已完成'}</h3><p>正式作答已提交并确认，反馈按独立授权规则开放。</p>
+    {attempt?.receiptOnly&&(attempt.status==='COMPLETED'||attempt.wholeAcceptedAt)?
+     <ReceiptOnlyConfirmation acceptedAt={attempt.wholeAcceptedAt??attempt.completedAt} onExit={leave}/>:
+     session.completion?<div role="status"><h3>{student?'本次评价已完成':'本次测评已完成'}</h3><p>正式作答已提交并确认，反馈按独立授权规则开放。</p>
       {renderFeedback?.(session.completion)}
       {!student&&<EducationPersonalChanges key={'changes:'+session.completion.executionId} api={api} executionId={session.completion.executionId} path={'/run-executions/'+encodeURIComponent(session.completion.executionId)+'/changes'}/>}
      </div>:

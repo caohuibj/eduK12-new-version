@@ -99,6 +99,26 @@ type PopulationPair = {
 
 type PreparedTrack = DraftTrack & { resourcePolicy: RunResourcePolicy }
 
+async function receiptOnlyTrackIds(tx: Tx, tracks: PreparedTrack[], provideParticipantReport?: boolean) {
+  const candidates = tracks.filter(({ resourcePolicy: policy }) => {
+    const origin = policy.educationComposition?.origin
+    return policy.runtimeLaunchTarget?.kind === 'COMPOSITE'
+      && (origin?.entry === 'SCHOOL' && origin.variantKey === 'STUDENT:SELF'
+        || origin?.entry === 'TEACHER' && origin.variantKey === 'TEACHER:SELF')
+  })
+  if (provideParticipantReport === true || !candidates.length) return new Set<string>()
+  const composed = Prisma.join(candidates.map(({ id, resourcePolicy }) =>
+    Prisma.sql`(${id}::text, ${resourcePolicy.runtimeLaunchTarget!.ref}::text)`))
+  const rows = await tx.$queryRaw<Array<{ id: string }>>`
+    SELECT candidate.id FROM (VALUES ${composed}) AS candidate(id, composite_id)
+    WHERE EXISTS (SELECT 1 FROM composite_assessment_items item WHERE item.composite_assessment_id=candidate.composite_id)
+      AND NOT EXISTS (SELECT 1 FROM composite_assessment_items item
+        WHERE item.composite_assessment_id=candidate.composite_id AND (item.type<>'SCALE' OR NOT item.required))
+      AND NOT EXISTS (SELECT 1 FROM composite_form_sections section WHERE section.composite_assessment_id=candidate.composite_id)
+  `
+  return new Set(rows.map(row => row.id))
+}
+
 type PublisherAuthority = {
   membershipId: string
   isOrgAdmin: boolean
@@ -978,6 +998,7 @@ export const publishAssessmentRun = async (input: {
   expectedVersion: number
   resourceRegistry?: RunResourceAuthorityRegistry
   tracking?:unknown
+  provideParticipantReport?: boolean
 }): Promise<PublishedRunResult> => {
   const registry = input.resourceRegistry ?? productionRunResourceAuthorityRegistry
   const preparedTracks = await prepareTracks(input.runId, input.organizationId, registry, input.actorUserId)
@@ -1082,6 +1103,7 @@ export const publishAssessmentRun = async (input: {
     // this locked publication transaction; never overwrite immutable facts.
     const relationshipCache = new Map<string, { id: string; snapshotHash: string }>()
     let executionCount = 0
+    const receiptOnlyTracks = await receiptOnlyTrackIds(tx, preparedTracks, input.provideParticipantReport)
 
     for (const track of preparedTracks) {
       // New library tracks were batch-authorized before the org lock. Never select another issuer here.
@@ -1107,7 +1129,8 @@ export const publishAssessmentRun = async (input: {
       const policyHash = canonicalHash(track.resourcePolicy)
       await tx.$executeRaw`
         UPDATE "assessment_run_tracks"
-        SET "frozen_resource_policy" = ${frozenPolicyJson}::jsonb, "resource_policy_hash" = ${policyHash}
+        SET "frozen_resource_policy" = ${frozenPolicyJson}::jsonb, "resource_policy_hash" = ${policyHash},
+          "receipt_only" = ${receiptOnlyTracks.has(track.id)}
         WHERE "id" = ${track.id} AND "run_id" = ${input.runId}
       `
       const pairs = libraryPairs?.get(track.id)??await resolvePairs(tx, input.organizationId, track, campusSelected)

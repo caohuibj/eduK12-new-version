@@ -288,6 +288,28 @@ suite('durable report outbox on isolated PostgreSQL', () => {
     expect(await outbox.readCompositeReportJob(f.parent.id, 1)).toMatchObject({ status: 'READY' })
   })
 
+  it('completes a receipt-only whole without a participant report and preserves staff exports', async () => {
+    const f = await fixture(3)
+    await db.compositeAssessmentAttempt.update({ where: { id: f.parent.id }, data: { receiptOnly: true } })
+    const { whole, input } = await wholeInput(f)
+    const principal = { userId: f.participant.id }
+    const accepted = await whole.submitWholeQuestionnaire(f.parent.id, input, principal)
+    expect(accepted).toMatchObject({ status: 'ACCEPTED', receiptOnly: true })
+    expect(accepted).not.toHaveProperty('reportStatus')
+    await processJob(await claim())
+    expect(await db.assessmentUnitSnapshot.count({ where: { compositeAttemptId: f.parent.id, terminalState: 'COMPLETED' } })).toBe(3)
+    const job = await outbox.readCompositeReportJob(f.parent.id, 1)
+    const { decryptUnifiedRuntimePayload } = await import('../../modules/assessment-runtime/security')
+    expect(decryptUnifiedRuntimePayload(job!.reportEncrypted!)).toMatchObject({ kind: 'WHOLE_RECEIPT_MATERIALIZED' })
+    expect(await service.getCompositeReportView(f.parent.id, principal)).toMatchObject({
+      generation: { receiptOnly: true, reportStatus: { state: 'NOT_OFFERED' } }, report: null,
+    })
+    await expect(service.getReport(f.parent.id, principal)).rejects.toMatchObject({ statusCode: 403 })
+    expect((await service.getReportForTeacher(f.owner.id, f.owner.role, f.parent.compositeAssessmentId, f.parent.id)).unitReports).toHaveLength(3)
+    expect(await whole.submitWholeQuestionnaire(f.parent.id, input, principal)).toMatchObject({ receiptOnly: true, replayed: true })
+    expect(await budget()).toBe(0)
+  })
+
   it('ACKs one complete answer envelope before scoring, then materializes the full report', async () => {
     const f = await fixture(3), { whole, input } = await wholeInput(f)
     const accepted = await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })

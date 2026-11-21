@@ -21,9 +21,9 @@ async function readOwn(tx:Prisma.TransactionClient,input:ScopedInput,loadContent
  const population=input.entry==='SCHOOL'?'STUDENT':'TEACHER'
  const [row]=await tx.$queryRaw<Array<{organizationId:string;key:string;version:string;policy:RunResourcePolicy;policyHash:string;status:string;
   subjectUserId:string;respondentUserId:string;subjectRole:string;respondentRole:string;relationshipKind:string;perspective:string;
-  contentState:OrdinaryStoredContent|null;parentId:string|null;parentStatus:string|null;attemptEpoch:number|null;contextSnapshotHash:string|null;frozenSlots:string|null;frozenSlotsHash:string|null}>>(Prisma.sql`
+  receiptOnly:boolean|null;contentState:OrdinaryStoredContent|null;parentId:string|null;parentStatus:string|null;attemptEpoch:number|null;contextSnapshotHash:string|null;frozenSlots:string|null;frozenSlotsHash:string|null}>>(Prisma.sql`
   SELECT e.organization_id AS "organizationId",t.resource_key AS key,t.resource_version AS version,t.frozen_resource_policy AS policy,
-   t.resource_policy_hash AS "policyHash",e.status,p.id AS "parentId",p.status AS "parentStatus",p.attempt_epoch AS "attemptEpoch",
+   t.resource_policy_hash AS "policyHash",e.status,p.receipt_only AS "receiptOnly",p.id AS "parentId",p.status AS "parentStatus",p.attempt_epoch AS "attemptEpoch",
    a.subject_user_id AS "subjectUserId",a.respondent_user_id AS "respondentUserId",a.subject_role AS "subjectRole",a.respondent_role AS "respondentRole",
    a.relationship_kind AS "relationshipKind",a.perspective,p.context_snapshot_hash AS "contextSnapshotHash",
    CASE WHEN a.relationship_kind='SELF' THEN p.frozen_active_slot_set_encrypted END AS "frozenSlots",
@@ -75,7 +75,7 @@ async function readOrdinaryFeedback(input:ScopedInput){
  return prisma.$transaction(async tx=>{
   await applyBoundedPlannerControls(tx)
   const own=await readOwn(tx,input,true)
-  if(!own)hidden()
+  if(!own || own.receiptOnly)hidden()
   const identity=await readFrozenCompositionIdentity(tx,own)
   if(identity.origin.entry!==input.entry||!matchesEducationCompositionRespondent(identity.origin,own))hidden()
   if(own.status!=='COMPLETED')return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,state:'IN_PROGRESS' as const,title:identity.title,units:[]}

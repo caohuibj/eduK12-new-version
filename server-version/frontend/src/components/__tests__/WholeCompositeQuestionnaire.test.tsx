@@ -35,6 +35,20 @@ beforeEach(() => { vi.clearAllMocks(); retry.mockImplementation(async ({ operati
 afterEach(async () => { await finalDraftStore.delete(key); for (let i = 0; i < 8; i++) await finalDraftStore.delete(`composite-scale:child-${i}`) })
 
 describe('whole questionnaire durable browser submission', () => {
+  it('shows a durable receipt without launching reports or querying progress', async () => {
+    const d = definition([1, 1]), client = api(), onCompleted = vi.fn(), onExit = vi.fn()
+    client.wholeDefinition.mockResolvedValue({ code: 0, data: d })
+    await seed(d)
+    render(<WholeCompositeQuestionnaire state={{ ...state, receiptOnly: true }} api={client} fallback={null} onCompleted={onCompleted} onExit={onExit}/>)
+    await lastQuestion(2)
+    fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
+    expect(await screen.findByText('答案已保存，本次问卷仅提供交卷回执。')).toBeTruthy()
+    expect(client.submitWhole).toHaveBeenCalledTimes(1)
+    expect(client.reportStatus).not.toHaveBeenCalled()
+    expect(onCompleted).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: '返回', exact: true }))
+    expect(onExit).toHaveBeenCalledOnce()
+  })
   it('keeps frozen scale and form order and shows a failed worker without resubmitting', async () => {
     const ordered = definition([1, 1])
     ordered.units[0].scale.name = '量表甲'

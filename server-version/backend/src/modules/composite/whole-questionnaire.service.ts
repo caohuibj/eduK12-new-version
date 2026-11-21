@@ -815,10 +815,14 @@ export const prepareWholeSubmissionPayload = (attemptId: string, input: WholeQue
   return { bytes, hash }
 }
 const childSubmissionId = (submissionId: string, itemId: string) => 'whole-' + createHash('sha256').update(submissionId + '/' + itemId).digest('hex')
-const receiptResponse = (attemptId: string, submissionId: string, payloadHash: string, acceptedAt: Date, replayed: boolean, feedbackPollProfile: ReportFeedbackProfile = 'QUEUED') => ({
+const receiptResponse = (attemptId: string, submissionId: string, payloadHash: string, acceptedAt: Date,
+  replayed: boolean, receiptOnly: boolean, feedbackPollProfile: ReportFeedbackProfile = 'QUEUED') => ({
   attemptId, submissionId, payloadHash, acceptedAt, committedAt: new Date(), replayed,
-  status: 'ACCEPTED' as const, hasAcceptedSubmission: true, feedbackPollProfile,
-  reportStatus: { state: 'PENDING', retryAfterSeconds: feedbackPollProfile === 'FAST_START' ? 0.25 : 2 },
+  status: 'ACCEPTED' as const, hasAcceptedSubmission: true,
+  ...(receiptOnly ? { receiptOnly: true as const } : {
+    feedbackPollProfile,
+    reportStatus: { state: 'PENDING', retryAfterSeconds: feedbackPollProfile === 'FAST_START' ? 0.25 : 2 },
+  }),
 })
 
 type WholeSubmissionHeader = Prisma.CompositeAssessmentAttemptGetPayload<{
@@ -869,7 +873,7 @@ const loadWholeSubmissionContext = async (attemptId: string, boundAssignmentRef?
       parent."training_flow_path_encrypted" AS "trainingFlowPathEncrypted", parent."training_flow_path_hash" AS "trainingFlowPathHash",
       parent."training_variant_allocation_encrypted" AS "trainingVariantAllocationEncrypted",
       parent."training_variant_allocation_hash" AS "trainingVariantAllocationHash",
-      parent."user_id" AS "userId",
+      parent."user_id" AS "userId", parent."receipt_only" AS "receiptOnly",
       parent."recovery_token_hash" AS "recoveryTokenHash",
       product."product_kind" AS "productKind", product."report_package_key" AS "reportPackageKey",
       product."analysis_protocol_key" AS "analysisProtocolKey",
@@ -967,7 +971,7 @@ export async function submitWholeQuestionnaire(attemptId: string, submission: Wh
     // replay. Epoch, slot-set and variant authorization above still bind every
     // replay; same id + different payload hash conflicts.
     if (prior.wholeSubmissionId !== input.submissionId || prior.wholePayloadHash !== canonical.hash) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '已收到不同的整份交卷内容', 409)
-    return receiptResponse(attemptId, input.submissionId, canonical.hash, prior.wholeAcceptedAt!, true, readWholeReportFeedbackHint(attemptId, input.submissionId).profile)
+    return receiptResponse(attemptId, input.submissionId, canonical.hash, prior.wholeAcceptedAt!, true, parent.receiptOnly, readWholeReportFeedbackHint(attemptId, input.submissionId).profile)
   }
   // The context hash is the only receipt-binding component whole Form
   // materialization can advance; compare it for fresh submissions only.
@@ -1019,8 +1023,9 @@ export async function submitWholeQuestionnaire(attemptId: string, submission: Wh
     rejectPriorUnitSnapshots: isEducationWholeAttempt(parent),
     expectedChildren: prepared.units.map(unit => ({ assessmentId: unit.assessmentId, itemId: unit.itemId })),
   })
-  const feedback = rememberWholeReportFeedbackHint(attemptId, input.submissionId, detachedWholeReceiptsEnabled() && !receipt.replayed ? recordWholeReceiptStored() : receipt.queueDepth)
-  return receiptResponse(attemptId, input.submissionId, canonical.hash, receipt.acceptedAt, receipt.replayed, feedback.profile)
+  const queueDepth = detachedWholeReceiptsEnabled() && !receipt.replayed ? recordWholeReceiptStored() : receipt.queueDepth
+  const feedback = parent.receiptOnly ? undefined : rememberWholeReportFeedbackHint(attemptId, input.submissionId, queueDepth)
+  return receiptResponse(attemptId, input.submissionId, canonical.hash, receipt.acceptedAt, receipt.replayed, parent.receiptOnly, feedback?.profile)
   }, anonymous && parent.compositeAssessment.productKind === 'QUESTIONNAIRE')
   }, anonymous)
 }
@@ -1028,7 +1033,7 @@ export async function submitWholeQuestionnaire(attemptId: string, submission: Wh
 /** Completion poll for an education whole receipt. It does not project a report. */
 export const readEducationWholeProgress = async (attemptId: string, userId: string, executionStatus?: string) => {
   const [progress] = await prisma.$queryRaw<EducationWholeProgressRow[]>`
-    SELECT parent.attempt_epoch AS epoch, parent.status AS "parentStatus",
+    SELECT parent.attempt_epoch AS epoch, parent.status AS "parentStatus", parent.receipt_only AS "receiptOnly",
       job.whole_submission_id AS "wholeSubmissionId", job.status AS "jobStatus"
     FROM composite_assessment_attempts parent
     JOIN composite_assessments publication ON publication.id=parent.composite_assessment_id
@@ -1042,6 +1047,7 @@ export const readEducationWholeProgress = async (attemptId: string, userId: stri
 
 type EducationWholeProgressRow = {
   epoch: number
+  receiptOnly?: boolean
   parentStatus: WholeSubmissionHeader['status']
   wholeSubmissionId: string | null
   jobStatus: CompositeReportJob['status'] | null
@@ -1053,6 +1059,7 @@ export function educationWholeProgressFromRow(attemptId: string, progress: Educa
   const awaitingRun = executionStatus === 'STARTED' && progress.parentStatus === 'COMPLETED' && Boolean(progress.wholeSubmissionId)
   const terminalFailure = progress.jobStatus === 'FAILED' || progress.jobStatus === 'CANCELLED' ? progress.jobStatus : undefined
   return {
+    ...(progress.receiptOnly ? { receiptOnly: true as const } : {}),
     attemptId, attemptEpoch: progress.epoch, status: awaitingRun ? 'IN_PROGRESS' : progress.parentStatus,
     wholeSubmissionReceived: Boolean(progress.wholeSubmissionId),
     ...(executionStatus === 'COMPLETED' && progress.parentStatus === 'COMPLETED' ? { runCompleted: true as const } : {}),

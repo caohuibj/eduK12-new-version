@@ -5,6 +5,7 @@ import {SchoolTaskHelp} from './SchoolTaskHelp'
 import { MemoryRouter } from 'react-router-dom'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
 import WholeCompositeQuestionnaire from '../components/WholeCompositeQuestionnaire'
+import { ReceiptOnlyConfirmation } from '../components/ReceiptOnlyConfirmation'
 import type { CompositeReportStatus, WholeQuestionnaireInput, WholeQuestionnaireReceipt, WholeQuestionnaireDefinition } from '../modules/composite/types'
 import type { WholeReceiptLookup } from '../modules/composite/receipt-recovery'
 import type { WholeQuestionnaireApi } from '../components/WholeCompositeQuestionnaire'
@@ -78,7 +79,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
     if(result.deliveryMode!=='FINAL_ONLY')throw new Error('不支持通过校园入口重启历史旧版测评')
     activeIdentityRef.current=educationAttemptIdentity(result)
     setState(result)
-    if(result.status==='COMPLETED')markCompleted(result.id)
+    if(result.status==='COMPLETED'&&!result.receiptOnly)markCompleted(result.id)
   },[api,identity,markCompleted])
   const start=async()=>{
     setBusy(true);setError('');inlineWholeRef.current=null;setFreshStart(false)
@@ -107,7 +108,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
         inlineWholeRef.current=inline?{attemptId:result.currentUnit.id,definition:inline}:null
         setFreshStart(Boolean(result.freshlyCreated))
         setState(result.currentUnit)
-        if(result.currentUnit.status==='COMPLETED')markCompleted(result.currentUnit.id)
+        if(result.currentUnit.status==='COMPLETED'&&!result.currentUnit.receiptOnly)markCompleted(result.currentUnit.id)
       }else{
         await load(result.runtimeBindingRef)
       }
@@ -263,7 +264,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
     {compactNotes?<details className="hs-school-runner-help"><summary>任务与隐私说明</summary><p>返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p><p>答案在官方评估引擎中结算，不会因为你完成测评就自动公开给家长或普通教师。</p></details>:<p className="hs-runner-note">答案在官方评估引擎中结算，不会因为你完成测评就自动公开给家长或普通教师。</p>}
     </>}
     {error&&<p className="hs-alert" role="alert">{error}</p>}
-    {done?<div role="status" className="hs-message">
+    {state?.receiptOnly && (state.status==='COMPLETED'||state.wholeAcceptedAt)?<ReceiptOnlyConfirmation acceptedAt={state.wholeAcceptedAt??state.completedAt} onExit={onExit}/>:done?<div role="status" className="hs-message">
       {observer?<><CircleCheck className="hs-observer-complete-icon" size={36} aria-hidden="true"/><h1>本次测评已完成</h1></>:<h3>本次测评已完成</h3>}
       <p>{observer?'作答已提交。报告会按学校的授权与隐私规则开放。':'已收到正式完成确认。报告是否可查看由独立披露政策决定。'}</p>
       <button onClick={()=>{if(state?.status==='COMPLETED')onFinished();else onExit()}}>{observer?'返回任务列表':'返回我的校园活动'}</button>
