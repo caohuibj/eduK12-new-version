@@ -170,24 +170,30 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
         GROUP BY a."course_id", a."organization_id", course."title"
         ORDER BY a."course_id" LIMIT 201
       ),
-      ${discoverPublishedSelf ? Prisma.sql`published_self_activities AS MATERIALIZED (
-        SELECT DISTINCT activity.course_id AS "courseId", activity.organization_id AS "organizationId", course.title,
-          ARRAY[]::text[] AS "membershipIds"
+      ${discoverPublishedSelf ? Prisma.sql`unlisted_self_executions AS MATERIALIZED (
+        -- Bound discovery to this student's assigned runs and discard activities
+        -- already found by the live path before opening the frozen track and units.
+        SELECT x.track_id, x.relational_assignment_id, x.organization_id, x.run_id, link.course_id
         FROM assessment_run_actor_snapshots actor
         JOIN assessment_run_executions x ON x.respondent_actor_snapshot_id=actor.id AND x.subject_actor_snapshot_id=actor.id
           AND x.organization_id=actor.organization_id AND x.run_id=actor.run_id AND x.status='ASSIGNED'
+        JOIN campus_activity_runs link ON link.run_id=x.run_id AND link.organization_id=x.organization_id
+        WHERE actor.user_id=${actor.userId} AND actor.actor_role='STUDENT'
+          ${input.activityId ? Prisma.sql`AND link.course_id=${input.activityId}` : Prisma.empty}
+          AND NOT EXISTS (SELECT 1 FROM activities live WHERE live."courseId"=link.course_id)
+      ),
+      published_self_activities AS MATERIALIZED (
+        SELECT DISTINCT activity.course_id AS "courseId", activity.organization_id AS "organizationId", course.title,
+          ARRAY[]::text[] AS "membershipIds"
+        FROM unlisted_self_executions x
         JOIN relational_assessment_assignments assignment ON assignment.id=x.relational_assignment_id
-          AND assignment.respondent_user_id=actor.user_id AND assignment.status='OPEN'
+          AND assignment.respondent_user_id=${actor.userId} AND assignment.status='OPEN'
         JOIN assessment_runs run ON run.id=x.run_id AND run.organization_id=x.organization_id AND run.status='PUBLISHED'
         JOIN assessment_run_tracks t ON t.id=x.track_id AND t.organization_id=x.organization_id AND t.run_id=x.run_id
           AND ${publishedSelfScaleTrackSql(Prisma.sql`t`, 'SCHOOL')}
-        JOIN campus_activity_runs link ON link.run_id=run.id AND link.organization_id=run.organization_id
-        JOIN campus_activities activity ON activity.organization_id=link.organization_id AND activity.course_id=link.course_id
+        JOIN campus_activities activity ON activity.organization_id=x.organization_id AND activity.course_id=x.course_id
           AND activity.status='OPEN'
         JOIN courses course ON course.id=activity.course_id AND course.course_type='CAMPUS_ACTIVITY'
-        WHERE actor.user_id=${actor.userId} AND actor.actor_role='STUDENT'
-          ${input.activityId ? Prisma.sql`AND activity.course_id=${input.activityId}` : Prisma.empty}
-          AND NOT EXISTS (SELECT 1 FROM activities live WHERE live."courseId"=activity.course_id)
         ORDER BY activity.course_id LIMIT 201
       ),` : Prisma.empty}
       listed_activities AS MATERIALIZED (

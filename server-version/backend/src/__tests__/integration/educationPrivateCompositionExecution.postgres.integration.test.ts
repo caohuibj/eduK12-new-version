@@ -74,12 +74,14 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
      await transitionHuiteacherEvent({organizationId:target.organizationId,eventId:event.id,actorUserId:target.managerUserId,action:'CANCEL',expectedVersion:event.version})
     }
    }
-   await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:f.organizationId,userId:actor,
-    permission:'RUN_START',reason:'Synthetic individual withdrawal after publication',deniedByUserId:f.managerUserId}})
    const list=async()=>school
     ? (await listCampusStudentTasks({userId:actor,role:'STUDENT',accountDomain:'SCHOOL'} as any,{page:1,pageSize:20,kind:'MEASUREMENT'})).list
     : (await request('/my-assessment-tasks',auth)).data.list
-   expect(await list()).toContainEqual(expect.objectContaining(school?{id:f.executionId,status:'PENDING'}:{executionId:f.executionId,status:'ASSIGNED'}))
+   const assignedTask=school?{id:f.executionId,status:'PENDING'}:{executionId:f.executionId,status:'ASSIGNED'}
+   if(school)expect((await list()).filter(row=>row.id===f.executionId)).toEqual([expect.objectContaining(assignedTask)])
+   await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:f.organizationId,userId:actor,
+    permission:'RUN_START',reason:'Synthetic individual withdrawal after publication',deniedByUserId:f.managerUserId}})
+   expect(await list()).toContainEqual(expect.objectContaining(assignedTask))
    const publishedHashes=new Set((await db.$queryRaw<Array<{hash:string}>>`
      SELECT template_hash AS hash FROM assessment_public_templates
    `).map(({hash})=>hash))

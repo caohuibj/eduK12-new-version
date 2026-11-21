@@ -506,7 +506,8 @@ async function readAssignedRunTasks<Student extends boolean>(userId: string, opt
           ${executionScope}
           ${cursorScope}
       )
-      SELECT (NOT fast_path."selfVerified" AND NOT ${publishedSchoolStart}) AS "__needsFallback",
+      SELECT CASE WHEN fast_path."selfVerified" THEN FALSE ELSE NOT ${publishedSchoolStart}
+        END AS "__needsFallback",
         school_cont."boundContinuation" AS "__boundSchoolContinuation",
         to_char(e."created_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros",
         e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",
