@@ -103,6 +103,7 @@ describe('runWithLowMemoryTrickleAdmission runtime gate & ALS permit', () => {
   it('rechecks a protected Run START at 250ms while retaining the normal two-sample trip', () => {
     vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
     vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+    sampleAssessmentHostResources()
     advanceSample(850, 99)
     expect(isAssessmentRunStartCpuPaused()).toBe(false)
     advanceSample(850, 99)
