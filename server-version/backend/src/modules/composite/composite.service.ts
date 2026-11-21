@@ -75,7 +75,8 @@ import {decodeTrainingFinalReceipt} from './training-content-final'
 import {freezeTrainingTimingSnapshot,readTrainingTimingPolicy} from '../assessment-runtime/training-scale-timing'
 import { isWholeLocalEligible, wholeLocalExecutionMode } from './whole-local-eligibility'
 import { typedFormPresentation } from '../reporting/typed-form-presentation'
-import { sharedControlWritesEnabled, storeSharedUnitAdmission, withSharedControlContext } from '../assessment-runtime/shared-control-records'
+import { withCommittedStartTemplates } from '../assessment-runtime/public-templates'
+import { sharedControlWritesEnabled, storeSharedUnitAdmission, storeSharedUnitAdmissions, withSharedControlContext } from '../assessment-runtime/shared-control-records'
 import { readCommittedScaleFacts } from '../assessment-runtime/scale-fact-records'
 import { resolveStoredScaleResult } from '../assessment-runtime/compact-assessment-storage'
 import { preloadStoredScaleResults } from '../assessment-runtime/compact-assessment-storage'
@@ -2399,7 +2400,12 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
     }
   }
   // Publish only: preview and historical reads never append artifacts.
-  if(content&&standardMode==='PUBLISH')content={...content,...await attachPublishedScaleArtifacts(prisma as Prisma.TransactionClient,composite,content)}
+  if(content&&standardMode==='PUBLISH'){
+    const ordinaryScalePublication = isOrdinaryQuestionnaireStart(composite)
+      && !composite.trainingFlowDraft && !composite.trainingVariantDraft && !composite.formSections?.length
+      && composite.items.every((item:any)=>item.required&&item.type==='SCALE'&&!item.contextKey)
+    content={...content,...await attachPublishedScaleArtifacts(prisma as Prisma.TransactionClient,composite,content,ordinaryScalePublication)}
+  }
   await content?.recheckSourceLicenses()
   return { analysisProtocolSnapshotEncrypted, reportPackageSnapshotEncrypted, ...variantFields, ...flowFields, ...persistenceFields, ...feedbackFields,
     ...(content?{trainingContentSnapshot:content.snapshot as Prisma.InputJsonValue,trainingContentSnapshotHash:content.snapshotHash}:{}) }
@@ -3126,7 +3132,34 @@ const getEmptyScaleAnswersCiphertext = (): string => {
   return cachedEmptyScaleAnswersCiphertext
 }
 
-const createChildRecords = async (db: Db, attempt: any, composite: {productKind:string}, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>, prepared?: PreparedVariantRuntimes, verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization,educationProduct?:'SCHOOL'|'TEACHER',educationAttempt?:VerifiedEducationAttempt,scaleFreezeMemo?: ScaleFreezeMemo, startAdmissionSlot?: FrozenActiveSlotV1) => {
+const freezeScaleAdmissionAtChildStart = async (
+db: Db,
+attempt: any,
+scale: Parameters<typeof createScaleAdmissionForRuntime>[0]['scale'],
+frozenScale: ScaleFreezeMemoEntry['frozenScale'] | null,
+userId: string | null,
+slot?: FrozenActiveSlotV1,
+) => {
+  if (!slot || !frozenScale || !userId) return
+  const admission = await createScaleAdmissionForRuntime({
+    db, attemptEpoch: attempt.attemptEpoch, scale, runtime: frozenScale,
+    principal: { userId, questionnaireSessionId: null, recoveryTokenHash: null },
+    parent: {
+      kind: 'composite', parentId: attempt.id, slotKey: slot.slotKey,
+      sourceDefinitionHash: slot.sourceDefinitionIdentity.hash,
+      compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
+    },
+    requestedMode: 'COMPOSITE', contextSnapshotHash: null, contextValues: null,
+    contextFrozenAt: null, respondentType: attempt.respondentType,
+    subjectUserId: attempt.subjectUserId, respondentUserId: attempt.respondentUserId,
+  })
+  if (admission.governance.status !== 'READY') {
+    throw compositeConflict(admission.governance.holdReason ?? '当前量表不满足准入条件')
+  }
+  return admission
+}
+
+const createChildRecords = async (db: Db, attempt: any, composite: {productKind:string}, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>, prepared?: PreparedVariantRuntimes, verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization,educationProduct?:'SCHOOL'|'TEACHER',educationAttempt?:VerifiedEducationAttempt,scaleFreezeMemo?: ScaleFreezeMemo, startAdmissionSlots?: ReadonlyMap<string, FrozenActiveSlotV1>) => {
   // Prisma create/findUnique parent rows contain scalar fields only. Product
   // policy comes from the caller's already-loaded server-owned composite.
   // A composition may reference several sources in different orders. Always
@@ -3222,23 +3255,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
             })
             continue
           }
-          const admission = startAdmissionSlot && frozenScale && userId
-            ? await createScaleAdmissionForRuntime({
-                db, attemptEpoch: attempt.attemptEpoch, scale: item.scale, runtime: frozenScale,
-                principal: { userId, questionnaireSessionId: null, recoveryTokenHash: null },
-                parent: {
-                  kind: 'composite', parentId: attempt.id, slotKey: startAdmissionSlot.slotKey,
-                  sourceDefinitionHash: startAdmissionSlot.sourceDefinitionIdentity.hash,
-                  compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
-                },
-                requestedMode: 'COMPOSITE', contextSnapshotHash: null, contextValues: null,
-                contextFrozenAt: null, respondentType: attempt.respondentType,
-                subjectUserId: attempt.subjectUserId, respondentUserId: attempt.respondentUserId,
-              })
-            : undefined
-          if (admission && admission.governance.status !== 'READY') {
-            throw compositeConflict(admission.governance.holdReason ?? '当前量表不满足准入条件')
-          }
+          const admission = await freezeScaleAdmissionAtChildStart(db, attempt, item.scale, frozenScale, userId, startAdmissionSlots?.get(item.id))
           const child = await db.assessment.create({
             data: {
               scaleId: item.scaleId,
@@ -3265,7 +3282,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
             },
           })
           if (frozenScale) {
-            if ((educationProduct || startAdmissionSlot) && !verifiedFlowMaterialization && requiredScaleItems.length === 1 && child.runtimeSnapshotEncrypted) {
+            if ((educationProduct || startAdmissionSlots) && !verifiedFlowMaterialization && requiredScaleItems.length === 1 && child.runtimeSnapshotEncrypted) {
               const projectedChild = { ...child, scale: item.scale }
               freshScaleRuntimeByChild.set(projectedChild, frozenScale)
               freshEducationScaleChild = projectedChild
@@ -3323,6 +3340,21 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
         }
       }
       if (pendingScales.length > 0) {
+        if (startAdmissionSlots) {
+          const admissions = []
+          for (const entry of pendingScales) {
+            const snapshot = await freezeScaleAdmissionAtChildStart(
+              db, attempt, entry.item.scale, entry.frozenScale, userId, startAdmissionSlots.get(entry.item.id),
+            )
+            if (!snapshot) throw compositeConflict('量表冻结准入与槽位不匹配')
+            admissions.push(snapshot)
+          }
+          const encrypted = await storeSharedUnitAdmissions(admissions, db)
+          for (const [index, entry] of pendingScales.entries()) {
+            entry.data.frozenAdmissionSnapshotEncrypted = encrypted[index]
+            entry.data.frozenAdmissionSnapshotHash = admissions[index].snapshotHash
+          }
+        }
         await db.assessment.createMany({ data: pendingScales.map((entry) => entry.data) })
         for (const entry of pendingScales) {
           if (entry.frozenScale) {
@@ -3345,8 +3377,9 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
   } else if (pendingScales.length === requiredScaleItems.length) {
     Object.defineProperty(runtime, '_freshScaleChildren', { value: pendingScales.map(entry => {
       const child = {
-        ...entry.data, questionnaireAssessmentId: null,
+        questionnaireAssessmentId: null,
         frozenAdmissionSnapshotEncrypted: null, frozenAdmissionSnapshotHash: null,
+        ...entry.data,
         scale: entry.item.scale,
       }
       if (entry.frozenScale) freshScaleRuntimeByChild.set(child, entry.frozenScale)
@@ -3963,19 +3996,27 @@ const createAttempt = async (
   // schemaVersion !== 2); ordinary questionnaires have no flow.
   const materialAssignment = isOrdinaryQuestionnaire ? null : await allocateTrainingMaterial(db,attempt,composite,restartMaterialClaimId)
   const flowCandidate = flowEnabled ? await freezeTrainingFlowCandidates(db,attempt,composite,prepared!,situationalReleases) : null
-  // A verified Run with one Scale and no context-producing units can persist
-  // admission on the initial child INSERT. The publication, slot and live
-  // deployment were admitted in this transaction before the child exists.
-  const startAdmissionSlot = composite.productKind === 'ORGANIZATION_RESOURCE' && relationalIdentity && userId
+  // Ordinary logged-in pure Scale delivery needs no user-supplied context.
+  // Persist each admission with its child using the deployment rows already
+  // checked in this START. Other shapes retain delivery-time admission.
+  const educationScaleStart = composite.productKind === 'ORGANIZATION_RESOURCE' && relationalIdentity
+    && educationComposition && /:(STUDENT|TEACHER):SELF:1\.0\.0$/.test(composite.creationKey ?? '')
+  const legacySingleScaleStart = composite.productKind === 'ORGANIZATION_RESOURCE' && relationalIdentity
+    && composite.items.length === 1
+  const wholeScaleStart = assessmentReportConfig().wholeSubmitEnabled
+    && process.env.ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED !== 'false'
+    && (educationScaleStart || isOrdinaryQuestionnaire)
+  const slots = precomputedActiveSlotSet?.slotSet.slots
+  const startAdmissionSlots = userId && (legacySingleScaleStart || wholeScaleStart)
     && !trainingTimingSnapshot && !bundleRuntimeHash && !packageSnapshot && !composite.analysisProtocolKey
-    && composite.items.length === 1 && formSections.length === 0
-    && precomputedActiveSlotSet?.slotSet.slots.length === 1
-    && precomputedActiveSlotSet.slotSet.slots[0].unitType === 'SCALE'
-    ? precomputedActiveSlotSet.slotSet.slots[0] : undefined
+    && formSections.length === 0 && slots && slots.length === composite.items.length
+    && composite.items.every((item: any) => item.required && item.type === 'SCALE' && !item.contextKey)
+    && slots.every(slot => slot.unitType === 'SCALE' && typeof slot.sourceBinding.compositeItemId === 'string')
+    ? new Map(slots.map(slot => [String(slot.sourceBinding.compositeItemId), slot])) : undefined
   const runtime = flowCandidate?.runtime ?? await createChildRecords(
     db, attempt, composite, composite.items, userId, formSections, situationalReleases, prepared, undefined,
     educationProduct, educationStart ? bindVerifiedEducationAttempt(educationStart, db, attempt) : undefined,
-    scaleFreezeMemo, startAdmissionSlot,
+    scaleFreezeMemo, startAdmissionSlots,
   )
   if (finalOnly && !precomputedActiveSlotSet) {
     const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
@@ -4289,7 +4330,8 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
                 'start.training_cpu_admission', awaitScaleCompositionStartResources,
               )
               const composite = prepared ??= await preparePublication()
-              const transact = () => prisma.$transaction(async (tx: Db) => {
+              const transact = () => withCommittedStartTemplates(
+                work => prisma.$transaction(work, { maxWait: 10_000, timeout: 30_000 }), async (tx: Db) => {
           const inTxStart = process.hrtime.bigint()
           try {
           return await withQueryRawLabel('start.raw.in_tx', async () => {
@@ -4321,7 +4363,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
           return createAttempt(tx, composite, userId, null, undefined, (usage._max.attemptNo ?? 0) + 1)
           })
           } finally { assessmentTimelineSpan('start.in_tx_admission_freeze_create', inTxStart) }
-            }, { maxWait: 10_000, timeout: 30_000 })
+            })
               return admittedScaleBatch && !composite.formSections?.length
                 ? withAdmittedScaleCompositionStart(transact)
                 : transact()

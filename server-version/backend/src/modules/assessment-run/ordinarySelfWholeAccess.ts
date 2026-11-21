@@ -6,6 +6,23 @@ import type { RunStartPreflight } from './resourceBoundary'
 import type { WholeReceiptRow } from '../composite/whole-receipt-recovery'
 
 export type OrdinarySelfWholeProduct = 'SCHOOL' | 'TEACHER'
+const roleFor = (product: OrdinarySelfWholeProduct) => product === 'SCHOOL' ? 'STUDENT' : 'TEACHER'
+
+export const ordinarySelfWholeEnabled = () => process.env.ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED !== 'false'
+  && process.env.ASSESSMENT_REPORT_ASYNC_ENABLED === 'true' && process.env.ASSESSMENT_WHOLE_SUBMIT_ENABLED === 'true'
+
+export function publishedSelfScaleTrackSql(track: Prisma.Sql, product: OrdinarySelfWholeProduct) {
+  const variant = roleFor(product) + ':SELF'
+  const target = Prisma.sql`${track}.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}'`
+  return Prisma.sql`(${track}.resource_family='BUNDLE' AND ${track}.resource_version='1.0.0'
+    AND ${track}.resource_key LIKE ${'education-composition:' + product + ':%:' + variant + ':1.0.0'}
+    AND ${track}.frozen_resource_policy#>>'{educationComposition,origin,variantKey}'=${variant}
+    AND ${track}.frozen_resource_policy#>>'{runtimeLaunchTarget,kind}'='COMPOSITE'
+    AND NOT EXISTS (SELECT 1 FROM composite_form_sections section WHERE section.composite_assessment_id=${target})
+    AND NOT EXISTS (SELECT 1 FROM composite_assessment_items item
+      WHERE item.composite_assessment_id=${target} AND (item.type<>'SCALE' OR NOT item.required)))`
+}
+
 type Locator = { attemptId: string } | { executionId: string; schoolPath?: { organizationId: string; runId: string; courseId: string } }
 export type OrdinarySelfWholeBinding = WholeReceiptRow & {
   kind: 'bound'
@@ -86,6 +103,7 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
         AND e.runtime_binding_ref IS NULL AND a.status='OPEN' THEN jsonb_build_object(
           'runtimeBindingKind',NULL,'runtimeBindingRef',NULL,'respondentUserId',a.respondent_user_id,
           'organizationId',e.organization_id,'runId',e.run_id,
+          'publishedSelfScale',${ordinarySelfWholeEnabled()} AND ${publishedSelfScaleTrackSql(Prisma.sql`t`,product)},
           'compositionStartCompositeId',t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}',
           'compositionStartTrack',jsonb_build_object('policy',t.frozen_resource_policy,'policyHash',t.resource_policy_hash,
             'organizationId',t.organization_id,'key',t.resource_key,'version',t.resource_version)) ELSE NULL END` : Prisma.sql`NULL::jsonb`} AS preflight

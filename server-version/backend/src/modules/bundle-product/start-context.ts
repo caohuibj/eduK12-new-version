@@ -37,7 +37,7 @@ export function validateBundleStartContextMappings(definition: AssessmentBundleD
 
 type BundleParentShape = {
   id: string; attemptEpoch: number; frozenActiveSlotSetEncrypted: string | null; frozenActiveSlotSetHash: string | null
-  compositeAssessment: { productKind?: string }
+  compositeAssessment: { productKind?: string; creationKey?: string | null }
 }
 type FrozenFormFacts = {
   values: Record<string, unknown>
@@ -60,6 +60,9 @@ export type BundleScaleStartParentContext = {
  * instance/FORM-fact read instead of repeating identical parent queries. */
 export async function loadBundleScaleStartParentContext(db: PrismaClient | Prisma.TransactionClient, parent: BundleParentShape): Promise<BundleScaleStartParentContext | undefined> {
   if (!['ASSESSMENT_BUNDLE', 'ORGANIZATION_RESOURCE'].includes(parent.compositeAssessment.productKind ?? '')) return undefined
+  // Sealed education compositions use their own FORM/scale admission contract.
+  if (parent.compositeAssessment.productKind === 'ORGANIZATION_RESOURCE'
+    && parent.compositeAssessment.creationKey?.startsWith('education-composition:')) return undefined
   const instance = await db.bundleInstance.findFirst({ where: { composite: { attempts: { some: { id: parent.id, attemptEpoch: parent.attemptEpoch } } } } })
   if (!instance) {
     if (parent.compositeAssessment.productKind === 'ASSESSMENT_BUNDLE') invalid('Bundle 冻结实例不存在')

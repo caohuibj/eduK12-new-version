@@ -178,7 +178,7 @@ export async function assertFrozenCompositionPublication(tx:Tx,identity:FrozenCo
  * not destroy an entered attempt or historical report. */
 export async function assertCompositionCollection(tx:Tx,identity:Pick<FrozenCompositionIdentity,'origin'>&{
  units:ReadonlyArray<{releaseId:string;scaleId?:string|null;native?:{provider:string;sourceMeasurementReleaseId?:string}}>;manifest:ReadonlyArray<{sourceProvider:string;versionId:string;contentHash:string;profileArtifactHash?:string}>;selectedBindings?:SelectedSourceBindings
-},purpose:'NEW_START'|'BOUND_COLLECTION',lock=false,libraryUses?:LockedEducationLibraryUses){
+},purpose:'NEW_START'|'PUBLISHED_SELF_START'|'BOUND_COLLECTION',lock=false,libraryUses?:LockedEducationLibraryUses){
  if(isStudentComposition(identity.origin)&&process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')privateToolFail('HUITEACHER_STUDENT_FEEDBACK_DISABLED',403)
  const c={entry:identity.origin.entry,organizationId:identity.origin.organizationId,principal:{userId:identity.origin.ownerUserId,accountDomain:'SCHOOL' as const}}
  if(purpose==='NEW_START')await authorizePrivateTool(tx,c)
@@ -194,7 +194,7 @@ export async function assertCompositionCollection(tx:Tx,identity:Pick<FrozenComp
    OR EXISTS(SELECT 1 FROM scales WHERE id=ANY(${scales}::text[]) AND status<>'PUBLISHED')
    OR EXISTS(SELECT 1 FROM measurement_content_releases m JOIN cognitive_assignments a ON a.id=m.scope->>'resourceId'
     WHERE m.id=ANY(${releases}::text[]) AND m.family='COGNITIVE' AND m.scope->>'product'=${identity.origin.entry} AND a.status<>'PUBLISHED')) AS unavailable`)
- if(row.stopped||purpose==='NEW_START'&&row.unavailable)privateToolFail('PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE',403)
+ if(row.stopped||purpose!=='BOUND_COLLECTION'&&row.unavailable)privateToolFail('PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE',403)
  if(purpose==='NEW_START'){
   const libraries=identity.manifest.filter(block=>block.sourceProvider==='LIBRARY_SCALE')
   await assertEducationLibraryUses(tx,c,libraries.map(source=>source.versionId),{locked:libraryUses,requireLocked:lock})
@@ -268,9 +268,9 @@ export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:s
  }
  return {identity,...row}
 }
-export async function admitCompositionStart(tx:Tx,input:{executionId:string;compositeId:string;actorUserId:string},libraryUses?:LockedEducationLibraryUses,checked?:CheckedCompositionIdentity){
+export async function admitCompositionStart(tx:Tx,input:{executionId:string;compositeId:string;actorUserId:string},libraryUses?:LockedEducationLibraryUses,checked?:CheckedCompositionIdentity,publishedSelfWhole=false){
  const source=await readCompositionExecutionSource(tx,input,checked)
- const checkedScaleIds=await assertCompositionCollection(tx,source.identity,'NEW_START',true,libraryUses)
+ const checkedScaleIds=await assertCompositionCollection(tx,source.identity,publishedSelfWhole?'PUBLISHED_SELF_START':'NEW_START',true,libraryUses)
  return issueVerifiedEducationStart({tx,product:source.product,compositeId:source.identity.compositeId,assignmentRef:source.assignmentRef,
   subjectUserId:source.subjectUserId,respondentUserId:source.respondentUserId,composition:source.identity.binding,
   checkedScaleIds:new Set(checkedScaleIds)})

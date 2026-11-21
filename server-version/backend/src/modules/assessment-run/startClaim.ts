@@ -1,3 +1,4 @@
+import { withCommittedStartTemplates } from '../assessment-runtime/public-templates'
 import type { RunResourceAuthorityRegistry } from './resourceAuthority'
 import { assertFrozenCompositionPublication, lockCompositionStartLibraryUses } from './educationCompositionExecution'
 import { randomUUID } from 'node:crypto'
@@ -6,7 +7,7 @@ import { prisma } from '../../config/database'
 import { logger } from '../../utils/logger'
 import { type RunPopulationProductScope } from './currentPopulationAuthority'
 import type { RelationalAssignmentRow } from '../assessment-relational/repository'
-import { assertCurrentRunStartAuthority, type StartAuthorityKnownEnvelope } from './startAuthority'
+import { assertCurrentRunStartAuthority, assertPublishedSelfWholeStartAuthority, type PublishedSelfIntake, type StartAuthorityKnownEnvelope } from './startAuthority'
 import {
   freezeRunExecutionScientificProvenanceWithDetailsInTransaction,
   type FrozenRunScientificDetails,
@@ -382,6 +383,7 @@ export type TransactionalStartDispatchContext = {
   now?: Date
   scientificDetails?: FrozenRunScientificDetails
   compositionSources?: Awaited<ReturnType<typeof lockCompositionStartLibraryUses>>
+  publishedSelfIntake?: PublishedSelfIntake
 }
 
 export async function acquireRunExecutionStartClaim(input: {
@@ -415,7 +417,9 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
     throw new RunStartClaimError('RUN_START_LEASE_INVALID', 'START claim lease must be between 1s and 5m', 400)
   }
 
-  return prisma.$transaction(async (tx) => {
+  return withCommittedStartTemplates(
+    work => prisma.$transaction(work, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted, timeout: 30_000 }),
+    async (tx) => {
     // Native source identities and library grant issuers precede the
     // Organization -> Run -> Execution locks, as in the two-phase binding path.
     const compositionSources = input.lockCompositionSources ? await lockCompositionStartLibraryUses(tx, input) : undefined
@@ -446,11 +450,14 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
     // committed by a concurrent START holder that did not mutate `e`.
     const existing = await lockClaim(tx, input.executionId)
     if (existing?.state === 'ABORTED') return { kind: 'ABORTED' as const, claim: existing }
-    if (!existing) {
+    const knownEnvelope = toStartAuthorityKnownEnvelope(execution)
+    const publishedSelfIntake = existing ? null
+      : await assertPublishedSelfWholeStartAuthority(tx, knownEnvelope, productScope, execution.relationalAssignmentId)
+    if (!existing && !publishedSelfIntake) {
       await assertCurrentRunStartAuthority(tx, input.executionId, {
         accountMode: 'DETECT_EDUCATION_LIBRARY',
         productScope,
-        knownEnvelope: toStartAuthorityKnownEnvelope(execution),
+        knownEnvelope,
       })
     }
     const admission = await loadRunExecutionStartAdmission({
@@ -489,13 +496,25 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
           now,
           alreadyLocked: true,
           preparedComposition: input.preparedComposition,
+          deferWrite: Boolean(publishedSelfIntake),
           ...(knownScientificRow ? { knownRow: knownScientificRow } : {}),
         },
       )
       const id = randomUUID()
       const operationKey = `run-start:${input.executionId}:${randomUUID()}`
+      const science = scientificDetails.record
+      const freezeWithClaim = scientificDetails.pendingWrite ? Prisma.sql`
+        frozen_execution AS (
+          UPDATE assessment_run_executions
+          SET scientific_maturity=${science.scientificMaturity},
+            scientific_provenance=${JSON.stringify(science.scientificProvenance)}::jsonb,
+            scientific_provenance_hash=${science.scientificProvenanceHash},
+            scientific_frozen_at=${science.scientificFrozenAt}, updated_at=${science.scientificFrozenAt}
+          WHERE id=${input.executionId} AND scientific_provenance_hash IS NULL
+          RETURNING id
+        ),` : Prisma.empty
       const rows = await tx.$queryRaw<RunStartClaimRecord[]>`
-        WITH inserted_claim AS (
+        WITH ${freezeWithClaim} inserted_claim AS (
           INSERT INTO "assessment_run_execution_start_claims" (
             "id", "organization_id", "run_id", "execution_id", "operation_key", "claim_generation",
             "state", "claimed_at", "lease_until", "admitted_attempt_identity", "updated_at"
@@ -513,7 +532,9 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
             ${JSON.stringify({ operationKey, assignmentId: admission.assignment.assignmentId, attemptIdentity: admission.attemptIdentity })}::jsonb)
         )
         SELECT * FROM inserted_claim
+        ${scientificDetails.pendingWrite ? Prisma.sql`WHERE EXISTS (SELECT 1 FROM frozen_execution)` : Prisma.empty}
       `
+      if (!rows[0]) throw new RunStartClaimError('RUN_SCIENCE_FREEZE_CONFLICT', 'scientific provenance changed concurrently')
       if (input.transactionalDispatch) {
         const inlineResult = await input.transactionalDispatch({
           tx,
@@ -524,6 +545,7 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
           now,
           scientificDetails,
           compositionSources,
+          publishedSelfIntake: publishedSelfIntake ?? undefined,
         })
         if (inlineResult !== null) {
           return { kind: 'COMPLETED_INLINE' as const, result: inlineResult }
@@ -558,7 +580,8 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
     return claimed.state === 'CLAIMED'
       ? { kind: 'ACQUIRED' as const, claim: claimed, admission }
       : { kind: 'RECOVER' as const, claim: claimed, admission }
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted, timeout: 30_000 })
+    },
+  )
 }
 
 export const markRunStartDispatchIntent = async (input: {

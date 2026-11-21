@@ -9,15 +9,17 @@ import {createTeacherAssessmentRuntimeRouter} from '../../modules/huiteacher/ass
 import {teacherAssessmentRuntimeSource} from '../../modules/huiteacher/assessmentRuntime.source'
 import {csrfProtection} from '../../middleware/csrf'
 import {generateToken} from '../../utils/jwt'
+import {listCampusStudentTasks} from '../../modules/campus/activity.tasks'
 import {HUITEACHER_AUTH_COOKIE_NAME,HUITEACHER_CSRF_COOKIE_NAME,SCHOOL_AUTH_COOKIE_NAME,SCHOOL_CSRF_COOKIE_NAME,CSRF_HEADER_NAME} from '../../utils/authCookies'
 import activityRunRouter from '../../modules/campus/activity.run.routes'
 import campusCompositeRouter from '../../modules/campus/composite.routes'
 import {changeCampusActivityStatus,readCampusActivity} from '../../modules/campus/activity.service'
 import {transitionHuiteacherEvent} from '../../modules/huiteacher/evaluation.service'
-import {closeAssessmentRun} from '../../modules/assessment-run/lifecycle'
+import {cancelAssessmentRun} from '../../modules/assessment-run/lifecycle'
 import {getAttemptState,startUserAttempt} from '../../modules/composite/composite.service'
 import {readTeacherOrdinaryFeedback} from '../../modules/reporting/education-ordinary-feedback.service'
 import {submitCompositeScaleFinal} from '../../modules/scale/scale-final-submit.service'
+import {decryptUnifiedRuntimePayload} from '../../modules/assessment-runtime/security'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {loadFrozenActiveSlotSet} from '../../modules/assessment-runtime/slot-set'
 import {updatePrivateTool} from '../../modules/education-tools/private-tool.service'
@@ -49,9 +51,11 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
   base='http://127.0.0.1:'+(server.address() as {port:number}).port
  })
  afterAll(async()=>{if(server)await new Promise<void>(resolve=>server.close(()=>resolve()));await db?.$disconnect()})
- it.each(['School','Teacher'])('%s admits SELF once and completes the scale whole receipt after closure and withdrawal',async product=>{
+ it.each(['School','Teacher'])('%s admits SELF once and completes the scale whole receipt after cancellation and withdrawal',async product=>{
   vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED','true')
   vi.stubEnv('ASSESSMENT_WHOLE_SUBMIT_ENABLED','true')
+  vi.stubEnv('ASSESSMENT_COMPACT_FACTS_ENABLED','true')
+  vi.stubEnv('ASSESSMENT_SHARED_CONTROL_ENABLED','true')
   try{
    const school=product==='School',create=school?setupSchoolCompositionExecution:setupTeacherCompositionExecution
    const f=await create(db,{scaleOnly:true}),actor=f.participantUserId
@@ -60,25 +64,45 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
     ? `/organizations/${target.organizationId}/activities/${target.workflow.id}/runs/${target.runId}/executions/${target.executionId}/start`
     : `/run-executions/${target.executionId}/start-assessment`
    const close=async(target:typeof f)=>{
-    await closeAssessmentRun({organizationId:target.organizationId,runId:target.runId})
+    await expect(cancelAssessmentRun({organizationId:target.organizationId,runId:target.runId})).resolves.toEqual({status:'CANCELLED'})
     if(school){
      const scope={organizationId:target.organizationId,courseId:target.workflow.id,actor:target.manager}
      const activity=await readCampusActivity(scope)
      await changeCampusActivityStatus({...scope,action:'CLOSE',expectedVersion:activity.version})
     }else{
      const event=await db.huiteacherEvaluationEvent.findUniqueOrThrow({where:{id:target.workflow.id}})
-     await transitionHuiteacherEvent({organizationId:target.organizationId,eventId:event.id,actorUserId:target.managerUserId,action:'CLOSE',expectedVersion:event.version})
+     await transitionHuiteacherEvent({organizationId:target.organizationId,eventId:event.id,actorUserId:target.managerUserId,action:'CANCEL',expectedVersion:event.version})
     }
    }
+   await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:f.organizationId,userId:actor,
+    permission:'RUN_START',reason:'Synthetic individual withdrawal after publication',deniedByUserId:f.managerUserId}})
+   const list=async()=>school
+    ? (await listCampusStudentTasks({userId:actor,role:'STUDENT',accountDomain:'SCHOOL'} as any,{page:1,pageSize:20,kind:'MEASUREMENT'})).list
+    : (await request('/my-assessment-tasks',auth)).data.list
+   expect(await list()).toContainEqual(expect.objectContaining(school?{id:f.executionId,status:'PENDING'}:{executionId:f.executionId,status:'ASSIGNED'}))
+   const publishedHashes=new Set((await db.$queryRaw<Array<{hash:string}>>`
+     SELECT template_hash AS hash FROM assessment_public_templates
+   `).map(({hash})=>hash))
    const start=()=>request(startPath(f),auth,{},school)
    const [first,otherStart]=await Promise.all([start(),start()])
    expect(first.status,JSON.stringify(first.value)).toBe(200)
    const id=first.data.runtimeBindingRef
    expect(otherStart.data).toMatchObject({runtimeBindingRef:id})
    expect(await compositionStartCommit(db,f.executionId,id)).toEqual([{atomic:true,state:'COMPLETED'}])
+   const parentBeforeDelivery=await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id}})
+   const childrenBeforeDelivery=await db.assessment.findMany({where:{compositeAttemptId:id}})
+   expect(childrenBeforeDelivery).toHaveLength(2)
+   const slotRef=decryptUnifiedRuntimePayload<{k:string;p:string}>(parentBeforeDelivery.frozenActiveSlotSetEncrypted!)
+   expect(slotRef.k).toBe('FSP2')
+   expect(publishedHashes.has(slotRef.p)).toBe(true)
+   for(const child of childrenBeforeDelivery){
+    expect(child.frozenAdmissionSnapshotHash).toBeTruthy()
+    const ref=decryptUnifiedRuntimePayload<{k:string;p:string}>(child.frozenAdmissionSnapshotEncrypted!)
+    expect(ref.k).toBe('UAR2')
+    expect(publishedHashes.has(ref.p)).toBe(true)
+   }
    await close(f)
-   await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:f.organizationId,userId:actor,
-    permission:'RUN_START',reason:'Synthetic withdrawal after admission',deniedByUserId:f.managerUserId}})
+   expect(await list()).not.toContainEqual(expect.objectContaining(school?{id:f.executionId,href:expect.any(String)}:{executionId:f.executionId}))
    expect((await start()).data).toMatchObject({runtimeBindingRef:id,replayed:true})
    const pending=await create(db,{scaleOnly:true})
    await close(pending)

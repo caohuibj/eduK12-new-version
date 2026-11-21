@@ -10,6 +10,7 @@ export class RunResourceBoundaryError extends Error {
 }
 
 export type RunStartPreflight = {
+  publishedSelfScale?: boolean
   runtimeBindingKind: string | null
   runtimeBindingRef: string | null
   respondentUserId: string

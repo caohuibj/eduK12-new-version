@@ -75,16 +75,50 @@ const saveBinding = async (value: ReturnType<typeof bindingBody>,db:SharedContro
 }
 
 /** The shared plan is an explicit allowlist; eligibility, grants and decisions remain personal. */
-export const storeSharedUnitAdmission = async (snapshot: VersionedFrozenUnitAdmission,db?:SharedControlDb): Promise<string> => {
-  if (!sharedControlWritesEnabled() || !snapshot.parent || canonicalJsonBytes(bindingBody(snapshot)).length>16*1024) return encryptUnifiedRuntimePayload(snapshot)
-  const plan: any = { schemaVersion: snapshot.schemaVersion, runtimeGeneration: snapshot.runtimeGeneration, requiresContext: snapshot.requiresContext,
-    parent: { kind: snapshot.parent.kind, slotKey: snapshot.parent.slotKey, sourceDefinitionHash: snapshot.parent.sourceDefinitionHash, compiledRuntimeHash: snapshot.parent.compiledRuntimeHash } }
-  for (const key of ['scale', 'cognitive', 'formSection'] as const) if (Object.prototype.hasOwnProperty.call(snapshot, key)) plan[key] = (snapshot as any)[key]
-  const [template] = await publicTemplatesForDatabase(db).saveMany([{ kind: 'UNIT_ADMISSION_PLAN', value: plan }])
-  const binding = await saveBinding(bindingBody(snapshot),db)
-  const personal = Object.fromEntries(Object.entries(snapshot).filter(([key]) => !['schemaVersion','runtimeGeneration','requiresContext','parent','principal','contextSnapshotHash','contextValues','attemptEpoch','snapshotHash','scale','cognitive','formSection'].includes(key)))
-  return encryptControlReference({ k: 'UAR2', p: template, b: binding, x: personal })
+export const storeSharedUnitAdmissions = async (
+  snapshots: VersionedFrozenUnitAdmission[],
+  db?: SharedControlDb,
+): Promise<string[]> => {
+  if (!sharedControlWritesEnabled()) return snapshots.map(encryptUnifiedRuntimePayload)
+  const encrypted: string[] = new Array(snapshots.length)
+  const shared = snapshots.flatMap((snapshot, index) => {
+    if (!snapshot.parent) {
+      encrypted[index] = encryptUnifiedRuntimePayload(snapshot)
+      return []
+    }
+    const binding = bindingBody(snapshot)
+    if (canonicalJsonBytes(binding).length > 16 * 1024) {
+      encrypted[index] = encryptUnifiedRuntimePayload(snapshot)
+      return []
+    }
+    const { kind, slotKey, sourceDefinitionHash, compiledRuntimeHash } = snapshot.parent
+    const plan = {
+      schemaVersion: snapshot.schemaVersion,
+      runtimeGeneration: snapshot.runtimeGeneration,
+      requiresContext: snapshot.requiresContext,
+      parent: { kind, slotKey, sourceDefinitionHash, compiledRuntimeHash },
+      ...Object.fromEntries(['scale', 'cognitive', 'formSection'].filter(key =>
+        Object.prototype.hasOwnProperty.call(snapshot, key)).map(key => [key, Reflect.get(snapshot, key)])),
+    }
+    return [{ index, snapshot, binding, plan }]
+  })
+  if (shared.length === 0) return encrypted
+  const hashes = await publicTemplatesForDatabase(db).saveMany(shared.map(({ plan }) => ({
+    kind: 'UNIT_ADMISSION_PLAN', value: plan,
+  })))
+  for (const [position, { index, snapshot, binding }] of shared.entries()) {
+    const bindingRef = await saveBinding(binding, db)
+    const personal = Object.fromEntries(Object.entries(snapshot).filter(([key]) => ![
+      'schemaVersion', 'runtimeGeneration', 'requiresContext', 'parent', 'principal', 'contextSnapshotHash',
+      'contextValues', 'attemptEpoch', 'snapshotHash', 'scale', 'cognitive', 'formSection',
+    ].includes(key)))
+    encrypted[index] = encryptControlReference({ k: 'UAR2', p: hashes[position], b: bindingRef, x: personal })
+  }
+  return encrypted
 }
+export const storeSharedUnitAdmission = async (snapshot: VersionedFrozenUnitAdmission, db?: SharedControlDb) =>
+  (await storeSharedUnitAdmissions([snapshot], db))[0]
+
 export const loadSharedUnitAdmission = async (encrypted: string,db?:SharedControlDb): Promise<unknown> => {
   const ref = decryptUnifiedRuntimePayload<any>(encrypted)
   if (ref?.k !== 'UAR2') return ref

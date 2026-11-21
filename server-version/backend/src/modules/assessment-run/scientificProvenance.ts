@@ -54,6 +54,7 @@ export type PreparedCompositionProvenance = NonNullable<Awaited<ReturnType<typeo
 
 export type ScientificProvenanceKnownLockContext = {
   preparedComposition?: PreparedCompositionProvenance
+  deferWrite?: boolean
   organizationId: string
   hasCampusActivity?: boolean
   hasHuiteacherLink?: boolean
@@ -76,6 +77,7 @@ export type ScientificProvenanceKnownLockContext = {
 
 export type FrozenRunScientificDetails = {
   record: FrozenRunScientificRecord
+  pendingWrite?: boolean
   track: {
     organizationId: string
     school: boolean
@@ -243,6 +245,11 @@ export const freezeRunExecutionScientificProvenanceWithDetailsInTransaction = as
   const hash = matchingPreparation?.hash ?? canonicalHash(provenance)
   const frozenAt = knownContext?.now
     ?? (await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`)[0].now
+  if (knownContext?.deferWrite) return {
+    record: { scientificMaturity: maturity as RunScientificMaturity, scientificProvenance: provenance,
+      scientificProvenanceHash: hash, scientificFrozenAt: frozenAt },
+    pendingWrite: true, track: trackSummary, compositionIdentity, educationScaleSource,
+  }
   const payload = JSON.stringify(provenance)
   const updated = await tx.$queryRaw<FrozenRunScientificRecord[]>`
     UPDATE "assessment_run_executions"

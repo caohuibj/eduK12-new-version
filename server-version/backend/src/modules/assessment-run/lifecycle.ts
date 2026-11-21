@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { ordinarySelfWholeEnabled, publishedSelfScaleTrackSql } from './ordinarySelfWholeAccess'
 import type { AuthenticatedPrincipal } from '../../types'
 import { lockAndAssertCampusActivityPublisher } from '../campus/activity.service'
 
@@ -165,12 +166,38 @@ export const cancelAssessmentRun = async (input: {
     throw new RunLifecycleError('RUN_STATE_CONFLICT', 'only a PUBLISHED Run can be cancelled', 409)
   }
   const executions = await lockExecutions(tx, input.runId)
-  const activeRuntime = executions.find((row) => (
+  const activeRuntimes = executions.filter((row) => (
     row.status !== 'COMPLETED'
     && (Boolean(row.runtimeBindingRef) || row.claimState === 'DISPATCHED' || row.claimState === 'UNKNOWN' || row.claimState === 'COMPLETED')
   ))
-  if (activeRuntime) {
-    throw new RunLifecycleError('RUN_CANCEL_RUNTIME_ACTIVE', 'Run contains a dispatched or bound runtime that cannot be proven safely cancelled', 409)
+  if (activeRuntimes.length) {
+    // Only a durable ordinary SELF binding can finish independently of intake.
+    const continuable = await tx.$queryRaw<Array<{ id: string }>>`
+      SELECT e.id FROM assessment_run_executions e
+      JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
+      JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
+        AND a.resource_kind=t.resource_family AND a.resource_key=t.resource_key AND a.resource_version=t.resource_version
+        AND a.relationship_kind='SELF' AND a.perspective='SELF_REPORT' AND a.subject_user_id=a.respondent_user_id
+      JOIN composite_assessment_attempts p ON e.runtime_binding_kind='COMPOSITE' AND p.id=e.runtime_binding_ref
+        AND p.assignment_ref=a.id AND p.episode_id=a.episode_id
+        AND p.user_id=a.respondent_user_id AND p.subject_user_id=p.user_id AND p.respondent_user_id=p.user_id
+        AND p.respondent_type='SELF' AND p.delivery_mode='FINAL_ONLY' AND p.runtime_generation='UNIFIED_V1'
+        AND p.composite_assessment_id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}'
+        AND p.training_content_binding#>>'{educationComposition,manifestHash}'=t.frozen_resource_policy#>>'{educationComposition,manifestHash}'
+        AND p.training_content_binding->'epoch'=to_jsonb(p.attempt_epoch)
+        AND (${ordinarySelfWholeEnabled()} OR p.async_report_epoch=p.attempt_epoch)
+      WHERE e.id IN (${Prisma.join(activeRuntimes.map(row => row.id))})
+        AND e.status='STARTED' AND e.subject_actor_snapshot_id=e.respondent_actor_snapshot_id
+        AND ((${publishedSelfScaleTrackSql(Prisma.sql`t`, 'SCHOOL')} AND a.subject_role='STUDENT' AND a.respondent_role='STUDENT'
+          AND EXISTS (SELECT 1 FROM campus_activity_runs l WHERE l.organization_id=e.organization_id AND l.run_id=e.run_id)
+          AND NOT EXISTS (SELECT 1 FROM huiteacher_evaluation_run_links l WHERE l.organization_id=e.organization_id AND l.run_id=e.run_id))
+          OR (${publishedSelfScaleTrackSql(Prisma.sql`t`, 'TEACHER')} AND a.subject_role='TEACHER' AND a.respondent_role='TEACHER'
+          AND EXISTS (SELECT 1 FROM huiteacher_evaluation_run_links l WHERE l.organization_id=e.organization_id AND l.run_id=e.run_id)
+          AND NOT EXISTS (SELECT 1 FROM campus_activity_runs l WHERE l.organization_id=e.organization_id AND l.run_id=e.run_id)))
+    `
+    if (continuable.length !== activeRuntimes.length) {
+      throw new RunLifecycleError('RUN_CANCEL_RUNTIME_ACTIVE', 'Run contains a dispatched or bound runtime that cannot be proven safely cancelled', 409)
+    }
   }
 
   await tx.$executeRaw`
