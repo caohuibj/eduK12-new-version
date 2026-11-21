@@ -455,7 +455,7 @@ const admittedBatchMemoryOk = (sample: AssessmentResourceSample): boolean => {
   if (sample.availableBytes === null) return false
   if (isLowMemoryTrickleEnabled()) {
     const config = configuredLowMemoryTrickleConfig()
-    const thresholdMiB = config.floorMiB < 650 ? config.releaseMiB : 700
+    const thresholdMiB = config.floorMiB < 650 ? config.floorMiB : 700
     return sample.availableBytes >= thresholdMiB * MiB
   }
   return normalStartMemory(sample)
