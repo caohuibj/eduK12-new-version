@@ -2,6 +2,7 @@ import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifac
 import { AssessmentStartBusyError, classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
 import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
 import {
+  admitPrecompiledScaleCompositionStart,
   assertAnonymousStartCriticalMemory,
   assertAssessmentStartResources,
   awaitScaleCompositionStartResources,
@@ -4343,9 +4344,9 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
               assessmentTimelineSpan('start.gate_wait', gateEnteredAt, process.hrtime.bigint())
               // Let a short CPU spike drain within the existing gate, before
               // checkout. Keep the slot through commit or rollback.
-              const admittedScaleBatch = scaleOnlyStart && (precompiledScaleOnlyStart || await traceAssessmentPhase(
-                'start.training_cpu_admission', awaitScaleCompositionStartResources,
-              ))
+              const admittedScaleBatch = scaleOnlyStart && (precompiledScaleOnlyStart
+                ? admitPrecompiledScaleCompositionStart()
+                : await traceAssessmentPhase('start.training_cpu_admission', awaitScaleCompositionStartResources))
               const composite = prepared ??= await preparePublication()
               const transact = () => withCommittedStartTemplates(
                 work => prisma.$transaction(work, { maxWait: 10_000, timeout: 30_000 }), async (tx: Db) => {
@@ -4410,7 +4411,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
 
   // CPU-only pressure is handled by the Training gate; the low-memory
   // trickle permit must still be acquired before entering that gate.
-  if (!scaleOnlyStart || precompiledScaleOnlyStart) return executeStart()
+  if (!scaleOnlyStart) return executeStart()
   if (isAssessmentStartCpuPaused()) return executeStart(true)
   if (!isLowMemoryTrickleEnabled()) {
     assertAssessmentStartResources()

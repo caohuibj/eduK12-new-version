@@ -504,6 +504,18 @@ export const awaitScaleCompositionStartResources = async (probeRunRecovery = fal
   return normalStartMemory(sample) && sample.cpuPercent !== null
 }
 
+/** Fast admission check for precompiled Scale-only STARTs before opening a
+ * transaction: skips the 3s CPU-recovery sleep when memory is healthy (>=700 MiB),
+ * while requiring a valid low-memory trickle permit (or healthy memory) before
+ * granting admitted-batch completion privileges. */
+export const admitPrecompiledScaleCompositionStart = (): boolean => {
+  if (!enabled()) return false
+  const value = sampleAssessmentHostResources()
+  if (normalStartMemory(value)) return true
+  assertAssessmentStartResources()
+  return true
+}
+
 /** A bounded, already-admitted batch may finish unrolling frozen Scale units
  * after a CPU-only trip. Memory failure still aborts the same transaction. */
 export const withAdmittedScaleCompositionStart = async <T>(operation: () => Promise<T>): Promise<T> => {

@@ -13,6 +13,7 @@ import { defaultRunStartAdmissionBound } from '../../config/databasePool'
 import { buildWholeStartPreload, startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
 import type { RunStartPreflight } from './resourceBoundary'
 import {
+  admitPrecompiledScaleCompositionStart,
   awaitScaleCompositionStartResources,
   isAssessmentStartCpuPaused,
   isAssessmentRunStartCpuPaused,
@@ -871,7 +872,7 @@ export const startAssessmentRunExecution = async (input: {
         : undefined
       return await runStartGate().run(async () => {
         const check = compositionCandidate
-          ? (fastPublishedSelfStart ? true : await checkCompositionResources())
+          ? (fastPublishedSelfStart ? admitPrecompiledScaleCompositionStart() : await checkCompositionResources())
           : false
         if (typeof check !== 'boolean') return check
         const admittedScaleBatch = check
@@ -1024,7 +1025,7 @@ export const startAssessmentRunExecution = async (input: {
   // Already-bound replays never allocate a new frozen runtime and bypass
   // low-memory trickle/rejection (Decision D-1/D-3); new starts consult the
   // host resource guard before claim TX1, publication loads, and dispatch TX2.
-  if (preflight?.publishedSelfScale !== true && isAssessmentStartResourceConstrained()) {
+  if (isAssessmentStartResourceConstrained()) {
     const bound = input.startPreflight
       ? boundResultFromPreflight(input.startPreflight, input.actorUserId)
       : await readExistingBoundExecution(input.executionId, input.actorUserId)
