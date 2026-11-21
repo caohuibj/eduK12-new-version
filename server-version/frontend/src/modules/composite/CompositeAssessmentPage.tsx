@@ -40,7 +40,7 @@ import FinalCompositeAssessment from '../../components/FinalCompositeAssessment'
 import WholeCompositeQuestionnaire from '../../components/WholeCompositeQuestionnaire'
 import { normalizeApiError } from '../../utils/normalizeApiError'
 import { isTrainingHost } from '../../training/context'
-import { startTrainingWithRecovery } from './training-start-recovery'
+import { startAnonymousTrainingWithBackoff, startTrainingWithRecovery } from './training-start-recovery'
 
 const tokenKey = (token: string) => `composite:recovery:token:${token}`
 const attemptKey = (attemptId: string) =>
@@ -88,6 +88,7 @@ const CompositeAssessmentContent: React.FC = () => {
   const [cognitiveRestartBlocked, setCognitiveRestartBlocked] = useState(false)
   const [isFreshStart, setIsFreshStart] = useState(false)
   const restartInFlight = useRef(false)
+  const startInFlight = useRef<{ routeKey: string; signal: AbortSignal } | null>(null)
   const [scaleAnswers, setScaleAnswers] = useState<
     Record<string, string | number>
   >({})
@@ -235,7 +236,10 @@ const CompositeAssessmentContent: React.FC = () => {
     const signal = pageSignal()
     if (signal.aborted) return
     const routeKey = routeKeyRef.current
-    const isCurrent = () => !signal.aborted && routeKeyRef.current === routeKey
+    if (startInFlight.current?.routeKey === routeKey && !startInFlight.current.signal.aborted) return
+    const request = { routeKey, signal }
+    startInFlight.current = request
+    const isCurrent = () => !signal.aborted && routeKeyRef.current === routeKey && startInFlight.current === request
     try {
       setSubmitting(true)
       setError(null)
@@ -246,11 +250,13 @@ const CompositeAssessmentContent: React.FC = () => {
           resumeToken ||
           recoveryInput.trim() ||
           (token ? readStored(tokenKey(token)) : '')
-        const response = await publicCompositeApi(credential).start(
-          token,
-          credential || undefined,
-          signal,
-        )
+        const client = publicCompositeApi(credential)
+        const response = credential
+          ? await client.start(token, credential, signal)
+          : await startAnonymousTrainingWithBackoff(
+            attemptSignal => client.start(token, undefined, attemptSignal),
+            { signal, isCurrent, onRetry: delayMs => setRetryMessage(`当前访问较多，${Math.ceil(delayMs / 1000)} 秒后重试开始。`) },
+          )
         if (!isCurrent()) return
         if (response.code !== 0 || !response.data)
           throw new Error(response.message || '无法开始匿名综合测评')
@@ -348,6 +354,7 @@ const CompositeAssessmentContent: React.FC = () => {
         setSubmitting(false)
         setLoading(false)
       }
+      if (startInFlight.current === request) startInFlight.current = null
     }
   }
 

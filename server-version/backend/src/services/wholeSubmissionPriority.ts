@@ -129,6 +129,29 @@ const pressure = new WholeSubmissionPressure()
 export const anonymousWholeSubmitQueued = (): boolean => (
   enabled() && pressure.hasAnonymous && wholeSubmitAdmission.getStats().queued > 0
 )
+export const anonymousStartPressureRampEnabled = () =>
+  process.env.ASSESSMENT_ANONYMOUS_START_PRESSURE_RAMP_ENABLED === 'true'
+
+/** Smooth a sustained, observed local Whole queue across brief drain/refill gaps. */
+export class AnonymousStartQueuePressure {
+  private resumeAt = -Infinity
+
+  constructor(private readonly clock = now) {}
+
+  shouldDefer(oldestVerifiedQueueWaitMs: number): boolean {
+    const at = this.clock()
+    if (oldestVerifiedQueueWaitMs >= COALESCE_MS) this.resumeAt = at + RECOVERY_MS
+    return at < this.resumeAt
+  }
+}
+
+const anonymousStartPressure = new AnonymousStartQueuePressure()
+export const deferAnonymousStartForWholeQueue = () => {
+  if (!enabled()) return false
+  const queued = anonymousWholeSubmitQueued()
+  if (!anonymousStartPressureRampEnabled()) return queued
+  return anonymousStartPressure.shouldDefer(queued ? wholeSubmitAdmission.oldestQueuedWaitMs() : 0)
+}
 const source = randomUUID().replace(/-/g, '')
 let sequence = 0
 let publishTimer: ReturnType<typeof setTimeout> | null = null

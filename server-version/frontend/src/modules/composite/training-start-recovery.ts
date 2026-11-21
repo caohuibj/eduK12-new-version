@@ -1,4 +1,4 @@
-import type { compositeApi } from './api'
+import type { compositeApi, publicCompositeApi } from './api'
 import {
   isTrainingBusy,
   isTrainingUncertainRequestError,
@@ -83,5 +83,18 @@ export const startTrainingWithRecovery = (
       return { kind: 'stop' }
     }
   },
+  options,
+)
+
+/** Public credentials cannot look up an anonymous attempt whose first START response was lost.
+ * Only this explicit pre-transaction rejection can be replayed automatically. */
+export const startAnonymousTrainingWithBackoff = (
+  start: (signal?: AbortSignal) => ReturnType<ReturnType<typeof publicCompositeApi>['start']>,
+  options: TrainingRetryOptions = {},
+) => runTrainingRetry(
+  start,
+  async error => isTrainingBusy(error, ['ANONYMOUS_START_DEFERRED'])
+    ? { kind: 'retry', retryAfterMs: normalizeApiError(error).retryAfterMs }
+    : { kind: 'stop' },
   options,
 )

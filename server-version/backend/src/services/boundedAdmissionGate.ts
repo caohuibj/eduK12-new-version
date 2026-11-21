@@ -80,6 +80,7 @@ type QueuedOperation<T> = {
   resolve: (value: T | PromiseLike<T>) => void
   reject: (reason?: unknown) => void
   timer: ReturnType<typeof setTimeout>
+  enqueuedAt: number
   deadline?: number
 }
 
@@ -138,6 +139,11 @@ export class BoundedAdmissionGate {
     }
   }
 
+  oldestQueuedWaitMs(): number {
+    const oldest = this.queue[0]
+    return oldest ? performance.now() - oldest.enqueuedAt : 0
+  }
+
   run<T>(operation: () => Promise<T>, maxQueueWaitMs?: number): Promise<T> {
     if (this.queue.length === 0 && this.active < this.options.maxConcurrent && !this.options.pauseDispatchWhile?.()) {
       return this.execute(operation)
@@ -153,7 +159,8 @@ export class BoundedAdmissionGate {
       entry.resolve = resolve
       entry.reject = reject
       const waitMs = Math.min(maxQueueWaitMs ?? this.options.maxWaitMs, this.options.maxWaitMs)
-      if (maxQueueWaitMs !== undefined) entry.deadline = performance.now() + waitMs
+      entry.enqueuedAt = performance.now()
+      if (maxQueueWaitMs !== undefined) entry.deadline = entry.enqueuedAt + waitMs
       entry.timer = setTimeout(() => {
         const index = this.queue.indexOf(entry as QueuedOperation<unknown>)
         if (index < 0) return

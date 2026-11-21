@@ -21,6 +21,7 @@ const knownP2028Rollback = (message: string) =>
 export const START_INTERACTIVE_TRANSACTION={maxWait:10_000,timeout:15_000} as const
 
 export const ASSESSMENT_START_BUSY='ASSESSMENT_START_BUSY'
+export const ANONYMOUS_START_DEFERRED='ANONYMOUS_START_DEFERRED'
 export type StartBusyDiagnostic='pool_wait'|'transaction_expired'|'queue_full'|'queue_timeout'|'write_conflict'|'other'
 const diagnosticFrom=(reason:string,original?:string):StartBusyDiagnostic=>{
  if(reason==='ADMISSION_QUEUE_FULL')return 'queue_full'
@@ -31,7 +32,7 @@ const diagnosticFrom=(reason:string,original?:string):StartBusyDiagnostic=>{
  return 'other'
 }
 export class AssessmentStartBusyError extends Error{
- readonly code=ASSESSMENT_START_BUSY
+ readonly code:typeof ASSESSMENT_START_BUSY|typeof ANONYMOUS_START_DEFERRED
  readonly statusCode=503
  /** Original rolled-back error text, for server-side diagnostics only; never
   * included in the HTTP response body. Distinguishes a transaction that never
@@ -40,6 +41,7 @@ export class AssessmentStartBusyError extends Error{
  readonly diagnosticClass:StartBusyDiagnostic
  constructor(readonly reason:string,readonly retryAfterSeconds=1,originalMessage?:string){
    super('综合测评开始请求繁忙，请稍后重试')
+   this.code=reason===ANONYMOUS_START_DEFERRED?ANONYMOUS_START_DEFERRED:ASSESSMENT_START_BUSY
    this.originalMessage=originalMessage
    this.diagnosticClass=diagnosticFrom(reason,originalMessage)
    // Low-cardinality, structured and safe: class + reason only, never SQL text.
