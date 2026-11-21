@@ -4,9 +4,12 @@ import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases }
 import {
   assertAnonymousStartCriticalMemory,
   assertAssessmentStartResources,
+  awaitScaleCompositionStartResources,
+  isAssessmentStartCpuPaused,
   isAssessmentStartResourceGateError,
   isLowMemoryTrickleEnabled,
   runWithLowMemoryTrickleAdmission,
+  withAdmittedScaleCompositionStart,
 } from '../../services/assessmentResourceProtection'
 import { availableTemplateCache, publicationReadKey, startCompositeCache, startMetadataCache } from './start-read-cache'
 import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments } from '../scale/deployment/repository'
@@ -4262,7 +4265,12 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
           try {
             return await trainingStartGate().run(async () => {
               assessmentTimelineSpan('start.gate_wait', gateEnteredAt, process.hrtime.bigint())
-              return prisma.$transaction(async (tx: Db) => {
+              // Let a short CPU spike drain within the existing gate, before
+              // checkout. Keep the slot through commit or rollback.
+              const admittedScaleBatch = scaleOnlyStart && await traceAssessmentPhase(
+                'start.training_cpu_admission', awaitScaleCompositionStartResources,
+              )
+              const transact = () => prisma.$transaction(async (tx: Db) => {
           const inTxStart = process.hrtime.bigint()
           try {
           return await withQueryRawLabel('start.raw.in_tx', async () => {
@@ -4295,6 +4303,9 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
           })
           } finally { assessmentTimelineSpan('start.in_tx_admission_freeze_create', inTxStart) }
             }, { maxWait: 10_000, timeout: 30_000 })
+              return admittedScaleBatch && !composite.formSections?.length
+                ? withAdmittedScaleCompositionStart(transact)
+                : transact()
             })
           } catch (err) { throw rethrowGateBusyAsStartBusy(err) }
         })
@@ -4319,7 +4330,9 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
     throw compositeConflict('无法创建综合测评记录，请稍后重试')
   }
 
-  if (!scaleOnlyStart) return executeStart()
+  // CPU-only pressure is handled by the Training gate; the low-memory
+  // trickle permit must still be acquired before entering that gate.
+  if (!scaleOnlyStart || isAssessmentStartCpuPaused()) return executeStart()
   if (!isLowMemoryTrickleEnabled()) {
     assertAssessmentStartResources()
     return executeStart()
