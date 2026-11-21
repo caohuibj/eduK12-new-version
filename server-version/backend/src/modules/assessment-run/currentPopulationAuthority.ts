@@ -303,6 +303,23 @@ const actorPopulationAuthoritySql = (
   role: Prisma.raw(`${alias}.actor_role`),
 }, purpose)
 
+/** Evaluate current collection/report rights on joined x, org, relation, subject and respondent rows. */
+export const joinedRunPopulationAuthoritySql = (
+  purpose: RunAuthorityPurpose,
+  productScope: RunPopulationProductScope,
+): Prisma.Sql => Prisma.sql`(org.status='ACTIVE'
+   AND ${actorPopulationAuthoritySql('subject', purpose)}
+   AND (x.respondent_actor_snapshot_id=x.subject_actor_snapshot_id OR ${actorPopulationAuthoritySql('respondent', purpose)})
+   AND ${relationshipAuthoritySql(productScope)}
+   AND ${domainPopulationAuthoritySql(purpose, productScope)}
+   AND (relation.snapshot_payload->'facts'->>'courseId' IS NULL OR EXISTS (
+    SELECT 1 FROM courses course JOIN course_students student ON student.course_id=course.id AND student.status IN ('ACTIVE','APPROVED')
+    WHERE course.id=relation.snapshot_payload->'facts'->>'courseId' AND course.status='PUBLISHED' AND course.ended_at IS NULL
+     AND course.creator_id=CASE WHEN subject.actor_role='TEACHER' THEN subject.user_id ELSE respondent.user_id END
+     AND student.student_id=CASE WHEN subject.actor_role='STUDENT' THEN subject.user_id ELSE respondent.user_id END
+   ))
+ )`
+
 /** Shared current population gate. Intake deadlines do not remove own history.
  * executionId is a static SQL expression supplied by the caller, never user SQL.
  */
@@ -316,17 +333,7 @@ export const currentRunPopulationAuthoritySql = (
   JOIN assessment_run_relationship_snapshots relation ON relation.id=x.relationship_snapshot_id
   JOIN assessment_run_actor_snapshots subject ON subject.id=x.subject_actor_snapshot_id
   JOIN assessment_run_actor_snapshots respondent ON respondent.id=x.respondent_actor_snapshot_id
-  WHERE x.id=${executionId} AND org.status='ACTIVE'
-   AND ${actorPopulationAuthoritySql('subject', purpose)}
-   AND (x.respondent_actor_snapshot_id=x.subject_actor_snapshot_id OR ${actorPopulationAuthoritySql('respondent', purpose)})
-   AND ${relationshipAuthoritySql(productScope)}
-   AND ${domainPopulationAuthoritySql(purpose, productScope)}
-   AND (relation.snapshot_payload->'facts'->>'courseId' IS NULL OR EXISTS (
-    SELECT 1 FROM courses course JOIN course_students student ON student.course_id=course.id AND student.status IN ('ACTIVE','APPROVED')
-    WHERE course.id=relation.snapshot_payload->'facts'->>'courseId' AND course.status='PUBLISHED' AND course.ended_at IS NULL
-     AND course.creator_id=CASE WHEN subject.actor_role='TEACHER' THEN subject.user_id ELSE respondent.user_id END
-     AND student.student_id=CASE WHEN subject.actor_role='STUDENT' THEN subject.user_id ELSE respondent.user_id END
-   ))
+  WHERE x.id=${executionId} AND ${joinedRunPopulationAuthoritySql(purpose, productScope)}
  )
 `
 

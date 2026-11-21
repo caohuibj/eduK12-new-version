@@ -101,7 +101,7 @@ export type ExecutionLockRow = RunExecutionLockIdentity & {
   assignmentRow?: RelationalAssignmentRow | null
 }
 
-const toStartAuthorityKnownEnvelope = (row: ExecutionLockRow): StartAuthorityKnownEnvelope | undefined => {
+export const toStartAuthorityKnownEnvelope = (row: ExecutionLockRow): StartAuthorityKnownEnvelope | undefined => {
   if (
     !row.orgStatus || !row.orgProductDomain
     || !row.subjectActorSnapshotId || !row.respondentActorSnapshotId

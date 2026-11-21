@@ -185,15 +185,20 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   return result
  }))
  const parent='/assessment-composite-attempts/:attemptId'
- const wholeBound:RequestHandler=(req,res,next)=>{
-  void Promise.resolve().then(()=>access.own(req.user!.userId,{attemptId:uuid.parse(req.params.attemptId)}))
+ const wholeBound=(acceptedWhole=false):RequestHandler=>(req,res,next)=>{
+  void Promise.resolve().then(()=>access.own(req.user!.userId,{attemptId:uuid.parse(req.params.attemptId),acceptedWhole}))
    .then(()=>next()).catch(error=>runtimeError(error,res,next))
  }
- router.get(parent+'/whole',wholeBound,compositeController.wholeDefinition)
- router.get(parent+'/whole/template/:templateHash',wholeBound,compositeController.wholeTemplate)
- router.get(parent+'/whole/receipt',wholeBound,compositeController.wholeReceipt)
- router.get(parent+'/whole/progress',wholeBound,compositeController.educationWholeProgress)
- router.post(parent+'/whole/submit',wholeBound,compositeController.wholeSubmit)
+ router.get(parent+'/whole',wholeBound(),compositeController.wholeDefinition)
+ router.get(parent+'/whole/template/:templateHash',wholeBound(),compositeController.wholeTemplate)
+ router.get(parent+'/whole/receipt',wholeBound(true),compositeController.wholeReceipt)
+ router.get(parent+'/whole/progress',wrapped(async req=>{
+  const attemptId=uuid.parse(req.params.attemptId),userId=req.user!.userId
+  const proof=await access.own(userId,{attemptId,acceptedWhole:true})
+  const {readEducationWholeProgress}=await import('../composite/whole-questionnaire.service')
+  return readEducationWholeProgress(attemptId,userId,proof.task.status)
+ }))
+ router.post(parent+'/whole/submit',wholeBound(true),compositeController.wholeSubmit)
  router.get(parent,attemptAccess,wrapped(async req=>projectTeacherCompositeRuntime(
   await getAttemptState(req.params.attemptId,{userId:req.user!.userId},undefined,'current-unit'))))
  router.get(parent+'/form-sections/:sectionId/assets/:assetId/content',childAccess('FORM_SECTION'),compositeImageController.educationFormImage)
