@@ -48,7 +48,8 @@ export function assertOrdinarySelfWholeBound<T extends BoundAuthority>(row: T | 
   return true
 }
 
-export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, userId: string, locator: Locator) {
+export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, userId: string, locator: Locator,
+  submission?: { columns: Prisma.Sql; productJoin: Prisma.Sql }) {
   // The per-unit compatibility writer retains its historical live authority.
   if (process.env.ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED === 'false') return null
   const wholeDelivery = process.env.ASSESSMENT_REPORT_ASYNC_ENABLED === 'true'
@@ -63,11 +64,11 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
     ${path ? Prisma.sql`AND link.course_id=${path.courseId}` : Prisma.empty}`
   const teacherLink = Prisma.sql`SELECT 1 FROM huiteacher_evaluation_run_links link WHERE ${sameRun}`
   return Prisma.sql`
-    SELECT e.status AS "executionStatus", a.id AS "assignmentRef", p.id, p.user_id AS "userId",
+    SELECT ${submission?.columns ?? Prisma.sql`e.status AS "executionStatus", a.id AS "assignmentRef", p.id, p.user_id AS "userId",
       NULL::text AS "recoveryTokenHash", p.attempt_epoch AS epoch, p.status AS "parentStatus",
       p.frozen_active_slot_set_hash AS "slotHash", j.slot_set_hash AS "jobSlot",
       j.whole_submission_id AS "wholeSubmissionId", j.whole_payload_hash AS "payloadHash",
-      j.whole_accepted_at AS "acceptedAt", j.status AS state, j.status AS "jobStatus",
+      j.whole_accepted_at AS "acceptedAt", j.status AS state, j.status AS "jobStatus"`},
       e.runtime_binding_ref IS NOT NULL AS opened,
       (e.status='COMPLETED' AND a.status='COMPLETED' AND p.status='COMPLETED'
         OR e.status='STARTED' AND ((a.status='STARTED' AND p.status='IN_PROGRESS')
@@ -109,6 +110,7 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
       AND (${wholeDelivery} OR p.async_report_epoch=p.attempt_epoch)
       AND NOT EXISTS (SELECT 1 FROM jsonb_array_elements(p.training_content_binding->'units') unit WHERE unit->>'family'<>'SCALE')
     LEFT JOIN composite_report_jobs j ON j.attempt_id=p.id AND j.attempt_epoch=p.attempt_epoch
+    ${submission?.productJoin ?? Prisma.empty}
     WHERE ${byExecution ? Prisma.sql`e.id=${locator.executionId}` : Prisma.sql`e.runtime_binding_kind='COMPOSITE' AND e.runtime_binding_ref=${locator.attemptId}`}
       ${path ? Prisma.sql`AND e.organization_id=${path.organizationId} AND e.run_id=${path.runId}` : Prisma.empty}
       AND e.subject_actor_snapshot_id=e.respondent_actor_snapshot_id
