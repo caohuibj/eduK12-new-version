@@ -46,7 +46,7 @@ describe('whole questionnaire durable browser submission', () => {
     expect(client.submitWhole).toHaveBeenCalledTimes(1)
     expect(client.reportStatus).not.toHaveBeenCalled()
     expect(onCompleted).not.toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: '返回', exact: true }))
+    fireEvent.click(screen.getByRole('button', { name: /^返回$/ }))
     expect(onExit).toHaveBeenCalledOnce()
   })
   it('keeps frozen scale and form order and shows a failed worker without resubmitting', async () => {
