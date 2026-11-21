@@ -1,8 +1,10 @@
 import { prisma } from '../../config/database'
 import { relationalFail } from './errors'
+import type { RelationalAssignmentStatusV1 } from './types'
 import {
   createSqlRelationalAssignmentRepository,
   type RelationalAssignmentRepository,
+  type RelationalConsentAssignment,
 } from './repository'
 
 type RuntimeConsentDb = {
@@ -23,6 +25,8 @@ type RuntimeConsentDb = {
 
 export type RuntimeConsentHeader = { id: string; userId: string | null; assignmentRef: string | null; consentId: string | null }
 
+export type RuntimeConsentAssignment = RelationalConsentAssignment & { assignmentId: string; status: RelationalAssignmentStatusV1 }
+
 export const createRelationalRuntimeConsentAuthority = (input?: {
   db?: RuntimeConsentDb
   assignments?: Pick<RelationalAssignmentRepository, 'findById' | 'resolveAcceptedConsent'>
@@ -31,7 +35,8 @@ export const createRelationalRuntimeConsentAuthority = (input?: {
   const assignments = input?.assignments
     ?? createSqlRelationalAssignmentRepository(prisma as any)
 
-  const assertCompositeFinal = async (attemptId: string, actorUserId: string, preloaded?: RuntimeConsentHeader | null): Promise<void> => {
+  const assertCompositeFinal = async (attemptId: string, actorUserId: string, preloaded?: RuntimeConsentHeader | null,
+    currentAssignment?: RuntimeConsentAssignment | null): Promise<void> => {
     if (preloaded && preloaded.id !== attemptId) relationalFail('RELATIONAL_RUNTIME_BINDING', 'preloaded consent header belongs to a different attempt')
     const attempt = preloaded === undefined ? await db.compositeAssessmentAttempt.findUnique({
       where: { id: attemptId },
@@ -43,8 +48,11 @@ export const createRelationalRuntimeConsentAuthority = (input?: {
       relationalFail('RELATIONAL_ASSIGNMENT_ACTOR', 'relational runtime FINAL actor is not the attempt respondent')
     }
 
-    const assignment = await assignments.findById(attempt.assignmentRef)
+    const assignment = (currentAssignment === undefined ? await assignments.findById(attempt.assignmentRef) : currentAssignment)
       ?? relationalFail('RELATIONAL_RUNTIME_BINDING', 'relational runtime attempt references a missing assignment')
+    if (assignment.assignmentId !== attempt.assignmentRef) {
+      relationalFail('RELATIONAL_RUNTIME_BINDING', 'preloaded assignment belongs to a different attempt')
+    }
     if (assignment.respondentUserId !== actorUserId) {
       relationalFail('RELATIONAL_RUNTIME_BINDING', 'relational assignment respondent does not match runtime FINAL actor')
     }

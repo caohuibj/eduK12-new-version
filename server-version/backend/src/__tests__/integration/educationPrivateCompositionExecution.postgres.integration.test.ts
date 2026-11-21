@@ -144,9 +144,13 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
       itemCode:item.itemCode,responseValue:item.options[0].value})),
     })),formAnswers:definition.formSections.map((section:any)=>({sectionId:section.id,definitionHash:section.definitionHash,
      answers:section.items.map((item:any)=>({formItemId:item.id,value:'Synthetic response'}))}))}
-   const receipt=await request(path+'/submit',auth,payload)
-   expect(receipt.status,JSON.stringify(receipt.value)).toBe(200)
-   expect(receipt.data).toMatchObject({status:'ACCEPTED',submissionId:payload.submissionId,replayed:false})
+   expect((await request(path+'/submit',other,payload)).status).toBe(404)
+   const receipts=await Promise.all([request(path+'/submit',auth,payload),request(path+'/submit',auth,payload)])
+   for(const receipt of receipts){
+    expect(receipt.status,JSON.stringify(receipt.value)).toBe(200)
+    expect(receipt.data).toMatchObject({status:'ACCEPTED',submissionId:payload.submissionId})
+   }
+   expect(receipts.map(receipt=>receipt.data.replayed).sort()).toEqual([false,true])
    const where={attemptId_attemptEpoch:{attemptId:id,attemptEpoch:payload.attemptEpoch}}
    // Give only this fixture's job a worker lease. Other suites may share the queue.
    const pending=await db.compositeReportJob.findUniqueOrThrow({where})
@@ -174,6 +178,7 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
     userId:f.participantUserId,permission:'RUN_START',reason:'Synthetic participant withdrawal',deniedByUserId:f.managerUserId}})
    expect((await request(path+'/progress',auth)).status).toBe(404)
    expect((await request(lookup,auth)).status).toBe(404)
+   expect((await request(path+'/submit',auth,payload)).status).toBe(404)
    await db.organizationAccessDeny.update({where:{id:deny.id},data:{liftedByUserId:f.managerUserId,liftedAt:new Date()}})
    const {finishCompositeReportJob}=await import('../../modules/assessment-runtime/report-outbox.service')
    expect(await finishCompositeReportJob(job,{kind:'failed',errorCode:'REPORT_GENERATION_FAILED'})).toBe(true)

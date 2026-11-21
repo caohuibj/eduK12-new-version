@@ -189,14 +189,26 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
   await source.assertUse(db,{identity,executionId:row.executionId,actorUserId,purpose})
   return {task:taskDto(row,entry.title),identity,row,runtimeCompositeId:origin.runtimeCompositeId,units:origin.units,startPreflight:startPreflightForRow(row,actorUserId)}
  }
- const own=async(actorUserId:string,input:{executionId?:string;attemptId?:string;acceptedWhole?:boolean;includeSlots?:boolean})=>{
+ const ownRow=async(actorUserId:string,input:{executionId?:string;attemptId?:string;acceptedWhole?:boolean;includeSlots?:boolean})=>{
   if(!input.executionId&&!input.attemptId)fail()
   const rows=await queryTeacherAssessmentRows(db,actorUserId,{...input,limit:2},audience)
   if(rows.length!==1)fail()
-  return authorize(rows[0],actorUserId)
+  return rows[0]
  }
+ const own=async(actorUserId:string,input:Parameters<typeof ownRow>[1])=>authorize(await ownRow(actorUserId,input),actorUserId)
  return {
   own,
+  async forStart(actorUserId:string,executionId:string){
+   const row=await ownRow(actorUserId,{executionId})
+   const target=row.policy?.runtimeLaunchTarget
+   if(audience==='TEACHER_SELF'&&row.status==='ASSIGNED'&&row.family==='BUNDLE'
+    &&row.resourceKey.startsWith('education-composition:TEACHER:')&&row.resourceKey.endsWith(':TEACHER:SELF:1.0.0')
+    &&target?.kind==='COMPOSITE'&&typeof target.ref==='string'&&target.ref){
+    // The locked START validates this exact track and all current source rights.
+    return {task:{runtimeBindingRef:null},startPreflight:startPreflightForRow(row,actorUserId,target.ref)}
+   }
+   return authorize(row,actorUserId)
+  },
   async page(actorUserId:string,raw:unknown={}){
    const input=pageSchema.parse(raw),cursor=input.cursor?decodeCursor(input.cursor,actorUserId):undefined
    const rows=await queryTeacherAssessmentRows(db,actorUserId,{cursor,limit:input.pageSize+1},audience)
