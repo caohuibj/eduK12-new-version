@@ -174,6 +174,12 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
    expect((await request(path+'/progress',auth)).status).toBe(404)
    expect((await request(lookup,auth)).status).toBe(404)
    await db.organizationAccessDeny.update({where:{id:deny.id},data:{liftedByUserId:f.managerUserId,liftedAt:new Date()}})
+   const {finishCompositeReportJob}=await import('../../modules/assessment-runtime/report-outbox.service')
+   expect(await finishCompositeReportJob(job,{kind:'failed',errorCode:'REPORT_GENERATION_FAILED'})).toBe(true)
+   const failed=await request(path+'/progress',auth)
+   expect(failed.status,JSON.stringify(failed.value)).toBe(200)
+   expect(failed.data).toMatchObject({status:'IN_PROGRESS',wholeSubmissionReceived:true,reportStatus:{state:'FAILED'}})
+
    const {reconcileRelationalCompositeCompletion}=await import('../../modules/assessment-relational/runtime-completion')
    await reconcileRelationalCompositeCompletion(id)
    expect((await request(path+'/progress',auth)).data).toMatchObject({status:'COMPLETED',reportStatus:{state:'READY'}})

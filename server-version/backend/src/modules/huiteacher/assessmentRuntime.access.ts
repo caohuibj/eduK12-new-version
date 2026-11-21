@@ -55,7 +55,9 @@ function decodeCursor(value:string,actorUserId:string):Cursor{
  }catch{throw new TeacherAssessmentRuntimeError('HUITEACHER_ASSESSMENT_CURSOR_INVALID',400)}
 }
 /** Product identity, current account/persona/entitlement, exact SELF assignment,
- * event, Run and durable parent binding are predicates on actual database rows. */
+ * event, Run and durable parent binding are predicates on actual database rows.
+ * Accepted-whole continuation before reconciliation is scoped to open events.
+ * Closed events use the regular history read once the Run is reconciled. */
 export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId:string,input:{executionId?:string;attemptId?:string;cursor?:Cursor;limit:number;acceptedWhole?:boolean;includeSlots?:boolean},audience:TeacherAssessmentAudience='TEACHER_SELF'){
  const student=audience==='STUDENT_EVALUATION'
  return withBoundedPlannerRead(db, client => client.$queryRaw<Row[]>(Prisma.sql`

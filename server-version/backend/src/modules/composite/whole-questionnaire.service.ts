@@ -1010,10 +1010,11 @@ export const readEducationWholeProgress = async (attemptId: string, userId: stri
   // The parent and assignment commit before the Run can release Teacher feedback.
   // Use the authorized execution snapshot even if the worker advances during this read.
   const awaitingRun = executionStatus === 'STARTED' && parent.status === 'COMPLETED' && Boolean(job?.wholeSubmissionId)
+  const terminalFailure = job?.status === 'FAILED' || job?.status === 'CANCELLED' ? job.status : undefined
   return {
     attemptId, attemptEpoch: parent.attemptEpoch, status: awaitingRun ? 'IN_PROGRESS' : parent.status,
     wholeSubmissionReceived: Boolean(job?.wholeSubmissionId),
-    reportStatus: { state: awaitingRun ? 'PROCESSING' : parent.status === 'COMPLETED' ? 'READY' : job?.status ?? 'WAITING' },
+    reportStatus: { state: awaitingRun ? terminalFailure ?? 'PROCESSING' : parent.status === 'COMPLETED' ? 'READY' : job?.status ?? 'WAITING' },
   }
 }
 
