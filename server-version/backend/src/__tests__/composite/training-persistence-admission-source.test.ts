@@ -10,6 +10,9 @@ const composite = source('composite/composite.service.ts')
 const authoring = source('questionnaire-product/service.ts')
 const cognitive = source('cognitive/session.service.ts')
 const admission = composite.slice(composite.indexOf('const createAttempt = async'), composite.indexOf('const createAttempt = async') + 30000)
+// Read the complete insert payload, not the 30k-character admission-ordering excerpt.
+const attemptInsertStart = composite.indexOf('const attempt = await db.compositeAssessmentAttempt.create', composite.indexOf('const createAttempt = async'))
+const attemptInsertData = composite.slice(attemptInsertStart, composite.indexOf('compositeAssessmentId: composite.id', attemptInsertStart))
 const now = new Date('2026-10-19T00:00:00.000Z')
 const publicationIdentity = { schemaVersion: 1, compositeId: 'publication', courseId: 'training', publishedAt: now.toISOString(), productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', trainingFlowDigest: null, trainingVariantDigest: null }
 
@@ -51,7 +54,7 @@ describe('Training persistence publication/admission source contracts (not HTTP 
     expect(admission).toContain('cutoffs: [facts[0].endedAt, current.expiresAt, roundCutoff]')
     const insert = admission.indexOf('const attempt = await db.compositeAssessmentAttempt.create')
     expect(admission.indexOf('const trainingPersistenceSnapshot =')).toBeLessThan(insert)
-    const insertData = admission.slice(insert, admission.indexOf('compositeAssessmentId: composite.id', insert))
+    const insertData = attemptInsertData
     expect(insertData).toContain('...(trainingPersistenceSnapshot ? { trainingPersistenceSnapshot: trainingPersistenceSnapshot as Prisma.InputJsonValue,')
     expect(insertData).toContain('trainingPersistenceSnapshotHash: canonicalHash(trainingPersistenceSnapshot)')
     expect(insertData).toContain('id: newAttemptId')
