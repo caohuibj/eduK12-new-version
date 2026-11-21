@@ -829,72 +829,72 @@ type WholeSubmissionHeader = Prisma.CompositeAssessmentAttemptGetPayload<{
 /** One fresh read of ownership, product eligibility and the current receipt. */
 const loadWholeSubmissionContext = async (attemptId: string, boundAssignmentRef?: string,
   ordinary?: { product: OrdinarySelfWholeProduct; userId: string }) => {
-  const columns = Prisma.sql`
-    p."id" AS "id",
-      p."status" AS "status",
-      p."progress" AS "progress",
-      p."completed_at" AS "completedAt",
-      p."attempt_epoch" AS "attemptEpoch",
-      p."async_report_epoch" AS "asyncReportEpoch",
-      p."delivery_mode" AS "deliveryMode",
-      p."runtime_generation" AS "runtimeGeneration",
-      p."frozen_active_slot_set_hash" AS "frozenActiveSlotSetHash",
-      p."context_snapshot_hash" AS "contextSnapshotHash",
-      p."aggregate_input_hash" AS "aggregateInputHash",
-      p."assignment_ref" AS "assignmentRef", p."consent_id" AS "consentId",
-      ${ordinary || boundAssignmentRef ? Prisma.sql`CASE WHEN a.id IS NOT NULL THEN jsonb_build_object(
+  const authority = ordinary && ordinarySelfWholeAccessQuery(ordinary.product, ordinary.userId, { attemptId })
+  if (ordinary && !authority) return null
+  const binding = authority ? Prisma.sql`ordinary."assignmentRef"` : boundAssignmentRef ? Prisma.sql`${boundAssignmentRef}` : undefined
+  const rows = await prisma.$queryRaw<Array<Omit<WholeSubmissionHeader, 'compositeAssessment'> & {
+    productKind: WholeSubmissionHeader['compositeAssessment']['productKind'];
+    reportPackageKey: string | null; analysisProtocolKey: string | null;
+    trainingFlowDraft: Prisma.JsonValue;trainingFlowFrozen:Prisma.JsonValue;trainingFlowDigest:string|null;
+    trainingVariantDraft: unknown; trainingVariantFrozen: unknown; trainingVariantDigest: string | null;
+    currentAssignment?: RuntimeConsentAssignment | null;
+    ordinaryId?: string | null; ordinaryOpened?: boolean; ordinaryAllowed?: boolean; ordinaryStopped?: boolean;
+    jobId: string | null; jobStatus: string | null; leaseToken: string | null;
+    wholeSubmissionId: string | null; wholePayloadHash: string | null; wholeAcceptedAt: Date | null;
+    wholeValidationEncrypted: string | null; wholeValidationHash: string | null;
+  }>>`
+    SELECT parent."id" AS "id",
+      parent."status" AS "status",
+      parent."progress" AS "progress",
+      parent."completed_at" AS "completedAt",
+      parent."attempt_epoch" AS "attemptEpoch",
+      parent."async_report_epoch" AS "asyncReportEpoch",
+      parent."delivery_mode" AS "deliveryMode",
+      parent."runtime_generation" AS "runtimeGeneration",
+      parent."frozen_active_slot_set_hash" AS "frozenActiveSlotSetHash",
+      parent."context_snapshot_hash" AS "contextSnapshotHash",
+      parent."aggregate_input_hash" AS "aggregateInputHash",
+      parent."assignment_ref" AS "assignmentRef", parent."consent_id" AS "consentId",
+      ${authority ? Prisma.sql`ordinary.id AS "ordinaryId", ordinary.opened AS "ordinaryOpened",
+        ordinary.allowed AS "ordinaryAllowed", ordinary.stopped AS "ordinaryStopped",` : Prisma.empty}
+      ${binding ? Prisma.sql`CASE WHEN a.id IS NOT NULL THEN jsonb_build_object(
         'assignmentId', a.id, 'status', a.status, 'consentId', a.consent_id,
         'subjectUserId', a.subject_user_id, 'respondentUserId', a.respondent_user_id, 'respondentRole', a.respondent_role,
         'createdByUserId', a.created_by_user_id, 'relationshipKind', a.relationship_kind, 'visibilityPolicyKey', a.visibility_policy_key,
         'policyDomain', a.policy_domain, 'resourceKind', a.resource_kind, 'resourceKey', a.resource_key, 'resourceVersion', a.resource_version
       ) END AS "currentAssignment",` : Prisma.empty}
-      p."delivery_course_id" AS "deliveryCourseId",
-      p."training_timing_snapshot" AS "trainingTimingSnapshot",
-      p."training_flow_snapshot_encrypted" AS "trainingFlowSnapshotEncrypted", p."training_flow_snapshot_hash" AS "trainingFlowSnapshotHash",
-      p."training_flow_path_encrypted" AS "trainingFlowPathEncrypted", p."training_flow_path_hash" AS "trainingFlowPathHash",
-      p."training_variant_allocation_encrypted" AS "trainingVariantAllocationEncrypted",
-      p."training_variant_allocation_hash" AS "trainingVariantAllocationHash",
-      p."user_id" AS "userId",
-      p."recovery_token_hash" AS "recoveryTokenHash",
+      parent."delivery_course_id" AS "deliveryCourseId",
+      parent."training_timing_snapshot" AS "trainingTimingSnapshot",
+      parent."training_flow_snapshot_encrypted" AS "trainingFlowSnapshotEncrypted", parent."training_flow_snapshot_hash" AS "trainingFlowSnapshotHash",
+      parent."training_flow_path_encrypted" AS "trainingFlowPathEncrypted", parent."training_flow_path_hash" AS "trainingFlowPathHash",
+      parent."training_variant_allocation_encrypted" AS "trainingVariantAllocationEncrypted",
+      parent."training_variant_allocation_hash" AS "trainingVariantAllocationHash",
+      parent."user_id" AS "userId",
+      parent."recovery_token_hash" AS "recoveryTokenHash",
       product."product_kind" AS "productKind", product."report_package_key" AS "reportPackageKey",
       product."analysis_protocol_key" AS "analysisProtocolKey",
       product."training_variant_draft" AS "trainingVariantDraft",
       product."training_variant_frozen" AS "trainingVariantFrozen",
       product."training_variant_digest" AS "trainingVariantDigest",
       product."training_flow_draft" AS "trainingFlowDraft", product."training_flow_frozen" AS "trainingFlowFrozen", product."training_flow_digest" AS "trainingFlowDigest",
-      j."id" AS "jobId", j."status" AS "jobStatus", j."lease_token" AS "leaseToken",
-      j."whole_submission_id" AS "wholeSubmissionId", j."whole_payload_hash" AS "wholePayloadHash",
-      j."whole_accepted_at" AS "wholeAcceptedAt",
-      CASE WHEN j."whole_submission_id" IS NULL THEN j."whole_validation_encrypted" END AS "wholeValidationEncrypted",
-      CASE WHEN j."whole_submission_id" IS NULL THEN j."whole_validation_hash" END AS "wholeValidationHash"
+      job."id" AS "jobId", job."status" AS "jobStatus", job."lease_token" AS "leaseToken",
+      job."whole_submission_id" AS "wholeSubmissionId", job."whole_payload_hash" AS "wholePayloadHash",
+      job."whole_accepted_at" AS "wholeAcceptedAt",
+      CASE WHEN job."whole_submission_id" IS NULL THEN job."whole_validation_encrypted" END AS "wholeValidationEncrypted",
+      CASE WHEN job."whole_submission_id" IS NULL THEN job."whole_validation_hash" END AS "wholeValidationHash"
+    FROM "composite_assessment_attempts" AS parent
+    JOIN "composite_assessments" AS product ON product."id" = parent."composite_assessment_id"
+    LEFT JOIN "composite_report_jobs" AS job ON job."attempt_id" = parent."id" AND job."attempt_epoch" = parent."attempt_epoch"
+    ${authority ? Prisma.sql`LEFT JOIN (${authority}) ordinary ON ordinary.id=parent.id` : Prisma.empty}
+    ${binding ? Prisma.sql`LEFT JOIN relational_assessment_assignments a
+      ON a.id=parent.assignment_ref AND a.id=${binding} AND a.policy_domain='ORGANIZATION_RUN'` : Prisma.empty}
+    WHERE parent."id" = ${attemptId}
   `
-  const productJoin = Prisma.sql`JOIN "composite_assessments" product ON product."id" = p."composite_assessment_id"`
-  const query = ordinary
-    ? ordinarySelfWholeAccessQuery(ordinary.product, ordinary.userId, { attemptId }, { columns, productJoin })
-    : Prisma.sql`
-      SELECT ${columns}
-      FROM "composite_assessment_attempts" p
-      ${productJoin}
-      LEFT JOIN "composite_report_jobs" j ON j."attempt_id" = p."id" AND j."attempt_epoch" = p."attempt_epoch"
-      ${boundAssignmentRef ? Prisma.sql`LEFT JOIN relational_assessment_assignments a
-        ON a.id=p.assignment_ref AND a.id=${boundAssignmentRef} AND a.policy_domain='ORGANIZATION_RUN'` : Prisma.empty}
-      WHERE p."id" = ${attemptId}
-    `
-  if (!query) return null
-  const [row] = await prisma.$queryRaw<Array<Omit<WholeSubmissionHeader, 'compositeAssessment'> & {
-    productKind: WholeSubmissionHeader['compositeAssessment']['productKind'];
-    reportPackageKey: string | null; analysisProtocolKey: string | null;
-    trainingFlowDraft: Prisma.JsonValue;trainingFlowFrozen:Prisma.JsonValue;trainingFlowDigest:string|null;
-    trainingVariantDraft: unknown; trainingVariantFrozen: unknown; trainingVariantDigest: string | null;
-    currentAssignment?: RuntimeConsentAssignment | null;
-    opened?: boolean; allowed?: boolean; stopped?: boolean;
-    jobId: string | null; jobStatus: string | null; leaseToken: string | null;
-    wholeSubmissionId: string | null; wholePayloadHash: string | null; wholeAcceptedAt: Date | null;
-    wholeValidationEncrypted: string | null; wholeValidationHash: string | null;
-  }>>(query)
+  const row = rows[0]
   if (!row) return null
   if (ordinary && !assertOrdinarySelfWholeBound({
-    id: row.id, opened: row.opened === true, allowed: row.allowed === true, stopped: row.stopped === true,
+    id: row.ordinaryId ?? null, opened: row.ordinaryOpened === true,
+    allowed: row.ordinaryAllowed === true, stopped: row.ordinaryStopped === true,
   })) return null
   const parent: WholeSubmissionHeader = { ...row, compositeAssessment: {
     productKind: row.productKind, reportPackageKey: row.reportPackageKey, analysisProtocolKey: row.analysisProtocolKey,
