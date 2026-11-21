@@ -178,7 +178,7 @@ export async function assertFrozenCompositionPublication(tx:Tx,identity:FrozenCo
  * not destroy an entered attempt or historical report. */
 export async function assertCompositionCollection(tx:Tx,identity:Pick<FrozenCompositionIdentity,'origin'>&{
  units:ReadonlyArray<{releaseId:string;scaleId?:string|null;native?:{provider:string;sourceMeasurementReleaseId?:string}}>;manifest:ReadonlyArray<{sourceProvider:string;versionId:string;contentHash:string;profileArtifactHash?:string}>;selectedBindings?:SelectedSourceBindings
-},purpose:'NEW_START'|'PUBLISHED_SELF_START'|'BOUND_COLLECTION',lock=false,libraryUses?:LockedEducationLibraryUses){
+},purpose:'NEW_START'|'PUBLISHED_SELF_START'|'BOUND_COLLECTION',lock=false,libraryUses?:LockedEducationLibraryUses,liveAnchor?:Pick<FrozenCompositionIdentity,'compositeId'|'policy'|'binding'|'origin'>){
  if(isStudentComposition(identity.origin)&&process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')privateToolFail('HUITEACHER_STUDENT_FEEDBACK_DISABLED',403)
  const c={entry:identity.origin.entry,organizationId:identity.origin.organizationId,principal:{userId:identity.origin.ownerUserId,accountDomain:'SCHOOL' as const}}
  if(purpose==='NEW_START')await authorizePrivateTool(tx,c)
@@ -187,13 +187,18 @@ export async function assertCompositionCollection(tx:Tx,identity:Pick<FrozenComp
  if(purpose==='NEW_START')await assertEducationCognitiveOriginalUse(tx,c,identity.manifest.filter(block=>block.sourceProvider==='COGNITIVE_CONFIG'&&!block.profileArtifactHash).map(block=>block.versionId),lock)
  const releases=[...new Set(identity.units.flatMap(unit=>[unit.releaseId,...(unit.native?.sourceMeasurementReleaseId?[unit.native.sourceMeasurementReleaseId]:[])]))],scales=[...new Set(identity.units.flatMap(unit=>unit.scaleId?[unit.scaleId]:[]))]
  if(lock)await assertScaleLibraryCollectionAllowed(tx,releases,scales)
- const [row]=await tx.$queryRaw<Array<{stopped:boolean;unavailable:boolean}>>(Prisma.sql`SELECT
+ const [row]=await tx.$queryRaw<Array<{stopped:boolean;unavailable:boolean;anchorOk:boolean}>>(Prisma.sql`SELECT
+  ${liveAnchor ? Prisma.sql`EXISTS(${liveCompositionAnchor({
+    compositeId:liveAnchor.compositeId,key:liveAnchor.policy.key,
+    manifestHash:liveAnchor.binding.manifestHash,origin:liveAnchor.origin,
+  })})` : Prisma.sql`TRUE`} AS "anchorOk",
   EXISTS(SELECT 1 FROM scale_library_emergency_stops s WHERE s.target_kind='RELEASE' AND s.target_id=ANY(${releases}::text[])
    OR s.target_kind='TRAINING_SCALE' AND s.target_id=ANY(${scales}::text[])) AS stopped,
   (EXISTS(SELECT 1 FROM measurement_content_releases WHERE id=ANY(${releases}::text[]) AND status<>'PUBLISHED')
    OR EXISTS(SELECT 1 FROM scales WHERE id=ANY(${scales}::text[]) AND status<>'PUBLISHED')
    OR EXISTS(SELECT 1 FROM measurement_content_releases m JOIN cognitive_assignments a ON a.id=m.scope->>'resourceId'
     WHERE m.id=ANY(${releases}::text[]) AND m.family='COGNITIVE' AND m.scope->>'product'=${identity.origin.entry} AND a.status<>'PUBLISHED')) AS unavailable`)
+ if(row.anchorOk===false)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
  if(row.stopped||purpose!=='BOUND_COLLECTION'&&row.unavailable)privateToolFail('PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE',403)
  if(purpose==='NEW_START'){
   const libraries=identity.manifest.filter(block=>block.sourceProvider==='LIBRARY_SCALE')
@@ -268,7 +273,23 @@ export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:s
  }
  return {identity,...row}
 }
-export async function admitCompositionStart(tx:Tx,input:{executionId:string;compositeId:string;actorUserId:string},libraryUses?:LockedEducationLibraryUses,checked?:CheckedCompositionIdentity,publishedSelfWhole=false){
+export type KnownPublishedSelfCompositionSource = {
+ product:'SCHOOL'|'TEACHER'
+ assignmentRef:string
+ subjectUserId:string
+ respondentUserId:string
+ receiptOnly:boolean
+}
+export async function admitCompositionStart(tx:Tx,input:{executionId:string;compositeId:string;actorUserId:string},libraryUses?:LockedEducationLibraryUses,checked?:CheckedCompositionIdentity,publishedSelfWhole=false,knownSelfSource?:KnownPublishedSelfCompositionSource){
+ if(publishedSelfWhole&&knownSelfSource&&checked?.tx===tx){
+  const identity=checked.identity
+  if(identity.origin.entry!==knownSelfSource.product||identity.compositeId!==input.compositeId||knownSelfSource.subjectUserId!==knownSelfSource.respondentUserId||knownSelfSource.respondentUserId!==input.actorUserId)
+   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
+  const checkedScaleIds=await assertCompositionCollection(tx,identity,'PUBLISHED_SELF_START',true,libraryUses,identity)
+  return issueVerifiedEducationStart({tx,product:knownSelfSource.product,compositeId:identity.compositeId,assignmentRef:knownSelfSource.assignmentRef,
+   subjectUserId:knownSelfSource.subjectUserId,respondentUserId:knownSelfSource.respondentUserId,composition:identity.binding,
+   checkedScaleIds:new Set(checkedScaleIds),receiptOnly:knownSelfSource.receiptOnly})
+ }
  const source=await readCompositionExecutionSource(tx,input,checked)
  const checkedScaleIds=await assertCompositionCollection(tx,source.identity,publishedSelfWhole?'PUBLISHED_SELF_START':'NEW_START',true,libraryUses)
  return issueVerifiedEducationStart({tx,product:source.product,compositeId:source.identity.compositeId,assignmentRef:source.assignmentRef,

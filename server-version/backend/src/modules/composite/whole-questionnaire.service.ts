@@ -835,7 +835,7 @@ const loadWholeSubmissionContext = async (attemptId: string, boundAssignmentRef?
   ordinary?: { product: OrdinarySelfWholeProduct; userId: string }) => {
   const authority = ordinary && ordinarySelfWholeAccessQuery(ordinary.product, ordinary.userId, { attemptId })
   if (ordinary && !authority) return null
-  const binding = authority ? Prisma.sql`ordinary."assignmentRef"` : boundAssignmentRef ? Prisma.sql`${boundAssignmentRef}` : undefined
+  const binding = !authority && boundAssignmentRef ? Prisma.sql`${boundAssignmentRef}` : undefined
   const rows = await prisma.$queryRaw<Array<Omit<WholeSubmissionHeader, 'compositeAssessment'> & {
     productKind: WholeSubmissionHeader['compositeAssessment']['productKind'];
     reportPackageKey: string | null; analysisProtocolKey: string | null;
@@ -860,7 +860,8 @@ const loadWholeSubmissionContext = async (attemptId: string, boundAssignmentRef?
       parent."aggregate_input_hash" AS "aggregateInputHash",
       parent."assignment_ref" AS "assignmentRef", parent."consent_id" AS "consentId",
       ${authority ? Prisma.sql`ordinary.id AS "ordinaryId", ordinary.opened AS "ordinaryOpened",
-        ordinary.allowed AS "ordinaryAllowed", ordinary.stopped AS "ordinaryStopped",` : Prisma.empty}
+        ordinary.allowed AS "ordinaryAllowed", ordinary.stopped AS "ordinaryStopped",
+        ordinary."currentAssignment" AS "currentAssignment",` : Prisma.empty}
       ${binding ? Prisma.sql`CASE WHEN a.id IS NOT NULL THEN jsonb_build_object(
         'assignmentId', a.id, 'status', a.status, 'consentId', a.consent_id,
         'subjectUserId', a.subject_user_id, 'respondentUserId', a.respondent_user_id, 'respondentRole', a.respondent_role,
@@ -1133,7 +1134,10 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
     if (!referenceDb) throw failure('整份交卷量表参照缺失')
     const references = referenceDb
     if (process.env.ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED !== 'false') {
-      committedScales = await traceAssessmentPhase('report.units_batch', () => submitUnifiedScaleCollectionBatch(job, units, execution, references))
+      const skipCollectionGuard = Boolean(reportParent) && parent.compositeAssessment.items.every(
+        item => item.type !== 'SCALE' || ((item as any).standardCombinationSource == null && (item as any).standardCombination == null),
+      )
+      committedScales = await traceAssessmentPhase('report.units_batch', () => submitUnifiedScaleCollectionBatch(job, units, execution, references, { skipCollectionGuard }))
     } else {
       for (const unit of units) await traceAssessmentPhase('report.unit',
         () => submitUnifiedScaleAssessmentFinal(unit.input, unit.child, execution, references), unit.input.itemId)

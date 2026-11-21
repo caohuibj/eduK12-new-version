@@ -118,7 +118,6 @@ export const runStartGate = (): BoundedAdmissionGate => {
 
     runStartGateInstance = new BoundedAdmissionGate({
       name: 'run_start_admission',
-      pauseDispatchWhile: isAssessmentRunStartCpuPaused,
       maxConcurrent,
       maxQueue,
       maxWaitMs,
@@ -401,9 +400,18 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
     })
   }
   const educationSource=admission.assignment.resourceKey.startsWith('education-assessment:')?await assertEducationAssessmentExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,purpose:'NEW_START'}):undefined
+  const knownSelfSource = publishedSelfWhole && envelope?.trackReceiptOnly !== undefined && (productScope === 'CAMPUS_ONLY' || productScope === 'HUITEACHER_ONLY')
+    ? {
+        product: productScope === 'CAMPUS_ONLY' ? 'SCHOOL' as const : 'TEACHER' as const,
+        assignmentRef: admission.assignment.assignmentId,
+        subjectUserId: admission.assignment.subjectUserId,
+        respondentUserId: admission.assignment.respondentUserId,
+        receiptOnly: Boolean(envelope.trackReceiptOnly),
+      }
+    : undefined
   const compositionStart=admission.assignment.resourceKey.startsWith('education-composition:')?await admitCompositionStart(tx,{
     executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId},libraryUses?.uses,
-    input.inlineContext?.scientificDetails?.compositionIdentity,publishedSelfWhole):undefined
+    input.inlineContext?.scientificDetails?.compositionIdentity,publishedSelfWhole,knownSelfSource):undefined
   if(admission.assignment.resourceKey.startsWith('private-form:'))await readPrivateFormExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId})
   // assessment_runs is already SHARE-locked by lockExecutionEnvelope, and
   // admission just projected r.status under that fence. A second SELECT
@@ -848,9 +856,10 @@ export const startAssessmentRunExecution = async (input: {
   const executeRunStart = async (): Promise<RunStartExecutionResult> => {
     try {
       const prepareBeforeGate = compositionCandidate && track?.policy.runtimeLaunchTarget?.ref === compositionCandidate
+      const fastPublishedSelfStart = preflight?.publishedSelfScale === true
       // Avoid starting expensive publication reads during a known CPU pause.
       // Recheck on entry after queueing; the memory trickle still wraps START.
-      if (compositionCandidate && isAssessmentStartCpuPaused()) {
+      if (compositionCandidate && !fastPublishedSelfStart && isAssessmentStartCpuPaused()) {
         const check = await checkCompositionResources()
         if (typeof check !== 'boolean') return check
       }
@@ -861,7 +870,9 @@ export const startAssessmentRunExecution = async (input: {
           ]))
         : undefined
       return await runStartGate().run(async () => {
-        const check = compositionCandidate ? await checkCompositionResources() : false
+        const check = compositionCandidate
+          ? (fastPublishedSelfStart ? true : await checkCompositionResources())
+          : false
         if (typeof check !== 'boolean') return check
         const admittedScaleBatch = check
         const preparation = prepared ? prepared[0] : candidate ? await loadPublication(candidate) : null
@@ -876,6 +887,8 @@ export const startAssessmentRunExecution = async (input: {
           ? {
               organizationId: input.startPreflight.organizationId,
               runId: input.startPreflight.runId,
+              ...(input.startPreflight.hasCampusActivity !== undefined ? { hasCampusActivity: input.startPreflight.hasCampusActivity } : {}),
+              ...(input.startPreflight.hasHuiteacherLink !== undefined ? { hasHuiteacherLink: input.startPreflight.hasHuiteacherLink } : {}),
             }
           : undefined
         const decision = await classifyStartTransaction(() =>
@@ -1011,7 +1024,7 @@ export const startAssessmentRunExecution = async (input: {
   // Already-bound replays never allocate a new frozen runtime and bypass
   // low-memory trickle/rejection (Decision D-1/D-3); new starts consult the
   // host resource guard before claim TX1, publication loads, and dispatch TX2.
-  if (isAssessmentStartResourceConstrained()) {
+  if (preflight?.publishedSelfScale !== true && isAssessmentStartResourceConstrained()) {
     const bound = input.startPreflight
       ? boundResultFromPreflight(input.startPreflight, input.actorUserId)
       : await readExistingBoundExecution(input.executionId, input.actorUserId)

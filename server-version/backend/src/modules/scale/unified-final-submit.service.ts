@@ -529,6 +529,7 @@ export const submitUnifiedScaleCollectionBatch = async (
   job: CompositeReportJob,
   units: Array<{ input: UnifiedScaleFinalSubmitInput; child: ScaleAdmissionChildRow }>,
   execution: WholeReceiptExecution, referenceDb: FrozenReferenceDb,
+  options?: { skipCollectionGuard?: boolean },
 ) => {
   if (!units.length || new Set(units.map(unit => unit.child.id)).size !== units.length)
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表单元缺失或重复', 409)
@@ -568,6 +569,7 @@ export const submitUnifiedScaleCollectionBatch = async (
       id: string; status: string; deliveryMode: string; runtimeGeneration: string | null; attemptEpoch: number;
       compiledRuntimeHash: string | null; frozenAdmissionSnapshotHash: string | null;
       submissionId: string | null; submissionPayloadHash: string | null; startedAt: Date; compositeItemId: string | null;
+      scaleId?: string | null;
       snapshotId: string | null; snapshotSlot: string | null; snapshotSubmission: string | null;
       snapshotDefinition: string | null; snapshotRuntime: string | null; snapshotPayload: string | null;
       snapshotUnitType: string | null; snapshotState: string | null; snapshotKind: string | null; snapshotSourceType: string | null;
@@ -578,6 +580,7 @@ export const submitUnifiedScaleCollectionBatch = async (
         child."frozen_admission_snapshot_hash" AS "frozenAdmissionSnapshotHash",
         child."submission_id" AS "submissionId", child."submission_payload_hash" AS "submissionPayloadHash",
         child."started_at" AS "startedAt", child."composite_item_id" AS "compositeItemId",
+        child."scale_id" AS "scaleId",
         snap."id" AS "snapshotId", snap."slot_key" AS "snapshotSlot",
         snap."source_submission_id" AS "snapshotSubmission", snap."source_definition_hash" AS "snapshotDefinition",
         snap."compiled_runtime_hash" AS "snapshotRuntime", snap."canonical_result_encrypted" AS "snapshotPayload",
@@ -624,7 +627,7 @@ export const submitUnifiedScaleCollectionBatch = async (
     // replay skips the guard and relies on the batch lease + trailing fence.
     // (The old per-unit loop guarded each unit only after its replay
     // `continue`, so replayed units never reached the guard.)
-    if (!completedReplay) {
+    if (!completedReplay && !options?.skipCollectionGuard) {
       const writable = prepared.filter(unit => unit.write !== null)
       await assertTrainingScaleCollectionAllowed(tx,
         writable.map(unit => unit.child.scaleId),
@@ -637,7 +640,8 @@ export const submitUnifiedScaleCollectionBatch = async (
       assertFinalOnly(current.deliveryMode); assertAttemptEpoch(current.attemptEpoch, unit.input.attemptEpoch)
       assertFinalSubmitStatus(current.status, '量表测评')
       if (current.runtimeGeneration !== 'UNIFIED_V1' || current.compiledRuntimeHash !== snapshot.compiledRuntime.compiledRuntimeHash
-        || current.frozenAdmissionSnapshotHash !== admission.snapshotHash || current.compositeItemId !== unit.child.compositeItemId)
+        || current.frozenAdmissionSnapshotHash !== admission.snapshotHash || current.compositeItemId !== unit.child.compositeItemId
+        || (current.scaleId !== undefined && current.scaleId !== unit.child.scaleId) || !current.compositeItemId)
         throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表冻结身份已变化', 409)
       if (assertSubmissionReplay(current, submissionId, payloadHash) === 'replay' && current.status === 'COMPLETED') {
         if (!current.snapshotId || current.snapshotSlot !== admission.parent!.slotKey

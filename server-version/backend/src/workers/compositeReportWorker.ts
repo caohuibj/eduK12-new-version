@@ -130,8 +130,14 @@ const pump = async (): Promise<void> => {
   try {
     while (!stopped && active.size < settings.workerConcurrency) {
       const resources = reportResourceClaimDecision(settings.workerConcurrency)
-      if (active.size >= resources.limit || resources.delayMs > 0) {
-        priorityDelay = Math.max(50, resources.delayMs)
+      const resourceLimit = resources.reason === 'host_cpu'
+        ? Math.min(1, settings.workerConcurrency)
+        : resources.reason === 'memory_headroom'
+          ? Math.min(2, settings.workerConcurrency)
+          : resources.limit
+      const resourceDelayMs = resources.reason === 'host_cpu' && active.size < resourceLimit ? 0 : resources.delayMs
+      if (active.size >= resourceLimit || resourceDelayMs > 0) {
+        priorityDelay = Math.max(50, resourceDelayMs)
         if (reportQueueObsEnabled()) {
           pollTickCount += 1
           recordReportQueueEvent({ kind: 'poll_tick', tick: pollTickCount, slotsBusy: active.size, concurrency: settings.workerConcurrency,

@@ -220,16 +220,39 @@ export const withPreloadedScaleStartFreeze = async <T>(
   }
   let setDeploymentsHere = false
   try {
-    const orClauses: Array<Record<string, unknown>> = []
-    if (scaleIds.length > 0) orClauses.push({ id: { in: scaleIds } })
-    if (codes.length > 0) {
-      orClauses.push({ code: { in: codes } })
-      orClauses.push({ standardSourceKind: 'DB_IMPORTED', standardToolKey: { in: codes } })
+    let rows: PreloadedScaleRow[]
+    if (scaleIds.length > 0 && scaleIds.length === items.length) {
+      rows = await scaleModel.findMany({
+        where: { id: { in: scaleIds } },
+        select: scaleSelect,
+      })
+      const missingCodes = rows.length > 0
+        ? codes.filter((code) => !rows.some((row) => row.code === code || (row.standardSourceKind === 'DB_IMPORTED' && row.standardToolKey === code)))
+        : []
+      if (missingCodes.length > 0) {
+        const extraRows: PreloadedScaleRow[] = await scaleModel.findMany({
+          where: {
+            OR: [
+              { code: { in: missingCodes } },
+              { standardSourceKind: 'DB_IMPORTED', standardToolKey: { in: missingCodes } },
+            ],
+          },
+          select: scaleSelect,
+        })
+        rows = [...rows, ...extraRows]
+      }
+    } else {
+      const orClauses: Array<Record<string, unknown>> = []
+      if (scaleIds.length > 0) orClauses.push({ id: { in: scaleIds } })
+      if (codes.length > 0) {
+        orClauses.push({ code: { in: codes } })
+        orClauses.push({ standardSourceKind: 'DB_IMPORTED', standardToolKey: { in: codes } })
+      }
+      rows = await scaleModel.findMany({
+        where: orClauses.length === 1 ? orClauses[0] : { OR: orClauses },
+        select: scaleSelect,
+      })
     }
-    const rows: PreloadedScaleRow[] = await scaleModel.findMany({
-      where: orClauses.length === 1 ? orClauses[0] : { OR: orClauses },
-      select: scaleSelect,
-    })
     const scalesById = new Map<string, PreloadedScaleRow>()
     const scalesByCode = new Map<string, PreloadedScaleRow>()
     const importedScalesByToolVersion = new Map<string, PreloadedScaleRow>()

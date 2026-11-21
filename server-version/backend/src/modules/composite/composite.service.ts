@@ -3193,9 +3193,15 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
   const canBatchScales = !verifiedFlowMaterialization && requiredScaleItems.length > 1 && typeof (db.assessment as any)?.createMany === 'function'
   const pendingScales: Array<{ id: string; item: any; frozenScale: Awaited<ReturnType<typeof freezeScaleRuntimeAtAttemptStart>> | null; data: Record<string, unknown> }> = []
   let freshEducationScaleChild: object | undefined
+  const unfrozenScaleItems = requiredScaleItems.filter((item: any) => {
+    if (attempt.runtimeGeneration !== 'UNIFIED_V1') return false
+    if (prepared?.scales.has(item.id)) return false
+    const memo = scaleFreezeMemo?.get(scaleFreezeCacheKey(item))
+    return !memo?.frozenScale
+  })
   await withPreloadedScaleStartFreeze(
     db,
-    requiredScaleItems.map((item: any) => ({ scaleId: item.scaleId, code: item.scale?.code, instrumentVersion: item.scale?.instrumentVersion })),
+    unfrozenScaleItems.map((item: any) => ({ scaleId: item.scaleId, code: item.scale?.code, instrumentVersion: item.scale?.instrumentVersion })),
     async () => {
       for (const item of items) {
         if (!item.required) continue
@@ -3805,6 +3811,9 @@ const createAttempt = async (
     snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,educationComposition,
     legacyArtifactMap:startReads?.legacyArtifacts})
   for(const item of composite.items){const artifact=trainingScaleArtifacts.get(item.id);if(artifact&&item.type==='SCALE')publishedScaleArtifactByItem.set(item,artifact)}
+  // Read mutable ACTIVE status once per batch in this transaction. Both
+  // present and absent deployments are reused by the per-scale freeze.
+  await preloadScaleDeploymentsForStart(db, composite)
   if (prepared) {
     try {
     await withPreloadedScaleStartFreeze(db, composite.items.filter((i:any)=>i.type==='SCALE').map((i:any)=>({scaleId:i.scaleId,code:i.scale?.code,instrumentVersion:i.scale?.instrumentVersion})), async () => {
@@ -3932,9 +3941,6 @@ const createAttempt = async (
   // inside this one transaction only. Each START re-validates live scale
   // admission; nothing here survives to the next attempt.
   const scaleFreezeMemo = createScaleFreezeMemo()
-  // Read mutable ACTIVE status once per batch in this transaction. Both
-  // present and absent deployments are reused by the per-scale freeze.
-  await preloadScaleDeploymentsForStart(db, composite)
   const precomputedActiveSlotSet = await precomputeScaleOnlyActiveSlotSet(db, { finalOnly, flowEnabled, composite, attemptEpoch, contentCandidate, prepared, formSections, scaleFreezeMemo })
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
@@ -4314,6 +4320,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
 
   const scaleOnlyStart = isOrdinaryQuestionnaireStart(metadata) && metadata.items.length > 0
     && metadata.items.every((item: any) => item.required && item.type === 'SCALE')
+  const precompiledScaleOnlyStart = scaleOnlyStart && Boolean((metadata as any).trainingContentSnapshotHash)
 
   const preparePublication = async () => {
     const composite = await loadStartComposite(compositeId, prisma, metadata)
@@ -4336,9 +4343,9 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
               assessmentTimelineSpan('start.gate_wait', gateEnteredAt, process.hrtime.bigint())
               // Let a short CPU spike drain within the existing gate, before
               // checkout. Keep the slot through commit or rollback.
-              const admittedScaleBatch = scaleOnlyStart && await traceAssessmentPhase(
+              const admittedScaleBatch = scaleOnlyStart && (precompiledScaleOnlyStart || await traceAssessmentPhase(
                 'start.training_cpu_admission', awaitScaleCompositionStartResources,
-              )
+              ))
               const composite = prepared ??= await preparePublication()
               const transact = () => withCommittedStartTemplates(
                 work => prisma.$transaction(work, { maxWait: 10_000, timeout: 30_000 }), async (tx: Db) => {
@@ -4403,7 +4410,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
 
   // CPU-only pressure is handled by the Training gate; the low-memory
   // trickle permit must still be acquired before entering that gate.
-  if (!scaleOnlyStart) return executeStart()
+  if (!scaleOnlyStart || precompiledScaleOnlyStart) return executeStart()
   if (isAssessmentStartCpuPaused()) return executeStart(true)
   if (!isLowMemoryTrickleEnabled()) {
     assertAssessmentStartResources()
@@ -7375,12 +7382,25 @@ export const getReport = async (attemptId: string, context: { userId?: string; r
     await assertParticipantFeedbackAvailable(attempt)
     return projectHttpReport(attempt, 'participant')
   }
-  const loaded = sharedControlWritesEnabled() ? await readCompositeReportStatusContext(attemptId, true) : null
-  const parent = sharedControlWritesEnabled() ? loaded?.parent : await loadReportReadHeader(attemptId)
+  let loaded = sharedControlWritesEnabled() ? await readCompositeReportStatusContext(attemptId, true) : null
+  let parent = sharedControlWritesEnabled() ? loaded?.parent : await loadReportReadHeader(attemptId)
   if (!parent) throw compositeNotFound('综合测评记录不存在')
   authorizeReportParticipant(parent, context)
-  const job = loaded ? loaded.job : parent.asyncReportEpoch === parent.attemptEpoch
+  let job = loaded ? loaded.job : parent.asyncReportEpoch === parent.attemptEpoch
     ? await readCompositeReportMaterialization(parent.id, parent.attemptEpoch) : null
+  if (parent.status === 'COMPLETED' && !parent.receiptOnly && parent.asyncReportEpoch === parent.attemptEpoch
+    && job && job.status === 'PROCESSING' && !job.reportEncrypted && reportReadyWaitAvailable()) {
+    await prepareReportReadyNotifications()
+    const wait = beginReportReadyWait(attemptId, parent.attemptEpoch, 2000, undefined, reportReadyNotificationSequence())
+    try {
+      if (wait) await wait.done
+    } finally {
+      wait?.cancel()
+    }
+    loaded = sharedControlWritesEnabled() ? await readCompositeReportStatusContext(attemptId, true) : null
+    parent = (sharedControlWritesEnabled() ? loaded?.parent : await loadReportReadHeader(attemptId)) ?? parent
+    job = loaded ? loaded.job : await readCompositeReportMaterialization(parent.id, parent.attemptEpoch)
+  }
   await assertParticipantFeedbackAvailable(parent, job)
   const cached = await materializedReportForHeader(parent, 'participant', job)
   if (cached) return cached

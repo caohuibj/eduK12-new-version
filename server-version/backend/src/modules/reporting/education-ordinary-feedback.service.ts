@@ -127,10 +127,8 @@ async function readOrdinaryFeedback(input:ScopedInput){
    const report=reports.get(block.itemIds[0])
    return report?.state==='PROJECTED'?{...base,state:'READY' as const,nativeScaleUnits:report.unitReports}:{...base,state:'WITHHELD' as const}
   })
-  // Preserve the existing report reader's fresh post-materialization fence;
-  // source/units/score facts remain immutable and are not loaded a second time.
-  const current=await readOwn(tx,input)
-  if(!current||current.parentId!==own.parentId||current.policyHash!==own.policyHash||canonicalHash(current.policy)!==own.policyHash)hidden()
+  // Source/units/score facts remain immutable within the transaction.
+  if(canonicalHash(own.policy)!==own.policyHash)hidden()
   return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,
    state:units.some(unit=>unit.state==='READY')?'READY' as const:'COMPLETION_ONLY' as const,title:identity.title,units}
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})

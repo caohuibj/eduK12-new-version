@@ -451,6 +451,16 @@ export const isAssessmentStartResourceConstrained = (): boolean => {
 const normalStartMemory = (sample: AssessmentResourceSample): boolean =>
   sample.availableBytes !== null && sample.availableBytes >= 700 * MiB
 
+const admittedBatchMemoryOk = (sample: AssessmentResourceSample): boolean => {
+  if (sample.availableBytes === null) return false
+  if (isLowMemoryTrickleEnabled()) {
+    const config = configuredLowMemoryTrickleConfig()
+    const thresholdMiB = config.floorMiB < 650 ? config.releaseMiB : 700
+    return sample.availableBytes >= thresholdMiB * MiB
+  }
+  return normalStartMemory(sample)
+}
+
 const startCpuPaused = (sample: AssessmentResourceSample): boolean =>
   normalStartMemory(sample) && (isLowMemoryTrickleEnabled()
     ? policy.startAdmissionDecision(sample).reason === 'host_cpu'
@@ -512,12 +522,12 @@ export const assertAssessmentStartResources = (): void => {
   const value = sampleAssessmentHostResources(
     trickleEnabled && permit?.active === true ? { forceMemoryRefresh: true } : undefined,
   )
-  const finishingAdmittedBatch = admittedScaleComposition.getStore()?.active === true && normalStartMemory(value)
+  const finishingAdmittedBatch = admittedScaleComposition.getStore()?.active === true && admittedBatchMemoryOk(value)
   if (trickleEnabled) {
     const config = configuredLowMemoryTrickleConfig()
     const decision = policy.startAdmissionDecision(value, performance.now(), config)
     logStartAdmissionTransition(decision, value)
-    if (decision.action === 'allow' || (finishingAdmittedBatch && decision.reason === 'host_cpu')) return
+    if (decision.action === 'allow' || (finishingAdmittedBatch && (decision.reason === 'host_cpu' || decision.reason === 'low_memory_cpu_busy' || decision.action === 'trickle'))) return
     if (decision.action === 'trickle' && permit?.active === true) return
     throw buildStartResourceError(decision.retryHint ?? 'memory')
   }
