@@ -7,12 +7,12 @@ import { compactAssessmentStorageEnabled } from '../assessment-runtime/compact-f
 import { prepareCompactScaleFacts } from '../assessment-runtime/compact-scale-facts'
 import { makeCanonicalFactsReference } from '../assessment-runtime/compact-assessment-storage'
 import { makeScaleFactsReference, makeScaleRawReference, persistScaleFactRecords, attachCommittedScaleFacts, type ScaleFactRecord } from '../assessment-runtime/scale-fact-records'
-import type { CommittedEducationScale } from '../assessment-runtime/unified-aggregate-finalizer.service'
+import type { CommittedEducationScale, CommittedWholeScaleUnit } from '../assessment-runtime/unified-aggregate-finalizer.service'
 import { ReportProcessingLeaseLostError, type SynchronousScaleParent } from '../assessment-runtime/report-outbox.service'
 import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import type { WholeReceiptExecution } from '../composite/whole-questionnaire.service'
-import { createHash } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import { Prisma, type CompositeReportJob } from '@prisma/client'
 import { prisma } from '../../config/database'
 import {
@@ -616,7 +616,7 @@ export const submitUnifiedScaleCollectionBatch = async (
     assessmentTimelineSpan('report.units_batch.lock_job', lockJobStart)
     if (lease.length !== 1) throw new ReportProcessingLeaseLostError()
     const byId = new Map(rows.map(row => [row.id, row]))
-    const writes = [], facts: ScaleFactRecord[] = [], snapshots: Prisma.AssessmentUnitSnapshotCreateManyInput[] = []
+    const writes = [], facts: ScaleFactRecord[] = [], committedUnits: CommittedWholeScaleUnit[] = []
     // PR-1 fix: the collection guard's receipt fence requires parent.status =
     // 'IN_PROGRESS', but the batch lease above explicitly allows a COMPLETED
     // parent for a full completedReplay (all units already submitted, report
@@ -651,16 +651,17 @@ export const submitUnifiedScaleCollectionBatch = async (
       if (current.status !== 'IN_PROGRESS' || !unit.write || current.snapshotId)
         throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表提交状态已变化', 409)
       const { completedAt, encryptedAnswers, encrypted } = unit.write
-      if (!encrypted.canonicalResult) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表缺少权威结果', 409)
+      if (!encrypted.canonicalResult || !unit.write.canonical) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表缺少权威结果', 409)
       const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())
       writes.push({ id: current.id, submissionId, payloadHash, answers: encryptedAnswers, result: encrypted.result,
         completedAt: completedAt.toISOString(), totalTime, timingEncrypted:unit.write.timingEncrypted })
       if (unit.write.compactFact) facts.push({ ...unit.write.compactFact, totalTime })
-      snapshots.push({ compositeAttemptId: job.attemptId, attemptEpoch: job.attemptEpoch, slotKey: admission.parent!.slotKey,
+      committedUnits.push({ canonical: unit.write.canonical, snapshot: {
+        id: randomUUID(), compositeAttemptId: job.attemptId, attemptEpoch: job.attemptEpoch, slotKey: admission.parent!.slotKey,
         unitType: 'SCALE', terminalState: 'COMPLETED', payloadKind: 'UNIT_RESULT', sourceType: 'ASSESSMENT',
         sourceAttemptId: current.id, sourceSubmissionId: submissionId, sourceDefinitionHash: snapshot.sourceDefinitionHash,
         compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
-        canonicalResultEncrypted: encrypted.canonicalResult, completedAt })
+        canonicalResultEncrypted: encrypted.canonicalResult, collectionFactsEncrypted: null, completedAt } })
     }
     if (writes.length) {
       const factsStart = process.hrtime.bigint(); await persistScaleFactRecords(tx, facts); assessmentTimelineSpan('report.units_batch.facts', factsStart)
@@ -682,9 +683,9 @@ export const submitUnifiedScaleCollectionBatch = async (
       if (changed.length !== writes.length || new Set(changed.map(row => row.id)).size !== writes.length)
         throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表更新行数不匹配', 409)
       const createManyStart = process.hrtime.bigint()
-      const inserted = await tx.assessmentUnitSnapshot.createMany({ data: snapshots })
+      const inserted = await tx.assessmentUnitSnapshot.createMany({ data: committedUnits.map(unit => unit.snapshot) })
       assessmentTimelineSpan('report.units_batch.createMany', createManyStart)
-      if (inserted.count !== snapshots.length) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表快照行数不匹配', 409)
+      if (inserted.count !== committedUnits.length) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表快照行数不匹配', 409)
     }
     const fenced = await tx.$queryRaw<Array<{ id: string }>>`
       SELECT "id" FROM "composite_report_jobs" WHERE "id" = ${job.id}
@@ -697,7 +698,7 @@ export const submitUnifiedScaleCollectionBatch = async (
     if (writes.length !== prepared.length || prepared.some(unit => !unit.write)) return null
     const byWriteId = new Map(writes.map(row => [row.id, row]))
     const byFactId = new Map(facts.map(row => [row.id, row]))
-    return prepared.map(({ child, write }) => {
+    const assessments = prepared.map(({ child, write }) => {
       const saved = byWriteId.get(child.id)!
       const record = { ...child, status: 'COMPLETED' as const, answers: saved.answers, result: saved.result,
         progress: 100, completedAt: write!.completedAt, totalTime: saved.totalTime,
@@ -705,6 +706,7 @@ export const submitUnifiedScaleCollectionBatch = async (
       const fact = byFactId.get(child.id)
       return fact ? attachCommittedScaleFacts(record, { row: fact, result: write!.result, canonical: write!.canonical }) : record
     })
+    return { assessments, committedUnits }
   }).catch(error => rethrowConfirmedScaleBatchSubmissionConflict(error,
     prepared.map(unit => unit.data.submissionId), prepared.map(unit => unit.child.id), prisma))
 }

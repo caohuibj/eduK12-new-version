@@ -111,9 +111,17 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
    const job=await db.compositeReportJob.update({where:{id:pendingJob.id,status:'PENDING'},data:{status:'PROCESSING',
     leaseToken:randomUUID(),leaseExpiresAt:new Date(Date.now()+90_000),claimedRevision:pendingJob.requestedRevision,attemptCount:{increment:1}}})
    const {processWholeQuestionnaireAnswers}=await import('../../modules/composite/whole-questionnaire.service')
-   expect(await processWholeQuestionnaireAnswers(job)).toBe(true)
+   let context:import('../../modules/composite/whole-questionnaire.service').WholeQuestionnaireReportContext|undefined
+   expect(await processWholeQuestionnaireAnswers(job,value=>{context=value})).toBe(true)
+   const committed=context?.committed?.parent
+   expect(committed?.committedScaleUnits).toHaveLength(2)
    const {finalizeCompositeAttemptUnifiedIfReady}=await import('../../modules/assessment-runtime/unified-aggregate-finalizer.service')
-   expect(await finalizeCompositeAttemptUnifiedIfReady(id,undefined,job)).toMatchObject({status:'COMPLETED'})
+   const {prisma}=await import('../../config/database')
+   const snapshotReads=vi.spyOn(prisma.assessmentUnitSnapshot,'findMany')
+   try{
+    expect(await finalizeCompositeAttemptUnifiedIfReady(id,committed,job,committed)).toMatchObject({status:'COMPLETED'})
+    expect(snapshotReads).not.toHaveBeenCalled()
+   }finally{snapshotReads.mockRestore()}
    expect(await db.assessmentUnitSnapshot.count({where:{compositeAttemptId:id,attemptEpoch:def.attemptEpoch}})).toBe(2)
    const progress=await get('/progress')
    expect(progress.status,JSON.stringify(progress.value)).toBe(200)
@@ -121,7 +129,7 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
    expect((await get(receipt())).data).toMatchObject({status:'ACCEPTED',submissionId})
    const {reconcileRelationalCompositeCompletion}=await import('../../modules/assessment-relational/runtime-completion')
    await reconcileRelationalCompositeCompletion(id)
-   expect((await get('/progress')).data).toMatchObject({status:'COMPLETED',reportStatus:{state:'READY'}})
+   expect((await get('/progress')).data).toMatchObject({status:'COMPLETED',runCompleted:true,reportStatus:{state:'READY'}})
   }finally{vi.unstubAllEnvs()}
  },120_000)
  it('delivers frozen block instructions through the real Scale/Form execution after a draft edit, without extra pages',async()=>{

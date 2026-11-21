@@ -723,9 +723,11 @@ suite('durable report outbox on isolated PostgreSQL', () => {
     let context: import('../../modules/composite/whole-questionnaire.service').WholeQuestionnaireReportContext | undefined
     await whole.processWholeQuestionnaireAnswers(job, value => { context = value })
     expect(context?.committed?.parent.scaleAssessments).toHaveLength(count)
+    expect(context?.committed?.parent.committedScaleUnits).toHaveLength(count)
     expect(await db.assessment.count({ where: { compositeAttemptId: f.parent.id, status: 'COMPLETED' } })).toBe(count)
     const shared = (await import('../../config/database')).prisma
     const reads = vi.spyOn(shared.compositeAssessmentAttempt, 'findUnique')
+    const snapshots = vi.spyOn(shared.assessmentUnitSnapshot, 'findMany')
     try {
       const parent = context!.committed!.parent
       const finalized = await service.finalizeCompositeAttemptIfReady(f.parent.id, {
@@ -733,6 +735,7 @@ suite('durable report outbox on isolated PostgreSQL', () => {
       })
       expect(finalized!.status).toBe('COMPLETED')
       expect(reads).not.toHaveBeenCalled()
+      expect(snapshots).not.toHaveBeenCalled()
       const projected = { ...parent, ...finalized }
       const fast = await service.materializeCompositeQuestionnaireReport(f.parent.id, identity(job), context, projected)
       expect(reads).not.toHaveBeenCalled()
@@ -744,7 +747,7 @@ suite('durable report outbox on isolated PostgreSQL', () => {
       expect(await outbox.finishCompositeReportJob(job, { kind: 'ready', ...fast })).toBe(true)
       expect((await service.getReport(f.parent.id, { userId: f.participant.id })).unitReports).toHaveLength(count)
       expect(await budget()).toBe(0)
-    } finally { reads.mockRestore() }
+    } finally { reads.mockRestore(); snapshots.mockRestore() }
   })
 
   it('reconstructs committed units after a lost invocation without reusing a stale lease context', async () => {

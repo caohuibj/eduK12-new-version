@@ -286,7 +286,7 @@ type TerminalProbe =
   | { kind: 'missing' }
   | { kind: 'terminal'; result: CompletionResult }
   | { kind: 'incomplete'; parent: UnifiedParentHeader; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; snapshotRows?: AggregateSnapshotRow[]; completeness: ReturnType<typeof evaluateCompleteness> }
-  | { kind: 'ready'; parent: UnifiedParentHeader; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; snapshotRows?: AggregateSnapshotRow[]; completeness: ReturnType<typeof evaluateCompleteness> }
+  | { kind: 'ready'; parent: UnifiedParentHeader; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; snapshotRows?: AggregateSnapshotRow[]; committedScaleUnits?: readonly CommittedWholeScaleUnit[]; completeness: ReturnType<typeof evaluateCompleteness> }
 
 const terminalFromParent = (parent: Pick<UnifiedParentHeader, 'status' | 'progress' | 'completedAt' | 'taskSatisfaction'>): CompletionResult => ({
   status: parent.status,
@@ -300,6 +300,7 @@ const probeUnifiedParent = async (input: {
   composite: boolean
   preloadedParent?: UnifiedParentHeader
   reportJob?: ReportJobIdentity
+  committedScaleUnits?: readonly CommittedWholeScaleUnit[]
 }): Promise<TerminalProbe> => {
   const parent = input.preloadedParent ?? await measureRequestPhase('aggregate.parent_probe_db', async () => (
     input.composite
@@ -322,7 +323,15 @@ const probeUnifiedParent = async (input: {
   // synchronous submissions still check lightweight headers before payloads.
   const singleRelationalScale = input.composite && Boolean(parent.assignmentRef)
     && frozenSlots.slots.length === 1 && frozenSlots.slots[0]?.unitType === 'SCALE'
-  const snapshotRows = (input.reportJob || singleRelationalScale) && process.env.ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED !== 'false'
+  const committedScaleUnits = input.committedScaleUnits
+  const committedRows = committedScaleUnits?.map(unit => unit.snapshot)
+  const committedKeys = new Set(committedRows?.map(row => row.slotKey))
+  const completeCommittedScaleSet = input.composite && input.reportJob && committedRows
+    && committedRows.length === frozenSlots.slots.length && committedKeys.size === committedRows.length
+    && frozenSlots.slots.every(slot => slot.required && slot.unitType === 'SCALE' && committedKeys.has(slot.slotKey))
+    && committedRows.every(row => row.compositeAttemptId === parent.id && row.attemptEpoch === parent.attemptEpoch)
+  const snapshotRows = completeCommittedScaleSet ? committedRows
+    : (input.reportJob || singleRelationalScale) && process.env.ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED !== 'false'
     ? await loadSnapshotPayloads({ parentId: input.parentId, attemptEpoch: parent.attemptEpoch, composite: input.composite })
     : undefined
   const headers = snapshotRows ? snapshotRows.map(headerFromRow) : await loadSnapshotHeaders({
@@ -336,7 +345,8 @@ const probeUnifiedParent = async (input: {
     throw aggregateInputError(`存在非法快照槽位：${completeness.invalidSlotKeys.join(',')}`)
   }
   if (!completeness.ready) return { kind: 'incomplete', parent, frozenSlots, headers, snapshotRows, completeness }
-  return { kind: 'ready', parent, frozenSlots, headers, snapshotRows, completeness }
+  return { kind: 'ready', parent, frozenSlots, headers, snapshotRows, completeness,
+    ...(completeCommittedScaleSet ? { committedScaleUnits } : {}) }
 }
 
 const snapshotPayloadSelect = {
@@ -352,6 +362,12 @@ type AggregateSnapshotRow = AggregateSnapshotHeader & {
   collectionFactsEncrypted: string | null
 }
 
+/** Internal handoff from a successful full batch transaction. */
+export type CommittedWholeScaleUnit = {
+  snapshot: AggregateSnapshotRow & { compositeAttemptId: string; canonicalResultEncrypted: string; completedAt: Date }
+  canonical: CanonicalUnitResultEnvelopeV1
+}
+
 type CanonicalPayload = {
   header: AggregateSnapshotRow
   envelope?: CanonicalUnitResultEnvelopeV1
@@ -360,7 +376,7 @@ type CanonicalPayload = {
 
 type CompletionResult = {
   _runReconciled?: true
-  _committedScaleCompletion?: true
+  _committedCompositeCompletion?: true
   taskSatisfaction?: string | null
   status: string
   progress: number
@@ -573,6 +589,7 @@ const decryptCompletedPayloads = async (input: {
   contextHash: string | null
   snapshotRows?: AggregateSnapshotRow[]
   committedRecords?: any[]
+  committedScaleUnits?: readonly CommittedWholeScaleUnit[]
   db?: Prisma.TransactionClient
   includeOptionalSlots?: boolean
 }): Promise<{ payloads: CanonicalPayload[]; entries: AggregateInputHashEntry[] }> => {
@@ -594,8 +611,10 @@ const decryptCompletedPayloads = async (input: {
   }
 
   const canonicalCiphers = rows.flatMap(row => row.canonicalResultEncrypted ? [row.canonicalResultEncrypted] : [])
-  const canonicalViews = await measureRequestPhase('aggregate.payload_db', () => loadStoredCanonicalUnitResults(canonicalCiphers, input.db ?? prisma, input.committedRecords))
-  const canonicalByCipher = new Map(canonicalCiphers.map((cipher,index) => [cipher,canonicalViews[index]]))
+  const canonicalByCipher = input.committedScaleUnits
+    ? new Map(input.committedScaleUnits.map(({snapshot,canonical}) => [snapshot.canonicalResultEncrypted,canonical]))
+    : new Map((await measureRequestPhase('aggregate.payload_db', () => loadStoredCanonicalUnitResults(canonicalCiphers, input.db ?? prisma, input.committedRecords)))
+      .map((result,index) => [canonicalCiphers[index],result]))
   const parsed = measureRequestPhaseSync('aggregate.decrypt_parse', () => {
     const headersBySlot = new Map<string, AggregateSnapshotHeader>()
     for (const header of input.headers) {
@@ -1140,7 +1159,7 @@ const finalizeCommittedEducationScale = async ({ parent, snapshot, canonical }: 
     attemptEpoch: parent.attemptEpoch, contextHash: parent.contextSnapshotHash, compiledBundleRuntimeHash: null,
     entries: [{ slotKey: header.slotKey, terminalState: header.terminalState, payloadKind: header.payloadKind, resultHash: canonical.resultHash }],
   })
-  const completed = await persistCompositeCompletion({
+  return persistCompositeCompletion({
     parent, frozenSlots, headers: [header], contextHash: parent.contextSnapshotHash,
     compiledBundleRuntimeHash: null, aggregateInputHash, taskSatisfaction: null,
     verifiedPayloads: [{ header: snapshot, envelope: canonical }], packageAnalysis: null, payloadEncrypted: null,
@@ -1148,8 +1167,6 @@ const finalizeCommittedEducationScale = async ({ parent, snapshot, canonical }: 
     // projection after commit, outside the release lock sequence.
     reconcileRun: parent.trainingContentBinding === null && parent.trainingContentBindingHash === null,
   })
-  Object.defineProperty(completed, '_committedScaleCompletion', { value: true })
-  return completed
 }
 
 const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity, preloadedGraph?: any, committedScale?: CommittedEducationScale): Promise<CompletionResult | null> => {
@@ -1166,7 +1183,10 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
     const completed = await finalizeCommittedEducationScale(committedScale)
     if (completed) return completed
   }
-  const probe = await probeUnifiedParent({ parentId: attemptId, composite: true, preloadedParent: route, reportJob })
+  const probe = await probeUnifiedParent({
+    parentId: attemptId, composite: true, preloadedParent: route, reportJob,
+    committedScaleUnits: preloadedGraph === route ? preloadedGraph?.committedScaleUnits : undefined,
+  })
   if (probe.kind === 'missing') return null
   if (probe.kind === 'terminal') return probe.result
   if (probe.kind === 'incomplete') return updateIncompleteComposite(probe.parent, probe.completeness)
@@ -1204,6 +1224,7 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
     contextHash: context.hash,
     snapshotRows: probe.snapshotRows,
     committedRecords: reusable ? parent.scaleAssessments : undefined,
+    committedScaleUnits: probe.committedScaleUnits,
   })
   const payloadBySlot = new Map(completed.payloads.map((payload) => [payload.header.slotKey, payload]))
   let packageSnapshot: FrozenReportPackageSnapshot | null = null
@@ -1306,7 +1327,7 @@ const persistCompositeCompletion = async (input: {
         runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: input.parent.id,
       }) : undefined
       const updated = await tx.compositeAssessmentAttempt.updateMany({
-        where: parentGuard(input.parent),
+        where: { ...parentGuard(input.parent), ...(input.parent.assignmentRef ? { assignmentRef: input.parent.assignmentRef } : {}) },
         data: {
           status: 'COMPLETED',
           progress: 100,
@@ -1395,6 +1416,7 @@ const persistCompositeCompletion = async (input: {
       }
       const result: CompletionResult = { status: 'COMPLETED', progress: 100, completedAt, aggregateInputHash: input.aggregateInputHash, taskSatisfaction:input.taskSatisfaction,
         totalTime: Math.max(0, completedAt.getTime() - new Date(input.parent.startedAt).getTime()) }
+      if (input.parent.assignmentRef) Object.defineProperty(result, '_committedCompositeCompletion', { value: true })
       if (execution) {
         await reconcileLockedRunExecutionInTransaction(tx, execution, {
           id: input.parent.id, status: 'COMPLETED', completedAt, assignmentRef: input.parent.assignmentRef,

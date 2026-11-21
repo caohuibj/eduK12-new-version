@@ -250,6 +250,8 @@ export interface CompositeReportStatus {
   feedbackPollProfile?: 'FAST_START' | 'QUEUED'
   wholeSubmissionReceived?: boolean
   wholeSubmissionId?: string | null
+  /** Returned by education progress after authoritatively observing Run reconciliation. */
+  runCompleted?: true
   attemptId: string
   attemptEpoch: number
   status: string

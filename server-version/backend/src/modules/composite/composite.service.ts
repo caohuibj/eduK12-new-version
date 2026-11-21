@@ -6123,8 +6123,8 @@ export const finalizeCompositeAttemptIfReady = async (attemptId: string, options
   // preserve the Run -> runtime lock order. Repeated FINAL/GET repairs any lag.
   if (result?.status === 'COMPLETED' && route?.assignmentRef && !('_runReconciled' in result)) {
     const { reconcileRelationalCompositeCompletion } = await import('../assessment-relational/runtime-completion')
-    if ('_committedScaleCompletion' in result && result.completedAt) {
-      // The synchronous aggregate already committed this exact terminal time.
+    if ('_committedCompositeCompletion' in result && result.completedAt) {
+      // The aggregate transaction committed this exact assignment and terminal time.
       // Reconcile under the Execution lock without rereading the terminal parent.
       await reconcileRelationalCompositeCompletion(attemptId, {
         id: attemptId, status: 'COMPLETED', completedAt: result.completedAt, assignmentRef: route.assignmentRef,

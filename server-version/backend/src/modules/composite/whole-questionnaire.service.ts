@@ -57,13 +57,14 @@ export const wholeQuestionnaireSubmitSchema = z.object({
 export type WholeQuestionnaireSubmitInput = z.infer<typeof wholeQuestionnaireSubmitSchema>
 type Principal = { userId?: string; recoveryTokenHash?: string }
 export type WholeReceiptExecution = { submissionId: string; payloadHash: string; leaseToken: string; acceptedAtMs: number; studyReceipt?:AcceptedStudyReceipt }
+type CommittedScaleBatch = NonNullable<Awaited<ReturnType<typeof submitUnifiedScaleCollectionBatch>>>
 /** Invocation-scoped verified scientific data; never an authorization cache. */
 export type WholeQuestionnaireReportContext = {
   attemptId: string; attemptEpoch: number; slotSetHash: string; contextHash: string | null;
   units: ReadonlyMap<string, { attemptEpoch: number; runtimeSnapshotEncrypted: string;
     runtime: Awaited<ReturnType<typeof loadScaleAdmissionRuntime>> }>;
   committed?: { submissionId: string; leaseToken: string;
-    parent: Omit<WholeReportParent, 'scaleAssessments'> & { scaleAssessments: NonNullable<Awaited<ReturnType<typeof submitUnifiedScaleCollectionBatch>>>; cognitiveSessions: []; situationalAttempts: [] } };
+    parent: ReturnType<typeof copyWholeCommittedReportParent> };
 }
 
 
@@ -111,8 +112,8 @@ type WholeReportParent = Prisma.CompositeAssessmentAttemptGetPayload<{ select: t
  * treating an in-memory scope field as authority. Participant DTOs still use
  * loadParent's selected projection. */
 export const copyWholeCommittedReportParent = (parent: WholeReportParent,
-  scaleAssessments: NonNullable<Awaited<ReturnType<typeof submitUnifiedScaleCollectionBatch>>>) => ({
-  ...parent, scaleAssessments, cognitiveSessions: [] as [], situationalAttempts: [] as [],
+  scaleAssessments: CommittedScaleBatch['assessments'], committedScaleUnits?: CommittedScaleBatch['committedUnits']) => ({
+  ...parent, scaleAssessments, cognitiveSessions: [] as [], situationalAttempts: [] as [], committedScaleUnits,
 })
 
 const failure = (message: string, status = 409) => new InstrumentFinalSubmitError('STALE_ATTEMPT', message, status)
@@ -1032,6 +1033,7 @@ export function educationWholeProgressFromRow(attemptId: string, progress: Educa
   return {
     attemptId, attemptEpoch: progress.epoch, status: awaitingRun ? 'IN_PROGRESS' : progress.parentStatus,
     wholeSubmissionReceived: Boolean(progress.wholeSubmissionId),
+    ...(executionStatus === 'COMPLETED' && progress.parentStatus === 'COMPLETED' ? { runCompleted: true as const } : {}),
     reportStatus: { state: awaitingRun ? terminalFailure ?? 'PROCESSING' : progress.parentStatus === 'COMPLETED' ? 'READY' : progress.jobStatus ?? 'WAITING' },
   }
 }
@@ -1125,7 +1127,10 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
       && frozen.slots.every(slot => ['SCALE', 'FORM_SECTION'].includes(slot.unitType))
       && parent.compositeAssessment.items.every(item => ['SCALE', 'FORM'].includes(item.type))
       ? { committed: { submissionId: execution.submissionId, leaseToken: execution.leaseToken,
-          parent: copyWholeCommittedReportParent(reportParent, committedScales) } } : {}),
+          parent: copyWholeCommittedReportParent(reportParent, committedScales.assessments,
+            !hasTrainingVariantMetadata(reportParent) && !parent.compositeAssessment.reportPackageKey
+              && !parent.compositeAssessment.analysisProtocolKey && parent.compositeAssessment.items.every(item => item.type === 'SCALE' && item.required)
+              ? committedScales.committedUnits : undefined) } } : {}),
     units: new Map(children.map(({ child, runtime }) => [child.id, { attemptEpoch: child.attemptEpoch,
       runtimeSnapshotEncrypted: child.runtimeSnapshotEncrypted!, runtime }])) })
   return true

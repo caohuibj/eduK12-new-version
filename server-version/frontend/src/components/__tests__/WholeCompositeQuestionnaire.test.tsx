@@ -53,12 +53,31 @@ describe('whole questionnaire durable browser submission', () => {
     expect(await screen.findByRole('heading', { name: '量表甲' })).toBeTruthy()
     const failed = api()
     failed.reportStatus.mockResolvedValueOnce({ code: 0, data: { wholeSubmissionReceived: true, reportStatus: { state: 'PENDING' } } })
-      .mockResolvedValueOnce({ code: 0, data: { status: 'IN_PROGRESS', wholeSubmissionReceived: true, reportStatus: { state: 'FAILED' } } })
+      .mockResolvedValueOnce({ code: 0, data: { attemptId: state.id, attemptEpoch: 1, status: 'IN_PROGRESS', wholeSubmissionReceived: true, reportStatus: { state: 'FAILED' } } })
     const media = { loadScaleImage: vi.fn(), loadScaleVideo: vi.fn(), loadFormImage: vi.fn(), loadFormVideo: vi.fn() }
     render(<WholeCompositeQuestionnaire state={frozen} api={failed} educationMedia={media} acceptedAction="查看完成状态" fallback={<p>旧单元作答</p>} onCompleted={vi.fn()} onExit={vi.fn()} />)
     fireEvent.click(await screen.findByRole('button', { name: '查看完成状态' }))
     expect(await screen.findByText('答案已保存，但后台处理失败。请稍后再次查看，不要重新交卷。')).toBeTruthy()
     expect(failed.submitWhole).not.toHaveBeenCalled()
+  })
+
+  it('hands the verified Run completion to the host without uploading again', async () => {
+    const client = api(), onCompleted = vi.fn()
+    const ready = { attemptId: state.id, attemptEpoch: 1, status: 'COMPLETED', runCompleted: true,
+      wholeSubmissionReceived: true, reportStatus: { state: 'READY' } }
+    client.reportStatus
+      .mockResolvedValueOnce({ code: 0, data: { ...ready, status: 'IN_PROGRESS', reportStatus: { state: 'PROCESSING' } } })
+      .mockResolvedValueOnce({ code: 0, data: { ...ready, attemptEpoch: 2 } })
+      .mockResolvedValueOnce({ code: 0, data: ready })
+    render(<WholeCompositeQuestionnaire state={state} api={client} educationMedia={{
+      loadScaleImage: vi.fn(), loadScaleVideo: vi.fn(), loadFormImage: vi.fn(), loadFormVideo: vi.fn(),
+    }} acceptedAction="查看完成状态" fallback={null} onCompleted={onCompleted} onExit={vi.fn()} />)
+    fireEvent.click(await screen.findByRole('button', { name: '查看完成状态' }))
+    expect(await screen.findByText('测评版本已变化，请返回任务查看。')).toBeInTheDocument()
+    expect(onCompleted).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: '查看完成状态' }))
+    await waitFor(() => expect(onCompleted).toHaveBeenCalledExactlyOnceWith(ready))
+    expect(client.submitWhole).not.toHaveBeenCalled()
   })
 
   it('shows the stepped fallback for an all-at-once unit and loads a form option image', async () => {
