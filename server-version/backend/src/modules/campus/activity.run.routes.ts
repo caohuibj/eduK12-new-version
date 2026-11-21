@@ -142,6 +142,7 @@ async function currentSchoolExecution(req:import('express').Request,res:import('
       runtimeBindingRef:string|null
       respondentUserId:string
       preloadCompositeId:string|null
+      compositionStartCompositeId:string|null
       organizationId:string
       runId:string
     }>>`
@@ -150,6 +151,9 @@ async function currentSchoolExecution(req:import('express').Request,res:import('
         respondent."user_id" AS "respondentUserId",
         e."organization_id" AS "organizationId",
         e."run_id" AS "runId",
+        CASE WHEN t."resource_key" LIKE 'education-composition:SCHOOL:%:STUDENT:SELF:1.0.0'
+          AND t."frozen_resource_policy" #>> '{runtimeLaunchTarget,kind}' = 'COMPOSITE'
+          THEN t."frozen_resource_policy" #>> '{runtimeLaunchTarget,ref}' ELSE NULL END AS "compositionStartCompositeId",
         CASE WHEN t."frozen_resource_policy" #>> '{runtimeLaunchTarget,kind}' = 'COMPOSITE'
           AND t."resource_key" NOT LIKE 'education-composition:%'
           AND EXISTS (SELECT 1 FROM "composite_assessments" candidate

@@ -4,7 +4,7 @@ import type {Server} from 'node:http'
 import {PrismaClient} from '@prisma/client'
 import {afterAll,beforeAll,describe,expect,it} from 'vitest'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from './integration-env'
-import {setupSchoolCompositionExecution,setupSchoolCompositionDraft} from './educationPrivateCompositionExecutionFixture'
+import {compositionStartCommit,setupSchoolCompositionExecution,setupSchoolCompositionDraft} from './educationPrivateCompositionExecutionFixture'
 import activityRunRouter from '../../modules/campus/activity.run.routes'
 import compositeRouter from '../../modules/campus/composite.routes'
 import {csrfProtection} from '../../middleware/csrf'
@@ -45,9 +45,11 @@ suite('School psychological author / ordinary questionnaire real HTTP execution'
   expect(task).toMatchObject({resourceFamily:'BUNDLE',feedbackNamespace:'EDUCATION_ASSESSMENT',feedbackMode:'COMPOSITION',status:'PENDING'})
   const execution=`/organizations/${f.organizationId}/activities/${f.workflow.id}/runs/${f.runId}/executions/${f.executionId}`
   if(task!.consentRequired)expect((await request(execution+'/consent/accept',actor.id,{})).status).toBe(200)
-  const started=await request(execution+'/start',actor.id,{})
+  const [started,concurrent]=await Promise.all([request(execution+'/start',actor.id,{}),request(execution+'/start',actor.id,{})])
   expect(started.status,JSON.stringify(started.value)).toBe(200);expect(started.data).toMatchObject({state:'STARTED',runtimeBindingKind:'COMPOSITE'})
   const attempt=started.data.runtimeBindingRef,path='/composite-attempts/'+attempt+'?view=current-unit'
+  expect(concurrent.data).toMatchObject({state:'STARTED',runtimeBindingRef:attempt})
+  expect(await compositionStartCommit(db,f.executionId,attempt)).toEqual([{atomic:true,state:'COMPLETED'}])
   const member=await db.organizationMembership.findFirstOrThrow({where:{organizationId:f.organizationId,userId:f.managerUserId,validUntil:null}})
   await db.organizationCapabilityGrant.updateMany({where:{membershipId:member.id,capability:'PSYCHOLOGY_STAFF',revokedAt:null},data:{revokedAt:new Date()}})
   expect((await request(execution+'/start',actor.id,{})).data).toMatchObject({runtimeBindingRef:attempt,replayed:true})
@@ -114,6 +116,7 @@ suite('School psychological author / ordinary questionnaire real HTTP execution'
   const result=await request(path+'/executions/'+execution.id+'/start',f.participantUserId,{})
   expect(result.status).toBe(403)
   expect(await db.compositeAssessmentAttempt.count({where:{compositeAssessmentId:f.runtime.compositeId}})).toBe(0)
+  expect(await db.$queryRaw`SELECT id FROM assessment_run_execution_start_claims WHERE execution_id=${execution.id}`).toHaveLength(0)
  })
  it('enforces PostgreSQL revocation consistency between START inline and direct GET, preventing bypassed delivery',async()=>{
   const f=await setupSchoolCompositionExecution(db,{instructions:['Revoke A','Revoke B','']})

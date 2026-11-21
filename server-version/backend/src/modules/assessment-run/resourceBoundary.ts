@@ -14,6 +14,8 @@ export type RunStartPreflight = {
   respondentUserId: string
   /** Candidate only; the frozen track in the admission transaction remains authoritative. */
   preloadCompositeId?: string | null
+  /** Exact SELF composition hint from the product route, verified again under the START locks. */
+  compositionStartCompositeId?: string | null
   organizationId?: string
   runId?: string
 }

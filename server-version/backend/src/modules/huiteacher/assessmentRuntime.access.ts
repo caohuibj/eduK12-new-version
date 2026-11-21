@@ -149,7 +149,7 @@ function taskDto(row:Row,title:string):TeacherAssessmentTask{
  return {executionId,organizationId,runId,eventId,eventTitle,title,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility,
   ...(row.teacherName?{teacherName:row.teacherName}:{}),mode:row.resourceKey.startsWith('education-composition:')?'COMPOSITION':family==='BUNDLE'?'PACKAGE_REFERENCE':'TOOL'}
 }
-function startPreflightForRow(row:Row,actorUserId:string){
+function startPreflightForRow(row:Row,actorUserId:string,compositionStartCompositeId?:string){
  if(!Object.prototype.hasOwnProperty.call(row,'preloadCompositeId'))return undefined
  return {
   runtimeBindingKind:null,
@@ -157,6 +157,7 @@ function startPreflightForRow(row:Row,actorUserId:string){
   respondentUserId:actorUserId,
   organizationId:row.organizationId,
   runId:row.runId,
+  ...(compositionStartCompositeId?{compositionStartCompositeId}:{}),
   ...(typeof row.preloadCompositeId==='string'?{preloadCompositeId:row.preloadCompositeId}:{}),
  }
 }
@@ -169,7 +170,7 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
    if(identity.origin.entry!=='TEACHER'||identity.origin.variantKey!==(audience==='STUDENT_EVALUATION'?'TEACHER:STUDENT_REPORT':'TEACHER:SELF'))fail()
    if(row.status!=='COMPLETED')await assertCompositionCollection(db,identity,row.status==='ASSIGNED'?'NEW_START':'BOUND_COLLECTION')
    return {task:taskDto(row,identity.title),identity,row,runtimeCompositeId:identity.compositeId,
-    startPreflight:startPreflightForRow(row,actorUserId),
+    startPreflight:startPreflightForRow(row,actorUserId,identity.origin.variantKey==='TEACHER:SELF'?identity.compositeId:undefined),
     units:identity.units.map(unit=>({itemId:unit.itemId,family:unit.family}))}
   }
   if(audience==='STUDENT_EVALUATION')fail()

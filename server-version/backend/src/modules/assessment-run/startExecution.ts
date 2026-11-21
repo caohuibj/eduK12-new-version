@@ -239,9 +239,9 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   inlineContext?: TransactionalStartDispatchContext
 }): Promise<RunStartExecutionResult> => {
   const inline = Boolean(input.inlineContext)
-  const libraryUses = !inline && input.launch.resourceKey.startsWith('education-composition:')
-    ? await lockCompositionStartLibraryUses(tx, input)
-    : undefined
+  const libraryUses = inline
+    ? input.inlineContext!.compositionSources
+    : input.launch.resourceKey.startsWith('education-composition:') ? await lockCompositionStartLibraryUses(tx, input) : undefined
   const envelope = inline
     ? input.inlineContext!.execution
     : await lockExecutionEnvelope(tx, input.executionId, {
@@ -797,14 +797,13 @@ export const startAssessmentRunExecution = async (input: {
   const executeRunStart = async (): Promise<RunStartExecutionResult> => {
     try {
       return await runStartGate().run(async () => {
-        // The School route already identified this respondent and a frozen
-        // track target. Prepare its publication before opening the claim
-        // transaction; admission and the locked track remain authoritative.
-        // A speculative preload failure is only a cache miss; the locked
-        // START path retries its actual target without changing replay or authority.
-        const candidate = input.startPreflight?.respondentUserId === input.actorUserId
+        // The product route identified the respondent and the frozen track.
+        // Prepare immutable publication data before taking execution locks.
+        const preflight = input.startPreflight?.respondentUserId === input.actorUserId
           && !input.startPreflight.runtimeBindingRef && !input.resourceRegistry
-          ? input.startPreflight.preloadCompositeId : null
+          ? input.startPreflight : undefined
+        const compositionCandidate = preflight?.compositionStartCompositeId
+        const candidate = compositionCandidate ?? preflight?.preloadCompositeId
         const preparation = candidate
           ? await import('../composite/composite.service')
               .then(module => module.loadStartComposite(candidate))
@@ -829,6 +828,7 @@ export const startAssessmentRunExecution = async (input: {
             actorUserId: input.actorUserId,
             resourceRegistry: input.resourceRegistry,
             ...(knownIdentity ? { knownIdentity } : {}),
+            lockCompositionSources: Boolean(compositionCandidate),
             transactionalDispatch: async (inlineContext: TransactionalStartDispatchContext) => {
               const inlineTrack = inlineContext.scientificDetails?.track
               const launch = inlineTrack
@@ -838,9 +838,11 @@ export const startAssessmentRunExecution = async (input: {
                     frozenResourcePolicy: inlineTrack.frozenResourcePolicy,
                   })
                 : await readLaunchEnvelope(inlineContext.tx, input.executionId)
-              // Composition START must lock library uses BEFORE Organization/Run/Execution;
-              // let it commit the claim and take the two-phase lock-ordered path below.
-              if (launch.resourceKey.startsWith('education-composition:')) return null
+              if (launch.resourceKey.startsWith('education-composition:')) {
+                const ordinarySelf = (inlineContext.productScope === 'CAMPUS_ONLY' && /:STUDENT:SELF:1\.0\.0$/.test(launch.resourceKey))
+                  || (inlineContext.productScope === 'HUITEACHER_ONLY' && /:TEACHER:SELF:1\.0\.0$/.test(launch.resourceKey))
+                if (!ordinarySelf || compositionCandidate !== launch.runtimeTargetRef) return null
+              }
               const resourceAdapter = resourceRegistry.assertStartSupported(launch.family)
               if (resourceAdapter.capabilities.transactionMode !== 'TRANSACTIONAL_DB') return null
               const inlineDecision = {
