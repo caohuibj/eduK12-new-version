@@ -61,5 +61,5 @@ it('rejects a mismatched preview version without adding a mandatory-preview publ
  fireEvent.click(screen.getByRole('button',{name:'预览任务配置'}));await screen.findByText('预览版本或人数响应无效，请重新预览任务配置。')
  expect(screen.queryByRole('region',{name:'任务配置预览'})).not.toBeInTheDocument()
  fireEvent.click(await screen.findByRole('button',{name:'发布教师评价任务'}))
- await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/publish','POST',{expectedVersion:3,tracking:{mode:'SINGLE',metrics:[],visibleMetrics:[]}}))
+ await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/publish','POST',{expectedVersion:3,tracking:{mode:'SINGLE',metrics:[],visibleMetrics:[]},provideParticipantReport:false}))
 })

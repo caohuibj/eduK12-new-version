@@ -80,7 +80,8 @@ suite('Training personal longitudinal native publication and SELF results',()=>{
    if(pending?.status!=='PUBLISHED'){
    await editor.getByRole('navigation',{name:'编制步骤',exact:true}).getByRole('link',{name:/检查与发布/}).click()
    await editor.getByText(/纵向追踪 · T3/).waitFor({timeout:30000})
-   await editor.getByRole('button',{name:'发布组合测评',exact:true}).click()
+   await editor.getByRole('checkbox',{name:'向作答者提供报告'}).check()
+    await editor.getByRole('button',{name:'发布组合测评',exact:true}).click()
    await editor.getByRole('button',{name:'确认发布',exact:true}).click()
    await editor.getByText(/已发布 ·/).waitFor({timeout:30000})
    }
@@ -161,7 +162,7 @@ suite('Training personal longitudinal native publication and SELF results',()=>{
   expect(await readTrainingPersonalChanges(endId,{userId:student.id})).toMatchObject({status:'AVAILABLE',metrics:[{unit:'raw',points:[{value:0},{value:3}],adjacent:[{delta:3}]}]})
  },30000)
  it('publishes T1, inherits exact C into T2 after source edits, records real finals and serves both own reports',async()=>{
-  await product.publish(actor,source.id,{revision:0,tracking:{mode:'LONGITUDINAL',metrics:[{itemId:item.id,scoreKey:'total'}]}})
+  await product.publish(actor,source.id,{revision:0,tracking:{mode:'LONGITUDINAL',metrics:[{itemId:item.id,scoreKey:'total'}]},provideParticipantReport:true})
   const first=await composite.startUserAttempt(student.id,source.id)
   await finish(first.attempt.id,{userId:student.id},'no')
   const changed=scaleDefinitionFor(1,'changed-after-T1')
@@ -172,7 +173,7 @@ suite('Training personal longitudinal native publication and SELF results',()=>{
   expect(next.personalTracking.ordinal).toBe(2)
   await product.update(actor,next.id,{revision:next.revision,name:next.name,courseIds:[course.id],publicEnabled:true,expiresAt:future().toISOString()})
   const draft=await product.detail(actor,next.id)
-  await product.publish(actor,next.id,{revision:draft.revision})
+  await product.publish(actor,next.id,{revision:draft.revision,provideParticipantReport:true})
   const second=await composite.startUserAttempt(student.id,next.id)
   await finish(second.attempt.id,{userId:student.id},'yes')
   try{

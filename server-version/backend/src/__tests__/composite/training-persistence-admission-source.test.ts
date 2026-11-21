@@ -52,7 +52,7 @@ describe('Training persistence publication/admission source contracts (not HTTP 
     expect(source('composite/training-checkpoint.service.ts')).toContain('trainingRoundPublicationIdentity(parent,s.courseId)')
     expect(admission).toContain('round.publicationHash !== canonicalHash(publicationIdentity)')
     expect(admission).toContain('cutoffs: [facts[0].endedAt, current.expiresAt, roundCutoff]')
-    const insert = admission.indexOf('const attempt = await db.compositeAssessmentAttempt.create')
+    const insert = attemptInsertStart - composite.indexOf('const createAttempt = async')
     expect(admission.indexOf('const trainingPersistenceSnapshot =')).toBeLessThan(insert)
     const insertData = attemptInsertData
     expect(insertData).toContain('...(trainingPersistenceSnapshot ? { trainingPersistenceSnapshot: trainingPersistenceSnapshot as Prisma.InputJsonValue,')

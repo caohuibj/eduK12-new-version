@@ -210,7 +210,7 @@ it('publishes own psychologist batch using server run capabilities without isAdm
     fireEvent.click(await screen.findByRole('button',{name:'预览合法参与者数量'}))
     await waitFor(()=>expect(screen.getByRole('button',{name:'正式发布本人测评'})).toBeEnabled())
     fireEvent.click(screen.getByRole('button',{name:'正式发布本人测评'}))
-    await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/runs/run-own/publish','POST',{expectedVersion:2,tracking:{mode:'SINGLE',metrics:[],visibleMetrics:[]}}))
+    await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/runs/run-own/publish','POST',{expectedVersion:2,tracking:{mode:'SINGLE',metrics:[],visibleMetrics:[]},provideParticipantReport:false}))
   }finally{window.confirm=original}
 })
 

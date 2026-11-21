@@ -12,7 +12,7 @@ describe('C22 runtime wiring source contracts (not concurrency/HTTP evidence)', 
     expect(lock).toBeGreaterThan(0); expect(marker).toBeGreaterThan(lock); expect(bind).toBeGreaterThan(admission.indexOf('await assertTrainingTokenRound(db as Prisma.TransactionClient, token)'))
     expect(admission).toContain('if (persistence?.checkpoint || persistence?.localCognitive || feedbackConfigured)')
     expect(admission).toContain('FOR SHARE OF c,u'); expect(admission).toContain('accessTokenId, round: feedbackRound')
-    const freeze = admission.indexOf('const trainingFeedbackSnapshot ='), insert = admission.indexOf('const attempt = await db.compositeAssessmentAttempt.create')
+    const freeze = admission.indexOf('const trainingFeedbackSnapshot ='), insert = attemptInsertStart - composite.indexOf('const createAttempt = async')
     expect(freeze).toBeGreaterThan(bind); expect(insert).toBeGreaterThan(freeze)
     const insertData = attemptInsertData
     expect(insertData).toContain('...(trainingFeedbackSnapshot ? { trainingFeedbackSnapshot: trainingFeedbackSnapshot as Prisma.InputJsonValue,')
