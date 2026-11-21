@@ -56,7 +56,7 @@ function decodeCursor(value:string,actorUserId:string):Cursor{
 }
 /** Product identity, current account/persona/entitlement, exact SELF assignment,
  * event, Run and durable parent binding are predicates on actual database rows. */
-export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId:string,input:{executionId?:string;attemptId?:string;cursor?:Cursor;limit:number},audience:TeacherAssessmentAudience='TEACHER_SELF'){
+export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId:string,input:{executionId?:string;attemptId?:string;cursor?:Cursor;limit:number;acceptedWhole?:boolean},audience:TeacherAssessmentAudience='TEACHER_SELF'){
  const student=audience==='STUDENT_EVALUATION'
  return withBoundedPlannerRead(db, client => client.$queryRaw<Row[]>(Prisma.sql`
  SELECT e.id AS "executionId",e.organization_id AS "organizationId",e.run_id AS "runId",event.id AS "eventId",
@@ -115,8 +115,8 @@ export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId
   AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`, 'COLLECTION', 'HUITEACHER_ONLY')}
   AND ((e.status='ASSIGNED' AND a.status='OPEN' AND r.status='PUBLISHED' AND event.status='OPEN'
     AND e.runtime_binding_kind IS NULL AND e.runtime_binding_ref IS NULL)
-   OR (e.status='STARTED' AND a.status='STARTED' AND parent.status='IN_PROGRESS' AND event.status='OPEN'
-    AND ${boundCompositeContinuationSql(Prisma.sql`e.id`,actorUserId)} AND r.status IN ('PUBLISHED','CLOSED'))
+   OR (e.status='STARTED' AND parent.id IS NOT NULL AND event.status='OPEN'
+    AND ${boundCompositeContinuationSql(Prisma.sql`e.id`,actorUserId,input.acceptedWhole)} AND r.status IN ('PUBLISHED','CLOSED'))
    OR (e.status='COMPLETED' AND a.status='COMPLETED' AND parent.status='COMPLETED'
     AND r.status IN ('PUBLISHED','CLOSED') AND event.status IN ('OPEN','CLOSED')))
   ${input.executionId?Prisma.sql`AND e.id=${input.executionId}`:Prisma.empty}
@@ -182,7 +182,7 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
   await source.assertUse(db,{identity,executionId:row.executionId,actorUserId,purpose})
   return {task:taskDto(row,entry.title),identity,row,runtimeCompositeId:origin.runtimeCompositeId,units:origin.units,startPreflight:startPreflightForRow(row,actorUserId)}
  }
- const own=async(actorUserId:string,input:{executionId?:string;attemptId?:string})=>{
+ const own=async(actorUserId:string,input:{executionId?:string;attemptId?:string;acceptedWhole?:boolean})=>{
   if(!input.executionId&&!input.attemptId)fail()
   const rows=await queryTeacherAssessmentRows(db,actorUserId,{...input,limit:2},audience)
   if(rows.length!==1)fail()

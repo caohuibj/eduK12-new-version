@@ -2,7 +2,7 @@ import {randomUUID} from 'node:crypto'
 import express from 'express'
 import type {Server} from 'node:http'
 import {PrismaClient} from '@prisma/client'
-import {afterAll,beforeAll,describe,expect,it} from 'vitest'
+import {afterAll,beforeAll,describe,expect,it,vi} from 'vitest'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from './integration-env'
 import {setupTeacherCompositionExecution} from './educationPrivateCompositionExecutionFixture'
 import {createTeacherAssessmentRuntimeRouter} from '../../modules/huiteacher/assessmentRuntime.routes'
@@ -125,6 +125,62 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
   await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:f.organizationId,userId:f.participantUserId,permission:'REPORT_READ',reason:'Synthetic current report withdrawal',deniedByUserId:f.managerUserId}})
   expect((await request(`/run-executions/${f.executionId}/feedback`,auth)).status).toBe(404)
  },120_000)
+ it('keeps the accepted whole receipt readable until Run reconciliation releases feedback',async()=>{
+  vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED','true')
+  vi.stubEnv('ASSESSMENT_WHOLE_SUBMIT_ENABLED','true')
+  try{
+   const f=await setupTeacherCompositionExecution(db)
+   const auth=await headers(f.participantUserId),other=await headers(f.managerUserId)
+   const started=await request(`/run-executions/${f.executionId}/start-assessment`,auth,{})
+   expect(started.status,JSON.stringify(started.value)).toBe(200)
+   const id=started.data.runtimeBindingRef,path=`/assessment-composite-attempts/${id}/whole`
+   const delivered=await request(path,auth)
+   expect(delivered.status,JSON.stringify(delivered.value)).toBe(200)
+   const definition=delivered.data
+   const payload={submissionId:randomUUID(),attemptEpoch:definition.attemptEpoch,slotSetHash:definition.slotSetHash,
+    contextSnapshotHash:definition.contextSnapshotHash,units:definition.units.map((unit:any)=>({
+     itemId:unit.itemId,definitionHash:unit.definitionHash,answers:unit.scale.definition.items.map((item:any)=>({
+      itemCode:item.itemCode,responseValue:item.options[0].value})),
+    })),formAnswers:definition.formSections.map((section:any)=>({sectionId:section.id,definitionHash:section.definitionHash,
+     answers:section.items.map((item:any)=>({formItemId:item.id,value:'Synthetic response'}))}))}
+   const receipt=await request(path+'/submit',auth,payload)
+   expect(receipt.status,JSON.stringify(receipt.value)).toBe(200)
+   expect(receipt.data).toMatchObject({status:'ACCEPTED',submissionId:payload.submissionId,replayed:false})
+   const where={attemptId_attemptEpoch:{attemptId:id,attemptEpoch:payload.attemptEpoch}}
+   // Give only this fixture's job a worker lease. Other suites may share the queue.
+   const pending=await db.compositeReportJob.findUniqueOrThrow({where})
+   const job=await db.compositeReportJob.update({where:{id:pending.id,status:'PENDING'},data:{
+    status:'PROCESSING',leaseToken:randomUUID(),leaseExpiresAt:new Date(Date.now()+90_000),
+    claimedRevision:pending.requestedRevision,attemptCount:{increment:1},
+   }})
+   // Pause between the same two commits as the worker, without changing any lifecycle rows.
+   const {processWholeQuestionnaireAnswers}=await import('../../modules/composite/whole-questionnaire.service')
+   expect(await processWholeQuestionnaireAnswers(job)).toBe(true)
+   const {finalizeCompositeAttemptUnifiedIfReady}=await import('../../modules/assessment-runtime/unified-aggregate-finalizer.service')
+   expect(await finalizeCompositeAttemptUnifiedIfReady(id,undefined,job)).toMatchObject({status:'COMPLETED'})
+   expect(await db.$queryRaw`SELECT e.status,a.status AS assignment FROM assessment_run_executions e
+    JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id WHERE e.id=${f.executionId}`).toEqual([{status:'STARTED',assignment:'COMPLETED'}])
+   const progress=await request(path+'/progress',auth)
+   expect(progress.status,JSON.stringify(progress.value)).toBe(200)
+   expect(progress.data).toMatchObject({status:'IN_PROGRESS',wholeSubmissionReceived:true,reportStatus:{state:'PROCESSING'}})
+   const lookup=path+`/receipt?submissionId=${payload.submissionId}&attemptEpoch=${payload.attemptEpoch}`
+   expect((await request(lookup,auth)).data).toMatchObject({submissionId:payload.submissionId})
+   expect((await request(path+'/submit',auth,payload)).data).toMatchObject({submissionId:payload.submissionId,replayed:true})
+   expect((await request(path+'/submit',auth,{...payload,submissionId:randomUUID()})).status).toBe(409)
+   expect((await request(path+'/progress',other)).status).toBe(404)
+   expect((await request(lookup,other)).status).toBe(404)
+   const deny=await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:f.organizationId,
+    userId:f.participantUserId,permission:'RUN_START',reason:'Synthetic participant withdrawal',deniedByUserId:f.managerUserId}})
+   expect((await request(path+'/progress',auth)).status).toBe(404)
+   expect((await request(lookup,auth)).status).toBe(404)
+   await db.organizationAccessDeny.update({where:{id:deny.id},data:{liftedByUserId:f.managerUserId,liftedAt:new Date()}})
+   const {reconcileRelationalCompositeCompletion}=await import('../../modules/assessment-relational/runtime-completion')
+   await reconcileRelationalCompositeCompletion(id)
+   expect((await request(path+'/progress',auth)).data).toMatchObject({status:'COMPLETED',reportStatus:{state:'READY'}})
+   expect((await request(`/run-executions/${f.executionId}/feedback`,auth)).data).toMatchObject({state:'READY'})
+   expect(await db.compositeReportJob.count({where:{attemptId:id,wholeSubmissionId:payload.submissionId}})).toBe(1)
+  }finally{vi.unstubAllEnvs()}
+ },90_000)
  it('rejects new entry after author withdrawal, and current participant withdrawal or emergency stop before native FINAL writes',async()=>{
   const f=await setupTeacherCompositionExecution(db),auth=await headers(f.participantUserId)
   const start=await request(`/run-executions/${f.executionId}/start-assessment`,auth,{})

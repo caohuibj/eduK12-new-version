@@ -994,7 +994,7 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
 }
 
 /** Completion poll for an education whole receipt. It does not project a report. */
-export const readEducationWholeProgress = async (attemptId: string, userId: string) => {
+export const readEducationWholeProgress = async (attemptId: string, userId: string, executionStatus?: string) => {
   const parent = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
     select: { id: true, userId: true, status: true, attemptEpoch: true, assignmentRef: true,
@@ -1007,10 +1007,13 @@ export const readEducationWholeProgress = async (attemptId: string, userId: stri
     where: { attemptId_attemptEpoch: { attemptId, attemptEpoch: parent.attemptEpoch } },
     select: { wholeSubmissionId: true, status: true },
   })
+  // The parent and assignment commit before the Run can release Teacher feedback.
+  // Use the authorized execution snapshot even if the worker advances during this read.
+  const awaitingRun = executionStatus === 'STARTED' && parent.status === 'COMPLETED' && Boolean(job?.wholeSubmissionId)
   return {
-    attemptId, attemptEpoch: parent.attemptEpoch, status: parent.status,
+    attemptId, attemptEpoch: parent.attemptEpoch, status: awaitingRun ? 'IN_PROGRESS' : parent.status,
     wholeSubmissionReceived: Boolean(job?.wholeSubmissionId),
-    reportStatus: { state: parent.status === 'COMPLETED' ? 'READY' as const : job?.status ?? 'WAITING' },
+    reportStatus: { state: awaitingRun ? 'PROCESSING' : parent.status === 'COMPLETED' ? 'READY' : job?.status ?? 'WAITING' },
   }
 }
 
