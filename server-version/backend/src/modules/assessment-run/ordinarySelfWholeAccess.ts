@@ -5,7 +5,7 @@ import { boundCompositeConsentSql } from './boundCompositeContinuation'
 import type { RunStartPreflight } from './resourceBoundary'
 import type { WholeReceiptRow } from '../composite/whole-receipt-recovery'
 
-type Product = 'SCHOOL' | 'TEACHER'
+export type OrdinarySelfWholeProduct = 'SCHOOL' | 'TEACHER'
 type Locator = { attemptId: string } | { executionId: string; schoolPath?: { organizationId: string; runId: string; courseId: string } }
 export type OrdinarySelfWholeBinding = WholeReceiptRow & {
   kind: 'bound'
@@ -24,14 +24,31 @@ type Row = Omit<OrdinarySelfWholeBinding, 'id' | 'kind'> & {
 }
 
 export function readOrdinarySelfWholeAccess(
-  db: Pick<Prisma.TransactionClient, '$queryRaw'>, product: Product, userId: string, locator: { attemptId: string },
+  db: Pick<Prisma.TransactionClient, '$queryRaw'>, product: OrdinarySelfWholeProduct, userId: string, locator: { attemptId: string },
 ): Promise<OrdinarySelfWholeBinding | null>
 export function readOrdinarySelfWholeAccess(
-  db: Pick<Prisma.TransactionClient, '$queryRaw'>, product: Product, userId: string, locator: Extract<Locator, { executionId: string }>,
+  db: Pick<Prisma.TransactionClient, '$queryRaw'>, product: OrdinarySelfWholeProduct, userId: string, locator: Extract<Locator, { executionId: string }>,
 ): Promise<OrdinarySelfWholeBinding | StartProof | null>
 export async function readOrdinarySelfWholeAccess(
-  db: Pick<Prisma.TransactionClient, '$queryRaw'>, product: Product, userId: string, locator: Locator,
+  db: Pick<Prisma.TransactionClient, '$queryRaw'>, product: OrdinarySelfWholeProduct, userId: string, locator: Locator,
 ): Promise<OrdinarySelfWholeBinding | StartProof | null> {
+  const query = ordinarySelfWholeAccessQuery(product, userId, locator)
+  if (!query) return null
+  const [row] = await db.$queryRaw<Row[]>(query)
+  if (row?.preflight) return { kind: 'start', preflight: row.preflight }
+  if (!assertOrdinarySelfWholeBound(row)) return null
+  return { ...row, id: row.id, kind: 'bound' }
+}
+
+type BoundAuthority = Pick<Row, 'id' | 'opened' | 'allowed' | 'stopped'>
+export function assertOrdinarySelfWholeBound<T extends BoundAuthority>(row: T | undefined | null): row is T & { id: string } {
+  if (!row?.opened || !row.id) return false
+  if (!row.allowed) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '当前测评作答不可访问', 404)
+  if (row.stopped) privateToolFail('PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE',403)
+  return true
+}
+
+export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, userId: string, locator: Locator) {
   // The per-unit compatibility writer retains its historical live authority.
   if (process.env.ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED === 'false') return null
   const wholeDelivery = process.env.ASSESSMENT_REPORT_ASYNC_ENABLED === 'true'
@@ -45,7 +62,7 @@ export async function readOrdinarySelfWholeAccess(
   const schoolLink = Prisma.sql`SELECT 1 FROM campus_activity_runs link WHERE ${sameRun}
     ${path ? Prisma.sql`AND link.course_id=${path.courseId}` : Prisma.empty}`
   const teacherLink = Prisma.sql`SELECT 1 FROM huiteacher_evaluation_run_links link WHERE ${sameRun}`
-  const [row] = await db.$queryRaw<Row[]>(Prisma.sql`
+  return Prisma.sql`
     SELECT e.status AS "executionStatus", a.id AS "assignmentRef", p.id, p.user_id AS "userId",
       NULL::text AS "recoveryTokenHash", p.attempt_epoch AS epoch, p.status AS "parentStatus",
       p.frozen_active_slot_set_hash AS "slotHash", j.slot_set_hash AS "jobSlot",
@@ -103,11 +120,5 @@ export async function readOrdinarySelfWholeAccess(
         WHERE section.composite_assessment_id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}')
       AND EXISTS (${school ? schoolLink : teacherLink}) AND NOT EXISTS (${school ? teacherLink : schoolLink})
     LIMIT 1
-  `)
-  if (!row) return null
-  if (row.preflight) return { kind: 'start', preflight: row.preflight }
-  if (!row.opened || !row.id) return null // Other or legacy attempt shapes retain their original authority path.
-  if (!row.allowed) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '当前测评作答不可访问', 404)
-  if (row.stopped) privateToolFail('PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE',403)
-  return { ...row, id: row.id, kind: 'bound' }
+  `
 }

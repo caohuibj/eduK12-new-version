@@ -239,10 +239,13 @@ router.get('/composite-attempts/:attemptId/whole/receipt',authenticateSchool,cam
   compositeController.wholeReceipt)
 router.get('/composite-attempts/:attemptId/whole/progress',authenticateSchool,campusWholeAccess,
   compositeController.educationWholeProgress)
-router.post('/composite-attempts/:attemptId/whole/submit',authenticateSchool,campusWholeAccess,(req,res)=>
-  res.locals.ordinarySelfWhole
-    ? compositeController.educationWholeSubmit(req,res,res.locals.ordinarySelfWhole.assignmentRef)
-    : compositeController.wholeSubmit(req,res))
+router.post('/composite-attempts/:attemptId/whole/submit',authenticateSchool,async(req,res,next)=>{
+  try{
+    if(req.user?.accountDomain==='SCHOOL'&&req.user.role==='STUDENT'
+      &&await compositeController.tryOrdinarySelfWholeSubmit(req,res,'SCHOOL'))return
+    return campusCompositeAccess(req,res,next)
+  }catch(error){return next(error)}
+},compositeController.wholeSubmit)
 router.get('/composite-attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content',
   authenticateSchool,campusCompositeAccess,compositeImageController.educationFormImage)
 router.get('/composite-attempts/:attemptId/items/:itemId/scale/assets/:assetId/content',

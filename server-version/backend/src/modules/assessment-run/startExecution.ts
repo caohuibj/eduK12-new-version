@@ -117,6 +117,7 @@ export const runStartGate = (): BoundedAdmissionGate => {
 
     runStartGateInstance = new BoundedAdmissionGate({
       name: 'run_start_admission',
+      pauseDispatchWhile: isAssessmentStartCpuPaused,
       maxConcurrent,
       maxQueue,
       maxWaitMs,
@@ -844,7 +845,7 @@ export const startAssessmentRunExecution = async (input: {
       const prepareBeforeGate = compositionCandidate && track?.policy.runtimeLaunchTarget?.ref === compositionCandidate
       // Avoid starting expensive publication reads during a known CPU pause.
       // Recheck on entry after queueing; the memory trickle still wraps START.
-      if (prepareBeforeGate && isAssessmentStartCpuPaused()) {
+      if (compositionCandidate && isAssessmentStartCpuPaused()) {
         const check = await checkCompositionResources()
         if (typeof check !== 'boolean') return check
       }

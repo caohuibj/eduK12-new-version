@@ -100,6 +100,8 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
      answers:unit.scale.definition.items.map((item:any)=>({itemCode:item.itemCode,responseValue:item.options[0].value}))}))}
    expect((await request(route+'/submit',other,payload,school)).status).toBe(404)
    expect((await post({...payload,units:[]})).status).toBe(400)
+   expect((await request(route+'/submit',other,{},school)).status).toBe(404)
+   expect((await post({...payload,attemptEpoch:def.attemptEpoch+1})).status).toBe(409)
    expect((await get(receipt())).data).toMatchObject({status:'NOT_RECEIVED'})
    const saved=await post(payload)
    expect(saved.status,JSON.stringify(saved.value)).toBe(200)

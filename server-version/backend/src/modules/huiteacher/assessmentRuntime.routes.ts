@@ -201,9 +201,9 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
  router.get(parent+'/whole/receipt',wholeBound(true),compositeController.wholeReceipt)
  router.get(parent+'/whole/progress',wholeBound(true),compositeController.educationWholeProgress)
  router.post(parent+'/whole/submit',handler(async(req,res)=>{
-  const admitted=await ordinaryAttempt(req)
-  if(admitted)return compositeController.educationWholeSubmit(req,res,admitted.assignmentRef)
-  const proof=await access.own(req.user!.userId,{attemptId:uuid.parse(req.params.attemptId),acceptedWhole:true})
+  uuid.parse(req.params.attemptId)
+  if(audience==='TEACHER_SELF'&&await compositeController.tryOrdinarySelfWholeSubmit(req,res,'TEACHER'))return
+  const proof=await access.own(req.user!.userId,{attemptId:req.params.attemptId,acceptedWhole:true})
   if(audience==='TEACHER_SELF'&&proof.row.resourceKey.startsWith('education-composition:TEACHER:')
    &&proof.row.resourceKey.endsWith(':TEACHER:SELF:1.0.0')){
    return compositeController.educationWholeSubmit(req,res,proof.row.assignmentId)

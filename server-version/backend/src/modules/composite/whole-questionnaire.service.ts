@@ -1,3 +1,4 @@
+import { assertOrdinarySelfWholeBound, ordinarySelfWholeAccessQuery, type OrdinarySelfWholeProduct } from '../assessment-run/ordinarySelfWholeAccess'
 import type { RuntimeConsentAssignment } from '../assessment-relational/runtime-consent'
 import {acceptedStudyReceipt,assertCurrentStudyPrincipal,withStudyPrincipalReadBatch,type AcceptedStudyReceipt} from '../anonymous-study/admission-principal'
 import { applyTrainingAttemptScope, hasTrainingVariantMetadata } from './training-variant-scope'
@@ -826,13 +827,18 @@ type WholeSubmissionHeader = Prisma.CompositeAssessmentAttemptGetPayload<{
   trainingVariantAllocationEncrypted: string | null; trainingVariantAllocationHash: string | null;
   compositeAssessment: { trainingVariantDraft: unknown; trainingVariantFrozen: unknown; trainingVariantDigest: string | null } }
 /** One fresh read of ownership, product eligibility and the current receipt. */
-const loadWholeSubmissionContext = async (attemptId: string, boundAssignmentRef?: string) => {
+const loadWholeSubmissionContext = async (attemptId: string, boundAssignmentRef?: string,
+  ordinary?: { product: OrdinarySelfWholeProduct; userId: string }) => {
+  const authority = ordinary && ordinarySelfWholeAccessQuery(ordinary.product, ordinary.userId, { attemptId })
+  if (ordinary && !authority) return null
+  const binding = authority ? Prisma.sql`ordinary."assignmentRef"` : boundAssignmentRef ? Prisma.sql`${boundAssignmentRef}` : undefined
   const rows = await prisma.$queryRaw<Array<Omit<WholeSubmissionHeader, 'compositeAssessment'> & {
     productKind: WholeSubmissionHeader['compositeAssessment']['productKind'];
     reportPackageKey: string | null; analysisProtocolKey: string | null;
     trainingFlowDraft: Prisma.JsonValue;trainingFlowFrozen:Prisma.JsonValue;trainingFlowDigest:string|null;
     trainingVariantDraft: unknown; trainingVariantFrozen: unknown; trainingVariantDigest: string | null;
     currentAssignment?: RuntimeConsentAssignment | null;
+    ordinaryId?: string | null; ordinaryOpened?: boolean; ordinaryAllowed?: boolean; ordinaryStopped?: boolean;
     jobId: string | null; jobStatus: string | null; leaseToken: string | null;
     wholeSubmissionId: string | null; wholePayloadHash: string | null; wholeAcceptedAt: Date | null;
     wholeValidationEncrypted: string | null; wholeValidationHash: string | null;
@@ -849,7 +855,9 @@ const loadWholeSubmissionContext = async (attemptId: string, boundAssignmentRef?
       parent."context_snapshot_hash" AS "contextSnapshotHash",
       parent."aggregate_input_hash" AS "aggregateInputHash",
       parent."assignment_ref" AS "assignmentRef", parent."consent_id" AS "consentId",
-      ${boundAssignmentRef ? Prisma.sql`CASE WHEN a.id IS NOT NULL THEN jsonb_build_object(
+      ${authority ? Prisma.sql`ordinary.id AS "ordinaryId", ordinary.opened AS "ordinaryOpened",
+        ordinary.allowed AS "ordinaryAllowed", ordinary.stopped AS "ordinaryStopped",` : Prisma.empty}
+      ${binding ? Prisma.sql`CASE WHEN a.id IS NOT NULL THEN jsonb_build_object(
         'assignmentId', a.id, 'status', a.status, 'consentId', a.consent_id,
         'subjectUserId', a.subject_user_id, 'respondentUserId', a.respondent_user_id, 'respondentRole', a.respondent_role,
         'createdByUserId', a.created_by_user_id, 'relationshipKind', a.relationship_kind, 'visibilityPolicyKey', a.visibility_policy_key,
@@ -877,12 +885,17 @@ const loadWholeSubmissionContext = async (attemptId: string, boundAssignmentRef?
     FROM "composite_assessment_attempts" AS parent
     JOIN "composite_assessments" AS product ON product."id" = parent."composite_assessment_id"
     LEFT JOIN "composite_report_jobs" AS job ON job."attempt_id" = parent."id" AND job."attempt_epoch" = parent."attempt_epoch"
-    ${boundAssignmentRef ? Prisma.sql`LEFT JOIN relational_assessment_assignments a
-      ON a.id=parent.assignment_ref AND a.id=${boundAssignmentRef} AND a.policy_domain='ORGANIZATION_RUN'` : Prisma.empty}
+    ${authority ? Prisma.sql`LEFT JOIN (${authority}) ordinary ON ordinary.id=parent.id` : Prisma.empty}
+    ${binding ? Prisma.sql`LEFT JOIN relational_assessment_assignments a
+      ON a.id=parent.assignment_ref AND a.id=${binding} AND a.policy_domain='ORGANIZATION_RUN'` : Prisma.empty}
     WHERE parent."id" = ${attemptId}
   `
   const row = rows[0]
   if (!row) return null
+  if (ordinary && !assertOrdinarySelfWholeBound({
+    id: row.ordinaryId ?? null, opened: row.ordinaryOpened === true,
+    allowed: row.ordinaryAllowed === true, stopped: row.ordinaryStopped === true,
+  })) return null
   const parent: WholeSubmissionHeader = { ...row, compositeAssessment: {
     productKind: row.productKind, reportPackageKey: row.reportPackageKey, analysisProtocolKey: row.analysisProtocolKey,
     trainingFlowDraft:row.trainingFlowDraft,trainingFlowFrozen:row.trainingFlowFrozen,trainingFlowDigest:row.trainingFlowDigest,
@@ -896,19 +909,28 @@ const loadWholeSubmissionContext = async (attemptId: string, boundAssignmentRef?
   return { parent, prior, currentAssignment: row.currentAssignment }
 }
 
+export function submitWholeQuestionnaire(attemptId: string, input: WholeQuestionnaireSubmitInput, principal: Principal,
+  receivedAtMs?: number, boundAssignmentRef?: string): Promise<ReturnType<typeof receiptResponse>>
+export function submitWholeQuestionnaire(attemptId: string, input: () => WholeQuestionnaireSubmitInput, principal: { userId: string },
+  receivedAtMs: number, boundAssignmentRef: undefined, ordinaryProduct: OrdinarySelfWholeProduct): Promise<ReturnType<typeof receiptResponse> | null>
 /** One HTTP body, one durable encrypted answer envelope, one transactional job. */
-export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQuestionnaireSubmitInput, principal: Principal,
-  receivedAtMs = Date.now(), boundAssignmentRef?: string) => {
+export async function submitWholeQuestionnaire(attemptId: string, submission: WholeQuestionnaireSubmitInput | (() => WholeQuestionnaireSubmitInput), principal: Principal,
+  receivedAtMs = Date.now(), boundAssignmentRef?: string, ordinaryProduct?: OrdinarySelfWholeProduct) {
   const admissionStarted = process.hrtime.bigint()
   const anonymous = !principal.userId && Boolean(principal.recoveryTokenHash)
   return withWholeSubmitAdmission(async () => {
   assessmentTimelineSpan('whole.admission_wait', admissionStarted)
-  const context = await traceAssessmentPhase('whole.owner_header_query', () => loadWholeSubmissionContext(attemptId, boundAssignmentRef))
-  if (!context) throw failure('问卷作答不存在', 404)
+  const ordinary = ordinaryProduct && principal.userId ? { product: ordinaryProduct, userId: principal.userId } : undefined
+  const context = await traceAssessmentPhase('whole.owner_header_query', () => loadWholeSubmissionContext(attemptId, boundAssignmentRef, ordinary))
+  if (!context) {
+    if (ordinary) return null
+    throw failure('问卷作答不存在', 404)
+  }
   const { parent, prior, currentAssignment } = context
   const owned = principal.userId ? parent.userId === principal.userId
     : parent.userId === null && Boolean(principal.recoveryTokenHash && parent.recoveryTokenHash === principal.recoveryTokenHash)
   if (!owned || (boundAssignmentRef && parent.assignmentRef !== boundAssignmentRef)) throw failure('无权限操作此问卷', 403)
+  const input = typeof submission === 'function' ? submission() : submission
   const runWithPressure = typeof wholeSubmissionPriority.trackVerifiedWholeSubmissionPressure === 'function'
     ? wholeSubmissionPriority.trackVerifiedWholeSubmissionPressure
     : async <T>(op: () => Promise<T>, _anonymous: boolean): Promise<T> => op()

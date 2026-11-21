@@ -1,5 +1,5 @@
 import { serveProjectedReportImage } from '../reporting/report-image-delivery'
-import type { OrdinarySelfWholeBinding } from '../assessment-run/ordinarySelfWholeAccess'
+import type { OrdinarySelfWholeBinding, OrdinarySelfWholeProduct } from '../assessment-run/ordinarySelfWholeAccess'
 import { isAssessmentStartBusyError } from './start-transient'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
 import { wholeQuestionnaireArrival, markAssessmentTimeline, traceAssessmentPhase, traceAssessmentPhaseSync } from '../../services/runtimeObservability'
@@ -148,6 +148,9 @@ export const compositeController = {
   async wholeSubmit(req: Request, res: Response) { return handleWholeSubmit(req, res, false) },
   async educationWholeSubmit(req: Request, res: Response, assignmentRef: string) {
     return handleWholeSubmit(req, res, false, assignmentRef)
+  },
+  async tryOrdinarySelfWholeSubmit(req: Request, res: Response, product: OrdinarySelfWholeProduct) {
+    return handleWholeSubmit(req, res, false, undefined, product)
   },
   async educationWholeProgress(req: Request, res: Response) {
     try {
@@ -1006,7 +1009,8 @@ const handleError = (res: Response, err: unknown): Response => {
   return error(res, '服务器内部错误', -1, 500)
 }
 
-async function handleWholeSubmit(req: Request, res: Response, anonymous: boolean, boundAssignmentRef?: string) {
+async function handleWholeSubmit(req: Request, res: Response, anonymous: boolean, boundAssignmentRef?: string,
+  ordinaryProduct?: OrdinarySelfWholeProduct) {
   const arrival = wholeQuestionnaireArrival(req)
   res.setHeader('X-Whole-Request-Started-At', String(arrival.requestStartedAtMs))
   res.setHeader('X-Whole-Body-Received-At', String(arrival.bodyReceivedAtMs))
@@ -1014,8 +1018,11 @@ async function handleWholeSubmit(req: Request, res: Response, anonymous: boolean
     markAssessmentTimeline('whole.controller_enter')
     const { submitWholeQuestionnaire, wholeQuestionnaireSubmitSchema } = await traceAssessmentPhase('whole.module_import', () => import('./whole-questionnaire.service'))
     const principal = anonymous ? { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) } : { userId: req.user!.userId }
-    const input = traceAssessmentPhaseSync('whole.schema_parse', () => wholeQuestionnaireSubmitSchema.parse(req.body))
-    const receipt = await submitWholeQuestionnaire(req.params.attemptId, input, principal, arrival.bodyReceivedAtMs, boundAssignmentRef)
+    const parse = () => traceAssessmentPhaseSync('whole.schema_parse', () => wholeQuestionnaireSubmitSchema.parse(req.body))
+    const receipt = ordinaryProduct
+      ? await submitWholeQuestionnaire(req.params.attemptId, parse, { userId: req.user!.userId }, arrival.bodyReceivedAtMs, undefined, ordinaryProduct)
+      : await submitWholeQuestionnaire(req.params.attemptId, parse(), principal, arrival.bodyReceivedAtMs, boundAssignmentRef)
+    if (!receipt) return false
     markAssessmentTimeline('whole.receipt_response_send')
     return success(res, receipt, '整份问卷已可靠保存，报告正在生成')
   } catch (err) {

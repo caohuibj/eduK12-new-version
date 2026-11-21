@@ -71,6 +71,28 @@ describe('BoundedAdmissionGate', () => {
     expect(gate.getStats()).toMatchObject({ active: 0, queued: 0 })
   })
 
+  it('keeps a host-paused burst bounded and lets it drain FIFO without taking slots during the pause', async () => {
+    vi.useFakeTimers()
+    let paused = true
+    const run = vi.fn(async (name: string) => name)
+    const gate = new BoundedAdmissionGate({
+      name: 'host_paused', maxConcurrent: 1, maxQueue: 2, maxWaitMs: 1_000,
+      pauseDispatchWhile: () => paused,
+    })
+    const first = gate.run(() => run('first'))
+    const second = gate.run(() => run('second'))
+    await expect(gate.run(() => run('excess'))).rejects.toMatchObject({ reason: 'queue_full' })
+    await vi.advanceTimersByTimeAsync(300)
+    expect(gate.getStats()).toMatchObject({ active: 0, queued: 2 })
+    expect(run).not.toHaveBeenCalled()
+
+    paused = false
+    await vi.advanceTimersByTimeAsync(100)
+    await expect(Promise.all([first, second])).resolves.toEqual(['first', 'second'])
+    expect(run.mock.calls).toEqual([['first'], ['second']])
+    expect(gate.getStats()).toMatchObject({ active: 0, queued: 0 })
+  })
+
   it('rejects with Retry-After metadata when the bounded queue is full', async () => {
     const gate = new BoundedAdmissionGate({
       name: 'aggregate_finalization',
