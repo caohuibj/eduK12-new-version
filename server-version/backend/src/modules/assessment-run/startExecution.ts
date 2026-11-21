@@ -9,12 +9,13 @@ import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { classifyStartTransaction, isAssessmentStartBusyError, AssessmentStartBusyError, rolledBackStartReason, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from '../composite/start-transient'
 import { BoundedAdmissionGate, configuredInteger } from '../../services/boundedAdmissionGate'
-import { boundedTrainingStartConcurrency, defaultRunStartAdmissionBound } from '../../config/databasePool'
+import { defaultRunStartAdmissionBound } from '../../config/databasePool'
 import { buildWholeStartPreload, startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
 import type { RunStartPreflight } from './resourceBoundary'
 import {
   awaitScaleCompositionStartResources,
   isAssessmentStartCpuPaused,
+  isAssessmentRunStartCpuPaused,
   isAssessmentStartResourceGateError,
   isAssessmentStartResourceConstrained,
   runWithLowMemoryTrickleAdmission,
@@ -95,8 +96,7 @@ export const resetRunStartGateForTests = (): void => {
 
 export const runStartGate = (): BoundedAdmissionGate => {
   if (!runStartGateInstance) {
-    // Leave the same pool headroom as Training for receipt and definition reads.
-    const defaultConcurrent = boundedTrainingStartConcurrency(defaultRunStartAdmissionBound(process.env.DATABASE_URL))
+    const defaultConcurrent = defaultRunStartAdmissionBound(process.env.DATABASE_URL)
     const maxConcurrent = resolveBound(
       'RUN_START_MAX_CONCURRENT',
       'TRAINING_START_MAX_CONCURRENT',
@@ -118,7 +118,7 @@ export const runStartGate = (): BoundedAdmissionGate => {
 
     runStartGateInstance = new BoundedAdmissionGate({
       name: 'run_start_admission',
-      pauseDispatchWhile: isAssessmentStartCpuPaused,
+      pauseDispatchWhile: isAssessmentRunStartCpuPaused,
       maxConcurrent,
       maxQueue,
       maxWaitMs,
@@ -832,7 +832,7 @@ export const startAssessmentRunExecution = async (input: {
     .then(module => module.loadStartComposite(id)).catch(() => null)
   const checkCompositionResources = async () => {
     try {
-      return await traceAssessmentPhase('start.run_cpu_admission', awaitScaleCompositionStartResources)
+      return await traceAssessmentPhase('start.run_cpu_admission', () => awaitScaleCompositionStartResources(true))
     } catch (err) {
       if (isAssessmentStartResourceGateError(err) && isAssessmentStartCpuPaused()) {
         const bound = await readExistingBoundExecution(input.executionId, input.actorUserId)

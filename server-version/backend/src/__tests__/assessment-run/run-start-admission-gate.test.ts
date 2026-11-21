@@ -41,15 +41,6 @@ describe('runStartGate admission and busy mapping', () => {
     expect(stats.options.maxWaitMs).toBe(15000)
   })
 
-  it('leaves the same database pool headroom for new Run and Training starts by default', () => {
-    vi.stubEnv('DATABASE_URL', 'postgresql://test@localhost/test?connection_limit=8')
-    try {
-      expect(runStartGate().getStats().options.maxConcurrent).toBe(4)
-    } finally {
-      vi.unstubAllEnvs()
-    }
-  })
-
   it('RUN_START explicit environment variables take precedence over TRAINING_START', () => {
     process.env.TRAINING_START_MAX_CONCURRENT = '24'
     process.env.RUN_START_MAX_CONCURRENT = '16'
