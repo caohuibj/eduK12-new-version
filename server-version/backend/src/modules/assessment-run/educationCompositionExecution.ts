@@ -1,5 +1,5 @@
 import {readSealedCompositionContent} from '../education-tools/private-tool.composition-content'
-import {lockExecutionNativeSources} from '../education-tools/native-source.locks'
+import {lockEducationNativeSourceIds} from '../education-tools/native-source.locks'
 import {educationNativeDescriptorSchema} from '../education-tools/native-source.contracts'
 import {educationBlockPublicSource} from '../education-tools/public-source.identity'
 import {assertEducationCognitiveOriginalUse} from '../education-tools/native-source.cognitive'
@@ -49,6 +49,30 @@ const frozenCompositionIdentityCache=new BoundedTtlCache<Omit<Awaited<ReturnType
 )
 export const resetEducationCompositionIdentityCacheForTests=()=>{frozenCompositionIdentityCache.clear()}
 
+export type FrozenCompositionTrack={policy:RunResourcePolicy;policyHash:string;organizationId:string;key:string;version:string}
+const frozenCompositionCacheKey=(input:FrozenCompositionTrack,manifestHash:string,compositeId:string)=>
+ `${input.organizationId}:${input.key}:${input.version}:${input.policyHash}:${manifestHash}:${compositeId}`
+
+function liveCompositionAnchor(input:{compositeId:string;key:string;manifestHash:string;
+ origin:z.infer<typeof educationCompositionPolicyBindingSchema>['origin']}){
+ const {compositeId,key,manifestHash,origin}=input
+ return Prisma.sql`SELECT c.id FROM composite_assessments c
+   JOIN education_private_tool_versions original ON original.id=${origin.versionId}
+    AND original.content_hash=${origin.contentHash} AND original.entry=${origin.entry} AND original.kind='COMPOSITION'
+    AND original.organization_id=${origin.organizationId} AND original.owner_user_id=${origin.ownerUserId}
+   WHERE c.id=${compositeId} AND c.creation_key=${key}
+    AND c.creation_hash=${canonicalHash(origin)} AND c.training_content_snapshot_hash=${manifestHash}
+    AND c.created_by=${origin.ownerUserId} AND c.status='PUBLISHED' AND c.published_at IS NOT NULL
+    AND c.product_kind='ORGANIZATION_RESOURCE' AND NOT c.public_enabled AND NOT c.copyable LIMIT 1`
+}
+
+/** Warm only committed static content. START still checks live anchors in its transaction. */
+export async function prepareFrozenCompositionStart(input:FrozenCompositionTrack):Promise<FrozenCompositionIdentity|undefined>{
+ const {runtimeLaunchTarget,educationComposition}=input.policy
+ if(runtimeLaunchTarget?.kind!=='COMPOSITE'||!educationComposition)return
+ return resolveFrozenCompositionIdentity(prisma,input,true)
+}
+
 async function loadFrozenCompositionIdentityRow(tx:Tx,input:{
  policy:RunResourcePolicy;origin:z.infer<typeof educationCompositionPolicyBindingSchema>['origin'];
  binding:z.infer<typeof educationCompositionPolicyBindingSchema>;key:string;
@@ -92,7 +116,11 @@ async function loadFrozenCompositionIdentityRow(tx:Tx,input:{
  * immutable version/children prove content correspondence; this reader checks
  * only the independent header anchors and bounded references, never full source
  * definitions, stimuli, report bodies or full snapshot hashes. No author rights. */
-export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResourcePolicy;policyHash:string;organizationId:string;key:string;version:string}){
+export function readFrozenCompositionIdentity(tx:Tx,input:FrozenCompositionTrack){
+ return resolveFrozenCompositionIdentity(tx,input)
+}
+
+async function resolveFrozenCompositionIdentity(tx:Tx,input:FrozenCompositionTrack,prepareOnly=false){
  const policy=input.policy,binding=educationCompositionPolicyBindingSchema.parse(policy.educationComposition),origin=binding.origin
  if(origin.variantKey==='TEACHER:EXPERT_REPORT')privateToolFail('PRIVATE_COMPOSITION_FIELD_INVITATION_REQUIRED',400)
  const variant=educationCompositionVariant(origin)
@@ -106,22 +134,17 @@ export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResou
    !==canonicalHash([[variant.subjectRole],[variant.respondentRole],variant.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'),[variant.perspective]]))
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
  const isRootClient=tx===(prisma as unknown as Tx)
- const cacheKey=`${input.organizationId}:${input.key}:${input.version}:${input.policyHash}:${binding.manifestHash}:${policy.runtimeLaunchTarget.ref}`
- const originHash=canonicalHash(origin)
+ const cacheKey=frozenCompositionCacheKey(input,binding.manifestHash,policy.runtimeLaunchTarget.ref)
  const cached=frozenCompositionIdentityCache.get(cacheKey)
  let parsed:NonNullable<typeof cached>
  if(cached){
-  // Live publication and source anchors stay verified on caller's tx; only the
-  // heavy 8-table manifest/units JSON expansion is served from cache.
-  const [live]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT c.id FROM composite_assessments c
-   JOIN education_private_tool_versions original ON original.id=${origin.versionId}
-    AND original.content_hash=${origin.contentHash} AND original.entry=${origin.entry} AND original.kind='COMPOSITION'
-    AND original.organization_id=${origin.organizationId} AND original.owner_user_id=${origin.ownerUserId}
-   WHERE c.id=${policy.runtimeLaunchTarget.ref} AND c.creation_key=${input.key}
-    AND c.creation_hash=${originHash} AND c.training_content_snapshot_hash=${binding.manifestHash}
-    AND c.created_by=${origin.ownerUserId} AND c.status='PUBLISHED' AND c.published_at IS NOT NULL
-    AND c.product_kind='ORGANIZATION_RESOURCE' AND NOT c.public_enabled AND NOT c.copyable LIMIT 1`)
-  if(!live)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
+  // Speculative preparation leaves the live anchor to START's source query.
+  if(!prepareOnly){
+   const [live]=await tx.$queryRaw<Array<{id:string}>>(liveCompositionAnchor({
+    compositeId:policy.runtimeLaunchTarget.ref,key:input.key,manifestHash:binding.manifestHash,origin,
+   }))
+   if(!live)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
+  }
   parsed=cached
  }else{
   // Populate global cache only from non-transactional root reads so a rolled-back
@@ -136,10 +159,18 @@ export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResou
  }
  if(group)assertSchoolCompositionGroupIdentity(policy,parsed.groupReporting)
  else if(parsed.groupReporting!=null)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
- return {kind:'COMPOSITION' as const,origin,compositeId:policy.runtimeLaunchTarget.ref,title:parsed.title,policy,binding,
+ return {kind:'COMPOSITION' as const,origin,compositeId:policy.runtimeLaunchTarget.ref,title:parsed.title,policy,policyHash:input.policyHash,binding,
   manifest:parsed.manifest,units:parsed.units,selectedBindings:parsed.selectedBindings,identityOnly:true as const}
 }
 export type FrozenCompositionIdentity=Awaited<ReturnType<typeof readFrozenCompositionIdentity>>
+export type CheckedCompositionIdentity={tx:Tx;identity:FrozenCompositionIdentity}
+
+export async function assertFrozenCompositionPublication(tx:Tx,identity:FrozenCompositionIdentity):Promise<void>{
+ const [live]=await tx.$queryRaw<Array<{id:string}>>(liveCompositionAnchor({
+  compositeId:identity.compositeId,key:identity.policy.key,manifestHash:identity.binding.manifestHash,origin:identity.origin,
+ }))
+ if(!live)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
+}
 
 /** Collection boundaries only. NEW_START rechecks the publisher's author right;
  * a participant never needs that role. Continuation uses its frozen admission,
@@ -147,7 +178,7 @@ export type FrozenCompositionIdentity=Awaited<ReturnType<typeof readFrozenCompos
  * not destroy an entered attempt or historical report. */
 export async function assertCompositionCollection(tx:Tx,identity:Pick<FrozenCompositionIdentity,'origin'>&{
  units:ReadonlyArray<{releaseId:string;scaleId?:string|null;native?:{provider:string;sourceMeasurementReleaseId?:string}}>;manifest:ReadonlyArray<{sourceProvider:string;versionId:string;contentHash:string;profileArtifactHash?:string}>;selectedBindings?:SelectedSourceBindings
-},purpose:'NEW_START'|'BOUND_COLLECTION',lock=false,libraryUses?:LockedEducationLibraryUses){
+},purpose:'NEW_START'|'PUBLISHED_SELF_START'|'BOUND_COLLECTION',lock=false,libraryUses?:LockedEducationLibraryUses){
  if(isStudentComposition(identity.origin)&&process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')privateToolFail('HUITEACHER_STUDENT_FEEDBACK_DISABLED',403)
  const c={entry:identity.origin.entry,organizationId:identity.origin.organizationId,principal:{userId:identity.origin.ownerUserId,accountDomain:'SCHOOL' as const}}
  if(purpose==='NEW_START')await authorizePrivateTool(tx,c)
@@ -163,7 +194,7 @@ export async function assertCompositionCollection(tx:Tx,identity:Pick<FrozenComp
    OR EXISTS(SELECT 1 FROM scales WHERE id=ANY(${scales}::text[]) AND status<>'PUBLISHED')
    OR EXISTS(SELECT 1 FROM measurement_content_releases m JOIN cognitive_assignments a ON a.id=m.scope->>'resourceId'
     WHERE m.id=ANY(${releases}::text[]) AND m.family='COGNITIVE' AND m.scope->>'product'=${identity.origin.entry} AND a.status<>'PUBLISHED')) AS unavailable`)
- if(row.stopped||purpose==='NEW_START'&&row.unavailable)privateToolFail('PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE',403)
+ if(row.stopped||purpose!=='BOUND_COLLECTION'&&row.unavailable)privateToolFail('PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE',403)
  if(purpose==='NEW_START'){
   const libraries=identity.manifest.filter(block=>block.sourceProvider==='LIBRARY_SCALE')
   await assertEducationLibraryUses(tx,c,libraries.map(source=>source.versionId),{locked:libraryUses,requireLocked:lock})
@@ -175,20 +206,31 @@ export async function assertCompositionCollection(tx:Tx,identity:Pick<FrozenComp
    if(headers.size!==keys.length||allowed.size!==keys.length)privateToolFail('PUBLIC_SOURCE_USE_REQUIRED',403)
   }
  }
+ return scales
 }
 
 /** Exact persisted execution/assignment identity. The consuming START, FINAL
  * or report layer owns current actor/relationship/consent checks; source reading
  * does not repeat that query or confer those rights. */
-export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:string;assignmentRef?:string;actorUserId?:string;compositeId?:string;parentAttemptId?:string}){
+export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:string;assignmentRef?:string;actorUserId?:string;compositeId?:string;parentAttemptId?:string},checked?:CheckedCompositionIdentity){
+ const known=checked?.tx===tx?checked.identity:undefined
+ // On the exact same locked track, check publication in this SELECT and
+ // reuse the provenance reader's parsed manifest and unit identities.
+ const currentAnchor=known?Prisma.sql`CASE WHEN
+   t.resource_policy_hash=${known.policyHash} AND t.resource_key=${known.policy.key}
+   AND t.resource_version=${known.policy.version} AND t.organization_id=${known.origin.organizationId}
+   THEN EXISTS(${liveCompositionAnchor({compositeId:known.compositeId,key:known.policy.key,
+    manifestHash:known.binding.manifestHash,origin:known.origin})}) END`:Prisma.sql`NULL::boolean`
  const [row]=await tx.$queryRaw<Array<{executionId:string;organizationId:string;key:string;version:string;policy:RunResourcePolicy;policyHash:string;
   assignmentRef:string;subjectUserId:string;respondentUserId:string;subjectRole:string;respondentRole:string;relationshipKind:string;perspective:string;
-  bindingKind:string|null;bindingRef:string|null;status:string;runStatus:string;assignmentStatus:string;product:'SCHOOL'|'TEACHER'}>>(Prisma.sql`
+  bindingKind:string|null;bindingRef:string|null;status:string;runStatus:string;assignmentStatus:string;product:'SCHOOL'|'TEACHER';
+  checkedAnchorCurrent:boolean|null}>>(Prisma.sql`
   SELECT e.id AS "executionId",e.organization_id AS "organizationId",t.resource_key AS key,t.resource_version AS version,
    t.frozen_resource_policy AS policy,t.resource_policy_hash AS "policyHash",a.id AS "assignmentRef",a.subject_user_id AS "subjectUserId",
    a.respondent_user_id AS "respondentUserId",a.subject_role AS "subjectRole",a.respondent_role AS "respondentRole",a.relationship_kind AS "relationshipKind",a.perspective,
    e.runtime_binding_kind AS "bindingKind",e.runtime_binding_ref AS "bindingRef",e.status,
-   r.status AS "runStatus",a.status AS "assignmentStatus",CASE WHEN school.run_id IS NOT NULL THEN 'SCHOOL' ELSE 'TEACHER' END AS product
+   r.status AS "runStatus",a.status AS "assignmentStatus",CASE WHEN school.run_id IS NOT NULL THEN 'SCHOOL' ELSE 'TEACHER' END AS product,
+   ${currentAnchor} AS "checkedAnchorCurrent"
   FROM assessment_run_executions e JOIN assessment_runs r ON r.id=e.run_id AND r.organization_id=e.organization_id
   JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
   JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
@@ -213,7 +255,8 @@ export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:s
  if(!row||!['PUBLISHED','CLOSED'].includes(row.runStatus)||!['ASSIGNED','STARTED','COMPLETED'].includes(row.status)
   ||!['OPEN','STARTED','COMPLETED'].includes(row.assignmentStatus)||(input.actorUserId!==undefined&&input.actorUserId!==row.respondentUserId))
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
- const identity=await readFrozenCompositionIdentity(tx,row)
+ if(row.checkedAnchorCurrent===false)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
+ const identity=known&&row.checkedAnchorCurrent===true?known:await readFrozenCompositionIdentity(tx,row)
  if(identity.origin.entry!==row.product||input.compositeId!==undefined&&identity.compositeId!==input.compositeId)
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
  if(!matchesEducationCompositionRespondent(identity.origin,row))privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
@@ -225,32 +268,38 @@ export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:s
  }
  return {identity,...row}
 }
-export async function admitCompositionStart(tx:Tx,input:{executionId:string;compositeId:string;actorUserId:string},libraryUses?:LockedEducationLibraryUses){
- const source=await readCompositionExecutionSource(tx,input)
- await assertCompositionCollection(tx,source.identity,'NEW_START',true,libraryUses)
+export async function admitCompositionStart(tx:Tx,input:{executionId:string;compositeId:string;actorUserId:string},libraryUses?:LockedEducationLibraryUses,checked?:CheckedCompositionIdentity,publishedSelfWhole=false){
+ const source=await readCompositionExecutionSource(tx,input,checked)
+ const checkedScaleIds=await assertCompositionCollection(tx,source.identity,publishedSelfWhole?'PUBLISHED_SELF_START':'NEW_START',true,libraryUses)
  return issueVerifiedEducationStart({tx,product:source.product,compositeId:source.identity.compositeId,assignmentRef:source.assignmentRef,
-  subjectUserId:source.subjectUserId,respondentUserId:source.respondentUserId,composition:source.identity.binding})
+  subjectUserId:source.subjectUserId,respondentUserId:source.respondentUserId,composition:source.identity.binding,
+  checkedScaleIds:new Set(checkedScaleIds)})
 }
 
 /** Before Organization/Run/Execution locks, for this actual frozen respondent
  * only. An unavailable U is recorded, not thrown here: concurrent reconciliation
  * may discover an already-entered attempt, which keeps its completion right. */
 export async function lockCompositionStartLibraryUses(tx:Tx,input:{executionId:string;actorUserId:string}){
- await lockExecutionNativeSources(tx,input)
- const [row]=await tx.$queryRaw<Array<{entry:'SCHOOL'|'TEACHER';organizationId:string;ownerId:string;entryIds:string[]}>>(Prisma.sql`
-  SELECT v.entry,v.organization_id AS "organizationId",v.owner_user_id AS "ownerId",
-   ARRAY(SELECT DISTINCT b->>'versionId' FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b
-    WHERE b->>'sourceProvider'='LIBRARY_SCALE') AS "entryIds"
+ const [row]=await tx.$queryRaw<Array<{entry:'SCHOOL'|'TEACHER'|null;organizationId:string|null;ownerId:string|null;
+  entryIds:string[];nativeIds:string[]}>>(Prisma.sql`
+  SELECT v.entry,v.organization_id AS "organizationId",v.owner_user_id AS "ownerId",sources.*
   FROM assessment_run_executions e JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
   JOIN assessment_run_actor_snapshots respondent ON respondent.id=e.respondent_actor_snapshot_id AND respondent.organization_id=e.organization_id
    AND respondent.run_id=e.run_id AND respondent.user_id=${input.actorUserId}
   JOIN composite_assessments c ON c.id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}' AND c.creation_key=t.resource_key
    AND c.training_content_snapshot_hash=t.frozen_resource_policy#>>'{educationComposition,manifestHash}'
-  JOIN education_private_tool_versions v ON v.id=c.training_content_snapshot#>>'{educationBinding,origin,versionId}'
+  LEFT JOIN education_private_tool_versions v ON v.id=c.training_content_snapshot#>>'{educationBinding,origin,versionId}'
    AND v.organization_id=e.organization_id AND c.created_by=v.owner_user_id AND v.kind='COMPOSITION'
+  CROSS JOIN LATERAL (
+   SELECT COALESCE(array_agg(DISTINCT b->>'versionId') FILTER (WHERE b->>'sourceProvider'='LIBRARY_SCALE'),'{}') AS "entryIds",
+    COALESCE(array_agg(DISTINCT b->>'versionId') FILTER (WHERE b->>'sourceProvider'='SJT_RELEASE'),'{}') AS "nativeIds"
+   FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b
+  ) sources
   WHERE e.id=${input.executionId} AND e.runtime_binding_ref IS NULL AND t.resource_family='BUNDLE'
    AND t.resource_key LIKE 'education-composition:%'`)
- if(!row?.entryIds.length)return
+ if(!row)return
+ await lockEducationNativeSourceIds(tx,row.nativeIds)
+ if(!row.entryIds.length||!row.entry||!row.organizationId||!row.ownerId)return
  const context:PrivateToolContext={entry:row.entry,organizationId:row.organizationId,principal:{userId:row.ownerId,accountDomain:'SCHOOL'}}
  return {context,entryIds:row.entryIds,uses:await lockEducationLibraryUses(tx,context,row.entryIds)}
 }

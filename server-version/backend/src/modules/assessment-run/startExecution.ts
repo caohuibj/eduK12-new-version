@@ -15,6 +15,8 @@ import type { RunStartPreflight } from './resourceBoundary'
 import {
   awaitScaleCompositionStartResources,
   isAssessmentStartCpuPaused,
+  isAssessmentRunStartCpuPaused,
+  isAssessmentStartResourceGateError,
   isAssessmentStartResourceConstrained,
   runWithLowMemoryTrickleAdmission,
   withAdmittedScaleCompositionStart,
@@ -45,8 +47,8 @@ import {
   type TransactionalStartDispatchContext,
 } from './startClaim'
 import { loadRunExecutionStartAdmission } from './startAdmission'
-import { assertCurrentRunStartAuthority } from './startAuthority'
-import { freezeRunExecutionScientificProvenance, freezeRunExecutionScientificProvenanceInTransaction } from './scientificProvenance'
+import { assertCurrentRunStartAuthority, assertPublishedSelfWholeStartAuthority } from './startAuthority'
+import { freezeRunExecutionScientificProvenance, freezeRunExecutionScientificProvenanceInTransaction, prepareCompositionScientificProvenance } from './scientificProvenance'
 import {
   productionRunRuntimeAdapterRegistry,
   type RunRuntimeAdapterRegistry,
@@ -116,6 +118,7 @@ export const runStartGate = (): BoundedAdmissionGate => {
 
     runStartGateInstance = new BoundedAdmissionGate({
       name: 'run_start_admission',
+      pauseDispatchWhile: isAssessmentRunStartCpuPaused,
       maxConcurrent,
       maxQueue,
       maxWaitMs,
@@ -293,7 +296,8 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
     await freezeRunExecutionScientificProvenanceInTransaction(tx, input.executionId)
   }
 
-  const existing = await tx.compositeAssessmentAttempt.findFirst({
+  const inlineIntake = input.inlineContext?.publishedSelfIntake
+  const existing = inlineIntake ? inlineIntake.existingAttempt : await tx.compositeAssessmentAttempt.findFirst({
     where: { assignmentRef: admission.assignment.assignmentId },
     orderBy: { startedAt: 'desc' },
     select: {
@@ -354,12 +358,15 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   // When executing in a separate second transaction, re-check current PR1/PR2
   // gates under TX2's locks; inline single-transaction dispatch already holds
   // those exact locks and verified current authority in acquireRunExecutionStartClaim.
-  if (!inline) {
+  const knownEnvelope = envelope?.trackResourceKey?.startsWith('education-composition:')
+    ? toStartAuthorityKnownEnvelope(envelope) : undefined
+  const publishedSelfWhole = Boolean(inline ? inlineIntake
+    : await assertPublishedSelfWholeStartAuthority(tx, knownEnvelope, productScope, admission.assignment.assignmentId))
+  if (!inline && !publishedSelfWhole) {
     await assertCurrentRunStartAuthority(tx, input.executionId, {
       accountMode: 'DETECT_EDUCATION_LIBRARY',
       productScope,
-      knownEnvelope: envelope?.trackResourceKey?.startsWith('education-composition:')
-        ? toStartAuthorityKnownEnvelope(envelope) : undefined,
+      knownEnvelope,
     })
   }
   if (admission.assignment.resourceKey.startsWith('library-scale:')||admission.assignment.resourceKey.startsWith('private-scale:')) {
@@ -395,7 +402,8 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   }
   const educationSource=admission.assignment.resourceKey.startsWith('education-assessment:')?await assertEducationAssessmentExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,purpose:'NEW_START'}):undefined
   const compositionStart=admission.assignment.resourceKey.startsWith('education-composition:')?await admitCompositionStart(tx,{
-    executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId},libraryUses?.uses):undefined
+    executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId},libraryUses?.uses,
+    input.inlineContext?.scientificDetails?.compositionIdentity,publishedSelfWhole):undefined
   if(admission.assignment.resourceKey.startsWith('private-form:'))await readPrivateFormExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId})
   // assessment_runs is already SHARE-locked by lockExecutionEnvelope, and
   // admission just projected r.status under that fence. A second SELECT
@@ -408,7 +416,7 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   const started = await relational.start({
     assignmentId: admission.assignment.assignmentId,
     actorUserId: input.actorUserId,
-    ...(inline ? { knownAssignment: admission.assignment } : {}),
+    ...(inline ? { knownAssignment: admission.assignment, acceptedConsentInTransaction: admission.acceptedConsent } : {}),
   })
   // The claim freezes runtime identity before this transaction. The relational
   // transition still checks current assignment/consent authority, but its legacy
@@ -495,7 +503,7 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
     await markRunStartClaimCompleted(tx, { claimId: input.decision.claim.id, generation: input.decision.claim.claimGeneration, now, allowClaimedInline: inline })
   }
   await assertTrainingPrivateReferenceAdmissionCurrent(tx)
-  if(libraryUses)await assertEducationLibraryUses(tx,libraryUses.context,libraryUses.entryIds,{locked:libraryUses.uses,requireLocked:true})
+  if(libraryUses&&!publishedSelfWhole)await assertEducationLibraryUses(tx,libraryUses.context,libraryUses.entryIds,{locked:libraryUses.uses,requireLocked:true})
   const result: RunStartExecutionResult = {
     state: 'STARTED',
     runtimeBindingKind: 'COMPOSITE',
@@ -822,20 +830,41 @@ export const startAssessmentRunExecution = async (input: {
     && !input.startPreflight.runtimeBindingRef && !input.resourceRegistry
     ? input.startPreflight : undefined
   const compositionCandidate = preflight?.compositionStartCompositeId
+  const track = preflight?.compositionStartTrack
+  const candidate = compositionCandidate ?? preflight?.preloadCompositeId
+  const loadPublication = (id: string) => import('../composite/composite.service')
+    .then(module => module.loadStartComposite(id)).catch(() => null)
+  const checkCompositionResources = async () => {
+    try {
+      return await traceAssessmentPhase('start.run_cpu_admission', () => awaitScaleCompositionStartResources(true))
+    } catch (err) {
+      if (isAssessmentStartResourceGateError(err) && isAssessmentStartCpuPaused()) {
+        const bound = await readExistingBoundExecution(input.executionId, input.actorUserId)
+        if (bound) return bound
+      }
+      throw err
+    }
+  }
   const executeRunStart = async (): Promise<RunStartExecutionResult> => {
     try {
+      const prepareBeforeGate = compositionCandidate && track?.policy.runtimeLaunchTarget?.ref === compositionCandidate
+      // Avoid starting expensive publication reads during a known CPU pause.
+      // Recheck on entry after queueing; the memory trickle still wraps START.
+      if (compositionCandidate && isAssessmentStartCpuPaused()) {
+        const check = await checkCompositionResources()
+        if (typeof check !== 'boolean') return check
+      }
+      const prepared = prepareBeforeGate
+        ? await traceAssessmentPhase('start.run_prepare_frozen', () => Promise.all([
+            loadPublication(compositionCandidate),
+            prepareCompositionScientificProvenance(track).catch(() => undefined),
+          ]))
+        : undefined
       return await runStartGate().run(async () => {
-        const admittedScaleBatch = Boolean(compositionCandidate) && await traceAssessmentPhase(
-          'start.run_cpu_admission', awaitScaleCompositionStartResources,
-        )
-        // The product route identified the respondent and the frozen track.
-        // Prepare immutable publication data before taking execution locks.
-        const candidate = compositionCandidate ?? preflight?.preloadCompositeId
-        const preparation = candidate
-          ? await import('../composite/composite.service')
-              .then(module => module.loadStartComposite(candidate))
-              .catch(() => null)
-          : null
+        const check = compositionCandidate ? await checkCompositionResources() : false
+        if (typeof check !== 'boolean') return check
+        const admittedScaleBatch = check
+        const preparation = prepared ? prepared[0] : candidate ? await loadPublication(candidate) : null
         // The claim transaction is the first durable step of a Run START. Its own
         // rolled-back outcomes (P2028 maxWait, serialization/deadlock/lock-timeout)
         // leave no claim, audit or provenance rows behind, so they share the same
@@ -855,7 +884,8 @@ export const startAssessmentRunExecution = async (input: {
             actorUserId: input.actorUserId,
             resourceRegistry: input.resourceRegistry,
             ...(knownIdentity ? { knownIdentity } : {}),
-            lockCompositionSources: Boolean(compositionCandidate),
+            lockCompositionSources: Boolean(compositionCandidate) && !preflight?.publishedSelfScale,
+            preparedComposition: prepared?.[1],
             transactionalDispatch: async (inlineContext: TransactionalStartDispatchContext) => {
               const inlineTrack = inlineContext.scientificDetails?.track
               const launch = inlineTrack

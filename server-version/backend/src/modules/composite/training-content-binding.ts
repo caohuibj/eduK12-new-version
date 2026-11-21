@@ -1,3 +1,4 @@
+import { appendPublishedStartPlans, type PublishedStartScale } from '../assessment-runtime/published-start-plans'
 import {loadCognitiveProfileArtifact} from '../assessment-authorization/cognitive-profile-artifact'
 import {readTrainingCognitiveTaskBinding,trainingCognitiveTaskBindingSchema} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
@@ -332,6 +333,23 @@ function assertScope(release:Stored,source:Unit['source']){
 
 /** New START binds exact publication pointers. Historical null/null remains
  * legacy; recovery uses the already stored attempt binding, never this selector. */
+export function educationCompositionSlotPresentation(binding: NonNullable<TrainingContentSnapshot['educationBinding']>) {
+  const presentation=new Map<string,EducationSlotPresentation>(),orderedSlots:string[]=binding.context?['form-section:'+binding.context.sectionId]:[]
+  if(binding.context){
+    const id=binding.context.sectionId
+    presentation.set('form-section:'+id,{blockId:id})
+  }
+  for(const block of binding.manifest){
+    const prefix=block.kind==='SCALE'?'scale:':block.kind==='COGNITIVE'?'cognitive:':'situational:'
+    const keys=block.kind!=='FORM'?block.itemIds.map(id=>prefix+id):block.sectionIds.map(id=>'form-section:'+id)
+    const instruction=[block.instruction,block.sourceInstruction].filter(Boolean).join('\n\n')
+    for(const [index,key] of keys.entries()){
+      orderedSlots.push(key);presentation.set(key,{blockId:block.blockId,...(index===0&&instruction?{instruction}:{})})
+    }
+  }
+  return {order:new Map(orderedSlots.map((key,index)=>[key,index])),presentation}
+}
+
 export async function prepareTrainingContentAttemptBinding(db:Prisma.TransactionClient,input:{compositeId:string;attemptId:string;epoch:number;snapshot:unknown;snapshotHash:string|null|undefined;scaleArtifacts?:Map<string,PublishedScaleArtifact>;prefetchedReleases?:Map<string,import('../measurement-content/repository').StoredRelease>;composite:{id:string;createdBy?:string|null;items:any[]};resolvedSituational:Map<string,ResolvedSituationalRelease>;educationComposition?:EducationCompositionPolicyBinding}){
   if(input.snapshot==null&&input.snapshotHash==null)return null
   if(!input.snapshot||!input.snapshotHash)fail('SNAPSHOT_INVALID')
@@ -363,20 +381,8 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
     // registry wrapper. Native runtime freezing still occurs once per child.
     const binding=trainingContentAttemptBindingSchema.parse({schemaVersion:1,compositeId:input.compositeId,attemptId:input.attemptId,
       epoch:input.epoch,publicationHash:input.snapshotHash,units:snapshot.units,educationComposition:anchor})
-    const presentation=new Map<string,EducationSlotPresentation>(),orderedSlots:string[]=snapshot.educationBinding.context?['form-section:'+snapshot.educationBinding.context.sectionId]:[]
-    if(snapshot.educationBinding.context){
-      const id=snapshot.educationBinding.context.sectionId
-      presentation.set('form-section:'+id,{blockId:id})
-    }
-    for(const block of snapshot.educationBinding.manifest){
-      const prefix=block.kind==='SCALE'?'scale:':block.kind==='COGNITIVE'?'cognitive:':'situational:'
-      const keys=block.kind!=='FORM'?block.itemIds.map(id=>prefix+id):block.sectionIds.map(id=>'form-section:'+id)
-      const instruction=[block.instruction,block.sourceInstruction].filter(Boolean).join('\n\n')
-      for(const [index,key] of keys.entries()){
-        orderedSlots.push(key);presentation.set(key,{blockId:block.blockId,...(index===0&&instruction?{instruction}:{})})
-      }
-    }
-    return {binding,bindingHash:canonicalHash(binding),educationUnitOrder:new Map(orderedSlots.map((key,index)=>[key,index])),
+    const {order,presentation}=educationCompositionSlotPresentation(snapshot.educationBinding)
+    return {binding,bindingHash:canonicalHash(binding),educationUnitOrder:order,
       educationUnitPresentation:presentation,recheckSourceLicenses:async()=>{}}
   }
   const actualItems=input.composite.items.filter(item=>item.type!=='FORM')
@@ -540,6 +546,7 @@ export async function attachLegacyScaleArtifactsForSnapshot(
   snapshot:TrainingContentSnapshot,
   snapshotHash:string,
   releases:Map<string,Stored>,
+  startUnits?:PublishedStartScale[],
 ):Promise<void>{
   if(typeof (db as any).$queryRaw!=='function'||typeof (db as any).$executeRaw!=='function')return
   const items=new Map(composite.items.map((item:any)=>[item.id,item]))
@@ -547,6 +554,7 @@ export async function attachLegacyScaleArtifactsForSnapshot(
     if(unit.family!=='SCALE'||unit.source.kind!=='SCALE'||unit.artifact)continue
     const built=await buildScaleUnitArtifact(db,items.get(unit.itemId),unit,releases.get(unit.measurement.releaseId))
     if(typeof built==='string')fail('SOURCE_MISMATCH')
+    startUnits?.push({itemId:unit.itemId,scale:items.get(unit.itemId).scale,artifact:built.artifact})
     await appendLegacyScaleArtifactBinding(db,{compositeId:composite.id,publicationHash:snapshotHash,itemId:unit.itemId,
       built,releaseId:unit.measurement.releaseId,contentHash:unit.measurement.contentHash})
   }
@@ -557,8 +565,9 @@ export async function attachLegacyScaleArtifactsForSnapshot(
  * release, append it content-addressed in the publishing transaction, and emit
  * a schemaVersion 2 snapshot. A code-package Scale is frozen at publish. */
 export async function attachPublishedScaleArtifacts(db:Prisma.TransactionClient,composite:{id:string;items:any[]},
-  content:{snapshot:TrainingContentSnapshot;releases:Map<string,Stored>}){
+  content:{snapshot:TrainingContentSnapshot;releases:Map<string,Stored>},publishOrdinaryStartPlans=false){
   const {snapshot}=content
+  const startUnits:PublishedStartScale[]|undefined=publishOrdinaryStartPlans?[]:undefined
   if(snapshot.schemaVersion!==1)return {snapshot,snapshotHash:canonicalHash(snapshot)}
   const hasEligible=snapshot.units.some(publishedArtifactEligible)
   const hasTargetScale=snapshot.units.some(unit=>unit.family==='SCALE'&&unit.source.kind==='SCALE')
@@ -566,7 +575,8 @@ export async function attachPublishedScaleArtifacts(db:Prisma.TransactionClient,
     if(!hasTargetScale)return {snapshot,snapshotHash:canonicalHash(snapshot)}
     const next=trainingContentSnapshotSchema.parse({...snapshot,artifactsRequired:true})
     const snapshotHash=canonicalHash(next)
-    await attachLegacyScaleArtifactsForSnapshot(db,composite,next,snapshotHash,content.releases)
+    await attachLegacyScaleArtifactsForSnapshot(db,composite,next,snapshotHash,content.releases,startUnits)
+    if(startUnits?.length===composite.items.length)await appendPublishedStartPlans(db,startUnits)
     return {snapshot:next,snapshotHash}
   }
   const items=new Map(composite.items.map((item:any)=>[item.id,item]))
@@ -575,11 +585,13 @@ export async function attachPublishedScaleArtifacts(db:Prisma.TransactionClient,
     if(!publishedArtifactEligible(unit)){units.push(unit);continue}
     const built=await buildScaleUnitArtifact(db,items.get(unit.itemId),unit,content.releases.get(unit.measurement.releaseId))
     if(typeof built==='string')fail('SOURCE_MISMATCH')
+    startUnits?.push({itemId:unit.itemId,scale:items.get(unit.itemId).scale,artifact:built.artifact})
     units.push({...unit,artifact:await appendPublishedScaleArtifact(db,built)})
   }
   const next=trainingContentSnapshotSchema.parse({...snapshot,schemaVersion:2,units})
   assertTrainingSnapshotArtifacts(next)
   const snapshotHash=canonicalHash(next)
-  await attachLegacyScaleArtifactsForSnapshot(db,composite,next,snapshotHash,content.releases)
+  await attachLegacyScaleArtifactsForSnapshot(db,composite,next,snapshotHash,content.releases,startUnits)
+  if(startUnits?.length===composite.items.length)await appendPublishedStartPlans(db,startUnits)
   return {snapshot:next,snapshotHash}
 }

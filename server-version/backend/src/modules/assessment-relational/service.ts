@@ -95,13 +95,14 @@ export const createRelationalAssessmentService = (repository: RelationalAssignme
       startedAt?: string
       /** Optional same-transaction already-loaded assignment under the caller's execution lock. */
       knownAssignment?: RelationalAssignmentRecordV1
+      acceptedConsentInTransaction?: ResolvedRelationalConsentV1 | null
     }) {
       const assignment = input.knownAssignment && input.knownAssignment.assignmentId === input.assignmentId
         ? input.knownAssignment
         : await requireAssignment(input.assignmentId)
-      const resolvedConsent = assignment.consentId
-        ? await repository.resolveAcceptedConsent(assignment)
-        : null
+      const resolvedConsent = input.acceptedConsentInTransaction !== undefined
+        ? input.acceptedConsentInTransaction
+        : assignment.consentId ? await repository.resolveAcceptedConsent(assignment) : null
       const consentAcceptedAt = resolvedConsent?.acceptedAt ?? null
       assertAssignmentStartable({ assignment, actorUserId: input.actorUserId, consentAcceptedAt })
       const startedAt = input.startedAt ?? new Date().toISOString()

@@ -1,7 +1,8 @@
+import { ordinarySelfWholeEnabled, publishedSelfScaleTrackSql } from './ordinarySelfWholeAccess'
 import {privateFormTrackIdentitySql} from './educationPrivateFormIdentitySql'
 import {educationCompositionTrackIdentitySql} from './educationCompositionIdentitySql'
 import {privateScaleRegistryIdentitySql} from './educationPrivateScaleIdentitySql'
-import { Prisma } from '@prisma/client'
+import { Prisma, type CompositeAssessmentAttempt } from '@prisma/client'
 import { currentWindowSql } from './currentActorAuthority'
 import {
   buildDecomposedSingleExecutionAuthoritySql,
@@ -90,6 +91,55 @@ const buildTargetedEducationLibrarySql = (envelope: StartAuthorityKnownEnvelope)
     )`
   }
   return null
+}
+
+type ExistingStartAttempt = Pick<CompositeAssessmentAttempt, 'id' | 'compositeAssessmentId' | 'userId' |
+  'subjectUserId' | 'respondentUserId' | 'respondentType' | 'episodeId' | 'assignmentRef' | 'consentId'>
+export type PublishedSelfIntake = { existingAttempt: ExistingStartAttempt | null }
+
+/** A published ordinary SELF task already names its participant. The locked
+ * intake state decides whether this participant can create a new attempt. */
+export async function assertPublishedSelfWholeStartAuthority(
+  tx: Prisma.TransactionClient,
+  known: StartAuthorityKnownEnvelope | undefined,
+  scope: RunPopulationProductScope,
+  assignmentRef: string | null | undefined,
+): Promise<PublishedSelfIntake | null> {
+  const product = scope === 'CAMPUS_ONLY' ? 'SCHOOL' : scope === 'HUITEACHER_ONLY' ? 'TEACHER' : null
+  const role = product === 'SCHOOL' ? 'STUDENT' : 'TEACHER'
+  if (!product || !assignmentRef || !ordinarySelfWholeEnabled() || !known
+    || known.subjectActorSnapshotId !== known.respondentActorSnapshotId || known.relationshipKind !== 'SELF'
+    || known.subjectRole !== role || !known.trackResourceKey?.startsWith('education-composition:' + product + ':')
+    || !known.trackResourceKey.endsWith(':' + role + ':SELF:1.0.0')) return null
+  const activity = product === 'SCHOOL'
+    ? Prisma.sql`campus_activity_runs link JOIN campus_activities activity
+        ON activity.course_id=link.course_id AND activity.organization_id=link.organization_id`
+    : Prisma.sql`huiteacher_evaluation_run_links link JOIN huiteacher_evaluation_events activity
+        ON activity.id=link.event_id AND activity.organization_id=link.organization_id`
+  const [row] = await tx.$queryRaw<Array<PublishedSelfIntake & { active: boolean; open: boolean }>>`
+    SELECT EXISTS (SELECT 1 FROM users u WHERE u.id=${known.subjectUserId} AND u.account_domain='SCHOOL'
+      AND u.is_active AND NOT u.is_frozen AND NOT u.must_change_password
+      AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
+      AND ${product === 'SCHOOL' ? Prisma.sql`u.role='STUDENT'` : Prisma.sql`u.role IN ('TEACHER','ADMIN') AND u.teacher_approved`}) AS active,
+      EXISTS (SELECT 1 FROM ${activity}
+        WHERE link.organization_id=t.organization_id AND link.run_id=t.run_id AND activity.status='OPEN')
+      AND ${known.intakeDeadline === null ? Prisma.sql`TRUE` : Prisma.sql`${known.intakeDeadline}>statement_timestamp()`}
+      AND EXISTS (SELECT 1 FROM education_product_entitlements ent WHERE ent.organization_id=t.organization_id
+        AND ent.product=${product === 'SCHOOL' ? 'HUISCHOOL' : 'HUITEACHER'} AND ent.status='ACTIVE') AS open,
+      (SELECT jsonb_build_object('id',p.id,'compositeAssessmentId',p.composite_assessment_id,
+        'userId',p.user_id,'subjectUserId',p.subject_user_id,'respondentUserId',p.respondent_user_id,
+        'respondentType',p.respondent_type,'episodeId',p.episode_id,'assignmentRef',p.assignment_ref,'consentId',p.consent_id)
+        FROM composite_assessment_attempts p WHERE p.assignment_ref=${assignmentRef}
+        ORDER BY p.started_at DESC LIMIT 1) AS "existingAttempt"
+    FROM assessment_run_tracks t
+    WHERE t.id=${known.trackId} AND t.organization_id=${known.organizationId} AND t.run_id=${known.runId}
+      AND ${publishedSelfScaleTrackSql(Prisma.sql`t`, product)}
+  `
+  if (!row) return null
+  if (!row.active) throw new RunStartAdmissionError('RUN_ACCOUNT_INACTIVE', 'Current account cannot open this questionnaire', 403)
+  if (known.orgStatus !== 'ACTIVE') throw new RunStartAdmissionError('ORGANIZATION_SUSPENDED', 'Organization is suspended', 403)
+  if (!row.open) throw new RunStartAdmissionError('RUN_INTAKE_CLOSED', 'Questionnaire is no longer accepting new attempts', 403)
+  return { existingAttempt: row.existingAttempt }
 }
 
 /** Called with Organization SHARE -> Run SHARE -> Execution UPDATE held. */

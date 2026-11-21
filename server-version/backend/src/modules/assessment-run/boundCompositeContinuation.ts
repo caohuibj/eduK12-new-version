@@ -1,18 +1,7 @@
 import { Prisma } from '@prisma/client'
 
-/** For callers that already matched the exact respondent, assignment, attempt and frozen track. */
-export const boundCompositeStateAndConsentSql = (
-  assignment: Prisma.Sql, attempt: Prisma.Sql, acceptedWhole = false,
-): Prisma.Sql => Prisma.sql`(
-  ((${assignment}."status"='STARTED' AND ${attempt}."status"='IN_PROGRESS')
-      ${acceptedWhole ? Prisma.sql`OR (${assignment}."status"='COMPLETED' AND ${attempt}."status"='COMPLETED'
-        AND ${assignment}."completed_at"=${attempt}."completed_at"
-        AND EXISTS (SELECT 1 FROM composite_report_jobs receipt
-          WHERE receipt.attempt_id=${attempt}.id AND receipt.attempt_epoch=${attempt}.attempt_epoch
-            AND receipt.slot_set_hash=${attempt}.frozen_active_slot_set_hash
-            AND receipt.whole_submission_id IS NOT NULL AND receipt.whole_payload_hash IS NOT NULL
-            AND receipt.whole_accepted_at IS NOT NULL))` : Prisma.empty})
-  AND ((${assignment}."consent_id" IS NULL AND ${attempt}."consent_id" IS NULL)
+export const boundCompositeConsentSql = (assignment: Prisma.Sql, attempt: Prisma.Sql): Prisma.Sql => Prisma.sql`(
+  (${assignment}."consent_id" IS NULL AND ${attempt}."consent_id" IS NULL)
       OR EXISTS (
         SELECT 1 FROM "assessment_attempt_consents" issued
         JOIN "assessment_attempt_consents" accepted ON accepted."id"=${attempt}."consent_id"
@@ -25,7 +14,22 @@ export const boundCompositeStateAndConsentSql = (
           AND issued."revoked_at" IS NULL
           AND issued."subject_user_id"=${assignment}."subject_user_id"
           AND issued."respondent_user_id"=${assignment}."respondent_user_id"
-      ))
+      )
+)`
+
+/** For callers that already matched the exact respondent, assignment, attempt and frozen track. */
+export const boundCompositeStateAndConsentSql = (
+  assignment: Prisma.Sql, attempt: Prisma.Sql, acceptedWhole = false,
+): Prisma.Sql => Prisma.sql`(
+  ((${assignment}."status"='STARTED' AND ${attempt}."status"='IN_PROGRESS')
+      ${acceptedWhole ? Prisma.sql`OR (${assignment}."status"='COMPLETED' AND ${attempt}."status"='COMPLETED'
+        AND ${assignment}."completed_at"=${attempt}."completed_at"
+        AND EXISTS (SELECT 1 FROM composite_report_jobs receipt
+          WHERE receipt.attempt_id=${attempt}.id AND receipt.attempt_epoch=${attempt}.attempt_epoch
+            AND receipt.slot_set_hash=${attempt}.frozen_active_slot_set_hash
+            AND receipt.whole_submission_id IS NOT NULL AND receipt.whole_payload_hash IS NOT NULL
+            AND receipt.whole_accepted_at IS NOT NULL))` : Prisma.empty})
+  AND ${boundCompositeConsentSql(assignment, attempt)}
 )`
 
 /** Exact durable binding, not a pending START claim or another attempt by the same user.

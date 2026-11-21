@@ -8,7 +8,8 @@ import {hashScaleDefinition} from '../scale/scale-definition'
 import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
 import {resolveFrozenScaleInstructionForScale} from '../scale/onboarding/instrument-registry'
 import {frozenTripletInstruction} from '../survey/standard-triplet.model'
-import {appendLegacyScaleArtifactBinding,trainingContentSnapshotSchema} from '../composite/training-content-binding'
+import {appendPublishedStartPlans,type PublishedStartScale} from '../assessment-runtime/published-start-plans'
+import {appendLegacyScaleArtifactBinding,educationCompositionSlotPresentation,trainingContentSnapshotSchema} from '../composite/training-content-binding'
 import {privateScaleMeasurementInput} from './private-tool.runtime-source'
 import {privateScaleCode} from './private-tool.runtime-origin'
 import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
@@ -108,7 +109,7 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
   name:version.title,instruction:compiled.definition.instruction,createdBy:c.principal.userId,productKind:'ORGANIZATION_RESOURCE',status:'DRAFT',publicEnabled:false,copyable:false}})
  const sections:Prisma.CompositeFormSectionCreateManyInput[]=[],items:Prisma.CompositeAssessmentItemCreateManyInput[]=[]
  const units:unknown[]=[],manifest:EducationCompositionBinding['manifest']=[]
- const scaleArtifactTasks:Array<{itemId:string;leafKey:string;build:()=>ReturnType<typeof buildPublishedScaleArtifact>;releaseId:string;contentHash:string}>=[]
+ const scaleArtifactTasks:Array<{itemId:string;scale:PublishedStartScale['scale'];leafKey:string;build:()=>ReturnType<typeof buildPublishedScaleArtifact>;releaseId:string;contentHash:string}>=[]
  let context:EducationCompositionBinding['context']
  if(compiled.definition.contextFields?.length){
   const sectionId=randomUUID(),itemIds:string[]=[]
@@ -133,7 +134,7 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
     ...(derived?{referencePolicy:derived.referencePolicy,...(derived.report?{report:derived.report}:{})}:{})})
    const leafKey=`${leaf.provider}:${leaf.version.id}`
    scaleArtifactTasks.push({
-    itemId,
+    itemId,scale,
     leafKey,
     releaseId:release.releaseId,
     contentHash:release.contentHash,
@@ -192,12 +193,17 @@ export async function sealPrivateComposition(tx:Tx,c:PrivateToolContext,version:
  await tx.compositeAssessment.update({where:{id:parent.id},data:{code:key,creationKey:key,creationHash:canonicalHash(origin),
   trainingContentSnapshot:snapshot as unknown as Prisma.InputJsonValue,trainingContentSnapshotHash:manifestHash}})
  if(scaleArtifactTasks.length&&typeof (tx as any).$queryRaw==='function'&&typeof (tx as any).$executeRaw==='function'){
+  const startUnits:PublishedStartScale[]=[]
   const builtByLeaf=new Map<string,ReturnType<typeof buildPublishedScaleArtifact>>()
   for(const task of scaleArtifactTasks){
    let built=builtByLeaf.get(task.leafKey)
    if(!built){built=task.build();builtByLeaf.set(task.leafKey,built)}
    await appendLegacyScaleArtifactBinding(tx,{compositeId:parent.id,publicationHash:manifestHash,itemId:task.itemId,
     built,releaseId:task.releaseId,contentHash:task.contentHash})
+   startUnits.push({itemId:task.itemId,scale:task.scale,artifact:built.artifact})
+  }
+  if(!sections.length&&startUnits.length===items.length&&origin.variantKey.endsWith(':SELF')){
+   await appendPublishedStartPlans(tx,startUnits,educationCompositionSlotPresentation(snapshot.educationBinding!))
   }
  }
  return {compositeId:parent.id,resourceKey:key,version:origin.adapterVersion,manifestHash,origin,status:'DRAFT' as const,identityOnly:true as const,canPublish:false as const}

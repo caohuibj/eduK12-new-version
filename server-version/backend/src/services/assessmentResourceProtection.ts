@@ -99,10 +99,29 @@ let sample: AssessmentResourceSample | null = null
 let memSampleAt = -Infinity
 let cpuSampleAt = -Infinity
 let previousCpu: { total: number; idle: number } | null = null
-export const sampleAssessmentHostResources = (options?: { forceMemoryRefresh?: boolean }): AssessmentResourceSample => {
+const CPU_RECOVERY_POLL_MS = 250
+let runRecoveryProbeAt = -Infinity
+
+const readHostCpuCounters = (): NonNullable<typeof previousCpu> | null => {
+  try {
+    const times = readFileSync('/proc/stat', 'utf8').split('\n')[0].trim().split(/\s+/).slice(1, 9).map(Number)
+    if (times.length === 8 && times.every(Number.isFinite)) {
+      return { total: times.reduce((a, v) => a + v, 0), idle: times[3] + times[4] }
+    }
+  } catch { /* Missing observation narrows concurrency. */ }
+  return null
+}
+
+const hostCpuPercent = (current: NonNullable<typeof previousCpu>) =>
+  previousCpu && current.total > previousCpu.total
+    ? Math.max(0, Math.min(100, 100 * (1 - (current.idle - previousCpu.idle) / (current.total - previousCpu.total))))
+    : null
+
+export const sampleAssessmentHostResources = (options?: { forceMemoryRefresh?: boolean; reportCpuRecoveryProbe?: boolean }): AssessmentResourceSample => {
   const at = performance.now()
   const needsMemory = Boolean(options?.forceMemoryRefresh) || !sample || at - memSampleAt >= 1000
-  const needsCpu = !sample || at - cpuSampleAt >= 1000
+  const cpuSampleInterval = options?.reportCpuRecoveryProbe ? CPU_RECOVERY_POLL_MS : 1000
+  const needsCpu = !sample || at - cpuSampleAt >= cpuSampleInterval
   if (!needsMemory && !needsCpu && sample) return sample
 
   let availableBytes = sample?.availableBytes ?? null
@@ -120,14 +139,11 @@ export const sampleAssessmentHostResources = (options?: { forceMemoryRefresh?: b
 
   if (needsCpu) {
     cpuPercent = null
-    try {
-      const times = readFileSync('/proc/stat', 'utf8').split('\n')[0].trim().split(/\s+/).slice(1, 9).map(Number)
-      if (times.length === 8 && times.every(Number.isFinite)) {
-        const total = times.reduce((a, v) => a + v, 0), idle = times[3] + times[4]
-        if (previousCpu && total > previousCpu.total) cpuPercent = Math.max(0, Math.min(100, 100 * (1 - (idle - previousCpu.idle) / (total - previousCpu.total))))
-        previousCpu = { total, idle }
-      }
-    } catch { /* Missing observation narrows concurrency; it never loses a receipt. */ }
+    const current = readHostCpuCounters()
+    if (current) {
+      cpuPercent = hostCpuPercent(current)
+      previousCpu = current
+    }
     cpuSampleAt = at
     nextCpuSampleAt = at
   }
@@ -253,6 +269,7 @@ export class AssessmentResourceProtection {
 }
 const policy = new AssessmentResourceProtection()
 let previousMode = '', modeSince = performance.now()
+let reportCpuProtected = false
 let previousStartMode = '', startModeSince = performance.now()
 let trickleGateCache: {
   maxConcurrent: number
@@ -323,9 +340,11 @@ export const resetAssessmentResourceProtectionForTests = (): void => {
   memSampleAt = -Infinity
   cpuSampleAt = -Infinity
   previousCpu = null
+  runRecoveryProbeAt = -Infinity
   policy.reset()
   previousMode = ''
   modeSince = performance.now()
+  reportCpuProtected = false
   previousStartMode = ''
   startModeSince = performance.now()
   cachedTrickleConfig = null
@@ -334,7 +353,12 @@ export const resetAssessmentResourceProtectionForTests = (): void => {
 
 export const reportResourceClaimDecision = (concurrency: number): ResourceClaimDecision => {
   if (!enabled()) return { mode: 'normal', limit: concurrency, delayMs: 0, reason: null }
-  const value = sampleAssessmentHostResources(), decision = policy.decision(value, concurrency)
+  // A protected worker still claims nothing. Recheck CPU recovery sooner so
+  // a short saturation spike does not hold all durable receipts for a full second.
+  const value = sampleAssessmentHostResources({ reportCpuRecoveryProbe: reportCpuProtected })
+  const resourceDecision = policy.decision(value, concurrency)
+  reportCpuProtected = resourceDecision.reason === 'host_cpu'
+  const decision = reportCpuProtected ? { ...resourceDecision, delayMs: CPU_RECOVERY_POLL_MS } : resourceDecision
   if (decision.mode !== previousMode) {
     logger.info('ASSESSMENT_RESOURCE_MODE ' + JSON.stringify({ ...decision, previousMode, previousModeMs: performance.now() - modeSince, ...value }))
     previousMode = decision.mode; modeSince = performance.now()
@@ -435,9 +459,27 @@ const startCpuPaused = (sample: AssessmentResourceSample): boolean =>
 export const isAssessmentStartCpuPaused = (): boolean =>
   enabled() && startCpuPaused(sampleAssessmentHostResources())
 
-/** Called with an existing Run START slot but before taking a DB connection.
- * Give the CPU latch a short chance to clear while previously admitted work drains. */
-export const awaitScaleCompositionStartResources = async (): Promise<boolean> => {
+const runStartRecoverySample = (value: AssessmentResourceSample): AssessmentResourceSample => {
+  const now = performance.now()
+  if (now - Math.max(cpuSampleAt, runRecoveryProbeAt) < CPU_RECOVERY_POLL_MS) return value
+  runRecoveryProbeAt = now
+  const counters = readHostCpuCounters()
+  const cpuPercent = counters ? hostCpuPercent(counters) : null
+  // Recovery-only probes do not increment the high-CPU trip or retry counters.
+  if (cpuPercent === null || cpuPercent > 90) return value
+  previousCpu = counters
+  cpuSampleAt = now
+  return (sample = { ...value, at: now, cpuAt: now, cpuPercent })
+}
+
+export const isAssessmentRunStartCpuPaused = (): boolean => {
+  if (!enabled()) return false
+  const value = sampleAssessmentHostResources()
+  return startCpuPaused(value) && startCpuPaused(runStartRecoverySample(value))
+}
+
+/** Give the CPU latch a short chance to clear before checkout. */
+export const awaitScaleCompositionStartResources = async (probeRunRecovery = false): Promise<boolean> => {
   if (!enabled()) return false
   const deadline = performance.now() + 3000
   let sample = sampleAssessmentHostResources()
@@ -446,6 +488,7 @@ export const awaitScaleCompositionStartResources = async (): Promise<boolean> =>
     if (remaining <= 0) break
     await delay(Math.min(250, remaining))
     sample = sampleAssessmentHostResources()
+    if (probeRunRecovery && startCpuPaused(sample)) sample = runStartRecoverySample(sample)
   }
   assertAssessmentStartResources()
   return normalStartMemory(sample) && sample.cpuPercent !== null

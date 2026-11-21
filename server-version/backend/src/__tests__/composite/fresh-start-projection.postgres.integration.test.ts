@@ -41,7 +41,7 @@ suite('fresh untimed whole START projection / PostgreSQL',()=>{
   }
  },60000)
  afterAll(async()=>{vi.unstubAllEnvs();await(await import('../../config/queue')).closeQueues(true);await db.$disconnect()})
- it('projects from fresh rows without post-gate reads, and Definition freezes all nine admissions',async()=>{
+ it('projects from fresh rows without post-gate reads, with all nine admissions already frozen',async()=>{
   const result=await startUserAttempt(students[0],compositeId)
   expect(result.freshlyCreated).toBe(true)
   expect(result.attempt.executionMode).toBe('WHOLE_LOCAL')
@@ -49,7 +49,7 @@ suite('fresh untimed whole START projection / PostgreSQL',()=>{
   const composite=await loadComposite(compositeId,true)
   const children=await db.assessment.findMany({where:{compositeAttemptId:parent.id},include:{scale:true}})
   expect(children).toHaveLength(9)
-  expect(children.every(child=>child.frozenAdmissionSnapshotHash===null)).toBe(true)
+  expect(children.every(child=>Boolean(child.frozenAdmissionSnapshotHash))).toBe(true)
   const raw=vi.spyOn(db,'$queryRaw'),snapshots=vi.spyOn(db.assessmentUnitSnapshot,'findMany'),child=vi.spyOn(db.assessment,'findUnique')
   try{
    const projected=await projectFreshStartedAttempt(parent,composite,children,{userId:students[0]},null)

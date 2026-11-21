@@ -2,7 +2,7 @@ import {stableStudyAdmissionHash} from '../anonymous-study/admission-principal'
 import { assertTrainingChildSelected, loadTrainingChildAdmissionParent, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
 import {readTrainingTimingSnapshot,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { loadStoredVersionedUnitAdmission } from '../assessment-runtime/unit-admission'
-import { storeSharedUnitAdmission } from '../assessment-runtime/shared-control-records'
+import { storeSharedUnitAdmissions } from '../assessment-runtime/shared-control-records'
 import { withSerializableScaleTransaction } from './deployment/transactions'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -542,15 +542,12 @@ const persistAdmissionsBatch = async (
   const result = new Map<string, VersionedFrozenUnitAdmission>()
   if (items.length === 0) return result
   // Same shared-storage payload per child as persistVersionedAdmissionOnce.
-  const persisted: Array<{ assessmentId: string; snapshot: VersionedFrozenUnitAdmission; encrypted: string; hash: string }> = []
-  for (const item of items) {
-    persisted.push({
-      assessmentId: item.assessmentId,
-      snapshot: item.snapshot,
-      encrypted: await storeSharedUnitAdmission(item.snapshot, db),
-      hash: item.snapshot.snapshotHash,
-    })
-  }
+  const encrypted = await storeSharedUnitAdmissions(items.map(item => item.snapshot), db)
+  const persisted = items.map((item, index) => ({
+    ...item,
+    encrypted: encrypted[index],
+    hash: item.snapshot.snapshotHash,
+  }))
   const ids = persisted.map((entry) => entry.assessmentId)
   const written = await db.$executeRaw`
     UPDATE "assessments"

@@ -3,6 +3,9 @@ import { describe, expect, it } from 'vitest'
 const read = (name: string) => readFileSync(`src/${name}`, 'utf8')
 const composite = read('modules/composite/composite.service.ts')
 const admission = composite.slice(composite.indexOf('const createAttempt = async'), composite.indexOf('const createAttempt = async') + 30000)
+// Read the complete insert payload, not the 30k-character admission-ordering excerpt.
+const attemptInsertStart = composite.indexOf('const attempt = await db.compositeAssessmentAttempt.create', composite.indexOf('const createAttempt = async'))
+const attemptInsertData = composite.slice(attemptInsertStart, composite.indexOf('compositeAssessmentId: composite.id', attemptInsertStart))
 describe('C22 runtime wiring source contracts (not concurrency/HTTP evidence)', () => {
   it('binds feedback under the existing publication/course/round locks and atomic attempt insert', () => {
     const lock = admission.indexOf('await lockCompositeAdmissionShare(db'), marker = admission.indexOf('const feedbackConfigured ='), bind = admission.indexOf('feedbackBinding = prepareTrainingFeedbackBinding(')
@@ -11,7 +14,9 @@ describe('C22 runtime wiring source contracts (not concurrency/HTTP evidence)', 
     expect(admission).toContain('FOR SHARE OF c,u'); expect(admission).toContain('accessTokenId, round: feedbackRound')
     const freeze = admission.indexOf('const trainingFeedbackSnapshot ='), insert = admission.indexOf('const attempt = await db.compositeAssessmentAttempt.create')
     expect(freeze).toBeGreaterThan(bind); expect(insert).toBeGreaterThan(freeze)
-    expect(admission.slice(insert, insert + 500)).toContain('trainingFeedbackSnapshotHash: canonicalHash(trainingFeedbackSnapshot)')
+    const insertData = attemptInsertData
+    expect(insertData).toContain('...(trainingFeedbackSnapshot ? { trainingFeedbackSnapshot: trainingFeedbackSnapshot as Prisma.InputJsonValue,')
+    expect(insertData).toContain('trainingFeedbackSnapshotHash: canonicalHash(trainingFeedbackSnapshot)')
     expect(admission).not.toContain('trainingPublicRound.create')
     expect(admission).not.toContain('compositeAssessmentAccessToken.create')
   })

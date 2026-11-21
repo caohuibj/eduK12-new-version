@@ -37,6 +37,7 @@ import {
   assertAssessmentStartResources,
   awaitScaleCompositionStartResources,
   isAssessmentStartCpuPaused,
+  isAssessmentRunStartCpuPaused,
   withAdmittedScaleCompositionStart,
   reportResourceClaimDecision,
   resetAssessmentResourceProtectionForTests,
@@ -96,6 +97,27 @@ describe('runWithLowMemoryTrickleAdmission runtime gate & ALS permit', () => {
       expect(() => assertAssessmentStartResources()).toThrow(/系统繁忙/)
     })
     advanceSample(850, 99)
+    expect(() => assertAssessmentStartResources()).toThrow(/系统繁忙/)
+  })
+
+  it('rechecks a protected Run START at 250ms while retaining the normal two-sample trip', () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+    sampleAssessmentHostResources()
+    advanceSample(850, 99)
+    expect(isAssessmentRunStartCpuPaused()).toBe(false)
+    advanceSample(850, 99)
+    expect(isAssessmentRunStartCpuPaused()).toBe(true)
+
+    clock += 250
+    proc.advanceCpuPercent(99)
+    expect(isAssessmentRunStartCpuPaused()).toBe(true)
+    clock += 250
+    proc.advanceCpuPercent(30)
+    expect(isAssessmentRunStartCpuPaused()).toBe(false)
+    expect(() => assertAssessmentStartResources()).not.toThrow()
+
+    advanceSample(640, 25)
     expect(() => assertAssessmentStartResources()).toThrow(/系统繁忙/)
   })
 
@@ -383,5 +405,26 @@ describe('runWithLowMemoryTrickleAdmission runtime gate & ALS permit', () => {
 
     gate.resolve()
     await expect(p).resolves.toBe('ok')
+  })
+
+  it('rechecks report CPU recovery without claiming under sustained CPU or changing the memory wait', () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    reportResourceClaimDecision(3)
+    advanceSample(950, 98)
+    expect(reportResourceClaimDecision(3)).toMatchObject({ mode: 'normal', limit: 3 })
+    advanceSample(950, 98)
+    const cpuPause = { mode: 'protected', limit: 0, delayMs: 250, reason: 'host_cpu' }
+    expect(reportResourceClaimDecision(3)).toMatchObject(cpuPause)
+    clock += 249
+    proc.advanceCpuPercent(97)
+    expect(reportResourceClaimDecision(3)).toMatchObject(cpuPause)
+    clock += 1
+    expect(reportResourceClaimDecision(3)).toMatchObject(cpuPause)
+    clock += 250
+    proc.advanceCpuPercent(75)
+    expect(reportResourceClaimDecision(3)).toMatchObject({ mode: 'normal', limit: 3, delayMs: 0 })
+
+    advanceSample(500, 30)
+    expect(reportResourceClaimDecision(3)).toMatchObject({ mode: 'protected', limit: 0, delayMs: 1000, reason: 'host_memory' })
   })
 })

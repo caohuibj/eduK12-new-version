@@ -1,7 +1,7 @@
 /** Server-only, transaction-bound proof issued after exact education START admission.
  * A serialized product hint cannot select the education SJT runtime path. */
 export interface VerifiedEducationStart { readonly kind: 'VERIFIED_EDUCATION_START' }
-type Facts={tx:object;product:'SCHOOL'|'TEACHER';compositeId:string;assignmentRef:string;subjectUserId?:string;respondentUserId:string;composition?:EducationCompositionPolicyBinding;longitudinal?:boolean}
+type Facts={tx:object;product:'SCHOOL'|'TEACHER';compositeId:string;assignmentRef:string;subjectUserId?:string;respondentUserId:string;composition?:EducationCompositionPolicyBinding;checkedScaleIds?:ReadonlySet<string>;longitudinal?:boolean}
 const proofs=new WeakMap<object,Facts>()
 export function issueVerifiedEducationStart(facts:Facts):VerifiedEducationStart {
  const origin=facts.composition?.origin
@@ -23,7 +23,8 @@ export function readVerifiedEducationStart(proof:VerifiedEducationStart,expected
 export function readVerifiedCompositionStart(proof:VerifiedEducationStart|undefined,expected:Omit<Facts,'product'>){
  if(!proof)return undefined
  readVerifiedEducationStart(proof,expected)
- return proofs.get(proof)?.composition
+ const facts=proofs.get(proof)
+ return facts?.composition?{binding:facts.composition,checkedScaleIds:facts.checkedScaleIds}:undefined
 }
 export interface VerifiedEducationAttempt { readonly kind:'VERIFIED_EDUCATION_ATTEMPT' }
 const attempts=new WeakMap<object,Facts&{attemptId:string}>()

@@ -23,6 +23,8 @@ export type BoundedAdmissionGateOptions = {
    */
   onStateChange?: (active: number, queued: number) => void
   onRejection?: (reason: BoundedAdmissionReason) => void
+  /** A host-wide pause leaves operations in the existing bounded FIFO. */
+  pauseDispatchWhile?: () => boolean
 }
 
 export const positiveInteger = (value: number, name: string, allowZero = false): number => {
@@ -90,6 +92,7 @@ type QueuedOperation<T> = {
  */
 export class BoundedAdmissionGate {
   private active = 0
+  private pauseTimer: ReturnType<typeof setTimeout> | undefined
   private readonly queue: Array<QueuedOperation<unknown>> = []
   private readonly retryAfterSeconds: number
   private readonly busyCode: string
@@ -136,7 +139,9 @@ export class BoundedAdmissionGate {
   }
 
   run<T>(operation: () => Promise<T>, maxQueueWaitMs?: number): Promise<T> {
-    if (this.active < this.options.maxConcurrent) return this.execute(operation)
+    if (this.queue.length === 0 && this.active < this.options.maxConcurrent && !this.options.pauseDispatchWhile?.()) {
+      return this.execute(operation)
+    }
     if (this.queue.length >= this.options.maxQueue) {
       this.rejectBusy('queue_full')
       return Promise.reject(this.busyError('queue_full'))
@@ -159,6 +164,7 @@ export class BoundedAdmissionGate {
       }, waitMs)
       this.queue.push(entry as QueuedOperation<unknown>)
       this.publishState()
+      if (this.options.pauseDispatchWhile) this.drain()
     })
   }
 
@@ -191,6 +197,14 @@ export class BoundedAdmissionGate {
 
   private drain(): void {
     while (this.active < this.options.maxConcurrent && this.queue.length > 0) {
+      if (this.options.pauseDispatchWhile?.()) {
+        this.pauseTimer ??= setTimeout(() => {
+          this.pauseTimer = undefined
+          this.drain()
+          this.publishState()
+        }, 100)
+        return
+      }
       const entry = this.queue.shift()!
       clearTimeout(entry.timer)
       // A busy event loop can delay the timer until after the slot releases.

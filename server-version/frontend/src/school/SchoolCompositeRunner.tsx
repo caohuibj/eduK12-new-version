@@ -65,6 +65,10 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
   const needsAdmissionConsent=!!execution.consentRequired&&!execution.resumeExisting
   const prefix=`/organizations/${execution.organizationId}/activities/${execution.courseId}/runs/${execution.runId}/executions/${execution.executionId}`
   const wrapped=<T,>(data:T):ApiResponse<T>=>({code:0,message:'成功',data})
+  const markCompleted=useCallback((attemptId:string)=>{
+    setDone(true)
+    if(!observer&&completion.current!==attemptId){completion.current=attemptId;onParentCompletedRef.current?.()}
+  },[observer])
   const load=useCallback(async(id:string)=>{
     inlineWholeRef.current=null
     setFreshStart(false)
@@ -74,11 +78,8 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
     if(result.deliveryMode!=='FINAL_ONLY')throw new Error('不支持通过校园入口重启历史旧版测评')
     activeIdentityRef.current=educationAttemptIdentity(result)
     setState(result)
-    if(result.status==='COMPLETED'){
-      setDone(true)
-      if(!observer&&completion.current!==result.id){completion.current=result.id;onParentCompletedRef.current?.()}
-    }
-  },[api,identity,observer])
+    if(result.status==='COMPLETED')markCompleted(result.id)
+  },[api,identity,markCompleted])
   const start=async()=>{
     setBusy(true);setError('');inlineWholeRef.current=null;setFreshStart(false)
     try{
@@ -106,10 +107,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
         inlineWholeRef.current=inline?{attemptId:result.currentUnit.id,definition:inline}:null
         setFreshStart(Boolean(result.freshlyCreated))
         setState(result.currentUnit)
-        if(result.currentUnit.status==='COMPLETED'){
-          setDone(true)
-          if(!observer&&completion.current!==result.currentUnit.id){completion.current=result.currentUnit.id;onParentCompletedRef.current?.()}
-        }
+        if(result.currentUnit.status==='COMPLETED')markCompleted(result.currentUnit.id)
       }else{
         await load(result.runtimeBindingRef)
       }
@@ -293,7 +291,13 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
       acceptedNotice="答案已保存，正在处理。完成状态以服务器确认的测评记录为准，交卷回执不会开放个人报告。"
       acceptedAction="查看完成状态"
       committedMessage="答案已保存，正在处理。请勿重复交卷。"
-      onCompleted={()=>{void load(state.id)}}
+      onCompleted={progress=>{
+        if(currentIdentity.current!==identity)return
+        if(progress?.runCompleted&&progress.attemptId===state.id&&progress.attemptEpoch===state.attemptEpoch){
+          setState({...state,status:'COMPLETED',progress:100,currentItem:null,allUnitsSubmitted:true})
+          markCompleted(state.id)
+        }else void load(state.id)
+      }}
     />:stepped??<div className="hs-school-task-launch">
       {observerReady&&<p className="hs-observer-ready-prompt">确认任务后，开始或继续本次测评。</p>}
       {needsAdmissionConsent&&<div className="hs-panel hs-runner-consent">

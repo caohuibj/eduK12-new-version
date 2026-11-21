@@ -1,5 +1,6 @@
 import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
+import type { FrozenCompositionTrack } from './educationCompositionExecution'
 
 export class RunResourceBoundaryError extends Error {
   constructor(public readonly code: string, message: string, public readonly statusCode = 404) {
@@ -9,6 +10,7 @@ export class RunResourceBoundaryError extends Error {
 }
 
 export type RunStartPreflight = {
+  publishedSelfScale?: boolean
   runtimeBindingKind: string | null
   runtimeBindingRef: string | null
   respondentUserId: string
@@ -16,6 +18,7 @@ export type RunStartPreflight = {
   preloadCompositeId?: string | null
   /** Exact SELF composition hint from the product route, verified again under the START locks. */
   compositionStartCompositeId?: string | null
+  compositionStartTrack?: FrozenCompositionTrack | null
   organizationId?: string
   runId?: string
 }

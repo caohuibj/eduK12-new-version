@@ -46,7 +46,7 @@ type EducationWholeMedia = {
   loadFormImage: (sectionId: string, assetId: string) => Promise<Blob>
   loadFormVideo: (sectionId: string, itemId: string, optionIndex: number) => Promise<AssessmentVideoCapabilitySources>
 }
-type Props = { state: CompositeAttemptState; api: WholeQuestionnaireApi; publicMode?: boolean; recoveryToken?: string; isFreshStart?: boolean; fallback: ReactNode; onExit: () => void; onCompleted: () => void; educationMedia?: EducationWholeMedia; acceptedNotice?: string; acceptedAction?: string; committedMessage?: string }
+type Props = { state: CompositeAttemptState; api: WholeQuestionnaireApi; publicMode?: boolean; recoveryToken?: string; isFreshStart?: boolean; fallback: ReactNode; onExit: () => void; onCompleted: (progress?: CompositeReportStatus) => void; educationMedia?: EducationWholeMedia; acceptedNotice?: string; acceptedAction?: string; committedMessage?: string }
 type Answer = { responseValue?: string | number; value?: unknown; responseTimeMs?: number; changeCount?: number; otherText?: string }
 export const wholeDraftKey = (id: string, epoch: number) => `composite-whole:${id}:${epoch}`
 export const wholeAnswerKey = (itemId: string, itemCode: string) => JSON.stringify([itemId, itemCode])
@@ -574,10 +574,16 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
         setBusy(true)
         try {
           const status = await api.reportStatus(state.id)
-          const data = status.data as { status?: string; reportStatus?: { state?: string } } | undefined
+          const data = status.data
           if (status.code !== 0 || !data) throw responseError(status)
-          if (data.status === 'COMPLETED' || data.reportStatus?.state === 'READY') { onCompleted(); return }
-          if (data.reportStatus?.state === 'FAILED') { setProgressNote('答案已保存，但后台处理失败。请稍后再次查看，不要重新交卷。'); return }
+          if (data.attemptId !== state.id || data.attemptEpoch !== (state.attemptEpoch ?? 1)) throw new Error('测评版本已变化，请返回任务查看。')
+          if (data.reportStatus.state === 'FAILED' || data.reportStatus.state === 'CANCELLED') {
+            setProgressNote(data.reportStatus.state === 'FAILED'
+              ? '答案已保存，但后台处理失败。请稍后再次查看，不要重新交卷。'
+              : '答案已保存，后台处理已取消。请稍后查看，不要重新交卷。')
+            return
+          }
+          if (data.status === 'COMPLETED' && data.reportStatus.state === 'READY') { onCompleted(data); return }
           setProgressNote('答案已保存，仍在处理。可以稍后再次查看，不必重新交卷。')
         } catch (cause) { setProgressNote(normalizeApiError(cause).message) }
         finally { setBusy(false) }

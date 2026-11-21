@@ -6,7 +6,9 @@ import {
   prepareWholeSubmissionPayload,
   submitWholeQuestionnaire,
   processWholeQuestionnaireAnswers,
+  readEducationWholeProgress,
 } from '../../modules/composite/whole-questionnaire.service'
+import { prisma } from '../../config/database'
 import { prepareCanonicalSubmission } from '../../services/instrumentFinalSubmit'
 import {
   encryptUnifiedRuntimePayload,
@@ -21,6 +23,23 @@ import {
 } from '../../services/wholeSubmitAdmission'
 
 describe('Scheme X Unified Whole Questionnaire Submit & Encrypted Ingestion (PR X-03)', () => {
+  it('uses the current epoch receipt in one progress query and preserves terminal failure during reconciliation', async () => {
+    const query = vi.spyOn(prisma, '$queryRaw').mockResolvedValueOnce([{
+      epoch: 2, parentStatus: 'COMPLETED', wholeSubmissionId: 'receipt', jobStatus: 'FAILED',
+    }]).mockResolvedValueOnce([])
+    try {
+      await expect(readEducationWholeProgress('attempt', 'owner', 'STARTED')).resolves.toEqual({
+        attemptId: 'attempt', attemptEpoch: 2, status: 'IN_PROGRESS', wholeSubmissionReceived: true,
+        reportStatus: { state: 'FAILED' },
+      })
+      expect(query).toHaveBeenCalledOnce()
+      expect(Array.from(query.mock.calls[0][0] as TemplateStringsArray).join('?')).toContain('job.attempt_epoch=parent.attempt_epoch')
+      await expect(readEducationWholeProgress('attempt', 'other-user', 'STARTED')).rejects.toMatchObject({ statusCode: 403 })
+    } finally {
+      query.mockRestore()
+    }
+  })
+
   it('validates schema accepting mixed Scale units and Form answers', () => {
     const validPayload = {
       submissionId: '0123456789abcdef0123456789abcdef',

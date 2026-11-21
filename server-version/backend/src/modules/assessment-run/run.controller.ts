@@ -17,6 +17,7 @@ import { error, instrumentError, success, unauthorized } from '../../utils/respo
 import { addAssessmentRunTrackDraft, createAssessmentRunDraft, type AssessmentRunStatus } from './repository'
 import { previewAssessmentRun, publishAssessmentRun } from './publish'
 import { startAssessmentRunExecution } from './startExecution'
+import { readOrdinarySelfWholeAccess, type OrdinarySelfWholeBinding } from './ordinarySelfWholeAccess'
 import { readAssessmentRunProgress } from './progress'
 import { cancelAssessmentRun, closeAssessmentRun } from './lifecycle'
 import {
@@ -287,13 +288,16 @@ export const assessmentRunController = {
   async startExecution(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     try {
+      const admitted = res.locals?.ordinarySelfWhole as OrdinarySelfWholeBinding | undefined
       const startPreflight = (res.locals as { startPreflight?: RunStartPreflight } | undefined)?.startPreflight
-        ?? await assertRunExecutionParent({
+        ?? (admitted ? undefined : await assertRunExecutionParent({
           organizationId: req.params.organizationId,
           runId: req.params.runId,
           executionId: req.params.executionId,
-        })
-      const started = await startAssessmentRunExecution({
+        }))
+      const started = admitted
+        ? { state: 'STARTED' as const, runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: admitted.id, replayed: true }
+        : await startAssessmentRunExecution({
         executionId: req.params.executionId,
         actorUserId: req.user.userId,
         ...(startPreflight ? { startPreflight } : {}),
@@ -310,9 +314,12 @@ export const assessmentRunController = {
       ) {
         const startMs = Date.now()
         try {
-          if (req.user.accountDomain === 'SCHOOL' && started.replayed) {
+          if (req.user.accountDomain === 'SCHOOL' && started.replayed && !admitted) {
             const { checkCampusCompositeAccessAuthority } = await import('../campus/campus-composite-authority')
-            const allowed = await checkCampusCompositeAccessAuthority({
+            const ordinary = startPreflight?.compositionStartTrack && req.user.role === 'STUDENT'
+              ? await readOrdinarySelfWholeAccess(prisma, 'SCHOOL', req.user.userId, { attemptId: started.runtimeBindingRef })
+              : null
+            const allowed = ordinary || await checkCampusCompositeAccessAuthority({
               attemptId: started.runtimeBindingRef,
               userId: req.user.userId,
             })

@@ -1,4 +1,5 @@
 import { checkCampusCompositeAccessDetails } from './campus-composite-authority'
+import { readOrdinarySelfWholeAccess } from '../assessment-run/ordinarySelfWholeAccess'
 import { Router, type Request,type Response,type NextFunction } from 'express'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -65,6 +66,18 @@ async function campusCompositeAccess(req:Request,res:Response,next:NextFunction)
     }
     return next()
   }catch(error){return next(error)}
+}
+async function campusWholeAccess(req:Request,res:Response,next:NextFunction){
+  try {
+    if(req.user?.accountDomain==='SCHOOL'&&req.user.role==='STUDENT'){
+      const proof=await readOrdinarySelfWholeAccess(prisma,'SCHOOL',req.user.userId,{attemptId:req.params.attemptId})
+      if(proof){res.locals.ordinarySelfWhole=proof;return next()}
+    }
+    return campusCompositeAccess(req,res,next)
+  } catch(error) {
+    if(isInstrumentFinalSubmitError(error))return instrumentError(res,error.code,error.message,error.statusCode)
+    return next(error)
+  }
 }
 async function campusFinalConsent(req:Request,res:Response,next:NextFunction){
   try{
@@ -216,18 +229,23 @@ router.post(campusCognitivePrefix+'/submit',
   authenticateSchool,campusCompositeAccess,campusCognitiveChildAccess,
   campusCognitiveFinalConsent,submitCampusCognitiveChild)
 
-router.get('/composite-attempts/:attemptId',authenticateSchool,campusCompositeAccess,
+router.get('/composite-attempts/:attemptId',authenticateSchool,campusWholeAccess,
   compositeController.getAttempt)
-router.get('/composite-attempts/:attemptId/whole',authenticateSchool,campusCompositeAccess,
+router.get('/composite-attempts/:attemptId/whole',authenticateSchool,campusWholeAccess,
   compositeController.wholeDefinition)
-router.get('/composite-attempts/:attemptId/whole/template/:templateHash',authenticateSchool,campusCompositeAccess,
+router.get('/composite-attempts/:attemptId/whole/template/:templateHash',authenticateSchool,campusWholeAccess,
   compositeController.wholeTemplate)
-router.get('/composite-attempts/:attemptId/whole/receipt',authenticateSchool,campusCompositeAccess,
+router.get('/composite-attempts/:attemptId/whole/receipt',authenticateSchool,campusWholeAccess,
   compositeController.wholeReceipt)
-router.get('/composite-attempts/:attemptId/whole/progress',authenticateSchool,campusCompositeAccess,
+router.get('/composite-attempts/:attemptId/whole/progress',authenticateSchool,campusWholeAccess,
   compositeController.educationWholeProgress)
-router.post('/composite-attempts/:attemptId/whole/submit',authenticateSchool,campusCompositeAccess,
-  compositeController.wholeSubmit)
+router.post('/composite-attempts/:attemptId/whole/submit',authenticateSchool,async(req,res,next)=>{
+  try{
+    if(req.user?.accountDomain==='SCHOOL'&&req.user.role==='STUDENT'
+      &&await compositeController.tryOrdinarySelfWholeSubmit(req,res,'SCHOOL'))return
+    return campusCompositeAccess(req,res,next)
+  }catch(error){return next(error)}
+},compositeController.wholeSubmit)
 router.get('/composite-attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content',
   authenticateSchool,campusCompositeAccess,compositeImageController.educationFormImage)
 router.get('/composite-attempts/:attemptId/items/:itemId/scale/assets/:assetId/content',

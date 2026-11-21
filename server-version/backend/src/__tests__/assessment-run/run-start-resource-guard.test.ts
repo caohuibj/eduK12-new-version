@@ -4,6 +4,7 @@ import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 const m = vi.hoisted(() => ({
   queryRaw: vi.fn(),
   acquireClaim: vi.fn(),
+  loadPublication: vi.fn(),
   constrained: vi.fn(),
   cpuPaused: vi.fn(),
   awaitResources: vi.fn(),
@@ -35,6 +36,7 @@ vi.mock('../../services/assessmentResourceProtection', async () => {
 })
 vi.mock('../../modules/composite/composite.service', () => ({
   buildWholeStartPreload: vi.fn(),
+  loadStartComposite: m.loadPublication,
   startRelationalCompositeAttemptInTransaction: vi.fn(),
 }))
 vi.mock('../../services/instrumentFinalSubmit', async () => {
@@ -45,8 +47,10 @@ vi.mock('../../services/instrumentFinalSubmit', async () => {
 })
 
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
-import { startAssessmentRunExecution } from '../../modules/assessment-run/startExecution'
+import { runStartGate, startAssessmentRunExecution } from '../../modules/assessment-run/startExecution'
 import {
+  prepareFrozenCompositionStart,
+  readCompositionExecutionSource,
   readFrozenCompositionIdentity,
   resetEducationCompositionIdentityCacheForTests,
 } from '../../modules/assessment-run/educationCompositionExecution'
@@ -121,14 +125,21 @@ describe('assessment-run pre-gate resource protection & composition identity cac
     m.cpuPaused.mockReturnValue(true)
     const busy = new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '系统繁忙', 503)
     m.awaitResources.mockRejectedValueOnce(busy)
-    await expect(startAssessmentRunExecution({
+    m.queryRaw.mockResolvedValueOnce([])
+    const start = () => startAssessmentRunExecution({
       executionId: uuid(10), actorUserId: uuid(1),
       startPreflight: {
         runtimeBindingKind: null, runtimeBindingRef: null, respondentUserId: uuid(1),
         compositionStartCompositeId: uuid(11),
       },
-    })).rejects.toBe(busy)
+    })
+    await expect(start()).rejects.toBe(busy)
     expect(m.awaitResources).toHaveBeenCalledOnce()
+    expect(m.queryRaw).toHaveBeenCalledOnce()
+    m.awaitResources.mockRejectedValueOnce(busy)
+    m.queryRaw.mockResolvedValueOnce([{ runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: uuid(99), respondentUserId: uuid(1) }])
+    await expect(start()).resolves.toMatchObject({ state: 'STARTED', runtimeBindingRef: uuid(99), replayed: true })
+    expect(m.queryRaw).toHaveBeenCalledTimes(2)
     expect(m.trickle).not.toHaveBeenCalled()
     expect(m.acquireClaim).not.toHaveBeenCalled()
   })
@@ -198,17 +209,38 @@ describe('assessment-run pre-gate resource protection & composition identity cac
       }],
     }
 
-    // 1. Cold cache -> runs heavy catalog join query
-    m.queryRaw.mockResolvedValueOnce([row])
-    const first = await readFrozenCompositionIdentity(prisma, { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' })
-    expect(first.title).toBe('Cached Teacher Composition')
+    const track = { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' }
+    // 1. The actual cold START preflight warms the catalog before invoking the claim.
+    m.loadPublication.mockImplementationOnce(async () => {
+      expect(runStartGate().getStats().active).toBe(0)
+      return { id: compositeId, trainingContentSnapshotHash: policy.educationComposition.manifestHash }
+    })
+    m.queryRaw.mockImplementationOnce(async () => {
+      expect(runStartGate().getStats().active).toBe(0)
+      return [row]
+    })
+    m.acquireClaim.mockImplementationOnce(async input => {
+      expect(runStartGate().getStats().active).toBe(1)
+      expect(input.preparedComposition).toMatchObject({
+        identity: { compositeId, policyHash },
+        provenance: { resourceKey: key, resourcePolicyHash: policyHash, scientificMaturity: 'PILOT' },
+      })
+      expect(m.queryRaw).toHaveBeenCalledTimes(1)
+      expect(m.queryRaw.mock.calls[0][0].sql).toContain('jsonb_array_elements')
+      return { kind: 'BOUND', runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: compositeId }
+    })
+    await startAssessmentRunExecution({ executionId: uuid(10), actorUserId: ownerId,
+      startPreflight: { runtimeBindingKind: null, runtimeBindingRef: null, respondentUserId: ownerId,
+        compositionStartCompositeId: compositeId, compositionStartTrack: track } })
+    expect(m.acquireClaim).toHaveBeenCalledOnce()
+    await prepareFrozenCompositionStart(track)
     expect(m.queryRaw).toHaveBeenCalledTimes(1)
     expect(m.queryRaw.mock.calls[0][0].sql).toContain('education_private_tool_versions')
 
     // 2. Warm cache -> runs only lightweight live PUBLISHED check on composite_assessments
     m.queryRaw.mockResolvedValueOnce([{ id: compositeId }])
-    const second = await readFrozenCompositionIdentity(prisma, { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' })
-    expect(second).toEqual(first)
+    const second = await readFrozenCompositionIdentity(prisma, track)
+    expect(second.title).toBe('Cached Teacher Composition')
     expect(m.queryRaw).toHaveBeenCalledTimes(2)
     expect(m.queryRaw.mock.calls[1][0].sql).not.toContain('jsonb_array_elements')
     expect(m.queryRaw.mock.calls[1][0].sql).toContain('education_private_tool_versions')
@@ -216,8 +248,27 @@ describe('assessment-run pre-gate resource protection & composition identity cac
 
     // 3. Retired/unpublished composite -> still fails closed on cache hit
     m.queryRaw.mockResolvedValueOnce([])
-    await expect(readFrozenCompositionIdentity(prisma, { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' }))
+    await expect(readFrozenCompositionIdentity(prisma, track))
       .rejects.toMatchObject({ code: 'PRIVATE_COMPOSITION_EXECUTION_INVALID', statusCode: 409 })
+
+    const sourceRow = {
+      ...track, product: 'TEACHER', assignmentRef: uuid(19), subjectUserId: ownerId, respondentUserId: ownerId,
+      subjectRole: 'TEACHER', respondentRole: 'TEACHER', relationshipKind: 'SELF', perspective: 'SELF_REPORT',
+      status: 'ASSIGNED', runStatus: 'PUBLISHED', assignmentStatus: 'OPEN',
+    }
+    const queryRaw = vi.fn().mockResolvedValueOnce([{ ...sourceRow, checkedAnchorCurrent: true }])
+      .mockResolvedValueOnce([{ ...sourceRow, checkedAnchorCurrent: false }])
+    const tx = { $queryRaw: queryRaw } as any
+    const checked = { tx, identity: second }
+    const input = { executionId: uuid(10), compositeId, actorUserId: ownerId }
+    const source = await readCompositionExecutionSource(tx, input, checked)
+    expect(source.identity).toBe(second)
+    expect(queryRaw).toHaveBeenCalledOnce()
+    expect(queryRaw.mock.calls[0][0].sql).toContain("c.status='PUBLISHED'")
+    expect(queryRaw.mock.calls[0][0].sql).not.toContain('jsonb_array_elements')
+    await expect(readCompositionExecutionSource(tx, input, checked)).rejects.toMatchObject({
+      code: 'PRIVATE_COMPOSITION_EXECUTION_INVALID',
+    })
   })
 
   it('never writes global cache from scoped transactions, and re-verifies full source anchors on cross-tx hits', async () => {

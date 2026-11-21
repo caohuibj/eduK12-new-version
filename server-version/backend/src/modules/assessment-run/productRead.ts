@@ -1,5 +1,6 @@
 import { boundCompositeContinuationSql } from './boundCompositeContinuation'
 import { Prisma } from '@prisma/client'
+import { ordinarySelfWholeEnabled, publishedSelfScaleTrackSql } from './ordinarySelfWholeAccess'
 import { currentRunPopulationAuthoritySql, type RunPopulationProductScope } from './currentPopulationAuthority'
 import {completedSchoolOrdinaryFeedbackSql} from './completedSchoolFeedback'
 import { educationCompositionTrackIdentitySql } from './educationCompositionIdentitySql'
@@ -341,6 +342,23 @@ async function readAssignedRunTasks<Student extends boolean>(userId: string, opt
   const completedSchoolFeedback=options?.includeCompletedSchoolFeedback
     ? completedSchoolOrdinaryFeedbackSql(Prisma.sql`e."id"`,userId)
     : Prisma.sql`FALSE`
+  const publishedSchoolStart = student && options?.populationProductScope === 'CAMPUS_ONLY' && ordinarySelfWholeEnabled()
+    ? Prisma.sql`(r.status='PUBLISHED' AND e.status='ASSIGNED' AND e.runtime_binding_ref IS NULL
+      AND e.subject_actor_snapshot_id=e.respondent_actor_snapshot_id
+      AND a.status='OPEN' AND a.policy_domain='ORGANIZATION_RUN' AND a.relationship_kind='SELF'
+      AND a.subject_user_id=${userId} AND a.respondent_user_id=${userId}
+      AND ${publishedSelfScaleTrackSql(Prisma.sql`t`, 'SCHOOL')}
+      AND EXISTS (SELECT 1 FROM users u WHERE u.id=${userId} AND u.account_domain='SCHOOL'
+        AND u.role='STUDENT' AND u.is_active AND NOT u.is_frozen AND NOT u.must_change_password
+        AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp()))
+      AND EXISTS (SELECT 1 FROM campus_activity_runs link JOIN campus_activities activity
+        ON activity.organization_id=link.organization_id AND activity.course_id=link.course_id AND activity.status='OPEN'
+        JOIN organizations org ON org.id=activity.organization_id AND org.status='ACTIVE'
+        JOIN education_product_entitlements ent ON ent.organization_id=org.id AND ent.product='HUISCHOOL' AND ent.status='ACTIVE'
+        WHERE link.organization_id=e.organization_id AND link.run_id=e.run_id)
+      AND NOT EXISTS (SELECT 1 FROM huiteacher_evaluation_run_links link
+        WHERE link.organization_id=e.organization_id AND link.run_id=e.run_id))`
+    : Prisma.sql`FALSE`
   const runQuery = (client: Pick<PlannerBoundReadDb, '$queryRaw'>) => client.$queryRaw<Array<StudentRunTaskRow & (Student extends true ? object : GeneralRunTaskDetails)>>`
     SELECT school_cont."boundContinuation" AS "__boundSchoolContinuation",
       to_char(e."created_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros",
@@ -391,7 +409,7 @@ async function readAssignedRunTasks<Student extends boolean>(userId: string, opt
       AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
         WHERE d."organization_id" = e."organization_id" AND d."user_id" = ${userId}
           AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START')))
-        OR ${completedSchoolFeedback})
+        OR ${publishedSchoolStart} OR ${completedSchoolFeedback})
     ORDER BY e."created_at" DESC, e."id" DESC LIMIT ${limit + 1}
   `
   const canUseVerifiedCampusFastPath = student
@@ -488,7 +506,8 @@ async function readAssignedRunTasks<Student extends boolean>(userId: string, opt
           ${executionScope}
           ${cursorScope}
       )
-      SELECT (NOT fast_path."selfVerified") AS "__needsFallback",
+      SELECT CASE WHEN fast_path."selfVerified" THEN FALSE ELSE NOT ${publishedSchoolStart}
+        END AS "__needsFallback",
         school_cont."boundContinuation" AS "__boundSchoolContinuation",
         to_char(e."created_at" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "createdAtMicros",
         e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",

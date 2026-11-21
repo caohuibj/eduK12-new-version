@@ -1,23 +1,25 @@
 import { prisma } from '../../config/database'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 type Principal = { userId?: string; recoveryTokenHash?: string }
+export type WholeReceiptRow = {
+  id: string; userId: string | null; recoveryTokenHash: string | null; epoch: number;
+  slotHash: string | null; jobSlot: string | null; wholeSubmissionId: string | null;
+  payloadHash: string | null; acceptedAt: Date | null; state: string | null;
+}
 /** Receipt-only read: never loads answers, validation manifests or report contents. */
-export const recoverWholeQuestionnaireReceipt = async (attemptId: string, submissionId: string, attemptEpoch: number, principal: Principal) => {
-  const rows = await prisma.$queryRaw<Array<{
-    id: string; userId: string | null; recoveryTokenHash: string | null; epoch: number;
-    slotHash: string | null; contextHash: string | null; jobSlot: string | null; jobContext: string | null;
-    wholeSubmissionId: string | null; payloadHash: string | null; acceptedAt: Date | null; state: string | null;
-  }>>`
+export const recoverWholeQuestionnaireReceipt = async (
+  attemptId: string, submissionId: string, attemptEpoch: number, principal: Principal, admitted?: WholeReceiptRow,
+) => {
+  const row = admitted ?? (await prisma.$queryRaw<WholeReceiptRow[]>`
     SELECT p."id", p."user_id" AS "userId", p."recovery_token_hash" AS "recoveryTokenHash",
-      p."attempt_epoch" AS epoch, p."frozen_active_slot_set_hash" AS "slotHash", p."context_snapshot_hash" AS "contextHash",
-      j."slot_set_hash" AS "jobSlot", j."context_hash" AS "jobContext", j."whole_submission_id" AS "wholeSubmissionId",
+      p."attempt_epoch" AS epoch, p."frozen_active_slot_set_hash" AS "slotHash",
+      j."slot_set_hash" AS "jobSlot", j."whole_submission_id" AS "wholeSubmissionId",
       j."whole_payload_hash" AS "payloadHash", j."whole_accepted_at" AS "acceptedAt", j."status" AS state
     FROM "composite_assessment_attempts" p
     LEFT JOIN "composite_report_jobs" j ON j."attempt_id" = p."id" AND j."attempt_epoch" = p."attempt_epoch"
     WHERE p."id" = ${attemptId}
-  `
-  const row = rows[0]
-  if (!row) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷作答不存在', 404)
+  `)[0]
+  if (!row || row.id !== attemptId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷作答不存在', 404)
   const owned = principal.userId ? row.userId === principal.userId
     : row.userId === null && Boolean(principal.recoveryTokenHash && row.recoveryTokenHash === principal.recoveryTokenHash)
   if (!owned) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限查询此交卷回执', 403)

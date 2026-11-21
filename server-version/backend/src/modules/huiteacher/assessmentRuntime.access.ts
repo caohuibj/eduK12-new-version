@@ -6,6 +6,7 @@ import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {loadFrozenActiveSlot,compositeItemSlotKey,formSectionSlotKey} from '../assessment-runtime/slot-set'
 import {joinedRunPopulationAuthoritySql} from '../assessment-run/currentPopulationAuthority'
+import {ordinarySelfWholeEnabled,publishedSelfScaleTrackSql} from '../assessment-run/ordinarySelfWholeAccess'
 import {boundCompositeStateAndConsentSql} from '../assessment-run/boundCompositeContinuation'
 import {withBoundedPlannerRead} from '../assessment-run/plannerBound'
 import {relationalEntryToRunPolicy,type RunResourcePolicy} from '../assessment-run/resourceAuthority'
@@ -39,6 +40,7 @@ export type TeacherAssessmentTask={
 type Row=Omit<TeacherAssessmentTask,'title'|'mode'>&{
  resourceKey:string;resourceVersion:string;policy:RunResourcePolicy;policyHash:string;
  assignmentId:string;episodeId:string;bindingKind:string|null;preloadCompositeId?:string|null;cursorCreatedAt:string;
+ publishedSelf?:boolean;
  attemptEpoch:number|null;frozenSlotSet:string|null;frozenSlotSetHash:string|null
 }
 const uuid=z.string().guid()
@@ -60,6 +62,9 @@ function decodeCursor(value:string,actorUserId:string):Cursor{
  * Closed events use the regular history read once the Run is reconciled. */
 export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId:string,input:{executionId?:string;attemptId?:string;cursor?:Cursor;limit:number;acceptedWhole?:boolean;includeSlots?:boolean},audience:TeacherAssessmentAudience='TEACHER_SELF'){
  const student=audience==='STUDENT_EVALUATION'
+ const publishedSelf = !student && ordinarySelfWholeEnabled()
+  ? Prisma.sql`(x.subject_actor_snapshot_id=x.respondent_actor_snapshot_id AND ${publishedSelfScaleTrackSql(Prisma.sql`t`, 'TEACHER')})`
+  : Prisma.sql`FALSE`
  return withBoundedPlannerRead(db, client => client.$queryRaw<Row[]>(Prisma.sql`
  SELECT x.id AS "executionId",x.organization_id AS "organizationId",x.run_id AS "runId",event.id AS "eventId",
   event.title AS "eventTitle",${student?Prisma.sql`student_target.name`:Prisma.sql`NULL::text`} AS "teacherName",t.resource_family AS family,x.status,r.status AS "runStatus",x.runtime_binding_ref AS "runtimeBindingRef",
@@ -69,7 +74,7 @@ export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId
       WHERE candidate.id = t.frozen_resource_policy #>> '{runtimeLaunchTarget,ref}'
         AND candidate.training_content_snapshot_hash IS NOT NULL)
     THEN t.frozen_resource_policy #>> '{runtimeLaunchTarget,ref}' ELSE NULL END AS "preloadCompositeId",`:Prisma.empty}
-  t.resource_key AS "resourceKey",t.resource_version AS "resourceVersion",t.frozen_resource_policy AS policy,t.resource_policy_hash AS "policyHash",
+  ${publishedSelf} AS "publishedSelf",t.resource_key AS "resourceKey",t.resource_version AS "resourceVersion",t.frozen_resource_policy AS policy,t.resource_policy_hash AS "policyHash",
   a.id AS "assignmentId",a.episode_id AS "episodeId",x.runtime_binding_kind AS "bindingKind",
   parent.attempt_epoch AS "attemptEpoch",${input.includeSlots?Prisma.sql`parent.frozen_active_slot_set_encrypted`:Prisma.sql`NULL::text`} AS "frozenSlotSet",parent.frozen_active_slot_set_hash AS "frozenSlotSetHash",
   (a.consent_id IS NOT NULL) AS "consentRequired",consent.purpose AS "consentPurpose",consent.visibility_scope AS "consentVisibility",
@@ -118,7 +123,8 @@ export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId
   AND t.resource_family IN ('COGNITIVE','SITUATIONAL','BUNDLE') AND t.resource_version IN ('1.0.0','2.0.0')
   AND (t.resource_key LIKE 'education-assessment:TEACHER:%' OR t.resource_key LIKE 'education-composition:TEACHER:%')
   AND NOT EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=x.organization_id AND school.run_id=x.run_id)
-  AND ${joinedRunPopulationAuthoritySql('COLLECTION', 'HUITEACHER_ONLY')}
+  AND ((x.status IN ('ASSIGNED','STARTED') AND ${publishedSelf})
+    OR ${joinedRunPopulationAuthoritySql('COLLECTION', 'HUITEACHER_ONLY')})
   AND ((x.status='ASSIGNED' AND a.status='OPEN' AND r.status='PUBLISHED' AND event.status='OPEN'
     AND x.runtime_binding_kind IS NULL AND x.runtime_binding_ref IS NULL)
    OR (x.status='STARTED' AND parent.id IS NOT NULL AND event.status='OPEN'
@@ -157,7 +163,11 @@ function startPreflightForRow(row:Row,actorUserId:string,compositionStartComposi
   respondentUserId:actorUserId,
   organizationId:row.organizationId,
   runId:row.runId,
-  ...(compositionStartCompositeId?{compositionStartCompositeId}:{}),
+  ...(compositionStartCompositeId?{
+   compositionStartCompositeId,
+   compositionStartTrack:{policy:row.policy,policyHash:row.policyHash,organizationId:row.organizationId,
+    key:row.resourceKey,version:row.resourceVersion},
+  }:{}),
   ...(typeof row.preloadCompositeId==='string'?{preloadCompositeId:row.preloadCompositeId}:{}),
  }
 }
@@ -168,7 +178,8 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
    const identity=await readFrozenCompositionIdentity(db,{policy:row.policy,policyHash:row.policyHash,organizationId:row.organizationId,
     key:row.resourceKey,version:row.resourceVersion})
    if(identity.origin.entry!=='TEACHER'||identity.origin.variantKey!==(audience==='STUDENT_EVALUATION'?'TEACHER:STUDENT_REPORT':'TEACHER:SELF'))fail()
-   if(row.status!=='COMPLETED')await assertCompositionCollection(db,identity,row.status==='ASSIGNED'?'NEW_START':'BOUND_COLLECTION')
+   if(row.status!=='COMPLETED')await assertCompositionCollection(db,identity,row.status==='STARTED'
+    ? 'BOUND_COLLECTION' : row.publishedSelf ? 'PUBLISHED_SELF_START' : 'NEW_START')
    return {task:taskDto(row,identity.title),identity,row,runtimeCompositeId:identity.compositeId,
     startPreflight:startPreflightForRow(row,actorUserId,identity.origin.variantKey==='TEACHER:SELF'?identity.compositeId:undefined),
     units:identity.units.map(unit=>({itemId:unit.itemId,family:unit.family}))}

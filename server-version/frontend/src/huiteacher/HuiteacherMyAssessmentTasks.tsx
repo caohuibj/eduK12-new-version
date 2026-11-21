@@ -141,11 +141,16 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
    }
   })
  }
- const reload=async()=>{
+ const reload=async(progress?:CompositeReportStatus)=>{
   const source=active.current,token=generation.current
   if(!source?.attempt)return
   const valid=()=>mounted.current&&apiRef.current===api&&generation.current===token&&active.current===source
-  await load(source.task,source.attempt.id,valid)
+  const attempt=source.attempt
+  if(progress?.runCompleted&&progress.attemptId===attempt.id&&progress.attemptEpoch===attempt.attemptEpoch){
+   accept(source.task,attempt.id,{...attempt,status:'COMPLETED',progress:100,currentItem:null,allUnitsSubmitted:true},valid)
+   return
+  }
+  await load(source.task,attempt.id,valid)
  }
  const childFinished=()=>{void execute(async valid=>{
   const source=active.current
@@ -240,7 +245,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
       acceptedNotice="答案已保存，正在处理。完成状态以服务器确认的测评记录为准，交卷回执不会开放个人报告。"
       acceptedAction="查看完成状态"
       committedMessage="答案已保存，正在处理。请勿重复交卷。"
-      onCompleted={()=>{void reload()}}
+      onCompleted={progress=>{void reload(progress)}}
     />:stepped??
      <div><h3>{session.task.title}</h3>
       {session.task.consentRequired&&!session.task.runtimeBindingRef&&<div>

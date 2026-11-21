@@ -1,3 +1,4 @@
+import { ordinarySelfWholeEnabled, publishedSelfScaleTrackSql } from '../assessment-run/ordinarySelfWholeAccess'
 import { boundCompositeContinuationSql } from '../assessment-run/boundCompositeContinuation'
 import {completedSchoolOrdinaryFeedbackSql} from '../assessment-run/completedSchoolFeedback'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
@@ -126,7 +127,8 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
         AND sc."valid_from"<=statement_timestamp()
         AND (sc."valid_until" IS NULL OR sc."valid_until">statement_timestamp())
     `
-    if (!memberships.length) {
+    const discoverPublishedSelf = ordinarySelfWholeEnabled()
+    if (!memberships.length && !discoverPublishedSelf) {
       return {
         activityRows: [] as CampusActivityForStudent[],
         linkedRuns: [] as Array<{ courseId: string; runId: string }>,
@@ -168,6 +170,36 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
         GROUP BY a."course_id", a."organization_id", course."title"
         ORDER BY a."course_id" LIMIT 201
       ),
+      ${discoverPublishedSelf ? Prisma.sql`unlisted_self_executions AS MATERIALIZED (
+        -- Bound discovery to this student's assigned runs and discard activities
+        -- already found by the live path before opening the frozen track and units.
+        SELECT x.track_id, x.relational_assignment_id, x.organization_id, x.run_id, link.course_id
+        FROM assessment_run_actor_snapshots actor
+        JOIN assessment_run_executions x ON x.respondent_actor_snapshot_id=actor.id AND x.subject_actor_snapshot_id=actor.id
+          AND x.organization_id=actor.organization_id AND x.run_id=actor.run_id AND x.status='ASSIGNED'
+        JOIN campus_activity_runs link ON link.run_id=x.run_id AND link.organization_id=x.organization_id
+        WHERE actor.user_id=${actor.userId} AND actor.actor_role='STUDENT'
+          ${input.activityId ? Prisma.sql`AND link.course_id=${input.activityId}` : Prisma.empty}
+          AND NOT EXISTS (SELECT 1 FROM activities live WHERE live."courseId"=link.course_id)
+      ),
+      published_self_activities AS MATERIALIZED (
+        SELECT DISTINCT activity.course_id AS "courseId", activity.organization_id AS "organizationId", course.title,
+          ARRAY[]::text[] AS "membershipIds"
+        FROM unlisted_self_executions x
+        JOIN relational_assessment_assignments assignment ON assignment.id=x.relational_assignment_id
+          AND assignment.respondent_user_id=${actor.userId} AND assignment.status='OPEN'
+        JOIN assessment_runs run ON run.id=x.run_id AND run.organization_id=x.organization_id AND run.status='PUBLISHED'
+        JOIN assessment_run_tracks t ON t.id=x.track_id AND t.organization_id=x.organization_id AND t.run_id=x.run_id
+          AND ${publishedSelfScaleTrackSql(Prisma.sql`t`, 'SCHOOL')}
+        JOIN campus_activities activity ON activity.organization_id=x.organization_id AND activity.course_id=x.course_id
+          AND activity.status='OPEN'
+        JOIN courses course ON course.id=activity.course_id AND course.course_type='CAMPUS_ACTIVITY'
+        ORDER BY activity.course_id LIMIT 201
+      ),` : Prisma.empty}
+      listed_activities AS MATERIALIZED (
+        SELECT * FROM activities
+        ${discoverPublishedSelf ? Prisma.sql`UNION ALL SELECT * FROM published_self_activities` : Prisma.empty}
+      ),
       linked_runs AS MATERIALIZED (
         SELECT ar."course_id" AS "courseId", ar."run_id" AS "runId",
           ar."organization_id" AS "organizationId",
@@ -175,7 +207,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
             SELECT 1 FROM "huiteacher_evaluation_run_links" h
             WHERE h."organization_id"=ar."organization_id" AND h."run_id"=ar."run_id"
           ) AS "hasHuiteacherLink"
-        FROM activities act
+        FROM listed_activities act
         JOIN "campus_activity_runs" ar ON ar."course_id"=act."courseId"
         JOIN "assessment_runs" r ON r."id"=ar."run_id" AND r."status" IN ('PUBLISHED','CLOSED')
       )
@@ -211,7 +243,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
         JOIN "checkins" chk ON chk."course_id"=act."courseId"
       )`}
       SELECT
-        COALESCE((SELECT jsonb_agg(to_jsonb(a) ORDER BY a."courseId") FROM activities a), '[]'::jsonb) AS "activities",
+        COALESCE((SELECT jsonb_agg(to_jsonb(a) ORDER BY a."courseId") FROM listed_activities a), '[]'::jsonb) AS "activities",
         COALESCE((SELECT jsonb_agg(to_jsonb(lr)) FROM linked_runs lr), '[]'::jsonb) AS "linkedRuns",
         ${skipContentTasks ? Prisma.sql`'[]'::jsonb AS "assignments", '[]'::jsonb AS "checkins"` : Prisma.sql`
           COALESCE((SELECT jsonb_agg(to_jsonb(asg)) FROM activity_assignments asg), '[]'::jsonb) AS "assignments",

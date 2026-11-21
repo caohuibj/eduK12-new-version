@@ -6,6 +6,7 @@ import {
   toRelationalAssignmentRecord,
   type RelationalAssignmentRepository,
   type RelationalAssignmentRow,
+  type ResolvedRelationalConsentV1,
 } from '../assessment-relational/repository'
 import type { RelationalAssignmentRecordV1 } from '../assessment-relational/types'
 
@@ -46,6 +47,7 @@ export interface RunStartAdmission {
   execution: ExecutionAdmissionRow
   assignment: RelationalAssignmentRecordV1
   attemptIdentity: RunAttemptIdentityBinding
+  acceptedConsent?: ResolvedRelationalConsentV1 | null
 }
 
 const legacyRespondentTypeFor = (assignment: RelationalAssignmentRecordV1): RespondentTypeV1 | null => {
@@ -118,25 +120,29 @@ const assertFrozenIdentityMatchesAssignment = (
   }
 }
 
-export const buildRunAttemptIdentity = async (
+const resolveRunAttemptAdmission = async (
   assignment: RelationalAssignmentRecordV1,
   assignments: Pick<RelationalAssignmentRepository, 'resolveAcceptedConsent'>,
-): Promise<RunAttemptIdentityBinding> => {
+) => {
   const resolved = assignment.consentId
     ? await assignments.resolveAcceptedConsent(assignment)
     : null
   if (assignment.consentId && !resolved) {
     throw new RunStartAdmissionError('RUN_CONSENT_REQUIRED', 'current accepted consent is required before Run START', 409)
   }
-  return {
+  return { acceptedConsent: resolved, attemptIdentity: {
     subjectUserId: assignment.subjectUserId,
     respondentUserId: assignment.respondentUserId,
     respondentType: respondentTypeFor(assignment),
     episodeId: assignment.episodeId,
     assignmentRef: assignment.assignmentId,
     consentId: resolved?.consentId ?? null,
-  }
+  } }
 }
+
+export const buildRunAttemptIdentity = async (
+  ...args: Parameters<typeof resolveRunAttemptAdmission>
+): Promise<RunAttemptIdentityBinding> => (await resolveRunAttemptAdmission(...args)).attemptIdentity
 
 // Decision D-8 (2026-11-06, product-confirmed): a Run does NOT use
 // maxAttempts. Single-use per execution is enforced by the claim +
@@ -230,6 +236,5 @@ export const loadRunExecutionStartAdmission = async (input: {
     return { execution, assignment, attemptIdentity }
   }
 
-  const attemptIdentity = await buildRunAttemptIdentity(assignment, assignmentRepository)
-  return { execution, assignment, attemptIdentity }
+  return { execution, assignment, ...await resolveRunAttemptAdmission(assignment, assignmentRepository) }
 }
