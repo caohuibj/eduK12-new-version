@@ -6,11 +6,14 @@ const proc = vi.hoisted(() => ({
   user: 100,
   idle: 900,
   fail: false,
+  delay: vi.fn(),
   advanceCpuPercent(pct: number) {
     this.user += Math.round(pct * 10)
     this.idle += Math.round((100 - pct) * 10)
   },
 }))
+
+vi.mock('node:timers/promises', () => ({ setTimeout: proc.delay }))
 
 vi.mock('node:fs', async (importOriginal) => {
   const actual = await importOriginal<typeof import('node:fs')>()
@@ -32,6 +35,9 @@ vi.mock('node:fs', async (importOriginal) => {
 
 import {
   assertAssessmentStartResources,
+  awaitScaleCompositionStartResources,
+  isAssessmentStartCpuPaused,
+  withAdmittedScaleCompositionStart,
   reportResourceClaimDecision,
   resetAssessmentResourceProtectionForTests,
   runWithLowMemoryTrickleAdmission,
@@ -71,6 +77,52 @@ describe('runWithLowMemoryTrickleAdmission runtime gate & ALS permit', () => {
     nowSpy.mockRestore()
     vi.unstubAllEnvs()
     resetAssessmentResourceProtectionForTests()
+  })
+
+  it.each(['false', 'true'])('lets an admitted Scale batch finish a CPU-only trip with trickle=%s', async trickle => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', trickle)
+    advanceSample(850, 40)
+    expect(await awaitScaleCompositionStartResources()).toBe(true)
+    await withAdmittedScaleCompositionStart(async () => {
+      for (const cpu of [98, 99]) {
+        advanceSample(850, cpu)
+        sampleAssessmentHostResources()
+        reportResourceClaimDecision(2)
+      }
+      expect(isAssessmentStartCpuPaused()).toBe(true)
+      expect(() => assertAssessmentStartResources()).not.toThrow()
+      advanceSample(640, 99)
+      expect(() => assertAssessmentStartResources()).toThrow(/系统繁忙/)
+    })
+    advanceSample(850, 99)
+    expect(() => assertAssessmentStartResources()).toThrow(/系统繁忙/)
+  })
+
+  it('waits only for CPU pressure to clear and stops waiting after three seconds', async () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+    sampleAssessmentHostResources()
+    for (const cpu of [98, 99]) {
+      advanceSample(850, cpu)
+      reportResourceClaimDecision(2)
+    }
+
+    proc.delay.mockReset().mockImplementation(async (ms: number) => {
+      clock += ms
+      proc.advanceCpuPercent(99)
+    })
+    await expect(awaitScaleCompositionStartResources()).rejects.toMatchObject({
+      code: 'INSTRUMENT_NOT_AVAILABLE', statusCode: 503,
+    })
+    expect(proc.delay.mock.calls.reduce((sum, [ms]) => sum + ms, 0)).toBe(3000)
+
+    proc.delay.mockClear().mockImplementation(async (ms: number) => {
+      clock += ms
+      proc.advanceCpuPercent(35)
+    })
+    await expect(awaitScaleCompositionStartResources()).resolves.toBe(true)
+    expect(proc.delay).toHaveBeenCalled()
   })
 
   it('keeps strict <700 MiB rejection when ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED is unset', async () => {
