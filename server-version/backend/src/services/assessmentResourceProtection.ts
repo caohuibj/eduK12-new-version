@@ -1,6 +1,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks'
 import { readFileSync } from 'node:fs'
 import { performance } from 'node:perf_hooks'
+import { setTimeout as delay } from 'node:timers/promises'
 import { BoundedAdmissionBusyError, BoundedAdmissionGate, configuredInteger } from './boundedAdmissionGate'
 import { InstrumentFinalSubmitError } from './instrumentFinalSubmit'
 import { logger } from '../utils/logger'
@@ -260,6 +261,7 @@ let trickleGateCache: {
   gate: BoundedAdmissionGate
 } | null = null
 const lowMemoryTrickleContext = new AsyncLocalStorage<{ active: boolean }>()
+const admittedScaleComposition = new AsyncLocalStorage<{ active: boolean }>()
 
 const buildStartResourceError = (retryHint: 'memory' | 'cpu'): InstrumentFinalSubmitError => {
   const err = new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '系统繁忙，请稍后开始测评；已经提交的答案不受影响。', 503)
@@ -422,6 +424,42 @@ export const isAssessmentStartResourceConstrained = (): boolean => {
     || (value.availableBytes !== null && value.availableBytes < 700 * MiB)
 }
 
+const normalStartMemory = (sample: AssessmentResourceSample): boolean =>
+  sample.availableBytes !== null && sample.availableBytes >= 700 * MiB
+
+const startCpuPaused = (sample: AssessmentResourceSample): boolean =>
+  normalStartMemory(sample) && (isLowMemoryTrickleEnabled()
+    ? policy.startAdmissionDecision(sample).reason === 'host_cpu'
+    : policy.decision(sample, 1).reason === 'host_cpu')
+
+export const isAssessmentStartCpuPaused = (): boolean =>
+  enabled() && startCpuPaused(sampleAssessmentHostResources())
+
+/** Called with an existing Run START slot but before taking a DB connection.
+ * Give the CPU latch a short chance to clear while previously admitted work drains. */
+export const awaitScaleCompositionStartResources = async (): Promise<boolean> => {
+  if (!enabled()) return false
+  const deadline = performance.now() + 3000
+  let sample = sampleAssessmentHostResources()
+  while (startCpuPaused(sample)) {
+    const remaining = deadline - performance.now()
+    if (remaining <= 0) break
+    await delay(Math.min(250, remaining))
+    sample = sampleAssessmentHostResources()
+  }
+  assertAssessmentStartResources()
+  return normalStartMemory(sample) && sample.cpuPercent !== null
+}
+
+/** A bounded, already-admitted batch may finish unrolling frozen Scale units
+ * after a CPU-only trip. Memory failure still aborts the same transaction. */
+export const withAdmittedScaleCompositionStart = async <T>(operation: () => Promise<T>): Promise<T> => {
+  const permit = { active: true }
+  return admittedScaleComposition.run(permit, async () => {
+    try { return await operation() } finally { permit.active = false }
+  })
+}
+
 /** Only creation of NEW frozen runtimes is guarded. Existing durable answers,
  * retries and report reads retain their normal persistence/recovery paths. */
 export const assertAssessmentStartResources = (): void => {
@@ -431,16 +469,18 @@ export const assertAssessmentStartResources = (): void => {
   const value = sampleAssessmentHostResources(
     trickleEnabled && permit?.active === true ? { forceMemoryRefresh: true } : undefined,
   )
+  const finishingAdmittedBatch = admittedScaleComposition.getStore()?.active === true && normalStartMemory(value)
   if (trickleEnabled) {
     const config = configuredLowMemoryTrickleConfig()
     const decision = policy.startAdmissionDecision(value, performance.now(), config)
     logStartAdmissionTransition(decision, value)
-    if (decision.action === 'allow') return
+    if (decision.action === 'allow' || (finishingAdmittedBatch && decision.reason === 'host_cpu')) return
     if (decision.action === 'trickle' && permit?.active === true) return
     throw buildStartResourceError(decision.retryHint ?? 'memory')
   }
   const decision = policy.decision(value, 1)
-  if ((value.availableBytes !== null && value.availableBytes < 700 * MiB) || decision.reason === 'host_cpu') {
+  if ((value.availableBytes !== null && value.availableBytes < 700 * MiB)
+    || (decision.reason === 'host_cpu' && !finishingAdmittedBatch)) {
     // Keep CPU and memory hints independent; the controller preserves the hint.
     if (decision.reason === 'host_cpu' && (value.availableBytes === null || value.availableBytes >= 700 * MiB)) {
       throw buildStartResourceError('cpu')

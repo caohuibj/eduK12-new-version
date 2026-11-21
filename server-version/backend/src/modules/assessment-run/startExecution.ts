@@ -12,7 +12,14 @@ import { BoundedAdmissionGate, configuredInteger } from '../../services/boundedA
 import { defaultRunStartAdmissionBound } from '../../config/databasePool'
 import { buildWholeStartPreload, startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
 import type { RunStartPreflight } from './resourceBoundary'
-import { isAssessmentStartResourceConstrained, runWithLowMemoryTrickleAdmission } from '../../services/assessmentResourceProtection'
+import {
+  awaitScaleCompositionStartResources,
+  isAssessmentStartCpuPaused,
+  isAssessmentStartResourceConstrained,
+  runWithLowMemoryTrickleAdmission,
+  withAdmittedScaleCompositionStart,
+} from '../../services/assessmentResourceProtection'
+import { traceAssessmentPhase } from '../../services/runtimeObservability'
 import {resolvePublishedTeacherForm,teacherFormResourceRef,
   TEACHER_FORM_RUNTIME_KIND} from '../huiteacher/formRunResource'
 import {studentFormResourceId,assertStudentFormRunUse} from '../huiteacher/studentFormResource'
@@ -237,6 +244,7 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   launch: LaunchEnvelope
   preloadedComposite?: any
   inlineContext?: TransactionalStartDispatchContext
+  admittedScaleBatch?: boolean
 }): Promise<RunStartExecutionResult> => {
   const inline = Boolean(input.inlineContext)
   const libraryUses = inline
@@ -431,7 +439,7 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
       preloadedComposite = await compositeModule.loadStartComposite(input.launch.runtimeTargetRef, tx as any)
     }
   }
-  const attempt = await startRelationalCompositeAttemptInTransaction(tx as any, {
+  const createRuntime = () => startRelationalCompositeAttemptInTransaction(tx as any, {
     compositeAssessmentId: input.launch.runtimeTargetRef,
     respondentUserId: input.actorUserId,
     attemptIdentity: admission.attemptIdentity,
@@ -439,6 +447,10 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
     preloadedComposite,
     knownNoExistingAssignmentAttempt: true,
   })
+  const units = preloadedComposite?.items as { type: string; required: boolean }[] | undefined
+  const attempt = input.admittedScaleBatch && compositionStart && !preloadedComposite?.formSections?.length && units?.length
+    && units.every(unit => unit.required && unit.type === 'SCALE')
+    ? await withAdmittedScaleCompositionStart(createRuntime) : await createRuntime()
   if (inline) {
     // Coalesce execution binding + inline claim completion into one roundtrip.
     const boundRows = await tx.$queryRaw<Array<{ execChanged: number; claimChanged: number }>>`
@@ -794,15 +806,18 @@ export const startAssessmentRunExecution = async (input: {
    * Prevents an extra SQL roundtrip during constrained pre-gate admission. */
   startPreflight?: RunStartPreflight
 }): Promise<RunStartExecutionResult> => {
+  const preflight = input.startPreflight?.respondentUserId === input.actorUserId
+    && !input.startPreflight.runtimeBindingRef && !input.resourceRegistry
+    ? input.startPreflight : undefined
+  const compositionCandidate = preflight?.compositionStartCompositeId
   const executeRunStart = async (): Promise<RunStartExecutionResult> => {
     try {
       return await runStartGate().run(async () => {
+        const admittedScaleBatch = Boolean(compositionCandidate) && await traceAssessmentPhase(
+          'start.run_cpu_admission', awaitScaleCompositionStartResources,
+        )
         // The product route identified the respondent and the frozen track.
         // Prepare immutable publication data before taking execution locks.
-        const preflight = input.startPreflight?.respondentUserId === input.actorUserId
-          && !input.startPreflight.runtimeBindingRef && !input.resourceRegistry
-          ? input.startPreflight : undefined
-        const compositionCandidate = preflight?.compositionStartCompositeId
         const candidate = compositionCandidate ?? preflight?.preloadCompositeId
         const preparation = candidate
           ? await import('../composite/composite.service')
@@ -870,6 +885,7 @@ export const startAssessmentRunExecution = async (input: {
                 ...(candidate === launch.runtimeTargetRef && preparation?.trainingContentSnapshotHash
                   ? { preloadedComposite: preparation } : {}),
                 inlineContext,
+                admittedScaleBatch,
               })
             },
           }),
@@ -958,7 +974,11 @@ export const startAssessmentRunExecution = async (input: {
       ? boundResultFromPreflight(input.startPreflight, input.actorUserId)
       : await readExistingBoundExecution(input.executionId, input.actorUserId)
     if (bound) return bound
-    return runWithLowMemoryTrickleAdmission(executeRunStart)
+    // CPU-only pressure on the composition path waits inside the existing Run
+    // gate. Low-memory trickle must still acquire its gate before the Run gate.
+    if (!compositionCandidate || !isAssessmentStartCpuPaused()) {
+      return runWithLowMemoryTrickleAdmission(executeRunStart)
+    }
   }
   return executeRunStart()
 }

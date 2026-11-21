@@ -5,6 +5,8 @@ const m = vi.hoisted(() => ({
   queryRaw: vi.fn(),
   acquireClaim: vi.fn(),
   constrained: vi.fn(),
+  cpuPaused: vi.fn(),
+  awaitResources: vi.fn(),
   trickle: vi.fn(),
 }))
 
@@ -26,6 +28,8 @@ vi.mock('../../services/assessmentResourceProtection', async () => {
   return {
     ...actual,
     isAssessmentStartResourceConstrained: m.constrained,
+    isAssessmentStartCpuPaused: m.cpuPaused,
+    awaitScaleCompositionStartResources: m.awaitResources,
     runWithLowMemoryTrickleAdmission: m.trickle,
   }
 })
@@ -55,6 +59,8 @@ describe('assessment-run pre-gate resource protection & composition identity cac
     vi.clearAllMocks()
     resetEducationCompositionIdentityCacheForTests()
     m.constrained.mockReturnValue(false)
+    m.cpuPaused.mockReturnValue(false)
+    m.awaitResources.mockResolvedValue(false)
     m.trickle.mockImplementation(async (op: () => Promise<unknown>) => op())
   })
 
@@ -108,6 +114,23 @@ describe('assessment-run pre-gate resource protection & composition identity cac
     })
     expect(m.queryRaw).not.toHaveBeenCalled()
     expect(m.trickle).toHaveBeenCalledTimes(1)
+  })
+
+  it('defers a fresh composition on CPU pressure before loading publication or taking a claim', async () => {
+    m.constrained.mockReturnValue(true)
+    m.cpuPaused.mockReturnValue(true)
+    const busy = new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '系统繁忙', 503)
+    m.awaitResources.mockRejectedValueOnce(busy)
+    await expect(startAssessmentRunExecution({
+      executionId: uuid(10), actorUserId: uuid(1),
+      startPreflight: {
+        runtimeBindingKind: null, runtimeBindingRef: null, respondentUserId: uuid(1),
+        compositionStartCompositeId: uuid(11),
+      },
+    })).rejects.toBe(busy)
+    expect(m.awaitResources).toHaveBeenCalledOnce()
+    expect(m.trickle).not.toHaveBeenCalled()
+    expect(m.acquireClaim).not.toHaveBeenCalled()
   })
 
   it('caches immutable frozen composition identity on prisma reads while keeping live status checks authoritative', async () => {
