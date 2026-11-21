@@ -4096,7 +4096,7 @@ export const startRelationalCompositeAttemptInTransaction = async (
 
 /** Field authority is verified by the product adapter in this same transaction.
  * This wrapper shares the canonical builder and never creates a relational Run. */
-export async function startFieldCompositeAttemptInTransaction(db:Db,input:{compositeId:string;respondentUserId:string;proof:VerifiedFieldStart;beforeCreate:()=>Promise<void>}){
+export async function startFieldCompositeAttemptInTransaction(db:Db,input:{compositeId:string;respondentUserId:string;proof:VerifiedFieldStart;beforeCreate:()=>Promise<unknown>}){
  const scope=readVerifiedFieldStart(input.proof,{tx:db,compositeId:input.compositeId,respondentUserId:input.respondentUserId})
  await db.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${scope.participantKey}))`)
  const prior=await db.compositeAssessmentAttempt.findFirst({where:{compositeAssessmentId:input.compositeId,participantKey:scope.participantKey},orderBy:{attemptNo:'desc'}})
