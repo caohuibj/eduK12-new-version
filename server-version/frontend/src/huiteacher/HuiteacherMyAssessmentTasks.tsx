@@ -43,7 +43,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
  const generation=useRef(0),listGeneration=useRef(0),active=useRef(session),apiRef=useRef(api)
  const inlineWholeRef=useRef<{attemptId:string;definition:WholeQuestionnaireDefinition}|null>(null)
  const activeIdentityRef=useRef<InlineWholeDefinitionIdentity|null>(null)
- const completed=useRef(new Set<string>()),completionCallback=useRef(onCompleted)
+ const completed=useRef(new Set<string>()),receiptCompleted=useRef(new Set<string>()),completionCallback=useRef(onCompleted)
  active.current=session;apiRef.current=api;completionCallback.current=onCompleted
  const panel=useRef<HTMLDivElement>(null)
  const mounted=useRef(true)
@@ -56,19 +56,34 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
   try{
    const data=await api<{list:TeacherAssessmentTask[];nextCursor:string|null}>('/my-assessment-tasks'+(appendCursor?'?cursor='+encodeURIComponent(appendCursor):''))
    if(!valid())return
-   setRows(old=>appendCursor?[...old,...data.list.filter(row=>!old.some(value=>value.executionId===row.executionId))]:data.list)
+   const nextList=data.list.map(row=>{
+    if(row.status==='COMPLETED'){receiptCompleted.current.delete(row.executionId);return row}
+    if(receiptCompleted.current.has(row.executionId)&&(row.status==='STARTED'||row.status==='ASSIGNED'))return {...row,status:'COMPLETED'}
+    return row
+   })
+   setRows(old=>appendCursor?[...old,...nextList.filter(row=>!old.some(value=>value.executionId===row.executionId))]:nextList)
    setCursor(data.nextCursor);setList({pending:false,error:'',loaded:true})
   }catch(reason){if(valid())setList(old=>({...old,pending:false,error:reason instanceof Error?reason.message:'任务列表暂不可读取'}))}
  },[api])
+ const markReceiptCompleted=useCallback((executionId:string)=>{
+  receiptCompleted.current.add(executionId)
+  setRows(old=>old.map(row=>row.executionId===executionId?{...row,status:'COMPLETED'}:row))
+  void refresh()
+ },[refresh])
  useEffect(()=>{
-  generation.current++;setSession(null);setBusy(false);setError('');setAccepted(false);completed.current.clear()
+  generation.current++;setSession(null);setBusy(false);setError('');setAccepted(false);completed.current.clear();receiptCompleted.current.clear()
   setRows([]);setCursor(null);setList({pending:true,error:'',loaded:false});void refresh()
   return invalidateRequests
  },[api,refresh,invalidateRequests])
  useEffect(()=>onListStateChange?.({pending:list.pending,error:!!list.error,count:rows.length}),[onListStateChange,list.pending,list.error,rows.length])
  const activeExecutionId=session?.task.executionId
  useEffect(()=>{if(activeExecutionId){panel.current?.focus({preventScroll:true});panel.current?.scrollIntoView?.({block:'start'})}},[activeExecutionId])
- const leave=()=>{generation.current++;active.current=null;inlineWholeRef.current=null;activeIdentityRef.current=null;setFreshStart(false);setSession(null);setBusy(false);setError('');setAccepted(false)}
+ const leave=()=>{
+  const current=active.current
+  const shouldRefresh=Boolean(current?.attempt?.receiptOnly&&(current.attempt.status==='COMPLETED'||current.attempt.wholeAcceptedAt))
+  generation.current++;active.current=null;inlineWholeRef.current=null;activeIdentityRef.current=null;setFreshStart(false);setSession(null);setBusy(false);setError('');setAccepted(false)
+  if(shouldRefresh)void refresh()
+ }
  const execute=async(work:(valid:()=>boolean)=>Promise<void>)=>{
   if(!mounted.current||apiRef.current!==api)return
   const token=++generation.current
@@ -94,6 +109,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
    inlineWholeRef.current=inline?.definition?{attemptId:state.id,definition:inline.definition}:null
    setFreshStart(Boolean(inline?.freshlyCreated))
    setSession({task,attempt:state,child:null,completion:null})
+   if(state.receiptOnly&&(state.status==='COMPLETED'||state.wholeAcceptedAt))markReceiptCompleted(task.executionId)
   }
  }
  const load=async(task:TeacherAssessmentTask,attemptId:string,valid:()=>boolean)=>{
@@ -245,6 +261,14 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
       <MemoryRouter key={actorKey+':'+child.situationalAttemptId}><SituationalRunner host={{attemptId:child.situationalAttemptId,parentAttemptId:attempt.id,
        compositeItemId:child.id,instructionsSummary:'作答说明',client:situational,onCompleted:childFinished}}/></MemoryRouter>:
      attempt?.executionMode==='WHOLE_LOCAL'&&!child&&wholeApi&&educationMedia?<WholeCompositeQuestionnaire state={attempt} isFreshStart={freshStart} fallback={stepped} api={wholeApi} educationMedia={educationMedia} onExit={leave}
+      onReceiptAccepted={acceptedAt=>{
+       const current=active.current
+       if(!current?.attempt||current.attempt.id!==attempt.id)return
+       const nextAttempt:CompositeAttemptState={...current.attempt,receiptOnly:true,wholeAcceptedAt:acceptedAt??current.attempt.wholeAcceptedAt??new Date().toISOString()}
+       const nextSession={...current,attempt:nextAttempt}
+       active.current=nextSession;setSession(nextSession)
+       markReceiptCompleted(current.task.executionId)
+      }}
       acceptedNotice="答案已保存，正在处理。完成状态以服务器确认的测评记录为准，交卷回执不会开放个人报告。"
       acceptedAction="查看完成状态"
       committedMessage="答案已保存，正在处理。请勿重复交卷。"

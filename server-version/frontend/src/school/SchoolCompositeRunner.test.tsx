@@ -334,3 +334,42 @@ it('renders WHOLE_LOCAL fresh START from inline wholeDefinition with zero extra 
   clearWholeQuestionnaireTemplateCacheForTest()
  }
 })
+
+it('calls onFinished when exiting a receipt-only WHOLE_LOCAL submission so the task list refreshes immediately',async()=>{
+ clearWholeQuestionnaireTemplateCacheForTest()
+ const templateHash='a'.repeat(64)
+ const slotSetHash='b'.repeat(64)
+ const wholeDef={
+  attemptId:'parent-attempt-ro-1',attemptEpoch:1,slotSetHash,contextSnapshotHash:null,templateHash,
+  units:[{itemId:'unit-1',scaleAssessmentId:'scale-1',definitionHash:'d'.repeat(64),scale:{id:'s-1',name:'仅回执量表',
+   definition:{schemaVersion:2,respondentType:'participant_self_report',display:{randomizeItems:false},
+    items:[{itemCode:'q1',content:'仅回执题目一',type:'single',required:true,sortOrder:0,responseSetKey:'r',randomizeOptions:false,options:[{value:1,label:'同意'}]}]}}}],
+ }
+ const api=vi.fn(async(path:string,method='GET',payload?:any)=>{
+  if(path.includes('/start')&&method==='POST'){
+   return {
+    state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-attempt-ro-1',replayed:false,freshlyCreated:true,
+    currentUnit:{id:'parent-attempt-ro-1',attemptEpoch:1,contextSnapshotHash:null,deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',executionMode:'WHOLE_LOCAL',receiptOnly:true,items:[],currentItem:{id:'unit-1',type:'SCALE',position:0,required:true,presentationMode:'ONE_BY_ONE'}},
+    wholeDefinition:wholeDef,
+   }
+  }
+  if(path.endsWith('/whole/submit')&&method==='POST'){
+   return {status:'ACCEPTED',attemptId:'parent-attempt-ro-1',submissionId:payload.submissionId,payloadHash:'h'.repeat(64),acceptedAt:'2026-11-21T12:00:00.000Z',committedAt:'2026-11-21T12:00:00.000Z',replayed:false,receiptOnly:true}
+  }
+  throw new Error('Unexpected request: '+method+' '+path)
+ })
+ const onExit=vi.fn(),onFinished=vi.fn()
+ try{
+  render(<SchoolCompositeRunner api={api as unknown as SchoolApi} title="仅回执学生整卷" execution={execution} onExit={onExit} onFinished={onFinished}/>)
+  fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+  fireEvent.click(await screen.findByText('同意'))
+  fireEvent.click(screen.getByRole('button',{name:'提交整份问卷'}))
+  expect(await screen.findByText(/本次问卷仅提供交卷回执/)).toBeInTheDocument()
+  expect(onFinished).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button',{name:'返回'}))
+  expect(onFinished).toHaveBeenCalledTimes(1)
+  expect(onExit).not.toHaveBeenCalled()
+ }finally{
+  clearWholeQuestionnaireTemplateCacheForTest()
+ }
+})

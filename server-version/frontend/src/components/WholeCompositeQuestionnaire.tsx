@@ -47,7 +47,7 @@ type EducationWholeMedia = {
   loadFormImage: (sectionId: string, assetId: string) => Promise<Blob>
   loadFormVideo: (sectionId: string, itemId: string, optionIndex: number) => Promise<AssessmentVideoCapabilitySources>
 }
-type Props = { state: CompositeAttemptState; api: WholeQuestionnaireApi; publicMode?: boolean; recoveryToken?: string; isFreshStart?: boolean; fallback: ReactNode; onExit: () => void; onCompleted: (progress?: CompositeReportStatus) => void; educationMedia?: EducationWholeMedia; acceptedNotice?: string; acceptedAction?: string; committedMessage?: string }
+type Props = { state: CompositeAttemptState; api: WholeQuestionnaireApi; publicMode?: boolean; recoveryToken?: string; isFreshStart?: boolean; fallback: ReactNode; onExit: () => void; onCompleted: (progress?: CompositeReportStatus) => void; onReceiptAccepted?: (acceptedAt?: string) => void; educationMedia?: EducationWholeMedia; acceptedNotice?: string; acceptedAction?: string; committedMessage?: string }
 type Answer = { responseValue?: string | number; value?: unknown; responseTimeMs?: number; changeCount?: number; otherText?: string }
 export const wholeDraftKey = (id: string, epoch: number) => `composite-whole:${id}:${epoch}`
 export const wholeAnswerKey = (itemId: string, itemCode: string) => JSON.stringify([itemId, itemCode])
@@ -116,7 +116,9 @@ function parseFormOptions(
   return []
 }
 
-function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, recoveryToken, isFreshStart = false, fallback, onExit, onCompleted, educationMedia, acceptedNotice = '答案已保存。可以离开页面，稍后查看报告；报告失败不需要重新交卷。', acceptedAction = '查看报告进度', committedMessage }: Props) {
+function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, recoveryToken, isFreshStart = false, fallback, onExit, onCompleted, onReceiptAccepted, educationMedia, acceptedNotice = '答案已保存。可以离开页面，稍后查看报告；报告失败不需要重新交卷。', acceptedAction = '查看报告进度', committedMessage }: Props) {
+  const onReceiptAcceptedRef = useRef(onReceiptAccepted)
+  onReceiptAcceptedRef.current = onReceiptAccepted
   const draftKey = wholeDraftKey(state.id, state.attemptEpoch ?? 1)
   const [definition, setDefinition] = useState<WholeQuestionnaireDefinition | null>(null)
   const [meta, setMeta] = useState<FinalDraftMeta | null>(null)
@@ -224,7 +226,10 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
             if (cancelled) return
             if (receipt.status === 'ACCEPTED') {
               rememberWholeReceipt(receipt); setAcceptedAt(receipt.acceptedAt); setAccepted(true)
-              if (receipt.receiptOnly) setReceiptOnly(true)
+              if (state.receiptOnly || receipt.receiptOnly) {
+                setReceiptOnly(true)
+                onReceiptAcceptedRef.current?.(receipt.acceptedAt)
+              }
               await finalDraftStore.setStatus(draftKey, 'COMPLETED'); await finalDraftStore.delete(draftKey)
             }
             if (!cancelled) setReceiptCheck(receipt.status === 'UNKNOWN' ? 'unknown' : null)
@@ -495,11 +500,15 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       })
       setReceiptCheck(null)
       confirmed = true; setAccepted(true); setAcceptedAt(result.acceptedAt); rememberWholeReceipt(result)
-      if (result.receiptOnly) setReceiptOnly(true)
+      const isReceiptOnly = state.receiptOnly === true || result.receiptOnly === true
+      if (isReceiptOnly) {
+        setReceiptOnly(true)
+        onReceiptAcceptedRef.current?.(result.acceptedAt)
+      }
       try { sessionStorage.setItem(`composite:whole-receipt:${state.id}`, JSON.stringify(result)) } catch { /* The server receipt is already durable. */ }
       await finalDraftStore.setStatus(draftKey, 'COMPLETED')
       await finalDraftStore.delete(draftKey)
-      if (!state.receiptOnly && !result.receiptOnly) onCompleted()
+      if (!isReceiptOnly) onCompleted()
     } catch (cause) {
       if (confirmed) { setError('交卷已保存，无需重新交卷。'); return }
       const next = await recordFinalSubmissionFailure(draftKey, cause, meta.submissionId).catch(() => null)
