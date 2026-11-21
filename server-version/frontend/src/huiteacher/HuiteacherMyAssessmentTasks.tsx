@@ -58,7 +58,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
    if(!valid())return
    const nextList=data.list.map(row=>{
     if(row.status==='COMPLETED'){receiptCompleted.current.delete(row.executionId);return row}
-    if(receiptCompleted.current.has(row.executionId)&&(row.status==='STARTED'||row.status==='ASSIGNED'))return {...row,status:'COMPLETED'}
+    if(receiptCompleted.current.has(row.executionId)&&(row.status==='STARTED'||row.status==='ASSIGNED'))return {...row,status:'COMPLETED' as const}
     return row
    })
    setRows(old=>appendCursor?[...old,...nextList.filter(row=>!old.some(value=>value.executionId===row.executionId))]:nextList)
@@ -67,7 +67,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
  },[api])
  const markReceiptCompleted=useCallback((executionId:string)=>{
   receiptCompleted.current.add(executionId)
-  setRows(old=>old.map(row=>row.executionId===executionId?{...row,status:'COMPLETED'}:row))
+  setRows(old=>old.map(row=>row.executionId===executionId?{...row,status:'COMPLETED' as const}:row))
   void refresh()
  },[refresh])
  useEffect(()=>{
@@ -96,7 +96,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
    inlineWholeRef.current=null;activeIdentityRef.current=null;setFreshStart(false)
    const completion={executionId:task.executionId,attemptId:state.id,...(task.mode?{mode:task.mode}:{})},key=completion.executionId+':'+completion.attemptId
    setSession({task,attempt:state,child:null,completion})
-   setRows(old=>old.map(row=>row.executionId===task.executionId?{...row,status:'COMPLETED'}:row))
+   setRows(old=>old.map(row=>row.executionId===task.executionId?{...row,status:'COMPLETED' as const}:row))
    // Completion is durable even when list refresh or report reading fails.
    void refresh()
    if(!completed.current.has(key)){completed.current.add(key);completionCallback.current?.(completion)}
@@ -161,7 +161,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
   const valid=()=>mounted.current&&apiRef.current===api&&generation.current===token&&active.current===source
   const attempt=source.attempt
   if(progress?.runCompleted&&progress.attemptId===attempt.id&&progress.attemptEpoch===attempt.attemptEpoch){
-   accept(source.task,attempt.id,{...attempt,status:'COMPLETED',progress:100,currentItem:null,allUnitsSubmitted:true},valid)
+   accept(source.task,attempt.id,{...attempt,status:'COMPLETED' as const,progress:100,currentItem:null,allUnitsSubmitted:true},valid)
    return
   }
   await load(source.task,attempt.id,valid)
