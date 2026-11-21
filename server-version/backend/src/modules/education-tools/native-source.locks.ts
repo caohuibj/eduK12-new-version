@@ -29,15 +29,3 @@ export async function lockOwnedDraftNativeSources(tx:Prisma.TransactionClient,c:
    AND d.kind='COMPOSITION' AND b#>>'{source,provider}'='SJT_RELEASE'`)
  await lockEducationNativeSourceIds(tx,rows.map(row=>row.id))
 }
-export async function lockExecutionNativeSources(tx:Prisma.TransactionClient,input:{executionId:string;actorUserId:string}){
- const rows=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT b->>'versionId' AS id FROM assessment_run_executions e
-  JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
-  JOIN assessment_run_actor_snapshots respondent ON respondent.id=e.respondent_actor_snapshot_id AND respondent.organization_id=e.organization_id
-   AND respondent.run_id=e.run_id AND respondent.user_id=${input.actorUserId}
-  JOIN composite_assessments c ON c.id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}' AND c.creation_key=t.resource_key
-   AND c.training_content_snapshot_hash=t.frozen_resource_policy#>>'{educationComposition,manifestHash}'
-  CROSS JOIN LATERAL jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b
-  WHERE e.id=${input.executionId} AND e.runtime_binding_ref IS NULL AND t.resource_family='BUNDLE'
-   AND t.resource_key LIKE 'education-composition:%' AND b->>'sourceProvider'='SJT_RELEASE'`)
- await lockEducationNativeSourceIds(tx,rows.map(row=>row.id))
-}

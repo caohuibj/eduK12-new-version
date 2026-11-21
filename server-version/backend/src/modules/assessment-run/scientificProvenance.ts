@@ -1,6 +1,6 @@
 import {assertEducationAssessmentExecutionSource} from './educationAssessmentExecution'
 import {readPrivateFormExecutionSource} from './educationPrivateFormExecution'
-import {readFrozenCompositionIdentity,type CheckedCompositionIdentity} from './educationCompositionExecution'
+import {prepareFrozenCompositionStart,readFrozenCompositionIdentity,type CheckedCompositionIdentity,type FrozenCompositionTrack} from './educationCompositionExecution'
 import {readEducationScaleExecutionSource, type EducationScaleExecutionSource} from './educationScaleExecutionSource'
 import { relationalEntryToRunPolicy, productionRunResourceAuthorityRegistry, type RunResourceAuthorityRegistry, type RunResourceFamily, type RunResourcePolicy } from './resourceAuthority'
 import { Prisma } from '@prisma/client'
@@ -36,7 +36,24 @@ export class RunScientificProvenanceError extends Error {
 
 const MATURITIES = new Set<RunScientificMaturity>(['PILOT', 'RESEARCH_READY', 'RESEARCH_GRADE'])
 
+export async function prepareCompositionScientificProvenance(track: FrozenCompositionTrack) {
+  const identity = await prepareFrozenCompositionStart(track)
+  if (!identity) return undefined
+  const provenance: FrozenRunScientificProvenanceV1 = {
+    schemaVersion: 1,
+    resourceFamily: identity.policy.family,
+    resourceKey: track.key,
+    resourceVersion: track.version,
+    resourcePolicyHash: track.policyHash,
+    scientificMaturity: 'PILOT',
+  }
+  return { identity, provenance, hash: canonicalHash(provenance) }
+}
+
+export type PreparedCompositionProvenance = NonNullable<Awaited<ReturnType<typeof prepareCompositionScientificProvenance>>>
+
 export type ScientificProvenanceKnownLockContext = {
+  preparedComposition?: PreparedCompositionProvenance
   organizationId: string
   hasCampusActivity?: boolean
   hasHuiteacherLink?: boolean
@@ -158,6 +175,15 @@ export const freezeRunExecutionScientificProvenanceWithDetailsInTransaction = as
     resourcePolicyHash: row.resourcePolicyHash,
     frozenResourcePolicy: row.frozenResourcePolicy,
   }
+  const prepared = knownContext?.preparedComposition
+  const matchingPreparation = prepared && prepared.identity.origin.organizationId === row.organizationId
+    && prepared.provenance.resourceFamily === row.resourceFamily
+    && prepared.provenance.resourceKey === row.resourceKey
+    && prepared.provenance.resourceVersion === row.resourceVersion
+    && prepared.provenance.resourcePolicyHash === row.resourcePolicyHash ? prepared : undefined
+  // The dispatch source query checks the live publication and exact actor/track
+  // binding before the transaction can commit.
+  const preparedIdentity = matchingPreparation ? { tx, identity: matchingPreparation.identity } : undefined
   if (row.scientificMaturity && row.scientificProvenance && row.scientificProvenanceHash && row.scientificFrozenAt) {
     return {
       record: {
@@ -167,6 +193,7 @@ export const freezeRunExecutionScientificProvenanceWithDetailsInTransaction = as
         scientificFrozenAt: row.scientificFrozenAt,
       },
       track: trackSummary,
+      compositionIdentity: preparedIdentity,
     }
   }
   if (!row.resourcePolicyHash || !row.frozenResourcePolicy || typeof row.frozenResourcePolicy !== 'object') {
@@ -176,10 +203,10 @@ export const freezeRunExecutionScientificProvenanceWithDetailsInTransaction = as
   // Private resources intentionally cannot enter the generic registry. Derive
   // their baseline only from the exact immutable version bound to this real
   // product execution, not author roles or a caller-supplied trusted flag.
-  const compositionIdentity = row.resourceKey.startsWith('education-composition:')
+  const compositionIdentity = preparedIdentity ?? (row.resourceKey.startsWith('education-composition:')
     ? {tx,identity:await readFrozenCompositionIdentity(tx,{policy:row.frozenResourcePolicy as RunResourcePolicy,policyHash:row.resourcePolicyHash,
        organizationId:row.organizationId,key:row.resourceKey,version:row.resourceVersion})}
-    : undefined
+    : undefined)
   const current = compositionIdentity
     ? compositionIdentity.identity.policy
     : row.resourceKey.startsWith('private-form:')
@@ -205,7 +232,7 @@ export const freezeRunExecutionScientificProvenanceWithDetailsInTransaction = as
   if (typeof maturity !== 'string' || !MATURITIES.has(maturity as RunScientificMaturity)) {
     throw new RunScientificProvenanceError('RUN_SCIENCE_MATURITY_INVALID', 'frozen resource policy has no valid scientific maturity', 409)
   }
-  const provenance: FrozenRunScientificProvenanceV1 = {
+  const provenance: FrozenRunScientificProvenanceV1 = matchingPreparation?.provenance ?? {
     schemaVersion: 1,
     resourceFamily: row.resourceFamily,
     resourceKey: row.resourceKey,
@@ -213,7 +240,7 @@ export const freezeRunExecutionScientificProvenanceWithDetailsInTransaction = as
     resourcePolicyHash: row.resourcePolicyHash,
     scientificMaturity: maturity as RunScientificMaturity,
   }
-  const hash = canonicalHash(provenance)
+  const hash = matchingPreparation?.hash ?? canonicalHash(provenance)
   const frozenAt = knownContext?.now
     ?? (await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`)[0].now
   const payload = JSON.stringify(provenance)

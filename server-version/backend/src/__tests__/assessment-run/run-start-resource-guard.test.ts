@@ -4,6 +4,7 @@ import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 const m = vi.hoisted(() => ({
   queryRaw: vi.fn(),
   acquireClaim: vi.fn(),
+  loadPublication: vi.fn(),
   constrained: vi.fn(),
   cpuPaused: vi.fn(),
   awaitResources: vi.fn(),
@@ -35,6 +36,7 @@ vi.mock('../../services/assessmentResourceProtection', async () => {
 })
 vi.mock('../../modules/composite/composite.service', () => ({
   buildWholeStartPreload: vi.fn(),
+  loadStartComposite: m.loadPublication,
   startRelationalCompositeAttemptInTransaction: vi.fn(),
 }))
 vi.mock('../../services/instrumentFinalSubmit', async () => {
@@ -45,7 +47,7 @@ vi.mock('../../services/instrumentFinalSubmit', async () => {
 })
 
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
-import { startAssessmentRunExecution } from '../../modules/assessment-run/startExecution'
+import { runStartGate, startAssessmentRunExecution } from '../../modules/assessment-run/startExecution'
 import {
   prepareFrozenCompositionStart,
   readCompositionExecutionSource,
@@ -209,8 +211,20 @@ describe('assessment-run pre-gate resource protection & composition identity cac
 
     const track = { policy: policy as any, policyHash, organizationId: orgId, key, version: '1.0.0' }
     // 1. The actual cold START preflight warms the catalog before invoking the claim.
-    m.queryRaw.mockResolvedValueOnce([row])
-    m.acquireClaim.mockImplementationOnce(async () => {
+    m.loadPublication.mockImplementationOnce(async () => {
+      expect(runStartGate().getStats().active).toBe(0)
+      return { id: compositeId, trainingContentSnapshotHash: policy.educationComposition.manifestHash }
+    })
+    m.queryRaw.mockImplementationOnce(async () => {
+      expect(runStartGate().getStats().active).toBe(0)
+      return [row]
+    })
+    m.acquireClaim.mockImplementationOnce(async input => {
+      expect(runStartGate().getStats().active).toBe(1)
+      expect(input.preparedComposition).toMatchObject({
+        identity: { compositeId, policyHash },
+        provenance: { resourceKey: key, resourcePolicyHash: policyHash, scientificMaturity: 'PILOT' },
+      })
       expect(m.queryRaw).toHaveBeenCalledTimes(1)
       expect(m.queryRaw.mock.calls[0][0].sql).toContain('jsonb_array_elements')
       return { kind: 'BOUND', runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: compositeId }

@@ -3569,8 +3569,9 @@ const createAttempt = async (
   const field=fieldStart?readVerifiedFieldStart(fieldStart,{tx:db,compositeId:composite.id,respondentUserId:userId??''}):undefined
   if(field&&(relationalIdentity||educationStart||accessTokenId||credential||composite.productKind!=='ORGANIZATION_RESOURCE'))throw compositeForbidden('现场观察准入上下文不匹配')
   const educationProduct=field?'TEACHER':educationStart?readVerifiedEducationStart(educationStart,{tx:db,compositeId:composite.id,assignmentRef:relationalIdentity?.assignmentRef??'',subjectUserId:relationalIdentity?.subjectUserId??'',respondentUserId:userId??''}):undefined
-  const educationComposition=field?fieldCompositionBinding(field.assessmentRef):readVerifiedCompositionStart(educationStart,{tx:db,compositeId:composite.id,
+  const compositionAdmission=readVerifiedCompositionStart(educationStart,{tx:db,compositeId:composite.id,
     assignmentRef:relationalIdentity?.assignmentRef??'',subjectUserId:relationalIdentity?.subjectUserId??'',respondentUserId:userId??''})
+  const educationComposition=field?fieldCompositionBinding(field.assessmentRef):compositionAdmission?.binding
   if(educationProduct&&!field&&(composite.productKind!=='ORGANIZATION_RESOURCE'||!relationalIdentity
     ||(!educationComposition&&relationalIdentity.subjectUserId!==userId)||relationalIdentity.respondentUserId!==userId))throw compositeForbidden('教育测评准入上下文不匹配')
   // Parent START and publication stop/archive serialize on the same row. Child
@@ -3867,8 +3868,15 @@ const createAttempt = async (
   // boundary (education use grant checked at publication); for them only the
   // shared emergency-stop/identity lock applies, never Training entry policies.
   const collectionScaleIds=composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scaleId)
-  if(composite.productKind==='ORGANIZATION_RESOURCE')await assertScaleLibraryCollectionAllowed(db as Prisma.TransactionClient,[],collectionScaleIds)
-  else {
+  if(composite.productKind==='ORGANIZATION_RESOURCE'){
+    // The exact current Scale identities were checked and SHARE-locked by
+    // SELF Run admission in this transaction. Check any uncovered identities.
+    const checkedScaleIds = heldPublication && !formSections.length && composite.items.every((item:any)=>item.type==='SCALE')
+      && educationComposition?.manifestHash===composite.trainingContentSnapshotHash
+      ? compositionAdmission?.checkedScaleIds : undefined
+    const uncheckedScaleIds = checkedScaleIds ? collectionScaleIds.filter((id:string)=>!checkedScaleIds.has(id)) : collectionScaleIds
+    if(!checkedScaleIds||uncheckedScaleIds.length)await assertScaleLibraryCollectionAllowed(db as Prisma.TransactionClient,[],uncheckedScaleIds)
+  } else {
     // Explicit product decision: exact C/P/R combinations carry their own
     // Training entry approval. contentCandidate already revalidated each such
     // item, its current use, source/deployment identity and shared stop locks.

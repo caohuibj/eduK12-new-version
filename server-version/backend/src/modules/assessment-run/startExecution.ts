@@ -1,6 +1,6 @@
 import {assertEducationAssessmentExecutionSource} from './educationAssessmentExecution'
 import {readPrivateFormExecutionSource} from './educationPrivateFormExecution'
-import {admitCompositionStart,lockCompositionStartLibraryUses,prepareFrozenCompositionStart} from './educationCompositionExecution'
+import {admitCompositionStart,lockCompositionStartLibraryUses} from './educationCompositionExecution'
 import {assertEducationLibraryUses} from '../education-tools/library-source.use'
 import { assertEducationLibraryExecutionSource } from './educationLibraryExecution'
 import {assertTrainingPrivateReferenceAdmissionCurrent} from '../composite/training-private-reference-use'
@@ -47,7 +47,7 @@ import {
 } from './startClaim'
 import { loadRunExecutionStartAdmission } from './startAdmission'
 import { assertCurrentRunStartAuthority } from './startAuthority'
-import { freezeRunExecutionScientificProvenance, freezeRunExecutionScientificProvenanceInTransaction } from './scientificProvenance'
+import { freezeRunExecutionScientificProvenance, freezeRunExecutionScientificProvenanceInTransaction, prepareCompositionScientificProvenance } from './scientificProvenance'
 import {
   productionRunRuntimeAdapterRegistry,
   type RunRuntimeAdapterRegistry,
@@ -824,32 +824,41 @@ export const startAssessmentRunExecution = async (input: {
     && !input.startPreflight.runtimeBindingRef && !input.resourceRegistry
     ? input.startPreflight : undefined
   const compositionCandidate = preflight?.compositionStartCompositeId
+  const track = preflight?.compositionStartTrack
+  const candidate = compositionCandidate ?? preflight?.preloadCompositeId
+  const loadPublication = (id: string) => import('../composite/composite.service')
+    .then(module => module.loadStartComposite(id)).catch(() => null)
+  const checkCompositionResources = async () => {
+    try {
+      return await traceAssessmentPhase('start.run_cpu_admission', awaitScaleCompositionStartResources)
+    } catch (err) {
+      if (isAssessmentStartResourceGateError(err) && isAssessmentStartCpuPaused()) {
+        const bound = await readExistingBoundExecution(input.executionId, input.actorUserId)
+        if (bound) return bound
+      }
+      throw err
+    }
+  }
   const executeRunStart = async (): Promise<RunStartExecutionResult> => {
     try {
+      const prepareBeforeGate = compositionCandidate && track?.policy.runtimeLaunchTarget?.ref === compositionCandidate
+      // Avoid starting expensive publication reads during a known CPU pause.
+      // Recheck on entry after queueing; the memory trickle still wraps START.
+      if (prepareBeforeGate && isAssessmentStartCpuPaused()) {
+        const check = await checkCompositionResources()
+        if (typeof check !== 'boolean') return check
+      }
+      const prepared = prepareBeforeGate
+        ? await traceAssessmentPhase('start.run_prepare_frozen', () => Promise.all([
+            loadPublication(compositionCandidate),
+            prepareCompositionScientificProvenance(track).catch(() => undefined),
+          ]))
+        : undefined
       return await runStartGate().run(async () => {
-        let admittedScaleBatch = false
-        if (compositionCandidate) {
-          try {
-            admittedScaleBatch = await traceAssessmentPhase('start.run_cpu_admission', awaitScaleCompositionStartResources)
-          } catch (err) {
-            if (isAssessmentStartResourceGateError(err) && isAssessmentStartCpuPaused()) {
-              const bound = await readExistingBoundExecution(input.executionId, input.actorUserId)
-              if (bound) return bound
-            }
-            throw err
-          }
-        }
-        // The product route identified the respondent and the frozen track.
-        // Prepare immutable publication data before taking execution locks.
-        const candidate = compositionCandidate ?? preflight?.preloadCompositeId
-        const [preparation] = await Promise.all([
-          candidate ? import('../composite/composite.service')
-            .then(module => module.loadStartComposite(candidate))
-            .catch(() => null) : null,
-          compositionCandidate && preflight?.compositionStartTrack
-            ? prepareFrozenCompositionStart(preflight.compositionStartTrack).catch(() => undefined)
-            : undefined,
-        ])
+        const check = compositionCandidate ? await checkCompositionResources() : false
+        if (typeof check !== 'boolean') return check
+        const admittedScaleBatch = check
+        const preparation = prepared ? prepared[0] : candidate ? await loadPublication(candidate) : null
         // The claim transaction is the first durable step of a Run START. Its own
         // rolled-back outcomes (P2028 maxWait, serialization/deadlock/lock-timeout)
         // leave no claim, audit or provenance rows behind, so they share the same
@@ -870,6 +879,7 @@ export const startAssessmentRunExecution = async (input: {
             resourceRegistry: input.resourceRegistry,
             ...(knownIdentity ? { knownIdentity } : {}),
             lockCompositionSources: Boolean(compositionCandidate),
+            preparedComposition: prepared?.[1],
             transactionalDispatch: async (inlineContext: TransactionalStartDispatchContext) => {
               const inlineTrack = inlineContext.scientificDetails?.track
               const launch = inlineTrack

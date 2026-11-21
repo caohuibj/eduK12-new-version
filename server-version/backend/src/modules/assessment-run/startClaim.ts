@@ -1,5 +1,5 @@
 import type { RunResourceAuthorityRegistry } from './resourceAuthority'
-import { lockCompositionStartLibraryUses } from './educationCompositionExecution'
+import { assertFrozenCompositionPublication, lockCompositionStartLibraryUses } from './educationCompositionExecution'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -10,6 +10,7 @@ import { assertCurrentRunStartAuthority, type StartAuthorityKnownEnvelope } from
 import {
   freezeRunExecutionScientificProvenanceWithDetailsInTransaction,
   type FrozenRunScientificDetails,
+  type PreparedCompositionProvenance,
   type FrozenRunScientificProvenanceV1,
   type RunScientificMaturity,
 } from './scientificProvenance'
@@ -396,6 +397,7 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
   resourceRegistry?: RunResourceAuthorityRegistry
   knownIdentity?: RunExecutionLockIdentity
   lockCompositionSources?: boolean
+  preparedComposition?: PreparedCompositionProvenance
   transactionalDispatch?: (ctx: TransactionalStartDispatchContext) => Promise<TInlineResult | null>
 }): Promise<RunStartClaimDecision | { kind: 'COMPLETED_INLINE'; result: TInlineResult }>
 export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
@@ -405,6 +407,7 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
   resourceRegistry?: RunResourceAuthorityRegistry
   knownIdentity?: RunExecutionLockIdentity
   lockCompositionSources?: boolean
+  preparedComposition?: PreparedCompositionProvenance
   transactionalDispatch?: (ctx: TransactionalStartDispatchContext) => Promise<TInlineResult | null>
 }): Promise<RunStartClaimDecision | { kind: 'COMPLETED_INLINE'; result: TInlineResult }> {
   const leaseMs = input.leaseMs ?? 30_000
@@ -485,6 +488,7 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
           hasHuiteacherLink: execution.hasHuiteacherLink,
           now,
           alreadyLocked: true,
+          preparedComposition: input.preparedComposition,
           ...(knownScientificRow ? { knownRow: knownScientificRow } : {}),
         },
       )
@@ -524,6 +528,11 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
         if (inlineResult !== null) {
           return { kind: 'COMPLETED_INLINE' as const, result: inlineResult }
         }
+      }
+      // When START falls back to a separate dispatch, nothing in this
+      // transaction used the source query's live publication predicate yet.
+      if (input.preparedComposition && scientificDetails.compositionIdentity?.identity === input.preparedComposition.identity) {
+        await assertFrozenCompositionPublication(tx, input.preparedComposition.identity)
       }
       return { kind: 'ACQUIRED' as const, claim: rows[0], admission }
     }
