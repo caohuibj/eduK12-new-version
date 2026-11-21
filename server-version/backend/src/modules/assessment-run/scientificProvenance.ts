@@ -1,6 +1,6 @@
 import {assertEducationAssessmentExecutionSource} from './educationAssessmentExecution'
 import {readPrivateFormExecutionSource} from './educationPrivateFormExecution'
-import {readFrozenCompositionIdentity} from './educationCompositionExecution'
+import {readFrozenCompositionIdentity,type CheckedCompositionIdentity} from './educationCompositionExecution'
 import {readEducationScaleExecutionSource, type EducationScaleExecutionSource} from './educationScaleExecutionSource'
 import { relationalEntryToRunPolicy, productionRunResourceAuthorityRegistry, type RunResourceAuthorityRegistry, type RunResourceFamily, type RunResourcePolicy } from './resourceAuthority'
 import { Prisma } from '@prisma/client'
@@ -70,6 +70,7 @@ export type FrozenRunScientificDetails = {
     frozenResourcePolicy: unknown | null
   }
   educationScaleSource?: EducationScaleExecutionSource
+  compositionIdentity?: CheckedCompositionIdentity
 }
 
 export const freezeRunExecutionScientificProvenanceWithDetailsInTransaction = async (
@@ -175,9 +176,12 @@ export const freezeRunExecutionScientificProvenanceWithDetailsInTransaction = as
   // Private resources intentionally cannot enter the generic registry. Derive
   // their baseline only from the exact immutable version bound to this real
   // product execution, not author roles or a caller-supplied trusted flag.
-  const current = row.resourceKey.startsWith('education-composition:')
-    ? (await readFrozenCompositionIdentity(tx,{policy:row.frozenResourcePolicy as RunResourcePolicy,policyHash:row.resourcePolicyHash,
-       organizationId:row.organizationId,key:row.resourceKey,version:row.resourceVersion})).policy
+  const compositionIdentity = row.resourceKey.startsWith('education-composition:')
+    ? {tx,identity:await readFrozenCompositionIdentity(tx,{policy:row.frozenResourcePolicy as RunResourcePolicy,policyHash:row.resourcePolicyHash,
+       organizationId:row.organizationId,key:row.resourceKey,version:row.resourceVersion})}
+    : undefined
+  const current = compositionIdentity
+    ? compositionIdentity.identity.policy
     : row.resourceKey.startsWith('private-form:')
     ? relationalEntryToRunPolicy((await readPrivateFormExecutionSource(tx,{executionId})).resourceEntry)
     : row.resourceKey.startsWith('private-scale:') ? await (async () => {
@@ -229,7 +233,7 @@ export const freezeRunExecutionScientificProvenanceWithDetailsInTransaction = as
   if (!updated[0]) {
     throw new RunScientificProvenanceError('RUN_SCIENCE_FREEZE_CONFLICT', 'scientific provenance changed concurrently', 409)
   }
-  return { record: updated[0], track: trackSummary, educationScaleSource }
+  return { record: updated[0], track: trackSummary, educationScaleSource, compositionIdentity }
 }
 
 export const freezeRunExecutionScientificProvenanceInTransaction = async (

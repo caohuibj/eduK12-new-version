@@ -157,7 +157,11 @@ function startPreflightForRow(row:Row,actorUserId:string,compositionStartComposi
   respondentUserId:actorUserId,
   organizationId:row.organizationId,
   runId:row.runId,
-  ...(compositionStartCompositeId?{compositionStartCompositeId}:{}),
+  ...(compositionStartCompositeId?{
+   compositionStartCompositeId,
+   compositionStartTrack:{policy:row.policy,policyHash:row.policyHash,organizationId:row.organizationId,
+    key:row.resourceKey,version:row.resourceVersion},
+  }:{}),
   ...(typeof row.preloadCompositeId==='string'?{preloadCompositeId:row.preloadCompositeId}:{}),
  }
 }

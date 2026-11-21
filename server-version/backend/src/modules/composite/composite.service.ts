@@ -26,7 +26,7 @@ import {readEducationSjtSources} from '../education-tools/native-source.sjt'
 import {admitEducationNativeCognitive} from '../education-tools/native-source.cognitive'
 import { emptyOptionalReportRelations, OPTIONAL_REPORT_RELATION_COUNTS } from './composite-report-read-plan'
 import { lockAnonymousAdmission, lockAuthenticatedAdmission, lockCompositeAdmissionShare } from './authenticated-admission-lock'
-import { lockRelationalAdmission } from './relational-admission-lock'
+import { lockRelationalAdmission, type RelationalPublicationHeader } from './relational-admission-lock'
 import { BoundedAdmissionGate } from '../../services/boundedAdmissionGate'
 import { defaultStartAdmissionBound, boundedTrainingStartConcurrency } from '../../config/databasePool'
 import {publicTrainingFormDefinition} from '../assessment-runtime/typed-form'
@@ -3562,6 +3562,7 @@ const createAttempt = async (
   restartMaterialClaimId?: string,
   educationStart?: VerifiedEducationStart,
   fieldStart?: VerifiedFieldStart,
+  lockedRelationalPublication?: RelationalPublicationHeader,
 ) => {
   assertSupportedComposite(composite)
   const isOrdinaryQuestionnaire = isOrdinaryQuestionnaireStart(composite, relationalIdentity, educationStart, fieldStart)
@@ -3574,16 +3575,18 @@ const createAttempt = async (
     ||(!educationComposition&&relationalIdentity.subjectUserId!==userId)||relationalIdentity.respondentUserId!==userId))throw compositeForbidden('教育测评准入上下文不匹配')
   // Parent START and publication stop/archive serialize on the same row. Child
   // progression later consumes the already-admitted immutable runtime plan.
-  await lockCompositeAdmissionShare(db as Prisma.TransactionClient, composite.id)
+  const heldPublication = educationComposition && ['STUDENT:SELF', 'TEACHER:SELF'].includes(educationComposition.origin.variantKey)
+    ? lockedRelationalPublication : undefined
+  if (!heldPublication) await lockCompositeAdmissionShare(db as Prisma.TransactionClient, composite.id)
   if (!['QUESTIONNAIRE','ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
-    const current=await db.compositeAssessment.findUnique({where:{id:composite.id},
+    const current=heldPublication??await db.compositeAssessment.findUnique({where:{id:composite.id},
       select:composite._preloaded
         ?{status:true,trainingContentSnapshotHash:true,updatedAt:true}
         :{status:true,trainingContentSnapshot:true,trainingContentSnapshotHash:true,updatedAt:true}})
     if(!current||current.status!=='PUBLISHED')throw compositeForbidden('测评已停止接收新作答')
     if (composite._preloaded && (current.updatedAt?.getTime() !== composite.updatedAt?.getTime() || current.trainingContentSnapshotHash !== composite.trainingContentSnapshotHash)) {
       composite = await loadComposite(composite.id, true, db)
-    } else if(!composite._preloaded) {
+    } else if(!composite._preloaded && !heldPublication && 'trainingContentSnapshot' in current) {
       composite={...composite,trainingContentSnapshot:current.trainingContentSnapshot,trainingContentSnapshotHash:current.trainingContentSnapshotHash}
     } else {
       composite={...composite,trainingContentSnapshotHash:current.trainingContentSnapshotHash}
@@ -4036,7 +4039,7 @@ export const startRelationalCompositeAttemptInTransaction = async (
   // hold FOR UPDATE, so a mutation that returns always orders after every
   // admission it overlaps with, exactly as the previous exclusive row lock did.
   const participantKey = `user:${input.respondentUserId}`
-  await lockRelationalAdmission(db, input.compositeAssessmentId, participantKey)
+  const publication = await lockRelationalAdmission(db, input.compositeAssessmentId, participantKey)
   let composite = (input.preloadedComposite && input.preloadedComposite.id === input.compositeAssessmentId)
     ? { ...input.preloadedComposite, _preloaded: true }
     : await loadComposite(input.compositeAssessmentId, true, db)
@@ -4074,6 +4077,8 @@ export const startRelationalCompositeAttemptInTransaction = async (
     input.attemptIdentity,
     undefined,
     input.educationStart,
+    undefined,
+    publication,
   )
   if (attempt && !(attempt as any).compositeAssessment) {
     (attempt as any).compositeAssessment = composite
@@ -4251,9 +4256,14 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
   const scaleOnlyStart = isOrdinaryQuestionnaireStart(metadata) && metadata.items.length > 0
     && metadata.items.every((item: any) => item.required && item.type === 'SCALE')
 
-  const executeStart = async () => {
+  const preparePublication = async () => {
     const composite = await loadStartComposite(compositeId, prisma, metadata)
     if (metadata.deliveryCourseId) (composite as any).deliveryCourseId = metadata.deliveryCourseId
+    return composite
+  }
+
+  const executeStart = async (deferPublication = false) => {
+    let prepared = deferPublication ? undefined : await preparePublication()
 
     const isUniqueConstraintError = (err: unknown) =>
       typeof err === 'object' && err !== null && 'code' in err && (err as { code?: unknown }).code === 'P2002'
@@ -4270,6 +4280,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
               const admittedScaleBatch = scaleOnlyStart && await traceAssessmentPhase(
                 'start.training_cpu_admission', awaitScaleCompositionStartResources,
               )
+              const composite = prepared ??= await preparePublication()
               const transact = () => prisma.$transaction(async (tx: Db) => {
           const inTxStart = process.hrtime.bigint()
           try {
@@ -4332,7 +4343,8 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
 
   // CPU-only pressure is handled by the Training gate; the low-memory
   // trickle permit must still be acquired before entering that gate.
-  if (!scaleOnlyStart || isAssessmentStartCpuPaused()) return executeStart()
+  if (!scaleOnlyStart) return executeStart()
+  if (isAssessmentStartCpuPaused()) return executeStart(true)
   if (!isLowMemoryTrickleEnabled()) {
     assertAssessmentStartResources()
     return executeStart()

@@ -825,7 +825,7 @@ type WholeSubmissionHeader = Prisma.CompositeAssessmentAttemptGetPayload<{
   trainingVariantAllocationEncrypted: string | null; trainingVariantAllocationHash: string | null;
   compositeAssessment: { trainingVariantDraft: unknown; trainingVariantFrozen: unknown; trainingVariantDigest: string | null } }
 /** One fresh read of ownership, product eligibility and the current receipt. */
-const loadWholeSubmissionContext = async (attemptId: string, teacherAssignmentRef?: string) => {
+const loadWholeSubmissionContext = async (attemptId: string, boundAssignmentRef?: string) => {
   const rows = await prisma.$queryRaw<Array<Omit<WholeSubmissionHeader, 'compositeAssessment'> & {
     productKind: WholeSubmissionHeader['compositeAssessment']['productKind'];
     reportPackageKey: string | null; analysisProtocolKey: string | null;
@@ -848,7 +848,7 @@ const loadWholeSubmissionContext = async (attemptId: string, teacherAssignmentRe
       parent."context_snapshot_hash" AS "contextSnapshotHash",
       parent."aggregate_input_hash" AS "aggregateInputHash",
       parent."assignment_ref" AS "assignmentRef", parent."consent_id" AS "consentId",
-      ${teacherAssignmentRef ? Prisma.sql`CASE WHEN a.id IS NOT NULL THEN jsonb_build_object(
+      ${boundAssignmentRef ? Prisma.sql`CASE WHEN a.id IS NOT NULL THEN jsonb_build_object(
         'assignmentId', a.id, 'status', a.status, 'consentId', a.consent_id,
         'subjectUserId', a.subject_user_id, 'respondentUserId', a.respondent_user_id, 'respondentRole', a.respondent_role,
         'createdByUserId', a.created_by_user_id, 'relationshipKind', a.relationship_kind, 'visibilityPolicyKey', a.visibility_policy_key,
@@ -876,8 +876,8 @@ const loadWholeSubmissionContext = async (attemptId: string, teacherAssignmentRe
     FROM "composite_assessment_attempts" AS parent
     JOIN "composite_assessments" AS product ON product."id" = parent."composite_assessment_id"
     LEFT JOIN "composite_report_jobs" AS job ON job."attempt_id" = parent."id" AND job."attempt_epoch" = parent."attempt_epoch"
-    ${teacherAssignmentRef ? Prisma.sql`LEFT JOIN relational_assessment_assignments a
-      ON a.id=parent.assignment_ref AND a.id=${teacherAssignmentRef} AND a.policy_domain='ORGANIZATION_RUN'` : Prisma.empty}
+    ${boundAssignmentRef ? Prisma.sql`LEFT JOIN relational_assessment_assignments a
+      ON a.id=parent.assignment_ref AND a.id=${boundAssignmentRef} AND a.policy_domain='ORGANIZATION_RUN'` : Prisma.empty}
     WHERE parent."id" = ${attemptId}
   `
   const row = rows[0]
@@ -897,17 +897,17 @@ const loadWholeSubmissionContext = async (attemptId: string, teacherAssignmentRe
 
 /** One HTTP body, one durable encrypted answer envelope, one transactional job. */
 export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQuestionnaireSubmitInput, principal: Principal,
-  receivedAtMs = Date.now(), teacherAssignmentRef?: string) => {
+  receivedAtMs = Date.now(), boundAssignmentRef?: string) => {
   const admissionStarted = process.hrtime.bigint()
   const anonymous = !principal.userId && Boolean(principal.recoveryTokenHash)
   return withWholeSubmitAdmission(async () => {
   assessmentTimelineSpan('whole.admission_wait', admissionStarted)
-  const context = await traceAssessmentPhase('whole.owner_header_query', () => loadWholeSubmissionContext(attemptId, teacherAssignmentRef))
+  const context = await traceAssessmentPhase('whole.owner_header_query', () => loadWholeSubmissionContext(attemptId, boundAssignmentRef))
   if (!context) throw failure('问卷作答不存在', 404)
   const { parent, prior, currentAssignment } = context
   const owned = principal.userId ? parent.userId === principal.userId
     : parent.userId === null && Boolean(principal.recoveryTokenHash && parent.recoveryTokenHash === principal.recoveryTokenHash)
-  if (!owned || (teacherAssignmentRef && parent.assignmentRef !== teacherAssignmentRef)) throw failure('无权限操作此问卷', 403)
+  if (!owned || (boundAssignmentRef && parent.assignmentRef !== boundAssignmentRef)) throw failure('无权限操作此问卷', 403)
   const runWithPressure = typeof wholeSubmissionPriority.trackVerifiedWholeSubmissionPressure === 'function'
     ? wholeSubmissionPriority.trackVerifiedWholeSubmissionPressure
     : async <T>(op: () => Promise<T>, _anonymous: boolean): Promise<T> => op()
@@ -1004,26 +1004,35 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
 
 /** Completion poll for an education whole receipt. It does not project a report. */
 export const readEducationWholeProgress = async (attemptId: string, userId: string, executionStatus?: string) => {
-  const parent = await prisma.compositeAssessmentAttempt.findUnique({
-    where: { id: attemptId },
-    select: { id: true, userId: true, status: true, attemptEpoch: true, assignmentRef: true,
-      compositeAssessment: { select: { productKind: true } } },
-  })
-  if (!parent || parent.userId !== userId || !parent.assignmentRef || parent.compositeAssessment.productKind !== 'ORGANIZATION_RESOURCE') {
-    throw failure('无权限操作此问卷', 403)
-  }
-  const job = await prisma.compositeReportJob.findUnique({
-    where: { attemptId_attemptEpoch: { attemptId, attemptEpoch: parent.attemptEpoch } },
-    select: { wholeSubmissionId: true, status: true },
-  })
+  const [progress] = await prisma.$queryRaw<EducationWholeProgressRow[]>`
+    SELECT parent.attempt_epoch AS epoch, parent.status AS "parentStatus",
+      job.whole_submission_id AS "wholeSubmissionId", job.status AS "jobStatus"
+    FROM composite_assessment_attempts parent
+    JOIN composite_assessments publication ON publication.id=parent.composite_assessment_id
+    LEFT JOIN composite_report_jobs job ON job.attempt_id=parent.id AND job.attempt_epoch=parent.attempt_epoch
+    WHERE parent.id=${attemptId} AND parent.user_id=${userId} AND parent.assignment_ref<>''
+      AND publication.product_kind='ORGANIZATION_RESOURCE'
+  `
+  if (!progress) throw failure('无权限操作此问卷', 403)
+  return educationWholeProgressFromRow(attemptId, progress, executionStatus)
+}
+
+type EducationWholeProgressRow = {
+  epoch: number
+  parentStatus: WholeSubmissionHeader['status']
+  wholeSubmissionId: string | null
+  jobStatus: CompositeReportJob['status'] | null
+}
+
+export function educationWholeProgressFromRow(attemptId: string, progress: EducationWholeProgressRow, executionStatus?: string) {
   // The parent and assignment commit before the Run can release Teacher feedback.
   // Use the authorized execution snapshot even if the worker advances during this read.
-  const awaitingRun = executionStatus === 'STARTED' && parent.status === 'COMPLETED' && Boolean(job?.wholeSubmissionId)
-  const terminalFailure = job?.status === 'FAILED' || job?.status === 'CANCELLED' ? job.status : undefined
+  const awaitingRun = executionStatus === 'STARTED' && progress.parentStatus === 'COMPLETED' && Boolean(progress.wholeSubmissionId)
+  const terminalFailure = progress.jobStatus === 'FAILED' || progress.jobStatus === 'CANCELLED' ? progress.jobStatus : undefined
   return {
-    attemptId, attemptEpoch: parent.attemptEpoch, status: awaitingRun ? 'IN_PROGRESS' : parent.status,
-    wholeSubmissionReceived: Boolean(job?.wholeSubmissionId),
-    reportStatus: { state: awaitingRun ? terminalFailure ?? 'PROCESSING' : parent.status === 'COMPLETED' ? 'READY' : job?.status ?? 'WAITING' },
+    attemptId, attemptEpoch: progress.epoch, status: awaitingRun ? 'IN_PROGRESS' : progress.parentStatus,
+    wholeSubmissionReceived: Boolean(progress.wholeSubmissionId),
+    reportStatus: { state: awaitingRun ? terminalFailure ?? 'PROCESSING' : progress.parentStatus === 'COMPLETED' ? 'READY' : progress.jobStatus ?? 'WAITING' },
   }
 }
 

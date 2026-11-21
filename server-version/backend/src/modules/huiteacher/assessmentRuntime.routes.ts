@@ -12,6 +12,7 @@ import {isInstrumentFinalSubmitError} from '../../services/instrumentFinalSubmit
 import {isUnitSubmitAdmissionBusyError} from '../../services/unitSubmitAdmission'
 import {isQuestionnaireCompletionAdmissionBusyError,isTransientCompletionDatabaseError} from '../../services/questionnaireCompletionAdmission'
 import {startAssessmentRunExecution} from '../assessment-run/startExecution'
+import {readOrdinarySelfWholeAccess} from '../assessment-run/ordinarySelfWholeAccess'
 import {isAssessmentStartBusyError} from '../composite/start-transient'
 import {isAssessmentStartResourceGateError} from '../../services/assessmentResourceProtection'
 import {parseKnownTemplateHashes} from '../composite/whole-start-inline'
@@ -101,11 +102,9 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
    return runtimeError(new TeacherAssessmentRuntimeError(),res,next)
   next()
  })
- const attemptAccess:RequestHandler=(req,res,next)=>{
-  void Promise.resolve().then(()=>access.own(req.user!.userId,{attemptId:uuid.parse(req.params.attemptId)}))
-   .then(()=>relationalRuntimeConsentAuthority.assertCompositeFinal(req.params.attemptId,req.user!.userId))
-   .then(()=>next()).catch(error=>runtimeError(error,res,next))
- }
+ const ordinaryAttempt=(req:Request)=>audience==='TEACHER_SELF'
+  ? readOrdinarySelfWholeAccess(db,'TEACHER',req.user!.userId,{attemptId:uuid.parse(req.params.attemptId)})
+  : null
  const childAccess=(type:'COGNITIVE'|'SITUATIONAL'|'SCALE'|'FORM_SECTION'):RequestHandler=>(req,res,next)=>{
   void Promise.resolve().then(()=>access.child(req.user!.userId,{
    attemptId:uuid.parse(req.params.attemptId),itemId:uuid.parse(type==='FORM_SECTION'?req.params.sectionId:req.params.itemId),type,
@@ -142,33 +141,36 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
  }))
  router.post('/run-executions/:executionId/start-assessment',wrapped(async req=>{
   const executionId=uuid.parse(req.params.executionId),actorUserId=req.user!.userId
-  const proof=await access.forStart(actorUserId,executionId)
-  // Resume the exact durable binding without re-running new-intake admission.
-  // All current product/source/actor/consent checks still run on subsequent reads.
+  const admitted=audience==='TEACHER_SELF'
+   ? await readOrdinarySelfWholeAccess(db,'TEACHER',actorUserId,{executionId}) : null
+  const proof=admitted ? undefined : await access.forStart(actorUserId,executionId)
   const knownTemplateHashes=parseKnownTemplateHashes(req)
-  if(proof.task.runtimeBindingRef){
-   await relationalRuntimeConsentAuthority.assertCompositeFinal(proof.task.runtimeBindingRef,req.user!.userId)
+  const boundAttemptId=admitted?.kind==='bound' ? admitted.id : proof?.task.runtimeBindingRef
+  if(boundAttemptId){
+   if(!admitted)await relationalRuntimeConsentAuthority.assertCompositeFinal(boundAttemptId,actorUserId)
    return attachTeacherInlineCurrentUnit({
     requested:requestedTeacherInlineCurrentUnit(req),
-    started:{state:'STARTED' as const,runtimeBindingKind:'COMPOSITE' as const,runtimeBindingRef:proof.task.runtimeBindingRef,replayed:true as const},
-    attemptId:proof.task.runtimeBindingRef,
-    actorUserId:req.user!.userId,
+    started:{state:'STARTED' as const,runtimeBindingKind:'COMPOSITE' as const,runtimeBindingRef:boundAttemptId,replayed:true as const},
+    attemptId:boundAttemptId,
+    actorUserId,
     freshlyCreated:false,
     knownTemplateHashes,
-    authorize:({attemptId,actorUserId})=>relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId),
+    authorize:admitted ? undefined : ({attemptId,actorUserId})=>relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId),
     project:projectTeacherCompositeRuntime,
    })
   }
   const result=await startAssessmentRunExecution({
    executionId,actorUserId:req.user!.userId,
-   // access.own already established this execution has no persisted binding.
-   startPreflight:proof.startPreflight??{runtimeBindingKind:null,runtimeBindingRef:null,respondentUserId:req.user!.userId},
+   startPreflight:(admitted?.kind==='start' ? admitted.preflight : proof?.startPreflight)
+    ??{runtimeBindingKind:null,runtimeBindingRef:null,respondentUserId:actorUserId},
   })
   if(result.state==='STARTED'){
    if(result.runtimeBindingKind!=='COMPOSITE')throw new TeacherAssessmentRuntimeError()
    const binding=result._committedCompositionStart
    const committed=binding?.executionId===executionId&&binding.actorUserId===actorUserId&&binding.attemptId===result.runtimeBindingRef
-   if(!committed)await assertPersistedTeacherRunBinding(db,actorUserId,{executionId,attemptId:result.runtimeBindingRef})
+   const resumed = !committed && admitted?.kind==='start'
+    ? await readOrdinarySelfWholeAccess(db,'TEACHER',actorUserId,{attemptId:result.runtimeBindingRef}) : null
+   if(!committed&&!resumed)await assertPersistedTeacherRunBinding(db,actorUserId,{executionId,attemptId:result.runtimeBindingRef})
    return attachTeacherInlineCurrentUnit({
     requested:requestedTeacherInlineCurrentUnit(req),
     started:result,
@@ -176,7 +178,7 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
     actorUserId:req.user!.userId,
     freshlyCreated:(result as {_freshlyCreatedAttempt?:boolean})._freshlyCreatedAttempt===true,
     knownTemplateHashes,
-    authorize:committed&&binding.consentFree?undefined:({attemptId,actorUserId})=>
+    authorize:resumed||committed&&binding.consentFree?undefined:({attemptId,actorUserId})=>
      relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId),
     project:projectTeacherCompositeRuntime,
    })
@@ -184,28 +186,31 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   return result
  }))
  const parent='/assessment-composite-attempts/:attemptId'
- const wholeBound=(acceptedWhole=false):RequestHandler=>(req,res,next)=>{
-  void Promise.resolve().then(()=>access.own(req.user!.userId,{attemptId:uuid.parse(req.params.attemptId),acceptedWhole}))
+ const wholeBound=(acceptedWhole=false,finalConsentForLegacy=false):RequestHandler=>(req,res,next)=>{
+  void Promise.resolve().then(async()=>{
+   const admitted=await ordinaryAttempt(req)
+   if(admitted){res.locals.ordinarySelfWhole=admitted;return}
+   const proof=await access.own(req.user!.userId,{attemptId:uuid.parse(req.params.attemptId),acceptedWhole})
+   res.locals.educationExecutionStatus=proof.task.status
+   if(finalConsentForLegacy)await relationalRuntimeConsentAuthority.assertCompositeFinal(req.params.attemptId,req.user!.userId)
+  })
    .then(()=>next()).catch(error=>runtimeError(error,res,next))
  }
  router.get(parent+'/whole',wholeBound(),compositeController.wholeDefinition)
  router.get(parent+'/whole/template/:templateHash',wholeBound(),compositeController.wholeTemplate)
  router.get(parent+'/whole/receipt',wholeBound(true),compositeController.wholeReceipt)
- router.get(parent+'/whole/progress',wrapped(async req=>{
-  const attemptId=uuid.parse(req.params.attemptId),userId=req.user!.userId
-  const proof=await access.own(userId,{attemptId,acceptedWhole:true})
-  const {readEducationWholeProgress}=await import('../composite/whole-questionnaire.service')
-  return readEducationWholeProgress(attemptId,userId,proof.task.status)
- }))
+ router.get(parent+'/whole/progress',wholeBound(true),compositeController.educationWholeProgress)
  router.post(parent+'/whole/submit',handler(async(req,res)=>{
+  const admitted=await ordinaryAttempt(req)
+  if(admitted)return compositeController.educationWholeSubmit(req,res,admitted.assignmentRef)
   const proof=await access.own(req.user!.userId,{attemptId:uuid.parse(req.params.attemptId),acceptedWhole:true})
   if(audience==='TEACHER_SELF'&&proof.row.resourceKey.startsWith('education-composition:TEACHER:')
    &&proof.row.resourceKey.endsWith(':TEACHER:SELF:1.0.0')){
-   return compositeController.teacherWholeSubmit(req,res,proof.row.assignmentId)
+   return compositeController.educationWholeSubmit(req,res,proof.row.assignmentId)
   }
   return compositeController.wholeSubmit(req,res)
  }))
- router.get(parent,attemptAccess,wrapped(async req=>projectTeacherCompositeRuntime(
+ router.get(parent,wholeBound(false,true),wrapped(async req=>projectTeacherCompositeRuntime(
   await getAttemptState(req.params.attemptId,{userId:req.user!.userId},undefined,'current-unit'))))
  router.get(parent+'/form-sections/:sectionId/assets/:assetId/content',childAccess('FORM_SECTION'),compositeImageController.educationFormImage)
  router.post(parent+'/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability',childAccess('FORM_SECTION'),compositeVideoController.educationFormVideo)

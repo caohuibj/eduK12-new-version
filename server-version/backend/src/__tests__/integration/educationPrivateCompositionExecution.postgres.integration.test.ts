@@ -4,12 +4,17 @@ import type {Server} from 'node:http'
 import {PrismaClient} from '@prisma/client'
 import {afterAll,beforeAll,describe,expect,it,vi} from 'vitest'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from './integration-env'
-import {compositionStartCommit,setupTeacherCompositionExecution} from './educationPrivateCompositionExecutionFixture'
+import {compositionStartCommit,setupSchoolCompositionExecution,setupTeacherCompositionExecution} from './educationPrivateCompositionExecutionFixture'
 import {createTeacherAssessmentRuntimeRouter} from '../../modules/huiteacher/assessmentRuntime.routes'
 import {teacherAssessmentRuntimeSource} from '../../modules/huiteacher/assessmentRuntime.source'
 import {csrfProtection} from '../../middleware/csrf'
 import {generateToken} from '../../utils/jwt'
-import {HUITEACHER_AUTH_COOKIE_NAME,HUITEACHER_CSRF_COOKIE_NAME,CSRF_HEADER_NAME} from '../../utils/authCookies'
+import {HUITEACHER_AUTH_COOKIE_NAME,HUITEACHER_CSRF_COOKIE_NAME,SCHOOL_AUTH_COOKIE_NAME,SCHOOL_CSRF_COOKIE_NAME,CSRF_HEADER_NAME} from '../../utils/authCookies'
+import activityRunRouter from '../../modules/campus/activity.run.routes'
+import campusCompositeRouter from '../../modules/campus/composite.routes'
+import {changeCampusActivityStatus,readCampusActivity} from '../../modules/campus/activity.service'
+import {transitionHuiteacherEvent} from '../../modules/huiteacher/evaluation.service'
+import {closeAssessmentRun} from '../../modules/assessment-run/lifecycle'
 import {getAttemptState,startUserAttempt} from '../../modules/composite/composite.service'
 import {readTeacherOrdinaryFeedback} from '../../modules/reporting/education-ordinary-feedback.service'
 import {submitCompositeScaleFinal} from '../../modules/scale/scale-final-submit.service'
@@ -19,15 +24,15 @@ import {updatePrivateTool} from '../../modules/education-tools/private-tool.serv
 
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
 let db:PrismaClient,server:Server,base:string
-async function headers(userId:string){
+async function headers(userId:string,school=false){
  const user=await db.user.findUniqueOrThrow({where:{id:userId}}),csrf='synthetic-ordinary-csrf'
  const token=generateToken({userId,username:user.username,role:user.role,tokenVersion:user.tokenVersion,accountDomain:'SCHOOL',
-  sessionProduct:'HUITEACHER',mfaVerifiedAt:Math.floor(Date.now()/1000)})
- return {cookie:`${HUITEACHER_AUTH_COOKIE_NAME}=${encodeURIComponent(token)}; ${HUITEACHER_CSRF_COOKIE_NAME}=${csrf}`,
+  ...(!school?{sessionProduct:'HUITEACHER' as const}:{}),mfaVerifiedAt:Math.floor(Date.now()/1000)})
+ return {cookie:`${school?SCHOOL_AUTH_COOKIE_NAME:HUITEACHER_AUTH_COOKIE_NAME}=${encodeURIComponent(token)}; ${school?SCHOOL_CSRF_COOKIE_NAME:HUITEACHER_CSRF_COOKIE_NAME}=${csrf}`,
   [CSRF_HEADER_NAME]:csrf,'content-type':'application/json'}
 }
-async function request(path:string,auth:Record<string,string>,body?:unknown){
- const response=await fetch(base+path,{headers:auth,...(body!==undefined?{method:'POST',body:JSON.stringify(body)}:{})})
+async function request(path:string,auth:Record<string,string>,body?:unknown,school=false){
+ const response=await fetch(base+(school?'/api/campus':'/api/huiteacher')+path,{headers:auth,...(body!==undefined?{method:'POST',body:JSON.stringify(body)}:{})})
  const value=await response.json()
  return {status:response.status,value,data:value.data}
 }
@@ -38,11 +43,87 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
   db=new PrismaClient({datasources:{db:{url:url!}}});await db.$connect()
   const app=express();app.use(express.json());app.use('/api',csrfProtection)
   app.use('/api/huiteacher',createTeacherAssessmentRuntimeRouter(teacherAssessmentRuntimeSource))
+  app.use('/api/campus',activityRunRouter,campusCompositeRouter)
   app.use((error:any,_req:any,res:any,_next:any)=>res.status(error.statusCode??500).json({code:error.code??'ERROR',message:error.message}))
   server=app.listen(0,'127.0.0.1');await new Promise<void>(resolve=>server.once('listening',resolve))
-  base='http://127.0.0.1:'+(server.address() as {port:number}).port+'/api/huiteacher'
+  base='http://127.0.0.1:'+(server.address() as {port:number}).port
  })
  afterAll(async()=>{if(server)await new Promise<void>(resolve=>server.close(()=>resolve()));await db?.$disconnect()})
+ it.each(['School','Teacher'])('%s admits SELF once and completes the scale whole receipt after closure and withdrawal',async product=>{
+  vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED','true')
+  vi.stubEnv('ASSESSMENT_WHOLE_SUBMIT_ENABLED','true')
+  try{
+   const school=product==='School',create=school?setupSchoolCompositionExecution:setupTeacherCompositionExecution
+   const f=await create(db,{scaleOnly:true}),actor=f.participantUserId
+   const auth=await headers(actor,school),other=await headers(f.managerUserId,school)
+   const startPath=(target:typeof f)=>school
+    ? `/organizations/${target.organizationId}/activities/${target.workflow.id}/runs/${target.runId}/executions/${target.executionId}/start`
+    : `/run-executions/${target.executionId}/start-assessment`
+   const close=async(target:typeof f)=>{
+    await closeAssessmentRun({organizationId:target.organizationId,runId:target.runId})
+    if(school){
+     const scope={organizationId:target.organizationId,courseId:target.workflow.id,actor:target.manager}
+     const activity=await readCampusActivity(scope)
+     await changeCampusActivityStatus({...scope,action:'CLOSE',expectedVersion:activity.version})
+    }else{
+     const event=await db.huiteacherEvaluationEvent.findUniqueOrThrow({where:{id:target.workflow.id}})
+     await transitionHuiteacherEvent({organizationId:target.organizationId,eventId:event.id,actorUserId:target.managerUserId,action:'CLOSE',expectedVersion:event.version})
+    }
+   }
+   const start=()=>request(startPath(f),auth,{},school)
+   const [first,otherStart]=await Promise.all([start(),start()])
+   expect(first.status,JSON.stringify(first.value)).toBe(200)
+   const id=first.data.runtimeBindingRef
+   expect(otherStart.data).toMatchObject({runtimeBindingRef:id})
+   expect(await compositionStartCommit(db,f.executionId,id)).toEqual([{atomic:true,state:'COMPLETED'}])
+   await close(f)
+   await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:f.organizationId,userId:actor,
+    permission:'RUN_START',reason:'Synthetic withdrawal after admission',deniedByUserId:f.managerUserId}})
+   expect((await start()).data).toMatchObject({runtimeBindingRef:id,replayed:true})
+   const pending=await create(db,{scaleOnly:true})
+   await close(pending)
+   const blocked=await request(startPath(pending),await headers(pending.participantUserId,school),{},school)
+   expect([403,404,409]).toContain(blocked.status)
+   expect(await db.compositeAssessmentAttempt.count({where:{compositeAssessmentId:pending.runtime.compositeId}})).toBe(0)
+   const route=(school?'/composite-attempts/':'/assessment-composite-attempts/')+id+'/whole'
+   const get=(suffix='')=>request(route+suffix,auth,undefined,school)
+   const post=(payload:unknown)=>request(route+'/submit',auth,payload,school)
+   const delivered=await get()
+   expect(delivered.status,JSON.stringify(delivered.value)).toBe(200)
+   const def=delivered.data,submissionId=randomUUID()
+   const receipt=(epoch=def.attemptEpoch,id=submissionId)=>`/receipt?submissionId=${id}&attemptEpoch=${epoch}`
+   expect((await get(receipt())).data).toMatchObject({status:'NOT_RECEIVED'})
+   expect((await get(receipt(def.attemptEpoch+1))).status).toBe(409)
+   expect((await request(route,other,undefined,school)).status).toBe(404)
+   const payload={submissionId,attemptEpoch:def.attemptEpoch,slotSetHash:def.slotSetHash,contextSnapshotHash:def.contextSnapshotHash,
+    units:def.units.map((unit:any)=>({itemId:unit.itemId,definitionHash:unit.definitionHash,
+     answers:unit.scale.definition.items.map((item:any)=>({itemCode:item.itemCode,responseValue:item.options[0].value}))}))}
+   expect((await request(route+'/submit',other,payload,school)).status).toBe(404)
+   expect((await post({...payload,units:[]})).status).toBe(400)
+   expect((await get(receipt())).data).toMatchObject({status:'NOT_RECEIVED'})
+   const saved=await post(payload)
+   expect(saved.status,JSON.stringify(saved.value)).toBe(200)
+   expect(saved.data).toMatchObject({status:'ACCEPTED',submissionId})
+   expect((await post(payload)).data).toMatchObject({status:'ACCEPTED',replayed:true})
+   expect((await post({...payload,units:payload.units.map((unit:any)=>({...unit,answers:unit.answers.map((answer:any)=>({...answer,responseValue:'b'}))}))})).status).toBe(409)
+   expect((await get(receipt(def.attemptEpoch,randomUUID()))).status).toBe(409)
+   const pendingJob=await db.compositeReportJob.findUniqueOrThrow({where:{attemptId_attemptEpoch:{attemptId:id,attemptEpoch:def.attemptEpoch}}})
+   const job=await db.compositeReportJob.update({where:{id:pendingJob.id,status:'PENDING'},data:{status:'PROCESSING',
+    leaseToken:randomUUID(),leaseExpiresAt:new Date(Date.now()+90_000),claimedRevision:pendingJob.requestedRevision,attemptCount:{increment:1}}})
+   const {processWholeQuestionnaireAnswers}=await import('../../modules/composite/whole-questionnaire.service')
+   expect(await processWholeQuestionnaireAnswers(job)).toBe(true)
+   const {finalizeCompositeAttemptUnifiedIfReady}=await import('../../modules/assessment-runtime/unified-aggregate-finalizer.service')
+   expect(await finalizeCompositeAttemptUnifiedIfReady(id,undefined,job)).toMatchObject({status:'COMPLETED'})
+   expect(await db.assessmentUnitSnapshot.count({where:{compositeAttemptId:id,attemptEpoch:def.attemptEpoch}})).toBe(2)
+   const progress=await get('/progress')
+   expect(progress.status,JSON.stringify(progress.value)).toBe(200)
+   expect(progress.data).toMatchObject({wholeSubmissionReceived:true,reportStatus:{state:'PROCESSING'}})
+   expect((await get(receipt())).data).toMatchObject({status:'ACCEPTED',submissionId})
+   const {reconcileRelationalCompositeCompletion}=await import('../../modules/assessment-relational/runtime-completion')
+   await reconcileRelationalCompositeCompletion(id)
+   expect((await get('/progress')).data).toMatchObject({status:'COMPLETED',reportStatus:{state:'READY'}})
+  }finally{vi.unstubAllEnvs()}
+ },120_000)
  it('delivers frozen block instructions through the real Scale/Form execution after a draft edit, without extra pages',async()=>{
   const instructions=['冻结的量表衔接说明','冻结的表单衔接说明','']
   const f=await setupTeacherCompositionExecution(db,{instructions}),auth=await headers(f.participantUserId)

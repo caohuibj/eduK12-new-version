@@ -7,6 +7,10 @@ import { requireRecentSchoolMfa } from './mfa.middleware'
 import { asyncHandler } from '../../middleware/asyncHandler'
 import { success, forbidden, notFound } from '../../utils/response'
 import { assessmentRunController } from '../assessment-run/run.controller'
+import type { FrozenCompositionTrack } from '../assessment-run/educationCompositionExecution'
+import { readOrdinarySelfWholeAccess } from '../assessment-run/ordinarySelfWholeAccess'
+import { isInstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
+import { instrumentError } from '../../utils/response'
 import { CampusActivityError,assertCampusActivityEditor } from './activity.service'
 import {
   assertCampusActivityRunEditor,assertCampusActivityRunPublisher,
@@ -143,6 +147,7 @@ async function currentSchoolExecution(req:import('express').Request,res:import('
       respondentUserId:string
       preloadCompositeId:string|null
       compositionStartCompositeId:string|null
+      compositionStartTrack:FrozenCompositionTrack|null
       organizationId:string
       runId:string
     }>>`
@@ -154,6 +159,11 @@ async function currentSchoolExecution(req:import('express').Request,res:import('
         CASE WHEN t."resource_key" LIKE 'education-composition:SCHOOL:%:STUDENT:SELF:1.0.0'
           AND t."frozen_resource_policy" #>> '{runtimeLaunchTarget,kind}' = 'COMPOSITE'
           THEN t."frozen_resource_policy" #>> '{runtimeLaunchTarget,ref}' ELSE NULL END AS "compositionStartCompositeId",
+        CASE WHEN t."resource_key" LIKE 'education-composition:SCHOOL:%:STUDENT:SELF:1.0.0'
+          AND t."frozen_resource_policy" #>> '{runtimeLaunchTarget,kind}' = 'COMPOSITE'
+          THEN jsonb_build_object('policy',t."frozen_resource_policy",'policyHash',t."resource_policy_hash",
+            'organizationId',t."organization_id",'key',t."resource_key",'version',t."resource_version")
+          ELSE NULL END AS "compositionStartTrack",
         CASE WHEN t."frozen_resource_policy" #>> '{runtimeLaunchTarget,kind}' = 'COMPOSITE'
           AND t."resource_key" NOT LIKE 'education-composition:%'
           AND EXISTS (SELECT 1 FROM "composite_assessments" candidate
@@ -187,8 +197,27 @@ async function currentSchoolExecution(req:import('express').Request,res:import('
 router.post('/organizations/:organizationId/activities/:courseId/runs/:runId/executions/:executionId/consent/accept',
   authenticateSchool,currentSchoolExecution,wrap(async(req,res)=>
     assessmentRunController.acceptConsent(req,res)))
+async function schoolWholeStart(req:import('express').Request,res:import('express').Response,next:import('express').NextFunction){
+  try {
+    const path=execPath.safeParse(req.params)
+    if(req.user?.accountDomain==='SCHOOL'&&req.user.role==='STUDENT'&&path.success){
+      const proof=await readOrdinarySelfWholeAccess(prisma,'SCHOOL',req.user.userId,{
+        executionId:path.data.executionId,schoolPath:path.data,
+      })
+      if(proof){
+        if(proof.kind==='bound')res.locals.ordinarySelfWhole=proof
+        else res.locals.startPreflight=proof.preflight
+        return next()
+      }
+    }
+    return currentSchoolExecution(req,res,next)
+  } catch(error) {
+    if(isInstrumentFinalSubmitError(error))return instrumentError(res,error.code,error.message,error.statusCode)
+    return next(error)
+  }
+}
 router.post('/organizations/:organizationId/activities/:courseId/runs/:runId/executions/:executionId/start',
-  authenticateSchool,currentSchoolExecution,wrap(async(req,res)=>
+  authenticateSchool,schoolWholeStart,wrap(async(req,res)=>
     assessmentRunController.startExecution(req,res)))
 
 export default router

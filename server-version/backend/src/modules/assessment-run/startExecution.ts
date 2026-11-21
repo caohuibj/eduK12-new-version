@@ -1,6 +1,6 @@
 import {assertEducationAssessmentExecutionSource} from './educationAssessmentExecution'
 import {readPrivateFormExecutionSource} from './educationPrivateFormExecution'
-import {admitCompositionStart,lockCompositionStartLibraryUses} from './educationCompositionExecution'
+import {admitCompositionStart,lockCompositionStartLibraryUses,prepareFrozenCompositionStart} from './educationCompositionExecution'
 import {assertEducationLibraryUses} from '../education-tools/library-source.use'
 import { assertEducationLibraryExecutionSource } from './educationLibraryExecution'
 import {assertTrainingPrivateReferenceAdmissionCurrent} from '../composite/training-private-reference-use'
@@ -15,6 +15,7 @@ import type { RunStartPreflight } from './resourceBoundary'
 import {
   awaitScaleCompositionStartResources,
   isAssessmentStartCpuPaused,
+  isAssessmentStartResourceGateError,
   isAssessmentStartResourceConstrained,
   runWithLowMemoryTrickleAdmission,
   withAdmittedScaleCompositionStart,
@@ -395,7 +396,8 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   }
   const educationSource=admission.assignment.resourceKey.startsWith('education-assessment:')?await assertEducationAssessmentExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,purpose:'NEW_START'}):undefined
   const compositionStart=admission.assignment.resourceKey.startsWith('education-composition:')?await admitCompositionStart(tx,{
-    executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId},libraryUses?.uses):undefined
+    executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId},libraryUses?.uses,
+    input.inlineContext?.scientificDetails?.compositionIdentity):undefined
   if(admission.assignment.resourceKey.startsWith('private-form:'))await readPrivateFormExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId})
   // assessment_runs is already SHARE-locked by lockExecutionEnvelope, and
   // admission just projected r.status under that fence. A second SELECT
@@ -825,17 +827,29 @@ export const startAssessmentRunExecution = async (input: {
   const executeRunStart = async (): Promise<RunStartExecutionResult> => {
     try {
       return await runStartGate().run(async () => {
-        const admittedScaleBatch = Boolean(compositionCandidate) && await traceAssessmentPhase(
-          'start.run_cpu_admission', awaitScaleCompositionStartResources,
-        )
+        let admittedScaleBatch = false
+        if (compositionCandidate) {
+          try {
+            admittedScaleBatch = await traceAssessmentPhase('start.run_cpu_admission', awaitScaleCompositionStartResources)
+          } catch (err) {
+            if (isAssessmentStartResourceGateError(err) && isAssessmentStartCpuPaused()) {
+              const bound = await readExistingBoundExecution(input.executionId, input.actorUserId)
+              if (bound) return bound
+            }
+            throw err
+          }
+        }
         // The product route identified the respondent and the frozen track.
         // Prepare immutable publication data before taking execution locks.
         const candidate = compositionCandidate ?? preflight?.preloadCompositeId
-        const preparation = candidate
-          ? await import('../composite/composite.service')
-              .then(module => module.loadStartComposite(candidate))
-              .catch(() => null)
-          : null
+        const [preparation] = await Promise.all([
+          candidate ? import('../composite/composite.service')
+            .then(module => module.loadStartComposite(candidate))
+            .catch(() => null) : null,
+          compositionCandidate && preflight?.compositionStartTrack
+            ? prepareFrozenCompositionStart(preflight.compositionStartTrack).catch(() => undefined)
+            : undefined,
+        ])
         // The claim transaction is the first durable step of a Run START. Its own
         // rolled-back outcomes (P2028 maxWait, serialization/deadlock/lock-timeout)
         // leave no claim, audit or provenance rows behind, so they share the same
