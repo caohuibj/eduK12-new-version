@@ -80,8 +80,35 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
     ${path ? Prisma.sql`AND link.course_id=${path.courseId}` : Prisma.empty}`
   const teacherLink = Prisma.sql`SELECT 1 FROM huiteacher_evaluation_run_links link WHERE ${sameRun}`
   return Prisma.sql`
-    SELECT e.status AS "executionStatus", a.id AS "assignmentRef", p.id, p.user_id AS "userId",
-      NULL::text AS "recoveryTokenHash", p.attempt_epoch AS epoch, p.status AS "parentStatus",
+    WITH target_exec AS MATERIALIZED (
+      SELECT e.*
+      FROM assessment_run_executions e
+      WHERE ${byExecution ? Prisma.sql`e.id=${locator.executionId}` : Prisma.sql`e.runtime_binding_kind='COMPOSITE' AND e.runtime_binding_ref=${locator.attemptId}`}
+        ${path ? Prisma.sql`AND e.organization_id=${path.organizationId} AND e.run_id=${path.runId}` : Prisma.empty}
+        AND e.subject_actor_snapshot_id=e.respondent_actor_snapshot_id
+      LIMIT 1
+    ),
+    target_track AS MATERIALIZED (
+      SELECT t.*
+      FROM target_exec e
+      JOIN assessment_run_tracks t ON t.id=e.track_id AND t.organization_id=e.organization_id AND t.run_id=e.run_id
+      WHERE t.resource_family='BUNDLE' AND t.resource_version='1.0.0'
+        AND t.resource_key LIKE ${'education-composition:' + product + ':%:' + variant + ':1.0.0'}
+        AND t.frozen_resource_policy#>>'{educationComposition,origin,variantKey}'=${variant}
+        AND t.frozen_resource_policy#>>'{runtimeLaunchTarget,kind}'='COMPOSITE'
+        AND NOT EXISTS (SELECT 1 FROM composite_form_sections section
+          WHERE section.composite_assessment_id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}')
+        AND EXISTS (${school ? schoolLink : teacherLink}) AND NOT EXISTS (${school ? teacherLink : schoolLink})
+    )
+    SELECT e.status AS "executionStatus", a.id AS "assignmentRef",
+      jsonb_build_object(
+        'assignmentId', a.id, 'status', a.status, 'consentId', a.consent_id,
+        'subjectUserId', a.subject_user_id, 'respondentUserId', a.respondent_user_id, 'respondentRole', a.respondent_role,
+        'createdByUserId', a.created_by_user_id, 'relationshipKind', a.relationship_kind, 'visibilityPolicyKey', a.visibility_policy_key,
+        'policyDomain', a.policy_domain, 'resourceKind', a.resource_kind, 'resourceKey', a.resource_key, 'resourceVersion', a.resource_version
+      ) AS "currentAssignment",
+      p.id, p.user_id AS "userId",
+      NULL::text AS "recoveryTokenHash", p.attempt_epoch AS epoch, p.status AS "parentStatus", p.receipt_only AS "receiptOnly",
       p.frozen_active_slot_set_hash AS "slotHash", j.slot_set_hash AS "jobSlot",
       j.whole_submission_id AS "wholeSubmissionId", j.whole_payload_hash AS "payloadHash",
       j.whole_accepted_at AS "acceptedAt", j.status AS state, j.status AS "jobStatus",
@@ -92,7 +119,8 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
             AND j.slot_set_hash=p.frozen_active_slot_set_hash AND j.whole_submission_id IS NOT NULL
             AND j.whole_payload_hash IS NOT NULL AND j.whole_accepted_at IS NOT NULL))
           AND ${boundCompositeConsentSql(Prisma.sql`a`, Prisma.sql`p`)}) AS allowed,
-      CASE WHEN ${!school} AND e.status='STARTED' AND p.id IS NOT NULL THEN EXISTS (
+      CASE WHEN ${!school} AND e.status='STARTED' AND p.id IS NOT NULL
+        AND EXISTS (SELECT 1 FROM scale_library_emergency_stops LIMIT 1) THEN EXISTS (
         SELECT 1 FROM jsonb_array_elements(p.training_content_binding->'units') unit
         JOIN scale_library_emergency_stops stop ON
           (stop.target_kind='RELEASE' AND stop.target_id IN
@@ -103,12 +131,13 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
         AND e.runtime_binding_ref IS NULL AND a.status='OPEN' THEN jsonb_build_object(
           'runtimeBindingKind',NULL,'runtimeBindingRef',NULL,'respondentUserId',a.respondent_user_id,
           'organizationId',e.organization_id,'runId',e.run_id,
+          'hasCampusActivity',${school},'hasHuiteacherLink',${!school},
           'publishedSelfScale',${ordinarySelfWholeEnabled()} AND ${publishedSelfScaleTrackSql(Prisma.sql`t`,product)},
           'compositionStartCompositeId',t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}',
           'compositionStartTrack',jsonb_build_object('policy',t.frozen_resource_policy,'policyHash',t.resource_policy_hash,
             'organizationId',t.organization_id,'key',t.resource_key,'version',t.resource_version)) ELSE NULL END` : Prisma.sql`NULL::jsonb`} AS preflight
-    FROM assessment_run_executions e
-    JOIN assessment_run_tracks t ON t.id=e.track_id AND t.organization_id=e.organization_id AND t.run_id=e.run_id
+    FROM target_exec e
+    JOIN target_track t ON TRUE
     JOIN assessment_run_actor_snapshots actor ON actor.id=e.respondent_actor_snapshot_id
       AND actor.run_id=e.run_id AND actor.organization_id=e.organization_id AND actor.user_id=${userId} AND actor.actor_role=${role}
     JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
@@ -116,6 +145,7 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
       AND a.subject_user_id=actor.user_id AND a.respondent_user_id=actor.user_id
       AND a.subject_role=${role} AND a.respondent_role=${role} AND a.relationship_kind='SELF' AND a.perspective='SELF_REPORT'
     LEFT JOIN composite_assessment_attempts p ON p.id=e.runtime_binding_ref AND e.runtime_binding_kind='COMPOSITE'
+      ${byExecution ? Prisma.empty : Prisma.sql`AND p.id=${locator.attemptId}`}
       AND p.assignment_ref=a.id AND p.episode_id=a.episode_id AND p.user_id=actor.user_id
       AND p.subject_user_id=actor.user_id AND p.respondent_user_id=actor.user_id AND p.respondent_type='SELF'
       AND p.delivery_mode='FINAL_ONLY' AND p.runtime_generation='UNIFIED_V1'
@@ -127,16 +157,6 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
       AND (${wholeDelivery} OR p.async_report_epoch=p.attempt_epoch)
       AND NOT EXISTS (SELECT 1 FROM jsonb_array_elements(p.training_content_binding->'units') unit WHERE unit->>'family'<>'SCALE')
     LEFT JOIN composite_report_jobs j ON j.attempt_id=p.id AND j.attempt_epoch=p.attempt_epoch
-    WHERE ${byExecution ? Prisma.sql`e.id=${locator.executionId}` : Prisma.sql`e.runtime_binding_kind='COMPOSITE' AND e.runtime_binding_ref=${locator.attemptId}`}
-      ${path ? Prisma.sql`AND e.organization_id=${path.organizationId} AND e.run_id=${path.runId}` : Prisma.empty}
-      AND e.subject_actor_snapshot_id=e.respondent_actor_snapshot_id
-      AND t.resource_family='BUNDLE' AND t.resource_version='1.0.0'
-      AND t.resource_key LIKE ${'education-composition:' + product + ':%:' + variant + ':1.0.0'}
-      AND t.frozen_resource_policy#>>'{educationComposition,origin,variantKey}'=${variant}
-      AND t.frozen_resource_policy#>>'{runtimeLaunchTarget,kind}'='COMPOSITE'
-      AND NOT EXISTS (SELECT 1 FROM composite_form_sections section
-        WHERE section.composite_assessment_id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}')
-      AND EXISTS (${school ? schoolLink : teacherLink}) AND NOT EXISTS (${school ? teacherLink : schoolLink})
     LIMIT 1
   `
 }

@@ -51,14 +51,15 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
   base='http://127.0.0.1:'+(server.address() as {port:number}).port
  })
  afterAll(async()=>{if(server)await new Promise<void>(resolve=>server.close(()=>resolve()));await db?.$disconnect()})
- it.each(['School','Teacher'])('%s admits SELF once and completes the scale whole receipt after cancellation and withdrawal',async product=>{
+ it.each([['School',undefined],['Teacher',undefined],['School',true],['Teacher',true]] as const)(
+  '%s admits SELF once and completes the scale whole receipt after cancellation and withdrawal (report %s)',async (product,provideParticipantReport)=>{
   vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED','true')
   vi.stubEnv('ASSESSMENT_WHOLE_SUBMIT_ENABLED','true')
   vi.stubEnv('ASSESSMENT_COMPACT_FACTS_ENABLED','true')
   vi.stubEnv('ASSESSMENT_SHARED_CONTROL_ENABLED','true')
   try{
    const school=product==='School',create=school?setupSchoolCompositionExecution:setupTeacherCompositionExecution
-   const f=await create(db,{scaleOnly:true}),actor=f.participantUserId
+   const f=await create(db,{scaleOnly:true,provideParticipantReport}),actor=f.participantUserId
    const auth=await headers(actor,school),other=await headers(f.managerUserId,school)
    const startPath=(target:typeof f)=>school
     ? `/organizations/${target.organizationId}/activities/${target.workflow.id}/runs/${target.runId}/executions/${target.executionId}/start`
@@ -92,6 +93,7 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
    expect(otherStart.data).toMatchObject({runtimeBindingRef:id})
    expect(await compositionStartCommit(db,f.executionId,id)).toEqual([{atomic:true,state:'COMPLETED'}])
    const parentBeforeDelivery=await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id}})
+   expect(parentBeforeDelivery.receiptOnly).toBe(provideParticipantReport !== true)
    const childrenBeforeDelivery=await db.assessment.findMany({where:{compositeAttemptId:id}})
    expect(childrenBeforeDelivery).toHaveLength(2)
    const slotRef=decryptUnifiedRuntimePayload<{k:string;p:string}>(parentBeforeDelivery.frozenActiveSlotSetEncrypted!)
@@ -132,6 +134,8 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
    const saved=await post(payload)
    expect(saved.status,JSON.stringify(saved.value)).toBe(200)
    expect(saved.data).toMatchObject({status:'ACCEPTED',submissionId})
+   expect(saved.data.receiptOnly).toBe(provideParticipantReport ? undefined : true)
+   expect(Boolean(saved.data.reportStatus)).toBe(Boolean(provideParticipantReport))
    expect((await post(payload)).data).toMatchObject({status:'ACCEPTED',replayed:true})
    expect((await post({...payload,units:payload.units.map((unit:any)=>({...unit,answers:unit.answers.map((answer:any)=>({...answer,responseValue:'b'}))}))})).status).toBe(409)
    expect((await get(receipt(def.attemptEpoch,randomUUID()))).status).toBe(409)
@@ -154,7 +158,9 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
    const progress=await get('/progress')
    expect(progress.status,JSON.stringify(progress.value)).toBe(200)
    expect(progress.data).toMatchObject({wholeSubmissionReceived:true,reportStatus:{state:'PROCESSING'}})
-   expect((await get(receipt())).data).toMatchObject({status:'ACCEPTED',submissionId})
+   const recovered=(await get(receipt())).data
+   expect(recovered).toMatchObject({status:'ACCEPTED',submissionId})
+   expect(recovered.receiptOnly).toBe(provideParticipantReport ? undefined : true)
    const {reconcileRelationalCompositeCompletion}=await import('../../modules/assessment-relational/runtime-completion')
    await reconcileRelationalCompositeCompletion(id)
    expect((await get('/progress')).data).toMatchObject({status:'COMPLETED',runCompleted:true,reportStatus:{state:'READY'}})

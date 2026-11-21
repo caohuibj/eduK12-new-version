@@ -9,7 +9,7 @@ import {addPrivateCompositionRunTrack} from '../../modules/education-tools/priva
 
 /** Real author/freeze/attach/publish services only. Runtime, admission, answers,
  * canonical FINAL and feedback are never inserted or repaired by the fixture. */
-type Options={instructions?:readonly string[];scaleOnly?:boolean}
+type Options={instructions?:readonly string[];scaleOnly?:boolean;provideParticipantReport?:boolean}
 async function published(result:ReturnType<typeof setupCompositionExecution>){
  const f=await result;if(!f.executionId)throw new Error('Expected actual published composition execution')
  return {...f,executionId:f.executionId}
@@ -47,7 +47,7 @@ async function setupCompositionExecution(db:PrismaClient,product:'SCHOOL'|'TEACH
  if(options.publish!==false){
   if(product==='TEACHER')await addTeacherPrivateCompositionRunTrack(teacher,body)
   else await addPrivateCompositionRunTrack({organizationId:f.organizationId,runId:f.runId,actorUserId:f.managerUserId,parent:{kind:'SCHOOL_ACTIVITY',id:f.workflow.id}},body)
-  await f.open();if(product==='TEACHER')await publishTeacherRun({...teacher,expectedVersion:f.expectedVersion+1});else await f.publish()
+  await f.open();if(product==='TEACHER')await publishTeacherRun({...teacher,expectedVersion:f.expectedVersion+1,provideParticipantReport:options.provideParticipantReport});else await f.publish(undefined,options.provideParticipantReport)
  }
  const [execution]=await f.executions()
  return {...f,executionId:execution?.id??null,context,fixed,runtime:fixed.runtime,definition,visible,form,hidden,body}

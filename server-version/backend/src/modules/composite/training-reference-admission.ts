@@ -1,7 +1,14 @@
 import {Prisma} from '@prisma/client'
 import {InstrumentFinalSubmitError} from '../../services/instrumentFinalSubmit'
-type Parent={id:string;trainingContentBindingHash?:string|null;trainingReferenceBindingHash?:string|null}
-const checked=new WeakSet<object>(),digest=/^[a-f0-9]{64}$/
+type Parent={
+ id:string
+ attemptEpoch?:number
+ trainingContentBinding?:{attemptId?:unknown;epoch?:unknown;units?:unknown}|null
+ trainingContentBindingHash?:string|null
+ trainingReferenceBinding?:unknown
+ trainingReferenceBindingHash?:string|null
+}
+const checked=new WeakSet<object>(),verifiedByDb=new WeakMap<object,Set<string>>(),digest=/^[a-f0-9]{64}$/
 function unavailable():never{throw new InstrumentFinalSubmitError('STALE_ATTEMPT','请先提交人口学上下文并冻结参考选择',409)}
 /** Runner/media admission only. Forms must remain accessible to collect context.
  * The two markers join existing parent reads; ready/new and no-content/legacy
@@ -14,6 +21,21 @@ export async function assertTrainingReferenceReadyForMeasurement(db:Prisma.Trans
  // Both immutable columns come from the same authoritative parent read; the
  // database binding guard preserves attempt/epoch/content/context identity.
  if(typeof content==='string'&&digest.test(content)&&typeof reference==='string'&&digest.test(reference)){checked.add(parent);return}
+ const cacheKey=typeof content==='string'&&digest.test(content)&&reference===null?`${parent.id}:${content}`:undefined
+ if(cacheKey&&db&&typeof db==='object'&&verifiedByDb.get(db)?.has(cacheKey)){checked.add(parent);return}
+ const binding=parent.trainingContentBinding
+ if(typeof content==='string'&&digest.test(content)&&reference===null&&parent.trainingReferenceBinding===null
+  &&binding&&typeof binding==='object'&&binding.attemptId===parent.id
+  &&(parent.attemptEpoch===undefined||binding.epoch===parent.attemptEpoch)&&Array.isArray(binding.units)
+  &&!binding.units.some((u:unknown)=>Boolean(u&&typeof u==='object'&&'referencePolicy' in (u as Record<string,unknown>)))){
+  checked.add(parent)
+  if(cacheKey&&db&&typeof db==='object'){
+   let set=verifiedByDb.get(db);if(!set){set=new Set();verifiedByDb.set(db,set)}
+   if(set.size>=4096)set.clear()
+   set.add(cacheKey)
+  }
+  return
+ }
  const [row]=await db.$queryRaw<Array<{id:string;content_hash:string|null;reference_hash:string|null;required:boolean;identity_valid:boolean}>>(Prisma.sql`
   SELECT id,training_content_binding_hash AS content_hash,training_reference_binding_hash AS reference_hash,
    EXISTS(SELECT 1 FROM jsonb_array_elements(COALESCE(training_content_binding->'units','[]'::jsonb)) u WHERE u ? 'referencePolicy') AS required,
@@ -25,4 +47,9 @@ export async function assertTrainingReferenceReadyForMeasurement(db:Prisma.Trans
  if(!row||row.id!==parent.id||!row.identity_valid||row.required&&(!row.reference_hash||!digest.test(row.reference_hash))
   ||content!==undefined&&content!==row.content_hash||reference!==undefined&&reference!==null&&reference!==row.reference_hash)unavailable()
  checked.add(parent)
+ if(cacheKey&&!row.required&&row.reference_hash===null&&db&&typeof db==='object'){
+  let set=verifiedByDb.get(db);if(!set){set=new Set();verifiedByDb.set(db,set)}
+  if(set.size>=4096)set.clear()
+  set.add(cacheKey)
+ }
 }

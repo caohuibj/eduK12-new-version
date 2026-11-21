@@ -220,4 +220,49 @@ describe('Teacher participant host with synthetic runtime DTOs',()=>{
    clearWholeQuestionnaireTemplateCacheForTest()
   }
  })
+ it('marks a receipt-only WHOLE_LOCAL task completed immediately on submit and exit without reverting to in-progress',async()=>{
+  clearWholeQuestionnaireTemplateCacheForTest()
+  const templateHash='c'.repeat(64)
+  const slotSetHash='d'.repeat(64)
+  const assigned:TeacherAssessmentTask={...task,status:'ASSIGNED',runtimeBindingRef:null,consentRequired:false}
+  const wholeDef={
+   attemptId:'parent-ro',attemptEpoch:1,slotSetHash,contextSnapshotHash:null,templateHash,
+   units:[{itemId:'unit-1',scaleAssessmentId:'scale-1',definitionHash:'e'.repeat(64),scale:{id:'s-1',name:'教师仅回执量表',
+    definition:{schemaVersion:2,respondentType:'participant_self_report',display:{randomizeItems:false},
+     items:[{itemCode:'q1',content:'教师仅回执题目一',type:'single',required:true,sortOrder:0,responseSetKey:'r',randomizeOptions:false,options:[{value:1,label:'同意'}]}]}}}],
+  }
+  let listReads=0
+  const onCompleted=vi.fn()
+  const api=vi.fn(async(path:string,method='GET',payload?:any)=>{
+   if(path.startsWith('/my-assessment-tasks')){
+    listReads++
+    return {list:[listReads===1?assigned:{...assigned,status:'STARTED',runtimeBindingRef:'parent-ro'}],nextCursor:null}
+   }
+   if(path.includes('/start-assessment'))return {
+    state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-ro',replayed:false,freshlyCreated:true,
+    currentUnit:{...state('SCALE'),id:'parent-ro',attemptEpoch:1,contextSnapshotHash:null,executionMode:'WHOLE_LOCAL',receiptOnly:true},
+    wholeDefinition:wholeDef,
+   }
+   if(path.endsWith('/whole/submit')&&method==='POST')return {
+    status:'ACCEPTED',attemptId:'parent-ro',submissionId:payload.submissionId,payloadHash:'f'.repeat(64),
+    acceptedAt:'2026-11-21T12:00:00.000Z',committedAt:'2026-11-21T12:00:00.000Z',replayed:false,receiptOnly:true,
+   }
+   throw new Error('unexpected request: '+method+' '+path)
+  })
+  try{
+   render(<HuiteacherMyAssessmentTasks api={api as EducationReportApi} actorKey="teacher" onCompleted={onCompleted}/>)
+   fireEvent.click(await screen.findByRole('button',{name:'开始测评'}))
+   fireEvent.click(screen.getByRole('button',{name:'开始或继续测评'}))
+   fireEvent.click(await screen.findByText('同意'))
+   fireEvent.click(screen.getByRole('button',{name:'提交整份问卷'}))
+   expect(await screen.findByText(/本次问卷仅提供交卷回执/)).toBeInTheDocument()
+   fireEvent.click(screen.getByRole('button',{name:'返回'}))
+   await waitFor(()=>expect(listReads).toBeGreaterThanOrEqual(2))
+   expect(screen.getByText('已完成')).toBeInTheDocument()
+   expect(screen.getByRole('button',{name:'查看完成状态'})).toBeInTheDocument()
+   expect(onCompleted).not.toHaveBeenCalled()
+  }finally{
+   clearWholeQuestionnaireTemplateCacheForTest()
+  }
+ })
 })

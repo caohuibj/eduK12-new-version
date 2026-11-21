@@ -52,7 +52,7 @@ it.skipIf(!url)('publishes a new Teacher private GROUP composition, retains own 
   const run=await createHuiteacherEventRunDraft({...scope,eventId:event.id,name:'Synthetic private composition'})
   await addTeacherPrivateCompositionRunTrack({...scope,eventId:event.id},{expectedVersion:1,privateComposition:{versionId:fixed.id,contentHash:fixed.contentHash},subjectSelector:{kind:'MEMBERSHIP_IDS',membershipIds:members},respondentSelector:{kind:'MEMBERSHIP_IDS',membershipIds:members}})
   await transitionHuiteacherEvent({...scope,eventId:event.id,action:'OPEN',expectedVersion:1})
-  await publishTeacherRun({...scope,eventId:event.id,expectedVersion:2})
+  await publishTeacherRun({...scope,eventId:event.id,expectedVersion:2,provideParticipantReport:true})
   const result={scope:{...scope,eventId:event.id},runId:run.runId,sourceVersionId:fixed.id}
   writeFileSync(file,JSON.stringify(result));return result
  })()

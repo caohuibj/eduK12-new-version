@@ -131,7 +131,7 @@ export interface CompositeCurrentItem {
 }
 
 export interface CompositeReportJobState {
-  state: 'PENDING' | 'PROCESSING' | 'WAITING' | 'READY' | 'FAILED' | 'CANCELLED'
+  state: 'PENDING' | 'PROCESSING' | 'WAITING' | 'READY' | 'FAILED' | 'CANCELLED' | 'NOT_OFFERED'
   jobId: string | null
   retryAfterSeconds: number
   errorCode: string | null
@@ -233,6 +233,7 @@ export interface WholeQuestionnaireInput {
   formAnswers?: WholeQuestionnaireFormAnswer[]
 }
 export interface WholeQuestionnaireReceipt {
+  receiptOnly?: true
   feedbackPollProfile?: 'FAST_START' | 'QUEUED'
   status: 'ACCEPTED'
   attemptId: string
@@ -244,6 +245,7 @@ export interface WholeQuestionnaireReceipt {
 }
 
 export interface CompositeReportStatus {
+  receiptOnly?: true
   /** Absent on legacy records. Report generation and participant access are separate. */
   participantFeedback?: ParticipantFeedbackStatus | null
   feedbackWaitMs?: number
@@ -273,6 +275,8 @@ export type TrainingFlowState = {
 }
 
 export interface CompositeAttemptState {
+  receiptOnly?: true
+  wholeAcceptedAt?: string
   trainingPersistence?: TrainingPersistence
   checkpointDefinitionHash?: string
 

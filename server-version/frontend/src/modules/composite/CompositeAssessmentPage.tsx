@@ -38,6 +38,7 @@ import {
 } from '../../components/product-ui'
 import FinalCompositeAssessment from '../../components/FinalCompositeAssessment'
 import WholeCompositeQuestionnaire from '../../components/WholeCompositeQuestionnaire'
+import { ReceiptOnlyConfirmation } from '../../components/ReceiptOnlyConfirmation'
 import { normalizeApiError } from '../../utils/normalizeApiError'
 import { isTrainingHost } from '../../training/context'
 import { startTrainingWithRecovery } from './training-start-recovery'
@@ -188,7 +189,7 @@ const CompositeAssessmentContent: React.FC = () => {
     activeAttemptIdentityRef.current = { attemptId: next.id, attemptEpoch: next.attemptEpoch,
       contextSnapshotHash: next.contextSnapshotHash }
     setState(next)
-    if (!next.trainingFlow && (next.status === 'COMPLETED' || next.allUnitsSubmitted)) {
+    if (!next.receiptOnly && !next.trainingFlow && (next.status === 'COMPLETED' || next.allUnitsSubmitted)) {
       goReport(next.id, next.trainingPersistence?.courseId)
       return
     }
@@ -267,7 +268,7 @@ const CompositeAssessmentContent: React.FC = () => {
           store(tokenKey(token), returnedCredential)
           store(attemptKey(response.data.attempt.id), returnedCredential)
         }
-        if (response.data.attempt.status === 'COMPLETED' && !response.data.attempt.trainingFlow)
+        if (response.data.attempt.status === 'COMPLETED' && !response.data.attempt.receiptOnly && !response.data.attempt.trainingFlow)
           goReport(response.data.attempt.id)
         else {
           setIsFreshStart(response.data.freshlyCreated === true)
@@ -312,7 +313,7 @@ const CompositeAssessmentContent: React.FC = () => {
             attemptEpoch: response.data.attempt.attemptEpoch,
             contextSnapshotHash: response.data.attempt.contextSnapshotHash ?? null },
         } : null
-        if (response.data.attempt.status === 'COMPLETED' && !response.data.attempt.trainingFlow)
+        if (response.data.attempt.status === 'COMPLETED' && !response.data.attempt.receiptOnly && !response.data.attempt.trainingFlow)
           goReport(response.data.attempt.id)
         else {
           setIsFreshStart(startSource === 'start-response' && response.data.freshlyCreated === true)
@@ -624,6 +625,9 @@ const CompositeAssessmentContent: React.FC = () => {
     </>}
   >{retryMessage || error || '综合测评不存在或不可访问'}{error?.includes('最大次数') && !existingReportId && <p>已有结果可从课程详情中查看。</p>}</ProductStatus></ProductPage>
 
+  if (state.receiptOnly && (state.status === 'COMPLETED' || state.wholeAcceptedAt)) {
+    return <ReceiptOnlyConfirmation acceptedAt={state.wholeAcceptedAt ?? state.completedAt} onExit={() => void saveAndExit()}/>
+  }
   if (state.status === 'COMPLETED' && !state.trainingFlow) {
     return <div className="card p-8 max-w-xl mx-auto text-center"><CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" /><h1 className="text-2xl font-bold mb-3">{state.taskSatisfied === false ? '已交卷，任务未达成' : state.productKind === 'QUESTIONNAIRE' ? '问卷已完成' : '综合测评已完成'}</h1>{state.taskSatisfied === false && <p className="mb-3 text-sm text-gray-600">作答已保存并计入次数，可查看本次个人报告。</p>}<button onClick={() => goReport(state.id)} className="btn-primary">{relationalMode ? '返回关系测评' : '查看个人报告'}</button></div>
   }

@@ -144,6 +144,40 @@ describe('assessment-run pre-gate resource protection & composition identity cac
     expect(m.acquireClaim).not.toHaveBeenCalled()
   })
 
+  it('still routes publishedSelfScale new START through the low-memory trickle gate under memory constraint while skipping 3s CPU sleep', async () => {
+    m.constrained.mockReturnValue(true)
+    m.cpuPaused.mockReturnValue(false)
+    const busy = new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '系统繁忙', 503)
+    m.trickle.mockRejectedValueOnce(busy)
+    await expect(startAssessmentRunExecution({
+      executionId: uuid(10), actorUserId: uuid(1),
+      startPreflight: {
+        runtimeBindingKind: null, runtimeBindingRef: null, respondentUserId: uuid(1),
+        compositionStartCompositeId: uuid(11),
+        publishedSelfScale: true,
+      },
+    })).rejects.toBe(busy)
+    expect(m.trickle).toHaveBeenCalledTimes(1)
+    expect(m.acquireClaim).not.toHaveBeenCalled()
+
+    // Under CPU-only pause (healthy memory), publishedSelfScale skips both trickle and the 3s CPU wait.
+    m.cpuPaused.mockReturnValue(true)
+    m.acquireClaim.mockResolvedValueOnce({
+      kind: 'BOUND', runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: uuid(77),
+    })
+    await expect(startAssessmentRunExecution({
+      executionId: uuid(10), actorUserId: uuid(1),
+      startPreflight: {
+        runtimeBindingKind: null, runtimeBindingRef: null, respondentUserId: uuid(1),
+        compositionStartCompositeId: uuid(11),
+        publishedSelfScale: true,
+      },
+    })).resolves.toMatchObject({ state: 'STARTED', runtimeBindingRef: uuid(77), replayed: true })
+    expect(m.trickle).toHaveBeenCalledTimes(1)
+    expect(m.awaitResources).not.toHaveBeenCalled()
+    expect(m.acquireClaim).toHaveBeenCalledTimes(1)
+  })
+
   it('caches immutable frozen composition identity on prisma reads while keeping live status checks authoritative', async () => {
     const orgId = uuid(3)
     const ownerId = uuid(4)

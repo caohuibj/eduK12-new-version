@@ -27,7 +27,7 @@ export class ReportClaimPriority {
   private yieldUntil = 0
   private nextYieldAllowedAt = 0
   private override: { enabled: boolean; expires: number } | null = null
-  constructor(private readonly clock = now, private readonly isolated = false) {}
+  constructor(private readonly clock = now, private readonly isolated = false, private readonly maxYieldMs = MAX_YIELD_MS) {}
   receive(message: string): void {
     if (message.length > 350) return
     let value: Record<string, unknown>
@@ -68,8 +68,8 @@ export class ReportClaimPriority {
       if (this.busySince === null) {
         this.busySince = at
         // Repeated short quiet gaps cannot starve durable reports indefinitely.
-        if (at >= this.nextYieldAllowedAt) {
-          this.yieldUntil = at + MAX_YIELD_MS
+        if (this.maxYieldMs > 0 && at >= this.nextYieldAllowedAt) {
+          this.yieldUntil = at + this.maxYieldMs
           this.nextYieldAllowedAt = at + YIELD_COOLDOWN_MS
         } else this.yieldUntil = 0
       }
@@ -217,7 +217,9 @@ let lastObservationAt = -Infinity
 const modeDurations: Record<string, number> = {}
 export const startReportClaimPriority = (): void => {
   if (!enabled() || policy) return
-  policy = new ReportClaimPriority(now, process.env.PERF_ISOLATED_TEST_MODE === '1')
+  const configuredYieldMs = Number(process.env.ASSESSMENT_REPORT_YIELD_MS ?? 750)
+  const runtimeMaxYieldMs = Number.isFinite(configuredYieldMs) && configuredYieldMs >= 0 ? configuredYieldMs : 750
+  policy = new ReportClaimPriority(now, process.env.PERF_ISOLATED_TEST_MODE === '1', runtimeMaxYieldMs)
   detach = onReportSchedulingHint(message => policy?.receive(message))
   reconnectTimer = setInterval(() => { void prepareReportReadyNotifications() }, 1000); reconnectTimer.unref()
 }

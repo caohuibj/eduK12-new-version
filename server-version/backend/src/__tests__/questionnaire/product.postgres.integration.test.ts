@@ -495,11 +495,21 @@ suite('Four-type Questionnaire production lifecycle', () => {
     expect(await db.questionnaire.findUnique({where:{id:old.id},include:{formItems:true}})).toEqual(before)
     expect((await product.list(actor,1,50,{search:'Legacy'})).list.some(v=>v.id===old.id&&v.kind==='LEGACY')).toBe(true)
   })
+  it('freezes the default receipt and explicit report options for Training publications', async () => {
+    for (const provideParticipantReport of [undefined, true]) {
+      let row = await fresh()
+      row = await add(row, { type: 'SCALE', scaleId })
+      row = await product.publish(actor, row.id, { revision: row.revision, provideParticipantReport })
+      expect(row.receiptOnly).toBe(provideParticipantReport !== true)
+      const started = await runtime.startUserAttempt(student, row.id)
+      expect(started.attempt.receiptOnly).toBe(provideParticipantReport ? undefined : true)
+    }
+  })
   it('allows two slots of the same scale without conflating identity', async () => {
     let row=await fresh()
     row=await add(row,{type:'SCALE',scaleId})
     row=await add(row,{type:'SCALE',scaleId})
-    row=await product.publish(actor,row.id,{revision:row.revision})
+    row=await product.publish(actor,row.id,{revision:row.revision,provideParticipantReport:true})
     const started=await runtime.startUserAttempt(student,row.id)
     const children=await db.assessment.findMany({where:{compositeAttemptId:started.attempt.id}})
     expect(children).toHaveLength(2)
