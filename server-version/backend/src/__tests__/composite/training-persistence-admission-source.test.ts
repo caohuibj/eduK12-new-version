@@ -9,7 +9,7 @@ const source = (file: string) => readFileSync(`src/modules/${file}`, 'utf8')
 const composite = source('composite/composite.service.ts')
 const authoring = source('questionnaire-product/service.ts')
 const cognitive = source('cognitive/session.service.ts')
-const admission = composite.slice(composite.indexOf('const createAttempt = async'), composite.indexOf('const createAttempt = async') + 30000)
+const admission = composite.slice(composite.indexOf('const createAttempt = async'), composite.indexOf('const createAttempt = async') + 33000)
 const now = new Date('2026-10-19T00:00:00.000Z')
 const publicationIdentity = { schemaVersion: 1, compositeId: 'publication', courseId: 'training', publishedAt: now.toISOString(), productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', trainingFlowDigest: null, trainingVariantDigest: null }
 
