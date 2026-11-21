@@ -79,10 +79,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
  const activeExecutionId=session?.task.executionId
  useEffect(()=>{if(activeExecutionId){panel.current?.focus({preventScroll:true});panel.current?.scrollIntoView?.({block:'start'})}},[activeExecutionId])
  const leave=()=>{
-  const current=active.current
-  const shouldRefresh=Boolean(current?.attempt?.receiptOnly&&(current.attempt.status==='COMPLETED'||current.attempt.wholeAcceptedAt))
   generation.current++;active.current=null;inlineWholeRef.current=null;activeIdentityRef.current=null;setFreshStart(false);setSession(null);setBusy(false);setError('');setAccepted(false)
-  if(shouldRefresh)void refresh()
  }
  const execute=async(work:(valid:()=>boolean)=>Promise<void>)=>{
   if(!mounted.current||apiRef.current!==api)return
