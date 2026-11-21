@@ -26,6 +26,7 @@ import {
 import {
   acquireRunExecutionStartClaim,
   lockExecutionEnvelope,
+  toStartAuthorityKnownEnvelope,
   markRunStartClaimCompleted,
   markRunStartDispatchIntent,
   markRunStartUnknown,
@@ -319,7 +320,7 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
     if (admission.assignment.status !== 'STARTED') {
       throw new RunStartExecutionError('RUN_START_OUTCOME_UNKNOWN', 'runtime attempt exists without a STARTED Run assignment', 409)
     }
-    const now = input.inlineContext?.now
+    const now = input.inlineContext?.now ?? envelope?.txNow
       ?? (await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`)[0].now
     await tx.$executeRaw`
       UPDATE "assessment_run_execution_start_claims"
@@ -346,6 +347,8 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
     await assertCurrentRunStartAuthority(tx, input.executionId, {
       accountMode: 'DETECT_EDUCATION_LIBRARY',
       productScope,
+      knownEnvelope: envelope?.trackResourceKey?.startsWith('education-composition:')
+        ? toStartAuthorityKnownEnvelope(envelope) : undefined,
     })
   }
   if (admission.assignment.resourceKey.startsWith('library-scale:')||admission.assignment.resourceKey.startsWith('private-scale:')) {
@@ -386,7 +389,7 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   // assessment_runs is already SHARE-locked by lockExecutionEnvelope, and
   // admission just projected r.status under that fence. A second SELECT
   // cannot observe a newer CLOSE.
-  if(admission.execution.runStatus!=='PUBLISHED'){
+  if((envelope?.runStatus ?? admission.execution.runStatus)!=='PUBLISHED'){
     throw new RunStartExecutionError('RUN_NOT_STARTABLE','Run was closed after START claim',409)
   }
   const repository = createSqlRelationalAssignmentRepository(tx as any)
@@ -410,7 +413,7 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
       throw new RunStartExecutionError('RUN_RUNTIME_BINDING_MISMATCH', 'current assignment or consent differs from frozen Run admission', 409)
     }
   }
-  const now = input.inlineContext?.now
+  const now = input.inlineContext?.now ?? envelope?.txNow
     ?? (await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`)[0].now
   if (!inline) {
     const dispatched = await tx.$executeRaw`
