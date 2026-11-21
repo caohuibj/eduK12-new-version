@@ -12,7 +12,14 @@ import { BoundedAdmissionGate, configuredInteger } from '../../services/boundedA
 import { defaultRunStartAdmissionBound } from '../../config/databasePool'
 import { buildWholeStartPreload, startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
 import type { RunStartPreflight } from './resourceBoundary'
-import { isAssessmentStartResourceConstrained, runWithLowMemoryTrickleAdmission } from '../../services/assessmentResourceProtection'
+import {
+  awaitScaleCompositionStartResources,
+  isAssessmentStartCpuPaused,
+  isAssessmentStartResourceConstrained,
+  runWithLowMemoryTrickleAdmission,
+  withAdmittedScaleCompositionStart,
+} from '../../services/assessmentResourceProtection'
+import { traceAssessmentPhase } from '../../services/runtimeObservability'
 import {resolvePublishedTeacherForm,teacherFormResourceRef,
   TEACHER_FORM_RUNTIME_KIND} from '../huiteacher/formRunResource'
 import {studentFormResourceId,assertStudentFormRunUse} from '../huiteacher/studentFormResource'
@@ -237,11 +244,12 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   launch: LaunchEnvelope
   preloadedComposite?: any
   inlineContext?: TransactionalStartDispatchContext
+  admittedScaleBatch?: boolean
 }): Promise<RunStartExecutionResult> => {
   const inline = Boolean(input.inlineContext)
-  const libraryUses = !inline && input.launch.resourceKey.startsWith('education-composition:')
-    ? await lockCompositionStartLibraryUses(tx, input)
-    : undefined
+  const libraryUses = inline
+    ? input.inlineContext!.compositionSources
+    : input.launch.resourceKey.startsWith('education-composition:') ? await lockCompositionStartLibraryUses(tx, input) : undefined
   const envelope = inline
     ? input.inlineContext!.execution
     : await lockExecutionEnvelope(tx, input.executionId, {
@@ -431,7 +439,7 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
       preloadedComposite = await compositeModule.loadStartComposite(input.launch.runtimeTargetRef, tx as any)
     }
   }
-  const attempt = await startRelationalCompositeAttemptInTransaction(tx as any, {
+  const createRuntime = () => startRelationalCompositeAttemptInTransaction(tx as any, {
     compositeAssessmentId: input.launch.runtimeTargetRef,
     respondentUserId: input.actorUserId,
     attemptIdentity: admission.attemptIdentity,
@@ -439,6 +447,10 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
     preloadedComposite,
     knownNoExistingAssignmentAttempt: true,
   })
+  const units = preloadedComposite?.items as { type: string; required: boolean }[] | undefined
+  const attempt = input.admittedScaleBatch && compositionStart && !preloadedComposite?.formSections?.length && units?.length
+    && units.every(unit => unit.required && unit.type === 'SCALE')
+    ? await withAdmittedScaleCompositionStart(createRuntime) : await createRuntime()
   if (inline) {
     // Coalesce execution binding + inline claim completion into one roundtrip.
     const boundRows = await tx.$queryRaw<Array<{ execChanged: number; claimChanged: number }>>`
@@ -794,17 +806,19 @@ export const startAssessmentRunExecution = async (input: {
    * Prevents an extra SQL roundtrip during constrained pre-gate admission. */
   startPreflight?: RunStartPreflight
 }): Promise<RunStartExecutionResult> => {
+  const preflight = input.startPreflight?.respondentUserId === input.actorUserId
+    && !input.startPreflight.runtimeBindingRef && !input.resourceRegistry
+    ? input.startPreflight : undefined
+  const compositionCandidate = preflight?.compositionStartCompositeId
   const executeRunStart = async (): Promise<RunStartExecutionResult> => {
     try {
       return await runStartGate().run(async () => {
-        // The School route already identified this respondent and a frozen
-        // track target. Prepare its publication before opening the claim
-        // transaction; admission and the locked track remain authoritative.
-        // A speculative preload failure is only a cache miss; the locked
-        // START path retries its actual target without changing replay or authority.
-        const candidate = input.startPreflight?.respondentUserId === input.actorUserId
-          && !input.startPreflight.runtimeBindingRef && !input.resourceRegistry
-          ? input.startPreflight.preloadCompositeId : null
+        const admittedScaleBatch = Boolean(compositionCandidate) && await traceAssessmentPhase(
+          'start.run_cpu_admission', awaitScaleCompositionStartResources,
+        )
+        // The product route identified the respondent and the frozen track.
+        // Prepare immutable publication data before taking execution locks.
+        const candidate = compositionCandidate ?? preflight?.preloadCompositeId
         const preparation = candidate
           ? await import('../composite/composite.service')
               .then(module => module.loadStartComposite(candidate))
@@ -829,6 +843,7 @@ export const startAssessmentRunExecution = async (input: {
             actorUserId: input.actorUserId,
             resourceRegistry: input.resourceRegistry,
             ...(knownIdentity ? { knownIdentity } : {}),
+            lockCompositionSources: Boolean(compositionCandidate),
             transactionalDispatch: async (inlineContext: TransactionalStartDispatchContext) => {
               const inlineTrack = inlineContext.scientificDetails?.track
               const launch = inlineTrack
@@ -838,9 +853,11 @@ export const startAssessmentRunExecution = async (input: {
                     frozenResourcePolicy: inlineTrack.frozenResourcePolicy,
                   })
                 : await readLaunchEnvelope(inlineContext.tx, input.executionId)
-              // Composition START must lock library uses BEFORE Organization/Run/Execution;
-              // let it commit the claim and take the two-phase lock-ordered path below.
-              if (launch.resourceKey.startsWith('education-composition:')) return null
+              if (launch.resourceKey.startsWith('education-composition:')) {
+                const ordinarySelf = (inlineContext.productScope === 'CAMPUS_ONLY' && /:STUDENT:SELF:1\.0\.0$/.test(launch.resourceKey))
+                  || (inlineContext.productScope === 'HUITEACHER_ONLY' && /:TEACHER:SELF:1\.0\.0$/.test(launch.resourceKey))
+                if (!ordinarySelf || compositionCandidate !== launch.runtimeTargetRef) return null
+              }
               const resourceAdapter = resourceRegistry.assertStartSupported(launch.family)
               if (resourceAdapter.capabilities.transactionMode !== 'TRANSACTIONAL_DB') return null
               const inlineDecision = {
@@ -868,6 +885,7 @@ export const startAssessmentRunExecution = async (input: {
                 ...(candidate === launch.runtimeTargetRef && preparation?.trainingContentSnapshotHash
                   ? { preloadedComposite: preparation } : {}),
                 inlineContext,
+                admittedScaleBatch,
               })
             },
           }),
@@ -956,7 +974,11 @@ export const startAssessmentRunExecution = async (input: {
       ? boundResultFromPreflight(input.startPreflight, input.actorUserId)
       : await readExistingBoundExecution(input.executionId, input.actorUserId)
     if (bound) return bound
-    return runWithLowMemoryTrickleAdmission(executeRunStart)
+    // CPU-only pressure on the composition path waits inside the existing Run
+    // gate. Low-memory trickle must still acquire its gate before the Run gate.
+    if (!compositionCandidate || !isAssessmentStartCpuPaused()) {
+      return runWithLowMemoryTrickleAdmission(executeRunStart)
+    }
   }
   return executeRunStart()
 }

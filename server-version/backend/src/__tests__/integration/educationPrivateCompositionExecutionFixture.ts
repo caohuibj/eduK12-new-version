@@ -52,3 +52,15 @@ async function setupCompositionExecution(db:PrismaClient,product:'SCHOOL'|'TEACH
  const [execution]=await f.executions()
  return {...f,executionId:execution?.id??null,context,fixed,runtime:fixed.runtime,definition,visible,form,hidden,body}
 }
+
+/** An audit row is written only at claim creation. PostgreSQL tuple versions
+ * prove that claim admission and runtime creation committed together. */
+export async function compositionStartCommit(db:PrismaClient,executionId:string,attemptId:string){
+ return db.$queryRaw<Array<{atomic:boolean;state:string}>>`
+  SELECT audit.xmin=parent.xmin AS atomic,claim.state::text AS state
+  FROM assessment_run_execution_start_claims claim
+  JOIN organization_governance_audits audit ON audit.domain_event_id=claim.id
+   AND audit.organization_id=claim.organization_id AND audit.action='ASSESSMENT_RUN_START_ADMITTED'
+  JOIN composite_assessment_attempts parent ON parent.id=${attemptId}
+  WHERE claim.execution_id=${executionId}`
+}

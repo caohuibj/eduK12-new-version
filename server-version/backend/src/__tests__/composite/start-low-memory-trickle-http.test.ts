@@ -5,10 +5,16 @@ const proc = vi.hoisted(() => ({
   availKiB: 665600, // 650 MiB exact default floor
   user: 100,
   idle: 900,
+  delay: vi.fn(),
   advanceCpuPercent(pct: number) {
     this.user += Math.round(pct * 10)
     this.idle += Math.round((100 - pct) * 10)
   },
+}))
+
+vi.mock('node:timers/promises', async (importOriginal) => ({
+  ...await importOriginal<typeof import('node:timers/promises')>(),
+  setTimeout: proc.delay,
 }))
 
 vi.mock('node:fs', async (importOriginal) => {
@@ -88,6 +94,7 @@ import { createFrozenActiveSlotSet } from '../../modules/assessment-runtime/slot
 import { resetStartReadCachesForTests } from '../../modules/composite/start-read-cache'
 import {
   assertAssessmentStartResources,
+  reportResourceClaimDecision,
   resetAssessmentResourceProtectionForTests,
   sampleAssessmentHostResources,
 } from '../../services/assessmentResourceProtection'
@@ -169,6 +176,14 @@ describe('authenticated START controller low-memory trickle HTTP contract', () =
     clock += 1500
     proc.availKiB = availMiB * 1024
     proc.advanceCpuPercent(cpuPercent)
+  }
+
+  const tripCpuProtection = () => {
+    sampleAssessmentHostResources()
+    for (const percent of [98, 99]) {
+      advanceSample(850, percent)
+      reportResourceClaimDecision(2)
+    }
   }
 
   beforeEach(() => {
@@ -323,5 +338,50 @@ describe('authenticated START controller low-memory trickle HTTP contract', () =
     await compositeController.startAttempt(startReq(), resRecovered)
     expect(resRecovered.statusCode).toBe(200)
     expect(mocks.prisma.$transaction).toHaveBeenCalledTimes(2)
+  })
+
+  it('finishes an admitted Scale START when CPU protection trips just after transaction checkout', async () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+    advanceSample(850, 30)
+    const transaction = mocks.prisma.$transaction.getMockImplementation()!
+    mocks.prisma.$transaction.mockImplementationOnce(async (callback) => {
+      tripCpuProtection()
+      return transaction(callback)
+    })
+
+    const res = fakeRes()
+    await compositeController.startAttempt(startReq(), res)
+
+    expect(res.statusCode).toBe(200)
+    expect(mocks.prisma.$transaction).toHaveBeenCalledTimes(1)
+    expect(() => assertAssessmentStartResources()).toThrow(/系统繁忙/)
+  })
+
+  it('waits before checkout for a brief CPU trip and rejects sustained pressure without opening a transaction', async () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+    tripCpuProtection()
+    proc.delay.mockImplementation(async (ms: number) => {
+      expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+      clock += ms
+      proc.advanceCpuPercent(99)
+    })
+
+    const busy = fakeRes()
+    await compositeController.startAttempt(startReq(), busy)
+    expect(busy.statusCode).toBe(503)
+    expect(busy.headers['Retry-After']).toBeDefined()
+    expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+
+    proc.delay.mockImplementation(async (ms: number) => {
+      expect(mocks.prisma.$transaction).not.toHaveBeenCalled()
+      clock += ms
+      proc.advanceCpuPercent(30)
+    })
+    const recovered = fakeRes()
+    await compositeController.startAttempt(startReq(), recovered)
+    expect(recovered.statusCode).toBe(200)
+    expect(mocks.prisma.$transaction).toHaveBeenCalledTimes(1)
   })
 })

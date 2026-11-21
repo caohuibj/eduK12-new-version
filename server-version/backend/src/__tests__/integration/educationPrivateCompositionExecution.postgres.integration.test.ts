@@ -4,7 +4,7 @@ import type {Server} from 'node:http'
 import {PrismaClient} from '@prisma/client'
 import {afterAll,beforeAll,describe,expect,it,vi} from 'vitest'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from './integration-env'
-import {setupTeacherCompositionExecution} from './educationPrivateCompositionExecutionFixture'
+import {compositionStartCommit,setupTeacherCompositionExecution} from './educationPrivateCompositionExecutionFixture'
 import {createTeacherAssessmentRuntimeRouter} from '../../modules/huiteacher/assessmentRuntime.routes'
 import {teacherAssessmentRuntimeSource} from '../../modules/huiteacher/assessmentRuntime.source'
 import {csrfProtection} from '../../middleware/csrf'
@@ -78,6 +78,7 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
   const id=start.data.runtimeBindingRef,parent=await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id}})
   expect(parent.trainingContentBinding).toMatchObject({educationComposition:{origin:f.runtime.origin,manifestHash:f.runtime.manifestHash}})
   expect(parent.trainingContentBindingHash).toBe(canonicalHash(parent.trainingContentBinding))
+  expect(await compositionStartCommit(db,f.executionId,id)).toEqual([{atomic:true,state:'COMPLETED'}])
   await expect(startUserAttempt(f.participantUserId,parent.compositeAssessmentId)).rejects.toMatchObject({statusCode:403})
   const admin=await db.organizationMembership.findFirstOrThrow({where:{organizationId:f.organizationId,userId:f.managerUserId,validUntil:null}})
   await db.$executeRaw`UPDATE education_product_role_grants SET revoked_at=clock_timestamp(),revoked_by_user_id=${f.managerUserId}

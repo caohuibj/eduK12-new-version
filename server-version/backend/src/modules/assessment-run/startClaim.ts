@@ -1,4 +1,5 @@
 import type { RunResourceAuthorityRegistry } from './resourceAuthority'
+import { lockCompositionStartLibraryUses } from './educationCompositionExecution'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -379,6 +380,7 @@ export type TransactionalStartDispatchContext = {
   productScope: RunPopulationProductScope
   now?: Date
   scientificDetails?: FrozenRunScientificDetails
+  compositionSources?: Awaited<ReturnType<typeof lockCompositionStartLibraryUses>>
 }
 
 export async function acquireRunExecutionStartClaim(input: {
@@ -393,6 +395,7 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
   leaseMs?: number
   resourceRegistry?: RunResourceAuthorityRegistry
   knownIdentity?: RunExecutionLockIdentity
+  lockCompositionSources?: boolean
   transactionalDispatch?: (ctx: TransactionalStartDispatchContext) => Promise<TInlineResult | null>
 }): Promise<RunStartClaimDecision | { kind: 'COMPLETED_INLINE'; result: TInlineResult }>
 export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
@@ -401,6 +404,7 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
   leaseMs?: number
   resourceRegistry?: RunResourceAuthorityRegistry
   knownIdentity?: RunExecutionLockIdentity
+  lockCompositionSources?: boolean
   transactionalDispatch?: (ctx: TransactionalStartDispatchContext) => Promise<TInlineResult | null>
 }): Promise<RunStartClaimDecision | { kind: 'COMPLETED_INLINE'; result: TInlineResult }> {
   const leaseMs = input.leaseMs ?? 30_000
@@ -409,6 +413,9 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
   }
 
   return prisma.$transaction(async (tx) => {
+    // Native source identities and library grant issuers precede the
+    // Organization -> Run -> Execution locks, as in the two-phase binding path.
+    const compositionSources = input.lockCompositionSources ? await lockCompositionStartLibraryUses(tx, input) : undefined
     const execution = await lockExecutionEnvelope(tx, input.executionId, input.knownIdentity)
     if (execution.respondentUserId !== input.actorUserId) {
       throw new RunStartClaimError('RUN_EXECUTION_ACTOR', 'only the frozen respondent may own START', 403)
@@ -512,6 +519,7 @@ export async function acquireRunExecutionStartClaim<TInlineResult>(input: {
           productScope,
           now,
           scientificDetails,
+          compositionSources,
         })
         if (inlineResult !== null) {
           return { kind: 'COMPLETED_INLINE' as const, result: inlineResult }
