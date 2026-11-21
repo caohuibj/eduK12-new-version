@@ -25,14 +25,14 @@ export async function attachTeacherInlineCurrentUnit<T extends object,U>(input:{
  actorUserId:string
  freshlyCreated?:boolean
  knownTemplateHashes?:ReadonlySet<string>
- authorize:(input:{attemptId:string;actorUserId:string})=>Promise<unknown>
+ authorize?:(input:{attemptId:string;actorUserId:string})=>Promise<unknown>
  project:(state:AttemptState)=>U
 }):Promise<T|(T&{currentUnit:U})>{
  const {attemptId}=input
  if(!input.requested||!attemptId)return input.started
  try{
   return await withSharedControlContext(async()=>{
-   await input.authorize({attemptId,actorUserId:input.actorUserId})
+   if(input.authorize)await input.authorize({attemptId,actorUserId:input.actorUserId})
    const preloaded=(input.started as {
     _educationWholePreload?:{
      parent?:Parameters<typeof getAttemptState>[4]

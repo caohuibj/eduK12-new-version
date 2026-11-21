@@ -1,3 +1,4 @@
+import type { RuntimeConsentAssignment } from '../assessment-relational/runtime-consent'
 import {acceptedStudyReceipt,assertCurrentStudyPrincipal,withStudyPrincipalReadBatch,type AcceptedStudyReceipt} from '../anonymous-study/admission-principal'
 import { applyTrainingAttemptScope, hasTrainingVariantMetadata } from './training-variant-scope'
 import {readTrainingTimingSnapshot,normalizeTrainingScaleTiming,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
@@ -10,7 +11,7 @@ import { rememberWholeReportFeedbackHint, readWholeReportFeedbackHint, type Repo
 import { markAssessmentTimeline, assessmentTimelineSpan, traceAssessmentPhase, traceAssessmentPhaseSync } from '../../services/runtimeObservability'
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
-import type { CompositeReportJob, Prisma } from '@prisma/client'
+import { Prisma, type CompositeReportJob } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { acceptsAsyncCompositeReport, acceptsEducationWholeMaterialization, isEducationWholeAttempt, assessmentReportConfig } from '../../config/assessmentReports'
 import { finalScaleSubmitSchema } from '../../services/scale-final-submit.schema'
@@ -824,12 +825,13 @@ type WholeSubmissionHeader = Prisma.CompositeAssessmentAttemptGetPayload<{
   trainingVariantAllocationEncrypted: string | null; trainingVariantAllocationHash: string | null;
   compositeAssessment: { trainingVariantDraft: unknown; trainingVariantFrozen: unknown; trainingVariantDigest: string | null } }
 /** One fresh read of ownership, product eligibility and the current receipt. */
-const loadWholeSubmissionContext = async (attemptId: string) => {
+const loadWholeSubmissionContext = async (attemptId: string, teacherAssignmentRef?: string) => {
   const rows = await prisma.$queryRaw<Array<Omit<WholeSubmissionHeader, 'compositeAssessment'> & {
     productKind: WholeSubmissionHeader['compositeAssessment']['productKind'];
     reportPackageKey: string | null; analysisProtocolKey: string | null;
     trainingFlowDraft: Prisma.JsonValue;trainingFlowFrozen:Prisma.JsonValue;trainingFlowDigest:string|null;
     trainingVariantDraft: unknown; trainingVariantFrozen: unknown; trainingVariantDigest: string | null;
+    currentAssignment?: RuntimeConsentAssignment | null;
     jobId: string | null; jobStatus: string | null; leaseToken: string | null;
     wholeSubmissionId: string | null; wholePayloadHash: string | null; wholeAcceptedAt: Date | null;
     wholeValidationEncrypted: string | null; wholeValidationHash: string | null;
@@ -846,6 +848,12 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
       parent."context_snapshot_hash" AS "contextSnapshotHash",
       parent."aggregate_input_hash" AS "aggregateInputHash",
       parent."assignment_ref" AS "assignmentRef", parent."consent_id" AS "consentId",
+      ${teacherAssignmentRef ? Prisma.sql`CASE WHEN a.id IS NOT NULL THEN jsonb_build_object(
+        'assignmentId', a.id, 'status', a.status, 'consentId', a.consent_id,
+        'subjectUserId', a.subject_user_id, 'respondentUserId', a.respondent_user_id, 'respondentRole', a.respondent_role,
+        'createdByUserId', a.created_by_user_id, 'relationshipKind', a.relationship_kind, 'visibilityPolicyKey', a.visibility_policy_key,
+        'policyDomain', a.policy_domain, 'resourceKind', a.resource_kind, 'resourceKey', a.resource_key, 'resourceVersion', a.resource_version
+      ) END AS "currentAssignment",` : Prisma.empty}
       parent."delivery_course_id" AS "deliveryCourseId",
       parent."training_timing_snapshot" AS "trainingTimingSnapshot",
       parent."training_flow_snapshot_encrypted" AS "trainingFlowSnapshotEncrypted", parent."training_flow_snapshot_hash" AS "trainingFlowSnapshotHash",
@@ -868,6 +876,8 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
     FROM "composite_assessment_attempts" AS parent
     JOIN "composite_assessments" AS product ON product."id" = parent."composite_assessment_id"
     LEFT JOIN "composite_report_jobs" AS job ON job."attempt_id" = parent."id" AND job."attempt_epoch" = parent."attempt_epoch"
+    ${teacherAssignmentRef ? Prisma.sql`LEFT JOIN relational_assessment_assignments a
+      ON a.id=parent.assignment_ref AND a.id=${teacherAssignmentRef} AND a.policy_domain='ORGANIZATION_RUN'` : Prisma.empty}
     WHERE parent."id" = ${attemptId}
   `
   const row = rows[0]
@@ -882,22 +892,22 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
     wholePayloadHash: row.wholePayloadHash, wholeAnswersEncrypted: null, wholeAcceptedAt: row.wholeAcceptedAt,
     wholeValidationEncrypted: row.wholeValidationEncrypted, wholeValidationHash: row.wholeValidationHash,
   } : null
-  return { parent, prior }
+  return { parent, prior, currentAssignment: row.currentAssignment }
 }
 
 /** One HTTP body, one durable encrypted answer envelope, one transactional job. */
 export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQuestionnaireSubmitInput, principal: Principal,
-  receivedAtMs = Date.now()) => {
+  receivedAtMs = Date.now(), teacherAssignmentRef?: string) => {
   const admissionStarted = process.hrtime.bigint()
   const anonymous = !principal.userId && Boolean(principal.recoveryTokenHash)
   return withWholeSubmitAdmission(async () => {
   assessmentTimelineSpan('whole.admission_wait', admissionStarted)
-  const context = await traceAssessmentPhase('whole.owner_header_query', () => loadWholeSubmissionContext(attemptId))
-  const parent = context?.parent
-  if (!parent) throw failure('问卷作答不存在', 404)
+  const context = await traceAssessmentPhase('whole.owner_header_query', () => loadWholeSubmissionContext(attemptId, teacherAssignmentRef))
+  if (!context) throw failure('问卷作答不存在', 404)
+  const { parent, prior, currentAssignment } = context
   const owned = principal.userId ? parent.userId === principal.userId
     : parent.userId === null && Boolean(principal.recoveryTokenHash && parent.recoveryTokenHash === principal.recoveryTokenHash)
-  if (!owned) throw failure('无权限操作此问卷', 403)
+  if (!owned || (teacherAssignmentRef && parent.assignmentRef !== teacherAssignmentRef)) throw failure('无权限操作此问卷', 403)
   const runWithPressure = typeof wholeSubmissionPriority.trackVerifiedWholeSubmissionPressure === 'function'
     ? wholeSubmissionPriority.trackVerifiedWholeSubmissionPressure
     : async <T>(op: () => Promise<T>, _anonymous: boolean): Promise<T> => op()
@@ -906,7 +916,7 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   // reuse switch because its router already runs the consent guard.
   if (principal.userId && (isEducationWholeAttempt(parent) || process.env.ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED !== 'false')) {
     const { relationalRuntimeConsentAuthority } = await import('../assessment-relational/runtime-consent')
-    await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId, principal.userId, parent)
+    await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId, principal.userId, parent, currentAssignment)
   }
   if (input.attemptEpoch !== parent.attemptEpoch || input.slotSetHash !== parent.frozenActiveSlotSetHash) throw failure('交卷版本与当前问卷不匹配')
   // A cached validation manifest is scientific data, never allocation authority.
@@ -927,7 +937,6 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   const canonical = traceAssessmentPhaseSync('whole.payload_hash', () => prepareWholeSubmissionPayload(attemptId, input, timingSnapshotHash,
     parent.userId === null && parent.compositeAssessment.productKind === 'QUESTIONNAIRE'))
   assertCanonicalSubmissionPayloadSize(canonical, 1536 * 1024, '整份问卷')
-  const prior = context!.prior
   if (prior?.wholeSubmissionId) {
     // X-04A: the accepted receipt replays before the context comparison, because
     // worker-side Form materialization may advance the parent context hash

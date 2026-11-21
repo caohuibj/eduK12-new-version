@@ -143,6 +143,9 @@ export const compositeController = {
   async wholeReceipt(req: Request, res: Response) { return handleWholeReceipt(req, res, false) },
   async publicWholeReceipt(req: Request, res: Response) { return handleWholeReceipt(req, res, true) },
   async wholeSubmit(req: Request, res: Response) { return handleWholeSubmit(req, res, false) },
+  async teacherWholeSubmit(req: Request, res: Response, assignmentRef: string) {
+    return handleWholeSubmit(req, res, false, assignmentRef)
+  },
   async educationWholeProgress(req: Request, res: Response) {
     try {
       const { readEducationWholeProgress } = await import('./whole-questionnaire.service')
@@ -997,7 +1000,7 @@ const handleError = (res: Response, err: unknown): Response => {
   return error(res, '服务器内部错误', -1, 500)
 }
 
-async function handleWholeSubmit(req: Request, res: Response, anonymous: boolean) {
+async function handleWholeSubmit(req: Request, res: Response, anonymous: boolean, teacherAssignmentRef?: string) {
   const arrival = wholeQuestionnaireArrival(req)
   res.setHeader('X-Whole-Request-Started-At', String(arrival.requestStartedAtMs))
   res.setHeader('X-Whole-Body-Received-At', String(arrival.bodyReceivedAtMs))
@@ -1006,7 +1009,7 @@ async function handleWholeSubmit(req: Request, res: Response, anonymous: boolean
     const { submitWholeQuestionnaire, wholeQuestionnaireSubmitSchema } = await traceAssessmentPhase('whole.module_import', () => import('./whole-questionnaire.service'))
     const principal = anonymous ? { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) } : { userId: req.user!.userId }
     const input = traceAssessmentPhaseSync('whole.schema_parse', () => wholeQuestionnaireSubmitSchema.parse(req.body))
-    const receipt = await submitWholeQuestionnaire(req.params.attemptId, input, principal, arrival.bodyReceivedAtMs)
+    const receipt = await submitWholeQuestionnaire(req.params.attemptId, input, principal, arrival.bodyReceivedAtMs, teacherAssignmentRef)
     markAssessmentTimeline('whole.receipt_response_send')
     return success(res, receipt, '整份问卷已可靠保存，报告正在生成')
   } catch (err) {

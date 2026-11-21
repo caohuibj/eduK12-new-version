@@ -141,7 +141,8 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   return acceptRunExecutionConsent({executionId,actorUserId:req.user!.userId})
  }))
  router.post('/run-executions/:executionId/start-assessment',wrapped(async req=>{
-  const executionId=uuid.parse(req.params.executionId),proof=await access.own(req.user!.userId,{executionId})
+  const executionId=uuid.parse(req.params.executionId),actorUserId=req.user!.userId
+  const proof=await access.forStart(actorUserId,executionId)
   // Resume the exact durable binding without re-running new-intake admission.
   // All current product/source/actor/consent checks still run on subsequent reads.
   const knownTemplateHashes=parseKnownTemplateHashes(req)
@@ -154,9 +155,7 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
     actorUserId:req.user!.userId,
     freshlyCreated:false,
     knownTemplateHashes,
-    authorize:async({attemptId,actorUserId})=>{
-     await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId)
-    },
+    authorize:({attemptId,actorUserId})=>relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId),
     project:projectTeacherCompositeRuntime,
    })
   }
@@ -167,8 +166,9 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   })
   if(result.state==='STARTED'){
    if(result.runtimeBindingKind!=='COMPOSITE')throw new TeacherAssessmentRuntimeError()
-   // Re-read the actual persisted Run binding, not just the adapter response, without replaying full access.own.
-   await assertPersistedTeacherRunBinding(db,req.user!.userId,{executionId,attemptId:result.runtimeBindingRef})
+   const binding=result._committedCompositionStart
+   const committed=binding?.executionId===executionId&&binding.actorUserId===actorUserId&&binding.attemptId===result.runtimeBindingRef
+   if(!committed)await assertPersistedTeacherRunBinding(db,actorUserId,{executionId,attemptId:result.runtimeBindingRef})
    return attachTeacherInlineCurrentUnit({
     requested:requestedTeacherInlineCurrentUnit(req),
     started:result,
@@ -176,9 +176,8 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
     actorUserId:req.user!.userId,
     freshlyCreated:(result as {_freshlyCreatedAttempt?:boolean})._freshlyCreatedAttempt===true,
     knownTemplateHashes,
-    authorize:async({attemptId,actorUserId})=>{
-     await relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId)
-    },
+    authorize:committed&&binding.consentFree?undefined:({attemptId,actorUserId})=>
+     relationalRuntimeConsentAuthority.assertCompositeFinal(attemptId,actorUserId),
     project:projectTeacherCompositeRuntime,
    })
   }
@@ -198,7 +197,14 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   const {readEducationWholeProgress}=await import('../composite/whole-questionnaire.service')
   return readEducationWholeProgress(attemptId,userId,proof.task.status)
  }))
- router.post(parent+'/whole/submit',wholeBound(true),compositeController.wholeSubmit)
+ router.post(parent+'/whole/submit',handler(async(req,res)=>{
+  const proof=await access.own(req.user!.userId,{attemptId:uuid.parse(req.params.attemptId),acceptedWhole:true})
+  if(audience==='TEACHER_SELF'&&proof.row.resourceKey.startsWith('education-composition:TEACHER:')
+   &&proof.row.resourceKey.endsWith(':TEACHER:SELF:1.0.0')){
+   return compositeController.teacherWholeSubmit(req,res,proof.row.assignmentId)
+  }
+  return compositeController.wholeSubmit(req,res)
+ }))
  router.get(parent,attemptAccess,wrapped(async req=>projectTeacherCompositeRuntime(
   await getAttemptState(req.params.attemptId,{userId:req.user!.userId},undefined,'current-unit'))))
  router.get(parent+'/form-sections/:sectionId/assets/:assetId/content',childAccess('FORM_SECTION'),compositeImageController.educationFormImage)

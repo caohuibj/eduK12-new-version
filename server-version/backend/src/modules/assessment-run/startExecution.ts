@@ -55,8 +55,11 @@ import {
 
 type Tx = Prisma.TransactionClient
 
+type CommittedCompositionStart = { executionId: string; actorUserId: string; attemptId: string; consentFree: boolean }
+
 export type RunStartExecutionResult =
-  | { state: 'STARTED'; runtimeBindingKind: string; runtimeBindingRef: string; replayed: boolean }
+  | { state: 'STARTED'; runtimeBindingKind: string; runtimeBindingRef: string; replayed: boolean
+      _committedCompositionStart?: CommittedCompositionStart }
   | { state: 'IN_PROGRESS'; operationKey: string }
 
 export class RunStartExecutionError extends Error {
@@ -504,6 +507,15 @@ const executeTransactionalCompositeInTx = async (tx: Tx, input: {
   Object.defineProperty(result, '_freshlyCreatedAttempt', {
     value: (attempt as { _freshlyCreatedAttempt?: boolean })._freshlyCreatedAttempt === true,
   })
+  if (inline && compositionStart) {
+    Object.defineProperty(result, '_committedCompositionStart', {
+      value: {
+        executionId: input.executionId, actorUserId: input.actorUserId, attemptId: attempt.id,
+        consentFree: admission.assignment.consentId === null && admission.attemptIdentity.consentId === null
+          && admission.assignment.respondentRole !== 'PARENT' && !admission.assignment.visibilityPolicyKey.startsWith('observer_'),
+      } satisfies CommittedCompositionStart,
+    })
+  }
   const sourceComposite = (attempt as any)._startComposite
   const children = (attempt as any)._freshScaleChildren as object[] | undefined
   if (sourceComposite) {

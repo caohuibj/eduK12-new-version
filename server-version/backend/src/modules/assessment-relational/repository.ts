@@ -175,21 +175,25 @@ export const toRelationalAssignmentRecord = (row: AssignmentRow): RelationalAssi
 }
 const toRecord = toRelationalAssignmentRecord
 
-const expectedConsentRespondentType = (assignment: RelationalAssignmentRecordV1): string | null => {
+export type RelationalConsentAssignment = Pick<RelationalAssignmentRecordV1,
+  'consentId' | 'subjectUserId' | 'respondentUserId' | 'respondentRole' | 'createdByUserId'
+  | 'relationshipKind' | 'visibilityPolicyKey' | 'policyDomain' | 'resourceKind' | 'resourceKey' | 'resourceVersion'>
+
+const expectedConsentRespondentType = (assignment: RelationalConsentAssignment): string | null => {
   if (assignment.relationshipKind === 'SELF') return 'SELF'
   if (assignment.respondentRole === 'PARENT') return 'PARENT'
   if (assignment.respondentRole === 'TEACHER') return 'TEACHER'
   return null
 }
 
-const expectedConsentScope = (assignment: RelationalAssignmentRecordV1): string | null => {
+const expectedConsentScope = (assignment: RelationalConsentAssignment): string | null => {
   if (assignment.visibilityPolicyKey === 'observer_private_respondent_v1') return 'PRIVATE_RESPONDENT'
   if (assignment.visibilityPolicyKey === 'observer_assigning_teacher_v1') return 'ASSIGNING_TEACHER'
   if (assignment.visibilityPolicyKey === 'observer_shared_course_lead_v1') return 'SHARED_COURSE_LEAD'
   return null
 }
 
-const expectedConsentPurpose = (assignment: RelationalAssignmentRecordV1): string | null => {
+const expectedConsentPurpose = (assignment: RelationalConsentAssignment): string | null => {
   if (assignment.policyDomain === 'ORGANIZATION_RUN') return `organization_run:${assignment.resourceKind}:${assignment.resourceKey}:${assignment.resourceVersion}`
   if (
     assignment.visibilityPolicyKey === 'observer_private_respondent_v1'
@@ -216,7 +220,7 @@ const expectedConsentPurpose = (assignment: RelationalAssignmentRecordV1): strin
 const stableJson = (value: unknown): string => JSON.stringify(value ?? null)
 
 const assertConsentRootMatchesAssignment = (
-  assignment: RelationalAssignmentRecordV1,
+  assignment: RelationalConsentAssignment,
   consent: ConsentRow,
 ): void => {
   const respondentType = expectedConsentRespondentType(assignment)
@@ -262,7 +266,7 @@ export interface RelationalAssignmentRepository {
     to: RelationalAssignmentStatusV1
     at: string
   }): Promise<boolean>
-  resolveAcceptedConsent(assignment: RelationalAssignmentRecordV1): Promise<ResolvedRelationalConsentV1 | null>
+  resolveAcceptedConsent(assignment: RelationalConsentAssignment): Promise<ResolvedRelationalConsentV1 | null>
 }
 
 export const createSqlRelationalAssignmentRepository = (
