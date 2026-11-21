@@ -384,4 +384,48 @@ describe('authenticated START controller low-memory trickle HTTP contract', () =
     expect(recovered.statusCode).toBe(200)
     expect(mocks.prisma.$transaction).toHaveBeenCalledTimes(1)
   })
+
+  it('bounds precompiled scale STARTs through the low-memory trickle gate at 650 MiB while fast-passing CPU spikes at 850 MiB', async () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT', '1')
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_MAX_QUEUE', '0')
+    mocks.prisma.compositeAssessment.findUnique.mockResolvedValue({
+      ...compositeRow,
+      trainingContentSnapshotHash: 'snap-hash-1',
+    })
+
+    // At 650 MiB, a precompiled START must still acquire the trickle gate slot.
+    let releaseFirstTx!: () => void
+    let firstEntered = false
+    const txImpl = mocks.prisma.$transaction.getMockImplementation()!
+    mocks.prisma.$transaction.mockImplementationOnce(async (callback) => {
+      firstEntered = true
+      await new Promise<void>(resolve => { releaseFirstTx = resolve })
+      return txImpl(callback)
+    })
+
+    const res1 = fakeRes()
+    const p1 = compositeController.startAttempt(startReq(), res1)
+    await vi.waitFor(() => expect(firstEntered).toBe(true))
+
+    const res2 = fakeRes()
+    await compositeController.startAttempt(startReq(), res2)
+    expect(res2.statusCode).toBe(503)
+    expect(res2.headers['Retry-After']).toBe('10')
+    expect(mocks.prisma.$transaction).toHaveBeenCalledTimes(1)
+
+    releaseFirstTx()
+    await p1
+    expect(res1.statusCode).toBe(200)
+
+    // At 850 MiB with a CPU-only trip, precompiled START takes the fast path without 3s polling.
+    proc.delay.mockClear()
+    tripCpuProtection()
+    const resFast = fakeRes()
+    await compositeController.startAttempt(startReq(), resFast)
+    expect(resFast.statusCode).toBe(200)
+    expect(proc.delay).not.toHaveBeenCalled()
+    expect(mocks.prisma.$transaction).toHaveBeenCalledTimes(2)
+  })
 })

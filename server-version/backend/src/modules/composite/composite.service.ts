@@ -2,6 +2,7 @@ import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifac
 import { AssessmentStartBusyError, classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
 import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
 import {
+  admitPrecompiledScaleCompositionStart,
   assertAnonymousStartCriticalMemory,
   assertAssessmentStartResources,
   awaitScaleCompositionStartResources,
@@ -1284,6 +1285,8 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
     id: composite.id,
     productKind: composite.productKind,
     questionnaireType: composite.questionnaireType,
+    receiptOnly: composite.receiptOnly === true,
+    receiptOnlyAvailable: supportsReceiptOnlyPublication(composite),
     ...(composite.personalTracking?{personalTracking:{baselineId:composite.personalTrackingBaselineId,ordinal:composite.personalTrackingOrdinal}}:{}),
     trainingFlowDraft:composite.trainingFlowDraft??null,trainingFlowFrozen:composite.trainingFlowFrozen??null,trainingFlowDigest:composite.trainingFlowDigest??null,
     trainingVariantDraft:composite.trainingVariantDraft??null,trainingVariantFrozen:composite.trainingVariantFrozen??null,trainingVariantDigest:composite.trainingVariantDigest??null,
@@ -2411,7 +2414,7 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
     ...(content?{trainingContentSnapshot:content.snapshot as Prisma.InputJsonValue,trainingContentSnapshotHash:content.snapshotHash}:{}) }
 }
 
-const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db, resolvedSituational?: Map<string, ResolvedSituationalRelease>,trackingSelection?:unknown) => {
+const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db, resolvedSituational?: Map<string, ResolvedSituationalRelease>,trackingSelection?:unknown,provideParticipantReport?:boolean) => {
   await db.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${id} FOR UPDATE`
   const prepared = await prepareCompositePublication(userId, role, id, db, resolvedSituational,'PUBLISH')
   const publicationSource=await loadComposite(id,true,db)
@@ -2430,14 +2433,15 @@ const publishCompositeInTransaction = async (userId: string, role: UserRole, id:
       publishedAt: new Date(),
       ...prepared,
       ...tracking,
+      receiptOnly: provideParticipantReport !== true && supportsReceiptOnlyPublication(publicationSource),
     },
   })
   return withoutAnalysisProtocolCipher(published)
 }
 
-export const publishComposite = async (userId: string, role: UserRole, id: string, db: Db = defaultPrisma, resolvedSituational?: Map<string, ResolvedSituationalRelease>,trackingSelection?:unknown): Promise<any> =>
-  db === defaultPrisma ? defaultPrisma.$transaction(tx => publishCompositeInTransaction(userId, role, id, tx, resolvedSituational,trackingSelection))
-    : publishCompositeInTransaction(userId, role, id, db, resolvedSituational,trackingSelection)
+export const publishComposite = async (userId: string, role: UserRole, id: string, db: Db = defaultPrisma, resolvedSituational?: Map<string, ResolvedSituationalRelease>,trackingSelection?:unknown,provideParticipantReport?:boolean): Promise<any> =>
+  db === defaultPrisma ? defaultPrisma.$transaction(tx => publishCompositeInTransaction(userId, role, id, tx, resolvedSituational,trackingSelection,provideParticipantReport))
+    : publishCompositeInTransaction(userId, role, id, db, resolvedSituational,trackingSelection,provideParticipantReport)
 
 const assertTokenWindow = (token: { isActive: boolean; expiresAt: Date; maxUses: number; usedCount: number }) => {
   if (!token.isActive) throw compositeForbidden('公开链接已停用')
@@ -3190,9 +3194,15 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
   const canBatchScales = !verifiedFlowMaterialization && requiredScaleItems.length > 1 && typeof (db.assessment as any)?.createMany === 'function'
   const pendingScales: Array<{ id: string; item: any; frozenScale: Awaited<ReturnType<typeof freezeScaleRuntimeAtAttemptStart>> | null; data: Record<string, unknown> }> = []
   let freshEducationScaleChild: object | undefined
+  const unfrozenScaleItems = requiredScaleItems.filter((item: any) => {
+    if (attempt.runtimeGeneration !== 'UNIFIED_V1') return false
+    if (prepared?.scales.has(item.id)) return false
+    const memo = scaleFreezeMemo?.get(scaleFreezeCacheKey(item))
+    return !memo?.frozenScale
+  })
   await withPreloadedScaleStartFreeze(
     db,
-    requiredScaleItems.map((item: any) => ({ scaleId: item.scaleId, code: item.scale?.code, instrumentVersion: item.scale?.instrumentVersion })),
+    unfrozenScaleItems.map((item: any) => ({ scaleId: item.scaleId, code: item.scale?.code, instrumentVersion: item.scale?.instrumentVersion })),
     async () => {
       for (const item of items) {
         if (!item.required) continue
@@ -3501,6 +3511,12 @@ const isOrdinaryQuestionnaireStart = (
   !composite.items.some((item: any) => item.type === 'COGNITIVE' || item.type === 'SITUATIONAL') &&
   !composite.items.some((item: any) => item.standardCombinationSource != null)
 
+const supportsReceiptOnlyPublication = (composite: any): boolean =>
+  isOrdinaryQuestionnaireStart(composite) && composite.items.length > 0
+    && composite.trainingFlowDraft == null && composite.trainingVariantDraft == null
+    && !composite.formSections?.length
+    && composite.items.every((item: any) => item.type === 'SCALE' && item.required && !item.contextKey)
+
 const precomputeScaleOnlyActiveSlotSet = async (db: Db, input: {
   finalOnly: boolean; flowEnabled: boolean; composite: any; attemptEpoch: number;
   contentCandidate: any; prepared?: PreparedVariantRuntimes; formSections: any[];
@@ -3643,7 +3659,7 @@ const createAttempt = async (
     // authenticated admissions keep their own participant lock. Other entry
     // paths retain their outer exclusive publication/token locks.
     const current = await db.compositeAssessment.findUnique({ where: { id: composite.id },
-      select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,
+      select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true, receiptOnly: true,
         personalTracking:true,personalTrackingBaselineId:true,personalTrackingOrdinal:true,
         trainingPersistencePolicy: true, trainingPersistencePolicyHash: true,
         ...(composite._preloaded?{}:{trainingContentSnapshot:true}),
@@ -3659,7 +3675,7 @@ const createAttempt = async (
     if (current.expiresAt && current.expiresAt.getTime() <= Date.now()) throw compositeBadRequest('问卷已过期')
     // Read the publication-owned policy under the same admission lock as status.
     // The preloaded snapshot blob is reused when the in-tx hash/updatedAt recheck matches.
-    composite = { ...composite, trainingContentSnapshot:authoritativeSnapshot,
+    composite = { ...composite, receiptOnly: current.receiptOnly, trainingContentSnapshot:authoritativeSnapshot,
       trainingContentSnapshotHash:current.trainingContentSnapshotHash,
       personalTracking:current.personalTracking,personalTrackingBaselineId:current.personalTrackingBaselineId,personalTrackingOrdinal:current.personalTrackingOrdinal,
       trainingPersistencePolicy: current.trainingPersistencePolicy,
@@ -3796,6 +3812,9 @@ const createAttempt = async (
     snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,educationComposition,
     legacyArtifactMap:startReads?.legacyArtifacts})
   for(const item of composite.items){const artifact=trainingScaleArtifacts.get(item.id);if(artifact&&item.type==='SCALE')publishedScaleArtifactByItem.set(item,artifact)}
+  // Read mutable ACTIVE status once per batch in this transaction. Both
+  // present and absent deployments are reused by the per-scale freeze.
+  await preloadScaleDeploymentsForStart(db, composite)
   if (prepared) {
     try {
     await withPreloadedScaleStartFreeze(db, composite.items.filter((i:any)=>i.type==='SCALE').map((i:any)=>({scaleId:i.scaleId,code:i.scale?.code,instrumentVersion:i.scale?.instrumentVersion})), async () => {
@@ -3923,13 +3942,11 @@ const createAttempt = async (
   // inside this one transaction only. Each START re-validates live scale
   // admission; nothing here survives to the next attempt.
   const scaleFreezeMemo = createScaleFreezeMemo()
-  // Read mutable ACTIVE status once per batch in this transaction. Both
-  // present and absent deployments are reused by the per-scale freeze.
-  await preloadScaleDeploymentsForStart(db, composite)
   const precomputedActiveSlotSet = await precomputeScaleOnlyActiveSlotSet(db, { finalOnly, flowEnabled, composite, attemptEpoch, contentCandidate, prepared, formSections, scaleFreezeMemo })
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
       id: newAttemptId,
+      receiptOnly: compositionAdmission?.receiptOnly === true || composite.receiptOnly === true,
       ...(trainingContentBinding?{trainingContentBinding:trainingContentBinding as Prisma.InputJsonValue,
         trainingContentBindingHash:canonicalHash(trainingContentBinding)}:{}),
       ...(trainingFeedbackSnapshot ? { trainingFeedbackSnapshot: trainingFeedbackSnapshot as Prisma.InputJsonValue,
@@ -4304,6 +4321,7 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
 
   const scaleOnlyStart = isOrdinaryQuestionnaireStart(metadata) && metadata.items.length > 0
     && metadata.items.every((item: any) => item.required && item.type === 'SCALE')
+  const precompiledScaleOnlyStart = scaleOnlyStart && Boolean((metadata as any).trainingContentSnapshotHash)
 
   const preparePublication = async () => {
     const composite = await loadStartComposite(compositeId, prisma, metadata)
@@ -4326,9 +4344,9 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
               assessmentTimelineSpan('start.gate_wait', gateEnteredAt, process.hrtime.bigint())
               // Let a short CPU spike drain within the existing gate, before
               // checkout. Keep the slot through commit or rollback.
-              const admittedScaleBatch = scaleOnlyStart && await traceAssessmentPhase(
-                'start.training_cpu_admission', awaitScaleCompositionStartResources,
-              )
+              const admittedScaleBatch = scaleOnlyStart && (precompiledScaleOnlyStart
+                ? admitPrecompiledScaleCompositionStart()
+                : await traceAssessmentPhase('start.training_cpu_admission', awaitScaleCompositionStartResources))
               const composite = prepared ??= await preparePublication()
               const transact = () => withCommittedStartTemplates(
                 work => prisma.$transaction(work, { maxWait: 10_000, timeout: 30_000 }), async (tx: Db) => {
@@ -5208,6 +5226,7 @@ const unifiedCompositeProgressSnapshot = (
 // re-reads the same composite attempt row for routing, projection, or
 // admission.
 const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
+  receiptOnly: true,
   trainingContentBindingHash:true,trainingReferenceBindingHash:true,
   ...trainingFeedbackAttemptSelect,
   participantKey:true, trainingVariantAllocationEncrypted:true, trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
@@ -5717,6 +5736,7 @@ const getUnifiedCompositeAttemptState = async (
   return {
     id: attempt.id,
     executionMode,
+    ...(attempt.receiptOnly ? { receiptOnly: true as const } : {}),
     wholeLocalEligible: isEligible,
     ...(trainingPersistenceMetadata(attempt) ? { trainingPersistence: trainingPersistenceMetadata(attempt), checkpointDefinitionHash: attempt.frozenActiveSlotSetHash } : {}),
     assessmentId: attempt.compositeAssessment.id,
@@ -6254,10 +6274,13 @@ export const getAttemptState = async (
       const { reconcileRelationalCompositeCompletion } = await import('../assessment-relational/runtime-completion')
       await reconcileRelationalCompositeCompletion(attemptId)
     }
+    const receiptJob = runtime.receiptOnly && runtime.asyncReportEpoch === runtime.attemptEpoch
+      ? await readCompositeReportJobHeader(attemptId, runtime.attemptEpoch) : undefined
+    if (receiptJob?.wholeAcceptedAt) return { ...state, wholeAcceptedAt: receiptJob.wholeAcceptedAt }
     if (state.status === 'IN_PROGRESS' && ((state as any).trainingFlow?.termination && (state as any).trainingFlow.termination!=='PENDING' || state.totalItems > 0 && state.completedItems >= state.totalItems)) {
       // Reconcile-once: patch parent completion fields onto the first projection.
       if (runtime.asyncReportEpoch === runtime.attemptEpoch) {
-        const job = await readCompositeReportJobHeader(attemptId, runtime.attemptEpoch)
+        const job = receiptJob === undefined ? await readCompositeReportJobHeader(attemptId, runtime.attemptEpoch) : receiptJob
         return { ...state, allUnitsSubmitted: true, reportStatus: compositeReportJobState(job) }
       }
       // Units being complete is not the same as the aggregate transaction
@@ -7134,10 +7157,12 @@ const authorizeReportParticipant = (parent: any, context: { userId?: string; rec
   assertSupportedComposite(parent.compositeAssessment, true)
 }
 
-const reportStatusForHeader = async (parent: any, joinedJob?: Awaited<ReturnType<typeof readCompositeReportJobHeader>>, participant = true) => {
+type ReportStatusJob = Omit<NonNullable<Awaited<ReturnType<typeof readCompositeReportJobHeader>>>, 'wholeAcceptedAt'>
+const reportStatusForHeader = async (parent: any, joinedJob?: ReportStatusJob | null, participant = true) => {
   const job = joinedJob !== undefined ? joinedJob : parent.asyncReportEpoch === parent.attemptEpoch
     ? await readCompositeReportJobHeader(parent.id, parent.attemptEpoch) : null
-  const feedback = job?.wholeSubmissionId ? readWholeReportFeedbackHint(parent.id, job.wholeSubmissionId) : null
+  const receiptOnly = participant && parent.receiptOnly === true
+  const feedback = !receiptOnly && job?.wholeSubmissionId ? readWholeReportFeedbackHint(parent.id, job.wholeSubmissionId) : null
   const release = participant ? evaluateTrainingFeedbackForAttempt(parent, { reportReady: trainingFeedbackReportReady(parent, job) }) : null
   // Whole FINAL and a complete set of unit FINALs can both precede parent
   // completion. A queued job must not strand the learner on "continue" while
@@ -7146,13 +7171,14 @@ const reportStatusForHeader = async (parent: any, joinedJob?: Awaited<ReturnType
     (job.wholeSubmissionId ? job.status !== 'WAITING'
       : job.requestedRevision > 0 && (job.status === 'PENDING' || job.status === 'PROCESSING'))) release.state = 'REPORT_PROCESSING'
   return {
-    ...(release?.configured ? { participantFeedback: { state: release.state, releaseAt: release.releaseAt } } : {}),
+    ...(receiptOnly ? { receiptOnly: true as const } : {}),
+    ...(release?.configured && !receiptOnly ? { participantFeedback: { state: release.state, releaseAt: release.releaseAt } } : {}),
     ...(feedback ? { feedbackPollProfile: feedback.profile } : {}),
-    feedbackWaitMs: job?.wholeSubmissionId && reportReadyWaitAvailable() ? REPORT_READY_MAX_WAIT_MS : 0,
+    feedbackWaitMs: !receiptOnly && job?.wholeSubmissionId && reportReadyWaitAvailable() ? REPORT_READY_MAX_WAIT_MS : 0,
     attemptId: parent.id, attemptEpoch: parent.attemptEpoch, status: parent.status,
     hasAcceptedSubmission: Boolean(job && (job.wholeSubmissionId || job.requestedRevision > 0)),
     wholeSubmissionReceived: Boolean(job?.wholeSubmissionId), wholeSubmissionId: job?.wholeSubmissionId ?? null,
-    reportStatus: job ? { ...compositeReportJobState(job), ...(feedback ? { retryAfterSeconds: job?.wholeSubmissionId && reportReadyWaitAvailable() ? 0.1 : feedback.retryAfterSeconds } : {}) } : {
+    reportStatus: receiptOnly ? { ...compositeReportJobState(null), state: 'NOT_OFFERED' as const } : job ? { ...compositeReportJobState(job), ...(feedback ? { retryAfterSeconds: job?.wholeSubmissionId && reportReadyWaitAvailable() ? 0.1 : feedback.retryAfterSeconds } : {}) } : {
       state: parent.status === 'COMPLETED' ? 'READY' : 'WAITING', jobId: null,
       retryAfterSeconds: 2, errorCode: null, completedAt: parent.completedAt,
     },
@@ -7169,7 +7195,7 @@ const readParticipantReportStatus = async (attemptId: string, context: { userId?
   const parent = loaded?.parent
   if (!parent) throw compositeNotFound('综合测评记录不存在')
   authorizeReportParticipant(parent, context)
-  const wait = beginReportReadyWait(attemptId, parent.attemptEpoch, options.waitMs ?? 0, options.signal, sequence)
+  const wait = parent.receiptOnly ? null : beginReportReadyWait(attemptId, parent.attemptEpoch, options.waitMs ?? 0, options.signal, sequence)
   try {
     const status = await reportStatusForHeader(parent, loaded!.job)
     if (!wait || !status.wholeSubmissionReceived || !['PENDING', 'PROCESSING'].includes(status.reportStatus.state)) {
@@ -7193,7 +7219,7 @@ export const getCompositeReportStatus = async (attemptId: string, context: { use
 export const retryCompositeQuestionnaireReport = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
   const parent = await loadReportReadHeader(attemptId)
   authorizeReportParticipant(parent, context)
-  if (parent.asyncReportEpoch !== parent.attemptEpoch) throw compositeBadRequest('本次作答没有异步报告任务')
+  if (parent.receiptOnly || parent.asyncReportEpoch !== parent.attemptEpoch) throw compositeBadRequest('本次作答没有异步报告任务')
   await retryCompositeReport(parent)
   return reportStatusForHeader(parent)
 }
@@ -7342,6 +7368,7 @@ export const materializeCompositeQuestionnaireReport = async (attemptId: string,
 }
 
 const assertParticipantFeedbackAvailable = async (parent: any, joinedJob?: any): Promise<void> => {
+  if (parent.receiptOnly) throw compositeForbidden('本次问卷仅提供交卷回执')
   if (await isLoadedCompositeParticipantFeedbackDeferred(parent, prisma, joinedJob)) {
     throw compositeForbidden('报告尚未向学员开放，请查看报告状态')
   }
@@ -7356,12 +7383,25 @@ export const getReport = async (attemptId: string, context: { userId?: string; r
     await assertParticipantFeedbackAvailable(attempt)
     return projectHttpReport(attempt, 'participant')
   }
-  const loaded = sharedControlWritesEnabled() ? await readCompositeReportStatusContext(attemptId, true) : null
-  const parent = sharedControlWritesEnabled() ? loaded?.parent : await loadReportReadHeader(attemptId)
+  let loaded = sharedControlWritesEnabled() ? await readCompositeReportStatusContext(attemptId, true) : null
+  let parent = sharedControlWritesEnabled() ? loaded?.parent : await loadReportReadHeader(attemptId)
   if (!parent) throw compositeNotFound('综合测评记录不存在')
   authorizeReportParticipant(parent, context)
-  const job = loaded ? loaded.job : parent.asyncReportEpoch === parent.attemptEpoch
+  let job = loaded ? loaded.job : parent.asyncReportEpoch === parent.attemptEpoch
     ? await readCompositeReportMaterialization(parent.id, parent.attemptEpoch) : null
+  if (parent.status === 'COMPLETED' && !parent.receiptOnly && parent.asyncReportEpoch === parent.attemptEpoch
+    && job && job.status === 'PROCESSING' && !job.reportEncrypted && reportReadyWaitAvailable()) {
+    await prepareReportReadyNotifications()
+    const wait = beginReportReadyWait(attemptId, parent.attemptEpoch, 2000, undefined, reportReadyNotificationSequence())
+    try {
+      if (wait) await wait.done
+    } finally {
+      wait?.cancel()
+    }
+    loaded = sharedControlWritesEnabled() ? await readCompositeReportStatusContext(attemptId, true) : null
+    parent = (sharedControlWritesEnabled() ? loaded?.parent : await loadReportReadHeader(attemptId)) ?? parent
+    job = loaded ? loaded.job : await readCompositeReportMaterialization(parent.id, parent.attemptEpoch)
+  }
   await assertParticipantFeedbackAvailable(parent, job)
   const cached = await materializedReportForHeader(parent, 'participant', job)
   if (cached) return cached
@@ -7653,7 +7693,7 @@ export async function getTrainingVariantReportsForTeacher(userId:string,role:Use
     if(attempt.compositeAssessmentId!==compositeId)throw compositeForbidden('报告任务来源不一致')
     await assertRelationalTeacherAttemptReadAllowed(attempt,userId,role)
     const job=byAttempt.get(`${attempt.id}:${attempt.attemptEpoch}`)??null
-    const materialized=assessmentReportConfig().enabled&&attempt.asyncReportEpoch===attempt.attemptEpoch
+    const materialized=assessmentReportConfig().enabled&&!attempt.receiptOnly&&attempt.asyncReportEpoch===attempt.attemptEpoch
     selected.push({attempt:await applyTrainingAttemptScope(attempt),scope,job,materialized,
       binding:materialized?await reportMaterializationBinding(attempt,job):null})
   }
@@ -7694,7 +7734,7 @@ export const getReportForTeacher = async (
   const header = await loadReportReadHeader(attemptId)
   if (header.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
   await assertRelationalTeacherAttemptReadAllowed(header, userId, role)
-  if (!partial && header.asyncReportEpoch === header.attemptEpoch) {
+  if (!partial && !header.receiptOnly && header.asyncReportEpoch === header.attemptEpoch) {
     if (snapshotId) throw compositeNotFound('分析快照不存在')
     return materializedReportForHeader(header, role === UserRole.ADMIN ? 'researcher' : 'teacher')
   }

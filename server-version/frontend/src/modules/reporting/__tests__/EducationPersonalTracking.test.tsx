@@ -12,7 +12,7 @@ describe('Education tracking plan versus own numeric disclosure',()=>{
   const visible=screen.getByRole('group',{name:'本轮本人可见指标'}),boxes=within(visible).getAllByRole('checkbox')
   expect(boxes[0]).toBeChecked();expect(boxes[1]).toBeDisabled();expect(boxes[1]).not.toBeChecked()
   fireEvent.click(boxes[0]);fireEvent.click(screen.getByRole('button',{name:'正式发布本人测评'}))
-  expect(publish).toHaveBeenCalledWith({mode:'LONGITUDINAL',metrics:choices.map(({trackId,itemId,scoreKey})=>({trackId,itemId,scoreKey})),visibleMetrics:[]})
+  expect(publish).toHaveBeenCalledWith({mode:'LONGITUDINAL',metrics:choices.map(({trackId,itemId,scoreKey})=>({trackId,itemId,scoreKey})),visibleMetrics:[]},false)
  })
  it('keeps inherited metrics locked and does not restore a previously hidden metric implicitly',async()=>{
   const api=vi.fn(async()=>({baselineId:'T1',ordinal:2,choices:[{...choices[0],selectedVisible:true},{...choices[1],visible:true,selectedVisible:false}]})),publish=vi.fn()

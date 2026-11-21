@@ -260,6 +260,7 @@ type AssignedRunTaskOptions = {
 }
 
 type StudentRunTaskRow = {
+  receiptOnly: boolean
   __boundSchoolContinuation: boolean; createdAtMicros: string;
   executionId: string; organizationId: string; runId: string; runName: string;
   deadline: Date | null; status: string; resourceFamily: string; resourceKey: string;
@@ -375,7 +376,7 @@ async function readAssignedRunTasks<Student extends boolean>(userId: string, opt
         WHEN school_cont."boundContinuation" AND r."status" IN ('PUBLISHED','CLOSED') THEN 'STARTED'
         WHEN r."status" = 'CLOSED' OR r."intake_deadline" <= statement_timestamp() THEN 'EXPIRED'
         ELSE e."status" END AS "status",
-      t."resource_family" AS "resourceFamily", t."resource_key" AS "resourceKey",
+      t."resource_family" AS "resourceFamily", t."resource_key" AS "resourceKey", t."receipt_only" AS "receiptOnly",
       (a."consent_id" IS NOT NULL) AS "consentRequired",
       consent."purpose" AS "consentPurpose", consent."visibility_scope" AS "consentVisibility"
       ${student ? Prisma.empty : Prisma.sql`, c."state" AS "claimState", t."resource_version" AS "resourceVersion",
@@ -518,7 +519,7 @@ async function readAssignedRunTasks<Student extends boolean>(userId: string, opt
           WHEN school_cont."boundContinuation" AND r."status" IN ('PUBLISHED','CLOSED') THEN 'STARTED'
           WHEN r."status" = 'CLOSED' OR r."intake_deadline" <= statement_timestamp() THEN 'EXPIRED'
           ELSE e."status" END AS "status",
-        t."resource_family" AS "resourceFamily", t."resource_key" AS "resourceKey",
+        t."resource_family" AS "resourceFamily", t."resource_key" AS "resourceKey", t."receipt_only" AS "receiptOnly",
         (a."consent_id" IS NOT NULL) AS "consentRequired",
         consent."purpose" AS "consentPurpose", consent."visibility_scope" AS "consentVisibility"
       FROM candidate_execs e

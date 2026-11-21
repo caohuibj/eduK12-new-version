@@ -9,6 +9,7 @@ const SituationalRunner=deferredPage(()=>import('../modules/situational/pages/Si
 import type {CompositeAttemptState,CompositeCurrentItem,CompositeReportStatus,WholeQuestionnaireDefinition,WholeQuestionnaireInput,WholeQuestionnaireReceipt} from '../modules/composite/types'
 import type {WholeReceiptLookup} from '../modules/composite/receipt-recovery'
 import type {WholeQuestionnaireApi} from '../components/WholeCompositeQuestionnaire'
+import {ReceiptOnlyConfirmation} from '../components/ReceiptOnlyConfirmation'
 import type {AssessmentVideoCapabilitySources} from '../modules/assessment-media/types'
 import type {EducationReportApi} from '../components/education-tools/EducationScalePersonalReport'
 import {TeacherAssessmentPage} from './TeacherAssessmentPage'
@@ -42,7 +43,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
  const generation=useRef(0),listGeneration=useRef(0),active=useRef(session),apiRef=useRef(api)
  const inlineWholeRef=useRef<{attemptId:string;definition:WholeQuestionnaireDefinition}|null>(null)
  const activeIdentityRef=useRef<InlineWholeDefinitionIdentity|null>(null)
- const completed=useRef(new Set<string>()),completionCallback=useRef(onCompleted)
+ const completed=useRef(new Set<string>()),receiptCompleted=useRef(new Set<string>()),completionCallback=useRef(onCompleted)
  active.current=session;apiRef.current=api;completionCallback.current=onCompleted
  const panel=useRef<HTMLDivElement>(null)
  const mounted=useRef(true)
@@ -55,19 +56,31 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
   try{
    const data=await api<{list:TeacherAssessmentTask[];nextCursor:string|null}>('/my-assessment-tasks'+(appendCursor?'?cursor='+encodeURIComponent(appendCursor):''))
    if(!valid())return
-   setRows(old=>appendCursor?[...old,...data.list.filter(row=>!old.some(value=>value.executionId===row.executionId))]:data.list)
+   const nextList=data.list.map(row=>{
+    if(row.status==='COMPLETED'){receiptCompleted.current.delete(row.executionId);return row}
+    if(receiptCompleted.current.has(row.executionId)&&(row.status==='STARTED'||row.status==='ASSIGNED'))return {...row,status:'COMPLETED' as const}
+    return row
+   })
+   setRows(old=>appendCursor?[...old,...nextList.filter(row=>!old.some(value=>value.executionId===row.executionId))]:nextList)
    setCursor(data.nextCursor);setList({pending:false,error:'',loaded:true})
   }catch(reason){if(valid())setList(old=>({...old,pending:false,error:reason instanceof Error?reason.message:'任务列表暂不可读取'}))}
  },[api])
+ const markReceiptCompleted=useCallback((executionId:string)=>{
+  receiptCompleted.current.add(executionId)
+  setRows(old=>old.map(row=>row.executionId===executionId?{...row,status:'COMPLETED' as const}:row))
+  void refresh()
+ },[refresh])
  useEffect(()=>{
-  generation.current++;setSession(null);setBusy(false);setError('');setAccepted(false);completed.current.clear()
+  generation.current++;setSession(null);setBusy(false);setError('');setAccepted(false);completed.current.clear();receiptCompleted.current.clear()
   setRows([]);setCursor(null);setList({pending:true,error:'',loaded:false});void refresh()
   return invalidateRequests
  },[api,refresh,invalidateRequests])
  useEffect(()=>onListStateChange?.({pending:list.pending,error:!!list.error,count:rows.length}),[onListStateChange,list.pending,list.error,rows.length])
  const activeExecutionId=session?.task.executionId
  useEffect(()=>{if(activeExecutionId){panel.current?.focus({preventScroll:true});panel.current?.scrollIntoView?.({block:'start'})}},[activeExecutionId])
- const leave=()=>{generation.current++;active.current=null;inlineWholeRef.current=null;activeIdentityRef.current=null;setFreshStart(false);setSession(null);setBusy(false);setError('');setAccepted(false)}
+ const leave=()=>{
+  generation.current++;active.current=null;inlineWholeRef.current=null;activeIdentityRef.current=null;setFreshStart(false);setSession(null);setBusy(false);setError('');setAccepted(false)
+ }
  const execute=async(work:(valid:()=>boolean)=>Promise<void>)=>{
   if(!mounted.current||apiRef.current!==api)return
   const token=++generation.current
@@ -79,20 +92,21 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
  const accept=(task:TeacherAssessmentTask,attemptId:string,state:CompositeAttemptState,valid:()=>boolean,inline?:{definition:WholeQuestionnaireDefinition|null;freshlyCreated:boolean})=>{
   if(!valid())return
   if(state.id!==attemptId||state.deliveryMode!=='FINAL_ONLY')throw new Error('测评记录与当前冻结任务不一致')
-  if(state.status==='COMPLETED'){
+  if(state.status==='COMPLETED'&&!state.receiptOnly){
    inlineWholeRef.current=null;activeIdentityRef.current=null;setFreshStart(false)
    const completion={executionId:task.executionId,attemptId:state.id,...(task.mode?{mode:task.mode}:{})},key=completion.executionId+':'+completion.attemptId
    setSession({task,attempt:state,child:null,completion})
-   setRows(old=>old.map(row=>row.executionId===task.executionId?{...row,status:'COMPLETED'}:row))
+   setRows(old=>old.map(row=>row.executionId===task.executionId?{...row,status:'COMPLETED' as const}:row))
    // Completion is durable even when list refresh or report reading fails.
    void refresh()
    if(!completed.current.has(key)){completed.current.add(key);completionCallback.current?.(completion)}
   }else{
-   if(state.status!=='IN_PROGRESS')throw new Error('当前测评已结束，不能继续作答')
+   if(state.status!=='IN_PROGRESS'&&state.status!=='COMPLETED')throw new Error('当前测评已结束，不能继续作答')
    activeIdentityRef.current=educationAttemptIdentity(state)
    inlineWholeRef.current=inline?.definition?{attemptId:state.id,definition:inline.definition}:null
    setFreshStart(Boolean(inline?.freshlyCreated))
    setSession({task,attempt:state,child:null,completion:null})
+   if(state.receiptOnly&&(state.status==='COMPLETED'||state.wholeAcceptedAt))markReceiptCompleted(task.executionId)
   }
  }
  const load=async(task:TeacherAssessmentTask,attemptId:string,valid:()=>boolean)=>{
@@ -147,7 +161,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
   const valid=()=>mounted.current&&apiRef.current===api&&generation.current===token&&active.current===source
   const attempt=source.attempt
   if(progress?.runCompleted&&progress.attemptId===attempt.id&&progress.attemptEpoch===attempt.attemptEpoch){
-   accept(source.task,attempt.id,{...attempt,status:'COMPLETED',progress:100,currentItem:null,allUnitsSubmitted:true},valid)
+   accept(source.task,attempt.id,{...attempt,status:'COMPLETED' as const,progress:100,currentItem:null,allUnitsSubmitted:true},valid)
    return
   }
   await load(source.task,attempt.id,valid)
@@ -230,7 +244,9 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
     {student&&session.task.teacherName&&<p>被评价教师：{session.task.teacherName}</p>}
     {error&&<p role="alert">{error}</p>}
     {busy&&<p role="status">正在核对测评状态…</p>}
-    {session.completion?<div role="status"><h3>{student?'本次评价已完成':'本次测评已完成'}</h3><p>正式作答已提交并确认，反馈按独立授权规则开放。</p>
+    {attempt?.receiptOnly&&(attempt.status==='COMPLETED'||attempt.wholeAcceptedAt)?
+     <ReceiptOnlyConfirmation acceptedAt={attempt.wholeAcceptedAt??attempt.completedAt} onExit={leave}/>:
+     session.completion?<div role="status"><h3>{student?'本次评价已完成':'本次测评已完成'}</h3><p>正式作答已提交并确认，反馈按独立授权规则开放。</p>
       {renderFeedback?.(session.completion)}
       {!student&&<EducationPersonalChanges key={'changes:'+session.completion.executionId} api={api} executionId={session.completion.executionId} path={'/run-executions/'+encodeURIComponent(session.completion.executionId)+'/changes'}/>}
      </div>:
@@ -242,6 +258,14 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
       <MemoryRouter key={actorKey+':'+child.situationalAttemptId}><SituationalRunner host={{attemptId:child.situationalAttemptId,parentAttemptId:attempt.id,
        compositeItemId:child.id,instructionsSummary:'作答说明',client:situational,onCompleted:childFinished}}/></MemoryRouter>:
      attempt?.executionMode==='WHOLE_LOCAL'&&!child&&wholeApi&&educationMedia?<WholeCompositeQuestionnaire state={attempt} isFreshStart={freshStart} fallback={stepped} api={wholeApi} educationMedia={educationMedia} onExit={leave}
+      onReceiptAccepted={acceptedAt=>{
+       const current=active.current
+       if(!current?.attempt||current.attempt.id!==attempt.id)return
+       const nextAttempt:CompositeAttemptState={...current.attempt,receiptOnly:true,wholeAcceptedAt:acceptedAt??current.attempt.wholeAcceptedAt??new Date().toISOString()}
+       const nextSession={...current,attempt:nextAttempt}
+       active.current=nextSession;setSession(nextSession)
+       markReceiptCompleted(current.task.executionId)
+      }}
       acceptedNotice="答案已保存，正在处理。完成状态以服务器确认的测评记录为准，交卷回执不会开放个人报告。"
       acceptedAction="查看完成状态"
       committedMessage="答案已保存，正在处理。请勿重复交卷。"

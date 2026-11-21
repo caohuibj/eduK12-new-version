@@ -5,13 +5,14 @@ type Choice={trackId:string;itemId:string;scoreKey:string;label:string;unit:stri
 type Metric=Pick<Choice,'trackId'|'itemId'|'scoreKey'>
 type Selection={mode:'SINGLE'|'LONGITUDINAL';metrics:Metric[];visibleMetrics:Metric[]}
 const choiceKey=(choice:Metric)=>JSON.stringify([choice.trackId,choice.itemId,choice.scoreKey])
-type PublicationProps={api:Api;path:string;publish:(tracking?:Selection)=>void;disabled:boolean;entry?:'SCHOOL'|'TEACHER';publishLabel?:string}
+type PublicationProps={api:Api;path:string;publish:(tracking?:Selection,provideParticipantReport?:boolean)=>void;disabled:boolean;entry?:'SCHOOL'|'TEACHER';publishLabel?:string}
 export function EducationTrackingPublish(props:PublicationProps){
  const scope=useRef({api:props.api,path:props.path,generation:0})
  if(scope.current.api!==props.api||scope.current.path!==props.path)scope.current={api:props.api,path:props.path,generation:scope.current.generation+1}
  return <EducationTrackingPublishSession key={scope.current.generation} {...props}/>
 }
 function EducationTrackingPublishSession({api,path,publish,disabled,entry='TEACHER',publishLabel}:PublicationProps){
+ const [provideParticipantReport,setProvideParticipantReport]=useState(false)
  const [options,setOptions]=useState<{baselineId:string|null;ordinal:number|null;choices:Choice[]}|null>(null)
  const [error,setError]=useState(''),[longitudinal,setLongitudinal]=useState(false),[selected,setSelected]=useState<Choice[]>([]),[visibleKeys,setVisibleKeys]=useState<string[]>([])
  useEffect(()=>{let active=true;void api<NonNullable<typeof options>>(path+'/tracking').then(value=>{if(!active)return;setOptions(value);if(value.baselineId){setSelected(value.choices);setVisibleKeys(value.choices.filter(c=>c.visible!==false&&(c.selectedVisible??true)).map(choiceKey))}}).catch(e=>{if(active)setError(e instanceof Error?e.message:'追踪配置读取失败')});return()=>{active=false}},[api,path])
@@ -26,7 +27,8 @@ function EducationTrackingPublishSession({api,path,publish,disabled,entry='TEACH
    }}/>{c.label}（{c.unit}）{c.visible===false?' · 工具未开放本人变化数值':''}</label>)}</fieldset>}
   </>}
   {tracking&&<fieldset><legend>本轮本人可见指标</legend>{selected.map(c=><label key={choiceKey(c)} className="block"><input type="checkbox" disabled={disabled||c.visible===false} checked={visibleKeys.includes(choiceKey(c))&&c.visible!==false} onChange={e=>setVisibleKeys(old=>e.target.checked?[...new Set([...old,choiceKey(c)])]:old.filter(key=>key!==choiceKey(c)))}/>{c.label}{c.visible===false?' · 来源未授权本人展示':''}</label>)}<p>计划追踪与本人披露分别冻结；此选择不会让学校或其他受众获得个人分数。</p></fieldset>}
-  <button disabled={disabled||tracking&&!selected.length} onClick={()=>publish({mode:tracking?'LONGITUDINAL':'SINGLE',metrics:selected.map(({trackId,itemId,scoreKey})=>({trackId,itemId,scoreKey})),visibleMetrics:selected.filter(c=>c.visible!==false&&visibleKeys.includes(choiceKey(c))).map(({trackId,itemId,scoreKey})=>({trackId,itemId,scoreKey}))})}>{publishLabel??(entry==='SCHOOL'?'正式发布本人测评':'发布教师评价任务')}</button>
+  <label className="block"><input type="checkbox" checked={provideParticipantReport} disabled={disabled} onChange={e=>setProvideParticipantReport(e.target.checked)}/> 向作答者提供报告（普通自评整卷）</label>
+  <button disabled={disabled||tracking&&!selected.length} onClick={()=>publish({mode:tracking?'LONGITUDINAL':'SINGLE',metrics:selected.map(({trackId,itemId,scoreKey})=>({trackId,itemId,scoreKey})),visibleMetrics:selected.filter(c=>c.visible!==false&&visibleKeys.includes(choiceKey(c))).map(({trackId,itemId,scoreKey})=>({trackId,itemId,scoreKey}))},provideParticipantReport)}>{publishLabel??(entry==='SCHOOL'?'正式发布本人测评':'发布教师评价任务')}</button>
  </div>
 }
 export function EducationTrackingNext({api,path,create,disabled,entry='TEACHER'}:{api:Api;path:string;create:()=>void;disabled:boolean;entry?:'SCHOOL'|'TEACHER'}){

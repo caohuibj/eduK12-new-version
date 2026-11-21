@@ -110,3 +110,26 @@ it('uses the server-declared education feedback namespace for approved new famil
  await waitFor(()=>expect(api).toHaveBeenCalledWith('/assessment-reports/executions/'+id))
  expect(api.mock.calls.some(([path])=>path.startsWith('/reports/student/'))).toBe(false)
 })
+
+it('keeps receipt-only task marked completed even if an immediate list refresh precedes background materialization',async()=>{
+ let lists=0
+ const receiptPage=(status:'PENDING'|'IN_PROGRESS'|'COMPLETED')=>({
+  list:[{...page('BUNDLE').list[0],status,receiptOnly:true as const,feedbackNamespace:'EDUCATION_ASSESSMENT',feedbackMode:'COMPOSITION'}],
+  total:1,page:1,hasMore:false,truncated:false,
+ })
+ const api=vi.fn(async(path:string)=>{
+  if(path==='/my/student-reference')return {reference:'SYNTHETIC'}
+  if(path.startsWith('/my/activity-tasks'))return ++lists===1?receiptPage('PENDING'):receiptPage('IN_PROGRESS')
+  throw Error('Unexpected request '+path)
+ })
+ render(<SchoolStudentTasks api={api as unknown as SchoolApi}/>)
+ fireEvent.click(await screen.findByRole('button',{name:'开始／继续官方测评'}))
+ await screen.findByRole('button',{name:'退出合成测评宿主'})
+ act(()=>capture.finished!())
+ expect(await screen.findByText('本次测评已完成，正式提交已确认。')).toBeInTheDocument()
+ await waitFor(()=>expect(lists).toBe(2))
+ expect(screen.getByText('已完成')).toBeInTheDocument()
+ expect(screen.getByText('答案已保存。')).toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'开始／继续官方测评'})).not.toBeInTheDocument()
+ expect(api.mock.calls.some(([path])=>path.includes('feedback')||path.includes('reports'))).toBe(false)
+})

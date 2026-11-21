@@ -311,7 +311,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
     id:string;activityId:string;activityTitle:string;kind:CampusTaskType|'MEASUREMENT'
     title:string;status:'PENDING'|'COMPLETED'|'EXPIRED'|'IN_PROGRESS'|'UNAVAILABLE'
     deadline:string|null;href:string|null;resourceFamily?:string;feedbackNamespace?:'EDUCATION_ASSESSMENT';feedbackMode?:'COMPOSITION'
-    canResumeExisting?:boolean;consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
+    receiptOnly?:true;canResumeExisting?:boolean;consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
   }>=[]
   for(const t of assignments){
     const activity=activityMap.get(t.courseId)
@@ -349,6 +349,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
       kind:'MEASUREMENT',resourceFamily:e.resourceFamily,title:e.runName,status,
       ...(e.resourceKey?.startsWith('education-assessment:')?{feedbackNamespace:'EDUCATION_ASSESSMENT' as const}:{}),
       ...(e.resourceKey?.startsWith('education-composition:SCHOOL:')?{feedbackNamespace:'EDUCATION_ASSESSMENT' as const,feedbackMode:'COMPOSITION' as const}:{}),
+      ...(e.receiptOnly ? {receiptOnly:true as const}:{}),
       canResumeExisting:e.canResumeExisting,consentRequired:e.consentRequired,consentPurpose:e.consentPurpose,
       consentVisibility:e.consentVisibility,
       deadline:e.deadline?.toISOString()??null,

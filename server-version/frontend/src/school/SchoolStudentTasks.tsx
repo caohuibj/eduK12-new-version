@@ -20,6 +20,7 @@ export type SchoolTask={
   title:string;status:'PENDING'|'COMPLETED'|'EXPIRED'|'IN_PROGRESS'|'UNAVAILABLE'
   deadline:string|null;href:string|null;resourceFamily?:string;feedbackNamespace?:'EDUCATION_ASSESSMENT'
   feedbackMode?:'COMPOSITION'
+  receiptOnly?:true
   canResumeExisting?:boolean
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
@@ -65,6 +66,7 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
   const executionRef=useRef(execution);executionRef.current=execution
   const executionScope=useRef<object|null>(null)
   const executionTask=useRef<{scope:object;task:SchoolTask}|null>(null)
+  const receiptCompletedRef=useRef(new Set<string>())
   const [loading,setLoading]=useState(false)
   const [listError,setListError]=useState('')
   const [retryPage,setRetryPage]=useState(1)
@@ -86,7 +88,14 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
       const result=await api<TaskPage>('/my/activity-tasks?page='+targetPage+'&pageSize=25'
         +(activityId?'&activityId='+encodeURIComponent(activityId):'')
         +(activeCursor?'&runCursor='+encodeURIComponent(activeCursor):''))
-      if(currentScope.current===scope){setItems(result);setPage(targetPage)}
+      if(currentScope.current===scope){
+        const list=result.list.map(row=>{
+          if(row.status==='COMPLETED'){receiptCompletedRef.current.delete(row.id);return row}
+          if(receiptCompletedRef.current.has(row.id)&&(row.status==='IN_PROGRESS'||row.status==='PENDING'))return {...row,status:'COMPLETED' as const}
+          return row
+        })
+        setItems({...result,list});setPage(targetPage)
+      }
     }catch(err){
       if(currentScope.current===scope)setListError(err instanceof Error?err.message:'活动待办暂不可用')
     }finally{
@@ -96,6 +105,7 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
   },[api,scope,activityId])
   useEffect(()=>{
     currentScope.current=scope
+    receiptCompletedRef.current.clear()
     setFeedback(null);setItems(null);setPage(1);setRunCursor(null);setCursorStack([])
     setSelected(null);setDetails(null);setAnswer('');setExecution(null);setError('');setNotice('');setQuery('');setSort('recommended')
     setStudentReference(null);setBusy(false)
@@ -140,10 +150,11 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
     if(currentScope.current!==scope||!active||active!==execution)return
     executionRef.current=null;setExecution(null)
     const task=executionTask.current?.scope===scope&&executionTask.current.task.id===active.executionId?executionTask.current.task:undefined
+    if(task?.receiptOnly)receiptCompletedRef.current.add(active.executionId)
     setNotice('本次测评已完成，正式提交已确认。')
     setItems(old=>old?{...old,list:old.list.map(row=>row.id===active.executionId?{...row,status:'COMPLETED'}:row)}:old)
     void load(page)
-    if(task&&task.resourceFamily!=='FORM')showFeedback(task)
+    if(task&&!task.receiptOnly&&task.resourceFamily!=='FORM')showFeedback(task)
   }
   const submit=async()=>{
     if(!selected||!details||selected.status==='COMPLETED'||scope.submitting||currentScope.current!==scope)return
@@ -204,7 +215,7 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
                     consentPurpose:task.consentPurpose,
                     consentVisibility:task.consentVisibility})
                 }}>开始／继续官方测评</button>:
-              task.status==='COMPLETED'?task.resourceFamily==='FORM'?
+              task.status==='COMPLETED'?task.receiptOnly?<p>答案已保存。</p>:task.resourceFamily==='FORM'?
                 <p>本次表单已正式提交。表单只记录作答，不计算量表分数，也不新增个人报告读取权。</p>:
                 <button disabled={busy} onClick={()=>void showFeedback(task)}>查看我的测评反馈</button>:
                 <p>测评目前不可作答。符合授权与科学规则的反馈才可查看。</p>:

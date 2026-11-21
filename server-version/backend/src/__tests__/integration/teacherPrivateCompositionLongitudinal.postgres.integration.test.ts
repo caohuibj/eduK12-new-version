@@ -54,7 +54,7 @@ it.skipIf(!url)('publishes two private composition waves through the real source
   await addTeacherPrivateCompositionRunTrack({...scope,eventId:event.id},{expectedVersion:1,privateComposition:{versionId:fixed.id,contentHash:fixed.contentHash},subjectSelector:{kind:'MEMBERSHIP_IDS',membershipIds:members},respondentSelector:{kind:'MEMBERSHIP_IDS',membershipIds:members}})
   await transitionHuiteacherEvent({...scope,eventId:event.id,action:'OPEN',expectedVersion:1})
   const options=await teacherTrackingOptions({...scope,eventId:event.id})
-  await publishTeacherRun({...scope,eventId:event.id,expectedVersion:2,tracking:{mode:'LONGITUDINAL',metrics:options.choices.map(({trackId,itemId,scoreKey})=>({trackId,itemId,scoreKey}))}})
+  await publishTeacherRun({...scope,eventId:event.id,expectedVersion:2,tracking:{mode:'LONGITUDINAL',metrics:options.choices.map(({trackId,itemId,scoreKey})=>({trackId,itemId,scoreKey}))},provideParticipantReport:true})
   const result={scope:{...scope,eventId:event.id},runId:run.runId,sourceVersionId:fixed.id,participantUserId:f.participantUserId,next:null as null|{eventId:string;runId:string;ordinal:number},specId:null as string|null}
   writeFileSync(file,JSON.stringify(result));return result
  })()
@@ -75,7 +75,7 @@ it.skipIf(!url)('publishes two private composition waves through the real source
  const [run]=await db.$queryRaw<Array<{status:string;version:number}>>`SELECT status,version FROM assessment_runs WHERE id=${checkpoint.next.runId}`
  if(run.status==='DRAFT'){
   await transitionHuiteacherEvent({...nextScope,action:'OPEN',expectedVersion:1})
-  await publishTeacherRun({...nextScope,expectedVersion:run.version})
+  await publishTeacherRun({...nextScope,expectedVersion:run.version,provideParticipantReport:true})
  }
  await completeOne(checkpoint.next.runId)
  if(!checkpoint.specId){

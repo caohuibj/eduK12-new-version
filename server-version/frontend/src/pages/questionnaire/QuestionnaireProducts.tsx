@@ -392,6 +392,8 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
   const actionInFlight = useRef(false)
   useEffect(()=>{actionInFlight.current=false;setBusy(false)},[measurementRecoveryKey])
   const [preflight, setPreflight] = useState<{ revision: number; ok: boolean; trackingCandidates?:Array<{itemId:string;scoreKey:string;label:string;unit:string}>; checks: Array<{ key: string; label: string; status: string; message: string; targetId?: string }> } | null>(null)
+  const [provideParticipantReport,setProvideParticipantReport]=useState(false)
+  useEffect(()=>setProvideParticipantReport(false),[id])
   const [trackingMode,setTrackingMode]=useState<'SINGLE'|'LONGITUDINAL'>('SINGLE'),[trackingKeys,setTrackingKeys]=useState<string[]>([])
   useEffect(()=>{setTrackingMode('SINGLE');setTrackingKeys([])},[id,user?.id])
   const [nameError, setNameError] = useState('')
@@ -726,6 +728,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     return action(async () => {
       hydrate(
         await request('/' + id + '/publish', { revision: detail.revision,
+          ...(detail.receiptOnlyAvailable ? {provideParticipantReport}:{}),
           ...(trainingDesign&&!detail.personalTracking&&trackingMode==='LONGITUDINAL'?{tracking:{mode:trackingMode,
             metrics:(preflight?.trackingCandidates??[]).filter(m=>trackingKeys.includes(JSON.stringify([m.itemId,m.scoreKey]))).map(({itemId,scoreKey})=>({itemId,scoreKey}))}}:{}) }),
       )
@@ -1448,6 +1451,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
             </div>}
           </>}
         </fieldset>}
+        {detail.receiptOnlyAvailable&&<label className="block"><input type="checkbox" checked={provideParticipantReport} disabled={busy} onChange={event=>setProvideParticipantReport(event.target.checked)}/> 向作答者提供报告</label>}
         <div className="questionnaire-publish-summary"><div><h2>草稿 · 尚未发布</h2><p>{dirty ? '设置有未保存的修改，请先保存设置。' : '确认内容与投放设置后，可自检或正式发布。'}</p></div>
         <div className="flex flex-wrap gap-3">
                 {dirty && !trainingDesign && <ProductButton variant="primary" disabled={busy} onClick={() => void save()}>保存全部设置</ProductButton>}
@@ -1494,7 +1498,8 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     {!publicEnabled && <p className="qt-anonymous-off">{draft ? '不启用时，继续使用课程中的原有作答入口。需要免登录分享时，再打开此项。' : '当前测评未启用匿名链接。如需启用，请复制为新草稿后设置。'}</p>}
     {publicDeliverySettings}
   </section>
-  const reportSummary = detail && !detail.trainingFeedbackPolicy && !feedbackChanged && !feedbackDefaultsOnBinding
+  const reportSummary = detail && (draft ? detail.receiptOnlyAvailable && !provideParticipantReport : detail.receiptOnly)
+    ? '仅回执' : detail && !detail.trainingFeedbackPolicy && !feedbackChanged && !feedbackDefaultsOnBinding
     ? '沿用原有反馈方式' : feedbackMode === 'SCHEDULED' ? '预设时间开放' : '完成并生成后可见'
   const savedPreflight = Boolean(preflight?.ok && !dirty && preflight.revision === detail?.revision)
   const readyItems = [

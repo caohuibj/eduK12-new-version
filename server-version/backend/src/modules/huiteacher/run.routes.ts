@@ -92,7 +92,7 @@ router.post(base+'/preview',authenticateHuiteacher,requireTeacherProductAdmin,
   }))))
 router.post(base+'/publish',authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>success(res,await publishTeacherRun({
-    ...keys.parse(req.params),actorUserId:req.user!.userId,...version.extend({tracking:z.unknown().optional()}).parse(req.body),
+    ...keys.parse(req.params),actorUserId:req.user!.userId,...version.extend({tracking:z.unknown().optional(),provideParticipantReport:z.boolean().optional()}).parse(req.body),
   }))))
 router.get(base+'/tracking',authenticateHuiteacher,requireTeacherProductAdmin,wrap(async(req,res)=>success(res,await teacherTrackingOptions({...keys.parse(req.params),actorUserId:req.user!.userId}))))
 router.delete(base+'/tracks/:trackId',authenticateHuiteacher,requireTeacherProductAdmin,wrap(async(req,res)=>success(res,await removeTeacherTrackingDraftSource({...keys.extend({trackId:uuid}).parse(req.params),actorUserId:req.user!.userId,...z.object({expectedVersion:z.number().int().positive()}).strict().parse(req.body)}))))

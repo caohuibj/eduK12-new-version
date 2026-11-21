@@ -28,6 +28,7 @@ type Input = {
 export const registerWholeReceiptAtomic = async (parent: Parent, input: Input) => {
   const detached = detachedWholeReceiptsEnabled()
   const expectedChildren = input.expectedChildren ?? []
+  const uniqueExpectedChildren = new Set(expectedChildren.map(child => child.assessmentId)).size === expectedChildren.length
   const expectedChildrenJson = JSON.stringify(expectedChildren)
   // Answers and their durable task share one commit independently of legacy report permits.
   const reservation = detached ? Prisma.sql`SELECT NULL::integer AS "pending" FROM eligible LIMIT 1`
@@ -59,7 +60,7 @@ export const registerWholeReceiptAtomic = async (parent: Parent, input: Input) =
       SELECT parent_locked."id" FROM parent_locked
       WHERE ${expectedChildren.length === 0}
         OR (
-          SELECT count(DISTINCT a."id")::int
+          SELECT ${uniqueExpectedChildren ? Prisma.sql`count(*)::int` : Prisma.sql`count(DISTINCT a."id")::int`}
           FROM "assessments" AS a
           JOIN jsonb_to_recordset(${expectedChildrenJson}::jsonb) AS expected("assessmentId" text, "itemId" text)
             ON a."id" = expected."assessmentId" AND a."composite_item_id" = expected."itemId"

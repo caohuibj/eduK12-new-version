@@ -330,6 +330,13 @@ const CompositeReportContent: React.FC = () => {
     />
   }
 
+  if (generation?.receiptOnly) {
+    const saved = generation.wholeSubmissionReceived || generation.status === 'COMPLETED'
+    return <ReportShell title="交卷回执"
+      status={{kind:'info',title:saved ? '答案已保存' : '本次问卷仅提供交卷回执'}}
+      actions={<button type="button" className="hui-button hui-button--secondary" onClick={() => navigate(backTo)}>返回</button>}/>
+  }
+
   if (!report && generation && generation.reportStatus.state !== 'READY') {
     const failed = generation.reportStatus.state === 'FAILED'
     const submissionConflict = failed && generation.reportStatus.errorCode === 'REPORT_SUBMISSION_KEY_CONFLICT'

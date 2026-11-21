@@ -451,6 +451,16 @@ export const isAssessmentStartResourceConstrained = (): boolean => {
 const normalStartMemory = (sample: AssessmentResourceSample): boolean =>
   sample.availableBytes !== null && sample.availableBytes >= 700 * MiB
 
+const admittedBatchMemoryOk = (sample: AssessmentResourceSample): boolean => {
+  if (sample.availableBytes === null) return false
+  if (isLowMemoryTrickleEnabled()) {
+    const config = configuredLowMemoryTrickleConfig()
+    const thresholdMiB = config.floorMiB < 650 ? config.floorMiB : 700
+    return sample.availableBytes >= thresholdMiB * MiB
+  }
+  return normalStartMemory(sample)
+}
+
 const startCpuPaused = (sample: AssessmentResourceSample): boolean =>
   normalStartMemory(sample) && (isLowMemoryTrickleEnabled()
     ? policy.startAdmissionDecision(sample).reason === 'host_cpu'
@@ -494,6 +504,18 @@ export const awaitScaleCompositionStartResources = async (probeRunRecovery = fal
   return normalStartMemory(sample) && sample.cpuPercent !== null
 }
 
+/** Fast admission check for precompiled Scale-only STARTs before opening a
+ * transaction: skips the 3s CPU-recovery sleep when memory is healthy (>=700 MiB),
+ * while requiring a valid low-memory trickle permit (or healthy memory) before
+ * granting admitted-batch completion privileges. */
+export const admitPrecompiledScaleCompositionStart = (): boolean => {
+  if (!enabled()) return false
+  const value = sampleAssessmentHostResources()
+  if (normalStartMemory(value)) return true
+  assertAssessmentStartResources()
+  return true
+}
+
 /** A bounded, already-admitted batch may finish unrolling frozen Scale units
  * after a CPU-only trip. Memory failure still aborts the same transaction. */
 export const withAdmittedScaleCompositionStart = async <T>(operation: () => Promise<T>): Promise<T> => {
@@ -512,12 +534,12 @@ export const assertAssessmentStartResources = (): void => {
   const value = sampleAssessmentHostResources(
     trickleEnabled && permit?.active === true ? { forceMemoryRefresh: true } : undefined,
   )
-  const finishingAdmittedBatch = admittedScaleComposition.getStore()?.active === true && normalStartMemory(value)
+  const finishingAdmittedBatch = admittedScaleComposition.getStore()?.active === true && admittedBatchMemoryOk(value)
   if (trickleEnabled) {
     const config = configuredLowMemoryTrickleConfig()
     const decision = policy.startAdmissionDecision(value, performance.now(), config)
     logStartAdmissionTransition(decision, value)
-    if (decision.action === 'allow' || (finishingAdmittedBatch && decision.reason === 'host_cpu')) return
+    if (decision.action === 'allow' || (finishingAdmittedBatch && (decision.reason === 'host_cpu' || decision.reason === 'low_memory_cpu_busy' || decision.action === 'trickle'))) return
     if (decision.action === 'trickle' && permit?.active === true) return
     throw buildStartResourceError(decision.retryHint ?? 'memory')
   }

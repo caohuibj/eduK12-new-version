@@ -1276,6 +1276,7 @@ enum CompositeAnalysisSnapshotGenerationReason {
 
 // 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
 model CompositeAssessment {
+  receiptOnly Boolean @default(false) @map("receipt_only")
   personalTrackingBaselineId String? @map("personal_tracking_baseline_id")
   personalTrackingOrdinal Int? @map("personal_tracking_ordinal")
   personalTracking Json? @map("personal_tracking")
@@ -1442,6 +1443,7 @@ model CompositeFormSection {
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
+  receiptOnly Boolean @default(false) @map("receipt_only")
   personalChangesSnapshots Json @default("{}") @map("personal_changes_snapshots")
   trainingContentInterpretationEncrypted String? @map("training_content_interpretation_encrypted")
   trainingContentInterpretationHash String? @map("training_content_interpretation_hash")

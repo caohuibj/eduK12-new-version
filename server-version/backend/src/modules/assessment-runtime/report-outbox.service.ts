@@ -21,7 +21,7 @@ export const REPORT_PARENT_SELECT = {
   id: true, status: true, progress: true, completedAt: true, attemptEpoch: true, taskSatisfaction: true,
   asyncReportEpoch: true, deliveryMode: true, runtimeGeneration: true,
   frozenActiveSlotSetHash: true, contextSnapshotHash: true, aggregateInputHash: true,
-  assignmentRef: true, deliveryCourseId: true,
+  assignmentRef: true, deliveryCourseId: true, receiptOnly: true,
   compositeAssessment: { select: { productKind: true, reportPackageKey: true, analysisProtocolKey: true,
     trainingFlowDraft: true, trainingFlowFrozen: true, trainingFlowDigest: true } },
 } as const
@@ -78,7 +78,7 @@ export const readCompositeReportMaterialization = async (attemptId: string, atte
 
 export const readCompositeReportJobHeader = async (attemptId: string, attemptEpoch: number) => (
   prisma.compositeReportJob.findUnique({ where: { attemptId_attemptEpoch: { attemptId, attemptEpoch } },
-    select: { id: true, status: true, errorCode: true, completedAt: true, requestedRevision: true, wholeSubmissionId: true,
+    select: { id: true, status: true, errorCode: true, completedAt: true, requestedRevision: true, wholeSubmissionId: true, wholeAcceptedAt: true,
       attemptEpoch: true, slotSetHash: true, contextHash: true, aggregateInputHash: true } })
 )
 

@@ -35,7 +35,7 @@ export const processCompositeReportJob = async (job: CompositeReportJob): Promis
   }, Math.max(10, Math.floor(settings.leaseMs / 3)))
   heartbeat.unref()
   let outcome: ReportJobOutcome
-  let educationMaterialized = false
+  let completionOnly = false
   try {
     const wholeService = await traceAssessmentPhase('report.whole_module_import', () => import('../modules/composite/whole-questionnaire.service'))
     let reportContext: import('../modules/composite/whole-questionnaire.service').WholeQuestionnaireReportContext | undefined
@@ -56,13 +56,14 @@ export const processCompositeReportJob = async (job: CompositeReportJob): Promis
         reportJob: { attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextHash: job.contextHash },
       }))
       if (whole && result?.status !== 'COMPLETED') throw new Error('WHOLE_QUESTIONNAIRE_CANONICAL_NOT_COMPLETE')
-      educationMaterialized = isEducationWholeAttempt(parent)
+      completionOnly = parent.receiptOnly || isEducationWholeAttempt(parent)
       if (result?.status !== 'COMPLETED') outcome = { kind: 'waiting' }
-      else if (educationMaterialized) {
+      else if (completionOnly) {
         const aggregateInputHash = result.aggregateInputHash ?? parent.aggregateInputHash
-        if (!aggregateInputHash) throw new Error('EDUCATION_WHOLE_AGGREGATE_HASH_MISSING')
+        if (!aggregateInputHash) throw new Error('WHOLE_AGGREGATE_HASH_MISSING')
         outcome = { kind: 'ready', aggregateInputHash, reportEncrypted: encryptUnifiedRuntimePayload({
-          schemaVersion: 1, kind: 'EDUCATION_WHOLE_MATERIALIZED', attemptId: job.attemptId, aggregateInputHash,
+          schemaVersion: 1, kind: parent.receiptOnly ? 'WHOLE_RECEIPT_MATERIALIZED' : 'EDUCATION_WHOLE_MATERIALIZED',
+          attemptId: job.attemptId, aggregateInputHash,
         }) }
       }
       else outcome = { kind: 'ready', ...await traceAssessmentPhase('report.aggregate_materialize', () => materializeCompositeQuestionnaireReport(job.attemptId, {
@@ -93,7 +94,7 @@ export const processCompositeReportJob = async (job: CompositeReportJob): Promis
     recordReportQueueEvent({ kind: 'generation_end', attemptId: job.attemptId, jobId: job.id, startMs: generationStartMs, endMs: Date.now() })
     recordReportQueueEvent({ kind: 'ready_commit', attemptId: job.attemptId, jobId: job.id, outcomeKind: outcome.kind, published: Boolean(published) })
   }
-  if (published && outcome.kind === 'ready' && !educationMaterialized) {
+  if (published && outcome.kind === 'ready' && !completionOnly) {
     markAssessmentTimeline('report.ready_commit_confirmed')
     if (job.wholeSubmissionId) void publishReportReady(job.attemptId, job.attemptEpoch)
   }
@@ -129,8 +130,14 @@ const pump = async (): Promise<void> => {
   try {
     while (!stopped && active.size < settings.workerConcurrency) {
       const resources = reportResourceClaimDecision(settings.workerConcurrency)
-      if (active.size >= resources.limit || resources.delayMs > 0) {
-        priorityDelay = Math.max(50, resources.delayMs)
+      const resourceLimit = resources.reason === 'host_cpu'
+        ? Math.min(1, settings.workerConcurrency)
+        : resources.reason === 'memory_headroom'
+          ? Math.min(2, settings.workerConcurrency)
+          : resources.limit
+      const resourceDelayMs = resources.reason === 'host_cpu' && active.size < resourceLimit ? 0 : resources.delayMs
+      if (active.size >= resourceLimit || resourceDelayMs > 0) {
+        priorityDelay = Math.max(50, resourceDelayMs)
         if (reportQueueObsEnabled()) {
           pollTickCount += 1
           recordReportQueueEvent({ kind: 'poll_tick', tick: pollTickCount, slotsBusy: active.size, concurrency: settings.workerConcurrency,

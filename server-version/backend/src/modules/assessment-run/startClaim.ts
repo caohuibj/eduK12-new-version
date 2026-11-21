@@ -97,6 +97,7 @@ export type ExecutionLockRow = RunExecutionLockIdentity & {
   trackResourceVersion?: string
   trackResourcePolicyHash?: string | null
   trackFrozenResourcePolicy?: unknown | null
+  trackReceiptOnly?: boolean
   scientificMaturity?: RunScientificMaturity | null
   scientificProvenance?: FrozenRunScientificProvenanceV1 | null
   scientificProvenanceHash?: string | null
@@ -291,6 +292,7 @@ export const lockExecutionEnvelope = async (
       t."resource_version" AS "trackResourceVersion",
       t."resource_policy_hash" AS "trackResourcePolicyHash",
       t."frozen_resource_policy" AS "trackFrozenResourcePolicy",
+      t."receipt_only" AS "trackReceiptOnly",
       e."scientific_maturity" AS "scientificMaturity",
       e."scientific_provenance" AS "scientificProvenance",
       e."scientific_provenance_hash" AS "scientificProvenanceHash",

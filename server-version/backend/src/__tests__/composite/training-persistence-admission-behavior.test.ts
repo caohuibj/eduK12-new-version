@@ -131,7 +131,7 @@ describe('C23 persistence admission projection (schema-aware mock DB, actual sta
     expect(selected).toHaveLength(enabled ? 2 : 1)
     for (const [args] of selected) expect(args.select).not.toHaveProperty('deliveryMode')
     expect(Object.keys(selected[0][0].select).sort()).toEqual([
-      'status', 'publicEnabled', 'opensAt', 'expiresAt', 'trainingPersistencePolicy', 'trainingPersistencePolicyHash',
+      'status', 'publicEnabled', 'opensAt', 'expiresAt', 'receiptOnly', 'trainingPersistencePolicy', 'trainingPersistencePolicyHash',
       'trainingFeedbackPolicy', 'trainingFeedbackPolicyHash', 'trainingContentSnapshotHash',
       'personalTracking', 'personalTrackingBaselineId', 'personalTrackingOrdinal', 'updatedAt',
     ].sort())
