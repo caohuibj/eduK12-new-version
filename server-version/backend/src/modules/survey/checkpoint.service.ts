@@ -82,7 +82,7 @@ type AuthContext={projectId:string;waveId:string;attemptId:string;
 const access=async(tx:Prisma.TransactionClient,proof:Proof,known:AuthContext)=>{
   await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${known.projectId} FOR SHARE`
   await tx.$queryRaw`SELECT id FROM survey_waves
-    WHERE id=${known.waveId} AND project_id=${known.projectId} FOR SHARE`
+    WHERE id=${known.waveId} AND project_id=${known.projectId} FOR KEY SHARE`
   await tx.$queryRaw`SELECT id FROM survey_wave_attempts
     WHERE id=${known.attemptId} AND project_id=${known.projectId}
       AND wave_id=${known.waveId} FOR UPDATE`

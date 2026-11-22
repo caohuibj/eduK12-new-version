@@ -24,25 +24,36 @@ const enabled=()=>{
 const publicIdFormat=/^[a-f0-9-]{36}$/i
 const secretPattern=/^[A-Za-z0-9_-]{43}$/
 const codePattern=/^R-[A-Z0-9]{8,32}$/
+const publicInfoInFlight=new BoundedTtlCache<unknown>(0,64)
+const projectPublicInFlight=new BoundedTtlCache<{
+  id:string;title:string;description:string|null;collectionMode:string;status:string;
+  participantIdentityMode:string;participantCodeLabel:string|null;participantCodeInstructions:string|null
+}>(0,64)
 async function projectPublic(tx:Tx | typeof prisma,publicId:string){
   if(!publicIdFormat.test(publicId))blocked('研究入口无效')
-  const project=await tx.surveyProject.findFirst({where:{publicId},
-    select:{id:true,title:true,description:true,collectionMode:true,status:true,participantIdentityMode:true,participantCodeLabel:true,participantCodeInstructions:true}})
-  if(!project)blocked('研究入口无效')
-  return project!
+  const load=async()=>{
+    const project=await tx.surveyProject.findFirst({where:{publicId},
+      select:{id:true,title:true,description:true,collectionMode:true,status:true,participantIdentityMode:true,participantCodeLabel:true,participantCodeInstructions:true}})
+    if(!project)blocked('研究入口无效')
+    return project!
+  }
+  return tx===prisma?projectPublicInFlight.singleFlight(publicId,load):load()
 }
 async function openWaveLocked(tx:Tx,projectId:string,waveId:string,linked:boolean){
   // Admission and project pause/close acquire locks in the same order:
-  // Project -> Wave. A committed PAUSE cannot race a newly created Attempt.
+  // Project -> Wave. A committed PAUSE/CLOSE/HARD_STOP takes FOR UPDATE on
+  // survey_waves, which conflicts with FOR KEY SHARE here. Using FOR KEY SHARE
+  // allows concurrent STARTs and FINAL/TASK readers to run in parallel while
+  // claimQuota takes a brief end-of-tx advisory lock + UPDATE starts_count
+  // (FOR NO KEY UPDATE, compatible with FOR KEY SHARE).
   const [project]=await tx.$queryRaw<Array<{
     ownerUserId:string;status:string;collectionMode:string
   }>>`SELECT "owner_user_id" AS "ownerUserId","status","collection_mode" AS "collectionMode"
     FROM "survey_projects" WHERE "id"=${projectId} FOR SHARE`
   if(!project||project.status!=='ACTIVE')blocked('研究项目暂停或已结束')
-  // Coalesce the Wave FOR UPDATE lock and admission column projection into one
-  // query roundtrip so the exclusive wave lock is held for fewer DB roundtrips.
-  // Fall back to tx.surveyWave.findFirst only when a unit test mock returns a
-  // bare [{ id }] lock stub without wave columns.
+  // Coalesce the Wave FOR KEY SHARE lock and admission column projection into
+  // one query roundtrip. Fall back to tx.surveyWave.findFirst only when a unit
+  // test mock returns a bare [{ id }] lock stub without wave columns.
   const lockedWaves=await tx.$queryRaw<Array<{
     id:string
     projectId?:string
@@ -66,7 +77,7 @@ async function openWaveLocked(tx:Tx,projectId:string,waveId:string,linked:boolea
     starts_count AS "startsCount",
     quota_starts AS "quotaStarts"
   FROM "survey_waves"
-    WHERE id=${waveId} AND project_id=${projectId} FOR UPDATE`
+    WHERE id=${waveId} AND project_id=${projectId} FOR KEY SHARE`
   const lockedWave=lockedWaves[0]
   const wave=lockedWave&&typeof lockedWave.status==='string'&&typeof lockedWave.consentVersion==='number'
     ?(lockedWave as NonNullable<Awaited<ReturnType<typeof tx.surveyWave.findFirst>>>)
@@ -93,7 +104,30 @@ async function validateEntry(tx:Tx,projectId:string,waveId:string,raw:string){
   if(!token)blocked('研究招募链接已经失效')
 }
 const hasQuota=(w:{startsCount:number;quotaStarts:number|null})=>w.quotaStarts===null||w.startsCount<w.quotaStarts
-const claimQuota=async(tx:Tx,waveId:string,startsCount:number)=>{
+const claimQuota=async(tx:Tx,projectId:string,waveId:string,startsCount:number)=>{
+  if(typeof (tx as {$executeRaw?:unknown}).$executeRaw==='function'){
+    // Brief end-of-tx per-wave advisory lock (~0.3 ms right before COMMIT) so
+    // only one START runs UPDATE starts_count (FOR NO KEY UPDATE) at a time.
+    // Because openWaveLocked and runtime readers hold FOR KEY SHARE (compatible
+    // with FOR NO KEY UPDATE), STARTs run concurrently without LockTuple
+    // deadlocks against concurrent Admin FOR UPDATE.
+    const lockKey=JSON.stringify(['survey-wave-quota-v1',projectId,waveId])
+    const updated=await tx.$executeRaw`
+      WITH quota_gate AS MATERIALIZED (
+        SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))
+      )
+      UPDATE "survey_waves"
+      SET "starts_count" = "starts_count" + 1
+      FROM quota_gate
+      WHERE "id" = ${waveId}
+        AND "project_id" = ${projectId}
+        AND "status" = 'OPEN'
+        AND "hard_stop_at" IS NULL
+        AND ("quota_starts" IS NULL OR "starts_count" < "quota_starts")
+    `
+    if(updated!==1)blocked('本波次参与名额已用尽')
+    return
+  }
   const updated=await tx.surveyWave.updateMany({where:{id:waveId,startsCount},
     data:{startsCount:{increment:1}}})
   if(updated.count!==1)blocked('研究名额出现竞争，请重新进入')
@@ -146,12 +180,14 @@ async function loadMeasurementNotices(client:Tx|typeof prisma,projectId:string,p
 }
 export async function getPublicResearchInfo(publicId:string,entryToken?:string){
   enabled()
-  return withSurveyReadClient(async tx=>{
+  if(!publicIdFormat.test(publicId))blocked('研究入口无效')
+  if(entryToken!==undefined&&!secretPattern.test(entryToken))blocked('研究招募链接无效')
+  const flightKey=entryToken===undefined?publicId:`${publicId}:${hashResearchCredential(entryToken)}`
+  return publicInfoInFlight.singleFlight(flightKey,()=>withSurveyReadClient(async tx=>{
     const project=await projectPublic(tx,publicId)
     const now=new Date()
     let scopeWaveId:string|undefined
     if(entryToken!==undefined){
-      if(!secretPattern.test(entryToken))blocked('研究招募链接无效')
       const entry=await tx.surveyEntryToken.findFirst({where:{projectId:project.id,
         tokenHash:hashResearchCredential(entryToken),revokedAt:null,expiresAt:{gt:now}},
         select:{waveId:true,wave:{select:{groupIpPolicy:true}}}})
@@ -173,7 +209,11 @@ export async function getPublicResearchInfo(publicId:string,entryToken?:string){
         consentText:disclosedSurveyConsent(wave.consentText,{
           measurementNotice:noticeFor(publicationId),
         })}))}
-  })
+  })) as Promise<{
+    scopeWaveId:string|null
+    project:{name:string;description:string|null;collectionMode:string;status:string;participantIdentityMode:string;participantCodeLabel:string|null;participantCodeInstructions:string|null}
+    waves:Array<Omit<ConsentWaveProjection,'publicationId'>&{consentText:string}>
+  }>
 }
 type PreparedPublication={
   preparedDigest:PreparedSurveyPublicationDigest;preparedSnapshot:ResearchFrozenPublication
@@ -194,6 +234,8 @@ export function resetSurveyPublicationCachesForTests(){
   preparedPublicationCache.clear()
   verifiedPublicationCache.clear()
   measurementNoticeCache.clear()
+  publicInfoInFlight.clear()
+  projectPublicInFlight.clear()
   publicationPreparationInFlight.clear()
   resetSurveyFinalPublicationCacheForTests()
 }
@@ -337,7 +379,6 @@ export async function startLinkedWave(input:{
       return {attemptId:previous.id,waveId:wave.id,status:previous.status,recovered:true}
     }
     if(!hasQuota(wave))blocked('本波次参与名额已用尽')
-    await claimQuota(tx,wave.id,wave.startsCount)
     const row=await tx.surveyWaveAttempt.create({data:{
       id:randomUUID(),projectId:project.id,waveId:wave.id,
       participantId:identity.participantId,status:'STARTED',
@@ -353,6 +394,7 @@ export async function startLinkedWave(input:{
       researchCode:input.researchCode,accessCredential:input.accessCredential,...(prepared??{}),
     })
     await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:row.id,publicationId:wave.publicationId!,newAttempt:true,...(prepared??{})})
+    await claimQuota(tx,project.id,wave.id,wave.startsCount)
     return {attemptId:row.id,waveId:wave.id,status:'STARTED',recovered:false}
   }))
 }
@@ -379,8 +421,11 @@ export async function startSingleUnlinkedWave(input:{
   const bearer=legacy?serverSession!.accessCredential:input.accessCredential!
   // Reject heavy pre-gate work for invalid/expired credentials while keeping
   // the existing in-transaction validation and error precedence unchanged.
-  const canPrepare=await mayPrepareUnlinkedPublication(project.id,input.waveId,input.entryToken)
-  const prepared=canPrepare?await preparePublicationDigest(project.id,input.waveId):undefined
+  // When the immutable prepared publication is already warm in memory, reuse
+  // it without a redundant pre-tx token DB query; in-tx validateEntry stays
+  // authoritative.
+  const cachedPrepared=preparedPublicationCache.get(JSON.stringify([project.id,input.waveId]))
+  const prepared=cachedPrepared??(await mayPrepareUnlinkedPublication(project.id,input.waveId,input.entryToken)?await preparePublicationDigest(project.id,input.waveId):undefined)
   return await surveyAdmissionGate().run(() => prisma.$transaction(async tx=>{
     const wave=await openWaveLocked(tx,project.id,input.waveId,false)
     await validateEntry(tx,project.id,wave.id,input.entryToken)
@@ -404,7 +449,6 @@ export async function startSingleUnlinkedWave(input:{
     }
     if(input.consentVersion!==wave.consentVersion)blocked('研究说明已更新，请重新确认')
     if(!hasQuota(wave))blocked('本波次参与名额已用尽')
-    await claimQuota(tx,wave.id,wave.startsCount)
     const row=await tx.surveyWaveAttempt.create({data:{
       id:randomUUID(),projectId:project.id,waveId:wave.id,
       sessionHash,...(operationKeyHash?{operationKeyHash}:{}),status:'STARTED',
@@ -418,6 +462,7 @@ export async function startSingleUnlinkedWave(input:{
       attemptId:row.id,participantId:null,accessCredential:bearer,...(prepared??{}),
     })
     await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:row.id,publicationId:wave.publicationId!,newAttempt:true,...(prepared??{})})
+    await claimQuota(tx,project.id,wave.id,wave.startsCount)
     return {attemptId:row.id,waveId:wave.id,status:'STARTED',
       recovered:false,accessCredential:bearer}
   }))

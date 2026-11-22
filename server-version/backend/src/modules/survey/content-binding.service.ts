@@ -71,7 +71,7 @@ export async function bindSurveyAttemptContent(tx:Prisma.TransactionClient,input
     JOIN survey_waves wave ON wave.id=attempt.wave_id AND wave.project_id=attempt.project_id
     JOIN survey_publications publication ON publication.id=wave.publication_id AND publication.project_id=project.id
     WHERE attempt.id=${input.attemptId} AND attempt.project_id=${input.projectId} AND attempt.wave_id=${input.waveId}
-      AND publication.id=${input.publicationId} FOR SHARE OF project,wave,publication`
+      AND publication.id=${input.publicationId} FOR SHARE OF project,publication FOR KEY SHARE OF wave`
   const rows=await tx.$queryRaw<Row[]>(skipSnapshotRead
     ? Prisma.sql`SELECT attempt.status,attempt.content_binding_cipher,attempt.content_binding_hash,
       attempt.flow_assignment_cipher,project.owner_user_id AS owner_id,publication.definition_digest ${lockedFrom}`
