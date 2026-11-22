@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
-import { canonicalHash, canonicalJsonString } from '../assessment-runtime/canonical'
+import { BoundedArtifactCache } from '../assessment-runtime/bounded-artifact-cache'
+import { canonicalHash, canonicalJsonString, retainImmutableCanonicalValue } from '../assessment-runtime/canonical'
 import { assertMeasurementDependency, assertReleaseTransition, ContentReleaseError, prepareRelease, type PreparedRelease, type ReleaseStatus } from './release'
 
 type Db = Prisma.TransactionClient
@@ -13,6 +14,48 @@ type Row = {
   scope: PreparedRelease['scope']; asset_refs: PreparedRelease['assetRefs']; source_release_id: string | null;
   published_by: string; published_at: Date; status: ReleaseStatus;
 }
+type HeaderRow = {
+  id: string; layer: PreparedRelease['layer']; family: PreparedRelease['family']; content_key: string; version: string;
+  hash_scheme: PreparedRelease['hashScheme']; content_hash: string; meta_hash?: string;
+  published_by: string; published_at: Date; status: ReleaseStatus;
+  content?: PreparedRelease['content'];
+}
+
+// Cache only content-verified immutable PreparedRelease payloads. Live status,
+// published_by, published_at, and FOR SHARE locks are always queried fresh from DB.
+const verifiedPreparedReleases = new BoundedArtifactCache<PreparedRelease>(256, 8 * 1024 * 1024)
+export const resetContentReleaseCacheForTests = (): void => { verifiedPreparedReleases.clear() }
+export const contentReleaseCacheStats = () => verifiedPreparedReleases.stats()
+
+const deepFreeze = <T>(value: T): T => {
+  if (value && typeof value === 'object' && !Object.isFrozen(value)) {
+    for (const child of Object.values(value)) deepFreeze(child)
+    Object.freeze(value)
+  }
+  return value
+}
+const releaseCacheKey = (r: Pick<HeaderRow, 'id' | 'layer' | 'family' | 'content_key' | 'version' | 'hash_scheme' | 'content_hash' | 'meta_hash'>): string | null => (
+  r.meta_hash && r.hash_scheme === 'MEASUREMENT_CONTENT_CANONICAL_V1'
+    ? `${r.id}:${r.layer}:${r.family}:${r.content_key}:${r.version}:${r.content_hash}:${r.meta_hash}`
+    : null
+)
+const toStoredRelease = (prepared: PreparedRelease, r: Pick<HeaderRow, 'id' | 'hash_scheme' | 'content_hash' | 'status' | 'published_by' | 'published_at'>): StoredRelease => ({
+  ...prepared,
+  hashScheme: r.hash_scheme,
+  contentHash: r.content_hash,
+  releaseId: r.id,
+  status: r.status,
+  publishedBy: r.published_by,
+  publishedAt: r.published_at,
+})
+const cachePreparedRelease = (key: string | null, prepared: PreparedRelease): void => {
+  if (!key) return
+  const frozen = deepFreeze(prepared)
+  retainImmutableCanonicalValue(frozen.content)
+  const charge = Math.max(1024, Buffer.byteLength(JSON.stringify(frozen), 'utf8') * 2)
+  verifiedPreparedReleases.set(key, frozen, charge)
+}
+
 /** Decodes one persisted row and verifies its stored digest from the single
  * prepareRelease projection (prepareRelease is idempotent on its own output,
  * so a second rehash of the decoded value proved nothing new). */
@@ -21,14 +64,36 @@ const decode = (r: Row, verifyStoredDigest = true): StoredRelease => {
     scope: r.scope, provenance: r.provenance, assetRefs: r.asset_refs, sourceReleaseId: r.source_release_id })
   if (verifyStoredDigest && (prepared.contentHash !== r.content_hash || r.hash_scheme !== 'MEASUREMENT_CONTENT_CANONICAL_V1'))
     throw new ContentReleaseError('CONTENT_RELEASE_HASH_MISMATCH')
-  return { ...prepared, hashScheme: r.hash_scheme, contentHash: r.content_hash, releaseId: r.id, status: r.status,
-    publishedBy: r.published_by, publishedAt: r.published_at }
+  return toStoredRelease(prepared, r)
 }
+const decodePrepared = (r: Row): { prepared: PreparedRelease; stored: StoredRelease } => {
+  const prepared = prepareRelease({ layer: r.layer, family: r.family, key: r.content_key, version: r.version, content: r.content,
+    scope: r.scope, provenance: r.provenance, assetRefs: r.asset_refs, sourceReleaseId: r.source_release_id })
+  if (prepared.contentHash !== r.content_hash || r.hash_scheme !== 'MEASUREMENT_CONTENT_CANONICAL_V1')
+    throw new ContentReleaseError('CONTENT_RELEASE_HASH_MISMATCH')
+  return { prepared, stored: toStoredRelease(prepared, r) }
+}
+const headerColumnsSql = Prisma.sql`id,layer,family,content_key,version,hash_scheme,content_hash,
+  md5(scope::text||'|'||provenance::text||'|'||asset_refs::text||'|'||COALESCE(source_release_id,'')) AS meta_hash,
+  published_by,published_at,status`
+
 export async function getContentRelease(db: Db, releaseId: string, lockForPublication = false): Promise<StoredRelease | null> {
-  const rows = await withStartNestedQueryRawLabel<Row[]>('content_release', () => db.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM measurement_content_releases WHERE id=${releaseId} ${lockForPublication ? Prisma.sql`FOR SHARE` : Prisma.empty}`))
+  const headers = await withStartNestedQueryRawLabel<HeaderRow[]>('content_release', () => db.$queryRaw<HeaderRow[]>(
+    Prisma.sql`SELECT ${headerColumnsSql} FROM measurement_content_releases WHERE id=${releaseId} ${lockForPublication ? Prisma.sql`FOR SHARE` : Prisma.empty}`,
+  ))
+  const header = headers[0]
+  if (!header) return null
+  if (header.content !== undefined) return decode(header as unknown as Row)
+  const key = releaseCacheKey(header)
+  const cached = key ? verifiedPreparedReleases.get(key) : undefined
+  if (cached) return toStoredRelease(cached, header)
+  const rows = await withStartNestedQueryRawLabel<Row[]>('content_release', () => db.$queryRaw<Row[]>(
+    Prisma.sql`SELECT * FROM measurement_content_releases WHERE id=${releaseId} ${lockForPublication ? Prisma.sql`FOR SHARE` : Prisma.empty}`,
+  ))
   if (!rows[0]) return null
-  const row = rows[0]
-  return decode(row)
+  const { prepared, stored } = decodePrepared(rows[0])
+  cachePreparedRelease(key, prepared)
+  return stored
 }
 /** Bounded projection preload; uses exactly the same persisted hash checks as
  * single-release reads. A missing ID remains absent, never synthesized. */
@@ -36,11 +101,44 @@ export async function getContentReleaseBatch(db: Db, ids: string[], lockForPubli
   const unique = [...new Set(ids)]
   if (unique.length > 1000) throw new ContentReleaseError('CONTENT_RELEASE_BATCH_LIMIT')
   if (!unique.length) return new Map()
-  const rows = await withStartNestedQueryRawLabel<Row[]>('content_release_batch', () => db.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM measurement_content_releases WHERE id IN (${Prisma.join(unique)})
-    ORDER BY id ${lockForPublication ? Prisma.sql`FOR SHARE` : Prisma.empty}`))
-  if (new Set(rows.map(row => row.id)).size !== rows.length || rows.some(row => !unique.includes(row.id)))
+  const headers = await withStartNestedQueryRawLabel<HeaderRow[]>('content_release_batch', () => db.$queryRaw<HeaderRow[]>(
+    Prisma.sql`SELECT ${headerColumnsSql} FROM measurement_content_releases WHERE id IN (${Prisma.join(unique)})
+      ORDER BY id ${lockForPublication ? Prisma.sql`FOR SHARE` : Prisma.empty}`,
+  ))
+  if (new Set(headers.map(row => row.id)).size !== headers.length || headers.some(row => !unique.includes(row.id)))
     throw new ContentReleaseError('CONTENT_RELEASE_BATCH_INVALID')
-  return new Map(rows.map(row => { const value = decode(row); return [value.releaseId, value] }))
+  const result = new Map<string, StoredRelease>()
+  const missedIds: string[] = []
+  const cacheKeysById = new Map<string, string | null>()
+  for (const header of headers) {
+    if (header.content !== undefined) {
+      const value = decode(header as unknown as Row)
+      result.set(value.releaseId, value)
+      continue
+    }
+    const key = releaseCacheKey(header)
+    const cached = key ? verifiedPreparedReleases.get(key) : undefined
+    if (cached) {
+      result.set(header.id, toStoredRelease(cached, header))
+    } else {
+      missedIds.push(header.id)
+      cacheKeysById.set(header.id, key)
+    }
+  }
+  if (missedIds.length) {
+    const rows = await withStartNestedQueryRawLabel<Row[]>('content_release_batch', () => db.$queryRaw<Row[]>(
+      Prisma.sql`SELECT * FROM measurement_content_releases WHERE id IN (${Prisma.join(missedIds)})
+        ORDER BY id ${lockForPublication ? Prisma.sql`FOR SHARE` : Prisma.empty}`,
+    ))
+    if (new Set(rows.map(row => row.id)).size !== rows.length || rows.some(row => !missedIds.includes(row.id)))
+      throw new ContentReleaseError('CONTENT_RELEASE_BATCH_INVALID')
+    for (const row of rows) {
+      const { prepared, stored } = decodePrepared(row)
+      cachePreparedRelease(cacheKeysById.get(row.id) ?? null, prepared)
+      result.set(stored.releaseId, stored)
+    }
+  }
+  return result
 }
 /** Prefetch a bounded set of releases into an existing request-local cache in
  * one round trip. Same rows, same FOR SHARE semantics, same decode as the

@@ -272,8 +272,38 @@ type VerifiedSurveyFinalPublication = Readonly<{
   ) => SurveyComputedFinal
 }>
 const verifiedFinalPublicationCache = new BoundedTtlCache<VerifiedSurveyFinalPublication>(120_000, 64)
+const authenticVerifiedPublications = new WeakSet<VerifiedSurveyFinalPublication>()
+export type VerifiedDbSurveyFinalPublication = Readonly<{
+  publicationId: string
+  definitionDigest: string
+  pgSnapshotSha256: string
+  verified: VerifiedSurveyFinalPublication
+}>
+const verifiedDbFinalPublicationCache = new BoundedTtlCache<VerifiedDbSurveyFinalPublication>(120_000, 64)
+const sha256HexPattern = /^[a-f0-9]{64}$/
 export function resetSurveyFinalPublicationCacheForTests(): void {
   verifiedFinalPublicationCache.clear()
+  verifiedDbFinalPublicationCache.clear()
+}
+export function getVerifiedDbSurveyFinalPublication(
+  publicationId: string,
+  definitionDigest: string,
+): VerifiedDbSurveyFinalPublication | undefined {
+  return verifiedDbFinalPublicationCache.get(`${publicationId}:${definitionDigest}`)
+}
+export function rememberVerifiedDbSurveyFinalPublication(entry: {
+  publicationId: string
+  definitionDigest: string
+  pgSnapshotSha256: string
+  verified: VerifiedSurveyFinalPublication
+}): void {
+  if (!authenticVerifiedPublications.has(entry.verified)
+    || !sha256HexPattern.test(entry.pgSnapshotSha256)
+    || !sha256HexPattern.test(entry.definitionDigest)) return
+  verifiedDbFinalPublicationCache.set(
+    `${entry.publicationId}:${entry.definitionDigest}`,
+    Object.freeze({ ...entry }),
+  )
 }
 /** A request-local proof owns its frozen copy. Its compute closure is the only
  * route that can reuse this digest; callers cannot supply a trusted hash to the
@@ -306,6 +336,7 @@ export function verifySurveyFinalPublication(snapshot:ResearchFrozenPublication,
       cognitiveResults?:ReadonlyMap<string,FrozenUnitResult>,nativeSituationalResults?:ReadonlyMap<string,FrozenUnitResult>,contextFrozenAt?:Date)=>
       computeSurveyFinalFromSnapshot(frozen,input,assignment,clientObservedBlocks,mode,itemTimings,definitionDigest,cognitiveResults,nativeSituationalResults,contextFrozenAt),
   })
+  authenticVerifiedPublications.add(verified)
   verifiedFinalPublicationCache.set(expectedDigest, verified)
   return verified
 }

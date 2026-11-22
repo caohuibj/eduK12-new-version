@@ -12,7 +12,12 @@ import { prepareCanonicalSubmission, assertCanonicalSubmissionPayloadSize, valid
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
 import { encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { verifySurveyFinalPublication, SurveyFinalValidationError } from './final.compute'
+import {
+  verifySurveyFinalPublication,
+  getVerifiedDbSurveyFinalPublication,
+  rememberVerifiedDbSurveyFinalPublication,
+  SurveyFinalValidationError,
+} from './final.compute'
 import { SurveyScaleTimingError } from './timing.definition'
 import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
 import { hashResearchCredential } from './identity.service'
@@ -67,7 +72,8 @@ export async function submitResearchFinal(input:FinalInput){
     ...(input.itemTimings!==undefined?{itemTimings:input.itemTimings}:{}),
   })
   assertCanonicalSubmissionPayloadSize(canonical,1024*1024,'研究 FINAL 作答')
-  return withFinalOnlyCompletionTransaction(async tx=>{
+  const warmState:{target:{publicationId:string;definitionDigest:string;verified:NonNullable<ReturnType<typeof verifySurveyFinalPublication>>}|null}={target:null}
+  const committed=await withFinalOnlyCompletionTransaction(async tx=>{
       // Decision D-6 (2026-11-06, product-confirmed): PAUSE / CLOSE blocks new
     // intake (START), not an already-admitted FINAL. This path intentionally
     // does NOT check wave.status; the submission window (finishUntil /
@@ -84,11 +90,12 @@ export async function submitResearchFinal(input:FinalInput){
     await tx.$queryRaw`SELECT id FROM survey_wave_attempts
       WHERE id=${input.attemptId} AND project_id=${known.projectId}
         AND wave_id=${known.waveId} FOR UPDATE`
+    const cachedDbPub=getVerifiedDbSurveyFinalPublication(known.publicationId,known.definitionDigest)
     const attempt=await tx.surveyWaveAttempt.findFirst({where:{
       id:input.attemptId,projectId:known.projectId,waveId:known.waveId,
     },select:{id:true,participantId:true,status:true,excludedAt:true,sessionHash:true,startedAt:true,
       wave:{select:{id:true,consentVersion:true,generalText:true,finishUntil:true,closesAt:true,hardStopAt:true,
-        publication:{select:{id:true,definitionDigest:true,compiledSnapshot:true}}}}}})
+        publication:{select:{id:true,definitionDigest:true,...(cachedDbPub?{}:{compiledSnapshot:true})}}}}}})
     if(!attempt||!attempt.wave.publication||attempt.participantId!==known.participantId)
       blocked('作答记录不属于此研究入口')
     const wave=attempt.wave
@@ -97,12 +104,33 @@ export async function submitResearchFinal(input:FinalInput){
     if(publication.id!==known.publicationId||
       publication.definitionDigest!==known.definitionDigest)
       invalid('提交时研究冻结版本已经发生变化')
-    if((publication.compiledSnapshot as unknown as ResearchFrozenPublication)?.runtimeStatus!=='SURVEY_FINAL_V1')
-      blocked('冻结研究定义校验失败')
-    const verified=verifySurveyFinalPublication(
-      publication.compiledSnapshot as unknown as ResearchFrozenPublication,publication.definitionDigest)
-    if(!verified)
-      blocked('冻结研究定义校验失败')
+    const pubRecord=publication as {id:string;definitionDigest:string;compiledSnapshot?:unknown}
+    let verified:ReturnType<typeof verifySurveyFinalPublication>=null
+    if(cachedDbPub&&pubRecord.compiledSnapshot===undefined){
+      const shaRows=await tx.$queryRaw<Array<{snapshotSha256?:unknown}>>`
+        SELECT encode(sha256(convert_to(compiled_snapshot::text,'UTF8')),'hex') AS "snapshotSha256"
+        FROM survey_publications WHERE id=${pubRecord.id}`
+      const liveSha256=shaRows[0]?.snapshotSha256
+      if(typeof liveSha256==='string'&&liveSha256===cachedDbPub.pgSnapshotSha256){
+        verified=cachedDbPub.verified
+      }
+    }
+    if(!verified){
+      let rawSnapshot=pubRecord.compiledSnapshot
+      if(rawSnapshot===undefined){
+        const reloaded=await tx.surveyWaveAttempt.findFirst({where:{
+          id:input.attemptId,projectId:known.projectId,waveId:known.waveId,
+        },select:{wave:{select:{publication:{select:{compiledSnapshot:true}}}}}})
+        rawSnapshot=reloaded?.wave.publication?.compiledSnapshot
+      }
+      if((rawSnapshot as ResearchFrozenPublication|undefined)?.runtimeStatus!=='SURVEY_FINAL_V1')
+        blocked('冻结研究定义校验失败')
+      verified=verifySurveyFinalPublication(
+        rawSnapshot as ResearchFrozenPublication,pubRecord.definitionDigest)
+      if(!verified)
+        blocked('冻结研究定义校验失败')
+      warmState.target={publicationId:pubRecord.id,definitionDigest:pubRecord.definitionDigest,verified}
+    }
     const snapshot=verified.snapshot
     // Flow assignment is fixed to this Attempt while serialized with the
     // Wave/Attempt and participant's current credential and revocation locks.
@@ -231,6 +259,24 @@ export async function submitResearchFinal(input:FinalInput){
       status:'COMPLETED' as const,idempotent:false,
       generalText:general.text,generalReceipt:general,...(participantFeedbackReceipt?{participantFeedbackReceipt}:{})}
   })
+  const warmTarget=warmState.target
+  if(warmTarget&&typeof (prisma as unknown as {$queryRaw?:unknown}).$queryRaw==='function'){
+    try{
+      const shaRows=await prisma.$queryRaw<Array<{snapshotSha256?:unknown}>>`
+        SELECT encode(sha256(convert_to(compiled_snapshot::text,'UTF8')),'hex') AS "snapshotSha256"
+        FROM survey_publications WHERE id=${warmTarget.publicationId} AND definition_digest=${warmTarget.definitionDigest}`
+      const liveSha256=shaRows[0]?.snapshotSha256
+      if(typeof liveSha256==='string'&&/^[a-f0-9]{64}$/.test(liveSha256)){
+        rememberVerifiedDbSurveyFinalPublication({
+          publicationId:warmTarget.publicationId,
+          definitionDigest:warmTarget.definitionDigest,
+          pgSnapshotSha256:liveSha256,
+          verified:warmTarget.verified,
+        })
+      }
+    }catch{ /* Best-effort warm of immutable publication sha256; never fail a committed FINAL. */ }
+  }
+  return committed
 }
 export async function readGeneralForOwnAttempt(input:{
   publicId:string;attemptId:string;researchCode?:string;accessCredential:string
