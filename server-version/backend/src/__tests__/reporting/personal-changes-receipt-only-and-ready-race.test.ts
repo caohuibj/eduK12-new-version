@@ -22,6 +22,7 @@ const m = vi.hoisted(() => ({
   prepareWait: vi.fn(),
   beginWait: vi.fn(),
   waitSequence: vi.fn(),
+  waitAvailable: true,
 }))
 
 vi.mock('../../config/database', () => ({
@@ -50,7 +51,7 @@ vi.mock('../../modules/composite/training-content-final', () => ({
 vi.mock('../../services/reportReadyNotifications', () => ({
   prepareReportReadyNotifications: m.prepareWait,
   beginReportReadyWait: m.beginWait,
-  reportReadyWaitAvailable: () => true,
+  reportReadyWaitAvailable: () => m.waitAvailable,
   reportReadyNotificationSequence: m.waitSequence,
   REPORT_READY_MAX_WAIT_MS: 4000,
 }))
@@ -66,6 +67,7 @@ import { testDisclosure } from '../assessment-policy/result-disclosure.fixture'
 
 beforeEach(() => {
   vi.resetAllMocks()
+  m.waitAvailable = true
   vi.stubEnv('DATA_ENCRYPTION_KEY', '55'.repeat(32))
   vi.stubEnv('DATA_PSEUDONYM_KEY', '66'.repeat(32))
   vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED', 'true')
@@ -309,8 +311,28 @@ describe('P2 regression: getReport captures READY notification sequence before i
     await getReport('att-ready', { userId: 'student-1' }).catch(() => undefined)
 
     // Crucial invariant: beginReportReadyWait received pre-read sequence 10, NOT post-read 11!
-    expect(m.prepareWait).toHaveBeenCalledTimes(1)
-    expect(m.prepareWait.mock.invocationCallOrder[0]).toBeLessThan(m.attemptFindUnique.mock.invocationCallOrder[0])
+    expect(m.prepareWait).not.toHaveBeenCalled()
+    expect(m.waitSequence.mock.invocationCallOrder[0]).toBeLessThan(m.attemptFindUnique.mock.invocationCallOrder[0])
     expect(m.beginWait).toHaveBeenCalledWith('att-ready', 1, 2000, undefined, 10)
+  })
+
+  it('only subscribes after authorized PROCESSING and rechecks READY on a cold subscription', async () => {
+    m.waitAvailable = false
+    m.prepareWait.mockImplementation(async () => { m.waitAvailable = true; return true })
+    m.waitSequence.mockReturnValue(8)
+    m.attemptFindUnique.mockResolvedValue({
+      id: 'att-cold', userId: 'student-1', status: 'COMPLETED',
+      receiptOnly: false, attemptEpoch: 1, asyncReportEpoch: 1,
+      completedAt: new Date(), aggregateInputHash: 'a'.repeat(64),
+      frozenActiveSlotSetHash: 'b'.repeat(64), contextSnapshotHash: 'c'.repeat(64),
+      compositeAssessment: { id: 'comp-1', name: 'T', status: 'PUBLISHED', createdBy: 'teacher-1', productKind: 'QUESTIONNAIRE' },
+    })
+    m.reportJobFindUnique
+      .mockResolvedValueOnce({ id: 'job-1', status: 'PROCESSING', reportEncrypted: null, completedAt: null, errorCode: null })
+      .mockResolvedValueOnce({ id: 'job-1', status: 'READY', reportEncrypted: null, completedAt: new Date(), errorCode: null })
+    await getReport('att-cold', { userId: 'student-1' }).catch(() => undefined)
+    expect(m.attemptFindUnique.mock.invocationCallOrder[0]).toBeLessThan(m.prepareWait.mock.invocationCallOrder[0])
+    expect(m.reportJobFindUnique).toHaveBeenCalledTimes(2)
+    expect(m.beginWait).not.toHaveBeenCalled()
   })
 })

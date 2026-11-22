@@ -19,10 +19,12 @@ export async function assertScaleLibraryCollectionAllowed(tx:Prisma.TransactionC
     seed_ids:string[]
     release_ids:string[]
     truncated:boolean
+    locked_release_count:number
   }>>('library_lock_and_ancestors', () => tx.$queryRaw<Array<{
     seed_ids:string[]
     release_ids:string[]
     truncated:boolean
+    locked_release_count:number
   }>>(Prisma.sql`WITH RECURSIVE
     locked_scales AS MATERIALIZED (
       SELECT id,measurement_release_id FROM scales
@@ -66,7 +68,7 @@ export async function assertScaleLibraryCollectionAllowed(tx:Prisma.TransactionC
   const seeds=resolved?.seed_ids??original
   const releases=resolved?.release_ids??[]
   const releaseSet=new Set(releases)
-  if(resolved?.truncated||seeds.some(id=>!releaseSet.has(id)))throw new ScaleLibraryError(409,'量表依赖身份不完整')
+  if(resolved?.truncated||seeds.some(id=>!releaseSet.has(id))||resolved?.locked_release_count!==releases.length)throw new ScaleLibraryError(409,'量表依赖身份不完整')
   if(releases.length>1000)throw new ScaleLibraryError(409,'量表依赖数量超限')
   const rows=await withStartNestedQueryRawLabel<Array<{target_id:string}>>('library_emergency_stops', () => tx.$queryRaw<Array<{target_id:string}>>(Prisma.sql`SELECT target_id FROM scale_library_emergency_stops
     WHERE (target_kind='RELEASE' AND target_id=ANY(${releases}::text[]))
