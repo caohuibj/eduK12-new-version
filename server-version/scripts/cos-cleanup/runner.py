@@ -66,10 +66,20 @@ def record_status(value):
         temp.replace(target)
     finally: temp.unlink(missing_ok=True)
 
-def run():
+def scan_cache_mount():
+    cache = STATE / 'scan-cache-v1'
+    cache.mkdir(mode=0o700, exist_ok=True)
+    info = cache.lstat()
+    require(stat.S_ISDIR(info.st_mode) and cache.resolve() == cache and info.st_uid == 0
+            and not info.st_mode & 0o077, 'PRIVATE_SCAN_CACHE_REQUIRED')
+    return ['--mount', 'type=bind,src=' + str(cache) + ',dst=/scan-cache',
+            '--env', 'EDUK12_COS_SCAN_CACHE=/scan-cache']
+
+def run(plan_only=False):
     require(os.geteuid() == 0, 'ROOT_REQUIRED')
     c = json.loads(private(CONFIG))
     require(c.get('mode') in ['plan_only', 'execute'], 'CLEANUP_MODE_REFUSED')
+    if plan_only: c['mode'] = 'plan_only'
     require(c.get('backupBucket') == 'eduk12-backups-1393949445' and c.get('sourceBucket') == 'ptool-videos-edu-1393949445' and c.get('region') == 'ap-beijing', 'BUCKET_BINDING_REFUSED')
     require(CODE.resolve().parent.parent == Path('/opt/eduk12-cos-cleanup/releases'), 'REVIEWED_CODE_REQUIRED')
     for directory in [STATE, Path('/var/lib/eduk12-backups'), Path('/var/lib/eduk12-attachments')]:
@@ -114,6 +124,7 @@ def run():
                 '--user', '0:0', '--read-only', '--cap-drop', 'ALL', '--cap-add', 'DAC_OVERRIDE', '--security-opt', 'no-new-privileges',
                 '--cpus', '0.3', '--memory', '256m', '--pids-limit', '64', '--tmpfs', '/tmp:size=16m,noexec,nosuid']
         for m in mounts: args.extend(['--mount', m])
+        args.extend(scan_cache_mount())
         args.extend(['--entrypoint', 'node', backend['Image'], '/ops/cli.mjs'])
         try:
             result = subprocess.run(args, input=json.dumps(payload).encode(), capture_output=True, timeout=2400)
@@ -133,7 +144,8 @@ def run():
 def main():
     os.umask(0o077); signal.signal(signal.SIGTERM, interrupted); signal.signal(signal.SIGINT, interrupted)
     try:
-        require(sys.argv[1:] == ['run'], 'COMMAND_REFUSED'); result = run()
+        require(sys.argv[1:] in [['run'], ['plan']], 'COMMAND_REFUSED')
+        result = run(plan_only=sys.argv[1] == 'plan')
         record_status({'status': 'BLOCKED' if result.get('blocked') else 'SKIPPED' if result.get('skipped') else 'SUCCESS', **result})
         print(json.dumps(result)); return 0
     except Exception as e:

@@ -172,6 +172,45 @@ test('historical encrypted catalog scan exceeds the old budget with bounded reta
   await assert.rejects(scan(api,cfg,local,secret,temp),/INDEX_AUTHENTICATION_FAILED/);
 });
 
+test('bounded metadata scans resume across workers and authenticate exact cached versions',async t=>{
+  const work=await fs.mkdtemp(path.join(os.tmpdir(),'cleanup-resume-'));
+  t.after(()=>fs.rm(work,{recursive:true,force:true}));
+  const cache=path.join(work,'cache');await fs.mkdir(cache,{mode:0o700});
+  // The hosted resource smoke uses a small tmpfs for synthetic fixtures.
+  t.mock.method(fs,'statfs',async()=>({bavail:8*1024**3,bsize:1}));
+  const api=new MemoryApi({inventory:[]}),identity=fixture().attachment.identity;
+  const attachment={schema:1,identity,receipts:{},snapshots:[]},pointers=[];
+  for(let n=0;n<3;n++) {
+    const file=path.join(work,'catalog.gcm');
+    const state={...attachment,extra:'x'.repeat(2048)};
+    const receipt=await encryptStream(Readable.from([Buffer.from(JSON.stringify(seal(state,secret)))]),file,secret,identity.keyId,8192);
+    const remote=await api.put('attachments/v1/catalogs/'+crypto.randomUUID()+'.gcm',file);
+    await fs.unlink(file);
+    const body=Buffer.from(JSON.stringify(seal({...receipt,key:remote.key,versionId:remote.versionId,keyId:identity.keyId},secret)));
+    pointers.push(await api.put('attachments/v1/catalog-latest.json',body));
+  }
+  const local={host:{schema:1,points:[]},attachment};
+  const cfg={...c,maxScanBytes:3500};
+  await assert.rejects(scan(api,cfg,local,secret,work,cache),/METADATA_SCAN_BUDGET/);
+  await assert.rejects(scan(api,cfg,local,secret,work,cache),/METADATA_SCAN_BUDGET/);
+  const resumed=await scan(api,cfg,local,secret,work,cache);
+  const full=await scan(api,c,local,secret,work);
+  assert.equal(resumed.catalogs.size,3);
+  assert.ok(resumed.scanBytes<full.scanBytes);
+  assert.deepEqual(resumed.records,full.records);
+  const hot=await scan(api,cfg,local,secret,work,cache);
+  assert.equal(hot.scanBytes,0);
+  const target=pointers[0];
+  const cacheFile=r=>path.join(cache,hash(['eduk12-cos-scan-cache-v1',cfg.backupBucket,cfg.region,r.key,r.versionId,r.bytes])+'.meta');
+  await fs.copyFile(cacheFile(pointers[1]),cacheFile(target));
+  const restored=await scan(api,cfg,local,secret,work,cache);
+  assert.equal(restored.scanBytes,target.bytes);
+  assert.deepEqual(restored.records,full.records);
+  api.rows.delete(id(target));
+  await scan(api,cfg,local,secret,work,cache);
+  await assert.rejects(fs.stat(cacheFile(target)),{code:'ENOENT'});
+});
+
 test('detachment refuses conflicting versions for one retained deduplication key',()=>{
   const f=fixture(),p=mature(f),s=f.snapshots.get('00000000-0000-0000-0000-000000000004');
   const other={...f.baseline,versionId:'other-retained-version',receipt:{...f.baseline.receipt,versionId:'other-retained-version'}};

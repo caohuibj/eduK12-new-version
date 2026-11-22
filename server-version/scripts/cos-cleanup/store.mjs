@@ -1,4 +1,4 @@
-import { promises as fsp } from 'node:fs';
+import { constants, promises as fsp } from 'node:fs';
 import path from 'node:path';
 import https from 'node:https';
 import { PassThrough } from 'node:stream';
@@ -85,15 +85,90 @@ export class CosApi {
   }
 }
 export const fingerprint = versions => hash(versions.map(r=>[r.key,r.versionId,r.bytes,r.kind]).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b))));
-export async function scan(api, c, local, secret, work) {
+const CACHE_LIMIT = 4 * 1024 ** 3;
+const MINIMUM_FREE = 6 * 1024 ** 3;
+const MAC_BYTES = 32;
+const CACHE_FILE = /^[a-f0-9]{64}\.meta$/;
+const INCOMPLETE_FILE = /^\.write-[a-f0-9-]{36}$/;
+
+// Cache the exact version's wire bytes. Every hit still passes the same catalog,
+// pointer, manifest or receipt authentication in the scanner below.
+async function metadataCache(directory, c, versions, secret) {
+  const stat = await fsp.lstat(directory);
+  need(stat.isDirectory() && stat.uid === process.getuid() && !(stat.mode & 0o077), 'PRIVATE_SCAN_CACHE_REQUIRED');
+  const filename = r => hash(['eduk12-cos-scan-cache-v1', c.backupBucket, c.region, r.key, r.versionId, r.bytes]) + '.meta';
+  const mac = (name, body) => crypto.createHmac('sha256', secret).update(name).update(body).digest();
+  const present = new Set(versions.filter(r => r.kind === 'object' && r.bytes <= METADATA_CIPHER_LIMIT).map(filename));
+  let used = 0;
+  for (const name of await fsp.readdir(directory)) {
+    const file = path.join(directory, name), entry = await fsp.lstat(file);
+    need(entry.isFile() && entry.uid === stat.uid && !(entry.mode & 0o077) && entry.nlink === 1
+      && (CACHE_FILE.test(name) || INCOMPLETE_FILE.test(name)), 'PRIVATE_SCAN_CACHE_REQUIRED');
+    if (!present.has(name)) await fsp.unlink(file);
+    else used += entry.size;
+  }
+  need(used <= CACHE_LIMIT, 'METADATA_CACHE_CAPACITY');
+  return {
+    async get(r) {
+      const name = filename(r), file = path.join(directory, name);
+      let input;
+      try { input = await fsp.open(file, constants.O_RDONLY | constants.O_NOFOLLOW); }
+      catch (e) { if (e.code === 'ENOENT') return null; throw e; }
+      let size;
+      try {
+        size = (await input.stat()).size;
+        if (size === r.bytes + MAC_BYTES) {
+          const data = await input.readFile(), body = data.subarray(MAC_BYTES);
+          if (data.length === size && crypto.timingSafeEqual(data.subarray(0, MAC_BYTES), mac(name, body))) return body;
+        }
+      } finally { await input.close(); }
+      await fsp.unlink(file);
+      used -= size;
+      return null;
+    },
+    async put(r, body) {
+      const name = filename(r), size = body.length + MAC_BYTES;
+      need(used + size <= CACHE_LIMIT, 'METADATA_CACHE_CAPACITY');
+      const space = await fsp.statfs(directory);
+      need(space.bavail * space.bsize >= MINIMUM_FREE + size, 'METADATA_CACHE_DISK_HEADROOM_REQUIRED');
+      const temporary = path.join(directory, '.write-' + crypto.randomUUID());
+      try {
+        await fsp.writeFile(temporary, Buffer.concat([mac(name, body), body]), {flag:'wx',mode:0o600});
+        await fsp.rename(temporary, path.join(directory, name));
+        used += size;
+      } finally { await fsp.rm(temporary, {force:true}); }
+    }
+  };
+}
+
+export async function scan(api, c, local, secret, work, cacheDir = process.env.EDUK12_COS_SCAN_CACHE) {
   const versions=await api.versions(), lookup=new Map(versions.filter(r=>r.kind==='object').map(r=>[id(r),r]));
-  const records=new Map(),snapshots=new Map(),catalogs=new Map();let readBytes=0;
+  const cache=cacheDir ? await metadataCache(cacheDir,c,versions,secret) : null;
+  const records=new Map(),snapshots=new Map(),catalogs=new Map();
+  // Adjacent catalogs repeat most references. Keep one string per identity.
+  const references=new Map();
+  const share=value=>{
+    const existing=references.get(value);
+    if(existing!==undefined)return existing;
+    references.set(value,value);
+    return value;
+  };
+  let readBytes=0;
   const register=(r,kind,extra={})=>{
     validRecord(r);const listed=lookup.get(id(r));need(listed&&listed.bytes===r.bytes,'INDEXED_VERSION_MISSING');
     const previous=records.get(id(r));need(!previous||previous.sha256===r.sha256,'CONFLICTING_VERSION_RECEIPTS');
     const record={...r,at:listed.at,kind,...extra};records.set(id(r),record);return record;
   };
-  const read=async r=>{readBytes+=r.bytes;need(readBytes<=c.maxScanBytes,'METADATA_SCAN_BUDGET');return api.buffer(r,METADATA_CIPHER_LIMIT);};
+  const read=async r=>{
+    need(r.bytes<=METADATA_CIPHER_LIMIT,'METADATA_LIMIT');
+    const cached=await cache?.get(r);
+    if(cached)return cached;
+    need(readBytes+r.bytes<=c.maxScanBytes,'METADATA_SCAN_BUDGET');
+    const body=await api.buffer(r,METADATA_CIPHER_LIMIT);
+    readBytes+=r.bytes;
+    await cache?.put(r,body);
+    return body;
+  };
   const decrypted=async r=>{
     const original=lookup.get(id(r));need(original&&original.bytes===r.encryptedBytes,'INDEXED_METADATA_MISSING');
     const encrypted=path.join(work,crypto.randomUUID()+'.gcm'),plain=encrypted+'.json';
@@ -130,8 +205,8 @@ export async function scan(api, c, local, secret, work) {
     if(!catalogs.has(id(pointer))){
       const state=unseal(await decrypted(pointer),secret);
       need(JSON.stringify(state.identity)===JSON.stringify(local.attachment.identity)&&state.schema===1,'HISTORICAL_REPOSITORY_IDENTITY_CHANGED');
-      const blobs=Object.values(state.receipts).map(r=>id(r));
-      catalogs.set(id(pointer),{blobs,snapshotIds:state.snapshots.map(s=>s.id)});register(metadataRecord(pointer),'catalog');
+      const blobs=Object.values(state.receipts).map(r=>share(id(r)));
+      catalogs.set(id(pointer),{blobs,snapshotIds:state.snapshots.map(s=>share(s.id))});register(metadataRecord(pointer),'catalog');
       await registerState(state);
     }
   }

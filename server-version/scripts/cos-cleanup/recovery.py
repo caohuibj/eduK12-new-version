@@ -15,6 +15,8 @@ import subprocess
 import time
 import uuid
 
+from runner import scan_cache_mount
+
 ROOT = Path('/var/lib/eduk12-cos-recovery')
 CODE = Path('/opt/eduk12-cos-cleanup/current')
 CONFIG = Path('/etc/eduk12-cos-cleanup/config.json')
@@ -133,8 +135,10 @@ def helper(backup, image, work, c, secret, credentials, command, **extra):
             '--mount', 'type=bind,src=' + str(CODE.resolve().parent / 'attachment-backup') + ',dst=/attachment-backup,readonly',
             '--mount', 'type=bind,src=' + str(work) + ',dst=/work',
             '--mount', 'type=bind,src=/var/lib/eduk12-backups,dst=/host,readonly',
-            '--mount', 'type=bind,src=/var/lib/eduk12-attachments/data,dst=/attachments,readonly', '--mount', proof_mount,
-            '--entrypoint', 'node', image]
+            '--mount', 'type=bind,src=/var/lib/eduk12-attachments/data,dst=/attachments,readonly', '--mount', proof_mount]
+        if command in ['repository', 'readiness']:
+            args.extend(scan_cache_mount())
+        args.extend(['--entrypoint', 'node', image])
         # Keep the attachment verifier byte-identical so immutable joint bindings
         # remain reusable; database transport follows the validated backup bound.
         args += ['--input-type=module', '-e', DATABASE_DOWNLOAD_JS] if command == 'database' else ['/ops/recovery.mjs']

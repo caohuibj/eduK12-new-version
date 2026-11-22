@@ -12,11 +12,14 @@ remote catalog pointer version, downloads/decrypts the indexed historical catalo
 and manifests, and reconstructs version-specific dependencies. Authenticated blob
 sidecars provide ownership for orphan content. Unknown recovery metadata, corrupt
 indices, incomplete pagination or resource limits fail closed. Unknown payload
-versions stay protected. Metadata scans remain bounded to 512 MiB per run; catalogs
-are authenticated one at a time and only their version/reference graph is retained,
-keeping the existing 256 MiB helper memory limit. Existing installations must update
-`maxScanBytes` explicitly after reviewed validation. Budget exhaustion still blocks
-planning and joint recovery, without deleting or ignoring historical metadata.
+versions stay protected. COS metadata downloads remain bounded to 512 MiB per run.
+If a scan reaches that limit, the next run reuses wire bytes in a shared root-only
+cache, authenticated against the bucket, region, key, VersionId and size. A fresh
+complete listing governs every scan. All metadata still passes the original
+verification and only the dependency graph stays in memory. Cache files absent
+from the current inventory are retired locally. The cache is limited to 4 GiB
+and cannot consume the last 6 GiB of free space. A partial scan cannot issue a
+plan or a recovery proof.
 Retention: 48 hourly hours, 30 daily days, 12 weekly weeks,
 12 monthly months, permanent initial baseline, protected points and at least two
 recovery points. Retained DB points pin their attached manifests. Currently retained
@@ -86,6 +89,8 @@ only with their durable exact-version/hash intents; deletion is idempotent. Reta
 encrypted checkpoint staging until COMPLETE. There is no undo for a permanent
 version deletion. Stop the timer for pause; a pending transaction still requires
 resume or audited repair, not journal removal, source rollback or wholesale prune.
+
+Use the installed launcher with the `plan` command to generate a fresh plan without risking deletion or changing the persisted execute mode. It uses the same writer locks and stores the plan with the existing observation history.
 
 Install: `sudo bash install.sh <40-char-reviewed-SHA>`; optional `--enable-plan`
 starts the hourly `:50` timer with 0-30 second jitter. First use production plan-only
