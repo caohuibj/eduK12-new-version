@@ -55,10 +55,15 @@ export const runtimeResourceConfig = Object.freeze({
   videoSmartCompression: boolEnv('VIDEO_SMART_COMPRESSION', true),
 })
 
-export const effectiveRuntimeResourceConfig = () => ({
-  heapLimitMiB: Math.round(getHeapStatistics().heap_size_limit / 1048576),
-  prismaConnectionLimit: new URL(buildDatabaseUrl(process.env.DATABASE_URL) ?? 'postgresql://localhost').searchParams.get('connection_limit'),
-  prismaPoolTimeoutSeconds: new URL(buildDatabaseUrl(process.env.DATABASE_URL) ?? 'postgresql://localhost').searchParams.get('pool_timeout'),
+export const effectiveRuntimeResourceConfig = () => {
+  const effectiveDbUrl = new URL(buildDatabaseUrl(process.env.DATABASE_URL) ?? 'postgresql://localhost')
+  return {
+    heapLimitMiB: Math.round(getHeapStatistics().heap_size_limit / 1048576),
+    prismaConnectionLimit: effectiveDbUrl.searchParams.get('connection_limit'),
+    prismaPoolTimeoutSeconds: effectiveDbUrl.searchParams.get('pool_timeout'),
+    prismaStatementCacheSize: effectiveDbUrl.searchParams.get('statement_cache_size'),
+    prismaMaxIdleConnectionLifetimeSeconds: effectiveDbUrl.searchParams.get('max_idle_connection_lifetime'),
+    prismaMaxConnectionLifetimeSeconds: effectiveDbUrl.searchParams.get('max_connection_lifetime'),
   admissionOverrides: Object.fromEntries(Object.entries(process.env).filter(([name]) => /^(?:UNIT_SUBMIT|AGGREGATE_FINALIZATION|QUESTIONNAIRE_COMPLETION|UPLOAD|LOGIN|PASSWORD_CHANGE|REGISTRATION)_/.test(name) && /(?:LIMIT|QUEUE|TIMEOUT_MS|MAX_WAIT_MS|MAX_CONCURRENT|MAX_PIXELS|MAX_ACTIVE_ACCOUNTS|BYTE_BUDGET|RETRY_AFTER_SECONDS)$/.test(name)).map(([name]) => [name, intEnv(name, 1, name.endsWith('_QUEUE') ? 0 : 1, Number.MAX_SAFE_INTEGER)])),
   videoConcurrency: runtimeResourceConfig.videoConcurrency,
   imageConcurrency: runtimeResourceConfig.imageConcurrency,
@@ -74,4 +79,5 @@ export const effectiveRuntimeResourceConfig = () => ({
   videoBitrate: runtimeResourceConfig.videoBitrate,
   videoAudioBitrate: runtimeResourceConfig.videoAudioBitrate,
   videoSmartCompression: runtimeResourceConfig.videoSmartCompression,
-})
+  }
+}

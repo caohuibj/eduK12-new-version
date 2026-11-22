@@ -1,16 +1,42 @@
 export const DEFAULT_PRISMA_CONNECTION_POOL_SIZE = 10
 export const DEFAULT_PRISMA_POOL_TIMEOUT_SECONDS = 30
 
-const positiveInteger = (value: string | undefined, fallback: number, name: string): number => {
+type PoolUrlParamSpec = {
+  parameter:
+    | 'connection_limit'
+    | 'pool_timeout'
+    | 'statement_cache_size'
+    | 'max_idle_connection_lifetime'
+    | 'max_connection_lifetime'
+  envName:
+    | 'PRISMA_CONNECTION_POOL_SIZE'
+    | 'PRISMA_POOL_TIMEOUT'
+    | 'PRISMA_STATEMENT_CACHE_SIZE'
+    | 'PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS'
+    | 'PRISMA_MAX_CONNECTION_LIFETIME_SECONDS'
+  min: number
+  max: number
+  fallback?: number
+}
+
+const POOL_URL_PARAM_SPECS: readonly PoolUrlParamSpec[] = [
+  { parameter: 'connection_limit', envName: 'PRISMA_CONNECTION_POOL_SIZE', min: 1, max: 1000, fallback: DEFAULT_PRISMA_CONNECTION_POOL_SIZE },
+  { parameter: 'pool_timeout', envName: 'PRISMA_POOL_TIMEOUT', min: 1, max: 1000, fallback: DEFAULT_PRISMA_POOL_TIMEOUT_SECONDS },
+  { parameter: 'statement_cache_size', envName: 'PRISMA_STATEMENT_CACHE_SIZE', min: 0, max: 1000 },
+  { parameter: 'max_idle_connection_lifetime', envName: 'PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS', min: 0, max: 86400 },
+  { parameter: 'max_connection_lifetime', envName: 'PRISMA_MAX_CONNECTION_LIFETIME_SECONDS', min: 0, max: 86400 },
+]
+
+const boundedInteger = (value: string | undefined, min: number, max: number, fallback: number | undefined, name: string): number | undefined => {
   if (value === undefined || value.trim() === '') return fallback
   const parsed = Number(value)
-  if (!Number.isSafeInteger(parsed) || parsed < 1 || parsed > 1000) throw new Error(`${name} must be an integer from 1 to 1000`)
+  if (!Number.isSafeInteger(parsed) || parsed < min || parsed > max) throw new Error(`${name} must be an integer from ${min} to ${max}`)
   return parsed
 }
 
 /**
- * Apply the Prisma pool contract at runtime while preserving an explicit
- * connection_limit/pool_timeout already present in DATABASE_URL.
+ * Apply the Prisma pool and connection-lifecycle contract at runtime while
+ * preserving explicit parameters already present in DATABASE_URL.
  */
 export const buildDatabaseUrl = (
   databaseUrl: string | undefined,
@@ -19,38 +45,28 @@ export const buildDatabaseUrl = (
   if (!databaseUrl) return undefined
 
   const url = new URL(databaseUrl)
-  for (const key of ['connection_limit', 'pool_timeout']) {
-    if (url.searchParams.has(key)) positiveInteger(url.searchParams.get(key)!, 1, key)
-  }
-  positiveInteger(env.PRISMA_CONNECTION_POOL_SIZE, DEFAULT_PRISMA_CONNECTION_POOL_SIZE, 'PRISMA_CONNECTION_POOL_SIZE')
-  positiveInteger(env.PRISMA_POOL_TIMEOUT, DEFAULT_PRISMA_POOL_TIMEOUT_SECONDS, 'PRISMA_POOL_TIMEOUT')
-  if (!url.searchParams.has('connection_limit')) {
-    url.searchParams.set(
-      'connection_limit',
-      String(positiveInteger(env.PRISMA_CONNECTION_POOL_SIZE, DEFAULT_PRISMA_CONNECTION_POOL_SIZE, 'PRISMA_CONNECTION_POOL_SIZE')),
-    )
-  }
-  if (!url.searchParams.has('pool_timeout')) {
-    url.searchParams.set(
-      'pool_timeout',
-      String(positiveInteger(env.PRISMA_POOL_TIMEOUT, DEFAULT_PRISMA_POOL_TIMEOUT_SECONDS, 'PRISMA_POOL_TIMEOUT')),
-    )
+  for (const spec of POOL_URL_PARAM_SPECS) {
+    if (url.searchParams.has(spec.parameter)) {
+      boundedInteger(url.searchParams.get(spec.parameter)!, spec.min, spec.max, undefined, spec.parameter)
+    }
+    const envValue = boundedInteger(env[spec.envName], spec.min, spec.max, spec.fallback, spec.envName)
+    if (!url.searchParams.has(spec.parameter) && envValue !== undefined) {
+      url.searchParams.set(spec.parameter, String(envValue))
+    }
   }
   return url.toString()
 }
 
 export type DatabasePoolConfigConflict = {
-  parameter: 'connection_limit' | 'pool_timeout'
+  parameter: PoolUrlParamSpec['parameter']
   urlValue: number
-  envName: 'PRISMA_CONNECTION_POOL_SIZE' | 'PRISMA_POOL_TIMEOUT'
+  envName: PoolUrlParamSpec['envName']
   envValue: number
 }
 
 /**
- * Detect silent overrides where DATABASE_URL explicitly pins connection_limit
- * or pool_timeout to a different value than PRISMA_CONNECTION_POOL_SIZE /
- * PRISMA_POOL_TIMEOUT. buildDatabaseUrl preserves DATABASE_URL precedence, so
- * callers use this check to fail fast in preflight or warn loudly at startup.
+ * Detect silent overrides where DATABASE_URL explicitly pins pool/cache/lifetime
+ * parameters to a different value than PRISMA_* environment variables.
  */
 export const detectDatabasePoolConfigConflicts = (
   databaseUrl: string | undefined,
@@ -60,22 +76,15 @@ export const detectDatabasePoolConfigConflicts = (
   let url: URL
   try { url = new URL(databaseUrl) } catch { return [] }
   const conflicts: DatabasePoolConfigConflict[] = []
-  const pairs: Array<{
-    parameter: 'connection_limit' | 'pool_timeout'
-    envName: 'PRISMA_CONNECTION_POOL_SIZE' | 'PRISMA_POOL_TIMEOUT'
-  }> = [
-    { parameter: 'connection_limit', envName: 'PRISMA_CONNECTION_POOL_SIZE' },
-    { parameter: 'pool_timeout', envName: 'PRISMA_POOL_TIMEOUT' },
-  ]
-  for (const { parameter, envName } of pairs) {
+  for (const { parameter, envName, min, max } of POOL_URL_PARAM_SPECS) {
     const rawUrl = url.searchParams.get(parameter)
     const rawEnv = env[envName]
     if (rawUrl === null || rawEnv === undefined || rawEnv.trim() === '') continue
     const urlValue = Number(rawUrl)
     const envValue = Number(rawEnv)
     if (
-      Number.isSafeInteger(urlValue) && urlValue >= 1 && urlValue <= 1000
-      && Number.isSafeInteger(envValue) && envValue >= 1 && envValue <= 1000
+      Number.isSafeInteger(urlValue) && urlValue >= min && urlValue <= max
+      && Number.isSafeInteger(envValue) && envValue >= min && envValue <= max
       && urlValue !== envValue
     ) {
       conflicts.push({ parameter, urlValue, envName, envValue })
