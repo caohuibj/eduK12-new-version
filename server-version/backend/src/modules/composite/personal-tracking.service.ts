@@ -16,12 +16,13 @@ function fail():never{throw compositeForbidden('本人变化报告不可访问')
 export async function readTrainingPersonalChangesAvailability(attemptId:string,userId:string){
  const end=await prisma.compositeAssessmentAttempt.findUnique({where:{id:attemptId},select:{
   userId:true,status:true,completedAt:true,assignmentRef:true,subjectUserId:true,respondentUserId:true,
-  deliveryCourseId:true,compositeAssessment:{select:{
+  receiptOnly:true,deliveryCourseId:true,compositeAssessment:{select:{
    personalTrackingBaselineId:true,createdBy:true,status:true,productKind:true,courseId:true,
   }},
  }})
  if(!end||end.status!=='COMPLETED'||!end.completedAt||end.userId!==userId||end.assignmentRef
    ||end.subjectUserId&&end.subjectUserId!==end.userId||end.respondentUserId&&end.respondentUserId!==end.userId)fail()
+ if(end.receiptOnly)return {configured:false}
  const publication=end.compositeAssessment
  if(!publication.personalTrackingBaselineId||!publication.createdBy
    ||!['PUBLISHED','ARCHIVED'].includes(publication.status)
@@ -48,6 +49,7 @@ export async function readTrainingPersonalChanges(attemptId:string,proof:Proof){
   if(!end||end.status!=='COMPLETED'||!end.completedAt||end.assignmentRef||end.subjectUserId&&end.subjectUserId!==end.userId
    ||end.respondentUserId&&end.respondentUserId!==end.userId)fail()
   if(proof.userId?end!.userId!==proof.userId:(!study?.attemptIds.includes(attemptId)||end!.userId!==null))fail()
+  if(end!.receiptOnly)throw compositeForbidden('本次问卷仅提供交卷回执')
   const publication=end!.compositeAssessment
   const courseId=end!.deliveryCourseId??(publication.productKind==='ASSESSMENT_BUNDLE'?publication.courseId:null)
   if(!publication.personalTrackingBaselineId)return {status:'NOT_CONFIGURED' as const}
@@ -92,7 +94,7 @@ export async function readTrainingPersonalChanges(attemptId:string,proof:Proof){
    eligibility:leaves.map(leaf=>({waveId:leaf.waveId,sourceHash:leaf.sourceHash,metrics:Object.fromEntries(Object.entries(leaf.metrics).map(([id,m])=>[id,{visible:m.visible,pending:m.pending??false}]))})),
    waves:waves.map(w=>({id:w.id,ordinal:w.personalTrackingOrdinal})),
    parents:parents.map(p=>({id:p.id,epoch:p.attemptEpoch,completedAt:p.completedAt?.toISOString(),result:p.aggregateInputHash,
-    binding:p.trainingContentBindingHash,tracking:p.compositeAssessment.personalTracking,
+    binding:p.trainingContentBindingHash,tracking:p.compositeAssessment.personalTracking,receiptOnly:Boolean(p.receiptOnly),
     feedback:evaluateTrainingFeedbackForAttempt(p,{now,reportReady:true})}))})
   // Result-source lifecycle checks belong to the adapter even on cache hits.
   const [cached]=await tx.$queryRaw<Array<{cipher:string|null}>>`SELECT personal_changes_snapshots->>${sourceHash} AS cipher FROM composite_assessment_attempts WHERE id=${attemptId}`

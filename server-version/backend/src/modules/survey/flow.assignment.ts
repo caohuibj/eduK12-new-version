@@ -85,7 +85,7 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
   const wave=await tx.$queryRaw<Array<{id:string;publication_id:string|null;definition_digest:string|null}>>`
     SELECT wave.id,wave.publication_id,publication.definition_digest FROM survey_waves wave
     LEFT JOIN survey_publications publication ON publication.id=wave.publication_id AND publication.project_id=wave.project_id
-    WHERE wave.id=${input.waveId} AND wave.project_id=${input.projectId} FOR SHARE OF wave
+    WHERE wave.id=${input.waveId} AND wave.project_id=${input.projectId} FOR KEY SHARE OF wave
   `
   if(wave.length!==1)fail('冻结研究波次不可访问')
   const locked=await tx.$queryRaw<Array<{id:string}>>`

@@ -16,7 +16,7 @@ export async function lockSurveyTaskAccess(tx:Prisma.TransactionClient,proof:Sur
   const {allowCompleted,fail}=policy
   const tool=policy.kind==='COGNITIVE'?'认知任务':'情境化测评'
   await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${known.projectId} FOR SHARE`
-  await tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${known.waveId} AND project_id=${known.projectId} FOR SHARE`
+  await tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${known.waveId} AND project_id=${known.projectId} FOR KEY SHARE`
   await tx.$queryRaw`SELECT id FROM survey_wave_attempts WHERE id=${known.attemptId}
     AND project_id=${known.projectId} AND wave_id=${known.waveId} FOR UPDATE`
   const attempt=await tx.surveyWaveAttempt.findFirst({where:{

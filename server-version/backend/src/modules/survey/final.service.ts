@@ -80,7 +80,7 @@ export async function submitResearchFinal(input:FinalInput){
     await tx.$queryRaw`SELECT id FROM survey_projects
       WHERE id=${known.projectId} FOR SHARE`
     await tx.$queryRaw`SELECT id FROM survey_waves
-      WHERE id=${known.waveId} AND project_id=${known.projectId} FOR SHARE`
+      WHERE id=${known.waveId} AND project_id=${known.projectId} FOR KEY SHARE`
     await tx.$queryRaw`SELECT id FROM survey_wave_attempts
       WHERE id=${input.attemptId} AND project_id=${known.projectId}
         AND wave_id=${known.waveId} FOR UPDATE`
@@ -241,7 +241,7 @@ export async function readGeneralForOwnAttempt(input:{
     // Serialize disclosure with current withdrawal/credential/window governance.
     await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${valid.projectId} FOR SHARE`
     await tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${valid.waveId}
-      AND project_id=${valid.projectId} FOR SHARE`
+      AND project_id=${valid.projectId} FOR KEY SHARE`
     await tx.$queryRaw`SELECT id FROM survey_wave_attempts WHERE id=${valid.attemptId}
       AND project_id=${valid.projectId} FOR SHARE`
     const attempt=await tx.surveyWaveAttempt.findFirst({where:{id:valid.attemptId,projectId:valid.projectId,

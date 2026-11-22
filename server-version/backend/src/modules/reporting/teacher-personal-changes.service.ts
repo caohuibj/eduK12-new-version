@@ -84,6 +84,7 @@ export async function readEducationPersonalChanges(input:{actorUserId:string;exe
     AND a.delivery_mode='FINAL_ONLY' AND a.runtime_generation='UNIFIED_V1'
    ORDER BY a.assignment_ref,a.completed_at DESC,a.id DESC`):[]
   const parents=await tx.compositeAssessmentAttempt.findMany({where:{id:{in:latest.map(r=>r.id)}},include:{compositeAssessment:true}})
+  if(parents.find(p=>p.assignmentRef===end.assignmentId)?.receiptOnly)denied()
   const adapted=parents.map(parent=>{
    const wave=eligible.find(w=>w.assignmentId===parent.assignmentRef)!
    if(parent.compositeAssessmentId!==wave.policy.runtimeLaunchTarget?.ref||parent.episodeId!==wave.episodeId)denied()
@@ -91,7 +92,7 @@ export async function readEducationPersonalChanges(input:{actorUserId:string;exe
    return {...parent,compositeAssessment:{...parent.compositeAssessment,personalTrackingOrdinal:wave.ordinal,personalTracking:{schemaVersion:1,bindings:tracking.bindings.map(({metricId,itemId,scoreKey,visible})=>{
      const block=(parent.compositeAssessment.trainingContentSnapshot as any)?.educationBinding?.manifest?.find((b:any)=>b.itemIds.includes(itemId))
      const ceiling=wave.policy.educationComposition?wave.policy.educationComposition.unitReports.find((r:any)=>r.blockId===block?.blockId)?.respondent:rule
-     return {metricId,itemId,scoreKey,visible:visible!==false&&ceiling?.mode==='INDIVIDUAL_SUMMARY'&&ceiling.metricKeys.includes(scoreKey)&&ceiling.longitudinalMetricKeys.includes(scoreKey)}
+     return {metricId,itemId,scoreKey,visible:!parent.receiptOnly&&visible!==false&&ceiling?.mode==='INDIVIDUAL_SUMMARY'&&ceiling.metricKeys.includes(scoreKey)&&ceiling.longitudinalMetricKeys.includes(scoreKey)}
     })}}}
   })
   const leaves=await readTrainingPersonalLeafs(tx,{scopedSubjectId:end.organizationId+':'+input.actorUserId,plan:plan!,parents:adapted})

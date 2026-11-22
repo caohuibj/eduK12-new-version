@@ -122,7 +122,8 @@ suite('education composition real service fences',()=>{
     const query=tx.$queryRaw.bind(tx),wrapped=new Proxy(tx,{get(target,key){
      if(key==='$queryRaw')return async(...args:any[])=>{
       const result=await (query as any)(...args),text=sql(args[0])
-      if(tag==='start'&&!paused&&text.includes('SELECT id FROM measurement_content_releases')&&text.includes('FOR SHARE')&&result.some((row:any)=>row.id===measurement.id)){
+      if(tag==='start'&&!paused&&text.includes('locked_releases AS MATERIALIZED')&&text.includes('FOR SHARE')
+        &&result.some((row:any)=>Array.isArray(row.release_ids)&&row.release_ids.includes(measurement.id))){
        paused=true;entered.resolve();await release.promise
       }
       return result

@@ -33,7 +33,7 @@ export async function screenOutResearchAttempt(input:FinalInput){
     await tx.$queryRaw`SELECT id FROM survey_projects
       WHERE id=${own.projectId} FOR SHARE`
     await tx.$queryRaw`SELECT id FROM survey_waves
-      WHERE id=${own.waveId} AND project_id=${own.projectId} FOR SHARE`
+      WHERE id=${own.waveId} AND project_id=${own.projectId} FOR KEY SHARE`
     await tx.$queryRaw`SELECT id FROM survey_wave_attempts
       WHERE id=${own.attemptId} AND project_id=${own.projectId} FOR UPDATE`
     const attempt=await tx.surveyWaveAttempt.findFirst({where:{

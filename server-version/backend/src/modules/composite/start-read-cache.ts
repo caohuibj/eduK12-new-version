@@ -65,6 +65,7 @@ export const startCompositeCache = new BoundedTtlCache<unknown>(START_READ_CACHE
 // re-check in createAttempt remain authoritative race guards.
 export const START_METADATA_CACHE_TTL_MS = 0
 export const startMetadataCache = new BoundedTtlCache<unknown>(START_METADATA_CACHE_TTL_MS, START_READ_CACHE_MAX_ENTRIES)
+export const startIdentityCache = new BoundedTtlCache<unknown>(START_METADATA_CACHE_TTL_MS, START_READ_CACHE_MAX_ENTRIES)
 
 export const availableTemplateCache = new BoundedTtlCache<unknown>(AVAILABLE_TEMPLATE_CACHE_TTL_MS, 8)
 
@@ -76,6 +77,7 @@ export const publicationReadKey = (id: string, snapshotHash: string | null | und
 export const resetStartReadCachesForTests = () => {
   availableTemplateCache.clear()
   startMetadataCache.clear()
+  startIdentityCache.clear()
   startReadsCache.clear()
   startCompositeCache.clear()
 }
