@@ -4,10 +4,11 @@
 # Preserves the verified 4C4G dual-backend + dual-worker production topology
 # (2026-11-22 tuning pass) without credentials, tokens, or keys:
 #   - Symmetric APIs: `backend` & `backend-2` (cpus=2.25, 768m, heap=384M,
-#     pool=8, statement_cache_size=60, idle=120s, max_conn=900s)
-#   - Dual Workers: `worker` (cpus=1.0, 640m, pool=4) + `report-worker-2`
-#     (cpus=0.8, 384m, pool=3), each at `MALLOC_ARENA_MAX=2`,
-#     `MALLOC_TRIM_THRESHOLD_=524288`, `statement_cache_size=48`, idle=180s
+#     pool=10, statement_cache_size=80, idle=120s, max_conn=900s)
+#   - Dual Workers: `worker` (cpus=1.0, 640m, pool=4, concurrency=3) +
+#     `report-worker-2` (cpus=0.8, 384m, pool=3, concurrency=2), each at
+#     `MALLOC_ARENA_MAX=2`, `MALLOC_TRIM_THRESHOLD_=524288`,
+#     `statement_cache_size=64`, idle=180s
 #   - Postgres: 960m (`effective_cache_size=768MB`, `shared_buffers=192MB`,
 #     `jit=off`, `MALLOC_TRIM_THRESHOLD_=131072`)
 #   - `#743` low-memory trickle is enabled ONLY in this production profile, keeping
@@ -227,11 +228,11 @@ services:
       NODE_OPTIONS: "--max-old-space-size=384 --max-semi-space-size=16"
       MALLOC_ARENA_MAX: "2"
       MALLOC_TRIM_THRESHOLD_: "524288"
-      PRISMA_CONNECTION_POOL_SIZE: "8"
-      PRISMA_STATEMENT_CACHE_SIZE: "60"
+      PRISMA_CONNECTION_POOL_SIZE: "10"
+      PRISMA_STATEMENT_CACHE_SIZE: "80"
       PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: "120"
       PRISMA_MAX_CONNECTION_LIFETIME_SECONDS: "900"
-      WHOLE_SUBMIT_ADMISSION_LIMIT: "8"
+      WHOLE_SUBMIT_ADMISSION_LIMIT: "10"
       UNIT_SUBMIT_ADMISSION_LIMIT: "7"
       ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT: "4"
       ASSESSMENT_REPORT_COMPRESSION_ENABLED: "false"
@@ -249,11 +250,11 @@ services:
       NODE_OPTIONS: "--max-old-space-size=384 --max-semi-space-size=16"
       MALLOC_ARENA_MAX: "2"
       MALLOC_TRIM_THRESHOLD_: "524288"
-      PRISMA_CONNECTION_POOL_SIZE: "8"
-      PRISMA_STATEMENT_CACHE_SIZE: "60"
+      PRISMA_CONNECTION_POOL_SIZE: "10"
+      PRISMA_STATEMENT_CACHE_SIZE: "80"
       PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: "120"
       PRISMA_MAX_CONNECTION_LIFETIME_SECONDS: "900"
-      WHOLE_SUBMIT_ADMISSION_LIMIT: "8"
+      WHOLE_SUBMIT_ADMISSION_LIMIT: "10"
       UNIT_SUBMIT_ADMISSION_LIMIT: "7"
       ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT: "4"
       ASSESSMENT_REPORT_COMPRESSION_ENABLED: "false"
@@ -279,13 +280,13 @@ services:
       <<: *prod-shared-env
       BACKGROUND_WORKERS_ENABLED: "true"
       PRISMA_CONNECTION_POOL_SIZE: "4"
-      PRISMA_STATEMENT_CACHE_SIZE: "48"
+      PRISMA_STATEMENT_CACHE_SIZE: "64"
       PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: "180"
       PRISMA_MAX_CONNECTION_LIFETIME_SECONDS: "900"
       NODE_OPTIONS: "--max-old-space-size=192 --max-semi-space-size=16"
       MALLOC_ARENA_MAX: "2"
       MALLOC_TRIM_THRESHOLD_: "524288"
-      ASSESSMENT_REPORT_WORKER_CONCURRENCY: "2"
+      ASSESSMENT_REPORT_WORKER_CONCURRENCY: "3"
       ASSESSMENT_REPORT_COMPRESSION_ENABLED: "true"
 
   report-worker-2:
@@ -300,7 +301,7 @@ services:
       <<: *prod-shared-env
       BACKGROUND_WORKERS_ENABLED: "true"
       PRISMA_CONNECTION_POOL_SIZE: "3"
-      PRISMA_STATEMENT_CACHE_SIZE: "48"
+      PRISMA_STATEMENT_CACHE_SIZE: "64"
       PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: "180"
       PRISMA_MAX_CONNECTION_LIFETIME_SECONDS: "900"
       NODE_OPTIONS: "--max-old-space-size=192 --max-semi-space-size=16"

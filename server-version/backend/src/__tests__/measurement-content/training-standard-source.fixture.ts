@@ -84,7 +84,7 @@ export function trainingSourceHarness(){
         const found=h.rows.get(values[0]);if(!found)return []
         return sql.includes('SELECT tool_key')?[{tool_key:found.tool_key,instrument_version:found.snapshot.instrumentVersion,measurement_release:structuredClone(found.measurement_release)}]:[structuredClone(found)]
       }
-      if(sql.includes('SELECT * FROM measurement_content_releases'))return h.missingMeasurement?[]:[structuredClone(h.release)]
+      if(sql.includes('SELECT * FROM measurement_content_releases')||sql.includes('md5(scope::text'))return h.missingMeasurement?[]:[structuredClone(h.release)]
       if(sql.includes('SELECT id,status,content_hash,hash_scheme FROM measurement_content_releases'))return h.missingMeasurement?[]:[{
         id:h.release.id,status:h.release.status,content_hash:h.release.content_hash,hash_scheme:h.release.hash_scheme}]
       if(sql.includes('SELECT id,measurement_release_id FROM scales')&&!sql.includes('locked_scales AS MATERIALIZED'))return [{id:ids.scale,measurement_release_id:h.scale.measurementReleaseId}]

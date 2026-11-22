@@ -59,7 +59,7 @@ function fixture(options:Options={}){
    if(sql.includes('FROM education_product_entitlements'))return [{organization_id:id(1)}]
    if(sql.includes('FROM scale_library_entries e JOIN measurement_content_releases'))return [entry]
    if(sql.includes('FROM scale_library_submissions'))return [submission]
-   if(sql.startsWith('SELECT * FROM measurement_content_releases'))return [release]
+   if(sql.startsWith('SELECT * FROM measurement_content_releases')||sql.includes('md5(scope::text'))return [release]
    if(sql.includes('WITH RECURSIVE')&&sql.includes('locked_releases AS MATERIALIZED'))
      return [{seed_ids:[release.id],release_ids:[release.id],truncated:false,locked_release_count:1}]
    if(sql.startsWith('SELECT id FROM measurement_content_releases'))return [{id:release.id}]

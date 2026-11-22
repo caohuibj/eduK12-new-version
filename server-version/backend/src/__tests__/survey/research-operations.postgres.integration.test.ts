@@ -9,6 +9,7 @@ import { createDraft,updateDraft } from '../../modules/survey/builder.service'
 import { createWave,getWave } from '../../modules/survey/waves.service'
 import { prepareWave,openWave } from '../../modules/survey/waves.publish'
 import { startSingleUnlinkedWave } from '../../modules/survey/admission.service'
+import { SurveyAssignmentError } from '../../modules/survey/flow.assignment'
 import { getOwnResearchTask } from '../../modules/survey/task.public'
 import { saveSurveyCheckpoint,readSurveyCheckpoint,cleanupExpiredSurveyCheckpoints } from '../../modules/survey/checkpoint.service'
 import { screenOutResearchAttempt } from '../../modules/survey/flow.screen-out.service'
@@ -127,9 +128,24 @@ suite('Survey PR4 real PG: bounded quota, opt-in encrypted checkpoint, exact N',
       platformRole:'STANDARD',mustChangePassword:false,accountDomain:'SURVEY'},
   }) as unknown as Request
   it('atomically accepts exactly two participants, without leaking a third quota/Attempt',async()=>{
-    const batch=await Promise.allSettled(Array.from({length:5},()=>
-      startSingleUnlinkedWave({ ...surveyStartKeys('research-operations'),publicId,waveId,entryToken,
-        consent:true,consentVersion:1})))
+    // Quota bucket CAS deliberately rejects a simultaneous loser with 409.
+    // Reuse that participant's START identity on the bounded retry; do not
+    // mistake a temporary bucket conflict for exhausted experiment capacity.
+    const startWithQuotaRetry=async()=>{
+      const keys=surveyStartKeys('research-operations')
+      for(let attempt=0;attempt<5;attempt++){
+        try{
+          return await startSingleUnlinkedWave({...keys,publicId,waveId,entryToken,
+            consent:true,consentVersion:1})
+        }catch(error){
+          if(!(error instanceof SurveyAssignmentError)
+            ||error.message!=='本组名额正在由其他参与者领取，请重新进入'
+            ||attempt===4)throw error
+        }
+      }
+      throw new Error('START quota retry exhausted')
+    }
+    const batch=await Promise.allSettled(Array.from({length:5},()=>startWithQuotaRetry()))
     const admitted=batch.filter((r):r is PromiseFulfilledResult<
       Awaited<ReturnType<typeof startSingleUnlinkedWave>>>=>r.status==='fulfilled')
     expect(admitted).toHaveLength(2)

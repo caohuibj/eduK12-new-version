@@ -55,7 +55,9 @@ export function trainingReleaseQueryFixture(currentComposite: () => Promise<any>
       const ids = releases.map(row => row.id)
       return [{ seed_ids: ids, release_ids: ids, truncated: false, locked_release_count: ids.length }]
     }
-    if (sql.includes('SELECT * FROM measurement_content_releases')) {
+    // Legacy business fixtures supply a full persisted row for the new header-only
+    // release query; cache-path behavior is covered by release-cache.test.ts.
+    if (sql.includes('SELECT * FROM measurement_content_releases') || sql.includes('md5(scope::text')) {
       const values: any[] = query.strings ? query.values : args
       return releases.filter(row => values.includes(row.id))
     }

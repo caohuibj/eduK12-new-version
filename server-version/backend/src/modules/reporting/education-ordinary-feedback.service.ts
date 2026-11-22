@@ -5,7 +5,7 @@ import {loadFrozenActiveSlotSet} from '../assessment-runtime/slot-set'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import {currentRunPopulationAuthoritySql} from '../assessment-run/currentPopulationAuthority'
-import {applyBoundedPlannerControls,withBoundedPlannerRead,type PlannerBoundReadDb} from '../assessment-run/plannerBound'
+import {withBoundedPlannerRead,type PlannerBoundReadDb} from '../assessment-run/plannerBound'
 import {readFrozenCompositionIdentity} from '../assessment-run/educationCompositionExecution'
 import type {RunResourcePolicy} from '../assessment-run/resourceAuthority'
 import type {ResultDisclosureContractV1} from '../assessment-policy/result-disclosure'
@@ -26,9 +26,9 @@ async function readOwn(tx:ReadOwnDb,input:ScopedInput,loadContent=false){
    t.resource_policy_hash AS "policyHash",e.status,p.receipt_only AS "receiptOnly",p.id AS "parentId",p.status AS "parentStatus",p.attempt_epoch AS "attemptEpoch",
    a.subject_user_id AS "subjectUserId",a.respondent_user_id AS "respondentUserId",a.subject_role AS "subjectRole",a.respondent_role AS "respondentRole",
    a.relationship_kind AS "relationshipKind",a.perspective,p.context_snapshot_hash AS "contextSnapshotHash",
-   CASE WHEN a.relationship_kind='SELF' THEN p.frozen_active_slot_set_encrypted END AS "frozenSlots",
-   CASE WHEN a.relationship_kind='SELF' THEN p.frozen_active_slot_set_hash END AS "frozenSlotsHash",
-   ${loadContent?Prisma.sql`CASE WHEN a.relationship_kind='SELF' THEN jsonb_build_object('trainingContentBinding',p.training_content_binding,'trainingContentBindingHash',p.training_content_binding_hash,
+   CASE WHEN a.relationship_kind='SELF' AND e.status='COMPLETED' AND p.status='COMPLETED' AND NOT COALESCE(p.receipt_only,FALSE) THEN p.frozen_active_slot_set_encrypted END AS "frozenSlots",
+   CASE WHEN a.relationship_kind='SELF' AND e.status='COMPLETED' AND p.status='COMPLETED' AND NOT COALESCE(p.receipt_only,FALSE) THEN p.frozen_active_slot_set_hash END AS "frozenSlotsHash",
+   ${loadContent?Prisma.sql`CASE WHEN a.relationship_kind='SELF' AND e.status='COMPLETED' AND p.status='COMPLETED' AND NOT COALESCE(p.receipt_only,FALSE) THEN jsonb_build_object('trainingContentBinding',p.training_content_binding,'trainingContentBindingHash',p.training_content_binding_hash,
     'trainingReferenceBinding',p.training_reference_binding,'trainingReferenceBindingHash',p.training_reference_binding_hash,
     'trainingContentInterpretationEncrypted',p.training_content_interpretation_encrypted,'trainingContentInterpretationHash',p.training_content_interpretation_hash,
     'aggregateInputHash',p.aggregate_input_hash) END`:Prisma.sql`NULL::jsonb`} AS "contentState"
@@ -72,86 +72,74 @@ async function readOwn(tx:ReadOwnDb,input:ScopedInput,loadContent=false){
 export const readTeacherOrdinaryFeedback=(input:Input)=>readOrdinaryFeedback({...input,entry:'TEACHER'})
 export const readSchoolOrdinaryFeedback=(input:Input)=>readOrdinaryFeedback({...input,entry:'SCHOOL'})
 async function readOrdinaryFeedback(input:ScopedInput){
- const initialOwn=await withBoundedPlannerRead(prisma,tx=>readOwn(tx,input,false))
- if(!initialOwn || initialOwn.receiptOnly)hidden()
+ // Run the bounded-planner authority & live revocation query once; contentState
+ // is materialized only for COMPLETED, non-receiptOnly SELF executions.
+ const own=await withBoundedPlannerRead(prisma,tx=>readOwn(tx,input,true))
+ if(!own || own.receiptOnly)hidden()
  // Reading through root prisma safely warms/reuses frozenCompositionIdentityCache
  // and verifies policyHash + live composition anchor without holding an interactive tx.
- const initialIdentity=await readFrozenCompositionIdentity(prisma,initialOwn)
- if(initialIdentity.origin.entry!==input.entry||!matchesEducationCompositionRespondent(initialIdentity.origin,initialOwn))hidden()
- if(initialOwn.status!=='COMPLETED')return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,state:'IN_PROGRESS' as const,title:initialIdentity.title,units:[]}
- if(!initialOwn.parentId||initialOwn.parentStatus!=='COMPLETED'||!initialOwn.attemptEpoch)hidden()
+ const identity=await readFrozenCompositionIdentity(prisma,own)
+ if(identity.origin.entry!==input.entry||!matchesEducationCompositionRespondent(identity.origin,own))hidden()
+ if(own.status!=='COMPLETED')return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,state:'IN_PROGRESS' as const,title:identity.title,units:[]}
+ if(!own.parentId||own.parentStatus!=='COMPLETED'||!own.attemptEpoch)hidden()
  // Reuse the existing observer contract: no new individual report right is
  // inferred from library U, authorship or becoming a parent/teacher respondent.
  // Its completion receipt needs no result decryption, scoring or report body.
- if(initialOwn.relationshipKind!=='SELF')return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,
-  state:'COMPLETION_ONLY' as const,title:initialIdentity.title,units:initialIdentity.manifest.map(block=>({blockId:block.blockId,kind:block.kind,title:block.title,
+ if(own.relationshipKind!=='SELF')return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,
+  state:'COMPLETION_ONLY' as const,title:identity.title,units:identity.manifest.map(block=>({blockId:block.blockId,kind:block.kind,title:block.title,
    state:block.kind==='FORM'?'COMPLETION_ONLY' as const:'WITHHELD' as const}))}
- const collectDisclosurePlan=(identity:typeof initialIdentity)=>{
-  const sources:NativeEducationFeedbackSource[]=[],declaredBlocks=new Set<string>(),nativeBlocks=new Set<string>()
-  for(const block of identity.manifest.filter(block=>block.kind==='COGNITIVE'||block.kind==='SJT')){
-   const ceiling=identity.binding.unitReports.find(unit=>unit.blockId===block.blockId)
-   if(!ceiling||ceiling.versionId!==block.versionId||ceiling.contentHash!==block.contentHash)hidden()
-   if(ceiling.respondent.mode==='INDIVIDUAL_SUMMARY')nativeBlocks.add(block.blockId)
-  }
-  for(const block of identity.manifest.filter(block=>block.kind==='SCALE')){
-   const ceiling=identity.binding.unitReports.find(unit=>unit.blockId===block.blockId)
-   if(!ceiling||ceiling.versionId!==block.versionId||ceiling.contentHash!==block.contentHash||block.itemIds.length!==1)hidden()
-   if(ceiling.respondent.mode!=='INDIVIDUAL_SUMMARY')continue
-   if(block.sourceProvider==='STANDARD_SCALE'){declaredBlocks.add(block.blockId);continue}
-   const unit=identity.units.find(unit=>unit.itemId===block.itemIds[0]&&unit.versionId===block.versionId)
-   if(!unit||unit.family!=='SCALE'||!unit.scaleId)hidden()
-   const none={mode:'NONE' as const,metricKeys:[],longitudinalMetricKeys:[]}
-   const contract:ResultDisclosureContractV1={schemaVersion:1,policyKey:'EDUCATION_PRIVATE_TOOL_V1',minimumRespondents:null,
-    audiences:{RESPONDENT:ceiling.respondent,SUBJECT:none,TEACHER:none,PARENT:none,PROFESSIONAL:none,ORGANIZATION:none,RESEARCH:none}}
-   sources.push({itemId:unit.itemId,scaleId:unit.scaleId,title:block.title,sourceDefinitionHash:unit.definitionHash,
-    resultDisclosure:contract,...(block.sourceProvider==='LIBRARY_SCALE'?{approvedLibrary:{approvedSnapshotHash:block.contentHash}}:
-     {privateVersion:{versionId:block.versionId,contentHash:block.contentHash}})})
-  }
-  return {sources,declaredBlocks,nativeBlocks}
+ const sources:NativeEducationFeedbackSource[]=[],declaredBlocks=new Set<string>(),nativeBlocks=new Set<string>()
+ for(const block of identity.manifest.filter(block=>block.kind==='COGNITIVE'||block.kind==='SJT')){
+  const ceiling=identity.binding.unitReports.find(unit=>unit.blockId===block.blockId)
+  if(!ceiling||ceiling.versionId!==block.versionId||ceiling.contentHash!==block.contentHash)hidden()
+  if(ceiling.respondent.mode==='INDIVIDUAL_SUMMARY')nativeBlocks.add(block.blockId)
  }
- const initialPlan=collectDisclosurePlan(initialIdentity)
- // Completion-only / withheld respondent feedback needs no interactive ReadCommitted
- // transaction, contentState blob load, or snapshot decryption.
- if(!initialPlan.sources.length&&!initialPlan.declaredBlocks.size&&!initialPlan.nativeBlocks.size){
+ for(const block of identity.manifest.filter(block=>block.kind==='SCALE')){
+  const ceiling=identity.binding.unitReports.find(unit=>unit.blockId===block.blockId)
+  if(!ceiling||ceiling.versionId!==block.versionId||ceiling.contentHash!==block.contentHash||block.itemIds.length!==1)hidden()
+  if(ceiling.respondent.mode!=='INDIVIDUAL_SUMMARY')continue
+  if(block.sourceProvider==='STANDARD_SCALE'){declaredBlocks.add(block.blockId);continue}
+  const unit=identity.units.find(unit=>unit.itemId===block.itemIds[0]&&unit.versionId===block.versionId)
+  if(!unit||unit.family!=='SCALE'||!unit.scaleId)hidden()
+  const none={mode:'NONE' as const,metricKeys:[],longitudinalMetricKeys:[]}
+  const contract:ResultDisclosureContractV1={schemaVersion:1,policyKey:'EDUCATION_PRIVATE_TOOL_V1',minimumRespondents:null,
+   audiences:{RESPONDENT:ceiling.respondent,SUBJECT:none,TEACHER:none,PARENT:none,PROFESSIONAL:none,ORGANIZATION:none,RESEARCH:none}}
+  sources.push({itemId:unit.itemId,scaleId:unit.scaleId,title:block.title,sourceDefinitionHash:unit.definitionHash,
+   resultDisclosure:contract,...(block.sourceProvider==='LIBRARY_SCALE'?{approvedLibrary:{approvedSnapshotHash:block.contentHash}}:
+    {privateVersion:{versionId:block.versionId,contentHash:block.contentHash}})})
+ }
+ // Completion-only / withheld respondent feedback needs no snapshot decryption.
+ if(!sources.length&&!declaredBlocks.size&&!nativeBlocks.size){
   return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,
-   state:'COMPLETION_ONLY' as const,title:initialIdentity.title,
-   units:initialIdentity.manifest.map(block=>({blockId:block.blockId,kind:block.kind,title:block.title,
+   state:'COMPLETION_ONLY' as const,title:identity.title,
+   units:identity.manifest.map(block=>({blockId:block.blockId,kind:block.kind,title:block.title,
     state:block.kind==='FORM'?'COMPLETION_ONLY' as const:'WITHHELD' as const}))}
  }
- return prisma.$transaction(async tx=>{
-  await applyBoundedPlannerControls(tx)
-  const own=await readOwn(tx,input,true)
-  if(!own || own.receiptOnly)hidden()
-  const identity=await readFrozenCompositionIdentity(tx,own)
-  if(identity.origin.entry!==input.entry||!matchesEducationCompositionRespondent(identity.origin,own))hidden()
-  if(own.status!=='COMPLETED')return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,state:'IN_PROGRESS' as const,title:identity.title,units:[]}
-  if(!own.parentId||own.parentStatus!=='COMPLETED'||!own.attemptEpoch)hidden()
-  if(own.relationshipKind!=='SELF')return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,
-   state:'COMPLETION_ONLY' as const,title:identity.title,units:identity.manifest.map(block=>({blockId:block.blockId,kind:block.kind,title:block.title,
-    state:block.kind==='FORM'?'COMPLETION_ONLY' as const:'WITHHELD' as const}))}
-  const {sources,declaredBlocks,nativeBlocks}=collectDisclosurePlan(identity)
-  const slots=(sources.length||declaredBlocks.size||nativeBlocks.size)&&own.frozenSlots?await loadFrozenActiveSlotSet(own.frozenSlots,tx):undefined
-  if((sources.length||declaredBlocks.size||nativeBlocks.size)&&(!slots||slots.snapshotHash!==own.frozenSlotsHash||slots.attemptEpoch!==own.attemptEpoch))hidden()
-  const native=nativeBlocks.size?await readOrdinaryNativeFeedback(tx,{identity,parent:{...own.contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash},slots:slots!,actorUserId:input.actorUserId,blockIds:nativeBlocks}):new Map()
-  const declared=declaredBlocks.size?await readOrdinaryDeclaredFeedback(tx,{identity,parent:{...own.contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash},slots:slots!,blockIds:declaredBlocks}):new Map()
-  const reports=await readNativeEducationScaleFeedback(tx,{actorUserId:input.actorUserId,parent:{id:own.parentId!,status:own.parentStatus!,
+ // Immutable completed snapshots and content releases do not need an interactive
+ // ReadCommitted transaction pinning a Prisma pool connection across CPU projection.
+ const slots=own.frozenSlots?await loadFrozenActiveSlotSet(own.frozenSlots,prisma):undefined
+ if(!slots||slots.snapshotHash!==own.frozenSlotsHash||slots.attemptEpoch!==own.attemptEpoch)hidden()
+ const [native,declared,reports]=await Promise.all([
+  nativeBlocks.size?readOrdinaryNativeFeedback(prisma,{identity,parent:{...own.contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash},slots,actorUserId:input.actorUserId,blockIds:nativeBlocks}):Promise.resolve(new Map()),
+  declaredBlocks.size?readOrdinaryDeclaredFeedback(prisma,{identity,parent:{...own.contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash},slots,blockIds:declaredBlocks}):Promise.resolve(new Map()),
+  sources.length?readNativeEducationScaleFeedback(prisma,{actorUserId:input.actorUserId,parent:{id:own.parentId!,status:own.parentStatus!,
    userId:input.actorUserId,subjectUserId:input.actorUserId,respondentUserId:input.actorUserId,attemptEpoch:own.attemptEpoch!,
-   contextSnapshotHash:own.contextSnapshotHash,frozenActiveSlotSetEncrypted:own.frozenSlots,frozenActiveSlotSetHash:own.frozenSlotsHash},sources,slotSet:slots})
-  const units=identity.manifest.map(block=>{
-   const base={blockId:block.blockId,kind:block.kind,title:block.title}
-   if(block.kind==='FORM')return {...base,state:'COMPLETION_ONLY' as const}
-   if(block.kind==='COGNITIVE'||block.kind==='SJT'){
-    const report=native.get(block.itemIds[0])
-    return report?{...base,state:'READY' as const,...report}:{...base,state:'WITHHELD' as const}
-   }
-   if(block.sourceProvider==='STANDARD_SCALE'){
-    const report=declared.get(block.itemIds[0])
-    return report?.status==='READY'&&report.rendered?{...base,state:'READY' as const,declaredReport:report.rendered,...(report.message?{message:report.message}:{})}:{...base,state:'WITHHELD' as const}
-   }
-   const report=reports.get(block.itemIds[0])
-   return report?.state==='PROJECTED'?{...base,state:'READY' as const,nativeScaleUnits:report.unitReports}:{...base,state:'WITHHELD' as const}
-  })
-  return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,
-   state:units.some(unit=>unit.state==='READY')?'READY' as const:'COMPLETION_ONLY' as const,title:identity.title,units}
- },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:10_000,timeout:15_000})
+   contextSnapshotHash:own.contextSnapshotHash,frozenActiveSlotSetEncrypted:own.frozenSlots,frozenActiveSlotSetHash:own.frozenSlotsHash},sources,slotSet:slots}):Promise.resolve(new Map()),
+ ])
+ const units=identity.manifest.map(block=>{
+  const base={blockId:block.blockId,kind:block.kind,title:block.title}
+  if(block.kind==='FORM')return {...base,state:'COMPLETION_ONLY' as const}
+  if(block.kind==='COGNITIVE'||block.kind==='SJT'){
+   const report=native.get(block.itemIds[0])
+   return report?{...base,state:'READY' as const,...report}:{...base,state:'WITHHELD' as const}
+  }
+  if(block.sourceProvider==='STANDARD_SCALE'){
+   const report=declared.get(block.itemIds[0])
+   return report?.status==='READY'&&report.rendered?{...base,state:'READY' as const,declaredReport:report.rendered,...(report.message?{message:report.message}:{})}:{...base,state:'WITHHELD' as const}
+  }
+  const report=reports.get(block.itemIds[0])
+  return report?.state==='PROJECTED'?{...base,state:'READY' as const,nativeScaleUnits:report.unitReports}:{...base,state:'WITHHELD' as const}
+ })
+ return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,
+  state:units.some(unit=>unit.state==='READY')?'READY' as const:'COMPLETION_ONLY' as const,title:identity.title,units}
 }

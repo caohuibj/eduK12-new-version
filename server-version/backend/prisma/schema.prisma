@@ -3259,6 +3259,7 @@ model SurveyConsent {
   accepted      Boolean
   createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   @@index([projectId,waveId,createdAt],map:"survey_consents_project_wave_idx")
+  @@index([projectId,waveId,attemptId],map:"survey_consents_project_wave_attempt_idx")
   @@map("survey_consents")
 }
 
