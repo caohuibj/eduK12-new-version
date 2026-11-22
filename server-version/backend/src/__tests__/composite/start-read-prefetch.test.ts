@@ -83,7 +83,8 @@ describe('hoisted START read-only checks',()=>{
     for(const fn of ['export const startUserAttempt','export const restartUserAttempt','export const startPublicAttempt','export const restartPublicAttempt']){
       const start=source.indexOf(fn)
       expect(start).toBeGreaterThan(-1)
-      const body=source.slice(start,start+2500)
+      // Public START loads additional token metadata before publication.
+      const body=source.slice(start,start+(fn==='export const startPublicAttempt'?4500:2500))
       expect(body,fn).toMatch(/loadStartComposite\(/)
     }
   })

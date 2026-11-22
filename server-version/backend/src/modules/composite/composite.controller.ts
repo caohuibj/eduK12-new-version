@@ -153,13 +153,19 @@ export const compositeController = {
     return handleWholeSubmit(req, res, false, undefined, product)
   },
   async educationWholeProgress(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
+    const abort = new AbortController(); const closed = () => abort.abort(); res.once('close', closed)
     try {
-      const { educationWholeProgressFromRow, readEducationWholeProgress } = await import('./whole-questionnaire.service')
+      const { readEducationWholeProgressWithWait } = await import('./whole-questionnaire.service')
       const bound = res.locals?.ordinarySelfWhole as OrdinarySelfWholeBinding | undefined
-      return success(res, bound
-        ? educationWholeProgressFromRow(bound.id, bound, bound.executionStatus)
-        : await readEducationWholeProgress(req.params.attemptId, req.user!.userId, res.locals?.educationExecutionStatus))
+      return success(res, await readEducationWholeProgressWithWait(req.params.attemptId, req.user!.userId, {
+        bound,
+        executionStatus: res.locals?.educationExecutionStatus,
+        waitMs: Number(req.query.waitMs) || 0,
+        signal: abort.signal,
+      }))
     } catch (err) { return handleError(res, err) }
+    finally { res.off('close', closed) }
   },
   async publicWholeSubmit(req: Request, res: Response) { return handleWholeSubmit(req, res, true) },
 

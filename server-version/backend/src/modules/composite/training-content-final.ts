@@ -6,7 +6,7 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
 import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
 import type {CanonicalUnitResultEnvelopeV1} from '../assessment-runtime/unit-result'
-import {getContentRelease,type StoredRelease} from '../measurement-content/repository'
+import {getContentRelease,prefetchContentReleases,type StoredRelease} from '../measurement-content/repository'
 import {ContentReleaseError} from '../measurement-content/release'
 import {interpretContentBinding,FinalInterpretationIdentityError,type FinalInterpretation} from '../measurement-content/final-interpretation'
 import {trainingContentAttemptBindingSchema,trainingMeasurementSourceScopeMatchesForConsumer} from './training-content-binding'
@@ -77,9 +77,13 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
     }
   }
   const cache=new Map<string,StoredRelease>(),sources:TrainingFinalReceipt['sources']=[]
-  // Reads stay lazy by contract: the shared interpreter skips reference/report
-  // reads behind revoked / not-executed / quality stop guards, and the unit
-  // tests pin those guards with exact read counts. Do not prefetch here.
+  // interpretContentBinding unconditionally reads every unit's MEASUREMENT release
+  // first before evaluating any stop guard; batch-prefetching ONLY measurement IDs
+  // collapses N sequential FOR SHARE queries into 1 ordered FOR SHARE batch query
+  // while keeping all REFERENCE and REPORT reads strictly lazy behind stop guards.
+  if(binding.units.length>1 && typeof (tx as unknown as {$queryRaw?:unknown})?.$queryRaw==='function'){
+    await prefetchContentReleases(tx,cache,binding.units.map(unit=>unit.measurement.releaseId),true)
+  }
   const readRelease=async(id:string,expectedHash:string)=>{
     let release=cache.get(id)
     if(!release){release=(await getContentRelease(tx,id,true))??undefined;if(release)cache.set(id,release)}

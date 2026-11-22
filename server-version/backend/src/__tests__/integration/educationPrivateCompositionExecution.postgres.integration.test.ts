@@ -163,7 +163,8 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
    expect(recovered.receiptOnly).toBe(provideParticipantReport ? undefined : true)
    const {reconcileRelationalCompositeCompletion}=await import('../../modules/assessment-relational/runtime-completion')
    await reconcileRelationalCompositeCompletion(id)
-   expect((await get('/progress')).data).toMatchObject({status:'COMPLETED',runCompleted:true,reportStatus:{state:'READY'}})
+   expect((await get('/progress')).data).toMatchObject({status:'COMPLETED',runCompleted:true,
+     reportStatus:{state:provideParticipantReport?'PROCESSING':'READY'}})
   }finally{vi.unstubAllEnvs()}
  },120_000)
  it('delivers frozen block instructions through the real Scale/Form execution after a draft edit, without extra pages',async()=>{
@@ -311,7 +312,7 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
 
    const {reconcileRelationalCompositeCompletion}=await import('../../modules/assessment-relational/runtime-completion')
    await reconcileRelationalCompositeCompletion(id)
-   expect((await request(path+'/progress',auth)).data).toMatchObject({status:'COMPLETED',reportStatus:{state:'READY'}})
+   expect((await request(path+'/progress',auth)).data).toMatchObject({status:'COMPLETED',reportStatus:{state:'FAILED'}})
    expect((await request(`/run-executions/${f.executionId}/feedback`,auth)).data).toMatchObject({state:'READY'})
    expect(await db.compositeReportJob.count({where:{attemptId:id,wholeSubmissionId:payload.submissionId}})).toBe(1)
   }finally{vi.unstubAllEnvs()}

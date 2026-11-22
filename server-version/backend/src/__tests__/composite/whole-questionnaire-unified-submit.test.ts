@@ -7,6 +7,8 @@ import {
   submitWholeQuestionnaire,
   processWholeQuestionnaireAnswers,
   readEducationWholeProgress,
+  readEducationWholeProgressWithWait,
+  educationWholeProgressFromRow,
 } from '../../modules/composite/whole-questionnaire.service'
 import { prisma } from '../../config/database'
 import { prepareCanonicalSubmission } from '../../services/instrumentFinalSubmit'
@@ -37,6 +39,48 @@ describe('Scheme X Unified Whole Questionnaire Submit & Encrypted Ingestion (PR 
       await expect(readEducationWholeProgress('attempt', 'other-user', 'STARTED')).rejects.toMatchObject({ statusCode: 403 })
     } finally {
       query.mockRestore()
+    }
+  })
+
+  it('keeps Job READY distinct from parent/Run completion and waits for processing jobs', async () => {
+    const bound = {
+      epoch: 1, parentStatus: 'COMPLETED' as const, executionStatus: 'COMPLETED',
+      wholeSubmissionId: 'sub-1', receiptOnly: false,
+    }
+    for (const [jobStatus, expected] of [
+      ['PENDING', 'PENDING'], ['PROCESSING', 'PROCESSING'],
+      ['FAILED', 'FAILED'], ['CANCELLED', 'CANCELLED'], [null, 'WAITING'],
+    ] as const) {
+      const state = educationWholeProgressFromRow('attempt', { ...bound, jobStatus }, bound.executionStatus)
+      expect(state).toMatchObject({
+        status: 'COMPLETED', runCompleted: true, reportStatus: { state: expected },
+      })
+    }
+    expect(educationWholeProgressFromRow('attempt', { ...bound, jobStatus: 'READY' }, bound.executionStatus))
+      .toMatchObject({ status: 'COMPLETED', reportStatus: { state: 'READY' } })
+    // Receipt-only means completed units, not an individual report. Preserve
+    // the existing completion receipt after Run reconciliation.
+    for (const jobStatus of ['PROCESSING', 'FAILED'] as const) {
+      expect(educationWholeProgressFromRow('attempt', { ...bound, receiptOnly: true, jobStatus }, 'COMPLETED'))
+        .toMatchObject({ receiptOnly: true, status: 'COMPLETED', runCompleted: true, reportStatus: { state: 'READY' } })
+    }
+    expect(educationWholeProgressFromRow('attempt', {
+      ...bound, executionStatus: 'STARTED', jobStatus: 'READY',
+    }, 'STARTED')).toMatchObject({ status: 'IN_PROGRESS', reportStatus: { state: 'PROCESSING' } })
+
+    // A completed parent with a still-processing Job must not bypass the
+    // long-poll's authoritative re-read as a falsely completed report.
+    vi.stubEnv('ASSESSMENT_REPORT_READY_WAIT_ENABLED', 'false')
+    const query = vi.spyOn(prisma, '$queryRaw').mockResolvedValueOnce([{ ...bound, jobStatus: 'PROCESSING' }])
+    try {
+      const pending = await readEducationWholeProgressWithWait('attempt', 'owner', {
+        bound: { ...bound, jobStatus: 'PROCESSING' }, waitMs: 4000,
+      })
+      expect(pending).toMatchObject({ status: 'COMPLETED', reportStatus: { state: 'PROCESSING' } })
+      expect(query).toHaveBeenCalledOnce()
+    } finally {
+      query.mockRestore()
+      vi.unstubAllEnvs()
     }
   })
 
@@ -212,5 +256,50 @@ describe('Scheme X Unified Whole Questionnaire Submit & Encrypted Ingestion (PR 
 
     const normalError = new Error('ordinary error')
     expect(isWholeSubmitAdmissionBusyError(normalError)).toBe(false)
+  })
+
+  it('short-circuits readEducationWholeProgressWithWait when bound execution is already completed and returns cleanly when long-poll wait is unavailable', async () => {
+    const query = vi.spyOn(prisma, '$queryRaw')
+    try {
+      const done = await readEducationWholeProgressWithWait('attempt-done', 'owner', {
+        bound: {
+          epoch: 1,
+          parentStatus: 'COMPLETED',
+          wholeSubmissionId: 'sub-1',
+          jobStatus: 'READY',
+          executionStatus: 'COMPLETED',
+        },
+        waitMs: 4000,
+      })
+      expect(done).toEqual({
+        attemptId: 'attempt-done',
+        attemptEpoch: 1,
+        status: 'COMPLETED',
+        wholeSubmissionReceived: true,
+        runCompleted: true,
+        reportStatus: { state: 'READY' },
+      })
+      expect(query).not.toHaveBeenCalled()
+
+      query.mockResolvedValueOnce([{
+        epoch: 1,
+        parentStatus: 'IN_PROGRESS',
+        wholeSubmissionId: 'sub-2',
+        jobStatus: 'PROCESSING',
+        executionStatus: 'STARTED',
+      }])
+      const waiting = await readEducationWholeProgressWithWait('attempt-wait', 'owner', { waitMs: 4000 })
+      expect(waiting).toEqual({
+        attemptId: 'attempt-wait',
+        attemptEpoch: 1,
+        status: 'IN_PROGRESS',
+        wholeSubmissionReceived: true,
+        feedbackWaitMs: 0,
+        reportStatus: { state: 'PROCESSING' },
+      })
+      expect(query).toHaveBeenCalledOnce()
+    } finally {
+      query.mockRestore()
+    }
   })
 })

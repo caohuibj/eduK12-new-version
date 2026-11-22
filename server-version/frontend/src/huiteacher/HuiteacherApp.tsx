@@ -12,6 +12,8 @@ import {usePrivateToolCapability,type PrivateDraftState} from '../components/edu
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import {finalDraftStore} from '../services/persistence/finalDraftStore'
 import {clearHuiteacherSessionDrafts} from '../services/persistence/sessionDraftHygiene'
+import {isTrainingBusy,runTrainingRetry} from '../services/trainingBusyRetry'
+import {normalizeApiError} from '../utils/normalizeApiError'
 import {flushSync} from 'react-dom'
 import {QRCodeSVG} from 'qrcode.react'
 import {UserRound,X,BookOpen,Compass,FileText,ClipboardList,Sprout,UsersRound,Info,MessageSquare,TrendingUp} from 'lucide-react'
@@ -70,27 +72,40 @@ function cookie(name:string){
   try{return decodeURIComponent(part.slice(name.length+1))}catch{return ''}
 }
 async function teacherApi<T>(path:string,method='GET',data?:unknown,options?:{responseType?:'blob'}):Promise<T>{
-  const headers:Record<string,string>={}
-  if(method!=='GET'){
-    let csrf=cookie('huiteacher_csrf')
-    if(!csrf){
-      const resp=await fetch('/api/huiteacher/auth/csrf',{credentials:'same-origin'})
-      const payload=await resp.json() as Envelope<{csrfToken:string}>
-      csrf=payload.data?.csrfToken??''
+  const executeOnce=async():Promise<T>=>{
+    const headers:Record<string,string>={}
+    if(method!=='GET'){
+      let csrf=cookie('huiteacher_csrf')
+      if(!csrf){
+        const resp=await fetch('/api/huiteacher/auth/csrf',{credentials:'same-origin'})
+        const payload=await resp.json() as Envelope<{csrfToken:string}>
+        csrf=payload.data?.csrfToken??''
+      }
+      if(!csrf)throw new Error('安全令牌不可用')
+      headers['X-CSRF-Token']=csrf
+      headers['Content-Type']='application/json'
     }
-    if(!csrf)throw new Error('安全令牌不可用')
-    headers['X-CSRF-Token']=csrf
-    headers['Content-Type']='application/json'
+    if(data instanceof FormData)delete headers['Content-Type']
+    const response=await fetch('/api/huiteacher'+path,{
+      method,headers,credentials:'same-origin',
+      ...(data===undefined?{}:{body:data instanceof FormData?data:JSON.stringify(data)}),
+    })
+    if(options?.responseType==='blob'&&response.ok)return await response.blob() as T
+    const retryAfterSeconds=Number(response.headers?.get?.('Retry-After'))||undefined
+    const retryAfterMs=retryAfterSeconds?retryAfterSeconds*1000:undefined
+    let result:Envelope<T>|null=null
+    try{result=await response.json() as Envelope<T>}catch{result=null}
+    if(!response.ok||!result||result.code!==0)throw Object.assign(new Error(result?.message||'请求未能完成'),{code:result?.code??response.status,data:result?.data??null,status:response.status,retryAfterSeconds,retryAfterMs})
+    return result.data
   }
-  if(data instanceof FormData)delete headers['Content-Type']
-  const response=await fetch('/api/huiteacher'+path,{
-    method,headers,credentials:'same-origin',
-    ...(data===undefined?{}:{body:data instanceof FormData?data:JSON.stringify(data)}),
-  })
-  if(options?.responseType==='blob'&&response.ok)return await response.blob() as T
-  const result=await response.json() as Envelope<T>
-  if(!response.ok||result.code!==0)throw Object.assign(new Error(result.message||'请求未能完成'),{code:result.code,data:result.data,status:response.status,retryAfterSeconds:Number(response.headers.get('Retry-After'))||undefined})
-  return result.data
+  for(let attempt=0;;attempt+=1){
+    try{return await executeOnce()}
+    catch(cause){
+      if(method!=='GET'||attempt>=2||!isTrainingBusy(cause,['SERVICE_BUSY']))throw cause
+      const delayMs=Math.max(1_000,normalizeApiError(cause).retryAfterMs??1_000)+Math.floor(Math.random()*1_500)
+      await new Promise(resolve=>setTimeout(resolve,delayMs))
+    }
+  }
 }
 const assessmentRuntime={renderFeedback:createEducationAssessmentFeedback({api:teacherApi,entry:'TEACHER'})}
 const assessmentResources=createEducationAssessmentResourceAdapter(teacherApi,'TEACHER')
@@ -272,8 +287,12 @@ function HuiteacherApplication(){
     void work().catch(e=>setMessage(e instanceof Error?e.message:'操作失败')).finally(()=>setWorking(false))
   }
   const login=()=>run(async()=>{
-    const response=await teacherApi<(Mfa|{user:{id:string};product:string})>(
-      '/auth/login','POST',{username,password},
+    const response=await runTrainingRetry(
+      ()=>teacherApi<(Mfa|{user:{id:string};product:string})>('/auth/login','POST',{username,password}),
+      (cause)=>isTrainingBusy(cause,['LOGIN_VERIFY_BUSY','LOGIN_LOOKUP_BUSY'])
+        ? {kind:'retry',retryAfterMs:normalizeApiError(cause).retryAfterMs}
+        : {kind:'stop'},
+      {onRetry:()=>setMessage('登录人数较多，正在自动重试...')},
     )
     setPassword('')
     if('mfaRequired' in response&&response.mfaRequired){

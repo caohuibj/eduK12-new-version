@@ -4,6 +4,7 @@ import { performance } from 'node:perf_hooks'
 import { cacheService } from '../services/cacheService'
 import { BoundedAdmissionGate, configuredInteger } from '../services/boundedAdmissionGate'
 import { recordBoundedAdmissionRejection, setBoundedAdmissionGateState } from '../services/runtimeObservability'
+import { reportForegroundGateQueueDepth } from '../services/wholeSubmissionPriority'
 
 const WINDOW_SECONDS = 15 * 60
 const ACCOUNT_FAILURE_LIMIT = 10
@@ -24,6 +25,7 @@ export const loginPasswordVerificationAdmission = new BoundedAdmissionGate({
   retryAfterSeconds: 1,
   busyCode: 'LOGIN_VERIFY_BUSY',
   busyMessage: '登录服务繁忙，请稍后重试',
+  onStateChange: (_active, queued) => reportForegroundGateQueueDepth('login_password_verify', queued),
 })
 
 export const withLoginPasswordVerification = <T>(operation: () => Promise<T>): Promise<T> =>

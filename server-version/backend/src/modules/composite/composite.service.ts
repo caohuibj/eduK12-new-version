@@ -15,7 +15,7 @@ import {
 import { availableTemplateCache, publicationReadKey, startCompositeCache, startIdentityCache, startMetadataCache } from './start-read-cache'
 import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments } from '../scale/deployment/repository'
 import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
-import { anonymousWholeSubmitQueued } from '../../services/wholeSubmissionPriority'
+import { anonymousWholeSubmitQueued, reportForegroundGateQueueDepth } from '../../services/wholeSubmissionPriority'
 import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
@@ -4203,6 +4203,7 @@ const trainingStartGate = (): BoundedAdmissionGate => {
       retryAfterSeconds: 1,
       busyCode: 'ASSESSMENT_START_BUSY',
       busyMessage: '综合测评开始请求繁忙，请稍后重试',
+      onStateChange: (_active, queued) => reportForegroundGateQueueDepth('training_start_admission', queued),
     })
   }
   return gateInstance
@@ -4526,13 +4527,18 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
           updatedAt: true,
           trainingContentSnapshotHash: true,
           productKind: true,
+          trainingFlowFrozen: true,
+          trainingVariantFrozen: true,
+          reportPackageKey: true,
+          analysisProtocolKey: true,
+          trainingTimingPolicy: true,
           personalTracking: true,
           publicEnabled: true,
           status: true,
           opensAt: true,
           expiresAt: true,
           course: { select: { isLibrary: true } },
-          items: { select: { type: true, situationalInstrumentKey: true, situationalInstrumentVersion: true } },
+          items: { select: { type: true, required: true, standardCombinationSource: true, situationalInstrumentKey: true, situationalInstrumentVersion: true } },
         },
       },
     },
@@ -4550,13 +4556,18 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
             updatedAt: true,
             trainingContentSnapshotHash: true,
             productKind: true,
+            trainingFlowFrozen: true,
+            trainingVariantFrozen: true,
+            reportPackageKey: true,
+            analysisProtocolKey: true,
+            trainingTimingPolicy: true,
             personalTracking: true,
           publicEnabled: true,
             status: true,
             opensAt: true,
             expiresAt: true,
             course: { select: { isLibrary: true } },
-            items: { select: { type: true, situationalInstrumentKey: true, situationalInstrumentVersion: true } },
+            items: { select: { type: true, required: true, standardCombinationSource: true, situationalInstrumentKey: true, situationalInstrumentVersion: true } },
           },
         },
       },
@@ -4727,6 +4738,12 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
     }
   }
   const plainTrainingStart = !study && token.compositeAssessment.productKind === 'QUESTIONNAIRE'
+  const precompiledScaleOnlyPublicStart = plainTrainingStart
+    && Array.isArray(token.compositeAssessment.items)
+    && token.compositeAssessment.items.length > 0
+    && isOrdinaryQuestionnaireStart(token.compositeAssessment)
+    && Boolean((token.compositeAssessment as any).trainingContentSnapshotHash)
+    && token.compositeAssessment.items.every((item: any) => item.required && item.type === 'SCALE')
   const yieldToQueuedWholeSubmits = () => {
     if (plainTrainingStart && anonymousWholeSubmitQueued()) {
       throw new AssessmentStartBusyError('WHOLE_SUBMIT_QUEUE_PRESSURE')
@@ -4762,12 +4779,15 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
     try {
       return await anonymousStartAdmissionGate().run(async () => {
         yieldToQueuedWholeSubmits()
+        const admittedScaleBatch = precompiledScaleOnlyPublicStart
+          ? admitPrecompiledScaleCompositionStart()
+          : false
         const gateAdmittedAt = process.hrtime.bigint()
         recordAnonymousStartPhase('anonymous.start.gate_wait_ms', gateEnteredAt, gateAdmittedAt)
         const txCallAt = process.hrtime.bigint()
         let txCallbackEntered = false
         try {
-          return await prisma.$transaction(async (tx) => {
+          const transact = () => prisma.$transaction(async (tx) => {
             txCallbackEntered = true
             const txCallbackAt = process.hrtime.bigint()
             // Successful connection acquisition and BEGIN. Failures before
@@ -4822,6 +4842,9 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
             if (claimed.length !== 1) throw compositeConflict('公开链接已达到最大参与次数')
             return admitted
           }, START_INTERACTIVE_TRANSACTION)
+          return admittedScaleBatch && !composite.formSections?.length
+            ? await withAdmittedScaleCompositionStart(transact)
+            : await transact()
         } finally {
           // tx_wall and gate_slot both end when the transaction settles.
           // gate_slot ⊃ tx_wall; they are nearly equal here because the gate
@@ -4855,6 +4878,13 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   }
   }
   if (!study) {
+    // Align precompiled scale-only anonymous START with authenticated Training
+    // and School/Teacher: under CPU-only pressure with healthy memory (>=700 MiB),
+    // queue smoothly inside anonymousStartAdmissionGate instead of shedding
+    // immediately with 503. Memory-constrained STARTs remain under trickle/guard.
+    if (precompiledScaleOnlyPublicStart && isAssessmentStartCpuPaused()) {
+      return executePublicAdmission()
+    }
     // Trickle owns the [floor, 700) band and the in-transaction permit.
     // When it is off, the optional <650 / missing-sample guard still runs,
     // then the same <700 / CPU gate the freeze uses — both before any load.

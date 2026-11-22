@@ -71,6 +71,7 @@ import { recordRequestPhase, requestObservabilityMiddleware, recordNodeRequestCa
 import { postgresActivityMetricLines } from './services/postgresActivityMetrics'
 import { effectiveRuntimeResourceConfig } from './config/runtimeResources'
 import { warmPasswordVerificationPool } from './services/passwordVerificationPool'
+import { configuredInteger } from './services/boundedAdmissionGate'
 
 // 导入路由
 import legacyArchiveRoutes from './modules/legacy-archive/routes'
@@ -151,6 +152,13 @@ const server = createServer((req, res) => {
   recordNodeRequestCallback(req)
   app(req, res)
 })
+// Keep idle keep-alive sockets open longer than reverse-proxy upstream reuse
+// windows (typically 60s) to avoid Nginx/Node half-close 502 races.
+server.keepAliveTimeout = configuredInteger('HTTP_KEEP_ALIVE_TIMEOUT_MS', 65_000)
+server.headersTimeout = Math.max(
+  server.keepAliveTimeout + 1_000,
+  configuredInteger('HTTP_HEADERS_TIMEOUT_MS', 66_000),
+)
 
 app.use(requestObservabilityMiddleware)
 

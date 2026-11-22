@@ -36,6 +36,8 @@ export const processCompositeReportJob = async (job: CompositeReportJob): Promis
   heartbeat.unref()
   let outcome: ReportJobOutcome
   let completionOnly = false
+  let receiptOnly = false
+  let educationWhole = false
   try {
     const wholeService = await traceAssessmentPhase('report.whole_module_import', () => import('../modules/composite/whole-questionnaire.service'))
     let reportContext: import('../modules/composite/whole-questionnaire.service').WholeQuestionnaireReportContext | undefined
@@ -56,7 +58,9 @@ export const processCompositeReportJob = async (job: CompositeReportJob): Promis
         reportJob: { attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextHash: job.contextHash },
       }))
       if (whole && result?.status !== 'COMPLETED') throw new Error('WHOLE_QUESTIONNAIRE_CANONICAL_NOT_COMPLETE')
-      completionOnly = parent.receiptOnly || isEducationWholeAttempt(parent)
+      receiptOnly = parent.receiptOnly === true
+      educationWhole = isEducationWholeAttempt(parent)
+      completionOnly = receiptOnly || educationWhole
       if (result?.status !== 'COMPLETED') outcome = { kind: 'waiting' }
       else if (completionOnly) {
         const aggregateInputHash = result.aggregateInputHash ?? parent.aggregateInputHash
@@ -94,7 +98,8 @@ export const processCompositeReportJob = async (job: CompositeReportJob): Promis
     recordReportQueueEvent({ kind: 'generation_end', attemptId: job.attemptId, jobId: job.id, startMs: generationStartMs, endMs: Date.now() })
     recordReportQueueEvent({ kind: 'ready_commit', attemptId: job.attemptId, jobId: job.id, outcomeKind: outcome.kind, published: Boolean(published) })
   }
-  if (published && outcome.kind === 'ready' && !completionOnly) {
+  const notifyReady = !receiptOnly && (!educationWhole || process.env.ASSESSMENT_REPORT_READY_WAIT_ENABLED === 'true')
+  if (published && outcome.kind === 'ready' && notifyReady) {
     markAssessmentTimeline('report.ready_commit_confirmed')
     if (job.wholeSubmissionId) void publishReportReady(job.attemptId, job.attemptEpoch)
   }

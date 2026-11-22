@@ -30,6 +30,7 @@ vi.mock('../../modules/assessment-run/runtimeAccess', () => ({
 vi.mock('../../services/wholeSubmissionPriority', () => ({
   prepareWholeSubmissionPriority: () => undefined,
   authenticatedWholeSubmissionPriority: (_req: any, _res: any, next: any) => next(),
+  reportForegroundGateQueueDepth: () => undefined,
 }))
 
 vi.mock('../../modules/composite/whole-questionnaire.service', () => ({

@@ -27,6 +27,8 @@ import type { AssessmentVideoCapabilitySources } from '../modules/assessment-med
 import type { CompositeAttemptState,CompositeCurrentItem } from '../modules/composite/types'
 import type { ApiResponse } from '../types'
 import type { SchoolApi } from './SchoolRecovery'
+import { isTrainingBusy, runTrainingRetry, TrainingRetryCancelledError } from '../services/trainingBusyRetry'
+import { normalizeApiError } from '../utils/normalizeApiError'
 import './school-assessment.css'
 
 export type CampusExecutionRef={
@@ -92,9 +94,15 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
         await api(prefix+'/consent/accept','POST',{})
       }
       if(currentIdentity.current!==identity)return
-      const result=await api<{
-        state:'STARTED'|'IN_PROGRESS';runtimeBindingKind?:string;runtimeBindingRef?:string;currentUnit?:CompositeAttemptState
-      } & EducationInlineWholePayload>(withKnownWholeTemplateQuery(prefix+'/start'),'POST',{delivery:'inline'})
+      const result=await runTrainingRetry(
+        ()=>api<{
+          state:'STARTED'|'IN_PROGRESS';runtimeBindingKind?:string;runtimeBindingRef?:string;currentUnit?:CompositeAttemptState
+        } & EducationInlineWholePayload>(withKnownWholeTemplateQuery(prefix+'/start'),'POST',{delivery:'inline'}),
+        (cause)=>isTrainingBusy(cause,['INSTRUMENT_NOT_AVAILABLE','ASSESSMENT_START_BUSY'])
+          ? {kind:'retry',retryAfterMs:normalizeApiError(cause).retryAfterMs}
+          : {kind:'stop'},
+        {isCurrent:()=>currentIdentity.current===identity},
+      )
       if(result.state==='IN_PROGRESS'){
         setError('启动请求正在确认中，请重新核对；请勿重复开启另一份测评。')
         return
@@ -112,7 +120,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
       }else{
         await load(result.runtimeBindingRef)
       }
-    }catch(e){setError(e instanceof Error?e.message:'测评暂时不能开始')}
+    }catch(e){if(!(e instanceof TrainingRetryCancelledError))setError(e instanceof Error?e.message:'测评暂时不能开始')}
     finally{setBusy(false)}
   }
   const videoLoader=useCallback(async(url:string)=>{
@@ -205,7 +213,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
     }),
     submitWhole:async(id:string,input:WholeQuestionnaireInput)=>wrapped(await api<WholeQuestionnaireReceipt>('/composite-attempts/'+encodeURIComponent(id)+'/whole/submit','POST',input)),
     wholeReceipt:async(id:string,submissionId:string,attemptEpoch:number)=>wrapped(await api<WholeReceiptLookup>('/composite-attempts/'+encodeURIComponent(id)+'/whole/receipt?submissionId='+encodeURIComponent(submissionId)+'&attemptEpoch='+attemptEpoch)),
-    reportStatus:async(id:string)=>wrapped(await api<CompositeReportStatus>('/composite-attempts/'+encodeURIComponent(id)+'/whole/progress')),
+    reportStatus:async(id:string,waitMs?:number)=>wrapped(await api<CompositeReportStatus>('/composite-attempts/'+encodeURIComponent(id)+'/whole/progress'+(waitMs&&waitMs>0?'?waitMs='+Math.round(waitMs):''))),
   }),[api])
   const educationMedia=useMemo(()=>{
     const root='/composite-attempts/'+encodeURIComponent(state?.id||'')

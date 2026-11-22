@@ -336,12 +336,18 @@ export const claimCompositeReportJob = async (): Promise<CompositeReportJob | nu
       "claimed_revision" = job."requested_revision", "attempt_count" = job."attempt_count" + 1,
       "updated_at" = (CURRENT_TIMESTAMP AT TIME ZONE 'UTC')
     FROM (
-      SELECT "id" FROM "composite_report_jobs"
-      WHERE ("budget_held" = true OR ("whole_submission_id" IS NOT NULL
-        AND "whole_answers_encrypted" IS NOT NULL AND "whole_accepted_at" IS NOT NULL)) AND (
-        ("status" = 'PENDING' AND "next_attempt_at" <= (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'))
-        OR ("status" = 'PROCESSING' AND "lease_expires_at" <= (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'))
-      ) ORDER BY "next_attempt_at", "created_at" FOR UPDATE SKIP LOCKED LIMIT 1
+      SELECT candidate_job."id" FROM "composite_report_jobs" AS candidate_job
+      LEFT JOIN "composite_assessment_attempts" AS parent ON parent."id" = candidate_job."attempt_id"
+      WHERE (candidate_job."budget_held" = true OR (candidate_job."whole_submission_id" IS NOT NULL
+        AND candidate_job."whole_answers_encrypted" IS NOT NULL AND candidate_job."whole_accepted_at" IS NOT NULL)) AND (
+        (candidate_job."status" = 'PENDING' AND candidate_job."next_attempt_at" <= (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'))
+        OR (candidate_job."status" = 'PROCESSING' AND candidate_job."lease_expires_at" <= (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'))
+      )
+      ORDER BY (CASE WHEN COALESCE(parent."receipt_only", false)
+        AND candidate_job."next_attempt_at" > (CURRENT_TIMESTAMP AT TIME ZONE 'UTC') - INTERVAL '30 seconds'
+        THEN 1 ELSE 0 END) ASC,
+        candidate_job."next_attempt_at", candidate_job."created_at"
+      FOR UPDATE OF candidate_job SKIP LOCKED LIMIT 1
     ) AS candidate WHERE job."id" = candidate."id" RETURNING job."id" AS "id", job."attempt_id" AS "attemptId", job."attempt_epoch" AS "attemptEpoch", job."slot_set_hash" AS "slotSetHash", job."context_hash" AS "contextHash", job."status" AS "status", job."requested_revision" AS "requestedRevision", job."claimed_revision" AS "claimedRevision", job."attempt_count" AS "attemptCount", job."budget_held" AS "budgetHeld", job."lease_token" AS "leaseToken", job."lease_expires_at" AS "leaseExpiresAt", job."next_attempt_at" AS "nextAttemptAt", job."report_encrypted" AS "reportEncrypted", job."aggregate_input_hash" AS "aggregateInputHash", job."error_code" AS "errorCode", job."completed_at" AS "completedAt", job."created_at" AS "createdAt", job."updated_at" AS "updatedAt", job."whole_submission_id" AS "wholeSubmissionId", job."whole_payload_hash" AS "wholePayloadHash", job."whole_answers_encrypted" AS "wholeAnswersEncrypted", job."whole_accepted_at" AS "wholeAcceptedAt"
   `
   if (!rows[0]) return null

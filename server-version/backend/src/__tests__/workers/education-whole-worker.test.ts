@@ -42,4 +42,16 @@ describe('education whole worker identity', () => {
     expect(typeof outcome.reportEncrypted).toBe('string')
     expect(outcome.reportEncrypted).not.toContain('EDUCATION_WHOLE_MATERIALIZED')
   })
+
+  it('publishes report-ready wakeup for non-receipt-only education attempts when ready-wait is enabled, and stays silent for receiptOnly', async () => {
+    vi.stubEnv('ASSESSMENT_REPORT_READY_WAIT_ENABLED', 'true')
+    await processCompositeReportJob(job)
+    expect(h.publish).toHaveBeenCalledOnce()
+    expect(h.publish).toHaveBeenCalledWith('edu-attempt', 1)
+
+    h.publish.mockClear()
+    h.parent.mockResolvedValueOnce({ ...educationParent, receiptOnly: true })
+    await processCompositeReportJob(job)
+    expect(h.publish).not.toHaveBeenCalled()
+  })
 })
