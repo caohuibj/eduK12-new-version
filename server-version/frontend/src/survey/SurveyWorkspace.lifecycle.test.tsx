@@ -136,7 +136,7 @@ describe('Survey workspace in-flight editing and request scope',()=>{
   })
 
   const wave=(id:string,ordinal:number)=>({id,ordinal,title:'波次 '+ordinal,status:'OPEN',starts:1,
-    finalCompleted:1,analysisIncluded:1,qualityExcluded:0,uniqueLinkedCodes:null,excluded:0})
+    completedTotal:2,finalCompleted:1,analysisIncluded:1,qualityExcluded:0,uniqueLinkedCodes:null,excluded:0})
   const items={waveId:'wave1',items:[],descriptiveScores:[],note:'仅属于第一波次的统计'}
   const ticket={id:'export1',status:'READY',format:'RAW_WAVE',expiresAt:'2030-01-01T00:00:00Z',
     pageNumber:1,manifest:{rowCount:1,columnCount:5}}
@@ -161,7 +161,7 @@ describe('Survey workspace in-flight editing and request scope',()=>{
     const summary=await screen.findByRole('region',{name:'答卷完成概览'})
     expect(summary).toHaveTextContent('各波次累计答卷，不代表独立参与人数')
     const cards=summary.querySelectorAll('article')
-    expect(cards[0]).toHaveTextContent('已完成答卷2')
+    expect(cards[0]).toHaveTextContent('累计提交答卷4')
     expect(cards[1]).toHaveTextContent('有效分析答卷2')
     expect(cards[2]).toHaveTextContent('质量排除0')
     expect(cards[3]).toHaveTextContent('撤回排除0')

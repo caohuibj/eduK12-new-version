@@ -42,7 +42,7 @@ describe('Survey researcher directory and editing context',()=>{
     expect(window.location.pathname).toBe('/workspace')
     expect(window.location.search).toBe('')
     expect(vi.mocked(fetch).mock.calls.some(([url])=>/\/projects\/[^?]+$/.test(String(url)))).toBe(false)
-    expect(screen.getByRole('heading',{name:'学习体验研究'})).toBeVisible()
+    expect(await screen.findByRole('heading',{name:'学习体验研究'})).toBeVisible()
   })
   it('keeps hash-only navigation inside the current editor without discarding edits or issuing requests',async()=>{
     render(<SurveyApp/>)

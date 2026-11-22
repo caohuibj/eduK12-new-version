@@ -78,7 +78,7 @@ describe('Survey parent/child boundary and feedback',()=>{
     fireEvent.click(screen.getByRole('radio',{name:'很好'}))
     fireEvent.click(screen.getByRole('button',{name:'题目导航'}))
     expect(screen.getByRole('navigation',{name:'本量表已答题导航'}).querySelectorAll('.survey-scale-question-grid button')).toHaveLength(1)
-    fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'}))
+    fireEvent.click(screen.getByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/}))
     await screen.findByText('感谢参与，问卷已提交')
     expect(finals[0].answers).toEqual({form:{q:'yes'},followup:{s:'good'}})
   })
@@ -90,13 +90,13 @@ describe('Survey parent/child boundary and feedback',()=>{
   it('locks prior answers, blocks outer navigation while running, and seals exact child refs on parent retry',async()=>{
     failFirst=true;await open();fireEvent.click(screen.getByRole('radio',{name:'符合'}));fireEvent.click(screen.getByRole('button',{name:'下一部分'}))
     await screen.findByRole('button',{name:'模拟开始认知'})
-    expect(screen.queryByRole('button',{name:'提交本轮正式回答'})).toBeNull()
+    expect(screen.queryByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/})).toBeNull()
     expect(harness.cognitive.priorAnswers).toEqual({form:{q:'yes'}})
     fireEvent.click(screen.getByRole('button',{name:'模拟开始认知'}))
-    expect(screen.queryByRole('button',{name:'上一部分'})).toBeNull();expect(screen.queryByRole('button',{name:'提交本轮正式回答'})).toBeNull()
+    expect(screen.queryByRole('button',{name:'上一部分'})).toBeNull();expect(screen.queryByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/})).toBeNull()
     fireEvent.click(screen.getByRole('button',{name:'模拟子结果确认'}));expect(finals).toHaveLength(0)
     expect(screen.queryByRole('button',{name:'上一部分'})).toBeNull();expect(screen.queryByRole('radio',{name:'不符合'})).toBeNull()
-    await exhaustCapacityRetry(()=>fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'})))
+    await exhaustCapacityRetry(()=>fireEvent.click(screen.getByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/})))
     await screen.findByText('结果尚不确定');expect(finals[0].answers).toEqual({form:{q:'yes'},cog:{}})
     expect(finals[0].cognitiveReferences).toHaveLength(1)
     fireEvent.click(screen.getByRole('button',{name:'重试原提交'}));await screen.findByText('感谢参与，问卷已提交')
@@ -108,7 +108,7 @@ describe('Survey parent/child boundary and feedback',()=>{
   it('restores locked canonical prior answers and child references from authorized task metadata',async()=>{
     task.lockedPriorAnswers={form:{q:'yes'}};task.cognitiveSessions=[{slotKey:'cog',sessionId:'session',status:'COMPLETED',epoch:1,resultReference:{slotKey:'cog',epoch:1,resultId:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',resultHash:'a'.repeat(64),measurementDigest:'b'.repeat(64)}}]
     await open();expect(screen.getByRole('radio',{name:'符合'})).toBeChecked();expect(screen.getByRole('radio',{name:'不符合'})).toBeDisabled()
-    fireEvent.click(screen.getByRole('button',{name:'下一部分'}));fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'}))
+    fireEvent.click(screen.getByRole('button',{name:'下一部分'}));fireEvent.click(screen.getByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/}))
     await screen.findByText('感谢参与，问卷已提交');expect(finals[0].cognitiveReferences).toEqual([task.cognitiveSessions[0].resultReference])
   })
   it.each([
@@ -175,13 +175,13 @@ describe('Survey parent/child boundary and feedback',()=>{
     fireEvent.click(screen.getByRole('button',{name:advance}))
     expect(harness.cognitive.priorAnswers).toEqual(task.lockedPriorAnswers)
     if(status==='IN_PROGRESS'){
-      expect(screen.queryByRole('button',{name:'提交本轮正式回答'})).toBeNull()
+      expect(screen.queryByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/})).toBeNull()
       fireEvent.submit(screen.getByRole('button',{name:'模拟子结果确认'}).closest('form')!)
       expect(screen.getByRole('alert')).toHaveTextContent('请完成当前工具后再提交')
       expect(finals).toHaveLength(0)
       fireEvent.click(screen.getByRole('button',{name:'模拟子结果确认'}))
     }
-    fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'}))
+    fireEvent.click(screen.getByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/}))
     await screen.findByText('感谢参与，问卷已提交')
     expect(finals).toHaveLength(1)
     expect(finals[0].answers).toEqual({...task.lockedPriorAnswers,cog:{}})
@@ -191,7 +191,7 @@ describe('Survey parent/child boundary and feedback',()=>{
   it('does not accept a missing cognitive child as a whole-study completion',async()=>{
     await open();fireEvent.click(screen.getByRole('radio',{name:'符合'}));fireEvent.click(screen.getByRole('button',{name:'下一部分'}))
     await screen.findByRole('button',{name:'模拟子结果确认'})
-    expect(screen.queryByRole('button',{name:'提交本轮正式回答'})).toBeNull()
+    expect(screen.queryByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/})).toBeNull()
     fireEvent.submit(screen.getByRole('button',{name:'模拟子结果确认'}).closest('form')!);await screen.findByText('请完成当前工具后再提交')
     expect(finals).toHaveLength(0);expect(screen.queryByText('感谢参与，问卷已提交')).toBeNull()
   })
@@ -226,7 +226,7 @@ describe('Survey parent/child boundary and feedback',()=>{
     }
     fireEvent.click(screen.getByRole('button',{name:'确认当前步骤，继续研究'}))
     fireEvent.click(screen.getByRole('radio',{name:'符合'}))
-    fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'}))
+    fireEvent.click(screen.getByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/}))
     await screen.findByText('感谢参与，问卷已提交')
     expect(finals).toHaveLength(1)
     expect(finals[0].answers).toEqual({form:{q:'yes'},sjt:selection==='empty'?{}:
@@ -239,7 +239,7 @@ describe('Survey parent/child boundary and feedback',()=>{
     fireEvent.click(screen.getByRole('button',{name:'模拟子结果确认'}))
     expect(screen.queryByRole('button',{name:'上一部分'})).toBeNull()
     expect(screen.queryByRole('radio',{name:'不符合'})).toBeNull()
-    fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'}))
+    fireEvent.click(screen.getByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/}))
     await screen.findByText('感谢参与，问卷已提交')
     expect(finals[0].answers.form).toEqual({q:'yes'})
     vi.spyOn(window,'confirm').mockReturnValue(true)

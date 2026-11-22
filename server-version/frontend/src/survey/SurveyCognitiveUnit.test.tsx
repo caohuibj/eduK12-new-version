@@ -51,7 +51,7 @@ describe('Survey embedded cognitive lifecycle (component contract only)',()=>{
     const request=vi.fn(async()=>({...current,status:'COMPLETED',resultReference:reference})),{callbacks}=setup(request,existing)
     await screen.findByText('此任务已提交');expect(callbacks.onCommitted).toHaveBeenCalledWith(reference)
     expect(finalDraftStore.delete).toHaveBeenCalledWith('cognitive:s1')
-    expect(screen.getByText(/请继续完成本轮研究并提交整轮回答/)).toBeInTheDocument()
+    expect(screen.getByText(/请继续填写，再点击「提交整份问卷」/)).toBeInTheDocument()
     expect(screen.queryByTestId('shared-runner')).toBeNull()
   })
   it('checks completion before replacing an uncertain child',async()=>{
