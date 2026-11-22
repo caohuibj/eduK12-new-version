@@ -58,6 +58,12 @@ describe('Scheme X Unified Whole Questionnaire Submit & Encrypted Ingestion (PR 
     }
     expect(educationWholeProgressFromRow('attempt', { ...bound, jobStatus: 'READY' }, bound.executionStatus))
       .toMatchObject({ status: 'COMPLETED', reportStatus: { state: 'READY' } })
+    // Receipt-only means completed units, not an individual report. Preserve
+    // the existing completion receipt after Run reconciliation.
+    for (const jobStatus of ['PROCESSING', 'FAILED'] as const) {
+      expect(educationWholeProgressFromRow('attempt', { ...bound, receiptOnly: true, jobStatus }, 'COMPLETED'))
+        .toMatchObject({ receiptOnly: true, status: 'COMPLETED', runCompleted: true, reportStatus: { state: 'READY' } })
+    }
     expect(educationWholeProgressFromRow('attempt', {
       ...bound, executionStatus: 'STARTED', jobStatus: 'READY',
     }, 'STARTED')).toMatchObject({ status: 'IN_PROGRESS', reportStatus: { state: 'PROCESSING' } })

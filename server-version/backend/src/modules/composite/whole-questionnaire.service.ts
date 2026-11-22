@@ -1228,7 +1228,10 @@ export function educationWholeProgressFromRow(attemptId: string, progress: Educa
   const terminalFailure = progress.jobStatus === 'FAILED' || progress.jobStatus === 'CANCELLED' ? progress.jobStatus : undefined
   // Parent/Run completion is not the report job's durable READY commit.
   const jobState = progress.jobStatus ?? 'WAITING'
-  const reportState = terminalFailure ?? (awaitingRun || (progress.parentStatus !== 'COMPLETED' && jobState === 'READY')
+  // Receipt-only completion follows the committed parent/Run, not a report
+  // materialization job. With-report still requires the durable Job READY.
+  const receiptCompleted = progress.receiptOnly === true && progress.parentStatus === 'COMPLETED' && executionStatus === 'COMPLETED'
+  const reportState = receiptCompleted ? 'READY' : terminalFailure ?? (awaitingRun || (progress.parentStatus !== 'COMPLETED' && jobState === 'READY')
     ? 'PROCESSING' : jobState)
   const waitEnabled = !progress.receiptOnly && Boolean(progress.wholeSubmissionId) && reportReadyWaitAvailable()
   return {

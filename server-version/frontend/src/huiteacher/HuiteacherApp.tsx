@@ -91,7 +91,7 @@ async function teacherApi<T>(path:string,method='GET',data?:unknown,options?:{re
       ...(data===undefined?{}:{body:data instanceof FormData?data:JSON.stringify(data)}),
     })
     if(options?.responseType==='blob'&&response.ok)return await response.blob() as T
-    const retryAfterSeconds=Number(response.headers.get('Retry-After'))||undefined
+    const retryAfterSeconds=Number(response.headers?.get?.('Retry-After'))||undefined
     const retryAfterMs=retryAfterSeconds?retryAfterSeconds*1000:undefined
     let result:Envelope<T>|null=null
     try{result=await response.json() as Envelope<T>}catch{result=null}
