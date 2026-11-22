@@ -8,9 +8,18 @@ vi.mock('../../services/runtimeObservability', async original => ({
 }))
 vi.mock('../../utils/logger', () => ({ logger: { info: vi.fn() } }))
 import { wholeSubmitAdmission, withWholeSubmitAdmission } from '../../services/wholeSubmitAdmission'
-import { anonymousWholeSubmitQueued, authenticatedWholeSubmissionPriority, trackVerifiedWholeSubmissionPressure } from '../../services/wholeSubmissionPriority'
+import {
+  anonymousWholeSubmitQueued,
+  authenticatedWholeSubmissionPriority,
+  reportForegroundGateQueueDepth,
+  resetForegroundGatePressureForTests,
+  trackVerifiedWholeSubmissionPressure,
+} from '../../services/wholeSubmissionPriority'
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-afterEach(() => vi.unstubAllEnvs())
+afterEach(() => {
+  resetForegroundGatePressureForTests()
+  vi.unstubAllEnvs()
+})
 describe('coalesced pressure transport', () => {
   it('adds no Redis operation for ordinary single-person requests and coalesces a burst with one final quiet hint', async () => {
     vi.stubEnv('ASSESSMENT_REPORT_SUBMISSION_PRIORITY_ENABLED', 'true'); h.publish.mockClear()
@@ -87,5 +96,15 @@ describe('coalesced pressure transport', () => {
     await sleep(160)
     expect(innerDone).toBe(true)
     expect(h.publish).not.toHaveBeenCalled()
+  })
+
+  it('signals worker yield when foreground login or START gates are queued and clears when drained', async () => {
+    vi.stubEnv('ASSESSMENT_REPORT_SUBMISSION_PRIORITY_ENABLED', 'true'); h.publish.mockClear()
+    reportForegroundGateQueueDepth('run_start_admission', 4)
+    await vi.waitFor(() => expect(h.publish).toHaveBeenCalled(), { timeout: 1000, interval: 10 })
+    expect(JSON.parse(h.publish.mock.calls.at(-1)![0])).toMatchObject({ busy: true, queued: true })
+    reportForegroundGateQueueDepth('run_start_admission', 0)
+    await sleep(350)
+    expect(JSON.parse(h.publish.mock.calls.at(-1)![0])).toMatchObject({ busy: false, queued: false })
   })
 })

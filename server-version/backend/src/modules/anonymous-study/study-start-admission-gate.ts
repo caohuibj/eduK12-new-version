@@ -1,4 +1,5 @@
 import { BoundedAdmissionGate, configuredInteger } from '../../services/boundedAdmissionGate'
+import { reportForegroundGateQueueDepth } from '../../services/wholeSubmissionPriority'
 import { defaultStartAdmissionBound } from '../../config/databasePool'
 import { ASSESSMENT_START_BUSY } from '../composite/start-transient'
 
@@ -73,6 +74,7 @@ export const anonymousStartAdmissionGate = (): BoundedAdmissionGate => {
       retryAfterSeconds: 1,
       busyCode: ASSESSMENT_START_BUSY,
       busyMessage: '综合测评开始请求繁忙，请稍后重试',
+      onStateChange: (_active, queued) => reportForegroundGateQueueDepth('anonymous_start_admission', queued),
     })
   }
   return anonymousStartGateInstance

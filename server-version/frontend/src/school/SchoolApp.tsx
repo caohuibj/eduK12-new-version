@@ -1,5 +1,7 @@
 import {deferredPage} from '../components/page-loading/deferredPage'
 import {finalDraftStore} from '../services/persistence/finalDraftStore'
+import {isTrainingBusy,runTrainingRetry} from '../services/trainingBusyRetry'
+import {normalizeApiError} from '../utils/normalizeApiError'
 
 
 import {usePrivateToolCapability,type PrivateDraftState} from '../components/education-tools/privateToolClient'
@@ -95,27 +97,40 @@ const cookie=(name:string)=>{
   return item?decodeURIComponent(item.slice(key.length)):null
 }
 async function api<T>(path:string,method='GET',payload?:unknown,options?:{responseType?:'blob'}):Promise<T>{
-  const headers:Record<string,string>={'Content-Type':'application/json'}
-  if(method!=='GET'){
-    let csrf=cookie('huischool_csrf')
-    if(!csrf){
-      const response=await fetch('/api/campus/auth/csrf',{credentials:'same-origin'})
-      if(!response.ok)throw new Error('无法建立安全请求，请刷新页面')
-      const body=await response.json() as Envelope<{csrfToken:string}>
-      csrf=body.data?.csrfToken??null
+  const executeOnce=async():Promise<T>=>{
+    const headers:Record<string,string>={'Content-Type':'application/json'}
+    if(method!=='GET'){
+      let csrf=cookie('huischool_csrf')
+      if(!csrf){
+        const response=await fetch('/api/campus/auth/csrf',{credentials:'same-origin'})
+        if(!response.ok)throw new Error('无法建立安全请求，请刷新页面')
+        const body=await response.json() as Envelope<{csrfToken:string}>
+        csrf=body.data?.csrfToken??null
+      }
+      if(!csrf)throw new Error('安全令牌不可用')
+      headers['X-CSRF-Token']=csrf
     }
-    if(!csrf)throw new Error('安全令牌不可用')
-    headers['X-CSRF-Token']=csrf
+    if(payload instanceof FormData)delete headers['Content-Type']
+    const response=await fetch('/api/campus'+path,{
+      method,headers,credentials:'same-origin',
+      ...(payload===undefined?{}:{body:payload instanceof FormData?payload:JSON.stringify(payload)}),
+    })
+    if(options?.responseType==='blob'&&response.ok)return await response.blob() as T
+    const retryAfterSeconds=Number(response.headers.get('Retry-After'))||undefined
+    const retryAfterMs=retryAfterSeconds?retryAfterSeconds*1000:undefined
+    let result:Envelope<T>|null=null
+    try{result=await response.json() as Envelope<T>}catch{result=null}
+    if(!response.ok||!result||result.code!==0)throw Object.assign(new Error(result?.message||'请求失败，请稍后重试'),{code:result?.code??response.status,data:result?.data??null,status:response.status,retryAfterSeconds,retryAfterMs})
+    return result.data
   }
-  if(payload instanceof FormData)delete headers['Content-Type']
-  const response=await fetch('/api/campus'+path,{
-    method,headers,credentials:'same-origin',
-    ...(payload===undefined?{}:{body:payload instanceof FormData?payload:JSON.stringify(payload)}),
-  })
-  if(options?.responseType==='blob'&&response.ok)return await response.blob() as T
-  const result=await response.json() as Envelope<T>
-  if(!response.ok||result.code!==0)throw Object.assign(new Error(result.message||'请求失败，请稍后重试'),{code:result.code,data:result.data,status:response.status,retryAfterSeconds:Number(response.headers.get('Retry-After'))||undefined})
-  return result.data
+  for(let attempt=0;;attempt+=1){
+    try{return await executeOnce()}
+    catch(cause){
+      if(method!=='GET'||attempt>=2||!isTrainingBusy(cause,['SERVICE_BUSY']))throw cause
+      const delayMs=Math.max(1_000,normalizeApiError(cause).retryAfterMs??1_000)+Math.floor(Math.random()*1_500)
+      await new Promise(resolve=>setTimeout(resolve,delayMs))
+    }
+  }
 }
 const assessmentResources=createEducationAssessmentResourceAdapter(api,'SCHOOL')
 const field=(label:string,value:string,onChange:(v:string)=>void,type='text')=>(
@@ -292,7 +307,13 @@ function SchoolApplication(){
   const signIn=async(e:React.FormEvent)=>{
     e.preventDefault()
     await run(async()=>{
-      const result=await api<{user?:CampusUser}&Partial<MfaState>>('/auth/login','POST',{username,password})
+      const result=await runTrainingRetry(
+        ()=>api<{user?:CampusUser}&Partial<MfaState>>('/auth/login','POST',{username,password}),
+        (cause)=>isTrainingBusy(cause,['LOGIN_VERIFY_BUSY','LOGIN_LOOKUP_BUSY'])
+          ? {kind:'retry',retryAfterMs:normalizeApiError(cause).retryAfterMs}
+          : {kind:'stop'},
+        {onRetry:()=>setNotice('登录人数较多，正在自动重试...')},
+      )
       setPassword('')
       if(result.mfaRequired){
         setMfaEnrolled(result.enrolled??true);setScreen('mfa');setMfaUri('');setMfaCode('')

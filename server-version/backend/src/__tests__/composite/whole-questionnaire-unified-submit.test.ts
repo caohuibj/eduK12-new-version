@@ -7,6 +7,7 @@ import {
   submitWholeQuestionnaire,
   processWholeQuestionnaireAnswers,
   readEducationWholeProgress,
+  readEducationWholeProgressWithWait,
 } from '../../modules/composite/whole-questionnaire.service'
 import { prisma } from '../../config/database'
 import { prepareCanonicalSubmission } from '../../services/instrumentFinalSubmit'
@@ -212,5 +213,50 @@ describe('Scheme X Unified Whole Questionnaire Submit & Encrypted Ingestion (PR 
 
     const normalError = new Error('ordinary error')
     expect(isWholeSubmitAdmissionBusyError(normalError)).toBe(false)
+  })
+
+  it('short-circuits readEducationWholeProgressWithWait when bound execution is already completed and returns cleanly when long-poll wait is unavailable', async () => {
+    const query = vi.spyOn(prisma, '$queryRaw')
+    try {
+      const done = await readEducationWholeProgressWithWait('attempt-done', 'owner', {
+        bound: {
+          epoch: 1,
+          parentStatus: 'COMPLETED',
+          wholeSubmissionId: 'sub-1',
+          jobStatus: 'READY',
+          executionStatus: 'COMPLETED',
+        },
+        waitMs: 4000,
+      })
+      expect(done).toEqual({
+        attemptId: 'attempt-done',
+        attemptEpoch: 1,
+        status: 'COMPLETED',
+        wholeSubmissionReceived: true,
+        runCompleted: true,
+        reportStatus: { state: 'READY' },
+      })
+      expect(query).not.toHaveBeenCalled()
+
+      query.mockResolvedValueOnce([{
+        epoch: 1,
+        parentStatus: 'IN_PROGRESS',
+        wholeSubmissionId: 'sub-2',
+        jobStatus: 'PROCESSING',
+        executionStatus: 'STARTED',
+      }])
+      const waiting = await readEducationWholeProgressWithWait('attempt-wait', 'owner', { waitMs: 4000 })
+      expect(waiting).toEqual({
+        attemptId: 'attempt-wait',
+        attemptEpoch: 1,
+        status: 'IN_PROGRESS',
+        wholeSubmissionReceived: true,
+        feedbackWaitMs: 0,
+        reportStatus: { state: 'PROCESSING' },
+      })
+      expect(query).toHaveBeenCalledOnce()
+    } finally {
+      query.mockRestore()
+    }
   })
 })

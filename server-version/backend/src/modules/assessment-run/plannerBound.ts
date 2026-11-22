@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client'
 export type PlannerBoundReadDb = {
   $queryRaw: <T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]) => Promise<T>
   $executeRaw?: (query: TemplateStringsArray | Prisma.Sql, ...values: any[]) => Promise<unknown>
-  $transaction?: <T>(fn: (tx: any) => Promise<T>) => Promise<T>
+  $transaction?: <T>(fn: (tx: any) => Promise<T>, options?: { maxWait?: number; timeout?: number }) => Promise<T>
 }
 
 /**
@@ -34,7 +34,7 @@ export async function withBoundedPlannerRead<T>(
     return db.$transaction(async tx => {
       await applyBoundedPlannerControls(tx)
       return action(tx)
-    })
+    }, { maxWait: 10_000, timeout: 15_000 })
   }
   return action(db)
 }

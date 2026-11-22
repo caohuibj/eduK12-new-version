@@ -39,7 +39,7 @@ export interface WholeQuestionnaireApi {
   wholeReceipt?: (id: string, submissionId: string, attemptEpoch: number) => Promise<ApiResponse<WholeReceiptLookup>>
   wholeDefinition: (id: string) => Promise<ApiResponse<WholeQuestionnaireDefinition>>
   submitWhole: (id: string, input: WholeQuestionnaireInput) => Promise<ApiResponse<WholeQuestionnaireReceipt>>
-  reportStatus: (id: string) => Promise<ApiResponse<CompositeReportStatus>>
+  reportStatus: (id: string, waitMs?: number) => Promise<ApiResponse<CompositeReportStatus>>
 }
 type EducationWholeMedia = {
   loadScaleImage: (itemId: string, assetId: string) => Promise<Blob>
@@ -590,7 +590,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       void (async () => {
         setBusy(true)
         try {
-          const status = await api.reportStatus(state.id)
+          const status = await api.reportStatus(state.id, 4000)
           const data = status.data
           if (status.code !== 0 || !data) throw responseError(status)
           if (data.attemptId !== state.id || data.attemptEpoch !== (state.attemptEpoch ?? 1)) throw new Error('测评版本已变化，请返回任务查看。')

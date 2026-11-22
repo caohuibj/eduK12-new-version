@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-const mockLogger = vi.hoisted(() => ({ error: vi.fn() }))
+const mockLogger = vi.hoisted(() => ({ error: vi.fn(), warn: vi.fn() }))
 vi.mock('../../utils/logger', () => ({ logger: mockLogger }))
 
 import { errorHandler } from '../../middleware/errorHandler'
@@ -48,5 +48,31 @@ describe('error handler disclosure boundary', () => {
 
     expect(res.statusCode).toBe(400)
     expect(res.body.message).toBe('请求参数无效')
+  })
+
+  it('classifies transient DB pool and interactive-transaction contention on GET reads as retryable 503 SERVICE_BUSY', () => {
+    for (const err of [
+      { code: 'P2024', message: 'Timed out fetching a new connection from the connection pool' },
+      { code: 'P2028', message: 'Unable to start a transaction in the given time' },
+      { code: 'P2010', meta: { code: '57014' }, message: 'canceling statement due to statement timeout' },
+      { code: '53300', message: 'sorry, too many clients already' },
+    ]) {
+      const res = makeRes()
+      errorHandler(err, { method: 'GET', requestId: 'req-get' } as any, res, vi.fn())
+      expect(res.statusCode).toBe(503)
+      expect(res.body).toEqual({
+        code: 'SERVICE_BUSY',
+        message: '服务繁忙，请稍后重试',
+        data: null,
+      })
+      expect(res.setHeader).toHaveBeenCalledWith('Retry-After', '1')
+    }
+  })
+
+  it('does not classify mutating POST transient DB contention as generic 503 SERVICE_BUSY', () => {
+    const res = makeRes()
+    errorHandler({ code: 'P2024', message: 'pool timeout' }, { method: 'POST', requestId: 'req-post' } as any, res, vi.fn())
+    expect(res.statusCode).toBe(500)
+    expect(res.body.message).toBe('服务器内部错误')
   })
 })

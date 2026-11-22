@@ -4,6 +4,18 @@ import { logger } from '../utils/logger'
 import { isAssessmentStartBusyError } from '../modules/composite/start-transient'
 import { isAssessmentStartResourceGateError } from '../services/assessmentResourceProtection'
 
+const TRANSIENT_READ_PRISMA_CODES = new Set(['P2024', 'P2028'])
+const TRANSIENT_READ_PG_SQLSTATES = new Set(['53300', '57014'])
+
+const isTransientReadContentionError = (err: any): boolean => {
+  const code = typeof err?.code === 'string' ? err.code : ''
+  if (TRANSIENT_READ_PRISMA_CODES.has(code) || TRANSIENT_READ_PG_SQLSTATES.has(code)) {
+    return true
+  }
+  const metaCode = typeof err?.meta?.code === 'string' ? err.meta.code : ''
+  return TRANSIENT_READ_PG_SQLSTATES.has(metaCode)
+}
+
 export const errorHandler = (err: any, req: Request & { requestId?: string }, res: Response, _next: NextFunction) => {
   // Only the shared completion boundary classifies transient DB failures.
   // Preserve its safe retry contract in routes without a local busy mapper.
@@ -25,6 +37,20 @@ export const errorHandler = (err: any, req: Request & { requestId?: string }, re
   if (err?.code === 'ASSESSMENT_RUNTIME_UNAVAILABLE' && err?.statusCode === 503) {
     res.setHeader('Retry-After', '5')
     return instrumentError(res, 'ASSESSMENT_RUNTIME_UNAVAILABLE', '测评内容暂时无法读取，作答会保留，请稍后重试。', 503)
+  }
+  // Idempotent read requests hitting transient DB pool or interactive-transaction wait
+  // contention under bursts are safely retryable as 503 SERVICE_BUSY; mutations keep their
+  // explicit route boundaries so uncertain writes are never blindly replayed.
+  if ((req.method === 'GET' || req.method === 'HEAD') && isTransientReadContentionError(err)) {
+    const log = typeof logger.warn === 'function' ? logger.warn.bind(logger) : logger.error.bind(logger)
+    log('Transient read contention error', {
+      requestId: req.requestId,
+      method: req.method,
+      code: err?.code,
+      metaCode: err?.meta?.code,
+    })
+    res.setHeader('Retry-After', '1')
+    return instrumentError(res, 'SERVICE_BUSY', '服务繁忙，请稍后重试', 503)
   }
   const rawStatusCode = Number(err?.statusCode)
   const statusCode = Number.isInteger(rawStatusCode) && rawStatusCode >= 400 && rawStatusCode < 600

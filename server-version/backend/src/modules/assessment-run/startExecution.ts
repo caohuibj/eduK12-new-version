@@ -9,6 +9,7 @@ import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { classifyStartTransaction, isAssessmentStartBusyError, AssessmentStartBusyError, rolledBackStartReason, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from '../composite/start-transient'
 import { BoundedAdmissionGate, configuredInteger } from '../../services/boundedAdmissionGate'
+import { reportForegroundGateQueueDepth } from '../../services/wholeSubmissionPriority'
 import { defaultRunStartAdmissionBound } from '../../config/databasePool'
 import { buildWholeStartPreload, startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
 import type { RunStartPreflight } from './resourceBoundary'
@@ -125,6 +126,7 @@ export const runStartGate = (): BoundedAdmissionGate => {
       retryAfterSeconds: 1,
       busyCode: 'ASSESSMENT_START_BUSY',
       busyMessage: '测评开始请求繁忙，请稍后重试',
+      onStateChange: (_active, queued) => reportForegroundGateQueueDepth('run_start_admission', queued),
     })
   }
   return runStartGateInstance

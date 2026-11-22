@@ -19,6 +19,8 @@ import {createTeacherCognitiveClient,createTeacherSituationalClient,createTeache
 import {captureEducationInlineWhole,educationAttemptIdentity,fetchEducationWholeDefinition,
  withKnownWholeTemplateQuery,type EducationInlineWholePayload} from '../modules/composite/education-whole-client'
 import type {InlineWholeDefinitionIdentity} from '../modules/composite/whole-definition-source'
+import {isTrainingBusy,runTrainingRetry,TrainingRetryCancelledError} from '../services/trainingBusyRetry'
+import {normalizeApiError} from '../utils/normalizeApiError'
 
 export type TeacherAssessmentRuntimeProps={
  api:EducationReportApi;actorKey:string;student?:boolean;
@@ -131,8 +133,17 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
     await api('/run-executions/'+encodeURIComponent(task.executionId)+'/assessment-consent/accept','POST',{})
     if(!valid())return
    }
-   const result=await api<{state:string;runtimeBindingKind?:string;runtimeBindingRef?:string;currentUnit?:CompositeAttemptState} & EducationInlineWholePayload>(
-    withKnownWholeTemplateQuery('/run-executions/'+encodeURIComponent(task.executionId)+'/start-assessment'),'POST',{delivery:'inline'})
+   let result:{state:string;runtimeBindingKind?:string;runtimeBindingRef?:string;currentUnit?:CompositeAttemptState} & EducationInlineWholePayload
+   try{
+    result=await runTrainingRetry(
+     ()=>api<{state:string;runtimeBindingKind?:string;runtimeBindingRef?:string;currentUnit?:CompositeAttemptState} & EducationInlineWholePayload>(
+      withKnownWholeTemplateQuery('/run-executions/'+encodeURIComponent(task.executionId)+'/start-assessment'),'POST',{delivery:'inline'}),
+     (cause)=>isTrainingBusy(cause,['INSTRUMENT_NOT_AVAILABLE','ASSESSMENT_START_BUSY'])
+      ? {kind:'retry',retryAfterMs:normalizeApiError(cause).retryAfterMs}
+      : {kind:'stop'},
+     {isCurrent:valid},
+    )
+   }catch(cause){if(cause instanceof TrainingRetryCancelledError)return;throw cause}
    if(!valid())return
    if(result.state==='IN_PROGRESS')throw new Error('测评正在建立，请稍后重新核对同一任务')
    if(result.state!=='STARTED'||result.runtimeBindingKind!=='COMPOSITE'||!result.runtimeBindingRef)throw new Error('当前任务尚无获授权的正式运行记录')
@@ -193,7 +204,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
   }),
   submitWhole:async(id:string,input:WholeQuestionnaireInput)=>({code:0,message:'成功',data:await api<WholeQuestionnaireReceipt>(teacherAssessmentParentPath(id)+'/whole/submit','POST',input)}),
   wholeReceipt:async(id:string,submissionId:string,attemptEpoch:number)=>({code:0,message:'成功',data:await api<WholeReceiptLookup>(teacherAssessmentParentPath(id)+'/whole/receipt?submissionId='+encodeURIComponent(submissionId)+'&attemptEpoch='+attemptEpoch)}),
-  reportStatus:async(id:string)=>({code:0,message:'成功',data:await api<CompositeReportStatus>(teacherAssessmentParentPath(id)+'/whole/progress')}),
+  reportStatus:async(id:string,waitMs?:number)=>({code:0,message:'成功',data:await api<CompositeReportStatus>(teacherAssessmentParentPath(id)+'/whole/progress'+(waitMs&&waitMs>0?'?waitMs='+Math.round(waitMs):''))}),
  }:null,[api,attempt?.id])
  const educationMedia=useMemo(()=>{
   if(!attempt)return undefined

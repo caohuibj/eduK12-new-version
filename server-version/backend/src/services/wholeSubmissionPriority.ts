@@ -126,6 +126,29 @@ export class WholeSubmissionPressure {
   }
 }
 const pressure = new WholeSubmissionPressure()
+const foregroundGateQueues = new Map<string, number>()
+let foregroundQueuedTotal = 0
+export const resetForegroundGatePressureForTests = (): void => {
+  foregroundGateQueues.clear()
+  foregroundQueuedTotal = 0
+}
+/** Feed foreground login / START admission gate queue depth into the existing
+ * coalesced worker-yield hint so background report jobs step aside when
+ * interactive login or assessment START requests are queueing on the same host. */
+export const reportForegroundGateQueueDepth = (gateName: string, queued: number): void => {
+  if (!enabled()) return
+  const next = Number.isSafeInteger(queued) && queued > 0 ? queued : 0
+  const prev = foregroundGateQueues.get(gateName) ?? 0
+  if (prev === next) return
+  const wasQueued = foregroundQueuedTotal > 0
+  if (next === 0) foregroundGateQueues.delete(gateName)
+  else foregroundGateQueues.set(gateName, next)
+  foregroundQueuedTotal = Math.max(0, foregroundQueuedTotal - prev + next)
+  const isQueued = foregroundQueuedTotal > 0
+  if (wasQueued !== isQueued || (isQueued && !lastBusyPublished)) {
+    schedulePressure(isQueued ? 0 : COALESCE_MS)
+  }
+}
 export const anonymousWholeSubmitQueued = (): boolean => (
   enabled() && pressure.hasAnonymous && wholeSubmitAdmission.getStats().queued > 0
 )
@@ -141,7 +164,7 @@ const emitPressure = async (): Promise<void> => {
   publishTimer = null; scheduledAt = Infinity
   if (!enabled() || publishing) return
   const lagMs = runtimeEventLoopDelayMs()
-  const queued = anonymousWholeSubmitQueued()
+  const queued = anonymousWholeSubmitQueued() || foregroundQueuedTotal > 0
   const state = pressure.snapshot(lagMs, queued)
   // No per-submission Redis operation for the normal single-person path.
   // A quiet hint is needed only to clear a previously published busy hint.
@@ -150,7 +173,7 @@ const emitPressure = async (): Promise<void> => {
   try { await publishReportSchedulingHint(JSON.stringify({ v: 1, kind: 'pressure', source, seq: ++sequence, ...state, lagMs, queued })) }
   finally {
     publishing = false
-    if (enabled() && (pressure.active > 0 || state.busy)) schedulePressure()
+    if (enabled() && (pressure.active > 0 || foregroundQueuedTotal > 0 || state.busy)) schedulePressure()
   }
 }
 const schedulePressure = (delay = COALESCE_MS): void => {

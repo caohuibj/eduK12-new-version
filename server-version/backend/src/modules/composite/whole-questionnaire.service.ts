@@ -9,6 +9,13 @@ import { withSharedControlContext, storeSharedWholeValidation, loadSharedWholeVa
 import { compactAssessmentStorageEnabled } from '../assessment-runtime/compact-field-codec'
 import { packWholeRawEnvelope, unpackWholeRawEnvelope } from '../assessment-runtime/compact-raw'
 import { rememberWholeReportFeedbackHint, readWholeReportFeedbackHint, type ReportFeedbackProfile } from '../../services/reportFeedbackHints'
+import {
+  beginReportReadyWait,
+  prepareReportReadyNotifications,
+  REPORT_READY_MAX_WAIT_MS,
+  reportReadyNotificationSequence,
+  reportReadyWaitAvailable,
+} from '../../services/reportReadyNotifications'
 import { markAssessmentTimeline, assessmentTimelineSpan, traceAssessmentPhase, traceAssessmentPhaseSync } from '../../services/runtimeObservability'
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
@@ -92,10 +99,11 @@ export const wholeReportParentSelect = {
   formAnswers: { select: { itemId: true, value: true } },
   compositeAssessment: { select: {
     id: true, name: true, createdBy:true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
+    status: true, updatedAt: true, creationKey: true, trainingFeedbackPolicyHash: true,
     publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,
     reportPackageVersion: true, reportPackageProfile: true, reportPackageSnapshotEncrypted: true,
     items: { orderBy: { position: 'asc' }, include: {
-      scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true } },
+      scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, status: true, instruction: true } },
     } },
     formSections: { orderBy: { position: 'asc' }, select: {
       id: true, title: true, description: true, position: true, contextSection: true,
@@ -107,6 +115,143 @@ export const wholeReportParentSelect = {
   } },
 } satisfies Prisma.CompositeAssessmentAttemptSelect
 type WholeReportParent = Prisma.CompositeAssessmentAttemptGetPayload<{ select: typeof wholeReportParentSelect }>
+
+const {
+  compositeAttempt: _omitChildParentForWorker,
+  scale: _omitChildScaleForWorker,
+  ...workerScaleChildCoreSelect
+} = UNIFIED_SCALE_CHILD_ADMISSION_SELECT
+
+const workerSlimReportParentSelect = {
+  ...REPORT_PARENT_SELECT,
+  userId: true,
+  recoveryTokenHash: true,
+  trainingTimingSnapshot: true,
+  participantKey: true,
+  trainingVariantAllocationEncrypted: true,
+  trainingFlowSnapshotEncrypted: true,
+  trainingFlowSnapshotHash: true,
+  trainingFlowPathEncrypted: true,
+  trainingFlowPathHash: true,
+  trainingVariantAllocationHash: true,
+  contextSnapshotEncrypted: true,
+  frozenActiveSlotSetEncrypted: true,
+  anonymousCode: true,
+  totalTime: true,
+  startedAt: true,
+  compositeAssessmentId: true,
+  trainingContentBinding: true,
+  trainingContentBindingHash: true,
+  trainingReferenceBinding: true,
+  trainingReferenceBindingHash: true,
+  trainingContentInterpretationEncrypted: true,
+  trainingContentInterpretationHash: true,
+  completedItems: true,
+  compiledBundleRuntimeHash: true,
+  compositeAssessment: { select: { id: true, status: true, updatedAt: true, publishedAt: true } },
+  scaleAssessments: { select: workerScaleChildCoreSelect },
+} as const
+
+type CachedWorkerComposite = {
+  compositeAssessment: WholeReportParent['compositeAssessment']
+  scaleById: Map<string, NonNullable<WholeReportParent['scaleAssessments'][number]['scale']>>
+}
+const workerPublishedCompositeCache = new BoundedArtifactCache<CachedWorkerComposite>(64, 4 * 1024 * 1024)
+let workerPublishedCompositeCacheHasEntries = false
+const workerCompositeCacheKey = (id: string, updatedAt: Date): string => `${id}:${updatedAt.getTime()}`
+
+const hydrateWorkerScaleChildren = (parent: any, scaleById: Map<string, any>) => {
+  const compositeAttemptRef = {
+    id: parent.id,
+    status: parent.status,
+    assignmentRef: parent.assignmentRef,
+    respondentType: parent.respondentType,
+    asyncReportEpoch: parent.asyncReportEpoch,
+    trainingFeedbackSnapshotHash: parent.trainingFeedbackSnapshotHash ?? null,
+    trainingVariantAllocationHash: parent.trainingVariantAllocationHash,
+    trainingFlowSnapshotHash: parent.trainingFlowSnapshotHash,
+    compositeAssessment: parent.compositeAssessment,
+  }
+  const hydrated = []
+  for (const child of parent.scaleAssessments ?? []) {
+    const scale = child.scale ?? scaleById.get(child.scaleId)
+    if (!scale) return null
+    hydrated.push({
+      ...child,
+      scale,
+      compositeAttempt: child.compositeAttempt ?? compositeAttemptRef,
+    })
+  }
+  return hydrated
+}
+
+const loadWorkerReportParent = async (attemptId: string, hasFormAnswers: boolean): Promise<WholeReportParent | null> => {
+  if (!hasFormAnswers && workerPublishedCompositeCacheHasEntries) {
+    const slim = await prisma.compositeAssessmentAttempt.findUnique({
+      where: { id: attemptId },
+      select: workerSlimReportParentSelect,
+    }) as any
+    if (!slim) return null
+    // Guard against partial test mocks that already returned a full parent shape.
+    if (Array.isArray(slim.compositeAssessment?.items)) return slim as WholeReportParent
+    const comp = slim.compositeAssessment
+    if (comp?.id && comp.status === 'PUBLISHED' && comp.publishedAt && comp.updatedAt instanceof Date) {
+      const cached = workerPublishedCompositeCache.get(workerCompositeCacheKey(comp.id, comp.updatedAt))
+      if (cached) {
+        const merged = {
+          ...slim,
+          compositeAssessment: cached.compositeAssessment,
+          formSectionAttempts: [],
+          formAnswers: [],
+        }
+        const scaleAssessments = hydrateWorkerScaleChildren(merged, cached.scaleById)
+        if (scaleAssessments) {
+          return { ...merged, scaleAssessments } as WholeReportParent
+        }
+      }
+    }
+  }
+  const full = await prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId },
+    select: {
+      ...wholeReportParentSelect,
+      scaleAssessments: {
+        select: {
+          ...workerScaleChildCoreSelect,
+          scale: { select: { ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT.scale.select, instruction: true } },
+        },
+      },
+    },
+  }) as any
+  if (!full) return null
+  const scaleById = new Map<string, any>()
+  for (const child of full.scaleAssessments ?? []) {
+    if (child.scale?.id) scaleById.set(child.scale.id, child.scale)
+  }
+  for (const item of full.compositeAssessment?.items ?? []) {
+    if (item.scale?.id && !scaleById.has(item.scale.id)) scaleById.set(item.scale.id, item.scale)
+  }
+  const comp = full.compositeAssessment
+  if (
+    comp?.id
+    && comp.status === 'PUBLISHED'
+    && comp.publishedAt
+    && comp.updatedAt instanceof Date
+    && (comp.formSections?.length ?? 0) === 0
+    && (comp.items?.length ?? 0) > 0
+    && comp.items.every((item: any) => item.type === 'SCALE' && item.scale && item.scale.status === 'PUBLISHED')
+    && comp.reportPackageKey == null
+    && comp.analysisProtocolKey == null
+  ) {
+    const key = workerCompositeCacheKey(comp.id, comp.updatedAt)
+    if (!workerPublishedCompositeCache.get(key)) {
+      workerPublishedCompositeCache.set(key, { compositeAssessment: comp, scaleById }, 16_384)
+      workerPublishedCompositeCacheHasEntries = true
+    }
+  }
+  const hydrated = hydrateWorkerScaleChildren(full, scaleById)
+  return (hydrated ? { ...full, scaleAssessments: hydrated } : full) as WholeReportParent
+}
 
 /** Keep the verified full publication in the internal committed carrier. Each
  * later shallow copy can then revalidate allocation/union identity rather than
@@ -191,6 +336,8 @@ export const clearWholeValidationRulesForTest = () => {
   if (process.env.NODE_ENV !== 'test') throw new Error('Test-only rule-cache reset')
   wholeRules.clear(); wholeRulesBytes = 0
   verifiedWholeValidationHashes.clear()
+  workerPublishedCompositeCache.clear()
+  workerPublishedCompositeCacheHasEntries = false
 }
 const ensureWholeRules = async (attemptId: string, principal: Principal, manifest: WholeValidationManifest,
   verifiedParent?: Awaited<ReturnType<typeof loadParent>>): Promise<WholeRules[]> => {
@@ -1035,15 +1182,17 @@ export async function submitWholeQuestionnaire(attemptId: string, submission: Wh
 export const readEducationWholeProgress = async (attemptId: string, userId: string, executionStatus?: string) => {
   const [progress] = await prisma.$queryRaw<EducationWholeProgressRow[]>`
     SELECT parent.attempt_epoch AS epoch, parent.status AS "parentStatus", parent.receipt_only AS "receiptOnly",
-      job.whole_submission_id AS "wholeSubmissionId", job.status AS "jobStatus"
+      job.whole_submission_id AS "wholeSubmissionId", job.status AS "jobStatus",
+      exec.status AS "executionStatus"
     FROM composite_assessment_attempts parent
     JOIN composite_assessments publication ON publication.id=parent.composite_assessment_id
     LEFT JOIN composite_report_jobs job ON job.attempt_id=parent.id AND job.attempt_epoch=parent.attempt_epoch
+    LEFT JOIN assessment_run_executions exec ON exec.runtime_binding_kind='COMPOSITE' AND exec.runtime_binding_ref=parent.id
     WHERE parent.id=${attemptId} AND parent.user_id=${userId} AND parent.assignment_ref<>''
       AND publication.product_kind='ORGANIZATION_RESOURCE'
   `
   if (!progress) throw failure('无权限操作此问卷', 403)
-  return educationWholeProgressFromRow(attemptId, progress, executionStatus)
+  return educationWholeProgressFromRow(attemptId, progress, executionStatus ?? progress.executionStatus ?? undefined)
 }
 
 type EducationWholeProgressRow = {
@@ -1052,6 +1201,7 @@ type EducationWholeProgressRow = {
   parentStatus: WholeSubmissionHeader['status']
   wholeSubmissionId: string | null
   jobStatus: CompositeReportJob['status'] | null
+  executionStatus?: string | null
 }
 
 export function educationWholeProgressFromRow(attemptId: string, progress: EducationWholeProgressRow, executionStatus?: string) {
@@ -1059,12 +1209,60 @@ export function educationWholeProgressFromRow(attemptId: string, progress: Educa
   // Use the authorized execution snapshot even if the worker advances during this read.
   const awaitingRun = executionStatus === 'STARTED' && progress.parentStatus === 'COMPLETED' && Boolean(progress.wholeSubmissionId)
   const terminalFailure = progress.jobStatus === 'FAILED' || progress.jobStatus === 'CANCELLED' ? progress.jobStatus : undefined
+  const waitEnabled = !progress.receiptOnly && Boolean(progress.wholeSubmissionId) && reportReadyWaitAvailable()
   return {
     ...(progress.receiptOnly ? { receiptOnly: true as const } : {}),
+    ...(waitEnabled ? { feedbackWaitMs: REPORT_READY_MAX_WAIT_MS } : {}),
     attemptId, attemptEpoch: progress.epoch, status: awaitingRun ? 'IN_PROGRESS' : progress.parentStatus,
     wholeSubmissionReceived: Boolean(progress.wholeSubmissionId),
     ...(executionStatus === 'COMPLETED' && progress.parentStatus === 'COMPLETED' ? { runCompleted: true as const } : {}),
     reportStatus: { state: awaitingRun ? terminalFailure ?? 'PROCESSING' : progress.parentStatus === 'COMPLETED' ? 'READY' : progress.jobStatus ?? 'WAITING' },
+  }
+}
+
+const isEducationProgressPending = (status: ReturnType<typeof educationWholeProgressFromRow>): boolean => (
+  !status.receiptOnly
+  && status.wholeSubmissionReceived
+  && (status.status !== 'COMPLETED' || ['PENDING', 'PROCESSING'].includes(status.reportStatus.state))
+  && !['FAILED', 'CANCELLED'].includes(status.reportStatus.state)
+)
+
+/** Optional Redis Pub/Sub long-poll alignment for School/Teacher /whole/progress.
+ * Captures the notification sequence before the authoritative pre-wait read so
+ * a worker READY commit between middleware and subscription can never be lost. */
+export const readEducationWholeProgressWithWait = async (
+  attemptId: string,
+  userId: string,
+  options: {
+    bound?: EducationWholeProgressRow & { executionStatus?: string }
+    executionStatus?: string
+    waitMs?: number
+    signal?: AbortSignal
+  } = {},
+) => {
+  const waitMs = Number.isFinite(options.waitMs) && (options.waitMs ?? 0) > 0 ? options.waitMs! : 0
+  if (waitMs <= 0) {
+    return options.bound
+      ? educationWholeProgressFromRow(attemptId, options.bound, options.bound.executionStatus)
+      : readEducationWholeProgress(attemptId, userId, options.executionStatus)
+  }
+  if (options.bound) {
+    const initial = educationWholeProgressFromRow(attemptId, options.bound, options.bound.executionStatus)
+    if (!isEducationProgressPending(initial)) return initial
+  }
+  await prepareReportReadyNotifications()
+  const sequence = reportReadyNotificationSequence()
+  const current = await readEducationWholeProgress(attemptId, userId)
+  if (!isEducationProgressPending(current)) return current
+  const wait = beginReportReadyWait(attemptId, current.attemptEpoch, waitMs, options.signal, sequence)
+  if (!wait) return { ...current, feedbackWaitMs: 0 }
+  try {
+    const result = await wait.done
+    if (options.signal?.aborted) return current
+    const refreshed = await readEducationWholeProgress(attemptId, userId)
+    return result === 'unavailable' ? { ...refreshed, feedbackWaitMs: 0 } : refreshed
+  } finally {
+    wait.cancel()
   }
 }
 
@@ -1105,10 +1303,9 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
     : envelope.respondentUserId ? { userId: envelope.respondentUserId }
     : { recoveryTokenHash: envelope.recoveryTokenHash ?? undefined }
   const reuseCommitted = process.env.ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED !== 'false'
+  const hasFormAnswers = Boolean(envelope.formAnswers && envelope.formAnswers.length > 0)
   const { parent, children, frozen, reportParent } = await traceAssessmentPhase('report.frozen_context_load', async () => {
-    const reportParent = reuseCommitted ? await prisma.compositeAssessmentAttempt.findUnique({
-      where: { id: job.attemptId }, select: wholeReportParentSelect,
-    }) : undefined
+    const reportParent = reuseCommitted ? await loadWorkerReportParent(job.attemptId, hasFormAnswers) : undefined
     const loaded = await loadParent(job.attemptId, principal, reportParent ?? undefined, execution.studyReceipt)
     return { ...loaded, reportParent: reportParent ?? undefined }
   })

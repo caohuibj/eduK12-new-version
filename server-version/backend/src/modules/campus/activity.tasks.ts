@@ -301,7 +301,11 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
       db: client,
     })
     return { activityRows, linkedRuns, assignments, checkins, assigned }
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead })
+  }, {
+    isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead,
+    maxWait: 10_000,
+    timeout: 15_000,
+  })
   const authorized=activityRows
   const ids=authorized.map(a=>a.courseId)
   if(!ids.length)return {list:[],total:0,page:input.page,hasMore:false,truncated:activityRows.length>200,nextRunCursor:null as RunTaskCursor|null}
