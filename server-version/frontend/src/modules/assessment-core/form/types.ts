@@ -28,7 +28,7 @@ export type ProfessionalQuestion={
 }
 
 export type FormChoiceExtrasQuestion={
-  itemKey:string;type:string;otherOptionKey?:string;otherMaxLength?:number;
+  itemKey:string;type:string;prompt?:string;otherOptionKey?:string;otherMaxLength?:number;
   exclusiveOptionKeys?:string[];options:{optionKey:string;label:string}[]
 }
 

@@ -210,7 +210,7 @@ describe('C06 policy controls',()=>{
  })
  it('edits selected other text through a separate typed side field',()=>{
   const other=vi.fn();render(<FormPlayer item={item} options={q.options.map(o=>({value:o.optionKey,label:o.label}))} value={['other']} onChange={vi.fn()} otherText="先前文本" onOtherTextChange={other} {...navigationProps}/>)
-  fireEvent.change(screen.getByLabelText('其他填写：q_v3'),{target:{value:'补充'}});expect(other).toHaveBeenCalledWith('补充')
+  fireEvent.change(screen.getByLabelText('其他填写：选择'),{target:{value:'补充'}});expect(other).toHaveBeenCalledWith('补充')
  })
 })
 
