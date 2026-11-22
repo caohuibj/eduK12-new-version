@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # Small dispatcher over the operator's existing Compose entry. Default: plan only.
 set -euo pipefail
-apply=false; entry=; live=; next=; rollback=; ops=; roles=; grace=60; data_action=preflight
+apply=false; entry=; live=; next=; rollback=; ops=; roles=; grace=60; data_action=preflight; baseline=; image_proof=; revision=; producer_run=
 usage() {
   cat <<'EOF'
 update.sh [--apply] frontend|service|content|full --entry COMPOSE_ENTRY
   [--live-profile JSON --next-profile JSON --rollback-profile UNUSED_PATH]
   [--ops-overlay FILE] [--role-sync EXECUTABLE] [--stop-timeout SECONDS]
   [--data-action reuse|preflight|backfill] # full only; default: preflight
+  [--baseline-profile JSON --release-images JSON --release-revision SHA --release-run RUN] # unchanged full release
   -- [application service names | existing npm script and its arguments]
 Default is a non-mutating command plan. Images must already be qualified/preloaded.
 frontend: frontend only; service: explicit application services, no migration.
@@ -21,11 +22,12 @@ while (($#)); do
   case "$1" in
     frontend|service|content|full) [[ -z "$mode" ]] || die 'One mode required'; mode=$1; shift ;;
     --apply) apply=true; shift ;;
-    --entry|--live-profile|--next-profile|--rollback-profile|--ops-overlay|--role-sync|--stop-timeout|--data-action)
+    --entry|--live-profile|--next-profile|--rollback-profile|--ops-overlay|--role-sync|--stop-timeout|--data-action|--baseline-profile|--release-images|--release-revision|--release-run)
       (($# >= 2)) || die "Missing value for $1"
       case "$1" in
         --entry) entry=$2;; --live-profile) live=$2;; --next-profile) next=$2;;
         --rollback-profile) rollback=$2;; --ops-overlay) ops=$2;; --role-sync) roles=$2;; --stop-timeout) grace=$2;; --data-action) data_action=$2;;
+        --baseline-profile) baseline=$2;; --release-images) image_proof=$2;; --release-revision) revision=$2;; --release-run) producer_run=$2;;
       esac; shift 2 ;;
     --) shift; break;;
     -h|--help) usage; exit 0;;
@@ -60,6 +62,10 @@ done
 [[ "$live" = /* && "$next" = /* && "$rollback" = /* && "$live" != "$next" && "$live" != "$rollback" && "$next" != "$rollback" ]] || die 'Use three distinct absolute profile paths'
 [[ ! -e "$rollback" ]] || die 'Rollback profile already exists; choose an unused path'
 [[ "$mode" != full || ( -n "$ops" && -n "$roles" && "$roles" = /* ) ]] || die 'full requires --ops-overlay and the prepared --role-sync executable'
+if [[ -n "$baseline$image_proof$revision$producer_run" ]]; then
+  [[ "$mode" = full && "$baseline" = /* && "$image_proof" = /* && "$revision" =~ ^[a-f0-9]{40}$ && "$producer_run" =~ ^[1-9][0-9]*$ ]] || die 'Full unchanged-profile mode requires baseline, image proof and exact revision'
+  cmp -s "$live" "$baseline" || die 'Live profile no longer matches the captured baseline'
+fi
 # Actual site profiles are JSON Compose documents. Never resolve or print .env.
 # Small updates may change only selected image fields, preserving topology/config.
 images=$(python3 - "$mode" "$live" "$next" "${services[@]}" <<'PY'
@@ -101,10 +107,15 @@ if [[ "$mode" = full ]]; then
   # mounted read-only into the migrate container alongside the next
   # profile. Like the index check, a failure aborts before the stop.
   preflight_script="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)/prelaunch-resource-preflight.mjs"
+  check_mounts=(); check_args=()
+  if [[ -n "$baseline" ]]; then
+    check_mounts=(-v "$baseline:/tmp/baseline-profile.json:ro" -v "$image_proof:/tmp/release-images.json:ro")
+    check_args=(--baseline-json /tmp/baseline-profile.json --images-json /tmp/release-images.json --release-revision "$revision" --release-run "$producer_run")
+  fi
   run "$entry" -f "$ops" --profile ops run --rm --no-deps \
     -v "$preflight_script:/tmp/prelaunch-resource-preflight.mjs:ro" \
-    -v "$next:/tmp/next-profile.json:ro" \
-    migrate node /tmp/prelaunch-resource-preflight.mjs --compose-json /tmp/next-profile.json
+    -v "$next:/tmp/next-profile.json:ro" "${check_mounts[@]}" \
+    migrate node /tmp/prelaunch-resource-preflight.mjs --compose-json /tmp/next-profile.json "${check_args[@]}"
 fi
 if [[ "$mode" != frontend ]]; then run "$entry" stop -t "$grace" "${services[@]}"; fi
 if [[ "$mode" = full ]]; then

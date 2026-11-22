@@ -163,3 +163,45 @@ test('rejects DATABASE_URL vs Prisma env pool mismatches and trickle maxConcurre
  assert.equal(replicaReport.services['backend-2'].prismaPool,10)
  assert.equal(replicaReport.maximumConfiguredAppConnections,28)
 })
+
+test('unchanged production mode retains the complete baseline while reporting existing budgets',async()=>{
+ const {inspectUnchangedProductionRelease}=await import('./prelaunch-resource-preflight.mjs')
+ const baseline=fixture()
+ baseline.services.backend.cpus=2
+ baseline.services.backend.environment.UNIT_SUBMIT_ADMISSION_LIMIT='9'
+ baseline.services.backend.environment.QUESTIONNAIRE_COMPLETION_ADMISSION_LIMIT='8'
+ delete baseline.services.backend.environment.AGGREGATE_FINALIZATION_ADMISSION_LIMIT
+ baseline.services['backend-2']=structuredClone(baseline.services.backend)
+ baseline.services['backend-2'].ports=[{host_ip:'127.0.0.1'}]
+ baseline.services['report-worker-2']={cpus:0.6,mem_limit:402653184}
+ for(const name of ['backend','backend-2','worker','report-worker-2','frontend'])baseline.services[name].labels={}
+ const images={backend:{runtimeImageId:'sha256:'+'a'.repeat(64)},frontend:{runtimeImageId:'sha256:'+'b'.repeat(64)}}
+ const revision='c'.repeat(40),producerRun='44962011172'
+ const candidate=structuredClone(baseline)
+ for(const name of ['backend','backend-2','worker','report-worker-2','frontend']) {
+  const service=candidate.services[name]
+  service.image=images[name==='frontend'?'frontend':'backend'].runtimeImageId
+  Object.assign(service.labels,{'org.opencontainers.image.revision':revision,'io.eduk12.release.source':revision,'io.eduk12.release.producer.run':producerRun})
+ }
+ const options={images,revision,producerRun}
+ const result=inspectUnchangedProductionRelease(candidate,baseline,options)
+ assert.equal(result.baselinePreserved,true)
+ assert.equal(result.finalGateConcurrencyTotal,25)
+ assert.ok(result.totalCpu>4)
+ assert.equal(result.reportWorker2.cpus,0.6)
+ assert.equal(result.capacityCertified,false)
+ for(const mutate of [
+  f=>f.services.backend.environment.UNIT_SUBMIT_ADMISSION_LIMIT='10',
+  f=>f.services['backend-2'].cpus=3,
+  f=>f.services['report-worker-2'].mem_limit=999999999,
+  f=>f.services.frontend.image='sha256:'+'d'.repeat(64),
+  f=>f.services.backend.labels['io.eduk12.release.producer.run']='123',
+ ]) {
+  const changed=structuredClone(candidate);mutate(changed)
+  assert.throws(()=>inspectUnchangedProductionRelease(changed,baseline,options))
+ }
+ const unsafeBaseline=structuredClone(baseline),unsafeCandidate=structuredClone(candidate)
+ unsafeBaseline.services['backend-2'].ports[0].host_ip='0.0.0.0'
+ unsafeCandidate.services['backend-2'].ports[0].host_ip='0.0.0.0'
+ assert.throws(()=>inspectUnchangedProductionRelease(unsafeCandidate,unsafeBaseline,options),/Public host exposure/)
+})
