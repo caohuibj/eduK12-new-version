@@ -107,4 +107,21 @@ describe('coalesced pressure transport', () => {
     await sleep(350)
     expect(JSON.parse(h.publish.mock.calls.at(-1)![0])).toMatchObject({ busy: false, queued: false })
   })
+
+  it('bounds worker yield under continuous foreground queuing and fails open when Redis hints expire', async () => {
+    const { ReportClaimPriority } = await import('../../services/wholeSubmissionPriority')
+    let clock = 1000
+    const priority = new ReportClaimPriority(() => clock, false, 750)
+    const src = 'a'.repeat(32)
+    priority.receive(JSON.stringify({ v: 1, kind: 'pressure', source: src, seq: 1, active: 0, busy: true, lagMs: 10, queued: true }))
+    // Initial burst yields briefly (bounded to 750ms)
+    expect(priority.decision(3)).toMatchObject({ mode: 'yield', limit: 0 })
+    // After maxYieldMs=750ms, continuous queuing must keep at least 1 worker slot running (no starvation)
+    clock += 800
+    priority.receive(JSON.stringify({ v: 1, kind: 'pressure', source: src, seq: 2, active: 0, busy: true, lagMs: 10, queued: true }))
+    expect(priority.decision(3)).toMatchObject({ mode: 'minimum', limit: 1 })
+    // If Redis goes silent / drops, hint expires after TTL_MS (1500ms) and fails open to full concurrency
+    clock += 1600
+    expect(priority.decision(3)).toMatchObject({ mode: 'normal', limit: 3 })
+  })
 })

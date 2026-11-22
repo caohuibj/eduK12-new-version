@@ -827,6 +827,7 @@ export const activateScaleAdmission = async (
   row: ScaleAdmissionChildRow,
   parent?: CompositeScaleAdmissionParent,
   referenceTimeMs = Date.now(),
+  preloadedRuntime?: VersionedFrozenScaleRuntimeSnapshot,
 ): Promise<VersionedFrozenUnitAdmission> => {
   parent = await assertTrainingChildSelected(row, { parent }) ?? parent
   if((parent?.compositeAssessment as {creationKey?:string}|undefined)?.creationKey?.endsWith(':TEACHER:EXPERT_REPORT:2.0.0')
@@ -836,7 +837,7 @@ export const activateScaleAdmission = async (
     await currentFieldComposition(prisma,{attemptId:row.compositeAttemptId,actorUserId:row.userId})
   }
   const stored = await loadStoredScaleAdmission(row)
-  if (stored) return (await validateStoredAgainstRuntime(row, stored, referenceTimeMs))
+  if (stored) return (await validateStoredAgainstRuntime(row, stored, referenceTimeMs, undefined, preloadedRuntime))
   assertFinalOnly(row.deliveryMode)
   // First delivery must lock before the collection guard takes a shared child
   // lock. Two V1 readers otherwise deadlock upgrading those locks to persist

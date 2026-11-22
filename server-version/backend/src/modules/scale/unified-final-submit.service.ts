@@ -232,12 +232,13 @@ export const assertUnifiedScaleDelivery = async (input: UnifiedScaleFinalSubmitI
 
 export const prepareUnifiedScaleFinalSubmission = async (
   input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, referenceTimeMs = Date.now(), receipt?:AcceptedStudyReceipt,
+  preloadedRuntime?: VersionedFrozenScaleRuntimeSnapshot,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  const admission = await measureRequestPhase('final_submit_admission', () => activateScaleAdmission(child, undefined, referenceTimeMs))
+  const admission = await measureRequestPhase('final_submit_admission', () => activateScaleAdmission(child, undefined, referenceTimeMs, preloadedRuntime))
   await assertFrozenAdmission(child, admission, input, receipt)
   const snapshot = (await measureRequestPhase('final_submit_definition_prepare', async () => {
-    const parsed = (await loadScaleAdmissionRuntime(child))
+    const parsed = preloadedRuntime ?? (await loadScaleAdmissionRuntime(child))
     assertRuntimeAgainstAdmission(child, admission, parsed, input)
     return parsed
   }))
@@ -527,7 +528,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
  */
 export const submitUnifiedScaleCollectionBatch = async (
   job: CompositeReportJob,
-  units: Array<{ input: UnifiedScaleFinalSubmitInput; child: ScaleAdmissionChildRow }>,
+  units: Array<{ input: UnifiedScaleFinalSubmitInput; child: ScaleAdmissionChildRow; runtime?: VersionedFrozenScaleRuntimeSnapshot }>,
   execution: WholeReceiptExecution, referenceDb: FrozenReferenceDb,
   options?: { skipCollectionGuard?: boolean },
 ) => {
@@ -538,9 +539,9 @@ export const submitUnifiedScaleCollectionBatch = async (
     data: Awaited<ReturnType<typeof prepareUnifiedScaleFinalSubmission>>;
     write: Awaited<ReturnType<typeof prepareUnifiedScaleWrite>> | null;
   }> = []
-  const prepareUnits = async () => { for (const { input, child } of units) {
+  const prepareUnits = async () => { for (const { input, child, runtime } of units) {
     const data = await traceAssessmentPhase('report.prepare.final_submission',
-      () => prepareUnifiedScaleFinalSubmission(input, child, execution.acceptedAtMs, execution.studyReceipt), child.id)
+      () => prepareUnifiedScaleFinalSubmission(input, child, execution.acceptedAtMs, execution.studyReceipt, runtime), child.id)
     if (child.compositeAttemptId !== job.attemptId || input.compositeAttemptId !== job.attemptId
       || child.questionnaireAssessmentId || input.assessmentId !== child.id || !data.admission.parent?.slotKey
       || !data.snapshot.compiledRuntime.runtimeCapabilities.aggregateEligible)

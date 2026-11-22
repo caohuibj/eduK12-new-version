@@ -163,10 +163,13 @@ export const createPasswordVerificationPool = (options: PoolOptions) => {
 export type PasswordVerificationPool = ReturnType<typeof createPasswordVerificationPool>
 let defaultPool: PasswordVerificationPool | undefined
 
-/** Default 4 workers outside tests; set LOGIN_PASSWORD_WORKERS=0 to opt out.
- * This changes scheduling only, not bcryptjs algorithm, cost or existing hashes. */
+/** Default 0 outside explicit opt-in: @node-rs/bcrypt already executes
+ * natively on libuv's thread pool off the event loop, so spawning 4 extra V8
+ * worker_threads isolates per API process wastes ~40-58 MiB of resident RAM
+ * without improving concurrency (bounded by loginPasswordVerificationAdmission).
+ * Set LOGIN_PASSWORD_WORKERS=1..32 to opt into dedicated worker_threads. */
 export const passwordVerificationPool = (): PasswordVerificationPool | undefined => {
-  const raw = process.env.LOGIN_PASSWORD_WORKERS ?? (process.env.NODE_ENV === 'test' ? '0' : '4')
+  const raw = process.env.LOGIN_PASSWORD_WORKERS ?? '0'
   if (!/^(?:[0-9]|[12][0-9]|3[0-2])$/.test(raw)) throw new Error('Invalid LOGIN_PASSWORD_WORKERS')
   const size = Number(raw)
   if (size === 0) return undefined

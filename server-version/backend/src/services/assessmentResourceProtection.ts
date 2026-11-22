@@ -227,6 +227,9 @@ export class AssessmentResourceProtection {
     const spread = this.cpuRejectSequence++ % 4
     return Math.min(30, baseSeconds * 3 + spread)
   }
+  nextLowMemoryCpuRetrySpread(): number {
+    return this.cpuRejectSequence++ % 3
+  }
   decision(value: AssessmentResourceSample, concurrency: number, now = performance.now()): ResourceClaimDecision {
     this.syncSampleState(value)
     if (now - value.at > 5000 || value.availableBytes === null) return { mode: 'limited', limit: Math.min(1, concurrency), delayMs: 0, reason: 'observation_unavailable' }
@@ -280,12 +283,36 @@ let trickleGateCache: {
 const lowMemoryTrickleContext = new AsyncLocalStorage<{ active: boolean }>()
 const admittedScaleComposition = new AsyncLocalStorage<{ active: boolean }>()
 
-const buildStartResourceError = (retryHint: 'memory' | 'cpu'): InstrumentFinalSubmitError => {
+const configuredLowMemoryCpuRetryAfterSeconds = (config?: LowMemoryTrickleConfig): number => {
+  const explicit = process.env.ASSESSMENT_START_LOW_MEMORY_CPU_RETRY_AFTER_SECONDS
+  if (explicit !== undefined && explicit !== '') {
+    const base = configuredBoundedInteger('ASSESSMENT_START_LOW_MEMORY_CPU_RETRY_AFTER_SECONDS', 2, 1, 30)
+    return Math.min(30, base + policy.nextLowMemoryCpuRetrySpread())
+  }
+  // On tuned low-memory trickle hosts (floorMiB < 650 with explicit CPU retry budget),
+  // transient CPU spikes above maxCpuPercent while MemAvailable >= floorMiB use a short
+  // staggered retry (2-4s) instead of a synchronized 10s thundering-herd sleep.
+  // Hard memory rejections (< floorMiB / latched) always retain HOST_MEMORY_RETRY_AFTER_SECONDS.
+  if (config && config.floorMiB < 650 && process.env.ASSESSMENT_HOST_CPU_RETRY_AFTER_SECONDS !== undefined) {
+    const cpuBase = configuredInteger('ASSESSMENT_HOST_CPU_RETRY_AFTER_SECONDS', HOST_CPU_RETRY_AFTER_SECONDS)
+    const base = Math.max(2, cpuBase)
+    return Math.min(HOST_MEMORY_RETRY_AFTER_SECONDS, base + policy.nextLowMemoryCpuRetrySpread())
+  }
+  return HOST_MEMORY_RETRY_AFTER_SECONDS
+}
+
+const buildStartResourceError = (
+  retryHint: 'memory' | 'cpu',
+  reason?: StartAdmissionDecision['reason'] | 'trickle_queue_busy',
+  config?: LowMemoryTrickleConfig,
+): InstrumentFinalSubmitError => {
   const err = new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '系统繁忙，请稍后开始测评；已经提交的答案不受影响。', 503)
   ;(err as { preferredRetryAfterSeconds?: number }).preferredRetryAfterSeconds =
     retryHint === 'cpu'
       ? policy.recommendedCpuRetryAfterSeconds(HOST_CPU_RETRY_AFTER_SECONDS)
-      : HOST_MEMORY_RETRY_AFTER_SECONDS
+      : (reason === 'low_memory_cpu_busy' || reason === 'trickle_queue_busy' || reason === 'host_cpu')
+        ? configuredLowMemoryCpuRetryAfterSeconds(config)
+        : HOST_MEMORY_RETRY_AFTER_SECONDS
   return err
 }
 
@@ -387,6 +414,24 @@ export const assertAnonymousStartCriticalMemory = ():void => {
  * refreshes live MemAvailable on gate-slot acquisition without disturbing the
  * 1s /proc/stat CPU window, and scopes a revocable trickle permit strictly to
  * the active slot lifetime. */
+const runLowMemoryCpuRecoverySample = (
+  value: AssessmentResourceSample,
+  maxCpuPercent: number,
+): AssessmentResourceSample => {
+  const now = performance.now()
+  if (now - Math.max(cpuSampleAt, runRecoveryProbeAt) < CPU_RECOVERY_POLL_MS) return value
+  runRecoveryProbeAt = now
+  const counters = readHostCpuCounters()
+  const cpuPercent = counters ? hostCpuPercent(counters) : null
+  // Recovery-only probes never increment highCpu trip counters; they only clear
+  // once live CPU has settled <= maxCpuPercent, and always refresh live MemAvailable.
+  if (cpuPercent === null || cpuPercent > maxCpuPercent) return value
+  previousCpu = counters
+  cpuSampleAt = now
+  const refreshed = sampleAssessmentHostResources({ forceMemoryRefresh: true })
+  return (sample = { ...refreshed, at: now, cpuAt: now, cpuPercent })
+}
+
 export const runWithLowMemoryTrickleAdmission = async <T>(operation: () => Promise<T>): Promise<T> => {
   if (!enabled()) return operation()
   if (!isLowMemoryTrickleEnabled()) {
@@ -394,24 +439,46 @@ export const runWithLowMemoryTrickleAdmission = async <T>(operation: () => Promi
     return operation()
   }
   const config = configuredLowMemoryTrickleConfig()
-  const value = sampleAssessmentHostResources()
-  const decision = policy.startAdmissionDecision(value, performance.now(), config)
+  let value = sampleAssessmentHostResources()
+  let decision = policy.startAdmissionDecision(value, performance.now(), config)
+  if (
+    (decision.reason === 'low_memory_cpu_busy' || decision.reason === 'host_cpu')
+    && value.availableBytes !== null
+    && value.availableBytes >= config.floorMiB * MiB
+  ) {
+    const probed = runLowMemoryCpuRecoverySample(value, decision.reason === 'host_cpu' ? 90 : config.maxCpuPercent)
+    if (probed !== value) {
+      value = probed
+      decision = policy.startAdmissionDecision(value, performance.now(), config)
+    }
+  }
   logStartAdmissionTransition(decision, value)
   if (decision.action === 'allow') return operation()
   if (decision.action === 'reject_memory' || decision.action === 'reject_cpu') {
-    throw buildStartResourceError(decision.retryHint)
+    throw buildStartResourceError(decision.retryHint, decision.reason, config)
   }
   const gate = getLowMemoryTrickleGate(config)
   if (!gate) {
-    throw buildStartResourceError('memory')
+    throw buildStartResourceError('memory', 'host_memory', config)
   }
   try {
     return await gate.run(async () => {
-      const fresh = sampleAssessmentHostResources({ forceMemoryRefresh: true })
-      const recheck = policy.startAdmissionDecision(fresh, performance.now(), config)
+      let fresh = sampleAssessmentHostResources({ forceMemoryRefresh: true })
+      let recheck = policy.startAdmissionDecision(fresh, performance.now(), config)
+      if (
+        (recheck.reason === 'low_memory_cpu_busy' || recheck.reason === 'host_cpu')
+        && fresh.availableBytes !== null
+        && fresh.availableBytes >= config.floorMiB * MiB
+      ) {
+        const probed = runLowMemoryCpuRecoverySample(fresh, recheck.reason === 'host_cpu' ? 90 : config.maxCpuPercent)
+        if (probed !== fresh) {
+          fresh = probed
+          recheck = policy.startAdmissionDecision(fresh, performance.now(), config)
+        }
+      }
       logStartAdmissionTransition(recheck, fresh)
       if (recheck.action === 'reject_memory' || recheck.action === 'reject_cpu') {
-        throw buildStartResourceError(recheck.retryHint)
+        throw buildStartResourceError(recheck.retryHint, recheck.reason, config)
       }
       if (recheck.action === 'allow') {
         return operation()
@@ -427,7 +494,7 @@ export const runWithLowMemoryTrickleAdmission = async <T>(operation: () => Promi
     })
   } catch (error) {
     if (error instanceof BoundedAdmissionBusyError) {
-      throw buildStartResourceError('memory')
+      throw buildStartResourceError('memory', 'trickle_queue_busy', config)
     }
     throw error
   }
@@ -541,7 +608,7 @@ export const assertAssessmentStartResources = (): void => {
     logStartAdmissionTransition(decision, value)
     if (decision.action === 'allow' || (finishingAdmittedBatch && (decision.reason === 'host_cpu' || decision.reason === 'low_memory_cpu_busy' || decision.action === 'trickle'))) return
     if (decision.action === 'trickle' && permit?.active === true) return
-    throw buildStartResourceError(decision.retryHint ?? 'memory')
+    throw buildStartResourceError(decision.retryHint ?? 'memory', decision.reason, config)
   }
   const decision = policy.decision(value, 1)
   if ((value.availableBytes !== null && value.availableBytes < 700 * MiB)

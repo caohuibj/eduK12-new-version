@@ -93,6 +93,7 @@ export const wholeReportParentSelect = {
   ...wholeParentSelect, anonymousCode: true, totalTime: true, startedAt: true,
   compositeAssessmentId:true,trainingContentBinding:true,trainingContentBindingHash:true,
   trainingReferenceBinding:true,trainingReferenceBindingHash:true,
+  trainingFeedbackSnapshotHash:true,
   trainingContentInterpretationEncrypted:true,trainingContentInterpretationHash:true,
   formSectionAttempts: {select:{sectionId:true,attemptEpoch:true,status:true,taskSatisfaction:true}},
   completedItems: true, compiledBundleRuntimeHash: true,
@@ -100,6 +101,7 @@ export const wholeReportParentSelect = {
   compositeAssessment: { select: {
     id: true, name: true, createdBy:true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
     status: true, updatedAt: true, creationKey: true, trainingFeedbackPolicyHash: true,
+    trainingContentSnapshotHash: true,
     publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,
     reportPackageVersion: true, reportPackageProfile: true, reportPackageSnapshotEncrypted: true,
     items: { orderBy: { position: 'asc' }, include: {
@@ -144,32 +146,42 @@ const workerSlimReportParentSelect = {
   trainingContentBindingHash: true,
   trainingReferenceBinding: true,
   trainingReferenceBindingHash: true,
+  trainingFeedbackSnapshotHash: true,
   trainingContentInterpretationEncrypted: true,
   trainingContentInterpretationHash: true,
   completedItems: true,
   compiledBundleRuntimeHash: true,
-  compositeAssessment: { select: { id: true, status: true, updatedAt: true, publishedAt: true } },
+  compositeAssessment: { select: { id: true, status: true, updatedAt: true, publishedAt: true, trainingContentSnapshotHash: true } },
   scaleAssessments: { select: workerScaleChildCoreSelect },
 } as const
 
+const WORKER_PUBLISHED_COMPOSITE_CACHE_TTL_MS = 30_000
 type CachedWorkerComposite = {
   compositeAssessment: WholeReportParent['compositeAssessment']
   scaleById: Map<string, NonNullable<WholeReportParent['scaleAssessments'][number]['scale']>>
+  expiresAt: number
 }
 const workerPublishedCompositeCache = new BoundedArtifactCache<CachedWorkerComposite>(64, 4 * 1024 * 1024)
 let workerPublishedCompositeCacheHasEntries = false
-const workerCompositeCacheKey = (id: string, updatedAt: Date): string => `${id}:${updatedAt.getTime()}`
+const workerCompositeCacheKey = (id: string, updatedAt: Date, snapshotHash?: string | null): string =>
+  `${id}:${updatedAt.getTime()}:${snapshotHash ?? ''}`
 
 const hydrateWorkerScaleChildren = (parent: any, scaleById: Map<string, any>) => {
   const compositeAttemptRef = {
     id: parent.id,
     status: parent.status,
     assignmentRef: parent.assignmentRef,
-    respondentType: parent.respondentType,
+    respondentType: parent.respondentType ?? 'SELF',
     asyncReportEpoch: parent.asyncReportEpoch,
+    trainingContentBindingHash: parent.trainingContentBindingHash ?? null,
+    trainingReferenceBindingHash: parent.trainingReferenceBindingHash ?? null,
     trainingFeedbackSnapshotHash: parent.trainingFeedbackSnapshotHash ?? null,
-    trainingVariantAllocationHash: parent.trainingVariantAllocationHash,
-    trainingFlowSnapshotHash: parent.trainingFlowSnapshotHash,
+    trainingFlowSnapshotEncrypted: parent.trainingFlowSnapshotEncrypted ?? null,
+    trainingFlowSnapshotHash: parent.trainingFlowSnapshotHash ?? null,
+    trainingFlowPathEncrypted: parent.trainingFlowPathEncrypted ?? null,
+    trainingFlowPathHash: parent.trainingFlowPathHash ?? null,
+    trainingVariantAllocationEncrypted: parent.trainingVariantAllocationEncrypted ?? null,
+    trainingVariantAllocationHash: parent.trainingVariantAllocationHash ?? null,
     compositeAssessment: parent.compositeAssessment,
   }
   const hydrated = []
@@ -196,8 +208,8 @@ const loadWorkerReportParent = async (attemptId: string, hasFormAnswers: boolean
     if (Array.isArray(slim.compositeAssessment?.items)) return slim as WholeReportParent
     const comp = slim.compositeAssessment
     if (comp?.id && comp.status === 'PUBLISHED' && comp.publishedAt && comp.updatedAt instanceof Date) {
-      const cached = workerPublishedCompositeCache.get(workerCompositeCacheKey(comp.id, comp.updatedAt))
-      if (cached) {
+      const cached = workerPublishedCompositeCache.get(workerCompositeCacheKey(comp.id, comp.updatedAt, comp.trainingContentSnapshotHash))
+      if (cached && cached.expiresAt > Date.now()) {
         const merged = {
           ...slim,
           compositeAssessment: cached.compositeAssessment,
@@ -243,9 +255,14 @@ const loadWorkerReportParent = async (attemptId: string, hasFormAnswers: boolean
     && comp.reportPackageKey == null
     && comp.analysisProtocolKey == null
   ) {
-    const key = workerCompositeCacheKey(comp.id, comp.updatedAt)
-    if (!workerPublishedCompositeCache.get(key)) {
-      workerPublishedCompositeCache.set(key, { compositeAssessment: comp, scaleById }, 16_384)
+    const key = workerCompositeCacheKey(comp.id, comp.updatedAt, comp.trainingContentSnapshotHash)
+    const existing = workerPublishedCompositeCache.get(key)
+    if (!existing || existing.expiresAt <= Date.now()) {
+      workerPublishedCompositeCache.set(key, {
+        compositeAssessment: comp,
+        scaleById,
+        expiresAt: Date.now() + WORKER_PUBLISHED_COMPOSITE_CACHE_TTL_MS,
+      }, 16_384)
       workerPublishedCompositeCacheHasEntries = true
     }
   }
@@ -1319,7 +1336,7 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
     const bound = childrenById.get(unit.assessmentId)
     if (!bound || bound.child.compositeItemId !== unit.itemId
       || unit.submissionId !== childSubmissionId(receipt.wholeSubmissionId!, unit.itemId)) throw failure('整份交卷单元身份不匹配')
-    return { input: unit, child: bound.child }
+    return { input: unit, child: bound.child, runtime: bound.runtime }
   })
   let committedScales: Awaited<ReturnType<typeof submitUnifiedScaleCollectionBatch>> = null
   // PR-1 (final-scale dedup): the collection batch is the default worker path —

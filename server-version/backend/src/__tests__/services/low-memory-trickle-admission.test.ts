@@ -427,4 +427,39 @@ describe('runWithLowMemoryTrickleAdmission runtime gate & ALS permit', () => {
     advanceSample(500, 30)
     expect(reportResourceClaimDecision(3)).toMatchObject({ mode: 'protected', limit: 0, delayMs: 1000, reason: 'host_memory' })
   })
+
+  it('uses short staggered Retry-After and 250ms CPU recovery probe for low_memory_cpu_busy while keeping <floorMiB at 10s', async () => {
+    vi.stubEnv('ASSESSMENT_RESOURCE_PROTECTION_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_LOW_MEMORY_TRICKLE_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_FLOOR_MIB', '512')
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_RELEASE_MIB', '532')
+    vi.stubEnv('ASSESSMENT_START_LOW_MEMORY_MAX_CPU_PERCENT', '90')
+    vi.stubEnv('ASSESSMENT_HOST_CPU_RETRY_AFTER_SECONDS', '1')
+
+    // Consume the beforeEach 20% baseline before advancing to 93% CPU
+    sampleAssessmentHostResources()
+    // MemAvailable=640 MiB (safely above 512 MiB floor) + CPU=93% -> staggered short Retry-After (2..4s), not 10s
+    advanceSample(640, 93)
+    const retryAfters: number[] = []
+    for (let i = 0; i < 3; i += 1) {
+      await runWithLowMemoryTrickleAdmission(async () => 'nope').catch(err => {
+        retryAfters.push((err as { preferredRetryAfterSeconds?: number }).preferredRetryAfterSeconds ?? -1)
+      })
+    }
+    expect(retryAfters.every(s => s >= 2 && s <= 6)).toBe(true)
+    expect(new Set(retryAfters).size).toBeGreaterThan(1)
+
+    // After 250ms, CPU drops to 55% while MemAvailable stays 640 MiB -> recovery probe admits immediately without waiting 1000ms
+    clock += 250
+    proc.advanceCpuPercent(55)
+    await expect(runWithLowMemoryTrickleAdmission(async () => 'recovered')).resolves.toBe('recovered')
+
+    // Below floorMiB (500 MiB) ALWAYS retains strict 10s memory protection
+    advanceSample(500, 20)
+    await expect(runWithLowMemoryTrickleAdmission(async () => 'nope')).rejects.toMatchObject({
+      code: 'INSTRUMENT_NOT_AVAILABLE',
+      statusCode: 503,
+      preferredRetryAfterSeconds: 10,
+    })
+  })
 })

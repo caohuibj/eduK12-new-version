@@ -146,11 +146,26 @@ const isScaleAnswerEnvelopeV1 = (value: unknown): value is ScaleAnswerEnvelopeV1
     || deviceInputProvenanceV1Schema.safeParse(candidate.deviceInputProvenance).success
 }
 
+const MAX_VERIFIED_EMPTY_ANSWER_CIPHERS = 64
+const verifiedEmptyScaleAnswerCiphers = new Set<string>()
+
 export const readScaleAnswers = (value: unknown): ScaleAnswerReadResult => {
+  if (typeof value === 'string' && value.length <= 256 && verifiedEmptyScaleAnswerCiphers.has(value)) {
+    return { answers: [], decryptError: false }
+  }
   const parsed = readJsonField<ScaleAnswer[] | Record<string, unknown>>(value)
   if (!parsed.decryptError && parsed.value) { try { parsed.value = decodeInlineScaleRaw(parsed.value) } catch { return { answers: [], decryptError: true } } }
   if (parsed.decryptError || parsed.value === null) return { answers: [], decryptError: parsed.decryptError }
-  if (validScaleAnswerArray(parsed.value)) return { answers: parsed.value, decryptError: false }
+  if (validScaleAnswerArray(parsed.value)) {
+    if (typeof value === 'string' && value.length <= 256 && parsed.value.length === 0) {
+      if (verifiedEmptyScaleAnswerCiphers.size >= MAX_VERIFIED_EMPTY_ANSWER_CIPHERS) {
+        const oldest = verifiedEmptyScaleAnswerCiphers.values().next().value
+        if (oldest !== undefined) verifiedEmptyScaleAnswerCiphers.delete(oldest)
+      }
+      verifiedEmptyScaleAnswerCiphers.add(value)
+    }
+    return { answers: parsed.value, decryptError: false }
+  }
   if (!isScaleAnswerEnvelopeV1(parsed.value)) return { answers: [], decryptError: true }
   const envelope = parsed.value
   const provenance = deviceInputProvenanceV1Schema.safeParse(envelope.deviceInputProvenance)

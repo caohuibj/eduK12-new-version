@@ -5,7 +5,7 @@ import {loadFrozenActiveSlotSet} from '../assessment-runtime/slot-set'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import {currentRunPopulationAuthoritySql} from '../assessment-run/currentPopulationAuthority'
-import {applyBoundedPlannerControls} from '../assessment-run/plannerBound'
+import {applyBoundedPlannerControls,withBoundedPlannerRead,type PlannerBoundReadDb} from '../assessment-run/plannerBound'
 import {readFrozenCompositionIdentity} from '../assessment-run/educationCompositionExecution'
 import type {RunResourcePolicy} from '../assessment-run/resourceAuthority'
 import type {ResultDisclosureContractV1} from '../assessment-policy/result-disclosure'
@@ -16,7 +16,7 @@ import {matchesEducationCompositionRespondent} from '../education-tools/private-
 function hidden():never{return reportingFail('REPORT_NOT_FOUND','reporting resource not found',404)}
 type Input={executionId:string;actorUserId:string}
 type ScopedInput=Input&{entry:'SCHOOL'|'TEACHER'}
-type ReadOwnDb = Pick<Prisma.TransactionClient, '$queryRaw'>
+type ReadOwnDb = Pick<PlannerBoundReadDb, '$queryRaw'>
 async function readOwn(tx:ReadOwnDb,input:ScopedInput,loadContent=false){
  const population=input.entry==='SCHOOL'?'STUDENT':'TEACHER'
  const [row]=await tx.$queryRaw<Array<{organizationId:string;key:string;version:string;policy:RunResourcePolicy;policyHash:string;status:string;
@@ -72,7 +72,7 @@ async function readOwn(tx:ReadOwnDb,input:ScopedInput,loadContent=false){
 export const readTeacherOrdinaryFeedback=(input:Input)=>readOrdinaryFeedback({...input,entry:'TEACHER'})
 export const readSchoolOrdinaryFeedback=(input:Input)=>readOrdinaryFeedback({...input,entry:'SCHOOL'})
 async function readOrdinaryFeedback(input:ScopedInput){
- const initialOwn=await readOwn(prisma,input,false)
+ const initialOwn=await withBoundedPlannerRead(prisma,tx=>readOwn(tx,input,false))
  if(!initialOwn || initialOwn.receiptOnly)hidden()
  // Reading through root prisma safely warms/reuses frozenCompositionIdentityCache
  // and verifies policyHash + live composition anchor without holding an interactive tx.
@@ -153,5 +153,5 @@ async function readOrdinaryFeedback(input:ScopedInput){
   })
   return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,
    state:units.some(unit=>unit.state==='READY')?'READY' as const:'COMPLETION_ONLY' as const,title:identity.title,units}
- },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
+ },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:10_000,timeout:15_000})
 }

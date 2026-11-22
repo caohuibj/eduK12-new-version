@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { withStartNestedQueryRawLabel } from '../../services/runtimeObservability'
@@ -10,6 +11,12 @@ export type PublicTemplateRow = { templateHash: string; templateKind: PublicTemp
 export interface PublicTemplateRepository { read(hashes: string[]): Promise<PublicTemplateRow[]>; append(rows: PublicTemplateRow[]): Promise<void> }
 const MAX_BYTES = 2 * 1024 * 1024
 const kinds = new Set<PublicTemplateKind>(['SCALE_RESULT_BASE', 'SCALE_REFERENCE', 'SCALE_INTERPRETATION', 'SCALE_CAVEATS', 'SCALE_CANONICAL_LAYOUT', 'COMPOSITE_REPORT_LAYOUT', 'UNIT_ADMISSION_PLAN', 'FROZEN_SLOT_PLAN', 'WHOLE_VALIDATION_PLAN', 'COGNITIVE_PROFILE_CONFIGURATION'])
+const hashOfBytes = (kind: PublicTemplateKind, valueBytes: Buffer): string =>
+  createHash('sha256')
+    .update(`{"kind":${JSON.stringify(kind)},"storageVersion":1,"value":`)
+    .update(valueBytes)
+    .update('}')
+    .digest('hex')
 const hashOf = (kind: PublicTemplateKind, value: unknown) => canonicalHash({ storageVersion: 1, kind, value })
 export const publicTemplateHash = hashOf
 type VerifiedTemplate = { kind: PublicTemplateKind; value: any; bytes: number }
@@ -45,7 +52,7 @@ export const createPublicTemplateStore = (
           return precomputedHash
         }
       }
-      const bytes = canonicalJsonBytes(value), hash = hashOf(kind, value)
+      const bytes = canonicalJsonBytes(value), hash = hashOfBytes(kind, bytes)
       if (bytes.length < 1 || bytes.length > MAX_BYTES) throw new Error('Public template size limit')
       const known = get(hash)
       if (known && known.kind !== kind) throw new Error('Public template kind mismatch')

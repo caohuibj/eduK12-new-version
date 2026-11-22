@@ -866,7 +866,10 @@ export const startAssessmentRunExecution = async (input: {
         const check = await checkCompositionResources()
         if (typeof check !== 'boolean') return check
       }
-      const prepared = prepareBeforeGate
+      // Warm cold publication/provenance before holding a runStartGate slot when
+      // the gate is unqueued, but defer inside the gate under bursts so queued
+      // START requests do not clone/pin hundreds of publication trees in heap.
+      const preGatePrepared = prepareBeforeGate && runStartGate().getStats().queued === 0
         ? await traceAssessmentPhase('start.run_prepare_frozen', () => Promise.all([
             loadPublication(compositionCandidate),
             prepareCompositionScientificProvenance(track).catch(() => undefined),
@@ -878,6 +881,12 @@ export const startAssessmentRunExecution = async (input: {
           : false
         if (typeof check !== 'boolean') return check
         const admittedScaleBatch = check
+        const prepared = preGatePrepared ?? (prepareBeforeGate
+          ? await traceAssessmentPhase('start.run_prepare_frozen', () => Promise.all([
+              loadPublication(compositionCandidate),
+              prepareCompositionScientificProvenance(track).catch(() => undefined),
+            ]))
+          : undefined)
         const preparation = prepared ? prepared[0] : candidate ? await loadPublication(candidate) : null
         // The claim transaction is the first durable step of a Run START. Its own
         // rolled-back outcomes (P2028 maxWait, serialization/deadlock/lock-timeout)
