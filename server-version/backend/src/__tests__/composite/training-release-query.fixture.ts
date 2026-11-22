@@ -51,6 +51,10 @@ export function trainingReleaseQueryFixture(currentComposite: () => Promise<any>
           measurement_release_id:id,instrument_key:null,instrument_version:null}
       })
     }
+    if (sql.includes('WITH RECURSIVE') && sql.includes('locked_releases AS MATERIALIZED')) {
+      const ids = releases.map(row => row.id)
+      return [{ seed_ids: ids, release_ids: ids, truncated: false, locked_release_count: ids.length }]
+    }
     if (sql.includes('SELECT * FROM measurement_content_releases')) {
       const values: any[] = query.strings ? query.values : args
       return releases.filter(row => values.includes(row.id))

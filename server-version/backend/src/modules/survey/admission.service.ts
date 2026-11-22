@@ -104,6 +104,17 @@ async function validateEntry(tx:Tx,projectId:string,waveId:string,raw:string){
   if(!token)blocked('研究招募链接已经失效')
 }
 const hasQuota=(w:{startsCount:number;quotaStarts:number|null})=>w.quotaStarts===null||w.startsCount<w.quotaStarts
+// Only persisted unlinked START identities qualify for post-rollback recovery.
+const isUnlinkedStartIdentityConflict=(error:unknown):boolean=>{
+  const failure=error as {code?:unknown;meta?:{target?:unknown}}|null
+  if(failure?.code!=='P2002')return false
+  const target=failure.meta?.target
+  if(typeof target==='string')return target==='survey_attempts_wave_session_key'
+    ||target==='survey_attempts_project_wave_operation_key'
+  return Array.isArray(target)&&(
+    (target.length===2&&target[0]==='wave_id'&&target[1]==='session_hash')||
+    (target.length===3&&target[0]==='project_id'&&target[1]==='wave_id'&&target[2]==='operation_key_hash'))
+}
 const claimQuota=async(tx:Tx,projectId:string,waveId:string,startsCount:number)=>{
   if(typeof (tx as {$executeRaw?:unknown}).$executeRaw==='function'){
     // Brief end-of-tx per-wave advisory lock (~0.3 ms right before COMMIT) so
@@ -426,7 +437,9 @@ export async function startSingleUnlinkedWave(input:{
   // authoritative.
   const cachedPrepared=preparedPublicationCache.get(JSON.stringify([project.id,input.waveId]))
   const prepared=cachedPrepared??(await mayPrepareUnlinkedPublication(project.id,input.waveId,input.entryToken)?await preparePublicationDigest(project.id,input.waveId):undefined)
-  return await surveyAdmissionGate().run(() => prisma.$transaction(async tx=>{
+  return surveyAdmissionGate().run(async()=>{
+    try{
+      return await prisma.$transaction(async tx=>{
     const wave=await openWaveLocked(tx,project.id,input.waveId,false)
     await validateEntry(tx,project.id,wave.id,input.entryToken)
     // Replay first, before any quota is claimed: the same operation identity
@@ -465,7 +478,26 @@ export async function startSingleUnlinkedWave(input:{
     await claimQuota(tx,project.id,wave.id,wave.startsCount)
     return {attemptId:row.id,waveId:wave.id,status:'STARTED',
       recovered:false,accessCredential:bearer}
-  }))
+      })
+    }catch(error){
+      // The loser of a simultaneous START unique-index race has fully rolled
+      // back. Only that rare case opens a fresh transaction for live replay.
+      // Normal STARTs gain no extra SQL, locks, or admission gates.
+      if(!operationKeyHash||!isUnlinkedStartIdentityConflict(error))throw error
+      return prisma.$transaction(async tx=>{
+        const wave=await openWaveLocked(tx,project.id,input.waveId,false)
+        await validateEntry(tx,project.id,wave.id,input.entryToken)
+        const previous=await tx.surveyWaveAttempt.findFirst({where:{
+          projectId:project.id,waveId:wave.id,operationKeyHash,
+        }})
+        if(!previous)blocked('开始操作与已有作答凭证冲突')
+        if(previous.sessionHash!==sessionHash)blocked('开始凭证与本轮记录不匹配')
+        await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,
+          attemptId:previous.id,publicationId:wave.publicationId!,newAttempt:false,...(prepared??{})})
+        return {attemptId:previous.id,waveId:wave.id,status:previous.status,recovered:true,accessCredential:bearer}
+      })
+    }
+  })
 }
 type SurveyAttemptProof={publicId:string;attemptId:string;researchCode?:string;accessCredential:string}
 type VerifiedSurveyAttempt={attemptId:string;projectId:string;waveId:string;participantId:string|null;

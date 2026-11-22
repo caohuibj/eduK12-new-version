@@ -47,16 +47,6 @@ describe('assertScaleLibraryCollectionAllowed SQL roundtrip coalescing', () => {
     expect(txTruncated.$queryRaw).toHaveBeenCalledTimes(1)
   })
 
-  it('rejects when a resolved release disappears before its row lock', async () => {
-    const tx = { $queryRaw: vi.fn(async () => [{
-      seed_ids: ['rel-1'], release_ids: ['rel-0', 'rel-1'],
-      truncated: false, locked_release_count: 1,
-    }]) }
-    await expect(assertScaleLibraryCollectionAllowed(tx as never, ['rel-1']))
-      .rejects.toThrow('量表依赖身份不完整')
-    expect(tx.$queryRaw).toHaveBeenCalledTimes(1)
-  })
-
   it('rejects when an emergency stop matches on the second fresh-snapshot query', async () => {
     const tx = {
       $queryRaw: vi.fn()

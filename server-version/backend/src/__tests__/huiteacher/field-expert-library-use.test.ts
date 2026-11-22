@@ -60,7 +60,8 @@ function fixture(options:Options={}){
    if(sql.includes('FROM scale_library_entries e JOIN measurement_content_releases'))return [entry]
    if(sql.includes('FROM scale_library_submissions'))return [submission]
    if(sql.startsWith('SELECT * FROM measurement_content_releases'))return [release]
-   if(sql.includes('WITH RECURSIVE ancestors'))return [{id:release.id,truncated:false}]
+   if(sql.includes('WITH RECURSIVE')&&sql.includes('locked_releases AS MATERIALIZED'))
+     return [{seed_ids:[release.id],release_ids:[release.id],truncated:false,locked_release_count:1}]
    if(sql.startsWith('SELECT id FROM measurement_content_releases'))return [{id:release.id}]
    if(sql.includes('FROM scale_library_emergency_stops'))return options.stopped?[{target_id:release.id}]:[]
    if(sql.includes('FROM scale_library_media'))return []

@@ -216,6 +216,23 @@ suite('anonymous SINGLE_UNLINKED START idempotency on real PostgreSQL', () => {
     expect(await db.surveyWaveAttempt.count({ where: { operationKeyHash: hashResearchCredential(k.operationKey) } })).toBe(1)
   }, 60000)
 
+  it('concurrent same operation with different credentials never recovers an impostor',async()=>{
+    const k=keys('concurrent-wrong-credential')
+    const before=await db.surveyWaveAttempt.count({where:{waveId:waveUnlimited}})
+    const outcomes=await Promise.allSettled([
+      start({publicId:projectB,waveId:waveUnlimited,entryToken:entryUnlimited,...k}),
+      start({publicId:projectB,waveId:waveUnlimited,entryToken:entryUnlimited,
+        operationKey:k.operationKey,accessCredential:keys('impostor').accessCredential}),
+    ])
+    expect(outcomes.filter(result=>result.status==='fulfilled')).toHaveLength(1)
+    const rejected=outcomes.find(result=>result.status==='rejected')
+    expect(rejected?.status).toBe('rejected')
+    if(rejected?.status==='rejected')expect(rejected.reason).toMatchObject({statusCode:403})
+    expect(await db.surveyWaveAttempt.count({where:{waveId:waveUnlimited}})).toBe(before+1)
+    expect(await db.surveyWaveAttempt.count({where:{waveId:waveUnlimited,
+      operationKeyHash:hashResearchCredential(k.operationKey)}})).toBe(1)
+  },60000)
+
   it('replay still honors entry-token and wave governance (no recovery bypass)', async () => {
     const k = keys('boundary')
     const first = await start({ publicId: projectA, waveId: waveQuota5, entryToken: entryQuota5, ...k })
