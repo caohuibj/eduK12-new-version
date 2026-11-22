@@ -173,7 +173,7 @@ test('unchanged production mode retains the complete baseline while reporting ex
  delete baseline.services.backend.environment.AGGREGATE_FINALIZATION_ADMISSION_LIMIT
  baseline.services['backend-2']=structuredClone(baseline.services.backend)
  baseline.services['backend-2'].ports=[{host_ip:'127.0.0.1'}]
- baseline.services['report-worker-2']={cpus:0.6,mem_limit:402653184}
+ baseline.services['report-worker-2']={cpus:0.6,mem_limit:402653184,environment:{DATABASE_URL:'postgresql://u:secret@db/app',PRISMA_CONNECTION_POOL_SIZE:'4',EXPORT_CONCURRENCY:'1',WORKER_SHUTDOWN_TIMEOUT_SECONDS:'30'}}
  for(const name of ['backend','backend-2','worker','report-worker-2','frontend'])baseline.services[name].labels={}
  const images={backend:{runtimeImageId:'sha256:'+'a'.repeat(64)},frontend:{runtimeImageId:'sha256:'+'b'.repeat(64)}}
  const revision='c'.repeat(40),producerRun='44962011172'
@@ -189,6 +189,10 @@ test('unchanged production mode retains the complete baseline while reporting ex
  assert.equal(result.finalGateConcurrencyTotal,25)
  assert.ok(result.totalCpu>4)
  assert.equal(result.reportWorker2.cpus,0.6)
+ assert.equal(result.reportWorker2.shutdownGraceAdequate,false)
+ assert.equal(result.reportWorker2.stopGracePeriodSeconds,10)
+ assert.equal(result.totalMemoryMiB,4608)
+ assert.equal(result.maximumConfiguredAppConnections,36)
  assert.equal(result.capacityCertified,false)
  for(const mutate of [
   f=>f.services.backend.environment.UNIT_SUBMIT_ADMISSION_LIMIT='10',

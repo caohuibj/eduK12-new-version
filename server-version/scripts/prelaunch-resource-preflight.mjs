@@ -170,7 +170,20 @@ export function inspectUnchangedProductionRelease(candidate, baseline, {images, 
  if((worker.ports || []).length)throw new Error('Forbidden report-worker-2 host exposure')
  const result=inspectResourceContract(normalized,{capacity:true,existingEnvelope:envelope})
  result.baselinePreserved=true
- result.reportWorker2={cpus:Number(worker.cpus),memoryMiB:size(worker.mem_limit)/1048576}
+ const workerEnv=worker.environment || {}
+ const workerDb=new URL(workerEnv.DATABASE_URL)
+ const workerUrlPool=workerDb.searchParams.has('connection_limit')?integer(workerDb.searchParams.get('connection_limit'),'report-worker-2 DATABASE_URL connection_limit',1,1000):null
+ const workerEnvPool=workerEnv.PRISMA_CONNECTION_POOL_SIZE===undefined || String(workerEnv.PRISMA_CONNECTION_POOL_SIZE).trim()===''?null:integer(workerEnv.PRISMA_CONNECTION_POOL_SIZE,'report-worker-2 Prisma pool',1,1000)
+ if(workerUrlPool!==null && workerEnvPool!==null && workerUrlPool!==workerEnvPool)throw new Error('report-worker-2 DATABASE_URL connection_limit disagrees with Prisma pool')
+ const workerPool=workerUrlPool ?? workerEnvPool ?? integer(undefined,'report-worker-2 Prisma pool',1,1000)
+ const workerProcesses=1+integer(workerEnv.EXPORT_CONCURRENCY,'report-worker-2 EXPORT_CONCURRENCY',1,4)
+ const workerGrace=worker.stop_grace_period===undefined?10:durationSeconds(worker.stop_grace_period,'report-worker-2 stop_grace_period')
+ const workerBudget=workerEnv.WORKER_SHUTDOWN_TIMEOUT_SECONDS===undefined || workerEnv.WORKER_SHUTDOWN_TIMEOUT_SECONDS==='' ? 30 : integer(workerEnv.WORKER_SHUTDOWN_TIMEOUT_SECONDS,'report-worker-2 WORKER_SHUTDOWN_TIMEOUT_SECONDS',5,300)
+ result.reportWorker2={cpus:Number(worker.cpus),memoryMiB:size(worker.mem_limit)/1048576,prismaPool:workerPool,stopGracePeriodSeconds:workerGrace,workerShutdownTimeoutSeconds:workerBudget,shutdownGraceAdequate:workerGrace>=workerBudget+15}
+ result.maximumConfiguredAppConnections+=workerPool*workerProcesses
+ result.totalCpu+=result.reportWorker2.cpus
+ result.totalMemoryMiB+=result.reportWorker2.memoryMiB
+ result.hostMemoryReserveMiB=4096-result.totalMemoryMiB
  result.note='Existing resource limits preserved; capacity is not certified by this check.'
  return result
 }
