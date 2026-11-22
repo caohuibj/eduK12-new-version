@@ -104,7 +104,7 @@ describe('exact independent SJT Survey entry authority', () => {
     const queries = db.$queryRaw.mock.calls.map(call => sql(call[0]))
     const draftLock = queries.findIndex(text => text.includes('FROM sjt_author_drafts'))
     const authorLock = queries.findIndex(text => text.includes('FROM sjt_author_releases'))
-    const measurementLock = queries.findIndex(text => text.includes('SELECT * FROM measurement_content_releases'))
+    const measurementLock = queries.findIndex(text => text.includes('FROM measurement_content_releases') && text.includes('FOR SHARE'))
     expect(draftLock).toBeLessThan(authorLock); expect(authorLock).toBeLessThan(measurementLock)
     for (const index of [draftLock, authorLock, measurementLock]) expect(queries[index]).toContain('FOR SHARE')
     expect(db.sjtAuthorRelease.findUnique.mock.invocationCallOrder[1]).toBeGreaterThan(db.$queryRaw.mock.invocationCallOrder[authorLock])
