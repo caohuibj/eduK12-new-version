@@ -1226,6 +1226,10 @@ export function educationWholeProgressFromRow(attemptId: string, progress: Educa
   // Use the authorized execution snapshot even if the worker advances during this read.
   const awaitingRun = executionStatus === 'STARTED' && progress.parentStatus === 'COMPLETED' && Boolean(progress.wholeSubmissionId)
   const terminalFailure = progress.jobStatus === 'FAILED' || progress.jobStatus === 'CANCELLED' ? progress.jobStatus : undefined
+  // Parent/Run completion is not the report job's durable READY commit.
+  const jobState = progress.jobStatus ?? 'WAITING'
+  const reportState = terminalFailure ?? (awaitingRun || (progress.parentStatus !== 'COMPLETED' && jobState === 'READY')
+    ? 'PROCESSING' : jobState)
   const waitEnabled = !progress.receiptOnly && Boolean(progress.wholeSubmissionId) && reportReadyWaitAvailable()
   return {
     ...(progress.receiptOnly ? { receiptOnly: true as const } : {}),
@@ -1233,15 +1237,15 @@ export function educationWholeProgressFromRow(attemptId: string, progress: Educa
     attemptId, attemptEpoch: progress.epoch, status: awaitingRun ? 'IN_PROGRESS' : progress.parentStatus,
     wholeSubmissionReceived: Boolean(progress.wholeSubmissionId),
     ...(executionStatus === 'COMPLETED' && progress.parentStatus === 'COMPLETED' ? { runCompleted: true as const } : {}),
-    reportStatus: { state: awaitingRun ? terminalFailure ?? 'PROCESSING' : progress.parentStatus === 'COMPLETED' ? 'READY' : progress.jobStatus ?? 'WAITING' },
+    reportStatus: { state: reportState },
   }
 }
 
 const isEducationProgressPending = (status: ReturnType<typeof educationWholeProgressFromRow>): boolean => (
   !status.receiptOnly
   && status.wholeSubmissionReceived
-  && (status.status !== 'COMPLETED' || ['PENDING', 'PROCESSING'].includes(status.reportStatus.state))
   && !['FAILED', 'CANCELLED'].includes(status.reportStatus.state)
+  && (status.status !== 'COMPLETED' || status.reportStatus.state !== 'READY')
 )
 
 /** Optional Redis Pub/Sub long-poll alignment for School/Teacher /whole/progress.
