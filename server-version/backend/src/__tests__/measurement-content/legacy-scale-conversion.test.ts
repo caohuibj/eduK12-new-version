@@ -54,7 +54,7 @@ function harness(standard = false) {
       if (sql.includes('FROM scales') || sql.includes('FROM "scales"')) return [{ id: state.scale.id,code:state.scale.code,instrument_version:state.scale.instrumentVersion,instrument_class:state.scale.instrumentClass }]
       if (sql.includes('FROM "scale_deployment_policies"')) return state.active ? [deployment] : []
       if (sql.includes('FROM scale_deployment_policies')) return state.active ? [{ id: deployment.id }] : []
-      if (sql.includes('SELECT * FROM measurement_content_releases')) {
+      if (sql.includes('SELECT * FROM measurement_content_releases') || sql.includes('md5(scope::text')) {
         if (sql.includes('WHERE id IN')) return [...state.releases.values()].filter(r=>values.includes(r.id))
         if (sql.includes('WHERE id=')) return state.releases.has(values[0]) ? [state.releases.get(values[0])] : []
         return [...state.releases.values()].filter(r => r.family === values[0] && r.layer === values[1] && r.content_key === values[2] && r.version === values[3])

@@ -186,7 +186,7 @@ describe('addItem scale grants', () => {
       const sql=Array.from(query.strings??query).join(' ')
       const result=await rows(query,...args)
       if(failure==='missing-release'&&sql.includes('WITH scale_sources AS'))return result.map(row=>({...row,measurement_release_id:null}))
-      if(failure==='wrong-digest'&&sql.includes('SELECT * FROM measurement_content_releases'))return result.map(row=>({...row,content_hash:'0'.repeat(64)}))
+      if(failure==='wrong-digest'&&(sql.includes('SELECT * FROM measurement_content_releases')||sql.includes('md5(scope::text')))return result.map(row=>({...row,content_hash:'0'.repeat(64)}))
       return result
     })
     await expect(publishComposite('teacher-a',TEACHER,'composite-1')).rejects.toThrow(failure==='missing-release'?'CONTENT_TRAINING_RELEASE_REQUIRED':'CONTENT_RELEASE_HASH_MISMATCH')

@@ -72,7 +72,7 @@ beforeEach(() => {
     if (text.includes("provenance ->> 'authorReleaseId'")) return [{ authorReleaseId: measurement.provenance.authorReleaseId }]
     if (text.includes('FROM sjt_author_drafts')) return draft ? [{ id: draft.id }] : []
     if (text.includes('FROM sjt_author_releases')) return source ? [{ id: source.id }] : []
-    if (text.includes('SELECT * FROM measurement_content_releases')) return [measurement]
+    if (text.includes('SELECT * FROM measurement_content_releases') || text.includes('md5(scope::text')) return [measurement]
     if (text.includes('FROM content_capability_grants leaf')) return chains.get(query.values[0]) ?? []
     if (text.includes('SELECT id FROM content_capability_grants')) return candidates
     if (text.includes('WITH locked AS MATERIALIZED')) return entryActive ? [{ id: actorId }] : []

@@ -73,7 +73,7 @@ function database(author:ReturnType<typeof authorFixture>|null=null,registry:Ret
   if(text.includes('FROM sjt_author_drafts'))return author&&values.includes(author.draft.id)?[{id:author.draft.id}]:[]
   if(text.includes('FROM sjt_author_releases'))return author&&values.includes(author.author.id)?[{id:author.author.id}]:[]
   if(text.includes('FROM static_sjt_measurement_mappings'))return registry&&values.includes(registry.mapping.instrument_key)&&values.includes(registry.mapping.instrument_version)?[registry.mapping]:[]
-  if(text.includes('SELECT * FROM measurement_content_releases'))return [author?.measurement,registry?.measurement].filter(row=>row&&values.includes(row.id))
+  if(text.includes('SELECT * FROM measurement_content_releases')||text.includes('md5(scope::text'))return [author?.measurement,registry?.measurement].filter(row=>row&&values.includes(row.id))
   throw new Error('Unexpected authority or persistence query: '+text)
  })
  return {db,tx:db as unknown as Prisma.TransactionClient}
