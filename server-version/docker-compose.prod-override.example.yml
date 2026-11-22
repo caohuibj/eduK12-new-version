@@ -1,13 +1,15 @@
 # ============================================================
 # eduK12 / PTool — Verified 4C4G Production Compose Override Example (Secret-Free)
 #
-# Preserves the live production dual-backend + dual-worker topology validated on
-# 2026-11-16 (`01687312c-43806777313`) without credentials, tokens, or keys:
-#   - Dual APIs: `backend` (cpus=2.0, 896m, heap=512M, low-mem trickle=1)
-#             + `backend-2` (cpus=2.5, 640m, heap=384M, low-mem trickle=0)
-#   - Dual Workers: `worker` (cpus=1.0, 640m) + `report-worker-2` (cpus=1.0, 384m)
-#     each at `ASSESSMENT_REPORT_WORKER_CONCURRENCY=3`, `MALLOC_ARENA_MAX=2`
-#     (`report-worker-3` retired)
+# Preserves the verified 4C4G dual-backend + dual-worker production topology
+# (2026-11-22 tuning pass) without credentials, tokens, or keys:
+#   - Symmetric APIs: `backend` & `backend-2` (cpus=2.25, 768m, heap=384M,
+#     pool=8, statement_cache_size=60, idle=120s, max_conn=900s)
+#   - Dual Workers: `worker` (cpus=1.0, 640m, pool=4) + `report-worker-2`
+#     (cpus=0.8, 384m, pool=3), each at `MALLOC_ARENA_MAX=2`,
+#     `MALLOC_TRIM_THRESHOLD_=524288`, `statement_cache_size=48`, idle=180s
+#   - Postgres: 960m (`effective_cache_size=768MB`, `shared_buffers=192MB`,
+#     `jit=off`, `MALLOC_TRIM_THRESHOLD_=131072`)
 #   - `#743` low-memory trickle is enabled ONLY in this production profile, keeping
 #     `server-version/docker-compose.yml` default-off for other environments.
 #
@@ -182,8 +184,11 @@ services:
   postgres:
     cpus: 1.5
     cpu_shares: 1024
-    mem_limit: 1024m
-    memswap_limit: 1472m
+    mem_limit: 960m
+    memswap_limit: 1536m
+    environment:
+      MALLOC_ARENA_MAX: "2"
+      MALLOC_TRIM_THRESHOLD_: "131072"
     command:
       - postgres
       - -c
@@ -193,7 +198,9 @@ services:
       - -c
       - maintenance_work_mem=64MB
       - -c
-      - max_connections=80
+      - max_connections=60
+      - -c
+      - effective_cache_size=768MB
       - -c
       - jit=off
 
@@ -211,30 +218,44 @@ services:
 
   backend:
     <<: *prod-api-hardening
-    cpus: 2.0
+    cpus: 2.25
     cpu_shares: 1024
-    mem_limit: 896m
+    mem_limit: 768m
     environment:
       <<: *prod-shared-env
       BACKGROUND_WORKERS_ENABLED: "false"
-      NODE_OPTIONS: "--max-old-space-size=512 --max-semi-space-size=16"
+      NODE_OPTIONS: "--max-old-space-size=384 --max-semi-space-size=16"
       MALLOC_ARENA_MAX: "2"
-      ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT: "1"
+      MALLOC_TRIM_THRESHOLD_: "524288"
+      PRISMA_CONNECTION_POOL_SIZE: "8"
+      PRISMA_STATEMENT_CACHE_SIZE: "60"
+      PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: "120"
+      PRISMA_MAX_CONNECTION_LIFETIME_SECONDS: "900"
+      WHOLE_SUBMIT_ADMISSION_LIMIT: "8"
+      UNIT_SUBMIT_ADMISSION_LIMIT: "7"
+      ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT: "4"
       ASSESSMENT_REPORT_COMPRESSION_ENABLED: "false"
 
   backend-2:
     <<: *prod-api-hardening
     image: server-version-backend:latest
     command: ["node", "dist/index.js"]
-    cpus: 2.5
+    cpus: 2.25
     cpu_shares: 1024
-    mem_limit: 640m
+    mem_limit: 768m
     environment:
       <<: *prod-shared-env
       BACKGROUND_WORKERS_ENABLED: "false"
       NODE_OPTIONS: "--max-old-space-size=384 --max-semi-space-size=16"
       MALLOC_ARENA_MAX: "2"
-      ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT: "0"
+      MALLOC_TRIM_THRESHOLD_: "524288"
+      PRISMA_CONNECTION_POOL_SIZE: "8"
+      PRISMA_STATEMENT_CACHE_SIZE: "60"
+      PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: "120"
+      PRISMA_MAX_CONNECTION_LIFETIME_SECONDS: "900"
+      WHOLE_SUBMIT_ADMISSION_LIMIT: "8"
+      UNIT_SUBMIT_ADMISSION_LIMIT: "7"
+      ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT: "4"
       ASSESSMENT_REPORT_COMPRESSION_ENABLED: "false"
     ports:
       - "127.0.0.1:${BACKEND_2_HOST_PORT:-18081}:3000"
@@ -258,26 +279,34 @@ services:
       <<: *prod-shared-env
       BACKGROUND_WORKERS_ENABLED: "true"
       PRISMA_CONNECTION_POOL_SIZE: "4"
+      PRISMA_STATEMENT_CACHE_SIZE: "48"
+      PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: "180"
+      PRISMA_MAX_CONNECTION_LIFETIME_SECONDS: "900"
       NODE_OPTIONS: "--max-old-space-size=192 --max-semi-space-size=16"
       MALLOC_ARENA_MAX: "2"
-      ASSESSMENT_REPORT_WORKER_CONCURRENCY: "3"
+      MALLOC_TRIM_THRESHOLD_: "524288"
+      ASSESSMENT_REPORT_WORKER_CONCURRENCY: "2"
       ASSESSMENT_REPORT_COMPRESSION_ENABLED: "true"
 
   report-worker-2:
     <<: *prod-api-hardening
     image: server-version-backend:latest
     command: ["node", "dist/workers/main.js"]
-    cpus: 1.0
+    cpus: 0.8
     cpu_shares: 256
     mem_limit: 384m
     stop_grace_period: 45s
     environment:
       <<: *prod-shared-env
       BACKGROUND_WORKERS_ENABLED: "true"
-      PRISMA_CONNECTION_POOL_SIZE: "4"
+      PRISMA_CONNECTION_POOL_SIZE: "3"
+      PRISMA_STATEMENT_CACHE_SIZE: "48"
+      PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: "180"
+      PRISMA_MAX_CONNECTION_LIFETIME_SECONDS: "900"
       NODE_OPTIONS: "--max-old-space-size=192 --max-semi-space-size=16"
       MALLOC_ARENA_MAX: "2"
-      ASSESSMENT_REPORT_WORKER_CONCURRENCY: "3"
+      MALLOC_TRIM_THRESHOLD_: "524288"
+      ASSESSMENT_REPORT_WORKER_CONCURRENCY: "2"
       ASSESSMENT_REPORT_COMPRESSION_ENABLED: "true"
     volumes: *prod-app-volumes
     depends_on: *prod-app-depends-on

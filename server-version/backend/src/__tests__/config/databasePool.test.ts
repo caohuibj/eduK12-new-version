@@ -64,4 +64,39 @@ describe('detectDatabasePoolConfigConflicts', () => {
       { PRISMA_CONNECTION_POOL_SIZE: '10' },
     )).toEqual([])
   })
+
+  it('supports optional statement_cache_size and connection-lifetime overrides while preserving URL precedence', () => {
+    const injected = new URL(buildDatabaseUrl(
+      'postgresql://user:pass@localhost:5432/ptool?schema=public',
+      {
+        PRISMA_STATEMENT_CACHE_SIZE: '60',
+        PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: '120',
+        PRISMA_MAX_CONNECTION_LIFETIME_SECONDS: '900',
+      },
+    )!)
+    expect(injected.searchParams.get('statement_cache_size')).toBe('60')
+    expect(injected.searchParams.get('max_idle_connection_lifetime')).toBe('120')
+    expect(injected.searchParams.get('max_connection_lifetime')).toBe('900')
+
+    const preserved = new URL(buildDatabaseUrl(
+      'postgresql://user:pass@localhost:5432/ptool?statement_cache_size=0&max_idle_connection_lifetime=45',
+      {
+        PRISMA_STATEMENT_CACHE_SIZE: '80',
+        PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: '120',
+      },
+    )!)
+    expect(preserved.searchParams.get('statement_cache_size')).toBe('0')
+    expect(preserved.searchParams.get('max_idle_connection_lifetime')).toBe('45')
+
+    expect(detectDatabasePoolConfigConflicts(
+      'postgresql://user:pass@localhost:5432/ptool?statement_cache_size=80&max_connection_lifetime=600',
+      { PRISMA_STATEMENT_CACHE_SIZE: '60', PRISMA_MAX_CONNECTION_LIFETIME_SECONDS: '900' },
+    )).toEqual([
+      { parameter: 'statement_cache_size', urlValue: 80, envName: 'PRISMA_STATEMENT_CACHE_SIZE', envValue: 60 },
+      { parameter: 'max_connection_lifetime', urlValue: 600, envName: 'PRISMA_MAX_CONNECTION_LIFETIME_SECONDS', envValue: 900 },
+    ])
+
+    expect(() => buildDatabaseUrl('postgresql://localhost/db', { PRISMA_STATEMENT_CACHE_SIZE: '-1' })).toThrow('PRISMA_STATEMENT_CACHE_SIZE')
+    expect(() => buildDatabaseUrl('postgresql://localhost/db', { PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: '0' })).toThrow('PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS')
+  })
 })
