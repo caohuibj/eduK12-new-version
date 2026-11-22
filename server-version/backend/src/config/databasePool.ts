@@ -23,8 +23,8 @@ const POOL_URL_PARAM_SPECS: readonly PoolUrlParamSpec[] = [
   { parameter: 'connection_limit', envName: 'PRISMA_CONNECTION_POOL_SIZE', min: 1, max: 1000, fallback: DEFAULT_PRISMA_CONNECTION_POOL_SIZE },
   { parameter: 'pool_timeout', envName: 'PRISMA_POOL_TIMEOUT', min: 1, max: 1000, fallback: DEFAULT_PRISMA_POOL_TIMEOUT_SECONDS },
   { parameter: 'statement_cache_size', envName: 'PRISMA_STATEMENT_CACHE_SIZE', min: 0, max: 1000 },
-  { parameter: 'max_idle_connection_lifetime', envName: 'PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS', min: 1, max: 86400 },
-  { parameter: 'max_connection_lifetime', envName: 'PRISMA_MAX_CONNECTION_LIFETIME_SECONDS', min: 1, max: 86400 },
+  { parameter: 'max_idle_connection_lifetime', envName: 'PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS', min: 0, max: 86400 },
+  { parameter: 'max_connection_lifetime', envName: 'PRISMA_MAX_CONNECTION_LIFETIME_SECONDS', min: 0, max: 86400 },
 ]
 
 const boundedInteger = (value: string | undefined, min: number, max: number, fallback: number | undefined, name: string): number | undefined => {

@@ -97,6 +97,14 @@ describe('detectDatabasePoolConfigConflicts', () => {
     ])
 
     expect(() => buildDatabaseUrl('postgresql://localhost/db', { PRISMA_STATEMENT_CACHE_SIZE: '-1' })).toThrow('PRISMA_STATEMENT_CACHE_SIZE')
-    expect(() => buildDatabaseUrl('postgresql://localhost/db', { PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: '0' })).toThrow('PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS')
+    // Prisma's Rust pool explicitly accepts zero to disable each lifetime.
+    const disabled = new URL(buildDatabaseUrl(
+      'postgresql://localhost/db?max_idle_connection_lifetime=0',
+      { PRISMA_MAX_CONNECTION_LIFETIME_SECONDS: '0' },
+    )!)
+    expect(disabled.searchParams.get('max_idle_connection_lifetime')).toBe('0')
+    expect(disabled.searchParams.get('max_connection_lifetime')).toBe('0')
+    expect(() => buildDatabaseUrl('postgresql://localhost/db', { PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: '-1' })).toThrow('PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS')
+    expect(() => buildDatabaseUrl('postgresql://localhost/db?max_connection_lifetime=-1', {})).toThrow('max_connection_lifetime')
   })
 })
