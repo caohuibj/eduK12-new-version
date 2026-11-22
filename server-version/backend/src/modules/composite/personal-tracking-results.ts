@@ -50,6 +50,7 @@ export async function readTrainingPersonalLeafs(db:Prisma.TransactionClient,inpu
  const bundles=new Map(bundleRows.map(row=>[row.compositeId,readInstance(row)]))
  for(const {parent,tracking,receipt,items,numeric} of selected){
   const metrics:PersonalLeafResult['metrics']={}
+  const receiptOnly=Boolean(parent.receiptOnly)
   const pending=!evaluateTrainingFeedbackForAttempt(parent,{reportReady:true}).allowed
   const ownForms=formAnswers.filter(answer=>answer.attemptId===parent.id)
   for(const chosen of numeric){
@@ -59,7 +60,7 @@ export async function readTrainingPersonalLeafs(db:Prisma.TransactionClient,inpu
      &&answer.formSectionAttempt.submissionPayloadHash&&/^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(answer.value)
    const value=valid?Number(answer!.value):null
    metrics[chosen.metricId]={value:value!==null&&Number.isFinite(value)?value:null,unit:'raw',
-    measurementHash:definition?.measurementHash??metric.measurementHash,visible:chosen.visible,pending,
+    measurementHash:definition?.measurementHash??metric.measurementHash,visible:!receiptOnly&&chosen.visible,pending,
     ...(!answer?{missingReason:'NOT_EXECUTED' as const}:{})}
   }
   for(const {unit,slotKey} of items){
@@ -73,7 +74,7 @@ export async function readTrainingPersonalLeafs(db:Prisma.TransactionClient,inpu
     if(receipt!.sources.some(s=>s.itemId===unit.itemId))fail()
     // A conditional/weighted branch is a missing observation, not a zero.
     for(const choice of chosen){const metric=input.plan.metrics.find(m=>m.id===choice.metricId);if(!metric)fail()
-     metrics[choice.metricId]={value:null,measurementHash:metric!.measurementHash,unit:metric!.unit,visible:choice.visible,pending,missingReason:'NOT_EXECUTED'}}
+     metrics[choice.metricId]={value:null,measurementHash:metric!.measurementHash,unit:metric!.unit,visible:!receiptOnly&&choice.visible,pending,missingReason:'NOT_EXECUTED'}}
     continue
    }
    const {row,envelope}=saved,core=envelope.core
@@ -94,7 +95,7 @@ export async function readTrainingPersonalLeafs(db:Prisma.TransactionClient,inpu
     const valid=core.quality.status==='interpretable'&&(!fact?.quality||['calculated','OK','interpretable'].includes(fact.quality))
     const identity=trainingTrackingMeasurementIdentity(unit,{cognitiveAssignment:{profile:core.scientificProvenance.profileKey??null}})
     metrics[choice.metricId]={value:valid&&typeof fact?.value==='number'&&Number.isFinite(fact.value)?fact.value:null,
-     measurementHash:identity,unit:definition!.unit,visible:choice.visible&&bundleVisible&&disclosure.metricKeys.has(choice.scoreKey),pending}
+     measurementHash:identity,unit:definition!.unit,visible:!receiptOnly&&choice.visible&&bundleVisible&&disclosure.metricKeys.has(choice.scoreKey),pending}
    }
   }
   result.push({scopedSubjectId:input.scopedSubjectId,waveId:parent.compositeAssessmentId,ordinal:parent.compositeAssessment.personalTrackingOrdinal,

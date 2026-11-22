@@ -12,7 +12,7 @@ import {
   runWithLowMemoryTrickleAdmission,
   withAdmittedScaleCompositionStart,
 } from '../../services/assessmentResourceProtection'
-import { availableTemplateCache, publicationReadKey, startCompositeCache, startMetadataCache } from './start-read-cache'
+import { availableTemplateCache, publicationReadKey, startCompositeCache, startIdentityCache, startMetadataCache } from './start-read-cache'
 import { readActiveScaleDeployments, setPreloadedActiveScaleDeployments } from '../scale/deployment/repository'
 import { anonymousStartAdmissionGate } from '../anonymous-study/study-start-admission-gate'
 import { anonymousWholeSubmitQueued } from '../../services/wholeSubmissionPriority'
@@ -441,12 +441,17 @@ export const cloneCachedStartComposite = (cached: any) => {
 }
 
 const startCompositeIdentity = async (id: string, db: Db = prisma) => {
-  const identity = await db.compositeAssessment.findUnique({
-    where: { id },
-    select: { id: true, updatedAt: true, trainingContentSnapshotHash: true },
-  })
-  if (!identity) throw compositeNotFound()
-  return identity
+  const load = async () => {
+    const identity = await db.compositeAssessment.findUnique({
+      where: { id },
+      select: { id: true, updatedAt: true, trainingContentSnapshotHash: true },
+    })
+    if (!identity) throw compositeNotFound()
+    return identity
+  }
+  return db === prisma
+    ? await startIdentityCache.singleFlight(id, load) as Awaited<ReturnType<typeof load>>
+    : await load()
 }
 
 /** START-only scalar classification read: eligibility, product support and the
@@ -7383,6 +7388,11 @@ export const getReport = async (attemptId: string, context: { userId?: string; r
     await assertParticipantFeedbackAvailable(attempt)
     return projectHttpReport(attempt, 'participant')
   }
+  // Record the READY notification sequence BEFORE the first DB read (same as
+  // readParticipantReportStatus) so a Worker completion racing between the
+  // initial read and wait registration wakes immediately instead of timing out.
+  await prepareReportReadyNotifications()
+  const sequence = reportReadyNotificationSequence()
   let loaded = sharedControlWritesEnabled() ? await readCompositeReportStatusContext(attemptId, true) : null
   let parent = sharedControlWritesEnabled() ? loaded?.parent : await loadReportReadHeader(attemptId)
   if (!parent) throw compositeNotFound('综合测评记录不存在')
@@ -7391,8 +7401,7 @@ export const getReport = async (attemptId: string, context: { userId?: string; r
     ? await readCompositeReportMaterialization(parent.id, parent.attemptEpoch) : null
   if (parent.status === 'COMPLETED' && !parent.receiptOnly && parent.asyncReportEpoch === parent.attemptEpoch
     && job && job.status === 'PROCESSING' && !job.reportEncrypted && reportReadyWaitAvailable()) {
-    await prepareReportReadyNotifications()
-    const wait = beginReportReadyWait(attemptId, parent.attemptEpoch, 2000, undefined, reportReadyNotificationSequence())
+    const wait = beginReportReadyWait(attemptId, parent.attemptEpoch, 2000, undefined, sequence)
     try {
       if (wait) await wait.done
     } finally {
