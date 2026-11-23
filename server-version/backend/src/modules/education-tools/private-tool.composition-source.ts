@@ -1,4 +1,5 @@
 import {Prisma} from '@prisma/client'
+import {evaluateEducationLeafReportEligibility} from '../assessment-policy/tool-report-eligibility'
 import {teacherCompositionGroupChoice,readTeacherCompositionLibraryGroupChoices} from './teacher-composition-group-source'
 import {assertSelfGroupV2Entry,buildSelfGroupCohortAnalysisPolicy,SELF_GROUP_POLICY_KEY} from '../assessment-policy/self-group-contract'
 import {parseSchoolPrivateGroupSelection,schoolPrivateGroupSelectionSchema} from './school-private-group-selection'
@@ -23,9 +24,10 @@ import {educationCompositionKey,educationCompositionOriginSchema,educationCompos
 
 type Tx=Prisma.TransactionClient
 type Ref={family:string;key:string;version:string}
-const leafSummarySchema=z.array(z.object({blockId:z.string().guid(),versionId:z.string().guid(),contentHash:z.string(),
+ const leafSummarySchema=z.array(z.object({blockId:z.string().guid(),versionId:z.string().guid(),contentHash:z.string(),
  kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']),audience:z.string().nullable(),metricKeys:z.array(z.string()).max(100),sourceProvider:z.string().optional(),
  longitudinal:z.boolean().optional(),sourceLongitudinalMetricKeys:z.array(z.string()).nullable().optional(),reportRespondent:z.string().nullable().optional(),subjectNumeric:z.boolean().nullable().optional(),reportScoreKeys:z.array(z.string()).nullable().optional(),
+ standardReportConfigured:z.boolean().nullish(),reportObject:z.unknown().optional(),
  groupAuthorLicense:z.object({status:z.string(),redistribution:z.string()}).passthrough().nullish()}).strict()).min(1).max(50)
 type Row={id:string;key:string;creationHash:string;createdBy:string;status:string;publishedAt:Date|null;productKind:string;
  publicEnabled:boolean;copyable:boolean;manifestHash:string;versionId:string;toolId:string;entry:string;organizationId:string;
@@ -66,6 +68,8 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
     'reportRespondent',COALESCE(s.definition#>>'{report,audienceContract,respondent}',std.snapshot#>>'{definition,report,audienceContract,respondent}',library.snapshot#>>'{compiledDefinition,report,audienceContract,respondent}'),
     'reportScoreKeys',COALESCE(s.definition#>'{report,scoreOrder}',std.snapshot#>'{definition,report,scoreOrder}',library.snapshot#>'{compiledDefinition,report,scoreOrder}'),
     'subjectNumeric',std.snapshot#>'{parts,CONTENT,reference,metadata,disclosure,audiences,subject,numericScores}',
+    'standardReportConfigured',CASE WHEN b->>'sourceProvider'='STANDARD_SCALE' THEN (std.snapshot#>'{parts,REPORT,payload}') IS NOT NULL AND jsonb_typeof(std.snapshot#>'{parts,REPORT,payload}')<>'null' ELSE NULL END,
+    'reportObject',CASE WHEN b->>'sourceProvider'='PRIVATE_VERSION' AND s.kind='SCALE' THEN s.definition->'report' WHEN b->>'sourceProvider'='LIBRARY_SCALE' THEN library.snapshot#>'{compiledDefinition,report}' ELSE NULL END,
     'metricKeys',CASE WHEN b->>'sourceProvider' IN ('COGNITIVE_CONFIG','SJT_RELEASE') THEN (SELECT COALESCE(jsonb_agg(metric->>'metricKey'),'[]') FROM jsonb_array_elements(native_m.content->'metrics') metric) WHEN b->>'sourceProvider'='LIBRARY_SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]') FROM jsonb_array_elements(library.snapshot#>'{compiledDefinition,scoring,scores}') score) WHEN b->>'sourceProvider'='STANDARD_SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]') FROM jsonb_array_elements(std.snapshot#>'{definition,scoring,scores}') score) WHEN s.kind='SCALE' THEN (SELECT COALESCE(jsonb_agg(score->>'key'),'[]')
       FROM jsonb_array_elements(s.definition#>'{scoring,scores}') score) ELSE '[]'::jsonb END) ORDER BY ordinal)
    FROM jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') WITH ORDINALITY blocks(b,ordinal)
@@ -136,10 +140,17 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
   })}):null
  const student=isStudentComposition(origin)
  const binding=educationCompositionPolicyBindingSchema.parse({origin,manifestHash:row.manifestHash,
-   unitReports:leaves.filter(leaf=>leaf.kind!=='FORM').map(leaf=>({blockId:leaf.blockId,versionId:leaf.versionId,
-    contentHash:leaf.contentHash,respondent:variant.responseMode==='SELF'&&leaf.audience===(origin.entry==='SCHOOL'?'student':'teacher')
-     ?{mode:'INDIVIDUAL_SUMMARY',metricKeys:leaf.metricKeys,longitudinalMetricKeys:leaf.longitudinal&&leaf.subjectNumeric!==false?leaf.metricKeys.filter(key=>leaf.sourceLongitudinalMetricKeys==null||leaf.sourceLongitudinalMetricKeys.includes(key)):[]}:none,
-    ...(student?{subject:studentCompositionSubjectCeiling(leaf)}:{})}))})
+   unitReports:leaves.filter(leaf=>leaf.kind!=='FORM').map(leaf=>{
+    const toolReportEligible=leaf.sourceProvider==='STANDARD_SCALE'
+     ?evaluateEducationLeafReportEligibility({kind:leaf.kind,sourceProvider:leaf.sourceProvider,standardReportConfigured:leaf.standardReportConfigured}).eligible
+     :leaf.reportObject!==undefined
+      ?evaluateEducationLeafReportEligibility({kind:leaf.kind,sourceProvider:leaf.sourceProvider,reportObject:leaf.reportObject}).eligible
+      :true
+    return {blockId:leaf.blockId,versionId:leaf.versionId,
+     contentHash:leaf.contentHash,respondent:toolReportEligible&&variant.responseMode==='SELF'&&leaf.audience===(origin.entry==='SCHOOL'?'student':'teacher')
+      ?{mode:'INDIVIDUAL_SUMMARY',metricKeys:leaf.metricKeys,longitudinalMetricKeys:leaf.longitudinal&&leaf.subjectNumeric!==false?leaf.metricKeys.filter(key=>leaf.sourceLongitudinalMetricKeys==null||leaf.sourceLongitudinalMetricKeys.includes(key)):[]}:none,
+     ...(student?{subject:studentCompositionSubjectCeiling(leaf)}:{})}
+   })})
   if(groupReporting)binding.unitReports=binding.unitReports.map(unit=>{
    const selected=groupReporting.leaves.find(leaf=>leaf.blockId===unit.blockId)
    return selected?{...unit,groupDisclosure:schoolPrivateGroupDisclosure({minimumRespondents:groupReporting.minimumRespondents,audiences:selected.audiences,

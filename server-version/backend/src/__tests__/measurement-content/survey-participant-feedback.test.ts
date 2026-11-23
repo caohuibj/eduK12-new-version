@@ -12,7 +12,12 @@ vi.mock('../../modules/assessment-runtime/security',()=>({decryptUnifiedRuntimeP
 const draftId='00000000-0000-4000-8000-000000000001'
 const policy=()=>({policyVersion:'SURVEY_RAW_METRICS_V1' as const,mode:'DESCRIPTIVE' as const,metricKeys:['safe'],release:'AFTER_FINAL' as const})
 const unit=(kind:'SCALE'|'SJT'='SCALE'):ResearchFrozenUnit=>({draftId,instrumentKey:'instrument',kind,title:'Title',draftRevision:1,
- sourceDigest:'source',scoringDigest:'scoring',compiledDefinition:{scoring:{scores:[{key:'safe'},{key:'private'}],publishedMetrics:[{key:'safe'},{key:'private'}]}},displayDefinition:{},
+ sourceDigest:'source',scoringDigest:'scoring',
+ ...(kind==='SJT'?{executionProtocol:'SITUATIONAL_NATIVE_V1' as const}:{}),
+ compiledDefinition:{
+  scoring:{scores:[{key:'safe'},{key:'private'}],publishedMetrics:[{key:'safe'},{key:'private'}]},
+  ...(kind==='SCALE'?{report:{reportVersion:'survey-private-score-v1',rawScoreFeedback:{schemaVersion:1,rules:[{scoreKey:'safe',ranges:[{key:'all',min:0,max:100,includeMax:true,text:'已配置区间反馈'}]}]}}}:{}),
+ },displayDefinition:{},
  measurementRelease:{releaseId:'measurement',contentHash:'content',measurementHash:'measurement-hash'},participantFeedback:policy()})
 const stored=(kind:'SCALE'|'SJT'='SCALE'):FrozenUnitResult=>({instrumentKey:'instrument',kind,sourceDigest:'source',scoringDigest:'scoring',rawAnswers:{secret:'answer'},missing:[],
  privateScoring:{[kind==='SCALE'?'scores':'metrics']:[{key:'safe',value:7,status:'calculated',privateDetail:'hidden'},{key:'private',value:99,status:'calculated'}],quality:{status:'interpretable',secret:'hidden'}}})
@@ -98,7 +103,8 @@ import {verifySurveyFinalPublication} from '../../modules/survey/final.compute'
 import {prepareRelease} from '../../modules/measurement-content/release'
 const realScale={schemaVersion:1,respondentType:'participant_self_report',aggregation:'sum',responseOptions:[
  {optionKey:'yes',label:'Yes',score:3},{optionKey:'no',label:'No',score:0}],dimensions:[{dimensionKey:'total',label:'Total',direction:'descriptive'}],
- items:[{itemKey:'one',prompt:'Question',required:true,reverse:false,dimensionKeys:['total']}]}
+ items:[{itemKey:'one',prompt:'Question',required:true,reverse:false,dimensionKeys:['total']}],
+ rawScoreFeedback:{schemaVersion:1,rules:[{scoreKey:'total',ranges:[{key:'all',min:0,max:10,includeMax:true,text:'已配置区间反馈'}]}]}}
 const realSjtV1={schemaVersion:1,respondentType:'student_self_report',scenarioKey:'classroom',title:'Scene',stimulus:'Discuss with classmates.',
  author:'Researcher',sourceNote:'Local authored',licenseStatus:'self_authored',redistribution:'allowed',metrics:[{metricKey:'effort',label:'Effort',direction:'descriptive'}],
  questions:[{questionKey:'first',prompt:'What first?',options:[{optionKey:'try',label:'Try',contributions:{effort:2}},{optionKey:'wait',label:'Wait',contributions:{effort:0}}]},
@@ -117,6 +123,10 @@ describe('actual compiler → verified FINAL computation → participant project
   const release=prepareRelease(surveyMeasurementReleaseInput(frozen,'owner','project'))
   if(release.layer!=='MEASUREMENT')throw new Error('Expected measurement')
   frozen.measurementRelease={releaseId:'real-measurement',contentHash:release.contentHash,measurementHash:release.content.measurementHash}
+  if(family!=='SCALE'){
+   frozen.contentSelection={referencePolicy:{policyVersion:'EXACT_POPULATION_PRIORITY_V1',measurementReleaseId:'real-measurement',choices:[]},
+    reportRelease:{releaseId:'real-report',contentHash:'r'.repeat(64)}}
+  }
   const key=family==='SCALE'?'total':'effort'
   freezeSurveyParticipantFeedback([frozen],[{instrumentId:draftId,feedback:{...policy(),metricKeys:[key]}}],
     new Map([[draftId,release.content.metrics.map(metric=>metric.metricKey)]]))
