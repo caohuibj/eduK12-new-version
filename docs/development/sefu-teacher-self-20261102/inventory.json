@@ -1,0 +1,305 @@
+{
+  "recordKind": "development_handoff_not_runtime_schema",
+  "mother": {
+    "name": "SEfU",
+    "stableTag": "family:sefu",
+    "metadataRevision": 1,
+    "source": "Friedrich-Schiller-Universität Jena / projekt kompetenztest.de",
+    "focus": "Current German secondary short questionnaire; teacher self perspective with separately identified student experience and importance",
+    "nativeScalesCreated": 0,
+    "nativeFormsCreated": 0,
+    "databaseImportStatus": "NOT_EXECUTED_SOURCE_AND_RIGHTS_MISSING",
+    "publicTextScope": "Source metadata, original editorial report drafts, dedup and validation notes only; no exact source item text, PDFs or actual student responses."
+  },
+  "components": [
+    {
+      "proposedKey": "sefu_short15_teacher_self_de_de",
+      "name": "SEfU｜课堂特征自述｜教师自评｜德语中学短版（原版待核）",
+      "status": "SOURCE_RESEARCH_ONLY",
+      "intendedNativeType": "ORDINARY_FORM_IF_NO_AUTHOR_SCORING_RULE_AFTER_TEXT_AND_RIGHTS_ARE_AVAILABLE",
+      "nativeRecordCreated": false,
+      "registered": false,
+      "respondentRole": "teacher_self",
+      "perspective": "teacher_experience",
+      "evaluationTarget": [
+        "classroom",
+        "teacher_practice"
+      ],
+      "listedCount": 15,
+      "countMeaning": "官方短版公开目录的教学特征数／背景题数／开放题数；不推断教师版有背景或开放题。",
+      "officialVersion": null,
+      "C": null,
+      "P": null,
+      "R": null,
+      "sourceLanguage": "de-DE",
+      "validatedChineseVersion": false,
+      "tags": [
+        "family:sefu",
+        "language:de-DE",
+        "stage:secondary_i_ii",
+        "purpose:developmental_reflection",
+        "source_version:unconfirmed",
+        "status:source_missing",
+        "rights:external_reuse_unconfirmed",
+        "role:teacher_self",
+        "perspective:teacher_experience"
+      ],
+      "tagsAppliedToDatabase": false,
+      "score": null,
+      "norms": null,
+      "reverseItemKey": null,
+      "completeCurrentWordingAvailable": false,
+      "items": [],
+      "missingRule": "未来无分表单逐项保存未答为null，不补零；原问卷必答性未核，不伪造为官方规则。",
+      "blockers": [
+        "EXACT_CURRENT_ITEM_TEXT_MISSING",
+        "EXTERNAL_PLATFORM_REUSE_PERMISSION_UNCONFIRMED"
+      ]
+    },
+    {
+      "proposedKey": "sefu_short15_student_experience_de_de",
+      "name": "SEfU｜课堂体验｜学生填答｜德语中学短版（原版待核）",
+      "status": "SOURCE_RESEARCH_ONLY",
+      "intendedNativeType": "ORDINARY_FORM_IF_NO_AUTHOR_SCORING_RULE_AFTER_TEXT_AND_RIGHTS_ARE_AVAILABLE",
+      "nativeRecordCreated": false,
+      "registered": false,
+      "respondentRole": "student",
+      "perspective": "student_experience",
+      "evaluationTarget": [
+        "classroom",
+        "teacher_practice"
+      ],
+      "listedCount": 15,
+      "countMeaning": "官方短版公开目录的教学特征数／背景题数／开放题数；不推断教师版有背景或开放题。",
+      "officialVersion": null,
+      "C": null,
+      "P": null,
+      "R": null,
+      "sourceLanguage": "de-DE",
+      "validatedChineseVersion": false,
+      "tags": [
+        "family:sefu",
+        "language:de-DE",
+        "stage:secondary_i_ii",
+        "purpose:developmental_reflection",
+        "source_version:unconfirmed",
+        "status:source_missing",
+        "rights:external_reuse_unconfirmed",
+        "role:student",
+        "perspective:student_experience"
+      ],
+      "tagsAppliedToDatabase": false,
+      "score": null,
+      "norms": null,
+      "reverseItemKey": null,
+      "completeCurrentWordingAvailable": false,
+      "items": [],
+      "missingRule": "未来无分表单逐项保存未答为null，不补零；原问卷必答性未核，不伪造为官方规则。",
+      "blockers": [
+        "EXACT_CURRENT_ITEM_TEXT_MISSING",
+        "EXTERNAL_PLATFORM_REUSE_PERMISSION_UNCONFIRMED"
+      ]
+    },
+    {
+      "proposedKey": "sefu_short15_student_importance_de_de",
+      "name": "SEfU｜课堂方面的重要性｜学生填答｜德语中学短版（原版待核）",
+      "status": "SOURCE_RESEARCH_ONLY",
+      "intendedNativeType": "ORDINARY_FORM_IF_NO_AUTHOR_SCORING_RULE_AFTER_TEXT_AND_RIGHTS_ARE_AVAILABLE",
+      "nativeRecordCreated": false,
+      "registered": false,
+      "respondentRole": "student",
+      "perspective": "student_importance",
+      "evaluationTarget": [
+        "classroom",
+        "teacher_practice"
+      ],
+      "listedCount": 15,
+      "countMeaning": "官方短版公开目录的教学特征数／背景题数／开放题数；不推断教师版有背景或开放题。",
+      "officialVersion": null,
+      "C": null,
+      "P": null,
+      "R": null,
+      "sourceLanguage": "de-DE",
+      "validatedChineseVersion": false,
+      "tags": [
+        "family:sefu",
+        "language:de-DE",
+        "stage:secondary_i_ii",
+        "purpose:developmental_reflection",
+        "source_version:unconfirmed",
+        "status:source_missing",
+        "rights:external_reuse_unconfirmed",
+        "role:student",
+        "perspective:student_importance"
+      ],
+      "tagsAppliedToDatabase": false,
+      "score": null,
+      "norms": null,
+      "reverseItemKey": null,
+      "completeCurrentWordingAvailable": false,
+      "items": [],
+      "missingRule": "未来无分表单逐项保存未答为null，不补零；原问卷必答性未核，不伪造为官方规则。",
+      "blockers": [
+        "EXACT_CURRENT_ITEM_TEXT_MISSING",
+        "EXTERNAL_PLATFORM_REUSE_PERMISSION_UNCONFIRMED"
+      ]
+    },
+    {
+      "proposedKey": "sefu_short_student_context4_de_de",
+      "name": "SEfU｜背景记录｜学生填答｜德语中学短版（原版待核）",
+      "status": "SOURCE_RESEARCH_ONLY",
+      "intendedNativeType": "ORDINARY_FORM_IF_NO_AUTHOR_SCORING_RULE_AFTER_TEXT_AND_RIGHTS_ARE_AVAILABLE",
+      "nativeRecordCreated": false,
+      "registered": false,
+      "respondentRole": "student",
+      "perspective": "context",
+      "evaluationTarget": [
+        "as_declared_by_original_items"
+      ],
+      "listedCount": 4,
+      "countMeaning": "官方短版公开目录的教学特征数／背景题数／开放题数；不推断教师版有背景或开放题。",
+      "officialVersion": null,
+      "C": null,
+      "P": null,
+      "R": null,
+      "sourceLanguage": "de-DE",
+      "validatedChineseVersion": false,
+      "tags": [
+        "family:sefu",
+        "language:de-DE",
+        "stage:secondary_i_ii",
+        "purpose:developmental_reflection",
+        "source_version:unconfirmed",
+        "status:source_missing",
+        "rights:external_reuse_unconfirmed",
+        "role:student",
+        "perspective:context"
+      ],
+      "tagsAppliedToDatabase": false,
+      "score": null,
+      "norms": null,
+      "reverseItemKey": null,
+      "completeCurrentWordingAvailable": false,
+      "items": [],
+      "missingRule": "未来无分表单逐项保存未答为null，不补零；原问卷必答性未核，不伪造为官方规则。",
+      "blockers": [
+        "EXACT_CURRENT_ITEM_TEXT_MISSING",
+        "EXTERNAL_PLATFORM_REUSE_PERMISSION_UNCONFIRMED"
+      ]
+    },
+    {
+      "proposedKey": "sefu_short_student_open2_de_de",
+      "name": "SEfU｜开放反馈｜学生填答｜德语中学短版（原版待核）",
+      "status": "SOURCE_RESEARCH_ONLY",
+      "intendedNativeType": "ORDINARY_FORM_IF_NO_AUTHOR_SCORING_RULE_AFTER_TEXT_AND_RIGHTS_ARE_AVAILABLE",
+      "nativeRecordCreated": false,
+      "registered": false,
+      "respondentRole": "student",
+      "perspective": "open_feedback",
+      "evaluationTarget": [
+        "as_declared_by_original_items"
+      ],
+      "listedCount": 2,
+      "countMeaning": "官方短版公开目录的教学特征数／背景题数／开放题数；不推断教师版有背景或开放题。",
+      "officialVersion": null,
+      "C": null,
+      "P": null,
+      "R": null,
+      "sourceLanguage": "de-DE",
+      "validatedChineseVersion": false,
+      "tags": [
+        "family:sefu",
+        "language:de-DE",
+        "stage:secondary_i_ii",
+        "purpose:developmental_reflection",
+        "source_version:unconfirmed",
+        "status:source_missing",
+        "rights:external_reuse_unconfirmed",
+        "role:student",
+        "perspective:open_feedback"
+      ],
+      "tagsAppliedToDatabase": false,
+      "score": null,
+      "norms": null,
+      "reverseItemKey": null,
+      "completeCurrentWordingAvailable": false,
+      "items": [],
+      "missingRule": "未来无分表单逐项保存未答为null，不补零；原问卷必答性未核，不伪造为官方规则。",
+      "blockers": [
+        "EXACT_CURRENT_ITEM_TEXT_MISSING",
+        "EXTERNAL_PLATFORM_REUSE_PERMISSION_UNCONFIRMED"
+      ]
+    }
+  ],
+  "scaleCandidates": [],
+  "scaleDecision": "No short15 official subscale key, exact item-to-score map or aggregate scoring rule verified. Fifteen features are not fifteen validated subscales. Full text with permitted handling can use existing ordinary unscored Form without demanding norms or standalone validation.",
+  "optionalCombinations": [
+    {
+      "proposedKey": "sefu_short_teacher_self_de_de",
+      "respondentRole": "teacher_self",
+      "members": [
+        "sefu_short15_teacher_self_de_de"
+      ],
+      "nativeTarget": "EXISTING_ORDINARY_QUESTIONNAIRE_OR_FORM",
+      "status": "PLAN_ONLY",
+      "scoreAggregation": null
+    },
+    {
+      "proposedKey": "sefu_short_student_feedback_de_de",
+      "respondentRole": "student",
+      "members": [
+        "sefu_short15_student_experience_de_de",
+        "sefu_short15_student_importance_de_de",
+        "sefu_short_student_context4_de_de",
+        "sefu_short_student_open2_de_de"
+      ],
+      "nativeTarget": "EXISTING_ORDINARY_COMPOSITE_QUESTIONNAIRE",
+      "status": "PLAN_ONLY",
+      "scoreAggregation": null
+    }
+  ],
+  "crossPerspectiveRule": "Different respondent roles do not share one delivery. family tag supports filtering and authorized side-by-side analysis only; no equivalence, teacher-minus-student score or importance-times-deficit index.",
+  "versionsNotSubstituted": [
+    {
+      "name": "Basisfragebogen",
+      "listedFeatures": 35,
+      "variant": "NRW lists 41",
+      "status": "REFERENCE_METADATA_ONLY"
+    },
+    {
+      "name": "Grundschulfragebogen",
+      "listedFeatures": 16,
+      "status": "REFERENCE_METADATA_ONLY; not the secondary15; 2016 guide omits student importance; current exact version not obtained"
+    },
+    {
+      "name": "Berufsschulfragebogen",
+      "listedFeatures": 41,
+      "status": "REFERENCE_METADATA_ONLY"
+    },
+    {
+      "name": "Vertiefungsmodule",
+      "listedCountRange": "3–12 per module",
+      "status": "REFERENCE_METADATA_ONLY; no invented scales from 21 topic labels"
+    },
+    {
+      "name": "Rolff2012 feedback-conference table",
+      "listedFeatures": 15,
+      "status": "Historical student wordings visible on printed p14; teacher responses deliberately omitted; not verified equivalent to current short15"
+    },
+    {
+      "name": "QUA-LiS2016 NRW teacher excerpt",
+      "listedFeatures": 4,
+      "status": "Four teacher examples on printed p12 only; not a complete15-item teacher form"
+    }
+  ],
+  "existingTagMechanism": {
+    "freeTextFields": [
+      "Scale.tags",
+      "Questionnaire.tags",
+      "CompositeAssessment.tags"
+    ],
+    "catalogField": "catalog.construct.constructOverlapTags",
+    "existingFamilyExample": "rses10_en/1.0.0/source.json contains family:Rosenberg_Self_Esteem_Scale",
+    "applyBoundary": "No database or catalog tags were written; these are proposed values for existing fields after actual source import. No new tag engine/table or implicit cross-role authority."
+  }
+}
