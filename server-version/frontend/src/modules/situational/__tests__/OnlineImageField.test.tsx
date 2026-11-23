@@ -19,9 +19,9 @@ beforeEach(() => {
   Object.defineProperty(URL,'revokeObjectURL',{configurable:true,value:vi.fn()})
 })
 afterEach(() => vi.unstubAllGlobals())
-function Editor({ initial }: { initial?: AssessmentImage }) {
+function Editor({ initial, draftId }: { initial?: AssessmentImage; draftId?: string }) {
   const [value, setValue] = useState(initial)
-  return <><OnlineImageField image={value} onChange={setValue}/><output data-testid="image-value">{JSON.stringify(value)}</output></>
+  return <><OnlineImageField image={value} onChange={setValue} draftId={draftId}/><output data-testid="image-value">{JSON.stringify(value)}</output></>
 }
 describe('private online author images', () => {
   it('rejects invalid type and oversized uploads before the API call', () => {
@@ -46,6 +46,24 @@ describe('private online author images', () => {
     fireEvent.change(screen.getByLabelText('图片版权状态'), { target: { value: 'authorized' } })
     fireEvent.change(screen.getByLabelText('图片版权／授权凭据说明（必填）'), { target: { value: '已获课程展示授权' } })
     expect(JSON.parse(screen.getByTestId('image-value').textContent!)).toEqual({ asset: stored.asset, altText: '学生举手', rightsStatus: 'authorized', rightsNote: '已获课程展示授权' })
+  })
+  it('uploads and previews newly selected images through the authorized historical draft', async () => {
+    vi.mocked(sessionFetch).mockImplementation(async (url, init) => {
+      if (init?.method === 'POST') return json(stored)
+      if (String(url).includes('/media/images?')) return json({ items: [], nextCursor: null })
+      return blob()
+    })
+    render(<Editor draftId="teacher-owned-draft"/>)
+    fireEvent.change(screen.getByLabelText('上传情境图片（不超过 2MB）'),
+      { target: { files: [new File(['image'], 'classroom.png', { type: 'image/png' })] } })
+    expect(await screen.findByRole('img', { name: 'classroom' })).toBeInTheDocument()
+    expect(vi.mocked(sessionFetch).mock.calls.some(([url, init]) =>
+      String(url)==='/api/situational/authoring/drafts/teacher-owned-draft/media/images' && init?.method==='POST')).toBe(true)
+    expect(vi.mocked(sessionFetch).mock.calls.some(([url]) =>
+      String(url)==='/api/situational/authoring/drafts/teacher-owned-draft/media/private-image/content')).toBe(true)
+    fireEvent.click(screen.getByRole('button', { name: '打开作者素材库' }))
+    await waitFor(() => expect(vi.mocked(sessionFetch).mock.calls.some(([url]) =>
+      String(url).startsWith('/api/situational/authoring/drafts/teacher-owned-draft/media/images?pageSize='))).toBe(true))
   })
   it('uses saved draft authorization for reviewer preview without upload controls', async () => {
     vi.mocked(sessionFetch).mockResolvedValue(blob())

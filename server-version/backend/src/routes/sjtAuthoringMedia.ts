@@ -29,26 +29,32 @@ const portable = (asset: { id: string; sha256: string; mimeType: string; origina
   asset: { assetId: asset.id, contentHash: asset.sha256, mimeType: asset.mimeType },
   name: asset.originalName || asset.id, sizeBytes: asset.sizeBytes,
 })
-router.post('/media/images', uploadPrincipalRateLimit,
-  boundedUpload('image', SJT_AUTHOR_MAX_IMAGE_BYTES, [...ASSESSMENT_STATIC_IMAGE_MIME_TYPES], handle(async (req, res) => {
-    if (!req.file) throw problem(400, '请选择 PNG、JPEG 或 WebP 图片')
-    const mimeType = (req.file as Express.Multer.File & { detectedMimeType: string }).detectedMimeType
-    let asset: Awaited<ReturnType<typeof storeAsset>> | undefined
-    try {
-      asset = await storeAsset({ buffer: req.file.buffer, originalName: req.file.originalname, mimeType,
-        ownerId: req.user!.userId, accessScope: 'PRIVATE', scopeId: SJT_AUTHOR_MEDIA_SCOPE })
-      send(res, portable(asset))
-    } catch (error) {
-      if (asset) await discardUnreferencedAsset(asset).catch(() => undefined)
-      throw error
-    }
-  })))
+const uploadImage = boundedUpload('image', SJT_AUTHOR_MAX_IMAGE_BYTES, [...ASSESSMENT_STATIC_IMAGE_MIME_TYPES], handle(async (req, res) => {
+  if (!req.file) throw problem(400, '请选择 PNG、JPEG 或 WebP 图片')
+  // Administrator continuation preserves the existing draft author's private media identity.
+  const draft = req.params?.id ? await getSjtDraft(actor(req), req.params.id) : null
+  if (draft?.status === 'PUBLISHED') throw problem(409, '已发布内容不可修改，请先创建新版本')
+  const mimeType = (req.file as Express.Multer.File & { detectedMimeType: string }).detectedMimeType
+  let asset: Awaited<ReturnType<typeof storeAsset>> | undefined
+  try {
+    asset = await storeAsset({ buffer: req.file.buffer, originalName: req.file.originalname, mimeType,
+      ownerId: draft?.ownerId ?? req.user!.userId, accessScope: 'PRIVATE', scopeId: SJT_AUTHOR_MEDIA_SCOPE })
+    send(res, portable(asset))
+  } catch (error) {
+    if (asset) await discardUnreferencedAsset(asset).catch(() => undefined)
+    throw error
+  }
+}))
+router.post('/media/images', uploadPrincipalRateLimit, uploadImage)
+router.post('/drafts/:id/media/images', uploadPrincipalRateLimit, uploadImage)
 const pageQuery = z.object({
   pageSize: z.string().regex(/^[1-9]\d{0,2}$/u).transform(Number).pipe(z.number().int().max(100)).optional(),
   cursor: z.string().min(1).max(512).regex(/^[A-Za-z0-9_-]+$/u).optional(),
 }).strict()
 const cursorSchema = z.object({ createdAt: z.string().datetime(), id: z.string().min(1).max(200) }).strict()
-router.get('/media/images', handle(async (req, res) => {
+const listImages = async (req: Request, res: Response) => {
+  const draft = req.params?.id ? await getSjtDraft(actor(req), req.params.id) : null
+  const ownerId = draft?.ownerId ?? req.user!.userId
   const query = pageQuery.parse(req.query), pageSize = query.pageSize ?? 30
   let cursor: z.infer<typeof cursorSchema> | undefined
   if (query.cursor) {
@@ -56,7 +62,7 @@ router.get('/media/images', handle(async (req, res) => {
     catch { throw problem(400, '图片分页游标无效') }
   }
   const rows = await prisma.storedAsset.findMany({ where: {
-    ownerId: req.user!.userId, accessScope: 'PRIVATE', scopeId: SJT_AUTHOR_MEDIA_SCOPE, deletedAt: null,
+    ownerId, accessScope: 'PRIVATE', scopeId: SJT_AUTHOR_MEDIA_SCOPE, deletedAt: null,
     mimeType: { in: [...ASSESSMENT_STATIC_IMAGE_MIME_TYPES] }, sizeBytes: { gt: 0, lte: SJT_AUTHOR_MAX_IMAGE_BYTES },
     ...(cursor ? { OR: [{ createdAt: { lt: new Date(cursor.createdAt) } },
       { createdAt: new Date(cursor.createdAt), id: { lt: cursor.id } }] } : {}),
@@ -66,7 +72,9 @@ router.get('/media/images', handle(async (req, res) => {
   const nextCursor = rows.length > pageSize && last
     ? Buffer.from(JSON.stringify({ createdAt: last.createdAt.toISOString(), id: last.id })).toString('base64url') : null
   send(res, { items: items.map(portable), nextCursor })
-}))
+}
+router.get('/media/images', handle(listImages))
+router.get('/drafts/:id/media/images', handle(listImages))
 router.get('/media/images/:assetId/content', handle(async (req, res) => {
   const asset = await prisma.storedAsset.findFirst({ where: {
     id: req.params.assetId, ownerId: req.user!.userId, accessScope: 'PRIVATE', scopeId: SJT_AUTHOR_MEDIA_SCOPE, deletedAt: null,
@@ -86,7 +94,17 @@ router.delete('/media/images/:assetId', handle(async (req, res) => {
 router.get('/drafts/:id/media/:assetId/content', handle(async (req, res) => {
   // getSjtDraft checks exact draft entitlement, including current adaptation grants.
   const draft = await getSjtDraft(actor(req), req.params.id)
-  const reference = sjtAuthorImages(draft.template).find(image => image.asset.assetId === req.params.assetId)?.asset
+  let reference = sjtAuthorImages(draft.template).find(image => image.asset.assetId === req.params.assetId)?.asset
+  if (!reference && draft.status !== 'PUBLISHED') {
+    // Before a draft revision is saved, preview only its owner's SJT private uploads.
+    const owned = await prisma.storedAsset.findFirst({ where: {
+      id: req.params.assetId, ownerId: draft.ownerId, accessScope: 'PRIVATE',
+      scopeId: SJT_AUTHOR_MEDIA_SCOPE, deletedAt: null,
+      mimeType: { in: [...ASSESSMENT_STATIC_IMAGE_MIME_TYPES] },
+      sizeBytes: { gt: 0, lte: SJT_AUTHOR_MAX_IMAGE_BYTES },
+    } })
+    if (owned) reference = portable(owned).asset as ReturnType<typeof sjtAuthorImages>[number]['asset']
+  }
   if (!reference) throw problem(404, '图片不属于当前授权题面')
   res.setHeader('Cache-Control', 'private, no-store')
   await serveAssessmentImageContent({ reference, res })

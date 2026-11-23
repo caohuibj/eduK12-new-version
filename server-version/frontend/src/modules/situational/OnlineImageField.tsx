@@ -31,9 +31,9 @@ export function OnlineImageField({ image, onChange, draftId, readOnly = false, o
   onBusyChange?: (busy: boolean) => void
 }) {
   const [open, setOpen] = useState(false)
-  const library = useAuthorCursorList<AuthorImageAsset>(open ? '/media/images' : null, imageKey, 30)
+  const mediaPath = draftId ? `/drafts/${encodeURIComponent(draftId)}/media/images` : '/media/images'
+  const library = useAuthorCursorList<AuthorImageAsset>(open ? mediaPath : null, imageKey, 30)
   const [uploading, setUploading] = useState(false), [error, setError] = useState('')
-  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null)
   const uploadRequest = useRef<AbortController | null>(null)
   const mounted = useRef(true), libraryId = useId()
   const change = useRef(onChange); change.current = onChange
@@ -44,15 +44,13 @@ export function OnlineImageField({ image, onChange, draftId, readOnly = false, o
     return () => { mounted.current = false; uploadRequest.current?.abort(); busyChange.current?.(false) }
   }, [])
   const items = useMemo(() => image ? [{ asset: image.asset, altText: image.altText, caption: image.caption }] : [], [image])
-  // Newly selected assets have not yet been saved into a draft, so use the owner's library proxy.
-  const previewDraftId = image?.asset.assetId === selectedAssetId ? undefined : draftId
-  const loadImage = useCallback((assetId: string) => loadAuthorImage(assetId, previewDraftId), [previewDraftId])
+  // Draft-scoped media includes newly uploaded but not-yet-saved owner assets.
+  const loadImage = useCallback((assetId: string) => loadAuthorImage(assetId, draftId), [draftId])
   const assetItems = useMemo(() => image ? [{ asset: image.asset, altText: '' }] : [],
     [image?.asset.assetId, image?.asset.contentHash, image?.asset.mimeType])
   const visual = useAssessmentImageAssets(assetItems, loadImage)
   const choose = (item: AuthorImageAsset | undefined) => {
     if (readOnlyNow.current) return
-    setSelectedAssetId(item?.asset.assetId ?? null)
     change.current(item ? reference(item) : undefined)
   }
   const upload = async (file: File) => {
@@ -64,7 +62,7 @@ export function OnlineImageField({ image, onChange, draftId, readOnly = false, o
     setUploading(true); busyChange.current?.(true); setError('')
     try {
       const body = new FormData(); body.append('image', file)
-      const response = await sessionFetch(`${base}/media/images`, { method: 'POST', body, signal: controller.signal })
+      const response = await sessionFetch(`${base}${mediaPath}`, { method: 'POST', body, signal: controller.signal })
       const result = await response.json()
       if (!response.ok || result.code !== 0 || !result.data) throw new Error(result.message || '图片上传失败')
       if (controller.signal.aborted || !mounted.current) return
