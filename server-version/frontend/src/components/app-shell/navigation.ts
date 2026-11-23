@@ -28,7 +28,6 @@ const staff: NavigationItem[] = [
   { path: '/assignments', label: '练习管理', section: 'teaching' },
   { path: '/checkins', label: '打卡管理', section: 'teaching' },
   { path: '/teacher/classrooms', label: '课堂互动', section: 'teaching' },
-  { path: '/sjt-authoring', label: 'SJT 题包管理', section: 'assessment' },
   { path: '/scales', label: '心理量表', section: 'assessment' },
   { path: '/scale-library', label: '量表库', section: 'assessment' },
   { path: '/questionnaires', label: '组合测评', aliases: ['/questionnaire-products', '/composite-assessments', '/general-questionnaires'], section: 'assessment' },
@@ -45,6 +44,7 @@ export function navigationFor(role: Role | undefined, cognitive: boolean, relati
   if (role === 'ADMIN') items.push(
     { path: '/admin/training', label: '培训版管理', section: 'system' },
     { path: '/users', label: '用户管理', section: 'system' }, { path: '/teacher-codes', label: '教师码', section: 'system' },
+    { path: '/sjt-authoring', label: 'SJT 题包管理', section: 'system' },
     { path: '/admin/bundle-authoring', label: '固定包制作', section: 'system' },
     { path: '/admin/material-grants', label: '材料授权', section: 'system' },
   )

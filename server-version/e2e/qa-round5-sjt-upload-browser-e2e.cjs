@@ -21,9 +21,9 @@ const output = process.env.VISUAL_QA_EVIDENCE_DIR || '/tmp/eduk12-r5-sjt'
     const page = await context.newPage(), errors = [], uploads = []
     page.setDefaultTimeout(15000)
     page.on('pageerror', error => errors.push(error.message))
-    await installApiFixture(page, 'TEACHER')
+    await installApiFixture(page, 'ADMIN')
     let saved = false
-    const draft = { id: 'synthetic-sjt-upload', ownerId: 'teacher-visual-user', revision: 1, status: 'DRAFT', contentDigest: 'a'.repeat(64), template }
+    const draft = { id: 'synthetic-sjt-upload', ownerId: 'admin-visual-user', revision: 1, status: 'DRAFT', contentDigest: 'a'.repeat(64), template }
     // Browser interception omits binary file parts on some engines. Receive the
     // multipart stream over real loopback HTTP instead of reconstructing it.
     const server = http.createServer(async (request, response) => {

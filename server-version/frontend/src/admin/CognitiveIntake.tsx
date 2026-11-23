@@ -111,8 +111,95 @@ function CognitiveIntakeWorkspace(){
       if(current(request)){setNeedsRefresh(true);setError('安装结果尚未确认。请先刷新回读当前状态，不要重复安装。'+requestError(caught))}
     }finally{finish(request)}
   }
+  const [profileKey, setProfileKey] = useState('')
+  const [profilePreview, setProfilePreview] = useState<{ configId: string; profile: string; title: string; artifactHash: string; approvedProducts?: Array<'TRAINING' | 'SURVEY' | 'SCHOOL' | 'TEACHER'>; hasPriorPolicy?: boolean; report?: { title?: string } } | null>(null)
+  const [allowedProducts, setAllowedProducts] = useState<Array<'TRAINING' | 'SURVEY' | 'SCHOOL' | 'TEACHER'>>(['SURVEY', 'TRAINING'])
+  const [approvalReason, setApprovalReason] = useState('系统管理员确认参数与报告配置')
+  const [profileStatus, setProfileStatus] = useState('')
+
+  const publishConfig = async () => {
+    const configId = selected?.plan.configId
+    if (!selected || !configId || needsRefresh || selected.plan.status !== 'DRAFT') return
+    const request = begin(); if (request === null) return
+    const choice = identity(selected)
+    setError(''); setNotice('')
+    try {
+      const response = await api.post<{ id: string; status: 'PUBLISHED' }>(`/cognitive/configs/${encodeURIComponent(configId)}/publish`, {})
+      if (!current(request)) return
+      if (response.code !== 0 || !response.data) throw new Error(response.message || '发布未完成')
+      updatePlan(choice, { ...selected.plan, ...choice, action: 'ALREADY_PRESENT', status: 'PUBLISHED', configId, reasons: [] })
+      setProfileKey(selected.profiles[0]?.key ?? 'standard')
+      setProfilePreview(null); setProfileStatus('')
+      setNotice('配置已发布（PUBLISHED）。接下来可在下方为各个运行参数配置（Profile）启用准入产品。')
+    } catch (caught) {
+      if (current(request)) setError(requestError(caught))
+    } finally { finish(request) }
+  }
+
+  const retireConfig = async () => {
+    const configId = selected?.plan.configId
+    if (!selected || !configId || needsRefresh || selected.plan.status !== 'PUBLISHED') return
+    if (!window.confirm(`确认停用/退役 ${selected.name}（${selected.configVersion}）？停止新创建任务，已开始的作答与报告保持可读。`)) return
+    const request = begin(); if (request === null) return
+    const choice = identity(selected)
+    setError(''); setNotice('')
+    try {
+      const response = await api.post<{ id: string; status: 'RETIRED' }>(`/cognitive/configs/${encodeURIComponent(configId)}/retire`, {})
+      if (!current(request)) return
+      if (response.code !== 0 || !response.data) throw new Error(response.message || '退役未完成')
+      updatePlan(choice, { ...selected.plan, ...choice, action: 'ALREADY_PRESENT', status: 'RETIRED', configId, reasons: [] })
+      setProfilePreview(null); setProfileStatus('')
+      setNotice('配置已退役（RETIRED），历史记录保持不可变。')
+    } catch (caught) {
+      if (current(request)) setError(requestError(caught))
+    } finally { finish(request) }
+  }
+
+  const loadProfilePreview = async (targetProfile = profileKey || selected?.profiles[0]?.key || 'standard') => {
+    const configId = selected?.plan.configId
+    if (!selected || !configId || selected.plan.status !== 'PUBLISHED') return
+    const request = begin(); if (request === null) return
+    setError(''); setProfileStatus('')
+    try {
+      const response = await api.get<{ configId: string; profile: string; title: string; artifactHash: string; approvedProducts?: Array<'TRAINING' | 'SURVEY' | 'SCHOOL' | 'TEACHER'>; hasPriorPolicy?: boolean; report?: { title?: string } }>(
+        `/cognitive/profile-configurations/system/${encodeURIComponent(configId)}/${encodeURIComponent(targetProfile)}`,
+      )
+      if (!current(request)) return
+      if (response.code !== 0 || !response.data) throw new Error(response.message || '读取 Profile 失败')
+      const existing = response.data.approvedProducts ?? []
+      setProfileKey(targetProfile)
+      setProfilePreview(response.data)
+      setAllowedProducts(existing.length > 0 ? existing : response.data.hasPriorPolicy ? [] : ['SURVEY', 'TRAINING'])
+    } catch (caught) {
+      if (current(request)) setError(requestError(caught))
+    } finally { finish(request) }
+  }
+
+  const approveProfile = async () => {
+    if (!profilePreview || allowedProducts.length === 0 || !approvalReason.trim()) return
+    const request = begin(); if (request === null) return
+    setError(''); setProfileStatus('')
+    try {
+      const response = await api.post<{ artifactHash: string; allowedProducts: Array<'TRAINING' | 'SURVEY' | 'SCHOOL' | 'TEACHER'> }>(
+        `/cognitive/profile-configurations/system/${encodeURIComponent(profilePreview.configId)}/${encodeURIComponent(profilePreview.profile)}/approve`,
+        {
+          requestId: crypto.randomUUID(),
+          expectedArtifactHash: profilePreview.artifactHash,
+          allowedProducts,
+          reason: approvalReason.trim(),
+        },
+      )
+      if (!current(request)) return
+      if (response.code !== 0 || !response.data) throw new Error(response.message || '批准 Profile 失败')
+      setProfilePreview(prev => prev ? { ...prev, approvedProducts: response.data!.allowedProducts } : prev)
+      setProfileStatus(`已批准 ${profileLabel[profilePreview.profile] ?? profilePreview.profile}：准入产品 ${response.data.allowedProducts.join('、')}。`)
+    } catch (caught) {
+      if (current(request)) setError(requestError(caught))
+    } finally { finish(request) }
+  }
+
   return <div className="system-page system-cognitive-intake" aria-busy={busy}>
-    <header className="sys-heading"><div><p className="system-eyebrow">认知测验 · 内容入库</p><h1>认知入库</h1><p>查看代码登记的推荐草稿，核对精确版本后入库；未登记项单独显示缺口。</p></div>
+    <header className="sys-heading"><div><p className="system-eyebrow">认知测验 · 内容入库与发布</p><h1>认知入库</h1><p>查看代码登记的推荐草稿，核对精确版本后入库；可直接在页面完成发布与 Profile 入口准入，无需手工脚本。</p></div>
       <button type="button" disabled={busy} onClick={()=>void refresh()}><RefreshCw size={16} aria-hidden="true"/>刷新回读</button></header>
     {error&&<p className="sys-message sys-error" role="alert">{error}</p>}
     {notice&&<p className="sys-message" role="status">{notice}</p>}
@@ -133,7 +220,7 @@ function CognitiveIntakeWorkspace(){
             {row.plan.reasons.length>0&&<ul>{row.plan.reasons.map((reason,index)=><li key={index}>{reason}</li>)}</ul>}
             <button type="button" disabled={busy||needsRefresh||selectedKey===key(row)} onClick={()=>{
               if(locked.current||needsRefresh)return
-              setSelectedKey(key(row));setPreview(null);setError('');setNotice('')
+              setSelectedKey(key(row));setPreview(null);setError('');setNotice('');setProfileKey(row.profiles[0]?.key??'standard');setProfilePreview(null);setProfileStatus('')
             }}>{selectedKey===key(row)?`已选择 ${row.name}`:`选择 ${row.name}`}</button>
             <details className="sys-technical"><summary>反馈指标与配置标识</summary><p>{row.reportMetrics.join('、')||'未声明反馈指标'}</p>{row.plan.configId&&<p>配置标识：{row.plan.configId}</p>}</details>
           </div></details></article>)}</div>
@@ -148,10 +235,46 @@ function CognitiveIntakeWorkspace(){
         {preview&&<div role="status"><p>预览结果：{planLabel(preview)}</p>{preview.reasons.length>0&&<ul>{preview.reasons.map((reason,index)=><li key={index}>{reason}</li>)}</ul>}</div>}
         <button type="button" disabled={busy||needsRefresh} onClick={()=>void inspect()}>预览所选配置</button>
         {preview?.action==='CREATE_DRAFT'&&!needsRefresh&&<button type="button" className="sys-primary" disabled={busy} onClick={()=>void install()}>安装为草稿</button>}
+        {selected.plan.configId&&selected.plan.status==='DRAFT'&&!needsRefresh&&<button type="button" className="sys-primary" disabled={busy} onClick={()=>void publishConfig()}>发布此配置</button>}
+        {selected.plan.configId&&selected.plan.status==='PUBLISHED'&&!needsRefresh&&<>
+          <div className="sys-technical" aria-label="Profile 准入审批">
+            <p>已发布配置可按 Profile 启用产品准入（需下方管理员双因素验证）：</p>
+            <label>选择 Profile<select value={profileKey||selected.profiles[0]?.key||'standard'} disabled={busy} onChange={e=>{setProfileKey(e.target.value);setProfilePreview(null);setProfileStatus('')}}>
+              {(selected.profiles.length?selected.profiles:[{key:'standard',estimatedMinutes:[1,1]}]).map(p=><option key={p.key} value={p.key}>{profileLabel[p.key]??p.key}</option>)}
+            </select></label>
+            <button type="button" disabled={busy} onClick={()=>void loadProfilePreview(profileKey||selected.profiles[0]?.key||'standard')}>预览 Profile 摘要</button>
+            {profilePreview&&<div>
+              <p>摘要：{profilePreview.artifactHash.slice(0,12)}…（{profilePreview.report?.title??profilePreview.title}）</p>
+              <p>当前已启用入口：{(profilePreview.approvedProducts?.length?profilePreview.approvedProducts.join('、'):'暂无（按下方勾选启用）')}</p>
+              {profilePreview.hasPriorPolicy && !profilePreview.approvedProducts?.length && <p className="sys-muted">已有入口策略目前均未启用，请明确选择需要重新启用的入口。</p>}
+              <fieldset disabled={busy}><legend>允许使用的产品入口</legend>
+                {(['SURVEY','TRAINING','SCHOOL','TEACHER'] as const).map(prod=><label key={prod}>
+                  <input type="checkbox" checked={allowedProducts.includes(prod)} onChange={e=>setAllowedProducts(prev=>e.target.checked?[...prev,prod]:prev.filter(x=>x!==prod))}/> {prod}
+                </label>)}
+              </fieldset>
+              {(() => {
+                const currentApproved = profilePreview.approvedProducts ?? []
+                const added = allowedProducts.filter(p => !currentApproved.includes(p))
+                const removed = currentApproved.filter(p => !allowedProducts.includes(p))
+                return (added.length > 0 || removed.length > 0) ? (
+                  <p className="sys-muted">
+                    {added.length > 0 ? `将新增：${added.join('、')}` : ''}
+                    {added.length > 0 && removed.length > 0 ? '；' : ''}
+                    {removed.length > 0 ? `将移除：${removed.join('、')}` : ''}
+                  </p>
+                ) : null
+              })()}
+              <label>批准说明<input type="text" value={approvalReason} maxLength={200} disabled={busy} onChange={e=>setApprovalReason(e.target.value)}/></label>
+              <button type="button" className="sys-primary" disabled={busy||allowedProducts.length===0||!approvalReason.trim()} onClick={()=>void approveProfile()}>批准并启用此 Profile</button>
+            </div>}
+            {profileStatus&&<p role="status">{profileStatus}</p>}
+          </div>
+          <button type="button" disabled={busy} onClick={()=>void retireConfig()}>退役此配置</button>
+        </>}
       </>:<p className="sys-muted">在已登记候选中选择一项，再核对安装状态。</p>}</section>
-      <details className="sys-panel sys-verification"><summary><ShieldCheck size={18} aria-hidden="true"/>安装操作验证</summary><p>安装前使用现有管理员双因素验证，有效期五分钟；验证不会自动提交安装。</p>
-        <fieldset disabled={busy}><AdminStepUp onVerified={()=>{if(mounted.current)setNotice(needsRefresh?'身份验证已完成。请先刷新回读，再重新预览。':'身份验证已完成。请核对所选版本，再点击安装；尚未提交安装。')}}/></fieldset></details>
-      <section className="sys-panel sys-guide"><h2>安装后的状态</h2><p>新配置只安装为 DRAFT 草稿。GRANT 表示仍须另有使用授权，本次安装不授予机构或用户权限；发布和公开可见仍需独立处理。</p><p>已存在配置保留原状态；发现版本冲突时展示缺口，不覆盖。未收到成功回执时，先刷新回读。</p></section>
+      <details className="sys-panel sys-verification"><summary><ShieldCheck size={18} aria-hidden="true"/>安装操作验证</summary><p>安装前或批准 Profile 入口准入前使用现有管理员双因素验证，有效期五分钟；验证不会自动提交操作。</p>
+        <fieldset disabled={busy}><AdminStepUp onVerified={()=>{if(mounted.current)setNotice(needsRefresh?'身份验证已完成。请先刷新回读，再重新预览。':'身份验证已完成。请核对所选版本，再执行安装或审批。')}}/></fieldset></details>
+      <section className="sys-panel sys-guide"><h2>安装与发布状态</h2><p>新配置先安装为 DRAFT 草稿（不授予产品权限）；点击“发布此配置”后可按 Profile 批准启用的产品入口；必要时可“退役此配置”，不影响历史作答与报告。</p><p>已存在配置保留原状态；未收到成功回执时，先刷新回读。</p></section>
     </aside></div>
   </div>
 }

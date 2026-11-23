@@ -19,8 +19,8 @@ const definition=()=>compileResearchScale('Synthetic',{schemaVersion:1,presentat
 function makeRow(){const d=definition();return {id,entry:'SCHOOL',organizationId:org,ownerUserId:owner,kind:'SCALE',title:'Synthetic',revision:1,definition:d,contentHash:privateToolContentHash('SCALE','Synthetic',d)}}
 let stored:ReturnType<typeof makeRow>
 const input=(content=csv.replace('default',stored.definition.responseSets[0].key))=>({content,expectedRevision:stored.revision,expectedContentHash:stored.contentHash})
-const preview=async()=>await importPrivateToolCsv(c,id,input()) as {digest:string;previewToken:string;previewExpiresAt:number}
-const proof=(p:Awaited<ReturnType<typeof preview>>)=>({...input(),digest:p.digest,previewToken:p.previewToken,previewExpiresAt:p.previewExpiresAt})
+const preview=async()=>await importPrivateToolCsv(c,id,input()) as {digest:string}
+const proof=(p:Awaited<ReturnType<typeof preview>>)=>({...input(),digest:p.digest})
 describe('education private CSV real adapter contract',()=>{
  beforeEach(()=>{
   vi.clearAllMocks();stored=makeRow()
@@ -33,7 +33,7 @@ describe('education private CSV real adapter contract',()=>{
   })
  })
  it('previews without writes and applies complete saved DTO once, rejecting replay',async()=>{
-  const before=structuredClone(stored),p=await preview(),request=proof(p)
+  const before=structuredClone(stored),p=await preview(),request={...proof(p),previewToken:'a'.repeat(64),previewExpiresAt:Date.now()+600000}
   expect(stored).toEqual(before);expect(m.update).not.toHaveBeenCalled();expect(m.sync).not.toHaveBeenCalled()
   const result=await importPrivateToolCsv(c,id,request,true)
   expect(result).toMatchObject({id,revision:2,kind:'SCALE',importedCount:1,canPublish:false})
@@ -58,10 +58,10 @@ describe('education private CSV real adapter contract',()=>{
   await expect(importPrivateToolCsv(c,id,{...request,expectedContentHash:'a'.repeat(64)},true)).rejects.toMatchObject({code:'PRIVATE_TOOL_REVISION_CONFLICT'})
   expect(m.update).not.toHaveBeenCalled()
  })
- it('rejects expired and forged preview evidence',async()=>{
+ it('rejects altered digest or unknown extra proof fields',async()=>{
   const p=await preview()
-  await expect(importPrivateToolCsv(c,id,{...proof(p),previewExpiresAt:1},true)).rejects.toMatchObject({code:'PRIVATE_TOOL_CSV_PREVIEW_EXPIRED'})
-  await expect(importPrivateToolCsv(c,id,{...proof(p),previewToken:'0'.repeat(64)},true)).rejects.toMatchObject({code:'PRIVATE_TOOL_CSV_PREVIEW_EXPIRED'})
+  await expect(importPrivateToolCsv(c,id,{...proof(p),digest:'0'.repeat(64)},true)).rejects.toMatchObject({code:'PRIVATE_TOOL_CSV_PREVIEW_EXPIRED'})
+  await expect(importPrivateToolCsv(c,id,{...proof(p),extra:'1'} as any,true)).rejects.toThrow()
   expect(m.update).not.toHaveBeenCalled()
  })
  it.each(['q2,"broken,true,total,default','q2,Second,true,unknown,default','q2,Second,maybe,total,default','q2,Second,true,,default'])('rejects malformed or unsupported mapping without modifying draft: %s',async line=>{

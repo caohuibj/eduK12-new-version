@@ -1,5 +1,5 @@
 import type { CompositeReportJob } from '@prisma/client'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const h = vi.hoisted(() => ({ parent: vi.fn(), whole: vi.fn(), finish: vi.fn(), finalize: vi.fn(), materialize: vi.fn(), publish: vi.fn() }))
 vi.mock('../../config/database', () => ({ prisma: { compositeAssessmentAttempt: { findUnique: h.parent } } }))
 vi.mock('../../utils/logger', () => ({ logger: { warn: vi.fn(), error: vi.fn(), info: vi.fn() } }))
@@ -24,12 +24,15 @@ beforeEach(() => {
   vi.stubEnv('DATA_ENCRYPTION_KEY', 'e'.repeat(64))
   vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED', 'false')
   vi.stubEnv('ASSESSMENT_WHOLE_SUBMIT_ENABLED', 'false')
+  vi.stubEnv('ASSESSMENT_REPORT_READY_WAIT_ENABLED', 'false')
+  vi.stubEnv('EDUCATION_FEEDBACK_PREMATERIALIZE_ENABLED', 'false')
   h.whole.mockResolvedValue(true)
   h.parent.mockResolvedValue(educationParent)
   h.finalize.mockResolvedValue({ status: 'COMPLETED', aggregateInputHash: 'b'.repeat(64) })
   h.materialize.mockResolvedValue({})
   h.finish.mockResolvedValue(true)
 })
+afterEach(() => vi.unstubAllEnvs())
 
 describe('education whole worker identity', () => {
   it('materializes an accepted education receipt without a training report after the flags are off', async () => {
@@ -41,7 +44,7 @@ describe('education whole worker identity', () => {
     expect(outcome.aggregateInputHash).toBe('b'.repeat(64))
     expect(typeof outcome.reportEncrypted).toBe('string')
     expect(outcome.reportEncrypted).not.toContain('EDUCATION_WHOLE_MATERIALIZED')
-  })
+  }, 15000)
 
   it('publishes report-ready wakeup for non-receipt-only education attempts when ready-wait is enabled, and stays silent for receiptOnly', async () => {
     vi.stubEnv('ASSESSMENT_REPORT_READY_WAIT_ENABLED', 'true')

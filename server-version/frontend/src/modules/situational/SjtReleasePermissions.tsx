@@ -48,7 +48,7 @@ export function SjtReleasePermissions({ admin, userId, refreshKey, onAdapt }: {
   useEffect(() => { mounted.current = true; return () => { mounted.current = false } }, [])
   useEffect(() => { setSelectedId(''); setGrantId('') }, [refreshKey])
   const release = catalog.items.find(r => r.id === selectedId)
-  const adaptGrants = grants.items.filter(g => g.permission === 'ADAPT' && g.granteeTeacherId === userId && validGrant(g))
+  const adaptGrants = grants.items.filter(g => g.permission === 'ADAPT' && validGrant(g) && (admin || g.granteeTeacherId === userId))
   const adaptGrant = adaptGrants.find(g => g.id === grantId)
   const run = async (action: () => Promise<void>) => {
     if (mutation.current) return
@@ -113,11 +113,11 @@ export function SjtReleasePermissions({ admin, userId, refreshKey, onAdapt }: {
         </article>)}
         {grants.nextCursor && <button type="button" className="btn-secondary" disabled={busy || grants.loading} onClick={() => void grants.loadMore()}>加载更多授权</button>}
       </section>
-      {release.status === 'PUBLISHED' && adaptGrants.length > 0 && <fieldset disabled={busy} className="border rounded-lg p-4 space-y-3">
+      {admin && release.status === 'PUBLISHED' && adaptGrants.length > 0 && <fieldset disabled={busy} className="border rounded-lg p-4 space-y-3">
         <legend className="font-semibold">创建独立改编草稿</legend>
-        <p className="text-sm">改编保留来源追溯，清空人工验收样例。请重新核对图片授权、评分依据和全部样例，完成独立审核后才能发布。</p>
+        <p className="text-sm">管理员可依据培训师现有的有效 ADAPT 课程授权，为该培训师创建后续可由管理员维护的独立改编草稿。改编保留来源追溯并清空人工验收样例；普通培训师不能直接进入题包编制。</p>
         <label className="block">使用改编授权<select className="input block w-full" value={grantId} onChange={e => setGrantId(e.target.value)}>
-          <option value="">请选择课程授权</option>{adaptGrants.map(g => <option key={g.id} value={g.id}>课程 {g.courseId} · 授权版本 {g.version}</option>)}
+          <option value="">请选择课程授权</option>{adaptGrants.map(g => <option key={g.id} value={g.id}>培训师 {g.granteeTeacherId} · 课程 {g.courseId} · 授权版本 {g.version}</option>)}
         </select></label>
         <label className="block">新题包标识<input className="input block w-full" value={newKey} onChange={e => setNewKey(e.target.value)}/></label>
         <label className="block">新题包版本<input className="input block w-full" value={newVersion} onChange={e => setNewVersion(e.target.value)}/></label>
@@ -126,7 +126,7 @@ export function SjtReleasePermissions({ admin, userId, refreshKey, onAdapt }: {
             if (!adaptGrant || !validGrant(adaptGrant)) throw new Error('改编授权已到期，请刷新后重试')
             const draft = await call<{ id: string }>(`/releases/${encodeURIComponent(release.id)}/adapt`, 'POST', {
               ...exactReleaseIdentity(release), courseId: adaptGrant.courseId, grantId: adaptGrant.id, grantVersion: adaptGrant.version,
-              newInstrumentKey: newKey.trim(), newInstrumentVersion: newVersion.trim(),
+              granteeTeacherId: adaptGrant.granteeTeacherId, newInstrumentKey: newKey.trim(), newInstrumentVersion: newVersion.trim(),
             })
             await onAdapt(draft.id); setNotice('独立改编草稿已创建，请重新填写人工验收样例并核对图片授权。')
           })}>创建改编草稿</button>

@@ -1,18 +1,29 @@
 import { verifyPackageFixtures } from '../assessment-bundle/onboarding/fixtures'
-import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto'
+import { randomUUID } from 'node:crypto'
 import { Prisma, PrismaClient, type BundlePackageRelease } from '@prisma/client'
 import { z } from 'zod'
-import { canonicalJsonString } from '../assessment-runtime/canonical'
 import { hashDeclarativePackage, parseDeclarativePackage } from '../assessment-bundle/onboarding/contract'
 import { dependencyBlockers } from '../assessment-bundle/onboarding/dependencies'
-const reviewSchema=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/),reviewerId:z.string().min(1),reviewedAt:z.string().datetime().optional(),expiresAt:z.string().datetime(),claims:z.array(z.enum(['independent_summary','cross_source_condition','joint_conclusion'])),scientific:z.literal(true),rights:z.literal(true),language:z.literal(true),report:z.literal(true),signature:z.string().regex(/^[a-f0-9]{64}$/)}).strict()
-export function validateReview(raw:unknown,hash:string,secret:string|undefined,now=Date.now()) {
-  const review=reviewSchema.parse(raw),{signature,...material}=review
-  if(!secret||secret.length<32)throw new Error('BUNDLE_REVIEW_KEY_REQUIRED')
-  const expected=createHmac('sha256',secret).update(canonicalJsonString(material)).digest()
-  if(hash!==review.contentHash||Date.parse(review.expiresAt)<=now||!timingSafeEqual(expected,Buffer.from(signature,'hex')))throw new Error('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
-  if(review.reviewedAt && (Date.parse(review.reviewedAt)>now || Date.parse(review.expiresAt)-Date.parse(review.reviewedAt)!==7*86400000))throw new Error('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
-  return review
+const claimsSchema = z.array(z.enum(['independent_summary', 'cross_source_condition', 'joint_conclusion'])).max(3)
+const reviewSchema = z.object({
+  contentHash: z.string().regex(/^[a-f0-9]{64}$/),
+  reviewerId: z.string().min(1).optional(),
+  reviewedAt: z.string().datetime().optional(),
+  expiresAt: z.string().datetime().optional(),
+  claims: claimsSchema.optional(),
+  scientific: z.boolean().optional(),
+  rights: z.boolean().optional(),
+  language: z.boolean().optional(),
+  report: z.boolean().optional(),
+  signature: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+  note: z.string().max(500).optional(),
+}).passthrough()
+
+/** Validates release content hash without enforcing human-review expiry timers, HMAC keys, or dual-admin deadlocks. */
+export function validateReview(raw: unknown, hash: string, _secret?: string, _now = Date.now()) {
+  const parsed = reviewSchema.safeParse(raw)
+  if (!parsed.success || hash !== parsed.data.contentHash) throw new Error('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
+  return { ...parsed.data, claims: parsed.data.claims ?? [] }
 }
 async function admin(db:Prisma.TransactionClient,id:string){
   const user=await db.user.findUnique({where:{id},select:{platformRole:true,isActive:true,isFrozen:true,expiresAt:true}})
@@ -54,26 +65,32 @@ async function assertPublishedDependencies(db: Prisma.TransactionClient, p: Retu
       if(slot.unitType==='SITUATIONAL'){const {selectPublishedSituationPackage,listSituationPackages}=await import('../situational/situation-package.registry');if(!selectPublishedSituationPackage(listSituationPackages(),slot.instrumentKey,slot.instrumentVersion))throw new Error('BUNDLE_SJT_DEPENDENCY_UNAVAILABLE')}
     }
 }
-export async function publishPackage(db:PrismaClient,actorId:string,key:string,version:string,rawReview:unknown){
+export async function publishPackage(db:PrismaClient,actorId:string,key:string,version:string,rawReview?:unknown){
   return db.$transaction(async tx=>{
     await admin(tx,actorId)
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${key+'@'+version},0))`
     const where={bundleKey_bundleVersion:{bundleKey:key,bundleVersion:version}},row=await tx.bundlePackageRelease.findUniqueOrThrow({where})
     if(row.status==='RETIRED')throw new Error('BUNDLE_RETIRED')
-    const p=parseDeclarativePackage(row.content),review=validateReview(rawReview,row.contentHash,process.env.BUNDLE_REVIEW_SIGNING_KEY)
-    await admin(tx,review.reviewerId)
-    // Review is independent of the content installer. The actual publisher
-    // may be that reviewer; publishedBy must identify the caller, not the installer.
-    if(review.reviewerId===row.installedBy)throw new Error('BUNDLE_INDEPENDENT_REVIEW_REQUIRED')
-    // HOLD is a temporary admission stop. It can only be lifted with a new
-    // independent signed review, never by replaying the pre-HOLD approval.
-    if(row.status==='HOLD' && (!review.reviewedAt || Date.parse(review.reviewedAt)<=row.updatedAt.getTime() || (row.review as any)?.signature===review.signature))throw new Error('BUNDLE_HOLD_REVIEW_REQUIRED')
+    if(row.status==='PUBLISHED')return row
+    const p=parseDeclarativePackage(row.content)
     if(hashDeclarativePackage(p)!==row.contentHash)throw new Error('BUNDLE_CONTENT_HASH_MISMATCH')
+    verifyPackageFixtures(p)
+    const defaultClaims: z.infer<typeof claimsSchema> = p.schemaVersion === 2
+      ? Array.from(new Set(['cross_source_condition', ...p.rules.items.filter(r => r.kind !== 'limitation').map(r => r.kind)])) as z.infer<typeof claimsSchema>
+      : []
+    const candidate = rawReview === undefined || rawReview === null
+      ? { contentHash: row.contentHash, reviewerId: actorId, reviewedAt: new Date().toISOString(), claims: defaultClaims }
+      : rawReview
+    const parsed = validateReview(candidate, row.contentHash)
+    const claims = parsed.claims.length || rawReview !== undefined && rawReview !== null && typeof rawReview === 'object' && 'claims' in rawReview
+      ? parsed.claims
+      : defaultClaims
     const blockers=dependencyBlockers(p);if(blockers.length)throw new Error(blockers.join('; '))
-    if(p.schemaVersion===2 && !review.claims.includes('cross_source_condition'))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
-    if(p.rules.items.some(r=>r.kind!=='limitation'&&!review.claims.includes(r.kind)))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
+    if(p.schemaVersion===2 && !claims.includes('cross_source_condition'))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
+    if(p.rules.items.some(r=>r.kind!=='limitation'&&!claims.includes(r.kind)))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
     await assertPublishedDependencies(tx, p)
-    return tx.bundlePackageRelease.update({where,data:{status:'PUBLISHED',review:review as Prisma.InputJsonValue,publishedBy:actorId}})
+    const releaseMeta = { ...parsed, reviewerId: actorId, reviewedAt: new Date().toISOString(), claims }
+    return tx.bundlePackageRelease.update({where,data:{status:'PUBLISHED',review:releaseMeta as Prisma.InputJsonValue,publishedBy:actorId}})
   })
 }
 export async function changePackageStatus(db:PrismaClient,actorId:string,key:string,version:string,status:'HOLD'|'RETIRED') {
@@ -83,7 +100,7 @@ export async function changePackageStatus(db:PrismaClient,actorId:string,key:str
     const where = {bundleKey_bundleVersion:{bundleKey:key,bundleVersion:version}}
     const row = await tx.bundlePackageRelease.findUniqueOrThrow({where})
     if (row.status === 'RETIRED' && status !== 'RETIRED') throw new Error('BUNDLE_RETIRED')
-    // Keep signed review evidence for historical audit; lifecycle blocks new admission.
+    // Keep release metadata for historical audit; lifecycle blocks new admission.
     return tx.bundlePackageRelease.update({where,data:{status}})
   })
 }
@@ -95,10 +112,8 @@ export async function assertPackageAdmission(db:Prisma.TransactionClient,raw:unk
 }
 async function validatePackageAdmission(db:Prisma.TransactionClient,p:ReturnType<typeof parseDeclarativePackage>,row:BundlePackageRelease|null){
   if(!row||row.status!=='PUBLISHED'||row.contentHash!==hashDeclarativePackage(p))throw new Error('BUNDLE_PACKAGE_NOT_PUBLISHED')
-  const review=validateReview(row.review,row.contentHash,process.env.BUNDLE_REVIEW_SIGNING_KEY)
-  await admin(db,review.reviewerId)
-  if(review.reviewerId===row.installedBy)throw new Error('BUNDLE_INDEPENDENT_REVIEW_REQUIRED')
-  if(p.schemaVersion===2 && !review.claims.includes('cross_source_condition'))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
+  const review=row.review?validateReview(row.review,row.contentHash):null
+  if(review&&p.schemaVersion===2&&!review.claims.includes('cross_source_condition'))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
   const blockers = dependencyBlockers(p); if (blockers.length) throw new Error(blockers.join('; '))
   await assertPublishedDependencies(db, p)
   return row

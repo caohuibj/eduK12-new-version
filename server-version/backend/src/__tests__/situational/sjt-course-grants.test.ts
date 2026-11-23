@@ -162,6 +162,19 @@ describe('C13 grant administration and adaptation', () => {
       expiresAt: grant.expiresAt, note: 'exact grant' })).rejects.toMatchObject({ statusCode: 403 })
     expect(db.sjtReleaseGrant.create).not.toHaveBeenCalled()
   })
+  it('accepts a current SYSTEM_ADMIN with teacher business role for grant mutations', async () => {
+    db.user.findUnique.mockResolvedValue({ ...teacher, platformRole: 'SYSTEM_ADMIN' })
+    db.sjtReleaseGrant.create.mockResolvedValue(grant)
+    await createSjtReleaseGrant(admin, release.id, { ...exactInput, granteeTeacherId: 'teacher',
+      courseId: scope.courseId, purpose: scope.purpose, permission: 'DISTRIBUTE',
+      validFrom: grant.validFrom, expiresAt: grant.expiresAt, note: grant.note })
+    expect(db.sjtReleaseGrant.create).toHaveBeenCalledTimes(1)
+    db.sjtReleaseGrant.findUnique.mockResolvedValue({ releaseId: release.id })
+    db.sjtReleaseGrant.updateMany.mockResolvedValue({ count: 1 })
+    db.sjtReleaseGrant.findUniqueOrThrow.mockResolvedValue({ ...grant, status: 'REVOKED', version: 2 })
+    await revokeSjtReleaseGrant(admin, grant.id, 1, 'withdraw')
+    expect(db.sjtReleaseGrantAudit.create).toHaveBeenCalledTimes(2)
+  })
   it('creates one explicit permission and records full immutable scope in the audit', async () => {
     db.user.findUnique.mockResolvedValueOnce({ ...teacher, role: 'ADMIN' })
     db.sjtReleaseGrant.create.mockResolvedValue(grant)
@@ -241,6 +254,20 @@ describe('C13 grant administration and adaptation', () => {
     await expect(adaptSjtRelease(actor, release.id, { ...adaptInput, newInstrumentVersion: release.instrumentVersion })).rejects.toMatchObject({ statusCode: 409 })
     db.sjtReleaseGrant.findMany.mockResolvedValue([{ ...grant, permission: 'ADAPT' }])
     await expect(adaptSjtRelease(actor, release.id, { ...adaptInput, grantVersion: 8 })).rejects.toMatchObject({ statusCode: 409 })
+    expect(db.sjtAuthorDraft.create).not.toHaveBeenCalled()
+  })
+  it('allows an administrator to continue an existing teacher ADAPT grant on that teacher’s behalf', async () => {
+    db.sjtReleaseGrant.findMany.mockResolvedValue([{ ...grant, permission: 'ADAPT' }])
+    db.sjtAuthorRelease.findUnique.mockResolvedValueOnce(release).mockResolvedValueOnce(null)
+    const adapted = await adaptSjtRelease(admin, release.id, { ...adaptInput, granteeTeacherId: scope.teacherId })
+    expect(adapted.ownerId).toBe(scope.teacherId)
+    expect(db.sjtAuthorDraft.create.mock.calls[0][0].data.ownerId).toBe(scope.teacherId)
+    expect(media.assertSjtAuthorMedia).toHaveBeenCalledWith(db, scope.teacherId, expect.anything(), expect.anything())
+    expect(db.sjtAuthorAudit.create.mock.calls[0][0].data.actorId).toBe(admin.userId)
+  })
+  it('does not allow a non-admin to substitute another teacher in an ADAPT receipt', async () => {
+    await expect(adaptSjtRelease(actor, release.id, { ...adaptInput, granteeTeacherId: 'other' }))
+      .rejects.toMatchObject({ statusCode: 403 })
     expect(db.sjtAuthorDraft.create).not.toHaveBeenCalled()
   })
   it('clears copied golden cases, freezes exact source and never writes the original release', async () => {

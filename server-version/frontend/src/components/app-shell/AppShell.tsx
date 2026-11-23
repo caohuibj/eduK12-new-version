@@ -97,8 +97,11 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const items=management?adminNavigation(user):training?trainingNavigation(user?.role):[...navigationFor(user?.role,cognitive,relational.status==='available'),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole,directoryActions):[])]
   if(!management){
   items.push(...surveyGovernanceNavigation(Boolean(productOrigins()),user?.role,platformRole??user?.platformRole,user?.entryGrants))
-  if(user?.platformRole==='SYSTEM_ADMIN')items.push({path:'/admin/permissions',label:'系统治理与入口授权',section:'system'},
-    {path:'/admin/reporting-content',label:'报告方案与内容审核',section:'system'})
+  if(user?.platformRole==='SYSTEM_ADMIN'){
+    if(user.role!=='ADMIN'&&!items.some(item=>item.path==='/sjt-authoring'))items.push({path:'/sjt-authoring',label:'SJT 题包管理',section:'system'})
+    items.push({path:'/admin/permissions',label:'系统治理与入口授权',section:'system'},
+      {path:'/admin/reporting-content',label:'报告方案与内容审核',section:'system'})
+  }
   if(user&&(user.platformRole==='SYSTEM_ADMIN'||user.entryGrants?.length))items.push({path:'/admin/entrances',label:'管理入口',section:'system'})
   if(!training&&user?.role==='ADMIN'&&platformRole==='SYSTEM_ADMIN') items.push({path:'/admin/legacy-archive',label:'历史归档（只读）',section:'system'})
   if(hasAdminEntry(user,'HUISCHOOL')||hasAdminEntry(user,'HUITEACHER'))

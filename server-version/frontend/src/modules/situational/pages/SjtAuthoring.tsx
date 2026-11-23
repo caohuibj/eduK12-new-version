@@ -178,16 +178,18 @@ export default function SjtAuthoring() {
           ?.channelKeys.includes(c.channelKey),
     ) ?? []
   const owned = selected?.ownerId === user?.id
+  const isAdmin = user?.role === 'ADMIN' || user?.platformRole === 'SYSTEM_ADMIN'
+  const canMaintain = owned || isAdmin
   return (
     <ProductPage>
       <PageHeader
         title="SJT 模板与题包"
-        description="填写模板，检查内容并预览作答；审核通过后发布试点版本。"
+        description="填写模板，检查内容并预览作答；管理员可直接发布或维护历史教师稿件。"
       />
       <section className="card my-5 space-y-4 p-6">
         <button className="btn-primary" disabled={busy || mediaBusy} onClick={()=>{setNewDraftEpoch(x=>x+1);setSelected(null);setOnline(newOnlineDocument());setPolicyChoice('COURSE_GRANT_V1');setShowOnline(true);setPreview(false)}}>在线创建图文题包</button>
         <p className="text-sm">在线编辑图文情境、单选／多选、拒答与评分矩阵，并独立录入人工验收样例。图片须来自私有作者素材库，完成替代文字与版权说明后保存。</p>
-        {(showOnline || selected) && <fieldset className="border rounded-lg p-4 space-y-3" disabled={busy || mediaBusy || Boolean(selected && (!owned || selected.status === 'PUBLISHED'))}>
+        {(showOnline || selected) && <fieldset className="border rounded-lg p-4 space-y-3" disabled={busy || mediaBusy || Boolean(selected && (!canMaintain || selected.status === 'PUBLISHED'))}>
             <legend className="font-semibold">发布使用策略</legend>
             <label className="block">题包发布策略<select className="input block w-full" value={policyChoice}
               disabled={selected?.authorizationPolicy === 'COURSE_GRANT_V1'} onChange={e => setPolicyChoice(e.target.value as typeof policyChoice)}>
@@ -204,8 +206,8 @@ export default function SjtAuthoring() {
             </>}
           </fieldset>}
         {showOnline && <>
-          <OnlineAuthorEditor key={selected ? `${selected.id}:${selected.revision}` : `new:${newDraftEpoch}`} draftId={selected?.id} onMediaBusyChange={setMediaBusy} value={online} onChange={setOnline} disabled={busy || Boolean(selected && (!owned || selected.status==='PUBLISHED'))}/>
-          {(!selected || (owned && selected.status!=='PUBLISHED')) && <button className="btn-primary" disabled={busy || mediaBusy || Boolean(selected && policyChoice !== (selected.authorizationPolicy === 'COURSE_GRANT_V1' ? 'COURSE_GRANT_V1' : 'LEGACY'))} onClick={()=>void run(async()=>{
+          <OnlineAuthorEditor key={selected ? `${selected.id}:${selected.revision}` : `new:${newDraftEpoch}`} draftId={selected?.id} onMediaBusyChange={setMediaBusy} value={online} onChange={setOnline} disabled={busy || Boolean(selected && (!canMaintain || selected.status==='PUBLISHED'))}/>
+          {(!selected || (canMaintain && selected.status!=='PUBLISHED')) && <button className="btn-primary" disabled={busy || mediaBusy || Boolean(selected && policyChoice !== (selected.authorizationPolicy === 'COURSE_GRANT_V1' ? 'COURSE_GRANT_V1' : 'LEGACY'))} onClick={()=>void run(async()=>{
             const saved = selected ? await call<Draft>(`/drafts/${selected.id}`,'PUT',{revision:selected.revision,template:online}) : await call<Draft>('/online/drafts','POST',{template:online,authorizationPolicy:policyChoice === 'COURSE_GRANT_V1' ? policyChoice : null})
             await refresh(); await open(selected?.id??saved.id);setNotice('在线题包已保存。人工验收通过后可提交独立审核。')
           })}>{selected?'保存在线修订':'保存在线新草稿'}</button>}
@@ -223,7 +225,7 @@ export default function SjtAuthoring() {
         <p className="text-sm text-gray-600">
           首版支持文字情境、行动后追问、五级或名义类别、非回答与补充文字。评分键按作者暂定规则求和，发布不代表已完成科学校准。
         </p>
-        <p className="text-sm text-gray-600">制作步骤：下载并填写模板 → 检查并保存草稿 → 预览作答与报告 → 提交独立审核 → 审批发布。上传或预览不会创建正式作答。</p>
+        <p className="text-sm text-gray-600">制作步骤：下载并填写模板 → 检查并保存草稿 → 预览作答与报告 → 管理员发布。上传或预览不会创建正式作答。</p>
         <label className="block">
           选择填写后的模板
           <input
@@ -249,7 +251,7 @@ export default function SjtAuthoring() {
           >
             保存新草稿
           </button>
-          {owned && selected?.template.templateVersion !== 'sjt-online-v1' && selected?.status !== 'PUBLISHED' ? (
+          {canMaintain && selected?.template.templateVersion !== 'sjt-online-v1' && selected?.status !== 'PUBLISHED' ? (
             <button
               disabled={busy}
               className="btn-secondary"
@@ -337,7 +339,17 @@ export default function SjtAuthoring() {
             >
               预览作答与报告
             </button>
-            {owned && selected.status === 'DRAFT' ? (
+            {isAdmin && selected.status === 'PUBLISHED' ? (
+              <button type="button" className="btn-secondary ml-3" disabled={busy} onClick={() =>
+                void run(async () => {
+                  const next = await call<{ id: string }>(`/drafts/${selected.id}/version`, 'POST', {})
+                  await refresh()
+                  await open(next.id)
+                  setNotice('已创建下一内容版本草稿；原发布版本及原作者素材归属保持不变。')
+                })
+              }>创建下一内容版本</button>
+            ) : null}
+            {owned && selected.status === 'DRAFT' && !isAdmin ? (
               <button
                 disabled={busy}
                 className="btn-primary ml-3"
@@ -355,19 +367,35 @@ export default function SjtAuthoring() {
                 提交审核
               </button>
             ) : null}
-            {user?.role === 'ADMIN' && !owned && selected.status === 'IN_REVIEW' ? (
+            {isAdmin && ['DRAFT', 'IN_REVIEW'].includes(selected.status) ? (
               <div className="space-y-3">
                 <label>
-                  审核意见
+                  发布/审核备注（直接发布可留空）
                   <textarea
                     className="block w-full rounded border p-2"
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                   />
                 </label>
-                {[false, true].map((approve) => (
+                <button
+                  disabled={busy}
+                  className="btn-primary mr-3"
+                  onClick={() =>
+                    void run(async () => {
+                      await call(`/drafts/${selected.id}/publish`, 'POST', {
+                        revision: selected.revision,
+                        contentDigest: selected.contentDigest,
+                        ...(note.trim() ? { note: note.trim() } : {}),
+                      })
+                      await open(selected.id)
+                      await refresh()
+                    })
+                  }
+                >
+                  {selected.status === 'IN_REVIEW' ? '审核通过并发布' : '发布版本'}
+                </button>
+                {selected.status === 'IN_REVIEW' && (
                   <button
-                    key={String(approve)}
                     disabled={busy || !note.trim()}
                     className="btn-secondary mr-3"
                     onClick={() =>
@@ -375,7 +403,7 @@ export default function SjtAuthoring() {
                         await call(`/drafts/${selected.id}/review`, 'POST', {
                           revision: selected.revision,
                           contentDigest: selected.contentDigest,
-                          approve,
+                          approve: false,
                           note,
                         })
                         await open(selected.id)
@@ -383,12 +411,12 @@ export default function SjtAuthoring() {
                       })
                     }
                   >
-                    {approve ? '审核通过并发布' : '退回修订'}
+                    退回修订
                   </button>
-                ))}
+                )}
               </div>
             ) : null}
-            {user?.role === 'ADMIN' && selected.release?.status === 'PUBLISHED' ? (
+            {isAdmin && selected.release?.status === 'PUBLISHED' ? (
               <div>
                 <label>
                   停用说明
@@ -422,7 +450,7 @@ export default function SjtAuthoring() {
                     修订 {a.revision} · {actionLabels[a.action] ?? a.action}
                     {a.note ? `：${a.note}` : ''}
                   </p>
-                  {owned &&
+                  {canMaintain &&
                   selected.status !== 'PUBLISHED' &&
                   a.template &&
                   a.revision < selected.revision ? (
@@ -542,7 +570,7 @@ export default function SjtAuthoring() {
           </AuthorPreviewMedia>
         </section>
       ) : null}
-      <SjtReleasePermissions admin={user?.role === 'ADMIN'} userId={user?.id}
+      <SjtReleasePermissions admin={user?.role === 'ADMIN' || user?.platformRole === 'SYSTEM_ADMIN'} userId={user?.id}
         refreshKey={selected?.release ? `${selected.release.id}:${selected.release.status}` : ''}
         onAdapt={async id => { await refresh(); await open(id) }}/>
       {paragraphs.length ? (

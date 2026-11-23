@@ -60,10 +60,11 @@ describe('current system authority on Bundle release transitions and new admissi
     expect(f.update).not.toHaveBeenCalled()
     expect(f.row()).toMatchObject({ status: 'PUBLISHED', review: f.review })
   })
-  it.each(denied)('rejects a new admission whose signed reviewer is now $name', async ({ value }) => {
+  it.each(denied)('keeps a published version admissible after its historical reviewer becomes $name', async ({ value }) => {
     const f = releaseFixture(value)
-    await expect(assertPackageAdmission(f.tx as never, f.pack)).rejects.toThrow('BUNDLE_ADMIN_REQUIRED')
-    expect(f.tx.user.findUnique).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'synthetic-reviewer' } }))
+    await expect(assertPackageAdmission(f.tx as never, f.pack)).resolves.toMatchObject({status:'PUBLISHED',contentHash:f.row().contentHash})
+    // Current release status, hash and dependencies—not the historical reviewer's live account—govern admission.
+    expect(f.tx.user.findUnique).not.toHaveBeenCalled()
     expect(f.update).not.toHaveBeenCalled()
     expect(f.row().review).toEqual(f.review)
   })
@@ -79,13 +80,14 @@ describe('current system authority on Bundle release transitions and new admissi
       expect(canonicalHash(readFrozenBundleProductionDefinition(frozen))).toBe(originalFrozenHash)
     }
   })
-  it('does not turn current reviewer demotion into a mutation of admitted frozen history', async () => {
+  it('keeps the frozen history unchanged when a former reviewer is demoted', async () => {
     const reviewer = authority({ id: 'synthetic-reviewer' })
     const f = releaseFixture(reviewer)
     const frozen = freezeBundleProductionDefinition(packageEntry(f.pack), { frozenAt: new Date().toISOString(), sourceReference: 'synthetic-admitted-history' })
     const original = canonicalHash(frozen)
     reviewer.platformRole = 'STANDARD'
-    await expect(assertPackageAdmission(f.tx as never, f.pack)).rejects.toThrow('BUNDLE_ADMIN_REQUIRED')
+    await expect(assertPackageAdmission(f.tx as never, f.pack)).resolves.toMatchObject({status:'PUBLISHED'})
+    expect(f.tx.user.findUnique).not.toHaveBeenCalled()
     expect(canonicalHash(readFrozenBundleProductionDefinition(frozen))).toBe(original)
     expect(f.row().review).toEqual(f.review)
     expect(f.update).not.toHaveBeenCalled()

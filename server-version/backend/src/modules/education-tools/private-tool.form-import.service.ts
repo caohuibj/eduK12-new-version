@@ -1,7 +1,6 @@
-import {createHash,createHmac,timingSafeEqual} from 'node:crypto'
+import {createHash,timingSafeEqual} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
-import {config} from '../../config'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {parseText,parseCsv,type ImportIssue} from '../assessment-core/form/import-parser'
@@ -13,12 +12,11 @@ import {privateToolId,privateToolFail,type PrivateToolContext} from './private-t
 import {privateToolContentHash,privateToolDefinition} from './private-tool.definition'
 import {assertPrivateToolImages,syncPrivateToolDraftImages} from './private-tool.media'
 
-const hash=z.string().regex(/^[a-f0-9]{64}$/),protocol='education-private-form-import-v1',ttl=10*60*1000
+const hash=z.string().regex(/^[a-f0-9]{64}$/),protocol='education-private-form-import-v1'
 export const privateFormImportInput=z.object({format:z.enum(['CSV','TEXT']),content:z.string().min(1).max(200000),batchId:z.string().guid(),
  targetPageKey:assessmentKeySchema.optional(),expectedRevision:z.number().int().positive(),expectedContentHash:hash}).strict()
-export const privateFormImportApplyInput=privateFormImportInput.extend({digest:hash,previewToken:hash,previewExpiresAt:z.number().int().positive().max(Number.MAX_SAFE_INTEGER)}).strict()
+export const privateFormImportApplyInput=privateFormImportInput.extend({digest:hash,previewToken:z.string().optional(),previewExpiresAt:z.union([z.string(),z.number()]).optional()}).strict()
 type Input=z.infer<typeof privateFormImportInput>
-const sign=(digest:string,expires:number)=>createHmac('sha256',config.assetSigningSecret).update(protocol+'\0').update(digest).update('\0').update(String(expires)).digest('hex')
 const equal=(a:string,b:string)=>timingSafeEqual(Buffer.from(a,'hex'),Buffer.from(b,'hex'))
 const boundary={visibility:'AUTHOR_PRIVATE',snapshotOnly:true,canPublish:false,canShare:false,canReadParticipantReports:false} as const
 
@@ -68,16 +66,14 @@ export async function importPrivateForm(c:PrivateToolContext,id:string,raw:unkno
   if(row.kind!=='FORM')privateToolFail('PRIVATE_TOOL_FORM_REQUIRED',400)
   if(row.contentHash!==privateToolContentHash('FORM',row.title,row.definition))privateToolFail('PRIVATE_TOOL_HASH_MISMATCH')
   if(row.revision!==input.expectedRevision||row.contentHash!==input.expectedContentHash)privateToolFail('PRIVATE_TOOL_REVISION_CONFLICT')
-  if(proof&&(proof.previewExpiresAt<=Date.now()||proof.previewExpiresAt>Date.now()+ttl||!equal(proof.previewToken,sign(proof.digest,proof.previewExpiresAt))))privateToolFail('PRIVATE_TOOL_FORM_IMPORT_PREVIEW_EXPIRED')
   const {definition:planned,...preview}=planPrivateFormImport(row.definition,input)
   if(!preview.ok){if(apply)privateToolFail('PRIVATE_TOOL_FORM_IMPORT_INVALID',400,preview.issues);return preview}
   const definition=privateToolDefinition('FORM',planned)
   const media=await assertPrivateToolImages(tx,c,id,'FORM',definition)
   const digest=canonicalHash({protocol,id,...scope,accountDomain:c.principal.accountDomain,revision:row.revision,baseContentHash:row.contentHash,
    format:input.format,batchId:input.batchId,targetPageKey:input.targetPageKey??null,contentHash:createHash('sha256').update(input.content,'utf8').digest('hex'),nextDefinitionHash:canonicalHash(definition)})
-  const previewExpiresAt=Date.now()+ttl
-  if(!apply)return {...preview,digest,previewToken:sign(digest,previewExpiresAt),previewExpiresAt,expectedRevision:row.revision,expectedContentHash:row.contentHash}
-  if(!proof||!equal(proof.digest,digest)||proof.previewExpiresAt<=Date.now())privateToolFail('PRIVATE_TOOL_FORM_IMPORT_PREVIEW_EXPIRED')
+  if(!apply)return {...preview,digest,expectedRevision:row.revision,expectedContentHash:row.contentHash}
+  if(!proof||!equal(proof.digest,digest))privateToolFail('PRIVATE_TOOL_FORM_IMPORT_PREVIEW_EXPIRED')
   const contentHash=privateToolContentHash('FORM',row.title,definition)
   const result=await tx.educationPrivateTool.updateMany({where:{id,...scope,revision:row.revision,contentHash:row.contentHash},data:{definition:definition as Prisma.InputJsonValue,contentHash,revision:{increment:1}}})
   if(result.count!==1)privateToolFail('PRIVATE_TOOL_REVISION_CONFLICT')

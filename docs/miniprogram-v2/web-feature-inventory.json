@@ -1835,7 +1835,6 @@
     {
       "webRoute": "/sjt-authoring",
       "roles": [
-        "TEACHER",
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:691",

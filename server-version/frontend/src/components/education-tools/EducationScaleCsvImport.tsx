@@ -1,7 +1,7 @@
 import {useEffect,useRef,useState} from 'react'
 import {privateToolBase,privateToolError,type PrivateTool,type PrivateToolApi} from './privateToolClient'
 
-type Preview={digest:string;previewToken:string;previewExpiresAt:number;expectedRevision:number;expectedContentHash:string;
+type Preview={digest:string;expectedRevision:number;expectedContentHash:string;
  count:number;totalItems:number;responseSetKey:string;responseSet:{options:Array<{value:string|number;label:string;score:number}>};
  scores:Array<{key:string;label:string;aggregation:string}>;items:Array<{itemCode:string;content:string;reverse:boolean;scoreKeys:string[]}>}
 type Props={api:PrivateToolApi;organizationId:string;tool:PrivateTool;disabled:boolean;
@@ -22,7 +22,7 @@ export function EducationScaleCsvImport({api,organizationId,tool,disabled,onImpo
   pending.current=true;setBusy(true);onBusy(true);setMessage('');setFailed(false)
   try{
    const body={content,expectedRevision:tool.revision,expectedContentHash:tool.contentHash,
-    ...(apply&&preview?{digest:preview.digest,previewToken:preview.previewToken,previewExpiresAt:preview.previewExpiresAt}:{})}
+    ...(apply&&preview?{digest:preview.digest}:{})}
    const path=`${privateToolBase(organizationId)}/${encodeURIComponent(tool.id)}/import/${apply?'apply':'preview'}`
    if(apply){
     const value=await api<PrivateTool&{importedCount:number}>(path,'POST',body)
@@ -33,7 +33,7 @@ export function EducationScaleCsvImport({api,organizationId,tool,disabled,onImpo
    }else{
     const value=await api<Preview>(path,'POST',body)
     if(!current())return
-    setPreview(value);setMessage('预检通过，凭据有效期 10 分钟。请核对题干、反向计分、计分项和共享选项，再确认追加保存。')
+    setPreview(value);setMessage('预检通过。请核对题干、反向计分、计分项和共享选项，再确认追加保存。')
    }
   }catch(error){
    if(!current())return

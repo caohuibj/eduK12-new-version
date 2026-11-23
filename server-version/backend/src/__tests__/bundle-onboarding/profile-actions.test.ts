@@ -1,8 +1,7 @@
 import {describe,it,expect,vi} from 'vitest'
 import path from 'node:path'
-import {createHmac} from 'node:crypto'
 import type {PrismaClient} from '@prisma/client'
-import {canonicalHash,canonicalJsonString} from '../../modules/assessment-runtime/canonical'
+import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {loadPackage} from '../../modules/assessment-bundle/onboarding/loader'
 import {hashDeclarativePackage,parseDeclarativePackage} from '../../modules/assessment-bundle/onboarding/contract'
 import {projectProfileView} from '../../modules/assessment-bundle/profile/report'
@@ -55,23 +54,34 @@ describe('Bundle-owned profile actions',()=>{
     expect(hashDeclarativePackage(without)).not.toBe(hashDeclarativePackage(current))
     expect(()=>parseDeclarativePackage({...current,report:{...current.report,profileActionContent:'SOURCE_EDUCATIONAL_MATERIALS'}})).toThrow()
   })
-  it('uses existing content-bound rights/report review; ordinary allocation is not content approval',async()=>{
-    const secret='synthetic-unit-review-key-not-for-publication',hash=hashDeclarativePackage(current)
-    const material={contentHash:hash,reviewerId:'synthetic-content-reviewer',expiresAt:'2030-10-31T00:00:00.000Z',
-      claims:['cross_source_condition'],scientific:true,rights:true,language:true,report:true}
-    const review={...material,signature:createHmac('sha256',secret).update(canonicalJsonString(material)).digest('hex')}
-    expect(validateReview(review,hash,secret,Date.parse('2026-10-30T00:00:00Z')).report).toBe(true)
-    expect(()=>validateReview(review,hashDeclarativePackage(withoutOwn()),secret,Date.parse('2026-10-30T00:00:00Z'))).toThrow('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
+  it('requires system administrator authority and matching content hash; ordinary allocation cannot publish',async()=>{
+    const hash=hashDeclarativePackage(current)
+    const material={contentHash:hash,reviewerId:'synthetic-content-reviewer',claims:['cross_source_condition']}
+    expect(validateReview(material,hash).claims).toEqual(['cross_source_condition'])
+    expect(()=>validateReview(material,hashDeclarativePackage(withoutOwn()))).toThrow('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
     const db=(role:string,platformRole:'STANDARD'|'SYSTEM_ADMIN'='STANDARD')=>({$transaction:async(callback:(tx:unknown)=>Promise<unknown>)=>callback({
       user:{findUnique:async()=>({role,platformRole,isActive:true,isFrozen:false,expiresAt:null})},$executeRaw:async()=>0,
       bundlePackageRelease:{findUniqueOrThrow:async()=>({status:'DRAFT',installedBy:'synthetic-installer',contentHash:hash,content:current})},
     })}) as unknown as PrismaClient
-    vi.stubEnv('BUNDLE_REVIEW_SIGNING_KEY',secret)
-    try{
-      await expect(publishPackage(db('TEACHER'),'ordinary-allocator',current.profile.key,'0.1.2',review)).rejects.toThrow('BUNDLE_ADMIN_REQUIRED')
-      await expect(publishPackage(db('ADMIN'),'ordinary-admin-allocator',current.profile.key,'0.1.2',review)).rejects.toThrow('BUNDLE_ADMIN_REQUIRED')
-      await expect(publishPackage(db('ADMIN','SYSTEM_ADMIN'),'synthetic-system-publisher',current.profile.key,'0.1.2',{...review,signature:'0'.repeat(64)})).rejects.toThrow('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
-    }finally{vi.unstubAllEnvs()}
+    await expect(publishPackage(db('TEACHER'),'ordinary-allocator',current.profile.key,'0.1.2',material)).rejects.toThrow('BUNDLE_ADMIN_REQUIRED')
+    await expect(publishPackage(db('ADMIN'),'ordinary-admin-allocator',current.profile.key,'0.1.2',material)).rejects.toThrow('BUNDLE_ADMIN_REQUIRED')
+    await expect(publishPackage(db('ADMIN','SYSTEM_ADMIN'),'synthetic-system-publisher',current.profile.key,'0.1.2',{...material,contentHash:'0'.repeat(64)})).rejects.toThrow('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
+  })
+  it('returns an already PUBLISHED package idempotently without overwriting review metadata',async()=>{
+    const hash=hashDeclarativePackage(current)
+    const existingRow={id:'rel-1',bundleKey:current.profile.key,bundleVersion:'0.1.2',status:'PUBLISHED',installedBy:'inst-1',publishedBy:'orig-admin',contentHash:hash,content:current,review:{contentHash:hash,reviewerId:'orig-admin',reviewedAt:'2026-01-01T00:00:00.000Z',claims:['cross_source_condition']}}
+    let updated=false
+    const db={ $transaction: async(callback:(tx:unknown)=>Promise<unknown>)=>callback({
+      user:{findUnique:async()=>({role:'ADMIN',platformRole:'SYSTEM_ADMIN',isActive:true,isFrozen:false,expiresAt:null})},
+      $executeRaw:async()=>0,
+      bundlePackageRelease:{
+        findUniqueOrThrow:async()=>existingRow,
+        update:async()=>{updated=true;return existingRow},
+      },
+    })} as unknown as PrismaClient
+    const res=await publishPackage(db,'second-admin',current.profile.key,'0.1.2')
+    expect(updated).toBe(false)
+    expect(res).toBe(existingRow)
   })
 })
 function withoutOwn(){const p=structuredClone(current);delete p.report.profileActionContent;return p}

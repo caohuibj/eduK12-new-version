@@ -128,6 +128,60 @@ it('filters registered candidates and focuses the selected operation panel',asyn
  expect(mock.post).not.toHaveBeenCalled()
 })
 
+it('publishes an installed DRAFT config and approves a profile in one admin flow',async()=>{
+ const draftPlan={...plan,action:'ALREADY_PRESENT',configId:'cfg-1',status:'DRAFT'}
+ mock.get.mockImplementation(async(path:string)=>path.startsWith(root)
+  ?response({...catalog,registered:[{...candidate,plan:draftPlan}]})
+  :response({configId:'cfg-1',profile:'experience',title:'数字线估计',artifactHash:'a'.repeat(64),report:{title:'数字线估计报告'}}))
+ mock.post.mockImplementation(async(path:string)=>{
+  if(path==='/cognitive/configs/cfg-1/publish')return response({id:'cfg-1',status:'PUBLISHED'})
+  if(path==='/cognitive/profile-configurations/system/cfg-1/experience/approve')return response({artifactHash:'a'.repeat(64),allowedProducts:['SURVEY','TRAINING']})
+  if(path==='/cognitive/configs/cfg-1/retire')return response({id:'cfg-1',status:'RETIRED'})
+  throw new Error('Unexpected path: '+path)
+ })
+ render(<CognitiveIntake/>);await screen.findByText('数字线估计',{selector:'strong'});choose()
+ fireEvent.click(await screen.findByRole('button',{name:'发布此配置'}))
+ await screen.findByText(/配置已发布（PUBLISHED）/)
+ fireEvent.click(await screen.findByRole('button',{name:'预览 Profile 摘要'}))
+ await screen.findByText(/数字线估计报告/)
+ fireEvent.click(await screen.findByRole('button',{name:'批准并启用此 Profile'}))
+ await screen.findByText(/已批准 .*：准入产品 SURVEY、TRAINING/)
+ const approveCall=mock.post.mock.calls.find(call=>call[0]==='/cognitive/profile-configurations/system/cfg-1/experience/approve')!
+ expect(approveCall[1]).toMatchObject({expectedArtifactHash:'a'.repeat(64),allowedProducts:['SURVEY','TRAINING']})
+})
+
+it('preserves existing approvedProducts when adding another entry',async()=>{
+ const publishedPlan={...plan,action:'ALREADY_PRESENT',configId:'cfg-1',status:'PUBLISHED'}
+ mock.get.mockImplementation(async(path:string)=>path.startsWith(root)
+  ?response({...catalog,registered:[{...candidate,plan:publishedPlan}]})
+  :response({configId:'cfg-1',profile:'experience',title:'数字线估计',artifactHash:'a'.repeat(64),approvedProducts:['SCHOOL','TEACHER'],report:{title:'数字线估计报告'}}))
+ mock.post.mockImplementation(async(path:string)=>{
+  if(path==='/cognitive/profile-configurations/system/cfg-1/experience/approve')return response({artifactHash:'a'.repeat(64),allowedProducts:['SCHOOL','TEACHER','TRAINING']})
+  throw new Error('Unexpected path: '+path)
+ })
+ render(<CognitiveIntake/>);await screen.findByText('数字线估计',{selector:'strong'});choose()
+ fireEvent.click(await screen.findByRole('button',{name:'预览 Profile 摘要'}))
+ await screen.findByText(/当前已启用入口：SCHOOL、TEACHER/)
+ fireEvent.click(screen.getByRole('checkbox',{name:'TRAINING'}))
+ await screen.findByText(/将新增：TRAINING/)
+ fireEvent.click(await screen.findByRole('button',{name:'批准并启用此 Profile'}))
+ const approveCall=mock.post.mock.calls.find(call=>call[0]==='/cognitive/profile-configurations/system/cfg-1/experience/approve')!
+ expect(approveCall[1]).toMatchObject({expectedArtifactHash:'a'.repeat(64),allowedProducts:['SCHOOL','TEACHER','TRAINING']})
+})
+
+it('does not silently re-enable entries when a previously approved profile has no active entry',async()=>{
+ const publishedPlan={...plan,action:'ALREADY_PRESENT',configId:'cfg-1',status:'PUBLISHED'}
+ mock.get.mockImplementation(async(path:string)=>path.startsWith(root)
+  ?response({...catalog,registered:[{...candidate,plan:publishedPlan}]})
+  :response({configId:'cfg-1',profile:'experience',title:'数字线估计',artifactHash:'a'.repeat(64),approvedProducts:[],hasPriorPolicy:true}))
+ render(<CognitiveIntake/>);await screen.findByText('数字线估计',{selector:'strong'});choose()
+ fireEvent.click(await screen.findByRole('button',{name:'预览 Profile 摘要'}))
+ await screen.findByText(/已有入口策略目前均未启用/)
+ for(const entry of ['SURVEY','TRAINING','SCHOOL','TEACHER'])expect(screen.getByRole('checkbox',{name:entry})).not.toBeChecked()
+ expect(screen.getByRole('button',{name:'批准并启用此 Profile'})).toBeDisabled()
+ expect(mock.post).not.toHaveBeenCalled()
+})
+
 it('pages a long candidate directory and resets paging after search',async()=>{
  mock.get.mockResolvedValue(response({...catalog,registered:Array.from({length:13},(_,index)=>({...candidate,testType:`candidate-${index}`,name:`分页候选 ${index}`,plan:{...plan,testType:`candidate-${index}`}}))}))
  render(<CognitiveIntake/>);await screen.findByText('分页候选 0',{selector:'strong'})

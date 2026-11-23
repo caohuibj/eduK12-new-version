@@ -1,7 +1,5 @@
-import { createHmac } from 'node:crypto'
 import type { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
-import { canonicalJsonString } from '../assessment-runtime/canonical'
 import { hashDeclarativePackage, parseDeclarativePackage } from '../assessment-bundle/onboarding/contract'
 import { packageEntry } from '../assessment-bundle/onboarding/catalog'
 import { dependencyBlockers } from '../assessment-bundle/onboarding/dependencies'
@@ -19,19 +17,17 @@ const releaseConflicts: Record<string, string> = {
   BUNDLE_VERSION_IMMUTABLE: '该版本内容已锁定，请更换版本号后保存',
   BUNDLE_LEGACY_IDENTITY_RESERVED: '该包标识和版本已被历史定义占用，请使用新的标识或版本',
   BUNDLE_RETIRED: '该版本已退役，请制作新版本',
-  BUNDLE_HOLD_REVIEW_REQUIRED: '暂停版本需要重新独立审核后恢复，不能复用暂停前的审批',
   BUNDLE_CONTENT_HASH_MISMATCH: '登记内容校验失败，请联系管理员复核',
-  BUNDLE_CLAIM_NOT_APPROVED: '仍有整体报告结论未获审核，请重新核对报告声明',
+  BUNDLE_CLAIM_NOT_APPROVED: '仍有整体报告结论未包含在声明中，请重新预览当前版本',
   BUNDLE_COGNITIVE_DEPENDENCY_UNAVAILABLE: '引用的认知任务版本不可用，请核对发布状态',
   BUNDLE_SCALE_DEPENDENCY_UNAVAILABLE: '引用的量表版本不可用，请核对发布状态',
   BUNDLE_SJT_DEPENDENCY_UNAVAILABLE: '引用的情境题包版本不可用，请核对发布状态',
-  BUNDLE_REVIEW_KEY_REQUIRED: '固定包审批签名服务尚未配置，请联系运维',
-  BUNDLE_REVIEW_INVALID_OR_EXPIRED: '审核记录已失效，请重新审核当前版本',
+  BUNDLE_REVIEW_INVALID_OR_EXPIRED: '发布摘要与当前版本不一致，请重新预览当前版本',
 }
 function releaseError(cause: unknown): never {
   if (cause instanceof Error) {
-    if (cause.message === 'BUNDLE_ADMIN_REQUIRED' || cause.message === 'BUNDLE_INDEPENDENT_REVIEW_REQUIRED') {
-      throw compositeForbidden('需要有权限的另一位管理员独立审核此版本')
+    if (cause.message === 'BUNDLE_ADMIN_REQUIRED') {
+      throw compositeForbidden('需要当前系统管理员权限执行此操作')
     }
     const message = releaseConflicts[cause.message]
     if (message) throw compositeConflict(message)
@@ -79,22 +75,42 @@ export async function getPackageDraft(db: PrismaClient, actor: BundleAdministrat
   administrator(actor)
   const row = await db.bundlePackageRelease.findUnique({ where: { bundleKey_bundleVersion: { bundleKey: key, bundleVersion: version } } })
   if (!row) throw compositeNotFound('固定包版本不存在')
-  return { ...row, review: row.review ? { contentHash: (row.review as any).contentHash, reviewerId: (row.review as any).reviewerId, reviewedAt: (row.review as any).reviewedAt, expiresAt: (row.review as any).expiresAt } : null }
+  return {
+    ...row,
+    review: row.review
+      ? {
+        contentHash: (row.review as any).contentHash,
+        reviewerId: (row.review as any).reviewerId,
+        reviewedAt: (row.review as any).reviewedAt,
+        ...((row.review as any).expiresAt !== undefined ? { expiresAt: (row.review as any).expiresAt } : {}),
+      }
+      : null,
+  }
 }
-const approval = z.object({ contentHash: z.string().regex(/^[a-f0-9]{64}$/), scientific: z.literal(true), rights: z.literal(true), language: z.literal(true), report: z.literal(true),
-  claims: z.array(z.enum(['independent_summary', 'cross_source_condition', 'joint_conclusion'])).max(3) }).strict()
+const approval = z.object({
+  contentHash: z.string().regex(/^[a-f0-9]{64}$/),
+  claims: z.array(z.enum(['independent_summary', 'cross_source_condition', 'joint_conclusion'])).max(3).optional(),
+  note: z.string().max(500).optional(),
+  scientific: z.boolean().optional(),
+  rights: z.boolean().optional(),
+  language: z.boolean().optional(),
+  report: z.boolean().optional(),
+}).strict()
 export async function approvePackage(db: PrismaClient, actor: BundleAdministrator, key: string, version: string, raw: unknown) {
   administrator(actor)
   const checked = approval.parse(raw)
   const row = await getPackageDraft(db, actor, key, version)
-  if (row.installedBy === actor.userId) throw compositeForbidden('需要另一位管理员独立审核此版本')
   if (checked.contentHash !== row.contentHash) throw compositeConflict('审批内容与当前版本不一致，请重新预览')
-  const secret = process.env.BUNDLE_REVIEW_SIGNING_KEY
-  if (!secret || secret.length < 32) throw compositeConflict('固定包审批签名服务尚未配置，请联系运维')
-  const now = Date.now()
-  const material = { ...checked, reviewerId: actor.userId, reviewedAt: new Date(now).toISOString(), expiresAt: new Date(now + 7 * 86400000).toISOString() }
-  const signature = createHmac('sha256', secret).update(canonicalJsonString(material)).digest('hex')
-  await publishPackage(db, actor.userId, key, version, { ...material, signature }).catch(releaseError)
+  const preview = previewValidatedPackage(actor, row.content)
+  if (preview.blockers.length > 0) throw compositeConflict(`包结构或合成试验未通过校验：${preview.blockers.join('、')}`)
+  const releaseRecord = {
+    contentHash: checked.contentHash,
+    reviewerId: actor.userId,
+    reviewedAt: new Date().toISOString(),
+    claims: checked.claims ?? preview.requiredClaims,
+    ...(checked.note ? { note: checked.note } : {}),
+  }
+  await publishPackage(db, actor.userId, key, version, releaseRecord).catch(releaseError)
   return getPackageDraft(db, actor, key, version)
 }
 /** Published JSON definitions use the same validator and admission signature

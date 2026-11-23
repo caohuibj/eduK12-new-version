@@ -1,11 +1,10 @@
 import {publishTrainingSourcesFixture,publishStaticMeasurementFixture} from '../fixtures/published-measurement'
 import { describe,it,expect,beforeAll,afterAll,vi } from 'vitest'
 import { PrismaClient, UserRole } from '@prisma/client'
-import { randomUUID,createHmac } from 'node:crypto'
+import { randomUUID } from 'node:crypto'
 import { mkdtempSync,rmSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { canonicalJsonString } from '../../modules/assessment-runtime/canonical'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 import { scaffoldPackage } from '../../modules/assessment-bundle/onboarding/template'
 import { writePackage,loadPackage,generatePackages } from '../../modules/assessment-bundle/onboarding/loader'
@@ -90,11 +89,8 @@ suite('unknown declarative packages: installation to frozen report',()=>{
     await expect(installPackage(db,student,loaded)).rejects.toThrow('ADMIN')
     const changed=structuredClone(loaded);changed.rules.items[0].text='Different'
     await expect(installPackage(db,actor.userId,changed)).rejects.toThrow('IMMUTABLE')
-    const material={contentHash:hash,reviewerId:reviewer,expiresAt:new Date(Date.now()+3600000).toISOString(),claims:['independent_summary','cross_source_condition'],scientific:true,rights:true,language:true,report:true}
-    const review={...material,signature:createHmac('sha256',secret).update(canonicalJsonString(material)).digest('hex')}
-    const selfMaterial = { ...material, reviewerId: actor.userId }
-    const selfReview = { ...selfMaterial, signature: createHmac('sha256', secret).update(canonicalJsonString(selfMaterial)).digest('hex') }
-    await expect(publishPackage(db, reviewer, key, '1.0.0', selfReview)).rejects.toThrow('BUNDLE_INDEPENDENT_REVIEW_REQUIRED')
+    const review={contentHash:hash,reviewerId:actor.userId,claims:['independent_summary','cross_source_condition']}
+    await expect(publishPackage(db, student, key, '1.0.0', review)).rejects.toThrow('BUNDLE_ADMIN_REQUIRED')
     await expect(publishPackage(db,actor.userId,key,'1.0.0',{...review,contentHash:'0'.repeat(64)})).rejects.toThrow()
     const provider=new BundleDefinitionProvider([packageEntry(loaded)]),product=(await import('../../modules/bundle-product/service')).createBundleProductService(provider)
     await expect(product.eligible(actor,key,'1.0.0')).rejects.toThrow()
@@ -124,10 +120,10 @@ suite('unknown declarative packages: installation to frozen report',()=>{
     await expect(product.eligible(actor,key,'1.0.0')).rejects.toThrow()
     await expect(changePackageStatus(db,actor.userId,key,'1.0.0','HOLD')).rejects.toThrow('RETIRED')
     await expect(publishPackage(db,actor.userId,key,'1.0.0',review)).rejects.toThrow('RETIRED')
-    expect((await db.bundlePackageRelease.findUniqueOrThrow({where:{id:installed.id}})).review).toEqual(review)
+    expect((await db.bundlePackageRelease.findUniqueOrThrow({where:{id:installed.id}})).review).toMatchObject(review)
     expect((await analysis.readReport(attemptId,'admin',initial.analysisId)).factsHash).toBe(initial.factsHash)
   },60000)
-  it('supports admin authoring and independent signed approval without exposing signing material', async () => {
+  it('supports single-admin authoring and functional publication without content-review locks or 7-day expiry timers', async () => {
     const key = 'admin_authoring_' + suffix.replace(/-/g, '')
     keys.push(key)
     const pack = scaffoldPackage(key)
@@ -137,15 +133,15 @@ suite('unknown declarative packages: installation to frozen report',()=>{
     expect(() => previewPackage({ userId: student, role: UserRole.TEACHER }, pack)).toThrow()
     const saved = await savePackage(db, actor, pack)
     expect(saved.status).toBe('DRAFT')
-    const material = { contentHash: saved.contentHash, scientific: true, rights: true, language: true, report: true, claims: preview.requiredClaims }
-    await expect(approvePackage(db, actor, key, '1.0.0', material)).rejects.toMatchObject({ statusCode: 403 })
-    await expect(approvePackage(db, { userId: reviewer, role: UserRole.ADMIN, platformRole: 'SYSTEM_ADMIN' }, key, '1.0.0', { ...material, contentHash: 'f'.repeat(64) })).rejects.toMatchObject({ statusCode: 409 })
-    const approved = await approvePackage(db, { userId: reviewer, role: UserRole.ADMIN, platformRole: 'SYSTEM_ADMIN' }, key, '1.0.0', material)
+    const material = { contentHash: saved.contentHash, claims: preview.requiredClaims }
+    await expect(approvePackage(db, actor, key, '1.0.0', { ...material, contentHash: 'f'.repeat(64) })).rejects.toMatchObject({ statusCode: 409 })
+    const approved = await approvePackage(db, actor, key, '1.0.0', material)
     expect(approved.status).toBe('PUBLISHED')
     expect(approved.installedBy).toBe(actor.userId)
-    expect(approved.publishedBy).toBe(reviewer)
-    expect(approved.review).toMatchObject({ reviewerId: reviewer, contentHash: saved.contentHash })
+    expect(approved.publishedBy).toBe(actor.userId)
+    expect(approved.review).toMatchObject({ reviewerId: actor.userId, contentHash: saved.contentHash })
     expect(approved.review).not.toHaveProperty('signature')
+    expect(approved.review).not.toHaveProperty('expiresAt')
     const provider = new BundleDefinitionProvider([])
     await refreshPublishedPackages(db, provider)
     expect(provider.exact(key, '1.0.0')?.declarativePackage).toEqual(pack)
@@ -153,17 +149,9 @@ suite('unknown declarative packages: installation to frozen report',()=>{
     expect((await getPackageDraft(db, actor, key, '1.0.0')).contentHash).toBe(saved.contentHash)
     const product = (await import('../../modules/bundle-product/service')).createBundleProductService(provider)
     expect((await product.eligible(actor, key, '1.0.0')).definition.bundleKey).toBe(key)
-    // Advance only Date; real Prisma/HTTP timers remain available.
-    const expiry = Date.parse(approved.review!.expiresAt)
     vi.useFakeTimers({ toFake: ['Date'] })
     try {
-      vi.setSystemTime(expiry + 1)
-      await expect(product.eligible(actor, key, '1.0.0')).rejects.toMatchObject({ statusCode: 409 })
-      await expect(approvePackage(db, actor, key, '1.0.0', material)).rejects.toMatchObject({ statusCode: 403 })
-      const renewed = await approvePackage(db, { userId: reviewer, role: UserRole.ADMIN, platformRole: 'SYSTEM_ADMIN' }, key, '1.0.0', material)
-      expect(renewed).toMatchObject({ status: 'PUBLISHED', installedBy: actor.userId, publishedBy: reviewer, contentHash: saved.contentHash })
-      expect(Date.parse(renewed.review!.expiresAt)).toBeGreaterThan(Date.now())
-      expect(renewed.content).toEqual(saved.content)
+      vi.setSystemTime(Date.now() + 30 * 86400000)
       expect((await product.eligible(actor, key, '1.0.0')).definition.bundleKey).toBe(key)
       const previous = await db.bundleAnalysis.findFirstOrThrow({ where: { attempt: { userId: student } } })
       expect((await analysis.readReport(previous.attemptId, 'admin', previous.id)).factsHash).toBe(previous.factsHash)
@@ -183,30 +171,22 @@ suite('unknown declarative packages: installation to frozen report',()=>{
     const provider = new BundleDefinitionProvider([packageEntry(pack)])
     expect(() => provider.register(packageEntry(installed.content))).not.toThrow()
   })
-  it('requires a new independent signed review to restore HOLD and never restores RETIRED', async () => {
+  it('allows system admins to restore HOLD versions directly and never restores RETIRED', async () => {
     const key = 'hold_review_' + suffix.replace(/-/g, '')
     keys.push(key)
     const pack = scaffoldPackage(key), preview = previewPackage(actor, pack), saved = await savePackage(db, actor, pack)
-    const material = { contentHash: saved.contentHash, scientific: true, rights: true, language: true, report: true, claims: preview.requiredClaims }
+    const material = { contentHash: saved.contentHash, claims: preview.requiredClaims }
     const independent = { userId: reviewer, role: UserRole.ADMIN, platformRole: 'SYSTEM_ADMIN' as const }
-    await approvePackage(db, independent, key, '1.0.0', material)
+    await approvePackage(db, actor, key, '1.0.0', material)
     const where = { bundleKey_bundleVersion: { bundleKey: key, bundleVersion: '1.0.0' } }
-    const published = await db.bundlePackageRelease.findUniqueOrThrow({ where })
     await changePackageStatus(db, actor.userId, key, '1.0.0', 'HOLD')
-    await expect(publishPackage(db, reviewer, key, '1.0.0', published.review)).rejects.toThrow('BUNDLE_HOLD_REVIEW_REQUIRED')
-    await expect(approvePackage(db, actor, key, '1.0.0', material)).rejects.toMatchObject({ statusCode: 403 })
     expect((await db.bundlePackageRelease.findUniqueOrThrow({ where })).status).toBe('HOLD')
-    vi.useFakeTimers({ toFake: ['Date'] })
-    try {
-      vi.setSystemTime(Date.now() + 1000)
-      const restored = await approvePackage(db, independent, key, '1.0.0', material)
-      expect(restored).toMatchObject({ status: 'PUBLISHED', contentHash: saved.contentHash, installedBy: actor.userId, publishedBy: reviewer })
-      expect(restored.content).toEqual(saved.content)
-      expect((await db.bundlePackageRelease.findUniqueOrThrow({ where })).review).not.toEqual(published.review)
-      await changePackageStatus(db, actor.userId, key, '1.0.0', 'RETIRED')
-      await expect(approvePackage(db, independent, key, '1.0.0', material)).rejects.toMatchObject({ statusCode: 409 })
-      await expect(changePackageStatus(db, reviewer, key, '1.0.0', 'HOLD')).rejects.toThrow('BUNDLE_RETIRED')
-      expect((await db.bundlePackageRelease.findUniqueOrThrow({ where })).status).toBe('RETIRED')
-    } finally { vi.useRealTimers() }
+    const restored = await approvePackage(db, actor, key, '1.0.0', material)
+    expect(restored).toMatchObject({ status: 'PUBLISHED', contentHash: saved.contentHash, installedBy: actor.userId, publishedBy: actor.userId })
+    expect(restored.content).toEqual(saved.content)
+    await changePackageStatus(db, actor.userId, key, '1.0.0', 'RETIRED')
+    await expect(approvePackage(db, independent, key, '1.0.0', material)).rejects.toMatchObject({ statusCode: 409 })
+    await expect(changePackageStatus(db, reviewer, key, '1.0.0', 'HOLD')).rejects.toThrow('BUNDLE_RETIRED')
+    expect((await db.bundlePackageRelease.findUniqueOrThrow({ where })).status).toBe('RETIRED')
   })
 })

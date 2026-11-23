@@ -125,6 +125,11 @@ export function exactStandardCombinationEntryProducts(value:unknown):StandardCom
   throw new AdminPermissionError(400,'批准时必须明确选择允许的入口，且不能重复')
  return [...value].sort() as StandardCombinationEntryProduct[]
 }
+export async function readApprovedToolEntryProducts(tx:Prisma.TransactionClient,identity:PolicyIdentity){
+ const rows=await tx.$queryRaw<Array<{product:StandardCombinationEntryProduct;decision:ToolPolicy['decision'];paused:boolean}>>`SELECT product,decision,paused FROM survey_tool_policies
+  WHERE resource_key=${identity.resourceKey} AND fingerprint=${identity.fingerprint} ORDER BY product`
+ return {approvedProducts:rows.filter(row=>row.decision==='APPROVED'&&!row.paused).map(row=>row.product),hasPriorPolicy:rows.length>0}
+}
 export async function approveToolEntryPolicies(tx:Prisma.TransactionClient,identity:PolicyIdentity,rawProducts:unknown,actorId:string,reason:string){
  const products=exactToolEntryProducts(rawProducts)
  return writeEntryPolicies(tx,identity,products,actorId,reason)

@@ -21,7 +21,7 @@ async function actor(organizationId?:string){
  return {context,org,user,capability,tool:await readPrivateTool(context,created.id)}
 }
 const body=(tool:{revision:number;contentHash:string},extra:Record<string,unknown>={})=>({format:'TEXT',content:'追加观察\n甲\n乙\n\n补充记录',batchId:randomUUID(),expectedRevision:tool.revision,expectedContentHash:tool.contentHash,...extra})
-const confirmation=(request:ReturnType<typeof body>,preview:any)=>({...request,digest:preview.digest,previewToken:preview.previewToken,previewExpiresAt:preview.previewExpiresAt})
+const confirmation=(request:ReturnType<typeof body>,preview:any)=>({...request,digest:preview.digest})
 suite('School form bulk import / explicitly isolated PostgreSQL',()=>{
  beforeAll(async()=>{requireIsolatedReleaseDatabase(url!);db=new PrismaClient({datasources:{db:{url:url!}}});await db.$connect()})
  afterAll(async()=>{await db?.$disconnect()})

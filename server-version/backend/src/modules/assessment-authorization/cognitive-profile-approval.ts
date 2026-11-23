@@ -5,7 +5,7 @@ import {AdminPermissionError} from '../admin-permissions/service'
 import {validAdminProof,ADMIN_STEP_UP_SECONDS,type AdminSessionProof} from '../admin-permissions/proof'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {publicTemplatesForDatabase} from '../assessment-runtime/public-templates'
-import {approveCognitiveProfileEntryPolicies,exactStandardCombinationEntryProducts} from '../assessment-governance/tool-entry-policy'
+import {approveCognitiveProfileEntryPolicies,exactStandardCombinationEntryProducts,readApprovedToolEntryProducts} from '../assessment-governance/tool-entry-policy'
 import {preparePublishedCognitiveProfile,cognitiveProfilePolicyIdentity} from './cognitive-profile-source'
 import {saveCognitiveProfileArtifact} from './cognitive-profile-artifact'
 import {selectedConfigurationSchema} from './selected-configuration'
@@ -28,8 +28,9 @@ export async function previewCognitiveProfileApproval(actorId:string,configId:st
  return prisma.$transaction(async tx=>{
   await assertSystem(tx,actorId)
   const source=await preparePublishedCognitiveProfile(tx,id.parse(configId),selected)
+  const {approvedProducts,hasPriorPolicy}=await readApprovedToolEntryProducts(tx,cognitiveProfilePolicyIdentity(configId,selected,source.artifactHash))
   return {configId,profile:selected,title:source.config.name,artifactHash:source.artifactHash,configuration:source.artifact.identity,
-   report:source.artifact.resolvedReport,previewOnly:true}
+   report:source.artifact.resolvedReport,approvedProducts,hasPriorPolicy,previewOnly:true}
  },options)
 }
 export async function approveCognitiveProfile(actorId:string,configId:string,rawProfile:unknown,raw:unknown,proof:AdminSessionProof){

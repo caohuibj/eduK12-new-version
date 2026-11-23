@@ -4,7 +4,7 @@ import {EducationScaleCsvImport} from './EducationScaleCsvImport'
 import type {PrivateTool} from './privateToolClient'
 const content='item_code,prompt,reverse,score_keys,response_set_key\nQ2,Question,true,total,default'
 const tool:PrivateTool={id:'tool',title:'Synthetic',kind:'SCALE',revision:1,contentHash:'a'.repeat(64),definition:{} as PrivateTool['definition']}
-const preview={digest:'b'.repeat(64),previewToken:'c'.repeat(64),previewExpiresAt:1792282200000,expectedRevision:1,expectedContentHash:tool.contentHash,
+const preview={digest:'b'.repeat(64),expectedRevision:1,expectedContentHash:tool.contentHash,
  count:1,totalItems:2,responseSetKey:'default',responseSet:{options:[{value:'yes',label:'Yes',score:1}]},scores:[{key:'total',label:'Total',aggregation:'sum'}],items:[{itemCode:'Q2',content:'Question',reverse:true,scoreKeys:['total']}]}
 const props=()=>({api:vi.fn(),organizationId:'org',tool,disabled:false,onImported:vi.fn(),onBusy:vi.fn(),onPendingChange:vi.fn()})
 const enter=()=>fireEvent.change(screen.getByLabelText('CSV 内容'),{target:{value:content}})
@@ -18,7 +18,7 @@ describe('education CSV component DTO contract',()=>{
   fireEvent.click(await screen.findByRole('button',{name:'确认导入并保存草稿'}))
   await waitFor(()=>expect(p.onImported).toHaveBeenCalledWith(saved))
   expect(p.api).toHaveBeenNthCalledWith(1,'/organizations/org/private-tools/tool/import/preview','POST',{content,expectedRevision:1,expectedContentHash:tool.contentHash})
-  expect(p.api).toHaveBeenNthCalledWith(2,'/organizations/org/private-tools/tool/import/apply','POST',{content,expectedRevision:1,expectedContentHash:tool.contentHash,digest:preview.digest,previewToken:preview.previewToken,previewExpiresAt:preview.previewExpiresAt})
+  expect(p.api).toHaveBeenNthCalledWith(2,'/organizations/org/private-tools/tool/import/apply','POST',{content,expectedRevision:1,expectedContentHash:tool.contentHash,digest:preview.digest})
   expect(screen.getByLabelText('CSV 内容')).toHaveValue('');expect(p.onPendingChange).toHaveBeenLastCalledWith(false)
   expect(p.onBusy).toHaveBeenLastCalledWith(false)
  })

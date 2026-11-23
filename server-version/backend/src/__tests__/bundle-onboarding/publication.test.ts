@@ -1,6 +1,4 @@
 import {describe,it,expect} from 'vitest'
-import {createHmac} from 'node:crypto'
-import {canonicalJsonString} from '../../modules/assessment-runtime/canonical'
 import {validateReview} from '../../modules/bundle-product/package-release'
 import {verifyPackageFixtures} from '../../modules/assessment-bundle/onboarding/fixtures'
 import {scaffoldPackage} from '../../modules/assessment-bundle/onboarding/template'
@@ -8,15 +6,13 @@ import {dependencyBlockers} from '../../modules/assessment-bundle/onboarding/dep
 import {BundleDefinitionProvider,freezeBundleProductionDefinition,readFrozenBundleProductionDefinition} from '../../modules/bundle-product/definition-provider'
 import {packageEntry} from '../../modules/assessment-bundle/onboarding/catalog'
 describe('content-bound publication and immutable freeze',()=>{
-  it('rejects unsigned, expired, substituted and wrong-key review material',()=>{
-    const secret='fixture-only-key-12345678901234567890',hash='a'.repeat(64)
-    const m={contentHash:hash,reviewerId:'fixture',expiresAt:'2030-01-01T00:00:00.000Z',claims:['independent_summary'],scientific:true,rights:true,language:true,report:true}
-    const review={...m,signature:createHmac('sha256',secret).update(canonicalJsonString(m)).digest('hex')}
-    expect(validateReview(review,hash,secret,0).contentHash).toBe(hash)
-    expect(()=>validateReview(review,hash,undefined,0)).toThrow()
-    expect(()=>validateReview(review,'b'.repeat(64),secret,0)).toThrow()
-    expect(()=>validateReview(review,hash,secret,Date.parse('2031-01-01'))).toThrow()
-    expect(()=>validateReview({...review,claims:['joint_conclusion']},hash,secret,0)).toThrow()
+  it('validates content hash and allowed claims without requiring HMAC keys or 7-day expiry timers',()=>{
+    const hash='a'.repeat(64)
+    const review={contentHash:hash,reviewerId:'fixture',claims:['independent_summary','joint_conclusion']}
+    expect(validateReview(review,hash).contentHash).toBe(hash)
+    expect(validateReview({...review,claims:['joint_conclusion']},hash).claims).toEqual(['joint_conclusion'])
+    expect(()=>validateReview(review,'b'.repeat(64))).toThrow('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
+    expect(()=>validateReview({...review,claims:['unknown_claim']},hash)).toThrow('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
   })
   it('rejects broken golden expectations, selectors and incompatible units',()=>{
     const p=scaffoldPackage('unknown_package');verifyPackageFixtures(p)

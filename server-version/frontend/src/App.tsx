@@ -169,7 +169,7 @@ class RouteErrorBoundary extends React.Component<
 }
 
 // Guards decide access only; AppShell owns chrome outside the route tree.
-const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: ('STUDENT' | 'TEACHER' | 'ADMIN' | 'PARENT')[] }> = ({ children, roles = ['TEACHER', 'ADMIN'] }) => <RouteAccess roles={roles}>{children}</RouteAccess>
+const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: ('STUDENT' | 'TEACHER' | 'ADMIN' | 'PARENT')[]; allowSystemAdmin?: boolean }> = ({ children, roles = ['TEACHER', 'ADMIN'], allowSystemAdmin = false }) => <RouteAccess roles={roles} allowSystemAdmin={allowSystemAdmin}>{children}</RouteAccess>
 const ParentProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess roles={['PARENT']}>{children}</RouteAccess>
 const StudentProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess roles={['STUDENT']}>{children}</RouteAccess>
 const LegacyRelationalTasksRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => <RouteAccess roles={['STUDENT', 'PARENT', 'TEACHER']}>{children}</RouteAccess>
@@ -688,7 +688,7 @@ function AppRoutes() {
               </StudentProtectedRoute>
             }
           />
-          <Route path="/sjt-authoring" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><TrainingSjtAuthoringAccess><SjtAuthoring /></TrainingSjtAuthoringAccess></ProtectedRoute>} />
+          <Route path="/sjt-authoring" element={<ProtectedRoute roles={['ADMIN']} allowSystemAdmin><TrainingSjtAuthoringAccess><SjtAuthoring /></TrainingSjtAuthoringAccess></ProtectedRoute>} />
           <Route path="/teacher/situational" element={<ProtectedRoute roles={['TEACHER']}><SituationalHome /></ProtectedRoute>} />
           <Route path="/teacher/situational/history" element={<ProtectedRoute roles={['TEACHER']}><SituationalHistory /></ProtectedRoute>} />
           <Route path="/teacher/situational/:instrumentKey" element={<ProtectedRoute roles={['TEACHER']}><SituationalRunner /></ProtectedRoute>} />
