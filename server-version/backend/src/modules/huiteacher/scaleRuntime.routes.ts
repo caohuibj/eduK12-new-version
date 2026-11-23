@@ -789,7 +789,6 @@ router.post('/composite-attempts/:attemptId/items/:itemId/scale/submit',
 mountCompositeWholeV2Routes(router, {
   prefix: '/composite-attempts',
   middleware: [authenticateHuiteacher, requireScaleAttempt],
-  submitMiddleware: [requireTeacherCompositeFinalConsent],
   authorizeAttempt: authorizeEducationWholeV2,
 })
 router.get('/run-executions/:executionId/personal-summary',

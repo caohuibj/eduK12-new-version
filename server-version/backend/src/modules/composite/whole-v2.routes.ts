@@ -29,6 +29,7 @@ import {
   serveCompositeSlotImage,
 } from '../assessment-runtime/composite-slot-media.service'
 import type { AssessmentMediaCapabilityAudience } from '../assessment-media/assessment-media-capability'
+import { RelationalAssessmentError } from '../assessment-relational/errors'
 
 const checkpointPutSchema = z.object({
   expectedRevision: z.number().int().min(0),
@@ -60,12 +61,21 @@ const videoCapabilityRequestSchema = z.object({
   videoKey: z.string().min(1).max(240),
 }).strict()
 
+export interface WholeV2PersistencePolicyView {
+  draftCheckpointEnabled: boolean
+  draftTtlHours: number | null
+  localCognitiveEnabled: boolean
+  localCognitiveTtlHours: number | null
+}
+
 export interface AuthorizedWholeV2Attempt {
   attempt: CommitCompositeWholeFinalInput['attempt'] & { status?: string }
   plan: CompositePublicationPlanV1
   audience: AssessmentMediaCapabilityAudience
   educationRun?: CommitCompositeWholeFinalInput['educationRun']
   activeSlotKeys?: ReadonlySet<string>
+  timingEnabled?: boolean
+  persistencePolicy?: WholeV2PersistencePolicyView
   verifyAuthorityInTx?: CommitCompositeWholeFinalInput['verifyAuthorityInTx']
   buildFeedback?: CommitCompositeWholeFinalInput['buildFeedback']
 }
@@ -73,8 +83,10 @@ export interface AuthorizedWholeV2Attempt {
 export interface WholeV2RouteAdapter {
   /** Entry-specific auth middleware(s) (e.g. authenticateSchool, authenticateTeacher, etc.). */
   middleware: RequestHandler[]
-  /** Optional extra middleware(s) applied specifically to POST /v2/whole/submit (e.g. final consent). */
+  /** Optional extra middleware(s) applied specifically to POST /v2/whole/submit (e.g. submit priority). */
   submitMiddleware?: RequestHandler[]
+  /** When true, submitMiddleware replaces `middleware` on POST /v2/whole/submit to avoid duplicate auth queries. */
+  replaceMiddlewareOnSubmit?: boolean
   /** Optional base path prefix before `/:attemptId/...` (default `''`). */
   prefix?: string
   /** Authorize attempt ownership and resolve its frozen CompositePublicationPlanV1. */
@@ -94,6 +106,27 @@ function respondError(res: Response, err: unknown, fallbackMessage: string) {
   }
   if (isInstrumentFinalSubmitError(err)) {
     return instrumentError(res, err.code, err.message, err.statusCode)
+  }
+  if (err instanceof RelationalAssessmentError) {
+    const status = err.code === 'RELATIONAL_ANALYSIS_ACCESS' || err.code === 'RELATIONAL_ASSIGNMENT_ACTOR' ? 403 : 409
+    return instrumentError(res, err.code, err.message, status)
+  }
+  if (err && typeof err === 'object') {
+    const known = err as { statusCode?: unknown; code?: unknown; message?: unknown }
+    if (
+      typeof known.statusCode === 'number'
+      && known.statusCode >= 400
+      && known.statusCode < 500
+      && typeof known.code === 'string'
+      && known.code.length > 0
+    ) {
+      return instrumentError(
+        res,
+        known.code,
+        typeof known.message === 'string' && known.message ? known.message : fallbackMessage,
+        known.statusCode,
+      )
+    }
   }
   return error(res, err instanceof Error ? err.message : fallbackMessage, -1, 500)
 }
@@ -250,6 +283,8 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
         templateHash: ctx.plan.publicationHash,
         activeSlotKeys: ctx.activeSlotKeys ? [...ctx.activeSlotKeys] : null,
         receiptOnly: ctx.attempt.receiptOnly,
+        timingEnabled: ctx.timingEnabled === true,
+        ...(ctx.persistencePolicy ? { persistencePolicy: ctx.persistencePolicy } : {}),
         unitSeeds,
         checkpoint,
         ...(existingReceipt ? { existingReceipt } : {}),
@@ -297,6 +332,11 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
         return instrumentError(res, 'STALE_ATTEMPT', '作答版本已变更', 409)
       }
       const allowedSlotKeys = ctx.activeSlotKeys ?? new Set(ctx.plan.slots.map(s => s.slotKey))
+      // Cognitive/SJT monotonic lockUnit is mandatory anti-tamper measurement evidence
+      // and is always permitted; optional plain draft autosaves obey persistencePolicy.
+      if (!parsed.lockUnit && ctx.persistencePolicy && !ctx.persistencePolicy.draftCheckpointEnabled) {
+        return instrumentError(res, 'CHECKPOINT_NOT_ENABLED', '此作答未启用云端草稿保存策略', 403)
+      }
       if (parsed.lockUnit) {
         if (!allowedSlotKeys.has(parsed.lockUnit.slotKey)) {
           return instrumentError(res, 'DEFINITION_MISMATCH', `锁定槽位不在本次作答范围：${parsed.lockUnit.slotKey}`, 409)
@@ -308,15 +348,17 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
           unit: parsed.lockUnit.unit,
         })
       }
+      const ttlHours = ctx.persistencePolicy?.draftTtlHours ?? 24
       const snapshot = await prisma.$transaction(tx => saveCompositeCheckpoint(tx, {
         attemptId: ctx.attempt.id,
         attemptEpoch: ctx.attempt.attemptEpoch,
         publicationHash: ctx.plan.publicationHash,
         expectedRevision: parsed.expectedRevision,
-        drafts: parsed.drafts,
-        itemTimings: parsed.itemTimings,
+        drafts: ctx.persistencePolicy && !ctx.persistencePolicy.draftCheckpointEnabled ? {} : parsed.drafts,
+        itemTimings: ctx.timingEnabled === false ? undefined : parsed.itemTimings,
         lockUnit: parsed.lockUnit,
         allowedSlotKeys,
+        expiresAt: new Date(Date.now() + ttlHours * 3_600_000),
         verifyAttemptActive: true,
       }))
       return success(res, snapshot)
@@ -343,7 +385,9 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
     }
   })
 
-  const submitMw = [...mw, ...(adapter.submitMiddleware ?? [])]
+  const submitMw = adapter.replaceMiddlewareOnSubmit && adapter.submitMiddleware
+    ? adapter.submitMiddleware
+    : [...mw, ...(adapter.submitMiddleware ?? [])]
   router.post(`${base}/v2/whole/submit`, ...submitMw, async (req: Request, res: Response) => {
     try {
       const ctx = await adapter.authorizeAttempt(req)

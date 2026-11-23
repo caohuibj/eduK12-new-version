@@ -237,6 +237,11 @@ export function buildCompositePublicationPlan(input: {
   return retainImmutableCanonicalValue({ ...unsigned, publicationHash })
 }
 
+export function cacheCommittedCompositePublicationPlan(plan: CompositePublicationPlanV1): void {
+  const estBytes = Math.max(4096, JSON.stringify(plan).length * 4)
+  planCache.set(plan.publicationHash, plan, estBytes)
+}
+
 export async function saveCompositePublicationPlan(
   plan: CompositePublicationPlanV1,
   templates: PublicTemplateStore = publicTemplates,
@@ -247,8 +252,12 @@ export async function saveCompositePublicationPlan(
     value: unsigned,
     precomputedHash: publicationHash,
   }])
-  const estBytes = Math.max(4096, JSON.stringify(plan).length * 4)
-  planCache.set(templateHash, plan, estBytes)
+  // Only promote into the process-global planCache when saved through the committed
+  // root publicTemplates store; tx-local stores must promote post-commit.
+  if (templates === publicTemplates) {
+    const estBytes = Math.max(4096, JSON.stringify(plan).length * 4)
+    planCache.set(templateHash, plan, estBytes)
+  }
   return templateHash
 }
 
@@ -269,8 +278,10 @@ export async function loadCompositePublicationPlan(
     ...(loaded as Omit<CompositePublicationPlanV1, 'publicationHash'>),
     publicationHash,
   })
-  const estBytes = Math.max(4096, JSON.stringify(plan).length * 4)
-  planCache.set(publicationHash, plan, estBytes)
+  if (templates === publicTemplates) {
+    const estBytes = Math.max(4096, JSON.stringify(plan).length * 4)
+    planCache.set(publicationHash, plan, estBytes)
+  }
   return plan
 }
 

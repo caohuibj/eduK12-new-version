@@ -218,6 +218,7 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   prefix: '/assessment-composite-attempts',
   middleware: [wholeBound()],
   submitMiddleware: [wholeBound(true)],
+  replaceMiddlewareOnSubmit: true,
   authorizeAttempt: authorizeEducationWholeV2,
  })
  router.get(parent,wholeBound(false,true),wrapped(async req=>projectTeacherCompositeRuntime(
