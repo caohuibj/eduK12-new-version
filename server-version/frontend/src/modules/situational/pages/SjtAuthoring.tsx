@@ -404,7 +404,7 @@ export default function SjtAuthoring() {
                 )}
               </div>
             ) : null}
-            {user?.role === 'ADMIN' && selected.release?.status === 'PUBLISHED' ? (
+            {(user?.role === 'ADMIN' || user?.platformRole === 'SYSTEM_ADMIN') && selected.release?.status === 'PUBLISHED' ? (
               <div>
                 <label>
                   停用说明
@@ -558,7 +558,7 @@ export default function SjtAuthoring() {
           </AuthorPreviewMedia>
         </section>
       ) : null}
-      <SjtReleasePermissions admin={user?.role === 'ADMIN'} userId={user?.id}
+      <SjtReleasePermissions admin={user?.role === 'ADMIN' || user?.platformRole === 'SYSTEM_ADMIN'} userId={user?.id}
         refreshKey={selected?.release ? `${selected.release.id}:${selected.release.status}` : ''}
         onAdapt={async id => { await refresh(); await open(id) }}/>
       {paragraphs.length ? (

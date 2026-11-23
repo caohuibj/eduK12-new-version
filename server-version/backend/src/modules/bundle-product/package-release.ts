@@ -71,6 +71,7 @@ export async function publishPackage(db:PrismaClient,actorId:string,key:string,v
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${key+'@'+version},0))`
     const where={bundleKey_bundleVersion:{bundleKey:key,bundleVersion:version}},row=await tx.bundlePackageRelease.findUniqueOrThrow({where})
     if(row.status==='RETIRED')throw new Error('BUNDLE_RETIRED')
+    if(row.status==='PUBLISHED')return row
     const p=parseDeclarativePackage(row.content)
     if(hashDeclarativePackage(p)!==row.contentHash)throw new Error('BUNDLE_CONTENT_HASH_MISMATCH')
     verifyPackageFixtures(p)
@@ -84,13 +85,11 @@ export async function publishPackage(db:PrismaClient,actorId:string,key:string,v
     const claims = parsed.claims.length || rawReview !== undefined && rawReview !== null && typeof rawReview === 'object' && 'claims' in rawReview
       ? parsed.claims
       : defaultClaims
-    const publisherId = parsed.reviewerId || actorId
-    if (publisherId !== actorId) await admin(tx, publisherId)
     const blockers=dependencyBlockers(p);if(blockers.length)throw new Error(blockers.join('; '))
     if(p.schemaVersion===2 && !claims.includes('cross_source_condition'))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
     if(p.rules.items.some(r=>r.kind!=='limitation'&&!claims.includes(r.kind)))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
     await assertPublishedDependencies(tx, p)
-    const releaseMeta = { ...parsed, reviewerId: publisherId, reviewedAt: parsed.reviewedAt ?? new Date().toISOString(), claims }
+    const releaseMeta = { ...parsed, reviewerId: actorId, reviewedAt: new Date().toISOString(), claims }
     return tx.bundlePackageRelease.update({where,data:{status:'PUBLISHED',review:releaseMeta as Prisma.InputJsonValue,publishedBy:actorId}})
   })
 }
@@ -114,9 +113,6 @@ export async function assertPackageAdmission(db:Prisma.TransactionClient,raw:unk
 async function validatePackageAdmission(db:Prisma.TransactionClient,p:ReturnType<typeof parseDeclarativePackage>,row:BundlePackageRelease|null){
   if(!row||row.status!=='PUBLISHED'||row.contentHash!==hashDeclarativePackage(p))throw new Error('BUNDLE_PACKAGE_NOT_PUBLISHED')
   const review=row.review?validateReview(row.review,row.contentHash):null
-  const authorityId=review?.reviewerId||row.publishedBy
-  if(!authorityId)throw new Error('BUNDLE_ADMIN_REQUIRED')
-  await admin(db,authorityId)
   if(review&&p.schemaVersion===2&&!review.claims.includes('cross_source_condition'))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
   const blockers = dependencyBlockers(p); if (blockers.length) throw new Error(blockers.join('; '))
   await assertPublishedDependencies(db, p)

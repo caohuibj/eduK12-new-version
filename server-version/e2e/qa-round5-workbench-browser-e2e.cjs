@@ -99,24 +99,18 @@ async function reviewBoundaries(browser, engine, width) {
   }
   try {
     await adminPage.goto(base + '/admin/bundle-authoring')
-    await adminPage.getByRole('button', { name: '查看定义与审批' }).click()
-    const restore = adminPage.getByRole('button', { name: '重新审核并恢复发布', exact: true })
-    await restore.waitFor(); assert.equal(await restore.isDisabled(), true)
-    const checks = adminPage.getByRole('checkbox')
-    assert.equal(await checks.count(), 4)
-    for (let index = 0; index < 4; index++) {
-      await checks.nth(index).check()
-      assert.equal(await restore.isDisabled(), index < 3)
-    }
+    await adminPage.getByRole('button', { name: '查看与发布' }).click()
+    const restore = adminPage.getByRole('button', { name: '恢复发布此版本', exact: true })
+    await restore.waitFor(); assert.equal(await restore.isDisabled(), false)
     assert.equal(approvals.length, 0)
     await shot(adminPage, 'hold-review')
     await restore.click()
-    await adminPage.getByRole('dialog', { name: '重新审核并恢复固定包发布' }).waitFor()
+    await adminPage.getByRole('dialog', { name: '恢复固定包发布' }).waitFor()
     assert.equal(approvals.length, 0)
-    await adminPage.getByRole('button', { name: '重新审核并恢复', exact: true }).click()
-    await adminPage.getByRole('button', { name: '独立续审并发布' }).waitFor()
+    await adminPage.getByRole('button', { name: '确认恢复发布', exact: true }).click()
+    await adminPage.getByText('当前版本已发布').waitFor()
     assert.equal(approvals.length, 1)
-    assert.deepEqual(approvals[0], { contentHash: record.contentHash, scientific: true, rights: true, language: true, report: true, claims: ['independent_summary'] })
+    assert.deepEqual(approvals[0], { contentHash: record.contentHash, claims: ['independent_summary'] })
   } finally { await adminContext.close() }
   const studentContext = await browser.newContext(options), page = await studentContext.newPage()
   page.on('pageerror', error => errors.push(error.message))

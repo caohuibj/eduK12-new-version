@@ -67,5 +67,21 @@ describe('Bundle-owned profile actions',()=>{
     await expect(publishPackage(db('ADMIN'),'ordinary-admin-allocator',current.profile.key,'0.1.2',material)).rejects.toThrow('BUNDLE_ADMIN_REQUIRED')
     await expect(publishPackage(db('ADMIN','SYSTEM_ADMIN'),'synthetic-system-publisher',current.profile.key,'0.1.2',{...material,contentHash:'0'.repeat(64)})).rejects.toThrow('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
   })
+  it('returns an already PUBLISHED package idempotently without overwriting review metadata',async()=>{
+    const hash=hashDeclarativePackage(current)
+    const existingRow={id:'rel-1',bundleKey:current.profile.key,bundleVersion:'0.1.2',status:'PUBLISHED',installedBy:'inst-1',publishedBy:'orig-admin',contentHash:hash,content:current,review:{contentHash:hash,reviewerId:'orig-admin',reviewedAt:'2026-01-01T00:00:00.000Z',claims:['cross_source_condition']}}
+    let updated=false
+    const db={ $transaction: async(callback:(tx:unknown)=>Promise<unknown>)=>callback({
+      user:{findUnique:async()=>({role:'ADMIN',platformRole:'SYSTEM_ADMIN',isActive:true,isFrozen:false,expiresAt:null})},
+      $executeRaw:async()=>0,
+      bundlePackageRelease:{
+        findUniqueOrThrow:async()=>existingRow,
+        update:async()=>{updated=true;return existingRow},
+      },
+    })} as unknown as PrismaClient
+    const res=await publishPackage(db,'second-admin',current.profile.key,'0.1.2')
+    expect(updated).toBe(false)
+    expect(res).toBe(existingRow)
+  })
 })
 function withoutOwn(){const p=structuredClone(current);delete p.report.profileActionContent;return p}

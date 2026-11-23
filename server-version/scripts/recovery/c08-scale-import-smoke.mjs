@@ -37,17 +37,17 @@ try{
  assert.equal(pre.count,1);assert.equal(pre.totalItems,2)
  await prisma.materialGrant.create({data:{teacherId:users[1].id,resourceType:'SCALE',resourceId:draft.id,grantedBy:users[0].id}})
  await other.request(`/scales/${draft.id}/import/preview`,'POST',input,403)
- await other.request(`/scales/${draft.id}/import/confirm`,'POST',{...input,digest:pre.digest,previewToken:pre.previewToken,previewExpiresAt:pre.previewExpiresAt},403)
+ await other.request(`/scales/${draft.id}/import/confirm`,'POST',{...input,digest:pre.digest},403)
  await student.request(`/scales/${draft.id}/import/preview`,'POST',input,403)
  await anonymous.request('/auth/csrf')
  await anonymous.request(`/scales/${draft.id}/import/preview`,'POST',input,401)
  check('owner-only import; use-grant, student and anonymous denied')
- for(const body of [{...input,content:content+'\n',digest:pre.digest,previewToken:pre.previewToken,previewExpiresAt:pre.previewExpiresAt},{...input,digest:'0'.repeat(64),previewToken:pre.previewToken,previewExpiresAt:pre.previewExpiresAt},{...input,expectedUpdatedAt:new Date(0).toISOString(),digest:pre.digest,previewToken:pre.previewToken,previewExpiresAt:pre.previewExpiresAt}])await teacher.request(`/scales/${draft.id}/import/confirm`,'POST',body,409)
+ for(const body of [{...input,content:content+'\n',digest:pre.digest},{...input,digest:'0'.repeat(64)},{...input,expectedUpdatedAt:new Date(0).toISOString(),digest:pre.digest}])await teacher.request(`/scales/${draft.id}/import/confirm`,'POST',body,409)
  assert.equal((await prisma.scale.findUniqueOrThrow({where:{id:draft.id}})).itemCount,1)
  await teacher.request(`/scales/${draft.id}/import/preview`,'POST',{...input,content:content.replace('reverse','score')},400)
  check('changed original content/digest/revision and unknown science columns rejected without writes')
- const before=Buffer.byteLength(JSON.stringify(draft.definition));draft=await teacher.request(`/scales/${draft.id}/import/confirm`,'POST',{...input,digest:pre.digest,previewToken:pre.previewToken,previewExpiresAt:pre.previewExpiresAt})
- assert.equal(draft.definition.items[1].content,'中文, quoted\nitem');await teacher.request(`/scales/${draft.id}/import/confirm`,'POST',{...input,digest:pre.digest,previewToken:pre.previewToken,previewExpiresAt:pre.previewExpiresAt},409)
+ const before=Buffer.byteLength(JSON.stringify(draft.definition));draft=await teacher.request(`/scales/${draft.id}/import/confirm`,'POST',{...input,digest:pre.digest})
+ assert.equal(draft.definition.items[1].content,'中文, quoted\nitem');await teacher.request(`/scales/${draft.id}/import/confirm`,'POST',{...input,digest:pre.digest},409)
  const audits=await prisma.assessmentManagementEvent.findMany({where:{resourceId:draft.id}});assert.equal(audits.length,1);assert.equal(audits[0].action,'SCALE_IMPORT');assert.ok(!JSON.stringify(audits).includes('quoted'));assert.ok(!JSON.stringify(audits).includes('item_code'))
  storage={sourceBytes:Buffer.byteLength(content),definitionBytesBefore:before,definitionBytesAfter:Buffer.byteLength(JSON.stringify(draft.definition)),auditMetadataBytes:Buffer.byteLength(JSON.stringify(audits[0].metadata)),rawCsvStored:false}
  assert.equal((await teacher.request(`/scales/${draft.id}/validate`,'POST',{})).valid,true)
@@ -56,16 +56,16 @@ try{
  check('exact appended definition, canonical scorer oracle 5+reverse(1)=10, compact audit and replay conflict')
  draft=await teacher.request(`/scales/${draft.id}/publish`,'POST',{expectedUpdatedAt:draft.updatedAt});assert.equal(draft.status,'PUBLISHED')
  await teacher.request(`/scales/${draft.id}/import/preview`,'POST',{...input,expectedUpdatedAt:draft.updatedAt},409)
- await teacher.request(`/scales/${draft.id}/import/confirm`,'POST',{...input,expectedUpdatedAt:draft.updatedAt,digest:pre.digest,previewToken:pre.previewToken,previewExpiresAt:pre.previewExpiresAt},409)
+ await teacher.request(`/scales/${draft.id}/import/confirm`,'POST',{...input,expectedUpdatedAt:draft.updatedAt,digest:pre.digest},409)
  check('public validation/publication freezes imported definition')
  const standard=await prisma.scale.create({data:{code:'C08-standard-'+randomUUID(),name:'Standard protection fixture',creatorId:users[0].id,instrumentClass:'STANDARD',status:'DRAFT',definition:definition()}})
  await teacher.request(`/scales/${standard.id}/import/preview`,'POST',{...input,expectedUpdatedAt:standard.updatedAt.toISOString()},409)
- await teacher.request(`/scales/${standard.id}/import/confirm`,'POST',{...input,expectedUpdatedAt:standard.updatedAt.toISOString(),digest:pre.digest,previewToken:pre.previewToken,previewExpiresAt:pre.previewExpiresAt},409)
+ await teacher.request(`/scales/${standard.id}/import/confirm`,'POST',{...input,expectedUpdatedAt:standard.updatedAt.toISOString(),digest:pre.digest},409)
  check('STANDARD cannot be imported or overridden')
  let cost=await teacher.request('/scales','POST',{code:'C08-cost-'+randomUUID(),name:'Cost fixture'});cost=await teacher.request(`/scales/${cost.id}/definition`,'PUT',{definition:definition(),expectedUpdatedAt:cost.updatedAt})
  const ci={content,expectedUpdatedAt:cost.updatedAt},actor={userId:users[0].id,role:'TEACHER'};let start=sqlEvents
  const cp=await importScaleCsv(cost.id,actor,ci,false);const previewSql=sqlEvents-start;start=sqlEvents
- await importScaleCsv(cost.id,actor,{...ci,digest:cp.digest,previewToken:cp.previewToken,previewExpiresAt:cp.previewExpiresAt},true);queryCounts={previewSql,confirmSql:sqlEvents-start,scope:'direct native-draft service transactions; includes BEGIN/COMMIT, excludes HTTP auth and fixtures'}
+ await importScaleCsv(cost.id,actor,{...ci,digest:cp.digest},true);queryCounts={previewSql,confirmSql:sqlEvents-start,scope:'direct native-draft service transactions; includes BEGIN/COMMIT, excludes HTTP auth and fixtures'}
  assert.ok(queryCounts.previewSql>0 && queryCounts.confirmSql>queryCounts.previewSql)
  fs.writeFileSync(path.join(state,'c08-http-result.json'),JSON.stringify({passed:true,requests,checks,observations,storage,queryCounts},null,2))
 }catch(error){fs.writeFileSync(path.join(state,'c08-http-result.json'),JSON.stringify({passed:false,requests,checks,observations,storage,queryCounts,error:String(error)},null,2));throw error}finally{await prisma.$disconnect()}

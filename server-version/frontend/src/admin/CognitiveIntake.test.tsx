@@ -149,3 +149,22 @@ it('publishes an installed DRAFT config and approves a profile in one admin flow
  const approveCall=mock.post.mock.calls.find(call=>call[0]==='/cognitive/profile-configurations/system/cfg-1/experience/approve')!
  expect(approveCall[1]).toMatchObject({expectedArtifactHash:'a'.repeat(64),allowedProducts:['SURVEY','TRAINING']})
 })
+
+it('preserves existing approvedProducts when adding another entry',async()=>{
+ const publishedPlan={...plan,action:'ALREADY_PRESENT',configId:'cfg-1',status:'PUBLISHED'}
+ mock.get.mockImplementation(async(path:string)=>path.startsWith(root)
+  ?response({...catalog,registered:[{...candidate,plan:publishedPlan}]})
+  :response({configId:'cfg-1',profile:'experience',title:'数字线估计',artifactHash:'a'.repeat(64),approvedProducts:['SCHOOL','TEACHER'],report:{title:'数字线估计报告'}}))
+ mock.post.mockImplementation(async(path:string)=>{
+  if(path==='/cognitive/profile-configurations/system/cfg-1/experience/approve')return response({artifactHash:'a'.repeat(64),allowedProducts:['SCHOOL','TEACHER','TRAINING']})
+  throw new Error('Unexpected path: '+path)
+ })
+ render(<CognitiveIntake/>);await screen.findByText('数字线估计',{selector:'strong'});choose()
+ fireEvent.click(await screen.findByRole('button',{name:'预览 Profile 摘要'}))
+ await screen.findByText(/当前已启用入口：SCHOOL、TEACHER/)
+ fireEvent.click(screen.getByRole('checkbox',{name:'TRAINING'}))
+ await screen.findByText(/将新增：TRAINING/)
+ fireEvent.click(await screen.findByRole('button',{name:'批准并启用此 Profile'}))
+ const approveCall=mock.post.mock.calls.find(call=>call[0]==='/cognitive/profile-configurations/system/cfg-1/experience/approve')!
+ expect(approveCall[1]).toMatchObject({expectedArtifactHash:'a'.repeat(64),allowedProducts:['SCHOOL','TEACHER','TRAINING']})
+})

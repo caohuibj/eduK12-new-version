@@ -116,7 +116,7 @@ export async function forkSjtDraftVersion(actor: SjtAuthorActor, id: string) {
   return prisma.$transaction(async tx => {
     await tx.$queryRaw`SELECT id FROM sjt_author_drafts WHERE id=${id} FOR UPDATE`
     const source = await tx.sjtAuthorDraft.findUnique({where:{id}})
-    if (!source || source.ownerId !== actor.userId) throw problem('只能更新自己编制的工具',403)
+    if (!source || (!actor.admin && source.ownerId !== actor.userId)) throw problem('只能更新自己编制的工具',403)
     if (source.status !== 'PUBLISHED') throw problem('仅已发布工具需要创建新版本')
     const template = source.template as Record<string, any>
     const parts = String(template.instrumentVersion).split('.').map(Number)
@@ -140,7 +140,7 @@ export async function forkSjtDraftVersion(actor: SjtAuthorActor, id: string) {
     const compiled = compileSjtAuthorDocument(next)
     assertAdaptedVersion(source.adaptationSource,compiled.template)
     const mediaOptions=await adaptationMediaOptions(tx,source,true)
-    await assertSjtAuthorMedia(tx,actor.userId,compiled.template,mediaOptions)
+    await assertSjtAuthorMedia(tx,source.ownerId,compiled.template,mediaOptions)
     const row=await tx.sjtAuthorDraft.create({data:{ownerId:actor.userId,template:json(compiled.template),contentDigest:compiled.contentDigest,
       authorizationPolicy:source.authorizationPolicy,adaptationSource:source.adaptationSource===null?Prisma.DbNull:json(source.adaptationSource)}})
     await tx.sjtAuthorAudit.create({data:{draftId:row.id,actorId:actor.userId,revision:1,action:'VERSION_COPY',contentDigest:compiled.contentDigest,
@@ -176,7 +176,7 @@ export async function reviseSjtDraft(
     const old = await tx.sjtAuthorDraft.findUnique({ where: { id } })
     if (!old) throw problem('草稿不存在', 404)
     // Administrators review; authors own edits, keeping the reviewer independent.
-    if (old.ownerId !== actor.userId) throw problem('仅作者可修订草稿', 403)
+    if (!actor.admin && old.ownerId !== actor.userId) throw problem('仅作者可修订草稿', 403)
     if (old.status === 'PUBLISHED') throw problem('发布内容不可修改，请另建新版本')
     assertAdaptedVersion(old.adaptationSource, c.template)
     const mediaOptions = await adaptationMediaOptions(tx, old, true)
@@ -213,7 +213,7 @@ export async function requestSjtReview(
     await tx.$queryRaw`SELECT id FROM sjt_author_drafts WHERE id=${id} FOR UPDATE`
     const draft = await tx.sjtAuthorDraft.findUnique({ where: { id } })
     if (!draft) throw problem('草稿不存在', 404)
-    if (draft.ownerId !== actor.userId) throw problem('仅作者可提交审核', 403)
+    if (!actor.admin && draft.ownerId !== actor.userId) throw problem('仅作者可提交审核', 403)
     if (draft.revision !== revision || draft.status !== 'DRAFT' || draft.contentDigest !== digest)
       throw problem('草稿已变化或不可提交审核')
     const c = compileSjtAuthorDocument(draft.template)
@@ -357,7 +357,7 @@ export async function restoreSjtRevision(
   targetRevision: number,
 ) {
   const draft = await getSjtDraft(actor, id)
-  if (draft.ownerId !== actor.userId) throw problem('仅作者可恢复草稿', 403)
+  if (!actor.admin && draft.ownerId !== actor.userId) throw problem('仅作者可恢复草稿', 403)
   const old = await prisma.sjtAuthorAudit.findFirst({
     where: { draftId: id, revision: targetRevision, template: { not: Prisma.DbNull } },
     orderBy: { createdAt: 'desc' },
@@ -441,7 +441,7 @@ export async function setSjtDraftPolicy(actor: SjtAuthorActor, id: string, revis
     await tx.$queryRaw`SELECT id FROM sjt_author_drafts WHERE id=${id} FOR UPDATE`
     const draft = await tx.sjtAuthorDraft.findUnique({ where: { id } })
     if (!draft) throw problem('草稿不存在', 404)
-    if (draft.ownerId !== actor.userId) throw problem('仅作者可选择草稿发布策略', 403)
+    if (!actor.admin && draft.ownerId !== actor.userId) throw problem('仅作者可选择草稿发布策略', 403)
     if (draft.status === 'PUBLISHED' || draft.revision !== revision) throw problem('草稿已变化或已发布')
     if (draft.authorizationPolicy === SJT_COURSE_GRANT_POLICY && authorizationPolicy !== SJT_COURSE_GRANT_POLICY)
       throw problem('受控发布策略不可降级', 403)

@@ -11,7 +11,11 @@ export const scaleImportInputSchema = z.object({
   content: z.string().min(1).max(SCALE_IMPORT_MAX_BYTES),
   expectedUpdatedAt: z.string().datetime({ offset: true }),
 }).strict()
-export const scaleImportConfirmSchema = scaleImportInputSchema.extend({ digest: z.string().regex(/^[a-f0-9]{64}$/) }).strict()
+export const scaleImportConfirmSchema = scaleImportInputSchema.extend({
+  digest: z.string().regex(/^[a-f0-9]{64}$/),
+  previewToken: z.string().optional(),
+  previewExpiresAt: z.string().optional(),
+}).strict()
 export class ScaleImportError extends Error {
   constructor(readonly status: number, message: string) { super(message) }
 }
@@ -55,6 +59,8 @@ const fullWorkbookPreviewSchema = z.object({
 }).strict()
 const fullWorkbookConfirmSchema = fullWorkbookPreviewSchema.extend({
   digest: z.string().regex(/^[a-f0-9]{64}$/),
+  previewToken: z.string().optional(),
+  previewExpiresAt: z.string().optional(),
 }).strict()
 
 /** One-step Excel (.xlsx) import for custom scales: populates responseSet,

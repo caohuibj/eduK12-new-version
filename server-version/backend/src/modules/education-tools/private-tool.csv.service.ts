@@ -12,7 +12,7 @@ import {assertPrivateToolImages,syncPrivateToolDraftImages} from './private-tool
 const hash=z.string().regex(/^[a-f0-9]{64}$/)
 export const privateToolCsvPreviewInput=z.object({content:z.string().min(1).max(SCALE_IMPORT_MAX_BYTES),
  expectedRevision:z.number().int().positive(),expectedContentHash:hash}).strict()
-export const privateToolCsvApplyInput=privateToolCsvPreviewInput.extend({digest:hash}).strict()
+export const privateToolCsvApplyInput=privateToolCsvPreviewInput.extend({digest:hash,previewToken:z.string().optional(),previewExpiresAt:z.string().optional()}).strict()
 const equal=(a:string,b:string)=>timingSafeEqual(Buffer.from(a,'hex'),Buffer.from(b,'hex'))
 const boundary={visibility:'AUTHOR_PRIVATE',snapshotOnly:true,canPublish:false,canShare:false,canReadParticipantReports:false} as const
 

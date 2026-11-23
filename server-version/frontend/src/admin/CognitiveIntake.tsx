@@ -107,7 +107,7 @@ function CognitiveIntakeWorkspace(){
     }finally{finish(request)}
   }
   const [profileKey, setProfileKey] = useState('')
-  const [profilePreview, setProfilePreview] = useState<{ configId: string; profile: string; title: string; artifactHash: string; report?: { title?: string } } | null>(null)
+  const [profilePreview, setProfilePreview] = useState<{ configId: string; profile: string; title: string; artifactHash: string; approvedProducts?: Array<'TRAINING' | 'SURVEY' | 'SCHOOL' | 'TEACHER'>; report?: { title?: string } } | null>(null)
   const [allowedProducts, setAllowedProducts] = useState<Array<'TRAINING' | 'SURVEY' | 'SCHOOL' | 'TEACHER'>>(['SURVEY', 'TRAINING'])
   const [approvalReason, setApprovalReason] = useState('系统管理员确认参数与报告配置')
   const [profileStatus, setProfileStatus] = useState('')
@@ -156,13 +156,15 @@ function CognitiveIntakeWorkspace(){
     const request = begin(); if (request === null) return
     setError(''); setProfileStatus('')
     try {
-      const response = await api.get<{ configId: string; profile: string; title: string; artifactHash: string; report?: { title?: string } }>(
+      const response = await api.get<{ configId: string; profile: string; title: string; artifactHash: string; approvedProducts?: Array<'TRAINING' | 'SURVEY' | 'SCHOOL' | 'TEACHER'>; report?: { title?: string } }>(
         `/cognitive/profile-configurations/system/${encodeURIComponent(configId)}/${encodeURIComponent(targetProfile)}`,
       )
       if (!current(request)) return
       if (response.code !== 0 || !response.data) throw new Error(response.message || '读取 Profile 失败')
+      const existing = response.data.approvedProducts ?? []
       setProfileKey(targetProfile)
       setProfilePreview(response.data)
+      setAllowedProducts(existing.length > 0 ? existing : ['SURVEY', 'TRAINING'])
     } catch (caught) {
       if (current(request)) setError(requestError(caught))
     } finally { finish(request) }
@@ -173,7 +175,7 @@ function CognitiveIntakeWorkspace(){
     const request = begin(); if (request === null) return
     setError(''); setProfileStatus('')
     try {
-      const response = await api.post<{ artifactHash: string; allowedProducts: string[] }>(
+      const response = await api.post<{ artifactHash: string; allowedProducts: Array<'TRAINING' | 'SURVEY' | 'SCHOOL' | 'TEACHER'> }>(
         `/cognitive/profile-configurations/system/${encodeURIComponent(profilePreview.configId)}/${encodeURIComponent(profilePreview.profile)}/approve`,
         {
           requestId: crypto.randomUUID(),
@@ -184,6 +186,7 @@ function CognitiveIntakeWorkspace(){
       )
       if (!current(request)) return
       if (response.code !== 0 || !response.data) throw new Error(response.message || '批准 Profile 失败')
+      setProfilePreview(prev => prev ? { ...prev, approvedProducts: response.data!.allowedProducts } : prev)
       setProfileStatus(`已批准 ${profileLabel[profilePreview.profile] ?? profilePreview.profile}：准入产品 ${response.data.allowedProducts.join('、')}。`)
     } catch (caught) {
       if (current(request)) setError(requestError(caught))
@@ -236,11 +239,24 @@ function CognitiveIntakeWorkspace(){
             <button type="button" disabled={busy} onClick={()=>void loadProfilePreview(profileKey||selected.profiles[0]?.key||'standard')}>预览 Profile 摘要</button>
             {profilePreview&&<div>
               <p>摘要：{profilePreview.artifactHash.slice(0,12)}…（{profilePreview.report?.title??profilePreview.title}）</p>
+              <p>当前已启用入口：{(profilePreview.approvedProducts?.length?profilePreview.approvedProducts.join('、'):'暂无（保存后按下方勾选启用）')}</p>
               <fieldset disabled={busy}><legend>允许使用的产品入口</legend>
                 {(['SURVEY','TRAINING','SCHOOL','TEACHER'] as const).map(prod=><label key={prod}>
                   <input type="checkbox" checked={allowedProducts.includes(prod)} onChange={e=>setAllowedProducts(prev=>e.target.checked?[...prev,prod]:prev.filter(x=>x!==prod))}/> {prod}
                 </label>)}
               </fieldset>
+              {(() => {
+                const currentApproved = profilePreview.approvedProducts ?? []
+                const added = allowedProducts.filter(p => !currentApproved.includes(p))
+                const removed = currentApproved.filter(p => !allowedProducts.includes(p))
+                return (added.length > 0 || removed.length > 0) ? (
+                  <p className="sys-muted">
+                    {added.length > 0 ? `将新增：${added.join('、')}` : ''}
+                    {added.length > 0 && removed.length > 0 ? '；' : ''}
+                    {removed.length > 0 ? `将移除：${removed.join('、')}` : ''}
+                  </p>
+                ) : null
+              })()}
               <label>批准说明<input type="text" value={approvalReason} maxLength={200} disabled={busy} onChange={e=>setApprovalReason(e.target.value)}/></label>
               <button type="button" className="sys-primary" disabled={busy||allowedProducts.length===0||!approvalReason.trim()} onClick={()=>void approveProfile()}>批准并启用此 Profile</button>
             </div>}
