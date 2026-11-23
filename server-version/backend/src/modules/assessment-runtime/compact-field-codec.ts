@@ -26,7 +26,9 @@ const zstdDecompressSync: ZstdSyncFn | undefined = typeof (zlib as Record<string
   ? (zlib as unknown as { zstdDecompressSync: ZstdSyncFn }).zstdDecompressSync
   : undefined
 const ZSTD_C_COMPRESSION_LEVEL = (zlib.constants as Record<string, number>).ZSTD_c_compressionLevel
-const useZstdCodec = () => process.env.ASSESSMENT_COMPACT_CODEC === 'zstd' && typeof zstdCompressSync === 'function'
+// Default to native Node 24 zstd when available (9af040c8+ decodes ekc1:zs:
+// unconditionally); set ASSESSMENT_COMPACT_CODEC=gzip to force gzip writes.
+const useZstdCodec = () => process.env.ASSESSMENT_COMPACT_CODEC !== 'gzip' && typeof zstdCompressSync === 'function'
 
 export const isCompactEncryptedField = (value: unknown): boolean => typeof value === 'string' && value.startsWith(PREFIX)
 

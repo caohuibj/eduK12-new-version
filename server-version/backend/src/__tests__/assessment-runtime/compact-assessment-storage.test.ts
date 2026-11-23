@@ -1,7 +1,7 @@
 import { makeScaleFactsReference, makeScaleRawReference, attachLoadedScaleFactRecord } from '../../modules/assessment-runtime/scale-fact-records'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { isDeepStrictEqual } from 'node:util'
-import { encryptField, decryptField } from '../../utils/encryption'
+import { encryptField, decryptField, isEncrypted } from '../../utils/encryption'
 import { buildScaleUnitReport } from '../../modules/reporting/scale-unit-report'
 import { encryptCompactCompositeReport, decryptCompactCompositeReport } from '../../modules/composite/compact-composite-report'
 import { makeWholeScaleRawReference, makeCanonicalFactsReference } from '../../modules/assessment-runtime/compact-assessment-storage'
@@ -31,7 +31,7 @@ describe('versioned compact authenticated fields',()=>{
  it('preserves JSON types, unicode, zero and fractional times',()=>{const v={a:[0,'0',null,false,'中文'],time:1.125};expect(decryptCompactField(encryptCompactField(v))).toEqual(v)})
  it('rejects changed ciphertext, header, unsupported version and noncanonical base64',()=>{
   const value=encryptCompactField({text:'a'.repeat(5000)})
-  for(const changed of [value.replace('ekc1:','ekc2:'),value.replace(':gz:',':js:'),value.slice(0,-4)+'AAAA',value+'='])expect(()=>decryptCompactField(changed)).toThrow()
+  for(const changed of [value.replace('ekc1:','ekc2:'),value.replace(/:(gz|zs):/,':js:'),value.slice(0,-4)+'AAAA',value+'='])expect(()=>decryptCompactField(changed)).toThrow()
  })
  it('bounds declared and actual decompression sizes and rejects a different key',()=>{
   const cipher=encryptCompactField({text:'x'.repeat(20000)})
@@ -46,11 +46,81 @@ describe('one raw representation',()=>{
   const whole={schemaVersion:1,binding:{attemptId:'parent',attemptEpoch:1},payloadHash:'hash',units:[{assessmentId:'child',answers,deviceInputProvenance:{deviceClass:'desktop'}}]}
   expect(unpackWholeRawEnvelope(packWholeRawEnvelope(whole))).toEqual(whole)
  })
- it('rejects bad masks, extra values and unknown fields without truncation',()=>{
-  const data=encodeAnswerRows([{itemCode:'A',responseValue:0}])
-  expect(()=>decodeAnswerRows({...data,rows:[[8,'A',0]]})).toThrow()
-  expect(()=>decodeAnswerRows({...data,rows:[[3,'A',0,999]]})).toThrow()
-  expect(()=>decodeAnswerRows({...data,fields:['itemCode','__proto__']})).toThrow()
+  it('rejects bad masks, extra values and unknown fields without truncation',()=>{
+  const dataV1=encodeAnswerRows([{itemCode:'A',responseValue:0,responseTimeMs:10}])
+  expect(dataV1.version).toBe(1)
+  expect(()=>decodeAnswerRows({...dataV1,rows:[[8,'A',0,10]]})).toThrow()
+  expect(()=>decodeAnswerRows({...dataV1,rows:[[7,'A',0,10,999]]})).toThrow()
+  expect(()=>decodeAnswerRows({...dataV1,fields:['itemCode','__proto__']})).toThrow()
+  const dataV2=encodeAnswerRows([{itemCode:'A',responseValue:0}])
+  expect(dataV2.version).toBe(2)
+  expect(()=>decodeAnswerRows({...dataV2,rows:[[8,'A',0]]})).toThrow()
+  expect(()=>decodeAnswerRows({...dataV2,values:[0,1]})).toThrow()
+  expect(()=>decodeAnswerRows({...dataV2,codes:['']})).toThrow()
+ })
+ it('factors identical whole-unit metadata into WHOLE_RAW_FACTS v2 and rejects unknown shared keys',()=>{
+  const sharedMeta={compositeAttemptId:'parent-1',attemptEpoch:1,contextSnapshotHash:'a'.repeat(64),userId:'u-1',recoveryTokenHash:null}
+  const whole={
+   schemaVersion:1,
+   binding:{attemptId:'parent-1',attemptEpoch:1},
+   payloadHash:'b'.repeat(64),
+   units:[
+    {assessmentId:'child-1',...sharedMeta,answers:[{itemCode:'Q1',responseValue:1},{itemCode:'Q2',responseValue:2}]},
+    {assessmentId:'child-2',...sharedMeta,answers:[{itemCode:'Q1',responseValue:3},{itemCode:'Q2',responseValue:4}]},
+   ],
+  }
+  const packed=packWholeRawEnvelope(whole)
+  expect(packed.version).toBe(2)
+  expect(packed.shared).toEqual(sharedMeta)
+  expect(packed.envelope.units[0]).not.toHaveProperty('contextSnapshotHash')
+  expect(unpackWholeRawEnvelope(packed)).toEqual(whole)
+  expect(()=>unpackWholeRawEnvelope({...packed,shared:{...packed.shared,unexpectedKey:'x'}})).toThrow()
+ })
+ it('encodes SCALE_RESULT_FACTS with binary ekf1:, handles edge cases, authenticates tampering, and shrinks cipher size',async()=>{
+  const {encryptCompactScaleFactsBinary,decryptCompactScaleFactsBinary,isCompactScaleFactsBinary}=await import('../../modules/assessment-runtime/compact-scale-facts-binary')
+  const h1='1'.repeat(64),h2='2'.repeat(64),h3='3'.repeat(64),h4='4'.repeat(64)
+  const edgeFacts={
+   kind:'SCALE_RESULT_FACTS' as const,
+   version:2 as const,
+   binding:{assessmentId:'00000000-0000-4000-8000-000000000099',attemptEpoch:3,submissionId:'whole-'+'5'.repeat(64),payloadHash:h1},
+   sourceResultHash:h2,
+   bundle:h3,
+   base:'',
+   scores:[[-12.5,'calculated',false,null,{}],[null,'not_calculable',true,[0,2],{note:'edge'}],[42,'limited',false,null,{}]] as any,
+   quality:{status:'limited' as const,flags:['missing_items' as const]},
+   context:{schemaVersion:1 as const,snapshotHash:h4},
+   items:[[2,1,5,3,{extra:true}],[0,18,-2,0,{}]] as any,
+   references:[{base:h1,band:h2,hasBand:true,dynamic:{z:1.25}}],
+   interpretations:[{template:h3,extras:{custom:'x'}}],
+   caveats:'',
+   extras:{rawScoreFeedback:[{scoreKey:'s1',text:'ok'}]},
+   methodExtras:{customFlag:true},
+   canonical:{template:'',values:['v1',123]},
+   completedAt:'2026-11-23T08:00:00.000+08:00',
+  }
+  const cipher=encryptCompactScaleFactsBinary(edgeFacts,4096)
+  expect(isCompactScaleFactsBinary(cipher)).toBe(true)
+  expect(isEncrypted(cipher)).toBe(true)
+  expect(decryptCompactScaleFactsBinary(cipher)).toEqual(edgeFacts)
+  expect(decryptField(cipher)).toEqual(edgeFacts)
+
+  const m=memory(),pkg=selected[0],fixture=pkg.goldenCases.find(c=>c.expected.quality)!,result=resultFor(pkg,fixture),canonical=canonicalFor(result)
+  const binCipher=await prepareCompactScaleFacts({result,itemOrder:pkg.definition.items.map(i=>i.itemCode),binding:binding(),canonical},m.store)
+  expect(isCompactScaleFactsBinary(binCipher)).toBe(true)
+  const decoded=decodeScaleFacts(binCipher)!
+  const legacyJsonCipher=encryptCompactField(decoded)
+  expect(Buffer.byteLength(binCipher)).toBeLessThan(Buffer.byteLength(legacyJsonCipher))
+
+  // Tamper rejection on header/tag/body + key rotation rejection
+  const parts=binCipher.split(':')
+  const raw=Buffer.from(parts[2],'base64')
+  for(const offset of [0,1,10,14,26,raw.length-1]){
+   const mutated=Buffer.from(raw);mutated[offset]^=1
+   expect(()=>decryptCompactScaleFactsBinary(`ekf1:${parts[1]}:${mutated.toString('base64')}`)).toThrow()
+  }
+  expect(()=>decryptCompactScaleFactsBinary(`ekf1:${Number(parts[1])+1}:${parts[2]}`)).toThrow()
+  vi.stubEnv('DATA_ENCRYPTION_KEY','b'.repeat(64))
+  expect(()=>decryptCompactScaleFactsBinary(binCipher)).toThrow()
  })
 })
 describe('shared immutable public content',()=>{

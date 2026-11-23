@@ -89,7 +89,8 @@ export const registerWholeReceiptAtomic = async (parent: Parent, input: Input) =
     ), receipt_saved AS (
       UPDATE "composite_report_jobs" AS job SET "whole_submission_id" = ${input.submissionId},
         "whole_payload_hash" = ${input.payloadHash}, "whole_answers_encrypted" = ${input.answersEncrypted},
-        "whole_accepted_at" = ${input.acceptedAt}, "status" = 'PENDING', "budget_held" = ${!detached},
+        "whole_accepted_at" = ${input.acceptedAt}, "whole_validation_encrypted" = NULL, "whole_validation_hash" = NULL,
+        "status" = 'PENDING', "budget_held" = ${!detached},
         "attempt_count" = 0, "error_code" = NULL, "next_attempt_at" = (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'),
         "updated_at" = (CURRENT_TIMESTAMP AT TIME ZONE 'UTC')
       FROM eligible, parent_saved WHERE job."id" = eligible."id"

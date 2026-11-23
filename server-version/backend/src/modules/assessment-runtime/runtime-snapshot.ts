@@ -581,8 +581,15 @@ export const decryptFrozenScaleRuntimeSnapshot = (encrypted: string): VersionedF
 /** New writes are opt-in; compatible reads remain unconditional for rollback. */
 export const persistFrozenScaleRuntimeSnapshot = async (snapshot: VersionedFrozenScaleRuntimeSnapshot, db?: import('./shared-scale-runtime').SharedScaleArtifactDb): Promise<string> => {
   if (process.env.ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED !== 'true') return encryptFrozenScaleRuntimeSnapshot(snapshot)
-  const shared = await import('./shared-scale-runtime')
-  return shared.sharedScaleRuntimeStore.save(snapshot, db ? shared.sharedScaleArtifactRepositoryForDatabase(db) : undefined)
+  const [shared, templates] = await Promise.all([
+    import('./shared-scale-runtime'),
+    import('./public-templates'),
+  ])
+  return shared.sharedScaleRuntimeStore.save(
+    snapshot,
+    db ? shared.sharedScaleArtifactRepositoryForDatabase(db) : undefined,
+    db ? templates.publicTemplatesForDatabase(db) : templates.publicTemplates,
+  )
 }
 export class FrozenRuntimeStorageUnavailableError extends Error {
   readonly code = 'ASSESSMENT_RUNTIME_UNAVAILABLE'
@@ -604,7 +611,12 @@ export const loadFrozenScaleRuntimeSnapshot = async (encrypted: string, db?: imp
     snapshot = parseVersionedFrozenScaleRuntimeSnapshot(value)
   } else {
     try {
-      snapshot = await shared.sharedScaleRuntimeStore.load(value, db ? shared.sharedScaleArtifactRepositoryForDatabase(db) : undefined)
+      const templates = await import('./public-templates')
+      snapshot = await shared.sharedScaleRuntimeStore.load(
+        value,
+        db ? shared.sharedScaleArtifactRepositoryForDatabase(db) : undefined,
+        db ? templates.publicTemplatesForDatabase(db) : templates.publicTemplates,
+      )
     } catch (cause) {
       throw new FrozenRuntimeStorageUnavailableError(cause)
     }

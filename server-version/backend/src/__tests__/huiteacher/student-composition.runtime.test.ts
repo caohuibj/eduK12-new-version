@@ -10,7 +10,7 @@ vi.mock('../../modules/organization/principal',async original=>({...await origin
 vi.mock('../../utils/sessionRevocation',()=>({isSessionRevoked:async()=>false}))
 vi.mock('../../modules/campus/mfa.service',()=>({schoolAccountNeedsMfa:async()=>false}))
 vi.mock('../../modules/admin-permissions/security',()=>({needsAdminKey:()=>false,validAdminProof:()=>false,ADMIN_STEP_UP_SECONDS:300}))
-vi.mock('../../modules/assessment-run/educationCompositionExecution',()=>({readFrozenCompositionIdentity:m.identity,assertCompositionCollection:m.collection}))
+vi.mock('../../modules/assessment-run/educationCompositionExecution',()=>({readFrozenCompositionIdentity:m.identity,assertCompositionCollection:m.collection,verifyLiveCompositionAnchorsBatch:vi.fn(async()=>new Set())}))
 vi.mock('../../modules/assessment-relational/runtime-consent',()=>({relationalRuntimeConsentAuthority:{assertCompositeFinal:m.consent}}))
 vi.mock('../../modules/composite/composite.service',()=>({getAttemptState:m.parent}))
 vi.mock('../../modules/composite/composite.controller',()=>({compositeController:{submitFinalScale:m.final,submitFinalFormSection:m.final,embeddedSituationalAsset:m.final,wholeDefinition:vi.fn(),wholeTemplate:vi.fn(),wholeReceipt:vi.fn(),wholeSubmit:vi.fn(),educationWholeProgress:vi.fn()}}))

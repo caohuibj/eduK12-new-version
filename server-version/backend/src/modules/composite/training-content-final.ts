@@ -124,7 +124,28 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
     }}).catch(error=>{if(error instanceof FinalInterpretationIdentityError)fail();throw error})
   const receipt=receiptSchema.parse({schemaVersion:referenceBinding?2:1,...(referenceBinding?{referenceBindingHash:parent.trainingReferenceBindingHash}:{}),attemptId:parent.id,epoch:parent.attemptEpoch,aggregateInputHash:input.aggregateInputHash,
     contentBindingHash:parent.trainingContentBindingHash,generatedAt:new Date(input.completedAt).toISOString(),sources,interpretation})
-  return {receipt,encrypted:encryptUnifiedRuntimePayload(receipt),hash:canonicalHash(receipt)}
+  const receiptHash=canonicalHash(receipt)
+  const canCompact=sources.length===binding.units.length&&sources.every((source,index)=>source.itemId===binding.units[index].itemId)
+  const payload=canCompact
+    ? {
+        k:'TFR2' as const,
+        v:receipt.schemaVersion,
+        g:receipt.generatedAt,
+        s:sources.map(source=>Buffer.from(source.resultHash,'hex').toString('base64')),
+        u:receipt.interpretation.units.map(unit=>{
+          if(unit.reason===undefined&&unit.references.length===0){
+            if(unit.status==='NOT_SELECTED'&&unit.report.status==='NOT_SELECTED'&&unit.report.generatorVersion===undefined)return 2
+            if(unit.status==='INTERPRETED'){
+              if(unit.report.status==='NOT_SELECTED'&&unit.report.generatorVersion===undefined)return 0
+              if(unit.report.status==='READY')return unit.report.generatorVersion===undefined?[1]:[1,unit.report.generatorVersion]
+            }
+          }
+          const {instrumentKey:_ignored,...rest}=unit
+          return rest
+        }),
+      }
+    : receipt
+  return {receipt,encrypted:encryptUnifiedRuntimePayload(payload),hash:receiptHash}
 }
 /** Historical reads validate the stored receipt only. No owner, facts, release
  * resolution or current-version recomputation is required by this decoder. */
@@ -134,7 +155,41 @@ export function decodeTrainingFinalReceipt(parent:Parent&{aggregateInputHash:str
   if(cipher==null&&hashValue==null)return null
   const binding=decodeBinding(parent)
   if(!cipher||!hashValue||!binding)fail()
-  const parsed=receiptSchema.safeParse(decryptUnifiedRuntimePayload(cipher))
+  const raw=decryptUnifiedRuntimePayload<any>(cipher)
+  let candidate:unknown=raw
+  if(raw&&typeof raw==='object'&&raw.k==='TFR2'){
+    if((raw.v!==1&&raw.v!==2)||typeof raw.g!=='string'||!Array.isArray(raw.s)||!Array.isArray(raw.u)
+      ||raw.s.length!==binding.units.length||raw.u.length!==binding.units.length
+      ||!parent.aggregateInputHash||!parent.trainingContentBindingHash)fail()
+    const sources=raw.s.map((encoded:unknown,index:number)=>{
+      if(typeof encoded!=='string')fail()
+      const bytes=Buffer.from(encoded,'base64')
+      if(bytes.length!==32||bytes.toString('base64')!==encoded)fail()
+      return {itemId:binding.units[index].itemId,resultHash:bytes.toString('hex')}
+    })
+    const units=raw.u.map((entry:unknown,index:number)=>{
+      const instrumentKey=binding.units[index].itemId
+      if(entry===0)return {instrumentKey,status:'INTERPRETED' as const,references:[],report:{status:'NOT_SELECTED' as const}}
+      if(entry===2)return {instrumentKey,status:'NOT_SELECTED' as const,references:[],report:{status:'NOT_SELECTED' as const}}
+      if(Array.isArray(entry)&&entry[0]===1&&(entry.length===1||(entry.length===2&&typeof entry[1]==='string'))){
+        return {instrumentKey,status:'INTERPRETED' as const,references:[],report:{status:'READY' as const,...(entry.length===2?{generatorVersion:entry[1]}:{})}}
+      }
+      if(!entry||typeof entry!=='object'||Array.isArray(entry))fail()
+      return {instrumentKey,...(entry as Record<string,unknown>)}
+    })
+    candidate={
+      schemaVersion:raw.v,
+      ...(raw.v===2?{referenceBindingHash:parent.trainingReferenceBindingHash}:{}),
+      attemptId:parent.id,
+      epoch:parent.attemptEpoch,
+      aggregateInputHash:parent.aggregateInputHash,
+      contentBindingHash:parent.trainingContentBindingHash,
+      generatedAt:raw.g,
+      sources,
+      interpretation:{schemaVersion:1,contentBindingHash:parent.trainingContentBindingHash,units},
+    }
+  }
+  const parsed=receiptSchema.safeParse(candidate)
   if(!parsed.success)fail()
   const receipt=parsed.data
   if(canonicalHash(receipt)!==hashValue||receipt.attemptId!==parent.id||receipt.epoch!==parent.attemptEpoch

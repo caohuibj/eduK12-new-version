@@ -1,4 +1,5 @@
 import { Prisma, type CompositeAssessmentAttempt, type CompositeReportJob } from '@prisma/client'
+import { prisma } from '../../config/database'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { privateToolFail } from '../education-tools/private-tool.contracts'
 import { boundCompositeConsentSql } from './boundCompositeContinuation'
@@ -7,6 +8,47 @@ import type { WholeReceiptRow } from '../composite/whole-receipt-recovery'
 
 export type OrdinarySelfWholeProduct = 'SCHOOL' | 'TEACHER'
 const roleFor = (product: OrdinarySelfWholeProduct) => product === 'SCHOOL' ? 'STUDENT' : 'TEACHER'
+
+const RUN_PRODUCT_CACHE_MAX = 2048
+const immutableRunProductCache = new Map<string, OrdinarySelfWholeProduct>()
+export const resetOrdinarySelfWholeRunProductCacheForTests = () => {
+  immutableRunProductCache.clear()
+}
+
+const resolveImmutableRunProduct = async (
+  db: Pick<Prisma.TransactionClient, '$queryRaw'>,
+  organizationId: string,
+  runId: string,
+): Promise<OrdinarySelfWholeProduct | null> => {
+  const isRootDb = db === (prisma as unknown as Pick<Prisma.TransactionClient, '$queryRaw'>)
+  const key = `${organizationId}:${runId}`
+  if (isRootDb) {
+    const cached = immutableRunProductCache.get(key)
+    if (cached) {
+      immutableRunProductCache.delete(key)
+      immutableRunProductCache.set(key, cached)
+      return cached
+    }
+  }
+  const [link] = await db.$queryRaw<Array<{ hasSchool: boolean; hasTeacher: boolean }>>(Prisma.sql`
+    SELECT
+      EXISTS (SELECT 1 FROM campus_activity_runs WHERE organization_id=${organizationId} AND run_id=${runId}) AS "hasSchool",
+      EXISTS (SELECT 1 FROM huiteacher_evaluation_run_links WHERE organization_id=${organizationId} AND run_id=${runId}) AS "hasTeacher"
+  `)
+  const resolved: OrdinarySelfWholeProduct | null = link?.hasSchool && !link?.hasTeacher
+    ? 'SCHOOL'
+    : link?.hasTeacher && !link?.hasSchool
+      ? 'TEACHER'
+      : null
+  if (resolved && isRootDb) {
+    if (immutableRunProductCache.size >= RUN_PRODUCT_CACHE_MAX) {
+      const oldest = immutableRunProductCache.keys().next().value
+      if (oldest) immutableRunProductCache.delete(oldest)
+    }
+    immutableRunProductCache.set(key, resolved)
+  }
+  return resolved
+}
 
 export const ordinarySelfWholeEnabled = () => process.env.ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED !== 'false'
   && process.env.ASSESSMENT_REPORT_ASYNC_ENABLED === 'true' && process.env.ASSESSMENT_WHOLE_SUBMIT_ENABLED === 'true'
@@ -38,6 +80,120 @@ type Row = Omit<OrdinarySelfWholeBinding, 'id' | 'kind'> & {
   allowed: boolean
   stopped: boolean
   preflight: RunStartPreflight | null
+}
+
+export type OrdinarySelfWholeProgressBinding = {
+  kind: 'progress'
+  id: string
+  epoch: number
+  receiptOnly: boolean
+  parentStatus: CompositeAssessmentAttempt['status']
+  wholeSubmissionId: string | null
+  jobStatus: CompositeReportJob['status'] | null
+  executionStatus: string
+}
+
+type ProgressFastRow = {
+  id: string
+  epoch: number
+  receiptOnly: boolean | null
+  parentStatus: CompositeAssessmentAttempt['status']
+  slotHash: string | null
+  assignmentRef: string | null
+  jobSlot: string | null
+  wholeSubmissionId: string | null
+  payloadHash: string | null
+  acceptedAt: Date | null
+  jobStatus: CompositeReportJob['status'] | null
+  executionStatus: string
+  assignmentStatus: string
+  consentId: string | null
+  organizationId: string
+  runId: string
+  isSelfExec: boolean
+  execAssignmentId: string | null
+  needsStopCheck: boolean
+}
+
+/** Lightweight 4-table PK/UK progress poll for already-accepted ordinary SELF whole
+ * submissions. Eliminates the 10-table CTE planning overhead (~6.1ms/call, 1,533
+ * planning buffers) on high-frequency /whole/progress polls while falling back to the
+ * full authority query for pre-submit, consent-bound, transitional, or emergency-stop states. */
+export async function readOrdinarySelfWholeProgress(
+  db: Pick<Prisma.TransactionClient, '$queryRaw'>,
+  product: OrdinarySelfWholeProduct,
+  userId: string,
+  attemptId: string,
+): Promise<OrdinarySelfWholeBinding | OrdinarySelfWholeProgressBinding | null> {
+  if (process.env.ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED === 'false') return null
+  const [row] = await db.$queryRaw<ProgressFastRow[]>(Prisma.sql`
+    SELECT p.id, p.attempt_epoch AS epoch, p.receipt_only AS "receiptOnly",
+      p.status AS "parentStatus", p.frozen_active_slot_set_hash AS "slotHash",
+      p.assignment_ref AS "assignmentRef", j.slot_set_hash AS "jobSlot",
+      j.whole_submission_id AS "wholeSubmissionId", j.whole_payload_hash AS "payloadHash",
+      j.whole_accepted_at AS "acceptedAt", j.status AS "jobStatus",
+      e.status AS "executionStatus", a.status AS "assignmentStatus", a.consent_id AS "consentId",
+      e.organization_id AS "organizationId", e.run_id AS "runId",
+      (e.subject_actor_snapshot_id = e.respondent_actor_snapshot_id) AS "isSelfExec",
+      e.relational_assignment_id AS "execAssignmentId",
+      ${product === 'TEACHER'
+        ? Prisma.sql`(e.status = 'STARTED' AND EXISTS (SELECT 1 FROM scale_library_emergency_stops LIMIT 1))`
+        : Prisma.sql`FALSE`} AS "needsStopCheck"
+    FROM composite_assessment_attempts p
+    JOIN assessment_run_executions e
+      ON e.runtime_binding_kind = 'COMPOSITE' AND e.runtime_binding_ref = p.id
+    JOIN relational_assessment_assignments a
+      ON a.id = e.relational_assignment_id
+      AND a.subject_user_id = ${userId}
+      AND a.respondent_user_id = ${userId}
+      AND a.relationship_kind = 'SELF'
+      AND a.policy_domain = 'ORGANIZATION_RUN'
+    LEFT JOIN composite_report_jobs j
+      ON j.attempt_id = p.id AND j.attempt_epoch = p.attempt_epoch
+    WHERE p.id = ${attemptId}
+      AND p.user_id = ${userId}
+      AND p.subject_user_id = ${userId}
+      AND p.respondent_user_id = ${userId}
+      AND p.respondent_type = 'SELF'
+      AND p.delivery_mode = 'FINAL_ONLY'
+      AND p.runtime_generation = 'UNIFIED_V1'
+      AND p.training_content_binding_hash IS NOT NULL
+    LIMIT 1
+  `)
+  const steadyAcceptedState = Boolean(
+    row
+    && row.isSelfExec
+    && !row.needsStopCheck
+    && !row.consentId
+    && row.assignmentRef
+    && row.execAssignmentId === row.assignmentRef
+    && row.wholeSubmissionId
+    && row.payloadHash
+    && row.acceptedAt
+    && row.slotHash
+    && row.jobSlot === row.slotHash
+    && (
+      (row.executionStatus === 'COMPLETED' && row.assignmentStatus === 'COMPLETED' && row.parentStatus === 'COMPLETED')
+      || (row.executionStatus === 'STARTED' && row.assignmentStatus === 'STARTED' && row.parentStatus === 'IN_PROGRESS')
+    ),
+  )
+  if (steadyAcceptedState && row) {
+    const runProduct = await resolveImmutableRunProduct(db, row.organizationId, row.runId)
+    if (runProduct === product) {
+      return {
+        kind: 'progress',
+        id: row.id,
+        epoch: row.epoch,
+        receiptOnly: Boolean(row.receiptOnly),
+        parentStatus: row.parentStatus,
+        wholeSubmissionId: row.wholeSubmissionId,
+        jobStatus: row.jobStatus,
+        executionStatus: row.executionStatus,
+      }
+    }
+    return null
+  }
+  return readOrdinarySelfWholeAccess(db, product, userId, { attemptId, mode: 'progress' })
 }
 
 export function readOrdinarySelfWholeAccess(

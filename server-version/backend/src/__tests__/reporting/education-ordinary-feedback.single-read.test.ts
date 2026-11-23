@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   loadFrozenActiveSlotSet: vi.fn(),
   readOrdinaryDeclaredFeedback: vi.fn(),
   tryReadPreMaterializedDeclaredFeedback: vi.fn(),
+  tryReadPreMaterializedNativeScaleFeedback: vi.fn(),
   readOrdinaryNativeFeedback: vi.fn(),
   readNativeEducationScaleFeedback: vi.fn(),
 }))
@@ -29,6 +30,7 @@ vi.mock('../../modules/assessment-runtime/slot-set', () => ({
 vi.mock('../../modules/reporting/education-ordinary-declared-feedback', () => ({
   readOrdinaryDeclaredFeedback: mocks.readOrdinaryDeclaredFeedback,
   tryReadPreMaterializedDeclaredFeedback: mocks.tryReadPreMaterializedDeclaredFeedback,
+  tryReadPreMaterializedNativeScaleFeedback: mocks.tryReadPreMaterializedNativeScaleFeedback,
 }))
 vi.mock('../../modules/reporting/education-ordinary-native-feedback', () => ({
   readOrdinaryNativeFeedback: mocks.readOrdinaryNativeFeedback,
@@ -203,6 +205,160 @@ describe('education-ordinary-feedback single-read without held interactive trans
     expect(result.units[0]).toMatchObject({ blockId, state: 'READY', declaredReport: { title: 'Pre-Materialized Report' } })
     expect(mocks.loadFrozenActiveSlotSet).not.toHaveBeenCalled()
     expect(mocks.readOrdinaryDeclaredFeedback).not.toHaveBeenCalled()
+  })
+
+  it('uses pre-materialized native scale feedback without loading slots, hydrating TOAST columns, or re-projecting', async () => {
+    const blockId = '00000000-0000-4000-8000-000000000001'
+    const itemId = '00000000-0000-4000-8000-000000000002'
+    const versionId = '00000000-0000-4000-8000-000000000003'
+    const contentHash = 'a'.repeat(64)
+    mocks.queryRaw.mockResolvedValue([{
+      organizationId: 'org-1',
+      key: 'education-composition:SCHOOL:test:STUDENT:SELF:1.0.0',
+      version: '1.0.0',
+      policy: {},
+      policyHash: 'b'.repeat(64),
+      status: 'COMPLETED',
+      subjectUserId: 'user-1',
+      respondentUserId: 'user-1',
+      subjectRole: 'STUDENT',
+      respondentRole: 'STUDENT',
+      relationshipKind: 'SELF',
+      perspective: 'SELF_REPORT',
+      receiptOnly: false,
+      preMaterializedReport: 'ekc1:prematerialized-native',
+      contentState: {
+        trainingContentBinding: null,
+        trainingContentBindingHash: 'c'.repeat(64),
+        trainingReferenceBinding: null,
+        trainingReferenceBindingHash: null,
+        trainingContentInterpretationEncrypted: null,
+        trainingContentInterpretationHash: 'd'.repeat(64),
+        aggregateInputHash: 'e'.repeat(64),
+      },
+      parentId: 'parent-1',
+      parentStatus: 'COMPLETED',
+      attemptEpoch: 1,
+      contextSnapshotHash: null,
+      frozenSlots: null,
+      frozenSlotsHash: 'f'.repeat(64),
+    }])
+    mocks.readFrozenCompositionIdentity.mockResolvedValue({
+      compositeId: 'comp-1',
+      title: 'Private Scale Composition',
+      origin: { entry: 'SCHOOL', variantKey: 'STUDENT:SELF', ownerUserId: 'owner-1' },
+      manifest: [{
+        blockId,
+        kind: 'SCALE',
+        versionId,
+        contentHash,
+        sourceProvider: 'PRIVATE_VERSION',
+        itemIds: [itemId],
+        sectionIds: [],
+        title: 'Private Scale 1',
+      }],
+      units: [{ itemId, versionId, family: 'SCALE', scaleId: 'scale-1', definitionHash: contentHash }],
+      binding: {
+        manifestHash: '1'.repeat(64),
+        unitReports: [{
+          blockId,
+          versionId,
+          contentHash,
+          respondent: { mode: 'INDIVIDUAL_SUMMARY', metricKeys: ['total'], longitudinalMetricKeys: [] },
+        }],
+      },
+    })
+    mocks.tryReadPreMaterializedNativeScaleFeedback.mockReturnValue(new Map([
+      [itemId, { state: 'PROJECTED', unitReports: [{ itemId, title: 'Private Scale 1' }] }],
+    ]))
+
+    const result = await readSchoolOrdinaryFeedback({ executionId: 'exec-1', actorUserId: 'user-1' })
+    expect(result.state).toBe('READY')
+    expect(result.units[0]).toMatchObject({ blockId, state: 'READY', title: 'Private Scale 1' })
+    expect(mocks.queryRaw).toHaveBeenCalledTimes(1)
+    expect(mocks.loadFrozenActiveSlotSet).not.toHaveBeenCalled()
+    expect(mocks.readNativeEducationScaleFeedback).not.toHaveBeenCalled()
+  })
+
+  it('lazily hydrates deferred TOAST columns by PK when pre-materialized native feedback misses', async () => {
+    const blockId = '00000000-0000-4000-8000-000000000001'
+    const itemId = '00000000-0000-4000-8000-000000000002'
+    const versionId = '00000000-0000-4000-8000-000000000003'
+    const contentHash = 'a'.repeat(64)
+    mocks.queryRaw
+      .mockResolvedValueOnce([{
+        organizationId: 'org-1',
+        key: 'education-composition:SCHOOL:test:STUDENT:SELF:1.0.0',
+        version: '1.0.0',
+        policy: {},
+        policyHash: 'b'.repeat(64),
+        status: 'COMPLETED',
+        subjectUserId: 'user-1',
+        respondentUserId: 'user-1',
+        subjectRole: 'STUDENT',
+        respondentRole: 'STUDENT',
+        relationshipKind: 'SELF',
+        perspective: 'SELF_REPORT',
+        receiptOnly: false,
+        preMaterializedReport: 'ekc1:stale-native',
+        contentState: {
+          trainingContentBinding: null,
+          trainingContentBindingHash: 'c'.repeat(64),
+          trainingReferenceBinding: null,
+          trainingReferenceBindingHash: null,
+          trainingContentInterpretationEncrypted: null,
+          trainingContentInterpretationHash: 'd'.repeat(64),
+          aggregateInputHash: 'e'.repeat(64),
+        },
+        parentId: 'parent-1',
+        parentStatus: 'COMPLETED',
+        attemptEpoch: 1,
+        contextSnapshotHash: null,
+        frozenSlots: null,
+        frozenSlotsHash: 'f'.repeat(64),
+      }])
+      .mockResolvedValueOnce([{
+        frozenSlots: 'hydrated-slots',
+        trainingContentBinding: { units: [] },
+        trainingReferenceBinding: null,
+        trainingContentInterpretationEncrypted: 'hydrated-interp',
+      }])
+    mocks.readFrozenCompositionIdentity.mockResolvedValue({
+      compositeId: 'comp-1',
+      title: 'Private Scale Composition',
+      origin: { entry: 'SCHOOL', variantKey: 'STUDENT:SELF', ownerUserId: 'owner-1' },
+      manifest: [{
+        blockId,
+        kind: 'SCALE',
+        versionId,
+        contentHash,
+        sourceProvider: 'PRIVATE_VERSION',
+        itemIds: [itemId],
+        sectionIds: [],
+        title: 'Private Scale 1',
+      }],
+      units: [{ itemId, versionId, family: 'SCALE', scaleId: 'scale-1', definitionHash: contentHash }],
+      binding: {
+        manifestHash: '1'.repeat(64),
+        unitReports: [{
+          blockId,
+          versionId,
+          contentHash,
+          respondent: { mode: 'INDIVIDUAL_SUMMARY', metricKeys: ['total'], longitudinalMetricKeys: [] },
+        }],
+      },
+    })
+    mocks.tryReadPreMaterializedNativeScaleFeedback.mockReturnValue(null)
+    mocks.loadFrozenActiveSlotSet.mockResolvedValue({ attemptEpoch: 1, snapshotHash: 'f'.repeat(64), slots: [] })
+    mocks.readNativeEducationScaleFeedback.mockResolvedValue(new Map([
+      [itemId, { state: 'PROJECTED', unitReports: [{ itemId, title: 'Private Scale 1' }] }],
+    ]))
+
+    const result = await readSchoolOrdinaryFeedback({ executionId: 'exec-1', actorUserId: 'user-1' })
+    expect(result.state).toBe('READY')
+    expect(mocks.queryRaw).toHaveBeenCalledTimes(2)
+    expect(mocks.loadFrozenActiveSlotSet).toHaveBeenCalledWith('hydrated-slots', expect.anything())
+    expect(mocks.readNativeEducationScaleFeedback).toHaveBeenCalledTimes(1)
   })
 
   it('hides receiptOnly attempts without projecting feedback', async () => {

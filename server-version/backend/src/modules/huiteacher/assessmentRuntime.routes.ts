@@ -12,7 +12,7 @@ import {isInstrumentFinalSubmitError} from '../../services/instrumentFinalSubmit
 import {isUnitSubmitAdmissionBusyError} from '../../services/unitSubmitAdmission'
 import {isQuestionnaireCompletionAdmissionBusyError,isTransientCompletionDatabaseError} from '../../services/questionnaireCompletionAdmission'
 import {startAssessmentRunExecution} from '../assessment-run/startExecution'
-import {readOrdinarySelfWholeAccess} from '../assessment-run/ordinarySelfWholeAccess'
+import {readOrdinarySelfWholeAccess,readOrdinarySelfWholeProgress} from '../assessment-run/ordinarySelfWholeAccess'
 import {isAssessmentStartBusyError} from '../composite/start-transient'
 import {isAssessmentStartResourceGateError} from '../../services/assessmentResourceProtection'
 import {parseKnownTemplateHashes} from '../composite/whole-start-inline'
@@ -103,7 +103,9 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   next()
  })
  const ordinaryAttempt=(req:Request,mode:'full'|'progress'='full')=>audience==='TEACHER_SELF'
-  ? readOrdinarySelfWholeAccess(db,'TEACHER',req.user!.userId,{attemptId:uuid.parse(req.params.attemptId),...(mode==='progress'?{mode:'progress' as const}:{})})
+  ? (mode==='progress'
+    ? readOrdinarySelfWholeProgress(db,'TEACHER',req.user!.userId,uuid.parse(req.params.attemptId))
+    : readOrdinarySelfWholeAccess(db,'TEACHER',req.user!.userId,{attemptId:uuid.parse(req.params.attemptId)}))
   : null
  const childAccess=(type:'COGNITIVE'|'SITUATIONAL'|'SCALE'|'FORM_SECTION'):RequestHandler=>(req,res,next)=>{
   void Promise.resolve().then(()=>access.child(req.user!.userId,{

@@ -265,3 +265,57 @@ it('falls back to inline encrypted snapshot when published reference exceeds 16K
   expect(loaded.snapshotHash).toBe(v2.snapshotHash)
   expect(loaded.compiledPolicy).toEqual(v2.compiledPolicy)
 })
+
+it('persists compact storageVersion=4 policy-plan references (<120B) when shared control + template store are enabled and resolves batch artifact hashes', async () => {
+  vi.stubEnv('ASSESSMENT_COMPACT_FACTS_ENABLED', 'true')
+  vi.stubEnv('ASSESSMENT_SHARED_CONTROL_ENABLED', 'true')
+  const { buildPublishedScaleArtifact, cacheCommittedPublishedScaleArtifact } = await import('../../modules/assessment-runtime/published-scale-artifact')
+  const { createPublicTemplateStore } = await import('../../modules/assessment-runtime/public-templates')
+  const { setSnapshotPublishedArtifactHash } = await import('../../modules/assessment-runtime/runtime-snapshot')
+  const { resolveSharedScaleRuntimeArtifactHashes } = await import('../../modules/assessment-runtime/shared-scale-runtime')
+
+  const s = source()
+  const built = buildPublishedScaleArtifact({
+    release: { releaseId: 'release-v4', contentHash: 'b'.repeat(64) },
+    instrumentKey: s.identity.instrumentKey,
+    instrumentVersion: s.identity.instrumentVersion,
+    definition: s.executable!.definition,
+    instruction: null,
+  })
+  cacheCommittedPublishedScaleArtifact(built.record.artifactHash, built.artifact, built.record.plaintextBytes)
+  const templateRows = new Map<string, any>()
+  const templateRepo = {
+    read: vi.fn(async (hashes: string[]) => hashes.flatMap(h => templateRows.has(h) ? [templateRows.get(h)!] : [])),
+    append: vi.fn(async (rows: any[]) => { for (const r of rows) templateRows.set(r.templateHash, r) }),
+  }
+  const templates = createPublicTemplateStore(templateRepo)
+  const m = memory()
+  m.rows.set(built.record.artifactHash, built.record)
+  const storeV4 = createSharedScaleRuntimeStore(m.repository, templates)
+
+  const v2 = createFrozenScaleRuntimeSnapshotV2ForTest({
+    instrumentKey: s.identity.instrumentKey,
+    instrumentVersion: s.identity.instrumentVersion,
+    definition: s.executable!.definition,
+    compiledPolicy: compileScalePolicy(s),
+    frozenAt: new Date('2026-11-23T01:02:03.456Z'),
+  })
+  setSnapshotPublishedArtifactHash(v2, built.record.artifactHash)
+
+  const cipherV3 = await m.store.save(v2)
+  const cipherV4 = await storeV4.save(v2)
+  expect(cipherV4.startsWith('ekr1:')).toBe(true)
+  expect(Buffer.byteLength(cipherV4)).toBeLessThan(120)
+  expect(Buffer.byteLength(cipherV4)).toBeLessThan(Buffer.byteLength(cipherV3) / 2)
+
+  const decodedRef = reference(cipherV4)
+  expect(decodedRef).toMatchObject({ kind: 'SHARED_SCALE_RUNTIME', storageVersion: 4, frozenAt: v2.frozenAt })
+  expect(templateRows.size).toBe(1)
+
+  const coldTemplates = createPublicTemplateStore(templateRepo)
+  const resolved = await resolveSharedScaleRuntimeArtifactHashes([decodedRef], coldTemplates)
+  expect(resolved.get(decodedRef.planHash)).toBe(built.record.artifactHash)
+
+  const coldStore = createSharedScaleRuntimeStore(m.repository, coldTemplates)
+  expect(await coldStore.load(decodedRef)).toEqual(v2)
+})

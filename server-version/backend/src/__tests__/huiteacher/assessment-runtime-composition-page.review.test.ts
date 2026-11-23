@@ -2,10 +2,10 @@ import {beforeEach,describe,expect,it,vi} from 'vitest'
 import type {Prisma} from '@prisma/client'
 import {createTeacherAssessmentAccess,type TeacherAssessmentSourceAccess} from '../../modules/huiteacher/assessmentRuntime.access'
 import {EducationPrivateToolError} from '../../modules/education-tools/private-tool.contracts'
-import {readFrozenCompositionIdentity,assertCompositionCollection} from '../../modules/assessment-run/educationCompositionExecution'
+import {readFrozenCompositionIdentity,assertCompositionCollection,verifyLiveCompositionAnchorsBatch} from '../../modules/assessment-run/educationCompositionExecution'
 
 vi.mock('../../modules/assessment-run/educationCompositionExecution',()=>({
- readFrozenCompositionIdentity:vi.fn(),assertCompositionCollection:vi.fn(),
+ readFrozenCompositionIdentity:vi.fn(),assertCompositionCollection:vi.fn(),verifyLiveCompositionAnchorsBatch:vi.fn(async()=>new Set()),
 }))
 
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
@@ -53,5 +53,19 @@ describe('Review: ordinary Teacher page isolates current source-use withdrawal',
   vi.mocked(assertCompositionCollection).mockRejectedValue(error)
   const db={$queryRaw:vi.fn().mockResolvedValue([row(1,'ASSIGNED')])} as unknown as Prisma.TransactionClient
   await expect(createTeacherAssessmentAccess(db,{readIdentity:vi.fn(),assertUse:vi.fn()}).page(id(60),{})).rejects.toBe(error)
+ })
+ it('batches live composition anchor verification once per page and deduplicates identical collection checks',async()=>{
+  const a=row(1,'ASSIGNED'),b={...row(2,'ASSIGNED'),resourceKey:a.resourceKey,policyHash:a.policyHash},c={...row(3,'STARTED'),resourceKey:a.resourceKey,policyHash:a.policyHash}
+  const verifiedSet=new Set(['anchor-1'])
+  vi.mocked(verifyLiveCompositionAnchorsBatch).mockResolvedValue(verifiedSet)
+  vi.mocked(readFrozenCompositionIdentity).mockResolvedValue({origin:{entry:'TEACHER',variantKey:'TEACHER:SELF'},compositeId:id(50),title:'Shared Pack',units:[]} as never)
+  vi.mocked(assertCompositionCollection).mockResolvedValue(undefined)
+  const db={$queryRaw:vi.fn().mockResolvedValue([a,b,c])} as unknown as Prisma.TransactionClient
+  const result=await createTeacherAssessmentAccess(db,{readIdentity:vi.fn(),assertUse:vi.fn()}).page(id(60),{pageSize:50})
+  expect(result.list.map(t=>t.executionId)).toEqual([a.executionId,b.executionId,c.executionId])
+  expect(verifyLiveCompositionAnchorsBatch).toHaveBeenCalledTimes(1)
+  expect(vi.mocked(readFrozenCompositionIdentity).mock.calls.every(call=>call[2]?.verifiedLiveAnchors===verifiedSet)).toBe(true)
+  // Two ASSIGNED rows share one NEW_START check; one STARTED row runs one BOUND_COLLECTION check -> 2 total instead of 3
+  expect(assertCompositionCollection).toHaveBeenCalledTimes(2)
  })
 })

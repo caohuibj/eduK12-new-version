@@ -80,6 +80,11 @@ export const processCompositeReportJob = async (job: CompositeReportJob): Promis
                 attemptId: job.attemptId,
                 attemptEpoch: job.attemptEpoch,
                 aggregateInputHash,
+                preloaded: {
+                  children: committedParent?.scaleAssessments,
+                  committedUnits: committedParent?.committedScaleUnits,
+                  runtimes: reportContext?.units,
+                },
               }),
             )
             if (preMaterialized) {
