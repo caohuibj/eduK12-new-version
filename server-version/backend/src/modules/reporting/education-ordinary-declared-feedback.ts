@@ -1,3 +1,4 @@
+import { readCompositeFinalUnitSnapshots } from '../assessment-runtime/composite-final.bridge'
 import {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
@@ -78,32 +79,43 @@ export async function readOrdinaryDeclaredFeedback(tx:Prisma.TransactionClient,i
   ...(refUnitsByItemId.get(unit.itemId)?.references.flatMap(ref=>ref.status==='SELECTED'?[ref.releaseId]:[])??[])]))]
  input.onReleaseIds?.(releaseIds)
  const slotKeys=expected.map(e=>e.slotKey)
- const [releases,rows]='$transaction' in tx
-  ? await Promise.all([
-   getContentReleaseBatch(tx,releaseIds),
-   tx.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,slotKey:{in:slotKeys}}}),
-  ])
-  : [
-   await getContentReleaseBatch(tx,releaseIds),
-   await tx.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,slotKey:{in:slotKeys}}}),
-  ]
- if(rows.length!==expected.length||new Set(rows.map(row=>row.slotKey)).size!==rows.length)hidden()
- const slotsByKey=new Map(input.slots.slots.map(slot=>[slot.slotKey,slot]))
- for(const row of rows){
-  const slot=slotsByKey.get(row.slotKey)
-  if(!slot||row.terminalState!=='COMPLETED'||row.payloadKind!=='UNIT_RESULT'||!row.canonicalResultEncrypted||row.unitType!==slot.unitType
-   ||row.sourceDefinitionHash!==slot.sourceDefinitionIdentity.hash)hidden()
- }
- const envelopes=await loadStoredCanonicalUnitResults(rows.map(row=>row.canonicalResultEncrypted!),tx)
- const expectedBySlotKey=new Map(expected.map(entry=>[entry.slotKey,entry]))
- const facts=new Map<string,typeof envelopes[number]>()
- for(const [index,row] of rows.entries()){
-  const envelope=envelopes[index],unit=expectedBySlotKey.get(row.slotKey)!.unit
-  if(!envelope||envelope.core.unitType!==row.unitType||envelope.core.sourceDefinitionHash!==row.sourceDefinitionHash
-   ||envelope.core.compiledRuntimeHash!==row.compiledRuntimeHash||envelope.core.contextHash!==parent.contextSnapshotHash
-   ||envelope.persistenceProvenance.sourceType!==row.sourceType||envelope.persistenceProvenance.sourceAttemptId!==row.sourceAttemptId
-   ||(envelope.persistenceProvenance.sourceSubmissionId??null)!==(row.sourceSubmissionId??null))hidden()
-  facts.set(unit.itemId,envelope)
+ const v2UnitRead = (input.parent as { publicationHash?: string | null }).publicationHash
+  ? await readCompositeFinalUnitSnapshots(
+      tx,
+      [{ attemptId: parent.id, attemptEpoch: parent.attemptEpoch }],
+      { slotKeys },
+    )
+  : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
+ const hasV2Final = v2UnitRead.loadedFactsByKey.has(`${parent.id}:${parent.attemptEpoch}`)
+ const releases = await getContentReleaseBatch(tx, releaseIds)
+ const facts = new Map<string, Awaited<ReturnType<typeof loadStoredCanonicalUnitResults>>[number]>()
+ if (hasV2Final) {
+  if (v2UnitRead.snapshots.length !== expected.length) hidden()
+  const expectedBySlotKey = new Map(expected.map(entry => [entry.slotKey, entry]))
+  for (const snap of v2UnitRead.snapshots) {
+   const unit = expectedBySlotKey.get(snap.slotKey)?.unit
+   if (!unit || !snap.canonicalEnvelope) hidden()
+   facts.set(unit.itemId, snap.canonicalEnvelope)
+  }
+ } else {
+  const rows = await tx.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,slotKey:{in:slotKeys}}})
+  if(rows.length!==expected.length||new Set(rows.map(row=>row.slotKey)).size!==rows.length)hidden()
+  const slotsByKey=new Map(input.slots.slots.map(slot=>[slot.slotKey,slot]))
+  for(const row of rows){
+   const slot=slotsByKey.get(row.slotKey)
+   if(!slot||row.terminalState!=='COMPLETED'||row.payloadKind!=='UNIT_RESULT'||!row.canonicalResultEncrypted||row.unitType!==slot.unitType
+    ||row.sourceDefinitionHash!==slot.sourceDefinitionIdentity.hash)hidden()
+  }
+  const envelopes=await loadStoredCanonicalUnitResults(rows.map(row=>row.canonicalResultEncrypted!),tx)
+  const expectedBySlotKey=new Map(expected.map(entry=>[entry.slotKey,entry]))
+  for(const [index,row] of rows.entries()){
+   const envelope=envelopes[index],unit=expectedBySlotKey.get(row.slotKey)!.unit
+   if(!envelope||envelope.core.unitType!==row.unitType||envelope.core.sourceDefinitionHash!==row.sourceDefinitionHash
+    ||envelope.core.compiledRuntimeHash!==row.compiledRuntimeHash||envelope.core.contextHash!==parent.contextSnapshotHash
+    ||envelope.persistenceProvenance.sourceType!==row.sourceType||envelope.persistenceProvenance.sourceAttemptId!==row.sourceAttemptId
+    ||(envelope.persistenceProvenance.sourceSubmissionId??null)!==(row.sourceSubmissionId??null))hidden()
+   facts.set(unit.itemId,envelope)
+  }
  }
  const ceilingsByBlockId=new Map(identity.binding.unitReports.map(ceiling=>[ceiling.blockId,ceiling]))
  for(const {block,unit} of expected){

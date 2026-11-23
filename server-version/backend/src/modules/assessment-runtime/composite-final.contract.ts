@@ -141,6 +141,7 @@ export type CompositeUnitFactV1 =
   | CompositeFormSectionUnitFactV1
   | CompositeSituationalUnitFactV1
   | CompositeCognitiveUnitFactV1
+export type CompositeUnitType = CompositeUnitFactV1['unitType']
 
 export const resolvedUnitReferenceSlotSchema = z.object({
   metricKey: nonEmptyText,

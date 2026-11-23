@@ -3,6 +3,7 @@ import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
 import {loadStoredCanonicalUnitResults} from '../assessment-runtime/compact-assessment-storage'
+import {readCompositeFinalUnitSnapshots} from '../assessment-runtime/composite-final.bridge'
 import {decodeTrainingFinalReceipt} from '../composite/training-content-final'
 import {trainingContentSnapshotSchema} from '../composite/training-content-binding'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
@@ -82,13 +83,25 @@ export function trainingInterpretationSource(parent:TrainingInterpretationParent
 async function readTrainingInterpretationRow(tx:Prisma.TransactionClient,parent:TrainingInterpretationParent,source:ReturnType<typeof trainingInterpretationSource>){
  if(!source.source)return null
  const type=source.unit.family==='SJT'?'SITUATIONAL':source.unit.family,slotKey=compositeItemSlotKey(source.unit.itemId,type)
+ const v2Read = (parent as { publicationHash?: string | null }).publicationHash
+  ? await readCompositeFinalUnitSnapshots(
+      tx,
+      [{ attemptId: parent.id, attemptEpoch: parent.attemptEpoch }],
+      { slotKeys: [slotKey] },
+    )
+  : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
+ if (v2Read.loadedFactsByKey.has(`${parent.id}:${parent.attemptEpoch}`)) {
+  const snap = v2Read.snapshots[0]
+  if (!snap || snap.unitType !== type || !snap.canonicalEnvelope) interpretationFail()
+  return { ...snap, canonicalResultEncrypted: null as string | null, v2Envelope: snap.canonicalEnvelope }
+ }
  const rows=await tx.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,slotKey},select:{
   compositeAttemptId:true,attemptEpoch:true,slotKey:true,unitType:true,terminalState:true,payloadKind:true,canonicalResultEncrypted:true,sourceType:true,sourceAttemptId:true,sourceSubmissionId:true}})
  if(rows.length!==1)interpretationFail()
  const row=rows[0]
  if(row.compositeAttemptId!==parent.id||row.attemptEpoch!==parent.attemptEpoch||row.slotKey!==slotKey||row.unitType!==type
   ||row.terminalState!=='COMPLETED'||row.payloadKind!=='UNIT_RESULT'||!row.canonicalResultEncrypted)interpretationFail()
- return row
+ return { ...row, v2Envelope: null }
 }
 /** Stored artifact reads recheck current disclosure without reinterpreting,
  * rerendering, or modifying the immutable artifact or source result. */
@@ -101,9 +114,9 @@ export async function readTrainingInterpretationFacts(tx:Prisma.TransactionClien
  const row=await readTrainingInterpretationRow(tx,parent,source)
  if(!row)return {notExecuted:true,quality:undefined,metrics:[],core:null,disclosure:null}
  const type=source.unit.family==='SJT'?'SITUATIONAL':source.unit.family
- const envelopes=await loadStoredCanonicalUnitResults([row.canonicalResultEncrypted!],tx)
- if(envelopes.length!==1)interpretationFail()
- const envelope=envelopes[0],core=envelope.core
+ const envelope = row.v2Envelope ?? (await loadStoredCanonicalUnitResults([row.canonicalResultEncrypted!], tx))[0]
+ if(!envelope)interpretationFail()
+ const core=envelope.core
  if(envelope.resultHash!==source.source!.resultHash||core.unitType!==type||core.contextHash!==parent.contextSnapshotHash
   ||envelope.persistenceProvenance.sourceType!==row.sourceType||envelope.persistenceProvenance.sourceAttemptId!==row.sourceAttemptId
   ||(envelope.persistenceProvenance.sourceSubmissionId??null)!==(row.sourceSubmissionId??null)||new Set(core.metrics.map(m=>m.key)).size!==core.metrics.length)interpretationFail()

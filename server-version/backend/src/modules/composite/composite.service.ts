@@ -1,4 +1,8 @@
 import {previewTrainingStandardReportEligibility} from './training-standard-report-preview'
+import { isCompositeWholeV2Enabled } from '../assessment-runtime/composite-whole-v2-flag'
+import { generateCompositeUnitSeeds } from '../assessment-runtime/composite-publication-plan'
+import { readCompositeFinalUnitSnapshots } from '../assessment-runtime/composite-final.bridge'
+import { materializeCompositePublicationPlan, resolveCompositePublicationPlanForAttempt } from './whole-v2.access'
 import {scaleRuntimeInstrumentKey} from '../scale/runtime-identity'
 import {
   evaluateTrainingItemReportEligibility,
@@ -1695,6 +1699,7 @@ export const listAttemptsForTeacher = async (
         completedAt: true,
         totalTime: true,
         anonymousCode: true,
+        publicationHash: true,
         userId: true,
         user: { select: { id: true, nickname: true, username: true } },
       },
@@ -1704,11 +1709,23 @@ export const listAttemptsForTeacher = async (
   ])
 
   const totalPages = Math.ceil(total / query.pageSize)
-  const unifiedIds = attempts.filter(attempt => attempt.runtimeGeneration === 'UNIFIED_V1').map(attempt => attempt.id)
-  const headers = unifiedIds.length ? await prisma.assessmentUnitSnapshot.findMany({
-    where: { compositeAttemptId: { in: unifiedIds } },
+  const unifiedAttempts = attempts.filter(attempt => attempt.runtimeGeneration === 'UNIFIED_V1')
+  const v2UnifiedAttempts = unifiedAttempts.filter(attempt => attempt.publicationHash != null)
+  const v2SnapshotsResult = v2UnifiedAttempts.length
+    ? await readCompositeFinalUnitSnapshots(
+        prisma,
+        v2UnifiedAttempts.map(attempt => ({ attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch })),
+        { hydrateScaleCanonical: false },
+      )
+    : { loadedFactsByKey: new Map(), snapshots: [] as any[] }
+  const missingLegacyUnifiedIds = unifiedAttempts
+    .filter(attempt => !v2SnapshotsResult.loadedFactsByKey.has(`${attempt.id}:${attempt.attemptEpoch}`))
+    .map(attempt => attempt.id)
+  const legacyHeaders = missingLegacyUnifiedIds.length ? await prisma.assessmentUnitSnapshot.findMany({
+    where: { compositeAttemptId: { in: missingLegacyUnifiedIds } },
     select: { compositeAttemptId: true, slotKey: true, attemptEpoch: true, unitType: true, terminalState: true, payloadKind: true, sourceType: true, sourceAttemptId: true },
   }) : []
+  const headers = [...v2SnapshotsResult.snapshots, ...legacyHeaders]
   const headersByAttempt = new Map<string, AggregateSnapshotHeader[]>()
   for (const header of headers) {
     if (!header.compositeAttemptId) continue
@@ -3993,6 +4010,55 @@ const createAttempt = async (
     const nativeScaleIds=composite.items.filter((item:any)=>item.type==='SCALE'&&item.standardCombinationSource==null).map((item:any)=>item.scaleId)
     await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient,nativeScaleIds,{sourceOwnerId:composite.createdBy})
   }
+  // Phase 2 WHOLE_V2 zero-child-row START: creates ONLY 1 row in
+  // composite_assessment_attempts (with publicationHash + Cognitive-only unitSeedsEncrypted)
+  // and writes 0 child rows (0 assessments, 0 form_section_attempts, 0 cognitive_sessions, 0 situational_attempts).
+  if (finalOnly && isCompositeWholeV2Enabled()) {
+    const plan = await materializeCompositePublicationPlan(composite.id, db)
+    const generatedSeeds = generateCompositeUnitSeeds(plan, newAttemptId, attemptEpoch)
+    const v2Attempt = await db.compositeAssessmentAttempt.create({
+      data: {
+        id: newAttemptId,
+        receiptOnly: compositionAdmission?.receiptOnly === true || composite.receiptOnly === true,
+        ...(variantAllocation ? { trainingVariantAllocationEncrypted: encryptUnifiedRuntimePayload(variantAllocation), trainingVariantAllocationHash: variantAllocation.allocationHash } : {}),
+        compositeAssessmentId: composite.id,
+        ...(composite.productKind === 'QUESTIONNAIRE'
+          ? { deliveryCourseId: composite.deliveryCourseId ?? null }
+          : composite.productKind === 'ASSESSMENT_BUNDLE'
+            ? { deliveryCourseId: composite.courseId ?? null }
+            : {}),
+        userId,
+        accessTokenId,
+        recoveryTokenHash: credential?.hash ?? null,
+        participantKey: field?.participantKey ?? credential?.participantKey ?? `user:${userId}`,
+        anonymousCode: credential?.anonymousCode ?? null,
+        attemptNo,
+        deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
+        compiledBundleRuntimeHash: bundleRuntimeHash ?? (packageSnapshot ? compiledBundleRuntimeHashForSnapshot(packageSnapshot) : null),
+        attemptEpoch,
+        ...(relationalIdentity ? {
+          subjectUserId: relationalIdentity.subjectUserId,
+          respondentUserId: relationalIdentity.respondentUserId,
+          respondentType: relationalIdentity.respondentType,
+          episodeId: relationalIdentity.episodeId,
+          assignmentRef: relationalIdentity.assignmentRef,
+          consentId: relationalIdentity.consentId,
+        } : {}),
+        ...(field ? { subjectUserId: field.subjectUserId, respondentUserId: field.respondentUserId, respondentType: 'OBSERVER', assignmentRef: null, episodeId: null, consentId: null } : {}),
+        completedItems: 0,
+        progress: 0,
+        publicationHash: plan.publicationHash,
+        frozenActiveSlotSetHash: plan.slotSetHash,
+        unitSeedsEncrypted: generatedSeeds?.encrypted ?? null,
+      },
+    })
+    await contentCandidate?.recheckSourceLicenses()
+    await assertTrainingPrivateReferenceAdmissionCurrent(db as Prisma.TransactionClient)
+    Object.defineProperty(v2Attempt, '_freshlyCreatedAttempt', { value: true })
+    return v2Attempt
+  }
+
   const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
     units:contentCandidate.binding.units.filter(unit=>selectedContentItems.has(unit.itemId))}:null
   // Per-START freeze memo: shared by the precompute and the child build
@@ -4486,7 +4552,8 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
 /** An acknowledged unit is FINAL even while its asynchronous snapshot is pending. */
 const assertNoAcceptedTrainingVariantUnit = async (db: Db, attemptId: string, epoch: number) => {
   const rows = await db.$queryRaw<Array<{ accepted: boolean }>>`SELECT (
-    EXISTS(SELECT 1 FROM assessment_unit_snapshots WHERE composite_attempt_id=${attemptId} AND attempt_epoch=${epoch})
+    EXISTS(SELECT 1 FROM composite_attempt_finals WHERE attempt_id=${attemptId} AND attempt_epoch=${epoch})
+    OR EXISTS(SELECT 1 FROM assessment_unit_snapshots WHERE composite_attempt_id=${attemptId} AND attempt_epoch=${epoch})
     OR EXISTS(SELECT 1 FROM composite_form_section_attempts WHERE attempt_id=${attemptId} AND attempt_epoch=${epoch} AND (submission_id IS NOT NULL OR submission_payload_hash IS NOT NULL OR submitted_at IS NOT NULL OR status='COMPLETED'))
     OR EXISTS(SELECT 1 FROM assessments WHERE composite_attempt_id=${attemptId} AND attempt_epoch=${epoch} AND (submission_id IS NOT NULL OR submission_payload_hash IS NOT NULL OR status='COMPLETED'))
     OR EXISTS(SELECT 1 FROM cognitive_sessions WHERE composite_attempt_id=${attemptId} AND attempt_no=${epoch} AND (submission_id IS NOT NULL OR submission_payload_hash IS NOT NULL OR submitted_at IS NOT NULL OR status='COMPLETED'))
@@ -5314,6 +5381,7 @@ const unifiedCompositeProgressSnapshot = (
 // admission.
 const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
   receiptOnly: true,
+  publicationHash: true,
   trainingContentBindingHash:true,trainingReferenceBindingHash:true,
   ...trainingFeedbackAttemptSelect,
   participantKey:true, trainingVariantAllocationEncrypted:true, trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
@@ -5547,6 +5615,65 @@ const getUnifiedCompositeAttemptState = async (
   attempt = await applyTrainingAttemptScope(attempt)
   if (attempt.deliveryMode !== 'FINAL_ONLY' || attempt.runtimeGeneration !== 'UNIFIED_V1') {
     throw compositeConflict('综合测评运行时版本不匹配，请重启测评')
+  }
+  // Phase 2 WHOLE_V2 fast state projection: zero child-table queries.
+  if (attempt.publicationHash) {
+    const plan = await resolveCompositePublicationPlanForAttempt(attempt)
+    const isCompleted = attempt.status === 'COMPLETED'
+    return {
+      id: attempt.id,
+      executionMode: 'WHOLE_V2' as const,
+      publicationHash: attempt.publicationHash,
+      templateHash: attempt.publicationHash,
+      ...(attempt.receiptOnly ? { receiptOnly: true as const } : {}),
+      wholeLocalEligible: true,
+      assessmentId: attempt.compositeAssessment.id,
+      name: attempt.compositeAssessment.name,
+      ...(attempt.compositeAssessment.productKind === 'QUESTIONNAIRE' ? { productKind: 'QUESTIONNAIRE' as const, reportMode: 'COLLECTION_ONLY' as const } : {}),
+      instruction: attempt.compositeAssessment.instruction,
+      status: attempt.status,
+      taskSatisfaction: attempt.taskSatisfaction ?? null,
+      taskSatisfied: isTaskSatisfied(attempt),
+      deliveryMode: attempt.deliveryMode,
+      attemptEpoch: attempt.attemptEpoch,
+      definitionHash: attempt.publicationHash,
+      contextSnapshotHash: attempt.contextSnapshotHash ?? null,
+      progress: isCompleted ? 100 : 0,
+      completedItems: isCompleted ? plan.slots.length : 0,
+      totalItems: plan.slots.length,
+      currentIndex: isCompleted ? plan.slots.length : 0,
+      startedAt: attempt.startedAt,
+      lastSavedAt: attempt.lastSavedAt,
+      completedAt: attempt.completedAt,
+      anonymousCode: attempt.anonymousCode,
+      context: {
+        status: attempt.contextSnapshotHash ? 'frozen' as const : 'collecting' as const,
+        frozenAt: attempt.contextFrozenAt?.toISOString?.() ?? null,
+        snapshotHash: attempt.contextSnapshotHash ?? null,
+      },
+      items: attempt.compositeAssessment.items.map((item: any, index: number) => ({
+        id: item.id,
+        type: item.type,
+        position: item.position,
+        label: item.scale?.name ?? item.cognitiveAssignment?.title ?? item.formLabel ?? item.situationalInstrumentKey ?? null,
+        completed: isCompleted,
+        index,
+      })),
+      units: plan.slots.map((slot, index) => ({
+        id: slot.unitType === 'FORM_SECTION' ? slot.sectionId : slot.itemId,
+        type: slot.unitType,
+        position: slot.position,
+        label: slot.title,
+        required: slot.required,
+        ...(slot.unitType === 'FORM_SECTION' ? { formSectionId: slot.sectionId, contextSection: slot.contextSection } : {}),
+        completed: isCompleted,
+        index,
+      })),
+      currentItem: null,
+      allUnitsSubmitted: isCompleted,
+      trainingPersistence: null,
+      checkpointDefinitionHash: null,
+    }
   }
   // Publication controls new admission. Existing attempts are validated against
   // their frozen slot set below, so retiring content cannot break resume/history.

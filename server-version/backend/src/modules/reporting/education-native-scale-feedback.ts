@@ -5,6 +5,7 @@ import {loadStoredVersionedUnitAdmission} from '../assessment-runtime/unit-admis
 import {loadFrozenActiveSlotSet,compositeItemSlotKey} from '../assessment-runtime/slot-set'
 import {withSharedControlContext} from '../assessment-runtime/shared-control-records'
 import {resolveStoredScaleResult,loadStoredCanonicalUnitResults,createStoredScaleFactsReader} from '../assessment-runtime/compact-assessment-storage'
+import {readCompositeFinalUnitSnapshots} from '../assessment-runtime/composite-final.bridge'
 import type {CanonicalUnitResultEnvelopeV1} from '../assessment-runtime/unit-result'
 import {scaleProjectionPolicyFromCompiled} from '../scale/projection/policy-resolver'
 import {DISCLOSURE_PRESETS} from '../scale/policy/disclosure'
@@ -32,10 +33,42 @@ export async function readNativeEducationScaleFeedback(tx:Prisma.TransactionClie
   const {parent,preloaded}=input,allowed=input.sources.filter(source=>source.resultDisclosure.audiences.RESPONDENT.mode==='INDIVIDUAL_SUMMARY')
   const output=new Map<string,ReturnType<typeof projectEducationScaleIndividualReport>>()
   if(!allowed.length)return output
+  const isWholeV2 = Boolean((parent as { publicationHash?: string | null }).publicationHash)
   if(parent.status!=='COMPLETED'||parent.userId!==input.actorUserId||parent.respondentUserId!==input.actorUserId
-   ||parent.subjectUserId!==input.actorUserId||!parent.frozenActiveSlotSetEncrypted||!parent.frozenActiveSlotSetHash)hidden()
+   ||parent.subjectUserId!==input.actorUserId||(!isWholeV2&&(!parent.frozenActiveSlotSetEncrypted||!parent.frozenActiveSlotSetHash)))hidden()
   const allowedItemIds=new Set(allowed.map(source=>source.itemId))
   const allowedSlotKeys=new Set(allowed.map(source=>compositeItemSlotKey(source.itemId,'SCALE')))
+  // Phase 2 single-row FINAL fast path: read Scale results directly from composite_attempt_finals.facts_cipher
+  const v2ScaleRead = isWholeV2
+    ? await readCompositeFinalUnitSnapshots(
+        tx,
+        [{ attemptId: parent.id, attemptEpoch: parent.attemptEpoch }],
+        { slotKeys: [...allowedSlotKeys], unitTypes: ['SCALE'] },
+      )
+    : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
+  if (v2ScaleRead.loadedFactsByKey.has(`${parent.id}:${parent.attemptEpoch}`)) {
+    const bySlot = new Map(v2ScaleRead.snapshots.map(snap => [snap.slotKey, snap]))
+    for (const source of allowed) {
+      const snap = bySlot.get(compositeItemSlotKey(source.itemId, 'SCALE'))
+      if (!snap || !snap.scaleResult || !snap.canonicalEnvelope) hidden()
+      const report = buildScaleUnitReport({
+        assessmentId: snap.sourceAttemptId,
+        itemId: source.itemId,
+        scaleId: source.scaleId,
+        scaleCode: snap.scaleResult.instrument.code,
+        scaleName: snap.scaleResult.instrument.name || source.title,
+        result: snap.scaleResult,
+        completedAt: snap.completedAt,
+        totalTime: null,
+      })
+      if (!report.result) hidden()
+      output.set(source.itemId, {
+        state: 'PROJECTED',
+        unitReports: [report],
+      } as any)
+    }
+    return output
+  }
   const preloadedChildren=preloaded?.children?.filter(row=>row.compositeAttemptId===parent.id&&row.attemptEpoch===parent.attemptEpoch&&allowedItemIds.has(row.compositeItemId))
   const children=preloadedChildren&&preloadedChildren.length===allowed.length
    ? preloadedChildren

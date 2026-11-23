@@ -9,6 +9,9 @@ import {encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload} from '../asse
 import {loadFrozenActiveSlotSet,formSectionSlotKey} from '../assessment-runtime/slot-set'
 import {readFormSectionCollectionFacts} from '../assessment-runtime/form-facts'
 import {createStoredScaleFactsReader,loadStoredCanonicalUnitResults} from '../assessment-runtime/compact-assessment-storage'
+import {readCompositeFinalUnitSnapshots} from '../assessment-runtime/composite-final.bridge'
+import {loadCompositePublicationPlan} from '../assessment-runtime/composite-publication-plan'
+import {publicTemplatesForDatabase} from '../assessment-runtime/public-templates'
 import {fieldAssessmentRefSchema,fieldParticipantKey} from './fieldComposition.contract'
 import {currentFieldComposition,fieldFail} from './fieldComposition.authority'
 
@@ -26,8 +29,36 @@ const payloadSchema=z.object({schemaVersion:z.literal(2),kind:z.literal('FIELD_C
 const finalDigest=(input:{attemptId:string;attemptEpoch:number;slotsHash:string;receipts:z.infer<typeof receiptSchema>[]})=>canonicalHash({kind:'FIELD_FINAL_RECEIPT_DIGEST_V1',...input})
 async function finals(tx:Tx,attemptId:string,attemptEpoch:number){
  const parent=await tx.compositeAssessmentAttempt.findUnique({where:{id:attemptId},select:{id:true,status:true,userId:true,subjectUserId:true,respondentUserId:true,participantKey:true,
-  attemptEpoch:true,assignmentRef:true,compositeAssessmentId:true,contextSnapshotHash:true,frozenActiveSlotSetEncrypted:true,frozenActiveSlotSetHash:true}})
- if(!parent||parent.status!=='COMPLETED'||parent.attemptEpoch!==attemptEpoch||!parent.frozenActiveSlotSetEncrypted||!parent.frozenActiveSlotSetHash)fieldFail('HUITEACHER_FIELD_CANONICAL_FINAL_REQUIRED',409)
+  attemptEpoch:true,assignmentRef:true,compositeAssessmentId:true,contextSnapshotHash:true,publicationHash:true,frozenActiveSlotSetEncrypted:true,frozenActiveSlotSetHash:true}})
+ if(!parent||parent.status!=='COMPLETED'||parent.attemptEpoch!==attemptEpoch)fieldFail('HUITEACHER_FIELD_CANONICAL_FINAL_REQUIRED',409)
+ if (parent.publicationHash) {
+  const v2Read = await readCompositeFinalUnitSnapshots(tx, [{ attemptId, attemptEpoch }])
+  const v2Loaded = v2Read.loadedFactsByKey.get(`${attemptId}:${attemptEpoch}`)
+  if (v2Loaded) {
+   const receipts = v2Read.snapshots
+    .filter(row => row.unitType === 'SCALE' || row.unitType === 'FORM_SECTION')
+    .map(row => receiptSchema.parse({
+     slotKey: row.slotKey,
+     unitType: row.unitType,
+     sourceType: row.sourceType,
+     sourceAttemptId: row.sourceAttemptId,
+     sourceSubmissionId: row.sourceSubmissionId,
+     sourceDefinitionHash: row.sourceDefinitionHash,
+     compiledRuntimeHash: row.compiledRuntimeHash,
+     payloadHash: row.sourceResultHash,
+    }))
+   const slotsHash = v2Loaded.meta.slotSetHash
+   return {
+    parent,
+    snapshots: v2Read.snapshots as any[],
+    v2Snapshots: v2Read.snapshots,
+    receipts,
+    slotsHash,
+    finalHash: v2Loaded.meta.aggregateHash,
+   }
+  }
+ }
+ if(!parent.frozenActiveSlotSetEncrypted||!parent.frozenActiveSlotSetHash)fieldFail('HUITEACHER_FIELD_CANONICAL_FINAL_REQUIRED',409)
  const slots=await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted,tx)
  if(slots.snapshotHash!==parent.frozenActiveSlotSetHash||slots.attemptEpoch!==parent.attemptEpoch)fieldFail('HUITEACHER_FIELD_FINAL_INTEGRITY',409)
  const snapshots=await tx.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:attemptId,attemptEpoch},orderBy:{slotKey:'asc'}})
@@ -53,6 +84,56 @@ export async function createCanonicalFieldEvidence(tx:Tx,input:{recordId:string;
  if(parent.participantKey!==fieldParticipantKey(scope)||parent.subjectUserId!==scope.subjectUserId||parent.respondentUserId!==scope.respondentUserId||parent.userId!==scope.respondentUserId||parent.assignmentRef!==null)
   fieldFail('HUITEACHER_FIELD_FINAL_INTEGRITY',409)
  const units:z.infer<typeof payloadSchema>['units']=[]
+ if('v2Snapshots' in frozen && frozen.v2Snapshots){
+  const plan=parent.publicationHash
+   ? await loadCompositePublicationPlan(parent.publicationHash,publicTemplatesForDatabase(tx)).catch(()=>null)
+   : null
+  for(const row of frozen.v2Snapshots.filter(row=>row.unitType==='FORM_SECTION')){
+   if(row.unitFact.unitType!=='FORM_SECTION')fieldFail('HUITEACHER_FIELD_FINAL_INTEGRITY',409)
+   const planSlot=plan?.slots.find(s=>s.unitType==='FORM_SECTION'&&s.slotKey===row.slotKey)
+   const planItems=planSlot&&planSlot.unitType==='FORM_SECTION'?planSlot.section.items:[]
+   const itemEntries=planItems.length
+    ? planItems.map(item=>{
+       const val=row.unitFact.unitType==='FORM_SECTION'?row.unitFact.typedValues[item.id]??null:null
+       return {key:item.id,prompt:item.formLabel,state:val===null||val===undefined?'SHOWN_MISSING':'ANSWERED',value:val}
+      })
+    : Object.entries(row.unitFact.typedValues).map(([key,val])=>({
+       key,prompt:key,state:val===null||val===undefined?'SHOWN_MISSING':'ANSWERED',value:val??null,
+      }))
+   units.push({kind:'FORM',unitId:row.slotKey,items:itemEntries})
+  }
+  const v2Scales=frozen.v2Snapshots.filter(row=>row.unitType==='SCALE')
+  if(v2Scales.length){
+   const declarations=await tx.$queryRaw<Array<{itemId:string;audience:string|null;respondent:string|null;scoresAllowed:boolean;scores:Array<{key:string;label:string}>;allowed:string[]}>>(Prisma.sql`
+    SELECT b->'itemIds'->>0 AS "itemId",fixed.definition#>>'{report,audienceContract,audience}' AS audience,fixed.definition#>>'{report,audienceContract,respondent}' AS respondent,
+     (SELECT jsonb_agg(jsonb_build_object('key',s->>'key','label',s->>'label')) FROM jsonb_array_elements(fixed.definition#>'{scoring,scores}') s) AS scores,
+     ARRAY(SELECT jsonb_array_elements_text(fixed.definition#>'{report,scoreOrder}')) AS allowed,
+     CASE WHEN b->>'sourceProvider'='STANDARD_SCALE' THEN COALESCE((u#>>'{source,educationStandard,respondentDisclosure,numericScores}')::boolean,false) ELSE true END AS "scoresAllowed"
+    FROM composite_assessments c CROSS JOIN LATERAL jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') b
+    JOIN LATERAL jsonb_array_elements(c.training_content_snapshot->'units') u ON u->>'itemId'=b->'itemIds'->>0
+    LEFT JOIN education_private_tool_versions v ON b->>'sourceProvider'='PRIVATE_VERSION' AND v.id=b->>'versionId' AND v.content_hash=b->>'contentHash' AND v.kind='SCALE'
+    LEFT JOIN survey_standard_releases std ON b->>'sourceProvider'='STANDARD_SCALE' AND std.id=b->>'versionId' AND std.combination_hash=b->>'contentHash'
+    LEFT JOIN scale_library_entries entry ON b->>'sourceProvider'='LIBRARY_SCALE' AND entry.id=b->>'versionId'
+    LEFT JOIN scale_library_submissions library ON library.id=entry.submission_id AND library.snapshot_hash=b->>'contentHash'
+    JOIN LATERAL (SELECT CASE b->>'sourceProvider' WHEN 'PRIVATE_VERSION' THEN v.definition WHEN 'STANDARD_SCALE' THEN std.snapshot->'definition' WHEN 'LIBRARY_SCALE' THEN library.snapshot->'compiledDefinition' END AS definition) fixed ON fixed.definition IS NOT NULL
+    WHERE c.id=${scope.assessmentRef.compositeId} AND b->>'kind'='SCALE'`)
+   for(const row of v2Scales){
+    const result=row.canonicalEnvelope
+    if(row.unitFact.unitType!=='SCALE'||!result||result.core.unitType!=='SCALE'||result.core.sourceDefinitionHash!==row.sourceDefinitionHash
+     ||result.core.contextHash!==parent.contextSnapshotHash)fieldFail('HUITEACHER_FIELD_FINAL_INTEGRITY',409)
+    const scaleItemId=row.unitFact.itemId
+    const declaration=declarations.find(declaration=>declaration.itemId===scaleItemId)
+    if(!declaration)fieldFail('HUITEACHER_FIELD_FINAL_INTEGRITY',409)
+    const visible=declaration.scoresAllowed&&declaration.audience==='teacher'&&declaration.respondent==='OBSERVER_REPORT'
+    const metrics=visible?declaration.scores.filter(score=>declaration.allowed.includes(score.key)).map(score=>{
+     const metric=result.core.metrics.find(metric=>metric.key===score.key)
+     if(!metric||metric.value!==null&&(typeof metric.value!=='number'||!Number.isFinite(metric.value)))fieldFail('HUITEACHER_FIELD_FINAL_INTEGRITY',409)
+     return {key:score.key,label:score.label,value:result.core.quality.status==='invalid'||metric.quality==='not_calculable'?null:metric.value as number|null}
+    }):[]
+    units.push({kind:'SCALE',unitId:row.slotKey,state:metrics.length?'DESCRIPTIVE':'WITHHELD',metrics})
+   }
+  }
+ }else{
  const sections=await tx.compositeFormSectionAttempt.findMany({where:{attemptId:parent.id,attemptEpoch:parent.attemptEpoch,status:'COMPLETED'},
   select:{id:true,sectionId:true,submissionId:true}})
  for(const row of snapshots.filter(row=>row.unitType==='FORM_SECTION')){
@@ -97,6 +178,7 @@ export async function createCanonicalFieldEvidence(tx:Tx,input:{recordId:string;
    units.push({kind:'SCALE',unitId:row.slotKey,state:metrics.length?'DESCRIPTIVE':'WITHHELD',metrics})
   }
  }
+ }
  const payload=payloadSchema.parse({schemaVersion:2,kind:'FIELD_CANONICAL_OBSERVATION',recordId:input.recordId,scope,attemptId:parent.id,attemptEpoch:parent.attemptEpoch,
   slotsHash:frozen.slotsHash,finalHash:frozen.finalHash,receipts:frozen.receipts,units})
  await tx.huiteacherFieldFormEvidence.create({data:{id:randomUUID(),organizationId:input.organizationId,eventId:input.eventId,recordId:input.recordId,
@@ -114,6 +196,21 @@ export async function readCanonicalFieldEvidence(tx:Tx,row:{recordId:string;orga
   ||actual.parent.subjectUserId!==payload.scope.subjectUserId||actual.parent.respondentUserId!==payload.scope.respondentUserId||actual.parent.compositeAssessmentId!==payload.scope.assessmentRef.compositeId)
   fieldFail('HUITEACHER_FIELD_EVIDENCE_INTEGRITY',409)
  // Resolve labels only from this FINAL's immutable admission; never from an author's live draft.
+ if('v2Snapshots' in actual && actual.v2Snapshots && actual.parent.publicationHash){
+  const plan=await loadCompositePublicationPlan(actual.parent.publicationHash,publicTemplatesForDatabase(tx)).catch(()=>null)
+  const units=payload.units.map(unit=>{
+   if(unit.kind!=='FORM'||!plan)return unit
+   const slot=plan.slots.find(s=>s.unitType==='FORM_SECTION'&&s.slotKey===unit.unitId)
+   if(!slot||slot.unitType!=='FORM_SECTION')return unit
+   const definitions=slot.section.items as Array<{id:string;formDefinition?:unknown}>
+   return {...unit,items:unit.items.map(item=>{
+    const definition=definitions.find(value=>value.id===item.key)
+    const question=formQuestionSchema.safeParse(definition?.formDefinition)
+    return question.success?{...item,displayValue:fieldEvidenceDisplay(question.data,item)}:item
+   })}
+  })
+  return {recordId:row.recordId,assessmentRef:payload.scope.assessmentRef,attemptId:payload.attemptId,attemptEpoch:payload.attemptEpoch,finalHash:payload.finalHash,units}
+ }
  const sections=await tx.compositeFormSectionAttempt.findMany({where:{attemptId:payload.attemptId,attemptEpoch:payload.attemptEpoch,status:'COMPLETED'},
   select:{id:true,sectionId:true,frozenAdmissionSnapshotEncrypted:true,frozenAdmissionSnapshotHash:true}})
  const units=await Promise.all(payload.units.map(async unit=>{

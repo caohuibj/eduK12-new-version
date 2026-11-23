@@ -5,6 +5,7 @@ import type { AssessmentBundleDefinitionV1, BundleContextFactsV1 } from '../asse
 import { readFormSectionCollectionFacts } from '../assessment-runtime/form-facts'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { loadFrozenActiveSlotSet } from '../assessment-runtime/slot-set'
+import { readCompositeFinalContextSnapshot } from '../assessment-runtime/composite-final.bridge'
 import type { AssessmentContextValues } from '../assessment-context/context'
 import { contextValues } from './context-submission'
 import { readInstance } from './instance'
@@ -81,6 +82,16 @@ export async function loadBundleScaleStartParentContext(db: PrismaClient | Prism
     },
     resolvedFacts() {
       return memo ??= (async () => {
+        const v2Context = (parent as any).publicationHash != null
+          ? await readCompositeFinalContextSnapshot(db, parent.id, parent.attemptEpoch)
+          : null
+        if (v2Context) {
+          const contextFacts = buildBundleContextFactsFromValues({
+            definition: frozen.contextDefinition!,
+            values: v2Context.values as any,
+          })
+          return { values: v2Context.values as any, contextFacts }
+        }
         const encryptedSlotSet = parent.frozenActiveSlotSetEncrypted
         if (!encryptedSlotSet) return invalid('START 缺少冻结 FORM 槽位')
         const active = await loadFrozenActiveSlotSet(encryptedSlotSet, db)

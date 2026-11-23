@@ -33,6 +33,12 @@ export async function teacherNativeLeafContract(source:Source,track:Track,leaf:R
  const key=unit!.family==='COGNITIVE'?measurement.content.runnerKey:unit!.family==='SJT'?item.situationalInstrumentKey:item.scale?.code
  const version=unit!.family==='COGNITIVE'?measurement.content.runnerVersion:unit!.family==='SJT'?item.situationalInstrumentVersion:item.scale?.instrumentVersion
  if(leaf.instrumentKey!==key||leaf.instrumentVersion!==version)hidden()
+ const [v2Header]=await db.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT f.attempt_id AS id FROM assessment_run_executions e
+  JOIN composite_assessment_attempts p ON p.id=e.runtime_binding_ref AND e.runtime_binding_kind='COMPOSITE'
+   AND p.composite_assessment_id=${identity.origin.runtimeCompositeId} AND p.status='COMPLETED'
+  JOIN composite_attempt_finals f ON f.attempt_id=p.id AND f.attempt_epoch=p.attempt_epoch
+  WHERE e.organization_id=${source.organizationId} AND e.run_id=${source.runId} AND e.track_id=${source.trackId} AND e.status='COMPLETED' LIMIT 1`)
+ if(v2Header)return validateResultDisclosureContract(unit!.groupDisclosure)
  const [header]=await db.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT snap.id FROM assessment_run_executions e
   JOIN composite_assessment_attempts p ON p.id=e.runtime_binding_ref AND e.runtime_binding_kind='COMPOSITE'
    AND p.composite_assessment_id=${identity.origin.runtimeCompositeId} AND p.status='COMPLETED'

@@ -11,6 +11,8 @@ import { mapCompositeSection } from '../assessment-runtime/form-section-definiti
 import { protectCsvCell } from '../../utils/exportCsvCell'
 import { loadScaleResult } from '../scale/scale-workflow.service'
 import { createStoredScaleExportReader } from '../assessment-runtime/compact-assessment-storage'
+import { extractCompositeFinalFormValues, readCompositeFinalUnitSnapshots, type CompositeFinalUnitSnapshotView } from '../assessment-runtime/composite-final.bridge'
+import { readCompositeFinalRawBatch, type LoadedCompositeFinalFacts, type LoadedCompositeFinalRaw } from '../assessment-runtime/composite-final.reader'
 import { loadScaleAnswers } from '../scale/scale-workflow.service'
 import { compositeForbidden, compositeBadRequest } from './composite.errors'
 import { wideExportPackage } from '../../services/wideExportPackage'
@@ -399,18 +401,48 @@ export const getExportData = async (
   // Flow scopes already authenticated one batch of all current-epoch facts.
   // Consume those exact rows, rather than rereading a potentially changed set.
   // Other exports retain their original single bounded snapshot query.
+  const v2ExportAttempts = template.attempts.filter((attempt: any) => attempt.publicationHash != null)
+  const v2Read: {
+    loadedFactsByKey: Map<string, LoadedCompositeFinalFacts>
+    byAttemptKey: Map<string, CompositeFinalUnitSnapshotView[]>
+    snapshots: CompositeFinalUnitSnapshotView[]
+  } = v2ExportAttempts.length
+    ? await readCompositeFinalUnitSnapshots(
+        prisma,
+        v2ExportAttempts.map(attempt => ({ attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch })),
+      )
+    : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
+  const v2Keys = [...v2Read.loadedFactsByKey.values()].map(entry => ({
+    attemptId: entry.meta.attemptId,
+    attemptEpoch: entry.meta.attemptEpoch,
+  }))
+  const v2RawByKey: Map<string, LoadedCompositeFinalRaw> = detail === 'full' && v2Keys.length
+    ? await readCompositeFinalRawBatch(prisma, v2Keys)
+    : new Map()
+  const legacyAttempts = template.attempts.filter(attempt => !v2Read.loadedFactsByKey.has(`${attempt.id}:${attempt.attemptEpoch}`))
+
   const flowSnapshots = (template as any).trainingFlowFrozen != null ? template.attempts.flatMap(attempt => {
     const flow = variantGraph?.scopes.get(attempt.id)?.flow
     if (!flow) throw new Error('Training flow export verified scope missing')
     return flow.snapshots
   }) : null
-  const snapshots = flowSnapshots ?? ((hasTypedForms || hasSituational) && template.attempts.length ? await prisma.assessmentUnitSnapshot.findMany({where:{OR:template.attempts.map(attempt=>({compositeAttemptId:attempt.id,attemptEpoch:attempt.attemptEpoch})),unitType:{in:[...(hasTypedForms ? ['FORM_SECTION' as const] : []), ...(hasSituational ? ['SITUATIONAL' as const] : [])]}}}) : [])
+  const snapshots = flowSnapshots ?? ((hasTypedForms || hasSituational) && legacyAttempts.length ? await prisma.assessmentUnitSnapshot.findMany({where:{OR:legacyAttempts.map(attempt=>({compositeAttemptId:attempt.id,attemptEpoch:attempt.attemptEpoch})),unitType:{in:[...(hasTypedForms ? ['FORM_SECTION' as const] : []), ...(hasSituational ? ['SITUATIONAL' as const] : [])]}}}) : [])
   const snapshotsByAttempt = new Map<string,typeof snapshots>()
   for(const snapshot of snapshots) { const rows=snapshotsByAttempt.get(snapshot.compositeAttemptId!)??[]; rows.push(snapshot); snapshotsByAttempt.set(snapshot.compositeAttemptId!,rows) }
-  const situationalSlots = hasSituational ? (variantGraph?.frozenSlotSets ?? await loadSituationalExportSlotSets(template.attempts)) : new Map()
-  const situationalByAttempt = new Map(template.attempts.map(attempt => [attempt.id,
-    hasSituational ? readSituationalExportResults({ ...attempt, compositeAssessment: template }, snapshotsByAttempt.get(attempt.id) ?? [],
-      situationalSlots.get(attempt.id)!, variantGraph?.scopes.get(attempt.id)) : new Map()]))
+  const situationalSlots = hasSituational ? (variantGraph?.frozenSlotSets ?? (legacyAttempts.length ? await loadSituationalExportSlotSets(legacyAttempts) : new Map())) : new Map()
+  const situationalByAttempt = new Map(template.attempts.map(attempt => {
+    const v2Key = `${attempt.id}:${attempt.attemptEpoch}`
+    if (hasSituational && v2Read.loadedFactsByKey.has(v2Key)) {
+      const sjtMap = new Map<string, any>()
+      for (const unit of v2Read.byAttemptKey.get(v2Key) ?? []) {
+        if (unit.unitType === 'SITUATIONAL') sjtMap.set(unit.slotKey, unit.canonicalEnvelope)
+      }
+      return [attempt.id, sjtMap] as const
+    }
+    return [attempt.id,
+      hasSituational ? readSituationalExportResults({ ...attempt, compositeAssessment: template }, snapshotsByAttempt.get(attempt.id) ?? [],
+        situationalSlots.get(attempt.id)!, variantGraph?.scopes.get(attempt.id)) : new Map()] as const
+  }))
   const visibleSjtSlots = new Set(template.items.filter(item => item.type === 'SITUATIONAL').map(item => `situational:${item.id}`))
   for (const plan of situationalSlots.values()) for (const slot of plan.slots) if (slot.unitType === 'SITUATIONAL' && !visibleSjtSlots.has(slot.slotKey)) throw new Error('SJT export frozen slot has no export column')
   const situationalColumns = new Map<string, ReturnType<typeof situationalExportColumns>>()
@@ -426,7 +458,7 @@ export const getExportData = async (
   // Only the already-authorized, selected graph may enter the request-local
   // reader. Its order matches projection below, including multi-Scale attempts.
   const orderedScaleRecords: any[] = []
-  for (const attempt of template.attempts as any[]) {
+  for (const attempt of legacyAttempts as any[]) {
     const scope = variantGraph?.scopes.get(attempt.id)
     for (const item of template.items) {
       if (item.type !== 'SCALE' || (scope && !scope.itemIds.has(item.id))) continue
@@ -437,12 +469,25 @@ export const getExportData = async (
   const scaleReader = createStoredScaleExportReader(orderedScaleRecords)
   try {
   for (const attempt of template.attempts as any[]) {
+    const v2Key = `${attempt.id}:${attempt.attemptEpoch}`
+    const v2Loaded = v2Read.loadedFactsByKey.get(v2Key)
+    const v2Units = v2Read.byAttemptKey.get(v2Key) ?? []
+    const v2Raw = v2RawByKey.get(v2Key)
     const scope = variantGraph?.scopes.get(attempt.id)
     const selectedFormItems = scope ? formItems.filter((item: any) => scope.itemIds.has(item.id)) : formItems
     const selectedTypedSections = scope ? typedSections.filter(section => scope.sectionIds.has(section.id)) : typedSections
-    const readableFormAnswers = readContextFormAnswers(selectedFormItems, attempt.formAnswers)
+    const readableFormAnswers = v2Loaded ? [] : readContextFormAnswers(selectedFormItems, attempt.formAnswers)
     const formStates = new Map<string,import('../assessment-runtime/typed-form-facts').TypedFormMetadata>()
-    const canonicalValues = hasTypedForms ? readLoadedCompositeTypedFormValues(attempt,selectedTypedSections,snapshotsByAttempt.get(attempt.id)??[],formStates) : new Map()
+    let canonicalValues: Map<string, any>
+    if (v2Loaded) {
+      canonicalValues = new Map()
+      for (const [formItemId, value] of Object.entries(extractCompositeFinalFormValues(v2Loaded.facts))) {
+        canonicalValues.set(formItemId, value)
+        formStates.set(formItemId, { state: value === null || value === undefined ? 'SHOWN_MISSING' : 'ANSWERED' })
+      }
+    } else {
+      canonicalValues = hasTypedForms ? readLoadedCompositeTypedFormValues(attempt,selectedTypedSections,snapshotsByAttempt.get(attempt.id)??[],formStates) : new Map()
+    }
     const legacyValues = new Map(readableFormAnswers.map((answer:any)=>[answer.itemId,answer.value]))
     const row: Record<string, unknown> = {
       U_id: attempt.anonymousCode || (attempt.userId ? `U${attempt.userId.substring(0, 8)}` : 'ANONYMOUS'),
@@ -484,19 +529,26 @@ export const getExportData = async (
       }
       if (item.type === 'SITUATIONAL') {
         const slotKey = `situational:${item.id}`
-        const terminal = snapshotsByAttempt.get(attempt.id)?.find(snapshot => snapshot.slotKey === slotKey)?.terminalState
-          ?? (situationalSlots.get(attempt.id)?.slots.some((slot: { slotKey: string }) => slot.slotKey === slotKey) ? 'MISSING_OPTIONAL' : 'NOT_ACTIVE')
+        const terminal = v2Loaded
+          ? (v2Units.some(unit => unit.slotKey === slotKey) ? 'COMPLETED' : 'MISSING_OPTIONAL')
+          : (snapshotsByAttempt.get(attempt.id)?.find(snapshot => snapshot.slotKey === slotKey)?.terminalState
+            ?? (situationalSlots.get(attempt.id)?.slots.some((slot: { slotKey: string }) => slot.slotKey === slotKey) ? 'MISSING_OPTIONAL' : 'NOT_ACTIVE'))
         Object.assign(row, situationalColumns.get(item.id)!.read(situationalByAttempt.get(attempt.id)?.get(slotKey) ?? null, terminal))
       }
       if (item.type === 'SCALE') {
-        const result = attempt.scaleAssessments.find((assessment: any) => assessment.compositeItemId === item.id)
+        const v2Unit = v2Loaded
+          ? v2Units.find(unit => unit.unitType === 'SCALE' && unit.unitFact.unitType === 'SCALE' && unit.unitFact.itemId === item.id)
+          : undefined
+        const v2ScaleRawEntry = v2Unit && v2Raw?.raw.units[v2Unit.slotKey]
+        const v2ScaleRaw = v2ScaleRawEntry && v2ScaleRawEntry.unitType === 'SCALE' ? v2ScaleRawEntry : null
+        const result = v2Loaded ? null : attempt.scaleAssessments.find((assessment: any) => assessment.compositeItemId === item.id)
         row[`${prefix}scale_id`] = item.scale?.id ?? item.scaleId ?? null
         row[`${prefix}scale_code`] = item.scale?.code ?? null
         const definition = item.scale.definition && typeof item.scale.definition === 'object' ? item.scale.definition as any : null
         const v2Items = Array.isArray(definition?.items) ? definition.items : []
         const v2Scores = Array.isArray(definition?.scoring?.scores) ? definition.scoring.scores : []
         if(template.productKind==='QUESTIONNAIRE'&&template.timingExportEnabled){
-          const timing=projectTrainingTimingFact(attempt.trainingTimingSnapshot,result?.timingEncrypted?decryptUnifiedRuntimePayload(result.timingEncrypted):null)
+          const timing=projectTrainingTimingFact(attempt.trainingTimingSnapshot,v2Loaded?(v2ScaleRaw?.timings??null):(result?.timingEncrypted?decryptUnifiedRuntimePayload(result.timingEncrypted):null))
           row[`${prefix}TIMING_scope`]=timing.scope;row[`${prefix}TIMING_status`]=timing.status
           const scaleLabel=packageSlotLabels.get(item.position)??item.scale.name
           for(const question of v2Items){
@@ -507,9 +559,26 @@ export const getExportData = async (
             }
           }
         }
-        if (result) await scaleReader.prepare(result)
-        const scaleResult = (await loadScaleResult(result?.result, result)).result
-        const decodedAnswers = (await loadScaleAnswers(result?.answers, result))
+        let scaleResult: any
+        let decodedAnswers: { answers: any[]; deviceInputProvenance?: any }
+        if (v2Loaded) {
+          scaleResult = v2Unit?.scaleResult ?? null
+          const rawAnswers = v2ScaleRaw
+            ? v2ScaleRaw.codes.map((code, idx) => ({
+                itemCode: code,
+                responseValue: v2ScaleRaw.values[idx],
+                responseTimeMs: (v2ScaleRaw.timings as Record<string, any> | undefined)?.[code]?.firstResponseMs ?? null,
+              }))
+            : []
+          decodedAnswers = {
+            answers: rawAnswers,
+            deviceInputProvenance: v2ScaleRaw?.deviceInputProvenance ?? null,
+          }
+        } else {
+          if (result) await scaleReader.prepare(result)
+          scaleResult = (await loadScaleResult(result?.result, result)).result
+          decodedAnswers = (await loadScaleAnswers(result?.answers, result))
+        }
         const answers = detail === 'full' ? decodedAnswers.answers : []
         const answerMap = new Map<string, any>(answers.map((answer) => [answer.itemCode, answer]))
         const itemScoreMap = new Map<string, any>((scaleResult?.itemScores || []).map((answer: any) => [answer.itemCode, answer]))
@@ -555,8 +624,69 @@ export const getExportData = async (
         })
       }
       if (item.type === 'COGNITIVE') {
-        const session = attempt.cognitiveSessions.find((candidate: any) => candidate.compositeItemId === item.id)
         const childPrefix = slotPrefix('C', index)
+        const v2Unit = v2Loaded
+          ? v2Units.find(unit => unit.unitType === 'COGNITIVE' && unit.unitFact.unitType === 'COGNITIVE' && unit.unitFact.itemId === item.id)
+          : undefined
+        if (v2Loaded && v2Unit && v2Unit.unitFact.unitType === 'COGNITIVE') {
+          const cogFact = v2Unit.unitFact
+          const assignment = item.cognitiveAssignment
+          const frozenReport = frozenReportFor(assignment)
+          const metrics = cogFact.metrics ?? {}
+          row[`${childPrefix}quality`] = cogFact.quality.state ?? null
+          row[`${childPrefix}profile`] = cogFact.profile ?? frozenReport?.profile ?? assignment?.profile ?? null
+          row[`${childPrefix}profile_definition_version`] = frozenReport?.profileDefinitionVersion ?? null
+          row[`${childPrefix}metric_definition_version`] = frozenReport?.metricDefinitionVersion ?? null
+          row[`${childPrefix}quality_definition_version`] = frozenReport?.qualityDefinitionVersion ?? null
+          row[`${childPrefix}test_type`] = cogFact.testType ?? null
+          row[`${childPrefix}engine_version`] = cogFact.engineVersion ?? null
+          row[`${childPrefix}scoring_version`] = cogFact.scoringVersion ?? null
+          row[`${childPrefix}config_version`] = cogFact.configVersion ?? null
+          row[`${childPrefix}randomization_algorithm_version`] = frozenReport?.randomizationAlgorithmVersion ?? null
+          row[`${childPrefix}report_definition_version`] = frozenReport?.reportDefinitionVersion ?? null
+          if (frozenReport) {
+            for (const key of Object.keys(frozenReport.metricDefinitions || {}).sort()) {
+              const definition = frozenReport.metricDefinitions[key]
+              if (!includeFrozenMetric(definition, detail)) continue
+              const metricLabel = definition.export?.label || definition.label || key
+              const metricName = builder.resolve(fieldName(`${childPrefix}M_`, key), `[${packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')}] ${metricLabel}`)
+              row[metricName] = scalarExportValue(metrics[key] ?? null)
+            }
+          } else {
+            for (const [key, value] of Object.entries(metrics)) {
+              const metricLabel = `[${packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')}] ${key}`
+              const metricType = typeof value === 'number' ? 'numeric' : 'string'
+              const metricName = builder.add(
+                fieldName(`${childPrefix}M_`, key),
+                metricLabel,
+                metricType,
+                metricType === 'numeric' ? 12 : 80,
+                typeof value === 'number' && !Number.isInteger(value) ? 4 : 0,
+              )
+              row[metricName] = scalarExportValue(value)
+            }
+          }
+          if (detail === 'full') {
+            const v2CogRawEntry = v2Raw?.raw.units[v2Unit.slotKey]
+            const v2Trials = v2CogRawEntry && v2CogRawEntry.unitType === 'COGNITIVE' ? v2CogRawEntry.trials : []
+            v2Trials.forEach((payload, trialIndex) => {
+              trialCount += 1
+              for (const [key, value] of flatten(payload)) {
+                const trialLabel = `[${packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')}] 第${trialIndex + 1}次 ${key}`
+                const trialType = typeof value === 'number' ? 'numeric' : 'string'
+                const trialName = builder.add(
+                  fieldName(`${childPrefix}T${String(trialIndex + 1).padStart(3, '0')}_`, key),
+                  trialLabel,
+                  trialType,
+                  trialType === 'numeric' ? 12 : 80,
+                  typeof value === 'number' && !Number.isInteger(value) ? 4 : 0,
+                )
+                row[trialName] = scalarExportValue(value)
+              }
+            })
+          }
+        } else if (!v2Loaded) {
+        const session = attempt.cognitiveSessions.find((candidate: any) => candidate.compositeItemId === item.id)
         const assignment = session?.assignment || item.cognitiveAssignment
         if (session) {
           const resultSnapshot: CognitiveResultSnapshot | null = session.resultSnapshotEncrypted
@@ -629,6 +759,7 @@ export const getExportData = async (
               }
             }
           }
+        }
         }
       }
     }

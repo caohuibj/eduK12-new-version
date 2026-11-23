@@ -62,21 +62,25 @@ export const listOrganizationSafetyCases = async (input: {
       c."ack_due_at" AS "ackDueAt",
       c."dispose_due_at" AS "disposeDueAt"
     FROM "safety_cases" c
-    JOIN "assessment_unit_snapshots" snapshot
+    LEFT JOIN "assessment_unit_snapshots" snapshot
       ON snapshot."id" = c."trigger_source_record_id"
       AND snapshot."payload_kind" = 'UNIT_RESULT'
       AND snapshot."terminal_state" = 'COMPLETED'
       AND snapshot."canonical_result_encrypted" IS NOT NULL
       AND snapshot."composite_attempt_id" IS NOT NULL
+    LEFT JOIN "composite_attempt_finals" v2_final
+      ON c."trigger_source_record_id" LIKE 'final:%'
+      AND v2_final."attempt_id" = split_part(c."trigger_source_record_id", ':', 2)
+      AND v2_final."attempt_epoch"::text = split_part(c."trigger_source_record_id", ':', 3)
     JOIN "composite_assessment_attempts" attempt
-      ON attempt."id" = snapshot."composite_attempt_id"
+      ON attempt."id" = COALESCE(v2_final."attempt_id", snapshot."composite_attempt_id")
       AND attempt."status" = 'COMPLETED'
-      AND attempt."attempt_epoch" = snapshot."attempt_epoch"
+      AND attempt."attempt_epoch" = COALESCE(v2_final."attempt_epoch", snapshot."attempt_epoch")
       AND attempt."subject_user_id" = c."subject_user_id"
     JOIN "assessment_run_executions" execution
       ON execution."organization_id" = ${input.organizationId}
       AND execution."runtime_binding_kind" = 'COMPOSITE'
-      AND execution."runtime_binding_ref" = snapshot."composite_attempt_id"
+      AND execution."runtime_binding_ref" = attempt."id"
       AND execution."status" = 'COMPLETED'
     JOIN "assessment_run_actor_snapshots" subject
       ON subject."organization_id" = execution."organization_id"

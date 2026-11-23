@@ -6,6 +6,9 @@ import { parseCompiledWeightedVariants } from '../assessment-core/weighted-varia
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { isScaleReportFactsView, prefetchCompactScaleTemplates, restoreCompactScaleFacts } from '../assessment-runtime/compact-scale-facts'
 import { loadStoredCanonicalUnitResults, createStoredScaleFactsReader } from '../assessment-runtime/compact-assessment-storage'
+import { readCompositeFinalUnitSnapshots, type CompositeFinalUnitSnapshotView } from '../assessment-runtime/composite-final.bridge'
+import type { LoadedCompositeFinalFacts } from '../assessment-runtime/composite-final.reader'
+import { loadCompositePublicationPlan } from '../assessment-runtime/composite-publication-plan'
 import { publicTemplatesForDatabase } from '../assessment-runtime/public-templates'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { parseVersionedFrozenScaleRuntimeSnapshot, loadFrozenScaleRuntimeSnapshot, type VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
@@ -270,7 +273,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     if (attempts.length > TRAINING_ANALYSIS_SOURCE_LIMIT) throw compositeBadRequest('分析来源超过 6000 条，请缩小选择范围')
     const identitySelection = options.group ? await trainingParticipantIdentities(tx, actor, attempts) : null
     const groupIds = options.group ? new Set((options.group.parentIds ? attempts : selectLatestTrainingGroupParents(attempts, identitySelection!.ids)).map(row => row.id)) : null
-    const eligibleForSlots = attempts.filter(row => row.runtimeGeneration === 'UNIFIED_V1' && row.frozenActiveSlotSetEncrypted && row.frozenActiveSlotSetHash)
+    const eligibleForSlots = attempts.filter(row => row.runtimeGeneration === 'UNIFIED_V1' && !row.publicationHash && row.frozenActiveSlotSetEncrypted && row.frozenActiveSlotSetHash)
     const slotSets = graph?.frozenSlotSets ?? await loadSituationalExportSlotSets(eligibleForSlots, tx)
     for (const row of attempts) {
       if (groupIds && !groupIds.has(row.id)) continue
@@ -278,7 +281,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
       const attempt = {...row, compositeAssessment: task, scaleAssessments: [], cognitiveSessions: [], formAnswers: []}
       const scope = graph?.scopes.get(row.id) ?? await resolveTrainingAttemptScope(attempt, task, {db: tx, frozenSlotSets: slotSets})
       if (!stratumMatches(wave, scope)) continue
-      if (row.status === 'COMPLETED' && row.deliveryMode === 'FINAL_ONLY' && row.runtimeGeneration === 'UNIFIED_V1' && !slotSets.has(row.id)) invalid('已完成 FINAL 测量缺少冻结单元计划')
+      if (row.status === 'COMPLETED' && row.deliveryMode === 'FINAL_ONLY' && row.runtimeGeneration === 'UNIFIED_V1' && !row.publicationHash && !slotSets.has(row.id)) invalid('已完成 FINAL 测量缺少冻结单元计划')
       entries.push({wave, attempt: await applyTrainingAttemptScope(attempt, {db: tx, frozenSlotSets: slotSets,verifiedScope:scope}), scope, slots: slotSets.get(row.id) ?? null})
     }
   }
@@ -299,11 +302,25 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     return {group, researchGovernance, source: {schemaVersion: 1, courseId: selector.courseId, observations: []}, manifest: {schemaVersion: 1, courseId: selector.courseId, selectorHash: hash(selector), attempts: [], dictionary: [], authoritySnapshot: null, exclusions: {IDENTITY_UNAVAILABLE: 0}}, authorityHash: hash({principal: auth.principal, course: auth.course}), sourceFingerprint: hash({selector, parents: group?.parents ?? []}), dictionary: []}
   }
   if (entries.reduce((count, entry) => count + entry.wave.metrics.length, 0) > 50000) throw compositeBadRequest('数值观测超过 50000 条，请缩小指标范围')
-  const final = selected.filter(entry => entry.attempt.status === 'COMPLETED' && entry.attempt.deliveryMode === 'FINAL_ONLY' && entry.attempt.runtimeGeneration === 'UNIFIED_V1' && entry.slots)
+  const final = selected.filter(entry => entry.attempt.status === 'COMPLETED' && entry.attempt.deliveryMode === 'FINAL_ONLY' && entry.attempt.runtimeGeneration === 'UNIFIED_V1' && (entry.attempt.publicationHash != null || entry.slots))
   const finalSet = new Set(final.map(entry => entry.attempt))
-  const childConditions = final.map(({attempt, wave, scope}) => ({compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch,
+  const v2Templates = publicTemplatesForDatabase(tx)
+  const v2Final = final.filter(entry => entry.attempt.publicationHash != null)
+  const legacyFinal = final.filter(entry => entry.attempt.publicationHash == null)
+  const v2Read: {
+    loadedFactsByKey: Map<string, LoadedCompositeFinalFacts>
+    byAttemptKey: Map<string, CompositeFinalUnitSnapshotView[]>
+    snapshots: CompositeFinalUnitSnapshotView[]
+  } = v2Final.length
+    ? await readCompositeFinalUnitSnapshots(
+        tx,
+        v2Final.map(({ attempt }) => ({ attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch })),
+        { templates: v2Templates },
+      )
+    : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
+  const childConditions = legacyFinal.map(({attempt, wave, scope}) => ({compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch,
     compositeItemId: {in: wave.metrics.filter(metric => scope.itemIds.has(metric.itemId) && scope.items.some(item => item.id === metric.itemId && item.type === 'SCALE')).map(metric => metric.itemId)}})).filter(row => row.compositeItemId.in.length)
-  const snapshotConditions = final.map(({attempt, wave, scope}) => ({compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch, slotKey: {in: [...new Set(wave.metrics.flatMap(metric => {
+  const snapshotConditions = legacyFinal.map(({attempt, wave, scope}) => ({compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch, slotKey: {in: [...new Set(wave.metrics.flatMap(metric => {
     const item = scope.items.find(candidate => candidate.id === metric.itemId)
     return !item ? [] : [item.type === 'FORM' ? formSectionSlotKey(item.formSectionId) : compositeItemSlotKey(item.id, item.type)]
   }))]}})).filter(row => row.slotKey.in.length)
@@ -359,7 +376,10 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
   const uniqueCiphers = [...new Set(canonicalCiphers)]
   const canonicalViews = await loadStoredCanonicalUnitResults(uniqueCiphers, tx, [], factsFor.scaleFacts)
   const canonicalByCipher = new Map(uniqueCiphers.map((cipher, index) => [cipher, canonicalViews[index]]))
-  if (group) group.snapshots = snapshots.map(row => ({attemptId: row.compositeAttemptId!, attemptEpoch: row.attemptEpoch, slotKey: row.slotKey, hash: trainingGroupSnapshotHash(row)}))
+  if (group) group.snapshots = [
+    ...snapshots.map(row => ({attemptId: row.compositeAttemptId!, attemptEpoch: row.attemptEpoch, slotKey: row.slotKey, hash: trainingGroupSnapshotHash(row)})),
+    ...v2Read.snapshots.map(row => ({attemptId: row.compositeAttemptId, attemptEpoch: row.attemptEpoch, slotKey: row.slotKey, hash: row.sourceResultHash})),
+  ]
   const groupForms = new Map<string, {question: ReturnType<typeof trainingGroupFormQuestion>; definitions: GroupMetricDefinition[]}>()
   const categoricalGroup = options.group && selector.waves.some(wave => wave.metrics.some(metric => {const item: any = byTask.get(wave.taskId)!.items.find(item => item.id === metric.itemId); return item.type === 'FORM' && !['NUMBER', 'SLIDER'].includes(item.formDefinition?.type)}))
   const observations: TrainingNumericObservationV1[] = [], manifests: TrainingAnalysisManifestAttemptV1[] = [], formSourceHashes = new WeakMap<object, string>()
@@ -368,6 +388,9 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     const sourceHashes: Record<string, string> = {participant: hash(participant ?? {response: attempt.id}), parent: hash(parentIdentity(attempt)), publication: hash({taskId: wave.taskId, publication: wave.publication, configDigest: wave.configDigest, variantKey: wave.variantKey, ...materialFields(wave)})}
     if(scope.flow?.materialAssignment){sourceHashes.materialAssignment=scope.flow.materialAssignment.assignmentHash;sourceHashes.materialConfig=scope.flow.config.flowDigest;sourceHashes.materialPath=scope.flow.pathHash}
     const isFinal = finalSet.has(attempt), facts = isFinal ? factsFor(attempt) : null
+    const v2Key = `${attempt.id}:${attempt.attemptEpoch}`
+    const v2Loaded = v2Read.loadedFactsByKey.get(v2Key)
+    const v2Units = v2Read.byAttemptKey.get(v2Key) ?? []
     const itemsById = new Map(scope.items.map(item => [item.id, item]))
     for (const metric of wave.metrics) {
       const item = itemsById.get(metric.itemId)
@@ -383,27 +406,37 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
         const question = groupForm?.question ?? formMetric(item, metric.metricKey)
         if (options.group && !groupDefinition) unavailable()
         const raw = facts!.typedFormValues.get(item.id), state = facts!.typedFormStates.get(item.id)?.state
-        const section = scope.formSections.find(candidate => candidate.id === item.formSectionId), slot = slots!.slots.find(candidate => candidate.slotKey === formSectionSlotKey(item.formSectionId))
-        if (!section || !slot || slot.sourceDefinitionIdentity.hash !== hash(mapCompositeSection(section))) invalid('表单冻结定义不一致')
         measurement = {instrumentKey: `FORM:${question.itemKey}`, scoreKey: question.itemKey, scoringDigest: hash(item.formDefinition ?? {type: question.type, options: question.options}), responseSignature: hash({type: question.type, definition: item.formDefinition ?? {options: question.options}}),
           respondentType: attempt.respondentType ?? 'SELF', unit: null, version: 'training-typed-form-v1'}
         const projected = question.type === 'MATRIX' || question.type === 'MATRIX_MULTIPLE' ? (raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>)[metric.metricKey.slice(question.itemKey.length + 1)] : null) : raw
         groupValue = numeric(projected) || typeof projected === 'string' || (Array.isArray(projected) && projected.every(value => typeof value === 'string')) ? projected as GroupMetricObservation['value'] : null
         value = numeric(raw) ? raw : null
         reason = options.group ? state === 'NOT_SHOWN' ? 'NOT_ASSIGNED' : state === 'REFUSED' || state === 'SHOWN_MISSING' || groupValue === null ? 'UNANSWERED' : null : state === 'NOT_SHOWN' ? 'NOT_ASSIGNED' : raw == null || state === 'REFUSED' || state === 'SHOWN_MISSING' ? 'UNANSWERED' : !numeric(raw) ? 'INVALID_VALUE' : null
-        const formRows = (snapshotsByParent.get(attempt.id) ?? []).filter(row => row.slotKey === slot.slotKey && row.attemptEpoch === attempt.attemptEpoch)
-        const formRow = formRows[0]
-        if (formRows.length !== 1 || !formRow.sourceAttemptId || !formRow.sourceSubmissionId || formRow.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
-          || formRow.sourceType !== 'COMPOSITE_FORM_SECTION' || !formRow.completedAt) invalid('表单已接受来源身份不完整')
-        let formHash = formSourceHashes.get(formRow)
-        if (!formHash) {formHash = hash({sourceAttemptId: formRow.sourceAttemptId, sourceSubmissionId: formRow.sourceSubmissionId,
-          completedAt: iso(formRow.completedAt), definitionHash: formRow.sourceDefinitionHash, facts: decryptUnifiedRuntimePayload(formRow.collectionFactsEncrypted)}); formSourceHashes.set(formRow, formHash)}
-        sourceHashes[item.id] = formHash
+        if (v2Loaded) {
+          const formSlotKey = formSectionSlotKey(item.formSectionId)
+          const v2FormRow = v2Units.find(unit => unit.slotKey === formSlotKey)
+          if (!v2FormRow) invalid('表单已接受来源身份不完整')
+          sourceHashes[item.id] = v2FormRow.sourceResultHash
+        } else {
+          const section = scope.formSections.find(candidate => candidate.id === item.formSectionId), slot = slots!.slots.find(candidate => candidate.slotKey === formSectionSlotKey(item.formSectionId))
+          if (!section || !slot || slot.sourceDefinitionIdentity.hash !== hash(mapCompositeSection(section))) invalid('表单冻结定义不一致')
+          const formRows = (snapshotsByParent.get(attempt.id) ?? []).filter(row => row.slotKey === slot.slotKey && row.attemptEpoch === attempt.attemptEpoch)
+          const formRow = formRows[0]
+          if (formRows.length !== 1 || !formRow.sourceAttemptId || !formRow.sourceSubmissionId || formRow.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
+            || formRow.sourceType !== 'COMPOSITE_FORM_SECTION' || !formRow.completedAt) invalid('表单已接受来源身份不完整')
+          let formHash = formSourceHashes.get(formRow)
+          if (!formHash) {formHash = hash({sourceAttemptId: formRow.sourceAttemptId, sourceSubmissionId: formRow.sourceSubmissionId,
+            completedAt: iso(formRow.completedAt), definitionHash: formRow.sourceDefinitionHash, facts: decryptUnifiedRuntimePayload(formRow.collectionFactsEncrypted)}); formSourceHashes.set(formRow, formHash)}
+          sourceHashes[item.id] = formHash
+        }
         policies.push({taskId: taskIdOf(attempt), itemId: item.id, formReadable: true})
       } else {
-        const envelope = acceptedEnvelope(attempt, item, snapshotsByParent.get(attempt.id) ?? [], slots!, canonicalByCipher)
+        const v2Unit = v2Loaded ? v2Units.find(unit => unit.slotKey === compositeItemSlotKey(item.id, item.type)) : undefined
+        const envelope = v2Loaded
+          ? (v2Unit?.canonicalEnvelope ?? null)
+          : acceptedEnvelope(attempt, item, snapshotsByParent.get(attempt.id) ?? [], slots!, canonicalByCipher)
         if (!envelope) {
-          const terminal = (snapshotsByParent.get(attempt.id) ?? []).find(row => row.slotKey === compositeItemSlotKey(item.id, item.type))
+          const terminal = v2Loaded ? undefined : (snapshotsByParent.get(attempt.id) ?? []).find(row => row.slotKey === compositeItemSlotKey(item.id, item.type))
           reason = terminal ? 'NOT_ASSIGNED' : 'MISSING_SOURCE'
           // An accepted optional skip is still frozen evidence, not an absent
           // source. Bind its terminal state so replay cannot silently change it.
@@ -418,6 +451,28 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
           metricQuality = storedMetric.quality
           let responseSignature = core.scientificProvenance.protocolSignature ?? core.compiledRuntimeHash
           if (item.type === 'SCALE') {
+            if (v2Loaded && v2Unit && v2Unit.unitFact.unitType === 'SCALE') {
+              const result = v2Unit.scaleResult
+              if (!result || v2Unit.unitFact.scaleId !== item.scaleId) invalid('量表冻结运行时或评分版本不一致')
+              const plan = attempt.publicationHash ? await loadCompositePublicationPlan(attempt.publicationHash, v2Templates).catch(() => null) : null
+              const planSlot = plan?.slots.find(s => s.unitType === 'SCALE' && s.slotKey === v2Unit.slotKey)
+              const policy = resolveProjectionPolicyForAssessment({
+                scale: { code: core.instrumentKey, instrumentVersion: core.instrumentVersion, instrumentClass: item.scale.instrumentClass },
+              } as any, result, undefined)
+              const capability = resolveEffectiveScaleDisclosure(createScaleProjectionContext({
+                instrumentKey: core.instrumentKey, instrumentVersion: core.instrumentVersion,
+                audience: 'teacher', purpose: 'export', principalId: actor.userId, frozenPolicy: policy.policy,
+              }))
+              if (policy.snapshotError || !capability.numericScores) unavailable()
+              policies.push({taskId: wave.taskId, itemId: item.id, policy: policy.policy, capability})
+              const score = result.scores.find(candidate => candidate.key === metric.metricKey)
+              if (groupDefinition && score) {groupDefinition.label = score.label; groupDefinition.range = score.range ?? null}
+              if (!score || score.value !== storedMetric.value) invalid('量表分数与已接受事实不一致')
+              if (planSlot && planSlot.unitType === 'SCALE') {
+                responseSignature = hash({items: planSlot.definition.items.map(row => ({itemCode: row.itemCode, responseSetKey: row.responseSetKey})), responseSets: planSlot.definition.responseSets})
+              }
+              sourceHashes[`scale:${item.id}`] = v2Unit.sourceResultHash
+            } else {
             const matches = attempt.scaleAssessments.filter((row: any) => row.compositeItemId === item.id), child = matches[0]
             if (matches.length !== 1 || child.compositeAttemptId !== attempt.id || child.attemptEpoch !== attempt.attemptEpoch
               || child.status !== 'COMPLETED' || child.deliveryMode !== 'FINAL_ONLY' || child.runtimeGeneration !== 'UNIFIED_V1'
@@ -453,6 +508,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
             const sourceResultHash = immutableResultHash ?? hash(result) // Validated, original noncompact result only.
             if (envelope.bundleBridge && envelope.bundleBridge.sourceResultHash !== sourceResultHash) invalid('量表原始结果摘要与已接受事实不一致')
             sourceHashes[`scale:${item.id}`] = hash({id: child.id, epoch: child.attemptEpoch, submissionId: child.submissionId, payloadHash: child.submissionPayloadHash, runtime: runtime.snapshotHash, result: sourceResultHash})
+            }
           } else if (item.type === 'COGNITIVE') {
             const {report, metric: definition} = cognitivePermission(item, metric.metricKey, actor)
             if (groupDefinition) groupDefinition.label = definition.label ?? metric.metricKey
@@ -640,6 +696,56 @@ async function discoverFrozenScaleMetrics(tx: Prisma.TransactionClient, actor: T
     }
     metrics.set(parent.compositeAssessmentId, existing)
   }
+  // Discover Scale metrics from WHOLE_V2 single-row FINAL attempts (zero legacy child rows).
+  const v2ScaleParents = await tx.compositeAssessmentAttempt.findMany({
+    where: {
+      compositeAssessmentId: {in: scaleTasks.map(task => task.id)},
+      deliveryCourseId: courseId,
+      status: 'COMPLETED',
+      deliveryMode: 'FINAL_ONLY',
+      runtimeGeneration: 'UNIFIED_V1',
+      publicationHash: {not: null},
+      ...(visibility ? {AND: [visibility]} : {}),
+    },
+    select: {id: true, compositeAssessmentId: true, attemptEpoch: true, respondentType: true},
+    orderBy: {id: 'asc'},
+    take: TRAINING_ANALYSIS_SOURCE_LIMIT + 1,
+  })
+  if (v2ScaleParents.length) {
+    const v2ScaleRead = await readCompositeFinalUnitSnapshots(
+      tx,
+      v2ScaleParents.map(p => ({attemptId: p.id, attemptEpoch: p.attemptEpoch})),
+      {unitTypes: ['SCALE'], templates: publicTemplatesForDatabase(tx)},
+    )
+    const v2TaskById = new Map(scaleTasks.map(t => [t.id, t]))
+    for (const parent of v2ScaleParents) {
+      const task = v2TaskById.get(parent.compositeAssessmentId)
+      if (!task) continue
+      const units = v2ScaleRead.byAttemptKey.get(`${parent.id}:${parent.attemptEpoch}`) ?? []
+      const existing = metrics.get(parent.compositeAssessmentId) ?? []
+      for (const unit of units) {
+        if (unit.unitFact.unitType !== 'SCALE' || !unit.scaleResult) continue
+        const scaleItemId = unit.unitFact.itemId
+        if (itemId && scaleItemId !== itemId) continue
+        const taskItem = task.items.find((c: any) => c.id === scaleItemId)
+        if (!taskItem?.scale) continue
+        const policy = resolveProjectionPolicyForAssessment({
+          scale: {code: unit.scaleResult.instrument.code, instrumentVersion: unit.scaleResult.instrument.instrumentVersion, instrumentClass: taskItem.scale.instrumentClass},
+        } as any, unit.scaleResult, undefined)
+        const disclosure = resolveEffectiveScaleDisclosure(createScaleProjectionContext({
+          instrumentKey: unit.scaleResult.instrument.code, instrumentVersion: unit.scaleResult.instrument.instrumentVersion,
+          audience: 'teacher', purpose: 'export', principalId: actor.userId, frozenPolicy: policy.policy,
+        }))
+        if (policy.snapshotError || !disclosure.numericScores) continue
+        for (const score of unit.scaleResult.scores) {
+          if (!existing.some(value => value.itemId === scaleItemId && value.metricKey === score.key)) {
+            existing.push({itemId: scaleItemId, metricKey: score.key, label: score.label})
+          }
+        }
+      }
+      metrics.set(parent.compositeAssessmentId, existing)
+    }
+  }
   return metrics
 }
 
@@ -706,6 +812,44 @@ export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     const existing = sjtMetrics.get(task.id) ?? []
     for (const metric of envelope?.core.metrics ?? []) if ((metric.value === null || numeric(metric.value)) && !existing.some(value => value.itemId === item.id && value.metricKey === metric.key)) existing.push({itemId: item.id, metricKey: metric.key, label: metric.key})
     sjtMetrics.set(task.id, existing)
+  }
+  if (sjtTasks.length) {
+    const v2SjtParents = await tx.compositeAssessmentAttempt.findMany({
+      where: {
+        compositeAssessmentId: {in: sjtTasks.map(task => task.id)},
+        deliveryCourseId: courseId,
+        status: 'COMPLETED',
+        deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
+        publicationHash: {not: null},
+        ...(auth.visibility ? {AND: [auth.visibility]} : {}),
+      },
+      select: {id: true, compositeAssessmentId: true, attemptEpoch: true},
+      orderBy: {id: 'asc'},
+      take: TRAINING_ANALYSIS_SOURCE_LIMIT + 1,
+    })
+    if (v2SjtParents.length) {
+      const v2SjtRead = await readCompositeFinalUnitSnapshots(
+        tx,
+        v2SjtParents.map(p => ({attemptId: p.id, attemptEpoch: p.attemptEpoch})),
+        {unitTypes: ['SITUATIONAL'], templates: publicTemplatesForDatabase(tx)},
+      )
+      for (const parent of v2SjtParents) {
+        const units = v2SjtRead.byAttemptKey.get(`${parent.id}:${parent.attemptEpoch}`) ?? []
+        const existing = sjtMetrics.get(parent.compositeAssessmentId) ?? []
+        for (const unit of units) {
+          if (unit.unitFact.unitType !== 'SITUATIONAL' || !unit.canonicalEnvelope) continue
+          const sjtItemId = unit.unitFact.itemId
+          if (options.groupKey && sjtItemId !== options.groupKey) continue
+          for (const metric of unit.canonicalEnvelope.core.metrics) {
+            if ((metric.value === null || numeric(metric.value)) && !existing.some(value => value.itemId === sjtItemId && value.metricKey === metric.key)) {
+              existing.push({itemId: sjtItemId, metricKey: metric.key, label: metric.key})
+            }
+          }
+        }
+        sjtMetrics.set(parent.compositeAssessmentId, existing)
+      }
+    }
   }
   const scaleTasks = options.groupKey ? available.filter(task => task.items.some((item: any) => item.type === 'SCALE' && item.id === options.groupKey)) : available
   const scaleMetrics = await discoverFrozenScaleMetrics(tx, actor, courseId, scaleTasks, auth.visibility, options.groupKey)

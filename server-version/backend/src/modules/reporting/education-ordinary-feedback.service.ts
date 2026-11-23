@@ -1,4 +1,5 @@
 import {readOrdinaryDeclaredFeedback,tryReadPreMaterializedDeclaredFeedback,tryReadPreMaterializedNativeScaleFeedback,type OrdinaryStoredContent} from './education-ordinary-declared-feedback'
+import {tryReadCompositeFinalFeedback} from '../assessment-runtime/composite-final.bridge'
 import {schoolSelfGroupAssignmentSql} from '../assessment-run/educationCompositionExecution'
 import {readOrdinaryNativeFeedback} from './education-ordinary-native-feedback'
 import {loadFrozenActiveSlotSet} from '../assessment-runtime/slot-set'
@@ -21,12 +22,12 @@ async function readOwn(tx:ReadOwnDb,input:ScopedInput,loadContent=false){
  const population=input.entry==='SCHOOL'?'STUDENT':'TEACHER'
  const [row]=await tx.$queryRaw<Array<{organizationId:string;key:string;version:string;policy:RunResourcePolicy;policyHash:string;status:string;
   subjectUserId:string;respondentUserId:string;subjectRole:string;respondentRole:string;relationshipKind:string;perspective:string;
-  receiptOnly:boolean|null;contentState:OrdinaryStoredContent|null;preMaterializedReport?:string|null;parentId:string|null;parentStatus:string|null;attemptEpoch:number|null;contextSnapshotHash:string|null;frozenSlots:string|null;frozenSlotsHash:string|null}>>(Prisma.sql`
+  receiptOnly:boolean|null;contentState:OrdinaryStoredContent|null;preMaterializedReport?:string|null;parentId:string|null;parentStatus:string|null;attemptEpoch:number|null;publicationHash?:string|null;contextSnapshotHash:string|null;frozenSlots:string|null;frozenSlotsHash:string|null}>>(Prisma.sql`
   WITH target_exec AS MATERIALIZED (
    SELECT e.* FROM assessment_run_executions e WHERE e.id=${input.executionId} LIMIT 1
   )
   SELECT e.organization_id AS "organizationId",t.resource_key AS key,t.resource_version AS version,t.frozen_resource_policy AS policy,
-   t.resource_policy_hash AS "policyHash",e.status,p.receipt_only AS "receiptOnly",p.id AS "parentId",p.status AS "parentStatus",p.attempt_epoch AS "attemptEpoch",
+   t.resource_policy_hash AS "policyHash",e.status,p.receipt_only AS "receiptOnly",p.id AS "parentId",p.status AS "parentStatus",p.attempt_epoch AS "attemptEpoch",p.publication_hash AS "publicationHash",
    a.subject_user_id AS "subjectUserId",a.respondent_user_id AS "respondentUserId",a.subject_role AS "subjectRole",a.respondent_role AS "respondentRole",
    a.relationship_kind AS "relationshipKind",a.perspective,p.context_snapshot_hash AS "contextSnapshotHash",
    CASE WHEN a.relationship_kind='SELF' AND e.status='COMPLETED' AND p.status='COMPLETED' AND NOT COALESCE(p.receipt_only,FALSE)
@@ -102,6 +103,29 @@ async function readOrdinaryFeedback(input:ScopedInput){
  if(own.relationshipKind!=='SELF')return {schemaVersion:1 as const,kind:'EDUCATION_FEEDBACK' as const,mode:'COMPOSITION' as const,
   state:'COMPLETION_ONLY' as const,title:identity.title,units:identity.manifest.map(block=>({blockId:block.blockId,kind:block.kind,title:block.title,
    state:block.kind==='FORM'?'COMPLETION_ONLY' as const:'WITHHELD' as const}))}
+ // Phase 2 single-row FINAL fast path: 1 PK read of composite_attempt_finals.feedback_cipher
+ type CachedOrdinaryFeedback = {
+  schemaVersion: 1
+  kind: 'EDUCATION_FEEDBACK'
+  mode: 'COMPOSITION'
+  state: 'READY' | 'COMPLETION_ONLY'
+  title: string
+  units: Array<{
+   blockId: string
+   kind: string
+   title: string
+   state: 'READY' | 'COMPLETION_ONLY' | 'WITHHELD'
+   nativeScaleUnits?: any[]
+   declaredReport?: any
+   message?: string
+  }>
+ }
+ const singleRowFeedback = own.publicationHash
+  ? await tryReadCompositeFinalFeedback<CachedOrdinaryFeedback>(prisma, own.parentId, own.attemptEpoch)
+  : null
+ if (singleRowFeedback && singleRowFeedback.kind === 'EDUCATION_FEEDBACK') {
+  return singleRowFeedback
+ }
  const sources:NativeEducationFeedbackSource[]=[],declaredBlocks=new Set<string>(),nativeBlocks=new Set<string>()
  for(const block of identity.manifest.filter(block=>block.kind==='COGNITIVE'||block.kind==='SJT')){
   const ceiling=identity.binding.unitReports.find(unit=>unit.blockId===block.blockId)

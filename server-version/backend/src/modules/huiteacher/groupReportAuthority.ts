@@ -59,6 +59,11 @@ export async function teacherScaleLeafContract(source:Source,leaf:ReportingLeafS
   JOIN composite_assessment_items item ON item.composite_assessment_id=r.composite_id AND item.scale_id=s.id AND item.type='SCALE'
   WHERE r.resource_key=${track.key} AND r.resource_version=${track.version} AND r.status IN ('PUBLISHED','RETIRED')`)
  if(!unit||leaf.instrumentKey!==unit.code||leaf.instrumentVersion!==unit.version||leaf.slotKey!==compositeItemSlotKey(unit.id,'SCALE'))hidden()
+ const [v2Header]=await db.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT f.attempt_id AS id FROM assessment_run_executions e
+  JOIN composite_assessment_attempts p ON p.id=e.runtime_binding_ref AND p.composite_assessment_id=${unit.compositeId} AND p.status='COMPLETED'
+  JOIN composite_attempt_finals f ON f.attempt_id=p.id AND f.attempt_epoch=p.attempt_epoch
+  WHERE e.organization_id=${source.organizationId} AND e.run_id=${source.runId} AND e.track_id=${source.trackId} AND e.status='COMPLETED' LIMIT 1`)
+ if(v2Header)return validateResultDisclosureContract(entry!.resultDisclosure)
  const [header]=await db.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT snap.id FROM assessment_run_executions e
   JOIN composite_assessment_attempts p ON p.id=e.runtime_binding_ref AND p.composite_assessment_id=${unit.compositeId} AND p.status='COMPLETED'
   JOIN assessment_unit_snapshots snap ON snap.composite_attempt_id=p.id AND snap.attempt_epoch=p.attempt_epoch

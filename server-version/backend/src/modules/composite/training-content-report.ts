@@ -5,6 +5,7 @@ import type {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
 import {loadStoredCanonicalUnitResults} from '../assessment-runtime/compact-assessment-storage'
+import {readCompositeFinalUnitSnapshots} from '../assessment-runtime/composite-final.bridge'
 import {getContentRelease,prefetchContentReleases,type StoredRelease} from '../measurement-content/repository'
 import {ContentReleaseError} from '../measurement-content/release'
 import {renderDeclaredReport,DECLARATIVE_REPORT_GENERATOR,type ReportMetricFact} from '../measurement-content/report-renderer'
@@ -39,14 +40,31 @@ export async function readTrainingContentReports(db:Prisma.TransactionClient,inp
   if(!bound?.report||!source)fail()
   return {bound,source,interpreted:u,slotKey:compositeItemSlotKey(bound.itemId,bound.family==='SJT'?'SITUATIONAL':bound.family)}
  })
- const rows=expected.length?await db.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,slotKey:{in:expected.map(e=>e.slotKey)}},
-  select:{compositeAttemptId:true,attemptEpoch:true,slotKey:true,unitType:true,terminalState:true,payloadKind:true,canonicalResultEncrypted:true,sourceType:true,sourceAttemptId:true,sourceSubmissionId:true}}):[]
- if(rows.length!==expected.length||new Set(rows.map(r=>r.slotKey)).size!==rows.length)fail()
- for(const row of rows)if(row.compositeAttemptId!==parent.id||row.attemptEpoch!==parent.attemptEpoch||row.terminalState!=='COMPLETED'
-  ||row.payloadKind!=='UNIT_RESULT'||!row.canonicalResultEncrypted||!expected.some(e=>e.slotKey===row.slotKey))fail()
- const envelopes=rows.length?await loadStoredCanonicalUnitResults(rows.map(r=>r.canonicalResultEncrypted!),db):[]
- if(envelopes.length!==rows.length)fail()
- const facts=new Map(rows.map((row,i)=>[row.slotKey,{row,envelope:envelopes[i]}]))
+ const v2Read = expected.length && (parent as any).publicationHash != null
+  ? await readCompositeFinalUnitSnapshots(
+     db,
+     [{ attemptId: parent.id, attemptEpoch: parent.attemptEpoch }],
+     { slotKeys: expected.map(e => e.slotKey) },
+    )
+  : { loadedFactsByKey: new Map(), snapshots: [] }
+ const hasV2Final = v2Read.loadedFactsByKey.has(`${parent.id}:${parent.attemptEpoch}`)
+ const facts = new Map<string, { row: any; envelope: any }>()
+ if (hasV2Final) {
+  if (v2Read.snapshots.length !== expected.length) fail()
+  for (const snap of v2Read.snapshots) {
+   if (!snap.canonicalEnvelope) fail()
+   facts.set(snap.slotKey, { row: snap, envelope: snap.canonicalEnvelope })
+  }
+ } else {
+  const rows=expected.length?await db.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,slotKey:{in:expected.map(e=>e.slotKey)}},
+   select:{compositeAttemptId:true,attemptEpoch:true,slotKey:true,unitType:true,terminalState:true,payloadKind:true,canonicalResultEncrypted:true,sourceType:true,sourceAttemptId:true,sourceSubmissionId:true}}):[]
+  if(rows.length!==expected.length||new Set(rows.map(r=>r.slotKey)).size!==rows.length)fail()
+  for(const row of rows)if(row.compositeAttemptId!==parent.id||row.attemptEpoch!==parent.attemptEpoch||row.terminalState!=='COMPLETED'
+   ||row.payloadKind!=='UNIT_RESULT'||!row.canonicalResultEncrypted||!expected.some(e=>e.slotKey===row.slotKey))fail()
+  const envelopes=rows.length?await loadStoredCanonicalUnitResults(rows.map(r=>r.canonicalResultEncrypted!),db):[]
+  if(envelopes.length!==rows.length)fail()
+  for (const [i, row] of rows.entries()) facts.set(row.slotKey, { row, envelope: envelopes[i] })
+ }
  const cache=new Map<string,StoredRelease>()
  // One round trip for every distinct release this report renders (measurements,
  // reports, selected references); the per-pointer checks below are unchanged.
@@ -95,7 +113,7 @@ export async function readTrainingContentReports(db:Prisma.TransactionClient,inp
    renderedByItem.set(bound.itemId,{itemId:bound.itemId,status:'UNAVAILABLE',reportRelease:bound.report!,lifecycleNotices,rendered:null});continue
   }
   const allowed=new Set(report.content.metricKeys)
-  const metrics:ReportMetricFact[]=core.metrics.filter(m=>allowed.has(m.key)&&disclosure.metricKeys.has(m.key)).map(m=>({metricKey:m.key,
+  const metrics:ReportMetricFact[]=core.metrics.filter((m:any)=>allowed.has(m.key)&&disclosure.metricKeys.has(m.key)).map((m:any)=>({metricKey:m.key,
    value:typeof m.value==='number'&&Number.isFinite(m.value)?m.value:null,unit:measurement.content.metrics.find(v=>v.metricKey===m.key)?.unit??m.unit??'unknown',
    status:core.quality.status==='interpretable'&&(m.quality===undefined||['calculated','OK','interpretable'].includes(m.quality))?'INTERPRETABLE':core.quality.status==='invalid'?'INVALID':'UNAVAILABLE'}))
   renderedByItem.set(bound.itemId,{itemId:bound.itemId,status:'READY',reportRelease:bound.report!,lifecycleNotices,

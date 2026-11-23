@@ -3,6 +3,7 @@ import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {compositeItemSlotKey,parseFrozenActiveSlotSet,type loadFrozenActiveSlotSet} from '../assessment-runtime/slot-set'
 import {loadStoredCanonicalUnitResults} from '../assessment-runtime/compact-assessment-storage'
+import {readCompositeFinalUnitSnapshots} from '../assessment-runtime/composite-final.bridge'
 import {loadSharedCognitiveRuntime} from '../assessment-runtime/shared-cognitive-runtime'
 import {loadStoredUnitAdmission} from '../assessment-runtime/unit-admission'
 import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
@@ -156,6 +157,32 @@ export async function readOrdinaryNativeFeedback(tx:Prisma.TransactionClient,inp
   return measurement.status!=='REVOKED'
  })
  if(!expected.length)return output
+ const v2NativeRead = (input.parent as { publicationHash?: string | null }).publicationHash
+  ? await readCompositeFinalUnitSnapshots(
+      tx,
+      [{ attemptId: parent.id, attemptEpoch: parent.attemptEpoch }],
+      { slotKeys: expected.map(item => item.slotKey) },
+    )
+  : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
+ if (v2NativeRead.loadedFactsByKey.has(`${parent.id}:${parent.attemptEpoch}`)) {
+  const bySlot = new Map(v2NativeRead.snapshots.map(snap => [snap.slotKey, snap]))
+  for (const item of expected) {
+   const snap = bySlot.get(item.slotKey)
+   if (!snap || !snap.canonicalEnvelope) hidden()
+   const core = snap.canonicalEnvelope.core
+   const allowedMetrics = new Set(item.ceiling.respondent.metricKeys)
+   const visibleMetrics = core.metrics.filter(m => allowedMetrics.has(m.key))
+   output.set(item.block.blockId, {
+    blockId: item.block.blockId,
+    kind: item.block.kind,
+    title: item.block.title,
+    state: 'READY',
+    qualityStatus: core.quality.status,
+    metrics: visibleMetrics,
+   } as any)
+  }
+  return output
+ }
  const finals=await tx.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,
   slotKey:{in:expected.map(item=>item.slotKey)}}})
  if(finals.length!==expected.length||new Set(finals.map(row=>row.slotKey)).size!==expected.length)hidden()
