@@ -32,7 +32,7 @@ ENV VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED=${VITE_REPORT_PRIVACY_TEACHER_V2_ENAB
 ENV VITE_REPORT_PRIVACY_SCHOOL_V2_ENABLED=${VITE_REPORT_PRIVACY_SCHOOL_V2_ENABLED}
 RUN npm run build
 
-FROM nginx:1.31.6-alpine3.24-slim AS runtime
+FROM nginx:1.31.6-alpine3.24-slim AS runtime-config
 # Optional regional prefix; empty retains the base image's official repositories.
 ARG ALPINE_MIRROR=
 # Apply the latest Alpine security updates to the runtime image before it is
@@ -42,7 +42,10 @@ RUN if [ -n "$ALPINE_MIRROR" ]; then \
     fi \
     && apk upgrade --no-cache \
     && apk add --no-cache --upgrade 'libexpat>=2.8.5-r0'
+COPY nginx-main.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+FROM runtime-config AS runtime
 # 覆盖默认站点：SPA + /api /uploads /socket.io 反向代理到 backend:3000
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
