@@ -68,8 +68,45 @@ export interface SaveCompositeCheckpointInput {
   }
   /** Optional allowlist of slotKeys valid in this frozen publication. */
   allowedSlotKeys?: ReadonlySet<string>
+  /** When true, locks the parent composite_assessment_attempts row FOR UPDATE and enforces
+   * status === 'IN_PROGRESS', matching epoch, and matching publicationHash to serialize with
+   * concurrent FINAL commits and checkpoint deletes. */
+  verifyAttemptActive?: boolean
   expiresAt?: Date
   now?: Date
+}
+
+export interface DeleteCompositeCheckpointInput {
+  attemptId: string
+  attemptEpoch: number
+  publicationHash: string
+  expectedRevision?: number
+  verifyAttemptActive?: boolean
+}
+
+async function lockAndAssertActiveAttempt(
+  db: CompositeCheckpointDb,
+  input: { attemptId: string; attemptEpoch: number; publicationHash: string },
+): Promise<void> {
+  const rows = await db.$queryRaw<Array<{
+    status: string
+    attemptEpoch: number
+    publicationHash: string | null
+  }>>(Prisma.sql`
+    SELECT status::text AS status,
+      attempt_epoch AS "attemptEpoch",
+      publication_hash AS "publicationHash"
+    FROM composite_assessment_attempts
+    WHERE id = ${input.attemptId}
+    FOR UPDATE
+  `)
+  const parent = rows[0]
+  if (!parent || parent.attemptEpoch !== input.attemptEpoch || parent.publicationHash !== input.publicationHash) {
+    throw new CompositeCheckpointError(409, 'CHECKPOINT_IDENTITY_MISMATCH', '草稿与当前作答版本不一致')
+  }
+  if (parent.status !== 'IN_PROGRESS') {
+    throw new CompositeCheckpointError(409, 'CHECKPOINT_ATTEMPT_NOT_ACTIVE', '作答已结束，无法修改或清空草稿')
+  }
 }
 
 function assertDraftBounds(value: unknown, depth = 0, budget = { nodes: 0, bytes: 0 }): void {
@@ -162,7 +199,10 @@ export async function readCompositeCheckpoint(
     return { revision: 0, saveCount: 0, lockedSlotKeys: [], expiresAt: null, updatedAt: null, envelope: null }
   }
   if (row.attemptEpoch < input.attemptEpoch) {
-    await clearCompositeCheckpoint(db, input.attemptId)
+    await db.$executeRaw(Prisma.sql`
+      DELETE FROM composite_attempt_checkpoints
+      WHERE attempt_id = ${input.attemptId} AND attempt_epoch < ${input.attemptEpoch}
+    `)
     return { revision: 0, saveCount: 0, lockedSlotKeys: [], expiresAt: null, updatedAt: null, envelope: null }
   }
   if (row.attemptEpoch !== input.attemptEpoch || row.publicationHash !== input.publicationHash) {
@@ -170,7 +210,13 @@ export async function readCompositeCheckpoint(
   }
   if (row.expiresAt <= now) {
     if (row.lockedSlotKeys.length === 0) {
-      await clearCompositeCheckpoint(db, input.attemptId)
+      await db.$executeRaw(Prisma.sql`
+        DELETE FROM composite_attempt_checkpoints
+        WHERE attempt_id = ${input.attemptId}
+          AND attempt_epoch = ${row.attemptEpoch}
+          AND revision = ${row.revision}
+          AND cardinality(locked_slot_keys) = 0
+      `)
       return { revision: 0, saveCount: 0, lockedSlotKeys: [], expiresAt: null, updatedAt: null, envelope: null }
     }
     // Preserve monotonically locked Cognitive/SJT units even if draft TTL elapsed; expire only drafts.
@@ -226,14 +272,28 @@ export async function saveCompositeCheckpoint(
     }
   }
 
+  if (input.verifyAttemptActive) {
+    await lockAndAssertActiveAttempt(db, {
+      attemptId: input.attemptId,
+      attemptEpoch: input.attemptEpoch,
+      publicationHash: input.publicationHash,
+    })
+  }
+
   const now = input.now ?? new Date()
   const expiresAt = input.expiresAt ?? new Date(now.getTime() + DEFAULT_CHECKPOINT_TTL_MS)
   let existing = await loadCheckpointRow(db, input.attemptId, true)
 
   // Drop unlocked expired rows or stale-epoch rows before CAS so INSERT starts cleanly at revision 1.
   if (existing && (existing.attemptEpoch < input.attemptEpoch || (existing.expiresAt <= now && existing.lockedSlotKeys.length === 0))) {
-    await clearCompositeCheckpoint(db, input.attemptId)
-    existing = null
+    const deleted = await db.$executeRaw(Prisma.sql`
+      DELETE FROM composite_attempt_checkpoints
+      WHERE attempt_id = ${input.attemptId}
+        AND attempt_epoch = ${existing.attemptEpoch}
+        AND revision = ${existing.revision}
+        AND (attempt_epoch < ${input.attemptEpoch} OR cardinality(locked_slot_keys) = 0)
+    `)
+    if (deleted > 0) existing = null
   }
   if (existing && (existing.attemptEpoch !== input.attemptEpoch || existing.publicationHash !== input.publicationHash)) {
     throw new CompositeCheckpointError(409, 'CHECKPOINT_IDENTITY_MISMATCH', '草稿与当前作答版本不一致')
@@ -295,7 +355,7 @@ export async function saveCompositeCheckpoint(
   const nextSaveCount = (existing?.saveCount ?? 0) + 1
 
   if (!existing) {
-    await db.$executeRaw(Prisma.sql`
+    const inserted = await db.$executeRaw(Prisma.sql`
       INSERT INTO composite_attempt_checkpoints (
         attempt_id, attempt_epoch, publication_hash, revision, save_count,
         locked_slot_keys, payload_cipher, payload_hash, expires_at, updated_at
@@ -303,9 +363,13 @@ export async function saveCompositeCheckpoint(
         ${input.attemptId}, ${input.attemptEpoch}, ${input.publicationHash}, ${nextRevision}, ${nextSaveCount},
         ${lockedSlotKeys}::text[], ${payloadCipher}, ${payloadHash}, ${expiresAt}, ${now}
       )
+      ON CONFLICT (attempt_id) DO NOTHING
     `)
+    if (inserted !== 1) {
+      throw new CompositeCheckpointError(409, 'CHECKPOINT_CONFLICT', '草稿已被并发创建，请刷新后重试')
+    }
   } else {
-    await db.$executeRaw(Prisma.sql`
+    const updated = await db.$executeRaw(Prisma.sql`
       UPDATE composite_attempt_checkpoints
       SET attempt_epoch = ${input.attemptEpoch},
           publication_hash = ${input.publicationHash},
@@ -317,7 +381,12 @@ export async function saveCompositeCheckpoint(
           expires_at = ${expiresAt},
           updated_at = ${now}
       WHERE attempt_id = ${input.attemptId}
+        AND attempt_epoch = ${input.attemptEpoch}
+        AND revision = ${currentRevision}
     `)
+    if (updated !== 1) {
+      throw new CompositeCheckpointError(409, 'CHECKPOINT_CONFLICT', '草稿已被并发更新，请刷新后重试')
+    }
   }
 
   return {
@@ -347,7 +416,46 @@ export async function readLockedUnitsForSubmit(
   return decodeStoredEnvelope(row).lockedUnits
 }
 
-/** Deletes the ephemeral checkpoint row once final submission commits (or on expiry/cancel). */
+/** Atomically deletes an active unlocked checkpoint without racing concurrent unit locks or FINAL commits. */
+export async function deleteUnlockedCompositeCheckpoint(
+  db: CompositeCheckpointDb,
+  input: DeleteCompositeCheckpointInput,
+): Promise<{ cleared: true }> {
+  if (!HEX64_RE.test(input.publicationHash)) {
+    throw new CompositeCheckpointError(400, 'CHECKPOINT_INVALID', '无效的发布快照摘要')
+  }
+  if (input.verifyAttemptActive !== false) {
+    await lockAndAssertActiveAttempt(db, {
+      attemptId: input.attemptId,
+      attemptEpoch: input.attemptEpoch,
+      publicationHash: input.publicationHash,
+    })
+  }
+  const deleted = await db.$executeRaw(Prisma.sql`
+    DELETE FROM composite_attempt_checkpoints
+    WHERE attempt_id = ${input.attemptId}
+      AND attempt_epoch = ${input.attemptEpoch}
+      AND publication_hash = ${input.publicationHash}
+      AND cardinality(locked_slot_keys) = 0
+      ${input.expectedRevision !== undefined ? Prisma.sql`AND revision = ${input.expectedRevision}` : Prisma.empty}
+  `)
+  if (deleted > 0) return { cleared: true }
+
+  const remaining = await loadCheckpointRow(db, input.attemptId, true)
+  if (!remaining) return { cleared: true }
+  if (remaining.attemptEpoch !== input.attemptEpoch || remaining.publicationHash !== input.publicationHash) {
+    throw new CompositeCheckpointError(409, 'CHECKPOINT_IDENTITY_MISMATCH', '草稿与当前作答版本不一致')
+  }
+  if (remaining.lockedSlotKeys.length > 0) {
+    throw new CompositeCheckpointError(409, 'CHECKPOINT_LOCKED_UNIT_IMMUTABLE', '存在已锁定的认知或情境单元，无法清空草稿')
+  }
+  if (input.expectedRevision !== undefined && remaining.revision !== input.expectedRevision) {
+    throw new CompositeCheckpointError(409, 'CHECKPOINT_CONFLICT', `草稿版本冲突（预期 ${input.expectedRevision}，当前 ${remaining.revision}）`)
+  }
+  return { cleared: true }
+}
+
+/** Deletes the ephemeral checkpoint row once final submission commits (caller holds parent attempt lock). */
 export async function clearCompositeCheckpoint(
   db: CompositeCheckpointDb,
   attemptId: string,
