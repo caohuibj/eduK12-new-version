@@ -1,0 +1,34 @@
+{
+  "sourceExecutionBase": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "filesSha256": {
+    "server-version/backend/src/modules/survey/governed-tool.routes.ts": "cbf3351ee324d4a16cce614a97657bcbe7eb6376cc38e43174925b6c3d08b2a1",
+    "server-version/backend/src/modules/survey/governed-tool.service.ts": "76f68b15bd6aab2044ad80b9357337b741d166ddecd5c2b21fc08365b025daa9",
+    "server-version/backend/src/modules/survey/final.compute.ts": "2cfd50b03964bb511e2b4d476d35375e38537b16e558ba949d7840b1954e2c23",
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": "e482ec3a13d0f0e30087663c7acbd75eb7617428dd78a2ac2297fe6d2f9e6b60",
+    "server-version/backend/src/modules/assessment-core/form/import-parser.ts": "89969bd75f39fe258420e5a328705eab21d54304283d7c2a9237f7d770f70050",
+    "server-version/backend/src/modules/assessment-core/form/import-builder.ts": "0bbfc149d8a9e22c7b9c4113d8a570e4f6673565d7ad212dc645ecd0080301d5",
+    "server-version/backend/src/modules/assessment-core/form/answers.ts": "172eb777fc670d6b2fa421474d77a75b607b84fbfd43c91cc25bca02e4477716",
+    "server-version/backend/prisma/schema.prisma": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591"
+  },
+  "node": "24.21.0",
+  "prisma": "5.22.0",
+  "matchingEngineCommit": "605197351a3c8bdd595af2d2a9bc3025bca48ea2",
+  "dependencyReuse": "Exact package-lock identical to prior AIR/GTL worktree; existing locked node_modules copied, own Prisma client freshly generated against current schema using installed matching official engines. Not a fresh dependency install or full app build.",
+  "database": "New task-owned PostgreSQL16.15 loopback-only DB; current existing migrations applied successfully once; Redis existing local service. No production connection.",
+  "nativeHttpBoundary": "Existing surveyGovernedToolsRouter mounted at /tools on a local Express listener; actual production path /api/platform/survey-tools. This fixture checks router/session/auth/submission/readback, not outer application origin/feature guards or UI.",
+  "publicChangeScope": "Documentation/evidence only. Private item-bearing definitions, submissions and CSVs remain /tmp; no auto-loading source registry or runtime changes.",
+  "publicationBase": "6cad86d8f721a45a47a91290edf1523519d1d239",
+  "sourceEvidenceReuse": "All listed native consumers/schema/lock byte-identical after fast-forward to publication base; no replay of the five already successful saves.",
+  "unchangedConsumersAtPublicationBase": {
+    "server-version/backend/src/modules/survey/governed-tool.routes.ts": true,
+    "server-version/backend/src/modules/survey/governed-tool.service.ts": true,
+    "server-version/backend/src/modules/survey/final.compute.ts": true,
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": true,
+    "server-version/backend/src/modules/assessment-core/form/import-parser.ts": true,
+    "server-version/backend/src/modules/assessment-core/form/import-builder.ts": true,
+    "server-version/backend/src/modules/assessment-core/form/answers.ts": true,
+    "server-version/backend/prisma/schema.prisma": true,
+    "server-version/backend/package-lock.json": true
+  }
+}
