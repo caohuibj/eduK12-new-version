@@ -79,7 +79,7 @@ describe('scoped same-IP participant discovery',()=>{
     window.history.replaceState(null,'',`/r/${pid}#entry=${token}`)
     const api=fixture({ordinaryToken:true,singleGroup:true});render(<SurveyPublicApp/>)
     expect(await screen.findByRole('heading',{name:'知情同意书'})).toBeInTheDocument()
-    expect(screen.getByLabelText('匿名参与方式')).toHaveTextContent('完全匿名：无需登录，不记录个人信息，放心作答')
+    expect(screen.getByLabelText('匿名参与方式')).toHaveTextContent('独立匿名作答无需注册；具体记录范围请阅读下方研究说明。')
     expect(screen.queryByText('本次回答独立记录，不与其他轮次关联。')).toBeNull()
     expect(screen.queryByText('第 2 轮 · 本次集体问卷')).toBeNull()
     expect(screen.getByText(group.consentText)).toBeInTheDocument()

@@ -1,3 +1,4 @@
+import './survey-form-studio.css'
 import {deferredResearcherComponent} from './deferred-researcher-component'
 import {SurveyMaterialPicker} from './SurveyMaterialPicker'
 import {SurveyMaterialDisplay} from './SurveyMaterialDisplay'

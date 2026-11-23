@@ -129,12 +129,18 @@ export async function recipients(actorId:string,entryId:string,raw:unknown){
   await assertToolEntryPolicy(tx,{resourceKey:'release:'+current.release_id,fingerprint:current.content_hash!},input.product)
   if(!libraryCompatibility(submission.snapshot).supportedEntrypoints.includes(input.product))fail('SCALE_LIBRARY_ENTRYPOINT_NOT_SUPPORTED',400)
   const pattern='%'+input.keyword.replace(/[\\%_]/g,'\\$&')+'%'
-  const list=await tx.$queryRaw<Array<{id:string;username:string;name:string|null}>>(Prisma.sql`SELECT u.id,u.username,u.nickname AS name FROM users u
+  // Survey invitations use an opaque users.username; the separately scoped
+  // Survey login is the identity an administrator and researcher actually know.
+  // Keep Training's existing account projection and all qualification checks.
+  const accountName=input.product==='SURVEY'?Prisma.sql`COALESCE(a.login_name,u.username)`:Prisma.sql`u.username`
+  const accountJoin=input.product==='SURVEY'?Prisma.sql`LEFT JOIN survey_accounts a ON a.user_id=u.id`:Prisma.empty
+  const list=await tx.$queryRaw<Array<{id:string;username:string;name:string|null}>>(Prisma.sql`SELECT u.id,${accountName} AS username,u.nickname AS name FROM users u
+    ${accountJoin}
     WHERE u.is_active AND NOT u.is_frozen AND NOT u.must_change_password AND (u.expires_at IS NULL OR u.expires_at>clock_timestamp())
-      AND (u.username ILIKE ${pattern} OR u.nickname ILIKE ${pattern}) AND
+      AND (${accountName} ILIKE ${pattern} OR u.nickname ILIKE ${pattern}) AND
       (${input.product}='TRAINING' AND u.account_domain IN ('TRAINING','LEGACY') AND u.role='TEACHER' AND u.teacher_approved
        OR ${input.product}='SURVEY' AND u.account_domain='SURVEY' AND EXISTS(SELECT 1 FROM survey_researcher_grants g WHERE g.user_id=u.id AND g.status IN ('ACTIVE','PENDING_MFA')))
-    ORDER BY u.username,u.id LIMIT 26 OFFSET ${(input.page-1)*25}`)
+    ORDER BY ${accountName},u.id LIMIT 26 OFFSET ${(input.page-1)*25}`)
   return {list:list.slice(0,25),page:input.page,hasMore:list.length>25}
  })
 }

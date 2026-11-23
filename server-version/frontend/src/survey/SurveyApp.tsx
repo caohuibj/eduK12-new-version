@@ -69,7 +69,12 @@ function SurveyApplication(){
       surveyFeatures.some(feature=>feature.path===window.location.pathname)?'feature':'login')
   const [initialStudy]=useState(readStudyLocation)
   const studyRestoreEpoch=useRef(0)
-  const cancelStudyRestore=useCallback(()=>{studyRestoreEpoch.current++},[])
+  const studyRestorePending=useRef(false)
+  const acceptedWorkspaceUrl=useRef(window.location.pathname+window.location.search+window.location.hash)
+  const cancelStudyRestore=useCallback((restoreUrl=false)=>{
+    if(restoreUrl&&studyRestorePending.current)window.history.replaceState(null,'',acceptedWorkspaceUrl.current)
+    studyRestoreEpoch.current++;studyRestorePending.current=false
+  },[])
   const activeFeature=surveyFeatures.find(feature=>feature.path===window.location.pathname)
   const [screen,setScreen]=useState<'home'|'feature'|'claim'|'reset'|'login'|'mfa'|'work'>(initial)
   const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[enrolled,setEnrolled]=useState(true)
@@ -92,12 +97,12 @@ function SurveyApplication(){
   const [toolLibraryVisited,setToolLibraryVisited]=useState(()=>readResearchArea()==='tools')
   const [materialLibraryVisited,setMaterialLibraryVisited]=useState(()=>readResearchArea()==='media')
   const materialLibraryRisk=useRef<BuilderLeaveRisk>({dirty:false,busy:false})
-  const materialLibraryRiskChanged=useCallback((risk:BuilderLeaveRisk)=>{materialLibraryRisk.current=risk},[])
+  const materialLibraryRiskChanged=useCallback((risk:BuilderLeaveRisk)=>{materialLibraryRisk.current=risk;if(studyRestorePending.current&&(risk.dirty||risk.busy))cancelStudyRestore(true)},[cancelStudyRestore])
   const toolLibraryRisk=useRef<BuilderLeaveRisk>({dirty:false,busy:false})
-  const toolLibraryRiskChanged=useCallback((risk:BuilderLeaveRisk)=>{toolLibraryRisk.current=risk},[])
+  const toolLibraryRiskChanged=useCallback((risk:BuilderLeaveRisk)=>{toolLibraryRisk.current=risk;if(studyRestorePending.current&&(risk.dirty||risk.busy))cancelStudyRestore(true)},[cancelStudyRestore])
   const projectCreationRequestId=useRef<string|null>(null)
   const reportLeaveRisk=useRef<ReportLeaveRisk>({dirty:false,pending:false,busy:false})
-  const reportRiskChanged=useCallback((risk:ReportLeaveRisk)=>{reportLeaveRisk.current=risk},[])
+  const reportRiskChanged=useCallback((risk:ReportLeaveRisk)=>{reportLeaveRisk.current=risk;if(studyRestorePending.current&&(risk.dirty||risk.pending||risk.busy))cancelStudyRestore(true)},[cancelStudyRestore])
   const [projectPage,setProjectPage]=useState(1)
   const [projectsLoading,setProjectsLoading]=useState(false),[projectsError,setProjectsError]=useState('')
   const [directoryOptions,setDirectoryOptions]=useState({q:'',status:'',pageSize:25,sort:'created_desc'})
@@ -107,7 +112,7 @@ function SurveyApplication(){
   useEffect(()=>()=>{clearTimeout(projectSearchTimer.current);projectListEpoch.current++},[])
   const [workspaceSection,setWorkspaceSection]=useState<WorkspaceSection>('settings')
   const builderLeaveRisk=useRef<BuilderLeaveRisk>({dirty:false,busy:false})
-  const builderRiskChanged=useCallback((risk:BuilderLeaveRisk)=>{builderLeaveRisk.current=risk},[])
+  const builderRiskChanged=useCallback((risk:BuilderLeaveRisk)=>{builderLeaveRisk.current=risk;if(studyRestorePending.current&&(risk.dirty||risk.busy))cancelStudyRestore(true)},[cancelStudyRestore])
   const [capabilitiesState,setCapabilitiesState]=useState<'loading'|'ready'|'error'>('loading')
   const [available,setAvailable]=useState<{analytics:boolean;publication:boolean}|null>(null)
   const selectedProjectId=selected?.id
@@ -134,11 +139,11 @@ function SurveyApplication(){
   const [title,setTitle]=useState(''),[description,setDescription]=useState('')
   const [mode,setMode]=useState<Project['collectionMode']>('SINGLE_UNLINKED')
   const settingsDirty=selected?title!==selected.title||description!==selected.description||mode!==selected.collectionMode:!!title.trim()||!!description.trim()||mode!=='SINGLE_UNLINKED'
-  const mayLeaveWorkspace=(includeLibrary=false)=>{
+  const mayLeaveWorkspace=useCallback((includeLibrary=false)=>{
     const report=reportLeaveRisk.current,builder=builderLeaveRisk.current
     if((includeLibrary&&toolLibraryRisk.current.busy)||workInFlight.current.writes>0||builder.busy||report.pending||report.busy){setError('当前操作尚未确认，请等待完成或核对结果后再离开项目。');return false}
     return !((includeLibrary&&toolLibraryRisk.current.dirty)||settingsDirty||builder.dirty||report.dirty)||window.confirm('当前研究有未保存的修改（研究设置、工具或报告）。确定放弃这些修改并离开？')
-  }
+  },[settingsDirty])
   useEffect(()=>{
     const warn=(event:BeforeUnloadEvent)=>{
       const report=reportLeaveRisk.current,builder=builderLeaveRisk.current
@@ -155,6 +160,7 @@ function SurveyApplication(){
     catch{setCapabilitiesState('error')}
   },[])
   const work=async(fn:()=>Promise<void>,writes=true)=>{
+    if(writes)cancelStudyRestore(true)
     workInFlight.current.total++;if(writes)workInFlight.current.writes++
     setWriteBusy(workInFlight.current.writes>0);setBusy(true);setError('');setNotice('')
     try{await fn()}catch(e){setError(e instanceof Error?e.message:'请求失败')}finally{
@@ -196,6 +202,14 @@ function SurveyApplication(){
     directoryOwner.current=user.id
     void loadProjects().catch(()=>{})
   },[user,loading,screen,researchArea,editorOpen,loadProjects])
+  const restoreStudy=useCallback(async(location:ReturnType<typeof readStudyLocation>,restoreEpoch:number)=>{
+    if(!location.id)return false
+    const project=await api<Project>('/projects/'+encodeURIComponent(location.id))
+    if(restoreEpoch!==studyRestoreEpoch.current)return false
+    setSelected(project);setTitle(project.title);setDescription(project.description);setMode(project.collectionMode)
+    setCreating(false);setWorkspaceSection(location.section);setEditorOpen(true)
+    return true
+  },[])
   const refresh=useCallback(async(openWorkspace=false)=>{
     const restoreEpoch=++studyRestoreEpoch.current
     try{
@@ -211,10 +225,7 @@ function SurveyApplication(){
         if(!me.mustChangePassword){
           if(initialStudy.id){
             try{
-              const project=await api<Project>('/projects/'+encodeURIComponent(initialStudy.id))
-              if(restoreEpoch!==studyRestoreEpoch.current)return
-              setSelected(project);setTitle(project.title);setDescription(project.description);setMode(project.collectionMode)
-              setWorkspaceSection(initialStudy.section);setEditorOpen(true)
+              await restoreStudy(initialStudy,restoreEpoch)
             }catch(error){
               if(restoreEpoch!==studyRestoreEpoch.current)return
               setSelected(null);setEditorOpen(false)
@@ -225,7 +236,7 @@ function SurveyApplication(){
       }
     }catch{setUser(null);if(initial==='login')setScreen('login')}
     finally{setLoading(false)}
-  },[initial,initialStudy])
+  },[initial,initialStudy,restoreStudy])
   useEffect(()=>{
     document.title=activeFeature?activeFeature.title+' | Research':'Research';void refresh()
     return cancelStudyRestore
@@ -289,6 +300,7 @@ function SurveyApplication(){
   const navigateResearchArea=(area:ResearchArea,path:string)=>{
     if(materialLibraryRisk.current.busy){setError('素材操作正在进行，请等待结果确认后再离开。');return}
     if(materialLibraryRisk.current.dirty&&!window.confirm('素材库有未保存的修改或待上传文件，确定离开？'))return
+    cancelStudyRestore(true)
     setResearchArea(area)
     if(area==='tools')setToolLibraryVisited(true)
     if(area==='media')setMaterialLibraryVisited(true)
@@ -298,20 +310,49 @@ function SurveyApplication(){
   }
   useEffect(()=>{
     const restore=()=>{
-      const area=readResearchArea()
-      // Same-page hash navigation also emits popstate; keep the editor open.
-      if(area===researchArea)return
-      setResearchArea(area)
-      if(area==='tools')setToolLibraryVisited(true)
-      if(area==='media')setMaterialLibraryVisited(true)
-      if(area==='studies')setEditorOpen(false)
-      focusSection(area==='studies'?'survey-projects-heading':'survey-'+area+'-heading')
+      if(loading||screen!=='work'||!user||user.mustChangePassword)return
+      const area=readResearchArea(),location=readStudyLocation()
+      const targetUrl=window.location.pathname+window.location.search+window.location.hash
+      const sameProject=!!location.id&&location.id===selectedProjectId
+      const sameLocation=area===researchArea&&(area!=='studies'||(sameProject&&editorOpen&&location.section===workspaceSection)||(!location.id&&!editorOpen))
+      cancelStudyRestore()
+      if(sameLocation){acceptedWorkspaceUrl.current=targetUrl;return}
+      const restoreUrl=()=>window.history.replaceState(null,'',acceptedWorkspaceUrl.current)
+      const material=materialLibraryRisk.current,report=reportLeaveRisk.current,builder=builderLeaveRisk.current
+      if(material.busy||toolLibraryRisk.current.busy||workInFlight.current.writes>0||builder.busy||report.pending||report.busy){
+        restoreUrl();setError('当前操作尚未确认，请等待完成或核对结果后再离开项目。');return
+      }
+      if(material.dirty&&!window.confirm('素材库有未保存的修改或待上传文件，确定离开？')){restoreUrl();return}
+      // Existing editors stay mounted for area/section changes. Only replacing
+      // the project (or abandoning creation) may discard its unsaved fields.
+      if(((area==='studies'&&location.id&&!sameProject)||creating)&&!mayLeaveWorkspace(true)){restoreUrl();return}
+      const accept=()=>{
+        acceptedWorkspaceUrl.current=targetUrl;setResearchArea(area)
+        if(area==='tools')setToolLibraryVisited(true)
+        if(area==='media')setMaterialLibraryVisited(true)
+        if(area==='studies'){
+          setEditorOpen(!!location.id);setCreating(false)
+          if(location.id)setWorkspaceSection(location.section)
+        }
+        focusSection(area==='studies'?(location.id?'survey-current-project-heading':'survey-projects-heading'):'survey-'+area+'-heading')
+      }
+      if(area!=='studies'||!location.id||sameProject){accept();return}
+      const restoreEpoch=studyRestoreEpoch.current
+      studyRestorePending.current=true;setError('')
+      void restoreStudy(location,restoreEpoch).then(restored=>{
+        if(!restored||restoreEpoch!==studyRestoreEpoch.current)return
+        studyRestorePending.current=false;accept()
+      }).catch(error=>{
+        if(restoreEpoch!==studyRestoreEpoch.current)return
+        studyRestorePending.current=false;restoreUrl()
+        setError('无法打开地址中的研究：'+(error instanceof Error?error.message:'请求失败')+'。当前编辑已保留，请重新选择。')
+      })
     }
     window.addEventListener('popstate',restore)
     return ()=>window.removeEventListener('popstate',restore)
-  },[focusSection,researchArea])
+  },[loading,screen,user,researchArea,selectedProjectId,editorOpen,workspaceSection,creating,focusSection,mayLeaveWorkspace,cancelStudyRestore,restoreStudy])
   useEffect(()=>{
-    if(loading||screen!=='work'||!user||user.mustChangePassword)return
+    if(loading||screen!=='work'||!user||user.mustChangePassword||studyRestorePending.current)return
     const url=new URL(window.location.href)
     if(researchArea==='studies')url.pathname='/workspace'
     if(researchArea==='studies'&&editorOpen&&selectedProjectId){
@@ -319,13 +360,17 @@ function SurveyApplication(){
       url.searchParams.set('project',selectedProjectId);url.searchParams.set('section',workspaceSection)
     }else{url.searchParams.delete('project');url.searchParams.delete('section');if(researchArea==='studies'&&!editorOpen&&/^#survey-(?:data|report|wave|publish|project-)/.test(url.hash))url.hash=''}
     if(url.href!==window.location.href)window.history.replaceState(null,'',url.pathname+url.search+url.hash)
+    acceptedWorkspaceUrl.current=url.pathname+url.search+url.hash
   },[loading,screen,user,researchArea,editorOpen,selectedProjectId,workspaceSection])
+  const changeWorkspaceSection=(section:WorkspaceSection)=>{cancelStudyRestore(true);setWorkspaceSection(section)}
   const choose=(p:Project)=>{
+    cancelStudyRestore(true)
     if(selected?.id===p.id){setEditorOpen(true);focusSection('survey-current-project-heading');return}
     if(!mayLeaveWorkspace()){setEditorOpen(true);return}
     setWorkspaceSection('settings');applyProject(p);focusSection('survey-current-project-heading')
   }
   const newProject=()=>{
+    cancelStudyRestore(true)
     if(!mayLeaveWorkspace())return
     projectCreationRequestId.current=null
     setError('');setNotice('')
@@ -339,7 +384,7 @@ function SurveyApplication(){
     setCreating(false);setTitle('');setDescription('');setMode('SINGLE_UNLINKED')
     focusSection('survey-projects-heading')
   }
-  const showProjectList=()=>{setEditorOpen(false);focusSection('survey-projects-heading')}
+  const showProjectList=()=>{cancelStudyRestore(true);setEditorOpen(false);focusSection('survey-projects-heading')}
   const save=(e:FormEvent)=>{e.preventDefault();if(!selected)return;void work(async()=>{
     const p=await api<Project>('/projects/'+selected.id,'PATCH',
       {revision:selected.revision,title,description,collectionMode:mode})
@@ -355,7 +400,7 @@ function SurveyApplication(){
   })
   const field=(label:string,value:string,change:(value:string)=>void,type='text')=>
     <label className="block my-3 text-sm">{label}<input className="input block mt-1 w-full" required
-      type={type} autoComplete={type==='password'?'off':'on'} value={value} onChange={e=>change(e.target.value)}/></label>
+      type={type} autoComplete={type==='password'?'off':'on'} value={value} onChange={e=>{if(studyRestorePending.current)cancelStudyRestore(true);change(e.target.value)}}/></label>
   if(screen==='home')return <SurveyLanding signedIn={user!==null}/>
   if(screen==='feature'&&activeFeature)return <SurveyFeaturePage feature={activeFeature} signedIn={user!==null}/>
   // Entry styling deliberately stops before MFA, the workspace and all timed tasks.
@@ -425,7 +470,7 @@ function SurveyApplication(){
           onPage={page=>void work(()=>loadProjects(page),false)} onRefresh={()=>void work(()=>loadProjects(projectPage),false)} onCreate={newProject}/></div>
       <div className="survey-project-editor" hidden={!editorOpen}>
       {editorOpen&&projectsError&&<div role="alert" className="survey-workspace-message survey-workspace-message--error"><p>研究列表未能更新：{projectsError}。当前研究及修改会保留。</p><button type="button" className="btn-secondary" disabled={busy} onClick={()=>void work(()=>loadProjects(projectPage),false)}>重试研究列表</button></div>}
-      {selected&&<SurveyWorkspaceNav active={workspaceSection} onChange={setWorkspaceSection} title={selected.title}
+      {selected&&<SurveyWorkspaceNav active={workspaceSection} onChange={changeWorkspaceSection} title={selected.title}
         onReturn={showProjectList}/>}
       {selected&&<section className="survey-project-settings bg-white rounded-xl border p-6 my-4"
         data-readonly={selected.status!=='DRAFT'} id="survey-workspace-settings" role={selected?'tabpanel':undefined}
@@ -436,9 +481,9 @@ function SurveyApplication(){
         <form id="survey-project-basics" tabIndex={-1} onSubmit={save} aria-busy={busy} className="survey-settings-form">
           <fieldset disabled={busy||selected.status!=='DRAFT'} className="survey-settings-fields">
             <div className="survey-settings-basics"><h3 className="survey-settings-group-title"><span>01</span>基本信息</h3>{field('研究名称',title,setTitle)}
-              <label>研究说明<textarea className="input" rows={4} value={description} onChange={e=>setDescription(e.target.value)} placeholder="说明研究目的、参与方式或适用范围"/></label></div>
+              <label>研究说明<textarea className="input" rows={4} value={description} onChange={e=>{if(studyRestorePending.current)cancelStudyRestore(true);setDescription(e.target.value)}} placeholder="说明研究目的、参与方式或适用范围"/></label></div>
             <div id="survey-project-collection" tabIndex={-1} className="survey-settings-collection"><h3 className="survey-settings-group-title"><span>02</span>采集方式</h3>
-              <label>采集方式<select className="input" value={mode} onChange={e=>setMode(e.target.value as Project['collectionMode'])}>
+              <label>采集方式<select className="input" value={mode} onChange={e=>{if(studyRestorePending.current)cancelStudyRestore(true);setMode(e.target.value as Project['collectionMode'])}}>
                 <option value="SINGLE_UNLINKED">单次独立匿名</option><option value="LINKED_WAVES">同一研究编号的多波次采集</option>
               </select></label>
               <p>{mode==='SINGLE_UNLINKED'?'每轮独立匿名作答，不关联不同时间点的回答。':'使用同一研究编号关联不同时间点的回答，须在正式采集前向被试明确告知。'}</p>
@@ -446,7 +491,7 @@ function SurveyApplication(){
           </fieldset>
           <div id="survey-project-save" tabIndex={-1} className="survey-settings-actions">
             <div className="survey-settings-save"><button type="submit" className="btn-primary" disabled={busy||selected.status!=='DRAFT'}>保存修改</button>{notice==='研究草稿已保存'&&<p role="status" className="survey-settings-feedback">{notice}</p>}</div>
-            <div className="survey-settings-secondary"><button type="button" className={selected.status==='DRAFT'?'btn-secondary':'btn-primary'} onClick={()=>setWorkspaceSection('publish')}>{selected.status==='DRAFT'?'配置问卷与采集 →':'查看问卷与采集 →'}</button><button type="button" className="survey-settings-new" disabled={busy} onClick={newProject}>新建其他项目</button></div>
+            <div className="survey-settings-secondary"><button type="button" className={selected.status==='DRAFT'?'btn-secondary':'btn-primary'} onClick={()=>changeWorkspaceSection('publish')}>{selected.status==='DRAFT'?'配置问卷与采集 →':'查看问卷与采集 →'}</button><button type="button" className="survey-settings-new" disabled={busy} onClick={newProject}>新建其他项目</button></div>
           </div>
         </form>
         {selected.collectionMode==='LINKED_WAVES'&&<SurveyParticipationSettings key={selected.id} projectId={selected.id} revision={selected.revision} request={api}

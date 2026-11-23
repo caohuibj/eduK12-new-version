@@ -212,7 +212,7 @@ export default function SurveyPublicApp(){
     void import('./survey-cognitive-retention').then(module=>module.cleanupExpiredSurveyCognitiveDrafts()).catch(()=>{/* optional maintenance retries on a later Survey open */})
   }),[])
   const publicId=useMemo(()=>window.location.pathname.match(/^\/r\/([a-f0-9-]{36})$/i)?.[1]||'',[])
-  const [personalProof]=useState(()=>readPersonalParticipationProof(window.location.hash))
+  const [personalProof,setPersonalProof]=useState(()=>readPersonalParticipationProof(window.location.hash))
   const [entryToken,setEntryToken]=useState(()=>{
     if(personalProof)return ''
     try{return readRecruitmentEntry(publicId,window.location.hash,sessionStorage)}
@@ -344,16 +344,26 @@ export default function SurveyPublicApp(){
     }
   },[publicId,attemptId,task,answers,itemTimings])
   useEffect(()=>{
-    function reopenInvitation(){
-      if(!window.location.hash.startsWith('#entry='))return
-      const incoming=readRecruitmentEntry(publicId,window.location.hash,null)
+    function reopenParticipation(){
+      const hash=window.location.hash
+      if(!hash.startsWith('#entry=')&&!new URLSearchParams(hash.slice(1)).has('resume'))return
+      const incomingProof=readPersonalParticipationProof(hash)
+      const incoming=readRecruitmentEntry(publicId,hash,null)
+      // A saved link can reopen this same document after a refresh. Remove its
+      // bearer before any request, and never replace an existing participant.
       window.history.replaceState(null,'',window.location.pathname+window.location.search)
-      if(!isRecruitmentEntryToken(incoming)||personalProof||busy||task||attemptId||researchCode||accessCredential||singleResume||general||completion||revoked||withdrawn)return
-      setEntryToken(incoming)
+      if(personalProof||busy||task||attemptId||researchCode||accessCredential||singleResume||general||completion||revoked||withdrawn)return
+      if(incomingProof){
+        hasScopedInfoRequest.current=false
+        setEntryToken('')
+        setResearchCode(incomingProof.researchCode);setAccessCredential(incomingProof.accessCredential)
+        setPersonalProof(incomingProof)
+      }else if(isRecruitmentEntryToken(incoming))setEntryToken(incoming)
+      else return
       refreshDiscovery(value=>value+1)
     }
-    window.addEventListener('hashchange',reopenInvitation)
-    return ()=>window.removeEventListener('hashchange',reopenInvitation)
+    window.addEventListener('hashchange',reopenParticipation)
+    return ()=>window.removeEventListener('hashchange',reopenParticipation)
   },[publicId,personalProof,busy,task,attemptId,researchCode,accessCredential,singleResume,general,completion,revoked,withdrawn])
   useEffect(()=>{
     document.title='Huisurvey · 研究参与'
@@ -526,6 +536,17 @@ export default function SurveyPublicApp(){
     codeHome(result.waves)
   })
   const chooseWave=(wave:Wave)=>{
+    const completed=wave.attempt
+    if(linkedIdentityReady&&completed?.status==='COMPLETED'){
+      const proof={...(researchCode?{researchCode}:{}),accessCredential}
+      void run(async()=>{
+        // Reading an existing receipt is not a new participation or consent.
+        // The ordinary reader still verifies the current participant and FINAL.
+        await readCompletion(completed.id,proof)
+        markCompleted(completed.id,proof)
+      },'正在读取已完成问卷的回执…')
+      return
+    }
     setSelectedWave(wave);setAgreed(false);setTask(null);setGeneral(null);setCompletion(null);setWithdrawn(false);setRevoked(false)
     window.requestAnimationFrame(()=>{
       const consent=document.getElementById('survey-participant-consent')
@@ -954,7 +975,7 @@ export default function SurveyPublicApp(){
   },'正在提交，请勿刷新或重复操作…').finally(()=>{finalInFlight.current=false})}
   const saveCheckpoint=()=>{if(!task?.checkpointPolicy?.enabled||!attemptId)return
     if(checkpointOverwritePending&&!window.confirm(
-      '确认用当前本地答案替换另一设备保存的服务器 Checkpoint？此操作不能恢复被覆盖的未提交草稿。',
+      '确认用当前答案替换服务器上较新的加密临时进度？被覆盖的未提交草稿无法恢复。',
     ))return
     void run(async()=>{
       // Only the current route is eligible for a voluntary server checkpoint.
@@ -984,7 +1005,9 @@ export default function SurveyPublicApp(){
       setCheckpointRevision(saved.revision)
       setCheckpointOverwritePending(false)
       setNotice('已加密暂存未完成答案，至 '+new Date(saved.expiresAt).toLocaleString('zh-CN')+
-        ' 有效。这不是正式答卷（FINAL）；另一设备更改后须重新读取以避免覆盖。')
+        ' 有效。暂存不等于交卷，请完成后提交整份问卷。'+(info?.project.collectionMode==='LINKED_WAVES'
+          ?'使用保存的专属链接或完整研究编码恢复；另一设备更改后须重新读取，以免覆盖。'
+          :'本次独立匿名作答仅支持原标签页恢复，请保留此页并尽量一次完成。'))
     })
   }
   const revokeAccess=()=>{if(info?.project.collectionMode!=='LINKED_WAVES'||!researchCode||!accessCredential)return
@@ -1091,7 +1114,7 @@ export default function SurveyPublicApp(){
       {withdrawn&&<p role="status" className="border-l-4 border-teal-600 p-4">
         您的研究数据撤回请求已被记录。后续统计和新导出将排除可定位回答。
       </p>}
-      {!info&&!loading&&<section className="space-y-3"><label className="block text-sm">请从原研究邀请中复制 43 位凭证重试。
+      {!info&&!loading&&<section className="space-y-3"><label className="block text-sm">请重新打开完整的研究邀请链接；如需手动恢复，可在下方粘贴邀请中的访问凭证。
         <input className="input block w-full mt-2" autoComplete="off"
           aria-label="重新输入研究邀请凭证" value={entryToken}
           onChange={event=>setEntryToken(event.target.value.trim())}/>
@@ -1138,7 +1161,7 @@ export default function SurveyPublicApp(){
       {!task&&!general&&!completion&&!revoked&&!streamlinedRandomEntry&&!codeReturnEntry&&!identitySavePending&&<section className={panel('bg-white rounded-xl border p-5')+' survey-entry-options'}>
         {directConsentEntry?<div className="survey-consent-intro">
           <div className="survey-consent-anonymity" aria-label="匿名参与方式">
-            <strong>完全匿名：</strong><span>无需登录，不记录个人信息，放心作答</span>
+            <strong>独立匿名作答</strong><span>无需注册；具体记录范围请阅读下方研究说明。</span>
           </div>
           <p className="survey-entry-eyebrow">诚邀你参与</p>
           <h2>{info.project.name}</h2>
@@ -1221,8 +1244,10 @@ export default function SurveyPublicApp(){
             每次最多 64KB，保存期 {task.checkpointPolicy.ttlHours} 小时；不计入正式研究答卷（FINAL）。</p>
           <button type="button" className={action('btn-secondary')} disabled={busy||cognitiveRunning} onClick={saveCheckpoint}>
             保存加密临时进度（第 {checkpointRevision+1} 版）</button>
-          <p className="text-xs text-slate-500">研究者不会通过此按钮获得正式作答，取消、撤回或最终提交后将按策略清理。
-            仅拥有本研究合法私密凭证的当前参与者可以恢复。</p>
+          <p className="text-xs text-slate-500">临时保存不会形成正式答卷；取消、撤回或正式提交后，将按研究设置清理。
+            {info?.project.collectionMode==='LINKED_WAVES'
+              ?'恢复时请使用自己保存的专属链接或完整研究编码。'
+              :'本次独立匿名作答仅支持原标签页恢复；请保留此页，更换设备不能直接找回。'}</p>
         </section>}
         {cognitiveSessions.length>0&&Object.keys(lockedAnswers).length>0&&<p role="status" className="text-sm text-amber-800">认知任务已开始，之前的答案已锁定。完成认知任务后，还需提交整份问卷。</p>}
         {cognitiveRunning&&<p role="status" className="text-sm">认知任务运行／提交期间不能切换外层研究步骤。请勿刷新或离开页面。</p>}
@@ -1261,8 +1286,13 @@ export default function SurveyPublicApp(){
         }))}>{busy&&finalInFlight.current?'正在提交…':finalSealed?'重试原提交':currentFlow?.termination==='SCREEN_OUT'?'完成资格筛选':cognitiveSessions.length?'提交整份问卷':'提交本轮正式回答'}</button>}
         {!cognitiveRunning&&!finalSealed&&<div className="text-xs text-slate-500 space-y-1" aria-label="作答提醒">
           <p>{task.checkpointPolicy?.enabled
-            ?'离开前请保存加密临时进度，并保管好私密凭证。'
+            ?info?.project.collectionMode==='LINKED_WAVES'
+              ?'离开前请保存加密临时进度，并保存好专属链接或完整研究编码。'
+              :'请主动保存加密临时进度，并保留当前标签页。暂存不等于交卷，请尽量一次完成。'
             :'答案仅在此标签页暂存，最长两小时；关闭页面或更换设备后无法恢复，请尽量一次完成。'}</p>
+          {info?.project.collectionMode==='LINKED_WAVES'&&<p>{codeMode
+            ?'刷新后，请使用保存的完整研究编码继续参加。'
+            :'刷新后，请重新打开已保存的专属链接，再选择本轮以恢复暂存答案。'}</p>}
           {finalSubmitVisible&&<p>检查完成后点击提交，看到完成提示即表示已保存。</p>}
         </div>}
       </form>}

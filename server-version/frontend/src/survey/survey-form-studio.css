@@ -196,3 +196,22 @@
 .survey-researcher .is-form .survey-form-choice-add { display:flex; justify-content:center; align-items:center; gap:.35rem; width:100%; min-height:36px; border:1px dashed var(--survey-brand-border); border-radius:.4rem; background:transparent; color:var(--survey-brand-muted); font-size:.75rem; }
 .survey-form-bulk-preview { max-height:9rem; overflow:auto; padding:.6rem .8rem .6rem 2rem; margin:0; list-style:decimal; border:1px solid var(--survey-brand-line); border-radius:.4rem; background:var(--survey-brand-subtle); color:var(--survey-brand-muted); font-size:.8rem; line-height:1.8; overflow-wrap:anywhere; }
 @media(max-width:40rem){.survey-form-choice-list .survey-form-option-row{display:grid;grid-template-columns:1.1rem minmax(0,1fr)}.survey-form-choice-actions{grid-column:2;justify-content:flex-end}}
+
+/* Preserve clear touch targets for question and choice editing. */
+@media (max-width:40rem) {
+  .survey-researcher .survey-tool-template.is-form :is(.survey-form-choice-actions,.survey-form-order-actions,.survey-form-item-actions)>button { width:44px; min-width:44px; min-height:44px; }
+  .survey-researcher .survey-tool-template.is-form :is(.survey-form-choice-add,.survey-form-bulk-body button,.survey-form-compose-help>summary) { min-height:44px; }
+  .survey-researcher .survey-tool-template.is-form .survey-form-choice-actions { gap:4px; }
+}
+
+@media(max-width:40rem){
+ .survey-researcher .survey-tool-template>.survey-form-toolbar button { min-height:44px; }
+ .survey-researcher .survey-tool-template>.survey-form-toolbar .survey-form-rename { min-width:44px; }
+ .survey-researcher .survey-tool-template>.survey-library-help>summary,
+ .survey-researcher .survey-tool-template>.survey-template-fields>.survey-library-help>summary { min-height:44px; padding-block:10px; line-height:1.8; }
+}
+
+.survey-researcher .survey-tool-template>.survey-form-toolbar .survey-form-complete { min-height:44px; padding:10px 14px; border-radius:9px; font-size:13px; }
+@media(max-width:40rem){.survey-researcher .survey-tool-template>.survey-form-toolbar .survey-form-complete{flex-basis:100%;width:100%}}
+
+@media(max-width:40rem){.survey-researcher .survey-tool-template.is-form :is(.survey-form-bulk-lines>summary,.survey-form-commit-actions>button){min-height:44px}}

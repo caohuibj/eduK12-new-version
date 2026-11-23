@@ -100,3 +100,12 @@
  .survey-researcher .survey-directory-view-options label { flex:1; }
  .survey-researcher .survey-directory-view-options .input { width:100%; min-width:0; }
 }
+
+/* Six status choices remain an even, touchable grid on a phone. */
+@media (max-width:40rem) {
+  .survey-researcher .survey-project-directory .survey-directory-status-filters { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }
+  .survey-researcher .survey-project-directory .survey-directory-status-filters>button { width:100%; min-height:44px; padding:9px 6px; font-size:12px; }
+  .survey-researcher .survey-project-directory :is(.survey-project-actions,.survey-directory-pagination) button,
+  .survey-researcher .survey-project-directory :is(.survey-project-description-toggle,.survey-directory-active-filters>button) { min-height:44px; }
+  .survey-researcher .survey-project-directory .survey-directory-view-options select { min-height:44px; font-size:16px; }
+}
