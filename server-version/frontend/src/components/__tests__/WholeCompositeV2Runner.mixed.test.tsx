@@ -454,5 +454,147 @@ describe('WholeCompositeV2Runner (4-in-1 Form + Scale + SJT + Cognitive)', () =>
     await waitFor(() => expect(onCompleted).toHaveBeenCalledTimes(1))
     expect(submittedPayloads[0].submissionId).toBe(firstSubId)
     expect(Object.keys(submittedPayloads[0].units)).toEqual(['scale:item-scale'])
+    // Timing was disabled -> no per-answer timing telemetry attached (P1-05)
+    expect(submittedPayloads[0].units['scale:item-scale'].timings).toBeUndefined()
+    expect(submittedPayloads[0].units['scale:item-scale'].answers[0].responseTimeMs).toBeUndefined()
+  })
+
+  it('prompts explicit conflict choice on plain draft 409 instead of silently overwriting server drafts (P1-03)', async () => {
+    window.localStorage?.clear()
+    const { client } = makeMockV2Client()
+    let saveCalls = 0
+    client.saveCheckpoint = vi.fn(async input => {
+      saveCalls += 1
+      if (saveCalls === 1) {
+        const err = Object.assign(new Error('版本冲突'), { response: { status: 409, data: { code: 'CHECKPOINT_CONFLICT', message: '版本冲突' } } })
+        throw err
+      }
+      return {
+        code: 0,
+        message: '成功',
+        data: {
+          attemptId: 'att-v2-1',
+          attemptEpoch: 1,
+          publicationHash: PUB_HASH,
+          revision: input.expectedRevision + 1,
+          saveCount: 2,
+          lockedSlotKeys: [],
+          expiresAt: null,
+          updatedAt: '2026-11-24T02:00:00.000Z',
+          envelope: { schemaVersion: 1 as const, drafts: input.drafts, lockedUnits: {} },
+        },
+      }
+    })
+    const origLoadMeta = client.loadMeta
+    let metaCalls = 0
+    client.loadMeta = vi.fn(async () => {
+      metaCalls += 1
+      const res = await origLoadMeta()
+      if (metaCalls >= 2) {
+        return {
+          ...res,
+          data: {
+            ...res.data,
+            checkpoint: {
+              ...res.data.checkpoint,
+              revision: 2,
+              updatedAt: '2026-11-24T01:59:00.000Z',
+              envelope: {
+                schemaVersion: 1 as const,
+                drafts: { 'form:sec-1': { 'fi-grade': '7' } },
+                lockedUnits: {},
+              },
+            },
+          },
+        }
+      }
+      return res
+    })
+
+    const onExit = vi.fn()
+    render(
+      <WholeCompositeV2Runner
+        attemptId="att-v2-conflict"
+        client={client}
+        onExit={onExit}
+        onCompleted={vi.fn()}
+      />,
+    )
+
+    await screen.findByText('您的年级')
+    fireEvent.click(screen.getByText('八年级'))
+    fireEvent.click(screen.getByRole('button', { name: '保存并退出' }))
+
+    // Must NOT silently overwrite! Shows explicit conflict choices and stays on page
+    const adoptBtn = await screen.findByRole('button', { name: '采用云端最新草稿' })
+    expect(saveCalls).toBe(1)
+    expect(onExit).not.toHaveBeenCalled()
+
+    // Adopting server draft switches cleanly to server's value without calling saveCheckpoint again
+    fireEvent.click(adoptBtn)
+    await waitFor(() => expect(screen.queryByRole('button', { name: '采用云端最新草稿' })).toBeNull())
+    expect(saveCalls).toBe(1)
+  })
+
+  it('distinguishes other-tab submission mismatch on sealed recovery and offers reload exit on terminal 409 (P1-04)', async () => {
+    window.localStorage?.clear()
+    const { client } = makeMockV2Client()
+    const origLoadMeta = client.loadMeta
+    let metaCalls = 0
+    client.loadMeta = vi.fn(async () => {
+      metaCalls += 1
+      const res = await origLoadMeta()
+      if (metaCalls === 1) {
+        return { ...res, data: { ...res.data, activeSlotKeys: ['scale:item-scale'] } }
+      }
+      return {
+        ...res,
+        data: {
+          ...res.data,
+          activeSlotKeys: ['scale:item-scale'],
+          existingReceipt: {
+            status: 'COMPLETED' as const,
+            attemptId: 'att-v2-1',
+            attemptEpoch: 1,
+            submissionId: 'other-tab-submission-id',
+            payloadHash: '3'.repeat(64),
+            aggregateHash: '4'.repeat(64),
+            factsHash: '5'.repeat(64),
+            rawHash: '6'.repeat(64),
+            completedAt: '2026-11-24T01:10:00.000Z',
+            receiptOnly: false,
+            feedbackAvailable: true,
+            replayed: true,
+          },
+        },
+      }
+    })
+    client.submitWhole = vi.fn(async () => {
+      throw new Error('网络超时')
+    })
+    const onCompleted = vi.fn()
+
+    render(
+      <WholeCompositeV2Runner
+        attemptId="att-v2-other-tab"
+        client={client}
+        onExit={vi.fn()}
+        onCompleted={onCompleted}
+      />,
+    )
+
+    await screen.findByText('我最近情绪平稳')
+    fireEvent.click(screen.getByText('非常符合'))
+    fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
+
+    const retryBtn = await screen.findByRole('button', { name: '核对并重试提交' })
+    fireEvent.click(retryBtn)
+
+    // Must explicitly notify user that another tab/device completed with a different submissionId
+    await screen.findByText('此测评已在其他窗口或设备完成提交')
+    expect(onCompleted).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: '确认并查看结果' }))
+    expect(onCompleted).toHaveBeenCalledTimes(1)
   })
 })

@@ -58,6 +58,13 @@ export interface WholeV2CheckpointPutInput {
   }
 }
 
+export interface WholeV2PersistencePolicyView {
+  draftCheckpointEnabled: boolean
+  draftTtlHours: number | null
+  localCognitiveEnabled: boolean
+  localCognitiveTtlHours: number | null
+}
+
 export interface WholeV2Meta {
   executionMode: 'WHOLE_V2'
   attemptId: string
@@ -68,6 +75,8 @@ export interface WholeV2Meta {
   templateHash: string
   activeSlotKeys?: string[] | null
   receiptOnly: boolean
+  timingEnabled?: boolean
+  persistencePolicy?: WholeV2PersistencePolicyView
   unitSeeds: Record<string, string> | null
   checkpoint: WholeV2CheckpointSnapshot
   existingReceipt?: WholeV2Receipt | null
