@@ -1110,9 +1110,19 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
   })
 
 
-  it('freezes, answers, audits and privacy-filters an actual V2 Form FINAL in PostgreSQL',async()=>{
+  it('freezes all thirteen Form question types, submits one FINAL and verifies researcher readback and export',async()=>{
+    const options=[{optionKey:'a',label:'A'},{optionKey:'b',label:'B'}]
+    const rows=[{rowKey:'first',label:'第一个维度'}]
     const professional:FormDraft={schemaVersion:2,pages:[{pageKey:'formv2',title:'研究任务',questions:[
       {itemKey:'date',type:'DATE',prompt:'日期',required:true,options:[],rows:[]},
+      {itemKey:'clock',type:'TIME',prompt:'时间',required:true,options:[],rows:[],timeZone:'Asia/Shanghai'},
+      {itemKey:'one',type:'SINGLE',prompt:'单选',required:true,options,rows:[]},
+      {itemKey:'short',type:'SHORT_TEXT',prompt:'简答',required:true,options:[],rows:[]},
+      {itemKey:'long',type:'LONG_TEXT',prompt:'长答',required:true,options:[],rows:[]},
+      {itemKey:'number',type:'NUMBER',prompt:'数值',required:true,options:[],rows:[]},
+      {itemKey:'rating',type:'LIKERT',prompt:'程度',required:true,options,rows:[]},
+      {itemKey:'matrix',type:'MATRIX',prompt:'每行单选',required:true,options,rows},
+      {itemKey:'matrixmany',type:'MATRIX_MULTIPLE',prompt:'每行多选',required:true,options,rows},
       {itemKey:'rank',type:'RANK_ORDER',prompt:'排序',required:true,rows:[],
         options:[{optionKey:'a',label:'A'},{optionKey:'b',label:'B'}]},
       {itemKey:'slider',type:'SLIDER',prompt:'滑块',required:true,rows:[],
@@ -1138,6 +1148,8 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     expect(JSON.stringify(unit)).not.toContain('privateScoring')
     const baseline={
       date:'2024-02-29',rank:['b','a'],slider:2,total:{a:0,b:10},
+      clock:'09:30',one:'a',short:'合成短答',long:'仅用于本机核对的合成长答',
+      number:7,rating:'b','matrix:first':'a','matrixmany:first':['a','b'],
       choice:['a','other'],'choice:other':'个人敏感自由文字',
     }
     await expect(submitResearchFinal({
@@ -1162,6 +1174,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     expect(projected.raw.map(r=>r.itemKey)).toEqual(['rank'])
     expect(projected.scores).toEqual([])
     expect(projected.codebook.some(r=>r.itemKey==='choice:other')).toBe(true)
+    expect(new Set(source.raw.map(row=>row.itemKey))).toEqual(new Set(Object.keys(baseline)))
     const other=source.raw.find(r=>r.itemKey==='choice:other')
     expect(other?.value).toBe('个人敏感自由文字')
     expect(source.codebook.find(row=>row.itemKey==='choice:other'))

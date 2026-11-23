@@ -45,7 +45,7 @@ type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Wave={id:string;title:string;ordinal:number;status:string;consentText:string;consentVersion:number;
   opensAt:string|null;closesAt:string|null;allowNewParticipants:boolean;attempt?:{id:string;status:string}|null;
   groupIpPolicy?:{schemaVersion:1;timeZone:string;activationDate?:string}|null;groupIpActivatedAt?:string|null}
-type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string;participantIdentityMode?:'PERSONAL_LINK'|'MEMORABLE_CODE'|'SELF_CODE';participantCodeLabel?:string;participantCodeInstructions?:string};waves:Wave[];scopeWaveId?:string|null}
+type StudyInfo={project:{hasPersonalTracking?:boolean;name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string;participantIdentityMode?:'PERSONAL_LINK'|'MEMORABLE_CODE'|'SELF_CODE';participantCodeLabel?:string;participantCodeInstructions?:string};waves:Wave[];scopeWaveId?:string|null}
 type Task={attemptId:string;waveId:string;status:string;definitionDigest:string;units:Unit[];reportMode:'GENERAL_ONLY'|'DESCRIPTIVE';cognitiveSessions?:SurveyCognitiveSessionInfo[];lockedPriorAnswers?:Record<string,Record<string,Answer>>;flow?:PublicFlow;checkpointPolicy?:{enabled:true;ttlHours:number}}
 type ParticipantFeedbackBase={instrumentKey:string;title:string;quality:string;rawScoreFeedback?:import('../modules/scale/rawScoreFeedback').MatchedRawScoreFeedback[];declaredReport?:SurveyDeclaredReport}
 type ParticipantFeedback=ParticipantFeedbackBase&(
@@ -218,6 +218,7 @@ export default function SurveyPublicApp(){
     try{return readRecruitmentEntry(publicId,window.location.hash,sessionStorage)}
     catch{return readRecruitmentEntry(publicId,window.location.hash,null)}
   })
+  const [discoveryRevision,refreshDiscovery]=useState(0)
   const [info,setInfo]=useState<StudyInfo|null>(null),[loading,setLoading]=useState(true)
   const [error,setError]=useState(''),[busy,setBusy]=useState(false)
   const [busyLabel,setBusyLabel]=useState('')
@@ -343,6 +344,18 @@ export default function SurveyPublicApp(){
     }
   },[publicId,attemptId,task,answers,itemTimings])
   useEffect(()=>{
+    function reopenInvitation(){
+      if(!window.location.hash.startsWith('#entry='))return
+      const incoming=readRecruitmentEntry(publicId,window.location.hash,null)
+      window.history.replaceState(null,'',window.location.pathname+window.location.search)
+      if(!isRecruitmentEntryToken(incoming)||personalProof||busy||task||attemptId||researchCode||accessCredential||singleResume||general||completion||revoked||withdrawn)return
+      setEntryToken(incoming)
+      refreshDiscovery(value=>value+1)
+    }
+    window.addEventListener('hashchange',reopenInvitation)
+    return ()=>window.removeEventListener('hashchange',reopenInvitation)
+  },[publicId,personalProof,busy,task,attemptId,researchCode,accessCredential,singleResume,general,completion,revoked,withdrawn])
+  useEffect(()=>{
     document.title='Huisurvey · 研究参与'
     // Both invitation and personal capabilities leave history before any fetch.
     // The participant deliberately saves the generated link; never persist it here.
@@ -375,7 +388,7 @@ export default function SurveyPublicApp(){
       .catch(e=>{if(current&&request===requests.current)setError(parseError(e))})
       .finally(()=>{if(current&&request===requests.current)setLoading(false)})
     return()=>{current=false;requests.current++}
-  },[base,publicId,infoEntryToken,personalProof])
+  },[base,publicId,infoEntryToken,personalProof,discoveryRevision])
   const focusStep=()=>window.requestAnimationFrame(()=>{if(!cognitiveRunningRef.current)document.getElementById('survey-task-step')?.focus()})
   const revealAnswer=(unit:Unit,itemKey?:string,correctRejectedAnswer=false)=>{
     if(cognitiveRunningRef.current)return
@@ -423,10 +436,17 @@ export default function SurveyPublicApp(){
   const run=async(task:()=>Promise<void>,label='正在处理，请稍候…')=>{
     setError('');setNotice('');setBusyLabel(label);setBusy(true)
     try{await task()}catch(e){
-      const message=parseError(e);setError(message)
+      const message=parseError(e)
       // Locate a server-rejected answer without changing validation or payloads.
       const target=rejectedAnswerTarget(message)
-      if(target)revealAnswer(target.unit,target.itemKey)
+      if(target){
+        const {unit,itemKey}=target
+        const prompt=unit.pages?.flatMap(page=>page.questions).find(q=>q.itemKey===itemKey)?.prompt
+          ??unit.items?.find(q=>q.itemKey===itemKey)?.prompt
+          ??(unit.scenes?.flatMap(scene=>scene.questions)??unit.questions)?.find(q=>q.questionKey===itemKey)?.prompt
+        setError(message.replace(/answers\.[a-z][a-z0-9_-]*(?:\.[a-z][a-z0-9_-]*)?/i,()=>prompt?'「'+prompt+'」':unit.title))
+        revealAnswer(unit,itemKey)
+      }else setError(message)
     }finally{setBusy(false);setBusyLabel('')}
   }
   // Same path and body on every attempt. 400/401/409/413/429 are not retried.
@@ -1139,6 +1159,10 @@ export default function SurveyPublicApp(){
             onChange={event=>setEntryToken(event.target.value.trim())}
             placeholder="输入研究邀请凭证"/>
         </label>}
+        {!home&&!participationWaves.length&&validEntry&&!singleResume&&<div className="space-y-2">
+          <p role="status">当前邀请暂无开放的问卷。</p>
+          <button type="button" className={action('btn-secondary')} disabled={busy} onClick={()=>refreshDiscovery(value=>value+1)}>重新检查开放状态</button>
+        </div>}
         {home&&visibleWaves.every(wave=>wave.status!=='OPEN'||['COMPLETED','SCREENED_OUT'].includes(wave.attempt?.status??''))&&
           <p className="survey-entry-next">目前没有待填写的问卷。请保存专属链接，下次开放后再来。</p>}
         {!directConsentEntry&&participationWaves.map(wave=><div key={wave.id} className="survey-wave-row border-b py-3 flex items-center justify-between gap-3">
@@ -1200,7 +1224,7 @@ export default function SurveyPublicApp(){
           <p className="text-xs text-slate-500">研究者不会通过此按钮获得正式作答，取消、撤回或最终提交后将按策略清理。
             仅拥有本研究合法私密凭证的当前参与者可以恢复。</p>
         </section>}
-        {cognitiveSessions.length>0&&Object.keys(lockedAnswers).length>0&&<p role="status" className="text-sm text-amber-800">认知任务已经开始，前置工具答案已锁定。此任务已提交与本轮研究已提交分别确认。</p>}
+        {cognitiveSessions.length>0&&Object.keys(lockedAnswers).length>0&&<p role="status" className="text-sm text-amber-800">认知任务已开始，之前的答案已锁定。完成认知任务后，还需提交整份问卷。</p>}
         {cognitiveRunning&&<p role="status" className="text-sm">认知任务运行／提交期间不能切换外层研究步骤。请勿刷新或离开页面。</p>}
         {task.flow&&currentFlow?<>
           <p className="text-xs text-slate-500">研究流程 · 步骤 {Math.min(flowStep+1,currentFlow.blocks.length)} / {currentFlow.blocks.length}</p>
@@ -1234,7 +1258,7 @@ export default function SurveyPublicApp(){
             own(answers,unit.instrumentKey)??{})
           const pages=(unit.pages||[]).filter(p=>p.questions.some(q=>vis.has(q.itemKey)))
           return (own(formPages,unit.instrumentKey)??0)>=pages.length-1
-        }))}>{busy&&finalInFlight.current?'正在提交…':finalSealed?'重试原提交':currentFlow?.termination==='SCREEN_OUT'?'完成资格筛选':'提交本轮正式回答'}</button>}
+        }))}>{busy&&finalInFlight.current?'正在提交…':finalSealed?'重试原提交':currentFlow?.termination==='SCREEN_OUT'?'完成资格筛选':cognitiveSessions.length?'提交整份问卷':'提交本轮正式回答'}</button>}
         {!cognitiveRunning&&!finalSealed&&<div className="text-xs text-slate-500 space-y-1" aria-label="作答提醒">
           <p>{task.checkpointPolicy?.enabled
             ?'离开前请保存加密临时进度，并保管好私密凭证。'
@@ -1278,7 +1302,7 @@ export default function SurveyPublicApp(){
           </article>)}
         </section>}
         {general.nativeBundles?.map(bundle=><section key={bundle.importId} aria-label="整体理论报告"><h2>{bundle.title}</h2>{bundle.derivedView?<BundleDerivedReport view={bundle.derivedView}/>:bundle.profileView?<BundleProfileSummary view={bundle.profileView}/>:<p>综合结果暂不可用；单项作答已保存。</p>}</section>)}
-        {info.project.collectionMode==='LINKED_WAVES'&&completion&&<SurveyPersonalChanges publicId={publicId} attemptId={completion.attemptId} proof={completion.proof}/>}
+        {info.project.collectionMode==='LINKED_WAVES'&&info.project.hasPersonalTracking!==false&&completion&&<SurveyPersonalChanges publicId={publicId} attemptId={completion.attemptId} proof={completion.proof}/>}
         {info.project.collectionMode==='LINKED_WAVES'&&<div className="survey-completion-primary">
           <button type="button" className={action('btn-secondary')} disabled={busy} onClick={returnHome}>返回我的研究波次</button>
         </div>}

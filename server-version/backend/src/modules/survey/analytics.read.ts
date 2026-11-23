@@ -26,10 +26,11 @@ export async function waveOverview(actorUserId:string,projectId:string){
     const project=await authorized(tx,actorUserId,projectId)
     const waveRows=await tx.$queryRaw<Array<{
       id:string;ordinal:number;title:string;status:string;starts:number;
-      finalCompleted:number;analysisIncluded:number;qualityExcluded:number;uniqueLinkedCodes:number;excluded:number
+      completedTotal:number;finalCompleted:number;analysisIncluded:number;qualityExcluded:number;uniqueLinkedCodes:number;excluded:number
     }>>`
       SELECT w.id,w.ordinal,w.title,w.status,
         COUNT(swa.id)::int AS starts,
+        COUNT(sf.id)::int AS "completedTotal",
         COUNT(sf.id) FILTER (
           WHERE swa.status='COMPLETED' AND sf.id IS NOT NULL
             AND swa.excluded_at IS NULL
