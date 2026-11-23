@@ -28,7 +28,7 @@ function makeTemplateStore() {
 }
 
 /** In-memory fake DB tracking EVERY SQL statement to guarantee 0 legacy child-table writes. */
-function makeSingleRowFinalTxDb() {
+function makeSingleRowFinalTxDb(initialParent?: { status: string; attemptEpoch: number; publicationHash: string | null }) {
   const finals = new Map<string, any>()
   const finalsBySubmission = new Map<string, any>()
   const checkpoints = new Map<string, any>()
@@ -36,11 +36,20 @@ function makeSingleRowFinalTxDb() {
   const executionUpdates: string[] = []
   const assignmentUpdates: string[] = []
   const executedSqls: string[] = []
+  const parentState = {
+    status: initialParent?.status ?? 'IN_PROGRESS',
+    attemptEpoch: initialParent?.attemptEpoch ?? 1,
+    publicationHash: initialParent?.publicationHash ?? null as string | null,
+  }
+  const runStatus = { execution: 'STARTED', assignment: 'STARTED' }
 
   const db: any = {
     $queryRaw: vi.fn(async (sql: any) => {
       const text = Array.isArray(sql?.strings) ? sql.strings.join('?') : String(sql?.sql ?? '')
       executedSqls.push(text)
+      if (text.includes('FROM composite_assessment_attempts')) {
+        return [{ ...parentState }]
+      }
       if (text.includes('FROM composite_attempt_finals') && text.includes('submission_id =')) {
         const [attemptId, attemptEpoch, submissionId] = sql.values
         const row = finals.get(`${attemptId}:${attemptEpoch}`) ?? finalsBySubmission.get(submissionId)
@@ -84,14 +93,20 @@ function makeSingleRowFinalTxDb() {
         return 1
       }
       if (text.includes('UPDATE composite_assessment_attempts')) {
+        if (parentState.status !== 'IN_PROGRESS') return 0
+        parentState.status = 'COMPLETED'
         attemptUpdates.push(sql.values)
         return 1
       }
       if (text.includes('UPDATE assessment_run_executions')) {
+        if (!['ASSIGNED', 'STARTED'].includes(runStatus.execution)) return 0
+        runStatus.execution = 'COMPLETED'
         executionUpdates.push(sql.values[2])
         return 1
       }
       if (text.includes('UPDATE relational_assessment_assignments')) {
+        if (!['OPEN', 'STARTED'].includes(runStatus.assignment)) return 0
+        runStatus.assignment = 'COMPLETED'
         assignmentUpdates.push(sql.values[2])
         return 1
       }
@@ -112,7 +127,7 @@ function makeSingleRowFinalTxDb() {
       return 0
     }),
   }
-  return { db, finals, checkpoints, attemptUpdates, executionUpdates, assignmentUpdates, executedSqls }
+  return { db, finals, checkpoints, attemptUpdates, executionUpdates, assignmentUpdates, executedSqls, parentState, runStatus }
 }
 
 function makeGonogoTrials(randomSeed: string, count = 8) {
@@ -146,7 +161,7 @@ describe('composite-final.writer (synchronous 1-tx 4-in-1 single-row FINAL)', ()
 
   it('commits Form + Scale + SJT + Cognitive atomically in 1 row with 0 child writes and full reader roundtrip', async () => {
     const { store } = makeTemplateStore()
-    const { db, finals, checkpoints, attemptUpdates, executionUpdates, assignmentUpdates, executedSqls } = makeSingleRowFinalTxDb()
+    const { db, finals, checkpoints, attemptUpdates, executionUpdates, assignmentUpdates, executedSqls, parentState } = makeSingleRowFinalTxDb()
     const fixture = buildFourFamilyTestSlots()
     const compositeId = randomUUID()
     const attemptId = randomUUID()
@@ -158,6 +173,7 @@ describe('composite-final.writer (synchronous 1-tx 4-in-1 single-row FINAL)', ()
       title: '四合一压测混合卷',
       slots: fixture.slots,
     })
+    parentState.publicationHash = plan.publicationHash
     const seeds = generateCompositeUnitSeeds(plan, attemptId, 1)!
     const cogSlotKey = `cognitive:${fixture.cogItemId}`
     const cogTrials = makeGonogoTrials(seeds.seeds[cogSlotKey], 8)
@@ -202,7 +218,11 @@ describe('composite-final.writer (synchronous 1-tx 4-in-1 single-row FINAL)', ()
         [`scale:${fixture.scaleItemId}`]: {
           unitType: 'SCALE' as const,
           definitionHash: fixture.scaleDefHash,
-          answers: scaleGold.answers,
+          answers: scaleGold.answers.map((a, idx) => ({
+            ...a,
+            responseTimeMs: 400 + idx * 25,
+            changeCount: idx === 0 ? 1 : 0,
+          })),
         },
         [`situational:${fixture.sjtItemId}`]: {
           unitType: 'SITUATIONAL' as const,
@@ -291,11 +311,25 @@ describe('composite-final.writer (synchronous 1-tx 4-in-1 single-row FINAL)', ()
       expect(cogFact.trialCount).toBe(8)
       expect(cogFact.testType).toBe('gonogo')
       expect(Object.keys(cogFact.metrics).length).toBeGreaterThan(0)
+      expect(Object.keys(cogFact.reportSummary).length).toBeGreaterThan(0)
+      expect(cogFact.reportSummary.title).toBeTruthy()
     }
 
     const rawMap = await readCompositeFinalRawBatch(db, [{ attemptId, attemptEpoch: 1 }])
     const raw = rawMap.get(`${attemptId}:1`)!.raw
     expect(Object.keys(raw.units)).toHaveLength(4)
+    const scaleRaw = raw.units[`scale:${fixture.scaleItemId}`]
+    expect(scaleRaw.unitType).toBe('SCALE')
+    if (scaleRaw.unitType === 'SCALE') {
+      expect(scaleRaw.timings).toBeDefined()
+    }
+    // Full hydration with per-answer responseTimeMs + changeCount must match sourceResultHash!
+    const fullHydrated = await hydrateCompositeScaleUnitsBatch([loadedFacts!], {
+      rawByKey: rawMap,
+      full: true,
+      templates: store,
+    })
+    expect(fullHydrated.get(`${attemptId}:1`)?.get(`scale:${fixture.scaleItemId}`)?.result.scores.length).toBeGreaterThan(0)
 
     const feedbackRow = await readCompositeFinalFeedback(db, { attemptId, attemptEpoch: 1 })
     expect(feedbackRow?.feedback).toEqual({ headline: '四合一反馈完成', unitCount: 4 })
@@ -329,9 +363,9 @@ describe('composite-final.writer (synchronous 1-tx 4-in-1 single-row FINAL)', ()
     })).rejects.toMatchObject({ statusCode: 409, code: 'SUBMISSION_PAYLOAD_CONFLICT' })
   })
 
-  it('rejects tampered locked Cognitive trials (409), wrong randomSeed (409), and missing required units (400)', async () => {
+  it('rejects tampered locked Cognitive trials (409), wrong randomSeed (409), non-IN_PROGRESS parent (409), and missing required units (400)', async () => {
     const { store } = makeTemplateStore()
-    const { db } = makeSingleRowFinalTxDb()
+    const { db, parentState } = makeSingleRowFinalTxDb()
     const fixture = buildFourFamilyTestSlots()
     const attemptId = randomUUID()
     const plan = buildCompositePublicationPlan({
@@ -339,6 +373,7 @@ describe('composite-final.writer (synchronous 1-tx 4-in-1 single-row FINAL)', ()
       title: '防篡改校验卷',
       slots: fixture.slots,
     })
+    parentState.publicationHash = plan.publicationHash
     const seeds = generateCompositeUnitSeeds(plan, attemptId, 1)!
     const cogSlotKey = `cognitive:${fixture.cogItemId}`
     const cogTrials = makeGonogoTrials(seeds.seeds[cogSlotKey], 8)
@@ -463,5 +498,26 @@ describe('composite-final.writer (synchronous 1-tx 4-in-1 single-row FINAL)', ()
         },
       },
     })).rejects.toMatchObject({ statusCode: 409, code: 'CHECKPOINT_LOCKED_UNIT_IMMUTABLE' })
+
+    // 4. Non-IN_PROGRESS parent attempt (e.g. ABANDONED) is rejected inside transaction (409 STALE_ATTEMPT)
+    parentState.status = 'ABANDONED'
+    await expect(commitCompositeWholeFinal(db, {
+      attempt,
+      plan,
+      templates: store,
+      submit: {
+        submissionId: `whole-${sha('abandoned-parent')}`,
+        attemptEpoch: 1,
+        publicationHash: plan.publicationHash,
+        slotSetHash: plan.slotSetHash,
+        units: {
+          [`form:${fixture.formSectionId}`]: {
+            unitType: 'FORM_SECTION',
+            definitionHash: fixture.formDefHash,
+            answers: [{ formItemId: fixture.formItemId, value: '7' }],
+          },
+        },
+      },
+    })).rejects.toMatchObject({ statusCode: 409, code: 'STALE_ATTEMPT' })
   })
 })

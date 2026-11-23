@@ -12,6 +12,8 @@ import {attachTeacherInlineCurrentUnit,requestedTeacherInlineCurrentUnit} from '
 import {compositeController} from '../composite/composite.controller'
 import {compositeImageController} from '../composite/composite-image.controller'
 import {compositeVideoController} from '../composite/composite-video.controller'
+import {mountCompositeWholeV2Routes} from '../composite/whole-v2.routes'
+import {authorizeFieldCompositionWholeV2} from '../composite/whole-v2.access'
 
 const router=Router(),uuid=z.string().guid()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
@@ -66,4 +68,9 @@ router.post(parent+'/items/:itemId/scale/submit',asyncHandler(async(req,res)=>{
  req.query.response='receipt'
  await compositeController.submitFinalScale(req,res)
 }))
+mountCompositeWholeV2Routes(router, {
+ prefix: '/assessment-composite-attempts',
+ middleware: [],
+ authorizeAttempt: authorizeFieldCompositionWholeV2,
+})
 export default router
