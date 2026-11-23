@@ -54,3 +54,7 @@
 - 同一双报告浏览器场景：修复前全屏及打印各出现2份，修复后均仅出现当前1份；实际PDF文本只含第一份报告、对应题目及披露说明，不含第二份。
 - [修复前截图](teacher-review-801/report-isolation-before.png) · [修复后截图](teacher-review-801/report-isolation-after.png)。原始JSON、PDF与日志保存于 `/workspace/pr801-merge-review`。
 - 之前的494项前端及577项后端结果保留其原始输入身份；本次仅重验报告直接影响项。正式资格以Ready后的真实合并门禁为准，不用Draft绿色状态替代。
+
+Ready首轮CI（run `45145741986`、attempt 1、head `a78a9866f2726c4341f7653f966bb561c2718d7e`）的前端job `137594891938`保留失败：697个文件中695通过、2失败；4792个用例中4787通过、2失败、3跳过。首错为SurveyMaterialDisplay和TrainingRawScoreFeedback两处仍查找旧sandbox iframe标题。更新这两个消费者测试以核对已验证的文档卡片、Blob链接、新窗口隔离、PDF文件名、凭证不进入DOM及URL回收；生产代码不变。仅定向执行两文件11项全部通过，相关ESLint通过。其余选中作业均成功，merge gate因frontend失败而失败，原结果不改写。
+
+该两文件失败不符合现有仅单用例的frontend-retest接纳条件；后续只使用原有Ready流程及可核验的backend-regression-reuse，不修改CI或分支保护。原run/job/首错及下轮检查清单保存在 `/workspace/pr801-merge-review/ci-failure-record.json`。仓库指定Notion历史页访问返回404，错误回写保持pending，没有新建替代页面。
