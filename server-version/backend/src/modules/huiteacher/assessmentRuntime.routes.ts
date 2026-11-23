@@ -102,8 +102,8 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
    return runtimeError(new TeacherAssessmentRuntimeError(),res,next)
   next()
  })
- const ordinaryAttempt=(req:Request)=>audience==='TEACHER_SELF'
-  ? readOrdinarySelfWholeAccess(db,'TEACHER',req.user!.userId,{attemptId:uuid.parse(req.params.attemptId)})
+ const ordinaryAttempt=(req:Request,mode:'full'|'progress'='full')=>audience==='TEACHER_SELF'
+  ? readOrdinarySelfWholeAccess(db,'TEACHER',req.user!.userId,{attemptId:uuid.parse(req.params.attemptId),...(mode==='progress'?{mode:'progress' as const}:{})})
   : null
  const childAccess=(type:'COGNITIVE'|'SITUATIONAL'|'SCALE'|'FORM_SECTION'):RequestHandler=>(req,res,next)=>{
   void Promise.resolve().then(()=>access.child(req.user!.userId,{
@@ -186,9 +186,9 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   return result
  }))
  const parent='/assessment-composite-attempts/:attemptId'
- const wholeBound=(acceptedWhole=false,finalConsentForLegacy=false):RequestHandler=>(req,res,next)=>{
+ const wholeBound=(acceptedWhole=false,finalConsentForLegacy=false,progressOnly=false):RequestHandler=>(req,res,next)=>{
   void Promise.resolve().then(async()=>{
-   const admitted=await ordinaryAttempt(req)
+   const admitted=await ordinaryAttempt(req,progressOnly?'progress':'full')
    if(admitted){res.locals.ordinarySelfWhole=admitted;return}
    const proof=await access.own(req.user!.userId,{attemptId:uuid.parse(req.params.attemptId),acceptedWhole})
    res.locals.educationExecutionStatus=proof.task.status
@@ -199,7 +199,7 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
  router.get(parent+'/whole',wholeBound(),compositeController.wholeDefinition)
  router.get(parent+'/whole/template/:templateHash',wholeBound(),compositeController.wholeTemplate)
  router.get(parent+'/whole/receipt',wholeBound(true),compositeController.wholeReceipt)
- router.get(parent+'/whole/progress',wholeBound(true),compositeController.educationWholeProgress)
+ router.get(parent+'/whole/progress',wholeBound(true,false,true),compositeController.educationWholeProgress)
  router.post(parent+'/whole/submit',handler(async(req,res)=>{
   uuid.parse(req.params.attemptId)
   if(audience==='TEACHER_SELF'&&await compositeController.tryOrdinarySelfWholeSubmit(req,res,'TEACHER'))return
