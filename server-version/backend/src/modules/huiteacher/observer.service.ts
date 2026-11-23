@@ -154,8 +154,15 @@ export async function acceptHuiteacherObserver(input:{userId:string;invitationId
     const grant=rows[0]
     if(!grant||grant.status!=='INVITED')
       denied('HUITEACHER_OBSERVER_INVITATION_UNAVAILABLE',404)
-    await schoolEvent(tx,{organizationId:grant.organizationId,
+    const event=await schoolEvent(tx,{organizationId:grant.organizationId,
       eventId:grant.eventId,allowDraft:true,allowClosed:true})
+    if(event.status==='CLOSED'){
+      const authored=await tx.huiteacherObservationRecord.count({where:{
+        organizationId:grant.organizationId,eventId:grant.eventId,
+        observerUserId:input.userId,kind:'FORMAL_FEEDBACK',status:'SUBMITTED',
+      }})
+      if(authored<1)denied('HUITEACHER_CLOSED_EVENT_REVIEWER_NOT_SOURCED',403)
+    }
     const changed=await tx.huiteacherObserverGrant.update({
       where:{id:input.invitationId},
       data:{status:'ACCEPTED',acceptedAt:new Date(),revision:{increment:1}},
@@ -225,12 +232,21 @@ export async function myHuiteacherFieldAssignments(userId:string){
       JOIN "huiteacher_evaluation_events" event
         ON event."organization_id"=grant_row."organization_id"
         AND event."id"=grant_row."event_id"
-        AND event."status" IN ('DRAFT','OPEN')
+        AND (event."status" IN ('DRAFT','OPEN')
+          OR event."status"='CLOSED' AND EXISTS (
+            SELECT 1 FROM "huiteacher_observation_records" authored
+            WHERE authored."organization_id"=event."organization_id"
+              AND authored."event_id"=event."id"
+              AND authored."observer_user_id"=grant_row."observer_user_id"
+              AND authored."kind"='FORMAL_FEEDBACK'
+              AND authored."status"='SUBMITTED'
+          ))
       JOIN "education_product_entitlements" entitlement
         ON entitlement."organization_id"=event."organization_id"
         AND entitlement."product"='HUITEACHER' AND entitlement."status"='ACTIVE'
       WHERE grant_row."observer_user_id"=${userId}
         AND grant_row."status" IN ('INVITED','ACCEPTED')
+        AND grant_row."revoked_at" IS NULL
         AND grant_row."expires_at">statement_timestamp()
       ORDER BY grant_row."created_at" DESC LIMIT 101
     `

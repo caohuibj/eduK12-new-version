@@ -24,10 +24,15 @@ interface CachedPrincipal {
 }
 
 const principalCache = new Map<string, CachedPrincipal>()
+// Discard reads started before any explicit invalidation instead of allowing
+// a slow pre-rotation query to repopulate the cache with an old credential version.
+let principalCacheGeneration = 0
+export const getPrincipalCacheGeneration = (): number => principalCacheGeneration
 
 export const getPrincipalCacheSize = (): number => principalCache.size
 
 export const invalidatePrincipalCache = (userId?: string): void => {
+  principalCacheGeneration++
   if (userId) {
     principalCache.delete(userId)
   } else {
@@ -35,9 +40,9 @@ export const invalidatePrincipalCache = (userId?: string): void => {
   }
 }
 
-export const primePrincipalCache = (principal: CurrentPrincipal | null): void => {
+export const primePrincipalCache = (principal: CurrentPrincipal | null, expectedGeneration = principalCacheGeneration): void => {
   const ttl = getPrincipalCacheTtlMs()
-  if (ttl <= 0 || principal === null) return
+  if (ttl <= 0 || principal === null || expectedGeneration !== principalCacheGeneration) return
   const cacheable = principal.platformRole !== 'SYSTEM_ADMIN'
     && principal.role !== UserRole.ADMIN
     && principal.businessRole !== UserRole.ADMIN
@@ -83,6 +88,7 @@ export const loadPrincipal = async (userId: string, bypassCache = false): Promis
     }
   }
 
+  const queryGeneration = principalCacheGeneration
   const label = currentAssessmentTimelineKind() === 'start'
     ? 'start.raw.pre_gate.auth_account_lookup'
     : 'auth.raw.account_lookup'
@@ -97,7 +103,7 @@ export const loadPrincipal = async (userId: string, bypassCache = false): Promis
     && principal.businessRole !== UserRole.ADMIN
     && principal.needsMfa !== true
     && !(principal.entryGrants?.length)
-  if (ttl > 0 && cacheable) {
+  if (ttl > 0 && cacheable && queryGeneration === principalCacheGeneration) {
     const maxEntries = getPrincipalCacheMaxEntries()
     if (principalCache.size >= maxEntries) {
       const oldestKey = principalCache.keys().next().value

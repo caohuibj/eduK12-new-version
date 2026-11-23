@@ -38,3 +38,9 @@
 .assessment-material-display { min-width:0; max-width:100%; }
 .assessment-material-display figcaption { flex-wrap:wrap; }
 .assessment-material-display figcaption strong { min-width:0; max-width:100%; overflow-wrap:anywhere; }
+
+/* Native PDF viewers cannot run in a sandboxed frame; keep documents outside the app frame. */
+.assessment-material-pdf { margin-top:12px; padding:16px; border:1px solid var(--material-line); border-radius:10px; background:var(--material-surface); }
+.assessment-material-pdf p { margin:8px 0 12px; color:var(--material-muted); font-size:13px; line-height:1.7; }
+.assessment-material-pdf-actions { display:flex; flex-wrap:wrap; gap:10px; }
+.assessment-material-pdf-actions a { display:inline-flex; align-items:center; justify-content:center; min-height:44px; max-width:100%; box-sizing:border-box; padding:8px 12px; border:1px solid var(--material-line); border-radius:8px; color:var(--material-accent); overflow-wrap:anywhere; text-decoration:underline; text-underline-offset:3px; }
