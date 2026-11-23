@@ -6,13 +6,21 @@ import type {SurveyComputedFinal} from './final.compute'
 import {rawParticipantFeedback} from './participant-feedback'
 import {cognitiveParticipantFeedback} from './measurement.result'
 
-type Feedback=Exclude<NonNullable<ReturnType<typeof rawParticipantFeedback>|ReturnType<typeof cognitiveParticipantFeedback>>,{pending:true}>
-type FeedbackProjection={kind:'GENERAL_ONLY'}|{kind:'DESCRIPTIVE';measurements:Feedback[];pending:boolean;nativeBundles?:ReturnType<typeof savedSurveyNativeFeedback>}
+import type { SurveyRenderedDeclaredReport } from './participant-declared-report'
+
+type RawFeedback = Exclude<NonNullable<ReturnType<typeof rawParticipantFeedback>>, { pending: true }> & {
+  declaredReport?: SurveyRenderedDeclaredReport
+}
+type CognitiveFeedback = Exclude<NonNullable<ReturnType<typeof cognitiveParticipantFeedback>>, { pending: true }>
+type Feedback = RawFeedback | CognitiveFeedback
+export type SurveyParticipantFeedbackProjection =
+  | { kind: 'GENERAL_ONLY' }
+  | { kind: 'DESCRIPTIVE'; measurements: Feedback[]; pending: boolean; nativeBundles?: ReturnType<typeof savedSurveyNativeFeedback> }
 
 /** The same existing disclosure projectors for a freshly accepted result and
  * an independently authorized saved-result read. No scoring, DB or authority
  * cache; callers must establish their own current authorization boundary. */
-export function projectSurveyParticipantFeedback(units:readonly ResearchFrozenUnit[],result:SurveyComputedFinal,collectionClosed:boolean,packages:readonly FrozenGovernedPackage[]=[]):FeedbackProjection|null{
+export function projectSurveyParticipantFeedback(units:readonly ResearchFrozenUnit[],result:SurveyComputedFinal,collectionClosed:boolean,packages:readonly FrozenGovernedPackage[]=[]):SurveyParticipantFeedbackProjection|null{
   const measurements:Feedback[]=[];let pending=false
   const blocked=blockedSurveyNativeInstruments(packages,result)
   for(const unit of units.filter(unit=>!blocked.has(unit.instrumentKey)&&(unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE'))){
