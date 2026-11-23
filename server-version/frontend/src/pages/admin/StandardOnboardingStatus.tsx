@@ -6,6 +6,13 @@ const reviewLabels:Record<string,string>={APPROVED:'已批准',COMPLETED:'已完
 const maturityLabels:Record<string,string>={PILOT:'试用',RESEARCH_READY:'研究就绪',RESEARCH_GRADE:'研究级'}
 const entryLabels:Record<string,string>={APPROVED:'准入已批准',RETURNED:'已退回，禁止新增使用',PENDING:'待决定'}
 const gapLabels:Record<string,string>={
+ OFFICIAL_ITEM9_SEMANTIC_MISMATCH:'官方第 9 题的中文与原文语义不一致。请由内容与计分负责人核对授权题文和计分方向，完成版本审校后再申请准入。',
+ GENERAL_EMOTIONAL_SHORT_SELECTION_MISMATCH:'通用情境短版的情绪维度选题与原版记录不一致。请内容负责人核对精确题目集合及维度映射，并补齐审校记录。',
+ PUBLIC_REDISTRIBUTION_SCOPE_NOT_ESTABLISHED:'尚未建立公开再分发的许可范围。请授权负责人补充覆盖当前语言和版本的许可依据。',
+ USER_EDITORIAL_APPROVAL_NOT_SOURCE_OR_SCORING_CLEARANCE:'文字编辑已确认，但不代表题文来源或计分已获准。请分别完成来源授权和计分核验。',
+ SCALE_NOT_INSTALLED:'该精确版本尚未安装。请补齐许可与可执行内容，通过导入流程保存并核对版本。',
+ EDUCATION_LIBRARY_APPLICABILITY_REQUIRED:'教育入口的适用范围尚未填写。请治理负责人补充适用人群、用途和限制，再提交入口审核。',
+ PUBLISHED_PROVENANCE:'已发布版本的来源记录需核对。请内容负责人补齐精确版本及可追溯来源，重新申请审核。',
  EXECUTABLE_NOT_REGISTERED:'尚未登记完整可执行内容。请补齐真实题本、选项及计分资料后，通过已有导入流程保存草稿。',
  RIGHTS_FOR_DIGITAL_REPUBLICATION_UNKNOWN:'数字呈现或公开再分发的授权范围尚未明确，请核对现有许可资料。',
  EXACT_CHINESE_ITEMS_NOT_LICENSED_FOR_PUBLIC_SOURCE:'精确中文题文的公开源码许可尚未确认，请补充经许可的版本。',
@@ -57,7 +64,7 @@ export default function StandardOnboardingStatus({onOpenWorkspace}:{onOpenWorksp
     <p>以上为该量表版本的状态；内容、参数与报告的批准组合仍须单独审核和试运行，入口使用权仍须另行分配。</p>
     {row.blockers.length>0?<div className="sys-message"><h4>待处理事项</h4><ul>{row.blockers.map(code=>{
      const action=row.nextActions.find(item=>item.code===code)
-     return <li key={code}>{action?<><strong>{action.stage}</strong> · 责任角色：{action.owner}<p>{action.next}</p></>:<p>{/[\u3400-\u9fff]/.test(code)?code:gapLabels[code]??'该项缺口尚无中文说明，请核对来源资料及下方标识。'}</p>}<details className="sys-technical"><summary>阻断标识</summary><code>{code}</code></details></li>
+     return <li key={code}>{action?<><strong>{action.stage}</strong> · 责任角色：{action.owner}<p>{action.next}</p></>:<p>{/[\u3400-\u9fff]/.test(code)?code:gapLabels[code]??'请将下方阻断标识交给内容与治理负责人核对来源、授权及版本材料，补齐后重新审核。'}</p>}<details className="sys-technical"><summary>阻断标识</summary><code>{code}</code></details></li>
     })}</ul></div>:<p>当前未列出内容阻断；这不代替组合批准、试运行及入口授权。</p>}
     {onOpenWorkspace&&<div className="system-actions"><p>目录记录不会自动生成可编辑草稿。按待办补齐内容后导入，或查找之前保存的草稿继续处理。</p>
      <button type="button" onClick={()=>onOpenWorkspace({instrumentKey:row.instrumentKey,instrumentVersion:row.instrumentVersion,name:row.name},'import')}>补齐内容并导入</button>

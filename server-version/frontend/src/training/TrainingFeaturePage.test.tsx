@@ -23,14 +23,16 @@ beforeEach(() => {
 })
 
 describe('Training public feature navigation', () => {
-  it('opens the empty contact page from the homepage text panel', () => {
+  it('opens actionable account and course help from the homepage text panel', () => {
     show()
-    const contact = screen.getByRole('link', { name: '联系我们' })
+    const contact = screen.getByRole('link', { name: '使用帮助' })
     expect(contact.closest('.training-portal-copy')).not.toBeNull()
     expect(contact.closest('header')).toBeNull()
     fireEvent.click(contact)
-    expect(screen.getByRole('heading', { level: 1, name: '联系我们' })).toBeInTheDocument()
-    expect(screen.queryByRole('form')).toBeNull()
+    expect(screen.getByRole('heading', { level: 1, name: '使用帮助' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', {name:'账号与课程问题'})).toBeVisible()
+    expect(screen.getByRole('link', {name:'注册学员账号'})).toHaveAttribute('href','/register')
+    expect(screen.getByRole('link', {name:'课程功能介绍'})).toHaveAttribute('href','/features/courses')
   })
   it.each([
     ['课程与学习', '把每一次学习，连成一条清晰的路。', '/dashboard'],

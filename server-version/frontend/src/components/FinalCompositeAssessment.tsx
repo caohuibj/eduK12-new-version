@@ -258,6 +258,16 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
         setFormValues(cleaned)
         timingRef.current=item.trainingTiming ? new SurveyScaleTimingTracker(restoreTrainingTiming(nextMeta.instrumentMetadata,item.trainingTiming.snapshotHash),nextScale) : null
         setScaleValues(nextScale)
+        if (isTrainingHost() && nextMeta.status === 'DRAFT') {
+          // Restore a useful reading position without changing stored responses.
+          // A numeric zero or boolean false is a response, not an empty answer.
+          const visible = trainingVisibleFields(fields,cleaned)
+          const firstForm = visible.findIndex(field=>emptyValue(cleaned[field.formItemId]))
+          setSectionIndex(firstForm < 0 ? Math.max(0,visible.length-1) : firstForm)
+          const questions = item.type === 'SCALE' ? item.scale?.definition?.items || [] : []
+          const firstScale = questions.findIndex(question=>emptyValue(nextScale[question.itemCode] as FormValue))
+          setScaleIndex(firstScale < 0 ? Math.max(0,questions.length-1) : firstScale)
+        }
         setRequiresRestart(nextMeta.status === 'CONFLICT')
         if (nextMeta.status === 'CONFLICT') {
           setError(nextMeta.errorMessage || '本地草稿与当前测评版本不一致，请重新开始测评')

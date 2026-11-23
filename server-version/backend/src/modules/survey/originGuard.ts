@@ -34,7 +34,7 @@ export function platformSurveyOriginGuard(req: Request,res: Response,next: NextF
   try{
     const url=new URL(origin)
     const development=process.env.NODE_ENV!=='production'
-      && ['localhost','127.0.0.1'].includes(url.hostname)
+      && ['training.localhost','localhost','127.0.0.1'].includes(url.hostname)
       && ['http:','https:'].includes(url.protocol)
     if(url.origin!=='https://training.eduk12.top'&&!development)
       return forbidden(res,'当前来源不能操作 Survey 管理')

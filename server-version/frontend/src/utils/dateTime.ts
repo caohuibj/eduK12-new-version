@@ -14,7 +14,10 @@ export const dateTimeInputValue = (value: string) => {
 
 export const deadlineToIso = (value: string) => value ? new Date(value).toISOString() : undefined
 
-export const formatLocalDateTime = (value: string, options: Intl.DateTimeFormatOptions = {}) => {
+export const formatLocalDateTime = (value: string, options: Intl.DateTimeFormatOptions = {
+  year: 'numeric', month: '2-digit', day: '2-digit',
+  hour: '2-digit', minute: '2-digit', hour12: false,
+}) => {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return '无效日期'
   return new Intl.DateTimeFormat('zh-CN', { ...options, timeZoneName: 'shortOffset' }).format(date).replace('GMT', 'UTC')

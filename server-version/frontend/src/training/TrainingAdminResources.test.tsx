@@ -20,7 +20,7 @@ const cognitiveConfig={id:'c1',name:'开放认知配置',testType:'TASK',configV
 const record={id:'g1',teacherId:'t1',resourceType:'SCALE',resourceId:'s1',createdAt:'2026-10-23T00:00:00Z',teacher,resource:standard,resourceMissing:false}
 beforeEach(()=>{
  vi.clearAllMocks()
- api.get.mockImplementation(url=>Promise.resolve(url==='/scales'?page([standard,custom]):url==='/cognitive/configs'?page([cognitiveConfig]):page([])))
+ api.get.mockImplementation(url=>Promise.resolve(url==='/admin/training/resources/scales'?page([standard,custom]):url==='/admin/training/resources/cognitive-configs'?page([cognitiveConfig]):page([])))
  grants.list.mockResolvedValue({code:0,data:{list:[]}})
  grants.listTeachers.mockResolvedValue({code:0,data:{list:[teacher,{...teacher,id:'pending',username:'pending_trainer',teacherApproved:false}],total:2}})
  grants.set.mockResolvedValue({code:0,data:{list:[]}});grants.remove.mockResolvedValue({code:0})
@@ -37,7 +37,7 @@ describe('Training inline resources and authorization',()=>{
   expect(within(screen.getByText(custom.name).closest('tr')!).getByRole('button',{name:'管理授权'})).toBeDisabled()
   expect(screen.getByText('精确版本共用库审批')).toBeVisible()
   expect(document.querySelector('a[href^="/scales"]')).toBeNull()
-  expect(api.get).toHaveBeenCalledExactlyOnceWith('/scales',{params:{page:1,pageSize:20,view:'training-catalog'}})
+  expect(api.get).toHaveBeenCalledExactlyOnceWith('/admin/training/resources/scales',{params:{page:1,pageSize:20,view:'training-catalog'}})
  })
  it('requests only the current server page and resets paging when applying a later-page tag',async()=>{
   const rows=Array.from({length:101},(_,index)=>({...standard,id:'s'+index,name:'量表 '+index}))
@@ -53,7 +53,7 @@ describe('Training inline resources and authorization',()=>{
   fireEvent.change(screen.getByLabelText('领域'),{target:{value:'domain:later'}})
   fireEvent.click(screen.getByRole('button',{name:'检索'}))
   expect(await screen.findByText('量表 100')).toBeVisible();expect(screen.getByText('共 1 项资源')).toBeVisible();expect(screen.queryByRole('button',{name:'下一页'})).not.toBeInTheDocument()
-  expect(api.get).toHaveBeenLastCalledWith('/scales',{params:{page:1,pageSize:20,view:'training-catalog',tags:'domain:later'}})
+  expect(api.get).toHaveBeenLastCalledWith('/admin/training/resources/scales',{params:{page:1,pageSize:20,view:'training-catalog',tags:'domain:later'}})
   expect(api.get).toHaveBeenCalledTimes(3)
  })
  it('treats incomplete catalog reads as errors and retries without granting partial data',async()=>{
@@ -98,7 +98,7 @@ describe('Training inline resources and authorization',()=>{
   await waitFor(()=>expect(cognitive.updateConfigAccessPolicy).toHaveBeenCalledExactlyOnceWith('c1','GRANT'))
  })
  it('keeps fixed bundle versions exact and blocks packages without publication eligibility',async()=>{
-  api.get.mockImplementation(url=>Promise.resolve(url==='/scales'?page([]):page([{name:'合格固定包',bundleKey:'fixed',bundleVersion:'2.1',status:'PUBLISHED',canInstantiate:true},{name:'未就绪固定包',bundleKey:'blocked',bundleVersion:'1',status:'PUBLISHED',canInstantiate:false,publicationBlockers:['资格缺失']}])) )
+  api.get.mockImplementation(url=>Promise.resolve(url==='/admin/training/resources/scales'?page([]):page([{name:'合格固定包',bundleKey:'fixed',bundleVersion:'2.1',status:'PUBLISHED',canInstantiate:true},{name:'未就绪固定包',bundleKey:'blocked',bundleVersion:'1',status:'PUBLISHED',canInstantiate:false,publicationBlockers:['资格缺失']}])) )
   render(<TrainingAdminResources/>);fireEvent.change(screen.getByRole('combobox',{name:'资源类型'}),{target:{value:'ASSESSMENT_BUNDLE'}})
   await screen.findByText('合格固定包');openResourceActions('未就绪固定包');openResourceActions('合格固定包');expect(within(screen.getByText('未就绪固定包').closest('tr')!).getByRole('button',{name:'管理授权'})).toBeDisabled()
   fireEvent.click(within(screen.getByText('合格固定包').closest('tr')!).getByRole('button',{name:'管理授权'}))

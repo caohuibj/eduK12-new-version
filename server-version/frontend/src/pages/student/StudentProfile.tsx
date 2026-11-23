@@ -87,6 +87,8 @@ const StudentProfileContent: React.FC<{trainingAdmin?:boolean}> = ({trainingAdmi
     }
   }
 
+  const cancelPassword=()=>{setShowPasswordForm(false);setOldPassword('');setNewPassword('');setConfirmPassword('');setPasswordErrors({});setShowOldPassword(false);setShowNewPassword(false)}
+
   const handleChangePassword = async (event: React.FormEvent) => {
     event.preventDefault()
     if(saving||loading||loadError||!user?.id)return
@@ -110,10 +112,7 @@ const StudentProfileContent: React.FC<{trainingAdmin?:boolean}> = ({trainingAdmi
       const response = await apiClient.post('/auth/change-password', { oldPassword, newPassword })
       if (response.code === 0) {
         setMessage({ type: 'success', text: '密码修改成功' })
-        setOldPassword('')
-        setNewPassword('')
-        setConfirmPassword('')
-        setShowPasswordForm(false)
+        cancelPassword()
       } else {
         setMessage({ type: 'error', text: response.message || '修改失败' })
       }
@@ -125,7 +124,6 @@ const StudentProfileContent: React.FC<{trainingAdmin?:boolean}> = ({trainingAdmi
   }
 
   if(trainingAdmin){
-    const cancelPassword=()=>{setShowPasswordForm(false);setOldPassword('');setNewPassword('');setConfirmPassword('');setPasswordErrors({});setShowOldPassword(false);setShowNewPassword(false)}
     return <div className="training-management-home training-admin-profile">
       <header className="training-profile-heading"><h1>个人信息</h1></header>
       {loadError&&<div role="alert" className="training-profile-notice is-error"><span>{loadError}</span><button type="button" className="training-accounts-secondary" onClick={()=>void fetchUserInfo()}>重新加载资料</button></div>}
@@ -236,7 +234,7 @@ const StudentProfileContent: React.FC<{trainingAdmin?:boolean}> = ({trainingAdmi
                 <Lock className="h-5 w-5 text-gray-600" aria-hidden="true" />
                 <h2 id="student-password-title" className="text-lg font-semibold text-gray-800">{isTrainingHost() ? "账户安全" : "修改密码"}</h2>
               </div>
-              <button type="button" onClick={() => setShowPasswordForm(current => !current)} className="text-sm text-action hover:underline" aria-expanded={showPasswordForm}>
+              <button type="button" onClick={() => showPasswordForm ? cancelPassword() : setShowPasswordForm(true)} className="text-sm text-action hover:underline" aria-expanded={showPasswordForm}>
                 {showPasswordForm ? '取消' : '修改密码'}
               </button>
             </div>

@@ -47,3 +47,14 @@ describe('api client error normalization', () => {
     expect(error.retryAfterMs).toBe(4000)
   })
 })
+
+it('is a native Error and safely preserves server details without changing its prototype', () => {
+  const data = JSON.parse('{"code":"ADMIN_KEY_STEP_UP_REQUIRED","message":"请重新验证","__proto__":{"injected":true}}')
+  const failure = normalizeApiError({response:{status:403,data}})
+  expect(failure).toBeInstanceOf(Error)
+  expect(failure.message).toBe('请重新验证')
+  expect(failure.code).toBe('ADMIN_KEY_STEP_UP_REQUIRED')
+  expect(failure.data).toBe(data)
+  expect(Object.getPrototypeOf(failure)).toBe(Error.prototype)
+  expect((failure as any).injected).toBeUndefined()
+})

@@ -24,6 +24,7 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
   const [now, setNow] = useState(Date.now())
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
+  const [keyword,setKeyword]=useState(''),[appliedKeyword,setAppliedKeyword]=useState('')
   const [page, setPage] = useState(1)
   const [loadedPage, setLoadedPage] = useState<number | null>(null)
   const [total, setTotal] = useState(0)
@@ -40,7 +41,7 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
       setLoading(true)
       setError(null)
       const response = training
-        ? await apiClient.get('/teacher-codes', { params: { page, pageSize: 20 } })
+        ? await apiClient.get('/teacher-codes', { params: { page, pageSize: 20, ...(appliedKeyword?{keyword:appliedKeyword}:{}) } })
         : await apiClient.get('/teacher-codes')
       if (id !== requestId.current) return
       if (response.code === 0) {
@@ -60,7 +61,7 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
     } finally {
       if (id === requestId.current) setLoading(false)
     }
-  }, [training, page])
+  }, [training, page, appliedKeyword])
 
   useEffect(() => {
     void fetchCodes()
@@ -153,6 +154,11 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
           <button type="button" className="training-code-primary" disabled={Boolean(deletingId)} aria-expanded={formOpen} aria-controls="training-code-create" onClick={() => {setFormOpen(!formOpen); setError(null)}}><Plus size={15}/>生成注册码</button>
         </div>
       </div>
+      <form className="training-code-search" onSubmit={event=>{event.preventDefault();if(page===1&&appliedKeyword===keyword.trim())void fetchCodes();else {setPage(1);setLoadedPage(null);setAppliedKeyword(keyword.trim())}}}>
+        <label htmlFor="training-code-search">检索注册码</label><input id="training-code-search" type="search" maxLength={64} value={keyword} onChange={event=>setKeyword(event.target.value)} placeholder="输入注册码"/>
+        <button type="submit" className="training-accounts-secondary" disabled={loading}>搜索</button>
+        {appliedKeyword&&<button type="button" className="training-accounts-secondary" disabled={loading} onClick={()=>{setKeyword('');setPage(1);setLoadedPage(null);setAppliedKeyword('')}}>清除检索</button>}
+      </form>
       {formOpen && <form id="training-code-create" className="training-code-form" onSubmit={event => {event.preventDefault(); void handleCreate()}}>
         <div className="training-code-form-fields">
           <div>
@@ -175,7 +181,7 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
         <div className="training-code-form-footer"><span>仅适用于本次生成的注册码，已有账号和注册码不变。</span><button type="button" disabled={creating} className="training-accounts-secondary" onClick={() => setFormOpen(false)}>取消</button><button type="submit" disabled={creating} className="training-code-primary">{creating ? '生成中…' : '确认生成'}</button></div>
       </form>}
       {error && <div className="training-code-error" role="alert">{error}</div>}
-      {loading ? <p className="training-code-empty" role="status">正在加载注册码…</p> : loadedPage !== page ? null : codes.length === 0 ? <p className="training-code-empty">暂无注册码，点击右上方按钮生成。</p> : <div className="training-code-grid">{codes.map(code => {
+      {loading ? <p className="training-code-empty" role="status">正在加载注册码…</p> : loadedPage !== page ? null : codes.length === 0 ? <p className="training-code-empty">{appliedKeyword?'没有符合条件的注册码，请更换关键词或清除检索。':'暂无注册码，点击右上方按钮生成。'}</p> : <div className="training-code-grid">{codes.map(code => {
         const status = codeState(code)
         return <article className="training-code-card" key={code.id} aria-label={`培训师注册码 ${code.code}`}>
           <div className="training-code-card-heading"><code>{code.code}</code><span className={`training-code-status${status === '可使用' ? ' is-usable' : ''}`}>{status}</span><button type="button" className="training-code-icon" aria-label={`复制培训师注册码 ${code.code}`} title="复制注册码" onClick={() => void copyCode(code.code)}><Copy size={16}/></button></div>

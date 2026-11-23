@@ -46,3 +46,15 @@ describe('opt-in registration code pagination', () => {
     expect(db.teacherCode.count).not.toHaveBeenCalled()
   })
 })
+
+it('searches codes in the database and counts the same filtered set',async()=>{
+ const res=response()
+ await teacherCodeController.list({query:{page:'2',pageSize:'20',keyword:' abC '}} as any,res)
+ const where={code:{contains:'abC',mode:'insensitive'}}
+ expect(db.teacherCode.findMany).toHaveBeenCalledWith(expect.objectContaining({where,take:20,skip:20}))
+ expect(db.teacherCode.count).toHaveBeenCalledWith({where})
+})
+it.each([['a'], 'x'.repeat(65)])('rejects malformed search without querying',async keyword=>{
+ const res=response();await teacherCodeController.list({query:{keyword}} as any,res)
+ expect(res.statusCode).toBe(400);expect(db.teacherCode.findMany).not.toHaveBeenCalled()
+})

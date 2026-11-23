@@ -15,3 +15,6 @@
  .hui-training.hui-app--standard.training-workspace-shell .hui-account { gap:2px; }
  .hui-training.hui-app--standard.training-workspace-shell .hui-account .training-account-logout { gap:0;min-width:32px;min-height:40px;padding:6px;font-size:0; }
 }
+
+.training-code-search {display:flex;align-items:center;flex-wrap:wrap;gap:.65rem;margin:1rem 0;}
+.training-code-search input {min-height:2.75rem;max-width:100%;padding:.5rem .75rem;border:1px solid var(--border,#cbd5e1);border-radius:.5rem;background:var(--surface,#fff);color:inherit;}

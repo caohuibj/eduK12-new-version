@@ -164,6 +164,7 @@ export const scaleController = {
               s.status::text AS status,s.description,COALESCE(s.tags,ARRAY[]::text[]) AS tags,discovery.tags AS "classificationTags",discovery.ids,discovery.terms,s.created_at
             FROM scales s ${standardDiscoveryMetadataJoin(Prisma.sql`s.code`,Prisma.sql`s.instrument_version`)} ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`s.code`,version:Prisma.sql`s.instrument_version`,metadata:Prisma.sql`imported_discovery_source.metadata`,locale:Prisma.sql`imported_discovery_source.locale`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`},Prisma.sql`to_jsonb(s.tags)`)}
             WHERE ${visibility}
+              ${res.locals.trainingOversight?Prisma.sql`AND EXISTS(SELECT 1 FROM users owner WHERE owner.id=s.creator_id AND owner.account_domain::text IN ('TRAINING','LEGACY'))`:Prisma.empty}
               ${status&&status!=='all'?Prisma.sql`AND s.status::text=${String(status)}`:Prisma.empty}
               ${courseId?Prisma.sql`AND EXISTS(SELECT 1 FROM course_scales cs WHERE cs.scale_id=s.id AND cs.course_id=${String(courseId)})`:Prisma.empty}
           ) , matches AS (SELECT v.* FROM visible v CROSS JOIN LATERAL (SELECT v.ids,v.terms) discovery
