@@ -346,13 +346,15 @@ app.use('/api/public/survey', publicSurveyFeatureGuard, surveyOriginGuard, publi
 app.use('/api/survey/projects', surveyProjectsRouter)
 // Shared tool governance also serves Training while Survey collection is off.
 // Each router retains its own current authority, source ACL and MFA checks.
-app.use('/api/platform/survey-system',platformSurveyOriginGuard,surveySystemDataRouter)
+app.use('/api/platform/survey-system',surveyFeatureGuard,platformSurveyOriginGuard,surveySystemDataRouter)
 app.use('/api/platform/survey-tools',platformSurveyOriginGuard,surveyGovernedToolsRouter)
 app.use('/api/platform/survey-tool-use',surveyFeatureGuard,platformSurveyOriginGuard,surveyGovernedUseRouter)
 app.use('/api/survey/governed-projects',surveyFeatureGuard,surveyGovernedResearcherRouter)
 app.use('/api/platform/survey-standard',platformSurveyOriginGuard,surveyStandardTripletRouter)
+// Survey recipient lookup and grant management belong to the research workspace.
+app.use(['/api/platform/survey-library/entries','/api/platform/survey-library/grants'],surveyFeatureGuard)
 app.use('/api/platform/survey-library',platformSurveyOriginGuard,surveyLibraryAdminRouter)
-app.use('/api/platform/survey', platformSurveyOriginGuard, surveyPlatformRouter)
+app.use('/api/platform/survey', surveyFeatureGuard, platformSurveyOriginGuard, surveyPlatformRouter)
 const huiteacherFeatureGuard: express.RequestHandler = (_req,res,next)=>{
   if(process.env.HUITEACHER_WORKSPACE_ENABLED!=='true')
     return res.status(404).json({code:-1,message:'Huiteacher 尚未启用',data:null})
