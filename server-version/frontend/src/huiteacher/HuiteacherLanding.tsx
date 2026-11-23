@@ -24,7 +24,7 @@ export function HuiteacherLanding({ onEnter, theme = 'light' }: { onEnter: () =>
         <img className="ht-journal-image" src={`/huiteacher/${artwork}.webp`}
           srcSet={`/huiteacher/${artwork}-small.webp 768w, /huiteacher/${artwork}.webp 1536w`}
           sizes="(max-width: 600px) 1100px, 100vw"
-          width="1536" height="1024" fetchPriority="high" decoding="async"
+          width="1536" height="1024" {...{fetchpriority:'high'}} decoding="async"
           alt={theme === 'dark' ? '月光落在展开的工作手记上，书页里的教室窗外挂着月亮，一旁是铜杏色笔记本。' : '阳光落在展开的工作手记上，书页留着教室观察的铅笔速写，一旁是浅杏色笔记本。'}/>
       </figure>
       <section className="ht-feature-strip" id="ht-features" aria-label="教师发展与学校改进" tabIndex={-1}>

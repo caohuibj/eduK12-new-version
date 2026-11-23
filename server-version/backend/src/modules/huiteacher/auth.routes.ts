@@ -5,7 +5,7 @@ import { comparePassword, hashPassword, isValidPassword, PASSWORD_MAX_LENGTH } f
 import { generateToken } from '../../utils/jwt'
 import { success, unauthorized, forbidden } from '../../utils/response'
 import { issueHuiteacherCsrfToken, setHuiteacherSessionCookie, clearHuiteacherSessionCookie, getHuiteacherSessionToken } from '../../utils/authCookies'
-import { authenticateHuiteacher, primePrincipalCache } from '../../middleware/auth'
+import { authenticateHuiteacher, primePrincipalCache, invalidatePrincipalCache, getPrincipalCacheGeneration } from '../../middleware/auth'
 import { revokeCurrentSession } from '../../utils/sessionRevocation'
 import { createMfaAttemptRateLimiter } from '../../middleware/mfaAttemptRateLimit'
 import { passwordChangeRateLimit, withPasswordChangeAdmission } from '../../middleware/passwordChangeAdmission'
@@ -49,6 +49,7 @@ router.post('/login',loginRateLimit,withLoginAccountFailureThrottle(async(req,re
     const parsed=loginSchema.safeParse(req.body)
     if(!parsed.success)return failedLogin(req,res)
     const normalizedLogin=parsed.data.username.toLowerCase()
+    const cacheGeneration=getPrincipalCacheGeneration()
     const account=await withLoginAccountLookup(()=>
       prisma.campusAccount.findUnique({
         where:{normalizedLogin},
@@ -112,7 +113,7 @@ router.post('/login',loginRateLimit,withLoginAccountFailureThrottle(async(req,re
         teacherApproved:Boolean(u.teacherApproved),
         entryGrants:[],
         needsMfa:false,
-      })
+      },cacheGeneration)
     }
     setHuiteacherSessionCookie(req,res,generateToken({
       accountDomain:'SCHOOL',sessionProduct:'HUITEACHER',
@@ -201,6 +202,9 @@ router.post('/change-password',authenticateHuiteacher,passwordChangeRateLimit,wi
     data:{passwordHash,tokenVersion:{increment:1},mustChangePassword:false},
   })
   if(updated.count!==1)return res.status(409).json({code:-1,message:'账号状态已改变，请重新登录',data:null})
+  // Password rotation invalidates both education product sessions immediately,
+  // including ordinary users whose principal was cached before the mutation.
+  invalidatePrincipalCache(user.id)
   clearHuiteacherSessionCookie(req,res)
   return success(res,null,'密码已修改，请在两个产品重新登录')
 }))

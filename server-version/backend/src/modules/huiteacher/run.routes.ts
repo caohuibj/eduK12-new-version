@@ -62,7 +62,9 @@ const wrap=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)
     const known=e as {code?:string;message?:string;statusCode?:number}
     if(known&&typeof known.statusCode==='number'&&known.statusCode>=400&&known.statusCode<500)
       return res.status(known.statusCode).json({code:known.code??'RUN_INVALID',
-        message:'测评资源、版本或任务授权不满足发布条件',data:null})
+        message:known.code==='RUN_PARTICIPANT_REPORT_NOT_CONFIGURED'
+          ?'所选工具仅用于数据采集，不能提供个人报告。请取消勾选“向作答者提供报告”，再发布仅回执任务。'
+          :'测评资源、版本或任务授权不满足发布条件',data:null})
     throw e
   }
 })

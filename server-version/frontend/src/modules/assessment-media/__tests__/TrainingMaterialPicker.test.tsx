@@ -5,6 +5,7 @@ import type {AssessmentMaterial} from '../material'
 const api=vi.hoisted(()=>({get:vi.fn(),fetch:vi.fn()}))
 vi.mock('../../../api/client',()=>({default:{get:api.get},sessionFetch:api.fetch}))
 import {TrainingMaterialPicker,TrainingMaterials} from '../TrainingMaterialPicker'
+import {AssessmentMaterialDisplay} from '../AssessmentMaterialDisplay'
 function Editor(){const [value,onChange]=useState<AssessmentMaterial[]>([]);return <><TrainingMaterialPicker value={value} onChange={onChange} label="题目展示素材"/><output>{JSON.stringify(value)}</output></>}
 beforeEach(()=>vi.resetAllMocks())
 afterEach(()=>{cleanup();vi.unstubAllGlobals()})
@@ -35,5 +36,36 @@ describe('Training uses shared assessment materials',()=>{
     render(<TrainingMaterials items={[item]} loadAsset={load}/>);fireEvent.click(screen.getByRole('button',{name:'查看PDF 文档'}))
     await waitFor(()=>expect(screen.getByRole('alert')).toHaveTextContent('类型不一致'))
     expect(URL.createObjectURL).not.toHaveBeenCalled()
+  })
+  it('opens validated PDFs outside the app frame and releases their temporary links when closed',async()=>{
+    const create=vi.fn().mockReturnValueOnce('blob:authorized-pdf-1').mockReturnValueOnce('blob:authorized-pdf-2'),revoke=vi.fn()
+    vi.stubGlobal('URL',{createObjectURL:create,revokeObjectURL:revoke})
+    const item={asset:{assetId:'asset',contentHash:'a'.repeat(64),mimeType:'application/pdf' as const},name:'说明文档'}
+    const load=vi.fn(async()=>new Response('%PDF-1.4 fixture',{headers:{'Content-Type':'application/pdf'}}))
+    render(<AssessmentMaterialDisplay item={item} load={load}/>)
+    fireEvent.click(screen.getByRole('button',{name:'查看PDF 文档'}))
+    const open=await screen.findByRole('link',{name:'在新窗口查看 PDF'})
+    expect(open).toHaveAttribute('href','blob:authorized-pdf-1')
+    expect(open).toHaveAttribute('target','_blank');expect(open).toHaveAttribute('rel','noopener noreferrer')
+    expect(screen.getByRole('link',{name:'下载 PDF 文档'})).toHaveAttribute('download','说明文档.pdf')
+    expect(document.querySelector('iframe')).toBeNull()
+    fireEvent.click(screen.getByRole('button',{name:'收起素材'}))
+    await waitFor(()=>expect(revoke).toHaveBeenCalledWith('blob:authorized-pdf-1'))
+    expect(screen.queryByRole('link',{name:'在新窗口查看 PDF'})).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'查看PDF 文档'}))
+    expect(await screen.findByRole('link',{name:'在新窗口查看 PDF'})).toHaveAttribute('href','blob:authorized-pdf-2')
+    expect(load).toHaveBeenCalledTimes(2)
+  })
+  it('keeps failed PDF reads recoverable without exposing a document link before validation',async()=>{
+    vi.stubGlobal('URL',{createObjectURL:vi.fn(()=> 'blob:retry-pdf'),revokeObjectURL:vi.fn()})
+    const item={asset:{assetId:'asset',contentHash:'a'.repeat(64),mimeType:'application/pdf' as const},name:'REPORT.PDF'}
+    const load=vi.fn().mockRejectedValueOnce(Error('暂不可读取')).mockResolvedValueOnce(new Response('%PDF-1.4 fixture',{headers:{'Content-Type':'application/pdf'}}))
+    render(<AssessmentMaterialDisplay item={item} load={load}/>)
+    fireEvent.click(screen.getByRole('button',{name:'查看PDF 文档'}))
+    expect(await screen.findByRole('alert')).toHaveTextContent('暂不可读取')
+    expect(screen.queryByRole('link',{name:'在新窗口查看 PDF'})).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'重新加载素材'}))
+    await screen.findByRole('link',{name:'在新窗口查看 PDF'})
+    expect(screen.getByRole('link',{name:'下载 PDF 文档'})).toHaveAttribute('download','REPORT.PDF')
   })
 })

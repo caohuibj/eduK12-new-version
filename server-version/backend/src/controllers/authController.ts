@@ -17,7 +17,7 @@ import { z } from 'zod'
 import { setSessionCookie, clearSessionCookie, getSessionToken } from '../utils/authCookies'
 import { revokeCurrentSession } from '../utils/sessionRevocation'
 import { clearLoginFailures, recordLoginFailure, withLoginPasswordVerification, withLoginAccountLookup } from '../middleware/loginRateLimit'
-import { primePrincipalCache } from '../middleware/auth'
+import { primePrincipalCache, getPrincipalCacheGeneration } from '../middleware/auth'
 import { isBoundedAdmissionBusyError } from '../services/boundedAdmissionGate'
 import { CourseNotJoinableError, courseJoinabilityMessage, isCourseJoinable } from '../utils/courseEnrollment'
 
@@ -73,6 +73,7 @@ export const authController = {
 
       const { username, password, expectedRole, adminAuthMethod } = result.data
       req.body = result.data
+      const cacheGeneration = getPrincipalCacheGeneration()
       const current = await withLoginAccountLookup(() =>
         prisma.user.findUnique({
           where: { username },
@@ -136,7 +137,7 @@ export const authController = {
       }
 
       await clearLoginFailures(req)
-      primePrincipalCache?.(currentPrincipal)
+      primePrincipalCache?.(currentPrincipal, cacheGeneration)
       const token = generateToken({
         accountDomain: user.accountDomain as 'LEGACY' | 'TRAINING' | 'SCHOOL',
         userId: user.id,

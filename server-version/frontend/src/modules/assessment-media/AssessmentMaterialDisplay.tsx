@@ -17,9 +17,10 @@ export function AssessmentMaterialDisplay({item,load,appearance='survey'}:{item:
     return()=>{controller.abort();if(objectUrl)URL.revokeObjectURL(objectUrl)}
   },[open,assetId,contentHash,mimeType,load,retry])
   const kind=item.asset.mimeType.startsWith('image/')?'图片':item.asset.mimeType.startsWith('video/')?'视频':'PDF 文档'
+  const pdfName=/\.pdf$/i.test(item.name.trim())?item.name.trim():(item.name.trim()||'文档')+'.pdf'
   return <figure className="assessment-material-display" data-appearance={appearance}><figcaption><strong>{item.name}</strong><span>{kind}</span></figcaption>
     <button type="button" className="btn-secondary" aria-expanded={open} onClick={()=>setOpen(!open)}>{open?'收起素材':'查看'+kind}</button>
-    {open&&(error?<div role="alert">{error}<button type="button" className="btn-secondary" onClick={()=>setRetry(x=>x+1)}>重新加载素材</button></div>:!url?<p role="status">正在读取素材…</p>:item.asset.mimeType.startsWith('image/')?<img src={url} alt={item.name}/>:item.asset.mimeType.startsWith('video/')?<video src={url} controls preload="metadata" aria-label={item.name}/>:<><iframe src={url} title={item.name} sandbox=""/><a href={url} download={item.name}>下载 PDF 文档</a></>)}
+    {open&&(error?<div role="alert">{error}<button type="button" className="btn-secondary" onClick={()=>setRetry(x=>x+1)}>重新加载素材</button></div>:!url?<p role="status">正在读取素材…</p>:item.asset.mimeType.startsWith('image/')?<img src={url} alt={item.name}/>:item.asset.mimeType.startsWith('video/')?<video src={url} controls preload="metadata" aria-label={item.name}/>:<div className="assessment-material-pdf" role="group" aria-label="PDF 文档操作"><strong>PDF 文档已就绪</strong><p>在新窗口查看，或下载后阅读。</p><div className="assessment-material-pdf-actions"><a href={url} target="_blank" rel="noopener noreferrer">在新窗口查看 PDF</a><a href={url} download={pdfName}>下载 PDF 文档</a></div></div>)}
     {item.caption&&<p>{item.caption}</p>}
   </figure>
 }

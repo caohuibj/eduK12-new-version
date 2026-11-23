@@ -43,7 +43,8 @@ it('uses the real Teacher host and Final form section with CSRF, forwarding the 
  vi.stubGlobal('fetch',fetch);render(<HuiteacherApp/>)
  fireEvent.click(await screen.findByRole('link',{name:'参与测评'}))
  fireEvent.click(await screen.findByRole('button',{name:'开始测评'}))
- const input=await screen.findByRole('textbox',{name:/任教学科/})
+ // Wait for the actual deferred runner before exercising its durable FINAL flow.
+ const input=await screen.findByRole('textbox',{name:/任教学科/},{timeout:5000})
  await waitFor(()=>expect(input).toBeEnabled())
  fireEvent.change(input,{target:{value:'数学'}})
  expect(await screen.findByText('已保存到本机。',{exact:true})).toHaveClass('assessment-local-save-status')

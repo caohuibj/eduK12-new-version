@@ -28,3 +28,11 @@ html.task-group-report-presenting:fullscreen .task-group-report { width: 100%; m
   .task-group-report table { font-size: 10pt; }
   .task-group-report__bar { print-color-adjust: exact; }
 }
+
+/* A Teacher report action targets its own document even when several reports are mounted. */
+html.task-group-report-presenting:fullscreen:has(.task-group-report[data-teacher-report-presenting]) body *:not([data-teacher-report-presenting]):not([data-teacher-report-presenting] *):not(:has([data-teacher-report-presenting])) { display: none !important; }
+html.task-group-report-presenting:fullscreen:has(.task-group-report[data-teacher-report-presenting]) body *:has([data-teacher-report-presenting]) { display: block !important; margin: 0 !important; padding: 0 !important; border: 0 !important; height: auto !important; overflow: visible !important; }
+@media print {
+  body:has(.task-group-report[data-teacher-report-printing]) *:not([data-teacher-report-printing]):not([data-teacher-report-printing] *):not(:has([data-teacher-report-printing])) { display: none !important; }
+  body:has(.task-group-report[data-teacher-report-printing]) *:has([data-teacher-report-printing]) { display: block !important; margin: 0 !important; padding: 0 !important; border: 0 !important; height: auto !important; overflow: visible !important; }
+}

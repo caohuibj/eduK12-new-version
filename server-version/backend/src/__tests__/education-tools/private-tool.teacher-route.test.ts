@@ -1,11 +1,11 @@
 import express from 'express'
 import type {Server} from 'node:http'
 import {beforeAll,afterAll,beforeEach,describe,it,expect,vi} from 'vitest'
-const m=vi.hoisted(()=>({privateAdd:vi.fn(),formAdd:vi.fn(),legacyAdd:vi.fn()}))
+const m=vi.hoisted(()=>({privateAdd:vi.fn(),formAdd:vi.fn(),legacyAdd:vi.fn(),publish:vi.fn()}))
 vi.mock('../../middleware/auth',()=>({authenticateHuiteacher:(req:any,_res:any,next:any)=>{req.user={userId:'server-actor'};next()}}))
 vi.mock('../../modules/huiteacher/authority',()=>({requireTeacherProductAdmin:(req:any,res:any,next:any)=>req.headers['x-test-deny']?res.status(403).end():next(),requireRecentTeacherMfa:(_req:any,_res:any,next:any)=>next()}))
 vi.mock('../../modules/huiteacher/run.service',()=>({HuiteacherRunError:class extends Error{},addTeacherPrivateRunTrack:m.privateAdd,addTeacherPrivateFormRunTrack:m.formAdd,addTeacherRunTrack:m.legacyAdd,
- previewTeacherRun:vi.fn(),publishTeacherRun:vi.fn(),progressTeacherRun:vi.fn(),closeTeacherRun:vi.fn(),cancelTeacherRun:vi.fn(),listTeacherAvailableScales:vi.fn()}))
+ previewTeacherRun:vi.fn(),publishTeacherRun:m.publish,progressTeacherRun:vi.fn(),closeTeacherRun:vi.fn(),cancelTeacherRun:vi.fn(),listTeacherAvailableScales:vi.fn()}))
 import router from '../../modules/huiteacher/run.routes'
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
 const body={expectedVersion:4,privateScale:{versionId:id(3),contentHash:'a'.repeat(64),administration:{population:'TEACHER',responseMode:'SELF'}},subjectSelector:{kind:'ALL_CURRENT'},respondentSelector:{kind:'ALL_CURRENT'}}
@@ -53,4 +53,20 @@ it.each(['COGNITIVE','SITUATIONAL','BUNDLE'])('routes %s through the existing ad
  expect((await post(candidate)).status).toBe(200)
  expect(m.legacyAdd).toHaveBeenCalledWith({...candidate,subjectSelector:{},respondentSelector:{},organizationId:id(1),eventId:id(2),actorUserId:'server-actor'})
  expect(m.privateAdd).not.toHaveBeenCalled();expect(m.formAdd).not.toHaveBeenCalled()
+})
+
+
+it('explains the report-only publication refusal without exposing internal error messages',async()=>{
+ m.publish.mockRejectedValueOnce(Object.assign(new Error('internal resource details'),{code:'RUN_PARTICIPANT_REPORT_NOT_CONFIGURED',statusCode:400}))
+ const response=await fetch(url.replace(/\/tracks$/,'/publish'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({expectedVersion:4,provideParticipantReport:true})})
+ expect(response.status).toBe(400)
+ const result=await response.json()
+ expect(result).toEqual({code:'RUN_PARTICIPANT_REPORT_NOT_CONFIGURED',message:'所选工具仅用于数据采集，不能提供个人报告。请取消勾选“向作答者提供报告”，再发布仅回执任务。',data:null})
+ expect(result.message).not.toContain('internal')
+})
+it('retains the generic authorization boundary for other publication errors',async()=>{
+ m.publish.mockRejectedValueOnce(Object.assign(new Error('private source identity'),{code:'RUN_RESOURCE_UNAVAILABLE',statusCode:403}))
+ const response=await fetch(url.replace(/\/tracks$/,'/publish'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({expectedVersion:4})})
+ expect(response.status).toBe(403)
+ expect(await response.json()).toEqual({code:'RUN_RESOURCE_UNAVAILABLE',message:'测评资源、版本或任务授权不满足发布条件',data:null})
 })
