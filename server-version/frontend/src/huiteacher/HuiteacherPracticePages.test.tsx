@@ -262,3 +262,45 @@ it('shows draft activity state and offers no form or auxiliary write before open
  expect(screen.queryByText('新建辅助记录或私人反思')).not.toBeInTheDocument()
  expect(api.mock.calls.some(([path])=>path.endsWith('/form'))).toBe(false)
 })
+
+
+it('prioritizes accepting a CLOSED renewal even when formal feedback already exists, then opens only the original',async()=>{
+ const closed={...invite,eventStatus:'CLOSED',status:'INVITED'},completed={...note,status:'SUBMITTED',content:'关闭前已提交的原正式意见',submittedAt:'2026-11-23T08:00:00Z'}
+ const base=fixture({invites:[closed],existing:[completed]})
+ const api=vi.fn(async(path:string,method?:string,data?:unknown)=>{
+  if(path==='/field-invitations/invite/accept'&&method==='POST'){closed.status='ACCEPTED';return {id:'invite',eventId:'event',status:'ACCEPTED'}}
+  return base(path,method,data)
+ })
+ vi.spyOn(window,'confirm').mockReturnValue(true);render(<Workspace api={api as Api}/>)
+ fireEvent.click(await screen.findByRole('button',{name:'接受本次邀请'}))
+ const view=await screen.findByRole('button',{name:'查看已提交记录'})
+ expect(screen.getByText('活动已关闭')).toBeInTheDocument()
+ expect(screen.getByText(/本次仅续期协商确认授权/)).toBeInTheDocument()
+ expect(screen.queryByText('新建辅助记录或私人反思')).not.toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'填写实践表单'})).not.toBeInTheDocument()
+ fireEvent.click(view)
+ expect(await screen.findByText('关闭前已提交的原正式意见')).toBeInTheDocument()
+ expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'开始固定问卷'})).not.toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'正式提交'})).not.toBeInTheDocument()
+ expect(api.mock.calls.filter(([,method])=>Boolean(method))).toEqual([['/field-invitations/invite/accept','POST',{}]])
+ expect(api.mock.calls.some(([path])=>path.endsWith('/form'))).toBe(false)
+})
+it.each(['FACT','PRIVATE_REFLECTION','FORMAL_FEEDBACK'])('keeps a pre-close %s draft read-only after renewal without opening the expert questionnaire',async kind=>{
+ const completed={...note,id:'completed',status:'SUBMITTED',content:'已提交专业意见',submittedAt:'2026-11-23T08:00:00Z'},draft={...note,kind,content:'关闭前未提交草稿'}
+ const api=fixture({invites:[{...invite,eventStatus:'CLOSED'}],existing:[draft,completed]});render(<Workspace api={api as Api}/>)
+ fireEvent.click((await screen.findAllByRole('button',{name:'查看记录'}))[0])
+ expect(await screen.findByText('关闭前未提交草稿')).toBeInTheDocument()
+ expect(screen.getByText(/活动已关闭；续期授权仅用于/)).toBeInTheDocument()
+ expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'正式提交'})).not.toBeInTheDocument()
+ expect(api.mock.calls.some(([path])=>path.endsWith('/form'))).toBe(false)
+ expect(api.mock.calls.every(([,method])=>!method)).toBe(true)
+})
+it('does not offer a writable fallback for a CLOSED renewal whose original is absent from the current records page',async()=>{
+ const api=fixture({invites:[{...invite,eventStatus:'CLOSED'}]});render(<Workspace api={api as Api}/>)
+ expect(await screen.findByRole('button',{name:'查看已提交记录'})).toBeDisabled()
+ expect(screen.queryByText('新建辅助记录或私人反思')).not.toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'填写实践表单'})).not.toBeInTheDocument()
+ expect(api.mock.calls.some(([path])=>path.endsWith('/form'))).toBe(false)
+})

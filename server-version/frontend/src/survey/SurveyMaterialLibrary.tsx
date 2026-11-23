@@ -1,4 +1,4 @@
-import {useCallback,useEffect,useId,useRef,useState} from 'react'
+import {lazy,Suspense,useCallback,useEffect,useId,useRef,useState} from 'react'
 import {Search,Upload,Image as ImageIcon,Video,FileText,ArrowRight,Pencil,X,LoaderCircle,FolderOpen,ShieldCheck} from 'lucide-react'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import {ScaleLibraryMediaPreview} from '../components/scale-governance/ScaleLibraryMediaPreview'
@@ -7,6 +7,8 @@ import {toolLibraryApi as api} from './tool-library-api'
 import type {BuilderLeaveRisk} from './SurveyBuilder'
 import './survey-material-library.css'
 import './survey-material-library-polish.css'
+
+const PdfViewer=lazy(()=>import('../components/PdfViewer'))
 
 type Kind='image'|'video'|'document'
 type Source='all'|'owned'|'granted'
@@ -90,7 +92,7 @@ export function SurveyMaterialLibrary({visible=true,onLeaveRiskChange}:{visible?
     </div>
     {error&&<div role="alert" className="survey-material-message is-error">{error}<button type="button" disabled={loading||locked} onClick={()=>setRevision(value=>value+1)}>重新读取列表</button></div>}
     {notice&&<div role="status" className="survey-material-message"><span>{notice}</span><button type="button" aria-label="关闭提示" onClick={()=>setNotice('')}><X size={16}/></button></div>}
-    {loading?<div role="status" className="survey-material-empty"><LoaderCircle size={26} className="survey-material-spinner"/><p>正在读取素材…</p></div>:!error&&!list.length?<div className="survey-material-empty"><FolderOpen size={34} strokeWidth={1.3}/><h2>暂无{filter.source==='granted'?'获授权的':filter.source==='owned'?'自主上传的':'符合条件的'}素材</h2><p>{filter.source==='granted'?'管理员授权后，素材会显示在这里。也可调整类型与检索条件。':'调整筛选条件，或从右上角上传第一份素材。'}</p>{filtered&&<button type="button" className="btn-secondary" disabled={locked} onClick={clearFilters}>显示全部素材</button>}</div>:<div className="survey-material-grid">{list.map(row=>{const Icon=formats[row.kind].Icon,key=(row.bound?.entryId||'own')+':'+row.id,renaming=rename?.id===row.id&&row.source==='owned';return <article key={key} className="survey-material-card" aria-label={row.name} data-kind={row.kind}>
+    {loading?<div role="status" className="survey-material-empty"><LoaderCircle size={26} className="survey-material-spinner"/><p>正在读取素材…</p></div>:!error&&!list.length?<div className="survey-material-empty"><FolderOpen size={34} strokeWidth={1.3}/><h2>{!filtered?'还没有素材':filter.source==='granted'?'暂无获授权的素材':filter.source==='owned'?'暂无自主上传的素材':'没有符合条件的素材'}</h2><p>{!filtered?'先上传图片、PDF 或视频，再在问卷和反馈中选用。':filter.source==='granted'?'管理员授权后，素材会显示在这里。也可调整类型与检索条件。':'试试其他类型或关键词，也可清除筛选查看全部素材。'}</p>{filtered&&<button type="button" className="btn-secondary" disabled={locked} onClick={clearFilters}>显示全部素材</button>}</div>:<div className="survey-material-grid">{list.map(row=>{const Icon=formats[row.kind].Icon,key=(row.bound?.entryId||'own')+':'+row.id,renaming=rename?.id===row.id&&row.source==='owned';return <article key={key} className="survey-material-card" aria-label={row.name} data-kind={row.kind}>
       <MaterialCover key={key+row.updatedAt} material={row} disabled={locked} onPreview={()=>{setPreview(row);setPreviewError('')}}/>
       <div className={'survey-material-card-top is-'+row.kind}><span><Icon size={19} aria-hidden="true"/>{formats[row.kind].label}</span><small>{row.source==='owned'?'自主上传':'授权使用'}</small></div>
       {renaming?<form className="survey-material-rename" aria-label="重命名素材" onKeyDown={event=>{if(event.key==='Escape'&&!writeLock.current){event.preventDefault();setRename(null);setRenameError('')}}} onSubmit={event=>{event.preventDefault();void saveName()}}><label>素材名称<input autoFocus className="input" aria-label="修改素材名称" value={name} maxLength={160} disabled={busy} onChange={event=>setName(event.target.value)}/></label>{renameError&&<p role="alert">{renameError}</p>}<div><button type="submit" disabled={busy||!name.trim()||name.trim()===rename.name}>{busy?'保存中…':'保存名称'}</button><button type="button" disabled={busy} onClick={()=>{setRename(null);setRenameError('')}}>取消</button></div></form>:<h2 title={row.name}>{row.name}</h2>}
@@ -106,8 +108,9 @@ export function SurveyMaterialLibrary({visible=true,onLeaveRiskChange}:{visible?
       <p className="survey-material-upload-note">请上传你有权使用的研究素材。此处不转码、不压缩视频。</p></div>
       <footer><button type="button" className="btn-secondary" disabled={busy} onClick={closeUpload}>取消</button><button type="button" className="btn-primary" disabled={!file||busy} onClick={()=>void send()}><Upload size={16}/>{busy?'正在上传…':'开始上传'}</button></footer>
     </div></ModalSurface>
-    <ModalSurface open={!!preview} onClose={()=>setPreview(null)} className="survey-material-modal" dismissOnBackdrop><div className="survey-material-dialog is-preview" role="dialog" aria-modal="true" aria-label="素材预览" tabIndex={-1}><header><div><h2>{preview?.name}</h2><p>{preview?formats[preview.kind].label+' · '+sizeLabel(preview.size):''}</p></div><button type="button" aria-label="关闭预览" onClick={()=>setPreview(null)}><X size={20}/></button></header><div className="survey-material-preview">
-      {preview?.bound?<><p>随「{preview.bound.title}」授权，仅限该量表使用。</p><ScaleLibraryMediaPreview product="SURVEY" context={{kind:'entries',id:preview.bound.entryId}} item={preview.bound.item}/></>:preview?.kind==='image'?<img src={content(preview.id)} alt={preview.name} onError={()=>setPreviewError('图片暂不可用，请关闭后重新读取列表。')}/>:preview?.kind==='video'?<video src={content(preview.id)} controls preload="metadata" aria-label={preview.name} onError={()=>setPreviewError('视频暂不可用或浏览器不支持此编码，请关闭后重新读取列表。')}/>:preview?.kind==='document'?<><iframe title={preview.name} src={content(preview.id)} sandbox=""/><a href={content(preview.id)} target="_blank" rel="noopener noreferrer">在新页面查看文档</a></>:null}
+    <ModalSurface open={!!preview&&(preview.kind!=='document'||!!preview.bound)} onClose={()=>setPreview(null)} className="survey-material-modal" dismissOnBackdrop><div className="survey-material-dialog is-preview" role="dialog" aria-modal="true" aria-label="素材预览" tabIndex={-1}><header><div><h2>{preview?.name}</h2><p>{preview?formats[preview.kind].label+' · '+sizeLabel(preview.size):''}</p></div><button type="button" aria-label="关闭预览" onClick={()=>setPreview(null)}><X size={20}/></button></header><div className="survey-material-preview">
+      {preview?.bound?<><p>随「{preview.bound.title}」授权，仅限该量表使用。</p><ScaleLibraryMediaPreview product="SURVEY" context={{kind:'entries',id:preview.bound.entryId}} item={preview.bound.item}/></>:preview?.kind==='image'?<img src={content(preview.id)} alt={preview.name} onError={()=>setPreviewError('图片暂不可用，请关闭后重新读取列表。')}/>:preview?.kind==='video'?<video src={content(preview.id)} controls preload="metadata" aria-label={preview.name} onError={()=>setPreviewError('视频暂不可用或浏览器不支持此编码，请关闭后重新读取列表。')}/>:null}
       {previewError&&<p role="alert">{previewError}</p>}</div></div></ModalSurface>
+    {preview?.kind==='document'&&!preview.bound&&<Suspense fallback={<p role="status">正在加载文档预览…</p>}><PdfViewer isOpen url={content(preview.id)} title={preview.name} onClose={()=>setPreview(null)}/></Suspense>}
   </section>
 }

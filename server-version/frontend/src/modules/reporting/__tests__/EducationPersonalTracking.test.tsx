@@ -3,6 +3,37 @@ import {describe,it,expect,vi} from 'vitest'
 import {EducationTrackingPublish} from '../EducationPersonalTracking'
 const choices=[{trackId:'task',itemId:'a',scoreKey:'total',label:'A Total',unit:'points',visible:true},{trackId:'task',itemId:'b',scoreKey:'total',label:'B Total',unit:'points',visible:false}]
 describe('Education tracking plan versus own numeric disclosure',()=>{
+ it.each(['SCHOOL','TEACHER'] as const)('%s explains a server-ineligible report and publishes receipt-only without inferring from metric choices',async entry=>{
+  const reason='所选工具未配置作答者报告，请使用仅回执模式发布。'
+  const api=vi.fn(async()=>({baselineId:null,ordinal:null,choices,participantReport:{eligible:false,reason}})),publish=vi.fn()
+  render(<EducationTrackingPublish api={api as any} path="/data-only" entry={entry} publish={publish} disabled={false}/>)
+  const report=await screen.findByRole('checkbox',{name:'向作答者提供报告（普通自评整卷）'})
+  expect(report).toBeDisabled();expect(report).not.toBeChecked()
+  expect(report).toHaveAccessibleDescription(reason)
+  fireEvent.click(report)
+  fireEvent.click(screen.getByRole('button',{name:entry==='SCHOOL'?'正式发布本人测评':'发布教师评价任务'}))
+  expect(publish).toHaveBeenCalledWith({mode:'SINGLE',metrics:[],visibleMetrics:[]},false)
+ })
+ it.each(['SCHOOL','TEACHER'] as const)('%s keeps an eligible report selectable even when there are no longitudinal choices',async entry=>{
+  const api=vi.fn(async()=>({baselineId:null,ordinal:null,choices:[],participantReport:{eligible:true,reason:null}})),publish=vi.fn()
+  render(<EducationTrackingPublish api={api as any} path="/eligible" entry={entry} publish={publish} disabled={false}/>)
+  const report=await screen.findByRole('checkbox',{name:'向作答者提供报告（普通自评整卷）'})
+  expect(report).toBeEnabled();fireEvent.click(report);expect(report).toBeChecked()
+  fireEvent.click(screen.getByRole('button',{name:entry==='SCHOOL'?'正式发布本人测评':'发布教师评价任务'}))
+  expect(publish).toHaveBeenCalledWith({mode:'SINGLE',metrics:[],visibleMetrics:[]},true)
+ })
+ it('ignores an eligible former source response after switching to a data-only source',async()=>{
+  let finish!:(value:unknown)=>void
+  const old=vi.fn(()=>new Promise(resolve=>{finish=resolve})),publish=vi.fn()
+  const current=vi.fn(async()=>({baselineId:null,ordinal:null,choices:[],participantReport:{eligible:false,reason:'本来源仅提供回执'}}))
+  const view=render(<EducationTrackingPublish api={old as any} path="/old" publish={publish} disabled={false}/>)
+  view.rerender(<EducationTrackingPublish api={current as any} path="/current" publish={publish} disabled={false}/>)
+  const report=await screen.findByRole('checkbox',{name:'向作答者提供报告（普通自评整卷）'})
+  expect(report).toBeDisabled()
+  await act(async()=>finish({baselineId:null,ordinal:null,choices,participantReport:{eligible:true,reason:null}}))
+  expect(report).toBeDisabled();expect(report).toHaveAccessibleDescription('本来源仅提供回执')
+  expect(publish).not.toHaveBeenCalled()
+ })
  it('keeps both leaf totals in the plan while explicit empty own visibility hides all',async()=>{
   const api=vi.fn(async()=>({baselineId:null,ordinal:null,choices})),publish=vi.fn()
   render(<EducationTrackingPublish api={api as any} path="/task" entry="SCHOOL" publish={publish} disabled={false}/>)

@@ -36,24 +36,28 @@ function ParentTasksSession({api}:{api:SchoolApi}){
   const [error,setError]=useState('')
   const [busy,setBusy]=useState(false)
   const [query,setQuery]=useState(''),[sort,setSort]=useState('recommended'),[view,setView]=useState<SchoolCollectionView>('list')
-  const scope=useMemo(()=>({pending:false}),[api])
+  const scope=useMemo(()=>({pending:false,refreshQueued:false}),[api])
   const currentScope=useRef<typeof scope|null>(scope)
   currentScope.current=scope
-  const refresh=useCallback(async(append=false)=>{
-    if(currentScope.current!==scope||scope.pending)return
+  const refresh=useCallback(async function readInbox(append=false,requireFresh=false):Promise<void>{
+    if(currentScope.current!==scope)return
+    if(scope.pending){if(requireFresh)scope.refreshQueued=true;return}
     scope.pending=true;setBusy(true);setError('')
     try{
       const activeCursor=append?cursorRef.current:null
       const result=await api<{list:ParentRunTask[];nextCursor?:string|null}>('/my/parent-run-tasks'+(activeCursor?'?cursor='+encodeURIComponent(activeCursor):''))
-      if(currentScope.current===scope){
+      if(currentScope.current===scope&&!scope.refreshQueued){
         setTasks(prev=>append&&prev?[...prev,...result.list]:result.list)
         setCursor(result.nextCursor??null);setHasMore(Boolean(result.nextCursor))
       }
     }catch(e){
-      if(currentScope.current===scope)setError(e instanceof Error?e.message:'家长测评任务暂不可用')
+      if(currentScope.current===scope&&!scope.refreshQueued)setError(e instanceof Error?e.message:'家长测评任务暂不可用')
     }finally{
       scope.pending=false
-      if(currentScope.current===scope)setBusy(false)
+      if(currentScope.current===scope){
+        if(scope.refreshQueued){scope.refreshQueued=false;void readInbox()}
+        else setBusy(false)
+      }
     }
   },[api,scope])
   useEffect(()=>{
@@ -96,7 +100,7 @@ function ParentTasksSession({api}:{api:SchoolApi}){
     </details>
     {feedback&&renderFeedback({executionId:feedback.executionId,title:feedback.runTitle,mode:'COMPOSITION',onClose:()=>setFeedback(null)})}
     {active&&<SchoolCompositeRunner key={active.execution.executionId} api={api} execution={active.execution} observer observerRole="parent" observerTaskTitle={active.task.runTitle}
-      onExit={()=>{if(currentScope.current===scope)setActive(null)}}
-      onFinished={()=>{if(currentScope.current!==scope)return;setActive(null);if(active.task.feedbackMode==='COMPOSITION')setFeedback(active.task);void refresh()}}/>}
+      onExit={()=>{if(currentScope.current!==scope)return;setActive(null);setTasks(null);void refresh(false,true)}}
+      onFinished={()=>{if(currentScope.current!==scope)return;setActive(null);setTasks(null);if(active.task.feedbackMode==='COMPOSITION')setFeedback(active.task);void refresh(false,true)}}/>}
   </section>
 }

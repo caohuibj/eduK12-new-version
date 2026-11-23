@@ -1,0 +1,15 @@
+.training-contact-page .training-contact-content {width:min(100% - 64px,1040px);margin:64px auto 88px;padding:0;color:var(--training-ink,#203e33);}
+.training-help-heading {max-width:680px;margin:0 0 34px;}
+.training-help-heading>p {margin:0 0 12px;color:var(--training-muted,#5e7468);font-size:12px;letter-spacing:.14em;font-weight:600;}
+.training-help-heading h1 {margin:0 0 14px;font:600 clamp(32px,4vw,44px)/1.2 var(--training-serif,serif);letter-spacing:-.02em;}
+.training-help-heading>span {font-size:16px;line-height:1.8;color:var(--training-muted,#5e7468);}
+.training-help-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;}
+.training-help-topic {display:flex;flex-direction:column;align-items:flex-start;min-width:0;padding:28px;border:1px solid var(--training-border,#d9e1d4);border-radius:16px;background:var(--training-surface,#fffdf8);}
+.training-help-topic>svg {color:var(--training-bamboo,#285e47);margin-bottom:18px;}
+.training-help-topic h2 {margin:0 0 12px;font:600 22px/1.4 var(--training-serif,serif);}
+.training-help-topic>p {margin:0 0 20px;font-size:15px;line-height:1.85;color:var(--training-muted,#52685d);}
+.training-help-topic>small {font-size:13px;line-height:1.8;color:var(--training-muted,#52685d);}
+.training-help-links {display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:auto;}
+.training-help-links a {display:inline-flex;align-items:center;gap:8px;min-height:44px;color:var(--training-bamboo,#285e47);font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:5px;}
+.training-help-links a:focus-visible {outline:2px solid currentColor;outline-offset:4px;border-radius:3px;}
+@media(max-width:700px){.training-contact-page .training-contact-content{width:calc(100% - 36px);margin:40px auto 56px;}.training-help-heading{margin-bottom:26px;}.training-help-grid{grid-template-columns:1fr;gap:14px;}.training-help-topic{padding:22px;}.training-help-topic h2{font-size:21px;}.training-help-heading>span{font-size:15px;}}

@@ -83,6 +83,16 @@ const TeacherProfile: React.FC = () => {
     }
   }
 
+  const cancelPassword = () => {
+    setShowPasswordForm(false)
+    setOldPassword('')
+    setNewPassword('')
+    setConfirmPassword('')
+    setPasswordErrors({})
+    setShowOldPassword(false)
+    setShowNewPassword(false)
+  }
+
   const handleChangePassword = async (event: React.FormEvent) => {
     event.preventDefault()
 
@@ -105,10 +115,7 @@ const TeacherProfile: React.FC = () => {
       const response = await apiClient.post('/auth/change-password', { oldPassword, newPassword })
       if (response.code === 0) {
         setMessage({ type: 'success', text: '密码修改成功' })
-        setOldPassword('')
-        setNewPassword('')
-        setConfirmPassword('')
-        setShowPasswordForm(false)
+        cancelPassword()
       } else {
         setMessage({ type: 'error', text: response.message || '修改失败' })
       }
@@ -200,7 +207,7 @@ const TeacherProfile: React.FC = () => {
                 <Lock className="h-5 w-5 text-gray-600" aria-hidden="true" />
                 <h2 id="teacher-password-title" className="text-lg font-semibold text-gray-800">{isTrainingHost() ? "账户安全" : "修改密码"}</h2>
               </div>
-              <button type="button" onClick={() => setShowPasswordForm(current => !current)} className="text-sm text-action hover:underline" aria-expanded={showPasswordForm}>
+              <button type="button" onClick={() => showPasswordForm ? cancelPassword() : setShowPasswordForm(true)} className="text-sm text-action hover:underline" aria-expanded={showPasswordForm}>
                 {showPasswordForm ? '取消' : '修改密码'}
               </button>
             </div>

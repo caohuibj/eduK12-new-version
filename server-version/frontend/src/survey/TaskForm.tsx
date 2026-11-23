@@ -147,7 +147,7 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
       {q.allowRefusal&&!['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<label className="block my-3 text-sm">
         <input type="checkbox" checked={isTaskFormRefusal(answer[q.itemKey])}
           onChange={e=>onChange(q.itemKey,e.target.checked?refusal():null)}/>
-        我选择不回答这一题（REFUSED）
+        我选择不回答这一题
       </label>}
       {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<BasicFormAnswer question={{...q,prompt:q.prompt||'文本回答'}} value={typeof answer[q.itemKey]==='string'?answer[q.itemKey] as string:null} disabled={isTaskFormRefusal(answer[q.itemKey])} onChange={value=>onChange(q.itemKey,value)}/>}
     </fieldset>

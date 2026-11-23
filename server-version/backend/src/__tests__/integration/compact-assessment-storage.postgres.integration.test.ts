@@ -14,7 +14,19 @@ let processJob:typeof import('../../workers/compositeReportWorker')['processComp
 const qaIds:string[]=[],questionnaireIds:string[]=[]
 const fixtures:Array<Awaited<ReturnType<typeof createReportOutboxFixture>>>=[]
 const fixture=async(units=1)=>{const f=await createReportOutboxFixture(db,units);fixtures.push(f);return f}
-const claim=async()=>{const job=await outbox.claimCompositeReportJob();if(!job)throw new Error('Expected durable job');return job}
+const claim=async(attemptId:string)=>{
+ // Other suites can retain durable jobs in this shared test DB.
+ // Schedule only this fixture first, then exercise the real global claim and
+ // lease fencing without processing another suite's accepted receipt.
+ const scheduled=await db.$executeRaw`UPDATE composite_report_jobs
+  SET next_attempt_at=(SELECT COALESCE(MIN(next_attempt_at),CURRENT_TIMESTAMP AT TIME ZONE 'UTC')-INTERVAL '1 second' FROM composite_report_jobs)
+  WHERE attempt_id=${attemptId} AND attempt_epoch=1`
+ expect(scheduled).toBe(1)
+ const job=await outbox.claimCompositeReportJob()
+ if(!job)throw new Error('Expected durable job')
+ expect(job).toMatchObject({attemptId,attemptEpoch:1,status:'PROCESSING'})
+ return job
+}
 const wholeInput=async(f:Awaited<ReturnType<typeof fixture>>)=>{
  const whole=await import('../../modules/composite/whole-questionnaire.service'),definition=await whole.getWholeQuestionnaireDefinition(f.parent.id,{userId:f.participant.id})
  const children=await db.assessment.findMany({where:{compositeAttemptId:f.parent.id},select:{id:true,compositeItemId:true}})
@@ -63,17 +75,17 @@ suite('compact immutable assessment facts on isolated PostgreSQL',()=>{
   expect(full.decryptError).toBe(false);expect(canonicalHash(full.result)).toBe(fact.sourceResultHash)
   expect(await submit(input)).toMatchObject({replayed:true,payloadHash:first.payloadHash})
   expect(await db.$queryRaw<Array<{n:number}>>`SELECT count(*)::int AS n FROM assessment_result_facts WHERE assessment_id=${saved.id}`).toEqual([{n:1}])
-  await processJob(await claim());expect((await service.getReport(f.parent.id,{userId:f.participant.id})).unitReports[0].scores[0].value).toBe(3)
+  await processJob(await claim(f.parent.id));expect((await service.getReport(f.parent.id,{userId:f.participant.id})).unitReports[0].scores[0].value).toBe(3)
   await expect(submit({...input,answers:input.answers.map(a=>({...a,responseValue:'no'}))})).rejects.toMatchObject({code:'SUBMISSION_PAYLOAD_CONFLICT'})
  })
  it('recovers a partially completed whole receipt under a new lease without copying raw answers',async()=>{
   const f=await fixture(3),{whole,input}=await wholeInput(f),accepted=await whole.submitWholeQuestionnaire(f.parent.id,input,{userId:f.participant.id})
   expect(accepted.status).toBe('ACCEPTED');expect(await db.$queryRaw<Array<{n:number}>>`SELECT count(*)::int AS n FROM assessment_result_facts f JOIN assessments a ON a.id=f.assessment_id WHERE a.composite_attempt_id=${f.parent.id}`).toEqual([{n:0}])
-  const old=await claim(),unit=input.units[0],select=(await import('../../modules/scale/scale-admission.service')).UNIFIED_SCALE_CHILD_ADMISSION_SELECT
+  const old=await claim(f.parent.id),unit=input.units[0],select=(await import('../../modules/scale/scale-admission.service')).UNIFIED_SCALE_CHILD_ADMISSION_SELECT
   const child=await db.assessment.findFirstOrThrow({where:{compositeAttemptId:f.parent.id,compositeItemId:unit.itemId},select})
   await (await import('../../modules/scale/unified-final-submit.service')).submitUnifiedScaleAssessmentFinal({...unit,assessmentId:child.id,attemptEpoch:1,submissionId:'whole-'+createHash('sha256').update(input.submissionId+'/'+unit.itemId).digest('hex'),compositeAttemptId:f.parent.id,userId:f.participant.id,contextSnapshotHash:null},child,{submissionId:input.submissionId,payloadHash:accepted.payloadHash,leaseToken:old.leaseToken!,acceptedAtMs:accepted.acceptedAt.getTime()})
   await db.compositeReportJob.update({where:{id:old.id},data:{leaseExpiresAt:new Date(0)}})
-  const next=await claim();expect(next.leaseToken).not.toBe(old.leaseToken);await processJob(next)
+  const next=await claim(f.parent.id);expect(next.leaseToken).not.toBe(old.leaseToken);await processJob(next)
   const saved=await db.assessment.findMany({where:{compositeAttemptId:f.parent.id}}),facts=await loadScaleFactRecords(saved.map(a=>({id:a.id,attemptEpoch:1})),db,true)
   expect(facts).toHaveLength(3);expect(facts.every(row=>row.rawReceiptAttemptId===f.parent.id&&row.rawAnswersEncrypted===null)).toBe(true)
   for(const row of saved){const raw=await loadScaleAnswers(row.answers,row,db),original=input.units.find(u=>u.itemId===row.compositeItemId)!.answers;expect(raw.decryptError).toBe(false);expect(raw.answers).toEqual(expect.arrayContaining(original.map(a=>expect.objectContaining(a))));expect((await loadScaleResult(row.result,row,{full:true},db)).decryptError).toBe(false)}
@@ -136,7 +148,7 @@ suite('compact immutable assessment facts on isolated PostgreSQL',()=>{
   await expect(db.$executeRaw`DELETE FROM assessment_frozen_bindings WHERE id=${bindings[0].id}`).rejects.toThrow()
   vi.stubEnv('ASSESSMENT_SHARED_CONTROL_ENABLED','false')
   try{expect((await unit.loadStoredVersionedUnitAdmission(rows[0],'unreadable'))?.snapshotHash).toBe(rows[0].frozenAdmissionSnapshotHash)}finally{vi.stubEnv('ASSESSMENT_SHARED_CONTROL_ENABLED','true')}
-  await whole.submitWholeQuestionnaire(f.parent.id,input,{userId:f.participant.id});await processJob(await claim())
+  await whole.submitWholeQuestionnaire(f.parent.id,input,{userId:f.participant.id});await processJob(await claim(f.parent.id))
   expect((await service.getReport(f.parent.id,{userId:f.participant.id})).unitReports).toHaveLength(3)
  })
  it('reuses an immutable binding inside a request while isolating concurrent requests',async()=>{
@@ -164,7 +176,7 @@ suite('compact immutable assessment facts on isolated PostgreSQL',()=>{
   expect(await db.$queryRaw<any[]>`SELECT count(*)::int AS n FROM assessment_frozen_bindings WHERE composite_attempt_id=${f.parent.id}`).toEqual([{n:0}])
  })
  it('retains immutable prior-epoch results and rolls back failed fact transactions',async()=>{
-  const f=await fixture(),submit=(await import('../../modules/scale/scale-final-submit.service')).submitScaleAssessmentFinal;await submit(f.inputs[0]);await processJob(await claim())
+  const f=await fixture(),submit=(await import('../../modules/scale/scale-final-submit.service')).submitScaleAssessmentFinal;await submit(f.inputs[0]);await processJob(await claim(f.parent.id))
   const saved=await db.assessment.findUniqueOrThrow({where:{id:f.inputs[0].assessmentId}}),snapshot=await db.assessmentUnitSnapshot.findFirstOrThrow({where:{sourceAttemptId:saved.id}})
   const before=await loadStoredCanonicalUnitResult(snapshot.canonicalResultEncrypted!),[row]=await loadScaleFactRecords([{id:saved.id,attemptEpoch:1}],db,true)
   await expect(db.$transaction(async tx=>{await persistScaleFactRecords(tx,[{...row,attemptEpoch:2,submissionId:'rolled-back-'+randomUUID()}]);throw new Error('SYNTHETIC_ABORT')})).rejects.toThrow('SYNTHETIC_ABORT')

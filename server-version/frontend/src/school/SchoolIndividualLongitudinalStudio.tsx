@@ -7,7 +7,7 @@ type Spec={specId:string;title:string;version:number}
 type Catalog={subjects:Subject[];specs:Spec[];truncated:boolean}
 type Source={
   runId:string;trackId:string;runName:string;publishedAt:string;
-  resource:{family:string;key:string;version:string}
+  resource:{family:string;key:string;version:string;title?:string;versionLabel?:string}
 }
 type Sources={sources:Source[];truncated:boolean}
 type Result={artifactId:string;subjectReference:string;status:'AVAILABLE';note:string}
@@ -102,7 +102,7 @@ export function SchoolIndividualLongitudinalStudio({api,organizationId,compact=f
       {sources&&!sources.sources.length&&<p>该学生暂时没有已结束且符合独立生成条件的校园自评 Run。</p>}
       {sources&&<fieldset className="hs-task-list">
         <legend>选择 2–8 次合法的自评测量（同一工具，至少两个不同的 Run）</legend>
-        {sources.sources.map(s=><label key={sourceKey(s)} className="hs-task-card">
+        {sources.sources.map((s,index)=><label key={sourceKey(s)} className="hs-task-card">
           <input type="checkbox" disabled={busy}
             checked={selected.includes(sourceKey(s))}
             onChange={e=>{
@@ -110,7 +110,7 @@ export function SchoolIndividualLongitudinalStudio({api,organizationId,compact=f
               setSelected(prev=>e.target.checked?[...prev,sourceKey(s)]
                 :prev.filter(x=>x!==sourceKey(s)))
             }}/>
-          <span>{s.runName} · {s.resource.family} {s.resource.key} ({s.resource.version}) · {new Date(s.publishedAt).toLocaleDateString('zh-CN')}</span>
+          <span>{s.runName} · {s.resource.title??'测评来源 '+(index+1)} · {s.resource.versionLabel??'固定版本'} · {new Date(s.publishedAt).toLocaleDateString('zh-CN')}</span>
         </label>)}
         {sources.truncated&&<p>仅展示近期部分波次；请先缩小科学研究范围。</p>}
       </fieldset>}

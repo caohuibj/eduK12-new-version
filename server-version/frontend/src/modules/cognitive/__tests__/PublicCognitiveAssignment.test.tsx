@@ -35,6 +35,18 @@ beforeEach(() => {
 })
 
 describe('PublicCognitiveAssignment recovery flow', () => {
+  it.each([
+    ['Public link is disabled', '此公开链接已停用'],
+    ['Public link has expired', '此公开链接已过期'],
+    ['Public link reached its maximum uses', '此公开链接的参与次数已用完'],
+  ])('explains %s in Chinese and blocks a new start', async (message, expected) => {
+    api.info.mockRejectedValue({ message, status: 403 })
+    renderAt()
+    expect(await screen.findByRole('alert')).toHaveTextContent(expected)
+    expect(screen.getByRole('button', { name: '开始匿名测评' })).toBeDisabled()
+    expect(api.start).not.toHaveBeenCalled()
+  })
+
   it('keeps an existing recovery credential usable when the public link is exhausted', async () => {
     window.sessionStorage.setItem('cognitive:recovery:access:public-token', credential)
     api.info.mockResolvedValue({ code: 1, message: 'Public link reached its maximum uses' })

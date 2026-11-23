@@ -1,4 +1,5 @@
 import {readInstance} from '../bundle-product/instance'
+import {educationParticipantReportPublishOption} from '../assessment-run/participant-report-option'
 import {resolveAudienceDisclosure} from '../scale/policy/disclosure'
 import {trainingTrackingMeasurementIdentity} from '../composite/personal-tracking'
 import {readPrivateCompositionRunSources} from '../education-tools/private-tool.composition-source'
@@ -108,14 +109,15 @@ function freezeVisibleMetrics(bindings:EducationTracking['bindings'],choices:Cho
  return bindings.map(bound=>({...bound,visible:requested?requested.some(item=>selectedKey(item)===selectedKey(bound)):bound.visible===true}))
 }
 export async function educationTrackingOptions(db:Prisma.TransactionClient,run:{baselineId:string|null;ordinal:number|null;tracking:unknown},tracks:EducationTrackingTrack[],entry:'SCHOOL'|'TEACHER',organizationId:string){
+ const participantReport=educationParticipantReportPublishOption(tracks)
  const choices=await educationTrackingChoices(db,tracks,entry)
- if(!run.baselineId)return {...run,tracking:undefined,choices}
+ if(!run.baselineId)return {...run,tracking:undefined,choices,participantReport}
  const tracking=educationTrackingSchema.parse(run.tracking)
  const [baseline]=await db.$queryRaw<Array<{tracking:unknown}>>`SELECT personal_tracking AS tracking FROM assessment_runs WHERE id=${run.baselineId} AND organization_id=${organizationId}`
  const plan=educationTrackingSchema.parse(baseline?.tracking).plan
  if(!plan)fail('追踪基线不可用')
  const bindings=inheritEducationTrackingBindings(tracking,plan!,choices)
- return {baselineId:run.baselineId,ordinal:run.ordinal,choices:bindings.map(b=>({...choices.find(c=>selectedKey(c)===selectedKey(b))!,selectedVisible:b.visible===true}))}
+ return {baselineId:run.baselineId,ordinal:run.ordinal,participantReport,choices:bindings.map(b=>({...choices.find(c=>selectedKey(c)===selectedKey(b))!,selectedVisible:b.visible===true}))}
 }
 
 /** Inside the original Run publication transaction, after current product,

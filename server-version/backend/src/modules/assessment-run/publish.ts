@@ -1,4 +1,5 @@
 import {sealPrivateFormRuntimeForPublication} from '../education-tools/private-tool.form-runtime-resources'
+import {selfCompositionReportTracks,hasConfiguredSelfCompositionReport,educationParticipantReportPublishOption} from './participant-report-option'
 import {publishPrivateCompositionRuntime} from '../education-tools/private-tool.composition-source'
 import {isStudentCompositionKey} from '../huiteacher/studentComposition.policy'
 import {studentEvaluationConfigMatches} from '../huiteacher/studentCompositionResource'
@@ -100,22 +101,13 @@ type PopulationPair = {
 type PreparedTrack = DraftTrack & { resourcePolicy: RunResourcePolicy }
 
 async function receiptOnlyTrackIds(tx: Tx, tracks: PreparedTrack[], provideParticipantReport?: boolean) {
-  const candidates = tracks.filter(({ resourcePolicy: policy }) => {
-    const origin = policy.educationComposition?.origin
-    return policy.runtimeLaunchTarget?.kind === 'COMPOSITE'
-      && (origin?.entry === 'SCHOOL' && origin.variantKey === 'STUDENT:SELF'
-        || origin?.entry === 'TEACHER' && origin.variantKey === 'TEACHER:SELF')
-  })
+  const candidates = selfCompositionReportTracks(tracks)
   if (!candidates.length) return new Set<string>()
   const hasScoredUnits = (policy: RunResourcePolicy) => {
     const unitReports = policy.educationComposition?.unitReports
     return Array.isArray(unitReports) && unitReports.length > 0
   }
-  const hasAnyConfiguredReport = (policy: RunResourcePolicy) => {
-    const unitReports = policy.educationComposition?.unitReports
-    if (!Array.isArray(unitReports)) return true
-    return unitReports.some(unit => unit.respondent.mode === 'INDIVIDUAL_SUMMARY')
-  }
+  const hasAnyConfiguredReport = hasConfiguredSelfCompositionReport
   // A scored track (contains SCALE/SJT/COGNITIVE) whose tools ALL have NONE
   // respondent disclosure is data-collection-only and must stay receiptOnly.
   // Pure-FORM compositions (unitReports.length === 0) keep their existing
@@ -127,11 +119,11 @@ async function receiptOnlyTrackIds(tx: Tx, tracks: PreparedTrack[], provideParti
   // participant reports, reject when none of the selected self-report tracks has
   // any tool configured with a respondent report.
   if (provideParticipantReport === true) {
-    const eligible = candidates.filter(({ resourcePolicy }) => hasAnyConfiguredReport(resourcePolicy))
-    if (!eligible.length) {
+    const option = educationParticipantReportPublishOption(candidates)
+    if (!option.eligible) {
       throw new RunPublishError(
         'RUN_PARTICIPANT_REPORT_NOT_CONFIGURED',
-        '当前测评所选工具均未配置受测者报告，仅用于数据采集，请使用仅回执模式发布',
+        option.reason!,
         400,
       )
     }

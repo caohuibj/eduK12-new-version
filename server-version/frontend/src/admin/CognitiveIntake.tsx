@@ -42,11 +42,16 @@ function operationRow(value:Operation,selected:Identity,mode:Operation['mode']):
 }
 
 function CognitiveIntakeWorkspace(){
-  const [query,setQuery]=useState('')
+  const [query,setQuery]=useState(''),[page,setPage]=useState(1)
+  const pageSize=12
   const selectionPanel=useRef<HTMLElement>(null)
   const [catalog,setCatalog]=useState<Catalog|null>(null),[selectedKey,setSelectedKey]=useState<string|null>(null)
   useEffect(()=>{if(selectedKey){selectionPanel.current?.focus({preventScroll:true});selectionPanel.current?.scrollIntoView?.({block:'start',behavior:'smooth'})}},[selectedKey])
   const filtered=catalog?.registered.filter(row=>[row.name,row.testType,row.configVersion,row.engineVersion,row.scoringVersion].join(' ').toLowerCase().includes(query.trim().toLowerCase()))
+  const pages=Math.max(1,Math.ceil((filtered?.length??0)/pageSize))
+  const visible=filtered?.slice((page-1)*pageSize,page*pageSize)
+  useEffect(()=>{setPage(1)},[query])
+  useEffect(()=>{setPage(current=>Math.min(current,pages))},[pages])
   const [preview,setPreview]=useState<InstallRow|null>(null),[busy,setBusy]=useState(false),[needsRefresh,setNeedsRefresh]=useState(false)
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const mounted=useRef(false),epoch=useRef(0),locked=useRef(false)
@@ -65,7 +70,7 @@ function CognitiveIntakeWorkspace(){
       if(!current(request))return
       if(response.code!==0||response.data?.schemaVersion!==1||!Array.isArray(response.data.registered)||!Array.isArray(response.data.pending))
         throw new Error(response.message||'候选列表响应不完整')
-      setCatalog(response.data);setSelectedKey(null);setNeedsRefresh(false)
+      setCatalog(response.data);setPage(1);setSelectedKey(null);setNeedsRefresh(false)
     }catch(caught){if(current(request)){setNeedsRefresh(true);setError(requestError(caught))}}
     finally{finish(request)}
   },[begin,current,finish])
@@ -203,11 +208,11 @@ function CognitiveIntakeWorkspace(){
       <section className="sys-panel" aria-label="已登记认知候选">
         <div className="sys-section-heading"><div><h2><Brain size={18} aria-hidden="true"/>已登记候选</h2><p>每次只处理一个精确版本；其他任务的待审缺口不影响本列表。</p></div><span className="sys-badge">{catalog?`${catalog.registered.length} 项`:'正在读取'}</span></div>
         <label className="system-field">检索认知候选<input type="search" value={query} onChange={event=>setQuery(event.target.value)} placeholder="名称、任务类型或版本"/></label>
-        {catalog&&<p role="status">找到 {filtered?.length??0} 项，共 {catalog.registered.length} 项。</p>}
+        {catalog&&<p role="status">找到 {filtered?.length??0} 项，共 {catalog.registered.length} 项。{pages>1&&` 当前第 ${page} / ${pages} 页。`}</p>}
         {catalog&&filtered?.length===0&&query.trim()&&<p>没有符合条件的候选，请更换关键词。</p>}
         {!catalog&&<p role="status">{busy?'正在读取候选与安装状态…':'候选尚未读取，请刷新重试。'}</p>}
         {catalog&&!catalog.registered.length&&<p className="sys-empty">当前没有代码登记的推荐草稿。</p>}
-        <div className="sys-records">{filtered?.map(row=><article className="sys-record" key={key(row)}><details>
+        <div className="sys-records">{visible?.map(row=><article className="sys-record" key={key(row)}><details>
           <summary><span className="sys-record-heading"><strong>{row.name}</strong><small>{row.testType} · 配置 {row.configVersion}</small></span><span className="sys-record-state"><span className="sys-badge" data-status={row.plan.status}>{planLabel(row.plan)}</span><ChevronDown size={17} aria-hidden="true"/></span></summary>
           <div className="sys-record-body"><dl className="sys-facts"><div><dt>来源</dt><dd>当前代码登记</dd></div><div><dt>报告版本</dt><dd>{row.reportVersion??'未声明'}</dd></div>
             <div><dt>参数配置与预计时长</dt><dd>{row.profiles.map(profile=>`${profileLabel[profile.key]??profile.key}：${profile.estimatedMinutes[0]}–${profile.estimatedMinutes[1]} 分钟`).join('；')||'未声明'}</dd></div>
@@ -219,6 +224,7 @@ function CognitiveIntakeWorkspace(){
             }}>{selectedKey===key(row)?`已选择 ${row.name}`:`选择 ${row.name}`}</button>
             <details className="sys-technical"><summary>反馈指标与配置标识</summary><p>{row.reportMetrics.join('、')||'未声明反馈指标'}</p>{row.plan.configId&&<p>配置标识：{row.plan.configId}</p>}</details>
           </div></details></article>)}</div>
+        {pages>1&&<nav className="system-actions" aria-label="认知候选分页"><button type="button" disabled={busy||page===1} onClick={()=>setPage(value=>value-1)}>上一页</button><span>第 {page} / {pages} 页</span><button type="button" disabled={busy||page===pages} onClick={()=>setPage(value=>value+1)}>下一页</button></nav>}
       </section>
       <section className="sys-panel" aria-label="待审核认知候选"><h2>待审核候选</h2><p className="sys-muted">保留已开发内容与具体缺口，当前不能从这里安装。</p>
         {catalog&&!catalog.pending.length&&<p>当前没有待审核候选。</p>}

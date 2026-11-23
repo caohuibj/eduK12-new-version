@@ -38,6 +38,7 @@ const stateLabels:Record<string,string>={DRAFT:'草稿',OPEN:'已开放',PUBLISH
 const statusLabel=(status:string)=>stateLabels[status]??status
 function nextAction(event:Event,run?:Run){
   if(event.status==='CANCELLED')return '活动已取消，请查看历史配置。'
+  if(event.status==='CLOSED')return '查看历史配置、正式反馈与报告；报告仍按原有授权和隐私条件开放。'
   if(!run)return ['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)
     ?'现场观察可独立进行；草稿阶段先确认专家／同行接受邀请。已有测评任务可查看配置。'
     :'查看已有任务配置；如尚未创建，在活动草稿中建立评价任务。'
@@ -61,6 +62,7 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
   scaleScope.current={base,api}
   const [targets,setTargets]=useState<Target[]>([])
   const [events,setEvents]=useState<Event[]>([])
+  const [expandedEvents,setExpandedEvents]=useState<Record<string,boolean>>({})
   const [runMap,setRunMap]=useState<Record<string,Run>>({})
   const [previews,setPreviews]=useState<Record<string,PreviewSnapshot>>({})
   const previewEpoch=useRef(0)
@@ -128,7 +130,7 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
   const refresh=async()=>{await Promise.all([loadTargets(),loadEvents()])}
   useEffect(()=>{
     const generation=++scopeGeneration.current
-    setTargets([]);setEvents([]);setTargetCursor(null);setEventCursor(null)
+    setTargets([]);setEvents([]);setExpandedEvents({});setTargetCursor(null);setEventCursor(null)
     previewEpoch.current++;setPreviews({})
     setRunMap({});setProgress({});setReports({});setReleasedForms([]);setReleasedScales({})
     setScaleChoice({});setScaleCursor({});setScaleLoading({});setScaleError({});scaleRequest.current={}
@@ -172,6 +174,7 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     setNotice('已建立活动专属评价任务草稿，请加入已发布表单或获授权量表。')
   })
   const inspectRun=(event:Event)=>perform(async()=>{
+    setExpandedEvents(old=>({...old,[event.id]:true}))
     const run=await api<Run>(base+'/evaluation-events/'+event.id+'/run')
     setRunMap(old=>({...old,[event.id]:run}))
   })
@@ -365,12 +368,12 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     {eventLoading&&<p role="status">正在读取评价活动…</p>}
     {eventError&&<p role="alert">{eventError} <button disabled={eventLoading} onClick={()=>void loadEvents(eventCursor??undefined)}>重试评价活动</button></p>}
     {!eventLoading&&!eventError&&events.length===0&&<p className="ht-empty">尚无评价活动，可以先创建草稿。</p>}
-    <div className="ht-event-list">{events.map(event=><article key={event.id} className="ht-event">
-      <strong>{event.title}</strong>
-      <span className="ht-tag">{eventLabels[event.kind]??event.kind} · 活动：{statusLabel(event.status)}</span>
+    <div className="ht-event-list">{events.map(event=><article key={event.id} className="ht-event ht-managed-event" data-event-status={event.status}>
+      <header className="ht-event-heading"><strong>{event.title}</strong>
+      <span className="ht-tag">{eventLabels[event.kind]??event.kind} · 活动：{statusLabel(event.status)}</span></header>
       <p className="ht-muted">下一步：{nextAction(event,runMap[event.id])}</p>
-      <div className="ht-inline">
-        <button onClick={()=>inspectRun(event)} disabled={working}>查看任务配置</button>
+      <div className="ht-inline ht-event-actions">
+        <button className="ht-primary" onClick={()=>inspectRun(event)} disabled={working}>查看任务配置</button>
         {event.status==='DRAFT'&&<button onClick={()=>createRun(event)} disabled={working||!!runMap[event.id]}>创建评价任务草稿</button>}
         {event.status==='DRAFT'&&<button onClick={()=>transition(event,'OPEN')}
           disabled={working||(
@@ -383,12 +386,18 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
         {event.status==='DRAFT'&&!runMap[event.id]
           &&['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)
           &&<p className="ht-muted">纯现场观察无需创建测评任务；需先邀请至少一位专家／同行并由其接受，再开放活动。</p>}
-        {(event.status==='DRAFT'||event.status==='OPEN'&&runMap[event.id]?.status==='CANCELLED')&&<button onClick={()=>transition(event,'CANCEL')} disabled={working}>{event.status==='DRAFT'?'取消草稿':'取消活动并结束'}</button>}
+        {(event.status==='DRAFT'||event.status==='OPEN'&&runMap[event.id]?.status==='CANCELLED')&&<button className="ht-event-cancel" onClick={()=>transition(event,'CANCEL')} disabled={working}>{event.status==='DRAFT'?'取消草稿':'取消活动并结束'}</button>}
         {event.status==='OPEN'&&<button onClick={()=>transition(event,'CLOSE')}
           disabled={working||(runMap[event.id]&&runMap[event.id].status!=='CLOSED')}>
           结束活动
         </button>}
       </div>
+      <details className="ht-event-details" open={expandedEvents[event.id]??!['CLOSED','CANCELLED'].includes(event.status)} onToggle={e=>{
+        const open=e.currentTarget.open
+        setExpandedEvents(old=>old[event.id]===open?old:{...old,[event.id]:open})
+      }}>
+      <summary>{['CLOSED','CANCELLED'].includes(event.status)?'历史配置、观察与报告':'活动配置、观察与报告'}<span className="ht-event-details-hint">展开查看</span></summary>
+      <div className="ht-event-details-body">
       {runMap[event.id]&&<div>
         <p>任务状态：{statusLabel(runMap[event.id].status)} · 已配置工具 {runMap[event.id].trackCount??0} 项</p>
         <SelectedToolOutline disabled={working} onRemove={event.status==='DRAFT'&&runMap[event.id].status==='DRAFT'?trackId=>perform(async()=>{
@@ -525,7 +534,8 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
           organizationId={organizationId} eventId={event.id}
           eventStatus={event.status} api={api}/>}
       {reports[event.id]&&<TeacherFormGroupReport {...reports[event.id]}/>}
-
+      </div>
+      </details>
     </article>)}</div>
     {eventCursor&&<button disabled={eventLoading||working} onClick={()=>void loadEvents(eventCursor)}>加载更多评价活动</button>}
 {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'

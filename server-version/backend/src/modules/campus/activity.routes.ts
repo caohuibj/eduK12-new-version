@@ -210,7 +210,19 @@ router.get('/activities/:courseId/assignments/:id',
 router.post('/activities/:courseId/assignments/:id/submit',
   authenticateSchool,studentAssignment,assignmentController.submit)
 router.get('/activities/:courseId/checkins/:id',
-  authenticateSchool,studentCheckin,checkinController.detail)
+  authenticateSchool,studentCheckin,wrap(async(req,res)=>{
+    // School's task reader needs the learner's retained text when reopening a
+    // completed check-in. Keep the shared Training detail contract unchanged,
+    // and never project another learner's submission or its internal hashes.
+    const checkin=await prisma.checkin.findFirst({
+      where:{id:req.params.id,courseId:req.params.courseId},
+      select:{id:true,title:true,description:true,content:true,
+        submissions:{where:{studentId:req.user!.userId},select:{content:true},take:1}},
+    })
+    if(!checkin)return notFound(res,'当前任务不存在')
+    const {submissions,...detail}=checkin
+    return success(res,{...detail,mySubmission:submissions.length?{content:submissions[0].content,status:'SUBMITTED'}:null})
+  }))
 router.post('/activities/:courseId/checkins/:id/submit',
   authenticateSchool,studentCheckin,checkinController.submit)
 

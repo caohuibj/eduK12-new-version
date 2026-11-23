@@ -57,7 +57,8 @@ describe('real education host private report image transport',()=>{
    render(<HuiteacherApp/> )
    fireEvent.click(await screen.findByRole('button',{name:'我的工具'}))
   }
-  fireEvent.click(await screen.findByRole('button',{name:'编辑 报告图量表'}))
+  // Both real hosts defer the editor bundle; transport assertions start after it loads.
+  fireEvent.click(await screen.findByRole('button',{name:'编辑 报告图量表'},{timeout:5000}))
   await waitFor(()=>expect(screen.getByRole('button',{name:'报告文案'})).toBeEnabled())
   fireEvent.click(screen.getByRole('button',{name:'报告文案'}))
   const image=new File(['png'],'report.png',{type:'image/png'})

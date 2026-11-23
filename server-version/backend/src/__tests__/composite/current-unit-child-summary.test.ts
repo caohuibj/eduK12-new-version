@@ -89,3 +89,22 @@ describe('identity-only current-unit child summaries', () => {
     expect(mocks.scale).not.toHaveBeenCalled(); expect(mocks.headers).not.toHaveBeenCalled()
   })
 })
+
+it('delivers an imported Scale using the approved logical key and selects its source identity', async () => {
+  const { parent } = fixture('SCALE')
+  Object.assign(parent.compositeAssessment.items[0].scale, {
+    code: 'db-scale:scale', instrumentClass: 'STANDARD', standardSourceKind: 'DB_IMPORTED', standardToolKey: 'fixture',
+  })
+  const slots = createFrozenActiveSlotSet({ schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
+    slots: [{ slotKey: 'scale:item', unitType: 'SCALE', required: true,
+      sourceDefinitionIdentity: { key: 'db-scale:scale', version: '1', hash: definitionHash },
+      sourceBinding: { compiledRuntimeHash: runtimeHash } }] })
+  parent.frozenActiveSlotSetEncrypted = encryptFrozenActiveSlotSet(slots)
+  parent.frozenActiveSlotSetHash = slots.snapshotHash
+  const result = await getAttemptState('attempt', { userId: 'student' })
+  expect(result.currentItem?.type).toBe('SCALE')
+  const query = mocks.parent.mock.calls[0][0]
+  expect(query.select.compositeAssessment.select.items.select.scale.select).toMatchObject({
+    instrumentClass: true, standardSourceKind: true, standardToolKey: true,
+  })
+})
