@@ -69,6 +69,41 @@ describe('one-step full scale Excel workbook import', () => {
     const buffer = Buffer.from(await book.xlsx.writeBuffer())
     await expect(parseFullScaleWorkbook(buffer)).rejects.toThrow(/量表导入未通过校验/)
     await expect(parseFullScaleWorkbook(Buffer.from('not-an-xlsx'))).rejects.toThrow(/量表导入未通过校验/)
+
+    // Blank numeric score or threshold bounds must fail rather than coercing '' -> 0,
+    // while explicit '0' remains valid.
+    const blankScoreBook = new ExcelJS.Workbook()
+    const bOpts = blankScoreBook.addWorksheet('选项组')
+    bOpts.addRow(['选项组', '选项值', '选项文字', '分值'])
+    bOpts.addRow(['likert', '1', '否', ''])
+    bOpts.addRow(['likert', '2', '是', 1])
+    const bItems = blankScoreBook.addWorksheet('题目与计分')
+    bItems.addRow(['题号', '题干', '反向', '选项组', '维度标识', '维度名称', '聚合方式'])
+    bItems.addRow(['Q1', '题干', '否', 'likert', 'total', '总分', '求和'])
+    await expect(parseFullScaleWorkbook(Buffer.from(await blankScoreBook.xlsx.writeBuffer()))).rejects.toMatchObject({
+      issues: [expect.objectContaining({ message: expect.stringContaining('分值不能为空') })],
+    })
+
+    const zeroAndBlankBoundBook = new ExcelJS.Workbook()
+    const zOpts = zeroAndBlankBoundBook.addWorksheet('选项组')
+    zOpts.addRow(['选项组', '选项值', '选项文字', '分值'])
+    zOpts.addRow(['likert', '0', '从不', 0])
+    zOpts.addRow(['likert', '1', '总是', 1])
+    const zItems = zeroAndBlankBoundBook.addWorksheet('题目与计分')
+    zItems.addRow(['题号', '题干', '反向', '选项组', '维度标识', '维度名称', '聚合方式'])
+    zItems.addRow(['Q1', '题干', '否', 'likert', 'total', '总分', '求和'])
+    const zRep = zeroAndBlankBoundBook.addWorksheet('阈值报告')
+    zRep.addRow(['指标标识', '分档标识', '下限含', '上限', '含上限', '报告文字'])
+    zRep.addRow(['total', 'low', '', 3, '是', '缺下限'])
+    await expect(parseFullScaleWorkbook(Buffer.from(await zeroAndBlankBoundBook.xlsx.writeBuffer()))).rejects.toMatchObject({
+      issues: [expect.objectContaining({ message: expect.stringContaining('下限与上限均不能为空') })],
+    })
+
+    // Explicit 0 in both score and threshold lower bound must be preserved.
+    zRep.getRow(2).values = ['total', 'low', 0, 2, '是', '零分起段']
+    const validZeroParsed = await parseFullScaleWorkbook(Buffer.from(await zeroAndBlankBoundBook.xlsx.writeBuffer()))
+    expect(validZeroParsed.definition.responseSets[0].options[0].score).toBe(0)
+    expect(validZeroParsed.definition.report.rawScoreFeedback?.rules[0].ranges[0].min).toBe(0)
   })
 })
 

@@ -180,7 +180,11 @@ export async function parseFullScaleWorkbook(
     }
     const value = data['选项值']
     const label = data['选项文字']
-    const score = Number(data['分值'])
+    const rawScore = data['分值']
+    if (!rawScore) {
+      throw new ScaleImportValidationError([{ line, message: '选项分值不能为空，请填写有效数字' }])
+    }
+    const score = Number(rawScore)
     if (!value || seenOptValues.has(value)) {
       throw new ScaleImportValidationError([{ line, message: '选项值不能为空或重复' }])
     }
@@ -263,8 +267,13 @@ export async function parseFullScaleWorkbook(
     for (const { line, data } of reportRows) {
       const scoreKey = data['指标标识']
       const rangeKey = data['分档标识']
-      const min = Number(data['下限含'])
-      const max = Number(data['上限'])
+      const rawMin = data['下限含']
+      const rawMax = data['上限']
+      if (!rawMin || !rawMax) {
+        throw new ScaleImportValidationError([{ line, message: '阈值下限与上限均不能为空，请填写有效数字' }])
+      }
+      const min = Number(rawMin)
+      const max = Number(rawMax)
       const includeMax = boolCell(data['含上限'], false)
       const text = data['报告文字']
       if (!scoreMap.has(scoreKey)) {
