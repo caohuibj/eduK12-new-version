@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 
@@ -102,6 +102,13 @@ describe('tryReadPreMaterializedDeclaredFeedback', () => {
     ]))
   })
 
+  afterEach(() => {
+    if (oldKey === undefined) delete process.env.DATA_ENCRYPTION_KEY
+    else process.env.DATA_ENCRYPTION_KEY = oldKey
+    if (oldCompact === undefined) delete process.env.ASSESSMENT_COMPACT_FACTS_ENABLED
+    else process.env.ASSESSMENT_COMPACT_FACTS_ENABLED = oldCompact
+  })
+
   it('returns pre-materialized declared reports when identity, ceilings, and live release status match', async () => {
     const encrypted = encryptUnifiedRuntimePayload(makePayload())
     const result = await tryReadPreMaterializedDeclaredFeedback({} as never, {
@@ -155,7 +162,5 @@ describe('tryReadPreMaterializedDeclaredFeedback', () => {
       expect(result).toBeNull()
     }
     expect(mocks.getContentReleaseBatch).not.toHaveBeenCalled()
-    process.env.DATA_ENCRYPTION_KEY = oldKey
-    process.env.ASSESSMENT_COMPACT_FACTS_ENABLED = oldCompact
   })
 })

@@ -7,31 +7,48 @@
 --   assessments: 601,189 total rows, 0 with non-null questionnaire_assessment_id or episode_id
 --     -> 2 legacy indexes consumed 14.6 MB (7.3 + 7.3 MB) indexing pure NULLs
 --
--- Uniqueness semantics for non-null rows are 100% preserved (PostgreSQL UNIQUE
--- already allows arbitrary duplicate NULLs), index names remain identical for
--- contract tests, and every composite scale INSERT skips 5 wasted B-tree page writes.
+-- Safety & Rollout:
+--   1. Each replacement partial index is created under a temporary name BEFORE
+--      dropping the old full index and renaming, so uniqueness enforcement and
+--      index coverage are never absent even if a step fails before completion.
+--   2. Prisma 5 wraps multi-statement migration scripts in a single transaction,
+--      making each create/drop/rename atomic.
+--   3. Optional zero-write-block pre-stage on busy tables: create the 5 `*_p2`
+--      indexes beforehand via `CREATE [UNIQUE] INDEX CONCURRENTLY ...`, verify
+--      `pg_index.indisvalid = true`, then let `prisma migrate deploy` perform
+--      only the instantaneous metadata drop + rename.
 
-DROP INDEX IF EXISTS "assessment_unit_snapshots_questionnaire_slot_key";
-CREATE UNIQUE INDEX "assessment_unit_snapshots_questionnaire_slot_key"
+CREATE UNIQUE INDEX IF NOT EXISTS "assessment_unit_snapshots_questionnaire_slot_key_p2"
   ON "assessment_unit_snapshots" ("questionnaire_assessment_id", "attempt_epoch", "slot_key")
   WHERE "questionnaire_assessment_id" IS NOT NULL;
+DROP INDEX IF EXISTS "assessment_unit_snapshots_questionnaire_slot_key";
+ALTER INDEX "assessment_unit_snapshots_questionnaire_slot_key_p2"
+  RENAME TO "assessment_unit_snapshots_questionnaire_slot_key";
 
-DROP INDEX IF EXISTS "assessment_unit_snapshots_questionnaire_source_key";
-CREATE UNIQUE INDEX "assessment_unit_snapshots_questionnaire_source_key"
+CREATE UNIQUE INDEX IF NOT EXISTS "assessment_unit_snapshots_questionnaire_source_key_p2"
   ON "assessment_unit_snapshots" ("questionnaire_assessment_id", "attempt_epoch", "source_attempt_id")
   WHERE "questionnaire_assessment_id" IS NOT NULL;
+DROP INDEX IF EXISTS "assessment_unit_snapshots_questionnaire_source_key";
+ALTER INDEX "assessment_unit_snapshots_questionnaire_source_key_p2"
+  RENAME TO "assessment_unit_snapshots_questionnaire_source_key";
 
-DROP INDEX IF EXISTS "assessment_unit_snapshots_questionnaire_terminal_idx";
-CREATE INDEX "assessment_unit_snapshots_questionnaire_terminal_idx"
+CREATE INDEX IF NOT EXISTS "assessment_unit_snapshots_questionnaire_terminal_idx_p2"
   ON "assessment_unit_snapshots" ("questionnaire_assessment_id", "attempt_epoch", "terminal_state")
   WHERE "questionnaire_assessment_id" IS NOT NULL;
+DROP INDEX IF EXISTS "assessment_unit_snapshots_questionnaire_terminal_idx";
+ALTER INDEX "assessment_unit_snapshots_questionnaire_terminal_idx_p2"
+  RENAME TO "assessment_unit_snapshots_questionnaire_terminal_idx";
 
-DROP INDEX IF EXISTS "assessments_questionnaire_assessment_id_idx";
-CREATE INDEX "assessments_questionnaire_assessment_id_idx"
+CREATE INDEX IF NOT EXISTS "assessments_questionnaire_assessment_id_idx_p2"
   ON "assessments" ("questionnaire_assessment_id")
   WHERE "questionnaire_assessment_id" IS NOT NULL;
+DROP INDEX IF EXISTS "assessments_questionnaire_assessment_id_idx";
+ALTER INDEX "assessments_questionnaire_assessment_id_idx_p2"
+  RENAME TO "assessments_questionnaire_assessment_id_idx";
 
-DROP INDEX IF EXISTS "assessments_episode_id_idx";
-CREATE INDEX "assessments_episode_id_idx"
+CREATE INDEX IF NOT EXISTS "assessments_episode_id_idx_p2"
   ON "assessments" ("episode_id")
   WHERE "episode_id" IS NOT NULL;
+DROP INDEX IF EXISTS "assessments_episode_id_idx";
+ALTER INDEX "assessments_episode_id_idx_p2"
+  RENAME TO "assessments_episode_id_idx";

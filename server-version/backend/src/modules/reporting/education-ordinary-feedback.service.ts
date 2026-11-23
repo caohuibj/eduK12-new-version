@@ -53,6 +53,9 @@ async function readOwn(tx:ReadOwnDb,input:ScopedInput,loadContent=false){
    AND p.composite_assessment_id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}'
    AND p.delivery_mode='FINAL_ONLY' AND p.runtime_generation='UNIFIED_V1'
   LEFT JOIN composite_report_jobs j ON j.attempt_id=p.id AND j.attempt_epoch=p.attempt_epoch
+   AND j.slot_set_hash=p.frozen_active_slot_set_hash
+   AND j.context_hash IS NOT DISTINCT FROM p.context_snapshot_hash
+   AND j.aggregate_input_hash=p.aggregate_input_hash
   WHERE e.id=${input.executionId} AND ((e.status='COMPLETED' AND a.status='COMPLETED' AND p.status='COMPLETED')
     OR e.status IN ('ASSIGNED','STARTED') AND a.status IN ('OPEN','STARTED'))
    AND ${input.entry==='TEACHER'?Prisma.sql`EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links link

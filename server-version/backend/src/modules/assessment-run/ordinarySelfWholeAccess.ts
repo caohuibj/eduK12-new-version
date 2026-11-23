@@ -97,8 +97,8 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
         AND t.resource_key LIKE ${'education-composition:' + product + ':%:' + variant + ':1.0.0'}
         AND t.frozen_resource_policy#>>'{educationComposition,origin,variantKey}'=${variant}
         AND t.frozen_resource_policy#>>'{runtimeLaunchTarget,kind}'='COMPOSITE'
-        ${progressOnly ? Prisma.empty : Prisma.sql`AND NOT EXISTS (SELECT 1 FROM composite_form_sections section
-          WHERE section.composite_assessment_id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}')`}
+        AND NOT EXISTS (SELECT 1 FROM composite_form_sections section
+          WHERE section.composite_assessment_id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}')
         AND EXISTS (${school ? schoolLink : teacherLink}) AND NOT EXISTS (${school ? teacherLink : schoolLink})
     )
     SELECT e.status AS "executionStatus", a.id AS "assignmentRef",
@@ -120,14 +120,14 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
             AND j.slot_set_hash=p.frozen_active_slot_set_hash AND j.whole_submission_id IS NOT NULL
             AND j.whole_payload_hash IS NOT NULL AND j.whole_accepted_at IS NOT NULL))
           AND ${boundCompositeConsentSql(Prisma.sql`a`, Prisma.sql`p`)}) AS allowed,
-      ${progressOnly ? Prisma.sql`FALSE` : Prisma.sql`CASE WHEN ${!school} AND e.status='STARTED' AND p.id IS NOT NULL
+      CASE WHEN ${!school} AND e.status='STARTED' AND p.id IS NOT NULL
         AND EXISTS (SELECT 1 FROM scale_library_emergency_stops LIMIT 1) THEN EXISTS (
         SELECT 1 FROM jsonb_array_elements(p.training_content_binding->'units') unit
         JOIN scale_library_emergency_stops stop ON
           (stop.target_kind='RELEASE' AND stop.target_id IN
             (unit#>>'{measurement,releaseId}',unit#>>'{source,educationNative,sourceMeasurementReleaseId}'))
           OR (stop.target_kind='TRAINING_SCALE' AND unit->>'family'='SCALE' AND stop.target_id=unit#>>'{source,id}')
-      ) ELSE FALSE END`} AS stopped,
+      ) ELSE FALSE END AS stopped,
       ${byExecution ? Prisma.sql`CASE WHEN e.status='ASSIGNED' AND e.runtime_binding_kind IS NULL
         AND e.runtime_binding_ref IS NULL AND a.status='OPEN' THEN jsonb_build_object(
           'runtimeBindingKind',NULL,'runtimeBindingRef',NULL,'respondentUserId',a.respondent_user_id,
