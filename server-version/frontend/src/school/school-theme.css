@@ -17,6 +17,7 @@
 .hs-app[data-theme=dark] .hs-public-nav a:not([data-cognitive-task-root],[data-cognitive-task-root] *){color:var(--hs-ink)}
 .hs-app[data-theme=dark] .hs-public-nav [aria-current=page]:not([data-cognitive-task-root],[data-cognitive-task-root] *){box-shadow:inset 0 -2px var(--hs-primary)}
 .hs-app[data-theme=dark] .hs-alert:not(.hs-runner *):not([data-cognitive-task-root],[data-cognitive-task-root] *){background:#442b25;color:#ffd1c1;border-color:#976c5d}
+.hs-app.hs-workspace[data-theme=dark] .hs-runner>p.hs-alert{background:#442b25;color:#ffd1c1;border-color:#976c5d}
 .hs-app[data-theme=dark] .hs-message:not(.hs-runner *):not([data-cognitive-task-root],[data-cognitive-task-root] *){background:#23432e;color:#c2edcb;border-color:#668a6d}
 .hs-app[data-theme=dark] .hs-footer:not([data-cognitive-task-root],[data-cognitive-task-root] *){background:var(--hs-bg);color:var(--hs-muted);border-color:var(--hs-border)}
 .hs-app[data-theme=dark] input:not([data-cognitive-task-root],[data-cognitive-task-root] *)::placeholder,.hs-app[data-theme=dark] textarea:not([data-cognitive-task-root],[data-cognitive-task-root] *)::placeholder{color:#a6b9ab}

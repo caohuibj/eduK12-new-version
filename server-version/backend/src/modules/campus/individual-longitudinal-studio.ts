@@ -9,6 +9,7 @@ import { getPublishedReportingSpec } from '../reporting/spec'
 import { readOrganizationReportingArtifact } from '../reporting/pr4Service'
 import { reportingFail,type ReportingIndividualLongitudinalSpecV1 } from '../reporting/types'
 import { campusStudentReference } from './studentReference'
+import {readCampusSourceLabels,campusSourceLabelKey} from './source-labels'
 
 type IndividualSource={runId:string;trackId:string;runName:string;publishedAt:string;
   resource:{family:string;key:string;version:string}}
@@ -182,7 +183,13 @@ export async function listCampusIndividualLongitudinalSources(input:{
   actor:AuthenticatedPrincipal;organizationId:string;subjectReference:string,
 }){
   const data=await permittedSources(input.actor,input.organizationId,input.subjectReference)
-  return {sources:data.sources,truncated:data.truncated}
+  const labels=await readCampusSourceLabels(prisma,data.sources.map(source=>({
+    organizationId:input.organizationId,key:source.resource.key,family:source.resource.family,
+  })))
+  return {sources:data.sources.map(source=>{
+    const label=labels.get(campusSourceLabelKey({organizationId:input.organizationId,key:source.resource.key}))
+    return {...source,resource:{...source.resource,...(label?{title:label.title,versionLabel:label.versionLabel}:{})}}
+  }),truncated:data.truncated}
 }
 
 export async function generateCampusIndividualLongitudinal(input:{
