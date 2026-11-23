@@ -70,3 +70,16 @@ it.each([{sortBy:'title'},{sortOrder:'invalid'},{sortBy:['creator']},{creatorId:
   const res=response();await courseController.list({user:{userId:'manager',role:'ADMIN'},query} as any,res)
   expect(res.status).toHaveBeenCalledWith(400);expect(mocks.findMany).not.toHaveBeenCalled()
 })
+
+it('keeps Training oversight within its course and creator domains and separates cached results', async () => {
+  const res = response()
+  res.locals = { trainingOversight: true }
+  await courseController.list({ user: { userId: 'manager', role: 'ADMIN' }, query: {} } as any, res)
+  expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({
+    where: expect.objectContaining({
+      courseType: { in: ['TRAINING_COURSE', 'LEGACY_COURSE'] },
+      creator: { accountDomain: { in: ['TRAINING', 'LEGACY'] } },
+    }),
+  }))
+  expect(mocks.cacheGet).toHaveBeenCalledWith(expect.stringContaining('courses:list:training-oversight:'))
+})
