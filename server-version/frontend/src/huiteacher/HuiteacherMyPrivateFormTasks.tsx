@@ -150,7 +150,7 @@ function PrivateFormSession({api,actorKey,unified=false,onListStateChange}:{api:
    {!visible.attempt&&<><button type="button" disabled={busy} onClick={()=>void work(async()=>{await reload()})}>重新读取当前表单</button><button type="button" disabled={busy} onClick={leave}>返回任务列表</button></>}
    {visible.attempt?.status==='ABANDONED'&&<><p>本次作答已终止，不能继续提交。</p><button type="button" onClick={leave}>返回任务列表</button></>}
    {visible.attempt?.status==='COMPLETED'&&<><p>本次表单已正式提交。</p><button type="button" onClick={leave}>返回任务列表</button></>}
-   {visible.attempt?.status==='IN_PROGRESS'&&!visible.attempt.currentItem&&<><p>正在确认完成状态，请刷新。</p><button type="button" disabled={busy} onClick={()=>void work(async()=>{await reload()})}>重新读取当前表单</button><button type="button" disabled={busy} onClick={leave}>返回任务列表</button></>}
+   {visible.attempt?.status==='IN_PROGRESS'&&visible.attempt.executionMode!=='WHOLE_V2'&&!visible.attempt.currentItem&&<><p>正在确认完成状态，请刷新。</p><button type="button" disabled={busy} onClick={()=>void work(async()=>{await reload()})}>重新读取当前表单</button><button type="button" disabled={busy} onClick={leave}>返回任务列表</button></>}
    {visible.attempt?.status==='IN_PROGRESS'&&visible.attempt.executionMode==='WHOLE_V2'&&v2Client?<WholeCompositeV2Runner
     attemptId={visible.attempt.id}
     title={visible.task.formTitle}

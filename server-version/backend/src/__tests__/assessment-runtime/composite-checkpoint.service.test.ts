@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto'
 import {
   clearCompositeCheckpoint,
   CompositeCheckpointError,
+  deleteUnlockedCompositeCheckpoint,
   readCompositeCheckpoint,
   readLockedUnitsForSubmit,
   saveCompositeCheckpoint,
@@ -10,12 +11,16 @@ import {
 
 const sha = (s: string) => createHash('sha256').update(s).digest('hex')
 
-/** In-memory fake mimicking composite_attempt_checkpoints SQL queries + monotonic lock semantics. */
-function makeCheckpointDb() {
+/** In-memory fake mimicking composite_attempt_checkpoints + parent attempt SQL queries + monotonic lock semantics. */
+function makeCheckpointDb(initialAttempt?: { status: string; attemptEpoch: number; publicationHash: string | null }) {
   const store = new Map<string, any>()
+  const attemptState = initialAttempt ?? { status: 'IN_PROGRESS', attemptEpoch: 1, publicationHash: sha('publication-1') }
   const db = {
     $queryRaw: vi.fn(async (sql: any) => {
       const text = Array.isArray(sql?.strings) ? sql.strings.join('?') : String(sql?.sql ?? '')
+      if (text.includes('FROM composite_assessment_attempts')) {
+        return [{ ...attemptState }]
+      }
       if (text.includes('FROM composite_attempt_checkpoints')) {
         const attemptId = sql.values[0]
         const row = store.get(attemptId)
@@ -27,22 +32,29 @@ function makeCheckpointDb() {
       const text = Array.isArray(sql?.strings) ? sql.strings.join('?') : String(sql?.sql ?? '')
       if (text.includes('INSERT INTO composite_attempt_checkpoints')) {
         const [attemptId, attemptEpoch, publicationHash, revision, saveCount, lockedSlotKeys, payloadCipher, payloadHash, expiresAt, updatedAt] = sql.values
+        if (text.includes('ON CONFLICT') && store.has(attemptId)) return 0
         store.set(attemptId, { attemptId, attemptEpoch, publicationHash, revision, saveCount, lockedSlotKeys: [...lockedSlotKeys], payloadCipher, payloadHash, expiresAt, updatedAt })
         return 1
       }
       if (text.includes('UPDATE composite_attempt_checkpoints')) {
-        const [attemptEpoch, publicationHash, revision, saveCount, lockedSlotKeys, payloadCipher, payloadHash, expiresAt, updatedAt, attemptId] = sql.values
+        const [attemptEpoch, publicationHash, revision, saveCount, lockedSlotKeys, payloadCipher, payloadHash, expiresAt, updatedAt, attemptId, whereEpoch, whereRev] = sql.values
+        const existing = store.get(attemptId)
+        if (!existing || existing.attemptEpoch !== whereEpoch || existing.revision !== whereRev) return 0
         store.set(attemptId, { attemptId, attemptEpoch, publicationHash, revision, saveCount, lockedSlotKeys: [...lockedSlotKeys], payloadCipher, payloadHash, expiresAt, updatedAt })
         return 1
       }
       if (text.includes('DELETE FROM composite_attempt_checkpoints')) {
-        store.delete(sql.values[0])
+        const attemptId = sql.values[0]
+        const existing = store.get(attemptId)
+        if (!existing) return 0
+        if (text.includes('cardinality(locked_slot_keys) = 0') && existing.lockedSlotKeys.length > 0) return 0
+        store.delete(attemptId)
         return 1
       }
       return 0
     }),
   }
-  return { store, db }
+  return { store, db, attemptState }
 }
 
 describe('composite-checkpoint service (universal drafts + monotonic Cognitive/SJT unit lock)', () => {
@@ -182,5 +194,71 @@ describe('composite-checkpoint service (universal drafts + monotonic Cognitive/S
       drafts: { 'scale:s1': JSON.parse('{"__proto__": {"polluted": true}}') },
       now: t0,
     })).rejects.toMatchObject({ statusCode: 400, code: 'CHECKPOINT_INVALID' })
+  })
+
+  it('prevents concurrent DELETE from dropping locked units, turns concurrent first INSERT into 409 CAS, and rejects saves after COMPLETED', async () => {
+    const { db, store, attemptState } = makeCheckpointDb({ status: 'IN_PROGRESS', attemptEpoch: 1, publicationHash: pubHash })
+
+    // 1. Atomic delete succeeds on unlocked draft
+    await saveCompositeCheckpoint(db, {
+      attemptId,
+      attemptEpoch: 1,
+      publicationHash: pubHash,
+      expectedRevision: 0,
+      drafts: { 'scale:s1': { q1: 1 } },
+      verifyAttemptActive: true,
+      now: t0,
+    })
+    await expect(deleteUnlockedCompositeCheckpoint(db, {
+      attemptId,
+      attemptEpoch: 1,
+      publicationHash: pubHash,
+      expectedRevision: 1,
+    })).resolves.toEqual({ cleared: true })
+    expect(store.size).toBe(0)
+
+    // 2. Concurrent first INSERT conflict returns 409 CHECKPOINT_CONFLICT (not unique constraint 500)
+    db.$executeRaw.mockResolvedValueOnce(0)
+    await expect(saveCompositeCheckpoint(db, {
+      attemptId,
+      attemptEpoch: 1,
+      publicationHash: pubHash,
+      expectedRevision: 0,
+      drafts: { 'scale:s1': { q1: 2 } },
+      now: t0,
+    })).rejects.toMatchObject({ statusCode: 409, code: 'CHECKPOINT_CONFLICT' })
+
+    // 3. Atomic delete refuses when a Cognitive unit is locked
+    await saveCompositeCheckpoint(db, {
+      attemptId,
+      attemptEpoch: 1,
+      publicationHash: pubHash,
+      expectedRevision: 0,
+      drafts: {},
+      lockUnit: {
+        slotKey: 'cognitive:cog-1',
+        unit: { unitType: 'COGNITIVE', itemId: 'cog-1', randomSeed: 'seed-1', trials: [{ idx: 0 }] },
+      },
+      verifyAttemptActive: true,
+      now: t0,
+    })
+    await expect(deleteUnlockedCompositeCheckpoint(db, {
+      attemptId,
+      attemptEpoch: 1,
+      publicationHash: pubHash,
+    })).rejects.toMatchObject({ statusCode: 409, code: 'CHECKPOINT_LOCKED_UNIT_IMMUTABLE' })
+    expect(store.size).toBe(1)
+
+    // 4. After parent transitions to COMPLETED, late checkpoint save/delete is rejected with 409
+    attemptState.status = 'COMPLETED'
+    await expect(saveCompositeCheckpoint(db, {
+      attemptId,
+      attemptEpoch: 1,
+      publicationHash: pubHash,
+      expectedRevision: 1,
+      drafts: { 'scale:s1': { q1: 4 } },
+      verifyAttemptActive: true,
+      now: t1,
+    })).rejects.toMatchObject({ statusCode: 409, code: 'CHECKPOINT_ATTEMPT_NOT_ACTIVE' })
   })
 })

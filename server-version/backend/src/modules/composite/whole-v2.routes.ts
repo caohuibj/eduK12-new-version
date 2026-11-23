@@ -4,15 +4,17 @@ import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { error, instrumentError, success } from '../../utils/response'
 import { isInstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
+import { isWholeSubmitAdmissionBusyError, withWholeSubmitAdmission } from '../../services/wholeSubmitAdmission'
 import { decodeCompositeUnitSeeds } from '../assessment-runtime/composite-final.codec'
 import {
-  clearCompositeCheckpoint,
   CompositeCheckpointError,
+  deleteUnlockedCompositeCheckpoint,
   readCompositeCheckpoint,
   saveCompositeCheckpoint,
 } from '../assessment-runtime/composite-checkpoint.service'
 import {
   commitCompositeWholeFinal,
+  validateCompositeCheckpointLockUnit,
   wholeV2SubmitSchema,
   type CommitCompositeWholeFinalInput,
 } from '../assessment-runtime/composite-final.writer'
@@ -59,17 +61,20 @@ const videoCapabilityRequestSchema = z.object({
 }).strict()
 
 export interface AuthorizedWholeV2Attempt {
-  attempt: CommitCompositeWholeFinalInput['attempt']
+  attempt: CommitCompositeWholeFinalInput['attempt'] & { status?: string }
   plan: CompositePublicationPlanV1
   audience: AssessmentMediaCapabilityAudience
   educationRun?: CommitCompositeWholeFinalInput['educationRun']
   activeSlotKeys?: ReadonlySet<string>
+  verifyAuthorityInTx?: CommitCompositeWholeFinalInput['verifyAuthorityInTx']
   buildFeedback?: CommitCompositeWholeFinalInput['buildFeedback']
 }
 
 export interface WholeV2RouteAdapter {
   /** Entry-specific auth middleware(s) (e.g. authenticateSchool, authenticateTeacher, etc.). */
   middleware: RequestHandler[]
+  /** Optional extra middleware(s) applied specifically to POST /v2/whole/submit (e.g. final consent). */
+  submitMiddleware?: RequestHandler[]
   /** Optional base path prefix before `/:attemptId/...` (default `''`). */
   prefix?: string
   /** Authorize attempt ownership and resolve its frozen CompositePublicationPlanV1. */
@@ -77,6 +82,10 @@ export interface WholeV2RouteAdapter {
 }
 
 function respondError(res: Response, err: unknown, fallbackMessage: string) {
+  if (isWholeSubmitAdmissionBusyError(err)) {
+    res.setHeader('Retry-After', String(err.retryAfterSeconds))
+    return error(res, '系统交卷繁忙，请稍后重试', -1, 503)
+  }
   if (err instanceof z.ZodError) {
     return error(res, err.issues[0]?.message || '请求参数格式无效', -1, 400)
   }
@@ -174,16 +183,76 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
         attemptEpoch: ctx.attempt.attemptEpoch,
         publicationHash: ctx.plan.publicationHash,
       })
+      let existingReceipt: {
+        status: 'COMPLETED'
+        attemptId: string
+        attemptEpoch: number
+        submissionId: string
+        payloadHash: string
+        aggregateHash: string
+        factsHash: string
+        rawHash: string
+        completedAt: string
+        replayed: true
+        receiptOnly: boolean
+        feedbackAvailable: boolean
+      } | null = null
+      if (ctx.attempt.status === 'COMPLETED') {
+        const finalRows = await prisma.$queryRaw<Array<{
+          attemptId: string
+          attemptEpoch: number
+          submissionId: string
+          payloadHash: string
+          aggregateHash: string
+          factsHash: string
+          rawHash: string
+          hasFeedback: boolean
+          completedAt: Date
+        }>>(Prisma.sql`
+          SELECT attempt_id AS "attemptId",
+            attempt_epoch AS "attemptEpoch",
+            submission_id AS "submissionId",
+            payload_hash AS "payloadHash",
+            aggregate_hash AS "aggregateHash",
+            facts_hash AS "factsHash",
+            raw_hash AS "rawHash",
+            (feedback_cipher IS NOT NULL) AS "hasFeedback",
+            completed_at AS "completedAt"
+          FROM composite_attempt_finals
+          WHERE attempt_id = ${ctx.attempt.id} AND attempt_epoch = ${ctx.attempt.attemptEpoch}
+          LIMIT 1
+        `)
+        const row = finalRows[0]
+        if (row) {
+          existingReceipt = {
+            status: 'COMPLETED',
+            attemptId: row.attemptId,
+            attemptEpoch: row.attemptEpoch,
+            submissionId: row.submissionId,
+            payloadHash: row.payloadHash,
+            aggregateHash: row.aggregateHash,
+            factsHash: row.factsHash,
+            rawHash: row.rawHash,
+            completedAt: row.completedAt.toISOString(),
+            replayed: true,
+            receiptOnly: ctx.attempt.receiptOnly,
+            feedbackAvailable: row.hasFeedback,
+          }
+        }
+      }
       return success(res, {
         executionMode: 'WHOLE_V2',
         attemptId: ctx.attempt.id,
         attemptEpoch: ctx.attempt.attemptEpoch,
+        status: ctx.attempt.status ?? 'IN_PROGRESS',
         publicationHash: ctx.plan.publicationHash,
         slotSetHash: ctx.plan.slotSetHash,
         templateHash: ctx.plan.publicationHash,
+        activeSlotKeys: ctx.activeSlotKeys ? [...ctx.activeSlotKeys] : null,
         receiptOnly: ctx.attempt.receiptOnly,
         unitSeeds,
         checkpoint,
+        ...(existingReceipt ? { existingReceipt } : {}),
       })
     } catch (err) {
       return respondError(res, err, '获取整卷定义失败')
@@ -228,6 +297,17 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
         return instrumentError(res, 'STALE_ATTEMPT', '作答版本已变更', 409)
       }
       const allowedSlotKeys = ctx.activeSlotKeys ?? new Set(ctx.plan.slots.map(s => s.slotKey))
+      if (parsed.lockUnit) {
+        if (!allowedSlotKeys.has(parsed.lockUnit.slotKey)) {
+          return instrumentError(res, 'DEFINITION_MISMATCH', `锁定槽位不在本次作答范围：${parsed.lockUnit.slotKey}`, 409)
+        }
+        validateCompositeCheckpointLockUnit({
+          plan: ctx.plan,
+          unitSeedsEncrypted: ctx.attempt.unitSeedsEncrypted,
+          slotKey: parsed.lockUnit.slotKey,
+          unit: parsed.lockUnit.unit,
+        })
+      }
       const snapshot = await prisma.$transaction(tx => saveCompositeCheckpoint(tx, {
         attemptId: ctx.attempt.id,
         attemptEpoch: ctx.attempt.attemptEpoch,
@@ -237,6 +317,7 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
         itemTimings: parsed.itemTimings,
         lockUnit: parsed.lockUnit,
         allowedSlotKeys,
+        verifyAttemptActive: true,
       }))
       return success(res, snapshot)
     } catch (err) {
@@ -247,33 +328,38 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
   router.delete(`${base}/v2/checkpoint`, ...mw, async (req: Request, res: Response) => {
     try {
       const ctx = await adapter.authorizeAttempt(req)
-      const existing = await readCompositeCheckpoint(prisma, {
+      const rawRev = req.query.expectedRevision
+      const expectedRevision = typeof rawRev === 'string' && /^\d+$/.test(rawRev) ? Number(rawRev) : undefined
+      const result = await prisma.$transaction(tx => deleteUnlockedCompositeCheckpoint(tx, {
         attemptId: ctx.attempt.id,
         attemptEpoch: ctx.attempt.attemptEpoch,
         publicationHash: ctx.plan.publicationHash,
-      })
-      if (existing.lockedSlotKeys.length > 0) {
-        return instrumentError(res, 'CHECKPOINT_LOCKED_UNIT_IMMUTABLE', '存在已锁定的认知或情境单元，无法清空草稿', 409)
-      }
-      await clearCompositeCheckpoint(prisma, ctx.attempt.id)
-      return success(res, { cleared: true })
+        ...(expectedRevision !== undefined ? { expectedRevision } : {}),
+        verifyAttemptActive: true,
+      }))
+      return success(res, result)
     } catch (err) {
       return respondError(res, err, '清空草稿失败')
     }
   })
 
-  router.post(`${base}/v2/whole/submit`, ...mw, async (req: Request, res: Response) => {
+  const submitMw = [...mw, ...(adapter.submitMiddleware ?? [])]
+  router.post(`${base}/v2/whole/submit`, ...submitMw, async (req: Request, res: Response) => {
     try {
       const ctx = await adapter.authorizeAttempt(req)
       const submit = wholeV2SubmitSchema.parse(req.body)
-      const receipt = await prisma.$transaction(tx => commitCompositeWholeFinal(tx, {
-        attempt: ctx.attempt,
-        plan: ctx.plan,
-        submit,
-        educationRun: ctx.educationRun,
-        activeSlotKeys: ctx.activeSlotKeys,
-        buildFeedback: ctx.buildFeedback,
-      }))
+      const receipt = await withWholeSubmitAdmission(
+        () => prisma.$transaction(tx => commitCompositeWholeFinal(tx, {
+          attempt: ctx.attempt,
+          plan: ctx.plan,
+          submit,
+          educationRun: ctx.educationRun,
+          activeSlotKeys: ctx.activeSlotKeys,
+          verifyAuthorityInTx: ctx.verifyAuthorityInTx,
+          buildFeedback: ctx.buildFeedback,
+        })),
+        ctx.audience === 'public',
+      )
       return success(res, receipt)
     } catch (err) {
       return respondError(res, err, '提交整卷失败')
@@ -283,6 +369,9 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
   router.get(`${base}/slots/:slotKey/assets/:assetId/content`, ...mw, async (req: Request, res: Response) => {
     try {
       const ctx = await adapter.authorizeAttempt(req)
+      if (ctx.activeSlotKeys && !ctx.activeSlotKeys.has(req.params.slotKey)) {
+        return error(res, '无权访问未激活槽位的媒体资源', -1, 403)
+      }
       return await serveCompositeSlotImage({
         plan: ctx.plan,
         slotKey: req.params.slotKey,
@@ -297,6 +386,9 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
   router.post(`${base}/slots/:slotKey/video-capabilities`, ...mw, async (req: Request, res: Response) => {
     try {
       const ctx = await adapter.authorizeAttempt(req)
+      if (ctx.activeSlotKeys && !ctx.activeSlotKeys.has(req.params.slotKey)) {
+        return error(res, '无权访问未激活槽位的视频资源', -1, 403)
+      }
       const body = videoCapabilityRequestSchema.parse(req.body)
       const sources = await issueCompositeSlotVideoCapabilities({
         plan: ctx.plan,

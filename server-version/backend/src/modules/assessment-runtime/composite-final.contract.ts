@@ -51,6 +51,7 @@ export const compositeScaleUnitFactSchema = z.object({
   scaleId: nonEmptyText,
   sourceDefinitionHash: hashSchema,
   sourceResultHash: hashSchema,
+  compiledRuntimeHash: hashSchema.optional(),
   bundleHash: hashSchema,
   scores: z.array(compactScoreTupleSchema).max(500),
   quality: scaleQualitySummarySchema,

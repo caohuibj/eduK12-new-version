@@ -13,6 +13,7 @@ import {
   type SituationRuntimeDefinition,
 } from '../situational/situation-runtime-definition'
 import type { CognitiveProfile, SessionConfigSnapshot } from '../cognitive/v2/types'
+import type { FrozenReportSnapshot } from '../cognitive/profile-freeze'
 import type { AssessmentStaticImageAssetIdentityV1 } from '../assessment-media/assessment-image'
 import type { AssessmentVideoPresentationV1 } from '../assessment-media/assessment-video'
 
@@ -89,6 +90,8 @@ export type CompositePublicationCognitiveSlot = CompositeSlotMediaManifest & {
   profile: CognitiveProfile
   sessionSnapshot: SessionConfigSnapshot
   compiledRuntime: CompiledInstrumentRuntimeV1
+  frozenReport?: FrozenReportSnapshot | null
+  referenceSets?: AssessmentReferenceSetDefinition[]
 }
 
 export type CompositePublicationSlotV1 =

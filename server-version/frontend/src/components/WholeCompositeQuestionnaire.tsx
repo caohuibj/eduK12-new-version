@@ -698,15 +698,15 @@ export default function WholeCompositeQuestionnaire(props: Props) {
           status: 'COMPLETED',
           hasAcceptedSubmission: true,
           runCompleted: true,
+          ...(receipt.receiptOnly ? { receiptOnly: true as const } : {}),
           reportStatus: {
-            state: 'READY',
+            state: receipt.receiptOnly ? 'NOT_OFFERED' : receipt.feedbackAvailable ? 'READY' : 'PENDING',
             jobId: null,
-            retryAfterSeconds: 0,
+            retryAfterSeconds: receipt.feedbackAvailable || receipt.receiptOnly ? 0 : 2,
             errorCode: null,
             completedAt: receipt.completedAt,
           },
-          reportAvailable: receipt.feedbackAvailable,
-        } as CompositeReportStatus)}
+        })}
       />
     )
   }

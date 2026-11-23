@@ -62,12 +62,15 @@ export interface WholeV2Meta {
   executionMode: 'WHOLE_V2'
   attemptId: string
   attemptEpoch: number
+  status?: string
   publicationHash: string
   slotSetHash: string
   templateHash: string
+  activeSlotKeys?: string[] | null
   receiptOnly: boolean
   unitSeeds: Record<string, string> | null
   checkpoint: WholeV2CheckpointSnapshot
+  existingReceipt?: WholeV2Receipt | null
 }
 
 export interface WholeV2ScaleTemplateUnit {
