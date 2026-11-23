@@ -10,11 +10,15 @@ import {
 
 const checkpoints = new Map<string, any>()
 const finals = new Map<string, any>()
+const parentState = { status: 'IN_PROGRESS', attemptEpoch: 1, publicationHash: null as string | null }
 
 vi.mock('../../config/database', () => {
   const mockDb: any = {
     $queryRaw: vi.fn(async (sql: any) => {
       const text = Array.isArray(sql?.strings) ? sql.strings.join('?') : String(sql?.sql ?? '')
+      if (text.includes('FROM composite_assessment_attempts')) {
+        return [{ ...parentState }]
+      }
       if (text.includes('FROM composite_attempt_checkpoints')) {
         const row = checkpoints.get(sql.values[0])
         return row ? [{ ...row, lockedSlotKeys: [...row.lockedSlotKeys] }] : []
@@ -30,6 +34,7 @@ vi.mock('../../config/database', () => {
       const text = Array.isArray(sql?.strings) ? sql.strings.join('?') : String(sql?.sql ?? '')
       if (text.includes('INSERT INTO composite_attempt_checkpoints')) {
         const [attemptId, attemptEpoch, publicationHash, revision, saveCount, lockedSlotKeys, payloadCipher, payloadHash, expiresAt, updatedAt] = sql.values
+        if (text.includes('ON CONFLICT') && checkpoints.has(attemptId)) return 0
         checkpoints.set(attemptId, { attemptId, attemptEpoch, publicationHash, revision, saveCount, lockedSlotKeys: [...lockedSlotKeys], payloadCipher, payloadHash, expiresAt, updatedAt })
         return 1
       }
@@ -39,7 +44,11 @@ vi.mock('../../config/database', () => {
         return 1
       }
       if (text.includes('DELETE FROM composite_attempt_checkpoints')) {
-        checkpoints.delete(sql.values[0])
+        const attemptId = sql.values[0]
+        const existing = checkpoints.get(attemptId)
+        if (!existing) return 0
+        if (text.includes('cardinality(locked_slot_keys) = 0') && existing.lockedSlotKeys.length > 0) return 0
+        checkpoints.delete(attemptId)
         return 1
       }
       if (text.includes('INSERT INTO composite_attempt_finals')) {
@@ -59,8 +68,29 @@ vi.mock('../../config/database', () => {
 })
 
 import { mountCompositeWholeV2Routes } from '../../modules/composite/whole-v2.routes'
+import { resolveCompositePublicationPlanForAttempt } from '../../modules/composite/whole-v2.access'
+import { gonogoSequence } from '../../modules/cognitive/randomization'
 
 const sha = (s: string) => createHash('sha256').update(s).digest('hex')
+
+function makeGonogoTrials(randomSeed: string, count = 8) {
+  return gonogoSequence(randomSeed, count, 0.25).map((trialType, idx) => ({
+    schemaVersion: 1,
+    trialIndex: idx,
+    phase: 'test',
+    startedAtPerfMs: idx * 1300,
+    endedAtPerfMs: idx * 1300 + 360,
+    durationMs: 360,
+    flags: { timeout: false, premature: false },
+    qualityEvents: [],
+    payload: {
+      trialType,
+      responded: trialType !== 'nogo',
+      rtMs: trialType === 'nogo' ? null : 350 + idx * 5,
+      interrupted: false,
+    },
+  }))
+}
 
 async function startTestServer(router: express.Router) {
   const app = express()
@@ -92,6 +122,9 @@ describe('whole-v2.routes HTTP contract', () => {
       title: 'HTTP V2 路由测试卷',
       slots: fixture.slots,
     })
+    parentState.status = 'IN_PROGRESS'
+    parentState.attemptEpoch = 1
+    parentState.publicationHash = plan.publicationHash
     const seeds = generateCompositeUnitSeeds(plan, attemptId, 1)!
     const router = express.Router()
     mountCompositeWholeV2Routes(router, {
@@ -129,8 +162,29 @@ describe('whole-v2.routes HTTP contract', () => {
       const tplBody: any = await tplRes.json()
       expect(tplBody.data.units).toHaveLength(4)
 
-      // 3. PUT /v2/checkpoint saves draft and locks Cognitive unit; DELETE is then blocked (409)
+      // 3A. PUT /v2/checkpoint rejects bad Cognitive seed BEFORE permanently locking (P1-10)
       const cogSlotKey = `cognitive:${fixture.cogItemId}`
+      const badLockRes = await fetch(`${srv.baseUrl}/attempts/${attemptId}/v2/checkpoint`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          expectedRevision: 0,
+          attemptEpoch: 1,
+          drafts: {},
+          lockUnit: {
+            slotKey: cogSlotKey,
+            unit: {
+              unitType: 'COGNITIVE',
+              itemId: fixture.cogItemId,
+              randomSeed: 'wrong-seed',
+              trials: makeGonogoTrials(seeds.seeds[cogSlotKey], 8),
+            },
+          },
+        }),
+      })
+      expect(badLockRes.status).toBe(409)
+
+      // 3B. PUT /v2/checkpoint saves draft and locks valid Cognitive unit; DELETE is then blocked (409)
       const putRes = await fetch(`${srv.baseUrl}/attempts/${attemptId}/v2/checkpoint`, {
         method: 'PUT',
         headers: { 'content-type': 'application/json' },
@@ -144,7 +198,7 @@ describe('whole-v2.routes HTTP contract', () => {
               unitType: 'COGNITIVE',
               itemId: fixture.cogItemId,
               randomSeed: seeds.seeds[cogSlotKey],
-              trials: [],
+              trials: makeGonogoTrials(seeds.seeds[cogSlotKey], 8),
             },
           },
         }),
@@ -182,6 +236,12 @@ describe('whole-v2.routes HTTP contract', () => {
         }),
       })
       expect(badSubmitRes.status).toBe(400)
+
+      // 6. Strict WHOLE_V2 isolation: legacy attempt without publicationHash is rejected (409)
+      await expect(resolveCompositePublicationPlanForAttempt({
+        compositeAssessmentId: plan.compositeId,
+        publicationHash: null,
+      })).rejects.toMatchObject({ statusCode: 409, code: 'STALE_ATTEMPT' })
     } finally {
       await srv.close()
     }

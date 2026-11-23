@@ -48,6 +48,9 @@ import { scoreSituationalModel } from '../situational/situation-model-resolver'
 import { buildSjtNarrative } from '../situational/authoring/narrative'
 import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
 import { runAuthoritativeScorer } from '../cognitive/v2/authoritative-scorer'
+import { projectThreeLayerReport, referencesForReportReading } from '../cognitive/v2/report'
+import { resolveCognitiveMetricReferences } from '../cognitive/v2/reference-adapter'
+import { parseCognitiveResultSnapshot } from '../cognitive/v2/result-snapshot'
 import type { CognitiveResultSnapshot } from '../cognitive/v2/types'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 
@@ -134,10 +137,75 @@ export interface CommitCompositeWholeFinalInput {
   }
   /** Optional active slot subset (e.g. from weighted variant allocation or evaluated Flow). */
   activeSlotKeys?: ReadonlySet<string>
+  /** Optional in-transaction authority re-verification hook executed after locking the parent attempt row. */
+  verifyAuthorityInTx?: (tx: CompositeFinalWriterDb) => Promise<void>
+  /** Set false only in isolated unit tests without parent table rows. Default true. */
+  verifyParentAttemptRow?: boolean
   /** Optional in-memory feedback pre-materializer (zero extra DB queries). */
   buildFeedback?: (facts: CompositeFinalFactsV1) => unknown | Promise<unknown>
   templates?: PublicTemplateStore
   now?: Date
+}
+
+/** Validates a Cognitive or SJT unit BEFORE permanently locking it in composite_attempt_checkpoints,
+ * preventing malformed trials, invalid seeds, or incomplete trajectories from permanently bricking an attempt. */
+export function validateCompositeCheckpointLockUnit(input: {
+  plan: CompositePublicationPlanV1
+  unitSeedsEncrypted?: string | null
+  slotKey: string
+  unit:
+    | { unitType: 'COGNITIVE'; itemId: string; randomSeed: string; trials: unknown[]; summaryMeta?: Record<string, unknown> }
+    | { unitType: 'SITUATIONAL'; itemId: string; responses: Record<string, unknown>; researchEvents?: unknown[]; totalTimeMs?: number }
+}): void {
+  const slot = input.plan.slots.find(s => s.slotKey === input.slotKey)
+  if (!slot) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', `锁定槽位不存在：${input.slotKey}`, 409)
+  }
+  if (slot.unitType !== input.unit.unitType) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', `锁定单元类型与冻结槽位不匹配：${input.slotKey}`, 409)
+  }
+  if (slot.unitType === 'COGNITIVE' && input.unit.unitType === 'COGNITIVE') {
+    if (slot.itemId !== input.unit.itemId) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', `锁定认知单元标识不匹配：${input.slotKey}`, 409)
+    }
+    const unitSeeds = input.unitSeedsEncrypted ? decodeCompositeUnitSeeds(input.unitSeedsEncrypted).seeds : {}
+    const expectedSeed = unitSeeds[slot.slotKey]
+    if (!expectedSeed || input.unit.randomSeed !== expectedSeed) {
+      throw new InstrumentFinalSubmitError('COGNITIVE_SEED_MISMATCH', `认知测验随机种子不匹配：${slot.slotKey}`, 409)
+    }
+    const definition = getCognitiveV2TaskDefinition(
+      slot.testType,
+      slot.sessionSnapshot.engineVersion,
+      slot.sessionSnapshot.scoringVersion,
+    )
+    if (!definition) {
+      throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', `不支持的认知任务类型：${slot.testType}`, 409)
+    }
+    runAuthoritativeScorer({
+      definition,
+      session: slot.sessionSnapshot,
+      trials: input.unit.trials,
+      randomSeed: expectedSeed,
+    })
+    return
+  }
+  if (slot.unitType === 'SITUATIONAL' && input.unit.unitType === 'SITUATIONAL') {
+    if (slot.itemId !== input.unit.itemId) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', `锁定情境单元标识不匹配：${input.slotKey}`, 409)
+    }
+    const responseList = Object.entries(input.unit.responses).map(([pair, responseValue]) => {
+      const idx = pair.indexOf(':')
+      if (idx <= 0 || idx === pair.length - 1) {
+        throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', `无效的情境题回答键：${pair}`, 400)
+      }
+      return {
+        sceneKey: pair.slice(0, idx),
+        channelKey: pair.slice(idx + 1),
+        responseValue: responseValue as any,
+      }
+    })
+    normalizeSituationalSubmission(slot.definition, responseList)
+  }
 }
 
 export interface CompositeWholeFinalReceipt {
@@ -195,7 +263,37 @@ export async function commitCompositeWholeFinal(
     executedSlotKeys: submit.executedSlotKeys ?? null,
   })
 
-  // 1. Idempotent replay & submission conflict check
+  // 0. Acquire authoritative row lock on parent composite_assessment_attempts FIRST.
+  //    This single lock serializes concurrent duplicate submits (idempotency),
+  //    checkpoint mutations/deletes, and terminal state transitions with zero extra tables.
+  let lockedParentStatus: string | null = null
+  if (input.verifyParentAttemptRow !== false) {
+    const parentRows = await tx.$queryRaw<Array<{
+      status: string
+      attemptEpoch: number
+      publicationHash: string | null
+    }>>(Prisma.sql`
+      SELECT status::text AS status,
+        attempt_epoch AS "attemptEpoch",
+        publication_hash AS "publicationHash"
+      FROM composite_assessment_attempts
+      WHERE id = ${attempt.id}
+      FOR UPDATE
+    `)
+    const parent = parentRows[0]
+    if (!parent) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
+    }
+    if (parent.attemptEpoch !== submit.attemptEpoch) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '作答版本已变更，请刷新后重试', 409)
+    }
+    if (!parent.publicationHash || parent.publicationHash !== submit.publicationHash) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '冻结发布快照摘要不匹配，无法通过整卷 V2 提交', 409)
+    }
+    lockedParentStatus = parent.status
+  }
+
+  // 1. Idempotent replay & submission conflict check (under parent row lock)
   const existingRows = await tx.$queryRaw<ExistingFinalRow[]>(Prisma.sql`
     SELECT attempt_id AS "attemptId",
       attempt_epoch AS "attemptEpoch",
@@ -235,6 +333,16 @@ export async function commitCompositeWholeFinal(
       }
     }
     throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '作答已提交且内容与原提交不一致', 409)
+  }
+
+  // 1B. Enforce valid active status for fresh submission (never accept revoked/abandoned/already-completed rows)
+  if (lockedParentStatus !== null && lockedParentStatus !== 'IN_PROGRESS') {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '当前作答状态不可提交', 409)
+  }
+
+  // 1C. Optional in-transaction authority re-verification (e.g. field observation grant, consent)
+  if (input.verifyAuthorityInTx) {
+    await input.verifyAuthorityInTx(tx)
   }
 
   // 2. Load & verify monotonically locked Cognitive / SJT units from checkpoint
@@ -431,12 +539,31 @@ export async function commitCompositeWholeFinal(
       canonical,
     })
     scaleSlotKeys.push(slot.slotKey)
+    // Merge per-answer timing fields (responseTimeMs / answeredAt / changeCount) with
+    // submitted.timings into one canonical map so full cold-raw hydration is 100% symmetric.
+    const mergedTimings: Record<string, Record<string, unknown>> = {}
+    if (submitted.timings) {
+      for (const [code, entry] of Object.entries(submitted.timings)) {
+        if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+          mergedTimings[code] = { ...(entry as Record<string, unknown>) }
+        }
+      }
+    }
+    for (const a of answers) {
+      if (a.responseTimeMs !== undefined || a.answeredAt !== undefined || a.changeCount !== undefined) {
+        const cur = mergedTimings[a.itemCode] ?? {}
+        if (a.responseTimeMs !== undefined) cur.responseTimeMs = a.responseTimeMs
+        if (a.answeredAt !== undefined) cur.answeredAt = a.answeredAt
+        if (a.changeCount !== undefined) cur.changeCount = a.changeCount
+        mergedTimings[a.itemCode] = cur
+      }
+    }
     rawUnits[slot.slotKey] = {
       unitType: 'SCALE',
       itemId: slot.itemId,
       codes: answers.map(a => a.itemCode),
       values: answers.map(a => a.responseValue),
-      ...(submitted.timings ? { timings: submitted.timings } : {}),
+      ...(Object.keys(mergedTimings).length > 0 ? { timings: mergedTimings } : {}),
       ...(submitted.deviceInputProvenance ? { deviceInputProvenance: submitted.deviceInputProvenance } : {}),
     }
   }
@@ -533,7 +660,49 @@ export async function commitCompositeWholeFinal(
       trials: submitted.trials,
       randomSeed: expectedSeed,
     })
-    const snapshot: CognitiveResultSnapshot = {
+    const frozenReport = slot.frozenReport ?? null
+    const cognitiveContext = hasContext
+      ? {
+          schemaVersion: 1 as const,
+          source: 'composite_form' as const,
+          frozenAt: completedAtIso,
+          values: Object.fromEntries(
+            Object.entries(contextFields).filter(([, v]) => v !== null && v !== undefined),
+          ),
+          snapshotHash: contextHash!,
+        }
+      : null
+    const resolvedReferences = scored.quality.state === 'invalid' || definition.references.length === 0
+      ? []
+      : resolveCognitiveMetricReferences({
+          definition,
+          metrics: scored.metrics,
+          references: slot.referenceSets ?? [],
+          context: cognitiveContext,
+          quality: scored.quality,
+          measurement: {
+            profile: slot.profile,
+            resolvedConfigHash: slot.resolvedConfigHash,
+          },
+        })
+    const report = projectThreeLayerReport({
+      testType: slot.sessionSnapshot.testType,
+      configVersion: slot.sessionSnapshot.configVersion,
+      protocolSignature: slot.sessionSnapshot.protocolSignature,
+      engineVersion: slot.sessionSnapshot.engineVersion,
+      scoringVersion: slot.sessionSnapshot.scoringVersion,
+      profile: slot.profile,
+      participantPresentation: frozenReport?.participantPresentation,
+      reportCaveats: frozenReport?.reportCaveats,
+      trials: submitted.trials,
+      config: (slot.sessionSnapshot.config ?? {}) as Record<string, unknown>,
+      definition: frozenReport?.v2ReportDefinition ?? definition.report,
+      metrics: scored.metrics,
+      score: scored,
+      metricDefinitions: frozenReport?.v2MetricDefinitions ?? definition.metrics,
+      qualityDefinitions: frozenReport?.v2QualityDefinitions ?? definition.quality,
+    })
+    const snapshot: CognitiveResultSnapshot = parseCognitiveResultSnapshot({
       schemaVersion: 1,
       completedAt: completedAtIso,
       testType: slot.sessionSnapshot.testType,
@@ -544,10 +713,10 @@ export async function commitCompositeWholeFinal(
       profile: slot.profile,
       metrics: scored.metrics,
       quality: scored.quality,
-      references: [],
-      report: {},
+      references: referencesForReportReading(report, resolvedReferences) as unknown as Array<Record<string, unknown>>,
+      report: JSON.parse(JSON.stringify(report)) as Record<string, unknown>,
       assessmentContext,
-    }
+    })
     const canonicalCore = projectCognitiveCanonicalUnitResult({
       snapshot,
       runtime: slot.compiledRuntime,
@@ -646,7 +815,7 @@ export async function commitCompositeWholeFinal(
     )
   `)
 
-  await tx.$executeRaw(Prisma.sql`
+  const updatedAttempt = await tx.$executeRaw(Prisma.sql`
     UPDATE composite_assessment_attempts
     SET status = 'COMPLETED',
         progress = 100,
@@ -657,20 +826,33 @@ export async function commitCompositeWholeFinal(
         aggregate_input_hash = ${aggregateHash},
         context_snapshot_hash = ${contextHash},
         frozen_active_slot_set_hash = COALESCE(frozen_active_slot_set_hash, ${plan.slotSetHash})
-    WHERE id = ${attempt.id} AND attempt_epoch = ${attempt.attemptEpoch}
+    WHERE id = ${attempt.id}
+      AND attempt_epoch = ${attempt.attemptEpoch}
+      AND status = 'IN_PROGRESS'
   `)
+  if (updatedAttempt !== 1) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '作答状态已变更，提交已回滚', 409)
+  }
 
   if (input.educationRun) {
-    await tx.$executeRaw(Prisma.sql`
+    const updatedExec = await tx.$executeRaw(Prisma.sql`
       UPDATE assessment_run_executions
       SET status = 'COMPLETED', completed_at = ${now}, updated_at = ${now}
-      WHERE id = ${input.educationRun.executionId} AND status <> 'COMPLETED'
+      WHERE id = ${input.educationRun.executionId}
+        AND status IN ('ASSIGNED', 'STARTED')
     `)
-    await tx.$executeRaw(Prisma.sql`
+    if (updatedExec !== 1) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评执行状态已不可提交，请刷新任务列表', 409)
+    }
+    const updatedAssign = await tx.$executeRaw(Prisma.sql`
       UPDATE relational_assessment_assignments
       SET status = 'COMPLETED', completed_at = ${now}, updated_at = ${now}
-      WHERE id = ${input.educationRun.assignmentId} AND status <> 'COMPLETED'
+      WHERE id = ${input.educationRun.assignmentId}
+        AND status IN ('OPEN', 'STARTED')
     `)
+    if (updatedAssign !== 1) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评分配状态已撤销或失效，请刷新任务列表', 409)
+    }
   }
 
   await clearCompositeCheckpoint(tx, attempt.id)

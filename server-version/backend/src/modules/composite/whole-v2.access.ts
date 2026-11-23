@@ -45,8 +45,12 @@ import {
 } from '../situational/situational-release.service'
 import { prepareUnifiedCognitiveSessionConfigSnapshot } from '../cognitive/session.service'
 import { decryptCognitivePayload } from '../cognitive/cognitive.security'
-import { hashResolvedConfig } from '../cognitive/profile-freeze'
+import { hashResolvedConfig, readFrozenReport } from '../cognitive/profile-freeze'
+import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
 import type { CognitiveProfile } from '../cognitive/v2/types'
+import { publicTemplatesForDatabase } from '../assessment-runtime/public-templates'
+import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
+import { currentFieldComposition } from '../huiteacher/fieldComposition.authority'
 import type { AuthorizedWholeV2Attempt } from './whole-v2.routes'
 
 type Db = PrismaClient | Prisma.TransactionClient
@@ -194,6 +198,7 @@ export async function materializeCompositePublicationPlan(
               profile: true,
               resolvedConfigSnapshotEncrypted: true,
               resolvedConfigHash: true,
+              resolvedReportSnapshotEncrypted: true,
               config: {
                 select: {
                   testType: true,
@@ -240,8 +245,10 @@ export async function materializeCompositePublicationPlan(
   }
 
   const cacheKey = `${composite.id}:${composite.publishedAt?.toISOString() ?? composite.updatedAt.toISOString()}`
-  const isRootDb = db === prisma
-  if (isRootDb) {
+  // Published composite plans are immutable by (compositeId, publishedAt, updatedAt), so
+  // START transactions (where db is a Prisma.TransactionClient) safely share the read cache.
+  const canUsePlanCache = db === prisma || composite.publishedAt != null
+  if (canUsePlanCache) {
     const cached = planByCompositeCache.get(cacheKey)
     if (cached) return cached
   }
@@ -412,6 +419,39 @@ export async function materializeCompositePublicationPlan(
       const profile = (assignment.profile === 'experience' || assignment.profile === 'research'
         ? assignment.profile
         : 'standard') as CognitiveProfile
+      const frozenReport = assignment.resolvedReportSnapshotEncrypted
+        ? readFrozenReport(assignment.resolvedReportSnapshotEncrypted)
+        : null
+      const cogTaskDef = getCognitiveV2TaskDefinition(
+        assignment.config.testType,
+        assignment.config.engineVersion,
+        assignment.config.scoringVersion,
+      )
+      const cogReferenceSets: AssessmentReferenceSetDefinition[] = []
+      if (cogTaskDef && cogTaskDef.references.length > 0) {
+        const refVersions = [...new Set(cogTaskDef.references.map(r => r.referenceVersion))]
+        const refRows = await db.assessmentReferenceSet.findMany({
+          where: {
+            instrumentType: 'COGNITIVE',
+            instrumentKey: assignment.config.testType,
+            referenceVersion: { in: refVersions },
+            status: 'ACTIVE',
+          },
+        })
+        for (const r of refRows) {
+          const validation = validateReferenceSetDefinition({
+            ...(r.definition && typeof r.definition === 'object' ? r.definition : {}),
+            schemaVersion: 1,
+            instrumentType: 'cognitive',
+            instrumentKey: r.instrumentKey,
+            referenceVersion: r.referenceVersion,
+            status: r.status,
+          })
+          if (validation.definition && !validation.issues.some(issue => issue.severity === 'error')) {
+            cogReferenceSets.push(validation.definition)
+          }
+        }
+      }
       const media = collectMediaFromUnknown(
         prepared.snapshot.presentation,
         `COGNITIVE:${prepared.compiledRuntime.compiledRuntimeHash}`,
@@ -429,6 +469,8 @@ export async function materializeCompositePublicationPlan(
         profile,
         sessionSnapshot: prepared.snapshot,
         compiledRuntime: prepared.compiledRuntime,
+        ...(frozenReport ? { frozenReport } : {}),
+        ...(cogReferenceSets.length > 0 ? { referenceSets: cogReferenceSets } : {}),
         ...media,
       })
     }
@@ -441,8 +483,8 @@ export async function materializeCompositePublicationPlan(
     slots,
     flowDefinition: composite.trainingFlowFrozen ?? composite.trainingFlowDraft ?? null,
   })
-  await saveCompositePublicationPlan(plan)
-  if (isRootDb) {
+  await saveCompositePublicationPlan(plan, publicTemplatesForDatabase(db))
+  if (canUsePlanCache) {
     planByCompositeCache.set(cacheKey, plan, 256 * 1024)
   }
   return plan
@@ -450,12 +492,13 @@ export async function materializeCompositePublicationPlan(
 
 export async function resolveCompositePublicationPlanForAttempt(
   attempt: { compositeAssessmentId: string; publicationHash?: string | null },
-  db: Db = prisma,
+  _db: Db = prisma,
 ): Promise<CompositePublicationPlanV1> {
-  if (attempt.publicationHash) {
-    return loadCompositePublicationPlan(attempt.publicationHash)
+  // Strict WHOLE_V2 boundary: never materialize an ad-hoc publication plan for a legacy attempt.
+  if (!attempt.publicationHash) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '该作答不属于统一整卷 V2 模式，请使用原入口继续作答', 409)
   }
-  return materializeCompositePublicationPlan(attempt.compositeAssessmentId, db)
+  return loadCompositePublicationPlan(attempt.publicationHash)
 }
 
 interface LoadedAttemptRow {
@@ -470,6 +513,39 @@ interface LoadedAttemptRow {
   publicationHash: string | null
   unitSeedsEncrypted: string | null
   deliveryCourseId: string | null
+  trainingVariantAllocationEncrypted: string | null
+  trainingVariantAllocationHash: string | null
+}
+
+function resolveVariantActiveSlotKeys(
+  attempt: Pick<LoadedAttemptRow, 'trainingVariantAllocationEncrypted' | 'trainingVariantAllocationHash'>,
+  plan: CompositePublicationPlanV1,
+): ReadonlySet<string> | undefined {
+  if (!attempt.trainingVariantAllocationEncrypted && !attempt.trainingVariantAllocationHash) {
+    return undefined
+  }
+  if (!attempt.trainingVariantAllocationEncrypted || !attempt.trainingVariantAllocationHash) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '概率分卷冻结分配信息不完整', 409)
+  }
+  const allocation = decryptUnifiedRuntimePayload<{
+    allocationHash?: string
+    selectedItemIds?: string[]
+    selectedSectionIds?: string[]
+  }>(attempt.trainingVariantAllocationEncrypted)
+  if (!allocation || allocation.allocationHash !== attempt.trainingVariantAllocationHash) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '概率分卷冻结分配校验失败', 409)
+  }
+  const itemIds = new Set(allocation.selectedItemIds ?? [])
+  const sectionIds = new Set(allocation.selectedSectionIds ?? [])
+  const active = new Set<string>()
+  for (const slot of plan.slots) {
+    if (slot.unitType === 'FORM_SECTION') {
+      if (sectionIds.has(slot.sectionId)) active.add(slot.slotKey)
+    } else if (itemIds.has(slot.itemId)) {
+      active.add(slot.slotKey)
+    }
+  }
+  return active
 }
 
 async function loadAttemptRow(attemptId: string): Promise<LoadedAttemptRow> {
@@ -487,6 +563,8 @@ async function loadAttemptRow(attemptId: string): Promise<LoadedAttemptRow> {
       publicationHash: true,
       unitSeedsEncrypted: true,
       deliveryCourseId: true,
+      trainingVariantAllocationEncrypted: true,
+      trainingVariantAllocationHash: true,
     },
   })
   if (!attempt) {
@@ -520,19 +598,22 @@ export async function authorizeTrainingAuthenticatedWholeV2(req: Request): Promi
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权访问此综合测评', 403)
   }
   const plan = await resolveCompositePublicationPlanForAttempt(attempt)
+  const activeSlotKeys = resolveVariantActiveSlotKeys(attempt, plan)
   return {
     attempt: {
       id: attempt.id,
       compositeAssessmentId: attempt.compositeAssessmentId,
       attemptEpoch: attempt.attemptEpoch,
+      status: attempt.status,
       receiptOnly: attempt.receiptOnly,
       startedAt: attempt.startedAt,
-      publicationHash: attempt.publicationHash ?? plan.publicationHash,
+      publicationHash: attempt.publicationHash!,
       unitSeedsEncrypted: attempt.unitSeedsEncrypted,
       deliveryCourseId: attempt.deliveryCourseId,
     },
     plan,
     audience: 'authenticated',
+    ...(activeSlotKeys ? { activeSlotKeys } : {}),
   }
 }
 
@@ -547,24 +628,28 @@ export async function authorizeTrainingPublicWholeV2(req: Request): Promise<Auth
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '恢复凭证无权访问此综合测评', 403)
   }
   const plan = await resolveCompositePublicationPlanForAttempt(attempt)
+  const activeSlotKeys = resolveVariantActiveSlotKeys(attempt, plan)
   return {
     attempt: {
       id: attempt.id,
       compositeAssessmentId: attempt.compositeAssessmentId,
       attemptEpoch: attempt.attemptEpoch,
+      status: attempt.status,
       receiptOnly: attempt.receiptOnly,
       startedAt: attempt.startedAt,
-      publicationHash: attempt.publicationHash ?? plan.publicationHash,
+      publicationHash: attempt.publicationHash!,
       unitSeedsEncrypted: attempt.unitSeedsEncrypted,
       deliveryCourseId: attempt.deliveryCourseId,
     },
     plan,
     audience: 'public',
+    ...(activeSlotKeys ? { activeSlotKeys } : {}),
   }
 }
 
 export async function authorizeEducationWholeV2(req: Request): Promise<AuthorizedWholeV2Attempt> {
-  // Entry middleware (campusWholeAccess / wholeBound) has already verified School / Teacher authority.
+  // Entry middleware (campusWholeAccess / wholeBound / requireScaleAttempt / requireAttempt)
+  // has already verified School / Teacher authority.
   const attempt = await loadAttemptRow(req.params.attemptId)
   const [plan, runBinding] = await Promise.all([
     resolveCompositePublicationPlanForAttempt(attempt),
@@ -575,9 +660,10 @@ export async function authorizeEducationWholeV2(req: Request): Promise<Authorize
       id: attempt.id,
       compositeAssessmentId: attempt.compositeAssessmentId,
       attemptEpoch: attempt.attemptEpoch,
+      status: attempt.status,
       receiptOnly: attempt.receiptOnly,
       startedAt: attempt.startedAt,
-      publicationHash: attempt.publicationHash ?? plan.publicationHash,
+      publicationHash: attempt.publicationHash!,
       unitSeedsEncrypted: attempt.unitSeedsEncrypted,
       deliveryCourseId: attempt.deliveryCourseId,
       organizationId: runBinding?.organizationId ?? null,
@@ -592,5 +678,40 @@ export async function authorizeEducationWholeV2(req: Request): Promise<Authorize
           },
         }
       : {}),
+  }
+}
+
+export async function authorizeFieldCompositionWholeV2(req: Request): Promise<AuthorizedWholeV2Attempt> {
+  const actorUserId = req.user?.userId
+  if (!actorUserId) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '现场观察需要本人教育账号', 403)
+  }
+  const attempt = await loadAttemptRow(req.params.attemptId)
+  const [fieldCtx, plan] = await Promise.all([
+    currentFieldComposition(prisma, { attemptId: attempt.id, actorUserId }),
+    resolveCompositePublicationPlanForAttempt(attempt),
+  ])
+  return {
+    attempt: {
+      id: attempt.id,
+      compositeAssessmentId: attempt.compositeAssessmentId,
+      attemptEpoch: attempt.attemptEpoch,
+      status: attempt.status,
+      receiptOnly: true,
+      startedAt: attempt.startedAt,
+      publicationHash: attempt.publicationHash!,
+      unitSeedsEncrypted: attempt.unitSeedsEncrypted,
+      deliveryCourseId: attempt.deliveryCourseId,
+      organizationId: fieldCtx.scope.organizationId,
+    },
+    plan,
+    audience: 'authenticated',
+    verifyAuthorityInTx: async tx => {
+      await currentFieldComposition(tx as Prisma.TransactionClient, {
+        attemptId: attempt.id,
+        actorUserId,
+        lock: true,
+      })
+    },
   }
 }

@@ -190,6 +190,7 @@ export async function buildScaleUnitFactsBatch(
       scaleId: input.scaleId,
       sourceDefinitionHash: input.sourceDefinitionHash,
       sourceResultHash: input.canonical?.bundleBridge?.sourceResultHash ?? canonicalHash(result),
+      ...(input.canonical?.core.compiledRuntimeHash ? { compiledRuntimeHash: input.canonical.core.compiledRuntimeHash } : {}),
       bundleHash: hashes[bundleIdx],
       scores: result.scores.map(score => {
         const indices = score.answeredItems.map(code => {
