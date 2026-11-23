@@ -97,13 +97,23 @@ const cookie=(name:string)=>{
   const item=document.cookie.split('; ').find(value=>value.startsWith(key))
   return item?decodeURIComponent(item.slice(key.length)):null
 }
+const schoolFetch=async(url:string,options:RequestInit)=>{
+  try{return await fetch(url,options)}
+  catch(cause){
+    if(cause instanceof TypeError&&cause.name==='TypeError'
+      &&/^(Failed to fetch|fetch failed|NetworkError when attempting to fetch resource\.?|Load failed)$/i.test(cause.message.trim())){
+      throw Object.assign(new Error('网络请求未完成，请检查网络连接后重试。'),{cause})
+    }
+    throw cause
+  }
+}
 async function api<T>(path:string,method='GET',payload?:unknown,options?:{responseType?:'blob'}):Promise<T>{
   const executeOnce=async():Promise<T>=>{
     const headers:Record<string,string>={'Content-Type':'application/json'}
     if(method!=='GET'){
       let csrf=cookie('huischool_csrf')
       if(!csrf){
-        const response=await fetch('/api/campus/auth/csrf',{credentials:'same-origin'})
+        const response=await schoolFetch('/api/campus/auth/csrf',{credentials:'same-origin'})
         if(!response.ok)throw new Error('无法建立安全请求，请刷新页面')
         const body=await response.json() as Envelope<{csrfToken:string}>
         csrf=body.data?.csrfToken??null
@@ -112,7 +122,7 @@ async function api<T>(path:string,method='GET',payload?:unknown,options?:{respon
       headers['X-CSRF-Token']=csrf
     }
     if(payload instanceof FormData)delete headers['Content-Type']
-    const response=await fetch('/api/campus'+path,{
+    const response=await schoolFetch('/api/campus'+path,{
       method,headers,credentials:'same-origin',
       ...(payload===undefined?{}:{body:payload instanceof FormData?payload:JSON.stringify(payload)}),
     })
@@ -283,6 +293,10 @@ function SchoolApplication(){
   const psychologyStaff=!!access?.personas.includes('COUNSELOR')
     && !!access?.capabilities.includes('PSYCHOLOGY_STAFF')
     && !access?.explicitDenies.some(x=>['*','PSYCHOLOGY_STAFF','CLASS_APPROVE','ORGANIZATION_GOVERNANCE'].includes(x))
+  const canVerifySensitiveActions=(user?.role==='TEACHER'||user?.role==='ADMIN')&&(
+    user.role==='ADMIN'||schoolAdmin||!!access?.capabilities.some(capability=>
+      ['PSYCHOLOGY_STAFF','PARENT_REPORT_DISCLOSURE','REPORT_MEMBER_EXPORT','REPORT_EXPORT'].includes(capability)
+      &&!access.explicitDenies.some(denied=>denied==='*'||denied===capability)))
   const ordinaryTeacher=user?.role==='TEACHER'&&!schoolAdmin&&!psychologyStaff
   const parentWorkspace=user?.role==='PARENT'
   const professionalWorkspace=user?.role==='TEACHER'&&psychologyStaff
@@ -582,7 +596,7 @@ function SchoolApplication(){
           <ProductPasswordChange product="school" busy={working} onChangePassword={changeAccountPassword}/></div>
         </section>}
         {page==='account'&&['STUDENT','TEACHER','ADMIN'].includes(user.role)&&<SchoolPersonnelClaim key={user.id} api={api} student={user.role==='STUDENT'} onComplete={()=>void refresh()}/>}
-        {page==='account'&&(user.role==='TEACHER'||user.role==='ADMIN')&&<section className={'hs-panel hs-account-security'+(administratorWorkspace?' hs-admin-panel hs-admin-security':'')}>
+        {page==='account'&&canVerifySensitiveActions&&<section className={'hs-panel hs-account-security'+(administratorWorkspace?' hs-admin-panel hs-admin-security':'')}>
           <SchoolReportHeader compact title="敏感操作二次验证" label="二次验证使用说明"><p>学校管理员与心理专业人员在执行名册、人员授权或整班审批前，需要最近五分钟内的动态验证码。普通教师无需使用此功能。</p></SchoolReportHeader>
           <div className="hs-actions">
             <label className="hs-field"><span>验证器 6 位动态验证码</span>

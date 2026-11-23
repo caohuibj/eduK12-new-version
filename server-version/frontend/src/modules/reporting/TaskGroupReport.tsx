@@ -78,7 +78,7 @@ export function TaskGroupReport({ artifact }: { artifact: TaskGroupArtifact }) {
               <ReportMetric label="样本标准差" value={number(value.sdSample)} description={value.validN !== null && value.validN < 2 ? '有效样本不足 2，标准差不适用。' : undefined} /></>}</ReportMetricGrid>
           {value.type === 'NUMBER' && <><ReportRangeTrack label={value.label} value={value.mean} formattedValue={number(value.mean)} range={value.range}
             status={value.observedRange ? `本次观测范围 ${number(value.observedRange.min)}–${number(value.observedRange.max)}，并非理论量尺范围。` : value.mean === null ? '暂无有效数值。' : '本方案未提供范围；均值按原单位呈现。'} />
-            <p>有效 N={value.validN}，均值 {number(value.mean)}{value.unit ? ` ${value.unit}` : ''}；样本标准差 {number(value.sdSample)}。</p></>}
+            <p>有效 N={number(value.validN)}，均值 {number(value.mean)}{value.unit ? ` ${value.unit}` : ''}；样本标准差 {number(value.sdSample)}。</p></>}
           {value.frequencies.length > 0 && <table><caption>{value.type === 'NUMBER' ? '数值分布' : '选项分布'} · 有效作答 N={value.validN}</caption><thead><tr><th>{value.type === 'NUMBER' ? '数值' : '选项'}</th><th>频数</th><th>比例</th></tr></thead>
             <tbody>{value.frequencies.map(cell => <tr key={cell.value}><th scope="row">{cell.label}</th><td>{cell.count}</td><td>
               <span className="task-group-report__bar" style={{ width: `${(cell.proportion ?? 0) * 100}%` }} />{cell.proportion === null ? '—' : `${number(cell.proportion * 100)}%`}</td></tr>)}</tbody></table>}

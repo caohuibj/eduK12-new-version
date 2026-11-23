@@ -58,7 +58,7 @@ const generation={actor:actor as any,organizationId:org,subjectReference:alias,
   specId,sources:[{runId:r2,trackId:t2},{runId:r1,trackId:t1}]}
 describe('Huischool current-CLIENT individual longitudinal studio',()=>{
   beforeEach(()=>{
-    vi.clearAllMocks()
+    vi.resetAllMocks()
     m.ctx.mockResolvedValue(ctx)
     m.reference.mockReturnValue(alias)
     m.query.mockResolvedValue([{userId:'student-1'}])
@@ -121,7 +121,9 @@ describe('Huischool current-CLIENT individual longitudinal studio',()=>{
     const x=await listCampusIndividualLongitudinalSources({
       actor:actor as any,organizationId:org,subjectReference:alias,
     })
-    expect(x.sources).toEqual([source2,source1])
+    expect(x.sources).toEqual([source2,source1].map(source=>({...source,
+      resource:{...source.resource,title:'量表',versionLabel:'固定版本'},
+    })))
     expect(JSON.stringify(x)).not.toContain('student-1')
     const scopeSql=m.query.mock.calls[1][0].strings.join('')
     expect(scopeSql).toContain("run.status='CLOSED'")
@@ -130,6 +132,20 @@ describe('Huischool current-CLIENT individual longitudinal studio',()=>{
     expect(m.scope).toHaveBeenCalledWith(expect.objectContaining({
       organizationId:org,subjectUserId:'student-1',
     }))
+  })
+  it('labels only authorized immutable School source versions without exposing metric metadata',async()=>{
+    const versionId='00000000-0000-4000-8000-000000000077'
+    const resourceKey='private-scale:SCHOOL:'+versionId+':STUDENT:SELF'
+    m.sources.mockResolvedValue({list:[{...source1,resource:{family,key:resourceKey,version:'1.0.0'}}],nextPage:null})
+    m.query.mockResolvedValueOnce([{id:versionId,organizationId:org,kind:'SCALE',title:'固定工具名称',revision:4,
+      scores:[{key:'private_metric',label:'内部指标名称'}]}])
+    const result=await listCampusIndividualLongitudinalSources({actor:actor as any,organizationId:org,subjectReference:alias})
+    expect(result.sources[0].resource).toEqual({family,key:resourceKey,version:'1.0.0',title:'固定工具名称',versionLabel:'修订 4'})
+    expect(JSON.stringify(result)).not.toMatch(/metricLabels|private_metric|内部指标名称|student-1/)
+    const labelSql=m.query.mock.calls[2][0].strings.join('')
+    expect(labelSql).toContain("education_private_tool_versions WHERE entry='SCHOOL'")
+    expect(labelSql).toContain('organization_id IN')
+    expect(m.scope).toHaveBeenCalledTimes(2)
   })
   it('sorts source waves chronologically and delegates to canonical individual artifact',async()=>{
     const x=await generateCampusIndividualLongitudinal(generation)

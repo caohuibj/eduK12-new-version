@@ -25,7 +25,7 @@ function ResetSession({api,organizationId}:{api:SchoolApi;organizationId:string}
   alive.current=true;lock.current=false;void run(load)
   return()=>{alive.current=false;epoch.current++;lock.current=false}
  },[run,load])
- return <section className="hs-panel" aria-label="双管理员验证器恢复">
+ return <section className="hs-panel hs-mfa-reset" aria-label="双管理员验证器恢复">
   <h2>双管理员验证器恢复</h2>
   <p>验证器丢失且无法使用恢复码时，由一名管理员核实并申请，再由另一名管理员独立批准。两人均需完成本页近期动态验证码验证。</p>
   <p>批准会撤销目标账号所有旧会话和恢复码；本人重新登录后必须重新绑定验证器。多学校账号请联系平台处理。</p>

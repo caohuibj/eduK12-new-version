@@ -31,8 +31,8 @@ describe('School parent observation collection',()=>{
   await waitFor(()=>expect(runner).toHaveBeenLastCalledWith(expect.objectContaining({observer:true,observerRole:'parent',observerTaskTitle:task.runTitle,execution:{organizationId:'school',courseId:'activity',runId:'run',executionId:'e1',resumeExisting:true,consentRequired:true,consentPurpose:'教育观察',consentVisibility:'PRIVATE_RESPONDENT'}})))
   fireEvent.click(screen.getByRole('button',{name:'返回任务'}))
   expect(screen.queryByRole('region',{name:'测试作答页'})).not.toBeInTheDocument()
-  expect(screen.getByRole('heading',{name:'乙观察任务'})).toBeInTheDocument()
-  expect(api.mock.calls).toEqual([['/my/parent-run-tasks']])
+  expect(await screen.findByRole('heading',{name:'乙观察任务'})).toBeInTheDocument()
+  expect(api.mock.calls).toEqual([['/my/parent-run-tasks'],['/my/parent-run-tasks']])
  })
 })
 

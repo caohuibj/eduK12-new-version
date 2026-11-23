@@ -54,3 +54,52 @@
 .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-editor>details{margin:0 0 12px;padding:0;border:0;background:transparent}
 .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-editor>details>summary{min-height:36px;padding:8px 0;font-size:12px;color:var(--hs-muted);cursor:pointer}
 .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-editor>.hs-selected-tool-outline{margin:12px 0 0;padding:0;border:0;background:transparent}
+
+/* Saved content and the next action are part of the editor, with one compact rhythm. */
+.hs-app.hs-workspace.hs-professional .hs-activity-manager--compact .hs-activity-state-panel{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:4px 20px;margin:10px 0 16px;padding:14px 16px;border-radius:10px;background:var(--hs-surface-soft,#f1f6eb)}
+.hs-app.hs-professional .hs-activity-state-panel>h3{grid-column:1;margin:0;font-family:inherit;font-size:16px;line-height:1.6}
+.hs-activity-state-panel>[aria-label="活动下一步"]{grid-column:1;min-width:0}
+.hs-app.hs-professional .hs-activity-state-panel>[aria-label="活动下一步"]>p{font-size:13px;line-height:1.75;margin:3px 0}
+.hs-app.hs-professional .hs-activity-state-panel>.hs-actions{grid-column:2;grid-row:1/3;align-items:center;margin:0;gap:8px}
+.hs-app.hs-professional .hs-activity-state-panel>.hs-actions>button{font-size:13px;min-height:44px}
+.hs-app.hs-workspace.hs-professional .hs-activity-content-list{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px 16px;margin:0 0 20px;padding:16px;border-radius:10px;background:var(--hs-surface);box-shadow:none}
+.hs-app.hs-professional .hs-activity-content-list>h3{margin:0;font-family:inherit;font-size:16px;line-height:1.6}
+.hs-app.hs-professional .hs-activity-content-list>button{justify-self:end;min-height:40px;padding:8px 12px;font-size:12px}
+.hs-app.hs-professional .hs-activity-content-list>:is(p,article){grid-column:1/-1;margin:0}
+.hs-app.hs-professional .hs-activity-content-list>p{font-size:13px;line-height:1.8}
+.hs-app.hs-workspace.hs-professional .hs-activity-content-list>.hs-task-card{padding:14px 16px;border-radius:9px;background:var(--hs-surface-soft,#f1f6eb);border-color:var(--hs-border)}
+.hs-app.hs-professional .hs-activity-content-list .hs-task-card>h4{margin:0;font-family:inherit;font-size:15px;font-weight:600;line-height:1.7;overflow-wrap:anywhere}
+.hs-app.hs-professional .hs-activity-content-list .hs-task-card>p{font-size:12px;line-height:1.7;margin:4px 0 10px;color:var(--hs-muted)}
+.hs-app.hs-professional .hs-activity-content-list details{margin:10px 0;padding:0 12px;border-radius:8px;background:var(--hs-surface);border-color:var(--hs-border)}
+.hs-app.hs-professional .hs-activity-content-list summary{min-height:40px;padding:8px 0;font-size:13px}
+.hs-app.hs-professional .hs-activity-content-list details>p{margin:0 0 12px;font-size:14px;line-height:1.8;color:var(--hs-ink)}
+.hs-app.hs-professional .hs-activity-content-list .hs-task-card>form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:12px;margin-top:14px}
+.hs-app.hs-workspace.hs-professional .hs-activity-content-list form>.hs-field{grid-column:1/-1;min-width:0;gap:6px;margin:0}
+.hs-app.hs-professional .hs-activity-content-list form>.hs-field>span{font-size:13px;font-weight:500}
+.hs-app.hs-professional .hs-activity-content-list form :is(input,textarea){min-width:0;min-height:44px;font-size:15px;font-weight:400;line-height:1.7;background:var(--hs-surface);color:var(--hs-ink);border-color:var(--hs-border)}
+.hs-app.hs-professional .hs-activity-content-list form textarea{min-height:140px;resize:vertical}
+.hs-app.hs-professional .hs-activity-content-list form>button{min-height:44px;margin:0;font-size:13px}
+.hs-app.hs-workspace.hs-professional[data-theme] .hs-activity-content-list form>button:first-of-type{background:var(--hs-primary);border-color:var(--hs-primary);color:var(--hs-on-primary,#fff)}
+.hs-app.hs-professional .hs-activity-content-list .hs-actions{align-items:center;gap:8px;margin:12px 0 0}
+.hs-app.hs-professional .hs-activity-content-list .hs-actions>button{min-height:40px;padding:8px 12px;font-size:12px}
+.hs-app.hs-professional .hs-activity-content-list .hs-actions>button:last-child{color:#95492f;border-color:var(--hs-border);background:transparent}
+.hs-app.hs-professional[data-theme=dark] .hs-activity-content-list .hs-actions>button:last-child{color:#f0b69f}
+/* A visible scroll track makes the remaining setup sections discoverable. */
+.hs-app.hs-professional .hs-activity-config-tabs{padding-bottom:5px;scrollbar-width:thin;scrollbar-color:var(--hs-border) transparent}
+.hs-app.hs-professional .hs-activity-config-tabs::-webkit-scrollbar{display:block;height:4px}
+.hs-activity-config-tabs::-webkit-scrollbar-thumb{background:var(--hs-border);border-radius:4px}
+.hs-app.hs-professional .hs-activity-config-tabs>button:focus-visible{outline-offset:-3px}
+@media(max-width:700px){
+ .hs-app.hs-workspace.hs-professional[data-theme] .hs-activity-config-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;overflow:visible;padding:0;margin-bottom:4px}
+ .hs-app.hs-workspace.hs-professional[data-theme] .hs-activity-config-tabs>button{width:100%;min-width:0;white-space:normal;text-align:center}
+ .hs-app.hs-workspace.hs-professional .hs-activity-manager--compact .hs-activity-state-panel{grid-template-columns:minmax(0,1fr);gap:6px;margin:8px 0 12px;padding:12px}
+ .hs-app.hs-professional .hs-activity-state-panel>.hs-actions{grid-column:1;grid-row:auto;display:flex;flex-direction:row;flex-wrap:wrap;width:100%;margin-top:4px}
+ .hs-app.hs-professional .hs-activity-state-panel>.hs-actions>button{flex:1 1 130px;width:auto}
+ .hs-app.hs-workspace.hs-professional .hs-activity-content-list{padding:12px;gap:10px;margin-bottom:16px}
+ .hs-app.hs-professional .hs-activity-content-list>h3{grid-column:1/-1;font-size:15px}
+ .hs-app.hs-professional .hs-activity-content-list>button{grid-column:1/-1;justify-self:start}
+ .hs-app.hs-workspace.hs-professional .hs-activity-content-list>.hs-task-card{padding:12px}
+ .hs-app.hs-professional .hs-activity-content-list form :is(input,textarea){font-size:16px}
+ .hs-app.hs-professional .hs-activity-content-list .hs-actions{display:flex;flex-direction:row;flex-wrap:wrap}
+ .hs-app.hs-professional .hs-activity-content-list .hs-actions>button{flex:1 1 120px;width:auto}
+}

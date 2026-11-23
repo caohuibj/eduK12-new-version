@@ -15,9 +15,9 @@ const stateLabel = (state: LongitudinalTrendModel['state']) => ({
   unavailable: '暂无可绘制数据',
 }[state])
 
-const readToken = (name: string, fallback: string) => {
+const readToken = (host: HTMLElement, name: string, fallback: string) => {
   if (typeof document === 'undefined') return fallback
-  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+  const value = getComputedStyle(host).getPropertyValue(name).trim()
   return value || fallback
 }
 
@@ -42,10 +42,10 @@ export function ReportTrendChart({
     let disposed = false
     const render = () => {
       if (disposed || !host.isConnected || host.clientWidth <= 0) return
-      const action = readToken('--hui-ds-color-action', '#2f6fed')
-      const ink = readToken('--hui-ds-color-ink', '#14304a')
-      const muted = readToken('--hui-ds-color-muted', '#64748b')
-      const line = readToken('--hui-ds-color-line', '#dde7f0')
+      const action = readToken(host, '--hui-ds-color-action', '#2f6fed')
+      const ink = readToken(host, '--hui-ds-color-ink', '#14304a')
+      const muted = readToken(host, '--hui-ds-color-muted', '#64748b')
+      const line = readToken(host, '--hui-ds-color-line', '#dde7f0')
       const chart = chartRef.current ?? echarts.init(host, undefined, { renderer: 'svg' })
       chartRef.current = chart
 
@@ -116,12 +116,19 @@ export function ReportTrendChart({
     const resize = () => chartRef.current?.resize()
     const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(resize) : null
     observer?.observe(host)
+    const themeOwner = host.closest('[data-theme], [data-training-theme]') ?? document.documentElement
+    const themeObserver = typeof MutationObserver !== 'undefined' ? new MutationObserver(render) : null
+    // Watch appearance attributes, never the SVG subtree mutated by the chart.
+    for (const owner of new Set([themeOwner, document.documentElement])) {
+      themeObserver?.observe(owner, { attributes: true, attributeFilter: ['data-theme', 'data-training-theme', 'class', 'style'] })
+    }
     window.addEventListener('resize', resize)
 
     return () => {
       disposed = true
       if (frame !== null && typeof window.cancelAnimationFrame === 'function') window.cancelAnimationFrame(frame)
       observer?.disconnect()
+      themeObserver?.disconnect()
       window.removeEventListener('resize', resize)
       chartRef.current?.dispose()
       chartRef.current = null

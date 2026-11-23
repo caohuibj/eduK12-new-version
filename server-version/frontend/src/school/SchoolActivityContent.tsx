@@ -28,7 +28,7 @@ export function SchoolActivityContent({api,path,editable,disabled,revision}:{api
   }catch(e){if(token===generation.current)setError(e instanceof Error?e.message:'内容修改未完成，请刷新活动后核对。')}
   finally{lock.current=false;setWriting(false)}
  }
- return <section className="hs-panel" aria-label="已添加活动内容">
+ return <section className="hs-panel hs-activity-content-list" aria-label="已添加活动内容">
   <h3>已添加的阅读、练习与记录</h3>
   <button type="button" disabled={loading||writing||disabled} onClick={()=>setRefresh(x=>x+1)}>刷新活动内容</button>
   {loading&&<p role="status">正在读取活动内容…</p>}
