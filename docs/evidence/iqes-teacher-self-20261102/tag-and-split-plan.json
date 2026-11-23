@@ -1,0 +1,78 @@
+{
+  "kind": "EDITORIAL_PLAN_NOT_RUNTIME_CONFIGURATION",
+  "familyTag": "family:iqes",
+  "tagContract": "Use existing free-string tags[] on actual Scale/Questionnaire/Composite records; source catalog constructOverlapTags is discovery metadata, not evidence that native tags[] was populated. No new label table/engine.",
+  "existingEvidence": [
+    "prisma/schema.prisma: Scale.tags, Questionnaire.tags, CompositeAssessment.tags",
+    "scale/library/catalog-discovery.ts: catalogTagsFromIds and exact-tag filter support free IDs; family:iqes is other facet and still exact-filterable",
+    "scale/onboarding/materialize.ts currently initializes Scale.tags with primaryDomain only; future install must read back actual shared family tag through existing editing/import surfaces"
+  ],
+  "sharedTags": [
+    "family:iqes",
+    "language:de",
+    "use:teacher_development",
+    "status:SOURCE_REVIEW_PENDING"
+  ],
+  "roleTags": {
+    "L02": [
+      "role:teacher_self",
+      "version:2009-12-01",
+      "grades:source_all_stages"
+    ],
+    "L03": [
+      "role:observer",
+      "version:pending"
+    ],
+    "S01a": [
+      "role:student",
+      "grades:3-6",
+      "version:pending"
+    ],
+    "S01b": [
+      "role:student",
+      "grades:7-9",
+      "version:pending"
+    ],
+    "S01c": [
+      "role:student",
+      "grades:10-plus",
+      "version:pending"
+    ],
+    "S01d": [
+      "role:student",
+      "stage:vocational",
+      "version:pending"
+    ],
+    "S02": [
+      "role:teacher",
+      "version:pending",
+      "target:unverified"
+    ]
+  },
+  "namingPlan": [
+    "IQES｜L02教学质量自评｜教师自评｜德文2009-12-01",
+    "IQES｜L03课堂观察｜同伴观察｜德文（具体版本待核）",
+    "IQES｜S01a课堂体验｜学生填答｜3–6年级（具体版本待核）",
+    "IQES｜S01b课堂体验｜学生填答｜7–9年级（具体版本待核）",
+    "IQES｜S01c课堂体验｜学生填答｜10年级以上（具体版本待核）",
+    "IQES｜S01d课堂体验｜学生填答｜职业教育（具体版本待核）"
+  ],
+  "splitPolicy": "Do not turn the public list of10 teaching characteristics or the6-item first-page preview into10 scales/a short scale. Full item-to-construct mapping and scoring guide decide native scales; factual/open/unsupported-scoring blocks become native FORM only when reuse is permitted. Missing norms or separate-administration validation alone do not require FORM.",
+  "combinationPlan": {
+    "status": "NOT_CREATED",
+    "kind": "existing ordinary questionnaire only after fixed licensed child versions exist",
+    "sources": [
+      "L02 teacher self",
+      "selected age-matchedS01 student version",
+      "L03 observer (optional, correct edition)"
+    ],
+    "comparison": "parallel evidence about the same class/time/topic only; no equivalence claim or cross-role/whole-family total",
+    "familyTagEffect": "filtering and side-by-side analysis only; no scoring or permission effect"
+  },
+  "versions": {
+    "dossier": "1.0.0",
+    "instrumentContent": null,
+    "scoringParameters": null,
+    "runtimeReport": null
+  }
+}

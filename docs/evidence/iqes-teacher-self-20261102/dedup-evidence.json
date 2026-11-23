@@ -1,0 +1,29 @@
+{
+  "base": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "sourceJsonCount": 235,
+  "registeredWrappers": 258,
+  "repositoryMatches": [],
+  "openPrCount": 42,
+  "openPrMatches": [],
+  "productionDb": "NOT_CHECKED",
+  "itemLevelDedup": "NOT_POSSIBLE_WITHOUT_COMPLETE_VERIFIED_ITEM_SET",
+  "distinctTools": [
+    "EMU shares Helmke attribution but is a distinct source family; do not assume same items",
+    "TALIS/QTI/SPS/TSR not IQES L02"
+  ],
+  "initialResearchBase": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "latestMainReuseEvidence": {
+    "server-version/backend/src/modules/scale/instruments": {
+      "initial": "1a04fd036a8e7293883668c85ddb578047ca9129",
+      "current": "1a04fd036a8e7293883668c85ddb578047ca9129"
+    },
+    "server-version/backend/src/modules/scale/library/catalog-discovery.ts": {
+      "initial": "19bcf8c3fa3b3fab7bf4bdc61a9e78eba3311604",
+      "current": "19bcf8c3fa3b3fab7bf4bdc61a9e78eba3311604"
+    },
+    "server-version/backend/prisma/schema.prisma": {
+      "initial": "99ea9850cabaad4a61561bc968384d2149f4ce31",
+      "current": "99ea9850cabaad4a61561bc968384d2149f4ce31"
+    }
+  }
+}
