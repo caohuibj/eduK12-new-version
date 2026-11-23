@@ -22,8 +22,16 @@ export async function copyTripletContent(tx:Prisma.TransactionClient,triplet:Tri
   for(const entry of entries)if(policy.type==='declared'&&policy.selections.some(s=>s.referenceVersion===set.referenceVersion&&s.scoreKey===entry.scoreKey&&s.referenceKind===entry.referenceKind))binding.referencePolicy.choices.push({releaseId:release.releaseId,contentHash:release.contentHash,entryKey:referenceEntryKey(entry),priority:0,metricKey:entry.scoreKey,referenceKind:entry.referenceKind})
  }
  if(!triplet.template)return binding
- const report=await publishContentRelease(tx,{layer:'REPORT',family:'SCALE',key:'standard-report:'+measurement.releaseId,version:canonicalHash({parameters:triplet.parts.PARAMETERS.hash,report:triplet.parts.REPORT.hash}),scope:measurement.scope,sourceReleaseId:null,assetRefs:selectedStandardReport(triplet.parts.REPORT.payload).assetRefs,provenance,
-  content:{projectionVersion:1,measurements:[pointer],metricKeys:triplet.definition.scoring.scores.map(s=>s.key),audience:triplet.definition.report.audienceContract?.audience??'researcher',language:triplet.definition.versionAxes?.locale??'und',generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:triplet.template}},actorId)
+ const reportAudience=triplet.definition.report.audienceContract?.audience??'researcher'
+ // Keep the legacy version hash when audience is researcher so existing
+ // frozen releases remain untouched, and include participant audience in the
+ // version hash so upgrading from researcher -> participant never collides on
+ // CONTENT_VERSION_IMMUTABLE.
+ const reportVersion=reportAudience==='researcher'
+  ?canonicalHash({parameters:triplet.parts.PARAMETERS.hash,report:triplet.parts.REPORT.hash})
+  :canonicalHash({parameters:triplet.parts.PARAMETERS.hash,report:triplet.parts.REPORT.hash,audience:reportAudience})
+ const report=await publishContentRelease(tx,{layer:'REPORT',family:'SCALE',key:'standard-report:'+measurement.releaseId,version:reportVersion,scope:measurement.scope,sourceReleaseId:null,assetRefs:selectedStandardReport(triplet.parts.REPORT.payload).assetRefs,provenance,
+  content:{projectionVersion:1,measurements:[pointer],metricKeys:triplet.definition.scoring.scores.map(s=>s.key),audience:reportAudience,language:triplet.definition.versionAxes?.locale??'und',generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:triplet.template}},actorId)
  binding.reportRelease={releaseId:report.releaseId,contentHash:report.contentHash}
  return binding
 }

@@ -34,7 +34,7 @@ export function freezeSurveyParticipantFeedback(units:ResearchFrozenUnit[],raw:u
       selection.feedback.metricKeys.some(key=>!metrics.includes(key)))
       throw new SurveyWaveError(400,'被试反馈只允许显式选择当前量表或情境测验的已发布指标')
     if(selection.feedback.mode==='DESCRIPTIVE'){
-      const eligibility=evaluateSurveyUnitReportEligibility(unit)
+      const eligibility=unit.reportEligibility??evaluateSurveyUnitReportEligibility(unit)
       if(!eligibility.eligible)
         throw new SurveyWaveError(409,eligibility.reason??'该工具未配置完整报告，仅用于数据采集，不能开启受测者报告')
     }

@@ -161,7 +161,13 @@ describe('tool-level participant report eligibility (publish-time gate)', () => 
     })
     expect(evaluateSurveyUnitReportEligibility({ ...withReportRelease, reportReleaseAudience: 'student' })).toMatchObject({ eligible: true, source: 'DECLARED_REPORT_RELEASE' })
     // Researcher-only bound REPORT release MUST NOT qualify for participant DESCRIPTIVE
-    expect(evaluateSurveyUnitReportEligibility({ ...withReportRelease, reportReleaseAudience: 'researcher' }).eligible).toBe(false)
+    const researcherOnlyEligibility = evaluateSurveyUnitReportEligibility({ ...withReportRelease, reportReleaseAudience: 'researcher' })
+    expect(researcherOnlyEligibility.eligible).toBe(false)
+    expect(() => freezeSurveyParticipantFeedback(
+      [{ ...withReportRelease, reportEligibility: researcherOnlyEligibility }],
+      [{ instrumentId: draftId, feedback: { policyVersion: 'SURVEY_RAW_METRICS_V1', mode: 'DESCRIPTIVE', metricKeys: ['total'], release: 'AFTER_FINAL' } }],
+      new Map([[draftId, ['total']]]),
+    )).toThrow(/研究者|数据采集|报告/)
     freezeSurveyParticipantFeedback(
       [withReportRelease],
       [{ instrumentId: draftId, feedback: { policyVersion: 'SURVEY_RAW_METRICS_V1', mode: 'DESCRIPTIVE', metricKeys: ['total'], release: 'AFTER_FINAL' } }],
