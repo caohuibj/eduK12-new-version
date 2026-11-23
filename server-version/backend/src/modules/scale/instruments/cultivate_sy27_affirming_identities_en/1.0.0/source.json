@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "cultivate_sy27_affirming_identities_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Cultivate｜身份认同支持｜5–12年级｜学生填答",
+      "abbreviation": "Cultivate SY27",
+      "instrumentFamily": "Cultivate CPS 2026–27 English; classroom conditions metadata only"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "Affirming Identities：来自官方九类课堂条件名称。仅登记原题块Q10（4题）的暂定对应；不是大学核准的独立量表或计分映射。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:cultivate",
+        "wave:CPS_SY27_2026_2027",
+        "benchmark:2024_rules_unavailable",
+        "student_evaluation_of_teaching",
+        "evaluation_target:teacher",
+        "evaluation_target:classroom",
+        "respondent:student",
+        "grade:5_12",
+        "age:not_specified",
+        "language:en",
+        "source:University_of_Chicago_Consortium_on_School_Research",
+        "license:CC_BY_NC_3_0_stated_explicit_permission_scope_unconfirmed",
+        "research:PILOT",
+        "availability:catalog_only"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 5,
+        "maxGrade": 12
+      },
+      "populationNotes": "CPS 2026–27原版覆盖5–12年级；未给出统一年龄界限。学生就一门指定核心课程回答；原版整卷证据不自动外推拆分后独立施测。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 20,
+      "administrationModes": [
+        "DIGITAL_SUPERVISED"
+      ],
+      "timeFrame": "原版指定核心课程的课堂经历；没有另造回溯天数。目录不提供施测。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "仅定位codebook第4页Q10的Q10_01, Q10_02, Q10_03, Q10_04；维度名称与题块对应尚待正式计分表确认。",
+        "estimatedMinutes=20引用原整卷约20分钟；不是本子项独立耗时测定。",
+        "维持原组卷、指定同一目标课程与可跳题说明；秋季/春季、语言及施测产品分别记录。",
+        "不含题文、选项、指导语、executable、计分参数、常模或运行时报告。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅来源候选；未来获授权且确认测量/计分范围后用于课堂改进研究。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "SY27 CPS English codebook metadata only; no item text reproduced.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "中文名称仅为目录导航；没有翻译题目，不是已验证中文版。"
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Cultivate Student Survey — CPS SY27 codebook (2024 benchmarked Measures)",
+      "citation": "University of Chicago. 2026. Cultivate® Survey. Chicago, IL: University of Chicago Consortium on School Research. Codebook p1 license; pp3–4 classroom conditions; Fall 2026 administration manual p4 framework.",
+      "url": "https://uchicagoimpact.org/sites/default/files/SY27_CPS_Cultivate_Codebook_FINAL.pdf",
+      "publicationYear": 2026
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "身份认同支持"
+      ],
+      "limitations": [
+        "没有可作答或可计分包；本目录不生成个人结果。",
+        "原始编码1–5不等于官方维度得分；反向、缺失阈值、换算与基准均未取得。",
+        "原版要求保密并合并学生响应；不得以个体反馈替代原版聚合报告。",
+        "仅发展性课堂改进；不用于教师绩效、优秀教师排名或跨工具总分。"
+      ],
+      "disclaimer": "当前仅为Cultivate SY27目录资料。独立施测效度、分组计分及具体授权尚待核实；保留原组合结构，不给出分数或等级。"
+    },
+    "blockers": [
+      "EXPLICIT_PERMISSION_SCOPE_UNCONFIRMED",
+      "OFFICIAL_SCORING_RULES_NOT_OBTAINED",
+      "SUBSCALE_BLOCK_MAPPING_PROVISIONAL",
+      "STANDALONE_VALIDITY_NOT_ESTABLISHED",
+      "PRODUCTION_CUSTOM_CONTENT_DEDUP_NOT_CHECKED"
+    ]
+  }
+}
