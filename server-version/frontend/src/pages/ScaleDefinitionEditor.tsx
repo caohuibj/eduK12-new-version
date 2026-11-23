@@ -135,7 +135,7 @@ export function ScaleDefinitionEditor({ definition, setDefinition, activeTab, re
 
   return <>
       {activeTab === 'responses' && <section className="staff-panel scale-author-panel">
-        <header className="scale-author-heading"><div><h2>作答选项</h2><p>设置学员看到的选项文字和对应分值，同一组选项供题目共用。</p></div><button onClick={addOption} disabled={controlsDisabled || responseSet.options.length >= 50} className="hui-button hui-button--secondary"><Plus size={17} aria-hidden="true" />增加选项</button></header>
+        <header className="scale-author-heading"><div><h2>作答选项</h2><p>设置作答者看到的选项文字和对应分值，同一组选项供题目共用。</p></div><button onClick={addOption} disabled={controlsDisabled || responseSet.options.length >= 50} className="hui-button hui-button--secondary"><Plus size={17} aria-hidden="true" />增加选项</button></header>
         {definition.responseSets.length > 1 && <p className="scale-edit-multiset-note">此量表含 {definition.responseSets.length} 组响应选项；这里编辑第一组（{responseSet.key}），其余响应集将完整保留。</p>}
         {!readOnly && <div className="scale-author-bulk">
           <div className="scale-author-presets"><label>选项数量<select aria-label="选项数量" disabled={controlsDisabled} value={responseSet.options.length} onChange={event => replaceOptions(resizeScaleOptions(responseSet.options, Number(event.target.value)))}>{Array.from({ length: 49 }, (_, index) => index + 2).map(count => <option key={count} value={count}>{count} 项</option>)}</select></label><div><span>常用选项</span>{scaleOptionPresets.map(preset => <button key={preset.label} type="button" disabled={controlsDisabled} onClick={() => { const text = preset.labels.join('\n'); setOptionPaste(text); applyOptionText(text) }}>{preset.label}</button>)}</div></div>

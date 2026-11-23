@@ -183,7 +183,9 @@ export async function listHuiteacherObserverGrants(input:{
       select:{id:true,observerUserId:true,role:true,status:true,
         expiresAt:true,acceptedAt:true,revokedAt:true,revision:true},
     })
-    return {list:list.slice(0,100),truncated:list.length>100}
+    const page=list.slice(0,100)
+    const accounts=await tx.campusAccount.findMany({where:{userId:{in:page.map(row=>row.observerUserId)}},select:{userId:true,loginName:true}})
+    return {list:page.map(row=>({...row,loginName:accounts.find(account=>account.userId===row.observerUserId)?.loginName??'已邀请账号'})),truncated:list.length>100}
   })
 }
 
@@ -212,11 +214,11 @@ export async function myHuiteacherFieldAssignments(userId:string){
     await validEducationActor(tx,userId)
     const rows=await tx.$queryRaw<Array<{
       organizationId:string;eventId:string;title:string;kind:string;
-      role:string;expiresAt:Date;invitationId:string;status:string
+      role:string;expiresAt:Date;invitationId:string;status:string;eventStatus:string
     }>>`
       SELECT grant_row."organization_id" AS "organizationId",
         grant_row."event_id" AS "eventId",
-        event."title",event."kind",grant_row."role",
+        event."title",event."kind",event."status" AS "eventStatus",grant_row."role",
         grant_row."expires_at" AS "expiresAt",
         grant_row."id" AS "invitationId",grant_row."status"
       FROM "huiteacher_observer_grants" grant_row

@@ -1,3 +1,6 @@
+import {fieldEvidenceDisplay} from './fieldEvidenceDisplay'
+import {formQuestionSchema} from '../assessment-core/form/definition'
+import {loadStoredUnitAdmission,assertAdmissionParentBinding} from '../assessment-runtime/unit-admission'
 import {randomUUID,createHash} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
@@ -110,5 +113,25 @@ export async function readCanonicalFieldEvidence(tx:Tx,row:{recordId:string;orga
  if(actual.finalHash!==payload.finalHash||actual.parent.participantKey!==fieldParticipantKey(payload.scope)||actual.parent.userId!==payload.scope.respondentUserId
   ||actual.parent.subjectUserId!==payload.scope.subjectUserId||actual.parent.respondentUserId!==payload.scope.respondentUserId||actual.parent.compositeAssessmentId!==payload.scope.assessmentRef.compositeId)
   fieldFail('HUITEACHER_FIELD_EVIDENCE_INTEGRITY',409)
- return {recordId:row.recordId,assessmentRef:payload.scope.assessmentRef,attemptId:payload.attemptId,attemptEpoch:payload.attemptEpoch,finalHash:payload.finalHash,units:payload.units}
+ // Resolve labels only from this FINAL's immutable admission; never from an author's live draft.
+ const sections=await tx.compositeFormSectionAttempt.findMany({where:{attemptId:payload.attemptId,attemptEpoch:payload.attemptEpoch,status:'COMPLETED'},
+  select:{id:true,sectionId:true,frozenAdmissionSnapshotEncrypted:true,frozenAdmissionSnapshotHash:true}})
+ const units=await Promise.all(payload.units.map(async unit=>{
+  if(unit.kind!=='FORM')return unit
+  const section=sections.find(value=>formSectionSlotKey(value.sectionId)===unit.unitId)
+  // Old evidence without a stored definition retains its original facts unchanged.
+  if(!section?.frozenAdmissionSnapshotEncrypted)return unit
+  const admission=await loadStoredUnitAdmission(section,'固定观察题目无法读取',tx)
+  const snapshot=actual.snapshots.find(value=>value.slotKey===unit.unitId)
+  if(!admission?.formSection||admission.formSection.id!==section.sectionId||admission.formSection.identityHash!==snapshot?.sourceDefinitionHash)
+   fieldFail('HUITEACHER_FIELD_EVIDENCE_INTEGRITY',409)
+  assertAdmissionParentBinding({compositeAttemptId:payload.attemptId},admission)
+  const definitions=admission.formSection.definition.items as Array<{id:string;formDefinition?:unknown}>
+  return {...unit,items:unit.items.map(item=>{
+   const definition=definitions.find(value=>value.id===item.key)
+   const question=formQuestionSchema.safeParse(definition?.formDefinition)
+   return question.success?{...item,displayValue:fieldEvidenceDisplay(question.data,item)}:item
+  })}
+ }))
+ return {recordId:row.recordId,assessmentRef:payload.scope.assessmentRef,attemptId:payload.attemptId,attemptEpoch:payload.attemptEpoch,finalHash:payload.finalHash,units}
 }

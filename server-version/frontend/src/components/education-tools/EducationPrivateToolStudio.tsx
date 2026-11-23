@@ -192,7 +192,7 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
     if(!window.confirm('改变施测声明会清除本草稿的旧受众声明，请核对题目适用性后保存并固定新版本。原固定版本保持不变。'))return
     const {audienceContract:_oldAudience,...report}=definition.report
     editDefinition({...definition,respondentType:event.target.value,report})
-   }}><option value={(tool.definition as ScaleDefinition).respondentType}>{(tool.definition as ScaleDefinition).respondentType==='expert_report'?'专家观察':'当前原版声明 · '+(tool.definition as ScaleDefinition).respondentType}</option>
+   }}><option value={(tool.definition as ScaleDefinition).respondentType}>{(tool.definition as ScaleDefinition).respondentType==='expert_report'?'专家观察':(['participant_self_report','teacher_self_report'].includes((tool.definition as ScaleDefinition).respondentType)?'教师自评':'其他原版作答声明')}</option>
     {(tool.definition as ScaleDefinition).respondentType!=='expert_report'?<option value="expert_report">声明为专家观察（新版本）</option>:<option value="teacher_self_report">声明为教师自评（新版本）</option>}
    </select></label>}
    {(entry==='SCHOOL'||entry==='TEACHER')&&tool.kind==='FORM'&&!previewing&&<EducationFormBulkImport key={`${tool.id}:${editorSessionRevision}`} api={api} organizationId={organizationId} actorId={actorId} tool={tool} disabled={dirty||bulkPending||busy||importBusy||mediaCount>0||sharingState.writing} onBusy={onImportBusy} onPendingChange={setCsvPending} onImported={value=>{apply(value);setNotice('表单题目已追加并保存，请重新检查定义。')}}/>}

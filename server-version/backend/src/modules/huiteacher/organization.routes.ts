@@ -49,10 +49,11 @@ router.delete('/organizations/:organizationId/units/:unitId',authenticateHuiteac
 router.get('/organizations/:organizationId/members',authenticateHuiteacher,
   requireTeacherProductAdmin,wrap(async(req,res)=>{
     const org=id.parse(req.params.organizationId)
+    const query=z.string().trim().max(100).parse(req.query.q??'').toLocaleLowerCase()
     const rows=await prisma.$queryRaw<Array<{
-      membershipId:string;loginName:string;role:string;joinedAt:Date;
+      membershipId:string;userId:string;loginName:string;role:string;joinedAt:Date;
     }>>`
-      SELECT m."id" AS "membershipId",ca."login_name" AS "loginName",
+      SELECT m."id" AS "membershipId",u."id" AS "userId",ca."login_name" AS "loginName",
         u."role"::text AS "role",m."valid_from" AS "joinedAt"
       FROM "organization_memberships" m
       JOIN "users" u ON u."id"=m."user_id"
@@ -61,6 +62,7 @@ router.get('/organizations/:organizationId/members',authenticateHuiteacher,
       WHERE m."organization_id"=${org}
         AND m."valid_from"<=statement_timestamp()
         AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+      AND (${query}='' OR ca."normalized_login" LIKE ${'%'+query+'%'})
       ORDER BY ca."normalized_login",m."id" LIMIT 201
     `
     return success(res,{list:rows.slice(0,200),truncated:rows.length>200})

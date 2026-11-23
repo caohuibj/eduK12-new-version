@@ -199,3 +199,28 @@ describe('Teacher compact workspace',()=>{
  })
 
 })
+
+it('restores an authorized school workspace and its section after a fresh load',async()=>{
+ session([organization('a',true)])
+ window.history.replaceState(null,'','/login#ht-school-relationships')
+ render(<HuiteacherApp/>)
+ expect(await screen.findByText('学校班级关系内容')).toBeVisible()
+ expect(screen.getByRole('link',{name:'班级关系'})).toHaveAttribute('aria-current','location')
+ fireEvent.click(screen.getByRole('button',{name:'教师成长'}))
+ expect(await screen.findByRole('region',{name:'参与测评'})).toBeVisible()
+ expect(window.location.hash).toBe('#ht-personal-tasks')
+})
+
+it('restores personal history from school and ignores unknown school fragments',async()=>{
+ session([organization('a',true)])
+ render(<HuiteacherApp/>)
+ fireEvent.click(await screen.findByRole('button',{name:'学校改进'}))
+ await screen.findByRole('region',{name:'学校设置与成员'})
+ window.history.replaceState({teacherWorkspace:'teacher'},'','/login#ht-personal-tasks')
+ fireEvent(window,new PopStateEvent('popstate'))
+ expect(await screen.findByRole('region',{name:'参与测评'})).toBeVisible()
+ window.history.replaceState(null,'','/login#ht-school-unknown')
+ fireEvent(window,new PopStateEvent('popstate'))
+ expect(screen.getByRole('region',{name:'参与测评'})).toBeVisible()
+ expect(screen.queryByRole('navigation',{name:'学校管理分区'})).not.toBeInTheDocument()
+})

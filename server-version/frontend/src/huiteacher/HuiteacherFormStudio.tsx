@@ -95,7 +95,8 @@ export function HuiteacherFormStudio({organizationId,api,onDraftStateChange}:{
       }catch(error){
         // The detailed Survey V2 validation issues are returned server-side.
         const detail=error instanceof Error?error.message:'请修改表单'
-        setErrors([{path:'definition',message:detail,severity:'error'}])
+        const issues=(error as {data?:{issues?:Issue[]}})?.data?.issues
+        setErrors(Array.isArray(issues)&&issues.length?issues:[{path:'definition',message:detail,severity:'error'}])
         throw error
       }
       const value=await api<Full>(base+'/'+active.id)
@@ -125,7 +126,7 @@ export function HuiteacherFormStudio({organizationId,api,onDraftStateChange}:{
       {active.status==='DRAFT'
         ?<fieldset disabled={busy}><legend>表单内容</legend><ResearchFormEditor value={draft} onChange={value=>{setDraft(value);setDirty(true)}}/></fieldset>
         :<p>已发布的题目定义不可再修改。如需更新，请另建表单草稿。</p>}
-      {errors.length>0&&<div role="alert">{errors.map((i,k)=><p key={k}>{i.path}：{i.message}</p>)}</div>}
+      {errors.length>0&&<div role="alert">{errors.map((i,k)=><p key={k}>{i.path.replace(/\[(\d+)\]/g,'.$1').replace(/pages\.(\d+)/g,(_,n)=>'第'+(Number(n)+1)+'页').replace(/(?:questions|items)\.(\d+)/g,(_,n)=>'第'+(Number(n)+1)+'题')}：{i.message}</p>)}</div>}
       <div className="ht-inline">
         <button disabled={busy||!dirty||active.status!=='DRAFT'} onClick={()=>void save()}>保存草稿</button>
         <button disabled={busy||dirty||active.status!=='DRAFT'} onClick={()=>void publish()}>审核并发布</button>

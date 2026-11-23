@@ -112,7 +112,7 @@ export function HuiteacherImprovementPanel({api,organizationId,targetId,targetNa
     </div>
     {actions.length===0?<p className="ht-empty">暂无此受众范围内的改进行动。</p>:
       <div className="ht-event-list">{actions.map(item=><article key={item.id} className="ht-event">
-        <strong>{item.goal}</strong> <span className="ht-tag">{item.status}</span>
+        <strong>{item.goal}</strong> <span className="ht-tag">{{PLANNED:'待开展',IN_PROGRESS:'进行中',COMPLETED:'已完成',CANCELLED:'已取消'}[item.status]}</span>
         <p className="ht-field-content">{item.plan}</p>
         {item.sourceEventId&&<p className="ht-muted">来自已结束评价事件：<code>{item.sourceEventId.slice(0,8)}…</code></p>}
         {item.dueAt&&<p>计划截止：{new Date(item.dueAt).toLocaleDateString('zh-CN')}</p>}

@@ -12,7 +12,7 @@ vi.mock('./HuiteacherFieldQuestionnaire',()=>({HuiteacherFieldQuestionnaire:({ta
  return <section><h4>{task.title}</h4><button onClick={()=>setStarted(true)}>开始固定问卷</button><button onClick={()=>{setStarted(true);setCompleted(true)}}>完成固定问卷</button></section>
 }}))
 type Api=Parameters<typeof HuiteacherFieldWorkspace>[0]['api']
-const invite={invitationId:'invite',organizationId:'school',eventId:'event',title:'课堂实践活动',kind:'CLASSROOM',role:'PEER',expiresAt:'2026-12-01T00:00:00Z',status:'ACCEPTED'}
+const invite={invitationId:'invite',organizationId:'school',eventId:'event',title:'课堂实践活动',kind:'CLASSROOM',role:'EXPERT',eventStatus:'OPEN',expiresAt:'2026-12-01T00:00:00Z',status:'ACCEPTED'}
 const form={title:'课堂观察预制表单',targetName:'本次教师',assessmentRef:{origin:{versionId:'fixed-version',contentHash:'a'.repeat(64),targetKind:'PERSON'}},attemptId:null,status:'ASSIGNED',attemptEpoch:null}
 const note={id:'note',eventId:'event',kind:'FORMAL_FEEDBACK',status:'DRAFT',revision:1,content:'原有意见',createdAt:'2026-10-26',submittedAt:null as string|null}
 function Workspace({api,onDraftStateChange}:{api:Api;onDraftStateChange?:(value:{dirty:boolean;writing:boolean})=>void}){
@@ -243,4 +243,22 @@ describe('Teacher professional practice form pages',()=>{
   expect(next.mock.calls.filter(([path])=>path.endsWith('/form'))).toHaveLength(1)
  })
 
+})
+
+it('routes an accepted peer to factual notes without calling the expert form API',async()=>{
+ const api=fixture({invites:[{...invite,role:'PEER'}]});render(<Workspace api={api as Api}/>)
+ fireEvent.click(await screen.findByRole('button',{name:'填写同行观察记录'}))
+ expect(await screen.findByLabelText('记录正文')).toBeEnabled()
+ expect(screen.queryByRole('button',{name:'填写实践表单'})).not.toBeInTheDocument()
+ expect(api.mock.calls.some(([path])=>path.endsWith('/form'))).toBe(false)
+ fireEvent.change(screen.getByLabelText('记录正文'),{target:{value:'同行记录的课堂事实'}})
+ fireEvent.click(screen.getByRole('button',{name:'保存加密草稿'}))
+ await waitFor(()=>expect(api).toHaveBeenCalledWith('/organizations/school/evaluation-events/event/field-notes','POST',{kind:'FACT',content:'同行记录的课堂事实'}))
+})
+it('shows draft activity state and offers no form or auxiliary write before opening',async()=>{
+ const api=fixture({invites:[{...invite,eventStatus:'DRAFT'}]});render(<Workspace api={api as Api}/>)
+ expect(await screen.findByRole('button',{name:'等待活动开放'})).toBeDisabled()
+ expect(screen.getByText('活动尚未开放')).toBeInTheDocument()
+ expect(screen.queryByText('新建辅助记录或私人反思')).not.toBeInTheDocument()
+ expect(api.mock.calls.some(([path])=>path.endsWith('/form'))).toBe(false)
 })

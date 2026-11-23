@@ -41,7 +41,7 @@ function nextAction(event:Event,run?:Run){
   if(!run)return ['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)
     ?'现场观察可独立进行；草稿阶段先确认专家／同行接受邀请。已有测评任务可查看配置。'
     :'查看已有任务配置；如尚未创建，在活动草稿中建立评价任务。'
-  if(run.status==='CANCELLED')return '评价任务已取消，活动状态仍独立保留。'
+  if(run.status==='CANCELLED')return '评价任务已取消，请确认取消并结束活动；历史记录会继续保留。'
   if(run.status==='DRAFT')return (run.trackCount??0)<1
     ?'加入已发布表单或本校、本入口获授权的固定工具版本，再预览任务配置。'
     :event.status==='DRAFT'?'预览配置并开放活动，然后单独发布评价任务。'
@@ -309,6 +309,7 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     setReports({[event.id]:{report,activityTitle:event.title,formTitle:releasedForms.find(form=>form.id===formId)?.title??formId}})
   })
   const transition=(event:Event,action:'OPEN'|'CLOSE'|'CANCEL')=>perform(async()=>{
+    if(action==='CANCEL'&&!window.confirm('确认取消活动“'+event.title+'”？取消后将保留历史记录，不能重新开放。'))return
     const result=await api<{status:string;version:number}>(
       base+'/evaluation-events/'+event.id+'/transition','POST',{
         action,expectedVersion:event.version,
@@ -382,7 +383,7 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
         {event.status==='DRAFT'&&!runMap[event.id]
           &&['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)
           &&<p className="ht-muted">纯现场观察无需创建测评任务；需先邀请至少一位专家／同行并由其接受，再开放活动。</p>}
-        {event.status==='DRAFT'&&<button onClick={()=>transition(event,'CANCEL')} disabled={working}>取消草稿</button>}
+        {(event.status==='DRAFT'||event.status==='OPEN'&&runMap[event.id]?.status==='CANCELLED')&&<button onClick={()=>transition(event,'CANCEL')} disabled={working}>{event.status==='DRAFT'?'取消草稿':'取消活动并结束'}</button>}
         {event.status==='OPEN'&&<button onClick={()=>transition(event,'CLOSE')}
           disabled={working||(runMap[event.id]&&runMap[event.id].status!=='CLOSED')}>
           结束活动
@@ -529,6 +530,6 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     {eventCursor&&<button disabled={eventLoading||working} onClick={()=>void loadEvents(eventCursor)}>加载更多评价活动</button>}
 {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'
   &&<HuiteacherGrowthManager api={api} organizationId={organizationId} targets={targets}/>}
-<p className="ht-muted">Form-only 使用正式发布版本、正式评价任务和加密最终提交；没有计分规则，不产生 Scale 得分。低于最小样本量的群体报告保持抑制。</p>
+<p className="ht-muted">表单使用正式固定版本、正式评价任务和加密提交；没有计分规则，不产生量表得分。低于最小样本量的群体报告保持抑制。</p>
   </section>
 }

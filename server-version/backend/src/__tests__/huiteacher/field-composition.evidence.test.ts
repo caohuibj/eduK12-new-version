@@ -1,3 +1,4 @@
+import {createFrozenUnitAdmission,encryptFrozenUnitAdmission} from '../../modules/assessment-runtime/admission-snapshot'
 import {beforeEach,afterEach,describe,expect,it,vi} from 'vitest'
 import type {Prisma} from '@prisma/client'
 import {createCanonicalFieldEvidence,readCanonicalFieldEvidence} from '../../modules/huiteacher/fieldComposition.evidence'
@@ -15,11 +16,11 @@ const scope:FieldAttemptIdentity={organizationId:id(1),eventId:id(6),targetId:id
  assessmentRef:{schemaVersion:1,kind:'COMPOSITION',compositeId:id(5),resourceKey:educationCompositionKey(origin),resourceVersion:'2.0.0',manifestHash:'b'.repeat(64),origin}}
 const item=id(20),section=id(21),attempt=id(22),record=id(23),hash='c'.repeat(64)
 let parent:any,snapshots:any[],children:any[],declarations:any[],stored:any
-const save=vi.fn(),query=vi.fn(),getParent=vi.fn(),getSnapshots=vi.fn(),getChildren=vi.fn()
-const tx={compositeAssessmentAttempt:{findUnique:getParent},assessmentUnitSnapshot:{findMany:getSnapshots},compositeFormSectionAttempt:{findMany:async()=>[{id:section,sectionId:section,submissionId:id(30)}]},assessment:{findMany:getChildren},huiteacherFieldFormEvidence:{create:save},$queryRaw:query} as unknown as Prisma.TransactionClient
+const save=vi.fn(),query=vi.fn(),getParent=vi.fn(),getSnapshots=vi.fn(),getChildren=vi.fn(),getSections=vi.fn()
+const tx={compositeAssessmentAttempt:{findUnique:getParent},assessmentUnitSnapshot:{findMany:getSnapshots},compositeFormSectionAttempt:{findMany:getSections},assessment:{findMany:getChildren},huiteacherFieldFormEvidence:{create:save},$queryRaw:query} as unknown as Prisma.TransactionClient
 const input={recordId:record,organizationId:scope.organizationId,eventId:scope.eventId,actorUserId:scope.respondentUserId,attemptId:attempt}
 beforeEach(()=>{
- vi.clearAllMocks();vi.stubEnv('DATA_ENCRYPTION_KEY','55'.repeat(32));vi.stubEnv('ASSESSMENT_COMPACT_STORAGE_ENABLED','false')
+ vi.clearAllMocks();getSections.mockResolvedValue([{id:section,sectionId:section,submissionId:id(30)}]);vi.stubEnv('DATA_ENCRYPTION_KEY','55'.repeat(32));vi.stubEnv('ASSESSMENT_COMPACT_STORAGE_ENABLED','false')
  const slots=createFrozenActiveSlotSet({schemaVersion:1,runtimeGeneration:'UNIFIED_V1',attemptEpoch:1,slots:[
   {slotKey:'form-section:'+section,unitType:'FORM_SECTION',required:true,sourceDefinitionIdentity:{key:'form',version:'3',hash},sourceBinding:{formSectionId:section}},
   {slotKey:'scale:'+item,unitType:'SCALE',required:true,sourceDefinitionIdentity:{key:'scale',version:'1',hash},sourceBinding:{compositeItemId:item}},
@@ -91,4 +92,15 @@ describe('Formal expert evidence consumes the exact durable native final',()=>{
   snapshots[0].collectionFactsEncrypted=encryptUnifiedRuntimePayload({schemaVersion:3,sectionKey:section,items:[]})
   await expect(readCanonicalFieldEvidence(tx,row)).rejects.toThrow()
  })
+})
+
+it('renders historical option labels from the same frozen admission without changing the signed evidence',async()=>{
+ await createCanonicalFieldEvidence(tx,input)
+ const row=save.mock.calls[0][0].data,cipher=row.answersCipher
+ const snapshot=createFrozenUnitAdmission({attemptEpoch:1,formSection:{id:section,identityHash:hash,kind:'composite',definition:{items:[{id:'expert-comment',formDefinition:{itemKey:'q',prompt:'专业观察',type:'SINGLE',required:true,options:[{optionKey:'other',label:'清晰'}],rows:[]}}]}},parent:{kind:'composite',parentId:attempt,slotKey:'form-section:'+section,sourceDefinitionHash:hash,compiledRuntimeHash:hash},principal:{userId:scope.respondentUserId}})
+ getSections.mockResolvedValue([{id:section,sectionId:section,frozenAdmissionSnapshotEncrypted:encryptFrozenUnitAdmission(snapshot),frozenAdmissionSnapshotHash:snapshot.snapshotHash}])
+ const view=await readCanonicalFieldEvidence(tx,row)
+ expect(view.units[0]).toMatchObject({items:[{value:'other',displayValue:'清晰；其他说明：EXPERT professional text'},{}]})
+ expect(row.answersCipher).toBe(cipher)
+ expect(m.current).toHaveBeenCalledTimes(1)
 })
