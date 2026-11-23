@@ -31,8 +31,8 @@ function receipt(grant: SjtReleaseGrant, at = new Date()): SjtCourseGrantReceipt
 async function assertAdmin(tx: Prisma.TransactionClient, actor: SjtGrantActor) {
   if (!actor.admin) throw problem('仅管理员可管理 SJT 授权')
   const user = await tx.user.findUnique({ where: { id: actor.userId },
-    select: { role: true, isActive: true, isFrozen: true, expiresAt: true } })
-  if (!user || user.role !== 'ADMIN' || !user.isActive || user.isFrozen
+    select: { role: true, platformRole: true, isActive: true, isFrozen: true, expiresAt: true } })
+  if (!user || (user.role !== 'ADMIN' && user.platformRole !== 'SYSTEM_ADMIN') || !user.isActive || user.isFrozen
     || (user.expiresAt && user.expiresAt <= new Date())) throw problem('管理员身份已失效')
 }
 async function assertScope(tx: Prisma.TransactionClient, scope: SjtCourseGrantScope, now: Date) {

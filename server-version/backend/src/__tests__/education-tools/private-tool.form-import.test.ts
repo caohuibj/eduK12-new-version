@@ -27,7 +27,7 @@ beforeEach(()=>{
 })
 describe('School append-only private form import',()=>{
  it.each(['CSV','TEXT'] as const)('%s previews without writes and appends once, retaining all existing content and media',async format=>{
-  const extra={format,...(format==='TEXT'?{content:'新题\n甲\n乙\n\n补充记录'}:{})},before=structuredClone(stored),p=await preview(extra),request=proof(p,extra)
+  const extra={format,...(format==='TEXT'?{content:'新题\n甲\n乙\n\n补充记录'}:{})},before=structuredClone(stored),p=await preview(extra),request={...proof(p,extra),previewToken:'a'.repeat(64),previewExpiresAt:Date.now()+600000}
   expect(p.ok).toBe(true);expect(stored).toEqual(before);expect(m.update).not.toHaveBeenCalled();expect(m.sync).not.toHaveBeenCalled()
   expect(await importPrivateForm(c,id(2),request,true)).toMatchObject({revision:2,canPublish:false,kind:'FORM',importedCount:format==='CSV'?1:2})
   expect(stored.definition.pages[0]).toEqual(before.definition.pages[0]);expect(stored.definition.pages).toHaveLength(2)

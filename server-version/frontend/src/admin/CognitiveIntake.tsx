@@ -112,7 +112,7 @@ function CognitiveIntakeWorkspace(){
     }finally{finish(request)}
   }
   const [profileKey, setProfileKey] = useState('')
-  const [profilePreview, setProfilePreview] = useState<{ configId: string; profile: string; title: string; artifactHash: string; approvedProducts?: Array<'TRAINING' | 'SURVEY' | 'SCHOOL' | 'TEACHER'>; report?: { title?: string } } | null>(null)
+  const [profilePreview, setProfilePreview] = useState<{ configId: string; profile: string; title: string; artifactHash: string; approvedProducts?: Array<'TRAINING' | 'SURVEY' | 'SCHOOL' | 'TEACHER'>; hasPriorPolicy?: boolean; report?: { title?: string } } | null>(null)
   const [allowedProducts, setAllowedProducts] = useState<Array<'TRAINING' | 'SURVEY' | 'SCHOOL' | 'TEACHER'>>(['SURVEY', 'TRAINING'])
   const [approvalReason, setApprovalReason] = useState('系统管理员确认参数与报告配置')
   const [profileStatus, setProfileStatus] = useState('')
@@ -161,7 +161,7 @@ function CognitiveIntakeWorkspace(){
     const request = begin(); if (request === null) return
     setError(''); setProfileStatus('')
     try {
-      const response = await api.get<{ configId: string; profile: string; title: string; artifactHash: string; approvedProducts?: Array<'TRAINING' | 'SURVEY' | 'SCHOOL' | 'TEACHER'>; report?: { title?: string } }>(
+      const response = await api.get<{ configId: string; profile: string; title: string; artifactHash: string; approvedProducts?: Array<'TRAINING' | 'SURVEY' | 'SCHOOL' | 'TEACHER'>; hasPriorPolicy?: boolean; report?: { title?: string } }>(
         `/cognitive/profile-configurations/system/${encodeURIComponent(configId)}/${encodeURIComponent(targetProfile)}`,
       )
       if (!current(request)) return
@@ -169,7 +169,7 @@ function CognitiveIntakeWorkspace(){
       const existing = response.data.approvedProducts ?? []
       setProfileKey(targetProfile)
       setProfilePreview(response.data)
-      setAllowedProducts(existing.length > 0 ? existing : ['SURVEY', 'TRAINING'])
+      setAllowedProducts(existing.length > 0 ? existing : response.data.hasPriorPolicy ? [] : ['SURVEY', 'TRAINING'])
     } catch (caught) {
       if (current(request)) setError(requestError(caught))
     } finally { finish(request) }
@@ -245,7 +245,8 @@ function CognitiveIntakeWorkspace(){
             <button type="button" disabled={busy} onClick={()=>void loadProfilePreview(profileKey||selected.profiles[0]?.key||'standard')}>预览 Profile 摘要</button>
             {profilePreview&&<div>
               <p>摘要：{profilePreview.artifactHash.slice(0,12)}…（{profilePreview.report?.title??profilePreview.title}）</p>
-              <p>当前已启用入口：{(profilePreview.approvedProducts?.length?profilePreview.approvedProducts.join('、'):'暂无（保存后按下方勾选启用）')}</p>
+              <p>当前已启用入口：{(profilePreview.approvedProducts?.length?profilePreview.approvedProducts.join('、'):'暂无（按下方勾选启用）')}</p>
+              {profilePreview.hasPriorPolicy && !profilePreview.approvedProducts?.length && <p className="sys-muted">已有入口策略目前均未启用，请明确选择需要重新启用的入口。</p>}
               <fieldset disabled={busy}><legend>允许使用的产品入口</legend>
                 {(['SURVEY','TRAINING','SCHOOL','TEACHER'] as const).map(prod=><label key={prod}>
                   <input type="checkbox" checked={allowedProducts.includes(prod)} onChange={e=>setAllowedProducts(prev=>e.target.checked?[...prev,prod]:prev.filter(x=>x!==prod))}/> {prod}

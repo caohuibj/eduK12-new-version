@@ -29,27 +29,32 @@ describe('explicit release course grants', () => {
     const [, init] = vi.mocked(sessionFetch).mock.calls.find(([url]) => String(url).endsWith('/release-1/grants'))!
     expect(JSON.parse(init!.body as string)).toEqual({ instrumentKey: 'source', instrumentVersion: '2.0.0', definitionHash: 'a'.repeat(64), contentDigest: 'b'.repeat(64), granteeTeacherId: 'teacher-1', courseId: 'course-1', purpose: 'TRAINING_COURSE', permission: 'DISTRIBUTE', validFrom: new Date('2020-01-01T00:00').toISOString(), expiresAt: new Date('2099-01-01T00:00').toISOString(), note: '批准本课程分发' })
   })
-  it('adapts only the selected own valid ADAPT grant into a new draft', async () => {
+  it('allows administrators to adapt on behalf of the explicitly granted teacher', async () => {
     const onAdapt = vi.fn().mockResolvedValue(undefined)
     vi.mocked(sessionFetch).mockImplementation(async (url, init) => init?.method === 'POST' ? json({ id: 'adapted-draft' }) : String(url).includes('/grants?') ? page([grant()]) : page([release()]))
-    render(<SjtReleasePermissions admin={false} userId="teacher-1" onAdapt={onAdapt}/>)
+    render(<SjtReleasePermissions admin userId="admin" onAdapt={onAdapt}/>)
     await choose()
     fireEvent.change(screen.getByLabelText('使用改编授权'), { target: { value: 'grant-1' } })
     fireEvent.change(screen.getByLabelText('新题包标识'), { target: { value: 'new-course-sjt' } })
     fireEvent.click(screen.getByRole('button', { name: '创建改编草稿' }))
     await waitFor(() => expect(onAdapt).toHaveBeenCalledWith('adapted-draft'))
     const [, init] = vi.mocked(sessionFetch).mock.calls.find(([url]) => String(url).endsWith('/release-1/adapt'))!
-    expect(JSON.parse(init!.body as string)).toEqual({ instrumentKey: 'source', instrumentVersion: '2.0.0', definitionHash: 'a'.repeat(64), contentDigest: 'b'.repeat(64), courseId: 'course-1', grantId: 'grant-1', grantVersion: 3, newInstrumentKey: 'new-course-sjt', newInstrumentVersion: '1.0.0' })
-    expect(screen.queryByText('授予指定课程权限')).not.toBeInTheDocument()
+    expect(JSON.parse(init!.body as string)).toEqual({ instrumentKey: 'source', instrumentVersion: '2.0.0', definitionHash: 'a'.repeat(64), contentDigest: 'b'.repeat(64), courseId: 'course-1', grantId: 'grant-1', grantVersion: 3, granteeTeacherId: 'teacher-1', newInstrumentKey: 'new-course-sjt', newInstrumentVersion: '1.0.0' })
+    expect(screen.getByText('授予指定课程权限')).toBeInTheDocument()
   })
-  it.each(['DISTRIBUTE', 'REVOKED', 'EXPIRED', 'OTHER_TEACHER'] as const)('does not offer adaptation for %s', async variant => {
+  it('does not expose SJT authoring through an ordinary teacher’s historical ADAPT grant', async () => {
+    vi.mocked(sessionFetch).mockImplementation(async url => String(url).includes('/grants?') ? page([grant()]) : page([release()]))
+    render(<SjtReleasePermissions admin={false} userId="teacher-1" onAdapt={vi.fn()}/>)
+    await choose()
+    expect(screen.queryByRole('button', { name: '创建改编草稿' })).not.toBeInTheDocument()
+  })
+  it.each(['DISTRIBUTE', 'REVOKED', 'EXPIRED'] as const)('does not offer adaptation for %s', async variant => {
     const g = grant()
     if (variant === 'DISTRIBUTE') g.permission = 'DISTRIBUTE'
     if (variant === 'REVOKED') g.status = 'REVOKED'
     if (variant === 'EXPIRED') g.expiresAt = '2021-01-01T00:00:00.000Z'
-    if (variant === 'OTHER_TEACHER') g.granteeTeacherId = 'teacher-2'
     vi.mocked(sessionFetch).mockImplementation(async url => String(url).includes('/grants?') ? page([g]) : page([release()]))
-    render(<SjtReleasePermissions admin={false} userId="teacher-1" onAdapt={vi.fn()}/>)
+    render(<SjtReleasePermissions admin userId="admin" onAdapt={vi.fn()}/>)
     await choose()
     expect(screen.queryByRole('button', { name: '创建改编草稿' })).not.toBeInTheDocument()
   })
@@ -80,7 +85,7 @@ describe('explicit release course grants', () => {
     expect(screen.getAllByRole('option', { name: 'source · 2.0.0 · 已发布' })).toHaveLength(1)
     fireEvent.change(screen.getByLabelText('选择受控发布版本'), { target: { value: 'release-2' } })
     fireEvent.click(await screen.findByRole('button', { name: '加载更多授权' }))
-    await screen.findByRole('option', { name: '课程 course-2 · 授权版本 3' })
+    await screen.findByText(/ADAPT · 课程 course-2 · 培训师 teacher-1/)
     expect(screen.queryByRole('button', { name: '加载更多授权' })).not.toBeInTheDocument()
     const requested = vi.mocked(sessionFetch).mock.calls.map(([url]) => new URL(String(url), 'https://example.test'))
     expect(requested.find(url => url.searchParams.get('cursor') === 'release-cursor+/=')?.pathname).toBe('/api/situational/authoring/releases')

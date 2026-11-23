@@ -46,4 +46,24 @@ describe('SJT author workbench course policy', () => {
     expect(JSON.parse(init!.body as string)).toEqual({ revision: 2, authorizationPolicy: 'COURSE_GRANT_V1' })
     expect(screen.getByLabelText('题包发布策略')).toBeDisabled()
   })
+  it('lets an administrator fork a teacher-owned published version and continue editing the new draft', async () => {
+    const original = { ...draft(), ownerId: 'original-teacher', status: 'PUBLISHED' }
+    const forked = { ...draft(), id: 'fork-1', ownerId: 'original-teacher',
+      template: { ...doc(), instrumentVersion: '1.0.1' } }
+    vi.mocked(sessionFetch).mockImplementation(async (url, init) => {
+      if (String(url).endsWith('/drafts/draft-1/version') && init?.method === 'POST') return json(forked)
+      if (String(url).endsWith('/drafts/fork-1')) return json(forked)
+      if (String(url).endsWith('/drafts/draft-1')) return json(original)
+      if (String(url).endsWith('/drafts')) return json([original])
+      return String(url).includes('/releases?') ? json({ items: [], nextCursor: null }) : json([])
+    })
+    render(<MemoryRouter><SjtAuthoring/></MemoryRouter>)
+    fireEvent.click(await screen.findByRole('button', { name: '打开题包 online-new 1.0.0' }))
+    fireEvent.click(await screen.findByRole('button', { name: '创建下一内容版本' }))
+    await screen.findByText('已创建下一内容版本草稿；原发布版本及原作者素材归属保持不变。')
+    expect(screen.getByRole('button', { name: '保存在线修订' })).toBeEnabled()
+    expect(screen.getByLabelText('题包发布策略')).not.toBeDisabled()
+    expect(vi.mocked(sessionFetch).mock.calls.some(([url,init]) => String(url).endsWith('/drafts/draft-1/version') && init?.method === 'POST')).toBe(true)
+  })
+
 })

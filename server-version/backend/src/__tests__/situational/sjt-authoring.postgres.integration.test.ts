@@ -242,6 +242,20 @@ suite('SJT upload real PostgreSQL governance and frozen FINAL', () => {
     expect(restored.contentDigest).toBe(d.contentDigest)
     expect((await service.getSjtDraft(a(), d.id)).audits[0]?.action).toBe('RESTORE')
   }, 60000)
+  it('lets a system administrator fork and maintain a teacher-owned published version without transferring ownership', async () => {
+    const d = await draft()
+    await service.reviewSjtDraft(r(), d.id, d.revision, d.contentDigest, true, 'direct admin publication')
+    const version = await service.forkSjtDraftVersion(r(), d.id)
+    ids.push(version.id)
+    expect(version.ownerId).toBe(author)
+    expect((await service.getSjtDraft(r(), version.id)).ownerId).toBe(author)
+    const changed = structuredClone(version.template) as typeof example
+    changed.title = '管理员接续修订'
+    const revised = await service.reviseSjtDraft(r(), version.id, version.revision, changed)
+    expect(revised.ownerId).toBe(author)
+    expect(revised.status).toBe('DRAFT')
+    expect((await service.getSjtDraft(r(), version.id)).audits[0]).toMatchObject({ actorId: reviewer, action: 'REVISE' })
+  }, 60000)
   it('rejects duplicate immutable versions and inadequate coverage', async () => {
     const d = await draft(),
       t = d.template as typeof example

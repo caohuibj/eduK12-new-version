@@ -28,9 +28,9 @@ export async function previewCognitiveProfileApproval(actorId:string,configId:st
  return prisma.$transaction(async tx=>{
   await assertSystem(tx,actorId)
   const source=await preparePublishedCognitiveProfile(tx,id.parse(configId),selected)
-  const approvedProducts=await readApprovedToolEntryProducts(tx,cognitiveProfilePolicyIdentity(configId,selected,source.artifactHash))
+  const {approvedProducts,hasPriorPolicy}=await readApprovedToolEntryProducts(tx,cognitiveProfilePolicyIdentity(configId,selected,source.artifactHash))
   return {configId,profile:selected,title:source.config.name,artifactHash:source.artifactHash,configuration:source.artifact.identity,
-   report:source.artifact.resolvedReport,approvedProducts,previewOnly:true}
+   report:source.artifact.resolvedReport,approvedProducts,hasPriorPolicy,previewOnly:true}
  },options)
 }
 export async function approveCognitiveProfile(actorId:string,configId:string,rawProfile:unknown,raw:unknown,proof:AdminSessionProof){

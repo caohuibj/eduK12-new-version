@@ -373,6 +373,7 @@ router.post('/grants/:id/revoke', handle(async (req, res) => {
 router.post('/releases/:id/adapt', handle(async (req, res) => {
   const body = exactRelease.extend({
     courseId: z.string().guid(), grantId: z.string().guid(), grantVersion: z.number().int().positive(),
+    granteeTeacherId: z.string().guid().optional(),
     newInstrumentKey: z.string().max(80).regex(/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/),
     newInstrumentVersion: z.string().max(40).regex(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/),
   }).strict().parse(req.body)

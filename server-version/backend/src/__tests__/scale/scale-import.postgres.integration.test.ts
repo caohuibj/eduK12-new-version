@@ -25,7 +25,7 @@ suite('Scale import PostgreSQL atomicity and governance', () => {
     const pre: any = await run(scale.id, actor, input, false)
     expect(await db.scale.findUnique({ where: { id: scale.id } })).toEqual(scale)
     expect(await db.assessmentManagementEvent.count({ where: { resourceId: scale.id } })).toBe(0)
-    const saved: any = await run(scale.id, actor, { ...input, digest: pre.digest }, true)
+    const saved: any = await run(scale.id, actor, { ...input, digest: pre.digest, previewToken:'a'.repeat(64), previewExpiresAt:Date.now()+600000 }, true)
     expect(saved.definition.items.map((i: any) => i.itemCode)).toEqual(['Q-1', 'Q2'])
     expect(saved.updatedAt.getTime()).toBeGreaterThan(scale.updatedAt.getTime())
     const events = await db.assessmentManagementEvent.findMany({ where: { resourceId: scale.id } })

@@ -33,7 +33,7 @@ describe('education private CSV real adapter contract',()=>{
   })
  })
  it('previews without writes and applies complete saved DTO once, rejecting replay',async()=>{
-  const before=structuredClone(stored),p=await preview(),request=proof(p)
+  const before=structuredClone(stored),p=await preview(),request={...proof(p),previewToken:'a'.repeat(64),previewExpiresAt:Date.now()+600000}
   expect(stored).toEqual(before);expect(m.update).not.toHaveBeenCalled();expect(m.sync).not.toHaveBeenCalled()
   const result=await importPrivateToolCsv(c,id,request,true)
   expect(result).toMatchObject({id,revision:2,kind:'SCALE',importedCount:1,canPublish:false})

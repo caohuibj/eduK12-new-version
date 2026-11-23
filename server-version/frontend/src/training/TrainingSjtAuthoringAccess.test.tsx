@@ -1,9 +1,12 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { expect, it, vi } from 'vitest'
-const context = vi.hoisted(() => ({ training: true }))
+import { beforeEach, expect, it, vi } from 'vitest'
+const context = vi.hoisted(() => ({ training: true, user: { role: 'TEACHER', platformRole: 'STANDARD' } }))
 vi.mock('./context', () => ({ isTrainingHost: () => context.training }))
+vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ user: context.user }) }))
 import TrainingSjtAuthoringAccess from './TrainingSjtAuthoringAccess'
+
+beforeEach(() => { context.training = true; context.user = { role: 'TEACHER', platformRole: 'STANDARD' } })
 
 it('does not mount the SJT authoring app in Training, including direct old draft links', () => {
   context.training = true
@@ -19,4 +22,11 @@ it('preserves the existing authoring app outside Training', () => {
   context.training = false
   render(<MemoryRouter><TrainingSjtAuthoringAccess><p>原有编制器</p></TrainingSjtAuthoringAccess></MemoryRouter>)
   expect(screen.getByText('原有编制器')).toBeInTheDocument()
+})
+
+it.each([{ role: 'TEACHER', platformRole: 'SYSTEM_ADMIN' }, { role: 'ADMIN', platformRole: 'STANDARD' }])('lets %j use SJT authoring on Training hosts', user => {
+  context.user = user
+  render(<MemoryRouter><TrainingSjtAuthoringAccess><p>管理员工作台</p></TrainingSjtAuthoringAccess></MemoryRouter>)
+  expect(screen.getByText('管理员工作台')).toBeInTheDocument()
+  expect(screen.queryByText('暂不开放情境判断编制')).toBeNull()
 })

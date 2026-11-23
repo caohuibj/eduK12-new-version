@@ -15,7 +15,7 @@ import {assertPrivateToolImages,syncPrivateToolDraftImages} from './private-tool
 const hash=z.string().regex(/^[a-f0-9]{64}$/),protocol='education-private-form-import-v1'
 export const privateFormImportInput=z.object({format:z.enum(['CSV','TEXT']),content:z.string().min(1).max(200000),batchId:z.string().guid(),
  targetPageKey:assessmentKeySchema.optional(),expectedRevision:z.number().int().positive(),expectedContentHash:hash}).strict()
-export const privateFormImportApplyInput=privateFormImportInput.extend({digest:hash,previewToken:z.string().optional(),previewExpiresAt:z.string().optional()}).strict()
+export const privateFormImportApplyInput=privateFormImportInput.extend({digest:hash,previewToken:z.string().optional(),previewExpiresAt:z.union([z.string(),z.number()]).optional()}).strict()
 type Input=z.infer<typeof privateFormImportInput>
 const equal=(a:string,b:string)=>timingSafeEqual(Buffer.from(a,'hex'),Buffer.from(b,'hex'))
 const boundary={visibility:'AUTHOR_PRIVATE',snapshotOnly:true,canPublish:false,canShare:false,canReadParticipantReports:false} as const

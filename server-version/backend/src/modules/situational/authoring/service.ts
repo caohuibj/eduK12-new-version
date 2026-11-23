@@ -141,7 +141,7 @@ export async function forkSjtDraftVersion(actor: SjtAuthorActor, id: string) {
     assertAdaptedVersion(source.adaptationSource,compiled.template)
     const mediaOptions=await adaptationMediaOptions(tx,source,true)
     await assertSjtAuthorMedia(tx,source.ownerId,compiled.template,mediaOptions)
-    const row=await tx.sjtAuthorDraft.create({data:{ownerId:actor.userId,template:json(compiled.template),contentDigest:compiled.contentDigest,
+    const row=await tx.sjtAuthorDraft.create({data:{ownerId:source.ownerId,template:json(compiled.template),contentDigest:compiled.contentDigest,
       authorizationPolicy:source.authorizationPolicy,adaptationSource:source.adaptationSource===null?Prisma.DbNull:json(source.adaptationSource)}})
     await tx.sjtAuthorAudit.create({data:{draftId:row.id,actorId:actor.userId,revision:1,action:'VERSION_COPY',contentDigest:compiled.contentDigest,
       template:json(compiled.template),authorizationPolicy:source.authorizationPolicy,note:`来源草稿 ${source.id}；原发布版本保持不变`}})
@@ -458,9 +458,12 @@ export async function setSjtDraftPolicy(actor: SjtAuthorActor, id: string, revis
 
 export async function adaptSjtRelease(actor: SjtAuthorActor, releaseId: string,
   input: SjtGrantExactInput & { courseId: string; grantId: string; grantVersion: number;
-    newInstrumentKey: string; newInstrumentVersion: string }) {
+    granteeTeacherId?: string; newInstrumentKey: string; newInstrumentVersion: string }) {
+  if (!actor.admin && input.granteeTeacherId && input.granteeTeacherId !== actor.userId)
+    throw problem('仅管理员可代其他教师使用改编授权', 403)
+  const teacherId = actor.admin ? input.granteeTeacherId ?? actor.userId : actor.userId
   return prisma.$transaction(async tx => {
-    await lockSjtGrantScope(tx, { teacherId: actor.userId, courseId: input.courseId, purpose: 'TRAINING_COURSE' })
+    await lockSjtGrantScope(tx, { teacherId, courseId: input.courseId, purpose: 'TRAINING_COURSE' })
     await tx.$queryRaw`SELECT id FROM sjt_author_releases WHERE id=${releaseId} FOR SHARE`
     const release = await tx.sjtAuthorRelease.findUnique({ where: { id: releaseId } })
     if (!release || release.status !== 'PUBLISHED' || release.authorizationPolicy !== SJT_COURSE_GRANT_POLICY
@@ -468,7 +471,7 @@ export async function adaptSjtRelease(actor: SjtAuthorActor, releaseId: string,
       || release.definitionHash !== input.definitionHash || release.contentDigest !== input.contentDigest)
       throw problem('改编来源必须精确匹配已发布受控版本', 409)
     if (input.newInstrumentVersion === release.instrumentVersion) throw problem('改编必须使用新的内容版本')
-    const grants = await assertSjtCourseGrants(tx, [release], { teacherId: actor.userId,
+    const grants = await assertSjtCourseGrants(tx, [release], { teacherId,
       courseId: input.courseId, purpose: 'TRAINING_COURSE' }, 'ADAPT', { lock: true, releaseLocked: true })
     const receipt = grants.get(releaseId)
     if (!receipt || receipt.grantId !== input.grantId || receipt.grantVersion !== input.grantVersion)
@@ -497,8 +500,8 @@ export async function adaptSjtRelease(actor: SjtAuthorActor, releaseId: string,
       sourceDraftId: source.id, sourceAuthorId: source.ownerId }
     const mediaOptions = { adaptSource: { template: source.template, sourceOwnerId: source.ownerId,
       grantId: receipt.grantId, provenance: adaptationSource } }
-    await assertSjtAuthorMedia(tx, actor.userId, c.template, mediaOptions)
-    const draft = await tx.sjtAuthorDraft.create({ data: { ownerId: actor.userId, template: json(c.template),
+    await assertSjtAuthorMedia(tx, teacherId, c.template, mediaOptions)
+    const draft = await tx.sjtAuthorDraft.create({ data: { ownerId: teacherId, template: json(c.template),
       contentDigest: c.contentDigest, authorizationPolicy: SJT_COURSE_GRANT_POLICY,
       adaptationSource: json(adaptationSource) } })
     await tx.sjtAuthorAudit.create({ data: { draftId: draft.id, actorId: actor.userId, revision: 1,

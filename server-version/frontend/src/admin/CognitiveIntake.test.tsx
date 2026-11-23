@@ -169,6 +169,19 @@ it('preserves existing approvedProducts when adding another entry',async()=>{
  expect(approveCall[1]).toMatchObject({expectedArtifactHash:'a'.repeat(64),allowedProducts:['SCHOOL','TEACHER','TRAINING']})
 })
 
+it('does not silently re-enable entries when a previously approved profile has no active entry',async()=>{
+ const publishedPlan={...plan,action:'ALREADY_PRESENT',configId:'cfg-1',status:'PUBLISHED'}
+ mock.get.mockImplementation(async(path:string)=>path.startsWith(root)
+  ?response({...catalog,registered:[{...candidate,plan:publishedPlan}]})
+  :response({configId:'cfg-1',profile:'experience',title:'数字线估计',artifactHash:'a'.repeat(64),approvedProducts:[],hasPriorPolicy:true}))
+ render(<CognitiveIntake/>);await screen.findByText('数字线估计',{selector:'strong'});choose()
+ fireEvent.click(await screen.findByRole('button',{name:'预览 Profile 摘要'}))
+ await screen.findByText(/已有入口策略目前均未启用/)
+ for(const entry of ['SURVEY','TRAINING','SCHOOL','TEACHER'])expect(screen.getByRole('checkbox',{name:entry})).not.toBeChecked()
+ expect(screen.getByRole('button',{name:'批准并启用此 Profile'})).toBeDisabled()
+ expect(mock.post).not.toHaveBeenCalled()
+})
+
 it('pages a long candidate directory and resets paging after search',async()=>{
  mock.get.mockResolvedValue(response({...catalog,registered:Array.from({length:13},(_,index)=>({...candidate,testType:`candidate-${index}`,name:`分页候选 ${index}`,plan:{...plan,testType:`candidate-${index}`}}))}))
  render(<CognitiveIntake/>);await screen.findByText('分页候选 0',{selector:'strong'})
