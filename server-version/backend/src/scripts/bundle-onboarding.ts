@@ -18,7 +18,7 @@ async function main(){
   try{
     const release=await import('../modules/bundle-product/package-release')
     if(command==='install'){if(args.length!==2)throw new Error('Usage: install <directory> <admin-user-id>');const row=await release.installPackage(db,args[1],loadPackage(path.resolve(args[0])));return {ok:true,id:row.id,status:row.status,contentHash:row.contentHash}}
-    if(command==='publish'){if(args.length!==4)throw new Error('Usage: publish <key> <version> <admin-user-id> <signed-review.json>');const row=await release.publishPackage(db,args[2],args[0],args[1],JSON.parse(fs.readFileSync(args[3],'utf8')));return {ok:true,status:row.status,contentHash:row.contentHash}}
+    if(command==='publish'){if(args.length<3||args.length>4)throw new Error('Usage: publish <key> <version> <admin-user-id> [release.json]');const raw=args[3]?JSON.parse(fs.readFileSync(args[3],'utf8')):undefined;const row=await release.publishPackage(db,args[2],args[0],args[1],raw);return {ok:true,status:row.status,contentHash:row.contentHash}}
     if(command==='hold'||command==='retire'){if(args.length!==3)throw new Error('Usage: hold|retire <key> <version> <admin-user-id>');const row=await release.changePackageStatus(db,args[2],args[0],args[1],command==='hold'?'HOLD':'RETIRED');return {ok:true,status:row.status}}
     throw new Error('Unknown Bundle onboarding command')
   }finally{await db.$disconnect()}

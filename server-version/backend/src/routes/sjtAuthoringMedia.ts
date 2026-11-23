@@ -9,9 +9,12 @@ import { AssessmentImageDeliveryError, serveAssessmentImageContent } from '../mo
 import { getSjtDraft } from '../modules/situational/authoring/service'
 import { SJT_AUTHOR_MEDIA_SCOPE, SJT_AUTHOR_MAX_IMAGE_BYTES, sjtAuthorImages } from '../modules/situational/authoring/media'
 
-/** Mounted behind sjtAuthoring's existing authenticate + requireTeacher boundary. */
+/** Mounted behind sjtAuthoring's existing authenticate + requireSjtAdmin boundary. */
 const router = Router()
-const actor = (req: Request) => ({ userId: req.user!.userId, admin: req.user!.role === UserRole.ADMIN })
+const actor = (req: Request) => ({
+  userId: req.user!.userId,
+  admin: Boolean(req.user!.role === UserRole.ADMIN || req.user!.platformRole === 'SYSTEM_ADMIN'),
+})
 const send = (res: Response, data: unknown) => res.json({ code: 0, message: '成功', data })
 const problem = (statusCode: number, message: string) => Object.assign(new Error(message), { statusCode })
 const handle = (fn: (req: Request, res: Response) => Promise<unknown>): RequestHandler => async (req, res) => {

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import apiClient, { sessionFetch } from '../api/client'
 
 type ImportPreview = {
-  digest: string; previewToken: string; previewExpiresAt: number; expectedUpdatedAt: string; count: number; totalItems: number; responseSetKey: string
+  digest: string; expectedUpdatedAt: string; count: number; totalItems: number; responseSetKey: string
   reportConfigured?: boolean
   responseSet: { options: Array<{ value: string | number; label: string; score: number }> }
   scores: Array<{ key: string; label: string; aggregation: string }>
@@ -51,8 +51,6 @@ export default function ScaleCsvImport({ id, revision, disabled, onImported, onB
       form.append('expectedUpdatedAt', confirm ? preview!.expectedUpdatedAt : revision)
       if (confirm) {
         form.append('digest', preview!.digest)
-        form.append('previewToken', preview!.previewToken)
-        form.append('previewExpiresAt', String(preview!.previewExpiresAt))
       }
       const res = await sessionFetch(`/api/scales/${id}/import/full-${confirm ? 'confirm' : 'preview'}`, {
         method: 'POST',
@@ -66,7 +64,7 @@ export default function ScaleCsvImport({ id, revision, disabled, onImported, onB
         setMessage(`已一步导入并保存 ${envelope.data.importedCount} 道题（${envelope.data.reportConfigured ? '已配置阈值报告' : '仅数据采集'}）。发布前请再次校验。`)
       } else {
         setPreview(envelope.data)
-        setMessage('Excel 预检通过，凭据有效期 10 分钟。请核对题目、选项、计分与阈值报告后确认保存。')
+        setMessage('Excel 预检通过。请核对题目、选项、计分与阈值报告后确认保存。')
       }
     } catch (error) {
       if (!mounted.current) return
@@ -84,14 +82,14 @@ export default function ScaleCsvImport({ id, revision, disabled, onImported, onB
     try {
       const response = await apiClient.post<any>(`/scales/${id}/import/${confirm ? 'confirm' : 'preview'}`, {
         content, expectedUpdatedAt: confirm ? preview!.expectedUpdatedAt : revision,
-        ...(confirm ? { digest: preview!.digest, previewToken: preview!.previewToken, previewExpiresAt: preview!.previewExpiresAt } : {}),
+        ...(confirm ? { digest: preview!.digest } : {}),
       })
       if (!mounted.current) return
       if (response.code !== 0) throw new Error(response.message || '导入失败')
       if (confirm) {
         onImported(response.data); setPreview(null)
         setMessage(`已导入并保存 ${response.data.importedCount} 道题。发布前请再次校验。`)
-      } else { setPreview(response.data); setMessage('预检通过，凭据有效期 10 分钟。请核对题目、计分项和共享选项后确认保存。') }
+      } else { setPreview(response.data); setMessage('预检通过。请核对题目、计分项和共享选项后确认保存。') }
     } catch (error) {
       if (!mounted.current) return
       setPreview(null); setFailed(true)

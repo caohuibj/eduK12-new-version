@@ -3,7 +3,7 @@ import {authoringImportTemplate} from '../../survey/authoring-import-template'
 import type {FormDraft} from '../../survey/builder.types'
 import {privateToolBase,privateToolError,type PrivateTool,type PrivateToolApi} from './privateToolClient'
 
-type Proof={digest:string;previewToken:string;previewExpiresAt:number;expectedRevision:number;expectedContentHash:string}
+type Proof={digest:string;expectedRevision:number;expectedContentHash:string}
 type Preview={ok:boolean;issues:Array<{line:number;message:string}>;count:number;totalQuestions:number;totalFields:number;
  groups:Array<{title:string;addedCount:number}>;items:Array<{line:number;type:string;prompt:string;required:boolean;options:string[];rows:string[]}>}&Partial<Proof>
 type Props={api:PrivateToolApi;organizationId:string;actorId?:string;tool:PrivateTool;disabled:boolean;onImported:(tool:PrivateTool)=>void;onBusy:(busy:boolean)=>void;onPendingChange:(pending:boolean)=>void}
@@ -23,12 +23,12 @@ function ImportSession({api,organizationId,tool,disabled,onImported,onBusy,onPen
  useEffect(()=>{callbacks.current.onPendingChange(Boolean(content))},[content])
  const replace=(text:string)=>{setContent(text);setBatchId(crypto.randomUUID());setPreview(null);setError('');onPendingChange(Boolean(text))}
  const run=async(apply:boolean)=>{
-  if(disabled||locked.current||uncertain||!content.trim()||apply&&(!preview?.ok||!preview.digest||!preview.previewToken||!preview.previewExpiresAt))return
+  if(disabled||locked.current||uncertain||!content.trim()||apply&&(!preview?.ok||!preview.digest))return
   const started=identity.current,token=++generation.current
   const current=()=>alive.current&&generation.current===token&&identity.current.api===started.api&&identity.current.revision===started.revision&&identity.current.hash===started.hash
   locked.current=true;setBusy(true);onBusy(true);setError('')
   const body={format,content,batchId,...(target?{targetPageKey:target}:{}),expectedRevision:tool.revision,expectedContentHash:tool.contentHash,
-   ...(apply?{digest:preview!.digest,previewToken:preview!.previewToken,previewExpiresAt:preview!.previewExpiresAt}:{})}
+   ...(apply?{digest:preview!.digest}:{})}
   try{
    const path=`${privateToolBase(organizationId)}/${encodeURIComponent(tool.id)}/form-import/${apply?'apply':'preview'}`
    if(apply){
@@ -38,7 +38,7 @@ function ImportSession({api,organizationId,tool,disabled,onImported,onBusy,onPen
    }else{
     const result=await api<Preview>(path,'POST',body)
     if(!current())return
-    if(result.ok&&(result.expectedRevision!==tool.revision||result.expectedContentHash!==tool.contentHash||!result.digest||!result.previewToken||!result.previewExpiresAt))throw Error('预览与当前草稿不一致，请重新读取并核对。')
+    if(result.ok&&(result.expectedRevision!==tool.revision||result.expectedContentHash!==tool.contentHash||!result.digest))throw Error('预览与当前草稿不一致，请重新读取并核对。')
     setPreview(result)
    }
   }catch(cause){
@@ -69,7 +69,7 @@ function ImportSession({api,organizationId,tool,disabled,onImported,onBusy,onPen
   {preview&&<section className="education-form-import-preview" aria-label="导入预览结果">
    <p role="status">识别到 {preview.count} 题。{preview.ok?`确认后共 ${preview.totalQuestions} 题、${preview.totalFields} 个作答字段。尚未写入。`:'请先修正以下问题，再重新解析预览；尚未写入。'}</p>
    {preview.issues.length>0&&<ul role="alert" aria-label="导入错误">{preview.issues.map((issue,index)=><li key={index}>第 {issue.line} 行：{issue.message}</li>)}</ul>}
-   {preview.ok&&<p>追加到：{preview.groups.map(group=>`${group.title}（新增 ${group.addedCount} 题）`).join('、')}。预览有效期 10 分钟。</p>}
+   {preview.ok&&<p>追加到：{preview.groups.map(group=>`${group.title}（新增 ${group.addedCount} 题）`).join('、')}。</p>}
    <ol>{preview.items.map((item,index)=><li key={index}><div><strong>{index+1}. {item.prompt}</strong><span>第 {item.line} 行 · {kinds[item.type]??item.type} · {item.required?'必答':'选答'}</span></div>{item.options.length>0&&<p>选项：{item.options.join(' / ')}</p>}{item.rows.length>0&&<p>矩阵行：{item.rows.join(' / ')}</p>}</li>)}</ol>
    {preview.ok&&<button type="button" className="education-private-primary" disabled={busy||disabled||uncertain} onClick={()=>void run(true)}>确认追加并保存草稿</button>}
   </section>}</div>

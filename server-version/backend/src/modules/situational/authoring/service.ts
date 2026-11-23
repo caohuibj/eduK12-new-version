@@ -245,13 +245,12 @@ export async function reviewSjtDraft(
       await tx.$queryRaw`SELECT "id" FROM "sjt_author_drafts" WHERE "id" = ${id} FOR UPDATE`
       const draft = await tx.sjtAuthorDraft.findUnique({ where: { id } })
       if (!draft) throw problem('草稿不存在', 404)
-      if (draft.ownerId === actor.userId) throw problem('作者不能审核自己的上传内容', 403)
       if (
-        draft.status !== 'IN_REVIEW' ||
+        (approve ? !['DRAFT', 'IN_REVIEW'].includes(draft.status) : draft.status !== 'IN_REVIEW') ||
         draft.revision !== revision ||
         draft.contentDigest !== digest
       )
-        throw problem('待审核内容已变化')
+        throw problem('待发布或审核内容已变化')
       const c = compileSjtAuthorDocument(draft.template)
       assertUnreserved(c.template.instrumentKey)
       if (c.contentDigest !== digest) throw problem('存储内容摘要不一致')

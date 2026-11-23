@@ -337,7 +337,7 @@ export default function SjtAuthoring() {
             >
               预览作答与报告
             </button>
-            {owned && selected.status === 'DRAFT' ? (
+            {owned && selected.status === 'DRAFT' && !(user?.role === 'ADMIN' || user?.platformRole === 'SYSTEM_ADMIN') ? (
               <button
                 disabled={busy}
                 className="btn-primary ml-3"
@@ -355,19 +355,35 @@ export default function SjtAuthoring() {
                 提交审核
               </button>
             ) : null}
-            {user?.role === 'ADMIN' && !owned && selected.status === 'IN_REVIEW' ? (
+            {(user?.role === 'ADMIN' || user?.platformRole === 'SYSTEM_ADMIN') && ['DRAFT', 'IN_REVIEW'].includes(selected.status) ? (
               <div className="space-y-3">
                 <label>
-                  审核意见
+                  发布/审核备注（直接发布可留空）
                   <textarea
                     className="block w-full rounded border p-2"
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                   />
                 </label>
-                {[false, true].map((approve) => (
+                <button
+                  disabled={busy}
+                  className="btn-primary mr-3"
+                  onClick={() =>
+                    void run(async () => {
+                      await call(`/drafts/${selected.id}/publish`, 'POST', {
+                        revision: selected.revision,
+                        contentDigest: selected.contentDigest,
+                        ...(note.trim() ? { note: note.trim() } : {}),
+                      })
+                      await open(selected.id)
+                      await refresh()
+                    })
+                  }
+                >
+                  {selected.status === 'IN_REVIEW' ? '审核通过并发布' : '发布版本'}
+                </button>
+                {selected.status === 'IN_REVIEW' && (
                   <button
-                    key={String(approve)}
                     disabled={busy || !note.trim()}
                     className="btn-secondary mr-3"
                     onClick={() =>
@@ -375,7 +391,7 @@ export default function SjtAuthoring() {
                         await call(`/drafts/${selected.id}/review`, 'POST', {
                           revision: selected.revision,
                           contentDigest: selected.contentDigest,
-                          approve,
+                          approve: false,
                           note,
                         })
                         await open(selected.id)
@@ -383,9 +399,9 @@ export default function SjtAuthoring() {
                       })
                     }
                   >
-                    {approve ? '审核通过并发布' : '退回修订'}
+                    退回修订
                   </button>
-                ))}
+                )}
               </div>
             ) : null}
             {user?.role === 'ADMIN' && selected.release?.status === 'PUBLISHED' ? (

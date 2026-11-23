@@ -75,12 +75,14 @@ describe('role navigation', () => {
   })
   it('groups staff navigation by task without changing route destinations', () => {
     const teacher = navigationFor('TEACHER', true)
+    expect(teacher.some(item => item.path === '/sjt-authoring')).toBe(false)
     expect(teacher.find(item => item.path === '/dashboard')?.section).toBe('teaching')
     expect(teacher.find(item => item.path === '/cognitive-assignments')?.section).toBe('assessment')
     expect(teacher.find(item => item.path === '/documents')?.section).toBe('content')
     expect(teacher.find(item => item.path === '/profile')?.section).toBe('account')
     const admin = navigationFor('ADMIN', true)
     expect(admin.find(item => item.path === '/users')?.section).toBe('system')
+    expect(admin.find(item => item.path === '/sjt-authoring')?.section).toBe('system')
   })
 })
 

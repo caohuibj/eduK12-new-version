@@ -88,12 +88,12 @@ suite('SJT upload real PostgreSQL governance and frozen FINAL', () => {
     await service.requestSjtReview(a(), d.id, d.revision, d.contentDigest)
     await expect(
       service.reviewSjtDraft(
-        { userId: author, admin: true },
+        { userId: author, admin: false },
         d.id,
         d.revision,
         d.contentDigest,
         true,
-        'synthetic only',
+        'non-admin blocked',
       ),
     ).rejects.toMatchObject({ statusCode: 403 })
     await expect(

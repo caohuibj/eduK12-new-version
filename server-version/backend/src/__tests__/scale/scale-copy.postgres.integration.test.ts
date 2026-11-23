@@ -31,11 +31,13 @@ suite('Scale copied draft immutable provenance and publication',()=>{
   expect(await db.courseScale.count({where:{scaleId:draft.id}})).toBe(0);expect(await db.assessment.count({where:{scaleId:draft.id}})).toBe(0)
   const res=response();await publish(request(draft.id,user.id),res);expect(res.statusCode).toBe(200);expect(res.body.data.status).toBe('PUBLISHED');expect(await db.scale.findUnique({where:{id:scale.id}})).toEqual(scale)
  })
- it('denies non-author, STANDARD, draft and non-self-authored/restricted licenses',async()=>{
+ it('denies non-author, STANDARD, draft and allows creator copyright metadata variations',async()=>{
   const {scale,user,definition}=await fixture();await expect(copy(scale.id,randomUUID())).rejects.toMatchObject({status:403})
-  for(const patch of [{instrumentClass:'STANDARD'},{status:'DRAFT'},{definition:{...definition,license:{status:'authorized',redistribution:'allowed'}}},{definition:{...definition,license:{status:'self_authored',redistribution:'restricted'}}}]){
+  for(const patch of [{instrumentClass:'STANDARD'},{status:'DRAFT'}]){
    await db.scale.update({where:{id:scale.id},data:{status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',definition:definition as any,...patch} as any});await expect(copy(scale.id,user.id)).rejects.toMatchObject({status:403})
   }
+  await db.scale.update({where:{id:scale.id},data:{status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',definition:{...definition,license:{status:'authorized',redistribution:'restricted'}} as any}})
+  const allowed=await copy(scale.id,user.id);expect(allowed.copySource).toMatchObject({parentId:scale.id})
  })
  it('rejects request-supplied provenance; edits retain the server-created source',async()=>{
   const {scale,user,definition}=await fixture();const invalid=response();await controller.copy(request(scale.id,user.id,{copySource:{parentId:'fake'}}),invalid);expect(invalid.body.code).not.toBe(0)
@@ -53,11 +55,11 @@ suite('Scale copied draft immutable provenance and publication',()=>{
   await locked.promise;const r=response();const publishing=publish(request(draft.id,user.id),r);await new Promise(r=>setTimeout(r,50));release.resolve();await deletion;await publishing
   expect(r.statusCode).toBe(409);expect(r.body.message).toContain('不存在');expect((await db.scale.findUniqueOrThrow({where:{id:draft.id}})).status).toBe('DRAFT')
  })
- it('checks source license digest even when version-axis definition hash excludes license',async()=>{
+ it('does not block publish when only source copyright metadata note changes',async()=>{
   const {scale,user,definition}=await fixture();definition.versionAxes={schemaVersion:1,subjectKey:'test',locale:'zh-CN',localizationVersion:'1'}
   await db.scale.update({where:{id:scale.id},data:{definition:definition as any,definitionHash:hashScaleDefinition(definition)}});const draft=await copy(scale.id,user.id)
   definition.license.note='Changed right evidence';await db.scale.update({where:{id:scale.id},data:{definition:definition as any}})
-  const r=response();await publish(request(draft.id,user.id),r);expect(r.statusCode).toBe(409)
+  const r=response();await publish(request(draft.id,user.id),r);expect(r.statusCode).toBe(200)
  })
  it('does not impose copy licensing on native drafts or retroactively change published copies',async()=>{
   const {scale,user,definition}=await fixture();const draft=await copy(scale.id,user.id);const r=response();await publish(request(draft.id,user.id),r);expect(r.body.code).toBe(0)

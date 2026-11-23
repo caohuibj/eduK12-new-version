@@ -60,7 +60,7 @@ async function state(id:string){
   versions:await db.educationPrivateToolVersion.findMany({where:{toolId:id},orderBy:{id:'asc'}}),
   pins:await db.assetReference.findMany({where:{entityType:'EducationPrivateToolDraft',entityId:id},orderBy:{id:'asc'}})}
 }
-const command=(input:Awaited<ReturnType<typeof draft>>['input'],preview:any)=>({...input,digest:preview.digest,previewToken:preview.previewToken,previewExpiresAt:preview.previewExpiresAt})
+const command=(input:Awaited<ReturnType<typeof draft>>['input'],preview:any)=>({...input,digest:preview.digest})
 
 suite('Education CSV real authenticated routes / isolated PostgreSQL',()=>{
  beforeAll(async()=>{

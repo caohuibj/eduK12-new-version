@@ -13,8 +13,8 @@ const definition=():FormDraft=>({schemaVersion:2,pages:[{pageKey:'existing',titl
 const makeRow=()=>{const d=definition();return {id:id(2),entry:'SCHOOL',organizationId:id(1),ownerUserId:id(3),kind:'FORM',title:'Synthetic',revision:1,definition:d,contentHash:privateToolContentHash('FORM','Synthetic',d)}}
 let stored:ReturnType<typeof makeRow>
 const input=(extra:Record<string,unknown>={})=>({format:'CSV' as const,content:'type,prompt,required,options\nSINGLE,新题,false,甲||乙',batchId:id(4),expectedRevision:stored.revision,expectedContentHash:stored.contentHash,...extra})
-const preview=async(extra:Record<string,unknown>={})=>await importPrivateForm(c,id(2),input(extra)) as {ok:boolean;digest:string;previewToken:string;previewExpiresAt:number;issues:unknown[]}
-const proof=(value:Awaited<ReturnType<typeof preview>>,extra:Record<string,unknown>={})=>({...input(extra),digest:value.digest,previewToken:value.previewToken,previewExpiresAt:value.previewExpiresAt})
+const preview=async(extra:Record<string,unknown>={})=>await importPrivateForm(c,id(2),input(extra)) as {ok:boolean;digest:string;issues:unknown[]}
+const proof=(value:Awaited<ReturnType<typeof preview>>,extra:Record<string,unknown>={})=>({...input(extra),digest:value.digest})
 beforeEach(()=>{
  vi.clearAllMocks();stored=makeRow()
  m.query.mockResolvedValue([{organizationId:id(1),organizationName:'Synthetic',membershipId:id(5),orgRole:'MEMBER',productAdmin:false}])
@@ -103,7 +103,7 @@ describe('School append-only private form import',()=>{
  })
  it('binds confirmation to content, format, destination, batch, scope and saved revision',async()=>{
   const p=await preview(),request=proof(p)
-  for(const extra of [{content:request.content+'\nTEXT,另一题'},{targetPageKey:'existing'},{batchId:id(7)},{previewToken:'0'.repeat(64)},{previewExpiresAt:1}])
+  for(const extra of [{content:request.content+'\nTEXT,另一题'},{targetPageKey:'existing'},{batchId:id(7)},{digest:'0'.repeat(64)}])
    await expect(importPrivateForm(c,id(2),{...request,...extra},true)).rejects.toMatchObject({code:'PRIVATE_TOOL_FORM_IMPORT_PREVIEW_EXPIRED'})
   // Reinterpreting this CSV as TEXT is invalid before proof comparison.
   await expect(importPrivateForm(c,id(2),{...request,format:'TEXT'},true)).rejects.toMatchObject({code:'PRIVATE_TOOL_FORM_IMPORT_INVALID'})

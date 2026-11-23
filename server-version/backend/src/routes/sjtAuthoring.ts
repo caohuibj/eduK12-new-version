@@ -3,7 +3,7 @@ import multer from 'multer'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { z } from 'zod'
-import { authenticate, requireTeacher } from '../middleware/auth'
+import { authenticate } from '../middleware/auth'
 import { UserRole } from '../types'
 import { uploadPrincipalRateLimit, withUploadAdmission } from '../middleware/uploadAdmission'
 import { createTemporaryUploadStorage } from '../utils/uploadTemp'
@@ -45,12 +45,20 @@ import { createSjtReleaseGrant, revokeSjtReleaseGrant, listSjtReleaseGrants,
 import sjtAuthoringMediaRouter from './sjtAuthoringMedia'
 
 const router = Router()
-router.use(authenticate, requireTeacher)
-router.use(sjtAuthoringMediaRouter)
-const actor = (req: Request) => ({
-  userId: req.user!.userId,
-  admin: req.user!.role === UserRole.ADMIN,
-})
+const isSjtAdmin = (user?: Request['user']) =>
+  Boolean(user && (user.role === UserRole.ADMIN || user.platformRole === 'SYSTEM_ADMIN'))
+const requireSjtAdmin: RequestHandler = (req, res, next) => {
+  if (!req.user) return res.status(401).json({ code: -1, message: '未登录' })
+  if (!isSjtAdmin(req.user)) return res.status(403).json({ code: 'SJT_ADMIN_REQUIRED', message: '情境判断（SJT）题包编制与发布仅限管理员操作' })
+  next()
+}
+const requireSjtReleaseViewer: RequestHandler = (req, res, next) => {
+  if (!req.user) return res.status(401).json({ code: -1, message: '未登录' })
+  const role = req.user.businessRole ?? req.user.role
+  if (isSjtAdmin(req.user) || role === UserRole.TEACHER) return next()
+  return res.status(403).json({ code: 'SJT_ADMIN_REQUIRED', message: '需要管理员或培训师权限' })
+}
+const actor = (req: Request) => ({ userId: req.user!.userId, admin: isSjtAdmin(req.user) })
 const send = (res: Response, data: unknown) => res.json({ code: 0, message: '成功', data })
 const handle =
   (fn: (req: Request, res: Response) => Promise<unknown>): RequestHandler =>
@@ -81,6 +89,17 @@ const handle =
         })
     }
   }
+router.use(authenticate)
+router.get('/releases', requireSjtReleaseViewer, handle(async (req, res) => {
+  const query = sjtGrantListQuerySchema.parse(req.query)
+  send(res, await listSjtControlledReleases(actor(req), query))
+}))
+router.get('/releases/:id/grants', requireSjtReleaseViewer, handle(async (req, res) => {
+  const query = sjtGrantListQuerySchema.parse(req.query)
+  send(res, await listSjtReleaseGrants(actor(req), req.params.id, query))
+}))
+router.use(requireSjtAdmin)
+router.use(sjtAuthoringMediaRouter)
 const revision = z
   .object({
     revision: z.number().int().positive(),
@@ -325,18 +344,18 @@ const exactRelease = z.object({
   instrumentKey: z.string().min(1).max(80), instrumentVersion: z.string().min(1).max(40),
   definitionHash: z.string().regex(/^[a-f0-9]{64}$/), contentDigest: z.string().regex(/^[a-f0-9]{64}$/),
 }).strict()
+router.post('/drafts/:id/publish', handle(async (req, res) => {
+  const b = z.object({
+    revision: z.number().int().positive(),
+    contentDigest: z.string().regex(/^[a-f0-9]{64}$/),
+    note: z.string().trim().max(2000).optional(),
+  }).strict().parse(req.body)
+  send(res, await reviewSjtDraft(actor(req), req.params.id, b.revision, b.contentDigest, true, b.note || '管理员确认发布'))
+}))
 router.put('/drafts/:id/policy', handle(async (req, res) => {
   const body = z.object({ revision: z.number().int().positive(),
     authorizationPolicy: z.literal('COURSE_GRANT_V1').nullable() }).strict().parse(req.body)
   send(res, await setSjtDraftPolicy(actor(req), req.params.id, body.revision, body.authorizationPolicy))
-}))
-router.get('/releases', handle(async (req, res) => {
-  const query = sjtGrantListQuerySchema.parse(req.query)
-  send(res, await listSjtControlledReleases(actor(req), query))
-}))
-router.get('/releases/:id/grants', handle(async (req, res) => {
-  const query = sjtGrantListQuerySchema.parse(req.query)
-  send(res, await listSjtReleaseGrants(actor(req), req.params.id, query))
 }))
 router.post('/releases/:id/grants', handle(async (req, res) => {
   const body = exactRelease.extend({

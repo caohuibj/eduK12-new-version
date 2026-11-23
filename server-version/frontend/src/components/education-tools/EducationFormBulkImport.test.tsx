@@ -5,7 +5,7 @@ import {EducationPrivateToolStudio} from './EducationPrivateToolStudio'
 import type {PrivateTool,PrivateToolApi} from './privateToolClient'
 const content='type,prompt,required,options\nSINGLE,新题,true,甲||乙'
 const tool:PrivateTool={id:'tool',kind:'FORM',title:'已有表单',revision:2,contentHash:'a'.repeat(64),definition:{schemaVersion:2,pages:[{pageKey:'existing',title:'已有分组',questions:[{itemKey:'q',type:'SHORT_TEXT',prompt:'已有题目',required:true,options:[],rows:[]}]}]}}
-const preview={ok:true,issues:[],count:1,totalQuestions:2,totalFields:2,groups:[{title:'导入题目',addedCount:1}],items:[{line:2,type:'SINGLE',prompt:'新题',required:true,options:['甲','乙'],rows:[]}],digest:'b'.repeat(64),previewToken:'c'.repeat(64),previewExpiresAt:1799999999999,expectedRevision:2,expectedContentHash:tool.contentHash}
+const preview={ok:true,issues:[],count:1,totalQuestions:2,totalFields:2,groups:[{title:'导入题目',addedCount:1}],items:[{line:2,type:'SINGLE',prompt:'新题',required:true,options:['甲','乙'],rows:[]}],digest:'b'.repeat(64),expectedRevision:2,expectedContentHash:tool.contentHash}
 const props=()=>({api:vi.fn(),organizationId:'org',actorId:'author',tool,disabled:false,onImported:vi.fn(),onBusy:vi.fn(),onPendingChange:vi.fn()})
 const enter=()=>{fireEvent.click(screen.getByText('批量导入题目 · CSV／多行文本'));fireEvent.change(screen.getByLabelText('表单待导入内容'),{target:{value:content}})}
 const start=()=>fireEvent.click(screen.getByRole('button',{name:'解析并预览'}))
@@ -23,7 +23,7 @@ describe('School form import confirmation workflow',()=>{
   fireEvent.click(screen.getByRole('button',{name:'确认追加并保存草稿'}));fireEvent.click(screen.getByRole('button',{name:'确认追加并保存草稿'}))
   await waitFor(()=>expect(p.onImported).toHaveBeenCalledWith(saved))
   expect(p.api).toHaveBeenCalledTimes(2)
-  expect(p.api).toHaveBeenNthCalledWith(2,'/organizations/org/private-tools/tool/form-import/apply','POST',{...request,digest:preview.digest,previewToken:preview.previewToken,previewExpiresAt:preview.previewExpiresAt})
+  expect(p.api).toHaveBeenNthCalledWith(2,'/organizations/org/private-tools/tool/form-import/apply','POST',{...request,digest:preview.digest})
   expect(screen.getByLabelText('表单待导入内容')).toHaveValue('');expect(p.onPendingChange).toHaveBeenLastCalledWith(false)
  })
  it('shows row errors, retains input and never exposes confirmation for an invalid plan',async()=>{

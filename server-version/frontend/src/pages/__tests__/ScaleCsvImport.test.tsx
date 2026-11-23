@@ -5,7 +5,7 @@ const api = vi.hoisted(() => ({ post: vi.fn() }))
 vi.mock('../../api/client', () => ({ default: api }))
 import ScaleCsvImport from '../ScaleCsvImport'
 const content = 'item_code,prompt,reverse,score_keys,response_set_key\nQ2,Question,true,total,default'
-const preview = { digest: 'a'.repeat(64), previewToken: 'b'.repeat(64), previewExpiresAt: 1792282200000, expectedUpdatedAt: '2026-10-18T00:00:00.000Z', count: 1, totalItems: 2, responseSetKey: 'default', responseSet: { options: [{ value: 'yes', label: 'Yes', score: 1 }] }, scores: [{ key: 'total', label: 'Total', aggregation: 'sum' }], items: [{ itemCode: 'Q2', content: 'Question', reverse: true, scoreKeys: ['total'] }] }
+const preview = { digest: 'a'.repeat(64), expectedUpdatedAt: '2026-10-18T00:00:00.000Z', count: 1, totalItems: 2, responseSetKey: 'default', responseSet: { options: [{ value: 'yes', label: 'Yes', score: 1 }] }, scores: [{ key: 'total', label: 'Total', aggregation: 'sum' }], items: [{ itemCode: 'Q2', content: 'Question', reverse: true, scoreKeys: ['total'] }] }
 const props = () => ({ id: 'scale', revision: preview.expectedUpdatedAt, disabled: false, onImported: vi.fn(), onBusy: vi.fn() })
 beforeEach(() => vi.clearAllMocks())
 describe('Scale CSV import confirmation', () => {
@@ -18,7 +18,7 @@ describe('Scale CSV import confirmation', () => {
     expect(await screen.findByText(/反向计分/)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '确认导入并保存' }))
     await screen.findByText(/已导入并保存 1 道题/)
-    expect(api.post).toHaveBeenNthCalledWith(2, '/scales/scale/import/confirm', { content, expectedUpdatedAt: preview.expectedUpdatedAt, digest: preview.digest, previewToken: preview.previewToken, previewExpiresAt: preview.previewExpiresAt })
+    expect(api.post).toHaveBeenNthCalledWith(2, '/scales/scale/import/confirm', { content, expectedUpdatedAt: preview.expectedUpdatedAt, digest: preview.digest })
     expect(p.onImported).toHaveBeenCalledOnce()
     expect(screen.getByLabelText('CSV 内容')).toHaveValue(content)
   })

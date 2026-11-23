@@ -127,3 +127,25 @@ it('filters registered candidates and focuses the selected operation panel',asyn
  expect(screen.getByRole('button',{name:'预览所选配置'})).toBeVisible()
  expect(mock.post).not.toHaveBeenCalled()
 })
+
+it('publishes an installed DRAFT config and approves a profile in one admin flow',async()=>{
+ const draftPlan={...plan,action:'ALREADY_PRESENT',configId:'cfg-1',status:'DRAFT'}
+ mock.get.mockImplementation(async(path:string)=>path.startsWith(root)
+  ?response({...catalog,registered:[{...candidate,plan:draftPlan}]})
+  :response({configId:'cfg-1',profile:'experience',title:'数字线估计',artifactHash:'a'.repeat(64),report:{title:'数字线估计报告'}}))
+ mock.post.mockImplementation(async(path:string)=>{
+  if(path==='/cognitive/configs/cfg-1/publish')return response({id:'cfg-1',status:'PUBLISHED'})
+  if(path==='/cognitive/profile-configurations/system/cfg-1/experience/approve')return response({artifactHash:'a'.repeat(64),allowedProducts:['SURVEY','TRAINING']})
+  if(path==='/cognitive/configs/cfg-1/retire')return response({id:'cfg-1',status:'RETIRED'})
+  throw new Error('Unexpected path: '+path)
+ })
+ render(<CognitiveIntake/>);await screen.findByText('数字线估计',{selector:'strong'});choose()
+ fireEvent.click(await screen.findByRole('button',{name:'发布此配置'}))
+ await screen.findByText(/配置已发布（PUBLISHED）/)
+ fireEvent.click(await screen.findByRole('button',{name:'预览 Profile 摘要'}))
+ await screen.findByText(/数字线估计报告/)
+ fireEvent.click(await screen.findByRole('button',{name:'批准并启用此 Profile'}))
+ await screen.findByText(/已批准 .*：准入产品 SURVEY、TRAINING/)
+ const approveCall=mock.post.mock.calls.find(call=>call[0]==='/cognitive/profile-configurations/system/cfg-1/experience/approve')!
+ expect(approveCall[1]).toMatchObject({expectedArtifactHash:'a'.repeat(64),allowedProducts:['SURVEY','TRAINING']})
+})

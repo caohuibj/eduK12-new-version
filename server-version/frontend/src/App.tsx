@@ -688,7 +688,7 @@ function AppRoutes() {
               </StudentProtectedRoute>
             }
           />
-          <Route path="/sjt-authoring" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><TrainingSjtAuthoringAccess><SjtAuthoring /></TrainingSjtAuthoringAccess></ProtectedRoute>} />
+          <Route path="/sjt-authoring" element={<ProtectedRoute roles={['ADMIN']}><TrainingSjtAuthoringAccess><SjtAuthoring /></TrainingSjtAuthoringAccess></ProtectedRoute>} />
           <Route path="/teacher/situational" element={<ProtectedRoute roles={['TEACHER']}><SituationalHome /></ProtectedRoute>} />
           <Route path="/teacher/situational/history" element={<ProtectedRoute roles={['TEACHER']}><SituationalHistory /></ProtectedRoute>} />
           <Route path="/teacher/situational/:instrumentKey" element={<ProtectedRoute roles={['TEACHER']}><SituationalRunner /></ProtectedRoute>} />

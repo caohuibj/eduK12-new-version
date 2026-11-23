@@ -107,8 +107,8 @@ describe('one-step full scale Excel workbook import', () => {
   })
 })
 
-describe('scaleCopyEligibility for COPY vs REVISION', () => {
-  const baseScale = (license: { status: string; redistribution: string }) => ({
+describe('scaleCopyEligibility for COPY vs REVISION (functional boundary only)', () => {
+  const baseScale = (license: { status: string; redistribution: string }, overrides: Record<string, unknown> = {}) => ({
     id: 'scale-1',
     code: 'custom_1',
     creatorId: 'author-1',
@@ -118,20 +118,24 @@ describe('scaleCopyEligibility for COPY vs REVISION', () => {
     definition: { license },
     definitionHash: 'a'.repeat(64),
     libraryEntryId: null,
+    ...overrides,
   })
 
-  it('keeps independent COPY restricted to self_authored + allowed redistribution', () => {
-    expect(scaleCopyEligibility(baseScale({ status: 'self_authored', redistribution: 'allowed' }), 'author-1', 'COPY').allowed).toBe(true)
-    expect(scaleCopyEligibility(baseScale({ status: 'self_authored', redistribution: 'restricted' }), 'author-1', 'COPY').allowed).toBe(false)
-    expect(scaleCopyEligibility(baseScale({ status: 'authorized', redistribution: 'allowed' }), 'author-1', 'COPY').allowed).toBe(false)
+  it('allows the original creator to COPY or REVISE any published non-library custom scale regardless of copyright metadata', () => {
+    for (const mode of ['COPY', 'REVISION'] as const) {
+      expect(scaleCopyEligibility(baseScale({ status: 'self_authored', redistribution: 'allowed' }), 'author-1', mode).allowed).toBe(true)
+      expect(scaleCopyEligibility(baseScale({ status: 'self_authored', redistribution: 'restricted' }), 'author-1', mode).allowed).toBe(true)
+      expect(scaleCopyEligibility(baseScale({ status: 'authorized', redistribution: 'restricted' }), 'author-1', mode).allowed).toBe(true)
+      expect(scaleCopyEligibility(baseScale({ status: 'unknown', redistribution: 'unknown' }), 'author-1', mode).allowed).toBe(true)
+    }
   })
 
-  it('allows the original author to create same-family REVISION drafts for self_authored scales even when restricted, without granting third-party adaptation rights', () => {
-    expect(scaleCopyEligibility(baseScale({ status: 'self_authored', redistribution: 'restricted' }), 'author-1', 'REVISION').allowed).toBe(true)
-    expect(scaleCopyEligibility(baseScale({ status: 'self_authored', redistribution: 'allowed' }), 'author-1', 'REVISION').allowed).toBe(true)
-    expect(scaleCopyEligibility(baseScale({ status: 'authorized', redistribution: 'restricted' }), 'author-1', 'REVISION').allowed).toBe(false)
-    expect(scaleCopyEligibility(baseScale({ status: 'authorized', redistribution: 'allowed' }), 'author-1', 'REVISION').allowed).toBe(false)
-    expect(scaleCopyEligibility(baseScale({ status: 'unknown', redistribution: 'restricted' }), 'author-1', 'REVISION').allowed).toBe(false)
-    expect(scaleCopyEligibility(baseScale({ status: 'self_authored', redistribution: 'restricted' }), 'other-user', 'REVISION').allowed).toBe(false)
+  it('still blocks non-owners, shared library references, STANDARD scales, and unpublished drafts', () => {
+    for (const mode of ['COPY', 'REVISION'] as const) {
+      expect(scaleCopyEligibility(baseScale({ status: 'self_authored', redistribution: 'allowed' }), 'other-user', mode).allowed).toBe(false)
+      expect(scaleCopyEligibility(baseScale({ status: 'self_authored', redistribution: 'allowed' }, { libraryEntryId: 'lib-1' }), 'author-1', mode).allowed).toBe(false)
+      expect(scaleCopyEligibility(baseScale({ status: 'self_authored', redistribution: 'allowed' }, { instrumentClass: 'STANDARD' }), 'author-1', mode).allowed).toBe(false)
+      expect(scaleCopyEligibility(baseScale({ status: 'self_authored', redistribution: 'allowed' }, { status: 'DRAFT' }), 'author-1', mode).allowed).toBe(false)
+    }
   })
 })

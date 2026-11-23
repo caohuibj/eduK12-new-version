@@ -6,7 +6,7 @@ import { newOnlineDocument } from '../OnlineAuthorEditor'
 import { MemoryRouter } from 'react-router-dom'
 
 vi.mock('../../../api/client', () => ({ sessionFetch: vi.fn() }))
-vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'author-1', role: 'TEACHER' } }) }))
+vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'author-1', role: 'ADMIN' } }) }))
 const doc = () => ({ ...newOnlineDocument(), instrumentKey: 'online-new' })
 const draft = (policy: 'COURSE_GRANT_V1' | null = null) => ({ id: 'draft-1', ownerId: 'author-1', revision: 2, status: 'DRAFT', contentDigest: 'digest', authorizationPolicy: policy, template: doc(), release: null })
 const json = (data: unknown) => ({ ok: true, json: async () => ({ code: 0, data }) }) as Response

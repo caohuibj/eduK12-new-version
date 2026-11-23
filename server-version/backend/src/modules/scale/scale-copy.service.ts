@@ -22,18 +22,10 @@ const stable = (value: any): any => Array.isArray(value) ? value.map(stable)
   : value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])])) : value
 const digestValue = (value: unknown) => createHash('sha256').update(JSON.stringify(stable(value))).digest('hex')
 type Source = { libraryEntryId?: string | null; id: string; code: string; creatorId: string; status: string; instrumentClass: string; instrumentVersion: string; definition: unknown; definitionHash: string | null }
-export const scaleCopyEligibility = (scale: Source, userId: string, mode: 'COPY' | 'REVISION' = 'COPY') => {
+export const scaleCopyEligibility = (scale: Source, userId: string, _mode: 'COPY' | 'REVISION' = 'COPY') => {
   if (scale.libraryEntryId) return { allowed: false, reason: '共用库授权引用只读，不能复制或修订为私人可编辑工具。' }
-  if (scale.creatorId !== userId) return { allowed: false, reason: '仅作者可以复制自编量表；查看或使用授权不包含改编权。' }
-  if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE' || scale.status !== 'PUBLISHED') return { allowed: false, reason: '仅已发布的自编描述性量表可以复制。' }
-  const definition = scale.definition as Partial<ScaleDefinitionV2> | null
-  if (mode === 'REVISION') {
-    if (definition?.license?.status !== 'self_authored') {
-      return { allowed: false, reason: '仅自有量表支持创建同系列修订草稿；第三方已授权量表需先单独确认改编权。' }
-    }
-    return { allowed: true }
-  }
-  if (definition?.license?.status !== 'self_authored' || definition.license.redistribution !== 'allowed') return { allowed: false, reason: '仅明确可再分发的自有内容支持复制；其他来源需单独确认改编权。' }
+  if (scale.creatorId !== userId) return { allowed: false, reason: '仅作者可以复制或修订自编量表。' }
+  if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE' || scale.status !== 'PUBLISHED') return { allowed: false, reason: '仅已发布的自编描述性量表可以复制或修订。' }
   return { allowed: true }
 }
 const sourceSnapshot = (scale: Source, definition: ScaleDefinitionV2): ScaleCopySource => ({
@@ -60,9 +52,16 @@ export const assertScaleCopyPublishSource = async (tx: Prisma.TransactionClient,
   const eligibility = scaleCopyEligibility(source, copy.creatorId, copy.sourceScaleId ? 'REVISION' : 'COPY')
   if (!eligibility.allowed) throw new ScaleCopyError(eligibility.reason!)
   const validation = validateScaleProductDefinition(source.definition, 'CUSTOM_DESCRIPTIVE')
+  const functionalSnapshot = (value: { parentId: string; parentVersion: string; parentDefinitionHash: string; parentCreatorId: string; parentSourceHash: string }) => ({
+    parentId: value.parentId,
+    parentVersion: value.parentVersion,
+    parentDefinitionHash: value.parentDefinitionHash,
+    parentCreatorId: value.parentCreatorId,
+    parentSourceHash: value.parentSourceHash,
+  })
   if (!validation.valid || !validation.definition || source.definitionHash !== hashScaleDefinition(validation.definition)
-    || JSON.stringify(stable(sourceSnapshot(source, validation.definition))) !== JSON.stringify(stable(parsed.data))) {
-    throw new ScaleCopyError('复制来源或许可已变化，不能发布此草稿，请重新核对来源。')
+    || JSON.stringify(stable(functionalSnapshot(sourceSnapshot(source, validation.definition)))) !== JSON.stringify(stable(functionalSnapshot(parsed.data)))) {
+    throw new ScaleCopyError('复制来源定义已变化，不能发布此草稿，请重新核对来源。')
   }
   return source // Reuse this locked, rights-checked identity for release provenance.
 }
