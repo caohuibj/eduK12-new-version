@@ -1,0 +1,5 @@
+{
+  "format": "CSV",
+  "content": "type,prompt,required,options,rows\r\nMATRIX,To what extent do you agree or disagree with the following statements? (Please select one response in each row.),False,Strongly disagree||Disagree||Agree||Strongly agree,\"The teachers at my school are respectful towards me.||If I walked into my classes upset, my teachers would be concerned about me.||If I came back to visit my school three years from now, my teachers would be excited to see me.||I feel intimidated by the teachers at my school.||When my teachers ask how I am doing, they are really interested in my answer.||The teachers at my school are friendly towards me.||The teachers at my school are interested in students' well-being.||The teachers at my school are mean towards me.\"\r\n",
+  "batchId": "f5157723-5ad3-4e56-aeb4-4d9d6d2ad85d"
+}

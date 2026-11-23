@@ -1,0 +1,263 @@
+{
+  "fixtureFailures": [
+    {
+      "invocation": "verify-first.log",
+      "status": "NOT_EXECUTED",
+      "reason": "Temporary .ts was treated as CJS; top-level await transform failed before assertions",
+      "fix": "Renamed temporary script to .mts"
+    },
+    {
+      "invocation": "verify-second.log",
+      "status": "FAIL",
+      "reason": "Temporary fixture expected flat rawAnswers; existing MATRIX normalizer returns nested verified row map",
+      "completed": "5 source schema/catalog contracts passed, first FORM preview/apply/schema/field count passed; database inserts not reached",
+      "fix": "Corrected assertion to native nested output; product/content unchanged; retry only the uncompleted FORM validation"
+    }
+  ],
+  "node": "v24.21.0",
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "sourceContracts": [
+    {
+      "instrumentKey": "pisa2022_relatst_usa_en_student",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "scoringExecutions": 0,
+      "validation": "PASS in prior invocation before first MATRIX fixture assertion failed; unchanged inputs not repeated",
+      "evidence": "/tmp/pisa2022-evidence/verify-second.log"
+    },
+    {
+      "instrumentKey": "pisa2022_disclim_usa_en_student",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "scoringExecutions": 0,
+      "validation": "PASS in prior invocation before first MATRIX fixture assertion failed; unchanged inputs not repeated",
+      "evidence": "/tmp/pisa2022-evidence/verify-second.log"
+    },
+    {
+      "instrumentKey": "pisa2022_teachsup_usa_en_student",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "scoringExecutions": 0,
+      "validation": "PASS in prior invocation before first MATRIX fixture assertion failed; unchanged inputs not repeated",
+      "evidence": "/tmp/pisa2022-evidence/verify-second.log"
+    },
+    {
+      "instrumentKey": "pisa2022_cogacrco_usa_en_student",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "scoringExecutions": 0,
+      "validation": "PASS in prior invocation before first MATRIX fixture assertion failed; unchanged inputs not repeated",
+      "evidence": "/tmp/pisa2022-evidence/verify-second.log"
+    },
+    {
+      "instrumentKey": "pisa2022_cogacmco_usa_en_student",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "scoringExecutions": 0,
+      "validation": "PASS in prior invocation before first MATRIX fixture assertion failed; unchanged inputs not repeated",
+      "evidence": "/tmp/pisa2022-evidence/verify-second.log"
+    }
+  ],
+  "nativeForms": [
+    {
+      "key": "pisa2022_st267_usa_en_student_form",
+      "contentVersion": "1.0.0",
+      "sourceBlock": "ST267",
+      "fields": 8,
+      "type": "FORM/MATRIX",
+      "preview": "PASS",
+      "apply": "PASS",
+      "schema": "PASS",
+      "roundTrip": "PASS",
+      "mixedCategoricalAnswers": "PASS",
+      "oneMissing": "PASS",
+      "allMissing": "PASS",
+      "invalidCategoryCases": 7,
+      "persistenceReadback": "PASS",
+      "status": "DRAFT_IN_ISOLATED_DB",
+      "scoringParameters": null,
+      "reportVersion": null,
+      "definitionSha256": "075cd86e5e1d100523dce664b075392d615ddc7cee2b9fe7ca7142fe154d13a9",
+      "fixtureData": "synthetic only"
+    },
+    {
+      "key": "pisa2022_st273_usa_en_student_form",
+      "contentVersion": "1.0.0",
+      "sourceBlock": "ST273",
+      "fields": 7,
+      "type": "FORM/MATRIX",
+      "preview": "PASS",
+      "apply": "PASS",
+      "schema": "PASS",
+      "roundTrip": "PASS",
+      "mixedCategoricalAnswers": "PASS",
+      "oneMissing": "PASS",
+      "allMissing": "PASS",
+      "invalidCategoryCases": 7,
+      "persistenceReadback": "PASS",
+      "status": "DRAFT_IN_ISOLATED_DB",
+      "scoringParameters": null,
+      "reportVersion": null,
+      "definitionSha256": "ce6c129f6b69e9c1ce8f9b01b72f90c23108bfb1e0688adf695167cabe422eee",
+      "fixtureData": "synthetic only"
+    },
+    {
+      "key": "pisa2022_st270_usa_en_student_form",
+      "contentVersion": "1.0.0",
+      "sourceBlock": "ST270",
+      "fields": 4,
+      "type": "FORM/MATRIX",
+      "preview": "PASS",
+      "apply": "PASS",
+      "schema": "PASS",
+      "roundTrip": "PASS",
+      "mixedCategoricalAnswers": "PASS",
+      "oneMissing": "PASS",
+      "allMissing": "PASS",
+      "invalidCategoryCases": 7,
+      "persistenceReadback": "PASS",
+      "status": "DRAFT_IN_ISOLATED_DB",
+      "scoringParameters": null,
+      "reportVersion": null,
+      "definitionSha256": "bd6b8359c50bdd5fcb2529331ec6fa094f34ae9da9b355159c93a6a0412fb1f8",
+      "fixtureData": "synthetic only"
+    },
+    {
+      "key": "pisa2022_st285_usa_en_student_form",
+      "contentVersion": "1.0.0",
+      "sourceBlock": "ST285",
+      "fields": 9,
+      "type": "FORM/MATRIX",
+      "preview": "PASS",
+      "apply": "PASS",
+      "schema": "PASS",
+      "roundTrip": "PASS",
+      "mixedCategoricalAnswers": "PASS",
+      "oneMissing": "PASS",
+      "allMissing": "PASS",
+      "invalidCategoryCases": 7,
+      "persistenceReadback": "PASS",
+      "status": "DRAFT_IN_ISOLATED_DB",
+      "scoringParameters": null,
+      "reportVersion": null,
+      "definitionSha256": "273642e0ce86b774825910943fa4dce3a96f39ea2c21ca7ecd6287d61f4655ba",
+      "fixtureData": "synthetic only"
+    },
+    {
+      "key": "pisa2022_st283_usa_en_student_form",
+      "contentVersion": "1.0.0",
+      "sourceBlock": "ST283",
+      "fields": 9,
+      "type": "FORM/MATRIX",
+      "preview": "PASS",
+      "apply": "PASS",
+      "schema": "PASS",
+      "roundTrip": "PASS",
+      "mixedCategoricalAnswers": "PASS",
+      "oneMissing": "PASS",
+      "allMissing": "PASS",
+      "invalidCategoryCases": 7,
+      "persistenceReadback": "PASS",
+      "status": "DRAFT_IN_ISOLATED_DB",
+      "scoringParameters": null,
+      "reportVersion": null,
+      "definitionSha256": "c165331cf5e1b7a3bd273c68210e12bfe39cb4ff3b813c2694b0d3a76f310cda",
+      "fixtureData": "synthetic only"
+    }
+  ],
+  "database": {
+    "database": "pisa2022_intake_20261102",
+    "schema": "unchanged main Prisma schema via db push --skip-generate",
+    "isolation": "separate disposable local database; not eduk12_dev or production",
+    "validation": "native parser/runtime + draft persistence/readback only; no service authorization, public release, participant final or browser claim",
+    "savedRows": 5,
+    "status": "PASS",
+    "retained": "Five DRAFT rows retained only in disposable local isolated database; no production/dev public library installation."
+  },
+  "noScoreReportChecks": [
+    "FORM definitions contain no scoring or report fields",
+    "No item reverse transform in FORM",
+    "Category identifiers are strings, not numeric scores",
+    "Recipient-specific examples are prose only, no runtime report or disclosure change"
+  ],
+  "initialToolFailures": [
+    {
+      "action": "generator",
+      "reason": "First invocation used repository root; generator requires backend cwd; no generated output was changed",
+      "resolution": "Retried once in backend cwd; generator and --check passed"
+    },
+    {
+      "action": "Notion fetch attempts",
+      "reason": "First call missing connection link_id; second passed page URL as link_id and got Unknown tool; corrected to advertised Hui connection",
+      "resolution": "Correct Qiang connection read succeeded; Hui connection returned NOT_FOUND. Page read; CI awaits parent independent review."
+    }
+  ],
+  "notRun": [
+    "Official IRT/WLE scoring (not installed)",
+    "Formal CI",
+    "Production/admin custom-content dedup",
+    "Production database install/publication",
+    "Browser or full backend/frontend tests",
+    "Standalone psychometric or Chinese translation validation"
+  ],
+  "inputSha256": {
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/prisma/schema.prisma": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+    "server-version/backend/scripts/scale-intake-selected-check.ts": "a6e02bd0b7fe4071ecd1050e35f8ad988873ef841b5c2b1e5821b51838ec1831",
+    "server-version/backend/src/modules/scale/onboarding/schema.ts": "a037587db31680599c90cdef724d093491efed86541d89a167f7b9a704d7edee",
+    "server-version/backend/src/modules/scale/onboarding/validate-instrument.ts": "667e27831adcb987f8dd116e9d8d2f391a7cd4d44371b788d26fc61193d00264",
+    "server-version/backend/src/modules/assessment-core/form/import-parser.ts": "89969bd75f39fe258420e5a328705eab21d54304283d7c2a9237f7d770f70050",
+    "server-version/backend/src/modules/assessment-core/form/import-builder.ts": "0bbfc149d8a9e22c7b9c4113d8a570e4f6673565d7ad212dc645ecd0080301d5",
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": "e482ec3a13d0f0e30087663c7acbd75eb7617428dd78a2ac2297fe6d2f9e6b60",
+    "server-version/backend/src/modules/assessment-core/form/runtime.ts": "4fa9d8643754c4cc2041a8146eb20757897b8ee79d4c0323291ebe0981ee9e12",
+    "server-version/backend/src/modules/survey/builder.import.ts": "20efb5b38758ea172526821bcac17b2f93d6699ab13895da9248987f33a28419"
+  },
+  "nativeFormSourceSha256": "b0dc168e3e5dc32e4aafbd146fec5ee6e43a783f2f4c23a910b012b4b6df554c",
+  "generator": {
+    "status": "PASS",
+    "cwd": "server-version/backend",
+    "command": "tsx scripts/generate-scale-instruments.ts; tsx scripts/generate-scale-instruments.ts --check",
+    "existingSources": 258,
+    "newMetadataCandidates": 5
+  },
+  "reportExamples": {
+    "studentScenarios": [
+      "normal experience",
+      "low support experience",
+      "insufficient answers"
+    ],
+    "teacherScenarios": [
+      "normal authorised aggregate",
+      "low experience authorised aggregate",
+      "insufficient evidence or group privacy conditions unmet"
+    ],
+    "runtimeInstalled": false,
+    "noScoreForms": true,
+    "review": "manual prose/receiver-scope review only; no browser or permission-service claim"
+  },
+  "ciPreflight": {
+    "page": "https://app.notion.com/p/404d27635a388186ac80de3593da05a5",
+    "readStatus": "PASS using correct connected Qiang workspace; page last edited 2026-11-01T06:54:46.604Z",
+    "applicableHistoricalErrors": {
+      "CI-001": "N_A: formal content lane has no DB; local persistence verification uses separately named localhost isolated database",
+      "CI-003": "PASS bounded: unchanged backend lock/schema/tools; no frontend/type closure change",
+      "CI-006": "N_A for public release: none granted; local DB evidence is explicitly persistence-only, no authority claim",
+      "CI-007": "PASS: existing registry generator regenerated and --check succeeded",
+      "CI-020": "Candidate exact base/head/tree and raw-diff route recorded in PR; old failed fixture logs retained"
+    },
+    "plannedRoute": "existing content / scale-intake light; no full backend/frontend/DB/Redis/browser/Docker application checks",
+    "formalCiStatus": "NOTRUN at source freeze; actual run status is recorded in PR/final separately; local checks are not CI approval"
+  },
+  "scopeSourceSha256": {
+    "server-version/backend/src/modules/scale/instruments/pisa2022_cogacrco_usa_en_student/1.0.0/source.json": "229d6c0438f0305107ae81aece89b40e7fd1f6419e195aa6aa9611ad00f29e12",
+    "server-version/backend/src/modules/scale/instruments/pisa2022_teachsup_usa_en_student/1.0.0/source.json": "cfbec3a57879aef2b0ded4f67ee8b11ca1c0945c2cedca2554adecbe33356c1c",
+    "server-version/backend/src/modules/scale/instruments/pisa2022_disclim_usa_en_student/1.0.0/source.json": "f19c572ba4840f4cd4227f878329d0a4acd08077c345bb375f043e9bd40779e7",
+    "server-version/backend/src/modules/scale/instruments/pisa2022_cogacmco_usa_en_student/1.0.0/source.json": "f9711a468a8c03ac179a31b9c177a7cde934fb0333508dc1ac38cb87491e8e58",
+    "server-version/backend/src/modules/scale/instruments/pisa2022_relatst_usa_en_student/1.0.0/source.json": "7c13c72fb45bb02cbcdcd125a6fbcc934ca20aef23285937d71b9cecd7fe5360"
+  }
+}

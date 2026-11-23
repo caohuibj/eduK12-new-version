@@ -1,0 +1,76 @@
+{
+  "zipUrl": "https://www.oecd.org/content/dam/oecd/en/data/datasets/pisa/pisa-2022-datasets/national-versions-pisa-2022-datasets/United%20States.zip",
+  "bytes": 2645172,
+  "sha256": "9453c96f4d0e2b50bfb7b2ae78c75d80c57e89decabb7a6a44428e3270d3e0ee",
+  "entries": [
+    "USA/",
+    "USA/eng-USA_United States-Financial_Literacy_Questionnaire_MS22.pdf",
+    "USA/eng-USA_United States-ICT_Familiarity_Questionnaire_MS22.pdf",
+    "USA/eng-USA_United States-School_Questionnaire_MS22.pdf",
+    "USA/eng-USA_United States-Student_Questionnaire_MS22.pdf",
+    "USA/eng-USA_United States-Student_Questionnaire_UH_MS22.pdf",
+    "USA/eng-ZZZ_United States-Financial_Literacy_Questionnaire_MS22.pdf",
+    "USA/eng-ZZZ_United States-ICT_Familiarity_Questionnaire_MS22.pdf",
+    "USA/eng-ZZZ_United States-School_Questionnaire_MS22.pdf",
+    "USA/eng-ZZZ_United States-Student_Questionnaire_MS22.pdf",
+    "USA/eng-ZZZ_United States-Student_Questionnaire_UH_MS22.pdf"
+  ],
+  "noticeFiles": [],
+  "exactComparedMember": "USA/eng-USA_United States-Student_Questionnaire_MS22.pdf",
+  "memberSha256": "baf0191c8da494801063dce61922d8a7fbbabee81ba559b943f5fb2d224ee6f2",
+  "mapping": [
+    {
+      "block": "ST267",
+      "page1Based": 38,
+      "rows": 8,
+      "rowTextMatches": 8,
+      "options": 4,
+      "optionTextMatches": 4,
+      "itemIdsPresent": true,
+      "optionCodeOrder": "original 1..4 or 1..5; original codebook mapping retained; not scores"
+    },
+    {
+      "block": "ST273",
+      "page1Based": 48,
+      "rows": 7,
+      "rowTextMatches": 7,
+      "options": 4,
+      "optionTextMatches": 4,
+      "itemIdsPresent": true,
+      "optionCodeOrder": "original 1..4 or 1..5; original codebook mapping retained; not scores"
+    },
+    {
+      "block": "ST270",
+      "page1Based": 49,
+      "rows": 4,
+      "rowTextMatches": 4,
+      "options": 4,
+      "optionTextMatches": 4,
+      "itemIdsPresent": true,
+      "optionCodeOrder": "original 1..4 or 1..5; original codebook mapping retained; not scores"
+    },
+    {
+      "block": "ST285",
+      "page1Based": 50,
+      "rows": 9,
+      "rowTextMatches": 9,
+      "options": 5,
+      "optionTextMatches": 5,
+      "itemIdsPresent": true,
+      "optionCodeOrder": "original 1..4 or 1..5; original codebook mapping retained; not scores"
+    },
+    {
+      "block": "ST283",
+      "page1Based": 51,
+      "rows": 9,
+      "rowTextMatches": 9,
+      "options": 5,
+      "optionTextMatches": 5,
+      "itemIdsPresent": true,
+      "optionCodeOrder": "original 1..4 or 1..5; original codebook mapping retained; not scores"
+    }
+  ],
+  "comparisonNote": "Initial pdftotext -layout substring comparison interleaved columns; corrected extraction reads natural-order PDF text per source-block page. All 37 rows and all 22 option labels match; no wording correction required.",
+  "specificThirdPartyRightsMarksInSelectedBlocks": "NONE_FOUND; absence is not a warranty, terms reserve actual third-party rights",
+  "prScope": "English descriptive Forms only; not WLE, translation, official administration or endorsement"
+}
