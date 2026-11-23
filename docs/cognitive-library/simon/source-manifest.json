@@ -1,0 +1,29 @@
+[
+  {
+    "repo": "simon",
+    "file": "LICENSE",
+    "commit": "5a296fa16b905a14acc8e8d962fcf18db2b55ba4",
+    "same_as_inspected": true,
+    "sha256": "f841287245cf39077d5aa709425d953581bcb9327b67941212fed18fdcbdb796",
+    "url": "https://github.com/expfactory-experiments/simon/blob/5a296fa16b905a14acc8e8d962fcf18db2b55ba4/LICENSE",
+    "rehash_matches": true
+  },
+  {
+    "repo": "simon",
+    "file": "experiment.js",
+    "commit": "5a296fa16b905a14acc8e8d962fcf18db2b55ba4",
+    "same_as_inspected": true,
+    "sha256": "bcc5efff4439008a969d21b73fea8afbb5c6d0d09a5416efa70cda7eb62ea5a9",
+    "url": "https://github.com/expfactory-experiments/simon/blob/5a296fa16b905a14acc8e8d962fcf18db2b55ba4/experiment.js",
+    "rehash_matches": true
+  },
+  {
+    "repo": "simon",
+    "file": "style.css",
+    "commit": "5a296fa16b905a14acc8e8d962fcf18db2b55ba4",
+    "same_as_inspected": true,
+    "sha256": "2d2eaebcd02ed161d1ef591803835bddb2bcd4efad61f6915d5cab126e554a10",
+    "url": "https://github.com/expfactory-experiments/simon/blob/5a296fa16b905a14acc8e8d962fcf18db2b55ba4/style.css",
+    "rehash_matches": true
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "commit": "6caac2b320cafe4b0707b3d1fdd360eb4f07dd43",
+  "review_type": "static only; no task/runtime execution",
+  "selected_scope": "MIT script and stylesheet reference only; PNG files excluded; dependency code not copied",
+  "files": [
+    {
+      "file": "LICENSE",
+      "sha256": "f841287245cf39077d5aa709425d953581bcb9327b67941212fed18fdcbdb796",
+      "immutable_url": "https://github.com/expfactory-experiments/attention-network-task/blob/6caac2b320cafe4b0707b3d1fdd360eb4f07dd43/LICENSE"
+    },
+    {
+      "file": "experiment.js",
+      "sha256": "fc067b8638246e7a7e0f3af6fde3196afcc4dbd925a53f9a94c9bf631589c55c",
+      "immutable_url": "https://github.com/expfactory-experiments/attention-network-task/blob/6caac2b320cafe4b0707b3d1fdd360eb4f07dd43/experiment.js"
+    },
+    {
+      "file": "style.css",
+      "sha256": "19a1c85e1f31e76c46b2c632baf5879099b7bdaa0f4d3b4b42cd0a4077dd4eeb",
+      "immutable_url": "https://github.com/expfactory-experiments/attention-network-task/blob/6caac2b320cafe4b0707b3d1fdd360eb4f07dd43/style.css"
+    },
+    {
+      "file": "config.json",
+      "sha256": "a103cffe467197739c4597e52da93d9beea3c189e8c5847e356693aa754362b0",
+      "immutable_url": "https://github.com/expfactory-experiments/attention-network-task/blob/6caac2b320cafe4b0707b3d1fdd360eb4f07dd43/config.json"
+    }
+  ]
+}

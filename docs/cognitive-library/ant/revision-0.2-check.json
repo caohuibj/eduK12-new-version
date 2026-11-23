@@ -1,0 +1,66 @@
+{
+  "version": "0.2",
+  "scope": "New oracle arithmetic, dependency and normalization assertions only. No task execution, CI, or rerun of previous48-factor checks.",
+  "previous_consistency_check_is_historical": true,
+  "unequal_n_actual": {
+    "primary_fraction": "50/3",
+    "secondary_pooled_fraction": "300/7",
+    "passed": true
+  },
+  "dependency_checks": [
+    {
+      "missing_cells": [
+        "none:neutral:up:left"
+      ],
+      "actual_ms": {
+        "alerting": null,
+        "orienting": 40,
+        "conflict": 70
+      },
+      "actual_missing_dependency_flags": {
+        "alerting": [
+          "none:neutral:up:left"
+        ],
+        "orienting": [],
+        "conflict": []
+      },
+      "passed": true
+    },
+    {
+      "missing_cells": [
+        "center:neutral:up:left"
+      ],
+      "actual_ms": {
+        "alerting": 100,
+        "orienting": null,
+        "conflict": 70
+      },
+      "actual_missing_dependency_flags": {
+        "alerting": [],
+        "orienting": [
+          "center:neutral:up:left"
+        ],
+        "conflict": []
+      },
+      "passed": true
+    }
+  ],
+  "normalization_checks_passed": true,
+  "before_sha256": {
+    "REVIEW.md": "48fce0e5f9411b23a7fadcf268cfc5c351e047b843b135e3b5c424ed5c624a0a",
+    "status.json": "3c4161bf97b5a77630fba5b10378e4e2f06289cae51494a0f3a7ad3e331d6ff7",
+    "factor-and-scoring-goldens.json": "33fbbe0a20d4ba0a24d91f334e641d5a0c7e87a178cdb3625676cea72671b113",
+    "source-manifest.json": "2eb0f51f48e1618dd0a7c578c112400229a6bd47d97deea180b626bce9aee806",
+    "LICENSE.upstream-MIT": "f841287245cf39077d5aa709425d953581bcb9327b67941212fed18fdcbdb796",
+    "material-consistency-check.json": "68d07b817e42b201b1efed76ab2553c8a9384df7bc172c4552aabfd71c88d019"
+  },
+  "after_sha256": {
+    "REVIEW.md": "87d2179d9b8eb59c0498c8843bfa16b9abb3afcab542db57a6da365240907fe5",
+    "status.json": "0b17616e075f3b2bece6e27be927f3579e1a69480822fa224a4011b865057345",
+    "factor-and-scoring-goldens.json": "2061887d2680551ddc9c41f6f435705722ef8ea43cf8562e43d5c5365a82017f",
+    "source-manifest.json": "2eb0f51f48e1618dd0a7c578c112400229a6bd47d97deea180b626bce9aee806",
+    "LICENSE.upstream-MIT": "f841287245cf39077d5aa709425d953581bcb9327b67941212fed18fdcbdb796",
+    "material-consistency-check.json": "68d07b817e42b201b1efed76ab2553c8a9384df7bc172c4552aabfd71c88d019"
+  },
+  "source_and_license_unchanged": true
+}

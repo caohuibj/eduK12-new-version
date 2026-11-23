@@ -1,0 +1,31 @@
+{
+  "status": "HOLD_VISUAL_AND_IMPLEMENTATION_REVIEW",
+  "source_only_design_complete": true,
+  "candidate_key": "ant-paper-protocol-original-artwork-draft-0.2",
+  "new_identity": true,
+  "registered": false,
+  "task_executed": false,
+  "clinical_validity_established": false,
+  "normative_cutoff": null,
+  "blocks": [
+    "Original artwork cannot be claimed visually equivalent: original line-width/head-height/luminance not resolved and angular width numbers conflict",
+    "Physical visual-angle calibration and target-onset/timing implementation unverified",
+    "Scoring and scheduling design requires independent review; goldens are design oracles only"
+  ],
+  "excluded_assets": [
+    "images/left_arrow.png",
+    "images/right_arrow.png",
+    "images/no_arrow.png",
+    "legacy dependency runtime",
+    "remote font styles",
+    "save/next routes",
+    "paper PDFs and figures"
+  ],
+  "target_formal_trials": 288,
+  "upstream_comparison_formal_trials": 144,
+  "version": "0.2",
+  "source_material_review_status": "CONDITIONAL_GO_SOURCE_ONLY",
+  "scope": "Independent single-session adaptation; not full replication of original two-session research procedure",
+  "executable_release_status": "HOLD",
+  "visual_equivalence_status": "HOLD"
+}

@@ -1,0 +1,164 @@
+{
+  "status": "DESIGN_ORACLE_NOT_TASK_EXECUTION",
+  "mapping_vectors": [
+    {
+      "mapping": "A",
+      "red_key": 37,
+      "blue_key": 39,
+      "color": "red",
+      "stimulus_side": "left",
+      "expected_correct_key": 37,
+      "expected_condition": "congruent",
+      "upstream_condition": "congruent",
+      "upstream_label_correct": true
+    },
+    {
+      "mapping": "A",
+      "red_key": 37,
+      "blue_key": 39,
+      "color": "red",
+      "stimulus_side": "right",
+      "expected_correct_key": 37,
+      "expected_condition": "incongruent",
+      "upstream_condition": "incongruent",
+      "upstream_label_correct": true
+    },
+    {
+      "mapping": "A",
+      "red_key": 37,
+      "blue_key": 39,
+      "color": "blue",
+      "stimulus_side": "left",
+      "expected_correct_key": 39,
+      "expected_condition": "incongruent",
+      "upstream_condition": "incongruent",
+      "upstream_label_correct": true
+    },
+    {
+      "mapping": "A",
+      "red_key": 37,
+      "blue_key": 39,
+      "color": "blue",
+      "stimulus_side": "right",
+      "expected_correct_key": 39,
+      "expected_condition": "congruent",
+      "upstream_condition": "congruent",
+      "upstream_label_correct": true
+    },
+    {
+      "mapping": "B",
+      "red_key": 39,
+      "blue_key": 37,
+      "color": "red",
+      "stimulus_side": "left",
+      "expected_correct_key": 39,
+      "expected_condition": "incongruent",
+      "upstream_condition": "congruent",
+      "upstream_label_correct": false
+    },
+    {
+      "mapping": "B",
+      "red_key": 39,
+      "blue_key": 37,
+      "color": "red",
+      "stimulus_side": "right",
+      "expected_correct_key": 39,
+      "expected_condition": "congruent",
+      "upstream_condition": "incongruent",
+      "upstream_label_correct": false
+    },
+    {
+      "mapping": "B",
+      "red_key": 39,
+      "blue_key": 37,
+      "color": "blue",
+      "stimulus_side": "left",
+      "expected_correct_key": 37,
+      "expected_condition": "congruent",
+      "upstream_condition": "incongruent",
+      "upstream_label_correct": false
+    },
+    {
+      "mapping": "B",
+      "red_key": 39,
+      "blue_key": 37,
+      "color": "blue",
+      "stimulus_side": "right",
+      "expected_correct_key": 37,
+      "expected_condition": "incongruent",
+      "upstream_condition": "congruent",
+      "upstream_label_correct": false
+    }
+  ],
+  "aggregation_fixture": {
+    "mapping": "B",
+    "trials": [
+      {
+        "color": "red",
+        "side": "left",
+        "key": 39,
+        "rt_ms": 500,
+        "condition": "incongruent"
+      },
+      {
+        "color": "red",
+        "side": "right",
+        "key": 39,
+        "rt_ms": 400,
+        "condition": "congruent"
+      }
+    ],
+    "corrected_simon_effect_ms": 100,
+    "upstream_labeled_effect_ms": -100
+  },
+  "edge_cases": [
+    {
+      "case": "practice_correct",
+      "include_accuracy": false,
+      "include_rt": false
+    },
+    {
+      "case": "test_wrong_key_in_window",
+      "include_accuracy": true,
+      "correct": false,
+      "include_rt": false
+    },
+    {
+      "case": "test_omission",
+      "include_accuracy": true,
+      "correct": false,
+      "include_rt": false
+    },
+    {
+      "case": "focus_lost",
+      "include_accuracy": false,
+      "include_rt": false,
+      "record": "technical_invalid"
+    },
+    {
+      "case": "correct_rt_0",
+      "include_accuracy": true,
+      "correct": true,
+      "include_rt": false,
+      "record": "nonpositive_rt"
+    },
+    {
+      "case": "correct_rt_1999",
+      "include_accuracy": true,
+      "correct": true,
+      "include_rt": true
+    },
+    {
+      "case": "response_at_2000",
+      "include_accuracy": true,
+      "correct": false,
+      "include_rt": false,
+      "record": "late_omission"
+    },
+    {
+      "case": "empty_condition",
+      "effect_ms": null,
+      "record": "insufficient_data"
+    }
+  ]
+}

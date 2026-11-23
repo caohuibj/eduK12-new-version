@@ -1,0 +1,53 @@
+{
+  "scope": "JSON/document arithmetic and uniqueness only, NOT task/runtime execution or CI",
+  "cells": 48,
+  "formal_target": 288,
+  "practice_counts": {
+    "cue": {
+      "none": 6,
+      "center": 6,
+      "double": 6,
+      "spatial": 6
+    },
+    "flanker": {
+      "neutral": 8,
+      "congruent": 8,
+      "incongruent": 8
+    },
+    "location": {
+      "up": 12,
+      "down": 12
+    },
+    "direction": {
+      "left": 12,
+      "right": 12
+    }
+  },
+  "effects_ms": {
+    "alerting": 100.0,
+    "orienting": 40.0,
+    "conflict": 70.0
+  },
+  "files": [
+    {
+      "name": "source-manifest.json",
+      "sha256": "2eb0f51f48e1618dd0a7c578c112400229a6bd47d97deea180b626bce9aee806"
+    },
+    {
+      "name": "status.json",
+      "sha256": "3c4161bf97b5a77630fba5b10378e4e2f06289cae51494a0f3a7ad3e331d6ff7"
+    },
+    {
+      "name": "LICENSE.upstream-MIT",
+      "sha256": "f841287245cf39077d5aa709425d953581bcb9327b67941212fed18fdcbdb796"
+    },
+    {
+      "name": "factor-and-scoring-goldens.json",
+      "sha256": "33fbbe0a20d4ba0a24d91f334e641d5a0c7e87a178cdb3625676cea72671b113"
+    },
+    {
+      "name": "REVIEW.md",
+      "sha256": "48fce0e5f9411b23a7fadcf268cfc5c351e047b843b135e3b5c424ed5c624a0a"
+    }
+  ]
+}
