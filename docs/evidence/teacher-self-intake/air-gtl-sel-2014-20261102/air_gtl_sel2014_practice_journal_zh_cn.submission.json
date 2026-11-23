@@ -1,0 +1,190 @@
+{
+  "requestId": "41289634-6d2b-5636-b07b-10fcb0d49bed",
+  "toolKey": "air_gtl_sel2014_practice_journal_zh_cn",
+  "version": "0.1.0",
+  "title": "AIR/GTL SEL｜实践证据札记（项目自编）｜教师自评｜zh-CN v0.1.0",
+  "definition": {
+    "schemaVersion": 1,
+    "pages": [
+      {
+        "pageKey": "practice_journal_page",
+        "title": "实践证据札记",
+        "description": "这是一份可跳过任意问题的个人反思记录。它没有分数，不用于判断教学优劣。可以只记录一件事，并选择一个需要支持的小步骤。",
+        "questions": [
+          {
+            "itemKey": "practice_context",
+            "type": "SHORT_TEXT",
+            "prompt": "任选最近一次课堂或一段教学经历，写下科目、学段与大致时间；可不填具体班级。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 160
+          },
+          {
+            "itemKey": "practice_topic",
+            "type": "SINGLE",
+            "prompt": "这次想从哪个实践话题开始记录？",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "student_centered_discipline",
+                "label": "支持学习的规则与纪律"
+              },
+              {
+                "optionKey": "teacher_language",
+                "label": "教师表达与回应"
+              },
+              {
+                "optionKey": "responsibility_choice",
+                "label": "责任与选择"
+              },
+              {
+                "optionKey": "warmth_support",
+                "label": "温暖与支持"
+              },
+              {
+                "optionKey": "cooperative_learning",
+                "label": "合作学习"
+              },
+              {
+                "optionKey": "classroom_discussions",
+                "label": "课堂讨论"
+              },
+              {
+                "optionKey": "self_assessment_reflection",
+                "label": "学习中的自评与反思"
+              },
+              {
+                "optionKey": "balanced_instruction",
+                "label": "多种教学方式的安排"
+              },
+              {
+                "optionKey": "academic_press_expectations",
+                "label": "学习挑战与期望"
+              },
+              {
+                "optionKey": "competence_building",
+                "label": "示范、练习与反馈支持"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "practice_evidence",
+            "type": "LONG_TEXT",
+            "prompt": "记录一个你实际看到或听到的片段，先描述发生了什么。不要填写学生姓名或可识别细节。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1200
+          },
+          {
+            "itemKey": "practice_notice",
+            "type": "LONG_TEXT",
+            "prompt": "这个片段让你注意到什么？可以分别写下你已知道的事和仍不确定的地方。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1200
+          },
+          {
+            "itemKey": "practice_support",
+            "type": "LONG_TEXT",
+            "prompt": "这次情境中，有哪些条件在帮助你，或有哪些支持还没有到位？",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1200
+          },
+          {
+            "itemKey": "practice_next",
+            "type": "LONG_TEXT",
+            "prompt": "如果愿意，再写下下一次想尝试的一个小调整。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1200
+          },
+          {
+            "itemKey": "practice_evidence_status",
+            "type": "SINGLE",
+            "prompt": "目前的记录处于哪种状态？",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "specific_event",
+                "label": "已有具体片段"
+              },
+              {
+                "optionKey": "still_gathering",
+                "label": "还需要补充材料"
+              },
+              {
+                "optionKey": "no_opportunity",
+                "label": "最近没有合适情境"
+              }
+            ],
+            "rows": []
+          }
+        ]
+      }
+    ]
+  },
+  "statement": "EduK12项目自编的开放式记录与行动模板，借用一般反思流程；没有复制、翻译或逐题改写AIR/GTL原手册题项，不冒充原工具或其短版；待审，无评分。",
+  "classificationTags": [
+    "population:teacher",
+    "response:self",
+    "domain:teacher_workplace",
+    "language_validation:content_zh-CN",
+    "license:self_authored",
+    "use:not_diagnostic"
+  ],
+  "reference": {
+    "tags": [
+      "family:air_gtl_sel",
+      "role:teacher_self",
+      "stage:k12",
+      "language:zh-CN",
+      "version:project_0_1_0",
+      "use:developmental_reflection",
+      "research:PILOT",
+      "content:project_authored_journal",
+      "scoring:none",
+      "journal:practice_journal"
+    ],
+    "motherTool": "AIR/GTL SEL teaching reflection",
+    "motherTag": "family:air_gtl_sel",
+    "contentOrigin": "PROJECT_AUTHORED_OPEN_JOURNAL_NOT_ORIGINAL_AIR_INSTRUMENT",
+    "sourceContext": {
+      "author": "Nicholas Yoder",
+      "year": 2014,
+      "url": "https://files.eric.ed.gov/fulltext/ED553369.pdf",
+      "sha256": "0b3cfdd980e55bec88ea6bfde5ec231cf4864ee84c477c2902f474dc9702c37b",
+      "relationship": "bibliographic and broad-topic context only; no original items, rating anchors or reflection questions reproduced"
+    },
+    "language": "zh-CN",
+    "translationStatus": "NOT_A_TRANSLATION_OF_ORIGINAL_ITEMS",
+    "audience": {
+      "respondent": "teacher_self",
+      "receiver": "teacher_self_or_existing_explicit_authorization",
+      "studentVersion": null
+    },
+    "versions": {
+      "content": "0.1.0",
+      "parameters": null,
+      "report": null
+    },
+    "scientificMaturity": "PILOT",
+    "rights": {
+      "originalSource": "AIR 2014 all rights reserved; project reuse scope unresolved",
+      "thesePrompts": "project-authored draft; do not imply AIR approval or licensing of original content"
+    },
+    "scoring": "NONE",
+    "reportPolicy": "COMPLETION_ONLY",
+    "limitations": [
+      "描述个人记录，不推断实际教学质量、学生获得的支持或能力水平。",
+      "没有原工具量表得分、常模、诊断或跨工具总分。",
+      "填写者不等于所有报告接收者；不自动改变原有可见范围或共享规则。"
+    ]
+  }
+}

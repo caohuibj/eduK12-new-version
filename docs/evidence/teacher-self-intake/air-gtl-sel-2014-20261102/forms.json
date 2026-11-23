@@ -1,0 +1,127 @@
+{
+  "motherTag": "family:air_gtl_sel",
+  "forms": [
+    {
+      "toolKey": "air_gtl_sel2014_practice_journal_zh_cn",
+      "title": "AIR/GTL SEL｜实践证据札记（项目自编）｜教师自评｜zh-CN v0.1.0",
+      "kind": "FORM",
+      "contentVersion": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "questionCount": 7,
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:zh-CN",
+        "version:project_0_1_0",
+        "use:developmental_reflection",
+        "research:PILOT",
+        "content:project_authored_journal",
+        "scoring:none",
+        "journal:practice_journal"
+      ],
+      "controlledClassificationTags": [
+        "population:teacher",
+        "response:self",
+        "domain:teacher_workplace",
+        "language_validation:content_zh-CN",
+        "license:self_authored",
+        "use:not_diagnostic"
+      ],
+      "submissionFile": "air_gtl_sel2014_practice_journal_zh_cn.submission.json",
+      "definitionFile": "air_gtl_sel2014_practice_journal_zh_cn.form.json",
+      "csvSyntaxFile": "air_gtl_sel2014_practice_journal_zh_cn.import.txt",
+      "rights": "PROJECT_AUTHORED_PROMPTS_ONLY",
+      "originalToolImported": false,
+      "sourceInstrumentStatus": "FULLTEXT_READ_RIGHTS_UNRESOLVED",
+      "installation": "PREPARED",
+      "report": "NO_SCORED_REPORT; native completion/facts only"
+    },
+    {
+      "toolKey": "air_gtl_sel2014_competency_journal_zh_cn",
+      "title": "AIR/GTL SEL｜自身SEL情境札记（项目自编）｜教师自评｜zh-CN v0.1.0",
+      "kind": "FORM",
+      "contentVersion": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "questionCount": 6,
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:zh-CN",
+        "version:project_0_1_0",
+        "use:developmental_reflection",
+        "research:PILOT",
+        "content:project_authored_journal",
+        "scoring:none",
+        "journal:competency_journal"
+      ],
+      "controlledClassificationTags": [
+        "population:teacher",
+        "response:self",
+        "domain:teacher_workplace",
+        "language_validation:content_zh-CN",
+        "license:self_authored",
+        "use:not_diagnostic"
+      ],
+      "submissionFile": "air_gtl_sel2014_competency_journal_zh_cn.submission.json",
+      "definitionFile": "air_gtl_sel2014_competency_journal_zh_cn.form.json",
+      "csvSyntaxFile": "air_gtl_sel2014_competency_journal_zh_cn.import.txt",
+      "rights": "PROJECT_AUTHORED_PROMPTS_ONLY",
+      "originalToolImported": false,
+      "sourceInstrumentStatus": "FULLTEXT_READ_RIGHTS_UNRESOLVED",
+      "installation": "PREPARED",
+      "report": "NO_SCORED_REPORT; native completion/facts only"
+    },
+    {
+      "toolKey": "air_gtl_sel2014_action_review_zh_cn",
+      "title": "AIR/GTL SEL｜行动与回顾计划（项目自编）｜教师自评｜zh-CN v0.1.0",
+      "kind": "FORM",
+      "contentVersion": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "questionCount": 6,
+      "tags": [
+        "family:air_gtl_sel",
+        "role:teacher_self",
+        "stage:k12",
+        "language:zh-CN",
+        "version:project_0_1_0",
+        "use:developmental_reflection",
+        "research:PILOT",
+        "content:project_authored_journal",
+        "scoring:none",
+        "journal:action_review"
+      ],
+      "controlledClassificationTags": [
+        "population:teacher",
+        "response:self",
+        "domain:teacher_workplace",
+        "language_validation:content_zh-CN",
+        "license:self_authored",
+        "use:not_diagnostic"
+      ],
+      "submissionFile": "air_gtl_sel2014_action_review_zh_cn.submission.json",
+      "definitionFile": "air_gtl_sel2014_action_review_zh_cn.form.json",
+      "csvSyntaxFile": "air_gtl_sel2014_action_review_zh_cn.import.txt",
+      "rights": "PROJECT_AUTHORED_PROMPTS_ONLY",
+      "originalToolImported": false,
+      "sourceInstrumentStatus": "FULLTEXT_READ_RIGHTS_UNRESOLVED",
+      "installation": "PREPARED",
+      "report": "NO_SCORED_REPORT; native completion/facts only"
+    }
+  ],
+  "tagStorage": "Native submission reference.tags is preserved under reference.metadata.annotations.tags; controlled classificationTags use only existing label IDs. Custom family tag is not registered as a new shared UI facet.",
+  "combination": {
+    "status": "OPTIONAL_ORDINARY_COMBINATION_PLAN_ONLY",
+    "members": [
+      "air_gtl_sel2014_practice_journal_zh_cn",
+      "air_gtl_sel2014_competency_journal_zh_cn",
+      "air_gtl_sel2014_action_review_zh_cn"
+    ],
+    "sumScore": null,
+    "conditions": "each form remains separately usable; no nested assessment engine, no automatic sharing or public publication"
+  }
+}
