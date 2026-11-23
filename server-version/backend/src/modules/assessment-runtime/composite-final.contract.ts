@@ -51,6 +51,7 @@ export const compositeScaleUnitFactSchema = z.object({
   scaleId: nonEmptyText,
   sourceDefinitionHash: hashSchema,
   sourceResultHash: hashSchema,
+  compiledRuntimeHash: hashSchema.optional(),
   bundleHash: hashSchema,
   scores: z.array(compactScoreTupleSchema).max(500),
   quality: scaleQualitySummarySchema,
@@ -141,6 +142,7 @@ export type CompositeUnitFactV1 =
   | CompositeFormSectionUnitFactV1
   | CompositeSituationalUnitFactV1
   | CompositeCognitiveUnitFactV1
+export type CompositeUnitType = CompositeUnitFactV1['unitType']
 
 export const resolvedUnitReferenceSlotSchema = z.object({
   metricKey: nonEmptyText,
