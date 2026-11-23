@@ -23,7 +23,7 @@ export async function copyTripletContent(tx:Prisma.TransactionClient,triplet:Tri
  }
  if(!triplet.template)return binding
  const report=await publishContentRelease(tx,{layer:'REPORT',family:'SCALE',key:'standard-report:'+measurement.releaseId,version:canonicalHash({parameters:triplet.parts.PARAMETERS.hash,report:triplet.parts.REPORT.hash}),scope:measurement.scope,sourceReleaseId:null,assetRefs:selectedStandardReport(triplet.parts.REPORT.payload).assetRefs,provenance,
-  content:{projectionVersion:1,measurements:[pointer],metricKeys:triplet.definition.scoring.scores.map(s=>s.key),audience:'researcher',language:triplet.definition.versionAxes?.locale??'und',generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:triplet.template}},actorId)
+  content:{projectionVersion:1,measurements:[pointer],metricKeys:triplet.definition.scoring.scores.map(s=>s.key),audience:triplet.definition.report.audienceContract?.audience??'researcher',language:triplet.definition.versionAxes?.locale??'und',generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:triplet.template}},actorId)
  binding.reportRelease={releaseId:report.releaseId,contentHash:report.contentHash}
  return binding
 }

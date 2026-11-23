@@ -152,14 +152,16 @@ describe('tool-level participant report eligibility (publish-time gate)', () => 
     )
     expect(withRawFeedback.participantFeedback?.mode).toBe('DESCRIPTIVE')
 
-    // 3. Scale with researcher-bound REPORT release -> eligible for DESCRIPTIVE
+    // 3. Scale with participant-facing bound REPORT release -> eligible for DESCRIPTIVE
     const withReportRelease = baseSurveyScaleUnit({
       contentSelection: {
         referencePolicy: { policyVersion: 'EXACT_POPULATION_PRIORITY_V1', measurementReleaseId: '11111111-1111-4111-8111-111111111111', choices: [] },
         reportRelease: { releaseId: '22222222-2222-4222-8222-222222222222', contentHash: hashC },
       },
     })
-    expect(evaluateSurveyUnitReportEligibility(withReportRelease)).toMatchObject({ eligible: true, source: 'DECLARED_REPORT_RELEASE' })
+    expect(evaluateSurveyUnitReportEligibility({ ...withReportRelease, reportReleaseAudience: 'student' })).toMatchObject({ eligible: true, source: 'DECLARED_REPORT_RELEASE' })
+    // Researcher-only bound REPORT release MUST NOT qualify for participant DESCRIPTIVE
+    expect(evaluateSurveyUnitReportEligibility({ ...withReportRelease, reportReleaseAudience: 'researcher' }).eligible).toBe(false)
     freezeSurveyParticipantFeedback(
       [withReportRelease],
       [{ instrumentId: draftId, feedback: { policyVersion: 'SURVEY_RAW_METRICS_V1', mode: 'DESCRIPTIVE', metricKeys: ['total'], release: 'AFTER_FINAL' } }],
@@ -184,6 +186,9 @@ describe('tool-level participant report eligibility (publish-time gate)', () => 
     expect(evaluateEducationLeafReportEligibility({ kind: 'SCALE', sourceProvider: 'STANDARD_SCALE', standardReportConfigured: true }).eligible).toBe(true)
     expect(evaluateEducationLeafReportEligibility({ kind: 'SCALE', sourceProvider: 'STANDARD_SCALE', standardReportConfigured: false }).eligible).toBe(false)
     expect(evaluateEducationLeafReportEligibility({ kind: 'SCALE', sourceProvider: 'PRIVATE_VERSION', reportObject: { reportVersion: 'none-v1', interpretations: [] } }).eligible).toBe(false)
+    expect(evaluateEducationLeafReportEligibility({ kind: 'SCALE', sourceProvider: 'PRIVATE_VERSION', reportObject: { reportVersion: 'none-v1', audienceContract: { schemaVersion: 1, respondent: 'STUDENT_SELF', audience: 'student', locale: 'zh-CN' } } }).eligible).toBe(false)
+    expect(evaluateEducationLeafReportEligibility({ kind: 'SCALE', sourceProvider: 'PRIVATE_VERSION', reportObject: { reportVersion: 'survey-private-score-v1', interpretations: [] } }).eligible).toBe(false)
+    expect(evaluateEducationLeafReportEligibility({ kind: 'SCALE', sourceProvider: 'PRIVATE_VERSION', reportObject: { reportVersion: 'survey-private-score-v1', audienceContract: { schemaVersion: 1, respondent: 'STUDENT_SELF', audience: 'student', locale: 'zh-CN' } } })).toMatchObject({ eligible: true, source: 'EDUCATION_AUDIENCE_CONTRACT' })
     expect(evaluateEducationLeafReportEligibility({ kind: 'SCALE', sourceProvider: 'PRIVATE_VERSION', reportObject: { rawScoreFeedback: sampleRawFeedback } }).eligible).toBe(true)
     expect(evaluateEducationLeafReportEligibility({ kind: 'FORM' }).eligible).toBe(false)
 
@@ -299,6 +304,7 @@ describe('Survey participant declared report rendering and asset authorization',
             content: {
               measurements: [{ releaseId: measurementReleaseId, contentHash: hashA }],
               metricKeys: ['total', 'hidden_metric'],
+              audience: 'student',
               generatorVersion: 'DECLARATIVE_REPORT_V1',
               template: {
                 title: '标准量表完整报告',
@@ -380,5 +386,94 @@ describe('Survey participant declared report rendering and asset authorization',
     const enriched = await attachSurveyParticipantDeclaredReports([unit], computed, projected)
     if (enriched.kind !== 'DESCRIPTIVE') throw new Error('expected DESCRIPTIVE')
     expect('declaredReport' in enriched.measurements[0]).toBe(false)
+  })
+
+  it('never renders a researcher-only REPORT release on the participant side or authorizes its ASSET image', async () => {
+    const unit = baseSurveyScaleUnit({
+      contentSelection: {
+        referencePolicy: { policyVersion: 'EXACT_POPULATION_PRIORITY_V1', measurementReleaseId, choices: [] },
+        reportRelease: { releaseId: reportReleaseId, contentHash: hashC },
+      },
+      participantFeedback: {
+        policyVersion: 'SURVEY_RAW_METRICS_V1',
+        mode: 'DESCRIPTIVE',
+        metricKeys: ['total'],
+        release: 'AFTER_FINAL',
+      },
+    })
+    const computed: SurveyComputedFinal = {
+      schemaVersion: 1,
+      definitionDigest: hashA,
+      units: [],
+      interpretation: {
+        schemaVersion: 1,
+        contentBindingHash: hashB,
+        units: [{ instrumentKey: 'scale_a', references: [], report: { status: 'READY', generatorVersion: 'DECLARATIVE_REPORT_V1' } }],
+      },
+    }
+    const projected: SurveyParticipantFeedbackProjection = {
+      kind: 'DESCRIPTIVE',
+      pending: false,
+      measurements: [
+        {
+          feedbackKind: 'RAW_METRICS',
+          pending: false,
+          instrumentKey: 'scale_a',
+          title: '示例量表',
+          measurementReleaseId,
+          metrics: [{ key: 'total', label: '总分', value: 8, unit: null, status: 'OK' }],
+          quality: 'interpretable',
+        },
+      ],
+    }
+
+    mocks.getContentReleaseBatch.mockResolvedValue(
+      new Map<string, any>([
+        [measurementReleaseId, { releaseId: measurementReleaseId, layer: 'MEASUREMENT', contentHash: hashA, status: 'PUBLISHED', content: { metrics: [{ metricKey: 'total', unit: 'points' }] } }],
+        [
+          reportReleaseId,
+          {
+            releaseId: reportReleaseId,
+            layer: 'REPORT',
+            contentHash: hashC,
+            status: 'PUBLISHED',
+            assetRefs: [{ assetId, sha256: hashA, mediaType: 'image/png' }],
+            content: {
+              measurements: [{ releaseId: measurementReleaseId, contentHash: hashA }],
+              metricKeys: ['total'],
+              audience: 'researcher',
+              generatorVersion: 'DECLARATIVE_REPORT_V1',
+              template: {
+                title: '仅研究者内部报告',
+                blocks: [
+                  { type: 'TEXT', text: '内部研究分析文本' },
+                  { type: 'ASSET', assetId, alt: '内部研究图表' },
+                ],
+              },
+            },
+          },
+        ],
+      ]),
+    )
+
+    const enriched = await attachSurveyParticipantDeclaredReports([unit], computed, projected)
+    if (enriched.kind !== 'DESCRIPTIVE') throw new Error('expected DESCRIPTIVE')
+    expect('declaredReport' in enriched.measurements[0]).toBe(false)
+
+    // Even if a forged projected payload carried a declaredReport pointing to the
+    // researcher-only release's assetId, resolveSurveyDeclaredReportAsset refuses it.
+    const forgedProjected: SurveyParticipantFeedbackProjection = {
+      ...projected,
+      measurements: [
+        {
+          ...(projected.measurements[0] as any),
+          declaredReport: {
+            generatorVersion: 'DECLARATIVE_REPORT_V1',
+            blocks: [{ type: 'ASSET', assetId, alt: '内部研究图表' }],
+          },
+        },
+      ],
+    }
+    expect(await resolveSurveyDeclaredReportAsset([unit], forgedProjected, assetId)).toBeNull()
   })
 })

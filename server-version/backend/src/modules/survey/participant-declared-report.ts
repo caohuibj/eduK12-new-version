@@ -1,5 +1,6 @@
 import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { isParticipantReportAudience } from '../assessment-policy/tool-report-eligibility'
 import { getContentReleaseBatch } from '../measurement-content/repository'
 import {
   DECLARATIVE_REPORT_GENERATOR,
@@ -61,8 +62,13 @@ function collectDeclaredCandidates(
  * Attach frozen declarative REPORT renderings (thresholds/bands, narrative prose,
  * charts, asset blocks) to authorized Survey participant feedback measurements.
  *
- * Uses bounded-cached getContentReleaseBatch so warm reads do zero extra DB I/O
- * and units without a bound REPORT release pay zero cost.
+ * Only REPORT releases whose `audience` explicitly targets participants
+ * (`student` / `parent` / `teacher`) may be rendered; researcher-only REPORT
+ * releases (`audience: 'researcher'`) are never disclosed on participant paths.
+ *
+ * Uses getContentReleaseBatch so live release header/status is checked in a
+ * single batched DB query while reusing bounded-cached immutable content, and
+ * units without a bound REPORT release skip the query entirely.
  */
 export async function attachSurveyParticipantDeclaredReports(
   units: readonly ResearchFrozenUnit[],
@@ -91,6 +97,7 @@ export async function attachSurveyParticipantDeclaredReports(
     if (!report || report.layer !== 'REPORT'
       || report.contentHash !== candidate.reportRelease.contentHash
       || report.status === 'REVOKED'
+      || !isParticipantReportAudience(report.content.audience)
       || report.content.generatorVersion !== DECLARATIVE_REPORT_GENERATOR
       || candidate.interpreted.report.generatorVersion !== report.content.generatorVersion
       || report.content.measurements.length !== 1
@@ -168,7 +175,8 @@ export async function resolveSurveyDeclaredReportAsset(
   )
   for (const pointer of matchingReleasePointers) {
     const report = releases.get(pointer.releaseId)
-    if (!report || report.layer !== 'REPORT' || report.contentHash !== pointer.contentHash || report.status === 'REVOKED') continue
+    if (!report || report.layer !== 'REPORT' || report.contentHash !== pointer.contentHash || report.status === 'REVOKED'
+      || !isParticipantReportAudience(report.content.audience)) continue
     const ref = report.assetRefs.find((asset) => asset.assetId === assetId)
     if (ref && ['image/png', 'image/jpeg', 'image/webp'].includes(ref.mediaType)) {
       return {

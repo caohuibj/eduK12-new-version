@@ -292,17 +292,23 @@ export async function submitResearchFinal(input:FinalInput){
   }
   return committed
 }
-export async function readGeneralForOwnAttempt(input:{
+type SurveyReadInput={
   publicId:string;attemptId:string;researchCode?:string;accessCredential:string
-}){
-  const valid=await verifiedSurveyAttempt(input)
+}
+
+async function readGeneralForVerifiedAttempt(
+  input:SurveyReadInput,
+  valid:Awaited<ReturnType<typeof verifiedSurveyAttempt>>,
+){
   const hasFeedback=valid.compiledSnapshot.units.some(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE')
   if(hasFeedback){
-    // Hold row locks ONLY for live withdrawal/credential/consent/final verification.
-    // Decryption, canonicalHash verification, and declared report projection run
-    // outside the lock transaction so concurrent reads never pin DB connections.
+    // Read-start authorization contract (same pattern as Education ordinary feedback):
+    // hold row locks ONLY while verifying live withdrawal, credential, consent,
+    // collection window, and final digest. Decryption, canonicalHash verification,
+    // and immutable content-release report projection run after commit so
+    // concurrent reads never pin DB connections.
     const verifiedRow=await prisma.$transaction(async tx=>{
-      // Serialize disclosure with current withdrawal/credential/window governance.
+      // Serialize disclosure check with current withdrawal/credential/window governance.
       await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${valid.projectId} FOR SHARE`
       await tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${valid.waveId}
         AND project_id=${valid.projectId} FOR KEY SHARE`
@@ -351,13 +357,16 @@ export async function readGeneralForOwnAttempt(input:{
   return {kind:'GENERAL_ONLY' as const,...generalReceipt(valid.generalText,final.completedAt)}
 }
 
+export async function readGeneralForOwnAttempt(input:SurveyReadInput){
+  const valid=await verifiedSurveyAttempt(input)
+  return readGeneralForVerifiedAttempt(input,valid)
+}
+
 /** Authorize a static report image referenced by either rawScoreFeedback or a
  * participant-authorized declaredReport ASSET block. */
-export async function authorizeSurveyReportImageAsset(input:{
-  publicId:string;attemptId:string;researchCode?:string;accessCredential:string
-},assetId:string){
+export async function authorizeSurveyReportImageAsset(input:SurveyReadInput,assetId:string){
   const valid=await verifiedSurveyAttempt(input)
-  const report=await readGeneralForOwnAttempt(input)
+  const report=await readGeneralForVerifiedAttempt(input,valid)
   if(report.kind!=='DESCRIPTIVE')return null
   const rawImage=report.measurements.flatMap(measurement=>
     'rawScoreFeedback' in measurement?(measurement.rawScoreFeedback??[]).flatMap(feedback=>feedback.images??[]):[])

@@ -393,7 +393,8 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
   useEffect(()=>{actionInFlight.current=false;setBusy(false)},[measurementRecoveryKey])
   const [preflight, setPreflight] = useState<{ revision: number; ok: boolean; trackingCandidates?:Array<{itemId:string;scoreKey:string;label:string;unit:string}>; checks: Array<{ key: string; label: string; status: string; message: string; targetId?: string }> } | null>(null)
   const [provideParticipantReport,setProvideParticipantReport]=useState(false)
-  useEffect(()=>setProvideParticipantReport(false),[id])
+  const provideParticipantReportTouched = useRef(false)
+  useEffect(()=>{provideParticipantReportTouched.current=false;setProvideParticipantReport(false)},[id])
   const [trackingMode,setTrackingMode]=useState<'SINGLE'|'LONGITUDINAL'>('SINGLE'),[trackingKeys,setTrackingKeys]=useState<string[]>([])
   useEffect(()=>{setTrackingMode('SINGLE');setTrackingKeys([])},[id,user?.id])
   const [nameError, setNameError] = useState('')
@@ -425,6 +426,9 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     setMaxAttempts(row.maxAttempts ?? 1)
     setExpiry(row.expiresAt || '')
     setOpens(row.opensAt || '')
+    if (!provideParticipantReportTouched.current) {
+      setProvideParticipantReport(Boolean(row.defaultProvideParticipantReport))
+    }
   }
   const reload = async () => {
     if (id === 'new') return
@@ -1451,12 +1455,12 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
             </div>}
           </>}
         </fieldset>}
-        {detail.participantReportEligibility&&<div className="text-sm text-slate-600 mb-2" aria-label="工具报告资格">
+        {detail.receiptOnlyAvailable&&detail.participantReportEligibility&&<div className="text-sm text-slate-600 mb-2" aria-label="工具报告资格">
           {detail.participantReportEligibility.hasEligibleUnits
             ?<p>报告资格：共 {detail.participantReportEligibility.eligibleCount} 项工具已配置完整报告{detail.participantReportEligibility.dataCollectionOnlyCount>0?`，${detail.participantReportEligibility.dataCollectionOnlyCount} 项仅用于数据采集`:''}。发布时可选择向作答者提供报告，或不勾选以仅提供回执。</p>
             :<p>报告资格：当前工具均未配置完整报告（仅用于数据采集），发布后将仅向作答者提供完成回执。</p>}
         </div>}
-        {detail.receiptOnlyAvailable&&<label className="block"><input type="checkbox" checked={detail.participantReportEligibility?.hasEligibleUnits===false?false:provideParticipantReport} disabled={busy||detail.participantReportEligibility?.hasEligibleUnits===false} onChange={event=>setProvideParticipantReport(event.target.checked)}/> 向作答者提供报告</label>}
+        {detail.receiptOnlyAvailable&&<label className="block"><input type="checkbox" checked={detail.participantReportEligibility?.hasEligibleUnits===false?false:provideParticipantReport} disabled={busy||detail.participantReportEligibility?.hasEligibleUnits===false} onChange={event=>{provideParticipantReportTouched.current=true;setProvideParticipantReport(event.target.checked)}}/> 向作答者提供报告</label>}
         <div className="questionnaire-publish-summary"><div><h2>草稿 · 尚未发布</h2><p>{dirty ? '设置有未保存的修改，请先保存设置。' : '确认内容与投放设置后，可自检或正式发布。'}</p></div>
         <div className="flex flex-wrap gap-3">
                 {dirty && !trainingDesign && <ProductButton variant="primary" disabled={busy} onClick={() => void save()}>保存全部设置</ProductButton>}

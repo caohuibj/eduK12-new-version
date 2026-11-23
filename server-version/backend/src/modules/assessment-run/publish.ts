@@ -107,11 +107,22 @@ async function receiptOnlyTrackIds(tx: Tx, tracks: PreparedTrack[], provideParti
         || origin?.entry === 'TEACHER' && origin.variantKey === 'TEACHER:SELF')
   })
   if (!candidates.length) return new Set<string>()
+  const hasScoredUnits = (policy: RunResourcePolicy) => {
+    const unitReports = policy.educationComposition?.unitReports
+    return Array.isArray(unitReports) && unitReports.length > 0
+  }
   const hasAnyConfiguredReport = (policy: RunResourcePolicy) => {
     const unitReports = policy.educationComposition?.unitReports
     if (!Array.isArray(unitReports)) return true
     return unitReports.some(unit => unit.respondent.mode === 'INDIVIDUAL_SUMMARY')
   }
+  // A scored track (contains SCALE/SJT/COGNITIVE) whose tools ALL have NONE
+  // respondent disclosure is data-collection-only and must stay receiptOnly.
+  // Pure-FORM compositions (unitReports.length === 0) keep their existing
+  // COMPLETION_ONLY feedback contract unless the publisher opts into receiptOnly.
+  const isDataCollectionOnlyScoredTrack = (policy: RunResourcePolicy) => (
+    hasScoredUnits(policy) && !hasAnyConfiguredReport(policy)
+  )
   // Tool-level gate at publish time: if the publisher explicitly asks to provide
   // participant reports, reject when none of the selected self-report tracks has
   // any tool configured with a respondent report.
@@ -124,9 +135,9 @@ async function receiptOnlyTrackIds(tx: Tx, tracks: PreparedTrack[], provideParti
         400,
       )
     }
-    // Any individual track with zero eligible units stays receiptOnly so it
+    // Any individual scored track with zero eligible units stays receiptOnly so it
     // never enters the report worker queue unnecessarily.
-    return new Set(candidates.filter(({ resourcePolicy }) => !hasAnyConfiguredReport(resourcePolicy)).map(t => t.id))
+    return new Set(candidates.filter(({ resourcePolicy }) => isDataCollectionOnlyScoredTrack(resourcePolicy)).map(t => t.id))
   }
   // Explicit opt-out (`provideParticipantReport === false`) applies to EVERY
   // self-report composition track (including mixed Form/SJT/Cognitive/Scale).
@@ -134,10 +145,10 @@ async function receiptOnlyTrackIds(tx: Tx, tracks: PreparedTrack[], provideParti
     return new Set(candidates.map(track => track.id))
   }
   // Default (`provideParticipantReport === undefined`): keep existing scale-only
-  // receiptOnly behavior AND automatically mark data-collection-only tracks
-  // (zero report-eligible units) as receiptOnly.
+  // receiptOnly behavior AND automatically mark data-collection-only scored
+  // tracks (scored tools with zero configured respondent reports) as receiptOnly.
   const dataCollectionOnlyIds = candidates
-    .filter(({ resourcePolicy }) => !hasAnyConfiguredReport(resourcePolicy))
+    .filter(({ resourcePolicy }) => isDataCollectionOnlyScoredTrack(resourcePolicy))
     .map(track => track.id)
   const composed = Prisma.join(candidates.map(({ id, resourcePolicy }) =>
     Prisma.sql`(${id}::text, ${resourcePolicy.runtimeLaunchTarget!.ref}::text)`))

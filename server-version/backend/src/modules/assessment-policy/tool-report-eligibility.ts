@@ -16,6 +16,7 @@ export type ToolParticipantReportSource =
   | 'DECLARED_REPORT_RELEASE'
   | 'RAW_SCORE_FEEDBACK'
   | 'SCALE_INTERPRETATIONS'
+  | 'EDUCATION_AUDIENCE_CONTRACT'
   | 'STANDARD_TRIPLET_REPORT'
   | 'NATIVE_TASK_REPORT'
   | 'NONE'
@@ -25,6 +26,14 @@ export interface ToolParticipantReportEligibility {
   mode: 'CONFIGURED_REPORT' | 'DATA_COLLECTION_ONLY'
   source: ToolParticipantReportSource
   reason: string | null
+}
+
+const PARTICIPANT_REPORT_AUDIENCES = new Set(['student', 'parent', 'teacher'])
+
+/** True iff a REPORT release / audienceContract audience explicitly targets
+ * participants (never `'researcher'`). */
+export function isParticipantReportAudience(audience: unknown): boolean {
+  return typeof audience === 'string' && PARTICIPANT_REPORT_AUDIENCES.has(audience)
 }
 
 const PLACEHOLDER_REPORT_VERSIONS = new Set(['none-v1', 'survey-private-score-v1'])
@@ -119,12 +128,17 @@ export interface SurveyUnitEligibilityInput {
   displayDefinition?: unknown
   sourceProvenance?: Record<string, unknown> | null
   contentSelection?: { reportRelease?: { releaseId: string; contentHash: string } | null } | null
-  nativeBundleReport?: unknown
+  /** Explicit audience of the bound contentSelection.reportRelease when resolved at freeze time. */
+  reportReleaseAudience?: string | null
+  nativeBundleReport?: { audience?: string | null } | unknown
   nativeBundleCognitiveReport?: unknown
 }
 
-/** Publish/freeze-time report eligibility for a Survey unit.
- * Must be evaluated AFTER governed/triplet/content-selection report bindings attach. */
+/** Publish/freeze-time participant report eligibility for a Survey unit.
+ * Must be evaluated AFTER governed/triplet/content-selection report bindings attach.
+ * Strictly separates tool content completeness from participant audience eligibility:
+ * researcher-only REPORT releases (`audience: 'researcher'`) never qualify for
+ * participant disclosure on their own. */
 export function evaluateSurveyUnitReportEligibility(unit: SurveyUnitEligibilityInput): ToolParticipantReportEligibility {
   if (unit.kind === 'FORM') {
     return dataCollectionOnly('普通表单仅用于信息采集，不生成受测者报告')
@@ -135,22 +149,48 @@ export function evaluateSurveyUnitReportEligibility(unit: SurveyUnitEligibilityI
   if (unit.kind === 'COGNITIVE') {
     return ready('NATIVE_TASK_REPORT')
   }
-  if (unit.contentSelection?.reportRelease) {
+  const boundReportRelease = unit.contentSelection?.reportRelease
+  const provenanceAudience = unit.sourceProvenance?.reportAudience
+  const boundReleaseIsResearcherOnly = Boolean(
+    boundReportRelease
+    && (
+      (unit.reportReleaseAudience !== undefined && !isParticipantReportAudience(unit.reportReleaseAudience))
+      || (unit.reportReleaseAudience === undefined && provenanceAudience === 'researcher')
+    ),
+  )
+  if (boundReportRelease && !boundReleaseIsResearcherOnly) {
     return ready('DECLARED_REPORT_RELEASE')
   }
   if (unit.kind === 'SJT') {
     if (unit.executionProtocol === 'SITUATIONAL_NATIVE_V1') {
       return ready('NATIVE_TASK_REPORT')
     }
-    return dataCollectionOnly('该情境测验未配置完整报告模板或原生报告，仅用于数据采集')
+    return dataCollectionOnly(
+      boundReleaseIsResearcherOnly
+        ? '该情境测验仅配置了面向研究者的报告模板，未配置受测者可读报告，仅用于数据采集'
+        : '该情境测验未配置完整报告模板或原生报告，仅用于数据采集',
+    )
   }
   // SCALE:
-  if (unit.nativeBundleReport || unit.sourceProvenance?.reportConfigured === true) {
+  const nativeBundleAudience = isRecord(unit.nativeBundleReport) ? unit.nativeBundleReport.audience : null
+  if (unit.nativeBundleReport && (nativeBundleAudience == null || isParticipantReportAudience(nativeBundleAudience))) {
+    return ready('STANDARD_TRIPLET_REPORT')
+  }
+  if (
+    unit.sourceProvenance?.reportConfigured === true
+    && !boundReleaseIsResearcherOnly
+    && (provenanceAudience === undefined || isParticipantReportAudience(provenanceAudience))
+  ) {
     return ready('STANDARD_TRIPLET_REPORT')
   }
   const scaleEligibility = hasConfiguredScaleDefinitionReport(unit.compiledDefinition)
   if (scaleEligibility.eligible) return scaleEligibility
-  return hasConfiguredScaleDefinitionReport(unit.displayDefinition)
+  const displayEligibility = hasConfiguredScaleDefinitionReport(unit.displayDefinition)
+  if (displayEligibility.eligible) return displayEligibility
+  if (boundReleaseIsResearcherOnly || provenanceAudience === 'researcher') {
+    return dataCollectionOnly('该工具仅配置了面向研究者的报告，未配置受测者可读报告，仅用于数据采集')
+  }
+  return displayEligibility
 }
 
 export interface EducationLeafEligibilityInput {
@@ -160,7 +200,7 @@ export interface EducationLeafEligibilityInput {
   reportObject?: unknown
 }
 
-/** Publish/freeze-time report eligibility for an Education (School / Teacher) composition block. */
+/** Publish/freeze-time participant report eligibility for an Education (School / Teacher) composition block. */
 export function evaluateEducationLeafReportEligibility(leaf: EducationLeafEligibilityInput): ToolParticipantReportEligibility {
   if (leaf.kind === 'FORM') {
     return dataCollectionOnly('普通表单仅用于信息采集，不生成受测者报告')
@@ -172,6 +212,23 @@ export function evaluateEducationLeafReportEligibility(leaf: EducationLeafEligib
     return leaf.standardReportConfigured === false
       ? dataCollectionOnly('该标准量表组合未配置报告（REPORT=none），仅用于数据采集')
       : ready('STANDARD_TRIPLET_REPORT')
+  }
+  if (isRecord(leaf.reportObject)) {
+    const reportVersion = typeof leaf.reportObject.reportVersion === 'string' ? leaf.reportObject.reportVersion.trim() : ''
+    if (reportVersion === 'none-v1') {
+      return dataCollectionOnly('该量表明确不配置报告（none-v1），仅用于数据采集')
+    }
+    const contentEligibility = evaluateScaleReportObject(leaf.reportObject)
+    if (contentEligibility.eligible) {
+      return contentEligibility
+    }
+    // Education private/library scales explicitly declare participant summary
+    // reporting via report.audienceContract (e.g. student/teacher self-report).
+    const contract = isRecord(leaf.reportObject.audienceContract) ? leaf.reportObject.audienceContract : null
+    if (contract && isParticipantReportAudience(contract.audience)) {
+      return ready('EDUCATION_AUDIENCE_CONTRACT')
+    }
+    return contentEligibility
   }
   return evaluateScaleReportObject(leaf.reportObject)
 }

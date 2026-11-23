@@ -15,7 +15,7 @@ import {evaluateSurveyUnitReportEligibility,type ToolParticipantReportEligibilit
 import {ContentReleaseError} from '../measurement-content/release'
 import { cognitiveMeasurementRelease } from '../measurement-content/cognitive'
 import { sjtMeasurementRelease } from '../measurement-content/sjt'
-import { publishContentRelease,requirePublishedContentRelease } from '../measurement-content/repository'
+import { getContentReleaseBatch,publishContentRelease,requirePublishedContentRelease } from '../measurement-content/repository'
 import { parseFrozenSurveyCognitive } from './cognitive.definition'
 import { scaleMeasurementRelease, surveyScaleReleaseContext } from '../measurement-content/scale'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
@@ -263,10 +263,15 @@ export async function freezeResearchWaveDraft(input:{
     if((input.contentSelections??[]).some(s=>units.some(u=>u.draftId===s.instrumentId&&(u.sourceProvenance?.surveyStandardReleaseId||u.sourceProvenance?.surveyToolReleaseId))))stop('已批准标准工具的参数与报告组合已冻结，不能在投放时替换版本')
     // Freeze content selections (bound REPORT/REFERENCE releases) BEFORE
     // checking participant report eligibility so researcher-bound REPORT
-    // templates count toward the tool-level publish-time gate.
+    // templates are checked with their exact audience toward the tool-level gate.
     await freezeSurveyContentSelections(tx,input.actorUserId,input.projectId,units,contentSelections)
+    const boundReportIds=[...new Set(units.flatMap(unit=>unit.contentSelection?.reportRelease?[unit.contentSelection.reportRelease.releaseId]:[]))]
+    const boundReports=boundReportIds.length?await getContentReleaseBatch(tx,boundReportIds):new Map()
     for(const unit of units){
-      unit.reportEligibility=evaluateSurveyUnitReportEligibility(unit)
+      const boundId=unit.contentSelection?.reportRelease?.releaseId
+      const boundRelease=boundId?boundReports.get(boundId):null
+      const reportReleaseAudience=boundRelease&&boundRelease.layer==='REPORT'?boundRelease.content.audience:undefined
+      unit.reportEligibility=evaluateSurveyUnitReportEligibility({...unit,reportReleaseAudience})
     }
     freezeSurveyParticipantFeedback(units,participantFeedback,feedbackMetrics)
     // Initial bounded research safety limit, not a measured capacity claim.

@@ -1309,12 +1309,18 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
     listCompositeFormSections(composite.id),
   ])
   const participantReportEligibility = trainingQuestionnaireReportEligibility(composite)
+  const hasScoredItems = composite.items.some((item: any) => item.type !== 'FORM')
+  const receiptOnlyAvailable = composite.productKind === 'QUESTIONNAIRE' && hasScoredItems
+  const defaultProvideParticipantReport = receiptOnlyAvailable
+    && participantReportEligibility.hasEligibleUnits
+    && !supportsReceiptOnlyPublication(composite)
   return {
     id: composite.id,
     productKind: composite.productKind,
     questionnaireType: composite.questionnaireType,
     receiptOnly: composite.receiptOnly === true,
-    receiptOnlyAvailable: composite.productKind === 'QUESTIONNAIRE' && composite.items.length > 0,
+    receiptOnlyAvailable,
+    defaultProvideParticipantReport,
     participantReportEligibility,
     ...(composite.personalTracking?{personalTracking:{baselineId:composite.personalTrackingBaselineId,ordinal:composite.personalTrackingOrdinal}}:{}),
     trainingFlowDraft:composite.trainingFlowDraft??null,trainingFlowFrozen:composite.trainingFlowFrozen??null,trainingFlowDigest:composite.trainingFlowDigest??null,
@@ -2461,15 +2467,13 @@ const publishCompositeInTransaction = async (userId: string, role: UserRole, id:
   if (provideParticipantReport === true && reportEligibility && !reportEligibility.hasEligibleUnits) {
     throw compositeBadRequest('当前问卷中的工具均未配置完整报告，仅用于数据采集，不能向作答者开放报告；请使用仅回执模式发布')
   }
-  const hasLongitudinalFormOnly = publicationSource.items.length > 0
-    && publicationSource.items.every((item: any) => item.type === 'FORM')
-    && Boolean((tracking as any)?.personalTracking)
+  const hasScoredItems = publicationSource.items.some((item: any) => item.type !== 'FORM')
   const receiptOnly = provideParticipantReport === false
     ? publicationSource.productKind === 'QUESTIONNAIRE'
     : provideParticipantReport === true
       ? false
       : supportsReceiptOnlyPublication(publicationSource)
-        || Boolean(reportEligibility && !reportEligibility.hasEligibleUnits && !hasLongitudinalFormOnly)
+        || Boolean(hasScoredItems && reportEligibility && !reportEligibility.hasEligibleUnits)
   const published = await db.compositeAssessment.update({
     where: { id },
     data: {
