@@ -11,7 +11,7 @@ type ImportPreview = {
 export default function ScaleCsvImport({ id, revision, disabled, onImported, onBusy, onFailure }: {
   id: string; revision?: string; disabled: boolean; onImported: (value: any) => void; onBusy: (value: boolean) => void; onFailure?: (error: unknown) => Promise<void>
 }) {
-  const [mode, setMode] = useState<'xlsx' | 'csv'>('xlsx')
+  const [mode, setMode] = useState<'xlsx' | 'csv'>('csv')
   const [content, setContent] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<ImportPreview | null>(null)
@@ -106,15 +106,15 @@ export default function ScaleCsvImport({ id, revision, disabled, onImported, onB
     <div className="flex flex-wrap items-center justify-between gap-2">
       <h3 className="font-semibold">{mode === 'xlsx' ? 'Excel 一步整份导入' : 'CSV 批量导入'}</h3>
       <div className="flex gap-2" role="tablist" aria-label="导入方式">
-        <button type="button" role="tab" aria-selected={mode === 'xlsx'} className={`hui-button ${mode === 'xlsx' ? 'hui-button--primary' : 'hui-button--secondary'}`} disabled={busy} onClick={() => { setMode('xlsx'); setPreview(null); setMessage(''); setFailed(false) }}>Excel 整份模板 (.xlsx)</button>
-        <button type="button" role="tab" aria-selected={mode === 'csv'} className={`hui-button ${mode === 'csv' ? 'hui-button--primary' : 'hui-button--secondary'}`} disabled={busy} onClick={() => { setMode('csv'); setPreview(null); setMessage(''); setFailed(false) }}>CSV 追加题目</button>
+        <button type="button" role="tab" aria-selected={mode === 'csv'} className={`hui-button ${mode === 'csv' ? 'hui-button--primary' : 'hui-button--secondary'}`} disabled={busy || disabled} onClick={() => { setMode('csv'); setPreview(null); setMessage(''); setFailed(false) }}>CSV 追加题目</button>
+        <button type="button" role="tab" aria-selected={mode === 'xlsx'} className={`hui-button ${mode === 'xlsx' ? 'hui-button--primary' : 'hui-button--secondary'}`} disabled={busy || disabled} onClick={() => { setMode('xlsx'); setPreview(null); setMessage(''); setFailed(false) }}>Excel 整份模板 (.xlsx)</button>
       </div>
     </div>
     {disabled && !busy && <p role="status">请先保存当前编辑内容，再进行导入。</p>}
     {mode === 'xlsx' ? <>
       <p className="text-sm">下载 3 页签 Excel 模板（选项组、题目与计分、阈值报告），填写后上传即可一次性覆盖并保存当前草稿的选项、题目、计分维度及阈值报告（若「阈值报告」留空，则视为仅数据采集工具）。</p>
       <div className="flex flex-wrap items-center gap-3">
-        <button type="button" className="hui-button hui-button--secondary" disabled={busy} onClick={() => void downloadTemplate()}>下载 Excel 模板</button>
+        <button type="button" className="hui-button hui-button--secondary" disabled={busy || disabled} onClick={() => void downloadTemplate()}>下载 Excel 模板</button>
         <label className="block text-sm">上传填写好的 .xlsx 文件<input type="file" accept=".xlsx" className="ml-2" disabled={busy || disabled} onChange={event => { setFile(event.target.files?.[0] ?? null); setPreview(null); setMessage(''); setFailed(false) }} /></label>
       </div>
       <button type="button" className="hui-button hui-button--secondary" disabled={busy || disabled || !file || !revision} onClick={() => void runWorkbook(false)}>预检 Excel</button>
