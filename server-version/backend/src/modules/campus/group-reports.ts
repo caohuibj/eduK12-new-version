@@ -22,6 +22,7 @@ import {parseFrozenSchoolOptions} from './privacyV2'
 import {projectCampusGeneralGroupV2} from './generalGroupV2.projection'
 import type {TaskArtifactCursor,TaskArtifactPointer} from '../reporting/task-artifact'
 import {assertCampusMetricDifferencing} from './group-contributor-differencing'
+import {readCampusSourceLabels,campusSourceLabelKey} from './source-labels'
 
 /** PR5 first tranche: INTERNAL school-only, whole frozen SELF/STUDENT Run.
  * This route never publishes peer/teacher ratings or longitudinal comparisons.
@@ -29,6 +30,7 @@ import {assertCampusMetricDifferencing} from './group-contributor-differencing'
  */
 export const CAMPUS_GROUP_MIN_N = 10
 const hidden = ():never=>reportingFail('CAMPUS_GROUP_REPORT_NOT_FOUND','school report unavailable',404)
+const displayLabel=(label:{title:string;versionLabel:string}|undefined)=>label?{title:label.title,versionLabel:label.versionLabel}:{}
 
 export async function requireCampusGroupManager(actor:AuthenticatedPrincipal, organizationId:string){
   if(actor.accountDomain!=='SCHOOL'||!['TEACHER','ADMIN'].includes(actor.role))hidden()
@@ -296,6 +298,11 @@ export async function projectCampusLeafGroupWithPolicy(input:Parameters<typeof p
     options=parseFrozenSchoolOptions(frozen.effective,frozen.scenario)
   }
   const report=projectCampusLeafGroupReport(input,leaf)
+  const labels=await readCampusSourceLabels(prisma,[{organizationId:input.organizationId,key:leaf.instrumentKey,family:leaf.unitType}])
+  const label=labels.get(campusSourceLabelKey({organizationId:input.organizationId,key:leaf.instrumentKey}))!
+  report.projection.tool.title=label.title
+  report.projection.sourceLabel=(input.presentation?.sourceLabel??'本轮测评')+' · '+label.title+' · '+label.versionLabel
+  report.projection.metrics=report.projection.metrics.map(metric=>({...metric,label:label.metricLabels[metric.key]??(metric.key==='total'?'总分':metric.label)}))
   const safe=projectCampusGeneralGroupV2({artifactId:input.artifactId,projection:input.projection,options,
     minimumN:CAMPUS_GROUP_MIN_N,metricMinimums:Object.fromEntries(report.projection.metrics
       .map(metric=>[metric.key,Math.max(CAMPUS_GROUP_MIN_N,input.metricMetadata?.[metric.key]?.minimumN??0)]))})
@@ -325,8 +332,9 @@ async function reviewedSpec(specId:string){
 export async function listCampusGroupReportSources(actor:AuthenticatedPrincipal,organizationId:string,page=1){
   const principal=await requireCampusGroupManager(actor,organizationId)
   const result=await listOrganizationReportingSources({principal,organizationId,page,pageSize:100,analysisKind:'GROUP'})
+  const labels=await readCampusSourceLabels(prisma,result.list.map(s=>({organizationId,key:s.resource.key,family:s.resource.family})))
   return {sources:result.list.map(s=>({runId:s.runId,trackId:s.trackId,name:s.runName,
-    resource:{family:s.resource.family,key:s.resource.key,version:s.resource.version}})),nextSourcePage:result.nextPage}
+    resource:{family:s.resource.family,key:s.resource.key,version:s.resource.version,...displayLabel(labels.get(campusSourceLabelKey({organizationId,key:s.resource.key})))}})),nextSourcePage:result.nextPage}
 }
 
 export async function listCampusGroupReportCatalog(actor:AuthenticatedPrincipal,organizationId:string){
@@ -349,12 +357,13 @@ export async function listCampusGroupReportCatalog(actor:AuthenticatedPrincipal,
     &&(s.privacy.minimumCohortN??0)>=CAMPUS_GROUP_MIN_N
     &&(s.privacy.minimumContributorN??0)>=CAMPUS_GROUP_MIN_N)
   const sourceList=sources.list
+  const labels=await readCampusSourceLabels(prisma,sourceList.map(s=>({organizationId,key:s.resource.key,family:s.resource.family})))
   return {specs:allowedSpecs.map(s=>({
     specId:s.specId,title:s.specKey,version:s.version,
     privacy:s.privacy,metricIds:s.metricIds,
   })),sources:sourceList.map(s=>({
     runId:s.runId,trackId:s.trackId,name:s.runName,
-    resource:{family:s.resource.family,key:s.resource.key,version:s.resource.version},
+    resource:{family:s.resource.family,key:s.resource.key,version:s.resource.version,...displayLabel(labels.get(campusSourceLabelKey({organizationId,key:s.resource.key})))},
   })),artifacts,nextSourcePage:sources.nextPage,truncated:!!sources.truncated||specs.total>50}
 }
 
@@ -384,7 +393,8 @@ export async function listCampusGroupReportTools(input:{actor:AuthenticatedPrinc
     campusGroupHistoryPage(input),
   ])
   await requireCampusGroupManager(input.actor,input.organizationId)
-  return {tools,groups,...history}
+  const labels=await readCampusSourceLabels(prisma,tools.map(row=>({organizationId:input.organizationId,key:row.leaf.instrumentKey,family:row.leaf.unitType})))
+  return {tools:tools.map(row=>({...row,...displayLabel(labels.get(campusSourceLabelKey({organizationId:input.organizationId,key:row.leaf.instrumentKey})))})),groups,...history}
 }
 
 export async function generateCampusGroupReport(input:{

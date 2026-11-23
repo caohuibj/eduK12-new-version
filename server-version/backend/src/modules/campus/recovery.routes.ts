@@ -8,7 +8,7 @@ import { asyncHandler } from '../../middleware/asyncHandler'
 import { CampusAdmissionError } from './admission.service'
 import {
   issueSchoolStudentRecovery, completeSchoolStudentRecovery,
-  requestSchoolMfaReset, approveSchoolMfaReset,
+  requestSchoolMfaReset, approveSchoolMfaReset, listSchoolMfaResets,
 } from './recovery.service'
 import { success } from '../../utils/response'
 import { isValidPassword, PASSWORD_MAX_LENGTH } from '../../utils/password'
@@ -16,11 +16,18 @@ import { isValidPassword, PASSWORD_MAX_LENGTH } from '../../utils/password'
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 const ids=z.string().guid()
+const resetMessages:Record<string,string>={
+  TWO_OFFICERS_REQUIRED:'必须由另一名学校管理员独立审批，申请人不能批准自己的请求。',
+  MULTI_SCHOOL_MFA_RESET_REQUIRES_OPERATOR:'该账号属于多个学校，请联系平台核实恢复。',
+  MFA_RESET_TARGET_NOT_ENROLLED:'该账号当前未绑定有效验证器，请刷新核对。',
+  MFA_RESET_REQUEST_UNAVAILABLE:'恢复请求已处理或已过期，请刷新核对。',
+  MFA_RESET_REQUEST_PENDING:'该账号已有待审批请求，请刷新后由另一名管理员核实处理。',
+}
 const wrap=(handler:(req:any,res:any)=>Promise<any>)=>asyncHandler(async(req,res)=>{
   try{return await handler(req,res)}
   catch(err){
     if(err instanceof CampusAdmissionError)
-      return res.status(err.statusCode).json({code:err.code,message:'账户操作暂不可用，请联系学校核对',data:null})
+      return res.status(err.statusCode).json({code:err.code,message:resetMessages[err.code]??'账户操作暂不可用，请联系学校核对',data:null})
     if(err instanceof ZodError)
       return res.status(400).json({code:'BAD_REQUEST',message:'请求信息格式不正确',data:null})
     throw err
@@ -57,6 +64,9 @@ router.post('/credentials/redeem',
     return success(res,result,'校园账号已恢复，原会话失效，请重新登录')
   }))
 )
+
+router.get('/organizations/:organizationId/mfa-resets',...privileged,wrap(async(req,res)=>
+  success(res,await listSchoolMfaResets({actor:req.user!,organizationId:ids.parse(req.params.organizationId)}))))
 
 router.post('/organizations/:organizationId/mfa-resets',
   ...privileged,wrap(async(req,res)=>{

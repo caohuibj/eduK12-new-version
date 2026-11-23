@@ -4,7 +4,7 @@ import {ArrowLeft,ArrowRight,MessageSquareText} from 'lucide-react'
 import {workspaceHref} from './school-navigation'
 import type { SchoolApi } from './SchoolRecovery'
 
-type ParentLinks = {list:Array<{id:string;status:string}>}
+type ParentLinks = {list:Array<{id:string;status:string;counterpartLabel?:string}>}
 type ReportOption = {id:string;title:string;canConsent:boolean;canRevoke?:boolean;legacy?:boolean}
 type Options = {list:ReportOption[];truncated:boolean}
 type ParentProjection = {
@@ -16,7 +16,7 @@ type ConsentPreview = {
   consentVersion?:string;consentText?:string;commandKey?:string;publicationHash?:string
   canConsent:boolean;canRevoke:boolean;consentStatus?:string
 }
-type Child = {childId:string;relationshipId:string}
+type Child = {childId:string;relationshipId:string;childLabel?:string}
 type ChildList = {list:Child[];hasMore:boolean}
 type ParentReport = {id:string;title:string;mode:'COMPLETION_ONLY'|'EDUCATIONAL_SUMMARY'}
 type ParentReportList = {list:ParentReport[];hasMore:boolean}
@@ -98,7 +98,7 @@ export function SchoolStudentReportConsent({api}: {api:SchoolApi}) {
       <p>目前没有已确认的亲子关系，无需设置报告分享。</p>:
       <div className="hs-actions">{links.list.filter(item=>item.status==='ACTIVE').map((item,i)=>
         <button key={item.id} disabled={busy} aria-pressed={selected===item.id}
-          onClick={()=>void choose(item.id)}>查看第 {i+1} 位已关联家长的可分享报告</button>)}</div>}
+          onClick={()=>void choose(item.id)}>{item.counterpartLabel?'查看 '+item.counterpartLabel+' 的可分享报告':`查看第 ${i+1} 位已关联家长的可分享报告`}</button>)}</div>}
     {selected&&options&&<div className="hs-task-list">
       {options.list.length===0?<p>目前没有经过审核且允许分享的家长版报告。</p>:
         options.list.map(option=><article className="hs-task-card" key={option.id}>
@@ -174,7 +174,7 @@ export function SchoolParentReports({api}: {api:SchoolApi}) {
       <p>目前没有可申请查看报告的有效亲子关系。</p>:
       <div className="hs-actions">{children.list.map((row,i)=>
         <button key={row.relationshipId} aria-pressed={child===row.childId}
-          onClick={()=>void selectChild(row.childId)}>孩子 {i+1} 的获准反馈</button>)}</div>}
+          onClick={()=>void selectChild(row.childId)}>{row.childLabel??'孩子 '+(i+1)} 的获准反馈</button>)}</div>}
     {reports&&<div className="hs-task-list">{reports.list.length===0?
       <p>该孩子目前没有完成全部单份授权步骤的家长报告。</p>:
       reports.list.map(report=><article className="hs-task-card" key={report.id}>
@@ -345,6 +345,8 @@ export function SchoolDisclosureOfficers({api,organizationId}: {api:SchoolApi;or
   const [busy,setBusy]=useState(false)
   const [error,setError]=useState('')
   const [notice,setNotice]=useState('')
+  const commands=useRef(new Map<string,string>())
+  const mutationLock=useRef(false)
   const reload=async()=>{
     const value=await api<DisclosureOfficers>('/organizations/'+organizationId+'/disclosure-officers')
     setOfficers(value)
@@ -358,17 +360,23 @@ export function SchoolDisclosureOfficers({api,organizationId}: {api:SchoolApi;or
     return ()=>{active=false}
   },[api,organizationId])
   const change=async(officer:DisclosureOfficer)=>{
+    if(mutationLock.current)return
     const grant=!officer.hasDisclosure
     if(grant&&!officer.hasPsychology)return
     if(!window.confirm(grant?'确认向此心理教师授予家长报告逐份披露能力？此授权不自动向家长开放任何报告。':'确认立即撤销此心理教师的家长报告披露能力？已获批的家长访问将重新校验。'))return
+    mutationLock.current=true
     setError('');setNotice('');setBusy(true)
+    const operation=organizationId+':'+officer.membershipId+':'+String(grant)
+    const commandKey=commands.current.get(operation)??crypto.randomUUID()
+    commands.current.set(operation,commandKey)
     try{
       const prefix='/organizations/'+organizationId+'/memberships/'+officer.membershipId+'/capabilities'
-      await api(prefix+(grant?'':'/revoke'),'POST',{capability:'PARENT_REPORT_DISCLOSURE'})
+      await api(prefix+(grant?'':'/revoke'),'POST',{capability:'PARENT_REPORT_DISCLOSURE',commandKey})
+      commands.current.delete(operation)
       await reload()
       setNotice(grant?'已授予专项披露能力；仍需要当前合法个案关系、审核发布和学生单份同意。':'专项披露能力已撤销；新读取需要重新通过权限校验。')
     }catch(e){setError(reason(e,'权限操作未完成，请检查近期 TOTP 验证和当前学校授权'))}
-    finally{setBusy(false)}
+    finally{mutationLock.current=false;setBusy(false)}
   }
   return <section className="hs-panel">
     <h2>学校管理员 · 家长报告披露人员授权</h2>

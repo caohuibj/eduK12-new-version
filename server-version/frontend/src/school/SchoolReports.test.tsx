@@ -8,6 +8,28 @@ const CHILD_B='00000000-0000-4000-8000-000000000002'
 const ARTIFACT='00000000-0000-4000-8000-000000000003'
 
 describe('Huischool report privacy and lifecycle UI', () => {
+  it('retries an uncertain disclosure command with the same key and uses a different key for revoke',async()=>{
+    const confirm=vi.spyOn(window,'confirm').mockReturnValue(true)
+    let attempts=0,granted=false
+    const keys:string[]=[]
+    const api=vi.fn(async(_path:string,method='GET',payload?:any)=>{
+      if(method==='POST'){
+        keys.push(payload.commandKey);attempts++
+        if(attempts===1)throw Error('响应未确认，请重试')
+        granted=!granted;return {}
+      }
+      return {list:[{membershipId:'staff',displayName:'心理教师',hasPsychology:true,hasDisclosure:granted}]}
+    })
+    render(<SchoolDisclosureOfficers api={api as SchoolApi} organizationId={CHILD_A}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'授予专项披露能力'}))
+    await screen.findByRole('alert')
+    fireEvent.click(screen.getByRole('button',{name:'授予专项披露能力'}))
+    fireEvent.click(await screen.findByRole('button',{name:'撤销披露能力'}))
+    await screen.findByRole('button',{name:'授予专项披露能力'})
+    expect(keys).toHaveLength(3);expect(keys[0]).toMatch(/^[a-f0-9-]{36}$/)
+    expect(keys[1]).toBe(keys[0]);expect(keys[2]).not.toBe(keys[0])
+    confirm.mockRestore()
+  })
   it('never displays a report solely from an ACTIVE relationship',async()=>{
     const api=vi.fn(async(path:string)=>{
       if(path==='/reports/parent/children')return {list:[{childId:CHILD_A,relationshipId:'link-a'}],hasMore:false}
@@ -94,14 +116,14 @@ describe('Huischool report privacy and lifecycle UI', () => {
     const api=vi.fn(async(path:string,method='GET',payload?:unknown)=>{
       if(method==='POST') {
         expect(path).toBe('/organizations/'+CHILD_A+'/memberships/staff-one/capabilities')
-        expect(payload).toEqual({capability:'PARENT_REPORT_DISCLOSURE'})
+        expect(payload).toEqual({capability:'PARENT_REPORT_DISCLOSURE',commandKey:expect.any(String)})
         return {}
       }
       return {list:[{membershipId:'staff-one',displayName:'学校心理教师',hasPsychology:true,hasDisclosure:false}]}
     })
     render(<SchoolDisclosureOfficers api={api as SchoolApi} organizationId={CHILD_A}/>)
     fireEvent.click(await screen.findByRole('button',{name:'授予专项披露能力'}))
-    await waitFor(()=>expect(api).toHaveBeenCalledWith(expect.stringContaining('/memberships/staff-one/capabilities'),'POST',{capability:'PARENT_REPORT_DISCLOSURE'}))
+    await waitFor(()=>expect(api).toHaveBeenCalledWith(expect.stringContaining('/memberships/staff-one/capabilities'),'POST',{capability:'PARENT_REPORT_DISCLOSURE',commandKey:expect.any(String)}))
     confirm.mockRestore()
   })
 

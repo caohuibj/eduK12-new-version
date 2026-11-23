@@ -7,7 +7,7 @@ import { sanitizeFormAnswers } from './form-visibility'
 
 const options=[{optionKey:'a',label:'选项 A'},{optionKey:'other',label:'其他情况'},
   {optionKey:'none',label:'均不符合'}]
-const question={itemKey:'source',type:'MULTIPLE',options,otherOptionKey:'other',
+const question={itemKey:'source',prompt:'消息来源',type:'MULTIPLE',options,otherOptionKey:'other',
   otherMaxLength:20,exclusiveOptionKeys:['none']}
 function Host(){
   const [answers,setAnswers]=useState<Record<string,ProfessionalAnswer>>({source:['other']})
@@ -26,7 +26,7 @@ describe('Form V2 other text and exclusive-choice UI contracts',()=>{
     expect(hasSelectedOther(question,['a','other'])).toBe(true)
     expect(hasSelectedOther(question,['a'])).toBe(false)
     render(<Host/>)
-    const field=screen.getByRole('textbox',{name:'其他填写：source'})
+    const field=screen.getByRole('textbox',{name:'其他填写：消息来源'})
     expect(field).toBeRequired()
     fireEvent.change(field,{target:{value:'具体情况'}})
     const answers=JSON.parse(screen.getByTestId('answers').textContent||'{}')

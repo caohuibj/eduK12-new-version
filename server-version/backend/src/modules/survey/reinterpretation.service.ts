@@ -147,6 +147,26 @@ export async function createSurveyReinterpretation(actorId:string,raw:unknown){
   },txOptions)
 }
 
+export async function listSurveyReinterpretations(actorId:string,input:{projectId:string;waveId:string;finalId:string;afterId?:string}){
+  const source=await loadSurveySource({actorUserId:actorId,projectId:input.projectId,waveIds:[input.waveId],finalId:input.finalId,
+    maxFinals:1,selectRaw:false,selectScore:false,includeInterpretation:true,includeAttendance:false})
+  if(source.completeAttempts!==1)throw new SurveyAnalyticsError(404,'研究数据不可访问')
+  return prisma.$transaction(async tx=>{
+    await authorizedProject(tx,actorId,input.projectId,false)
+    await fence(tx,input,source)
+    const scope={finalId:input.finalId,sourceFinalHash:source.interpretations![0].sourceFinalHash}
+    const cursor=input.afterId?await tx.surveyInterpretationArtifact.findFirst({
+      where:{...scope,id:input.afterId},select:{id:true}
+    }):null
+    if(input.afterId&&!cursor)throw new SurveyAnalyticsError(404,'历史解释记录不可访问')
+    const rows=await tx.surveyInterpretationArtifact.findMany({
+      where:scope,...(cursor?{cursor:{id:cursor.id},skip:1}:{}),
+      orderBy:[{createdAt:'desc'},{id:'desc'}],take:21,select:{id:true,createdAt:true}
+    })
+    return {list:rows.slice(0,20),nextAfterId:rows.length>20?rows[19].id:null}
+  },txOptions)
+}
+
 /** Current authorized data reader; returning a saved artifact never reruns its
  * selector, numerical reference resolution, renderer or lifecycle choice. */
 export async function readSurveyReinterpretation(actorId:string,input:{projectId:string;waveId:string;finalId:string;artifactId:string}){

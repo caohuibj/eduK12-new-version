@@ -29,7 +29,7 @@ export function assertRecentSurveyMfa(req:Request):void{
   if(!payload||payload.accountDomain!=='SURVEY'||payload.userId!==req.user?.userId
     ||payload.tokenVersion!==req.user?.tokenVersion
     ||typeof verified!=='number'||verified>now||now-verified>300)
-    fail(403,'导出包含研究原始数据，需要最近五分钟的 TOTP 二次验证')
+    fail(403,'此操作需要最近五分钟的 TOTP 二次验证，请先验证身份再重试。')
 }
 const maxBytes=2*1024*1024
 const artifactFor=(format:Format,projectId:string,source:Awaited<ReturnType<typeof loadSurveySource>>,waveId?:string)=>{

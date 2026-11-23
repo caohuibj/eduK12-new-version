@@ -9,6 +9,7 @@ import { LINK_CONSENT_TEXT, LINK_CONSENT_VERSION } from '../parent-portal/contra
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { appendAudit } from '../organization/service'
 import { CampusAdmissionError } from './admission.service'
+import { campusStudentReference } from './studentReference'
 
 type Tx=Prisma.TransactionClient
 const refuse=(code='CAMPUS_PARENT_LINK_UNAVAILABLE',status=404):never=>{
@@ -159,21 +160,26 @@ async function verifiedRelationship(tx:Tx,actor:AuthenticatedPrincipal,id:string
   await assertCurrentChild(tx,link.organizationId,link.studentUserId)
   return link
 }
-export async function readCampusParentLinks(actor:AuthenticatedPrincipal){
+export async function readCampusParentLinks(actor:AuthenticatedPrincipal,relationshipIds?:string[]){
   if(actor.accountDomain!=='SCHOOL'||!['STUDENT','PARENT'].includes(actor.role))
     refuse('CAMPUS_PARENT_AUTH_REQUIRED',403)
-  const rows=await prisma.$queryRaw<Array<{id:string;status:string;approvedAt:Date|null}>>`
-    SELECT r."id",r."status",r."approved_at" AS "approvedAt"
+  const rows=await prisma.$queryRaw<Array<{id:string;status:string;approvedAt:Date|null;organizationId:string;studentUserId:string;parentLogin:string|null}>>`
+    SELECT r."id",r."status",r."approved_at" AS "approvedAt",
+      i."organization_id" AS "organizationId",r."student_user_id" AS "studentUserId",pc.login_name AS "parentLogin"
     FROM "parent_student_relationships" r
     JOIN "parent_invite_codes" i ON i."id"=r."invite_code_id"
       AND i."organization_id" IS NOT NULL AND i."course_id" IS NULL
     JOIN "users" p ON p."id"=r."parent_user_id" AND p."account_domain"='SCHOOL'
     JOIN "users" s ON s."id"=r."student_user_id" AND s."account_domain"='SCHOOL'
-    WHERE (${actor.role}='STUDENT' AND r."student_user_id"=${actor.userId})
-      OR (${actor.role}='PARENT' AND r."parent_user_id"=${actor.userId})
+    LEFT JOIN campus_accounts pc ON pc.user_id=p.id
+    WHERE ((${actor.role}='STUDENT' AND r."student_user_id"=${actor.userId})
+      OR (${actor.role}='PARENT' AND r."parent_user_id"=${actor.userId}))
+      ${relationshipIds?relationshipIds.length?Prisma.sql`AND r.id IN (${Prisma.join(relationshipIds)})`:Prisma.sql`AND FALSE`:Prisma.empty}
     ORDER BY r."created_at" DESC,r."id" DESC LIMIT 101
   `
-  return {list:rows.slice(0,100),truncated:rows.length>100,
+  return {list:rows.slice(0,100).map(({organizationId,studentUserId,parentLogin,...row})=>({...row,
+    counterpartLabel:actor.role==='PARENT'?'孩子 · '+campusStudentReference(organizationId,studentUserId):'家长账号 · '+(parentLogin??'关联 '+row.id.slice(-8)),
+  })),truncated:rows.length>100,
     canApprove:actor.role==='STUDENT'}
 }
 export async function approveCampusParentLink(actor:AuthenticatedPrincipal,id:string,version:string){

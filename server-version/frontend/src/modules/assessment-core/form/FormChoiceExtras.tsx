@@ -29,7 +29,7 @@ export function FormChoiceExtras({question,answers,onChange}:{
   return <label className="block mt-3 text-sm space-y-1">
     <span className="block">请说明「{label}」（必填，最多 {question.otherMaxLength??300} 字）</span>
     <input className="input block w-full" required type="text"
-      aria-label={'其他填写：'+question.itemKey} maxLength={question.otherMaxLength??300}
+      aria-label={'其他填写：'+(question.prompt??question.itemKey)} maxLength={question.otherMaxLength??300}
       value={typeof text==='string'?text:''}
       onChange={e=>onChange(otherKey,e.target.value)}/>
   </label>

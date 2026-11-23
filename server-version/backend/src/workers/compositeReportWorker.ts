@@ -65,10 +65,49 @@ export const processCompositeReportJob = async (job: CompositeReportJob): Promis
       else if (completionOnly) {
         const aggregateInputHash = result.aggregateInputHash ?? parent.aggregateInputHash
         if (!aggregateInputHash) throw new Error('WHOLE_AGGREGATE_HASH_MISSING')
-        outcome = { kind: 'ready', aggregateInputHash, reportEncrypted: encryptUnifiedRuntimePayload({
-          schemaVersion: 1, kind: parent.receiptOnly ? 'WHOLE_RECEIPT_MATERIALIZED' : 'EDUCATION_WHOLE_MATERIALIZED',
-          attemptId: job.attemptId, aggregateInputHash,
-        }) }
+        const fallbackStub = {
+          schemaVersion: 1,
+          kind: parent.receiptOnly ? 'WHOLE_RECEIPT_MATERIALIZED' : 'EDUCATION_WHOLE_MATERIALIZED',
+          attemptId: job.attemptId,
+          aggregateInputHash,
+        }
+        let reportEncrypted: string | null = null
+        if (educationWhole && !receiptOnly && process.env.EDUCATION_FEEDBACK_PREMATERIALIZE_ENABLED !== 'false') {
+          try {
+            const { materializeEducationWholeFeedbackForWorker } = await import('../modules/reporting/education-ordinary-declared-feedback')
+            const preMaterialized = await traceAssessmentPhase('report.education_feedback_materialize', () =>
+              materializeEducationWholeFeedbackForWorker(prisma, {
+                attemptId: job.attemptId,
+                attemptEpoch: job.attemptEpoch,
+                aggregateInputHash,
+              }),
+            )
+            if (preMaterialized) {
+              const candidate = encryptUnifiedRuntimePayload(preMaterialized)
+              if (Buffer.byteLength(candidate, 'utf8') <= settings.maxReportBytes) {
+                reportEncrypted = candidate
+              } else {
+                logger.warn('Education feedback pre-materialization exceeded maxReportBytes; falling back to stub', {
+                  jobId: job.id,
+                  attemptId: job.attemptId,
+                  bytes: Buffer.byteLength(candidate, 'utf8'),
+                  maxReportBytes: settings.maxReportBytes,
+                })
+              }
+            }
+          } catch (error) {
+            logger.warn('Education feedback pre-materialization skipped; GET /feedback retains live fallback', {
+              jobId: job.id,
+              attemptId: job.attemptId,
+              error: String(error),
+            })
+          }
+        }
+        outcome = {
+          kind: 'ready',
+          aggregateInputHash,
+          reportEncrypted: reportEncrypted ?? encryptUnifiedRuntimePayload(fallbackStub),
+        }
       }
       else outcome = { kind: 'ready', ...await traceAssessmentPhase('report.aggregate_materialize', () => materializeCompositeQuestionnaireReport(job.attemptId, {
         attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextHash: job.contextHash,

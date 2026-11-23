@@ -88,7 +88,15 @@ describe('School append-only private form import',()=>{
  it('checks current authority and exact ownership/product scope on both stages',async()=>{
   await expect(importPrivateForm({...c,principal:{...c.principal,accountDomain:'TRAINING' as never}},id(2),input())).rejects.toMatchObject({code:'PRIVATE_TOOL_AUTHOR_REQUIRED'})
   for(const changed of [{...c,organizationId:id(7)},{...c,principal:{...c.principal,userId:id(7)}}])await expect(importPrivateForm(changed,id(2),input())).rejects.toMatchObject({code:'PRIVATE_TOOL_NOT_FOUND'})
-  await expect(importPrivateForm({...c,entry:'TEACHER'},id(2),input())).rejects.toMatchObject({code:'PRIVATE_TOOL_FORM_IMPORT_NOT_AVAILABLE'})
+  // Cross-entry isolation and Teacher private form bulk import support:
+  await expect(importPrivateForm({...c,entry:'TEACHER'},id(2),input())).rejects.toMatchObject({code:'PRIVATE_TOOL_AUTHOR_REQUIRED'})
+  m.query.mockResolvedValue([{organizationId:id(1),organizationName:'Synthetic',membershipId:id(5),orgRole:'ORG_ADMIN',productAdmin:true}])
+  await expect(importPrivateForm({...c,entry:'TEACHER'},id(2),input())).rejects.toMatchObject({code:'PRIVATE_TOOL_NOT_FOUND'})
+  stored.entry='TEACHER'
+  const teacherPreview=await importPrivateForm({...c,entry:'TEACHER'},id(2),input())
+  expect(teacherPreview).toMatchObject({ok:true,count:1})
+  stored.entry='SCHOOL'
+  m.query.mockResolvedValue([{organizationId:id(1),organizationName:'Synthetic',membershipId:id(5),orgRole:'MEMBER',productAdmin:false}])
   const p=await preview();m.query.mockResolvedValue([])
   await expect(importPrivateForm(c,id(2),proof(p),true)).rejects.toMatchObject({code:'PRIVATE_TOOL_AUTHOR_REQUIRED'})
   expect(m.update).not.toHaveBeenCalled()

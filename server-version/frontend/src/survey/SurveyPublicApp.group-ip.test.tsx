@@ -47,6 +47,21 @@ async function recover(){
 beforeEach(()=>{sessionStorage.clear();window.history.replaceState(null,'',`/r/${pid}`)})
 afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();vi.restoreAllMocks()})
 describe('scoped same-IP participant discovery',()=>{
+  it('rechecks a paused invitation when the same tab receives a fresh link',async()=>{
+    window.history.replaceState(null,'','/r/'+pid+'#entry='+token)
+    const {fetcher}=fixture({singleGroup:true})
+    fetcher.mockImplementationOnce(()=>response({project:{name:'研究项目',collectionMode:'SINGLE_UNLINKED',status:'ACTIVE'},waves:[]}))
+    render(<SurveyPublicApp/>)
+    await screen.findByRole('button',{name:'重新检查开放状态'})
+    const replacement='b'.repeat(43)
+    act(()=>{
+      window.history.replaceState(null,'','/r/'+pid+'#entry='+replacement)
+      window.dispatchEvent(new HashChangeEvent('hashchange'))
+    })
+    await screen.findByRole('checkbox',{name:'我已阅读以上说明，自愿参加本次问卷。'})
+    expect(window.location.hash).toBe('')
+    expect(fetcher.mock.calls.filter(([url])=>String(url).endsWith('/info')).map(([,init])=>JSON.parse(String(init?.body)).entryToken)).toEqual([token,replacement])
+  })
   it('requires a new consent choice when invitation discovery changes the consent version',async()=>{
     const api=fixture({ordinaryToken:true,singleGroup:true});render(<SurveyPublicApp/>)
     const agreement=await screen.findByRole('checkbox',{name:'我已阅读以上说明，自愿参加本次问卷。'})

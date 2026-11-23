@@ -154,14 +154,14 @@ export function SurveyCognitiveUnit({publicId,attemptId,instrumentKey,title,proo
     <h3 className="font-semibold text-lg">{title}</h3>
     {error&&<p role="alert">{error}</p>}
     {committed?<div role="status" className="space-y-2"><h4 className="font-semibold">此任务已提交</h4>
-      <p>认知子结果已由服务器确认。请继续完成本轮研究并提交整轮回答。</p>
+      <p>认知任务结果已保存。请继续填写，再点击「提交整份问卷」。</p>
       <p className="text-xs">任务回执：{committed.resultId} · 尝试 {committed.epoch}</p></div>:
       checking?<p role="status">正在核对已保存的任务状态…</p>:
       recovery?<div className="space-y-3"><p>此前任务未确认完成。不会混入旧试次或从中间续测；先查询已封存提交，再按冻结规则整单元重做。</p>
         <p className="text-sm">已用尝试：{epoch} / 2。之前的普通问卷答案保持锁定。</p>
         <button type="button" className="btn-secondary" disabled={busy} onClick={()=>void readThenRestart()}>{epoch>=2?'仅核对已封存提交':'核对提交并处理整单元重做'}</button></div>:
       sessionId?<MemoryRouter><CognitiveRunner key={sessionId} embedded={{sessionId,api,
-        requiredInput:'KEYBOARD',failClosedOnTrialPersistence:true,completionTitle:'此认知任务已提交',completionAction:'确认任务回执，继续研究',
+        requiredInput:'KEYBOARD',failClosedOnTrialPersistence:true,submitLabel:'保存认知任务结果',completionTitle:'认知任务已保存',completionAction:'确认任务回执，继续研究',
         completionNotice:'单个任务已持久化；整轮研究尚需最终提交。',
         onCompleted:()=>{const token=generation.current;void api.getSession(sessionId).catch(e=>{if(isCurrent(token))setError(e instanceof Error?e.message:'回执读取失败')})},
         onExit:()=>{releaseDraft();setRecovery(true);callbacks.current.onRunningChange(false)},

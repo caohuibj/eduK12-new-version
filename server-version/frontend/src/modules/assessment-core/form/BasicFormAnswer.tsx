@@ -25,10 +25,18 @@ export function BasicFormAnswer({ question: q, value, onChange, disabled = false
     step={q.step ?? (q.integerOnly ? 1 : 'any')} placeholder={placeholder}
     value={typeof value === 'number' && Number.isFinite(value) ? value : ''}
     onChange={e => onChange(e.target.value === '' || !Number.isFinite(e.target.valueAsNumber) ? null : e.target.valueAsNumber)} />
-  if (q.type === 'DATE' || q.type === 'TIME') return <div className="space-y-1">
-    <input {...common} type={q.type === 'DATE' ? 'date' : 'time'}
-      value={typeof value === 'string' ? value : ''} onChange={e => onChange(e.target.value || null)} />
-    {q.type === 'TIME' && <p className="text-xs text-slate-600">时间解释时区：{q.timeZone === 'UTC' ? 'UTC' : '中国标准时间（UTC+08:00）'}；请填写 24 小时制。</p>}
-  </div>
+  if (q.type === 'DATE' || q.type === 'TIME') {
+    // Native pickers and keyboard editing can commit at different points.
+    const commit = (event: { currentTarget: HTMLInputElement }) => {
+      const next = event.currentTarget.value || null
+      if (next !== (value ?? null)) onChange(next)
+    }
+    return <div className="space-y-1">
+      <input {...common} type={q.type === 'DATE' ? 'date' : 'time'}
+        value={typeof value === 'string' ? value : ''} onInput={commit} onBlur={commit}
+        onChange={event => { if (event.nativeEvent.type !== 'input') commit(event) }} />
+      {q.type === 'TIME' && <p className="text-xs text-slate-600">时间解释时区：{q.timeZone === 'UTC' ? 'UTC' : '中国标准时间（UTC+08:00）'}；请填写 24 小时制。</p>}
+    </div>
+  }
   return null
 }

@@ -3,7 +3,7 @@ import { HeartHandshake, RefreshCw } from 'lucide-react'
 import { SchoolTaskHelp } from './SchoolTaskHelp'
 import type { SchoolApi } from './SchoolRecovery'
 
-type ParentLink={id:string;status:string;approvedAt:string|null}
+type ParentLink={id:string;status:string;approvedAt:string|null;counterpartLabel?:string}
 type ParentLinks={list:ParentLink[];truncated:boolean;canApprove:boolean}
 type Consent={version:string;text:string;reminder:string}
 export function SchoolParentRegistration({api,onRegistered,resolvedInviteCode}:{
@@ -88,11 +88,12 @@ export function SchoolParentLinks({api,role,organizationId}:{
   }
   const relationshipRecords=!links?null:links.list.length===0?!loading&&!readError&&<p>目前没有亲子关联记录。</p>:
       <div>{links.list.map(link=><div className="hs-task-card" key={link.id}>
+        <h3>{link.counterpartLabel??'亲子关联 · '+link.id.slice(-8)}</h3>
         <p>关联状态：{link.status==='PENDING'?'等待孩子确认':
           link.status==='ACTIVE'?'有效亲子关系':'关系已撤销'}</p>
         {role==='STUDENT'&&link.status==='PENDING'&&
           <button disabled={busy||loading||!consent} onClick={()=>void execute(async()=>{
-            if(!window.confirm('确认此邀请码确实交给你要关联的监护人，并知晓报告不自动公开？'))return
+            if(!window.confirm('确认与'+(link.counterpartLabel??'此监护人')+'建立亲子关系，并知晓报告不自动公开？'))return
             await api('/parent-links/'+link.id+'/approve','POST',{
               consentVersion:consent!.version,
             })
@@ -100,7 +101,7 @@ export function SchoolParentLinks({api,role,organizationId}:{
           })}>确认监护人关系</button>}
         {link.status!=='REVOKED'&&
           <button disabled={busy||loading} onClick={()=>void execute(async()=>{
-            if(!window.confirm('撤销此亲子关系并停止新的关联授权？'))return
+            if(!window.confirm('撤销与'+(link.counterpartLabel??'此对象')+'的亲子关系并停止新的关联授权？'))return
             await api('/parent-links/'+link.id+'/revoke','POST',{reason:'已由本人撤销校园亲子关联'})
             await reload();setNotice('关联已撤销。')
           })}>撤销关联</button>}

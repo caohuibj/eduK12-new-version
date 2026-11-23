@@ -18,11 +18,16 @@ const uuid=z.string().guid()
 const path=z.object({organizationId:uuid,courseId:uuid})
 const limiter=createRedisRateLimiter({name:'campus-peer-consent',limit:20,windowSeconds:900,
   key:req=>req.user?.userId??'anonymous'})
+const peerMessages:Record<string,string>={
+  CAMPUS_PEER_INCOMPLETE_CONSENT:'当前有效同意尚未齐备。学生撤回后重新参加，需要监护人再次独立确认。',
+  CAMPUS_PEER_ALLOCATION_FROZEN:'本班已生成互评配对，当前配对已冻结，不能重复生成。请沿用本次分配。',
+  CAMPUS_PEER_PRIVACY_FLOOR:'当前符合条件的人数不足五人，暂不能生成互评配对。',
+}
 const wrap=(handler:(req:any,res:any)=>Promise<any>)=>asyncHandler(async(req,res)=>{
   try{return await handler(req,res)}
   catch(error){
     if(error instanceof CampusActivityError)return res.status(error.statusCode).json({
-      code:error.code,message:'同伴互评尚未取得当前授权或有效同意',data:null,
+      code:error.code,message:peerMessages[error.code]??'同伴互评尚未取得当前授权或有效同意',data:null,
     })
     if(error instanceof ZodError)return res.status(400).json({
       code:'CAMPUS_PEER_INPUT_INVALID',message:'同伴互评请求信息无效',data:null,

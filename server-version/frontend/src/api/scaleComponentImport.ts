@@ -1,11 +1,12 @@
 import {sessionFetch} from './client'
 import {standardRequest} from './surveyStandard'
 import type {ScaleDefinition} from '../pages/scaleDefinitionEditorModel'
+import type {StandardReportDefinition} from '../pages/admin/ScaleComponentReportEditor'
 import type {ReportTemplateDefinition} from '../modules/assessment-core/report/ReportTemplateFields'
 
 export type ComponentAxis='CONTENT'|'PARAMETERS'|'REPORT'
 export type ComponentPointer={releaseId:string;combinationHash:string}
-export type ReportPayload=ScaleDefinition['report']|{definition:ScaleDefinition['report'];template:ReportTemplateDefinition;assetRefs?:Array<{assetId:string;sha256:string;mediaType:string}>}
+export type ReportPayload=StandardReportDefinition|{definition:StandardReportDefinition;template:ReportTemplateDefinition;assetRefs?:Array<{assetId:string;sha256:string;mediaType:string}>}
 export type ComponentDocument={toolKey:string;configurationName:string;baseCombination:ComponentPointer|null;changedParts:{
  CONTENT?:{version:string;definition:ScaleDefinition;metadata:Record<string,unknown>};PARAMETERS?:{version:string;payload:unknown|null};REPORT?:{version:string;payload:ReportPayload|null}}}
 export type ComponentDraft=ComponentDocument&{id:string;revision:number;publishedReleaseId:string|null;updatedAt:string}

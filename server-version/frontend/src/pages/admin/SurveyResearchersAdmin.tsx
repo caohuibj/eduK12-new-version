@@ -147,7 +147,7 @@ export function SurveyResearchersWorkspace({actorId}:{actorId?:string}={}){
     catch{setError('未能写入剪贴板，请手动选择复制此链接。')}}
   return <ProductPage width="management"><div className="survey-admin">
     <header className="survey-admin-header">
-      <div><p className="survey-admin-kicker">RESEARCH · 管理工作台</p><h1>研究者与授权</h1><p>让每一份研究，拥有清晰的使用边界。</p></div>
+      <div><h1>研究者与授权</h1><p>签发开户邀请，管理研究者账号和可用工具。</p></div>
       <button className="btn-secondary survey-admin-refresh" type="button" aria-label={unconfirmed?'核对当前列表与状态':'刷新管理列表'} disabled={busy||loading} onClick={()=>void refreshForReview()}><RefreshCw size={16} aria-hidden="true"/>{unconfirmed?'核对状态':'刷新列表'}</button>
     </header>
     <div className="survey-admin-workbench">

@@ -1,5 +1,6 @@
 import {act,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import {describe,expect,it,vi} from 'vitest'
+import {StrictMode} from 'react'
 import {EducationCompositionStudio} from './EducationCompositionStudio'
 import {EducationCompositionRunPicker} from './EducationCompositionRunPicker'
 import {emptyDefinition} from '../../pages/scaleDefinitionEditorModel'
@@ -13,6 +14,21 @@ const formRef={id:formVersion,toolId:formId,kind:'FORM',sourceProvider:'PRIVATE_
 const definition={schemaVersion:1,adapterVersion:'1.0.0',administration:{population:'TEACHER',responseMode:'SELF'},instruction:'',blocks:[] as any[]}
 
 describe('education ordinary questionnaire authoring and fixed task attachment',()=>{
+ it('unlocks the replayed StrictMode load and ignores the former effect response',async()=>{
+  const pending:Array<(value:unknown)=>void>=[]
+  const api=vi.fn((path:string)=>{
+   if(path===base+'?kind=COMPOSITION')return new Promise(resolve=>pending.push(resolve))
+   throw Error('Unexpected API '+path)
+  })
+  render(<StrictMode><EducationCompositionStudio entry="SCHOOL" api={api as PrivateToolApi} organizationId={org} actorId={id(2)}/></StrictMode>)
+  await waitFor(()=>expect(pending).toHaveLength(2))
+  await act(async()=>{pending[1]({list:[],nextCursor:null})})
+  expect(screen.getByLabelText('问卷名称')).toBeEnabled()
+  await act(async()=>{pending[0]({list:[{id:rootId,kind:'COMPOSITION',title:'失效读取不应重现',revision:1}],nextCursor:null})})
+  expect(screen.queryByText('失效读取不应重现')).not.toBeInTheDocument()
+  fireEvent.change(screen.getByLabelText('问卷名称'),{target:{value:'可继续编制'}})
+  expect(screen.getByRole('button',{name:'新建普通问卷'})).toBeEnabled()
+ })
  it.each(['TEACHER','SCHOOL'] as const)('%s chooses explicit immutable versions, saves/reopens real order and lazily previews only the current source',async entry=>{
   const title=(entry==='SCHOOL'?'学生':'教师')+'普通问卷'
   let root={id:rootId,kind:'COMPOSITION',title,revision:1,contentHash:hash('e'),definition:{...structuredClone(definition),administration:{population:entry==='SCHOOL'?'STUDENT':'TEACHER',responseMode:'SELF'}}}

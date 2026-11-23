@@ -8,7 +8,7 @@ type StudentOpportunity={
 }
 type GuardianRequest={
   organizationId:string;courseId:string;relationshipId:string
-  title:string;consented:boolean
+  title:string;consented:boolean;childLabel?:string
 }
 export function SchoolPeerConsent({api,role}:{
   api:SchoolApi;role:'STUDENT'|'PARENT'
@@ -96,6 +96,7 @@ export function SchoolPeerConsent({api,role}:{
     </article>):parentItems.map(item=><article className="hs-task-card"
       key={item.relationshipId+':'+item.courseId}>
       <h3>{item.title}</h3>
+      <p><strong>{item.childLabel??'孩子 · 关联 '+item.relationshipId.slice(-8)}</strong></p>
       <p>孩子已自愿提出参加申请，学校只按同班随机抽样。
         你的确认不能让你查看其他学生的互评回答或孩子的个人心理报告。</p>
       <button disabled={busy} onClick={()=>void act(async()=>{

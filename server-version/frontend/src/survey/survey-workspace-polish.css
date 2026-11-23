@@ -181,3 +181,22 @@
  .survey-researcher #survey-workspace-reports .survey-section-shortcuts a svg { display:none; }
  .survey-researcher #survey-workspace-reports .survey-shortcut-number { width:19px; height:21px; font-size:9px; }
 }
+
+.survey-report-actions, .survey-report-history {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .625rem;
+  margin-block: .625rem;
+}
+.survey-report-history {
+  padding-inline-start: 1rem;
+  border-inline-start: 3px solid currentColor;
+}
+.survey-report-history article { flex-basis: 100%; }
+.survey-saved-reports { min-width: 0; overflow-wrap: anywhere; }
+.survey-report-actions label { display: grid; gap: .25rem; }
+@media (max-width: 40rem) {
+  .survey-report-actions { align-items: stretch; flex-direction: column; }
+  .survey-saved-reports button { min-height: 44px; white-space: normal; }
+}

@@ -103,6 +103,7 @@ export interface SchoolEmbeddedSituationalProps {
   parentAttemptId:string
   compositeItemId:string
   client:SituationalRunnerClient
+  sceneTitleOnly?:boolean
   instructionsSummary?:string
   onCompleted:()=>void
 }
@@ -387,10 +388,10 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:
       kind: 'open-path',
       visited: currentIndex + 1,
       visitedLabel: '已查看',
-      current: currentParts.join(' · '),
+      current: host?.sceneTitleOnly ? currentScene.title : currentParts.join(' · '),
       label: '当前开放路径',
     }
-  }, [currentFlowNode?.roundKey, currentFlowNode?.stepKey, currentIndex, currentScene, data, scenes.length])
+  }, [host?.sceneTitleOnly, currentFlowNode?.roundKey, currentFlowNode?.stepKey, currentIndex, currentScene, data, scenes.length])
 
   const submissionStatus = useMemo<AssessmentSubmissionStatus>(() => {
     if (submitting) return { state: 'submitting', message: '答案已锁定，正在提交同一份封存 FINAL。' }
