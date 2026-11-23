@@ -1,0 +1,122 @@
+{
+  "recordType": "TAG_AND_SPLIT_PLAN_NOT_RUNTIME_MANIFEST",
+  "sharedFamilyTag": "family:qti",
+  "storage": "Use existing tags string[] only after actual authorized creation; no new tag engine/table.",
+  "schemaReferences": [
+    "server-version/backend/prisma/schema.prisma: CompositeAssessment.tags / Questionnaire.tags",
+    "server-version/backend/src/modules/training-catalog/filters.ts: catalogFilterSchema tags<=10, tag length<=20"
+  ],
+  "variants": [
+    {
+      "sourceVariant": "uu_current_en_actual",
+      "name": "QTI｜实际自我感知｜教师自评｜英文中学版（确切题本版本待核）",
+      "tags": [
+        "family:qti",
+        "role:teacher_self",
+        "view:actual",
+        "stage:secondary",
+        "lang:en",
+        "source:uu",
+        "use:reflection",
+        "status:pilot",
+        "rights:pending"
+      ],
+      "contentVersion": null,
+      "itemCount": null,
+      "persisted": false
+    },
+    {
+      "sourceVariant": "uu_current_en_ideal",
+      "name": "QTI｜理想行为｜教师自评｜英文中学版（确切题本版本待核）",
+      "tags": [
+        "family:qti",
+        "role:teacher_self",
+        "view:ideal",
+        "stage:secondary",
+        "lang:en",
+        "source:uu",
+        "use:reflection",
+        "status:pilot",
+        "rights:pending"
+      ],
+      "contentVersion": null,
+      "itemCount": null,
+      "persisted": false
+    },
+    {
+      "sourceVariant": "uu_current_nl_actual",
+      "name": "QTI｜实际自我感知｜教师自评｜荷兰文中学版（确切题本版本待核）",
+      "tags": [
+        "family:qti",
+        "role:teacher_self",
+        "view:actual",
+        "stage:secondary",
+        "lang:nl",
+        "source:uu",
+        "use:reflection",
+        "status:pilot",
+        "rights:pending"
+      ],
+      "contentVersion": null,
+      "itemCount": null,
+      "persisted": false
+    },
+    {
+      "sourceVariant": "uu_current_nl_ideal",
+      "name": "QTI｜理想行为｜教师自评｜荷兰文中学版（确切题本版本待核）",
+      "tags": [
+        "family:qti",
+        "role:teacher_self",
+        "view:ideal",
+        "stage:secondary",
+        "lang:nl",
+        "source:uu",
+        "use:reflection",
+        "status:pilot",
+        "rights:pending"
+      ],
+      "contentVersion": null,
+      "itemCount": null,
+      "persisted": false
+    },
+    {
+      "sourceVariant": "lee2010_en_actual48",
+      "name": "QTI｜实际自我感知｜教师自评｜Lee2010英文小学科学历史版",
+      "tags": [
+        "family:qti",
+        "role:teacher_self",
+        "view:actual",
+        "stage:primary",
+        "lang:en",
+        "source:lee2010",
+        "use:reflection",
+        "status:pilot",
+        "rights:restricted"
+      ],
+      "contentVersion": null,
+      "itemCount": 48,
+      "persisted": false
+    }
+  ],
+  "splitPlan": [
+    {
+      "part": "teacher_actual",
+      "meaning": "Teacher perception of own behaviour in a particular teaching context",
+      "nativeItems": "Current exact form missing; historical48 needs rights and exact scan check",
+      "octantChildren": "Create only after item-to-octant key for that exact version is verified; no Sun2018 mapping borrowed"
+    },
+    {
+      "part": "teacher_ideal",
+      "meaning": "Teacher preferred/ideal behaviour; same respondent, different target perspective",
+      "nativeItems": "Current exact form missing; historical Appendix E not itemwise verified",
+      "octantChildren": "Separate identity and parameters; ideal is not observer or actual quality"
+    },
+    {
+      "part": "optional_context_form",
+      "meaning": "Only source-specified or separately identified project context facts",
+      "nativeItems": "Not manufactured to stand in for missing QTI",
+      "created": false
+    }
+  ],
+  "comparison": "Shared tag supports filtering/side-by-side analysis only, not measurement equivalence, a total or normative ideal-gap score. Existing student PR545 is referenced and left unchanged; a coordinator may align its family tag later through normal metadata editing."
+}
