@@ -64,8 +64,9 @@ suite('Scale import PostgreSQL atomicity and governance', () => {
     for (const patch of [{ instrumentClass: 'STANDARD' }, { status: 'PUBLISHED' }]) {
       const f = await fixture(patch); await expect(run(f.scale.id, f.actor, f.input, false)).rejects.toMatchObject({ status: 409 })
     }
-    await db.scale.update({ where: { id: scale.id }, data: { status: 'PUBLISHED' } }); const draft = await copy(scale.id, actor.userId)
-    await db.scale.update({ where: { id: scale.id }, data: { definition: { ...(scale.definition as any), license: { status: 'self_authored', redistribution: 'restricted' } } } })
+    const authorizedDef = { ...(scale.definition as any), license: { status: 'authorized', redistribution: 'restricted' } }
+    await db.scale.update({ where: { id: scale.id }, data: { status: 'PUBLISHED', definition: authorizedDef, definitionHash: hashScaleDefinition(authorizedDef) } })
+    const draft = await copy(scale.id, actor.userId)
     const preview: any = await run(draft.id, actor, { ...input, expectedUpdatedAt: draft.updatedAt.toISOString() }, false)
     expect(preview.count).toBe(1)
   })

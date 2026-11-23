@@ -36,7 +36,8 @@ suite('Scale copied draft immutable provenance and publication',()=>{
   for(const patch of [{instrumentClass:'STANDARD'},{status:'DRAFT'}]){
    await db.scale.update({where:{id:scale.id},data:{status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',definition:definition as any,...patch} as any});await expect(copy(scale.id,user.id)).rejects.toMatchObject({status:403})
   }
-  await db.scale.update({where:{id:scale.id},data:{status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',definition:{...definition,license:{status:'authorized',redistribution:'restricted'}} as any}})
+  const authorizedDef = { ...definition, license: { status: 'authorized', redistribution: 'restricted' } } as any
+  await db.scale.update({where:{id:scale.id},data:{status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',definition:authorizedDef,definitionHash:hashScaleDefinition(authorizedDef)}})
   const allowed=await copy(scale.id,user.id);expect(allowed.copySource).toMatchObject({parentId:scale.id})
  })
  it('rejects request-supplied provenance; edits retain the server-created source',async()=>{

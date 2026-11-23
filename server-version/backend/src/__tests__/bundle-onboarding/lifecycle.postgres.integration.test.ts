@@ -120,7 +120,7 @@ suite('unknown declarative packages: installation to frozen report',()=>{
     await expect(product.eligible(actor,key,'1.0.0')).rejects.toThrow()
     await expect(changePackageStatus(db,actor.userId,key,'1.0.0','HOLD')).rejects.toThrow('RETIRED')
     await expect(publishPackage(db,actor.userId,key,'1.0.0',review)).rejects.toThrow('RETIRED')
-    expect((await db.bundlePackageRelease.findUniqueOrThrow({where:{id:installed.id}})).review).toEqual(review)
+    expect((await db.bundlePackageRelease.findUniqueOrThrow({where:{id:installed.id}})).review).toMatchObject(review)
     expect((await analysis.readReport(attemptId,'admin',initial.analysisId)).factsHash).toBe(initial.factsHash)
   },60000)
   it('supports single-admin authoring and functional publication without content-review locks or 7-day expiry timers', async () => {

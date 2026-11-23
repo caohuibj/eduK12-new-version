@@ -75,7 +75,17 @@ export async function getPackageDraft(db: PrismaClient, actor: BundleAdministrat
   administrator(actor)
   const row = await db.bundlePackageRelease.findUnique({ where: { bundleKey_bundleVersion: { bundleKey: key, bundleVersion: version } } })
   if (!row) throw compositeNotFound('固定包版本不存在')
-  return { ...row, review: row.review ? { contentHash: (row.review as any).contentHash, reviewerId: (row.review as any).reviewerId, reviewedAt: (row.review as any).reviewedAt, expiresAt: (row.review as any).expiresAt } : null }
+  return {
+    ...row,
+    review: row.review
+      ? {
+        contentHash: (row.review as any).contentHash,
+        reviewerId: (row.review as any).reviewerId,
+        reviewedAt: (row.review as any).reviewedAt,
+        ...((row.review as any).expiresAt !== undefined ? { expiresAt: (row.review as any).expiresAt } : {}),
+      }
+      : null,
+  }
 }
 const approval = z.object({
   contentHash: z.string().regex(/^[a-f0-9]{64}$/),
