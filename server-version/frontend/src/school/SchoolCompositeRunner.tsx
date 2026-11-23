@@ -5,6 +5,7 @@ import {SchoolTaskHelp} from './SchoolTaskHelp'
 import { MemoryRouter } from 'react-router-dom'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
 import WholeCompositeQuestionnaire from '../components/WholeCompositeQuestionnaire'
+import { createEducationWholeV2Client } from '../modules/composite/whole-v2.client'
 import { ReceiptOnlyConfirmation } from '../components/ReceiptOnlyConfirmation'
 import type { CompositeReportStatus, WholeQuestionnaireInput, WholeQuestionnaireReceipt, WholeQuestionnaireDefinition } from '../modules/composite/types'
 import type { WholeReceiptLookup } from '../modules/composite/receipt-recovery'
@@ -197,6 +198,10 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
   }
   const consentVisibility=observer&&execution.consentVisibility&&observerVisibility[execution.consentVisibility]
     ||execution.consentVisibility||'仅限经授权人员'
+  const v2Client=useMemo(
+    ()=>state?createEducationWholeV2Client(api,'/composite-attempts/'+encodeURIComponent(state.id)):undefined,
+    [api,state?.id],
+  )
   const wholeApi=useMemo(():WholeQuestionnaireApi=>({
     wholeDefinition:(id:string)=>fetchEducationWholeDefinition({
       attemptId:id,
@@ -299,7 +304,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentC
           client:situationalClient,onCompleted:()=>{void childFinished()},
         }}/>
       </MemoryRouter>:
-    state?.executionMode==='WHOLE_LOCAL'&&!child?<WholeCompositeQuestionnaire state={state} isFreshStart={freshStart} fallback={stepped} api={wholeApi} educationMedia={educationMedia} onExit={exitRunner}
+    (state?.executionMode==='WHOLE_V2'||state?.executionMode==='WHOLE_LOCAL')&&!child?<WholeCompositeQuestionnaire state={state} isFreshStart={freshStart} fallback={stepped} api={wholeApi} v2Client={v2Client} educationMedia={educationMedia} onExit={exitRunner}
       onReceiptAccepted={acceptedAt=>{
         if(currentIdentity.current!==identity)return
         setState(prev=>prev?{...prev,receiptOnly:true,wholeAcceptedAt:acceptedAt??prev.wholeAcceptedAt??new Date().toISOString()}:prev)

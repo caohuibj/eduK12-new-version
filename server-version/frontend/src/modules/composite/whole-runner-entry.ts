@@ -12,6 +12,7 @@ export const shouldUseWholeRunner = (
   relationalMode: boolean,
 ): boolean => {
   if (!state) return false
+  if (state.executionMode === 'WHOLE_V2') return true
   if (state.trainingFlow || relationalMode) return false
   if (state.productKind !== 'QUESTIONNAIRE') return false
   return state.executionMode === 'WHOLE_LOCAL' || state.currentItem?.type === 'SCALE'

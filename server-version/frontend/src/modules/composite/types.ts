@@ -289,7 +289,7 @@ export interface CompositeAttemptState {
   reportMode?: string
   /** Server-computed Scheme X execution mode (#668 contract). Trusted for the
    * whole-runner entry decision; never present from older servers. */
-  executionMode?: 'WHOLE_LOCAL' | 'STEPPED' | (string & {})
+  executionMode?: 'WHOLE_V2' | 'WHOLE_LOCAL' | 'STEPPED' | (string & {})
   id: string
   assessmentId: string
   name: string

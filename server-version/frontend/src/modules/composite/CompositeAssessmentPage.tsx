@@ -15,6 +15,7 @@ import {
   LockKeyhole,
 } from 'lucide-react'
 import { compositeApi, publicCompositeApi } from './api'
+import { createTrainingWholeV2Client } from './whole-v2.client'
 import {
   assembleInlineWholePayload,
   cacheWholeQuestionnaireTemplate,
@@ -101,6 +102,10 @@ const CompositeAssessmentContent: React.FC = () => {
   }, [state?.currentItem?.id, scaleIndex])
 
   const attemptId = params.attemptId || state?.id || ''
+  const trainingV2Client = useMemo(
+    () => (attemptId ? createTrainingWholeV2Client(attemptId, { publicMode, recoveryToken }) : undefined),
+    [attemptId, publicMode, recoveryToken],
+  )
   // Query data selects UI only and cannot authorize a restart or create a new
   // scientific identity. Bind the hint to the server's current parent/child.
   const recoveryHint = new URLSearchParams(location.search)
@@ -665,7 +670,7 @@ const CompositeAssessmentContent: React.FC = () => {
       />
     )
     if (shouldUseWholeRunner(state, relationalMode)) {
-      return <>{anonymousRecovery}<WholeCompositeQuestionnaire state={state} api={api} publicMode={publicMode} recoveryToken={recoveryToken}
+      return <>{anonymousRecovery}<WholeCompositeQuestionnaire state={state} api={api} v2Client={trainingV2Client} publicMode={publicMode} recoveryToken={recoveryToken}
         isFreshStart={isFreshStart} fallback={unitAssessment} onExit={() => void saveAndExit()} onCompleted={() => goReport(state.id)} /></>
     }
     return <>{anonymousRecovery}{unitAssessment}</>
