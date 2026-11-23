@@ -9,7 +9,7 @@ import { hasActiveCourseMembership } from '../../utils/courseAccess'
 import { assignmentController } from '../../controllers/assignmentController'
 import { checkinController } from '../../controllers/checkinController'
 import { allocateCampusActivityParticipants, revokeCampusActivityParticipant, listCampusActivityEligibleClasses } from './activity.allocation'
-import { addCampusActivityTask, listCampusStudentTasks, listCampusParentRunTasks } from './activity.tasks'
+import { addCampusActivityTask, listCampusStudentTasks, listCampusParentRunTasks,listCampusActivityContent,changeCampusActivityContent } from './activity.tasks'
 import { listCampusTeacherRunTasks } from './teacher-tasks'
 import { decodeRunTaskCursor, encodeRunTaskCursor } from '../assessment-run/productRead'
 import { readCampusStudentStatus } from './admission.service'
@@ -24,12 +24,18 @@ const uuid=z.string().guid()
 const params=z.object({organizationId:uuid})
 const activityParams=params.extend({courseId:uuid})
 const purpose=z.enum(['STUDENT_WELLBEING','LEARNING_ADAPTATION','SCHOOL_CLIMATE','FAMILY_SUPPORT'])
+const contentMessages:Record<string,string>={
+  ACTIVITY_TASK_STALE:'内容已被其他操作更新，请刷新后重新核对并编辑。',
+  ACTIVITY_TASK_FROZEN:'活动已离开准备阶段，不能修改或移除内容。',
+  ACTIVITY_TASK_HAS_RECORDS:'该内容已有作答或访问记录，不能修改或移除。',
+  ACTIVITY_TASK_NOT_FOUND:'该内容已不存在或不属于当前活动，请刷新核对。',
+}
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 const wrap=(f:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
   try{return await f(req,res)}
   catch(error){
     if(error instanceof CampusActivityError)return res.status(error.statusCode).json({
-      code:error.code,message:'当前校园活动状态或权限不允许该操作',data:null,
+      code:error.code,message:contentMessages[error.code]??'当前校园活动状态或权限不允许该操作',data:null,
     })
     if(error instanceof ZodError)return res.status(400).json({
       code:'ACTIVITY_REQUEST_INVALID',message:'校园活动参数无效',data:null,
@@ -111,6 +117,17 @@ router.post('/organizations/:organizationId/activities/:courseId/participants/re
     const body=z.object({membershipId:uuid}).strict().parse(req.body)
     return success(res,await revokeCampusActivityParticipant({actor:req.user!,...p,...body}))
   }))
+router.get('/organizations/:organizationId/activities/:courseId/tasks',authenticateSchool,wrap(async(req,res)=>
+  success(res,await listCampusActivityContent({actor:req.user!,...activityParams.parse(req.params)}))))
+const contentParams=activityParams.extend({taskId:uuid,kind:z.enum(['READING','ASSIGNMENT','CHECKIN'])})
+router.patch('/organizations/:organizationId/activities/:courseId/tasks/:kind/:taskId',authenticateSchool,wrap(async(req,res)=>{
+  const body=z.object({expectedUpdatedAt:z.iso.datetime({offset:true}),title:z.string().trim().min(1).max(200),content:z.string().max(25000)}).strict().parse(req.body)
+  return success(res,await changeCampusActivityContent({actor:req.user!,...contentParams.parse(req.params),...body,expectedUpdatedAt:new Date(body.expectedUpdatedAt),action:'UPDATE'}))
+}))
+router.delete('/organizations/:organizationId/activities/:courseId/tasks/:kind/:taskId',authenticateSchool,wrap(async(req,res)=>{
+  const body=z.object({expectedUpdatedAt:z.iso.datetime({offset:true})}).strict().parse(req.body)
+  return success(res,await changeCampusActivityContent({actor:req.user!,...contentParams.parse(req.params),expectedUpdatedAt:new Date(body.expectedUpdatedAt),action:'REMOVE'}))
+}))
 router.post('/organizations/:organizationId/activities/:courseId/tasks',
   authenticateSchool,wrap(async(req,res)=>{
     const p=activityParams.parse(req.params)

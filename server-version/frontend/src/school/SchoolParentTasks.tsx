@@ -14,7 +14,7 @@ const SchoolCompositeRunner=deferredPage(async()=>({default:(await import('./Sch
 
 type ParentRunTask={
   executionId:string;runId:string;organizationId:string;activityId:string
-  activityTitle:string;runTitle:string;status:string;deadline:string|null
+  activityTitle:string;runTitle:string;status:string;deadline:string|null;childLabel?:string
   canResumeExisting?:boolean
   feedbackMode?:'COMPOSITION'
   consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
@@ -76,7 +76,7 @@ function ParentTasksSession({api}:{api:SchoolApi}){
     {!tasks?null:!tasks.length?!busy&&!error&&<p className="hs-collection-empty">暂无需要你参与的家校观察任务。</p>:
       <div className={'hs-task-list hs-parent-task-list'+(view==='cards'?' hs-parent-task-list--cards':'')}>{visible.map(task=><article className="hs-task-card" key={task.executionId}>
         <span className="hs-parent-task-icon" aria-hidden="true"><ClipboardList size={21}/></span>
-        <div className="hs-parent-task-copy"><small>{task.activityTitle}</small><h3>{task.runTitle}</h3>
+        <div className="hs-parent-task-copy"><small>{task.activityTitle}</small><h3>{task.runTitle}</h3>{task.childLabel&&<p><strong>{task.childLabel}</strong></p>}
         <p>当前状态：{({ASSIGNED:'待完成',STARTED:'进行中',COMPLETED:'已完成',EXPIRED:'已截止',CANCELLED:'已取消'} as Record<string,string>)[task.status]??task.status}{task.deadline?' · 截止 '+new Date(task.deadline).toLocaleDateString('zh-CN'):''}</p></div>
         <div className="hs-parent-task-action">{['ASSIGNED','STARTED'].includes(task.status)&&
           <button disabled={busy} aria-label={(task.status==='STARTED'?'继续作答':'查看任务')+'（开始／继续校园正式测评）'} onClick={()=>{setFeedback(null);setActive({task,execution:{

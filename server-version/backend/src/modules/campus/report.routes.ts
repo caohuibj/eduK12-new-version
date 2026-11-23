@@ -9,6 +9,7 @@ import { success } from '../../utils/response'
 import { ParentPortalError } from '../parent-portal/contracts'
 import { parentPortalService } from '../parent-portal/service'
 import { parentPublisher } from '../parent-portal/publisher'
+import {readCampusParentLinks} from './parent.service'
 import { ReportingError } from '../reporting/types'
 import { readCampusStudentStatus } from './admission.service'
 import { requireRecentSchoolMfa } from './mfa.middleware'
@@ -240,9 +241,11 @@ router.use('/reports/officer', (_req, res, next) => config.campusParentReportEna
 router.get('/reports/parent/children', guarded(async req => {
   const q = pagination.parse(req.query)
   const data = await parentPortalService.children(req.user!, q.page, q.pageSize)
+  const labels=await readCampusParentLinks(req.user!,data.list.map(row=>row.relationshipId))
+  const byRelationship=new Map(labels.list.map(row=>[row.id,row.counterpartLabel]))
   // Legacy parent DTOs may include the student's internal username. It is
   // never a SCHOOL parent reporting field or a legitimate identity mapping.
-  return { ...data, list: data.list.map(({ childId, relationshipId }) => ({ childId, relationshipId })) }
+  return { ...data, list: data.list.map(({ childId, relationshipId }) => ({ childId, relationshipId,childLabel:byRelationship.get(relationshipId)??'孩子 · 关联 '+relationshipId.slice(-8) })) }
 }))
 router.get('/reports/parent/children/:childId/reports', guarded(req => {
   const q = pagination.parse(req.query)

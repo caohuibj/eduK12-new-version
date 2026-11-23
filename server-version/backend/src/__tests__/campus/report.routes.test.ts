@@ -25,6 +25,7 @@ const state = vi.hoisted(() => ({
 }))
 vi.mock('../../config', () => ({ config: state.config }))
 vi.mock('../../modules/parent-portal/service', () => ({ parentPortalService: state.parent }))
+vi.mock('../../modules/campus/parent.service',()=>({readCampusParentLinks:async()=>({list:[]})}))
 vi.mock('../../modules/parent-portal/publisher', () => ({ parentPublisher: state.publisher }))
 vi.mock('../../modules/campus/admission.service', () => ({ readCampusStudentStatus: state.studentStatus }))
 vi.mock('../../modules/reporting/participantService', () => ({
@@ -194,7 +195,7 @@ describe('Huischool governed report HTTP surface', () => {
     const response = await request('/reports/parent/children')
     expect(response.status).toBe(200)
     const data=(await response.json()).data
-    expect(data.list).toEqual([{childId:CHILD,relationshipId:LINK}])
+    expect(data.list).toEqual([{childId:CHILD,relationshipId:LINK,childLabel:'孩子 · 关联 '+LINK.slice(-8)}])
     expect(JSON.stringify(data)).not.toMatch(/internal-private-login|displayName|username/)
   })
   it('passes authenticated SCHOOL parent identity to the existing per-grant read policy', async () => {
