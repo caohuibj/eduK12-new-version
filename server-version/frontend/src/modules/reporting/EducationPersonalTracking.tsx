@@ -1,4 +1,4 @@
-import {useEffect,useRef,useState} from 'react'
+import {useEffect,useId,useRef,useState} from 'react'
 import {PersonalChangesReport,type PersonalChangesResponse} from './PersonalChangesReport'
 type Api=<T>(path:string,method?:string,data?:unknown)=>Promise<T>
 type Choice={trackId:string;itemId:string;scoreKey:string;label:string;unit:string;visible?:boolean;selectedVisible?:boolean}
@@ -13,12 +13,14 @@ export function EducationTrackingPublish(props:PublicationProps){
 }
 function EducationTrackingPublishSession({api,path,publish,disabled,entry='TEACHER',publishLabel}:PublicationProps){
  const [provideParticipantReport,setProvideParticipantReport]=useState(false)
- const [options,setOptions]=useState<{baselineId:string|null;ordinal:number|null;choices:Choice[]}|null>(null)
+ const [options,setOptions]=useState<{baselineId:string|null;ordinal:number|null;choices:Choice[];participantReport?:{eligible:boolean;reason:string|null}}|null>(null)
+ const reportReasonId=useId()
  const [error,setError]=useState(''),[longitudinal,setLongitudinal]=useState(false),[selected,setSelected]=useState<Choice[]>([]),[visibleKeys,setVisibleKeys]=useState<string[]>([])
  useEffect(()=>{let active=true;void api<NonNullable<typeof options>>(path+'/tracking').then(value=>{if(!active)return;setOptions(value);if(value.baselineId){setSelected(value.choices);setVisibleKeys(value.choices.filter(c=>c.visible!==false&&(c.selectedVisible??true)).map(choiceKey))}}).catch(e=>{if(active)setError(e instanceof Error?e.message:'追踪配置读取失败')});return()=>{active=false}},[api,path])
  if(error)return <p role="alert">{error}</p>
  if(!options)return <p>正在读取追踪配置…</p>
  const tracking=!!options.baselineId||longitudinal
+ const reportAvailable=options.participantReport?.eligible!==false
  return <div>
   {options.baselineId?<p>纵向 T{options.ordinal}：追踪指标和计分定义继承自首次发布；本人可见性可在原披露上限内收窄。</p>:<>
    <label>测量模式 <select aria-label={entry==='SCHOOL'?'学生测量模式':'教师测量模式'} value={longitudinal?'LONGITUDINAL':'SINGLE'} onChange={e=>{setLongitudinal(e.target.value==='LONGITUDINAL');setSelected([]);setVisibleKeys([])}}><option value="SINGLE">单次测量</option><option value="LONGITUDINAL" disabled={!options.choices.length}>Longitudinal 纵向追踪</option></select></label>
@@ -27,8 +29,9 @@ function EducationTrackingPublishSession({api,path,publish,disabled,entry='TEACH
    }}/>{c.label}（{c.unit}）{c.visible===false?' · 工具未开放本人变化数值':''}</label>)}</fieldset>}
   </>}
   {tracking&&<fieldset><legend>本轮本人可见指标</legend>{selected.map(c=><label key={choiceKey(c)} className="block"><input type="checkbox" disabled={disabled||c.visible===false} checked={visibleKeys.includes(choiceKey(c))&&c.visible!==false} onChange={e=>setVisibleKeys(old=>e.target.checked?[...new Set([...old,choiceKey(c)])]:old.filter(key=>key!==choiceKey(c)))}/>{c.label}{c.visible===false?' · 来源未授权本人展示':''}</label>)}<p>计划追踪与本人披露分别冻结；此选择不会让学校或其他受众获得个人分数。</p></fieldset>}
-  <label className="block"><input type="checkbox" checked={provideParticipantReport} disabled={disabled} onChange={e=>setProvideParticipantReport(e.target.checked)}/> 向作答者提供报告（普通自评整卷）</label>
-  <button disabled={disabled||tracking&&!selected.length} onClick={()=>publish({mode:tracking?'LONGITUDINAL':'SINGLE',metrics:selected.map(({trackId,itemId,scoreKey})=>({trackId,itemId,scoreKey})),visibleMetrics:selected.filter(c=>c.visible!==false&&visibleKeys.includes(choiceKey(c))).map(({trackId,itemId,scoreKey})=>({trackId,itemId,scoreKey}))},provideParticipantReport)}>{publishLabel??(entry==='SCHOOL'?'正式发布本人测评':'发布教师评价任务')}</button>
+  <label className="block"><input type="checkbox" checked={reportAvailable&&provideParticipantReport} disabled={disabled||!reportAvailable} aria-describedby={!reportAvailable?reportReasonId:undefined} onChange={e=>setProvideParticipantReport(e.target.checked)}/> 向作答者提供报告（普通自评整卷）</label>
+  {!reportAvailable&&<p id={reportReasonId} role="note">{options.participantReport?.reason||'当前所选工具未配置作答者报告，将以仅回执模式发布。'}</p>}
+  <button disabled={disabled||tracking&&!selected.length} onClick={()=>publish({mode:tracking?'LONGITUDINAL':'SINGLE',metrics:selected.map(({trackId,itemId,scoreKey})=>({trackId,itemId,scoreKey})),visibleMetrics:selected.filter(c=>c.visible!==false&&visibleKeys.includes(choiceKey(c))).map(({trackId,itemId,scoreKey})=>({trackId,itemId,scoreKey}))},reportAvailable&&provideParticipantReport)}>{publishLabel??(entry==='SCHOOL'?'正式发布本人测评':'发布教师评价任务')}</button>
  </div>
 }
 export function EducationTrackingNext({api,path,create,disabled,entry='TEACHER'}:{api:Api;path:string;create:()=>void;disabled:boolean;entry?:'SCHOOL'|'TEACHER'}){

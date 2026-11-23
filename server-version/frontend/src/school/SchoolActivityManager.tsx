@@ -359,7 +359,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
         · 关联测评 {selected.runs.length} 项</p>
       {!compact&&lifecycleControls}
       {compact&&<nav className="hs-activity-config-tabs" aria-label="活动配置分区">{activityPanels.map(item=><button type="button" key={item.id} aria-pressed={panel===item.id} aria-controls={'hs-activity-panel-'+item.id} onClick={()=>setPanel(item.id)}>{item.label}</button>)}</nav>}
-      {compact&&<section className="hs-panel" aria-label="活动状态操作"><h3>活动状态与下一步</h3>{lifecycleControls}</section>}
+      {compact&&<section className="hs-panel hs-activity-state-panel" aria-label="活动状态操作"><h3>活动状态与下一步</h3>{lifecycleControls}</section>}
       <section className="hs-activity-config-panel" id="hs-activity-panel-participants" aria-label="班级与参与者" hidden={compact&&panel!=='participants'}>
         {compact&&selected.status!=='DRAFT'&&<p>当前活动已离开准备阶段，参与范围按现有班级分配保留。</p>}
         {selected.status==='DRAFT'&&<>

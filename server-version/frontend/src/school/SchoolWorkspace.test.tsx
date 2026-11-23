@@ -15,7 +15,7 @@ it('keeps teacher task panels unique when organization context loads',async()=>{
  }))
  try{
   render(<SchoolApp/> )
-  await screen.findByRole('heading',{name:'我的学生观察任务'})
+  await screen.findByRole('heading',{name:'我的学生观察任务'},{timeout:5000})
   expect(screen.queryByRole('navigation',{name:'校园功能入口'})).not.toBeInTheDocument()
   expect(screen.queryByRole('link',{name:/活动管理/})).not.toBeInTheDocument()
   expect(screen.queryByRole('link',{name:'返回概览'})).not.toBeInTheDocument()

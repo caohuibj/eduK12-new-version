@@ -13,7 +13,7 @@ const alias='林-ABCDEF123456'
 const catalog={subjects:[{reference:alias}],specs:[{
   specId:spec,title:'合法的纵向科学方案',version:1,
 }],truncated:false}
-const resource={family:'SCALE',key:'wellbeing',version:'1.0.0'}
+const resource={family:'SCALE',key:'wellbeing',version:'1.0.0',title:'校园适应普通问卷',versionLabel:'修订 2'}
 const sources={sources:[
   {runId:r1,trackId:t1,runName:'前测',publishedAt:'2026-02-10T00:00:00Z',resource},
   {runId:r2,trackId:t2,runName:'后测',publishedAt:'2026-03-10T00:00:00Z',resource},
@@ -38,6 +38,8 @@ describe('Huischool longitudinal professional workspace',()=>{
         {target:{value:alias}})
       const boxes=await screen.findAllByRole('checkbox')
       expect(boxes.length).toBe(2)
+      for(const box of boxes)expect(box).toHaveAccessibleName(/校园适应普通问卷 · 修订 2/)
+      expect(screen.queryByText(/SCALE wellbeing/)).not.toBeInTheDocument()
       boxes.forEach(x=>fireEvent.click(x))
       fireEvent.change(screen.getByLabelText('经独立审核的个人纵向方案'),
         {target:{value:spec}})
@@ -53,6 +55,16 @@ describe('Huischool longitudinal professional workspace',()=>{
       }))
       expect(JSON.stringify(api.mock.calls)).not.toMatch(/userId|username|studentNumber|rawAnswers/)
     }finally{window.confirm=original}
+  })
+  it('uses neutral numbered source labels when an older source projection has no display metadata',async()=>{
+    const legacyResource={family:'BUNDLE',key:'education-composition:SCHOOL:00000000-0000-4000-8000-000000000123:STUDENT:SELF',version:'1.0.0'}
+    const api=vi.fn(async(path:string)=>path.startsWith('/reports/longitudinal/catalog')?catalog:
+      {sources:sources.sources.map(source=>({...source,resource:legacyResource})),truncated:false})
+    render(<SchoolIndividualLongitudinalStudio api={api as unknown as SchoolApi} organizationId={org}/>)
+    fireEvent.change(await screen.findByLabelText('当前心理服务学生的匿名观察编号'),{target:{value:alias}})
+    expect(await screen.findByRole('checkbox',{name:/前测 · 测评来源 1 · 固定版本/})).toBeInTheDocument()
+    expect(screen.getByRole('checkbox',{name:/后测 · 测评来源 2 · 固定版本/})).toBeInTheDocument()
+    expect(document.body.textContent).not.toContain(legacyResource.key)
   })
   it('does not carry an earlier subject selection into a changed school or patient',async()=>{
     const api=vi.fn(async(path:string)=>{

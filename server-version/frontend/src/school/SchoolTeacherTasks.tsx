@@ -45,24 +45,28 @@ function TeacherTasksSession({api,organizationId,compact=false}:Props) {
   const [error,setError]=useState('')
   const [busy,setBusy]=useState(false)
   const [query,setQuery]=useState(''),[sort,setSort]=useState('recommended'),[view,setView]=useState<SchoolCollectionView>('list')
-  const scope=useMemo(()=>({pending:false}),[api,inboxPath])
+  const scope=useMemo(()=>({pending:false,refreshQueued:false}),[api,inboxPath])
   const currentScope=useRef<typeof scope|null>(scope)
   currentScope.current=scope
-  const refresh=useCallback(async(append=false)=>{
-    if(currentScope.current!==scope||scope.pending)return
+  const refresh=useCallback(async function readInbox(append=false,requireFresh=false):Promise<void>{
+    if(currentScope.current!==scope)return
+    if(scope.pending){if(requireFresh)scope.refreshQueued=true;return}
     scope.pending=true;setBusy(true);setError('')
     try{
       const activeCursor=append?cursorRef.current:null
       const result=await api<Inbox>(inboxPath+(activeCursor?'&cursor='+encodeURIComponent(activeCursor):''))
-      if(currentScope.current===scope){
+      if(currentScope.current===scope&&!scope.refreshQueued){
         setInbox(prev=>append&&prev?{list:[...prev.list,...result.list],truncated:result.truncated,nextCursor:result.nextCursor}:result)
         setCursor(result.nextCursor??null);setHasMore(Boolean(result.nextCursor))
       }
     }catch(e){
-      if(currentScope.current===scope)setError(e instanceof Error?e.message:'教师观察任务暂不可读取')
+      if(currentScope.current===scope&&!scope.refreshQueued)setError(e instanceof Error?e.message:'教师观察任务暂不可读取')
     }finally{
       scope.pending=false
-      if(currentScope.current===scope)setBusy(false)
+      if(currentScope.current===scope){
+        if(scope.refreshQueued){scope.refreshQueued=false;void readInbox()}
+        else setBusy(false)
+      }
     }
   },[api,scope,inboxPath])
   useEffect(()=>{
@@ -109,7 +113,7 @@ function TeacherTasksSession({api,organizationId,compact=false}:Props) {
     {feedback&&renderFeedback({executionId:feedback.executionId,title:feedback.runTitle,mode:'COMPOSITION',onClose:()=>setFeedback(null)})}
     {active&&<SchoolCompositeRunner key={active.execution.executionId} api={api} execution={active.execution} observer={compact||active.task.feedbackMode==='COMPOSITION'} observerRole="teacher"
       observerTaskTitle={active.task.runTitle}
-      onExit={()=>{if(currentScope.current===scope)setActive(null)}}
-      onFinished={()=>{if(currentScope.current!==scope)return;setActive(null);if(active.task.feedbackMode==='COMPOSITION')setFeedback(active.task);void refresh()}}/>}
+      onExit={()=>{if(currentScope.current!==scope)return;setActive(null);setInbox(null);void refresh(false,true)}}
+      onFinished={()=>{if(currentScope.current!==scope)return;setActive(null);setInbox(null);if(active.task.feedbackMode==='COMPOSITION')setFeedback(active.task);void refresh(false,true)}}/>}
   </section>
 }

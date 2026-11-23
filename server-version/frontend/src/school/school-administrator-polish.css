@@ -95,3 +95,18 @@
 .hs-app.hs-school-admin .hs-workspace-content:has(.hs-activity-current-title)>.hs-workspace-page-heading{height:0;min-height:0;margin:0;padding:0}
 .hs-app.hs-school-admin .hs-workspace-content:has(.hs-activity-current-title)>.hs-workspace-page-heading>:not(h1){display:none}
 .hs-app.hs-school-admin .hs-workspace-content:has(.hs-activity-current-title)>.hs-workspace-page-heading>h1{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* Keep verification and recovery in reading order, without empty grid cells. */
+.hs-app.hs-school-admin .hs-workspace-content:has(>.hs-mfa-reset){grid-template-columns:minmax(0,1fr);gap:16px}
+.hs-app.hs-school-admin .hs-workspace-content:has(>.hs-mfa-reset)>.hs-panel{margin:0}
+.hs-app.hs-school-admin .hs-workspace-content:has(>.hs-mfa-reset)>.hs-personnel-claim{padding:12px 20px}
+.hs-app.hs-school-admin .hs-workspace-content:has(>.hs-mfa-reset)>.hs-personnel-claim>details{margin:0;background:transparent;border:0;padding:0}
+.hs-app.hs-school-admin .hs-workspace-content:has(>.hs-mfa-reset)>.hs-personnel-claim>details>summary{font-size:13px}
+.hs-app.hs-school-admin .hs-workspace-content:has(>.hs-mfa-reset)>.hs-admin-security>.hs-actions{max-width:720px}
+@media(min-width:1001px){
+ .hs-app.hs-school-admin .hs-workspace-content:has(>.hs-mfa-reset)>.hs-admin-account{display:grid;grid-template-columns:minmax(0,.65fr) minmax(0,1.35fr);gap:24px;align-items:start}
+ .hs-app.hs-school-admin .hs-workspace-content:has(>.hs-mfa-reset)>.hs-admin-account>div+div{margin:0;padding:0 0 0 24px;border-top:0;border-left:1px solid var(--hs-border)}
+ .hs-app.hs-school-admin .hs-workspace-content:has(>.hs-mfa-reset)>.hs-admin-account form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
+ .hs-app.hs-school-admin .hs-workspace-content:has(>.hs-mfa-reset)>.hs-admin-account form>:not(.hs-field){grid-column:1/-1}
+ .hs-app.hs-school-admin .hs-workspace-content:has(>.hs-mfa-reset)>.hs-admin-account form>button{justify-self:end}
+}
