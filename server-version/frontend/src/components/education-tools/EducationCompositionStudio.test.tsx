@@ -119,3 +119,19 @@ describe('education ordinary questionnaire authoring and fixed task attachment',
   expect(screen.queryByDisplayValue('旧账号创建结果')).not.toBeInTheDocument()
  })
 })
+
+it.each(['TEACHER','SCHOOL'] as const)('%s survives StrictMode replay and a stale list result cannot unlock a current write',async entry=>{
+ let oldList!:(value:unknown)=>void,created!:(value:unknown)=>void,reads=0
+ const old=new Promise(resolve=>{oldList=resolve}),write=new Promise(resolve=>{created=resolve})
+ const api=vi.fn(async(path:string,method='GET')=>method==='POST'?write:++reads===1?old:{list:[],nextCursor:null})
+ const {StrictMode}=await import('react')
+ render(<StrictMode><EducationCompositionStudio api={api as PrivateToolApi} organizationId={org} actorId={id(2)} entry={entry}/></StrictMode>)
+ await waitFor(()=>expect(screen.getByLabelText('问卷名称')).toBeEnabled())
+ fireEvent.change(screen.getByLabelText('问卷名称'),{target:{value:'StrictMode 正常创建'}})
+ fireEvent.click(screen.getByRole('button',{name:'新建普通问卷'}))
+ await act(async()=>{oldList({list:[{id:rootId,kind:'COMPOSITION',title:'过期列表',revision:1}],nextCursor:null});await old})
+ expect(screen.getByRole('button',{name:'新建普通问卷'})).toBeDisabled()
+ expect(screen.queryByText('过期列表')).not.toBeInTheDocument()
+ await act(async()=>{created({id:rootId,kind:'COMPOSITION',title:'StrictMode 正常创建',revision:1,contentHash:hash('e'),definition:{...definition,administration:{population:entry==='TEACHER'?'TEACHER':'STUDENT',responseMode:'SELF'}}});await write})
+ expect(await screen.findByRole('button',{name:'保存问卷草稿'})).toBeInTheDocument()
+})

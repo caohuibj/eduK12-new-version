@@ -301,3 +301,11 @@
 .ht-practice-consensus .ht-event h3{font-size:15px}
 @media(min-width:1101px){.ht-practice-layout{grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr);gap:18px}}
 @media(max-width:640px){.ht-practice-card>button{min-height:44px}.ht-practice-consensus .ht-section-heading h2{font-size:17px}}
+
+/* Keep core entry points visible without requiring undisclosed horizontal swipes. */
+@media(max-width:640px){
+ .ht-app .ht-topbar .ht-workspace-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;overflow:visible;gap:4px}
+ .ht-app .ht-workspace-tabs button{min-width:0;padding-inline:8px;white-space:normal}
+ .ht-workspace-body>.ht-workspace-jumps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px;overflow:visible}
+ .ht-workspace-jumps a{min-width:0;white-space:normal}
+}

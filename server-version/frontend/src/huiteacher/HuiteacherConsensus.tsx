@@ -18,11 +18,19 @@ export function HuiteacherConsensusManager({organizationId,eventId,api}:{
   const [draftTitle,setDraftTitle]=useState(''),[draftBody,setDraftBody]=useState('')
   const [dirty,setDirty]=useState(false),[busy,setBusy]=useState(false)
   const [notice,setNotice]=useState('')
-  const refresh=async()=>{
-    const [e,c]=await Promise.all([
+  const selection=useRef(current),edited=useRef(dirty);selection.current=current;edited.current=dirty
+  const refresh=async(includeCurrent=false)=>{
+    const selected=includeCurrent?selection.current:null
+    const [e,c,fresh]=await Promise.all([
       api<{list:Formal[]}>(base+'/formal-notes'),
-      api<{list:typeof entries}>(base+'/consensuses')])
+      api<{list:typeof entries}>(base+'/consensuses'),
+      selected?api<Consensus>('/consensuses/'+selected.id):Promise.resolve(null)])
     setNotes(e.list);setEntries(c.list)
+    if(fresh&&selection.current?.id===fresh.id){
+      if(edited.current&&selection.current.revision!==fresh.revision){setNotice('共识已有新版本，请先复制保留当前文字，再重新打开核对。');return}
+      setCurrent(fresh)
+      if(!edited.current){setDraftTitle(fresh.title);setDraftBody(fresh.content)}
+    }
   }
   useEffect(()=>{
     let live=true
@@ -73,7 +81,7 @@ export function HuiteacherConsensusManager({organizationId,eventId,api}:{
     <p className="ht-muted">至少两位独立评价者的正式反馈作为不可修改的来源；
       共识必须经评价者分别确认同一版本，不能将分数平均当作共识。</p>
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
-    <button type="button" disabled={busy} onClick={()=>run(refresh)}>刷新证据和确认进度</button>
+    <button type="button" disabled={busy} onClick={()=>run(()=>refresh(true))}>刷新证据和确认进度</button>
     <div className="ht-event-list">{notes.filter(x=>x.kind==='FORMAL_FEEDBACK').map(n=>
       <label className="ht-consensus-citation" key={n.id}>
         <input type="checkbox" checked={chosen.includes(n.id)}
@@ -148,7 +156,7 @@ export function HuiteacherConsensusReviews({api}:{api:Api}){
     {loaded&&!busy&&!readError&&reviews.length===0&&<p className="ht-empty">暂无需要你确认的共识。收到待办后，可在这里阅读并确认。</p>}
     {reviews.map(r=><article className="ht-event" key={r.id}>
       <h3>{r.title}</h3><p className="ht-field-content">{r.content}</p>
-      <p className="ht-muted">版本 {r.revision} · 评价者确认数 {r.approvalCount} · {r.status}</p>
+      <p className="ht-muted">版本 {r.revision} · 评价者确认数 {r.approvalCount} · {r.status==='DRAFT'?'待确认':'已冻结'}</p>
       {r.status==='DRAFT'&&(approved(r)?<span className="ht-tag">本人已确认此版本</span>:<button disabled={busy} onClick={()=>approve(r)}>
         我确认此版本的人工共识</button>)}
     </article>)}

@@ -43,7 +43,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
  const [answers,setAnswers]=useState<Record<string,ProfessionalAnswer>>({})
  const mounted=useRef(true),epoch=useRef(0),locked=useRef(false)
  const dirty=tool?fingerprint(tool)!==saved:Boolean(title.trim()),dirtyRef=useRef(dirty);dirtyRef.current=dirty
- useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;epoch.current++}},[])
+ useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;epoch.current++;locked.current=false}},[])
  useEffect(()=>{onDraftStateChange?.({dirty,writing:busy})},[dirty,busy,onDraftStateChange])
  useEffect(()=>()=>{onDraftStateChange?.({dirty:false,writing:false})},[onDraftStateChange])
  useEffect(()=>{const guard=(event:BeforeUnloadEvent)=>{if(dirtyRef.current||locked.current){event.preventDefault();event.returnValue=''}}

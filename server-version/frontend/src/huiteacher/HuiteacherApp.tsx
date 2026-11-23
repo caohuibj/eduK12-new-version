@@ -202,16 +202,17 @@ function HuiteacherApplication(){
   const practiceDraft=useRef<PrivateDraftState>({dirty:false,writing:false})
   const setPracticeDraftState=useCallback((state:PrivateDraftState)=>{practiceDraft.current=state},[])
   const setPrivateDraftState=useCallback((state:PrivateDraftState)=>{privateDraft.current=state},[])
-  const canLeaveForm=()=>{
+  const canLeaveForm=useCallback(()=>{
     if(privateDraft.current.writing){setMessage('私有工具正在处理，请等待完成后再离开。');return false}
     if(privateDraft.current.dirty&&!window.confirm('私有工具草稿尚未保存，确定放弃修改并离开吗？'))return false
     if(practiceDraft.current.writing){setMessage('实践记录正在保存或提交，请等待完成后再离开。');return false}
     if(practiceDraft.current.dirty&&!window.confirm('实践表单或记录尚未正式保存，确定放弃当前输入并离开吗？'))return false
     if(formDraftState.writing){setMessage('表单正在保存或发布，请等待完成后再离开。');return false}
     return !formDraftState.dirty||window.confirm('当前表单草稿尚未保存，确定放弃修改并离开吗？')
-  }
+  },[formDraftState.dirty,formDraftState.writing])
   const changeWorkspaceTab=(next:WorkspaceTab)=>{
     if(next===workspaceTab||!canLeaveForm())return
+    window.history.pushState({...window.history.state,teacherWorkspace:next},'',window.location.pathname+window.location.search+(next==='school'?'#'+schoolSection:next==='teacher'?'#'+personalSection:''))
     setWorkspaceTab(next)
   }
   const changeOrganization=(next:string)=>{
@@ -423,6 +424,21 @@ function HuiteacherApplication(){
     const restoreSection=(event?:Event)=>{
       const fragment=window.location.hash.slice(1)||(workspaceTab==='school'?'ht-school-settings':'ht-personal-tasks')
       const id=['ht-personal-forms','ht-personal-private-forms','ht-personal-scales'].includes(fragment)?'ht-personal-tasks':fragment
+      // Only known sections and currently authorized workspaces may be restored.
+      const school=['ht-school-settings','ht-school-relationships','ht-school-evaluations','ht-school-forms'].includes(id)
+      const personal=['ht-personal-tasks','ht-personal-self','ht-personal-feedback','ht-personal-growth'].includes(id)
+      const stored=window.history.state?.teacherWorkspace
+      const requested=window.location.hash?(school?'school':personal?'teacher':null):stored
+      const allowed=requested==='school'?org?.productAdmin:requested==='private-tools'?canAuthorPrivateTools:requested==='teacher'||requested==='expert'
+      if(me&&me.role!=='STUDENT'&&!me.mustChangePassword&&screen==='workspace'&&allowed&&requested!==workspaceTab){
+        if(event&&!canLeaveForm()){
+          window.history.pushState({teacherWorkspace:workspaceTab},'',window.location.pathname+window.location.search+(workspaceTab==='school'?'#'+schoolSection:workspaceTab==='teacher'?'#'+personalSection:''))
+          return
+        }
+        if(school)setSchoolSection(id)
+        if(personal)setPersonalSection(id)
+        setWorkspaceTab(requested as WorkspaceTab);return
+      }
       // A fragment can only select an already-authorized, mounted section.
       const target=document.getElementById(id)
       if(!target?.classList.contains('ht-workspace-section'))return
@@ -437,7 +453,7 @@ function HuiteacherApplication(){
     window.addEventListener('popstate',restoreSection)
     window.addEventListener('hashchange',restoreSection)
     return ()=>{window.removeEventListener('popstate',restoreSection);window.removeEventListener('hashchange',restoreSection)}
-  },[workspaceTab,loading,me?.id,selectedOrg])
+  },[workspaceTab,loading,me,selectedOrg,org?.productAdmin,screen,canAuthorPrivateTools,canLeaveForm,personalSection,schoolSection])
   const publicHome=screen==='home'
   const publicAuth=!me&&screen!=='home'
   const workspaceNavigation=Boolean(me&&screen==='workspace'&&!me.mustChangePassword&&me.role!=='STUDENT'&&!assessmentPageOpen)

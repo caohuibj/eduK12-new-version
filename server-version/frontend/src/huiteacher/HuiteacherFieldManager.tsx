@@ -5,12 +5,12 @@ import {compositionAdministrationForEntry} from '../components/education-tools/e
 type Api=<T>(path:string,method?:string,payload?:unknown)=>Promise<T>
 type Role='EXPERT'|'PEER'
 type Grant={id:string;observerUserId:string;role:Role;status:'INVITED'|'ACCEPTED'|'REVOKED';
-  revision:number;expiresAt:string;acceptedAt:string|null}
+  revision:number;expiresAt:string;acceptedAt:string|null;loginName?:string}
 type FormalNote={id:string;eventId:string;kind:'FACT'|'FORMAL_FEEDBACK';
   status:'SUBMITTED';submittedAt:string;content:string}
 type Binding={title:string;assessmentRef:{origin:{versionId:string;contentHash:string;targetKind:string}}}
 type Evidence={attemptId:string;attemptEpoch:number;finalHash:string;units:Array<
- {kind:'FORM';unitId:string;items:Array<{prompt:string;state:string;value:unknown;rowStates?:unknown;otherText?:unknown}>}|
+ {kind:'FORM';unitId:string;items:Array<{prompt:string;state:string;value:unknown;displayValue?:string;rowStates?:unknown;otherText?:unknown}>}|
  {kind:'SCALE';unitId:string;state:'WITHHELD'|'DESCRIPTIVE';metrics:Array<{key:string;label:string;value:number|null}>}>}
 type Props={
   organizationId:string;eventId:string;eventStatus:string;api:Api
@@ -24,6 +24,13 @@ export function HuiteacherFieldManager(props:Props){
 function FieldManagerSession({organizationId,eventId,eventStatus,api}:Props){
   const base='/organizations/'+organizationId+'/evaluation-events/'+eventId
   const [observerId,setObserverId]=useState('')
+  const [observerQuery,setObserverQuery]=useState('')
+  const [observers,setObservers]=useState<Array<{userId:string;loginName:string;role:string}>>([])
+  const loadObservers=()=>run(async()=>{
+    const result=await api<{list:Array<{userId:string;loginName:string;role:string}>;truncated:boolean}>('/organizations/'+organizationId+'/members?q='+encodeURIComponent(observerQuery.trim()))
+    setObservers(result.list.filter(row=>['ADMIN','TEACHER'].includes(row.role)));setObserverId('')
+    setNotice(result.truncated?'匹配账号较多，请输入更完整的登录名后重新查询。':'已读取本校当前成员，请核对登录名并选择受邀者。')
+  })
   const [expertInviteCode,setExpertInviteCode]=useState('')
   const [role,setRole]=useState<Role>('EXPERT')
   const [expiresAt,setExpiresAt]=useState('')
@@ -59,8 +66,9 @@ function FieldManagerSession({organizationId,eventId,eventStatus,api}:Props){
     const result=await api<{list:Grant[]}>(base+'/observer-grants')
     setGrants(result.list);setShowGrants(true)
   }
+  const observerChoices=[...new Map([...observers,...grants.filter(row=>row.status!=='REVOKED').map(row=>({userId:row.observerUserId,loginName:row.loginName??'已邀请账号',role:'TEACHER'}))].map(row=>[row.userId,row])).values()]
   const invite=()=>run(async()=>{
-    if(!/^[0-9a-f-]{36}$/i.test(observerId))throw new Error('请填写受邀者已核验的教育用户 ID')
+    if(!observerChoices.some(row=>row.userId===observerId))throw new Error('请先查询并选择已核对的本校账号')
     const timestamp=new Date(expiresAt)
     if(!expiresAt||Number.isNaN(timestamp.getTime()))
       throw new Error('请先设置明确的邀请到期时间')
@@ -103,7 +111,7 @@ function FieldManagerSession({organizationId,eventId,eventStatus,api}:Props){
       <button disabled={busy} type="button" onClick={loadFormBinding}>
         查看本次固定问卷绑定
       </button>
-      {boundForm?<p className="ht-tag">已绑定：{boundForm.title} · {boundForm.assessmentRef.origin.targetKind} · {boundForm.assessmentRef.origin.contentHash.slice(0,12)}…（固定后不可替换）</p>
+      {boundForm?<p className="ht-tag">已绑定：{boundForm.title}（固定后不可替换）</p>
         :bindingLoaded&&eventStatus==='DRAFT'?<>
           <EducationPrivateVersionChooser api={api} organizationId={organizationId} kind="COMPOSITION" disabled={busy} selectLabel="选作专家观察问卷" onSelect={value=>{
             const administration=compositionAdministrationForEntry(value.administration,'TEACHER')
@@ -117,16 +125,16 @@ function FieldManagerSession({organizationId,eventId,eventStatus,api}:Props){
     </div>
     {['DRAFT','OPEN'].includes(eventStatus)&&<div className="ht-inline">
       <button type="button" onClick={inviteNewExpert} disabled={busy}>
-        为尚无教育账号的外部专家生成受控邀请码
+        生成外部专家活动邀请码
       </button>
       {expertInviteCode&&<p className="ht-secret">
         一次性专家邀请码（请安全交付）：<code className="ht-wrap">{expertInviteCode}</code>
       </p>}
     </div>}
     {['DRAFT','OPEN','CLOSED'].includes(eventStatus)&&<div className="ht-inline">
-      <label className="ht-field"><span>观察者教育账号 ID</span>
-        <input value={observerId} onChange={e=>setObserverId(e.target.value)}
-          placeholder="已核验 User ID" autoComplete="off"/></label>
+      <label className="ht-field"><span>检索本校观察者账号</span><input maxLength={100} value={observerQuery} onChange={e=>setObserverQuery(e.target.value)} placeholder="输入教育账号登录名"/></label>
+      <button type="button" disabled={busy} onClick={loadObservers}>查询本校可邀请账号</button>
+      <label className="ht-field"><span>受邀观察者账号</span><select value={observerId} onChange={e=>setObserverId(e.target.value)}><option value="">请选择已核对的账号</option>{observerChoices.map(row=><option key={row.userId} value={row.userId}>{row.loginName}</option>)}</select></label>
       <label className="ht-field"><span>本次角色</span>
         <select value={role} onChange={e=>setRole(e.target.value as Role)}>
           <option value="EXPERT">外部专家</option><option value="PEER">同行观察者</option>
@@ -140,6 +148,7 @@ function FieldManagerSession({organizationId,eventId,eventStatus,api}:Props){
         活动已关闭，仅允许延长既有专家的共识确认资格；不可新建现场观察或修改已提交的原稿。
       </p>}
     </div>}
+    <p className="ht-muted">外部专家无须提供内部账号编号：已有教育账号可在“专业实践 → 使用活动邀请码”领取；没有账号可使用该码注册外部专家。</p>
     <div className="ht-inline">
       {['DRAFT','OPEN','CLOSED'].includes(eventStatus)&&
         <button type="button" disabled={busy} onClick={()=>run(readGrants)}>查看／管理邀请名单</button>}
@@ -147,8 +156,8 @@ function FieldManagerSession({organizationId,eventId,eventStatus,api}:Props){
     </div>
     {showGrants&&<div className="ht-event-list">{grants.length?grants.map(grant=>
       <article className="ht-event" key={grant.id}>
-        <p>账号：<code>{grant.observerUserId}</code> · {grant.role==='EXPERT'?'专家':'同行'}
-          · {grant.status} · 到期 {new Date(grant.expiresAt).toLocaleString()}</p>
+        <p>账号：{grant.loginName??'已邀请账号'} · {grant.role==='EXPERT'?'专家':'同行'}
+          · {{INVITED:'待接受',ACCEPTED:'已领取',REVOKED:'已撤销'}[grant.status]} · 到期 {new Date(grant.expiresAt).toLocaleString()}</p>
         {grant.status!=='REVOKED'&&
           <button type="button" disabled={busy} onClick={()=>revoke(grant)}>撤销本次授权</button>}
       </article>):<p>本次活动没有观察者邀请。</p>}</div>}
@@ -161,7 +170,7 @@ function FieldManagerSession({organizationId,eventId,eventStatus,api}:Props){
           onClick={()=>readFieldEvidence(note)}>按授权核验结构化观察证据</button>}
         {evidence[note.id]&&<div className="ht-field-evidence">
           <strong>已提交的固定问卷证据</strong>
-          {evidence[note.id].units.map(unit=><section key={unit.unitId}>{unit.kind==='FORM'?<><h5>表单观察记录（不计分）</h5><dl>{unit.items.map((item,index)=><div key={index}><dt>{item.prompt}</dt><dd>{item.state==='ANSWERED'?JSON.stringify(item.value):'未作答'}{item.rowStates!==undefined&&<span> · {JSON.stringify(item.rowStates)}</span>}{item.otherText!==undefined&&<span> · {JSON.stringify(item.otherText)}</span>}</dd></div>)}</dl></>:<><h5>量表描述结果</h5>{unit.state==='WITHHELD'?<p>此量表的固定报告设置未授权在正式证据中展示结果。</p>:<dl>{unit.metrics.map(metric=><div key={metric.key}><dt>{metric.label}</dt><dd>{metric.value===null?'无法计算':metric.value}</dd></div>)}</dl>}</>}</section>)}
+          {evidence[note.id].units.map(unit=><section key={unit.unitId}>{unit.kind==='FORM'?<><h5>表单观察记录（不计分）</h5><dl>{unit.items.map((item,index)=><div key={index}><dt>{item.prompt}</dt><dd>{item.displayValue??(item.state==='ANSWERED'?'已作答':item.state==='REFUSED'?'已明确拒答':item.state==='NOT_SHOWN'?'未显示':'未作答')}<details><summary>原始记录详情</summary><pre>{JSON.stringify({state:item.state,value:item.value,rowStates:item.rowStates,otherText:item.otherText},null,2)}</pre></details></dd></div>)}</dl></>:<><h5>量表描述结果</h5>{unit.state==='WITHHELD'?<p>此量表的固定报告设置未授权在正式证据中展示结果。</p>:<dl>{unit.metrics.map(metric=><div key={metric.key}><dt>{metric.label}</dt><dd>{metric.value===null?'无法计算':metric.value}</dd></div>)}</dl>}</>}</section>)}
         </div>}
       </article>):<p>尚无正式提交的观察反馈。私人反思不进入学校反馈。</p>}</div>}
     {eventStatus==='CLOSED'&&<HuiteacherConsensusManager

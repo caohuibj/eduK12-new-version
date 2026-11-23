@@ -5,7 +5,7 @@ import { useCallback,useEffect,useRef,useState } from 'react'
 import {HuiteacherFieldQuestionnaire,type FieldQuestionnaireTask,type FieldQuestionnaireProgress} from './HuiteacherFieldQuestionnaire'
 type Api=<T>(path:string,method?:string,payload?:unknown)=>Promise<T>
 type Invite={invitationId:string;organizationId:string;eventId:string;title:string;
-  kind:string;role:'EXPERT'|'PEER';expiresAt:string;status:'INVITED'|'ACCEPTED'}
+  kind:string;role:'EXPERT'|'PEER';expiresAt:string;status:'INVITED'|'ACCEPTED';eventStatus?:'DRAFT'|'OPEN'}
 type Note={id:string;eventId:string;kind:'FACT'|'FORMAL_FEEDBACK'|'PRIVATE_REFLECTION';
   status:'DRAFT'|'SUBMITTED';revision:number;content:string;createdAt:string;submittedAt:string|null}
 type Kind=Note['kind']
@@ -84,7 +84,7 @@ function FieldWorkspaceSession({api,onDraftStateChange}:Props){
   const submittedFeedback=(event:string)=>notes.find(note=>note.eventId===event&&note.kind==='FORMAL_FEEDBACK'&&note.status==='SUBMITTED')
   const formal=currentKind==='FORMAL_FEEDBACK'
   const alreadySubmitted=formal&&!!submittedFeedback(eventId)
-  const editable=currentNote?.status!=='SUBMITTED'&&currentInvite?.status==='ACCEPTED'&&!alreadySubmitted
+  const editable=currentNote?.status!=='SUBMITTED'&&currentInvite?.status==='ACCEPTED'&&currentInvite.eventStatus!=='DRAFT'&&!alreadySubmitted
   const ready=editable&&(!formal||!!bound)
   // Read only the selected editable record's frozen event binding. Returning to
   // a previously visited activity reuses that definition and its local answers;
@@ -111,7 +111,9 @@ function FieldWorkspaceSession({api,onDraftStateChange}:Props){
   },[api,eventId,formInvitation,formLoaded,formReload])
   const openActivity=(invite:Invite)=>{
     const existing=submittedFeedback(invite.eventId)??notes.find(note=>note.eventId===invite.eventId&&note.kind==='FORMAL_FEEDBACK'&&note.status==='DRAFT')
-    setNewEvent(invite.invitationId);setKind('FORMAL_FEEDBACK');setActiveNoteId(existing?.id??'');setOpened(true);setNotice('')
+    if(invite.eventStatus==='DRAFT')return
+    const selected=invite.role==='PEER'?notes.find(note=>note.eventId===invite.eventId&&note.kind==='FACT'&&note.status==='DRAFT'):existing
+    setNewEvent(invite.invitationId);setKind(invite.role==='PEER'?'FACT':'FORMAL_FEEDBACK');setActiveNoteId(selected?.id??'');setOpened(true);setNotice('')
   }
   const openNote=(note:Note)=>{setActiveNoteId(note.id);setOpened(true);setNotice('')}
   const action=(fn:()=>Promise<void>)=>{
@@ -172,7 +174,7 @@ function FieldWorkspaceSession({api,onDraftStateChange}:Props){
     await refresh();setNotice(note.kind==='PRIVATE_REFLECTION'?
       '私人反思已归档，未向学校披露。':'正式观察记录已提交，原稿将保持不可改写。')
   })
-  const active=invitations.filter(i=>i.status==='ACCEPTED')
+  const active=invitations.filter(i=>i.status==='ACCEPTED'&&i.eventStatus!=='DRAFT')
   const canonicalReady=!formal||!!progress?.completed
   return <section className="ht-panel ht-practice-workbench" aria-label="我的专业实践">
     <header className="ht-section-heading"><h2>我的专业实践</h2><PracticeHelp label="专业实践与记录说明" buttonText=""><p>从受邀活动进入，填写组织者配置的实践表单。私人反思仅本人可见，与提交给学校的专业意见分别保存。</p></PracticeHelp></header>
@@ -181,9 +183,10 @@ function FieldWorkspaceSession({api,onDraftStateChange}:Props){
     <h3 className="ht-practice-section-title">实践活动</h3>
     {!invitations.length?<p className="ht-empty">尚未收到实践活动邀请。</p>:<div className="ht-event-list">{invitations.map(inv=><article key={inv.invitationId} className="ht-event ht-practice-card">
       <span className="ht-practice-card-icon" aria-hidden="true"><Compass size={20}/></span>
-      <div className="ht-practice-card-copy"><h4>{inv.title}</h4><div className="ht-practice-card-meta"><span>{inv.role==='EXPERT'?'外部专家':'同行观察者'}</span><span className="ht-tag">{submittedFeedback(inv.eventId)?'已提交':inv.status==='ACCEPTED'?'已领取':'待接受'}</span><span>到期：{new Date(inv.expiresAt).toLocaleString('zh-CN')}</span></div></div>
-      {submittedFeedback(inv.eventId)?<button disabled={busy} onClick={()=>openActivity(inv)}>查看已提交记录</button>:inv.status==='INVITED'?<button disabled={busy} onClick={()=>accept(inv)}>接受本次邀请</button>:<button disabled={busy} onClick={()=>openActivity(inv)}>填写实践表单</button>}
+      <div className="ht-practice-card-copy"><h4>{inv.title}</h4><div className="ht-practice-card-meta"><span>{inv.role==='EXPERT'?'外部专家':'同行观察者'}</span><span className="ht-tag">{submittedFeedback(inv.eventId)?'已提交':inv.status==='ACCEPTED'?'已领取':'待接受'}</span><span>{inv.eventStatus==='DRAFT'?'活动尚未开放':'活动已开放'}</span><span>到期：{new Date(inv.expiresAt).toLocaleString('zh-CN')}</span></div></div>
+      {submittedFeedback(inv.eventId)?<button disabled={busy} onClick={()=>openActivity(inv)}>查看已提交记录</button>:inv.status==='INVITED'?<button disabled={busy} onClick={()=>accept(inv)}>接受本次邀请</button>:<button disabled={busy||inv.eventStatus==='DRAFT'} onClick={()=>openActivity(inv)}>{inv.eventStatus==='DRAFT'?'等待活动开放':inv.role==='PEER'?'填写同行观察记录':'填写实践表单'}</button>}
     </article>)}</div>}
+    <p className="ht-muted">同行可提交事实观察依据和私人反思；固定专家问卷与专业意见由受邀专家填写。</p>
     <h3 className="ht-practice-section-title">我的记录</h3>
     {!notes.length?<p className="ht-empty">尚未创建实践记录。</p>:<div className="ht-event-list">{notes.map(note=><article key={note.id} className="ht-event ht-practice-card">
       <span className="ht-practice-card-icon" aria-hidden="true">{note.kind==='PRIVATE_REFLECTION'?<NotebookPen size={20}/>:<ClipboardList size={20}/>}</span>

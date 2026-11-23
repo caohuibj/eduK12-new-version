@@ -58,7 +58,7 @@ describe('Teacher student evaluation read recovery',()=>{
       failure=false
       fireEvent.click(screen.getByRole('button',{name:'重试读取评价配置与任务'}))
       expect(await screen.findByRole('button',{name:'发布评价'})).toBeEnabled()
-      expect(screen.getByText(/标准 Run · DRAFT · run-a/)).toBeInTheDocument()
+      expect(screen.getByText('run-a')).toBeInTheDocument()
       expect(writes(api)).toEqual([])
     },
   )
@@ -102,12 +102,12 @@ describe('Teacher student evaluation read recovery',()=>{
       render(<HuiteacherStudentEvaluationManager {...props} eventStatus="OPEN" api={api as Api}/>)
       fireEvent.click(await screen.findByRole('button',{name:'发布评价'}))
       expect(await screen.findByRole('alert')).toHaveTextContent('HTTP 503')
-      expect(screen.getByText(/标准 Run · DRAFT · run-a/)).toBeInTheDocument()
+      expect(screen.getByText('run-a')).toBeInTheDocument()
       expect(screen.getByRole('button',{name:'发布评价'})).toBeDisabled()
       expect(screen.queryByRole('button',{name:'继续准备已保存的评价'})).not.toBeInTheDocument()
       fireEvent.click(screen.getByRole('button',{name:'重试读取评价配置与任务'}))
       expect(await screen.findByRole('button',{name:'查看参与进度'})).toBeEnabled()
-      expect(screen.getByText(/标准 Run · PUBLISHED · run-a/)).toBeInTheDocument()
+      expect(screen.getByText('run-a')).toBeInTheDocument()
       expect(writes(api)).toHaveLength(1)
     }finally{confirm.mockRestore()}
   })
@@ -127,7 +127,7 @@ describe('Teacher student evaluation read recovery',()=>{
     expect(await screen.findByText('class-b')).toBeInTheDocument()
     await act(async()=>{old.resolve(config)})
     expect(screen.queryByText('class-a')).not.toBeInTheDocument()
-    expect(screen.getByText(/标准 Run · DRAFT · run-b/)).toBeInTheDocument()
+    expect(screen.getByText('run-b')).toBeInTheDocument()
     expect(api.mock.calls.some(([path])=>path===base+'/run')).toBe(false)
     expect(writes(api)).toEqual([])
   })
@@ -147,7 +147,7 @@ describe('Teacher student evaluation read recovery',()=>{
     await screen.findByRole('button',{name:'选择学校核验的任教关系'})
     await act(async()=>{old.resolve(draft)})
     expect(screen.queryByRole('button',{name:'发布评价'})).not.toBeInTheDocument()
-    expect(screen.queryByText(/标准 Run/)).not.toBeInTheDocument()
+    expect(screen.queryByText('任务编号')).not.toBeInTheDocument()
     expect(writes(apiA)).toEqual([]);expect(writes(apiB)).toEqual([])
   })
 

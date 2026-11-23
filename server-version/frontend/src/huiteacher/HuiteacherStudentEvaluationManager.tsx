@@ -219,9 +219,9 @@ function StudentEvaluationSession({organizationId,eventId,eventStatus,
       <button disabled={blocked||!staffId||(sourceKind==='FORM'?!formId:!composition)} onClick={configure}>准备评价草稿</button>
     </div>}
     {configured&&<div className="ht-field-evidence">
-      <p>冻结班级：<code>{configured.classUnitId}</code>
+      <details><summary>固定问卷版本详情</summary><p>冻结班级：<code>{configured.classUnitId}</code>
         {' · '}{configured.privateComposition?'固定普通问卷：':'发布 Form：'}<code>{configured.privateComposition?.versionId??configured.formId}</code></p>
-      <p>问卷内容摘要：<code>{(configured.privateComposition?.contentHash??configured.definitionDigest??'').slice(0,16)}…</code></p>
+      <p>问卷内容摘要：<code>{(configured.privateComposition?.contentHash??configured.definitionDigest??'').slice(0,16)}…</code></p></details>
       {eventStatus==='DRAFT'&&<button disabled={blocked} onClick={count}>
         核验当前参与资格与隐私人数下限</button>}
       {preview&&<p>当前符合资格学生：{preview.eligibleStudentCount} 人，
@@ -236,7 +236,7 @@ function StudentEvaluationSession({organizationId,eventId,eventStatus,
         <button disabled={blocked} onClick={create}>继续准备已保存的评价</button>
       </div>}
       {assignedRun&&<div className="ht-event">
-        <p>标准 Run · {assignedRun.status} · {assignedRun.runId}</p>
+        <p>评价任务 · {{DRAFT:'草稿',PUBLISHED:'已发布',CLOSED:'已结束',CANCELLED:'已取消'}[assignedRun.status]??assignedRun.status}</p><details><summary>任务编号</summary><code>{assignedRun.runId}</code></details>
         <div className="ht-inline">
           {['DRAFT','OPEN'].includes(eventStatus)&&assignedRun.status==='DRAFT'&&
             <button disabled={blocked} onClick={publish}>发布评价</button>}

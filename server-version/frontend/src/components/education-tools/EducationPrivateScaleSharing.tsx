@@ -53,7 +53,7 @@ function SharingSession({api,entry,organizationId,actorId,toolId,version,disable
  const manifest=prepared?.mediaManifest
  const consentIdentity=manifest?JSON.stringify([scope,prepared?.releaseId,prepared?.contentHash,manifest.manifestHash]):''
  const mediaReady=Boolean(manifest&&(!manifest.items.length||consent===consentIdentity))
- const canSubmit=Boolean(prepared&&loaded&&!duplicate&&mediaReady&&applicability.valid&&Object.values(metadata).every(value=>value.trim()))
+ const canSubmit=Boolean(prepared&&loaded&&!duplicate&&mediaReady&&applicability.valid&&(['title','applicability','scoringDescription','reportDescription'] as const).every(key=>metadata[key].trim()))
  const submit=(retry=false)=>void work(async current=>{
   if(!retry&&!canSubmit)return
   const body=retry?pending:prepared?{contentHash:version.contentHash,releaseId:prepared.releaseId,requestId:crypto.randomUUID(),metadata:{...metadata},dependencyReleaseIds:[] as [],
@@ -92,7 +92,7 @@ function SharingSession({api,entry,organizationId,actorId,toolId,version,disable
   {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
   {pending&&<button type="button" disabled={busy||disabled} onClick={()=>submit(true)}>按原申请编号及内容重试</button>}
   {prepared&&<>
-   <p>私有版本摘要：{prepared.privateContentHash} · 入库内容版本：{prepared.releaseId} · 内容摘要：{prepared.contentHash}</p>
+   <details><summary>固定版本技术详情</summary><p>私有版本摘要：{prepared.privateContentHash} · 入库内容版本：{prepared.releaseId} · 内容摘要：{prepared.contentHash}</p></details>
    <SubmissionMetadataFields value={metadata} onChange={setMetadata} disabled={busy||disabled||Boolean(pending)} entry={entry}/>
    <EducationApplicabilityFields product={entry} rows={applicability.rows} onChange={applicability.setRows} valid={applicability.valid} disabled={busy||disabled||Boolean(pending)}/>
    {entry==='TEACHER'&&<><label><input type="checkbox" checked={expert} disabled={busy||disabled||Boolean(pending)} onChange={event=>setExpert(event.target.checked)}/>本次新固定版本另行声明适用于受邀专家观察教师个人</label>

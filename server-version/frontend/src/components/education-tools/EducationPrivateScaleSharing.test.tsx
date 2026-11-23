@@ -113,3 +113,18 @@ describe('private-scale application session',()=>{
   await screen.findByText(/申请已撤回/);expect(screen.queryByRole('button',{name:'撤回此申请'})).not.toBeInTheDocument()
  })
 })
+
+it('submits blank optional author/copyright while continuing to require purpose and scoring metadata',async()=>{
+ const defaults={...metadata,author:'',copyright:''}
+ const api=vi.fn(async(path:string,method='GET')=>path.endsWith('/prepare')?{...prepared,product:'TEACHER',defaults,mediaManifest:{...mediaManifest,items:[]}}:method==='POST'?{...row,product:'TEACHER',metadata:defaults}:{list:[],hasMore:false})
+ render(<EducationPrivateScaleSharing {...props} entry="TEACHER" api={api as PrivateToolApi}/>);await prepare()
+ fireEvent.click(screen.getByRole('checkbox',{name:'本次新固定版本另行声明适用于受邀专家观察教师个人'}))
+ await waitFor(()=>expect(screen.getByRole('button',{name:'提交此版本入库申请'})).toBeEnabled())
+ const purpose=screen.getByLabelText('用途与适用范围')
+ fireEvent.change(purpose,{target:{value:' '}})
+ expect(screen.getByRole('button',{name:'提交此版本入库申请'})).toBeDisabled()
+ fireEvent.change(purpose,{target:{value:defaults.applicability}})
+ fireEvent.click(screen.getByRole('button',{name:'提交此版本入库申请'}))
+ await screen.findByText(/入库申请已提交，等待管理员审核/)
+ expect(api.mock.calls.some((call:any[])=>call[1]==='POST'&&call[2]?.metadata?.author===''&&call[2]?.metadata?.copyright==='')).toBe(true)
+})

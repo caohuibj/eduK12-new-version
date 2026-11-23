@@ -63,3 +63,21 @@ it('rejects a mismatched preview version without adding a mandatory-preview publ
  fireEvent.click(await screen.findByRole('button',{name:'发布教师评价任务'}))
  await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/publish','POST',{expectedVersion:3,tracking:{mode:'SINGLE',metrics:[],visibleMetrics:[]},provideParticipantReport:false}))
 })
+
+it('provides an explicitly confirmed activity cancellation after a published Run was cancelled',async()=>{
+ let cancelled=false
+ const api=setup((path,method)=>{
+  if(path===base)return Promise.resolve({...run,status:'CANCELLED'})
+  if(path.endsWith('/evaluation-events'))return Promise.resolve({list:[{...event,status:cancelled?'CANCELLED':'OPEN'}]})
+  if(path.endsWith('/transition')&&method==='POST'){cancelled=true;return Promise.resolve({status:'CANCELLED',version:2})}
+ })
+ const confirm=vi.spyOn(window,'confirm').mockReturnValue(false)
+ render(<HuiteacherEvaluationStudio organizationId="org" api={api as never}/>)
+ fireEvent.click(await screen.findByRole('button',{name:'查看任务配置'}))
+ fireEvent.click(await screen.findByRole('button',{name:'取消活动并结束'}))
+ await waitFor(()=>expect(confirm).toHaveBeenCalledOnce())
+ expect(api.mock.calls.some(([p,m])=>p.endsWith('/transition')&&m==='POST')).toBe(false)
+ confirm.mockReturnValue(true)
+ fireEvent.click(await screen.findByRole('button',{name:'取消活动并结束'}))
+ await waitFor(()=>expect(api).toHaveBeenCalledWith('/organizations/org/evaluation-events/event/transition','POST',{action:'CANCEL',expectedVersion:1}))
+})
