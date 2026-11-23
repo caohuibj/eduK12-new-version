@@ -27,10 +27,12 @@ const suite=process.env.SURVEY_ADMIN_ISOLATED_TEST==='1'?describe:describe.skip
 suite('independent Survey admin with real HTTP, current DB and deidentified export',()=>{
  let server:Server,base:string,pid:string,owner:string,manager:any,system:any,training:any,finalId:string
  const proof={adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()}
+ const previousAdminOrigin=process.env.ADMIN_AUTH_ORIGIN
  const ready=listScaleInstrumentSources().find(s=>s.executable)!,notReady=listScaleInstrumentSources().find(s=>!s.executable)!
  let identity:ReturnType<typeof standardPolicyIdentity>
  beforeAll(async()=>{
   const url=new URL(process.env.DATABASE_URL!);if(url.port!=='55433'||!url.pathname.startsWith('/survey_permissions_test_'))throw new Error('Dedicated Survey permission test DB required')
+  process.env.ADMIN_AUTH_ORIGIN='http://localhost:5174'
   process.env.SURVEY_WORKSPACE_ENABLED='true';process.env.SURVEY_PUBLICATION_ENABLED='true'
   const create=(name:string,role:'STANDARD'|'SYSTEM_ADMIN')=>db.user.create({data:{username:name+'-'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'TRAINING',platformRole:role,role:'STUDENT'}})
   manager=await create('survey-manager','STANDARD');system=await create('system','SYSTEM_ADMIN');training=await create('training','STANDARD')
@@ -58,7 +60,8 @@ suite('independent Survey admin with real HTTP, current DB and deidentified expo
   server=createServer(app);await new Promise<void>(r=>server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+(server.address() as {port:number}).port
   identity=standardPolicyIdentity(ready.identity.instrumentKey,ready.identity.instrumentVersion)
  },60000)
- afterAll(async()=>{if(server)await new Promise<void>(r=>server.close(()=>r()));await (await import('../../config/queue')).closeQueues(true);await db.$disconnect()})
+ afterAll(async()=>{if(previousAdminOrigin===undefined)delete process.env.ADMIN_AUTH_ORIGIN;else process.env.ADMIN_AUTH_ORIGIN=previousAdminOrigin
+  if(server)await new Promise<void>(r=>server.close(()=>r()));await (await import('../../config/queue')).closeQueues(true);await db.$disconnect()})
  async function call(user:any,path:string,body?:unknown,extra:Record<string,unknown>={},csrf=true,origin='http://localhost:5174'){
   const token=generateToken({userId:user.id,username:user.username,role:user.role,accountDomain:user.accountDomain,tokenVersion:user.tokenVersion,...proof,...extra})
   const response=await fetch(base+'/api'+path,{method:body===undefined?'GET':'POST',headers:{Cookie:'ptool_session='+token+'; ptool_csrf=synthetic-csrf','X-CSRF-Token':csrf?'synthetic-csrf':'wrong',Origin:origin,'Content-Type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)})})
@@ -84,19 +87,20 @@ suite('independent Survey admin with real HTTP, current DB and deidentified expo
   expect((await call(system,'/platform/survey-system/projects',{reason:'Inspect'},{},false)).status).toBe(403)
   expect((await call(system,'/platform/survey-system/projects',{reason:'Inspect'},{},true,'http://survey.localhost:5174')).status).toBe(403)
  })
- it('keeps 53 content-ready packages separate from four catalog-only packages and blocked authorization',async()=>{
-  expect(listScaleInstrumentSources().filter(s=>standardContentReadiness(s.identity.instrumentKey,s.identity.instrumentVersion).ready)).toHaveLength(53)
+ it('distinguishes executable and catalog-only sources from assignment and deployment readiness',async()=>{
+  expect(standardContentReadiness(ready.identity.instrumentKey,ready.identity.instrumentVersion).ready).toBe(true)
   expect(standardContentReadiness(notReady.identity.instrumentKey,notReady.identity.instrumentVersion).ready).toBe(false)
   const result=await call(manager,'/platform/survey-library/catalog?page=1');expect(result.status).toBe(200)
   expect(result.body.data.list.every((r:any)=>!r.states.assignment.ready&&!r.states.deployment.ready)).toBe(true)
  })
- it('permits both roles to approve Survey scope, with exact identity, CAS and no automatic grants',async()=>{
+ it('reserves the content decision for the system while preserving exact identity, revision checks and independent grants',async()=>{
   const grants=await db.$queryRaw`SELECT id FROM survey_tool_grants`
   const update={...identity,expectedVersion:0,decision:'APPROVED' as const,paused:false,reason:'Synthetic exact-version review'}
-  expect((await call(manager,'/platform/survey-library/policies',update)).status).toBe(200)
+  expect((await call(manager,'/platform/survey-library/policies',update)).status).toBe(403)
+  expect((await call(system,'/platform/survey-library/policies',update)).status).toBe(200)
   expect((await call(system,'/platform/survey-library/policies',update)).status).toBe(409)
   await expect(db.$transaction(tx=>assertSurveyToolPolicy(tx,identity,true))).resolves.toBeUndefined()
-  await expect(changeSurveyToolPolicy(manager.id,{...standardPolicyIdentity(notReady.identity.instrumentKey,notReady.identity.instrumentVersion),expectedVersion:0,decision:'APPROVED',paused:false,reason:'Synthetic'})).rejects.toMatchObject({statusCode:409})
+  await expect(changeSurveyToolPolicy(system.id,{...standardPolicyIdentity(notReady.identity.instrumentKey,notReady.identity.instrumentVersion),expectedVersion:0,decision:'APPROVED',paused:false,reason:'Synthetic'})).rejects.toMatchObject({statusCode:409})
   expect(await db.$queryRaw`SELECT id FROM survey_tool_grants`).toEqual(grants)
  })
  it('pauses Survey future use without altering FINALs, and retains old missing-policy attempts',async()=>{

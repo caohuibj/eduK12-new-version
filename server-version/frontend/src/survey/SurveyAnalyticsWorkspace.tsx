@@ -10,7 +10,7 @@ import { useEffect,useRef,useState,type FormEvent } from 'react'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type WaveSummary={id:string;ordinal:number;title:string;status:string;
-  starts:number;finalCompleted:number;analysisIncluded:number;qualityExcluded:number;
+  starts:number;completedTotal:number;finalCompleted:number;analysisIncluded:number;qualityExcluded:number;
   uniqueLinkedCodes:number|null;excluded:number}
 type Overview={projectId:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';source:string;note:string;waves:WaveSummary[]}
 type Matched={baselineN:number;followupN:number;matchedN:number;attritionN:number;lateJoinN:number;note:string}
@@ -411,24 +411,24 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
     {overviewError&&<p role="alert">完成进度加载失败：{overviewError}。请使用“刷新完成进度”重试。{overview?'下方保留上次成功读取的数据，可能不是最新状态。':''}</p>}
     {!overviewLoading&&!overviewError&&overview?.waves.length===0&&<p>本项目暂无研究波次。请先在发布入口创建并保存波次。</p>}
     {overview&&<><section className="survey-data-summary" aria-label="答卷完成概览"><div className="survey-data-summary-heading"><h3>答卷完成情况</h3><span>各波次累计答卷，不代表独立参与人数</span></div><div className="survey-data-metrics">{[
-      {label:'已完成答卷',key:'finalCompleted' as const,Icon:ClipboardCheck},
+      {label:'累计提交答卷',key:'completedTotal' as const,Icon:ClipboardCheck},
       {label:'有效分析答卷',key:'analysisIncluded' as const,Icon:CheckCircle2},
       {label:'质量排除',key:'qualityExcluded' as const,Icon:Filter},
       {label:'撤回排除',key:'excluded' as const,Icon:UserMinus},
     ].map(({label,key,Icon})=><article key={key}><span><Icon size={17} aria-hidden="true"/>{label}</span><strong>{overview.waves.every(w=>typeof w[key]==='number')?overview.waves.reduce((sum,w)=>sum+w[key],0):'—'}</strong></article>)}</div></section>
     <div className="survey-data-wave-table overflow-x-auto" tabIndex={0} role="region" aria-label="研究波次完成统计"><table className="w-full text-sm border-collapse">
       <thead><tr className="bg-slate-100"><th className="p-2 text-left">波次</th><th className="p-2">状态</th>
-        <th className="p-2">已启动</th><th className="p-2">已完成答卷</th>
+        <th className="p-2">已启动</th><th className="p-2">累计提交</th>
         <th className="p-2">有效分析</th><th className="p-2">质量排除</th>
         <th className="p-2">研究编号数</th><th className="p-2">撤回排除</th></tr></thead>
       <tbody>{overview.waves.map(w=><tr key={w.id} className="border-b">
         <th scope="row" className="p-2 text-left">T{w.ordinal} · {w.title}</th><td className="p-2 text-center"><span className="survey-data-wave-state" data-status={w.status}>{{OPEN:'采集中',DRAFT:'未开放',PAUSED:'已暂停',CLOSED:'已结束'}[w.status]||w.status}</span></td>
-        <td className="p-2 text-center">{w.starts}</td><td className="p-2 text-center">{w.finalCompleted}</td>
+        <td className="p-2 text-center">{w.starts}</td><td className="p-2 text-center">{w.completedTotal??'—'}</td>
         <td className="p-2 text-center">{w.analysisIncluded}</td>
         <td className="p-2 text-center">{w.qualityExcluded}</td>
         <td className="p-2 text-center">{w.uniqueLinkedCodes??'不可关联'}</td>
         <td className="p-2 text-center">{w.excluded}</td></tr>)}</tbody></table></div>
-      <details className="survey-data-count-note"><summary>答卷数量与统计口径</summary><p>{overview.note} 质量排除不修改原始答卷；参与者撤回另行处理。</p></details>
+      <details className="survey-data-count-note"><summary>答卷数量与统计口径</summary><p>{overview.note} 累计提交包含后来撤回的正式答卷。有效分析排除已撤回及人工排除的样本。撤回排除也可能包含未完成的作答。</p></details>
       <section id="survey-data-quality" data-empty={!qualityRows.length} tabIndex={-1} className="survey-task-card space-y-3" aria-label="科研样本质量复核">
         <h3 className="font-semibold">科研样本质量复核</h3>
         <p className="text-xs text-slate-600">只列出本人项目已完成且未撤回的 FINAL。审核决定可恢复，必须注明理由并留痕。</p>
@@ -443,7 +443,7 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
         {qualityRows.map(row=><div className="survey-quality-record flex flex-wrap justify-between gap-3 border-b py-2" key={row.attemptId}>
           <div className="text-xs"><code>{row.attemptCode}</code>
             <p>{row.researchCode??'独立匿名作答'} · <span className="survey-quality-verdict" data-verdict={row.verdict}>{row.verdict==='EXCLUDED'?'当前排除':'当前纳入'}</span></p>
-            <p>{row.reason??'尚无人工质量复核'} · {new Date(row.completedAt).toLocaleString('zh-CN')}</p>
+            <p>答卷提交于 {new Date(row.completedAt).toLocaleString('zh-CN')} · {row.reason?'最近复核理由：'+row.reason:'尚无人工质量复核'}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" className="btn-secondary" disabled={busy}
@@ -721,13 +721,16 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
             FINAL 页可合并，独立参与状态页按研究编号与波次关联；不要将两类 CSV 直接拼接。</p>}
         </div>}
       </div>
+      <section id="survey-data-reports" tabIndex={-1} aria-label="个人报告与历史解释">
+        {waveId?<SurveyStoredReportReader actorId={actorId} key={projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>
+          :<p>选择波次后可查看个人报告与历史解释。</p>}
+      </section>
       {waveId&&<SurveyGroupReports key={'group:'+actorId+':'+projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>}
       {waveId&&<details className="survey-data-advanced">
-        <summary>参考版本与历史报告 · 高级工具</summary>
-        <p>需要编制项目样本参考或查看已保存报告时，再展开以下工具。</p>
+        <summary>参考版本与组合报告 · 高级工具</summary>
+        <p>编制项目样本参考，或查看组合问卷报告。</p>
         <SurveyPrivateReferenceStudio actorId={actorId} key={'reference:'+actorId+':'+projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>
         <StoredPackageReports key={'package:'+projectId+':'+waveId} projectId={projectId} waveId={waveId}/>
-        <SurveyStoredReportReader actorId={actorId} key={projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>
       </details>}
     </>}
     </fieldset>

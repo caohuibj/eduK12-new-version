@@ -79,6 +79,18 @@ async function campusWholeAccess(req:Request,res:Response,next:NextFunction){
     return next(error)
   }
 }
+async function campusWholeProgressAccess(req:Request,res:Response,next:NextFunction){
+  try {
+    if(req.user?.accountDomain==='SCHOOL'&&req.user.role==='STUDENT'){
+      const proof=await readOrdinarySelfWholeAccess(prisma,'SCHOOL',req.user.userId,{attemptId:req.params.attemptId,mode:'progress'})
+      if(proof){res.locals.ordinarySelfWhole=proof;return next()}
+    }
+    return campusCompositeAccess(req,res,next)
+  } catch(error) {
+    if(isInstrumentFinalSubmitError(error))return instrumentError(res,error.code,error.message,error.statusCode)
+    return next(error)
+  }
+}
 async function campusFinalConsent(req:Request,res:Response,next:NextFunction){
   try{
     if(!req.user)return notFound(res)
@@ -237,7 +249,7 @@ router.get('/composite-attempts/:attemptId/whole/template/:templateHash',authent
   compositeController.wholeTemplate)
 router.get('/composite-attempts/:attemptId/whole/receipt',authenticateSchool,campusWholeAccess,
   compositeController.wholeReceipt)
-router.get('/composite-attempts/:attemptId/whole/progress',authenticateSchool,campusWholeAccess,
+router.get('/composite-attempts/:attemptId/whole/progress',authenticateSchool,campusWholeProgressAccess,
   compositeController.educationWholeProgress)
 router.post('/composite-attempts/:attemptId/whole/submit',authenticateSchool,async(req,res,next)=>{
   try{

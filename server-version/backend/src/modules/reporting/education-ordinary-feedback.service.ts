@@ -1,4 +1,4 @@
-import {readOrdinaryDeclaredFeedback,type OrdinaryStoredContent} from './education-ordinary-declared-feedback'
+import {readOrdinaryDeclaredFeedback,tryReadPreMaterializedDeclaredFeedback,type OrdinaryStoredContent} from './education-ordinary-declared-feedback'
 import {schoolSelfGroupAssignmentSql} from '../assessment-run/educationCompositionExecution'
 import {readOrdinaryNativeFeedback} from './education-ordinary-native-feedback'
 import {loadFrozenActiveSlotSet} from '../assessment-runtime/slot-set'
@@ -21,13 +21,14 @@ async function readOwn(tx:ReadOwnDb,input:ScopedInput,loadContent=false){
  const population=input.entry==='SCHOOL'?'STUDENT':'TEACHER'
  const [row]=await tx.$queryRaw<Array<{organizationId:string;key:string;version:string;policy:RunResourcePolicy;policyHash:string;status:string;
   subjectUserId:string;respondentUserId:string;subjectRole:string;respondentRole:string;relationshipKind:string;perspective:string;
-  receiptOnly:boolean|null;contentState:OrdinaryStoredContent|null;parentId:string|null;parentStatus:string|null;attemptEpoch:number|null;contextSnapshotHash:string|null;frozenSlots:string|null;frozenSlotsHash:string|null}>>(Prisma.sql`
+  receiptOnly:boolean|null;contentState:OrdinaryStoredContent|null;preMaterializedReport?:string|null;parentId:string|null;parentStatus:string|null;attemptEpoch:number|null;contextSnapshotHash:string|null;frozenSlots:string|null;frozenSlotsHash:string|null}>>(Prisma.sql`
   SELECT e.organization_id AS "organizationId",t.resource_key AS key,t.resource_version AS version,t.frozen_resource_policy AS policy,
    t.resource_policy_hash AS "policyHash",e.status,p.receipt_only AS "receiptOnly",p.id AS "parentId",p.status AS "parentStatus",p.attempt_epoch AS "attemptEpoch",
    a.subject_user_id AS "subjectUserId",a.respondent_user_id AS "respondentUserId",a.subject_role AS "subjectRole",a.respondent_role AS "respondentRole",
    a.relationship_kind AS "relationshipKind",a.perspective,p.context_snapshot_hash AS "contextSnapshotHash",
    CASE WHEN a.relationship_kind='SELF' AND e.status='COMPLETED' AND p.status='COMPLETED' AND NOT COALESCE(p.receipt_only,FALSE) THEN p.frozen_active_slot_set_encrypted END AS "frozenSlots",
    CASE WHEN a.relationship_kind='SELF' AND e.status='COMPLETED' AND p.status='COMPLETED' AND NOT COALESCE(p.receipt_only,FALSE) THEN p.frozen_active_slot_set_hash END AS "frozenSlotsHash",
+   ${loadContent?Prisma.sql`CASE WHEN a.relationship_kind='SELF' AND e.status='COMPLETED' AND p.status='COMPLETED' AND NOT COALESCE(p.receipt_only,FALSE) AND j.status='READY' THEN j.report_encrypted END`:Prisma.sql`NULL::text`} AS "preMaterializedReport",
    ${loadContent?Prisma.sql`CASE WHEN a.relationship_kind='SELF' AND e.status='COMPLETED' AND p.status='COMPLETED' AND NOT COALESCE(p.receipt_only,FALSE) THEN jsonb_build_object('trainingContentBinding',p.training_content_binding,'trainingContentBindingHash',p.training_content_binding_hash,
     'trainingReferenceBinding',p.training_reference_binding,'trainingReferenceBindingHash',p.training_reference_binding_hash,
     'trainingContentInterpretationEncrypted',p.training_content_interpretation_encrypted,'trainingContentInterpretationHash',p.training_content_interpretation_hash,
@@ -51,6 +52,10 @@ async function readOwn(tx:ReadOwnDb,input:ScopedInput,loadContent=false){
    AND p.subject_user_id=a.subject_user_id AND p.respondent_user_id=a.respondent_user_id
    AND p.composite_assessment_id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}'
    AND p.delivery_mode='FINAL_ONLY' AND p.runtime_generation='UNIFIED_V1'
+  LEFT JOIN composite_report_jobs j ON j.attempt_id=p.id AND j.attempt_epoch=p.attempt_epoch
+   AND j.slot_set_hash=p.frozen_active_slot_set_hash
+   AND j.context_hash IS NOT DISTINCT FROM p.context_snapshot_hash
+   AND j.aggregate_input_hash=p.aggregate_input_hash
   WHERE e.id=${input.executionId} AND ((e.status='COMPLETED' AND a.status='COMPLETED' AND p.status='COMPLETED')
     OR e.status IN ('ASSIGNED','STARTED') AND a.status IN ('OPEN','STARTED'))
    AND ${input.entry==='TEACHER'?Prisma.sql`EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links link
@@ -117,11 +122,22 @@ async function readOrdinaryFeedback(input:ScopedInput){
  }
  // Immutable completed snapshots and content releases do not need an interactive
  // ReadCommitted transaction pinning a Prisma pool connection across CPU projection.
- const slots=own.frozenSlots?await loadFrozenActiveSlotSet(own.frozenSlots,prisma):undefined
- if(!slots||slots.snapshotHash!==own.frozenSlotsHash||slots.attemptEpoch!==own.attemptEpoch)hidden()
+ const preMaterializedDeclared=declaredBlocks.size&&own.preMaterializedReport
+  ?await tryReadPreMaterializedDeclaredFeedback(prisma,{
+   preMaterializedReport:own.preMaterializedReport,
+   identity,
+   own:{parentId:own.parentId!,attemptEpoch:own.attemptEpoch!,policyHash:own.policyHash,contentState:own.contentState},
+   declaredBlocks,
+  })
+  :null
+ const needsSlots=Boolean(nativeBlocks.size||sources.length||(declaredBlocks.size&&!preMaterializedDeclared))
+ const slots=needsSlots&&own.frozenSlots?await loadFrozenActiveSlotSet(own.frozenSlots,prisma):undefined
+ if(needsSlots&&(!slots||slots.snapshotHash!==own.frozenSlotsHash||slots.attemptEpoch!==own.attemptEpoch))hidden()
  const [native,declared,reports]=await Promise.all([
-  nativeBlocks.size?readOrdinaryNativeFeedback(prisma,{identity,parent:{...own.contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash},slots,actorUserId:input.actorUserId,blockIds:nativeBlocks}):Promise.resolve(new Map()),
-  declaredBlocks.size?readOrdinaryDeclaredFeedback(prisma,{identity,parent:{...own.contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash},slots,blockIds:declaredBlocks}):Promise.resolve(new Map()),
+  nativeBlocks.size?readOrdinaryNativeFeedback(prisma,{identity,parent:{...own.contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash},slots:slots!,actorUserId:input.actorUserId,blockIds:nativeBlocks}):Promise.resolve(new Map()),
+  preMaterializedDeclared
+   ?Promise.resolve(preMaterializedDeclared)
+   :declaredBlocks.size?readOrdinaryDeclaredFeedback(prisma,{identity,parent:{...own.contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash},slots:slots!,blockIds:declaredBlocks}):Promise.resolve(new Map()),
   sources.length?readNativeEducationScaleFeedback(prisma,{actorUserId:input.actorUserId,parent:{id:own.parentId!,status:own.parentStatus!,
    userId:input.actorUserId,subjectUserId:input.actorUserId,respondentUserId:input.actorUserId,attemptEpoch:own.attemptEpoch!,
    contextSnapshotHash:own.contextSnapshotHash,frozenActiveSlotSetEncrypted:own.frozenSlots,frozenActiveSlotSetHash:own.frozenSlotsHash},sources,slotSet:slots}):Promise.resolve(new Map()),

@@ -55,3 +55,12 @@
   .survey-admin-logout > span { display:none; }
   .survey-admin-frame .hui-product.hui-page { padding:24px 16px 32px; }
 }
+
+.survey-admin :is(button,summary,a):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+@media (max-width: 40rem) {
+  .survey-admin :is(.survey-admin-refresh,[role="tab"],summary) { min-height: 44px; }
+  .survey-admin-person, .survey-admin-invitation-card { min-width: 0; overflow-wrap: anywhere; }
+}

@@ -64,6 +64,9 @@ x-prod-shared-env: &prod-shared-env
   ASSESSMENT_COMPILED_ARTIFACT_CACHE_ENABLED: "true"
   ASSESSMENT_FROZEN_ARTIFACT_CACHE_ENABLED: "true"
   ASSESSMENT_COMPACT_FACTS_ENABLED: "true"
+  # Keep default gzip until every API/Worker + rollback image supports ekc1:zs: decoding,
+  # then flip to "zstd" for native Node 24 zstd writes without a code redeploy.
+  ASSESSMENT_COMPACT_CODEC: "gzip"
   ASSESSMENT_COMPACT_VERIFY_WRITES: "false"
   ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED: "true"
   ASSESSMENT_SHARED_CONTROL_ENABLED: "true"

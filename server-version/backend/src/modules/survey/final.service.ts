@@ -2,7 +2,8 @@ import {computeSurveyNativeReports} from '../bundle-product/survey-native'
 import {loadSurveyTaskReceipts,assertSurveyReachedTaskReceipts} from './task-receipts'
 import { SURVEY_NATIVE_SJT_PROTOCOL,type SurveySituationalReceiptReference } from './situational-native.contract'
 import {persistGovernedPackageReports} from './governed-package.reports'
-import {projectSurveyParticipantFeedback} from './participant-feedback-response'
+import {projectSurveyParticipantFeedback,type SurveyParticipantFeedbackProjection} from './participant-feedback-response'
+import {attachSurveyParticipantDeclaredReports,resolveSurveyDeclaredReportAsset} from './participant-declared-report'
 import {interpretSurveyFinal} from './final-interpretation.service'
 import type { SurveyCognitiveReference } from './cognitive.definition'
 import type { SurveyComputedFinal } from './final.compute'
@@ -23,7 +24,7 @@ import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assign
 import { hashResearchCredential } from './identity.service'
 import { verifiedSurveyAttempt,verifiedSurveyFinalLocator } from './admission.service'
 import { SurveyWaveError } from './waves.service'
-import type { ResearchFrozenPublication } from './publication.service'
+import type { ResearchFrozenPublication, ResearchFrozenUnit } from './publication.service'
 
 export class SurveyFinalError extends Error {
   constructor(readonly statusCode:number,message:string){super(message)}
@@ -73,6 +74,7 @@ export async function submitResearchFinal(input:FinalInput){
   })
   assertCanonicalSubmissionPayloadSize(canonical,1024*1024,'研究 FINAL 作答')
   const warmState:{target:{publicationId:string;definitionDigest:string;verified:NonNullable<ReturnType<typeof verifySurveyFinalPublication>>}|null}={target:null}
+  const postCommitDeclaredState:{value:{units:ResearchFrozenUnit[];calculated:SurveyComputedFinal;projected:SurveyParticipantFeedbackProjection;general:ReturnType<typeof generalReceipt>}|null}={value:null}
   const committed=await withFinalOnlyCompletionTransaction(async tx=>{
       // Decision D-6 (2026-11-06, product-confirmed): PAUSE / CLOSE blocks new
     // intake (START), not an already-admitted FINAL. This path intentionally
@@ -247,18 +249,30 @@ export async function submitResearchFinal(input:FinalInput){
     // Optional projection failure must not turn a durable answer into a retry;
     // the independent reader remains the recovery path. Flow/replay keep it too.
     let participantFeedbackReceipt
-    if(!snapshot.flow&&selectedSnapshot.units.some(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE')){
+    if(selectedSnapshot.units.some(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE')){
       try{
         const end=wave.finishUntil??wave.closesAt
         const projected=projectSurveyParticipantFeedback(selectedSnapshot.units,calculated,
           wave.hardStopAt!==null||(end!==null&&end<=new Date()),selectedSnapshot.governedPackages)
-        if(projected)participantFeedbackReceipt={...general,...projected}
+        if(projected){
+          participantFeedbackReceipt={...general,...projected}
+          if(projected.kind==='DESCRIPTIVE'&&selectedSnapshot.units.some(unit=>unit.contentSelection?.reportRelease)){
+            postCommitDeclaredState.value={units:selectedSnapshot.units,calculated,projected,general}
+          }
+        }
       }catch{ /* Accepted FINAL remains authoritative; the GET path reports unavailable feedback. */ }
     }
     return {attemptId:attempt.id,receiptId:receipt.id,completedAt:receipt.completedAt,
       status:'COMPLETED' as const,idempotent:false,
       generalText:general.text,generalReceipt:general,...(participantFeedbackReceipt?{participantFeedbackReceipt}:{})}
   })
+  const postCommitDeclared=postCommitDeclaredState.value
+  if(postCommitDeclared&&'participantFeedbackReceipt' in committed&&committed.participantFeedbackReceipt){
+    try{
+      const enriched=await attachSurveyParticipantDeclaredReports(postCommitDeclared.units,postCommitDeclared.calculated,postCommitDeclared.projected,prisma)
+      committed.participantFeedbackReceipt={...postCommitDeclared.general,...enriched}
+    }catch{ /* Accepted FINAL remains authoritative; the GENERAL path can re-project declared reports. */ }
+  }
   const warmTarget=warmState.target
   if(warmTarget&&typeof (prisma as unknown as {$queryRaw?:unknown}).$queryRaw==='function'){
     try{
@@ -278,47 +292,61 @@ export async function submitResearchFinal(input:FinalInput){
   }
   return committed
 }
-export async function readGeneralForOwnAttempt(input:{
+type SurveyReadInput={
   publicId:string;attemptId:string;researchCode?:string;accessCredential:string
-}){
-  const valid=await verifiedSurveyAttempt(input)
+}
+
+async function readGeneralForVerifiedAttempt(
+  input:SurveyReadInput,
+  valid:Awaited<ReturnType<typeof verifiedSurveyAttempt>>,
+){
   const hasFeedback=valid.compiledSnapshot.units.some(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE')
-  if(hasFeedback)return prisma.$transaction(async tx=>{
-    // Serialize disclosure with current withdrawal/credential/window governance.
-    await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${valid.projectId} FOR SHARE`
-    await tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${valid.waveId}
-      AND project_id=${valid.projectId} FOR KEY SHARE`
-    await tx.$queryRaw`SELECT id FROM survey_wave_attempts WHERE id=${valid.attemptId}
-      AND project_id=${valid.projectId} FOR SHARE`
-    const attempt=await tx.surveyWaveAttempt.findFirst({where:{id:valid.attemptId,projectId:valid.projectId,
-      waveId:valid.waveId},select:{status:true,excludedAt:true,participantId:true,sessionHash:true,
-        wave:{select:{consentVersion:true,generalText:true,finishUntil:true,closesAt:true,hardStopAt:true}}}})
-    if(!attempt||attempt.status!=='COMPLETED'||attempt.excludedAt!==null||
-      attempt.participantId!==valid.participantId)blocked('研究反馈不可访问')
-    if(attempt.participantId){
-      await tx.$queryRaw`SELECT id FROM survey_participants WHERE id=${attempt.participantId}
+  if(hasFeedback){
+    // Read-start authorization contract (same pattern as Education ordinary feedback):
+    // hold row locks ONLY while verifying live withdrawal, credential, consent,
+    // collection window, and final digest. Decryption, canonicalHash verification,
+    // and immutable content-release report projection run after commit so
+    // concurrent reads never pin DB connections.
+    const verifiedRow=await prisma.$transaction(async tx=>{
+      // Serialize disclosure check with current withdrawal/credential/window governance.
+      await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${valid.projectId} FOR SHARE`
+      await tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${valid.waveId}
+        AND project_id=${valid.projectId} FOR KEY SHARE`
+      await tx.$queryRaw`SELECT id FROM survey_wave_attempts WHERE id=${valid.attemptId}
         AND project_id=${valid.projectId} FOR SHARE`
-      const person=await tx.surveyParticipant.findFirst({where:{id:attempt.participantId,
-        projectId:valid.projectId,researchCode:input.researchCode,status:'ACTIVE',credentialRevokedAt:null,
-        credentialHash:hashResearchCredential(input.accessCredential)},select:{id:true}})
-      if(!person)blocked('研究身份已失效')
-    }else if(attempt.sessionHash!==hashResearchCredential(input.accessCredential))blocked('研究凭证已失效')
-    const consent=await tx.surveyConsent.findFirst({where:{projectId:valid.projectId,waveId:valid.waveId,
-      attemptId:valid.attemptId,accepted:true,consentVersion:attempt.wave.consentVersion},select:{id:true}})
-    if(!consent)blocked('当前研究缺少有效的知情同意记录')
-    const final=await tx.surveyWaveFinal.findUnique({where:{attemptId:valid.attemptId},
-      select:{definitionDigest:true,resultsCipher:true,resultsHash:true,completedAt:true}})
-    if(!final||final.definitionDigest!==valid.definitionDigest)blocked('研究反馈来源校验失败')
+      const attempt=await tx.surveyWaveAttempt.findFirst({where:{id:valid.attemptId,projectId:valid.projectId,
+        waveId:valid.waveId},select:{status:true,excludedAt:true,participantId:true,sessionHash:true,
+          wave:{select:{consentVersion:true,generalText:true,finishUntil:true,closesAt:true,hardStopAt:true}}}})
+      if(!attempt||attempt.status!=='COMPLETED'||attempt.excludedAt!==null||
+        attempt.participantId!==valid.participantId)blocked('研究反馈不可访问')
+      if(attempt.participantId){
+        await tx.$queryRaw`SELECT id FROM survey_participants WHERE id=${attempt.participantId}
+          AND project_id=${valid.projectId} FOR SHARE`
+        const person=await tx.surveyParticipant.findFirst({where:{id:attempt.participantId,
+          projectId:valid.projectId,researchCode:input.researchCode,status:'ACTIVE',credentialRevokedAt:null,
+          credentialHash:hashResearchCredential(input.accessCredential)},select:{id:true}})
+        if(!person)blocked('研究身份已失效')
+      }else if(attempt.sessionHash!==hashResearchCredential(input.accessCredential))blocked('研究凭证已失效')
+      const consent=await tx.surveyConsent.findFirst({where:{projectId:valid.projectId,waveId:valid.waveId,
+        attemptId:valid.attemptId,accepted:true,consentVersion:attempt.wave.consentVersion},select:{id:true}})
+      if(!consent)blocked('当前研究缺少有效的知情同意记录')
+      const final=await tx.surveyWaveFinal.findUnique({where:{attemptId:valid.attemptId},
+        select:{definitionDigest:true,resultsCipher:true,resultsHash:true,completedAt:true}})
+      if(!final||final.definitionDigest!==valid.definitionDigest)blocked('研究反馈来源校验失败')
+      return {wave:attempt.wave,final}
+    })
+    const {wave,final}=verifiedRow
     const result=decryptUnifiedRuntimePayload<SurveyComputedFinal>(final.resultsCipher)
     if(canonicalHash(result)!==final.resultsHash||result.definitionDigest!==valid.definitionDigest)
       blocked('研究反馈结果摘要校验失败')
-    const collectionEnd=attempt.wave.finishUntil??attempt.wave.closesAt
-    const collectionClosed=attempt.wave.hardStopAt!==null||
+    const collectionEnd=wave.finishUntil??wave.closesAt
+    const collectionClosed=wave.hardStopAt!==null||
       (collectionEnd!==null&&collectionEnd<=new Date())
     const projected=projectSurveyParticipantFeedback(valid.compiledSnapshot.units,result,collectionClosed,valid.compiledSnapshot.governedPackages)
     if(!projected)blocked('研究反馈工具来源缺失')
-    return {...generalReceipt(attempt.wave.generalText,final.completedAt),...projected}
-  })
+    const enriched=await attachSurveyParticipantDeclaredReports(valid.compiledSnapshot.units,result,projected,prisma)
+    return {...generalReceipt(wave.generalText,final.completedAt),...enriched}
+  }
   const final=await prisma.surveyWaveFinal.findFirst({where:{
     attemptId:valid.attemptId,projectId:valid.projectId,waveId:valid.waveId,
   },select:{completedAt:true,id:true,definitionDigest:true}})
@@ -327,4 +355,22 @@ export async function readGeneralForOwnAttempt(input:{
   // ALLOWLIST: no scoring, raw answers, canonical SJT weights, or longitudinal
   // psychological interpretation may be exposed via participant General.
   return {kind:'GENERAL_ONLY' as const,...generalReceipt(valid.generalText,final.completedAt)}
+}
+
+export async function readGeneralForOwnAttempt(input:SurveyReadInput){
+  const valid=await verifiedSurveyAttempt(input)
+  return readGeneralForVerifiedAttempt(input,valid)
+}
+
+/** Authorize a static report image referenced by either rawScoreFeedback or a
+ * participant-authorized declaredReport ASSET block. */
+export async function authorizeSurveyReportImageAsset(input:SurveyReadInput,assetId:string){
+  const valid=await verifiedSurveyAttempt(input)
+  const report=await readGeneralForVerifiedAttempt(input,valid)
+  if(report.kind!=='DESCRIPTIVE')return null
+  const rawImage=report.measurements.flatMap(measurement=>
+    'rawScoreFeedback' in measurement?(measurement.rawScoreFeedback??[]).flatMap(feedback=>feedback.images??[]):[])
+    .find(image=>image.asset.assetId===assetId)?.asset
+  if(rawImage)return rawImage
+  return resolveSurveyDeclaredReportAsset(valid.compiledSnapshot.units,report,assetId,prisma)
 }

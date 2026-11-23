@@ -4,7 +4,7 @@ import {groupLongitudinalRequestSchema,GroupLongitudinalError} from '../reportin
 import {readSurveyReferenceRequest,createSurveyReferenceCandidate,readSurveyReferenceCandidate,reviewSurveyReferenceCandidate,publishSurveyReferenceCandidate,
   referenceCandidateView,surveyReferenceCreateSchema,surveyReferenceReviewSchema,surveyReferencePublishSchema} from './reference-candidates.service'
 import {ContentReleaseError} from '../measurement-content/release'
-import {createSurveyReinterpretation,readSurveyReinterpretation} from './reinterpretation.service'
+import {createSurveyReinterpretation,listSurveyReinterpretations,readSurveyReinterpretation} from './reinterpretation.service'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {SurveyBuilderError} from './builder.service'
 import {SurveyWaveError} from './waves.service'
@@ -160,6 +160,11 @@ surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/finals/:finalId/reports/:i
 
 const reinterpretBody=z.object({requestId:id,grantId:id,instrumentKey:key,reportReleaseId:id.optional(),
   references:z.array(z.object({releaseId:id,entryKey:z.string().regex(/^[a-f0-9]{64}$/),priority:z.number().int().safe()}).strict()).max(100)}).strict()
+surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/finals/:finalId/interpretations',wrap(async req=>{
+  assertRecentSurveyMfa(req)
+  return listSurveyReinterpretations(req.user!.userId,{projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),
+    finalId:id.parse(req.params.finalId),afterId:id.optional().parse(req.query.afterId)})
+}))
 surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/finals/:finalId/interpretations',wrap(async req=>{
   assertRecentSurveyMfa(req)
   return createSurveyReinterpretation(req.user!.userId,{...reinterpretBody.parse(req.body),projectId:id.parse(req.params.pid),

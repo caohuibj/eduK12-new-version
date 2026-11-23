@@ -19,6 +19,16 @@ describe('Professional Survey Form input contracts',()=>{
     expect(read().time).toBe('15:30')
     expect(screen.getByText(/UTC\+08:00/)).toBeInTheDocument()
   })
+  it.each([['DATE','2026-11-23'],['TIME','09:30']] as const)('captures a native %s value on blur even without a change notification',(type,value)=>{
+    render(<Host question={{type,itemKey:'when',prompt:'填写时间',options:[]}}/>)
+    const input=screen.getByLabelText('填写时间') as HTMLInputElement
+    input.value=value
+    fireEvent.input(input)
+    expect(read().when).toBe(value)
+    input.value=''
+    fireEvent.blur(input)
+    expect(read().when).toBeNull()
+  })
   it('requires explicit ranking confirmation and preserves all stable option keys',()=>{
     render(<Host question={{type:'RANK_ORDER',itemKey:'rank',prompt:'优先级',options}}/>)
     expect(read().rank).toBeUndefined()
