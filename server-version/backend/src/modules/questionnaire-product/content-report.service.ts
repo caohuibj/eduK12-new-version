@@ -3,7 +3,7 @@ import {z} from 'zod'
 import {prisma} from '../../config/database'
 import {canonicalHash,canonicalJsonString} from '../assessment-runtime/canonical'
 import {assertContentAuthority} from '../measurement-content/content-authority.repository'
-import {ContentAuthorityError} from '../measurement-content/content-authority'
+import {ContentAuthorityError,contentScopeContains,type ContentAuthorityScope} from '../measurement-content/content-authority'
 import {prepareRelease,ContentReleaseError} from '../measurement-content/release'
 import {getContentRelease,publishContentRelease} from '../measurement-content/repository'
 import {reportTemplateSchema} from '../measurement-content/report-template'
@@ -103,6 +103,52 @@ async function releaseInput(tx:Prisma.TransactionClient,context:TrainingReportCo
       audience:payload.audience,language:payload.language,generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:payload.template}})
   return {release,measurement}
 }
+export async function listTrainingReportGrants(input:{actorId:string;courseId:string;compositeId:string}){
+  const ctx=z.object({actorId:text,courseId:id,compositeId:id}).strict().parse(input)
+  return prisma.$transaction(async tx=>{
+    const courses=await tx.$queryRaw<Array<{id:string;creator_id:string;course_type:string;is_library:boolean}>>(Prisma.sql`
+      SELECT id,creator_id,course_type,is_library FROM courses WHERE id=${ctx.courseId} FOR SHARE`)
+    const course=courses[0]
+    if(!course||course.creator_id!==ctx.actorId||course.course_type!=='TRAINING_COURSE'||course.is_library)denied()
+    const composites=await tx.$queryRaw<Array<{id:string;created_by:string;course_id:string|null;product_kind:string;questionnaire_type:string|null}>>(Prisma.sql`
+      SELECT id,created_by,course_id,product_kind,questionnaire_type FROM composite_assessments WHERE id=${ctx.compositeId} FOR SHARE`)
+    const composite=composites[0]
+    if(!composite||composite.created_by!==ctx.actorId)denied()
+    const deliveries=await tx.$queryRaw<Array<{course_id:string}>>(Prisma.sql`
+      SELECT course_id FROM questionnaire_course_deliveries WHERE composite_id=${ctx.compositeId} AND course_id=${ctx.courseId} FOR SHARE`)
+    if(composite.product_kind==='QUESTIONNAIRE'?(composite.questionnaire_type!=='COURSE'||!deliveries.length):composite.course_id!==ctx.courseId)denied()
+    const targetScope:ContentAuthorityScope={product:'TRAINING',scopeKind:'COURSE',scopeId:ctx.courseId,resourceKind:'report',resourceKeys:[ctx.compositeId]}
+    const rows=await tx.$queryRaw<Array<{
+      id:string;product:ContentAuthorityScope['product'];scope_kind:ContentAuthorityScope['scopeKind'];scope_id:string;
+      resource_kind:ContentAuthorityScope['resourceKind'];resource_keys:string[];capabilities:string[];
+      valid_from:Date;expires_at:Date;version:number;
+    }>>(Prisma.sql`
+      SELECT g.id,g.product,g.scope_kind,g.scope_id,g.resource_kind,g.resource_keys,g.capabilities,g.valid_from,g.expires_at,g.version
+      FROM content_capability_grants g
+      WHERE g.subject_id=${ctx.actorId}
+        AND g.product='TRAINING'
+        AND g.resource_kind='report'
+        AND g.revoked_at IS NULL
+        AND g.valid_from<=clock_timestamp()
+        AND g.expires_at>clock_timestamp()
+        AND 'report.edit'=ANY(g.capabilities)
+      ORDER BY g.expires_at DESC,g.id ASC
+      LIMIT 20`)
+    return rows
+      .filter(row=>contentScopeContains({
+        product:row.product,scopeKind:row.scope_kind,scopeId:row.scope_id,
+        resourceKind:row.resource_kind,resourceKeys:row.resource_keys,
+      },targetScope))
+      .map(row=>({
+        grantId:row.id,
+        capabilities:row.capabilities,
+        validFrom:row.valid_from,
+        expiresAt:row.expires_at,
+        version:row.version,
+      }))
+  },options)
+}
+
 export async function listTrainingReportMeasurements(context:TrainingReportContext){
   return prisma.$transaction(async tx=>{await authorize(tx,context,'report.edit')
     const {units,releases,metricKeys}=await measurements(tx,context),ids=[...new Set(units.map(unit=>unit.measurement.releaseId))]

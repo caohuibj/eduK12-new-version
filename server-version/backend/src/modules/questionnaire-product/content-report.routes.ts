@@ -22,6 +22,9 @@ const handle=(run:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respon
   return next(e)
  }
 }
+trainingContentReportsRouter.get('/grants',handle(req=>reports.listTrainingReportGrants({
+ actorId:req.user!.userId,compositeId:uuid.parse(req.params.id),courseId:uuid.parse(req.params.courseId),
+})))
 trainingContentReportsRouter.get('/measurements',handle(req=>reports.listTrainingReportMeasurements(context(req))))
 trainingContentReportsRouter.get('/',handle(req=>reports.listTrainingReportDrafts(context(req),z.coerce.number().int().min(1).max(1000).default(1).parse(req.query.page))))
 trainingContentReportsRouter.post('/',handle(req=>reports.createTrainingReportDraft(context(req),req.body)))

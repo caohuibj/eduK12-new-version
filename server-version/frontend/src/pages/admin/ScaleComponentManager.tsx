@@ -8,6 +8,7 @@ import {ReportTemplateFields} from '../../modules/assessment-core/report/ReportT
 import {EntryAdmissionChoices,type StandardCombinationEntryAdmissionProduct} from '../../components/scale-governance/EntryAdmissionChoices'
 import AdminStepUp from '../../admin/AdminStepUp'
 import ScaleComponentPreview from './ScaleComponentPreview'
+import { ScaleComponentReportEditor } from './ScaleComponentReportEditor'
 import './scale-component-manager.css'
 
 type Header=Pick<ComponentDraft,'id'|'toolKey'|'configurationName'|'revision'|'publishedReleaseId'>
@@ -135,6 +136,7 @@ export default function ScaleComponentManager({actorId,initialCombination,initia
     <fieldset disabled={busy||readOnly} className="component-fields"><legend>内容编辑</legend>
      {c&&simpleDefinition(c.definition)&&<details className="component-technical"><summary>使用已有量表编辑器编辑 C</summary><nav className="component-editor-tabs" aria-label="量表编辑内容">{(['basic','items','responses','scores'] as const).map(t=><button key={t} aria-pressed={tab===t} onClick={()=>setTab(t)}>{tabs[t]}</button>)}</nav><ScaleDefinitionEditor definition={c.definition} setDefinition={updateC} activeTab={tab} readOnly={readOnly} controlsDisabled={busy} saveDefinition={save} mediaEnabled={false}/></details>}
      {report&&effective&&simpleDefinition(effective)&&Array.isArray(report.interpretations)&&report.interpretations.every(i=>i?.source?.type==='score_only'&&Array.isArray(i.bands)&&Array.isArray(i.guidance)&&!i.bands.length&&!i.guidance.length)&&<details className="component-technical"><summary>使用已有报告内容编辑器</summary><ScaleDefinitionEditor definition={{...effective,report}} setDefinition={action=>{const next=typeof action==='function'?action({...effective,report}):action;mutate(d=>{const old=d.changedParts.REPORT!;return {...d,changedParts:{...d.changedParts,REPORT:{...old,payload:old.payload&&'definition'in old.payload?{...old.payload,definition:next.report}:next.report}}}})}} activeTab="report" readOnly={readOnly} controlsDisabled={busy} saveDefinition={save} mediaEnabled={false}/></details>}
+     {report&&Array.isArray(report.interpretations)&&(!effective||!simpleDefinition(effective)||report.interpretations.some(i=>i?.source?.type!=='score_only'||(Array.isArray(i.bands)&&i.bands.length>0)||(Array.isArray(i.guidance)&&i.guidance.length>0)))&&<details className="component-technical"><summary>使用分档阈值报告编辑器</summary><ScaleComponentReportEditor report={report} scoreLabels={Object.fromEntries((effective?.scoring.scores??[]).map(s=>[s.key,s.label]))} disabled={busy||readOnly} onChange={nextReport=>mutate(d=>{const old=d.changedParts.REPORT!;return {...d,changedParts:{...d.changedParts,REPORT:{...old,payload:old.payload&&'definition'in old.payload?{...old.payload,definition:nextReport}:nextReport}}}})}/></details>}
      {template&&Array.isArray(template.blocks)&&effective&&simpleDefinition(effective)&&<details className="component-technical"><summary>使用已有报告结构编辑器</summary><ReportTemplateFields template={template} metricKeys={effective.scoring.scores.map(s=>s.key)} onChange={next=>mutate(d=>({...d,changedParts:{...d.changedParts,REPORT:{...d.changedParts.REPORT!,payload:{...d.changedParts.REPORT!.payload as object,template:next} as NonNullable<typeof r>}}}))}/></details>}
     </fieldset>
     <div className="component-fields"><button disabled={busy} className="component-disclosure" aria-expanded={advancedOpen||!doc} aria-controls={uid+'-definition'} onClick={()=>setAdvancedOpen(!advancedOpen)}>高级定义 · 完整 JSON{advancedOpen?'（收起）':'（展开）'}</button>
@@ -144,6 +146,11 @@ export default function ScaleComponentManager({actorId,initialCombination,initia
     {!readOnly&&<div className="component-save-bar"><span>{dirty?'请先保存修改，再核对发布。':'草稿已保存，尚未发布。'}</span><div className="component-actions"><button disabled={busy||!doc||!dirty} className="component-primary" onClick={()=>void save()}>{isNew?'建立新版本草稿':'保存草稿'}</button>{selected&&<button disabled={busy||dirty} onClick={()=>void inspect()}>预览拟发布组合<ArrowRight size={15} aria-hidden="true"/></button>}</div></div>}
     {selected&&!readOnly&&preview&&<section className="component-publication" aria-label="发布预览"><div className="component-section-heading"><div><h3>{preview.blockers.length?'拟发布组合需要处理':'拟发布组合已核对'}</h3><p>{preview.reviewNotice}</p></div>{!preview.blockers.length&&<CheckCircle2 size={24} aria-hidden="true"/>}</div>
      <div className="component-preview-grid">{axes.map(a=><div key={a}><small>{friendlyLabels[a]}</small><strong>{preview.parts[a]?.version??'尚未提供'}</strong><span>{preview.changedParts.includes(a)?'本次提供':preview.inheritedParts.includes(a)?'继承基础版本':'尚未提供'}</span></div>)}</div>
+     <p className="component-message" role="status">
+       {preview.parts.REPORT?.payload!==null&&preview.parts.REPORT?.payload!==undefined
+         ?'报告资格：本版本已配置报告内容，发布后各入口可向受测者展示完整报告（入口发布时亦可选择仅提供回执）。'
+         :'报告资格：本版本未配置报告（仅数据采集），发布后所有入口均仅向受测者提供回执。'}
+     </p>
      {preview.blockers.length>0&&<ul className="component-issues">{preview.blockers.map((b,i)=><li key={i} role="alert">{b}</li>)}</ul>}
      <ScaleComponentPreview preview={preview}/>
      <details className="component-technical"><summary>核对参数、报告及组分差异</summary><pre>{JSON.stringify(preview.parts,null,2)}</pre></details>
