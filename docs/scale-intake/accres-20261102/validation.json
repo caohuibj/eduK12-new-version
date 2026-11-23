@@ -1,0 +1,202 @@
+{
+  "base": "826f8e2ee5171acfff644efdd9e8527d41a8238f",
+  "node": "v24.21.0",
+  "sourceContracts": [
+    {
+      "key": "accres_ecp_2019_en_us_teacher_self",
+      "version": "1.0.0",
+      "schema": "PASS",
+      "selectedSource": "PASS",
+      "familyTag": "family:accres",
+      "administrable": false,
+      "scoreExecutions": 0
+    },
+    {
+      "key": "accres_ccc_2019_en_us_teacher_self",
+      "version": "1.0.0",
+      "schema": "PASS",
+      "selectedSource": "PASS",
+      "familyTag": "family:accres",
+      "administrable": false,
+      "scoreExecutions": 0
+    },
+    {
+      "key": "accres_ais_2019_en_us_teacher_self",
+      "version": "1.0.0",
+      "schema": "PASS",
+      "selectedSource": "PASS",
+      "familyTag": "family:accres",
+      "administrable": false,
+      "scoreExecutions": 0
+    }
+  ],
+  "nativeForms": [
+    {
+      "key": "accres_ecp_2019_en_us_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "originalNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "fields": 13,
+      "status": "DRAFT_IN_ISOLATED_DB",
+      "preview": "PASS",
+      "apply": "PASS",
+      "schema": "PASS",
+      "rawCategoryRoundTrip": "PASS",
+      "oneMissing": "PASS",
+      "allMissing": "PASS",
+      "invalidCategoryCases": 6,
+      "persistenceReadback": "PASS",
+      "scoringVersion": null,
+      "runtimeReportVersion": null,
+      "definitionSha256": "f3639777a459c385a40f8d8b335258cf3539f24c139be79bb394f959c8f564f2",
+      "tags": "not persisted: existing HuiteacherFormInstrument has no tags field; family is in catalog tags and private intake manifest only",
+      "requiredFalse": "project no-score draft choice, not an official missing-data scoring rule",
+      "displayedCategoryCodes": "1–6 retained as label text only; no option.score"
+    },
+    {
+      "key": "accres_ccc_2019_en_us_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "originalNumbers": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "fields": 11,
+      "status": "DRAFT_IN_ISOLATED_DB",
+      "preview": "PASS",
+      "apply": "PASS",
+      "schema": "PASS",
+      "rawCategoryRoundTrip": "PASS",
+      "oneMissing": "PASS",
+      "allMissing": "PASS",
+      "invalidCategoryCases": 6,
+      "persistenceReadback": "PASS",
+      "scoringVersion": null,
+      "runtimeReportVersion": null,
+      "definitionSha256": "3d12e347f0baef5fbec39c07b40069dddbc2b6e608d101bc419caf7057c57f02",
+      "tags": "not persisted: existing HuiteacherFormInstrument has no tags field; family is in catalog tags and private intake manifest only",
+      "requiredFalse": "project no-score draft choice, not an official missing-data scoring rule",
+      "displayedCategoryCodes": "1–6 retained as label text only; no option.score"
+    },
+    {
+      "key": "accres_ais_2019_en_us_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "originalNumbers": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "fields": 11,
+      "status": "DRAFT_IN_ISOLATED_DB",
+      "preview": "PASS",
+      "apply": "PASS",
+      "schema": "PASS",
+      "rawCategoryRoundTrip": "PASS",
+      "oneMissing": "PASS",
+      "allMissing": "PASS",
+      "invalidCategoryCases": 6,
+      "persistenceReadback": "PASS",
+      "scoringVersion": null,
+      "runtimeReportVersion": null,
+      "definitionSha256": "296a449fce7cf31583507b1806a73a344987a10f08f4420dce3e43273d7a3d65",
+      "tags": "not persisted: existing HuiteacherFormInstrument has no tags field; family is in catalog tags and private intake manifest only",
+      "requiredFalse": "project no-score draft choice, not an official missing-data scoring rule",
+      "displayedCategoryCodes": "1–6 retained as label text only; no option.score"
+    }
+  ],
+  "database": {
+    "name": "accres_intake_20261102",
+    "kind": "SEPARATE_LOCAL_DISPOSABLE",
+    "schema": "unchanged Prisma schema via db push --skip-generate",
+    "scope": "native importer/runtime plus isolated DRAFT persistence/readback, not authorization or publication",
+    "rows": 3,
+    "status": "PASS"
+  },
+  "notRun": [
+    "Production/admin dedup",
+    "Commercial/public redistribution authorization",
+    "Individual scalar scoring",
+    "Standalone extraction psychometric validation",
+    "Chinese translation or contextual equivalence validation",
+    "Service authorization or participant FINAL flow",
+    "Browser or full backend/frontend suites",
+    "Actual group disclosure/report release",
+    "Ordinary composite creation"
+  ],
+  "presentationRevision": {
+    "change": "Retained original displayed identifiers 1–6 in categorical labels; no score assignment",
+    "schema": "PASS",
+    "persistenceReadback": "PASS",
+    "reused": "Earlier answer normalization/missing/invalid fixtures: same native engine, option keys, rows and required flag; no re-execution",
+    "scope": "three local synthetic DRAFT rows only"
+  },
+  "finalCsvToSavedDefinition": {
+    "status": "PASS",
+    "count": 3,
+    "description": "Final private CSV labels include original displayed 1–6 identifiers. Existing preview/apply plus original directions/definitions reconstructs exactly the saved native definitions."
+  },
+  "catalogFamilyFilter": {
+    "status": "PASS",
+    "matches": 3,
+    "unrelatedRejected": true
+  },
+  "rebaseCompatibility": {
+    "reviewBase": "6cbf4eaa5a269f54f9872b656d0294a48ec15dc2",
+    "originalHead": "3b4a82492614838b9fe6f26ebf64fc15a4a9069e",
+    "unchangedNativeInputs": [
+      "server-version/backend/src/modules/survey/builder.import.ts",
+      "server-version/backend/src/modules/assessment-core/form/definition.ts",
+      "server-version/backend/src/modules/assessment-core/form/runtime.ts",
+      "server-version/backend/src/modules/assessment-runtime/canonical.ts",
+      "server-version/backend/prisma/schema.prisma",
+      "server-version/backend/package.json",
+      "server-version/backend/package-lock.json"
+    ],
+    "originalNativeChecksReused": true,
+    "unchangedAccresSourceFiles": 6,
+    "registry": {
+      "main": 280,
+      "candidate": 283,
+      "added": [
+        "../instruments/accres_ais_2019_en_us_teacher_self/1.0.0/instrument",
+        "../instruments/accres_ccc_2019_en_us_teacher_self/1.0.0/instrument",
+        "../instruments/accres_ecp_2019_en_us_teacher_self/1.0.0/instrument"
+      ],
+      "removed": []
+    },
+    "boundedChecks": [
+      "existing generator --check PASS",
+      "all main registry paths retained and exactly 3 ACCReS paths added",
+      "native input blobs and 6 source blobs unchanged"
+    ]
+  }
+}
