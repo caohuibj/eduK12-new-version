@@ -46,7 +46,7 @@ describe('Survey workspace browser history restoration',()=>{
     render(<SurveyApp/>);await openFirst()
     fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
     fireEvent.change(await screen.findByLabelText('历史测试草稿'),{target:{value:'保留当前问卷编辑'}})
-    fireEvent.click(screen.getByRole('link',{name:'工具集',exact:true}))
+    fireEvent.click(screen.getByRole('link',{name:'工具集'}))
     await screen.findByText('合成独立工具集')
     historyLocation('/workspace?project=p0&section=publish')
     expect(await screen.findByLabelText('历史测试草稿')).toBeVisible()
