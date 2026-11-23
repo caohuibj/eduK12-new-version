@@ -1,7 +1,7 @@
 import {projectStoredMeasurement} from '../assessment-runtime/measurement-result'
 import {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
-import {getContentRelease,type StoredRelease} from '../measurement-content/repository'
+import {getContentRelease,prefetchContentReleases,type StoredRelease} from '../measurement-content/repository'
 import {decodeSurveyAttemptContentBinding,type SurveyAttemptContentBinding} from './content-binding.service'
 import type {ResearchFrozenPublication} from './publication.service'
 import type {SurveyComputedFinal} from './final.compute'
@@ -49,8 +49,13 @@ export async function interpretSurveyContentBinding(tx:Prisma.TransactionClient,
 }):Promise<SurveyFinalInterpretation>{
   const {binding}=input
   const cache=input.releases??new Map<string,StoredRelease>()
-  // Reads stay lazy by contract: the shared interpreter skips reference/report
-  // reads behind revoked / not-executed / quality stop guards. Do not prefetch.
+  // interpretContentBinding unconditionally reads every unit's MEASUREMENT release
+  // before evaluating any stop guard; batch-prefetching ONLY measurement IDs
+  // collapses N sequential FOR SHARE queries into 1 ordered FOR SHARE batch query
+  // while keeping all REFERENCE and REPORT reads strictly lazy behind stop guards.
+  if(binding.units.length>1 && typeof prefetchContentReleases==='function' && typeof (tx as unknown as {$queryRaw?:unknown})?.$queryRaw==='function'){
+    await prefetchContentReleases(tx,cache,binding.units.map(unit=>unit.measurement.releaseId),true)
+  }
   const read=async(id:string,hash:string)=>{
     let release=cache.get(id)
     if(!release){release=(await getContentRelease(tx,id,true))??undefined;if(release)cache.set(id,release)}

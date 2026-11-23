@@ -1,5 +1,5 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes, createSecretKey, type KeyObject } from 'node:crypto'
-import { gzipSync, gunzipSync } from 'node:zlib'
+import * as zlib from 'node:zlib'
 
 const PREFIX = 'ekc1:'
 export const COMPACT_FIELD_MAX_BYTES = 8 * 1024 * 1024
@@ -18,6 +18,15 @@ const key = () => {
 // or full 32 KiB compression window on every read/write. The gzip wire format
 // stays unchanged and all authenticated length/digest limits still apply.
 const outputChunk = (bytes: number) => Math.max(64, Math.min(16 * 1024, bytes + 64))
+type ZstdSyncFn = (input: Buffer, options?: Record<string, unknown>) => Buffer
+const zstdCompressSync: ZstdSyncFn | undefined = typeof (zlib as Record<string, unknown>).zstdCompressSync === 'function'
+  ? (zlib as unknown as { zstdCompressSync: ZstdSyncFn }).zstdCompressSync
+  : undefined
+const zstdDecompressSync: ZstdSyncFn | undefined = typeof (zlib as Record<string, unknown>).zstdDecompressSync === 'function'
+  ? (zlib as unknown as { zstdDecompressSync: ZstdSyncFn }).zstdDecompressSync
+  : undefined
+const ZSTD_C_COMPRESSION_LEVEL = (zlib.constants as Record<string, number>).ZSTD_c_compressionLevel
+const useZstdCodec = () => process.env.ASSESSMENT_COMPACT_CODEC === 'zstd' && typeof zstdCompressSync === 'function'
 
 export const isCompactEncryptedField = (value: unknown): boolean => typeof value === 'string' && value.startsWith(PREFIX)
 
@@ -27,18 +36,38 @@ export const encryptCompactField = (value: unknown, limit = COMPACT_FIELD_MAX_BY
   if (serialized === undefined) throw new Error('Compact field is not JSON')
   const plain = Buffer.from(serialized, 'utf8')
   if (plain.length < 1 || plain.length > limit || limit > COMPACT_FIELD_MAX_BYTES) throw new Error('Compact field size limit')
-  const material = key(), iv = randomBytes(12), packed = gzipSync(plain, { level: 1, chunkSize: outputChunk(plain.length), ...(plain.length <= 4096 ? { windowBits: 12, memLevel: 4 } : {}) })
-  const useGzip = packed.length < plain.length
-  const header = `ekc1:${useGzip ? 'gz' : 'js'}:${material.identity}:${plain.length}:${digest(plain)}:`
+  const material = key(), iv = randomBytes(12)
+  let codec: 'zs' | 'gz' | 'js' = 'js'
+  let payload: Buffer = plain
+  if (useZstdCodec() && plain.length >= 96) {
+    const packed = zstdCompressSync!(plain, ZSTD_C_COMPRESSION_LEVEL !== undefined
+      ? { params: { [ZSTD_C_COMPRESSION_LEVEL]: 3 } }
+      : undefined)
+    if (packed.length < plain.length) {
+      codec = 'zs'
+      payload = packed
+    }
+  } else {
+    const packed = zlib.gzipSync(plain, {
+      level: plain.length >= 256 ? 6 : 1,
+      chunkSize: outputChunk(plain.length),
+      ...(plain.length <= 256 ? { windowBits: 12, memLevel: 4 } : {}),
+    })
+    if (packed.length < plain.length) {
+      codec = 'gz'
+      payload = packed
+    }
+  }
+  const header = `ekc1:${codec}:${material.identity}:${plain.length}:${digest(plain)}:`
   const cipher = createCipheriv('aes-256-gcm', material.material, iv)
   cipher.setAAD(Buffer.from(header))
-  const body = Buffer.concat([cipher.update(useGzip ? packed : plain), cipher.final()])
+  const body = Buffer.concat([cipher.update(payload), cipher.final()])
   return header + Buffer.concat([iv, cipher.getAuthTag(), body]).toString('base64')
 }
 
 export const decryptCompactField = <T>(value: string, limit = COMPACT_FIELD_MAX_BYTES): T => {
   if (!Number.isSafeInteger(limit) || limit < 1 || limit > COMPACT_FIELD_MAX_BYTES || value.length > 2 * (limit + 1024)) throw new Error('Compact field size limit')
-  const match = /^ekc1:(gz|js):([a-f0-9]{16}):([1-9][0-9]*):([a-f0-9]{64}):([A-Za-z0-9+/]+={0,2})$/.exec(value)
+  const match = /^ekc1:(gz|js|zs):([a-f0-9]{16}):([1-9][0-9]*):([a-f0-9]{64}):([A-Za-z0-9+/]+={0,2})$/.exec(value)
   if (!match) throw new Error('Compact field encoding invalid')
   const size = Number(match[3]), material = key()
   if (!Number.isSafeInteger(size) || size > limit || match[2] !== material.identity) throw new Error('Compact field metadata invalid')
@@ -48,7 +77,15 @@ export const decryptCompactField = <T>(value: string, limit = COMPACT_FIELD_MAX_
   const decipher = createDecipheriv('aes-256-gcm', material.material, data.subarray(0, 12))
   decipher.setAAD(Buffer.from(header)); decipher.setAuthTag(data.subarray(12, 28))
   const packed = Buffer.concat([decipher.update(data.subarray(28)), decipher.final()])
-  const plain = match[1] === 'gz' ? gunzipSync(packed, { maxOutputLength: Math.min(size, limit), chunkSize: outputChunk(size) }) : packed
+  let plain: Buffer
+  if (match[1] === 'gz') {
+    plain = zlib.gunzipSync(packed, { maxOutputLength: Math.min(size, limit), chunkSize: outputChunk(size) })
+  } else if (match[1] === 'zs') {
+    if (!zstdDecompressSync) throw new Error('Compact field zstd codec unavailable')
+    plain = zstdDecompressSync(packed, { maxOutputLength: Math.min(size, limit) })
+  } else {
+    plain = packed
+  }
   if (plain.length !== size || digest(plain) !== match[4]) throw new Error('Compact field integrity invalid')
   return JSON.parse(plain.toString('utf8')) as T
 }

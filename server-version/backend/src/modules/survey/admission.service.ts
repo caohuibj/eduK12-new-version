@@ -26,18 +26,19 @@ const secretPattern=/^[A-Za-z0-9_-]{43}$/
 const codePattern=/^R-[A-Z0-9]{8,32}$/
 const publicInfoInFlight=new BoundedTtlCache<unknown>(0,64)
 const projectPublicInFlight=new BoundedTtlCache<{
-  id:string;title:string;description:string|null;collectionMode:string;status:string;
+  hasPersonalTracking:boolean;id:string;title:string;description:string|null;collectionMode:string;status:string;
   participantIdentityMode:string;participantCodeLabel:string|null;participantCodeInstructions:string|null
 }>(0,64)
-async function projectPublic(tx:Tx | typeof prisma,publicId:string){
+async function projectPublic(tx:Tx | typeof prisma,publicId:string,includeTracking=false){
   if(!publicIdFormat.test(publicId))blocked('研究入口无效')
   const load=async()=>{
     const project=await tx.surveyProject.findFirst({where:{publicId},
-      select:{id:true,title:true,description:true,collectionMode:true,status:true,participantIdentityMode:true,participantCodeLabel:true,participantCodeInstructions:true}})
+      select:{id:true,title:true,description:true,collectionMode:true,status:true,participantIdentityMode:true,participantCodeLabel:true,participantCodeInstructions:true,...(includeTracking?{longitudinalPlan:true}:{})}})
     if(!project)blocked('研究入口无效')
-    return project!
+    const {longitudinalPlan,...summary}=project!
+    return {...summary,hasPersonalTracking:longitudinalPlan!=null}
   }
-  return tx===prisma?projectPublicInFlight.singleFlight(publicId,load):load()
+  return tx===prisma&&!includeTracking?projectPublicInFlight.singleFlight(publicId,load):load()
 }
 async function openWaveLocked(tx:Tx,projectId:string,waveId:string,linked:boolean){
   // Admission and project pause/close acquire locks in the same order:
@@ -195,7 +196,7 @@ export async function getPublicResearchInfo(publicId:string,entryToken?:string){
   if(entryToken!==undefined&&!secretPattern.test(entryToken))blocked('研究招募链接无效')
   const flightKey=entryToken===undefined?publicId:`${publicId}:${hashResearchCredential(entryToken)}`
   return publicInfoInFlight.singleFlight(flightKey,()=>withSurveyReadClient(async tx=>{
-    const project=await projectPublic(tx,publicId)
+    const project=await projectPublic(tx,publicId,true)
     const now=new Date()
     let scopeWaveId:string|undefined
     if(entryToken!==undefined){
@@ -213,7 +214,7 @@ export async function getPublicResearchInfo(publicId:string,entryToken?:string){
         ${scopeWaveId?Prisma.sql`AND w.id=${scopeWaveId}`:Prisma.empty}
       ORDER BY w.ordinal ASC LIMIT 100`:[]
     const noticeFor=await loadMeasurementNotices(tx,project.id,waves.map(w=>w.publicationId))
-    return {scopeWaveId:scopeWaveId??null,project:{name:project.title,description:project.description,
+    return {scopeWaveId:scopeWaveId??null,project:{name:project.title,description:project.description,hasPersonalTracking:project.hasPersonalTracking,
       collectionMode:project.collectionMode,status:project.status,participantIdentityMode:project.participantIdentityMode,
       participantCodeLabel:project.participantCodeLabel,participantCodeInstructions:project.participantCodeInstructions},
       waves:waves.map(({publicationId,...wave})=>({...wave,
@@ -222,7 +223,7 @@ export async function getPublicResearchInfo(publicId:string,entryToken?:string){
         })}))}
   })) as Promise<{
     scopeWaveId:string|null
-    project:{name:string;description:string|null;collectionMode:string;status:string;participantIdentityMode:string;participantCodeLabel:string|null;participantCodeInstructions:string|null}
+    project:{name:string;description:string|null;hasPersonalTracking:boolean;collectionMode:string;status:string;participantIdentityMode:string;participantCodeLabel:string|null;participantCodeInstructions:string|null}
     waves:Array<Omit<ConsentWaveProjection,'publicationId'>&{consentText:string}>
   }>
 }

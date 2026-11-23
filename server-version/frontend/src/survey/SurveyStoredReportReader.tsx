@@ -2,11 +2,14 @@ import {SurveyReinterpretationStudio} from './SurveyReinterpretationStudio'
 import {ReportDetails} from '../modules/reporting/ReportPrimitives'
 import type {ReactNode} from 'react'
 import {useEffect,useRef,useState} from 'react'
+type History={list:{id:string;createdAt:string}[];nextAfterId:string|null}
+type SavedExplanation={artifactId:string;finalId:string;accessAudience:string;artifact:{report:DeclaredReport|null;binding:{units:{instrumentKey:string}[]}}}
 type Pointer={releaseId:string;contentHash:string}
 type List={list:{finalId:string;attemptCode:string;completedAt:string;reports:{instrumentKey:string;measurementRelease:Pointer;reportRelease:Pointer|null;status:string}[]}[];nextAfterId:string|null}
 export type DeclaredReport={title:string|null;blocks:unknown[];limitations:string[];disclaimer:string|null}
 type View={accessAudience:'researcher';intendedAudience:string;sourceFinalHash:string;contentBindingHash:string;reportRelease:Pointer;
   interpretationSemantics:string;lifecycleNotices:{layer:string;releaseId:string;status:string}[];report:DeclaredReport}
+const reportStatus:Record<string,string>={READY:'可查看原报告',NOT_SELECTED:'提交时未选模板',NOT_RECORDED:'当时未记录报告状态',UNAVAILABLE:'原报告暂不可用'}
 const text=(value:unknown)=>typeof value==='string'?value:''
 const record=(value:unknown):Record<string,unknown>=>value&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:{}
 const valueText=(value:unknown)=>typeof value==='number'&&Number.isFinite(value)?String(value):'不可用'
@@ -33,35 +36,66 @@ export function SurveyDeclaredReport({report,metadata}:{report:DeclaredReport;me
 export function SurveyStoredReportReader({actorId,projectId,waveId,request}:{actorId?:string;projectId:string;waveId:string;request:<T>(path:string,method?:string,body?:unknown)=>Promise<T>}){
   const [list,setList]=useState<List|null>(null),[view,setView]=useState<View|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('')
   const [selected,setSelected]=useState<{finalId:string;instrumentKey:string}|null>(null)
+  const [history,setHistory]=useState<(History&{finalId:string})|null>(null)
+  const [explanation,setExplanation]=useState<SavedExplanation|null>(null)
+  const [otp,setOtp]=useState(''),[verified,setVerified]=useState(false),[needsVerification,setNeedsVerification]=useState(false)
   const epoch=useRef(0)
-  useEffect(()=>{epoch.current++;setSelected(null);setList(null);setView(null);setError('');setBusy(false);return()=>{epoch.current++}},[projectId,waveId])
+  useEffect(()=>{epoch.current++;setSelected(null);setList(null);setView(null);setError('');setBusy(false);setHistory(null);setExplanation(null);setOtp('');setVerified(false);setNeedsVerification(false);return()=>{epoch.current++}},[actorId,projectId,waveId])
   const base='/projects/'+encodeURIComponent(projectId)+'/analytics/waves/'+encodeURIComponent(waveId)
   const run=async(work:()=>Promise<void>)=>{const current=++epoch.current;setBusy(true);setError('');setView(null)
-    try{await work()}catch(e){if(current===epoch.current){setSelected(null);setList(null);setView(null);setError(e instanceof Error?e.message:'报告读取失败')}}
+    try{await work()}catch(e){if(current===epoch.current){setSelected(null);setList(null);setView(null);setHistory(null);setExplanation(null);setVerified(false);if(e instanceof Error&&e.message.includes('TOTP'))setNeedsVerification(true);setError(e instanceof Error?e.message:'报告读取失败')}}
     finally{if(current===epoch.current)setBusy(false)}}
   const load=(afterId?:string)=>void run(async()=>{
     const current=epoch.current
     const result=await request<List>(base+'/reports'+(afterId?'?afterId='+encodeURIComponent(afterId):''))
-    if(current===epoch.current)setList(result)
+    if(current===epoch.current){setList(result);setHistory(null);setExplanation(null);setSelected(null);setVerified(false);setNeedsVerification(false)}
   })
   const read=(finalId:string,instrumentKey:string)=>void run(async()=>{
     const current=epoch.current
     const result=await request<View>(base+'/finals/'+encodeURIComponent(finalId)+'/reports/'+encodeURIComponent(instrumentKey))
-    if(current===epoch.current)setView(result)
+    if(current===epoch.current){setView(result);setExplanation(null);setSelected(null)}
   })
-  return <section className="border rounded-xl p-4 space-y-3" aria-label="已保存版本报告">
-    <h3 className="font-semibold">研究者查看版本报告</h3>
-    <p className="text-sm">当前项目数据权限与近期 MFA 生效后读取。列表只含已保存指针；点击才加载精确 FINAL 的报告。不重算分数或重新选择参考，不扩大被试披露。</p>
+  const historyPath=(finalId:string)=>base+'/finals/'+encodeURIComponent(finalId)+'/interpretations'
+  const showHistory=(finalId:string,afterId?:string)=>void run(async()=>{
+    const current=epoch.current
+    const page=await request<History>(historyPath(finalId)+(afterId?'?afterId='+encodeURIComponent(afterId):''))
+    if(current===epoch.current){setHistory({...page,finalId});setSelected(null);setExplanation(null)}
+  })
+  const openExplanation=(finalId:string,id:string)=>void run(async()=>{
+    const current=epoch.current
+    const result=await request<SavedExplanation>(historyPath(finalId)+'/'+encodeURIComponent(id))
+    if(result.finalId!==finalId||result.artifactId!==id||result.accessAudience!=='researcher')throw Error('历史解释与当前答卷不匹配')
+    if(current===epoch.current){setExplanation(result);setSelected(null)}
+  })
+  return <section className="survey-saved-reports border rounded-xl p-4 space-y-3" aria-label="已保存版本报告">
+    <h3 className="font-semibold">个人报告与历史解释</h3>
+    <p className="text-sm">按提交时间选择答卷。原报告保留提交时的版本，后续生成的解释可在同一份答卷下查看。</p>
     <button type="button" className="btn-secondary" disabled={busy||!waveId} onClick={()=>load()}>读取报告列表</button>
     {error&&<p role="alert">{error}</p>}
-    {list&&<div className="space-y-2">{list.list.length===0&&<p>本页没有可访问的 FINAL。</p>}
+     {needsVerification&&<form className="survey-report-actions" onSubmit={event=>{event.preventDefault();void run(async()=>{
+      const current=epoch.current
+      try{await request('/auth/mfa/step-up','POST',{code:otp.trim()})}finally{if(current===epoch.current)setOtp('')}
+      if(current===epoch.current){setNeedsVerification(false);setVerified(true)}
+    })}}><label>验证器动态码<input className="input" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" required value={otp} onChange={e=>setOtp(e.target.value)}/></label>
+      <button className="btn-primary" disabled={busy}>验证身份</button></form>}
+    {verified&&<p role="status">身份已验证，可以重新读取报告列表。</p>}
+    {list&&<div className="space-y-2">{list.list.length===0&&<p>本页没有可查看的正式答卷。</p>}
       {list.list.map(row=><article key={row.finalId} className="border-b py-2"><p>{row.attemptCode} · {new Date(row.completedAt).toLocaleString('zh-CN')}</p>
-        {!row.reports.length&&<p>此 FINAL 未保存三层报告绑定。</p>}
-        {row.reports.map(report=><div key={report.instrumentKey} className="space-x-2"><span>{report.instrumentKey} · {report.status}</span>
-          {report.reportRelease&&<span className="text-xs">报告版本 {report.reportRelease.releaseId}</span>}
+        {!row.reports.length&&<p>这份答卷未绑定原报告。</p>}
+        {row.reports.map(report=><div key={report.instrumentKey} className="survey-report-actions"><span>{report.instrumentKey} · {reportStatus[report.status]??report.status}</span>
+          {report.reportRelease&&<details className="text-xs"><summary>版本信息</summary>{report.reportRelease.releaseId}</details>}
           <button type="button" className="btn-secondary" disabled={busy||report.status!=='READY'||!report.reportRelease}
             onClick={()=>read(row.finalId,report.instrumentKey)}>查看 {report.instrumentKey} 报告</button>
-          {actorId&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>setSelected({finalId:row.finalId,instrumentKey:report.instrumentKey})}>为 {report.instrumentKey} 创建新解释</button>}</div>)}
+          {actorId&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>{setExplanation(null);setHistory(null);setView(null);setSelected({finalId:row.finalId,instrumentKey:report.instrumentKey})}}>为 {report.instrumentKey} 创建新解释</button>}</div>)}
+        <button type="button" className="btn-secondary" disabled={busy} onClick={()=>showHistory(row.finalId)}>查看历史解释</button>
+        {history?.finalId===row.finalId&&<div className="survey-report-history" aria-label="此份答卷的历史解释">
+          {!history.list.length&&<p>这份答卷尚无历史解释。</p>}
+          {history.list.map(item=><button key={item.id} type="button" className="btn-secondary" disabled={busy}
+            onClick={()=>openExplanation(row.finalId,item.id)}>打开解释 · {new Date(item.createdAt).toLocaleString('zh-CN')}</button>)}
+          {history.nextAfterId&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>showHistory(row.finalId,history.nextAfterId!)}>更早的解释</button>}
+          {explanation?.finalId===row.finalId&&<article aria-label="历史解释报告"><h4>历史解释 · {explanation.artifact.binding.units.map(u=>u.instrumentKey).join('、')}</h4>
+            {explanation.artifact.report?<SurveyDeclaredReport report={explanation.artifact.report}/>:<p>此解释未绑定报告模板。</p>}</article>}
+        </div>}
       </article>)}
       <button type="button" className="btn-secondary" disabled={busy||!list.nextAfterId} onClick={()=>load(list.nextAfterId!)}>下一页报告记录</button>
     </div>}

@@ -1,4 +1,5 @@
 import {createRelationalProductRegistry,type RelationalProductEntryV1} from '../assessment-relational/product-registry'
+import {evaluateEducationLeafReportEligibility} from '../assessment-policy/tool-report-eligibility'
 import type {ScaleDefinitionV2} from '../scale/scale-definition'
 import {privateScaleResourceKey,privateScaleVariant,type PrivateScaleRuntimeOrigin} from './private-tool.runtime-origin'
 import {assertSelfGroupV2Entry,buildSelfGroupCohortAnalysisPolicy,SELF_GROUP_POLICY_KEY} from '../assessment-policy/self-group-contract'
@@ -8,7 +9,9 @@ export function privateScaleResourceEntry(origin:PrivateScaleRuntimeOrigin,title
  const [population,responseMode]=origin.variantKey.split(':')
  const v=privateScaleVariant(origin.entry,{population,responseMode})
  const metricKeys=definition.scoring.scores.map(score=>score.key)
- const personal=v.responseMode==='SELF'&&definition.report.audienceContract?.audience===(v.population==='STUDENT'?'student':'teacher')
+ const personal=v.responseMode==='SELF'
+  &&definition.report.audienceContract?.audience===(v.population==='STUDENT'?'student':'teacher')
+  &&evaluateEducationLeafReportEligibility({kind:'SCALE',sourceProvider:'PRIVATE_VERSION',reportObject:definition.report}).eligible
  const none={mode:'NONE' as const,metricKeys:[],longitudinalMetricKeys:[]}
  const policyKey='EDUCATION_PRIVATE_TOOL_V1'
  const entry:RelationalProductEntryV1&{privateOrigin:PrivateScaleRuntimeOrigin}={

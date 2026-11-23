@@ -547,7 +547,8 @@ export const scaleController = {
       const metadata=scale.libraryEntryId?libraryMetadata:allMetadata
       return success(res, { ...metadata, runner,
         ...(scale.creatorId === req.user!.userId || req.user!.role === UserRole.ADMIN ? { copySource } : {}),
-        revisionEligibility: scaleCopyEligibility(scale, req.user!.userId), copyEligibility: scaleCopyEligibility(scale, req.user!.userId) })
+        revisionEligibility: scaleCopyEligibility(scale, req.user!.userId, 'REVISION'),
+        copyEligibility: scaleCopyEligibility(scale, req.user!.userId, 'COPY') })
     } catch (err) {
       logger.error('获取量表详情错误', err)
       return error(res, '获取量表详情失败')

@@ -67,7 +67,7 @@ describe('Personal exact raw-score changes',()=>{
   })
 })
 const unit=(name:string):ResearchFrozenUnit=>({draftId:randomUUID(),instrumentKey:name,kind:'SCALE',title:name,draftRevision:1,
-  sourceDigest:hash,scoringDigest:hash,compiledDefinition:{scoring:{scores:[{key:'total',label:'总分'}]}},displayDefinition:{},
+  sourceDigest:hash,scoringDigest:hash,compiledDefinition:{scoring:{scores:[{key:'total',label:'总分'}]},report:{reportVersion:'survey-private-score-v1',rawScoreFeedback:{schemaVersion:1,rules:[{scoreKey:'total',ranges:[{key:'all',min:0,max:10,includeMax:true,text:'已配置区间反馈'}]}]}}},displayDefinition:{},
   measurementRelease:{releaseId:'release',contentHash:hash,measurementHash:hash},trackingIdentity:{measurementHash:hash,metrics:[{key:'total',label:'总分',unit:'points'}]},
   participantFeedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',metricKeys:['total'],release:'AFTER_FINAL'}})
 describe('Frozen Survey tracking plan and leaf identity',()=>{

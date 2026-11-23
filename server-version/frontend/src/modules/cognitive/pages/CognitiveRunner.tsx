@@ -150,6 +150,7 @@ export type CampusCognitiveRunnerBinding = {
   api: CognitiveSessionApi
   onCompleted: () => void
   onExit: () => void
+  submitLabel?: string
   completionTitle?: string
   completionAction?: string
   completionNotice?: string
@@ -633,7 +634,7 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
           : { state: 'idle' }}
         actions={isLastTrial && state.status !== 'SUBMITTING_TRIAL' ? (
           <div className="text-center">
-            <button type="button" onClick={() => void completeWithProvenance()} className="btn-primary">完成测评</button>
+            <button type="button" onClick={() => void completeWithProvenance()} className="btn-primary">{campus?.submitLabel??"完成测评"}</button>
           </div>
         ) : undefined}
         waitingContent={waitingContent}

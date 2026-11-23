@@ -125,7 +125,7 @@ async function completeCognitive(){
   fireEvent.click(start)
   const next=screen.queryByRole('button',{name:'下一部分'})
   if(next)expect(next).toBeDisabled()
-  expect(screen.queryByRole('button',{name:'提交本轮正式回答'})).toBeNull()
+  expect(screen.queryByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/})).toBeNull()
   fireEvent(window,new Event('beforeunload'))
   // The no-canonical onStarted fallback must never add native {} to ordinary locks/answers.
   expect(JSON.parse(sessionStorage.getItem(draftKey)!).answers).toEqual(ordinaryAnswers)
@@ -143,7 +143,7 @@ async function completeNative(){
   if(screen.queryByRole('button',{name:'下一部分'})){
     advance()
     expect(screen.getByRole('button',{name:'模拟原生情境完成回调'})).toBeInTheDocument()
-  }else expect(screen.getByRole('button',{name:'提交本轮正式回答'})).toBeDisabled()
+  }else expect(screen.getByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/})).toBeDisabled()
   expect(finals).toHaveLength(0)
   nativeAccepted=true
   fireEvent.click(screen.getByRole('button',{name:'重试读取任务'}))
@@ -169,8 +169,8 @@ describe('Survey static mixed native SJT and cognitive parent boundary',()=>{
       advance();await completeNative()
     }
     expect(screen.queryByRole('button',{name:'上一部分'})).toBeNull()
-    expect(screen.getByRole('button',{name:'提交本轮正式回答'})).toBeEnabled()
-    await exhaustCapacityRetry(()=>fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'})))
+    expect(screen.getByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/})).toBeEnabled()
+    await exhaustCapacityRetry(()=>fireEvent.click(screen.getByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/})))
     await screen.findByText('整轮提交结果尚不确定')
     expect(finals).toHaveLength(4);expectExactReferences(finals[0])
     expect(finals.every(body=>JSON.stringify(body)===JSON.stringify(finals[0]))).toBe(true)
@@ -206,7 +206,7 @@ describe('Survey static mixed native SJT and cognitive parent boundary',()=>{
     expect(harness.cognitive?.existing).toEqual({...cognitiveSession,status:'COMPLETED',resultReference:cognitiveReference})
     expect(nativePaths).toEqual(['start'])
     expect(screen.queryByRole('button',{name:'模拟原生情境完成回调'})).toBeNull()
-    fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'}))
+    fireEvent.click(screen.getByRole('button',{name:/^提交(整份问卷|本轮正式回答)$/}))
     await screen.findByText('感谢参与，问卷已提交')
     expect(finals).toHaveLength(1);expectExactReferences(finals[0])
   })

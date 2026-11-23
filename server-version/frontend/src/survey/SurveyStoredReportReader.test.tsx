@@ -5,6 +5,33 @@ const list=()=>({list:[{finalId:'final-a',attemptCode:'R-001',completedAt:'2026-
 const view=()=>({accessAudience:'researcher',intendedAudience:'student',sourceFinalHash:'final-hash',contentBindingHash:'binding-hash',reportRelease:{releaseId:'r'},interpretationSemantics:'SAVED_AT_FINAL_NO_RECALCULATION',lifecycleNotices:[{layer:'REFERENCE',releaseId:'ref',status:'REVOKED'}],report:{title:'Saved report',blocks:[{type:'TEXT',text:'<script>alert(1)</script>'},{type:'METRIC',metricKey:'score',value:3,unit:'points'},{type:'REFERENCE_BAND',text:'Saved band',guidance:['Saved guidance']},{type:'CHART',metrics:[{metricKey:'chart-score',value:4,unit:'points'}]},{type:'ASSET',assetId:'secret',alt:'Licensed image'}],limitations:['Limit'],disclaimer:'Descriptive only'}})
 afterEach(()=>vi.restoreAllMocks())
 describe('researcher exact saved report component',()=>{
+ it('keeps verification in the report panel after a mistyped code and only reloads on request',async()=>{
+  const request=vi.fn().mockRejectedValueOnce(Error('此操作需要最近五分钟的 TOTP 二次验证'))
+    .mockRejectedValueOnce(Error('验证码无效')).mockResolvedValueOnce({}).mockResolvedValueOnce(list())
+  render(<SurveyStoredReportReader projectId="p" waveId="w" request={request}/>)
+  fireEvent.click(screen.getByRole('button',{name:'读取报告列表'}))
+  fireEvent.change(await screen.findByRole('textbox',{name:'验证器动态码'}),{target:{value:'111111'}})
+  fireEvent.click(screen.getByRole('button',{name:'验证身份'}))
+  expect(await screen.findByText('验证码无效')).toBeVisible()
+  fireEvent.change(screen.getByRole('textbox',{name:'验证器动态码'}),{target:{value:'222222'}})
+  fireEvent.click(screen.getByRole('button',{name:'验证身份'}))
+  await screen.findByText('身份已验证，可以重新读取报告列表。')
+  expect(request).toHaveBeenCalledTimes(3)
+  fireEvent.click(screen.getByRole('button',{name:'读取报告列表'}))
+  expect(await screen.findByText(/R-001/)).toBeVisible()
+ })
+ it('opens an older saved interpretation without entering an identifier',async()=>{
+  const request=vi.fn().mockResolvedValueOnce(list())
+    .mockResolvedValueOnce({list:[{id:'older',createdAt:'2026-10-21T12:00:00Z'}],nextAfterId:null})
+    .mockResolvedValueOnce({finalId:'final-a',artifactId:'older',accessAudience:'researcher',
+      artifact:{binding:{units:[{instrumentKey:'scale'}]},report:{title:'历史模板',blocks:[],limitations:[],disclaimer:null}}})
+  render(<SurveyStoredReportReader projectId="p" waveId="w" request={request}/>)
+  fireEvent.click(screen.getByRole('button',{name:'读取报告列表'}))
+  fireEvent.click(await screen.findByRole('button',{name:'查看历史解释'}))
+  fireEvent.click(await screen.findByRole('button',{name:/打开解释/}))
+  expect(await screen.findByText('历史模板')).toBeVisible()
+  expect(request).toHaveBeenLastCalledWith('/projects/p/analytics/waves/w/finals/final-a/interpretations/older')
+ })
  it('loads bounded pointers only on demand, then requests the exact FINAL and instrument',async()=>{
   const request=vi.fn(async(path:string)=>path.includes('/finals/')?view():list())
   const {container}=render(<SurveyStoredReportReader projectId="project" waveId="wave" request={request as any}/>)

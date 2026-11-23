@@ -59,8 +59,7 @@ export function planPrivateFormImport(definition:unknown,input:Input){
 export async function importPrivateForm(c:PrivateToolContext,id:string,raw:unknown,apply=false){
  privateToolId.parse(id)
  const input=(apply?privateFormImportApplyInput:privateFormImportInput).parse(raw),proof=apply?privateFormImportApplyInput.parse(input):null
- // Enable the new adapter only on School. Teacher's existing feature surface is unchanged.
- if(c.entry!=='SCHOOL')privateToolFail('PRIVATE_TOOL_FORM_IMPORT_NOT_AVAILABLE',403)
+ if(!['SCHOOL','TEACHER'].includes(c.entry))privateToolFail('PRIVATE_TOOL_FORM_IMPORT_NOT_AVAILABLE',403)
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c,apply)
   if(apply)await tx.$queryRaw(Prisma.sql`SELECT id FROM education_private_tools WHERE id=${id} AND entry=${c.entry} AND organization_id=${c.organizationId} AND owner_user_id=${c.principal.userId} FOR UPDATE`)

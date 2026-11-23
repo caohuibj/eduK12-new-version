@@ -20,7 +20,7 @@ import { prisma } from '../../config/database'
 import { createSurveyPublicRateLimiter } from './public-rate.middleware'
 import { success,error } from '../../utils/response'
 import { SurveyWaveError } from './waves.service'
-import { SurveyFinalError,submitResearchFinal,readGeneralForOwnAttempt } from './final.service'
+import { SurveyFinalError,submitResearchFinal,readGeneralForOwnAttempt,authorizeSurveyReportImageAsset } from './final.service'
 import { screenOutResearchAttempt } from './flow.screen-out.service'
 import { SurveyAssignmentError } from './flow.assignment'
 import { readSurveyCheckpoint,saveSurveyCheckpoint,clearSurveyCheckpoint,SurveyCheckpointError } from './checkpoint.service'
@@ -230,13 +230,8 @@ publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/scale-media/:instrumen
 publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/report-images/:assetId',async(req,res,next)=>{
   try{
     const params=proof.parse(req.body)
-    const report=await readGeneralForOwnAttempt({publicId:id.parse(req.params.publicId),
-      attemptId:id.parse(req.params.attemptId),...params})
-    const assetId=id.parse(req.params.assetId)
-    const measurements='measurements' in report?report.measurements:[]
-    const reference=measurements.flatMap(measurement=>
-      'rawScoreFeedback' in measurement?(measurement.rawScoreFeedback??[]).flatMap(feedback=>feedback.images??[]):[])
-      .find(image=>image.asset.assetId===assetId)?.asset
+    const reference=await authorizeSurveyReportImageAsset({publicId:id.parse(req.params.publicId),
+      attemptId:id.parse(req.params.attemptId),...params},id.parse(req.params.assetId))
     if(!reference)return res.status(404).end()
     res.setHeader('Cache-Control','private, no-store, max-age=0')
     await serveAssessmentImageContent({reference,res})

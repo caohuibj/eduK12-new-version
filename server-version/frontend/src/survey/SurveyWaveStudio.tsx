@@ -56,7 +56,8 @@ type FlowAnalytics={flowDigest:string;asOf:string;total:FlowCounts;
   limits:{complete:boolean;maxAttempts:number;noTruncation:boolean}}
 type TrackingOption={instrumentId:string;instrumentKey:string;scoreKey:string;label:string;unit:string}
 type TrackingChoice={mode:'SINGLE'|'LONGITUDINAL';metrics:Array<{instrumentId:string;scoreKey:string}>}
-type Preflight={trackingOptions?:TrackingOption[];ok:boolean;publicationReady:boolean;reason:string;checks:{
+type ReportEligibilityInfo={instrumentId:string;instrumentKey:string;title:string;kind:string;eligible:boolean;mode:'CONFIGURED_REPORT'|'DATA_COLLECTION_ONLY';source:string;reason:string|null}
+type Preflight={trackingOptions?:TrackingOption[];reportEligibility?:ReportEligibilityInfo[];ok:boolean;publicationReady:boolean;reason:string;checks:{
   key:string;ok:boolean;issues:string[];digest?:string}[]}
 const surveyApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   let token=''
@@ -452,17 +453,36 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
         :(def.metrics??[]).map(x=>({key:x.metricKey,label:x.label}))
       return list.map(x=>({instrumentKey:d.instrumentKey,scoreKey:x.key,label:x.label}))
     })
-  const feedbackTools=Object.values(details).filter(d=>
-    editing?.instrumentIds.includes(d.id)&&form.instrumentIds.includes(d.id)&&
-    ['SCALE','SJT'].includes(d.kind)&&!d.catalogGrantId&&!d.readOnly)
-    .map(d=>{
-      const totalScore=d.kind==='SCALE'?(d.definition as ScaleDraft).totalScore:undefined
-      return {...d,metrics:[...flowMetrics.filter(metric=>metric.instrumentKey===d.instrumentKey),
-        ...(totalScore?[{instrumentKey:d.instrumentKey,scoreKey:totalScore.key,label:totalScore.label}]:[])]}
-    })
+  const reportEligibilityById=useMemo(()=>new Map((ready?.reportEligibility??[]).map(item=>[item.instrumentId,item])),[ready])
+  const boundReportToolIds=useMemo(()=>new Set(contentSelections.filter(item=>Boolean(item.reportReleaseId)).map(item=>item.instrumentId)),[contentSelections])
+  const feedbackTools=[
+    ...Object.values(details).filter(d=>
+      editing?.instrumentIds.includes(d.id)&&form.instrumentIds.includes(d.id)&&
+      ['SCALE','SJT'].includes(d.kind)&&!d.catalogGrantId&&!d.readOnly)
+      .map(d=>{
+        const totalScore=d.kind==='SCALE'?(d.definition as ScaleDraft).totalScore:undefined
+        const eligibility=reportEligibilityById.get(d.id)
+        const reportBlocked=Boolean(eligibility&&!eligibility.eligible&&!boundReportToolIds.has(d.id))
+        return {...d,reportEligibility:eligibility,reportBlocked,metrics:[...flowMetrics.filter(metric=>metric.instrumentKey===d.instrumentKey),
+          ...(totalScore?[{instrumentKey:d.instrumentKey,scoreKey:totalScore.key,label:totalScore.label}]:[])]}
+      }),
+    // Catalog / Standard Triplet / Governed tools with a server-verified configured report
+    // (returned by preflight) can also be enabled for participant reports (or kept receipt-only).
+    ...(ready?.reportEligibility??[]).filter(item=>
+      item.eligible&&['SCALE','SJT'].includes(item.kind)
+      &&editing?.instrumentIds.includes(item.instrumentId)&&form.instrumentIds.includes(item.instrumentId)
+      &&Boolean(details[item.instrumentId]?.catalogGrantId||details[item.instrumentId]?.readOnly))
+      .map(item=>{
+        const detail=details[item.instrumentId]
+        const metrics=(ready?.trackingOptions??[]).filter(option=>option.instrumentId===item.instrumentId)
+          .map(option=>({instrumentKey:option.instrumentKey,scoreKey:option.scoreKey,label:option.label.replace(/^[^·]+·\s*/,'')}))
+        return {id:item.instrumentId,title:detail?.title??item.title,kind:item.kind,instrumentKey:item.instrumentKey,
+          reportEligibility:item,reportBlocked:false,metrics}
+      }),
+  ]
   const feedbackInvalid=Object.entries(participantFeedback).some(([id,choice])=>{
     const tool=feedbackTools.find(tool=>tool.id===id)
-    return !tool||!choice.metricKeys.length||choice.metricKeys.some(key=>!tool.metrics.some(metric=>metric.scoreKey===key))
+    return !tool||tool.reportBlocked||!choice.metricKeys.length||choice.metricKeys.some(key=>!tool.metrics.some(metric=>metric.scoreKey===key))
   })
   // The legacy embedded builder can still manage its existing draft selection.
   // The independent-library workspace offers only saved wave members or published
@@ -747,7 +767,10 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
               <p className="text-sm">仅在本次冻结时提交所选指标，不随“保存波次草稿”保存；离开波次或工具更新后需重新选择。匿名身份不推断年龄或角色，不提供参考等级、常模或研究者报告模板。指标来自当前草稿供选择，后端仍须校验实际已发布测量版本。</p>
               {feedbackTools.map(tool=><fieldset key={tool.id} className="border rounded p-2 space-y-2">
                 <legend>{tool.kind} · {tool.title}</legend>
-                <label className="block text-sm"><input type="checkbox" checked={!!participantFeedback[tool.id]} disabled={busy}
+                {tool.reportEligibility&&<p className="text-xs text-slate-600">{tool.reportBlocked
+                  ?'工具报告资格：仅数据采集（'+(tool.reportEligibility.reason||'未配置阈值、文案或报告模板')+'；可在下方绑定已发布报告版本后启用）'
+                  :'工具报告资格：已配置完整报告（可选择向被试展示，或不勾选以仅提供回执）'}</p>}
+                <label className="block text-sm"><input type="checkbox" checked={!!participantFeedback[tool.id]} disabled={busy||tool.reportBlocked}
                   onChange={e=>setParticipantFeedback(old=>{const next={...old};if(e.target.checked)next[tool.id]={metricKeys:[],release:'AFTER_FINAL'};else delete next[tool.id];return next})}/>
                   启用 {tool.title} 的原始指标反馈</label>
                 {participantFeedback[tool.id]&&<>

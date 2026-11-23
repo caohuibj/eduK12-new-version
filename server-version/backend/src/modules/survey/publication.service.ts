@@ -11,10 +11,11 @@ import type {PackageReport} from './governed-tool.model'
 import {bindApprovedTripletContent} from './standard-triplet.content'
 import {freezeSurveyParticipantFeedback,type SurveyRawFeedback,type SurveyParticipantFeedbackSelection} from './participant-feedback'
 import {freezeSurveyContentSelections,type SurveyContentSelection,type FrozenSurveyContentSelection} from './content-selection'
+import {evaluateSurveyUnitReportEligibility,type ToolParticipantReportEligibility} from '../assessment-policy/tool-report-eligibility'
 import {ContentReleaseError} from '../measurement-content/release'
 import { cognitiveMeasurementRelease } from '../measurement-content/cognitive'
 import { sjtMeasurementRelease } from '../measurement-content/sjt'
-import { publishContentRelease,requirePublishedContentRelease } from '../measurement-content/repository'
+import { getContentReleaseBatch,publishContentRelease,requirePublishedContentRelease } from '../measurement-content/repository'
 import { parseFrozenSurveyCognitive } from './cognitive.definition'
 import { scaleMeasurementRelease, surveyScaleReleaseContext } from '../measurement-content/scale'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
@@ -54,6 +55,7 @@ export interface ResearchFrozenUnit {
   authoringFamilyId?:string
   authoringVersion?:number
   participantFeedback?:SurveyRawFeedback
+  reportEligibility?:ToolParticipantReportEligibility
   contentSelection?:FrozenSurveyContentSelection
   measurementRelease?: { releaseId: string; contentHash: string; measurementHash: string }
   sourceProvenance?:Record<string,unknown>
@@ -259,8 +261,19 @@ export async function freezeResearchWaveDraft(input:{
     const contentSelections=input.contentSelections??defaults.contentSelections
     if(participantFeedback.some(s=>units.some(u=>s.feedback.mode==='DESCRIPTIVE'&&u.draftId===s.instrumentId&&(u.sourceProvenance?.surveyStandardReleaseId||u.sourceProvenance?.surveyToolReleaseId)&&u.sourceProvenance?.reportConfigured===false)))stop('已批准组合明确不反馈，不能在投放时添加报告反馈')
     if((input.contentSelections??[]).some(s=>units.some(u=>u.draftId===s.instrumentId&&(u.sourceProvenance?.surveyStandardReleaseId||u.sourceProvenance?.surveyToolReleaseId))))stop('已批准标准工具的参数与报告组合已冻结，不能在投放时替换版本')
-    freezeSurveyParticipantFeedback(units,participantFeedback,feedbackMetrics)
+    // Freeze content selections (bound REPORT/REFERENCE releases) BEFORE
+    // checking participant report eligibility so researcher-bound REPORT
+    // templates are checked with their exact audience toward the tool-level gate.
     await freezeSurveyContentSelections(tx,input.actorUserId,input.projectId,units,contentSelections)
+    const boundReportIds=[...new Set(units.flatMap(unit=>unit.contentSelection?.reportRelease?[unit.contentSelection.reportRelease.releaseId]:[]))]
+    const boundReports=boundReportIds.length?await getContentReleaseBatch(tx,boundReportIds):new Map()
+    for(const unit of units){
+      const boundId=unit.contentSelection?.reportRelease?.releaseId
+      const boundRelease=boundId?boundReports.get(boundId):null
+      const reportReleaseAudience=boundRelease&&boundRelease.layer==='REPORT'?boundRelease.content.audience:undefined
+      unit.reportEligibility=evaluateSurveyUnitReportEligibility({...unit,reportReleaseAudience})
+    }
+    freezeSurveyParticipantFeedback(units,participantFeedback,feedbackMetrics)
     // Initial bounded research safety limit, not a measured capacity claim.
     if(units.filter(unit=>unit.kind==='COGNITIVE').length>4)
       stop('一个波次最多包含 4 个受控认知任务（480 个正式试次）')

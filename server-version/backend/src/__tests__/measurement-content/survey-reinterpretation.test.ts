@@ -6,7 +6,7 @@ vi.mock('../../modules/survey/builder.service',()=>({authorizedProject:mocks.aut
 vi.mock('../../modules/measurement-content/content-authority.repository',()=>({assertContentAuthority:mocks.authority}))
 vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.get}))
 vi.mock('../../modules/assessment-runtime/security',()=>({encryptUnifiedRuntimePayload:(x:unknown)=>JSON.stringify(x),decryptUnifiedRuntimePayload:(x:string)=>JSON.parse(x)}))
-import {createSurveyReinterpretation,readSurveyReinterpretation} from '../../modules/survey/reinterpretation.service'
+import {createSurveyReinterpretation,listSurveyReinterpretations,readSurveyReinterpretation} from '../../modules/survey/reinterpretation.service'
 import {referenceEntryKey} from '../../modules/measurement-content/reference-candidate'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 const ids={project:'00000000-0000-4000-8000-000000000001',wave:'00000000-0000-4000-8000-000000000002',final:'00000000-0000-4000-8000-000000000003',request:'00000000-0000-4000-8000-000000000004',grant:'00000000-0000-4000-8000-000000000005',reference:'00000000-0000-4000-8000-000000000006',report:'00000000-0000-4000-8000-000000000007'}
@@ -31,6 +31,20 @@ beforeEach(()=>{
  })
 })
 describe('explicit reinterpretation uses actual scoped saved FINAL facts',()=>{
+ it('lists metadata only after checking the same project and FINAL as direct reading',async()=>{
+  const args={projectId:ids.project,waveId:ids.wave,finalId:ids.final}
+  const rows=Array.from({length:21},(_,i)=>({id:String(i),createdAt:new Date()}))
+  const findMany=vi.fn().mockResolvedValue(rows)
+  mocks.transaction.mockImplementation(async fn=>fn({surveyProject:{findUnique:mocks.project},surveyWaveFinal:{findFirst:mocks.final},
+    surveyInterpretationArtifact:{findMany}}))
+  const result=await listSurveyReinterpretations('owner',args)
+  expect(result.list).toHaveLength(20)
+  expect(result.nextAfterId).toBe('19')
+  expect(findMany).toHaveBeenCalledWith(expect.objectContaining({where:{finalId:ids.final,sourceFinalHash:source().interpretations[0].sourceFinalHash},take:21,select:{id:true,createdAt:true}}))
+  mocks.source.mockResolvedValue({...source(),completeAttempts:0})
+  await expect(listSurveyReinterpretations('other',args)).rejects.toMatchObject({statusCode:404})
+  expect(findMany).toHaveBeenCalledTimes(1)
+ })
  it('requires exact data capability, preserves old FINAL, and stores an independent immutable artifact',async()=>{
   const old=source(),before=JSON.stringify(old);mocks.source.mockResolvedValue(old)
   const result=await createSurveyReinterpretation('owner',input())
