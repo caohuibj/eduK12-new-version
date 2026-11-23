@@ -85,3 +85,12 @@
  .survey-tool-library .survey-library-card-meta>span:last-child { display:none; }
 }
 @media(prefers-reduced-motion:reduce){.survey-tool-library .survey-library-card{transition:none;}}
+
+/* Mobile filters and secondary actions keep the same target as primary actions. */
+@media (max-width:40rem) {
+  .survey-researcher .survey-tool-library :is(.survey-library-sources,.survey-library-type-filters,.survey-library-pagination) button,
+  .survey-researcher .survey-tool-library :is(.survey-library-clear,.survey-library-help>summary) { min-height:44px; }
+  .survey-researcher .survey-tool-library .survey-library-type-filters { flex-wrap:wrap; }
+  .survey-researcher .survey-tool-library .survey-library-help>summary { display:list-item; padding-block:10px; line-height:1.8; }
+  .survey-researcher .survey-tool-library :is(input[type=search],input[type=text]) { font-size:16px; }
+}

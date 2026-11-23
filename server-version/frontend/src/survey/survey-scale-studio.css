@@ -96,7 +96,7 @@
 
 /* Guided authoring presentation, preserving the Survey theme. */
 .survey-scale-navigation .scale-author-step { display:grid; place-items:center; width:23px; height:23px; flex-shrink:0; border:1px solid var(--survey-brand-line); border-radius:50%; font-size:12px; }
-.survey-scale-navigation [aria-selected=true] .scale-author-step { color:#fff; background:var(--survey-brand-accent); border-color:var(--survey-brand-accent); }
+.survey-scale-navigation [aria-selected=true] .scale-author-step { color:var(--survey-ui-on-action,#fff); background:var(--survey-brand-accent); border-color:var(--survey-brand-accent); }
 .survey-researcher .survey-scale-navigation>button { min-height:48px; font-size:15px; }
 .survey-scale-studio .survey-scale-panel-heading h3 { font-size:20px; line-height:1.5; }
 .survey-scale-studio .survey-scale-panel-heading p { font-size:14px; }
@@ -105,4 +105,9 @@
 @media(max-width:600px) {
  .survey-researcher .survey-scale-navigation>button { flex-direction:column; flex-basis:calc(20% - .3rem); gap:5px; padding:8px 2px; font-size:12px; }
  .survey-scale-navigation small { display:none; }
+}
+
+@media(max-width:40rem){
+ .survey-researcher .survey-tool-template.is-scale .survey-scale-save-footer>button { min-height:44px; }
+ .survey-researcher .survey-tool-template.is-scale .survey-scale-help>summary { min-height:44px; padding-block:10px; line-height:1.8; }
 }

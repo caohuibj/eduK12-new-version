@@ -5,6 +5,7 @@ const path = require('node:path')
 const http = require('node:http')
 const assert = require('node:assert/strict')
 const esbuild = require('../frontend/node_modules/esbuild')
+const { worker, urlAssetPlugin } = require('./qa-round3-browser-assets.cjs')
 const { chromium } = require(process.env.PLAYWRIGHT_CORE_PATH || '../backend/node_modules/playwright-core')
 const output = path.resolve(process.argv[2] || '')
 if (!process.argv[2]) throw new Error('Usage: node qa-round3-browser-e2e.cjs <evidence-directory>')
@@ -20,13 +21,14 @@ const fixture = { attempt: {
   currentIndex: 0, completedItems: 0, totalItems: 1, items: [{ id: 'unit-1', type: 'SCALE', label: '量表', index: 0 }],
   currentItem: { id: 'unit-1', type: 'SCALE', definitionHash: 'local-r3-definition', scaleAssessmentId: 'r3-browser-scale-attempt', scale: { id: 'scale-1', name: '本地三题量表', definition } },
 } }
-esbuild.buildSync({ entryPoints: [path.join(__dirname, 'qa-round3-browser-fixture.tsx')], outfile: path.join(output, 'fixture.js'),
+const buildFixture = () => esbuild.build({ plugins: [urlAssetPlugin], entryPoints: [path.join(__dirname, 'qa-round3-browser-fixture.tsx')], outfile: path.join(output, 'fixture.js'),
   bundle: true, jsx: 'automatic', nodePaths: [path.join(__dirname, '../frontend/node_modules')],
   loader: { '.png': 'dataurl', '.webp': 'dataurl', '.avif': 'dataurl' }, define: require('./qa-round3-browser-build.cjs') })
 const html = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><link rel="stylesheet" href="/fixture.css"><div id="root"></div><script id="fixture" type="application/json">' +
   JSON.stringify(fixture).replace(/</g, '\\u003c') + '</script><script src="/fixture.js"></script></html>'
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://127.0.0.1')
+  if (url.pathname === worker.url) { res.setHeader('Content-Type', worker.contentType); res.end(fs.readFileSync(worker.file)); return }
   if (url.pathname === '/fixture.js') { res.setHeader('Content-Type', 'text/javascript'); res.end(fs.readFileSync(path.join(output, 'fixture.js'))); return }
   if (url.pathname === '/fixture.css') {
     const assets = path.join(__dirname, '../frontend/dist/assets')
@@ -82,6 +84,7 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({ code: 0, message: 'ok', data }))
 })
 ;(async () => {
+  await buildFixture()
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
   const base = 'http://127.0.0.1:' + server.address().port
   const browser = await chromium.launch({ headless: true })
@@ -91,6 +94,12 @@ const server = http.createServer(async (req, res) => {
     const errors = evidence.pageErrors
     page.on('pageerror', error => errors.push(String(error)))
     await page.goto(base + '/?mode=draft')
+    const workerResponse = await page.request.get(base + worker.url)
+    assert.equal(workerResponse.status(), 200)
+    assert.equal(workerResponse.headers()['content-type'], worker.contentType)
+    const workerBytes = await workerResponse.body()
+    assert.deepEqual(workerBytes, fs.readFileSync(worker.file))
+    evidence.workerAsset = { url: worker.url, bytes: workerBytes.length, matchesInstalledWorker: true }
     await page.getByRole('button', { name: '选项 3', exact: true }).click()
     assert.equal(await page.getByRole('button', { name: '选项 3', exact: true }).getAttribute('aria-pressed'), 'true')
     await page.getByRole('button', { name: '下一题', exact: true }).click()

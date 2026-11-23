@@ -53,3 +53,10 @@
 .survey-researcher .survey-composition-footer .btn-primary { min-height:38px; padding:.45rem .85rem; border-radius:.5rem; font-size:.8rem; }
 @media(max-width:65rem){.survey-composition-studio{grid-template-columns:minmax(0,1fr)}.survey-composition-outline{position:static}.survey-composition-outline-actions{max-width:none}}
 @media(max-width:40rem){.survey-researcher .survey-tool-template.is-composition{padding:.85rem}.survey-composition-catalog,.survey-composition-outline{padding:.8rem}.survey-composition-types{gap:.4rem}.survey-researcher .survey-composition-types>button{padding:.6rem;gap:.4rem}.survey-composition-types small{font-size:.6rem}.survey-composition-candidates article{flex-wrap:wrap;padding:.7rem}.survey-composition-candidates article>.btn-secondary{margin-left:auto}.survey-composition-filter form{flex-basis:100%}.survey-composition-footer .btn-primary{margin-left:auto}.survey-composition-step{gap:.5rem}.survey-composition-step>small{white-space:normal}}
+
+@media (max-width:40rem) {
+  .survey-researcher .survey-tool-template.is-composition :is(.survey-composition-outline-actions,.survey-composition-pagination,.survey-composition-filter) button { min-width:44px; min-height:44px; }
+  .survey-researcher .survey-tool-template.is-composition .survey-composition-outline-actions { flex-wrap:wrap; }
+}
+
+@media(max-width:40rem){.survey-researcher .survey-tool-template.is-composition .survey-composition-footer>.btn-primary{min-height:44px}}

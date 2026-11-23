@@ -15,7 +15,7 @@ const wave={id:'wave2',title:'学习体验',ordinal:2,status:'OPEN',consentText:
   opensAt:null,closesAt:null,allowNewParticipants:true}
 const previous={...wave,id:'wave1',ordinal:1,status:'CLOSED',attempt:{id:'old-attempt',status:'COMPLETED'}}
 const response=(data:unknown,status=200)=>Promise.resolve({ok:status<400,status,json:async()=>({code:status<400?0:status,message:'参与链接无效或已撤销',data})} as Response)
-function fixture({reject=false,waiting=false,single=false,scale=false}:{reject?:boolean;waiting?:boolean;single?:boolean;scale?:boolean}={}){
+function fixture({reject=false,waiting=false,single=false,scale=false,rejectReceipt=false}:{reject?:boolean;waiting?:boolean;single?:boolean;scale?:boolean;rejectReceipt?:boolean}={}){
   const fetcher=vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>{
     const url=String(input)
     // Browser history must be scrubbed before every API request.
@@ -24,6 +24,7 @@ function fixture({reject=false,waiting=false,single=false,scale=false}:{reject?:
     if(url.endsWith('/info'))return response({project:{name:'匿名追踪研究',description:'研究介绍',status:'ACTIVE',collectionMode:single?'SINGLE_UNLINKED':'LINKED_WAVES'},waves:[wave]})
     if(url.endsWith('/enter'))return reject?response(null,403):response({waves:waiting?[previous]:[previous,wave]})
     if(url.endsWith('/join'))return response(proof)
+    if(url.endsWith('/general'))return rejectReceipt?response(null,403):response({kind:'GENERAL_ONLY',text:'已有回答已保存',disclaimer:'研究用途',completedAt:'2026-11-23T00:00:00Z'})
     if(url.endsWith('/start'))return response({attemptId:'new-attempt'})
     if(url.endsWith('/task'))return response({attemptId:'new-attempt',waveId:wave.id,status:'STARTED',definitionDigest:'d'.repeat(64),reportMode:'GENERAL_ONLY',units:[...(scale?[{kind:'SCALE',instrumentKey:'scale',title:'学习体验',presentationMode:'ONE_BY_ONE',items:[{itemKey:'s1',prompt:'我能把握自己的学习节奏',required:true}],responseOptions:[{optionKey:'yes',label:'同意'},{optionKey:'no',label:'不同意'}]}]:[]),{kind:'FORM',instrumentKey:'form',title:'基本情况',pages:[{pageKey:'page',title:'第一页',questions:[{itemKey:'q',type:'SHORT_TEXT',prompt:'本次感受',required:false,options:[]}]}]}]})
     throw new Error('Unexpected request '+url)
@@ -215,5 +216,72 @@ describe('personal participation link',()=>{
     expect(screen.getByRole('status')).toHaveTextContent('已发起保存')
     act(()=>vi.advanceTimersByTime(1000));expect(revoke).toHaveBeenCalledWith('blob:personal')
     vi.useRealTimers()
+  })
+})
+
+
+describe('same-document saved participation links',()=>{
+  it.each([false,true])('reopens a saved personal link in an idle tab (scoped invitation: %s)',async(scoped)=>{
+    if(scoped)window.history.replaceState(null,'','/r/'+pid+'#entry='+invite)
+    const api=fixture();render(<SurveyPublicApp/>)
+    await screen.findByRole('button',{name:'查看参与说明'})
+    await act(async()=>{openLink();window.dispatchEvent(new HashChangeEvent('hashchange'))})
+    await screen.findByText(wave.consentText)
+    expect(window.location.hash).toBe('')
+    const enters=api.mock.calls.filter(([url])=>String(url).endsWith('/enter'))
+    expect(enters).toHaveLength(1)
+    expect(JSON.parse(String(enters[0][1]?.body))).toEqual(proof)
+    expect(api.mock.calls.filter(([url])=>/\/(join|start|task)$/.test(String(url)))).toHaveLength(0)
+    expect([...Object.values(sessionStorage),...Object.values(localStorage)].join('')).not.toContain(proof.accessCredential)
+  })
+  it('scrubs another personal link without replacing an active answer or identity',async()=>{
+    openLink();const api=fixture();render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('checkbox',{name:/我已阅读并同意/}))
+    fireEvent.click(screen.getByRole('button',{name:'开始填写问卷'}))
+    const answer=await screen.findByRole('textbox',{name:/本次感受/})
+    fireEvent.change(answer,{target:{value:'保留当前答卷'}})
+    const before=api.mock.calls.length
+    await act(async()=>{
+      window.history.replaceState(null,'',personalParticipationLink(window.location.origin,pid,{researchCode:'R-OTHER123',accessCredential:'t'.repeat(43)}))
+      window.dispatchEvent(new HashChangeEvent('hashchange'))
+    })
+    expect(window.location.hash).toBe('')
+    expect(answer).toHaveValue('保留当前答卷')
+    expect(api.mock.calls).toHaveLength(before)
+  })
+  it('removes malformed personal fragments without enrolling or authenticating',async()=>{
+    const api=fixture();render(<SurveyPublicApp/>)
+    await screen.findByRole('button',{name:'查看参与说明'})
+    const before=api.mock.calls.length
+    await act(async()=>{
+      window.history.replaceState(null,'','/r/'+pid+'#resume=1&code=R-ABCDEFGH&key=invalid')
+      window.dispatchEvent(new HashChangeEvent('hashchange'))
+    })
+    expect(window.location.hash).toBe('')
+    expect(api.mock.calls).toHaveLength(before)
+    expect(screen.queryByText(wave.consentText)).toBeNull()
+  })
+})
+
+
+describe('completed-wave receipt navigation',()=>{
+  it('opens an existing receipt without a new consent or START',async()=>{
+    openLink();const api=fixture({waiting:true});render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByText('已完成问卷'))
+    fireEvent.click(await screen.findByRole('button',{name:'查看回执'}))
+    await screen.findByRole('heading',{name:'感谢参与，问卷已提交'})
+    expect(screen.queryByRole('checkbox',{name:/我已阅读并同意/})).toBeNull()
+    const reads=api.mock.calls.filter(([url])=>String(url).endsWith('/general'))
+    expect(reads).toHaveLength(1)
+    expect(JSON.parse(String(reads[0][1]?.body))).toEqual(proof)
+    expect(api.mock.calls.filter(([url])=>/\/(join|start|task)$/.test(String(url)))).toHaveLength(0)
+  })
+  it('does not display a receipt rejected by the authorized reader',async()=>{
+    openLink();const api=fixture({waiting:true,rejectReceipt:true});render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByText('已完成问卷'))
+    fireEvent.click(await screen.findByRole('button',{name:'查看回执'}))
+    expect(await screen.findByRole('alert')).toHaveTextContent('参与链接无效或已撤销')
+    expect(screen.queryByRole('heading',{name:'感谢参与，问卷已提交'})).toBeNull()
+    expect(api.mock.calls.filter(([url])=>/\/(join|start|task)$/.test(String(url)))).toHaveLength(0)
   })
 })
