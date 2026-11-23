@@ -1,7 +1,10 @@
+import {previewTrainingStandardReportEligibility} from './training-standard-report-preview'
+import {scaleRuntimeInstrumentKey} from '../scale/runtime-identity'
 import {
   evaluateTrainingItemReportEligibility,
   summarizeCollectionReportEligibility,
   type CollectionReportEligibilitySummary,
+  type ToolParticipantReportEligibility,
 } from '../assessment-policy/tool-report-eligibility'
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
 import { AssessmentStartBusyError, classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
@@ -350,6 +353,9 @@ export const loadComposite = async (id: string, includeItems = false, db: Db = p
                     instruction: true,
                     instrumentClass: true,
                     instrumentVersion: true,
+                    standardSourceKind: true,
+                    standardToolKey: true,
+                    definitionHash: true,
                     libraryEntryId: true,
                     measurementReleaseId: true,
                     definition: true,
@@ -1282,6 +1288,7 @@ export const listComposites = async (userId: string, role: UserRole) => {
 const trainingQuestionnaireReportEligibility = (
   composite: { items?: any[]; trainingContentSnapshot?: any },
   preparedSnapshot?: any,
+  draftEligibility?: ReadonlyMap<string, ToolParticipantReportEligibility>,
 ): CollectionReportEligibilitySummary => {
   const snapshot = preparedSnapshot ?? composite.trainingContentSnapshot
   const boundUnits: any[] = Array.isArray(snapshot?.units) ? snapshot.units : []
@@ -1291,7 +1298,7 @@ const trainingQuestionnaireReportEligibility = (
       id: item.id,
       title: item.label ?? item.scale?.name ?? item.formLabel ?? item.situationalInstrumentKey ?? item.type,
       kind: item.type,
-      eligibility: evaluateTrainingItemReportEligibility(item, byItemId.get(item.id) ?? null),
+      eligibility: draftEligibility?.get(item.id) ?? evaluateTrainingItemReportEligibility(item, byItemId.get(item.id) ?? null),
     })),
   )
 }
@@ -1308,7 +1315,9 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
     listCompositeContentUnits(composite.id),
     listCompositeFormSections(composite.id),
   ])
-  const participantReportEligibility = trainingQuestionnaireReportEligibility(composite)
+  const participantReportEligibility = trainingQuestionnaireReportEligibility(composite, undefined,
+    composite.status === 'DRAFT' && composite.items.some((item: any) => item.standardCombinationSource != null)
+      ? await previewTrainingStandardReportEligibility(prisma as Prisma.TransactionClient, composite) : undefined)
   const hasScoredItems = composite.items.some((item: any) => item.type !== 'FORM')
   const receiptOnlyAvailable = composite.productKind === 'QUESTIONNAIRE' && hasScoredItems
   const defaultProvideParticipantReport = receiptOnlyAvailable
@@ -5040,7 +5049,7 @@ const reportScaleChildSelect = {
   submissionId: true, submissionPayloadHash: true,
   attemptEpoch: true, compiledRuntimeHash: true, runtimeSnapshotEncrypted: true,
   scale: { select: { code: true, instrumentVersion: true, instrumentClass: true,
-    libraryEntryId: true, measurementReleaseId: true } },
+    standardSourceKind: true, standardToolKey: true, libraryEntryId: true, measurementReleaseId: true } },
 } as const
 const reportCognitiveChildSelect = {
   id: true, compositeItemId: true, attemptNo: true, testType: true, finishedAt: true,
@@ -5367,6 +5376,8 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
               instruction: true,
               instrumentClass: true,
               instrumentVersion: true,
+              standardSourceKind: true,
+              standardToolKey: true,
             },
           },
           cognitiveAssignment: { select: { id: true, title: true } },
@@ -5434,6 +5445,10 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT_NARROWED = {
               code: true,
               name: true,
               instrumentVersion: true,
+              // Imported standards freeze the approved logical tool identity.
+              instrumentClass: true,
+              standardSourceKind: true,
+              standardToolKey: true,
             },
           },
           cognitiveAssignment: { select: { id: true, title: true } },
@@ -5449,7 +5464,7 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT_NARROWED = {
 // identical to the full select for all paths, and a single read keeps the
 // load-once contract (the locked Training child-candidate flow relies on
 // exactly one load read before the FLOW re-read below). Dropped, all
-// large-payload fields: the scale description/instruction/instrumentClass
+// large-payload fields: the scale description/instruction
 // (the current unit's scale text comes from its child row / frozen runtime),
 // and the FORM-item form fields (FORM items never reach the runner; forms
 // are delivered as formSections, whose full select is kept). Kept:
@@ -5688,7 +5703,9 @@ const getUnifiedCompositeAttemptState = async (
     try {
       const runtime = (await loadScaleAdmissionRuntime(child))
       if (
-        runtime.instrumentKey !== item.scale?.code
+        runtime.instrumentKey !== scaleRuntimeInstrumentKey(item.scale)
+        || item.scale.code !== slot.sourceDefinitionIdentity.key
+        || runtime.instrumentVersion !== slot.sourceDefinitionIdentity.version
         || runtime.instrumentVersion !== item.scale?.instrumentVersion
         || runtime.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
         || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
@@ -6866,7 +6883,7 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
             && entry?.attemptEpoch === result?.attemptEpoch
             && entry.runtimeSnapshotEncrypted === result?.runtimeSnapshotEncrypted
             && entry.runtime.compiledRuntime.compiledRuntimeHash === result?.compiledRuntimeHash
-            && entry.runtime.instrumentKey === result?.scale?.code
+            && entry.runtime.instrumentKey === (result?.scale ? scaleRuntimeInstrumentKey(result.scale) : null)
             && entry.runtime.instrumentVersion === result?.scale?.instrumentVersion)
           // Legacy composites can consume approved library wrappers too. Their
           // generated code is not a registry key: carry the actual child's
@@ -6877,7 +6894,7 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
               frozenRuntime = await loadFrozenScaleRuntimeSnapshot(result.runtimeSnapshotEncrypted)
             }
             if (!frozenRuntime || result.scaleId !== item.scaleId
-              || frozenRuntime.instrumentKey !== result.scale.code
+              || frozenRuntime.instrumentKey !== scaleRuntimeInstrumentKey(result.scale)
               || frozenRuntime.instrumentVersion !== result.scale.instrumentVersion
               || frozenRuntime.compiledRuntime.compiledRuntimeHash !== result.compiledRuntimeHash
               || !result.scale.measurementReleaseId
@@ -7359,7 +7376,7 @@ const loadCollectionReportAttempt = async (attemptId: string) => {
         id: true, scaleId: true, compositeItemId: true, result: true, completedAt: true, totalTime: true,
         submissionId: true, submissionPayloadHash: true,
         attemptEpoch: true, compiledRuntimeHash: true, runtimeSnapshotEncrypted: true,
-        scale: { select: { code: true, instrumentVersion: true, instrumentClass: true, libraryEntryId: true, measurementReleaseId: true } },
+        scale: { select: { code: true, instrumentVersion: true, instrumentClass: true, standardSourceKind: true, standardToolKey: true, libraryEntryId: true, measurementReleaseId: true } },
       } },
       cognitiveSessions: { select: {
         id: true, compositeItemId: true, attemptNo: true, testType: true, finishedAt: true,
@@ -7404,7 +7421,7 @@ const materializeCompactReportFromFacts = async (attempt: any, binding: ReportJo
     const entry=verified?.units.get(child.id),reuse=verified&&entry&&verified.attemptId===attempt.id&&verified.attemptEpoch===attempt.attemptEpoch
       &&verified.slotSetHash===attempt.frozenActiveSlotSetHash&&verified.contextHash===attempt.contextSnapshotHash&&entry.attemptEpoch===child.attemptEpoch
       &&entry.runtimeSnapshotEncrypted===child.runtimeSnapshotEncrypted&&entry.runtime.compiledRuntime.compiledRuntimeHash===child.compiledRuntimeHash
-      &&entry.runtime.instrumentKey===child.scale?.code&&entry.runtime.instrumentVersion===child.scale?.instrumentVersion
+      &&entry.runtime.instrumentKey===(child.scale?scaleRuntimeInstrumentKey(child.scale):null)&&entry.runtime.instrumentVersion===child.scale?.instrumentVersion
     const policy=await loadProjectionPolicyForAssessment(child,result,reuse?entry!.runtime:undefined)
     if(policy.snapshotError)throw new Error('Frozen report disclosure unavailable')
     const unit={itemId:item.id,type:'SCALE',kind:'scale',scaleId:item.scaleId,scaleCode:item.scale?.code,scaleName:item.scale?.name||'未知量表',result}

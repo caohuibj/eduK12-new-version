@@ -1,3 +1,4 @@
+import {scaleRuntimeInstrumentKey} from './runtime-identity'
 import {stableStudyAdmissionHash} from '../anonymous-study/admission-principal'
 import { assertTrainingChildSelected, loadTrainingChildAdmissionParent, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
 import {readTrainingTimingSnapshot,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
@@ -88,6 +89,8 @@ export const UNIFIED_SCALE_CHILD_ADMISSION_SELECT = {
       name: true,
       instrumentVersion: true,
       instrumentClass: true,
+      standardSourceKind: true,
+      standardToolKey: true,
       status: true,
     },
   },
@@ -122,6 +125,8 @@ export type ScaleAdmissionChildRow = {
     name: string
     instrumentVersion: string
     instrumentClass: 'STANDARD' | 'CUSTOM_DESCRIPTIVE'
+    standardSourceKind?: string
+    standardToolKey?: string | null
     status: string
   }
 }
@@ -346,7 +351,7 @@ export const createScaleAdmissionForRuntime = async (input: {
   legacyRequiresContext?: boolean
   bundleContext?: BundleScaleStartContext
 }): Promise<VersionedFrozenUnitAdmission> => {
-  if (input.runtime.instrumentKey !== input.scale.code || input.runtime.instrumentVersion !== input.scale.instrumentVersion) {
+  if (input.runtime.instrumentKey !== scaleRuntimeInstrumentKey(input.scale) || input.runtime.instrumentVersion !== input.scale.instrumentVersion) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时身份不匹配', 409)
   }
 

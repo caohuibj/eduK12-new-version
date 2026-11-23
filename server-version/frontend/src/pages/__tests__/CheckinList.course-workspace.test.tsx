@@ -10,6 +10,7 @@ vi.mock('../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'te
 vi.mock('../../components/RichTextEditor', () => ({ default: () => null }))
 vi.mock('../../components/QuestionEditor', () => ({ default: () => null }))
 vi.mock('../../components/MediaSelector', () => ({ default: () => null }))
+vi.mock('../../components/CheckinTokenManager', () => ({ default: ({open,onOpenChange,checkinTitle}:any) => open ? <div role="dialog" aria-label={checkinTitle+'匿名管理'}><button onClick={()=>onOpenChange(false)}>关闭匿名管理</button></div> : null }))
 import CheckinList from '../CheckinList'
 
 const course = { id: 'course', title: '当前课程', creatorId: 'teacher-1', status: 'PUBLISHED', courseCode: 'TEST' } as Course
@@ -26,6 +27,16 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 describe('Unified course check-in management', () => {
+  it('keeps anonymous management mounted after its opening action closes the menu', async () => {
+    mount()
+    fireEvent.click(await screen.findByRole('button', { name: '课程打卡 的更多操作' }))
+    fireEvent.click(screen.getByRole('button', { name: '管理匿名打卡链接' }))
+    expect(screen.queryByRole('group', { name: '课程打卡 的更多操作菜单' })).not.toBeInTheDocument()
+    expect(await screen.findByRole('dialog', { name: '课程打卡匿名管理' })).toBeVisible()
+    fireEvent.click(screen.getByRole('button', { name: '关闭匿名管理' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
   it('redirects old links to the course, retaining task identity and namespaced filters', async () => {
     render(<MemoryRouter initialEntries={['/checkins?id=task&courseId=course&search=keyword&page=2&returnTo=%2Fcourses%2Fcourse%2Fdetail%3Fsection%3Dcheckins']}><Routes><Route path="/checkins" element={<CheckinList/>}/><Route path="/courses/:courseId/detail" element={<RouteState/>}/></Routes></MemoryRouter>)
     expect(await screen.findByTestId('route')).toHaveTextContent('/courses/course/detail?section=checkins&checkins_search=keyword&checkins_page=2&checkinId=task')

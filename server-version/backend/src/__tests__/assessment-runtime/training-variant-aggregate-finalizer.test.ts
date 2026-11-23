@@ -177,3 +177,27 @@ describe('committed aggregate graph to Training FINAL receipt',()=>{
   // Mocked I/O proves shared transaction/error propagation, not PostgreSQL rollback.
  })
 })
+
+describe('imported standard canonical identity',()=>{
+ function imported(override:Record<string,unknown>={}){
+  const f=boundScaleFixture(),slot=createFrozenActiveSlotSet({schemaVersion:1,runtimeGeneration:'UNIFIED_V1',attemptEpoch:1,slots:[{
+   slotKey:'scale:scale-item',unitType:'SCALE',required:true,sourceDefinitionIdentity:{key:'db-scale:source',version:'1',hash:'a'.repeat(64)},
+   sourceBinding:{compositeItemId:'scale-item',compiledRuntimeHash:'a'.repeat(64)}}]})
+  f.parent.compositeAssessment.items[0].scale={code:'db-scale:source',instrumentVersion:'1',instrumentClass:'STANDARD',
+   standardSourceKind:'DB_IMPORTED',standardToolKey:'scale-key',...override}
+  Object.assign(f.parent,{trainingContentBinding:null,trainingContentBindingHash:null,
+   frozenActiveSlotSetEncrypted:encryptFrozenActiveSlotSet(slot),frozenActiveSlotSetHash:slot.snapshotHash})
+  f.reportJob.slotSetHash=slot.snapshotHash
+  return f
+ }
+ it('completes the logical approved result without changing the physical frozen slot or accepted facts',async()=>{
+  const f=imported(),before=JSON.stringify(f.row),frozen=f.parent.frozenActiveSlotSetEncrypted
+  await expect(finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent,f.reportJob,f.parent)).resolves.toMatchObject({status:'COMPLETED'})
+  expect(JSON.stringify(f.row)).toBe(before);expect(f.parent.frozenActiveSlotSetEncrypted).toBe(frozen)
+ })
+ it.each([{standardToolKey:null},{standardToolKey:'other-tool'},{code:'db-scale:other'},{instrumentVersion:'2'}])('rejects mismatched imported source: %o',async override=>{
+  const f=imported(override)
+  await expect(finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent,f.reportJob,f.parent)).rejects.toMatchObject({code:'DEFINITION_MISMATCH'})
+  expect(db.compositeAssessmentAttempt.updateMany).not.toHaveBeenCalled()
+ })
+})

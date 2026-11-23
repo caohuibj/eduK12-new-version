@@ -1,3 +1,4 @@
+import {scaleRuntimeInstrumentKey} from './runtime-identity'
 import {assertCurrentStudyPrincipal,assertStudyReceiptBatch,withStudyPrincipalReadBatch,type AcceptedStudyReceipt} from '../anonymous-study/admission-principal'
 import { lockTrainingFlowFinalAdmission, requiresTrainingFlowFinalLock } from '../composite/training-variant-child-scope'
 import {normalizeTrainingScaleTiming} from '../assessment-runtime/training-scale-timing'
@@ -160,7 +161,7 @@ const assertRuntimeAgainstAdmission = (
   snapshot: VersionedFrozenScaleRuntimeSnapshot,
   input: UnifiedScaleFinalSubmitInput,
 ): void => {
-  if (snapshot.instrumentKey !== child.scale.code || snapshot.instrumentVersion !== child.scale.instrumentVersion) {
+  if (snapshot.instrumentKey !== scaleRuntimeInstrumentKey(child.scale) || snapshot.instrumentVersion !== child.scale.instrumentVersion) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '冻结的量表运行时身份不匹配', 409)
   }
   if (child.compiledRuntimeHash !== snapshot.compiledRuntime.compiledRuntimeHash) {
@@ -193,7 +194,7 @@ const buildResult = async (
   }
   return buildScaleResult({
     scaleId: child.scale.id,
-    instrumentKey: child.scale.code,
+    instrumentKey: snapshot.instrumentKey,
     name: child.scale.name,
     instrumentVersion: child.scale.instrumentVersion,
     definition: snapshot.definition,

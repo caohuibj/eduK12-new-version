@@ -146,6 +146,7 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
   // 提交列表弹窗状态
   const [showSubmissionsModal, setShowSubmissionsModal] = useState(false)
   const [selectedCheckin, setSelectedCheckin] = useState<Checkin | null>(null)
+  const [tokenCheckin, setTokenCheckin] = useState<Checkin | null>(null)
   const { list: submissions, loading: submissionsLoading, error: submissionsError, total: submissionsTotal, more: moreSubmissions, refresh: refreshSubmissions, hasMore: moreSubmissionsAvailable } = useCursorList<CheckinSubmission>(showSubmissionsModal && selectedCheckin ? `/checkins/${selectedCheckin.id}/submissions` : null)
 
   useEffect(() => {
@@ -539,7 +540,7 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
         {checkin.description && <TrainingCardDescription id={'checkin-description-'+checkin.id} description={checkin.description}/>}
         {checkin.tags?.length ? <div className="staff-inline-tags">{checkin.tags.slice(0,3).map((tag,index)=><TagBadge key={index} tag={tag}/>)}</div> : null}
         <dl className="training-assignment-facts"><div><dt>截止时间</dt><dd>{checkin.endTime ? new Date(checkin.endTime).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '无截止时间'}</dd></div><div><dt>参与人数</dt><dd>{checkin._count?.submissions || 0} 人</dd></div>{checkin.scheduleId && checkin.scheduledFor && <div><dt>本期发布时间</dt><dd>{new Date(checkin.scheduledFor).toLocaleString('zh-CN')}</dd></div>}</dl>
-        <footer className="training-assignment-card-actions"><ProductButton variant="primary" onClick={()=>openSubmissionsModal(checkin)}>查看提交</ProductButton><ProductButton onClick={()=>void openEditModal(checkin)}>编辑打卡</ProductButton><ProductButton disabled={exporting.has(checkin.id)} onClick={()=>void handleExport(checkin)}>{exporting.has(checkin.id)?'导出中…':'导出提交'}</ProductButton><MoreActions label={`${checkin.title} 的更多操作`}><React.Suspense fallback={<span role="status">正在加载公开参与管理…</span>}><CheckinTokenManager checkinId={checkin.id} checkinTitle={checkin.title} allowAnonymous={checkin.allowAnonymous||false} onAllowAnonymousChange={value=>setCheckins(current=>current.map(item=>item.id===checkin.id?{...item,allowAnonymous:value}:item))}/></React.Suspense><button type="button" onClick={()=>void handleClone(checkin)}>复制打卡</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(checkin)}>删除打卡</button></MoreActions></footer>
+        <footer className="training-assignment-card-actions"><ProductButton variant="primary" onClick={()=>openSubmissionsModal(checkin)}>查看提交</ProductButton><ProductButton onClick={()=>void openEditModal(checkin)}>编辑打卡</ProductButton><ProductButton disabled={exporting.has(checkin.id)} onClick={()=>void handleExport(checkin)}>{exporting.has(checkin.id)?'导出中…':'导出提交'}</ProductButton><MoreActions label={`${checkin.title} 的更多操作`}><button type="button" onClick={()=>setTokenCheckin(checkin)}>管理匿名打卡链接</button><button type="button" onClick={()=>void handleClone(checkin)}>复制打卡</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(checkin)}>删除打卡</button></MoreActions></footer>
       </article>)}</div>
       : <div className={`staff-table-container ${isTrainingHost() ? "staff-record-table" : ""}`}><table className="staff-table"><thead><tr><th>打卡</th><th>课程</th><th>截止时间</th><th>参与</th><th>公开参与</th><th className="text-right">操作</th></tr></thead><tbody>
         {filteredCheckins.map(checkin=><tr id={`checkin-record-${checkin.id}`} tabIndex={-1} key={checkin.id} className={focusId===checkin.id?'staff-target-row':''}>
@@ -548,7 +549,7 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
           <td data-label="截止时间">{checkin.endTime ? new Date(checkin.endTime).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '无截止时间'}</td>
           <td data-label="参与"><button type="button" className="staff-text-action" onClick={()=>openSubmissionsModal(checkin)}>{checkin._count?.submissions || 0} 人参与</button></td>
           <td data-label="公开参与"><span className={`staff-badge ${checkin.allowAnonymous?'staff-badge--success':''}`}>{checkin.allowAnonymous?'已开启':'未开启'}</span></td>
-          <td><div className="staff-table-actions"><ProductButton onClick={()=>openSubmissionsModal(checkin)}>查看提交</ProductButton><MoreActions label={`${checkin.title} 的更多操作`}><React.Suspense fallback={<span role="status">正在加载公开参与管理…</span>}><CheckinTokenManager checkinId={checkin.id} checkinTitle={checkin.title} allowAnonymous={checkin.allowAnonymous||false} onAllowAnonymousChange={value=>setCheckins(current=>current.map(item=>item.id===checkin.id?{...item,allowAnonymous:value}:item))}/></React.Suspense><button type="button" disabled={exporting.has(checkin.id)} onClick={()=>void handleExport(checkin)}>{exporting.has(checkin.id)?'导出中…':'导出数据'}</button><button type="button" onClick={()=>void handleClone(checkin)}>复制打卡</button><button type="button" onClick={()=>openEditModal(checkin)}>编辑打卡</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(checkin)}>删除打卡</button></MoreActions></div></td>
+          <td><div className="staff-table-actions"><ProductButton onClick={()=>openSubmissionsModal(checkin)}>查看提交</ProductButton><MoreActions label={`${checkin.title} 的更多操作`}><button type="button" onClick={()=>setTokenCheckin(checkin)}>管理匿名打卡链接</button><button type="button" disabled={exporting.has(checkin.id)} onClick={()=>void handleExport(checkin)}>{exporting.has(checkin.id)?'导出中…':'导出数据'}</button><button type="button" onClick={()=>void handleClone(checkin)}>复制打卡</button><button type="button" onClick={()=>openEditModal(checkin)}>编辑打卡</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(checkin)}>删除打卡</button></MoreActions></div></td>
         </tr>)}
       </tbody></table></div>}
       {!focusId && <CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={total} loading={loading} label="打卡"/>}
@@ -922,6 +923,11 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
           </div>
         </ModalSurface>
       )}
+      {tokenCheckin && <React.Suspense fallback={<p role="status">正在加载公开参与管理…</p>}>
+        <CheckinTokenManager checkinId={tokenCheckin.id} checkinTitle={tokenCheckin.title} allowAnonymous={tokenCheckin.allowAnonymous || false}
+          open showTrigger={false} onOpenChange={value=>{if(!value)setTokenCheckin(null)}}
+          onAllowAnonymousChange={value=>{setCheckins(current=>current.map(item=>item.id===tokenCheckin.id?{...item,allowAnonymous:value}:item));setTokenCheckin(current=>current?{...current,allowAnonymous:value}:null)}}/>
+      </React.Suspense>}
       {editorGuard.confirmation}
     </PageContainer>
   )
