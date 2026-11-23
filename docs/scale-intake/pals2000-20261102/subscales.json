@@ -1,0 +1,1823 @@
+{
+  "motherTool": "PALS2000",
+  "sourceDocumentSha256": "dc27657aa1ff7bc3eda64e6d8e683ba973912fc4bbe054ff07d5366d94b49301",
+  "sources": [
+    "https://public.websites.umich.edu/~pals/pals/PALS%202000_V13Word97.pdf",
+    "https://public.websites.umich.edu/~pals/manuals.html",
+    "https://umich.flintbox.com/"
+  ],
+  "scope": "metadata only; no official questionnaire items or manual bytes redistributed",
+  "tools": [
+    {
+      "instrumentKey": "pals2000_personal_mastery_original_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜个人掌握目标（原版）｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "personal_original",
+      "respondent": "student",
+      "evaluationTarget": "student",
+      "printedPage": 7,
+      "pdfPage": 11,
+      "itemNumberNamespace": "definition_local",
+      "sourceItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "itemCount": 6,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.86,
+      "sourceAlphaSample": "美国中学六年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "更强调学习、理解与兴趣；原版含兴趣成分",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "选择一个想弄懂的知识点，试着说出自己的理解。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_personal_mastery_original_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_personal_performance_approach_original_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜个人成绩趋近目标（原版）｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "personal_original",
+      "respondent": "student",
+      "evaluationTarget": "student",
+      "printedPage": 9,
+      "pdfPage": 13,
+      "itemNumberNamespace": "definition_local",
+      "sourceItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "itemCount": 5,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.86,
+      "sourceAlphaSample": "美国中学六年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "更在意展示能力和相对表现；不能简单解释为好或坏",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "把一次比较带来的感受，转为自己下一步想学会的小目标。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_personal_performance_approach_original_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_personal_performance_avoid_original_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜个人成绩回避目标（原版）｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "personal_original",
+      "respondent": "student",
+      "evaluationTarget": "student",
+      "printedPage": 10,
+      "pdfPage": 14,
+      "itemNumberNamespace": "definition_local",
+      "sourceItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "itemCount": 6,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.75,
+      "sourceAlphaSample": "美国中学六年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "更担心被看作能力不足；不是能力差的证据",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "可以先在安全的小组或课后问一个具体问题。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_personal_performance_avoid_original_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_personal_mastery_revised_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜个人掌握目标（修订版）｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "personal_revised",
+      "respondent": "student",
+      "evaluationTarget": "student",
+      "printedPage": 11,
+      "pdfPage": 15,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        9,
+        25,
+        29,
+        38,
+        49
+      ],
+      "itemCount": 5,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.85,
+      "sourceAlphaSample": "美国小学六年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "更以发展理解和技能为学习目标",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "记录今天比昨天更明白的一件事。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_personal_mastery_revised_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_personal_performance_approach_revised_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜个人成绩趋近目标（修订版）｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "personal_revised",
+      "respondent": "student",
+      "evaluationTarget": "student",
+      "printedPage": 12,
+      "pdfPage": 16,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        8,
+        26,
+        41,
+        45,
+        48
+      ],
+      "itemCount": 5,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.89,
+      "sourceAlphaSample": "美国小学六年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "更以展示能力、显得聪明为学习目标；无单一优劣方向",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "给自己选一个与别人名次无关的学习小目标。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_personal_performance_approach_revised_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_personal_performance_avoid_revised_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜个人成绩回避目标（修订版）｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "personal_revised",
+      "respondent": "student",
+      "evaluationTarget": "student",
+      "printedPage": 13,
+      "pdfPage": 17,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        3,
+        33,
+        51,
+        55
+      ],
+      "itemCount": 4,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.74,
+      "sourceAlphaSample": "美国小学六年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "更以避免显得能力不足为学习目标；不等于实际能力低",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "遇到不懂的地方，可以找可信任的人一起想办法。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_personal_performance_avoid_revised_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_teacher_mastery_goal_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜学生感知教师掌握目标｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "teacher_goals",
+      "respondent": "student",
+      "evaluationTarget": "teacher",
+      "printedPage": 14,
+      "pdfPage": 18,
+      "itemNumberNamespace": "definition_local",
+      "sourceItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "itemCount": 5,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.83,
+      "sourceAlphaSample": "美国高中九年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 1,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "学生更感到教师重视理解、努力和学习",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "需要时可以说：我能做出答案，但还想弄懂为什么。",
+        "recipients": [
+          "student_self",
+          "authorized_teacher_aggregate"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_teacher_mastery_goal_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_teacher_performance_approach_goal_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜学生感知教师成绩趋近目标｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "teacher_goals",
+      "respondent": "student",
+      "evaluationTarget": "teacher",
+      "printedPage": 15,
+      "pdfPage": 19,
+      "itemNumberNamespace": "definition_local",
+      "sourceItemNumbers": [
+        1,
+        2,
+        3
+      ],
+      "itemCount": 3,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.79,
+      "sourceAlphaSample": "美国高中九年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 1,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "学生更感到教师强调成绩比较和展示能力；不是教师质量分",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "留意哪种反馈能帮你看清下一步怎样学习。",
+        "recipients": [
+          "student_self",
+          "authorized_teacher_aggregate"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_teacher_performance_approach_goal_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_teacher_performance_avoid_goal_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜学生感知教师成绩回避目标｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "teacher_goals",
+      "respondent": "student",
+      "evaluationTarget": "teacher",
+      "printedPage": 16,
+      "pdfPage": 20,
+      "itemNumberNamespace": "definition_local",
+      "sourceItemNumbers": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "itemCount": 4,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.71,
+      "sourceAlphaSample": "美国高中九年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 1,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "学生更感到教师强调避免显得不会；不反向美化为安全感",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "如果你担心提问后难堪，可找可信成人商量更安全的表达方式。",
+        "recipients": [
+          "student_self",
+          "authorized_teacher_aggregate"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_teacher_performance_avoid_goal_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_classroom_mastery_structure_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜学生感知课堂掌握目标结构｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "classroom_goals",
+      "respondent": "student",
+      "evaluationTarget": "classroom",
+      "printedPage": 17,
+      "pdfPage": 21,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        59,
+        61,
+        63,
+        66,
+        68,
+        70
+      ],
+      "itemCount": 6,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.76,
+      "sourceAlphaSample": "美国初中七年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 1,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "学生更感到课堂重视理解、进步与学习",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "试着说出一处自己想进一步弄懂的内容。",
+        "recipients": [
+          "student_self",
+          "authorized_teacher_aggregate"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_classroom_mastery_structure_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_classroom_performance_approach_structure_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜学生感知课堂成绩趋近目标结构｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "classroom_goals",
+      "respondent": "student",
+      "evaluationTarget": "classroom",
+      "printedPage": 18,
+      "pdfPage": 22,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        62,
+        64,
+        71
+      ],
+      "itemCount": 3,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.7,
+      "sourceAlphaSample": "美国初中七年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 1,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "学生更感到课堂重视成绩与正确答案；没有统一优劣分界",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "可以在关心结果的同时，也记录一个自己理解上的进步。",
+        "recipients": [
+          "student_self",
+          "authorized_teacher_aggregate"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_classroom_performance_approach_structure_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_classroom_performance_avoid_structure_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜学生感知课堂成绩回避目标结构｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "classroom_goals",
+      "respondent": "student",
+      "evaluationTarget": "classroom",
+      "printedPage": 19,
+      "pdfPage": 23,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        60,
+        65,
+        67,
+        69,
+        72
+      ],
+      "itemCount": 5,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.83,
+      "sourceAlphaSample": "美国初中七年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 1,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "学生更感到课堂重视避免出错和落后；不等于学生胆小",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "如当众提问令你担心，可先写下问题，寻求可信成人帮助。",
+        "recipients": [
+          "student_self",
+          "authorized_teacher_aggregate"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_classroom_performance_avoid_structure_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_academic_efficacy_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜学业自我效能｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "academic",
+      "respondent": "student",
+      "evaluationTarget": "student",
+      "printedPage": 20,
+      "pdfPage": 24,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        1,
+        11,
+        52,
+        56,
+        58
+      ],
+      "itemCount": 5,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.78,
+      "sourceAlphaSample": "美国小学五年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "学生对完成课堂学习的把握感更强；不是客观能力测验",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "把一个难任务分成能先做的一小步。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_academic_efficacy_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_academic_press_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜学生感知理解促进要求｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "academic",
+      "respondent": "student",
+      "evaluationTarget": "teacher",
+      "printedPage": 21,
+      "pdfPage": 25,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        6,
+        10,
+        15,
+        17,
+        19,
+        53,
+        57
+      ],
+      "itemCount": 7,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.79,
+      "sourceAlphaSample": "美国初中七年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "学生更感到教师推动深入思考与充分努力；不等同有害压力",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "可以说明自己已经理解到哪一步，以及还需要哪种帮助。",
+        "recipients": [
+          "student_self",
+          "authorized_teacher_aggregate"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_academic_press_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_academic_self_handicapping_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜学业自我设限策略｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "academic",
+      "respondent": "student",
+      "evaluationTarget": "student",
+      "printedPage": 22,
+      "pdfPage": 26,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        12,
+        16,
+        18,
+        42,
+        44,
+        47
+      ],
+      "itemCount": 6,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.84,
+      "sourceAlphaSample": "美国小学五年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "更认同用某些行为为可能的低表现提供理由；不贴懒惰标签",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "找出一次开始学习的小阻碍，并请合适的人一起想办法。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_academic_self_handicapping_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_avoiding_novelty_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜回避新颖任务｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "academic",
+      "respondent": "student",
+      "evaluationTarget": "student",
+      "printedPage": 24,
+      "pdfPage": 28,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        7,
+        20,
+        23,
+        35,
+        40
+      ],
+      "itemCount": 5,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.78,
+      "sourceAlphaSample": "美国小学六年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "更偏向熟悉任务和方法；不能据此断言缺少创造力",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "条件合适时，先尝试新方法中的一个小步骤。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_avoiding_novelty_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_cheating_behavior_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜学业不诚实行为自报｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "academic",
+      "respondent": "student",
+      "evaluationTarget": "student",
+      "printedPage": 25,
+      "pdfPage": 29,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        22,
+        31,
+        39
+      ],
+      "itemCount": 3,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.87,
+      "sourceAlphaSample": "美国小学六年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "更认同题目涉及的不诚实学习行为；非纪律定罪证据",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "遇到不会的题，尝试先标记难点并寻求允许的帮助。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_cheating_behavior_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_disruptive_behavior_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜课堂干扰行为自报｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "academic",
+      "respondent": "student",
+      "evaluationTarget": "student",
+      "printedPage": 26,
+      "pdfPage": 30,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        14,
+        30,
+        34,
+        50,
+        54
+      ],
+      "itemCount": 5,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.89,
+      "sourceAlphaSample": "美国小学六年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "更认同题目涉及的课堂干扰行为；非行为障碍诊断",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "想一想哪种提醒或安排能帮助自己参与课堂。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_disruptive_behavior_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_low_achievement_self_presentation_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜低成就自我呈现｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "academic",
+      "respondent": "student",
+      "evaluationTarget": "student",
+      "printedPage": 27,
+      "pdfPage": 31,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        2,
+        5,
+        21,
+        24,
+        27,
+        37,
+        46
+      ],
+      "itemCount": 7,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.78,
+      "sourceAlphaSample": "美国初中七年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "更倾向不让同伴看到自己的好表现；不等于实际成绩低",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "如果担心被同伴评价，可以与可信成人讨论怎样安心参与。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_low_achievement_self_presentation_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_school_future_skepticism_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜学校对未来作用的怀疑｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "academic",
+      "respondent": "student",
+      "evaluationTarget": "student",
+      "printedPage": 28,
+      "pdfPage": 32,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        4,
+        13,
+        28,
+        32,
+        36,
+        43
+      ],
+      "itemCount": 6,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.83,
+      "sourceAlphaSample": "美国小学六年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "更怀疑学校学习对未来生活的帮助；不是对未来的预测",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "找一个自己关心的问题，问问正在学的内容与它有什么联系。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_school_future_skepticism_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_parent_mastery_goal_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜学生感知家长掌握目标｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "home",
+      "respondent": "student",
+      "evaluationTarget": "parents",
+      "printedPage": 29,
+      "pdfPage": 33,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        75,
+        80,
+        82,
+        87,
+        89,
+        91
+      ],
+      "itemCount": 6,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.71,
+      "sourceAlphaSample": "美国初中七年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "学生更感到家长重视理解、挑战与学习联系",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "愿意时可向家里可信任的人介绍一个自己想弄懂的问题。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_parent_mastery_goal_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_parent_performance_goal_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜学生感知家长成绩目标｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "home",
+      "respondent": "student",
+      "evaluationTarget": "parents",
+      "printedPage": 30,
+      "pdfPage": 34,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        73,
+        78,
+        90,
+        92,
+        94
+      ],
+      "itemCount": 5,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.71,
+      "sourceAlphaSample": "美国初中七年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "学生更感到家长重视成绩及能力展示；不判断家长好坏",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "可以找合适时机表达自己除成绩之外还需要的学习支持。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_parent_performance_goal_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_home_school_dissonance_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜家庭与学校不协调感｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "home",
+      "respondent": "student",
+      "evaluationTarget": "home_school",
+      "printedPage": 31,
+      "pdfPage": 35,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        76,
+        81,
+        83,
+        85,
+        88
+      ],
+      "itemCount": 5,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.76,
+      "sourceAlphaSample": "美国小学五年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "更感到家庭和学校差异带来的不安；不归咎家庭或学生",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "如差异令你困扰，可以请可信成人帮助理解和沟通。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_home_school_dissonance_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_neighborhood_space_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜社区可用空间｜小学四年级起（中学分学科另版）｜学生填答（英文目录候选）",
+      "family": "home",
+      "respondent": "student",
+      "evaluationTarget": "neighborhood",
+      "printedPage": 32,
+      "pdfPage": 36,
+      "itemNumberNamespace": "student_sample_survey",
+      "sourceItemNumbers": [
+        74,
+        77,
+        79,
+        84,
+        86,
+        93
+      ],
+      "itemCount": 6,
+      "reverseItemNumbers": [
+        74,
+        77,
+        93
+      ],
+      "sourceAlpha": 0.76,
+      "sourceAlphaSample": "美国初中七年级",
+      "sampleEvidencePdfPage": 73,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": "6-x",
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "反向处理后更感到社区有安全、积极、可用的活动空间",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "如想找活动去处，可与可信成人一起了解安全、可达的选择。",
+        "recipients": [
+          "student_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_neighborhood_space_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_school_mastery_structure_teacher_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜教师感知学校掌握目标结构｜小学至高中｜教师填答（英文目录候选）",
+      "family": "teacher_school",
+      "respondent": "teacher",
+      "evaluationTarget": "school",
+      "printedPage": 34,
+      "pdfPage": 38,
+      "itemNumberNamespace": "teacher_sample_survey",
+      "sourceItemNumbers": [
+        3,
+        5,
+        14,
+        16,
+        20,
+        22,
+        27
+      ],
+      "itemCount": 7,
+      "reverseItemNumbers": [
+        14
+      ],
+      "sourceAlpha": 0.81,
+      "sourceAlphaSample": "美国小学教师",
+      "sampleEvidencePdfPage": 74,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": "6-x",
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "教师更感到学校向学生传递理解、努力与进步的目标",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "与同事讨论一个已经支持学生理解的学校安排。",
+        "recipients": [
+          "teacher_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_school_mastery_structure_teacher_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_school_performance_structure_teacher_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜教师感知学校成绩目标结构｜小学至高中｜教师填答（英文目录候选）",
+      "family": "teacher_school",
+      "respondent": "teacher",
+      "evaluationTarget": "school",
+      "printedPage": 35,
+      "pdfPage": 39,
+      "itemNumberNamespace": "teacher_sample_survey",
+      "sourceItemNumbers": [
+        7,
+        10,
+        12,
+        15,
+        25,
+        29
+      ],
+      "itemCount": 6,
+      "reverseItemNumbers": [
+        15
+      ],
+      "sourceAlpha": 0.7,
+      "sourceAlphaSample": "美国小学教师",
+      "sampleEvidencePdfPage": 74,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": "6-x",
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "教师更感到学校强调成绩、荣誉与竞争；非学校质量分",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "观察学校反馈中比较性信息与学习过程信息的平衡。",
+        "recipients": [
+          "teacher_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_school_performance_structure_teacher_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_mastery_instruction_teacher_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜掌握导向教学方式自报｜小学至高中｜教师填答（英文目录候选）",
+      "family": "teacher_instruction",
+      "respondent": "teacher",
+      "evaluationTarget": "teacher",
+      "printedPage": 36,
+      "pdfPage": 40,
+      "itemNumberNamespace": "teacher_sample_survey",
+      "sourceItemNumbers": [
+        4,
+        11,
+        13,
+        26
+      ],
+      "itemCount": 4,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.69,
+      "sourceAlphaSample": "美国小学六年级学生的数学教师",
+      "sampleEvidencePdfPage": 74,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "教师更自报使用关注个人进步、选择和差异化的方式",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "选一个适合当前班级的做法，结合学生反馈做小范围调整。",
+        "recipients": [
+          "teacher_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_mastery_instruction_teacher_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_performance_instruction_teacher_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜成绩导向教学方式自报｜小学至高中｜教师填答（英文目录候选）",
+      "family": "teacher_instruction",
+      "respondent": "teacher",
+      "evaluationTarget": "teacher",
+      "printedPage": 37,
+      "pdfPage": 41,
+      "itemNumberNamespace": "teacher_sample_survey",
+      "sourceItemNumbers": [
+        1,
+        9,
+        17,
+        19,
+        21
+      ],
+      "itemCount": 5,
+      "reverseItemNumbers": [],
+      "sourceAlpha": 0.69,
+      "sourceAlphaSample": "美国小学六年级学生的数学教师",
+      "sampleEvidencePdfPage": 74,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": null,
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "教师更自报使用成绩展示和竞争比较方式；无统一好坏阈值",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "回顾一次成绩反馈，看看是否同时给出可操作的学习建议。",
+        "recipients": [
+          "teacher_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_performance_instruction_teacher_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    },
+    {
+      "instrumentKey": "pals2000_personal_teaching_efficacy_teacher_en",
+      "catalogSourceVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "canonicalName": "PALS2000｜个人教学自我效能｜小学至高中｜教师填答（英文目录候选）",
+      "family": "teacher_efficacy",
+      "respondent": "teacher",
+      "evaluationTarget": "teacher",
+      "printedPage": 38,
+      "pdfPage": 42,
+      "itemNumberNamespace": "teacher_sample_survey",
+      "sourceItemNumbers": [
+        2,
+        6,
+        8,
+        18,
+        23,
+        24,
+        28
+      ],
+      "itemCount": 7,
+      "reverseItemNumbers": [
+        6,
+        18,
+        24
+      ],
+      "sourceAlpha": 0.74,
+      "sourceAlphaSample": "美国高中九年级数学教师",
+      "sampleEvidencePdfPage": 74,
+      "priority": 2,
+      "scoringPlan": {
+        "status": "EDITORIAL_PROPOSAL_NOT_EXECUTABLE",
+        "sourceResponseValues": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "reverseTransform": "6-x",
+        "aggregate": "arithmetic_mean_within_this_subscale_only",
+        "range": [
+          1,
+          5
+        ],
+        "direction": "反向处理后教学贡献与应对学习问题的把握感更强；非教学质量证据",
+        "missing": "Any missing required item => null / not_calculable; no zero fill or prorating. Editorial conservative choice; manual has no explicit missing-data rule.",
+        "basis": "manual scale descriptive statistics use 1–5 scale means; exact individual aggregation not explicitly prescribed; confirm before executable freeze",
+        "referencePolicy": "none",
+        "crossToolTotal": false
+      },
+      "reportPlan": {
+        "status": "EDITORIAL_DRAFT_NOT_PUBLISHED",
+        "action": "选一处需要支持的教学情境，与同事讨论可获得的资源。",
+        "recipients": [
+          "teacher_self"
+        ],
+        "teacherAggregate": "existing authorized group summary only; no individual responses or sensitive open answers"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pals2000_personal_teaching_efficacy_teacher_en/1.0.0/source.json",
+      "developmentDatabaseInstallation": "NOT_RUN",
+      "productionDatabaseInstallation": "NOT_RUN"
+    }
+  ],
+  "publicationYear": 2000,
+  "authors": [
+    "Carol Midgley",
+    "Martin L. Maehr",
+    "Ludmila Z. Hruda",
+    "Eric Anderman",
+    "Lynley Anderman",
+    "Kimberley E. Freeman",
+    "Margaret Gheen",
+    "Avi Kaplan",
+    "Revathy Kumar",
+    "Michael J. Middleton",
+    "Jeanne Nelson",
+    "Robert Roeser",
+    "Timothy Urdan"
+  ]
+}

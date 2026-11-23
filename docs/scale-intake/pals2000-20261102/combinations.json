@@ -1,0 +1,194 @@
+{
+  "motherTool": "PALS2000",
+  "combinationEngine": "existing ordinary combinations; no new runtime or total",
+  "plans": [
+    {
+      "combinationKey": "pals2000_teacher_goals_en",
+      "name": "PALS2000｜教师目标感知三维｜四年级起/中学分学科另核｜学生填答",
+      "status": "ORDINARY_COMBINATION_PLAN_NOT_CREATED",
+      "members": [
+        {
+          "instrumentKey": "pals2000_teacher_mastery_goal_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        },
+        {
+          "instrumentKey": "pals2000_teacher_performance_approach_goal_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        },
+        {
+          "instrumentKey": "pals2000_teacher_performance_avoid_goal_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        }
+      ],
+      "optionalContextForm": "pals2000_student_context_en",
+      "crossToolScore": null,
+      "reportRecipients": [
+        "student_self",
+        "authorized_teacher_aggregate"
+      ],
+      "constraints": [
+        "All members are catalog-only; cannot administer or publish this plan.",
+        "Preserve each subscale and its instruction context. No mother-tool total.",
+        "Teacher-goals and classroom-goals plans are alternatives; do not use together in the same analysis."
+      ]
+    },
+    {
+      "combinationKey": "pals2000_classroom_goals_en",
+      "name": "PALS2000｜课堂目标结构三维｜四年级起/中学分学科另核｜学生填答",
+      "status": "ORDINARY_COMBINATION_PLAN_NOT_CREATED",
+      "members": [
+        {
+          "instrumentKey": "pals2000_classroom_mastery_structure_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        },
+        {
+          "instrumentKey": "pals2000_classroom_performance_approach_structure_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        },
+        {
+          "instrumentKey": "pals2000_classroom_performance_avoid_structure_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        }
+      ],
+      "optionalContextForm": "pals2000_student_context_en",
+      "crossToolScore": null,
+      "reportRecipients": [
+        "student_self",
+        "authorized_teacher_aggregate"
+      ],
+      "constraints": [
+        "All members are catalog-only; cannot administer or publish this plan.",
+        "Preserve each subscale and its instruction context. No mother-tool total.",
+        "Teacher-goals and classroom-goals plans are alternatives; do not use together in the same analysis."
+      ]
+    },
+    {
+      "combinationKey": "pals2000_personal_original_en",
+      "name": "PALS2000｜个人学习目标原版三维｜四年级起/中学分学科另核｜学生填答",
+      "status": "ORDINARY_COMBINATION_PLAN_NOT_CREATED",
+      "members": [
+        {
+          "instrumentKey": "pals2000_personal_mastery_original_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        },
+        {
+          "instrumentKey": "pals2000_personal_performance_approach_original_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        },
+        {
+          "instrumentKey": "pals2000_personal_performance_avoid_original_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        }
+      ],
+      "optionalContextForm": "pals2000_student_context_en",
+      "crossToolScore": null,
+      "reportRecipients": [
+        "student_self"
+      ],
+      "constraints": [
+        "All members are catalog-only; cannot administer or publish this plan.",
+        "Preserve each subscale and its instruction context. No mother-tool total.",
+        "Original and revised personal-goal versions are alternatives, not a combined long form or interchangeable repeated measure."
+      ]
+    },
+    {
+      "combinationKey": "pals2000_personal_revised_en",
+      "name": "PALS2000｜个人学习目标修订版三维｜四年级起/中学分学科另核｜学生填答",
+      "status": "ORDINARY_COMBINATION_PLAN_NOT_CREATED",
+      "members": [
+        {
+          "instrumentKey": "pals2000_personal_mastery_revised_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        },
+        {
+          "instrumentKey": "pals2000_personal_performance_approach_revised_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        },
+        {
+          "instrumentKey": "pals2000_personal_performance_avoid_revised_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        }
+      ],
+      "optionalContextForm": "pals2000_student_context_en",
+      "crossToolScore": null,
+      "reportRecipients": [
+        "student_self"
+      ],
+      "constraints": [
+        "All members are catalog-only; cannot administer or publish this plan.",
+        "Preserve each subscale and its instruction context. No mother-tool total.",
+        "Original and revised personal-goal versions are alternatives, not a combined long form or interchangeable repeated measure."
+      ]
+    },
+    {
+      "combinationKey": "pals2000_teacher_school_en",
+      "name": "PALS2000｜学校目标结构双维｜小学至高中/适用性另核｜教师填答",
+      "status": "ORDINARY_COMBINATION_PLAN_NOT_CREATED",
+      "members": [
+        {
+          "instrumentKey": "pals2000_school_mastery_structure_teacher_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        },
+        {
+          "instrumentKey": "pals2000_school_performance_structure_teacher_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        }
+      ],
+      "optionalContextForm": "pals2000_teacher_context_en",
+      "crossToolScore": null,
+      "reportRecipients": [
+        "teacher_self"
+      ],
+      "constraints": [
+        "All members are catalog-only; cannot administer or publish this plan.",
+        "Preserve each subscale and its instruction context. No mother-tool total."
+      ]
+    },
+    {
+      "combinationKey": "pals2000_teacher_instruction_en",
+      "name": "PALS2000｜教学方式双维｜数学教师来源样本｜教师填答",
+      "status": "ORDINARY_COMBINATION_PLAN_NOT_CREATED",
+      "members": [
+        {
+          "instrumentKey": "pals2000_mastery_instruction_teacher_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        },
+        {
+          "instrumentKey": "pals2000_performance_instruction_teacher_en",
+          "catalogSourceVersion": "1.0.0",
+          "executableContentVersion": null
+        }
+      ],
+      "optionalContextForm": "pals2000_teacher_context_en",
+      "crossToolScore": null,
+      "reportRecipients": [
+        "teacher_self"
+      ],
+      "constraints": [
+        "All members are catalog-only; cannot administer or publish this plan.",
+        "Preserve each subscale and its instruction context. No mother-tool total."
+      ]
+    }
+  ],
+  "additionalNotes": [
+    "Other scales may be selected individually under the manual guidance after licensing and executable readiness.",
+    "Parent performance goal item92 cross-loaded with classroom performance-approach; joint analysis requires explicit caution.",
+    "The 94-item student and 29-item teacher survey examples are examples of assembled instruments, not new validated total-score instruments.",
+    "Background/open answers remain FORM data and never enter scale scores."
+  ]
+}
