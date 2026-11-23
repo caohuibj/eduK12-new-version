@@ -1,9 +1,52 @@
-import type { ScaleDefinition } from '../scaleDefinitionEditorModel'
+import type { RawScoreFeedback } from '../../modules/scale/rawScoreFeedback'
 
-type ScaleReport = ScaleDefinition['report']
-type Interpretation = ScaleReport['interpretations'][number]
-type Band = Interpretation['bands'][number]
-type Guidance = Interpretation['guidance'][number]
+export type StandardReportBand = {
+  key: string
+  label: string
+  interpretation: string
+}
+
+export type StandardReportGuidance = {
+  category: 'reflection' | 'strategy' | 'environment' | 'support'
+  text: string
+}
+
+export type StandardReportInterpretationSource =
+  | { type: 'score_only' }
+  | { type: 'reference_context' }
+  | { type: 'reference'; referenceVersion?: string; referenceKind?: string }
+
+export type StandardReportInterpretation = {
+  scoreKey: string
+  headline: string
+  source: StandardReportInterpretationSource
+  summary: string
+  bands: StandardReportBand[]
+  guidance: StandardReportGuidance[]
+}
+
+export type StandardReportDefinition = {
+  audienceContract?: {
+    schemaVersion: 1
+    respondent: 'STUDENT_SELF' | 'ADULT_SELF' | 'PARENT_REPORT' | 'TEACHER_REPORT' | 'OBSERVER_REPORT'
+    audience: 'student' | 'parent' | 'teacher'
+    locale: string
+    longitudinalMetricKeys?: string[]
+    qcReview?: { reviewer: string; reviewedAt: string; basis: string }
+  }
+  rawScoreFeedback?: RawScoreFeedback
+  reportVersion: string
+  primaryScoreKeys: string[]
+  scoreOrder: string[]
+  interpretations: StandardReportInterpretation[]
+  limitations: string[]
+  disclaimer: string
+}
+
+type ScaleReport = StandardReportDefinition
+type Interpretation = StandardReportInterpretation
+type Band = StandardReportBand
+type Guidance = StandardReportGuidance
 
 const GUIDANCE_CATEGORIES: Array<{ value: Guidance['category']; label: string }> = [
   { value: 'reflection', label: '反思' },

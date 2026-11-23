@@ -127,7 +127,10 @@ export async function listTrainingReportGrants(input:{actorId:string;courseId:st
       FROM content_capability_grants g
       WHERE g.subject_id=${ctx.actorId}
         AND g.product='TRAINING'
+        AND g.scope_kind='COURSE'
+        AND g.scope_id=${ctx.courseId}
         AND g.resource_kind='report'
+        AND ${ctx.compositeId}=ANY(g.resource_keys)
         AND g.revoked_at IS NULL
         AND g.valid_from<=clock_timestamp()
         AND g.expires_at>clock_timestamp()

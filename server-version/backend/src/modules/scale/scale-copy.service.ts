@@ -28,8 +28,9 @@ export const scaleCopyEligibility = (scale: Source, userId: string, mode: 'COPY'
   if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE' || scale.status !== 'PUBLISHED') return { allowed: false, reason: '仅已发布的自编描述性量表可以复制。' }
   const definition = scale.definition as Partial<ScaleDefinitionV2> | null
   if (mode === 'REVISION') {
-    const allowedStatus = definition?.license?.status === 'self_authored' || definition?.license?.status === 'authorized'
-    if (!allowedStatus) return { allowed: false, reason: '仅自有或已获授权的自编量表支持创建同系列修订草稿；其他来源需先确认改编权。' }
+    if (definition?.license?.status !== 'self_authored') {
+      return { allowed: false, reason: '仅自有量表支持创建同系列修订草稿；第三方已授权量表需先单独确认改编权。' }
+    }
     return { allowed: true }
   }
   if (definition?.license?.status !== 'self_authored' || definition.license.redistribution !== 'allowed') return { allowed: false, reason: '仅明确可再分发的自有内容支持复制；其他来源需单独确认改编权。' }

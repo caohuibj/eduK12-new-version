@@ -3,9 +3,9 @@ import {
   createCustomScaleDefinition,
   validateScaleDefinition,
   type ScaleDefinitionV2,
-} from '../../scale/scale-definition'
-import type { RawScoreFeedback } from '../../scale/raw-score-feedback'
-import { ScaleImportValidationError, SCALE_IMPORT_MAX_ITEMS } from './import-parser'
+} from './scale-definition'
+import type { RawScoreFeedback } from './raw-score-feedback'
+import { ScaleImportValidationError, SCALE_IMPORT_MAX_ITEMS } from '../assessment-core/scale/import-parser'
 
 const KEY_RE = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/
 const MAX_XLSX_BYTES = 2 * 1024 * 1024

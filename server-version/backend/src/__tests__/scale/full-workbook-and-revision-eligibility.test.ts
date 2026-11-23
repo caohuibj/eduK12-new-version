@@ -3,7 +3,7 @@ import ExcelJS from 'exceljs'
 import {
   parseFullScaleWorkbook,
   scaleFullTemplateWorkbook,
-} from '../../modules/assessment-core/scale/full-workbook'
+} from '../../modules/scale/scale-full-workbook'
 import { scaleCopyEligibility } from '../../modules/scale/scale-copy.service'
 
 describe('one-step full scale Excel workbook import', () => {
@@ -91,10 +91,11 @@ describe('scaleCopyEligibility for COPY vs REVISION', () => {
     expect(scaleCopyEligibility(baseScale({ status: 'authorized', redistribution: 'allowed' }), 'author-1', 'COPY').allowed).toBe(false)
   })
 
-  it('allows the original author to create same-family REVISION drafts for self_authored or authorized scales even when restricted', () => {
+  it('allows the original author to create same-family REVISION drafts for self_authored scales even when restricted, without granting third-party adaptation rights', () => {
     expect(scaleCopyEligibility(baseScale({ status: 'self_authored', redistribution: 'restricted' }), 'author-1', 'REVISION').allowed).toBe(true)
-    expect(scaleCopyEligibility(baseScale({ status: 'authorized', redistribution: 'restricted' }), 'author-1', 'REVISION').allowed).toBe(true)
-    expect(scaleCopyEligibility(baseScale({ status: 'authorized', redistribution: 'allowed' }), 'author-1', 'REVISION').allowed).toBe(true)
+    expect(scaleCopyEligibility(baseScale({ status: 'self_authored', redistribution: 'allowed' }), 'author-1', 'REVISION').allowed).toBe(true)
+    expect(scaleCopyEligibility(baseScale({ status: 'authorized', redistribution: 'restricted' }), 'author-1', 'REVISION').allowed).toBe(false)
+    expect(scaleCopyEligibility(baseScale({ status: 'authorized', redistribution: 'allowed' }), 'author-1', 'REVISION').allowed).toBe(false)
     expect(scaleCopyEligibility(baseScale({ status: 'unknown', redistribution: 'restricted' }), 'author-1', 'REVISION').allowed).toBe(false)
     expect(scaleCopyEligibility(baseScale({ status: 'self_authored', redistribution: 'restricted' }), 'other-user', 'REVISION').allowed).toBe(false)
   })

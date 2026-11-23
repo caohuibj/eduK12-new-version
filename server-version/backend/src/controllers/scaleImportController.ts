@@ -3,7 +3,7 @@ import { ZodError } from 'zod'
 import { error, success, forbidden } from '../utils/response'
 import { logger } from '../utils/logger'
 import { ScaleImportValidationError } from '../modules/assessment-core/scale/import-parser'
-import { scaleFullTemplateWorkbook } from '../modules/assessment-core/scale/full-workbook'
+import { scaleFullTemplateWorkbook } from '../modules/scale/scale-full-workbook'
 import { importScaleCsv, importScaleFullWorkbook, ScaleImportError } from '../modules/scale/scale-import.service'
 import { ScaleCopyError } from '../modules/scale/scale-copy.service'
 
