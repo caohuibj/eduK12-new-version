@@ -1,4 +1,4 @@
-import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
+import {act,cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import {afterEach,beforeEach,expect,it,vi} from 'vitest'
 import {TeacherFormGroupReport,type TeacherFormGroupProjection} from './TeacherFormGroupReport'
 const report:TeacherFormGroupProjection={eventId:'event',formId:'form',definitionDigest:'a'.repeat(64),independentRespondents:11,minimumRespondents:10,distributions:[{itemKey:'q',prompt:'教学支持',status:'WITHHELD',reason:'PRIVATE_FREE_TEXT'}]}
@@ -90,4 +90,23 @@ it('isolates a replaced Form report from the previous report pending entry and p
   await act(async()=>lateExit.resolve())
   expect(print).not.toHaveBeenCalled();expect(frame).not.toHaveBeenCalled();expect(document.documentElement).not.toHaveClass('task-group-report-presenting')
   expect(screen.getByRole('heading',{name:'第三份表单'})).toBeVisible()
+})
+
+it('isolates the selected report among mounted reports and clears only its own print target',async()=>{
+  const first=view(),second=render(<TeacherFormGroupReport report={{...report,eventId:'other'}} activityTitle="另一组活动" formTitle="另一份报告"/>)
+  const [a,b]=screen.getAllByRole('article',{name:'教师群体报告阅读'})
+  fireEvent.click(within(a).getByRole('button',{name:'全屏展示'}))
+  await within(a).findByRole('button',{name:'退出全屏'})
+  expect(a).toHaveAttribute('data-teacher-report-presenting');expect(b).not.toHaveAttribute('data-teacher-report-presenting')
+  act(()=>{fullscreen=null;document.dispatchEvent(new Event('fullscreenchange'))})
+  expect(a).not.toHaveAttribute('data-teacher-report-presenting')
+  const print=vi.spyOn(window,'print').mockImplementation(()=>{})
+  fireEvent.click(within(b).getByRole('button',{name:'打印 / 保存 PDF'}))
+  expect(b).toHaveAttribute('data-teacher-report-printing');expect(a).not.toHaveAttribute('data-teacher-report-printing')
+  fireEvent.click(within(a).getByRole('button',{name:'打印 / 保存 PDF'}))
+  expect(a).toHaveAttribute('data-teacher-report-printing');expect(b).not.toHaveAttribute('data-teacher-report-printing')
+  second.unmount();expect(a).toHaveAttribute('data-teacher-report-printing')
+  act(()=>window.dispatchEvent(new Event('afterprint')))
+  expect(a).not.toHaveAttribute('data-teacher-report-printing');expect(print).toHaveBeenCalledTimes(2)
+  first.unmount()
 })

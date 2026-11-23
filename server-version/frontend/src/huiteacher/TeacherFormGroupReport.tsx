@@ -20,10 +20,16 @@ const withheld:Record<string,string>={
 const percentage=(count:number|undefined,n:number|null,published:number|undefined)=>
   published!==undefined?`${published}%`:count!==undefined&&n!==null&&n>0
     ?`${new Intl.NumberFormat('zh-CN',{maximumFractionDigits:1}).format(count/n*100)}%`:'—'
-type PresentationClaim={page:HTMLElement;entering:boolean;entered:boolean;exit:Promise<void>|null}
+const presentingTarget='data-teacher-report-presenting',printingTarget='data-teacher-report-printing'
+function selectReportTarget(report:HTMLElement,attribute:string){
+  document.querySelectorAll('.task-group-report['+attribute+']').forEach(element=>element.removeAttribute(attribute))
+  report.setAttribute(attribute,'')
+}
+type PresentationClaim={page:HTMLElement;report:HTMLElement|null;entering:boolean;entered:boolean;exit:Promise<void>|null}
 let presentationOwner:PresentationClaim|null=null
 function releasePresentation(claim:PresentationClaim|null){
   if(!claim||presentationOwner!==claim)return
+  claim.report?.removeAttribute(presentingTarget)
   claim.page.classList.remove('task-group-report-presenting')
   if(claim.entering)return // The pending request must clean up its own eventual result.
   if(claim.entered&&document.fullscreenElement===claim.page){
@@ -55,17 +61,23 @@ function TeacherFormGroupReportSession({report,activityTitle,formTitle}:TeacherF
   const released=report.releasedAt?new Date(report.releasedAt).toLocaleString('zh-CN'):null
   useEffect(()=>{
     mounted.current=true
-    const page=document.documentElement,requests=operation.current
+    const page=document.documentElement,requests=operation.current,reportElement=root.current
     const sync=()=>{
       const owns=claim.current!==null&&presentationOwner===claim.current
       const active=owns&&document.fullscreenElement===page&&page.classList.contains('task-group-report-presenting')
+      if(!active)reportElement?.removeAttribute(presentingTarget)
       if(owns&&!active)page.classList.remove('task-group-report-presenting')
       setPresenting(active)
     }
+    const afterPrint=()=>reportElement?.removeAttribute(printingTarget)
     document.addEventListener('fullscreenchange',sync)
+    window.addEventListener('afterprint',afterPrint)
     return()=>{
       mounted.current=false;requests.version++
       document.removeEventListener('fullscreenchange',sync)
+      window.removeEventListener('afterprint',afterPrint)
+      reportElement?.removeAttribute(presentingTarget)
+      reportElement?.removeAttribute(printingTarget)
       if(printFrame.current!==null)cancelAnimationFrame(printFrame.current)
       printFrame.current=null
       releasePresentation(claim.current)
@@ -84,10 +96,11 @@ function TeacherFormGroupReportSession({report,activityTitle,formTitle}:TeacherF
         if(!current())return
         releasePresentation(owned);setPresenting(false)
       }else{
-        owned={page:document.documentElement,entering:true,entered:false,exit:null}
+        owned={page:document.documentElement,report:root.current,entering:true,entered:false,exit:null}
         claim.current=owned;presentationOwner=owned
         try{await owned.page.requestFullscreen();owned.entered=true}finally{owned.entering=false}
         if(!current()||presentationOwner!==owned||document.fullscreenElement!==owned.page){releasePresentation(owned);return}
+        if(owned.report)selectReportTarget(owned.report,presentingTarget)
         owned.page.classList.add('task-group-report-presenting')
         setPresenting(true)
         root.current?.scrollIntoView?.({block:'start'})
@@ -98,6 +111,12 @@ function TeacherFormGroupReportSession({report,activityTitle,formTitle}:TeacherF
       if(!current())releasePresentation(owned)
       else setError('浏览器未能切换全屏，可继续阅读或打印。')
     }finally{if(current()){pending.current=false;setWorking(false)}}
+  }
+  function invokePrint(){
+    const reportElement=root.current
+    if(!reportElement)return
+    selectReportTarget(reportElement,printingTarget)
+    try{window.print()}catch(error){reportElement.removeAttribute(printingTarget);throw error}
   }
   async function printReport(){
     if(pending.current||!mounted.current)return
@@ -112,9 +131,9 @@ function TeacherFormGroupReportSession({report,activityTitle,formTitle}:TeacherF
         if(!current())return
         printFrame.current=requestAnimationFrame(()=>{
           printFrame.current=null
-          if(current())window.print()
+          if(current())invokePrint()
         })
-      }else window.print()
+      }else invokePrint()
     }catch{
       if(current()){
         if(claim.current)claim.current.exit=null
