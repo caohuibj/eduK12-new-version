@@ -1,3 +1,8 @@
+import {
+  evaluateTrainingItemReportEligibility,
+  summarizeCollectionReportEligibility,
+  type CollectionReportEligibilitySummary,
+} from '../assessment-policy/tool-report-eligibility'
 import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
 import { AssessmentStartBusyError, classifyStartTransaction, rethrowGateBusyAsStartBusy, START_INTERACTIVE_TRANSACTION } from './start-transient'
 import { preloadStartComposite, startReadsIfCurrent, recheckPrefetchedReleases } from './start-read-prefetch'
@@ -1274,6 +1279,23 @@ export const listComposites = async (userId: string, role: UserRole) => {
   })
 }
 
+const trainingQuestionnaireReportEligibility = (
+  composite: { items?: any[]; trainingContentSnapshot?: any },
+  preparedSnapshot?: any,
+): CollectionReportEligibilitySummary => {
+  const snapshot = preparedSnapshot ?? composite.trainingContentSnapshot
+  const boundUnits: any[] = Array.isArray(snapshot?.units) ? snapshot.units : []
+  const byItemId = new Map(boundUnits.map((unit) => [unit.itemId, unit]))
+  return summarizeCollectionReportEligibility(
+    (composite.items ?? []).map((item: any) => ({
+      id: item.id,
+      title: item.label ?? item.scale?.name ?? item.formLabel ?? item.situationalInstrumentKey ?? item.type,
+      kind: item.type,
+      eligibility: evaluateTrainingItemReportEligibility(item, byItemId.get(item.id) ?? null),
+    })),
+  )
+}
+
 export const getCompositeForTeacher = async (userId: string, role: UserRole, id: string) => {
   assertTeacher(role)
   const { ensureCompositeFormSections, listCompositeFormSections } = await import('./final-submit.service')
@@ -1286,12 +1308,14 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
     listCompositeContentUnits(composite.id),
     listCompositeFormSections(composite.id),
   ])
+  const participantReportEligibility = trainingQuestionnaireReportEligibility(composite)
   return {
     id: composite.id,
     productKind: composite.productKind,
     questionnaireType: composite.questionnaireType,
     receiptOnly: composite.receiptOnly === true,
-    receiptOnlyAvailable: supportsReceiptOnlyPublication(composite),
+    receiptOnlyAvailable: composite.productKind === 'QUESTIONNAIRE' && composite.items.length > 0,
+    participantReportEligibility,
     ...(composite.personalTracking?{personalTracking:{baselineId:composite.personalTrackingBaselineId,ordinal:composite.personalTrackingOrdinal}}:{}),
     trainingFlowDraft:composite.trainingFlowDraft??null,trainingFlowFrozen:composite.trainingFlowFrozen??null,trainingFlowDigest:composite.trainingFlowDigest??null,
     trainingVariantDraft:composite.trainingVariantDraft??null,trainingVariantFrozen:composite.trainingVariantFrozen??null,trainingVariantDigest:composite.trainingVariantDigest??null,
@@ -2431,6 +2455,21 @@ const publishCompositeInTransaction = async (userId: string, role: UserRole, id:
   // publication; only immutable source bodies can be reused in this transaction.
   for(const item of publicationSource.items)if(item.standardCombinationSource!=null)
     await verifyStoredTrainingStandardItem(db as Prisma.TransactionClient,publicationSource,item)
+  const reportEligibility = publicationSource.productKind === 'QUESTIONNAIRE'
+    ? trainingQuestionnaireReportEligibility(publicationSource, prepared.trainingContentSnapshot)
+    : null
+  if (provideParticipantReport === true && reportEligibility && !reportEligibility.hasEligibleUnits) {
+    throw compositeBadRequest('当前问卷中的工具均未配置完整报告，仅用于数据采集，不能向作答者开放报告；请使用仅回执模式发布')
+  }
+  const hasLongitudinalFormOnly = publicationSource.items.length > 0
+    && publicationSource.items.every((item: any) => item.type === 'FORM')
+    && Boolean((tracking as any)?.personalTracking)
+  const receiptOnly = provideParticipantReport === false
+    ? publicationSource.productKind === 'QUESTIONNAIRE'
+    : provideParticipantReport === true
+      ? false
+      : supportsReceiptOnlyPublication(publicationSource)
+        || Boolean(reportEligibility && !reportEligibility.hasEligibleUnits && !hasLongitudinalFormOnly)
   const published = await db.compositeAssessment.update({
     where: { id },
     data: {
@@ -2438,7 +2477,7 @@ const publishCompositeInTransaction = async (userId: string, role: UserRole, id:
       publishedAt: new Date(),
       ...prepared,
       ...tracking,
-      receiptOnly: provideParticipantReport !== true && supportsReceiptOnlyPublication(publicationSource),
+      receiptOnly,
     },
   })
   return withoutAnalysisProtocolCipher(published)

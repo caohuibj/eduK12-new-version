@@ -106,7 +106,39 @@ async function receiptOnlyTrackIds(tx: Tx, tracks: PreparedTrack[], provideParti
       && (origin?.entry === 'SCHOOL' && origin.variantKey === 'STUDENT:SELF'
         || origin?.entry === 'TEACHER' && origin.variantKey === 'TEACHER:SELF')
   })
-  if (provideParticipantReport === true || !candidates.length) return new Set<string>()
+  if (!candidates.length) return new Set<string>()
+  const hasAnyConfiguredReport = (policy: RunResourcePolicy) => {
+    const unitReports = policy.educationComposition?.unitReports
+    if (!Array.isArray(unitReports)) return true
+    return unitReports.some(unit => unit.respondent.mode === 'INDIVIDUAL_SUMMARY')
+  }
+  // Tool-level gate at publish time: if the publisher explicitly asks to provide
+  // participant reports, reject when none of the selected self-report tracks has
+  // any tool configured with a respondent report.
+  if (provideParticipantReport === true) {
+    const eligible = candidates.filter(({ resourcePolicy }) => hasAnyConfiguredReport(resourcePolicy))
+    if (!eligible.length) {
+      throw new RunPublishError(
+        'RUN_PARTICIPANT_REPORT_NOT_CONFIGURED',
+        '当前测评所选工具均未配置受测者报告，仅用于数据采集，请使用仅回执模式发布',
+        400,
+      )
+    }
+    // Any individual track with zero eligible units stays receiptOnly so it
+    // never enters the report worker queue unnecessarily.
+    return new Set(candidates.filter(({ resourcePolicy }) => !hasAnyConfiguredReport(resourcePolicy)).map(t => t.id))
+  }
+  // Explicit opt-out (`provideParticipantReport === false`) applies to EVERY
+  // self-report composition track (including mixed Form/SJT/Cognitive/Scale).
+  if (provideParticipantReport === false) {
+    return new Set(candidates.map(track => track.id))
+  }
+  // Default (`provideParticipantReport === undefined`): keep existing scale-only
+  // receiptOnly behavior AND automatically mark data-collection-only tracks
+  // (zero report-eligible units) as receiptOnly.
+  const dataCollectionOnlyIds = candidates
+    .filter(({ resourcePolicy }) => !hasAnyConfiguredReport(resourcePolicy))
+    .map(track => track.id)
   const composed = Prisma.join(candidates.map(({ id, resourcePolicy }) =>
     Prisma.sql`(${id}::text, ${resourcePolicy.runtimeLaunchTarget!.ref}::text)`))
   const rows = await tx.$queryRaw<Array<{ id: string }>>`
@@ -116,7 +148,7 @@ async function receiptOnlyTrackIds(tx: Tx, tracks: PreparedTrack[], provideParti
         WHERE item.composite_assessment_id=candidate.composite_id AND (item.type<>'SCALE' OR NOT item.required))
       AND NOT EXISTS (SELECT 1 FROM composite_form_sections section WHERE section.composite_assessment_id=candidate.composite_id)
   `
-  return new Set(rows.map(row => row.id))
+  return new Set([...dataCollectionOnlyIds, ...rows.map(row => row.id)])
 }
 
 type PublisherAuthority = {

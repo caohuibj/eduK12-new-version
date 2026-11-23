@@ -53,7 +53,8 @@ suite('Survey personal tracking real publication/FINAL/HTTP loop',()=>{
       await createDraft(owner,projectId,{requestId:id,instrumentKey,kind:'SCALE',title})
       await updateDraft(owner,projectId,id,{revision:0,title,definition:{schemaVersion:1,respondentType:'participant_self_report',aggregation:'mean',
         responseOptions:[{optionKey:'zero',label:'0',score:0},{optionKey:'one',label:'1',score:1}],
-        dimensions:[{dimensionKey:'total',label:'总分',direction:'descriptive'}],items:[{itemKey:'item',prompt:'合成问题',required:true,reverse:false,dimensionKeys:['total']}]}})
+        dimensions:[{dimensionKey:'total',label:'总分',direction:'descriptive'}],items:[{itemKey:'item',prompt:'合成问题',required:true,reverse:false,dimensionKeys:['total']}],
+        rawScoreFeedback:{schemaVersion:1,rules:[{scoreKey:'total',ranges:[{key:'all',min:0,max:1,includeMax:true,text:'合成区间反馈'}]}]}}})
       await publishSurveyMeasurementDraft(owner,projectId,id,1)
     }
     const consent='这是合成研究，使用研究编号关联不同轮次回答，自愿参加，允许本人查看已披露指标的数值变化。'
@@ -171,7 +172,8 @@ suite('Survey personal tracking real publication/FINAL/HTTP loop',()=>{
     const scaleId=uuid(),formId=uuid(),scaleKey=key(),formKey=key()
     const definition={schemaVersion:1,respondentType:'participant_self_report',aggregation:'mean',
       responseOptions:[{optionKey:'zero',label:'0',score:0},{optionKey:'one',label:'1',score:1}],dimensions:[{dimensionKey:'total',label:'总分',direction:'descriptive'}],
-      items:[{itemKey:'original',prompt:'T1原题',required:true,reverse:false,dimensionKeys:['total']}]}
+      items:[{itemKey:'original',prompt:'T1原题',required:true,reverse:false,dimensionKeys:['total']}],
+      rawScoreFeedback:{schemaVersion:1,rules:[{scoreKey:'total',ranges:[{key:'all',min:0,max:10,includeMax:true,text:'合成区间反馈'}]}]}}
     await createDraft(owner,projectId,{requestId:scaleId,instrumentKey:scaleKey,kind:'SCALE',title:'冻结A'})
     await updateDraft(owner,projectId,scaleId,{revision:0,title:'冻结A',definition})
     await publishSurveyMeasurementDraft(owner,projectId,scaleId,1)

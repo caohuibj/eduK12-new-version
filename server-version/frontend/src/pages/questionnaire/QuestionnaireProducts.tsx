@@ -1451,7 +1451,12 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
             </div>}
           </>}
         </fieldset>}
-        {detail.receiptOnlyAvailable&&<label className="block"><input type="checkbox" checked={provideParticipantReport} disabled={busy} onChange={event=>setProvideParticipantReport(event.target.checked)}/> 向作答者提供报告</label>}
+        {detail.participantReportEligibility&&<div className="text-sm text-slate-600 mb-2" aria-label="工具报告资格">
+          {detail.participantReportEligibility.hasEligibleUnits
+            ?<p>报告资格：共 {detail.participantReportEligibility.eligibleCount} 项工具已配置完整报告{detail.participantReportEligibility.dataCollectionOnlyCount>0?`，${detail.participantReportEligibility.dataCollectionOnlyCount} 项仅用于数据采集`:''}。发布时可选择向作答者提供报告，或不勾选以仅提供回执。</p>
+            :<p>报告资格：当前工具均未配置完整报告（仅用于数据采集），发布后将仅向作答者提供完成回执。</p>}
+        </div>}
+        {detail.receiptOnlyAvailable&&<label className="block"><input type="checkbox" checked={detail.participantReportEligibility?.hasEligibleUnits===false?false:provideParticipantReport} disabled={busy||detail.participantReportEligibility?.hasEligibleUnits===false} onChange={event=>setProvideParticipantReport(event.target.checked)}/> 向作答者提供报告</label>}
         <div className="questionnaire-publish-summary"><div><h2>草稿 · 尚未发布</h2><p>{dirty ? '设置有未保存的修改，请先保存设置。' : '确认内容与投放设置后，可自检或正式发布。'}</p></div>
         <div className="flex flex-wrap gap-3">
                 {dirty && !trainingDesign && <ProductButton variant="primary" disabled={busy} onClick={() => void save()}>保存全部设置</ProductButton>}

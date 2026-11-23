@@ -1,6 +1,7 @@
 import {resolveAudienceDisclosure} from '../scale/policy/disclosure'
 import {materialListSchema,publicMaterial} from '../assessment-media/material'
 import { assessmentImagePresentationListSchema } from '../assessment-media/assessment-image-presentation'
+import { evaluateSurveyUnitReportEligibility } from '../assessment-policy/tool-report-eligibility'
 import {z} from 'zod'
 import type {ResearchFrozenUnit} from './publication.service'
 import type {FrozenUnitResult} from './final.compute'
@@ -32,6 +33,11 @@ export function freezeSurveyParticipantFeedback(units:ResearchFrozenUnit[],raw:u
     if(!unit||!['SCALE','SJT'].includes(unit.kind)||!unit.measurementRelease||!metrics||
       selection.feedback.metricKeys.some(key=>!metrics.includes(key)))
       throw new SurveyWaveError(400,'被试反馈只允许显式选择当前量表或情境测验的已发布指标')
+    if(selection.feedback.mode==='DESCRIPTIVE'){
+      const eligibility=evaluateSurveyUnitReportEligibility(unit)
+      if(!eligibility.eligible)
+        throw new SurveyWaveError(409,eligibility.reason??'该工具未配置完整报告，仅用于数据采集，不能开启受测者报告')
+    }
     unit.participantFeedback=selection.feedback
   }
 }
@@ -45,7 +51,7 @@ const recordedScores=z.object({
 /** Project saved authoritative scores only. No scorer, reference resolver,
  * template rendering, population inference, or private result spreading. */
 export function surveyRawMetricDisclosure(unit:ResearchFrozenUnit,collectionClosed:boolean){
-  if(unit.sourceProvenance?.reportConfigured===false)return null
+  if(unit.sourceProvenance?.reportConfigured===false||unit.reportEligibility?.eligible===false)return null
   const nativePolicy=unit.nativeBundleReport?resolveAudienceDisclosure(unit.nativeBundleReport.policy.disclosure,'subject'):null
   if(unit.nativeBundleReport&&(unit.nativeBundleReport.audience!=='student'||unit.nativeBundleReport.policy.disposition==='UNKNOWN'||!nativePolicy?.numericScores))return null
   if(!['SCALE','SJT'].includes(unit.kind)||!unit.participantFeedback)return null
