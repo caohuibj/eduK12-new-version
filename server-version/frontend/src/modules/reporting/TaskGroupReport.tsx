@@ -50,9 +50,13 @@ export function TaskGroupReport({ artifact }: { artifact: TaskGroupArtifact }) {
   }
   async function printReport() {
     try {
-      if (document.fullscreenElement) await document.exitFullscreen()
-      // Let the browser lay out the complete document before opening print.
-      requestAnimationFrame(() => window.print())
+      if (document.fullscreenElement) {
+        await document.exitFullscreen()
+        // Wait for the fullscreen layout to be removed before printing.
+        requestAnimationFrame(() => window.print())
+      } else {
+        window.print()
+      }
     } catch { setPresentationError('未能退出全屏，请退出全屏后重试打印。') }
   }
   return <article ref={root} className="task-group-report" aria-label="群体报告阅读">
