@@ -1,3 +1,4 @@
+import trainingAdminRouter from './routes/trainingAdmin'
 import {surveyGovernedToolsRouter,surveyGovernedUseRouter,surveyGovernedResearcherRouter} from './modules/survey/governed-tool.routes'
 import huiteacherPrivateFormRuntimeRoutes from './modules/huiteacher/privateFormRuntime.routes'
 import { educationSchoolAssessmentReportRouter, educationTeacherAssessmentReportRouter } from './modules/reporting/education-assessment-report.routes'
@@ -313,6 +314,7 @@ app.use('/api/capabilities', capabilitiesRoutes)
 // API 路由
 app.use('/api/admin/legacy-archive', legacyArchiveRoutes)
 app.use('/api/auth', authRoutes)
+app.use('/api/admin/training', trainingAdminRouter)
 app.use('/api/admin/security', adminSecurityRouter)
 app.use('/api/admin/permissions', adminPermissionsRouter)
 app.use('/api/training/reference-governance',formalReferenceRouter)
@@ -342,12 +344,16 @@ const publicSurveyFeatureGuard: express.RequestHandler = (_req,res,next)=>{
 }
 app.use('/api/public/survey', publicSurveyFeatureGuard, surveyOriginGuard, publicSurveyRouter)
 app.use('/api/survey/projects', surveyProjectsRouter)
+// Shared tool governance also serves Training while Survey collection is off.
+// Each router retains its own current authority, source ACL and MFA checks.
 app.use('/api/platform/survey-system',surveyFeatureGuard,platformSurveyOriginGuard,surveySystemDataRouter)
-app.use('/api/platform/survey-tools',surveyFeatureGuard,platformSurveyOriginGuard,surveyGovernedToolsRouter)
+app.use('/api/platform/survey-tools',platformSurveyOriginGuard,surveyGovernedToolsRouter)
 app.use('/api/platform/survey-tool-use',surveyFeatureGuard,platformSurveyOriginGuard,surveyGovernedUseRouter)
 app.use('/api/survey/governed-projects',surveyFeatureGuard,surveyGovernedResearcherRouter)
-app.use('/api/platform/survey-standard',surveyFeatureGuard,platformSurveyOriginGuard,surveyStandardTripletRouter)
-app.use('/api/platform/survey-library',surveyFeatureGuard,platformSurveyOriginGuard,surveyLibraryAdminRouter)
+app.use('/api/platform/survey-standard',platformSurveyOriginGuard,surveyStandardTripletRouter)
+// Survey recipient lookup and grant management belong to the research workspace.
+app.use(['/api/platform/survey-library/entries','/api/platform/survey-library/grants'],surveyFeatureGuard)
+app.use('/api/platform/survey-library',platformSurveyOriginGuard,surveyLibraryAdminRouter)
 app.use('/api/platform/survey', surveyFeatureGuard, platformSurveyOriginGuard, surveyPlatformRouter)
 const huiteacherFeatureGuard: express.RequestHandler = (_req,res,next)=>{
   if(process.env.HUITEACHER_WORKSPACE_ENABLED!=='true')

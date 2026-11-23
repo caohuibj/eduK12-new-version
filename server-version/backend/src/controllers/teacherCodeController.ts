@@ -38,7 +38,12 @@ export const teacherCodeController = {
         }
         paging = { page, pageSize, skip }
       }
+      if (req.query.keyword !== undefined && (typeof req.query.keyword !== 'string' || req.query.keyword.length > 64))
+        return error(res, '注册码检索关键词无效', -1, 400)
+      const keyword = typeof req.query.keyword === 'string' ? req.query.keyword.trim() : ''
+      const where = keyword ? {code: {contains: keyword, mode: 'insensitive' as const}} : undefined
       const listQuery = prisma.teacherCode.findMany({
+        ...(where ? {where} : {}),
         include: {
           creator: {
             select: {
@@ -53,7 +58,7 @@ export const teacherCodeController = {
       })
       const [codes, total] = await Promise.all([
         listQuery,
-        paging ? prisma.teacherCode.count() : Promise.resolve(undefined),
+        paging ? (where ? prisma.teacherCode.count({where}) : prisma.teacherCode.count()) : Promise.resolve(undefined),
       ])
 
       return success(res, {

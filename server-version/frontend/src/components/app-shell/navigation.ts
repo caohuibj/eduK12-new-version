@@ -86,6 +86,7 @@ const staffTitles: Array<[string, string]> = [
   ['/organizations/:organizationId', '组织概览'], ['/organizations', '组织空间'],
   ['/courses/:courseId/students', '课程学生'], ['/courses/:courseId/detail', '课程详情'],
   ['/questionnaire-products/new', '创建组合测评'], ['/questionnaire-products/:id', '编辑组合测评'],
+  ['/questionnaires', '组合测评'], ['/bundle-products', '固定测评包'],
   ['/questionnaires/legacy', '历史问卷'], ['/questionnaires/:id', '编辑历史问卷'],
   ['/general-questionnaires/create', '创建泛化问卷'], ['/general-questionnaires/:id/edit', '编辑泛化问卷'],
   ['/scales/:id', '量表详情与编辑'], ['/bundle-products/:id', '测评包详情'],

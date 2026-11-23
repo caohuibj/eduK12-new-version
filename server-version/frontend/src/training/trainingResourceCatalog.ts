@@ -9,7 +9,7 @@ export type ResourcePage={list:Resource[];page:number;pageSize:number;hasMore:bo
 type Page<T>={list:T[];page:number;pageSize:number;hasMore:boolean;total?:number;tagFacets?:CatalogTagFacets}
 export async function trainingResourceCatalog(type:CatalogType,active:()=>boolean,query:{page:number;filters:CatalogFilters;status:string}={page:1,filters:EMPTY_CATALOG_FILTERS,status:'all'}):Promise<ResourcePage>{
  const params={...Object.fromEntries(new URLSearchParams(catalogQuery(query.page,query.filters))),page:query.page,pageSize:20,view:'training-catalog',...(query.status!=='all'?{status:query.status}:{})}
- const path=type==='SCALE'?'/scales':type==='COGNITIVE_CONFIG'?'/cognitive/configs':'/bundle-products/catalog'
+ const path=type==='SCALE'?'/admin/training/resources/scales':type==='COGNITIVE_CONFIG'?'/admin/training/resources/cognitive-configs':'/admin/training/resources/bundles'
  const response=await api.get<Page<Scale|Cognitive|Bundle>>(path,{params})
  if(response.code!==0)throw Error(response.message||'无法读取资源目录')
  const data=response.data

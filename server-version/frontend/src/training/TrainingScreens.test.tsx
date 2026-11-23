@@ -31,7 +31,7 @@ describe('training presentation and course-first entry', () => {
     expect(screen.getByRole('link', { name: '登录' })).toHaveAttribute('href', '/login?returnTo=%2Fstudent%2Fcourses%2Fcourse-1')
     expect(screen.getByRole('link', { name: '注册' })).toHaveAttribute('href', '/register?returnTo=%2Fstudent%2Fcourses%2Fcourse-1')
     expect(screen.getByRole('navigation', { name: 'Training 入口导航' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: '联系我们' })).toHaveAttribute('href', '/contact')
+    expect(screen.getByRole('link', { name: '使用帮助' })).toHaveAttribute('href', '/contact')
     expect(screen.queryByRole('navigation', { name: '培训账号入口' })).toBeNull()
     expect(screen.queryByText('登录账号')).toBeNull()
     expect(screen.queryByText('注册账号')).toBeNull()

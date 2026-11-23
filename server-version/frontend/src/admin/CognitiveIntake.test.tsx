@@ -116,3 +116,14 @@ it('isolates state by the current system administrator and ignores a late respon
   await waitFor(()=>expect(screen.getByRole('alert')).toHaveTextContent('仅系统管理员'))
   expect(mock.get).toHaveBeenCalledTimes(2)
 })
+
+it('filters registered candidates and focuses the selected operation panel',async()=>{
+ render(<CognitiveIntake/>);await screen.findByText('数字线估计',{selector:'strong'})
+ fireEvent.change(screen.getByRole('searchbox',{name:'检索认知候选'}),{target:{value:'symbolmatch'}})
+ expect(screen.queryByText('数字线估计',{selector:'strong'})).toBeNull()
+ expect(screen.getByText('符号数字配对',{selector:'strong'})).toBeVisible()
+ choose('符号数字配对')
+ expect(screen.getByRole('region',{name:'本次认知配置选择'})).toHaveFocus()
+ expect(screen.getByRole('button',{name:'预览所选配置'})).toBeVisible()
+ expect(mock.post).not.toHaveBeenCalled()
+})

@@ -601,3 +601,15 @@ describe('frozen scale instruction in the shared unit player',()=>{
   expect(props.submitScale).not.toHaveBeenCalled()
  })
 })
+
+it('restores Training to the first unanswered scale question and keeps saved selections',async()=>{
+ trainingPresentation.enabled=true
+ const draftKey='composite-scale:composite-scale-assessment-1'
+ await finalDraftStore.ensure(createFinalDraftMeta({draftKey,instrument:'scale',attemptId:'composite-scale-assessment-1',attemptEpoch:1,definitionHash:scaleItem.definitionHash!,contextSnapshotHash:null,deliveryMode:'final_only',submissionId:'training-resume'}))
+ await finalDraftStore.putAnswer({draftKey,itemKey:'item-1',value:{responseValue:'often'},updatedAt:Date.now()})
+ await finalDraftStore.putAnswer({draftKey,itemKey:'item-2',value:{responseValue:'rare'},updatedAt:Date.now()})
+ render(<FinalCompositeAssessment {...sharedProps} state={makeState({...scaleItem,scale:{...scaleItem.scale!,definition:{...scaleItem.scale!.definition!,items:['item-1','item-2','item-3'].map((itemCode,index)=>({...scaleItem.scale!.definition!.items[0],itemCode,content:`综合量表第 ${index+1} 题`,options:[{value:'often',label:'经常'},{value:'rare',label:'偶尔'}]}))}}})} submitScale={vi.fn()} submitFormSection={vi.fn()}/>)
+ expect(await screen.findByText('综合量表第 3 题')).toBeVisible()
+ await userEvent.setup().click(screen.getByRole('button',{name:/上一题/}))
+ expect(screen.getByRole('button',{name:'偶尔'})).toHaveAttribute('aria-pressed','true')
+})

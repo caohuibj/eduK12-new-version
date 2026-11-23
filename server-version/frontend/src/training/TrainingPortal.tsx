@@ -26,7 +26,7 @@ export default function TrainingPortal() {
           <p className="training-eyebrow">{trainingWelcomeCopy.eyebrow}</p>
           <h1 id="training-title">{trainingWelcomeCopy.titleLines[0]}<br />{trainingWelcomeCopy.titleLines[1]}</h1>
           <p className="training-portal-description">{trainingWelcomeCopy.descriptionLines[0]}<br />{trainingWelcomeCopy.descriptionLines[1]}</p>
-          <Link className="training-portal-copy-contact" to="/contact">联系我们<ArrowRight size={15} aria-hidden="true" /></Link>
+          <Link className="training-portal-copy-contact" to="/contact">使用帮助<ArrowRight size={15} aria-hidden="true" /></Link>
         </div>
       </section>
     </div>

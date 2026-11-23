@@ -132,7 +132,9 @@ export const normalizeApiError = (error: any): ApiClientError => {
       : true,
     retryAfterMs: parseRetryAfterMs(error?.response?.headers?.['retry-after']) ?? undefined,
   }
-  return normalized
+  // Keep the native Error contract used by page-level error handlers. Define
+  // descriptors rather than assigning untrusted response keys to the prototype.
+  return Object.defineProperties(new Error(message), Object.getOwnPropertyDescriptors(normalized)) as ApiClientError
 }
 
 const installSessionInterceptors = (client: typeof axiosClient, preserveAxiosError: boolean): void => {
@@ -156,6 +158,9 @@ const installSessionInterceptors = (client: typeof axiosClient, preserveAxiosErr
   client.interceptors.response.use(
     (response) => response,
     (error) => {
+      if (typeof window !== 'undefined' && error?.response?.data?.code === 'ADMIN_KEY_STEP_UP_REQUIRED') {
+        window.dispatchEvent(new CustomEvent('admin:step-up-required'))
+      }
       if (error?.response?.status === 401) {
         notifyAuthExpired(error.config?.url, error.config?.authRequestStartedAt)
       }
