@@ -111,7 +111,7 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
   const basicDirty = JSON.stringify(basicValues(scale)) !== savedBasic
   const definitionDirty = JSON.stringify(definition) !== savedDefinition
   const canCopy = !loading && !accessBlocked && scale.id === id && scale.status === 'PUBLISHED' && !standard && scale.copyEligibility?.allowed === true
-  const canRevise = canCopy && scale.revisionEligibility?.allowed === true
+  const canRevise = !loading && !accessBlocked && scale.id === id && scale.status === 'PUBLISHED' && !standard && scale.revisionEligibility?.allowed === true
   const sortedItems = useMemo(() => [...definition.items].sort((a, b) => a.sortOrder - b.sortOrder), [definition.items])
 
 

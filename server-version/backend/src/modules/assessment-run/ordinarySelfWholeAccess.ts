@@ -23,7 +23,7 @@ export function publishedSelfScaleTrackSql(track: Prisma.Sql, product: OrdinaryS
       WHERE item.composite_assessment_id=${target} AND (item.type<>'SCALE' OR NOT item.required)))`
 }
 
-type Locator = { attemptId: string } | { executionId: string; schoolPath?: { organizationId: string; runId: string; courseId: string } }
+type Locator = { attemptId: string; mode?: 'full' | 'progress' } | { executionId: string; schoolPath?: { organizationId: string; runId: string; courseId: string } }
 export type OrdinarySelfWholeBinding = WholeReceiptRow & {
   kind: 'bound'
   assignmentRef: string
@@ -41,7 +41,7 @@ type Row = Omit<OrdinarySelfWholeBinding, 'id' | 'kind'> & {
 }
 
 export function readOrdinarySelfWholeAccess(
-  db: Pick<Prisma.TransactionClient, '$queryRaw'>, product: OrdinarySelfWholeProduct, userId: string, locator: { attemptId: string },
+  db: Pick<Prisma.TransactionClient, '$queryRaw'>, product: OrdinarySelfWholeProduct, userId: string, locator: { attemptId: string; mode?: 'full' | 'progress' },
 ): Promise<OrdinarySelfWholeBinding | null>
 export function readOrdinarySelfWholeAccess(
   db: Pick<Prisma.TransactionClient, '$queryRaw'>, product: OrdinarySelfWholeProduct, userId: string, locator: Extract<Locator, { executionId: string }>,
@@ -74,6 +74,7 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
   const role = school ? 'STUDENT' : 'TEACHER'
   const variant = role + ':SELF'
   const byExecution = 'executionId' in locator
+  const progressOnly = !byExecution && locator.mode === 'progress'
   const path = byExecution ? locator.schoolPath : undefined
   const sameRun = Prisma.sql`link.organization_id=e.organization_id AND link.run_id=e.run_id`
   const schoolLink = Prisma.sql`SELECT 1 FROM campus_activity_runs link WHERE ${sameRun}
@@ -150,12 +151,14 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
       AND p.subject_user_id=actor.user_id AND p.respondent_user_id=actor.user_id AND p.respondent_type='SELF'
       AND p.delivery_mode='FINAL_ONLY' AND p.runtime_generation='UNIFIED_V1'
       AND p.composite_assessment_id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}'
-      AND p.training_content_binding#>>'{educationComposition,origin,variantKey}'=${variant}
+      ${progressOnly
+        ? Prisma.sql`AND p.training_content_binding_hash IS NOT NULL`
+        : Prisma.sql`AND p.training_content_binding#>>'{educationComposition,origin,variantKey}'=${variant}
       AND p.training_content_binding#>>'{educationComposition,manifestHash}'=t.frozen_resource_policy#>>'{educationComposition,manifestHash}'
       AND p.training_content_binding->>'attemptId'=p.id
       AND p.training_content_binding->'epoch'=to_jsonb(p.attempt_epoch)
+      AND NOT EXISTS (SELECT 1 FROM jsonb_array_elements(p.training_content_binding->'units') unit WHERE unit->>'family'<>'SCALE')`}
       AND (${wholeDelivery} OR p.async_report_epoch=p.attempt_epoch)
-      AND NOT EXISTS (SELECT 1 FROM jsonb_array_elements(p.training_content_binding->'units') unit WHERE unit->>'family'<>'SCALE')
     LEFT JOIN composite_report_jobs j ON j.attempt_id=p.id AND j.attempt_epoch=p.attempt_epoch
     LIMIT 1
   `

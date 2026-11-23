@@ -4,6 +4,7 @@ import {surveyFrozenMeasurementPointerSchema,surveyFrozenContentSelectionSchema}
 import {z} from 'zod'
 import {surveyRawFeedbackSchema} from './participant-feedback'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
+import { evaluateSurveyUnitReportEligibility } from '../assessment-policy/tool-report-eligibility'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -383,6 +384,13 @@ export async function preflightWave(uid:string,pid:string,wid:string){
         return metrics.map(m=>({instrumentId:unit.draftId,instrumentKey:unit.instrumentKey,scoreKey:m.key,label:unit.title+' · '+m.label,unit:m.unit}))
       }catch{return []}
     }),
+    reportEligibility:trackingTools.map(unit=>({
+      instrumentId:unit.draftId,
+      instrumentKey:unit.instrumentKey,
+      title:unit.title,
+      kind:unit.kind,
+      ...evaluateSurveyUnitReportEligibility(unit),
+    })),
     ok:checks.length===input.selected.length+(input.project.collectionMode==='LINKED_WAVES'?4:3)+
       (input.wave.flowDefinition?1:0)+(input.wave.quotaPolicy?1:0)+
       (input.wave.checkpointPolicy?1:0)+(input.wave.groupIpPolicy?1:0)+measured.length&&checks.every(c=>c.ok),

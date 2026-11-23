@@ -23,6 +23,7 @@ import {SurveyTimedScale} from './SurveyTimedScale'
 import {SurveyScaleTimingTracker,sealSurveyScaleTimings,
   type SurveyWaveScaleTimings} from './survey-scale-timing'
 import {SurveyParticipantImage} from './SurveyParticipantImage'
+import {SurveyDeclaredReportView,isSurveyDeclaredReport,type SurveyDeclaredReport} from './SurveyDeclaredReportView'
 import { resolveClientSurveyFlow,type PublicFlow } from './flow.client'
 import { resolveSurveyCheckpointDraft,sameSurveyCheckpointAnswers } from './checkpoint-recovery'
 import { readRecruitmentEntry, rememberRecruitmentEntry, clearRecruitmentEntry, isRecruitmentEntryToken } from './recruitment-entry'
@@ -46,7 +47,7 @@ type Wave={id:string;title:string;ordinal:number;status:string;consentText:strin
   groupIpPolicy?:{schemaVersion:1;timeZone:string;activationDate?:string}|null;groupIpActivatedAt?:string|null}
 type StudyInfo={project:{hasPersonalTracking?:boolean;name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string;participantIdentityMode?:'PERSONAL_LINK'|'MEMORABLE_CODE'|'SELF_CODE';participantCodeLabel?:string;participantCodeInstructions?:string};waves:Wave[];scopeWaveId?:string|null}
 type Task={attemptId:string;waveId:string;status:string;definitionDigest:string;units:Unit[];reportMode:'GENERAL_ONLY'|'DESCRIPTIVE';cognitiveSessions?:SurveyCognitiveSessionInfo[];lockedPriorAnswers?:Record<string,Record<string,Answer>>;flow?:PublicFlow;checkpointPolicy?:{enabled:true;ttlHours:number}}
-type ParticipantFeedbackBase={instrumentKey:string;title:string;quality:string;rawScoreFeedback?:import('../modules/scale/rawScoreFeedback').MatchedRawScoreFeedback[]}
+type ParticipantFeedbackBase={instrumentKey:string;title:string;quality:string;rawScoreFeedback?:import('../modules/scale/rawScoreFeedback').MatchedRawScoreFeedback[];declaredReport?:SurveyDeclaredReport}
 type ParticipantFeedback=ParticipantFeedbackBase&(
   {feedbackKind:'RAW_METRICS';measurementReleaseId:string;metrics:{key:string;label:string;value:number|null;unit:null;status:string}[]}
   |{feedbackKind?:undefined;measurementDigest:string;maturity:'PILOT';metrics:{key:string;label:string;value:number|null;unit:'ratio'|'ms';status:string}[]})
@@ -98,6 +99,7 @@ function firstFinalParticipantFeedback(result:FinalResponse,attemptId:string):Ge
         &&(feedback.rangeKey===null||typeof feedback.rangeKey==='string')
         &&(feedback.images===undefined||Array.isArray(feedback.images))&&(feedback.materials===undefined||Array.isArray(feedback.materials))
     })))return false
+    if(item.declaredReport!==undefined&&!isSurveyDeclaredReport(item.declaredReport))return false
     return true
   })
   const native=receipt.nativeBundles
@@ -1296,6 +1298,7 @@ export default function SurveyPublicApp(){
               {completion&&feedback.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item} purpose="report" proof={{publicId,attemptId:completion.attemptId,...completion.proof}}/>)}
               {completion&&feedback.images?.map(image=><SurveyParticipantImage key={image.asset.assetId} image={image} purpose="report" proof={{publicId,attemptId:completion.attemptId,...completion.proof}}/>)}
             </section>)}
+            {measurement.feedbackKind==='RAW_METRICS'&&measurement.declaredReport&&<SurveyDeclaredReportView report={measurement.declaredReport} proof={completion?{publicId,attemptId:completion.attemptId,...completion.proof}:undefined}/>}
           </article>)}
         </section>}
         {general.nativeBundles?.map(bundle=><section key={bundle.importId} aria-label="整体理论报告"><h2>{bundle.title}</h2>{bundle.derivedView?<BundleDerivedReport view={bundle.derivedView}/>:bundle.profileView?<BundleProfileSummary view={bundle.profileView}/>:<p>综合结果暂不可用；单项作答已保存。</p>}</section>)}
