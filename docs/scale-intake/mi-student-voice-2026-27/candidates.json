@@ -1,0 +1,249 @@
+{
+  "recordFormat": "intake-working-notes-not-backend-payload",
+  "parentKey": "mi_student_voice_2026_27_student_en",
+  "parentName": "MI Student Voice｜2026–27学校体验学生版｜5–12年级｜学生",
+  "parentRecordVersion": "1.0.0",
+  "parentRuntimeCreated": false,
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "status": "CANDIDATE_PENDING_REVIEW",
+  "nativeExecutableScales": 0,
+  "nativeExecutableForms": 0,
+  "nativeCatalogCandidates": 4,
+  "source": {
+    "url": "https://mistudentvoice-cdn.fxbrt.com/downloads/about_us/mi_student_voice_perception_survey_questions_2027.pdf",
+    "sha256": "3843dae3e2c0c6bc0a5661aa9f017893baf87297b2dff80526114557c0fc5bf0",
+    "bytes": 197368,
+    "pages": 7,
+    "wave": "2026-2027",
+    "locale": "en",
+    "retrievedOn": "2026-11-02"
+  },
+  "children": [
+    {
+      "candidateKey": "mi_student_voice_2026_27_sel_student_en",
+      "candidateVersion": "1.0.0",
+      "name": "MI Student Voice｜社会情感学习（表单候选）｜5–12年级｜学生",
+      "targetNativeKind": "FORM",
+      "status": "CATALOG_ONLY",
+      "sourcePdfPage": 4,
+      "itemCount": 15,
+      "groups": [
+        {
+          "name": "自我管理",
+          "itemCount": 3,
+          "standaloneAdministrationEstablished": false
+        },
+        {
+          "name": "社会意识",
+          "itemCount": 3,
+          "standaloneAdministrationEstablished": false
+        },
+        {
+          "name": "自我觉察",
+          "itemCount": 3,
+          "standaloneAdministrationEstablished": false
+        },
+        {
+          "name": "关系技能",
+          "itemCount": 3,
+          "standaloneAdministrationEstablished": false
+        },
+        {
+          "name": "负责任决策",
+          "itemCount": 3,
+          "standaloneAdministrationEstablished": false
+        }
+      ],
+      "contentVersion": null,
+      "scoringVersion": null,
+      "parameterVersion": null,
+      "reportVersion": null,
+      "formDefinition": null,
+      "scoringEnabled": false,
+      "allQuestionsOptional": true,
+      "language": "en",
+      "sourceWave": "2026-2027",
+      "gradeRange": [
+        5,
+        12
+      ],
+      "blockers": [
+        "PUBLIC_REDISTRIBUTION_AND_PLATFORM_USE_PERMISSION_NOT_ESTABLISHED",
+        "ITEM_RESPONSE_SCALE_MAPPING_NOT_PUBLISHED",
+        "DOMAIN_MISSING_RESPONSE_AGGREGATION_RULE_NOT_PUBLISHED",
+        "2026_27_DOMAIN_AND_FACET_SCORING_EVIDENCE_NOT_VERIFIED"
+      ]
+    },
+    {
+      "candidateKey": "mi_student_voice_2026_27_engagement_student_en",
+      "candidateVersion": "1.0.0",
+      "name": "MI Student Voice｜学生参与（表单候选）｜5–12年级｜学生",
+      "targetNativeKind": "FORM",
+      "status": "CATALOG_ONLY",
+      "sourcePdfPage": 5,
+      "itemCount": 15,
+      "groups": [
+        {
+          "name": "优势导向教学",
+          "itemCount": 3,
+          "standaloneAdministrationEstablished": false
+        },
+        {
+          "name": "师生及成人关系",
+          "itemCount": 3,
+          "standaloneAdministrationEstablished": false
+        },
+        {
+          "name": "学生中心",
+          "itemCount": 3,
+          "standaloneAdministrationEstablished": false
+        },
+        {
+          "name": "课堂气候与环境",
+          "itemCount": 3,
+          "standaloneAdministrationEstablished": false
+        },
+        {
+          "name": "教学行动",
+          "itemCount": 3,
+          "standaloneAdministrationEstablished": false
+        }
+      ],
+      "contentVersion": null,
+      "scoringVersion": null,
+      "parameterVersion": null,
+      "reportVersion": null,
+      "formDefinition": null,
+      "scoringEnabled": false,
+      "allQuestionsOptional": true,
+      "language": "en",
+      "sourceWave": "2026-2027",
+      "gradeRange": [
+        5,
+        12
+      ],
+      "blockers": [
+        "PUBLIC_REDISTRIBUTION_AND_PLATFORM_USE_PERMISSION_NOT_ESTABLISHED",
+        "ITEM_RESPONSE_SCALE_MAPPING_NOT_PUBLISHED",
+        "DOMAIN_MISSING_RESPONSE_AGGREGATION_RULE_NOT_PUBLISHED",
+        "2026_27_DOMAIN_AND_FACET_SCORING_EVIDENCE_NOT_VERIFIED"
+      ]
+    },
+    {
+      "candidateKey": "mi_student_voice_2026_27_belonging_student_en",
+      "candidateVersion": "1.0.0",
+      "name": "MI Student Voice｜学校归属与包容（表单候选）｜5–12年级｜学生",
+      "targetNativeKind": "FORM",
+      "status": "CATALOG_ONLY",
+      "sourcePdfPage": 6,
+      "itemCount": 12,
+      "groups": [
+        {
+          "name": "文化意识",
+          "itemCount": 3,
+          "standaloneAdministrationEstablished": false
+        },
+        {
+          "name": "包容环境",
+          "itemCount": 4,
+          "standaloneAdministrationEstablished": false
+        },
+        {
+          "name": "公平",
+          "itemCount": 5,
+          "standaloneAdministrationEstablished": false
+        }
+      ],
+      "contentVersion": null,
+      "scoringVersion": null,
+      "parameterVersion": null,
+      "reportVersion": null,
+      "formDefinition": null,
+      "scoringEnabled": false,
+      "allQuestionsOptional": true,
+      "language": "en",
+      "sourceWave": "2026-2027",
+      "gradeRange": [
+        5,
+        12
+      ],
+      "blockers": [
+        "PUBLIC_REDISTRIBUTION_AND_PLATFORM_USE_PERMISSION_NOT_ESTABLISHED",
+        "ITEM_RESPONSE_SCALE_MAPPING_NOT_PUBLISHED",
+        "DOMAIN_MISSING_RESPONSE_AGGREGATION_RULE_NOT_PUBLISHED",
+        "2026_27_DOMAIN_AND_FACET_SCORING_EVIDENCE_NOT_VERIFIED"
+      ]
+    },
+    {
+      "candidateKey": "mi_student_voice_2026_27_behavior_student_en",
+      "candidateVersion": "1.0.0",
+      "name": "MI Student Voice｜行为与安全体验（表单候选）｜5–12年级｜学生",
+      "targetNativeKind": "FORM",
+      "status": "CATALOG_ONLY",
+      "sourcePdfPage": 7,
+      "itemCount": 5,
+      "groups": [],
+      "contentVersion": null,
+      "scoringVersion": null,
+      "parameterVersion": null,
+      "reportVersion": null,
+      "formDefinition": null,
+      "scoringEnabled": false,
+      "allQuestionsOptional": true,
+      "language": "en",
+      "sourceWave": "2026-2027",
+      "gradeRange": [
+        5,
+        12
+      ],
+      "blockers": [
+        "PUBLIC_REDISTRIBUTION_AND_PLATFORM_USE_PERMISSION_NOT_ESTABLISHED",
+        "ITEM_RESPONSE_SCALE_MAPPING_NOT_PUBLISHED",
+        "DOMAIN_MISSING_RESPONSE_AGGREGATION_RULE_NOT_PUBLISHED",
+        "2026_27_DOMAIN_AND_FACET_SCORING_EVIDENCE_NOT_VERIFIED"
+      ]
+    },
+    {
+      "candidateKey": "mi_student_voice_2026_27_demographics_student_en",
+      "candidateVersion": "1.0.0",
+      "name": "MI Student Voice｜人口学资料（无计分表单候选）｜5–12年级｜学生",
+      "targetNativeKind": "FORM",
+      "status": "METADATA_ONLY_NOT_REGISTERED_AS_SCALE",
+      "sourcePdfPage": 7,
+      "itemCountMaximum": 2,
+      "topics": [
+        "性别认同（单选；地区可选扩展选项、精简选项或完全不问）",
+        "族裔背景（多选，保留不愿回答选项）"
+      ],
+      "contentVersion": null,
+      "scoringVersion": null,
+      "parameterVersion": null,
+      "reportVersion": null,
+      "formDefinition": null,
+      "allQuestionsOptional": true,
+      "scoringEnabled": false,
+      "districtConfigurationRequired": true,
+      "blockers": [
+        "PUBLIC_REDISTRIBUTION_AND_PLATFORM_USE_PERMISSION_NOT_ESTABLISHED",
+        "DISTRICT_DEMOGRAPHIC_CONFIGURATION_NOT_SELECTED"
+      ]
+    }
+  ],
+  "optionalOrdinaryComposite": {
+    "status": "PLAN_ONLY",
+    "useExistingOrdinaryComposite": true,
+    "order": [
+      "mi_student_voice_2026_27_sel_student_en",
+      "mi_student_voice_2026_27_engagement_student_en",
+      "mi_student_voice_2026_27_belonging_student_en",
+      "mi_student_voice_2026_27_behavior_student_en",
+      "mi_student_voice_2026_27_demographics_student_en"
+    ],
+    "selectedDomainSubsetsAllowedBySource": true,
+    "withinDomainOrderPreserved": true,
+    "demographicsOptional": true,
+    "crossToolTotal": null,
+    "crossDomainTotal": null,
+    "scaleParameterReportVersionsCreated": false
+  }
+}

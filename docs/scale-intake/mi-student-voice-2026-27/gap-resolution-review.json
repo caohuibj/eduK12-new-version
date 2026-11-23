@@ -1,0 +1,67 @@
+{
+  "status": "CONDITIONAL_PATH_IDENTIFIED_USER_OR_PARTICIPANT_INPUT_REQUIRED",
+  "reviewedOn": "2026-11-02",
+  "sourcePdf": {
+    "url": "https://mistudentvoice-cdn.fxbrt.com/downloads/about_us/mi_student_voice_perception_survey_questions_2027.pdf",
+    "bytes": 197368,
+    "pages": 7,
+    "sha256": "3843dae3e2c0c6bc0a5661aa9f017893baf87297b2dff80526114557c0fc5bf0",
+    "experienceItems": 47,
+    "optionalDemographicQuestionsMaximum": 2,
+    "responseFamiliesPresent": [
+      "FREQUENCY",
+      "PERCEPTION"
+    ],
+    "perItemResponseMappingVerified": 0
+  },
+  "missing": [
+    "2026-27 per-item original IDs, exact response choices and family mapping",
+    "specific off-platform/private/public/commercial/adaptation use scope as applicable"
+  ],
+  "rights": {
+    "publicAccess": "VERIFIED_OFFICIAL_ANONYMOUS_DOWNLOAD",
+    "privateResearchReading": "COMPLETED_NO_INSTRUMENT_LICENSE_CLAIM",
+    "internalIndependentDigitalAdministration": "CONDITIONAL_SCOPE_NOT_CONFIRMED",
+    "publicQuestionTextRedistribution": "NOT_ESTABLISHED_NOT_DECLARED_CATEGORICALLY_PROHIBITED",
+    "commercialInstrumentUse": "NOT_ESTABLISHED_SEPARATE_FROM_DATA_RESTRICTIONS",
+    "translationAdaptation": "NOT_ESTABLISHED_ENGLISH_CAN_PROCEED_WITHOUT_TRANSLATION_IF_OTHER_CONDITIONS_MET"
+  },
+  "officialDataAgreement": {
+    "url": "https://drive.google.com/file/d/18YTgurQNShcTZ4TrNgKPFqMf8Tv4W2K-/view?usp=drive_link",
+    "mimeType": "application/pdf",
+    "bytes": 211965,
+    "modifiedTime": "2026-10-05T15:02:41.264Z",
+    "readComplete": true,
+    "accepted": false,
+    "instrumentIPLicenseFound": false,
+    "writtenConsentActorInSectionF": "Survey Participant"
+  },
+  "registration": {
+    "url": "https://docs.google.com/forms/d/1El7hClqnqfsx0_581Tm0Yxp_DXk8KxlLfgDJth_cZi4/viewform?ts=654d3223&edit_requested=true&fbzx=5953840683476309317",
+    "submitted": false,
+    "containsAgreementAcknowledgement": true
+  },
+  "availableImplementationPath": {
+    "existingFormOnly": true,
+    "scoringNotRequired": true,
+    "demographicsCanBeOmitted": true,
+    "needsPerItemOriginalOptions": true,
+    "nativeExecutableScales": 0,
+    "nativeExecutableForms": 0,
+    "databaseWrites": 0,
+    "privateOriginalsPushed": false,
+    "mergeOrDeployment": false
+  },
+  "evidenceSources": [
+    "https://mistudentvoice-cdn.fxbrt.com/downloads/about_us/mi_student_voice_perception_survey_questions_2027.pdf",
+    "https://mistudentvoice.org/resources/faqs/",
+    "https://mistudentvoice.org/resources/survey-questions/",
+    "https://mistudentvoice.org/about/domains/",
+    "https://mistudentvoice.org/about/technical-advisory-committee/",
+    "https://docs.google.com/forms/d/1El7hClqnqfsx0_581Tm0Yxp_DXk8KxlLfgDJth_cZi4/viewform?ts=654d3223&edit_requested=true&fbzx=5953840683476309317",
+    "https://drive.google.com/file/d/18YTgurQNShcTZ4TrNgKPFqMf8Tv4W2K-/view?usp=drive_link"
+  ],
+  "searchOutcome": "No public current-wave guide/codebook or original blank administration export providing item mappings was found in the targeted official retrieval; not a claim that none exists",
+  "reuse": "Original four catalog source blobs unchanged; no repeated runtime/report/database validation",
+  "historicalCheckerIssue": "CHEXI factory-shape failure retained; shared fix #556 is in main and is not a current material blocker"
+}

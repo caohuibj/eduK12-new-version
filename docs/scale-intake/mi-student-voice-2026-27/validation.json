@@ -1,0 +1,166 @@
+{
+  "checkedSourceCommit": "aaee379d113960c9cb0b6d8617e45b7135c07a33",
+  "checkedTree": "536bd956425d1951a68ff3e73a5e09f5fee7d9a2",
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "node": "24.21.0",
+  "generatedIndexCheck": "PASS",
+  "sourceFunctions": {
+    "status": "SELECTED_SOURCE_FUNCTIONS_PASS",
+    "results": [
+      {
+        "instrumentKey": "mi_student_voice_2026_27_behavior_student_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "mi_student_voice_2026_27_belonging_student_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "mi_student_voice_2026_27_engagement_student_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "mi_student_voice_2026_27_sel_student_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      }
+    ],
+    "explicitPrefixAbsentFromBundleInputs": 7,
+    "officialSelectedCLI": "FAIL: unrelated built-in factory-shape; not repaired or bypassed",
+    "boundary": "AST/schema/validator function evidence; not the official full selected CLI or CI success"
+  },
+  "runtimeBoundary": {
+    "status": "PASS",
+    "cases": [
+      {
+        "key": "mi_student_voice_2026_27_behavior_student_en",
+        "packageProjection": "absent",
+        "runtimePolicyCompilation": "rejected_catalog_only",
+        "educationAdministration": "STUDENT/SELF"
+      },
+      {
+        "key": "mi_student_voice_2026_27_belonging_student_en",
+        "packageProjection": "absent",
+        "runtimePolicyCompilation": "rejected_catalog_only",
+        "educationAdministration": "STUDENT/SELF"
+      },
+      {
+        "key": "mi_student_voice_2026_27_engagement_student_en",
+        "packageProjection": "absent",
+        "runtimePolicyCompilation": "rejected_catalog_only",
+        "educationAdministration": "STUDENT/SELF"
+      },
+      {
+        "key": "mi_student_voice_2026_27_sel_student_en",
+        "packageProjection": "absent",
+        "runtimePolicyCompilation": "rejected_catalog_only",
+        "educationAdministration": "STUDENT/SELF"
+      }
+    ],
+    "boundary": "function checks only; no DB connection, scoring, installed form or report"
+  },
+  "officialSelectedCli": {
+    "status": "FAIL",
+    "exitCode": 1,
+    "command": "env -u DATABASE_URL SCALE_INTAKE_BASE_SHA=<base> SCALE_INTAKE_HEAD_SHA=<checkedSourceCommit> node --import tsx scripts/scale-intake-selected-check.ts",
+    "firstError": "BUILTIN_SCALE_STATIC_UNRESOLVED_USE_BROADER_CONTENT_LANE:server-version/backend/src/modules/assessment-bundle/bundles/child-chexi-observer-zh-cn-v1.ts:factory-shape",
+    "reason": "Existing checker only resolves its supported local arrow-factory pattern; unchanged CHEXI source uses exported function declaration and imported CHEXI_IDENTITY. CLI checks unrelated built-ins before determining selected source references.",
+    "sourceFunctionEvidenceReason": "CLI fails after four selected source checks but does not emit their result envelope. A bounded exported-function replay captures inspectable results; no whole-platform retry.",
+    "candidateChangesToChecker": false,
+    "broaderLaneExecuted": false,
+    "nextAction": "Coordinate a separate existing-checker compatibility fix or reviewed supported content route; do not call this CLI/CI passed."
+  },
+  "route": {
+    "scenario": "content",
+    "content": true,
+    "scale_intake_light": true,
+    "scale": true,
+    "frontend": false,
+    "frontend_build": false,
+    "image_build": false,
+    "codeql": true,
+    "platformReasons": []
+  },
+  "inputFiles": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_behavior_student_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_behavior_student_en/1.0.0/source.json",
+      "sha256": "497478da6c42c37439ad8a7259da85432d6142e08e00f2d2a481d848df1ed0ac"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_belonging_student_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_belonging_student_en/1.0.0/source.json",
+      "sha256": "66ccb87a9008ad1c7fb0dac83cd0de405d77cb7f8f57498dd3707a8be2b040df"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_engagement_student_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_engagement_student_en/1.0.0/source.json",
+      "sha256": "8e982327aa185ddae5737c153a902eb8d69de9a7a8ba9ec668608630aa93d412"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_sel_student_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_sel_student_en/1.0.0/source.json",
+      "sha256": "ed470c537946ecdf8d90a8c6d6a1dbc20dfe41fd7cea724de65a87a8d87ed166"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+      "sha256": "58ae21360e03ef15ef985441546d6d6f05ae82b26fc6b73afd62cac9538ff81b"
+    }
+  ],
+  "recipientFeedback": {
+    "status": "TEXT_REVIEW_ONLY",
+    "studentExamples": [
+      "grades_5_6",
+      "grades_7_12"
+    ],
+    "teacherExamples": "authorized_group_summary_only",
+    "scenarios": [
+      "positive_experience",
+      "low_experience",
+      "insufficient_evidence"
+    ],
+    "numericReportCreated": false,
+    "runtimeVisibilityPolicyChanged": false,
+    "realRecipientJourney": "NOT_RUN: no executable form, collected data or publication"
+  },
+  "databaseImport": "NOT_RUN: metadata only; no executable scale/form; do not manufacture empty items to install",
+  "productionDedup": "NOT_QUERIED",
+  "productionWrites": "NOT_RUN",
+  "officialCI": {
+    "status": "NOT_RUN",
+    "run": null,
+    "reason": "Parent dot independent preflight review pending; existing selected CLI is known to fail on unrelated builtin. Draft backup has [skip ci]."
+  },
+  "laterDocumentationChanges": "Source/index inputs above remain immutable; later evidence/doc-only commit does not rerun passing content checks. Final complete-diff routing checked separately."
+}

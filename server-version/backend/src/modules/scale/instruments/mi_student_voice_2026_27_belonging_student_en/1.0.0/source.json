@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "mi_student_voice_2026_27_belonging_student_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "MI Student Voice｜学校归属与包容（表单候选）｜5–12年级｜学生",
+      "abbreviation": "MI Student Voice",
+      "instrumentFamily": "MI Student Voice — 2026–27 Student Perception Survey"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_BELONGING",
+      "secondaryDomains": [],
+      "constructDefinition": "2026–27学生版学校归属与包容域；保留原12题与题组顺序。后续仅按普通无计分FORM准备，不是个人教师能力量表。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "family:mi_student_voice",
+        "wave:2026_27",
+        "respondent:student",
+        "population:grades_5_12",
+        "age:official_grade_range_only",
+        "language:en",
+        "学生评教",
+        "评价对象:学校",
+        "评价对象:课堂",
+        "评价对象:教师群体_非个人",
+        "来源许可:未确认再分发与平台施测",
+        "use:research",
+        "maturity:PILOT",
+        "availability:catalog_only",
+        "candidate_native_kind:FORM",
+        "scoring:not_installed",
+        "report:not_installed"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 5,
+        "maxGrade": 12
+      },
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "官方适用5–12年级；未将年级换算为精确年龄。学生描述自身学校体验，教师相关题目指多数教师或学校成人；不指定被评教师。未核定本年版中国学生/中文验证。"
+    },
+    "administration": {
+      "itemCount": 12,
+      "estimatedMinutes": 15,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "题本未规定固定回顾天数。estimatedMinutes=15仅借用官方整卷平均少于15分钟作排期参考上限；不是该子域实测或官方分域时长。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "2026–27官方PDF第6页。全部题目可跳答；不得以完整作答要求改变官方可选性。",
+        "官方支持按域选择；内部题组没有独立施测验证依据，保留域内原顺序。",
+        "PDF列两种五点选项和1–5数值，但没有逐题指明频率或感受选项；不得猜测映射。",
+        "仅元数据目录，不含题文、选项文本或可执行FORM/量表；原生表单须获权后从精确本年原件导入。",
+        "不生成教师排名、学校问责指标、跨域总分、常模或诊断。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "PROGRAM_EVALUATION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "官方目的为学校改进；本平台本年版施测、翻译和计分尚未验证。目录不授予使用权。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Official 2026–27 English student PDF; metadata only. No questionnaire or translated items reproduced.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "官方原件SHA-256 3843dae3e2c0c6bc0a5661aa9f017893baf87297b2dff80526114557c0fc5bf0。中文仅目录说明；不是已验证中文版。FAQ虽列Mandarin服务，但本任务未取得该年中文题本。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "STUDENT",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "MI Student Voice Student Perception Survey — 2026–2027 Survey Questions",
+      "citation": "MI Student Voice / Kent ISD, 2026–2027 student survey questions, official PDF, accessed 2026-11-02. PDF metadata author is not treated as sole instrument authorship.",
+      "url": "https://mistudentvoice-cdn.fxbrt.com/downloads/about_us/mi_student_voice_perception_survey_questions_2027.pdf",
+      "publicationYear": 2026
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "学校归属与包容"
+      ],
+      "limitations": [
+        "仅来源目录，不是可施测量表或已安装表单。",
+        "本年逐题选项映射、缺失聚合规则及许可未核清。",
+        "后续无计分表单只描述原始回答与未回答，不提供数值评分报告。"
+      ],
+      "disclaimer": "学校体验反馈候选；不评价个人教师能力，不用于问责、排名或诊断。"
+    },
+    "blockers": [
+      "PUBLIC_REDISTRIBUTION_AND_PLATFORM_USE_PERMISSION_NOT_ESTABLISHED",
+      "ITEM_RESPONSE_SCALE_MAPPING_NOT_PUBLISHED",
+      "DOMAIN_MISSING_RESPONSE_AGGREGATION_RULE_NOT_PUBLISHED",
+      "2026_27_DOMAIN_AND_FACET_SCORING_EVIDENCE_NOT_VERIFIED"
+    ]
+  }
+}
