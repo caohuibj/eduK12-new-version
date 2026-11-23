@@ -22,11 +22,17 @@ const stable = (value: any): any => Array.isArray(value) ? value.map(stable)
   : value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])])) : value
 const digestValue = (value: unknown) => createHash('sha256').update(JSON.stringify(stable(value))).digest('hex')
 type Source = { libraryEntryId?: string | null; id: string; code: string; creatorId: string; status: string; instrumentClass: string; instrumentVersion: string; definition: unknown; definitionHash: string | null }
-export const scaleCopyEligibility = (scale: Source, userId: string) => {
+export const scaleCopyEligibility = (scale: Source, userId: string, mode: 'COPY' | 'REVISION' = 'COPY') => {
   if (scale.libraryEntryId) return { allowed: false, reason: '共用库授权引用只读，不能复制或修订为私人可编辑工具。' }
   if (scale.creatorId !== userId) return { allowed: false, reason: '仅作者可以复制自编量表；查看或使用授权不包含改编权。' }
   if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE' || scale.status !== 'PUBLISHED') return { allowed: false, reason: '仅已发布的自编描述性量表可以复制。' }
   const definition = scale.definition as Partial<ScaleDefinitionV2> | null
+  if (mode === 'REVISION') {
+    if (definition?.license?.status !== 'self_authored') {
+      return { allowed: false, reason: '仅自有量表支持创建同系列修订草稿；第三方已授权量表需先单独确认改编权。' }
+    }
+    return { allowed: true }
+  }
   if (definition?.license?.status !== 'self_authored' || definition.license.redistribution !== 'allowed') return { allowed: false, reason: '仅明确可再分发的自有内容支持复制；其他来源需单独确认改编权。' }
   return { allowed: true }
 }
@@ -45,13 +51,13 @@ export const syncCopiedScaleDraftMedia = async (tx: Prisma.TransactionClient, id
   await assertAssessmentAssetReferencesReady(scaleAssessmentMediaReferences(definition), tx as never)
   await syncAssetReferences({ entityType: 'ScaleCopyDraft', entityId: id, values: { definition }, db: tx as never })
 }
-export const assertScaleCopyPublishSource = async (tx: Prisma.TransactionClient, copy: { id: string; creatorId: string; copySource?: unknown }) => {
+export const assertScaleCopyPublishSource = async (tx: Prisma.TransactionClient, copy: { id: string; creatorId: string; copySource?: unknown; sourceScaleId?: string | null }) => {
   if (copy.copySource == null) return // Existing/native drafts retain their publication contract.
   const parsed = scaleCopySourceSchema.safeParse(copy.copySource)
   if (!parsed.success || parsed.data.parentId === copy.id) throw new ScaleCopyError('复制来源记录无效，不能发布，请重新从来源创建草稿。')
   const source = await lockScaleCopySource(tx, parsed.data.parentId)
   if (!source) throw new ScaleCopyError('复制来源已不存在，不能发布此草稿；已发布版本和历史结果不受影响。')
-  const eligibility = scaleCopyEligibility(source, copy.creatorId)
+  const eligibility = scaleCopyEligibility(source, copy.creatorId, copy.sourceScaleId ? 'REVISION' : 'COPY')
   if (!eligibility.allowed) throw new ScaleCopyError(eligibility.reason!)
   const validation = validateScaleProductDefinition(source.definition, 'CUSTOM_DESCRIPTIVE')
   if (!validation.valid || !validation.definition || source.definitionHash !== hashScaleDefinition(validation.definition)
@@ -63,7 +69,7 @@ export const assertScaleCopyPublishSource = async (tx: Prisma.TransactionClient,
 export const copyScaleToDraft = async (sourceId: string, userId: string, mode: 'COPY' | 'REVISION' = 'COPY') => prisma.$transaction(async tx => {
   const source = await lockScaleCopySource(tx, sourceId)
   if (!source) throw new ScaleCopyError('量表不存在', 404)
-  const eligibility = scaleCopyEligibility(source, userId)
+  const eligibility = scaleCopyEligibility(source, userId, mode)
   if (!eligibility.allowed) throw new ScaleCopyError(eligibility.reason!, 403)
   const validation = validateScaleProductDefinition(source.definition, 'CUSTOM_DESCRIPTIVE')
   if (!validation.valid || !validation.definition) throw new ScaleCopyError('来源定义与当前编制器不兼容，不能复制。')

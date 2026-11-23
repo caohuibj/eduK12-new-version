@@ -1,4 +1,5 @@
 import { scaleImportController } from '../controllers/scaleImportController'
+import multer from 'multer'
 import { Router } from 'express'
 import { scaleController } from '../controllers/scaleController'
 import { scaleImageController } from '../controllers/scaleImageController'
@@ -10,8 +11,15 @@ import { authenticate, requireTeacher } from '../middleware/auth'
 import { legacyWriteDisabled } from '../middleware/instrumentFinalOnly'
 
 const router = Router()
+const fullWorkbookUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 2 * 1024 * 1024, files: 1, fields: 5 },
+}).single('file')
 
 // ==================== 导出文件下载（放在最前面避免路由冲突） ====================
+
+// 下载一站式完整量表导入模板（须在 /:id 之前）
+router.get('/import/full-template', authenticate, requireTeacher, scaleImportController.fullTemplate)
 
 // 下载导出文件
 router.get('/exports/:artifactId', authenticate, scaleController.downloadExportFile)
@@ -74,6 +82,8 @@ router.put('/:id', authenticate, requireTeacher, scaleController.update)
 
 router.post('/:id/import/preview', authenticate, requireTeacher, scaleImportController.preview)
 router.post('/:id/import/confirm', authenticate, requireTeacher, scaleImportController.confirm)
+router.post('/:id/import/full-preview', authenticate, requireTeacher, fullWorkbookUpload, scaleImportController.fullPreview)
+router.post('/:id/import/full-confirm', authenticate, requireTeacher, fullWorkbookUpload, scaleImportController.fullConfirm)
 
 // v2 聚合 definition 管理
 router.put('/:id/definition', authenticate, requireTeacher, scaleController.updateDefinition)
