@@ -91,7 +91,7 @@ const normalizedResponse = (response: SituationalResponse): SituationalResponse 
   ...(response.stageConfirmed === undefined ? {} : { stageConfirmed: response.stageConfirmed }),
 })
 
-const normalizeSituationalSubmission = (
+export const normalizeSituationalSubmission = (
   definition: SituationRuntimeDefinition,
   input: SituationalResponse[],
   options: { requiredValidated?: boolean } = {},

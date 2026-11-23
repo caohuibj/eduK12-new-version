@@ -7,6 +7,8 @@ import { compositeVideoController } from './composite-video.controller'
 import { situationalVideoController } from '../situational/situational-video.controller'
 import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
 import { prepareWholeSubmissionPriority } from '../../services/wholeSubmissionPriority'
+import { mountCompositeWholeV2Routes } from './whole-v2.routes'
+import { authorizeTrainingPublicWholeV2 } from './whole-v2.access'
 
 const router = Router()
 prepareWholeSubmissionPriority()
@@ -20,6 +22,11 @@ router.get('/attempts/:attemptId/whole/definition', compositeController.publicWh
 router.get('/attempts/:attemptId/whole/template/:templateHash', compositeController.publicWholeTemplate)
 router.get('/attempts/:attemptId/whole/receipt', compositeController.publicWholeReceipt)
 router.post('/attempts/:attemptId/whole/submit', compositeController.publicWholeSubmit)
+mountCompositeWholeV2Routes(router, {
+  prefix: '/attempts',
+  middleware: [],
+  authorizeAttempt: authorizeTrainingPublicWholeV2,
+})
 router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', compositeImageController.publicFormImage)
 router.get('/attempts/:attemptId/items/:itemId/scale/assets/:assetId/content', compositeImageController.publicScaleImage)
 router.post('/attempts/:attemptId/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability', compositeVideoController.publicFormVideo)
