@@ -263,9 +263,63 @@ export async function commitCompositeWholeFinal(
     executedSlotKeys: submit.executedSlotKeys ?? null,
   })
 
-  // 0. Acquire authoritative row lock on parent composite_assessment_attempts FIRST.
-  //    This single lock serializes concurrent duplicate submits (idempotency),
-  //    checkpoint mutations/deletes, and terminal state transitions with zero extra tables.
+  const findExistingFinal = () => tx.$queryRaw<ExistingFinalRow[]>(Prisma.sql`
+    SELECT attempt_id AS "attemptId",
+      attempt_epoch AS "attemptEpoch",
+      submission_id AS "submissionId",
+      payload_hash AS "payloadHash",
+      aggregate_hash AS "aggregateHash",
+      facts_hash AS "factsHash",
+      raw_hash AS "rawHash",
+      feedback_cipher AS "feedbackCipher",
+      completed_at AS "completedAt"
+    FROM composite_attempt_finals
+    WHERE (attempt_id = ${attempt.id} AND attempt_epoch = ${attempt.attemptEpoch})
+       OR submission_id = ${submit.submissionId}
+    LIMIT 2
+  `)
+
+  const resolveExistingFinal = (rows: ExistingFinalRow[]): CompositeWholeFinalReceipt | null => {
+    if (rows.length === 0) return null
+    const match = rows.find(
+      row => row.attemptId === attempt.id
+        && row.attemptEpoch === attempt.attemptEpoch
+        && row.submissionId === submit.submissionId
+        && row.payloadHash === payloadHash,
+    )
+    if (match) {
+      return {
+        status: 'COMPLETED',
+        attemptId: match.attemptId,
+        attemptEpoch: match.attemptEpoch,
+        submissionId: match.submissionId,
+        payloadHash: match.payloadHash,
+        aggregateHash: match.aggregateHash,
+        factsHash: match.factsHash,
+        rawHash: match.rawHash,
+        completedAt: match.completedAt.toISOString(),
+        replayed: true,
+        receiptOnly: attempt.receiptOnly,
+        feedbackAvailable: Boolean(match.feedbackCipher),
+      }
+    }
+    throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '作答已提交且内容与原提交不一致', 409)
+  }
+
+  // 0A. Lock-free idempotent replay fast path: an already-committed historical FINAL
+  //     remains replayable even if org/consent/grant authority was later revoked.
+  const preLockReplay = resolveExistingFinal(await findExistingFinal())
+  if (preLockReplay) return preLockReplay
+
+  // 0B. Run in-transaction authority & fence checks BEFORE locking parent attempt row,
+  //     preserving canonical org -> run -> execution -> parent lock ordering.
+  if (input.verifyAuthorityInTx) {
+    await input.verifyAuthorityInTx(tx)
+  }
+
+  // 0C. Acquire authoritative row lock on parent composite_assessment_attempts.
+  //     This single lock serializes concurrent duplicate submits (idempotency),
+  //     checkpoint mutations/deletes, and terminal state transitions with zero extra tables.
   let lockedParentStatus: string | null = null
   if (input.verifyParentAttemptRow !== false) {
     const parentRows = await tx.$queryRaw<Array<{
@@ -293,56 +347,14 @@ export async function commitCompositeWholeFinal(
     lockedParentStatus = parent.status
   }
 
-  // 1. Idempotent replay & submission conflict check (under parent row lock)
-  const existingRows = await tx.$queryRaw<ExistingFinalRow[]>(Prisma.sql`
-    SELECT attempt_id AS "attemptId",
-      attempt_epoch AS "attemptEpoch",
-      submission_id AS "submissionId",
-      payload_hash AS "payloadHash",
-      aggregate_hash AS "aggregateHash",
-      facts_hash AS "factsHash",
-      raw_hash AS "rawHash",
-      feedback_cipher AS "feedbackCipher",
-      completed_at AS "completedAt"
-    FROM composite_attempt_finals
-    WHERE (attempt_id = ${attempt.id} AND attempt_epoch = ${attempt.attemptEpoch})
-       OR submission_id = ${submit.submissionId}
-    LIMIT 2
-  `)
-  if (existingRows.length > 0) {
-    const match = existingRows.find(
-      row => row.attemptId === attempt.id
-        && row.attemptEpoch === attempt.attemptEpoch
-        && row.submissionId === submit.submissionId
-        && row.payloadHash === payloadHash,
-    )
-    if (match) {
-      return {
-        status: 'COMPLETED',
-        attemptId: match.attemptId,
-        attemptEpoch: match.attemptEpoch,
-        submissionId: match.submissionId,
-        payloadHash: match.payloadHash,
-        aggregateHash: match.aggregateHash,
-        factsHash: match.factsHash,
-        rawHash: match.rawHash,
-        completedAt: match.completedAt.toISOString(),
-        replayed: true,
-        receiptOnly: attempt.receiptOnly,
-        feedbackAvailable: Boolean(match.feedbackCipher),
-      }
-    }
-    throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '作答已提交且内容与原提交不一致', 409)
-  }
+  // 1. Re-check idempotent replay & submission conflict UNDER the parent row lock
+  //    (handles two concurrent fresh submits racing past step 0A simultaneously).
+  const underLockReplay = resolveExistingFinal(await findExistingFinal())
+  if (underLockReplay) return underLockReplay
 
   // 1B. Enforce valid active status for fresh submission (never accept revoked/abandoned/already-completed rows)
   if (lockedParentStatus !== null && lockedParentStatus !== 'IN_PROGRESS') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '当前作答状态不可提交', 409)
-  }
-
-  // 1C. Optional in-transaction authority re-verification (e.g. field observation grant, consent)
-  if (input.verifyAuthorityInTx) {
-    await input.verifyAuthorityInTx(tx)
   }
 
   // 2. Load & verify monotonically locked Cognitive / SJT units from checkpoint
