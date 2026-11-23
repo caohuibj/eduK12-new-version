@@ -1343,6 +1343,7 @@ model CompositeAssessment {
   formSections CompositeFormSection[]
   accessTokens CompositeAssessmentAccessToken[]
   attempts     CompositeAssessmentAttempt[]
+  finals       CompositeAttemptFinal[]
 
   @@index([courseId, status])
   @@index([createdBy, status])
@@ -1445,6 +1446,8 @@ model CompositeFormSection {
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
   receiptOnly Boolean @default(false) @map("receipt_only")
+  publicationHash String? @map("publication_hash")
+  unitSeedsEncrypted String? @map("unit_seeds_encrypted")
   personalChangesSnapshots Json @default("{}") @map("personal_changes_snapshots")
   trainingContentInterpretationEncrypted String? @map("training_content_interpretation_encrypted")
   trainingContentInterpretationHash String? @map("training_content_interpretation_hash")
@@ -1516,6 +1519,8 @@ model CompositeAssessmentAttempt {
   bundleAnalyses      BundleAnalysis[]
   analysisSnapshots   CompositeAnalysisSnapshot[]
   unitSnapshots       AssessmentUnitSnapshot[]        @relation("CompositeAssessmentUnitSnapshots")
+  finals              CompositeAttemptFinal[]
+  checkpoint          CompositeAttemptCheckpoint?
 
   @@unique([compositeAssessmentId, participantKey, attemptNo], map: "composite_attempts_assessment_participant_no_key")
   @@index([compositeAssessmentId, status])
@@ -1526,6 +1531,51 @@ model CompositeAssessmentAttempt {
   @@index([respondentUserId, status])
   @@index([episodeId])
   @@map("composite_assessment_attempts")
+}
+
+model CompositeAttemptFinal {
+  attemptId       String   @map("attempt_id")
+  attemptEpoch    Int      @default(1) @map("attempt_epoch")
+  compositeId     String   @map("composite_id")
+  organizationId  String?  @map("organization_id")
+  courseId        String?  @map("course_id")
+  publicationHash String   @map("publication_hash")
+  slotSetHash     String   @map("slot_set_hash")
+  contextHash     String?  @map("context_hash")
+  submissionId    String   @unique(map: "composite_attempt_finals_submission_uniq") @map("submission_id")
+  payloadHash     String   @map("payload_hash")
+  aggregateHash   String   @map("aggregate_hash")
+  factsHash       String   @map("facts_hash")
+  factsCipher     String   @map("facts_cipher")
+  rawHash         String   @map("raw_hash")
+  rawCipher       String   @map("raw_cipher")
+  feedbackCipher  String?  @map("feedback_cipher")
+  completedAt     DateTime @default(now()) @map("completed_at") @db.Timestamptz(6)
+
+  attempt   CompositeAssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict)
+  composite CompositeAssessment        @relation(fields: [compositeId], references: [id], onDelete: Restrict)
+
+  @@id([attemptId, attemptEpoch])
+  @@index([compositeId, completedAt(sort: Desc)], map: "composite_attempt_finals_composite_time_idx")
+  @@map("composite_attempt_finals")
+}
+
+model CompositeAttemptCheckpoint {
+  attemptId       String   @id @map("attempt_id")
+  attemptEpoch    Int      @map("attempt_epoch")
+  publicationHash String   @map("publication_hash")
+  revision        Int      @default(1)
+  saveCount       Int      @default(1) @map("save_count")
+  lockedSlotKeys  String[] @default([]) @map("locked_slot_keys")
+  payloadCipher   String   @map("payload_cipher")
+  payloadHash     String   @map("payload_hash")
+  expiresAt       DateTime @map("expires_at") @db.Timestamptz(6)
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  attempt CompositeAssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt], map: "composite_attempt_checkpoints_expires_idx")
+  @@map("composite_attempt_checkpoints")
 }
 
 // Package-scoped cognitive analysis output. Rows are append-only at the
