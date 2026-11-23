@@ -29,7 +29,8 @@ describe('real Teacher host and FinalComposite assessment media',()=>{
   vi.stubGlobal('fetch',request);render(<HuiteacherApp/>)
   fireEvent.click(await screen.findByRole('link',{name:'参与测评'}))
   fireEvent.click(await screen.findByRole('button',{name:'继续测评'}))
-  await screen.findByRole('img',{name:'教师题图'})
+  // The real assessment is code-split; cold module transforms precede media reads.
+  await screen.findByRole('img',{name:'教师题图'},{timeout:5000})
   const videoPath=`${prefix}/composite-attempts/${id}/items/unit/scale/items/q/video-capability`
   await waitFor(()=>expect(request.mock.calls.some(([url])=>url===videoPath)).toBe(true))
   const exchange=request.mock.calls.find(([url])=>url===videoPath)![1]!

@@ -32,3 +32,25 @@
 .ht-school-form-list .ht-tag{flex:none;font-size:12px;font-weight:400;padding:3px 8px}
 .ht-app .ht-school-form-list>button[aria-pressed=true]{border-color:var(--ht-copper);box-shadow:inset 3px 0 var(--ht-copper)}
 @media(max-width:700px){.ht-school-form-list{grid-template-columns:minmax(0,1fr)}.ht-workspace-admin .ht-admin-action{padding-inline:12px}.ht-workspace-admin .ht-admin-action .ht-inline>.ht-field{flex-basis:100%}.ht-admin-list-heading{align-items:flex-start}.ht-workspace-admin .ht-admin-mfa{align-items:stretch}}
+
+/* Completed activities remain easy to scan; their mounted history opens on demand. */
+.ht-workspace-admin .ht-event-heading{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;min-width:0}
+.ht-workspace-admin .ht-event-heading>strong{flex:1 1 240px;min-width:0;margin:0;font-size:15px;line-height:1.7}
+.ht-workspace-admin .ht-event-heading>.ht-tag{flex:none;max-width:100%;padding:3px 9px;font-size:12px;line-height:1.7}
+.ht-workspace-admin .ht-managed-event[data-event-status=OPEN]{border-inline-start:3px solid var(--ht-copper)}
+.ht-workspace-admin .ht-managed-event[data-event-status=OPEN]>.ht-event-heading>.ht-tag{color:var(--ht-copper);border-color:var(--ht-copper)}
+.ht-workspace-admin .ht-managed-event>.ht-inline.ht-event-actions{gap:8px;margin:12px 0}
+.ht-workspace-admin .ht-event-actions>.ht-muted{flex-basis:100%;margin:0;font-size:13px}
+.ht-workspace-admin .ht-event-actions>.ht-event-cancel{margin-inline-start:auto;color:var(--ht-copper);background:transparent}
+.ht-workspace-admin .ht-event-details{border-top:1px solid var(--ht-line);margin-top:14px}
+.ht-workspace-admin .ht-event-details>summary{position:relative;min-height:44px;padding:12px 0;color:var(--ht-quiet);font-size:13px;line-height:1.6;cursor:pointer}
+.ht-workspace-admin .ht-event-details>summary:hover{color:var(--ht-copper)}
+.ht-workspace-admin .ht-event-details>summary:focus-visible{outline:2px solid var(--ht-copper);outline-offset:3px;border-radius:4px}
+.ht-workspace-admin .ht-event-details-hint{float:right;margin-inline-start:12px;font-size:12px;font-weight:400}
+.ht-workspace-admin .ht-event-details[open]>summary .ht-event-details-hint{display:none}
+.ht-workspace-admin .ht-event-details-body{padding-top:4px}
+.ht-workspace-admin .ht-event-details-body>.ht-field-manager:first-child{margin-top:0;border-top:0;padding-top:0}
+@media(max-width:640px){
+ .ht-workspace-admin .ht-event-heading>strong{flex-basis:100%}
+ .ht-workspace-admin .ht-event-actions>.ht-event-cancel{margin-inline-start:0}
+}

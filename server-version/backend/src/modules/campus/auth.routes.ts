@@ -5,7 +5,7 @@ import { comparePassword, hashPassword, isValidPassword, PASSWORD_MAX_LENGTH } f
 import { generateToken } from '../../utils/jwt'
 import { success, unauthorized, forbidden } from '../../utils/response'
 import { issueSchoolCsrfToken, setSchoolSessionCookie, clearSchoolSessionCookie, getSchoolSessionToken } from '../../utils/authCookies'
-import { authenticateSchool, primePrincipalCache } from '../../middleware/auth'
+import { authenticateSchool, primePrincipalCache, invalidatePrincipalCache, getPrincipalCacheGeneration } from '../../middleware/auth'
 import { revokeCurrentSession } from '../../utils/sessionRevocation'
 import { createMfaAttemptRateLimiter } from '../../middleware/mfaAttemptRateLimit'
 import { passwordChangeRateLimit, withPasswordChangeAdmission } from '../../middleware/passwordChangeAdmission'
@@ -52,6 +52,7 @@ router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(async (req
     const parsed = loginSchema.safeParse(req.body)
     if (!parsed.success) return failedLogin(req, res)
     const normalizedLogin = parsed.data.username.toLowerCase()
+    const cacheGeneration = getPrincipalCacheGeneration()
     const account = await withLoginAccountLookup(() =>
       prisma.campusAccount.findUnique({
         where: { normalizedLogin },
@@ -118,7 +119,7 @@ router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(async (req
         teacherApproved: Boolean(u.teacherApproved),
         entryGrants: [],
         needsMfa: false,
-      })
+      }, cacheGeneration)
     }
     const token = generateToken({
       accountDomain: 'SCHOOL',
@@ -233,6 +234,9 @@ router.post('/change-password', authenticateSchool, passwordChangeRateLimit, wit
     data: { passwordHash, tokenVersion: { increment: 1 }, mustChangePassword: false },
   })
   if (updated.count !== 1) return res.status(409).json({ code: -1, message: '账号状态已改变，请重新登录' })
+  // Password rotation invalidates both education product sessions immediately,
+  // including ordinary users whose principal was cached before the mutation.
+  invalidatePrincipalCache(user.id)
   clearSchoolSessionCookie(req, res)
   return success(res, null, '密码已修改，请重新登录')
 }))

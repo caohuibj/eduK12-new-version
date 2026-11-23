@@ -1,0 +1,93 @@
+import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
+import {afterEach,beforeEach,expect,it,vi} from 'vitest'
+import {TeacherFormGroupReport,type TeacherFormGroupProjection} from './TeacherFormGroupReport'
+const report:TeacherFormGroupProjection={eventId:'event',formId:'form',definitionDigest:'a'.repeat(64),independentRespondents:11,minimumRespondents:10,distributions:[{itemKey:'q',prompt:'教学支持',status:'WITHHELD',reason:'PRIVATE_FREE_TEXT'}]}
+let fullscreen:Element|null=null
+const enter=vi.fn(),exit=vi.fn()
+beforeEach(()=>{
+  fullscreen=null;enter.mockReset();exit.mockReset()
+  Object.defineProperty(document,'fullscreenElement',{configurable:true,get:()=>fullscreen})
+  Object.defineProperty(document.documentElement,'requestFullscreen',{configurable:true,value:enter.mockImplementation(async()=>{fullscreen=document.documentElement;document.dispatchEvent(new Event('fullscreenchange'))})})
+  Object.defineProperty(document,'exitFullscreen',{configurable:true,value:exit.mockImplementation(async()=>{fullscreen=null;document.dispatchEvent(new Event('fullscreenchange'))})})
+})
+afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals();document.documentElement.classList.remove('task-group-report-presenting')})
+const view=()=>render(<TeacherFormGroupReport report={report} activityTitle="合成活动" formTitle="合成表单"/>)
+function deferred(){let resolve!:()=>void,reject!:(reason:Error)=>void;const promise=new Promise<void>((yes,no)=>{resolve=yes;reject=no});return {promise,resolve,reject}}
+it('uses document flow for presentation and exposes an explicit exit control',async()=>{
+  view();fireEvent.click(screen.getByRole('button',{name:'全屏展示'}))
+  await screen.findByRole('button',{name:'退出全屏'})
+  expect(fullscreen).toBe(document.documentElement);expect(document.documentElement).toHaveClass('task-group-report-presenting')
+  fireEvent.click(screen.getByRole('button',{name:'退出全屏'}))
+  await screen.findByRole('button',{name:'全屏展示'});expect(fullscreen).toBeNull();expect(document.documentElement).not.toHaveClass('task-group-report-presenting')
+})
+it('waits for fullscreen exit before printing while ordinary printing remains immediate',async()=>{
+  const print=vi.spyOn(window,'print').mockImplementation(()=>{expect(fullscreen).toBeNull()})
+  view();fireEvent.click(screen.getByRole('button',{name:'打印 / 保存 PDF'}));expect(print).toHaveBeenCalledOnce();expect(exit).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button',{name:'全屏展示'}));await screen.findByRole('button',{name:'退出全屏'})
+  let release!:()=>void
+  exit.mockImplementationOnce(()=>new Promise<void>(resolve=>{release=()=>{fullscreen=null;document.dispatchEvent(new Event('fullscreenchange'));resolve()}}))
+  fireEvent.click(screen.getByRole('button',{name:'打印 / 保存 PDF'}));expect(print).toHaveBeenCalledOnce()
+  await act(async()=>release());await waitFor(()=>expect(print).toHaveBeenCalledTimes(2))
+  expect(screen.getByRole('article',{name:'教师群体报告阅读'})).toHaveTextContent('开放性文字未获群体披露许可。')
+})
+it('cleans presentation after native fullscreen exit and when the report unmounts',async()=>{
+  const mounted=view();fireEvent.click(screen.getByRole('button',{name:'全屏展示'}));await screen.findByRole('button',{name:'退出全屏'})
+  act(()=>{fullscreen=null;document.dispatchEvent(new Event('fullscreenchange'))})
+  expect(screen.getByRole('button',{name:'全屏展示'})).toBeVisible();expect(document.documentElement).not.toHaveClass('task-group-report-presenting')
+  fireEvent.click(screen.getByRole('button',{name:'全屏展示'}));await screen.findByRole('button',{name:'退出全屏'});mounted.unmount()
+  expect(exit).toHaveBeenCalledOnce();expect(fullscreen).toBeNull();expect(document.documentElement).not.toHaveClass('task-group-report-presenting')
+})
+it('keeps the report available when fullscreen cannot be exited for print',async()=>{
+  const print=vi.spyOn(window,'print').mockImplementation(()=>{})
+  view();fireEvent.click(screen.getByRole('button',{name:'全屏展示'}));await screen.findByRole('button',{name:'退出全屏'})
+  exit.mockRejectedValueOnce(new Error('browser denied exit'));fireEvent.click(screen.getByRole('button',{name:'打印 / 保存 PDF'}))
+  expect(await screen.findByRole('status')).toHaveTextContent('未能退出全屏');expect(print).not.toHaveBeenCalled();expect(screen.getByRole('article',{name:'教师群体报告阅读'})).toBeVisible()
+})
+it('exits its late fullscreen entry after the requesting report unmounts without hiding the next page',async()=>{
+  const late=deferred();enter.mockImplementationOnce(async()=>{await late.promise;fullscreen=document.documentElement;document.dispatchEvent(new Event('fullscreenchange'))})
+  const mounted=view();fireEvent.click(screen.getByRole('button',{name:'全屏展示'}));expect(enter).toHaveBeenCalledOnce()
+  mounted.unmount();expect(exit).not.toHaveBeenCalled()
+  await act(async()=>late.resolve())
+  expect(exit).toHaveBeenCalledOnce();expect(fullscreen).toBeNull();expect(document.documentElement).not.toHaveClass('task-group-report-presenting')
+})
+it.each(['resolve','reject'] as const)('does not clear a newer report presentation when the old pending entry later %s',async result=>{
+  const late=deferred();enter.mockImplementationOnce(async()=>{await late.promise;fullscreen=document.documentElement;document.dispatchEvent(new Event('fullscreenchange'))})
+  const old=view();fireEvent.click(screen.getByRole('button',{name:'全屏展示'}));old.unmount()
+  view();fireEvent.click(screen.getByRole('button',{name:'全屏展示'}));await screen.findByRole('button',{name:'退出全屏'})
+  await act(async()=>{if(result==='resolve')late.resolve();else late.reject(Error('old entry denied'))})
+  expect(exit).not.toHaveBeenCalled();expect(fullscreen).toBe(document.documentElement);expect(document.documentElement).toHaveClass('task-group-report-presenting')
+  expect(screen.getByRole('button',{name:'退出全屏'})).toBeEnabled();expect(screen.queryByRole('status')).not.toBeInTheDocument()
+})
+it('does not print a replacement page after a pending fullscreen exit resolves on an unmounted report',async()=>{
+  const print=vi.spyOn(window,'print').mockImplementation(()=>{}),frame=vi.spyOn(window,'requestAnimationFrame'),late=deferred()
+  const mounted=view();fireEvent.click(screen.getByRole('button',{name:'全屏展示'}));await screen.findByRole('button',{name:'退出全屏'})
+  exit.mockImplementationOnce(async()=>{await late.promise;fullscreen=null;document.dispatchEvent(new Event('fullscreenchange'))})
+  fireEvent.click(screen.getByRole('button',{name:'打印 / 保存 PDF'}));mounted.unmount();expect(exit).toHaveBeenCalledOnce()
+  await act(async()=>late.resolve())
+  expect(frame).not.toHaveBeenCalled();expect(print).not.toHaveBeenCalled();expect(document.documentElement).not.toHaveClass('task-group-report-presenting')
+})
+it('cancels a queued print frame on unmount and guards even an already-dispatched callback',async()=>{
+  const print=vi.spyOn(window,'print').mockImplementation(()=>{}),cancel=vi.fn();let callback!:FrameRequestCallback
+  vi.stubGlobal('requestAnimationFrame',vi.fn((next:FrameRequestCallback)=>{callback=next;return 17}));vi.stubGlobal('cancelAnimationFrame',cancel)
+  const mounted=view();fireEvent.click(screen.getByRole('button',{name:'全屏展示'}));await screen.findByRole('button',{name:'退出全屏'})
+  fireEvent.click(screen.getByRole('button',{name:'打印 / 保存 PDF'}));await waitFor(()=>expect(requestAnimationFrame).toHaveBeenCalledOnce())
+  mounted.unmount();expect(cancel).toHaveBeenCalledWith(17);act(()=>callback(0))
+  expect(print).not.toHaveBeenCalled();expect(document.documentElement).not.toHaveClass('task-group-report-presenting')
+})
+it('isolates a replaced Form report from the previous report pending entry and print continuation',async()=>{
+  const print=vi.spyOn(window,'print').mockImplementation(()=>{}),frame=vi.spyOn(window,'requestAnimationFrame'),lateEntry=deferred(),lateExit=deferred()
+  enter.mockImplementationOnce(async()=>{await lateEntry.promise;fullscreen=document.documentElement;document.dispatchEvent(new Event('fullscreenchange'))})
+  const mounted=view();fireEvent.click(screen.getByRole('button',{name:'全屏展示'}))
+  mounted.rerender(<TeacherFormGroupReport report={{...report,formId:'second-form'}} activityTitle="合成活动" formTitle="第二份表单"/>)
+  expect(screen.getByRole('heading',{name:'第二份表单'})).toBeVisible();expect(screen.getByRole('button',{name:'全屏展示'})).toBeEnabled()
+  fireEvent.click(screen.getByRole('button',{name:'全屏展示'}));await screen.findByRole('button',{name:'退出全屏'})
+  await act(async()=>lateEntry.resolve())
+  expect(exit).not.toHaveBeenCalled();expect(document.documentElement).toHaveClass('task-group-report-presenting')
+  exit.mockImplementationOnce(async()=>{await lateExit.promise;fullscreen=null;document.dispatchEvent(new Event('fullscreenchange'))})
+  fireEvent.click(screen.getByRole('button',{name:'打印 / 保存 PDF'}))
+  mounted.rerender(<TeacherFormGroupReport report={{...report,formId:'third-form'}} activityTitle="合成活动" formTitle="第三份表单"/>)
+  expect(screen.getByRole('button',{name:'全屏展示'})).toBeEnabled();expect(screen.getByRole('button',{name:'打印 / 保存 PDF'})).toBeEnabled()
+  await act(async()=>lateExit.resolve())
+  expect(print).not.toHaveBeenCalled();expect(frame).not.toHaveBeenCalled();expect(document.documentElement).not.toHaveClass('task-group-report-presenting')
+  expect(screen.getByRole('heading',{name:'第三份表单'})).toBeVisible()
+})

@@ -4,7 +4,7 @@ vi.mock('../../config/database',()=>({prisma:{campusAccount:{findUnique:state.fi
 vi.mock('../../utils/password',()=>({comparePassword:async()=>true,hashPassword:vi.fn(),isValidPassword:()=>true,PASSWORD_MAX_LENGTH:72}))
 vi.mock('../../utils/jwt',()=>({generateToken:()=> 'synthetic-token'}))
 vi.mock('../../utils/authCookies',()=>({issueSchoolCsrfToken:vi.fn(),setSchoolSessionCookie:state.setCookie,clearSchoolSessionCookie:vi.fn(),getSchoolSessionToken:vi.fn()}))
-vi.mock('../../middleware/auth',()=>({authenticateSchool:vi.fn()}))
+vi.mock('../../middleware/auth',()=>({authenticateSchool:vi.fn(),primePrincipalCache:vi.fn(),invalidatePrincipalCache:vi.fn(),getPrincipalCacheGeneration:()=>0}))
 vi.mock('../../utils/sessionRevocation',()=>({revokeCurrentSession:vi.fn()}))
 vi.mock('../../middleware/mfaAttemptRateLimit',()=>({createMfaAttemptRateLimiter:()=>vi.fn()}))
 vi.mock('../../middleware/passwordChangeAdmission',()=>({passwordChangeRateLimit:vi.fn(),withPasswordChangeAdmission:(x:unknown)=>x}))

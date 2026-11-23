@@ -1,4 +1,4 @@
-import {useRef,useState} from 'react'
+import {useEffect,useRef,useState} from 'react'
 import {ReportDetails,ReportDisclaimer,ReportMetric,ReportMetricGrid,ReportSection} from '../modules/reporting/ReportPrimitives'
 import '../modules/reporting/task-group-report.css'
 
@@ -20,27 +20,116 @@ const withheld:Record<string,string>={
 const percentage=(count:number|undefined,n:number|null,published:number|undefined)=>
   published!==undefined?`${published}%`:count!==undefined&&n!==null&&n>0
     ?`${new Intl.NumberFormat('zh-CN',{maximumFractionDigits:1}).format(count/n*100)}%`:'—'
+type PresentationClaim={page:HTMLElement;entering:boolean;entered:boolean;exit:Promise<void>|null}
+let presentationOwner:PresentationClaim|null=null
+function releasePresentation(claim:PresentationClaim|null){
+  if(!claim||presentationOwner!==claim)return
+  claim.page.classList.remove('task-group-report-presenting')
+  if(claim.entering)return // The pending request must clean up its own eventual result.
+  if(claim.entered&&document.fullscreenElement===claim.page){
+    try{
+      claim.exit??=document.exitFullscreen()
+      void claim.exit.catch(()=>{}).finally(()=>{if(presentationOwner===claim)presentationOwner=null})
+    }catch{if(presentationOwner===claim)presentationOwner=null}
+  }else presentationOwner=null
+}
 
 /** Replace the old inline list with the shared report primitives and print CSS.
  * Keep counts absent when the original released projection hides them. */
-export function TeacherFormGroupReport({report,activityTitle,formTitle}:{
+type TeacherFormGroupReportProps={
   report:TeacherFormGroupProjection;activityTitle:string;formTitle:string
-}){
+}
+export function TeacherFormGroupReport(props:TeacherFormGroupReportProps){
+  const {report}=props
+  return <TeacherFormGroupReportSession key={JSON.stringify([
+    report.eventId,report.formId,report.definitionDigest,report.versionId??null,
+  ])} {...props}/>
+}
+function TeacherFormGroupReportSession({report,activityTitle,formTitle}:TeacherFormGroupReportProps){
   const root=useRef<HTMLElement>(null)
-  const [selected,setSelected]=useState(''),[error,setError]=useState('')
+  const mounted=useRef(false),operation=useRef({version:0}),pending=useRef(false)
+  const printFrame=useRef<number|null>(null),claim=useRef<PresentationClaim|null>(null)
+  const [selected,setSelected]=useState(''),[error,setError]=useState(''),[presenting,setPresenting]=useState(false)
+  const [working,setWorking]=useState(false)
   const chosen=report.distributions.find(item=>item.itemKey===selected)??report.distributions[0]
   const released=report.releasedAt?new Date(report.releasedAt).toLocaleString('zh-CN'):null
+  useEffect(()=>{
+    mounted.current=true
+    const page=document.documentElement,requests=operation.current
+    const sync=()=>{
+      const owns=claim.current!==null&&presentationOwner===claim.current
+      const active=owns&&document.fullscreenElement===page&&page.classList.contains('task-group-report-presenting')
+      if(owns&&!active)page.classList.remove('task-group-report-presenting')
+      setPresenting(active)
+    }
+    document.addEventListener('fullscreenchange',sync)
+    return()=>{
+      mounted.current=false;requests.version++
+      document.removeEventListener('fullscreenchange',sync)
+      if(printFrame.current!==null)cancelAnimationFrame(printFrame.current)
+      printFrame.current=null
+      releasePresentation(claim.current)
+    }
+  },[])
   async function fullscreen(){
-    try{await root.current?.requestFullscreen();setError('')}
-    catch{setError('浏览器未能进入全屏，可继续阅读或打印。')}
+    if(pending.current||!mounted.current)return
+    if(printFrame.current!==null){cancelAnimationFrame(printFrame.current);printFrame.current=null}
+    pending.current=true;setWorking(true)
+    const request=++operation.current.version,current=()=>mounted.current&&operation.current.version===request
+    let owned=claim.current
+    try{
+      if(owned&&presentationOwner===owned&&document.fullscreenElement===owned.page&&presenting){
+        owned.exit??=document.exitFullscreen()
+        await owned.exit
+        if(!current())return
+        releasePresentation(owned);setPresenting(false)
+      }else{
+        owned={page:document.documentElement,entering:true,entered:false,exit:null}
+        claim.current=owned;presentationOwner=owned
+        try{await owned.page.requestFullscreen();owned.entered=true}finally{owned.entering=false}
+        if(!current()||presentationOwner!==owned||document.fullscreenElement!==owned.page){releasePresentation(owned);return}
+        owned.page.classList.add('task-group-report-presenting')
+        setPresenting(true)
+        root.current?.scrollIntoView?.({block:'start'})
+      }
+      setError('')
+    }catch{
+      if(owned)owned.exit=null
+      if(!current())releasePresentation(owned)
+      else setError('浏览器未能切换全屏，可继续阅读或打印。')
+    }finally{if(current()){pending.current=false;setWorking(false)}}
+  }
+  async function printReport(){
+    if(pending.current||!mounted.current)return
+    if(printFrame.current!==null){cancelAnimationFrame(printFrame.current);printFrame.current=null}
+    pending.current=true;setWorking(true)
+    const request=++operation.current.version,current=()=>mounted.current&&operation.current.version===request
+    try{
+      if(document.fullscreenElement){
+        const exit=document.exitFullscreen()
+        if(claim.current&&presentationOwner===claim.current)claim.current.exit=exit
+        await exit
+        if(!current())return
+        printFrame.current=requestAnimationFrame(()=>{
+          printFrame.current=null
+          if(current())window.print()
+        })
+      }else window.print()
+    }catch{
+      if(current()){
+        if(claim.current)claim.current.exit=null
+        setError('未能退出全屏，请退出全屏后重试打印。')
+      }
+    }
+    finally{if(current()){pending.current=false;setWorking(false)}}
   }
   return <article className="task-group-report" ref={root} aria-label="教师群体报告阅读">
     <header className="task-group-report__header"><div><p className="report-eyebrow">教师群体报告 · Form</p>
       <h2>{formTitle}</h2><p>活动：{report.sourceLabel??activityTitle} · {report.populationLabel??'全部合格参与教师'}</p>
       {released?<p>正式发布 {released}</p>:<p>历史规则汇总 · 原报告未记录发布时间</p>}
     </div><div className="task-group-report__actions">
-      <button type="button" onClick={()=>void fullscreen()}>全屏展示</button>
-      <button type="button" onClick={()=>window.print()}>打印 / 保存 PDF</button>
+      <button type="button" disabled={working} onClick={()=>void fullscreen()}>{presenting?'退出全屏':'全屏展示'}</button>
+      <button type="button" disabled={working} onClick={()=>void printReport()}>打印 / 保存 PDF</button>
     </div></header>
     {error&&<p role="status" className="task-group-report__actions">{error}</p>}
     <ReportMetricGrid><ReportMetric label="纳入参与者" value={report.independentRespondents??'受限展示'}/>

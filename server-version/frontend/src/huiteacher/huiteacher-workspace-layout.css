@@ -170,6 +170,10 @@
 .ht-workspace .ht-task:focus{outline:none}
 .ht-workspace .ht-task:focus-visible{outline:2px solid var(--ht-copper);outline-offset:4px}
 
+/* Status badges move as a whole when a growth action has a long title. */
+.ht-workspace .ht-growth .ht-event>strong{max-width:100%;vertical-align:middle;overflow-wrap:anywhere}
+.ht-workspace .ht-growth .ht-event>.ht-tag{display:inline-flex;align-items:center;max-width:100%;padding:3px 9px;font-size:12px;line-height:1.7;white-space:nowrap;vertical-align:middle}
+
 /* Compact lists keep the task action adjacent to its title until a narrow screen needs stacking. */
 @media(max-width:600px){
  .ht-assessment-source>.ht-event-list>.ht-event{grid-template-columns:minmax(0,1fr);padding:16px;gap:7px}

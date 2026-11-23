@@ -51,7 +51,7 @@ describe('Teacher participant host with synthetic runtime DTOs',()=>{
     const whole={...state('SCALE'),executionMode:'WHOLE_LOCAL' as const,currentItem:current}
     render(<HuiteacherMyAssessmentTasks api={fixture([whole]) as EducationReportApi} actorKey="teacher"/>)
     await open()
-    expect(await screen.findByText('共享单元：SCALE')).toBeTruthy()
+    expect(await screen.findByText('共享单元：SCALE',{}, {timeout:5000})).toBeTruthy()
   })
 
  it('runs Cognitive, SJT, Scale and Form transports and completes only after a fresh parent COMPLETED',async()=>{
