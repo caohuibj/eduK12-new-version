@@ -33,13 +33,14 @@ interface MediaSelectorProps {
   onSelect: (item: MediaItem) => void
   type: 'video' | 'image' | 'document' | 'all'
   initialTab?: 'library' | 'upload'
+  uploadOnly?: boolean
 }
 
-const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect, type, initialTab = 'library' }) => {
+const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect, type, initialTab = 'library', uploadOnly = false }) => {
   const isImageMode = type === 'image'
   const isDocumentMode = type === 'document'
   const training = isTrainingHost()
-  const [activeTab, setActiveTab] = useState<'library' | 'external' | 'upload'>(initialTab)
+  const [activeTab, setActiveTab] = useState<'library' | 'external' | 'upload'>(uploadOnly ? 'upload' : initialTab)
   const [videos, setVideos] = useState<VideoType[]>([])
   const [images, setImages] = useState<ImageItem[]>([])
   const [documents, setDocuments] = useState<DocumentType[]>([])
@@ -90,6 +91,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
   }, [isDocumentMode, isImageMode, searchKeyword])
 
   useEffect(() => {
+    if (uploadOnly && activeTab !== 'upload') { setActiveTab('upload'); return }
     if (isOpen && activeTab === 'library') {
       void fetchLibrary()
     }
@@ -100,13 +102,13 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
       setUploadProgress(0)
       setIsUploading(false)
       setUploadError('')
-      setActiveTab('library')
+      setActiveTab(uploadOnly ? 'upload' : initialTab)
       setSelectedVideo(null)
       setSelectedImage(null)
       setSelectedDocument(null)
     }
     return () => { requestRef.current += 1 }
-  }, [isOpen, activeTab, fetchLibrary])
+  }, [isOpen, activeTab, fetchLibrary, uploadOnly, initialTab])
 
   const filteredVideos = videos.filter(v =>
     v.title.toLowerCase().includes(searchKeyword.toLowerCase())
@@ -375,7 +377,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
 
         {/* Tabs */}
         <div className="flex border-b training-media-picker-tabs">
-          <button
+          {!uploadOnly && <button
             type="button"
             aria-pressed={activeTab === 'library'}
             onClick={() => setActiveTab('library')}
@@ -385,8 +387,8 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
           >
             {isDocumentMode ? <FileText className="w-4 h-4" /> : isImageMode ? <ImageIcon className="w-4 h-4" /> : <Video className="w-4 h-4" />}
             <span>{isDocumentMode ? '文档库' : isImageMode ? '图片库' : '视频库'}</span>
-          </button>
-          {!isImageMode && !isDocumentMode && (
+          </button>}
+          {!uploadOnly && !isImageMode && !isDocumentMode && (
             <button
               type="button"
               aria-pressed={activeTab === 'external'}

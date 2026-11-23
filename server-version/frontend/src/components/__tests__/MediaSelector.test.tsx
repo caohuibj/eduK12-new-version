@@ -115,3 +115,26 @@ describe('MediaSelector', () => {
     expect(onSelect).not.toHaveBeenCalled()
   })
 })
+
+it.each(['video','image','document'] as const)('keeps %s library-upload actions in upload-only mode across reopening',async type=>{
+ get.mockClear();post.mockClear();training.enabled=true
+ const onSelect=vi.fn(),onClose=vi.fn()
+ const view=render(<MediaSelector isOpen uploadOnly initialTab="upload" type={type} onSelect={onSelect} onClose={onClose}/>)
+ expect(screen.queryByRole('button',{name:/^(视频库|图片库|文档库|外部链接|选择)$/})).toBeNull()
+ expect(get).not.toHaveBeenCalled()
+ expect(onSelect).not.toHaveBeenCalled()
+ view.rerender(<MediaSelector isOpen={false} uploadOnly type={type} onSelect={onSelect} onClose={onClose}/>)
+ view.rerender(<MediaSelector isOpen uploadOnly type={type} onSelect={onSelect} onClose={onClose}/>)
+ expect(screen.queryByRole('button',{name:'外部链接'})).toBeNull()
+ expect(screen.getAllByRole('button',{name:'上传'})).toHaveLength(2)
+ expect(onSelect).not.toHaveBeenCalled()
+})
+
+it('keeps library selection available when an ordinary picker opens on the upload tab',async()=>{
+ get.mockReset();get.mockResolvedValue({code:0,data:{list:[]}});training.enabled=false
+ render(<MediaSelector isOpen initialTab="upload" type="image" onSelect={vi.fn()} onClose={vi.fn()}/>)
+ await userEvent.setup().click(screen.getByRole('button',{name:'图片库'}))
+ expect(await screen.findByText(/^暂无/)).toBeVisible()
+ expect(get).toHaveBeenCalledWith('/uploads/images',expect.anything())
+ expect(screen.getByRole('button',{name:'选择'})).toBeVisible()
+})

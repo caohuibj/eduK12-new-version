@@ -42,7 +42,11 @@ function operationRow(value:Operation,selected:Identity,mode:Operation['mode']):
 }
 
 function CognitiveIntakeWorkspace(){
+  const [query,setQuery]=useState('')
+  const selectionPanel=useRef<HTMLElement>(null)
   const [catalog,setCatalog]=useState<Catalog|null>(null),[selectedKey,setSelectedKey]=useState<string|null>(null)
+  useEffect(()=>{if(selectedKey){selectionPanel.current?.focus({preventScroll:true});selectionPanel.current?.scrollIntoView?.({block:'start',behavior:'smooth'})}},[selectedKey])
+  const filtered=catalog?.registered.filter(row=>[row.name,row.testType,row.configVersion,row.engineVersion,row.scoringVersion].join(' ').toLowerCase().includes(query.trim().toLowerCase()))
   const [preview,setPreview]=useState<InstallRow|null>(null),[busy,setBusy]=useState(false),[needsRefresh,setNeedsRefresh]=useState(false)
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const mounted=useRef(false),epoch=useRef(0),locked=useRef(false)
@@ -111,9 +115,12 @@ function CognitiveIntakeWorkspace(){
     <div className="sys-workspace"><div className="sys-content">
       <section className="sys-panel" aria-label="已登记认知候选">
         <div className="sys-section-heading"><div><h2><Brain size={18} aria-hidden="true"/>已登记候选</h2><p>每次只处理一个精确版本；其他任务的待审缺口不影响本列表。</p></div><span className="sys-badge">{catalog?`${catalog.registered.length} 项`:'正在读取'}</span></div>
+        <label className="system-field">检索认知候选<input type="search" value={query} onChange={event=>setQuery(event.target.value)} placeholder="名称、任务类型或版本"/></label>
+        {catalog&&<p role="status">找到 {filtered?.length??0} 项，共 {catalog.registered.length} 项。</p>}
+        {catalog&&filtered?.length===0&&query.trim()&&<p>没有符合条件的候选，请更换关键词。</p>}
         {!catalog&&<p role="status">{busy?'正在读取候选与安装状态…':'候选尚未读取，请刷新重试。'}</p>}
         {catalog&&!catalog.registered.length&&<p className="sys-empty">当前没有代码登记的推荐草稿。</p>}
-        <div className="sys-records">{catalog?.registered.map(row=><article className="sys-record" key={key(row)}><details>
+        <div className="sys-records">{filtered?.map(row=><article className="sys-record" key={key(row)}><details>
           <summary><span className="sys-record-heading"><strong>{row.name}</strong><small>{row.testType} · 配置 {row.configVersion}</small></span><span className="sys-record-state"><span className="sys-badge" data-status={row.plan.status}>{planLabel(row.plan)}</span><ChevronDown size={17} aria-hidden="true"/></span></summary>
           <div className="sys-record-body"><dl className="sys-facts"><div><dt>来源</dt><dd>当前代码登记</dd></div><div><dt>报告版本</dt><dd>{row.reportVersion??'未声明'}</dd></div>
             <div><dt>参数配置与预计时长</dt><dd>{row.profiles.map(profile=>`${profileLabel[profile.key]??profile.key}：${profile.estimatedMinutes[0]}–${profile.estimatedMinutes[1]} 分钟`).join('；')||'未声明'}</dd></div>
@@ -131,7 +138,7 @@ function CognitiveIntakeWorkspace(){
         <div className="sys-records">{catalog?.pending.map(row=><article className="sys-record" key={row.testType}><details><summary><span className="sys-record-heading"><strong>{row.testType}</strong><small>PR{row.sourcePR} · 待审核</small></span><ChevronDown size={17} aria-hidden="true"/></summary><div className="sys-record-body"><ul>{row.reasons.map((reason,index)=><li key={index}>{reason}</li>)}</ul></div></details></article>)}</div>
       </section>
     </div><aside className="sys-rail" aria-label="认知安装操作">
-      <section className="sys-panel"><h2>本次选择</h2>{selected?<><p>{selected.name} · 配置 {selected.configVersion}</p><p>{planLabel(selected.plan)}</p>
+      <section ref={selectionPanel} tabIndex={-1} aria-label="本次认知配置选择" className="sys-panel"><h2>本次选择</h2>{selected?<><p>{selected.name} · 配置 {selected.configVersion}</p><p>{planLabel(selected.plan)}</p>
         {preview&&<div role="status"><p>预览结果：{planLabel(preview)}</p>{preview.reasons.length>0&&<ul>{preview.reasons.map((reason,index)=><li key={index}>{reason}</li>)}</ul>}</div>}
         <button type="button" disabled={busy||needsRefresh} onClick={()=>void inspect()}>预览所选配置</button>
         {preview?.action==='CREATE_DRAFT'&&!needsRefresh&&<button type="button" className="sys-primary" disabled={busy} onClick={()=>void install()}>安装为草稿</button>}

@@ -51,3 +51,14 @@ describe('Survey cross-product origin and public projection regression',()=>{
     expect(originless.status).toHaveBeenCalledWith(403)
   })
 })
+
+it('admits the exact local Training origin only in development',()=>{
+ process.env.NODE_ENV='development'
+ const accepted=vi.fn();platformSurveyOriginGuard(request('http://training.localhost:5173'),response(),accepted)
+ expect(accepted).toHaveBeenCalledOnce()
+ for(const origin of ['http://training.localhost.attacker.test:5173','http://survey.localhost:5173']){
+  const denied=response();platformSurveyOriginGuard(request(origin),denied,vi.fn());expect(denied.status).toHaveBeenCalledWith(403)
+ }
+ process.env.NODE_ENV='production'
+ const denied=response();platformSurveyOriginGuard(request('http://training.localhost:5173'),denied,vi.fn());expect(denied.status).toHaveBeenCalledWith(403)
+})

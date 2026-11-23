@@ -20,7 +20,7 @@ function CourseRoster({course}:{course:Course}){
  const [rows,setRows]=useState<Member[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[revision,setRevision]=useState(0)
  useEffect(()=>{
   let active=true;setLoading(true);setError('')
-  void apiClient.get<{list:Member[]}>('/courses/'+encodeURIComponent(course.id)+'/students').then(response=>{
+  void apiClient.get<{list:Member[]}>('/admin/training/courses/'+encodeURIComponent(course.id)+'/students').then(response=>{
    if(response.code!==0)throw Error(response.message||'无法读取学员名单')
    if(active)setRows(response.data.list)
   }).catch(cause=>{if(active)setError(message(cause))}).finally(()=>{if(active)setLoading(false)})
@@ -69,7 +69,7 @@ export default function TrainingAdminCourses({pageTitle}:{pageTitle?:string}={})
   const sequence=++request.current;setLoading(true);setError('')
   const [sortBy,sortOrder]=sort.split(':')
   try{
-   const response=await apiClient.get<{list:Course[];total:number}>('/courses',{params:{keyword:filters.keyword||undefined,status:filters.status,excludeLibrary:!filters.includeLibrary,creatorId:filters.creatorId||undefined,sortBy,sortOrder,page,pageSize}})
+   const response=await apiClient.get<{list:Course[];total:number}>('/admin/training/courses',{params:{keyword:filters.keyword||undefined,status:filters.status,excludeLibrary:!filters.includeLibrary,creatorId:filters.creatorId||undefined,sortBy,sortOrder,page,pageSize}})
    if(sequence!==request.current)return
    if(response.code!==0)throw Error(response.message||'读取课程列表失败')
    setRows(response.data.list);setTotal(response.data.total)
@@ -99,7 +99,7 @@ export default function TrainingAdminCourses({pageTitle}:{pageTitle?:string}={})
   event.preventDefault();if(!editing||operation.current||!title.trim())return
   operation.current=true;setBusy(true);setEditorError('')
   try{
-   const response=await apiClient.put('/courses/'+encodeURIComponent(editing.id),{title:title.trim(),description:description.trim()})
+   const response=await apiClient.put('/admin/training/courses/'+encodeURIComponent(editing.id),{title:title.trim(),description:description.trim()})
    if(response.code!==0)throw Error(response.message||'保存失败')
    if(details?.id===editing.id)setDetails({...details,title:title.trim(),description:description.trim()})
    setEditing(null);success('课程信息已更新');await fetchCourses()
@@ -116,7 +116,7 @@ export default function TrainingAdminCourses({pageTitle}:{pageTitle?:string}={})
   operation.current=true;setBusy(true)
   try{
    if(!await confirm({title:options.title,body:<><strong>{course.title}</strong><p>{options.body}</p></>,confirmLabel:options.label,danger:action==='end'}))return
-   const response=await apiClient.post('/courses/'+encodeURIComponent(course.id)+'/'+action,{})
+   const response=await apiClient.post('/admin/training/courses/'+encodeURIComponent(course.id)+'/'+action,{})
    if(response.code!==0)throw Error(response.message||'操作失败')
    if(details?.id===course.id)setDetails({...details,isRecruiting:action==='resume-recruiting',status:action==='end'?'COMPLETED':details.status})
    success(options.done);await fetchCourses()

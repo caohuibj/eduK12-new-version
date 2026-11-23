@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ReportDetails, ReportDisclaimer, ReportMetric, ReportMetricGrid, ReportRangeTrack, ReportSection } from './ReportPrimitives'
 import './task-group-report.css'
 
@@ -27,16 +27,44 @@ export function TaskGroupReport({ artifact }: { artifact: TaskGroupArtifact }) {
   const [presentationError, setPresentationError] = useState('')
   const report = artifact.projection
   const metric = report.metrics.find(value => value.key === selected) ?? report.metrics[0]
+  useEffect(() => {
+    const page = document.documentElement
+    const sync = () => { if (document.fullscreenElement !== page) page.classList.remove('task-group-report-presenting') }
+    document.addEventListener('fullscreenchange', sync)
+    return () => {
+      document.removeEventListener('fullscreenchange', sync)
+      const ownsFullscreen = page.classList.contains('task-group-report-presenting')
+      page.classList.remove('task-group-report-presenting')
+      if (ownsFullscreen && document.fullscreenElement === page) void document.exitFullscreen().catch(() => {})
+    }
+  }, [])
   async function fullscreen() {
-    try { await root.current?.requestFullscreen(); setPresentationError('') }
-    catch { setPresentationError('浏览器未能进入全屏，可继续阅读或打印。') }
+    try {
+      // A non-root fullscreen element is forced into a viewport-sized fixed box
+      // by the browser and cannot paginate. Keep the report in document flow.
+      await document.documentElement.requestFullscreen()
+      document.documentElement.classList.add('task-group-report-presenting')
+      root.current?.scrollIntoView?.({block: 'start'})
+      setPresentationError('')
+    } catch { setPresentationError('浏览器未能进入全屏，可继续阅读或打印。') }
+  }
+  async function printReport() {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen()
+        // Wait for the fullscreen layout to be removed before printing.
+        requestAnimationFrame(() => window.print())
+      } else {
+        window.print()
+      }
+    } catch { setPresentationError('未能退出全屏，请退出全屏后重试打印。') }
   }
   return <article ref={root} className="task-group-report" aria-label="群体报告阅读">
     <header className="task-group-report__header"><div><p className="report-eyebrow">群体报告 · {report.tool.kind}</p>
       <h2>{report.title}</h2><p>{report.sourceLabel} · {report.populationLabel}</p>
       <p>数据截止 {date(report.cutoff)}</p></div>
       <div className="task-group-report__actions"><button type="button" onClick={() => void fullscreen()}>全屏展示</button>
-        <button type="button" onClick={() => window.print()}>打印 / 保存 PDF</button></div></header>
+        <button type="button" onClick={() => void printReport()}>打印 / 保存 PDF</button></div></header>
     {presentationError && <p role="status" className="task-group-report__actions">{presentationError}</p>}
     <ReportMetricGrid><ReportMetric label={report.countUnit === 'RESPONSE' ? '纳入答卷' : '纳入人数'} value={number(report.completedN)} />
       <ReportMetric label="报告生成" value={date(artifact.generatedAt)} />

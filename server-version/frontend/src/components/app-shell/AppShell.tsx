@@ -1,3 +1,4 @@
+import AdminStepUpRecovery from '../../admin/AdminStepUpRecovery'
 import SystemAdminShell from '../../admin/SystemAdminShell'
 import {isSystemWorkspacePath,isSystemLoginTarget} from '../../admin/systemWorkspace'
 import {isTrainingAdminPath} from '../../admin/trainingPages'
@@ -91,8 +92,10 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const staffMode=mode==='standard'&&(adminWorkspace||user?.role==='ADMIN'||user?.role==='TEACHER'), staffWorkspace=staffMode&&!training&&isStaffWorkspacePath(location.pathname)
   const routeOrganizationId=matchPath('/organizations/:organizationId/*',location.pathname)?.params.organizationId
   const displayOrganization=!routeOrganizationId||routeOrganizationId==='new'||activeOrganization?.organization.id===routeOrganizationId?activeOrganization:null
-  const items=adminWorkspace?adminNavigation(user):training?trainingNavigation(user?.role):[...navigationFor(user?.role,cognitive,relational.status==='available'),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole,directoryActions):[])]
-  if(!adminWorkspace){
+  const management=Boolean(user&&(user.platformRole==='SYSTEM_ADMIN'||user.entryGrants?.length)&&accountView(location.pathname,location.search)==='MANAGEMENT')
+  const home=management?(user?.platformRole==='SYSTEM_ADMIN'?'/admin/system':hasAdminEntry(user,'TRAINING')?'/admin/training/accounts':'/admin/entrances'):homeFor(user?.businessRole??user?.role)
+  const items=management?adminNavigation(user):training?trainingNavigation(user?.role):[...navigationFor(user?.role,cognitive,relational.status==='available'),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole,directoryActions):[])]
+  if(!management){
   items.push(...surveyGovernanceNavigation(Boolean(productOrigins()),user?.role,platformRole??user?.platformRole,user?.entryGrants))
   if(user?.platformRole==='SYSTEM_ADMIN')items.push({path:'/admin/permissions',label:'系统治理与入口授权',section:'system'},
     {path:'/admin/reporting-content',label:'报告方案与内容审核',section:'system'})
@@ -106,11 +109,12 @@ function AppShellContent({ children }: { children: ReactNode }) {
   if(!training&&parentPortalEnabled&&displayOrganization?.allowedActions.includes('PARENT_REPORT_PUBLICATION'))items.push({path:`/organizations/${encodeURIComponent(displayOrganization.organization.id)}/parent-reports`,label:'家长报告',section:'organization'})
   }
   const trainingWorkspace=training&&!surveyAdmin&&mode==='standard'&&(user?.role==='TEACHER'||user?.role==='STUDENT')
-  const identityLabel=user?`${user.nickname||user.username} · ${adminWorkspace?managementIdentityLabel(user):{STUDENT:training?'学员':'学生',TEACHER:training?'培训师':'教师',ADMIN:(platformRole??user.platformRole)==='SYSTEM_ADMIN'?'系统管理员':'Training 管理员',PARENT:'家长'}[user.role]}`:''
-  const profilePath=user?.role==='STUDENT'?'/student/profile':'/profile'
+  const identityLabel=user?`${user.nickname||user.username} · ${management?managementIdentityLabel(user):{STUDENT:training?'学员':'学生',TEACHER:training?'培训师':'教师',ADMIN:(platformRole??user.platformRole)==='SYSTEM_ADMIN'?'系统管理员':'Training 管理员',PARENT:'家长'}[user.role]}`:''
+  const profilePath=management&&hasAdminEntry(user,'TRAINING')?'/admin/training/profile':user?.role==='STUDENT'?'/student/profile':'/profile'
   const teacherFamily = teacherVisualFamily(location.pathname)
   const teacherVisual = trainingWorkspace && user?.role === 'TEACHER' && teacherFamily !== 'execution'
-  const active=activeNavigation(items,location.pathname), title=routeTitle(location.pathname,active), breadcrumbs=breadcrumbsFor(location.pathname,homeFor(user?.role),active,displayOrganization?.organization.name)
+  useEffect(()=>{if(management&&location.pathname==='/dashboard')navigate(home,{replace:true})},[management,location.pathname,home,navigate])
+  const active=activeNavigation(items,location.pathname), title=routeTitle(location.pathname,active), breadcrumbs=breadcrumbsFor(location.pathname,home,active,displayOrganization?.organization.name)
   const mainRef=useRef<HTMLElement>(null), toggleRef=useRef<HTMLButtonElement>(null), previousPath=useRef(location.pathname)
   const [openPath,setOpenPath]=useState<string|null>(null),[loggingOut,setLoggingOut]=useState(false),menuOpen=openPath===location.pathname
   const onNavigate=(path:string)=>{setOpenPath(null);if(path===location.pathname)mainRef.current?.focus()}
@@ -141,7 +145,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   if(mode==='display')return <>{children}</>
   return <div className={`hui-app hui-app--${mode}${roleClass}${staffMode?' hui-app--staff':''}${assessmentSurfaceClass}${reportSurfaceClass}${studentSubmitClass}${entryMode?' hui-app--entry':''}${training&&!surveyAdmin?' hui-training':''}${surveyAdmin?' hui-survey-admin-shell':''}${trainingAssessmentVisual?' training-assessment-visual':''}${trainingWorkspace?' training-workspace-shell':''}${teacherVisual?' training-teacher-visual':''}`} data-shell-mode={mode} data-training-theme={training && !surveyAdmin ? appearance.theme : undefined}>
     <div className="hui-product"><a className="hui-skip" href="#hui-main" onClick={()=>mainRef.current?.focus()}>跳到主要内容</a></div>
-    {!entryMode&&<header className={`hui-product hui-app-header${trainingWorkspace&&user?.role==='TEACHER'?' training-teacher-header':''}`}>{surveyAdmin&&origins?<SurveyBrand href={origins.survey+'/'}/>:mode==='focused'&&training?<Link className="hui-brand" to={homeFor(user?.role)}><TrainingBrand /></Link>:mode==='focused'?<span className="hui-brand">Huisurvey</span>:<Link className="hui-brand" to={homeFor(user?.role)}>{training?<TrainingBrand />:'Huisurvey'}</Link>}
+    {!entryMode&&<header className={`hui-product hui-app-header${trainingWorkspace&&user?.role==='TEACHER'?' training-teacher-header':''}`}>{surveyAdmin&&origins?<SurveyBrand href={origins.survey+'/'}/>:mode==='focused'&&training?<Link className="hui-brand" to={home}><TrainingBrand /></Link>:mode==='focused'?<span className="hui-brand">Huisurvey</span>:<Link className="hui-brand" to={home}>{training?<TrainingBrand />:'Huisurvey'}</Link>}
       {trainingWorkspace&&user?.role==='TEACHER'&&<TrainingWorkspaceTabs/>}
       {mode==='standard'&&!trainingWorkspace&&<ProductButton ref={toggleRef} className="hui-menu-toggle" aria-expanded={menuOpen} aria-controls="hui-navigation" onKeyDown={e=>{if(e.key==='Escape')setOpenPath(null)}} onClick={()=>setOpenPath(menuOpen?null:location.pathname)}><PanelLeft size={18} aria-hidden="true"/>导航菜单</ProductButton>}
       <div className="hui-account">{isPublicAssessmentPath(location.pathname)?<span>公开参与</span>:user?(trainingWorkspace?<Link className="training-account-link" to={profilePath} title="个人账号设置" aria-label={`${identityLabel}，个人账号设置`} aria-current={location.pathname===profilePath?'page':undefined}><UserRound size={19} aria-hidden="true"/><span>{identityLabel}</span></Link>:<span>{identityLabel}</span>):<span>欢迎使用</span>}
@@ -174,7 +178,7 @@ export default function AppShell({children}:{children:ReactNode}) {
   const surveyManagement=systemManagement||pathname===SURVEY_ADMIN_PATH||(pathname==='/admin/scale-library-governance'&&new URLSearchParams(search).get('workspace')==='survey')||(['/admin/login','/admin/security/enroll'].includes(pathname)&&new URLSearchParams(search).get('returnTo')===SURVEY_ADMIN_PATH)
   return <AccountViewProvider view={accountView(pathname,search)}><TrainingAppearanceProvider suspended={surveyManagement} management={isTrainingAdminPath(pathname)}><OrganizationProvider suspended={surveyManagement||(training && !requiresOrganization)}>
     <RelationalAvailabilityProvider suspended={surveyManagement||(training && !requiresRelational)}>
-      <AppShellContent>{children}</AppShellContent>
+      <AppShellContent>{children}</AppShellContent><AdminStepUpRecovery/>
     </RelationalAvailabilityProvider>
   </OrganizationProvider></TrainingAppearanceProvider></AccountViewProvider>
 }

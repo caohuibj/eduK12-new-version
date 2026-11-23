@@ -141,7 +141,7 @@ export const courseController = {
         : [{ createdAt: direction }, { id: direction }]
 
       // 构建缓存键
-      const cacheKey = `courses:list:${userRole}:${userId}:${status}:${page}:${pageSize}:${excludeLibrary ? 'courses' : 'all'}:${encodeURIComponent(keyword)}:${encodeURIComponent(creatorId)}:${sortBy}:${sortOrder}`
+      const cacheKey = `courses:list:${res.locals?.trainingOversight ? 'training-oversight:' : ''}${userRole}:${userId}:${status}:${page}:${pageSize}:${excludeLibrary ? 'courses' : 'all'}:${encodeURIComponent(keyword)}:${encodeURIComponent(creatorId)}:${sortBy}:${sortOrder}`
       
       // 尝试从缓存获取
       const cached = cache.get(cacheKey)
@@ -150,7 +150,9 @@ export const courseController = {
         return success(res, cached)
       }
 
-      let where: any = { courseType: { not: 'CAMPUS_ACTIVITY' } }
+      let where: any = res.locals?.trainingOversight
+        ? {courseType: {in: ['TRAINING_COURSE','LEGACY_COURSE']}, creator: {accountDomain: {in: ['TRAINING','LEGACY']}}}
+        : { courseType: { not: 'CAMPUS_ACTIVITY' } }
       if (excludeLibrary) where.isLibrary = false
       if (keyword) where.OR = [{title:{contains:keyword,mode:'insensitive'}},{description:{contains:keyword,mode:'insensitive'}},{courseCode:{contains:keyword,mode:'insensitive'}}]
 

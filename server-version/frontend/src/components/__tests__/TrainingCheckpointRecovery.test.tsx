@@ -149,6 +149,11 @@ describe('checkpoint recovery publication boundaries', () => {
      let rows: Array<{slotKey:string;answers:Record<string,unknown>}>
      if(kind==='unit'){const {slotKey}=await mountUnit('scale');rows=[{slotKey,answers:{q:{responseValue:1}}}]}
      else {const mounted=await mountWhole();rows=mounted.rows.map(row=>({...row,answers:{q:{responseValue:1}}}))}
+     if(kind==='unit'){
+       // The saved first answer now resumes at the unanswered second question.
+       await screen.findByRole('heading',{name:/Second question/})
+       fireEvent.click(screen.getByRole('button',{name:'上一题'}))
+     }
      await screen.findByRole('button',{name:'Two'})
      vi.useFakeTimers({toFake:['setTimeout','clearTimeout']})
      await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Two'})); await Promise.resolve()})

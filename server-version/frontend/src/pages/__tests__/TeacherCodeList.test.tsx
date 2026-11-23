@@ -155,3 +155,17 @@ describe('Training registration code pagination', () => {
     await waitFor(() => expect(mockGet).toHaveBeenLastCalledWith('/teacher-codes'))
   })
 })
+
+it('searches codes on the server, resets pagination and restores the complete list on clear',async()=>{
+ vi.clearAllMocks()
+ mockGet.mockImplementation((_path,options)=>Promise.resolve({code:0,data:{list:[{id:'code',code:'ABCD2345',isActive:true,maxUses:1,usedCount:0,createdAt:'2026-01-01T00:00:00Z'}],total:options?.params?.keyword?1:41}}))
+ const user=userEvent.setup();render(<TeacherCodeList training/>);await screen.findByText('ABCD2345')
+ await user.click(screen.getByRole('button',{name:'下一页'}))
+ await waitFor(()=>expect(mockGet).toHaveBeenLastCalledWith('/teacher-codes',{params:{page:2,pageSize:20}}))
+ await user.type(screen.getByRole('searchbox',{name:'检索注册码'}),'ABCD')
+ await user.click(screen.getByRole('button',{name:'搜索'}))
+ await waitFor(()=>expect(mockGet).toHaveBeenLastCalledWith('/teacher-codes',{params:{page:1,pageSize:20,keyword:'ABCD'}}))
+ await user.click(screen.getByRole('button',{name:'清除检索'}))
+ await waitFor(()=>expect(mockGet).toHaveBeenLastCalledWith('/teacher-codes',{params:{page:1,pageSize:20}}))
+ expect(screen.getByRole('searchbox')).toHaveValue('')
+})
