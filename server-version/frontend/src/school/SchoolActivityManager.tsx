@@ -11,6 +11,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import {SchoolTaskHelp} from './SchoolTaskHelp'
 import type { SchoolApi } from './SchoolRecovery'
 import { schoolActivityNextStep, schoolRunStatusText } from './school-activity-workflow'
+import {SchoolActivityContent} from './SchoolActivityContent'
 import CatalogDiscoveryFilters from '../components/scale-governance/CatalogDiscoveryFilters'
 import CatalogClassificationTags from '../components/scale-governance/CatalogClassificationTags'
 import {catalogQuery,EMPTY_CATALOG_FILTERS,EMPTY_CATALOG_FACETS,type CatalogFilters,type CatalogClassificationTag,type CatalogTagFacets} from '../api/catalogDiscovery'
@@ -91,6 +92,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   const [peersPerRespondent,setPeersPerRespondent]=useState(1)
   const [activityInputs,setActivityInputs]=useState<Record<string,ActivityInputs>>({})
   const [panel,setPanel]=useState<ActivityPanel>('participants')
+  const [contentRevision,setContentRevision]=useState(0)
   const createPanel=useRef<HTMLDetailsElement>(null)
   const inputKey=actorKey+':'+organizationId+':'+(selected?.courseId??'')
   const {taskTitle,taskContent,taskKind,runTitle}=activityInputs[inputKey]??emptyActivityInputs
@@ -232,6 +234,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     if(!selected)return
     await api(path+'/tasks','POST',{kind:taskKind,title:taskTitle,content:taskContent})
     setTaskTitle('');setTaskContent('')
+    setContentRevision(value=>value+1)
     setNotice(compact?`已加入「${selected.title}」的活动内容。发布活动前学生不可见。`:'已加入活动内容。发布活动前学生不可见。')
   })
   const newRun=()=>void execute(async()=>{
@@ -356,6 +359,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
         · 关联测评 {selected.runs.length} 项</p>
       {!compact&&lifecycleControls}
       {compact&&<nav className="hs-activity-config-tabs" aria-label="活动配置分区">{activityPanels.map(item=><button type="button" key={item.id} aria-pressed={panel===item.id} aria-controls={'hs-activity-panel-'+item.id} onClick={()=>setPanel(item.id)}>{item.label}</button>)}</nav>}
+      {compact&&<section className="hs-panel" aria-label="活动状态操作"><h3>活动状态与下一步</h3>{lifecycleControls}</section>}
       <section className="hs-activity-config-panel" id="hs-activity-panel-participants" aria-label="班级与参与者" hidden={compact&&panel!=='participants'}>
         {compact&&selected.status!=='DRAFT'&&<p>当前活动已离开准备阶段，参与范围按现有班级分配保留。</p>}
         {selected.status==='DRAFT'&&<>
@@ -398,6 +402,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
       </section>}
       </section>
       <section className="hs-activity-config-panel" id="hs-activity-panel-content" aria-label="阅读、练习与打卡" hidden={compact&&panel!=='content'}>
+        {(!compact||panel==='content')&&<SchoolActivityContent key={path} api={api} path={path} editable={selected.status==='DRAFT'} disabled={busy} revision={contentRevision}/>}
         {selected.status==='DRAFT'&&<ActivityLayout compact={compact} className="hs-activity-content-create">{!compact&&<h3>添加活动内容</h3>}
         <label className="hs-field hs-activity-content-kind"><span>任务类型</span>
           <select value={taskKind} onChange={event=>setTaskKind(event.target.value as typeof taskKind)}>
@@ -553,7 +558,6 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
       </div>}
       </section>
       <section className="hs-activity-config-panel" id="hs-activity-panel-results" aria-label="活动进度与结果" hidden={compact&&panel!=='results'}>
-        {compact&&lifecycleControls}
       <section aria-label="进度与结果说明">
         <h3>3. 进度 · 核对参与与作答</h3>
         <p>当前授权学生人数和批次发布状态不是完成率。本页不展示个体心理作答或报告。</p>

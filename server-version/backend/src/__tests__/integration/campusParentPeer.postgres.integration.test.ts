@@ -141,6 +141,7 @@ suite('Campus parent identity / peer consent and cohort constraints — isolated
     const pending=await readCampusParentLinks(f.students[0])
     expect(pending.list).toHaveLength(1)
     expect(pending.list[0].status).toBe('PENDING')
+    expect(pending.list[0].counterpartLabel).toBe('家长账号 · '+login)
     const reportGrants=await db.$queryRaw<Array<{count:number}>>`
       SELECT COUNT(*)::int AS "count" FROM "parent_report_disclosure_grants"
       WHERE "parent_user_id"=${alias.userId}
@@ -150,6 +151,7 @@ suite('Campus parent identity / peer consent and cohort constraints — isolated
       LINK_CONSENT_VERSION)
     const approved=await readCampusParentLinks(principal(alias.user))
     expect(approved.list[0].status).toBe('ACTIVE')
+    expect(approved.list[0].counterpartLabel).toMatch(/^孩子 · 林-[A-F0-9]{12}$/)
     await revokeCampusParentLink(f.students[0],pending.list[0].id,
       'school student revoked link')
     expect((await readCampusParentLinks(principal(alias.user))).list[0].status).toBe('REVOKED')
@@ -210,7 +212,10 @@ suite('Campus parent identity / peer consent and cohort constraints — isolated
         AND "status"='ACTIVE'
     `
     expect(remain[0]?.count).toBeLessThan(10)
-    expect((await guardianPeerRequests(parentAccounts[0])).list).toHaveLength(1)
+    const requests=await guardianPeerRequests(parentAccounts[0])
+    expect(requests.list).toHaveLength(1)
+    expect(requests.list[0].childLabel).toMatch(/^孩子 · 林-[A-F0-9]{12}$/)
+    expect(requests.list[0]).not.toHaveProperty('studentUserId')
     expect((await campusPeerOpportunities(f.students[0])).list).toHaveLength(1)
     // A school pause must NOT trap previously granted pupil consent.
     await changeCampusActivityStatus({

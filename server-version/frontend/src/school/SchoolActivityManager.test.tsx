@@ -42,7 +42,7 @@ describe('Huischool Activity peer allocation after reopen',()=>{
 describe('School activity and assessment states',()=>{
   it.each(['PAUSED','CLOSED'])('keeps %s batch status without requesting forbidden details',async(status)=>{
     const detail={...activity,status,runs:[{runId:'run-a',name:'适应测评',status:'PUBLISHED'}]}
-    const api=vi.fn(async(path:string)=>path.endsWith('/tracking')?{baselineId:null,ordinal:null,choices:[]}:path.endsWith('pageSize=50')?{list:[detail]}:detail)
+    const api=vi.fn(async(path:string)=>path.endsWith('/tasks')?{list:[],truncated:false}:path.endsWith('/tracking')?{baselineId:null,ordinal:null,choices:[]}:path.endsWith('pageSize=50')?{list:[detail]}:detail)
     render(<SchoolActivityManager api={api as unknown as SchoolApi} organizationId={org} isAdmin classes={[]}/>)
     fireEvent.change(await screen.findByLabelText('选择已有活动'),{target:{value:course}})
     const batch=await screen.findByRole('button',{name:'适应测评 · 已发布'})
@@ -56,7 +56,7 @@ describe('School activity and assessment states',()=>{
   })
   it('explains the separate publication step after an activity opens',async()=>{
     const detail={...activity,runs:[{runId:'run-a',name:'适应测评',status:'DRAFT'}]}
-    const api=vi.fn(async(path:string)=>path.endsWith('pageSize=50')?{list:[detail]}:detail)
+    const api=vi.fn(async(path:string)=>path.endsWith('/tasks')?{list:[],truncated:false}:path.endsWith('pageSize=50')?{list:[detail]}:detail)
     render(<SchoolActivityManager api={api as unknown as SchoolApi} organizationId={org} isAdmin={false} classes={[]}/>)
     fireEvent.change(await screen.findByLabelText('选择已有活动'),{target:{value:course}})
     expect(await screen.findByText(/活动已开放，但仍有测评批次未发布/)).toBeInTheDocument()
@@ -157,6 +157,7 @@ describe('School psychologist backend operation capabilities',()=>{
     const detail={...activity,status:'SUBMITTED',capabilities}
     const api=vi.fn(async(path:string,method='GET')=>{
       if(path.endsWith('pageSize=50'))return {list:[detail]}
+      if(path.endsWith('/tasks'))return {list:[],truncated:false}
       if(path.endsWith('/govern')&&method==='POST')return {status:'OPEN',version:3}
       return detail
     })
@@ -168,7 +169,7 @@ describe('School psychologist backend operation capabilities',()=>{
   })
   it('does not infer control from administrator prop when backend capabilities deny it',async()=>{
     const detail={...activity,status:'SUBMITTED',capabilities:{...capabilities,canOpen:false,canClose:false,ownPsychologyPublisher:false}}
-    const api=vi.fn(async(path:string)=>path.endsWith('pageSize=50')?{list:[detail]}:detail)
+    const api=vi.fn(async(path:string)=>path.endsWith('/tasks')?{list:[],truncated:false}:path.endsWith('pageSize=50')?{list:[detail]}:detail)
     render(<SchoolActivityManager api={api as unknown as SchoolApi} organizationId={org} isAdmin classes={[]}/>)
     fireEvent.change(await screen.findByLabelText('选择已有活动'),{target:{value:course}})
     await screen.findByText(/状态：学校审核中/)
@@ -178,7 +179,7 @@ describe('School psychologist backend operation capabilities',()=>{
   it('closes an owned paused batch from activity facts without fetching forbidden run details',async()=>{
     const detail={...activity,status:'PAUSED',capabilities:{...capabilities,canOpen:false,canResume:true},
       runs:[{runId:'run-own',name:'本人测评',status:'PUBLISHED',capabilities:{canPublish:false,canClose:true,canCancel:true}}]}
-    const api=vi.fn(async(path:string)=>path.endsWith('pageSize=50')?{list:[detail]}:detail)
+    const api=vi.fn(async(path:string)=>path.endsWith('/tasks')?{list:[],truncated:false}:path.endsWith('pageSize=50')?{list:[detail]}:detail)
     const original=window.confirm;window.confirm=vi.fn(()=>true)
     try{
       render(<SchoolActivityManager api={api as unknown as SchoolApi} organizationId={org} isAdmin={false} classes={[]}/>)
@@ -197,6 +198,7 @@ it('publishes own psychologist batch using server run capabilities without isAdm
   const base=`/organizations/${org}/activities/${course}`
   const api=vi.fn(async(path:string)=>{
     if(path.endsWith('pageSize=50'))return {list:[detail]}
+    if(path.endsWith('/tasks'))return {list:[],truncated:false}
     if(path===base+'/runs/run-own')return {run:{id:'run-own',name:'本人测评',status:'DRAFT',version:2}}
     if(path.endsWith('/tracking'))return {baselineId:null,ordinal:null,choices:[]}
     if(path.endsWith('/preview'))return {tracks:[{executionCount:1,subjectCount:1,respondentCount:1}]}
@@ -220,6 +222,7 @@ it('separates compact configuration and preserves unsaved inputs per activity wi
  const other={...draft,courseId:second,title:'学习安排'}
  const api=vi.fn(async(path:string)=>{
   if(path.endsWith('pageSize=50'))return {list:[draft,other]}
+  if(path.endsWith('/tasks'))return {list:[],truncated:false}
   if(path.endsWith('/eligible-classes'))return {list:[{id:classUnit,name:'五年级一班'}]}
   if(path.endsWith('/'+second))return other
   if(path.endsWith('/'+course))return draft
@@ -236,7 +239,7 @@ it('separates compact configuration and preserves unsaved inputs per activity wi
  }
  await choose(course,'同伴支持')
  expect(screen.getByRole('button',{name:'班级与参与者'})).toHaveAttribute('aria-pressed','true')
- expect(screen.queryByRole('button',{name:'提交学校审核'})).not.toBeInTheDocument()
+ expect(screen.getByRole('button',{name:'提交学校审核'})).toBeVisible()
  fireEvent.click(screen.getByRole('button',{name:'阅读／练习／打卡'}))
  expect(screen.getByRole('region',{name:'阅读、练习与打卡'})).toBeVisible()
  fireEvent.change(screen.getByLabelText('任务名称'),{target:{value:'活动A未保存标题'}})
@@ -260,7 +263,7 @@ it('separates compact configuration and preserves unsaved inputs per activity wi
 })
 
 
-it.each([true,false])('keeps compact psychologist lifecycle controls in the results panel and honors backend canOpen=%s',async canOpen=>{
+it.each([true,false])('keeps compact lifecycle controls visible across panels and honors backend canOpen=%s',async canOpen=>{
  const detail={...activity,status:'SUBMITTED',runs:[],capabilities:{canOpen,canSubmit:false,canClose:false,canPause:false,canResume:false,canPublishRun:false,ownPsychologyPublisher:true}}
  const api=vi.fn(async(path:string)=>path.endsWith('pageSize=50')?{list:[detail]}:detail)
  render(<SchoolActivityManager compact api={api as unknown as SchoolApi} organizationId={org} isAdmin={false} classes={[]}/>)
@@ -274,7 +277,13 @@ it.each([true,false])('keeps compact psychologist lifecycle controls in the resu
  fireEvent.click(await screen.findByRole('button',{name:'配置活动：同伴支持'}))
  await screen.findByRole('heading',{name:'同伴支持'})
  expect(screen.getByRole('button',{name:'班级与参与者'})).toHaveAttribute('aria-pressed','true')
- expect(screen.queryByRole('button',{name:'开放本人活动'})).not.toBeInTheDocument()
+ const controls=screen.getByRole('region',{name:'活动状态操作'})
+ expect(controls).toBeVisible()
+ if(canOpen)expect(screen.getByRole('button',{name:'开放本人活动'})).toBeVisible()
+ else expect(screen.queryByRole('button',{name:'开放本人活动'})).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'正式测评批次'}))
+ expect(controls).toBeVisible()
+ if(canOpen)expect(screen.getByRole('button',{name:'开放本人活动'})).toBeEnabled()
  fireEvent.click(screen.getByRole('button',{name:'进度与结果说明'}))
  expect(screen.getByRole('region',{name:'活动进度与结果'})).toBeVisible()
  expect(screen.queryByRole('region',{name:'阅读、练习与打卡'})).not.toBeInTheDocument()

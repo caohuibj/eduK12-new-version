@@ -25,6 +25,7 @@ async function open(isAdmin:boolean){
   const detail={run:{id:runId,name:'观察批次',status:'DRAFT',version:2},tracks:[]}
   const api=vi.fn(async(path:string,method='GET')=>{
     if(path===base+'?page=1&pageSize=50')return {list:[activity]}
+    if(method==='GET'&&path===base+'/'+courseId+'/tasks')return {list:[],truncated:false}
     if(path===base+'/'+courseId)return activity
     if(path===base+'/'+courseId+'/eligible-classes')return {list:[]}
     if(path===base+'/'+courseId+'/runs/'+runId)return detail

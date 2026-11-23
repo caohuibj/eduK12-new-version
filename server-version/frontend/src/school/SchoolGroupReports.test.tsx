@@ -4,7 +4,7 @@ import {SchoolGroupReports} from './SchoolGroupReports'
 import type {SchoolApi} from './SchoolRecovery'
 const org='org',run='run',track='track',spec='spec'
 const leaf={slotKey:'scale:a',unitType:'SCALE',instrumentKey:'a',instrumentVersion:'1',compiledRuntimeHash:'a'.repeat(64)}
-const catalog={specs:[{specId:spec,title:'正式方案',version:1,metricIds:['score']}],sources:[{runId:run,trackId:track,name:'任务甲',resource:{family:'BUNDLE',key:'bundle',version:'1'}}],artifacts:[],truncated:false}
+const catalog={specs:[{specId:spec,title:'正式方案',version:1,metricIds:['score']}],sources:[{runId:run,trackId:track,name:'任务甲',resource:{family:'BUNDLE',key:'bundle',version:'1',title:'问卷甲',versionLabel:'修订 2'}}],artifacts:[],truncated:false}
 const report={artifactId:'artifact',generatedAt:'2026-10-30T00:00:00Z',projection:{title:'学校群体报告',sourceLabel:'工具甲',cutoff:'2026-10-30T00:00:00Z',populationLabel:'冻结子群',completedN:10,countUnit:'PERSON',assignedN:10,tool:{key:'a',title:'甲',kind:'SCALE'},metrics:[{key:'score',label:'score',type:'NUMBER',unit:'score',validN:10,missingN:0,mean:0,sdSample:1,range:null,observedRange:null,qualityCounts:{},measurement:leaf,frequencies:[]}],limitations:['不作因果结论']}}
 const tools={tools:[{leaf,metrics:[{key:'score',unit:'score'}]}],groups:{options:[{kind:'CLASSES',id:'class-a',name:'一班',dimensionId:null,dimensionName:null}],limitations:['按任务发布时分组']}}
 describe('School group workbench',()=>{
@@ -44,7 +44,7 @@ describe('School group workbench',()=>{
   })
   render(<SchoolGroupReports api={api as SchoolApi} organizationId={org}/>)
   fireEvent.click(await screen.findByRole('button',{name:'加载更多测评来源'}))
-  expect(await screen.findByRole('option',{name:'任务甲 · bundle'})).toBeInTheDocument()
+   expect(await screen.findByRole('option',{name:'任务甲 · 问卷甲 · 修订 2'})).toBeInTheDocument()
   expect(screen.queryByRole('button',{name:'加载更多测评来源'})).not.toBeInTheDocument()
   expect(api.mock.calls.map(([path])=>path)).toEqual(['/reports/groups/catalog?organizationId=org','/reports/groups/sources?organizationId=org&page=2'])
  })

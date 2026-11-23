@@ -1,9 +1,24 @@
 import { describe,it,expect,vi } from 'vitest'
-import { fireEvent,render,screen,waitFor } from '@testing-library/react'
+import { fireEvent,render,screen,waitFor,within } from '@testing-library/react'
 import { SchoolParentRegistration, SchoolParentLinks } from './SchoolParentPortal'
 import type { SchoolApi } from './SchoolRecovery'
 
 describe('Huischool independent parent onboarding',()=>{
+  it('identifies children with stable labels and confirms revocation of the selected relationship',async()=>{
+    const confirm=vi.spyOn(window,'confirm').mockReturnValue(true)
+    const links=[{id:'link-a',status:'ACTIVE',approvedAt:'2026-11-23',counterpartLabel:'孩子 · 林-AAAAAAAAAAAA'},
+      {id:'link-b',status:'ACTIVE',approvedAt:'2026-11-23',counterpartLabel:'孩子 · 林-BBBBBBBBBBBB'}]
+    const api=vi.fn(async(path:string,method='GET')=>{
+      if(method==='POST'){expect(path).toBe('/parent-links/link-b/revoke');return {}}
+      return path==='/parent-links'?{list:links,truncated:false,canApprove:false}:{version:'v1',text:'关系确认',reminder:'独立授权'}
+    })
+    render(<SchoolParentLinks api={api as SchoolApi} role="PARENT"/>)
+    const label=await screen.findByRole('heading',{name:'孩子 · 林-BBBBBBBBBBBB'})
+    fireEvent.click(within(label.closest('.hs-task-card') as HTMLElement).getByRole('button',{name:'撤销关联'}))
+    await waitFor(()=>expect(api).toHaveBeenCalledWith('/parent-links/link-b/revoke','POST',expect.anything()))
+    expect(confirm).toHaveBeenCalledWith(expect.stringContaining('孩子 · 林-BBBBBBBBBBBB'))
+    confirm.mockRestore()
+  })
   it('requires explicit guardian acknowledgement and never calls legacy registration',async()=>{
     const api=vi.fn(async(_path:string)=>({status:'PENDING_STUDENT_CONFIRMATION'}))
     const complete=vi.fn()

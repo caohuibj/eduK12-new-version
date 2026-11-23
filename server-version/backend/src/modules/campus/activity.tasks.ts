@@ -4,9 +4,13 @@ import {completedSchoolOrdinaryFeedbackSql} from '../assessment-run/completedSch
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
 import { withBoundedPlannerRead } from '../assessment-run/plannerBound'
 import { Prisma } from '@prisma/client'
+import { randomUUID } from 'node:crypto'
+import {readCampusSourceLabels,campusSourceLabelKey} from './source-labels'
+import {campusStudentReference} from './studentReference'
 import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
 import { lockAndAssertCampusActivityEditor, CampusActivityError } from './activity.service'
+import { appendAudit } from '../organization/service'
 import { listAssignedRunTasks, listSchoolStudentRunTasks, type RunTaskCursor } from '../assessment-run/productRead'
 
 const deny=(code:string,status=409):never=>{throw new CampusActivityError(code,status)}
@@ -40,6 +44,50 @@ export async function addCampusActivityTask(input:{
       tags:input.kind==='READING'?['CAMPUS_READING']:[],
     }})
     return {id:row.id,kind:input.kind,title:row.title}
+  })
+}
+
+type ContentScope={actor:AuthenticatedPrincipal;organizationId:string;courseId:string}
+export async function listCampusActivityContent(input:ContentScope){
+  return prisma.$transaction(async tx=>{
+    await lockAndAssertCampusActivityEditor(tx,input)
+    const [assignments,checkins]=await Promise.all([
+      tx.assignment.findMany({where:{courseId:input.courseId},orderBy:[{createdAt:'asc'},{id:'asc'}],take:201,
+        select:{id:true,title:true,content:true,tags:true,updatedAt:true}}),
+      tx.checkin.findMany({where:{courseId:input.courseId},orderBy:[{createdAt:'asc'},{id:'asc'}],take:201,
+        select:{id:true,title:true,content:true,updatedAt:true}}),
+    ])
+    return {list:[...assignments.slice(0,200).map(({tags,...row})=>({...row,kind:tags.includes('CAMPUS_READING')?'READING' as const:'ASSIGNMENT' as const})),
+      ...checkins.slice(0,200).map(row=>({...row,kind:'CHECKIN' as const}))],truncated:assignments.length>200||checkins.length>200}
+  })
+}
+export async function changeCampusActivityContent(input:ContentScope&{
+  kind:CampusTaskType;taskId:string;expectedUpdatedAt:Date;action:'UPDATE'|'REMOVE';title?:string;content?:string
+}){
+  if(input.action==='UPDATE'&&(!input.title?.trim()||input.title.length>200||(input.content?.length??0)>25000))deny('ACTIVITY_TASK_INVALID',400)
+  return prisma.$transaction(async tx=>{
+    const {activity}=await lockAndAssertCampusActivityEditor(tx,input)
+    if(activity.status!=='DRAFT')deny('ACTIVITY_TASK_FROZEN')
+    const checkin=input.kind==='CHECKIN'
+    const row=checkin
+      ?await tx.checkin.findFirst({where:{id:input.taskId,courseId:input.courseId},include:{_count:{select:{submissions:true,accessTokens:true}}}})
+      :await tx.assignment.findFirst({where:{id:input.taskId,courseId:input.courseId},include:{_count:{select:{submissions:true}}}})
+    if(!row)return deny('ACTIVITY_TASK_NOT_FOUND',404)
+    if(!checkin&&row.tags.includes('CAMPUS_READING')!==(input.kind==='READING'))deny('ACTIVITY_TASK_NOT_FOUND',404)
+    if(row.updatedAt.getTime()!==input.expectedUpdatedAt.getTime())deny('ACTIVITY_TASK_STALE')
+    if(row._count.submissions||('accessTokens'in row._count&&row._count.accessTokens))deny('ACTIVITY_TASK_HAS_RECORDS')
+    if(input.action==='REMOVE'){
+      if(checkin)await tx.checkin.delete({where:{id:row.id}})
+      else await tx.assignment.delete({where:{id:row.id}})
+    }else{
+      const data={title:input.title!.trim(),content:input.content?.trim()??null,updatedAt:new Date(Math.max(Date.now(),row.updatedAt.getTime()+1))}
+      if(checkin)await tx.checkin.update({where:{id:row.id},data})
+      else await tx.assignment.update({where:{id:row.id},data})
+    }
+    await appendAudit(tx,{organizationId:input.organizationId,actorUserId:input.actor.userId,
+      action:input.action==='REMOVE'?'CAMPUS_DRAFT_CONTENT_REMOVED':'CAMPUS_DRAFT_CONTENT_UPDATED',
+      targetType:'ACTIVITY_TASK',targetId:row.id,domainEventId:randomUUID(),payload:{kind:input.kind,courseId:input.courseId}})
+    return {changed:true}
   })
 }
 
@@ -311,6 +359,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
   if(!ids.length)return {list:[],total:0,page:input.page,hasMore:false,truncated:activityRows.length>200,nextRunCursor:null as RunTaskCursor|null}
   const runMap=new Map(linkedRuns.map(r=>[r.runId,r.courseId]))
   const activityMap=new Map(authorized.map(a=>[a.courseId,a]))
+  const sourceLabels=await readCampusSourceLabels(prisma,assigned.list.map(e=>({organizationId:e.organizationId,key:e.resourceKey,family:e.resourceFamily})))
   const tasks:Array<{
     id:string;activityId:string;activityTitle:string;kind:CampusTaskType|'MEASUREMENT'
     title:string;status:'PENDING'|'COMPLETED'|'EXPIRED'|'IN_PROGRESS'|'UNAVAILABLE'
@@ -350,7 +399,8 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
       e.status==='ASSIGNED'?'PENDING':
       e.status==='EXPIRED'?'EXPIRED':'UNAVAILABLE'
     tasks.push({id:e.executionId,activityId:courseId,activityTitle:activity.title,
-      kind:'MEASUREMENT',resourceFamily:e.resourceFamily,title:e.runName,status,
+      kind:'MEASUREMENT',resourceFamily:e.resourceFamily,
+      title:(sourceLabels.get(campusSourceLabelKey({organizationId:e.organizationId,key:e.resourceKey}))?.title??'测评工具')+' · '+e.runName,status,
       ...(e.resourceKey?.startsWith('education-assessment:')?{feedbackNamespace:'EDUCATION_ASSESSMENT' as const}:{}),
       ...(e.resourceKey?.startsWith('education-composition:SCHOOL:')?{feedbackNamespace:'EDUCATION_ASSESSMENT' as const,feedbackMode:'COMPOSITION' as const}:{}),
       ...(e.receiptOnly ? {receiptOnly:true as const}:{}),
@@ -457,11 +507,12 @@ export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal,curs
       executionId:t.executionId,runId:t.runId,
       organizationId:activity.organizationId,activityId:activity.courseId,
       activityTitle:activity.activityTitle,runTitle:t.runName,
+      childLabel:'孩子 · '+campusStudentReference(activity.organizationId,t.subjectUserId),
       status:t.status,deadline:t.deadline?.toISOString()??null,
       ...(t.resourceKey?.startsWith('education-composition:SCHOOL:')?{feedbackNamespace:'EDUCATION_ASSESSMENT' as const,feedbackMode:'COMPOSITION' as const}:{}),
       canResumeExisting:t.canResumeExisting,consentRequired:t.consentRequired,consentPurpose:t.consentPurpose,
       consentVisibility:t.consentVisibility,
-      // No child identifiers, reports, psychometric scores or raw responses.
+      // No internal child identifiers, reports, psychometric scores or raw responses.
     }
   })
   const last=indexed[indexed.length-1]
