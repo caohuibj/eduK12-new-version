@@ -7,7 +7,12 @@ const b={...a,courseId:'b',title:'Beta 家校',purpose:'FAMILY_SUPPORT',status:'
 const base='/organizations/org/activities'
 
 it('searches normalized text, sorts loaded activities and switches views without new reads or writes',async()=>{
- const api=vi.fn(async(path:string)=>path.endsWith('pageSize=50')?{list:[b,a],hasMore:false}:path.endsWith('/eligible-classes')?{list:[]}:a)
+ const api=vi.fn(async(path:string)=>{
+  if(path.endsWith('pageSize=50'))return {list:[b,a],hasMore:false}
+  if(path.endsWith('/tasks'))return {list:[],truncated:false}
+  if(path.endsWith('/eligible-classes'))return {list:[]}
+  return a
+ })
  const view=render(<SchoolActivityManager compact api={api as unknown as SchoolApi} organizationId="org" isAdmin classes={[]}/>)
  await screen.findByRole('button',{name:'配置活动：Alpha 校园'})
  expect(screen.queryByRole('heading',{name:'活动列表'})).not.toBeInTheDocument()

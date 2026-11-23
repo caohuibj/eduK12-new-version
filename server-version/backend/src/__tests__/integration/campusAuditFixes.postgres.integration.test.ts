@@ -7,7 +7,7 @@ import {createCampusActivity,changeCampusActivityStatus} from '../../modules/cam
 import {addCampusActivityTask,listCampusActivityContent,changeCampusActivityContent} from '../../modules/campus/activity.tasks'
 import {listSchoolMfaResets,requestSchoolMfaReset,approveSchoolMfaReset} from '../../modules/campus/recovery.service'
 import type {AuthenticatedPrincipal} from '../../types'
-const url=integrationDatabaseUrl('SCHOOL_AUDIT_FIX_DATABASE_URL'),suite=url?describe:describe.skip
+const url=integrationDatabaseUrl('SCHOOL_AUDIT_FIX_DATABASE_URL','RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
 let db:PrismaClient,organizationId:string,admin:AuthenticatedPrincipal,second:AuthenticatedPrincipal,target:AuthenticatedPrincipal
 const actor=(u:{id:string;username:string;role:UserRole}):AuthenticatedPrincipal=>({userId:u.id,username:u.username,role:u.role,
  platformRole:'STANDARD',accountDomain:'SCHOOL',tokenVersion:0,mustChangePassword:false})
