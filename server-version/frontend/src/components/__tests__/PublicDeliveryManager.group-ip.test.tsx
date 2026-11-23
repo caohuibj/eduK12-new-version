@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { dateTimeInputValue } from '../../utils/dateTime'
 import { PublicDeliveryManager } from '../PublicDeliveryManager'
 const api=vi.hoisted(()=>({get:vi.fn(),post:vi.fn(),delete:vi.fn()}))
 vi.mock('../../api/client',()=>({default:api,sessionFetch:vi.fn()}))
@@ -9,7 +10,7 @@ const now=Date.parse('2026-10-19T00:00:00Z')
 const row={id:'link',token:'real-token',createdAt:null,expiresAt:'2026-10-19T01:00:00Z',maxUses:0,usedCount:0,isActive:true,roundId:'frozen-round',groupIpWindow:{opensAt:'2026-10-19T00:00:00Z',closesAt:'2026-10-19T01:00:00Z'}}
 beforeEach(()=>{vi.clearAllMocks();vi.spyOn(Date,'now').mockReturnValue(now);api.get.mockResolvedValue({code:0,data:{list:[]}});api.post.mockResolvedValue({code:0,data:row})})
 async function ready(){await screen.findByText('尚未生成链接')}
-function expiry(){fireEvent.change(screen.getByLabelText('有效期'),{target:{value:'2026-10-19T01:00'}})}
+function expiry(){fireEvent.change(screen.getByLabelText('有效期'),{target:{value:dateTimeInputValue('2026-10-19T01:00:00Z')}})}
 it('defaults off and sends policy only after explicit opt-in',async()=>{
  render(<PublicDeliveryManager family="COMPOSITE" resourceId="task" groupIpEligible />)
  await ready();expiry()
@@ -36,10 +37,10 @@ it('does not expose opt-in without verified Training eligibility or for other fa
 it('rejects overlong windows and task cutoff before creating any link',async()=>{
  render(<PublicDeliveryManager family="COMPOSITE" resourceId="task" groupIpEligible maximumExpiry="2026-10-22T00:00:00Z" />)
  await ready();fireEvent.click(screen.getByRole('checkbox'))
- fireEvent.change(screen.getByLabelText('有效期'),{target:{value:'2026-10-21T01:00'}})
+ fireEvent.change(screen.getByLabelText('有效期'),{target:{value:dateTimeInputValue('2026-10-21T01:00:00Z')}})
  fireEvent.click(screen.getByRole('button',{name:'生成新链接'}))
  expect(await screen.findByRole('alert')).toHaveTextContent('最长为 48 小时')
- fireEvent.change(screen.getByLabelText('有效期'),{target:{value:'2026-10-23T01:00'}})
+ fireEvent.change(screen.getByLabelText('有效期'),{target:{value:dateTimeInputValue('2026-10-23T01:00:00Z')}})
  fireEvent.click(screen.getByRole('button',{name:'生成新链接'}))
  expect(await screen.findByRole('alert')).toHaveTextContent('不能晚于测评截止时间')
  expect(api.post).not.toHaveBeenCalled()
@@ -59,7 +60,7 @@ it('preserves a loaded link through invalid windows, timezone and rejected serve
  render(<PublicDeliveryManager family="COMPOSITE" resourceId="task" groupIpEligible />)
  await screen.findByText(/同 IP 短窗口：/)
  fireEvent.click(screen.getByRole('checkbox'))
- fireEvent.change(screen.getByLabelText('有效期'),{target:{value:'2026-10-21T01:00'}})
+ fireEvent.change(screen.getByLabelText('有效期'),{target:{value:dateTimeInputValue('2026-10-21T01:00:00Z')}})
  fireEvent.click(screen.getByRole('button',{name:'生成新链接'}))
  expect(await screen.findByRole('alert')).toHaveTextContent('最长为 48 小时')
  expect(screen.getByRole('link')).toHaveAttribute('href',window.location.origin+'/public/composite/real-token')

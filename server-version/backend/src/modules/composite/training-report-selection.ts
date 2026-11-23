@@ -88,7 +88,7 @@ export async function assertCurrentTrainingContentOwner(tx:Prisma.TransactionCli
     FROM users WHERE id=${actor.userId} FOR SHARE`)
   const courseIds:string[]=(row.questionnaireCourses??[]).map((entry:any)=>entry.courseId)
   if(row.questionnaireType==='COURSE') {
-    if(!courseIds.length)throw compositeForbidden('测量实例须属于真实 Training 课程')
+    if(!courseIds.length)throw compositeForbidden('请先在「投放设置」中关联 Training 课程，再添加固定配置或报告内容。')
     const currentCourses=await tx.$queryRaw<Array<{id:string;creator_id:string;course_type:string;is_library:boolean}>>(Prisma.sql`
       SELECT id,creator_id,course_type,is_library FROM courses WHERE id IN (${Prisma.join(courseIds)}) ORDER BY id FOR SHARE`)
     if(currentCourses.length!==new Set(courseIds).size||currentCourses.some(course=>course.creator_id!==actor.userId||course.course_type!=='TRAINING_COURSE'||course.is_library))

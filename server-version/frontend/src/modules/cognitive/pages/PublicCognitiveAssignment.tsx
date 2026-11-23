@@ -7,7 +7,15 @@ import { saveCognitiveRecoveryCredential } from '../core/recovery-credential'
 import { getOrCreateCognitiveStartIntent, readCognitiveStartIntent, rotateCognitiveStartIntent } from '../core/start-intent'
 
 const accessRecoveryKey = (token: string) => `cognitive:recovery:access:${token}`
-const messageFor = (error: unknown, fallback: string) => error instanceof Error ? error.message : fallback
+const messageFor = (error: unknown, fallback: string) => {
+  const message = (error as { message?: unknown } | null)?.message
+  if (typeof message !== 'string') return fallback
+  if (message === 'Public link is disabled') return '此公开链接已停用，不能开始新的测评；已有恢复凭证仍可继续原作答。'
+  if (message === 'Public link has expired') return '此公开链接已过期，不能开始新的测评；已有恢复凭证仍可继续原作答。'
+  if (message === 'Public link reached its maximum uses') return '此公开链接的参与次数已用完；已有恢复凭证仍可继续原作答。'
+  if (message === 'Public link is disabled or expired') return '此公开链接已停用或过期，请联系发布者核对链接。'
+  return message || fallback
+}
 
 const PublicCognitiveAssignment: React.FC = () => {
   const cognitiveEnabled = useCognitiveEnabled()
@@ -48,7 +56,7 @@ const PublicCognitiveAssignment: React.FC = () => {
         if (response.code === 0 && response.data) {
           setInfo(response.data)
           if (storageError && !saved) setError(storageError)
-        } else if (!saved && !pendingIntent) setError(response.message || '公开链接不可用')
+        } else if (!saved && !pendingIntent) setError(messageFor(response, '公开链接不可用'))
         else setInfoUnavailable(true)
       } catch (cause) {
         if (current !== generation.current) return

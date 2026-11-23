@@ -127,3 +127,16 @@ it('filters registered candidates and focuses the selected operation panel',asyn
  expect(screen.getByRole('button',{name:'预览所选配置'})).toBeVisible()
  expect(mock.post).not.toHaveBeenCalled()
 })
+
+it('pages a long candidate directory and resets paging after search',async()=>{
+ mock.get.mockResolvedValue(response({...catalog,registered:Array.from({length:13},(_,index)=>({...candidate,testType:`candidate-${index}`,name:`分页候选 ${index}`,plan:{...plan,testType:`candidate-${index}`}}))}))
+ render(<CognitiveIntake/>);await screen.findByText('分页候选 0',{selector:'strong'})
+ expect(screen.queryByText('分页候选 12',{selector:'strong'})).toBeNull()
+ fireEvent.click(screen.getByRole('button',{name:'下一页'}))
+ expect(screen.getByText('分页候选 12',{selector:'strong'})).toBeVisible()
+ expect(screen.queryByText('分页候选 0',{selector:'strong'})).toBeNull()
+ fireEvent.change(screen.getByRole('searchbox',{name:'检索认知候选'}),{target:{value:'candidate-0'}})
+ await screen.findByText('分页候选 0',{selector:'strong'})
+ expect(screen.queryByRole('navigation',{name:'认知候选分页'})).toBeNull()
+ expect(mock.post).not.toHaveBeenCalled()
+})

@@ -14,6 +14,9 @@ interface CheckinTokenManagerProps {
   checkinTitle: string
   allowAnonymous: boolean
   onAllowAnonymousChange?: (value: boolean) => void
+  open?: boolean
+  onOpenChange?: (value: boolean) => void
+  showTrigger?: boolean
 }
 
 interface Token {
@@ -39,8 +42,13 @@ const CheckinTokenManager: React.FC<CheckinTokenManagerProps> = ({
   checkinTitle,
   allowAnonymous,
   onAllowAnonymousChange,
+  open,
+  onOpenChange,
+  showTrigger = true,
 }) => {
-  const [showModal, setShowModal] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const showModal = open ?? internalOpen
+  const setShowModal = (value: boolean) => { if (open === undefined) setInternalOpen(value); onOpenChange?.(value) }
   const [tokens, setTokens] = useState<Token[]>([])
   const [loading, setLoading] = useState(false)
   const [creatingToken, setCreatingToken] = useState(false)
@@ -147,7 +155,7 @@ const CheckinTokenManager: React.FC<CheckinTokenManagerProps> = ({
 
   return (
     <>
-      <Tooltip title="管理匿名打卡链接">
+      {showTrigger && <Tooltip title="管理匿名打卡链接">
         <button
           type="button"
           onClick={() => setShowModal(true)}
@@ -156,7 +164,7 @@ const CheckinTokenManager: React.FC<CheckinTokenManagerProps> = ({
         >
           <Share2 className="w-4 h-4" aria-hidden="true" />
         </button>
-      </Tooltip>
+      </Tooltip>}
 
       <Modal
         title={`匿名打卡管理 - ${checkinTitle}`}
@@ -169,7 +177,7 @@ const CheckinTokenManager: React.FC<CheckinTokenManagerProps> = ({
         <div className="space-y-6">
           {/* 开启匿名打卡开关 */}
           <div className="bg-gray-50 p-4 rounded-lg">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <div>
                 <h4 className="font-medium text-gray-900">开启匿名打卡</h4>
                 <p className="text-sm text-gray-500 mt-1">
@@ -177,6 +185,8 @@ const CheckinTokenManager: React.FC<CheckinTokenManagerProps> = ({
                 </p>
               </div>
               <Switch
+                aria-label="开启匿名打卡"
+                className="shrink-0"
                 checked={allowAnonymous}
                 onChange={handleAllowAnonymousChange}
                 checkedChildren="开启"
@@ -190,12 +200,13 @@ const CheckinTokenManager: React.FC<CheckinTokenManagerProps> = ({
               {/* 创建新令牌 */}
               <div className="border rounded-lg p-4">
                 <h4 className="font-medium text-gray-900 mb-4">创建新的分享链接</h4>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor={`checkin-token-expiry-${checkinId}`} className="block text-sm font-medium text-gray-700 mb-2">
                       过期时间
                     </label>
                     <DatePicker
+                      id={`checkin-token-expiry-${checkinId}`}
                       value={expiresAt}
                       onChange={(date) => setExpiresAt(date)}
                       showTime
@@ -205,10 +216,11 @@ const CheckinTokenManager: React.FC<CheckinTokenManagerProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor={`checkin-token-max-uses-${checkinId}`} className="block text-sm font-medium text-gray-700 mb-2">
                       最大匿名提交次数（0表示无限制）
                     </label>
                     <InputNumber
+                      id={`checkin-token-max-uses-${checkinId}`}
                       value={maxUses}
                       onChange={(value) => setMaxUses(value || 0)}
                       min={0}
@@ -248,15 +260,17 @@ const CheckinTokenManager: React.FC<CheckinTokenManagerProps> = ({
                             !isActive ? 'bg-gray-50' : 'bg-white'
                           }`}
                         >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2 mb-2">
-                                <code className="text-sm bg-gray-100 px-2 py-1 rounded">
+                          <div className="flex flex-wrap items-start justify-between gap-3">
+                            <div className="min-w-0 flex-1">
+                              <div className="mb-2 flex flex-wrap items-center gap-2">
+                                <code className="max-w-full break-all rounded bg-gray-100 px-2 py-1 text-sm">
                                   {token.token.substring(0, 20)}...
                                 </code>
                                 <button
                                   onClick={() => copyShareLink(token.token)}
-                                  className="p-1 hover:bg-gray-100 rounded"
+                                  aria-label="复制匿名打卡链接"
+                                  title="复制匿名打卡链接"
+                                  className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:bg-gray-100"
                                 >
                                   <Copy className="w-4 h-4 text-gray-600" />
                                 </button>
@@ -266,7 +280,7 @@ const CheckinTokenManager: React.FC<CheckinTokenManagerProps> = ({
                                   </span>
                                 )}
                               </div>
-                              <div className="flex items-center space-x-4 text-sm text-gray-600">
+                              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
                                 <span className="flex items-center">
                                   <Clock className="w-4 h-4 mr-1" />
                                   {new Date(token.expiresAt).toLocaleString('zh-CN')}
@@ -283,7 +297,9 @@ const CheckinTokenManager: React.FC<CheckinTokenManagerProps> = ({
                             </div>
                             <button
                               onClick={() => handleDeleteToken(token.id)}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded"
+                              aria-label="删除匿名打卡链接"
+                              title="删除匿名打卡链接"
+                              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-red-600 hover:bg-red-50"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>

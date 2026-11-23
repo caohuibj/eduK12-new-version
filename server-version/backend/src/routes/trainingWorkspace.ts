@@ -26,9 +26,9 @@ export const workspaceQuery = z.object({
   page: z.coerce.number().int().min(1).max(500).default(1),
   pageSize: z.coerce.number().int().min(1).max(40).default(12),
 }).strict()
-const handle = (fn: (req: any) => Promise<unknown>) => async (req: any, res: any, next: any) => {
+const handle = (fn: (req: any) => Promise<unknown>, validationMessage = '检索条件无效') => async (req: any, res: any, next: any) => {
   try { return success(res, await fn(req)) } catch (cause) {
-    if (cause instanceof z.ZodError) return error(res, '检索条件无效', -1, 400)
+    if (cause instanceof z.ZodError) return error(res, validationMessage, -1, 400)
     return next(cause)
   }
 }
@@ -76,7 +76,7 @@ router.patch('/media/:id/name', handle(async req => {
     await tx.document.updateMany({where:{assetId:req.params.id,teacherId:req.user.userId},data:{title:name}})
     return {id:req.params.id,name}
   })
-}))
+}, '媒体名称须为1–160个字符，且不能包含斜线、反斜线或空字符。'))
 
 // Catalog services retain their scientific eligibility checks. Search responses
 // expose only descriptors, never scoring definitions, responses or reports.

@@ -40,7 +40,7 @@ describe('Education cognitive management UI contracts, mocked transport only',()
   await fill('HUISCHOOL');fireEvent.click(screen.getByRole('button',{name:'授权固定认知配置'}));await screen.findByText(/本次未保存，可修正/)
   expect(screen.queryByRole('region',{name:'认知原请求核对'})).not.toBeInTheDocument();expect(screen.getByLabelText('认知授权结束')).toBeEnabled()
   fireEvent.change(screen.getByLabelText('认知授权结束'),{target:{value:'2030-06-01T00:00'}});fireEvent.change(screen.getByLabelText('认知授权当前管理员密码'),{target:{value:'synthetic-password'}});fireEvent.click(screen.getByRole('button',{name:'授权固定认知配置'}));await screen.findByText('原认知配置请求已确认。')
-  expect(input.requestId).not.toBe(rejectedId);expect(input.expiresAt).toContain('2030-06-01');expect(api.mock.calls.filter(c=>c[0].includes('/operations/'))).toHaveLength(1)
+  expect(input.requestId).not.toBe(rejectedId);expect(input.expiresAt).toBe(new Date('2030-06-01T00:00').toISOString());expect(api.mock.calls.filter(c=>c[0].includes('/operations/'))).toHaveLength(1)
  })
  it('review: accepted POST followed by a rejected readback keeps the original pending request',async()=>{
   api.mockImplementation(async(path,method,body)=>{if(method==='POST'){input=body;return {id:input.requestId,version:1,revoked:false}}if(path.includes('/operations/'))throw new EducationConfigurationHttpError('读取暂不可用',409);return reads(path) as any})

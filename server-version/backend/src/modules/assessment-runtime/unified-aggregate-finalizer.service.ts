@@ -1,3 +1,4 @@
+import {scaleRuntimeInstrumentKey} from '../scale/runtime-identity'
 import { lockRunExecutionByRuntimeBinding, reconcileLockedRunExecutionInTransaction } from '../assessment-run/reconcile'
 import {isNativeBundleComposite} from '../bundle-product/runtime'
 import {prepareTrainingFinalReceipt} from '../composite/training-content-final'
@@ -186,7 +187,7 @@ const compositeParentGraphSelect = {
           formSectionId: true,
           formType: true, formLabel: true, formOptions: true, formPolicy: true,
           scaleId: true, cognitiveAssignmentId: true, situationalInstrumentKey: true, situationalInstrumentVersion: true, formDefinition: true,
-          scale: { select: { id: true, code: true, name: true, instrumentVersion: true } },
+          scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, standardSourceKind: true, standardToolKey: true } },
           cognitiveAssignment: {
             select: {
               id: true,
@@ -236,7 +237,7 @@ const questionnaireParentGraphSelect = {
       name: true,
       questionnaireScales: {
         orderBy: { position: 'asc' },
-        select: { id: true, scaleId: true, position: true, scale: { select: { id: true, code: true, name: true, instrumentVersion: true } } },
+        select: { id: true, scaleId: true, position: true, scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, standardSourceKind: true, standardToolKey: true } } },
       },
       formSections: {
         orderBy: { position: 'asc' },
@@ -505,10 +506,30 @@ const validateSnapshotHeader = (
   }
 }
 
+// Frozen slots bind the installed row; imported compiled results bind the approved
+// logical tool. Resolve that distinction only after checking the exact slot row.
+const canonicalScaleKeys = (slots: FrozenActiveSlotV1[], items: any[] = []) => {
+  const keys = new Map<string, string>()
+  for (const item of items) {
+    const scale = item.scale
+    if (scale?.instrumentClass !== 'STANDARD' || scale.standardSourceKind !== 'DB_IMPORTED') continue
+    const slot = slots.find(candidate => candidate.unitType === 'SCALE' && candidate.slotKey === `scale:${item.id}`)
+    if (!slot) continue
+    const key = scaleRuntimeInstrumentKey(scale)
+    if (!key || slot.sourceDefinitionIdentity.key !== scale.code
+      || slot.sourceDefinitionIdentity.version !== scale.instrumentVersion) {
+      throw aggregateInputError(`槽位 ${slot.slotKey} 的导入量表来源身份不匹配`)
+    }
+    keys.set(slot.slotKey, key)
+  }
+  return keys
+}
+
 const validateCanonicalPayload = (input: {
   row: AggregateSnapshotRow
   slot: FrozenActiveSlotV1
   envelope: CanonicalUnitResultEnvelopeV1
+  instrumentKey?: string
   contextHash: string | null
 }) => {
   const { row, slot, envelope, contextHash } = input
@@ -523,7 +544,7 @@ const validateCanonicalPayload = (input: {
   const core = envelope.core
   if (
     core.unitType !== slot.unitType
-    || core.instrumentKey !== slot.sourceDefinitionIdentity.key
+    || core.instrumentKey !== (input.instrumentKey ?? slot.sourceDefinitionIdentity.key)
     || core.instrumentVersion !== slot.sourceDefinitionIdentity.version
     || core.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
     || core.sourceDefinitionHash !== row.sourceDefinitionHash
@@ -589,6 +610,7 @@ const decryptCompletedPayloads = async (input: {
   contextHash: string | null
   snapshotRows?: AggregateSnapshotRow[]
   committedRecords?: any[]
+  scaleSources?: any[]
   committedScaleUnits?: readonly CommittedWholeScaleUnit[]
   db?: Prisma.TransactionClient
   includeOptionalSlots?: boolean
@@ -600,6 +622,7 @@ const decryptCompletedPayloads = async (input: {
     ids: input.headers.map((header) => header.id as string),
     db: input.db,
   })
+  const scaleKeys = canonicalScaleKeys(input.slots, input.scaleSources)
   const rowsBySlot = new Map(rows.map((row) => [row.slotKey, row]))
   const requiredSlots = input.slots.filter((candidate) => input.includeOptionalSlots || candidate.required)
 
@@ -671,7 +694,7 @@ const decryptCompletedPayloads = async (input: {
         continue
       }
       const envelope = item.envelope!
-      validateCanonicalPayload({ row, slot, envelope, contextHash: input.contextHash })
+      validateCanonicalPayload({ row, slot, envelope, contextHash: input.contextHash, instrumentKey: scaleKeys.get(slot.slotKey) })
       payloads.push({ header: row, envelope })
       entries.push({
         slotKey: slot.slotKey,
@@ -1094,7 +1117,7 @@ const finalizeTrainingFlowCompositeUnified = async (attemptId: string, expected:
     const context = readAggregateContext(parent, true)
     const completed = await decryptCompletedPayloads({ parentId: attemptId, attemptEpoch: parent.attemptEpoch,
       composite: true, slots: executedSlots, headers, contextHash: context.hash,
-      snapshotRows, db: tx, includeOptionalSlots: true })
+      snapshotRows, db: tx, includeOptionalSlots: true, scaleSources: assessment.items })
     const payloadsBySlot = new Map(completed.payloads.map(payload => [payload.header.slotKey, payload]))
     for (const section of assessment.formSections) {
       const key = formSectionSlotKey(section.id)
@@ -1153,6 +1176,8 @@ const finalizeCommittedEducationScale = async ({ parent, snapshot, canonical }: 
   if (frozenSlots.slots.length !== 1 || !slot?.required || slot.unitType !== 'SCALE') return null
   if (snapshot.compositeAttemptId !== parent.id) throw aggregateInputError('量表快照不属于当前作答')
   validateSnapshotHeader(snapshot, slot, parent.attemptEpoch)
+  // Imported logical keys require the full source graph, absent from this fast header.
+  if (canonical.core.instrumentKey !== slot.sourceDefinitionIdentity.key) return null
   validateCanonicalPayload({ row: snapshot, slot, envelope: canonical, contextHash: parent.contextSnapshotHash })
   const header = headerFromRow(snapshot)
   const aggregateInputHash = buildAggregateInputHash({
@@ -1225,6 +1250,7 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
     snapshotRows: probe.snapshotRows,
     committedRecords: reusable ? parent.scaleAssessments : undefined,
     committedScaleUnits: probe.committedScaleUnits,
+    scaleSources: parent.compositeAssessment.items,
   })
   const payloadBySlot = new Map(completed.payloads.map((payload) => [payload.header.slotKey, payload]))
   let packageSnapshot: FrozenReportPackageSnapshot | null = null
@@ -1351,7 +1377,7 @@ const persistCompositeCompletion = async (input: {
           const actualKeys=new Set(optionalRows.map(row=>row.slotKey))
           if(optionalRows.length)optionalPayloads=(await decryptCompletedPayloads({parentId:input.parent.id,attemptEpoch:input.parent.attemptEpoch,
             composite:true,slots:optionalSlots.filter(slot=>actualKeys.has(slot.slotKey)),headers:optionalRows.map(headerFromRow),
-            snapshotRows:optionalRows,contextHash:input.contextHash,db:tx,includeOptionalSlots:true})).payloads
+            snapshotRows:optionalRows,contextHash:input.contextHash,db:tx,includeOptionalSlots:true,scaleSources:input.parent.compositeAssessment.items})).payloads
         }
         const content=await prepareTrainingFinalReceipt(tx,{parent:input.parent,aggregateInputHash:input.aggregateInputHash,
           completedAt,verifiedPayloads:[...input.verifiedPayloads,...optionalPayloads]})
@@ -1528,6 +1554,7 @@ const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string, preloadedP
     parentId: assessmentId,
     attemptEpoch: parent.attemptEpoch,
     composite: false,
+    scaleSources: parent.questionnaire.questionnaireScales,
     slots: frozenSlots.slots,
     headers,
     contextHash: context.hash,
@@ -1542,7 +1569,7 @@ const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string, preloadedP
       const payload = slot ? payloadBySlot.get(slot.slotKey) : undefined
       if (!slot || !payload?.envelope) throw aggregateInputError(`问卷量表 ${questionnaireScale.id} 的冻结结果缺失`)
       if (
-        payload.envelope.core.instrumentKey !== questionnaireScale.scale.code
+        payload.envelope.core.instrumentKey !== scaleRuntimeInstrumentKey(questionnaireScale.scale)
         || payload.envelope.core.instrumentVersion !== questionnaireScale.scale.instrumentVersion
       ) throw aggregateInputError(`问卷量表 ${questionnaireScale.id} 的身份不匹配`)
       return {
@@ -1677,7 +1704,7 @@ export async function readCompletedCompositeBundleInputs(attemptId: string) {
   if (!completeness.ready || completeness.invalidSlotKeys.length) throw aggregateInputError('Bundle canonical 来源不完整')
   const context = readAggregateContext(parent, true)
   const completed = await decryptCompletedPayloads({ parentId: attemptId, attemptEpoch: parent.attemptEpoch, composite: true,
-    slots: frozenSlots.slots, headers, contextHash: context.hash })
+    slots: frozenSlots.slots, headers, contextHash: context.hash, scaleSources: parent.compositeAssessment.items })
   const hash = buildAggregateInputHash({ attemptEpoch: parent.attemptEpoch, contextHash: context.hash,
     compiledBundleRuntimeHash: parent.compiledBundleRuntimeHash, entries: completed.entries })
   if (hash !== parent.aggregateInputHash || bundleRuntimeHash(parent.compositeAssessment.bundleInstance) !== parent.compiledBundleRuntimeHash) throw aggregateInputError('Bundle 已完成来源发生变化')
