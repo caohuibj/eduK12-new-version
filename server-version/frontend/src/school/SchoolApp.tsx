@@ -63,6 +63,7 @@ const SchoolPersonnelDirectory=deferredPage(async()=>({default:(await import('./
 const SchoolPersonnelClaim=deferredPage(async()=>({default:(await import('./SchoolPersonnelImport')).SchoolPersonnelClaim}))
 const SchoolStudentRecovery=deferredPage(async()=>({default:(await import('./SchoolRecovery')).SchoolStudentRecovery}))
 const SchoolRecoveryOfficer=deferredPage(async()=>({default:(await import('./SchoolRecovery')).SchoolRecoveryOfficer}))
+const SchoolMfaReset=deferredPage(async()=>({default:(await import('./SchoolMfaReset')).SchoolMfaReset}))
 const SchoolActivityManager=deferredPage(async()=>({default:(await import('./SchoolActivityManager')).SchoolActivityManager}))
 const ReportPrivacyPreferences=deferredPage(async()=>({default:(await import('../components/report-privacy/ReportPrivacyPreferences')).ReportPrivacyPreferences}))
 const ProductPasswordChange=deferredPage(async()=>({default:(await import('../components/account/ProductPasswordChange')).ProductPasswordChange}))
@@ -511,9 +512,9 @@ function SchoolApplication(){
       {error&&<p className="hs-alert" role="alert">{error}</p>}
       {notice&&<p className="hs-message" role="status">{notice}</p>}
       {loading&&!publicHome?<p>正在核对校园会话…</p>:null}
-      {publicHome&&<SchoolLanding theme={appearance.theme} onJoin={()=>goPublic('recruit')}/>}
+      {publicHome&&<SchoolLanding theme={appearance.theme} onJoin={()=>goPublic('code')}/>}
       {!loading&&!user&&screen==='code'&&<SchoolCodeRegistration api={api} onResolved={codeResolved} onLogin={()=>goPublic('login')}/>}
-      {!loading&&!user&&screen==='recruit'&&<section className="hs-recruit-blank" aria-label="学校招募页面"><h1 className="hs-visually-hidden">学校招募</h1></section>}
+      {!loading&&!user&&screen==='recruit'&&<SchoolCodeRegistration api={api} onResolved={codeResolved} onLogin={()=>goPublic('login')}/>}
       {!loading&&!user&&['register','staff','parent'].includes(screen)&&<button className="hs-auth-back" type="button" onClick={()=>goPublic('code')}>← 更换注册码</button>}
       {!loading&&!user&&screen==='login'&&<section className="hs-panel hs-narrow">
         <p className="hs-section-kicker">欢迎回到 School</p>
@@ -592,6 +593,7 @@ function SchoolApplication(){
               onClick={()=>void stepUp()}>重新验证高权限操作</button>
           </div>
         </section>}
+        {page==='account'&&schoolAdmin&&schoolId&&<SchoolMfaReset api={api} organizationId={schoolId}/>}
         {user.role==='STUDENT'?
           studentStatus==='APPROVED'?<>
             {page==='tasks'&&<SchoolStudentTasks key={user.id} api={api} activityId={activityId} onNavigate={(id,activity)=>navigateWorkspace(id,undefined,activity)}/>}

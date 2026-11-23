@@ -129,13 +129,45 @@ async function schoolOrgAdmin(actor:AuthenticatedPrincipal,organizationId:string
    ||context.explicitDenies.includes('ORGANIZATION_GOVERNANCE'))deny('MFA_RESET_AUTH_REQUIRED',403)
  return context
 }
+export async function listSchoolMfaResets(input:{actor:AuthenticatedPrincipal;organizationId:string}){
+ await schoolOrgAdmin(input.actor,input.organizationId)
+ const [targets,requests]=await Promise.all([
+  prisma.$queryRaw<Array<{userId:string;label:string}>>`
+   SELECT DISTINCT u.id AS "userId",ca.login_name AS label
+   FROM organization_memberships m
+   JOIN users u ON u.id=m.user_id AND u.account_domain='SCHOOL' AND u.is_active AND NOT u.is_frozen
+   JOIN campus_accounts ca ON ca.user_id=u.id
+   JOIN campus_mfa_credentials credential ON credential.user_id=u.id AND credential.enabled
+   WHERE m.organization_id=${input.organizationId} AND u.id<>${input.actor.userId}
+    AND m.valid_from<=statement_timestamp() AND (m.valid_until IS NULL OR m.valid_until>statement_timestamp())
+    AND NOT EXISTS(SELECT 1 FROM campus_mfa_reset_requests pending WHERE pending.organization_id=m.organization_id
+     AND pending.target_user_id=u.id AND pending.status='PENDING' AND pending.expires_at>statement_timestamp())
+    AND (SELECT COUNT(DISTINCT other.organization_id) FROM organization_memberships other
+     JOIN organizations o ON o.id=other.organization_id AND o.product_domain='SCHOOL'
+     WHERE other.user_id=u.id AND other.valid_from<=statement_timestamp()
+      AND (other.valid_until IS NULL OR other.valid_until>statement_timestamp()))=1
+   ORDER BY ca.login_name,u.id LIMIT 101`,
+  prisma.$queryRaw<Array<{id:string;targetLabel:string;requestedByLabel:string;requestedById:string;reasonCode:string;expiresAt:Date}>>`
+   SELECT r.id,target.login_name AS "targetLabel",requester.login_name AS "requestedByLabel",
+    r.requested_by_id AS "requestedById",r.reason_code AS "reasonCode",r.expires_at AS "expiresAt"
+   FROM campus_mfa_reset_requests r
+   JOIN campus_accounts target ON target.user_id=r.target_user_id
+   JOIN campus_accounts requester ON requester.user_id=r.requested_by_id
+   WHERE r.organization_id=${input.organizationId} AND r.status='PENDING' AND r.expires_at>statement_timestamp()
+   ORDER BY r.created_at DESC,r.id DESC LIMIT 101`,
+ ])
+ return {targets:targets.slice(0,100),requests:requests.slice(0,100).map(({requestedById,...row})=>({...row,
+  expiresAt:row.expiresAt.toISOString(),canApprove:requestedById!==input.actor.userId,
+ })),truncated:targets.length>100||requests.length>100}
+}
+
 export async function requestSchoolMfaReset(input:{
  actor:AuthenticatedPrincipal;organizationId:string;targetUserId:string
  reasonCode:'DEVICE_LOST'|'SECURITY_INCIDENT'
 }){
  await schoolOrgAdmin(input.actor,input.organizationId)
  if(input.actor.userId===input.targetUserId)deny('TWO_OFFICERS_REQUIRED',403)
- return prisma.$transaction(async tx=>{
+ try{return await prisma.$transaction(async tx=>{
    const membership=await tx.$queryRaw<Array<{id:string}>>`
      SELECT m."id" FROM "organization_memberships" m
      JOIN "users" u ON u."id"=m."user_id" AND u."account_domain"='SCHOOL'
@@ -179,7 +211,10 @@ export async function requestSchoolMfaReset(input:{
      domainEventId:randomUUID(),payload:{reasonCode:input.reasonCode},
    })
    return {requestId:request.id,status:'PENDING' as const,expiresAt:request.expiresAt.toISOString()}
- })
+ })}catch(error){
+  if(error instanceof Prisma.PrismaClientKnownRequestError&&error.code==='P2002')deny('MFA_RESET_REQUEST_PENDING')
+  throw error
+ }
 }
 export async function approveSchoolMfaReset(input:{
  actor:AuthenticatedPrincipal;organizationId:string;requestId:string

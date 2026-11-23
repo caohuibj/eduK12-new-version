@@ -11,6 +11,7 @@ function setup(page:string){
   if(url.endsWith('/auth/csrf'))return reply({csrfToken:'synthetic-csrf'})
   if(url.endsWith('/auth/me'))return reply({id:'admin',username:'管理员',role:'ADMIN',accountDomain:'SCHOOL'})
   if(url.endsWith('/organizations'))return reply({list:[{id:'school',name:'管理学校',orgRole:'ORG_ADMIN'}]})
+  if(url.endsWith('/organizations/school/mfa-resets')&&(!options?.method||options.method==='GET'))return reply({targets:[],requests:[],truncated:false})
   if(url.endsWith('/context'))return reply({access:{orgRole:'ORG_ADMIN',canGovern:true,personas:[],capabilities:[],explicitDenies:[]}})
   if(url.endsWith('/units'))return reply(options?.method==='POST'?{id:'new-unit'}:{list:units})
   if(url.endsWith('/summary'))return reply({status:'CLOSED',rosterVersion:4,rosterExpectedCount:3,eligibleCount:3,registeredCount:3,unresolvedIncidents:0})

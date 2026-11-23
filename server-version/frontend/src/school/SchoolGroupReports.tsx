@@ -6,11 +6,11 @@ import {mergeGroupHistory,type GroupHistoryCursor,type GroupHistoryPage} from '.
 
 const SchoolPlanGroupLongitudinal=lazy(()=>import('./SchoolPlanGroupLongitudinal').then(module=>({default:module.SchoolPlanGroupLongitudinal})))
 
-type Source={runId:string;trackId:string;name:string;resource:{family:string;key:string;version:string}}
+type Source={runId:string;trackId:string;name:string;resource:{family:string;key:string;version:string;title?:string;versionLabel?:string}}
 type Leaf={slotKey:string;unitType:'SCALE'|'COGNITIVE'|'SITUATIONAL';instrumentKey:string;instrumentVersion:string;compiledRuntimeHash:string}
 type Catalog={specs:Array<{specId:string;title:string;version:number;metricIds:string[]}>;sources:Source[];
   artifacts:Array<{artifactId:string;generatedAt:string}>;truncated:boolean;nextSourcePage?:number|null}
-type Tools={tools:Array<{leaf:Leaf;metrics:Array<{key:string;unit?:string}>}>;
+type Tools={tools:Array<{leaf:Leaf;title?:string;versionLabel?:string;metrics:Array<{key:string;unit?:string}>}>;
   groups:{options:Array<{kind:'CLASSES'|'LABELS';id:string;name:string;dimensionId:string|null;dimensionName:string|null}>;limitations:string[]};artifacts?:GroupHistoryCursor[];nextCursor?:GroupHistoryCursor|null}
 const reason=(error:unknown)=>error instanceof Error?error.message:'当前报告不可访问'
 const leafKey=(leaf:Leaf)=>JSON.stringify(leaf)
@@ -66,7 +66,7 @@ export function SchoolGroupReports({api,organizationId,compact=false,longitudina
     {busy&&<p role="status">正在处理报告…</p>}
     {catalog&&<>
       <label className="hs-field"><span>测评来源</span><select disabled={busy} value={sourceKey} onChange={e=>{request.current++;setSourceKey(e.target.value);setTools(null);setToolKey('');setDimension('ALL');setSelected([]);setArtifact(null);setHistoryCursor(null);setCatalog(current=>current?{...current,artifacts:[]}:current)}}>
-        <option value="">选择任务</option>{catalog.sources.map(row=><option key={`${row.runId}:${row.trackId}`} value={`${row.runId}:${row.trackId}`}>{row.name} · {row.resource.key}</option>)}
+        <option value="">选择任务</option>{catalog.sources.map((row,index)=><option key={`${row.runId}:${row.trackId}`} value={`${row.runId}:${row.trackId}`}>{row.name} · {row.resource.title??'测评项目 '+(index+1)} · {row.resource.versionLabel??'固定版本'}</option>)}
       </select></label>
       {catalog.nextSourcePage&&<button type="button" disabled={busy} onClick={()=>void run(async token=>{
         const next=await api<Pick<Catalog,'sources'|'nextSourcePage'>>(`${base}/sources?${new URLSearchParams({organizationId,page:String(catalog.nextSourcePage)})}`)
@@ -79,7 +79,7 @@ export function SchoolGroupReports({api,organizationId,compact=false,longitudina
       })}>选择工具与人群</button>
       {(tools||longitudinalOnly)&&<>
         {!longitudinalOnly&&<label className="hs-field"><span>叶工具与固定版本</span><select disabled={busy} value={toolKey} onChange={e=>setToolKey(e.target.value)}>
-          <option value="">选择工具</option>{tools!.tools.map(row=><option key={leafKey(row.leaf)} value={leafKey(row.leaf)}>{row.leaf.instrumentKey} · {row.leaf.unitType} · {row.leaf.instrumentVersion} · {row.leaf.slotKey}</option>)}
+          <option value="">选择工具</option>{tools!.tools.map((row,index)=><option key={leafKey(row.leaf)} value={leafKey(row.leaf)}>{row.title??'测评工具 '+(index+1)} · {row.versionLabel??'固定版本'}</option>)}
         </select></label>}
         <label className="hs-field"><span>已发布统计方案</span><select disabled={busy} value={specId} onChange={e=>setSpecId(e.target.value)}>
           <option value="">选择方案</option>{catalog.specs.map(row=><option key={row.specId} value={row.specId}>{row.title} · v{row.version}</option>)}

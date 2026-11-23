@@ -4,6 +4,7 @@ import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
 import { CampusActivityError,lockSchoolActivity,lockAndAssertCampusActivityEditor } from './activity.service'
 import { appendAudit } from '../organization/service'
+import { campusStudentReference } from './studentReference'
 
 type Tx=Prisma.TransactionClient
 export const CAMPUS_PEER_CONSENT_VERSION='HUISCHOOL_PEER_V1'
@@ -326,10 +327,10 @@ export async function myPeerConsentState(actor:AuthenticatedPrincipal,organizati
 }
 export async function guardianPeerRequests(actor:AuthenticatedPrincipal){
   if(actor.accountDomain!=='SCHOOL'||actor.role!=='PARENT')fail('CAMPUS_PARENT_REQUIRED')
-  const rows=await prisma.$queryRaw<Array<{courseId:string;organizationId:string;relationshipId:string;title:string;consented:boolean}>>`
+  const rows=await prisma.$queryRaw<Array<{courseId:string;organizationId:string;relationshipId:string;title:string;consented:boolean;studentUserId:string}>>`
     SELECT DISTINCT c."course_id" AS "courseId",
       c."organization_id" AS "organizationId",r."id" AS "relationshipId",
-      course."title",c."guardian_consented_at" IS NOT NULL AS "consented"
+      course."title",c."guardian_consented_at" IS NOT NULL AS "consented",m.user_id AS "studentUserId"
     FROM "campus_peer_consents" c
     JOIN "organization_memberships" m ON m."id"=c."membership_id"
       AND m."organization_id"=c."organization_id"
@@ -341,7 +342,7 @@ export async function guardianPeerRequests(actor:AuthenticatedPrincipal){
     WHERE c."withdrawn_at" IS NULL
     ORDER BY c."course_id" LIMIT 50
   `
-  return {list:rows,policy:campusPeerDisclosure()}
+  return {list:rows.map(({studentUserId,...row})=>({...row,childLabel:'孩子 · '+campusStudentReference(row.organizationId,studentUserId)})),policy:campusPeerDisclosure()}
 }
 
 /** One batched student inbox projection for voluntary peer activities. No
