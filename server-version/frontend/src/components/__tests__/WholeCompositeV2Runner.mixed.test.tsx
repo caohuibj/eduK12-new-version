@@ -410,4 +410,49 @@ describe('WholeCompositeV2Runner (4-in-1 Form + Scale + SJT + Cognitive)', () =>
     expect(screen.queryByText('LEGACY STEPPED FALLBACK')).toBeNull()
     expect(client.loadMeta).toHaveBeenCalledTimes(1)
   })
+
+  it('seals submissionId before sending, reuses exact submissionId on retry, and respects activeSlotKeys filtering', async () => {
+    window.localStorage?.clear()
+    const { client, submittedPayloads } = makeMockV2Client()
+    // Limit variant to ONLY scale slot (hides form, SJT, and cognitive!)
+    const origLoadMeta = client.loadMeta
+    client.loadMeta = vi.fn(async () => {
+      const res = await origLoadMeta()
+      return { ...res, data: { ...res.data, activeSlotKeys: ['scale:item-scale'] } }
+    })
+    let attempts = 0
+    const origSubmit = client.submitWhole
+    client.submitWhole = vi.fn(async payload => {
+      attempts += 1
+      if (attempts === 1) throw new Error('网络超时')
+      return origSubmit(payload)
+    })
+    const onCompleted = vi.fn()
+
+    render(
+      <WholeCompositeV2Runner
+        attemptId="att-v2-seal"
+        client={client}
+        onExit={vi.fn()}
+        onCompleted={onCompleted}
+      />,
+    )
+
+    // Only the scale question is shown (1/1 step, not 4 steps!)
+    await screen.findByText('我最近情绪平稳')
+    expect(screen.getByText('整卷第 1 / 1 步')).toBeTruthy()
+    fireEvent.click(screen.getByText('非常符合'))
+    fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
+
+    // First submit fails -> sealed banner appears, answers frozen, original submissionId saved
+    const retryBtn = await screen.findByRole('button', { name: '核对并重试提交' })
+    const firstSubId = (client.submitWhole as ReturnType<typeof vi.fn>).mock.calls[0][0].submissionId
+    expect(firstSubId).toBeTruthy()
+
+    // Retry reuses the EXACT same submissionId and completes!
+    fireEvent.click(retryBtn)
+    await waitFor(() => expect(onCompleted).toHaveBeenCalledTimes(1))
+    expect(submittedPayloads[0].submissionId).toBe(firstSubId)
+    expect(Object.keys(submittedPayloads[0].units)).toEqual(['scale:item-scale'])
+  })
 })
