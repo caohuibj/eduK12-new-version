@@ -200,3 +200,38 @@
   .survey-report-actions { align-items: stretch; flex-direction: column; }
   .survey-saved-reports button { min-height: 44px; white-space: normal; }
 }
+
+/* The five data destinations form one complete navigation row. */
+.survey-researcher #survey-workspace-data .survey-section-header.is-compact .survey-section-shortcuts { grid-template-columns:repeat(5,minmax(0,1fr)); }
+
+/* Personal, single-wave and longitudinal reports are peer tasks in the data area. */
+.survey-researcher #survey-workspace-data :is([aria-label="单次群体报告"],[aria-label="纵向群体报告管理"]) {
+  min-width:0; margin:20px 0 0; padding:22px; border:1px solid var(--survey-brand-line); border-radius:13px; background:var(--survey-brand-canvas);
+}
+.survey-researcher #survey-workspace-data :is([aria-label="单次群体报告"],[aria-label="纵向群体报告管理"])>h3 {
+  margin:0 0 9px; color:var(--survey-brand-ink); font-size:16px; font-weight:600; line-height:1.6;
+}
+.survey-researcher #survey-workspace-data :is([aria-label="单次群体报告"],[aria-label="纵向群体报告管理"])>p {
+  max-width:75em; margin:0 0 16px; color:var(--survey-brand-muted); font-size:13px; line-height:1.9;
+}
+.survey-researcher #survey-workspace-data :is([aria-label="单次群体报告"],[aria-label="纵向群体报告管理"])>label {
+  display:grid; gap:8px; margin:16px 0; font-size:13px;
+}
+.survey-researcher #survey-workspace-data :is([aria-label="单次群体报告"],[aria-label="纵向群体报告管理"])>label>select {
+  width:100%; min-height:44px; padding:10px 12px; border:1px solid var(--survey-brand-border); border-radius:9px; background:var(--survey-brand-canvas); color:var(--survey-brand-ink);
+}
+@media (max-width:64rem) and (min-width:48.001rem) {
+  .survey-researcher #survey-workspace-data .survey-section-header.is-compact .survey-section-shortcuts { grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+@media (max-width:48rem) {
+  .survey-researcher #survey-workspace-data .survey-section-header.is-compact .survey-section-shortcuts { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .survey-researcher #survey-workspace-data .survey-section-shortcuts>a:last-child { grid-column:1/-1; }
+}
+@media (max-width:40rem) {
+  .survey-researcher :is(#survey-workspace-data,#survey-workspace-publish,#survey-workspace-reports) :is(button,summary) { min-height:44px; }
+  .survey-researcher :is(#survey-workspace-data,#survey-workspace-publish,#survey-workspace-reports) summary { align-content:center; }
+  .survey-researcher #survey-workspace-data :is([aria-label="单次群体报告"],[aria-label="纵向群体报告管理"]) { padding:18px 14px; }
+  .survey-researcher #survey-workspace-data :is([aria-label="单次群体报告"],[aria-label="纵向群体报告管理"])>.btn-secondary { width:100%; }
+  .survey-researcher #survey-workspace-data .survey-section-shortcuts a { font-size:12px; }
+  .survey-researcher #survey-workspace-publish #survey-wave-list>.btn-secondary { min-height:44px; }
+}

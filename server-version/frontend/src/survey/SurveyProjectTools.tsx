@@ -1,5 +1,7 @@
 import {deferredResearcherComponent} from './deferred-researcher-component'
-import {useCallback,useRef,useState} from 'react'
+import {useCallback,useEffect,useRef,useState} from 'react'
+import {publishSurveyMeasurement} from './measurement-publication'
+import {toolLibraryApi} from './tool-library-api'
 import {Plus,ArrowRight} from 'lucide-react'
 import type {BuilderLeaveRisk} from './SurveyBuilder'
 import {useInstrumentLibrary,type InstrumentLibrary} from './instrument-library'
@@ -9,7 +11,7 @@ import {ExactToolVersions,exactVersionLabel} from './ExactToolVersions'
 const SurveyToolLibrary=deferredResearcherComponent(()=>import('./SurveyToolLibrary').then(m=>m.SurveyToolLibrary),'工具集')
 const SurveyBuilder=deferredResearcherComponent(()=>import('./SurveyBuilder').then(m=>m.SurveyBuilder),'兼容管理')
 const ResearchPackageCatalog=deferredResearcherComponent(()=>import('./ResearchPackageCatalog').then(m=>m.ResearchPackageCatalog),'授权整包目录')
-type SelectedTool={id:string;title:string;kind:string;revision?:number;status:string}
+type SelectedTool={id:string;title:string;kind:string;revision?:number;status:string;measurementReleaseId?:string|null}
 export type SelectionOptions={wholePackage:boolean;membership?:PackageMembership}
 export function SurveyProjectTools({projectId,projectStatus,instrumentLibrary,onLeaveRiskChange,onNavigateLibrary,onSelected,onBeforeSelect,selectedTools,onReorder,selectionIds,memberships=[],membershipLoading=false,membershipError='',onRetryMembership}:{
  projectId:string;projectStatus:string;instrumentLibrary:InstrumentLibrary;onLeaveRiskChange:(risk:BuilderLeaveRisk)=>void;onNavigateLibrary:()=>void;
@@ -19,14 +21,38 @@ export function SurveyProjectTools({projectId,projectStatus,instrumentLibrary,on
  const [legacy,setLegacy]=useState(false),[picker,setPicker]=useState(false),[packages,setPackages]=useState(false)
  const [packageBusy,setPackageBusy]=useState(false),[selectionBusy,setSelectionBusy]=useState(false)
  const {list,page,loading,error,refresh}=useInstrumentLibrary(projectId,instrumentLibrary)
- const risks=useRef({picker:{dirty:false,busy:false},legacy:{dirty:false,busy:false},packages:false})
- const pickerRisk=useCallback((risk:BuilderLeaveRisk)=>{risks.current.picker=risk;setSelectionBusy(risk.busy||risks.current.legacy.busy);onLeaveRiskChange({dirty:risk.dirty||risks.current.legacy.dirty,busy:risk.busy||risks.current.legacy.busy||risks.current.packages})},[onLeaveRiskChange])
- const legacyRisk=useCallback((risk:BuilderLeaveRisk)=>{risks.current.legacy=risk;setSelectionBusy(risk.busy||risks.current.picker.busy);onLeaveRiskChange({dirty:risk.dirty||risks.current.picker.dirty,busy:risk.busy||risks.current.picker.busy||risks.current.packages})},[onLeaveRiskChange])
- const packageRisk=useCallback((busy:boolean)=>{risks.current.packages=busy;setPackageBusy(busy);onLeaveRiskChange({dirty:risks.current.picker.dirty||risks.current.legacy.dirty,busy:busy||risks.current.picker.busy||risks.current.legacy.busy})},[onLeaveRiskChange])
+ const [publishingId,setPublishingId]=useState<string|null>(null),[publicationError,setPublicationError]=useState(''),[publicationNotice,setPublicationNotice]=useState('')
+ const [published,setPublished]=useState<Record<string,string>>({})
+ const publicationLock=useRef(false),publicationGeneration=useRef(0)
+ useEffect(()=>{publicationGeneration.current++;return()=>{publicationGeneration.current++}},[projectId])
+ const risks=useRef({picker:{dirty:false,busy:false},legacy:{dirty:false,busy:false},packages:false,publication:false})
+ const pickerRisk=useCallback((risk:BuilderLeaveRisk)=>{risks.current.picker=risk;setSelectionBusy(risk.busy||risks.current.legacy.busy);onLeaveRiskChange({dirty:risk.dirty||risks.current.legacy.dirty,busy:risk.busy||risks.current.legacy.busy||risks.current.packages||risks.current.publication})},[onLeaveRiskChange])
+ const legacyRisk=useCallback((risk:BuilderLeaveRisk)=>{risks.current.legacy=risk;setSelectionBusy(risk.busy||risks.current.picker.busy);onLeaveRiskChange({dirty:risk.dirty||risks.current.picker.dirty,busy:risk.busy||risks.current.picker.busy||risks.current.packages||risks.current.publication})},[onLeaveRiskChange])
+ const packageRisk=useCallback((busy:boolean)=>{risks.current.packages=busy;setPackageBusy(busy);onLeaveRiskChange({dirty:risks.current.picker.dirty||risks.current.legacy.dirty,busy:busy||risks.current.picker.busy||risks.current.legacy.busy||risks.current.publication})},[onLeaveRiskChange])
  const tools=selectedTools??list,ids=selectionIds??tools.map(t=>t.id),units=packageArrangement(ids,memberships),broken=units.some(u=>u.issues.length),waiting=membershipLoading||Boolean(membershipError)
  const title=(id:string)=>tools.find(t=>t.id===id)?.title??id
+ const publish=async(tool:SelectedTool)=>{
+  if(publicationLock.current||waiting||selectionBusy||packageBusy||!['DRAFT','ACTIVE'].includes(projectStatus)||tool.kind!=='SCALE'||tool.status!=='DRAFT'||tool.revision===undefined||onBeforeSelect?.()===false)return
+  const generation=publicationGeneration.current,key=projectId+':'+tool.id+':'+tool.revision
+  publicationLock.current=true;risks.current.publication=true;setPublishingId(tool.id);setPublicationError('');setPublicationNotice('')
+  onLeaveRiskChange({dirty:risks.current.picker.dirty||risks.current.legacy.dirty,busy:true})
+  try{
+   const result=await publishSurveyMeasurement(toolLibraryApi,projectId,{id:tool.id,revision:tool.revision})
+   if(generation!==publicationGeneration.current)return
+   setPublished(previous=>({...previous,[key]:result.releaseId}))
+   setPublicationNotice('“'+tool.title+'”的测量版本已发布；请重新检查研究定义，再冻结波次。尚未开放采集。')
+   await instrumentLibrary.changed(page).catch(()=>{})
+  }catch(failure){if(generation===publicationGeneration.current)setPublicationError(failure instanceof Error?failure.message:'测量发布结果未确认，请重新读取当前工具后核对。')}
+  finally{
+   publicationLock.current=false;risks.current.publication=false
+   if(generation===publicationGeneration.current){setPublishingId(null);onLeaveRiskChange({dirty:risks.current.picker.dirty||risks.current.legacy.dirty,busy:risks.current.picker.busy||risks.current.legacy.busy||risks.current.packages})}
+  }
+ }
+
  return <section id="survey-wave-content" tabIndex={-1} className="survey-project-tool-selection">
   <header className="survey-library-heading"><div><h2>{onSelected?'问卷内容与顺序':'研究工具'}</h2><p>{onSelected?'普通工具和每次导入的整包按编排单元移动；包内批准顺序固定。':'本研究选用的内容独立保存，工具在首页工具集中编制。'}</p></div><div className="survey-template-actions"><button type="button" className="btn-secondary" onClick={onNavigateLibrary}>工具集 <ArrowRight size={16}/></button><button type="button" className="btn-primary" aria-expanded={picker} disabled={!['DRAFT','ACTIVE'].includes(projectStatus)||waiting} onClick={()=>setPicker(v=>!v)}><Plus size={17}/>{picker?'收起选用':'从工具集添加'}</button></div></header>
+  {publicationError&&<p role="alert" className="survey-library-error">{publicationError}</p>}
+  {publicationNotice&&<p role="status" className="survey-library-notice">{publicationNotice}</p>}
   {error&&<p role="alert" className="survey-library-error">{error}<button type="button" disabled={loading} onClick={()=>void refresh(page).catch(()=>{})}>重新读取</button></p>}
   {loading&&<p role="status">正在读取研究工具…</p>}{membershipLoading&&<p role="status">正在核对已选工具的整包身份…</p>}
   {membershipError&&<p role="alert">{membershipError}<button type="button" onClick={onRetryMembership}>重试整包身份读取</button></p>}
@@ -40,6 +66,9 @@ export function SurveyProjectTools({projectId,projectStatus,instrumentLibrary,on
      {unit.issues.map(issue=><p role="alert" key={issue}>{issue}</p>)}
      <details><summary>批准组件及固定顺序（{p.bindings.length} 项，只读）</summary><ol>{p.bindings.map((b,i)=><li key={b.draftId}>{i+1}. {p.components?.find(c=>c.slotKey===b.slotKey)?.title??title(b.draftId)}{!ids.includes(b.draftId)&&' · 尚未选中'}{p.components?.filter(c=>c.slotKey===b.slotKey).map(c=><small key={c.slotKey}>{exactVersionLabel(c.versions,c.source?.hash??b.draftId,c.kind)}</small>)}</li>)}</ol></details>
     </div>:<><span className="survey-selected-kind">{onSelected?(index+1)+'. ':''}{libraryKindLabel[tool?.kind as keyof typeof libraryKindLabel]??tool?.kind}</span><strong>{title(unit.id)}</strong><small>修订 {tool?.revision??'—'} · {{DRAFT:'研究内副本',PUBLISHED:'已发布',ARCHIVED:'已归档'}[tool?.status??'']??tool?.status}</small></>}
+    {!p&&tool?.kind==='SCALE'&&<div className="survey-selected-publication">
+     {('measurementReleaseId' in tool&&tool.measurementReleaseId)||published[projectId+':'+tool.id+':'+tool.revision]?<small>测量版本已发布；波次仍须检查与冻结。</small>:tool.status==='DRAFT'&&typeof tool.revision==='number'&&<><p>此研究内副本尚未发布测量版本。先显式发布当前已保存修订，再检查与冻结波次。</p><button type="button" className="btn-secondary" aria-label={'发布测量版本：'+tool.title} disabled={!!publishingId||waiting||selectionBusy||packageBusy||!['DRAFT','ACTIVE'].includes(projectStatus)} onClick={()=>void publish(tool)}>{publishingId===tool.id?'正在发布…':'发布测量版本'}</button></>}
+    </div>}
     {onReorder&&<div className="survey-selected-actions">
      {unit.issues.length>0&&p&&<button type="button" disabled={waiting} onClick={()=>onReorder(restorePackage(ids,p))}>恢复完整整包及批准顺序</button>}
      <button type="button" aria-label={'上移 '+label} disabled={waiting||broken||index===0} onClick={()=>onReorder(moveArrangementUnit(ids,memberships,unit.id,-1))}>↑</button>

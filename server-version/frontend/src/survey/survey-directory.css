@@ -129,3 +129,12 @@
   .survey-directory-empty { margin: .25rem 0 1rem; padding: 1rem; }
   .survey-session-actions { gap: .65rem; }
 }
+
+/* Keep the brand and all account actions separate on compact screens. */
+@media (max-width:40rem) {
+  .survey-researcher-header--navigation { grid-template-columns:auto minmax(0,1fr); column-gap:.75rem; }
+  .survey-researcher-header--navigation .survey-session-actions { flex-wrap:nowrap; gap:.25rem; justify-content:flex-end; }
+  .survey-researcher-header .survey-appearance-trigger { width:44px; min-width:44px; padding:.5rem; }
+  .survey-researcher-header .survey-appearance-trigger>span { display:none; }
+  .survey-researcher-header .survey-account-actions { gap:0; }
+}

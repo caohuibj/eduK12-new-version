@@ -89,3 +89,15 @@
  .survey-material-dialog>header { padding:16px; }
 }
 @media(prefers-reduced-motion:reduce){.survey-material-cover-action{transition:none}}
+
+/* Give an empty library and its actions the same rhythm as the toolkit. */
+.survey-material-library .survey-material-empty { min-height:220px; }
+.survey-material-library .survey-material-help>summary { display:list-item; min-height:44px; padding-block:10px; line-height:1.8; cursor:pointer; }
+@media (max-width:40rem) {
+  .survey-researcher .survey-material-library :is(.survey-material-sources,.survey-material-filters,.survey-material-pagination) button { min-height:44px; font-size:12px; }
+  .survey-researcher .survey-material-library .survey-material-filters>div { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); width:100%; }
+  .survey-researcher .survey-material-library .survey-material-filters button { justify-content:center; padding:8px 5px; }
+  .survey-researcher .survey-material-library .survey-material-search input { font-size:16px; }
+  .survey-material-library .survey-material-empty { min-height:240px; padding:28px 18px; }
+  .survey-material-library .survey-material-empty p { font-size:13px; line-height:1.8; }
+}
