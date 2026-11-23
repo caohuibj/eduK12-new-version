@@ -7,7 +7,12 @@ import { ReceiptOnlyConfirmation } from './ReceiptOnlyConfirmation'
 import ScalePlayer from './questionnaire/ScalePlayer'
 import { FormPlayer, type FormPlayerValue } from './questionnaire/FormPlayer'
 import AssessmentImageGate from '../modules/assessment-media/AssessmentImageGate'
+import FormOptionVideoGroupGate from '../modules/assessment-media/FormOptionVideoGroupGate'
+import ScaleFormVideoGate from '../modules/assessment-media/ScaleFormVideoGate'
+import { TrainingMaterials } from '../modules/assessment-media/TrainingMaterials'
 import { assessmentImageItems, assessmentOptionImageItems } from '../modules/assessment-media/adapter'
+import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
+import type { PublicMaterial } from '../modules/assessment-media/material'
 import { createWholeCognitiveSessionApi } from '../modules/composite/whole-cognitive-adapter'
 import { createWholeSituationalRunnerClient } from '../modules/composite/whole-situational-adapter'
 import type { CognitiveSessionApi } from '../modules/cognitive/api'
@@ -34,6 +39,9 @@ const LazyCognitiveRunner = deferredPage(async () => ({
 const LazySituationalRunner = deferredPage(() => import('../modules/situational/pages/SituationalRunner'))
 
 const OTHER_TEXT_PREFIX = '__otherText:'
+const DEFAULT_TTL_MS = 24 * 60 * 60 * 1000
+const MIN_TTL_MS = 60 * 60 * 1000
+const MAX_TTL_MS = 48 * 60 * 60 * 1000
 
 interface ScaleItemTimingEntry {
   firstResponseMs: number
@@ -45,14 +53,33 @@ interface ScaleItemTimingEntry {
 interface StoredLocalDraft {
   drafts: Record<string, Record<string, unknown>>
   formOtherTexts: Record<string, Record<string, string>>
-  itemTimings: Record<string, Record<string, ScaleItemTimingEntry>>
+  itemTimings?: Record<string, Record<string, ScaleItemTimingEntry>>
   elapsedMs: number
+  updatedAt: number
+  expiresAt: number
 }
 
 interface SealedPendingSubmission {
   submissionId: string
   payload: WholeV2SubmitInput
   sealedAt: string
+  expiresAt: number
+}
+
+interface CheckpointConflictState {
+  serverRevision: number
+  serverUpdatedAt: string | null
+  serverDrafts: Record<string, Record<string, unknown>>
+  serverFormOtherTexts: Record<string, Record<string, string>>
+  serverItemTimings: Record<string, Record<string, ScaleItemTimingEntry>>
+  serverLockedUnits: Record<string, WholeV2LockedUnit>
+}
+
+type SealedRecoveryState = 'SEALED' | 'UNCONFIRMED' | 'REJECTED_CONFLICT'
+
+function clampTtlMs(ttlHours?: number | null): number {
+  if (typeof ttlHours !== 'number' || !Number.isFinite(ttlHours)) return DEFAULT_TTL_MS
+  return Math.min(MAX_TTL_MS, Math.max(MIN_TTL_MS, Math.round(ttlHours * 3_600_000)))
 }
 
 function getStorage(): Storage | null {
@@ -101,6 +128,81 @@ function removeStoredKey(key: string): void {
   } catch {
     /* ignore storage errors */
   }
+}
+
+/** Strips Cognitive raw trials and SJT research data before writing a sealed
+ * pending submission to localStorage; the server checkpoint holds locked units
+ * authoritatively and rehydrates them on crash recovery. */
+function stripLockedUnitsForStorage(sealed: SealedPendingSubmission): SealedPendingSubmission {
+  const units: Record<string, WholeV2UnitSubmitPayload> = {}
+  for (const [slotKey, unit] of Object.entries(sealed.payload.units)) {
+    if (unit.unitType === 'SCALE' || unit.unitType === 'FORM_SECTION') {
+      units[slotKey] = unit
+    }
+  }
+  return {
+    ...sealed,
+    payload: {
+      ...sealed.payload,
+      units,
+    },
+  }
+}
+
+/** Rehydrates locked Cognitive/SJT units from server checkpoint into a stored
+ * pending submission so crash-reloaded retries send the exact canonical payload. */
+function rehydrateSealedWithLockedUnits(
+  sealed: SealedPendingSubmission,
+  template: WholeV2Template,
+  lockedUnits: Record<string, WholeV2LockedUnit>,
+): SealedPendingSubmission {
+  const units: Record<string, WholeV2UnitSubmitPayload> = { ...sealed.payload.units }
+  for (const unit of template.units) {
+    if (units[unit.slotKey]) continue
+    const locked = lockedUnits[unit.slotKey]
+    if (!locked) continue
+    if (unit.unitType === 'SITUATIONAL' && locked.unitType === 'SITUATIONAL') {
+      units[unit.slotKey] = {
+        unitType: 'SITUATIONAL',
+        definitionHash: unit.definitionHash,
+        responses: locked.responses,
+        ...(locked.researchEvents ? { researchEvents: locked.researchEvents } : {}),
+        ...(locked.totalTimeMs !== undefined ? { totalTimeMs: locked.totalTimeMs } : {}),
+      }
+    } else if (unit.unitType === 'COGNITIVE' && locked.unitType === 'COGNITIVE') {
+      units[unit.slotKey] = {
+        unitType: 'COGNITIVE',
+        definitionHash: unit.definitionHash,
+        randomSeed: locked.randomSeed,
+        trials: locked.trials,
+        ...(locked.summaryMeta ? { summaryMeta: locked.summaryMeta } : {}),
+      }
+    }
+  }
+  return {
+    ...sealed,
+    payload: {
+      ...sealed.payload,
+      units,
+    },
+  }
+}
+
+function sameLockedUnitPayload(
+  existing: WholeV2LockedUnit,
+  candidate:
+    | Omit<Extract<WholeV2LockedUnit, { unitType: 'COGNITIVE' }>, 'lockedAt' | 'payloadHash'>
+    | Omit<Extract<WholeV2LockedUnit, { unitType: 'SITUATIONAL' }>, 'lockedAt' | 'payloadHash'>,
+): boolean {
+  if (existing.unitType !== candidate.unitType || existing.itemId !== candidate.itemId) return false
+  if (existing.unitType === 'COGNITIVE' && candidate.unitType === 'COGNITIVE') {
+    return existing.randomSeed === candidate.randomSeed
+      && JSON.stringify(existing.trials) === JSON.stringify(candidate.trials)
+  }
+  if (existing.unitType === 'SITUATIONAL' && candidate.unitType === 'SITUATIONAL') {
+    return JSON.stringify(existing.responses) === JSON.stringify(candidate.responses)
+  }
+  return false
 }
 
 /** Packs formOtherTexts into checkpoint drafts using `__otherText:<itemId>` keys so
@@ -204,30 +306,54 @@ function makeSubmissionId(attemptId: string, epoch: number): string {
   return `wholev2:${attemptId}:${epoch}:${rand}`
 }
 
+type FormOptionWithMedia = {
+  value: string
+  label: string
+  images?: unknown
+  video?: unknown
+}
+
+function projectFormOption(raw: Record<string, unknown>): FormOptionWithMedia {
+  return {
+    value: String(raw.optionKey ?? raw.value ?? ''),
+    label: String(raw.label ?? ''),
+    ...(raw.images !== undefined ? { images: raw.images } : {}),
+    ...(raw.video !== undefined ? { video: raw.video } : {}),
+  }
+}
+
 function parseFormOptions(
   rawOptions: WholeQuestionnaireFormSectionItem['formOptions'],
   formDef?: WholeQuestionnaireFormSectionItem['formDefinition'],
-): Array<{ value: string; label: string }> {
-  if (formDef && Array.isArray((formDef as { options?: unknown[] }).options)) {
-    return ((formDef as { options: Array<Record<string, unknown>> }).options).map(o => ({
-      value: String(o.optionKey ?? o.value ?? ''),
-      label: String(o.label ?? ''),
-    }))
+): FormOptionWithMedia[] {
+  const defOptions = (formDef as { options?: unknown } | null | undefined)?.options
+  if (Array.isArray(defOptions) && defOptions.length > 0) {
+    return defOptions.map(o => projectFormOption((o ?? {}) as Record<string, unknown>))
   }
   if (Array.isArray(rawOptions)) {
-    return rawOptions.map(o => ({
-      value: String((o as { value?: unknown; optionKey?: unknown }).value ?? (o as { optionKey?: unknown }).optionKey ?? ''),
-      label: String((o as { label?: unknown }).label ?? ''),
-    }))
+    return rawOptions.map(o => {
+      const rec = (o ?? {}) as Record<string, unknown>
+      return {
+        value: String(rec.value ?? rec.optionKey ?? ''),
+        label: String(rec.label ?? ''),
+        ...(rec.images !== undefined ? { images: rec.images } : {}),
+        ...(rec.video !== undefined ? { video: rec.video } : {}),
+      }
+    })
   }
   if (typeof rawOptions === 'string') {
     try {
       const parsed = JSON.parse(rawOptions)
       if (Array.isArray(parsed)) {
-        return parsed.map((o: Record<string, unknown>) => ({
-          value: String(o.value ?? o.optionKey ?? ''),
-          label: String(o.label ?? ''),
-        }))
+        return parsed.map(o => {
+          const rec = (o ?? {}) as Record<string, unknown>
+          return {
+            value: String(rec.value ?? rec.optionKey ?? ''),
+            label: String(rec.label ?? ''),
+            ...(rec.images !== undefined ? { images: rec.images } : {}),
+            ...(rec.video !== undefined ? { video: rec.video } : {}),
+          }
+        })
       }
     } catch {
       /* ignore malformed legacy options string */
@@ -264,6 +390,7 @@ export function WholeCompositeV2Runner({
   const [template, setTemplate] = useState<WholeV2Template | null>(null)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [reloadNonce, setReloadNonce] = useState(0)
 
   // Scale & Form drafts keyed by slotKey -> itemCode/formItemId -> value
   const [drafts, setDrafts] = useState<Record<string, Record<string, unknown>>>({})
@@ -275,6 +402,9 @@ export function WholeCompositeV2Runner({
   const [savingDraft, setSavingDraft] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [pendingSeal, setPendingSeal] = useState<SealedPendingSubmission | null>(null)
+  const [sealedRecoveryState, setSealedRecoveryState] = useState<SealedRecoveryState>('SEALED')
+  const [otherSubmissionReceipt, setOtherSubmissionReceipt] = useState<WholeV2Receipt | null>(null)
+  const [checkpointConflict, setCheckpointConflict] = useState<CheckpointConflictState | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [receipt, setReceipt] = useState<WholeV2Receipt | null>(null)
 
@@ -289,6 +419,7 @@ export function WholeCompositeV2Runner({
   itemTimingsRef.current = itemTimings
   const revisionRef = useRef(revision)
   revisionRef.current = revision
+  const localDirtyRef = useRef(false)
 
   const computeTotalElapsedMs = useCallback(() => (
     Math.max(0, baseElapsedMsRef.current + (Date.now() - mountTimestampRef.current))
@@ -298,6 +429,8 @@ export function WholeCompositeV2Runner({
     removeStoredKey(pendingStorageKey(attemptId, epoch))
     removeStoredKey(draftStorageKey(attemptId, epoch))
     setPendingSeal(null)
+    setOtherSubmissionReceipt(null)
+    setCheckpointConflict(null)
     setReceipt(accepted)
     if (accepted.receiptOnly) {
       onReceiptAccepted?.(accepted.completedAt)
@@ -306,11 +439,31 @@ export function WholeCompositeV2Runner({
     }
   }, [attemptId, onReceiptAccepted, onCompleted])
 
+  const reconcileExistingReceipt = useCallback((
+    existing: WholeV2Receipt,
+    epoch: number,
+    localSeal: SealedPendingSubmission | null,
+  ) => {
+    if (localSeal && existing.submissionId !== localSeal.submissionId) {
+      // Another tab/device completed this attempt with a different submissionId;
+      // surface this explicitly instead of silently assuming local edits won.
+      removeStoredKey(pendingStorageKey(attemptId, epoch))
+      removeStoredKey(draftStorageKey(attemptId, epoch))
+      setPendingSeal(null)
+      setOtherSubmissionReceipt(existing)
+      return
+    }
+    finalizeReceipt(existing, epoch)
+  }, [attemptId, finalizeReceipt])
+
   useEffect(() => {
     let cancelled = false
     setLoading(true)
     setLoadError(null)
+    setCheckpointConflict(null)
+    setOtherSubmissionReceipt(null)
     mountTimestampRef.current = Date.now()
+    localDirtyRef.current = false
     void (async () => {
       try {
         const metaRes = await client.loadMeta()
@@ -318,14 +471,29 @@ export function WholeCompositeV2Runner({
           throw new Error(metaRes.message || '加载整卷元数据失败')
         }
         const loadedMeta = metaRes.data
+        const now = Date.now()
+
+        // Read & TTL-evict any stored pending seal before reconciling existingReceipt
+        const rawSealed = readStoredJson<SealedPendingSubmission>(pendingStorageKey(loadedMeta.attemptId, loadedMeta.attemptEpoch))
+        const validStoredSeal = rawSealed
+          && (!rawSealed.expiresAt || rawSealed.expiresAt > now)
+          && rawSealed.payload.attemptEpoch === loadedMeta.attemptEpoch
+          && rawSealed.payload.publicationHash === loadedMeta.publicationHash
+          ? rawSealed
+          : null
+        if (rawSealed && !validStoredSeal) {
+          removeStoredKey(pendingStorageKey(loadedMeta.attemptId, loadedMeta.attemptEpoch))
+        }
+
         // Recover already-committed submission immediately on refresh / lost response
         if (loadedMeta.existingReceipt) {
           if (!cancelled) {
             setMeta(loadedMeta)
-            finalizeReceipt(loadedMeta.existingReceipt, loadedMeta.attemptEpoch)
+            reconcileExistingReceipt(loadedMeta.existingReceipt, loadedMeta.attemptEpoch, validStoredSeal)
           }
           return
         }
+
         const tplRes = await client.loadTemplate(loadedMeta.templateHash)
         if (tplRes.code !== 0 || !tplRes.data) {
           throw new Error(tplRes.message || '加载整卷模板失败')
@@ -334,30 +502,51 @@ export function WholeCompositeV2Runner({
 
         const serverUnpacked = unpackDraftsAndOtherTexts(loadedMeta.checkpoint.envelope?.drafts)
         const serverTimings = (loadedMeta.checkpoint.envelope?.itemTimings ?? {}) as Record<string, Record<string, ScaleItemTimingEntry>>
-        const localDraft = readStoredJson<StoredLocalDraft>(draftStorageKey(loadedMeta.attemptId, loadedMeta.attemptEpoch))
-        const sealed = readStoredJson<SealedPendingSubmission>(pendingStorageKey(loadedMeta.attemptId, loadedMeta.attemptEpoch))
+        const serverLockedUnits = loadedMeta.checkpoint.envelope?.lockedUnits ?? {}
 
-        // Prefer local unsaved edits layered over server checkpoint when same epoch
+        // Only restore localStorage drafts when persistence policy permits local drafts and entry has not expired
+        const localDraftAllowed = loadedMeta.persistencePolicy?.draftCheckpointEnabled === true
+        const rawLocalDraft = readStoredJson<StoredLocalDraft>(draftStorageKey(loadedMeta.attemptId, loadedMeta.attemptEpoch))
+        const validLocalDraft = localDraftAllowed
+          && rawLocalDraft
+          && typeof rawLocalDraft.expiresAt === 'number'
+          && rawLocalDraft.expiresAt > now
+          ? rawLocalDraft
+          : null
+        if (rawLocalDraft && !validLocalDraft) {
+          removeStoredKey(draftStorageKey(loadedMeta.attemptId, loadedMeta.attemptEpoch))
+        }
+
+        // Compare server checkpoint timestamp vs local draft timestamp so stale localStorage
+        // never silently overwrites newer server drafts saved on another device/tab (P1-03).
+        const serverUpdatedAt = loadedMeta.checkpoint.updatedAt ? Date.parse(loadedMeta.checkpoint.updatedAt) : 0
+        const localUpdatedAt = typeof validLocalDraft?.updatedAt === 'number' ? validLocalDraft.updatedAt : 0
+        const localIsNewer = Boolean(
+          validLocalDraft
+            && (loadedMeta.checkpoint.revision === 0 || (Number.isFinite(serverUpdatedAt) && localUpdatedAt > serverUpdatedAt)),
+        )
+
         const mergedDrafts: Record<string, Record<string, unknown>> = { ...serverUnpacked.drafts }
-        if (localDraft?.drafts) {
-          for (const [slotKey, entries] of Object.entries(localDraft.drafts)) {
+        const mergedOthers: Record<string, Record<string, string>> = { ...serverUnpacked.formOtherTexts }
+        const mergedTimings: Record<string, Record<string, ScaleItemTimingEntry>> = loadedMeta.timingEnabled
+          ? { ...serverTimings }
+          : {}
+
+        if (localIsNewer && validLocalDraft) {
+          for (const [slotKey, entries] of Object.entries(validLocalDraft.drafts ?? {})) {
             mergedDrafts[slotKey] = { ...(mergedDrafts[slotKey] ?? {}), ...entries }
           }
-        }
-        const mergedOthers: Record<string, Record<string, string>> = { ...serverUnpacked.formOtherTexts }
-        if (localDraft?.formOtherTexts) {
-          for (const [slotKey, entries] of Object.entries(localDraft.formOtherTexts)) {
+          for (const [slotKey, entries] of Object.entries(validLocalDraft.formOtherTexts ?? {})) {
             mergedOthers[slotKey] = { ...(mergedOthers[slotKey] ?? {}), ...entries }
           }
-        }
-        const mergedTimings: Record<string, Record<string, ScaleItemTimingEntry>> = { ...serverTimings }
-        if (localDraft?.itemTimings) {
-          for (const [slotKey, entries] of Object.entries(localDraft.itemTimings)) {
-            mergedTimings[slotKey] = { ...(mergedTimings[slotKey] ?? {}), ...entries }
+          if (loadedMeta.timingEnabled && validLocalDraft.itemTimings) {
+            for (const [slotKey, entries] of Object.entries(validLocalDraft.itemTimings)) {
+              mergedTimings[slotKey] = { ...(mergedTimings[slotKey] ?? {}), ...entries }
+            }
           }
         }
-        baseElapsedMsRef.current = typeof localDraft?.elapsedMs === 'number' && Number.isFinite(localDraft.elapsedMs)
-          ? Math.max(0, localDraft.elapsedMs)
+        baseElapsedMsRef.current = validLocalDraft && typeof validLocalDraft.elapsedMs === 'number' && Number.isFinite(validLocalDraft.elapsedMs)
+          ? Math.max(0, validLocalDraft.elapsedMs)
           : 0
 
         setMeta(loadedMeta)
@@ -366,11 +555,12 @@ export function WholeCompositeV2Runner({
         setDrafts(mergedDrafts)
         setFormOtherTexts(mergedOthers)
         setItemTimings(mergedTimings)
-        setLockedUnits(loadedMeta.checkpoint.envelope?.lockedUnits ?? {})
-        if (sealed && sealed.payload.attemptEpoch === loadedMeta.attemptEpoch && sealed.payload.publicationHash === loadedMeta.publicationHash) {
-          setPendingSeal(sealed)
-        } else if (sealed) {
-          removeStoredKey(pendingStorageKey(loadedMeta.attemptId, loadedMeta.attemptEpoch))
+        setLockedUnits(serverLockedUnits)
+        if (validStoredSeal) {
+          setPendingSeal(rehydrateSealedWithLockedUnits(validStoredSeal, tplRes.data, serverLockedUnits))
+          setSealedRecoveryState('SEALED')
+        } else {
+          setPendingSeal(null)
         }
       } catch (cause) {
         if (!cancelled) setLoadError(normalizeApiError(cause).message)
@@ -379,16 +569,22 @@ export function WholeCompositeV2Runner({
       }
     })()
     return () => { cancelled = true }
-  }, [attemptId, client, finalizeReceipt])
+  }, [attemptId, client, reloadNonce, reconcileExistingReceipt])
 
-  // Persist local drafts/timings/otherText/elapsedMs automatically so refreshes never lose work
+  // Persist local drafts ONLY when Training persistence policy explicitly enables drafts (P1-05),
+  // with bounded TTL (1–48h) and updatedAt timestamp for conflict-safe resume.
   useEffect(() => {
-    if (!meta || receipt) return
+    if (!meta || receipt || !localDirtyRef.current) return
+    if (meta.persistencePolicy?.draftCheckpointEnabled !== true) return
+    const now = Date.now()
+    const ttlMs = clampTtlMs(meta.persistencePolicy.draftTtlHours)
     writeStoredJson(draftStorageKey(meta.attemptId, meta.attemptEpoch), {
       drafts,
       formOtherTexts,
-      itemTimings,
+      ...(meta.timingEnabled ? { itemTimings } : {}),
       elapsedMs: computeTotalElapsedMs(),
+      updatedAt: now,
+      expiresAt: now + ttlMs,
     } satisfies StoredLocalDraft)
   }, [meta, receipt, drafts, formOtherTexts, itemTimings, computeTotalElapsedMs])
 
@@ -440,6 +636,8 @@ export function WholeCompositeV2Runner({
     return count
   }, [steps, drafts, lockedUnits])
 
+  const draftCheckpointAllowed = meta?.persistencePolicy ? meta.persistencePolicy.draftCheckpointEnabled : true
+
   const persistCheckpoint = useCallback(async (
     lockUnit?: {
       slotKey: string
@@ -447,17 +645,27 @@ export function WholeCompositeV2Runner({
         | Omit<Extract<WholeV2LockedUnit, { unitType: 'COGNITIVE' }>, 'lockedAt' | 'payloadHash'>
         | Omit<Extract<WholeV2LockedUnit, { unitType: 'SITUATIONAL' }>, 'lockedAt' | 'payloadHash'>
     },
-  ) => {
-    if (!meta) return
+    options?: { forceOverwrite?: boolean; overrideRevision?: number },
+  ): Promise<'saved' | 'conflict' | 'receipt'> => {
+    if (!meta) return 'saved'
     setSavingDraft(true)
     setError(null)
-    const packedDrafts = packDraftsWithOtherTexts(draftsRef.current, formOtherTextsRef.current)
-    const attemptSave = async (expectedRev: number) => {
+    const packedDrafts = draftCheckpointAllowed
+      ? packDraftsWithOtherTexts(draftsRef.current, formOtherTextsRef.current)
+      : {}
+    const timingsPayload = meta.timingEnabled && Object.keys(itemTimingsRef.current).length > 0
+      ? itemTimingsRef.current
+      : undefined
+    const attemptSave = async (
+      expectedRev: number,
+      draftsToSend: Record<string, Record<string, unknown>>,
+      timingsToSend?: Record<string, Record<string, ScaleItemTimingEntry>>,
+    ) => {
       const res = await client.saveCheckpoint({
         expectedRevision: expectedRev,
         attemptEpoch: meta.attemptEpoch,
-        drafts: packedDrafts,
-        ...(Object.keys(itemTimingsRef.current).length > 0 ? { itemTimings: itemTimingsRef.current } : {}),
+        drafts: draftsToSend,
+        ...(timingsToSend && Object.keys(timingsToSend).length > 0 ? { itemTimings: timingsToSend } : {}),
         ...(lockUnit ? { lockUnit } : {}),
       })
       if (res.code !== 0 || !res.data) {
@@ -467,39 +675,78 @@ export function WholeCompositeV2Runner({
     }
     try {
       let saved
+      const baseRevision = options?.overrideRevision ?? revisionRef.current
       try {
-        saved = await attemptSave(revisionRef.current)
+        saved = await attemptSave(baseRevision, packedDrafts, timingsPayload)
       } catch (firstErr) {
         const normalized = normalizeApiError(firstErr)
-        // Auto-recover from CAS revision conflict (e.g. lost response on lock or second tab)
-        if (normalized.code === 'CHECKPOINT_CONFLICT' || normalized.status === 409) {
-          const refreshed = await client.loadMeta()
-          if (refreshed.code === 0 && refreshed.data) {
-            if (refreshed.data.existingReceipt) {
-              finalizeReceipt(refreshed.data.existingReceipt, refreshed.data.attemptEpoch)
-              return
-            }
-            const nextRev = refreshed.data.checkpoint.revision
-            setRevision(nextRev)
-            revisionRef.current = nextRev
-            if (refreshed.data.checkpoint.envelope) {
-              setLockedUnits(refreshed.data.checkpoint.envelope.lockedUnits)
-            }
-            saved = await attemptSave(nextRev)
-          } else {
-            throw firstErr
-          }
-        } else {
+        const isConflict = normalized.code === 'CHECKPOINT_CONFLICT' || normalized.status === 409
+        if (!isConflict || options?.forceOverwrite) {
           throw firstErr
         }
+        const refreshed = await client.loadMeta()
+        if (refreshed.code !== 0 || !refreshed.data) {
+          throw firstErr
+        }
+        if (refreshed.data.existingReceipt) {
+          reconcileExistingReceipt(refreshed.data.existingReceipt, refreshed.data.attemptEpoch, pendingSeal)
+          return 'receipt'
+        }
+        const serverCheckpoint = refreshed.data.checkpoint
+        const serverEnvelope = serverCheckpoint.envelope
+        const serverLocked = serverEnvelope?.lockedUnits ?? {}
+        const serverUnpacked = unpackDraftsAndOtherTexts(serverEnvelope?.drafts)
+        const serverTimings = (serverEnvelope?.itemTimings ?? {}) as Record<string, Record<string, ScaleItemTimingEntry>>
+
+        if (lockUnit) {
+          // Case A: Cognitive/SJT lockUnit 409 recovery
+          const existingLocked = serverLocked[lockUnit.slotKey]
+          if (existingLocked) {
+            if (sameLockedUnitPayload(existingLocked, lockUnit.unit)) {
+              // Lost ACK on the exact same Cognitive/SJT lock: confirm idempotently without overwriting server drafts.
+              setRevision(serverCheckpoint.revision)
+              revisionRef.current = serverCheckpoint.revision
+              setLockedUnits(serverLocked)
+              if (draftCheckpointAllowed && serverEnvelope) {
+                setDrafts(serverUnpacked.drafts)
+                setFormOtherTexts(serverUnpacked.formOtherTexts)
+              }
+              return 'saved'
+            }
+            throw firstErr
+          }
+          // Not yet locked on server: preserve server's newer drafts and attach lockUnit only (never overwrite newer drafts!).
+          const serverRawDrafts = draftCheckpointAllowed ? (serverEnvelope?.drafts ?? {}) : {}
+          setRevision(serverCheckpoint.revision)
+          revisionRef.current = serverCheckpoint.revision
+          setLockedUnits(serverLocked)
+          saved = await attemptSave(serverCheckpoint.revision, serverRawDrafts, meta.timingEnabled ? serverTimings : undefined)
+        } else {
+          // Case B: Plain draft version conflict -> surface explicit choice instead of silently overwriting other device's drafts!
+          setCheckpointConflict({
+            serverRevision: serverCheckpoint.revision,
+            serverUpdatedAt: serverCheckpoint.updatedAt,
+            serverDrafts: serverUnpacked.drafts,
+            serverFormOtherTexts: serverUnpacked.formOtherTexts,
+            serverItemTimings: serverTimings,
+            serverLockedUnits: serverLocked,
+          })
+          setError('检测到其他窗口或设备已更新云端草稿，请选择采用云端最新版本或覆盖云端。')
+          return 'conflict'
+        }
       }
+      setCheckpointConflict(null)
       setRevision(saved.revision)
+      revisionRef.current = saved.revision
       if (saved.envelope) {
-        const unpacked = unpackDraftsAndOtherTexts(saved.envelope.drafts)
-        setDrafts(unpacked.drafts)
-        setFormOtherTexts(unpacked.formOtherTexts)
+        if (draftCheckpointAllowed) {
+          const unpacked = unpackDraftsAndOtherTexts(saved.envelope.drafts)
+          setDrafts(unpacked.drafts)
+          setFormOtherTexts(unpacked.formOtherTexts)
+        }
         setLockedUnits(saved.envelope.lockedUnits)
       }
+      return 'saved'
     } catch (cause) {
       const msg = normalizeApiError(cause).message
       setError(msg)
@@ -507,27 +754,63 @@ export function WholeCompositeV2Runner({
     } finally {
       setSavingDraft(false)
     }
-  }, [client, meta, finalizeReceipt])
+  }, [client, meta, draftCheckpointAllowed, pendingSeal, reconcileExistingReceipt])
+
+  const adoptServerConflictDraft = useCallback(() => {
+    if (!checkpointConflict) return
+    setDrafts(checkpointConflict.serverDrafts)
+    setFormOtherTexts(checkpointConflict.serverFormOtherTexts)
+    if (meta?.timingEnabled) {
+      setItemTimings(checkpointConflict.serverItemTimings)
+    }
+    setLockedUnits(checkpointConflict.serverLockedUnits)
+    setRevision(checkpointConflict.serverRevision)
+    revisionRef.current = checkpointConflict.serverRevision
+    localDirtyRef.current = false
+    setCheckpointConflict(null)
+    setError(null)
+  }, [checkpointConflict, meta?.timingEnabled])
+
+  const forceOverwriteConflictDraft = useCallback(async () => {
+    if (!checkpointConflict) return
+    try {
+      await persistCheckpoint(undefined, {
+        forceOverwrite: true,
+        overrideRevision: checkpointConflict.serverRevision,
+      })
+    } catch {
+      /* error already surfaced */
+    }
+  }, [checkpointConflict, persistCheckpoint])
 
   const saveAndExit = useCallback(async () => {
-    try {
-      await persistCheckpoint()
+    if (!draftCheckpointAllowed) {
       onExit()
+      return
+    }
+    try {
+      const outcome = await persistCheckpoint()
+      if (outcome === 'saved') {
+        onExit()
+      }
     } catch {
       /* error already displayed */
     }
-  }, [persistCheckpoint, onExit])
+  }, [draftCheckpointAllowed, persistCheckpoint, onExit])
 
   const setScaleAnswer = useCallback((slotKey: string, itemCode: string, value: string | number) => {
     if (pendingSeal) return
+    localDirtyRef.current = true
     setError(null)
-    const now = Date.now()
-    const elapsedOnItem = Math.max(0, now - stepEnteredAtRef.current)
-    const answeredAt = new Date(now).toISOString()
     setDrafts(prev => ({
       ...prev,
       [slotKey]: { ...(prev[slotKey] ?? {}), [itemCode]: value },
     }))
+    // Only record item-level process timing telemetry when timing is explicitly enabled (P1-05).
+    if (meta?.timingEnabled !== true) return
+    const now = Date.now()
+    const elapsedOnItem = Math.max(0, now - stepEnteredAtRef.current)
+    const answeredAt = new Date(now).toISOString()
     setItemTimings(prev => {
       const slotMap = prev[slotKey] ?? {}
       const prior = slotMap[itemCode]
@@ -546,10 +829,11 @@ export function WholeCompositeV2Runner({
           }
       return { ...prev, [slotKey]: { ...slotMap, [itemCode]: nextEntry } }
     })
-  }, [pendingSeal])
+  }, [pendingSeal, meta?.timingEnabled])
 
   const setFormAnswer = useCallback((slotKey: string, formItemId: string, value: FormPlayerValue) => {
     if (pendingSeal) return
+    localDirtyRef.current = true
     setError(null)
     setDrafts(prev => ({
       ...prev,
@@ -559,16 +843,28 @@ export function WholeCompositeV2Runner({
 
   const setFormOtherText = useCallback((slotKey: string, formItemId: string, text: string) => {
     if (pendingSeal) return
+    localDirtyRef.current = true
     setFormOtherTexts(prev => ({
       ...prev,
       [slotKey]: { ...(prev[slotKey] ?? {}), [formItemId]: text },
     }))
   }, [pendingSeal])
 
+  const reloadServerState = useCallback(() => {
+    if (meta) {
+      removeStoredKey(pendingStorageKey(meta.attemptId, meta.attemptEpoch))
+    }
+    setPendingSeal(null)
+    setSealedRecoveryState('SEALED')
+    setError(null)
+    setReloadNonce(prev => prev + 1)
+  }, [meta])
+
   const submitWhole = useCallback(async () => {
     if (!meta || !template || submitting) return
     setError(null)
 
+    const isRetryOfSeal = Boolean(pendingSeal)
     let sealedToSend = pendingSeal
     if (!sealedToSend) {
       const unitsPayload: Record<string, WholeV2UnitSubmitPayload> = {}
@@ -595,7 +891,7 @@ export function WholeCompositeV2Runner({
           }
         } else if (unit.unitType === 'SCALE') {
           const slotDraft = draftsRef.current[unit.slotKey] ?? {}
-          const slotTimings = itemTimingsRef.current[unit.slotKey] ?? {}
+          const slotTimings = meta.timingEnabled ? (itemTimingsRef.current[unit.slotKey] ?? {}) : {}
           for (const item of unit.definition.items) {
             if (item.required && !isAnsweredValue(slotDraft[item.itemCode])) {
               setError(`请先完成量表题目：${item.content}`)
@@ -608,7 +904,7 @@ export function WholeCompositeV2Runner({
             answers: unit.definition.items
               .filter(item => slotDraft[item.itemCode] !== undefined)
               .map(item => {
-                const timing = slotTimings[item.itemCode]
+                const timing = meta.timingEnabled ? slotTimings[item.itemCode] : undefined
                 return {
                   itemCode: item.itemCode,
                   responseValue: slotDraft[item.itemCode] as string | number,
@@ -619,7 +915,7 @@ export function WholeCompositeV2Runner({
                   } : {}),
                 }
               }),
-            ...(Object.keys(slotTimings).length > 0 ? { timings: slotTimings } : {}),
+            ...(meta.timingEnabled && Object.keys(slotTimings).length > 0 ? { timings: slotTimings } : {}),
           }
         } else if (unit.unitType === 'SITUATIONAL') {
           const locked = lockedUnits[unit.slotKey]
@@ -656,10 +952,12 @@ export function WholeCompositeV2Runner({
         }
       }
 
+      const now = Date.now()
       const submissionId = makeSubmissionId(meta.attemptId, meta.attemptEpoch)
       sealedToSend = {
         submissionId,
-        sealedAt: new Date().toISOString(),
+        sealedAt: new Date(now).toISOString(),
+        expiresAt: now + clampTtlMs(meta.persistencePolicy?.draftTtlHours),
         payload: {
           submissionId,
           attemptEpoch: meta.attemptEpoch,
@@ -669,21 +967,38 @@ export function WholeCompositeV2Runner({
           units: unitsPayload,
         },
       }
-      // Seal locally BEFORE sending so lost responses / page refreshes reuse the exact submissionId & payload
-      writeStoredJson(pendingStorageKey(meta.attemptId, meta.attemptEpoch), sealedToSend)
+      // Seal locally BEFORE sending (omitting Cognitive trials & SJT research events from localStorage).
+      writeStoredJson(
+        pendingStorageKey(meta.attemptId, meta.attemptEpoch),
+        stripLockedUnitsForStorage(sealedToSend),
+      )
       setPendingSeal(sealedToSend)
+      setSealedRecoveryState('SEALED')
     }
 
     setSubmitting(true)
     try {
-      // On retry of a previously sealed submission, check server meta first in case commit already succeeded
-      if (pendingSeal) {
-        const probe = await client.loadMeta().catch(() => null)
-        if (probe?.code === 0 && probe.data?.existingReceipt) {
-          finalizeReceipt(probe.data.existingReceipt, meta.attemptEpoch)
+      // On retry of a previously sealed submission, probe server status explicitly first (P1-04).
+      if (isRetryOfSeal) {
+        let probe: Awaited<ReturnType<WholeV2Client['loadMeta']>>
+        try {
+          probe = await client.loadMeta()
+        } catch {
+          setSealedRecoveryState('UNCONFIRMED')
+          setError('暂时无法连接服务器核对回执状态，本机封存答案已保留，请网络恢复后重试。')
+          return
+        }
+        if (probe.code !== 0 || !probe.data) {
+          setSealedRecoveryState('UNCONFIRMED')
+          setError(probe.message || '回执状态核对失败，本机封存答案已保留，请稍后重试。')
+          return
+        }
+        if (probe.data.existingReceipt) {
+          reconcileExistingReceipt(probe.data.existingReceipt, meta.attemptEpoch, sealedToSend)
           return
         }
       }
+
       const res = await client.submitWhole(sealedToSend.payload)
       if (res.code !== 0 || !res.data) {
         throw new Error(res.message || '整卷提交失败')
@@ -691,16 +1006,38 @@ export function WholeCompositeV2Runner({
       finalizeReceipt(res.data, meta.attemptEpoch)
     } catch (cause) {
       const normalized = normalizeApiError(cause)
-      // If server explicitly rejected payload validation (400), unseal so user can correct answers
       if (normalized.status === 400) {
+        // Validation error: unseal so participant can fix invalid answers.
         removeStoredKey(pendingStorageKey(meta.attemptId, meta.attemptEpoch))
         setPendingSeal(null)
+        setSealedRecoveryState('SEALED')
+      } else if (
+        normalized.status === 409
+        && (
+          normalized.code === 'STALE_ATTEMPT'
+          || normalized.code === 'DEFINITION_MISMATCH'
+          || normalized.code === 'CHECKPOINT_LOCKED_UNIT_IMMUTABLE'
+          || normalized.code === 'SUBMISSION_PAYLOAD_CONFLICT'
+        )
+      ) {
+        // Terminal conflict: surface explicit server-reload recovery exit instead of stranding frozen UI.
+        setSealedRecoveryState('REJECTED_CONFLICT')
+      } else {
+        setSealedRecoveryState('UNCONFIRMED')
       }
       setError(normalized.message)
     } finally {
       setSubmitting(false)
     }
-  }, [meta, template, submitting, pendingSeal, activeUnits, lockedUnits, client, computeTotalElapsedMs, finalizeReceipt])
+  }, [meta, template, submitting, pendingSeal, activeUnits, lockedUnits, client, computeTotalElapsedMs, finalizeReceipt, reconcileExistingReceipt])
+
+  const loadSlotVideoSources = useCallback(async (slotKey: string, videoKey: string) => {
+    const res = await client.issueSlotVideo(slotKey, videoKey)
+    if (res.code !== 0 || !res.data) {
+      throw new Error(res.message || '加载视频资源失败')
+    }
+    return res.data
+  }, [client])
 
   const current = steps[index]
 
@@ -744,6 +1081,27 @@ export function WholeCompositeV2Runner({
     return <p role="status" className="p-6 text-slate-600">正在加载整卷测评定义…</p>
   }
 
+  if (otherSubmissionReceipt && meta) {
+    return (
+      <div role="alert" className="space-y-4 rounded-xl border border-amber-200 bg-amber-50 p-6 text-amber-950">
+        <h2 className="text-lg font-semibold">此测评已在其他窗口或设备完成提交</h2>
+        <p className="text-sm">
+          服务端已确认另一笔提交（完成时间：{otherSubmissionReceipt.completedAt}），当前窗口的未确认封存内容已自动失效，不会重复落库。
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            className="btn-primary min-h-11"
+            onClick={() => finalizeReceipt(otherSubmissionReceipt, meta.attemptEpoch)}
+          >
+            确认并查看结果
+          </button>
+          <button type="button" className="btn-secondary min-h-11" onClick={onExit}>返回</button>
+        </div>
+      </div>
+    )
+  }
+
   if (loadError || !meta || (!template && !receipt)) {
     return (
       <div role="alert" className="space-y-4 p-6">
@@ -768,7 +1126,11 @@ export function WholeCompositeV2Runner({
       instructions={
         <div className="space-y-2">
           {displayInstruction ? <p>{displayInstruction}</p> : null}
-          <p>整卷答案可随时暂存；认知测验与情境测评完成后将自动锁定，全部完成后一次提交。</p>
+          <p>
+            {draftCheckpointAllowed
+              ? '整卷答案可随时暂存；认知测验与情境测评完成后将自动锁定，全部完成后一次提交。'
+              : '认知测验与情境测评完成后将自动锁定，请完成全部内容后一次提交。'}
+          </p>
         </div>
       }
       progress={{ kind: 'count', completed: completedStepsCount, total: steps.length, label: '整卷作答进度' }}
@@ -779,7 +1141,12 @@ export function WholeCompositeV2Runner({
           : submitting
             ? { state: 'submitting', message: '正在提交整份测评…' }
             : pendingSeal
-              ? { state: 'pending', message: '上次提交回执尚未确认，答案已封存，请点击确认重试。' }
+              ? {
+                  state: 'pending',
+                  message: sealedRecoveryState === 'REJECTED_CONFLICT'
+                    ? '服务端状态已变更，请重新加载服务端状态。'
+                    : '上次提交回执尚未确认，答案已封存，请点击确认重试。',
+                }
               : { state: 'ready' }
       }
       actions={
@@ -789,100 +1156,169 @@ export function WholeCompositeV2Runner({
           disabled={lockedForPendingSubmit || savingDraft}
           onClick={() => void saveAndExit()}
         >
-          保存并退出
+          {draftCheckpointAllowed ? '保存并退出' : '退出'}
         </button>
       }
     >
+      {checkpointConflict ? (
+        <div role="alert" className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">
+          <span>
+            云端草稿已在其他窗口更新（版本 v{checkpointConflict.serverRevision}），为避免覆盖他人/他端作答，请明确选择恢复方式。
+          </span>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" className="btn-primary min-h-10" onClick={adoptServerConflictDraft}>
+              采用云端最新草稿
+            </button>
+            <button
+              type="button"
+              className="btn-secondary min-h-10"
+              disabled={savingDraft}
+              onClick={() => void forceOverwriteConflictDraft()}
+            >
+              使用当前内容覆盖云端
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       {pendingSeal && !receipt ? (
         <div role="status" className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-          <span>存在尚未确认回执的封存提交，答案已冻结。点击右侧按钮将先核对服务端状态，若未收到则沿用原提交号重发。</span>
-          <button
-            type="button"
-            className="btn-primary min-h-10"
-            disabled={submitting}
-            onClick={() => void submitWhole()}
-          >
-            {submitting ? '正在核对并重试…' : '核对并重试提交'}
-          </button>
+          <span>
+            {sealedRecoveryState === 'REJECTED_CONFLICT'
+              ? '服务端返回版本或状态冲突，当前本机封存提交无法直接重发。请重新加载服务端最新状态。'
+              : sealedRecoveryState === 'UNCONFIRMED'
+                ? '回执状态尚未确认，本机封存答案安全保留。点击右侧按钮先核对服务端回执，未收到时沿用原提交号重发。'
+                : '存在尚未确认回执的封存提交，答案已冻结。点击右侧按钮将先核对服务端状态，若未收到则沿用原提交号重发。'}
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {sealedRecoveryState !== 'REJECTED_CONFLICT' ? (
+              <button
+                type="button"
+                className="btn-primary min-h-10"
+                disabled={submitting}
+                onClick={() => void submitWhole()}
+              >
+                {submitting ? '正在核对并重试…' : '核对并重试提交'}
+              </button>
+            ) : null}
+            {sealedRecoveryState === 'REJECTED_CONFLICT' ? (
+              <button
+                type="button"
+                className="btn-primary min-h-10"
+                disabled={submitting}
+                onClick={reloadServerState}
+              >
+                重新加载服务端状态
+              </button>
+            ) : null}
+          </div>
         </div>
       ) : null}
 
       {error ? <p role="alert" className="mb-4 text-red-700">{error}</p> : null}
 
-      {current?.kind === 'SCALE_ITEM' ? (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
-          <h2 className="mb-2 text-xl font-semibold">{current.unit.title}</h2>
-          {current.unit.instruction ? (
-            <p className="mb-4 whitespace-pre-wrap text-slate-600">{current.unit.instruction}</p>
-          ) : null}
-          <p className="mb-4 text-sm text-slate-600">整卷第 {index + 1} / {steps.length} 步</p>
-          <AssessmentImageGate
-            items={assessmentImageItems((current.question as { images?: unknown }).images)}
-            loadAsset={assetId => client.loadSlotImage(current.slotKey, assetId)}
-            disabled={lockedForPendingSubmit}
-          >
-            <ScalePlayer
-              scopeKey={`wholev2:${meta.attemptId}:${current.slotKey}`}
-              item={current.question}
-              value={drafts[current.slotKey]?.[current.question.itemCode] as string | number | undefined}
-              answerDisabled={lockedForPendingSubmit}
-              navigationDisabled={submitting}
-              submitDisabled={submitting}
-              position={index + 1}
-              total={steps.length}
-              onChange={val => setScaleAnswer(current.slotKey, current.question.itemCode, val)}
-              onPrevious={() => setIndex(prev => Math.max(0, prev - 1))}
-              onNext={index + 1 < steps.length ? () => setIndex(prev => prev + 1) : undefined}
-              onSubmit={index + 1 === steps.length ? () => void submitWhole() : undefined}
-              submitLabel="提交整份问卷"
-              submitting={submitting}
-            />
-          </AssessmentImageGate>
-        </div>
-      ) : null}
+      {current?.kind === 'SCALE_ITEM' ? (() => {
+        const scaleVideo = scaleItemVideoPresentation(current.question)
+        const scalePlayer = (
+          <ScalePlayer
+            scopeKey={`wholev2:${meta.attemptId}:${current.slotKey}`}
+            item={current.question}
+            value={drafts[current.slotKey]?.[current.question.itemCode] as string | number | undefined}
+            answerDisabled={lockedForPendingSubmit}
+            navigationDisabled={submitting}
+            submitDisabled={submitting}
+            position={index + 1}
+            total={steps.length}
+            onChange={val => setScaleAnswer(current.slotKey, current.question.itemCode, val)}
+            onPrevious={() => setIndex(prev => Math.max(0, prev - 1))}
+            onNext={index + 1 < steps.length ? () => setIndex(prev => prev + 1) : undefined}
+            onSubmit={index + 1 === steps.length ? () => void submitWhole() : undefined}
+            submitLabel="提交整份问卷"
+            submitting={submitting}
+          />
+        )
+        return (
+          <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
+            <h2 className="mb-2 text-xl font-semibold">{current.unit.title}</h2>
+            {current.unit.instruction ? (
+              <p className="mb-4 whitespace-pre-wrap text-slate-600">{current.unit.instruction}</p>
+            ) : null}
+            <p className="mb-4 text-sm text-slate-600">整卷第 {index + 1} / {steps.length} 步</p>
+            <AssessmentImageGate
+              items={assessmentImageItems((current.question as { images?: unknown }).images)}
+              loadAsset={assetId => client.loadSlotImage(current.slotKey, assetId)}
+              disabled={lockedForPendingSubmit}
+            >
+              <ScaleFormVideoGate
+                presentation={scaleVideo}
+                loadSources={() => loadSlotVideoSources(current.slotKey, scaleVideo!.video.assetId)}
+                ariaLabel={`${current.unit.title} 题目视频`}
+              >
+                {scalePlayer}
+              </ScaleFormVideoGate>
+            </AssessmentImageGate>
+          </div>
+        )
+      })() : null}
 
-      {current?.kind === 'FORM_ITEM' ? (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
-          <h2 className="mb-2 text-xl font-semibold">{current.unit.title}</h2>
-          {current.unit.description ? (
-            <p className="mb-4 whitespace-pre-wrap text-slate-600">{current.unit.description}</p>
-          ) : null}
-          <p className="mb-4 text-sm text-slate-600">整卷第 {index + 1} / {steps.length} 步</p>
-          <AssessmentImageGate
-            items={assessmentOptionImageItems(parseFormOptions(current.item.formOptions, current.item.formDefinition))}
-            loadAsset={assetId => client.loadSlotImage(current.slotKey, assetId)}
-            disabled={lockedForPendingSubmit}
-          >
-            <FormPlayer
-              scopeKey={`wholev2:${meta.attemptId}:${current.slotKey}`}
-              item={{
-                id: current.item.id,
-                type: current.item.formType,
-                label: current.item.formLabel,
-                placeholder: current.item.formPlaceholder,
-                required: current.item.required,
-                formDefinition: current.item.formDefinition,
-                formPolicy: current.item.formPolicy as any,
-              }}
-              options={parseFormOptions(current.item.formOptions, current.item.formDefinition)}
-              value={drafts[current.slotKey]?.[current.item.id] as FormPlayerValue}
-              otherText={formOtherTexts[current.slotKey]?.[current.item.id]}
-              onOtherTextChange={text => setFormOtherText(current.slotKey, current.item.id, text)}
-              answerDisabled={lockedForPendingSubmit}
-              navigationDisabled={submitting}
-              submitDisabled={submitting}
-              position={index + 1}
-              total={steps.length}
-              onChange={val => setFormAnswer(current.slotKey, current.item.id, val)}
-              onPrevious={() => setIndex(prev => Math.max(0, prev - 1))}
-              onNext={index + 1 < steps.length ? () => setIndex(prev => prev + 1) : undefined}
-              onSubmit={index + 1 === steps.length ? () => void submitWhole() : undefined}
-              submitLabel="提交整份问卷"
-              submitting={submitting}
+      {current?.kind === 'FORM_ITEM' ? (() => {
+        const options = parseFormOptions(current.item.formOptions, current.item.formDefinition)
+        const materials = (current.item.formDefinition as { materials?: PublicMaterial[] } | null | undefined)?.materials
+        const formPlayer = (
+          <FormPlayer
+            scopeKey={`wholev2:${meta.attemptId}:${current.slotKey}`}
+            item={{
+              id: current.item.id,
+              type: current.item.formType,
+              label: current.item.formLabel,
+              placeholder: current.item.formPlaceholder,
+              required: current.item.required,
+              formDefinition: current.item.formDefinition,
+              formPolicy: current.item.formPolicy as any,
+            }}
+            options={options}
+            value={drafts[current.slotKey]?.[current.item.id] as FormPlayerValue}
+            otherText={formOtherTexts[current.slotKey]?.[current.item.id]}
+            onOtherTextChange={text => setFormOtherText(current.slotKey, current.item.id, text)}
+            answerDisabled={lockedForPendingSubmit}
+            navigationDisabled={submitting}
+            submitDisabled={submitting}
+            position={index + 1}
+            total={steps.length}
+            onChange={val => setFormAnswer(current.slotKey, current.item.id, val)}
+            onPrevious={() => setIndex(prev => Math.max(0, prev - 1))}
+            onNext={index + 1 < steps.length ? () => setIndex(prev => prev + 1) : undefined}
+            onSubmit={index + 1 === steps.length ? () => void submitWhole() : undefined}
+            submitLabel="提交整份问卷"
+            submitting={submitting}
+          />
+        )
+        return (
+          <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
+            <h2 className="mb-2 text-xl font-semibold">{current.unit.title}</h2>
+            {current.unit.description ? (
+              <p className="mb-4 whitespace-pre-wrap text-slate-600">{current.unit.description}</p>
+            ) : null}
+            <p className="mb-4 text-sm text-slate-600">整卷第 {index + 1} / {steps.length} 步</p>
+            <TrainingMaterials
+              items={materials}
+              loadAsset={assetId => client.loadSlotImage(current.slotKey, assetId)}
             />
-          </AssessmentImageGate>
-        </div>
-      ) : null}
+            <AssessmentImageGate
+              items={assessmentOptionImageItems(options)}
+              loadAsset={assetId => client.loadSlotImage(current.slotKey, assetId)}
+              disabled={lockedForPendingSubmit}
+            >
+              <FormOptionVideoGroupGate
+                entries={formOptionVideoPresentations(options)}
+                loadSources={entry => loadSlotVideoSources(current.slotKey, entry.presentation.video.assetId)}
+              >
+                {formPlayer}
+              </FormOptionVideoGroupGate>
+            </AssessmentImageGate>
+          </div>
+        )
+      })() : null}
 
       {current?.kind === 'SITUATIONAL_UNIT' ? (
         <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">

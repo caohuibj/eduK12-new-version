@@ -6,6 +6,7 @@ import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit
 import { BoundedArtifactCache } from '../assessment-runtime/bounded-artifact-cache'
 import {
   buildCompositePublicationPlan,
+  cacheCommittedCompositePublicationPlan,
   loadCompositePublicationPlan,
   saveCompositePublicationPlan,
   type CompositePublicationPlanV1,
@@ -48,10 +49,21 @@ import { decryptCognitivePayload } from '../cognitive/cognitive.security'
 import { hashResolvedConfig, readFrozenReport } from '../cognitive/profile-freeze'
 import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
 import type { CognitiveProfile } from '../cognitive/v2/types'
-import { publicTemplatesForDatabase } from '../assessment-runtime/public-templates'
+import {
+  onCommittedStartTransaction,
+  publicTemplates,
+  publicTemplatesForDatabase,
+} from '../assessment-runtime/public-templates'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
+import { createRelationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
+import { createSqlRelationalAssignmentRepository } from '../assessment-relational/repository'
+import { assertPrivateFormFinalCurrent } from '../assessment-run/educationPrivateFormExecution'
 import { currentFieldComposition } from '../huiteacher/fieldComposition.authority'
-import type { AuthorizedWholeV2Attempt } from './whole-v2.routes'
+import {
+  readTrainingPersistencePolicy,
+  readTrainingPersistenceSnapshot,
+} from './training-persistence.policy'
+import type { AuthorizedWholeV2Attempt, WholeV2PersistencePolicyView } from './whole-v2.routes'
 
 type Db = PrismaClient | Prisma.TransactionClient
 
@@ -483,9 +495,23 @@ export async function materializeCompositePublicationPlan(
     slots,
     flowDefinition: composite.trainingFlowFrozen ?? composite.trainingFlowDraft ?? null,
   })
+  const alreadyCommitted = Boolean(publicTemplates.get(plan.publicationHash))
   await saveCompositePublicationPlan(plan, publicTemplatesForDatabase(db))
-  if (canUsePlanCache) {
-    planByCompositeCache.set(cacheKey, plan, 256 * 1024)
+  if (db === prisma || alreadyCommitted) {
+    // Already durable in DB (committed root store or previously committed template).
+    cacheCommittedCompositePublicationPlan(plan)
+    if (canUsePlanCache) {
+      planByCompositeCache.set(cacheKey, plan, 256 * 1024)
+    }
+  } else {
+    // Inside a START transaction: NEVER populate process-global caches before commit
+    // so a rolled-back START can never leave a dangling publicationHash in memory.
+    onCommittedStartTransaction(db, () => {
+      cacheCommittedCompositePublicationPlan(plan)
+      if (canUsePlanCache) {
+        planByCompositeCache.set(cacheKey, plan, 256 * 1024)
+      }
+    })
   }
   return plan
 }
@@ -513,8 +539,71 @@ interface LoadedAttemptRow {
   publicationHash: string | null
   unitSeedsEncrypted: string | null
   deliveryCourseId: string | null
+  assignmentRef: string | null
+  consentId: string | null
+  trainingTimingSnapshot: unknown
+  trainingPersistenceSnapshot: unknown
+  trainingPersistenceSnapshotHash: string | null
   trainingVariantAllocationEncrypted: string | null
   trainingVariantAllocationHash: string | null
+  compositeAssessment: {
+    creationKey: string | null
+    productKind: string
+    timingExportEnabled: boolean
+    trainingTimingPolicy: unknown
+    trainingPersistencePolicy: unknown
+  } | null
+}
+
+function resolveTimingAndPersistence(attempt: LoadedAttemptRow): {
+  timingEnabled: boolean
+  persistencePolicy: WholeV2PersistencePolicyView
+} {
+  const timingEnabled = Boolean(
+    attempt.trainingTimingSnapshot != null
+      || attempt.compositeAssessment?.trainingTimingPolicy != null
+      || attempt.compositeAssessment?.timingExportEnabled === true,
+  )
+  let policy = null as ReturnType<typeof readTrainingPersistencePolicy>
+  try {
+    const snap = readTrainingPersistenceSnapshot(attempt)
+    if (snap) {
+      policy = snap.policy
+    }
+  } catch {
+    // Historical or incomplete snapshot fails closed to persistence disabled.
+    policy = null
+  }
+  if (!policy && attempt.compositeAssessment?.trainingPersistencePolicy != null) {
+    policy = readTrainingPersistencePolicy(attempt.compositeAssessment.trainingPersistencePolicy)
+  }
+  return {
+    timingEnabled,
+    persistencePolicy: {
+      draftCheckpointEnabled: Boolean(policy?.checkpoint?.enabled),
+      draftTtlHours: policy?.checkpoint?.ttlHours ?? null,
+      localCognitiveEnabled: Boolean(policy?.localCognitive?.enabled),
+      localCognitiveTtlHours: policy?.localCognitive?.ttlHours ?? null,
+    },
+  }
+}
+
+function assertRelationalConsentInTx(
+  tx: unknown,
+  attempt: Pick<LoadedAttemptRow, 'id' | 'userId' | 'assignmentRef' | 'consentId'>,
+  actorUserId: string,
+): Promise<void> {
+  if (!attempt.assignmentRef) return Promise.resolve()
+  const authority = createRelationalRuntimeConsentAuthority({
+    db: tx as any,
+    assignments: createSqlRelationalAssignmentRepository(tx as any),
+  })
+  return authority.assertCompositeFinal(attempt.id, actorUserId, {
+    id: attempt.id,
+    userId: attempt.userId,
+    assignmentRef: attempt.assignmentRef,
+    consentId: attempt.consentId,
+  })
 }
 
 function resolveVariantActiveSlotKeys(
@@ -563,8 +652,22 @@ async function loadAttemptRow(attemptId: string): Promise<LoadedAttemptRow> {
       publicationHash: true,
       unitSeedsEncrypted: true,
       deliveryCourseId: true,
+      assignmentRef: true,
+      consentId: true,
+      trainingTimingSnapshot: true,
+      trainingPersistenceSnapshot: true,
+      trainingPersistenceSnapshotHash: true,
       trainingVariantAllocationEncrypted: true,
       trainingVariantAllocationHash: true,
+      compositeAssessment: {
+        select: {
+          creationKey: true,
+          productKind: true,
+          timingExportEnabled: true,
+          trainingTimingPolicy: true,
+          trainingPersistencePolicy: true,
+        },
+      },
     },
   })
   if (!attempt) {
@@ -594,11 +697,13 @@ async function loadEducationRunBinding(
 
 export async function authorizeTrainingAuthenticatedWholeV2(req: Request): Promise<AuthorizedWholeV2Attempt> {
   const attempt = await loadAttemptRow(req.params.attemptId)
-  if (!req.user?.userId || attempt.userId !== req.user.userId) {
+  const actorUserId = req.user?.userId
+  if (!actorUserId || attempt.userId !== actorUserId) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权访问此综合测评', 403)
   }
   const plan = await resolveCompositePublicationPlanForAttempt(attempt)
   const activeSlotKeys = resolveVariantActiveSlotKeys(attempt, plan)
+  const { timingEnabled, persistencePolicy } = resolveTimingAndPersistence(attempt)
   return {
     attempt: {
       id: attempt.id,
@@ -613,7 +718,14 @@ export async function authorizeTrainingAuthenticatedWholeV2(req: Request): Promi
     },
     plan,
     audience: 'authenticated',
+    timingEnabled,
+    persistencePolicy,
     ...(activeSlotKeys ? { activeSlotKeys } : {}),
+    ...(attempt.assignmentRef
+      ? {
+          verifyAuthorityInTx: tx => assertRelationalConsentInTx(tx, attempt, actorUserId),
+        }
+      : {}),
   }
 }
 
@@ -629,6 +741,7 @@ export async function authorizeTrainingPublicWholeV2(req: Request): Promise<Auth
   }
   const plan = await resolveCompositePublicationPlanForAttempt(attempt)
   const activeSlotKeys = resolveVariantActiveSlotKeys(attempt, plan)
+  const { timingEnabled, persistencePolicy } = resolveTimingAndPersistence(attempt)
   return {
     attempt: {
       id: attempt.id,
@@ -643,18 +756,47 @@ export async function authorizeTrainingPublicWholeV2(req: Request): Promise<Auth
     },
     plan,
     audience: 'public',
+    timingEnabled,
+    persistencePolicy,
     ...(activeSlotKeys ? { activeSlotKeys } : {}),
+    verifyAuthorityInTx: async tx => {
+      const rows = await (tx as Prisma.TransactionClient).$queryRaw<Array<{
+        userId: string | null
+        recoveryTokenHash: string | null
+      }>>(Prisma.sql`
+        SELECT user_id AS "userId", recovery_token_hash AS "recoveryTokenHash"
+        FROM composite_assessment_attempts
+        WHERE id = ${attempt.id}
+        LIMIT 1
+      `)
+      const current = rows[0]
+      if (!current || current.userId !== null || current.recoveryTokenHash !== recoveryTokenHash) {
+        throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '恢复凭证无权访问此综合测评', 403)
+      }
+    },
   }
 }
 
 export async function authorizeEducationWholeV2(req: Request): Promise<AuthorizedWholeV2Attempt> {
   // Entry middleware (campusWholeAccess / wholeBound / requireScaleAttempt / requireAttempt)
-  // has already verified School / Teacher authority.
+  // has verified School / Teacher entry access; verifyAuthorityInTx re-checks live
+  // revocation/emergency-stop/consent fences atomically inside the FINAL transaction.
+  const actorUserId = req.user?.userId
+  if (!actorUserId) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '教育端作答需要已登录账号', 403)
+  }
   const attempt = await loadAttemptRow(req.params.attemptId)
+  if (attempt.userId !== actorUserId) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权访问此教育测评记录', 403)
+  }
   const [plan, runBinding] = await Promise.all([
     resolveCompositePublicationPlanForAttempt(attempt),
     loadEducationRunBinding(attempt.id),
   ])
+  const { timingEnabled, persistencePolicy } = resolveTimingAndPersistence(attempt)
+  const creationKey = attempt.compositeAssessment?.creationKey ?? ''
+  const isBoundCompositionOrPrivateForm = creationKey.startsWith('education-composition:')
+    || creationKey.startsWith('private-form:')
   return {
     attempt: {
       id: attempt.id,
@@ -670,6 +812,8 @@ export async function authorizeEducationWholeV2(req: Request): Promise<Authorize
     },
     plan,
     audience: 'authenticated',
+    timingEnabled,
+    persistencePolicy,
     ...(runBinding
       ? {
           educationRun: {
@@ -678,6 +822,16 @@ export async function authorizeEducationWholeV2(req: Request): Promise<Authorize
           },
         }
       : {}),
+    verifyAuthorityInTx: async tx => {
+      if (isBoundCompositionOrPrivateForm) {
+        await assertPrivateFormFinalCurrent(tx as Prisma.TransactionClient, {
+          attemptId: attempt.id,
+          actorUserId,
+        })
+      } else if (attempt.assignmentRef) {
+        await assertRelationalConsentInTx(tx, attempt, actorUserId)
+      }
+    },
   }
 }
 
@@ -706,6 +860,13 @@ export async function authorizeFieldCompositionWholeV2(req: Request): Promise<Au
     },
     plan,
     audience: 'authenticated',
+    timingEnabled: false,
+    persistencePolicy: {
+      draftCheckpointEnabled: false,
+      draftTtlHours: null,
+      localCognitiveEnabled: false,
+      localCognitiveTtlHours: null,
+    },
     verifyAuthorityInTx: async tx => {
       await currentFieldComposition(tx as Prisma.TransactionClient, {
         attemptId: attempt.id,

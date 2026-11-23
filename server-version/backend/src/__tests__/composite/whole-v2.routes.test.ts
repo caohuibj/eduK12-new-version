@@ -69,6 +69,17 @@ vi.mock('../../config/database', () => {
 
 import { mountCompositeWholeV2Routes } from '../../modules/composite/whole-v2.routes'
 import { resolveCompositePublicationPlanForAttempt } from '../../modules/composite/whole-v2.access'
+import {
+  clearCompositePublicationPlanCacheForTests,
+  loadCompositePublicationPlan,
+  saveCompositePublicationPlan,
+} from '../../modules/assessment-runtime/composite-publication-plan'
+import {
+  createPublicTemplateStore,
+  onCommittedStartTransaction,
+  withCommittedStartTemplates,
+} from '../../modules/assessment-runtime/public-templates'
+import { RelationalAssessmentError } from '../../modules/assessment-relational/errors'
 import { gonogoSequence } from '../../modules/cognitive/randomization'
 
 const sha = (s: string) => createHash('sha256').update(s).digest('hex')
@@ -245,5 +256,160 @@ describe('whole-v2.routes HTTP contract', () => {
     } finally {
       await srv.close()
     }
+  })
+
+  it('enforces persistencePolicy on plain drafts, replaceMiddlewareOnSubmit avoids double auth, and maps RelationalAssessmentError to 403/409', async () => {
+    const fixture = buildFourFamilyTestSlots()
+    const attemptId = randomUUID()
+    const plan = buildCompositePublicationPlan({
+      compositeId: randomUUID(),
+      title: '治理策略与事务授权测试卷',
+      slots: fixture.slots,
+    })
+    parentState.status = 'IN_PROGRESS'
+    parentState.attemptEpoch = 1
+    parentState.publicationHash = plan.publicationHash
+    const seeds = generateCompositeUnitSeeds(plan, attemptId, 1)!
+    const readMwCalls: string[] = []
+    const submitMwCalls: string[] = []
+    const router = express.Router()
+    mountCompositeWholeV2Routes(router, {
+      prefix: '/attempts',
+      middleware: [(_req, _res, next) => { readMwCalls.push('read'); next() }],
+      submitMiddleware: [(_req, _res, next) => { submitMwCalls.push('submit'); next() }],
+      replaceMiddlewareOnSubmit: true,
+      authorizeAttempt: async () => ({
+        attempt: {
+          id: attemptId,
+          compositeAssessmentId: plan.compositeId,
+          attemptEpoch: 1,
+          publicationHash: plan.publicationHash,
+          unitSeedsEncrypted: seeds.encrypted,
+          receiptOnly: true,
+          startedAt: new Date(),
+        },
+        plan,
+        audience: 'authenticated',
+        timingEnabled: false,
+        persistencePolicy: {
+          draftCheckpointEnabled: false,
+          draftTtlHours: null,
+          localCognitiveEnabled: false,
+          localCognitiveTtlHours: null,
+        },
+        verifyAuthorityInTx: async () => {
+          throw new RelationalAssessmentError('RELATIONAL_CONSENT_REQUIRED', 'accepted consent is required at relational FINAL')
+        },
+      }),
+    })
+
+    const srv = await startTestServer(router)
+    try {
+      // Plain draft PUT is rejected when draftCheckpointEnabled is false
+      const plainPut = await fetch(`${srv.baseUrl}/attempts/${attemptId}/v2/checkpoint`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          expectedRevision: 0,
+          attemptEpoch: 1,
+          drafts: { [`scale:${fixture.scaleItemId}`]: { q1: 1 } },
+        }),
+      })
+      expect(plainPut.status).toBe(403)
+      const plainBody: any = await plainPut.json()
+      expect(plainBody.code).toBe('CHECKPOINT_NOT_ENABLED')
+
+      // Mandatory Cognitive lockUnit is still allowed even when optional drafts are disabled
+      const cogSlotKey = `cognitive:${fixture.cogItemId}`
+      const lockPut = await fetch(`${srv.baseUrl}/attempts/${attemptId}/v2/checkpoint`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          expectedRevision: 0,
+          attemptEpoch: 1,
+          drafts: { [`scale:${fixture.scaleItemId}`]: { q1: 1 } },
+          lockUnit: {
+            slotKey: cogSlotKey,
+            unit: {
+              unitType: 'COGNITIVE',
+              itemId: fixture.cogItemId,
+              randomSeed: seeds.seeds[cogSlotKey],
+              trials: makeGonogoTrials(seeds.seeds[cogSlotKey], 8),
+            },
+          },
+        }),
+      })
+      expect(lockPut.status).toBe(200)
+      const lockBody: any = await lockPut.json()
+      expect(lockBody.data.lockedSlotKeys).toEqual([cogSlotKey])
+      // Drafts were stripped because draftCheckpointEnabled=false
+      expect(lockBody.data.envelope.drafts).toEqual({})
+
+      // Submit runs submitMiddleware ONCE (not read middleware!) and maps RelationalAssessmentError -> 409
+      const readCountBefore = readMwCalls.length
+      const submitRes = await fetch(`${srv.baseUrl}/attempts/${attemptId}/v2/whole/submit`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          submissionId: `whole-${sha('consent-revoked')}`,
+          attemptEpoch: 1,
+          publicationHash: plan.publicationHash,
+          slotSetHash: plan.slotSetHash,
+          units: {},
+        }),
+      })
+      expect(readMwCalls.length).toBe(readCountBefore)
+      expect(submitMwCalls).toEqual(['submit'])
+      expect(submitRes.status).toBe(409)
+      const submitBody: any = await submitRes.json()
+      expect(submitBody.code).toBe('RELATIONAL_CONSENT_REQUIRED')
+    } finally {
+      await srv.close()
+    }
+  })
+
+  it('never populates global publication plan cache from a tx-local template store before commit (P1-01)', async () => {
+    clearCompositePublicationPlanCacheForTests()
+    const fixture = buildFourFamilyTestSlots()
+    const plan = buildCompositePublicationPlan({
+      compositeId: randomUUID(),
+      title: '事务回滚不污染全局缓存测试卷',
+      slots: fixture.slots,
+    })
+    const txRows = new Map<string, any>()
+    const txStore = createPublicTemplateStore({
+      read: async hashes => hashes.map(h => txRows.get(h)).filter(Boolean),
+      append: async rows => { for (const r of rows) txRows.set(r.templateHash, r) },
+    })
+    // Saving through a tx-local store must NOT populate global planCache
+    await saveCompositePublicationPlan(plan, txStore)
+    const emptyCommittedStore = createPublicTemplateStore({
+      read: async () => [],
+      append: async () => {},
+    })
+    await expect(loadCompositePublicationPlan(plan.publicationHash, emptyCommittedStore))
+      .rejects.toThrow('PUBLIC_TEMPLATE_UNAVAILABLE')
+
+    // onCommittedStartTransaction only fires on commit, never on rollback
+    let promoted = 0
+    await expect(withCommittedStartTemplates(
+      async work => {
+        const fakeTx = {} as any
+        await work(fakeTx)
+        throw new Error('SIMULATED_ROLLBACK')
+      },
+      async tx => {
+        onCommittedStartTransaction(tx, () => { promoted += 1 })
+      },
+    )).rejects.toThrow('SIMULATED_ROLLBACK')
+    expect(promoted).toBe(0)
+
+    await withCommittedStartTemplates(
+      async work => work({} as any),
+      async tx => {
+        onCommittedStartTransaction(tx, () => { promoted += 1 })
+      },
+    )
+    expect(promoted).toBe(1)
   })
 })

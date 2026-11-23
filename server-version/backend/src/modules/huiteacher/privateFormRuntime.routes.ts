@@ -140,7 +140,6 @@ router.post('/private-form-composite-attempts/:attemptId/form-sections/:sectionI
 mountCompositeWholeV2Routes(router, {
  prefix: '/private-form-composite-attempts',
  middleware: [authenticateHuiteacher, requireAttempt],
- submitMiddleware: [finalConsent],
  authorizeAttempt: authorizeEducationWholeV2,
 })
 export default router

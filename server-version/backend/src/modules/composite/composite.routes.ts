@@ -82,7 +82,7 @@ router.post('/attempts/:attemptId/whole/submit', observeWholeMiddleware('whole.i
 mountCompositeWholeV2Routes(router, {
   prefix: '/attempts',
   middleware: [authenticate, respondentAttemptAccess],
-  submitMiddleware: [authenticatedWholeSubmissionPriority, relationalWholeFinalConsentGuard],
+  submitMiddleware: [authenticatedWholeSubmissionPriority],
   authorizeAttempt: authorizeTrainingAuthenticatedWholeV2,
 })
 router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', authenticate, respondentAttemptAccess, compositeImageController.authenticatedFormImage)
