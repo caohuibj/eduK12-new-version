@@ -188,6 +188,39 @@ function rehydrateSealedWithLockedUnits(
   }
 }
 
+function canonicalJson(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value)
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`
+  const entries = Object.entries(value as Record<string, unknown>)
+    .filter(([, v]) => v !== undefined)
+    .sort(([a], [b]) => a.localeCompare(b))
+  return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${canonicalJson(v)}`).join(',')}}`
+}
+
+function canonicalLockedUnitPayload(
+  unit:
+    | WholeV2LockedUnit
+    | Omit<Extract<WholeV2LockedUnit, { unitType: 'COGNITIVE' }>, 'lockedAt' | 'payloadHash'>
+    | Omit<Extract<WholeV2LockedUnit, { unitType: 'SITUATIONAL' }>, 'lockedAt' | 'payloadHash'>,
+): string {
+  if (unit.unitType === 'COGNITIVE') {
+    return canonicalJson({
+      unitType: 'COGNITIVE',
+      itemId: unit.itemId,
+      randomSeed: unit.randomSeed,
+      trials: unit.trials,
+      ...(unit.summaryMeta !== undefined ? { summaryMeta: unit.summaryMeta } : {}),
+    })
+  }
+  return canonicalJson({
+    unitType: 'SITUATIONAL',
+    itemId: unit.itemId,
+    responses: unit.responses,
+    ...(unit.researchEvents !== undefined ? { researchEvents: unit.researchEvents } : {}),
+    ...(unit.totalTimeMs !== undefined ? { totalTimeMs: unit.totalTimeMs } : {}),
+  })
+}
+
 function sameLockedUnitPayload(
   existing: WholeV2LockedUnit,
   candidate:
@@ -195,14 +228,7 @@ function sameLockedUnitPayload(
     | Omit<Extract<WholeV2LockedUnit, { unitType: 'SITUATIONAL' }>, 'lockedAt' | 'payloadHash'>,
 ): boolean {
   if (existing.unitType !== candidate.unitType || existing.itemId !== candidate.itemId) return false
-  if (existing.unitType === 'COGNITIVE' && candidate.unitType === 'COGNITIVE') {
-    return existing.randomSeed === candidate.randomSeed
-      && JSON.stringify(existing.trials) === JSON.stringify(candidate.trials)
-  }
-  if (existing.unitType === 'SITUATIONAL' && candidate.unitType === 'SITUATIONAL') {
-    return JSON.stringify(existing.responses) === JSON.stringify(candidate.responses)
-  }
-  return false
+  return canonicalLockedUnitPayload(existing) === canonicalLockedUnitPayload(candidate)
 }
 
 /** Packs formOtherTexts into checkpoint drafts using `__otherText:<itemId>` keys so

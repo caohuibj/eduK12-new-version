@@ -60,8 +60,9 @@ import { createSqlRelationalAssignmentRepository } from '../assessment-relationa
 import { assertPrivateFormFinalCurrent } from '../assessment-run/educationPrivateFormExecution'
 import { currentFieldComposition } from '../huiteacher/fieldComposition.authority'
 import {
-  readTrainingPersistencePolicy,
   readTrainingPersistenceSnapshot,
+  trainingCheckpointExpiry,
+  type TrainingPersistenceSnapshot,
 } from './training-persistence.policy'
 import type { AuthorizedWholeV2Attempt, WholeV2PersistencePolicyView } from './whole-v2.routes'
 
@@ -549,42 +550,52 @@ interface LoadedAttemptRow {
   compositeAssessment: {
     creationKey: string | null
     productKind: string
-    timingExportEnabled: boolean
-    trainingTimingPolicy: unknown
-    trainingPersistencePolicy: unknown
+    expiresAt: Date | null
+  } | null
+  accessToken: {
+    trainingRound: {
+      closesAt: Date | null
+    } | null
   } | null
 }
 
-function resolveTimingAndPersistence(attempt: LoadedAttemptRow): {
+async function resolveTimingAndPersistence(attempt: LoadedAttemptRow): Promise<{
   timingEnabled: boolean
   persistencePolicy: WholeV2PersistencePolicyView
-} {
-  const timingEnabled = Boolean(
-    attempt.trainingTimingSnapshot != null
-      || attempt.compositeAssessment?.trainingTimingPolicy != null
-      || attempt.compositeAssessment?.timingExportEnabled === true,
-  )
-  let policy = null as ReturnType<typeof readTrainingPersistencePolicy>
+  checkpointExpiresAt?: (now: Date) => Date
+}> {
+  // Strictly honor the attempt's frozen snapshots; never fall back to mutable
+  // composite-level draft/timing policies (P1-02).
+  const timingEnabled = attempt.trainingTimingSnapshot != null
+  let snapshot: TrainingPersistenceSnapshot | null = null
   try {
-    const snap = readTrainingPersistenceSnapshot(attempt)
-    if (snap) {
-      policy = snap.policy
-    }
+    snapshot = readTrainingPersistenceSnapshot(attempt)
   } catch {
-    // Historical or incomplete snapshot fails closed to persistence disabled.
-    policy = null
+    // Corrupted or mismatched snapshot fails closed to persistence disabled.
+    snapshot = null
   }
-  if (!policy && attempt.compositeAssessment?.trainingPersistencePolicy != null) {
-    policy = readTrainingPersistencePolicy(attempt.compositeAssessment.trainingPersistencePolicy)
+  let checkpointExpiresAt: ((now: Date) => Date) | undefined
+  if (snapshot?.policy.checkpoint) {
+    const course = snapshot.courseId
+      ? await prisma.course.findUnique({ where: { id: snapshot.courseId }, select: { endedAt: true } })
+      : null
+    const cutoffs = [
+      course?.endedAt ?? null,
+      attempt.compositeAssessment?.expiresAt ?? null,
+      attempt.accessToken?.trainingRound?.closesAt ?? null,
+    ]
+    const frozenSnapshot = snapshot
+    checkpointExpiresAt = (now: Date) => trainingCheckpointExpiry(frozenSnapshot, now, cutoffs)
   }
   return {
     timingEnabled,
     persistencePolicy: {
-      draftCheckpointEnabled: Boolean(policy?.checkpoint?.enabled),
-      draftTtlHours: policy?.checkpoint?.ttlHours ?? null,
-      localCognitiveEnabled: Boolean(policy?.localCognitive?.enabled),
-      localCognitiveTtlHours: policy?.localCognitive?.ttlHours ?? null,
+      draftCheckpointEnabled: Boolean(snapshot?.policy.checkpoint?.enabled),
+      draftTtlHours: snapshot?.policy.checkpoint?.ttlHours ?? null,
+      localCognitiveEnabled: Boolean(snapshot?.policy.localCognitive?.enabled),
+      localCognitiveTtlHours: snapshot?.policy.localCognitive?.ttlHours ?? null,
     },
+    ...(checkpointExpiresAt ? { checkpointExpiresAt } : {}),
   }
 }
 
@@ -663,9 +674,16 @@ async function loadAttemptRow(attemptId: string): Promise<LoadedAttemptRow> {
         select: {
           creationKey: true,
           productKind: true,
-          timingExportEnabled: true,
-          trainingTimingPolicy: true,
-          trainingPersistencePolicy: true,
+          expiresAt: true,
+        },
+      },
+      accessToken: {
+        select: {
+          trainingRound: {
+            select: {
+              closesAt: true,
+            },
+          },
         },
       },
     },
@@ -703,7 +721,7 @@ export async function authorizeTrainingAuthenticatedWholeV2(req: Request): Promi
   }
   const plan = await resolveCompositePublicationPlanForAttempt(attempt)
   const activeSlotKeys = resolveVariantActiveSlotKeys(attempt, plan)
-  const { timingEnabled, persistencePolicy } = resolveTimingAndPersistence(attempt)
+  const { timingEnabled, persistencePolicy, checkpointExpiresAt } = await resolveTimingAndPersistence(attempt)
   return {
     attempt: {
       id: attempt.id,
@@ -720,6 +738,7 @@ export async function authorizeTrainingAuthenticatedWholeV2(req: Request): Promi
     audience: 'authenticated',
     timingEnabled,
     persistencePolicy,
+    ...(checkpointExpiresAt ? { checkpointExpiresAt } : {}),
     ...(activeSlotKeys ? { activeSlotKeys } : {}),
     ...(attempt.assignmentRef
       ? {
@@ -741,7 +760,7 @@ export async function authorizeTrainingPublicWholeV2(req: Request): Promise<Auth
   }
   const plan = await resolveCompositePublicationPlanForAttempt(attempt)
   const activeSlotKeys = resolveVariantActiveSlotKeys(attempt, plan)
-  const { timingEnabled, persistencePolicy } = resolveTimingAndPersistence(attempt)
+  const { timingEnabled, persistencePolicy, checkpointExpiresAt } = await resolveTimingAndPersistence(attempt)
   return {
     attempt: {
       id: attempt.id,
@@ -758,6 +777,7 @@ export async function authorizeTrainingPublicWholeV2(req: Request): Promise<Auth
     audience: 'public',
     timingEnabled,
     persistencePolicy,
+    ...(checkpointExpiresAt ? { checkpointExpiresAt } : {}),
     ...(activeSlotKeys ? { activeSlotKeys } : {}),
     verifyAuthorityInTx: async tx => {
       const rows = await (tx as Prisma.TransactionClient).$queryRaw<Array<{
@@ -789,11 +809,12 @@ export async function authorizeEducationWholeV2(req: Request): Promise<Authorize
   if (attempt.userId !== actorUserId) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权访问此教育测评记录', 403)
   }
-  const [plan, runBinding] = await Promise.all([
+  const [plan, runBinding, governance] = await Promise.all([
     resolveCompositePublicationPlanForAttempt(attempt),
     loadEducationRunBinding(attempt.id),
+    resolveTimingAndPersistence(attempt),
   ])
-  const { timingEnabled, persistencePolicy } = resolveTimingAndPersistence(attempt)
+  const { timingEnabled, persistencePolicy, checkpointExpiresAt } = governance
   const creationKey = attempt.compositeAssessment?.creationKey ?? ''
   const isBoundCompositionOrPrivateForm = creationKey.startsWith('education-composition:')
     || creationKey.startsWith('private-form:')
@@ -814,6 +835,7 @@ export async function authorizeEducationWholeV2(req: Request): Promise<Authorize
     audience: 'authenticated',
     timingEnabled,
     persistencePolicy,
+    ...(checkpointExpiresAt ? { checkpointExpiresAt } : {}),
     ...(runBinding
       ? {
           educationRun: {

@@ -30,6 +30,7 @@ import {
 } from '../assessment-runtime/composite-slot-media.service'
 import type { AssessmentMediaCapabilityAudience } from '../assessment-media/assessment-media-capability'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
+import { TrainingPersistenceError } from './training-persistence.policy'
 
 const checkpointPutSchema = z.object({
   expectedRevision: z.number().int().min(0),
@@ -76,6 +77,8 @@ export interface AuthorizedWholeV2Attempt {
   activeSlotKeys?: ReadonlySet<string>
   timingEnabled?: boolean
   persistencePolicy?: WholeV2PersistencePolicyView
+  /** Optional frozen-policy checkpoint expiry calculator (enforces course/round cutoffs). */
+  checkpointExpiresAt?: (now: Date) => Date
   verifyAuthorityInTx?: CommitCompositeWholeFinalInput['verifyAuthorityInTx']
   buildFeedback?: CommitCompositeWholeFinalInput['buildFeedback']
 }
@@ -110,6 +113,9 @@ function respondError(res: Response, err: unknown, fallbackMessage: string) {
   if (err instanceof RelationalAssessmentError) {
     const status = err.code === 'RELATIONAL_ANALYSIS_ACCESS' || err.code === 'RELATIONAL_ASSIGNMENT_ACTOR' ? 403 : 409
     return instrumentError(res, err.code, err.message, status)
+  }
+  if (err instanceof TrainingPersistenceError) {
+    return instrumentError(res, 'CHECKPOINT_POLICY_REJECTED', err.message, err.statusCode)
   }
   if (err && typeof err === 'object') {
     const known = err as { statusCode?: unknown; code?: unknown; message?: unknown }
@@ -348,17 +354,25 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
           unit: parsed.lockUnit.unit,
         })
       }
+      const now = new Date()
       const ttlHours = ctx.persistencePolicy?.draftTtlHours ?? 24
+      // Enforce frozen Training course/round cutoffs via trainingCheckpointExpiry when present (P1-02);
+      // mandatory Cognitive/SJT lockUnit saves without draft policy retain a 24h lock horizon.
+      const expiresAt = ctx.checkpointExpiresAt && !parsed.lockUnit
+        ? ctx.checkpointExpiresAt(now)
+        : ctx.checkpointExpiresAt && ctx.persistencePolicy?.draftCheckpointEnabled
+          ? ctx.checkpointExpiresAt(now)
+          : new Date(now.getTime() + ttlHours * 3_600_000)
       const snapshot = await prisma.$transaction(tx => saveCompositeCheckpoint(tx, {
         attemptId: ctx.attempt.id,
         attemptEpoch: ctx.attempt.attemptEpoch,
         publicationHash: ctx.plan.publicationHash,
         expectedRevision: parsed.expectedRevision,
         drafts: ctx.persistencePolicy && !ctx.persistencePolicy.draftCheckpointEnabled ? {} : parsed.drafts,
-        itemTimings: ctx.timingEnabled === false ? undefined : parsed.itemTimings,
+        itemTimings: ctx.timingEnabled === true ? parsed.itemTimings : undefined,
         lockUnit: parsed.lockUnit,
         allowedSlotKeys,
-        expiresAt: new Date(Date.now() + ttlHours * 3_600_000),
+        expiresAt,
         verifyAttemptActive: true,
       }))
       return success(res, snapshot)
@@ -391,7 +405,31 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
   router.post(`${base}/v2/whole/submit`, ...submitMw, async (req: Request, res: Response) => {
     try {
       const ctx = await adapter.authorizeAttempt(req)
-      const submit = wholeV2SubmitSchema.parse(req.body)
+      const parsedSubmit = wholeV2SubmitSchema.parse(req.body)
+      // Enforce frozen timing governance at the server submit boundary (P1-03):
+      // when optional Scale timing is not explicitly enabled on this attempt,
+      // strip client-supplied per-item timing fields before scoring & FINAL persistence.
+      const submit = ctx.timingEnabled === true
+        ? parsedSubmit
+        : {
+            ...parsedSubmit,
+            units: Object.fromEntries(
+              Object.entries(parsedSubmit.units).map(([slotKey, unit]) => {
+                if (unit.unitType !== 'SCALE') return [slotKey, unit]
+                const { timings: _droppedTimings, ...rest } = unit
+                return [
+                  slotKey,
+                  {
+                    ...rest,
+                    answers: unit.answers.map(({ itemCode, responseValue }) => ({
+                      itemCode,
+                      responseValue,
+                    })),
+                  },
+                ]
+              }),
+            ),
+          }
       const receipt = await withWholeSubmitAdmission(
         () => prisma.$transaction(tx => commitCompositeWholeFinal(tx, {
           attempt: ctx.attempt,

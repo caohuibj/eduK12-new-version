@@ -10,41 +10,85 @@ import {
 
 const checkpoints = new Map<string, any>()
 const finals = new Map<string, any>()
+const publicTemplateRows = new Map<string, any>()
 const parentState = { status: 'IN_PROGRESS', attemptEpoch: 1, publicationHash: null as string | null }
+
+function flattenSqlValues(vals: unknown[]): unknown[] {
+  const out: unknown[] = []
+  for (const v of vals) {
+    if (v && typeof v === 'object' && Array.isArray((v as { values?: unknown[] }).values)) {
+      out.push(...flattenSqlValues((v as { values: unknown[] }).values))
+    } else {
+      out.push(v)
+    }
+  }
+  return out
+}
+
+function parseSqlCall(first: any, rest: unknown[]): { text: string; values: any[] } {
+  if (Array.isArray(first)) {
+    return { text: first.join('?'), values: flattenSqlValues(rest) }
+  }
+  return {
+    text: Array.isArray(first?.strings) ? first.strings.join('?') : String(first?.sql ?? ''),
+    values: flattenSqlValues(first?.values ?? []),
+  }
+}
 
 vi.mock('../../config/database', () => {
   const mockDb: any = {
-    $queryRaw: vi.fn(async (sql: any) => {
-      const text = Array.isArray(sql?.strings) ? sql.strings.join('?') : String(sql?.sql ?? '')
+    $queryRaw: vi.fn(async (first: any, ...rest: unknown[]) => {
+      const { text, values } = parseSqlCall(first, rest)
+      if (text.includes('INSERT INTO assessment_public_templates')) {
+        for (let i = 0; i < values.length; i += 4) {
+          const [templateHash, templateKind, plaintextBytes, payloadEncrypted] = values.slice(i, i + 4)
+          if (!publicTemplateRows.has(templateHash)) {
+            publicTemplateRows.set(templateHash, { templateHash, templateKind, plaintextBytes, payloadEncrypted })
+          }
+        }
+        return []
+      }
+      if (text.includes('FROM assessment_public_templates')) {
+        return values.map((h: string) => publicTemplateRows.get(h)).filter(Boolean)
+      }
       if (text.includes('FROM composite_assessment_attempts')) {
         return [{ ...parentState }]
       }
       if (text.includes('FROM composite_attempt_checkpoints')) {
-        const row = checkpoints.get(sql.values[0])
+        const row = checkpoints.get(values[0])
         return row ? [{ ...row, lockedSlotKeys: [...row.lockedSlotKeys] }] : []
       }
       if (text.includes('FROM composite_attempt_finals')) {
-        const [attemptId, attemptEpoch] = sql.values
+        const [attemptId, attemptEpoch] = values
         const row = finals.get(`${attemptId}:${attemptEpoch}`)
         return row ? [row] : []
       }
       return []
     }),
-    $executeRaw: vi.fn(async (sql: any) => {
-      const text = Array.isArray(sql?.strings) ? sql.strings.join('?') : String(sql?.sql ?? '')
+    $executeRaw: vi.fn(async (first: any, ...rest: unknown[]) => {
+      const { text, values } = parseSqlCall(first, rest)
+      if (text.includes('INSERT INTO assessment_public_templates')) {
+        for (let i = 0; i < values.length; i += 4) {
+          const [templateHash, templateKind, plaintextBytes, payloadEncrypted] = values.slice(i, i + 4)
+          if (!publicTemplateRows.has(templateHash)) {
+            publicTemplateRows.set(templateHash, { templateHash, templateKind, plaintextBytes, payloadEncrypted })
+          }
+        }
+        return 1
+      }
       if (text.includes('INSERT INTO composite_attempt_checkpoints')) {
-        const [attemptId, attemptEpoch, publicationHash, revision, saveCount, lockedSlotKeys, payloadCipher, payloadHash, expiresAt, updatedAt] = sql.values
+        const [attemptId, attemptEpoch, publicationHash, revision, saveCount, lockedSlotKeys, payloadCipher, payloadHash, expiresAt, updatedAt] = values
         if (text.includes('ON CONFLICT') && checkpoints.has(attemptId)) return 0
         checkpoints.set(attemptId, { attemptId, attemptEpoch, publicationHash, revision, saveCount, lockedSlotKeys: [...lockedSlotKeys], payloadCipher, payloadHash, expiresAt, updatedAt })
         return 1
       }
       if (text.includes('UPDATE composite_attempt_checkpoints')) {
-        const [attemptEpoch, publicationHash, revision, saveCount, lockedSlotKeys, payloadCipher, payloadHash, expiresAt, updatedAt, attemptId] = sql.values
+        const [attemptEpoch, publicationHash, revision, saveCount, lockedSlotKeys, payloadCipher, payloadHash, expiresAt, updatedAt, attemptId] = values
         checkpoints.set(attemptId, { attemptId, attemptEpoch, publicationHash, revision, saveCount, lockedSlotKeys: [...lockedSlotKeys], payloadCipher, payloadHash, expiresAt, updatedAt })
         return 1
       }
       if (text.includes('DELETE FROM composite_attempt_checkpoints')) {
-        const attemptId = sql.values[0]
+        const attemptId = values[0]
         const existing = checkpoints.get(attemptId)
         if (!existing) return 0
         if (text.includes('cardinality(locked_slot_keys) = 0') && existing.lockedSlotKeys.length > 0) return 0
@@ -52,7 +96,7 @@ vi.mock('../../config/database', () => {
         return 1
       }
       if (text.includes('INSERT INTO composite_attempt_finals')) {
-        const [attemptId, attemptEpoch, compositeId, organizationId, courseId, publicationHash, slotSetHash, contextHash, submissionId, payloadHash, aggregateHash, factsHash, factsCipher, rawHash, rawCipher, feedbackCipher, completedAt] = sql.values
+        const [attemptId, attemptEpoch, compositeId, organizationId, courseId, publicationHash, slotSetHash, contextHash, submissionId, payloadHash, aggregateHash, factsHash, factsCipher, rawHash, rawCipher, feedbackCipher, completedAt] = values
         finals.set(`${attemptId}:${attemptEpoch}`, { attemptId, attemptEpoch, compositeId, organizationId, courseId, publicationHash, slotSetHash, contextHash, submissionId, payloadHash, aggregateHash, factsHash, factsCipher, rawHash, rawCipher, feedbackCipher, completedAt })
         return 1
       }
@@ -80,6 +124,8 @@ import {
   withCommittedStartTemplates,
 } from '../../modules/assessment-runtime/public-templates'
 import { RelationalAssessmentError } from '../../modules/assessment-relational/errors'
+import { TrainingPersistenceError } from '../../modules/composite/training-persistence.policy'
+import { decodeCompositeFinalRaw } from '../../modules/assessment-runtime/composite-final.codec'
 import { gonogoSequence } from '../../modules/cognitive/randomization'
 
 const sha = (s: string) => createHash('sha256').update(s).digest('hex')
@@ -411,5 +457,105 @@ describe('whole-v2.routes HTTP contract', () => {
       },
     )
     expect(promoted).toBe(1)
+  })
+
+  it('strips unconfigured Scale timing fields on POST /v2/whole/submit (P1-03) and enforces checkpointExpiresAt cutoff (P1-02)', async () => {
+    const fixture = buildFourFamilyTestSlots()
+    const attemptId = randomUUID()
+    const scaleSlot = fixture.slots.find(s => s.unitType === 'SCALE')!
+    const plan = buildCompositePublicationPlan({
+      compositeId: randomUUID(),
+      title: '服务端计时裁剪与截止时间测试卷',
+      slots: [scaleSlot],
+    })
+    parentState.status = 'IN_PROGRESS'
+    parentState.attemptEpoch = 1
+    parentState.publicationHash = plan.publicationHash
+    const router = express.Router()
+    let rejectExpiry = false
+    mountCompositeWholeV2Routes(router, {
+      prefix: '/attempts',
+      middleware: [],
+      authorizeAttempt: async () => ({
+        attempt: {
+          id: attemptId,
+          compositeAssessmentId: plan.compositeId,
+          attemptEpoch: 1,
+          publicationHash: plan.publicationHash,
+          unitSeedsEncrypted: null,
+          receiptOnly: true,
+          startedAt: new Date(),
+        },
+        plan,
+        audience: 'authenticated',
+        timingEnabled: false,
+        persistencePolicy: {
+          draftCheckpointEnabled: true,
+          draftTtlHours: 24,
+          localCognitiveEnabled: false,
+          localCognitiveTtlHours: null,
+        },
+        checkpointExpiresAt: now => {
+          if (rejectExpiry) throw new TrainingPersistenceError(403, '此作答的草稿保存期限已结束')
+          return new Date(now.getTime() + 60_000)
+        },
+      }),
+    })
+
+    const srv = await startTestServer(router)
+    try {
+      // Expired Training cutoff rejects draft save with 403
+      rejectExpiry = true
+      const expiredPut = await fetch(`${srv.baseUrl}/attempts/${attemptId}/v2/checkpoint`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          expectedRevision: 0,
+          attemptEpoch: 1,
+          drafts: { [scaleSlot.slotKey]: { q1: 1 } },
+        }),
+      })
+      expect(expiredPut.status).toBe(403)
+      const expiredBody: any = await expiredPut.json()
+      expect(expiredBody.code).toBe('CHECKPOINT_POLICY_REJECTED')
+
+      // Direct API submit with timing fields when timingEnabled=false strips timings before FINAL write
+      const scaleGold = fixture.scalePkg.goldenCases[0]
+      const submitRes = await fetch(`${srv.baseUrl}/attempts/${attemptId}/v2/whole/submit`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          submissionId: `whole-${sha('strip-timing-test')}`,
+          attemptEpoch: 1,
+          publicationHash: plan.publicationHash,
+          slotSetHash: plan.slotSetHash,
+          units: {
+            [scaleSlot.slotKey]: {
+              unitType: 'SCALE',
+              definitionHash: scaleSlot.definitionHash,
+              answers: scaleGold.answers.map(a => ({
+                ...a,
+                responseTimeMs: 1234,
+                changeCount: 3,
+                answeredAt: '2026-11-24T01:00:00.000Z',
+              })),
+              timings: { [scaleGold.answers[0].itemCode]: { firstResponseMs: 1234 } },
+            },
+          },
+        }),
+      })
+      const submitJson = await submitRes.json()
+      expect({ status: submitRes.status, body: submitJson }).toMatchObject({ status: 200 })
+      const storedFinal = finals.get(`${attemptId}:1`)
+      expect(storedFinal).toBeDefined()
+      const raw = decodeCompositeFinalRaw(storedFinal.rawCipher, storedFinal.rawHash)
+      const rawScale = raw.units[scaleSlot.slotKey]
+      expect(rawScale.unitType).toBe('SCALE')
+      if (rawScale.unitType === 'SCALE') {
+        expect(rawScale.timings).toBeUndefined()
+      }
+    } finally {
+      await srv.close()
+    }
   })
 })
