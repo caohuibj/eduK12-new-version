@@ -1,4 +1,5 @@
 import { loadStoredCanonicalUnitResult } from '../assessment-runtime/compact-assessment-storage'
+import { readCompositeFinalUnitSnapshots } from '../assessment-runtime/composite-final.bridge'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { parseStoredCanonicalUnitResult } from '../assessment-runtime/persistence'
 import {
@@ -35,6 +36,7 @@ const createCompositeCanonicalResultSource = (
           episodeId: true,
           assignmentRef: true,
           attemptEpoch: true,
+          publicationHash: true,
         },
       })
       if (!attempt) return null
@@ -48,19 +50,33 @@ const createCompositeCanonicalResultSource = (
         relationalFail('RELATIONAL_RUNTIME_BINDING', 'completed runtime attempt does not match the relational cohort assignment')
       }
 
-      const rows = await db.assessmentUnitSnapshot.findMany({
-        where: {
-          compositeAttemptId: attempt.id,
-          attemptEpoch: attempt.attemptEpoch,
-          terminalState: 'COMPLETED',
-          payloadKind: 'UNIT_RESULT',
-        },
-        orderBy: { slotKey: 'asc' },
-        select: {
-          slotKey: true,
-          canonicalResultEncrypted: true,
-        },
-      })
+      const v2Read = attempt.publicationHash
+        ? await readCompositeFinalUnitSnapshots(
+            db,
+            [{ attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch }],
+            { unitTypes: ['SCALE', 'SITUATIONAL', 'COGNITIVE'] },
+          )
+        : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
+      const hasV2 = v2Read.loadedFactsByKey.has(`${attempt.id}:${attempt.attemptEpoch}`)
+      const rows = hasV2
+        ? v2Read.snapshots.map(snap => ({
+            slotKey: snap.slotKey,
+            canonicalResultEncrypted: null as string | null,
+            canonicalEnvelope: snap.canonicalEnvelope,
+          }))
+        : (await db.assessmentUnitSnapshot.findMany({
+            where: {
+              compositeAttemptId: attempt.id,
+              attemptEpoch: attempt.attemptEpoch,
+              terminalState: 'COMPLETED',
+              payloadKind: 'UNIT_RESULT',
+            },
+            orderBy: { slotKey: 'asc' },
+            select: {
+              slotKey: true,
+              canonicalResultEncrypted: true,
+            },
+          })).map((r: any) => ({ ...r, canonicalEnvelope: null }))
       if (rows.length === 0) return null
 
       const metrics: Record<string, number | null> = Object.fromEntries(
@@ -69,14 +85,18 @@ const createCompositeCanonicalResultSource = (
       const seen = new Set<string>()
       const unitResults: Array<{ slotKey: string; resultHash: string }> = []
       for (const row of rows) {
-        if (!row.canonicalResultEncrypted) {
-          relationalFail('RELATIONAL_RUNTIME_BINDING', 'completed UNIT_RESULT snapshot is missing its canonical result')
-        }
         let envelope
-        try {
-          envelope = await loadStoredCanonicalUnitResult(row.canonicalResultEncrypted, db)
-        } catch {
-          return relationalFail('RELATIONAL_RUNTIME_BINDING', 'stored canonical unit result is invalid')
+        if (row.canonicalEnvelope) {
+          envelope = row.canonicalEnvelope
+        } else {
+          if (!row.canonicalResultEncrypted) {
+            relationalFail('RELATIONAL_RUNTIME_BINDING', 'completed UNIT_RESULT snapshot is missing its canonical result')
+          }
+          try {
+            envelope = await loadStoredCanonicalUnitResult(row.canonicalResultEncrypted, db)
+          } catch {
+            return relationalFail('RELATIONAL_RUNTIME_BINDING', 'stored canonical unit result is invalid')
+          }
         }
         unitResults.push({ slotKey: row.slotKey, resultHash: envelope.resultHash })
         for (const metric of envelope.core.metrics) {

@@ -3,6 +3,7 @@ import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
 import {readFormSectionCollectionFacts} from '../assessment-runtime/form-facts'
 import {loadFrozenActiveSlotSet,compositeItemSlotKey,formSectionSlotKey} from '../assessment-runtime/slot-set'
 import {createStoredScaleFactsReader,loadStoredCanonicalUnitResults} from '../assessment-runtime/compact-assessment-storage'
+import {readCompositeFinalUnitSnapshots,type CompositeFinalUnitSnapshotView} from '../assessment-runtime/composite-final.bridge'
 import {readFrozenCompositionIdentity} from '../assessment-run/educationCompositionExecution'
 import type {RunResourcePolicy} from '../assessment-run/resourceAuthority'
 import {formDraftSchema} from '../assessment-core/form/definition'
@@ -55,9 +56,9 @@ export async function collectStudentCompositionFinals(tx:Tx,input:{organizationI
  const slots=blocks.flatMap(({block})=>block.kind==='SCALE'?(scaleBlocks.some(source=>source.block.blockId===block.blockId)?[compositeItemSlotKey(block.itemIds[0],'SCALE')]:[]):block.sectionIds.map(formSectionSlotKey))
  let cursor='',seen=0
  for(;;){
-  const parents=await tx.$queryRaw<Array<{id:string;userId:string;subjectUserId:string;respondentUserId:string;attemptEpoch:number;contextSnapshotHash:string|null;frozenSlots:string;frozenSlotsHash:string}>>(Prisma.sql`
+  const parents=await tx.$queryRaw<Array<{id:string;userId:string;subjectUserId:string;respondentUserId:string;attemptEpoch:number;publicationHash:string|null;contextSnapshotHash:string|null;frozenSlots:string;frozenSlotsHash:string}>>(Prisma.sql`
    SELECT p.id,p.user_id AS "userId",p.subject_user_id AS "subjectUserId",p.respondent_user_id AS "respondentUserId",p.attempt_epoch AS "attemptEpoch",
-    p.context_snapshot_hash AS "contextSnapshotHash",p.frozen_active_slot_set_encrypted AS "frozenSlots",p.frozen_active_slot_set_hash AS "frozenSlotsHash"
+    p.publication_hash AS "publicationHash",p.context_snapshot_hash AS "contextSnapshotHash",p.frozen_active_slot_set_encrypted AS "frozenSlots",p.frozen_active_slot_set_hash AS "frozenSlotsHash"
    FROM assessment_run_executions e JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
    JOIN assessment_run_actor_snapshots respondent ON respondent.id=e.respondent_actor_snapshot_id AND respondent.run_id=e.run_id AND respondent.organization_id=e.organization_id AND respondent.actor_role='STUDENT'
    JOIN assessment_run_actor_snapshots subject ON subject.id=e.subject_actor_snapshot_id AND subject.run_id=e.run_id AND subject.organization_id=e.organization_id AND subject.actor_role='TEACHER' AND subject.user_id=${input.teacherUserId}
@@ -69,17 +70,55 @@ export async function collectStudentCompositionFinals(tx:Tx,input:{organizationI
    WHERE e.organization_id=${input.organizationId} AND e.run_id=${input.runId} AND e.status='COMPLETED' AND t.resource_family='BUNDLE'
     AND t.resource_key=${ref.key} AND t.resource_version=${ref.version} AND p.id>${cursor} ORDER BY p.id LIMIT 50`)
   if(!parents.length)break
-  const epochs=parents.map(parent=>({compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch}))
-  const finals=await tx.assessmentUnitSnapshot.findMany({where:{OR:epochs,slotKey:{in:slots},terminalState:'COMPLETED'}})
-  const sections=await tx.compositeFormSectionAttempt.findMany({where:{OR:parents.map(parent=>({attemptId:parent.id,attemptEpoch:parent.attemptEpoch})),
-   sectionId:{in:blocks.flatMap(source=>source.block.sectionIds)},status:'COMPLETED'}})
-  const children=scaleBlocks.length?await tx.assessment.findMany({where:{OR:epochs,compositeItemId:{in:scaleBlocks.map(block=>block.block.itemIds[0])}}}):[]
+  const v2Parents = parents.filter(p => Boolean(p.publicationHash))
+  const v2Batch = v2Parents.length
+   ? await readCompositeFinalUnitSnapshots(
+      tx,
+      v2Parents.map(p => ({ attemptId: p.id, attemptEpoch: p.attemptEpoch })),
+      { slotKeys: slots },
+     )
+   : { loadedFactsByKey: new Map<string, unknown>(), byAttemptKey: new Map<string, CompositeFinalUnitSnapshotView[]>(), snapshots: [] as CompositeFinalUnitSnapshotView[] }
+  const legacyParents = parents.filter(p => !v2Batch.loadedFactsByKey.has(`${p.id}:${p.attemptEpoch}`))
+  const epochs=legacyParents.map(parent=>({compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch}))
+  const finals=epochs.length?await tx.assessmentUnitSnapshot.findMany({where:{OR:epochs,slotKey:{in:slots},terminalState:'COMPLETED'}}):[]
+  const sections=legacyParents.length?await tx.compositeFormSectionAttempt.findMany({where:{OR:legacyParents.map(parent=>({attemptId:parent.id,attemptEpoch:parent.attemptEpoch})),
+   sectionId:{in:blocks.flatMap(source=>source.block.sectionIds)},status:'COMPLETED'}}):[]
+  const children=scaleBlocks.length&&epochs.length?await tx.assessment.findMany({where:{OR:epochs,compositeItemId:{in:scaleBlocks.map(block=>block.block.itemIds[0])}}}):[]
   const scaleFinals=finals.filter(final=>final.unitType==='SCALE')
   if(scaleFinals.some(final=>!final.canonicalResultEncrypted))fail()
   const reader=scaleFinals.length?await createStoredScaleFactsReader(children,tx):undefined
   const canonical=scaleFinals.length?await loadStoredCanonicalUnitResults(scaleFinals.map(final=>final.canonicalResultEncrypted!),tx,[],reader):[]
   for(const parent of parents){
    if(respondents.has(parent.userId))fail();respondents.add(parent.userId)
+   const v2Units = v2Batch.byAttemptKey.get(`${parent.id}:${parent.attemptEpoch}`)
+   if (v2Units) {
+    const bySlot = new Map(v2Units.map(u => [u.slotKey, u]))
+    for (const source of blocks) {
+     if (source.form) {
+      const answers: Record<string, unknown> = {}
+      const missing: Array<{ itemKey: string; reason: string }> = []
+      let offset = 0
+      for (const [index, page] of source.form.pages.entries()) {
+       const sectionId = source.block.sectionIds[index]
+       const unit = bySlot.get(formSectionSlotKey(sectionId))
+       if (!unit || unit.unitFact.unitType !== 'FORM_SECTION') fail()
+       for (const [position, question] of page.questions.entries()) {
+        const val = unit.unitFact.typedValues[source.block.itemIds[offset + position]]
+        if (val === undefined || val === null) missing.push({ itemKey: question.itemKey, reason: 'BLANK' })
+        else answers[question.itemKey] = val
+       }
+       offset += page.questions.length
+      }
+      recordProtectedFormAnswers(source.items!, answers, missing)
+     } else if (source.metrics.length) {
+      const itemId = source.block.itemIds[0]
+      const unit = bySlot.get(compositeItemSlotKey(itemId, 'SCALE'))
+      if (!unit || !unit.canonicalEnvelope) fail()
+      recordStudentScaleMetrics(source.metrics, unit.canonicalEnvelope.core.metrics, unit.canonicalEnvelope.core.quality.status)
+     }
+    }
+    continue
+   }
    const set=await loadFrozenActiveSlotSet(parent.frozenSlots,tx)
    if(set.snapshotHash!==parent.frozenSlotsHash||set.attemptEpoch!==parent.attemptEpoch)fail()
    for(const source of blocks){

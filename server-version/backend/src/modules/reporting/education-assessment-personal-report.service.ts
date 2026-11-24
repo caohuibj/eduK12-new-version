@@ -1,6 +1,7 @@
 import {isSelfGroupV2Entry} from '../assessment-policy/self-group-contract'
 import {readEducationNativeBundleFeedback} from '../bundle-product/education-adapter'
 import { Prisma } from '@prisma/client'
+import { readCompositeFinalUnitSnapshots } from '../assessment-runtime/composite-final.bridge'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
@@ -158,30 +159,47 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
     if(summary.state!=='READY'||summary.mode!=='INDIVIDUAL_SUMMARY'){
       await recheck();return response('WITHHELD','当前反馈尚未获准显示。')
     }
+    const isWholeV2 = Boolean(parent.publicationHash)
     const binding=trainingBoundContent(parent),receipt=decodeTrainingFinalReceipt(parent),references=decodeTrainingReferenceBinding(parent)
-    if(!binding||!receipt||!parent.frozenActiveSlotSetEncrypted||!parent.frozenActiveSlotSetHash){await recheck();return response('WITHHELD','本次测评缺少可校验的固定报告版本，暂不展示解释。')}
+    if(!binding||!receipt||(!isWholeV2&&(!parent.frozenActiveSlotSetEncrypted||!parent.frozenActiveSlotSetHash))){await recheck();return response('WITHHELD','本次测评缺少可校验的固定报告版本，暂不展示解释。')}
     if(binding.publicationHash!==origin.runtimeSnapshotHash||canonicalHash({schemaVersion:binding.schemaVersion,compositeId:binding.compositeId,units:binding.units})!==origin.runtimeSnapshotHash)hidden()
-    const slots=await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted,tx)
-    if(slots.snapshotHash!==parent.frozenActiveSlotSetHash||slots.attemptEpoch!==parent.attemptEpoch)hidden()
+    const slots=isWholeV2?null:await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted!,tx)
+    if(!isWholeV2&&(!slots||slots.snapshotHash!==parent.frozenActiveSlotSetHash||slots.attemptEpoch!==parent.attemptEpoch))hidden()
     const expected=origin.units.map(unit=>({unit,slotKey:compositeItemSlotKey(unit.itemId,unit.family==='SJT'?'SITUATIONAL':unit.family)}))
-    const rows=await tx.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,slotKey:{in:expected.map(value=>value.slotKey)}}})
-    if(rows.length!==expected.length||new Set(rows.map(row=>row.slotKey)).size!==expected.length)hidden()
-    for(const row of rows){
-      const frozen=slots.slots.find(slot=>slot.slotKey===row.slotKey),expectedUnit=expected.find(value=>value.slotKey===row.slotKey)?.unit
-      if(!expectedUnit||!frozen||row.terminalState!=='COMPLETED'||row.payloadKind!=='UNIT_RESULT'||!row.canonicalResultEncrypted
-        ||row.compositeAttemptId!==parent.id||row.attemptEpoch!==parent.attemptEpoch||row.unitType!==frozen.unitType
-        ||row.sourceDefinitionHash!==frozen.sourceDefinitionIdentity.hash)hidden()
-    }
-    const envelopes=await loadStoredCanonicalUnitResults(rows.map(row=>row.canonicalResultEncrypted!),tx)
-    if(envelopes.length!==rows.length)hidden()
-    const facts=new Map<string,typeof envelopes[number]>()
-    for(const [index,row] of rows.entries()){
-      const envelope=envelopes[index],unit=expected.find(value=>value.slotKey===row.slotKey)!.unit
-      if(envelope.core.unitType!==row.unitType||envelope.core.sourceDefinitionHash!==row.sourceDefinitionHash
-        ||envelope.core.compiledRuntimeHash!==row.compiledRuntimeHash||envelope.core.contextHash!==(parent.contextSnapshotHash??null)
-        ||envelope.persistenceProvenance.sourceType!==row.sourceType||envelope.persistenceProvenance.sourceAttemptId!==row.sourceAttemptId
-        ||(envelope.persistenceProvenance.sourceSubmissionId??null)!==(row.sourceSubmissionId??null))hidden()
-      facts.set(unit.itemId,envelope)
+    const v2Read = isWholeV2
+      ? await readCompositeFinalUnitSnapshots(
+          tx,
+          [{ attemptId: parent.id, attemptEpoch: parent.attemptEpoch }],
+          { slotKeys: expected.map(v => v.slotKey) },
+        )
+      : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
+    const facts = new Map<string, Awaited<ReturnType<typeof loadStoredCanonicalUnitResults>>[number]>()
+    if (isWholeV2 && v2Read.loadedFactsByKey.has(`${parent.id}:${parent.attemptEpoch}`)) {
+      if (v2Read.snapshots.length !== expected.length) hidden()
+      for (const snap of v2Read.snapshots) {
+        const unit = expected.find(v => v.slotKey === snap.slotKey)?.unit
+        if (!unit || !snap.canonicalEnvelope) hidden()
+        facts.set(unit.itemId, snap.canonicalEnvelope)
+      }
+    } else {
+      const rows=await tx.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,slotKey:{in:expected.map(value=>value.slotKey)}}})
+      if(rows.length!==expected.length||new Set(rows.map(row=>row.slotKey)).size!==expected.length)hidden()
+      for(const row of rows){
+        const frozen=slots!.slots.find(slot=>slot.slotKey===row.slotKey),expectedUnit=expected.find(value=>value.slotKey===row.slotKey)?.unit
+        if(!expectedUnit||!frozen||row.terminalState!=='COMPLETED'||row.payloadKind!=='UNIT_RESULT'||!row.canonicalResultEncrypted
+          ||row.compositeAttemptId!==parent.id||row.attemptEpoch!==parent.attemptEpoch||row.unitType!==frozen.unitType
+          ||row.sourceDefinitionHash!==frozen.sourceDefinitionIdentity.hash)hidden()
+      }
+      const envelopes=await loadStoredCanonicalUnitResults(rows.map(row=>row.canonicalResultEncrypted!),tx)
+      if(envelopes.length!==rows.length)hidden()
+      for(const [index,row] of rows.entries()){
+        const envelope=envelopes[index],unit=expected.find(value=>value.slotKey===row.slotKey)!.unit
+        if(envelope.core.unitType!==row.unitType||envelope.core.sourceDefinitionHash!==row.sourceDefinitionHash
+          ||envelope.core.compiledRuntimeHash!==row.compiledRuntimeHash||envelope.core.contextHash!==(parent.contextSnapshotHash??null)
+          ||envelope.persistenceProvenance.sourceType!==row.sourceType||envelope.persistenceProvenance.sourceAttemptId!==row.sourceAttemptId
+          ||(envelope.persistenceProvenance.sourceSubmissionId??null)!==(row.sourceSubmissionId??null))hidden()
+        facts.set(unit.itemId,envelope)
+      }
     }
     const available=new Set(Array.isArray(summary.metricKeys)?summary.metricKeys:[])
     const metricKeysByItem=isSelfGroupV2Entry(source.entry)?new Map(origin.units.map(unit=>{

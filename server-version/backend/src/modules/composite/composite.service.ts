@@ -1,4 +1,9 @@
 import {previewTrainingStandardReportEligibility} from './training-standard-report-preview'
+import { isCompositeWholeV2Enabled } from '../assessment-runtime/composite-whole-v2-flag'
+import { generateCompositeUnitSeeds, loadCompositePublicationPlan } from '../assessment-runtime/composite-publication-plan'
+import { extractCompositeFinalFormValues, readCompositeFinalUnitSnapshots } from '../assessment-runtime/composite-final.bridge'
+import { materializeCompositePublicationPlan, resolveCompositePublicationPlanForAttempt } from './whole-v2.access'
+import { resolveLegacyScaleProjectionPolicy, scaleProjectionPolicyFromCompiled } from '../scale/projection/policy-resolver'
 import {scaleRuntimeInstrumentKey} from '../scale/runtime-identity'
 import {
   evaluateTrainingItemReportEligibility,
@@ -1695,6 +1700,7 @@ export const listAttemptsForTeacher = async (
         completedAt: true,
         totalTime: true,
         anonymousCode: true,
+        publicationHash: true,
         userId: true,
         user: { select: { id: true, nickname: true, username: true } },
       },
@@ -1704,11 +1710,23 @@ export const listAttemptsForTeacher = async (
   ])
 
   const totalPages = Math.ceil(total / query.pageSize)
-  const unifiedIds = attempts.filter(attempt => attempt.runtimeGeneration === 'UNIFIED_V1').map(attempt => attempt.id)
-  const headers = unifiedIds.length ? await prisma.assessmentUnitSnapshot.findMany({
-    where: { compositeAttemptId: { in: unifiedIds } },
+  const unifiedAttempts = attempts.filter(attempt => attempt.runtimeGeneration === 'UNIFIED_V1')
+  const v2UnifiedAttempts = unifiedAttempts.filter(attempt => attempt.publicationHash != null)
+  const v2SnapshotsResult = v2UnifiedAttempts.length
+    ? await readCompositeFinalUnitSnapshots(
+        prisma,
+        v2UnifiedAttempts.map(attempt => ({ attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch })),
+        { hydrateScaleCanonical: false },
+      )
+    : { loadedFactsByKey: new Map(), snapshots: [] as any[] }
+  const missingLegacyUnifiedIds = unifiedAttempts
+    .filter(attempt => !v2SnapshotsResult.loadedFactsByKey.has(`${attempt.id}:${attempt.attemptEpoch}`))
+    .map(attempt => attempt.id)
+  const legacyHeaders = missingLegacyUnifiedIds.length ? await prisma.assessmentUnitSnapshot.findMany({
+    where: { compositeAttemptId: { in: missingLegacyUnifiedIds } },
     select: { compositeAttemptId: true, slotKey: true, attemptEpoch: true, unitType: true, terminalState: true, payloadKind: true, sourceType: true, sourceAttemptId: true },
   }) : []
+  const headers = [...v2SnapshotsResult.snapshots, ...legacyHeaders]
   const headersByAttempt = new Map<string, AggregateSnapshotHeader[]>()
   for (const header of headers) {
     if (!header.compositeAttemptId) continue
@@ -3995,6 +4013,81 @@ const createAttempt = async (
   }
   const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
     units:contentCandidate.binding.units.filter(unit=>selectedContentItems.has(unit.itemId))}:null
+  // Phase 2 WHOLE_V2 zero-child-row START: creates ONLY 1 row in
+  // composite_assessment_attempts (with publicationHash + Cognitive-only unitSeedsEncrypted
+  // + parent-level frozen governance snapshots) and writes 0 child rows
+  // (0 assessments, 0 form_section_attempts, 0 cognitive_sessions, 0 situational_attempts).
+  // Conditional flow & material-allocation composites remain on the stepped legacy runtime.
+  if (finalOnly && !flowEnabled && isCompositeWholeV2Enabled()) {
+    const plan = await materializeCompositePublicationPlan(composite.id, db)
+    const generatedSeeds = generateCompositeUnitSeeds(plan, newAttemptId, attemptEpoch)
+    const v2Attempt = await db.compositeAssessmentAttempt.create({
+      data: {
+        id: newAttemptId,
+        receiptOnly: compositionAdmission?.receiptOnly === true || composite.receiptOnly === true,
+        ...(trainingContentBinding ? {
+          trainingContentBinding: trainingContentBinding as Prisma.InputJsonValue,
+          trainingContentBindingHash: canonicalHash(trainingContentBinding),
+        } : {}),
+        ...(trainingFeedbackSnapshot ? {
+          trainingFeedbackSnapshot: trainingFeedbackSnapshot as Prisma.InputJsonValue,
+          trainingFeedbackSnapshotHash: canonicalHash(trainingFeedbackSnapshot),
+        } : {}),
+        ...(trainingPersistenceSnapshot ? {
+          trainingPersistenceSnapshot: trainingPersistenceSnapshot as Prisma.InputJsonValue,
+          trainingPersistenceSnapshotHash: canonicalHash(trainingPersistenceSnapshot),
+        } : {}),
+        ...(trainingTimingSnapshot ? { trainingTimingSnapshot } : {}),
+        ...(variantAllocation ? { trainingVariantAllocationEncrypted: encryptUnifiedRuntimePayload(variantAllocation), trainingVariantAllocationHash: variantAllocation.allocationHash } : {}),
+        compositeAssessmentId: composite.id,
+        ...(composite.productKind === 'QUESTIONNAIRE'
+          ? { deliveryCourseId: composite.deliveryCourseId ?? null }
+          : composite.productKind === 'ASSESSMENT_BUNDLE'
+            ? { deliveryCourseId: composite.courseId ?? null }
+            : {}),
+        userId,
+        accessTokenId,
+        recoveryTokenHash: credential?.hash ?? null,
+        participantKey: field?.participantKey ?? credential?.participantKey ?? `user:${userId}`,
+        anonymousCode: credential?.anonymousCode ?? null,
+        attemptNo,
+        deliveryMode: 'FINAL_ONLY',
+        runtimeGeneration: 'UNIFIED_V1',
+        compiledBundleRuntimeHash: bundleRuntimeHash ?? (packageSnapshot ? compiledBundleRuntimeHashForSnapshot(packageSnapshot) : null),
+        attemptEpoch,
+        ...(relationalIdentity ? {
+          subjectUserId: relationalIdentity.subjectUserId,
+          respondentUserId: relationalIdentity.respondentUserId,
+          respondentType: relationalIdentity.respondentType,
+          episodeId: relationalIdentity.episodeId,
+          assignmentRef: relationalIdentity.assignmentRef,
+          consentId: relationalIdentity.consentId,
+        } : {}),
+        ...(field ? { subjectUserId: field.subjectUserId, respondentUserId: field.respondentUserId, respondentType: 'OBSERVER', assignmentRef: null, episodeId: null, consentId: null } : {}),
+        completedItems: 0,
+        progress: 0,
+        publicationHash: plan.publicationHash,
+        frozenActiveSlotSetHash: plan.slotSetHash,
+        unitSeedsEncrypted: generatedSeeds?.encrypted ?? null,
+      },
+    })
+    if (trainingContentBinding) {
+      const bound = trainingBoundContent({ ...v2Attempt, compositeAssessmentId: composite.id })
+      const hasReferencePolicy = bound?.units?.some((u: any) => u.referencePolicy !== undefined)
+      if (
+        hasReferencePolicy
+        && !formSections.some((section: any) => section.contextSection || section.items?.some((item: any) => item.contextKey))
+        && !composite.items.some((item: any) => item.type === 'FORM' && item.contextKey)
+      ) {
+        await freezeTrainingReferenceBinding(db as Prisma.TransactionClient, { ...v2Attempt, compositeAssessment: composite })
+      }
+    }
+    await contentCandidate?.recheckSourceLicenses()
+    await assertTrainingPrivateReferenceAdmissionCurrent(db as Prisma.TransactionClient)
+    Object.defineProperty(v2Attempt, '_freshlyCreatedAttempt', { value: true })
+    return v2Attempt
+  }
+
   // Per-START freeze memo: shared by the precompute and the child build
   // inside this one transaction only. Each START re-validates live scale
   // admission; nothing here survives to the next attempt.
@@ -4486,7 +4579,8 @@ export const startUserAttempt = async (userId: string, compositeId: string, opts
 /** An acknowledged unit is FINAL even while its asynchronous snapshot is pending. */
 const assertNoAcceptedTrainingVariantUnit = async (db: Db, attemptId: string, epoch: number) => {
   const rows = await db.$queryRaw<Array<{ accepted: boolean }>>`SELECT (
-    EXISTS(SELECT 1 FROM assessment_unit_snapshots WHERE composite_attempt_id=${attemptId} AND attempt_epoch=${epoch})
+    EXISTS(SELECT 1 FROM composite_attempt_finals WHERE attempt_id=${attemptId} AND attempt_epoch=${epoch})
+    OR EXISTS(SELECT 1 FROM assessment_unit_snapshots WHERE composite_attempt_id=${attemptId} AND attempt_epoch=${epoch})
     OR EXISTS(SELECT 1 FROM composite_form_section_attempts WHERE attempt_id=${attemptId} AND attempt_epoch=${epoch} AND (submission_id IS NOT NULL OR submission_payload_hash IS NOT NULL OR submitted_at IS NOT NULL OR status='COMPLETED'))
     OR EXISTS(SELECT 1 FROM assessments WHERE composite_attempt_id=${attemptId} AND attempt_epoch=${epoch} AND (submission_id IS NOT NULL OR submission_payload_hash IS NOT NULL OR status='COMPLETED'))
     OR EXISTS(SELECT 1 FROM cognitive_sessions WHERE composite_attempt_id=${attemptId} AND attempt_no=${epoch} AND (submission_id IS NOT NULL OR submission_payload_hash IS NOT NULL OR submitted_at IS NOT NULL OR status='COMPLETED'))
@@ -5314,6 +5408,7 @@ const unifiedCompositeProgressSnapshot = (
 // admission.
 const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
   receiptOnly: true,
+  publicationHash: true,
   trainingContentBindingHash:true,trainingReferenceBindingHash:true,
   ...trainingFeedbackAttemptSelect,
   participantKey:true, trainingVariantAllocationEncrypted:true, trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
@@ -5547,6 +5642,65 @@ const getUnifiedCompositeAttemptState = async (
   attempt = await applyTrainingAttemptScope(attempt)
   if (attempt.deliveryMode !== 'FINAL_ONLY' || attempt.runtimeGeneration !== 'UNIFIED_V1') {
     throw compositeConflict('综合测评运行时版本不匹配，请重启测评')
+  }
+  // Phase 2 WHOLE_V2 fast state projection: zero child-table queries.
+  if (attempt.publicationHash) {
+    const plan = await resolveCompositePublicationPlanForAttempt(attempt)
+    const isCompleted = attempt.status === 'COMPLETED'
+    return {
+      id: attempt.id,
+      executionMode: 'WHOLE_V2' as const,
+      publicationHash: attempt.publicationHash,
+      templateHash: attempt.publicationHash,
+      ...(attempt.receiptOnly ? { receiptOnly: true as const } : {}),
+      wholeLocalEligible: true,
+      assessmentId: attempt.compositeAssessment.id,
+      name: attempt.compositeAssessment.name,
+      ...(attempt.compositeAssessment.productKind === 'QUESTIONNAIRE' ? { productKind: 'QUESTIONNAIRE' as const, reportMode: 'COLLECTION_ONLY' as const } : {}),
+      instruction: attempt.compositeAssessment.instruction,
+      status: attempt.status,
+      taskSatisfaction: attempt.taskSatisfaction ?? null,
+      taskSatisfied: isTaskSatisfied(attempt),
+      deliveryMode: attempt.deliveryMode,
+      attemptEpoch: attempt.attemptEpoch,
+      definitionHash: attempt.publicationHash,
+      contextSnapshotHash: attempt.contextSnapshotHash ?? null,
+      progress: isCompleted ? 100 : 0,
+      completedItems: isCompleted ? plan.slots.length : 0,
+      totalItems: plan.slots.length,
+      currentIndex: isCompleted ? plan.slots.length : 0,
+      startedAt: attempt.startedAt,
+      lastSavedAt: attempt.lastSavedAt,
+      completedAt: attempt.completedAt,
+      anonymousCode: attempt.anonymousCode,
+      context: {
+        status: attempt.contextSnapshotHash ? 'frozen' as const : 'collecting' as const,
+        frozenAt: attempt.contextFrozenAt?.toISOString?.() ?? null,
+        snapshotHash: attempt.contextSnapshotHash ?? null,
+      },
+      items: attempt.compositeAssessment.items.map((item: any, index: number) => ({
+        id: item.id,
+        type: item.type,
+        position: item.position,
+        label: item.scale?.name ?? item.cognitiveAssignment?.title ?? item.formLabel ?? item.situationalInstrumentKey ?? null,
+        completed: isCompleted,
+        index,
+      })),
+      units: plan.slots.map((slot, index) => ({
+        id: slot.unitType === 'FORM_SECTION' ? slot.sectionId : slot.itemId,
+        type: slot.unitType,
+        position: slot.position,
+        label: slot.title,
+        required: slot.required,
+        ...(slot.unitType === 'FORM_SECTION' ? { formSectionId: slot.sectionId, contextSection: slot.contextSection } : {}),
+        completed: isCompleted,
+        index,
+      })),
+      currentItem: null,
+      allUnitsSubmitted: isCompleted,
+      trainingPersistence: null,
+      checkpointDefinitionHash: null,
+    }
   }
   // Publication controls new admission. Existing attempts are validated against
   // their frozen slot set below, so retiring content cannot break resume/history.
@@ -6835,19 +6989,42 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
 export const buildCompositeReport = async (attempt: any, verifiedContext?: WholeQuestionnaireReportContext, readBatch?: CompositeReportFactsReader) => {
   const batch = readBatch?.(attempt)
   attempt = await applyTrainingAttemptScope(attempt)
-  const scaleFacts = batch ? undefined : await preloadStoredScaleResults(attempt.scaleAssessments)
-  const scaleMap = new Map<string, any>(attempt.scaleAssessments.map((item: any) => [item.compositeItemId, item]))
-  const cognitiveMap = new Map<string, any>(attempt.cognitiveSessions.map((item: any) => [item.compositeItemId, item]))
-  const situationalMap = new Map<string, any>((attempt.situationalAttempts ?? []).map((item: any) => [item.compositeItemId, item]))
-  const readableFormAnswers = readContextFormAnswers(
-    attempt.compositeAssessment.items
-      .filter((item: any) => item.type === 'FORM')
-      .map((item: any) => ({ id: item.id, contextKey: item.contextKey })),
-    attempt.formAnswers,
-  )
+  const isWholeV2 = Boolean(attempt.publicationHash)
+  let v2LoadedFinal: Awaited<ReturnType<typeof readCompositeFinalUnitSnapshots>>['loadedFactsByKey'] extends Map<string, infer V> ? V | undefined : never = undefined
+  let v2SnapBySlot: Map<string, Awaited<ReturnType<typeof readCompositeFinalUnitSnapshots>>['snapshots'][number]> | null = null
+  let v2PlanSlotByKey: Map<string, Awaited<ReturnType<typeof loadCompositePublicationPlan>>['slots'][number]> | null = null
+  if (isWholeV2) {
+    const [v2Read, v2Plan] = await Promise.all([
+      readCompositeFinalUnitSnapshots(prisma, [{ attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch }]),
+      loadCompositePublicationPlan(attempt.publicationHash),
+    ])
+    v2LoadedFinal = v2Read.loadedFactsByKey.get(`${attempt.id}:${attempt.attemptEpoch}`)
+    if (v2LoadedFinal) {
+      v2SnapBySlot = new Map(v2Read.snapshots.map(snap => [snap.slotKey, snap]))
+      v2PlanSlotByKey = new Map(v2Plan.slots.map(slot => [slot.slotKey, slot]))
+    }
+  }
+  const useV2Final = Boolean(v2LoadedFinal && v2SnapBySlot && v2PlanSlotByKey)
+  const scaleAssessments = attempt.scaleAssessments ?? []
+  const cognitiveSessions = attempt.cognitiveSessions ?? []
+  const situationalAttempts = attempt.situationalAttempts ?? []
+  const scaleFacts = (batch || useV2Final) ? undefined : await preloadStoredScaleResults(scaleAssessments)
+  const scaleMap = new Map<string, any>(scaleAssessments.map((item: any) => [item.compositeItemId, item]))
+  const cognitiveMap = new Map<string, any>(cognitiveSessions.map((item: any) => [item.compositeItemId, item]))
+  const situationalMap = new Map<string, any>(situationalAttempts.map((item: any) => [item.compositeItemId, item]))
+  const readableFormAnswers = useV2Final
+    ? []
+    : readContextFormAnswers(
+        attempt.compositeAssessment.items
+          .filter((item: any) => item.type === 'FORM')
+          .map((item: any) => ({ id: item.id, contextKey: item.contextKey })),
+        attempt.formAnswers ?? [],
+      )
   const formMap = new Map<string, any>(readableFormAnswers.map((item: any) => [item.itemId, item]))
   const typedFormStates = batch?.typedFormStates ?? new Map<string,{state:string;rowStates?:Record<string,string>;otherText?:string}>()
-  const typedFormValues = batch?.typedFormValues ?? await loadCompositeTypedFormValues(attempt,typedFormStates)
+  const typedFormValues = useV2Final
+    ? new Map<string, any>(Object.entries(extractCompositeFinalFormValues(v2LoadedFinal!.facts)))
+    : (batch?.typedFormValues ?? await loadCompositeTypedFormValues(attempt,typedFormStates))
   const unitReports: any[] = []
   const backgroundValues: any[] = []
   const packageSlotLabels = getFrozenPackageSlotLabels(attempt.compositeAssessment)
@@ -6859,6 +7036,38 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
     }
     if (item.type === 'SCALE') {
       try {
+        if (useV2Final) {
+          const slotKey = compositeItemSlotKey(item.id, 'SCALE')
+          const snap = v2SnapBySlot!.get(slotKey)
+          const planSlot = v2PlanSlotByKey!.get(slotKey)
+          const scalePlanSlot = planSlot?.unitType === 'SCALE' ? planSlot : null
+          const report = buildScaleUnitReport({
+            assessmentId: snap?.sourceAttemptId,
+            itemId: item.id,
+            scaleId: item.scaleId,
+            scaleCode: snap?.scaleResult?.instrument.code ?? scalePlanSlot?.instrumentKey ?? item.scale?.code,
+            scaleName: snap?.scaleResult?.instrument.name || scalePlanSlot?.name || item.scale?.name || '未知量表',
+            result: snap?.scaleResult ?? null,
+            completedAt: snap?.completedAt ?? null,
+            totalTime: null,
+          })
+          const libraryWrapper = Boolean(item.scale?.libraryEntryId)
+          if (libraryWrapper || ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind)) {
+            const policy = scalePlanSlot?.compiledPolicy
+              ? scaleProjectionPolicyFromCompiled(scalePlanSlot.compiledPolicy)
+              : resolveLegacyScaleProjectionPolicy(
+                  scalePlanSlot?.instrumentKey ?? snap?.scaleResult?.instrument.code ?? item.scale?.code ?? '',
+                  scalePlanSlot?.instrumentVersion ?? snap?.scaleResult?.instrument.instrumentVersion ?? item.scale?.instrumentVersion ?? '',
+                  scalePlanSlot?.instrumentClass ?? item.scale?.instrumentClass,
+                )
+            Object.defineProperty(report, '__scaleProjectionPolicy', { value: policy, enumerable: false })
+          }
+          if (report.decryptError) {
+            logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
+          }
+          unitReports.push(report)
+          continue
+        }
         const result = scaleMap.get(item.id)
         const reportInput = {
           assessmentId: result?.id,
@@ -6947,6 +7156,38 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
     }
     if (item.type === 'SITUATIONAL') {
       try {
+        if (useV2Final) {
+          const slotKey = compositeItemSlotKey(item.id, 'SITUATIONAL')
+          const snap = v2SnapBySlot!.get(slotKey)
+          const planSlot = v2PlanSlotByKey!.get(slotKey)
+          const sjtPlanSlot = planSlot?.unitType === 'SITUATIONAL' ? planSlot : null
+          const canonical = snap?.canonicalEnvelope ?? null
+          if (canonical && canonical.core.unitType !== 'SITUATIONAL') throw new Error('wrong situational canonical unit type')
+          const scientificContext = frozenSituationalScientificProjection(undefined)
+          const builtinTitle = getSituationPackage(item.situationalInstrumentKey, item.situationalInstrumentVersion)?.definition.source.title
+          unitReports.push({
+            itemId: item.id,
+            type: 'SITUATIONAL' as const,
+            kind: 'situational' as const,
+            label: resolveSituationalReportLabel(item, sjtPlanSlot?.definition.source.title, builtinTitle, packageSlotLabels),
+            scienceMaturity: scientificContext.scientificMaturity,
+            scientificContext,
+            instrumentKey: canonical?.core.instrumentKey ?? sjtPlanSlot?.instrumentKey ?? item.situationalInstrumentKey ?? null,
+            instrumentVersion: canonical?.core.instrumentVersion ?? sjtPlanSlot?.instrumentVersion ?? item.situationalInstrumentVersion ?? null,
+            metrics: canonical?.core.metrics?.map((metric) => ({
+              key: metric.key,
+              value: metric.value,
+              unit: metric.unit,
+              quality: metric.quality,
+            })) ?? [],
+            quality: canonical?.core.quality ?? null,
+            qualityState: canonical?.core.quality.status ?? null,
+            resultHash: canonical?.resultHash ?? null,
+            completedAt: snap?.completedAt ?? null,
+            totalTime: null,
+          })
+          continue
+        }
         const child = situationalMap.get(item.id)
         const canonical = child?.canonicalResultEncrypted
           ? parseCanonicalUnitResultEnvelope(decryptUnifiedRuntimePayload<unknown>(child.canonicalResultEncrypted))
@@ -6998,6 +7239,60 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
       continue
     }
     try {
+      if (useV2Final) {
+        const slotKey = compositeItemSlotKey(item.id, 'COGNITIVE')
+        const snap = v2SnapBySlot!.get(slotKey)
+        const planSlot = v2PlanSlotByKey!.get(slotKey)
+        const cogPlanSlot = planSlot?.unitType === 'COGNITIVE' ? planSlot : null
+        const cogFact = snap?.unitFact.unitType === 'COGNITIVE' ? snap.unitFact : null
+        const frozenReport = cogPlanSlot?.frozenReport ?? readFrozenReport(item.cognitiveAssignment?.resolvedReportSnapshotEncrypted)
+        if (packageBased && !frozenReport) {
+          throw new Error('报告包认知模块缺少冻结报告定义')
+        }
+        const resultSnapshot = cogFact
+          ? parseCognitiveResultSnapshot({
+              schemaVersion: 1,
+              completedAt: (snap!.completedAt instanceof Date ? snap!.completedAt : new Date(snap!.completedAt)).toISOString(),
+              testType: cogFact.testType,
+              configVersion: cogFact.configVersion,
+              engineVersion: cogFact.engineVersion,
+              scoringVersion: cogFact.scoringVersion,
+              protocolSignature: cogFact.protocolSignature,
+              profile: cogFact.profile,
+              metrics: cogFact.metrics,
+              quality: cogFact.quality,
+              references: cogFact.references ?? [],
+              report: cogFact.reportSummary ?? {},
+              assessmentContext: v2LoadedFinal!.facts.contextHash
+                ? { schemaVersion: 1 as const, snapshotHash: v2LoadedFinal!.facts.contextHash }
+                : null,
+            })
+          : null
+        const resultReferences = resultSnapshot ? referencesForCognitiveResult(resultSnapshot) : []
+        const unitReport = {
+          itemId: item.id,
+          type: item.type,
+          kind: 'cognitive' as const,
+          label: resolveCompositeItemLabel(item, packageSlotLabels),
+          sessionId: snap?.sourceAttemptId,
+          testType: cogFact?.testType ?? cogPlanSlot?.testType,
+          score: null,
+          metrics: resultSnapshot?.metrics ?? {},
+          qualityFlags: resultSnapshot?.quality.flags ?? {},
+          quality: resultSnapshot?.quality,
+          finishedAt: snap?.completedAt ?? null,
+          reference: resultReferences[0],
+          references: resultReferences,
+          assessmentContext: resultSnapshot?.assessmentContext ?? null,
+          singleTaskReport: resultSnapshot?.report ?? null,
+        }
+        Object.defineProperty(unitReport, '__frozenMetricDefinitions', {
+          value: frozenReport?.metricDefinitions,
+          enumerable: false,
+        })
+        unitReports.push(unitReport)
+        continue
+      }
       const session = cognitiveMap.get(item.id)
       const resultSnapshot = session?.resultSnapshotEncrypted
         ? parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted))
@@ -7254,11 +7549,13 @@ const authorizeReportParticipant = (parent: any, context: { userId?: string; rec
 
 type ReportStatusJob = Omit<NonNullable<Awaited<ReturnType<typeof readCompositeReportJobHeader>>>, 'wholeAcceptedAt'>
 const reportStatusForHeader = async (parent: any, joinedJob?: ReportStatusJob | null, participant = true) => {
-  const job = joinedJob !== undefined ? joinedJob : parent.asyncReportEpoch === parent.attemptEpoch
-    ? await readCompositeReportJobHeader(parent.id, parent.attemptEpoch) : null
+  const isWholeV2 = Boolean(parent.publicationHash)
+  const isV2Completed = isWholeV2 && parent.status === 'COMPLETED'
+  const job = isWholeV2 ? null : (joinedJob !== undefined ? joinedJob : parent.asyncReportEpoch === parent.attemptEpoch
+    ? await readCompositeReportJobHeader(parent.id, parent.attemptEpoch) : null)
   const receiptOnly = participant && parent.receiptOnly === true
   const feedback = !receiptOnly && job?.wholeSubmissionId ? readWholeReportFeedbackHint(parent.id, job.wholeSubmissionId) : null
-  const release = participant ? evaluateTrainingFeedbackForAttempt(parent, { reportReady: trainingFeedbackReportReady(parent, job) }) : null
+  const release = participant ? evaluateTrainingFeedbackForAttempt(parent, { reportReady: isV2Completed || trainingFeedbackReportReady(parent, job) }) : null
   // Whole FINAL and a complete set of unit FINALs can both precede parent
   // completion. A queued job must not strand the learner on "continue" while
   // generation runs; genuinely incomplete unit sets retain WAITING.
@@ -7271,11 +7568,11 @@ const reportStatusForHeader = async (parent: any, joinedJob?: ReportStatusJob | 
     ...(feedback ? { feedbackPollProfile: feedback.profile } : {}),
     feedbackWaitMs: !receiptOnly && job?.wholeSubmissionId && reportReadyWaitAvailable() ? REPORT_READY_MAX_WAIT_MS : 0,
     attemptId: parent.id, attemptEpoch: parent.attemptEpoch, status: parent.status,
-    hasAcceptedSubmission: Boolean(job && (job.wholeSubmissionId || job.requestedRevision > 0)),
-    wholeSubmissionReceived: Boolean(job?.wholeSubmissionId), wholeSubmissionId: job?.wholeSubmissionId ?? null,
+    hasAcceptedSubmission: isV2Completed || Boolean(job && (job.wholeSubmissionId || job.requestedRevision > 0)),
+    wholeSubmissionReceived: isV2Completed || Boolean(job?.wholeSubmissionId), wholeSubmissionId: job?.wholeSubmissionId ?? null,
     reportStatus: receiptOnly ? { ...compositeReportJobState(null), state: 'NOT_OFFERED' as const } : job ? { ...compositeReportJobState(job), ...(feedback ? { retryAfterSeconds: job?.wholeSubmissionId && reportReadyWaitAvailable() ? 0.1 : feedback.retryAfterSeconds } : {}) } : {
       state: parent.status === 'COMPLETED' ? 'READY' : 'WAITING', jobId: null,
-      retryAfterSeconds: 2, errorCode: null, completedAt: parent.completedAt,
+      retryAfterSeconds: isV2Completed ? 0 : 2, errorCode: null, completedAt: parent.completedAt,
     },
   }
 }
@@ -7367,7 +7664,7 @@ const loadCollectionReportAttempt = async (attemptId: string) => {
         publishedAt:true,trainingVariantDraft:true,trainingVariantFrozen:true,trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,formSections:{include:{items:true}},
         reportPackageSnapshotEncrypted: true,
         items: { orderBy: { position: 'asc' }, include: {
-          scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true } },
+          scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, libraryEntryId: true } },
           cognitiveAssignment: { select: { id: true, title: true, profile: true,
             resolvedReportSnapshotEncrypted: true, config: { select: { testType: true, name: true } } } },
         } },

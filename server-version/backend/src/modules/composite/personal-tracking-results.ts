@@ -2,6 +2,7 @@ import type {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
 import {loadStoredCanonicalUnitResults} from '../assessment-runtime/compact-assessment-storage'
+import {extractCompositeFinalFormValues,readCompositeFinalUnitSnapshots} from '../assessment-runtime/composite-final.bridge'
 import type {PersonalLeafResult,PersonalTrackingPlan} from '../reporting/personal-tracking'
 import {getContentRelease} from '../measurement-content/repository'
 import {trainingContentAttemptBindingSchema} from './training-content-binding'
@@ -35,15 +36,34 @@ export async function readTrainingPersonalLeafs(db:Prisma.TransactionClient,inpu
   })
   return {parent,tracking,receipt,items,numeric}
  })
- const rows=selected.length?await db.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:{in:selected.map(s=>s.parent.id)},
-  slotKey:{in:[...new Set(selected.flatMap(s=>s.items.map(i=>i.slotKey)))]}},
+ const allSlotKeys = [...new Set(selected.flatMap(s => s.items.map(i => i.slotKey)))]
+ const v2Selected = selected.filter(s => (s.parent as any).publicationHash != null)
+ const v2Batch = v2Selected.length
+  ? await readCompositeFinalUnitSnapshots(
+     db,
+     v2Selected.map(s => ({ attemptId: s.parent.id, attemptEpoch: s.parent.attemptEpoch })),
+     { slotKeys: allSlotKeys.length ? allSlotKeys : undefined },
+    )
+  : { loadedFactsByKey: new Map(), snapshots: [] }
+ const legacySelected = selected.filter(s => !v2Batch.loadedFactsByKey.has(`${s.parent.id}:${s.parent.attemptEpoch}`))
+ const rows=legacySelected.length?await db.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:{in:legacySelected.map(s=>s.parent.id)},
+  slotKey:{in:[...new Set(legacySelected.flatMap(s=>s.items.map(i=>i.slotKey)))]}},
   select:{compositeAttemptId:true,attemptEpoch:true,slotKey:true,unitType:true,terminalState:true,payloadKind:true,
    canonicalResultEncrypted:true,sourceType:true,sourceAttemptId:true,sourceSubmissionId:true}}):[]
  const complete=rows.filter(row=>row.terminalState==='COMPLETED'&&row.payloadKind==='UNIT_RESULT'&&row.canonicalResultEncrypted)
- const envelopes=await loadStoredCanonicalUnitResults(complete.map(r=>r.canonicalResultEncrypted!),db)
- const facts=new Map(complete.map((row,i)=>[row.compositeAttemptId+':'+row.attemptEpoch+':'+row.slotKey,{row,envelope:envelopes[i]}]))
- const formIds=selected.flatMap(s=>s.numeric.map(b=>b.itemId))
- const formAnswers=formIds.length?await db.compositeFormAnswer.findMany({where:{attemptId:{in:input.parents.map(p=>p.id)},itemId:{in:formIds}},include:{item:true,formSectionAttempt:true}}):[]
+ const envelopes=complete.length?await loadStoredCanonicalUnitResults(complete.map(r=>r.canonicalResultEncrypted!),db):[]
+ const facts=new Map<string,{row:any;envelope:any}>(complete.map((row,i)=>[row.compositeAttemptId+':'+row.attemptEpoch+':'+row.slotKey,{row,envelope:envelopes[i]}]))
+ for (const snap of v2Batch.snapshots) {
+  if (snap.canonicalEnvelope) {
+   facts.set(`${snap.compositeAttemptId}:${snap.attemptEpoch}:${snap.slotKey}`, { row: snap, envelope: snap.canonicalEnvelope })
+  }
+ }
+ const formIds=legacySelected.flatMap(s=>s.numeric.map(b=>b.itemId))
+ const formAnswers=formIds.length?await db.compositeFormAnswer.findMany({where:{attemptId:{in:legacySelected.map(s=>s.parent.id)},itemId:{in:formIds}},include:{item:true,formSectionAttempt:true}}):[]
+ const v2FormValuesByAttempt = new Map<string, Record<string, unknown>>()
+ for (const [key, loaded] of v2Batch.loadedFactsByKey.entries()) {
+  v2FormValuesByAttempt.set(key, extractCompositeFinalFormValues(loaded.facts))
+ }
  const result:PersonalLeafResult[]=[],releases=new Map<string,Awaited<ReturnType<typeof getContentRelease>>>()
  const bundleIds=input.parents.filter(p=>['ASSESSMENT_BUNDLE','ORGANIZATION_RESOURCE'].includes(p.compositeAssessment.productKind)).map(p=>p.compositeAssessmentId)
  const bundleRows=bundleIds.length?await db.bundleInstance.findMany({where:{compositeId:{in:bundleIds}}}):[]
@@ -53,8 +73,23 @@ export async function readTrainingPersonalLeafs(db:Prisma.TransactionClient,inpu
   const receiptOnly=Boolean(parent.receiptOnly)
   const pending=!evaluateTrainingFeedbackForAttempt(parent,{reportReady:true}).allowed
   const ownForms=formAnswers.filter(answer=>answer.attemptId===parent.id)
+  const v2Forms = v2FormValuesByAttempt.get(`${parent.id}:${parent.attemptEpoch}`)
   for(const chosen of numeric){
-   const metric=input.plan.metrics.find(m=>m.id===chosen.metricId)!,answer=ownForms.find(a=>a.itemId===chosen.itemId)
+   const metric=input.plan.metrics.find(m=>m.id===chosen.metricId)!
+   if (v2Forms) {
+    const rawVal = v2Forms[chosen.itemId]
+    const numVal = typeof rawVal === 'number' ? rawVal : typeof rawVal === 'string' && /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(rawVal) ? Number(rawVal) : null
+    metrics[chosen.metricId] = {
+     value: numVal !== null && Number.isFinite(numVal) ? numVal : null,
+     unit: 'raw',
+     measurementHash: metric.measurementHash,
+     visible: !receiptOnly && chosen.visible,
+     pending,
+     ...(rawVal === undefined ? { missingReason: 'NOT_EXECUTED' as const } : {}),
+    }
+    continue
+   }
+   const answer=ownForms.find(a=>a.itemId===chosen.itemId)
    const definition=answer?trainingNumericFormIdentity(answer.item,tracking.formKeys):null
    const valid=answer?.completed&&answer.formSectionAttempt?.status==='COMPLETED'&&answer.formSectionAttempt.attemptEpoch===parent.attemptEpoch
      &&answer.formSectionAttempt.submissionPayloadHash&&/^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(answer.value)
@@ -91,7 +126,7 @@ export async function readTrainingPersonalLeafs(db:Prisma.TransactionClient,inpu
     const metric=input.plan.metrics.find(m=>m.id===choice.metricId)
     const definition=release.content.metrics.find(m=>m.metricKey===choice.scoreKey)
     if(!metric||!definition)fail()
-    const fact=core.metrics.find(m=>m.key===choice.scoreKey)
+    const fact=core.metrics.find((m:any)=>m.key===choice.scoreKey)
     const valid=core.quality.status==='interpretable'&&(!fact?.quality||['calculated','OK','interpretable'].includes(fact.quality))
     const identity=trainingTrackingMeasurementIdentity(unit,{cognitiveAssignment:{profile:core.scientificProvenance.profileKey??null}})
     metrics[choice.metricId]={value:valid&&typeof fact?.value==='number'&&Number.isFinite(fact.value)?fact.value:null,

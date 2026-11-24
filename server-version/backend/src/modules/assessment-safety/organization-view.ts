@@ -1,4 +1,5 @@
 import { loadStoredCanonicalUnitResult } from '../assessment-runtime/compact-assessment-storage'
+import { readCompositeFinalUnitForSafety } from '../assessment-runtime/composite-final.bridge'
 import { prisma } from '../../config/database'
 import { resolveOrganizationAccessContext } from '../organization/access'
 import { parseStoredCanonicalUnitResult } from '../assessment-runtime/persistence'
@@ -18,20 +19,34 @@ export const readOrganizationSafetyCase = async (input: {
   // PR4 enables the existing canonical-unit bridge; other trigger families
   // retain their existing policies rather than guessing a Run association.
   if (row.triggerSourceKind !== 'CANONICAL_UNIT_RESULT' || !row.triggerSourceRecordId) return hidden()
-  const snapshot = await prisma.assessmentUnitSnapshot.findUnique({ where: { id: row.triggerSourceRecordId } })
-  if (!snapshot?.compositeAttemptId || !snapshot.canonicalResultEncrypted || snapshot.payloadKind !== 'UNIT_RESULT' || snapshot.terminalState !== 'COMPLETED') return hidden()
-  const attempt = await prisma.compositeAssessmentAttempt.findUnique({ where: { id: snapshot.compositeAttemptId } })
-  if (!attempt || attempt.status !== 'COMPLETED' || attempt.attemptEpoch !== snapshot.attemptEpoch
+  const v2Safety = await readCompositeFinalUnitForSafety(row.triggerSourceRecordId, prisma)
+  let compositeAttemptId: string
+  let attemptEpoch: number
+  let canonicalResultHash: string
+  if (v2Safety) {
+    if (!v2Safety.unit.canonicalEnvelope) return hidden()
+    compositeAttemptId = v2Safety.attemptId
+    attemptEpoch = v2Safety.attemptEpoch
+    canonicalResultHash = v2Safety.unit.canonicalEnvelope.resultHash
+  } else {
+    const snapshot = await prisma.assessmentUnitSnapshot.findUnique({ where: { id: row.triggerSourceRecordId } })
+    if (!snapshot?.compositeAttemptId || !snapshot.canonicalResultEncrypted || snapshot.payloadKind !== 'UNIT_RESULT' || snapshot.terminalState !== 'COMPLETED') return hidden()
+    const canonical = await loadStoredCanonicalUnitResult(snapshot.canonicalResultEncrypted)
+    compositeAttemptId = snapshot.compositeAttemptId
+    attemptEpoch = snapshot.attemptEpoch
+    canonicalResultHash = canonical.resultHash
+  }
+  const attempt = await prisma.compositeAssessmentAttempt.findUnique({ where: { id: compositeAttemptId } })
+  if (!attempt || attempt.status !== 'COMPLETED' || attempt.attemptEpoch !== attemptEpoch
     || attempt.subjectUserId !== row.subjectUserId) return hidden()
-  const canonical = await loadStoredCanonicalUnitResult(snapshot.canonicalResultEncrypted)
-  if (canonical.resultHash !== row.triggerSourceHash) return hidden()
+  if (canonicalResultHash !== row.triggerSourceHash) return hidden()
   const bindings = await prisma.$queryRaw<Array<{ subjectUserId: string }>>`
     SELECT subject.user_id AS "subjectUserId"
     FROM assessment_run_executions e
     JOIN assessment_run_actor_snapshots subject ON subject.id=e.subject_actor_snapshot_id
       AND subject.organization_id=e.organization_id AND subject.run_id=e.run_id
     WHERE e.organization_id=${input.organizationId} AND e.runtime_binding_kind='COMPOSITE'
-      AND e.runtime_binding_ref=${snapshot.compositeAttemptId} AND e.status='COMPLETED'
+      AND e.runtime_binding_ref=${compositeAttemptId} AND e.status='COMPLETED'
   `
   if (bindings.length !== 1 || bindings[0].subjectUserId !== row.subjectUserId) return hidden()
   const context = await resolveOrganizationAccessContext(input)

@@ -11,6 +11,7 @@ import { decodeScaleFacts, assertScaleFactsBinding, prefetchCompactScaleTemplate
 import { mapCompositeSection } from '../assessment-runtime/form-section-definition'
 import { readLoadedCompositeTypedFormValues, type TypedFormMetadata } from '../assessment-runtime/typed-form-facts'
 import { formSectionSlotKey } from '../assessment-runtime/slot-set'
+import { extractCompositeFinalFormValues, readCompositeFinalUnitSnapshots } from '../assessment-runtime/composite-final.bridge'
 import type { TypedFormValue } from '../assessment-runtime/typed-form'
 import { resolveTrainingAttemptScope } from './training-variant-scope'
 
@@ -69,8 +70,39 @@ export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.Tr
     for (const row of attempt.scaleAssessments) if (row.compositeAttemptId !== attempt.id || row.attemptEpoch !== attempt.attemptEpoch || !scope.itemIds.has(row.compositeItemId)) throw new Error('Report batch scale ownership/version mismatch')
     contexts.set(attempt, {identity: identity(attempt), facts: {scaleResults: new Map(), scaleSourceResultHashes: new Map(), scaleRuntimes: new Map(), typedFormValues: new Map(), typedFormStates: new Map()}})
   }
-  const records = attempts.flatMap(attempt => attempt.scaleAssessments)
-  const snapshotWhere = attempts.flatMap(attempt => {
+  const v2Candidates = attempts.filter(a => a.publicationHash != null)
+  const v2Batch = v2Candidates.length
+    ? await readCompositeFinalUnitSnapshots(
+        db,
+        v2Candidates.map(a => ({ attemptId: a.id, attemptEpoch: a.attemptEpoch })),
+        { templates },
+      )
+    : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
+  const legacyAttempts = attempts.filter(a => !v2Batch.loadedFactsByKey.has(`${a.id}:${a.attemptEpoch}`))
+  for (const attempt of attempts) {
+    const key = `${attempt.id}:${attempt.attemptEpoch}`
+    const loaded = v2Batch.loadedFactsByKey.get(key)
+    if (!loaded) continue
+    const context = contexts.get(attempt)!.facts
+    const v2Units = v2Batch.byAttemptKey.get(key) ?? []
+    for (const unit of v2Units) {
+      if (unit.unitType === 'SCALE' && unit.scaleResult && unit.unitFact.unitType === 'SCALE') {
+        const scaleItemId = unit.unitFact.itemId
+        const syntheticRecord = attempt.scaleAssessments.find((r: any) => r.compositeItemId === scaleItemId) ?? scaleItemId
+        context.scaleResults.set(syntheticRecord, unit.scaleResult)
+        context.scaleSourceResultHashes.set(syntheticRecord, unit.sourceResultHash)
+      }
+    }
+    const mergedForm = extractCompositeFinalFormValues(loaded.facts)
+    for (const [formItemId, value] of Object.entries(mergedForm)) {
+      context.typedFormValues.set(formItemId, value as TypedFormValue)
+      context.typedFormStates.set(formItemId, {
+        state: value === null || value === undefined ? 'SHOWN_MISSING' : 'ANSWERED',
+      })
+    }
+  }
+  const records = legacyAttempts.flatMap(attempt => attempt.scaleAssessments)
+  const snapshotWhere = legacyAttempts.flatMap(attempt => {
     const sections = sectionsByAttempt.get(attempt)!
     return sections.length ? [{compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch, slotKey: {in: sections.map(section => formSectionSlotKey(section.id))}}] : []
   })
@@ -106,7 +138,7 @@ export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.Tr
     if (!owner || !sectionsByAttempt.get(owner)!.some(section => formSectionSlotKey(section.id) === snapshot.slotKey)) throw new Error('Report batch snapshot outside selected parent/epoch')
     const group = snapshotsByAttempt.get(owner.id) ?? []; group.push(snapshot); snapshotsByAttempt.set(owner.id, group)
   }
-  for (const attempt of attempts) {
+  for (const attempt of legacyAttempts) {
     const context = contexts.get(attempt)!.facts
     for (const record of attempt.scaleAssessments) {
       if(runtimes.has(record)){

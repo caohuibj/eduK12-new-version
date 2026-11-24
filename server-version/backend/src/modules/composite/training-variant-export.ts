@@ -9,6 +9,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { parseUnifiedCognitiveRawSubmissionPayload, UNIFIED_COGNITIVE_RAW_ENCODING_VERSION, UNIFIED_COGNITIVE_RAW_PAYLOAD_SCHEMA_VERSION } from '../cognitive/unified-raw-submission'
 import { loadSituationalExportSlotSets } from './situational-canonical-export'
+import { readCompositeFinalUnitSnapshots } from '../assessment-runtime/composite-final.bridge'
 import { resolveTrainingAttemptScope, type TrainingAttemptScope } from './training-variant-scope'
 import type { CompositeExportOptions } from './composite-export.service'
 
@@ -75,12 +76,27 @@ export async function loadTrainingVariantExportGraph(assessmentId: string, where
   if (config.configDigest !== template.trainingVariantDigest || config.unionDigest !== canonicalHash({kind: 'WEIGHTED_VARIANT_UNION', schemaVersion: 1, units: buildTrainingVariantUnion(template).units})) throw compositeBadRequest('分卷发布配置不一致')
   }
   assertExportLimits({records: template.attempts.length})
-  const frozenSlotSets = await loadSituationalExportSlotSets(template.attempts, db)
+  const legacySlotAttempts = template.attempts.filter((a: any) => !a.publicationHash)
+  const frozenSlotSets = legacySlotAttempts.length ? await loadSituationalExportSlotSets(legacySlotAttempts, db) : new Map()
   const flowSnapshots=new Map<string,any[]>()
   if(template.trainingFlowFrozen!=null&&template.attempts.length){
-    const rows=await db.assessmentUnitSnapshot.findMany({where:{OR:template.attempts.map((a:any)=>({compositeAttemptId:a.id,attemptEpoch:a.attemptEpoch}))}})
     for(const attempt of template.attempts)flowSnapshots.set(attempt.id,[])
-    for(const row of rows)flowSnapshots.get(row.compositeAttemptId!)!.push(row)
+    const v2FlowCandidates = template.attempts.filter((a: any) => a.publicationHash != null)
+    const v2Read = v2FlowCandidates.length
+      ? await readCompositeFinalUnitSnapshots(
+          db,
+          v2FlowCandidates.map((a: any) => ({ attemptId: a.id, attemptEpoch: a.attemptEpoch })),
+        )
+      : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
+    for (const [key, units] of v2Read.byAttemptKey.entries()) {
+      const attemptId = key.split(':')[0]
+      if (flowSnapshots.has(attemptId)) flowSnapshots.get(attemptId)!.push(...units)
+    }
+    const legacyFlowAttempts = template.attempts.filter((a: any) => !v2Read.loadedFactsByKey.has(`${a.id}:${a.attemptEpoch}`))
+    if (legacyFlowAttempts.length) {
+      const rows=await db.assessmentUnitSnapshot.findMany({where:{OR:legacyFlowAttempts.map((a:any)=>({compositeAttemptId:a.id,attemptEpoch:a.attemptEpoch}))}})
+      for(const row of rows)flowSnapshots.get(row.compositeAttemptId!)!.push(row)
+    }
   }
   const scopes = new Map<string, TrainingAttemptScope>()
   for (const attempt of template.attempts) scopes.set(attempt.id, await resolveTrainingAttemptScope(attempt, template, {frozenSlotSets, flowSnapshots, db}))

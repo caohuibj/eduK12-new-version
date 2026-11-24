@@ -8,6 +8,7 @@ import { readFormSectionCollectionFacts } from '../assessment-runtime/form-facts
 import { assertTypedCompositeFormFacts } from '../assessment-runtime/typed-form-facts'
 import { mapCompositeSection } from '../assessment-runtime/form-section-definition'
 import { loadStoredCanonicalUnitResults } from '../assessment-runtime/compact-assessment-storage'
+import { readCompositeFinalUnitSnapshots } from '../assessment-runtime/composite-final.bridge'
 import { onlineSituationalCanonicalTaskSatisfaction } from '../situational/situational-task-satisfaction'
 import { buildTrainingFlowUnits } from './training-flow-definition'
 import { scanTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey, TRAINING_FLOW_POLICY } from '../assessment-core/flow/training'
@@ -50,7 +51,11 @@ async function resolveTrainingFlowScopeAndCandidate(attempt:any, composite:any=a
   for(const item of composite.items??[])if(item.type!=='FORM'){const key=trainingFlowItemKey(item.id);unitSlots.set(key,compositeItemSlotKey(item.id,item.type));itemKeys.set(key,item.id)}
   const slotsByKey=new Map(frozenSlots.slots.map(s=>[s.slotKey,s]))
   if(unitSlots.size!==frozenSlots.slots.length||[...unitSlots.values()].some(k=>!slotsByKey.has(k)))fail()
-  const snapshots:any[]=options.snapshotRows??await db.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:attempt.id,attemptEpoch:attempt.attemptEpoch}})
+  const v2FlowRead = options.snapshotRows || (attempt as any).publicationHash == null
+    ? null
+    : await readCompositeFinalUnitSnapshots(db, [{ attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch }])
+  const hasV2Flow = Boolean(v2FlowRead?.loadedFactsByKey.has(`${attempt.id}:${attempt.attemptEpoch}`))
+  const snapshots:any[]=options.snapshotRows??(hasV2Flow ? v2FlowRead!.snapshots : await db.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:attempt.id,attemptEpoch:attempt.attemptEpoch}}))
   const bySlot=new Map<string,any>()
   for(const row of snapshots){
     const slot=slotsByKey.get(row.slotKey)

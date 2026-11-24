@@ -154,11 +154,22 @@ export async function assertTrainingGroupBindingsCurrent(tx:Prisma.TransactionCl
       const governed = await tx.$queryRaw<Array<{id: string}>>`SELECT a.id FROM composite_assessment_attempts a JOIN assessment_run_executions e ON e.runtime_binding_kind='COMPOSITE' AND e.runtime_binding_ref=a.id JOIN assessment_run_tracks t ON t.organization_id=e.organization_id AND t.run_id=e.run_id AND t.id=e.track_id WHERE a.id IN (${Prisma.join(ids)}) AND t.frozen_resource_policy ? 'resultDisclosure' LIMIT 1`
       if (governed.length) return stale()
     }
-    const snapshots = bindings.snapshots.length ? await tx.$queryRaw<Array<{compositeAttemptId: string; attemptEpoch: number; slotKey: string}>>`
+    const v2Finals = bindings.parents.length ? await tx.$queryRaw<Array<{ attemptId: string; attemptEpoch: number; factsHash: string; completedAt: Date }>>`
+      SELECT attempt_id AS "attemptId", attempt_epoch AS "attemptEpoch", facts_hash AS "factsHash", completed_at AS "completedAt"
+      FROM composite_attempt_finals
+      WHERE (attempt_id, attempt_epoch) IN (${Prisma.join(bindings.parents.map(p => Prisma.sql`(${p.attemptId},${p.attemptEpoch})`))})
+    ` : []
+    const v2FinalByKey = new Map(v2Finals.map(row => [`${row.attemptId}:${row.attemptEpoch}`, row]))
+    const legacySnapshotBindings = bindings.snapshots.filter(row => !v2FinalByKey.has(`${row.attemptId}:${row.attemptEpoch}`))
+    const snapshots = legacySnapshotBindings.length ? await tx.$queryRaw<Array<{compositeAttemptId: string; attemptEpoch: number; slotKey: string}>>`
       SELECT composite_attempt_id AS "compositeAttemptId",attempt_epoch AS "attemptEpoch",slot_key AS "slotKey",terminal_state AS "terminalState",payload_kind AS "payloadKind",source_type AS "sourceType",source_attempt_id AS "sourceAttemptId",source_submission_id AS "sourceSubmissionId",source_definition_hash AS "sourceDefinitionHash",completed_at AS "completedAt",md5(canonical_result_encrypted) AS "canonicalDigest",md5(collection_facts_encrypted) AS "collectionDigest"
-      FROM assessment_unit_snapshots WHERE (composite_attempt_id,attempt_epoch,slot_key) IN (${Prisma.join(bindings.snapshots.map(row => Prisma.sql`(${row.attemptId},${row.attemptEpoch},${row.slotKey})`))})
+      FROM assessment_unit_snapshots WHERE (composite_attempt_id,attempt_epoch,slot_key) IN (${Prisma.join(legacySnapshotBindings.map(row => Prisma.sql`(${row.attemptId},${row.attemptEpoch},${row.slotKey})`))})
     ` : []
     const hashes = new Map(snapshots.map(row => [`${row.compositeAttemptId}:${row.attemptEpoch}:${row.slotKey}`, trainingGroupSnapshotHash(row)]))
+    for (const row of bindings.snapshots) {
+      const v2 = v2FinalByKey.get(`${row.attemptId}:${row.attemptEpoch}`)
+      if (v2) hashes.set(`${row.attemptId}:${row.attemptEpoch}:${row.slotKey}`, v2.factsHash)
+    }
     if (hashes.size !== bindings.snapshots.length || bindings.snapshots.some(row => hashes.get(`${row.attemptId}:${row.attemptEpoch}:${row.slotKey}`) !== row.hash)) return stale()
     const {qualityHash} = await readTrainingAnalysisQuality(tx, input.courseId, bindings.sources)
     const {researchGovernance} = await trainingParticipantIdentities(tx, input.actor, parents)

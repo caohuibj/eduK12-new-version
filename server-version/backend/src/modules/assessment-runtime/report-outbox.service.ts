@@ -19,7 +19,7 @@ export const REPORT_PARENT_SELECT = {
   trainingFlowSnapshotEncrypted: true, trainingFlowSnapshotHash: true,
   trainingFlowPathEncrypted: true, trainingFlowPathHash: true,
   id: true, status: true, progress: true, completedAt: true, attemptEpoch: true, taskSatisfaction: true,
-  asyncReportEpoch: true, deliveryMode: true, runtimeGeneration: true,
+  asyncReportEpoch: true, deliveryMode: true, runtimeGeneration: true, publicationHash: true,
   frozenActiveSlotSetHash: true, contextSnapshotHash: true, aggregateInputHash: true,
   assignmentRef: true, deliveryCourseId: true, receiptOnly: true,
   compositeAssessment: { select: { productKind: true, reportPackageKey: true, analysisProtocolKey: true,

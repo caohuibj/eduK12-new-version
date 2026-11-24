@@ -1,4 +1,6 @@
 import { loadStoredCanonicalUnitResults } from '../assessment-runtime/compact-assessment-storage'
+import { readCompositeFinalUnitSnapshots } from '../assessment-runtime/composite-final.bridge'
+import type { CanonicalUnitResultEnvelopeV1 } from '../assessment-runtime/unit-result'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -185,6 +187,7 @@ type AttemptRow = {
   respondentUserId: string | null
   assignmentRef: string | null
   attemptEpoch: number
+  publicationHash?: string | null
 }
 
 type SnapshotRow = {
@@ -194,6 +197,7 @@ type SnapshotRow = {
   slotKey: string
   canonicalResultEncrypted: string | null
   compiledRuntimeHash: string | null
+  canonicalEnvelope?: CanonicalUnitResultEnvelopeV1 | null
 }
 
 type PreparedTrack = {
@@ -293,6 +297,7 @@ const prepareTrackInTransaction = async (
       respondentUserId: true,
       assignmentRef: true,
       attemptEpoch: true,
+      publicationHash: true,
     },
   }) as AttemptRow[]
   const attemptById = new Map(attempts.map((attempt) => [attempt.id, attempt]))
@@ -311,19 +316,47 @@ const prepareTrackInTransaction = async (
   const selectedCompleted = completed.filter((row) => selectedBy(row, selection))
   if ((leaf || catalog) && executions.length > 6000) reportingFail('REPORT_SOURCE_LIMIT', 'select a task with at most 6000 observations', 413)
   const selectedAttemptIds = selectedCompleted.map((row) => row.runtimeBindingRef!)
-  const snapshots = selectedAttemptIds.length === 0 ? [] : await tx.assessmentUnitSnapshot.findMany({
+  const v2SlotFilter = leaf ? [leaf.slotKey] : catalogSlotKey ? [catalogSlotKey] : undefined
+  const v2SelectedCompleted = selectedCompleted.filter(
+    row => Boolean(attemptById.get(row.runtimeBindingRef!)?.publicationHash),
+  )
+  const v2Batch = v2SelectedCompleted.length === 0
+    ? { loadedFactsByKey: new Map(), snapshots: [] }
+    : await readCompositeFinalUnitSnapshots(
+        tx,
+        v2SelectedCompleted.map(row => ({
+          attemptId: row.runtimeBindingRef!,
+          attemptEpoch: attemptById.get(row.runtimeBindingRef!)!.attemptEpoch,
+        })),
+        { slotKeys: v2SlotFilter, unitTypes: ['SCALE', 'SITUATIONAL', 'COGNITIVE'] },
+      )
+  const v2Snapshots: SnapshotRow[] = v2Batch.snapshots.map(snap => ({
+    id: snap.id,
+    compositeAttemptId: snap.compositeAttemptId,
+    attemptEpoch: snap.attemptEpoch,
+    slotKey: snap.slotKey,
+    canonicalResultEncrypted: null,
+    compiledRuntimeHash: snap.compiledRuntimeHash,
+    canonicalEnvelope: snap.canonicalEnvelope,
+  }))
+  const legacyCompleted = selectedCompleted.filter(
+    row => !v2Batch.loadedFactsByKey.has(`${row.runtimeBindingRef!}:${attemptById.get(row.runtimeBindingRef!)!.attemptEpoch}`),
+  )
+  const legacyAttemptIds = legacyCompleted.map(row => row.runtimeBindingRef!)
+  const legacySnapshots = legacyAttemptIds.length === 0 ? [] : await tx.assessmentUnitSnapshot.findMany({
     where: {
-      compositeAttemptId: { in: selectedAttemptIds },
+      compositeAttemptId: { in: legacyAttemptIds },
       terminalState: 'COMPLETED',
       payloadKind: 'UNIT_RESULT',
       ...(leaf ? { slotKey: leaf.slotKey } : catalogSlotKey ? {slotKey:catalogSlotKey} : {}),
-      ...(leaf || catalog ? { OR: selectedCompleted.map(row => ({ compositeAttemptId: row.runtimeBindingRef!,
+      ...(leaf || catalog ? { OR: legacyCompleted.map(row => ({ compositeAttemptId: row.runtimeBindingRef!,
         attemptEpoch: attemptById.get(row.runtimeBindingRef!)!.attemptEpoch })) } : {}),
     },
     orderBy: [{ compositeAttemptId: 'asc' }, { slotKey: 'asc' }],
     ...(catalog ? { take: 25001 } : {}),
     select: { id: true, compositeAttemptId: true, attemptEpoch: true, slotKey: true, compiledRuntimeHash: true, canonicalResultEncrypted: !catalog },
   }) as SnapshotRow[]
+  const snapshots: SnapshotRow[] = [...v2Snapshots, ...legacySnapshots]
   if (catalog && snapshots.length > 25000) reportingFail('REPORT_SOURCE_LIMIT', 'too many frozen leaf snapshots', 413)
 
   return {
@@ -368,12 +401,16 @@ const materializePreparedTrack = async (prepared: PreparedTrack): Promise<Report
     const metrics: ReportingResolvedMetricV1[] = []
     const hashes: Array<{ slotKey: string; resultHash: string }> = []
     for (const snapshot of unitRows) {
-      const encrypted = snapshot.canonicalResultEncrypted
-      if (!encrypted) throw new ReportingError('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is missing', 500)
-      let envelope
+      let envelope: CanonicalUnitResultEnvelopeV1 | undefined
       payloadMaterializationObserver?.()
-      try { envelope = canonicalByCipher.get(encrypted); if (!envelope) throw new Error('Missing canonical view') }
-      catch { return reportingFail('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is invalid', 500) }
+      if (snapshot.canonicalEnvelope) {
+        envelope = snapshot.canonicalEnvelope
+      } else {
+        const encrypted = snapshot.canonicalResultEncrypted
+        if (!encrypted) throw new ReportingError('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is missing', 500)
+        try { envelope = canonicalByCipher.get(encrypted); if (!envelope) throw new Error('Missing canonical view') }
+        catch { return reportingFail('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is invalid', 500) }
+      }
       if (prepared.leaf && (envelope.core.unitType !== prepared.leaf.unitType
         || envelope.core.instrumentKey !== prepared.leaf.instrumentKey
         || envelope.core.instrumentVersion !== prepared.leaf.instrumentVersion
@@ -529,23 +566,34 @@ export const listAuthoritativeRunLeafSources = async (input: {
   const selected = await prisma.$transaction(async tx => {
     const prepared = await prepareTrackInTransaction(tx, input, undefined, undefined, true, input.groupAudience, input.slotKey)
     const epochs = new Map(prepared.completed.map(({ attempt }) => [attempt.id, attempt.attemptEpoch]))
-    const unique = new Map<string, string>()
+    const unique = new Map<string, SnapshotRow>()
     for (const row of prepared.snapshots) {
       if (!row.compositeAttemptId || epochs.get(row.compositeAttemptId) !== row.attemptEpoch) continue
-      unique.set(JSON.stringify([row.slotKey, row.compiledRuntimeHash]), row.id)
+      unique.set(JSON.stringify([row.slotKey, row.compiledRuntimeHash]), row)
     }
     if (unique.size > 500) reportingFail('REPORT_SOURCE_LIMIT', 'too many frozen leaf definitions', 413)
-    const samples=await tx.assessmentUnitSnapshot.findMany({
-      where: { id: { in: [...unique.values()] } },
+    const uniqueRows = [...unique.values()]
+    const v2SampleRows = uniqueRows.filter(r => r.canonicalEnvelope)
+    const legacyIds = uniqueRows.filter(r => !r.canonicalEnvelope).map(r => r.id)
+    const legacySamples = legacyIds.length ? await tx.assessmentUnitSnapshot.findMany({
+      where: { id: { in: legacyIds } },
       select: { slotKey: true, canonicalResultEncrypted: true },
       orderBy: [{ slotKey: 'asc' }, { id: 'asc' }],
-    })
-    return {samples,schoolGroupSource:prepared.schoolGroupSource}
+    }) : []
+    return {
+      samples: [
+        ...v2SampleRows.map(r => ({ slotKey: r.slotKey, canonicalResultEncrypted: null as string | null, canonicalEnvelope: r.canonicalEnvelope! })),
+        ...legacySamples.map(r => ({ ...r, canonicalEnvelope: null as CanonicalUnitResultEnvelopeV1 | null })),
+      ],
+      schoolGroupSource: prepared.schoolGroupSource,
+    }
   }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead })
   const {samples,schoolGroupSource}=selected
-  const ciphers = samples.map(row => row.canonicalResultEncrypted
-    ?? reportingFail('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is missing', 500))
-  const views = await loadStoredCanonicalUnitResults(ciphers)
+  const legacyCiphers = samples.flatMap(row => row.canonicalEnvelope ? [] : [row.canonicalResultEncrypted
+    ?? reportingFail('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is missing', 500)])
+  const legacyViews = legacyCiphers.length ? await loadStoredCanonicalUnitResults(legacyCiphers) : []
+  let legacyIdx = 0
+  const views = samples.map(row => row.canonicalEnvelope ?? legacyViews[legacyIdx++])
   const tools=samples.map((sample, i) => {
     const { core } = views[i]
     return { leaf: { slotKey: sample.slotKey, unitType: core.unitType,

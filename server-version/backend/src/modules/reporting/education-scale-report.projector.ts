@@ -103,10 +103,34 @@ export function projectEducationScaleIndividualReport(input: EducationScaleRepor
     || result.method.reportVersion !== binding.reportVersion
     || context.frozenPolicy.runtimePolicyHash !== binding.runtimePolicyHash) return withheld()
 
+  return narrowAndProjectEducationScaleReport({
+    report,
+    resultDisclosure: input.resultDisclosure,
+    resultAudience: input.resultAudience,
+    contentAudience,
+    context,
+    expectedDisclosureHash: binding.resultDisclosureHash,
+  })
+}
+
+export function narrowAndProjectEducationScaleReport(input: {
+  report: ScaleUnitReport
+  resultDisclosure: unknown
+  resultAudience: ResultAudience
+  contentAudience: 'student' | 'teacher'
+  context: ScaleProjectionContext
+  expectedDisclosureHash?: string
+}) {
+  const { report, context, contentAudience } = input
+  const result = report.result
+  if (!context.principalId || !context.accessDecision.allowed
+    || context.relationalDisposition === 'COHORT_ONLY'
+    || context.purpose !== 'report' || report.decryptError || !result
+    || result.quality.status === 'invalid') return withheld()
   let contract
   try {
     contract = validateResultDisclosureContract(input.resultDisclosure)
-    if (canonicalHash(contract) !== binding.resultDisclosureHash) return withheld()
+    if (input.expectedDisclosureHash && canonicalHash(contract) !== input.expectedDisclosureHash) return withheld()
   } catch { return withheld() }
   const rule = contract.audiences[input.resultAudience]
   if (rule.mode !== 'INDIVIDUAL_SUMMARY') return withheld()

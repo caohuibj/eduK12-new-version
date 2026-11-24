@@ -10,7 +10,7 @@ export const readCompositeReportStatusContext = async (attemptId: string, includ
       'id', p."id", 'status', p."status", 'progress', p."progress", 'receiptOnly', p."receipt_only",
       'completedAt', p."completed_at", 'attemptEpoch', p."attempt_epoch",
       'asyncReportEpoch', p."async_report_epoch", 'deliveryMode', p."delivery_mode",
-      'runtimeGeneration', p."runtime_generation", 'frozenActiveSlotSetHash', p."frozen_active_slot_set_hash",
+      'runtimeGeneration', p."runtime_generation", 'publicationHash', p."publication_hash", 'frozenActiveSlotSetHash', p."frozen_active_slot_set_hash",
       'contextSnapshotHash', p."context_snapshot_hash", 'aggregateInputHash', p."aggregate_input_hash",
       'assignmentRef', p."assignment_ref", 'deliveryCourseId', p."delivery_course_id",
       'accessTokenId',p."access_token_id",'trainingFeedbackSnapshot',p."training_feedback_snapshot",'trainingFeedbackSnapshotHash',p."training_feedback_snapshot_hash",
@@ -57,7 +57,7 @@ export const readReportStatusPollSnapshot = async (attemptId: string): Promise<{
     const rows = await prisma.$queryRaw<Array<{ parent: any, job: ReportStatusPollJob | null }>>`
       SELECT jsonb_build_object(
         'id', p."id", 'status', p."status", 'completedAt', p."completed_at", 'receiptOnly', p."receipt_only",
-        'attemptEpoch', p."attempt_epoch", 'asyncReportEpoch', p."async_report_epoch",
+        'attemptEpoch', p."attempt_epoch", 'asyncReportEpoch', p."async_report_epoch", 'publicationHash', p."publication_hash",
         'userId', p."user_id", 'recoveryTokenHash', p."recovery_token_hash",
         'compositeAssessmentId', p."composite_assessment_id", 'deliveryCourseId', p."delivery_course_id",
         'accessTokenId', p."access_token_id",

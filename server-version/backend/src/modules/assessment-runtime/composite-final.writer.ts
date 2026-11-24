@@ -37,7 +37,15 @@ import {
   projectCognitiveCanonicalUnitResult,
   projectScaleCanonicalUnitResult,
   projectSituationCanonicalUnitResult,
+  type CanonicalUnitResultEnvelopeV1,
 } from './unit-result'
+import {
+  buildAssessmentContext,
+  hashAssessmentContext,
+  type AssessmentContextV1,
+  type ContextFormItem,
+} from '../assessment-context'
+import { encryptAssessmentContext } from '../assessment-context/security'
 import { buildScaleResult } from '../scale/scale-result'
 import type { ReferenceContext } from '../assessment-reference/reference'
 import type { ScaleAnswer } from '../scale/scale-scoring'
@@ -121,6 +129,7 @@ export interface CommitCompositeWholeFinalInput {
     id: string
     attemptEpoch: number
     compositeAssessmentId: string
+    subjectUserId?: string | null
     organizationId?: string | null
     deliveryCourseId?: string | null
     publicationHash: string
@@ -139,6 +148,24 @@ export interface CommitCompositeWholeFinalInput {
   activeSlotKeys?: ReadonlySet<string>
   /** Optional in-transaction authority re-verification hook executed after locking the parent attempt row. */
   verifyAuthorityInTx?: (tx: CompositeFinalWriterDb) => Promise<void>
+  /** Optional in-transaction governance receipt builder (freezes trainingReferenceBinding + trainingContentInterpretation
+   * onto the single parent composite_assessment_attempts row with ZERO child rows). */
+  finalizeGovernanceInTx?: (
+    tx: CompositeFinalWriterDb,
+    info: {
+      contextObj: AssessmentContextV1 | null
+      contextHash: string | null
+      contextSnapshotEncrypted: string | null
+      aggregateHash: string
+      completedAt: Date
+      verifiedPayloads: Array<{ header: { slotKey: string }; envelope?: CanonicalUnitResultEnvelopeV1 }>
+    },
+  ) => Promise<{
+    trainingReferenceBinding?: unknown
+    trainingReferenceBindingHash?: string | null
+    trainingContentInterpretationEncrypted?: string | null
+    trainingContentInterpretationHash?: string | null
+  } | void>
   /** Set false only in isolated unit tests without parent table rows. Default true. */
   verifyParentAttemptRow?: boolean
   /** Optional in-memory feedback pre-materializer (zero extra DB queries). */
@@ -463,7 +490,9 @@ export async function commitCompositeWholeFinal(
   )
   formSlots.sort((a, b) => Number(b.contextSection) - Number(a.contextSection))
 
-  const contextFields: Record<string, unknown> = {}
+  const contextFormItems: ContextFormItem[] = []
+  const contextFormAnswers: Array<{ formItemId: string; value: string }> = []
+  const hasContextSection = formSlots.some(s => s.contextSection)
   for (const slot of formSlots) {
     const submitted = effectiveUnits[slot.slotKey] as Extract<WholeV2UnitSubmitPayload, { unitType: 'FORM_SECTION' }>
     const normalizedResult = normalizeCompositeSectionAnswers(
@@ -472,12 +501,29 @@ export async function commitCompositeWholeFinal(
     )
     const typedValues: Record<string, unknown> = {}
     const sectionContext: Record<string, unknown> = {}
+    if (slot.contextSection || slot.section.items.some(it => Boolean(it.contextKey))) {
+      for (const item of slot.section.items) {
+        if (item.contextKey) {
+          contextFormItems.push({
+            id: item.id,
+            type: item.formType ?? 'single_choice',
+            label: item.formLabel ?? null,
+            required: item.required,
+            options: item.formOptions,
+            contextKey: item.contextKey,
+          })
+        }
+      }
+    }
     for (const entry of normalizedResult.normalized) {
       const val = 'payloadValue' in entry ? entry.payloadValue : entry.normalizedValue
       typedValues[entry.item.id] = val
       if (entry.item.contextKey && val !== null && val !== undefined) {
+        if (typeof entry.normalizedValue !== 'string') {
+          throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', '人口学字段必须是单个选项或出生年月', 400)
+        }
         sectionContext[entry.item.contextKey] = val
-        contextFields[entry.item.contextKey] = val
+        contextFormAnswers.push({ formItemId: entry.item.id, value: entry.normalizedValue })
       }
     }
     const formFact: CompositeFormSectionUnitFactV1 = {
@@ -496,11 +542,29 @@ export async function commitCompositeWholeFinal(
     }
   }
 
-  const hasContext = Object.keys(contextFields).length > 0
-  const contextHash = hasContext
-    ? canonicalHash({ schemaVersion: 1, fields: contextFields })
-    : null
+  let contextObj: AssessmentContextV1 | null = null
+  let contextHash: string | null = null
+  let contextSnapshotEncrypted: string | null = null
+  if (contextFormItems.length > 0 && (hasContextSection || contextFormAnswers.length > 0)) {
+    try {
+      contextObj = buildAssessmentContext({
+        items: contextFormItems,
+        answers: contextFormAnswers,
+        frozenAt: now,
+      })
+    } catch (err) {
+      throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', err instanceof Error ? err.message : '人口学上下文无效', 400)
+    }
+    if (attempt.subjectUserId) {
+      contextObj.subjectUserId = attempt.subjectUserId
+    }
+    contextHash = hashAssessmentContext(contextObj)
+    contextSnapshotEncrypted = encryptAssessmentContext(contextObj)
+  }
+  const hasContext = contextObj !== null
+  const contextFields: ReferenceContext = contextObj ? contextObj.values : {}
   const assessmentContext = contextHash ? { schemaVersion: 1 as const, snapshotHash: contextHash } : null
+  const verifiedPayloads: Array<{ header: { slotKey: string }; envelope?: CanonicalUnitResultEnvelopeV1 }> = []
 
   // 4B. Score all Scale units and batch-save templates in 1 single saveMany roundtrip
   const scaleSlots = plan.slots.filter(
@@ -542,6 +606,7 @@ export async function commitCompositeWholeFinal(
         sourceSubmissionId: submit.submissionId,
       },
     })
+    verifiedPayloads.push({ header: { slotKey: slot.slotKey }, envelope: canonical })
     scaleBuildInputs.push({
       itemId: slot.itemId,
       scaleId: slot.scaleId,
@@ -625,6 +690,16 @@ export async function commitCompositeWholeFinal(
       runtime: slot.compiledRuntime,
       contextHash,
     })
+    const sjtEnvelope = createCanonicalUnitResultEnvelope({
+      core: canonicalCore,
+      completedAt: completedAtIso,
+      persistenceProvenance: {
+        sourceType: 'SITUATIONAL_ATTEMPT',
+        sourceAttemptId: attempt.id,
+        sourceSubmissionId: submit.submissionId,
+      },
+    })
+    verifiedPayloads.push({ header: { slotKey: slot.slotKey }, envelope: sjtEnvelope })
     const sjtFact: CompositeSituationalUnitFactV1 = {
       unitType: 'SITUATIONAL',
       itemId: slot.itemId,
@@ -735,6 +810,16 @@ export async function commitCompositeWholeFinal(
       contextHash,
       resolvedConfigHash: slot.resolvedConfigHash,
     })
+    const cogEnvelope = createCanonicalUnitResultEnvelope({
+      core: canonicalCore,
+      completedAt: completedAtIso,
+      persistenceProvenance: {
+        sourceType: 'COGNITIVE_SESSION',
+        sourceAttemptId: attempt.id,
+        sourceSubmissionId: submit.submissionId,
+      },
+    })
+    verifiedPayloads.push({ header: { slotKey: slot.slotKey }, envelope: cogEnvelope })
     const cogFact: CompositeCognitiveUnitFactV1 = {
       unitType: 'COGNITIVE',
       itemId: slot.itemId,
@@ -807,6 +892,23 @@ export async function commitCompositeWholeFinal(
     }
   }
 
+  const governanceResult = input.finalizeGovernanceInTx
+    ? await input.finalizeGovernanceInTx(tx, {
+        contextObj,
+        contextHash,
+        contextSnapshotEncrypted,
+        aggregateHash,
+        completedAt: now,
+        verifiedPayloads,
+      })
+    : undefined
+  const refBindingJson = governanceResult?.trainingReferenceBinding != null
+    ? JSON.stringify(governanceResult.trainingReferenceBinding)
+    : null
+  const refBindingHash = governanceResult?.trainingReferenceBindingHash ?? null
+  const interpEncrypted = governanceResult?.trainingContentInterpretationEncrypted ?? null
+  const interpHash = governanceResult?.trainingContentInterpretationHash ?? null
+
   const totalTimeSeconds = submit.totalTimeMs !== undefined
     ? Math.max(0, Math.round(submit.totalTimeMs / 1000))
     : Math.max(0, Math.round((now.getTime() - attempt.startedAt.getTime()) / 1000))
@@ -836,7 +938,13 @@ export async function commitCompositeWholeFinal(
         last_saved_at = ${now},
         total_time = ${totalTimeSeconds},
         aggregate_input_hash = ${aggregateHash},
-        context_snapshot_hash = ${contextHash},
+        context_snapshot_encrypted = COALESCE(context_snapshot_encrypted, ${contextSnapshotEncrypted}),
+        context_snapshot_hash = COALESCE(context_snapshot_hash, ${contextHash}),
+        context_frozen_at = COALESCE(context_frozen_at, ${contextHash ? now : null}),
+        training_reference_binding = COALESCE(training_reference_binding, ${refBindingJson}::jsonb),
+        training_reference_binding_hash = COALESCE(training_reference_binding_hash, ${refBindingHash}),
+        training_content_interpretation_encrypted = COALESCE(training_content_interpretation_encrypted, ${interpEncrypted}),
+        training_content_interpretation_hash = COALESCE(training_content_interpretation_hash, ${interpHash}),
         frozen_active_slot_set_hash = COALESCE(frozen_active_slot_set_hash, ${plan.slotSetHash})
     WHERE id = ${attempt.id}
       AND attempt_epoch = ${attempt.attemptEpoch}

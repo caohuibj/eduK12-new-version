@@ -2,6 +2,7 @@ import type {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
 import {loadStoredCanonicalUnitResults} from '../assessment-runtime/compact-assessment-storage'
+import {readCompositeFinalUnitSnapshots} from '../assessment-runtime/composite-final.bridge'
 import {decodeTrainingFinalReceipt} from '../composite/training-content-final'
 import {trainingBoundContent} from '../composite/training-reference-binding'
 import {loadTrainingMetricDisclosure,trainingCognitiveMetricKeys,type TrainingMetricDisclosure} from '../composite/training-metric-disclosure'
@@ -60,6 +61,54 @@ export async function loadBundleCognitiveDisclosures(db:Prisma.TransactionClient
  let bound:ReturnType<typeof trainingBoundContent>,receipt:ReturnType<typeof decodeTrainingFinalReceipt>
  try{bound=trainingBoundContent(input.parent);receipt=decodeTrainingFinalReceipt(input.parent)}catch{return out}
  if(!bound||!receipt)return out
+ const v2Read = (input.parent as { publicationHash?: string | null }).publicationHash
+  ? await readCompositeFinalUnitSnapshots(
+      db,
+      [{ attemptId: input.parent.id, attemptEpoch: input.parent.attemptEpoch }],
+      { slotKeys: slots.map(s => compositeItemSlotKey(s.itemId, 'COGNITIVE')), unitTypes: ['COGNITIVE'] },
+    )
+  : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
+ if (v2Read.loadedFactsByKey.has(`${input.parent.id}:${input.parent.attemptEpoch}`)) {
+  const bySlot = new Map(v2Read.snapshots.map(s => [s.slotKey, s]))
+  for (const slot of slots) {
+   const snap = bySlot.get(compositeItemSlotKey(slot.itemId, 'COGNITIVE'))
+   const unit = bound.units.find(u => u.itemId === slot.itemId && u.family === 'COGNITIVE')
+   const declaration = input.pack.manifest.definition.slots.find(s => s.slotKey === slot.slotKey && s.unitType === 'COGNITIVE')
+   if (!snap || !snap.canonicalEnvelope || snap.unitFact.unitType !== 'COGNITIVE' || !unit || !declaration) continue
+   const verified = await loadTrainingMetricDisclosure(db, {
+    parent: input.parent,
+    unit,
+    source: snap as any,
+    core: snap.canonicalEnvelope.core,
+    audience: input.audience === 'student' ? 'participant' : input.audience === 'admin' ? 'researcher' : 'teacher',
+   })
+   const cogFact = snap.unitFact
+   const result: CognitiveResultSnapshot = {
+    schemaVersion: 1,
+    completedAt: snap.completedAt.toISOString(),
+    testType: cogFact.testType,
+    configVersion: cogFact.configVersion,
+    engineVersion: cogFact.engineVersion,
+    scoringVersion: cogFact.scoringVersion,
+    protocolSignature: cogFact.protocolSignature,
+    profile: cogFact.profile as CognitiveResultSnapshot['profile'],
+    metrics: cogFact.metrics,
+    quality: cogFact.quality as CognitiveResultSnapshot['quality'],
+    references: cogFact.references as CognitiveResultSnapshot['references'],
+    report: cogFact.reportSummary,
+    assessmentContext: snap.canonicalEnvelope.core.contextHash
+     ? { schemaVersion: 1, snapshotHash: snap.canonicalEnvelope.core.contextHash }
+     : null,
+   }
+   out.set(slot.slotKey, projectFrozenCognitiveDisclosure({
+    result,
+    report: null,
+    selectors: declaration.valueSelectors ?? [],
+    verified,
+   }))
+  }
+  return out
+ }
  const rows=await db.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:input.parent.id,attemptEpoch:input.parent.attemptEpoch,
   slotKey:{in:slots.map(s=>compositeItemSlotKey(s.itemId,'COGNITIVE'))}},select:{compositeAttemptId:true,attemptEpoch:true,slotKey:true,
   unitType:true,terminalState:true,payloadKind:true,canonicalResultEncrypted:true,sourceType:true,sourceAttemptId:true,sourceSubmissionId:true}})
