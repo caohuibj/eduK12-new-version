@@ -61,7 +61,7 @@ export const createPublicTemplateStore = (
       return hash
     })
     if (readPublishedStartPlans && pending.size
-      && [...pending.values()].every(row => row.templateKind === 'FROZEN_SLOT_PLAN' || row.templateKind === 'UNIT_ADMISSION_PLAN' || row.templateKind === 'SCALE_RUNTIME_POLICY_PLAN')) {
+      && [...pending.values()].every(row => row.templateKind === 'FROZEN_SLOT_PLAN' || row.templateKind === 'UNIT_ADMISSION_PLAN' || row.templateKind === 'SCALE_RUNTIME_POLICY_PLAN' || row.templateKind === 'COMPOSITE_PUBLICATION_PLAN')) {
       for (const row of await repository.read([...pending.keys()])) {
         if (!pending.delete(row.templateHash)) throw new Error('Public template lookup returned an unrelated row')
         decode(row)
@@ -103,6 +103,17 @@ export type PublicTemplateStore = Pick<ReturnType<typeof createPublicTemplateSto
 // templates; rows first observed in a transaction stay local until it commits.
 const transactionStores = new WeakMap<object, ReturnType<typeof createPublicTemplateStore>>()
 const pendingStartTemplates = new WeakMap<object, Set<string>>()
+const startCommitCallbacks = new WeakMap<object, Array<() => void>>()
+
+/** Registers a callback to promote derived process caches ONLY after the enclosing
+ * withCommittedStartTemplates transaction commits (never on rollback). */
+export function onCommittedStartTransaction(db: object, callback: () => void): boolean {
+  if (!pendingStartTemplates.has(db)) return false
+  const list = startCommitCallbacks.get(db) ?? []
+  list.push(callback)
+  startCommitCallbacks.set(db, list)
+  return true
+}
 
 export async function withCommittedStartTemplates<T>(
   transact: (work: (tx: Prisma.TransactionClient) => Promise<T>) => Promise<T>,
@@ -120,6 +131,8 @@ export async function withCommittedStartTemplates<T>(
     const template = local.get(hash)
     if (template) publicTemplates.acceptCommitted(hash, template)
   }
+  const callbacks = completedTx && startCommitCallbacks.get(completedTx)
+  if (callbacks) for (const callback of callbacks) callback()
   return result
 }
 export const publicTemplatesForDatabase = (db?: Pick<Prisma.TransactionClient,'$queryRaw'>): PublicTemplateStore => {
@@ -133,7 +146,7 @@ export const publicTemplatesForDatabase = (db?: Pick<Prisma.TransactionClient,'$
         payload_encrypted AS "payloadEncrypted" FROM assessment_public_templates WHERE template_hash IN (${Prisma.join(hashes)})`)
     const pending = pendingStartTemplates.get(db)
     if (pending) for (const row of rows) {
-      if (row.templateKind === 'FROZEN_SLOT_PLAN' || row.templateKind === 'UNIT_ADMISSION_PLAN' || row.templateKind === 'SCALE_RUNTIME_POLICY_PLAN') pending.add(row.templateHash)
+      if (row.templateKind === 'FROZEN_SLOT_PLAN' || row.templateKind === 'UNIT_ADMISSION_PLAN' || row.templateKind === 'SCALE_RUNTIME_POLICY_PLAN' || row.templateKind === 'COMPOSITE_PUBLICATION_PLAN') pending.add(row.templateHash)
     }
     return rows
   },

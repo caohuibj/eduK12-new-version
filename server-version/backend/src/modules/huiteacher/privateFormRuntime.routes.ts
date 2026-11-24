@@ -18,6 +18,8 @@ import {resolveEducationProductMemberScope} from '../organization/educationProdu
 import {relationalRuntimeConsentAuthority} from '../assessment-relational/runtime-consent'
 import {compositeController} from '../composite/composite.controller'
 import {attachTeacherInlineCurrentUnit,requestedTeacherInlineCurrentUnit} from './inlineCurrentUnit'
+import {mountCompositeWholeV2Routes} from '../composite/whole-v2.routes'
+import {authorizeEducationWholeV2} from '../composite/whole-v2.access'
 
 const router=Router(),uuid=z.string().guid()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
@@ -135,4 +137,9 @@ router.post('/run-executions/:executionId/start-private-form',authenticateHuitea
 router.get('/private-form-composite-attempts/:attemptId',authenticateHuiteacher,requireAttempt,compositeController.getAttempt)
 router.get('/private-form-composite-attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content',authenticateHuiteacher,requireAttempt,compositeImageController.authenticatedFormImage)
 router.post('/private-form-composite-attempts/:attemptId/form-sections/:sectionId/submit',authenticateHuiteacher,requireAttempt,finalConsent,compositeController.submitFinalFormSection)
+mountCompositeWholeV2Routes(router, {
+ prefix: '/private-form-composite-attempts',
+ middleware: [authenticateHuiteacher, requireAttempt],
+ authorizeAttempt: authorizeEducationWholeV2,
+})
 export default router

@@ -18,6 +18,8 @@ import { relationalProductReportService } from '../assessment-relational/product
 import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
 
 import { authenticatedWholeSubmissionPriority, prepareWholeSubmissionPriority } from '../../services/wholeSubmissionPriority'
+import { mountCompositeWholeV2Routes } from './whole-v2.routes'
+import { authorizeTrainingAuthenticatedWholeV2 } from './whole-v2.access'
 
 const router = Router()
 router.use(sharedControlRequestContext)
@@ -77,6 +79,12 @@ router.get('/attempts/:attemptId/whole/definition', authenticate, respondentAtte
 router.get('/attempts/:attemptId/whole/template/:templateHash', authenticate, respondentAttemptAccess, compositeController.wholeTemplate)
 router.get('/attempts/:attemptId/whole/receipt', authenticate, respondentAttemptAccess, compositeController.wholeReceipt)
 router.post('/attempts/:attemptId/whole/submit', observeWholeMiddleware('whole.identity_auth', authenticate), authenticatedWholeSubmissionPriority, observeWholeMiddleware('whole.respondent_gate', respondentAttemptAccess), observeWholeMiddleware('whole.relational_consent', relationalWholeFinalConsentGuard), compositeController.wholeSubmit)
+mountCompositeWholeV2Routes(router, {
+  prefix: '/attempts',
+  middleware: [authenticate, respondentAttemptAccess],
+  submitMiddleware: [authenticatedWholeSubmissionPriority],
+  authorizeAttempt: authorizeTrainingAuthenticatedWholeV2,
+})
 router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', authenticate, respondentAttemptAccess, compositeImageController.authenticatedFormImage)
 router.get('/attempts/:attemptId/items/:itemId/scale/assets/:assetId/content', authenticate, respondentAttemptAccess, compositeImageController.authenticatedScaleImage)
 router.post('/attempts/:attemptId/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability', authenticate, respondentAttemptAccess, compositeVideoController.authenticatedFormVideo)

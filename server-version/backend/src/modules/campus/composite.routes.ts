@@ -28,6 +28,8 @@ import {readSchoolOrdinaryFeedback} from '../reporting/education-ordinary-feedba
 import {serveProjectedReportImage} from '../reporting/report-image-delivery'
 import {assessmentAssetIdSchema} from '../assessment-media/assessment-asset-identity'
 import {ReportingError} from '../reporting/types'
+import { mountCompositeWholeV2Routes } from '../composite/whole-v2.routes'
+import { authorizeEducationWholeV2 } from '../composite/whole-v2.access'
 
 /** School-only canonical Composite runtime. A browser never switches to the
  * legacy ptool_session to answer a campus Run. Every read and write is bound
@@ -258,6 +260,11 @@ router.post('/composite-attempts/:attemptId/whole/submit',authenticateSchool,asy
     return campusCompositeAccess(req,res,next)
   }catch(error){return next(error)}
 },compositeController.wholeSubmit)
+mountCompositeWholeV2Routes(router, {
+  prefix: '/composite-attempts',
+  middleware: [authenticateSchool, campusWholeAccess],
+  authorizeAttempt: authorizeEducationWholeV2,
+})
 router.get('/composite-attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content',
   authenticateSchool,campusCompositeAccess,compositeImageController.educationFormImage)
 router.get('/composite-attempts/:attemptId/items/:itemId/scale/assets/:assetId/content',

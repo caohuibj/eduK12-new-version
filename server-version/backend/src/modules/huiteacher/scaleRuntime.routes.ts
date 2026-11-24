@@ -27,6 +27,8 @@ import { compositeController } from '../composite/composite.controller'
 import { relationalRuntimeConsentAuthority, type RuntimeConsentHeader } from '../assessment-relational/runtime-consent'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 import { attachTeacherInlineCurrentUnit, requestedTeacherInlineCurrentUnit } from './inlineCurrentUnit'
+import { mountCompositeWholeV2Routes } from '../composite/whole-v2.routes'
+import { authorizeEducationWholeV2 } from '../composite/whole-v2.access'
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
@@ -784,6 +786,11 @@ router.post('/composite-attempts/:attemptId/items/:itemId/scale/items/:itemCode/
 router.post('/composite-attempts/:attemptId/items/:itemId/scale/submit',
   authenticateHuiteacher,requireScaleAttempt,requireTeacherCompositeFinalConsent,
   compositeController.submitFinalScale)
+mountCompositeWholeV2Routes(router, {
+  prefix: '/composite-attempts',
+  middleware: [authenticateHuiteacher, requireScaleAttempt],
+  authorizeAttempt: authorizeEducationWholeV2,
+})
 router.get('/run-executions/:executionId/personal-summary',
   authenticateHuiteacher,wrap(async req=>{
     const executionId=uuid.parse(req.params.executionId)

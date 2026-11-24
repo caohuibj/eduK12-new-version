@@ -34,6 +34,8 @@ import {submitSituationalAttemptFinal} from '../situational/situational-final-su
 import {situationalVideoController} from '../situational/situational-video.controller'
 import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
 import {assertPersistedTeacherRunBinding,createTeacherAssessmentAccess,TeacherAssessmentRuntimeError,type TeacherAssessmentSourceAccess,type TeacherSourceIdentity,type TeacherRuntimeDb} from './assessmentRuntime.access'
+import { mountCompositeWholeV2Routes } from '../composite/whole-v2.routes'
+import { authorizeEducationWholeV2 } from '../composite/whole-v2.access'
 
 const uuid=z.string().guid()
 const pick=(value:Record<string,unknown>,keys:readonly string[])=>Object.fromEntries(keys.filter(key=>key in value).map(key=>[key,value[key]]))
@@ -212,6 +214,13 @@ export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSou
   }
   return compositeController.wholeSubmit(req,res)
  }))
+ mountCompositeWholeV2Routes(router, {
+  prefix: '/assessment-composite-attempts',
+  middleware: [wholeBound()],
+  submitMiddleware: [wholeBound(true)],
+  replaceMiddlewareOnSubmit: true,
+  authorizeAttempt: authorizeEducationWholeV2,
+ })
  router.get(parent,wholeBound(false,true),wrapped(async req=>projectTeacherCompositeRuntime(
   await getAttemptState(req.params.attemptId,{userId:req.user!.userId},undefined,'current-unit'))))
  router.get(parent+'/form-sections/:sectionId/assets/:assetId/content',childAccess('FORM_SECTION'),compositeImageController.educationFormImage)
