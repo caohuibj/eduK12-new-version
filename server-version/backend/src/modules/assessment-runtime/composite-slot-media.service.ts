@@ -62,6 +62,9 @@ export async function issueCompositeSlotVideoCapabilities(params: {
 }): Promise<AssessmentVideoCapabilitySourcesV1> {
   const slot = findSlot(params.plan, params.slotKey)
   const entry = slot.videoPresentations?.[params.videoKey]
+    ?? Object.values(slot.videoPresentations ?? {}).find(
+      candidate => candidate.presentation.video.assetId === params.videoKey,
+    )
   if (!entry) {
     throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '视频资产不属于当前冻结槽位', 404)
   }

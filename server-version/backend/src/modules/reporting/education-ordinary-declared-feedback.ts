@@ -5,8 +5,9 @@ import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
 import {compositeItemSlotKey,loadFrozenActiveSlotSet} from '../assessment-runtime/slot-set'
 import {loadStoredCanonicalUnitResults} from '../assessment-runtime/compact-assessment-storage'
 import {trainingBoundContent,decodeTrainingReferenceBinding} from '../composite/training-reference-binding'
-import {decodeTrainingFinalReceipt} from '../composite/training-content-final'
+import {decodeTrainingFinalReceipt,type TrainingFinalReceipt} from '../composite/training-content-final'
 import {getContentReleaseBatch} from '../measurement-content/repository'
+import {interpretContentBinding} from '../measurement-content/final-interpretation'
 import {readSealedCompositionContent} from '../education-tools/private-tool.composition-content'
 import {readFrozenCompositionIdentity,type FrozenCompositionIdentity} from '../assessment-run/educationCompositionExecution'
 import type {RunResourcePolicy} from '../assessment-run/resourceAuthority'
@@ -56,14 +57,15 @@ function hidden():never{return reportingFail('REPORT_NOT_FOUND','reporting resou
  * Load allowed declarative facts once, consume saved FINAL interpretation, and
  * reuse the same pure participant projector as other education deliveries. */
 export async function readOrdinaryDeclaredFeedback(tx:Prisma.TransactionClient,input:{identity:FrozenCompositionIdentity;
- parent:OrdinaryStoredContent&{id:string;attemptEpoch:number;contextSnapshotHash:string|null};
- slots:Awaited<ReturnType<typeof loadFrozenActiveSlotSet>>;blockIds:ReadonlySet<string>;
+ parent:OrdinaryStoredContent&{id:string;attemptEpoch:number;contextSnapshotHash:string|null;publicationHash?:string|null};
+ slots?:Awaited<ReturnType<typeof loadFrozenActiveSlotSet>>;blockIds:ReadonlySet<string>;
  onReleaseIds?:(releaseIds:string[])=>void}){
  const output=new Map<string,EducationAssessmentUnitReport>()
  if(!input.blockIds.size)return output
  const {identity}=input,parent={...input.parent,compositeAssessmentId:identity.compositeId}
- const binding=trainingBoundContent(parent),receipt=decodeTrainingFinalReceipt(parent),references=decodeTrainingReferenceBinding(parent)
- if(!binding||!receipt||!binding.educationComposition||binding.publicationHash!==identity.binding.manifestHash
+ const isWholeV2=Boolean(input.parent.publicationHash)
+ const binding=trainingBoundContent(parent),storedReceipt=decodeTrainingFinalReceipt(parent),references=decodeTrainingReferenceBinding(parent)
+ if(!binding||(!storedReceipt&&!isWholeV2)||!binding.educationComposition||binding.publicationHash!==identity.binding.manifestHash
   ||canonicalHash(binding.educationComposition.origin)!==canonicalHash(identity.origin))hidden()
  const sealed=await readSealedCompositionContent(tx,{compositeId:identity.compositeId,ownerId:identity.origin.ownerUserId,anchor:binding.educationComposition})
  const blocks=identity.manifest.filter(block=>input.blockIds.has(block.blockId))
@@ -79,7 +81,7 @@ export async function readOrdinaryDeclaredFeedback(tx:Prisma.TransactionClient,i
   ...(refUnitsByItemId.get(unit.itemId)?.references.flatMap(ref=>ref.status==='SELECTED'?[ref.releaseId]:[])??[])]))]
  input.onReleaseIds?.(releaseIds)
  const slotKeys=expected.map(e=>e.slotKey)
- const v2UnitRead = (input.parent as { publicationHash?: string | null }).publicationHash
+ const v2UnitRead = isWholeV2
   ? await readCompositeFinalUnitSnapshots(
       tx,
       [{ attemptId: parent.id, attemptEpoch: parent.attemptEpoch }],
@@ -89,6 +91,7 @@ export async function readOrdinaryDeclaredFeedback(tx:Prisma.TransactionClient,i
  const hasV2Final = v2UnitRead.loadedFactsByKey.has(`${parent.id}:${parent.attemptEpoch}`)
  const releases = await getContentReleaseBatch(tx, releaseIds)
  const facts = new Map<string, Awaited<ReturnType<typeof loadStoredCanonicalUnitResults>>[number]>()
+ let receipt: TrainingFinalReceipt | null = storedReceipt
  if (hasV2Final) {
   if (v2UnitRead.snapshots.length !== expected.length) hidden()
   const expectedBySlotKey = new Map(expected.map(entry => [entry.slotKey, entry]))
@@ -97,7 +100,54 @@ export async function readOrdinaryDeclaredFeedback(tx:Prisma.TransactionClient,i
    if (!unit || !snap.canonicalEnvelope) hidden()
    facts.set(unit.itemId, snap.canonicalEnvelope)
   }
+  if (!receipt) {
+   const loadedMeta = v2UnitRead.loadedFactsByKey.get(`${parent.id}:${parent.attemptEpoch}`)!.meta
+   const v2Sources: TrainingFinalReceipt['sources'] = []
+   const interpretation = await interpretContentBinding({
+    contentBindingHash: parent.trainingContentBindingHash!,
+    binding: {
+     populationContext: {},
+     units: expected.map(({ unit }) => ({
+      ...unit,
+      instrumentKey: unit.itemId,
+      references: refUnitsByItemId.get(unit.itemId)?.references ?? [],
+     })),
+    },
+    readRelease: async (id, expectedHash) => {
+     const rel = releases.get(id)
+     if (!rel || rel.contentHash !== expectedHash) hidden()
+     return rel
+    },
+    readFacts: (unit, measurement) => {
+     const envelope = facts.get(unit.itemId)
+     if (!envelope) return { notExecuted: true, quality: undefined, metrics: [] }
+     const core = envelope.core
+     if (core.unitType !== (measurement.family === 'SJT' ? 'SITUATIONAL' : measurement.family)) hidden()
+     v2Sources.push({ itemId: unit.itemId, resultHash: envelope.resultHash })
+     return {
+      notExecuted: false,
+      quality: core.quality.status,
+      metrics: core.metrics.map(m => ({
+       key: m.key,
+       value: typeof m.value === 'number' && Number.isFinite(m.value) ? m.value : null,
+       status: (m.quality === undefined || ['calculated', 'OK', 'interpretable'].includes(m.quality)) ? 'OK' : 'UNAVAILABLE',
+      })),
+     }
+    },
+   })
+   receipt = {
+    schemaVersion: 1,
+    attemptId: parent.id,
+    epoch: parent.attemptEpoch,
+    aggregateInputHash: loadedMeta.aggregateHash,
+    contentBindingHash: parent.trainingContentBindingHash!,
+    generatedAt: (loadedMeta.completedAt instanceof Date ? loadedMeta.completedAt : new Date(loadedMeta.completedAt)).toISOString(),
+    sources: v2Sources,
+    interpretation,
+   } as TrainingFinalReceipt
+  }
  } else {
+  if (!receipt || !input.slots) hidden()
   const rows = await tx.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,slotKey:{in:slotKeys}}})
   if(rows.length!==expected.length||new Set(rows.map(row=>row.slotKey)).size!==rows.length)hidden()
   const slotsByKey=new Map(input.slots.slots.map(slot=>[slot.slotKey,slot]))
@@ -117,6 +167,7 @@ export async function readOrdinaryDeclaredFeedback(tx:Prisma.TransactionClient,i
    facts.set(unit.itemId,envelope)
   }
  }
+ if (!receipt) hidden()
  const ceilingsByBlockId=new Map(identity.binding.unitReports.map(ceiling=>[ceiling.blockId,ceiling]))
  for(const {block,unit} of expected){
   const ceiling=ceilingsByBlockId.get(block.blockId)!

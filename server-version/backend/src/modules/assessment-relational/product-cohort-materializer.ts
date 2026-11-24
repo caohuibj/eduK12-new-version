@@ -36,6 +36,7 @@ const createCompositeCanonicalResultSource = (
           episodeId: true,
           assignmentRef: true,
           attemptEpoch: true,
+          publicationHash: true,
         },
       })
       if (!attempt) return null
@@ -49,11 +50,13 @@ const createCompositeCanonicalResultSource = (
         relationalFail('RELATIONAL_RUNTIME_BINDING', 'completed runtime attempt does not match the relational cohort assignment')
       }
 
-      const v2Read = await readCompositeFinalUnitSnapshots(
-        db,
-        [{ attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch }],
-        { unitTypes: ['SCALE', 'SITUATIONAL', 'COGNITIVE'] },
-      )
+      const v2Read = attempt.publicationHash
+        ? await readCompositeFinalUnitSnapshots(
+            db,
+            [{ attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch }],
+            { unitTypes: ['SCALE', 'SITUATIONAL', 'COGNITIVE'] },
+          )
+        : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
       const hasV2 = v2Read.loadedFactsByKey.has(`${attempt.id}:${attempt.attemptEpoch}`)
       const rows = hasV2
         ? v2Read.snapshots.map(snap => ({

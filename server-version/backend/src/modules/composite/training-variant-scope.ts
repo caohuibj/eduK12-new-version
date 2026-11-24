@@ -84,21 +84,27 @@ export async function resolveTrainingAttemptScope(attempt:any,composite:any=atte
       publishedAt:new Date(composite.publishedAt).toISOString(),
     })
     if(allocation.allocationHash!==attempt.trainingVariantAllocationHash)throw new Error('allocation hash mismatch')
-    if(!attempt.frozenActiveSlotSetEncrypted||!attempt.frozenActiveSlotSetHash)throw new Error('missing selected slots')
-    const slots=options?.frozenSlotSets?.get(attempt.id) ?? await loadFrozenActiveSlotSet(attempt.frozenActiveSlotSetEncrypted, options?.db)
-    if(slots.snapshotHash!==attempt.frozenActiveSlotSetHash||slots.attemptEpoch!==attempt.attemptEpoch)throw new Error('selected slot identity mismatch')
     const itemIds=new Set<string>(allocation.selectedItemIds),sectionIds=new Set<string>(allocation.selectedSectionIds)
     const items=(composite.items??[]).filter((i:any)=>itemIds.has(i.id)),formSections=(composite.formSections??[]).filter((s:any)=>sectionIds.has(s.id))
     if(items.length!==itemIds.size||formSections.length!==sectionIds.size)throw new Error('selected definition missing')
-    const expected=new Set<string>([...items.filter((i:any)=>i.type!=='FORM'&&i.required!==false).map((i:any)=>compositeItemSlotKey(i.id,i.type)),...formSections.map((s:any)=>formSectionSlotKey(s.id))])
-    if(expected.size!==slots.slots.length||slots.slots.some((s:any)=>!expected.has(s.slotKey)))throw new Error('allocation/slot membership mismatch')
     for(const section of formSections){
       if((section.items??[]).some((i:any)=>!itemIds.has(i.id)))throw new Error('partial Form section')
-      const slot=slots.slots.find((s:any)=>s.slotKey===formSectionSlotKey(section.id))
-      if(slot?.unitType!=='FORM_SECTION'||slot.sourceDefinitionIdentity.hash!==canonicalHash(mapCompositeSection(section)))throw new Error('selected section identity mismatch')
     }
-    for(const key of ['scaleAssessments','cognitiveSessions','situationalAttempts'])if((attempt[key]??[]).some((child:any)=>!itemIds.has(child.compositeItemId)))throw new Error('unselected child exists')
-    if((attempt.formSectionAttempts??[]).some((child:any)=>!sectionIds.has(child.sectionId)))throw new Error('unselected section child exists')
+    if(attempt.publicationHash){
+      if(!attempt.frozenActiveSlotSetHash)throw new Error('missing publication slot set hash')
+    }else{
+      if(!attempt.frozenActiveSlotSetEncrypted||!attempt.frozenActiveSlotSetHash)throw new Error('missing selected slots')
+      const slots=options?.frozenSlotSets?.get(attempt.id) ?? await loadFrozenActiveSlotSet(attempt.frozenActiveSlotSetEncrypted, options?.db)
+      if(slots.snapshotHash!==attempt.frozenActiveSlotSetHash||slots.attemptEpoch!==attempt.attemptEpoch)throw new Error('selected slot identity mismatch')
+      const expected=new Set<string>([...items.filter((i:any)=>i.type!=='FORM'&&i.required!==false).map((i:any)=>compositeItemSlotKey(i.id,i.type)),...formSections.map((s:any)=>formSectionSlotKey(s.id))])
+      if(expected.size!==slots.slots.length||slots.slots.some((s:any)=>!expected.has(s.slotKey)))throw new Error('allocation/slot membership mismatch')
+      for(const section of formSections){
+        const slot=slots.slots.find((s:any)=>s.slotKey===formSectionSlotKey(section.id))
+        if(slot?.unitType!=='FORM_SECTION'||slot.sourceDefinitionIdentity.hash!==canonicalHash(mapCompositeSection(section)))throw new Error('selected section identity mismatch')
+      }
+      for(const key of ['scaleAssessments','cognitiveSessions','situationalAttempts'])if((attempt[key]??[]).some((child:any)=>!itemIds.has(child.compositeItemId)))throw new Error('unselected child exists')
+      if((attempt.formSectionAttempts??[]).some((child:any)=>!sectionIds.has(child.sectionId)))throw new Error('unselected section child exists')
+    }
     const result={items,formSections,itemIds,sectionIds,variant:allocation};scopes.set(attempt,result);return result
   }catch(error){throw compositeForbidden('概率分卷作答的冻结配置、分配或单元不一致')}
 }

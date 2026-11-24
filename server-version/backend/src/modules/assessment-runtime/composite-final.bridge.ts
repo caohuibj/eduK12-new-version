@@ -28,8 +28,8 @@ export interface CompositeFinalUnitSnapshotView {
   slotKey: string
   unitType: CompositeUnitType
   terminalState: 'COMPLETED'
-  payloadKind: 'UNIT_RESULT'
-  sourceType: 'ASSESSMENT' | 'FORM_SECTION' | 'SITUATIONAL_ATTEMPT' | 'COGNITIVE_SESSION'
+  payloadKind: 'UNIT_RESULT' | 'COLLECTION_FACTS'
+  sourceType: 'ASSESSMENT' | 'COMPOSITE_FORM_SECTION' | 'SITUATIONAL_ATTEMPT' | 'COGNITIVE_SESSION'
   sourceAttemptId: string
   sourceSubmissionId: string
   sourceDefinitionHash: string
@@ -70,20 +70,13 @@ function canQueryRaw(db: unknown): db is CompositeFinalDb {
   return Boolean(db && typeof (db as { $queryRaw?: unknown }).$queryRaw === 'function')
 }
 
-async function safeReadFactsBatch(
+async function readFactsBatchStrict(
   db: unknown,
   keys: readonly CompositeFinalKey[],
 ): Promise<Map<string, LoadedCompositeFinalFacts>> {
   if (!keys.length || !canQueryRaw(db)) return new Map()
-  try {
-    return await readCompositeFinalFactsBatch(db, keys)
-  } catch (err) {
-    // Allow isolated legacy unit tests with minimal $queryRaw mocks that do not
-    // return composite_attempt_finals rows to fall through cleanly.
-    const msg = err instanceof Error ? err.message : ''
-    if (msg.includes('Composite final') || msg.includes('compact field')) throw err
-    return new Map()
-  }
+  // Fail loud on DB, decrypt, or integrity errors (never swallow exceptions into empty maps).
+  return readCompositeFinalFactsBatch(db, keys)
 }
 
 /** Projects loaded single-row composite_attempt_finals entries into canonical
@@ -144,7 +137,7 @@ export async function projectCompositeFinalsToUnitSnapshots(
           sourceSubmissionId: entry.meta.submissionId,
           sourceDefinitionHash: unit.sourceDefinitionHash,
           sourceResultHash: unit.sourceResultHash,
-          compiledRuntimeHash: canonicalEnvelope?.core.compiledRuntimeHash ?? unit.bundleHash,
+          compiledRuntimeHash: canonicalEnvelope?.core.compiledRuntimeHash ?? unit.compiledRuntimeHash ?? unit.bundleHash,
           completedAt,
           canonicalEnvelope,
           scaleResult: hydrated?.result,
@@ -158,8 +151,8 @@ export async function projectCompositeFinalsToUnitSnapshots(
           slotKey,
           unitType: 'FORM_SECTION',
           terminalState: 'COMPLETED',
-          payloadKind: 'UNIT_RESULT',
-          sourceType: 'FORM_SECTION',
+          payloadKind: 'COLLECTION_FACTS',
+          sourceType: 'COMPOSITE_FORM_SECTION',
           sourceAttemptId: entry.meta.attemptId,
           sourceSubmissionId: entry.meta.submissionId,
           sourceDefinitionHash: unit.sourceDefinitionHash,
@@ -252,7 +245,7 @@ export async function readCompositeFinalUnitSnapshots(
   byAttemptKey: Map<string, CompositeFinalUnitSnapshotView[]>
   snapshots: CompositeFinalUnitSnapshotView[]
 }> {
-  const loadedFactsByKey = await safeReadFactsBatch(db, keys)
+  const loadedFactsByKey = await readFactsBatchStrict(db, keys)
   if (!loadedFactsByKey.size) {
     return { loadedFactsByKey, byAttemptKey: new Map(), snapshots: [] }
   }
@@ -291,12 +284,8 @@ export async function tryReadCompositeFinalFeedback<T = unknown>(
   attemptEpoch: number,
 ): Promise<T | null> {
   if (!canQueryRaw(db)) return null
-  try {
-    const row = await readCompositeFinalFeedback<T>(db, { attemptId, attemptEpoch })
-    return row?.feedback ?? null
-  } catch {
-    return null
-  }
+  const row = await readCompositeFinalFeedback<T>(db, { attemptId, attemptEpoch })
+  return row?.feedback ?? null
 }
 
 /** Resolves a safety case triggerSourceRecordId (`final:<attemptId>:<epoch>:<slotKey>`)

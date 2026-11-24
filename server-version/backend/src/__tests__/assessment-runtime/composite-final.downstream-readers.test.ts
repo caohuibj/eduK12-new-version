@@ -32,7 +32,7 @@ function makeTemplateStore() {
   return { rows, repo, store: createPublicTemplateStore(repo) }
 }
 
-function makeInMemoryFinalDb() {
+function makeInMemoryFinalDb(parentRow?: { status: string; attemptEpoch: number; publicationHash: string }) {
   const finals = new Map<string, any>()
   const finalsBySubmission = new Map<string, any>()
   const executedSqls: string[] = []
@@ -41,6 +41,9 @@ function makeInMemoryFinalDb() {
     $queryRaw: vi.fn(async (sql: any) => {
       const text = Array.isArray(sql?.strings) ? sql.strings.join('?') : String(sql?.sql ?? '')
       executedSqls.push(text)
+      if (text.includes('FROM composite_assessment_attempts')) {
+        return parentRow ? [{ ...parentRow }] : []
+      }
       if (text.includes('FROM composite_attempt_finals') && text.includes('submission_id =')) {
         const [attemptId, attemptEpoch, submissionId] = sql.values
         const row = finals.get(`${attemptId}:${attemptEpoch}`) ?? finalsBySubmission.get(submissionId)
@@ -149,7 +152,6 @@ describe('Phase 2 PR 4 downstream readers bridge (zero legacy child-table reads)
 
   it('projects all 4 families, context, feedback, and safety units from composite_attempt_finals with 0 legacy reads', async () => {
     const { store } = makeTemplateStore()
-    const { db, executedSqls } = makeInMemoryFinalDb()
     const fixture = buildFourFamilyTestSlots()
     const compositeId = randomUUID()
     const attemptId = randomUUID()
@@ -157,6 +159,11 @@ describe('Phase 2 PR 4 downstream readers bridge (zero legacy child-table reads)
       compositeId,
       title: '四合一压测混合卷',
       slots: fixture.slots,
+    })
+    const { db, executedSqls } = makeInMemoryFinalDb({
+      status: 'IN_PROGRESS',
+      attemptEpoch: 1,
+      publicationHash: plan.publicationHash,
     })
     const seeds = generateCompositeUnitSeeds(plan, attemptId, 1)!
     const cogSlotKey = `cognitive:${fixture.cogItemId}`
@@ -257,8 +264,22 @@ describe('Phase 2 PR 4 downstream readers bridge (zero legacy child-table reads)
 
     const formView = unitRead.snapshots.find(s => s.unitType === 'FORM_SECTION')!
     expect(formView.unitFact.unitType).toBe('FORM_SECTION')
+    expect(formView.payloadKind).toBe('COLLECTION_FACTS')
+    expect(formView.sourceType).toBe('COMPOSITE_FORM_SECTION')
     if (formView.unitFact.unitType === 'FORM_SECTION') {
       expect(formView.unitFact.typedValues[fixture.formItemId]).toBe('8')
+    }
+
+    // 1B. Scale compiledRuntimeHash remains real (not bundleHash) even when hydrateScaleCanonical is false (P1-14)
+    const lightRead = await readCompositeFinalUnitSnapshots(
+      db,
+      [{ attemptId, attemptEpoch: 1 }],
+      { unitTypes: ['SCALE'], hydrateScaleCanonical: false, templates: store },
+    )
+    const lightScale = lightRead.snapshots[0]!
+    expect(lightScale.compiledRuntimeHash).toBe(scaleView.canonicalEnvelope!.core.compiledRuntimeHash)
+    if (lightScale.unitFact.unitType === 'SCALE') {
+      expect(lightScale.compiledRuntimeHash).not.toBe(lightScale.unitFact.bundleHash)
     }
 
     // 2. Context snapshot reader
@@ -297,5 +318,16 @@ describe('Phase 2 PR 4 downstream readers bridge (zero legacy child-table reads)
     expect(db.cognitiveSession.findMany).not.toHaveBeenCalled()
     expect(db.situationalAttempt.findMany).not.toHaveBeenCalled()
     expect(db.compositeFormAnswer.findMany).not.toHaveBeenCalled()
+  })
+
+  it('fails loud on DB errors in readCompositeFinalUnitSnapshots instead of swallowing exceptions (P1-13)', async () => {
+    const brokenDb = {
+      $queryRaw: vi.fn(async () => {
+        throw new Error('PG_CONNECTION_LOST')
+      }),
+    }
+    await expect(
+      readCompositeFinalUnitSnapshots(brokenDb, [{ attemptId: randomUUID(), attemptEpoch: 1 }]),
+    ).rejects.toThrow('PG_CONNECTION_LOST')
   })
 })

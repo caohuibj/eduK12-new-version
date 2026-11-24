@@ -6,6 +6,12 @@
 --   Teacher) and their legacy child rows before enabling Phase 2 single-row
 --   FINAL (`COMPOSITE_WHOLE_V2_ENABLED=true`).
 --
+-- DESTRUCTIVE SCOPE WARNING:
+--   This script deletes ALL composite_assessment_attempts and ALL composite-bound
+--   child attempt/evidence rows in the target database (intended ONLY for trial
+--   environments with synthetic/test data). An explicit confirmation variable is
+--   mandatory to prevent accidental execution against a real production DB.
+--
 -- STRICTLY PRESERVED (NEVER TOUCHED):
 --   - users, organizations, courses, classrooms, memberships, enrollments
 --   - scales, scale_library_*, assessment_reference_sets
@@ -21,9 +27,21 @@
 --   disabled inside this single transaction and re-enabled before COMMIT; if
 --   any statement fails, PostgreSQL rolls back everything including trigger state.
 --
--- USAGE:
---   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f server-version/backend/scripts/reset-phase2-test-attempts.sql
+-- USAGE (confirmation flag required):
+--   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
+--     -v CONFIRM_RESET_ALL_COMPOSITE_ATTEMPTS=YES \
+--     -f server-version/backend/scripts/reset-phase2-test-attempts.sql
 -- =============================================================================
+
+\if :{?CONFIRM_RESET_ALL_COMPOSITE_ATTEMPTS}
+\else
+  DO $$ BEGIN RAISE EXCEPTION 'ABORTED: Refusing to wipe composite attempts without -v CONFIRM_RESET_ALL_COMPOSITE_ATTEMPTS=YES'; END $$;
+\endif
+
+SELECT CASE
+  WHEN :'CONFIRM_RESET_ALL_COMPOSITE_ATTEMPTS' = 'YES' THEN 'CONFIRMED'
+  ELSE (1 / 0)::text
+END AS reset_confirmation_guard;
 
 BEGIN;
 
@@ -39,10 +57,14 @@ ALTER TABLE "training_analysis_quality_audit" DISABLE TRIGGER "training_analysis
 ALTER TABLE "training_material_allocation_claims" DISABLE TRIGGER "training_material_claim_immutable";
 ALTER TABLE "huiteacher_field_form_evidence" DISABLE TRIGGER "huiteacher_field_form_evidence_guard";
 
--- 1. Reset composite-bound Run execution & relational assignment pointers back
---    to ASSIGNED so pilot runs remain reusable for fresh WHOLE_V2 tests.
+-- 1. Reset composite-bound relational assignments & Run execution pointers so
+--    pilot runs remain reusable for fresh WHOLE_V2 tests.
+--    IMPORTANT ORDER: update relational_assessment_assignments FIRST (using
+--    relational_assignment_status_check valid value 'OPEN'), then delete start
+--    claims, then clear BOTH runtime_binding_kind AND runtime_binding_ref to
+--    satisfy assessment_run_executions_binding_shape_check.
 UPDATE "relational_assessment_assignments" r
-SET "status" = 'ASSIGNED',
+SET "status" = 'OPEN',
     "started_at" = NULL,
     "completed_at" = NULL,
     "updated_at" = CURRENT_TIMESTAMP
@@ -58,6 +80,7 @@ WHERE c."execution_id" = e."id"
 
 UPDATE "assessment_run_executions"
 SET "status" = 'ASSIGNED',
+    "runtime_binding_kind" = NULL,
     "runtime_binding_ref" = NULL,
     "started_at" = NULL,
     "completed_at" = NULL,

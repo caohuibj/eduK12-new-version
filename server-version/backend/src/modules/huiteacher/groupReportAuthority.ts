@@ -7,6 +7,7 @@ import {isSelfGroupV2Entry} from '../assessment-policy/self-group-contract'
 import {validateResultDisclosureContract} from '../assessment-policy/result-disclosure'
 import {resolveHistoricalRelationalEntry} from '../assessment-run/registeredResources'
 import {reportingFail,type ReportingLeafSourceV2} from '../reporting/types'
+import {readCompositeFinalUnitSnapshots} from '../assessment-runtime/composite-final.bridge'
 import {teacherNativeGroupTrack,teacherNativeLeafContract} from './nativeGroupSource'
 const hidden=():never=>reportingFail('REPORT_NOT_FOUND','Teacher group report unavailable',404)
 type Source={organizationId:string;runId:string;trackId:string}
@@ -59,17 +60,21 @@ export async function teacherScaleLeafContract(source:Source,leaf:ReportingLeafS
   JOIN composite_assessment_items item ON item.composite_assessment_id=r.composite_id AND item.scale_id=s.id AND item.type='SCALE'
   WHERE r.resource_key=${track.key} AND r.resource_version=${track.version} AND r.status IN ('PUBLISHED','RETIRED')`)
  if(!unit||leaf.instrumentKey!==unit.code||leaf.instrumentVersion!==unit.version||leaf.slotKey!==compositeItemSlotKey(unit.id,'SCALE'))hidden()
- const [v2Header]=await db.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT f.attempt_id AS id FROM assessment_run_executions e
-  JOIN composite_assessment_attempts p ON p.id=e.runtime_binding_ref AND p.composite_assessment_id=${unit.compositeId} AND p.status='COMPLETED'
-  JOIN composite_attempt_finals f ON f.attempt_id=p.id AND f.attempt_epoch=p.attempt_epoch
-  WHERE e.organization_id=${source.organizationId} AND e.run_id=${source.runId} AND e.track_id=${source.trackId} AND e.status='COMPLETED' LIMIT 1`)
- if(v2Header)return validateResultDisclosureContract(entry!.resultDisclosure)
  const [header]=await db.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT snap.id FROM assessment_run_executions e
   JOIN composite_assessment_attempts p ON p.id=e.runtime_binding_ref AND p.composite_assessment_id=${unit.compositeId} AND p.status='COMPLETED'
   JOIN assessment_unit_snapshots snap ON snap.composite_attempt_id=p.id AND snap.attempt_epoch=p.attempt_epoch
    AND snap.slot_key=${leaf.slotKey} AND snap.unit_type='SCALE' AND snap.terminal_state='COMPLETED' AND snap.payload_kind='UNIT_RESULT'
    AND snap.compiled_runtime_hash=${leaf.compiledRuntimeHash}
   WHERE e.organization_id=${source.organizationId} AND e.run_id=${source.runId} AND e.track_id=${source.trackId} AND e.status='COMPLETED' LIMIT 1`)
- if(!header)hidden()
+ if(header)return validateResultDisclosureContract(entry!.resultDisclosure)
+ const [v2Header]=await db.$queryRaw<Array<{attemptId:string;attemptEpoch:number}>>(Prisma.sql`SELECT f.attempt_id AS "attemptId",f.attempt_epoch AS "attemptEpoch" FROM assessment_run_executions e
+  JOIN composite_assessment_attempts p ON p.id=e.runtime_binding_ref AND e.runtime_binding_kind='COMPOSITE'
+   AND p.composite_assessment_id=${unit.compositeId} AND p.status='COMPLETED' AND p.publication_hash IS NOT NULL
+  JOIN composite_attempt_finals f ON f.attempt_id=p.id AND f.attempt_epoch=p.attempt_epoch
+  WHERE e.organization_id=${source.organizationId} AND e.run_id=${source.runId} AND e.track_id=${source.trackId} AND e.status='COMPLETED' LIMIT 1`)
+ if(!v2Header||typeof v2Header.attemptId!=='string'||!Number.isSafeInteger(v2Header.attemptEpoch))hidden()
+ const v2Read=await readCompositeFinalUnitSnapshots(db,[v2Header],{slotKeys:[leaf.slotKey],unitTypes:['SCALE'],hydrateScaleCanonical:false})
+ const matched=v2Read.snapshots.find(snap=>snap.slotKey===leaf.slotKey&&snap.unitType==='SCALE'&&snap.compiledRuntimeHash===leaf.compiledRuntimeHash)
+ if(!matched)hidden()
  return validateResultDisclosureContract(entry!.resultDisclosure)
 }

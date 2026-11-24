@@ -4010,16 +4010,33 @@ const createAttempt = async (
     const nativeScaleIds=composite.items.filter((item:any)=>item.type==='SCALE'&&item.standardCombinationSource==null).map((item:any)=>item.scaleId)
     await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient,nativeScaleIds,{sourceOwnerId:composite.createdBy})
   }
+  const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
+    units:contentCandidate.binding.units.filter(unit=>selectedContentItems.has(unit.itemId))}:null
   // Phase 2 WHOLE_V2 zero-child-row START: creates ONLY 1 row in
-  // composite_assessment_attempts (with publicationHash + Cognitive-only unitSeedsEncrypted)
-  // and writes 0 child rows (0 assessments, 0 form_section_attempts, 0 cognitive_sessions, 0 situational_attempts).
-  if (finalOnly && isCompositeWholeV2Enabled()) {
+  // composite_assessment_attempts (with publicationHash + Cognitive-only unitSeedsEncrypted
+  // + parent-level frozen governance snapshots) and writes 0 child rows
+  // (0 assessments, 0 form_section_attempts, 0 cognitive_sessions, 0 situational_attempts).
+  // Conditional flow & material-allocation composites remain on the stepped legacy runtime.
+  if (finalOnly && !flowEnabled && isCompositeWholeV2Enabled()) {
     const plan = await materializeCompositePublicationPlan(composite.id, db)
     const generatedSeeds = generateCompositeUnitSeeds(plan, newAttemptId, attemptEpoch)
     const v2Attempt = await db.compositeAssessmentAttempt.create({
       data: {
         id: newAttemptId,
         receiptOnly: compositionAdmission?.receiptOnly === true || composite.receiptOnly === true,
+        ...(trainingContentBinding ? {
+          trainingContentBinding: trainingContentBinding as Prisma.InputJsonValue,
+          trainingContentBindingHash: canonicalHash(trainingContentBinding),
+        } : {}),
+        ...(trainingFeedbackSnapshot ? {
+          trainingFeedbackSnapshot: trainingFeedbackSnapshot as Prisma.InputJsonValue,
+          trainingFeedbackSnapshotHash: canonicalHash(trainingFeedbackSnapshot),
+        } : {}),
+        ...(trainingPersistenceSnapshot ? {
+          trainingPersistenceSnapshot: trainingPersistenceSnapshot as Prisma.InputJsonValue,
+          trainingPersistenceSnapshotHash: canonicalHash(trainingPersistenceSnapshot),
+        } : {}),
+        ...(trainingTimingSnapshot ? { trainingTimingSnapshot } : {}),
         ...(variantAllocation ? { trainingVariantAllocationEncrypted: encryptUnifiedRuntimePayload(variantAllocation), trainingVariantAllocationHash: variantAllocation.allocationHash } : {}),
         compositeAssessmentId: composite.id,
         ...(composite.productKind === 'QUESTIONNAIRE'
@@ -4059,8 +4076,6 @@ const createAttempt = async (
     return v2Attempt
   }
 
-  const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
-    units:contentCandidate.binding.units.filter(unit=>selectedContentItems.has(unit.itemId))}:null
   // Per-START freeze memo: shared by the precompute and the child build
   // inside this one transaction only. Each START re-validates live scale
   // admission; nothing here survives to the next attempt.
@@ -7381,11 +7396,13 @@ const authorizeReportParticipant = (parent: any, context: { userId?: string; rec
 
 type ReportStatusJob = Omit<NonNullable<Awaited<ReturnType<typeof readCompositeReportJobHeader>>>, 'wholeAcceptedAt'>
 const reportStatusForHeader = async (parent: any, joinedJob?: ReportStatusJob | null, participant = true) => {
-  const job = joinedJob !== undefined ? joinedJob : parent.asyncReportEpoch === parent.attemptEpoch
-    ? await readCompositeReportJobHeader(parent.id, parent.attemptEpoch) : null
+  const isWholeV2 = Boolean(parent.publicationHash)
+  const isV2Completed = isWholeV2 && parent.status === 'COMPLETED'
+  const job = isWholeV2 ? null : (joinedJob !== undefined ? joinedJob : parent.asyncReportEpoch === parent.attemptEpoch
+    ? await readCompositeReportJobHeader(parent.id, parent.attemptEpoch) : null)
   const receiptOnly = participant && parent.receiptOnly === true
   const feedback = !receiptOnly && job?.wholeSubmissionId ? readWholeReportFeedbackHint(parent.id, job.wholeSubmissionId) : null
-  const release = participant ? evaluateTrainingFeedbackForAttempt(parent, { reportReady: trainingFeedbackReportReady(parent, job) }) : null
+  const release = participant ? evaluateTrainingFeedbackForAttempt(parent, { reportReady: isV2Completed || trainingFeedbackReportReady(parent, job) }) : null
   // Whole FINAL and a complete set of unit FINALs can both precede parent
   // completion. A queued job must not strand the learner on "continue" while
   // generation runs; genuinely incomplete unit sets retain WAITING.
@@ -7398,11 +7415,11 @@ const reportStatusForHeader = async (parent: any, joinedJob?: ReportStatusJob | 
     ...(feedback ? { feedbackPollProfile: feedback.profile } : {}),
     feedbackWaitMs: !receiptOnly && job?.wholeSubmissionId && reportReadyWaitAvailable() ? REPORT_READY_MAX_WAIT_MS : 0,
     attemptId: parent.id, attemptEpoch: parent.attemptEpoch, status: parent.status,
-    hasAcceptedSubmission: Boolean(job && (job.wholeSubmissionId || job.requestedRevision > 0)),
-    wholeSubmissionReceived: Boolean(job?.wholeSubmissionId), wholeSubmissionId: job?.wholeSubmissionId ?? null,
+    hasAcceptedSubmission: isV2Completed || Boolean(job && (job.wholeSubmissionId || job.requestedRevision > 0)),
+    wholeSubmissionReceived: isV2Completed || Boolean(job?.wholeSubmissionId), wholeSubmissionId: job?.wholeSubmissionId ?? null,
     reportStatus: receiptOnly ? { ...compositeReportJobState(null), state: 'NOT_OFFERED' as const } : job ? { ...compositeReportJobState(job), ...(feedback ? { retryAfterSeconds: job?.wholeSubmissionId && reportReadyWaitAvailable() ? 0.1 : feedback.retryAfterSeconds } : {}) } : {
       state: parent.status === 'COMPLETED' ? 'READY' : 'WAITING', jobId: null,
-      retryAfterSeconds: 2, errorCode: null, completedAt: parent.completedAt,
+      retryAfterSeconds: isV2Completed ? 0 : 2, errorCode: null, completedAt: parent.completedAt,
     },
   }
 }

@@ -171,9 +171,10 @@ async function readOrdinaryFeedback(input:ScopedInput){
    sources,
   })
   :null
+ const isWholeV2=Boolean(own.publicationHash)
  const needsDeclaredLive=Boolean(declaredBlocks.size&&!preMaterializedDeclared)
  const needsNativeScaleLive=Boolean(sources.length&&!preMaterializedNativeScales)
- const needsSlots=Boolean(nativeBlocks.size||needsNativeScaleLive||needsDeclaredLive)
+ const needsSlots=!isWholeV2&&Boolean(nativeBlocks.size||needsNativeScaleLive||needsDeclaredLive)
  let frozenSlots=own.frozenSlots
  let contentState=own.contentState
  const needsDeferredParentFields=(needsSlots&&!frozenSlots)
@@ -207,15 +208,15 @@ async function readOrdinaryFeedback(input:ScopedInput){
  const slots=needsSlots&&frozenSlots?await loadFrozenActiveSlotSet(frozenSlots,prisma):undefined
  if(needsSlots&&(!slots||slots.snapshotHash!==own.frozenSlotsHash||slots.attemptEpoch!==own.attemptEpoch))hidden()
  const [native,declared,reports]=await Promise.all([
-  nativeBlocks.size?readOrdinaryNativeFeedback(prisma,{identity,parent:{...contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash},slots:slots!,actorUserId:input.actorUserId,blockIds:nativeBlocks}):Promise.resolve(new Map()),
+  nativeBlocks.size?readOrdinaryNativeFeedback(prisma,{identity,parent:{...contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash,publicationHash:own.publicationHash??null},slots,actorUserId:input.actorUserId,blockIds:nativeBlocks}):Promise.resolve(new Map()),
   preMaterializedDeclared
    ?Promise.resolve(preMaterializedDeclared)
-   :declaredBlocks.size?readOrdinaryDeclaredFeedback(prisma,{identity,parent:{...contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash},slots:slots!,blockIds:declaredBlocks}):Promise.resolve(new Map()),
+   :declaredBlocks.size?readOrdinaryDeclaredFeedback(prisma,{identity,parent:{...contentState!,id:own.parentId!,attemptEpoch:own.attemptEpoch!,contextSnapshotHash:own.contextSnapshotHash,publicationHash:own.publicationHash??null},slots,blockIds:declaredBlocks}):Promise.resolve(new Map()),
   preMaterializedNativeScales
    ?Promise.resolve(preMaterializedNativeScales)
    :sources.length?readNativeEducationScaleFeedback(prisma,{actorUserId:input.actorUserId,parent:{id:own.parentId!,status:own.parentStatus!,
     userId:input.actorUserId,subjectUserId:input.actorUserId,respondentUserId:input.actorUserId,attemptEpoch:own.attemptEpoch!,
-    contextSnapshotHash:own.contextSnapshotHash,frozenActiveSlotSetEncrypted:frozenSlots,frozenActiveSlotSetHash:own.frozenSlotsHash},sources,slotSet:slots}):Promise.resolve(new Map()),
+    contextSnapshotHash:own.contextSnapshotHash,publicationHash:own.publicationHash??null,frozenActiveSlotSetEncrypted:frozenSlots,frozenActiveSlotSetHash:own.frozenSlotsHash},sources,slotSet:slots}):Promise.resolve(new Map()),
  ])
  const units=identity.manifest.map(block=>{
   const base={blockId:block.blockId,kind:block.kind,title:block.title}

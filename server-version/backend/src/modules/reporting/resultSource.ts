@@ -187,6 +187,7 @@ type AttemptRow = {
   respondentUserId: string | null
   assignmentRef: string | null
   attemptEpoch: number
+  publicationHash?: string | null
 }
 
 type SnapshotRow = {
@@ -296,6 +297,7 @@ const prepareTrackInTransaction = async (
       respondentUserId: true,
       assignmentRef: true,
       attemptEpoch: true,
+      publicationHash: true,
     },
   }) as AttemptRow[]
   const attemptById = new Map(attempts.map((attempt) => [attempt.id, attempt]))
@@ -315,11 +317,14 @@ const prepareTrackInTransaction = async (
   if ((leaf || catalog) && executions.length > 6000) reportingFail('REPORT_SOURCE_LIMIT', 'select a task with at most 6000 observations', 413)
   const selectedAttemptIds = selectedCompleted.map((row) => row.runtimeBindingRef!)
   const v2SlotFilter = leaf ? [leaf.slotKey] : catalogSlotKey ? [catalogSlotKey] : undefined
-  const v2Batch = selectedCompleted.length === 0
+  const v2SelectedCompleted = selectedCompleted.filter(
+    row => Boolean(attemptById.get(row.runtimeBindingRef!)?.publicationHash),
+  )
+  const v2Batch = v2SelectedCompleted.length === 0
     ? { loadedFactsByKey: new Map(), snapshots: [] }
     : await readCompositeFinalUnitSnapshots(
         tx,
-        selectedCompleted.map(row => ({
+        v2SelectedCompleted.map(row => ({
           attemptId: row.runtimeBindingRef!,
           attemptEpoch: attemptById.get(row.runtimeBindingRef!)!.attemptEpoch,
         })),

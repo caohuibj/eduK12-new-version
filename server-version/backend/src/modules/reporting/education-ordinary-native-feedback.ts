@@ -4,6 +4,12 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {compositeItemSlotKey,parseFrozenActiveSlotSet,type loadFrozenActiveSlotSet} from '../assessment-runtime/slot-set'
 import {loadStoredCanonicalUnitResults} from '../assessment-runtime/compact-assessment-storage'
 import {readCompositeFinalUnitSnapshots} from '../assessment-runtime/composite-final.bridge'
+import {
+  loadCompositePublicationPlan,
+  type CompositePublicationCognitiveSlot,
+  type CompositePublicationSituationalSlot,
+} from '../assessment-runtime/composite-publication-plan'
+import {publicTemplatesForDatabase} from '../assessment-runtime/public-templates'
 import {loadSharedCognitiveRuntime} from '../assessment-runtime/shared-cognitive-runtime'
 import {loadStoredUnitAdmission} from '../assessment-runtime/unit-admission'
 import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
@@ -67,8 +73,8 @@ export type OrdinaryNativeSituationalReport={itemId:string;type:'SITUATIONAL';ki
  qualityState:'interpretable'|'limited'|'invalid';qualityFlags:string[];completedAt:string;totalTime:number|null;
  narrative?:{version:'sjt-narrative-v1';paragraphs:string[]}}
 export type OrdinaryNativeFeedback={nativeCognitiveReport?:ThreeLayerReport;nativeSituationalReport?:OrdinaryNativeSituationalReport}
-type Input={identity:FrozenCompositionIdentity;parent:OrdinaryStoredContent&{id:string;attemptEpoch:number;contextSnapshotHash:string|null};
- slots:Awaited<ReturnType<typeof loadFrozenActiveSlotSet>>;actorUserId:string;blockIds:ReadonlySet<string>}
+type Input={identity:FrozenCompositionIdentity;parent:OrdinaryStoredContent&{id:string;attemptEpoch:number;contextSnapshotHash:string|null;publicationHash?:string|null};
+ slots?:Awaited<ReturnType<typeof loadFrozenActiveSlotSet>>;actorUserId:string;blockIds:ReadonlySet<string>}
 function hidden():never{return reportingFail('REPORT_NOT_FOUND','reporting resource not found',404)}
 function decode<T>(read:()=>T):T{try{return read()}catch{return hidden()}}
 const equal=(a:unknown,b:unknown)=>a===undefined||b===undefined?a===b:canonicalHash(a)===canonicalHash(b)
@@ -117,8 +123,10 @@ export async function readOrdinaryNativeFeedback(tx:Prisma.TransactionClient,inp
  if(!input.blockIds.size)return output
  const {identity}=input,parent={...input.parent,compositeAssessmentId:identity.compositeId}
  if(!['STUDENT:SELF','TEACHER:SELF'].includes(identity.origin.variantKey)||!input.actorUserId)hidden()
- const slots=decode(()=>parseFrozenActiveSlotSet(input.slots)),binding=trainingBoundContent(parent),receipt=decodeTrainingFinalReceipt(parent)
- if(!binding||!receipt||!binding.educationComposition||slots.attemptEpoch!==parent.attemptEpoch
+ const isWholeV2=Boolean(input.parent.publicationHash)
+ const slots=isWholeV2?null:decode(()=>parseFrozenActiveSlotSet(input.slots))
+ const binding=trainingBoundContent(parent),receipt=decodeTrainingFinalReceipt(parent)
+ if(!binding||(!receipt&&!isWholeV2)||!binding.educationComposition||(!isWholeV2&&slots!.attemptEpoch!==parent.attemptEpoch)
   ||binding.publicationHash!==identity.binding.manifestHash||!equal(binding.educationComposition,{origin:identity.origin,manifestHash:identity.binding.manifestHash}))hidden()
  const sealed=await readSealedCompositionContent(tx,{compositeId:identity.compositeId,ownerId:identity.origin.ownerUserId,anchor:binding.educationComposition})
  const blocks=identity.manifest.filter(block=>input.blockIds.has(block.blockId))
@@ -134,8 +142,8 @@ export async function readOrdinaryNativeFeedback(tx:Prisma.TransactionClient,inp
   if(descriptor.provider!==block.sourceProvider||descriptor.sourceId!==block.versionId||descriptor.contentHash!==block.contentHash
    ||!header.native||!equal(descriptor,header.native)||unit.family!==block.kind||unit.source.id!==block.versionId)hidden()
   const unitType=unit.family==='SJT'?'SITUATIONAL' as const:'COGNITIVE' as const,slotKey=compositeItemSlotKey(unit.itemId,unitType)
-  const slot=slots.slots.find(slot=>slot.slotKey===slotKey)
-  if(!slot||slot.unitType!==unitType||slot.sourceBinding.compositeItemId!==unit.itemId||slot.sourceBinding.educationBlockId!==block.blockId)hidden()
+  const slot=slots?slots.slots.find(s=>s.slotKey===slotKey):undefined
+  if(!isWholeV2&&(!slot||slot.unitType!==unitType||slot.sourceBinding.compositeItemId!==unit.itemId||slot.sourceBinding.educationBlockId!==block.blockId))hidden()
   return {block,unit,descriptor,ceiling,slot,slotKey,unitType}
  })
  // The profile M and its original config M are separate frozen identities.
@@ -157,7 +165,7 @@ export async function readOrdinaryNativeFeedback(tx:Prisma.TransactionClient,inp
   return measurement.status!=='REVOKED'
  })
  if(!expected.length)return output
- const v2NativeRead = (input.parent as { publicationHash?: string | null }).publicationHash
+ const v2NativeRead = isWholeV2
   ? await readCompositeFinalUnitSnapshots(
       tx,
       [{ attemptId: parent.id, attemptEpoch: parent.attemptEpoch }],
@@ -165,30 +173,115 @@ export async function readOrdinaryNativeFeedback(tx:Prisma.TransactionClient,inp
     )
   : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
  if (v2NativeRead.loadedFactsByKey.has(`${parent.id}:${parent.attemptEpoch}`)) {
+  const plan = await loadCompositePublicationPlan(input.parent.publicationHash!, publicTemplatesForDatabase(tx))
+  const planSlotByKey = new Map(plan.slots.map(s => [s.slotKey, s]))
   const bySlot = new Map(v2NativeRead.snapshots.map(snap => [snap.slotKey, snap]))
   for (const item of expected) {
    const snap = bySlot.get(item.slotKey)
-   if (!snap || !snap.canonicalEnvelope) hidden()
+   const planSlot = planSlotByKey.get(item.slotKey)
+   if (!snap || !snap.canonicalEnvelope || !planSlot) hidden()
    const core = snap.canonicalEnvelope.core
-   const allowedMetrics = new Set(item.ceiling.respondent.metricKeys)
-   const visibleMetrics = core.metrics.filter(m => allowedMetrics.has(m.key))
-   output.set(item.block.blockId, {
-    blockId: item.block.blockId,
-    kind: item.block.kind,
-    title: item.block.title,
-    state: 'READY',
-    qualityStatus: core.quality.status,
-    metrics: visibleMetrics,
-   } as any)
+   const allowed = new Set(item.ceiling.respondent.metricKeys)
+   if (item.descriptor.provider === 'COGNITIVE_CONFIG') {
+    if (planSlot.unitType !== 'COGNITIVE' || snap.unitFact.unitType !== 'COGNITIVE') hidden()
+    const cogSlot: CompositePublicationCognitiveSlot = planSlot
+    const cogFact = snap.unitFact
+    if (!cogSlot.frozenReport) hidden()
+    if (
+     cogSlot.resolvedConfigHash !== item.descriptor.resolvedConfigHash
+     || cogSlot.profile !== item.descriptor.profile
+     || cogFact.protocolSignature !== cogSlot.sessionSnapshot.protocolSignature
+    ) hidden()
+    const reconstructedSnapshot: CognitiveResultSnapshot = {
+     schemaVersion: 1,
+     testType: cogFact.testType as CognitiveResultSnapshot['testType'],
+     engineVersion: cogFact.engineVersion,
+     scoringVersion: cogFact.scoringVersion,
+     configVersion: cogFact.configVersion,
+     protocolSignature: cogFact.protocolSignature,
+     profile: cogFact.profile as CognitiveResultSnapshot['profile'],
+     completedAt: snap.completedAt.toISOString(),
+     assessmentContext: parent.contextSnapshotHash
+      ? { schemaVersion: 1, snapshotHash: parent.contextSnapshotHash }
+      : null,
+     metrics: cogFact.metrics as CognitiveResultSnapshot['metrics'],
+     quality: cogFact.quality as CognitiveResultSnapshot['quality'],
+     references: cogFact.references as CognitiveResultSnapshot['references'],
+     report: cogFact.reportSummary as unknown as CognitiveResultSnapshot['report'],
+    }
+    output.set(item.unit.itemId, {
+     nativeCognitiveReport: cognitiveReport(reconstructedSnapshot, cogSlot.frozenReport, allowed),
+    })
+   } else {
+    if (planSlot.unitType !== 'SITUATIONAL' || snap.unitFact.unitType !== 'SITUATIONAL') hidden()
+    const sjtSlot: CompositePublicationSituationalSlot = planSlot
+    const sjtFact = snap.unitFact
+    if (
+     !['participant_self_report', identity.origin.entry === 'TEACHER' ? 'teacher_self_report' : 'student_self_report']
+      .includes(sjtSlot.definition.respondentType)
+    ) hidden()
+    const narrativeOnly = Boolean(
+     sjtSlot.definition.report.narrative
+     || (core.quality.flags.includes(SJT_ONLINE_PROTOCOL_FLAG) && sjtSlot.definition.scoring.model?.modelKey === 'AUTHOR_KEY_SUM'),
+    )
+    const defMetricByKey = new Map(
+     (sjtSlot.definition.scoring.publishedMetrics ?? []).map(m => [m.key, m]),
+    )
+    const metrics: Array<z.infer<typeof situationalMetric>> = narrativeOnly
+     ? []
+     : core.metrics
+        .filter(m => allowed.has(m.key))
+        .map(m => {
+         const metaDef = defMetricByKey.get(m.key)
+         return decode(() => situationalMetric.parse({
+          key: m.key,
+          value: typeof m.value === 'number' && Number.isFinite(m.value) ? m.value : null,
+          label: metaDef?.label ?? m.key,
+          construct: metaDef?.construct ?? m.key,
+          channelKey: metaDef?.channelKey ?? m.key,
+          displayPrecision: metaDef?.displayPrecision ?? 2,
+          range: null,
+          status: m.quality === 'limited' ? 'limited' : m.value === null ? 'not_calculable' : 'calculated',
+         }))
+        })
+    const qualityState = core.quality.status === 'interpretable' || core.quality.status === 'limited' || core.quality.status === 'invalid'
+     ? core.quality.status
+     : 'limited'
+    const interpretations = sjtSlot.definition.report.interpretations
+     .filter(interp => qualityState === 'interpretable'
+      && metrics.some(m => m.key === interp.metricKey && m.status === 'calculated' && m.value !== null))
+     .map(({ metricKey, headline, summary }) => ({ metricKey, headline, summary }))
+    const report: OrdinaryNativeSituationalReport = {
+     itemId: item.unit.itemId,
+     type: 'SITUATIONAL',
+     kind: 'situational',
+     label: item.block.title,
+     instrumentKey: sjtFact.instrumentKey,
+     instrumentVersion: sjtFact.instrumentVersion,
+     scoringVersion: sjtSlot.definition.scoring.scoringVersion,
+     metrics,
+     metricOrder: sjtSlot.definition.report.metricOrder.filter(key => !narrativeOnly && allowed.has(key)),
+     interpretations,
+     disclaimer: sjtSlot.definition.report.disclaimer,
+     scientificContext: frozenSituationalScientificProjection(undefined),
+     limitations: [...sjtSlot.definition.report.limitations],
+     qualityState,
+     qualityFlags: [...core.quality.flags],
+     completedAt: snap.completedAt.toISOString(),
+     totalTime: null,
+    }
+    output.set(item.unit.itemId, { nativeSituationalReport: report })
+   }
   }
   return output
  }
+ if (!receipt || !slots) hidden()
  const finals=await tx.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,
   slotKey:{in:expected.map(item=>item.slotKey)}}})
  if(finals.length!==expected.length||new Set(finals.map(row=>row.slotKey)).size!==expected.length)hidden()
  for(const row of finals){
   const item=expected.find(item=>item.slotKey===row.slotKey)
-  if(!item||row.compositeAttemptId!==parent.id||row.attemptEpoch!==parent.attemptEpoch||row.terminalState!=='COMPLETED'
+  if(!item||!item.slot||row.compositeAttemptId!==parent.id||row.attemptEpoch!==parent.attemptEpoch||row.terminalState!=='COMPLETED'
    ||row.payloadKind!=='UNIT_RESULT'||!row.canonicalResultEncrypted||!row.sourceSubmissionId||!row.compiledRuntimeHash
    ||row.unitType!==item.unitType||row.sourceDefinitionHash!==item.slot.sourceDefinitionIdentity.hash
    ||row.compiledRuntimeHash!==item.slot.sourceBinding.compiledRuntimeHash
@@ -211,7 +304,7 @@ export async function readOrdinaryNativeFeedback(tx:Prisma.TransactionClient,inp
  for(const item of expected){
   const index=finals.findIndex(row=>row.slotKey===item.slotKey),row=finals[index],envelope=envelopes[index],core=envelope?.core
   const source=receipt.sources.find(source=>source.itemId===item.unit.itemId),measurement=releases.get(item.unit.measurement.releaseId)
-  if(!core||core.unitType!==item.unitType||core.sourceDefinitionHash!==row.sourceDefinitionHash||core.compiledRuntimeHash!==row.compiledRuntimeHash
+  if(!core||!item.slot||core.unitType!==item.unitType||core.sourceDefinitionHash!==row.sourceDefinitionHash||core.compiledRuntimeHash!==row.compiledRuntimeHash
    ||core.instrumentKey!==item.slot.sourceDefinitionIdentity.key||core.instrumentVersion!==item.slot.sourceDefinitionIdentity.version
    ||core.contextHash!==parent.contextSnapshotHash||envelope.persistenceProvenance.sourceType!==row.sourceType
    ||envelope.persistenceProvenance.sourceAttemptId!==row.sourceAttemptId||envelope.persistenceProvenance.sourceSubmissionId!==row.sourceSubmissionId
@@ -264,7 +357,7 @@ export async function readOrdinaryNativeFeedback(tx:Prisma.TransactionClient,inp
     ||child.definitionHash!==row.sourceDefinitionHash||child.compiledRuntimeHash!==row.compiledRuntimeHash||iso(child.completedAt)!==iso(envelope.completedAt)
     ||!equal(envelopes[finals.length+childIndex],envelope)||measurement.contentHash!==item.descriptor.contentHash)hidden()
    const frozen=decode(()=>decryptFrozenSituationalRuntimeSnapshot(child.runtimeSnapshotEncrypted)),result=decode(()=>decryptUnifiedRuntimePayload<SituationalResultV1>(child.resultEncrypted!))
-   if(iso(child.frozenAt)!==frozen.frozenAt||item.slot.runtimeIdentity?.frozenAt!==frozen.frozenAt
+   if(iso(child.frozenAt)!==frozen.frozenAt||item.slot!.runtimeIdentity?.frozenAt!==frozen.frozenAt
     ||frozen.definitionHash!==child.definitionHash||frozen.compiledRuntimeHash!==child.compiledRuntimeHash||frozen.instrumentKey!==child.instrumentKey
     ||frozen.instrumentVersion!==child.instrumentVersion||frozen.scorerKey!==child.scorerKey||frozen.scoringVersion!==child.scoringVersion
     ||item.unit.source.instrumentKey!==child.instrumentKey||item.unit.source.instrumentVersion!==child.instrumentVersion
