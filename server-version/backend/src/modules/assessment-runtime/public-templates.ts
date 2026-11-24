@@ -6,11 +6,11 @@ import { BoundedArtifactCache } from './bounded-artifact-cache'
 import { canonicalHash, canonicalJsonBytes, retainImmutableCanonicalValue } from './canonical'
 import { decryptCompactField, encryptCompactField } from './compact-field-codec'
 
-export type PublicTemplateKind = 'SCALE_RESULT_BASE' | 'SCALE_REFERENCE' | 'SCALE_INTERPRETATION' | 'SCALE_CAVEATS' | 'SCALE_CANONICAL_LAYOUT' | 'COMPOSITE_REPORT_LAYOUT' | 'UNIT_ADMISSION_PLAN' | 'FROZEN_SLOT_PLAN' | 'WHOLE_VALIDATION_PLAN' | 'COGNITIVE_PROFILE_CONFIGURATION' | 'SCALE_RUNTIME_POLICY_PLAN' | 'SCALE_FACTS_BUNDLE'
+export type PublicTemplateKind = 'SCALE_RESULT_BASE' | 'SCALE_REFERENCE' | 'SCALE_INTERPRETATION' | 'SCALE_CAVEATS' | 'SCALE_CANONICAL_LAYOUT' | 'COMPOSITE_REPORT_LAYOUT' | 'UNIT_ADMISSION_PLAN' | 'FROZEN_SLOT_PLAN' | 'WHOLE_VALIDATION_PLAN' | 'COGNITIVE_PROFILE_CONFIGURATION' | 'SCALE_RUNTIME_POLICY_PLAN' | 'SCALE_FACTS_BUNDLE' | 'COMPOSITE_PUBLICATION_PLAN'
 export type PublicTemplateRow = { templateHash: string; templateKind: PublicTemplateKind; plaintextBytes: number; payloadEncrypted: string }
 export interface PublicTemplateRepository { read(hashes: string[]): Promise<PublicTemplateRow[]>; append(rows: PublicTemplateRow[]): Promise<void> }
 const MAX_BYTES = 2 * 1024 * 1024
-const kinds = new Set<PublicTemplateKind>(['SCALE_RESULT_BASE', 'SCALE_REFERENCE', 'SCALE_INTERPRETATION', 'SCALE_CAVEATS', 'SCALE_CANONICAL_LAYOUT', 'COMPOSITE_REPORT_LAYOUT', 'UNIT_ADMISSION_PLAN', 'FROZEN_SLOT_PLAN', 'WHOLE_VALIDATION_PLAN', 'COGNITIVE_PROFILE_CONFIGURATION', 'SCALE_RUNTIME_POLICY_PLAN', 'SCALE_FACTS_BUNDLE'])
+const kinds = new Set<PublicTemplateKind>(['SCALE_RESULT_BASE', 'SCALE_REFERENCE', 'SCALE_INTERPRETATION', 'SCALE_CAVEATS', 'SCALE_CANONICAL_LAYOUT', 'COMPOSITE_REPORT_LAYOUT', 'UNIT_ADMISSION_PLAN', 'FROZEN_SLOT_PLAN', 'WHOLE_VALIDATION_PLAN', 'COGNITIVE_PROFILE_CONFIGURATION', 'SCALE_RUNTIME_POLICY_PLAN', 'SCALE_FACTS_BUNDLE', 'COMPOSITE_PUBLICATION_PLAN'])
 const hashOfBytes = (kind: PublicTemplateKind, valueBytes: Buffer): string =>
   createHash('sha256')
     .update(`{"kind":${JSON.stringify(kind)},"storageVersion":1,"value":`)

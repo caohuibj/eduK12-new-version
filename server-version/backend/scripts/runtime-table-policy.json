@@ -82,6 +82,8 @@
     "composite_assessment_attempts": "RUNTIME_RW",
     "composite_assessment_items": "RUNTIME_RW",
     "composite_assessments": "RUNTIME_RW",
+    "composite_attempt_checkpoints": "RUNTIME_RW",
+    "composite_attempt_finals": "RUNTIME_RW",
     "composite_form_answers": "RUNTIME_RW",
     "composite_form_section_attempts": "RUNTIME_RW",
     "composite_form_sections": "RUNTIME_RW",
