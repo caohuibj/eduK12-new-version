@@ -8,6 +8,8 @@ import {isCapabilitySources} from '../modules/assessment-media/video-capability-
 const FinalCompositeAssessment=deferredPage(()=>import('../components/FinalCompositeAssessment'),{
  label:'取消打开测评',run:props=>props.onExit(),
 })
+const WholeCompositeV2Runner=deferredPage(()=>import('../components/WholeCompositeV2Runner'))
+import { createEducationWholeV2Client } from '../modules/composite/whole-v2.client'
 import { type EducationReportApi } from '../components/education-tools/EducationScalePersonalReport'
 import { EducationTaskFeedback, type EducationFeedbackData } from '../components/education-tools/EducationTaskFeedback'
 import type { CompositeAttemptState } from '../modules/composite/types'
@@ -151,6 +153,10 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
   const feedbackExecutionId=visibleFeedback?.task.executionId
   const readFeedback=useCallback(()=>api<EducationFeedbackData>(
     '/run-executions/'+feedbackExecutionId+'/personal-summary'),[api,feedbackExecutionId])
+  const v2Client=useMemo(
+    ()=>visible?.attempt?createEducationWholeV2Client(api,'/composite-attempts/'+encodeURIComponent(visible.attempt.id)):undefined,
+    [api,visible?.attempt?.id],
+  )
   const leave=()=>{
     const hadSession=sessionRef.current?.api===api
     sessionEpoch.current+=1;sessionRef.current=null;setSession(null);setLoading(false)
@@ -213,7 +219,13 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
     {selected&&attempt&&attempt.status!=='COMPLETED'&&<TeacherAssessmentPage kind="answer" title={selected.title} showTitle={false}><div className="ht-task" ref={answering} tabIndex={-1} role="region" aria-label="当前测评作答">
       {!unified&&<h3>正在完成：{selected.title}</h3>}
       {message&&<p role="status" className="ht-notice">{message}</p>}
-      <FinalCompositeAssessment
+      {attempt.executionMode==='WHOLE_V2'&&v2Client?<WholeCompositeV2Runner
+        attemptId={attempt.id}
+        title={selected.title}
+        client={v2Client}
+        onExit={()=>{if(sessionRef.current===visible)leave()}}
+        onCompleted={()=>{if(visible&&sessionRef.current===visible){const task=visible.selected;confirmCompleted(task);leave();showReport(task)}}}
+      />:<FinalCompositeAssessment
         key={`${attempt.id}:${attempt.currentItem?.id??''}:${attempt.currentItem?.definitionHash??''}`}
         state={attempt}
         campusMode={false}
@@ -227,7 +239,7 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
         onCompleted={()=>{if(visible&&visible.attempt.status==='COMPLETED'&&sessionRef.current===visible){const task=visible.selected;leave();showReport(task)}}}
         onEnterCognitive={()=>setMessage('该教师个人测评不允许启动认知任务')}
         onEnterSituational={()=>setMessage('该教师个人测评不允许启动情境任务')}
-      />
+      />}
     </div></TeacherAssessmentPage>}
   </section>
 }

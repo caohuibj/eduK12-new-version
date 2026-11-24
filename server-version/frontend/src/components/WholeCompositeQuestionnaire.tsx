@@ -34,6 +34,8 @@ import { useLocalDraftSaveQueue } from './questionnaire/useLocalDraftSaveQueue'
 import type { CompositeScaleRunnerItem } from '../modules/composite/types'
 import type { AssessmentVideoCapabilitySources } from '../modules/assessment-media/types'
 import type { PublicMaterial } from '../modules/assessment-media/material'
+import { WholeCompositeV2Runner } from './WholeCompositeV2Runner'
+import type { WholeV2Client } from '../modules/composite/whole-v2.types'
 
 export interface WholeQuestionnaireApi {
   wholeReceipt?: (id: string, submissionId: string, attemptEpoch: number) => Promise<ApiResponse<WholeReceiptLookup>>
@@ -47,7 +49,7 @@ type EducationWholeMedia = {
   loadFormImage: (sectionId: string, assetId: string) => Promise<Blob>
   loadFormVideo: (sectionId: string, itemId: string, optionIndex: number) => Promise<AssessmentVideoCapabilitySources>
 }
-type Props = { state: CompositeAttemptState; api: WholeQuestionnaireApi; publicMode?: boolean; recoveryToken?: string; isFreshStart?: boolean; fallback: ReactNode; onExit: () => void; onCompleted: (progress?: CompositeReportStatus) => void; onReceiptAccepted?: (acceptedAt?: string) => void; educationMedia?: EducationWholeMedia; acceptedNotice?: string; acceptedAction?: string; committedMessage?: string }
+type Props = { state: CompositeAttemptState; api: WholeQuestionnaireApi; v2Client?: WholeV2Client; publicMode?: boolean; recoveryToken?: string; isFreshStart?: boolean; fallback: ReactNode; onExit: () => void; onCompleted: (progress?: CompositeReportStatus) => void; onReceiptAccepted?: (acceptedAt?: string) => void; educationMedia?: EducationWholeMedia; acceptedNotice?: string; acceptedAction?: string; committedMessage?: string }
 type Answer = { responseValue?: string | number; value?: unknown; responseTimeMs?: number; changeCount?: number; otherText?: string }
 export const wholeDraftKey = (id: string, epoch: number) => `composite-whole:${id}:${epoch}`
 export const wholeAnswerKey = (itemId: string, itemCode: string) => JSON.stringify([itemId, itemCode])
@@ -681,6 +683,33 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
 /** Conditional paths must submit only the current accepted unit, even if a
  * stale whole-questionnaire draft happens to exist in this browser. */
 export default function WholeCompositeQuestionnaire(props: Props) {
+  if (props.state.executionMode === 'WHOLE_V2' && props.v2Client) {
+    return (
+      <WholeCompositeV2Runner
+        attemptId={props.state.id}
+        title={props.state.name}
+        instruction={props.state.instruction}
+        client={props.v2Client}
+        onExit={props.onExit}
+        onReceiptAccepted={props.onReceiptAccepted}
+        onCompleted={receipt => props.onCompleted({
+          attemptId: receipt.attemptId,
+          attemptEpoch: receipt.attemptEpoch,
+          status: 'COMPLETED',
+          hasAcceptedSubmission: true,
+          runCompleted: true,
+          ...(receipt.receiptOnly ? { receiptOnly: true as const } : {}),
+          reportStatus: {
+            state: receipt.receiptOnly ? 'NOT_OFFERED' : receipt.feedbackAvailable ? 'READY' : 'PENDING',
+            jobId: null,
+            retryAfterSeconds: receipt.feedbackAvailable || receipt.receiptOnly ? 0 : 2,
+            errorCode: null,
+            completedAt: receipt.completedAt,
+          },
+        })}
+      />
+    )
+  }
   if (props.state.trainingFlow || props.state.currentItem?.presentationMode === 'ALL_AT_ONCE') return <>{props.fallback}</>
   return <WholeCompositeQuestionnaireRunner {...props} />
 }

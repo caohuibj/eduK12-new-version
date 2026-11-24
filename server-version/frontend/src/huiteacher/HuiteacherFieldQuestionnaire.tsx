@@ -3,7 +3,9 @@ import {deferredPage} from '../components/page-loading/deferredPage'
 import type {CompositeAttemptState} from '../modules/composite/types'
 import type {EducationReportApi} from '../components/education-tools/EducationScalePersonalReport'
 import {createTeacherAssessmentMediaTransport,teacherAssessmentParentPath} from './assessmentRuntime.client'
+import {createEducationWholeV2Client} from '../modules/composite/whole-v2.client'
 const FinalCompositeAssessment=deferredPage(()=>import('../components/FinalCompositeAssessment'))
+const WholeCompositeV2Runner=deferredPage(()=>import('../components/WholeCompositeV2Runner'))
 export type FieldQuestionnaireTask={title:string;targetName:string;assessmentRef:{origin:{versionId:string;contentHash:string;targetKind:string}};attemptId:string|null;status:string;attemptEpoch:number|null}
 export type FieldQuestionnaireProgress={attemptId:string|null;completed:boolean;writing:boolean}
 type Props={api:EducationReportApi;invitationId:string;task:FieldQuestionnaireTask;onProgress:(state:FieldQuestionnaireProgress)=>void;onExit:()=>void}
@@ -17,6 +19,7 @@ export function HuiteacherFieldQuestionnaire({api,invitationId,task,onProgress,o
  const invalidate=useCallback(()=>{alive.current=false;generation.current++},[])
  const fieldApi=useMemo<EducationReportApi>(()=><T,>(path:string,method?:string,body?:unknown,options?:{responseType?:'blob'})=>api<T>('/field-assessments'+path,method,body,options),[api])
  const media=useMemo(()=>attempt?.currentItem?createTeacherAssessmentMediaTransport(fieldApi,attempt.id,attempt.currentItem):undefined,[fieldApi,attempt])
+ const v2Client=useMemo(()=>attempt?createEducationWholeV2Client(fieldApi,teacherAssessmentParentPath(attempt.id)):undefined,[fieldApi,attempt?.id])
  useEffect(()=>{callback.current(latest.current)},[attempt,busy])
  useEffect(()=>()=>callback.current({...latest.current,writing:false}),[])
  const accept=(id:string,state:CompositeAttemptState,token:number)=>{
@@ -69,6 +72,7 @@ export function HuiteacherFieldQuestionnaire({api,invitationId,task,onProgress,o
   <p>按已接受的本次邀请作答。量表独立计分，表单不计分；完成问卷后，再由你确认正式提交专业意见。正式证据仅供获权管理员经 MFA 和审计读取，不自动向被评价者公开个人答案。</p>
   {error&&<p role="alert">{error}</p>}{busy&&<p role="status">正在核对同一观察任务…</p>}
   {attempt?.status==='COMPLETED'?<p role="status">观察问卷已完成，正式提交已确认。请保存专业意见后完成本次正式反馈。</p>:
+   attempt?.executionMode==='WHOLE_V2'&&v2Client?<WholeCompositeV2Runner attemptId={attempt.id} title={task.title} client={v2Client} onExit={onExit} onCompleted={()=>{void reload().catch(()=>undefined)}}/>:
    attempt?<FinalCompositeAssessment key={attempt.id+':'+(attempt.currentItem?.id??'')} state={attempt} campusMode mediaTransport={media}
     submitScale={(id,itemId,payload)=>submit(id,itemId,'scale',payload)} submitFormSection={(id,sectionId,payload)=>submit(id,sectionId,'form',payload)}
     onReload={reload} onCompleted={()=>{void reload().catch(()=>undefined)}} onExit={onExit}

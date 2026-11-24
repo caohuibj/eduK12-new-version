@@ -5,6 +5,8 @@ import {assessmentStatus,type AssessmentListPresentation} from './assessmentTask
 const FinalCompositeAssessment=deferredPage(()=>import('../components/FinalCompositeAssessment'),{
  label:'取消打开测评',run:props=>props.onExit(),
 })
+const WholeCompositeV2Runner=deferredPage(()=>import('../components/WholeCompositeV2Runner'))
+import {createEducationWholeV2Client} from '../modules/composite/whole-v2.client'
 import type {CompositeAttemptState} from '../modules/composite/types'
 
 type Api=<T>(path:string,method?:string,payload?:unknown,options?:{responseType?:'blob'})=>Promise<T>
@@ -31,6 +33,7 @@ function PrivateFormSession({api,actorKey,unified=false,onListStateChange}:{api:
  currentApi.current=api;currentActor.current=actorKey;activeRef.current=active
  const currentListing=listing?.api===api&&listing.actorKey===actorKey?listing:null
  const tasks=currentListing?.rows??[],visible=active?.api===api?active:null
+ const v2Client=useMemo(()=>visible?.attempt?createEducationWholeV2Client(api,attemptPath(visible.attempt.id)):undefined,[api,visible?.attempt?.id])
  useEffect(()=>{onListStateChange?.({pending:listPending,error:Boolean(listError),count:tasks.length})},[onListStateChange,listPending,listError,tasks.length])
  const mediaTransport=useMemo(()=>{
   const attempt=visible?.attempt,item=attempt?.currentItem
@@ -147,8 +150,14 @@ function PrivateFormSession({api,actorKey,unified=false,onListStateChange}:{api:
    {!visible.attempt&&<><button type="button" disabled={busy} onClick={()=>void work(async()=>{await reload()})}>重新读取当前表单</button><button type="button" disabled={busy} onClick={leave}>返回任务列表</button></>}
    {visible.attempt?.status==='ABANDONED'&&<><p>本次作答已终止，不能继续提交。</p><button type="button" onClick={leave}>返回任务列表</button></>}
    {visible.attempt?.status==='COMPLETED'&&<><p>本次表单已正式提交。</p><button type="button" onClick={leave}>返回任务列表</button></>}
-   {visible.attempt?.status==='IN_PROGRESS'&&!visible.attempt.currentItem&&<><p>正在确认完成状态，请刷新。</p><button type="button" disabled={busy} onClick={()=>void work(async()=>{await reload()})}>重新读取当前表单</button><button type="button" disabled={busy} onClick={leave}>返回任务列表</button></>}
-   {visible.attempt?.status==='IN_PROGRESS'&&visible.attempt.currentItem&&<FinalCompositeAssessment
+   {visible.attempt?.status==='IN_PROGRESS'&&visible.attempt.executionMode!=='WHOLE_V2'&&!visible.attempt.currentItem&&<><p>正在确认完成状态，请刷新。</p><button type="button" disabled={busy} onClick={()=>void work(async()=>{await reload()})}>重新读取当前表单</button><button type="button" disabled={busy} onClick={leave}>返回任务列表</button></>}
+   {visible.attempt?.status==='IN_PROGRESS'&&visible.attempt.executionMode==='WHOLE_V2'&&v2Client?<WholeCompositeV2Runner
+    attemptId={visible.attempt.id}
+    title={visible.task.formTitle}
+    client={v2Client}
+    onExit={leave}
+    onCompleted={()=>{void work(async()=>{await reload()})}}
+   />:visible.attempt?.status==='IN_PROGRESS'&&visible.attempt.currentItem&&<FinalCompositeAssessment
     key={`${actorKey}:${visible.task.executionId}:${visible.attempt.id}:${visible.attempt.currentItem?.id}:${visible.attempt.currentItem?.definitionHash}`}
     state={visible.attempt}
     autoAdvanceSingleChoice

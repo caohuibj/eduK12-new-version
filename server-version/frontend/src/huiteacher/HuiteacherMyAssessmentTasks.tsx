@@ -16,6 +16,7 @@ import {TeacherAssessmentPage} from './TeacherAssessmentPage'
 import {assessmentStatus,type AssessmentListPresentation} from './assessmentTaskPresentation'
 import {createTeacherCognitiveClient,createTeacherSituationalClient,createTeacherAssessmentMediaTransport,
  teacherAssessmentParentPath,type TeacherAssessmentTask,type TeacherAssessmentCompletion} from './assessmentRuntime.client'
+import {createEducationWholeV2Client} from '../modules/composite/whole-v2.client'
 import {captureEducationInlineWhole,educationAttemptIdentity,fetchEducationWholeDefinition,
  withKnownWholeTemplateQuery,type EducationInlineWholePayload} from '../modules/composite/education-whole-client'
 import type {InlineWholeDefinitionIdentity} from '../modules/composite/whole-definition-source'
@@ -188,6 +189,10 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
  const situational=useMemo(()=>parentId&&child?.type==='SITUATIONAL'&&child.situationalAttemptId
   ?createTeacherSituationalClient(api,parentId,child.id,child.situationalAttemptId):null,[api,parentId,child])
  const media=useMemo(()=>attempt?.currentItem?createTeacherAssessmentMediaTransport(api,attempt.id,attempt.currentItem):undefined,[api,attempt])
+ const v2Client=useMemo(
+  ()=>attempt?createEducationWholeV2Client(api,teacherAssessmentParentPath(attempt.id)):undefined,
+  [api,attempt?.id],
+ )
  const wholeApi=useMemo(():WholeQuestionnaireApi|null=>attempt?{
   wholeDefinition:(id:string)=>fetchEducationWholeDefinition({
    attemptId:id,
@@ -268,7 +273,7 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
      child?.type==='SITUATIONAL'&&child.situationalAttemptId&&attempt&&situational?
       <MemoryRouter key={actorKey+':'+child.situationalAttemptId}><SituationalRunner host={{attemptId:child.situationalAttemptId,parentAttemptId:attempt.id,
        compositeItemId:child.id,instructionsSummary:'作答说明',client:situational,onCompleted:childFinished}}/></MemoryRouter>:
-     attempt?.executionMode==='WHOLE_LOCAL'&&!child&&wholeApi&&educationMedia?<WholeCompositeQuestionnaire state={attempt} isFreshStart={freshStart} fallback={stepped} api={wholeApi} educationMedia={educationMedia} onExit={leave}
+     (attempt?.executionMode==='WHOLE_V2'||attempt?.executionMode==='WHOLE_LOCAL')&&!child&&wholeApi&&educationMedia?<WholeCompositeQuestionnaire state={attempt} isFreshStart={freshStart} fallback={stepped} api={wholeApi} v2Client={v2Client} educationMedia={educationMedia} onExit={leave}
       onReceiptAccepted={acceptedAt=>{
        const current=active.current
        if(!current?.attempt||current.attempt.id!==attempt.id)return
