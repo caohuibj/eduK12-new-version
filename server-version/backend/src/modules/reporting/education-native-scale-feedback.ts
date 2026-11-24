@@ -104,7 +104,9 @@ export async function readNativeEducationScaleFeedback(tx:Prisma.TransactionClie
           audience: 'respondent',
           purpose: 'report',
           accessDecision: { source: 'RESOURCE_AUTHORIZATION', allowed: true, capabilities: full },
-          frozenPolicy: educationLibraryV1ProjectionPolicy(),
+          frozenPolicy: slot.compiledPolicy
+            ? scaleProjectionPolicyFromCompiled(slot.compiledPolicy)
+            : educationLibraryV1ProjectionPolicy(),
           currentRestrictions: full,
           relationalDisposition: 'INDIVIDUAL_ALLOWED',
         },

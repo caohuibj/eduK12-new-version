@@ -80,6 +80,7 @@ export interface AuthorizedWholeV2Attempt {
   /** Optional frozen-policy checkpoint expiry calculator (enforces course/round cutoffs). */
   checkpointExpiresAt?: (now: Date) => Date
   verifyAuthorityInTx?: CommitCompositeWholeFinalInput['verifyAuthorityInTx']
+  finalizeGovernanceInTx?: CommitCompositeWholeFinalInput['finalizeGovernanceInTx']
   buildFeedback?: CommitCompositeWholeFinalInput['buildFeedback']
 }
 
@@ -438,6 +439,7 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
           educationRun: ctx.educationRun,
           activeSlotKeys: ctx.activeSlotKeys,
           verifyAuthorityInTx: ctx.verifyAuthorityInTx,
+          finalizeGovernanceInTx: ctx.finalizeGovernanceInTx,
           buildFeedback: ctx.buildFeedback,
         })),
         ctx.audience === 'public',

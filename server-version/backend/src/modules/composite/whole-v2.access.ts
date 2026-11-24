@@ -40,6 +40,9 @@ import {
   scaleDefinitionSchema,
 } from '../scale/scale-definition'
 import { scaleRuntimeInstrumentKey } from '../scale/runtime-identity'
+import { resolveScaleStartDeployment } from '../scale/deployment/service'
+import { computeTrainingReferenceBinding } from './training-reference-binding'
+import { prepareTrainingFinalReceipt } from './training-content-final'
 import {
   resolveSituationalReleases,
   situationalReleaseKey,
@@ -195,10 +198,13 @@ export async function materializeCompositePublicationPlan(
               id: true,
               code: true,
               name: true,
+              status: true,
               instrumentVersion: true,
               instrumentClass: true,
               standardSourceKind: true,
               standardToolKey: true,
+              libraryEntryId: true,
+              measurementReleaseId: true,
               definition: true,
               definitionHash: true,
               instruction: true,
@@ -332,6 +338,31 @@ export async function materializeCompositePublicationPlan(
         definition: def,
         sourceDefinitionHash: definitionHash,
       })
+      let compiledPolicy: import('../scale/policy/compile').CompiledScalePolicyV1 | undefined
+      let runtimePolicyHash: string | undefined
+      if (item.scale.instrumentClass === 'STANDARD' && typeof (db as any).$queryRaw === 'function') {
+        const deploymentResolution = await resolveScaleStartDeployment({
+          db: db as any,
+          scale: {
+            id: item.scale.id,
+            code: item.scale.code,
+            instrumentVersion: item.scale.instrumentVersion,
+            instrumentClass: item.scale.instrumentClass,
+            status: item.scale.status,
+          },
+        })
+        if (!deploymentResolution.allowNewStarts) {
+          throw new InstrumentFinalSubmitError(
+            'INSTRUMENT_NOT_AVAILABLE',
+            `量表部署策略不允许新开始：${deploymentResolution.reasons.join(',') || 'UNKNOWN'}`,
+            409,
+          )
+        }
+        if (deploymentResolution.kind === 'MANAGED_V2') {
+          compiledPolicy = deploymentResolution.runtimePolicy
+          runtimePolicyHash = deploymentResolution.runtimePolicy.runtimePolicyHash
+        }
+      }
       const media = collectMediaFromUnknown(def.items, `SCALE:${compiledRuntime.compiledRuntimeHash}`)
       slots.push({
         slotKey: compositeItemSlotKey(item.id, 'SCALE'),
@@ -340,6 +371,7 @@ export async function materializeCompositePublicationPlan(
         scaleId: item.scale.id,
         instrumentKey,
         instrumentVersion: item.scale.instrumentVersion,
+        instrumentClass: item.scale.instrumentClass,
         name: item.scale.name,
         title: item.scale.name,
         required: item.required,
@@ -348,6 +380,7 @@ export async function materializeCompositePublicationPlan(
         instruction: item.scale.instruction ?? null,
         definition: def,
         compiledRuntime,
+        ...(compiledPolicy ? { compiledPolicy, runtimePolicyHash } : {}),
         referenceSets: refSetsByInstrument.get(instrumentKey) ?? [],
         referencePolicy: def.referencePolicy,
         ...media,
@@ -532,6 +565,7 @@ interface LoadedAttemptRow {
   id: string
   compositeAssessmentId: string
   userId: string | null
+  subjectUserId: string | null
   recoveryTokenHash: string | null
   attemptEpoch: number
   status: string
@@ -542,6 +576,12 @@ interface LoadedAttemptRow {
   deliveryCourseId: string | null
   assignmentRef: string | null
   consentId: string | null
+  contextSnapshotEncrypted: string | null
+  contextSnapshotHash: string | null
+  trainingContentBinding: unknown
+  trainingContentBindingHash: string | null
+  trainingReferenceBinding: unknown
+  trainingReferenceBindingHash: string | null
   trainingTimingSnapshot: unknown
   trainingPersistenceSnapshot: unknown
   trainingPersistenceSnapshotHash: string | null
@@ -551,6 +591,7 @@ interface LoadedAttemptRow {
     creationKey: string | null
     productKind: string
     expiresAt: Date | null
+    createdBy: string | null
   } | null
   accessToken: {
     trainingRound: {
@@ -648,6 +689,72 @@ function resolveVariantActiveSlotKeys(
   return active
 }
 
+function buildFinalizeGovernanceInTx(
+  attempt: LoadedAttemptRow,
+): AuthorizedWholeV2Attempt['finalizeGovernanceInTx'] {
+  if (attempt.trainingContentBinding == null && attempt.trainingContentBindingHash == null) {
+    return undefined
+  }
+  return async (tx, info) => {
+    const prismaTx = tx as Prisma.TransactionClient
+    const effectiveContextEncrypted = info.contextSnapshotEncrypted ?? attempt.contextSnapshotEncrypted
+    const effectiveContextHash = info.contextHash ?? attempt.contextSnapshotHash
+    const refParent = {
+      id: attempt.id,
+      attemptEpoch: attempt.attemptEpoch,
+      compositeAssessmentId: attempt.compositeAssessmentId,
+      trainingContentBinding: attempt.trainingContentBinding,
+      trainingContentBindingHash: attempt.trainingContentBindingHash,
+      trainingReferenceBinding: attempt.trainingReferenceBinding,
+      trainingReferenceBindingHash: attempt.trainingReferenceBindingHash,
+      contextSnapshotEncrypted: effectiveContextEncrypted,
+      contextSnapshotHash: effectiveContextHash,
+      compositeAssessment: {
+        createdBy: attempt.compositeAssessment?.createdBy ?? null,
+      },
+    }
+    const frozenRef = attempt.trainingReferenceBindingHash
+      ? { binding: attempt.trainingReferenceBinding, hash: attempt.trainingReferenceBindingHash }
+      : await computeTrainingReferenceBinding(
+          prismaTx,
+          refParent,
+          info.contextObj && info.contextHash ? { context: info.contextObj, hash: info.contextHash } : undefined,
+        )
+    const ownerId = attempt.compositeAssessment?.createdBy
+    if (!ownerId) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '受控测评缺少作者归属信息，无法签发最终解释回执', 409)
+    }
+    const prepared = await prepareTrainingFinalReceipt(prismaTx, {
+      parent: {
+        ...refParent,
+        trainingReferenceBinding: frozenRef?.binding ?? null,
+        trainingReferenceBindingHash: frozenRef?.hash ?? null,
+        compositeAssessment: {
+          id: attempt.compositeAssessmentId,
+          createdBy: ownerId,
+        },
+      },
+      aggregateInputHash: info.aggregateHash,
+      completedAt: info.completedAt,
+      verifiedPayloads: info.verifiedPayloads,
+    })
+    return {
+      ...(frozenRef && !attempt.trainingReferenceBindingHash
+        ? {
+            trainingReferenceBinding: frozenRef.binding,
+            trainingReferenceBindingHash: frozenRef.hash,
+          }
+        : {}),
+      ...(prepared
+        ? {
+            trainingContentInterpretationEncrypted: prepared.encrypted,
+            trainingContentInterpretationHash: prepared.hash,
+          }
+        : {}),
+    }
+  }
+}
+
 async function loadAttemptRow(attemptId: string): Promise<LoadedAttemptRow> {
   const attempt = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
@@ -655,6 +762,7 @@ async function loadAttemptRow(attemptId: string): Promise<LoadedAttemptRow> {
       id: true,
       compositeAssessmentId: true,
       userId: true,
+      subjectUserId: true,
       recoveryTokenHash: true,
       attemptEpoch: true,
       status: true,
@@ -665,6 +773,12 @@ async function loadAttemptRow(attemptId: string): Promise<LoadedAttemptRow> {
       deliveryCourseId: true,
       assignmentRef: true,
       consentId: true,
+      contextSnapshotEncrypted: true,
+      contextSnapshotHash: true,
+      trainingContentBinding: true,
+      trainingContentBindingHash: true,
+      trainingReferenceBinding: true,
+      trainingReferenceBindingHash: true,
       trainingTimingSnapshot: true,
       trainingPersistenceSnapshot: true,
       trainingPersistenceSnapshotHash: true,
@@ -675,6 +789,7 @@ async function loadAttemptRow(attemptId: string): Promise<LoadedAttemptRow> {
           creationKey: true,
           productKind: true,
           expiresAt: true,
+          createdBy: true,
         },
       },
       accessToken: {
@@ -722,10 +837,12 @@ export async function authorizeTrainingAuthenticatedWholeV2(req: Request): Promi
   const plan = await resolveCompositePublicationPlanForAttempt(attempt)
   const activeSlotKeys = resolveVariantActiveSlotKeys(attempt, plan)
   const { timingEnabled, persistencePolicy, checkpointExpiresAt } = await resolveTimingAndPersistence(attempt)
+  const finalizeGovernanceInTx = buildFinalizeGovernanceInTx(attempt)
   return {
     attempt: {
       id: attempt.id,
       compositeAssessmentId: attempt.compositeAssessmentId,
+      subjectUserId: attempt.subjectUserId,
       attemptEpoch: attempt.attemptEpoch,
       status: attempt.status,
       receiptOnly: attempt.receiptOnly,
@@ -745,6 +862,7 @@ export async function authorizeTrainingAuthenticatedWholeV2(req: Request): Promi
           verifyAuthorityInTx: tx => assertRelationalConsentInTx(tx, attempt, actorUserId),
         }
       : {}),
+    ...(finalizeGovernanceInTx ? { finalizeGovernanceInTx } : {}),
   }
 }
 
@@ -761,10 +879,12 @@ export async function authorizeTrainingPublicWholeV2(req: Request): Promise<Auth
   const plan = await resolveCompositePublicationPlanForAttempt(attempt)
   const activeSlotKeys = resolveVariantActiveSlotKeys(attempt, plan)
   const { timingEnabled, persistencePolicy, checkpointExpiresAt } = await resolveTimingAndPersistence(attempt)
+  const finalizeGovernanceInTx = buildFinalizeGovernanceInTx(attempt)
   return {
     attempt: {
       id: attempt.id,
       compositeAssessmentId: attempt.compositeAssessmentId,
+      subjectUserId: attempt.subjectUserId,
       attemptEpoch: attempt.attemptEpoch,
       status: attempt.status,
       receiptOnly: attempt.receiptOnly,
@@ -794,6 +914,7 @@ export async function authorizeTrainingPublicWholeV2(req: Request): Promise<Auth
         throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '恢复凭证无权访问此综合测评', 403)
       }
     },
+    ...(finalizeGovernanceInTx ? { finalizeGovernanceInTx } : {}),
   }
 }
 
@@ -818,10 +939,12 @@ export async function authorizeEducationWholeV2(req: Request): Promise<Authorize
   const creationKey = attempt.compositeAssessment?.creationKey ?? ''
   const isBoundCompositionOrPrivateForm = creationKey.startsWith('education-composition:')
     || creationKey.startsWith('private-form:')
+  const finalizeGovernanceInTx = buildFinalizeGovernanceInTx(attempt)
   return {
     attempt: {
       id: attempt.id,
       compositeAssessmentId: attempt.compositeAssessmentId,
+      subjectUserId: attempt.subjectUserId,
       attemptEpoch: attempt.attemptEpoch,
       status: attempt.status,
       receiptOnly: attempt.receiptOnly,
@@ -854,6 +977,7 @@ export async function authorizeEducationWholeV2(req: Request): Promise<Authorize
         await assertRelationalConsentInTx(tx, attempt, actorUserId)
       }
     },
+    ...(finalizeGovernanceInTx ? { finalizeGovernanceInTx } : {}),
   }
 }
 
@@ -867,10 +991,12 @@ export async function authorizeFieldCompositionWholeV2(req: Request): Promise<Au
     currentFieldComposition(prisma, { attemptId: attempt.id, actorUserId }),
     resolveCompositePublicationPlanForAttempt(attempt),
   ])
+  const finalizeGovernanceInTx = buildFinalizeGovernanceInTx(attempt)
   return {
     attempt: {
       id: attempt.id,
       compositeAssessmentId: attempt.compositeAssessmentId,
+      subjectUserId: attempt.subjectUserId,
       attemptEpoch: attempt.attemptEpoch,
       status: attempt.status,
       receiptOnly: true,
@@ -896,5 +1022,6 @@ export async function authorizeFieldCompositionWholeV2(req: Request): Promise<Au
         lock: true,
       })
     },
+    ...(finalizeGovernanceInTx ? { finalizeGovernanceInTx } : {}),
   }
 }

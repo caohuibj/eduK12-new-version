@@ -42,13 +42,15 @@ export async function teacherNativeLeafContract(source:Source,track:Track,leaf:R
    AND snap.payload_kind='UNIT_RESULT' AND snap.compiled_runtime_hash=${leaf.compiledRuntimeHash}
   WHERE e.organization_id=${source.organizationId} AND e.run_id=${source.runId} AND e.track_id=${source.trackId} AND e.status='COMPLETED' LIMIT 1`)
  if(header)return validateResultDisclosureContract(unit!.groupDisclosure)
- const [v2Header]=await db.$queryRaw<Array<{attemptId:string;attemptEpoch:number}>>(Prisma.sql`SELECT f.attempt_id AS "attemptId",f.attempt_epoch AS "attemptEpoch" FROM assessment_run_executions e
+ const v2Headers=await db.$queryRaw<Array<{attemptId:string;attemptEpoch:number}>>(Prisma.sql`SELECT DISTINCT ON (p.publication_hash) f.attempt_id AS "attemptId",f.attempt_epoch AS "attemptEpoch" FROM assessment_run_executions e
   JOIN composite_assessment_attempts p ON p.id=e.runtime_binding_ref AND e.runtime_binding_kind='COMPOSITE'
    AND p.composite_assessment_id=${identity.origin.runtimeCompositeId} AND p.status='COMPLETED' AND p.publication_hash IS NOT NULL
   JOIN composite_attempt_finals f ON f.attempt_id=p.id AND f.attempt_epoch=p.attempt_epoch
-  WHERE e.organization_id=${source.organizationId} AND e.run_id=${source.runId} AND e.track_id=${source.trackId} AND e.status='COMPLETED' LIMIT 1`)
- if(!v2Header||typeof v2Header.attemptId!=='string'||!Number.isSafeInteger(v2Header.attemptEpoch))hidden()
- const v2Read=await readCompositeFinalUnitSnapshots(db,[v2Header],{slotKeys:[leaf.slotKey],unitTypes:[leaf.unitType],hydrateScaleCanonical:false})
+  WHERE e.organization_id=${source.organizationId} AND e.run_id=${source.runId} AND e.track_id=${source.trackId} AND e.status='COMPLETED'
+  ORDER BY p.publication_hash,f.completed_at DESC LIMIT 10`)
+ const validV2Headers=v2Headers.filter(row=>row&&typeof row.attemptId==='string'&&Number.isSafeInteger(row.attemptEpoch))
+ if(!validV2Headers.length)hidden()
+ const v2Read=await readCompositeFinalUnitSnapshots(db,validV2Headers,{slotKeys:[leaf.slotKey],unitTypes:[leaf.unitType],hydrateScaleCanonical:false})
  const matched=v2Read.snapshots.find(snap=>snap.slotKey===leaf.slotKey&&snap.unitType===leaf.unitType&&snap.compiledRuntimeHash===leaf.compiledRuntimeHash)
  if(!matched)hidden()
  return validateResultDisclosureContract(unit!.groupDisclosure)

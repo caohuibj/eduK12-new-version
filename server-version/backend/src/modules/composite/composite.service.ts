@@ -1,8 +1,9 @@
 import {previewTrainingStandardReportEligibility} from './training-standard-report-preview'
 import { isCompositeWholeV2Enabled } from '../assessment-runtime/composite-whole-v2-flag'
-import { generateCompositeUnitSeeds } from '../assessment-runtime/composite-publication-plan'
-import { readCompositeFinalUnitSnapshots } from '../assessment-runtime/composite-final.bridge'
+import { generateCompositeUnitSeeds, loadCompositePublicationPlan } from '../assessment-runtime/composite-publication-plan'
+import { extractCompositeFinalFormValues, readCompositeFinalUnitSnapshots } from '../assessment-runtime/composite-final.bridge'
 import { materializeCompositePublicationPlan, resolveCompositePublicationPlanForAttempt } from './whole-v2.access'
+import { resolveLegacyScaleProjectionPolicy, scaleProjectionPolicyFromCompiled } from '../scale/projection/policy-resolver'
 import {scaleRuntimeInstrumentKey} from '../scale/runtime-identity'
 import {
   evaluateTrainingItemReportEligibility,
@@ -4070,6 +4071,17 @@ const createAttempt = async (
         unitSeedsEncrypted: generatedSeeds?.encrypted ?? null,
       },
     })
+    if (trainingContentBinding) {
+      const bound = trainingBoundContent({ ...v2Attempt, compositeAssessmentId: composite.id })
+      const hasReferencePolicy = bound?.units?.some((u: any) => u.referencePolicy !== undefined)
+      if (
+        hasReferencePolicy
+        && !formSections.some((section: any) => section.contextSection || section.items?.some((item: any) => item.contextKey))
+        && !composite.items.some((item: any) => item.type === 'FORM' && item.contextKey)
+      ) {
+        await freezeTrainingReferenceBinding(db as Prisma.TransactionClient, { ...v2Attempt, compositeAssessment: composite })
+      }
+    }
     await contentCandidate?.recheckSourceLicenses()
     await assertTrainingPrivateReferenceAdmissionCurrent(db as Prisma.TransactionClient)
     Object.defineProperty(v2Attempt, '_freshlyCreatedAttempt', { value: true })
@@ -6977,19 +6989,42 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
 export const buildCompositeReport = async (attempt: any, verifiedContext?: WholeQuestionnaireReportContext, readBatch?: CompositeReportFactsReader) => {
   const batch = readBatch?.(attempt)
   attempt = await applyTrainingAttemptScope(attempt)
-  const scaleFacts = batch ? undefined : await preloadStoredScaleResults(attempt.scaleAssessments)
-  const scaleMap = new Map<string, any>(attempt.scaleAssessments.map((item: any) => [item.compositeItemId, item]))
-  const cognitiveMap = new Map<string, any>(attempt.cognitiveSessions.map((item: any) => [item.compositeItemId, item]))
-  const situationalMap = new Map<string, any>((attempt.situationalAttempts ?? []).map((item: any) => [item.compositeItemId, item]))
-  const readableFormAnswers = readContextFormAnswers(
-    attempt.compositeAssessment.items
-      .filter((item: any) => item.type === 'FORM')
-      .map((item: any) => ({ id: item.id, contextKey: item.contextKey })),
-    attempt.formAnswers,
-  )
+  const isWholeV2 = Boolean(attempt.publicationHash)
+  let v2LoadedFinal: Awaited<ReturnType<typeof readCompositeFinalUnitSnapshots>>['loadedFactsByKey'] extends Map<string, infer V> ? V | undefined : never = undefined
+  let v2SnapBySlot: Map<string, Awaited<ReturnType<typeof readCompositeFinalUnitSnapshots>>['snapshots'][number]> | null = null
+  let v2PlanSlotByKey: Map<string, Awaited<ReturnType<typeof loadCompositePublicationPlan>>['slots'][number]> | null = null
+  if (isWholeV2) {
+    const [v2Read, v2Plan] = await Promise.all([
+      readCompositeFinalUnitSnapshots(prisma, [{ attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch }]),
+      loadCompositePublicationPlan(attempt.publicationHash),
+    ])
+    v2LoadedFinal = v2Read.loadedFactsByKey.get(`${attempt.id}:${attempt.attemptEpoch}`)
+    if (v2LoadedFinal) {
+      v2SnapBySlot = new Map(v2Read.snapshots.map(snap => [snap.slotKey, snap]))
+      v2PlanSlotByKey = new Map(v2Plan.slots.map(slot => [slot.slotKey, slot]))
+    }
+  }
+  const useV2Final = Boolean(v2LoadedFinal && v2SnapBySlot && v2PlanSlotByKey)
+  const scaleAssessments = attempt.scaleAssessments ?? []
+  const cognitiveSessions = attempt.cognitiveSessions ?? []
+  const situationalAttempts = attempt.situationalAttempts ?? []
+  const scaleFacts = (batch || useV2Final) ? undefined : await preloadStoredScaleResults(scaleAssessments)
+  const scaleMap = new Map<string, any>(scaleAssessments.map((item: any) => [item.compositeItemId, item]))
+  const cognitiveMap = new Map<string, any>(cognitiveSessions.map((item: any) => [item.compositeItemId, item]))
+  const situationalMap = new Map<string, any>(situationalAttempts.map((item: any) => [item.compositeItemId, item]))
+  const readableFormAnswers = useV2Final
+    ? []
+    : readContextFormAnswers(
+        attempt.compositeAssessment.items
+          .filter((item: any) => item.type === 'FORM')
+          .map((item: any) => ({ id: item.id, contextKey: item.contextKey })),
+        attempt.formAnswers ?? [],
+      )
   const formMap = new Map<string, any>(readableFormAnswers.map((item: any) => [item.itemId, item]))
   const typedFormStates = batch?.typedFormStates ?? new Map<string,{state:string;rowStates?:Record<string,string>;otherText?:string}>()
-  const typedFormValues = batch?.typedFormValues ?? await loadCompositeTypedFormValues(attempt,typedFormStates)
+  const typedFormValues = useV2Final
+    ? new Map<string, any>(Object.entries(extractCompositeFinalFormValues(v2LoadedFinal!.facts)))
+    : (batch?.typedFormValues ?? await loadCompositeTypedFormValues(attempt,typedFormStates))
   const unitReports: any[] = []
   const backgroundValues: any[] = []
   const packageSlotLabels = getFrozenPackageSlotLabels(attempt.compositeAssessment)
@@ -7001,6 +7036,38 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
     }
     if (item.type === 'SCALE') {
       try {
+        if (useV2Final) {
+          const slotKey = compositeItemSlotKey(item.id, 'SCALE')
+          const snap = v2SnapBySlot!.get(slotKey)
+          const planSlot = v2PlanSlotByKey!.get(slotKey)
+          const scalePlanSlot = planSlot?.unitType === 'SCALE' ? planSlot : null
+          const report = buildScaleUnitReport({
+            assessmentId: snap?.sourceAttemptId,
+            itemId: item.id,
+            scaleId: item.scaleId,
+            scaleCode: snap?.scaleResult?.instrument.code ?? scalePlanSlot?.instrumentKey ?? item.scale?.code,
+            scaleName: snap?.scaleResult?.instrument.name || scalePlanSlot?.name || item.scale?.name || '未知量表',
+            result: snap?.scaleResult ?? null,
+            completedAt: snap?.completedAt ?? null,
+            totalTime: null,
+          })
+          const libraryWrapper = Boolean(item.scale?.libraryEntryId)
+          if (libraryWrapper || ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind)) {
+            const policy = scalePlanSlot?.compiledPolicy
+              ? scaleProjectionPolicyFromCompiled(scalePlanSlot.compiledPolicy)
+              : resolveLegacyScaleProjectionPolicy(
+                  scalePlanSlot?.instrumentKey ?? snap?.scaleResult?.instrument.code ?? item.scale?.code ?? '',
+                  scalePlanSlot?.instrumentVersion ?? snap?.scaleResult?.instrument.instrumentVersion ?? item.scale?.instrumentVersion ?? '',
+                  scalePlanSlot?.instrumentClass ?? item.scale?.instrumentClass,
+                )
+            Object.defineProperty(report, '__scaleProjectionPolicy', { value: policy, enumerable: false })
+          }
+          if (report.decryptError) {
+            logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
+          }
+          unitReports.push(report)
+          continue
+        }
         const result = scaleMap.get(item.id)
         const reportInput = {
           assessmentId: result?.id,
@@ -7089,6 +7156,38 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
     }
     if (item.type === 'SITUATIONAL') {
       try {
+        if (useV2Final) {
+          const slotKey = compositeItemSlotKey(item.id, 'SITUATIONAL')
+          const snap = v2SnapBySlot!.get(slotKey)
+          const planSlot = v2PlanSlotByKey!.get(slotKey)
+          const sjtPlanSlot = planSlot?.unitType === 'SITUATIONAL' ? planSlot : null
+          const canonical = snap?.canonicalEnvelope ?? null
+          if (canonical && canonical.core.unitType !== 'SITUATIONAL') throw new Error('wrong situational canonical unit type')
+          const scientificContext = frozenSituationalScientificProjection(undefined)
+          const builtinTitle = getSituationPackage(item.situationalInstrumentKey, item.situationalInstrumentVersion)?.definition.source.title
+          unitReports.push({
+            itemId: item.id,
+            type: 'SITUATIONAL' as const,
+            kind: 'situational' as const,
+            label: resolveSituationalReportLabel(item, sjtPlanSlot?.definition.source.title, builtinTitle, packageSlotLabels),
+            scienceMaturity: scientificContext.scientificMaturity,
+            scientificContext,
+            instrumentKey: canonical?.core.instrumentKey ?? sjtPlanSlot?.instrumentKey ?? item.situationalInstrumentKey ?? null,
+            instrumentVersion: canonical?.core.instrumentVersion ?? sjtPlanSlot?.instrumentVersion ?? item.situationalInstrumentVersion ?? null,
+            metrics: canonical?.core.metrics?.map((metric) => ({
+              key: metric.key,
+              value: metric.value,
+              unit: metric.unit,
+              quality: metric.quality,
+            })) ?? [],
+            quality: canonical?.core.quality ?? null,
+            qualityState: canonical?.core.quality.status ?? null,
+            resultHash: canonical?.resultHash ?? null,
+            completedAt: snap?.completedAt ?? null,
+            totalTime: null,
+          })
+          continue
+        }
         const child = situationalMap.get(item.id)
         const canonical = child?.canonicalResultEncrypted
           ? parseCanonicalUnitResultEnvelope(decryptUnifiedRuntimePayload<unknown>(child.canonicalResultEncrypted))
@@ -7140,6 +7239,60 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
       continue
     }
     try {
+      if (useV2Final) {
+        const slotKey = compositeItemSlotKey(item.id, 'COGNITIVE')
+        const snap = v2SnapBySlot!.get(slotKey)
+        const planSlot = v2PlanSlotByKey!.get(slotKey)
+        const cogPlanSlot = planSlot?.unitType === 'COGNITIVE' ? planSlot : null
+        const cogFact = snap?.unitFact.unitType === 'COGNITIVE' ? snap.unitFact : null
+        const frozenReport = cogPlanSlot?.frozenReport ?? readFrozenReport(item.cognitiveAssignment?.resolvedReportSnapshotEncrypted)
+        if (packageBased && !frozenReport) {
+          throw new Error('报告包认知模块缺少冻结报告定义')
+        }
+        const resultSnapshot = cogFact
+          ? parseCognitiveResultSnapshot({
+              schemaVersion: 1,
+              completedAt: (snap!.completedAt instanceof Date ? snap!.completedAt : new Date(snap!.completedAt)).toISOString(),
+              testType: cogFact.testType,
+              configVersion: cogFact.configVersion,
+              engineVersion: cogFact.engineVersion,
+              scoringVersion: cogFact.scoringVersion,
+              protocolSignature: cogFact.protocolSignature,
+              profile: cogFact.profile,
+              metrics: cogFact.metrics,
+              quality: cogFact.quality,
+              references: cogFact.references ?? [],
+              report: cogFact.reportSummary ?? {},
+              assessmentContext: v2LoadedFinal!.facts.contextHash
+                ? { schemaVersion: 1 as const, snapshotHash: v2LoadedFinal!.facts.contextHash }
+                : null,
+            })
+          : null
+        const resultReferences = resultSnapshot ? referencesForCognitiveResult(resultSnapshot) : []
+        const unitReport = {
+          itemId: item.id,
+          type: item.type,
+          kind: 'cognitive' as const,
+          label: resolveCompositeItemLabel(item, packageSlotLabels),
+          sessionId: snap?.sourceAttemptId,
+          testType: cogFact?.testType ?? cogPlanSlot?.testType,
+          score: null,
+          metrics: resultSnapshot?.metrics ?? {},
+          qualityFlags: resultSnapshot?.quality.flags ?? {},
+          quality: resultSnapshot?.quality,
+          finishedAt: snap?.completedAt ?? null,
+          reference: resultReferences[0],
+          references: resultReferences,
+          assessmentContext: resultSnapshot?.assessmentContext ?? null,
+          singleTaskReport: resultSnapshot?.report ?? null,
+        }
+        Object.defineProperty(unitReport, '__frozenMetricDefinitions', {
+          value: frozenReport?.metricDefinitions,
+          enumerable: false,
+        })
+        unitReports.push(unitReport)
+        continue
+      }
       const session = cognitiveMap.get(item.id)
       const resultSnapshot = session?.resultSnapshotEncrypted
         ? parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted))
@@ -7511,7 +7664,7 @@ const loadCollectionReportAttempt = async (attemptId: string) => {
         publishedAt:true,trainingVariantDraft:true,trainingVariantFrozen:true,trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,formSections:{include:{items:true}},
         reportPackageSnapshotEncrypted: true,
         items: { orderBy: { position: 'asc' }, include: {
-          scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true } },
+          scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, libraryEntryId: true } },
           cognitiveAssignment: { select: { id: true, title: true, profile: true,
             resolvedReportSnapshotEncrypted: true, config: { select: { testType: true, name: true } } } },
         } },

@@ -57,15 +57,24 @@ export function readTrainingReferenceContext(parent:TrainingReferenceParent):Ref
  if(!assessmentContextHashMatches(context,parent.contextSnapshotHash))trainingReferenceFail('CONTEXT_IDENTITY')
  return context.values
 }
-/** Called under the parent transaction lock, before any runner delivery: either
- * creation without a context section, or the successful context-section submit.
- * Existing bindings are read-only; retries never consult lifecycle or new refs. */
-export async function freezeTrainingReferenceBinding(tx:Prisma.TransactionClient,parent:TrainingReferenceParent&{compositeAssessment:{createdBy:string|null}},
- frozenContext?:{context:AssessmentContextV1;hash:string}){
+/** Computes and validates the immutable reference binding without writing to DB
+ * so single-statement WHOLE_V2 FINAL updates can persist context + reference
+ * binding + interpretation receipt atomically under all governance triggers. */
+export async function computeTrainingReferenceBinding(
+ tx:Prisma.TransactionClient,
+ parent:TrainingReferenceParent&{compositeAssessment:{createdBy:string|null}},
+ frozenContext?:{context:AssessmentContextV1;hash:string},
+):Promise<{binding:TrainingReferenceBinding;hash:string}|null>{
  const content=trainingBoundContent(parent)
- if(!content?.units.some(u=>u.referencePolicy!==undefined))return decodeTrainingReferenceBinding(parent)
+ if(!content?.units.some(u=>u.referencePolicy!==undefined)){
+  const existing=decodeTrainingReferenceBinding(parent)
+  return existing?{binding:existing,hash:parent.trainingReferenceBindingHash!}:null
+ }
  const current={...parent,...(frozenContext?{contextSnapshotHash:frozenContext.hash}:{})}
- if(parent.trainingReferenceBinding!=null||parent.trainingReferenceBindingHash!=null)return decodeTrainingReferenceBinding(current)
+ if(parent.trainingReferenceBinding!=null||parent.trainingReferenceBindingHash!=null){
+  const existing=decodeTrainingReferenceBinding(current)
+  return existing?{binding:existing,hash:parent.trainingReferenceBindingHash!}:null
+ }
  const context=frozenContext?frozenContext.context.values:readTrainingReferenceContext(parent)
  if(frozenContext&&!assessmentContextHashMatches(frozenContext.context,frozenContext.hash))trainingReferenceFail('CONTEXT_IDENTITY')
  const releases=new Map<string,StoredRelease>(),verified=new Map<string,VerifiedReferenceForSelection>()
@@ -85,8 +94,18 @@ export async function freezeTrainingReferenceBinding(tx:Prisma.TransactionClient
   contentBindingHash:parent.trainingContentBindingHash,contextHash:frozenContext?.hash??parent.contextSnapshotHash??null,units})
  const bindingHash=canonicalHash(binding)
  decodeTrainingReferenceBinding({...current,trainingReferenceBinding:binding,trainingReferenceBindingHash:bindingHash})
+ return {binding,hash:bindingHash}
+}
+/** Called under the parent transaction lock, before any runner delivery: either
+ * creation without a context section, or the successful context-section submit.
+ * Existing bindings are read-only; retries never consult lifecycle or new refs. */
+export async function freezeTrainingReferenceBinding(tx:Prisma.TransactionClient,parent:TrainingReferenceParent&{compositeAssessment:{createdBy:string|null}},
+ frozenContext?:{context:AssessmentContextV1;hash:string}){
+ const computed=await computeTrainingReferenceBinding(tx,parent,frozenContext)
+ if(!computed)return null
+ if(parent.trainingReferenceBinding!=null||parent.trainingReferenceBindingHash!=null)return computed.binding
  const changed=await tx.compositeAssessmentAttempt.updateMany({where:{id:parent.id,attemptEpoch:parent.attemptEpoch,status:'IN_PROGRESS',trainingReferenceBindingHash:null},
-  data:{trainingReferenceBinding:binding as Prisma.InputJsonValue,trainingReferenceBindingHash:bindingHash}})
+  data:{trainingReferenceBinding:computed.binding as Prisma.InputJsonValue,trainingReferenceBindingHash:computed.hash}})
  if(changed.count!==1)trainingReferenceFail('BINDING_CONFLICT')
- return binding
+ return computed.binding
 }

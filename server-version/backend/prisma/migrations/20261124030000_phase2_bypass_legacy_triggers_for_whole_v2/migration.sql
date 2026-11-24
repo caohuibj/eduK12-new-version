@@ -1,30 +1,13 @@
 -- Phase 2 PR 4:
--- 1. Keep parent-row governance integrity triggers (`training_content_attempt_guard`,
---    `training_feedback_attempt_guard`, `training_persistence_attempt_guard`) active
---    for WHOLE_V2 rows as well (since V2 START persists those parent snapshots).
---    Only scope legacy outbox-only triggers (`training_reference_binding_guard`,
---    `training_content_interpretation_guard`) to pre-V2 rows (`publication_hash IS NULL`),
---    because WHOLE_V2 anchors immutable results directly in `composite_attempt_finals`.
--- 2. Extend `huiteacher_field_final_digest` so WHOLE_V2 field evidence anchors
---    directly to `composite_attempt_finals.aggregate_hash`.
-
-DROP TRIGGER IF EXISTS training_reference_binding_guard ON composite_assessment_attempts;
-CREATE TRIGGER training_reference_binding_guard
-  BEFORE INSERT OR UPDATE OF
-    training_reference_binding, training_reference_binding_hash, training_content_binding, context_snapshot_hash
-  ON composite_assessment_attempts
-  FOR EACH ROW
-  WHEN (NEW.publication_hash IS NULL)
-  EXECUTE FUNCTION guard_training_reference_binding();
-
-DROP TRIGGER IF EXISTS training_content_interpretation_guard ON composite_assessment_attempts;
-CREATE TRIGGER training_content_interpretation_guard
-  BEFORE INSERT OR UPDATE OF
-    training_content_interpretation_encrypted, training_content_interpretation_hash, aggregate_input_hash, status, training_content_binding, attempt_epoch, id
-  ON composite_assessment_attempts
-  FOR EACH ROW
-  WHEN (NEW.publication_hash IS NULL)
-  EXECUTE FUNCTION guard_training_content_interpretation();
+-- All parent-row governance integrity triggers (`training_content_attempt_guard`,
+-- `training_feedback_attempt_guard`, `training_persistence_attempt_guard`,
+-- `training_reference_binding_guard`, `training_content_interpretation_guard`)
+-- remain 100% active for WHOLE_V2 rows as well (V2 START persists content/feedback/
+-- persistence/no-context reference bindings, and V2 FINAL atomically persists
+-- context + reference binding + interpretation receipt on the parent row).
+--
+-- Extend `huiteacher_field_final_digest` so WHOLE_V2 field evidence anchors
+-- directly to `composite_attempt_finals.aggregate_hash`.
 
 CREATE OR REPLACE FUNCTION huiteacher_field_final_digest(parent_id text, epoch integer) RETURNS text LANGUAGE sql STABLE AS $$
   SELECT CASE

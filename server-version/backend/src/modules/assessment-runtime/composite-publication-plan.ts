@@ -4,6 +4,7 @@ import { canonicalHash, retainImmutableCanonicalValue } from './canonical'
 import { publicTemplateHash, publicTemplates, type PublicTemplateStore } from './public-templates'
 import { encodeCompositeUnitSeeds } from './composite-final.codec'
 import { runnerDefinition, type ScaleDefinitionV2 } from '../scale/scale-definition'
+import type { CompiledScalePolicyV1 } from '../scale/policy/compile'
 import type { AssessmentReferenceSetDefinition } from '../assessment-reference/reference'
 import type { CompiledInstrumentRuntimeV1 } from './types'
 import type { CompositeSection } from './form-section-definition'
@@ -38,6 +39,7 @@ export type CompositePublicationScaleSlot = CompositeSlotMediaManifest & {
   scaleId: string
   instrumentKey: string
   instrumentVersion: string
+  instrumentClass?: 'STANDARD' | 'CUSTOM_DESCRIPTIVE'
   name: string
   title: string
   required: boolean
@@ -46,6 +48,8 @@ export type CompositePublicationScaleSlot = CompositeSlotMediaManifest & {
   instruction?: string | null
   definition: ScaleDefinitionV2
   compiledRuntime: CompiledInstrumentRuntimeV1
+  compiledPolicy?: CompiledScalePolicyV1
+  runtimePolicyHash?: string
   referenceSets: AssessmentReferenceSetDefinition[]
   referencePolicy?: unknown
 }

@@ -17,6 +17,10 @@ import {
   tryReadCompositeFinalFeedback,
 } from '../../modules/assessment-runtime/composite-final.bridge'
 import { isCompositeWholeV2Enabled } from '../../modules/assessment-runtime/composite-whole-v2-flag'
+import { assessmentContextHashMatches, decryptAssessmentContext } from '../../modules/assessment-context/security'
+import { compileScalePolicy } from '../../modules/scale/policy/compile'
+import { getScaleInstrumentSource } from '../../modules/scale/onboarding/instrument-registry'
+import { scaleProjectionPolicyFromCompiled } from '../../modules/scale/projection/policy-resolver'
 import { gonogoSequence } from '../../modules/cognitive/randomization'
 
 const sha = (s: string) => createHash('sha256').update(s).digest('hex')
@@ -329,5 +333,148 @@ describe('Phase 2 PR 4 downstream readers bridge (zero legacy child-table reads)
     await expect(
       readCompositeFinalUnitSnapshots(brokenDb, [{ attemptId: randomUUID(), attemptEpoch: 1 }]),
     ).rejects.toThrow('PG_CONNECTION_LOST')
+  })
+
+  it('persists verified AssessmentContextV1 + invokes finalizeGovernanceInTx with canonical 4-family envelopes in single parent UPDATE (P1-02 & P1-03)', async () => {
+    const { store } = makeTemplateStore()
+    const fixture = buildFourFamilyTestSlots()
+    const compositeId = randomUUID()
+    const attemptId = randomUUID()
+    const subjectUserId = randomUUID()
+
+    // Attach a real compiled Scale V2 disclosure policy to the Scale publication slot (P1-03)
+    const scaleSource = getScaleInstrumentSource(fixture.scalePkg.key, fixture.scalePkg.instrumentVersion)
+    const compiledPolicy = scaleSource ? compileScalePolicy(scaleSource) : undefined
+    const slots = fixture.slots.map(slot => (
+      slot.unitType === 'SCALE' && compiledPolicy
+        ? { ...slot, instrumentClass: 'STANDARD' as const, compiledPolicy, runtimePolicyHash: compiledPolicy.runtimePolicyHash }
+        : slot
+    ))
+    const plan = buildCompositePublicationPlan({
+      compositeId,
+      title: '治理闭环与V2策略测试卷',
+      slots,
+    })
+    const scaleSlot = plan.slots.find(s => s.unitType === 'SCALE')!
+    if (compiledPolicy && scaleSlot.unitType === 'SCALE') {
+      expect(scaleSlot.compiledPolicy?.runtimePolicyHash).toBe(compiledPolicy.runtimePolicyHash)
+      expect(scaleProjectionPolicyFromCompiled(scaleSlot.compiledPolicy!).disposition).toBe('FROZEN_V2')
+    }
+
+    const parentUpdateValues: unknown[][] = []
+    const { db } = makeInMemoryFinalDb({
+      status: 'IN_PROGRESS',
+      attemptEpoch: 1,
+      publicationHash: plan.publicationHash,
+    })
+    const origExecute = db.$executeRaw
+    db.$executeRaw = vi.fn(async (sql: any) => {
+      const text = Array.isArray(sql?.strings) ? sql.strings.join('?') : String(sql?.sql ?? '')
+      if (text.includes('UPDATE composite_assessment_attempts')) {
+        parentUpdateValues.push([...sql.values])
+      }
+      return origExecute(sql)
+    })
+
+    const seeds = generateCompositeUnitSeeds(plan, attemptId, 1)!
+    const cogSlotKey = `cognitive:${fixture.cogItemId}`
+    const scaleSlotKey = `scale:${fixture.scaleItemId}`
+    const sjtSlotKey = `situational:${fixture.sjtItemId}`
+    const formSlotKey = `form:${fixture.formSectionId}`
+    const scaleGold = fixture.scalePkg.goldenCases.find(c => c.expected.quality)!
+    const sjtGold = fixture.sjtPkg.goldenCases[0]
+    const sjtResponses = Object.fromEntries(
+      sjtGold.responses.map(r => [`${r.sceneKey}:${r.channelKey}`, r.responseValue]),
+    )
+
+    const fakeRefBinding = { schemaVersion: 1, attemptId, epoch: 1, units: [] }
+    const fakeRefHash = sha('ref-binding')
+    const fakeInterpCipher = 'enc:interp-receipt'
+    const fakeInterpHash = sha('interp-receipt')
+    let capturedGovernanceInfo: any = null
+
+    const receipt = await commitCompositeWholeFinal(db, {
+      attempt: {
+        id: attemptId,
+        compositeAssessmentId: compositeId,
+        subjectUserId,
+        attemptEpoch: 1,
+        publicationHash: plan.publicationHash,
+        unitSeedsEncrypted: seeds.encrypted,
+        receiptOnly: false,
+        startedAt: new Date('2026-11-24T01:00:00.000Z'),
+      },
+      plan,
+      submit: {
+        submissionId: `whole-${sha('governance-receipt-test')}`,
+        attemptEpoch: 1,
+        publicationHash: plan.publicationHash,
+        slotSetHash: plan.slotSetHash,
+        totalTimeMs: 30_000,
+        units: {
+          [formSlotKey]: {
+            unitType: 'FORM_SECTION',
+            definitionHash: fixture.formDefHash,
+            answers: [{ formItemId: fixture.formItemId, value: '8' }],
+          },
+          [scaleSlotKey]: {
+            unitType: 'SCALE',
+            definitionHash: fixture.scaleDefHash,
+            answers: scaleGold.answers,
+          },
+          [sjtSlotKey]: {
+            unitType: 'SITUATIONAL',
+            definitionHash: fixture.sjtDefHash,
+            responses: sjtResponses,
+            totalTimeMs: 9500,
+          },
+          [cogSlotKey]: {
+            unitType: 'COGNITIVE',
+            definitionHash: fixture.cogDefHash,
+            randomSeed: seeds.seeds[cogSlotKey],
+            trials: makeGonogoTrials(seeds.seeds[cogSlotKey], 8),
+          },
+        },
+      },
+      templates: store,
+      finalizeGovernanceInTx: async (_tx, info) => {
+        capturedGovernanceInfo = info
+        return {
+          trainingReferenceBinding: fakeRefBinding,
+          trainingReferenceBindingHash: fakeRefHash,
+          trainingContentInterpretationEncrypted: fakeInterpCipher,
+          trainingContentInterpretationHash: fakeInterpHash,
+        }
+      },
+      now: new Date('2026-11-24T01:00:30.000Z'),
+    })
+
+    expect(receipt.status).toBe('COMPLETED')
+    expect(capturedGovernanceInfo).not.toBeNull()
+    expect(capturedGovernanceInfo.contextObj).not.toBeNull()
+    expect(capturedGovernanceInfo.contextObj.values).toEqual({ gradeLevel: '8' })
+    expect(capturedGovernanceInfo.contextObj.subjectUserId).toBe(subjectUserId)
+    expect(capturedGovernanceInfo.contextSnapshotEncrypted).toBeTruthy()
+    // Verify assessmentContextHashMatches matches decrypted contextSnapshotEncrypted (P1-02)
+    const decryptedCtx = decryptAssessmentContext(capturedGovernanceInfo.contextSnapshotEncrypted)
+    expect(assessmentContextHashMatches(decryptedCtx, capturedGovernanceInfo.contextHash)).toBe(true)
+
+    // Verify canonical envelopes were supplied for Scale, Situational, and Cognitive matching readCompositeFinalUnitSnapshots
+    expect(capturedGovernanceInfo.verifiedPayloads).toHaveLength(3)
+    const unitRead = await readCompositeFinalUnitSnapshots(db, [{ attemptId, attemptEpoch: 1 }], { templates: store })
+    for (const payload of capturedGovernanceInfo.verifiedPayloads) {
+      const snap = unitRead.snapshots.find(s => s.slotKey === payload.header.slotKey)!
+      expect(snap).toBeDefined()
+      expect(snap.canonicalEnvelope?.resultHash).toBe(payload.envelope.resultHash)
+    }
+
+    // Verify the single parent UPDATE persisted context + reference binding + interpretation receipt atomically
+    expect(parentUpdateValues).toHaveLength(1)
+    expect(parentUpdateValues[0]).toContain(capturedGovernanceInfo.contextSnapshotEncrypted)
+    expect(parentUpdateValues[0]).toContain(capturedGovernanceInfo.contextHash)
+    expect(parentUpdateValues[0]).toContain(JSON.stringify(fakeRefBinding))
+    expect(parentUpdateValues[0]).toContain(fakeRefHash)
+    expect(parentUpdateValues[0]).toContain(fakeInterpCipher)
+    expect(parentUpdateValues[0]).toContain(fakeInterpHash)
   })
 })

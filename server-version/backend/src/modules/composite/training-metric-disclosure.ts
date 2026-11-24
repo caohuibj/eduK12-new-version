@@ -1,6 +1,9 @@
 import type {Prisma} from '@prisma/client'
 import type {CanonicalUnitResultCoreV1} from '../assessment-runtime/unit-result'
 import {loadFrozenScaleRuntimeSnapshot} from '../assessment-runtime/runtime-snapshot'
+import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
+import {loadCompositePublicationPlan} from '../assessment-runtime/composite-publication-plan'
+import {publicTemplatesForDatabase} from '../assessment-runtime/public-templates'
 import {readFrozenReport,hashResolvedConfig,type FrozenReportSnapshot} from '../cognitive/profile-freeze'
 import {decryptCognitivePayload} from '../cognitive/cognitive.security'
 import {loadSharedCognitiveRuntime} from '../assessment-runtime/shared-cognitive-runtime'
@@ -8,6 +11,7 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {ContentReleaseError} from '../measurement-content/release'
 import type {ReportTemplate} from '../measurement-content/report-template'
 import {resolveProjectionPolicyForAssessment} from '../scale/scale-workflow.service'
+import {resolveLegacyScaleProjectionPolicy,scaleProjectionPolicyFromCompiled} from '../scale/projection/policy-resolver'
 import {createScaleProjectionContext} from '../scale/projection/context-factory'
 import {resolveEffectiveScaleDisclosure} from '../scale/projection/context'
 import {DISCLOSURE_PRESETS,intersectDisclosureCapabilities} from '../scale/policy/disclosure'
@@ -48,10 +52,49 @@ export function trainingCognitiveMetricKeys(report:FrozenReportSnapshot|null){
  * No current registry defaults, report grants, raw answers, result rewriting or
  * rescoring participate. Callers must already own current attempt data access. */
 export async function loadTrainingMetricDisclosure(db:Prisma.TransactionClient,input:{
- parent:{id:string;attemptEpoch:number};unit:Unit;source:Source;audience:TrainingReportAudience;core?:CanonicalUnitResultCoreV1;metricKeys?:readonly string[]
+ parent:{id:string;attemptEpoch:number;publicationHash?:string|null};unit:Unit;source:Source;audience:TrainingReportAudience;core?:CanonicalUnitResultCoreV1;metricKeys?:readonly string[]
 }):Promise<TrainingMetricDisclosure>{
  const {parent,unit,source,core,audience}=input
  if(!['teacher','researcher','participant'].includes(audience)||!source.sourceAttemptId)invalid()
+ if(parent.publicationHash){
+  const plan=await loadCompositePublicationPlan(parent.publicationHash,publicTemplatesForDatabase(db))
+  const slotKey=compositeItemSlotKey(unit.itemId,unit.family==='SJT'?'SITUATIONAL':unit.family)
+  const slot=plan.slots.find(s=>s.slotKey===slotKey)
+  if(unit.family==='COGNITIVE'){
+   if(unit.source.kind!=='COGNITIVE_CONFIG'||!unit.source.assignmentId||source.sourceType!=='COGNITIVE_SESSION'
+    ||source.sourceAttemptId!==parent.id||slot?.unitType!=='COGNITIVE'||slot.itemId!==unit.itemId)invalid()
+   const report=slot.frozenReport??null
+   if(!report||report.profile!==slot.profile)invalid()
+   if(core&&(core.unitType!=='COGNITIVE'||core.instrumentKey!==slot.testType||core.instrumentVersion!==slot.sessionSnapshot.engineVersion
+    ||core.scorerVersion!==slot.sessionSnapshot.scoringVersion||core.compiledRuntimeHash!==slot.compiledRuntime.compiledRuntimeHash
+    ||core.scientificProvenance.profileKey!==report.profile
+    ||(core.scientificProvenance.resolvedConfigHash??null)!==(slot.resolvedConfigHash??null)))invalid()
+   const metricKeys=trainingCognitiveMetricKeys(report)
+   const referenceMetricKeys=new Set([...metricKeys].filter(key=>report.metricDefinitions[key].role!=='quality'
+    &&report.metricDefinitions[key].role!=='research_only'&&report.v2MetricDefinitions?.[key]?.referenceEligible===true))
+   return {metricKeys,referenceMetricKeys,capabilities:DISCLOSURE_PRESETS.FULL_REPORT()}
+  }
+  if(unit.family==='SCALE'){
+   if(unit.source.kind!=='SCALE'||source.sourceType!=='ASSESSMENT'||source.sourceAttemptId!==parent.id
+    ||slot?.unitType!=='SCALE'||slot.itemId!==unit.itemId||slot.scaleId!==unit.source.id)invalid()
+   if(core&&(core.unitType!=='SCALE'||core.compiledRuntimeHash!==slot.compiledRuntime.compiledRuntimeHash
+    ||core.instrumentKey!==slot.instrumentKey||core.instrumentVersion!==slot.instrumentVersion
+    ||core.sourceDefinitionHash!==slot.definitionHash||core.scorerVersion!==slot.compiledRuntime.scorerVersion))invalid()
+   const frozenPolicy=slot.compiledPolicy
+    ?scaleProjectionPolicyFromCompiled(slot.compiledPolicy)
+    :resolveLegacyScaleProjectionPolicy(slot.instrumentKey,slot.instrumentVersion,slot.instrumentClass??'STANDARD')
+   const context=createScaleProjectionContext({instrumentKey:slot.instrumentKey,
+    instrumentVersion:slot.instrumentVersion,audience:audience==='participant'?'subject':'teacher',purpose:'report',frozenPolicy})
+   const capabilities=intersectDisclosureCapabilities(resolveEffectiveScaleDisclosure(context),
+    resolveEffectiveScaleDisclosure({...context,audience:audience==='participant'?'subject':audience}))
+   const metricKeys=new Set(capabilities.numericScores?Object.keys(slot.compiledRuntime.metricDefinitions):[])
+   return {metricKeys,referenceMetricKeys:new Set(capabilities.references&&capabilities.individualInterpretations?metricKeys:[]),capabilities}
+  }
+  if(unit.family!=='SJT'||source.sourceType!=='SITUATIONAL_ATTEMPT'||source.sourceAttemptId!==parent.id
+   ||slot?.unitType!=='SITUATIONAL'||slot.itemId!==unit.itemId)invalid()
+  const metricKeys=new Set(core?.metrics.map(metric=>metric.key)??input.metricKeys??[])
+  return {metricKeys,referenceMetricKeys:metricKeys,capabilities:DISCLOSURE_PRESETS.FULL_REPORT()}
+ }
  if(unit.family==='COGNITIVE'){
   if(unit.source.kind!=='COGNITIVE_CONFIG'||!unit.source.assignmentId||source.sourceType!=='COGNITIVE_SESSION')invalid()
   const child=await db.cognitiveSession.findUnique({where:{id:source.sourceAttemptId},select:{
