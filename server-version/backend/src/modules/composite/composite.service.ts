@@ -4026,6 +4026,9 @@ const createAttempt = async (
     composite,resolvedSituational:situationalReleases,educationComposition,scaleArtifacts:trainingScaleArtifacts,
     prefetchedReleases:startReads?.releases,
   })
+  // Keep the full publication graph for the post-commit WHOLE_V2 projection.
+  // Variant scope validates the frozen union before applying the drawn subset.
+  const startPublicationComposite = composite
   let variantAllocation: ReturnType<typeof createWeightedVariantAllocation> | null = null
   if (variantEnabled) {
     const frozen = parseCompiledWeightedVariants(composite.trainingVariantFrozen)
@@ -4166,7 +4169,7 @@ const createAttempt = async (
     await contentCandidate?.recheckSourceLicenses()
     await assertTrainingPrivateReferenceAdmissionCurrent(db as Prisma.TransactionClient)
     Object.defineProperty(hydratedV2Attempt, '_freshlyCreatedAttempt', { value: true })
-    Object.defineProperty(hydratedV2Attempt, '_startComposite', { value: composite })
+    Object.defineProperty(hydratedV2Attempt, '_startComposite', { value: startPublicationComposite })
     return hydratedV2Attempt
   }
 

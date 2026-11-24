@@ -219,9 +219,6 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
         name: 'WHOLE_V2 DB Trigger Parity Fixture',
         createdBy: teacherId,
         status: 'PUBLISHED',
-        productKind: 'QUESTIONNAIRE',
-        questionnaireType: 'COURSE',
-        deliveryMode: 'FINAL_ONLY',
       },
     })
 
@@ -267,7 +264,7 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
       makeUnit(item2, 'scale-2', mRel2, false),
     ]
     const snapshot = { schemaVersion: 1, compositeId: comp.id, units }
-    const snapshotHash = hex(JSON.stringify(snapshot))
+    const snapshotHash = canonicalHash(snapshot)
     await db.$executeRaw`
       UPDATE composite_assessments
       SET training_content_snapshot = ${JSON.stringify(snapshot)}::jsonb,
@@ -585,7 +582,7 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
 
     const slot = authorized.plan.slots.find(s => s.unitType === 'SCALE')!
     const submissionId = `v2-e2e-${randomUUID()}`
-    const finalRes = await commitCompositeWholeFinal(db, {
+    const finalRes = await db.$transaction(tx => commitCompositeWholeFinal(tx, {
       ...authorized,
       submit: {
         submissionId,
@@ -600,12 +597,12 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
           },
         },
       },
-    })
+    }))
     expect(finalRes.status).toBe('COMPLETED')
     expect(finalRes.replayed).toBe(false)
 
     // Idempotent replay succeeds cleanly
-    const replayRes = await commitCompositeWholeFinal(db, {
+    const replayRes = await db.$transaction(tx => commitCompositeWholeFinal(tx, {
       ...authorized,
       submit: {
         submissionId,
@@ -620,7 +617,7 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
           },
         },
       },
-    })
+    }))
     expect(replayRes.replayed).toBe(true)
 
     const completedParent = await db.compositeAssessmentAttempt.findUniqueOrThrow({
@@ -682,6 +679,8 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
 
     const studentId = await createEnrolledStudent('variant')
     const started = await compositeService.startUserAttempt(studentId, draft.id)
+    expect(started.attempt.executionMode).toBe('WHOLE_V2')
+    expect(started.attempt.totalItems).toBe(1)
     const dbAttempt = await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: started.attempt.id } })
 
     expect(dbAttempt.publicationHash).toMatch(/^[a-f0-9]{64}$/)
@@ -707,7 +706,7 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
     const selectedSlotKey = [...authorized.activeSlotKeys!][0]
     const slot = authorized.plan.slots.find(s => s.slotKey === selectedSlotKey)!
 
-    const finalRes = await commitCompositeWholeFinal(db, {
+    const finalRes = await db.$transaction(tx => commitCompositeWholeFinal(tx, {
       ...authorized,
       submit: {
         submissionId: `v2-var-${randomUUID()}`,
@@ -722,7 +721,7 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
           },
         },
       },
-    })
+    }))
     expect(finalRes.status).toBe('COMPLETED')
 
     const completedParent = await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: started.attempt.id } })
