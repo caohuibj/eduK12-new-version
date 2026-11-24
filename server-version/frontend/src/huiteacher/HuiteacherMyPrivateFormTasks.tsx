@@ -156,6 +156,7 @@ function PrivateFormSession({api,actorKey,unified=false,onListStateChange}:{api:
     title={visible.task.formTitle}
     client={v2Client}
     onExit={leave}
+    onReceiptAccepted={()=>{void work(async()=>{await reload()})}}
     onCompleted={()=>{void work(async()=>{await reload()})}}
    />:visible.attempt?.status==='IN_PROGRESS'&&visible.attempt.currentItem&&<FinalCompositeAssessment
     key={`${actorKey}:${visible.task.executionId}:${visible.attempt.id}:${visible.attempt.currentItem?.id}:${visible.attempt.currentItem?.definitionHash}`}

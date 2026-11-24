@@ -700,9 +700,9 @@ export default function WholeCompositeQuestionnaire(props: Props) {
           runCompleted: true,
           ...(receipt.receiptOnly ? { receiptOnly: true as const } : {}),
           reportStatus: {
-            state: receipt.receiptOnly ? 'NOT_OFFERED' : receipt.feedbackAvailable ? 'READY' : 'PENDING',
+            state: receipt.receiptOnly ? 'NOT_OFFERED' : 'READY',
             jobId: null,
-            retryAfterSeconds: receipt.feedbackAvailable || receipt.receiptOnly ? 0 : 2,
+            retryAfterSeconds: 0,
             errorCode: null,
             completedAt: receipt.completedAt,
           },

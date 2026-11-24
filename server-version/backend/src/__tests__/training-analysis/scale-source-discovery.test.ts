@@ -49,6 +49,7 @@ function fixture(r: VersionedFrozenScaleRuntimeSnapshot = runtime(), instrumentC
     user: {findFirst: vi.fn(async () => ({id: actor.userId, role: actor.role, expiresAt: null}))},
     course: {findFirst: vi.fn(async () => ({id: 'course', creatorId: actor.userId}))},
     relationalAssessmentAssignment: {findMany: vi.fn(async () => [])}, compositeAssessment: {findMany: vi.fn(async () => [task])},
+    compositeAssessmentAttempt: {findMany: vi.fn(async () => [])},
     assessment: {findMany: vi.fn(async () => rows)}, assessmentUnitSnapshot: {findMany: vi.fn(async () => [])},
     $queryRaw: vi.fn(async (parts: TemplateStringsArray) => {
       const sql = parts.join('')

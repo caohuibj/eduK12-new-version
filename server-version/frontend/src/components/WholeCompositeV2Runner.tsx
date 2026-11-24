@@ -32,6 +32,12 @@ import type {
   WholeV2UnitSubmitPayload,
 } from '../modules/composite/whole-v2.types'
 import { normalizeApiError } from '../utils/normalizeApiError'
+import {
+  SurveyScaleTimingTracker,
+  sealObservedScaleTimings,
+  type SurveyScaleTimings,
+} from '../modules/scale/item-timing'
+import { TrainingTimingBoundary } from '../modules/scale/TrainingTimingBoundary'
 
 const LazyCognitiveRunner = deferredPage(async () => ({
   default: (await import('../modules/cognitive/pages/CognitiveRunner')).CognitiveRunner,
@@ -43,17 +49,10 @@ const DEFAULT_TTL_MS = 24 * 60 * 60 * 1000
 const MIN_TTL_MS = 60 * 60 * 1000
 const MAX_TTL_MS = 48 * 60 * 60 * 1000
 
-interface ScaleItemTimingEntry {
-  firstResponseMs: number
-  responseTimeMs: number
-  changeCount: number
-  answeredAt: string
-}
-
 interface StoredLocalDraft {
   drafts: Record<string, Record<string, unknown>>
   formOtherTexts: Record<string, Record<string, string>>
-  itemTimings?: Record<string, Record<string, ScaleItemTimingEntry>>
+  itemTimings?: Record<string, SurveyScaleTimings>
   elapsedMs: number
   updatedAt: number
   expiresAt: number
@@ -71,7 +70,7 @@ interface CheckpointConflictState {
   serverUpdatedAt: string | null
   serverDrafts: Record<string, Record<string, unknown>>
   serverFormOtherTexts: Record<string, Record<string, string>>
-  serverItemTimings: Record<string, Record<string, ScaleItemTimingEntry>>
+  serverItemTimings: Record<string, SurveyScaleTimings>
   serverLockedUnits: Record<string, WholeV2LockedUnit>
 }
 
@@ -421,7 +420,7 @@ export function WholeCompositeV2Runner({
   // Scale & Form drafts keyed by slotKey -> itemCode/formItemId -> value
   const [drafts, setDrafts] = useState<Record<string, Record<string, unknown>>>({})
   const [formOtherTexts, setFormOtherTexts] = useState<Record<string, Record<string, string>>>({})
-  const [itemTimings, setItemTimings] = useState<Record<string, Record<string, ScaleItemTimingEntry>>>({})
+  const [itemTimings, setItemTimings] = useState<Record<string, SurveyScaleTimings>>({})
   const [lockedUnits, setLockedUnits] = useState<Record<string, WholeV2LockedUnit>>({})
   const [revision, setRevision] = useState(0)
   const [index, setIndex] = useState(0)
@@ -436,7 +435,7 @@ export function WholeCompositeV2Runner({
 
   const mountTimestampRef = useRef<number>(Date.now())
   const baseElapsedMsRef = useRef<number>(0)
-  const stepEnteredAtRef = useRef<number>(Date.now())
+  const timingTrackersRef = useRef<Record<string, SurveyScaleTimingTracker>>({})
   const draftsRef = useRef(drafts)
   draftsRef.current = drafts
   const formOtherTextsRef = useRef(formOtherTexts)
@@ -446,6 +445,31 @@ export function WholeCompositeV2Runner({
   const revisionRef = useRef(revision)
   revisionRef.current = revision
   const localDirtyRef = useRef(false)
+
+  const getScaleTracker = useCallback((slotKey: string): SurveyScaleTimingTracker => {
+    let tracker = timingTrackersRef.current[slotKey]
+    if (!tracker) {
+      tracker = new SurveyScaleTimingTracker(
+        itemTimingsRef.current[slotKey] ?? {},
+        draftsRef.current[slotKey] ?? {},
+      )
+      timingTrackersRef.current[slotKey] = tracker
+    }
+    return tracker
+  }, [])
+
+  const updateSlotTimings = useCallback((slotKey: string, rows: SurveyScaleTimings) => {
+    itemTimingsRef.current = { ...itemTimingsRef.current, [slotKey]: rows }
+    setItemTimings(prev => ({ ...prev, [slotKey]: rows }))
+  }, [])
+
+  const snapshotAllTrackers = useCallback((): Record<string, SurveyScaleTimings> => {
+    const merged: Record<string, SurveyScaleTimings> = { ...itemTimingsRef.current }
+    for (const [slotKey, tracker] of Object.entries(timingTrackersRef.current)) {
+      merged[slotKey] = tracker.snapshot()
+    }
+    return merged
+  }, [])
 
   const computeTotalElapsedMs = useCallback(() => (
     Math.max(0, baseElapsedMsRef.current + (Date.now() - mountTimestampRef.current))
@@ -527,7 +551,7 @@ export function WholeCompositeV2Runner({
         if (cancelled) return
 
         const serverUnpacked = unpackDraftsAndOtherTexts(loadedMeta.checkpoint.envelope?.drafts)
-        const serverTimings = (loadedMeta.checkpoint.envelope?.itemTimings ?? {}) as Record<string, Record<string, ScaleItemTimingEntry>>
+        const serverTimings = (loadedMeta.checkpoint.envelope?.itemTimings ?? {}) as Record<string, SurveyScaleTimings>
         const serverLockedUnits = loadedMeta.checkpoint.envelope?.lockedUnits ?? {}
 
         // Only restore localStorage drafts when persistence policy permits local drafts and entry has not expired
@@ -554,7 +578,7 @@ export function WholeCompositeV2Runner({
 
         const mergedDrafts: Record<string, Record<string, unknown>> = { ...serverUnpacked.drafts }
         const mergedOthers: Record<string, Record<string, string>> = { ...serverUnpacked.formOtherTexts }
-        const mergedTimings: Record<string, Record<string, ScaleItemTimingEntry>> = loadedMeta.timingEnabled
+        const mergedTimings: Record<string, SurveyScaleTimings> = loadedMeta.timingEnabled
           ? { ...serverTimings }
           : {}
 
@@ -575,6 +599,9 @@ export function WholeCompositeV2Runner({
           ? Math.max(0, validLocalDraft.elapsedMs)
           : 0
 
+        timingTrackersRef.current = {}
+        draftsRef.current = mergedDrafts
+        itemTimingsRef.current = mergedTimings
         setMeta(loadedMeta)
         setTemplate(tplRes.data)
         setRevision(loadedMeta.checkpoint.revision)
@@ -613,11 +640,6 @@ export function WholeCompositeV2Runner({
       expiresAt: now + ttlMs,
     } satisfies StoredLocalDraft)
   }, [meta, receipt, drafts, formOtherTexts, itemTimings, computeTotalElapsedMs])
-
-  // Reset per-step timer whenever active question index changes
-  useEffect(() => {
-    stepEnteredAtRef.current = Date.now()
-  }, [index])
 
   // Respect probabilistic variant activeSlotKeys when present
   const activeUnits = useMemo(() => {
@@ -679,13 +701,14 @@ export function WholeCompositeV2Runner({
     const packedDrafts = draftCheckpointAllowed
       ? packDraftsWithOtherTexts(draftsRef.current, formOtherTextsRef.current)
       : {}
-    const timingsPayload = meta.timingEnabled && Object.keys(itemTimingsRef.current).length > 0
-      ? itemTimingsRef.current
+    const liveTimings = meta.timingEnabled ? snapshotAllTrackers() : {}
+    const timingsPayload = meta.timingEnabled && Object.keys(liveTimings).length > 0
+      ? liveTimings
       : undefined
     const attemptSave = async (
       expectedRev: number,
       draftsToSend: Record<string, Record<string, unknown>>,
-      timingsToSend?: Record<string, Record<string, ScaleItemTimingEntry>>,
+      timingsToSend?: Record<string, SurveyScaleTimings>,
     ) => {
       const res = await client.saveCheckpoint({
         expectedRevision: expectedRev,
@@ -722,7 +745,7 @@ export function WholeCompositeV2Runner({
         const serverEnvelope = serverCheckpoint.envelope
         const serverLocked = serverEnvelope?.lockedUnits ?? {}
         const serverUnpacked = unpackDraftsAndOtherTexts(serverEnvelope?.drafts)
-        const serverTimings = (serverEnvelope?.itemTimings ?? {}) as Record<string, Record<string, ScaleItemTimingEntry>>
+        const serverTimings = (serverEnvelope?.itemTimings ?? {}) as Record<string, SurveyScaleTimings>
 
         if (lockUnit) {
           // Case A: Cognitive/SJT lockUnit 409 recovery
@@ -780,13 +803,16 @@ export function WholeCompositeV2Runner({
     } finally {
       setSavingDraft(false)
     }
-  }, [client, meta, draftCheckpointAllowed, pendingSeal, reconcileExistingReceipt])
+  }, [client, meta, draftCheckpointAllowed, pendingSeal, reconcileExistingReceipt, snapshotAllTrackers])
 
   const adoptServerConflictDraft = useCallback(() => {
     if (!checkpointConflict) return
+    timingTrackersRef.current = {}
+    draftsRef.current = checkpointConflict.serverDrafts
     setDrafts(checkpointConflict.serverDrafts)
     setFormOtherTexts(checkpointConflict.serverFormOtherTexts)
     if (meta?.timingEnabled) {
+      itemTimingsRef.current = checkpointConflict.serverItemTimings
       setItemTimings(checkpointConflict.serverItemTimings)
     }
     setLockedUnits(checkpointConflict.serverLockedUnits)
@@ -826,36 +852,19 @@ export function WholeCompositeV2Runner({
 
   const setScaleAnswer = useCallback((slotKey: string, itemCode: string, value: string | number) => {
     if (pendingSeal) return
+    const prevValue = draftsRef.current[slotKey]?.[itemCode]
     localDirtyRef.current = true
     setError(null)
     setDrafts(prev => ({
       ...prev,
       [slotKey]: { ...(prev[slotKey] ?? {}), [itemCode]: value },
     }))
-    // Only record item-level process timing telemetry when timing is explicitly enabled (P1-05).
+    // Only record item-level process timing telemetry when timing is explicitly enabled (BROWSER_ACTIVE_SCALE_V1).
     if (meta?.timingEnabled !== true) return
-    const now = Date.now()
-    const elapsedOnItem = Math.max(0, now - stepEnteredAtRef.current)
-    const answeredAt = new Date(now).toISOString()
-    setItemTimings(prev => {
-      const slotMap = prev[slotKey] ?? {}
-      const prior = slotMap[itemCode]
-      const nextEntry: ScaleItemTimingEntry = prior
-        ? {
-            firstResponseMs: prior.firstResponseMs,
-            responseTimeMs: elapsedOnItem,
-            changeCount: prior.changeCount + 1,
-            answeredAt,
-          }
-        : {
-            firstResponseMs: elapsedOnItem,
-            responseTimeMs: elapsedOnItem,
-            changeCount: 0,
-            answeredAt,
-          }
-      return { ...prev, [slotKey]: { ...slotMap, [itemCode]: nextEntry } }
-    })
-  }, [pendingSeal, meta?.timingEnabled])
+    const tracker = getScaleTracker(slotKey)
+    tracker.answer(itemCode, prevValue, value)
+    updateSlotTimings(slotKey, tracker.snapshot())
+  }, [pendingSeal, meta?.timingEnabled, getScaleTracker, updateSlotTimings])
 
   const setFormAnswer = useCallback((slotKey: string, formItemId: string, value: FormPlayerValue) => {
     if (pendingSeal) return
@@ -917,11 +926,29 @@ export function WholeCompositeV2Runner({
           }
         } else if (unit.unitType === 'SCALE') {
           const slotDraft = draftsRef.current[unit.slotKey] ?? {}
-          const slotTimings = meta.timingEnabled ? (itemTimingsRef.current[unit.slotKey] ?? {}) : {}
           for (const item of unit.definition.items) {
             if (item.required && !isAnsweredValue(slotDraft[item.itemCode])) {
               setError(`请先完成量表题目：${item.content}`)
               return
+            }
+          }
+          let sealedTimings: SurveyScaleTimings | undefined
+          if (meta.timingEnabled) {
+            const tracker = timingTrackersRef.current[unit.slotKey]
+            let rawTimings: SurveyScaleTimings
+            if (tracker) {
+              tracker.pause()
+              rawTimings = tracker.snapshot()
+            } else {
+              rawTimings = itemTimingsRef.current[unit.slotKey] ?? {}
+            }
+            const observed = sealObservedScaleTimings(
+              unit.definition.items.map(item => item.itemCode),
+              slotDraft,
+              rawTimings,
+            )
+            if (Object.keys(observed).length > 0) {
+              sealedTimings = observed
             }
           }
           unitsPayload[unit.slotKey] = {
@@ -929,19 +956,11 @@ export function WholeCompositeV2Runner({
             definitionHash: unit.definitionHash,
             answers: unit.definition.items
               .filter(item => slotDraft[item.itemCode] !== undefined)
-              .map(item => {
-                const timing = meta.timingEnabled ? slotTimings[item.itemCode] : undefined
-                return {
-                  itemCode: item.itemCode,
-                  responseValue: slotDraft[item.itemCode] as string | number,
-                  ...(timing ? {
-                    responseTimeMs: timing.responseTimeMs,
-                    answeredAt: timing.answeredAt,
-                    changeCount: timing.changeCount,
-                  } : {}),
-                }
-              }),
-            ...(meta.timingEnabled && Object.keys(slotTimings).length > 0 ? { timings: slotTimings } : {}),
+              .map(item => ({
+                itemCode: item.itemCode,
+                responseValue: slotDraft[item.itemCode] as string | number,
+              })),
+            ...(sealedTimings ? { timings: sealedTimings } : {}),
           }
         } else if (unit.unitType === 'SITUATIONAL') {
           const locked = lockedUnits[unit.slotKey]
@@ -1280,7 +1299,17 @@ export function WholeCompositeV2Runner({
                 loadSources={() => loadSlotVideoSources(current.slotKey, scaleVideo!.video.assetId)}
                 ariaLabel={`${current.unit.title} 题目视频`}
               >
-                {scalePlayer}
+                {meta.timingEnabled ? (
+                  <TrainingTimingBoundary
+                    key={current.slotKey}
+                    tracker={getScaleTracker(current.slotKey)}
+                    itemKey={current.question.itemCode}
+                    locked={lockedForPendingSubmit}
+                    onTiming={rows => updateSlotTimings(current.slotKey, rows)}
+                  >
+                    {scalePlayer}
+                  </TrainingTimingBoundary>
+                ) : scalePlayer}
               </ScaleFormVideoGate>
             </AssessmentImageGate>
           </div>

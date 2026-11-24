@@ -72,7 +72,7 @@ export function HuiteacherFieldQuestionnaire({api,invitationId,task,onProgress,o
   <p>按已接受的本次邀请作答。量表独立计分，表单不计分；完成问卷后，再由你确认正式提交专业意见。正式证据仅供获权管理员经 MFA 和审计读取，不自动向被评价者公开个人答案。</p>
   {error&&<p role="alert">{error}</p>}{busy&&<p role="status">正在核对同一观察任务…</p>}
   {attempt?.status==='COMPLETED'?<p role="status">观察问卷已完成，正式提交已确认。请保存专业意见后完成本次正式反馈。</p>:
-   attempt?.executionMode==='WHOLE_V2'&&v2Client?<WholeCompositeV2Runner attemptId={attempt.id} title={task.title} client={v2Client} onExit={onExit} onCompleted={()=>{void reload().catch(()=>undefined)}}/>:
+   attempt?.executionMode==='WHOLE_V2'&&v2Client?<WholeCompositeV2Runner attemptId={attempt.id} title={task.title} client={v2Client} onExit={onExit} onCompleted={()=>{void reload().catch(()=>undefined)}} onReceiptAccepted={()=>{void reload().catch(()=>undefined)}}/>:
    attempt?<FinalCompositeAssessment key={attempt.id+':'+(attempt.currentItem?.id??'')} state={attempt} campusMode mediaTransport={media}
     submitScale={(id,itemId,payload)=>submit(id,itemId,'scale',payload)} submitFormSection={(id,sectionId,payload)=>submit(id,sectionId,'form',payload)}
     onReload={reload} onCompleted={()=>{void reload().catch(()=>undefined)}} onExit={onExit}

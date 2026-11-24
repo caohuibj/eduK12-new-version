@@ -2,6 +2,7 @@ import { z } from 'zod'
 import type { ScaleResultV2 } from '../scale/scale-result'
 import type { CanonicalUnitResultCoreV1 } from './unit-result'
 import type { TypedFormValue } from './typed-form'
+import { trainingTimingFactSchema } from './training-scale-timing'
 
 export const HEX64_RE = /^[a-f0-9]{64}$/
 const hashSchema = z.string().regex(HEX64_RE)
@@ -190,6 +191,7 @@ export const compositeScaleUnitRawSchema = z.object({
   codes: z.array(nonEmptyText).max(20000),
   values: z.array(z.union([z.string(), z.number().finite()])).max(20000),
   timings: z.record(z.string(), z.unknown()).optional(),
+  trainingTimingFact: trainingTimingFactSchema.optional(),
   deviceInputProvenance: z.record(z.string(), z.unknown()).optional(),
 }).strict().superRefine((value, ctx) => {
   if (value.codes.length !== value.values.length) {

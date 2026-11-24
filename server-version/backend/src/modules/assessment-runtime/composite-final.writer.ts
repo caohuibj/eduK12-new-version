@@ -61,6 +61,7 @@ import { resolveCognitiveMetricReferences } from '../cognitive/v2/reference-adap
 import { parseCognitiveResultSnapshot } from '../cognitive/v2/result-snapshot'
 import type { CognitiveResultSnapshot } from '../cognitive/v2/types'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
+import { normalizeTrainingScaleTiming } from './training-scale-timing'
 
 const hashSchema = z.string().regex(HEX64_RE)
 
@@ -134,6 +135,7 @@ export interface CommitCompositeWholeFinalInput {
     deliveryCourseId?: string | null
     publicationHash: string
     unitSeedsEncrypted?: string | null
+    trainingTimingSnapshot?: unknown
     receiptOnly: boolean
     startedAt: Date
   }
@@ -327,7 +329,7 @@ export async function commitCompositeWholeFinal(
         completedAt: match.completedAt.toISOString(),
         replayed: true,
         receiptOnly: attempt.receiptOnly,
-        feedbackAvailable: Boolean(match.feedbackCipher),
+        feedbackAvailable: !attempt.receiptOnly,
       }
     }
     throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '作答已提交且内容与原提交不一致', 409)
@@ -616,23 +618,33 @@ export async function commitCompositeWholeFinal(
       canonical,
     })
     scaleSlotKeys.push(slot.slotKey)
-    // Merge per-answer timing fields (responseTimeMs / answeredAt / changeCount) with
-    // submitted.timings into one canonical map so full cold-raw hydration is 100% symmetric.
+    const trainingTimingFact = attempt.trainingTimingSnapshot !== undefined
+      ? normalizeTrainingScaleTiming(
+          attempt.trainingTimingSnapshot,
+          slot.definition.items.map(it => it.itemCode),
+          answers.map(a => a.itemCode),
+          submitted.timings,
+        )
+      : null
+    // When standard TrainingTimingFact is not active (e.g. direct unit hydration tests),
+    // retain any explicit per-answer/submitted timing fields for cold-raw symmetry.
     const mergedTimings: Record<string, Record<string, unknown>> = {}
-    if (submitted.timings) {
-      for (const [code, entry] of Object.entries(submitted.timings)) {
-        if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
-          mergedTimings[code] = { ...(entry as Record<string, unknown>) }
+    if (!trainingTimingFact) {
+      if (submitted.timings) {
+        for (const [code, entry] of Object.entries(submitted.timings)) {
+          if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+            mergedTimings[code] = { ...(entry as Record<string, unknown>) }
+          }
         }
       }
-    }
-    for (const a of answers) {
-      if (a.responseTimeMs !== undefined || a.answeredAt !== undefined || a.changeCount !== undefined) {
-        const cur = mergedTimings[a.itemCode] ?? {}
-        if (a.responseTimeMs !== undefined) cur.responseTimeMs = a.responseTimeMs
-        if (a.answeredAt !== undefined) cur.answeredAt = a.answeredAt
-        if (a.changeCount !== undefined) cur.changeCount = a.changeCount
-        mergedTimings[a.itemCode] = cur
+      for (const a of answers) {
+        if (a.responseTimeMs !== undefined || a.answeredAt !== undefined || a.changeCount !== undefined) {
+          const cur = mergedTimings[a.itemCode] ?? {}
+          if (a.responseTimeMs !== undefined) cur.responseTimeMs = a.responseTimeMs
+          if (a.answeredAt !== undefined) cur.answeredAt = a.answeredAt
+          if (a.changeCount !== undefined) cur.changeCount = a.changeCount
+          mergedTimings[a.itemCode] = cur
+        }
       }
     }
     rawUnits[slot.slotKey] = {
@@ -640,7 +652,8 @@ export async function commitCompositeWholeFinal(
       itemId: slot.itemId,
       codes: answers.map(a => a.itemCode),
       values: answers.map(a => a.responseValue),
-      ...(Object.keys(mergedTimings).length > 0 ? { timings: mergedTimings } : {}),
+      ...(trainingTimingFact ? { trainingTimingFact } : {}),
+      ...(!trainingTimingFact && Object.keys(mergedTimings).length > 0 ? { timings: mergedTimings } : {}),
       ...(submitted.deviceInputProvenance ? { deviceInputProvenance: submitted.deviceInputProvenance } : {}),
     }
   }
@@ -989,6 +1002,6 @@ export async function commitCompositeWholeFinal(
     completedAt: completedAtIso,
     replayed: false,
     receiptOnly: attempt.receiptOnly,
-    feedbackAvailable: Boolean(feedbackCipher),
+    feedbackAvailable: !attempt.receiptOnly,
   }
 }

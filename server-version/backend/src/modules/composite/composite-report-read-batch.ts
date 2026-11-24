@@ -11,7 +11,9 @@ import { decodeScaleFacts, assertScaleFactsBinding, prefetchCompactScaleTemplate
 import { mapCompositeSection } from '../assessment-runtime/form-section-definition'
 import { readLoadedCompositeTypedFormValues, type TypedFormMetadata } from '../assessment-runtime/typed-form-facts'
 import { formSectionSlotKey } from '../assessment-runtime/slot-set'
-import { extractCompositeFinalFormValues, readCompositeFinalUnitSnapshots } from '../assessment-runtime/composite-final.bridge'
+import { extractCompositeFinalFormValues, readCompositeFinalUnitSnapshots, type CompositeFinalUnitSnapshotView } from '../assessment-runtime/composite-final.bridge'
+import type { LoadedCompositeFinalFacts } from '../assessment-runtime/composite-final.reader'
+import { loadCompositePublicationPlan, type CompositePublicationPlanV1 } from '../assessment-runtime/composite-publication-plan'
 import type { TypedFormValue } from '../assessment-runtime/typed-form'
 import { resolveTrainingAttemptScope } from './training-variant-scope'
 
@@ -41,6 +43,11 @@ export type CompositeReportFacts = {
   scaleRuntimes: Map<any, VersionedFrozenScaleRuntimeSnapshot | undefined>
   typedFormValues: Map<string, TypedFormValue>
   typedFormStates: Map<string, TypedFormMetadata>
+  v2Final?: {
+    loaded: LoadedCompositeFinalFacts
+    snapshots: CompositeFinalUnitSnapshotView[]
+    plan: CompositePublicationPlanV1
+  }
 }
 export type CompositeReportFactsReader = ((attempt: any) => CompositeReportFacts) & {readonly scaleFacts:StoredScaleFactsReader}
 const identity = (attempt: any) => canonicalHash({
@@ -78,6 +85,18 @@ export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.Tr
         { templates },
       )
     : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
+  const v2PlanByHash = new Map<string, CompositePublicationPlanV1>()
+  if (v2Batch.loadedFactsByKey.size > 0) {
+    const distinctHashes = [...new Set(
+      [...v2Batch.loadedFactsByKey.values()].map(loaded => loaded.meta.publicationHash),
+    )]
+    const loadedPlans = await Promise.all(
+      distinctHashes.map(hash => loadCompositePublicationPlan(hash, templates)),
+    )
+    distinctHashes.forEach((hash, idx) => {
+      v2PlanByHash.set(hash, loadedPlans[idx])
+    })
+  }
   const legacyAttempts = attempts.filter(a => !v2Batch.loadedFactsByKey.has(`${a.id}:${a.attemptEpoch}`))
   for (const attempt of attempts) {
     const key = `${attempt.id}:${attempt.attemptEpoch}`
@@ -85,6 +104,10 @@ export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.Tr
     if (!loaded) continue
     const context = contexts.get(attempt)!.facts
     const v2Units = v2Batch.byAttemptKey.get(key) ?? []
+    const v2Plan = v2PlanByHash.get(loaded.meta.publicationHash)
+    if (v2Plan) {
+      context.v2Final = { loaded, snapshots: v2Units, plan: v2Plan }
+    }
     for (const unit of v2Units) {
       if (unit.unitType === 'SCALE' && unit.scaleResult && unit.unitFact.unitType === 'SCALE') {
         const scaleItemId = unit.unitFact.itemId

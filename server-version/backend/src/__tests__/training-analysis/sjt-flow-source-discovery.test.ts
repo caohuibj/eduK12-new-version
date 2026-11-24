@@ -33,7 +33,9 @@ async function fixture(count = 2) {
   const db: any = {
     user: {findFirst: vi.fn(async () => ({id: actor.userId, role: actor.role, expiresAt: null}))},
     course: {findFirst: vi.fn(async () => ({id: 'course', creatorId: actor.userId}))}, relationalAssessmentAssignment: {findMany: vi.fn(async () => [])},
-    compositeAssessment: {findMany: vi.fn(async () => [task])}, assessment: {findMany: vi.fn(async () => {throw new Error('SJT discovery read Scale children')})},
+    compositeAssessment: {findMany: vi.fn(async () => [task])},
+    compositeAssessmentAttempt: {findMany: vi.fn(async () => [])},
+    assessment: {findMany: vi.fn(async () => {throw new Error('SJT discovery read Scale children')})},
     assessmentUnitSnapshot: {findMany: vi.fn(async (query: any) => query.include ? discovery : accepted)},
     $queryRaw: vi.fn(async (parts: TemplateStringsArray) => {
       if (parts.join('').includes('FROM courses c JOIN users')) return [sourceAuthorityRow()]

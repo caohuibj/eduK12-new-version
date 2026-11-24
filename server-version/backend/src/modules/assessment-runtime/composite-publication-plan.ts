@@ -37,6 +37,7 @@ export type CompositePublicationScaleSlot = CompositeSlotMediaManifest & {
   unitType: 'SCALE'
   itemId: string
   scaleId: string
+  scaleCode?: string
   instrumentKey: string
   instrumentVersion: string
   instrumentClass?: 'STANDARD' | 'CUSTOM_DESCRIPTIVE'
