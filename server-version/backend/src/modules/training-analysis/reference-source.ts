@@ -6,7 +6,7 @@ import {assertContentAuthority} from '../measurement-content/content-authority.r
 import {ContentReleaseError} from '../measurement-content/release'
 import {getContentRelease} from '../measurement-content/repository'
 import {decodeTrainingFinalReceipt} from '../composite/training-content-final'
-import {trainingContentSnapshotSchema} from '../composite/training-content-binding'
+import {isCompactTrainingContentBindingRef,resolveTrainingContentBindingParent,trainingContentSnapshotSchema} from '../composite/training-content-binding'
 import {loadTrainingAnalysisSources,type TrainingAnalysisManifestAttemptV1} from './source'
 import {TRAINING_ANALYSIS_MINIMUM_N} from './core'
 import {referenceConsentBodyHash,trainingReferenceSourceBindingSchema,type TrainingReferenceSourceBinding} from '../measurement-content/reference-candidate'
@@ -99,12 +99,15 @@ export async function readTrainingReferenceSource(tx:Prisma.TransactionClient,co
   if(qualityByKey.get(sourceKey(source))?.verdict==='EXCLUDE'){exclusionCounts.qualityExcluded++;continue}
   if(observation.reason!==null||observation.value===null||!Number.isFinite(observation.value)||observation.measurementQuality!=='interpretable'||observation.metricQuality!==undefined&&!['calculated','OK','interpretable'].includes(observation.metricQuality)||!observation.measurement){exclusionCounts.invalidOrMissing++;continue}
   if(head.training_content_binding==null&&head.training_content_binding_hash==null){exclusionCounts.legacyBinding++;continue}
-  const binding=attemptBindingSchema.parse(head.training_content_binding)
+  const hydratedHead=isCompactTrainingContentBindingRef(head.training_content_binding)
+   ?await resolveTrainingContentBindingParent(tx,{id:head.id,attemptEpoch:head.attempt_epoch,trainingContentBinding:head.training_content_binding})
+   :{id:head.id,attemptEpoch:head.attempt_epoch,trainingContentBinding:head.training_content_binding}
+  const binding=attemptBindingSchema.parse(hydratedHead.trainingContentBinding)
   if(canonicalHash(binding)!==head.training_content_binding_hash||binding.attemptId!==head.id||binding.epoch!==head.attempt_epoch||binding.compositeId!==context.compositeId)fail('REFERENCE_TRAINING_MEASUREMENT_MISMATCH')
   const unit=binding.units.find(row=>row.itemId===selector.itemId)
   if(!unit)fail('REFERENCE_TRAINING_MEASUREMENT_MISMATCH')
   const receipt=decodeTrainingFinalReceipt({id:head.id,attemptEpoch:head.attempt_epoch,compositeAssessmentId:context.compositeId,
-   trainingContentBinding:head.training_content_binding,trainingContentBindingHash:head.training_content_binding_hash,
+   trainingContentBinding:hydratedHead.trainingContentBinding,trainingContentBindingHash:head.training_content_binding_hash,
    trainingReferenceBinding:head.training_reference_binding,trainingReferenceBindingHash:head.training_reference_binding_hash,contextSnapshotHash:head.context_snapshot_hash,
    aggregateInputHash:head.aggregate_input_hash,trainingContentInterpretationEncrypted:head.training_content_interpretation_encrypted,
    trainingContentInterpretationHash:head.training_content_interpretation_hash})

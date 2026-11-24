@@ -166,7 +166,9 @@ export const assertCurrentRunStartAuthority = async (
   if (
     known
     && options?.accountMode === 'DETECT_EDUCATION_LIBRARY'
-    && options?.operation !== 'BOUND_FINAL'
+    && (options?.operation !== 'BOUND_FINAL'
+      || known.trackResourceKey.startsWith('education-composition:')
+      || (known.trackResourceFamily === 'FORM' && known.trackResourceKey.startsWith('private-form:')))
     && known.subjectActorSnapshotId === known.respondentActorSnapshotId
     && known.relationshipKind === 'SELF'
     && known.relationshipCourseId === null
@@ -218,13 +220,14 @@ export const assertCurrentRunStartAuthority = async (
       `
       const fast = fastRows[0]
       if (!fast) fail('RUN_ACCOUNT_INACTIVE')
+      if (!fast.isLibrary && options?.operation === 'BOUND_FINAL') fail('RUN_BOUND_FINAL_SOURCE_REQUIRED')
       if (fast.isLibrary) {
         if (!fast.userValid) fail('RUN_ACCOUNT_INACTIVE')
         if (known.orgStatus !== 'ACTIVE') fail('ORGANIZATION_SUSPENDED')
         if (!fast.actorValid || fast.actorDenied) fail('RUN_ACTOR_AUTHORITY_REVOKED')
         if (!fast.accountNotExpired) fail('RUN_ACCOUNT_INACTIVE')
         if (!fast.populationCurrent) fail('RUN_ACTOR_AUTHORITY_REVOKED')
-        if (!fast.intakeOpen) fail('RUN_INTAKE_CLOSED')
+        if (options?.operation !== 'BOUND_FINAL' && !fast.intakeOpen) fail('RUN_INTAKE_CLOSED')
         return
       }
     }

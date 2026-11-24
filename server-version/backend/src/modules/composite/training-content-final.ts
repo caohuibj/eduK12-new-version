@@ -1,4 +1,4 @@
-import {decodeTrainingReferenceBinding,readTrainingReferenceContext,type TrainingReferenceParent} from './training-reference-binding'
+import {decodeTrainingReferenceBinding,readTrainingReferenceContext,type TrainingReferenceBinding,type TrainingReferenceParent} from './training-reference-binding'
 import {validateTrainingReferenceRelease} from './training-reference-selection'
 import type {Prisma} from '@prisma/client'
 import {z} from 'zod'
@@ -6,10 +6,11 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
 import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
 import type {CanonicalUnitResultEnvelopeV1} from '../assessment-runtime/unit-result'
-import {getContentRelease,prefetchContentReleases,type StoredRelease} from '../measurement-content/repository'
+import * as measurementRepository from '../measurement-content/repository'
+import type {StoredRelease} from '../measurement-content/repository'
 import {ContentReleaseError} from '../measurement-content/release'
 import {interpretContentBinding,FinalInterpretationIdentityError,type FinalInterpretation} from '../measurement-content/final-interpretation'
-import {trainingContentAttemptBindingSchema,trainingMeasurementSourceScopeMatchesForConsumer} from './training-content-binding'
+import {resolveTrainingContentBindingParent,trainingContentAttemptBindingSchema,trainingMeasurementSourceScopeMatchesForConsumer,tryResolveTrainingContentBindingSync} from './training-content-binding'
 import {assertSealedCompositionAnchor} from '../assessment-run/educationCompositionExecution'
 import {validateTrainingReportPointer} from './training-report-selection'
 
@@ -33,7 +34,16 @@ export type TrainingFinalReceipt=z.infer<typeof receiptSchema>
 type Parent=TrainingReferenceParent
 class TrainingFinalContentError extends ContentReleaseError {readonly statusCode=409}
 function fail():never{throw new TrainingFinalContentError('CONTENT_TRAINING_FINAL_IDENTITY_MISMATCH')}
-function decodeBinding(parent:Parent){
+function resolvePrefetchFn(){
+  try{
+    const fn=measurementRepository.prefetchContentReleases
+    return typeof fn==='function'?fn:undefined
+  }catch{
+    return undefined
+  }
+}
+function decodeBinding(rawParent:Parent,db?:object){
+  const parent=tryResolveTrainingContentBindingSync(rawParent,db)
   if(parent.trainingContentBinding==null&&parent.trainingContentBindingHash==null)return null
   const parsed=bindingSchema.safeParse(parent.trainingContentBinding)
   if(!parsed.success||!parent.trainingContentBindingHash)fail()
@@ -47,8 +57,8 @@ function decodeBinding(parent:Parent){
 export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,input:{
   parent:Parent&{compositeAssessment:{id:string;createdBy:string}};aggregateInputHash:string;completedAt:string|Date;
   verifiedPayloads:Array<{header:{slotKey:string};envelope?:CanonicalUnitResultEnvelopeV1}>
-}):Promise<{receipt:TrainingFinalReceipt;encrypted:string;hash:string}|null>{
-  const {parent}=input,binding=decodeBinding(parent)
+}):Promise<{receipt:TrainingFinalReceipt;encrypted:string;hash:string;releases:ReadonlyMap<string,StoredRelease>;referenceBinding:TrainingReferenceBinding|null}|null>{
+  const parent=await resolveTrainingContentBindingParent(tx,input.parent),binding=decodeBinding(parent,tx)
   if(!binding)return null
   const referenceBinding=decodeTrainingReferenceBinding(parent),populationContext=referenceBinding?readTrainingReferenceContext(parent):{}
   if(parent.compositeAssessment.id!==binding.compositeId)fail()
@@ -77,16 +87,27 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
     }
   }
   const cache=new Map<string,StoredRelease>(),sources:TrainingFinalReceipt['sources']=[]
-  // interpretContentBinding unconditionally reads every unit's MEASUREMENT release
-  // first before evaluating any stop guard; batch-prefetching ONLY measurement IDs
-  // collapses N sequential FOR SHARE queries into 1 ordered FOR SHARE batch query
-  // while keeping all REFERENCE and REPORT reads strictly lazy behind stop guards.
-  if(binding.units.length>1 && typeof (tx as unknown as {$queryRaw?:unknown})?.$queryRaw==='function'){
-    await prefetchContentReleases(tx,cache,binding.units.map(unit=>unit.measurement.releaseId),true)
+  const canBatchQuery=typeof (tx as unknown as {$queryRaw?:unknown})?.$queryRaw==='function'
+  const prefetchFn=canBatchQuery?resolvePrefetchFn():undefined
+  // Prefetch MEASUREMENT + REPORT releases in 1 ordered FOR SHARE batch query while
+  // keeping all REFERENCE reads strictly lazy behind stop guards.
+  if(prefetchFn){
+    const initialReleaseIds=[...new Set(binding.units.flatMap(unit=>unit.report?.releaseId?[unit.measurement.releaseId,unit.report.releaseId]:[unit.measurement.releaseId]))]
+    if(initialReleaseIds.length>1){
+      await prefetchFn(tx,cache,initialReleaseIds,true)
+    }
   }
+  let referencesPrefetched=false
   const readRelease=async(id:string,expectedHash:string)=>{
     let release=cache.get(id)
-    if(!release){release=(await getContentRelease(tx,id,true))??undefined;if(release)cache.set(id,release)}
+    if(!release){
+      if(!referencesPrefetched&&selectedReferenceUnitsByReleaseId.has(id)&&prefetchFn&&selectedReferenceUnitsByReleaseId.size>1){
+        referencesPrefetched=true
+        await prefetchFn(tx,cache,[...selectedReferenceUnitsByReleaseId.keys()],true)
+        release=cache.get(id)
+      }
+      if(!release){release=(await measurementRepository.getContentRelease(tx,id,true))??undefined;if(release)cache.set(id,release)}
+    }
     if(!release||release.contentHash!==expectedHash)fail()
     const scope=release.scope
     if(release.layer==='REPORT'){
@@ -145,7 +166,7 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
         }),
       }
     : receipt
-  return {receipt,encrypted:encryptUnifiedRuntimePayload(payload),hash:receiptHash}
+  return {receipt,encrypted:encryptUnifiedRuntimePayload(payload),hash:receiptHash,releases:cache,referenceBinding}
 }
 /** Historical reads validate the stored receipt only. No owner, facts, release
  * resolution or current-version recomputation is required by this decoder. */

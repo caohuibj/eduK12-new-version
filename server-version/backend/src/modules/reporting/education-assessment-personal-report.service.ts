@@ -13,6 +13,7 @@ import type { StoredRelease } from '../measurement-content/repository'
 import { validateResultDisclosureContract } from '../assessment-policy/result-disclosure'
 import { trainingFeedbackAvailability, trainingFeedbackPolicySchema } from '../assessment-policy/training-feedback-policy'
 import { trainingFeedbackReportReady } from '../assessment-policy/participant-feedback'
+import { resolveTrainingContentBindingParent } from '../composite/training-content-binding'
 import { trainingBoundContent, decodeTrainingReferenceBinding } from '../composite/training-reference-binding'
 import { decodeTrainingFinalReceipt } from '../composite/training-content-final'
 import { compositeItemSlotKey, loadFrozenActiveSlotSet } from '../assessment-runtime/slot-set'
@@ -160,7 +161,8 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
       await recheck();return response('WITHHELD','当前反馈尚未获准显示。')
     }
     const isWholeV2 = Boolean(parent.publicationHash)
-    const binding=trainingBoundContent(parent),receipt=decodeTrainingFinalReceipt(parent),references=decodeTrainingReferenceBinding(parent)
+    const hydratedParent = await resolveTrainingContentBindingParent(tx, parent)
+    const binding=trainingBoundContent(hydratedParent,tx),receipt=decodeTrainingFinalReceipt(hydratedParent),references=decodeTrainingReferenceBinding(hydratedParent)
     if(!binding||!receipt||(!isWholeV2&&(!parent.frozenActiveSlotSetEncrypted||!parent.frozenActiveSlotSetHash))){await recheck();return response('WITHHELD','本次测评缺少可校验的固定报告版本，暂不展示解释。')}
     if(binding.publicationHash!==origin.runtimeSnapshotHash||canonicalHash({schemaVersion:binding.schemaVersion,compositeId:binding.compositeId,units:binding.units})!==origin.runtimeSnapshotHash)hidden()
     const slots=isWholeV2?null:await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted!,tx)

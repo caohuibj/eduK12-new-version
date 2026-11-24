@@ -4,6 +4,7 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
 import {compositeItemSlotKey,loadFrozenActiveSlotSet} from '../assessment-runtime/slot-set'
 import {loadStoredCanonicalUnitResults} from '../assessment-runtime/compact-assessment-storage'
+import {resolveTrainingContentBindingParent} from '../composite/training-content-binding'
 import {trainingBoundContent,decodeTrainingReferenceBinding} from '../composite/training-reference-binding'
 import {decodeTrainingFinalReceipt} from '../composite/training-content-final'
 import {getContentReleaseBatch} from '../measurement-content/repository'
@@ -61,9 +62,9 @@ export async function readOrdinaryDeclaredFeedback(tx:Prisma.TransactionClient,i
  onReleaseIds?:(releaseIds:string[])=>void}){
  const output=new Map<string,EducationAssessmentUnitReport>()
  if(!input.blockIds.size)return output
- const {identity}=input,parent={...input.parent,compositeAssessmentId:identity.compositeId}
+ const {identity}=input,parent=await resolveTrainingContentBindingParent(tx,{...input.parent,compositeAssessmentId:identity.compositeId})
  const isWholeV2=Boolean(input.parent.publicationHash)
- const binding=trainingBoundContent(parent),receipt=decodeTrainingFinalReceipt(parent),references=decodeTrainingReferenceBinding(parent)
+ const binding=trainingBoundContent(parent,tx),receipt=decodeTrainingFinalReceipt(parent),references=decodeTrainingReferenceBinding(parent)
  if(!binding||!receipt||!binding.educationComposition||binding.publicationHash!==identity.binding.manifestHash
   ||canonicalHash(binding.educationComposition.origin)!==canonicalHash(identity.origin))hidden()
  const sealed=await readSealedCompositionContent(tx,{compositeId:identity.compositeId,ownerId:identity.origin.ownerUserId,anchor:binding.educationComposition})

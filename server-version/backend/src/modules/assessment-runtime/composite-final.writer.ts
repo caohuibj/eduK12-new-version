@@ -61,6 +61,9 @@ import { resolveCognitiveMetricReferences } from '../cognitive/v2/reference-adap
 import { parseCognitiveResultSnapshot } from '../cognitive/v2/result-snapshot'
 import type { CognitiveResultSnapshot } from '../cognitive/v2/types'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
+import type { StoredRelease } from '../measurement-content/repository'
+import type { TrainingFinalReceipt } from '../composite/training-content-final'
+import type { TrainingReferenceBinding } from '../composite/training-reference-binding'
 import { normalizeTrainingScaleTiming } from './training-scale-timing'
 
 const hashSchema = z.string().regex(HEX64_RE)
@@ -162,18 +165,35 @@ export interface CommitCompositeWholeFinalInput {
       completedAt: Date
       verifiedPayloads: Array<{ header: { slotKey: string }; envelope?: CanonicalUnitResultEnvelopeV1 }>
     },
-  ) => Promise<{
-    trainingReferenceBinding?: unknown
-    trainingReferenceBindingHash?: string | null
-    trainingContentInterpretationEncrypted?: string | null
-    trainingContentInterpretationHash?: string | null
-  } | void>
+  ) => Promise<CompositeWholeFinalGovernanceResult | void>
   /** Set false only in isolated unit tests without parent table rows. Default true. */
   verifyParentAttemptRow?: boolean
+  /** When explicitly false and plan has no lockable Cogn/SJT units, final submit skips
+   * clearing composite_attempt_checkpoints (none could have been written). */
+  draftCheckpointEnabled?: boolean
   /** Optional in-memory feedback pre-materializer (zero extra DB queries). */
-  buildFeedback?: (facts: CompositeFinalFactsV1) => unknown | Promise<unknown>
+  buildFeedback?: (
+    facts: CompositeFinalFactsV1,
+    context?: CompositeWholeFinalFeedbackContext,
+  ) => unknown | Promise<unknown>
   templates?: PublicTemplateStore
   now?: Date
+}
+
+export type CompositeWholeFinalGovernanceResult = {
+  trainingReferenceBinding?: unknown
+  trainingReferenceBindingHash?: string | null
+  trainingContentInterpretationEncrypted?: string | null
+  trainingContentInterpretationHash?: string | null
+  receipt?: TrainingFinalReceipt | null
+  referenceBinding?: TrainingReferenceBinding | null
+  releases?: ReadonlyMap<string, StoredRelease>
+}
+
+export type CompositeWholeFinalFeedbackContext = {
+  scaleResults: ReadonlyMap<string, ReturnType<typeof buildScaleResult>>
+  envelopesBySlotKey: ReadonlyMap<string, CanonicalUnitResultEnvelopeV1>
+  governance?: CompositeWholeFinalGovernanceResult
 }
 
 /** Validates a Cognitive or SJT unit BEFORE permanently locking it in composite_attempt_checkpoints,
@@ -377,21 +397,28 @@ export async function commitCompositeWholeFinal(
   }
 
   // 1. Re-check idempotent replay & submission conflict UNDER the parent row lock
-  //    (handles two concurrent fresh submits racing past step 0A simultaneously).
-  const underLockReplay = resolveExistingFinal(await findExistingFinal())
-  if (underLockReplay) return underLockReplay
+  //    when the locked attempt wasn't strictly IN_PROGRESS (or when parent row verification
+  //    is disabled in isolated unit tests). When FOR UPDATE observed IN_PROGRESS, no other
+  //    writer could have committed composite_attempt_finals ahead of this transaction.
+  if (lockedParentStatus !== 'IN_PROGRESS') {
+    const underLockReplay = resolveExistingFinal(await findExistingFinal())
+    if (underLockReplay) return underLockReplay
+  }
 
   // 1B. Enforce valid active status for fresh submission (never accept revoked/abandoned/already-completed rows)
   if (lockedParentStatus !== null && lockedParentStatus !== 'IN_PROGRESS') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '当前作答状态不可提交', 409)
   }
 
-  // 2. Load & verify monotonically locked Cognitive / SJT units from checkpoint
-  const lockedUnits = await readLockedUnitsForSubmit(tx, {
-    attemptId: attempt.id,
-    attemptEpoch: attempt.attemptEpoch,
-    publicationHash: attempt.publicationHash,
-  })
+  // 2. Load & verify monotonically locked Cognitive / SJT units from checkpoint (skipping when plan has none)
+  const hasLockableUnits = plan.slots.some(slot => slot.unitType === 'COGNITIVE' || slot.unitType === 'SITUATIONAL')
+  const lockedUnits = hasLockableUnits
+    ? await readLockedUnitsForSubmit(tx, {
+        attemptId: attempt.id,
+        attemptEpoch: attempt.attemptEpoch,
+        publicationHash: attempt.publicationHash,
+      })
+    : {}
 
   const slotByKey = new Map(plan.slots.map(slot => [slot.slotKey, slot]))
   const effectiveUnits: Record<string, WholeV2UnitSubmitPayload> = { ...submit.units }
@@ -897,15 +924,7 @@ export async function commitCompositeWholeFinal(
     factsHash: encodedFacts.hash,
   })
 
-  let feedbackCipher: string | null = null
-  if (!attempt.receiptOnly && input.buildFeedback) {
-    const feedback = await input.buildFeedback(finalFacts)
-    if (feedback != null) {
-      feedbackCipher = encryptCompactField(feedback)
-    }
-  }
-
-  const governanceResult = input.finalizeGovernanceInTx
+  const governanceResult = (input.finalizeGovernanceInTx
     ? await input.finalizeGovernanceInTx(tx, {
         contextObj,
         contextHash,
@@ -914,7 +933,24 @@ export async function commitCompositeWholeFinal(
         completedAt: now,
         verifiedPayloads,
       })
-    : undefined
+    : undefined) ?? undefined
+
+  let feedbackCipher: string | null = null
+  if (!attempt.receiptOnly && input.buildFeedback) {
+    const scaleResults = new Map(scaleBuildInputs.map((b, i) => [scaleSlotKeys[i], b.result]))
+    const envelopesBySlotKey = new Map<string, CanonicalUnitResultEnvelopeV1>()
+    for (const payload of verifiedPayloads) {
+      if (payload.envelope) envelopesBySlotKey.set(payload.header.slotKey, payload.envelope)
+    }
+    const feedback = await input.buildFeedback(finalFacts, {
+      scaleResults,
+      envelopesBySlotKey,
+      ...(governanceResult ? { governance: governanceResult } : {}),
+    })
+    if (feedback != null) {
+      feedbackCipher = encryptCompactField(feedback)
+    }
+  }
   const refBindingJson = governanceResult?.trainingReferenceBinding != null
     ? JSON.stringify(governanceResult.trainingReferenceBinding)
     : null
@@ -988,7 +1024,9 @@ export async function commitCompositeWholeFinal(
     }
   }
 
-  await clearCompositeCheckpoint(tx, attempt.id)
+  if (hasLockableUnits || input.draftCheckpointEnabled !== false) {
+    await clearCompositeCheckpoint(tx, attempt.id)
+  }
 
   return {
     status: 'COMPLETED',

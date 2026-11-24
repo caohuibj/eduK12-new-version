@@ -3,7 +3,7 @@ import type { Prisma } from '@prisma/client'
 import { CONFLICT, NOT_FOUND } from './cognitive.errors'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {personalTrackingPlanSchema} from '../reporting/personal-tracking'
-import {trainingContentAttemptBindingSchema,trainingContentSnapshotSchema} from '../composite/training-content-binding'
+import {resolveTrainingContentBindingParent,trainingContentAttemptBindingSchema,trainingContentSnapshotSchema} from '../composite/training-content-binding'
 import {readVerifiedEducationAttempt,readVerifiedCompositionAttempt,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
 
 type Tx = Prisma.TransactionClient
@@ -158,7 +158,8 @@ async function trainingWaveScope(db:Tx,userId:string,assignmentId:string,source:
  // enclosing questionnaire happens to contain another tracked instrument.
  if(!selected.length)return null
  const item=await db.compositeAssessmentItem.findUnique({where:{id:context.compositeItemId}})
- const binding=parent?trainingContentAttemptBindingSchema.safeParse(parent.trainingContentBinding):trainingContentSnapshotSchema.safeParse(wave.trainingContentSnapshot)
+ const resolvedParent=parent?await resolveTrainingContentBindingParent(db,parent):null
+ const binding=resolvedParent?trainingContentAttemptBindingSchema.safeParse(resolvedParent.trainingContentBinding):trainingContentSnapshotSchema.safeParse(wave.trainingContentSnapshot)
  if(!binding.success||binding.data.compositeId!==wave.id||!item||item.compositeAssessmentId!==wave.id||item.type!=='COGNITIVE'
   ||(parent?(!('attemptId' in binding.data)||binding.data.attemptId!==parent.id||binding.data.epoch!==parent.attemptEpoch
    ||canonicalHash(binding.data)!==parent.trainingContentBindingHash||binding.data.publicationHash!==wave.trainingContentSnapshotHash)

@@ -439,6 +439,7 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
           verifyAuthorityInTx: ctx.verifyAuthorityInTx,
           finalizeGovernanceInTx: ctx.finalizeGovernanceInTx,
           buildFeedback: ctx.buildFeedback,
+          draftCheckpointEnabled: ctx.persistencePolicy?.draftCheckpointEnabled,
         })),
         ctx.audience === 'public',
       )

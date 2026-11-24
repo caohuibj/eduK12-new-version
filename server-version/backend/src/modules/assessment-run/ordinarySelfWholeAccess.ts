@@ -293,7 +293,12 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
           AND ${boundCompositeConsentSql(Prisma.sql`a`, Prisma.sql`p`)}) AS allowed,
       CASE WHEN ${!school} AND e.status='STARTED' AND p.id IS NOT NULL
         AND EXISTS (SELECT 1 FROM scale_library_emergency_stops LIMIT 1) THEN EXISTS (
-        SELECT 1 FROM jsonb_array_elements(p.training_content_binding->'units') unit
+        SELECT 1 FROM jsonb_array_elements(
+          CASE WHEN p.training_content_binding->>'schemaVersion'='2' AND NOT (p.training_content_binding ? 'units')
+            THEN COALESCE((SELECT ca.training_content_snapshot->'units' FROM composite_assessments ca WHERE ca.id=p.composite_assessment_id),'[]'::jsonb)
+            ELSE p.training_content_binding->'units'
+          END
+        ) unit
         JOIN scale_library_emergency_stops stop ON
           (stop.target_kind='RELEASE' AND stop.target_id IN
             (unit#>>'{measurement,releaseId}',unit#>>'{source,educationNative,sourceMeasurementReleaseId}'))
@@ -324,11 +329,28 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
       AND p.composite_assessment_id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}'
       ${progressOnly
         ? Prisma.sql`AND p.training_content_binding_hash IS NOT NULL`
-        : Prisma.sql`AND p.training_content_binding#>>'{educationComposition,origin,variantKey}'=${variant}
-      AND p.training_content_binding#>>'{educationComposition,manifestHash}'=t.frozen_resource_policy#>>'{educationComposition,manifestHash}'
-      AND p.training_content_binding->>'attemptId'=p.id
-      AND p.training_content_binding->'epoch'=to_jsonb(p.attempt_epoch)
-      AND NOT EXISTS (SELECT 1 FROM jsonb_array_elements(p.training_content_binding->'units') unit WHERE unit->>'family'<>'SCALE')`}
+        : Prisma.sql`AND (
+          CASE WHEN p.training_content_binding->>'schemaVersion'='2' AND NOT (p.training_content_binding ? 'units') THEN
+            p.publication_hash IS NOT NULL
+            AND p.training_content_binding_hash IS NOT NULL
+            AND p.training_variant_allocation_hash IS NULL
+            AND EXISTS (
+              SELECT 1 FROM composite_assessments ca WHERE ca.id=p.composite_assessment_id
+                AND ca.training_content_snapshot_hash ~ '^[a-f0-9]{64}$'
+                AND p.training_content_binding->>'publicationHash'=ca.training_content_snapshot_hash
+                AND ca.training_content_snapshot#>>'{educationBinding,origin,variantKey}'=${variant}
+                AND ca.training_content_snapshot#>>'{educationBinding,origin,versionId}'=t.frozen_resource_policy#>>'{educationComposition,origin,versionId}'
+                AND ca.training_content_snapshot#>>'{educationBinding,origin,contentHash}'=t.frozen_resource_policy#>>'{educationComposition,origin,contentHash}'
+                AND NOT EXISTS (SELECT 1 FROM jsonb_array_elements(ca.training_content_snapshot->'units') unit WHERE unit->>'family'<>'SCALE')
+            )
+          ELSE
+            p.training_content_binding#>>'{educationComposition,origin,variantKey}'=${variant}
+            AND p.training_content_binding#>>'{educationComposition,manifestHash}'=t.frozen_resource_policy#>>'{educationComposition,manifestHash}'
+            AND p.training_content_binding->>'attemptId'=p.id
+            AND p.training_content_binding->'epoch'=to_jsonb(p.attempt_epoch)
+            AND NOT EXISTS (SELECT 1 FROM jsonb_array_elements(p.training_content_binding->'units') unit WHERE unit->>'family'<>'SCALE')
+          END
+        )`}
       AND (${wholeDelivery} OR p.async_report_epoch=p.attempt_epoch OR p.publication_hash IS NOT NULL)
     LEFT JOIN composite_report_jobs j ON j.attempt_id=p.id AND j.attempt_epoch=p.attempt_epoch
     LEFT JOIN composite_attempt_finals f ON f.attempt_id=p.id AND f.attempt_epoch=p.attempt_epoch

@@ -183,8 +183,24 @@ export const cancelAssessmentRun = async (input: {
         AND p.user_id=a.respondent_user_id AND p.subject_user_id=p.user_id AND p.respondent_user_id=p.user_id
         AND p.respondent_type='SELF' AND p.delivery_mode='FINAL_ONLY' AND p.runtime_generation='UNIFIED_V1'
         AND p.composite_assessment_id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}'
-        AND p.training_content_binding#>>'{educationComposition,manifestHash}'=t.frozen_resource_policy#>>'{educationComposition,manifestHash}'
-        AND p.training_content_binding->'epoch'=to_jsonb(p.attempt_epoch)
+        AND (
+          CASE WHEN p.training_content_binding->>'schemaVersion'='2' AND NOT (p.training_content_binding ? 'units') THEN
+            p.publication_hash IS NOT NULL
+            AND p.training_content_binding_hash IS NOT NULL
+            AND p.training_variant_allocation_hash IS NULL
+            AND EXISTS (
+              SELECT 1 FROM composite_assessments ca WHERE ca.id=p.composite_assessment_id
+                AND ca.training_content_snapshot_hash ~ '^[a-f0-9]{64}$'
+                AND p.training_content_binding->>'publicationHash'=ca.training_content_snapshot_hash
+                AND ca.training_content_snapshot#>>'{educationBinding,origin,variantKey}'=t.frozen_resource_policy#>>'{educationComposition,origin,variantKey}'
+                AND ca.training_content_snapshot#>>'{educationBinding,origin,versionId}'=t.frozen_resource_policy#>>'{educationComposition,origin,versionId}'
+                AND ca.training_content_snapshot#>>'{educationBinding,origin,contentHash}'=t.frozen_resource_policy#>>'{educationComposition,origin,contentHash}'
+            )
+          ELSE
+            p.training_content_binding#>>'{educationComposition,manifestHash}'=t.frozen_resource_policy#>>'{educationComposition,manifestHash}'
+            AND p.training_content_binding->'epoch'=to_jsonb(p.attempt_epoch)
+          END
+        )
         AND (${ordinarySelfWholeEnabled()} OR p.async_report_epoch=p.attempt_epoch)
       WHERE e.id IN (${Prisma.join(activeRuntimes.map(row => row.id))})
         AND e.status='STARTED' AND e.subject_actor_snapshot_id=e.respondent_actor_snapshot_id
