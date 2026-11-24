@@ -697,20 +697,22 @@ async function discoverFrozenScaleMetrics(tx: Prisma.TransactionClient, actor: T
     metrics.set(parent.compositeAssessmentId, existing)
   }
   // Discover Scale metrics from WHOLE_V2 single-row FINAL attempts (zero legacy child rows).
-  const v2ScaleParents = await tx.compositeAssessmentAttempt.findMany({
-    where: {
-      compositeAssessmentId: {in: scaleTasks.map(task => task.id)},
-      deliveryCourseId: courseId,
-      status: 'COMPLETED',
-      deliveryMode: 'FINAL_ONLY',
-      runtimeGeneration: 'UNIFIED_V1',
-      publicationHash: {not: null},
-      ...(visibility ? {AND: [visibility]} : {}),
-    },
-    select: {id: true, compositeAssessmentId: true, attemptEpoch: true, respondentType: true},
-    orderBy: {id: 'asc'},
-    take: TRAINING_ANALYSIS_SOURCE_LIMIT + 1,
-  })
+  const v2ScaleParents = typeof tx.compositeAssessmentAttempt?.findMany === 'function'
+    ? await tx.compositeAssessmentAttempt.findMany({
+        where: {
+          compositeAssessmentId: {in: scaleTasks.map(task => task.id)},
+          deliveryCourseId: courseId,
+          status: 'COMPLETED',
+          deliveryMode: 'FINAL_ONLY',
+          runtimeGeneration: 'UNIFIED_V1',
+          publicationHash: {not: null},
+          ...(visibility ? {AND: [visibility]} : {}),
+        },
+        select: {id: true, compositeAssessmentId: true, attemptEpoch: true, respondentType: true},
+        orderBy: {id: 'asc'},
+        take: TRAINING_ANALYSIS_SOURCE_LIMIT + 1,
+      })
+    : []
   if (v2ScaleParents.length) {
     const v2ScaleRead = await readCompositeFinalUnitSnapshots(
       tx,
@@ -813,7 +815,7 @@ export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     for (const metric of envelope?.core.metrics ?? []) if ((metric.value === null || numeric(metric.value)) && !existing.some(value => value.itemId === item.id && value.metricKey === metric.key)) existing.push({itemId: item.id, metricKey: metric.key, label: metric.key})
     sjtMetrics.set(task.id, existing)
   }
-  if (sjtTasks.length) {
+  if (sjtTasks.length && typeof tx.compositeAssessmentAttempt?.findMany === 'function') {
     const v2SjtParents = await tx.compositeAssessmentAttempt.findMany({
       where: {
         compositeAssessmentId: {in: sjtTasks.map(task => task.id)},
