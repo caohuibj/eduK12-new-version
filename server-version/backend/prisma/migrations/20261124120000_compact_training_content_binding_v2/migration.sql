@@ -1,9 +1,31 @@
 -- Phase 2 storage convergence (WHOLE_V2):
 -- Deduplicates repeated per-attempt `training_content_binding` static payloads into
 -- content-addressed `assessment_public_templates` (`TRAINING_CONTENT_BINDING_PLAN`),
--- storing `{ "schemaVersion": 2, "templateHash": "<sha256>" }` (~96 B) on WHOLE_V2
--- rows while retaining exact canonical `training_content_binding_hash` semantics and
--- full V1 backwards compatibility.
+-- storing `{ "schemaVersion": 2, "templateHash": "<sha256>", "publicationHash": "<sha256>" }`
+-- (~168 B) on non-variant WHOLE_V2 rows while keeping probabilistic variants inline V1
+-- and retaining exact canonical `training_content_binding_hash` semantics and DB trigger parity.
+
+ALTER TABLE "assessment_public_templates"
+  DROP CONSTRAINT IF EXISTS "assessment_public_templates_template_kind_check";
+
+ALTER TABLE "assessment_public_templates"
+  ADD CONSTRAINT "assessment_public_templates_template_kind_check"
+  CHECK ("template_kind" IN (
+    'SCALE_RESULT_BASE',
+    'SCALE_REFERENCE',
+    'SCALE_INTERPRETATION',
+    'SCALE_CAVEATS',
+    'SCALE_CANONICAL_LAYOUT',
+    'COMPOSITE_REPORT_LAYOUT',
+    'UNIT_ADMISSION_PLAN',
+    'FROZEN_SLOT_PLAN',
+    'WHOLE_VALIDATION_PLAN',
+    'COGNITIVE_PROFILE_CONFIGURATION',
+    'SCALE_RUNTIME_POLICY_PLAN',
+    'SCALE_FACTS_BUNDLE',
+    'COMPOSITE_PUBLICATION_PLAN',
+    'TRAINING_CONTENT_BINDING_PLAN'
+  ));
 
 CREATE OR REPLACE FUNCTION guard_training_content_attempt() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE publication composite_assessments;
@@ -24,14 +46,21 @@ BEGIN
      WHERE id=NEW.composite_assessment_id FOR SHARE;
    IF NEW.training_content_binding->>'schemaVersion'='2' AND NOT (NEW.training_content_binding ? 'units') THEN
      IF NEW.publication_hash IS NULL
+        OR NEW.training_variant_allocation_encrypted IS NOT NULL
+        OR NEW.training_variant_allocation_hash IS NOT NULL
         OR jsonb_typeof(NEW.training_content_binding) IS DISTINCT FROM 'object'
         OR (NEW.training_content_binding->'schemaVersion') IS DISTINCT FROM '2'::jsonb
-        OR (NEW.training_content_binding - 'schemaVersion' - 'templateHash') IS DISTINCT FROM '{}'::jsonb
+        OR (NEW.training_content_binding - 'schemaVersion' - 'templateHash' - 'publicationHash') IS DISTINCT FROM '{}'::jsonb
         OR COALESCE(NEW.training_content_binding->>'templateHash','') !~ '^[a-f0-9]{64}$'
         OR publication.training_content_snapshot IS NULL
         OR COALESCE(publication.training_content_snapshot_hash,'') !~ '^[a-f0-9]{64}$'
+        OR (NEW.training_content_binding->>'publicationHash') IS DISTINCT FROM publication.training_content_snapshot_hash
         OR jsonb_typeof(publication.training_content_snapshot->'units') IS DISTINCT FROM 'array' THEN
        RAISE EXCEPTION 'Training content binding publication mismatch';
+     END IF;
+     IF (SELECT COUNT(*) FROM jsonb_array_elements(publication.training_content_snapshot->'units')) <>
+        (SELECT COUNT(DISTINCT unit->>'itemId') FROM jsonb_array_elements(publication.training_content_snapshot->'units') unit) THEN
+       RAISE EXCEPTION 'Training attempt contains duplicate or missing item identities';
      END IF;
      IF NOT EXISTS (
        SELECT 1 FROM assessment_public_templates t
@@ -65,7 +94,7 @@ BEGIN
 END $$;
 
 CREATE OR REPLACE FUNCTION guard_training_reference_binding() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE selected JSONB; content_unit JSONB; slot JSONB; binding_units JSONB; pub_snapshot JSONB; is_compact BOOLEAN;
+DECLARE selected JSONB; content_unit JSONB; slot JSONB; binding_units JSONB; pub_snapshot JSONB; pub_snapshot_hash TEXT; is_compact BOOLEAN;
 BEGIN
  IF TG_OP='UPDATE' AND OLD.training_reference_binding IS NOT NULL AND
     (OLD.training_reference_binding,OLD.training_reference_binding_hash)
@@ -81,8 +110,14 @@ BEGIN
  END IF;
  is_compact := (NEW.training_content_binding->>'schemaVersion'='2' AND NOT (NEW.training_content_binding ? 'units'));
  IF is_compact THEN
-   SELECT training_content_snapshot INTO pub_snapshot FROM composite_assessments
-     WHERE id=NEW.composite_assessment_id FOR SHARE;
+   IF NEW.training_variant_allocation_encrypted IS NOT NULL OR NEW.training_variant_allocation_hash IS NOT NULL THEN
+     RAISE EXCEPTION 'Training reference selection context identity mismatch';
+   END IF;
+   SELECT training_content_snapshot, training_content_snapshot_hash INTO pub_snapshot, pub_snapshot_hash
+     FROM composite_assessments WHERE id=NEW.composite_assessment_id FOR SHARE;
+   IF (NEW.training_content_binding->>'publicationHash') IS DISTINCT FROM pub_snapshot_hash THEN
+     RAISE EXCEPTION 'Training reference selection context identity mismatch';
+   END IF;
    binding_units := pub_snapshot->'units';
  ELSE
    binding_units := NEW.training_content_binding->'units';
@@ -94,12 +129,7 @@ BEGIN
     OR (NEW.training_reference_binding->>'contextHash') IS DISTINCT FROM NEW.context_snapshot_hash
     OR jsonb_typeof(NEW.training_reference_binding->'units') IS DISTINCT FROM 'array'
     OR jsonb_typeof(binding_units) IS DISTINCT FROM 'array'
-    OR (
-      CASE WHEN is_compact AND NEW.training_variant_allocation_encrypted IS NOT NULL
-        THEN jsonb_array_length(NEW.training_reference_binding->'units')>jsonb_array_length(binding_units)
-        ELSE jsonb_array_length(NEW.training_reference_binding->'units')<>jsonb_array_length(binding_units)
-      END
-    ) THEN
+    OR jsonb_array_length(NEW.training_reference_binding->'units')<>jsonb_array_length(binding_units) THEN
    RAISE EXCEPTION 'Training reference selection context identity mismatch';
  END IF;
  IF (SELECT count(*) FROM jsonb_array_elements(NEW.training_reference_binding->'units')) <>
@@ -132,6 +162,14 @@ BEGIN
    AND a.attempt_epoch=NEW.attempt_epoch AND a.status='COMPLETED' AND a.delivery_mode='FINAL_ONLY' AND a.runtime_generation='UNIFIED_V1'
    AND a.aggregate_input_hash=NEW.source_aggregate_hash AND a.training_content_binding_hash=NEW.source_binding_hash
    AND a.training_content_interpretation_hash=NEW.source_receipt_hash
+   AND (
+     NOT (a.training_content_binding->>'schemaVersion'='2' AND NOT (a.training_content_binding ? 'units'))
+     OR (
+       a.training_variant_allocation_encrypted IS NULL
+       AND a.training_variant_allocation_hash IS NULL
+       AND (a.training_content_binding->>'publicationHash') IS NOT DISTINCT FROM c.training_content_snapshot_hash
+     )
+   )
    AND EXISTS (SELECT 1 FROM jsonb_array_elements(
      CASE WHEN a.training_content_binding->>'schemaVersion'='2' AND NOT (a.training_content_binding ? 'units')
        THEN c.training_content_snapshot->'units'

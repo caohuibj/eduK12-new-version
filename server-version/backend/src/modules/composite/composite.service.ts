@@ -4087,7 +4087,10 @@ const createAttempt = async (
   if (wholeV2Plan) {
     const plan = wholeV2Plan
     const generatedSeeds = generateCompositeUnitSeeds(plan, newAttemptId, attemptEpoch)
-    const compactContentBinding = trainingContentBinding
+    // Only non-variant fixed whole questionnaires emit compact V2 refs;
+    // probabilistic variants keep inline V1 with only their drawn units so
+    // DB triggers retain 1-to-1 unit equality on reference/artifact writes.
+    const compactContentBinding = trainingContentBinding && !variantAllocation
       ? await saveCompactTrainingContentBinding(
           db as Prisma.TransactionClient,
           trainingContentAttemptBindingSchema.parse(trainingContentBinding),
@@ -4100,6 +4103,9 @@ const createAttempt = async (
         ...(compactContentBinding ? {
           trainingContentBinding: compactContentBinding.storedBinding as Prisma.InputJsonValue,
           trainingContentBindingHash: compactContentBinding.bindingHash,
+        } : trainingContentBinding ? {
+          trainingContentBinding: trainingContentBinding as Prisma.InputJsonValue,
+          trainingContentBindingHash: canonicalHash(trainingContentBinding),
         } : {}),
         ...(trainingFeedbackSnapshot ? {
           trainingFeedbackSnapshot: trainingFeedbackSnapshot as Prisma.InputJsonValue,

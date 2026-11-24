@@ -333,9 +333,11 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
           CASE WHEN p.training_content_binding->>'schemaVersion'='2' AND NOT (p.training_content_binding ? 'units') THEN
             p.publication_hash IS NOT NULL
             AND p.training_content_binding_hash IS NOT NULL
+            AND p.training_variant_allocation_hash IS NULL
             AND EXISTS (
               SELECT 1 FROM composite_assessments ca WHERE ca.id=p.composite_assessment_id
                 AND ca.training_content_snapshot_hash ~ '^[a-f0-9]{64}$'
+                AND p.training_content_binding->>'publicationHash'=ca.training_content_snapshot_hash
                 AND ca.training_content_snapshot#>>'{educationBinding,origin,variantKey}'=${variant}
                 AND ca.training_content_snapshot#>>'{educationBinding,origin,versionId}'=t.frozen_resource_policy#>>'{educationComposition,origin,versionId}'
                 AND ca.training_content_snapshot#>>'{educationBinding,origin,contentHash}'=t.frozen_resource_policy#>>'{educationComposition,origin,contentHash}'

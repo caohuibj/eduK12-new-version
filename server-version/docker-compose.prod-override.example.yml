@@ -4,7 +4,7 @@
 # Preserves the verified 4C4G dual-backend + dual-worker production topology
 # (2026-11-24 WHOLE_V2 convergence pass) without credentials, tokens, or keys:
 #   - Symmetric APIs: `backend` & `backend-2` (cpus=2.25, 768m, heap=384M,
-#     pool=12, whole_submit_limit=12, statement_cache_size=80, idle=120s, max_conn=900s)
+#     pool=12, whole_submit_limit=9, statement_cache_size=80, idle=120s, max_conn=900s)
 #   - Dual Workers: `worker` (cpus=0.75, 512m, pool=3, concurrency=2) +
 #     `report-worker-2` (cpus=0.5, 256m, pool=2, concurrency=1), each at
 #     `MALLOC_ARENA_MAX=2`, `MALLOC_TRIM_THRESHOLD_=524288`,
@@ -93,7 +93,7 @@ x-prod-shared-env: &prod-shared-env
   ASSESSMENT_REPORT_LEASE_MS: "30000"
   ASSESSMENT_REPORT_MAX_ATTEMPTS: "8"
   ASSESSMENT_REPORT_MAX_BYTES: "2097152"
-  WHOLE_SUBMIT_ADMISSION_LIMIT: "12"
+  WHOLE_SUBMIT_ADMISSION_LIMIT: "9"
   WHOLE_SUBMIT_ADMISSION_TIMEOUT_MS: "10000"
   UNIT_SUBMIT_ADMISSION_LIMIT: "7"
   UNIT_SUBMIT_ADMISSION_QUEUE: "128"
@@ -236,7 +236,7 @@ services:
       PRISMA_STATEMENT_CACHE_SIZE: "80"
       PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: "120"
       PRISMA_MAX_CONNECTION_LIFETIME_SECONDS: "900"
-      WHOLE_SUBMIT_ADMISSION_LIMIT: "12"
+      WHOLE_SUBMIT_ADMISSION_LIMIT: "9"
       UNIT_SUBMIT_ADMISSION_LIMIT: "7"
       ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT: "4"
       ASSESSMENT_REPORT_COMPRESSION_ENABLED: "false"
@@ -258,7 +258,7 @@ services:
       PRISMA_STATEMENT_CACHE_SIZE: "80"
       PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: "120"
       PRISMA_MAX_CONNECTION_LIFETIME_SECONDS: "900"
-      WHOLE_SUBMIT_ADMISSION_LIMIT: "12"
+      WHOLE_SUBMIT_ADMISSION_LIMIT: "9"
       UNIT_SUBMIT_ADMISSION_LIMIT: "7"
       ASSESSMENT_START_LOW_MEMORY_MAX_CONCURRENT: "4"
       ASSESSMENT_REPORT_COMPRESSION_ENABLED: "false"

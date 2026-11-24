@@ -153,8 +153,9 @@ describe('Phase 2 WHOLE_V2 storage & hot-path convergence', () => {
 
     expect(compact1.storedBinding.schemaVersion).toBe(2)
     expect(compact1.storedBinding.templateHash).toBe(compact2.storedBinding.templateHash)
+    expect(compact1.storedBinding.publicationHash).toBe(pubHash)
     expect(rows.size).toBe(1)
-    expect(Buffer.byteLength(JSON.stringify(compact1.storedBinding), 'utf8')).toBeLessThan(120)
+    expect(Buffer.byteLength(JSON.stringify(compact1.storedBinding), 'utf8')).toBeLessThan(200)
     expect(compact1.bindingHash).toBe(canonicalHash(expanded1))
     expect(compact2.bindingHash).toBe(canonicalHash(expanded2))
     expect(compact1.bindingHash).not.toBe(compact2.bindingHash)
@@ -175,6 +176,15 @@ describe('Phase 2 WHOLE_V2 storage & hot-path convergence', () => {
     expect(hydrated1.trainingContentBinding).toEqual(expanded1)
     expect(hydrated2.trainingContentBinding).toEqual(expanded2)
     expect(repo.append).toHaveBeenCalledTimes(1)
+
+    // Reject compact reference when publicationHash disagrees with template
+    const tamperedPubRef = { ...compact1.storedBinding, publicationHash: sha('wrong-pub') }
+    const unexpandedTampered = await resolveTrainingContentBindingParent(
+      undefined,
+      { id: expanded1.attemptId, attemptEpoch: 1, trainingContentBinding: tamperedPubRef },
+      store,
+    )
+    expect(unexpandedTampered.trainingContentBinding).toEqual(tamperedPubRef)
 
     // Validate downstream identity check passes & rejects tampering
     const validContent = trainingBoundContent({
@@ -203,9 +213,21 @@ describe('Phase 2 WHOLE_V2 storage & hot-path convergence', () => {
     const syncHydrated = tryResolveTrainingContentBindingSync({
       id: expanded2.attemptId,
       attemptEpoch: 2,
-      trainingContentBinding: { schemaVersion: 2, templateHash: fakeHash },
+      trainingContentBinding: { schemaVersion: 2, templateHash: fakeHash, publicationHash: pubHash },
     })
     expect(syncHydrated.trainingContentBinding).toEqual(expanded2)
+
+    vi.spyOn(publicTemplates, 'get').mockReturnValueOnce({
+      kind: 'TRAINING_CONTENT_BINDING_PLAN',
+      value: { schemaVersion: 1, compositeId, publicationHash: pubHash, units: baseUnits },
+      bytes: 128,
+    })
+    const syncMismatch = tryResolveTrainingContentBindingSync({
+      id: expanded2.attemptId,
+      attemptEpoch: 2,
+      trainingContentBinding: { schemaVersion: 2, templateHash: fakeHash, publicationHash: sha('wrong-pub') },
+    })
+    expect(isCompactTrainingContentBindingRef(syncMismatch.trainingContentBinding)).toBe(true)
   })
 
   it('commits Scale-only WHOLE_V2 FINAL without checkpoint queries, skips duplicate replay check, and runs buildFeedback after finalizeGovernanceInTx', async () => {
@@ -696,8 +718,14 @@ describe('Phase 2 WHOLE_V2 storage & hot-path convergence', () => {
       '../../../prisma/migrations/20261124120000_compact_training_content_binding_v2/migration.sql',
     )
     const migrationSql = fs.readFileSync(migrationPath, 'utf8')
+    expect(migrationSql).toContain('assessment_public_templates_template_kind_check')
+    expect(migrationSql).toContain("'TRAINING_CONTENT_BINDING_PLAN'")
     expect(migrationSql).toContain("schemaVersion'='2' AND NOT (NEW.training_content_binding ? 'units')")
     expect(migrationSql).toContain("schemaVersion'='2' AND NOT (a.training_content_binding ? 'units')")
+    expect(migrationSql).toContain('NEW.training_variant_allocation_encrypted IS NOT NULL')
+    expect(migrationSql).toContain('a.training_variant_allocation_encrypted IS NULL')
+    expect(migrationSql).toContain("(NEW.training_content_binding->>'publicationHash') IS DISTINCT FROM publication.training_content_snapshot_hash")
+    expect(migrationSql).toContain("jsonb_array_length(NEW.training_reference_binding->'units')<>jsonb_array_length(binding_units)")
     expect(migrationSql).toContain("t.template_kind='TRAINING_CONTENT_BINDING_PLAN'")
     expect(migrationSql).toContain('CREATE OR REPLACE FUNCTION guard_training_content_attempt()')
     expect(migrationSql).toContain('CREATE OR REPLACE FUNCTION guard_training_reference_binding()')
@@ -707,7 +735,8 @@ describe('Phase 2 WHOLE_V2 storage & hot-path convergence', () => {
     const overrideYml = fs.readFileSync(overridePath, 'utf8')
     expect(overrideYml).toContain('COMPOSITE_WHOLE_V2_ENABLED: "true"')
     expect(overrideYml).toContain('PRISMA_CONNECTION_POOL_SIZE: "12"')
-    expect(overrideYml).toContain('WHOLE_SUBMIT_ADMISSION_LIMIT: "12"')
+    expect(overrideYml).toContain('WHOLE_SUBMIT_ADMISSION_LIMIT: "9"')
+    expect(overrideYml).not.toContain('WHOLE_SUBMIT_ADMISSION_LIMIT: "12"')
     expect(overrideYml).toContain('shared_buffers=256MB')
     expect(overrideYml).toContain('effective_cache_size=1024MB')
     expect(overrideYml).toContain('PRISMA_CONNECTION_POOL_SIZE: "3"')

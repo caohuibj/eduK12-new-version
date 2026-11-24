@@ -6,7 +6,8 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
 import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
 import type {CanonicalUnitResultEnvelopeV1} from '../assessment-runtime/unit-result'
-import {getContentRelease,prefetchContentReleases,type StoredRelease} from '../measurement-content/repository'
+import * as measurementRepository from '../measurement-content/repository'
+import type {StoredRelease} from '../measurement-content/repository'
 import {ContentReleaseError} from '../measurement-content/release'
 import {interpretContentBinding,FinalInterpretationIdentityError,type FinalInterpretation} from '../measurement-content/final-interpretation'
 import {resolveTrainingContentBindingParent,trainingContentAttemptBindingSchema,trainingMeasurementSourceScopeMatchesForConsumer,tryResolveTrainingContentBindingSync} from './training-content-binding'
@@ -33,6 +34,14 @@ export type TrainingFinalReceipt=z.infer<typeof receiptSchema>
 type Parent=TrainingReferenceParent
 class TrainingFinalContentError extends ContentReleaseError {readonly statusCode=409}
 function fail():never{throw new TrainingFinalContentError('CONTENT_TRAINING_FINAL_IDENTITY_MISMATCH')}
+function resolvePrefetchFn(){
+  try{
+    const fn=measurementRepository.prefetchContentReleases
+    return typeof fn==='function'?fn:undefined
+  }catch{
+    return undefined
+  }
+}
 function decodeBinding(rawParent:Parent,db?:object){
   const parent=tryResolveTrainingContentBindingSync(rawParent,db)
   if(parent.trainingContentBinding==null&&parent.trainingContentBindingHash==null)return null
@@ -79,24 +88,25 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
   }
   const cache=new Map<string,StoredRelease>(),sources:TrainingFinalReceipt['sources']=[]
   const canBatchQuery=typeof (tx as unknown as {$queryRaw?:unknown})?.$queryRaw==='function'
+  const prefetchFn=canBatchQuery?resolvePrefetchFn():undefined
   // Prefetch MEASUREMENT + REPORT releases in 1 ordered FOR SHARE batch query while
   // keeping all REFERENCE reads strictly lazy behind stop guards.
-  if(canBatchQuery){
-    const initialReleaseIds=binding.units.flatMap(unit=>unit.report?.releaseId?[unit.measurement.releaseId,unit.report.releaseId]:[unit.measurement.releaseId])
-    if(initialReleaseIds.length>1||(initialReleaseIds.length===1&&binding.units.some(u=>u.report?.releaseId))){
-      await prefetchContentReleases(tx,cache,initialReleaseIds,true)
+  if(prefetchFn){
+    const initialReleaseIds=[...new Set(binding.units.flatMap(unit=>unit.report?.releaseId?[unit.measurement.releaseId,unit.report.releaseId]:[unit.measurement.releaseId]))]
+    if(initialReleaseIds.length>1){
+      await prefetchFn(tx,cache,initialReleaseIds,true)
     }
   }
   let referencesPrefetched=false
   const readRelease=async(id:string,expectedHash:string)=>{
     let release=cache.get(id)
     if(!release){
-      if(!referencesPrefetched&&selectedReferenceUnitsByReleaseId.has(id)&&canBatchQuery&&selectedReferenceUnitsByReleaseId.size>1){
+      if(!referencesPrefetched&&selectedReferenceUnitsByReleaseId.has(id)&&prefetchFn&&selectedReferenceUnitsByReleaseId.size>1){
         referencesPrefetched=true
-        await prefetchContentReleases(tx,cache,[...selectedReferenceUnitsByReleaseId.keys()],true)
+        await prefetchFn(tx,cache,[...selectedReferenceUnitsByReleaseId.keys()],true)
         release=cache.get(id)
       }
-      if(!release){release=(await getContentRelease(tx,id,true))??undefined;if(release)cache.set(id,release)}
+      if(!release){release=(await measurementRepository.getContentRelease(tx,id,true))??undefined;if(release)cache.set(id,release)}
     }
     if(!release||release.contentHash!==expectedHash)fail()
     const scope=release.scope
