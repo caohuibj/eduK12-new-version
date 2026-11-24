@@ -11,6 +11,7 @@ import {readFrozenCompositionIdentity} from '../assessment-run/educationComposit
 import type {RunResourcePolicy} from '../assessment-run/resourceAuthority'
 import type {ResultDisclosureContractV1} from '../assessment-policy/result-disclosure'
 import {readNativeEducationScaleFeedback,type NativeEducationFeedbackSource} from './education-native-scale-feedback'
+import {getContentReleaseBatch} from '../measurement-content/repository'
 import {reportingFail} from './types'
 import {matchesEducationCompositionRespondent} from '../education-tools/private-tool.composition-contracts'
 
@@ -121,10 +122,27 @@ async function readOrdinaryFeedback(input:ScopedInput){
   }>
  }
  const singleRowFeedback = own.publicationHash
-  ? await tryReadCompositeFinalFeedback<CachedOrdinaryFeedback>(prisma, own.parentId, own.attemptEpoch)
+  ? await tryReadCompositeFinalFeedback<CachedOrdinaryFeedback & {
+      _v2Verify?: { policyHash?: string; manifestHash?: string; releaseIds?: string[] }
+    }>(prisma, own.parentId, own.attemptEpoch)
   : null
  if (singleRowFeedback && singleRowFeedback.kind === 'EDUCATION_FEEDBACK') {
-  return singleRowFeedback
+  const verify = singleRowFeedback._v2Verify
+  let valid = true
+  if (verify) {
+    valid = verify.policyHash === own.policyHash && verify.manifestHash === identity.binding.manifestHash
+    if (valid && verify.releaseIds?.length) {
+      const liveReleases = await getContentReleaseBatch(prisma, verify.releaseIds)
+      valid = verify.releaseIds.every(releaseId => {
+        const release = liveReleases.get(releaseId)
+        return Boolean(release && release.status !== 'REVOKED')
+      })
+    }
+  }
+  if (valid) {
+    const { _v2Verify: _ignored, ...dto } = singleRowFeedback
+    return dto
+  }
  }
  const sources:NativeEducationFeedbackSource[]=[],declaredBlocks=new Set<string>(),nativeBlocks=new Set<string>()
  for(const block of identity.manifest.filter(block=>block.kind==='COGNITIVE'||block.kind==='SJT')){

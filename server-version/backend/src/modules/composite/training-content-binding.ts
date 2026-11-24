@@ -1,3 +1,4 @@
+import { getCachedPublicTemplate, publicTemplatesForDatabase, type PublicTemplateStore } from '../assessment-runtime/public-templates'
 import { appendPublishedStartPlans, type PublishedStartScale } from '../assessment-runtime/published-start-plans'
 import {loadCognitiveProfileArtifact} from '../assessment-authorization/cognitive-profile-artifact'
 import {readTrainingCognitiveTaskBinding,trainingCognitiveTaskBindingSchema} from '../assessment-authorization/training-cognitive-profile-use'
@@ -61,6 +62,93 @@ export type TrainingContentSnapshot=z.infer<typeof trainingContentSnapshotSchema
 export const trainingContentAttemptBindingSchema=trainingContentSnapshotSchema.omit({educationBinding:true}).extend({
  attemptId:text,epoch:z.number().int().positive(),publicationHash:digest,educationComposition:educationCompositionRuntimeAnchorSchema.optional(),
 }).strict()
+export type TrainingContentAttemptBinding=z.infer<typeof trainingContentAttemptBindingSchema>
+export const trainingContentAttemptBindingV2Schema=z.object({schemaVersion:z.literal(2),templateHash:digest}).strict()
+export type TrainingContentAttemptBindingV2=z.infer<typeof trainingContentAttemptBindingV2Schema>
+export const trainingContentBindingTemplateSchema=trainingContentSnapshotSchema.omit({educationBinding:true}).extend({
+ publicationHash:digest,educationComposition:educationCompositionRuntimeAnchorSchema.optional(),
+}).strict()
+export type TrainingContentBindingTemplate=z.infer<typeof trainingContentBindingTemplateSchema>
+
+export const isCompactTrainingContentBindingRef=(value:unknown):value is {schemaVersion:2;templateHash:string}=>
+ Boolean(value&&typeof value==='object'&&!Array.isArray(value)&&(value as {schemaVersion?:unknown}).schemaVersion===2&&!('units'in value))
+
+export function expandTrainingContentBindingFromTemplate(
+ parent:{id:string;attemptEpoch:number},
+ rawTemplate:unknown,
+):TrainingContentAttemptBinding|null{
+ const parsed=trainingContentBindingTemplateSchema.safeParse(rawTemplate)
+ if(!parsed.success)return null
+ const tpl=parsed.data
+ return {
+  schemaVersion:tpl.schemaVersion,
+  compositeId:tpl.compositeId,
+  attemptId:parent.id,
+  epoch:parent.attemptEpoch,
+  publicationHash:tpl.publicationHash,
+  units:tpl.units,
+  ...(tpl.educationComposition?{educationComposition:tpl.educationComposition}:{}),
+  ...(tpl.artifactsRequired!==undefined?{artifactsRequired:tpl.artifactsRequired}:{}),
+ }
+}
+
+/** Resolves a compact V2 `{ schemaVersion: 2, templateHash }` reference
+ * synchronously from the committed `publicTemplates` LRU cache when available.
+ * V1 inline bindings and uncached misses return the input unchanged so callers
+ * either succeed synchronously or hydrate asynchronously via `resolveTrainingContentBindingParent`. */
+export function tryResolveTrainingContentBindingSync<T extends {id:string;attemptEpoch:number;trainingContentBinding:unknown}>(
+ parent:T,
+ db?:object,
+):T{
+ const raw=parent.trainingContentBinding
+ if(!isCompactTrainingContentBindingRef(raw))return parent
+ const parsed=trainingContentAttemptBindingV2Schema.safeParse(raw)
+ if(!parsed.success)return parent
+ const template=getCachedPublicTemplate(parsed.data.templateHash,'TRAINING_CONTENT_BINDING_PLAN',db)
+ if(!template)return parent
+ const expanded=expandTrainingContentBindingFromTemplate(parent,template)
+ return expanded?{...parent,trainingContentBinding:expanded}:parent
+}
+
+/** Async hydrator for cold-cache compact V2 bindings across reads and FINAL paths. */
+export async function resolveTrainingContentBindingParent<T extends {id:string;attemptEpoch:number;trainingContentBinding:unknown}>(
+ db:Pick<Prisma.TransactionClient,'$queryRaw'>|undefined,
+ parent:T,
+ templates?:PublicTemplateStore,
+):Promise<T>{
+ const resolvedSync=tryResolveTrainingContentBindingSync(parent,db)
+ if(resolvedSync!==parent)return resolvedSync
+ const raw=parent.trainingContentBinding
+ if(!isCompactTrainingContentBindingRef(raw))return parent
+ const parsed=trainingContentAttemptBindingV2Schema.safeParse(raw)
+ if(!parsed.success)return parent
+ const store=templates??publicTemplatesForDatabase(db)
+ const [loaded]=await store.loadMany([{hash:parsed.data.templateHash,kind:'TRAINING_CONTENT_BINDING_PLAN'}])
+ const expanded=expandTrainingContentBindingFromTemplate(parent,loaded)
+ return expanded?{...parent,trainingContentBinding:expanded}:parent
+}
+
+/** Stores the attempt-independent binding payload once in `assessment_public_templates`
+ * and emits the compact `{ schemaVersion: 2, templateHash }` reference alongside the
+ * exact expanded canonical hash so downstream receipts and integrity checks stay unchanged. */
+export async function saveCompactTrainingContentBinding(
+ db:Pick<Prisma.TransactionClient,'$queryRaw'>|undefined,
+ expandedBinding:TrainingContentAttemptBinding,
+ templates?:PublicTemplateStore,
+):Promise<{storedBinding:TrainingContentAttemptBindingV2;bindingHash:string;expandedBinding:TrainingContentAttemptBinding}>{
+ const bindingHash=canonicalHash(expandedBinding)
+ const template:TrainingContentBindingTemplate={
+  schemaVersion:expandedBinding.schemaVersion,
+  compositeId:expandedBinding.compositeId,
+  publicationHash:expandedBinding.publicationHash,
+  units:expandedBinding.units,
+  ...(expandedBinding.educationComposition?{educationComposition:expandedBinding.educationComposition}:{}),
+  ...(expandedBinding.artifactsRequired!==undefined?{artifactsRequired:expandedBinding.artifactsRequired}:{}),
+ }
+ const store=templates??publicTemplatesForDatabase(db)
+ const [templateHash]=await store.saveMany([{kind:'TRAINING_CONTENT_BINDING_PLAN',value:template}])
+ return {storedBinding:{schemaVersion:2,templateHash},bindingHash,expandedBinding}
+}
 type Unit=TrainingContentSnapshot['units'][number]
 /** Ordinary single Scale units: the only units that carry a publish-time
  * static artifact. Education, private, library-education and standard

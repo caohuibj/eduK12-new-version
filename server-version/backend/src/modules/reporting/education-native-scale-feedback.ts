@@ -26,6 +26,79 @@ export type PreloadedNativeEducationScaleData={
 }
 type Parent=Pick<CompositeAssessmentAttempt,'id'|'status'|'userId'|'subjectUserId'|'respondentUserId'|'attemptEpoch'|'contextSnapshotHash'|'frozenActiveSlotSetEncrypted'|'frozenActiveSlotSetHash'>&{publicationHash?:string|null}
 function hidden():never{return reportingFail('REPORT_NOT_FOUND','reporting resource not found',404)}
+
+export function projectSingleNativeEducationScaleUnit(input:{
+  actorUserId:string
+  contextSnapshotHash:string|null
+  sourceAttemptId:string
+  completedAt:Date
+  source:NativeEducationFeedbackSource
+  slot:CompositePublicationScaleSlot
+  scaleResult:any
+  canonicalEnvelope:CanonicalUnitResultEnvelopeV1
+}):ReturnType<typeof projectEducationScaleIndividualReport>{
+  const {source,slot,scaleResult,canonicalEnvelope}=input
+  const core=canonicalEnvelope.core
+  if(
+    slot.scaleId!==source.scaleId
+    ||slot.definitionHash!==source.sourceDefinitionHash
+    ||core.unitType!=='SCALE'
+    ||core.sourceDefinitionHash!==source.sourceDefinitionHash
+    ||core.compiledRuntimeHash!==slot.compiledRuntime.compiledRuntimeHash
+    ||core.contextHash!==(input.contextSnapshotHash??null)
+  )hidden()
+  const contentAudience=slot.definition.report.audienceContract?.audience
+  if(
+    !(contentAudience==='student'||contentAudience==='teacher')
+    ||scaleResult.method.reportAudience!==contentAudience
+    ||scaleResult.method.reportVersion!==slot.definition.report.reportVersion
+  )hidden()
+  const report=buildScaleUnitReport({
+    assessmentId:input.sourceAttemptId,
+    itemId:source.itemId,
+    scaleId:source.scaleId,
+    scaleCode:scaleResult.instrument.code,
+    scaleName:scaleResult.instrument.name||source.title,
+    result:scaleResult,
+    completedAt:input.completedAt,
+    totalTime:null,
+  })
+  if(
+    !report.result
+    ||report.decryptError
+    ||core.metrics.length!==report.result.scores.length
+    ||report.result.scores.some(score=>!core.metrics.some(metric=>metric.key===score.key&&metric.value===score.value&&metric.quality===score.status))
+    ||core.quality.status!==report.result.quality.status
+  )hidden()
+  const full=DISCLOSURE_PRESETS.FULL_REPORT()
+  const projected=narrowAndProjectEducationScaleReport({
+    report,
+    resultDisclosure:source.resultDisclosure,
+    resultAudience:'RESPONDENT',
+    contentAudience,
+    context:{
+      principalId:input.actorUserId,
+      audience:'respondent',
+      purpose:'report',
+      accessDecision:{source:'RESOURCE_AUTHORIZATION',allowed:true,capabilities:full},
+      frozenPolicy:slot.compiledPolicy
+        ?scaleProjectionPolicyFromCompiled(slot.compiledPolicy)
+        :educationLibraryV1ProjectionPolicy(),
+      currentRestrictions:full,
+      relationalDisposition:'INDIVIDUAL_ALLOWED',
+    },
+  })
+  if(projected.state==='PROJECTED'&&'privateVersion'in source){
+    const refs=privateToolImageReferences('SCALE',slot.definition).reports
+    for(const unit of projected.unitReports){
+      if('rawScoreFeedback'in unit&&unit.rawScoreFeedback?.some((feedback:NonNullable<ScaleUnitReport['rawScoreFeedback']>[number])=>
+        feedback.images?.some(image=>!refs.some(ref=>ref.assetId===image.asset.assetId&&ref.contentHash===image.asset.contentHash&&ref.mimeType===image.asset.mimeType)))){
+        hidden()
+      }
+    }
+  }
+  return projected
+}
 /** Already authorized respondent + immutable sources only. Batch canonical
  * facts once and share the reader across native projections. NONE units never
  * load/decrypt child results. This helper does no scoring or source rebuilding. */
@@ -56,71 +129,21 @@ export async function readNativeEducationScaleFeedback(tx:Prisma.TransactionClie
         .map(s => [s.slotKey, s]),
     )
     const bySlot = new Map(v2ScaleRead.snapshots.map(snap => [snap.slotKey, snap]))
-    const full = DISCLOSURE_PRESETS.FULL_REPORT()
     for (const source of allowed) {
       const slotKey = compositeItemSlotKey(source.itemId, 'SCALE')
       const snap = bySlot.get(slotKey)
       const slot = slotByKey.get(slotKey)
       if (!snap || !snap.scaleResult || !snap.canonicalEnvelope || !slot) hidden()
-      const core = snap.canonicalEnvelope.core
-      if (
-        slot.scaleId !== source.scaleId
-        || slot.definitionHash !== source.sourceDefinitionHash
-        || core.unitType !== 'SCALE'
-        || core.sourceDefinitionHash !== source.sourceDefinitionHash
-        || core.compiledRuntimeHash !== slot.compiledRuntime.compiledRuntimeHash
-        || core.contextHash !== (parent.contextSnapshotHash ?? null)
-      ) hidden()
-      const contentAudience = slot.definition.report.audienceContract?.audience
-      if (
-        !(contentAudience === 'student' || contentAudience === 'teacher')
-        || snap.scaleResult.method.reportAudience !== contentAudience
-        || snap.scaleResult.method.reportVersion !== slot.definition.report.reportVersion
-      ) hidden()
-      const report = buildScaleUnitReport({
-        assessmentId: snap.sourceAttemptId,
-        itemId: source.itemId,
-        scaleId: source.scaleId,
-        scaleCode: snap.scaleResult.instrument.code,
-        scaleName: snap.scaleResult.instrument.name || source.title,
-        result: snap.scaleResult,
+      output.set(source.itemId, projectSingleNativeEducationScaleUnit({
+        actorUserId: input.actorUserId,
+        contextSnapshotHash: parent.contextSnapshotHash ?? null,
+        sourceAttemptId: snap.sourceAttemptId,
         completedAt: snap.completedAt,
-        totalTime: null,
-      })
-      if (
-        !report.result
-        || report.decryptError
-        || core.metrics.length !== report.result.scores.length
-        || report.result.scores.some(score => !core.metrics.some(metric => metric.key === score.key && metric.value === score.value && metric.quality === score.status))
-        || core.quality.status !== report.result.quality.status
-      ) hidden()
-      const projected = narrowAndProjectEducationScaleReport({
-        report,
-        resultDisclosure: source.resultDisclosure,
-        resultAudience: 'RESPONDENT',
-        contentAudience,
-        context: {
-          principalId: input.actorUserId,
-          audience: 'respondent',
-          purpose: 'report',
-          accessDecision: { source: 'RESOURCE_AUTHORIZATION', allowed: true, capabilities: full },
-          frozenPolicy: slot.compiledPolicy
-            ? scaleProjectionPolicyFromCompiled(slot.compiledPolicy)
-            : educationLibraryV1ProjectionPolicy(),
-          currentRestrictions: full,
-          relationalDisposition: 'INDIVIDUAL_ALLOWED',
-        },
-      })
-      if (projected.state === 'PROJECTED' && 'privateVersion' in source) {
-        const refs = privateToolImageReferences('SCALE', slot.definition).reports
-        for (const unit of projected.unitReports) {
-          if ('rawScoreFeedback' in unit && unit.rawScoreFeedback?.some((feedback: NonNullable<ScaleUnitReport['rawScoreFeedback']>[number]) =>
-            feedback.images?.some(image => !refs.some(ref => ref.assetId === image.asset.assetId && ref.contentHash === image.asset.contentHash && ref.mimeType === image.asset.mimeType)))) {
-            hidden()
-          }
-        }
-      }
-      output.set(source.itemId, projected)
+        source,
+        slot,
+        scaleResult: snap.scaleResult,
+        canonicalEnvelope: snap.canonicalEnvelope,
+      }))
     }
     return output
   }

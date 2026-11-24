@@ -4,10 +4,12 @@ import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {readPrivateFormRuntimeResource} from '../education-tools/private-tool.form-runtime-resources'
+import {matchesEducationCompositionRespondent} from '../education-tools/private-tool.composition-contracts'
 import {relationalEntryToRunPolicy,type RunResourcePolicy} from './resourceAuthority'
-import {lockExecutionEnvelope} from './startClaim'
-import {assertCurrentRunStartAuthority} from './startAuthority'
-import {readCompositionExecutionSource,assertCompositionCollection} from './educationCompositionExecution'
+import {lockExecutionEnvelope,type ExecutionLockRow,type RunExecutionLockIdentity} from './startClaim'
+import {assertCurrentRunStartAuthority,type StartAuthorityKnownEnvelope} from './startAuthority'
+import type {RunPopulationProductScope} from './currentPopulationAuthority'
+import {readCompositionExecutionSource,assertCompositionCollection,type FrozenCompositionIdentity} from './educationCompositionExecution'
 
 export class PrivateFormExecutionError extends Error {
  constructor(public readonly code:string,public readonly statusCode=409){super('私有表单的任务或固定版本不匹配');this.name='PrivateFormExecutionError'}
@@ -71,9 +73,82 @@ export async function assertPrivateFormParentSource(parentId:string,db:Prisma.Tr
 /** Called BEFORE parent/section locks in the actual FINAL transaction. It uses
  * existing org -> Run -> execution fences and server-verified query-time account
  * checks; it never takes a user SHARE after org or consults author privileges. */
-export async function assertPrivateFormFinalCurrent(tx:Prisma.TransactionClient,input:{attemptId:string;actorUserId:string|null|undefined}){
- const parent=await tx.compositeAssessmentAttempt.findUnique({where:{id:input.attemptId},select:{id:true,userId:true,assignmentRef:true,compositeAssessmentId:true,
-  compositeAssessment:{select:{creationKey:true}}}})
+export type KnownPrivateFormFinalParent = {
+ id:string
+ userId:string|null
+ subjectUserId:string|null
+ respondentUserId:string|null
+ assignmentRef:string|null
+ consentId:string|null
+ compositeAssessmentId:string
+ compositeAssessment:{creationKey:string|null}
+}
+
+export type KnownPrivateFormExecutionIdentity = RunExecutionLockIdentity & {
+ executionId:string
+}
+
+function knownEnvelopeFromLockRow(row:Partial<ExecutionLockRow>|undefined):StartAuthorityKnownEnvelope|undefined{
+ if(!row||!row.executionId||!row.organizationId||!row.runId||!row.trackId||!row.executionStatus
+  ||!row.orgStatus||!row.orgProductDomain||!row.subjectActorSnapshotId||!row.respondentActorSnapshotId
+  ||!row.subjectUserId||!row.subjectRole||!row.subjectProvenance||!row.respondentUserId
+  ||!row.respondentRole||!row.respondentProvenance||!row.relationshipKind
+  ||!row.trackResourceFamily||!row.trackResourceKey||!row.trackResourceVersion){
+  return undefined
+ }
+ return {
+  executionId:row.executionId,
+  organizationId:row.organizationId,
+  runId:row.runId,
+  trackId:row.trackId,
+  executionStatus:row.executionStatus,
+  orgStatus:row.orgStatus,
+  orgProductDomain:row.orgProductDomain,
+  subjectActorSnapshotId:row.subjectActorSnapshotId,
+  respondentActorSnapshotId:row.respondentActorSnapshotId,
+  subjectUserId:row.subjectUserId,
+  subjectRole:row.subjectRole,
+  subjectProvenance:row.subjectProvenance,
+  subjectMembershipId:row.subjectMembershipId??null,
+  subjectPersonaGrantId:row.subjectPersonaGrantId??null,
+  respondentUserId:row.respondentUserId,
+  respondentRole:row.respondentRole,
+  respondentProvenance:row.respondentProvenance,
+  respondentMembershipId:row.respondentMembershipId??null,
+  respondentPersonaGrantId:row.respondentPersonaGrantId??null,
+  relationshipKind:row.relationshipKind,
+  relationshipRef:row.relationshipRef??null,
+  relationshipCourseId:row.relationshipCourseId??null,
+  relationshipStudentClassAssignmentId:row.relationshipStudentClassAssignmentId??null,
+  relationshipStaffClassAssignmentId:row.relationshipStaffClassAssignmentId??null,
+  relationshipClassUnitId:row.relationshipClassUnitId??null,
+  trackResourceFamily:row.trackResourceFamily,
+  trackResourceKey:row.trackResourceKey,
+  trackResourceVersion:row.trackResourceVersion,
+  intakeDeadline:row.intakeDeadline??null,
+  hasCampusActivity:row.hasCampusActivity,
+  hasHuiteacherLink:row.hasHuiteacherLink,
+ }
+}
+
+function productScopeFromLockRow(row:Partial<ExecutionLockRow>|undefined):RunPopulationProductScope|undefined{
+ if(!row?.executionId)return undefined
+ if(row.hasCampusActivity===true&&row.hasHuiteacherLink===false)return 'CAMPUS_ONLY'
+ if(row.hasHuiteacherLink===true&&row.hasCampusActivity===false)return 'HUITEACHER_ONLY'
+ return 'ALL'
+}
+
+export async function assertPrivateFormFinalCurrent(tx:Prisma.TransactionClient,input:{
+ attemptId:string
+ actorUserId:string|null|undefined
+ knownParent?:KnownPrivateFormFinalParent
+ knownExecution?:KnownPrivateFormExecutionIdentity
+ knownCompositionIdentity?:FrozenCompositionIdentity
+}){
+ const parent=input.knownParent&&input.knownParent.id===input.attemptId
+  ?input.knownParent
+  :await tx.compositeAssessmentAttempt.findUnique({where:{id:input.attemptId},select:{id:true,userId:true,subjectUserId:true,respondentUserId:true,assignmentRef:true,consentId:true,compositeAssessmentId:true,
+   compositeAssessment:{select:{creationKey:true}}}})
  if(!parent)return
  if(parent.compositeAssessment.creationKey?.endsWith(':TEACHER:EXPERT_REPORT:2.0.0')){
   const {currentFieldComposition}=await import('../huiteacher/fieldComposition.authority')
@@ -84,16 +159,67 @@ export async function assertPrivateFormFinalCurrent(tx:Prisma.TransactionClient,
  const composition=parent?.compositeAssessment.creationKey?.startsWith('education-composition:')
  if(!composition&&!parent?.compositeAssessment.creationKey?.startsWith('private-form:'))return
  if(!input.actorUserId||parent.userId!==input.actorUserId||!parent.assignmentRef)fail()
- const [execution]=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM assessment_run_executions WHERE relational_assignment_id=${parent.assignmentRef}`
- if(!execution)fail()
- await lockExecutionEnvelope(tx,execution.id)
- if(composition){
-  const source=await readCompositionExecutionSource(tx,{executionId:execution.id,parentAttemptId:parent.id,actorUserId:input.actorUserId,compositeId:parent.compositeAssessmentId})
+ let executionId=input.knownExecution?.executionId
+ if(!executionId){
+  const [execution]=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM assessment_run_executions WHERE relational_assignment_id=${parent.assignmentRef}`
+  if(!execution)fail()
+  executionId=execution.id
+ }
+ const locked=(input.knownExecution
+  ?await lockExecutionEnvelope(tx,executionId,input.knownExecution)
+  :await lockExecutionEnvelope(tx,executionId)) as Partial<ExecutionLockRow>|undefined
+ const id=input.knownCompositionIdentity
+ const assignmentRow=locked?.assignmentRow
+ const canUseLockedComposition=Boolean(
+  composition&&id&&locked?.executionId&&assignmentRow&&locked.policyDomain==='ORGANIZATION_RUN'
+  &&locked.runStatus&&['PUBLISHED','CLOSED'].includes(locked.runStatus)
+  &&locked.executionStatus&&['ASSIGNED','STARTED','COMPLETED'].includes(locked.executionStatus)
+  &&['OPEN','STARTED','COMPLETED'].includes(assignmentRow.status)
+  &&locked.respondentUserId===input.actorUserId
+  &&locked.runtimeBindingKind==='COMPOSITE'&&locked.runtimeBindingRef===parent.id
+  &&locked.relationalAssignmentId===parent.assignmentRef
+  &&parent.userId===locked.respondentUserId&&parent.subjectUserId===locked.subjectUserId&&parent.respondentUserId===locked.respondentUserId
+  &&locked.trackResourceFamily==='BUNDLE'&&locked.trackResourceKey===id.policy.key
+  &&locked.trackResourceVersion===id.policy.version&&locked.trackResourcePolicyHash===id.policyHash
+  &&locked.organizationId===id.origin.organizationId&&id.compositeId===parent.compositeAssessmentId
+  &&locked.hasCampusActivity!==locked.hasHuiteacherLink
+  &&id.origin.entry===(locked.hasCampusActivity?'SCHOOL':'TEACHER')
+  &&assignmentRow.analysisMode==='INDIVIDUAL_ONLY'
+  &&locked.subjectRole===(locked.hasCampusActivity?'STUDENT':'TEACHER')
+  &&(locked.hasCampusActivity||(locked.respondentRole==='TEACHER'))
+  &&matchesEducationCompositionRespondent(id.origin,{
+   subjectUserId:assignmentRow.subjectUserId,respondentUserId:assignmentRow.respondentUserId,
+   subjectRole:assignmentRow.subjectRole,respondentRole:assignmentRow.respondentRole,
+   relationshipKind:assignmentRow.relationshipKind,perspective:assignmentRow.perspective,
+  })
+ )
+ const lockedExecutionId=locked?.executionId??executionId
+ if(canUseLockedComposition&&id){
+  await assertCompositionCollection(tx,id,'BOUND_COLLECTION',true,undefined,id)
+ }else if(composition){
+  const source=await readCompositionExecutionSource(tx,{executionId:lockedExecutionId,parentAttemptId:parent.id,actorUserId:input.actorUserId,compositeId:parent.compositeAssessmentId})
   await assertCompositionCollection(tx,source.identity,'BOUND_COLLECTION',true)
- }else await readPrivateFormExecutionSource(tx,{executionId:execution.id,parentAttemptId:parent.id,actorUserId:input.actorUserId,compositeId:parent.compositeAssessmentId})
- await assertCurrentRunStartAuthority(tx,execution.id,{accountMode:'DETECT_EDUCATION_LIBRARY',operation:'BOUND_FINAL'})
- await createRelationalRuntimeConsentAuthority({db:tx as any,assignments:createSqlRelationalAssignmentRepository(tx as any)})
-  .assertCompositeFinal(input.attemptId,input.actorUserId)
+ }else await readPrivateFormExecutionSource(tx,{executionId:lockedExecutionId,parentAttemptId:parent.id,actorUserId:input.actorUserId,compositeId:parent.compositeAssessmentId})
+ const knownEnvelope=knownEnvelopeFromLockRow(locked)
+ const productScope=productScopeFromLockRow(locked)
+ await assertCurrentRunStartAuthority(tx,lockedExecutionId,{
+  accountMode:'DETECT_EDUCATION_LIBRARY',
+  operation:'BOUND_FINAL',
+  ...(knownEnvelope?{knownEnvelope}:{}),
+  ...(productScope?{productScope}:{}),
+ })
+ const preloadedConsent=locked?.executionId&&parent.consentId!==undefined
+  ?{id:parent.id,userId:parent.userId,assignmentRef:parent.assignmentRef,consentId:parent.consentId}
+  :undefined
+ const preloadedAssignment=assignmentRow&&assignmentRow.id===parent.assignmentRef
+  ?{...assignmentRow,assignmentId:assignmentRow.id}
+  :undefined
+ const consentAuthority=createRelationalRuntimeConsentAuthority({db:tx as any,assignments:createSqlRelationalAssignmentRepository(tx as any)})
+ if(preloadedConsent!==undefined){
+  await consentAuthority.assertCompositeFinal(input.attemptId,input.actorUserId,preloadedConsent,preloadedAssignment)
+ }else{
+  await consentAuthority.assertCompositeFinal(input.attemptId,input.actorUserId)
+ }
 }
 
 /** Exact section ownership before ensureCompositeSectionAttempt can create any

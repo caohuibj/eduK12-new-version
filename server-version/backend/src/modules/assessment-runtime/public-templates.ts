@@ -6,11 +6,17 @@ import { BoundedArtifactCache } from './bounded-artifact-cache'
 import { canonicalHash, canonicalJsonBytes, retainImmutableCanonicalValue } from './canonical'
 import { decryptCompactField, encryptCompactField } from './compact-field-codec'
 
-export type PublicTemplateKind = 'SCALE_RESULT_BASE' | 'SCALE_REFERENCE' | 'SCALE_INTERPRETATION' | 'SCALE_CAVEATS' | 'SCALE_CANONICAL_LAYOUT' | 'COMPOSITE_REPORT_LAYOUT' | 'UNIT_ADMISSION_PLAN' | 'FROZEN_SLOT_PLAN' | 'WHOLE_VALIDATION_PLAN' | 'COGNITIVE_PROFILE_CONFIGURATION' | 'SCALE_RUNTIME_POLICY_PLAN' | 'SCALE_FACTS_BUNDLE' | 'COMPOSITE_PUBLICATION_PLAN'
+export type PublicTemplateKind = 'SCALE_RESULT_BASE' | 'SCALE_REFERENCE' | 'SCALE_INTERPRETATION' | 'SCALE_CAVEATS' | 'SCALE_CANONICAL_LAYOUT' | 'COMPOSITE_REPORT_LAYOUT' | 'UNIT_ADMISSION_PLAN' | 'FROZEN_SLOT_PLAN' | 'WHOLE_VALIDATION_PLAN' | 'COGNITIVE_PROFILE_CONFIGURATION' | 'SCALE_RUNTIME_POLICY_PLAN' | 'SCALE_FACTS_BUNDLE' | 'COMPOSITE_PUBLICATION_PLAN' | 'TRAINING_CONTENT_BINDING_PLAN'
 export type PublicTemplateRow = { templateHash: string; templateKind: PublicTemplateKind; plaintextBytes: number; payloadEncrypted: string }
 export interface PublicTemplateRepository { read(hashes: string[]): Promise<PublicTemplateRow[]>; append(rows: PublicTemplateRow[]): Promise<void> }
 const MAX_BYTES = 2 * 1024 * 1024
-const kinds = new Set<PublicTemplateKind>(['SCALE_RESULT_BASE', 'SCALE_REFERENCE', 'SCALE_INTERPRETATION', 'SCALE_CAVEATS', 'SCALE_CANONICAL_LAYOUT', 'COMPOSITE_REPORT_LAYOUT', 'UNIT_ADMISSION_PLAN', 'FROZEN_SLOT_PLAN', 'WHOLE_VALIDATION_PLAN', 'COGNITIVE_PROFILE_CONFIGURATION', 'SCALE_RUNTIME_POLICY_PLAN', 'SCALE_FACTS_BUNDLE', 'COMPOSITE_PUBLICATION_PLAN'])
+const kinds = new Set<PublicTemplateKind>(['SCALE_RESULT_BASE', 'SCALE_REFERENCE', 'SCALE_INTERPRETATION', 'SCALE_CAVEATS', 'SCALE_CANONICAL_LAYOUT', 'COMPOSITE_REPORT_LAYOUT', 'UNIT_ADMISSION_PLAN', 'FROZEN_SLOT_PLAN', 'WHOLE_VALIDATION_PLAN', 'COGNITIVE_PROFILE_CONFIGURATION', 'SCALE_RUNTIME_POLICY_PLAN', 'SCALE_FACTS_BUNDLE', 'COMPOSITE_PUBLICATION_PLAN', 'TRAINING_CONTENT_BINDING_PLAN'])
+const isStartReusableTemplateKind = (kind: PublicTemplateKind): boolean =>
+  kind === 'FROZEN_SLOT_PLAN'
+  || kind === 'UNIT_ADMISSION_PLAN'
+  || kind === 'SCALE_RUNTIME_POLICY_PLAN'
+  || kind === 'COMPOSITE_PUBLICATION_PLAN'
+  || kind === 'TRAINING_CONTENT_BINDING_PLAN'
 const hashOfBytes = (kind: PublicTemplateKind, valueBytes: Buffer): string =>
   createHash('sha256')
     .update(`{"kind":${JSON.stringify(kind)},"storageVersion":1,"value":`)
@@ -61,7 +67,7 @@ export const createPublicTemplateStore = (
       return hash
     })
     if (readPublishedStartPlans && pending.size
-      && [...pending.values()].every(row => row.templateKind === 'FROZEN_SLOT_PLAN' || row.templateKind === 'UNIT_ADMISSION_PLAN' || row.templateKind === 'SCALE_RUNTIME_POLICY_PLAN' || row.templateKind === 'COMPOSITE_PUBLICATION_PLAN')) {
+      && [...pending.values()].every(row => isStartReusableTemplateKind(row.templateKind))) {
       for (const row of await repository.read([...pending.keys()])) {
         if (!pending.delete(row.templateHash)) throw new Error('Public template lookup returned an unrelated row')
         decode(row)
@@ -98,6 +104,13 @@ const repository: PublicTemplateRepository = {
 }
 export const publicTemplates = createPublicTemplateStore(repository)
 export type PublicTemplateStore = Pick<ReturnType<typeof createPublicTemplateStore>, 'saveMany' | 'loadMany'>
+
+export function getCachedPublicTemplate<T = unknown>(hash: string, kind: PublicTemplateKind, db?: object): T | undefined {
+  const txStore = db && db !== prisma ? transactionStores.get(db) : undefined
+  const entry = txStore?.get(hash) ?? publicTemplates.get(hash)
+  if (entry && entry.kind === kind) return entry.value as T
+  return undefined
+}
 
 // Templates are append-only. Transactions can consume proofs from committed
 // templates; rows first observed in a transaction stay local until it commits.
@@ -146,7 +159,7 @@ export const publicTemplatesForDatabase = (db?: Pick<Prisma.TransactionClient,'$
         payload_encrypted AS "payloadEncrypted" FROM assessment_public_templates WHERE template_hash IN (${Prisma.join(hashes)})`)
     const pending = pendingStartTemplates.get(db)
     if (pending) for (const row of rows) {
-      if (row.templateKind === 'FROZEN_SLOT_PLAN' || row.templateKind === 'UNIT_ADMISSION_PLAN' || row.templateKind === 'SCALE_RUNTIME_POLICY_PLAN' || row.templateKind === 'COMPOSITE_PUBLICATION_PLAN') pending.add(row.templateHash)
+      if (isStartReusableTemplateKind(row.templateKind)) pending.add(row.templateHash)
     }
     return rows
   },

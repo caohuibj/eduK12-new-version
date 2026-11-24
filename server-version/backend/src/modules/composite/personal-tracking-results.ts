@@ -5,7 +5,7 @@ import {loadStoredCanonicalUnitResults} from '../assessment-runtime/compact-asse
 import {extractCompositeFinalFormValues,readCompositeFinalUnitSnapshots} from '../assessment-runtime/composite-final.bridge'
 import type {PersonalLeafResult,PersonalTrackingPlan} from '../reporting/personal-tracking'
 import {getContentRelease} from '../measurement-content/repository'
-import {trainingContentAttemptBindingSchema} from './training-content-binding'
+import {resolveTrainingContentBindingParent,trainingContentAttemptBindingSchema} from './training-content-binding'
 import {decodeTrainingFinalReceipt} from './training-content-final'
 import {loadTrainingMetricDisclosure} from './training-metric-disclosure'
 import {evaluateTrainingFeedbackForAttempt} from './training-feedback-binding'
@@ -22,7 +22,8 @@ function fail():never{throw compositeForbidden('本人变化来源不可访问')
 export async function readTrainingPersonalLeafs(db:Prisma.TransactionClient,input:{
  scopedSubjectId:string;plan:PersonalTrackingPlan;parents:any[]
 }):Promise<PersonalLeafResult[]>{
- const selected=input.parents.map(parent=>{
+ const parents=await Promise.all(input.parents.map(parent=>resolveTrainingContentBindingParent(db,parent)))
+ const selected=parents.map(parent=>{
   const tracking=readTrainingTracking(parent.compositeAssessment.personalTracking)
   const binding=parent.trainingContentBinding==null?null:trainingContentAttemptBindingSchema.parse(parent.trainingContentBinding)
   const receipt=decodeTrainingFinalReceipt(parent)

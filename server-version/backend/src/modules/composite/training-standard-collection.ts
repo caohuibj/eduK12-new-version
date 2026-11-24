@@ -1,6 +1,7 @@
 import {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {ContentReleaseError} from '../measurement-content/release'
+import {isCompactTrainingContentBindingRef,resolveTrainingContentBindingParent} from './training-content-binding'
 import {trainingBoundContent} from './training-reference-binding'
 import {verifyStoredTrainingStandardItem} from './training-standard-combination'
 import {readTrainingStandardContentIdentity} from './training-standard-content'
@@ -16,24 +17,39 @@ export async function assertTrainingStandardCollectionAllowed(tx:Prisma.Transact
   AND (EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=a.composite_assessment_id
    AND i.standard_combination_source IS NOT NULL AND i.scale_id=ANY(${[...scaleIds]}::text[])
    ${itemIds.length?Prisma.sql`AND i.id=ANY(${[...itemIds]}::text[])`:Prisma.empty})
-   OR EXISTS(SELECT 1 FROM jsonb_array_elements(COALESCE(a.training_content_binding->'units','[]'::jsonb)) u
+   OR EXISTS(SELECT 1 FROM jsonb_array_elements(COALESCE(
+    CASE WHEN a.training_content_binding->>'schemaVersion'='2' AND NOT (a.training_content_binding ? 'units')
+     THEN (SELECT c.training_content_snapshot->'units' FROM composite_assessments c WHERE c.id=a.composite_assessment_id)
+     ELSE a.training_content_binding->'units' END,
+    '[]'::jsonb)) u
     WHERE u#>'{source,standardCombination}' IS NOT NULL AND u#>>'{source,id}'=ANY(${[...scaleIds]}::text[])
     ${itemIds.length?Prisma.sql`AND u->>'itemId'=ANY(${[...itemIds]}::text[])`:Prisma.empty})) FOR SHARE OF a`)
  if(!header)return new Set<string>()
- const parent=await tx.compositeAssessmentAttempt.findUnique({where:{id:parentId},include:{scaleAssessments:{select:{compositeItemId:true,attemptEpoch:true,scaleId:true}},
+ const rawParent=await tx.compositeAssessmentAttempt.findUnique({where:{id:parentId},include:{scaleAssessments:{select:{compositeItemId:true,attemptEpoch:true,scaleId:true}},
   compositeAssessment:{include:{questionnaireCourses:true,items:{include:{scale:true}}}}}})
- if(!parent)throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_PARENT_MISSING')
+ if(!rawParent)throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_PARENT_MISSING')
+ const wasCompact=isCompactTrainingContentBindingRef(rawParent.trainingContentBinding)
+ const parent=await resolveTrainingContentBindingParent(tx,rawParent)
  const materializingScaleId=verifiedFlowMaterialization
   ?assertVerifiedTrainingFlowScaleMaterialization(tx,verifiedFlowMaterialization,{compositeAttemptId:parentId,
    compositeAttemptEpoch:parent.attemptEpoch,compositeItemIds:itemIds,scaleIds}):null
  if(materializingScaleId&&parent.status!=='IN_PROGRESS')throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_CHILD_IDENTITY_REQUIRED')
- const content=trainingBoundContent(parent)
+ const content=trainingBoundContent(parent,tx)
  if(!content)throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_BINDING_REQUIRED')
  const selectedIds=itemIds.length?itemIds:parent.scaleAssessments.filter(a=>a.attemptEpoch===parent.attemptEpoch&&scaleIds.includes(a.scaleId)).map(a=>a.compositeItemId)
  const selectedItems=parent.compositeAssessment.items.filter(item=>selectedIds.includes(item.id)&&scaleIds.includes(item.scaleId!))
  const standardIds=new Set([...selectedItems.filter(item=>item.standardCombinationSource!=null).map(item=>item.id),
   ...content.units.filter(unit=>selectedIds.includes(unit.itemId)&&scaleIds.includes(unit.source.id)&&unit.source.standardCombination).map(unit=>unit.itemId)])
- if(!standardIds.size)throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_CHILD_IDENTITY_REQUIRED')
+ if(!standardIds.size){
+  // Compact V2 checked the shared publication snapshot in SQL; if no standard-combination
+  // unit matches the requested scaleIds in this attempt's actual binding (and no selected item
+  // carries a legacy standardCombinationSource), no standard combination applies to this attempt.
+  if(wasCompact&&!selectedItems.some(item=>item.standardCombinationSource!=null)
+   &&!content.units.some(unit=>unit.source.standardCombination&&scaleIds.includes(unit.source.id)&&(itemIds.length===0||itemIds.includes(unit.itemId)))){
+   return new Set<string>()
+  }
+  throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_CHILD_IDENTITY_REQUIRED')
+ }
  if(acceptedReceipt){
   // This is an existing durable FINAL, not a new use. The internal worker's
   // receipt must still own a CURRENT matching DB lease; no client skip flag.

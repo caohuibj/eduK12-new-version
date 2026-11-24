@@ -5,7 +5,7 @@ import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
 import {loadStoredCanonicalUnitResults} from '../assessment-runtime/compact-assessment-storage'
 import {readCompositeFinalUnitSnapshots} from '../assessment-runtime/composite-final.bridge'
 import {decodeTrainingFinalReceipt} from '../composite/training-content-final'
-import {trainingContentSnapshotSchema} from '../composite/training-content-binding'
+import {resolveTrainingContentBindingParent,trainingContentSnapshotSchema,tryResolveTrainingContentBindingSync} from '../composite/training-content-binding'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {assertContentAuthority} from '../measurement-content/content-authority.repository'
 import {ContentReleaseError} from '../measurement-content/release'
@@ -55,13 +55,14 @@ export async function authorizeTrainingReinterpretation(tx:Prisma.TransactionCli
  await recheckTrainingReinterpretationAuthority(tx,c)
  const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
  if(!clock||user.expires_at&&user.expires_at<=clock.now)deny()
- return parent
+ return resolveTrainingContentBindingParent(tx,parent)
 }
 export function recheckTrainingReinterpretationAuthority(tx:Prisma.TransactionClient,c:TrainingReinterpretationContext){
  return assertContentAuthority(tx,{actorId:c.actorId,grantId:c.grantId,capability:'data.reinterpret',scope:{product:'TRAINING',scopeKind:'COURSE',
   scopeId:c.courseId,resourceKind:'data',resourceKeys:[c.attemptId]}})
 }
-export function trainingInterpretationSource(parent:TrainingInterpretationParent,itemId:string){
+export function trainingInterpretationSource(rawParent:TrainingInterpretationParent,itemId:string){
+ const parent=tryResolveTrainingContentBindingSync(rawParent)
  const receipt=decodeTrainingFinalReceipt(parent)
  if(!receipt)interpretationFail('FINAL_RECEIPT_REQUIRED')
  const binding=bindingSchema.parse(parent.trainingContentBinding),unit=binding.units.find(row=>row.itemId===itemId)

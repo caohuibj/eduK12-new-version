@@ -10,7 +10,7 @@ import {getContentRelease,prefetchContentReleases,type StoredRelease} from '../m
 import {ContentReleaseError} from '../measurement-content/release'
 import {renderDeclaredReport,DECLARATIVE_REPORT_GENERATOR,type ReportMetricFact} from '../measurement-content/report-renderer'
 import {decodeTrainingFinalReceipt} from './training-content-final'
-import {trainingContentSnapshotSchema,trainingMeasurementSourceScopeMatchesForConsumer} from './training-content-binding'
+import {resolveTrainingContentBindingParent,trainingContentSnapshotSchema,trainingMeasurementSourceScopeMatchesForConsumer} from './training-content-binding'
 import {validateTrainingReportPointer} from './training-report-selection'
 
 type Parent=Parameters<typeof decodeTrainingFinalReceipt>[0]&{compositeAssessment:{id:string;createdBy:string}}
@@ -27,7 +27,7 @@ function fail():never{throw new TrainingContentReportError('CONTENT_TRAINING_REP
 export async function readTrainingContentReports(db:Prisma.TransactionClient,input:{parent:Parent;audience:'teacher'|'researcher'|'participant'}):Promise<TrainingContentReport[]>{
  if(input.audience==='participant')return []
  if(input.audience!=='teacher'&&input.audience!=='researcher')fail()
- const {parent}=input,receipt=decodeTrainingFinalReceipt(parent)
+ const parent=await resolveTrainingContentBindingParent(db,input.parent),receipt=decodeTrainingFinalReceipt(parent)
  if(!receipt)return []
  if(parent.compositeAssessment.id!==parent.compositeAssessmentId)fail()
  const binding=parent.trainingContentBinding as {units:unknown}

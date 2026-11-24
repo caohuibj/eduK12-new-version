@@ -4,6 +4,7 @@ import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
 import {loadStoredCanonicalUnitResults} from '../assessment-runtime/compact-assessment-storage'
 import {readCompositeFinalUnitSnapshots} from '../assessment-runtime/composite-final.bridge'
 import {decodeTrainingFinalReceipt} from '../composite/training-content-final'
+import {resolveTrainingContentBindingParent} from '../composite/training-content-binding'
 import {trainingBoundContent} from '../composite/training-reference-binding'
 import {loadTrainingMetricDisclosure,trainingCognitiveMetricKeys,type TrainingMetricDisclosure} from '../composite/training-metric-disclosure'
 import {decryptCognitivePayload} from '../cognitive/cognitive.security'
@@ -58,17 +59,18 @@ export async function loadBundleCognitiveDisclosures(db:Prisma.TransactionClient
 }):Promise<Map<string,BundleCognitiveDisclosure>> {
  const slots=input.bindings.slots.filter(s=>s.unitType==='COGNITIVE'),out=new Map(slots.map(s=>[s.slotKey,denied()]))
  if(!slots.length||input.parent.status!=='COMPLETED'||input.audience==='parent')return out
+ const hydratedParent=await resolveTrainingContentBindingParent(db,input.parent)
  let bound:ReturnType<typeof trainingBoundContent>,receipt:ReturnType<typeof decodeTrainingFinalReceipt>
- try{bound=trainingBoundContent(input.parent);receipt=decodeTrainingFinalReceipt(input.parent)}catch{return out}
+ try{bound=trainingBoundContent(hydratedParent,db);receipt=decodeTrainingFinalReceipt(hydratedParent)}catch{return out}
  if(!bound||!receipt)return out
- const v2Read = (input.parent as { publicationHash?: string | null }).publicationHash
+ const v2Read = (hydratedParent as { publicationHash?: string | null }).publicationHash
   ? await readCompositeFinalUnitSnapshots(
       db,
-      [{ attemptId: input.parent.id, attemptEpoch: input.parent.attemptEpoch }],
+      [{ attemptId: hydratedParent.id, attemptEpoch: hydratedParent.attemptEpoch }],
       { slotKeys: slots.map(s => compositeItemSlotKey(s.itemId, 'COGNITIVE')), unitTypes: ['COGNITIVE'] },
     )
   : { loadedFactsByKey: new Map(), byAttemptKey: new Map(), snapshots: [] }
- if (v2Read.loadedFactsByKey.has(`${input.parent.id}:${input.parent.attemptEpoch}`)) {
+ if (v2Read.loadedFactsByKey.has(`${hydratedParent.id}:${hydratedParent.attemptEpoch}`)) {
   const bySlot = new Map(v2Read.snapshots.map(s => [s.slotKey, s]))
   for (const slot of slots) {
    const snap = bySlot.get(compositeItemSlotKey(slot.itemId, 'COGNITIVE'))
@@ -76,7 +78,7 @@ export async function loadBundleCognitiveDisclosures(db:Prisma.TransactionClient
    const declaration = input.pack.manifest.definition.slots.find(s => s.slotKey === slot.slotKey && s.unitType === 'COGNITIVE')
    if (!snap || !snap.canonicalEnvelope || snap.unitFact.unitType !== 'COGNITIVE' || !unit || !declaration) continue
    const verified = await loadTrainingMetricDisclosure(db, {
-    parent: input.parent,
+    parent: hydratedParent,
     unit,
     source: snap as any,
     core: snap.canonicalEnvelope.core,

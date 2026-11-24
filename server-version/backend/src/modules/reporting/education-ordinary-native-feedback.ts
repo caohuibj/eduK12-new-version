@@ -21,6 +21,7 @@ import {hashResolvedConfig,readFrozenReport,type FrozenReportSnapshot} from '../
 import {parseCognitiveResultSnapshot} from '../cognitive/v2/result-snapshot'
 import type {ThreeLayerReport} from '../cognitive/v2/report'
 import type {CognitiveResultSnapshot} from '../cognitive/v2/types'
+import {resolveTrainingContentBindingParent} from '../composite/training-content-binding'
 import {trainingBoundContent} from '../composite/training-reference-binding'
 import {decodeTrainingFinalReceipt} from '../composite/training-content-final'
 import {getContentReleaseBatch} from '../measurement-content/repository'
@@ -121,11 +122,11 @@ function cognitiveReport(snapshot:CognitiveResultSnapshot,frozen:FrozenReportSna
 export async function readOrdinaryNativeFeedback(tx:Prisma.TransactionClient,input:Input):Promise<Map<string,OrdinaryNativeFeedback>>{
  const output=new Map<string,OrdinaryNativeFeedback>()
  if(!input.blockIds.size)return output
- const {identity}=input,parent={...input.parent,compositeAssessmentId:identity.compositeId}
+ const {identity}=input,parent=await resolveTrainingContentBindingParent(tx,{...input.parent,compositeAssessmentId:identity.compositeId})
  if(!['STUDENT:SELF','TEACHER:SELF'].includes(identity.origin.variantKey)||!input.actorUserId)hidden()
  const isWholeV2=Boolean(input.parent.publicationHash)
  const slots=isWholeV2?null:decode(()=>parseFrozenActiveSlotSet(input.slots))
- const binding=trainingBoundContent(parent),receipt=decodeTrainingFinalReceipt(parent)
+ const binding=trainingBoundContent(parent,tx),receipt=decodeTrainingFinalReceipt(parent)
  if(!binding||(!receipt&&!isWholeV2)||!binding.educationComposition||(!isWholeV2&&slots!.attemptEpoch!==parent.attemptEpoch)
   ||binding.publicationHash!==identity.binding.manifestHash||!equal(binding.educationComposition,{origin:identity.origin,manifestHash:identity.binding.manifestHash}))hidden()
  const sealed=await readSealedCompositionContent(tx,{compositeId:identity.compositeId,ownerId:identity.origin.ownerUserId,anchor:binding.educationComposition})

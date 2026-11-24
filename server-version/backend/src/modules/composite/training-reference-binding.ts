@@ -5,7 +5,7 @@ import {assessmentContextHashMatches,decryptAssessmentContext,type AssessmentCon
 import type {ReferenceContext} from '../assessment-reference/reference'
 import {selectFrozenReferencePolicy,type VerifiedReferenceForSelection} from '../measurement-content/reference-policy'
 import type {StoredRelease} from '../measurement-content/repository'
-import {trainingContentAttemptBindingSchema} from './training-content-binding'
+import {resolveTrainingContentBindingParent,trainingContentAttemptBindingSchema,tryResolveTrainingContentBindingSync} from './training-content-binding'
 import {trainingReferenceKindSchema,trainingReferenceFail,validateTrainingReferenceRelease} from './training-reference-selection'
 const text=z.string().min(1).max(240),hash=z.string().regex(/^[a-f0-9]{64}$/)
 const slotBase={metricKey:text,referenceKind:trainingReferenceKindSchema}
@@ -19,11 +19,12 @@ const contentBindingSchema=trainingContentAttemptBindingSchema
 export type TrainingReferenceBinding=z.infer<typeof trainingReferenceBindingSchema>
 export type TrainingReferenceParent={id:string;attemptEpoch:number;compositeAssessmentId:string;trainingContentBinding:unknown;trainingContentBindingHash:string|null;
  trainingReferenceBinding?:unknown;trainingReferenceBindingHash?:string|null;contextSnapshotEncrypted?:string|null;contextSnapshotHash?:string|null}
-export function trainingBoundContent(parent:TrainingReferenceParent){
- if(parent.trainingContentBinding==null&&parent.trainingContentBindingHash==null)return null
- const parsed=contentBindingSchema.safeParse(parent.trainingContentBinding)
- if(!parsed.success||!parent.trainingContentBindingHash||canonicalHash(parsed.data)!==parent.trainingContentBindingHash
-  ||parsed.data.attemptId!==parent.id||parsed.data.compositeId!==parent.compositeAssessmentId||parsed.data.epoch!==parent.attemptEpoch
+export function trainingBoundContent(parent:TrainingReferenceParent,db?:object){
+ const resolved=tryResolveTrainingContentBindingSync(parent,db)
+ if(resolved.trainingContentBinding==null&&resolved.trainingContentBindingHash==null)return null
+ const parsed=contentBindingSchema.safeParse(resolved.trainingContentBinding)
+ if(!parsed.success||!resolved.trainingContentBindingHash||canonicalHash(parsed.data)!==resolved.trainingContentBindingHash
+  ||parsed.data.attemptId!==resolved.id||parsed.data.compositeId!==resolved.compositeAssessmentId||parsed.data.epoch!==resolved.attemptEpoch
   ||new Set(parsed.data.units.map(u=>u.itemId)).size!==parsed.data.units.length
   ||parsed.data.units.reduce((n,u)=>n+(u.referencePolicy?.choices.length??0),0)>1000)trainingReferenceFail('BINDING_IDENTITY')
  return parsed.data
@@ -62,10 +63,11 @@ export function readTrainingReferenceContext(parent:TrainingReferenceParent):Ref
  * binding + interpretation receipt atomically under all governance triggers. */
 export async function computeTrainingReferenceBinding(
  tx:Prisma.TransactionClient,
- parent:TrainingReferenceParent&{compositeAssessment:{createdBy:string|null}},
+ rawParent:TrainingReferenceParent&{compositeAssessment:{createdBy:string|null}},
  frozenContext?:{context:AssessmentContextV1;hash:string},
 ):Promise<{binding:TrainingReferenceBinding;hash:string}|null>{
- const content=trainingBoundContent(parent)
+ const parent=await resolveTrainingContentBindingParent(tx,rawParent)
+ const content=trainingBoundContent(parent,tx)
  if(!content?.units.some(u=>u.referencePolicy!==undefined)){
   const existing=decodeTrainingReferenceBinding(parent)
   return existing?{binding:existing,hash:parent.trainingReferenceBindingHash!}:null
