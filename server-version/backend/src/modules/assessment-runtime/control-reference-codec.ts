@@ -20,6 +20,7 @@ const encode=(value:any):{kind:number;plain:Buffer}=>{
   if(value?.k==='SCF2')return {kind:4,plain:Buffer.concat([id(value.a),integer(value.e)])}
   if(value?.kind==='SHARED_COGNITIVE_RUNTIME'&&value.storageVersion===1){const t=timestamp(value.frozenAt);if(t)return {kind:6,plain:Buffer.concat([hash(value.artifactHash),t])}}
   if(value?.kind==='SHARED_SCALE_RUNTIME'&&value.storageVersion===2){const t=timestamp(value.frozenAt);if(t)return {kind:5,plain:Buffer.concat([hash(value.artifactHash),t])}}
+  if(value?.kind==='SHARED_SCALE_RUNTIME'&&value.storageVersion===4){const t=timestamp(value.frozenAt);if(t)return {kind:7,plain:Buffer.concat([hash(value.planHash),t])}}
   if(value?.k==='UAR2'){
     const t=timestamp(value.x?.frozenAt)
     if(t&&typeof value.b==='string'&&/^[1-9][0-9]{0,18}$/.test(value.b)&&BigInt(value.b)<=0x7fffffffffffffffn){
@@ -49,6 +50,7 @@ const decode=(kind:number,plain:Buffer):any=>{
   else if(kind===4)value={k:'SCF2',a:readId(),e:take(4).readUInt32BE()}
   else if(kind===5)value={kind:'SHARED_SCALE_RUNTIME',storageVersion:2,artifactHash:take(32).toString('hex'),frozenAt:readTime()}
   else if(kind===6)value={kind:'SHARED_COGNITIVE_RUNTIME',storageVersion:1,artifactHash:take(32).toString('hex'),frozenAt:readTime()}
+  else if(kind===7)value={kind:'SHARED_SCALE_RUNTIME',storageVersion:4,planHash:take(32).toString('hex'),frozenAt:readTime()}
   else throw new Error('Control reference version/type unsupported')
   if(cursor!==plain.length)throw new Error('Control reference trailing data')
   return value

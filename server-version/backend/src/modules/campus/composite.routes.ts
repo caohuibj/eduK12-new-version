@@ -1,5 +1,5 @@
 import { checkCampusCompositeAccessDetails } from './campus-composite-authority'
-import { readOrdinarySelfWholeAccess } from '../assessment-run/ordinarySelfWholeAccess'
+import { readOrdinarySelfWholeAccess, readOrdinarySelfWholeProgress } from '../assessment-run/ordinarySelfWholeAccess'
 import { Router, type Request,type Response,type NextFunction } from 'express'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -82,7 +82,7 @@ async function campusWholeAccess(req:Request,res:Response,next:NextFunction){
 async function campusWholeProgressAccess(req:Request,res:Response,next:NextFunction){
   try {
     if(req.user?.accountDomain==='SCHOOL'&&req.user.role==='STUDENT'){
-      const proof=await readOrdinarySelfWholeAccess(prisma,'SCHOOL',req.user.userId,{attemptId:req.params.attemptId,mode:'progress'})
+      const proof=await readOrdinarySelfWholeProgress(prisma,'SCHOOL',req.user.userId,req.params.attemptId)
       if(proof){res.locals.ordinarySelfWhole=proof;return next()}
     }
     return campusCompositeAccess(req,res,next)

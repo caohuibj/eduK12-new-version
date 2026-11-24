@@ -17,6 +17,7 @@ describe('authenticated compact control references',()=>{
   {k:'SCF2',a:uuid,e:3},
   {k:'SCF2',a:'自定义-ABC-123',e:4},
   {kind:'SHARED_SCALE_RUNTIME',storageVersion:2,artifactHash:h,frozenAt:when},
+  {kind:'SHARED_SCALE_RUNTIME',storageVersion:4,planHash:h,frozenAt:when},
   {kind:'SHARED_COGNITIVE_RUNTIME',storageVersion:1,artifactHash:h,frozenAt:when},
   {k:'WVP2',p:h,b:{attemptId:uuid,userId:'owner',contextHash:h},u:[[uuid,h],['custom-scale-id','cd'.repeat(32)]]},
   {k:'WVP2',p:h,b:{attemptId:uuid},u:[[uuid,h,{schemaVersion:1,course:{courseId:'private-training-course'},snapshotHash:h}]]},
@@ -47,6 +48,8 @@ describe('authenticated compact control references',()=>{
   const a=encryptControlReference(cases[0]),b=encryptControlReference({...cases[0],p:'ab'.repeat(31)+'ac'})
   expect((decryptControlReference(a)as any).p).toBe(h);expect((decryptControlReference(b)as any).p).not.toBe(h)
   expect(a.length).toBeLessThan(180)
+  const v4=encryptControlReference({kind:'SHARED_SCALE_RUNTIME',storageVersion:4,planHash:h,frozenAt:when})
+  expect(v4.length).toBeLessThan(120)
  })
 })
 describe('safe reuse of deeply frozen strict JSON',()=>{

@@ -1,5 +1,6 @@
 import { isControlReferenceField, decryptControlReference } from '../modules/assessment-runtime/control-reference-codec'
 import { decryptCompactField, isCompactEncryptedField } from '../modules/assessment-runtime/compact-field-codec'
+import { decryptCompactScaleFactsBinary, isCompactScaleFactsBinary } from '../modules/assessment-runtime/compact-scale-facts-binary'
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
 import { logger } from './logger'
 
@@ -40,7 +41,7 @@ const getEncryptionKey = (): Buffer => {
  */
 export const isEncrypted = (data: string): boolean => {
   if (!data || typeof data !== 'string') return false
-  if (isCompactEncryptedField(data) || isControlReferenceField(data)) return true
+  if (isCompactEncryptedField(data) || isControlReferenceField(data) || isCompactScaleFactsBinary(data)) return true
   const parts = data.split(':')
   if (parts.length !== 3) return false
   // 检查每部分是否为有效的十六进制字符串
@@ -80,6 +81,7 @@ export const encryptSerializedField = (serializedJson: string): string => {
 export const decryptField = <T extends object>(encrypted: string): T => {
   try {
     if (isControlReferenceField(encrypted)) return {schemaVersion:1,value:decryptControlReference(encrypted)} as unknown as T
+    if (isCompactScaleFactsBinary(encrypted)) return decryptCompactScaleFactsBinary(encrypted) as unknown as T
     if (isCompactEncryptedField(encrypted)) return decryptCompactField<T>(encrypted)
     const key = getEncryptionKey()
     const [ivHex, authTagHex, dataHex] = encrypted.split(':')

@@ -9,7 +9,10 @@ import {getContentReleaseBatch} from '../measurement-content/repository'
 import {readSealedCompositionContent} from '../education-tools/private-tool.composition-content'
 import {readFrozenCompositionIdentity,type FrozenCompositionIdentity} from '../assessment-run/educationCompositionExecution'
 import type {RunResourcePolicy} from '../assessment-run/resourceAuthority'
+import type {ResultDisclosureContractV1} from '../assessment-policy/result-disclosure'
 import {projectEducationDeclaredUnitReports,type EducationAssessmentUnitReport} from './education-assessment-report.projector'
+import {readNativeEducationScaleFeedback,type NativeEducationFeedbackSource,type PreloadedNativeEducationScaleData} from './education-native-scale-feedback'
+import type {projectEducationScaleIndividualReport} from './education-scale-report.projector'
 import {reportingFail} from './types'
 
 export type OrdinaryStoredContent=Pick<Parameters<typeof decodeTrainingFinalReceipt>[0],
@@ -23,6 +26,16 @@ export type PreMaterializedEducationDeclaredUnit={
  metricKeysHash:string
  report:EducationAssessmentUnitReport
 }
+export type PreMaterializedEducationNativeScaleUnit={
+ blockId:string
+ itemId:string
+ scaleId:string
+ versionId:string
+ contentHash:string
+ sourceDefinitionHash:string
+ metricKeysHash:string
+ report:ReturnType<typeof projectEducationScaleIndividualReport>
+}
 export type PreMaterializedEducationWholeFeedbackV2={
  schemaVersion:2
  kind:'EDUCATION_WHOLE_FEEDBACK_V2'
@@ -32,9 +45,10 @@ export type PreMaterializedEducationWholeFeedbackV2={
  compositeId:string
  manifestHash:string
  policyHash:string
- interpretationHash:string
+ interpretationHash:string|null
  releaseIds:string[]
  declared:PreMaterializedEducationDeclaredUnit[]
+ nativeScales?:PreMaterializedEducationNativeScaleUnit[]
 }
 function hidden():never{return reportingFail('REPORT_NOT_FOUND','reporting resource not found',404)}
 /** Author/data ACL and current per-block ceilings have already been resolved.
@@ -102,21 +116,24 @@ export async function readOrdinaryDeclaredFeedback(tx:Prisma.TransactionClient,i
  return output
 }
 
-/** Pre-materialize immutable respondent declared feedback in the report worker so
- * GET /feedback avoids re-decrypting 9 scale snapshots and re-projecting prose on
+/** Pre-materialize immutable respondent scale feedback (both STANDARD_SCALE declared
+ * reports and PRIVATE_VERSION / LIBRARY_SCALE native projections) in the report worker
+ * so GET /feedback avoids re-decrypting 9 scale snapshots, admissions, and facts on
  * the API event loop. Live authority, revocation, receiptOnly and release-status
  * checks still execute on every GET /feedback read. */
 export async function materializeEducationWholeFeedbackForWorker(
  db:Prisma.TransactionClient,
- input:{attemptId:string;attemptEpoch:number;aggregateInputHash:string},
+ input:{attemptId:string;attemptEpoch:number;aggregateInputHash:string;preloaded?:PreloadedNativeEducationScaleData},
 ):Promise<PreMaterializedEducationWholeFeedbackV2|null>{
  const [row]=await db.$queryRaw<Array<{
   organizationId:string;key:string;version:string;policy:RunResourcePolicy;policyHash:string;
+  userId:string|null;subjectUserId:string|null;respondentUserId:string|null;
   contextSnapshotHash:string|null;frozenSlots:string|null;frozenSlotsHash:string|null;
   contentState:OrdinaryStoredContent|null;
  }>>(Prisma.sql`
   SELECT e.organization_id AS "organizationId",t.resource_key AS key,t.resource_version AS version,
    t.frozen_resource_policy AS policy,t.resource_policy_hash AS "policyHash",
+   p.user_id AS "userId",p.subject_user_id AS "subjectUserId",p.respondent_user_id AS "respondentUserId",
    p.context_snapshot_hash AS "contextSnapshotHash",
    p.frozen_active_slot_set_encrypted AS "frozenSlots",
    p.frozen_active_slot_set_hash AS "frozenSlotsHash",
@@ -137,35 +154,73 @@ export async function materializeEducationWholeFeedbackForWorker(
   WHERE p.id=${input.attemptId} AND p.attempt_epoch=${input.attemptEpoch}
    AND p.status='COMPLETED' AND NOT COALESCE(p.receipt_only,FALSE)
    AND p.aggregate_input_hash=${input.aggregateInputHash}
-   AND p.training_content_interpretation_hash IS NOT NULL
   LIMIT 1
  `)
- if(!row||!row.frozenSlots||!row.frozenSlotsHash||!row.contentState?.trainingContentInterpretationHash)return null
+ if(!row||!row.frozenSlots||!row.frozenSlotsHash)return null
  const identity=await readFrozenCompositionIdentity(db,row)
  const declaredBlocks=new Set<string>()
+ const nativeSources:Array<{block:FrozenCompositionIdentity['manifest'][number];source:NativeEducationFeedbackSource;metricKeysHash:string}>=[]
  const ceilingsByBlockId=new Map(identity.binding.unitReports.map(unit=>[unit.blockId,unit]))
+ const none={mode:'NONE' as const,metricKeys:[],longitudinalMetricKeys:[]}
  for(const block of identity.manifest){
-  if(block.kind!=='SCALE'||block.sourceProvider!=='STANDARD_SCALE'||block.itemIds.length!==1)continue
+  if(block.kind!=='SCALE'||block.itemIds.length!==1)continue
   const ceiling=ceilingsByBlockId.get(block.blockId)
   if(!ceiling||ceiling.versionId!==block.versionId||ceiling.contentHash!==block.contentHash)return null
-  if(ceiling.respondent.mode==='INDIVIDUAL_SUMMARY')declaredBlocks.add(block.blockId)
+  if(ceiling.respondent.mode!=='INDIVIDUAL_SUMMARY')continue
+  if(block.sourceProvider==='STANDARD_SCALE'){
+   declaredBlocks.add(block.blockId)
+   continue
+  }
+  if(!row.userId||row.userId!==row.subjectUserId||row.userId!==row.respondentUserId)return null
+  const unit=identity.units.find(candidate=>candidate.itemId===block.itemIds[0]&&candidate.versionId===block.versionId)
+  if(!unit||unit.family!=='SCALE'||!unit.scaleId)return null
+  const contract:ResultDisclosureContractV1={schemaVersion:1,policyKey:'EDUCATION_PRIVATE_TOOL_V1',minimumRespondents:null,
+   audiences:{RESPONDENT:ceiling.respondent,SUBJECT:none,TEACHER:none,PARENT:none,PROFESSIONAL:none,ORGANIZATION:none,RESEARCH:none}}
+  nativeSources.push({
+   block,
+   metricKeysHash:canonicalHash(ceiling.respondent.metricKeys),
+   source:{
+    itemId:unit.itemId,scaleId:unit.scaleId,title:block.title,sourceDefinitionHash:unit.definitionHash,resultDisclosure:contract,
+    ...(block.sourceProvider==='LIBRARY_SCALE'
+     ? {approvedLibrary:{approvedSnapshotHash:block.contentHash}}
+     : {privateVersion:{versionId:block.versionId,contentHash:block.contentHash}}),
+   },
+  })
  }
- if(!declaredBlocks.size)return null
+ if(!declaredBlocks.size&&!nativeSources.length)return null
+ if(declaredBlocks.size&&!row.contentState?.trainingContentInterpretationHash)return null
  const slots=await loadFrozenActiveSlotSet(row.frozenSlots,db)
  if(!slots||slots.snapshotHash!==row.frozenSlotsHash||slots.attemptEpoch!==input.attemptEpoch)return null
  let releaseIds:string[]=[]
- const rendered=await readOrdinaryDeclaredFeedback(db,{
-  identity,
-  parent:{...row.contentState,id:input.attemptId,attemptEpoch:input.attemptEpoch,contextSnapshotHash:row.contextSnapshotHash},
-  slots,
-  blockIds:declaredBlocks,
-  onReleaseIds:ids=>{releaseIds=ids},
- })
+ const [renderedDeclared,renderedNative]=await Promise.all([
+  declaredBlocks.size
+   ? readOrdinaryDeclaredFeedback(db,{
+      identity,
+      parent:{...row.contentState!,id:input.attemptId,attemptEpoch:input.attemptEpoch,contextSnapshotHash:row.contextSnapshotHash},
+      slots,
+      blockIds:declaredBlocks,
+      onReleaseIds:ids=>{releaseIds=ids},
+     })
+   : Promise.resolve(new Map<string,EducationAssessmentUnitReport>()),
+  nativeSources.length
+   ? readNativeEducationScaleFeedback(db,{
+      actorUserId:row.userId!,
+      parent:{
+       id:input.attemptId,status:'COMPLETED',userId:row.userId!,subjectUserId:row.subjectUserId!,respondentUserId:row.respondentUserId!,
+       attemptEpoch:input.attemptEpoch,contextSnapshotHash:row.contextSnapshotHash,
+       frozenActiveSlotSetEncrypted:row.frozenSlots,frozenActiveSlotSetHash:row.frozenSlotsHash,
+      },
+      sources:nativeSources.map(entry=>entry.source),
+      slotSet:slots,
+      preloaded:input.preloaded,
+     })
+   : Promise.resolve(new Map<string,ReturnType<typeof projectEducationScaleIndividualReport>>()),
+ ])
  const declared:PreMaterializedEducationDeclaredUnit[]=[]
  for(const block of identity.manifest){
   if(!declaredBlocks.has(block.blockId))continue
   const itemId=block.itemIds[0]
-  const report=rendered.get(itemId)
+  const report=renderedDeclared.get(itemId)
   const ceiling=ceilingsByBlockId.get(block.blockId)
   if(!report||!ceiling)return null
   declared.push({
@@ -174,6 +229,21 @@ export async function materializeEducationWholeFeedbackForWorker(
    versionId:block.versionId,
    contentHash:block.contentHash,
    metricKeysHash:canonicalHash(ceiling.respondent.metricKeys),
+   report,
+  })
+ }
+ const nativeScales:PreMaterializedEducationNativeScaleUnit[]=[]
+ for(const entry of nativeSources){
+  const report=renderedNative.get(entry.source.itemId)
+  if(!report)return null
+  nativeScales.push({
+   blockId:entry.block.blockId,
+   itemId:entry.source.itemId,
+   scaleId:entry.source.scaleId,
+   versionId:entry.block.versionId,
+   contentHash:entry.block.contentHash,
+   sourceDefinitionHash:entry.source.sourceDefinitionHash,
+   metricKeysHash:entry.metricKeysHash,
    report,
   })
  }
@@ -186,10 +256,40 @@ export async function materializeEducationWholeFeedbackForWorker(
   compositeId:identity.compositeId,
   manifestHash:identity.binding.manifestHash,
   policyHash:row.policyHash,
-  interpretationHash:row.contentState.trainingContentInterpretationHash,
+  interpretationHash:row.contentState?.trainingContentInterpretationHash??null,
   releaseIds,
   declared,
+  ...(nativeScales.length?{nativeScales}:{}),
  }
+}
+
+function parsePreMaterializedEnvelope(input:{
+ preMaterializedReport:string|null|undefined
+ identity:FrozenCompositionIdentity
+ own:{parentId:string;attemptEpoch:number;policyHash:string;contentState:OrdinaryStoredContent|null}
+ requireInterpretationHash:boolean
+}):PreMaterializedEducationWholeFeedbackV2|null{
+ if(!input.preMaterializedReport)return null
+ const contentState=input.own.contentState
+ if(!contentState?.aggregateInputHash)return null
+ if(input.requireInterpretationHash&&!contentState.trainingContentInterpretationHash)return null
+ let payload:PreMaterializedEducationWholeFeedbackV2
+ try{
+  payload=decryptUnifiedRuntimePayload<PreMaterializedEducationWholeFeedbackV2>(input.preMaterializedReport)
+ }catch{
+  return null
+ }
+ if(!payload||payload.schemaVersion!==2||payload.kind!=='EDUCATION_WHOLE_FEEDBACK_V2'
+  ||payload.attemptId!==input.own.parentId
+  ||payload.attemptEpoch!==input.own.attemptEpoch
+  ||payload.aggregateInputHash!==contentState.aggregateInputHash
+  ||payload.compositeId!==input.identity.compositeId
+  ||payload.manifestHash!==input.identity.binding.manifestHash
+  ||payload.policyHash!==input.own.policyHash
+  ||!Array.isArray(payload.declared)||!Array.isArray(payload.releaseIds))return null
+ const currentInterp=contentState.trainingContentInterpretationHash??null
+ if((input.requireInterpretationHash||payload.interpretationHash!==null)&&payload.interpretationHash!==currentInterp)return null
+ return payload
 }
 
 /** Verify pre-materialized declared feedback against live readOwn authority,
@@ -204,24 +304,9 @@ export async function tryReadPreMaterializedDeclaredFeedback(
   declaredBlocks:ReadonlySet<string>
  },
 ):Promise<Map<string,EducationAssessmentUnitReport>|null>{
- if(!input.preMaterializedReport||!input.declaredBlocks.size)return null
- const contentState=input.own.contentState
- if(!contentState?.aggregateInputHash||!contentState.trainingContentInterpretationHash)return null
- let payload:PreMaterializedEducationWholeFeedbackV2
- try{
-  payload=decryptUnifiedRuntimePayload<PreMaterializedEducationWholeFeedbackV2>(input.preMaterializedReport)
- }catch{
-  return null
- }
- if(!payload||payload.schemaVersion!==2||payload.kind!=='EDUCATION_WHOLE_FEEDBACK_V2'
-  ||payload.attemptId!==input.own.parentId
-  ||payload.attemptEpoch!==input.own.attemptEpoch
-  ||payload.aggregateInputHash!==contentState.aggregateInputHash
-  ||payload.compositeId!==input.identity.compositeId
-  ||payload.manifestHash!==input.identity.binding.manifestHash
-  ||payload.policyHash!==input.own.policyHash
-  ||payload.interpretationHash!==contentState.trainingContentInterpretationHash
-  ||!Array.isArray(payload.declared)||!Array.isArray(payload.releaseIds))return null
+ if(!input.declaredBlocks.size)return null
+ const payload=parsePreMaterializedEnvelope({...input,requireInterpretationHash:true})
+ if(!payload)return null
  const byBlockId=new Map(payload.declared.map(unit=>[unit.blockId,unit]))
  const ceilingsByBlockId=new Map(input.identity.binding.unitReports.map(unit=>[unit.blockId,unit]))
  const output=new Map<string,EducationAssessmentUnitReport>()
@@ -246,4 +331,36 @@ export async function tryReadPreMaterializedDeclaredFeedback(
   }
  }
  return output
+}
+
+/** Verify pre-materialized native (PRIVATE_VERSION / LIBRARY_SCALE) education scale
+ * feedback against live readOwn authority, frozen composition identity, source definition
+ * hashes, and current disclosure ceilings. Any mismatch returns null for live fallback. */
+export function tryReadPreMaterializedNativeScaleFeedback(input:{
+ preMaterializedReport:string|null|undefined
+ identity:FrozenCompositionIdentity
+ own:{parentId:string;attemptEpoch:number;policyHash:string;contentState:OrdinaryStoredContent|null}
+ sources:readonly NativeEducationFeedbackSource[]
+}):Map<string,ReturnType<typeof projectEducationScaleIndividualReport>>|null{
+ if(!input.sources.length)return null
+ const payload=parsePreMaterializedEnvelope({...input,requireInterpretationHash:false})
+ if(!payload||!Array.isArray(payload.nativeScales)||!payload.nativeScales.length)return null
+ const byItemId=new Map(payload.nativeScales.map(unit=>[unit.itemId,unit]))
+ const ceilingsByBlockId=new Map(input.identity.binding.unitReports.map(unit=>[unit.blockId,unit]))
+ const blockByItemId=new Map<string,FrozenCompositionIdentity['manifest'][number]>()
+ for(const block of input.identity.manifest){
+  if(block.kind==='SCALE'&&block.itemIds.length===1)blockByItemId.set(block.itemIds[0],block)
+ }
+ const output=new Map<string,ReturnType<typeof projectEducationScaleIndividualReport>>()
+ for(const source of input.sources){
+  const cached=byItemId.get(source.itemId)
+  const block=blockByItemId.get(source.itemId)
+  const ceiling=block?ceilingsByBlockId.get(block.blockId):undefined
+  if(!cached||!block||!ceiling||cached.blockId!==block.blockId||cached.scaleId!==source.scaleId
+   ||cached.versionId!==block.versionId||cached.contentHash!==block.contentHash
+   ||cached.sourceDefinitionHash!==source.sourceDefinitionHash
+   ||cached.metricKeysHash!==canonicalHash(ceiling.respondent.metricKeys))return null
+  output.set(source.itemId,cached.report)
+ }
+ return output.size===input.sources.length?output:null
 }

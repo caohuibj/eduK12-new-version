@@ -406,6 +406,7 @@ model CourseStudent {
   student   User                @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@unique([courseId, studentId])
+  @@index([studentId, status, courseId], map: "course_students_student_id_status_idx")
   @@map("course_students")
 }
 

@@ -12,6 +12,7 @@ import {encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload} from '../../m
 import {buildAggregateInputHash} from '../../modules/assessment-runtime/unified-aggregate'
 import {createCanonicalUnitResultEnvelope,projectScaleCanonicalUnitResult} from '../../modules/assessment-runtime/unit-result'
 import {finalizeCompositeAttemptUnifiedIfReady} from '../../modules/assessment-runtime/unified-aggregate-finalizer.service'
+import {decodeTrainingFinalReceipt} from '../../modules/composite/training-content-final'
 
 beforeEach(()=>{
  vi.clearAllMocks();vi.stubEnv('DATA_ENCRYPTION_KEY','e'.repeat(64))
@@ -157,7 +158,9 @@ describe('committed aggregate graph to Training FINAL receipt',()=>{
   expect(db.compositeAssessmentAttempt.update).toHaveBeenCalledExactlyOnceWith({where:{id:f.parent.id},data:{
    trainingContentInterpretationEncrypted:expect.any(String),trainingContentInterpretationHash:expect.any(String)}})
   const stored=db.compositeAssessmentAttempt.update.mock.calls[0][0].data
-  const receipt:any=decryptUnifiedRuntimePayload(stored.trainingContentInterpretationEncrypted)
+  const receipt=decodeTrainingFinalReceipt({...f.parent,aggregateInputHash:result!.aggregateInputHash,
+   trainingContentInterpretationEncrypted:stored.trainingContentInterpretationEncrypted,
+   trainingContentInterpretationHash:stored.trainingContentInterpretationHash})!
   expect(receipt).toMatchObject({attemptId:f.parent.id,epoch:1,aggregateInputHash:result!.aggregateInputHash,
    contentBindingHash:f.parent.trainingContentBindingHash,sources:[{itemId:'scale-item',resultHash:f.envelope.resultHash}],
    interpretation:{units:[{instrumentKey:'scale-item',report:{status:'READY'}}]}})

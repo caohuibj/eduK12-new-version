@@ -17,6 +17,7 @@ import { encryptUnifiedRuntimePayload, decryptUnifiedRuntimePayload } from '../.
 import { createCanonicalUnitResultEnvelope } from '../../modules/assessment-runtime/unit-result'
 import { finalizeCompositeAttemptUnifiedIfReady } from '../../modules/assessment-runtime/unified-aggregate-finalizer.service'
 import { enqueueCompositeReportForUnit } from '../../modules/assessment-runtime/report-outbox.service'
+import { decodeTrainingFinalReceipt } from '../../modules/composite/training-content-final'
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -236,7 +237,7 @@ describe('FLOW aggregate to real Training content FINAL receipt',()=>{
   const f=await fixture({sjt:'valid'});bindContent(f.parent)
   const before=JSON.stringify(f.rows),canonical:any=decryptUnifiedRuntimePayload(f.rows.find(row=>row.unitType==='SITUATIONAL')!.canonicalResultEncrypted)
   await finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent)
-  const receipt:any=decryptUnifiedRuntimePayload(f.parent.trainingContentInterpretationEncrypted)
+  const receipt=decodeTrainingFinalReceipt(f.parent)!
   expect(receipt.sources).toEqual([{itemId:'sjt',resultHash:canonical.resultHash}])
   expect(receipt.aggregateInputHash).toBe(f.parent.aggregateInputHash)
   expect(receipt.contentBindingHash).toBe(f.parent.trainingContentBindingHash)

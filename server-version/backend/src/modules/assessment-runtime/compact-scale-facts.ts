@@ -1,6 +1,11 @@
 import { sharedControlWritesEnabled } from './shared-control-records'
 import { canonicalHash } from './canonical'
-import { encryptCompactField, decryptCompactField, isCompactEncryptedField } from './compact-field-codec'
+import { decryptCompactField, isCompactEncryptedField } from './compact-field-codec'
+import {
+  decryptCompactScaleFactsBinary,
+  encryptCompactScaleFactsBinary,
+  isCompactScaleFactsBinary,
+} from './compact-scale-facts-binary'
 import { publicTemplates, type PublicTemplateStore, type PublicTemplateKind } from './public-templates'
 import { parseScaleResultV2, type ScaleResultV2 } from '../scale/scale-result'
 import type { ScaleAnswer } from '../scale/scale-scoring'
@@ -12,6 +17,7 @@ export type ScaleFactsBinding = { assessmentId: string; attemptEpoch: number; su
 type Graph = any[]
 type Facts = {
   kind: 'SCALE_RESULT_FACTS'; version: 1|2; binding: ScaleFactsBinding; sourceResultHash: string;
+  bundle?: string;
   base: string; scores: Array<[number | null, string, boolean, number[] | null, Record<string, unknown>]>;
   quality: ScaleResultV2['quality']; context: ScaleResultV2['method']['assessmentContext'];
   items: Array<[number, number, number, number, Record<string, unknown>]>;
@@ -87,12 +93,17 @@ const decodeGraph = (node: Graph, result: ScaleResultV2, values: unknown[], dept
 }
 export const isCompactScaleFacts = (value: any): value is Facts => value?.kind === 'SCALE_RESULT_FACTS'
 export const decodeScaleFacts = (value: unknown): Facts | null => {
-  if (typeof value !== 'string' || !isCompactEncryptedField(value)) return null
-  const data = decryptCompactField<any>(value)
-  if (!isCompactScaleFacts(data)) return null
+  if (typeof value !== 'string') return null
+  const data = isCompactScaleFactsBinary(value)
+    ? decryptCompactScaleFactsBinary(value)
+    : isCompactEncryptedField(value)
+      ? decryptCompactField<any>(value)
+      : null
+  if (!data || !isCompactScaleFacts(data)) return null
   if (![1,2].includes(data.version) || (data.version===2&&data.canonical&&typeof data.completedAt!=='string') || !data.binding || typeof data.binding.assessmentId !== 'string' || !Number.isSafeInteger(data.binding.attemptEpoch)
     || data.binding.attemptEpoch < 1 || typeof data.binding.submissionId !== 'string' || !/^[a-f0-9]{64}$/.test(data.binding.payloadHash)
-    || !/^[a-f0-9]{64}$/.test(data.sourceResultHash) || !Array.isArray(data.scores) || !Array.isArray(data.items)
+    || !/^[a-f0-9]{64}$/.test(data.sourceResultHash) || (data.bundle !== undefined && !/^[a-f0-9]{64}$/.test(data.bundle))
+    || !Array.isArray(data.scores) || !Array.isArray(data.items)
     || !Array.isArray(data.references) || !Array.isArray(data.interpretations) || data.scores.length > 20000 || data.items.length > 20000) throw new Error('Invalid compact scale facts')
   return data
 }
@@ -109,16 +120,20 @@ export const prepareCompactScaleFacts = async (input: {
   if (new Set(input.itemOrder).size !== input.itemOrder.length) throw new Error('Duplicate frozen question identity')
   const fragments: Array<{ kind: PublicTemplateKind; value: unknown }> = []
   const add = (kind: PublicTemplateKind, value: unknown) => { const index = fragments.length; fragments.push({kind,value}); return index }
-  const baseIndex = add('SCALE_RESULT_BASE', { schemaVersion: 2, instrument: result.instrument,
-    method: pick(result.method,methodStatic), scores: result.scores.map(s => pick(s,scoreStatic)), itemOrder: input.itemOrder, disclaimer: result.disclaimer })
+  const baseValue = { schemaVersion: 2, instrument: result.instrument,
+    method: pick(result.method,methodStatic), scores: result.scores.map(s => pick(s,scoreStatic)), itemOrder: input.itemOrder, disclaimer: result.disclaimer }
+  const canonical = input.canonical ? encodeCanonicalGraph(parseCanonicalUnitResultEnvelope(input.canonical),result,sharedControlWritesEnabled()) : null
+  const bundleIndex = add('SCALE_FACTS_BUNDLE', {
+    base: baseValue,
+    caveats: result.caveats,
+    canonical: canonical ? canonical.graph : null,
+  })
   const refIndices = result.references.map(ref => ({ base: add('SCALE_REFERENCE',{ kind:'REFERENCE', value:pick(ref,referenceStatic) }),
     band: ref.criterionBand == null ? null : add('SCALE_REFERENCE',{kind:'BAND',value:ref.criterionBand}) }))
   const interpIndices = result.interpretations.map(x => add('SCALE_INTERPRETATION',pick(x,interpretationStatic)))
-  const caveatIndex = add('SCALE_CAVEATS',result.caveats)
-  const canonical = input.canonical ? encodeCanonicalGraph(parseCanonicalUnitResultEnvelope(input.canonical),result,sharedControlWritesEnabled()) : null
-  const canonicalIndex = canonical ? add('SCALE_CANONICAL_LAYOUT',canonical.graph) : null
   const hashes = await templates.saveMany(fragments)
-  const data: Facts = { kind:'SCALE_RESULT_FACTS', version:sharedControlWritesEnabled()?2:1, binding:input.binding, sourceResultHash:input.canonical?.bundleBridge?.sourceResultHash ?? canonicalHash(result), base:hashes[baseIndex],
+  const bundleHash = hashes[bundleIndex]
+  const data: Facts = { kind:'SCALE_RESULT_FACTS', version:sharedControlWritesEnabled()?2:1, binding:input.binding, sourceResultHash:input.canonical?.bundleBridge?.sourceResultHash ?? canonicalHash(result), bundle:bundleHash, base:'',
     scores:result.scores.map(score => {
       const indices = score.answeredItems.map(code => { const index = score.expectedItems.indexOf(code); if(index < 0) throw new Error('Answered item is outside frozen score'); return index })
       const full = score.answeredItems.length === score.expectedItems.length && indices.every((v,i) => v===i)
@@ -129,24 +144,34 @@ export const prepareCompactScaleFacts = async (input: {
       let mask=0;itemRawKeys.forEach((key,i)=>{if(Object.prototype.hasOwnProperty.call(item,key))mask|=1<<i})
       return [index,item.baseScore,item.score,mask,omit(item,itemKeys)]
     }), references:result.references.map((ref,i)=>({base:hashes[refIndices[i].base],band:refIndices[i].band===null?null:hashes[refIndices[i].band!],hasBand:Object.prototype.hasOwnProperty.call(ref,'criterionBand'),dynamic:omit(ref,[...referenceStatic,'criterionBand'])})),
-    interpretations:result.interpretations.map((v,i)=>({template:hashes[interpIndices[i]],extras:omit(v,interpretationStatic)})),caveats:hashes[caveatIndex],
+    interpretations:result.interpretations.map((v,i)=>({template:hashes[interpIndices[i]],extras:omit(v,interpretationStatic)})),caveats:'',
     extras:omit(result,resultKeys), methodExtras:omit(result.method,[...methodStatic,'assessmentContext']),
-    canonical:canonical?{template:hashes[canonicalIndex!],values:canonical.values}:null, ...(sharedControlWritesEnabled()&&input.canonical?{completedAt:input.canonical.completedAt}:{}) }
+    canonical:canonical?{template:'',values:canonical.values}:null, ...(sharedControlWritesEnabled()&&input.canonical?{completedAt:input.canonical.completedAt}:{}) }
   // Exhaustive roundtrip is a focused validation mode, not repeated grading on the hot path.
   if (process.env.ASSESSMENT_COMPACT_VERIFY_WRITES === 'true') {
     const reconstructed = await restoreCompactScaleFacts(data,{answers:result.itemScores.map(i=>pick(i,['itemCode','responseValue',...itemRawKeys]) as unknown as ScaleAnswer),full:true},templates)
     if (!same(result,reconstructed.result) || (input.canonical && !same(input.canonical,reconstructed.canonical))) throw new Error('Compact result roundtrip mismatch')
   }
-  return encryptCompactField(data)
+  const estPlainBytes = Buffer.byteLength(JSON.stringify(data), 'utf8')
+  return encryptCompactScaleFactsBinary(data, estPlainBytes)
 }
 
 export const restoreCompactScaleFacts = async (facts: Facts, options: { full?: boolean; answers?: ScaleAnswer[]; canonical?: boolean; reportOnly?: boolean } = {}, templates: PublicTemplateStore = publicTemplates): Promise<{ result: ScaleResultV2; canonical: CanonicalUnitResultEnvelopeV1 | null }> => {
-  const requests: Array<{hash:string;kind:PublicTemplateKind}>=[{hash:facts.base,kind:'SCALE_RESULT_BASE'},{hash:facts.caveats,kind:'SCALE_CAVEATS'}]
+  const requests: Array<{hash:string;kind:PublicTemplateKind}> = facts.bundle
+    ? [{hash:facts.bundle,kind:'SCALE_FACTS_BUNDLE'}]
+    : [{hash:facts.base,kind:'SCALE_RESULT_BASE'},{hash:facts.caveats,kind:'SCALE_CAVEATS'}]
   for(const ref of facts.references){requests.push({hash:ref.base,kind:'SCALE_REFERENCE'});if(ref.band)requests.push({hash:ref.band,kind:'SCALE_REFERENCE'})}
   for(const ref of facts.interpretations)requests.push({hash:ref.template,kind:'SCALE_INTERPRETATION'})
-  if(facts.canonical&&options.canonical!==false)requests.push({hash:facts.canonical.template,kind:'SCALE_CANONICAL_LAYOUT'})
+  if(!facts.bundle&&facts.canonical&&options.canonical!==false)requests.push({hash:facts.canonical.template,kind:'SCALE_CANONICAL_LAYOUT'})
   const loaded=await templates.loadMany(requests);let cursor=0
-  const base=loaded[cursor++],caveats=loaded[cursor++]
+  let base:any,caveats:any,canonicalGraph:any
+  if(facts.bundle){
+    const bundle=loaded[cursor++]
+    if(!bundle||typeof bundle!=='object'||Array.isArray(bundle))throw new Error('Invalid compact scale facts bundle')
+    base=bundle.base;caveats=bundle.caveats;canonicalGraph=bundle.canonical
+  }else{
+    base=loaded[cursor++];caveats=loaded[cursor++]
+  }
   if(!base||base.schemaVersion!==2||!Array.isArray(base.scores)||base.scores.length!==facts.scores.length||!Array.isArray(base.itemOrder))throw new Error('Invalid compact score template')
   if(!verifiedBases.has(base)){
     parseScaleResultV2({schemaVersion:2,instrument:base.instrument,method:{...base.method,assessmentContext:null},quality:{status:'interpretable',flags:[]},
@@ -180,8 +205,10 @@ export const restoreCompactScaleFacts = async (facts: Facts, options: { full?: b
   else Object.defineProperty(result,SCALE_REPORT_FACTS_VIEW,{value:true})
   let canonical:CanonicalUnitResultEnvelopeV1|null=null
   if(facts.canonical&&options.canonical!==false){
+    const layoutGraph = facts.bundle ? canonicalGraph : loaded[cursor++]
+    if(!layoutGraph)throw new Error('Invalid compact canonical layout template')
     const metadata=facts.completedAt?[null,null,facts.completedAt,{sourceType:'ASSESSMENT',sourceAttemptId:facts.binding.assessmentId,sourceSubmissionId:facts.binding.submissionId},facts.sourceResultHash]:undefined
-    const decoded=decodeGraph(loaded[cursor++],result,facts.canonical.values,0,metadata)
+    const decoded=decodeGraph(layoutGraph,result,facts.canonical.values,0,metadata)
     if(metadata){decoded.resultHash=canonicalHash(decoded.core);if(decoded.bundleBridge)decoded.bundleBridgeHash=canonicalHash(decoded.bundleBridge)}
     canonical=parseCanonicalUnitResultEnvelope(decoded)
   }
@@ -190,9 +217,12 @@ export const restoreCompactScaleFacts = async (facts: Facts, options: { full?: b
 
 export const prefetchCompactScaleTemplates = async (facts: Facts[], templates: PublicTemplateStore = publicTemplates, options: {canonical?: boolean} = {}): Promise<void> => {
   const requests: Array<{hash:string;kind:PublicTemplateKind}> = []
-  for(const f of facts){requests.push({hash:f.base,kind:'SCALE_RESULT_BASE'},{hash:f.caveats,kind:'SCALE_CAVEATS'})
+  for(const f of facts){
+    if(f.bundle) requests.push({hash:f.bundle,kind:'SCALE_FACTS_BUNDLE'})
+    else requests.push({hash:f.base,kind:'SCALE_RESULT_BASE'},{hash:f.caveats,kind:'SCALE_CAVEATS'})
     for(const r of f.references){requests.push({hash:r.base,kind:'SCALE_REFERENCE'});if(r.band)requests.push({hash:r.band,kind:'SCALE_REFERENCE'})}
     for(const r of f.interpretations)requests.push({hash:r.template,kind:'SCALE_INTERPRETATION'})
-    if(f.canonical&&options.canonical!==false)requests.push({hash:f.canonical.template,kind:'SCALE_CANONICAL_LAYOUT'})}
+    if(!f.bundle&&f.canonical&&options.canonical!==false)requests.push({hash:f.canonical.template,kind:'SCALE_CANONICAL_LAYOUT'})
+  }
   if(requests.length)await templates.loadMany(requests)
 }

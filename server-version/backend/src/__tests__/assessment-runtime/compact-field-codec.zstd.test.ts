@@ -17,7 +17,7 @@ describe('compact-field-codec zstd and high-ratio gzip support', () => {
     else process.env.ASSESSMENT_COMPACT_CODEC = oldCodec
   })
 
-  it('emits ekc1:zs: when ASSESSMENT_COMPACT_CODEC=zstd and decrypts cleanly regardless of active write codec', () => {
+  it('defaults to ekc1:zs: on Node 24 zstd, supports explicit gzip opt-out, and decrypts both seamlessly', () => {
     const sample = {
       schemaVersion: 1,
       units: Array.from({ length: 9 }, (_, u) => ({
@@ -26,25 +26,26 @@ describe('compact-field-codec zstd and high-ratio gzip support', () => {
       })),
     }
 
+    const defaultZsCipher = encryptCompactField(sample)
+    expect(defaultZsCipher.startsWith('ekc1:zs:')).toBe(true)
+
+    process.env.ASSESSMENT_COMPACT_CODEC = 'gzip'
     const gzCipher = encryptCompactField(sample)
     expect(gzCipher.startsWith('ekc1:gz:')).toBe(true)
-
-    process.env.ASSESSMENT_COMPACT_CODEC = 'zstd'
-    const zsCipher = encryptCompactField(sample)
-    expect(zsCipher.startsWith('ekc1:zs:')).toBe(true)
-    expect(zsCipher.length).toBeLessThan(gzCipher.length)
+    expect(defaultZsCipher.length).toBeLessThan(gzCipher.length)
 
     // Plaintext byte length in slot 4 remains exact for SQL storedScaleFieldSizeSql
     const plainBytes = Buffer.byteLength(JSON.stringify(sample), 'utf8')
-    expect(Number(zsCipher.split(':')[3])).toBe(plainBytes)
+    expect(Number(defaultZsCipher.split(':')[3])).toBe(plainBytes)
 
-    // Switching back to default gzip writer still reads zstd cipher seamlessly
+    // Switching codecs still reads both zstd and gzip ciphers seamlessly
+    expect(decryptCompactField(defaultZsCipher)).toEqual(sample)
     delete process.env.ASSESSMENT_COMPACT_CODEC
-    expect(decryptCompactField(zsCipher)).toEqual(sample)
     expect(decryptCompactField(gzCipher)).toEqual(sample)
+    expect(decryptCompactField(defaultZsCipher)).toEqual(sample)
 
     // Tampered codec header fails AAD authentication
-    expect(() => decryptCompactField(zsCipher.replace(':zs:', ':gz:'))).toThrow()
-    expect(() => decryptCompactField(zsCipher.replace(':zs:', ':js:'))).toThrow()
+    expect(() => decryptCompactField(defaultZsCipher.replace(':zs:', ':gz:'))).toThrow()
+    expect(() => decryptCompactField(defaultZsCipher.replace(':zs:', ':js:'))).toThrow()
   })
 })

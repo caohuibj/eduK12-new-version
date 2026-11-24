@@ -9,7 +9,7 @@ import { loadStoredCanonicalUnitResults, createStoredScaleFactsReader } from '..
 import { publicTemplatesForDatabase } from '../assessment-runtime/public-templates'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { parseVersionedFrozenScaleRuntimeSnapshot, loadFrozenScaleRuntimeSnapshot, type VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
-import { createSharedScaleRuntimeStore, isSharedScaleRuntimeReference, type SharedScaleArtifactRecord } from '../assessment-runtime/shared-scale-runtime'
+import { createSharedScaleRuntimeStore, isSharedScaleRuntimeReference, resolveSharedScaleRuntimeArtifactHashes, type SharedScaleArtifactRecord } from '../assessment-runtime/shared-scale-runtime'
 import { compositeItemSlotKey, formSectionSlotKey, type FrozenActiveSlotSetV1 } from '../assessment-runtime/slot-set'
 import { mapCompositeSection } from '../assessment-runtime/form-section-definition'
 import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
@@ -513,19 +513,25 @@ async function discoveryScaleRuntimes(rows: any[], tx: Prisma.TransactionClient)
       const cipher = row.runtimeSnapshotEncrypted
       if (typeof cipher !== 'string' || !cipher) invalid('量表指标冻结运行时缺失')
       if (decoded.has(cipher)) continue
-      const value = decryptUnifiedRuntimePayload<any>(cipher)
-      decoded.set(cipher, value)
+      decoded.set(cipher, decryptUnifiedRuntimePayload<any>(cipher))
+    }
+    const templates = publicTemplatesForDatabase(tx)
+    const planArtifactHashes = await resolveSharedScaleRuntimeArtifactHashes(decoded.values(), templates)
+    for (const [cipher, value] of decoded.entries()) {
       const shared = isSharedScaleRuntimeReference(value)
-      if (shared && (typeof value.artifactHash !== 'string' || !/^[a-f0-9]{64}$/.test(value.artifactHash))) invalid('量表指标共享运行时无效')
-      if (shared) artifactHashes.add(value.artifactHash)
-      const key = shared ? value.artifactHash : cipher
+      const resolvedHash = shared
+        ? (value.storageVersion === 4 ? planArtifactHashes.get(value.planHash) : value.artifactHash)
+        : undefined
+      if (shared && (typeof resolvedHash !== 'string' || !/^[a-f0-9]{64}$/.test(resolvedHash))) invalid('量表指标共享运行时无效')
+      if (shared && resolvedHash) artifactHashes.add(resolvedHash)
+      const key = shared && resolvedHash ? resolvedHash : cipher
       const group = groups.get(key) ?? []; group.push(cipher); groups.set(key, group)
     }
     const artifacts = artifactHashes.size ? await tx.$queryRaw<SharedScaleArtifactRecord[]>`SELECT artifact_hash AS "artifactHash",format_version AS "formatVersion",plaintext_bytes AS "plaintextBytes",payload_encrypted AS "payloadEncrypted"
       FROM assessment_runtime_artifacts WHERE artifact_hash IN (${Prisma.join([...artifactHashes])})` : []
     const byHash = new Map(artifacts.map(row => [row.artifactHash, row]))
     if (byHash.size !== artifacts.length || artifacts.length !== artifactHashes.size || artifacts.some(row => !artifactHashes.has(row.artifactHash))) invalid('量表指标共享运行时批次不一致')
-    const store = createSharedScaleRuntimeStore({find: async key => byHash.get(key) ?? null, insert: async () => {throw new Error('Discovery runtime reader is read only')}})
+    const store = createSharedScaleRuntimeStore({find: async key => byHash.get(key) ?? null, insert: async () => {throw new Error('Discovery runtime reader is read only')}}, templates)
     const runtimes = new Map<string, VersionedFrozenScaleRuntimeSnapshot>(), references = new Map<string, VersionedFrozenScaleRuntimeSnapshot>()
     for (const group of groups.values()) for (const cipher of group) {
       const value = decoded.get(cipher)

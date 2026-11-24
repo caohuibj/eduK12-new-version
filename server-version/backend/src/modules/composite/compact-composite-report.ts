@@ -10,6 +10,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { compactAssessmentStorageEnabled, encryptCompactField, decryptCompactField, isCompactEncryptedField } from '../assessment-runtime/compact-field-codec'
+import { isCompactScaleFactsBinary } from '../assessment-runtime/compact-scale-facts-binary'
 import { publicTemplates, type PublicTemplateStore } from '../assessment-runtime/public-templates'
 import { decodeScaleFacts, assertScaleFactsBinding, restoreCompactScaleFacts, prefetchCompactScaleTemplates } from '../assessment-runtime/compact-scale-facts'
 import { getScaleReportSourceRow } from '../assessment-runtime/compact-assessment-storage'
@@ -23,7 +24,7 @@ const rootStatic=['assessmentId','name','productKind','reportMode']
 const cipherHash=(value:string)=>createHash('sha256').update(value).digest('hex')
 export const canStoreCompactCompositeReport=(report:any,children:any[],cognitive:any[]=[]):boolean=>compactAssessmentStorageEnabled()
   &&Array.isArray(report.unitReports)&&report.unitReports.length>0&&report.unitReports.every((u:any)=>!u.decryptError&&(
-    u.type==='SCALE'&&children.some(c=>c.compositeItemId===u.itemId&&(isScaleFactsReference(c.result)||(typeof c.result==='string'&&isCompactEncryptedField(c.result))))
+    u.type==='SCALE'&&children.some(c=>c.compositeItemId===u.itemId&&(isScaleFactsReference(c.result)||(typeof c.result==='string'&&(isCompactEncryptedField(c.result)||isCompactScaleFactsBinary(c.result)))))
     ||sharedControlWritesEnabled()&&u.type==='COGNITIVE'&&cognitive.some(c=>c.compositeItemId===u.itemId&&typeof c.resultSnapshotEncrypted==='string'&&c.resultSnapshotEncrypted&&c.finishedAt)))
 
 

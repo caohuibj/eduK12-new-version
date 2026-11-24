@@ -37,7 +37,9 @@ export const loadScaleFactRecords=async(identities:Array<{id:string;attemptEpoch
 export type ScaleFactRecordSize={id:string;attemptEpoch:number;submissionId:string;submissionPayloadHash:string;sizeBytes:bigint|number;rawReceiptAttemptId:string|null}
 export const storedScaleFieldSizeSql=(field:Prisma.Sql):Prisma.Sql=>Prisma.sql`COALESCE(octet_length(${field}),0)+CASE
  WHEN ${field} LIKE 'ekc1:%' AND split_part(${field},':',4) ~ '^[0-9]{1,15}$'
- THEN split_part(${field},':',4)::bigint ELSE 0 END`
+ THEN split_part(${field},':',4)::bigint
+ WHEN ${field} LIKE 'ekf1:%' AND split_part(${field},':',2) ~ '^[0-9]{1,15}$'
+ THEN split_part(${field},':',2)::bigint ELSE 0 END`
 export const loadScaleFactRecordSizes=async(identities:Array<{id:string;attemptEpoch:number}>,db:Pick<Prisma.TransactionClient,'$queryRaw'>=prisma):Promise<ScaleFactRecordSize[]>=>{
  if(!identities.length)return []
  const unique=[...new Map(identities.map(x=>[JSON.stringify([x.id,x.attemptEpoch]),x])).values()]

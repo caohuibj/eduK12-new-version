@@ -12,7 +12,7 @@ import {withBoundedPlannerRead} from '../assessment-run/plannerBound'
 import {relationalEntryToRunPolicy,type RunResourcePolicy} from '../assessment-run/resourceAuthority'
 import type {RelationalProductEntryV1} from '../assessment-relational/product-registry'
 import {educationAssessmentOriginSchema,educationAssessmentResourceKey,type EducationAssessmentOrigin} from '../education-tools/assessment-resource.contract'
-import {readFrozenCompositionIdentity,assertCompositionCollection} from '../assessment-run/educationCompositionExecution'
+import {readFrozenCompositionIdentity,assertCompositionCollection,verifyLiveCompositionAnchorsBatch} from '../assessment-run/educationCompositionExecution'
 import {EducationPrivateToolError} from '../education-tools/private-tool.contracts'
 import {studentEvaluationTrackConfigSql} from './studentCompositionResource'
 
@@ -172,14 +172,30 @@ function startPreflightForRow(row:Row,actorUserId:string,compositionStartComposi
  }
 }
 export function createTeacherAssessmentAccess<Identity extends TeacherSourceIdentity>(db:TeacherRuntimeDb,source:TeacherAssessmentSourceAccess<Identity>,audience:TeacherAssessmentAudience='TEACHER_SELF'){
- const authorize=async(row:Row,actorUserId:string)=>{
+ const authorize=async(
+  row:Row,
+  actorUserId:string,
+  pageContext?:{verifiedLiveAnchors:ReadonlySet<string>;collectionChecks:Map<string,Promise<unknown>>},
+ )=>{
   if(row.resourceKey.startsWith('education-composition:')){
    if(row.family!=='BUNDLE')fail()
    const identity=await readFrozenCompositionIdentity(db,{policy:row.policy,policyHash:row.policyHash,organizationId:row.organizationId,
-    key:row.resourceKey,version:row.resourceVersion})
+    key:row.resourceKey,version:row.resourceVersion},pageContext?{verifiedLiveAnchors:pageContext.verifiedLiveAnchors}:undefined)
    if(identity.origin.entry!=='TEACHER'||identity.origin.variantKey!==(audience==='STUDENT_EVALUATION'?'TEACHER:STUDENT_REPORT':'TEACHER:SELF'))fail()
-   if(row.status!=='COMPLETED')await assertCompositionCollection(db,identity,row.status==='STARTED'
-    ? 'BOUND_COLLECTION' : row.publishedSelf ? 'PUBLISHED_SELF_START' : 'NEW_START')
+   if(row.status!=='COMPLETED'){
+    const purpose=row.status==='STARTED' ? 'BOUND_COLLECTION' : row.publishedSelf ? 'PUBLISHED_SELF_START' : 'NEW_START'
+    if(pageContext){
+     const checkKey=`${row.organizationId}:${row.resourceKey}:${row.resourceVersion}:${row.policyHash}:${purpose}`
+     let pending=pageContext.collectionChecks.get(checkKey)
+     if(!pending){
+      pending=assertCompositionCollection(db,identity,purpose)
+      pageContext.collectionChecks.set(checkKey,pending)
+     }
+     await pending
+    }else{
+     await assertCompositionCollection(db,identity,purpose)
+    }
+   }
    return {task:taskDto(row,identity.title),identity,row,runtimeCompositeId:identity.compositeId,
     startPreflight:startPreflightForRow(row,actorUserId,identity.origin.variantKey==='TEACHER:SELF'?identity.compositeId:undefined),
     units:identity.units.map(unit=>({itemId:unit.itemId,family:unit.family}))}
@@ -224,8 +240,15 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
    const input=pageSchema.parse(raw),cursor=input.cursor?decodeCursor(input.cursor,actorUserId):undefined
    const rows=await queryTeacherAssessmentRows(db,actorUserId,{cursor,limit:input.pageSize+1},audience)
    const page=rows.slice(0,input.pageSize),list:TeacherAssessmentTask[]=[]
+   const compositionTracks=page
+    .filter(row=>row.resourceKey.startsWith('education-composition:')&&row.family==='BUNDLE')
+    .map(row=>({policy:row.policy,policyHash:row.policyHash,organizationId:row.organizationId,key:row.resourceKey,version:row.resourceVersion}))
+   const verifiedLiveAnchors=compositionTracks.length
+    ? await verifyLiveCompositionAnchorsBatch(db,compositionTracks)
+    : new Set<string>()
+   const pageContext={verifiedLiveAnchors,collectionChecks:new Map<string,Promise<unknown>>()}
    for(const row of page){
-    try{list.push((await authorize(row,actorUserId)).task)}catch(error){
+    try{list.push((await authorize(row,actorUserId,pageContext)).task)}catch(error){
      if(error instanceof EducationAssessmentSourceError&&['EDUCATION_ASSESSMENT_RESOURCE_NOT_AVAILABLE','EDUCATION_ASSESSMENT_ORIGINAL_ISSUER_REVOKED'].includes(error.code))continue
      if(error instanceof ContentAuthorityError&&error.code==='CONTENT_AUTHORITY_DENIED')continue
      if(error instanceof EducationPrivateToolError&&['PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE','PRIVATE_TOOL_AUTHOR_REQUIRED'].includes(error.code))continue

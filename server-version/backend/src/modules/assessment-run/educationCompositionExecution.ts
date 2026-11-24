@@ -112,15 +112,70 @@ async function loadFrozenCompositionIdentityRow(tx:Tx,input:{
  }
 }
 
+/** Batch-verify live composition anchors for already-cached tracks in one SQL
+ * roundtrip (used by task-list pagination to avoid N sequential anchor checks).
+ * Unmatched anchors are omitted so callers fall back to the single-row check
+ * and fail closed identically. */
+export async function verifyLiveCompositionAnchorsBatch(
+ tx:Tx,
+ tracks:readonly FrozenCompositionTrack[],
+):Promise<ReadonlySet<string>>{
+ const checks:Array<{
+  cacheKey:string;compositeId:string;key:string;creationHash:string;manifestHash:string;
+  versionId:string;contentHash:string;entry:string;organizationId:string;ownerUserId:string;
+ }>=[],seen=new Set<string>()
+ for(const input of tracks){
+  const launch=input.policy?.runtimeLaunchTarget
+  if(launch?.kind!=='COMPOSITE'||!launch.ref||!input.policy?.educationComposition)continue
+  const parsedBinding=educationCompositionPolicyBindingSchema.safeParse(input.policy.educationComposition)
+  if(!parsedBinding.success)continue
+  const binding=parsedBinding.data,origin=binding.origin
+  const cacheKey=frozenCompositionCacheKey(input,binding.manifestHash,launch.ref)
+  if(seen.has(cacheKey)||!frozenCompositionIdentityCache.get(cacheKey))continue
+  seen.add(cacheKey)
+  checks.push({
+   cacheKey,compositeId:launch.ref,key:input.key,creationHash:canonicalHash(origin),
+   manifestHash:binding.manifestHash,versionId:origin.versionId,contentHash:origin.contentHash,
+   entry:origin.entry,organizationId:origin.organizationId,ownerUserId:origin.ownerUserId,
+  })
+ }
+ if(!checks.length)return new Set()
+ const rows=await tx.$queryRaw<Array<{cacheKey:string}>>(Prisma.sql`
+  SELECT req."cacheKey"
+  FROM jsonb_to_recordset(${JSON.stringify(checks)}::jsonb) AS req(
+   "cacheKey" text,"compositeId" text,"key" text,"creationHash" text,"manifestHash" text,
+   "versionId" text,"contentHash" text,"entry" text,"organizationId" text,"ownerUserId" text
+  )
+  JOIN composite_assessments c ON c.id=req."compositeId" AND c.creation_key=req."key"
+   AND c.creation_hash=req."creationHash" AND c.training_content_snapshot_hash=req."manifestHash"
+   AND c.created_by=req."ownerUserId" AND c.status='PUBLISHED' AND c.published_at IS NOT NULL
+   AND c.product_kind='ORGANIZATION_RESOURCE' AND NOT c.public_enabled AND NOT c.copyable
+  JOIN education_private_tool_versions original ON original.id=req."versionId"
+   AND original.content_hash=req."contentHash" AND original.entry::text=req."entry"
+   AND original.kind='COMPOSITION' AND original.organization_id=req."organizationId"
+   AND original.owner_user_id=req."ownerUserId"
+ `)
+ return new Set(rows.map(row=>row.cacheKey))
+}
+
 /** Frozen policy comes from an actual server-loaded Run track. The DB seal and
  * immutable version/children prove content correspondence; this reader checks
  * only the independent header anchors and bounded references, never full source
  * definitions, stimuli, report bodies or full snapshot hashes. No author rights. */
-export function readFrozenCompositionIdentity(tx:Tx,input:FrozenCompositionTrack){
- return resolveFrozenCompositionIdentity(tx,input)
+export function readFrozenCompositionIdentity(
+ tx:Tx,
+ input:FrozenCompositionTrack,
+ options?:{verifiedLiveAnchors?:ReadonlySet<string>},
+){
+ return resolveFrozenCompositionIdentity(tx,input,false,options?.verifiedLiveAnchors)
 }
 
-async function resolveFrozenCompositionIdentity(tx:Tx,input:FrozenCompositionTrack,prepareOnly=false){
+async function resolveFrozenCompositionIdentity(
+ tx:Tx,
+ input:FrozenCompositionTrack,
+ prepareOnly=false,
+ verifiedLiveAnchors?:ReadonlySet<string>,
+){
  const policy=input.policy,binding=educationCompositionPolicyBindingSchema.parse(policy.educationComposition),origin=binding.origin
  if(origin.variantKey==='TEACHER:EXPERT_REPORT')privateToolFail('PRIVATE_COMPOSITION_FIELD_INVITATION_REQUIRED',400)
  const variant=educationCompositionVariant(origin)
@@ -139,7 +194,7 @@ async function resolveFrozenCompositionIdentity(tx:Tx,input:FrozenCompositionTra
  let parsed:NonNullable<typeof cached>
  if(cached){
   // Speculative preparation leaves the live anchor to START's source query.
-  if(!prepareOnly){
+  if(!prepareOnly&&!verifiedLiveAnchors?.has(cacheKey)){
    const [live]=await tx.$queryRaw<Array<{id:string}>>(liveCompositionAnchor({
     compositeId:policy.runtimeLaunchTarget.ref,key:input.key,manifestHash:binding.manifestHash,origin,
    }))

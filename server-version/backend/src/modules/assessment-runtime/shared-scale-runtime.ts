@@ -1,5 +1,6 @@
 import { encryptControlReference } from './control-reference-codec'
 import { sharedControlWritesEnabled } from './shared-control-records'
+import { publicTemplates, type PublicTemplateStore } from './public-templates'
 import type { Prisma } from '@prisma/client'
 import { gzipSync, gunzipSync } from 'node:zlib'
 import { z } from 'zod'
@@ -59,11 +60,22 @@ const publishedReferenceV2Schema = z.object({
   snapshotHash: z.string().regex(/^[0-9a-f]{64}$/),
 }).strict()
 const publishedReferenceSchema = z.discriminatedUnion('schemaVersion', [publishedReferenceV1Schema, publishedReferenceV2Schema])
+const publishedPolicyPlanV1Schema = publishedReferenceV1Schema.omit({ kind: true, storageVersion: true, frozenAt: true, snapshotHash: true })
+const publishedPolicyPlanV2Schema = publishedReferenceV2Schema.omit({ kind: true, storageVersion: true, frozenAt: true, snapshotHash: true })
+const publishedPolicyPlanSchema = z.discriminatedUnion('schemaVersion', [publishedPolicyPlanV1Schema, publishedPolicyPlanV2Schema])
+const publishedReferenceV4Schema = z.object({
+  kind: z.literal('SHARED_SCALE_RUNTIME'),
+  storageVersion: z.literal(4),
+  planHash: z.string().regex(/^[0-9a-f]{64}$/),
+  frozenAt: z.string().datetime({ offset: true }),
+}).strict()
 const bodySchema = z.object({ kind: z.literal('SCALE_RUNTIME_ARTIFACT'), storageVersion: z.literal(1),
   artifactHash: z.string().regex(/^[0-9a-f]{64}$/), codec: z.literal('gzip-json-v1'),
   plaintextBytes: z.number().int().positive().max(MAX_PLAIN_BYTES), data: z.string().max(MAX_CIPHER_BYTES) }).strict()
 type SharedReference = z.infer<typeof referenceSchema>
 type PublishedSharedReference = z.infer<typeof publishedReferenceSchema>
+type PublishedSharedReferenceInput = Omit<z.infer<typeof publishedReferenceV1Schema>, 'snapshotHash'> & { snapshotHash?: string }
+  | Omit<z.infer<typeof publishedReferenceV2Schema>, 'snapshotHash'> & { snapshotHash?: string }
 type Artifact = Omit<VersionedFrozenScaleRuntimeSnapshot, 'frozenAt' | 'snapshotHash'>
 export type SharedScaleArtifactRecord = { artifactHash: string; formatVersion: number; plaintextBytes: number; payloadEncrypted: string }
 export interface SharedScaleArtifactRepository {
@@ -86,9 +98,36 @@ export const isPublishedSharedScaleRuntimeReference = (value: unknown): boolean 
     value
       && typeof value === 'object'
       && (value as { kind?: unknown; storageVersion?: unknown }).kind === 'SHARED_SCALE_RUNTIME'
-      && (value as { storageVersion?: unknown }).storageVersion === 3,
+      && ((value as { storageVersion?: unknown }).storageVersion === 3
+        || (value as { storageVersion?: unknown }).storageVersion === 4),
   )
 )
+
+export const resolveSharedScaleRuntimeArtifactHashes = async (
+  references: Iterable<unknown>,
+  templates: PublicTemplateStore,
+): Promise<Map<string, string>> => {
+  const planHashes = new Set<string>()
+  for (const value of references) {
+    if (
+      isSharedScaleRuntimeReference(value)
+      && (value as { storageVersion?: unknown }).storageVersion === 4
+      && typeof (value as { planHash?: unknown }).planHash === 'string'
+      && /^[a-f0-9]{64}$/.test((value as { planHash: string }).planHash)
+    ) {
+      planHashes.add((value as { planHash: string }).planHash)
+    }
+  }
+  const resolved = new Map<string, string>()
+  if (!planHashes.size) return resolved
+  const list = [...planHashes]
+  const rawPlans = await templates.loadMany(list.map(hash => ({ hash, kind: 'SCALE_RUNTIME_POLICY_PLAN' as const })))
+  for (let i = 0; i < list.length; i++) {
+    const plan = publishedPolicyPlanSchema.parse(rawPlans[i])
+    resolved.set(list[i], plan.artifactHash)
+  }
+  return resolved
+}
 
 const verifiedPublishedPolicies = new BoundedArtifactCache<CompiledScalePolicyV1>(128, 2 * 1024 * 1024)
 const resolveVerifiedPublishedPolicy = (raw: unknown): CompiledScalePolicyV1 => {
@@ -104,7 +143,7 @@ const resolveVerifiedPublishedPolicy = (raw: unknown): CompiledScalePolicyV1 => 
 
 const reconstructFromPublishedScaleArtifact = (
   artifact: PublishedScaleArtifact,
-  reference: PublishedSharedReference,
+  reference: PublishedSharedReferenceInput,
 ): VersionedFrozenScaleRuntimeSnapshot => {
   const expectedSelections = artifact.compiledRuntime.referenceBindingDefinition.selections
   if (reference.referenceBindings.length !== expectedSelections.length) {
@@ -139,7 +178,7 @@ const reconstructFromPublishedScaleArtifact = (
   }
   const v1 = { ...unsignedV1, snapshotHash: canonicalHashObjectParts(unsignedV1) }
   if (reference.schemaVersion === 1) {
-    if (v1.snapshotHash !== reference.snapshotHash) throw new Error('Shared Scale runtime snapshot hash mismatch')
+    if (reference.snapshotHash && v1.snapshotHash !== reference.snapshotHash) throw new Error('Shared Scale runtime snapshot hash mismatch')
     return v1
   }
   const compiledPolicy = resolveVerifiedPublishedPolicy(reference.compiledPolicy)
@@ -147,18 +186,37 @@ const reconstructFromPublishedScaleArtifact = (
     throw new Error('Published Scale runtime policy hash mismatch')
   }
   const v2 = createFrozenScaleRuntimeSnapshotV2FromV1(v1, compiledPolicy)
-  if (v2.snapshotHash !== reference.snapshotHash) throw new Error('Shared Scale runtime snapshot hash mismatch')
+  if (reference.snapshotHash && v2.snapshotHash !== reference.snapshotHash) throw new Error('Shared Scale runtime snapshot hash mismatch')
   return v2
 }
 
 export const reconstructPublishedSharedScaleRuntimeSync = (value: unknown): VersionedFrozenScaleRuntimeSnapshot => {
+  if ((value as { storageVersion?: unknown })?.storageVersion === 4) {
+    const reference = publishedReferenceV4Schema.parse(value)
+    const cachedPlan = publicTemplates.get(reference.planHash)
+    if (!cachedPlan || cachedPlan.kind !== 'SCALE_RUNTIME_POLICY_PLAN') {
+      throw new Error('Published Scale runtime policy plan is not cached in memory; use async loadFrozenScaleRuntimeSnapshot')
+    }
+    const plan = publishedPolicyPlanSchema.parse(cachedPlan.value)
+    const artifact = getCachedPublishedScaleArtifact(plan.artifactHash)
+    if (!artifact) throw new Error('Published Scale runtime artifact is not cached in memory; use async loadFrozenScaleRuntimeSnapshot')
+    return reconstructFromPublishedScaleArtifact(artifact, {
+      ...plan,
+      kind: 'SHARED_SCALE_RUNTIME',
+      storageVersion: 3,
+      frozenAt: reference.frozenAt,
+    })
+  }
   const reference = publishedReferenceSchema.parse(value)
   const artifact = getCachedPublishedScaleArtifact(reference.artifactHash)
   if (!artifact) throw new Error('Published Scale runtime artifact is not cached in memory; use async loadFrozenScaleRuntimeSnapshot')
   return reconstructFromPublishedScaleArtifact(artifact, reference)
 }
 
-export const createSharedScaleRuntimeStore = (repository: SharedScaleArtifactRepository) => {
+export const createSharedScaleRuntimeStore = (
+  repository: SharedScaleArtifactRepository,
+  defaultTemplateStore?: PublicTemplateStore,
+) => {
   const artifacts = new BoundedArtifactCache<VerifiedArtifact>(64, 8 * 1024 * 1024)
   const publishedArtifacts = new BoundedArtifactCache<PublishedScaleArtifact>(64, 8 * 1024 * 1024)
   const contentIndex = new BoundedArtifactCache<string>(128, 64 * 1024)
@@ -228,16 +286,14 @@ export const createSharedScaleRuntimeStore = (repository: SharedScaleArtifactRep
   }
   const save = async (snapshot: VersionedFrozenScaleRuntimeSnapshot,
     transactionRepository?: SharedScaleArtifactRepository,
+    templateStore?: PublicTemplateStore,
   ): Promise<string> => {
     const publishedArtifactHash = getSnapshotPublishedArtifactHash(snapshot)
     const cachedPublishedArtifact = publishedArtifactHash ? getCachedPublishedScaleArtifact(publishedArtifactHash) : undefined
     if (publishedArtifactHash && cachedPublishedArtifact) {
-      const publishedRef = publishedReferenceSchema.parse({
-        kind: 'SHARED_SCALE_RUNTIME',
-        storageVersion: 3,
+      const policyPlan = publishedPolicyPlanSchema.parse({
         artifactHash: publishedArtifactHash,
         schemaVersion: snapshot.schemaVersion,
-        frozenAt: snapshot.frozenAt,
         referenceBindings: snapshot.referenceBindings,
         ...(snapshot.measurementPresentation && !cachedPublishedArtifact.measurementPresentation
           ? { measurementPresentation: snapshot.measurementPresentation }
@@ -246,9 +302,29 @@ export const createSharedScaleRuntimeStore = (repository: SharedScaleArtifactRep
         ...(snapshot.schemaVersion === 2
           ? { compiledPolicy: snapshot.compiledPolicy, runtimePolicyHash: snapshot.runtimePolicyHash }
           : {}),
+      })
+      const publishedRef = publishedReferenceSchema.parse({
+        kind: 'SHARED_SCALE_RUNTIME',
+        storageVersion: 3,
+        ...policyPlan,
+        frozenAt: snapshot.frozenAt,
         snapshotHash: snapshot.snapshotHash,
       })
       reconstructFromPublishedScaleArtifact(cachedPublishedArtifact, publishedRef)
+      const effectiveTemplates = templateStore ?? defaultTemplateStore
+      if (sharedControlWritesEnabled() && effectiveTemplates) {
+        const [planHash] = await effectiveTemplates.saveMany([{
+          kind: 'SCALE_RUNTIME_POLICY_PLAN',
+          value: policyPlan,
+        }])
+        const compactEncrypted = encryptControlReference({
+          kind: 'SHARED_SCALE_RUNTIME',
+          storageVersion: 4,
+          planHash,
+          frozenAt: snapshot.frozenAt,
+        })
+        if (Buffer.byteLength(compactEncrypted) <= 4096) return compactEncrypted
+      }
       const encrypted = sharedControlWritesEnabled()
         ? encryptControlReference(publishedRef)
         : encryptUnifiedRuntimePayload(publishedRef)
@@ -323,8 +399,34 @@ export const createSharedScaleRuntimeStore = (repository: SharedScaleArtifactRep
     if (Buffer.byteLength(encrypted) > 4096) throw new Error('Shared Scale reference exceeds versioned storage bound')
     return encrypted
   }
-  const load = async (value: unknown, transactionRepository?: SharedScaleArtifactRepository): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
+  const load = async (
+    value: unknown,
+    transactionRepository?: SharedScaleArtifactRepository,
+    templateStore?: PublicTemplateStore,
+  ): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
     const compact = value as any
+    if (compact?.storageVersion === 4) {
+      const reference = publishedReferenceV4Schema.parse(value)
+      const effectiveTemplates = templateStore ?? defaultTemplateStore ?? publicTemplates
+      const [rawPlan] = await effectiveTemplates.loadMany([{ hash: reference.planHash, kind: 'SCALE_RUNTIME_POLICY_PLAN' }])
+      const plan = publishedPolicyPlanSchema.parse(rawPlan)
+      let published = publishedArtifacts.get(plan.artifactHash) ?? getCachedPublishedScaleArtifact(plan.artifactHash)
+      if (!published) {
+        const row = await (transactionRepository ?? repository).find(plan.artifactHash)
+        if (!row) throw new Error('Shared Scale runtime artifact is missing; restore it before retrying')
+        published = decodePublishedScaleArtifact(row, plan.artifactHash)
+        publishedArtifacts.set(plan.artifactHash, published, row.plaintextBytes * 6 + row.payloadEncrypted.length * 2 + 2048)
+        if (!transactionRepository) {
+          cacheCommittedPublishedScaleArtifact(plan.artifactHash, published, row.plaintextBytes)
+        }
+      }
+      return reconstructFromPublishedScaleArtifact(published, {
+        ...plan,
+        kind: 'SHARED_SCALE_RUNTIME',
+        storageVersion: 3,
+        frozenAt: reference.frozenAt,
+      })
+    }
     if (compact?.storageVersion === 3) {
       const reference = publishedReferenceSchema.parse(value)
       let published = publishedArtifacts.get(reference.artifactHash) ?? getCachedPublishedScaleArtifact(reference.artifactHash)
@@ -380,4 +482,4 @@ const repository: SharedScaleArtifactRepository = {
   async find(hash) { return sharedScaleArtifactRepositoryForDatabase((await import('../../config/database')).prisma).find(hash) },
   async insert(row) { return sharedScaleArtifactRepositoryForDatabase((await import('../../config/database')).prisma).insert(row) },
 }
-export const sharedScaleRuntimeStore = createSharedScaleRuntimeStore(repository)
+export const sharedScaleRuntimeStore = createSharedScaleRuntimeStore(repository, publicTemplates)

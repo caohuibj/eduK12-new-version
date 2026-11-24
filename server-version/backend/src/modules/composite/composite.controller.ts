@@ -1,5 +1,5 @@
 import { serveProjectedReportImage } from '../reporting/report-image-delivery'
-import type { OrdinarySelfWholeBinding, OrdinarySelfWholeProduct } from '../assessment-run/ordinarySelfWholeAccess'
+import type { OrdinarySelfWholeBinding, OrdinarySelfWholeProduct, OrdinarySelfWholeProgressBinding } from '../assessment-run/ordinarySelfWholeAccess'
 import { isAssessmentStartBusyError } from './start-transient'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
 import { wholeQuestionnaireArrival, markAssessmentTimeline, traceAssessmentPhase, traceAssessmentPhaseSync } from '../../services/runtimeObservability'
@@ -157,7 +157,7 @@ export const compositeController = {
     const abort = new AbortController(); const closed = () => abort.abort(); res.once('close', closed)
     try {
       const { readEducationWholeProgressWithWait } = await import('./whole-questionnaire.service')
-      const bound = res.locals?.ordinarySelfWhole as OrdinarySelfWholeBinding | undefined
+      const bound = res.locals?.ordinarySelfWhole as (OrdinarySelfWholeBinding | OrdinarySelfWholeProgressBinding) | undefined
       return success(res, await readEducationWholeProgressWithWait(req.params.attemptId, req.user!.userId, {
         bound,
         executionStatus: res.locals?.educationExecutionStatus,

@@ -12,6 +12,7 @@ vi.mock('../../modules/measurement-content/repository', () => ({
 
 import {
   tryReadPreMaterializedDeclaredFeedback,
+  tryReadPreMaterializedNativeScaleFeedback,
   type PreMaterializedEducationWholeFeedbackV2,
 } from '../../modules/reporting/education-ordinary-declared-feedback'
 
@@ -162,5 +163,94 @@ describe('tryReadPreMaterializedDeclaredFeedback', () => {
       expect(result).toBeNull()
     }
     expect(mocks.getContentReleaseBatch).not.toHaveBeenCalled()
+  })
+
+  it('reads pre-materialized native scale feedback (PRIVATE_VERSION / LIBRARY_SCALE) and rejects any identity or ceiling drift', () => {
+    const nativeBlockId = '00000000-0000-4000-8000-000000000021'
+    const nativeItemId = '00000000-0000-4000-8000-000000000022'
+    const scaleId = '00000000-0000-4000-8000-000000000023'
+    const defHash = '9'.repeat(64)
+    const nativeIdentity: any = {
+      ...identity,
+      manifest: [{
+        blockId: nativeBlockId,
+        kind: 'SCALE',
+        versionId,
+        contentHash: defHash,
+        sourceProvider: 'PRIVATE_VERSION',
+        itemIds: [nativeItemId],
+        sectionIds: [],
+        title: 'Private Scale 1',
+      }],
+      units: [{
+        blockId: nativeBlockId,
+        itemId: nativeItemId,
+        family: 'SCALE',
+        scaleId,
+        sourceDefinitionHash: defHash,
+      }],
+      binding: {
+        manifestHash,
+        unitReports: [{
+          blockId: nativeBlockId,
+          versionId,
+          contentHash: defHash,
+          respondent: { mode: 'INDIVIDUAL_SUMMARY', metricKeys, longitudinalMetricKeys: [] },
+        }],
+      },
+    }
+    const nativePayload = makePayload({
+      interpretationHash: null,
+      releaseIds: [],
+      declared: [],
+      nativeScales: [{
+        blockId: nativeBlockId,
+        itemId: nativeItemId,
+        scaleId,
+        versionId,
+        contentHash: defHash,
+        sourceDefinitionHash: defHash,
+        metricKeysHash: canonicalHash(metricKeys),
+        report: {
+          state: 'PROJECTED',
+          unitReports: [{ itemId: nativeItemId, title: 'Private Scale 1', scores: [] }],
+        } as any,
+      }],
+    })
+    const ownWithoutInterpretation = {
+      ...own,
+      contentState: { ...own.contentState, trainingContentInterpretationHash: null },
+    }
+    const sources: any[] = [{
+      itemId: nativeItemId,
+      scaleId,
+      title: 'Private Scale 1',
+      sourceDefinitionHash: defHash,
+      resultDisclosure: {},
+      privateVersion: { versionId, contentHash: defHash },
+    }]
+    const hit = tryReadPreMaterializedNativeScaleFeedback({
+      preMaterializedReport: encryptUnifiedRuntimePayload(nativePayload),
+      identity: nativeIdentity,
+      own: ownWithoutInterpretation,
+      sources,
+    })
+    expect(hit).not.toBeNull()
+    expect(hit!.get(nativeItemId)).toMatchObject({ state: 'PROJECTED' })
+
+    // Drift on scaleId, sourceDefinitionHash, metricKeysHash, or interpretationHash forces fallback (null)
+    for (const drift of [
+      { ...nativePayload, nativeScales: [{ ...nativePayload.nativeScales![0], scaleId: 'other-scale' }] },
+      { ...nativePayload, nativeScales: [{ ...nativePayload.nativeScales![0], sourceDefinitionHash: '0'.repeat(64) }] },
+      { ...nativePayload, nativeScales: [{ ...nativePayload.nativeScales![0], metricKeysHash: canonicalHash(['only_one']) }] },
+      { ...nativePayload, interpretationHash },
+    ]) {
+      expect(tryReadPreMaterializedNativeScaleFeedback({
+        preMaterializedReport: encryptUnifiedRuntimePayload(drift),
+        identity: nativeIdentity,
+        own: ownWithoutInterpretation,
+        sources,
+      })).toBeNull()
+    }
   })
 })

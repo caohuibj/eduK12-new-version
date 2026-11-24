@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
-import { createSharedScaleRuntimeStore, isSharedScaleRuntimeReference, type SharedScaleArtifactRecord } from '../assessment-runtime/shared-scale-runtime'
+import { createSharedScaleRuntimeStore, isSharedScaleRuntimeReference, resolveSharedScaleRuntimeArtifactHashes, type SharedScaleArtifactRecord } from '../assessment-runtime/shared-scale-runtime'
 import { parseVersionedFrozenScaleRuntimeSnapshot, type VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -81,6 +81,8 @@ export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.Tr
       if(isSharedScaleRuntimeReference(value)&&typeof value.artifactHash==='string'&&/^[a-f0-9]{64}$/.test(value.artifactHash))artifactHashes.add(value.artifactHash)
     }catch{runtimes.set(record,undefined)}
   }
+  const planArtifactHashes = await resolveSharedScaleRuntimeArtifactHashes(runtimes.values(), templates)
+  for (const artifactHash of planArtifactHashes.values()) artifactHashes.add(artifactHash)
   const [scaleFacts, snapshots, artifacts] = await Promise.all([
     createStoredScaleFactsReader(records, db, true),
     snapshotWhere.length ? db.assessmentUnitSnapshot.findMany({where: {OR: snapshotWhere}}) : [],
@@ -89,7 +91,7 @@ export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.Tr
   ])
   const artifactRows=new Map(artifacts.map(row=>[row.artifactHash,row]))
   if(artifactRows.size!==artifacts.length||artifacts.some(row=>!artifactHashes.has(row.artifactHash)))throw new Error('Report runtime artifact batch binding mismatch')
-  const runtimeStore=createSharedScaleRuntimeStore({find:async hash=>artifactRows.get(hash)??null,insert:async()=>{throw new Error('Report runtime batch is read only')}})
+  const runtimeStore=createSharedScaleRuntimeStore({find:async hash=>artifactRows.get(hash)??null,insert:async()=>{throw new Error('Report runtime batch is read only')}}, templates)
   const decoded = new Map<any, NonNullable<ReturnType<typeof decodeScaleFacts>>>()
   for (const record of records) {
     const {row,facts} = scaleFacts.read(record,db)
