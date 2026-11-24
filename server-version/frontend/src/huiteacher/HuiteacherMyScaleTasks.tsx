@@ -224,6 +224,7 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
         title={selected.title}
         client={v2Client}
         onExit={()=>{if(sessionRef.current===visible)leave()}}
+        onReceiptAccepted={()=>{if(visible&&sessionRef.current===visible){confirmCompleted(visible.selected)}}}
         onCompleted={()=>{if(visible&&sessionRef.current===visible){const task=visible.selected;confirmCompleted(task);leave();showReport(task)}}}
       />:<FinalCompositeAssessment
         key={`${attempt.id}:${attempt.currentItem?.id??''}:${attempt.currentItem?.definitionHash??''}`}

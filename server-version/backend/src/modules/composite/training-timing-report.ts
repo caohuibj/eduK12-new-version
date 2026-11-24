@@ -2,7 +2,7 @@ import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {readCompositeFinalRaw} from '../assessment-runtime/composite-final.reader'
 import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
-import {normalizeTrainingScaleTiming,projectTrainingTimingFact} from '../assessment-runtime/training-scale-timing'
+import {projectTrainingTimingFact} from '../assessment-runtime/training-scale-timing'
 /** Timing is added only AFTER cached scientific report projection. Fresh permission
  * is read every time; cached bytes never contain a timing authorization decision. */
 export async function withTrainingTimingReport(report:Record<string,any>,parent:{id:string;attemptEpoch?:number;publicationHash?:string|null;trainingTimingSnapshot?:unknown;compositeAssessment:{productKind?:string;timingExportEnabled?:boolean;revision?:number}},audience:string,preloaded?:{attemptEpoch:number;children:Array<{compositeAttemptId:string|null;compositeItemId:string|null;attemptEpoch:number;timingEncrypted?:string|null}>}){
@@ -16,11 +16,7 @@ export async function withTrainingTimingReport(report:Record<string,any>,parent:
   if(loadedRaw){
    for(const unit of Object.values(loadedRaw.raw.units)){
     if(unit.unitType!=='SCALE')continue
-    let fact:ReturnType<typeof normalizeTrainingScaleTiming>=null
-    if(unit.timings){
-     try{fact=normalizeTrainingScaleTiming(parent.trainingTimingSnapshot,unit.codes,unit.codes,unit.timings)}catch{fact=null}
-    }
-    byId.set(unit.itemId,projectTrainingTimingFact(parent.trainingTimingSnapshot,fact))
+    byId.set(unit.itemId,projectTrainingTimingFact(parent.trainingTimingSnapshot,unit.trainingTimingFact??null))
    }
   }
  }else{

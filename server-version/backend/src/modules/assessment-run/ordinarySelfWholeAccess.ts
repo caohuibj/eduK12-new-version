@@ -72,6 +72,7 @@ export type OrdinarySelfWholeBinding = WholeReceiptRow & {
   executionStatus: string
   parentStatus: CompositeAssessmentAttempt['status']
   jobStatus: CompositeReportJob['status'] | null
+  v2FinalCommitted?: boolean
 }
 type StartProof = { kind: 'start'; preflight: RunStartPreflight }
 type Row = Omit<OrdinarySelfWholeBinding, 'id' | 'kind'> & {
@@ -90,6 +91,7 @@ export type OrdinarySelfWholeProgressBinding = {
   parentStatus: CompositeAssessmentAttempt['status']
   wholeSubmissionId: string | null
   jobStatus: CompositeReportJob['status'] | null
+  v2FinalCommitted?: boolean
   executionStatus: string
 }
 
@@ -105,6 +107,7 @@ type ProgressFastRow = {
   payloadHash: string | null
   acceptedAt: Date | null
   jobStatus: CompositeReportJob['status'] | null
+  v2FinalCommitted?: boolean
   executionStatus: string
   assignmentStatus: string
   consentId: string | null
@@ -129,9 +132,13 @@ export async function readOrdinarySelfWholeProgress(
   const [row] = await db.$queryRaw<ProgressFastRow[]>(Prisma.sql`
     SELECT p.id, p.attempt_epoch AS epoch, p.receipt_only AS "receiptOnly",
       p.status AS "parentStatus", p.frozen_active_slot_set_hash AS "slotHash",
-      p.assignment_ref AS "assignmentRef", j.slot_set_hash AS "jobSlot",
-      j.whole_submission_id AS "wholeSubmissionId", j.whole_payload_hash AS "payloadHash",
-      j.whole_accepted_at AS "acceptedAt", j.status AS "jobStatus",
+      p.assignment_ref AS "assignmentRef",
+      COALESCE(j.slot_set_hash, f.slot_set_hash) AS "jobSlot",
+      COALESCE(j.whole_submission_id, f.submission_id) AS "wholeSubmissionId",
+      COALESCE(j.whole_payload_hash, f.payload_hash) AS "payloadHash",
+      COALESCE(j.whole_accepted_at, f.completed_at) AS "acceptedAt",
+      j.status AS "jobStatus",
+      (f.attempt_id IS NOT NULL) AS "v2FinalCommitted",
       e.status AS "executionStatus", a.status AS "assignmentStatus", a.consent_id AS "consentId",
       e.organization_id AS "organizationId", e.run_id AS "runId",
       (e.subject_actor_snapshot_id = e.respondent_actor_snapshot_id) AS "isSelfExec",
@@ -150,6 +157,8 @@ export async function readOrdinarySelfWholeProgress(
       AND a.policy_domain = 'ORGANIZATION_RUN'
     LEFT JOIN composite_report_jobs j
       ON j.attempt_id = p.id AND j.attempt_epoch = p.attempt_epoch
+    LEFT JOIN composite_attempt_finals f
+      ON f.attempt_id = p.id AND f.attempt_epoch = p.attempt_epoch
     WHERE p.id = ${attemptId}
       AND p.user_id = ${userId}
       AND p.subject_user_id = ${userId}
@@ -188,6 +197,7 @@ export async function readOrdinarySelfWholeProgress(
         parentStatus: row.parentStatus,
         wholeSubmissionId: row.wholeSubmissionId,
         jobStatus: row.jobStatus,
+        ...(row.v2FinalCommitted ? { v2FinalCommitted: true } : {}),
         executionStatus: row.executionStatus,
       }
     }
@@ -266,9 +276,14 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
       ) AS "currentAssignment",
       p.id, p.user_id AS "userId",
       NULL::text AS "recoveryTokenHash", p.attempt_epoch AS epoch, p.status AS "parentStatus", p.receipt_only AS "receiptOnly",
-      p.frozen_active_slot_set_hash AS "slotHash", j.slot_set_hash AS "jobSlot",
-      j.whole_submission_id AS "wholeSubmissionId", j.whole_payload_hash AS "payloadHash",
-      j.whole_accepted_at AS "acceptedAt", j.status AS state, j.status AS "jobStatus",
+      p.frozen_active_slot_set_hash AS "slotHash",
+      COALESCE(j.slot_set_hash, f.slot_set_hash) AS "jobSlot",
+      COALESCE(j.whole_submission_id, f.submission_id) AS "wholeSubmissionId",
+      COALESCE(j.whole_payload_hash, f.payload_hash) AS "payloadHash",
+      COALESCE(j.whole_accepted_at, f.completed_at) AS "acceptedAt",
+      COALESCE(j.status::text, CASE WHEN f.attempt_id IS NOT NULL THEN 'READY' END) AS state,
+      j.status AS "jobStatus",
+      (f.attempt_id IS NOT NULL) AS "v2FinalCommitted",
       e.runtime_binding_ref IS NOT NULL AS opened,
       (e.status='COMPLETED' AND a.status='COMPLETED' AND p.status='COMPLETED'
         OR e.status='STARTED' AND ((a.status='STARTED' AND p.status='IN_PROGRESS')
@@ -314,8 +329,9 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
       AND p.training_content_binding->>'attemptId'=p.id
       AND p.training_content_binding->'epoch'=to_jsonb(p.attempt_epoch)
       AND NOT EXISTS (SELECT 1 FROM jsonb_array_elements(p.training_content_binding->'units') unit WHERE unit->>'family'<>'SCALE')`}
-      AND (${wholeDelivery} OR p.async_report_epoch=p.attempt_epoch)
+      AND (${wholeDelivery} OR p.async_report_epoch=p.attempt_epoch OR p.publication_hash IS NOT NULL)
     LEFT JOIN composite_report_jobs j ON j.attempt_id=p.id AND j.attempt_epoch=p.attempt_epoch
+    LEFT JOIN composite_attempt_finals f ON f.attempt_id=p.id AND f.attempt_epoch=p.attempt_epoch
     LIMIT 1
   `
 }

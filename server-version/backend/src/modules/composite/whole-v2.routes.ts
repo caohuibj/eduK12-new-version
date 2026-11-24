@@ -246,7 +246,6 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
           aggregateHash: string
           factsHash: string
           rawHash: string
-          hasFeedback: boolean
           completedAt: Date
         }>>(Prisma.sql`
           SELECT attempt_id AS "attemptId",
@@ -256,7 +255,6 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
             aggregate_hash AS "aggregateHash",
             facts_hash AS "factsHash",
             raw_hash AS "rawHash",
-            (feedback_cipher IS NOT NULL) AS "hasFeedback",
             completed_at AS "completedAt"
           FROM composite_attempt_finals
           WHERE attempt_id = ${ctx.attempt.id} AND attempt_epoch = ${ctx.attempt.attemptEpoch}
@@ -276,7 +274,7 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
             completedAt: row.completedAt.toISOString(),
             replayed: true,
             receiptOnly: ctx.attempt.receiptOnly,
-            feedbackAvailable: row.hasFeedback,
+            feedbackAvailable: !ctx.attempt.receiptOnly,
           }
         }
       }

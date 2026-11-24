@@ -597,4 +597,126 @@ describe('WholeCompositeV2Runner (4-in-1 Form + Scale + SJT + Cognitive)', () =>
     fireEvent.click(screen.getByRole('button', { name: '确认并查看结果' }))
     expect(onCompleted).toHaveBeenCalledTimes(1)
   })
+
+  it('uses TrainingTimingBoundary and submits strict SurveyScaleItemTimingV1 when timingEnabled is true', async () => {
+    window.localStorage?.clear()
+    const { client, submittedPayloads } = makeMockV2Client()
+    const origLoadMeta = client.loadMeta
+    client.loadMeta = vi.fn(async () => {
+      const res = await origLoadMeta()
+      return { ...res, data: { ...res.data, timingEnabled: true, activeSlotKeys: ['scale:item-scale'] } }
+    })
+    const onCompleted = vi.fn()
+
+    render(
+      <WholeCompositeV2Runner
+        attemptId="att-v2-timing"
+        client={client}
+        onExit={vi.fn()}
+        onCompleted={onCompleted}
+      />,
+    )
+
+    // TrainingTimingBoundary renders pause/resume control when timingEnabled is true
+    await screen.findByRole('button', { name: '暂停作答与计时' })
+    fireEvent.click(screen.getByText('非常符合'))
+    fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
+
+    await waitFor(() => expect(onCompleted).toHaveBeenCalledTimes(1))
+    const scaleUnit = submittedPayloads[0].units['scale:item-scale']
+    expect(scaleUnit.answers).toEqual([{ itemCode: 'q1', responseValue: 4 }])
+    expect(scaleUnit.timings?.q1).toMatchObject({
+      schemaVersion: 1,
+      changeCount: 0,
+      revisitCount: 0,
+      visits: 1,
+    })
+    expect(typeof scaleUnit.timings?.q1.activeTimeMs).toBe('number')
+    expect(typeof scaleUnit.timings?.q1.interrupted).toBe('boolean')
+    expect(typeof scaleUnit.timings?.q1.recoveredWithoutClock).toBe('boolean')
+    expect('answeredAt' in (scaleUnit.timings?.q1 ?? {})).toBe(false)
+    expect('responseTimeMs' in (scaleUnit.timings?.q1 ?? {})).toBe(false)
+  })
+
+  it('WholeCompositeQuestionnaire reports READY immediately for non-receiptOnly V2 and routes receiptOnly to onReceiptAccepted', async () => {
+    window.localStorage?.clear()
+    const { client } = makeMockV2Client()
+    const origLoadMeta = client.loadMeta
+    client.loadMeta = vi.fn(async () => {
+      const res = await origLoadMeta()
+      return { ...res, data: { ...res.data, activeSlotKeys: ['scale:item-scale'] } }
+    })
+    // Simulate backend receipt where feedbackCipher was null (feedbackAvailable=false in old payload)
+    // to prove WholeCompositeQuestionnaire ALWAYS emits READY (retryAfterSeconds=0) for non-receiptOnly V2
+    const origSubmit = client.submitWhole
+    client.submitWhole = vi.fn(async input => {
+      const res = await origSubmit(input)
+      return { ...res, data: { ...res.data, receiptOnly: false, feedbackAvailable: true } }
+    })
+    const onCompleted = vi.fn()
+    const onReceiptAccepted = vi.fn()
+    const state = {
+      id: 'att-v2-ready',
+      assessmentId: 'comp-1',
+      name: '整卷报告就绪测试',
+      status: 'IN_PROGRESS',
+      deliveryMode: 'FINAL_ONLY',
+      executionMode: 'WHOLE_V2',
+      attemptEpoch: 1,
+      progress: 0,
+      completedItems: 0,
+      totalItems: 1,
+      currentIndex: 0,
+      items: [],
+      units: [],
+      currentItem: null,
+    } as unknown as CompositeAttemptState
+
+    const { unmount } = render(
+      <WholeCompositeQuestionnaire
+        state={state}
+        api={{} as any}
+        v2Client={client}
+        fallback={<p>legacy</p>}
+        onExit={vi.fn()}
+        onCompleted={onCompleted}
+        onReceiptAccepted={onReceiptAccepted}
+      />,
+    )
+    await screen.findByText('我最近情绪平稳')
+    fireEvent.click(screen.getByText('非常符合'))
+    fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
+    await waitFor(() => expect(onCompleted).toHaveBeenCalledTimes(1))
+    expect(onCompleted.mock.calls[0][0]).toMatchObject({
+      status: 'COMPLETED',
+      runCompleted: true,
+      reportStatus: { state: 'READY', retryAfterSeconds: 0 },
+    })
+    expect(onReceiptAccepted).not.toHaveBeenCalled()
+    unmount()
+
+    // Receipt-only path calls onReceiptAccepted and renders ReceiptOnlyConfirmation (never onCompleted)
+    const onCompletedRo = vi.fn()
+    const onReceiptRo = vi.fn()
+    client.submitWhole = vi.fn(async input => {
+      const res = await origSubmit(input)
+      return { ...res, data: { ...res.data, receiptOnly: true, feedbackAvailable: false } }
+    })
+    render(
+      <WholeCompositeQuestionnaire
+        state={{ ...state, id: 'att-v2-ro', receiptOnly: true }}
+        api={{} as any}
+        v2Client={client}
+        fallback={<p>legacy</p>}
+        onExit={vi.fn()}
+        onCompleted={onCompletedRo}
+        onReceiptAccepted={onReceiptRo}
+      />,
+    )
+    await screen.findByText('我最近情绪平稳')
+    fireEvent.click(screen.getByText('非常符合'))
+    fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
+    await waitFor(() => expect(onReceiptRo).toHaveBeenCalledTimes(1))
+    expect(onCompletedRo).not.toHaveBeenCalled()
+  })
 })

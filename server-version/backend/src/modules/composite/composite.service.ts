@@ -2,7 +2,11 @@ import {previewTrainingStandardReportEligibility} from './training-standard-repo
 import { isCompositeWholeV2Enabled } from '../assessment-runtime/composite-whole-v2-flag'
 import { generateCompositeUnitSeeds, loadCompositePublicationPlan } from '../assessment-runtime/composite-publication-plan'
 import { extractCompositeFinalFormValues, readCompositeFinalUnitSnapshots } from '../assessment-runtime/composite-final.bridge'
-import { materializeCompositePublicationPlan, resolveCompositePublicationPlanForAttempt } from './whole-v2.access'
+import {
+  materializeCompositePublicationPlan,
+  resolveCompositePublicationPlanForAttempt,
+  resolveVariantActiveSlotKeys,
+} from './whole-v2.access'
 import { resolveLegacyScaleProjectionPolicy, scaleProjectionPolicyFromCompiled } from '../scale/projection/policy-resolver'
 import {scaleRuntimeInstrumentKey} from '../scale/runtime-identity'
 import {
@@ -4019,7 +4023,11 @@ const createAttempt = async (
   // (0 assessments, 0 form_section_attempts, 0 cognitive_sessions, 0 situational_attempts).
   // Conditional flow & material-allocation composites remain on the stepped legacy runtime.
   if (finalOnly && !flowEnabled && isCompositeWholeV2Enabled()) {
-    const plan = await materializeCompositePublicationPlan(composite.id, db)
+    const plan = await materializeCompositePublicationPlan(composite.id, db, {
+      id: composite.id,
+      publishedAt: composite.publishedAt ?? null,
+      updatedAt: composite.updatedAt,
+    })
     const generatedSeeds = generateCompositeUnitSeeds(plan, newAttemptId, attemptEpoch)
     const v2Attempt = await db.compositeAssessmentAttempt.create({
       data: {
@@ -5646,6 +5654,10 @@ const getUnifiedCompositeAttemptState = async (
   // Phase 2 WHOLE_V2 fast state projection: zero child-table queries.
   if (attempt.publicationHash) {
     const plan = await resolveCompositePublicationPlanForAttempt(attempt)
+    const activeSlotKeys = resolveVariantActiveSlotKeys(attempt, plan)
+    const activeSlots = activeSlotKeys
+      ? plan.slots.filter(slot => activeSlotKeys.has(slot.slotKey))
+      : plan.slots
     const isCompleted = attempt.status === 'COMPLETED'
     return {
       id: attempt.id,
@@ -5666,9 +5678,9 @@ const getUnifiedCompositeAttemptState = async (
       definitionHash: attempt.publicationHash,
       contextSnapshotHash: attempt.contextSnapshotHash ?? null,
       progress: isCompleted ? 100 : 0,
-      completedItems: isCompleted ? plan.slots.length : 0,
-      totalItems: plan.slots.length,
-      currentIndex: isCompleted ? plan.slots.length : 0,
+      completedItems: isCompleted ? activeSlots.length : 0,
+      totalItems: activeSlots.length,
+      currentIndex: isCompleted ? activeSlots.length : 0,
       startedAt: attempt.startedAt,
       lastSavedAt: attempt.lastSavedAt,
       completedAt: attempt.completedAt,
@@ -5686,7 +5698,7 @@ const getUnifiedCompositeAttemptState = async (
         completed: isCompleted,
         index,
       })),
-      units: plan.slots.map((slot, index) => ({
+      units: activeSlots.map((slot, index) => ({
         id: slot.unitType === 'FORM_SECTION' ? slot.sectionId : slot.itemId,
         type: slot.unitType,
         position: slot.position,
@@ -6994,14 +7006,24 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
   let v2SnapBySlot: Map<string, Awaited<ReturnType<typeof readCompositeFinalUnitSnapshots>>['snapshots'][number]> | null = null
   let v2PlanSlotByKey: Map<string, Awaited<ReturnType<typeof loadCompositePublicationPlan>>['slots'][number]> | null = null
   if (isWholeV2) {
-    const [v2Read, v2Plan] = await Promise.all([
-      readCompositeFinalUnitSnapshots(prisma, [{ attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch }]),
-      loadCompositePublicationPlan(attempt.publicationHash),
-    ])
-    v2LoadedFinal = v2Read.loadedFactsByKey.get(`${attempt.id}:${attempt.attemptEpoch}`)
-    if (v2LoadedFinal) {
-      v2SnapBySlot = new Map(v2Read.snapshots.map(snap => [snap.slotKey, snap]))
-      v2PlanSlotByKey = new Map(v2Plan.slots.map(slot => [slot.slotKey, slot]))
+    if (
+      batch?.v2Final
+      && batch.v2Final.loaded.meta.attemptId === attempt.id
+      && batch.v2Final.loaded.meta.attemptEpoch === attempt.attemptEpoch
+    ) {
+      v2LoadedFinal = batch.v2Final.loaded
+      v2SnapBySlot = new Map(batch.v2Final.snapshots.map(snap => [snap.slotKey, snap]))
+      v2PlanSlotByKey = new Map(batch.v2Final.plan.slots.map(slot => [slot.slotKey, slot]))
+    } else {
+      const [v2Read, v2Plan] = await Promise.all([
+        readCompositeFinalUnitSnapshots(prisma, [{ attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch }]),
+        loadCompositePublicationPlan(attempt.publicationHash),
+      ])
+      v2LoadedFinal = v2Read.loadedFactsByKey.get(`${attempt.id}:${attempt.attemptEpoch}`)
+      if (v2LoadedFinal) {
+        v2SnapBySlot = new Map(v2Read.snapshots.map(snap => [snap.slotKey, snap]))
+        v2PlanSlotByKey = new Map(v2Plan.slots.map(slot => [slot.slotKey, slot]))
+      }
     }
   }
   const useV2Final = Boolean(v2LoadedFinal && v2SnapBySlot && v2PlanSlotByKey)

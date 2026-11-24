@@ -13,10 +13,14 @@ export const recoverWholeQuestionnaireReceipt = async (
   const row = admitted ?? (await prisma.$queryRaw<WholeReceiptRow[]>`
     SELECT p."id", p."receipt_only" AS "receiptOnly", p."user_id" AS "userId", p."recovery_token_hash" AS "recoveryTokenHash",
       p."attempt_epoch" AS epoch, p."frozen_active_slot_set_hash" AS "slotHash",
-      j."slot_set_hash" AS "jobSlot", j."whole_submission_id" AS "wholeSubmissionId",
-      j."whole_payload_hash" AS "payloadHash", j."whole_accepted_at" AS "acceptedAt", j."status" AS state
+      COALESCE(j."slot_set_hash", f."slot_set_hash") AS "jobSlot",
+      COALESCE(j."whole_submission_id", f."submission_id") AS "wholeSubmissionId",
+      COALESCE(j."whole_payload_hash", f."payload_hash") AS "payloadHash",
+      COALESCE(j."whole_accepted_at", f."completed_at") AS "acceptedAt",
+      COALESCE(j."status"::text, CASE WHEN f."attempt_id" IS NOT NULL THEN 'READY' END) AS state
     FROM "composite_assessment_attempts" p
     LEFT JOIN "composite_report_jobs" j ON j."attempt_id" = p."id" AND j."attempt_epoch" = p."attempt_epoch"
+    LEFT JOIN "composite_attempt_finals" f ON f."attempt_id" = p."id" AND f."attempt_epoch" = p."attempt_epoch"
     WHERE p."id" = ${attemptId}
   `)[0]
   if (!row || row.id !== attemptId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷作答不存在', 404)
@@ -35,5 +39,5 @@ export const recoverWholeQuestionnaireReceipt = async (
   }
   return { status: 'ACCEPTED' as const, attemptId, submissionId, payloadHash: row.payloadHash,
     acceptedAt: row.acceptedAt, committedAt: new Date(), replayed: true,
-    ...(row.receiptOnly ? { receiptOnly: true as const } : { reportStatus: { state: row.state ?? 'PENDING', retryAfterSeconds: 2 } }) }
+    ...(row.receiptOnly ? { receiptOnly: true as const } : { reportStatus: { state: row.state ?? 'PENDING', retryAfterSeconds: row.state === 'READY' ? 0 : 2 } }) }
 }

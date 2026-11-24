@@ -1199,11 +1199,14 @@ export async function submitWholeQuestionnaire(attemptId: string, submission: Wh
 export const readEducationWholeProgress = async (attemptId: string, userId: string, executionStatus?: string) => {
   const [progress] = await prisma.$queryRaw<EducationWholeProgressRow[]>`
     SELECT parent.attempt_epoch AS epoch, parent.status AS "parentStatus", parent.receipt_only AS "receiptOnly",
-      job.whole_submission_id AS "wholeSubmissionId", job.status AS "jobStatus",
+      COALESCE(job.whole_submission_id, final.submission_id) AS "wholeSubmissionId",
+      job.status AS "jobStatus",
+      (final.attempt_id IS NOT NULL) AS "v2FinalCommitted",
       exec.status AS "executionStatus"
     FROM composite_assessment_attempts parent
     JOIN composite_assessments publication ON publication.id=parent.composite_assessment_id
     LEFT JOIN composite_report_jobs job ON job.attempt_id=parent.id AND job.attempt_epoch=parent.attempt_epoch
+    LEFT JOIN composite_attempt_finals final ON final.attempt_id=parent.id AND final.attempt_epoch=parent.attempt_epoch
     LEFT JOIN assessment_run_executions exec ON exec.runtime_binding_kind='COMPOSITE' AND exec.runtime_binding_ref=parent.id
     WHERE parent.id=${attemptId} AND parent.user_id=${userId} AND parent.assignment_ref<>''
       AND publication.product_kind='ORGANIZATION_RESOURCE'
@@ -1218,6 +1221,7 @@ type EducationWholeProgressRow = {
   parentStatus: WholeSubmissionHeader['status']
   wholeSubmissionId: string | null
   jobStatus: CompositeReportJob['status'] | null
+  v2FinalCommitted?: boolean
   executionStatus?: string | null
 }
 
@@ -1229,9 +1233,11 @@ export function educationWholeProgressFromRow(attemptId: string, progress: Educa
   // Parent/Run completion is not the report job's durable READY commit.
   const jobState = progress.jobStatus ?? 'WAITING'
   // Receipt-only completion follows the committed parent/Run, not a report
-  // materialization job. With-report still requires the durable Job READY.
+  // materialization job. WHOLE_V2 commits single-row FINAL synchronously so
+  // completed V2 attempts are immediately READY without a report_jobs row.
   const receiptCompleted = progress.receiptOnly === true && progress.parentStatus === 'COMPLETED' && executionStatus === 'COMPLETED'
-  const reportState = receiptCompleted ? 'READY' : terminalFailure ?? (awaitingRun || (progress.parentStatus !== 'COMPLETED' && jobState === 'READY')
+  const v2Ready = progress.v2FinalCommitted === true && progress.parentStatus === 'COMPLETED' && !awaitingRun
+  const reportState = receiptCompleted || v2Ready ? 'READY' : terminalFailure ?? (awaitingRun || (progress.parentStatus !== 'COMPLETED' && jobState === 'READY')
     ? 'PROCESSING' : jobState)
   const waitEnabled = !progress.receiptOnly && Boolean(progress.wholeSubmissionId) && reportReadyWaitAvailable()
   return {

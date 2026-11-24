@@ -81,6 +81,12 @@ export class BoundedArtifactCache<T> {
     }
     this.values.set(key, { value, charge }); this.bytes += charge
   }
+  delete(key: string): boolean {
+    const prior = this.values.get(key)
+    if (!prior) return false
+    this.bytes -= prior.charge
+    return this.values.delete(key)
+  }
   clear(): void {
     this.values.clear()
     this.bytes = 0

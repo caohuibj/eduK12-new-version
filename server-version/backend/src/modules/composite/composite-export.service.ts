@@ -548,7 +548,7 @@ export const getExportData = async (
         const v2Items = Array.isArray(definition?.items) ? definition.items : []
         const v2Scores = Array.isArray(definition?.scoring?.scores) ? definition.scoring.scores : []
         if(template.productKind==='QUESTIONNAIRE'&&template.timingExportEnabled){
-          const timing=projectTrainingTimingFact(attempt.trainingTimingSnapshot,v2Loaded?(v2ScaleRaw?.timings??null):(result?.timingEncrypted?decryptUnifiedRuntimePayload(result.timingEncrypted):null))
+          const timing=projectTrainingTimingFact(attempt.trainingTimingSnapshot,v2Loaded?(v2ScaleRaw?.trainingTimingFact??null):(result?.timingEncrypted?decryptUnifiedRuntimePayload(result.timingEncrypted):null))
           row[`${prefix}TIMING_scope`]=timing.scope;row[`${prefix}TIMING_status`]=timing.status
           const scaleLabel=packageSlotLabels.get(item.position)??item.scale.name
           for(const question of v2Items){
@@ -567,7 +567,9 @@ export const getExportData = async (
             ? v2ScaleRaw.codes.map((code, idx) => ({
                 itemCode: code,
                 responseValue: v2ScaleRaw.values[idx],
-                responseTimeMs: (v2ScaleRaw.timings as Record<string, any> | undefined)?.[code]?.firstResponseMs ?? null,
+                responseTimeMs: v2ScaleRaw.trainingTimingFact?.items?.[code]?.firstResponseMs
+                  ?? (v2ScaleRaw.timings as Record<string, any> | undefined)?.[code]?.firstResponseMs
+                  ?? null,
               }))
             : []
           decodedAnswers = {

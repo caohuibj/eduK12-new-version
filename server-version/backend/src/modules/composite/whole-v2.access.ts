@@ -166,12 +166,100 @@ async function loadScaleReferenceSetsForDefinitions(
   return result
 }
 
+async function loadCognitiveReferenceSetsForDefinitions(
+  db: Db,
+  requests: Array<{ testType: string; referenceVersions: string[] }>,
+): Promise<Map<string, AssessmentReferenceSetDefinition[]>> {
+  const result = new Map<string, AssessmentReferenceSetDefinition[]>()
+  const byType = new Map<string, Set<string>>()
+  for (const req of requests) {
+    if (!req.referenceVersions.length) continue
+    const set = byType.get(req.testType) ?? new Set<string>()
+    for (const v of req.referenceVersions) set.add(v)
+    byType.set(req.testType, set)
+  }
+  const orClauses: Prisma.AssessmentReferenceSetWhereInput[] = []
+  for (const [testType, versions] of byType.entries()) {
+    orClauses.push({
+      instrumentType: 'COGNITIVE',
+      instrumentKey: testType,
+      referenceVersion: { in: [...versions] },
+      status: 'ACTIVE',
+    })
+  }
+  if (!orClauses.length) return result
+  const rows = await db.assessmentReferenceSet.findMany({ where: { OR: orClauses } })
+  for (const row of rows) {
+    const validation = validateReferenceSetDefinition({
+      ...(row.definition && typeof row.definition === 'object' ? row.definition : {}),
+      schemaVersion: 1,
+      instrumentType: 'cognitive',
+      instrumentKey: row.instrumentKey,
+      referenceVersion: row.referenceVersion,
+      status: row.status,
+    })
+    if (validation.definition && !validation.issues.some(issue => issue.severity === 'error')) {
+      const list = result.get(row.instrumentKey) ?? []
+      list.push(validation.definition)
+      result.set(row.instrumentKey, list)
+    }
+  }
+  return result
+}
+
+async function verifyCachedScaleDeployments(
+  plan: CompositePublicationPlanV1,
+  db: Db,
+): Promise<boolean> {
+  for (const slot of plan.slots) {
+    if (slot.unitType !== 'SCALE' || slot.instrumentClass !== 'STANDARD') continue
+    const deploymentResolution = await resolveScaleStartDeployment({
+      db: db as any,
+      scale: {
+        id: slot.scaleId,
+        code: slot.scaleCode ?? slot.instrumentKey,
+        instrumentVersion: slot.instrumentVersion,
+        instrumentClass: 'STANDARD',
+        status: 'PUBLISHED',
+      },
+    })
+    if (!deploymentResolution.allowNewStarts) {
+      throw new InstrumentFinalSubmitError(
+        'INSTRUMENT_NOT_AVAILABLE',
+        `量表部署策略不允许新开始：${deploymentResolution.reasons.join(',') || 'UNKNOWN'}`,
+        409,
+      )
+    }
+    const livePolicyHash = deploymentResolution.kind === 'MANAGED_V2'
+      ? deploymentResolution.runtimePolicy.runtimePolicyHash
+      : undefined
+    if (livePolicyHash !== slot.runtimePolicyHash) {
+      return false
+    }
+  }
+  return true
+}
+
 /** Materializes and persists (content-addressed in assessment_public_templates)
  * the complete frozen CompositePublicationPlanV1 for a published composite assessment. */
 export async function materializeCompositePublicationPlan(
   compositeId: string,
   db: Db = prisma,
+  knownHeader?: { id: string; publishedAt: Date | null; updatedAt: Date },
 ): Promise<CompositePublicationPlanV1> {
+  const knownCacheKey = knownHeader && knownHeader.id === compositeId
+    ? `${knownHeader.id}:${knownHeader.publishedAt?.toISOString() ?? knownHeader.updatedAt.toISOString()}`
+    : null
+  if (knownCacheKey && (db === prisma || knownHeader!.publishedAt != null)) {
+    const cached = planByCompositeCache.get(knownCacheKey)
+    if (cached) {
+      if (await verifyCachedScaleDeployments(cached, db)) {
+        return cached
+      }
+      planByCompositeCache.delete(knownCacheKey)
+    }
+  }
+
   const composite = await db.compositeAssessment.findUnique({
     where: { id: compositeId },
     select: {
@@ -265,27 +353,47 @@ export async function materializeCompositePublicationPlan(
 
   const cacheKey = `${composite.id}:${composite.publishedAt?.toISOString() ?? composite.updatedAt.toISOString()}`
   // Published composite plans are immutable by (compositeId, publishedAt, updatedAt), so
-  // START transactions (where db is a Prisma.TransactionClient) safely share the read cache.
+  // START transactions (where db is a Prisma.TransactionClient) safely share the read cache,
+  // while still verifying live STANDARD Scale deployment policies before returning a cached plan.
   const canUsePlanCache = db === prisma || composite.publishedAt != null
   if (canUsePlanCache) {
     const cached = planByCompositeCache.get(cacheKey)
-    if (cached) return cached
-  }
-
-  // Preload declared scale reference sets in 1 query
-  const scaleRefRequests: Array<{ instrumentKey: string; referenceVersions: string[] }> = []
-  const parsedScaleDefs = new Map<string, ReturnType<typeof scaleDefinitionSchema.parse>>()
-  for (const item of composite.items) {
-    if (item.type !== 'SCALE' || !item.scale?.definition) continue
-    const def = scaleDefinitionSchema.parse(item.scale.definition)
-    parsedScaleDefs.set(item.id, def)
-    if (def.referencePolicy.type === 'declared') {
-      const instrumentKey = scaleRuntimeInstrumentKey(item.scale) ?? item.scale.code
-      const versions = [...new Set(def.referencePolicy.selections.map(s => s.referenceVersion))]
-      scaleRefRequests.push({ instrumentKey, referenceVersions: versions })
+    if (cached) {
+      if (await verifyCachedScaleDeployments(cached, db)) {
+        return cached
+      }
+      planByCompositeCache.delete(cacheKey)
     }
   }
-  const refSetsByInstrument = await loadScaleReferenceSetsForDefinitions(db, scaleRefRequests)
+
+  // Preload declared scale & cognitive reference sets in 1 batched query each
+  const scaleRefRequests: Array<{ instrumentKey: string; referenceVersions: string[] }> = []
+  const cogRefRequests: Array<{ testType: string; referenceVersions: string[] }> = []
+  const parsedScaleDefs = new Map<string, ReturnType<typeof scaleDefinitionSchema.parse>>()
+  for (const item of composite.items) {
+    if (item.type === 'SCALE' && item.scale?.definition) {
+      const def = scaleDefinitionSchema.parse(item.scale.definition)
+      parsedScaleDefs.set(item.id, def)
+      if (def.referencePolicy.type === 'declared') {
+        const instrumentKey = scaleRuntimeInstrumentKey(item.scale) ?? item.scale.code
+        const versions = [...new Set(def.referencePolicy.selections.map(s => s.referenceVersion))]
+        scaleRefRequests.push({ instrumentKey, referenceVersions: versions })
+      }
+    } else if (item.type === 'COGNITIVE' && item.cognitiveAssignment?.config) {
+      const cfg = item.cognitiveAssignment.config
+      const cogTaskDef = getCognitiveV2TaskDefinition(cfg.testType, cfg.engineVersion, cfg.scoringVersion)
+      if (cogTaskDef && cogTaskDef.references.length > 0) {
+        cogRefRequests.push({
+          testType: cfg.testType,
+          referenceVersions: [...new Set(cogTaskDef.references.map(r => r.referenceVersion))],
+        })
+      }
+    }
+  }
+  const [refSetsByInstrument, cogRefSetsByTestType] = await Promise.all([
+    loadScaleReferenceSetsForDefinitions(db, scaleRefRequests),
+    loadCognitiveReferenceSetsForDefinitions(db, cogRefRequests),
+  ])
 
   // Preload SJT releases in 1 batch
   const sjtIdentities = composite.items
@@ -340,7 +448,7 @@ export async function materializeCompositePublicationPlan(
       })
       let compiledPolicy: import('../scale/policy/compile').CompiledScalePolicyV1 | undefined
       let runtimePolicyHash: string | undefined
-      if (item.scale.instrumentClass === 'STANDARD' && typeof (db as any).$queryRaw === 'function') {
+      if (item.scale.instrumentClass === 'STANDARD') {
         const deploymentResolution = await resolveScaleStartDeployment({
           db: db as any,
           scale: {
@@ -369,6 +477,7 @@ export async function materializeCompositePublicationPlan(
         unitType: 'SCALE',
         itemId: item.id,
         scaleId: item.scale.id,
+        scaleCode: item.scale.code,
         instrumentKey,
         instrumentVersion: item.scale.instrumentVersion,
         instrumentClass: item.scale.instrumentClass,
@@ -473,31 +582,14 @@ export async function materializeCompositePublicationPlan(
         assignment.config.engineVersion,
         assignment.config.scoringVersion,
       )
-      const cogReferenceSets: AssessmentReferenceSetDefinition[] = []
-      if (cogTaskDef && cogTaskDef.references.length > 0) {
-        const refVersions = [...new Set(cogTaskDef.references.map(r => r.referenceVersion))]
-        const refRows = await db.assessmentReferenceSet.findMany({
-          where: {
-            instrumentType: 'COGNITIVE',
-            instrumentKey: assignment.config.testType,
-            referenceVersion: { in: refVersions },
-            status: 'ACTIVE',
-          },
-        })
-        for (const r of refRows) {
-          const validation = validateReferenceSetDefinition({
-            ...(r.definition && typeof r.definition === 'object' ? r.definition : {}),
-            schemaVersion: 1,
-            instrumentType: 'cognitive',
-            instrumentKey: r.instrumentKey,
-            referenceVersion: r.referenceVersion,
-            status: r.status,
-          })
-          if (validation.definition && !validation.issues.some(issue => issue.severity === 'error')) {
-            cogReferenceSets.push(validation.definition)
-          }
-        }
-      }
+      const neededCogVersions = cogTaskDef && cogTaskDef.references.length > 0
+        ? new Set(cogTaskDef.references.map(r => r.referenceVersion))
+        : null
+      const cogReferenceSets = neededCogVersions
+        ? (cogRefSetsByTestType.get(assignment.config.testType) ?? []).filter(
+            ref => neededCogVersions.has(ref.referenceVersion),
+          )
+        : []
       const media = collectMediaFromUnknown(
         prepared.snapshot.presentation,
         `COGNITIVE:${prepared.compiledRuntime.compiledRuntimeHash}`,
@@ -658,7 +750,7 @@ function assertRelationalConsentInTx(
   })
 }
 
-function resolveVariantActiveSlotKeys(
+export function resolveVariantActiveSlotKeys(
   attempt: Pick<LoadedAttemptRow, 'trainingVariantAllocationEncrypted' | 'trainingVariantAllocationHash'>,
   plan: CompositePublicationPlanV1,
 ): ReadonlySet<string> | undefined {
@@ -849,6 +941,7 @@ export async function authorizeTrainingAuthenticatedWholeV2(req: Request): Promi
       startedAt: attempt.startedAt,
       publicationHash: attempt.publicationHash!,
       unitSeedsEncrypted: attempt.unitSeedsEncrypted,
+      trainingTimingSnapshot: attempt.trainingTimingSnapshot ?? null,
       deliveryCourseId: attempt.deliveryCourseId,
     },
     plan,
@@ -891,6 +984,7 @@ export async function authorizeTrainingPublicWholeV2(req: Request): Promise<Auth
       startedAt: attempt.startedAt,
       publicationHash: attempt.publicationHash!,
       unitSeedsEncrypted: attempt.unitSeedsEncrypted,
+      trainingTimingSnapshot: attempt.trainingTimingSnapshot ?? null,
       deliveryCourseId: attempt.deliveryCourseId,
     },
     plan,
@@ -951,6 +1045,7 @@ export async function authorizeEducationWholeV2(req: Request): Promise<Authorize
       startedAt: attempt.startedAt,
       publicationHash: attempt.publicationHash!,
       unitSeedsEncrypted: attempt.unitSeedsEncrypted,
+      trainingTimingSnapshot: attempt.trainingTimingSnapshot ?? null,
       deliveryCourseId: attempt.deliveryCourseId,
       organizationId: runBinding?.organizationId ?? null,
     },
@@ -1003,6 +1098,7 @@ export async function authorizeFieldCompositionWholeV2(req: Request): Promise<Au
       startedAt: attempt.startedAt,
       publicationHash: attempt.publicationHash!,
       unitSeedsEncrypted: attempt.unitSeedsEncrypted,
+      trainingTimingSnapshot: null,
       deliveryCourseId: attempt.deliveryCourseId,
       organizationId: fieldCtx.scope.organizationId,
     },
