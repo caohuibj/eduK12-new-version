@@ -1093,6 +1093,8 @@ export default function SurveyPublicApp(){
   const directConsentEntry=participantEntry&&!!automaticConsentWave
   const codeReturnEntry=participantEntry&&codeMode&&!validEntry&&!linkedIdentityReady
   const streamlinedRandomEntry=participantEntry&&generatedCodeMode&&!home&&!!consentWave&&(validEntry||!!fullMemorableCode&&linkedIdentityReady)
+  const submittingFinal=busy&&finalInFlight.current
+  const readingCompletion=busy&&!!completion&&!general
   return <div className={'min-h-screen bg-slate-50 text-slate-800'+(!cognitiveRunning?' survey-participant-shell'+(task&&!general&&!completion?' survey-active-answer':''):'')}>
     {!cognitiveRunning&&<a className="survey-participant-skip" href="#survey-participant-content">跳至研究内容</a>}
     <header className={'border-b bg-white'+(!cognitiveRunning?' survey-participant-header':'')}>
@@ -1110,7 +1112,7 @@ export default function SurveyPublicApp(){
           aria-current={index===(general||completion?2:task?1:0)?'step':undefined}>
           <span aria-hidden="true">0{index+1}</span>{label}</li>)}
       </ol>}
-      {busy&&<p role="status" aria-live="polite" aria-atomic="true">{busyLabel}</p>}
+      {busy&&!readingCompletion&&<p role="status" aria-live="polite" aria-atomic="true">{busyLabel}</p>}
       {loading&&<p role="status">正在读取研究说明…</p>}
       {error&&<p role="alert" className={message('border-l-4 border-red-600 bg-red-50 p-3')}>{error}</p>}
       {notice&&notice!==singleStartNotice&&(notice!==singleResumeNotice||!cognitiveRunning)&&<p role="status" className={message('border-l-4 border-teal-600 bg-teal-50 p-3')}>{notice}</p>}
@@ -1282,7 +1284,7 @@ export default function SurveyPublicApp(){
           </nav>
         </section>:task.units.map(renderSurveyTask)}
         </fieldset>
-        {finalSealed&&<p role="status" className={message('')}>本次答案已封存，尚未确认提交结果。请使用下方按钮重试原提交，不会创建另一份答卷；暂不能修改答案，请勿刷新或关闭页面。</p>}
+        {finalSealed&&!submittingFinal&&<p role="status" className={message('')}>本次答案已封存，尚未确认提交结果。请使用下方按钮重试原提交，不会创建另一份答卷；暂不能修改答案，请勿刷新或关闭页面。</p>}
         {finalSubmitVisible&&<button className={action('btn-primary')} disabled={busy||cognitiveRunning||(!finalSealed&&task.units.some(unit=>unit.kind==='SCALE'&&!mountedScaleImagesReady(unit)))||(!finalSealed&&!task.flow&&!task.units.every(unit=>{
           if(unit.executionProtocol==='SITUATIONAL_NATIVE_V1')return !!situationalReferences[unit.instrumentKey]
           if(unit.kind!=='FORM')return true
@@ -1290,7 +1292,7 @@ export default function SurveyPublicApp(){
             own(answers,unit.instrumentKey)??{})
           const pages=(unit.pages||[]).filter(p=>p.questions.some(q=>vis.has(q.itemKey)))
           return (own(formPages,unit.instrumentKey)??0)>=pages.length-1
-        }))}>{busy&&finalInFlight.current?'正在提交…':finalSealed?'重试原提交':currentFlow?.termination==='SCREEN_OUT'?'完成资格筛选':cognitiveSessions.length?'提交整份问卷':'提交本轮正式回答'}</button>}
+        }))}>{submittingFinal?'正在提交…':finalSealed?'重试原提交':currentFlow?.termination==='SCREEN_OUT'?'完成资格筛选':cognitiveSessions.length?'提交整份问卷':'提交本轮正式回答'}</button>}
         {!cognitiveRunning&&!finalSealed&&<div className="text-xs text-slate-500 space-y-1" aria-label="作答提醒">
           <p>{task.checkpointPolicy?.enabled
             ?info?.project.collectionMode==='LINKED_WAVES'
@@ -1312,15 +1314,15 @@ export default function SurveyPublicApp(){
           :<button type="button" className={action('btn-secondary')} disabled={busy}
               onClick={withdraw}>撤回本轮筛选记录</button>}
       </section>}
-      {showingCompletion&&<section className={panel((general?'survey-completion-card ':'')+'bg-white border rounded-xl p-5 space-y-3')}>
-        {general&&<div className="survey-completion-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m6 12 4 4 8-8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></div>}
+      {showingCompletion&&<section className={panel('survey-completion-card bg-white border rounded-xl p-5 space-y-3')}>
+        <div className="survey-completion-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m6 12 4 4 8-8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
         <h2 ref={completionHeading} tabIndex={-1} className="text-xl font-semibold">感谢参与，问卷已提交</h2>
-        {!general&&completion&&<>
+        {!general&&completion&&(readingCompletion?<p role="status" className="survey-completion-copy">你的回答已保存，正在读取后续信息…</p>:<>
           <p className="survey-completion-state">你已完成问卷，可以关闭此页面。</p>
           <p>你的回答已保存。暂时无法显示后续信息，你可以稍后重试。</p>
           <button type="button" className={action('btn-secondary')} disabled={busy}
             onClick={()=>void run(()=>readCompletion(completion.attemptId,completion.proof))}>重新查看</button>
-        </>}
+        </>)}
         {general&&<>
           <p className="survey-completion-copy whitespace-pre-wrap">{general.text||'你已完成问卷，可以关闭此页面。'}</p>
           {general.kind==='DESCRIPTIVE'&&<section className="border rounded-lg p-3 space-y-3" aria-label="本次表现描述性反馈">

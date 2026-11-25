@@ -74,11 +74,9 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
   const currentScope=useRef<typeof scope|null>(scope)
   currentScope.current=scope
   const detailRef=useRef<HTMLDivElement>(null)
-  const inboxTitle=useRef<HTMLHeadingElement>(null),wasDetailOpen=useRef(false)
+  const inboxTitle=useRef<HTMLHeadingElement>(null)
   useEffect(()=>{
     if(selected&&details){detailRef.current?.focus({preventScroll:true});(detailRef.current?.parentElement?.querySelector('.hs-student-task-navigation')??detailRef.current)?.scrollIntoView?.({block:'start'})}
-    else if(wasDetailOpen.current){inboxTitle.current?.focus({preventScroll:true});inboxTitle.current?.scrollIntoView?.({block:'start'})}
-    wasDetailOpen.current=Boolean(selected&&details)
   },[selected,details])
   const load=useCallback(async(targetPage:number,cursorOverride?:string|null)=>{
     if(currentScope.current!==scope||scope.pending)return
@@ -136,11 +134,12 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
   const showFeedback=(task:SchoolTask)=>{
     if(currentScope.current===scope){setFeedback({scope,task});setError('')}
   }
-  const feedbackWasOpen=useRef(false)
+  const taskViewOpen=Boolean(selected||visibleExecution||visibleFeedback)
+  const wasTaskViewOpen=useRef(false)
   useEffect(()=>{
-    if(!visibleFeedback&&feedbackWasOpen.current){inboxTitle.current?.focus({preventScroll:true});inboxTitle.current?.scrollIntoView?.({block:'start'})}
-    feedbackWasOpen.current=Boolean(visibleFeedback)
-  },[visibleFeedback])
+    if(!taskViewOpen&&wasTaskViewOpen.current){inboxTitle.current?.focus({preventScroll:true});inboxTitle.current?.scrollIntoView?.({block:'start'})}
+    wasTaskViewOpen.current=taskViewOpen
+  },[taskViewOpen])
   const renderAssessmentFeedback=useMemo(()=>createEducationAssessmentFeedback({api,entry:'SCHOOL'}),[api])
   const feedbackExecutionId=visibleFeedback?.task.id
   const readFeedback=useCallback(()=>api<EducationFeedbackData>(
@@ -174,11 +173,11 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
   }
   const partial=Boolean(items&&(items.total>items.list.length||items.hasMore||items.truncated))
   const visibleTasks=(items?.list??[]).filter(task=>schoolSearchText(task.title+' '+task.activityTitle).includes(schoolSearchText(query))).slice().sort((a,b)=>sort==='title'?a.title.localeCompare(b.title,'zh-CN',{numeric:true}):sort==='deadline'?(schoolDeadline(a.deadline)-schoolDeadline(b.deadline))||0:0)
-  return <section className={'hs-panel hs-task-view hs-student-tasks'+(!selected&&!visibleExecution&&!visibleFeedback?' hs-student-task-index':'')}>
+  return <section className={'hs-panel hs-task-view hs-student-tasks'+(!taskViewOpen?' hs-student-task-index':'')}>
     <div className={selected?'hs-student-task-navigation':undefined}>
     {selected&&<button type="button" className="hs-student-detail-back" disabled={busy} onClick={()=>{setDetails(null);setSelected(null)}}><ArrowLeft size={17} aria-hidden="true"/>返回活动</button>}
-    <details className="hs-task-inbox" open={!(selected||visibleExecution||visibleFeedback)}>
-    <summary hidden={!(selected||visibleExecution||visibleFeedback)}>查看任务列表</summary>
+    <details className="hs-task-inbox" open={!taskViewOpen}>
+    <summary hidden={!taskViewOpen}>查看任务列表</summary>
     <div className="hs-student-task-trail"><a href={workspaceHref('overview')} onClick={event=>navigate(event,'overview')}><ArrowLeft size={16} aria-hidden="true"/>返回概览</a>{activityId&&<a href={workspaceHref('tasks')} onClick={event=>navigate(event,'tasks')}>查看全部任务</a>}</div>
     <header className="hs-student-task-heading"><div><h1 ref={inboxTitle} tabIndex={-1}>我的校园任务</h1><p>{activityId&&items?.list[0]?.activityTitle?items.list[0].activityTitle:'学校已开放的活动任务'}</p></div>
     {items?<SchoolCollectionControls query={query} onQuery={setQuery} sort={sort} onSort={setSort} view={view} onView={setView} searchLabel={partial?'检索本页任务':'检索任务'} placeholder="搜索任务名称或活动名称" sorts={[{value:'recommended',label:'默认顺序'},{value:'deadline',label:'截止时间优先'},{value:'title',label:'任务名称 A–Z'}]} actions={<button type="button" disabled={busy||loading} onClick={()=>void load(listError?retryPage:page)} aria-label={loading?'正在读取…':listError?'重试读取待办':'刷新待办'} title="刷新待办"><RefreshCw size={18} aria-hidden="true"/></button>}/>:<button type="button" disabled={busy||loading} onClick={()=>void load(listError?retryPage:page)} aria-label={loading?'正在读取…':listError?'重试读取待办':'刷新待办'} title="刷新待办"><RefreshCw size={18} aria-hidden="true"/></button>}</header>
