@@ -5,6 +5,16 @@ import './cognitive-report-reading.css'
 import './cognitive-report-audiences.css'
 
 const units: Record<string, string> = { ms: '毫秒', ratio: '比例', count: '次数', level: '内部水平', 'd-prime': 'd′', score: '任务内得分', map: '分条件/分轮次' }
+const qualityLabels: Record<CognitiveV2Report['qualityState'], string> = {
+  interpretable: '可解释',
+  limited: '受限',
+  invalid: '无效',
+}
+const effectLabels: Record<string, string> = {
+  none: '不影响解释',
+  limited: '限制解释',
+  invalid: '结果无效',
+}
 export default function CognitiveProfessionalReport({ report, recordLabel, reportId, assignmentTitle, finishedAt, references = [] }: { report: CognitiveV2Report; recordLabel?: string; reportId?: string | null; assignmentTitle?: string | null; finishedAt?: string | null; references?: Array<Record<string, unknown>> }) {
   const reading = report.reading
   const professional = reading?.professional
@@ -17,10 +27,10 @@ export default function CognitiveProfessionalReport({ report, recordLabel, repor
     <div className="cognitive-professional__body"><p className="cognitive-professional__eyebrow">教师与管理员 · 现有权限内的结果解释</p><h1>{report.title}：结果与解释依据</h1>
       <CognitiveReportRecord assignmentTitle={assignmentTitle} reportId={reportId} finishedAt={finishedAt} />
       {!professional && <p className="cognitive-professional__notice">历史冻结版本：保留原始结果与解释。本报告未使用当前规则补写历史指标或方法。</p>}
-      <section className={`cognitive-professional__summary cognitive-professional__summary--${state}`} aria-label="专业结果摘要"><h2>01 结果摘要</h2><dl><div><dt>原始数据质量</dt><dd>{report.qualityState}</dd></div><div><dt>当前解释状态</dt><dd>{state === 'available' ? '可作本次任务描述' : state === 'qualified' ? '受限解释' : '关键指标暂不解释'}</dd></div><div><dt>已展示指标</dt><dd>{metrics.length} 项</dd></div></dl><p>{state === 'withheld' ? '关键指标未满足解释条件。仅保留允许的过程记录，禁止将撤下的数值补零或据此作个体排序。' : metrics.slice(0, 3).map(metric => `${metric.label} ${metric.formatted}`).join('；') || '没有可展示的指标。'}</p><p>{professional?.interpretation ?? report.conclusion}</p></section>
+      <section className={`cognitive-professional__summary cognitive-professional__summary--${state}`} aria-label="专业结果摘要"><h2>01 结果摘要</h2><dl><div><dt>原始数据质量</dt><dd>{qualityLabels[report.qualityState]}</dd></div><div><dt>当前解释状态</dt><dd>{state === 'available' ? '可作本次任务描述' : state === 'qualified' ? '受限解释' : '关键指标暂不解释'}</dd></div><div><dt>已展示指标</dt><dd>{metrics.length} 项</dd></div></dl><p>{state === 'withheld' ? '关键指标未满足解释条件。仅保留允许的过程记录，禁止将撤下的数值补零或据此作个体排序。' : metrics.slice(0, 3).map(metric => `${metric.label} ${metric.formatted}`).join('；') || '没有可展示的指标。'}</p><p>{professional?.interpretation ?? report.conclusion}</p></section>
       {professional && <section><h2>02 测量任务与方法</h2><dl className="cognitive-professional__method"><div><dt>任务构念</dt><dd>{professional.construct}</dd></div><div><dt>操作与计算口径</dt><dd>{professional.procedure}</dd></div></dl>{professional.parameters.length > 0 && <dl className="cognitive-professional__parameters">{professional.parameters.map(parameter => <div key={parameter.label}><dt>{parameter.label}</dt><dd>{parameter.value}</dd></div>)}</dl>}</section>}
       <section><h2>03 指标记录与专业解读</h2>{metrics.length ? <div className="cognitive-professional__table-scroll"><table><thead><tr><th scope="col">指标与单位</th><th scope="col">本次结果</th><th scope="col">计算口径与解读边界</th></tr></thead><tbody>{metrics.map(metric => <tr key={metric.key}><th scope="row">{metric.label}<small>{metric.key} · {units[metric.unit] ?? metric.unit}</small></th><td>{metric.formatted}</td><td><p>{metric.definition}</p><p className="cognitive-professional__hint">{metric.readingHint}</p></td></tr>)}</tbody></table></div> : <p>当前无满足解释条件的指标。</p>}{professional?.withheld.length ? <aside className="cognitive-professional__notice"><h3>本次撤下或未测量的指标</h3><ul>{professional.withheld.map(metric => <li key={metric.key}>{metric.label}：{metric.reasons.join('、') || '按当前冻结规则不进入解释'}</li>)}</ul></aside> : null}</section>
-      <section><h2>04 质量标记与复核依据</h2><div className="cognitive-professional__quality">{quality.map(flag => <div key={flag.key} className={flag.active && flag.effect !== 'none' ? 'is-active' : ''}><strong>{flag.label}<span>{flag.active ? '已触发' : '未触发'}</span></strong><p>{flag.description}</p><small>{flag.key} · 影响级别 {flag.effect}</small></div>)}</div></section>
+      <section><h2>04 质量标记与复核依据</h2><div className="cognitive-professional__quality">{quality.map(flag => <div key={flag.key} className={flag.active && flag.effect !== 'none' ? 'is-active' : ''}><strong>{flag.label}<span>{flag.active ? '已触发' : '未触发'}</span></strong><p>{flag.description}</p><small>{flag.key} · 影响级别 {effectLabels[flag.effect] ?? flag.effect}</small></div>)}</div></section>
       {reading?.visuals.length ? <section aria-label="专业作答图"><h2>05 任务内记录图</h2>{reading.visuals.map((visual, index) => <CognitiveReportVisual key={`${visual.kind}-${index}`} visual={{ ...visual, title: visual.kind === 'reaction_trials' ? '有效反应时试次序列与缺失标记' : visual.kind === 'memory_lengths' ? '各序列长度的正确比例与尝试分母' : '任务内指标概览（同一量纲）' }} />)}</section> : null}
       <section><h2>06 限制、参考与后续使用</h2>{(reading?.methodCaveats ?? []).map(caveat => <p key={caveat}>{caveat}</p>)}<ul>{professional?.confounders.map(item => <li key={item}>{item}</li>) ?? <li>{report.disclaimer}</li>}</ul>{allowedReferences.map((reference, index) => <p key={index}>{String(reference.label ?? '参考信息')}：{String(reference.disclaimer ?? reference.unavailableReason ?? '按原参考适用范围阅读。')}</p>)}<p>如需纵向比较，先核查任务身份、协议剂量、输入设备与质量状态是否可比；不将不同任务指标加总为能力总分。</p></section>
       <footer className="cognitive-professional__provenance"><h2>冻结与版本依据</h2><p>任务 {report.method.testType} · 引擎 {report.method.engineVersion} · 评分 {report.method.scoringVersion} · 配置 {report.method.configVersion}</p><p>协议签名 {report.method.protocolSignature}</p><p>呈现 {reading?.presentationVersion ?? '历史版本'} · 报告规则 {reading?.reportVersion ?? '历史版本'}</p><p>专业措辞与指标数量不构成科学效度认证。本报告仅包含当前可读取的结果与解释，不含科研专用指标或原始作答记录。</p></footer>

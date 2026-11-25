@@ -111,7 +111,10 @@ describe('N-Back and Corsi runners', () => {
 
       view.rerender(<NbackTask taskContext={multiLevelContext} trialIndex={1} onTrialComplete={onTrialComplete} />)
       expect(screen.getByText('准备进入 2-back')).toBeTruthy()
-      fireEvent.click(screen.getByText('开始 2-back 练习'))
+      const startPractice = screen.getByRole('button', { name: '开始 2-back 练习' })
+      expect(fireEvent.keyDown(startPractice, { key: 'Enter' })).toBe(true)
+      expect(fireEvent.keyDown(startPractice, { key: ' ' })).toBe(true)
+      fireEvent.click(startPractice)
 
       const answerSecondLevel = async (responses: boolean[]) => {
         for (const shouldRespond of responses) {
@@ -130,6 +133,9 @@ describe('N-Back and Corsi runners', () => {
       await answerSecondLevel([false, false, true, false, false, true])
       fireEvent.click(screen.getByRole('button', { name: '继续 2-back 正式测验' }))
       expect(screen.getByText(/区块 2 \/ 2/)).toBeTruthy()
+      const startBlock = screen.getByRole('button', { name: '开始本区块' })
+      expect(fireEvent.keyDown(startBlock, { key: 'Enter' })).toBe(true)
+      expect(fireEvent.keyDown(startBlock, { key: ' ' })).toBe(true)
       expect(onTrialComplete).not.toHaveBeenCalled()
     } finally {
       vi.useRealTimers()

@@ -161,6 +161,40 @@ describe('FE-07B Go/No-Go and CPT frame timing routing', () => {
     act(() => vi.advanceTimersByTime(1))
     expect(screen.queryByText('X')).toBeNull()
   })
+
+  it('leaves CPT block confirmation keys to the focused control in the timing pilot', async () => {
+    let now = 100
+    const performanceNow = vi.spyOn(performance, 'now').mockImplementation(() => now)
+    const Runner = requireRunner('cpt')
+    const onTrialComplete = vi.fn()
+    try {
+      render(<Runner taskContext={{ ...baseContext, testType: 'cpt', configVersion: '1.1.0',
+        config: { totalTrials: 8, targetRatio: 0.25, blockCount: 2, stimulusMs: 50, isiMs: 20 } }}
+        trialIndex={0} onTrialComplete={onTrialComplete} />)
+      fireEvent.click(screen.getByText('开始练习'))
+      for (let index = 0; index < 4; index += 1) {
+        act(() => vi.advanceTimersByTime(20))
+        now = 100 + index * 1000
+        flushFrame(now)
+        if (index % 2 === 0) {
+          now += 10
+          const event = new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true })
+          Object.defineProperty(event, 'timeStamp', { value: now })
+          fireEvent(window, event)
+        }
+        await act(async () => { vi.advanceTimersByTime(50) })
+        fireEvent.click(screen.getByRole('button', { name: /继续下一题|查看练习结果/ }))
+      }
+      fireEvent.click(screen.getByText('开始正式测验'))
+      const startBlock = screen.getByRole('button', { name: '开始第 1 区块' })
+      expect(fireEvent.keyDown(startBlock, { key: 'Enter' })).toBe(true)
+      expect(fireEvent.keyDown(startBlock, { key: ' ' })).toBe(true)
+      expect(onTrialComplete).not.toHaveBeenCalled()
+    } finally {
+      performanceNow.mockRestore()
+    }
+  })
+
   it('enforces Survey keyboard-only responses and persists formal focus loss as interrupted raw data',async()=>{
     // jsdom checks event/state/payload wiring only; no hardware timing claim.
     let now=100

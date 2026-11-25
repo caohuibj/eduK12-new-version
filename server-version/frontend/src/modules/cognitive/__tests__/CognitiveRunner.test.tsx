@@ -78,6 +78,20 @@ describe('CognitiveRunner page', () => {
     expect(screen.queryByText('开始测评')).toBeNull()
   })
 
+  it('directs a saved embedded task back to its parent rather than offering restart', () => {
+    mockController.state = {
+      status: 'READY',
+      session: { sessionId: 's1', testType: 'nback', engineVersion: '1.0.0', deliveryMode: 'FINAL_ONLY', config: {} },
+      trialIndex: 60,
+      error: null,
+    }
+    renderAt('/student/cognitive/sessions/s1?returnTo=%2Fstudent%2Fcomposite%2Fattempts%2Fparent1')
+    expect(screen.getByText(/本机已保存 60 个试次/)).toBeInTheDocument()
+    expect(screen.getByText('本地草稿已保留，请返回上层测评。')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '返回上层测评' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '重启并继续作答' })).not.toBeInTheDocument()
+  })
+
   it('renders ERROR with recovery status and retry button', () => {
     mockController.state = {
       status: 'ERROR',

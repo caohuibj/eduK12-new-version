@@ -267,6 +267,11 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
 
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
+    if (phase === 'formal' && (
+      !isNbackFormalTrial(current)
+      || !practicedLevels.includes(current.nLevel)
+      || acknowledgedBlockIndex !== current.blockIndex
+    )) return
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.repeat || (event.key !== ' ' && event.key !== 'Enter')) return
       if (phase === 'practice' && feedback) {
@@ -280,7 +285,7 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [phase, feedback, continuePractice, respond])
+  }, [phase, current, practicedLevels, acknowledgedBlockIndex, feedback, continuePractice, respond])
 
   if (phase === 'instruction') {
     return (
