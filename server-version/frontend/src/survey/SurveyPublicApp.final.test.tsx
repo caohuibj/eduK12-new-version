@@ -173,6 +173,10 @@ describe('Survey first-success GENERAL receipt consumption',()=>{
     fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
     const heading=await screen.findByRole('heading',{name:'感谢参与，问卷已提交'})
     expect(heading).toHaveFocus()
+    expect(heading.parentElement).toHaveClass('survey-completion-card')
+    expect(screen.getByText('你的回答已保存，正在读取后续信息…')).toHaveAttribute('role','status')
+    expect(screen.queryByText(/暂时无法显示后续信息/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button',{name:'重新查看'})).not.toBeInTheDocument()
     expect(window.scrollTo).toHaveBeenCalledExactlyOnceWith({top:0,behavior:'instant'})
     await act(async()=>resolveGeneral(await response({
       kind:'DESCRIPTIVE',text:'本次反馈已就绪',completedAt:'2026-10-17T00:00:00Z',
@@ -539,6 +543,7 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
     expect(screen.getByRole('radio',{name:'不同意'})).toBeDisabled()
     expect(screen.getByRole('button',{name:'正在提交…'})).toBeDisabled()
     expect(screen.getByText('正在提交，请勿刷新或重复操作…')).toHaveAttribute('role','status')
+    expect(screen.queryByText(/本次答案已封存，尚未确认提交结果/)).not.toBeInTheDocument()
     fireEvent.submit(screen.getByRole('button',{name:'正在提交…'}).closest('form')!)
     expect(finalCalls).toHaveLength(1)
     await act(async()=>{resolve(await response({status:'COMPLETED'}))})

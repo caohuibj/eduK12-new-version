@@ -188,6 +188,7 @@ export default function HuiteacherApp(){
 
 function HuiteacherApplication(){
   const appRoot=useRef<HTMLElement>(null)
+  const workspaceHeading=useRef<HTMLHeadingElement>(null)
   const [workspaceTab,setWorkspaceTab]=useState<WorkspaceTab>('teacher')
   const [personalSection,setPersonalSection]=useState('ht-personal-tasks')
   const [schoolSection,setSchoolSection]=useState('ht-school-settings')
@@ -561,10 +562,10 @@ function HuiteacherApplication(){
       <h1>首次登录 · 修改教育账号密码</h1>
       <ProductPasswordChange product="teacher" forced busy={working} onChangePassword={changeAccountPassword}/>
     </section>:
-    me&&screen==='workspace'?<TeacherAssessmentProvider onActiveChange={setAssessmentPageOpen} scope={me.role==='STUDENT'?'ht-personal-tasks':workspaceTab==='teacher'?personalSection:workspaceTab==='expert'?'ht-professional-practice':'other'}><div className={'ht-workspace'+(me.role==='STUDENT'?' ht-student-workspace':workspaceTab==='school'?' ht-workspace-admin':'')} hidden={assessmentPageOpen}>
+    me&&screen==='workspace'?<TeacherAssessmentProvider onActiveChange={setAssessmentPageOpen} returnFocusRef={workspaceHeading} scope={me.role==='STUDENT'?'ht-personal-tasks':workspaceTab==='teacher'?personalSection:workspaceTab==='expert'?'ht-professional-practice':'other'}><div className={'ht-workspace'+(me.role==='STUDENT'?' ht-student-workspace':workspaceTab==='school'?' ht-workspace-admin':'')} hidden={assessmentPageOpen}>
       <section className="ht-workspace-header">
         <div className="ht-workspace-heading">
-          <h1>我的教育发展空间</h1>
+          <h1 ref={workspaceHeading} tabIndex={-1}>我的教育发展空间</h1>
           <p className="ht-workspace-welcome">欢迎，{me.username}</p>
         </div>
       </section>
