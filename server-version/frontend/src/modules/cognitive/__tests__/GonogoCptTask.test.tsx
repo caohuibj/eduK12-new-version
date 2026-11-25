@@ -73,7 +73,11 @@ describe('Go/No-Go and CPT runners', () => {
       expect(screen.getByText('准备开始持续注意测验')).toBeTruthy()
       expect(screen.getByText(/区块 1 \/ 2/)).toBeTruthy()
       expect(onTrialComplete).not.toHaveBeenCalled()
-      fireEvent.click(screen.getByText('开始第 1 区块'))
+      const startBlock = screen.getByRole('button', { name: '开始第 1 区块' })
+      expect(fireEvent.keyDown(startBlock, { key: 'Enter' })).toBe(true)
+      expect(fireEvent.keyDown(startBlock, { key: ' ' })).toBe(true)
+      expect(onTrialComplete).not.toHaveBeenCalled()
+      fireEvent.click(startBlock)
       expect(screen.getByLabelText('CPT 正式测验')).toBeTruthy()
       expect(screen.queryByText(/试次 1 \/ 8/)).toBeNull()
     } finally {

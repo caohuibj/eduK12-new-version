@@ -111,7 +111,31 @@ describe('N-Back and Corsi runners', () => {
 
       view.rerender(<NbackTask taskContext={multiLevelContext} trialIndex={1} onTrialComplete={onTrialComplete} />)
       expect(screen.getByText('准备进入 2-back')).toBeTruthy()
-      expect(screen.getByText('开始 2-back 练习')).toBeTruthy()
+      const startPractice = screen.getByRole('button', { name: '开始 2-back 练习' })
+      expect(fireEvent.keyDown(startPractice, { key: 'Enter' })).toBe(true)
+      expect(fireEvent.keyDown(startPractice, { key: ' ' })).toBe(true)
+      fireEvent.click(startPractice)
+
+      const answerSecondLevel = async (responses: boolean[]) => {
+        for (const shouldRespond of responses) {
+          await act(async () => { vi.advanceTimersByTime(10) })
+          if (shouldRespond) fireEvent.click(screen.getByRole('button', { name: '2-back 练习作答区' }))
+          await act(async () => { vi.advanceTimersByTime(10) })
+          fireEvent.click(screen.getByRole('button', { name: /继续下一题|查看练习结果/ }))
+        }
+      }
+
+      await answerSecondLevel([false, false, false, false, false, false])
+      expect(screen.getByText('还需要再练习一次')).toBeTruthy()
+      fireEvent.click(screen.getByRole('button', { name: '重看规则并重新练习' }))
+      expect(screen.getByText(/2-back 图示：前 2 个先记忆/)).toBeTruthy()
+      fireEvent.click(screen.getByRole('button', { name: '开始练习' }))
+      await answerSecondLevel([false, false, true, false, false, true])
+      fireEvent.click(screen.getByRole('button', { name: '继续 2-back 正式测验' }))
+      expect(screen.getByText(/区块 2 \/ 2/)).toBeTruthy()
+      const startBlock = screen.getByRole('button', { name: '开始本区块' })
+      expect(fireEvent.keyDown(startBlock, { key: 'Enter' })).toBe(true)
+      expect(fireEvent.keyDown(startBlock, { key: ' ' })).toBe(true)
       expect(onTrialComplete).not.toHaveBeenCalled()
     } finally {
       vi.useRealTimers()
@@ -198,6 +222,32 @@ describe('N-Back and Corsi runners', () => {
         interrupted: true,
       }))
       expect(screen.queryByText(/响应超时/)).toBeNull()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('shows the Corsi replay rule again before restarting failed practice, without recording either round', async () => {
+    vi.useFakeTimers()
+    const onTrialComplete = vi.fn()
+    try {
+      render(<CorsiTask taskContext={{ ...nbackContext, testType: 'corsi', config: { highlightMs: 1, intervalMs: 1, readyDurationMs: 1 } }} trialIndex={0} onTrialComplete={onTrialComplete} />)
+      const duplicateRule = /同一轮请勿重复点击同一个方块/
+      expect(screen.getByText(duplicateRule)).toBeTruthy()
+      fireEvent.click(screen.getByRole('button', { name: '开始练习' }))
+      for (const nextLabel of ['继续下一题', '查看练习结果']) {
+        await act(async () => { vi.advanceTimersByTime(1) })
+        await act(async () => { vi.advanceTimersByTime(10) })
+        for (const block of [0, 1, 2]) fireEvent.click(screen.getByLabelText(`block-${block}`))
+        fireEvent.click(screen.getByRole('button', { name: '提交' }))
+        fireEvent.click(screen.getByRole('button', { name: nextLabel }))
+      }
+      expect(screen.getByText('练习正确 0 / 2')).toBeTruthy()
+      fireEvent.click(screen.getByRole('button', { name: '重看规则并重新练习' }))
+      expect(screen.getByText(duplicateRule)).toBeTruthy()
+      fireEvent.click(screen.getByRole('button', { name: '开始练习' }))
+      expect(screen.getByText('练习 1 / 2')).toBeTruthy()
+      expect(onTrialComplete).not.toHaveBeenCalled()
     } finally {
       vi.useRealTimers()
     }

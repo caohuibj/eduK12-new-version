@@ -11,6 +11,32 @@ afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals() })
 
 describe('persistent practice review in timed runners', () => {
   it.each([
+    ['cpt', CptTask], ['cpt', CptFrameTask], ['taskswitch', TaskswitchTask], ['sst', SstTask],
+  ] as const)('%s shows its instructions again before retrying failed practice (%#)', async (testType, Task) => {
+    vi.useFakeTimers()
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => window.setTimeout(() => callback(performance.now()), 1))
+    vi.stubGlobal('cancelAnimationFrame', window.clearTimeout)
+    const save = vi.fn()
+    render(<Task trialIndex={0} onTrialComplete={save} taskContext={{
+      sessionId: 'failed-practice-only', testType, engineVersion: '1.0.0', scoringVersion: '1.0.0', configVersion: '1.0.0', attemptNo: 1, randomSeed: 'failed-practice',
+      config: { totalTrials: 8, blockCount: 1, isiMs: 10, cueMs: 10, stimulusMs: 20, goTimeoutMs: 20 },
+    }} />)
+    fireEvent.click(screen.getByRole('button', { name: '开始练习' }))
+    for (let trial = 0; trial < 4; trial += 1) {
+      await act(async () => { await vi.advanceTimersByTimeAsync(4000) })
+      fireEvent.click(screen.getByRole('button', { name: /继续下一题|查看练习结果/ }))
+    }
+    expect(screen.queryByRole('button', { name: '开始正式测验' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /重新练习/ }))
+    expect(screen.getByRole('region', { name: '核心规则' })).toBeInTheDocument()
+    expect(save).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: '开始练习' }))
+    await act(async () => { await vi.advanceTimersByTimeAsync(4000) })
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '1')
+    expect(save).not.toHaveBeenCalled()
+  })
+
+  it.each([
     ['gonogo', GonogoTask], ['gonogo', GonogoFrameTask],
     ['cpt', CptTask], ['cpt', CptFrameTask],
     ['sst', SstTask], ['taskswitch', TaskswitchTask],

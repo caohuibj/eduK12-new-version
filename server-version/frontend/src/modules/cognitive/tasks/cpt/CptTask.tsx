@@ -144,6 +144,7 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
 
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
+    if (phase === 'formal' && (!current || (blockCount > 1 && acknowledgedBlockIndex !== current.blockIndex))) return
     const onKeyDown = (event: KeyboardEvent) => {
       if (phase === 'practice' && practiceReview) return
       if (event.repeat || (event.key !== ' ' && event.key !== 'Enter')) return
@@ -179,7 +180,7 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
         total={PRACTICE_TRIAL_COUNT}
         passed={passed}
         onContinue={startFormal}
-        onRetry={startPractice}
+        onRetry={() => setPhase('instruction')}
       />
     )
   }

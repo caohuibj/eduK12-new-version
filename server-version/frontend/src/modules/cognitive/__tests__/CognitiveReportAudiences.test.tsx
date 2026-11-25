@@ -70,6 +70,18 @@ describe('popular and professional report voices', () => {
     expect(article).toHaveTextContent('CR-DEMO1')
     expect(article.querySelector('time')).toHaveAttribute('datetime', '2026-10-01T08:30:00Z')
   })
+  it.each([
+    ['interpretable', '可解释', 'none', '不影响解释'],
+    ['limited', '受限', 'limited', '限制解释'],
+    ['invalid', '无效', 'invalid', '结果无效'],
+  ] as const)('describes %s quality and its flag impact in Chinese', (qualityState, label, effect, impact) => {
+    const variant = structuredClone(report)
+    variant.qualityState = qualityState
+    variant.reading!.professional!.quality[0].effect = effect
+    render(<CognitiveProfessionalReport report={variant} />)
+    expect(screen.getByText(label, { selector: 'dd' })).toBeInTheDocument()
+    expect(screen.getByText(`interrupted · 影响级别 ${impact}`)).toBeInTheDocument()
+  })
   it('does not put withdrawn numeric estimates back into professional summaries', () => {
     const limited = structuredClone(report)
     limited.headline = []; limited.detail = []

@@ -3,7 +3,7 @@ import type { CognitiveParticipantPresentationV1 } from '../../participant-prese
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
-    "presentationVersion": "1.2.0",
+    "presentationVersion": "1.2.1",
     "testType": "sst",
     "engineVersion": "1.0.0",
     "scoringVersion": "1.0.0",
@@ -15,9 +15,9 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "singleExplanation": "停止反应估计时间：根据停止信号模型估计的动作停止时间。"
       },
       "pRespondStop": {
-        "label": "停止信号后仍响应的比例",
-        "explanation": "停止信号后仍作出反应的比例，用于检查停止任务是否处于可解释范围。",
-        "singleExplanation": "停止信号后仍作出反应的比例，用于检查停止任务是否处于可解释范围。"
+        "label": "停止试次的按键比例",
+        "explanation": "在安排了停止信号的试次中，记录到按键的比例，包括信号出现前和出现后的按键。",
+        "singleExplanation": "有停止信号的试次中记录到按键的比例，包括提示出现前的快速按键。"
       },
       "goMedianRtMs": {
         "label": "回应信号的典型用时",
@@ -48,11 +48,11 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "singleHiddenMetrics": [],
     "disclaimer": "结果反映本次动作停止任务表现，不是临床诊断或常模。",
     "reportReading": {
-      "version": "1.1.0",
+      "version": "1.1.1",
       "title": "已经准备出手，也能按下暂停",
       "introduction": "从这次作答出发，读懂一个与你有关的认知过程。",
       "summary": {
-        "template": "根据这次作答，停止动作的估计用时是 {ssrtMs}。暂停提示后仍发生回应的比例是 {pRespondStop}。",
+        "template": "根据这次作答，停止动作的估计用时是 {ssrtMs}。有停止信号的试次中，记录到按键的比例是 {pRespondStop}。",
         "metricKeys": [
           "ssrtMs",
           "pRespondStop"
@@ -75,7 +75,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         ],
         "pRespondStop": []
       },
-      "nextStep": "停止信号后的响应比例不是越低越好。先阅读协议限制，不作个人或临床抑制结论。",
+      "nextStep": "结合停止提示出现的早晚理解按键比例。不要为了降低这个比例而等待提示或放慢回答。",
       "hiddenByProfile": {
         "experience": [
           "ssrtMs"
@@ -91,7 +91,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       },
       "summaryByProfile": {
         "experience": {
-          "template": "这次简短体验中，暂停提示后仍发生回应的比例是 {pRespondStop}。提示出现的早晚也会影响它。",
+          "template": "这次简短体验里，有停止信号的试次中记录到按键的比例是 {pRespondStop}。提示出现的早晚也会影响这个比例。",
           "metricKeys": [
             "pRespondStop"
           ]
@@ -145,8 +145,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
             "explanation": "由一组回应与停止记录估计出来，不能直接当成现实中的刹车时间。"
           },
           "pRespondStop": {
-            "label": "暂停提示后仍有回应",
-            "explanation": "显示收到暂停提示后仍作出回应的比例；提示出现早晚会影响它。"
+            "label": "停止试次的按键比例",
+            "explanation": "统计有停止信号的试次里所有按键，包括提示出现前的按键。提示出现早晚会影响这个比例。"
           },
           "goMedianRtMs": {
             "label": "正常回应的通常用时",
@@ -169,7 +169,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
             "readingHint": "属于模型估计；先核查 Stop 数量、概率范围、Go 遗漏与策略性减速，短程不作个体估计解释。"
           },
           "pRespondStop": {
-            "definition": "停止试次中仍有响应的次数除以停止试次数。",
+            "definition": "有按键的停止试次数除以停止试次总数。分子包含提示出现前和出现后的有效记录。",
             "readingHint": "是过程概率，受 SSD 阶梯调节；并非越低越好或个人抑制能力等级。"
           },
           "goMedianRtMs": {

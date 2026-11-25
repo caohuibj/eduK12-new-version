@@ -150,6 +150,26 @@ describe('ReactionTask — instruction & practice', () => {
     expect(progress.parentElement).toHaveTextContent('0 / 20')
     expect(progress).toHaveAttribute('aria-valuenow', '0')
   })
+
+  it('gives distinct feedback for a response below the formal floor, a valid response, and a timeout', () => {
+    const onTrialComplete = vi.fn().mockResolvedValue(undefined)
+    render(<ReactionTask taskContext={makeContext()} trialIndex={0} onTrialComplete={onTrialComplete} />)
+    fireEvent.click(screen.getByText('开始练习'))
+    act(() => vi.advanceTimersByTime(1000))
+    now = 99
+    fireEvent.click(screen.getByLabelText('practice trial 0'))
+    expect(screen.getByText(/用时不足 100 毫秒/)).toBeTruthy()
+    fireEvent.click(screen.getByText('下一个'))
+    act(() => vi.advanceTimersByTime(1000))
+    now += 120
+    fireEvent.click(screen.getByLabelText('practice trial 1'))
+    expect(screen.getByText('很好！保持专注，等绿色出现再点击。')).toBeTruthy()
+    fireEvent.click(screen.getByText('下一个'))
+    act(() => vi.advanceTimersByTime(1000))
+    act(() => vi.advanceTimersByTime(2000))
+    expect(screen.getByText('超时了，绿色出现后再点击。')).toBeTruthy()
+    expect(onTrialComplete).not.toHaveBeenCalled()
+  })
 })
 
 describe('ReactionTask — formal trial', () => {
@@ -282,5 +302,27 @@ describe('ReactionTask — formal trial', () => {
     await act(async () => {})
     expect(onTrialComplete).toHaveBeenCalledTimes(1)
     expect(onTrialComplete.mock.calls[0][0].inputMode).toBe('keyboard')
+  })
+
+  it('ignores navigation and shortcut keys before and after the signal without suppressing their browser behavior', async () => {
+    const onTrialComplete = await enterFormal()
+    act(() => vi.advanceTimersByTime(600))
+    for (const key of ['Tab', 'Shift', 'Control', 'Alt', 'Meta', 'Escape']) {
+      const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })
+      fireEvent(window, event)
+      expect(event.defaultPrevented).toBe(false)
+    }
+    act(() => vi.advanceTimersByTime(400))
+    act(() => vi.advanceTimersByTime(deterministicForeperiod('seed-123', 0, 700, 1500)))
+    expect(screen.getByLabelText('trial 0').className).toContain('bg-green-500')
+    now += 200
+    for (const modifiers of [{ ctrlKey: true }, { metaKey: true }, { altKey: true }, { repeat: true }, { isComposing: true }]) {
+      fireEvent.keyDown(window, { key: 'a', ...modifiers })
+    }
+    fireEvent.keyDown(window, { key: 'Tab' })
+    expect(onTrialComplete).not.toHaveBeenCalled()
+    fireEvent.keyDown(window, { key: ' ' })
+    await act(async () => {})
+    expect(onTrialComplete).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ rtMs: 200, prematureCount: 0, inputMode: 'keyboard' }))
   })
 })

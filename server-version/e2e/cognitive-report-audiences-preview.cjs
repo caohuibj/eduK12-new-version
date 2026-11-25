@@ -86,7 +86,7 @@ fs.mkdirSync(output, { recursive: true })
     assert.deepEqual(errors, [])
     fs.writeFileSync(path.join(output, 'browser-validation.json'), JSON.stringify({ passed: true, synthetic: true, actualReactComponents: true,
       corpusChecked: options.length, audienceVariants: 2, viewportWidths: [1280, 390, 320], screenshots: shots,
-      checks: ['216 report/width/audience combinations without page or chart overflow', 'professional formulas and frozen method', 'insufficient and empty values withheld in both versions', 'SST short estimate withheld', 'occupational example scope', 'keyboard explanation expansion', 'separate print PDFs', 'closed explanatory notes retained in print', 'staff editing controls excluded from report print', 'no runtime errors'] }, null, 2))
+      checks: [`${options.length * 2 * 3} report/width/audience combinations without page or chart overflow`, 'professional formulas and frozen method', 'insufficient and empty values withheld in both versions', 'SST short estimate withheld', 'occupational example scope', 'keyboard explanation expansion', 'separate print PDFs', 'closed explanatory notes retained in print', 'staff editing controls excluded from report print', 'no runtime errors'] }, null, 2))
     console.log(`Passed ${options.length * 2 * 3} audience/viewport reports, ${shots.length} screenshots and 2 PDFs`)
   } finally { await browser.close() }
 })().catch(error => { console.error(error); process.exitCode = 1 })

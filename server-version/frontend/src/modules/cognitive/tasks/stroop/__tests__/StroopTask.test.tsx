@@ -89,6 +89,10 @@ describe('StroopTask', () => {
       act(() => vi.advanceTimersByTime(400))
       respondWith(/1 · 红/)
       fireEvent.click(screen.getByText(attempt === 0 ? '重新练习' : '结束'))
+      if (attempt === 0) {
+        expect(screen.getByRole('region', { name: '核心规则' })).toBeInTheDocument()
+        fireEvent.click(screen.getByText('开始练习'))
+      }
     }
     expect(screen.getByText('练习尚未通过，本次正式测评未开始。')).toBeTruthy()
     expect(onTrialComplete).not.toHaveBeenCalled()

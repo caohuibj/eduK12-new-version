@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom'
 import CognitiveRunner from '../pages/CognitiveRunner'
 import { initialRunnerState, runnerReducer } from '../core/runner.state'
 import type { RunnerState } from '../core/runner.types'
@@ -39,6 +39,21 @@ describe('bank intake exact registry and existing host completion', () => {
    } as unknown as CognitiveSession})
    render(tree())
    await waitFor(()=>expect(screen.getByRole('button',{name:'开始练习'})).toBeEnabled())
+ })
+ it('opens the report when the standalone route mounts already completed and replaces the runner history entry', async () => {
+   const session={sessionId:'bank-host',testType:'wordanalogy',engineVersion:'1.1.0',config:{},status:'COMPLETED'} as unknown as CognitiveSession
+   harness.controller.state={...initialRunnerState,status:'COMPLETED',session}
+   function Result(){
+     const navigate=useNavigate()
+     return <button onClick={()=>void navigate(-1)}>返回上一页</button>
+   }
+   render(<MemoryRouter initialEntries={['/previous','/student/cognitive/sessions/bank-host']}><Routes>
+     <Route path="/previous" element={<p>测验列表</p>}/>
+     <Route path="/student/cognitive/sessions/:sessionId" element={<CognitiveRunner/>}/>
+     <Route path="/student/cognitive/sessions/:sessionId/result" element={<Result/>}/>
+   </Routes></MemoryRouter>)
+   fireEvent.click(await screen.findByRole('button',{name:'返回上一页'}))
+   expect(await screen.findByText('测验列表')).toBeInTheDocument()
  })
  it.each(cases)('%s uses the parent completion action after final index advancement and resolved failure', async(testType,version,practiceKey) => {
    const config={totalTrials:1,stimulusSetVersion:`${testType}-zh-v${version}`,fixationMs:400,timeoutMs:15000,validRtFloorMs:300,report:{reportVersion:version,referenceMode:'none'}}

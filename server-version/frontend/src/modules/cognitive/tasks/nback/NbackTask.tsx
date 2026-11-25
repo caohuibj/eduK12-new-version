@@ -96,13 +96,13 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
   const practiceTrials = PRACTICE_BY_N[practiceNLevel]
   const scoredPracticeTrialCount = Math.max(0, practiceTrials.length - practiceNLevel)
   const practicePassCorrect = Math.ceil(scoredPracticeTrialCount * 0.75)
-  const nbackExampleSteps = firstNLevel === 1
+  const nbackExampleSteps = practiceNLevel === 1
     ? [
         { label: '第 1 个', value: 'A', note: '先记住，不作答', state: 'observe' as const },
         { label: '第 2 个', value: 'B', note: '和前 1 个不同，不按', state: 'wait' as const },
         { label: '第 3 个', value: 'B', note: '和前 1 个相同，按一次', state: 'respond' as const },
       ]
-    : firstNLevel === 2
+    : practiceNLevel === 2
       ? [
           { label: '第 1 个', value: 'A', note: '只记忆', state: 'observe' as const },
           { label: '第 2 个', value: 'C', note: '前 2 个都先记住', state: 'observe' as const },
@@ -267,6 +267,11 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
 
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
+    if (phase === 'formal' && (
+      !isNbackFormalTrial(current)
+      || !practicedLevels.includes(current.nLevel)
+      || acknowledgedBlockIndex !== current.blockIndex
+    )) return
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.repeat || (event.key !== ' ' && event.key !== 'Enter')) return
       if (phase === 'practice' && feedback) {
@@ -280,27 +285,27 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [phase, feedback, continuePractice, respond])
+  }, [phase, current, practicedLevels, acknowledgedBlockIndex, feedback, continuePractice, respond])
 
   if (phase === 'instruction') {
     return (
       <CognitiveTaskIntro
         title="N-Back"
-        description={<p>每个字母只出现片刻。请记住最近 {firstNLevel} 个字母；从出现第 {firstNLevel + 1} 个字母开始，把当前字母和往前第 {firstNLevel} 个位置比较：相同就按一次，不同就不要按。</p>}
+        description={<p>每个字母只出现片刻。请记住最近 {practiceNLevel} 个字母；从出现第 {practiceNLevel + 1} 个字母开始，把当前字母和往前第 {practiceNLevel} 个位置比较：相同就按一次，不同就不要按。</p>}
         example={(
           <CognitiveTaskExample
-            title={`${firstNLevel}-back 图示：前 ${firstNLevel} 个先记忆，之后再比较`}
+            title={`${practiceNLevel}-back 图示：前 ${practiceNLevel} 个先记忆，之后再比较`}
             steps={nbackExampleSteps}
-            result={firstNLevel === 1 ? '第三个 B 与它前一个 B 相同，所以按一次。' : `当前字母 A 与往前第 ${firstNLevel} 个位置的 A 相同，所以按一次。`}
+            result={practiceNLevel === 1 ? '第三个 B 与它前一个 B 相同，所以按一次。' : `当前字母 A 与往前第 ${practiceNLevel} 个位置的 A 相同，所以按一次。`}
           />
         )}
         hint={(
           <>
             <p><strong>怎么作答：</strong>字母出现时作答；电脑按空格或 Enter，触屏点击中央作答区。一个字母只按一次，不要长按。</p>
-            <p><strong>练习安排：</strong>前 {firstNLevel} 个字母只观察；之后每题结束会停留显示反馈，确认后再点“继续下一题”。练习不计入正式成绩。</p>
+            <p><strong>练习安排：</strong>前 {practiceNLevel} 个字母只观察；之后每题结束会停留显示反馈，确认后再点“继续下一题”。练习不计入正式成绩。</p>
           </>
         )}
-        onAction={() => startPractice(firstNLevel, false)}
+        onAction={() => startPractice(practiceNLevel, practiceReturnToFormal)}
       />
     )
   }
@@ -344,7 +349,7 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
           </div>
         ) : (
           <div className="cognitive-task-actions cognitive-task-actions--center">
-            <button className="btn-secondary" onClick={() => startPractice(practiceNLevel, practiceReturnToFormal)}>重新练习</button>
+            <button className="btn-secondary" onClick={() => setPhase('instruction')}>重看规则并重新练习</button>
           </div>
         )}
       </CognitiveTaskPanel>

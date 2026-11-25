@@ -177,8 +177,8 @@ export const MemoryTask: React.FC<CognitiveTaskProps> = ({
       startFormal()
       return
     }
-    startPractice()
-  }, [practiceIndex, practiceCorrectCount, startFormal, startPractice])
+    setPhase('instruction')
+  }, [practiceIndex, practiceCorrectCount, startFormal])
 
   const submitFormal = useCallback(async () => {
     if (

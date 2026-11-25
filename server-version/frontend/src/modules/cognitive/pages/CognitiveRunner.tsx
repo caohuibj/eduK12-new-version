@@ -6,7 +6,7 @@ import CognitiveCredentialReset from './CognitiveCredentialReset'
 import CognitiveSessionEntry from './CognitiveSessionEntry'
 import { isPublicAssessmentPath, parentReturnTo } from '../../../components/app-shell/access'
 import { AssessmentShell, type AssessmentInteractionReadiness, type AssessmentProgress, type AssessmentSaveStatus } from '../../../components/assessment-shell'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { cognitiveApi, publicCognitiveApi, type CognitiveSessionApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
@@ -289,6 +289,19 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
     cognitiveFallback,
   )
   const hasParentReturn = Boolean(campus) || parentTarget !== cognitiveFallback
+  const returnTo = searchParams.get('returnTo')
+  useEffect(() => {
+    if (state.status !== 'COMPLETED' || campus || !sessionId) return
+    const target = learner.enabled && trainingParent ? learner.backHref : parentReturnTo(
+      returnTo, isPublic,
+      isPublic
+        ? `/public/cognitive/sessions/${sessionId}/result?public=1`
+        : relationalMode
+          ? '/relational/tasks'
+          : `/student/cognitive/sessions/${sessionId}/result`,
+    )
+    navigate(target, { replace: true })
+  }, [state.status, campus, sessionId, learner.enabled, learner.backHref, trainingParent, returnTo, isPublic, relationalMode, navigate])
   const leaveParent = () => {
     if (campus) { campus.onExit(); return }
     if (trainingParent && state.error?.code === 'FINAL_DRAFT_EXPIRED' && state.session) {
@@ -329,18 +342,6 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
         <p role="status" className="text-center text-slate-600">{campus.completionNotice??"正式作答已提交并确认；是否开放解释性报告取决于独立科学审核。"}</p>
       </AssessmentShell>
     )
-    if (sessionId) {
-      const returnTo = searchParams.get('returnTo')
-      const target = learner.enabled && trainingParent ? learner.backHref : parentReturnTo(
-        returnTo, isPublic,
-        isPublic
-          ? `/public/cognitive/sessions/${sessionId}/result?public=1`
-          : relationalMode
-            ? '/relational/tasks'
-            : `/student/cognitive/sessions/${sessionId}/result`,
-      )
-      navigate(target, { replace: true })
-    }
     return null
   }
 
@@ -402,12 +403,14 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
       return (
         <AssessmentShell
           title={title}
-          progress={{ kind: 'phase', phase: '需要恢复处理', detail: `本机已保存 ${state.trialIndex} 个试次；不会仅按最大 trialIndex 自动重挂任务。` }}
+          progress={{ kind: 'phase', phase: '需要恢复处理', detail: `本机已保存 ${state.trialIndex} 个试次。当前任务无法从这个位置恢复作答。` }}
           recoveryState={{ state: 'blocked', message: readinessProfile.resumeReason }}
           actions={recoveryActions}
         >
           {publicCredentialNotice}
-          <p className="text-center text-slate-600">本地草稿保持不变；请选择返回或创建新的整份提交测评。</p>
+          <p className="text-center text-slate-600">
+            {hasParentReturn ? '本地草稿已保留，请返回上层测评。' : '本地草稿已保留，你可以返回列表或重新开始一次测评。'}
+          </p>
           {restartError ? <p role="alert" className="mt-3 text-center text-sm text-red-600">{restartError}</p> : null}
         </AssessmentShell>
       )

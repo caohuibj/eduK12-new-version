@@ -5,6 +5,7 @@ import { getCognitiveRegistryEntry } from './cognitive.registry'
 import { resolveLegacyCognitiveProtocolPresentation } from './legacy-protocol-presentation'
 import { legacyExperienceHeadline, legacySuppressTips } from './legacy-report-policy'
 import type { CognitiveParticipantPresentationV1 } from './participant-presentation.types'
+import { formatMapValue } from './v2/report'
 
 export interface CognitiveReportMetricView {
   presentationVersion?: string
@@ -49,14 +50,6 @@ const profileLabelOf = (profile: CognitiveProfile | null): string | null => {
   if (profile === 'research') return '科研版'
   if (profile === 'standard') return '正式版'
   return null
-}
-
-const formatMapValue = (metricKey: string, value: unknown): string => {
-  const number = Number(value)
-  if (!Number.isFinite(number)) return '—'
-  if (/rate/i.test(metricKey)) return `${Math.round(number * 100)}%`
-  if (/rt/i.test(metricKey)) return `${Math.round(number)} ms`
-  return String(Math.round(number * 100) / 100)
 }
 
 const formatMetric = (key: string, definition: Pick<MetricDefinition, 'unit'> | undefined, value: unknown): string => {

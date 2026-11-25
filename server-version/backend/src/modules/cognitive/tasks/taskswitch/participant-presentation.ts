@@ -3,7 +3,7 @@ import type { CognitiveParticipantPresentationV1 } from '../../participant-prese
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
-    "presentationVersion": "1.2.0",
+    "presentationVersion": "1.2.1",
     "testType": "taskswitch",
     "engineVersion": "1.0.0",
     "scoringVersion": "1.0.0",
@@ -16,8 +16,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       },
       "switchCostAccuracy": {
         "label": "准确率转换代价",
-        "explanation": "准确率转换代价：切换规则时相对重复规则时的正确率变化。",
-        "singleExplanation": "准确率转换代价：切换规则时相对重复规则时的正确率变化。"
+        "explanation": "沿用规则的正确率减去换规则的正确率。负值表示本次换规则时的正确率更高。",
+        "singleExplanation": "沿用规则的正确率减去换规则的正确率。这里是两项比例直接相减，负值表示本次换规则时的正确率更高。"
       },
       "medianRtSwitch": {
         "label": "Switch 中位RT"
@@ -44,14 +44,15 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "singleHiddenMetrics": [],
     "disclaimer": "结果反映本次认知灵活性任务表现，不是临床诊断或常模。",
     "reportReading": {
-      "version": "1.1.0",
+      "version": "1.1.1",
       "title": "换一条规则，思路也要转弯",
       "introduction": "从这次作答出发，读懂一个与你有关的认知过程。",
       "summary": {
-        "template": "这次，换规则与沿用规则时的通常用时相差 {switchCostRtMs}，正确比例相差 {switchCostAccuracy}。",
+        "template": "换规则时，正确率为 {accuracySwitch}；沿用规则时为 {accuracyRepeat}。换规则用时减去沿用规则用时为 {switchCostRtMs}。",
         "metricKeys": [
           "switchCostRtMs",
-          "switchCostAccuracy"
+          "accuracySwitch",
+          "accuracyRepeat"
         ]
       },
       "studentMetricKeys": [
