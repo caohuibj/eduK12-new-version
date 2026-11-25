@@ -214,7 +214,7 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
     }
   })
 
-  it.skipIf(!process.env.ANONYMOUS_303_FIXTURE)('prepares an actual 303-question / 9-unit anonymous Training publication for matched START benchmarks',async()=>{
+  it('publishes a 303-question anonymous Training questionnaire with nine granted library scales', async () => {
     const runtime=await import('../../modules/composite/composite.service')
     const comp=await db.compositeAssessment.create({data:{code:'anon-303-'+randomUUID(),name:'Synthetic full anonymous START',createdBy:teacherId,
       productKind:'QUESTIONNAIRE',questionnaireType:'COURSE',status:'DRAFT',publicEnabled:true,expiresAt:new Date(Date.now()+7200000),maxAttempts:1,questionnaireCourses:{create:{courseId}}}})
@@ -225,7 +225,32 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
     await runtime.publishComposite(teacherId,'TEACHER',comp.id)
     const token=await runtime.createAccessTokenForComposite(teacherId,'TEACHER',comp.id,new Date(Date.now()+3600000).toISOString(),0)
     expect(token.maxUses).toBe(0)
-    writeFileSync(process.env.ANONYMOUS_303_FIXTURE!,JSON.stringify({compositeId:comp.id,tokenId:token.id,token:token.token,questions:303,units:9}))
+    const publicInfo = await runtime.getPublicCompositeInfo(token.token)
+    expect(publicInfo.usedCount).toBe(0)
+    expect(publicInfo.units).toHaveLength(9)
+    expect(publicInfo.units.every(unit => unit.type === 'scale')).toBe(true)
+    const published = await db.compositeAssessment.findUniqueOrThrow({
+      where: { id: comp.id },
+      select: { status: true, items: {
+        orderBy: { position: 'asc' },
+        select: { scale: { select: { definition: true } } },
+      } },
+    })
+    expect(published.status).toBe('PUBLISHED')
+    expect(published.items.map(({ scale }) =>
+      (scale?.definition as { items?: unknown[] } | null)?.items?.length,
+    )).toEqual([34, 34, 34, 34, 34, 34, 33, 33, 33])
+
+    const benchmarkFixturePath = process.env.ANONYMOUS_303_FIXTURE
+    if (benchmarkFixturePath) {
+      writeFileSync(benchmarkFixturePath, JSON.stringify({
+        compositeId: comp.id,
+        tokenId: token.id,
+        token: token.token,
+        questions: 303,
+        units: 9,
+      }), { mode: 0o600 })
+    }
   },120000)
 
   it('inserts TRAINING_CONTENT_BINDING_PLAN under DB CHECK constraint, hydrates cold-cache compact V2, and enforces all 3 PostgreSQL triggers', async () => {
