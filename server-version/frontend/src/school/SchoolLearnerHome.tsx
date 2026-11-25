@@ -11,9 +11,22 @@ export function SchoolLearnerMenu({items,onNavigate}:{items:SchoolNavigationItem
  const menu=useRef<HTMLDetailsElement>(null)
  const available=items.filter(item=>!['overview','account'].includes(item.id))
  if(!available.length)return null
- return <details className="hs-learner-menu" ref={menu} onKeyDown={event=>{if(event.key==='Escape'&&menu.current){menu.current.open=false;menu.current.querySelector('summary')?.focus()}}}>
+ const closeMenu=()=>{
+  if(!menu.current?.open)return
+  menu.current.open=false
+  menu.current.querySelector('summary')?.focus()
+ }
+ return <details className="hs-learner-menu" ref={menu} onKeyDown={event=>{
+  if(event.key==='Escape'&&menu.current?.open){event.preventDefault();closeMenu()}
+ }}>
   <summary aria-label="校园功能" title="校园功能"><Menu size={20} aria-hidden="true"/></summary>
-  <div className="hs-learner-menu-links" aria-label="校园功能入口">{available.map(item=><a key={item.id} href={workspaceHref(item.id)} onClick={event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();if(menu.current)menu.current.open=false;onNavigate(item.id)}}><item.icon size={18} aria-hidden="true"/>{item.label}</a>)}</div>
+  <div className="hs-learner-menu-links" role="group" aria-label="校园功能入口">
+   {available.map(item=><a key={item.id} href={workspaceHref(item.id)} aria-label={item.label}
+    onClick={event=>{
+     if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return
+     event.preventDefault();closeMenu();onNavigate(item.id)
+    }}><item.icon size={18} aria-hidden="true"/><span>{item.label}</span></a>)}
+  </div>
  </details>
 }
 

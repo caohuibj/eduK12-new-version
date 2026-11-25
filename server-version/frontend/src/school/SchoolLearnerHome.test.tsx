@@ -1,5 +1,6 @@
 import {act,fireEvent,render,screen,waitFor} from '@testing-library/react'
 import {describe,it,expect,vi} from 'vitest'
+import userEvent from '@testing-library/user-event'
 import {SchoolLearnerHome,SchoolLearnerMenu} from './SchoolLearnerHome'
 import {SchoolStudentTasks,type SchoolTask} from './SchoolStudentTasks'
 import {SchoolWorkspaceShell} from './SchoolWorkspaceShell'
@@ -68,15 +69,26 @@ describe('School learner collections',()=>{
   await waitFor(()=>expect(api).toHaveBeenCalledWith('/my/activity-tasks?page=1&pageSize=25&activityId='+first.activityId))
   expect(screen.getByRole('link',{name:'查看全部任务'})).toHaveAttribute('href','/workspace/tasks')
  })
- it('moves authorized learner destinations into the banner while preserving page access boundaries',()=>{
+ it('moves authorized learner destinations into the banner with named links in keyboard order',async()=>{
   const navigate=vi.fn()
+  const user=userEvent.setup()
   render(<><SchoolLearnerMenu items={items} onNavigate={navigate}/><SchoolWorkspaceShell learner items={items} page="tasks" onNavigate={navigate}><p>授权任务</p></SchoolWorkspaceShell></>)
   expect(screen.queryByRole('navigation',{name:'工作台功能导航'})).not.toBeInTheDocument()
   const toggle=screen.getByText('',{selector:'summary[aria-label="校园功能"]'})
-  fireEvent.click(toggle)
-  expect(screen.getByRole('link',{name:'亲子关联'})).toBeVisible()
-  fireEvent.click(screen.getByRole('link',{name:'亲子关联'}))
+  await user.click(toggle)
+  for(const label of ['我的校园任务','我的反馈','亲子关联','同伴授权']){
+   const link=screen.getByRole('link',{name:label})
+   expect(link).toHaveAttribute('aria-label',label)
+   await user.tab()
+   expect(link).toHaveFocus()
+  }
+  await user.keyboard('{Escape}')
+  expect(toggle).toHaveFocus()
+  expect(toggle.closest('details')).not.toHaveAttribute('open')
+  await user.click(toggle)
+  await user.click(screen.getByRole('link',{name:'亲子关联'}))
   expect(navigate).toHaveBeenCalledWith('family')
+  expect(toggle).toHaveFocus()
   expect(screen.queryByRole('link',{name:'个人信息编辑'})).not.toBeInTheDocument()
   expect(screen.queryByRole('link',{name:'群体报告'})).not.toBeInTheDocument()
  })

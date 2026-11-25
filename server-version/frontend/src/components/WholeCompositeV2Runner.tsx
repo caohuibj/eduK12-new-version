@@ -1226,7 +1226,7 @@ export function WholeCompositeV2Runner({
         </div>
       ) : null}
 
-      {pendingSeal && !receipt ? (
+      {pendingSeal && !receipt && !submitting ? (
         <div role="status" className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
           <span>
             {sealedRecoveryState === 'REJECTED_CONFLICT'
@@ -1240,17 +1240,15 @@ export function WholeCompositeV2Runner({
               <button
                 type="button"
                 className="btn-primary min-h-10"
-                disabled={submitting}
                 onClick={() => void submitWhole()}
               >
-                {submitting ? '正在核对并重试…' : '核对并重试提交'}
+                核对并重试提交
               </button>
             ) : null}
             {sealedRecoveryState === 'REJECTED_CONFLICT' ? (
               <button
                 type="button"
                 className="btn-primary min-h-10"
-                disabled={submitting}
                 onClick={reloadServerState}
               >
                 重新加载服务端状态

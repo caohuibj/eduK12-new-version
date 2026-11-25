@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { WholeCompositeV2Runner } from '../WholeCompositeV2Runner'
 import WholeCompositeQuestionnaire from '../WholeCompositeQuestionnaire'
 import type { CompositeAttemptState } from '../../modules/composite/types'
@@ -420,13 +420,11 @@ describe('WholeCompositeV2Runner (4-in-1 Form + Scale + SJT + Cognitive)', () =>
       const res = await origLoadMeta()
       return { ...res, data: { ...res.data, activeSlotKeys: ['scale:item-scale'] } }
     })
-    let attempts = 0
     const origSubmit = client.submitWhole
-    client.submitWhole = vi.fn(async payload => {
-      attempts += 1
-      if (attempts === 1) throw new Error('网络超时')
-      return origSubmit(payload)
-    })
+    let rejectFirst!: (error: Error) => void
+    client.submitWhole = vi.fn(origSubmit).mockImplementationOnce(() => new Promise((_resolve, reject) => {
+      rejectFirst = reject
+    }))
     const onCompleted = vi.fn()
 
     render(
@@ -444,7 +442,13 @@ describe('WholeCompositeV2Runner (4-in-1 Form + Scale + SJT + Cognitive)', () =>
     fireEvent.click(screen.getByText('非常符合'))
     fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
 
-    // First submit fails -> sealed banner appears, answers frozen, original submissionId saved
+    expect(screen.getByText('正在提交整份测评…')).toBeVisible()
+    expect(screen.queryByText(/尚未确认/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /核对并重试/ })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '非常符合' })).toBeDisabled()
+
+    // Only show the recovery action once the first request has actually failed.
+    await act(async () => rejectFirst(new Error('网络超时')))
     const retryBtn = await screen.findByRole('button', { name: '核对并重试提交' })
     const firstSubId = (client.submitWhole as ReturnType<typeof vi.fn>).mock.calls[0][0].submissionId
     expect(firstSubId).toBeTruthy()
@@ -718,5 +722,13 @@ describe('WholeCompositeV2Runner (4-in-1 Form + Scale + SJT + Cognitive)', () =>
     fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
     await waitFor(() => expect(onReceiptRo).toHaveBeenCalledTimes(1))
     expect(onCompletedRo).not.toHaveBeenCalled()
+    const heading = await screen.findByRole('heading', { name: '交卷成功' })
+    const receipt = heading.closest('[role="status"]')
+    expect(receipt).toHaveClass('hui-page--assessment')
+    const time = receipt?.querySelector('time')
+    const completedAt = '2026-11-24T01:05:00.000Z'
+    expect(time).toHaveAttribute('datetime', completedAt)
+    expect(time).toHaveTextContent(new Date(completedAt).toLocaleString('zh-CN', { hourCycle: 'h23' }))
+    expect(time).not.toHaveTextContent(/AM|PM/)
   })
 })

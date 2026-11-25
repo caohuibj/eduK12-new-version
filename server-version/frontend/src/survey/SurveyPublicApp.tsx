@@ -287,6 +287,13 @@ export default function SurveyPublicApp(){
   const finalInFlight=useRef(false)
   const completedAttempts=useRef(new Set<string>())
   const [completion,setCompletion]=useState<{attemptId:string;proof:{accessCredential:string;researchCode?:string}}|null>(null)
+  const completionHeading=useRef<HTMLHeadingElement>(null)
+  const showingCompletion=!!(completion||general)
+  useEffect(()=>{
+    if(!showingCompletion)return
+    window.scrollTo({top:0,behavior:'instant'})
+    completionHeading.current?.focus({preventScroll:true})
+  },[showingCompletion])
   const draftState=useRef({answers,itemTimings})
   draftState.current={answers,itemTimings}
   const [withdrawn,setWithdrawn]=useState(false),[revoked,setRevoked]=useState(false)
@@ -1305,56 +1312,57 @@ export default function SurveyPublicApp(){
           :<button type="button" className={action('btn-secondary')} disabled={busy}
               onClick={withdraw}>撤回本轮筛选记录</button>}
       </section>}
-      {completion&&!general&&<section className={panel('bg-white border rounded-xl p-5 space-y-3')}>
-        <h2 className="text-xl font-semibold">感谢参与，问卷已提交</h2>
-        <p className="survey-completion-state">你已完成问卷，可以关闭此页面。</p>
-        <p>你的回答已保存。暂时无法显示后续信息，你可以稍后重试。</p>
-        <button type="button" className={action('btn-secondary')} disabled={busy}
-          onClick={()=>void run(()=>readCompletion(completion.attemptId,completion.proof))}>重新查看</button>
-      </section>}
-      {general&&<section className={panel('survey-completion-card bg-white border rounded-xl p-5 space-y-3')}>
-        <div className="survey-completion-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m6 12 4 4 8-8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
-        <h2 className="text-xl font-semibold">感谢参与，问卷已提交</h2>
-        <p className="survey-completion-copy whitespace-pre-wrap">{general.text||'你已完成问卷，可以关闭此页面。'}</p>
-        {general.kind==='DESCRIPTIVE'&&<section className="border rounded-lg p-3 space-y-3" aria-label="本次表现描述性反馈">
-          <h3 className="font-semibold">本次表现反馈</h3>
-          {general.pending&&<p role="status">部分反馈将在问卷收集结束后开放。</p>}
-          {general.measurements?.map(measurement=><article key={measurement.instrumentKey} className="space-y-2">
-            <h4 className="font-medium">{measurement.title}</h4>
-            <p className="text-xs">{measurement.feedbackKind==='RAW_METRICS'?feedbackQualityText(measurement.quality):'试点测量 · 质量状态：'+measurement.quality}。仅反映本次条件下的表现。</p>
-            {measurement.metrics.map(metric=><p key={metric.key}>{metric.label}：{metric.value===null?'不可计算':measurement.feedbackKind==='RAW_METRICS'?String(metric.value):metric.unit==='ratio'?(metric.value*100).toFixed(1)+'%':metric.unit==='ms'?metric.value+' ms':String(metric.value)}（{measurement.feedbackKind==='RAW_METRICS'?feedbackMetricStatusText(metric.status):metric.status}）</p>)}
-            {measurement.feedbackKind==='RAW_METRICS'&&measurement.rawScoreFeedback?.map((feedback,index)=><section className="border-l-2 border-slate-300 pl-3 space-y-2" key={feedback.scoreKey+':'+index} aria-label="原始分描述性反馈">
-              <p className="whitespace-pre-wrap text-sm">{feedback.text}</p>
-              {completion&&feedback.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item} purpose="report" proof={{publicId,attemptId:completion.attemptId,...completion.proof}}/>)}
-              {completion&&feedback.images?.map(image=><SurveyParticipantImage key={image.asset.assetId} image={image} purpose="report" proof={{publicId,attemptId:completion.attemptId,...completion.proof}}/>)}
-            </section>)}
-            {measurement.feedbackKind==='RAW_METRICS'&&measurement.declaredReport&&<SurveyDeclaredReportView report={measurement.declaredReport} proof={completion?{publicId,attemptId:completion.attemptId,...completion.proof}:undefined}/>}
-          </article>)}
-        </section>}
-        {general.nativeBundles?.map(bundle=><section key={bundle.importId} aria-label="整体理论报告"><h2>{bundle.title}</h2>{bundle.derivedView?<BundleDerivedReport view={bundle.derivedView}/>:bundle.profileView?<BundleProfileSummary view={bundle.profileView}/>:<p>综合结果暂不可用；单项作答已保存。</p>}</section>)}
-        {info.project.collectionMode==='LINKED_WAVES'&&info.project.hasPersonalTracking!==false&&completion&&<SurveyPersonalChanges publicId={publicId} attemptId={completion.attemptId} proof={completion.proof}/>}
-        {info.project.collectionMode==='LINKED_WAVES'&&<div className="survey-completion-primary">
-          <button type="button" className={action('btn-secondary')} disabled={busy} onClick={returnHome}>返回我的研究波次</button>
-        </div>}
-        <details className="survey-completion-options" open={completionOptionsOpen}
-          onToggle={event=>setCompletionOptionsOpen(event.currentTarget.open)}>
-          <summary onClick={event=>{event.preventDefault();setCompletionOptionsOpen(open=>!open)}}>参与与数据管理</summary>
-          {completionOptionsOpen&&<div className="survey-completion-option-list">
-            {info.project.collectionMode==='LINKED_WAVES'&&<div className="survey-completion-option">
-              <p>如不再参加后续问卷，可停止此编码的后续访问；已提交的回答会保留。</p>
-              <button type="button" className="survey-completion-management-action" disabled={busy} onClick={revokeAccess}>
-                只撤销未来访问（保留研究数据）</button>
-            </div>}
-            <div className="survey-completion-option">
-              <p>如希望退出研究，可申请将已提交的回答排除在后续统计之外。</p>
-              <button type="button" className="survey-completion-management-action" disabled={busy} onClick={withdraw}>
-                申请撤回本研究数据（排除未来统计）</button>
-            </div>
+      {showingCompletion&&<section className={panel((general?'survey-completion-card ':'')+'bg-white border rounded-xl p-5 space-y-3')}>
+        {general&&<div className="survey-completion-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m6 12 4 4 8-8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></div>}
+        <h2 ref={completionHeading} tabIndex={-1} className="text-xl font-semibold">感谢参与，问卷已提交</h2>
+        {!general&&completion&&<>
+          <p className="survey-completion-state">你已完成问卷，可以关闭此页面。</p>
+          <p>你的回答已保存。暂时无法显示后续信息，你可以稍后重试。</p>
+          <button type="button" className={action('btn-secondary')} disabled={busy}
+            onClick={()=>void run(()=>readCompletion(completion.attemptId,completion.proof))}>重新查看</button>
+        </>}
+        {general&&<>
+          <p className="survey-completion-copy whitespace-pre-wrap">{general.text||'你已完成问卷，可以关闭此页面。'}</p>
+          {general.kind==='DESCRIPTIVE'&&<section className="border rounded-lg p-3 space-y-3" aria-label="本次表现描述性反馈">
+            <h3 className="font-semibold">本次表现反馈</h3>
+            {general.pending&&<p role="status">部分反馈将在问卷收集结束后开放。</p>}
+            {general.measurements?.map(measurement=><article key={measurement.instrumentKey} className="space-y-2">
+              <h4 className="font-medium">{measurement.title}</h4>
+              <p className="text-xs">{measurement.feedbackKind==='RAW_METRICS'?feedbackQualityText(measurement.quality):'试点测量 · 质量状态：'+measurement.quality}。仅反映本次条件下的表现。</p>
+              {measurement.metrics.map(metric=><p key={metric.key}>{metric.label}：{metric.value===null?'不可计算':measurement.feedbackKind==='RAW_METRICS'?String(metric.value):metric.unit==='ratio'?(metric.value*100).toFixed(1)+'%':metric.unit==='ms'?metric.value+' ms':String(metric.value)}（{measurement.feedbackKind==='RAW_METRICS'?feedbackMetricStatusText(metric.status):metric.status}）</p>)}
+              {measurement.feedbackKind==='RAW_METRICS'&&measurement.rawScoreFeedback?.map((feedback,index)=><section className="border-l-2 border-slate-300 pl-3 space-y-2" key={feedback.scoreKey+':'+index} aria-label="原始分描述性反馈">
+                <p className="whitespace-pre-wrap text-sm">{feedback.text}</p>
+                {completion&&feedback.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item} purpose="report" proof={{publicId,attemptId:completion.attemptId,...completion.proof}}/>)}
+                {completion&&feedback.images?.map(image=><SurveyParticipantImage key={image.asset.assetId} image={image} purpose="report" proof={{publicId,attemptId:completion.attemptId,...completion.proof}}/>)}
+              </section>)}
+              {measurement.feedbackKind==='RAW_METRICS'&&measurement.declaredReport&&<SurveyDeclaredReportView report={measurement.declaredReport} proof={completion?{publicId,attemptId:completion.attemptId,...completion.proof}:undefined}/>}
+            </article>)}
+          </section>}
+          {general.nativeBundles?.map(bundle=><section key={bundle.importId} aria-label="整体理论报告"><h2>{bundle.title}</h2>{bundle.derivedView?<BundleDerivedReport view={bundle.derivedView}/>:bundle.profileView?<BundleProfileSummary view={bundle.profileView}/>:<p>综合结果暂不可用；单项作答已保存。</p>}</section>)}
+          {info.project.collectionMode==='LINKED_WAVES'&&info.project.hasPersonalTracking!==false&&completion&&<SurveyPersonalChanges publicId={publicId} attemptId={completion.attemptId} proof={completion.proof}/>}
+          {info.project.collectionMode==='LINKED_WAVES'&&<div className="survey-completion-primary">
+            <button type="button" className={action('btn-secondary')} disabled={busy} onClick={returnHome}>返回我的研究波次</button>
           </div>}
-        </details>
-        <ReportSupporting facts={[{label:'完成时间',value:new Date(general.completedAt).toLocaleString('zh-CN')}]}>
-          {general.disclaimer&&<p className="survey-completion-disclaimer">{general.disclaimer}</p>}
-        </ReportSupporting>
+          <details className="survey-completion-options" open={completionOptionsOpen}
+            onToggle={event=>setCompletionOptionsOpen(event.currentTarget.open)}>
+            <summary onClick={event=>{event.preventDefault();setCompletionOptionsOpen(open=>!open)}}>参与与数据管理</summary>
+            {completionOptionsOpen&&<div className="survey-completion-option-list">
+              {info.project.collectionMode==='LINKED_WAVES'&&<div className="survey-completion-option">
+                <p>如不再参加后续问卷，可停止此编码的后续访问；已提交的回答会保留。</p>
+                <button type="button" className="survey-completion-management-action" disabled={busy} onClick={revokeAccess}>
+                  只撤销未来访问（保留研究数据）</button>
+              </div>}
+              <div className="survey-completion-option">
+                <p>如希望退出研究，可申请将已提交的回答排除在后续统计之外。</p>
+                <button type="button" className="survey-completion-management-action" disabled={busy} onClick={withdraw}>
+                  申请撤回本研究数据（排除未来统计）</button>
+              </div>
+            </div>}
+          </details>
+          <ReportSupporting facts={[{label:'完成时间',value:new Date(general.completedAt).toLocaleString('zh-CN')}]}>
+            {general.disclaimer&&<p className="survey-completion-disclaimer">{general.disclaimer}</p>}
+          </ReportSupporting>
+        </>}
       </section>}
       {participantEntry&&!identitySavePending&&home&&completedWaves.length>0&&<details className="survey-completed-receipts" open={receiptsOpen}
         onToggle={event=>setReceiptsOpen(event.currentTarget.open)}>
