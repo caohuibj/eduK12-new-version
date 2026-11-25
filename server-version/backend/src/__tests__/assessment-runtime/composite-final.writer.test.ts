@@ -622,8 +622,22 @@ describe('prepared ordinary Scale FINAL', () => {
     expect(f.finals.size).toBe(1)
   })
 
-  it('falls back safely when governance depends on a live wall clock',async()=>{
+  it('runs receipt-only governance once after the write transaction locks, and rejects a failed check', async () => {
+    const f = fixture()
+    const check = vi.fn(async () => { throw new Error('revoked during preparation') })
+    f.input.finalizeGovernanceInTx = check
+    const prepared = await prepareCompositeWholeFinal(f.input, f.db)
+    expect(prepared).toBeDefined()
+    expect(check).not.toHaveBeenCalled()
+    await expect(commitCompositeWholeFinal(f.db, f.input, prepared)).rejects.toThrow('revoked during preparation')
+    expect(check).toHaveBeenCalledTimes(1)
+    expect(f.finals.size).toBe(0)
+  })
+
+  it('falls back safely when feedback governance depends on a live wall clock',async()=>{
     const f=fixture()
+    f.input.attempt.receiptOnly = false
+    f.input.buildFeedback = async () => ({ headline: 'feedback' })
     f.input.finalizeGovernanceInTx=async tx=>{await tx.$queryRaw`SELECT clock_timestamp() AS now`;return undefined}
     expect(await prepareCompositeWholeFinal(f.input,f.db)).toBeUndefined()
     expect(f.finals.size).toBe(0)

@@ -304,6 +304,7 @@ const preparedFinals = new WeakMap<PreparedCompositeWholeFinal, {
   governance?: CompositeWholeFinalGovernanceResult
   feedbackCipher?: string | null
   verifyReads?: (tx: any) => Promise<void>
+  deferGovernance?: boolean
   failed?: true
   error?: unknown
 }>()
@@ -345,7 +346,8 @@ export async function prepareCompositeWholeFinal(input: CommitCompositeWholeFina
     }, false) : {}
     const units = mergeLockedCompositeUnits(input.plan, input.submit, locked)
     const computed = await computeCompositeWholeFinal(input, units, locked, payloadHash, input.templates ?? publicTemplates)
-    const governed = input.finalizeGovernanceInTx ? await captureFinalAuthorityReads(db, tx => input.finalizeGovernanceInTx!(tx, {
+    const deferGovernance = input.attempt.receiptOnly || !input.buildFeedback
+    const governed = input.finalizeGovernanceInTx && !deferGovernance ? await captureFinalAuthorityReads(db, tx => input.finalizeGovernanceInTx!(tx, {
       contextObj: computed.contextObj, contextHash: computed.contextHash,
       contextSnapshotEncrypted: computed.contextSnapshotEncrypted, aggregateHash: computed.aggregateHash,
       completedAt: computed.now, verifiedPayloads: computed.verifiedPayloads,
@@ -353,7 +355,7 @@ export async function prepareCompositeWholeFinal(input: CommitCompositeWholeFina
     const governance = governed?.value || undefined
     const feedbackCipher = await encodePreparedFeedback(input, computed, governance)
     preparedFinals.set(token, { input, binding, computed, lockedHash: canonicalHash(locked), governance,
-      feedbackCipher, verifyReads: governed?.verify })
+      feedbackCipher, verifyReads: governed?.verify, deferGovernance })
   } catch (error) {
     if (error instanceof DynamicFinalAuthorityRead) return undefined
     preparedFinals.set(token, { input, binding, failed: true, error })
@@ -544,7 +546,7 @@ export async function commitCompositeWholeFinal(
       input.templates ?? publicTemplatesForDatabase(tx))
   const completedAtIso = now.toISOString()
 
-  const governanceResult = preparedValue ? preparedValue.governance : (input.finalizeGovernanceInTx
+  const governanceResult = preparedValue && !preparedValue.deferGovernance ? preparedValue.governance : (input.finalizeGovernanceInTx
     ? await input.finalizeGovernanceInTx(tx, {
         contextObj,
         contextHash,
