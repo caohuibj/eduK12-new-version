@@ -32,6 +32,13 @@ const snapshotSchema = z.object({
   publicationIdentity: publicationSchema, publicationHash: digest,
   policy: trainingFeedbackPolicySchema, policyHash: digest, accessTokenId: z.string().min(1).nullable(), roundId: z.string().min(1).nullable(),
 }).strict().refine(snapshot => snapshot.roundId === null || snapshot.accessTokenId !== null, 'Training round requires its frozen access token')
+// Static policy/publication data already has one immutable copy on the
+// published composite. New V2 attempts keep only its hashes and personal IDs.
+const compactSnapshotSchema = z.object({
+  schemaVersion:z.literal(2),attemptId:z.string().min(1),attemptEpoch:z.number().int().positive(),
+  compositeId:z.string().min(1),courseId:z.string().min(1),publicationHash:digest,policyHash:digest,
+  accessTokenId:z.string().min(1).nullable(),roundId:z.string().min(1).nullable(),
+}).strict()
 export type TrainingFeedbackSnapshot = z.infer<typeof snapshotSchema>
 export type TrainingFeedbackBinding = Omit<TrainingFeedbackSnapshot, 'schemaVersion' | 'attemptId' | 'attemptEpoch' | 'publicationHash'>
 export type TrainingFeedbackAttempt = {
@@ -78,13 +85,23 @@ export function freezeTrainingFeedbackSnapshot(input: TrainingFeedbackBinding & 
   } catch { throw compositeBadRequest('Training 反馈冻结身份不完整或不匹配') }
 }
 
+export function compactTrainingFeedbackSnapshot(snapshot: TrainingFeedbackSnapshot) {
+  const {policy:_policy,publicationIdentity:_publication,...personal}=snapshot
+  return compactSnapshotSchema.parse({...personal,schemaVersion:2})
+}
+
 /** Undefined is legacy only when BOTH publication and attempt configuration
  * are absent. A configured but missing/malformed snapshot always fails closed. */
 export function readTrainingFeedbackSnapshot(attempt: TrainingFeedbackAttempt): TrainingFeedbackSnapshot | null {
   const parent = attempt.compositeAssessment
   if (attempt.trainingFeedbackSnapshot == null && attempt.trainingFeedbackSnapshotHash == null &&
     parent?.trainingFeedbackPolicy == null && parent?.trainingFeedbackPolicyHash == null) return null
-  const snapshot = snapshotSchema.parse(attempt.trainingFeedbackSnapshot)
+  const stored = attempt.trainingFeedbackSnapshot as {schemaVersion?:number} | undefined
+  const snapshot = snapshotSchema.parse(stored?.schemaVersion===2
+    ? {...compactSnapshotSchema.parse(stored),schemaVersion:1,
+        policy:parseTrainingFeedbackPolicy(parent?.trainingFeedbackPolicy),
+        publicationIdentity:trainingRoundPublicationIdentity(parent,compactSnapshotSchema.parse(stored).courseId)}
+    : stored)
   if (!parent?.publishedAt || parent.trainingFeedbackPolicy == null || !parent.trainingFeedbackPolicyHash ||
     canonicalHash(snapshot) !== attempt.trainingFeedbackSnapshotHash || snapshot.attemptId !== attempt.id ||
     snapshot.attemptEpoch !== attempt.attemptEpoch || snapshot.compositeId !== attempt.compositeAssessmentId ||

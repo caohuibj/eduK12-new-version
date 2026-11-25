@@ -80,6 +80,12 @@ async function insertWave(tx:Db,userId:string,studyId:string,input:{compositeId:
         AND NOT EXISTS(SELECT 1 FROM composite_assessment_attempts a WHERE a.access_token_id=t.id) FOR UPDATE OF t
     `
     if(!binding[0]) return hidden()
+    // A fresh statement after the token lock observes shard commits that may
+    // have completed while the lock was waiting; the first MVCC snapshot cannot.
+    const unused=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM composite_assessment_access_tokens t
+      WHERE t.id=${input.tokenId} AND t.used_count=0 AND NOT EXISTS(
+        SELECT 1 FROM composite_access_token_usage_shards usage WHERE usage.token_id=t.id)`
+    if(!unused[0]) return hidden()
     const counts=await tx.$queryRaw<Array<{count:number}>>`SELECT count(*)::int AS count FROM anonymous_study_waves WHERE study_id=${studyId}`
     if(counts[0].count>=100) throw compositeBadRequest('每项研究最多 100 个波次')
     const existing=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM anonymous_study_waves WHERE access_token_id=${input.tokenId}`
@@ -259,7 +265,7 @@ export async function participantHome(studyId:string,credential:string) {
     SELECT w.id,w.title,w.ordinal,a.id AS "attemptId",a.status::text AS state,a.completed_at AS "completedAt",
       (s.status='ACTIVE' AND t.is_active AND t.expires_at>CURRENT_TIMESTAMP AND c.status='PUBLISHED' AND c.public_enabled
         AND (c.opens_at IS NULL OR c.opens_at<=CURRENT_TIMESTAMP) AND (c.expires_at IS NULL OR c.expires_at>CURRENT_TIMESTAMP)
-        AND (t.max_uses=0 OR t.used_count<t.max_uses)) AS accepting
+        AND (t.max_uses=0 OR t.used_count+COALESCE((SELECT SUM(usage.used_count) FROM composite_access_token_usage_shards usage WHERE usage.token_id=t.id),0)<t.max_uses)) AS accepting
     FROM anonymous_study_waves w JOIN anonymous_studies s ON s.id=w.study_id
     JOIN composite_assessment_access_tokens t ON t.id=w.access_token_id JOIN composite_assessments c ON c.id=t.composite_assessment_id
     LEFT JOIN anonymous_study_attempts sa ON sa.wave_id=w.id AND sa.participant_id=${p.id}
@@ -280,7 +286,7 @@ export async function startStudyWave(studyId:string,waveId:string,credential:str
     participantId:p.id,
     beforeAdmission:async tx=>{
       // Study then identity, both FOR SHARE: close and withdrawal still take
-      // FOR UPDATE and wait for these readers. Token usedCount stays a CAS
+      // FOR UPDATE and wait for these readers. Token quota and durable usage remain a final claim
       // updateMany, so a shared study row lock cannot oversell maxUses.
       await tx.$queryRaw`SELECT id FROM anonymous_studies WHERE id=${studyId} FOR SHARE`
       await tx.$queryRaw`SELECT id FROM anonymous_study_participants WHERE id=${p.id} FOR SHARE`

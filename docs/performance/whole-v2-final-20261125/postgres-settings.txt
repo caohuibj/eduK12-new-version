@@ -1,0 +1,6 @@
+fsync|on
+full_page_writes|on
+max_connections|100
+server_version|16.15 (Debian 16.15-1.pgdg12+2)
+shared_buffers|32768
+synchronous_commit|on

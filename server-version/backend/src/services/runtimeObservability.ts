@@ -661,10 +661,11 @@ export const requestObservabilityMiddleware = (req: Request, res: Response, next
     technicalTimeline = newTimeline('definition', match?.[1] || 'definition')
     pushTimeline(technicalTimeline, 'http.request_start', process.hrtime.bigint())
   }
-  if (req.method === 'POST' && /\/composite-assessments\/attempts\/[^/]+\/whole\/submit(?:\?|$)/.test(req.originalUrl || req.url)) {
+  const v2Submit = /(?:\/attempts|\/(?:assessment-)?composite-attempts)\/([^/]+)\/v2\/whole\/submit(?:\?|$)/.exec(url)
+  if (req.method === 'POST' && (v2Submit || /\/composite-assessments\/attempts\/[^/]+\/whole\/submit(?:\?|$)/.test(url))) {
     const arrival = { requestStartedAtMs: Date.now(), bodyReceivedAtMs: undefined as number | undefined }
     if (timelineEnabled()) {
-      const match = (req.originalUrl || req.url).match(/\/attempts\/([^/]+)\/whole\/submit/)
+      const match = v2Submit ?? url.match(/\/attempts\/([^/]+)\/whole\/submit/)
       if (match) technicalTimeline = newTimeline('submission', match[1])
       const rawCallback = nodeRequestCallbacks.get(req)
       if (rawCallback) pushTimeline(technicalTimeline, 'http.node_request_callback', rawCallback)

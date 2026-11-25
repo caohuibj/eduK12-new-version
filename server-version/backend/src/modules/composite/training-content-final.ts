@@ -10,7 +10,7 @@ import * as measurementRepository from '../measurement-content/repository'
 import type {StoredRelease} from '../measurement-content/repository'
 import {ContentReleaseError} from '../measurement-content/release'
 import {interpretContentBinding,FinalInterpretationIdentityError,type FinalInterpretation} from '../measurement-content/final-interpretation'
-import {resolveTrainingContentBindingParent,trainingContentAttemptBindingSchema,trainingMeasurementSourceScopeMatchesForConsumer,tryResolveTrainingContentBindingSync} from './training-content-binding'
+import {loadExactLibrarySources,resolveTrainingContentBindingParent,trainingContentAttemptBindingSchema,trainingMeasurementSourceScopeMatchesForConsumer,tryResolveTrainingContentBindingSync} from './training-content-binding'
 import {assertSealedCompositionAnchor} from '../assessment-run/educationCompositionExecution'
 import {validateTrainingReportPointer} from './training-report-selection'
 
@@ -97,6 +97,23 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
       await prefetchFn(tx,cache,initialReleaseIds,true)
     }
   }
+  // Plain library-scale receipts have no other per-unit authority locks.
+  // Validate the exact frozen identity once for each source in a sorted batch.
+  const batchLibraryScope = Boolean(prefetchFn && !educationComposition && !referenceBinding
+    && binding.units.length > 1 && binding.units.every(unit => {
+      const release = cache.get(unit.measurement.releaseId)
+      return unit.family === 'SCALE' && unit.source.kind === 'SCALE'
+        && unit.source.libraryEntryId && !unit.source.educationNative
+        && !unit.source.standardCombination && !unit.source.privateVersionId && !unit.report
+        && release?.layer === 'MEASUREMENT' && release.family === unit.family
+        && release.contentHash === unit.measurement.contentHash
+    }))
+  if (batchLibraryScope) {
+    await loadExactLibrarySources(tx, binding.units.map(unit => ({
+      release: cache.get(unit.measurement.releaseId)!,
+      source: unit.source,
+    })), 'FROZEN_IDENTITY')
+  }
   let referencesPrefetched=false
   const readRelease=async(id:string,expectedHash:string)=>{
     let release=cache.get(id)
@@ -119,8 +136,8 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
     }else if(release.layer==='MEASUREMENT'){
       const matching=measurementUnitsByReleaseId.get(id)??[]
       if(!matching.length)fail()
-      for(const unit of matching)if(release.family!==unit.family||!await trainingMeasurementSourceScopeMatchesForConsumer(tx,release,unit.source,
-        {compositeId:binding.compositeId,ownerId:parent.compositeAssessment.createdBy,itemId:unit.itemId,educationComposition}))fail()
+      for(const unit of matching)if(release.family!==unit.family||(!batchLibraryScope&&!await trainingMeasurementSourceScopeMatchesForConsumer(tx,release,unit.source,
+        {compositeId:binding.compositeId,ownerId:parent.compositeAssessment.createdBy,itemId:unit.itemId,educationComposition})))fail()
     }else if(release.layer==='REFERENCE'){
       const matching=selectedReferenceUnitsByReleaseId.get(id)??[]
       if(!matching.length)fail()

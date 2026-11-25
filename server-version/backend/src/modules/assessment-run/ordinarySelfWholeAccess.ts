@@ -68,6 +68,7 @@ export function publishedSelfScaleTrackSql(track: Prisma.Sql, product: OrdinaryS
 type Locator = { attemptId: string; mode?: 'full' | 'progress' } | { executionId: string; schoolPath?: { organizationId: string; runId: string; courseId: string } }
 export type OrdinarySelfWholeBinding = WholeReceiptRow & {
   kind: 'bound'
+  wholeV2Authorization?: Record<string, unknown> | null
   assignmentRef: string
   executionStatus: string
   parentStatus: CompositeAssessmentAttempt['status']
@@ -268,6 +269,47 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
         AND EXISTS (${school ? schoolLink : teacherLink}) AND NOT EXISTS (${school ? teacherLink : schoolLink})
     )
     SELECT e.status AS "executionStatus", a.id AS "assignmentRef",
+      CASE WHEN ${!progressOnly} AND p.publication_hash IS NOT NULL THEN jsonb_build_object(
+        'id',p.id,
+        'compositeAssessmentId',p.composite_assessment_id,
+        'userId',p.user_id,
+        'subjectUserId',p.subject_user_id,
+        'respondentUserId',p.respondent_user_id,
+        'recoveryTokenHash',p.recovery_token_hash,
+        'attemptEpoch',p.attempt_epoch,
+        'status',p.status::text,
+        'receiptOnly',p.receipt_only,
+        'startedAt',p.started_at AT TIME ZONE 'UTC',
+        'publicationHash',p.publication_hash,
+        'unitSeedsEncrypted',p.unit_seeds_encrypted,
+        'deliveryCourseId',p.delivery_course_id,
+        'assignmentRef',p.assignment_ref,
+        'consentId',p.consent_id,
+        'contextSnapshotEncrypted',p.context_snapshot_encrypted,
+        'contextSnapshotHash',p.context_snapshot_hash,
+        'trainingContentBinding',p.training_content_binding,
+        'trainingContentBindingHash',p.training_content_binding_hash,
+        'trainingReferenceBinding',p.training_reference_binding,
+        'trainingReferenceBindingHash',p.training_reference_binding_hash,
+        'trainingTimingSnapshot',p.training_timing_snapshot,
+        'trainingPersistenceSnapshot',p.training_persistence_snapshot,
+        'trainingPersistenceSnapshotHash',p.training_persistence_snapshot_hash,
+        'trainingVariantAllocationEncrypted',p.training_variant_allocation_encrypted,
+        'trainingVariantAllocationHash',p.training_variant_allocation_hash,
+        'creationKey',ca.creation_key,
+        'productKind',ca.product_kind::text,
+        'expiresAt',ca.expires_at AT TIME ZONE 'UTC',
+        'createdBy',ca.created_by,
+        'executionId',e.id,
+        'assignmentId',a.id,
+        'organizationId',e.organization_id,
+        'runId',e.run_id,
+        'hasCampusActivity',${school},
+        'hasHuiteacherLink',${!school},
+        'trackResourceKey',t.resource_key,
+        'trackResourceVersion',t.resource_version,
+        'trackPolicy',t.frozen_resource_policy,
+        'trackPolicyHash',t.resource_policy_hash) END AS "wholeV2Authorization",
       jsonb_build_object(
         'assignmentId', a.id, 'status', a.status, 'consentId', a.consent_id,
         'subjectUserId', a.subject_user_id, 'respondentUserId', a.respondent_user_id, 'respondentRole', a.respondent_role,
@@ -352,7 +394,8 @@ export function ordinarySelfWholeAccessQuery(product: OrdinarySelfWholeProduct, 
           END
         )`}
       AND (${wholeDelivery} OR p.async_report_epoch=p.attempt_epoch OR p.publication_hash IS NOT NULL)
-    LEFT JOIN composite_report_jobs j ON j.attempt_id=p.id AND j.attempt_epoch=p.attempt_epoch
+    LEFT JOIN composite_assessments ca ON ca.id=p.composite_assessment_id
+    LEFT JOIN composite_report_jobs j ON p.publication_hash IS NULL AND j.attempt_id=p.id AND j.attempt_epoch=p.attempt_epoch
     LEFT JOIN composite_attempt_finals f ON f.attempt_id=p.id AND f.attempt_epoch=p.attempt_epoch
     LIMIT 1
   `

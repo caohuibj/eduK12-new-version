@@ -1,8 +1,11 @@
+import { prisma } from '../../config/database'
+import { captureFinalAuthorityReads, DynamicFinalAuthorityRead } from './prepared-final-authority'
 import { Prisma } from '@prisma/client'
+import { traceAssessmentPhase, traceAssessmentPhaseSync } from '../../services/runtimeObservability'
 import { z } from 'zod'
-import { canonicalHash } from './canonical'
+import { canonicalHash, hasImmutableCanonicalValue } from './canonical'
 import { encryptCompactField } from './compact-field-codec'
-import { publicTemplatesForDatabase, type PublicTemplateStore } from './public-templates'
+import { publicTemplates, publicTemplatesForDatabase, type PublicTemplateStore } from './public-templates'
 import {
   buildScaleUnitFactsBatch,
   decodeCompositeUnitSeeds,
@@ -131,6 +134,9 @@ export type WholeV2SubmitInput = z.infer<typeof wholeV2SubmitSchema>
 export interface CommitCompositeWholeFinalInput {
   attempt: {
     id: string
+    userId?: string | null
+    status?: string
+    frozenState?: Record<string, unknown>
     attemptEpoch: number
     compositeAssessmentId: string
     subjectUserId?: string | null
@@ -286,13 +292,85 @@ type ExistingFinalRow = {
 
 export type CompositeFinalWriterDb = CompositeCheckpointDb
 
+
+declare const preparedFinalBrand: unique symbol
+export type PreparedCompositeWholeFinal = { readonly [preparedFinalBrand]: true }
+type ComputedFinal = Awaited<ReturnType<typeof computeCompositeWholeFinal>>
+const preparedFinals = new WeakMap<PreparedCompositeWholeFinal, {
+  input: CommitCompositeWholeFinalInput
+  binding: string
+  computed?: ComputedFinal
+  lockedHash?: string
+  governance?: CompositeWholeFinalGovernanceResult
+  feedbackCipher?: string | null
+  verifyReads?: (tx: any) => Promise<void>
+  deferGovernance?: boolean
+  failed?: true
+  error?: unknown
+}>()
+const preparationBinding = (input: CommitCompositeWholeFinalInput) => canonicalHash({
+  attempt: { id: input.attempt.id, userId: input.attempt.userId ?? null,
+    attemptEpoch: input.attempt.attemptEpoch, compositeAssessmentId: input.attempt.compositeAssessmentId,
+    subjectUserId: input.attempt.subjectUserId ?? null, organizationId: input.attempt.organizationId ?? null,
+    deliveryCourseId: input.attempt.deliveryCourseId ?? null, publicationHash: input.attempt.publicationHash,
+    receiptOnly: input.attempt.receiptOnly, trainingTimingSnapshot: input.attempt.trainingTimingSnapshot ?? null,
+    startedAt: input.attempt.startedAt.toISOString(), frozenState: input.attempt.frozenState ?? null },
+  publicationHash: input.plan.publicationHash,
+  submit: input.submit,
+  activeSlotKeys: input.activeSlotKeys ? [...input.activeSlotKeys].sort() : null,
+  educationRun: input.educationRun ?? null,
+  now: input.now?.toISOString() ?? null,
+})
+
+/** Prepare frozen V2 unit scoring, feedback, compression and encryption before
+ * opening the write transaction. Checkpoint units and governance reads are
+ * revalidated under the final authority/parent locks. Errors are deferred until
+ * after replay/conflict checks to preserve their existing precedence. Public
+ * templates saved here commit independently and contain no personal results.
+ */
+export async function prepareCompositeWholeFinal(input: CommitCompositeWholeFinalInput, db: any = prisma): Promise<PreparedCompositeWholeFinal | undefined> {
+  if (input.submit.attemptEpoch !== input.attempt.attemptEpoch
+    || input.submit.publicationHash !== input.attempt.publicationHash
+    || input.submit.publicationHash !== input.plan.publicationHash
+    || input.submit.slotSetHash !== input.plan.slotSetHash
+    || input.attempt.status !== 'IN_PROGRESS' || !hasImmutableCanonicalValue(input.plan)) return undefined
+  const token = Object.freeze({}) as PreparedCompositeWholeFinal
+  const binding = preparationBinding(input)
+  try {
+    const payloadHash = canonicalHash({ publicationHash: input.submit.publicationHash,
+      slotSetHash: input.submit.slotSetHash, units: input.submit.units,
+      executedSlotKeys: input.submit.executedSlotKeys ?? null })
+    const hasLocked = input.plan.slots.some(s => s.unitType === 'COGNITIVE' || s.unitType === 'SITUATIONAL')
+    const locked = hasLocked ? await readLockedUnitsForSubmit(db, {
+      attemptId: input.attempt.id, attemptEpoch: input.attempt.attemptEpoch, publicationHash: input.attempt.publicationHash,
+    }, false) : {}
+    const units = mergeLockedCompositeUnits(input.plan, input.submit, locked)
+    const computed = await computeCompositeWholeFinal(input, units, locked, payloadHash, input.templates ?? publicTemplates)
+    const deferGovernance = input.attempt.receiptOnly || !input.buildFeedback
+    const governed = input.finalizeGovernanceInTx && !deferGovernance ? await captureFinalAuthorityReads(db, tx => input.finalizeGovernanceInTx!(tx, {
+      contextObj: computed.contextObj, contextHash: computed.contextHash,
+      contextSnapshotEncrypted: computed.contextSnapshotEncrypted, aggregateHash: computed.aggregateHash,
+      completedAt: computed.now, verifiedPayloads: computed.verifiedPayloads,
+    })) : undefined
+    const governance = governed?.value || undefined
+    const feedbackCipher = await encodePreparedFeedback(input, computed, governance)
+    preparedFinals.set(token, { input, binding, computed, lockedHash: canonicalHash(locked), governance,
+      feedbackCipher, verifyReads: governed?.verify, deferGovernance })
+  } catch (error) {
+    if (error instanceof DynamicFinalAuthorityRead) return undefined
+    preparedFinals.set(token, { input, binding, failed: true, error })
+  }
+  return token
+}
+
 /** Authoritative 4-in-1 synchronous single-row FINAL writer (Scale + Form + SJT + Cognitive).
  * Scores purely in memory, enforces monotonic locked units from composite_attempt_checkpoints,
  * writes 1 row to composite_attempt_finals, updates parent/execution status, and clears
- * the ephemeral checkpoint — all inside the caller's transaction with ZERO child rows. */
+ * the ephemeral checkpoint — with ZERO child rows. Frozen V2 computations can be prepared before the transaction. */
 export async function commitCompositeWholeFinal(
   tx: CompositeFinalWriterDb,
   input: CommitCompositeWholeFinalInput,
+  prepared?: PreparedCompositeWholeFinal,
 ): Promise<CompositeWholeFinalReceipt> {
   const { attempt, plan, submit } = input
   if (submit.attemptEpoch !== attempt.attemptEpoch) {
@@ -375,10 +453,27 @@ export async function commitCompositeWholeFinal(
       status: string
       attemptEpoch: number
       publicationHash: string | null
+      userId?: string | null
+      compositeAssessmentId?: string
+      subjectUserId?: string | null
+      deliveryCourseId?: string | null
+      receiptOnly?: boolean
+      trainingTimingSnapshot?: unknown
+      startedAt?: Date
+      frozenState?: Record<string, unknown>
     }>>(Prisma.sql`
       SELECT status::text AS status,
         attempt_epoch AS "attemptEpoch",
         publication_hash AS "publicationHash"
+        ${prepared ? Prisma.sql`, user_id AS "userId", composite_assessment_id AS "compositeAssessmentId",
+          subject_user_id AS "subjectUserId", delivery_course_id AS "deliveryCourseId",
+          receipt_only AS "receiptOnly", training_timing_snapshot AS "trainingTimingSnapshot", started_at AS "startedAt",
+          jsonb_build_object('trainingContentBindingHash',training_content_binding_hash,
+            'trainingReferenceBindingHash',training_reference_binding_hash,'contextSnapshotHash',context_snapshot_hash,
+            'trainingPersistenceSnapshotHash',training_persistence_snapshot_hash,
+            'trainingVariantAllocationHash',training_variant_allocation_hash,'unitSeedsEncrypted',unit_seeds_encrypted,
+            'assignmentRef',assignment_ref,'consentId',consent_id,
+            'respondentUserId',respondent_user_id,'recoveryTokenHash',recovery_token_hash) AS "frozenState"` : Prisma.empty}
       FROM composite_assessment_attempts
       WHERE id = ${attempt.id}
       FOR UPDATE
@@ -394,6 +489,15 @@ export async function commitCompositeWholeFinal(
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '冻结发布快照摘要不匹配，无法通过整卷 V2 提交', 409)
     }
     lockedParentStatus = parent.status
+    if (prepared && parent.status === 'IN_PROGRESS' && (
+      (parent.userId ?? null) !== (attempt.userId ?? null) || parent.compositeAssessmentId !== attempt.compositeAssessmentId
+      || (parent.subjectUserId ?? null) !== (attempt.subjectUserId ?? null)
+      || (parent.deliveryCourseId ?? null) !== (attempt.deliveryCourseId ?? null)
+      || (attempt.frozenState != null && canonicalHash(parent.frozenState) !== canonicalHash(attempt.frozenState))
+      || parent.receiptOnly !== attempt.receiptOnly
+      || parent.startedAt?.getTime() !== attempt.startedAt.getTime()
+      || canonicalHash(parent.trainingTimingSnapshot ?? null) !== canonicalHash(attempt.trainingTimingSnapshot ?? null)
+    )) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '作答归属或冻结策略已变更，请刷新后重试', 409)
   }
 
   // 1. Re-check idempotent replay & submission conflict UNDER the parent row lock
@@ -410,6 +514,11 @@ export async function commitCompositeWholeFinal(
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '当前作答状态不可提交', 409)
   }
 
+  if (prepared && lockedParentStatus === 'IN_PROGRESS') {
+    const value = preparedFinals.get(prepared)
+    if (!value || value.input !== input || value.binding !== preparationBinding(input)) throw new Error('Prepared FINAL input changed')
+  }
+
   // 2. Load & verify monotonically locked Cognitive / SJT units from checkpoint (skipping when plan has none)
   const hasLockableUnits = plan.slots.some(slot => slot.unitType === 'COGNITIVE' || slot.unitType === 'SITUATIONAL')
   const lockedUnits = hasLockableUnits
@@ -420,64 +529,152 @@ export async function commitCompositeWholeFinal(
       })
     : {}
 
-  const slotByKey = new Map(plan.slots.map(slot => [slot.slotKey, slot]))
-  const effectiveUnits: Record<string, WholeV2UnitSubmitPayload> = { ...submit.units }
+  const effectiveUnits = mergeLockedCompositeUnits(plan, submit, lockedUnits)
 
-  for (const [slotKey, locked] of Object.entries(lockedUnits)) {
-    const slot = slotByKey.get(slotKey)
-    if (!slot) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', `锁定槽位不存在：${slotKey}`, 409)
-    const submitted = effectiveUnits[slotKey]
-    if (locked.unitType === 'COGNITIVE') {
-      if (submitted) {
-        if (submitted.unitType !== 'COGNITIVE') {
-          throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', `锁定认知单元类型冲突：${slotKey}`, 409)
-        }
-        const submittedHash = canonicalHash({
-          unitType: 'COGNITIVE',
-          itemId: locked.itemId,
-          randomSeed: submitted.randomSeed,
-          trials: submitted.trials,
-          ...(submitted.summaryMeta !== undefined ? { summaryMeta: submitted.summaryMeta } : {}),
-        })
-        if (submittedHash !== locked.payloadHash) {
-          throw new InstrumentFinalSubmitError('CHECKPOINT_LOCKED_UNIT_IMMUTABLE', `认知单元 ${slotKey} 已锁定，禁止修改或重做`, 409)
-        }
-      } else {
-        effectiveUnits[slotKey] = {
-          unitType: 'COGNITIVE',
-          definitionHash: slot.definitionHash,
-          randomSeed: locked.randomSeed,
-          trials: locked.trials,
-          ...(locked.summaryMeta !== undefined ? { summaryMeta: locked.summaryMeta } : {}),
-        }
-      }
-    } else {
-      if (submitted) {
-        if (submitted.unitType !== 'SITUATIONAL') {
-          throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', `锁定情境单元类型冲突：${slotKey}`, 409)
-        }
-        const submittedHash = canonicalHash({
-          unitType: 'SITUATIONAL',
-          itemId: locked.itemId,
-          responses: submitted.responses,
-          ...(submitted.researchEvents !== undefined ? { researchEvents: submitted.researchEvents } : {}),
-          ...(submitted.totalTimeMs !== undefined ? { totalTimeMs: submitted.totalTimeMs } : {}),
-        })
-        if (submittedHash !== locked.payloadHash) {
-          throw new InstrumentFinalSubmitError('CHECKPOINT_LOCKED_UNIT_IMMUTABLE', `情境单元 ${slotKey} 已锁定，禁止修改或重做`, 409)
-        }
-      } else {
-        effectiveUnits[slotKey] = {
-          unitType: 'SITUATIONAL',
-          definitionHash: slot.definitionHash,
-          responses: locked.responses,
-          ...(locked.researchEvents !== undefined ? { researchEvents: locked.researchEvents } : {}),
-          ...(locked.totalTimeMs !== undefined ? { totalTimeMs: locked.totalTimeMs } : {}),
-        }
-      }
+  const preparedValue = prepared && preparedFinals.get(prepared)
+  if (prepared && !preparedValue) throw new Error('Prepared FINAL unavailable')
+  if (preparedValue && (preparedValue.input !== input || preparedValue.binding !== preparationBinding(input))) {
+    throw new Error('Prepared FINAL input changed')
+  }
+  if (preparedValue?.failed) throw preparedValue.error
+  if (preparedValue && preparedValue.lockedHash !== canonicalHash(lockedUnits)) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '锁定单元已更新，请重试提交', 409)
+  }
+  if (preparedValue?.verifyReads) await preparedValue.verifyReads(tx)
+  const { now, contextObj, contextHash, contextSnapshotEncrypted, verifiedPayloads, scaleBuildInputs, scaleSlotKeys, finalFacts, encodedFacts, encodedRaw, aggregateHash, executedSlotKeys } = preparedValue?.computed
+    ?? await computeCompositeWholeFinal(input, effectiveUnits, lockedUnits, payloadHash,
+      input.templates ?? publicTemplatesForDatabase(tx))
+  const completedAtIso = now.toISOString()
+
+  const governanceResult = preparedValue && !preparedValue.deferGovernance ? preparedValue.governance : (input.finalizeGovernanceInTx
+    ? await input.finalizeGovernanceInTx(tx, {
+        contextObj,
+        contextHash,
+        contextSnapshotEncrypted,
+        aggregateHash,
+        completedAt: now,
+        verifiedPayloads,
+      })
+    : undefined) ?? undefined
+
+  let feedbackCipher: string | null = preparedValue?.feedbackCipher ?? null
+  if (!preparedValue && !attempt.receiptOnly && input.buildFeedback) {
+    const scaleResults = new Map(scaleBuildInputs.map((b, i) => [scaleSlotKeys[i], b.result]))
+    const envelopesBySlotKey = new Map<string, CanonicalUnitResultEnvelopeV1>()
+    for (const payload of verifiedPayloads) {
+      if (payload.envelope) envelopesBySlotKey.set(payload.header.slotKey, payload.envelope)
+    }
+    const feedback = await input.buildFeedback(finalFacts, {
+      scaleResults,
+      envelopesBySlotKey,
+      ...(governanceResult ? { governance: governanceResult } : {}),
+    })
+    if (feedback != null) {
+      feedbackCipher = encryptCompactField(feedback)
+    }
+  }
+  const refBindingJson = governanceResult?.trainingReferenceBinding != null
+    ? JSON.stringify(governanceResult.trainingReferenceBinding)
+    : null
+  const refBindingHash = governanceResult?.trainingReferenceBindingHash ?? null
+  const interpEncrypted = governanceResult?.trainingContentInterpretationEncrypted ?? null
+  const interpHash = governanceResult?.trainingContentInterpretationHash ?? null
+
+  const totalTimeSeconds = submit.totalTimeMs !== undefined
+    ? Math.max(0, Math.round(submit.totalTimeMs / 1000))
+    : Math.max(0, Math.round((now.getTime() - attempt.startedAt.getTime()) / 1000))
+
+  // 6. Atomic single-row FINAL persistence (ZERO child rows written)
+  await tx.$executeRaw(Prisma.sql`
+    INSERT INTO composite_attempt_finals (
+      attempt_id, attempt_epoch, composite_id, organization_id, course_id,
+      publication_hash, slot_set_hash, context_hash, submission_id,
+      payload_hash, aggregate_hash, facts_hash, facts_cipher,
+      raw_hash, raw_cipher, feedback_cipher, completed_at
+    ) VALUES (
+      ${attempt.id}, ${attempt.attemptEpoch}, ${attempt.compositeAssessmentId},
+      ${attempt.organizationId ?? null}, ${attempt.deliveryCourseId ?? null},
+      ${plan.publicationHash}, ${plan.slotSetHash}, ${contextHash}, ${submit.submissionId},
+      ${payloadHash}, ${aggregateHash}, ${encodedFacts.hash}, ${encodedFacts.cipher},
+      ${encodedRaw.hash}, ${encodedRaw.cipher}, ${feedbackCipher}, ${now}
+    )
+  `)
+
+  const updatedAttempt = await tx.$executeRaw(Prisma.sql`
+    UPDATE composite_assessment_attempts
+    SET status = 'COMPLETED',
+        progress = 100,
+        completed_items = ${executedSlotKeys.length},
+        completed_at = ${now},
+        last_saved_at = ${now},
+        total_time = ${totalTimeSeconds},
+        aggregate_input_hash = ${aggregateHash},
+        context_snapshot_encrypted = COALESCE(context_snapshot_encrypted, ${contextSnapshotEncrypted}),
+        context_snapshot_hash = COALESCE(context_snapshot_hash, ${contextHash}),
+        context_frozen_at = COALESCE(context_frozen_at, ${contextHash ? now : null}),
+        training_reference_binding = COALESCE(training_reference_binding, ${refBindingJson}::jsonb),
+        training_reference_binding_hash = COALESCE(training_reference_binding_hash, ${refBindingHash}),
+        training_content_interpretation_encrypted = COALESCE(training_content_interpretation_encrypted, ${interpEncrypted}),
+        training_content_interpretation_hash = COALESCE(training_content_interpretation_hash, ${interpHash}),
+        frozen_active_slot_set_hash = COALESCE(frozen_active_slot_set_hash, ${plan.slotSetHash})
+    WHERE id = ${attempt.id}
+      AND attempt_epoch = ${attempt.attemptEpoch}
+      AND status = 'IN_PROGRESS'
+  `)
+  if (updatedAttempt !== 1) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '作答状态已变更，提交已回滚', 409)
+  }
+
+  if (input.educationRun) {
+    const updatedExec = await tx.$executeRaw(Prisma.sql`
+      UPDATE assessment_run_executions
+      SET status = 'COMPLETED', completed_at = ${now}, updated_at = ${now}
+      WHERE id = ${input.educationRun.executionId}
+        AND status IN ('ASSIGNED', 'STARTED')
+    `)
+    if (updatedExec !== 1) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评执行状态已不可提交，请刷新任务列表', 409)
+    }
+    const updatedAssign = await tx.$executeRaw(Prisma.sql`
+      UPDATE relational_assessment_assignments
+      SET status = 'COMPLETED', completed_at = ${now}, updated_at = ${now}
+      WHERE id = ${input.educationRun.assignmentId}
+        AND status IN ('OPEN', 'STARTED')
+    `)
+    if (updatedAssign !== 1) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评分配状态已撤销或失效，请刷新任务列表', 409)
     }
   }
 
+  if (hasLockableUnits || input.draftCheckpointEnabled !== false) {
+    await clearCompositeCheckpoint(tx, attempt.id)
+  }
+
+  return {
+    status: 'COMPLETED',
+    attemptId: attempt.id,
+    attemptEpoch: attempt.attemptEpoch,
+    submissionId: submit.submissionId,
+    payloadHash,
+    aggregateHash,
+    factsHash: encodedFacts.hash,
+    rawHash: encodedRaw.hash,
+    completedAt: completedAtIso,
+    replayed: false,
+    receiptOnly: attempt.receiptOnly,
+    feedbackAvailable: !attempt.receiptOnly,
+  }
+}
+
+async function computeCompositeWholeFinal(
+  input: CommitCompositeWholeFinalInput,
+  effectiveUnits: Record<string, WholeV2UnitSubmitPayload>,
+  lockedUnits: Awaited<ReturnType<typeof readLockedUnitsForSubmit>>,
+  payloadHash: string,
+  templateStore: PublicTemplateStore,
+) {
+  const { attempt, plan, submit } = input
+  const slotByKey = new Map(plan.slots.map(slot => [slot.slotKey, slot]))
   // 3. Validate slot membership & required completeness
   const allowedSlotKeys = input.activeSlotKeys ?? new Set(plan.slots.map(s => s.slotKey))
   for (const [slotKey, unitPayload] of Object.entries(effectiveUnits)) {
@@ -601,92 +798,94 @@ export async function commitCompositeWholeFinal(
   )
   const scaleBuildInputs: BuildScaleUnitFactInput[] = []
   const scaleSlotKeys: string[] = []
-  for (const slot of scaleSlots) {
-    const submitted = effectiveUnits[slot.slotKey] as Extract<WholeV2UnitSubmitPayload, { unitType: 'SCALE' }>
-    const answers: ScaleAnswer[] = submitted.answers.map(a => ({
-      itemCode: a.itemCode,
-      responseValue: a.responseValue,
-      ...(a.responseTimeMs !== undefined ? { responseTimeMs: a.responseTimeMs } : {}),
-      ...(a.answeredAt !== undefined ? { answeredAt: a.answeredAt } : {}),
-      ...(a.changeCount !== undefined ? { changeCount: a.changeCount } : {}),
-    }))
-    const result = buildScaleResult({
-      scaleId: slot.scaleId,
-      instrumentKey: slot.instrumentKey,
-      name: slot.name,
-      instrumentVersion: slot.instrumentVersion,
-      definition: slot.definition,
-      answers,
-      referenceSets: slot.referenceSets,
-      ...(hasContext ? { participantContext: contextFields as ReferenceContext } : {}),
-      participantContextHash: contextHash,
-    })
-    const core = projectScaleCanonicalUnitResult({
-      runtime: slot.compiledRuntime,
-      result,
-      contextHash,
-    })
-    const canonical = createCanonicalUnitResultEnvelope({
-      core,
-      completedAt: completedAtIso,
-      persistenceProvenance: {
-        sourceType: 'ASSESSMENT',
-        sourceAttemptId: attempt.id,
-        sourceSubmissionId: submit.submissionId,
-      },
-    })
-    verifiedPayloads.push({ header: { slotKey: slot.slotKey }, envelope: canonical })
-    scaleBuildInputs.push({
-      itemId: slot.itemId,
-      scaleId: slot.scaleId,
-      sourceDefinitionHash: slot.definitionHash,
-      itemOrder: slot.definition.items.map(it => it.itemCode),
-      result,
-      canonical,
-    })
-    scaleSlotKeys.push(slot.slotKey)
-    const trainingTimingFact = attempt.trainingTimingSnapshot !== undefined
-      ? normalizeTrainingScaleTiming(
-          attempt.trainingTimingSnapshot,
-          slot.definition.items.map(it => it.itemCode),
-          answers.map(a => a.itemCode),
-          submitted.timings,
-        )
-      : null
-    // When standard TrainingTimingFact is not active (e.g. direct unit hydration tests),
-    // retain any explicit per-answer/submitted timing fields for cold-raw symmetry.
-    const mergedTimings: Record<string, Record<string, unknown>> = {}
-    if (!trainingTimingFact) {
-      if (submitted.timings) {
-        for (const [code, entry] of Object.entries(submitted.timings)) {
-          if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
-            mergedTimings[code] = { ...(entry as Record<string, unknown>) }
+  traceAssessmentPhaseSync('whole.v2.scoring', () => {
+    for (const slot of scaleSlots) {
+      const submitted = effectiveUnits[slot.slotKey] as Extract<WholeV2UnitSubmitPayload, { unitType: 'SCALE' }>
+      const answers: ScaleAnswer[] = submitted.answers.map(a => ({
+        itemCode: a.itemCode,
+        responseValue: a.responseValue,
+        ...(a.responseTimeMs !== undefined ? { responseTimeMs: a.responseTimeMs } : {}),
+        ...(a.answeredAt !== undefined ? { answeredAt: a.answeredAt } : {}),
+        ...(a.changeCount !== undefined ? { changeCount: a.changeCount } : {}),
+      }))
+      const result = buildScaleResult({
+        scaleId: slot.scaleId,
+        instrumentKey: slot.instrumentKey,
+        name: slot.name,
+        instrumentVersion: slot.instrumentVersion,
+        definition: slot.definition,
+        answers,
+        referenceSets: slot.referenceSets,
+        ...(hasContext ? { participantContext: contextFields as ReferenceContext } : {}),
+        participantContextHash: contextHash,
+      })
+      const core = projectScaleCanonicalUnitResult({
+        runtime: slot.compiledRuntime,
+        result,
+        contextHash,
+      })
+      const canonical = createCanonicalUnitResultEnvelope({
+        core,
+        completedAt: completedAtIso,
+        persistenceProvenance: {
+          sourceType: 'ASSESSMENT',
+          sourceAttemptId: attempt.id,
+          sourceSubmissionId: submit.submissionId,
+        },
+      })
+      verifiedPayloads.push({ header: { slotKey: slot.slotKey }, envelope: canonical })
+      scaleBuildInputs.push({
+        itemId: slot.itemId,
+        scaleId: slot.scaleId,
+        sourceDefinitionHash: slot.definitionHash,
+        itemOrder: slot.definition.items.map(it => it.itemCode),
+        result,
+        canonical,
+      })
+      scaleSlotKeys.push(slot.slotKey)
+      const trainingTimingFact = attempt.trainingTimingSnapshot !== undefined
+        ? normalizeTrainingScaleTiming(
+            attempt.trainingTimingSnapshot,
+            slot.definition.items.map(it => it.itemCode),
+            answers.map(a => a.itemCode),
+            submitted.timings,
+          )
+        : null
+      // When standard TrainingTimingFact is not active (e.g. direct unit hydration tests),
+      // retain any explicit per-answer/submitted timing fields for cold-raw symmetry.
+      const mergedTimings: Record<string, Record<string, unknown>> = {}
+      if (!trainingTimingFact) {
+        if (submitted.timings) {
+          for (const [code, entry] of Object.entries(submitted.timings)) {
+            if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+              mergedTimings[code] = { ...(entry as Record<string, unknown>) }
+            }
+          }
+        }
+        for (const a of answers) {
+          if (a.responseTimeMs !== undefined || a.answeredAt !== undefined || a.changeCount !== undefined) {
+            const cur = mergedTimings[a.itemCode] ?? {}
+            if (a.responseTimeMs !== undefined) cur.responseTimeMs = a.responseTimeMs
+            if (a.answeredAt !== undefined) cur.answeredAt = a.answeredAt
+            if (a.changeCount !== undefined) cur.changeCount = a.changeCount
+            mergedTimings[a.itemCode] = cur
           }
         }
       }
-      for (const a of answers) {
-        if (a.responseTimeMs !== undefined || a.answeredAt !== undefined || a.changeCount !== undefined) {
-          const cur = mergedTimings[a.itemCode] ?? {}
-          if (a.responseTimeMs !== undefined) cur.responseTimeMs = a.responseTimeMs
-          if (a.answeredAt !== undefined) cur.answeredAt = a.answeredAt
-          if (a.changeCount !== undefined) cur.changeCount = a.changeCount
-          mergedTimings[a.itemCode] = cur
-        }
+      rawUnits[slot.slotKey] = {
+        unitType: 'SCALE',
+        itemId: slot.itemId,
+        codes: answers.map(a => a.itemCode),
+        values: answers.map(a => a.responseValue),
+        ...(trainingTimingFact ? { trainingTimingFact } : {}),
+        ...(!trainingTimingFact && Object.keys(mergedTimings).length > 0 ? { timings: mergedTimings } : {}),
+        ...(submitted.deviceInputProvenance ? { deviceInputProvenance: submitted.deviceInputProvenance } : {}),
       }
     }
-    rawUnits[slot.slotKey] = {
-      unitType: 'SCALE',
-      itemId: slot.itemId,
-      codes: answers.map(a => a.itemCode),
-      values: answers.map(a => a.responseValue),
-      ...(trainingTimingFact ? { trainingTimingFact } : {}),
-      ...(!trainingTimingFact && Object.keys(mergedTimings).length > 0 ? { timings: mergedTimings } : {}),
-      ...(submitted.deviceInputProvenance ? { deviceInputProvenance: submitted.deviceInputProvenance } : {}),
-    }
-  }
+  })
   if (scaleBuildInputs.length > 0) {
-    const templates = input.templates ?? publicTemplatesForDatabase(tx)
-    const packedScales = await buildScaleUnitFactsBatch(scaleBuildInputs, templates)
+    const templates = templateStore
+    const packedScales = await traceAssessmentPhase('whole.v2.templates', () => buildScaleUnitFactsBatch(scaleBuildInputs, templates))
     packedScales.forEach((fact, idx) => {
       factsUnits[scaleSlotKeys[idx]] = fact
     })
@@ -915,8 +1114,8 @@ export async function commitCompositeWholeFinal(
     units: rawUnits,
   }
 
-  const encodedFacts = encodeCompositeFinalFacts(finalFacts)
-  const encodedRaw = encodeCompositeFinalRaw(finalRaw)
+  const encodedFacts = traceAssessmentPhaseSync('whole.v2.encode_facts', () => encodeCompositeFinalFacts(finalFacts))
+  const encodedRaw = traceAssessmentPhaseSync('whole.v2.encode_raw', () => encodeCompositeFinalRaw(finalRaw))
   const aggregateHash = canonicalHash({
     publicationHash: plan.publicationHash,
     slotSetHash: plan.slotSetHash,
@@ -924,122 +1123,77 @@ export async function commitCompositeWholeFinal(
     factsHash: encodedFacts.hash,
   })
 
-  const governanceResult = (input.finalizeGovernanceInTx
-    ? await input.finalizeGovernanceInTx(tx, {
-        contextObj,
-        contextHash,
-        contextSnapshotEncrypted,
-        aggregateHash,
-        completedAt: now,
-        verifiedPayloads,
-      })
-    : undefined) ?? undefined
+  return { now, contextObj, contextHash, contextSnapshotEncrypted, verifiedPayloads, scaleBuildInputs, scaleSlotKeys, finalFacts, encodedFacts, encodedRaw, aggregateHash, executedSlotKeys }
+}
 
-  let feedbackCipher: string | null = null
-  if (!attempt.receiptOnly && input.buildFeedback) {
-    const scaleResults = new Map(scaleBuildInputs.map((b, i) => [scaleSlotKeys[i], b.result]))
-    const envelopesBySlotKey = new Map<string, CanonicalUnitResultEnvelopeV1>()
-    for (const payload of verifiedPayloads) {
-      if (payload.envelope) envelopesBySlotKey.set(payload.header.slotKey, payload.envelope)
-    }
-    const feedback = await input.buildFeedback(finalFacts, {
-      scaleResults,
-      envelopesBySlotKey,
-      ...(governanceResult ? { governance: governanceResult } : {}),
-    })
-    if (feedback != null) {
-      feedbackCipher = encryptCompactField(feedback)
-    }
-  }
-  const refBindingJson = governanceResult?.trainingReferenceBinding != null
-    ? JSON.stringify(governanceResult.trainingReferenceBinding)
-    : null
-  const refBindingHash = governanceResult?.trainingReferenceBindingHash ?? null
-  const interpEncrypted = governanceResult?.trainingContentInterpretationEncrypted ?? null
-  const interpHash = governanceResult?.trainingContentInterpretationHash ?? null
+function mergeLockedCompositeUnits(plan: CompositePublicationPlanV1, submit: WholeV2SubmitInput,
+  lockedUnits: Awaited<ReturnType<typeof readLockedUnitsForSubmit>>) {
+  const slotByKey = new Map(plan.slots.map(slot => [slot.slotKey, slot]))
+  const effectiveUnits: Record<string, WholeV2UnitSubmitPayload> = { ...submit.units }
 
-  const totalTimeSeconds = submit.totalTimeMs !== undefined
-    ? Math.max(0, Math.round(submit.totalTimeMs / 1000))
-    : Math.max(0, Math.round((now.getTime() - attempt.startedAt.getTime()) / 1000))
-
-  // 6. Atomic single-row FINAL persistence (ZERO child rows written)
-  await tx.$executeRaw(Prisma.sql`
-    INSERT INTO composite_attempt_finals (
-      attempt_id, attempt_epoch, composite_id, organization_id, course_id,
-      publication_hash, slot_set_hash, context_hash, submission_id,
-      payload_hash, aggregate_hash, facts_hash, facts_cipher,
-      raw_hash, raw_cipher, feedback_cipher, completed_at
-    ) VALUES (
-      ${attempt.id}, ${attempt.attemptEpoch}, ${attempt.compositeAssessmentId},
-      ${attempt.organizationId ?? null}, ${attempt.deliveryCourseId ?? null},
-      ${plan.publicationHash}, ${plan.slotSetHash}, ${contextHash}, ${submit.submissionId},
-      ${payloadHash}, ${aggregateHash}, ${encodedFacts.hash}, ${encodedFacts.cipher},
-      ${encodedRaw.hash}, ${encodedRaw.cipher}, ${feedbackCipher}, ${now}
-    )
-  `)
-
-  const updatedAttempt = await tx.$executeRaw(Prisma.sql`
-    UPDATE composite_assessment_attempts
-    SET status = 'COMPLETED',
-        progress = 100,
-        completed_items = ${executedSlotKeys.length},
-        completed_at = ${now},
-        last_saved_at = ${now},
-        total_time = ${totalTimeSeconds},
-        aggregate_input_hash = ${aggregateHash},
-        context_snapshot_encrypted = COALESCE(context_snapshot_encrypted, ${contextSnapshotEncrypted}),
-        context_snapshot_hash = COALESCE(context_snapshot_hash, ${contextHash}),
-        context_frozen_at = COALESCE(context_frozen_at, ${contextHash ? now : null}),
-        training_reference_binding = COALESCE(training_reference_binding, ${refBindingJson}::jsonb),
-        training_reference_binding_hash = COALESCE(training_reference_binding_hash, ${refBindingHash}),
-        training_content_interpretation_encrypted = COALESCE(training_content_interpretation_encrypted, ${interpEncrypted}),
-        training_content_interpretation_hash = COALESCE(training_content_interpretation_hash, ${interpHash}),
-        frozen_active_slot_set_hash = COALESCE(frozen_active_slot_set_hash, ${plan.slotSetHash})
-    WHERE id = ${attempt.id}
-      AND attempt_epoch = ${attempt.attemptEpoch}
-      AND status = 'IN_PROGRESS'
-  `)
-  if (updatedAttempt !== 1) {
-    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '作答状态已变更，提交已回滚', 409)
-  }
-
-  if (input.educationRun) {
-    const updatedExec = await tx.$executeRaw(Prisma.sql`
-      UPDATE assessment_run_executions
-      SET status = 'COMPLETED', completed_at = ${now}, updated_at = ${now}
-      WHERE id = ${input.educationRun.executionId}
-        AND status IN ('ASSIGNED', 'STARTED')
-    `)
-    if (updatedExec !== 1) {
-      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评执行状态已不可提交，请刷新任务列表', 409)
-    }
-    const updatedAssign = await tx.$executeRaw(Prisma.sql`
-      UPDATE relational_assessment_assignments
-      SET status = 'COMPLETED', completed_at = ${now}, updated_at = ${now}
-      WHERE id = ${input.educationRun.assignmentId}
-        AND status IN ('OPEN', 'STARTED')
-    `)
-    if (updatedAssign !== 1) {
-      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评分配状态已撤销或失效，请刷新任务列表', 409)
+  for (const [slotKey, locked] of Object.entries(lockedUnits)) {
+    const slot = slotByKey.get(slotKey)
+    if (!slot) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', `锁定槽位不存在：${slotKey}`, 409)
+    const submitted = effectiveUnits[slotKey]
+    if (locked.unitType === 'COGNITIVE') {
+      if (submitted) {
+        if (submitted.unitType !== 'COGNITIVE') {
+          throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', `锁定认知单元类型冲突：${slotKey}`, 409)
+        }
+        const submittedHash = canonicalHash({
+          unitType: 'COGNITIVE',
+          itemId: locked.itemId,
+          randomSeed: submitted.randomSeed,
+          trials: submitted.trials,
+          ...(submitted.summaryMeta !== undefined ? { summaryMeta: submitted.summaryMeta } : {}),
+        })
+        if (submittedHash !== locked.payloadHash) {
+          throw new InstrumentFinalSubmitError('CHECKPOINT_LOCKED_UNIT_IMMUTABLE', `认知单元 ${slotKey} 已锁定，禁止修改或重做`, 409)
+        }
+      } else {
+        effectiveUnits[slotKey] = {
+          unitType: 'COGNITIVE',
+          definitionHash: slot.definitionHash,
+          randomSeed: locked.randomSeed,
+          trials: locked.trials,
+          ...(locked.summaryMeta !== undefined ? { summaryMeta: locked.summaryMeta } : {}),
+        }
+      }
+    } else {
+      if (submitted) {
+        if (submitted.unitType !== 'SITUATIONAL') {
+          throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', `锁定情境单元类型冲突：${slotKey}`, 409)
+        }
+        const submittedHash = canonicalHash({
+          unitType: 'SITUATIONAL',
+          itemId: locked.itemId,
+          responses: submitted.responses,
+          ...(submitted.researchEvents !== undefined ? { researchEvents: submitted.researchEvents } : {}),
+          ...(submitted.totalTimeMs !== undefined ? { totalTimeMs: submitted.totalTimeMs } : {}),
+        })
+        if (submittedHash !== locked.payloadHash) {
+          throw new InstrumentFinalSubmitError('CHECKPOINT_LOCKED_UNIT_IMMUTABLE', `情境单元 ${slotKey} 已锁定，禁止修改或重做`, 409)
+        }
+      } else {
+        effectiveUnits[slotKey] = {
+          unitType: 'SITUATIONAL',
+          definitionHash: slot.definitionHash,
+          responses: locked.responses,
+          ...(locked.researchEvents !== undefined ? { researchEvents: locked.researchEvents } : {}),
+          ...(locked.totalTimeMs !== undefined ? { totalTimeMs: locked.totalTimeMs } : {}),
+        }
+      }
     }
   }
 
-  if (hasLockableUnits || input.draftCheckpointEnabled !== false) {
-    await clearCompositeCheckpoint(tx, attempt.id)
-  }
-
-  return {
-    status: 'COMPLETED',
-    attemptId: attempt.id,
-    attemptEpoch: attempt.attemptEpoch,
-    submissionId: submit.submissionId,
-    payloadHash,
-    aggregateHash,
-    factsHash: encodedFacts.hash,
-    rawHash: encodedRaw.hash,
-    completedAt: completedAtIso,
-    replayed: false,
-    receiptOnly: attempt.receiptOnly,
-    feedbackAvailable: !attempt.receiptOnly,
-  }
+  return effectiveUnits
+}
+async function encodePreparedFeedback(input: CommitCompositeWholeFinalInput, computed: ComputedFinal,
+  governance?: CompositeWholeFinalGovernanceResult): Promise<string | null> {
+  if (input.attempt.receiptOnly || !input.buildFeedback) return null
+  const scaleResults = new Map(computed.scaleBuildInputs.map((b, i) => [computed.scaleSlotKeys[i], b.result]))
+  const envelopesBySlotKey = new Map<string, CanonicalUnitResultEnvelopeV1>()
+  for (const payload of computed.verifiedPayloads) if (payload.envelope) envelopesBySlotKey.set(payload.header.slotKey, payload.envelope)
+  const feedback = await input.buildFeedback(computed.finalFacts, {scaleResults,envelopesBySlotKey,...(governance?{governance}:{})})
+  return feedback == null ? null : encryptCompactField(feedback)
 }

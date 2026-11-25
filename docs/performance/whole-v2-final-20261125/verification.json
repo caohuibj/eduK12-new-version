@@ -1,0 +1,36 @@
+{
+  "kind": "recorded-local-execution",
+  "formalCi": false,
+  "types": {
+    "log": "types-after-snapshot.log",
+    "exitCode": 0
+  },
+  "unitCheckpoint": {
+    "files": 11,
+    "passed": 59,
+    "log": "tests-final-r1.log",
+    "exitCode": 0
+  },
+  "finalColdSnapshotDelta": {
+    "files": 4,
+    "passed": 25,
+    "log": "tests-snapshot-delta.log",
+    "exitCode": 0
+  },
+  "fallbackBoundaryDelta": {
+    "passed": 1,
+    "log": "fallback-boundaries.log",
+    "exitCode": 0
+  },
+  "nativeConvergenceFinal": {
+    "passed": 3,
+    "log": "convergence-native-final.log",
+    "exitCode": 0
+  },
+  "nativeRestoreAndRollback": {
+    "finalRows": 410,
+    "independentlyRecomputedScaleResults": 3690,
+    "log": "native-verification-final.log",
+    "exitCode": 0
+  }
+}

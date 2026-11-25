@@ -800,6 +800,22 @@ export function resolveVariantActiveSlotKeys(
   return active
 }
 
+/** Bind all attempt authority fields consumed during preparation. */
+function finalFrozenState(attempt: LoadedAttemptRow) {
+  return {
+    trainingContentBindingHash: attempt.trainingContentBindingHash,
+    trainingReferenceBindingHash: attempt.trainingReferenceBindingHash,
+    contextSnapshotHash: attempt.contextSnapshotHash,
+    trainingPersistenceSnapshotHash: attempt.trainingPersistenceSnapshotHash,
+    trainingVariantAllocationHash: attempt.trainingVariantAllocationHash,
+    unitSeedsEncrypted: attempt.unitSeedsEncrypted,
+    assignmentRef: attempt.assignmentRef,
+    consentId: attempt.consentId,
+    respondentUserId: attempt.respondentUserId ?? null,
+    recoveryTokenHash: attempt.recoveryTokenHash,
+  }
+}
+
 function buildFinalizeGovernanceInTx(
   attempt: LoadedAttemptRow,
 ): AuthorizedWholeV2Attempt['finalizeGovernanceInTx'] {
@@ -1108,7 +1124,7 @@ async function loadAttemptRow(attemptId: string): Promise<LoadedAttemptRow> {
   return attempt
 }
 
-async function loadEducationAttemptAndRunRow(attemptId: string): Promise<{
+async function loadEducationAttemptAndRunRow(attemptId: string, preloaded?: Record<string, unknown>): Promise<{
   attempt: LoadedAttemptRow
   educationRun?: {
     executionId: string
@@ -1165,7 +1181,7 @@ async function loadEducationAttemptAndRunRow(attemptId: string): Promise<{
     trackPolicy: RunResourcePolicy | null
     trackPolicyHash: string | null
   }
-  const rows = await prisma.$queryRaw<Row[]>(Prisma.sql`
+  const rows = preloaded ? [preloaded as unknown as Row] : await prisma.$queryRaw<Row[]>(Prisma.sql`
     SELECT
       p.id,
       p.composite_assessment_id AS "compositeAssessmentId",
@@ -1233,7 +1249,7 @@ async function loadEducationAttemptAndRunRow(attemptId: string): Promise<{
     attemptEpoch: row.attemptEpoch,
     status: row.status,
     receiptOnly: row.receiptOnly,
-    startedAt: row.startedAt,
+    startedAt: new Date(row.startedAt),
     publicationHash: row.publicationHash,
     unitSeedsEncrypted: row.unitSeedsEncrypted,
     deliveryCourseId: row.deliveryCourseId,
@@ -1253,7 +1269,7 @@ async function loadEducationAttemptAndRunRow(attemptId: string): Promise<{
     compositeAssessment: {
       creationKey: row.creationKey,
       productKind: row.productKind,
-      expiresAt: row.expiresAt,
+      expiresAt: row.expiresAt ? new Date(row.expiresAt) : null,
       createdBy: row.createdBy,
     },
     accessToken: null,
@@ -1295,6 +1311,7 @@ export async function authorizeTrainingAuthenticatedWholeV2(req: Request): Promi
   return {
     attempt: {
       id: attempt.id,
+      userId: attempt.userId,
       compositeAssessmentId: attempt.compositeAssessmentId,
       subjectUserId: attempt.subjectUserId,
       attemptEpoch: attempt.attemptEpoch,
@@ -1302,6 +1319,7 @@ export async function authorizeTrainingAuthenticatedWholeV2(req: Request): Promi
       receiptOnly: attempt.receiptOnly,
       startedAt: attempt.startedAt,
       publicationHash: attempt.publicationHash!,
+      frozenState: finalFrozenState(attempt),
       unitSeedsEncrypted: attempt.unitSeedsEncrypted,
       trainingTimingSnapshot: attempt.trainingTimingSnapshot ?? null,
       deliveryCourseId: attempt.deliveryCourseId,
@@ -1341,6 +1359,7 @@ export async function authorizeTrainingPublicWholeV2(req: Request): Promise<Auth
   return {
     attempt: {
       id: attempt.id,
+      userId: attempt.userId,
       compositeAssessmentId: attempt.compositeAssessmentId,
       subjectUserId: attempt.subjectUserId,
       attemptEpoch: attempt.attemptEpoch,
@@ -1348,6 +1367,7 @@ export async function authorizeTrainingPublicWholeV2(req: Request): Promise<Auth
       receiptOnly: attempt.receiptOnly,
       startedAt: attempt.startedAt,
       publicationHash: attempt.publicationHash!,
+      frozenState: finalFrozenState(attempt),
       unitSeedsEncrypted: attempt.unitSeedsEncrypted,
       trainingTimingSnapshot: attempt.trainingTimingSnapshot ?? null,
       deliveryCourseId: attempt.deliveryCourseId,
@@ -1377,7 +1397,7 @@ export async function authorizeTrainingPublicWholeV2(req: Request): Promise<Auth
   }
 }
 
-export async function authorizeEducationWholeV2(req: Request): Promise<AuthorizedWholeV2Attempt> {
+export async function authorizeEducationWholeV2(req: Request, res?: import('express').Response): Promise<AuthorizedWholeV2Attempt> {
   // Entry middleware (campusWholeAccess / wholeBound / requireScaleAttempt / requireAttempt)
   // has verified School / Teacher entry access; verifyAuthorityInTx re-checks live
   // revocation/emergency-stop/consent fences atomically inside the FINAL transaction.
@@ -1385,7 +1405,13 @@ export async function authorizeEducationWholeV2(req: Request): Promise<Authorize
   if (!actorUserId) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '教育端作答需要已登录账号', 403)
   }
-  const loaded = await loadEducationAttemptAndRunRow(req.params.attemptId)
+  const proof = res?.locals?.ordinarySelfWhole
+  const raw = proof?.kind === 'bound' && proof.id === req.params.attemptId && proof.userId === actorUserId
+    ? proof.wholeV2Authorization as Record<string, unknown> | undefined : undefined
+  const preloaded = raw && raw.id === proof.id && raw.userId === actorUserId
+    && raw.attemptEpoch === proof.epoch && raw.status === proof.parentStatus
+    && typeof raw.publicationHash === 'string' && typeof raw.startedAt === 'string' ? raw : undefined
+  const loaded = await loadEducationAttemptAndRunRow(req.params.attemptId, preloaded)
   let attempt = loaded.attempt
   if (attempt.userId !== actorUserId) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权访问此教育测评记录', 403)
@@ -1424,6 +1450,7 @@ export async function authorizeEducationWholeV2(req: Request): Promise<Authorize
   return {
     attempt: {
       id: attempt.id,
+      userId: attempt.userId,
       compositeAssessmentId: attempt.compositeAssessmentId,
       subjectUserId: attempt.subjectUserId,
       attemptEpoch: attempt.attemptEpoch,
@@ -1431,6 +1458,7 @@ export async function authorizeEducationWholeV2(req: Request): Promise<Authorize
       receiptOnly: attempt.receiptOnly,
       startedAt: attempt.startedAt,
       publicationHash: attempt.publicationHash!,
+      frozenState: finalFrozenState(attempt),
       unitSeedsEncrypted: attempt.unitSeedsEncrypted,
       trainingTimingSnapshot: attempt.trainingTimingSnapshot ?? null,
       deliveryCourseId: attempt.deliveryCourseId,
@@ -1503,6 +1531,7 @@ export async function authorizeFieldCompositionWholeV2(req: Request): Promise<Au
   return {
     attempt: {
       id: attempt.id,
+      userId: attempt.userId,
       compositeAssessmentId: attempt.compositeAssessmentId,
       subjectUserId: attempt.subjectUserId,
       attemptEpoch: attempt.attemptEpoch,
@@ -1510,6 +1539,7 @@ export async function authorizeFieldCompositionWholeV2(req: Request): Promise<Au
       receiptOnly: true,
       startedAt: attempt.startedAt,
       publicationHash: attempt.publicationHash!,
+      frozenState: finalFrozenState(attempt),
       unitSeedsEncrypted: attempt.unitSeedsEncrypted,
       trainingTimingSnapshot: null,
       deliveryCourseId: attempt.deliveryCourseId,

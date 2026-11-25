@@ -1673,12 +1673,25 @@ model CompositeAssessmentAccessToken {
   compositeAssessment CompositeAssessment          @relation(fields: [compositeAssessmentId], references: [id], onDelete: Cascade)
   creator             User                         @relation("CompositeTokenCreator", fields: [createdBy], references: [id])
   attempts            CompositeAssessmentAttempt[]
+  usageShards         CompositeAccessTokenUsageShard[]
 
   @@index([compositeAssessmentId])
   @@index([isActive, expiresAt])
   @@index([token])
   @@map("composite_assessment_access_tokens")
   @@index([trainingRoundId])
+}
+
+// Bounded durable counters for unlimited anonymous links. Quota/monotonicity
+// and shard bounds are also enforced by migration-defined database triggers.
+model CompositeAccessTokenUsageShard {
+  tokenId   String @map("token_id")
+  shard     Int    @db.SmallInt
+  usedCount BigInt @map("used_count")
+  token CompositeAssessmentAccessToken @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@id([tokenId, shard])
+  @@map("composite_access_token_usage_shards")
 }
 
 // ==================== 文档库模块 ====================

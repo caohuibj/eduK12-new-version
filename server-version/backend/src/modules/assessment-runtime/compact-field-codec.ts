@@ -1,5 +1,6 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes, createSecretKey, type KeyObject } from 'node:crypto'
 import * as zlib from 'node:zlib'
+import { traceAssessmentPhaseSync } from '../../services/runtimeObservability'
 
 const PREFIX = 'ekc1:'
 export const COMPACT_FIELD_MAX_BYTES = 8 * 1024 * 1024
@@ -42,9 +43,9 @@ export const encryptCompactField = (value: unknown, limit = COMPACT_FIELD_MAX_BY
   let codec: 'zs' | 'gz' | 'js' = 'js'
   let payload: Buffer = plain
   if (useZstdCodec() && plain.length >= 96) {
-    const packed = zstdCompressSync!(plain, ZSTD_C_COMPRESSION_LEVEL !== undefined
+    const packed = traceAssessmentPhaseSync('whole.codec.zstd', () => zstdCompressSync!(plain, ZSTD_C_COMPRESSION_LEVEL !== undefined
       ? { params: { [ZSTD_C_COMPRESSION_LEVEL]: 3 } }
-      : undefined)
+      : undefined))
     if (packed.length < plain.length) {
       codec = 'zs'
       payload = packed

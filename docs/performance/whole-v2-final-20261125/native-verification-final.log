@@ -1,0 +1,14 @@
+{
+  "finals": 410,
+  "exactResults": 3690,
+  "legacyCounts": {
+    "assessments": 0,
+    "composite_form_answers": 0,
+    "assessment_unit_snapshots": 0,
+    "assessment_result_facts": 0,
+    "composite_report_jobs": 0
+  },
+  "transactionRollback": true,
+  "teacherRevocationRollback": true,
+  "templateRollbackIsolation": true
+}

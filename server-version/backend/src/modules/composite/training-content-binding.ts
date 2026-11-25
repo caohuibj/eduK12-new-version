@@ -349,7 +349,7 @@ async function readExactLibrarySource(db:Prisma.TransactionClient,release:Stored
  return (await loadExactLibrarySources(db,[{release,source}],purpose)).get(source.id)!
 }
 /** Same exact wrapper checks for many library units with one locked read per table. */
-async function loadExactLibrarySources(db:Prisma.TransactionClient,requests:ReadonlyArray<{release:Stored;source:Unit['source']}>,purpose:'NEW_USE'|'FROZEN_IDENTITY'){
+export async function loadExactLibrarySources(db:Prisma.TransactionClient,requests:ReadonlyArray<{release:Stored;source:Unit['source']}>,purpose:'NEW_USE'|'FROZEN_IDENTITY'){
  const result=new Map<string,ExactLibrary>()
  if(!requests.length)return result
  for(const {source} of requests)if(source.kind!=='SCALE'||!source.libraryEntryId)fail('SCOPE_DENIED')

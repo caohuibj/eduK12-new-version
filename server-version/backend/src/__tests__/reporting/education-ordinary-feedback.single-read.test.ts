@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
+  getContentReleaseBatch: vi.fn(),
   queryRaw: vi.fn(),
   executeRaw: vi.fn(),
   transaction: vi.fn(),
@@ -39,6 +40,8 @@ vi.mock('../../modules/reporting/education-native-scale-feedback', () => ({
   readNativeEducationScaleFeedback: mocks.readNativeEducationScaleFeedback,
 }))
 
+vi.mock('../../modules/measurement-content/repository', () => ({getContentReleaseBatch:mocks.getContentReleaseBatch}))
+import { encryptCompactField } from '../../modules/assessment-runtime/compact-field-codec'
 import { readSchoolOrdinaryFeedback } from '../../modules/reporting/education-ordinary-feedback.service'
 
 describe('education-ordinary-feedback single-read without held interactive transaction', () => {
@@ -48,6 +51,29 @@ describe('education-ordinary-feedback single-read without held interactive trans
       $queryRaw: mocks.queryRaw,
       $executeRaw: mocks.executeRaw,
     }))
+  })
+
+  it('reads V2 feedback in the authority query and rechecks live release revocation', async () => {
+    vi.stubEnv('DATA_ENCRYPTION_KEY','a'.repeat(64))
+    const dto={schemaVersion:1,kind:'EDUCATION_FEEDBACK',mode:'COMPOSITION',state:'READY',title:'Frozen own feedback',units:[]}
+    const own={organizationId:'org',policyHash:'b'.repeat(64),status:'COMPLETED',subjectUserId:'user-1',respondentUserId:'user-1',
+      subjectRole:'STUDENT',respondentRole:'STUDENT',relationshipKind:'SELF',perspective:'SELF_REPORT',receiptOnly:false,
+      parentId:'parent',parentStatus:'COMPLETED',attemptEpoch:1,publicationHash:'a'.repeat(64),contentState:null,
+      finalFeedbackCipher:encryptCompactField({...dto,_v2Verify:{policyHash:'b'.repeat(64),manifestHash:'c'.repeat(64),releaseIds:['release']}})}
+    mocks.queryRaw.mockResolvedValue([own])
+    mocks.readFrozenCompositionIdentity.mockResolvedValue({title:dto.title,origin:{entry:'SCHOOL',variantKey:'STUDENT:SELF'},
+      manifest:[],units:[],binding:{manifestHash:'c'.repeat(64),unitReports:[]}})
+    mocks.getContentReleaseBatch.mockResolvedValue(new Map([['release',{status:'PUBLISHED'}]]))
+    expect(await readSchoolOrdinaryFeedback({executionId:'exec',actorUserId:'user-1'})).toEqual(dto)
+    expect(mocks.queryRaw).toHaveBeenCalledTimes(1)
+    const sql=mocks.queryRaw.mock.calls[0][0].strings.join('?')
+    expect(sql).toContain('final.feedback_cipher')
+    expect(sql).toContain('p.publication_hash IS NULL AND j.attempt_id=p.id')
+    expect(mocks.readNativeEducationScaleFeedback).not.toHaveBeenCalled()
+    mocks.getContentReleaseBatch.mockResolvedValue(new Map([['release',{status:'REVOKED'}]]))
+    expect((await readSchoolOrdinaryFeedback({executionId:'exec',actorUserId:'user-1'})).state).toBe('COMPLETION_ONLY')
+    expect(mocks.getContentReleaseBatch).toHaveBeenCalledTimes(2)
+    vi.unstubAllEnvs()
   })
 
   it('runs readOwn once and projects READY declared feedback outside any interactive transaction', async () => {

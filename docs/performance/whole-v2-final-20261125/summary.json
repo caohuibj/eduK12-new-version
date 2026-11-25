@@ -1,0 +1,366 @@
+{
+  "base": "9b00c20d0f26fde0b3727b4ad2b46cad9411e424",
+  "scope": "synthetic entry adapters + real shared V2 HTTP submit + real PostgreSQL; not product login/START/authorization capacity",
+  "resourceLimit": {
+    "effectiveCpuMax": "400000 100000",
+    "effectiveMemoryMax": 17179869184,
+    "requestedDockerMemory": 4294967296,
+    "memoryLimitEnforced": false
+  },
+  "arms": {
+    "main-a": {
+      "measurements": {
+        "training": {
+          "receiptMs": {
+            "n": 200,
+            "p50": 1374.0707220000002,
+            "p95": 2393.636583,
+            "max": 2489.783865
+          },
+          "success": 200,
+          "wallMs": 2550.845351,
+          "resources": {
+            "queries": {
+              "queryRaw": 800,
+              "executeRaw": 400
+            },
+            "peakRss": 618844160,
+            "cpu": {
+              "user": 3176681,
+              "system": 309728
+            },
+            "memory": {
+              "rss": 619237376,
+              "heapTotal": 375291904,
+              "heapUsed": 243495832,
+              "external": 49075347,
+              "arrayBuffers": 45833255
+            }
+          },
+          "errors": [],
+          "duplicateAndConflict": "passed"
+        },
+        "teacher": {
+          "receiptMs": {
+            "n": 200,
+            "p50": 1279.8070900000002,
+            "p95": 2049.5818579999996,
+            "max": 2116.9085620000005
+          },
+          "success": 200,
+          "wallMs": 2139.317492,
+          "resources": {
+            "queries": {
+              "queryRaw": 1600,
+              "executeRaw": 800
+            },
+            "peakRss": 631820288,
+            "cpu": {
+              "user": 2838715,
+              "system": 166166
+            },
+            "memory": {
+              "rss": 631820288,
+              "heapTotal": 379637760,
+              "heapUsed": 271250184,
+              "external": 43528862,
+              "arrayBuffers": 40286770
+            }
+          },
+          "errors": [],
+          "duplicateAndConflict": "passed"
+        }
+      },
+      "verify": {
+        "restored": 410,
+        "hydrated": 410,
+        "completed": 410,
+        "teacherCompleted": 205,
+        "children": 0,
+        "rowBytes": {
+          "n": 410,
+          "p50": 5376,
+          "p95": 5408,
+          "max": 5416
+        },
+        "sharedTemplates": 36,
+        "feedbackRows": 0
+      }
+    },
+    "main-b": {
+      "measurements": {
+        "training": {
+          "receiptMs": {
+            "n": 200,
+            "p50": 1554.8201669999999,
+            "p95": 2518.773317,
+            "max": 2590.754274
+          },
+          "success": 200,
+          "wallMs": 2612.31029,
+          "resources": {
+            "queries": {
+              "queryRaw": 800,
+              "executeRaw": 400
+            },
+            "peakRss": 571027456,
+            "cpu": {
+              "user": 2821285,
+              "system": 439337
+            },
+            "memory": {
+              "rss": 571027456,
+              "heapTotal": 402030592,
+              "heapUsed": 258418632,
+              "external": 76598039,
+              "arrayBuffers": 73355507
+            }
+          },
+          "errors": [],
+          "duplicateAndConflict": "passed"
+        },
+        "teacher": {
+          "receiptMs": {
+            "n": 200,
+            "p50": 1307.4193839999998,
+            "p95": 2063.238068,
+            "max": 2119.0923889999995
+          },
+          "success": 200,
+          "wallMs": 2155.193013,
+          "resources": {
+            "queries": {
+              "queryRaw": 1600,
+              "executeRaw": 800
+            },
+            "peakRss": 580325376,
+            "cpu": {
+              "user": 2579435,
+              "system": 181915
+            },
+            "memory": {
+              "rss": 580456448,
+              "heapTotal": 377540608,
+              "heapUsed": 261566488,
+              "external": 73571569,
+              "arrayBuffers": 70329037
+            }
+          },
+          "errors": [],
+          "duplicateAndConflict": "passed"
+        }
+      },
+      "verify": {
+        "restored": 410,
+        "hydrated": 410,
+        "completed": 410,
+        "teacherCompleted": 205,
+        "children": 0,
+        "rowBytes": {
+          "n": 410,
+          "p50": 5376,
+          "p95": 5408,
+          "max": 5416
+        },
+        "sharedTemplates": 36,
+        "feedbackRows": 0
+      }
+    },
+    "optimized-final-a": {
+      "measurements": {
+        "training": {
+          "receiptMs": {
+            "n": 200,
+            "p50": 1356.8808549999999,
+            "p95": 2140.5744889999996,
+            "max": 2191.54034
+          },
+          "success": 200,
+          "wallMs": 2252.571331,
+          "resources": {
+            "queries": {
+              "queryRaw": 400,
+              "executeRaw": 400
+            },
+            "peakRss": 585949184,
+            "cpu": {
+              "user": 2553315,
+              "system": 335831
+            },
+            "memory": {
+              "rss": 586080256,
+              "heapTotal": 437420032,
+              "heapUsed": 263205424,
+              "external": 22464134,
+              "arrayBuffers": 19221610
+            }
+          },
+          "errors": [],
+          "duplicateAndConflict": "passed"
+        },
+        "teacher": {
+          "receiptMs": {
+            "n": 200,
+            "p50": 1065.081639,
+            "p95": 1776.0158170000004,
+            "max": 1789.7307159999996
+          },
+          "success": 200,
+          "wallMs": 1815.145211,
+          "resources": {
+            "queries": {
+              "queryRaw": 1200,
+              "executeRaw": 800
+            },
+            "peakRss": 628809728,
+            "cpu": {
+              "user": 1901121,
+              "system": 259571
+            },
+            "memory": {
+              "rss": 630775808,
+              "heapTotal": 476479488,
+              "heapUsed": 375277792,
+              "external": 47281992,
+              "arrayBuffers": 44039468
+            }
+          },
+          "errors": [],
+          "duplicateAndConflict": "passed"
+        }
+      },
+      "verify": {
+        "restored": 410,
+        "hydrated": 410,
+        "completed": 410,
+        "teacherCompleted": 205,
+        "children": 0,
+        "rowBytes": {
+          "n": 410,
+          "p50": 5376,
+          "p95": 5408,
+          "max": 5416
+        },
+        "sharedTemplates": 36,
+        "feedbackRows": 0
+      }
+    },
+    "optimized-final-b": {
+      "measurements": {
+        "training": {
+          "receiptMs": {
+            "n": 200,
+            "p50": 1477.2511880000002,
+            "p95": 2135.38535,
+            "max": 2170.561649
+          },
+          "success": 200,
+          "wallMs": 2213.132858,
+          "resources": {
+            "queries": {
+              "queryRaw": 400,
+              "executeRaw": 400
+            },
+            "peakRss": 567271424,
+            "cpu": {
+              "user": 2035641,
+              "system": 236545
+            },
+            "memory": {
+              "rss": 569237504,
+              "heapTotal": 439984128,
+              "heapUsed": 306422528,
+              "external": 36621436,
+              "arrayBuffers": 32437196
+            }
+          },
+          "errors": [],
+          "duplicateAndConflict": "passed"
+        },
+        "teacher": {
+          "receiptMs": {
+            "n": 200,
+            "p50": 1037.3758040000002,
+            "p95": 1637.9510899999996,
+            "max": 1650.7184739999998
+          },
+          "success": 200,
+          "wallMs": 1671.3664519999998,
+          "resources": {
+            "queries": {
+              "queryRaw": 1200,
+              "executeRaw": 800
+            },
+            "peakRss": 610918400,
+            "cpu": {
+              "user": 2106861,
+              "system": 144882
+            },
+            "memory": {
+              "rss": 610918400,
+              "heapTotal": 445808640,
+              "heapUsed": 275351032,
+              "external": 31705675,
+              "arrayBuffers": 28463143
+            }
+          },
+          "errors": [],
+          "duplicateAndConflict": "passed"
+        }
+      },
+      "verify": {
+        "restored": 410,
+        "hydrated": 410,
+        "completed": 410,
+        "teacherCompleted": 205,
+        "children": 0,
+        "rowBytes": {
+          "n": 410,
+          "p50": 5376,
+          "p95": 5408,
+          "max": 5416
+        },
+        "sharedTemplates": 36,
+        "feedbackRows": 0
+      }
+    }
+  },
+  "pooled": {
+    "training": {
+      "main": {
+        "n": 400,
+        "vuPerBurst": 200,
+        "p50Ms": 1470.59312,
+        "p95Ms": 2453.816332
+      },
+      "optimized": {
+        "n": 400,
+        "vuPerBurst": 200,
+        "p50Ms": 1448.3254239999999,
+        "p95Ms": 2135.8792040000003
+      },
+      "improvementPercent": {
+        "p50Ms": 1.5141982984389402,
+        "p95Ms": 12.956842932937152
+      }
+    },
+    "teacher": {
+      "main": {
+        "n": 400,
+        "vuPerBurst": 200,
+        "p50Ms": 1280.2221450000002,
+        "p95Ms": 2063.238068
+      },
+      "optimized": {
+        "n": 400,
+        "vuPerBurst": 200,
+        "p50Ms": 1049.4351609999999,
+        "p95Ms": 1738.9812650000003
+      },
+      "improvementPercent": {
+        "p50Ms": 18.02710450692917,
+        "p95Ms": 15.715918004281404
+      }
+    }
+  }
+}
