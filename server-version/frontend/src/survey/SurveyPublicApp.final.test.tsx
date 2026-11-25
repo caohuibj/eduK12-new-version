@@ -50,6 +50,7 @@ async function exhaustCapacityRetry(action:()=>void=submit){
 }
 beforeEach(()=>{
   HTMLElement.prototype.scrollIntoView=vi.fn()
+  vi.spyOn(window,'scrollTo').mockImplementation(()=>{})
   sessionStorage.clear()
   window.history.replaceState(null,'',`/r/${publicId}`)
   sessionStorage.setItem(`huisurvey:v1:single:${publicId}`,JSON.stringify({
@@ -137,6 +138,8 @@ describe('Survey first-success GENERAL receipt consumption',()=>{
     await openTask()
     now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
     await screen.findByText(receiptText)
+    expect(screen.getByRole('heading',{name:'感谢参与，问卷已提交'})).toHaveFocus()
+    expect(window.scrollTo).toHaveBeenCalledExactlyOnceWith({top:0,behavior:'instant'})
     expect(screen.getByText('本次提交的一般免责声明')).toBeInTheDocument()
     expect(screen.getByText('完成时间').closest('details')).not.toHaveAttribute('open')
     expect(finalCalls).toHaveLength(1)
@@ -162,6 +165,22 @@ describe('Survey first-success GENERAL receipt consumption',()=>{
     expect(screen.queryByText(receiptText)).toBeNull()
     expect(generalCalls()).toHaveLength(1)
     expect(finalCalls).toHaveLength(1)
+  })
+  it('keeps the focused confirmation heading when the delayed feedback arrives',async()=>{
+    let resolveGeneral!:(value:Response)=>void
+    generalReply=()=>new Promise(resolve=>{resolveGeneral=resolve})
+    await openTask()
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    const heading=await screen.findByRole('heading',{name:'感谢参与，问卷已提交'})
+    expect(heading).toHaveFocus()
+    expect(window.scrollTo).toHaveBeenCalledExactlyOnceWith({top:0,behavior:'instant'})
+    await act(async()=>resolveGeneral(await response({
+      kind:'DESCRIPTIVE',text:'本次反馈已就绪',completedAt:'2026-10-17T00:00:00Z',
+    })))
+    await screen.findByText('本次反馈已就绪')
+    expect(screen.getByRole('heading',{name:'感谢参与，问卷已提交'})).toBe(heading)
+    expect(heading).toHaveFocus()
+    expect(window.scrollTo).toHaveBeenCalledTimes(1)
   })
   it('reauthorizes GENERAL after an ambiguous retry even if that retry creates the first FINAL',async()=>{
     finalReply=()=>Promise.reject(new Error('结果未知'))
