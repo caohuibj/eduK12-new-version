@@ -85,7 +85,8 @@ describe('intake20 exact readiness through the existing host', () => {
   it('keeps an incomplete local attempt blocked instead of remounting its task', async () => {
     harness.controller.state = readyState('numberline', 1)
     render(tree())
-    expect(await screen.findByText('本地草稿保持不变；请选择返回或创建新的整份提交测评。')).toBeVisible()
+    expect(await screen.findByText('本地草稿已保留，你可以返回列表或重新开始一次测评。')).toBeVisible()
+    expect(screen.getByRole('button', { name: '重启并继续作答' })).toBeVisible()
     expect(screen.queryByRole('button', { name: '开始测评' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '开始练习' })).not.toBeInTheDocument()
     expect(harness.controller.start).not.toHaveBeenCalled()
