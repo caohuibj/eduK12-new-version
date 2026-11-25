@@ -723,6 +723,7 @@ describe('WholeCompositeV2Runner (4-in-1 Form + Scale + SJT + Cognitive)', () =>
     await waitFor(() => expect(onReceiptRo).toHaveBeenCalledTimes(1))
     expect(onCompletedRo).not.toHaveBeenCalled()
     const heading = await screen.findByRole('heading', { name: '交卷成功' })
+    expect(heading).toHaveFocus()
     const receipt = heading.closest('[role="status"]')
     expect(receipt).toHaveClass('hui-page--assessment')
     const time = receipt?.querySelector('time')

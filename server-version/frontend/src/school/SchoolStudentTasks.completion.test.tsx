@@ -57,9 +57,19 @@ describe('School authoritative completion feedback consumer (synthetic transport
     await screen.findByRole('button',{name:'退出合成测评宿主'})
     act(()=>capture.finished!())
     await screen.findByText('本次测评已完成，正式提交已确认。')
+    expect(screen.getByRole('heading',{name:'我的校园任务'})).toHaveFocus()
     expect(screen.queryByRole('region',{name:'获准的个人测评反馈'})).not.toBeInTheDocument()
     expect(api.mock.calls.filter(([path])=>path.startsWith('/reports/'))).toHaveLength(0)
   })
+ it('returns keyboard focus to the inbox after leaving an open assessment',async()=>{
+    const api=vi.fn(async(path:string)=>path==='/my/student-reference'?{reference:'SYNTHETIC'}:page())
+    render(<SchoolStudentTasks api={api as unknown as SchoolApi}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'开始／继续官方测评'}))
+    const exit=await screen.findByRole('button',{name:'退出合成测评宿主'})
+    exit.focus()
+    fireEvent.click(exit)
+    expect(screen.getByRole('heading',{name:'我的校园任务'})).toHaveFocus()
+ })
 })
 
 it('remounts a newly selected task and prevents the previous completion callback from opening feedback',async()=>{

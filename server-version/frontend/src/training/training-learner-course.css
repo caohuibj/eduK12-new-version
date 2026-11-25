@@ -1,6 +1,7 @@
 /* Student course tasks share one visual rhythm across all three categories. */
 .hui-training.hui-app.hui-app--standard.hui-app--student.training-workspace-shell .training-learner-course .training-detail-header { grid-template-columns:minmax(0,1fr);margin-bottom:22px; }
 .hui-training.hui-app.hui-app--standard.hui-app--student.training-workspace-shell .training-learner-course .training-detail-header h1 { font-size:clamp(25px,2.7vw,34px);line-height:1.45; }
+.hui-training.hui-app.hui-app--standard.hui-app--student.training-workspace-shell .training-learner-course :is(.training-detail-header h1,.training-task-item h2,.training-task-item p) { overflow-wrap:anywhere; }
 .hui-training.hui-app.hui-app--standard.hui-app--student.training-workspace-shell .training-learner-course .training-course-layout { grid-template-columns:minmax(0,1fr) 240px;gap:24px; }
 .hui-training.hui-app.hui-app--standard.hui-app--student.training-workspace-shell .training-learner-course .training-course-layout--full { grid-template-columns:minmax(0,1fr); }
 .hui-training.hui-app.hui-app--standard.hui-app--student.training-workspace-shell .training-learner-course .training-course-work { border-radius:14px; }

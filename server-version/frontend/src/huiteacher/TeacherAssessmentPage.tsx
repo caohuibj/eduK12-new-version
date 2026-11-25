@@ -1,20 +1,41 @@
-import {createContext,useCallback,useContext,useEffect,useId,useLayoutEffect,useMemo,useRef,useState,type ReactNode} from 'react'
+import {createContext,useCallback,useContext,useEffect,useId,useLayoutEffect,useMemo,useRef,useState,type ReactNode,type RefObject} from 'react'
 import {createPortal} from 'react-dom'
 import {ArrowLeft} from 'lucide-react'
 
 type PageContext={scope:string;target:HTMLDivElement|null;activeId:string|undefined;activate:(id:string)=>void;deactivate:(id:string)=>void}
 const Context=createContext<PageContext|null>(null)
 /** Keep list controllers and drafts mounted while presenting one accessible content page. */
-export function TeacherAssessmentProvider({children,onActiveChange,scope='ht-personal-tasks'}:{children:ReactNode;onActiveChange:(active:boolean)=>void;scope?:string}){
+export function TeacherAssessmentProvider({children,onActiveChange,returnFocusRef,scope='ht-personal-tasks'}:{children:ReactNode;onActiveChange:(active:boolean)=>void;returnFocusRef?:RefObject<HTMLHeadingElement|null>;scope?:string}){
  const [target,setTarget]=useState<HTMLDivElement|null>(null),[pages,setPages]=useState<string[]>([])
+ const wasActive=useRef(false),opener=useRef<HTMLElement|null>(null)
  const activeId=pages[pages.length-1]
- const activate=useCallback((id:string)=>setPages(old=>old.includes(id)?old:[...old,id]),[])
+ const activate=useCallback((id:string)=>{
+  const focused=document.activeElement
+  if(!wasActive.current&&focused instanceof HTMLElement&&focused!==document.body&&!focused.closest('[data-teacher-assessment-page]'))opener.current=focused
+  setPages(old=>old.includes(id)?old:[...old,id])
+ },[])
  const deactivate=useCallback((id:string)=>setPages(old=>old.includes(id)?old.filter(value=>value!==id):old),[])
  const context=useMemo(()=>({scope,target,activeId,activate,deactivate}),[scope,target,activeId,activate,deactivate])
  useLayoutEffect(()=>{
   onActiveChange(Boolean(activeId))
-  if(activeId){target?.querySelector<HTMLElement>('[data-teacher-assessment-page]:not([hidden])')?.focus({preventScroll:true});target?.scrollIntoView?.({block:'start'})}
- },[activeId,target,onActiveChange])
+  if(activeId){
+   wasActive.current=true
+   target?.querySelector<HTMLElement>('[data-teacher-assessment-page]:not([hidden])')?.focus({preventScroll:true})
+   target?.scrollIntoView?.({block:'start'})
+   return
+  }
+  if(!wasActive.current)return
+  wasActive.current=false
+  const previous=opener.current
+  opener.current=null
+  const frame=requestAnimationFrame(()=>{
+   // The workspace is revealed by onActiveChange before restoring focus.
+   if(document.activeElement!==document.body&&!target?.contains(document.activeElement))return
+   if(previous?.isConnected&&!previous.closest('[hidden]')&&!previous.matches(':disabled'))previous.focus()
+   else returnFocusRef?.current?.focus()
+  })
+  return ()=>cancelAnimationFrame(frame)
+ },[activeId,target,onActiveChange,returnFocusRef])
  useEffect(()=>()=>onActiveChange(false),[onActiveChange])
  return <Context.Provider value={context}>{children}<div ref={setTarget} className="ht-workspace ht-assessment-page-host" hidden={!activeId}/></Context.Provider>
 }

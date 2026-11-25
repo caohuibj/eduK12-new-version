@@ -249,8 +249,15 @@ function TeacherAssessmentTasksSession({api,actorKey,unified=false,student=false
   {list.error&&<div role="alert"><p>{list.error}</p><button disabled={list.pending} onClick={()=>void refresh()}>重试读取任务</button></div>}
   {list.loaded&&!rows.length&&!unified&&!list.pending&&!list.error&&<p>暂无分配给你的测评任务。</p>}
   <div className="ht-event-list">{rows.map(task=><article className="ht-event" key={task.executionId}>
-   <strong>{task.title}</strong> <span className="ht-tag">{assessmentStatus(task.status)}</span>{task.mode==='COMPOSITION'&&<span className="ht-tag">普通问卷</span>}{task.mode==='PACKAGE_REFERENCE'&&<span className="ht-tag">正式整包</span>}<p>{task.eventTitle}</p>
-   {student&&task.teacherName&&<p>被评价教师：{task.teacherName}</p>}
+   <strong>{task.title}</strong>
+   <div className="ht-assessment-task-tags">
+    <span className="ht-tag">{assessmentStatus(task.status)}</span>
+    {task.mode==='COMPOSITION'&&<span className="ht-tag">普通问卷</span>}
+    {task.mode==='PACKAGE_REFERENCE'&&<span className="ht-tag">正式整包</span>}
+   </div>
+   <div className="ht-assessment-task-context"><p>{task.eventTitle}</p>
+    {student&&task.teacherName&&<p>被评价教师：{task.teacherName}</p>}
+   </div>
    <button disabled={!!session||busy} onClick={()=>open(task)}>{task.status==='COMPLETED'?'查看完成状态':task.runtimeBindingRef?(student?'继续评价':'继续测评'):(student?'开始评价':'开始测评')}</button>
   </article>)}</div>
   {cursor&&<button disabled={list.pending} onClick={()=>void refresh(cursor)}>加载更多测评任务</button>}

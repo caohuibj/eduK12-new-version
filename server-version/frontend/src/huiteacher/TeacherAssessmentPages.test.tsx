@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useRef,useState} from 'react'
 import {cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import {afterEach,describe,expect,it,vi} from 'vitest'
 import {TeacherAssessmentPage,TeacherAssessmentProvider} from './TeacherAssessmentPage'
@@ -7,7 +7,7 @@ import {HuiteacherPersonalSelf} from './HuiteacherPersonalSelf'
 vi.mock('../survey/TaskForm',()=>({TaskForm:({answer,onChange}:{answer:Record<string,string>;onChange:(key:string,value:string)=>void})=><input aria-label="草稿答案" value={answer.q??''} onChange={e=>onChange('q',e.target.value)}/>}))
 vi.mock('../components/FinalCompositeAssessment',()=>({default:()=> <p>共享作答界面</p>}))
 type Api=Parameters<typeof HuiteacherAssessmentTasks>[0]['api']
-function Workspace({api}:{api:Api}){const [active,setActive]=useState(false);return <TeacherAssessmentProvider onActiveChange={setActive}><div hidden={active}><h1>我的任务首页</h1><HuiteacherAssessmentTasks api={api} actorKey="teacher"/></div></TeacherAssessmentProvider>}
+function Workspace({api}:{api:Api}){const [active,setActive]=useState(false),heading=useRef<HTMLHeadingElement>(null);return <TeacherAssessmentProvider onActiveChange={setActive} returnFocusRef={heading}><div hidden={active}><h1 ref={heading} tabIndex={-1}>我的任务首页</h1><HuiteacherAssessmentTasks api={api} actorKey="teacher"/></div></TeacherAssessmentProvider>}
 afterEach(()=>{cleanup();sessionStorage.clear()})
 describe('dedicated Teacher assessment pages',()=>{
  it('shows only the answer page and returns without discarding the form draft or reloading other task sources',async()=>{
@@ -25,7 +25,8 @@ describe('dedicated Teacher assessment pages',()=>{
   expect(screen.queryByRole('button',{name:'继续测评'})).not.toBeInTheDocument()
   fireEvent.change(await within(page).findByRole('textbox',{name:'草稿答案'}),{target:{value:'保留我的草稿'}})
   fireEvent.click(within(page).getByRole('button',{name:'返回测评列表'}))
-  expect(await screen.findByRole('heading',{name:'我的任务首页'})).toBeVisible()
+  const heading=await screen.findByRole('heading',{name:'我的任务首页'})
+  await waitFor(()=>expect(heading).toHaveFocus())
   fireEvent.click(screen.getByRole('button',{name:'继续测评'}))
   expect(await screen.findByRole('textbox',{name:'草稿答案'})).toHaveValue('保留我的草稿')
   expect(api.mock.calls.filter(([path])=>path==='/my-private-form-tasks')).toHaveLength(1)
@@ -35,7 +36,9 @@ describe('dedicated Teacher assessment pages',()=>{
  it('opens feedback as a read-only page and closing returns to the same list without starting a task',async()=>{
   const api=vi.fn(async(path:string)=>path==='/my-scale-tasks'?{list:[{executionId:'done',title:'已完成工具',eventTitle:'个人发展',status:'COMPLETED',runStatus:'CLOSED'}]}:path.endsWith('/personal-summary')?{kind:'HUITEACHER_PERSONAL_DESCRIPTION',state:'READY',metrics:[{key:'one',label:'本次记录合计',value:12,precision:0}],limitations:[]}:{list:[]})
   render(<Workspace api={api as Api}/>)
-  fireEvent.click(await screen.findByRole('button',{name:'查看本人反馈'}))
+  const trigger=await screen.findByRole('button',{name:'查看本人反馈'})
+  trigger.focus()
+  fireEvent.click(trigger)
   const page=await screen.findByRole('region',{name:'个人反馈详情'})
   expect(within(page).getByText('个人反馈 · 只读结果')).toBeInTheDocument()
   expect(within(page).queryByRole('textbox')).not.toBeInTheDocument()
@@ -43,7 +46,7 @@ describe('dedicated Teacher assessment pages',()=>{
   expect(screen.queryByRole('heading',{name:'我的任务首页'})).not.toBeInTheDocument()
   fireEvent.click(within(page).getByRole('button',{name:'返回测评列表'}))
   await waitFor(()=>expect(screen.queryByRole('region',{name:'个人反馈详情'})).not.toBeInTheDocument())
-  expect(screen.getByRole('button',{name:'查看本人反馈'})).toBeEnabled()
+  await waitFor(()=>expect(trigger).toHaveFocus())
   expect(api.mock.calls.every(call=>call.length===1)).toBe(true)
   expect(api.mock.calls.filter(([path])=>path==='/my-scale-tasks')).toHaveLength(1)
  })
