@@ -1,0 +1,39 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ❯ src/__tests__/assessment-runtime/slot-plan-transaction.test.ts (5 tests | 2 failed) 25ms
+     × appends and verifies through the same transaction without borrowing a global connection 14ms
+     × retains the default committed global store and its existing frozen hash 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/assessment-runtime/slot-plan-transaction.test.ts > frozen slot plans stay on the supplied transaction > appends and verifies through the same transaction without borrowing a global connection
+AssertionError: expected "vi.fn()" to be called 2 times, but got 3 times
+ ❯ src/__tests__/assessment-runtime/slot-plan-transaction.test.ts:32:27
+     30|   const tx=transaction(),snapshot=slots('write-local'),cipher=await st…
+     31|   expect(cipher).toMatch(/^ekr1:/);expect(await loadFrozenActiveSlotSe…
+     32|   expect(tx.db.$queryRaw).toHaveBeenCalledTimes(2);expect(globalDb.$ex…
+       |                           ^
+     33|   expect((await loadFrozenActiveSlot({encrypted:cipher,storedHash:snap…
+     34|   await expect(loadFrozenActiveSlot({encrypted:cipher,storedHash:snaps…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/assessment-runtime/slot-plan-transaction.test.ts > frozen slot plans stay on the supplied transaction > retains the default committed global store and its existing frozen hash
+AssertionError: expected "vi.fn()" to be called 1 times, but got 2 times
+ ❯ src/__tests__/assessment-runtime/slot-plan-transaction.test.ts:57:148
+     55|   globalDb.$executeRaw.mockImplementation(rows.db.$queryRaw);globalDb.…
+     56|   const cipher=await storeFrozenActiveSlotSet(snapshot)
+     57|   expect(await loadFrozenActiveSlotSet(cipher)).toEqual(snapshot);expe…
+       |                                                                                                                                                    ^
+     58|  })
+     59|  it('retains inline legacy storage and rejects corrupted hashes withou…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 19 passed (21)
+   Start at  08:42:53
+   Duration  17.54s (transform 7.79s, setup 0ms, import 17.01s, tests 163ms, environment 0ms)
+

@@ -1,0 +1,11 @@
+{
+  "base": "e0f4b5e29f503cac252b762fc12ce09be9e47033",
+  "kind": "archival-snapshot-not-execution-attestation",
+  "sha256": {
+    "server-version/backend/src/modules/assessment-runtime/prepared-final-authority.ts": "056ad748906b5c9281d4e4e14e699798f9757a318bc60a9c9acf8d158980dd00",
+    "server-version/backend/src/__tests__/assessment-runtime/prepared-final-authority.test.ts": "0185a6a2892dae742bc6733699b3a5c75da9cba924b64e302f2d73f3b21c76ed",
+    "server-version/backend/src/modules/assessment-runtime/composite-final.writer.ts": "4ce775eb1da1b7ecbbaec17706fcc23a263b95fc40309f6209a32acd90e7dc89",
+    "server-version/backend/src/modules/composite/anonymous-token-usage.ts": "56a69b48aa31f2a5a121cc8749aef6b9cc2b287a43b886bd50301a8a1fe9d0f7",
+    "server-version/backend/src/modules/anonymous-study/service.ts": "f411b24a887507f787aa3aef7b57b2fc1b7c365fd341d65b7c3f277e13f31bfc"
+  }
+}

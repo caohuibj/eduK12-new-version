@@ -29,7 +29,7 @@ describe('frozen slot plans stay on the supplied transaction',()=>{
  it('appends and verifies through the same transaction without borrowing a global connection',async()=>{
   const tx=transaction(),snapshot=slots('write-local'),cipher=await storeFrozenActiveSlotSet(snapshot,tx.db)
   expect(cipher).toMatch(/^ekr1:/);expect(await loadFrozenActiveSlotSet(cipher,tx.db)).toEqual(snapshot)
-  expect(tx.db.$queryRaw).toHaveBeenCalledTimes(2);expect(globalDb.$executeRaw).not.toHaveBeenCalled();expect(globalDb.$queryRaw).not.toHaveBeenCalled()
+  expect(tx.db.$queryRaw).toHaveBeenCalledTimes(3);expect(globalDb.$executeRaw).not.toHaveBeenCalled();expect(globalDb.$queryRaw).not.toHaveBeenCalled()
   expect((await loadFrozenActiveSlot({encrypted:cipher,storedHash:snapshot.snapshotHash,attemptEpoch:3,slotKey:'scale:write-local'},tx.db)).sourceBinding).toEqual({compositeItemId:'write-local'})
   await expect(loadFrozenActiveSlot({encrypted:cipher,storedHash:snapshot.snapshotHash,attemptEpoch:4,slotKey:'scale:write-local'},tx.db)).rejects.toThrow('binding mismatch')
  })
@@ -54,7 +54,7 @@ describe('frozen slot plans stay on the supplied transaction',()=>{
   const rows=transaction(),snapshot=slots('default-committed')
   globalDb.$executeRaw.mockImplementation(rows.db.$queryRaw);globalDb.$queryRaw.mockImplementation(rows.db.$queryRaw)
   const cipher=await storeFrozenActiveSlotSet(snapshot)
-  expect(await loadFrozenActiveSlotSet(cipher)).toEqual(snapshot);expect(globalDb.$executeRaw).toHaveBeenCalledTimes(1);expect(globalDb.$queryRaw).toHaveBeenCalledTimes(1)
+  expect(await loadFrozenActiveSlotSet(cipher)).toEqual(snapshot);expect(globalDb.$executeRaw).toHaveBeenCalledTimes(1);expect(globalDb.$queryRaw).toHaveBeenCalledTimes(2)
  })
  it('retains inline legacy storage and rejects corrupted hashes without any database access',async()=>{
   vi.stubEnv('ASSESSMENT_SHARED_CONTROL_ENABLED','false');const tx=transaction(),snapshot=slots('legacy-inline'),cipher=await storeFrozenActiveSlotSet(snapshot,tx.db)

@@ -407,8 +407,9 @@ export async function readLockedUnitsForSubmit(
     attemptEpoch: number
     publicationHash: string
   },
+  lock = true,
 ): Promise<Record<string, LockedCheckpointUnitV1>> {
-  const row = await loadCheckpointRow(db, input.attemptId, true)
+  const row = await loadCheckpointRow(db, input.attemptId, lock)
   if (!row || row.attemptEpoch !== input.attemptEpoch) return {}
   if (row.publicationHash !== input.publicationHash) {
     throw new CompositeCheckpointError(409, 'CHECKPOINT_IDENTITY_MISMATCH', '草稿锁定单元与冻结发布不一致')

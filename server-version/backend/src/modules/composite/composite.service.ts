@@ -1,3 +1,4 @@
+import {claimAnonymousTokenUsage,withAnonymousTokenUsage} from './anonymous-token-usage'
 import {previewTrainingStandardReportEligibility} from './training-standard-report-preview'
 import { isCompositeWholeV2Enabled } from '../assessment-runtime/composite-whole-v2-flag'
 import {
@@ -65,7 +66,7 @@ import {assertCurrentTrainingContentOwner,attachTrainingReportSelection} from '.
 import {prepareTrainingContentSnapshot,attachPublishedScaleArtifacts,prepareTrainingContentAttemptBinding,resolveTrainingScaleArtifacts,resolveTrainingContentBindingParent,saveCompactTrainingContentBinding,trainingContentAttemptBindingSchema} from './training-content-binding'
 import {inheritTrainingTrackingSources,freezeTrainingTracking,readTrainingTracking} from './personal-tracking'
 import {verifyStoredTrainingStandardItem,freezeTrainingStandardScaleRuntime,trainingStandardCombinationSummary} from './training-standard-combination'
-import { evaluateTrainingFeedbackForAttempt, prepareTrainingFeedbackBinding, freezeTrainingFeedbackSnapshot, trainingFeedbackAttemptSelect, trainingFeedbackParentSelect, type TrainingFeedbackBinding } from './training-feedback-binding'
+import { evaluateTrainingFeedbackForAttempt, prepareTrainingFeedbackBinding, freezeTrainingFeedbackSnapshot, compactTrainingFeedbackSnapshot, trainingFeedbackAttemptSelect, trainingFeedbackParentSelect, type TrainingFeedbackBinding } from './training-feedback-binding'
 import { isLoadedCompositeParticipantFeedbackDeferred, trainingFeedbackReportReady } from '../assessment-policy/participant-feedback'
 import { freezeTrainingPersistenceSnapshot, readTrainingPersistencePolicy, trainingPersistenceMetadata } from './training-persistence.policy'
 import { trainingRoundPublicationIdentity, prepareTrainingPublicRound, assertTrainingTokenRound, publicRoundMetadata, trainingRoundSelect, type TrainingRoundInput } from './training-public-round'
@@ -2599,7 +2600,7 @@ export const listAccessTokens = async (userId: string, role: UserRole, composite
     orderBy: { createdAt: 'desc' },
     select: { id: true, expiresAt: true, maxUses: true, usedCount: true, isActive: true, createdAt: true, trainingRoundId:true,trainingRound:{select:trainingRoundSelect} },
   })
-  return records.map(({trainingRound,trainingRoundId,...record}) => ({ ...record, token: null, ...publicRoundMetadata({trainingRound,trainingRoundId}) }))
+  return (await withAnonymousTokenUsage(prisma,records)).map(({trainingRound,trainingRoundId,...record}) => ({ ...record, token: null, ...publicRoundMetadata({trainingRound,trainingRoundId}) }))
 }
 
 export const revealAccessToken = async (userId: string, role: UserRole, compositeId: string, tokenId: string) => {
@@ -2620,7 +2621,7 @@ export const revealAccessToken = async (userId: string, role: UserRole, composit
     token,
     expiresAt: record.expiresAt,
     maxUses: record.maxUses,
-    usedCount: record.usedCount,
+    usedCount: (await withAnonymousTokenUsage(prisma,[record]))[0].usedCount,
     isActive: record.isActive,
     createdAt: record.createdAt,
   }
@@ -4111,7 +4112,7 @@ const createAttempt = async (
           trainingContentBindingHash: canonicalHash(trainingContentBinding),
         } : {}),
         ...(trainingFeedbackSnapshot ? {
-          trainingFeedbackSnapshot: trainingFeedbackSnapshot as Prisma.InputJsonValue,
+          trainingFeedbackSnapshot: compactTrainingFeedbackSnapshot(trainingFeedbackSnapshot) as Prisma.InputJsonValue,
           trainingFeedbackSnapshotHash: canonicalHash(trainingFeedbackSnapshot),
         } : {}),
         ...(trainingPersistenceSnapshot ? {
@@ -4742,7 +4743,7 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
   return { attempt: await getAttemptState(next.id, { userId }), recoveryToken: null }
 }
 
-const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
+const findPublicToken = async (tokenValue: string, db: Db = prisma, options: { admissionOnly?: boolean } = {}) => {
   const tokenHash = hashPublicAccessToken(tokenValue)
   // Token/content layering (Work C): the token lookup reads only the token
   // metadata plus the minimal composite fields required for validation. The
@@ -4811,7 +4812,11 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
   if (!token.compositeAssessment.publicEnabled || token.compositeAssessment.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
   assertNotLibraryComposite(token.compositeAssessment, '库课程上的综合测评不能公开作答')
   assertSupportedComposite(token.compositeAssessment, false, false)
-  return token as any
+  // Unlimited START admission needs only the live token fence. Its usage total
+  // is still aggregated for discovery/list/reveal, while finite admission needs
+  // the full total before the authoritative in-transaction quota claim.
+  if (options.admissionOnly && token.maxUses === 0) return token as any
+  return (await withAnonymousTokenUsage(db,[token]))[0] as any
 }
 
 // Public discovery needs presentation, not scale definitions. Keep form items
@@ -4846,7 +4851,7 @@ const loadPublicCompositeInfo = async (id: string, db: Db) => {
  * personal-tracking publication still runs loadComposite so a bad baseline
  * is rejected the same way the info path rejects it. */
 export const assertPublicCompositeAdmission = async (tokenValue: string, db: Db = prisma) => {
-  const token = await findPublicToken(tokenValue, db)
+  const token = await findPublicToken(tokenValue, db, { admissionOnly: true })
   assertSupportedComposite(token.compositeAssessment)
   assertTokenWindow(token)
   await assertTrainingTokenRound(db as Prisma.TransactionClient, token)
@@ -4950,7 +4955,7 @@ const recordAnonymousStartDiagnosticPhase = (phase: RequestObservationPhase, sta
 
 export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string, study?: PublicStudyAdmission, opts?: { wantsWholeDelivery?: boolean; knownTemplateHashes?: ReadonlySet<string> }) => {
   const startAt = process.hrtime.bigint()
-  const token = await findPublicToken(tokenValue)
+  const token = await findPublicToken(tokenValue, prisma, { admissionOnly: true })
   // A recovery proof is checked using the narrow attempt index lookup BEFORE
   // any publication tree/preload. Merely supplying an unverified token must
   // never bypass the optional low-memory guard and trigger an expensive read.
@@ -5061,18 +5066,10 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
             await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
             // Claim last to shorten the token-row lock. A revoked, expired or
             // exhausted token rolls back the attempt and study binding together.
-            // Compare the LIVE row with itself, never against the pre-gate
-            // token.maxUses snapshot. The UPDATE row lock serializes competing
-            // claims and the database clock checks expiry at the final claim.
-            const claimed = await tx.$queryRaw<Array<{ id: string }>>`
-              UPDATE composite_assessment_access_tokens
-              SET used_count = used_count + 1
-              WHERE id = ${token.id} AND is_active = TRUE
-                AND expires_at > (clock_timestamp() AT TIME ZONE 'UTC')
-                AND (max_uses = 0 OR used_count < max_uses)
-              RETURNING id
-            `
-            if (claimed.length !== 1) throw compositeConflict('公开链接已达到最大参与次数')
+            // Unlimited links spread durable counts across bounded shards;
+            // finite quotas serialize the final live check including all shards.
+            // Both paths fence revocation and check database wall-clock expiry.
+            await claimAnonymousTokenUsage(tx,token,credential.hash)
             return admitted
           })
           return admittedScaleBatch && !composite.formSections?.length

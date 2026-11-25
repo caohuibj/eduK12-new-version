@@ -2,6 +2,7 @@ import { EventEmitter } from 'node:events'
 import { readFileSync } from 'node:fs'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  currentAssessmentTimelineKind,
   measureRequestPhase,
   measureRequestPhaseSync,
   recordPrismaCall,
@@ -251,4 +252,23 @@ describe('runtime observability', () => {
     expect(metrics).not.toContain('session-123')
   })
 
+})
+
+
+describe('V2 shared FINAL technical timelines', () => {
+  it.each([
+    '/api/composite-assessments/attempts/synthetic/v2/whole/submit',
+    '/api/huiteacher/assessment-composite-attempts/synthetic/v2/whole/submit',
+    '/api/campus/composite-attempts/synthetic/v2/whole/submit',
+    '/api/public/composite-attempts/synthetic/v2/whole/submit',
+  ])('attaches the existing opt-in submission context to %s', path => {
+    vi.stubEnv('PERF_ISOLATED_TEST_MODE','1');vi.stubEnv('ASSESSMENT_TIMELINE_ENABLED','true')
+    try {
+      const req=Object.assign(new EventEmitter(),{method:'POST',originalUrl:path,url:path,path}) as any
+      const res=Object.assign(new EventEmitter(),{statusCode:200}) as any
+      requestObservabilityMiddleware(req,res,()=>expect(currentAssessmentTimelineKind()).toBe('submission'))
+      // No finish here: this test checks context attachment, not the log sink.
+      resetRuntimeObservabilityForTests()
+    } finally {vi.unstubAllEnvs()}
+  })
 })

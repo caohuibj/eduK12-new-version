@@ -7,7 +7,7 @@ import {
   generateCompositeUnitSeeds,
 } from '../../modules/assessment-runtime/composite-publication-plan'
 import { saveCompositeCheckpoint } from '../../modules/assessment-runtime/composite-checkpoint.service'
-import { commitCompositeWholeFinal } from '../../modules/assessment-runtime/composite-final.writer'
+import { commitCompositeWholeFinal, prepareCompositeWholeFinal, type CommitCompositeWholeFinalInput } from '../../modules/assessment-runtime/composite-final.writer'
 import {
   hydrateCompositeScaleUnitsBatch,
   readCompositeFinalFacts,
@@ -244,8 +244,8 @@ describe('composite-final.writer (synchronous 1-tx 4-in-1 single-row FINAL)', ()
       startedAt: new Date('2026-11-24T01:00:00.000Z'),
     }
 
-    const receipt = await commitCompositeWholeFinal(db, {
-      attempt,
+    const mixedInput: CommitCompositeWholeFinalInput = {
+      attempt: {...attempt,status:'IN_PROGRESS'},
       plan,
       submit: submitPayload,
       templates: store,
@@ -255,7 +255,11 @@ describe('composite-final.writer (synchronous 1-tx 4-in-1 single-row FINAL)', ()
         unitCount: Object.keys(facts.units).length,
       }),
       now: new Date('2026-11-24T01:01:35.000Z'),
-    })
+    }
+    Object.assign(parentState, {compositeAssessmentId:compositeId,receiptOnly:false,startedAt:attempt.startedAt})
+    const prepared = await prepareCompositeWholeFinal(mixedInput, db)
+    expect(prepared).toBeDefined()
+    const receipt = await commitCompositeWholeFinal(db, mixedInput, prepared)
 
     expect(receipt.status).toBe('COMPLETED')
     expect(receipt.replayed).toBe(false)
@@ -519,5 +523,118 @@ describe('composite-final.writer (synchronous 1-tx 4-in-1 single-row FINAL)', ()
         },
       },
     })).rejects.toMatchObject({ statusCode: 409, code: 'STALE_ATTEMPT' })
+  })
+})
+
+
+describe('prepared ordinary Scale FINAL', () => {
+  beforeEach(() => vi.stubEnv('DATA_ENCRYPTION_KEY', '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'))
+  afterEach(() => vi.unstubAllEnvs())
+
+  function fixture() {
+    const f = buildFourFamilyTestSlots()
+    const slot = f.slots.find(s => s.unitType === 'SCALE')!
+    const plan = buildCompositePublicationPlan({ compositeId: randomUUID(), title: 'Frozen ordinary scales', slots: [slot] })
+    const templates = makeTemplateStore()
+    const input: CommitCompositeWholeFinalInput = {
+      attempt: { id: randomUUID(), userId: randomUUID(), status: 'IN_PROGRESS', attemptEpoch: 1,
+        compositeAssessmentId: plan.compositeId, publicationHash: plan.publicationHash,
+        receiptOnly: true, startedAt: new Date('2026-11-24T01:00:00Z') },
+      plan, templates: templates.store, draftCheckpointEnabled: false, now: new Date('2026-11-24T01:05:00Z'),
+      submit: { submissionId: randomUUID(), attemptEpoch: 1, publicationHash: plan.publicationHash,
+        slotSetHash: plan.slotSetHash, units: { [slot.slotKey]: { unitType: 'SCALE', definitionHash: slot.definitionHash,
+          answers: f.scalePkg.goldenCases.find(c => c.expected.quality)!.answers } } },
+    }
+    const db = makeSingleRowFinalTxDb({status:'IN_PROGRESS',attemptEpoch:1,publicationHash:plan.publicationHash})
+    Object.assign(db.parentState, { userId: input.attempt.userId, compositeAssessmentId: plan.compositeId,
+      receiptOnly: true, startedAt: input.attempt.startedAt, subjectUserId: null, deliveryCourseId: null, trainingTimingSnapshot: null })
+    return { ...db, input, templates }
+  }
+
+  it('prepares without opening a write transaction, preserves exact FINAL hashes/lengths, and never re-scores under the lock', async () => {
+    const f = fixture(), old = makeSingleRowFinalTxDb({status:'IN_PROGRESS',attemptEpoch:1,publicationHash:f.input.plan.publicationHash})
+    const legacy = await commitCompositeWholeFinal(old.db, f.input)
+    const prepared = await prepareCompositeWholeFinal(f.input)
+    expect(prepared).toBeDefined()
+    expect(f.db.$queryRaw).not.toHaveBeenCalled()
+    expect(f.db.$executeRaw).not.toHaveBeenCalled()
+    const save = vi.spyOn(f.templates.store, 'saveMany').mockRejectedValue(new Error('must not recompute in transaction'))
+    const receipt = await commitCompositeWholeFinal(f.db, f.input, prepared)
+    expect(receipt).toEqual(legacy)
+    const fresh = [...f.finals.values()][0], before = [...old.finals.values()][0]
+    expect(fresh.factsCipher.length).toBe(before.factsCipher.length)
+    expect(fresh.rawCipher.length).toBe(before.rawCipher.length)
+    expect(save).not.toHaveBeenCalled()
+  })
+
+  it.each(['userId', 'receiptOnly', 'trainingTimingSnapshot', 'attemptEpoch', 'publicationHash'])('rejects a concurrent %s change before any FINAL write', async field => {
+    const f = fixture(), prepared = await prepareCompositeWholeFinal(f.input)
+    Object.assign(f.parentState, { [field]: field === 'attemptEpoch' ? 2 : field === 'receiptOnly' ? false : field === 'trainingTimingSnapshot' ? { enabled: true } : randomUUID() })
+    await expect(commitCompositeWholeFinal(f.db, f.input, prepared)).rejects.toMatchObject({ statusCode: 409 })
+    expect(f.finals.size).toBe(0)
+    expect(f.attemptUpdates).toHaveLength(0)
+  })
+
+  it.each(['assignmentRef','consentId','recoveryTokenHash','respondentUserId'])('rechecks prepared %s under the parent lock',async field=>{
+    const f=fixture()
+    f.input.attempt.frozenState={[field]:null}
+    Object.assign(f.parentState,{frozenState:{[field]:null}})
+    const prepared=await prepareCompositeWholeFinal(f.input,f.db)
+    Object.assign(f.parentState,{frozenState:{[field]:randomUUID()}})
+    await expect(commitCompositeWholeFinal(f.db,f.input,prepared)).rejects.toMatchObject({code:'STALE_ATTEMPT',statusCode:409})
+    expect(f.finals.size).toBe(0)
+  })
+
+  it('rejects request mutation between preparation and commit, and keeps authority checks inside the transaction', async () => {
+    const f = fixture(), prepared = await prepareCompositeWholeFinal(f.input)
+    f.input.submit.totalTimeMs = 999
+    await expect(commitCompositeWholeFinal(f.db, f.input, prepared)).rejects.toThrow('Prepared FINAL input changed')
+    expect(f.finals.size).toBe(0)
+    delete f.input.submit.totalTimeMs
+    f.input.verifyAuthorityInTx = async () => { throw new Error('revoked') }
+    await expect(commitCompositeWholeFinal(f.db, f.input, prepared)).rejects.toThrow('revoked')
+    expect(f.finals.size).toBe(0)
+  })
+
+  it('preserves historical replay and conflict precedence even when new computation fails', async () => {
+    const f = fixture(), prepared = await prepareCompositeWholeFinal(f.input)
+    await commitCompositeWholeFinal(f.db, f.input, prepared)
+    f.input.verifyAuthorityInTx = async () => { throw new Error('revoked') }
+    expect(await commitCompositeWholeFinal(f.db, f.input, prepared)).toMatchObject({replayed:true})
+    const conflicting = { ...f.input, submit: { ...f.input.submit, units: {} } }
+    const rejected = await prepareCompositeWholeFinal(conflicting)
+    await expect(commitCompositeWholeFinal(f.db, conflicting, rejected)).rejects.toMatchObject({code:'SUBMISSION_PAYLOAD_CONFLICT'})
+    expect(f.finals.size).toBe(1)
+  })
+
+  it.each([true, false])('prepares anonymous submissions and feedback with receiptOnly=%s', async receiptOnly => {
+    const f = fixture()
+    f.input.attempt.userId = null
+    f.input.attempt.receiptOnly = receiptOnly
+    Object.assign(f.parentState, {userId:null,receiptOnly})
+    const buildFeedback = vi.fn(async () => ({headline:'prepared feedback'}))
+    f.input.buildFeedback = buildFeedback
+    const prepared = await prepareCompositeWholeFinal(f.input, f.db)
+    expect(prepared).toBeDefined()
+    expect(buildFeedback).toHaveBeenCalledTimes(receiptOnly ? 0 : 1)
+    await commitCompositeWholeFinal(f.db, f.input, prepared)
+    expect(buildFeedback).toHaveBeenCalledTimes(receiptOnly ? 0 : 1)
+    expect(f.finals.size).toBe(1)
+  })
+
+  it('falls back safely when governance depends on a live wall clock',async()=>{
+    const f=fixture()
+    f.input.finalizeGovernanceInTx=async tx=>{await tx.$queryRaw`SELECT clock_timestamp() AS now`;return undefined}
+    expect(await prepareCompositeWholeFinal(f.input,f.db)).toBeUndefined()
+    expect(f.finals.size).toBe(0)
+  })
+
+  it('retains the fallback for unregistered mutable plans and mismatched publication identities', async () => {
+    const f = fixture()
+    for (const input of [
+      {...f.input, plan:{...f.input.plan}},
+      {...f.input, submit:{...f.input.submit,publicationHash:'0'.repeat(64)}},
+      {...f.input, attempt:{...f.input.attempt,status:'ABANDONED'}},
+    ]) expect(await prepareCompositeWholeFinal(input, f.db)).toBeUndefined()
   })
 })

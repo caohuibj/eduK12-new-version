@@ -78,6 +78,7 @@
     "cognitive_test_configs": "RUNTIME_RW",
     "cognitive_trials": "RUNTIME_RW",
     "composite_analysis_snapshots": "RUNTIME_RW",
+    "composite_access_token_usage_shards": "RUNTIME_RW",
     "composite_assessment_access_tokens": "RUNTIME_RW",
     "composite_assessment_attempts": "RUNTIME_RW",
     "composite_assessment_items": "RUNTIME_RW",

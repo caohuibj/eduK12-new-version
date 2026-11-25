@@ -1,0 +1,18 @@
+/** Read-only row/TOAST/index allocation evidence for one isolated benchmark publication. */
+import {PrismaClient,Prisma} from '@prisma/client'
+import {readFileSync,writeFileSync} from 'node:fs'
+import assert from 'node:assert/strict'
+import {requireIsolatedReleaseDatabase} from '../src/__tests__/integration/integration-env'
+const url=process.env.DATABASE_URL!,fixture=JSON.parse(readFileSync(process.env.BENCH_REUSE_FIXTURE!,'utf8')),out=process.env.BENCH_OUT!
+requireIsolatedReleaseDatabase(url);assert(out&&fixture.compositeId)
+const db=new PrismaClient({datasources:{db:{url}}})
+async function main(){
+ const relations=await db.$queryRaw<any[]>`SELECT c.relname AS name,pg_relation_size(c.oid) AS "heapBytes",pg_table_size(c.oid) AS "tableAndToastBytes",pg_indexes_size(c.oid) AS "indexBytes",pg_total_relation_size(c.oid) AS "totalBytes",pg_stat_get_live_tuples(c.oid) AS "estimatedLiveRows",pg_stat_get_dead_tuples(c.oid) AS "estimatedDeadRows" FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('composite_assessment_attempts','composite_attempt_finals','assessment_public_templates','composite_access_token_usage_shards','composite_assessment_access_tokens','composite_report_jobs','assessments') ORDER BY c.relname`
+ const finals=await db.$queryRaw<any[]>`SELECT pg_column_size(f) AS "rowBytes",pg_column_size(f.facts_cipher) AS "factsBytes",octet_length(f.facts_cipher) AS "factsTextBytes",pg_column_size(f.raw_cipher) AS "rawBytes",octet_length(f.raw_cipher) AS "rawTextBytes",COALESCE(pg_column_size(f.feedback_cipher),0) AS "feedbackBytes",COALESCE(octet_length(f.feedback_cipher),0) AS "feedbackTextBytes" FROM composite_attempt_finals f WHERE f.composite_id=${fixture.compositeId}`
+ const parents=await db.$queryRaw<any[]>`SELECT status::text,pg_column_size(p) AS "rowBytes",COALESCE(pg_column_size(p.training_content_binding),0) AS "contentBindingBytes",COALESCE(pg_column_size(p.training_feedback_snapshot),0) AS "feedbackSnapshotBytes",COALESCE(pg_column_size(p.training_reference_binding),0) AS "referenceBytes",COALESCE(pg_column_size(p.unit_seeds_encrypted),0) AS "unitSeedsBytes" FROM composite_assessment_attempts p WHERE p.composite_assessment_id=${fixture.compositeId}`
+ const templates=await db.$queryRaw<any[]>`SELECT template_hash AS hash,template_kind AS kind,pg_column_size(t) AS "rowBytes",pg_column_size(payload_encrypted) AS "payloadBytes",plaintext_bytes AS "plaintextBytes" FROM assessment_public_templates t ORDER BY template_hash`
+ const tokens=fixture.tokenId?await db.$queryRaw<any[]>`SELECT t.id,t.used_count AS base,pg_column_size(t) AS "tokenRowBytes",COUNT(s.shard)::int AS buckets,COALESCE(SUM(s.used_count),0)::bigint AS uses,COALESCE(SUM(pg_column_size(s)),0)::bigint AS "shardRowBytes" FROM composite_assessment_access_tokens t LEFT JOIN composite_access_token_usage_shards s ON s.token_id=t.id WHERE t.id=${fixture.tokenId} GROUP BY t.id`:[]
+ const settings=await db.$queryRaw<any[]>`SELECT current_setting('server_version') AS version,current_setting('shared_buffers') AS "sharedBuffers",current_setting('block_size') AS "blockSize",current_setting('work_mem') AS "workMem",current_setting('max_connections') AS "maxConnections",current_setting('jit') AS jit`
+ writeFileSync(out,JSON.stringify({scope:'Same-publication row storage plus global relation allocation; allocated bytes include free pages, indexes and TOAST',compositeId:fixture.compositeId,relations,finals,parents,templates,tokens,settings},(_k,v)=>typeof v==='bigint'?Number(v):v,2))
+}
+main().finally(()=>db.$disconnect()).catch(error=>{console.error(error);process.exitCode=1})

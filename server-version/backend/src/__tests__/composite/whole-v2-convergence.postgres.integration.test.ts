@@ -1,9 +1,10 @@
+import { writeFileSync } from 'node:fs'
 import { createHash, randomUUID } from 'node:crypto'
 import type { PrismaClient } from '@prisma/client'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { prisma as appPrisma } from '../../config/database'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
-import { commitCompositeWholeFinal } from '../../modules/assessment-runtime/composite-final.writer'
+import { commitCompositeWholeFinal, prepareCompositeWholeFinal } from '../../modules/assessment-runtime/composite-final.writer'
 import {
   publicTemplates,
   publicTemplatesForDatabase,
@@ -63,9 +64,10 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
     items: [{ itemKey, prompt: '问题', required: true, reverse: false, dimensionKeys: ['total'] }],
   })
 
-  async function createGrantedLibraryScale(title: string, itemKey: string): Promise<string> {
+  async function createGrantedLibraryScale(title: string, itemKey: string, size = 1): Promise<string> {
     const metadata = makeMetadata(title)
     const definition = makeDefinition(itemKey)
+    if(size>1)definition.items=Array.from({length:size},(_,i)=>({...definition.items[0],itemKey:itemKey+'_'+i,prompt:'Synthetic reflection '+i}))
     const compiled = compileResearchScale(metadata.title, definition)
     const release = await db.$transaction(tx => publishContentRelease(
       tx,
@@ -211,6 +213,20 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
       await db.$disconnect()
     }
   })
+
+  it.skipIf(!process.env.ANONYMOUS_303_FIXTURE)('prepares an actual 303-question / 9-unit anonymous Training publication for matched START benchmarks',async()=>{
+    const runtime=await import('../../modules/composite/composite.service')
+    const comp=await db.compositeAssessment.create({data:{code:'anon-303-'+randomUUID(),name:'Synthetic full anonymous START',createdBy:teacherId,
+      productKind:'QUESTIONNAIRE',questionnaireType:'COURSE',status:'DRAFT',publicEnabled:true,expiresAt:new Date(Date.now()+7200000),maxAttempts:1,questionnaireCourses:{create:{courseId}}}})
+    for(let i=0;i<9;i++){
+      const scaleId=await createGrantedLibraryScale('Synthetic anonymous 303 source '+i,'q',i<6?34:33)
+      await runtime.addItem(teacherId,'TEACHER',comp.id,{type:'SCALE',scaleId,required:true})
+    }
+    await runtime.publishComposite(teacherId,'TEACHER',comp.id)
+    const token=await runtime.createAccessTokenForComposite(teacherId,'TEACHER',comp.id,new Date(Date.now()+3600000).toISOString(),0)
+    expect(token.maxUses).toBe(0)
+    writeFileSync(process.env.ANONYMOUS_303_FIXTURE!,JSON.stringify({compositeId:comp.id,tokenId:token.id,token:token.token,questions:303,units:9}))
+  },120000)
 
   it('inserts TRAINING_CONTENT_BINDING_PLAN under DB CHECK constraint, hydrates cold-cache compact V2, and enforces all 3 PostgreSQL triggers', async () => {
     const comp = await db.compositeAssessment.create({
@@ -380,7 +396,7 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
     })
     const querySpy = vi.fn(db.$queryRaw.bind(db))
     const coldStore = publicTemplatesForDatabase({ $queryRaw: querySpy } as any)
-    const getSpy = vi.spyOn(publicTemplates, 'get').mockReturnValueOnce(undefined)
+    const getSpy = vi.spyOn(publicTemplates, 'get').mockReturnValue(undefined)
     let coldHydrated: any
     try {
       coldHydrated = await resolveTrainingContentBindingParent(
@@ -534,6 +550,8 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
         questionnaireType: 'COURSE',
         status: 'DRAFT',
         maxAttempts: 1,
+        trainingFeedbackPolicy:{schemaVersion:1,mode:'IMMEDIATE'},
+        trainingFeedbackPolicyHash:canonicalHash({schemaVersion:1,mode:'IMMEDIATE'}),
         questionnaireCourses: { create: { courseId } },
       },
     })
@@ -564,6 +582,13 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
     const dbAttempt = await db.compositeAssessmentAttempt.findUniqueOrThrow({
       where: { id: started.attempt.id },
     })
+    expect(dbAttempt.trainingFeedbackSnapshot).toMatchObject({schemaVersion:2})
+    expect(dbAttempt.trainingFeedbackSnapshot).not.toHaveProperty('policy')
+    expect(dbAttempt.trainingFeedbackSnapshot).not.toHaveProperty('publicationIdentity')
+    const {readTrainingFeedbackSnapshot}=await import('../../modules/composite/training-feedback-binding')
+    const fullFeedback=readTrainingFeedbackSnapshot({...dbAttempt,compositeAssessment:published})!
+    expect(canonicalHash(fullFeedback)).toBe(dbAttempt.trainingFeedbackSnapshotHash)
+    expect(Buffer.byteLength(JSON.stringify(dbAttempt.trainingFeedbackSnapshot))).toBeLessThan(Buffer.byteLength(JSON.stringify(fullFeedback)))
     expect(dbAttempt.publicationHash).toMatch(/^[a-f0-9]{64}$/)
     expect(dbAttempt.trainingContentBinding).toMatchObject({
       schemaVersion: 2,
@@ -582,7 +607,7 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
 
     const slot = authorized.plan.slots.find(s => s.unitType === 'SCALE')!
     const submissionId = `v2-e2e-${randomUUID()}`
-    const finalRes = await db.$transaction(tx => commitCompositeWholeFinal(tx, {
+    const finalInput = {
       ...authorized,
       submit: {
         submissionId,
@@ -591,13 +616,16 @@ suite('WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL /
         slotSetHash: authorized.plan.slotSetHash,
         units: {
           [slot.slotKey]: {
-            unitType: 'SCALE',
+            unitType: 'SCALE' as const,
             definitionHash: slot.definitionHash,
             answers: [{ itemCode: 'item_1', responseValue: 'two' }],
           },
         },
       },
-    }))
+    }
+    const prepared = await prepareCompositeWholeFinal(finalInput, db)
+    expect(prepared).toBeDefined()
+    const finalRes = await db.$transaction(tx => commitCompositeWholeFinal(tx, finalInput, prepared))
     expect(finalRes.status).toBe('COMPLETED')
     expect(finalRes.replayed).toBe(false)
 

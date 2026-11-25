@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
-import { evaluateTrainingFeedbackForAttempt, freezeTrainingFeedbackSnapshot, prepareTrainingFeedbackBinding,
+import { evaluateTrainingFeedbackForAttempt, compactTrainingFeedbackSnapshot, freezeTrainingFeedbackSnapshot, prepareTrainingFeedbackBinding,
   readTrainingFeedbackSnapshot, trainingFeedbackAttemptSelect, type TrainingFeedbackAttempt } from '../../modules/composite/training-feedback-binding'
 import { trainingRoundPublicationIdentity } from '../../modules/composite/training-public-round'
 const now = new Date('2026-10-19T05:00:00.000Z')
@@ -22,6 +22,22 @@ function fixture(policy: unknown = scheduled, roundId: string | null = null): Tr
 }
 const evaluate = (attempt: TrainingFeedbackAttempt, extra: { now?: Date; reportReady?: boolean } = {}) => evaluateTrainingFeedbackForAttempt(attempt, { now, ...extra })
 describe('Training feedback immutable binding and loaded-attempt evaluator', () => {
+  it.each([null, 'round'])('reconstructs a compact snapshot from the immutable publication with the original hash (%s)', roundId => {
+    const attempt = fixture(scheduled, roundId)
+    const full = readTrainingFeedbackSnapshot(attempt)!
+    const compact = compactTrainingFeedbackSnapshot(full)
+    expect(compact).not.toHaveProperty('policy')
+    expect(compact).not.toHaveProperty('publicationIdentity')
+    expect(Buffer.byteLength(JSON.stringify(compact))).toBeLessThan(Buffer.byteLength(JSON.stringify(full)))
+    const saved = {...attempt,trainingFeedbackSnapshot:JSON.parse(JSON.stringify(compact))}
+    expect(readTrainingFeedbackSnapshot(saved)).toEqual(full)
+    expect(evaluate(saved)).toEqual(evaluate(attempt))
+    for (const change of [{publicationHash:'0'.repeat(64)}, {policyHash:'0'.repeat(64)}, {courseId:'other'}, {policy:immediate}]) {
+      expect(evaluate({...saved,trainingFeedbackSnapshot:{...compact,...change}}).state).toBe('UNAVAILABLE')
+    }
+    expect(evaluate({...saved,compositeAssessment:{...saved.compositeAssessment,trainingFeedbackPolicy:immediate}}).state).toBe('UNAVAILABLE')
+  })
+
   it('keeps historical absence on old whole-completed semantics even with no readiness metadata', () => {
     expect(evaluate({ status: 'COMPLETED' })).toEqual({ configured: false, allowed: true, state: 'AVAILABLE', releaseAt: null })
     for (const status of ['IN_PROGRESS', 'ABANDONED', undefined]) expect(evaluate({ status }).allowed).toBe(false)
