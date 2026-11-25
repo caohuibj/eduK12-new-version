@@ -1,0 +1,50 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/composite/whole-v2-convergence.postgres.integration.test.ts > WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL / real PostgreSQL > inserts TRAINING_CONTENT_BINDING_PLAN under DB CHECK constraint, hydrates cold-cache compact V2, and enforces all 3 PostgreSQL triggers
+prisma:error 
+Invalid `prisma.$executeRaw()` invocation:
+
+
+Raw query failed. Code: `P0001`. Message: `ERROR: Training attempt compact binding template not committed`
+
+stdout | src/__tests__/composite/whole-v2-convergence.postgres.integration.test.ts > WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL / real PostgreSQL > inserts TRAINING_CONTENT_BINDING_PLAN under DB CHECK constraint, hydrates cold-cache compact V2, and enforces all 3 PostgreSQL triggers
+prisma:error 
+Invalid `prisma.$executeRaw()` invocation:
+
+
+Raw query failed. Code: `P0001`. Message: `ERROR: Training content binding publication mismatch`
+
+stdout | src/__tests__/composite/whole-v2-convergence.postgres.integration.test.ts > WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL / real PostgreSQL > inserts TRAINING_CONTENT_BINDING_PLAN under DB CHECK constraint, hydrates cold-cache compact V2, and enforces all 3 PostgreSQL triggers
+prisma:error 
+Invalid `prisma.$executeRaw()` invocation:
+
+
+Raw query failed. Code: `P0001`. Message: `ERROR: Training content binding publication mismatch`
+
+stdout | src/__tests__/composite/whole-v2-convergence.postgres.integration.test.ts > WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL / real PostgreSQL
+[2026-11-24T23:58:48.745Z] [INFO] 队列已关闭
+
+ ❯ src/__tests__/composite/whole-v2-convergence.postgres.integration.test.ts (3 tests | 1 failed) 1515ms
+     × inserts TRAINING_CONTENT_BINDING_PLAN under DB CHECK constraint, hydrates cold-cache compact V2, and enforces all 3 PostgreSQL triggers 42ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/composite/whole-v2-convergence.postgres.integration.test.ts > WHOLE_V2 convergence CHECK constraint, DB trigger parity & START->FINAL / real PostgreSQL > inserts TRAINING_CONTENT_BINDING_PLAN under DB CHECK constraint, hydrates cold-cache compact V2, and enforces all 3 PostgreSQL triggers
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+ ❯ src/__tests__/composite/whole-v2-convergence.postgres.integration.test.ts:394:22
+    392|       getSpy.mockRestore()
+    393|     }
+    394|     expect(querySpy).toHaveBeenCalledTimes(1)
+       |                      ^
+    395|     expect(coldHydrated.trainingContentBinding).toEqual(expanded1)
+    396|     expect(canonicalHash(coldHydrated.trainingContentBinding)).toBe(ra…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  08:58:34
+   Duration  13.90s (transform 7.66s, setup 0ms, import 12.23s, tests 1.52s, environment 0ms)
+

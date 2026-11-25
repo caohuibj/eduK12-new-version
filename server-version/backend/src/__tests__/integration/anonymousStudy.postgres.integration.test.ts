@@ -7,6 +7,7 @@ import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from './integrati
 import * as study from '../../modules/anonymous-study/service'
 import * as composite from '../../modules/composite/composite.service'
 import {ensureCompositeFormSections,submitCompositeFormSectionFinal} from '../../modules/composite/final-submit.service'
+import {claimAnonymousTokenUsage} from '../../modules/composite/anonymous-token-usage'
 import {hashRecoveryToken} from '../../services/anonymousAccess'
 import {publicAnonymousStudyRouter} from '../../modules/anonymous-study/routes'
 import {csrfProtection} from '../../middleware/csrf'
@@ -48,6 +49,7 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   await prisma.$disconnect()
  })
 
+ const tokenUses=async(id:string)=>(await composite.listAccessTokens(owner,'TEACHER',cid)).find((t:any)=>t.id===id)!.usedCount
  const token=(limit=0)=>composite.createAccessTokenForComposite(owner,'TEACHER',cid,new Date(Date.now()+86400000).toISOString(),limit)
  const complete=async(a:{attemptId:string;recoveryToken:string},answer:string)=>{
   const state=await composite.getAttemptState(a.attemptId,{recoveryTokenHash:hashRecoveryToken(a.recoveryToken)})
@@ -67,7 +69,7 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   const [a,b]=await Promise.all([study.startStudyWave(s.id,w1.id,p.credential),study.startStudyWave(s.id,w1.id,p.credential)])
   await expect(composite.restartPublicAttempt(a.attemptId,hashRecoveryToken('other'))).rejects.toMatchObject({statusCode:403})
   await expect(composite.restartPublicAttempt(a.attemptId,hashRecoveryToken(a.recoveryToken))).rejects.toMatchObject({statusCode:409})
-  expect(a).toEqual(b);expect((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t1.id}})).usedCount).toBe(1)
+  expect(a).toEqual(b);expect(await tokenUses(t1.id)).toBe(1)
   expect((await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:a.attemptId}})).userId).toBeNull()
   await complete(a,'WAVE_ONE_B')
   const guest=await composite.startPublicAttempt(t1.token);await complete({attemptId:guest.attempt.id,recoveryToken:guest.recoveryToken!},'WAVE_ONE_A')
@@ -91,7 +93,7 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   await expect(composite.startPublicAttempt(t1.token)).rejects.toMatchObject({statusCode:403})
   const restoredGuest=await composite.startPublicAttempt(t1.token,guest.recoveryToken!)
   expect(restoredGuest.attempt).toMatchObject({id:guest.attempt.id,status:'COMPLETED'})
-  expect((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t1.id}})).usedCount).toBe(2)
+  expect(await tokenUses(t1.id)).toBe(2)
   expect((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t2.id}})).isActive).toBe(false)
   expect((await composite.getPublicCompositeInfo(unrelated.token)).id).toBe(cid)
   expect((await composite.getPublicCompositeInfo(otherWaveToken.token)).studyEntryPath).toBe(otherWave.entryPath)
@@ -125,7 +127,7 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   const p=await study.joinStudy(w.id,t.token,true),q=await study.joinStudy(w.id,t.token,true)
   const outcomes=await Promise.allSettled([study.startStudyWave(s.id,w.id,p.credential),study.startStudyWave(s.id,w.id,q.credential)])
   expect(outcomes.filter(r=>r.status==='fulfilled')).toHaveLength(1)
-  expect((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})).usedCount).toBe(1)
+  expect(await tokenUses(t.id)).toBe(1)
   await prisma.compositeAssessmentAccessToken.update({where:{id:t.id},data:{expiresAt:new Date(0)}})
   expect((await study.publicWaveInfo(w.id,t.token)).accepting).toBe(false)
   await expect(study.joinStudy(w.id,t.token,true)).rejects.toMatchObject({statusCode:403})
@@ -203,7 +205,7 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
    // Queue rejections never enter the gate, so they have no admitted-wait span.
    expect(phaseCount('anonymous.start.gate_wait_ms')).toBe(admittedBefore)
    // The rejected start must not have claimed the token or created an attempt.
-   expect((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})).usedCount).toBe(0)
+   expect(await tokenUses(t.id)).toBe(0)
   } finally {
    releaseGate?.()
    await holder
@@ -282,12 +284,37 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   const results=await Promise.all(participants.map(p=>study.startStudyWave(s.id,w.id,p.credential).then(v=>({ok:true as const,v})).catch(e=>({ok:false as const,e}))))
   const succeeded=results.filter(r=>r.ok)
   const rejected=results.filter(r=>!r.ok)
-  const used=(await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})).usedCount
+  const used=await tokenUses(t.id)
   expect(succeeded).toHaveLength(maxUses)
   expect(used).toBe(maxUses)
   expect(rejected).toHaveLength(participants.length-maxUses)
   expect(rejected.every(r=>((r as {e:any}).e?.statusCode===409)||((r as {e:any}).e?.code==='ASSESSMENT_START_BUSY'))).toBe(true)
  })
+ it('retains historical shard usage when deciding whether a link may bind a new study wave',async()=>{
+  const t=await token(),s=await study.createStudy(owner,'Used unlimited token')
+  await prisma.$transaction(tx=>claimAnonymousTokenUsage(tx,t,'synthetic-historical-usage'))
+  await expect(study.addWave(owner,'TEACHER',s.id,{compositeId:cid,tokenId:t.id,title:'Must reject'})).rejects.toMatchObject({statusCode:404})
+  expect(await tokenUses(t.id)).toBe(1)
+ })
+ it('uses a fresh shard snapshot after waiting for the token binding lock',async()=>{
+  const t=await token(),s=await study.createStudy(owner,'Token binding race')
+  let locked!:()=>void,release!:()=>void
+  const ready=new Promise<void>(r=>locked=r),wait=new Promise<void>(r=>release=r)
+  const held=prisma.$transaction(async tx=>{await claimAnonymousTokenUsage(tx,t,'synthetic-binding-race');locked();await wait},{timeout:10000})
+  await ready
+  const binding=study.addWave(owner,'TEACHER',s.id,{compositeId:cid,tokenId:t.id,title:'Must wait and reject'}).then(()=>null,error=>error)
+  try {
+   let waiting=false
+   for(let i=0;i<50;i++){
+    const [row]=await prisma.$queryRaw<Array<{waiting:boolean}>>`SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND wait_event_type='Lock' AND query LIKE '%FOR UPDATE OF t%') AS waiting`
+    if(row.waiting){waiting=true;break}
+    await new Promise(r=>setTimeout(r,10))
+   }
+   expect(waiting).toBe(true)
+  } finally {release();await held}
+  expect(await binding).toMatchObject({statusCode:404})
+  expect(await tokenUses(t.id)).toBe(1)
+ },15000)
  it('rolls back losing plain-link starts and never oversells the last uses',async()=>{
   const t=await token(3)
   const results=await Promise.allSettled(Array.from({length:8},()=>composite.startPublicAttempt(t.token)))
@@ -295,7 +322,7 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   const failures=results.filter(result=>result.status==='rejected') as PromiseRejectedResult[]
   expect(failures).toHaveLength(5)
   expect(failures.every(result=>result.reason?.statusCode===409)).toBe(true)
-  expect((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})).usedCount).toBe(3)
+  expect(await tokenUses(t.id)).toBe(3)
   expect(await prisma.compositeAssessmentAttempt.count({where:{accessTokenId:t.id}})).toBe(3)
  })
  it('honors the live token quota when its maximum is lowered during the final claim',async()=>{
@@ -358,7 +385,7 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   const error=await start
   expect(observed).toBe(true)
   expect(error?.statusCode).toBe(409)
-  expect((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})).usedCount).toBe(0)
+  expect(await tokenUses(t.id)).toBe(0)
   expect(await prisma.compositeAssessmentAttempt.count({where:{accessTokenId:t.id}})).toBe(0)
  },20000)
  it('rechecks a real study binding after a revocation during a batched read',async()=>{

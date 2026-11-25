@@ -439,11 +439,24 @@ describe('START freshlyCreated server distinction', () => {
       compositeAssessment: { id: 'comp-1', status: 'PUBLISHED', publicEnabled: true, opensAt: null, expiresAt: null, personalTracking: null },
     }
     mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue(openToken)
+    mocks.prisma.$queryRaw.mockResolvedValueOnce([])
     await assertPublicCompositeAdmission(tokenValue)
     expect(mocks.prisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
-    expect(mocks.prisma.$queryRaw).not.toHaveBeenCalled()
-    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({ ...openToken, maxUses: 1, usedCount: 1 })
+    expect(mocks.prisma.$queryRaw).toHaveBeenCalledTimes(1)
+    expect(mocks.prisma.$queryRaw.mock.calls[0][0].strings.join('?'))
+      .toContain('SUM(used_count)::bigint AS uses FROM composite_access_token_usage_shards')
+
+    mocks.prisma.$queryRaw.mockResolvedValueOnce([{ tokenId: openToken.id, uses: 9n }])
     await expect(assertPublicCompositeAdmission(tokenValue)).rejects.toMatchObject({ statusCode: 409 })
+
+    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({ ...openToken, maxUses: 1, usedCount: 1 })
+    mocks.prisma.$queryRaw.mockResolvedValueOnce([])
+    await expect(assertPublicCompositeAdmission(tokenValue)).rejects.toMatchObject({ statusCode: 409 })
+
+    mocks.prisma.$queryRaw.mockClear()
+    mocks.prisma.compositeAssessmentAccessToken.findUnique.mockResolvedValue({ ...openToken, maxUses: 0 })
+    await assertPublicCompositeAdmission(tokenValue)
+    expect(mocks.prisma.$queryRaw).not.toHaveBeenCalled()
     expect(mocks.prisma.compositeAssessment.findUnique).not.toHaveBeenCalled()
   })
   it('rejects a forged recovery proof before publication preload, admission, or memory sampling', async () => {

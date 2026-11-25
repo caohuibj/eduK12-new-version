@@ -8,8 +8,7 @@ import {
   buildCompositePublicationPlan,
 } from '../../modules/assessment-runtime/composite-publication-plan'
 import { commitCompositeWholeFinal } from '../../modules/assessment-runtime/composite-final.writer'
-import * as compositeFinalBridge from '../../modules/assessment-runtime/composite-final.bridge'
-import { decryptCompactField } from '../../modules/assessment-runtime/compact-field-codec'
+import { decryptCompactField, encryptCompactField } from '../../modules/assessment-runtime/compact-field-codec'
 import {
   createPublicTemplateStore,
   publicTemplates,
@@ -506,6 +505,7 @@ describe('Phase 2 WHOLE_V2 storage & hot-path convergence', () => {
       receiptOnly: false,
       contentState: null,
       preMaterializedReport: null,
+      finalFeedbackCipher: null as string | null,
       parentId,
       parentStatus: 'COMPLETED',
       attemptEpoch: 1,
@@ -581,7 +581,17 @@ describe('Phase 2 WHOLE_V2 storage & hot-path convergence', () => {
       units: [{ blockId: 'blk-1', kind: 'SCALE', title: 'Standard Scale', state: 'READY' as const }],
       _v2Verify: { policyHash, manifestHash, releaseIds: [relId] },
     }
-    vi.spyOn(compositeFinalBridge, 'tryReadCompositeFinalFeedback').mockResolvedValue(cachedFeedback)
+    ownRow.finalFeedbackCipher = encryptCompactField(cachedFeedback)
+    const deferredRead = vi.spyOn(prisma, '$queryRaw').mockResolvedValue([{
+      frozenSlots: null,
+      trainingContentBindingHash: null,
+      trainingReferenceBindingHash: null,
+      trainingContentInterpretationHash: null,
+      aggregateInputHash: null,
+      trainingContentBinding: null,
+      trainingReferenceBinding: null,
+      trainingContentInterpretationEncrypted: null,
+    }])
     const batchSpy = vi.spyOn(measurementRepo, 'getContentReleaseBatch').mockResolvedValue(
       new Map([[relId, { releaseId: relId, status: 'PUBLISHED' } as any]]),
     )
@@ -596,6 +606,7 @@ describe('Phase 2 WHOLE_V2 storage & hot-path convergence', () => {
     expect(batchSpy).toHaveBeenCalledTimes(1)
     expect(batchSpy.mock.calls[0]?.[1]).toEqual([relId])
     expect(declaredSpy).not.toHaveBeenCalled()
+    expect(deferredRead).not.toHaveBeenCalled()
     expect('_v2Verify' in resPublished).toBe(false)
     expect(resPublished.state).toBe('READY')
 
@@ -603,12 +614,13 @@ describe('Phase 2 WHOLE_V2 storage & hot-path convergence', () => {
     batchSpy.mockResolvedValueOnce(new Map([[relId, { releaseId: relId, status: 'REVOKED' } as any]]))
     const resRevoked = await readSchoolOrdinaryFeedback({ executionId: execId, actorUserId })
     expect(declaredSpy).toHaveBeenCalledTimes(1)
+    expect(deferredRead).toHaveBeenCalledTimes(1)
     expect(resRevoked.units[0]?.state).toBe('WITHHELD')
 
     // 3. Stale policyHash => invalidates cached feedback without even querying live releases
     batchSpy.mockClear()
     declaredSpy.mockClear()
-    vi.spyOn(compositeFinalBridge, 'tryReadCompositeFinalFeedback').mockResolvedValueOnce({
+    ownRow.finalFeedbackCipher = encryptCompactField({
       ...cachedFeedback,
       _v2Verify: { policyHash: sha('stale-policy'), manifestHash, releaseIds: [relId] },
     })
@@ -620,7 +632,7 @@ describe('Phase 2 WHOLE_V2 storage & hot-path convergence', () => {
     // 4. Pure native scale (releaseIds: []) => 0 release queries
     batchSpy.mockClear()
     declaredSpy.mockClear()
-    vi.spyOn(compositeFinalBridge, 'tryReadCompositeFinalFeedback').mockResolvedValueOnce({
+    ownRow.finalFeedbackCipher = encryptCompactField({
       ...cachedFeedback,
       _v2Verify: { policyHash, manifestHash, releaseIds: [] },
     })
@@ -740,6 +752,7 @@ describe('Phase 2 WHOLE_V2 storage & hot-path convergence', () => {
     expect(overrideYml).toContain('shared_buffers=256MB')
     expect(overrideYml).toContain('effective_cache_size=1024MB')
     expect(overrideYml).toContain('PRISMA_CONNECTION_POOL_SIZE: "3"')
-    expect(overrideYml).toContain('PRISMA_CONNECTION_POOL_SIZE: "2"')
+    expect(overrideYml).toMatch(/^  postgres:\n\s+cpus:[^\n]+\n\s+cpu_shares:[^\n]+\n\s+mem_limit: 1536m$/m)
+    expect(overrideYml).not.toMatch(/^  report-worker-2:/m)
   })
 })

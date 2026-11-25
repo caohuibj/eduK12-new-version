@@ -267,7 +267,7 @@ describe('whole-questionnaire optimization runtime caches & hashing', () => {
       warmStore.saveMany([{ kind: 'FROZEN_SLOT_PLAN', value: plan, precomputedHash: expectedHash }]),
     ).rejects.toThrow(/kind mismatch/)
 
-    // A fresh cold store with empty cache must still persist even if precomputedHash is supplied.
+    // A cold process recovers the already-committed row without encoding or appending it again.
     const coldStore = createPublicTemplateStore({ read, append })
     const [persistedHash] = await coldStore.saveMany([{
       kind: 'WHOLE_VALIDATION_PLAN',
@@ -275,7 +275,8 @@ describe('whole-questionnaire optimization runtime caches & hashing', () => {
       precomputedHash: expectedHash,
     }])
     expect(persistedHash).toBe(expectedHash)
-    expect(append).toHaveBeenCalledTimes(1)
+    expect(read).toHaveBeenCalledTimes(1)
+    expect(append).not.toHaveBeenCalled()
   })
 
   it('caches verified FSP2 slot set ciphertexts across loadFrozenActiveSlotSet calls and isolates key changes', async () => {

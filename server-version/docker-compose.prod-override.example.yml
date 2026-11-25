@@ -1,16 +1,15 @@
 # ============================================================
-# eduK12 / PTool — Verified 4C4G Production Compose Override Example (Secret-Free)
+# eduK12 / PTool — Candidate 4C4G Production Compose Override Example (Secret-Free)
 #
-# Preserves the verified 4C4G dual-backend + dual-worker production topology
-# (2026-11-24 WHOLE_V2 convergence pass) without credentials, tokens, or keys:
+# Candidate resource rebalance of the 4C4G dual-backend + single-worker production topology
+# (requires host acceptance) without credentials, tokens, or keys:
 #   - Symmetric APIs: `backend` & `backend-2` (cpus=2.25, 768m, heap=384M,
 #     pool=12, whole_submit_limit=9, statement_cache_size=80, idle=120s, max_conn=900s)
-#   - Dual Workers: `worker` (cpus=0.75, 512m, pool=3, concurrency=2) +
-#     `report-worker-2` (cpus=0.5, 256m, pool=2, concurrency=1), each at
+#   - One Worker: `worker` (cpus=0.75, 512m, pool=3, concurrency=2), at
 #     `MALLOC_ARENA_MAX=2`, `MALLOC_TRIM_THRESHOLD_=524288`,
 #     `statement_cache_size=64`, idle=180s
-#   - Postgres: cpus=2.5, 1280m (`effective_cache_size=1024MB`, `shared_buffers=256MB`,
-#     `jit=off`, `MALLOC_TRIM_THRESHOLD_=131072`, total app pools 12+12+3+2=29)
+#   - Postgres: cpus=2.5, 1536m (`effective_cache_size=1024MB`, `shared_buffers=256MB`,
+#     `jit=off`, `MALLOC_TRIM_THRESHOLD_=131072`, parent pools 12+12+3=27; one export child adds 3)
 #   - `#743` low-memory trickle is enabled ONLY in this production profile, keeping
 #     `server-version/docker-compose.yml` default-off for other environments.
 #
@@ -189,7 +188,7 @@ services:
   postgres:
     cpus: 2.5
     cpu_shares: 1024
-    mem_limit: 1280m
+    mem_limit: 1536m
     memswap_limit: 1792m
     environment:
       MALLOC_ARENA_MAX: "2"
@@ -292,30 +291,6 @@ services:
       MALLOC_TRIM_THRESHOLD_: "524288"
       ASSESSMENT_REPORT_WORKER_CONCURRENCY: "2"
       ASSESSMENT_REPORT_COMPRESSION_ENABLED: "true"
-
-  report-worker-2:
-    <<: *prod-api-hardening
-    image: server-version-backend:latest
-    command: ["node", "dist/workers/main.js"]
-    cpus: 0.5
-    cpu_shares: 256
-    mem_limit: 256m
-    stop_grace_period: 45s
-    environment:
-      <<: *prod-shared-env
-      BACKGROUND_WORKERS_ENABLED: "true"
-      PRISMA_CONNECTION_POOL_SIZE: "2"
-      PRISMA_STATEMENT_CACHE_SIZE: "64"
-      PRISMA_MAX_IDLE_CONNECTION_LIFETIME_SECONDS: "180"
-      PRISMA_MAX_CONNECTION_LIFETIME_SECONDS: "900"
-      NODE_OPTIONS: "--max-old-space-size=192 --max-semi-space-size=16"
-      MALLOC_ARENA_MAX: "2"
-      MALLOC_TRIM_THRESHOLD_: "524288"
-      ASSESSMENT_REPORT_WORKER_CONCURRENCY: "1"
-      ASSESSMENT_REPORT_COMPRESSION_ENABLED: "true"
-    volumes: *prod-app-volumes
-    depends_on: *prod-app-depends-on
-    restart: unless-stopped
 
   frontend:
     cpus: 0.5

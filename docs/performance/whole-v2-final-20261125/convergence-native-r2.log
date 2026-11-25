@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 2 skipped (3)
+   Start at  08:59:50
+   Duration  13.18s (transform 7.29s, setup 0ms, import 12.66s, tests 389ms, environment 0ms)
+

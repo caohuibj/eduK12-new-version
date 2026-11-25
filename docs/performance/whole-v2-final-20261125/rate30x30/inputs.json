@@ -1,0 +1,8 @@
+{
+  "base": "9b00c20d0f26fde0b3727b4ad2b46cad9411e424",
+  "applicationAndPriorHarnessUnchanged": true,
+  "reusedValidationInputs": "../inputs.json",
+  "arrivalClientSha256": "4b49908afe87b4bf6efedfc603a7b1900d6aa3997b06c2100d5b7baee6c23256",
+  "fixtureSha256": "466ff1403354e3dac60b8ff802e7cc2662065a523006ff4c1bca2b683ed5d475",
+  "schemaSha256": "ba868ba477274eefa3c83b3d922e79731f9e41760fe9b53ddc691415cc04eae7"
+}

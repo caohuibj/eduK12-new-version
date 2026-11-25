@@ -1,0 +1,23 @@
+{
+  "base": "9b00c20d0f26fde0b3727b4ad2b46cad9411e424",
+  "sourceSha256": {
+    "server-version/backend/scripts/benchmark-whole-v2-client.mjs": "e5597b6edadc71d7238eadb6b1e007dd8565b46ba005b5eca2b4c58fc37c3284",
+    "server-version/backend/scripts/benchmark-whole-v2-final.ts": "6841ae7a1aa938d0a2f10d1d44b7df535cf865d6ec3f1443d33953e49b356e08",
+    "server-version/backend/scripts/verify-whole-v2-benchmark.ts": "23cc8897792ef230036ddcb870152f6e9bb53b9838c8bfee30ffc2b6ff33f7c5",
+    "server-version/backend/src/__tests__/assessment-runtime/composite-final.writer.test.ts": "ae8b9fb5b74fc0e39e5c317ebb6d516264d186e68751c6cf0e6b57e10028c0e6",
+    "server-version/backend/src/__tests__/assessment-runtime/public-template-final-cache.test.ts": "0fa28ac2c39750573182e24751f3e04dbdc875759014192916587e4f68800c36",
+    "server-version/backend/src/__tests__/assessment-runtime/slot-plan-transaction.test.ts": "f4ee7493e2d0e7c87814b0de85de9f1d775315137bdc9c9e416eb84cfc7e4f12",
+    "server-version/backend/src/__tests__/composite/whole-template-runtime-cache.test.ts": "3045592bf4349c532c78289e23f9e3a68ef61b0324002da2334a444a75ac7ca3",
+    "server-version/backend/src/__tests__/composite/whole-v2-convergence.postgres.integration.test.ts": "37cfd80dae7b77872e86aa0ca192650347319342c387b07e371255436629b502",
+    "server-version/backend/src/__tests__/services/runtimeObservability.test.ts": "79cd32189059ff035c95b384dfadd63c4690c25389173cc4f8963463043bc94a",
+    "server-version/backend/src/modules/assessment-runtime/compact-field-codec.ts": "20f146275793fae8562e14479f05009294504e1a7e2f4a0bf313e4e409fa4607",
+    "server-version/backend/src/modules/assessment-runtime/composite-final.writer.ts": "c98c72cc18896cd696818f5f1e85c9a6c10691979b732d09e159b34fb982df5e",
+    "server-version/backend/src/modules/assessment-runtime/public-templates.ts": "210f52e96a4d2deaf6f9b5e6afcc2b72b49128dc7db5df6111d55d5246b873f1",
+    "server-version/backend/src/modules/composite/whole-v2.access.ts": "81abc088450d1980c080ef2c3275729a593437db1a85b56f9167131b29fd789c",
+    "server-version/backend/src/modules/composite/whole-v2.routes.ts": "cd67f0fb4f262ceb8f35cc3ba3b7051d41f6c60c44c3f73e946228ec92e63c3c",
+    "server-version/backend/src/services/runtimeObservability.ts": "9d4d8add22e21e5284f4567c05e9e8c347307db6cf3b7d7c47e2242d96250434"
+  },
+  "fixtureSha256": "d53cc4ca28661573bed7722bed2e9a98a937cb53277519fa61357c5482750184",
+  "databaseSnapshotSha256": "7330d37abe727fea86dee4760dbfc8cdda014e6a030a5e84406d9d7c8226a2d5",
+  "trackedDiffSha256": "db10f0d49e018339a79a9d07c32431719f92b03a1d04e07082c8fd7814179d71"
+}

@@ -1,5 +1,7 @@
 import type { Request, Response, Router, RequestHandler } from 'express'
 import { Prisma } from '@prisma/client'
+import { traceAssessmentPhase, tracePrismaInteractiveTransaction, assessmentTimelineSpan, withQueryRawLabel } from '../../services/runtimeObservability'
+import { withCommittedPublicTemplates } from '../assessment-runtime/public-templates'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { error, instrumentError, success } from '../../utils/response'
@@ -14,6 +16,7 @@ import {
 } from '../assessment-runtime/composite-checkpoint.service'
 import {
   commitCompositeWholeFinal,
+  prepareCompositeWholeFinal,
   validateCompositeCheckpointLockUnit,
   wholeV2SubmitSchema,
   type CommitCompositeWholeFinalInput,
@@ -94,7 +97,7 @@ export interface WholeV2RouteAdapter {
   /** Optional base path prefix before `/:attemptId/...` (default `''`). */
   prefix?: string
   /** Authorize attempt ownership and resolve its frozen CompositePublicationPlanV1. */
-  authorizeAttempt: (req: Request) => Promise<AuthorizedWholeV2Attempt>
+  authorizeAttempt: (req: Request, res?: Response) => Promise<AuthorizedWholeV2Attempt>
 }
 
 function respondError(res: Response, err: unknown, fallbackMessage: string) {
@@ -214,7 +217,7 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
 
   router.get(`${base}/v2/whole`, ...mw, async (req: Request, res: Response) => {
     try {
-      const ctx = await adapter.authorizeAttempt(req)
+      const ctx = await adapter.authorizeAttempt(req, res)
       const unitSeeds = ctx.attempt.unitSeedsEncrypted
         ? decodeCompositeUnitSeeds(ctx.attempt.unitSeedsEncrypted).seeds
         : null
@@ -301,7 +304,7 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
 
   router.get(`${base}/v2/whole/template/:templateHash`, ...mw, async (req: Request, res: Response) => {
     try {
-      const ctx = await adapter.authorizeAttempt(req)
+      const ctx = await adapter.authorizeAttempt(req, res)
       const plan = req.params.templateHash === ctx.plan.publicationHash
         ? ctx.plan
         : await loadCompositePublicationPlan(req.params.templateHash)
@@ -317,7 +320,7 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
 
   router.get(`${base}/v2/checkpoint`, ...mw, async (req: Request, res: Response) => {
     try {
-      const ctx = await adapter.authorizeAttempt(req)
+      const ctx = await adapter.authorizeAttempt(req, res)
       const snapshot = await readCompositeCheckpoint(prisma, {
         attemptId: ctx.attempt.id,
         attemptEpoch: ctx.attempt.attemptEpoch,
@@ -331,7 +334,7 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
 
   router.put(`${base}/v2/checkpoint`, ...mw, async (req: Request, res: Response) => {
     try {
-      const ctx = await adapter.authorizeAttempt(req)
+      const ctx = await adapter.authorizeAttempt(req, res)
       const parsed = checkpointPutSchema.parse(req.body)
       if (parsed.attemptEpoch !== ctx.attempt.attemptEpoch) {
         return instrumentError(res, 'STALE_ATTEMPT', '作答版本已变更', 409)
@@ -382,7 +385,7 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
 
   router.delete(`${base}/v2/checkpoint`, ...mw, async (req: Request, res: Response) => {
     try {
-      const ctx = await adapter.authorizeAttempt(req)
+      const ctx = await adapter.authorizeAttempt(req, res)
       const rawRev = req.query.expectedRevision
       const expectedRevision = typeof rawRev === 'string' && /^\d+$/.test(rawRev) ? Number(rawRev) : undefined
       const result = await prisma.$transaction(tx => deleteUnlockedCompositeCheckpoint(tx, {
@@ -403,7 +406,7 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
     : [...mw, ...(adapter.submitMiddleware ?? [])]
   router.post(`${base}/v2/whole/submit`, ...submitMw, async (req: Request, res: Response) => {
     try {
-      const ctx = await adapter.authorizeAttempt(req)
+      const ctx = await adapter.authorizeAttempt(req, res)
       const parsedSubmit = wholeV2SubmitSchema.parse(req.body)
       // Enforce frozen timing governance at the server submit boundary (P1-03):
       // when optional Scale timing is not explicitly enabled on this attempt,
@@ -429,18 +432,27 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
               }),
             ),
           }
+      const admissionQueuedAt = process.hrtime.bigint()
       const receipt = await withWholeSubmitAdmission(
-        () => prisma.$transaction(tx => commitCompositeWholeFinal(tx, {
-          attempt: ctx.attempt,
-          plan: ctx.plan,
-          submit,
-          educationRun: ctx.educationRun,
-          activeSlotKeys: ctx.activeSlotKeys,
-          verifyAuthorityInTx: ctx.verifyAuthorityInTx,
-          finalizeGovernanceInTx: ctx.finalizeGovernanceInTx,
-          buildFeedback: ctx.buildFeedback,
-          draftCheckpointEnabled: ctx.persistencePolicy?.draftCheckpointEnabled,
-        })),
+        async () => {
+          assessmentTimelineSpan('whole.v2.admission_wait', admissionQueuedAt)
+          const input: CommitCompositeWholeFinalInput = {
+            attempt: ctx.attempt,
+            plan: ctx.plan,
+            submit,
+            educationRun: ctx.educationRun,
+            activeSlotKeys: ctx.activeSlotKeys,
+            verifyAuthorityInTx: ctx.verifyAuthorityInTx,
+            finalizeGovernanceInTx: ctx.finalizeGovernanceInTx,
+            buildFeedback: ctx.buildFeedback,
+            draftCheckpointEnabled: ctx.persistencePolicy?.draftCheckpointEnabled,
+          }
+          const prepared = await traceAssessmentPhase('whole.v2.prepare', () => prepareCompositeWholeFinal(input))
+          return withCommittedPublicTemplates(
+            work => tracePrismaInteractiveTransaction('whole', prisma, work),
+            tx => withQueryRawLabel('whole.v2.sql', () => commitCompositeWholeFinal(tx, input, prepared)),
+          )
+        },
         ctx.audience === 'public',
       )
       return success(res, receipt)
@@ -451,7 +463,7 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
 
   router.get(`${base}/slots/:slotKey/assets/:assetId/content`, ...mw, async (req: Request, res: Response) => {
     try {
-      const ctx = await adapter.authorizeAttempt(req)
+      const ctx = await adapter.authorizeAttempt(req, res)
       if (ctx.activeSlotKeys && !ctx.activeSlotKeys.has(req.params.slotKey)) {
         return error(res, '无权访问未激活槽位的媒体资源', -1, 403)
       }
@@ -468,7 +480,7 @@ export function mountCompositeWholeV2Routes(router: Router, adapter: WholeV2Rout
 
   router.post(`${base}/slots/:slotKey/video-capabilities`, ...mw, async (req: Request, res: Response) => {
     try {
-      const ctx = await adapter.authorizeAttempt(req)
+      const ctx = await adapter.authorizeAttempt(req, res)
       if (ctx.activeSlotKeys && !ctx.activeSlotKeys.has(req.params.slotKey)) {
         return error(res, '无权访问未激活槽位的视频资源', -1, 403)
       }
