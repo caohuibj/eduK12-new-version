@@ -11,7 +11,15 @@ const request={requestId:'request',compositeId:'questionnaire',title:'Wave',expi
 beforeEach(()=>{
  vi.resetAllMocks();db.$transaction.mockImplementation((fn:any)=>fn(db));db.compositeAssessment.findUnique.mockResolvedValue(empty)
  composite.revealAccessToken.mockResolvedValue({token:'public-token'});composite.createAccessTokenForComposite.mockResolvedValue({id:'token',token:'public-token'})
- db.$queryRaw.mockImplementation((q:TemplateStringsArray)=>{const s=q.join('');return Promise.resolve(s.includes('FROM anonymous_studies s JOIN users')?[{id:'study',status:'ACTIVE'}]:s.includes('SELECT count(*)')?[{count:0}]:s.includes('FOR UPDATE OF t')?[{id:'token'}]:[])})
+ db.$queryRaw.mockImplementation(async (query: TemplateStringsArray) => {
+  const sql = query.join('')
+  if (sql.includes('FROM anonymous_studies s JOIN users')) return [{ id: 'study', status: 'ACTIVE' }]
+  if (sql.includes('SELECT count(*)')) return [{ count: 0 }]
+  if (sql.includes('FOR UPDATE OF t') || sql.includes('FROM composite_access_token_usage_shards')) {
+   return [{ id: 'token' }]
+  }
+  return []
+ })
 })
 describe('bidirectional Training flow / anonymous wave boundary',()=>{
  it.each(['trainingFlowDraft','trainingFlowFrozen','trainingFlowDigest','trainingVariantDigest'])('addWave rejects even incomplete marker %s under parent lock',async marker=>{
