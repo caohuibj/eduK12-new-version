@@ -179,7 +179,7 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
         total={PRACTICE_TRIAL_COUNT}
         passed={passed}
         onContinue={startFormal}
-        onRetry={startPractice}
+        onRetry={() => setPhase('instruction')}
       />
     )
   }

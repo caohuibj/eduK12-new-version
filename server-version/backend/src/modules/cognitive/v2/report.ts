@@ -58,7 +58,8 @@ export const referencesForReportReading = <T extends { metricKey?: unknown; scor
   })
 }
 
-const formatMapValue = (metricKey: string, value: unknown): string => {
+export const formatMapValue = (metricKey: string, value: unknown): string => {
+  if (value === null || value === undefined || value === '') return '—'
   const number = Number(value)
   if (!Number.isFinite(number)) return '—'
   if (/rate/i.test(metricKey)) return `${Math.round(number * 100)}%`

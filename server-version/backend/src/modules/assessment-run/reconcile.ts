@@ -95,6 +95,9 @@ export const reconcileLockedRunExecutionInTransaction = async (
   // assignment is either STARTED (and transitioned to COMPLETED in updated_rel)
   // or already COMPLETED with the exact same completion timestamp (e.g., when
   // finalizeCompositeAttemptUnifiedIfReady committed the assignment update first).
+  // Run timestamps carry a time zone. Prisma's assignment timestamps store UTC
+  // without a time zone, so compare and write them without the session offset.
+  const completedAt = attempt.completedAt.toISOString()
   const writeRows = await tx.$queryRaw<Array<{ changed: number }>>`
     WITH valid_rel AS (
       SELECT "id", "status"
@@ -103,13 +106,13 @@ export const reconcileLockedRunExecutionInTransaction = async (
         AND "policy_domain" = 'ORGANIZATION_RUN'
         AND (
           "status" = 'STARTED'
-          OR ("status" = 'COMPLETED' AND "completed_at" = ${attempt.completedAt})
+          OR ("status" = 'COMPLETED' AND "completed_at" = (${completedAt}::timestamptz AT TIME ZONE 'UTC'))
         )
       FOR UPDATE
     ),
     updated_exec AS (
       UPDATE "assessment_run_executions"
-      SET "status" = 'COMPLETED', "completed_at" = ${attempt.completedAt}, "updated_at" = transaction_timestamp()
+      SET "status" = 'COMPLETED', "completed_at" = ${completedAt}::timestamptz, "updated_at" = transaction_timestamp()
       WHERE "id" = ${execution.id}
         AND "status" <> 'COMPLETED'
         AND EXISTS (SELECT 1 FROM valid_rel)
@@ -117,7 +120,8 @@ export const reconcileLockedRunExecutionInTransaction = async (
     ),
     updated_rel AS (
       UPDATE "relational_assessment_assignments"
-      SET "status" = 'COMPLETED', "completed_at" = ${attempt.completedAt}, "updated_at" = transaction_timestamp()
+      SET "status" = 'COMPLETED', "completed_at" = ${completedAt}::timestamptz AT TIME ZONE 'UTC',
+        "updated_at" = transaction_timestamp() AT TIME ZONE 'UTC'
       WHERE "id" = ${execution.relationalAssignmentId}
         AND "status" = 'STARTED'
         AND "policy_domain" = 'ORGANIZATION_RUN'

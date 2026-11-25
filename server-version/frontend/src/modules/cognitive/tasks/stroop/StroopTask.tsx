@@ -99,12 +99,12 @@ export const StroopTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
     return () => window.removeEventListener('keydown', onKey)
   }, [handleResponse])
 
-  const startPractice = useCallback(() => { setPracticeIndex(0); setPracticeAttempt(1); setPracticeCorrect([]); setPracticeFeedback(null); setSubPhase('fixation'); setPhase('practice') }, [])
+  const startPractice = useCallback(() => { setPracticeIndex(0); setPracticeCorrect([]); setPracticeFeedback(null); setSubPhase('fixation'); setPhase('practice') }, [])
   const advancePractice = useCallback(() => {
     if (practiceIndex + 1 < PRACTICE_TRIALS.length) { setPracticeIndex((current) => current + 1); setPracticeFeedback(null); setSubPhase('fixation'); return }
     const passed = practiceCorrect.length === PRACTICE_TRIALS.length && practiceCorrect.every(Boolean)
     if (passed) { setFormalFeedback(null); setSubPhase('fixation'); setPhase('formal') }
-    else if (practiceAttempt < MAX_PRACTICE_ATTEMPTS) { setPracticeAttempt((current) => current + 1); setPracticeIndex(0); setPracticeCorrect([]); setPracticeFeedback(null); setSubPhase('fixation') }
+    else if (practiceAttempt < MAX_PRACTICE_ATTEMPTS) { setPracticeAttempt((current) => current + 1); setPhase('instruction') }
     else setPhase('blocked')
   }, [practiceIndex, practiceCorrect, practiceAttempt])
 

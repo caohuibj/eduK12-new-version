@@ -116,8 +116,6 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
     setPhase('practice')
   }
 
-  const startPractice = () => startPracticeStage('parity')
-
   const startFormal = () => {
     setFeedback(null)
     setSubPhase('cue')
@@ -246,7 +244,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
         title="任务转换"
         description={<>看到“奇偶”：奇数按左，偶数按右。看到“大小”：小于 5 按左，大于 5 按右。正式测验中规则会在试次之间切换，所以每一题都先看规则提示，再按对应规则作答。</>}
         hint="电脑使用左右方向键；触屏使用下方左右按键。先分别练习两条规则，再练习混合转换。"
-        onAction={startPractice}
+        onAction={() => startPracticeStage(practiceStage)}
       />
     )
   }
@@ -262,7 +260,7 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
         total={practiceTrials.length}
         passed={passed}
         onContinue={() => nextStage ? startPracticeStage(nextStage) : startFormal()}
-        onRetry={() => startPracticeStage(practiceStage)}
+        onRetry={() => setPhase('instruction')}
         continueLabel={nextStage ? `继续${stageLabel(nextStage)}练习` : '开始正式测验'}
         retryLabel="重新练习本阶段"
         detail={<>需要至少正确 {passCorrect} 题才能继续。</>}

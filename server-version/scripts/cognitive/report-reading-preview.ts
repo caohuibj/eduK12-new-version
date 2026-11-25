@@ -17,12 +17,12 @@ mkdirSync(output, { recursive: true })
 const tasksRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../backend/src/modules/cognitive/tasks')
 const corpus: Array<{ key: string; label: string; synthetic: true; report: ReturnType<typeof projectThreeLayerReport> }> = []
 
-const add = (key: string, label: string, testType: string, scoringVersion: string, input: { config: unknown; trials: unknown[]; randomSeed?: string }, profile: CognitiveProfile | null) => {
-  const entry = requireCognitiveRegistryEntry(testType, '1.0.0', scoringVersion)
-  const task = getCognitiveV2TaskDefinition(testType, '1.0.0', scoringVersion)!
+const add = (key: string, label: string, testType: string, scoringVersion: string, input: { config: unknown; trials: unknown[]; randomSeed?: string }, profile: CognitiveProfile | null, engineVersion = '1.0.0') => {
+  const entry = requireCognitiveRegistryEntry(testType, engineVersion, scoringVersion)
+  const task = getCognitiveV2TaskDefinition(testType, engineVersion, scoringVersion)!
   const scored = task.scorer(input as never)
   corpus.push({ key, label, synthetic: true, report: projectThreeLayerReport({
-    testType, engineVersion: '1.0.0', scoringVersion, configVersion: scoringVersion, protocolSignature: 'synthetic-local-preview', profile,
+    testType, engineVersion, scoringVersion, configVersion: scoringVersion, protocolSignature: 'synthetic-local-preview', profile,
     participantPresentation: resolveParticipantPresentation(entry), definition: task.report, metrics: scored.metrics, score: scored,
     metricDefinitions: task.metrics, qualityDefinitions: task.quality,
     reportCaveats: profile ? entry.profiles[profile]!.reportCaveats : ['模拟作答，用于开发视觉检查；非真实学生数据。'],
@@ -64,7 +64,10 @@ for (const profile of ['experience', 'standard', 'research'] as const) {
 for (const entry of listCognitiveRegistryEntries().filter(e => e.testType !== 'fake')) {
   const file = path.join(tasksRoot, entry.testType, 'fixtures', `${entry.engineVersion}-${entry.scoringVersion}.json`)
   const fixture = JSON.parse(readFileSync(file, 'utf8')).cases[0]
-  add(`identity-${entry.testType}-${entry.scoringVersion}`, `${entry.name} · ${entry.scoringVersion}（回归样例）`, entry.testType, entry.scoringVersion, fixture.input, null)
+  const identity = entry.engineVersion === '1.0.0'
+    ? `${entry.testType}-${entry.scoringVersion}`
+    : `${entry.testType}-${entry.engineVersion}-${entry.scoringVersion}`
+  add(`identity-${identity}`, `${entry.name} · 引擎 ${entry.engineVersion} / 评分 ${entry.scoringVersion}（回归样例）`, entry.testType, entry.scoringVersion, fixture.input, null, entry.engineVersion)
 }
 writeFileSync(path.join(output, 'preview-corpus.json'), JSON.stringify(corpus, null, 2))
 console.log(`Generated ${corpus.length} actual-scorer synthetic report previews`)

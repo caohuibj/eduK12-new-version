@@ -71,13 +71,15 @@ describe('Cognitive V2 participant report presentation', () => {
   it('keeps standard and research headline contracts unchanged', () => {
     const nback = project('nback', '1.0.0', 'standard', {
       dPrimeByN: { '1': 1.25, '2': 0.8 },
-      maxReliableN: 2,
-      hitRateByN: { '1': 0.8, '2': 0.7 },
+      maxReliableN: 1,
+      hitRateByN: { '1': 0.8, '2': 0 },
       falseAlarmRateByN: { '1': 0.1, '2': 0.2 },
-      medianRtByN: { '1': 410, '2': 480 },
+      medianRtByN: { '1': 410, '2': null },
       loadCostDPrime: 0.45,
     })
     expect(nback.headline.map((metric) => metric.key)).toEqual(['maxReliableN'])
+    expect([...nback.user, ...nback.detail].find((metric) => metric.key === 'hitRateByN')?.formatted).toBe('1-back：80%；2-back：0%')
+    expect([...nback.user, ...nback.detail].find((metric) => metric.key === 'medianRtByN')?.formatted).toBe('1-back：410 ms；2-back：—')
   })
 
   it('hides all quantitative layers when V2 quality is invalid', () => {

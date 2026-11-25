@@ -6,7 +6,7 @@ import CognitiveCredentialReset from './CognitiveCredentialReset'
 import CognitiveSessionEntry from './CognitiveSessionEntry'
 import { isPublicAssessmentPath, parentReturnTo } from '../../../components/app-shell/access'
 import { AssessmentShell, type AssessmentInteractionReadiness, type AssessmentProgress, type AssessmentSaveStatus } from '../../../components/assessment-shell'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { cognitiveApi, publicCognitiveApi, type CognitiveSessionApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
@@ -289,6 +289,19 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
     cognitiveFallback,
   )
   const hasParentReturn = Boolean(campus) || parentTarget !== cognitiveFallback
+  const returnTo = searchParams.get('returnTo')
+  useEffect(() => {
+    if (state.status !== 'COMPLETED' || campus || !sessionId) return
+    const target = learner.enabled && trainingParent ? learner.backHref : parentReturnTo(
+      returnTo, isPublic,
+      isPublic
+        ? `/public/cognitive/sessions/${sessionId}/result?public=1`
+        : relationalMode
+          ? '/relational/tasks'
+          : `/student/cognitive/sessions/${sessionId}/result`,
+    )
+    navigate(target, { replace: true })
+  }, [state.status, campus, sessionId, learner.enabled, learner.backHref, trainingParent, returnTo, isPublic, relationalMode, navigate])
   const leaveParent = () => {
     if (campus) { campus.onExit(); return }
     if (trainingParent && state.error?.code === 'FINAL_DRAFT_EXPIRED' && state.session) {
@@ -329,18 +342,6 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
         <p role="status" className="text-center text-slate-600">{campus.completionNotice??"正式作答已提交并确认；是否开放解释性报告取决于独立科学审核。"}</p>
       </AssessmentShell>
     )
-    if (sessionId) {
-      const returnTo = searchParams.get('returnTo')
-      const target = learner.enabled && trainingParent ? learner.backHref : parentReturnTo(
-        returnTo, isPublic,
-        isPublic
-          ? `/public/cognitive/sessions/${sessionId}/result?public=1`
-          : relationalMode
-            ? '/relational/tasks'
-            : `/student/cognitive/sessions/${sessionId}/result`,
-      )
-      navigate(target, { replace: true })
-    }
     return null
   }
 

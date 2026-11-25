@@ -93,8 +93,6 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
     setPhase('practice')
   }
 
-  const startPractice = () => startPracticeStage('go')
-
   const startFormal = () => {
     setFeedback(null)
     setVisible(false)
@@ -147,11 +145,11 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
           if (current.trialType === 'stop') practiceStopCorrectRef.current += 1
         }
         if (current.trialType === 'stop') {
-          setFeedback(correct ? '正确：看到红色停止信号后没有继续按。' : '看到红色停止信号后要停止响应。')
+          setFeedback(correct ? '正确：本题没有按键。' : '本题有停止信号，记录到了按键。')
         } else {
           setFeedback(correct ? '正确：箭头出现后立即按对应方向。' : '箭头出现后要立即按对应方向，不要等待停止信号。')
         }
-        setPracticeReview({ correct, prompt: (current.goStimulus === 'left' ? '← 左箭头' : '→ 右箭头') + (current.trialType === 'stop' ? '，随后出现红色停止信号' : '，没有停止信号'), expected: current.trialType === 'stop' ? '尝试停止反应' : (current.goStimulus === 'left' ? '立即按左方向' : '立即按右方向'), actual: responseRef.current == null ? '你没有按键' : (responseRef.current === 'left' ? '你按了左方向' : '你按了右方向'), explanation: current.trialType === 'stop' ? '红色信号出现后要尝试抑制反应；不要为了等停止信号而放慢普通题。' : '没有停止信号的题要立即按箭头方向。按相反方向是误按，没有按键是漏按。' })
+        setPracticeReview({ correct, prompt: (current.goStimulus === 'left' ? '← 左箭头' : '→ 右箭头') + (current.trialType === 'stop' ? '，随后出现红色停止信号' : '，没有停止信号'), expected: current.trialType === 'stop' ? '尝试停止反应' : (current.goStimulus === 'left' ? '立即按左方向' : '立即按右方向'), actual: responseRef.current == null ? '你没有按键' : (responseRef.current === 'left' ? '你按了左方向' : '你按了右方向'), explanation: current.trialType === 'stop' ? '按键可能早于红色停止信号。下一题仍请在箭头出现时立即回应，看到红色信号时再尝试停下。' : '没有停止信号的题要立即按箭头方向。按相反方向是误按，没有按键是漏按。' })
         return
       }
       if (!submittingRef.current) {
@@ -235,7 +233,7 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
         title="停止信号任务"
         description={<>箭头出现时请立即、尽快按对应方向。偶尔会在箭头出现后看到红色停止信号；只有看到停止信号时才尝试停止按键。<strong className="block mt-2">不要为了等待停止信号而故意放慢普通箭头反应。</strong></>}
         hint="电脑使用左右方向键；触屏使用下方左右按键。练习不计入正式成绩。"
-        onAction={startPractice}
+        onAction={() => startPracticeStage(practiceStage)}
       />
     )
   }
@@ -251,7 +249,7 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
         total={practiceTrials.length}
         passed={passed}
         onContinue={() => practiceStage === 'go' ? startPracticeStage('mixed') : startFormal()}
-        onRetry={() => startPracticeStage(practiceStage)}
+        onRetry={() => setPhase('instruction')}
         continueLabel={practiceStage === 'go' ? '继续停止信号练习' : '开始正式测验'}
         retryLabel="重新练习本阶段"
         detail={(

@@ -75,6 +75,8 @@ describe('MemoryTask Digit Span Forward', () => {
     expect(screen.getByText('重新练习')).toBeTruthy()
     expect(onTrialComplete).not.toHaveBeenCalled()
     fireEvent.click(screen.getByText('重新练习'))
+    expect(screen.getByRole('region', { name: '核心规则' })).toBeInTheDocument()
+    fireEvent.click(screen.getByText('开始练习'))
     expect(screen.getByText(/练习 1 \/ 2/)).toBeTruthy()
   })
 

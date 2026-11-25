@@ -6,6 +6,11 @@ import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { deterministicForeperiod } from './prng'
 
 const PRACTICE_TRIALS = 3
+// Match the validity boundary used by the formal Reaction scorer.
+const VALID_REACTION_MS = 100
+const nonResponseKeys = new Set(['Tab', 'Shift', 'Control', 'Alt', 'Meta', 'Escape'])
+const isResponseKey = (event: KeyboardEvent) => !event.repeat && !event.isComposing
+  && !event.ctrlKey && !event.metaKey && !event.altKey && !nonResponseKeys.has(event.key)
 
 type Phase = 'instruction' | 'practice' | 'formal'
 type Sub = 'ready' | 'gray' | 'green' | 'feedback'
@@ -86,7 +91,7 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
 
   useEffect(() => {
     if (phase !== 'formal' || trialIndex >= total) return
-    const onKey = (event: KeyboardEvent) => { if (!event.repeat) handleFormalInput('keyboard') }
+    const onKey = (event: KeyboardEvent) => { if (isResponseKey(event)) handleFormalInput('keyboard') }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [phase, trialIndex, total, handleFormalInput])
@@ -100,7 +105,7 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   const finishPractice = useCallback((rtMs: number | null) => {
     setPracticePremature(false)
     if (rtMs == null) setPracticeFeedback('超时了，绿色出现后再点击。')
-    else if (rtMs < 150) setPracticeFeedback('太快了！等绿色圆点出现再点击。')
+    else if (Math.round(rtMs) < VALID_REACTION_MS) setPracticeFeedback('本次用时不足 100 毫秒，正式测评会将这类反应记为无效。请看清圆点变绿后再作答。')
     else setPracticeFeedback('很好！保持专注，等绿色出现再点击。')
     setPracticeSub('feedback')
   }, [])
@@ -120,7 +125,7 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   useEffect(() => {
     if (phase !== 'practice' || practiceSub === 'feedback') return
     const onKey = (event: KeyboardEvent) => {
-      if (event.repeat || event.isComposing || event.ctrlKey || event.metaKey || event.altKey || ['Tab', 'Shift', 'Control', 'Alt', 'Meta', 'Escape'].includes(event.key)) return
+      if (!isResponseKey(event)) return
       event.preventDefault()
       handlePracticeInput()
     }
@@ -137,12 +142,12 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
 
   if (phase === 'instruction') return <CognitiveTaskIntro
     title="反应速度"
-    description={<p>每题先显示等待提示，随后圆点会变成绿色。只有看到绿色后，才尽快点击圆点或按任意键；等待时不要提前操作。</p>}
+    description={<p>每题先显示等待提示。看到圆点变绿后，尽快点击圆点或按空格等普通键。等待时不要提前操作，Tab 等导航键和组合快捷键不计入作答。</p>}
     example={<CognitiveTaskExample title="图示：看到绿色才反应" steps={[
       { label: '等待', value: '灰色圆点', note: '手不要动', state: 'wait' },
       { label: '目标出现', value: '绿色圆点', note: '立即点击或按键', state: 'respond' },
       { label: '本题结束', value: '下一题', note: '重新等绿色', state: 'neutral' },
-    ]} result="灰色时等待；变绿后立即点击圆点或按任意键。" explanation="绿色出现前点击会被记录为过早反应，并重新等待；如果绿色出现后一直不操作，本题会按超时记录。" />}
+    ]} result="灰色时等待；变绿后立即点击圆点或按空格键。" explanation="绿色出现前作答会被记录为过早反应，并重新等待；如果绿色出现后一直不操作，本题会按超时记录。" />}
     hint={<><p><strong>练习：</strong>先完成 3 次不计分练习，熟悉等待和点击的时机。</p><p><strong>正式作答：</strong>共 {total} 题；尽量看着屏幕，绿色出现后再反应。不要按住按键。</p></>}
     onAction={beginPractice}
   />
@@ -157,7 +162,7 @@ export const ReactionTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   if (trialIndex >= total) return <div className="card mx-auto w-full max-w-2xl p-5 text-center sm:p-8"><p className="text-gray-700">正式试次已完成，请提交测评结果。</p></div>
 
   return <CognitiveFocusStage ariaLabel="反应速度正式测验" progress={{ completed: trialIndex, total }}><CognitiveCenteredTask
-    footer={<p className="text-gray-500">看到绿色后尽快点击或按任意键{interrupted ? '（检测到页面切走，本次记为中断）' : ''}</p>}>
+    footer={<p className="text-gray-500">看到绿色后尽快点击或按空格键{interrupted ? '（检测到页面切走，本次记为中断）' : ''}</p>}>
     <button onPointerDown={(event) => { if (event.isPrimary && (event.pointerType !== 'mouse' || event.button === 0)) handleFormalInput(event.pointerType === 'touch' ? 'touch' : 'pointer') }} className={`cognitive-reaction-target w-48 h-48 rounded-full mx-auto ${stimulusClass(sub === 'green')}`} aria-label={`trial ${trialIndex}`}><span className="sr-only">{sub === 'green' ? '点击！' : '等待'}</span></button>
   </CognitiveCenteredTask></CognitiveFocusStage>
 }

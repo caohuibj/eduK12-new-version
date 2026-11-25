@@ -228,7 +228,7 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
           { label: '第 2 个亮起', value: '中间', note: '继续记住顺序', state: 'observe' },
           { label: '第 3 个亮起', value: '右下', note: '现在依次点回', state: 'respond' },
         ]} result={<>等亮光结束后，依次点击 <strong>左上 → 中间 → 右下</strong>。</>} explanation="只按方块位置，不需要数格子或记颜色；点错位置或顺序都算这题不正确。" />}
-        hint={<><p><strong>操作：</strong>灯光消失后再点击；不要在亮起过程中抢点。</p><p><strong>练习：</strong>练习不计入正式成绩；未通过可以重新练习。</p></>}
+        hint={<><p><strong>操作：</strong>灯光消失后再点击。同一轮请勿重复点击同一个方块，重复作答会让正式结果无法解释。</p><p><strong>练习：</strong>练习不计入正式成绩；未通过可重看规则再练习。</p></>}
         onAction={startPractice}
       />
     )
@@ -242,7 +242,7 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
         {passed ? (
           <button className="btn-primary" onClick={startFormal}>开始正式测验</button>
         ) : (
-          <button className="btn-secondary" onClick={startPractice}>重新练习</button>
+          <button className="btn-secondary" onClick={() => setPhase('instruction')}>重看规则并重新练习</button>
         )}
       </CognitiveTaskPanel>
     )

@@ -92,6 +92,15 @@ describe('versioned participant report interpretation', () => {
     expect(report.reading!.visuals[0].unit).toBe('d-prime')
     expect(report.reading!.visuals[0].points).toEqual([{ label: '1-back', value: 1.2 }, { label: '2-back', value: -0.4 }])
   })
+  it('explains Task Switching using separate accuracy rates and a signed time difference', () => {
+    const metrics = { switchCostRtMs: -20, switchCostAccuracy: -0.09, accuracySwitch: 0.96, accuracyRepeat: 0.87 }
+    const report = project('taskswitch', '1.0.0', metrics, {
+      metrics, quality: { state: 'interpretable', flags: {}, reasons: [] }, audit: { trialCount: 48, scorerVersion: '1.0.0' },
+    })
+    expect(report.reading?.reportVersion).toBe('1.1.1')
+    expect(report.reading?.feedback.summary).toContain('换规则时，正确率为 96%；沿用规则时为 87%')
+    expect(report.reading?.feedback.summary).toContain('-20 毫秒')
+  })
   it('reads task categories and learning rounds with their actual units and missing values', () => {
     for (const testType of ['matrix', 'pairedassociate', 'picturesequence']) {
       const fixture = JSON.parse(readFileSync(new URL(`../../modules/cognitive/tasks/${testType}/fixtures/1.0.0-1.0.0.json`, import.meta.url), 'utf8')).cases[0].input
