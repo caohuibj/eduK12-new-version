@@ -144,13 +144,25 @@ const classroomQuestionPayload = (question: any): Record<string, unknown> | null
   }
 }
 
+const roundIso = (value: Date | string | null | undefined): string | null => {
+  if (!value) return null
+  const date = value instanceof Date ? value : new Date(value)
+  return Number.isFinite(date.getTime()) ? date.toISOString() : null
+}
+
 export class ClassroomSocketHandler {
   private readonly danmakuSessions=new Map<string,{expiresAt:number;valid:Promise<boolean>}>()
   private readonly danmakuBatches = new Map<string, DanmakuBatch>()
   private activeTimers: Map<string, NodeJS.Timeout> = new Map()
   private managerRevalidationTimers: Map<string, NodeJS.Timeout> = new Map()
+  private readonly pendingStatsRounds = new Map<string, string>()
+  private readonly latestQuestionRounds = new Map<string, string>()
   private readonly statsScheduler = new ClassroomStatsScheduler(
-    (classroomId, questionId) => this.broadcastStats(classroomId, questionId),
+    (classroomId, questionId, startedAt) => {
+      const round = startedAt ?? ''
+      return this.pendingStatsRounds.get(classroomId + ':' + questionId) !== round
+        ? Promise.resolve() : this.broadcastStats(classroomId, questionId, round)
+    },
   )
 
   initialize(): void {
@@ -808,6 +820,7 @@ export class ClassroomSocketHandler {
       })
 
       if (activeQuestion?.startedAt) {
+        const startedAt = activeQuestion.startedAt.toISOString()
         const elapsedTime = Math.floor(
           (Date.now() - activeQuestion.startedAt.getTime()) / 1000
         )
@@ -816,6 +829,7 @@ export class ClassroomSocketHandler {
           questionContent: activeQuestion.questionContent,
           questionIndex: activeQuestion.questionIndex,
           timeLimit: activeQuestion.timeLimit,
+          startedAt,
           remainingTime: Math.max(
             0,
             (activeQuestion.timeLimit || 60) - elapsedTime
@@ -823,7 +837,8 @@ export class ClassroomSocketHandler {
         }
         response.stats = await this.buildStats(
           classroom.id,
-          activeQuestion.id
+          activeQuestion.id,
+          startedAt
         )
       }
 
@@ -963,15 +978,26 @@ export class ClassroomSocketHandler {
     timeLimit: number,
     expectedStartedAt?: Date
   ): void {
-    const timerKey = classroomId + ':' + questionId
-    const previousTimer = this.activeTimers.get(timerKey)
-    if (previousTimer) {
-      clearTimeout(previousTimer)
+    const questionKey = classroomId + ':' + questionId
+    const startedAt = roundIso(expectedStartedAt)
+    const latestRound = this.latestQuestionRounds.get(questionKey)
+    if (startedAt && latestRound && Date.parse(startedAt) < Date.parse(latestRound)) return
+    if (startedAt) this.latestQuestionRounds.set(questionKey, startedAt)
+    const timerKey = questionKey + ':' + (startedAt ?? 'legacy')
+    for (const [key, previousTimer] of this.activeTimers) {
+      if (key.startsWith(questionKey + ':')) {
+        clearTimeout(previousTimer)
+        this.activeTimers.delete(key)
+      }
     }
+    // A pending old-round rebuild may finish, but cannot publish into this round.
+    const previousRound = this.pendingStatsRounds.get(questionKey)
+    if (previousRound !== undefined) this.statsScheduler.cancel(classroomId, questionId, previousRound || undefined)
+    this.pendingStatsRounds.delete(questionKey)
 
     const timer = setTimeout(() => {
       void this.autoEndQuestion(classroomId, questionId, expectedStartedAt)
-    }, Math.max(1, timeLimit) * 1000)
+    }, Math.max(1, (expectedStartedAt?.getTime() ?? Date.now()) + timeLimit * 1000 - Date.now()))
 
     this.activeTimers.set(timerKey, timer)
   }
@@ -981,16 +1007,11 @@ export class ClassroomSocketHandler {
     questionId: string,
     expectedStartedAt?: Date
   ): Promise<void> {
+    this.activeTimers.delete(classroomId + ':' + questionId + ':' + (roundIso(expectedStartedAt) ?? 'legacy'))
     try {
       const result = await endClassroomQuestion(classroomId,questionId,{automatic:true,expectedStartedAt})
       if (!result.changed) return
-      this.activeTimers.delete(classroomId + ':' + questionId)
-      socketService.broadcastToRoom(
-        'classroom:' + classroomId,
-        'broadcast:finished',
-        { questionId }
-      )
-      await this.flushQuestionStatsAuthoritatively(classroomId, questionId)
+      await this.notifyQuestionEnded(classroomId, questionId, result.startedAt, result.endedAt)
 
       logger.info('答题计时结束', { classroomId, questionId })
     } catch {
@@ -1026,7 +1047,7 @@ export class ClassroomSocketHandler {
       if(startedAt&&!Number.isFinite(Date.parse(startedAt))){this.emitError(socket,'题目开始时间无效');return}
       const result = await submitClassroomAnswer({classroomId,sessionId,studentId,questionId,answer,...(startedAt?{expectedStartedAt:new Date(startedAt)}:{})})
       if (result.expired) {
-        await this.notifyQuestionEnded(classroomId, questionId)
+        await this.notifyQuestionEnded(classroomId, questionId, result.startedAt, result.endedAt)
         this.emitError(socket, '答题已结束，无法提交答案')
         return
       }
@@ -1039,9 +1060,9 @@ export class ClassroomSocketHandler {
       socket.emit('student:submitted', {
         questionId: question.id,
         success: true,
-        ...(startedAt ? { startedAt } : {}),
+        startedAt: roundIso(result.startedAt),
       })
-      this.statsScheduler.schedule(classroomId, question.id)
+      if (!result.alreadySubmitted) this.notifyAnswerSubmitted(classroomId, question.id, result.startedAt)
     } catch (error: any) {
       if (error?.code === 'P2002') {
         this.emitError(socket, '您已提交过答案')
@@ -1080,7 +1101,7 @@ export class ClassroomSocketHandler {
         this.emitError(socket, '题目已重新开始，请刷新后操作')
         return
       }
-      if (result.changed) await this.notifyQuestionEnded(classroom.id, questionId)
+      if (result.changed) await this.notifyQuestionEnded(classroom.id, questionId, result.startedAt, result.endedAt)
 
       logger.info('教师结束答题', {
         classroomId: classroom.id,
@@ -1110,8 +1131,17 @@ export class ClassroomSocketHandler {
         return
       }
 
-      const result = await endClassroomQuestion(classroom.id,questionId)
-      if (result.changed) await this.notifyQuestionEnded(classroom.id, questionId)
+      const startedAtValue = readString(data, 'startedAt')
+      if (startedAtValue && !Number.isFinite(Date.parse(startedAtValue))) {
+        this.emitError(socket, '题目轮次无效')
+        return
+      }
+      const result = await endClassroomQuestion(classroom.id,questionId,startedAtValue ? {expectedStartedAt:new Date(startedAtValue)} : {})
+      if (result.staleRound) {
+        this.emitError(socket, '题目已重新开始，请刷新后操作')
+        return
+      }
+      if (result.changed) await this.notifyQuestionEnded(classroom.id, questionId, result.startedAt, result.endedAt)
 
       logger.info('大屏结束答题', {
         classroomId: classroom.id,
@@ -1136,22 +1166,38 @@ export class ClassroomSocketHandler {
       }
 
       const expectedQuestionId = readString(data, 'expectedQuestionId') || readString(data, 'questionId')
+      const expectedStartedAt = readString(data, 'expectedStartedAt')
+      if (expectedStartedAt && (!expectedQuestionId || !Number.isFinite(Date.parse(expectedStartedAt)))) {
+        this.emitError(socket, '题目轮次无效')
+        return
+      }
+      let expectedQuestion: { id: string; startedAt: Date | null } | null = null
       if (expectedQuestionId) {
-        const expectedQuestion = await prisma.classroomQuestion.findFirst({
+        expectedQuestion = await prisma.classroomQuestion.findFirst({
           where: { id: expectedQuestionId, classroomId: classroom.id },
-          select: { id: true },
+          select: { id: true, startedAt: true },
         })
         if (!expectedQuestion) {
           this.emitError(socket, '题目不存在或不属于当前课堂')
           return
         }
+        if (expectedStartedAt && roundIso(expectedQuestion.startedAt) !== roundIso(expectedStartedAt)) {
+          this.emitError(socket, '题目已重新开始，请刷新后操作')
+          return
+        }
+      } else {
+        expectedQuestion = await prisma.classroomQuestion.findFirst({
+          where: { classroomId: classroom.id, startedAt: { not: null }, endedAt: null },
+          select: { id: true, startedAt: true },
+        })
       }
 
       socketService.broadcastToRoom(
         'classroom:' + classroom.id,
         'broadcast:next',
         {
-          expectedQuestionId: expectedQuestionId || null,
+          expectedQuestionId: expectedQuestion?.id || null,
+          expectedStartedAt: roundIso(expectedQuestion?.startedAt),
         }
       )
       logger.info('教师切换下一题', { classroomId: classroom.id })
@@ -1185,11 +1231,7 @@ export class ClassroomSocketHandler {
       await closeClassroom(classroom.id)
 
       ack?.({ ok: true, classroomId: classroom.id })
-      socketService.broadcastToRoom(
-        'classroom:' + classroom.id,
-        'broadcast:closed',
-        { classroomId: classroom.id }
-      )
+      this.notifyClassroomClosed(classroom.id)
       logger.info('教师关闭课堂', { classroomId: classroom.id })
     } catch {
       logger.error('处理教师关闭课堂错误')
@@ -1268,11 +1310,12 @@ export class ClassroomSocketHandler {
   }
 
   // Caller must authorize current classroom management before reading stats.
-  async readQuestionStats(classroomId:string,questionId:string){return this.buildStats(classroomId,questionId)}
+  async readQuestionStats(classroomId:string,questionId:string,startedAt?:Date|string|null){return this.buildStats(classroomId,questionId,roundIso(startedAt)??undefined)}
 
   private async buildStats(
     classroomId: string,
-    questionId: string
+    questionId: string,
+    expectedStartedAt?: string,
   ): Promise<Record<string, any> | null> {
     const question = await prisma.classroomQuestion.findFirst({
       where: {
@@ -1282,11 +1325,14 @@ export class ClassroomSocketHandler {
       select: {
         id: true,
         questionContent: true,
+        startedAt: true,
       },
     })
     if (!question) {
       return null
     }
+    const startedAt = roundIso(question.startedAt)
+    if (expectedStartedAt && startedAt !== expectedStartedAt) return null
 
     const { answerCount, totalSessions, activeAnswerCount, submissionRate } =
       await classroomSubmissionStats(classroomId, questionId)
@@ -1377,8 +1423,14 @@ export class ClassroomSocketHandler {
         .filter((item): item is { text: string; timestamp: number } => !!item)
     }
 
+    // Reads span multiple queries. Do not label new-round answers with an old marker.
+    const current = await prisma.classroomQuestion.findFirst({
+      where: { id: questionId, classroomId }, select: { startedAt: true },
+    })
+    if (!current || roundIso(current.startedAt) !== startedAt) return null
     return {
       questionId,
+      startedAt,
       unsupportedType: !(
         content
         && typeof content === 'object'
@@ -1397,12 +1449,14 @@ export class ClassroomSocketHandler {
 
   private async broadcastStats(
     classroomId: string,
-    questionId: string
+    questionId: string,
+    expectedStartedAt?: string,
   ): Promise<void> {
-    const stats = await this.buildStats(classroomId, questionId)
+    const stats = await this.buildStats(classroomId, questionId, expectedStartedAt)
     if (!stats) {
       return
     }
+    if (expectedStartedAt !== undefined && this.pendingStatsRounds.get(classroomId + ':' + questionId) !== expectedStartedAt) return
 
     await socketService.sendToClassroomManagers(classroomId, 'broadcast:stats', stats)
   }
@@ -1410,14 +1464,17 @@ export class ClassroomSocketHandler {
   private async flushQuestionStatsAuthoritatively(
     classroomId: string,
     questionId: string,
-  ): Promise<void> {
+    startedAt?: string,
+  ): Promise<boolean> {
     try {
-      await this.statsScheduler.flush(classroomId, questionId)
+      await this.statsScheduler.flush(classroomId, questionId, startedAt)
+      return true
     } catch (error) {
       // The answer/end transaction is already authoritative. A failed stats
       // rebuild is retried by the scheduler and must not turn a successful end
       // action into a client-visible failure.
       logger.error('课堂结束时统计重建失败', { classroomId, questionId, error })
+      return false
     }
   }
 
@@ -1436,16 +1493,35 @@ export class ClassroomSocketHandler {
     this.scheduleQuestionTimer(classroomId,question.id,question.timeLimit||60,question.startedAt)
     return this.broadcastQuestionStarted(classroomId, question)
   }
-  async notifyQuestionEnded(classroomId:string,questionId:string):Promise<void>{
-    const timerKey=classroomId+':'+questionId;const timer=this.activeTimers.get(timerKey);if(timer)clearTimeout(timer);this.activeTimers.delete(timerKey)
-    socketService.broadcastToRoom('classroom:'+classroomId,'broadcast:finished',{questionId})
-    await this.flushQuestionStatsAuthoritatively(classroomId,questionId)
+  async notifyQuestionEnded(classroomId:string,questionId:string,round:Date|string|null,endedAt?:Date|string|null):Promise<void>{
+    const startedAt=roundIso(round)
+    if(!startedAt)return
+    const questionKey=classroomId+':'+questionId,timerKey=questionKey+':'+startedAt
+    const timer=this.activeTimers.get(timerKey);if(timer)clearTimeout(timer);this.activeTimers.delete(timerKey)
+    socketService.broadcastToRoom('classroom:'+classroomId,'broadcast:finished',{questionId,startedAt,endedAt:roundIso(endedAt)})
+    const pendingRound=this.pendingStatsRounds.get(questionKey)
+    if(pendingRound!==undefined&&(pendingRound===startedAt||pendingRound==='')){
+      const completed=await this.flushQuestionStatsAuthoritatively(classroomId,questionId,pendingRound||undefined)
+      if(completed&&this.pendingStatsRounds.get(questionKey)===pendingRound)this.pendingStatsRounds.delete(questionKey)
+    }
   }
   notifyClassroomClosed(classroomId:string):void{
     for(const [key,timer] of this.activeTimers)if(key.startsWith(classroomId+':')){clearTimeout(timer);this.activeTimers.delete(key)}
+    for(const [key,round] of this.pendingStatsRounds)if(key.startsWith(classroomId+':')){
+      this.statsScheduler.cancel(classroomId,key.slice(classroomId.length+1),round||undefined)
+      this.pendingStatsRounds.delete(key)
+    }
+    for(const key of this.latestQuestionRounds.keys())if(key.startsWith(classroomId+':'))this.latestQuestionRounds.delete(key)
     socketService.broadcastToRoom('classroom:'+classroomId,'broadcast:closed',{classroomId})
   }
-  notifyAnswerSubmitted(classroomId:string,questionId:string):void {this.statsScheduler.schedule(classroomId,questionId)}
+  notifyAnswerSubmitted(classroomId:string,questionId:string,startedAt?:Date|string|null):void {
+    const key=classroomId+':'+questionId,marker=roundIso(startedAt),latest=this.latestQuestionRounds.get(key)
+    if(marker&&latest&&Date.parse(marker)<Date.parse(latest))return
+    const round=marker??latest??''
+    if(marker)this.latestQuestionRounds.set(key,marker)
+    this.pendingStatsRounds.set(key,round)
+    this.statsScheduler.schedule(classroomId,questionId,round||undefined)
+  }
   private async broadcastOnlineCount(classroomId: string): Promise<void> {
     const onlineCount = await socketService.getRoomConnectionCount(
       'classroom:' + classroomId + ':students'

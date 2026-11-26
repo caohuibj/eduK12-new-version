@@ -27,7 +27,11 @@ function setup(snapshot = initial()) {
       state.messages = (state.pending ?? []).map(item => ({ ...item, status: 'approved' as const }))
       state.pending = []
     }
-    if (command.action === 'hide' || command.action === 'clear' || command.action === 'stop') { state.messages = []; state.pending = [] }
+    if (command.action === 'hide') {
+      state.messages = state.messages.filter(item => item.id !== command.messageId)
+      state.pending = (state.pending ?? []).filter(item => item.id !== command.messageId)
+    }
+    if (command.action === 'clear' || command.action === 'stop') { state.messages = []; state.pending = [] }
     if (command.action === 'stop') { state.enabled = false; state.displayMode = 'QUESTION' }
     return { ok: true, snapshot: { ...state } }
   })
@@ -85,6 +89,23 @@ it('requires confirmation for clear and stop, then follows the authoritative sto
   await screen.findByText('弹幕已停止，当前消息已清空。')
   expect(screen.getByRole('button', { name: '开启弹幕' })).toBeEnabled()
   expect(screen.queryByRole('button', { name: '暂停屏显' })).not.toBeInTheDocument()
+})
+
+it('can find and hide an older message when more than 100 are still in the moderation list', async () => {
+  const messages = Array.from({ length: 125 }, (_, index) => ({
+    ...message(`approved-${index}`), text: `课堂弹幕 ${index + 1}`, status: 'approved' as const,
+  }))
+  const test = setup(initial({ enabled: true, sessionId: 'session-1', messages }))
+  const search = await screen.findByRole('searchbox', { name: '搜索弹幕内容' })
+  expect(screen.getAllByRole('button', { name: '隐藏弹幕' })).toHaveLength(20)
+  fireEvent.change(search, { target: { value: '课堂弹幕 25' } })
+  expect(screen.getByText('课堂弹幕 25')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: '隐藏弹幕' }))
+  await screen.findByText('该条弹幕已隐藏。')
+  expect(test.emitWithAck).toHaveBeenLastCalledWith('teacher:danmaku:control', expect.objectContaining({ action: 'hide', messageId: 'approved-24' }))
+  expect(screen.getByText('没有匹配的弹幕')).toBeInTheDocument()
+  fireEvent.change(search, { target: { value: '' } })
+  expect(screen.getByRole('button', { name: '已通过（124）' })).toBeInTheDocument()
 })
 
 it('does not turn timeout into success or resend a mutation; refresh is required', async () => {

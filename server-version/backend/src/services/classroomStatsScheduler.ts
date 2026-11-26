@@ -1,10 +1,11 @@
 import { logger } from '../utils/logger'
 
-type RebuildStats = (classroomId: string, questionId: string) => Promise<void>
+type RebuildStats = (classroomId: string, questionId: string, startedAt?: string) => Promise<void>
 
 type PendingStats = {
   classroomId: string
   questionId: string
+  startedAt?: string
   timer: NodeJS.Timeout | null
   firstScheduledAt: number
 }
@@ -16,6 +17,7 @@ type PendingStats = {
 export class ClassroomStatsScheduler {
   private readonly pending = new Map<string, PendingStats>()
   private readonly inFlight = new Map<string, Promise<void>>()
+  private readonly cancelled = new Set<string>()
   private readonly delayMs: number
   private readonly maxWaitMs: number
   private readonly retryDelayMs: number
@@ -30,12 +32,14 @@ export class ClassroomStatsScheduler {
     this.retryDelayMs = Math.max(1000, this.maxWaitMs)
   }
 
-  schedule(classroomId: string, questionId: string): void {
-    const key = `${classroomId}:${questionId}`
+  schedule(classroomId: string, questionId: string, startedAt?: string): void {
+    const key = `${classroomId}:${questionId}${startedAt ? ':' + startedAt : ''}`
+    this.cancelled.delete(key)
     const now = Date.now()
     const pending = this.pending.get(key) ?? {
       classroomId,
       questionId,
+      startedAt,
       timer: null,
       firstScheduledAt: now,
     }
@@ -44,23 +48,26 @@ export class ClassroomStatsScheduler {
     const delay = Math.min(this.delayMs, maxRemaining)
     this.pending.set(key, pending)
     if (delay === 0) {
-      void this.flush(classroomId, questionId).catch((error) => {
+      void this.flush(classroomId, questionId, startedAt).catch((error) => {
         logger.error('课堂统计异步重建失败', { classroomId, questionId, error })
       })
       return
     }
     pending.timer = setTimeout(() => {
       pending.timer = null
-      void this.flush(classroomId, questionId).catch((error) => {
+      void this.flush(classroomId, questionId, startedAt).catch((error) => {
         logger.error('课堂统计异步重建失败', { classroomId, questionId, error })
       })
     }, delay)
   }
 
-  async flush(classroomId: string, questionId: string): Promise<void> {
-    const key = `${classroomId}:${questionId}`
+  async flush(classroomId: string, questionId: string, startedAt?: string): Promise<void> {
+    const key = `${classroomId}:${questionId}${startedAt ? ':' + startedAt : ''}`
     const running = this.inFlight.get(key)
-    if (running) return running
+    if (running) {
+      await running
+      return this.flush(classroomId, questionId, startedAt)
+    }
     const pending = this.pending.get(key)
     if (!pending) return
     if (pending.timer) clearTimeout(pending.timer)
@@ -68,9 +75,10 @@ export class ClassroomStatsScheduler {
 
     const rebuild = (async () => {
       try {
-        await this.rebuild(classroomId, questionId)
+        if (startedAt === undefined) await this.rebuild(classroomId, questionId)
+        else await this.rebuild(classroomId, questionId, startedAt)
       } catch (error) {
-        this.scheduleRetry(classroomId, questionId)
+        if (!this.cancelled.has(key)) this.scheduleRetry(classroomId, questionId, startedAt)
         throw error
       }
     })()
@@ -79,6 +87,7 @@ export class ClassroomStatsScheduler {
       await rebuild
     } finally {
       if (this.inFlight.get(key) === rebuild) this.inFlight.delete(key)
+      this.cancelled.delete(key)
     }
   }
 
@@ -87,7 +96,7 @@ export class ClassroomStatsScheduler {
       const entries = [...this.pending.values()]
       const running = [...this.inFlight.values()]
       await Promise.all([
-        ...entries.map((entry) => this.flush(entry.classroomId, entry.questionId)),
+        ...entries.map((entry) => this.flush(entry.classroomId, entry.questionId, entry.startedAt)),
         ...running,
       ])
     }
@@ -98,26 +107,36 @@ export class ClassroomStatsScheduler {
       if (pending.timer) clearTimeout(pending.timer)
     }
     this.pending.clear()
+    for (const key of this.inFlight.keys()) this.cancelled.add(key)
+  }
+
+  cancel(classroomId: string, questionId: string, startedAt?: string): void {
+    const key = `${classroomId}:${questionId}${startedAt ? ':' + startedAt : ''}`
+    const pending = this.pending.get(key)
+    if (pending?.timer) clearTimeout(pending.timer)
+    this.pending.delete(key)
+    if (this.inFlight.has(key)) this.cancelled.add(key)
   }
 
   get size(): number {
     return this.pending.size
   }
 
-  private scheduleRetry(classroomId: string, questionId: string): void {
-    const key = `${classroomId}:${questionId}`
+  private scheduleRetry(classroomId: string, questionId: string, startedAt?: string): void {
+    const key = `${classroomId}:${questionId}${startedAt ? ':' + startedAt : ''}`
     const existing = this.pending.get(key)
     if (existing?.timer) return
     const pending = existing ?? {
       classroomId,
       questionId,
+      startedAt,
       timer: null,
       firstScheduledAt: Date.now(),
     }
     this.pending.set(key, pending)
     pending.timer = setTimeout(() => {
       pending.timer = null
-      void this.flush(classroomId, questionId).catch((error) => {
+      void this.flush(classroomId, questionId, startedAt).catch((error) => {
         logger.error('课堂统计异步重建重试失败', { classroomId, questionId, error })
       })
     }, this.retryDelayMs)

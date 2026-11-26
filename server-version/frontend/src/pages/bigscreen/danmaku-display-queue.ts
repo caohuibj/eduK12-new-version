@@ -24,21 +24,22 @@ export function advanceDanmakuQueue(queue:DanmakuDisplayQueue,now:number):Danmak
   if(!queue.enabled||queue.sessionDeadline!==null&&queue.sessionDeadline<=now)
     return {...queue,enabled:false,active:[],pending:[]}
   const active=queue.active.filter(message=>message.deadline>now&&(queue.paused||message.endsAt>now))
-  const pending=queue.pending.filter(message=>message.deadline>now)
+  const duration=durations[queue.speed]
+  const pending=queue.pending.filter(message=>message.deadline>now
+    &&(queue.paused||message.deadline-now>=duration))
   if(!queue.paused){
     const occupied=new Set(active.map(message=>message.lane))
     for(let lane=0;lane<queue.trackCount&&pending.length;lane++){
       if(occupied.has(lane))continue
       const message=pending.shift()!
-      const duration=Math.min(durations[queue.speed],message.deadline-now)
       active.push({...message,lane,duration,endsAt:now+duration})
     }
   }
   return {...queue,active,pending:pending.slice(-DANMAKU_PENDING_LIMIT)}
 }
 
-/** Snapshot ordering and the approved ID set are authoritative. Hiding or
- * clearing removes an in-flight message immediately, including while paused. */
+/** The moderation roster lets a flight continue while its text is absent from
+ * the rolling feed, and stops it once the teacher can no longer remove it. */
 export function reconcileDanmakuQueue(
   current:DanmakuDisplayQueue,snapshot:ClassroomDanmakuSnapshot,now:number,
 ):DanmakuDisplayQueue {
@@ -63,19 +64,22 @@ export function reconcileDanmakuQueue(
   const messages=snapshot.messages.filter(message=>message.status==='approved'&&message.id
     &&typeof message.text==='string'&&Array.from(message.text).length<=60
     &&Number.isFinite(Date.parse(message.expiresAt))&&Date.parse(message.expiresAt)>now)
-  // The complete authoritative snapshot decides whether a message has
-  // actually been hidden or expired. Only newly queued candidates are capped.
   const allowed=new Set(messages.map(message=>message.id))
+  const removed=Array.isArray(snapshot.removedMessageIds)?new Set(snapshot.removedMessageIds):null
+  const olderModeration=Array.isArray(snapshot.olderModerationIds)?new Set(snapshot.olderModerationIds):null
+  const inFlight=queue.active.filter(message=>!removed?.has(message.id)
+    &&(allowed.has(message.id)||olderModeration?.has(message.id)||olderModeration===null&&removed!==null))
   const candidates=messages.slice(-(DANMAKU_TRACKS+DANMAKU_PENDING_LIMIT))
+  const candidateIds=new Set(candidates.map(message=>message.id))
   const seen=new Set(queue.seen)
-  const displaced=queue.active.filter(message=>message.lane>=queue.trackCount)
-  const pending=[...displaced,...queue.pending].filter(message=>allowed.has(message.id))
+  const displaced=inFlight.filter(message=>message.lane>=queue.trackCount)
+  const pending=[...displaced,...queue.pending].filter(message=>candidateIds.has(message.id)&&!removed?.has(message.id))
   for(const message of candidates){
-    if(seen.has(message.id))continue
+    if(seen.has(message.id)||removed?.has(message.id))continue
     seen.add(message.id)
     pending.push({...message,deadline:Math.min(Date.parse(message.expiresAt),now+MAX_VISIBLE_MS)})
   }
-  return advanceDanmakuQueue({...queue,active:queue.active.filter(message=>message.lane<queue.trackCount&&allowed.has(message.id)),
+  return advanceDanmakuQueue({...queue,active:inFlight.filter(message=>message.lane<queue.trackCount),
     pending,seen:[...seen].slice(-MAX_SEEN)},now)
 }
 

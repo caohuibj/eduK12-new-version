@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { AlertCircle, BookOpen, CheckCircle, Clock, Radio } from 'lucide-react'
 import type { ClassroomDanmakuSnapshot } from '../../types/classroomDanmaku'
 import ClassroomDanmakuComposer from './ClassroomDanmakuComposer'
+import { ClassroomRoundGuard, classroomRemainingTime } from '../../utils/classroomRound'
 
 interface Question {
   questionId: string
@@ -26,6 +27,7 @@ const ClassroomAnswer: React.FC = () => {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const questionRef = useRef<Question | null>(null)
+  const roundGuard = useRef(new ClassroomRoundGuard())
   const submittedRef = useRef(false)
   const submittingRef = useRef(false)
   const [countdown, setCountdown] = useState<number | null>(null)
@@ -45,6 +47,7 @@ const ClassroomAnswer: React.FC = () => {
   })
 
   useEffect(() => {
+    roundGuard.current.reset()
     questionRef.current = null
     submittedRef.current = false
     submittingRef.current = false
@@ -99,9 +102,8 @@ const ClassroomAnswer: React.FC = () => {
     // 接收题目
     on('broadcast:question', (data: Question & { remainingTime?: number; mySubmission?: { answer: unknown } | null }) => {
       const previous = questionRef.current
-      // A delayed join snapshot must not roll back a restarted question.
-      if (previous && Date.parse(data.startedAt) < Date.parse(previous.startedAt)) return
-      const sameRound = previous?.questionId === data.questionId && previous?.startedAt === data.startedAt
+      if (!roundGuard.current.receive(data)) return
+      const sameRound = previous?.questionId === data.questionId && Date.parse(previous.startedAt) === Date.parse(data.startedAt)
       questionRef.current = data
       setCurrentQuestion(data)
       if (!sameRound) {
@@ -124,20 +126,26 @@ const ClassroomAnswer: React.FC = () => {
         setSubmitted(true)
         setSubmitting(false)
       }
-      const remaining = data.timeLimit ? (data.remainingTime ?? Math.max(0,
-        data.timeLimit - Math.floor((Date.now() - Date.parse(data.startedAt)) / 1000))) : null
-      setCountdown(remaining)
-      setIsFinished(remaining !== null && remaining <= 0)
+      const remaining = classroomRemainingTime(data)
+      if (remaining !== null && remaining <= 0) roundGuard.current.finish(data)
+      setCountdown(previousRemaining => {
+        if (!roundGuard.current.matches(data)) return previousRemaining
+        if (roundGuard.current.finished) return null
+        return sameRound && previousRemaining !== null && remaining !== null ? Math.min(previousRemaining, remaining) : remaining
+      })
+      setIsFinished(roundGuard.current.finished)
     })
 
     // 答题结束
-    on('broadcast:finished', () => {
+    on('broadcast:finished', (data) => {
+      if (!roundGuard.current.finish(data)) return
       setCountdown(null)
       setIsFinished(true) // 标记答题已结束
     })
 
     // 下一题
-    on('broadcast:next', () => {
+    on('broadcast:next', (data) => {
+      if (!roundGuard.current.clear({ questionId: data?.expectedQuestionId, startedAt: data?.expectedStartedAt })) return
       questionRef.current = null
       submittedRef.current = false
       submittingRef.current = false
@@ -152,6 +160,7 @@ const ClassroomAnswer: React.FC = () => {
 
     // 课堂关闭
     on('broadcast:closed', () => {
+      roundGuard.current.close()
       setCountdown(null)
       setSubmitting(false)
       setClosedClassroomId(classroomId ?? null)
@@ -160,8 +169,7 @@ const ClassroomAnswer: React.FC = () => {
     // 提交成功
     on('student:submitted', (data: { questionId: string; startedAt?: string; success: boolean }) => {
       const question = questionRef.current
-      if (!question || data.questionId !== question.questionId || !data.success ||
-          (data.startedAt && data.startedAt !== question.startedAt)) return
+      if (!question || !data.success || !roundGuard.current.matches(data)) return
       submittedRef.current = true
       submittingRef.current = false
       setSubmitted(true)
@@ -195,31 +203,32 @@ const ClassroomAnswer: React.FC = () => {
   // A missing confirmation must not leave the submit button locked indefinitely.
   useEffect(() => {
     if (!submitting) return
+    const round = questionRef.current
     const timer = setTimeout(() => {
+      if (!round || !roundGuard.current.matches(round)) return
       submittingRef.current = false
       setSubmitting(false)
       setNotice({ kind: 'error', message: '尚未收到提交确认，请重试或刷新。重复提交同一答案不会新增记录。' })
     }, 15_000)
     return () => clearTimeout(timer)
-  }, [submitting])
+  }, [submitting, currentQuestion?.questionId, currentQuestion?.startedAt])
 
   // 倒计时
   useEffect(() => {
     if (countdown === null || countdown <= 0) return
 
+    const round = questionRef.current
     const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev === null || prev <= 1) {
-          clearInterval(timer)
-          setIsFinished(true) // 倒计时结束，标记答题已结束
-          return 0
-        }
-        return prev - 1
-      })
+      if (!round || !roundGuard.current.matches(round) || roundGuard.current.finished) return
+      if (countdown <= 1) {
+        roundGuard.current.finish(round)
+        setCountdown(0)
+        setIsFinished(true)
+      } else setCountdown(countdown - 1)
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [countdown])
+  }, [countdown, currentQuestion?.questionId, currentQuestion?.startedAt])
 
   // 提交答案
   const handleSubmit = () => {

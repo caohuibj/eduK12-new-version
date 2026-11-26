@@ -14,6 +14,7 @@ interface Props {
 }
 
 const initialSettings: ClassroomDanmakuSettings = { topic: '', displayMode: 'QUESTION', reviewMode: 'realtime', speed: 'normal' }
+const messagePageSize = 20
 const settingsFrom = (snapshot: ClassroomDanmakuSnapshot): ClassroomDanmakuSettings => ({
   topic: snapshot.topic, displayMode: snapshot.displayMode, reviewMode: snapshot.enabled ? snapshot.reviewMode : 'realtime', speed: snapshot.speed,
 })
@@ -30,6 +31,8 @@ export default function ClassroomDanmakuPanel({ classroomId, isConnected, on, of
   const [problem, setProblem] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [filter, setFilter] = useState<'pending' | 'approved'>('approved')
+  const [search, setSearch] = useState('')
+  const [visibleLimit, setVisibleLimit] = useState(messagePageSize)
   const [clock, setClock] = useState(Date.now)
   const { feedback, confirm } = useStaffFeedback()
   const invalidateGeneration = useCallback(() => { ++generation.current }, [])
@@ -43,6 +46,10 @@ export default function ClassroomDanmakuPanel({ classroomId, isConnected, on, of
     setSynchronized(true)
     setClock(Date.now())
     if (!previous) setFilter(next.reviewMode === 'review' ? 'pending' : 'approved')
+    if (previous?.displayEpoch !== next.displayEpoch) {
+      setSearch('')
+      setVisibleLimit(messagePageSize)
+    }
     if (previous?.enabled && !next.enabled) dirty.current = false
     if (!dirty.current) setSettings(settingsFrom(next))
   }, [classroomId])
@@ -164,7 +171,15 @@ export default function ClassroomDanmakuPanel({ classroomId, isConnected, on, of
   const locked = !isConnected || !synchronized || !snapshot?.available || !!pending || reading
   const pendingMessages = (snapshot?.pending ?? []).filter(message => Date.parse(message.expiresAt) > clock)
   const approvedMessages = (snapshot?.messages ?? []).filter(message => Date.parse(message.expiresAt) > clock)
-  const visibleMessages = filter === 'pending' ? pendingMessages : approvedMessages
+  const messagesInTab = filter === 'pending' ? pendingMessages : approvedMessages
+  const searchTerm = search.trim().toLowerCase()
+  const matchingMessages = searchTerm ? messagesInTab.filter(message => message.text.toLowerCase().includes(searchTerm)) : messagesInTab
+  const visibleMessages = matchingMessages.slice(0, visibleLimit)
+  const selectFilter = (value: 'pending' | 'approved') => {
+    setFilter(value)
+    setSearch('')
+    setVisibleLimit(messagePageSize)
+  }
   const status = !snapshot ? '正在读取' : !synchronized ? '待刷新确认' : !snapshot.enabled ? '未开启' : snapshot.paused ? '屏显已暂停' : '进行中'
 
   return <section className="classroom-danmaku" aria-labelledby="classroom-danmaku-title">
@@ -211,15 +226,17 @@ export default function ClassroomDanmakuPanel({ classroomId, isConnected, on, of
     </div>}
     </div>
     <section className="staff-panel staff-panel--padded classroom-danmaku__queue" aria-labelledby="classroom-danmaku-review-title">
-      <div><h3 id="classroom-danmaku-review-title">弹幕审核</h3><p className="classroom-danmaku__hint">这里只显示当前仍有效的临时消息；隐藏后会从列表和大屏移除。</p></div>
-      <div className="classroom-danmaku__filters" role="group" aria-label="弹幕审核筛选"><button type="button" aria-pressed={filter === 'pending'} onClick={() => setFilter('pending')}>待审核（{pendingMessages.length}）</button><button type="button" aria-pressed={filter === 'approved'} onClick={() => setFilter('approved')}>已通过（{approvedMessages.length}）</button></div>
-      {!visibleMessages.length ? <p className="classroom-danmaku__empty">{filter === 'pending' ? '暂无待审核弹幕' : '暂无已通过的弹幕'}</p> : <ul className="classroom-danmaku__messages">{visibleMessages.map(message => <li key={message.id} className="classroom-danmaku__message">
+      <div><h3 id="classroom-danmaku-review-title">弹幕审核</h3><p className="classroom-danmaku__hint">可查找仍在有效期内的弹幕。隐藏后会从列表和大屏移除。</p></div>
+      <div className="classroom-danmaku__filters" role="group" aria-label="弹幕审核筛选"><button type="button" aria-pressed={filter === 'pending'} onClick={() => selectFilter('pending')}>待审核（{pendingMessages.length}）</button><button type="button" aria-pressed={filter === 'approved'} onClick={() => selectFilter('approved')}>已通过（{approvedMessages.length}）</button></div>
+      {(messagesInTab.length > messagePageSize || search) && <label className="staff-field"><span>搜索弹幕内容</span><input type="search" value={search} onChange={event => { setSearch(event.target.value); setVisibleLimit(messagePageSize) }} /></label>}
+      {!visibleMessages.length ? <p className="classroom-danmaku__empty">{searchTerm ? '没有匹配的弹幕' : filter === 'pending' ? '暂无待审核弹幕' : '暂无已通过的弹幕'}</p> : <ul className="classroom-danmaku__messages">{visibleMessages.map(message => <li key={message.id} className="classroom-danmaku__message">
         <div className="classroom-danmaku__message-top"><span className={`staff-badge ${filter === 'pending' ? 'staff-badge--warning' : 'staff-badge--success'}`}>{filter === 'pending' ? '待审核' : '已通过'}</span><time className="classroom-danmaku__message-meta" dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</time></div>
         <p className="classroom-danmaku__message-text">{message.text}</p><div className="classroom-danmaku__actions">
           {filter === 'pending' && <ProductButton variant="primary" disabled={locked || !snapshot?.enabled} onClick={() => void control('approve', message.id)}><Check size={16} aria-hidden="true" />{pending === `approve:${message.id}` ? '确认中…' : '批准展示'}</ProductButton>}
           <ProductButton disabled={locked || !snapshot?.enabled} onClick={() => void control('hide', message.id)}><EyeOff size={16} aria-hidden="true" />{pending === `hide:${message.id}` ? '确认中…' : '隐藏弹幕'}</ProductButton>
         </div>
       </li>)}</ul>}
+      {visibleMessages.length < matchingMessages.length && <ProductButton onClick={() => setVisibleLimit(limit => limit + messagePageSize)}>显示更多弹幕</ProductButton>}
     </section>
     </div>
   </section>

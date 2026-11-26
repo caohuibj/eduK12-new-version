@@ -8,6 +8,7 @@ import ClassroomDanmakuPanel from './ClassroomDanmakuPanel'
 import { useAuth } from '../../contexts/AuthContext'
 import { Play, Square, Users, QrCode, CheckCircle, Edit, Monitor } from 'lucide-react'
 import { normalizeApiError } from '../../utils/normalizeApiError'
+import { ClassroomRoundGuard } from '../../utils/classroomRound'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 import { isTrainingHost } from '../../training/context'
@@ -36,6 +37,7 @@ interface Classroom {
 
 type ClassroomStats = {
   questionId: string
+  startedAt?: string | null
   answerCount: number
   totalSessions: number
   activeAnswerCount: number
@@ -50,7 +52,7 @@ const questionFromSocket = (data: any): Question | null => {
     questionIndex: Number(data.questionIndex ?? 0),
     questionContent: data.questionContent,
     timeLimit: data.timeLimit ?? null,
-    startedAt: data.startedAt ?? new Date().toISOString(),
+    startedAt: data.startedAt ?? null,
     endedAt: data.endedAt ?? null,
   }
 }
@@ -64,6 +66,8 @@ const ClassroomControl: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
   const currentQuestionRef = useRef<Question | null>(null)
+  const roundGuard = useRef(new ClassroomRoundGuard())
+  const classroomRequestRevision = useRef(0)
   const statsRevision = useRef(0)
   const statsTimer = useRef<number | null>(null)
   const [onlineCount, setOnlineCount] = useState<number | null>(null)
@@ -86,10 +90,12 @@ const ClassroomControl: React.FC = () => {
     cancelStatsRefresh()
     const revision = ++statsRevision.current
     try {
-      const response = await apiClient.get<{ stats?: ClassroomStats }>(`/classrooms/${id}/questions/${question.id}/stats`)
-      if (revision !== statsRevision.current) return
+      const response = await apiClient.get<{ stats?: ClassroomStats; question?: Question }>(`/classrooms/${id}/questions/${question.id}/stats`)
+      if (revision !== statsRevision.current || !roundGuard.current.matches({ questionId: question.id, startedAt: question.startedAt })) return
       if (response.code !== 0 || !response.data?.stats) throw new Error(response.message || '统计暂不可用')
-      setStats({ ...response.data.stats, questionId: question.id })
+      const marker = response.data.stats.startedAt ?? response.data.question?.startedAt
+      if (!roundGuard.current.matches({ questionId: question.id, startedAt: marker })) return
+      setStats({ ...response.data.stats, questionId: question.id, startedAt: marker })
       setStatsUnknown(Boolean(response.data.stats.unsupportedType))
     } catch (err) {
       if (revision !== statsRevision.current) return
@@ -107,6 +113,10 @@ const ClassroomControl: React.FC = () => {
 
   const updateCurrentQuestion = useCallback((next: Question | null) => {
     const previous = currentQuestionRef.current
+    if (next) {
+      if (!roundGuard.current.receive({ questionId: next.id, startedAt: next.startedAt }, Boolean(next.endedAt))) return false
+      if (roundGuard.current.finished && !next.endedAt && previous?.endedAt) next = { ...next, endedAt: previous.endedAt }
+    } else roundGuard.current.clear()
     currentQuestionRef.current = next
     setCurrentQuestion(next)
     if (previous?.id !== next?.id || previous?.startedAt !== next?.startedAt) {
@@ -119,10 +129,19 @@ const ClassroomControl: React.FC = () => {
       cancelStatsRefresh()
       ++statsRevision.current
     }
+    return true
   }, [cancelStatsRefresh, scheduleStatsRefresh])
+
+  useEffect(() => {
+    roundGuard.current.reset()
+    currentQuestionRef.current = null
+    ++classroomRequestRevision.current
+    ++statsRevision.current
+  }, [id])
 
   useEffect(() => () => {
     cancelStatsRefresh()
+    ++classroomRequestRevision.current
     ++statsRevision.current
   }, [cancelStatsRefresh, id])
 
@@ -136,21 +155,25 @@ const ClassroomControl: React.FC = () => {
 
   // 获取课堂信息
   const fetchClassroom = useCallback(async () => {
+    const requestRevision = ++classroomRequestRevision.current
+    const roundRevision = roundGuard.current.revision
     try {
       setLoading(true)
       const response = await apiClient.get<Classroom>(`/classrooms/${id}`)
+      if (requestRevision !== classroomRequestRevision.current || roundRevision !== roundGuard.current.revision) return
       if (response.code === 0 && response.data) {
+        if (!updateCurrentQuestion(response.data.questions.find((question) => question.startedAt && !question.endedAt) || null)) return
         setClassroom(response.data)
-        updateCurrentQuestion(response.data.questions.find((question) => question.startedAt && !question.endedAt) || null)
       } else {
         setClassroom(null)
         setLoadError(response.message || '课堂信息缺失')
       }
     } catch (err: any) {
+      if (requestRevision !== classroomRequestRevision.current || roundRevision !== roundGuard.current.revision) return
       setClassroom(null)
       setLoadError(err.message || '获取课堂信息失败')
     } finally {
-      setLoading(false)
+      if (requestRevision === classroomRequestRevision.current) setLoading(false)
     }
   }, [id, updateCurrentQuestion])
 
@@ -162,20 +185,22 @@ const ClassroomControl: React.FC = () => {
   useEffect(() => {
     if (!isConnected) return
 
+    const joinedAtRevision = roundGuard.current.revision
     // 教师加入成功
     on('teacher:joined', (data) => {
+      const activeQuestion = questionFromSocket(data?.currentQuestion)
+      if (!activeQuestion && roundGuard.current.revision !== joinedAtRevision) return
+      if (!updateCurrentQuestion(activeQuestion)) return
       if (data?.status) {
         setClassroom((previous) => previous ? { ...previous, status: data.status } : previous)
       }
-      const activeQuestion = questionFromSocket(data?.currentQuestion)
-      updateCurrentQuestion(activeQuestion)
       // The join snapshot contains the active question, but not its stats.
       scheduleStatsRefresh()
     })
 
     // 实时统计
     on('broadcast:stats', (data) => {
-      if (!currentQuestionRef.current || data.questionId !== currentQuestionRef.current.id) return
+      if (!roundGuard.current.matches(data)) return
       // A newer Socket snapshot supersedes pending or in-flight HTTP reads.
       cancelStatsRefresh()
       ++statsRevision.current
@@ -199,8 +224,7 @@ const ClassroomControl: React.FC = () => {
     // receives its ACK. Keep the compatibility event authoritative as well.
     on('teacher:started', (data) => {
       const activeQuestion = questionFromSocket(data)
-      if (!activeQuestion) return
-      updateCurrentQuestion(activeQuestion)
+      if (!activeQuestion || !updateCurrentQuestion(activeQuestion)) return
       setClassroom((previous) => previous ? {
         ...previous,
         status: 'ACTIVE',
@@ -211,16 +235,15 @@ const ClassroomControl: React.FC = () => {
     // 答题结束
     on('broadcast:finished', (data) => {
       const previous = currentQuestionRef.current
-      if (previous && (!data?.questionId || previous.id === data.questionId)) {
-        updateCurrentQuestion({ ...previous, endedAt: data.endedAt || new Date().toISOString() })
-      }
+      if (!previous || !roundGuard.current.finish(data)) return
+      updateCurrentQuestion({ ...previous, endedAt: data.endedAt || new Date().toISOString() })
       // 刷新课堂信息以更新题目状态
       fetchClassroom()
     })
 
     // 下一题
     on('broadcast:next', (data) => {
-      if (!data?.expectedQuestionId || data.expectedQuestionId === currentQuestionRef.current?.id) {
+      if (roundGuard.current.clear({ questionId: data?.expectedQuestionId, startedAt: data?.expectedStartedAt })) {
         updateCurrentQuestion(null)
       }
     })
@@ -264,7 +287,7 @@ const ClassroomControl: React.FC = () => {
       const result = payload as { ok?: boolean; started?: boolean; message?: string; question?: unknown } | undefined
       const authoritative = questionFromSocket(result?.question)
       if (authoritative) {
-        updateCurrentQuestion(authoritative)
+        if (!updateCurrentQuestion(authoritative)) return
         setClassroom((previous) => previous ? {
           ...previous,
           status: authoritative.startedAt && !authoritative.endedAt ? 'ACTIVE' : (result?.ok ? 'ACTIVE' : previous.status),
@@ -298,7 +321,7 @@ const ClassroomControl: React.FC = () => {
   const handleNextQuestion = () => {
     if (!classroom) return
 
-    emit('teacher:next', { expectedQuestionId: currentQuestion?.id || null })
+    emit('teacher:next', { expectedQuestionId: currentQuestion?.id || null, expectedStartedAt: currentQuestion?.startedAt || null })
   }
 
   // 关闭课堂

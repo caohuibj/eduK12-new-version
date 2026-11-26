@@ -21,7 +21,7 @@ const {
     classroom: { findUnique: vi.fn(), update: vi.fn() },
     classroomQuestion: { findFirst: vi.fn(), findUnique: vi.fn(), updateMany: vi.fn() },
     classroomSession: { findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), upsert: vi.fn(), update: vi.fn(), updateMany: vi.fn(), count: vi.fn() },
-    classroomAnswer: { findUnique: vi.fn(), create: vi.fn(), count: vi.fn(), findMany: vi.fn(), deleteMany: vi.fn() },
+    classroomAnswer: { findUnique: vi.fn(), create: vi.fn(), createMany: vi.fn(), count: vi.fn(), findMany: vi.fn(), deleteMany: vi.fn() },
     $transaction: vi.fn(),
     $executeRaw: vi.fn().mockResolvedValue(1),
   },
@@ -132,7 +132,7 @@ describe('classroom socket authorization boundary', () => {
       message: '请先加入课堂',
     })
     expect(mockPrisma.classroomQuestion.updateMany).not.toHaveBeenCalled()
-    expect(mockPrisma.classroomAnswer.create).not.toHaveBeenCalled()
+    expect(mockPrisma.classroomAnswer.createMany).not.toHaveBeenCalled()
     expect(mockSocketService.broadcastToRoom).not.toHaveBeenCalled()
   })
 
@@ -169,7 +169,7 @@ describe('classroom socket authorization boundary', () => {
     expect(socket.emit).toHaveBeenCalledWith('error', {
       message: '课堂会话无效',
     })
-    expect(mockPrisma.classroomAnswer.create).not.toHaveBeenCalled()
+    expect(mockPrisma.classroomAnswer.createMany).not.toHaveBeenCalled()
     expect(mockSocketService.broadcastToRoom).not.toHaveBeenCalled()
   })
 
@@ -319,7 +319,7 @@ describe('classroom socket authorization boundary', () => {
       message: '课堂会话无效',
     })
     expect(mockPrisma.classroomQuestion.updateMany).not.toHaveBeenCalled()
-    expect(mockPrisma.classroomAnswer.create).not.toHaveBeenCalled()
+    expect(mockPrisma.classroomAnswer.createMany).not.toHaveBeenCalled()
     expect(mockSocketService.broadcastToRoom).not.toHaveBeenCalled()
   })
 
@@ -365,7 +365,7 @@ describe('classroom socket authorization boundary', () => {
     mockPrisma.classroomQuestion.findFirst.mockResolvedValue(question)
     mockPrisma.classroomSession.findFirst.mockResolvedValue({ id: 'server-session' })
     mockPrisma.classroomAnswer.findUnique.mockResolvedValue(null)
-    mockPrisma.classroomAnswer.create.mockResolvedValue({ id: 'answer-1' })
+    mockPrisma.classroomAnswer.createMany.mockResolvedValue({ count: 1 })
     mockPrisma.classroomAnswer.count.mockResolvedValue(1)
     mockPrisma.classroomSession.count.mockResolvedValue(1)
 
@@ -382,7 +382,7 @@ describe('classroom socket authorization boundary', () => {
       },
       select: { id: true },
     })
-    expect(mockPrisma.classroomAnswer.create).toHaveBeenCalledOnce()
+    expect(mockPrisma.classroomAnswer.createMany).toHaveBeenCalledOnce()
   })
 
   it('revalidates a current authenticated student before an ownership-bound submit', async () => {
@@ -393,13 +393,13 @@ describe('classroom socket authorization boundary', () => {
     mockPrisma.classroomQuestion.findFirst.mockResolvedValue({ id: 'question-1', startedAt: new Date(), endedAt: null, timeLimit: null })
     mockPrisma.classroomSession.findFirst.mockResolvedValue({ id: 'session-1' })
     mockPrisma.classroomAnswer.findUnique.mockResolvedValue(null)
-    mockPrisma.classroomAnswer.create.mockResolvedValue({ id: 'answer-1' })
+    mockPrisma.classroomAnswer.createMany.mockResolvedValue({ count: 1 })
     await (handler as any).handleStudentSubmit(socket, { questionId: 'question-1', answer: 'A' })
     expect(mockSocketService.refreshAuthenticatedSocket).toHaveBeenCalledWith(socket)
     expect(mockPrisma.classroomSession.findFirst).toHaveBeenCalledWith({
       where: { id: 'session-1', classroomId: 'classroom-1', studentId: 'student-1' }, select: { id: true },
     })
-    expect(mockPrisma.classroomAnswer.create).toHaveBeenCalledOnce()
+    expect(mockPrisma.classroomAnswer.createMany).toHaveBeenCalledOnce()
   })
 
   it.each(['revoked', 'role-changed', 'different-student'])('rejects %s signed identity without downgrading later retries to anonymous', async reason => {
@@ -420,7 +420,7 @@ describe('classroom socket authorization boundary', () => {
     expect(socket.data.authenticationInvalidated).toBe(reason === 'role-changed' ? undefined : true)
     expect(socket.disconnect).not.toHaveBeenCalled()
     expect(mockPrisma.classroom.findUnique).not.toHaveBeenCalled()
-    expect(mockPrisma.classroomAnswer.create).not.toHaveBeenCalled()
+    expect(mockPrisma.classroomAnswer.createMany).not.toHaveBeenCalled()
     expect(mockPrisma.classroomSession.upsert).not.toHaveBeenCalled()
   })
 

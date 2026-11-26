@@ -25,6 +25,8 @@ export interface ClassroomDanmakuSnapshot extends ClassroomDanmakuSettings {
   expiresAt: string | null
   messages: ClassroomDanmakuMessage[]
   pending?: ClassroomDanmakuMessage[]
+  removedMessageIds?: string[]
+  olderModerationIds?: string[]
   limits: {
     maxTextLength: number
     cooldownMs: number
