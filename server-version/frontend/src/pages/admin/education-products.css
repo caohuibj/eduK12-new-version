@@ -38,3 +38,8 @@
 .epg-actions a{display:inline-flex;align-items:center;padding:.45rem .7rem;border-radius:8px;background:#f2f5f7;text-decoration:none}
 .epg-actions a:hover{text-decoration:underline}
 @media(max-width:650px){.epg-verification>summary span{display:block;margin:4px 0 0}.epg-actions{gap:.5rem}}
+
+/* Keep the loaded school visible while preventing actions on a changed target. */
+.epg-school-controls{border:0;padding:0;margin:0;min-width:0;width:100%}
+.epg-help{font-size:.875rem;line-height:1.7;color:#59677a}
+.epg-scope-warning{border-left:4px solid #a86c30;background:#fff8e7;color:#67431f;padding:.8rem;line-height:1.7;border-radius:0 8px 8px 0}

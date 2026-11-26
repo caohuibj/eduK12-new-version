@@ -54,6 +54,8 @@ export default function SurveyResearchersAdmin(){
 export function SurveyResearchersWorkspace({actorId}:{actorId?:string}={}){
   const [list,setList]=useState<Researcher[]>([]),[pending,setPending]=useState<Invitation[]>([])
   const [researcherPage,setResearcherPage]=useState(1),[invitationPage,setInvitationPage]=useState(1)
+  const [researcherQuery,setResearcherQuery]=useState(''),[researcherStatus,setResearcherStatus]=useState('')
+  const visibleResearchers=list.filter(person=>(!researcherStatus||person.status===researcherStatus)&&person.username.toLocaleLowerCase().includes(researcherQuery.trim().toLocaleLowerCase()))
   const [password,setPassword]=useState('')
   // The login session's proof timestamp is not exposed to this page. Unknown
   // timing stays server-checked; only a successful reauthentication starts this
@@ -252,7 +254,8 @@ export function SurveyResearchersWorkspace({actorId}:{actorId?:string}={}){
     </section>
     <section role="tabpanel" id="survey-admin-panel-researchers" aria-labelledby="survey-admin-tab-researchers" hidden={section!=='researchers'} className="survey-admin-panel">
     <div className="survey-admin-section-heading"><h2>研究者</h2><span className="survey-admin-muted">当前页 {list.length} 位</span></div>
-    <div className="survey-admin-people">{list.map(person=><article className="survey-admin-card survey-admin-person" key={person.id} aria-label={'研究者：'+person.username}>
+    <div className="survey-admin-researcher-filters" role="search" aria-label="当前页研究者筛选"><label>检索当前页研究者<input type="search" className="input" aria-label="检索当前页研究者" value={researcherQuery} onChange={event=>setResearcherQuery(event.target.value)} placeholder="输入研究者登录名"/></label><label>资格状态<select className="input" value={researcherStatus} onChange={event=>setResearcherStatus(event.target.value)}><option value="">所有状态</option>{['ACTIVE','PENDING_MFA','SUSPENDED','REVOKED','UNAVAILABLE'].map(status=><option key={status} value={status}>{statusLabel(status)}</option>)}</select></label><button type="button" className="btn-secondary" disabled={!researcherQuery&&!researcherStatus} onClick={()=>{setResearcherQuery('');setResearcherStatus('')}}>清除筛选</button><p>仅筛选当前已加载的研究者，显示 {visibleResearchers.length} / {list.length} 位。查看其他页请使用下方分页；工具授权对象不受此筛选影响。</p></div>
+    <div className="survey-admin-people">{visibleResearchers.map(person=><article className="survey-admin-card survey-admin-person" key={person.id} aria-label={'研究者：'+person.username}>
       <details className="survey-admin-person-disclosure">
         <summary aria-label={'管理研究者：'+person.username}>
           <span className="survey-admin-avatar"><UserRound size={22} aria-hidden="true"/></span>
@@ -275,6 +278,7 @@ export function SurveyResearchersWorkspace({actorId}:{actorId?:string}={}){
         </div>
       </details>
     </article>)}</div>
+    {!loading&&!error&&list.length>0&&!visibleResearchers.length&&<p className="survey-admin-empty">当前页没有匹配的研究者。请调整条件、清除筛选，或切换研究者分页。</p>}
     {!loading&&!error&&!list.length&&<p className="survey-admin-empty">{researcherPage===1?'暂无可见研究者。':'本页没有研究者，可返回上一页。'}</p>}
     <div className="survey-admin-pagination">
       <button type="button" className="btn-secondary" disabled={busy||researcherPage<=1}

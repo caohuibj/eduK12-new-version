@@ -13,6 +13,7 @@ type Entitlement={product:Product;status:string;revision:number}
 type Grant={grantId:string;membershipId:string;loginName:string;grantedAt:string}
 type Envelope<T>={code:string|number;message:string;data:T}
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i
+const entitlementLabels:Record<string,string>={ACTIVE:'已开通',SUSPENDED:'已暂停'}
 const labels:Record<Product,string>={HUISCHOOL:'校园心理健康',HUITEACHER:'教师发展与学校改进'}
 const endpoint='/api/platform/education'
 
@@ -55,15 +56,16 @@ export default function EducationProductGovernance({product}:{product?:Product})
   const load=()=>{
     const org=school.trim()
     if(!uuid.test(org)){setError('必须输入正式学校的 Organization UUID');return}
-    setBusy(true);setError('');setNotice('')
+    setBusy(true);setError('');setNotice('');setPassword('')
     void read(org).catch(e=>{
       setLoaded('');setProducts([]);setGrants([])
       setError(e instanceof Error?e.message:'学校授权读取失败')
     }).finally(()=>setBusy(false))
   }
   const change=(message:string,send:(secret:string)=>Promise<unknown>)=>{
+    if(loaded&&school.trim()!==loaded){setError('学校编号已修改，请先重新查询学校，再执行操作。');return}
     if(!loaded||!password){setError('请先加载学校并输入本次管理员密码');return}
-    if(!window.confirm(message))return
+    if(!window.confirm(message+'\n学校编号：'+loaded))return
     const secret=password
     setPassword('');setBusy(true);setNotice('');setError('')
     void send(secret).then(()=>read(loaded))
@@ -92,12 +94,14 @@ export default function EducationProductGovernance({product}:{product?:Product})
     <div className="epg-panel">
       <h2>选择正式学校</h2>
       <label>学校 Organization UUID
-        <input value={school} autoComplete="off" onChange={e=>setSchool(e.target.value)}/>
+        <input value={school} autoComplete="off" placeholder="粘贴正式学校的组织编号（UUID）" aria-describedby="education-school-help" onChange={e=>{setSchool(e.target.value);setPassword('');setError('');setNotice('')}}/>
       </label>
+      <p id="education-school-help" className="epg-help">请从正式学校的机构记录复制组织编号。本入口负责独立产品开通与配置授权，不创建学校。</p>
+      {loaded&&school.trim()!==loaded&&<p role="status" className="epg-scope-warning">学校编号已修改。请先查询新学校；下方原学校操作已停用。</p>}
       <button type="button" onClick={load} disabled={busy||!uuid.test(school.trim())}>
         查询学校产品授权</button>
     </div>
-    {loaded&&<>
+    {loaded&&<fieldset className="epg-school-controls" aria-label="已加载学校治理操作" disabled={school.trim()!==loaded}>
       <Suspense fallback={<p role="status">正在加载固定配置授权…</p>}><EducationStandardConfigurations actorId={user!.id} organizationId={loaded} product={selectedProduct}/><EducationCognitiveConfigurations actorId={user!.id} organizationId={loaded} product={selectedProduct}/></Suspense>
       <div className="epg-panel">
         <h2>独立产品开通</h2>
@@ -107,15 +111,15 @@ export default function EducationProductGovernance({product}:{product?:Product})
             const item=products.find(x=>x.product===product)
             return <article key={product}>
               <h3>{labels[product]}</h3>
-              <p>{item?.status??'尚未开通'} · 版本 {item?.revision??0}</p>
+              <p>{item?(entitlementLabels[item.status]??item.status):'尚未开通'} · 版本 {item?.revision??0}</p>
               <div className="epg-actions">
                 <button type="button" disabled={busy||item?.status==='ACTIVE'} onClick={()=>change(
                   '确认开通'+labels[product]+'？当前学校与账号不会因此获得另一产品的权限。',
                   secret=>request('/organizations/'+loaded+'/products/'+product,'PUT',{
                     action:'ACTIVATE',currentPassword:secret,
                     expectedRevision:item?.revision??0,
-                    ...(product==='HUISCHOOL'&&uuid.test(schoolAdmin)
-                      ?{initialSchoolAdminMembershipId:schoolAdmin}:{}),
+                    ...(product==='HUISCHOOL'&&uuid.test(schoolAdmin.trim())
+                      ?{initialSchoolAdminMembershipId:schoolAdmin.trim()}:{}),
                   }))}>开通</button>
                 <button type="button" disabled={busy||item?.status!=='ACTIVE'} onClick={()=>change(
                   '确认暂停'+labels[product]+'？共享身份不会删除。',
@@ -127,7 +131,7 @@ export default function EducationProductGovernance({product}:{product?:Product})
             </article>
           })}
         </div>
-        {selectedProduct==='HUISCHOOL'&&<label>首次开通 Huischool 时的专门管理员 Membership UUID（仅需要时填写）
+        {selectedProduct==='HUISCHOOL'&&<label>School 独立管理员 Membership UUID（首次开通必填；须为本校组织管理员）
           <input value={schoolAdmin} autoComplete="off"
             onChange={e=>setSchoolAdmin(e.target.value)}/>
         </label>}
@@ -160,6 +164,6 @@ export default function EducationProductGovernance({product}:{product?:Product})
         <p>密码仅随当前受控操作提交，完成后清空；不写入 URL、日志或本地存储。
           所有操作由后端校验对应入口授权、最近安全密钥验证、当前密码及本校产品状态。</p>
       </div>
-    </>}
+    </fieldset>}
   </section>
 }

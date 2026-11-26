@@ -194,3 +194,18 @@ describe('S05 administrator workspace',()=>{
     expect(fetcher.mock.calls.filter(([,init])=>init?.method==='POST')).toHaveLength(1)
   })
 })
+
+it('filters only the loaded researcher page while retaining every authorization recipient',async()=>{
+ const {fetcher}=mount();await ready();const before=fetcher.mock.calls.length
+ fireEvent.change(screen.getByLabelText('检索当前页研究者'),{target:{value:'合成研究者2'}})
+ expect(screen.getByRole('article',{name:'研究者：合成研究者2'})).toBeVisible()
+ expect(screen.queryByRole('article',{name:'研究者：合成研究者0'})).toBeNull()
+ fireEvent.change(screen.getByLabelText('资格状态'),{target:{value:'ACTIVE'}})
+ expect(screen.getByText(/当前页没有匹配的研究者/)).toBeVisible()
+ expect(fetcher.mock.calls).toHaveLength(before)
+ fireEvent.click(tab('工具授权'))
+ expect(within(screen.getByLabelText('授权给研究者')).getByRole('option',{name:'合成研究者0 · 已激活'})).toBeInTheDocument()
+ expect(within(screen.getByLabelText('授权给研究者')).getByRole('option',{name:'合成研究者2 · 已暂停'})).toBeInTheDocument()
+ fireEvent.click(tab('研究者'));fireEvent.click(within(screen.getByRole('search',{name:'当前页研究者筛选'})).getByRole('button',{name:'清除筛选'}))
+ expect(screen.getByRole('article',{name:'研究者：合成研究者0'})).toBeVisible()
+})

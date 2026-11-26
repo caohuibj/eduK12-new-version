@@ -239,7 +239,7 @@ const TeacherRegister: React.FC = () => {
       </div>}
       <div className="hui-auth-note">
         <strong>账号说明</strong>
-        <div>{training ? '注册码仅用于首次注册。账号经平台管理员审核后可以登录，有效期为1年。' : '提交后教师码即失效。账号需管理员审核通过后才能登录，有效期为1年。'}</div>
+        <div>{training ? '注册码仅用于首次注册。账号经平台管理员审核后可以登录；账号有效期由注册码配置决定，从注册成功起算，包含等待审核的时间。' : '提交后教师码即失效。账号需管理员审核通过后才能登录，有效期为1年。'}</div>
       </div>
     </AuthShell>
   )
