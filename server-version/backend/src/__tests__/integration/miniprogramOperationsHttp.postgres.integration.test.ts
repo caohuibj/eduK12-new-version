@@ -176,18 +176,18 @@ suite('Mini role operations and shared classroom against actual HTTP/PostgreSQL/
  it('HTTP and Web handler race returns one winner, one persisted start and no timer reset',async()=>{
   await endClassroomQuestion(classroom.id,question.id)
   const t=await logged(teacher),state=await t.runtime.classrooms.state(classroom.id),handler=new ClassroomSocketHandler(),acks:any[]=[]
-  const broadcast=vi.spyOn(socketService,'broadcastToRoom').mockImplementation(()=>{});try{
+  const broadcast=vi.spyOn(socketService,'broadcastToRoom').mockImplementation(()=>{})
+  const managerDelivery=vi.spyOn(socketService,'sendToClassroomManagers').mockResolvedValue(undefined);try{
    await Promise.all([t.runtime.classrooms.command(classroom.id,'START',{questionId:question.id},state),...Array.from({length:8},async()=>{await (handler as any).handleTeacherStart({handshake:{headers:{cookie:'ptool_session='+generateToken({userId:teacher.id,username:teacher.username,role:'TEACHER',tokenVersion:teacher.tokenVersion})}},data:{authenticated:true,userId:teacher.id,userRole:'TEACHER',tokenVersion:0,classroomId:classroom.id},emit:vi.fn()},{questionId:question.id,timeLimit:60},(p:any)=>acks.push(p))})])
    const active=await prisma.classroomQuestion.findMany({where:{classroomId:classroom.id,startedAt:{not:null},endedAt:null}});expect(active).toHaveLength(1);expect(acks).toHaveLength(8);expect(acks.every(a=>a.ok&&a.question.startedAt===active[0].startedAt!.toISOString())).toBe(true)
-   // One start is delivered once to each audience; students receive a
-   // sanitized payload instead of the former shared classroom broadcast.
+   // One start produces one sanitized student broadcast and one authorized
+   // manager delivery request; manager data is not sent to a room.
    expect(broadcast.mock.calls.map(([room,event])=>[room,event])).toEqual([
     ['classroom:'+classroom.id+':students','broadcast:question'],
-    ['classroom:'+classroom.id+':teacher','broadcast:question'],
-    ['classroom:'+classroom.id+':bigscreen','broadcast:question'],
    ])
    expect(broadcast.mock.calls[0][2].questionContent.correctAnswer).toBeUndefined()
-  }finally{broadcast.mockRestore();(handler as any).activeTimers.forEach((t:any)=>clearTimeout(t))}
+   expect(managerDelivery).toHaveBeenCalledExactlyOnceWith(classroom.id,'broadcast:question',expect.objectContaining({questionContent:expect.objectContaining({correctAnswer:'A'})}))
+  }finally{managerDelivery.mockRestore();broadcast.mockRestore();(handler as any).activeTimers.forEach((t:any)=>clearTimeout(t))}
  })
  it('repeat answer is idempotent; different answer, forged identity, and old round are rejected',async()=>{
   const s=await logged(student),state=await s.runtime.classrooms.state(classroom.id),body={questionId:question.id,startedAt:state.question.startedAt,answer:'B'}

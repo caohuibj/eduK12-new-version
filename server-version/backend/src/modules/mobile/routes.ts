@@ -10,6 +10,7 @@ import { asyncHandler } from '../../middleware/asyncHandler'
 import { success, forbidden, notFound, error } from '../../utils/response'
 import { canAccessCourseContent, canAccessCourseRoster, hasActiveCourseMembership, trainingAccountScope, trainingCourseScope, trainingShareRecipientScope } from '../../utils/courseAccess'
 import { canManageClassroom, findClassroomAccess } from '../../middleware/classroomAccess'
+import { asBusinessPrincipal } from '../organization/principal'
 import { requireOrganizationGovernance } from '../organization/access'
 import { UserRole } from '../../types'
 
@@ -30,11 +31,15 @@ function collectionActions(domain: string, role: UserRole) {
 }
 mobileRouter.get('/context/:domain', asyncHandler(async (req, res) => {
   const domain = domains.parse(req.params.domain)
-  return success(res, { allowedActions: collectionActions(domain, req.user!.role), commandKey: randomUUID() })
+  const actor = domain === 'classrooms' ? asBusinessPrincipal(req.user!) : req.user!
+  if (!actor || (domain === 'classrooms' && actor.role !== UserRole.TEACHER)) return forbidden(res)
+  return success(res, { allowedActions: collectionActions(domain, actor.role), commandKey: randomUUID() })
 }))
 mobileRouter.get('/context/:domain/:id', asyncHandler(async (req, res) => {
   const domain = domains.parse(req.params.domain), id = idSchema.parse(req.params.id)
-  const actor = req.user!, staff = actor.role === UserRole.TEACHER || actor.role === UserRole.ADMIN
+  const actor = domain === 'classrooms' ? asBusinessPrincipal(req.user!) : req.user!
+  if (!actor || (domain === 'classrooms' && actor.role !== UserRole.TEACHER)) return forbidden(res)
+  const staff = actor.role === UserRole.TEACHER || actor.role === UserRole.ADMIN
   const actions: string[] = []
   let fields: Record<string, unknown> = {}
   if (domain === 'courses' || domain === 'assignments' || domain === 'checkins') {
@@ -131,7 +136,9 @@ mobileRouter.get('/students', requireTeacher, asyncHandler(async (req, res) => {
 mobileRouter.get('/lists/:domain', asyncHandler(async (req, res) => {
   const domain = z.enum(['courses','assignments','checkins','classrooms','teacherCodes']).parse(req.params.domain)
   const {page,pageSize,courseId,keyword} = z.object({page:z.coerce.number().int().min(1).default(1),pageSize:z.coerce.number().int().min(1).max(50).default(20),courseId:idSchema.optional(),keyword:z.string().max(100).optional()}).parse(req.query)
-  const actor=req.user!, staff=actor.role===UserRole.TEACHER||actor.role===UserRole.ADMIN
+  const actor=domain==='classrooms'?asBusinessPrincipal(req.user!):req.user!
+  if(!actor||(domain==='classrooms'&&actor.role!==UserRole.TEACHER))return forbidden(res)
+  const staff=actor.role===UserRole.TEACHER||actor.role===UserRole.ADMIN
   if(!staff&&actor.role!==UserRole.STUDENT)return forbidden(res)
   if((domain==='classrooms'&&!staff)||(domain==='teacherCodes'&&actor.role!==UserRole.ADMIN))return forbidden(res)
   const relationship: Prisma.CourseWhereInput = actor.role===UserRole.ADMIN?{}:actor.role===UserRole.TEACHER?{creatorId:actor.userId}:{isLibrary:false,students:{some:{studentId:actor.userId,status:{in:['ACTIVE','APPROVED']}}}}
@@ -157,7 +164,7 @@ mobileRouter.get('/lists/:domain', asyncHandler(async (req, res) => {
     const where={course:courseWhere,...(title?{title}: {})}
     ;[list,total]=await Promise.all([prisma.checkin.findMany({where,...paging,select:{id:true,title:true,description:true,endTime:true,courseId:true}}),prisma.checkin.count({where})])
   }else if(domain==='classrooms'){
-    const where={course:trainingCourseScope,...(actor.role===UserRole.ADMIN?{}:{creatorId:actor.userId}),...(courseId?{courseId}:{})}
+    const where={course:trainingCourseScope,creatorId:actor.userId,...(courseId?{courseId}:{})}
     ;[list,total]=await Promise.all([prisma.classroom.findMany({where,...paging,select:{id:true,name:true,status:true,courseId:true}}),prisma.classroom.count({where})])
   }else{
     ;[list,total]=await Promise.all([prisma.teacherCode.findMany({...paging,select:{id:true,code:true,isActive:true,maxUses:true,usedCount:true,expiresAt:true}}),prisma.teacherCode.count()])

@@ -164,8 +164,8 @@ describe('registration lookup projections', () => {
     expect(res.statusCode).toBe(200)
     expect(res.body.message).toBe('注册成功，已加入课程')
     expect(mockPrisma.course.findUnique.mock.calls).toEqual([
-      [{ where: { courseCode: 'COURSE' }, select: courseSelect }],
-      [{ where: { id: 'course-1' }, select: courseSelect }],
+      [{ where: { courseCode: 'COURSE', courseType: { in: ['TRAINING_COURSE', 'LEGACY_COURSE'] }, creator: { accountDomain: { in: ['TRAINING', 'LEGACY'] } } }, select: courseSelect }],
+      [{ where: { id: 'course-1', courseType: { in: ['TRAINING_COURSE', 'LEGACY_COURSE'] }, creator: { accountDomain: { in: ['TRAINING', 'LEGACY'] } } }, select: courseSelect }],
     ])
     expect(mockPrisma.user.findUnique).toHaveBeenCalledExactlyOnceWith({ where: { username: 'student01' }, select: { id: true } })
     expect(mockPrisma.$executeRaw).toHaveBeenCalledOnce()

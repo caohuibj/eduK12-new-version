@@ -83,6 +83,7 @@ suite('classroom teacher:start concurrency (real PostgreSQL)', () => {
   it('returns one authoritative active question for twenty concurrent starts', async () => {
     const originalBroadcast = socketService.broadcastToRoom
     socketService.broadcastToRoom = vi.fn() as any
+    const managerDelivery = vi.spyOn(socketService, 'sendToClassroomManagers').mockResolvedValue(undefined)
     try {
       const makeSocket = () => ({
         handshake: { headers: { cookie: 'ptool_session=' + sessionToken } },
@@ -112,13 +113,12 @@ suite('classroom teacher:start concurrency (real PostgreSQL)', () => {
       const broadcasts = vi.mocked(socketService.broadcastToRoom).mock.calls
       expect(broadcasts.map(([room, event]) => [room, event])).toEqual([
         ['classroom:' + classroomId + ':students', 'broadcast:question'],
-        ['classroom:' + classroomId + ':teacher', 'broadcast:question'],
-        ['classroom:' + classroomId + ':bigscreen', 'broadcast:question'],
       ])
       expect(broadcasts[0][2].questionContent.correctAnswer).toBeUndefined()
-      expect(broadcasts[1][2].questionContent.correctAnswer).toBe('A')
-      expect(broadcasts[2][2].questionContent.correctAnswer).toBe('A')
+      expect(managerDelivery).toHaveBeenCalledExactlyOnceWith(classroomId, 'broadcast:question',
+        expect.objectContaining({ questionContent: expect.objectContaining({ correctAnswer: 'A' }) }))
     } finally {
+      managerDelivery.mockRestore()
       socketService.broadcastToRoom = originalBroadcast
     }
   }, 60000)

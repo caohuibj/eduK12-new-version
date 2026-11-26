@@ -213,8 +213,7 @@ export class ClassroomSocketHandler {
   private isManagerSocket(socket: Socket): boolean {
     return (
       socket.data.authenticated === true &&
-      (socket.data.userRole === UserRole.ADMIN ||
-        socket.data.userRole === UserRole.TEACHER)
+      socket.data.userRole === UserRole.TEACHER
     )
   }
 
@@ -263,7 +262,7 @@ export class ClassroomSocketHandler {
       !(await socketService.refreshAuthenticatedSocket(socket)) ||
       !this.isManagerSocket(socket)
     ) {
-      this.emitError(socket, '需要经过认证的教师或管理员连接')
+      this.emitError(socket, '需要经过认证的教师连接')
       return null
     }
 

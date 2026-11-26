@@ -2,7 +2,8 @@ import { Router } from 'express'
 import { z } from 'zod'
 import { config } from '../../config'
 import { prisma } from '../../config/database'
-import { authenticate } from '../../middleware/auth'
+import { authenticate, requireBusinessRole } from '../../middleware/auth'
+import { UserRole } from '../../types'
 import { trainingCourseScope } from '../../utils/courseAccess'
 import { findClassroomAccess, canManageClassroom } from '../../middleware/classroomAccess'
 import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
@@ -12,7 +13,7 @@ import { joinClassroomStudent, startClassroomQuestion, endClassroomQuestion, clo
 import { classroomSocketHandler } from '../../services/classroomSocketHandler'
 
 export const classroomRuntimeRouter=Router()
-classroomRuntimeRouter.use((_req,res,next)=>{res.set('Cache-Control','no-store');if(!config.miniClassroomEnabled)return notFound(res);next()},authenticate)
+classroomRuntimeRouter.use((_req,res,next)=>{res.set('Cache-Control','no-store');if(!config.miniClassroomEnabled)return notFound(res);next()},authenticate,requireBusinessRole(UserRole.STUDENT,UserRole.TEACHER))
 const id=z.string().regex(/^[A-Za-z0-9_-]{1,128}$/)
 const mutationLimit=createRedisRateLimiter({name:'mini-classroom-command',limit:120,windowSeconds:60,key:req=>req.user!.userId})
 classroomRuntimeRouter.use((req,res,next)=>req.method==='GET'?next():mutationLimit(req,res,next))

@@ -34,7 +34,9 @@ suite('business identities remain orthogonal to Training management over real HT
     }
     const app=express();app.use(express.json());app.use('/api',(await import('../../middleware/csrf')).csrfProtection)
     app.use('/api/admin/training',(await import('../../routes/trainingAdmin')).default)
+    app.use('/api/mobile/classrooms',(await import('../../modules/mobile/classroom.routes')).classroomRuntimeRouter)
     app.use('/api/mobile',(await import('../../modules/mobile/routes')).mobileRouter)
+    app.use('/api/classrooms',(await import('../../routes/classrooms')).default)
     app.use('/api/courses',(await import('../../routes/courses')).default)
     app.use('/api/situational',(await import('../../routes/situational')).default)
     app.use('/api/teacher/situational',(await import('../../routes/sjtTeacherParticipation')).default)
@@ -84,6 +86,43 @@ suite('business identities remain orthogonal to Training management over real HT
       expect(accepted.body.data.sharedCount).toBe(1)
     }
     expect(await db.courseShare.count({ where: { courseId: courses.teacher.id } })).toBe(1)
+  })
+
+  it('classroom data requires an approved teacher and ownership, independently of Training management', async () => {
+    const { config } = await import('../../config')
+    const previousFlag = config.miniClassroomEnabled
+    config.miniClassroomEnabled = true
+    try {
+      const createClassroom = (name: 'teacher' | 'otherTeacher') => db.classroom.create({ data: {
+        name: 'Synthetic classroom', code: randomUUID(), courseId: courses[name].id, creatorId: users[name].id,
+      } })
+      const owned = await createClassroom('teacher'), unrelated = await createClassroom('otherTeacher')
+      for (const classroom of [owned, unrelated]) {
+        await db.classroomQuestion.create({ data: { classroomId: classroom.id, questionIndex: 1,
+          questionContent: { question: 'Synthetic question', correctAnswer: 'A' } } })
+      }
+      const paths = (id: string) => ['/classrooms/' + id, '/classrooms/' + id + '/questions',
+        '/mobile/context/classrooms/' + id, '/mobile/classrooms/' + id + '/state']
+      for (const path of paths(owned.id)) {
+        expect((await call('teacher', path, 'GET', undefined, 'MANAGEMENT')).status).toBe(200)
+        expect((await call('pureAdmin', path, 'GET', undefined, 'MANAGEMENT')).status).toBe(403)
+      }
+      for (const path of paths(unrelated.id)) {
+        expect((await call('teacher', path, 'GET', undefined, 'MANAGEMENT')).status).toBe(403)
+      }
+      const listing = await call('teacher', '/mobile/lists/classrooms', 'GET', undefined, 'MANAGEMENT')
+      expect(listing.status).toBe(200)
+      expect(listing.body.data.list.map((row: {id: string}) => row.id)).toContain(owned.id)
+      expect(listing.body.data.list.map((row: {id: string}) => row.id)).not.toContain(unrelated.id)
+      await db.user.update({ where: { id: users.teacher.id }, data: { teacherApproved: false } })
+      try {
+        for (const path of paths(owned.id)) {
+          expect((await call('teacher', path, 'GET', undefined, 'MANAGEMENT')).status).toBe(403)
+        }
+      } finally {
+        await db.user.update({ where: { id: users.teacher.id }, data: { teacherApproved: true } })
+      }
+    } finally { config.miniClassroomEnabled = previousFlag }
   })
 
   it('STUDENT + Training can join, see its actual tasks and retain management in the separate view',async()=>{

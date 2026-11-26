@@ -17,7 +17,7 @@ import { verifyToken } from '../utils/jwt'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import { canManageClassroom, findClassroomAccess } from '../middleware/classroomAccess'
 import { getCookieValue } from '../utils/authCookies'
-import { loadCurrentPrincipal } from '../modules/organization/principal'
+import { asBusinessPrincipal, loadCurrentPrincipal } from '../modules/organization/principal'
 import { needsAdminKey, validAdminProof } from '../modules/admin-permissions/security'
 import { isSessionRevoked } from '../utils/sessionRevocation'
 
@@ -162,7 +162,8 @@ export class SocketService {
           }
 
           const principal = await loadCurrentPrincipal(payload.userId)
-          const rejection = inactiveAccountMessage(principal)
+          const business = principal && asBusinessPrincipal(principal)
+          const rejection = inactiveAccountMessage(business)
           if (rejection) {
             return next(new Error(rejection))
           }
@@ -182,7 +183,7 @@ export class SocketService {
           socket.data.authenticated = true
           socket.data.userId = principal!.userId
           socket.data.tokenVersion = payload.tokenVersion
-          socket.data.userRole = principal!.role
+          socket.data.userRole = business!.role
           socket.data.platformRole = principal!.platformRole
         }
 
@@ -220,13 +221,14 @@ export class SocketService {
       const token = getSocketToken(socket)
       const payload = token ? verifyToken(token) : null
       const principal = await loadCurrentPrincipal(socket.data.userId)
+      const business = principal && asBusinessPrincipal(principal)
       const revoked = token ? await isSessionRevoked(token) : true
 
       if (
         !payload || payload.userId !== socket.data.userId || !trainingSession(payload.accountDomain) ||
         !Number.isInteger(payload.tokenVersion) || payload.tokenVersion !== socket.data.tokenVersion ||
-        !principal ||
-        inactiveAccountMessage(principal) ||
+        !principal || !business ||
+        inactiveAccountMessage(business) ||
         principal.mustChangePassword ||
         principal.tokenVersion !== socket.data.tokenVersion || revoked === true || (revoked === null && config.nodeEnv === 'production')
         || !['LEGACY','TRAINING'].includes(principal.accountDomain)
@@ -241,7 +243,7 @@ export class SocketService {
         return false
       }
 
-      socket.data.userRole = principal.role
+      socket.data.userRole = business.role
       socket.data.platformRole = principal.platformRole
       return true
     } catch {

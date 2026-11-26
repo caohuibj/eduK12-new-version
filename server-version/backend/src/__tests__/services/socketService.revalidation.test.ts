@@ -98,13 +98,18 @@ describe('SocketService manager room revalidation', () => {
   })
 
   it('delivers only to current managers when two teachers still occupy the manager rooms', async () => {
+    const proof = { adminVerifiedAt: Math.floor(Date.now() / 1000), adminSessionId: 'synthetic-proof' }
     const connected = (id: string) => makeRemoteSocket(
-      { authenticated: true, userId: id, userRole: UserRole.ADMIN, tokenVersion: 0 }, signedSession({ userId: id }))
+      { authenticated: true, userId: id, userRole: UserRole.ADMIN, tokenVersion: 0 }, signedSession({ userId: id, ...proof }))
     const owner = connected('teacher-1'), formerManager = connected('other-teacher')
     const service = new SocketService()
     const rooms = vi.fn().mockReturnValue({ fetchSockets: vi.fn().mockResolvedValue([owner, formerManager]) })
     ;(service as any).classroomNamespace = { in: rooms }
-    mockPrisma.$queryRaw.mockImplementation((_: unknown, id: string) => Promise.resolve(principalRow({ id })))
+    const grant = { entry: 'TRAINING', version: 1 }
+    let ownerApproved = true, ownerGranted = true
+    mockPrisma.$queryRaw.mockImplementation((_: unknown, id: string) => Promise.resolve(principalRow({
+      id, entryGrants: id !== 'teacher-1' || ownerGranted ? [grant] : [], teacherApproved: id !== 'teacher-1' || ownerApproved,
+    })))
 
     await service.sendToClassroomManagers('classroom-1', 'broadcast:question', { questionIndex: 2 })
 
@@ -112,6 +117,20 @@ describe('SocketService manager room revalidation', () => {
     expect(owner.emit).toHaveBeenCalledWith('broadcast:question', { questionIndex: 2 })
     expect(formerManager.emit).not.toHaveBeenCalled()
     expect(formerManager.disconnect).toHaveBeenCalledWith(true)
+    expect(owner.data.userRole).toBe(UserRole.TEACHER)
+
+    // Revoking the entry grant does not revoke the owner's teacher identity.
+    ownerGranted = false
+    await service.sendToClassroomManagers('classroom-1', 'broadcast:stats', {})
+    expect(owner.emit).toHaveBeenLastCalledWith('broadcast:stats', {})
+    expect(owner.disconnect).not.toHaveBeenCalled()
+
+    // An unapproved owner must lose the business socket even with an entry grant.
+    ownerGranted = true
+    ownerApproved = false
+    await service.sendToClassroomManagers('classroom-1', 'broadcast:stats', { private: true })
+    expect(owner.emit).toHaveBeenCalledTimes(2)
+    expect(owner.disconnect).toHaveBeenCalledWith(true)
   })
 
   it('disconnects a manager whose account is no longer active', async () => {
