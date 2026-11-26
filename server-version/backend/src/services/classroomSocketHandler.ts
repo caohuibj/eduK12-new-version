@@ -820,6 +820,7 @@ export class ClassroomSocketHandler {
       })
 
       if (activeQuestion?.startedAt) {
+        const startedAt = activeQuestion.startedAt.toISOString()
         const elapsedTime = Math.floor(
           (Date.now() - activeQuestion.startedAt.getTime()) / 1000
         )
@@ -828,6 +829,7 @@ export class ClassroomSocketHandler {
           questionContent: activeQuestion.questionContent,
           questionIndex: activeQuestion.questionIndex,
           timeLimit: activeQuestion.timeLimit,
+          startedAt,
           remainingTime: Math.max(
             0,
             (activeQuestion.timeLimit || 60) - elapsedTime
@@ -835,7 +837,8 @@ export class ClassroomSocketHandler {
         }
         response.stats = await this.buildStats(
           classroom.id,
-          activeQuestion.id
+          activeQuestion.id,
+          startedAt
         )
       }
 

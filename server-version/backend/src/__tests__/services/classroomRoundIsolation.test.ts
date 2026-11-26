@@ -8,7 +8,7 @@ const { db, wire } = vi.hoisted(() => ({
     classroomSession: { findFirst: vi.fn(), count: vi.fn() },
     classroomAnswer: { findUnique: vi.fn(), createMany: vi.fn(), deleteMany: vi.fn(), count: vi.fn(), findMany: vi.fn() },
   },
-  wire: { broadcastToRoom: vi.fn(), sendToClassroomManagers: vi.fn() },
+  wire: { broadcastToRoom: vi.fn(), sendToClassroomManagers: vi.fn(), getRoomConnectionCount: vi.fn() },
 }))
 vi.mock('../../config/database', () => ({ prisma: db }))
 vi.mock('../../services/socketService', () => ({ socketService: wire }))
@@ -58,6 +58,31 @@ describe('authoritative classroom round boundaries', () => {
     db.classroomQuestion.findFirst.mockResolvedValue({ ...question(), startedAt: nextStartedAt, endedAt: new Date() })
     expect(await endClassroomQuestion('c', 'q', { expectedStartedAt: startedAt })).toMatchObject({ changed: false, staleRound: true, startedAt: nextStartedAt })
     expect(db.classroomQuestion.updateMany).toHaveBeenCalledTimes(1)
+  })
+
+  it.each([
+    { label: 'the current round', statsRound: startedAt, statsIncluded: true },
+    { label: 'a reopened round', statsRound: nextStartedAt, statsIncluded: false },
+  ])('binds bigscreen join to its active round when statistics read $label', async ({ statsRound, statsIncluded }) => {
+    const handler = new ClassroomSocketHandler()
+    const actor = { ...socket(), id: 'screen', join: vi.fn() }
+    vi.spyOn(handler as any, 'authorizeManagerForClassroom').mockResolvedValue({ id: 'c', status: 'ACTIVE' })
+    vi.spyOn(handler as any, 'emitDanmakuJoin').mockResolvedValue(undefined)
+    wire.getRoomConnectionCount.mockResolvedValue(2)
+    db.classroomQuestion.findFirst
+      .mockResolvedValueOnce({ ...question(), questionIndex: 2 })
+      .mockResolvedValueOnce({ ...question(), startedAt: statsRound })
+      .mockResolvedValueOnce({ startedAt: statsRound })
+
+    await (handler as any).handleBigscreenJoin(actor, { classroomId: 'c' })
+
+    const joined = actor.emit.mock.calls.find(([event]) => event === 'bigscreen:joined')?.[1]
+    expect(joined).toMatchObject({
+      currentQuestion: { questionId: 'q', startedAt: startedAt.toISOString(), remainingTime: 117 },
+      onlineCount: 2,
+    })
+    if (statsIncluded) expect(joined.stats).toMatchObject({ questionId: 'q', startedAt: startedAt.toISOString(), answerCount: 1 })
+    else expect(joined.stats).toBeNull()
   })
 
   it.each(['handleTeacherEnd', 'handleBigscreenClose'])('binds legacy %s requests to the authoritative round', async method => {
