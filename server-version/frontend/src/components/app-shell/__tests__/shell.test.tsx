@@ -64,6 +64,17 @@ beforeEach(() => {
   sessionStorage.clear()
 })
 
+it.each([null, student])('uses Training branding for classroom answers without the Training hostname', user => {
+  auth.user = user
+  const view = render(<MemoryRouter initialEntries={['/student/classroom/answer/room?code=123456']}><AppShell>
+    <Link to="/student">离开课堂</Link>
+  </AppShell></MemoryRouter>)
+  expect(view.container.querySelector('.training-classroom-participant')).toHaveAttribute('data-shell-mode', 'public')
+  expect(screen.getByRole('link', { name: 'Training @EduK12.top' })).toHaveAttribute('href', '/student/classroom/enter')
+  expect(screen.getByRole('button', { name: /^外观：/ })).toBeVisible()
+  expect(screen.queryByRole('navigation', { name: '主要导航' })).toBeNull()
+})
+
 describe('Training administrator workspace presentation',()=>{
   it.each([false,true])('uses Training navigation for its explicit entry grant, Training host=%s',async training=>{
     presentation.training=training

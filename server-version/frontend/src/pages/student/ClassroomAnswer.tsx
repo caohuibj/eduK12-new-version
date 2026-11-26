@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useClassroomSocket } from '../../hooks/useClassroomSocket'
 import { useAuth } from '../../contexts/AuthContext'
-import { AlertCircle, CheckCircle, Clock } from 'lucide-react'
+import { AlertCircle, BookOpen, CheckCircle, Clock, Radio } from 'lucide-react'
+import type { ClassroomDanmakuSnapshot } from '../../types/classroomDanmaku'
+import ClassroomDanmakuComposer from './ClassroomDanmakuComposer'
 
 interface Question {
   questionId: string
@@ -32,9 +34,10 @@ const ClassroomAnswer: React.FC = () => {
   const classroomClosed = !!classroomId && closedClassroomId === classroomId
   const [joinUnavailable, setJoinUnavailable] = useState(false)
   const [notice, setNotice] = useState<{ kind: 'info' | 'error'; message: string } | null>(null)
+  const [danmaku, setDanmaku] = useState<ClassroomDanmakuSnapshot | null>(null)
 
   // Socket 连接只使用课堂码；session 由服务端创建并绑定。
-  const { isConnected, on, off, emit } = useClassroomSocket({
+  const { isConnected, on, off, emit, emitWithAck } = useClassroomSocket({
     classroomId,
     classroomCode,
     role: 'student',
@@ -54,18 +57,45 @@ const ClassroomAnswer: React.FC = () => {
     setIsFinished(false)
     setJoinUnavailable(false)
     setNotice(null)
+    setDanmaku(null)
   }, [classroomId, classroomCode])
 
   useEffect(() => {
     if (!isConnected) {
       submittingRef.current = false
       setSubmitting(false)
+      setDanmaku(null)
     }
   }, [isConnected])
+
+  const danmakuExpiresAt = danmaku?.expiresAt
+  useEffect(() => {
+    if (!danmakuExpiresAt) return
+    const timer = window.setTimeout(() => {
+      setDanmaku(previous => previous?.expiresAt === danmakuExpiresAt ? { ...previous, enabled: false } : previous)
+    }, Math.max(0, Date.parse(danmakuExpiresAt) - Date.now()))
+    return () => window.clearTimeout(timer)
+  }, [danmakuExpiresAt])
 
   // Register before connect/join can return a snapshot, including after auth
   // finishes loading. The hook creates the socket in its earlier effect.
   useEffect(() => {
+    const receiveDanmaku = (snapshot: ClassroomDanmakuSnapshot) => {
+      if (snapshot.classroomId !== classroomId) return
+      setDanmaku(previous => {
+        if (!snapshot.available) return null
+        const stale = previous && (
+          previous.displayEpoch > snapshot.displayEpoch ||
+          (previous.displayEpoch === snapshot.displayEpoch && previous.revision > snapshot.revision)
+        )
+        if (stale) return previous
+        return snapshot.expiresAt && Date.parse(snapshot.expiresAt) <= Date.now()
+          ? { ...snapshot, enabled: false }
+          : snapshot
+      })
+    }
+    on('danmaku:state', receiveDanmaku)
+
     // 接收题目
     on('broadcast:question', (data: Question & { remainingTime?: number; mySubmission?: { answer: unknown } | null }) => {
       const previous = questionRef.current
@@ -152,6 +182,7 @@ const ClassroomAnswer: React.FC = () => {
     on('error', handleError)
 
     return () => {
+      off('danmaku:state', receiveDanmaku)
       off('broadcast:question')
       off('broadcast:finished')
       off('broadcast:next')
@@ -252,9 +283,10 @@ const ClassroomAnswer: React.FC = () => {
   const renderQuestion = () => {
     if (!currentQuestion) {
       return (
-        <div className="text-center py-20 classroom-answer-empty">
-          <div className="text-gray-400 mb-4">等待教师出题...</div>
-          <div className="text-sm text-gray-300">请保持页面打开</div>
+        <div className="classroom-answer-empty">
+          <BookOpen size={24} aria-hidden="true" />
+          <strong>等待教师出题...</strong>
+          <p>请保持页面打开。</p>
         </div>
       )
     }
@@ -265,10 +297,10 @@ const ClassroomAnswer: React.FC = () => {
       case 'single_choice':
         return (
           <div className="space-y-3">
-            <div className="text-lg font-semibold text-gray-900 mb-4">
+            <div className="classroom-answer__prompt">
               {questionContent.question}
             </div>
-            {questionContent.options?.map((option: any, index: number) => {
+            {questionContent.options?.map((option: any) => {
               const optionValue = option.value || option.key
               const optionLabel = option.label || option.text
               
@@ -278,11 +310,7 @@ const ClassroomAnswer: React.FC = () => {
                   onClick={() => setAnswer(optionValue)}
                   disabled={submitted || submitting || isFinished}
                   aria-pressed={answer === optionValue}
-                  className={`w-full p-4 rounded-lg border-2 text-left transition-all classroom-answer-option ${
-                    answer === optionValue
-                      ? 'border-action bg-action/10'
-                      : 'border-gray-200 bg-white hover:border-gray-300'
-                  } ${submitted ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className="classroom-answer-option"
                 >
                   <span className="font-medium">{optionLabel}</span>
                 </button>
@@ -294,13 +322,13 @@ const ClassroomAnswer: React.FC = () => {
       case 'multiple_choice':
         return (
           <div className="space-y-3">
-            <div className="text-lg font-semibold text-gray-900 mb-4">
+            <div className="classroom-answer__prompt">
               {questionContent.question}
             </div>
             <div className="text-sm text-gray-500 mb-3">
               可选择多个选项
             </div>
-            {questionContent.options?.map((option: any, index: number) => {
+            {questionContent.options?.map((option: any) => {
               const optionValue = option.value || option.key
               const optionLabel = option.label || option.text
               
@@ -310,23 +338,13 @@ const ClassroomAnswer: React.FC = () => {
                   onClick={() => toggleMultiAnswer(optionValue)}
                   disabled={submitted || submitting || isFinished}
                   aria-pressed={multiAnswers.includes(optionValue)}
-                  className={`w-full p-4 rounded-lg border-2 text-left transition-all classroom-answer-option ${
-                    multiAnswers.includes(optionValue)
-                      ? 'border-action bg-action/10'
-                      : 'border-gray-200 bg-white hover:border-gray-300'
-                  } ${submitted ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className="classroom-answer-option"
                 >
                   <div className="flex items-center gap-3">
-                    <div
-                      className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                        multiAnswers.includes(optionValue)
-                          ? 'border-action bg-action'
-                          : 'border-gray-300'
-                      }`}
-                    >
+                    <div className="classroom-answer-option__marker" aria-hidden="true">
                       {multiAnswers.includes(optionValue) && (
                         <svg
-                          className="w-3 h-3 text-white"
+                          className="w-3 h-3"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -349,7 +367,7 @@ const ClassroomAnswer: React.FC = () => {
       case 'fill_blank':
         return (
           <div className="space-y-4">
-            <div className="text-lg font-semibold text-gray-900 mb-4">
+            <div className="classroom-answer__prompt">
               {questionContent.question}
             </div>
             <input
@@ -358,7 +376,7 @@ const ClassroomAnswer: React.FC = () => {
               onChange={(e) => setAnswer(e.target.value)}
               disabled={submitted || submitting || isFinished}
               placeholder="请输入答案"
-              className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-action focus:outline-hidden disabled:opacity-50 classroom-answer-input"
+              className="classroom-answer-input"
             />
           </div>
         )
@@ -366,7 +384,7 @@ const ClassroomAnswer: React.FC = () => {
       case 'text_input':
         return (
           <div className="space-y-4">
-            <div className="text-lg font-semibold text-gray-900 mb-4">
+            <div className="classroom-answer__prompt">
               {questionContent.question}
             </div>
             <textarea
@@ -375,7 +393,7 @@ const ClassroomAnswer: React.FC = () => {
               disabled={submitted || submitting || isFinished}
               placeholder="请输入答案"
               rows={5}
-              className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-action focus:outline-hidden disabled:opacity-50 resize-none classroom-answer-input"
+              className="classroom-answer-input"
             />
           </div>
         )
@@ -387,9 +405,12 @@ const ClassroomAnswer: React.FC = () => {
 
   if (!classroomId || !classroomCode) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 classroom-answer-state">
-        <div className="classroom-answer-state__card text-center text-gray-500">
-          缺少课堂码，请返回扫码入口重新加入课堂
+      <div className="classroom-answer-state">
+        <div className="classroom-answer-state__card">
+          <span className="classroom-answer-state__icon"><AlertCircle aria-hidden="true" /></span>
+          <h1>缺少课堂码</h1>
+          <p>返回课堂入口，输入六位课堂码后重新加入。</p>
+          <Link to="/student/classroom/enter" className="classroom-answer-state__link">返回课堂入口</Link>
         </div>
       </div>
     )
@@ -397,11 +418,14 @@ const ClassroomAnswer: React.FC = () => {
 
   if (classroomClosed || joinUnavailable) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 classroom-answer-state">
-        <div className="classroom-answer-state__card text-center">
-          <h1 className="text-xl font-semibold">{classroomClosed ? '课堂已结束' : '课堂暂不可加入'}</h1>
-          <p className="my-3 text-gray-600">{classroomClosed ? '感谢参与课堂互动。' : '课堂不存在或当前不可加入，请返回入口确认课堂码。'}</p>
-          <Link to="/student/classroom/enter" className="btn-secondary inline-block">返回课堂入口</Link>
+      <div className="classroom-answer-state">
+        <div className="classroom-answer-state__card">
+          <span className="classroom-answer-state__icon">
+            {classroomClosed ? <CheckCircle aria-hidden="true" /> : <AlertCircle aria-hidden="true" />}
+          </span>
+          <h1>{classroomClosed ? '课堂已结束' : '课堂暂不可加入'}</h1>
+          <p>{classroomClosed ? '感谢参与课堂互动。' : '课堂不存在或当前不可加入，请返回入口确认课堂码。'}</p>
+          <Link to="/student/classroom/enter" className="classroom-answer-state__link">返回课堂入口</Link>
         </div>
       </div>
     )
@@ -409,48 +433,48 @@ const ClassroomAnswer: React.FC = () => {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 classroom-answer-state">
-        <div className="classroom-answer-state__card text-center">
-          <div className="text-gray-500 mb-2">连接中...</div>
-          <div className="text-sm text-gray-400">正在建立实时连接</div>
+      <div className="classroom-answer-state">
+        <div className="classroom-answer-state__card" role="status">
+          <span className="classroom-answer-state__icon"><Radio aria-hidden="true" /></span>
+          <h1>正在连接课堂</h1>
+          <p>实时连接建立后，教师发布的内容会自动显示。</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 classroom-answer">
-      {/* 顶部状态栏 */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-10 classroom-answer__status">
-        <div className="max-w-2xl mx-auto px-4 py-3">
-          <div className="flex justify-between items-center">
-            <div className="text-sm text-gray-500">
-              {currentQuestion ? `第 ${currentQuestion.questionIndex} 题` : '等待出题'}
-            </div>
-            {countdown !== null && (
-              <div className="flex items-center gap-1 text-sm font-medium text-orange-600">
-                <Clock className="w-4 h-4" />
-                {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
-              </div>
-            )}
-          </div>
+    <div className="classroom-answer">
+      <header className="classroom-answer__status">
+        <div>
+          <span className="classroom-answer__context"><BookOpen size={16} aria-hidden="true" />课堂答题</span>
+          <h1>{currentQuestion ? `第 ${currentQuestion.questionIndex} 题` : danmaku?.enabled ? '课堂互动' : '等待出题'}</h1>
         </div>
-      </div>
+        {countdown !== null && (
+          <div className="classroom-answer__countdown">
+            <Clock size={18} aria-hidden="true" />
+            <span className="sr-only">剩余时间</span>
+            {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
+          </div>
+        )}
+      </header>
 
       {/* 主要内容区 */}
-      <div className="max-w-2xl mx-auto px-4 py-6 classroom-answer__body">
+      <div className="classroom-answer__body">
         {notice ? (
           <div
             role={notice.kind === 'error' ? 'alert' : 'status'}
             aria-live={notice.kind === 'error' ? 'assertive' : 'polite'}
-            className={`classroom-answer-notice ${notice.kind === 'error' ? 'classroom-answer-notice--ended bg-red-50 text-red-700' : 'bg-blue-50 text-blue-700'} p-4 rounded-lg`}
+            className={`classroom-answer-notice ${notice.kind === 'error' ? 'classroom-answer-notice--ended' : ''}`}
           >
             {notice.message}
           </div>
         ) : null}
 
         {/* 题目 */}
-        <section className="classroom-answer__question">{renderQuestion()}</section>
+        {(currentQuestion || !danmaku?.enabled) && (
+          <section className="classroom-answer__question">{renderQuestion()}</section>
+        )}
 
         {/* 提交按钮 */}
         {currentQuestion && !submitted && !isFinished && (
@@ -461,7 +485,7 @@ const ClassroomAnswer: React.FC = () => {
                 ? multiAnswers.length === 0
                 : !answer)
             }
-            className="w-full mt-6 px-4 py-4 bg-action text-white rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed classroom-answer-submit"
+            className="classroom-answer-submit"
           >
             {submitting ? '提交中…' : '提交答案'}
           </button>
@@ -469,25 +493,29 @@ const ClassroomAnswer: React.FC = () => {
 
         {/* 答题已结束提示 */}
         {currentQuestion && !submitted && isFinished && (
-          <div className="mt-6 p-4 bg-red-50 rounded-lg flex items-center justify-center gap-2 classroom-answer-notice classroom-answer-notice--ended">
-            <AlertCircle className="w-5 h-5 text-red-600" />
-            <span className="text-red-700 font-medium">答题已结束，无法提交</span>
+          <div className="classroom-answer-notice classroom-answer-notice--ended">
+            <AlertCircle size={18} aria-hidden="true" />
+            <span>答题已结束，无法提交</span>
           </div>
         )}
 
         {/* 已提交提示 */}
         {submitted && (
-          <div className="mt-6 p-4 bg-green-50 rounded-lg flex items-center justify-center gap-2 classroom-answer-notice classroom-answer-notice--submitted">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-            <span className="text-green-700 font-medium">答案已提交</span>
+          <div className="classroom-answer-notice classroom-answer-notice--submitted">
+            <CheckCircle size={18} aria-hidden="true" />
+            <span>答案已提交</span>
           </div>
         )}
 
         {/* 等待下一题提示 */}
         {submitted && (
-          <div className="mt-4 text-center text-gray-500 text-sm">
+          <div className="classroom-answer__waiting">
             请等待教师出下一题
           </div>
+        )}
+
+        {danmaku?.enabled && danmaku.sessionId && (
+          <ClassroomDanmakuComposer key={danmaku.sessionId} state={danmaku} emitWithAck={emitWithAck} />
         )}
       </div>
     </div>

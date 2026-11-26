@@ -16,6 +16,11 @@ export function isTrainingHost(
   return normalized === TRAINING_HOST || (import.meta.env.DEV && normalized === 'training.localhost')
 }
 
+/** These public classroom routes all use Training-owned courses on the server. */
+export function isTrainingClassroomParticipantPath(pathname: string): boolean {
+  return /^\/student\/classroom\/(?:enter|join\/[^/]+|answer\/[^/]+)\/?$/.test(pathname)
+}
+
 /** Keep the training menu independent of the generic scientific/admin menu. */
 export function trainingNavigation(role?: Role): NavigationItem[] {
   if (role === 'STUDENT') return [

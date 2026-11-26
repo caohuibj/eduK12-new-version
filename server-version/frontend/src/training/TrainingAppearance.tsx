@@ -10,8 +10,8 @@ function read(key: string, enabled: boolean): TrainingAppearance {
   if (!enabled) return 'light'
   try { return parseAppearance(localStorage.getItem(key)) } catch { return 'auto' }
 }
-export function TrainingAppearanceProvider({ children, management=false, suspended=false }: { children: ReactNode; management?:boolean; suspended?:boolean }) {
-  const enabled = !suspended && (isTrainingHost() || management)
+export function TrainingAppearanceProvider({ children, management=false, classroomParticipant=false, suspended=false }: { children: ReactNode; management?:boolean; classroomParticipant?:boolean; suspended?:boolean }) {
+  const enabled = !suspended && (isTrainingHost() || management || classroomParticipant)
   const { user, isLoading } = useAuth()
   const key = appearanceKey(user?.id)
   const [choice, setChoice] = useState(() => ({ key, enabled, mode: read(key, enabled), storageError: false }))

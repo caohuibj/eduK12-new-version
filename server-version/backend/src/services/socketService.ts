@@ -258,20 +258,22 @@ export class SocketService {
   }
 
   /** Deliver sensitive data only to recipients who still manage this classroom. */
-  async sendToClassroomManagers(classroomId: string, event: string, data: unknown): Promise<void> {
+  async sendToClassroomManagers(classroomId: string, event: string, data: unknown, roles: readonly ('teacher'|'bigscreen')[] = ['teacher','bigscreen'], dataForRole?: (role:'teacher'|'bigscreen')=>unknown): Promise<void> {
     if (!this.classroomNamespace) return
     const room = 'classroom:' + classroomId
     try {
-      const sockets = await this.classroomNamespace.in([room + ':teacher', room + ':bigscreen']).fetchSockets()
+      const sockets = await this.classroomNamespace.in(roles.map(role=>room+':'+role)).fetchSockets()
       if (!sockets.length) return
       const classroom = await findClassroomAccess(classroomId)
       await Promise.all(sockets.map(async (socket: Socket) => {
-        if (!classroom || !await this.refreshAuthenticatedSocket(socket)
+        if (!classroom || (event==='danmaku:state' && (classroom.status==='ENDED' || socket.data.classroomId!==classroomId || !roles.includes(socket.data.clientRole))) || !await this.refreshAuthenticatedSocket(socket)
           || !canManageClassroom(classroom, socket.data.userId, socket.data.userRole)) {
           socket.disconnect(true)
           return
         }
-        socket.emit(event, data)
+        // Socket rooms/data can change while distributed authentication is awaited.
+        if(event==='danmaku:state'&&(socket.data.classroomId!==classroomId||!roles.includes(socket.data.clientRole)||socket.connected===false))return
+        socket.emit(event, dataForRole?dataForRole(socket.data.clientRole):data)
       }))
     } catch {
       logger.error('课堂管理消息投递失败', { event })

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import * as echarts from 'echarts/core'
 import { BarChart } from 'echarts/charts'
@@ -10,6 +10,8 @@ import { useAuth } from '../../contexts/AuthContext'
 import apiClient from '../../api/client'
 import { Users, BookOpen, Clock } from 'lucide-react'
 import { sanitizeText } from '../../utils/sanitize'
+import {ClassroomDanmakuDisplay,type DanmakuPresentation} from './ClassroomDanmakuDisplay'
+import type {ClassroomDanmakuSnapshot,ClassroomDanmakuStateAck} from '../../types/classroomDanmaku'
 
 echarts.use([BarChart, GridComponent, TitleComponent, TooltipComponent, CanvasRenderer])
 
@@ -50,11 +52,32 @@ const BigScreen: React.FC = () => {
   const [countdown, setCountdown] = useState<number | null>(null)
   const [isFinished, setIsFinished] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [classroomClosed,setClassroomClosed]=useState(false)
+  const [danmakuView,setDanmakuView]=useState<DanmakuPresentation>({enabled:false,displayMode:'QUESTION'})
+  const danmakuFull=!isHistoryMode&&!classroomClosed&&danmakuView.enabled&&danmakuView.displayMode==='DANMAKU'
+
+  useEffect(()=>{
+    setClassroomClosed(false)
+    setDanmakuView({enabled:false,displayMode:'QUESTION'})
+  },[classroomId])
 
   const chartRef = useRef<HTMLDivElement>(null)
   const chartInstance = useRef<echarts.ECharts | null>(null)
   const wordCloudRef = useRef<HTMLDivElement>(null)
   const wordCloudInstance = useRef<echarts.ECharts | null>(null)
+
+  const showClassroomClosed=useCallback(()=>{
+  chartInstance.current?.dispose()
+  wordCloudInstance.current?.dispose()
+  chartInstance.current=null
+  wordCloudInstance.current=null
+  setClassroomClosed(true)
+  setDanmakuView({enabled:false,displayMode:'QUESTION'})
+  setCurrentQuestion(null)
+  setStats(null)
+  setCountdown(null)
+  setIsFinished(true)
+  },[])
 
   // Instances are created lazily when their canvas first appears, then kept
   // across data updates and disposed exactly once when this page unmounts.
@@ -66,11 +89,24 @@ const BigScreen: React.FC = () => {
   }, [])
 
   // Socket 连接
-  const { isConnected, on, off, emit } = useClassroomSocket({
+  const { isConnected, on, off, emit, emitWithAck } = useClassroomSocket({
     classroomId,
     role: 'bigscreen',
     autoConnect: !isHistoryMode && !authLoading && !!user,
   })
+
+  const subscribeDanmaku=useCallback((listener:(snapshot:ClassroomDanmakuSnapshot)=>void)=>{
+    on('danmaku:state',listener)
+    return ()=>off('danmaku:state',listener)
+  },[on,off])
+  const readDanmaku=useCallback(()=>emitWithAck<ClassroomDanmakuStateAck>('danmaku:state:get',{}),[emitWithAck])
+  const presentDanmaku=useCallback((next:DanmakuPresentation)=>setDanmakuView(previous=>
+    previous.enabled===next.enabled&&previous.displayMode===next.displayMode?previous:next),[])
+  useEffect(()=>{
+    if(danmakuFull)return
+    chartInstance.current?.resize()
+    wordCloudInstance.current?.resize()
+  },[danmakuFull,danmakuView.enabled])
 
   // 历史模式加载历史数据
   useEffect(() => {
@@ -110,12 +146,13 @@ const BigScreen: React.FC = () => {
 
   // 监听 Socket 事件
   useEffect(() => {
-    if (!isConnected) {
+    if (!isConnected || isHistoryMode) {
       return
     }
 
 
     on('bigscreen:joined', (data) => {
+      if(data?.status==='ENDED'){showClassroomClosed();return}
       
       // 如果有当前题目，设置题目和状态
       if (data.currentQuestion) {
@@ -171,6 +208,8 @@ const BigScreen: React.FC = () => {
 
     // `next` is a UI clear event only. Ignore an old event once a newer
     // question is already displayed on this screen.
+    on('broadcast:closed',showClassroomClosed)
+
     on('broadcast:next', (data) => {
       const expectedQuestionId = data?.expectedQuestionId
       if (!expectedQuestionId || expectedQuestionId === currentQuestion?.questionId) {
@@ -187,9 +226,10 @@ const BigScreen: React.FC = () => {
       off('broadcast:stats')
       off('broadcast:online')
       off('broadcast:finished')
+      off('broadcast:closed')
       off('broadcast:next')
     }
-  }, [currentQuestion?.questionId, isConnected, on, off])
+  }, [currentQuestion?.questionId, isConnected, isHistoryMode, showClassroomClosed, on, off])
 
   // 倒计时逻辑
   useEffect(() => {
@@ -245,7 +285,7 @@ const BigScreen: React.FC = () => {
       title: {
         text: isFinished ? '答题统计（已结束）' : '实时统计',
         left: 'center',
-        top: 20,
+        top: 12,
         textStyle: {
           color: '#ffffff',
           fontSize: 28,
@@ -271,7 +311,8 @@ const BigScreen: React.FC = () => {
         left: '10%',
         right: '10%',
         bottom: '15%',
-        top: '20%',
+        // Reserve a fixed title + two-line value-label band on short screens.
+        top: 120,
       },
       xAxis: {
         type: 'category',
@@ -292,7 +333,8 @@ const BigScreen: React.FC = () => {
       },
       yAxis: {
         type: 'value',
-        name: '人数',
+        minInterval: 1,
+        name: '',
         nameTextStyle: {
           color: '#8b949e',
           fontSize: 18,
@@ -328,6 +370,8 @@ const BigScreen: React.FC = () => {
           label: {
             show: true,
             position: 'top',
+            distance: 8,
+            lineHeight: 24,
             color: '#ffffff',
             fontSize: 20,
             formatter: (params: any) => {
@@ -449,7 +493,7 @@ const BigScreen: React.FC = () => {
 
   }, [currentQuestion, stats])
 
-  if (!isConnected && !isHistoryMode) {
+  if (!isConnected && !isHistoryMode && !classroomClosed) {
     return (
       <div className="min-h-screen bg-[#0d1117] flex items-center justify-center">
         <div className="text-white text-2xl">连接中...</div>
@@ -466,12 +510,12 @@ const BigScreen: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0d1117] text-white p-8">
+    <div className={"classroom-bigscreen min-h-screen bg-[#0d1117] text-white p-8"+(!isHistoryMode&&!classroomClosed&&danmakuView.enabled?" has-danmaku":"")}>
       {/* 顶部状态栏 */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="classroom-bigscreen__header flex justify-between items-center mb-8">
         <div className="flex items-center gap-6">
           <div className="text-3xl font-bold">
-            {isHistoryMode ? (
+            {classroomClosed?'课堂已结束':danmakuFull?'课堂弹幕':isHistoryMode ? (
               `第 ${currentQuestion?.questionIndex} 题 - 历史统计`
             ) : currentQuestion ? (
               `第 ${currentQuestion.questionIndex} 题`
@@ -480,7 +524,7 @@ const BigScreen: React.FC = () => {
             )}
           </div>
           {/* 倒计时 */}
-          {countdown !== null && countdown > 0 && (
+          {!danmakuFull && countdown !== null && countdown > 0 && (
             <div className="flex items-center gap-2 px-6 py-3 bg-orange-600/20 border-2 border-orange-500 rounded-lg">
               <Clock className="w-8 h-8 text-orange-400" />
               <span className="text-3xl font-bold text-orange-400">
@@ -489,7 +533,7 @@ const BigScreen: React.FC = () => {
             </div>
           )}
           {/* 已结束标记 */}
-          {isFinished && currentQuestion && (
+          {!danmakuFull && isFinished && currentQuestion && (
             <div className="px-6 py-3 bg-green-600/20 border-2 border-green-500 rounded-lg">
               <span className="text-2xl font-bold text-green-400">答题已结束</span>
             </div>
@@ -498,11 +542,11 @@ const BigScreen: React.FC = () => {
         
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-8 text-xl">
-            {!isHistoryMode && <div className="flex items-center gap-2">
+            {!isHistoryMode && !classroomClosed && <div className="flex items-center gap-2">
               <Users className="w-6 h-6" />
               <span>{onlineCount} 人在线</span>
             </div>}
-            {stats && (
+            {!danmakuFull && stats && (
               <>
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-6 h-6" />
@@ -519,10 +563,11 @@ const BigScreen: React.FC = () => {
               <span className="text-amber-300">该题型暂不支持统计</span>
             )}
           </div>
+          <a className="classroom-bigscreen__control-link" href={`/teacher/classrooms/${classroomId}/control`}>课堂控制</a>
           <button
             onClick={() => {
               // 非历史模式下，如果有正在进行的题目，通知后端结束
-              if (!isHistoryMode && currentQuestion && !isFinished) {
+              if (!isHistoryMode && !danmakuFull && currentQuestion && !isFinished) {
                 emit('bigscreen:close', {
                   questionId: currentQuestion.questionId,
                 })
@@ -536,12 +581,18 @@ const BigScreen: React.FC = () => {
         </div>
       </div>
 
+      <div className="classroom-bigscreen__questions" hidden={danmakuFull}>
       {/* 主要展示区 - 选择题：左右分栏 */}
-      {currentQuestion && 
+      {classroomClosed?(
+        <section className="flex min-h-[360px] items-center justify-center text-center" role="status">
+          <div><h2 className="text-3xl font-semibold mb-4">本次课堂互动已结束</h2>
+          <p className="text-gray-400">弹幕已停止，感谢同学们参与。</p></div>
+        </section>
+      ):currentQuestion &&
        (currentQuestion.questionContent.type === 'single_choice' ||
         currentQuestion.questionContent.type === 'multiple_choice') ? (
         (isFinished || stats) ? (
-          <div className="grid grid-cols-2 gap-8" style={{ height: 'calc(100vh - 180px)' }}>
+          <div className="classroom-bigscreen__visual-grid grid grid-cols-2 gap-8">
             {/* 左侧：题干和选项 */}
             <div className="bg-[#161b22] rounded-lg p-8 overflow-y-auto">
               <div className="mb-8">
@@ -630,7 +681,7 @@ const BigScreen: React.FC = () => {
         )
       ) : currentQuestion ? (
         /* 填空题/文本题：左侧题目 + 右侧词云 */
-        <div className="grid grid-cols-2 gap-8" style={{ height: 'calc(100vh - 180px)' }}>
+        <div className="classroom-bigscreen__visual-grid grid grid-cols-2 gap-8">
           {/* 左侧：题干 */}
           <div className="bg-[#161b22] rounded-lg p-8 overflow-y-auto">
             <div className="mb-8">
@@ -678,7 +729,7 @@ const BigScreen: React.FC = () => {
         </div>
       ) : (
         /* 无题目时显示等待 */
-        <div className="flex items-center justify-center" style={{ height: 'calc(100vh - 180px)' }}>
+        <div className="flex items-center justify-center" style={{height:'var(--classroom-question-height)'}}>
           <div className="text-center">
             <div className="text-6xl mb-4">📊</div>
             <div className="text-2xl text-gray-400">
@@ -687,6 +738,9 @@ const BigScreen: React.FC = () => {
           </div>
         </div>
       )}
+      </div>
+      {!isHistoryMode&&!classroomClosed&&classroomId&&<ClassroomDanmakuDisplay key={classroomId} classroomId={classroomId}
+        subscribe={subscribeDanmaku} readState={readDanmaku} onPresentationChange={presentDanmaku}/>}
     </div>
   )
 }
