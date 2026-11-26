@@ -155,7 +155,7 @@ function productAdminRecords(organizationId:string,product:EducationProduct) {
   return Prisma.sql`
     SELECT g."id" AS "grantId",g."membership_id" AS "membershipId",
       COALESCE(a."login_name",u."username") AS "loginName",g."granted_at" AS "grantedAt",
-      ((${eligibleAdminMember(product)}) AND ${enrolled}
+      ((${eligibleAdminMember(product)}) AND a."user_id" IS NOT NULL AND ${enrolled}
         AND o."status"='ACTIVE' AND e."status"='ACTIVE') AS "effective"
     FROM "education_product_role_grants" g
     JOIN "organizations" o ON o."id"=g."organization_id"
@@ -185,13 +185,13 @@ export async function searchEducationGovernanceSchools(actorUserId:string,input:
 export async function listEducationProductAdminCandidates(actorUserId:string,organizationId:string,product:EducationProduct,input:{q:string;page:number}){
   await assertEntryAdmin(prisma,actorUserId,product)
   const rows=await prisma.$queryRaw<Array<{membershipId:string;loginName:string;ready:boolean}>>`
-    SELECT m."id" AS "membershipId",COALESCE(a."login_name",u."username") AS "loginName",${enrolled} AS "ready"
+    SELECT m."id" AS "membershipId",a."login_name" AS "loginName",${enrolled} AS "ready"
     FROM "organization_memberships" m
     JOIN "organizations" o ON o."id"=m."organization_id" AND o."product_domain"='SCHOOL' AND o."status"='ACTIVE'
     JOIN "users" u ON u."id"=m."user_id"
-    LEFT JOIN "campus_accounts" a ON a."user_id"=u."id"
+    JOIN "campus_accounts" a ON a."user_id"=u."id"
     WHERE m."organization_id"=${organizationId} AND (${eligibleAdminMember(product)})
-      AND (${input.q}='' OR strpos(lower(COALESCE(a."login_name",u."username")),lower(${input.q}))>0)
+      AND (${input.q}='' OR strpos(lower(a."login_name"),lower(${input.q}))>0)
     ORDER BY "loginName",m."id" LIMIT 26 OFFSET ${(input.page-1)*25}
   `
   return {list:rows.slice(0,25),hasMore:rows.length>25,page:input.page}
@@ -225,6 +225,7 @@ export async function grantEducationProductAdmin(input:{
     if(e?.status!=='ACTIVE')refuse('EDUCATION_PRODUCT_NOT_ENABLED')
     const [eligible]=await tx.$queryRaw<Array<{id:string}>>`
       SELECT m."id" FROM "organization_memberships" m JOIN "users" u ON u."id"=m."user_id"
+      JOIN "campus_accounts" a ON a."user_id"=u."id"
       WHERE m."organization_id"=${input.organizationId} AND m."id"=${input.membershipId} AND (${eligibleAdminMember(product)})
       FOR SHARE OF m
     `
