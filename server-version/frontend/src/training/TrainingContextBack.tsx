@@ -5,6 +5,7 @@ import { routeTitle } from '../components/app-shell/navigation'
 import type { Role } from '../components/app-shell/access'
 import TrainingCourseTabs from './TrainingCourseTabs'
 import { trainingCourseContext } from './courseNavigation'
+import { TRAINING_CLASSROOMS_PATH } from './context'
 
 /** Breadcrumb escape for deep legacy editors and participant submissions.
  * Context comes from a non-secret courseId URL hint; the backend remains
@@ -13,6 +14,7 @@ export default function TrainingContextBack({ role }: { role: Role | undefined }
   const location = useLocation()
   if (role !== 'STUDENT' && role !== 'TEACHER') return null
   const path = location.pathname
+  if (role === 'TEACHER' && (path === TRAINING_CLASSROOMS_PATH || path.startsWith(TRAINING_CLASSROOMS_PATH + '/'))) return null
   const courseContext = role === 'TEACHER' ? trainingCourseContext(path, location.search) : null
   if (courseContext && !/^\/courses\/[^/]+\/detail$/.test(path)) {
     const pageTitle = path === '/assignments' ? '练习管理' : path === '/checkins' ? '打卡管理' : path === '/questionnaires' ? '复用测评' : routeTitle(path)

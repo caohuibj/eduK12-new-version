@@ -2,6 +2,7 @@ import type { Role } from '../components/app-shell/access'
 import type { NavigationItem } from '../components/app-shell/navigation'
 
 export const TRAINING_HOST = 'training.eduk12.top'
+export const TRAINING_CLASSROOMS_PATH = '/teacher/classrooms'
 
 /**
  * The edition is a presentation context, never an authorization decision.
@@ -25,6 +26,7 @@ export function trainingNavigation(role?: Role): NavigationItem[] {
     { path: '/dashboard', label: '课程', aliases: ['/courses'], section: 'teaching' },
     { path: '/media-library', label: '媒体', aliases: ['/videos','/images','/documents'], section: 'teaching' },
     { path: '/toolkit', label: '工具', aliases: ['/scales','/general-questionnaires','/sjt-authoring','/cognitive-assignments','/assessment-templates','/bundle-products'], section: 'assessment' },
+    { path: TRAINING_CLASSROOMS_PATH, label: '互动', section: 'teaching' },
     { path: '/profile', label: '我的账户', section: 'account' },
   ]
   return []

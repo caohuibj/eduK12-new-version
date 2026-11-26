@@ -498,21 +498,21 @@ const BigScreen: React.FC = () => {
         
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-8 text-xl">
-            <div className="flex items-center gap-2">
+            {!isHistoryMode && <div className="flex items-center gap-2">
               <Users className="w-6 h-6" />
               <span>{onlineCount} 人在线</span>
-            </div>
+            </div>}
             {stats && (
               <>
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-6 h-6" />
                   <span>{stats.answerCount} 人已答</span>
                 </div>
-                <div className="flex items-center gap-2">
+                {!isHistoryMode && <div className="flex items-center gap-2">
                   <span title="当前在线学生中已提交本题的人数占比；答案分布保留全部历史提交。">
                     在线学生提交率: {stats.totalSessions > 0 ? `${stats.submissionRate.toFixed(1)}%` : '—（暂无在线学生）'}
                   </span>
-                </div>
+                </div>}
               </>
             )}
             {stats?.unsupportedType && (
