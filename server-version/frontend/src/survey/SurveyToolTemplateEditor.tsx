@@ -8,6 +8,7 @@ import {toolLibraryApi as api,ToolLibraryError,libraryKindLabel,type LibraryTool
 import {ResearchImportGuide} from './ResearchAuthoringGuide'
 import type {FormDraft,ScaleDraft,ResearchDraft} from './builder.types'
 import type {BuilderLeaveRisk} from './SurveyBuilder'
+import type {PreviewFocusRequest} from './ResearchPreview'
 import {SurveyToolManagementGuide} from './SurveyToolManagementGuide'
 
 // Load researcher authoring/preview code only when its existing control is opened.
@@ -19,11 +20,22 @@ const SurveyCompositionEditor=deferredResearcherComponent(()=>import('./SurveyCo
 type Review={ok:boolean;issues:{path?:string;line?:number;message:string}[];score?:{scores?:{key:string;value:number|null;status:string}[]}|null;unitCount?:number}
 type Batch={batchId:string;format:'TEXT'|'CSV';content:string}
 type Bulk={revision:number;digest:string;ok:boolean;count:number;issues:{line:number;message:string}[]}
+function formAnswerIssueTarget(tool:LibraryTool|null,issue:Review['issues'][number]){
+  if(tool?.kind!=='FORM')return null
+  const match=issue.path?.match(/^answers\.([a-z][a-z0-9_-]*)(?:[.:]([a-z][a-z0-9_-]*))?/i)
+  if(!match)return null
+  const question=(tool.definition as FormDraft).pages.flatMap(page=>page.questions).find(item=>item.itemKey===match[1])
+  if(!question)return null
+  const row=question.rows.find(item=>item.rowKey===match[2])
+  return {itemKey:question.itemKey,label:'「'+(question.prompt||'未填写题干')+'」'+(row?' · '+row.label:match[2]==='other'?' · 其他填写':'')}
+}
 export function SurveyToolTemplateEditor({id,onReturn,onLeaveRiskChange}:{id:string;onReturn:()=>void;onLeaveRiskChange?:(risk:BuilderLeaveRisk)=>void}){
   const [tool,setTool]=useState<LibraryTool|null>(null),[dirty,setDirty]=useState(false),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true)
   const [error,setError]=useState(''),[issues,setIssues]=useState<Review['issues']>([]),[notice,setNotice]=useState(''),[review,setReview]=useState<Review|null>(null),[preview,setPreview]=useState(false)
   const [bulkText,setBulkText]=useState(''),[bulkFormat,setBulkFormat]=useState<'TEXT'|'CSV'>('CSV'),[bulk,setBulk]=useState<{batch:Batch;result:Bulk}|null>(null)
   const [formRisk,setFormRisk]=useState(false),[nameOpen,setNameOpen]=useState(false)
+  const [previewFocus,setPreviewFocus]=useState<PreviewFocusRequest|null>(null)
+  const previewFocusSequence=useRef(0)
   const [reload,setReload]=useState(0),[managementAction,setManagementAction]=useState<'archive'|'apply'|null>(null)
   const lock=useRef(false),editGeneration=useRef(0),nameInput=useRef<HTMLInputElement>(null)
   const risk=dirty||!!bulkText.trim()||formRisk
@@ -33,7 +45,7 @@ export function SurveyToolTemplateEditor({id,onReturn,onLeaveRiskChange}:{id:str
   useEffect(()=>{onLeaveRiskChange?.({dirty:risk,busy});return()=>onLeaveRiskChange?.({dirty:false,busy:false})},[risk,busy,onLeaveRiskChange])
   useEffect(()=>{const warn=(event:BeforeUnloadEvent)=>{if(risk||busy){event.preventDefault();event.returnValue=''}};window.addEventListener('beforeunload',warn);return()=>window.removeEventListener('beforeunload',warn)},[risk,busy])
   useEffect(()=>{if(!notice)return;const timer=window.setTimeout(()=>setNotice(''),5000);return()=>window.clearTimeout(timer)},[notice])
-  const run=async(task:()=>Promise<void>)=>{if(lock.current)return false;lock.current=true;setBusy(true);setError('');setIssues([]);setNotice('');try{await task();return true}catch(cause){setError(cause instanceof Error?cause.message:'操作失败');if(cause instanceof ToolLibraryError)setIssues(cause.issues);return false}finally{lock.current=false;setBusy(false)}}
+  const run=async(task:()=>Promise<void>)=>{if(lock.current)return false;lock.current=true;setBusy(true);setError('');setIssues([]);setPreviewFocus(null);setNotice('');try{await task();return true}catch(cause){setError(cause instanceof Error?cause.message:'操作失败');if(cause instanceof ToolLibraryError)setIssues(cause.issues);return false}finally{lock.current=false;setBusy(false)}}
   const change=(definition:any)=>{if(!tool)return;editGeneration.current++;setTool({...tool,definition});setDirty(true);setReview(null);setPreview(false);setBulk(null)}
   const save=()=>{if(!tool)return;const snapshot=tool,generation=editGeneration.current;void run(async()=>{const result=await api<LibraryTool>('/tool-library/'+id,'PATCH',{revision:snapshot.revision,title:snapshot.title,definition:snapshot.definition});const changed=editGeneration.current!==generation;setTool(current=>changed&&current?.id===snapshot.id?{...result,title:current.title,definition:current.definition}:result);setDirty(changed);if(!changed)setNameOpen(false);setNotice(changed?'本次已保存，保存期间的新修改仍待保存。':'工具草稿已保存；已有研究中的内容保持原样。')})}
   const commitForm=async(definition:FormDraft)=>{if(!tool||dirty)return false;return run(async()=>{const result=await api<LibraryTool>('/tool-library/'+id,'PATCH',{revision:tool.revision,title:tool.title,definition});setTool(result);setReview(null);setPreview(false);setNotice('表单内容已保存。')})}
@@ -43,6 +55,10 @@ export function SurveyToolTemplateEditor({id,onReturn,onLeaveRiskChange}:{id:str
   if(loading)return <p role="status">正在读取工具…</p>
   if(!tool)return <section className="survey-tool-library"><button className="btn-secondary" onClick={onReturn}>返回工具集</button><p role="alert">{error||'工具不可用'}</p><button className="btn-secondary" onClick={()=>setReload(value=>value+1)}>重新读取</button></section>
   const draft=tool.kind!=='COMPOSITION'?{...tool,kind:tool.kind,definition:tool.definition,projectId:'tool:'+id,instrumentKey:'library_tool',createdAt:tool.updatedAt} as ResearchDraft:null
+  const locatePreviewIssue=(issue:Review['issues'][number])=>{
+    const target=formAnswerIssueTarget(tool,issue)
+    if(target){setPreview(true);setPreviewFocus({itemKey:target.itemKey,sequence:++previewFocusSequence.current})}
+  }
   const items:ToolRef[]=tool.kind==='COMPOSITION'?tool.definition.items:[]
   const readOnly=tool.status!=='DRAFT'
   const importFormat=tool.kind==='SCALE'?'CSV':bulkFormat
@@ -58,7 +74,7 @@ export function SurveyToolTemplateEditor({id,onReturn,onLeaveRiskChange}:{id:str
     </header>
     <p className="survey-tool-completion-hint">{tool.readiness==='READY'&&!risk?'此修订已完成编制，可加入研究。后续保存修改后需重新完成。':'保存保留草稿；核对内容、检查与试答后，点击“完成编制”才能在研究中选用。'}</p>
     {error&&<div role="alert" className="survey-library-error">{error}</div>}
-    {!!issues.length&&<ul className="survey-library-issues" role="alert">{issues.map((issue,index)=><li key={index}>{issue.path||issue.line&&'第 '+issue.line+' 行'}：{issue.message}</li>)}</ul>}
+    {!!issues.length&&<ul className="survey-library-issues" role="alert">{issues.map((issue,index)=>{const target=formAnswerIssueTarget(tool,issue);return <li key={index}>{target?<button type="button" disabled={busy} onClick={()=>locatePreviewIssue(issue)}>{target.label}：{issue.message}</button>:<>{issue.path||issue.line&&'第 '+issue.line+' 行'}：{issue.message}</>}</li>})}</ul>}
     {tool.kind==='SCALE'&&<>{notice&&<p role="status" className="survey-library-notice">{notice}</p>}<ResearchScaleEditor key={id} value={tool.definition as ScaleDraft} onChange={change} projectId={'tool:'+id} appearance="studio" disabled={busy||readOnly} onDraftRiskChange={setFormRisk} onSave={save} canSave={dirty&&!busy&&!readOnly&&!!tool.title.trim()}/></>}
     <fieldset disabled={busy||readOnly} className="survey-template-fields">
     {notice&&tool.kind!=='SCALE'&&<p role="status" className="survey-library-notice">{notice}</p>}
@@ -77,7 +93,7 @@ export function SurveyToolTemplateEditor({id,onReturn,onLeaveRiskChange}:{id:str
       <ol><li>展开下方模板说明，复制或填入模板后修改题目。</li><li>点击“解析并预览”，核对候选题数与错误提示；这一步不会写入。</li><li>预览通过后点击“确认导入”，题目才会写入并立即保存；已有研究中的副本不随之更新。</li></ol></div>
       <ResearchImportGuide draft={draft} onUse={text=>{if(!bulkText.trim()||window.confirm('替换尚未导入的文本？')){setBulkText(text);setBulkFormat('CSV');setBulk(null)}}}/><label>输入格式<select className="input" value={importFormat} onChange={event=>{setBulkFormat(event.target.value as 'TEXT'|'CSV');setBulk(null)}}><option value="CSV">CSV</option>{tool.kind!=='SCALE'&&<option value="TEXT">多行文本</option>}</select></label><label>待导入内容<textarea className="input" rows={7} value={bulkText} onChange={event=>{setBulkText(event.target.value);setBulk(null)}}/></label><button type="button" className="btn-secondary" disabled={dirty||formRisk||!bulkText.trim()} onClick={()=>void run(async()=>{const batch:Batch={batchId:crypto.randomUUID(),format:importFormat,content:bulkText};const result=await api<Bulk>('/tool-library/'+id+'/bulk-import/preview','POST',batch);setBulk({batch,result});setIssues(result.issues)})}>解析并预览</button>{bulk&&<div><p>候选题数：{bulk.result.count}</p><button type="button" className="btn-primary" disabled={dirty||formRisk||!bulk.result.ok||bulk.result.revision!==tool.revision} onClick={()=>void run(async()=>{const result=await api<LibraryTool>('/tool-library/'+id+'/bulk-import/apply','POST',{revision:bulk.result.revision,digest:bulk.result.digest,batch:bulk.batch});setTool(result);setBulk(null);setBulkText('');setReview(null);setPreview(false);setNotice('题目已整批导入。')})}>确认导入</button></div>}</details>}
     {review?.ok&&tool.kind==='COMPOSITION'&&<p role="status">组合结构通过，共 {review.unitCount} 个工具。</p>}
-    {draft&&review?.ok&&!risk&&<details className="survey-library-help" open={preview} onToggle={event=>setPreview(event.currentTarget.open)}><summary>模拟作答（不产生正式答卷）</summary>{preview&&<ResearchPreview draft={draft} onSimulate={answers=>void run(async()=>{const result=await api<Review>('/tool-library/'+id+'/preview','POST',{answers});setReview(result);setIssues(result.issues)})} onValidateForm={answers=>void run(async()=>{const result=await api<Review>('/tool-library/'+id+'/form-dry-run','POST',{answers});setIssues(result.issues??[]);setNotice(result.ok?'表单试提交通过。':'请修正作答。')})}/>} {review.score?.scores?.map(score=><p key={score.key}>{score.key}：{score.value??'不可计算'}</p>)}</details>}
+    {draft&&review?.ok&&!risk&&<details className="survey-library-help" open={preview} onToggle={event=>setPreview(event.currentTarget.open)}><summary>模拟作答（不产生正式答卷）</summary>{preview&&<ResearchPreview draft={draft} focusRequest={previewFocus} onSimulate={answers=>void run(async()=>{const result=await api<Review>('/tool-library/'+id+'/preview','POST',{answers});setReview(result);setIssues(result.issues)})} onValidateForm={answers=>void run(async()=>{const result=await api<Review>('/tool-library/'+id+'/form-dry-run','POST',{answers});setIssues(result.issues??[]);const first=result.issues?.find(issue=>formAnswerIssueTarget(tool,issue));if(first)locatePreviewIssue(first);setNotice(result.ok?'表单试提交通过。':'请修正作答。')})}/>} {review.score?.scores?.map(score=><p key={score.key}>{score.key}：{score.value??'不可计算'}</p>)}</details>}
     </fieldset>
     <details className="survey-library-help"><summary>其他操作</summary><div className="survey-tool-management">
       <div className="survey-tool-management-options" aria-label="工具管理操作">

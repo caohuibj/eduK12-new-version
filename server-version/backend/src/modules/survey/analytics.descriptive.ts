@@ -1,3 +1,4 @@
+import {createSurveyNumericSummary} from './analytics.numeric'
 import {rejectPooledVariants} from './analytics.variant'
 import type { SurveySourceProjection, ResearchRawCodebook } from './analytics.source'
 import { pairedDescriptive } from './analytics.cohorts'
@@ -13,16 +14,14 @@ export interface ItemSummary {
   frequencies:{value:string;count:number}[]
   combinationFrequencies:{value:string;count:number}[]
   responseType:string
+  options:Array<{code:string;label:string}>
   numericMean:number|null
   numericSampleSd:number|null
 }
 const numeric=(values:number[])=>{
-  if(!values.length)return {mean:null,sd:null}
-  const mean=values.reduce((a,b)=>a+b,0)/values.length
-  const sd=values.length>1
-    ?Math.sqrt(values.reduce((sum,x)=>sum+(x-mean)**2,0)/(values.length-1))
-    :null
-  return {mean,sd}
+  const summary=createSurveyNumericSummary()
+  for(const value of values)summary.add(value)
+  return summary.result()
 }
 /** Aggregate in memory only from an already bounded, verified FINAL source.
  * Raw free-text values must never leak via descriptive frequency charts.
@@ -84,6 +83,7 @@ export function describeWave(source:SurveySourceProjection,waveId:string){
     const stats=numeric(values)
     items.push({columnKey:column,itemKey:codebook.itemKey,prompt:codebook.prompt,
       instrumentKey:codebook.instrumentKey,kind:codebook.kind,responseType:codebook.responseType,
+      options:codebook.options.map(({code,label})=>({code,label})),
       combinationFrequencies:[...combinations].map(([value,count])=>({value,count})),
       respondentN:rows.filter(x=>x.value!==null&&!x.missingReason).length,
       missingByReason,

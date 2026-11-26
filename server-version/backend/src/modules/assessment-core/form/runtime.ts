@@ -34,7 +34,7 @@ export const normalizeFormAnswers=(d:FormDraft,answers:AnswerMap):{rawAnswers:An
       if(q.otherOptionKey)missing.push({itemKey:q.itemKey+':other',reason:'NOT_SHOWN'})
       continue
     }
-    const value=answers[q.itemKey]
+    const value=Object.prototype.hasOwnProperty.call(answers,q.itemKey)?answers[q.itemKey]:undefined
     if(q.type!=='MATRIX'&&q.type!=='MATRIX_MULTIPLE'&&isRefusal(value)){
       if(!q.allowRefusal)invalid(path,'此题未声明允许明确拒答')
       if(q.otherOptionKey){
@@ -203,7 +203,7 @@ export const normalizeFormAnswers=(d:FormDraft,answers:AnswerMap):{rawAnswers:An
     }
     // Display conditions must be evaluated from previously verified answers,
     // never from attacker-provided hidden/off-page state.
-    previous[q.itemKey]=normalized[q.itemKey]??null
+    previous[q.itemKey]=Object.prototype.hasOwnProperty.call(normalized,q.itemKey)?normalized[q.itemKey]??null:null
   }
   return {rawAnswers:normalized,missing}
 }

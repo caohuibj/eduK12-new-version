@@ -221,7 +221,8 @@ export const projectRawItems=(items:readonly FrozenRawItem[],unit:FrozenUnitResu
   for(const item of items){
     if(deidentifiedChoicesOnly&&!DEIDENTIFIED_SURVEY_RESPONSE_TYPES.has(item.responseType))continue
     if(onlyItemKey&&item.itemKey!==onlyItemKey)continue
-    let value:AnswerPrimitive=values[item.answerKey]??null
+    let value:AnswerPrimitive=Object.prototype.hasOwnProperty.call(values,item.answerKey)
+      ?values[item.answerKey]??null:null
     let missingReason=missing.get(item.itemKey)??null
     if(item.matrixRow!==undefined){
       if(matrixAnswerKey!==item.answerKey){
@@ -229,7 +230,8 @@ export const projectRawItems=(items:readonly FrozenRawItem[],unit:FrozenUnitResu
         matrixAnswers=value&&typeof value==='object'&&!Array.isArray(value)
           ?value as Record<string,string|string[]>:{}
       }
-      value=matrixAnswers[item.matrixRow]??null
+      value=Object.prototype.hasOwnProperty.call(matrixAnswers,item.matrixRow)
+        ?matrixAnswers[item.matrixRow]??null:null
       missingReason=missingReason||(missing.get(item.answerKey)??null)
     }
     let scorerOptionKey:string|null|undefined
