@@ -11,12 +11,23 @@ export default function AdminPermissions(){
   const {user}=useAuth()
   const [accounts,setAccounts]=useState<Account[]>([]),[page,setPage]=useState(1),[keyword,setKeyword]=useState(''),[search,setSearch]=useState('')
   const [reason,setReason]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
-  const [audit,setAudit]=useState<Audit[]>([])
+  const [audit,setAudit]=useState<Audit[]>([]),[auditLoading,setAuditLoading]=useState(false),[auditError,setAuditError]=useState('')
+  const auditRequest=useRef(0)
+  useEffect(()=>()=>{auditRequest.current++},[])
   const reasonPanel=useRef<HTMLDetailsElement>(null)
   const [loading,setLoading]=useState(true)
   const [view,setView]=useState<'accounts'|'content'>('accounts'),[auditAccount,setAuditAccount]=useState('')
   const load=useCallback(async()=>{setLoading(true);try{const result=await api.get<{accounts:Account[]}>('/admin/permissions/accounts?page='+page+'&keyword='+encodeURIComponent(search));setAccounts(result.data!.accounts)}finally{setLoading(false)}},[page,search])
   useEffect(()=>{void load().catch(e=>setError(e.message))},[load])
+  const readAudit=async(account:Account)=>{
+    const request=++auditRequest.current
+    setAuditAccount(account.username);setAudit([]);setAuditError('');setAuditLoading(true)
+    try{
+      const result=await api.get<Audit[]>('/admin/permissions/audit?targetUserId='+account.id)
+      if(request===auditRequest.current)setAudit(result.data??[])
+    }catch(e){if(request===auditRequest.current)setAuditError(e instanceof Error?e.message:'审计记录读取失败，请重新选择账号重试')}
+    finally{if(request===auditRequest.current)setAuditLoading(false)}
+  }
   const change=async(account:Account,grant:Account['entries'][number])=>{
     if(!reason.trim()){setError('请填写授权变更原因');if(reasonPanel.current)reasonPanel.current.open=true;return}
     if(!window.confirm(`${grant.active?'撤销':'授予'} ${account.username} 的${entryLabels[grant.entry]}权限？`))return
@@ -38,10 +49,10 @@ export default function AdminPermissions(){
       <div className="sys-records">{accounts.map(account=><article className="sys-record" key={account.id}><details>
         <summary><span className="sys-record-avatar"><UsersRound size={20} aria-hidden="true"/></span><span className="sys-record-heading"><strong>{account.username}</strong><small>{account.platformRole==='SYSTEM_ADMIN'?'系统管理员':account.entries.some(g=>g.active)?'入口管理员':'尚无入口管理权限'} · {account.entries.filter(g=>g.active).length} 个入口已授权</small></span><span className="sys-expand">管理<ChevronDown size={17} aria-hidden="true"/></span></summary>
         <div className="sys-record-body"><div className="sys-grant-grid">{account.entries.map(grant=><div key={grant.entry} className="sys-grant"><div><strong>{entryLabels[grant.entry]}</strong><span className="sys-badge" data-active={grant.active}>{grant.active?'已授权':'未授权'}</span></div><button disabled={busy||loading} aria-label={`${grant.active?'撤销':'授予'} ${account.username} ${grant.entry}`} onClick={()=>void change(account,grant)}>{grant.active?'撤销权限':'授予权限'}</button></div>)}</div>
-        <button className="sys-text-button" onClick={()=>{setAuditAccount(account.username);void api.get<Audit[]>('/admin/permissions/audit?targetUserId='+account.id).then(r=>setAudit(r.data!)).catch(e=>setError(e.message))}}><History size={15} aria-hidden="true"/>查看 {account.username} 审计</button></div>
+        <button className="sys-text-button" onClick={()=>void readAudit(account)}><History size={15} aria-hidden="true"/>查看 {account.username} 审计</button></div>
       </details></article>)}</div>
       <nav className="system-pagination" aria-label="管理员列表分页"><span>第 {page} 页</span><div><button disabled={page===1||busy||loading} onClick={()=>setPage(p=>p-1)}>上一页</button><button disabled={accounts.length<25||busy||loading} onClick={()=>setPage(p=>p+1)}>下一页</button></div></nav>
-      <details className="sys-audit-history" open={auditAccount?true:undefined}><summary><History size={16} aria-hidden="true"/>最近授权审计{auditAccount&&' · '+auditAccount}</summary>{!audit.length?<p className="sys-muted">{auditAccount?'该账号暂无可见审计记录。':'在账号卡片中选择“查看审计”。'}</p>:<ol className="sys-timeline">{audit.map(row=><li key={row.id}><div><strong>{row.action} · {row.entry?entryLabels[row.entry]:'系统'}</strong><time>{new Date(row.createdAt).toLocaleString()}</time></div><p>{row.reason}</p></li>)}</ol>}</details>
+      <details className="sys-audit-history" open={auditAccount?true:undefined}><summary><History size={16} aria-hidden="true"/>最近授权审计{auditAccount&&' · '+auditAccount}</summary>{auditLoading?<p className="sys-muted" role="status">正在读取 {auditAccount} 的审计记录…</p>:auditError?<p className="sys-error" role="alert">{auditError}</p>:!audit.length?<p className="sys-muted">{auditAccount?'该账号暂无可见审计记录。':'在账号卡片中选择“查看审计”。'}</p>:<ol className="sys-timeline">{audit.map(row=><li key={row.id}><div><strong>{row.action} · {row.entry?entryLabels[row.entry]:'系统'}</strong><time>{new Date(row.createdAt).toLocaleString()}</time></div><p>{row.reason}</p></li>)}</ol>}</details>
     </section>
     <section hidden={view!=='content'} className="sys-panel sys-content-grants" aria-label="精确内容授权">{user&&<AdminContentPermissions key={user.id} actorId={user.id}/>}</section>
     </div><aside className="sys-rail" aria-label="授权操作准备"><details className="sys-panel sys-verification"><summary><ShieldCheck size={18} aria-hidden="true"/>操作验证</summary><p className="sys-muted">敏感变更前完成双因素验证，有效期五分钟。</p><AdminStepUp/></details><details ref={reasonPanel} className="sys-panel sys-reason" hidden={view!=='accounts'}><summary>变更依据</summary><label className="system-field">本次变更原因<textarea rows={4} maxLength={500} placeholder="说明本次授予或撤销权限的原因" value={reason} onChange={e=>setReason(e.target.value)}/></label><p className="sys-hint">填写原因后，在账号详情中操作；提交时仍需确认。</p></details><details className="sys-panel sys-guide"><summary>权限边界说明</summary><p>入口授权分别生效，不授予其他入口权限，也不修改账号业务身份。</p><p>系统管理员不负责研究者邀请、资格管理或研究者工具分配；这些由独立 Survey 管理员处理。</p></details></aside></div>

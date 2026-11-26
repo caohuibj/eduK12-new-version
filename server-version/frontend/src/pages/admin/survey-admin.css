@@ -309,3 +309,12 @@
   :is(.survey-admin-invitation-card,.survey-admin-tool-card) .survey-admin-badge { margin-left:44px; }
   :is(.survey-admin-invitation-disclosure,.survey-admin-tool-disclosure) > summary > .survey-admin-disclosure-chevron { margin-left:auto; }
 }
+
+/* Page-local researcher discovery keeps authorization recipients unchanged. */
+.survey-admin-researcher-filters { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) auto; gap:12px; align-items:end; margin:0 0 20px; padding:16px; border:1px solid var(--survey-brand-line); border-radius:12px; background:var(--survey-brand-subtle); }
+.survey-admin-researcher-filters label { display:grid; gap:7px; min-width:0; font-size:12px; font-weight:600; }
+.survey-admin-researcher-filters .input { width:100%; min-width:0; min-height:44px; }
+.survey-admin-researcher-filters > button { min-height:44px; }
+.survey-admin-researcher-filters > p { grid-column:1/-1; margin:0; font-size:11px; line-height:1.8; color:var(--survey-brand-muted); }
+.survey-admin-tool-card code { overflow-wrap:anywhere; }
+@media (max-width:760px) { .survey-admin-researcher-filters { grid-template-columns:minmax(0,1fr); padding:12px; } }

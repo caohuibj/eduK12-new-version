@@ -163,18 +163,18 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
         <div className="training-code-form-fields">
           <div>
             <label htmlFor="training-code-term">注册码有效期</label>
-            <select id="training-code-term" value={codeTerm} onChange={event => setCodeTerm(event.target.value)}>
+            <select id="training-code-term" value={codeTerm} onChange={event => { setCodeTerm(event.target.value); setError(null) }}>
               <option value="none">不限时间</option><option value="7">7 天</option><option value="30">30 天</option><option value="90">90 天</option><option value="custom">指定截止时间</option>
             </select>
-            {codeTerm === 'custom' && <label className="training-code-custom">注册码截止时间<input type="datetime-local" required value={codeDeadline} onChange={event => setCodeDeadline(event.target.value)}/></label>}
+            {codeTerm === 'custom' && <label className="training-code-custom">注册码截止时间<input type="datetime-local" required value={codeDeadline} onChange={event => { setCodeDeadline(event.target.value); setError(null) }}/></label>}
             <p>决定最晚何时可以用此码注册；使用后即失效。</p>
           </div>
           <div>
             <label htmlFor="training-account-term">注册后账号有效期</label>
-            <select id="training-account-term" value={accountTerm} onChange={event => setAccountTerm(event.target.value)}>
+            <select id="training-account-term" value={accountTerm} onChange={event => { setAccountTerm(event.target.value); setError(null) }}>
               <option value="year">1 年（默认）</option><option value="30">30 天</option><option value="90">90 天</option><option value="180">180 天</option><option value="custom">自定义天数</option>
             </select>
-            {accountTerm === 'custom' && <label className="training-code-custom">账号有效天数<input type="number" min="1" max="3650" step="1" required value={accountDays} onChange={event => setAccountDays(event.target.value)}/></label>}
+            {accountTerm === 'custom' && <label className="training-code-custom">账号有效天数<input type="number" min="1" max="3650" step="1" required value={accountDays} onChange={event => { setAccountDays(event.target.value); setError(null) }}/></label>}
             <p>从注册成功起算，包含待审核时间；到期后无法登录。</p>
           </div>
         </div>
