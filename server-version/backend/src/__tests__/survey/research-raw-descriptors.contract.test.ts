@@ -1,3 +1,4 @@
+import {describeWave} from '../../modules/survey/analytics.descriptive'
 import * as scalePresentation from '../../modules/survey/catalog-scale.presentation'
 import {rawLongExport,rawWideExport} from '../../modules/survey/analytics.raw-export'
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
@@ -17,16 +18,16 @@ const choices=[{optionKey:'a',label:'A'},{optionKey:'b',label:'B'}]
 const question=(itemKey:string,extra:Partial<FormQuestion>={}):FormQuestion=>({
   itemKey,type:'NUMBER',prompt:itemKey,required:false,options:[],rows:[],...extra,
 })
-function fixture(participants=3,quality=false){
+function fixture(participants=3,quality=false,prototypeRowReason?:'SHOWN_MISSING'|'REFUSED'){
   const form:FormDraft={schemaVersion:2,pages:[{pageKey:'page',title:'Synthetic',questions:[
     question('zero'),question('blank',{type:'SHORT_TEXT'}),question('note',{type:'LONG_TEXT'}),
     question('multi',{type:'MULTIPLE',options:choices}),
     question('rank',{type:'RANK_ORDER',options:choices}),
     question('total',{type:'CONSTANT_SUM',options:choices,total:10}),
     question('time',{type:'TIME',timeZone:'Asia/Shanghai'}),
-    question('grid',{type:'MATRIX',options:choices,rows:[{rowKey:'first',label:'First'},{rowKey:'second',label:'Second'}]}),
+    question('grid',{type:'MATRIX',options:choices,...(prototypeRowReason?{allowRefusal:true}:{}),rows:[{rowKey:'first',label:'First'},{rowKey:'second',label:'Second'},...(prototypeRowReason?[{rowKey:'constructor',label:'Constructor'}]:[])]}),
     question('grid_first'),
-    question('matrix',{type:'MATRIX_MULTIPLE',options:choices,rows:[{rowKey:'row',label:'Row'}]}),
+    question('matrix',{type:'MATRIX_MULTIPLE',options:choices,...(prototypeRowReason?{allowRefusal:true}:{}),rows:[{rowKey:'row',label:'Row'},...(prototypeRowReason?[{rowKey:'constructor',label:'Constructor'}]:[])]}),
     question('choose',{type:'SINGLE',options:choices,otherOptionKey:'b'}),question('choose_other'),
     question('missing'),question('refused',{allowRefusal:true}),
   ]}]}
@@ -54,7 +55,8 @@ function fixture(participants=3,quality=false){
     ]}
   const result=computeSurveyFinal(snapshot,{form:{zero:0,blank:'',note:'private text',multi:['b','a'],rank:['b','a'],
     total:{a:0,b:10},time:'09:30','grid:first':'a',grid_first:7,'matrix:row':['a','b'],
-    choose:'b','choose:other':'private other',choose_other:8,refused:{_surveyRefusal:true}},
+    choose:'b','choose:other':'private other',choose_other:8,refused:{_surveyRefusal:true},
+    ...(prototypeRowReason==='REFUSED'?{'grid:constructor':{_surveyRefusal:true},'matrix:constructor':{_surveyRefusal:true}}:{})},
     scale:{one:'a',two:'b',three:'a',...(quality?{attention:'a',social:'b'}:{})},sjt:{single:'b',multiple:['b','a']}})
   const publication={id:'synthetic-publication',projectId:owner.projectId,version:4,
     compiledSnapshot:snapshot,definitionDigest:canonicalHash(snapshot)}
@@ -113,6 +115,20 @@ beforeEach(()=>{vi.clearAllMocks();vi.stubEnv('DATA_ENCRYPTION_KEY','ab'.repeat(
 afterEach(()=>{vi.restoreAllMocks();vi.unstubAllEnvs()})
 
 describe('Request-local frozen Survey raw descriptors',()=>{
+  it.each(['SHOWN_MISSING','REFUSED'] as const)('reads and exports a legitimate constructor matrix row as %s',async reason=>{
+    fixture(1,false,reason)
+    const source=await loadSurveySource({...owner,includeWideSchema:true})
+    for(const itemKey of ['grid:constructor','matrix:constructor']){
+      expect(source.raw.find(row=>row.itemKey===itemKey)).toMatchObject({value:null,missingReason:reason})
+      expect(describeWave(source,owner.waveIds[0]).items.find(item=>item.itemKey===itemKey))
+        .toMatchObject({respondentN:0,missingByReason:{[reason]:1}})
+    }
+    const long=rawLongExport(owner.projectId,source),wide=rawWideExport(owner.projectId,source)
+    expect(long.csv).toContain('"'+reason+'"')
+    expect(wide.csv).toContain('"'+reason+'"')
+    expect(long.codebook.filter(row=>row.itemKey.endsWith(':constructor'))).toHaveLength(2)
+  })
+
   it('constructs each unit descriptor and option table once across schema and participant projection',async()=>{
     const {snapshot}=fixture(4),counts=countSchemaWork(snapshot)
     const source=await loadSurveySource({...owner,includeWideSchema:true})

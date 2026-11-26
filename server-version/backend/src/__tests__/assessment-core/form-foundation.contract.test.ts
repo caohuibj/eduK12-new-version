@@ -70,6 +70,43 @@ describe('shared Form foundation immutable baseline oracle',()=>{
     expect(validateFormDefinition(fixture.definition,{forPreview:true}))
       .toEqual(builder.validateSurveyDraft('FORM',fixture.definition,true))
   })
+  const constructorCases=[
+    {type:'NUMBER' as const,answer:0,options:[]},
+    {type:'SHORT_TEXT' as const,answer:'合法文本',options:[]},
+    {type:'SINGLE' as const,answer:'yes',options:[{optionKey:'yes',label:'Yes'},{optionKey:'no',label:'No'}]},
+  ]
+  const constructorDefinition=(test:typeof constructorCases[number])=>validateFormDefinition({
+    schemaVersion:2,pages:[{pageKey:'page',title:'Synthetic',questions:[
+      {itemKey:'constructor',type:test.type,prompt:'Optional constructor',required:false,
+        options:test.options,rows:[]},
+      ...(test.type==='SINGLE'?[{itemKey:'followup',type:'SHORT_TEXT',prompt:'Follow-up',required:false,
+        options:[],rows:[],displayIf:{itemKey:'constructor',operator:'EQUALS',optionKey:'yes'}}]:[]),
+    ]}],
+  },{forPreview:true})
+  it.each(constructorCases)('treats an omitted optional $type constructor key as missing, never as a prototype answer',test=>{
+    const validation=constructorDefinition(test)
+    expect(validation.issues).toEqual([])
+    const result=normalizeFormAnswers(validation.definition!,parseAnswerMap({},'answers'))
+    expect(JSON.stringify(result.rawAnswers)).toBe('{}')
+    expect(Object.prototype.hasOwnProperty.call(result.rawAnswers,'constructor')).toBe(false)
+    expect(result.missing).toEqual([
+      {itemKey:'constructor',reason:'SHOWN_MISSING'},
+      ...(test.type==='SINGLE'?[{itemKey:'followup',reason:'NOT_SHOWN'}]:[]),
+    ])
+  })
+  it.each(constructorCases)('keeps an explicitly owned $type constructor answer and its verified display condition',test=>{
+    const validation=constructorDefinition(test)
+    expect(validation.issues).toEqual([])
+    const input=Object.fromEntries([
+      ['constructor',test.answer],
+      ...(test.type==='SINGLE'?[['followup','已显示的后续回答']]:[]),
+    ])
+    const result=normalizeFormAnswers(validation.definition!,parseAnswerMap(input,'answers'))
+    expect(result.rawAnswers).toEqual(input)
+    expect(Object.prototype.hasOwnProperty.call(result.rawAnswers,'constructor')).toBe(true)
+    expect(result.rawAnswers.constructor).toBe(test.answer)
+    expect(result.missing).toEqual([])
+  })
   it('keeps all shared runtime imports away from entry adapters, database and HTTP',()=>{
     const root=path.resolve('src/modules/assessment-core')
     const walk=(dir:string):string[]=>fs.readdirSync(dir,{withFileTypes:true}).flatMap(x=>x.isDirectory()?walk(path.join(dir,x.name)):[path.join(dir,x.name)])

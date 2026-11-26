@@ -37,8 +37,8 @@ export const formWorstCaseAnswerBytes=(form:FormDraft)=>{
   const quote=(value:string)=>Buffer.byteLength(JSON.stringify(value),'utf8')
   let bytes=2 // root JSON object
   for(const page of form.pages)for(const q of page.questions){
-    const option= Math.max(4,...q.options.map(o=>quote(o.optionKey)),
-      q.allowRefusal?23:0)
+    const refusal=q.allowRefusal?23:0 // serialized explicit refusal marker
+    const option= Math.max(4,...q.options.map(o=>quote(o.optionKey)),refusal)
     const allOptions=2+q.options.reduce((n,o)=>n+quote(o.optionKey)+1,0)
     const valueBytes=()=>{
       if(q.type==='SHORT_TEXT'||q.type==='LONG_TEXT')
@@ -52,8 +52,8 @@ export const formWorstCaseAnswerBytes=(form:FormDraft)=>{
     }
     if(q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE'){
       for(const row of q.rows)bytes+=quote(q.itemKey+':'+row.rowKey)+
-        (q.type==='MATRIX_MULTIPLE'?allOptions:option)+2
-    }else bytes+=quote(q.itemKey)+valueBytes()+2
+        Math.max(refusal,q.type==='MATRIX_MULTIPLE'?allOptions:option)+2
+    }else bytes+=quote(q.itemKey)+Math.max(refusal,valueBytes())+2
     if(q.otherOptionKey)bytes+=quote(q.itemKey+':other')+2+6*(q.otherMaxLength??300)+2
   }
   return bytes

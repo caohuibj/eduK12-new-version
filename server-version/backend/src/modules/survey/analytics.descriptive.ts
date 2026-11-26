@@ -1,3 +1,4 @@
+import {createSurveyNumericSummary} from './analytics.numeric'
 import {rejectPooledVariants} from './analytics.variant'
 import type { SurveySourceProjection, ResearchRawCodebook } from './analytics.source'
 import { pairedDescriptive } from './analytics.cohorts'
@@ -13,9 +14,11 @@ export interface ItemSummary {
   frequencies:{value:string;count:number}[]
   combinationFrequencies:{value:string;count:number}[]
   responseType:string
+  options:Array<{code:string;label:string}>
   numericMean:number|null
   numericSampleSd:number|null
 }
+// Keep existing score statistics exact for governed reference candidates.
 const numeric=(values:number[])=>{
   if(!values.length)return {mean:null,sd:null}
   const mean=values.reduce((a,b)=>a+b,0)/values.length
@@ -46,14 +49,14 @@ export function describeWave(source:SurveySourceProjection,waveId:string){
     const combinations=new Map<string,number>()
     const possible=new Set(codebook.options.map(o=>o.code))
     const multi=['MULTIPLE','MATRIX_MULTIPLE','SJT_MULTIPLE'].includes(codebook.responseType)
-    const values:number[]=[]
+    const summary=createSurveyNumericSummary()
     for(const row of rows){
       if(row.missingReason){
         missingByReason[row.missingReason]=(missingByReason[row.missingReason]||0)+1
         continue
       }
       if(row.value===null)continue
-      if(typeof row.value==='number'&&Number.isFinite(row.value))values.push(row.value)
+      if(typeof row.value==='number'&&Number.isFinite(row.value))summary.add(row.value)
       else if(codebook.options.length&&typeof row.value==='string'){
         if(multi){
           let selected:unknown
@@ -81,9 +84,10 @@ export function describeWave(source:SurveySourceProjection,waveId:string){
         }
       }
     }
-    const stats=numeric(values)
+    const stats=summary.result()
     items.push({columnKey:column,itemKey:codebook.itemKey,prompt:codebook.prompt,
       instrumentKey:codebook.instrumentKey,kind:codebook.kind,responseType:codebook.responseType,
+      options:codebook.options.map(({code,label})=>({code,label})),
       combinationFrequencies:[...combinations].map(([value,count])=>({value,count})),
       respondentN:rows.filter(x=>x.value!==null&&!x.missingReason).length,
       missingByReason,

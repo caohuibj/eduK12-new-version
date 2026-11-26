@@ -18,7 +18,9 @@ type ScoreStat={instrumentKey:string;scoreKey:string;validN:number;mean:number|n
   scoringDigest?:string;responseSignature?:string;unit?:string|null;
   provenance?:{kind:string;measurementDigest:string;scoringVersion:string;engineVersion?:string;timingPolicy?:string;devicePolicy?:string};
   qualityCounts?:Record<string,number>;completionCounts?:Record<string,number>}
+type FrozenOption={code:string;label:string}
 type ItemStat={itemKey:string;instrumentKey:string;prompt:string;kind:string;respondentN:number;
+  options?:FrozenOption[];
   missingByReason:Record<string,number>;frequencies:{value:string;count:number}[];
   combinationFrequencies?:{value:string;count:number}[];responseType?:string;
   numericMean:number|null;numericSampleSd:number|null}
@@ -27,10 +29,45 @@ type WaveItems={waveId:string;items:ItemStat[];descriptiveScores:ScoreStat[];not
 type BoundedVariable={instrumentKey:string;itemKey:string;prompt:string;
   responseType:string;columnKey:string;kind:string}
 type BoundedItem={analysisFinalCount:number;respondentN:number;prompt:string;
+  options?:FrozenOption[];
   itemKey:string;instrumentKey:string;responseType:string;
   frequencies:{value:string;count:number}[];missingByReason:Record<string,number>;
   numericMean:number|null;numericSampleSd:number|null;
   complete:true;sourceCutOff:string;note:string}
+type FrequencyRow={value:string;count:number}
+type FrequencyLabels={responseType?:string;options?:FrozenOption[]}
+const labelledChoiceTypes=new Set(['SINGLE','MULTIPLE','LIKERT','MATRIX','MATRIX_MULTIPLE'])
+const missingReasonLabels=new Map<string,string>([
+  ['REFUSED','不愿回答'],['UNABLE_TO_JUDGE','无法判断'],['NOT_SHOWN','未呈现'],
+  ['SHOWN_MISSING','未作答'],['NO_WAVE','未参加'],['ABANDONED','未完成'],
+  ['WITHDRAWN','已撤回'],['QUALITY_EXCLUDED','未纳入分析'],
+  ['NOT_COMPARABLE','不可比较'],['FREE_TEXT_EXCLUDED','未包含文字回答'],
+])
+function frequencyLabel(value:string,item:FrequencyLabels,combination:boolean){
+  const label=(code:string)=>item.options?.find(option=>option.code===code)?.label||code
+  if(combination){
+    try{
+      const selected:unknown=JSON.parse(value)
+      if(Array.isArray(selected)&&selected.every(code=>typeof code==='string'))
+        return selected.length?selected.map(label).join('、'):'未选择任何选项'
+    }catch{/* Older or unrecognized values retain their original encoding. */}
+    return value
+  }
+  if(item.responseType==='RANK_ORDER'){
+    const ranked=value.match(/^(.+)@rank([1-9]\d*)$/)
+    const option=ranked&&item.options?.find(option=>option.code===ranked[1])
+    return option?.label?option.label+' · 第'+ranked![2]+'位':value
+  }
+  return labelledChoiceTypes.has(item.responseType??'')?label(value):value
+}
+function StatisticalFrequencies({rows,item,combination=false}:{rows:FrequencyRow[];item:FrequencyLabels;combination?:boolean}){
+  return <>{rows.map((row,index)=><span key={row.value+':'+index} title={'原始编码：'+row.value}>
+    {index>0?'；':''}{frequencyLabel(row.value,item,combination)}：{row.count}</span>)}</>
+}
+function StatisticalMissing({reasons}:{reasons:Record<string,number>}){
+  return <>{Object.entries(reasons).map(([code,count],index)=><span key={code} title={'缺失代码：'+code}>
+    {index>0?'；':''}{missingReasonLabels.get(code)??code}：{count}</span>)}</>
+}
 type PairedScore={baselineN:number;followupN:number;matchedN:number;attritionN:number;lateJoinN:number;
   meanPairedChange:number|null;comparability:'COMPARABLE'|'NOT_COMPARABLE';reason?:string}
 type GroupResult={minGroupN:number;suppressedGroups:number;note:string;groups:Array<{
@@ -535,9 +572,9 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
               均值={boundedItem.numericMean?.toFixed(2)??'—'}，
               SD={boundedItem.numericSampleSd?.toFixed(2)??'—'}</p>
             {boundedItem.frequencies.length>0&&<p>选项频数：
-              {boundedItem.frequencies.map(row=>row.value+'：'+row.count).join('；')}</p>}
+              <StatisticalFrequencies rows={boundedItem.frequencies} item={boundedItem}/></p>}
             {Object.keys(boundedItem.missingByReason).length>0&&<p>缺失：
-              {Object.entries(boundedItem.missingByReason).map(([why,count])=>why+'：'+count).join('；')}</p>}
+              <StatisticalMissing reasons={boundedItem.missingByReason}/></p>}
             <p className="text-xs text-slate-500">已核对全部有效 FINAL ·
               数据截止 {new Date(boundedItem.sourceCutOff).toLocaleString('zh-CN')} · {boundedItem.note}</p>
           </div>}
@@ -549,10 +586,10 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
             <tbody>{itemStats.items.slice(0,150).map(q=><tr key={q.itemKey+'-'+q.instrumentKey} className="border-t">
               <th className="text-left p-2 font-normal">{q.prompt}</th>
               <td className="text-center">{q.respondentN}</td>
-              <td className="text-xs p-2">{q.frequencies.map(c=>c.value+': '+c.count).join('；')}
+              <td className="text-xs p-2"><StatisticalFrequencies rows={q.frequencies} item={q}/>
                 {(q.combinationFrequencies?.length??0)>0&&<p>多选组合：
-                  {q.combinationFrequencies!.map(x=>x.value+': '+x.count).join('；')}</p>}
-                {Object.entries(q.missingByReason).length>0&&<p>缺失：{Object.entries(q.missingByReason).map(([k,v])=>k+': '+v).join('；')}</p>}</td>
+                  <StatisticalFrequencies rows={q.combinationFrequencies!} item={q} combination/></p>}
+                {Object.entries(q.missingByReason).length>0&&<p>缺失：<StatisticalMissing reasons={q.missingByReason}/></p>}</td>
               <td className="text-center">{q.numericMean===null?'—':q.numericMean.toFixed(2)}</td>
             </tr>)}</tbody>
           </table></div>

@@ -284,7 +284,7 @@ export async function freezeResearchWaveDraft(input:{
       ?(u.displayDefinition as ScaleDraft).items.length:0),0)
     if(timedItems>3000)stop('逐题计时量表超过单次 FINAL 3000 题的安全提交预算')
     let checkpointBudgetBytes=0
-    if(timedItems||units.some(unit=>unit.kind==='COGNITIVE'||unit.kind==='SJT'&&
+    if(timedItems||units.some(unit=>unit.kind==='FORM'||unit.kind==='COGNITIVE'||unit.kind==='SJT'&&
       (unit.displayDefinition as AnySjtDraft).schemaVersion===2)){
       // Worst-case answer + timing JSON must fit the one-MiB FINAL budget.
       // A count-only budget (e.g. 3000 max-length option keys) is insufficient.
@@ -331,7 +331,7 @@ export async function freezeResearchWaveDraft(input:{
         stop('逐题计时元数据最大体积超过 390 KB 发布预算，请减少量表题目')
       checkpointBudgetBytes=worst
       if(worst>900000)
-        stop('量表逐题计时与其他工具组合的最大 FINAL 超过 900 KB 发布预算，请缩短内容或拆分波次')
+        stop('本轮答案与逐题计时的最大 FINAL 超过 900 KB 发布预算，请缩短内容或拆分波次')
     }
     let frozenFlow:FrozenSurveyFlow|undefined
     if(wave.flowDefinition){

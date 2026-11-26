@@ -1,3 +1,4 @@
+import {createSurveyNumericSummary} from './analytics.numeric'
 import { isResearchFreeTextType } from './analytics.response-privacy'
 import {rejectPooledVariants} from './analytics.variant'
 import {loadSurveySource} from './analytics.source'
@@ -80,8 +81,10 @@ export async function describeSurveyWaveItemPaged(input:{
   let columnKey:string|undefined
   let responseType:string|undefined
   let prompt:string|undefined
+  let options:Array<{code:string;label:string}>=[]
   let optionCodes:string[]=[]
-  let processed=0,respondentN=0,numericN=0,mean=0,m2=0
+  let processed=0,respondentN=0
+  const numeric=createSurveyNumericSummary()
   const missingByReason:Record<string,number>={}
   const frequencies=new Map<string,number>()
   for(let page=0;page<MAX_PAGES;page++){
@@ -106,7 +109,8 @@ export async function describeSurveyWaveItemPaged(input:{
       if(isResearchFreeTextType(target.responseType))
         throw new SurveyAnalyticsError(403,'敏感自由文本不进入自动逐题汇总')
       columnKey=target.columnKey;prompt=target.prompt;responseType=target.responseType
-      optionCodes=target.options.map(o=>o.code)
+      options=target.options.map(({code,label})=>({code,label}))
+      optionCodes=options.map(option=>option.code)
     }
     processed+=chunk.completeAttempts
     for(const row of chunk.raw){
@@ -118,10 +122,7 @@ export async function describeSurveyWaveItemPaged(input:{
       if(row.value===null)continue
       respondentN++
       if(typeof row.value==='number'&&Number.isFinite(row.value)){
-        numericN++
-        const delta=row.value-mean
-        mean+=delta/numericN
-        m2+=delta*(row.value-mean)
+        numeric.add(row.value)
       }else if(typeof row.value==='string'&&optionCodes.length){
         const allowed=new Set(optionCodes)
         const multi=['MULTIPLE','MATRIX_MULTIPLE','SJT_MULTIPLE'].includes(responseType??'')
@@ -167,14 +168,15 @@ export async function describeSurveyWaveItemPaged(input:{
     if(!chunk.nextFinalCursor){
       if(expectedFinalCount!==undefined&&processed!==expectedFinalCount)
         throw new SurveyAnalyticsError(409,'逐题统计页数与有效样本数量无法核对')
+      const stats=numeric.result()
       return {
         projectId:input.projectId,waveId:input.waveId,instrumentKey:input.instrumentKey,
-        itemKey:input.itemKey,columnKey,responseType,prompt,
+        itemKey:input.itemKey,columnKey,responseType,prompt,options,
         analysisFinalCount:processed,respondentN,missingByReason,
         frequencies:[...frequencies].sort(([a],[b])=>a.localeCompare(b))
           .map(([value,count])=>({value,count})),
-        numericMean:numericN?mean:null,
-        numericSampleSd:numericN>1?Math.sqrt(m2/(numericN-1)):null,
+        numericMean:stats.mean,
+        numericSampleSd:stats.sd,
         sourceCutOff:snapshotCutOff.toISOString(),sourceRevision:expectedSourceRevision,
         complete:true,noTruncation:true,maxFinals:PAGE_SIZE*MAX_PAGES,
         note:'只有冻结的有效 FINAL；自由文本不做频数；非诊断描述统计。',
