@@ -31,6 +31,10 @@ const {
   mockFailedLimit: vi.fn(),
 }))
 
+vi.mock('../../services/classroomDanmaku', async (original) => {
+ const actual=await original<typeof import('../../services/classroomDanmaku')>();return {...actual,classroomDanmaku:{control:vi.fn(),send:vi.fn(),read:vi.fn().mockRejectedValue(new actual.DanmakuError('UNAVAILABLE','test cache offline')),close:vi.fn().mockResolvedValue({}),unavailable:vi.fn().mockReturnValue({available:false,messages:[]})}}
+})
+
 vi.mock('../../services/socketService', () => ({
   socketService: mockSocketService,
 }))
@@ -50,6 +54,7 @@ vi.mock('../../utils/classroomRateLimiter', () => ({
 }))
 
 import { ClassroomSocketHandler } from '../../services/classroomSocketHandler'
+import {classroomDanmaku,DanmakuError,DANMAKU_LIMITS} from '../../services/classroomDanmaku'
 
 const makeSocket = (data: Record<string, unknown>) => ({
   data,
@@ -596,4 +601,78 @@ describe('classroom socket authorization boundary', () => {
     }))
   })
 
+})
+
+
+describe('danmaku socket admission and committed-state broadcast',()=>{
+ const snapshot={available:true,classroomId:'classroom-1',sessionId:'danmaku-session',revision:3,controlRevision:1,displayEpoch:1,enabled:true,paused:false,displayMode:'QUESTION' as const,reviewMode:'review' as const,topic:'主题',speed:'normal' as const,expiresAt:null,messages:[{id:'approved',text:'公开',createdAt:'',expiresAt:'',status:'approved' as const}],pending:[{id:'pending',text:'待审',createdAt:'',expiresAt:'',status:'pending' as const}],limits:DANMAKU_LIMITS}
+ const manager=()=>makeSocket({authenticated:true,userRole:'TEACHER',userId:'teacher-1',classroomId:'classroom-1',clientRole:'teacher'})
+ const student=()=>makeSocket({authenticated:false,classroomId:'classroom-1',clientRole:'student',studentId:'temp_bound',sessionId:'bound-session'})
+ beforeEach(()=>{
+  vi.clearAllMocks();mockSocketService.refreshAuthenticatedSocket.mockResolvedValue(true)
+  mockCanManageClassroom.mockReturnValue(true);mockFindClassroomAccess.mockResolvedValue({id:'classroom-1',status:'PREPARING',creatorId:'teacher-1',course:{creatorId:'teacher-1'}})
+  mockPrisma.classroomSession.findFirst.mockResolvedValue({id:'bound-session'})
+  vi.mocked(classroomDanmaku.read).mockResolvedValue({ok:true,snapshot})
+  vi.mocked(classroomDanmaku.control).mockResolvedValue({ok:true,snapshot})
+  vi.mocked(classroomDanmaku.send).mockResolvedValue({ok:true,snapshot,messageId:'approved',status:'approved',replayed:false})
+ })
+ it('ignores forged non-function ACK arguments and preserves ordinary omitted/function ACKs',async()=>{
+  mockSocketService.getClassroomNamespace.mockReturnValue(mockNamespace)
+  const handler=new ClassroomSocketHandler() as any,socket=makeSocket({})
+  const events=[['danmaku:state:get','handleDanmakuRead'],['teacher:danmaku:control','handleDanmakuControl'],['student:danmaku:send','handleDanmakuSend']]
+  const spies=events.map(([,method])=>vi.spyOn(handler,method).mockResolvedValue(undefined))
+  handler.initialize();mockNamespace.on.mock.calls.find(([event])=>event==='connection')![1](socket)
+  events.forEach(([event],index)=>{
+   const listener=socket.on.mock.calls.find(([name])=>name===event)![1],spy=spies[index]
+   for(const forged of ['bogus',null,42,{}])listener({},forged)
+   expect(spy).not.toHaveBeenCalled()
+   listener({});expect(spy).toHaveBeenCalledOnce()
+   const ack=vi.fn();listener({},ack);expect(spy).toHaveBeenCalledTimes(2)
+   expect(spy.mock.calls[1].at(-1)).toBe(ack)
+  })
+ })
+ it('rejects unjoined and departed students without reading Redis',async()=>{
+  const handler=new ClassroomSocketHandler() as any,ack=vi.fn()
+  await handler.handleDanmakuRead(makeSocket({}),ack);expect(ack).toHaveBeenLastCalledWith(expect.objectContaining({code:'FORBIDDEN'}))
+  mockPrisma.classroomSession.findFirst.mockResolvedValue(null)
+  await handler.handleDanmakuSend(student(),{},ack);expect(ack).toHaveBeenLastCalledWith(expect.objectContaining({code:'FORBIDDEN'}))
+  expect(classroomDanmaku.send).not.toHaveBeenCalled();expect(classroomDanmaku.read).not.toHaveBeenCalled()
+ })
+ it('reads use bound active session and never disclose any peer text to students',async()=>{
+  const handler=new ClassroomSocketHandler() as any,ack=vi.fn()
+  await handler.handleDanmakuRead(student(),ack)
+  expect(mockPrisma.classroomSession.findFirst).toHaveBeenCalledWith(expect.objectContaining({where:expect.objectContaining({id:'bound-session',studentId:'temp_bound',classroomId:'classroom-1',leftAt:null})}))
+  expect(ack).toHaveBeenCalledWith({ok:true,snapshot:expect.objectContaining({messages:[]})})
+  expect(ack.mock.calls[0][0].snapshot).not.toHaveProperty('pending')
+ })
+ it('bigscreen and revoked managers cannot control; ended classes cannot restart',async()=>{
+  const handler=new ClassroomSocketHandler() as any,ack=vi.fn(),screen=manager();screen.data.clientRole='bigscreen'
+  await handler.handleDanmakuControl(screen,{},ack);expect(ack).toHaveBeenLastCalledWith(expect.objectContaining({code:'FORBIDDEN'}))
+  mockCanManageClassroom.mockReturnValue(false);await handler.handleDanmakuControl(manager(),{},ack)
+  expect(ack).toHaveBeenLastCalledWith(expect.objectContaining({code:'FORBIDDEN'}));expect(classroomDanmaku.control).not.toHaveBeenCalled()
+  mockCanManageClassroom.mockReturnValue(true);mockFindClassroomAccess.mockResolvedValue({id:'classroom-1',status:'ENDED'})
+  await handler.handleDanmakuControl(manager(),{},ack);expect(ack).toHaveBeenLastCalledWith(expect.objectContaining({code:'CLASSROOM_CLOSED'}))
+ })
+ it('committed teacher controls still broadcast when requester changes role before ACK',async()=>{
+  const handler=new ClassroomSocketHandler() as any,socket=manager(),ack=vi.fn(),schedule=vi.spyOn(handler,'scheduleDanmaku').mockImplementation(()=>{})
+  vi.mocked(classroomDanmaku.control).mockImplementation(async()=>{socket.data.clientRole='bigscreen';return {ok:true,snapshot}})
+  await handler.handleDanmakuControl(socket,{},ack)
+  expect(schedule).toHaveBeenCalledWith('classroom-1',true)
+  expect(ack).toHaveBeenCalledWith(expect.objectContaining({ok:false,code:'FORBIDDEN'}))
+ })
+ it('committed student sends still broadcast but no success ACK goes to a departed context',async()=>{
+  const handler=new ClassroomSocketHandler() as any,socket=student(),ack=vi.fn(),schedule=vi.spyOn(handler,'scheduleDanmaku').mockImplementation(()=>{})
+  vi.mocked(classroomDanmaku.send).mockImplementation(async()=>{socket.data.sessionId='different-session';return {ok:true,snapshot,messageId:'approved',status:'approved',replayed:false}})
+  await handler.handleDanmakuSend(socket,{},ack)
+  expect(schedule).toHaveBeenCalledWith('classroom-1',false);expect(ack).toHaveBeenCalledWith(expect.objectContaining({ok:false,code:'FORBIDDEN'}))
+ })
+ it('read post-Redis role changes withhold pending; Redis failures advertise unavailable',async()=>{
+  const handler=new ClassroomSocketHandler() as any,socket=manager(),ack=vi.fn()
+  vi.mocked(classroomDanmaku.read).mockImplementation(async()=>{socket.data.clientRole='bigscreen';return {ok:true,snapshot}})
+  await handler.handleDanmakuRead(socket,ack);expect(ack).toHaveBeenLastCalledWith(expect.objectContaining({ok:false,code:'FORBIDDEN'}))
+  vi.mocked(classroomDanmaku.read).mockRejectedValue(new DanmakuError('UNAVAILABLE','缓存不可用'))
+  const second=manager();await handler.handleDanmakuRead(second,ack)
+  expect(second.emit).toHaveBeenCalledWith('danmaku:state',expect.objectContaining({available:false}))
+  expect(ack).toHaveBeenLastCalledWith(expect.objectContaining({ok:false,code:'UNAVAILABLE'}))
+ })
 })

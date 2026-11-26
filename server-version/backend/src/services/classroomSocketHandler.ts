@@ -1,3 +1,4 @@
+import { classroomDanmaku, DanmakuError, danmakuForRole, type DanmakuRole, type DanmakuSnapshot } from './classroomDanmaku'
 import { trainingCourseScope } from '../utils/courseAccess'
 import { classroomSubmissionStats } from './classroomSubmissionStats'
 import { startClassroomQuestion, endClassroomQuestion, closeClassroom, submitClassroomAnswer, joinClassroomStudent, leaveClassroomStudent, ClassroomLifecycleError } from './classroomLifecycleService'
@@ -132,6 +133,8 @@ const classroomQuestionPayload = (question: any): Record<string, unknown> | null
 }
 
 export class ClassroomSocketHandler {
+  private readonly danmakuSessions=new Map<string,{expiresAt:number;valid:Promise<boolean>}>()
+  private readonly danmakuBatches = new Map<string,NodeJS.Timeout>()
   private activeTimers: Map<string, NodeJS.Timeout> = new Map()
   private managerRevalidationTimers: Map<string, NodeJS.Timeout> = new Map()
   private readonly statsScheduler = new ClassroomStatsScheduler(
@@ -143,6 +146,22 @@ export class ClassroomSocketHandler {
 
     namespace.on('connection', (socket: Socket) => {
       logger.debug('课堂 Socket 连接已建立')
+
+      socket.on('danmaku:state:get', (_data:unknown, ack?:unknown)=>{
+        // A client may send an ordinary second payload instead of a callback.
+        if(ack!==undefined&&typeof ack!=='function')return
+        void this.handleDanmakuRead(socket,ack as SocketAck|undefined)
+      })
+      socket.on('teacher:danmaku:control', (data:unknown, ack?:unknown)=>{
+        // A client may send an ordinary second payload instead of a callback.
+        if(ack!==undefined&&typeof ack!=='function')return
+        void this.handleDanmakuControl(socket,data,ack as SocketAck|undefined)
+      })
+      socket.on('student:danmaku:send', (data:unknown, ack?:unknown)=>{
+        // A client may send an ordinary second payload instead of a callback.
+        if(ack!==undefined&&typeof ack!=='function')return
+        void this.handleDanmakuSend(socket,data,ack as SocketAck|undefined)
+      })
 
       socket.on('teacher:join', (data: unknown) => {
         void this.handleTeacherJoin(socket, data)
@@ -185,6 +204,146 @@ export class ClassroomSocketHandler {
     logger.info('课堂 Socket.IO 事件处理器已初始化')
   }
 
+    private danmakuFailure(cause: unknown): Record<string, unknown> {
+        const error = cause instanceof DanmakuError ? cause : new DanmakuError('UNAVAILABLE', '弹幕暂不可用，请稍后再试');
+        return { ok: false, code: error.code, message: error.message, ...(error.retryAfterMs ? { retryAfterMs: error.retryAfterMs } : {}) };
+    }
+    private async authorizeDanmaku(socket: Socket, teacherOnly = false): Promise<{
+        classroomId: string;
+        role: DanmakuRole;
+        studentId?: string;
+    } | null> {
+        const role = socket.data.clientRole;
+        const classroomId = socket.data.classroomId;
+        if (typeof classroomId !== 'string')
+            return null;
+        if (role === 'teacher' || (!teacherOnly && role === 'bigscreen')) {
+            const classroom = await this.authorizeManagerAction(socket, role);
+            if (!classroom)
+                return null;
+            if (classroom.status !== 'PREPARING' && classroom.status !== 'ACTIVE')
+                throw new DanmakuError('CLASSROOM_CLOSED', '课堂已结束');
+            if (socket.data.classroomId !== classroomId || socket.data.clientRole !== role || socket.connected === false)
+                return null;
+            return { classroomId, role };
+        }
+        if (teacherOnly || role !== 'student' || typeof socket.data.sessionId !== 'string' || typeof socket.data.studentId !== 'string')
+            return null;
+        const sessionId = socket.data.sessionId, studentId = socket.data.studentId;
+        if (!await this.authorizeStudentIdentity(socket, studentId))
+            return null;
+        const key = classroomId + ':' + sessionId + ':' + studentId;
+        let entry = this.danmakuSessions.get(key);
+        if (!entry || entry.expiresAt <= Date.now()) {
+            const valid = prisma.classroomSession.findFirst({ where: { id: sessionId, classroomId, studentId, leftAt: null, classroom: { status: { in: ['PREPARING', 'ACTIVE'] }, course: trainingCourseScope } }, select: { id: true } }).then(Boolean);
+            entry = { expiresAt: Date.now() + 250, valid };
+            this.danmakuSessions.set(key, entry);
+            if (this.danmakuSessions.size > 1000)
+                this.danmakuSessions.delete(this.danmakuSessions.keys().next().value!);
+            void valid.catch(() => { this.danmakuSessions.delete(key); });
+        }
+        const valid = await entry.valid;
+        if (!valid || socket.connected === false || socket.data.sessionId !== sessionId || socket.data.classroomId !== classroomId || socket.data.clientRole !== 'student')
+            return null;
+        return { classroomId, role, studentId };
+    }
+    private async handleDanmakuRead(socket: Socket, ack?: SocketAck): Promise<void> {
+        let classroomId: string | undefined;
+        try {
+            const access = await this.authorizeDanmaku(socket);
+            if (!access) {
+                ack?.({ ok: false, code: 'FORBIDDEN', message: '课堂会话无效或无权限' });
+                return;
+            }
+            classroomId = access.classroomId;
+            const { snapshot } = await classroomDanmaku.read(classroomId);
+            if (socket.data.classroomId !== classroomId || socket.data.clientRole !== access.role || socket.connected === false)
+                throw new DanmakuError('FORBIDDEN', '课堂会话已变化');
+            ack?.({ ok: true, snapshot: danmakuForRole(snapshot, access.role) });
+        }
+        catch (cause) {
+            if (classroomId && cause instanceof DanmakuError && cause.code === 'UNAVAILABLE')
+                socket.emit('danmaku:state', danmakuForRole(classroomDanmaku.unavailable(classroomId), socket.data.clientRole));
+            ack?.(this.danmakuFailure(cause));
+        }
+    }
+    private async emitDanmakuJoin(socket: Socket): Promise<void> {
+        await this.handleDanmakuRead(socket, (reply) => { const result = asRecord(reply); if (result.ok === true)
+            socket.emit('danmaku:state', result.snapshot); });
+    }
+    private async handleDanmakuControl(socket: Socket, data: unknown, ack?: SocketAck): Promise<void> {
+        let classroomId: string | undefined;
+        try {
+            const access = await this.authorizeDanmaku(socket, true);
+            if (!access) {
+                ack?.({ ok: false, code: 'FORBIDDEN', message: '无权限管理此课堂' });
+                return;
+            }
+            classroomId = access.classroomId;
+            const { snapshot } = await classroomDanmaku.control(classroomId, data);
+            this.scheduleDanmaku(classroomId, true);
+            if (socket.data.classroomId !== classroomId || socket.data.clientRole !== 'teacher' || socket.connected === false)
+                throw new DanmakuError('FORBIDDEN', '课堂会话已变化');
+            ack?.({ ok: true, snapshot: danmakuForRole(snapshot, 'teacher') });
+        }
+        catch (cause) {
+            if (classroomId && cause instanceof DanmakuError && cause.code === 'UNAVAILABLE')
+                void this.broadcastDanmakuUnavailable(classroomId);
+            ack?.(this.danmakuFailure(cause));
+        }
+    }
+    private async handleDanmakuSend(socket: Socket, data: unknown, ack?: SocketAck): Promise<void> {
+        let classroomId: string | undefined;
+        try {
+            const access = await this.authorizeDanmaku(socket);
+            if (!access || access.role !== 'student' || !access.studentId) {
+                ack?.({ ok: false, code: 'FORBIDDEN', message: '学生课堂会话无效' });
+                return;
+            }
+            classroomId = access.classroomId;
+            const sessionId = socket.data.sessionId;
+            const { snapshot, messageId, status, replayed } = await classroomDanmaku.send(classroomId, access.studentId, data);
+            if (!replayed) this.scheduleDanmaku(classroomId, false);
+            if (socket.data.classroomId !== classroomId || socket.data.clientRole !== 'student' || socket.data.sessionId !== sessionId || socket.connected === false)
+                throw new DanmakuError('FORBIDDEN', '课堂会话已变化');
+            ack?.({ ok: true, messageId, status, snapshot: danmakuForRole(snapshot, 'student') });
+        }
+        catch (cause) {
+            if (classroomId && cause instanceof DanmakuError && cause.code === 'UNAVAILABLE')
+                void this.broadcastDanmakuUnavailable(classroomId);
+            ack?.(this.danmakuFailure(cause));
+        }
+    }
+    private readonly danmakuStudentUpdates = new Set<string>();
+    private scheduleDanmaku(classroomId: string, includeStudents: boolean): void {
+        if (includeStudents)
+            this.danmakuStudentUpdates.add(classroomId);
+        if (this.danmakuBatches.has(classroomId))
+            return;
+        const timer = setTimeout(() => { this.danmakuBatches.delete(classroomId); const students = this.danmakuStudentUpdates.delete(classroomId); void this.broadcastDanmaku(classroomId, students); }, 250);
+        timer.unref?.();
+        this.danmakuBatches.set(classroomId, timer);
+    }
+    private async dispatchDanmaku(classroomId: string, snapshot: DanmakuSnapshot, includeStudents: boolean): Promise<void> {
+        await socketService.sendToClassroomManagers(classroomId, 'danmaku:state', undefined, ['teacher','bigscreen'], role=>danmakuForRole(snapshot,role));
+        if (includeStudents)
+            socketService.broadcastToRoom('classroom:' + classroomId + ':students', 'danmaku:state', danmakuForRole(snapshot, 'student'));
+    }
+    private async broadcastDanmaku(classroomId: string, includeStudents: boolean): Promise<void> {
+        try {
+            const classroom = await findClassroomAccess(classroomId);
+            if (!classroom || !['PREPARING', 'ACTIVE'].includes(classroom.status))
+                return;
+            const { snapshot } = await classroomDanmaku.read(classroomId);
+            await this.dispatchDanmaku(classroomId, snapshot, includeStudents);
+        }
+        catch {
+            await this.broadcastDanmakuUnavailable(classroomId);
+        }
+    }
+    private async broadcastDanmakuUnavailable(classroomId: string): Promise<void> {
+        await this.dispatchDanmaku(classroomId, classroomDanmaku.unavailable(classroomId), true);
+    }
   private emitError(socket: Socket, message: string): void {
     socket.emit('error', { message })
   }
@@ -362,6 +521,7 @@ export class ClassroomSocketHandler {
         status: classroom.status,
         currentQuestion: classroomQuestionPayload(activeQuestion),
       })
+      void this.emitDanmakuJoin(socket)
     } catch {
       logger.error('处理教师加入课堂错误')
       this.emitError(socket, '加入课堂失败')
@@ -528,6 +688,7 @@ export class ClassroomSocketHandler {
       }
 
       await this.broadcastOnlineCount(classroom.id)
+      void this.emitDanmakuJoin(socket)
     } catch {
       logger.error('处理学生加入课堂错误')
       this.emitError(socket, '加入课堂失败')
@@ -607,6 +768,7 @@ export class ClassroomSocketHandler {
         hasActiveQuestion: !!activeQuestion,
       })
       socket.emit('bigscreen:joined', response)
+      void this.emitDanmakuJoin(socket)
     } catch {
       logger.error('处理大屏加入课堂错误')
       this.emitError(socket, '加入课堂失败')
@@ -980,6 +1142,7 @@ export class ClassroomSocketHandler {
       }
 
       const classroomId = socket.data.classroomId
+      this.danmakuSessions.delete(classroomId+':'+socket.data.sessionId+':'+socket.data.studentId)
       const result = await leaveClassroomStudent({classroomId,sessionId:socket.data.sessionId,studentId:socket.data.studentId})
 
       socket.leave('classroom:' + classroomId)
@@ -1012,6 +1175,7 @@ export class ClassroomSocketHandler {
         typeof socket.data.studentId === 'string'
       ) {
         const classroomId = socket.data.classroomId
+        this.danmakuSessions.delete(classroomId+':'+socket.data.sessionId+':'+socket.data.studentId)
         const result = await prisma.classroomSession.updateMany({
           where: {
             id: socket.data.sessionId,

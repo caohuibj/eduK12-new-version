@@ -1,17 +1,97 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, expect, it, vi } from 'vitest'
-const mocks = vi.hoisted(() => ({ listeners: {} as Record<string, (data: any) => void>, emit: vi.fn() }))
+import type { ClassroomDanmakuSnapshot } from '../../../types/classroomDanmaku'
+const mocks = vi.hoisted(() => ({
+  listeners: {} as Record<string, (data: any) => void>,
+  emit: vi.fn(),
+  emitWithAck: vi.fn(),
+}))
 function on(event: string, handler: (data: any) => void) { mocks.listeners[event] = handler }
 const off = vi.fn()
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ isLoading: false }) }))
-vi.mock('../../../hooks/useClassroomSocket', () => ({ useClassroomSocket: () => ({ isConnected: true, on, off, emit: mocks.emit }) }))
+vi.mock('../../../hooks/useClassroomSocket', () => ({
+  useClassroomSocket: () => ({ isConnected: true, on, off, emit: mocks.emit, emitWithAck: mocks.emitWithAck }),
+}))
 import ClassroomAnswer from '../ClassroomAnswer'
 const question = { questionId: 'q1', questionIndex: 1, startedAt: '2026-10-04T12:00:00Z', timeLimit: 600, remainingTime: 100,
   questionContent: { type: 'single_choice', question: '颜色？', options: [{ value: 'A', label: '红色' }, { value: 'B', label: '绿色' }] } }
 function show() { return render(<MemoryRouter initialEntries={['/student/classroom/c1?code=123456']}><Routes><Route path="/student/classroom/:classroomId" element={<ClassroomAnswer />} /></Routes></MemoryRouter>) }
 function receive(data: any) { act(() => mocks.listeners['broadcast:question'](data)) }
 beforeEach(() => { vi.clearAllMocks(); mocks.listeners = {} })
+
+const activeDanmaku: ClassroomDanmakuSnapshot = {
+  available: true,
+  classroomId: 'c1',
+  sessionId: 'activity',
+  revision: 4,
+  controlRevision: 2,
+  displayEpoch: 1,
+  enabled: true,
+  paused: false,
+  displayMode: 'QUESTION',
+  reviewMode: 'realtime',
+  topic: '今天的收获',
+  speed: 'normal',
+  expiresAt: null,
+  messages: [],
+  limits: { maxTextLength: 60, cooldownMs: 3000, maxPerMinute: 10, messageTtlMs: 30000, pendingTtlMs: 300000 },
+}
+
+function receiveDanmaku(snapshot: ClassroomDanmakuSnapshot) {
+  act(() => mocks.listeners['danmaku:state'](snapshot))
+}
+
+it('keeps answers independent and retries an unconfirmed danmaku with the same message ID', async () => {
+  show()
+  receive(question)
+  receiveDanmaku({ ...activeDanmaku, reviewMode: 'review' })
+  mocks.emitWithAck.mockRejectedValueOnce(new Error('尚未收到课堂确认')).mockResolvedValueOnce({
+    ok: true, status: 'pending', snapshot: activeDanmaku,
+  })
+
+  fireEvent.click(screen.getByRole('button', { name: '绿色' }))
+  fireEvent.click(screen.getByRole('button', { name: '提交答案' }))
+  const message = screen.getByRole('textbox', { name: '弹幕内容' })
+  fireEvent.change(message, { target: { value: '愿意多听不同观点' } })
+  fireEvent.click(screen.getByRole('button', { name: '发送弹幕' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('尚未收到课堂确认')
+  expect(message).toHaveValue('愿意多听不同观点')
+  fireEvent.click(screen.getByRole('button', { name: '发送弹幕' }))
+  expect(await screen.findByRole('status')).toHaveTextContent('等待教师审核')
+  expect(message).toHaveValue('')
+  expect(mocks.emitWithAck.mock.calls[1]).toEqual(mocks.emitWithAck.mock.calls[0])
+  expect(mocks.emit).toHaveBeenCalledExactlyOnceWith('student:submit', {
+    questionId: 'q1', startedAt: question.startedAt, answer: 'B',
+  })
+})
+
+it('rejects overlong danmaku locally and ignores stale activity after the teacher stops it', () => {
+  show()
+  receiveDanmaku({ ...activeDanmaku, classroomId: 'other' })
+  expect(screen.queryByRole('textbox', { name: '弹幕内容' })).toBeNull()
+  receiveDanmaku(activeDanmaku)
+  fireEvent.change(screen.getByRole('textbox', { name: '弹幕内容' }), { target: { value: '好'.repeat(61) } })
+  expect(screen.getByRole('button', { name: '发送弹幕' })).toBeDisabled()
+  expect(screen.getByText('61 / 60，内容过长')).toBeInTheDocument()
+  receiveDanmaku({ ...activeDanmaku, enabled: false, sessionId: null, revision: 1, displayEpoch: 2 })
+  receiveDanmaku(activeDanmaku)
+  expect(screen.queryByRole('textbox', { name: '弹幕内容' })).toBeNull()
+  expect(mocks.emitWithAck).not.toHaveBeenCalled()
+})
+
+it('removes the danmaku composer at the restored activity deadline without hiding the question', () => {
+  vi.useFakeTimers()
+  try {
+    show()
+    receive(question)
+    receiveDanmaku({ ...activeDanmaku, expiresAt: new Date(Date.now() + 3000).toISOString() })
+    expect(screen.getByRole('textbox', { name: '弹幕内容' })).toBeInTheDocument()
+    act(() => vi.advanceTimersByTime(3000))
+    expect(screen.queryByRole('textbox', { name: '弹幕内容' })).toBeNull()
+    expect(screen.getByRole('button', { name: '提交答案' })).toBeInTheDocument()
+  } finally { vi.useRealTimers() }
+})
 it('restores the server answer and submitted state after a full remount', () => {
   const first = show(); receive(question)
   fireEvent.click(screen.getByRole('button', { name: '绿色' }))

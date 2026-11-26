@@ -1,3 +1,4 @@
+import { classroomDanmaku } from './classroomDanmaku'
 import { prisma } from '../config/database'
 import { canonicalHash } from '../modules/assessment-runtime/canonical'
 import type { ClassroomAccessRecord } from '../middleware/classroomAccess'
@@ -136,7 +137,10 @@ export async function endClassroomQuestion(classroomId:string,questionId:string,
  })
 }
 export async function closeClassroom(classroomId:string){
- return prisma.$transaction(async tx=>{await lockClassroom(tx,classroomId);const classroom=await tx.classroom.findUnique({where:{id:classroomId},select:{status:true}});if(!classroom)throw new ClassroomLifecycleError('课堂不存在',404);if(classroom.status==='ENDED')return {changed:false,classroomId};const endedAt=new Date();await tx.classroomQuestion.updateMany({where:{classroomId,startedAt:{not:null},endedAt:null},data:{endedAt}});await tx.classroom.update({where:{id:classroomId},data:{status:'ENDED',endedAt}});return {changed:true,classroomId}})
+ const result=await prisma.$transaction(async tx=>{await lockClassroom(tx,classroomId);const classroom=await tx.classroom.findUnique({where:{id:classroomId},select:{status:true}});if(!classroom)throw new ClassroomLifecycleError('课堂不存在',404);if(classroom.status==='ENDED')return {changed:false,classroomId};const endedAt=new Date();await tx.classroomQuestion.updateMany({where:{classroomId,startedAt:{not:null},endedAt:null},data:{endedAt}});await tx.classroom.update({where:{id:classroomId},data:{status:'ENDED',endedAt}});return {changed:true,classroomId}})
+ // Feature-cache failure never rolls back or blocks the authoritative classroom close.
+ try{await classroomDanmaku.close(classroomId)}catch{}
+ return result
 }
 export async function submitClassroomAnswer(input:{classroomId:string;sessionId:string;studentId:string;questionId:string;answer:unknown;expectedStartedAt?:Date}){
  const serialized=JSON.stringify(input.answer)

@@ -75,6 +75,13 @@ describe('Training synchronous startup identity and colors',()=>{
   expect(bootstrap('/dashboard','dark','training.eduk12.top.evil.example').dataset).toEqual({})
   expect(bootstrap('/dashboard','dark','training.eduk12.top','',false,'false').dataset.trainingTheme).toBe('dark')
  })
+ it('primes Training on classroom participant links without rebranding other local pages',()=>{
+  const answer=bootstrap('/student/classroom/answer/room','dark','127.0.0.1','?code=123456')
+  expect(answer.doc.title).toBe('Training')
+  expect(answer.dataset.trainingTheme).toBe('dark')
+  expect(bootstrap('/student/classroom/answer','dark','127.0.0.1').dataset).toEqual({})
+  expect(bootstrap('/student','dark','127.0.0.1').dataset).toEqual({})
+ })
  it.each(['survey.localhost','survey.eduk12.top','school.eduk12.top','teacher.eduk12.top','localhost'])('does not prime a regular workspace on %s',host=>{
   expect(bootstrap('/dashboard','dark',host).dataset).toEqual({})
  })

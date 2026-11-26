@@ -7,6 +7,7 @@ const backendTarget = process.env.E2E_BACKEND_URL || 'http://localhost:3000'
 const proxy = {
   '/api': { target: backendTarget, changeOrigin: true, secure: false },
   '/uploads': { target: backendTarget, changeOrigin: true, secure: false },
+  '/socket.io': { target: backendTarget, ws: true },
 }
 
 // https://vitejs.dev/config/

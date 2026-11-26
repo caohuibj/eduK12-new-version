@@ -8,6 +8,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { io, Socket } from 'socket.io-client'
+import type { ClassroomDanmakuSnapshot } from '../types/classroomDanmaku'
 
 interface UseClassroomSocketOptions {
   classroomId?: string
@@ -32,6 +33,7 @@ interface SocketEvents {
   'broadcast:next'?: (data: any) => void
   'broadcast:closed'?: (data: any) => void
   'bigscreen:joined'?: (data: any) => void
+  'danmaku:state'?: (data: ClassroomDanmakuSnapshot) => void
   error?: (data: any) => void
 }
 
@@ -239,6 +241,17 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
     }
   }, [isConnected])
 
+  const emitWithAck = useCallback(async <T>(event: string, data: unknown): Promise<T> => {
+    const socket = socketRef.current
+    if (!socket?.connected) throw new Error('课堂连接已断开，请重新连接。')
+
+    try {
+      return await socket.timeout(5_000).emitWithAck(event, data) as T
+    } catch {
+      throw new Error('尚未收到课堂确认，请稍后查看结果。')
+    }
+  }, [])
+
   const manualRetry = useCallback(() => {
     setConnectionState('MANUAL_RETRY')
     if (fallbackTimerRef.current) clearTimeout(fallbackTimerRef.current)
@@ -270,6 +283,7 @@ export function useClassroomSocket(options: UseClassroomSocketOptions) {
     on,
     off,
     emit,
+    emitWithAck,
     socket: socketRef.current,
   }
 }

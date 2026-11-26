@@ -244,4 +244,24 @@ describe('SocketService manager room revalidation', () => {
     expect(remoteSocket.emit).not.toHaveBeenCalled()
     expect(remoteSocket.disconnect).toHaveBeenCalledWith(true)
   })
+  it('danmaku fan-out shares classroom lookup and sends pending only to the teacher role',async()=>{
+    const teacher=makeRemoteSocket({classroomId:'classroom-1',clientRole:'teacher',userId:'teacher-1',userRole:UserRole.TEACHER})
+    const screen=makeRemoteSocket({classroomId:'classroom-1',clientRole:'bigscreen',userId:'teacher-1',userRole:UserRole.TEACHER})
+    const service=new SocketService()
+    ;(service as any).classroomNamespace={in:vi.fn().mockReturnValue({fetchSockets:vi.fn().mockResolvedValue([teacher,screen])})}
+    vi.spyOn(service,'refreshAuthenticatedSocket').mockResolvedValue(true)
+    await service.sendToClassroomManagers('classroom-1','danmaku:state',undefined,['teacher','bigscreen'],role=>role==='teacher'?{pending:['review-text']}:{messages:['approved-text']})
+    expect(mockPrisma.classroom.findUnique).toHaveBeenCalledTimes(1)
+    expect(teacher.emit).toHaveBeenCalledWith('danmaku:state',{pending:['review-text']})
+    expect(screen.emit).toHaveBeenCalledWith('danmaku:state',{messages:['approved-text']})
+  })
+  it('danmaku fan-out rechecks room binding after awaited authentication',async()=>{
+    const socket=makeRemoteSocket({classroomId:'classroom-1',clientRole:'teacher',userId:'teacher-1',userRole:UserRole.TEACHER})
+    const service=new SocketService()
+    ;(service as any).classroomNamespace={in:vi.fn().mockReturnValue({fetchSockets:vi.fn().mockResolvedValue([socket])})}
+    vi.spyOn(service,'refreshAuthenticatedSocket').mockImplementation(async()=>{socket.data.classroomId='other-classroom';return true})
+    await service.sendToClassroomManagers('classroom-1','danmaku:state',{pending:['must-not-leak']})
+    expect(socket.emit).not.toHaveBeenCalled()
+  })
+
 })

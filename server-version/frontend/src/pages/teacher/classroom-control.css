@@ -1,0 +1,103 @@
+/* Training teacher presentation only. Keep participant and big-screen surfaces independent. */
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page > * { margin-block: 0; min-width: 0; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-heading {
+  padding: 24px 28px;
+  border: 1px solid var(--tt-line, #dce4db);
+  border-radius: 16px;
+  background: linear-gradient(115deg, #fff 30%, #f2f6ec);
+}
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-eyebrow {
+  margin: 0 0 10px;
+  color: var(--tt-green, #285b47);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: .08em;
+}
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .hui-page-header { align-items: center; gap: 20px; margin: 0; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .hui-page-header__text { min-width: 0; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .hui-page-header__title { font-size: 28px; line-height: 1.4; overflow-wrap: anywhere; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .hui-page-header__actions { flex-shrink: 0; width: auto; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-context { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 10px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-context > span:first-child { overflow-wrap: anywhere; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-code { display: inline-flex; align-items: center; gap: 10px; padding: 4px 10px; border: 1px solid #dbe5d3; border-radius: 7px; color: #52705c; background: #f5f8f0; white-space: nowrap; font-size: 12px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-code strong { color: var(--tt-green, #285b47); font-size: 17px; letter-spacing: .12em; font-variant-numeric: tabular-nums; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-secondary-link,
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-primary-link,
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .hui-button { min-height: 44px; border-radius: 8px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-summary { padding: 10px 16px; border-radius: 10px; background: #f0f4e9; box-shadow: none; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-summary .staff-detail-header__top { align-items: center; gap: 12px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-summary__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 0; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-badge { font-size: 12px; border-radius: 6px; padding: 3px 8px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-nav { padding: 0 0 12px; margin: 0; border: 0; border-bottom: 1px solid var(--tt-line, #dce4db); border-radius: 0; background: transparent; box-shadow: none; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; border: 0; background: transparent; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-tabs button { min-height: 44px; padding: 10px 16px; border: 1px solid transparent; border-radius: 9px; background: transparent; color: var(--tt-muted, #66756c); font-size: 14px; font-weight: 600; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-tabs button[aria-pressed=true] { border-color: var(--tt-green, #285b47); background: var(--tt-green, #285b47); color: #fff; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-tabs button:hover:not([aria-pressed=true]) { background: #eaf0e2; color: var(--tt-green, #285b47); }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-grid { grid-template-columns: minmax(0, 1.65fr) minmax(280px, 1fr); gap: 20px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page :is(.classroom-control-main, .classroom-control-questions, .classroom-control-history) { min-width: 0; padding: 0; overflow: hidden; border-radius: 14px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-panel__header { padding: 18px 20px; align-items: flex-start; gap: 14px; border-bottom-color: #e8ede3; background: #fcfdf9; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-panel__header h2 { margin: 0; font-size: 18px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-panel__header p { margin: 5px 0 0; font-size: 13px; line-height: 1.65; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-panel__body { padding: 20px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-body { gap: 20px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-current { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; padding: 18px; border-color: #d8e4cf; border-radius: 12px; background: #f4f7ee; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-current strong { color: var(--tt-ink, #233b34); font-size: 19px; line-height: 1.6; overflow-wrap: anywhere; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-current .staff-inline-actions { align-content: flex-start; justify-content: flex-end; max-width: 130px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-current .staff-inline-actions > * { width: 100%; justify-content: center; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-stat { padding: 16px; border: 1px solid #e1e8db; border-radius: 10px; background: #fafcf6; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-stat dt { color: var(--tt-muted, #66756c); font-size: 12px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-stat dd { margin: 6px 0 0; color: var(--tt-ink, #233b34); font-size: 27px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-progress { gap: 9px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-progress__track { height: 8px; background: #e6ecdd; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-progress__value { background: var(--tt-green, #285b47); }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-question-list { gap: 10px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-question { width: 100%; min-height: 78px; padding: 13px 14px; border-color: var(--tt-line, #dce4db); border-radius: 10px; color: var(--tt-muted, #66756c); background: #fff; text-align: left; white-space: normal; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-question.is-current { border-color: #9bb993; background: #eef5e5; box-shadow: inset 3px 0 0 var(--tt-green, #285b47); }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-question.is-complete { border-color: #d7e4ce; background: #f7faf2; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-question:disabled { opacity: .65; cursor: default; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-question__copy strong { color: var(--tt-ink, #233b34); font-size: 14px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-question__copy p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; overflow-wrap: anywhere; font-size: 13px; line-height: 1.6; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-history-card { padding: 16px; border-color: var(--tt-line, #dce4db); border-radius: 10px; background: #f9fbf5; text-align: left; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-history-card strong { color: var(--tt-ink, #233b34); font-size: 14px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-history-card small { color: var(--tt-muted, #66756c); font-size: 13px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-wrapup > section { margin: 0; padding: 24px; border: 1px solid #d8e3ce; border-radius: 14px; background: #fbfdf7; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-wrapup h2 { color: var(--tt-ink, #233b34); font-size: 20px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-wrapup p { color: var(--tt-muted, #66756c); font-size: 14px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-wrapup li { border: 1px solid #e2e9da; border-radius: 8px; background: #f3f7ed; font-size: 14px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-wrapup .hui-button { margin-right: 10px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-closed-note { margin: 0; padding: 16px; border-radius: 10px; background: #f3f6ec; color: var(--tt-muted, #66756c); font-size: 14px; line-height: 1.8; }
+
+@media (max-width: 1050px) {
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-grid { grid-template-columns: minmax(0, 1fr); }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-current { grid-template-columns: minmax(0, 1fr); }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-current .staff-inline-actions { justify-content: flex-start; max-width: none; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-current .staff-inline-actions > * { width: auto; }
+}
+@media (max-width: 640px) {
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page { gap: 16px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-heading { padding: 18px 16px; border-radius: 12px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .hui-page-header { display: grid; gap: 16px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .hui-page-header__title { font-size: 23px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .hui-page-header__actions,
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .hui-page-header__actions .staff-inline-actions { width: 100%; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .hui-page-header__actions .staff-inline-actions > * { flex: 1; justify-content: center; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-summary { padding: 10px 12px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-summary__meta { gap: 8px 12px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; gap: 6px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-tabs button { padding: 10px 8px; justify-content: center; font-size: 13px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-panel__header,
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-panel__body { padding: 16px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-current { padding: 14px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-stat-grid { gap: 8px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-stat { padding: 12px 8px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-stat dt { font-size: 11px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .staff-stat dd { font-size: 23px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-wrapup > section { padding: 18px 16px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-control-wrapup .hui-button { width: 100%; margin-right: 0; justify-content: center; }
+}

@@ -1,0 +1,199 @@
+.classroom-danmaku {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+  color: var(--hui-color-text, #25483d);
+}
+
+.classroom-danmaku__header,
+.classroom-danmaku__actions,
+.classroom-danmaku__message-top,
+.classroom-danmaku__filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.classroom-danmaku__header,
+.classroom-danmaku__message-top {
+  justify-content: space-between;
+}
+
+.classroom-danmaku h2,
+.classroom-danmaku h3,
+.classroom-danmaku p {
+  margin: 0;
+}
+
+.classroom-danmaku h2 { font-size: 20px; }
+.classroom-danmaku h3 { font-size: 18px; }
+
+.classroom-danmaku__intro,
+.classroom-danmaku__hint,
+.classroom-danmaku__message-meta {
+  color: var(--hui-color-muted, #526451);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.classroom-danmaku__header > div,
+.classroom-danmaku__message-top > div { min-width: 0; }
+.classroom-danmaku__intro { margin-top: 6px !important; }
+
+.classroom-danmaku__config {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  min-width: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.classroom-danmaku__config fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.classroom-danmaku__config legend {
+  padding: 0;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.classroom-danmaku__topic,
+.classroom-danmaku__config > .classroom-danmaku__hint,
+.classroom-danmaku__config > .classroom-danmaku__actions { grid-column: 1 / -1; }
+.classroom-danmaku__topic textarea { min-height: 88px; resize: vertical; }
+.classroom-danmaku__config input,
+.classroom-danmaku__config select,
+.classroom-danmaku .hui-button { min-height: 44px; }
+
+.classroom-danmaku__choices { display: grid; gap: 8px; }
+.classroom-danmaku__choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid var(--hui-color-border, #dce4d6);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+}
+.classroom-danmaku__choice input { flex: 0 0 auto; min-height: 0; margin-top: 5px; }
+.classroom-danmaku__choice strong { display: block; font-size: 14px; }
+.classroom-danmaku__choice:has(input:checked) {
+  border-color: var(--hui-color-action, #285b49);
+  background: var(--hui-color-background, #f2f6ef);
+}
+
+.classroom-danmaku__state {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--hui-color-background, #f2f6ef);
+  border: 1px solid var(--hui-color-border, #dce4d6);
+}
+.classroom-danmaku__state p { overflow-wrap: anywhere; }
+.classroom-danmaku__queue { display: grid; gap: 16px; }
+.classroom-danmaku__filters button {
+  min-height: 44px;
+  border: 1px solid var(--hui-color-border, #dce4d6);
+  border-radius: 8px;
+  padding: 8px 14px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.classroom-danmaku__filters button[aria-pressed=true] {
+  color: var(--hui-color-action, #285b49);
+  border-color: currentColor;
+  font-weight: 650;
+}
+.classroom-danmaku__filters button:focus-visible,
+.classroom-danmaku__choice:focus-within {
+  outline: 2px solid var(--hui-color-focus, #285b49);
+  outline-offset: 3px;
+}
+.classroom-danmaku__messages { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.classroom-danmaku__message {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  border: 1px solid var(--hui-color-border, #dce4d6);
+  border-radius: 12px;
+  padding: 16px;
+}
+.classroom-danmaku__message-text { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; }
+.classroom-danmaku__message-meta { font-size: 12px; overflow-wrap: anywhere; }
+.classroom-danmaku__empty { padding: 28px 16px; text-align: center; color: var(--hui-color-muted, #526451); }
+
+@media (max-width: 640px) {
+  .classroom-danmaku { gap: 20px; }
+  .classroom-danmaku__config { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .classroom-danmaku__header { align-items: flex-start; }
+  .classroom-danmaku__actions > * { flex: 1 1 140px; justify-content: center; }
+  .classroom-danmaku__actions > .classroom-danmaku__hint { flex-basis: 100%; }
+  .classroom-danmaku__message { padding: 14px; }
+}
+
+/* Match the surrounding Training teacher paper workspace without changing other entries. */
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku { gap: 18px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__header { align-items: center; gap: 16px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku h2 { font-size: 21px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku h3 { font-size: 17px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__intro { font-size: 13px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__workspace { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(290px, .9fr); align-items: start; gap: 20px; min-width: 0; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__setup { display: grid; align-content: start; gap: 16px; min-width: 0; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page :is(.classroom-danmaku__settings-panel, .classroom-danmaku__queue) { min-width: 0; margin: 0; padding: 22px; border-radius: 14px; box-shadow: none; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__settings-heading { display: grid; gap: 4px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e7ece1; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__state { gap: 8px 12px; padding: 12px 16px; border-color: #d7e2cc; background: #eff4e8; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__state strong { font-size: 14px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__state > span { border: 1px solid #dce6d3; border-radius: 6px; padding: 2px 8px; background: #fbfdf7; font-size: 12px; color: #526b57; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__state > p { flex: 1 1 180px; min-width: 0; font-size: 13px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__state > .hui-button { margin-left: auto; background: #fff; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__config { gap: 18px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__topic { gap: 8px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__topic > span:first-child { font-size: 14px; font-weight: 650; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__topic > .classroom-danmaku__hint { text-align: right; font-size: 12px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__topic textarea { width: 100%; min-height: 90px; padding: 12px 14px; border-radius: 9px; font-size: 14px; line-height: 1.7; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__choice { gap: 9px; padding: 12px 10px; border-radius: 9px; background: #fdfefa; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__choice input { width: 16px; height: 16px; min-height: 0; padding: 0; margin: 3px 0 0; accent-color: var(--tt-green, #285b47); }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__choice:has(input:checked) { background: #eef5e5; border-color: #94af87; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__choice strong { font-size: 13px; line-height: 1.5; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__choice .classroom-danmaku__hint { display: block; margin-top: 4px; font-size: 12px; line-height: 1.65; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__config fieldset > p { margin-top: 10px; font-size: 12px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__config > .classroom-danmaku__hint { font-size: 12px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__config > .classroom-danmaku__actions { padding-top: 16px; border-top: 1px solid #e7ece1; justify-content: flex-end; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__live-controls { padding: 16px; border: 1px solid #dfe5d7; border-radius: 12px; background: #f3f6ec; gap: 10px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__live-controls > p { flex-basis: 100%; font-size: 12px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__queue { gap: 18px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__queue > div:first-child { display: grid; gap: 5px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__queue > div:first-child > p { font-size: 13px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__filters { gap: 6px; padding-bottom: 14px; border-bottom: 1px solid #e7ece1; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__filters button { flex: 1; min-width: 0; padding: 9px 8px; border-color: transparent; background: #f4f6ef; font-size: 13px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__filters button[aria-pressed=true] { border-color: #bed0b3; background: #eaf2df; color: var(--tt-green, #285b47); }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__empty { padding: 38px 16px; border: 1px dashed #d8e2ce; border-radius: 10px; background: #fafcf7; font-size: 14px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__message { padding: 14px; background: #fcfdf9; border-radius: 10px; }
+.hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__message-text { font-size: 15px; color: var(--tt-ink, #233b34); }
+
+@media (max-width: 1050px) {
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__workspace { grid-template-columns: minmax(0, 1fr); }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__config { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__header { align-items: flex-start; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__header > .staff-secondary-link { width: 100%; justify-content: center; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page :is(.classroom-danmaku__settings-panel, .classroom-danmaku__queue) { padding: 18px 16px; border-radius: 12px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__config { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__state { padding: 12px; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__state > p { flex-basis: 100%; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__state > .hui-button { width: 100%; margin-left: 0; justify-content: center; }
+  .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__live-controls { padding: 14px; }
+}

@@ -4,11 +4,14 @@ import apiClient from '../../api/client'
 import { useClassroomSocket } from '../../hooks/useClassroomSocket'
 import ClassroomQRCode from './ClassroomQRCode'
 import ClassroomSummary from './ClassroomSummary'
+import ClassroomDanmakuPanel from './ClassroomDanmakuPanel'
 import { useAuth } from '../../contexts/AuthContext'
 import { Play, Square, Users, QrCode, CheckCircle, Edit, Monitor } from 'lucide-react'
 import { normalizeApiError } from '../../utils/normalizeApiError'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
+import { isTrainingHost } from '../../training/context'
+import './classroom-control.css'
 
 interface Question {
   id: string
@@ -124,7 +127,7 @@ const ClassroomControl: React.FC = () => {
   }, [cancelStatsRefresh, id])
 
   // Socket 连接
-  const { isConnected, connectionState, manualRetry, on, off, emit } = useClassroomSocket({
+  const { isConnected, connectionState, manualRetry, on, off, emit, emitWithAck } = useClassroomSocket({
     classroomId: id!,
     role: 'teacher',
     autoConnect: !authLoading && !!user && !!classroom && classroom.status !== 'ENDED',
@@ -334,10 +337,12 @@ const ClassroomControl: React.FC = () => {
   const submissionProgress = questionStats && questionStats.totalSessions > 0 ? Math.round(questionStats.submissionRate) : null
 
   return (
-    <ProductPage width="management" className="space-y-6 classroom-control-page">
+    <ProductPage width="management" className={`space-y-6 classroom-control-page${classroom.status === 'ENDED' ? ' classroom-control-page--ended' : ''}`}>
+      <div className="classroom-control-heading">
+      {isTrainingHost() && <p className="classroom-control-eyebrow">课堂互动 · 教师控制台</p>}
       <PageHeader
         title={classroom.name}
-        description={`${classroom.course.title} · 课堂码 ${classroom.code}`}
+        description={isTrainingHost() ? <div className="classroom-control-context"><span>{classroom.course.title}</span><span className="classroom-control-code">课堂码 <strong>{classroom.code}</strong></span></div> : `${classroom.course.title} · 课堂码 ${classroom.code}`}
         actions={
           <div className="staff-inline-actions">
             <Link to="/teacher/classrooms" className="staff-secondary-link">课堂列表</Link>
@@ -352,8 +357,8 @@ const ClassroomControl: React.FC = () => {
           </div>
         }
       />
+      </div>
       {feedback}
-      {classroom.status === 'ENDED' && <ClassroomSummary key={classroom.id} id={classroom.id} />}
 
       {classroom.status !== 'ENDED' && <section className="staff-detail-header classroom-control-summary" aria-label="课堂实时状态">
         <div className="staff-detail-header__top">
@@ -387,6 +392,9 @@ const ClassroomControl: React.FC = () => {
           <button type="button" aria-pressed={activeTab === 'control'} onClick={() => setActiveTab('control')}>
             答题控制
           </button>
+          {isTrainingHost() && classroom.status !== 'ENDED' && <button type="button" aria-pressed={activeTab === 'danmaku'} onClick={() => setActiveTab('danmaku')}>
+            课堂弹幕
+          </button>}
           {classroom.status === 'PREPARING' && (
             <button type="button" aria-pressed={activeTab === 'edit'} onClick={() => setActiveTab('edit')}>
               <Edit className="w-4 h-4" aria-hidden="true" />
@@ -403,6 +411,12 @@ const ClassroomControl: React.FC = () => {
           </button>}
         </div>
       </div>
+
+      {classroom.status === 'ENDED' && <div className="classroom-control-wrapup"><ClassroomSummary key={classroom.id} id={classroom.id} /></div>}
+
+      {activeTab === 'danmaku' && isTrainingHost() && classroom.status !== 'ENDED' && <ClassroomDanmakuPanel
+        classroomId={classroom.id} isConnected={isConnected} on={on} off={off} emitWithAck={emitWithAck}
+      />}
 
       {activeTab === 'edit' && (
         <section className="staff-panel staff-panel--padded">
@@ -422,7 +436,7 @@ const ClassroomControl: React.FC = () => {
       )}
 
       {activeTab === 'history' && (
-        <section className="staff-panel" aria-labelledby="classroom-history-title">
+        <section className="staff-panel classroom-control-history" aria-labelledby="classroom-history-title">
           <div className="staff-panel__header">
             <div>
               <h2 id="classroom-history-title">历史大屏</h2>
@@ -486,8 +500,8 @@ const ClassroomControl: React.FC = () => {
           <section className="staff-panel classroom-control-main" aria-labelledby="classroom-control-title">
             <div className="staff-panel__header">
               <div>
-                <h2 id="classroom-control-title">答题控制</h2>
-                <p>教师发起题目后，实时连接负责同步题目状态与提交统计。</p>
+                <h2 id="classroom-control-title">{classroom.status === 'ENDED' ? '课堂回顾' : '答题控制'}</h2>
+                <p>{classroom.status === 'ENDED' ? '本场课堂已结束，可查看小结与历史大屏。' : '选择题目发起互动，在这里查看实时作答进度。'}</p>
               </div>
               <span className={`staff-badge ${
                 currentQuestion && !currentQuestion.endedAt && classroom.status !== 'ENDED'
@@ -501,6 +515,7 @@ const ClassroomControl: React.FC = () => {
             </div>
 
             <div className="staff-panel__body classroom-control-body">
+              {classroom.status === 'ENDED' && <p className="classroom-control-closed-note">作答已停止。上方的小结与“历史大屏”保留本场课堂的回顾入口。</p>}
               {classroom.status === 'PREPARING' && (
                 <ProductStatus kind="info" title="等待选择题目">
                   请从右侧题目列表中选择一道未开始题目发起答题。

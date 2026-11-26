@@ -10,12 +10,13 @@
     && new URLSearchParams(window.location.search).get('returnTo') === '/admin/survey-researchers'
   const survey = hostname === 'survey.eduk12.top' || (development && hostname === 'survey.localhost') || surveyAdminEntry
   const trainingHost = hostname === 'training.eduk12.top' || (development && hostname === 'training.localhost')
+  const trainingClassroom = /^\/student\/classroom\/(?:enter|join\/[^/]+|answer\/[^/]+)\/?$/.test(window.location.pathname)
   const isTrainingAdminPath = value => ['/admin/training', '/admin/training/accounts', '/admin/training/courses', '/admin/training/resources', '/admin/training/profile'].includes(value.replace(/\/$/, ''))
   const trainingAdminPage = !survey && productOrigin && isTrainingAdminPath(window.location.pathname)
   const trainingAdminEntry = trainingAdminPage
     || (productOrigin && ['/admin/login', '/admin/security/enroll'].includes(window.location.pathname)
       && isTrainingAdminPath(new URLSearchParams(window.location.search).get('returnTo') || ''))
-  const training = trainingHost || trainingAdminEntry
+  const training = trainingHost || trainingAdminEntry || trainingClassroom
   if (training && !survey) {
     let mode = 'auto'
     try { mode = localStorage.getItem('training:appearance:boot:v1') || 'auto' } catch { /* Use the local clock when storage is unavailable. */ }
