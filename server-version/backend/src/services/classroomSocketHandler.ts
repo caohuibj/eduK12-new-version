@@ -44,6 +44,18 @@ import {
 type ClientRole = 'teacher' | 'student' | 'bigscreen'
 type SocketAck = (payload?: unknown) => void
 
+type DanmakuBatch = {
+  timer: NodeJS.Timeout | null
+  running: boolean
+  dirty: boolean
+  includeStudents: boolean
+  unavailable: boolean
+  recoveryAttempted: boolean
+}
+const DANMAKU_BATCH_MS = 250
+// The dedicated Redis client has a five-second reconnect backoff.
+const DANMAKU_RECOVERY_MS = 6000
+
 const MANAGER_SOCKET_REVALIDATION_INTERVAL_MS = 15_000
 
 const isJoinableClassroomStatus = (status: string): boolean => {
@@ -134,7 +146,7 @@ const classroomQuestionPayload = (question: any): Record<string, unknown> | null
 
 export class ClassroomSocketHandler {
   private readonly danmakuSessions=new Map<string,{expiresAt:number;valid:Promise<boolean>}>()
-  private readonly danmakuBatches = new Map<string,NodeJS.Timeout>()
+  private readonly danmakuBatches = new Map<string, DanmakuBatch>()
   private activeTimers: Map<string, NodeJS.Timeout> = new Map()
   private managerRevalidationTimers: Map<string, NodeJS.Timeout> = new Map()
   private readonly statsScheduler = new ClassroomStatsScheduler(
@@ -247,7 +259,7 @@ export class ClassroomSocketHandler {
             return null;
         return { classroomId, role, studentId };
     }
-    private async handleDanmakuRead(socket: Socket, ack?: SocketAck): Promise<void> {
+    private async handleDanmakuRead(socket: Socket, ack?: SocketAck, reconcile = true): Promise<void> {
         let classroomId: string | undefined;
         try {
             const access = await this.authorizeDanmaku(socket);
@@ -259,17 +271,24 @@ export class ClassroomSocketHandler {
             const { snapshot } = await classroomDanmaku.read(classroomId);
             if (socket.data.classroomId !== classroomId || socket.data.clientRole !== access.role || socket.connected === false)
                 throw new DanmakuError('FORBIDDEN', '课堂会话已变化');
+            // An explicit teacher refresh repairs every participant, including
+            // when the failure was reported by another API node. Join reads
+            // remain private and do not generate a whole-class broadcast.
+            if (reconcile && access.role === 'teacher')
+                this.scheduleDanmaku(classroomId, true, true);
             ack?.({ ok: true, snapshot: danmakuForRole(snapshot, access.role) });
         }
         catch (cause) {
-            if (classroomId && cause instanceof DanmakuError && cause.code === 'UNAVAILABLE')
+            if (classroomId && cause instanceof DanmakuError && cause.code === 'UNAVAILABLE') {
                 socket.emit('danmaku:state', danmakuForRole(classroomDanmaku.unavailable(classroomId), socket.data.clientRole));
+                if (reconcile) this.scheduleDanmaku(classroomId, true);
+            }
             ack?.(this.danmakuFailure(cause));
         }
     }
     private async emitDanmakuJoin(socket: Socket): Promise<void> {
         await this.handleDanmakuRead(socket, (reply) => { const result = asRecord(reply); if (result.ok === true)
-            socket.emit('danmaku:state', result.snapshot); });
+            socket.emit('danmaku:state', result.snapshot); }, false);
     }
     private async handleDanmakuControl(socket: Socket, data: unknown, ack?: SocketAck): Promise<void> {
         let classroomId: string | undefined;
@@ -281,14 +300,14 @@ export class ClassroomSocketHandler {
             }
             classroomId = access.classroomId;
             const { snapshot } = await classroomDanmaku.control(classroomId, data);
-            this.scheduleDanmaku(classroomId, true);
+            this.scheduleDanmaku(classroomId, true, true);
             if (socket.data.classroomId !== classroomId || socket.data.clientRole !== 'teacher' || socket.connected === false)
                 throw new DanmakuError('FORBIDDEN', '课堂会话已变化');
             ack?.({ ok: true, snapshot: danmakuForRole(snapshot, 'teacher') });
         }
         catch (cause) {
             if (classroomId && cause instanceof DanmakuError && cause.code === 'UNAVAILABLE')
-                void this.broadcastDanmakuUnavailable(classroomId);
+                this.scheduleDanmaku(classroomId, true);
             ack?.(this.danmakuFailure(cause));
         }
     }
@@ -303,46 +322,95 @@ export class ClassroomSocketHandler {
             classroomId = access.classroomId;
             const sessionId = socket.data.sessionId;
             const { snapshot, messageId, status, replayed } = await classroomDanmaku.send(classroomId, access.studentId, data);
-            if (!replayed) this.scheduleDanmaku(classroomId, false);
+            // The original command may have committed after its ACK timed out.
+            // A deduplicated retry must still repair a missed broadcast.
+            this.scheduleDanmaku(classroomId, Boolean(replayed), true);
             if (socket.data.classroomId !== classroomId || socket.data.clientRole !== 'student' || socket.data.sessionId !== sessionId || socket.connected === false)
                 throw new DanmakuError('FORBIDDEN', '课堂会话已变化');
             ack?.({ ok: true, messageId, status, snapshot: danmakuForRole(snapshot, 'student') });
         }
         catch (cause) {
             if (classroomId && cause instanceof DanmakuError && cause.code === 'UNAVAILABLE')
-                void this.broadcastDanmakuUnavailable(classroomId);
+                this.scheduleDanmaku(classroomId, true);
             ack?.(this.danmakuFailure(cause));
         }
     }
-    private readonly danmakuStudentUpdates = new Set<string>();
-    private scheduleDanmaku(classroomId: string, includeStudents: boolean): void {
-        if (includeStudents)
-            this.danmakuStudentUpdates.add(classroomId);
-        if (this.danmakuBatches.has(classroomId))
-            return;
-        const timer = setTimeout(() => { this.danmakuBatches.delete(classroomId); const students = this.danmakuStudentUpdates.delete(classroomId); void this.broadcastDanmaku(classroomId, students); }, 250);
-        timer.unref?.();
-        this.danmakuBatches.set(classroomId, timer);
+    private scheduleDanmaku(classroomId: string, includeStudents: boolean, knownAvailable = false): void {
+        let batch = this.danmakuBatches.get(classroomId);
+        if (!batch) {
+            batch = { timer: null, running: false, dirty: false, includeStudents: false, unavailable: false, recoveryAttempted: false };
+            this.danmakuBatches.set(classroomId, batch);
+        }
+        batch.dirty = true;
+        batch.includeStudents ||= includeStudents;
+        // A confirmed successful operation can shorten an outage backoff.
+        if (knownAvailable && batch.unavailable && batch.timer) {
+            clearTimeout(batch.timer);
+            batch.timer = null;
+        }
+        if (!batch.running && !batch.timer)
+            this.armDanmakuBatch(classroomId, batch, DANMAKU_BATCH_MS);
+    }
+    private armDanmakuBatch(classroomId: string, batch: DanmakuBatch, delay: number): void {
+        batch.timer = setTimeout(() => {
+            batch.timer = null;
+            void this.flushDanmakuBatch(classroomId, batch);
+        }, delay);
+        batch.timer.unref?.();
     }
     private async dispatchDanmaku(classroomId: string, snapshot: DanmakuSnapshot, includeStudents: boolean): Promise<void> {
         await socketService.sendToClassroomManagers(classroomId, 'danmaku:state', undefined, ['teacher','bigscreen'], role=>danmakuForRole(snapshot,role));
         if (includeStudents)
             socketService.broadcastToRoom('classroom:' + classroomId + ':students', 'danmaku:state', danmakuForRole(snapshot, 'student'));
     }
-    private async broadcastDanmaku(classroomId: string, includeStudents: boolean): Promise<void> {
+    private async flushDanmakuBatch(classroomId: string, batch: DanmakuBatch): Promise<void> {
+        // Keep the entry until the asynchronous read and fan-out both finish.
+        // Concurrent success/failure events mark it dirty instead of spawning
+        // overlapping authorization and full-room broadcasts.
+        if (this.danmakuBatches.get(classroomId) !== batch || batch.running)
+            return;
+        batch.running = true;
+        batch.dirty = false;
+        const includeStudents = batch.includeStudents || batch.unavailable;
+        batch.includeStudents = false;
         try {
             const classroom = await findClassroomAccess(classroomId);
-            if (!classroom || !['PREPARING', 'ACTIVE'].includes(classroom.status))
+            if (!classroom || !['PREPARING', 'ACTIVE'].includes(classroom.status)) {
+                this.danmakuBatches.delete(classroomId);
                 return;
+            }
             const { snapshot } = await classroomDanmaku.read(classroomId);
             await this.dispatchDanmaku(classroomId, snapshot, includeStudents);
+            batch.unavailable = false;
+            batch.recoveryAttempted = false;
         }
         catch {
-            await this.broadcastDanmakuUnavailable(classroomId);
+            // Only the transition into an outage broadcasts unavailable.
+            // Individual failed commands still receive their own ACK.
+            if (!batch.unavailable) {
+                batch.unavailable = true;
+                try {
+                    await this.dispatchDanmaku(classroomId, classroomDanmaku.unavailable(classroomId), true);
+                } catch {
+                    logger.warn('课堂弹幕不可用状态投递失败', { classroomId });
+                }
+            }
         }
-    }
-    private async broadcastDanmakuUnavailable(classroomId: string): Promise<void> {
-        await this.dispatchDanmaku(classroomId, classroomDanmaku.unavailable(classroomId), true);
+        finally {
+            batch.running = false;
+            if (this.danmakuBatches.get(classroomId) === batch) {
+                if (batch.unavailable && !batch.recoveryAttempted) {
+                    // A single automatic recovery probe for a quiet classroom.
+                    // Persistent faults require new demand or a teacher refresh.
+                    batch.recoveryAttempted = true;
+                    this.armDanmakuBatch(classroomId, batch, DANMAKU_RECOVERY_MS);
+                } else if (batch.dirty) {
+                    this.armDanmakuBatch(classroomId, batch, batch.unavailable ? DANMAKU_RECOVERY_MS : DANMAKU_BATCH_MS);
+                } else {
+                    this.danmakuBatches.delete(classroomId);
+                }
+            }
+        }
     }
   private emitError(socket: Socket, message: string): void {
     socket.emit('error', { message })

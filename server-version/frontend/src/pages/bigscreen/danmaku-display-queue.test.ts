@@ -29,6 +29,25 @@ describe('bounded classroom danmaku display',()=>{
     expect(advanced.active.every(item=>!queue.active.some(old=>old.id===item.id))).toBe(true)
     expect(nextDanmakuWake(queue)).toBe(now+12_000)
   })
+  it('does not truncate an active flight when later approved messages exceed the local candidate cap',()=>{
+    const original=Array.from({length:6},(_,i)=>message('original-'+i))
+    let queue=reconcileDanmakuQueue(emptyDanmakuQueue(),snapshot({messages:original}),now)
+    const activeIds=queue.active.map(item=>item.id)
+    const later=Array.from({length:40},(_,i)=>message('later-'+i,1000))
+    queue=reconcileDanmakuQueue(queue,snapshot({revision:2,messages:[...original,...later]}),now+1000)
+    expect(queue.active.map(item=>item.id)).toEqual(activeIds)
+    expect(queue.active.every(item=>item.endsAt===now+12_000)).toBe(true)
+    expect(queue.pending).toHaveLength(DANMAKU_PENDING_LIMIT)
+    const more=Array.from({length:30},(_,i)=>message('more-'+i,2000))
+    const all=[...original,...later,...more]
+    queue=reconcileDanmakuQueue(queue,snapshot({revision:3,messages:all}),now+2000)
+    expect(queue.active.map(item=>item.id)).toEqual(activeIds)
+    // Removing the message from the authoritative set still means hide.
+    queue=reconcileDanmakuQueue(queue,snapshot({revision:4,messages:all.filter(item=>item.id!==activeIds[0])}),now+2001)
+    expect(queue.active.some(item=>item.id===activeIds[0])).toBe(false)
+    expect(queue.active.filter(item=>activeIds.includes(item.id))).toHaveLength(5)
+    expect(queue.pending.length).toBeLessThanOrEqual(DANMAKU_PENDING_LIMIT)
+  })
   it('keeps the overlay to three tracks and safely queues displaced full-screen messages',()=>{
     const messages=Array.from({length:6},(_,i)=>message(String(i)))
     let queue=reconcileDanmakuQueue(emptyDanmakuQueue(),snapshot({messages}),now)

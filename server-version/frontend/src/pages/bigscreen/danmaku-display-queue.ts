@@ -63,12 +63,14 @@ export function reconcileDanmakuQueue(
   const messages=snapshot.messages.filter(message=>message.status==='approved'&&message.id
     &&typeof message.text==='string'&&Array.from(message.text).length<=60
     &&Number.isFinite(Date.parse(message.expiresAt))&&Date.parse(message.expiresAt)>now)
-    .slice(-(DANMAKU_TRACKS+DANMAKU_PENDING_LIMIT))
+  // The complete authoritative snapshot decides whether a message has
+  // actually been hidden or expired. Only newly queued candidates are capped.
   const allowed=new Set(messages.map(message=>message.id))
+  const candidates=messages.slice(-(DANMAKU_TRACKS+DANMAKU_PENDING_LIMIT))
   const seen=new Set(queue.seen)
   const displaced=queue.active.filter(message=>message.lane>=queue.trackCount)
   const pending=[...displaced,...queue.pending].filter(message=>allowed.has(message.id))
-  for(const message of messages){
+  for(const message of candidates){
     if(seen.has(message.id))continue
     seen.add(message.id)
     pending.push({...message,deadline:Math.min(Date.parse(message.expiresAt),now+MAX_VISIBLE_MS)})

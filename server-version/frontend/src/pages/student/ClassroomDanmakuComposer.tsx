@@ -54,7 +54,7 @@ export default function ClassroomDanmakuComposer({ state, emitWithAck }: Props) 
       setDraft('')
       setRetryAt(Date.now() + cooldownMs)
       setReceipt({
-        message: result.status === 'pending' ? '已发送，等待教师审核。' : '已发送，等待大屏播放。',
+        message: result.status === 'pending' ? '已发送，等待教师审核。' : '已接收，将根据大屏展示容量择机播放。',
         error: false,
       })
     } catch (error) {
@@ -73,7 +73,7 @@ export default function ClassroomDanmakuComposer({ state, emitWithAck }: Props) 
       </div>
       <p className="classroom-danmaku-compose__topic">{state.topic}</p>
       <p id={inputId + '-hint'} className="classroom-danmaku-compose__hint">
-        {state.reviewMode === 'review' ? '教师审核后匿名展示。' : '内容将匿名展示在课堂大屏。'}
+        {state.reviewMode === 'review' ? '教师审核后匿名展示。' : '内容将匿名发送，按大屏展示容量择机播放。'}
         {state.paused && ' 大屏已暂停，可继续发送。'}
       </p>
       <label htmlFor={inputId} className="sr-only">弹幕内容</label>
