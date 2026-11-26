@@ -172,7 +172,7 @@ export async function searchEducationGovernanceSchools(actorUserId:string,input:
   const entry=await prisma.adminEntryGrant.findFirst({
     where:{userId:actorUserId,revokedAt:null,entry:{in:['HUISCHOOL','HUITEACHER']}},select:{entry:true},
   })
-  if(!entry)throw new AdminPermissionError(403,'缺少教育入口管理授权')
+  if(entry?.entry!=='HUISCHOOL'&&entry?.entry!=='HUITEACHER')throw new AdminPermissionError(403,'缺少教育入口管理授权')
   await assertEntryAdmin(prisma,actorUserId,entry.entry)
   const rows=await prisma.$queryRaw<Array<{id:string;name:string}>>`
     SELECT id,name FROM organizations
