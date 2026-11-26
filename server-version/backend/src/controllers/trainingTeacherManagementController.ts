@@ -8,11 +8,12 @@ import { manageTrainingTeacher, trainingTeacherManagementPreflight, type Trainin
 import { BoundedAdmissionGate, isBoundedAdmissionBusyError } from '../services/boundedAdmissionGate'
 
 const common={expectedUpdatedAt:z.string().datetime()}
+const reason=z.string().trim().min(1).max(500)
 const commandSchema=z.discriminatedUnion('action',[
   z.object({...common,action:z.literal('EXTEND'),months:z.number().int().min(1).max(120).default(12)}).strict(),
-  z.object({...common,action:z.literal('FREEZE')}).strict(),
+  z.object({...common,action:z.literal('FREEZE'),reason}).strict(),
   z.object({...common,action:z.literal('UNFREEZE')}).strict(),
-  z.object({...common,action:z.literal('RESET_PASSWORD')}).strict(),
+  z.object({...common,action:z.literal('RESET_PASSWORD'),reason}).strict(),
 ])
 const gate=new BoundedAdmissionGate({name:'training_teacher_management',maxConcurrent:2,maxQueue:4,maxWaitMs:1000,retryAfterSeconds:2})
 export async function trainingTeacherManagement(req:Request,res:Response) {

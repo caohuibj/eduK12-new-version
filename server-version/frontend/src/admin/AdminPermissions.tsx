@@ -5,11 +5,16 @@ import {entryLabels,type AdminEntry} from './authority'
 import AdminStepUp from './AdminStepUp'
 import AdminContentPermissions from './AdminContentPermissions'
 import {useAuth} from '../contexts/AuthContext'
-type Account={id:string;username:string;platformRole:string;entries:Array<{entry:AdminEntry;active:boolean;version:number}>}
+const accountLabels={ACTIVE:'可登录',FROZEN:'已冻结',EXPIRED:'已过期',INACTIVE:'未启用或待审核',PASSWORD_CHANGE_REQUIRED:'待激活或待改密'}
+const mfaLabels={TOTP:'已绑定 Authenticator',SECURITY_KEY_ONLY:'仅绑定安全密钥',UNBOUND:'待绑定 Authenticator'}
+type Enrollment={username:string;enrollmentToken:string;initialActivation:boolean;expiresAt:string}
+type Account={id:string;username:string;platformRole:string;accountStatus:keyof typeof accountLabels;mfaStatus:keyof typeof mfaLabels;operable:boolean;entries:Array<{entry:AdminEntry;active:boolean;version:number}>}
 type Audit={id:string;action:string;entry:AdminEntry|null;version:number|null;reason:string;createdAt:string}
 export default function AdminPermissions(){
   const {user}=useAuth()
   const [accounts,setAccounts]=useState<Account[]>([]),[page,setPage]=useState(1),[keyword,setKeyword]=useState(''),[search,setSearch]=useState('')
+  const [newUsername,setNewUsername]=useState(''),[newEntry,setNewEntry]=useState<AdminEntry>('TRAINING')
+  const [enrollment,setEnrollment]=useState<Enrollment|null>(null),[operableOnPage,setOperableOnPage]=useState(0)
   const [reason,setReason]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const [audit,setAudit]=useState<Audit[]>([]),[auditLoading,setAuditLoading]=useState(false),[auditError,setAuditError]=useState('')
   const auditRequest=useRef(0)
@@ -17,7 +22,7 @@ export default function AdminPermissions(){
   const reasonPanel=useRef<HTMLDetailsElement>(null)
   const [loading,setLoading]=useState(true)
   const [view,setView]=useState<'accounts'|'content'>('accounts'),[auditAccount,setAuditAccount]=useState('')
-  const load=useCallback(async()=>{setLoading(true);try{const result=await api.get<{accounts:Account[]}>('/admin/permissions/accounts?page='+page+'&keyword='+encodeURIComponent(search));setAccounts(result.data!.accounts)}finally{setLoading(false)}},[page,search])
+  const load=useCallback(async()=>{setLoading(true);try{const result=await api.get<{accounts:Account[];operableOnPage:number}>('/admin/permissions/accounts?page='+page+'&keyword='+encodeURIComponent(search));setAccounts(result.data!.accounts);setOperableOnPage(result.data!.operableOnPage??0)}finally{setLoading(false)}},[page,search])
   useEffect(()=>{void load().catch(e=>setError(e.message))},[load])
   const readAudit=async(account:Account)=>{
     const request=++auditRequest.current
@@ -27,6 +32,18 @@ export default function AdminPermissions(){
       if(request===auditRequest.current)setAudit(result.data??[])
     }catch(e){if(request===auditRequest.current)setAuditError(e instanceof Error?e.message:'审计记录读取失败，请重新选择账号重试')}
     finally{if(request===auditRequest.current)setAuditLoading(false)}
+  }
+  const issueEnrollment=async(account?:Account)=>{
+    if(!reason.trim()){setError('请填写变更原因');if(reasonPanel.current)reasonPanel.current.open=true;return}
+    setBusy(true);setError('');setNotice('');setEnrollment(null)
+    try{
+      const result=await api.post<Enrollment>(account?'/admin/permissions/accounts/'+account.id+'/enrollment':'/admin/permissions/accounts',
+        account?{reason:reason.trim()}:{username:newUsername.trim(),entry:newEntry,reason:reason.trim()})
+      setEnrollment(result.data!)
+      if(!account)setNewUsername('')
+      await load()
+    }catch(e){setError(e instanceof Error?e.message:'签发未完成，请核对账号状态后再试')}
+    finally{setBusy(false)}
   }
   const change=async(account:Account,grant:Account['entries'][number])=>{
     if(!reason.trim()){setError('请填写授权变更原因');if(reasonPanel.current)reasonPanel.current.open=true;return}
@@ -42,13 +59,35 @@ export default function AdminPermissions(){
     {error&&<p className="sys-message sys-error" role="alert">{error}</p>}{notice&&<p className="sys-message" role="status">{notice}</p>}
     <div className="sys-workspace"><div className="sys-content">
     <section hidden={view!=='accounts'} aria-label="入口管理员" className="sys-panel">
-      <div className="sys-section-heading"><div><h2>入口管理员</h2><p>查看账号当前资格，展开卡片管理各入口权限。</p></div><span className="sys-badge">本页 {accounts.length} 位</span></div>
+      <div className="sys-section-heading"><div><h2>入口管理员</h2><p>查看账号当前资格，展开卡片管理各入口权限。</p></div><span className="sys-badge">本页可操作管理员 {operableOnPage} 位</span></div>
+      <details className="sys-record">
+        <summary>新建入口管理员</summary>
+        <form className="sys-record-body" onSubmit={e=>{e.preventDefault();void issueEnrollment()}}>
+          <label className="system-field">新管理账号<input value={newUsername} onChange={e=>setNewUsername(e.target.value)} autoComplete="off" required minLength={4} maxLength={64}/></label>
+          <label className="system-field">授权入口<select value={newEntry} onChange={e=>setNewEntry(e.target.value as AdminEntry)}>
+            {Object.entries(entryLabels).map(([entry,label])=><option value={entry} key={entry}>{label}</option>)}
+          </select></label>
+          <button type="submit" disabled={busy||loading}>新建并签发绑定码</button>
+        </form>
+      </details>
+      {enrollment&&<section className="sys-record" aria-label="私密绑定信息">
+        <div className="sys-record-body">
+          <p>账号 {enrollment.username} 的绑定码在 {new Date(enrollment.expiresAt).toLocaleTimeString('zh-CN')} 前可用。请通过已核实的私密渠道交给本人。</p>
+          <label className="system-field">一次性绑定码<input readOnly value={enrollment.enrollmentToken} autoComplete="off" /></label>
+          <p>{enrollment.initialActivation?'本人在绑定页自行设置密码。':'本人在绑定页使用当前密码。'}绑定完成后再登录。</p>
+          <a href={'/admin/security/enroll'+(enrollment.initialActivation?'?activate=1':'')} target="_blank" rel="noreferrer">打开绑定页</a>
+          <button onClick={()=>setEnrollment(null)}>关闭绑定信息</button>
+        </div>
+      </section>}
       <form className="sys-search" onSubmit={e=>{e.preventDefault();setPage(1);setSearch(keyword.trim())}}><label><Search size={17} aria-hidden="true"/><span className="sr-only">查找管理账号</span><input placeholder="搜索管理员账号" disabled={busy||loading} value={keyword} onChange={e=>setKeyword(e.target.value)}/></label><button type="submit" disabled={busy||loading}>查找</button></form>
       {loading&&<p role="status" className="sys-empty">正在读取账号…</p>}
       {!loading&&!accounts.length&&<div className="sys-empty"><UsersRound size={28} aria-hidden="true"/><h3>没有匹配的账号</h3><p>调整关键词后再次查找。</p></div>}
       <div className="sys-records">{accounts.map(account=><article className="sys-record" key={account.id}><details>
-        <summary><span className="sys-record-avatar"><UsersRound size={20} aria-hidden="true"/></span><span className="sys-record-heading"><strong>{account.username}</strong><small>{account.platformRole==='SYSTEM_ADMIN'?'系统管理员':account.entries.some(g=>g.active)?'入口管理员':'尚无入口管理权限'} · {account.entries.filter(g=>g.active).length} 个入口已授权</small></span><span className="sys-expand">管理<ChevronDown size={17} aria-hidden="true"/></span></summary>
-        <div className="sys-record-body"><div className="sys-grant-grid">{account.entries.map(grant=><div key={grant.entry} className="sys-grant"><div><strong>{entryLabels[grant.entry]}</strong><span className="sys-badge" data-active={grant.active}>{grant.active?'已授权':'未授权'}</span></div><button disabled={busy||loading} aria-label={`${grant.active?'撤销':'授予'} ${account.username} ${grant.entry}`} onClick={()=>void change(account,grant)}>{grant.active?'撤销权限':'授予权限'}</button></div>)}</div>
+        <summary><span className="sys-record-avatar"><UsersRound size={20} aria-hidden="true"/></span><span className="sys-record-heading"><strong>{account.username}</strong><small>{account.platformRole==='SYSTEM_ADMIN'?'系统管理员':account.entries.some(g=>g.active)?'入口管理员':'尚无入口管理权限'} · {account.entries.filter(g=>g.active).length} 个入口已授权{account.accountStatus&&' · '+accountLabels[account.accountStatus]}{account.mfaStatus&&' · '+mfaLabels[account.mfaStatus]}</small></span><span className="sys-expand">管理<ChevronDown size={17} aria-hidden="true"/></span></summary>
+        <div className="sys-record-body"><div className="sys-grant-grid">{account.entries.map(grant=><div key={grant.entry} className="sys-grant"><div><strong>{entryLabels[grant.entry]}</strong><span className="sys-badge" data-active={grant.active}>{grant.active?(account.operable===false?'已授权 · 暂不可操作':'已授权'):'未授权'}</span></div><button disabled={busy||loading||(!grant.active&&account.platformRole==='SYSTEM_ADMIN')} aria-label={`${grant.active?'撤销':'授予'} ${account.username} ${grant.entry}`} onClick={()=>void change(account,grant)}>{grant.active?'撤销权限':'授予权限'}</button></div>)}</div>
+        {account.platformRole==='STANDARD'&&account.entries.some(grant=>grant.active)&&account.mfaStatus==='UNBOUND'
+          &&['ACTIVE','PASSWORD_CHANGE_REQUIRED'].includes(account.accountStatus)&&
+          <button className="sys-text-button" disabled={busy||loading} onClick={()=>void issueEnrollment(account)}>签发绑定码</button>}
         <button className="sys-text-button" onClick={()=>void readAudit(account)}><History size={15} aria-hidden="true"/>查看 {account.username} 审计</button></div>
       </details></article>)}</div>
       <nav className="system-pagination" aria-label="管理员列表分页"><span>第 {page} 页</span><div><button disabled={page===1||busy||loading} onClick={()=>setPage(p=>p-1)}>上一页</button><button disabled={accounts.length<25||busy||loading} onClick={()=>setPage(p=>p+1)}>下一页</button></div></nav>

@@ -20,7 +20,7 @@ import {
   finishSurveyMfa, verifySurveyTotpStepUp,
 } from './mfa.service'
 
-import { redeemResearcherInvite, redeemPasswordReset, SurveyGovernanceError } from './governance.service'
+import { redeemResearcherInvite, redeemPasswordReset, redeemResearcherMfaRebind, SurveyGovernanceError } from './governance.service'
 
 export const surveyAuthRouter=Router()
 surveyAuthRouter.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
@@ -143,6 +143,10 @@ const resetInput=z.object({
   password:z.string().min(8).max(PASSWORD_MAX_LENGTH).refine(isValidPassword),
 }).strict()
 const claimLimit=createRedisRateLimiter({name:'survey-invitation-claim',limit:12,windowSeconds:900})
+const rebindLimit=createRedisRateLimiter({name:'survey-mfa-rebind',limit:8,windowSeconds:900,key:req=>{
+  const token=resetInput.shape.token.safeParse(req.body?.token)
+  return token.success?token.data:'invalid'
+}})
 surveyAuthRouter.post('/claim',claimLimit,async(req,res)=>{
   const parsed=claimInput.safeParse(req.body)
   if(!parsed.success)return forbidden(res,'邀请不可用或输入不合法')
@@ -155,8 +159,20 @@ surveyAuthRouter.post('/claim',claimLimit,async(req,res)=>{
 surveyAuthRouter.post('/reset-password',claimLimit,async(req,res)=>{
   const parsed=resetInput.safeParse(req.body)
   if(!parsed.success)return forbidden(res,'恢复邀请不可用')
-  try{return success(res,await redeemPasswordReset(req,res,parsed.data.token,parsed.data.password))}
+  try{
+    const result=await redeemPasswordReset(parsed.data.token,parsed.data.password)
+    clearSurveySessionCookie(req,res)
+    return success(res,result,'密码已更新，请重新登录')
+  }
   catch(e){if(e instanceof SurveyGovernanceError)return forbidden(res,'恢复邀请已失效')
+    return unavailable(res)
+  }
+})
+surveyAuthRouter.post('/rebind-mfa',claimLimit,rebindLimit,async(req,res)=>{
+  const parsed=resetInput.extend({password:loginInput.shape.password}).safeParse(req.body)
+  if(!parsed.success)return forbidden(res,'恢复邀请不可用')
+  try{return success(res,await redeemResearcherMfaRebind(req,res,parsed.data.token,parsed.data.password))}
+  catch(e){if(e instanceof SurveyGovernanceError)return forbidden(res,'恢复邀请或当前密码无效')
     return unavailable(res)
   }
 })

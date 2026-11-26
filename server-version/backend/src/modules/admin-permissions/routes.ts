@@ -10,14 +10,16 @@ import { prisma } from '../../config/database'
 import { authenticate } from '../../middleware/auth'
 import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
 import { loginRateLimit, withLoginAccountFailureThrottle, withLoginPasswordVerification, recordLoginFailure } from '../../middleware/loginRateLimit'
-import { comparePassword } from '../../utils/password'
+import { comparePassword, hashPassword, isValidPassword } from '../../utils/password'
 import { getSessionToken } from '../../utils/authCookies'
 import { verifyToken } from '../../utils/jwt'
 import { success, error } from '../../utils/response'
 import { ADMIN_ENTRIES, AdminPermissionError, changeEntryGrant } from './service'
-import { beginAdminRegistration, finishAdminRegistration, beginAdminLogin, finishAdminAuthentication, adminAuthOrigin } from './security'
+import { beginAdminRegistration, finishAdminRegistration, beginAdminLogin, finishAdminAuthentication, adminAuthOrigin, adminRequiresTotp, adminSecretHash } from './security'
 import { beginAdminTotpRegistration, finishAdminTotp, adminTotpAttemptLimiter } from './totp'
 import { requireRecentAdminKey, requireSystemAdmin } from './guards'
+import { ADMIN_ENTRY_ACTIVATION, createEntryAdmin, issueEntryAdminEnrollment } from './provisioning'
+import { inactiveAccountMessage } from '../../utils/accountStatus'
 import { cognitiveIntakeAdminRouter } from '../cognitive/onboarding/admin.routes'
 
 const handle = (work: (req: Request, res: Response) => Promise<unknown>) => async (req: Request, res: Response, next: NextFunction) => {
@@ -63,11 +65,24 @@ adminSecurityRouter.post('/registration/options', loginRateLimit, withLoginAccou
 adminSecurityRouter.post('/registration/verify', handle(req => finishAdminRegistration(req, registration.parse(req.body).response)))
 adminSecurityRouter.post('/authentication/verify', handle((req, res) => finishAdminAuthentication(req, res, assertion.parse(req.body).response)))
 adminSecurityRouter.post('/totp/registration/options', loginRateLimit, withLoginAccountFailureThrottle(handle(async (req, res) => {
-  const input = z.object({ username: z.string().min(1).max(320), password: z.string().min(1).max(128), enrollmentToken: z.string().length(43) }).strict().parse(req.body)
+  const input = z.object({ username: z.string().min(1).max(320), password: z.string().min(1).max(128),
+    enrollmentToken: z.string().length(43), activate: z.boolean().optional() }).strict().parse(req.body)
   const user = await prisma.user.findUnique({ where: { username: input.username } })
-  const ok = await withLoginPasswordVerification(() => comparePassword(input.password, user?.passwordHash ?? '$2a$10$fuhNGsB2Z5/iwZtxlw1usOIb5sbX2OzkV/cccQJRbkSpHu2ZPql.a'))
-  if (!ok || !user) { await recordLoginFailure(req); throw new AdminPermissionError(403, '登记凭据无效') }
-  return beginAdminTotpRegistration(req, res, user.id, input.enrollmentToken)
+  let initialPasswordHash: string | undefined
+  if (input.activate) {
+    const ticket = await prisma.adminSecurityChallenge.findUnique({ where: { idHash: adminSecretHash(input.enrollmentToken) } })
+    if (!user || !ticket || ticket.userId !== user.id || ticket.tokenVersion !== user.tokenVersion
+      || ticket.purpose !== 'ENROLLMENT' || ticket.challenge !== ADMIN_ENTRY_ACTIVATION || ticket.expiresAt <= new Date()) {
+      await recordLoginFailure(req)
+      throw new AdminPermissionError(403, '登记凭据无效')
+    }
+    if (!isValidPassword(input.password)) throw new AdminPermissionError(400, '密码至少 8 个字符，包含字母和数字')
+    initialPasswordHash = await withLoginPasswordVerification(() => hashPassword(input.password))
+  } else {
+    const ok = await withLoginPasswordVerification(() => comparePassword(input.password, user?.passwordHash ?? '$2a$10$fuhNGsB2Z5/iwZtxlw1usOIb5sbX2OzkV/cccQJRbkSpHu2ZPql.a'))
+    if (!ok || !user) { await recordLoginFailure(req); throw new AdminPermissionError(403, '登记凭据无效') }
+  }
+  return beginAdminTotpRegistration(req, res, user!.id, input.enrollmentToken, initialPasswordHash)
 })))
 const totpCode = z.object({ code: z.string().regex(/^\d{6}$/) }).strict()
 // Even malformed OTPs reach the service and consume their one-use challenge.
@@ -102,14 +117,47 @@ adminPermissionsRouter.get('/accounts', handle(async req => {
   const query = z.object({ page: z.coerce.number().int().min(1).max(10000).default(1), keyword: z.string().trim().max(100).default('') }).strict().parse(req.query)
   const users = await prisma.user.findMany({ where: { accountDomain: { in: ['LEGACY','TRAINING'] },
     ...(query.keyword ? { username: { contains: query.keyword } } : {}) }, take: 25, skip: (query.page - 1) * 25, orderBy: { id: 'asc' },
-    select: { id: true, username: true, role: true, platformRole: true, isActive: true } })
-  const grants = await prisma.adminEntryGrant.findMany({ where: { userId: { in: users.map(u => u.id) } } })
+    select: { id: true, username: true, role: true, platformRole: true, isActive: true,
+      isFrozen: true, expiresAt: true, mustChangePassword: true, teacherApproved: true } })
+  const ids = users.map(u => u.id)
+  const [grants, totp, securityKeys] = await Promise.all([
+    prisma.adminEntryGrant.findMany({ where: { userId: { in: ids } } }),
+    prisma.adminTotpCredential.findMany({ where: { userId: { in: ids } }, select: { userId: true } }),
+    prisma.adminSecurityKey.findMany({ where: { userId: { in: ids } }, distinct: ['userId'], select: { userId: true } }),
+  ])
+  const totpUsers = new Set(totp.map(row => row.userId)), keyUsers = new Set(securityKeys.map(row => row.userId))
   const byUser = new Map<string, typeof grants>()
-  for (const g of grants) byUser.set(g.userId, [...(byUser.get(g.userId) ?? []), g])
-  return { page: query.page, pageSize: 25, accounts: users.map(u => ({ ...u, entries: ADMIN_ENTRIES.map(entry => {
-    const grant = byUser.get(u.id)?.find(g => g.entry === entry)
-    return { entry, active: Boolean(grant && !grant.revokedAt), version: grant?.version ?? 0 }
-  }) })) }
+  for (const grant of grants) byUser.set(grant.userId, [...(byUser.get(grant.userId) ?? []), grant])
+  const accounts = users.map(user => {
+    const accountStatus = user.isFrozen ? 'FROZEN' : user.expiresAt && user.expiresAt <= new Date() ? 'EXPIRED'
+      : inactiveAccountMessage(user) ? 'INACTIVE' : user.mustChangePassword ? 'PASSWORD_CHANGE_REQUIRED' : 'ACTIVE'
+    const mfaStatus = totpUsers.has(user.id) ? 'TOTP' : keyUsers.has(user.id) ? 'SECURITY_KEY_ONLY' : 'UNBOUND'
+    const operable = accountStatus === 'ACTIVE' && (mfaStatus === 'TOTP'
+      || (mfaStatus === 'SECURITY_KEY_ONLY' && !adminRequiresTotp()))
+    return { id: user.id, username: user.username, role: user.role, platformRole: user.platformRole,
+      isActive: user.isActive, accountStatus, mfaStatus, operable, entries: ADMIN_ENTRIES.map(entry => {
+        const grant = byUser.get(user.id)?.find(row => row.entry === entry)
+        return { entry, active: Boolean(grant && !grant.revokedAt), version: grant?.version ?? 0 }
+      }),
+    }
+  })
+  return { page: query.page, pageSize: 25, accounts,
+    operableOnPage: accounts.filter(account => account.operable
+      && (account.platformRole === 'SYSTEM_ADMIN' || account.entries.some(entry => entry.active))).length,
+  }
+}))
+const enrollmentReason = z.string().trim().min(1).max(500)
+adminPermissionsRouter.post('/accounts', requireRecentAdminKey, handle(async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store')
+  const input = z.object({ username: z.string().trim().regex(/^[A-Za-z0-9_.-]{4,64}$/),
+    entry: z.enum(ADMIN_ENTRIES), reason: enrollmentReason }).strict().parse(req.body)
+  return createEntryAdmin({ ...input, actorUserId: req.user!.userId, actorSession: req.user! })
+}))
+adminPermissionsRouter.post('/accounts/:id/enrollment', requireRecentAdminKey, handle(async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store')
+  const { reason } = z.object({ reason: enrollmentReason }).strict().parse(req.body)
+  return issueEntryAdminEnrollment({ targetUserId: z.string().guid().parse(req.params.id),
+    actorUserId: req.user!.userId, actorSession: req.user!, reason })
 }))
 adminPermissionsRouter.put('/accounts/:id/entries/:entry', requireRecentAdminKey, handle(req => {
   const body = z.object({ active: z.boolean(), expectedVersion: z.number().int().min(0), reason: z.string().trim().min(1).max(500) }).strict().parse(req.body)

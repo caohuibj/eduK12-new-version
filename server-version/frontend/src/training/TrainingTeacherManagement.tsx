@@ -10,20 +10,22 @@ export default function TrainingTeacherManagement({selection,onClose,onChanged,o
   selection:{user:User;action:TeacherAction}|null;onClose:()=>void;onChanged:()=>Promise<void>;onBusyChange:(busy:boolean)=>void
 }) {
   const [months,setMonths]=useState('12'),[customMonths,setCustomMonths]=useState('12')
+  const [reason,setReason]=useState('')
   const [busy,setBusy]=useState(false),[error,setError]=useState('')
   const [handoff,setHandoff]=useState<TemporaryPasswordHandoffValue|null>(null)
   const locked=useRef(false)
-  useEffect(()=>{setMonths('12');setCustomMonths('12');setError('');setHandoff(null)},[selection])
+  useEffect(()=>{setMonths('12');setCustomMonths('12');setReason('');setError('');setHandoff(null)},[selection])
   const close=()=>{if(!locked.current){setHandoff(null);onClose()}}
   const execute=async()=>{
     if(!selection||locked.current)return
     const {user,action}=selection
     const term=Number(months==='custom'?customMonths:months)
     if(action==='EXTEND'&&(!Number.isInteger(term)||term<1||term>120)){setError('延期月数需为 1–120 的整数。');return}
+    if((action==='FREEZE'||action==='RESET_PASSWORD')&&!reason.trim()){setError('请填写操作原因。');return}
     if(!user.updatedAt){setError('账号版本信息缺失，请关闭弹窗并刷新列表后重试。');return}
     locked.current=true;setBusy(true);onBusyChange(true);setError('')
     try {
-      const response=await apiClient.post(`/users/${user.id}/training-management`,{action,expectedUpdatedAt:user.updatedAt,...(action==='EXTEND'?{months:term}:{})})
+      const response=await apiClient.post(`/users/${user.id}/training-management`,{action,expectedUpdatedAt:user.updatedAt,...(action==='EXTEND'?{months:term}:action==='UNFREEZE'?{}:{reason:reason.trim()})})
       if(response.code!==0)throw new Error(response.message||'操作未完成')
       if(action==='RESET_PASSWORD') {
         setHandoff({studentName:user.nickname||user.username,username:response.data.username,temporaryPassword:response.data.temporaryPassword})
@@ -44,6 +46,7 @@ export default function TrainingTeacherManagement({selection,onClose,onChanged,o
         {action==='FREEZE'&&<><p>冻结后立即停止该培训师的登录和系统访问，并使原有登录会话失效。</p><p>账号、课程、学员和历史数据保留。冻结期间有效期继续计算，之后可在此解冻。</p></>}
         {action==='UNFREEZE'&&<><p>解除临时冻结，保留原有效期和审核状态；培训师需要重新登录。</p>{expired&&<p className="training-accounts-expired">该账号已过期，解冻后还需延期才能登录。</p>}</>}
         {action==='RESET_PASSWORD'&&<><p>请先核实培训师身份。系统将生成随机临时密码，仅在下一步显示一次；原密码无法查看。</p><p>旧登录会话立即失效，首次登录必须修改密码。到期、冻结或待审核状态不会因此解除。</p></>}
+        {(action==='FREEZE'||action==='RESET_PASSWORD')&&<label>操作原因<textarea maxLength={500} value={reason} disabled={busy} onChange={event=>setReason(event.target.value)} /></label>}
         {error&&<p className="training-accounts-error" role="alert">{error}</p>}
       </div>
     </ManagementDialog>

@@ -4,33 +4,41 @@ import {prisma} from '../../config/database'
 import {AdminPermissionError} from '../admin-permissions/service'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {lockEducationAssessmentUsers} from '../education-tools/assessment-resource.locks'
-import {assertEducationConfigurationManager} from './education-standard-management'
+import {assertEducationConfigurationManager,educationConfigurationDistributionRoots} from './education-standard-management'
+import {assertContentAuthority} from '../measurement-content/content-authority.repository'
 import {EDUCATION_STANDARD_USE_ACTION,EDUCATION_STANDARD_REVOKE_ACTION,readEducationStandardUseBinding,type EducationConfigurationScope} from './education-standard-use'
 
 const id=z.string().guid()
 export const educationStandardRevokeInput=z.object({requestId:id,expectedVersion:z.number().int().positive(),reason:z.string().trim().min(1).max(500)}).strict()
-/** Reduces only this manager's original exact school/source use. A source or
- * original distribution withdrawal must not prevent clean-up or rewrite T1. */
+/** The original issuer retains cleanup access. A successor needs an exact
+ * distribution delegation for this school, product and frozen measurement. */
 export async function revokeEducationStandardConfigurationUse(actorId:string,scope:EducationConfigurationScope,combinationId:string,grantId:string,raw:unknown){
  id.parse(combinationId);id.parse(grantId);const input=educationStandardRevokeInput.parse(raw)
  const intentHash=canonicalHash({schemaVersion:1,actorId,scope,combinationId,grantId,...input})
  return prisma.$transaction(async tx=>{
   await lockEducationAssessmentUsers(tx,[actorId])
   await assertEducationConfigurationManager(tx,actorId,scope)
-  const header=await tx.contentCapabilityGrant.findFirst({where:{id:grantId,issuerId:actorId,product:scope.product,scopeKind:'ORGANIZATION',scopeId:scope.organizationId},select:{subjectId:true}})
+  const header=await tx.contentCapabilityGrant.findFirst({where:{id:grantId,product:scope.product,scopeKind:'ORGANIZATION',scopeId:scope.organizationId},select:{subjectId:true}})
   if(!header)throw new AdminPermissionError(404,'未找到本管理范围内的原配置授权')
   await lockEducationAssessmentUsers(tx,[header.subjectId])
-  const [row]=await tx.$queryRaw<Array<{id:string;subject_id:string;version:number;revoked_at:Date|null;resource_keys:string[]}>>(Prisma.sql`
-   SELECT id,subject_id,version,revoked_at,resource_keys FROM content_capability_grants
-   WHERE id=${grantId} AND issuer_id=${actorId} AND product=${scope.product} AND scope_kind='ORGANIZATION' AND scope_id=${scope.organizationId}
+  const [row]=await tx.$queryRaw<Array<{id:string;issuer_id:string;subject_id:string;version:number;revoked_at:Date|null;resource_keys:string[]}>>(Prisma.sql`
+   SELECT id,issuer_id,subject_id,version,revoked_at,resource_keys FROM content_capability_grants
+   WHERE id=${grantId} AND product=${scope.product} AND scope_kind='ORGANIZATION' AND scope_id=${scope.organizationId}
     AND resource_kind='material' AND capabilities=ARRAY['material.use']::text[] AND parent_grant_id IS NULL AND ancestry=ARRAY[id]::text[]
     AND remaining_delegation_depth=0 AND delegable_capabilities=ARRAY[]::text[] FOR UPDATE`)
   const original=await tx.assessmentManagementEvent.findUnique({where:{id:grantId}})
-  if(!row||row.resource_keys.length!==1||!original||original.actorId!==actorId||original.action!==EDUCATION_STANDARD_USE_ACTION||original.resourceId!==combinationId)
+  if(!row||row.resource_keys.length!==1||!original||original.actorId!==row.issuer_id||original.action!==EDUCATION_STANDARD_USE_ACTION||original.resourceId!==combinationId)
    throw new AdminPermissionError(409,'原精确配置授权身份不完整')
-  const selected=readEducationStandardUseBinding(original.metadata,{id:grantId,issuerId:actorId,recipientId:row.subject_id,scope,resourceKey:row.resource_keys[0]})
+  const selected=readEducationStandardUseBinding(original.metadata,{id:grantId,issuerId:row.issuer_id,recipientId:row.subject_id,scope,resourceKey:row.resource_keys[0]})
   if((selected.binding.configuration.kind==='STANDARD_COMBINATION'?selected.binding.configuration.combinationId:selected.binding.configuration.configId)!==combinationId)
    throw new AdminPermissionError(409,'原配置来源与撤销目标不一致')
+  if(row.issuer_id!==actorId){
+   const measurementId=selected.binding.configuration.measurement.releaseId
+   const [delegation]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`${measurementId}`)} ORDER BY g.id LIMIT 1`)
+   if(!delegation)throw new AdminPermissionError(403,'接任管理员需要原配置所属学校、入口和测量版本的分发授权')
+   await assertContentAuthority(tx,{actorId,grantId:delegation.id,capability:'material.distribute',
+    scope:{product:scope.product,scopeKind:'ORGANIZATION',scopeId:scope.organizationId,resourceKind:'material',resourceKeys:[measurementId]}})
+  }
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'education-standard-revoke:'+input.requestId}))`
   const previous=await tx.assessmentManagementEvent.findUnique({where:{id:input.requestId}})
   if(previous){

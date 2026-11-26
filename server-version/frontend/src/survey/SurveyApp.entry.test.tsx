@@ -81,7 +81,7 @@ describe('Survey public entry and existing authentication transitions', () => {
     expect(await screen.findByRole('heading', { name: '研究工作台' })).toBeInTheDocument()
   })
 
-  it.each([['/claim', '激活研究者身份', '/auth/claim'], ['/reset-password', '恢复 Survey 密码', '/auth/reset-password']])(
+  it.each([['/claim', '激活研究者身份', '/auth/claim'], ['/rebind-mfa', '重新绑定 Survey 验证器', '/auth/rebind-mfa']])(
     'preserves %s activation and MFA after its token is removed from the URL', async (entry, heading, endpoint) => {
       window.history.replaceState(null, '', entry + '#token=one-time-test-token')
       let verified = false
@@ -98,7 +98,7 @@ describe('Survey public entry and existing authentication transitions', () => {
       await screen.findByRole('heading', { name: heading })
       expect(screen.getByLabelText('一次性邀请凭证')).toHaveValue('one-time-test-token')
       if (entry === '/claim') fireEvent.change(screen.getByLabelText('研究者登录名'), { target: { value: 'invited' } })
-      fireEvent.change(screen.getByLabelText('新密码（至少 8 位，字母与数字组合）'), { target: { value: 'test-password' } })
+      fireEvent.change(screen.getByLabelText(entry === '/claim' ? '新密码（至少 8 位，字母与数字组合）' : '当前密码'), { target: { value: 'test-password' } })
       fireEvent.click(screen.getByRole('button', { name: '确认并绑定验证器' }))
       await screen.findByRole('heading', { name: '双因素验证' })
       await waitFor(() => expect(window.location.hash).toBe(''))
@@ -109,6 +109,24 @@ describe('Survey public entry and existing authentication transitions', () => {
       expect(screen.queryByRole('link', { name: '研究者登录' })).not.toBeInTheDocument()
     },
   )
+
+  it('returns to login after resetting the password and retains the existing second factor', async () => {
+    window.history.replaceState(null, '', '/reset-password#token=one-time-test-token')
+    const fetcher = vi.fn((path: string) => {
+      if (path.endsWith('/csrf')) return response({ csrfToken: 'test-csrf' })
+      if (path.endsWith('/auth/reset-password')) return response({ changed: true })
+      return response(null, false)
+    })
+    vi.stubGlobal('fetch', fetcher)
+    render(<SurveyApp />)
+    await screen.findByRole('heading', { name: '恢复 Survey 密码' })
+    fireEvent.change(screen.getByLabelText('新密码（至少 8 位，字母与数字组合）'), { target: { value: 'test-password' } })
+    fireEvent.click(screen.getByRole('button', { name: '更新密码' }))
+    expect(await screen.findByRole('heading', { name: '研究者登录' })).toBeInTheDocument()
+    expect(screen.getByText('密码已更新。请使用新密码和原验证器登录。')).toBeInTheDocument()
+    expect(window.location.hash).toBe('')
+    expect(fetcher.mock.calls.some(([path]) => path.includes('/mfa/'))).toBe(false)
+  })
 
   it('allows a forced-password SURVEY researcher to change password before project reads', async () => {
     window.history.replaceState(null, '', '/workspace')

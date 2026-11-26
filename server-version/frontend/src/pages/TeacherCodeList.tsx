@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { ChevronDown, Copy, Key, Plus, RefreshCw, Trash2 } from 'lucide-react'
+import { ChevronDown, Copy, Key, Plus, RefreshCw, Ban } from 'lucide-react'
 import apiClient from '../api/client'
 import { PageHeader } from '../components/product-ui/PageHeader'
 import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
@@ -22,7 +22,7 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
   const [accountTerm, setAccountTerm] = useState("year")
   const [accountDays, setAccountDays] = useState("365")
   const [now, setNow] = useState(Date.now())
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [revokingId, setRevokingId] = useState<string | null>(null)
 
   const [keyword,setKeyword]=useState(''),[appliedKeyword,setAppliedKeyword]=useState('')
   const [page, setPage] = useState(1)
@@ -109,25 +109,22 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
     }
   }
 
-  const handleDelete = async (teacherCode: TeacherCode) => {
-    if (!await ask(`确定要删除${codeName} ${teacherCode.code} 吗？`)) return
+  const handleRevoke = async (teacherCode: TeacherCode) => {
+    if (!await ask(`确定要撤销${codeName} ${teacherCode.code} 吗？`)) return
 
     try {
-      setDeletingId(teacherCode.id)
+      setRevokingId(teacherCode.id)
       setError(null)
       const response = await apiClient.delete(`/teacher-codes/${teacherCode.id}`)
       if (response.code === 0) {
-        if (training) {
-          if (codes.length === 1 && page > 1) setPage(current => current - 1)
-          else await fetchCodes()
-        } else setCodes(current => current.filter(item => item.id !== teacherCode.id))
+        setCodes(current => current.map(item => item.id === teacherCode.id ? {...item,isActive:false} : item))
       } else {
-        setError(response.message || '删除教师码失败')
+        setError(response.message || '撤销教师码失败')
       }
     } catch (operationError: any) {
-      setError(operationError.message || '删除教师码失败')
+      setError(operationError.message || '撤销教师码失败')
     } finally {
-      setDeletingId(null)
+      setRevokingId(null)
     }
   }
 
@@ -141,7 +138,7 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
   }
 
   const formatDate = (value: string) => new Date(value).toLocaleString('zh-CN', {year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false})
-  const codeState = (code: TeacherCode) => code.usedCount >= code.maxUses ? '已用完' : code.expiresAt && new Date(code.expiresAt).getTime() <= now ? '已过期' : !code.isActive ? '已失效' : '可使用'
+  const codeState = (code: TeacherCode) => code.usedCount >= code.maxUses ? '已用完' : !code.isActive ? '已失效' : code.expiresAt && new Date(code.expiresAt).getTime() <= now ? '已过期' : '可使用'
   const accountTermLabel = (code: TeacherCode) => code.accountValidityDays == null ? '注册后 1 年' : `注册后 ${code.accountValidityDays} 天`
 
   if (training) return (
@@ -150,8 +147,8 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
       <div className="training-code-toolbar">
         <p>共 {total} 个注册码 <span>· 新码限注册 1 个账号</span></p>
         <div>
-          <button type="button" className="training-accounts-secondary" aria-label="刷新注册码" disabled={loading || creating || Boolean(deletingId)} onClick={() => void fetchCodes()}><RefreshCw size={15}/></button>
-          <button type="button" className="training-code-primary" disabled={Boolean(deletingId)} aria-expanded={formOpen} aria-controls="training-code-create" onClick={() => {setFormOpen(!formOpen); setError(null)}}><Plus size={15}/>生成注册码</button>
+          <button type="button" className="training-accounts-secondary" aria-label="刷新注册码" disabled={loading || creating || Boolean(revokingId)} onClick={() => void fetchCodes()}><RefreshCw size={15}/></button>
+          <button type="button" className="training-code-primary" disabled={Boolean(revokingId)} aria-expanded={formOpen} aria-controls="training-code-create" onClick={() => {setFormOpen(!formOpen); setError(null)}}><Plus size={15}/>生成注册码</button>
         </div>
       </div>
       <form className="training-code-search" onSubmit={event=>{event.preventDefault();if(page===1&&appliedKeyword===keyword.trim())void fetchCodes();else {setPage(1);setLoadedPage(null);setAppliedKeyword(keyword.trim())}}}>
@@ -186,10 +183,10 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
         return <article className="training-code-card" key={code.id} aria-label={`培训师注册码 ${code.code}`}>
           <div className="training-code-card-heading"><code>{code.code}</code><span className={`training-code-status${status === '可使用' ? ' is-usable' : ''}`}>{status}</span><button type="button" className="training-code-icon" aria-label={`复制培训师注册码 ${code.code}`} title="复制注册码" onClick={() => void copyCode(code.code)}><Copy size={16}/></button></div>
           <dl className="training-code-terms"><div><dt>注册截止</dt><dd>{code.expiresAt ? formatDate(code.expiresAt) : '不限时间'}</dd></div><div><dt>账号期限</dt><dd>{accountTermLabel(code)}</dd></div></dl>
-          <details className="training-code-details"><summary>详情与管理<ChevronDown size={14}/><span>已用 {code.usedCount}/{code.maxUses}</span></summary><dl><div><dt>创建者</dt><dd>{code.creator?.nickname || code.creator?.username || '—'}</dd></div><div><dt>创建时间</dt><dd>{formatDate(code.createdAt)}</dd></div><div><dt>使用次数</dt><dd>{code.usedCount} / {code.maxUses}</dd></div></dl><button type="button" className="training-code-delete" aria-label={`删除培训师注册码 ${code.code}`} disabled={loading || creating || Boolean(deletingId)} onClick={() => void handleDelete(code)}><Trash2 size={14}/>删除注册码</button></details>
+          <details className="training-code-details"><summary>详情与管理<ChevronDown size={14}/><span>已用 {code.usedCount}/{code.maxUses}</span></summary><dl><div><dt>创建者</dt><dd>{code.creator?.nickname || code.creator?.username || '—'}</dd></div><div><dt>创建时间</dt><dd>{formatDate(code.createdAt)}</dd></div><div><dt>使用次数</dt><dd>{code.usedCount} / {code.maxUses}</dd></div></dl><button type="button" className="training-code-delete" aria-label={`撤销培训师注册码 ${code.code}`} disabled={!code.isActive || loading || creating || Boolean(revokingId)} onClick={() => void handleRevoke(code)}><Ban size={14}/>撤销注册码</button></details>
         </article>
       })}</div>}
-      {total > 20 && <div className="training-accounts-pagination"><p>共 {total} 个注册码 · 第 {page} / {Math.max(1, Math.ceil(total / 20))} 页</p><div><button type="button" disabled={page <= 1 || loading || creating || Boolean(deletingId)} onClick={() => setPage(current => current - 1)}>上一页</button><button type="button" disabled={page >= Math.ceil(total / 20) || loading || creating || Boolean(deletingId)} onClick={() => setPage(current => current + 1)}>下一页</button></div></div>}
+      {total > 20 && <div className="training-accounts-pagination"><p>共 {total} 个注册码 · 第 {page} / {Math.max(1, Math.ceil(total / 20))} 页</p><div><button type="button" disabled={page <= 1 || loading || creating || Boolean(revokingId)} onClick={() => setPage(current => current - 1)}>上一页</button><button type="button" disabled={page >= Math.ceil(total / 20) || loading || creating || Boolean(revokingId)} onClick={() => setPage(current => current + 1)}>下一页</button></div></div>}
     </section>
   )
 
@@ -271,13 +268,13 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
                   </span>
                   <button
                     type="button"
-                    onClick={() => void handleDelete(code)}
-                    disabled={deletingId === code.id}
+                    onClick={() => void handleRevoke(code)}
+                    disabled={!code.isActive || revokingId === code.id}
                     className="rounded p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
-                    aria-label={`删除${codeName} ${code.code}`}
-                    title={`删除${codeName}`}
+                    aria-label={`撤销${codeName} ${code.code}`}
+                    title={`撤销${codeName}`}
                   >
-                    <Trash2 className="h-4 w-4" aria-hidden="true" />
+                    <Ban className="h-4 w-4" aria-hidden="true" />
                   </button>
                 </div>
               </article>

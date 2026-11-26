@@ -8,10 +8,15 @@ import { hashPassword } from '../../utils/password'
 import { generateToken } from '../../utils/jwt'
 import { authenticate, authenticateSurvey } from '../../middleware/auth'
 import { csrfProtection } from '../../middleware/csrf'
+import { surveyAuthRouter } from '../../modules/survey/auth.routes'
 import { surveyProjectsRouter } from '../../modules/survey/projects.routes'
 import { issueSurveyCsrfToken } from '../../utils/authCookies'
 import { isActiveResearcher } from '../../modules/survey/authority'
-import { inviteResearcher, redeemResearcherInvite, authorizeAdmin, invitePasswordReset, resetResearcherMfa, updateResearcherStatus, revokeResearcherPermanently } from '../../modules/survey/governance.service'
+import {
+  inviteResearcher, redeemResearcherInvite, authorizeAdmin, invitePasswordReset, redeemPasswordReset,
+  inviteResearcherMfaRebind, redeemResearcherMfaRebind, revokeInvite,
+  updateResearcherStatus, revokeResearcherPermanently,
+} from '../../modules/survey/governance.service'
 import {
   startSurveyMfaEnrollment, completeSurveyMfa, totpAt, verifySurveyTotpStepUp,
 } from '../../modules/survey/mfa.service'
@@ -50,7 +55,7 @@ const jwt=(uid:string,tokenVersion=0)=>generateToken({
 })
 const http=async(path:string,opts:RequestInit={})=>{
   const r=await fetch(base+path,opts)
-  return {status:r.status,data:await r.json()}
+  return {status:r.status,data:await r.json(),cookies:r.headers.getSetCookie()}
 }
 suite('Survey realm, TOTP and project ACL — isolated PostgreSQL',()=>{
   beforeAll(async()=>{
@@ -70,6 +75,7 @@ suite('Survey realm, TOTP and project ACL — isolated PostgreSQL',()=>{
     app.get('/api/survey/auth/csrf',(req,res)=>res.json({code:0,data:{csrfToken:issueSurveyCsrfToken(req,res)}}))
     app.get('/api/legacy-check',authenticate,(_req,res)=>res.json({code:0}))
     app.get('/api/survey-check',authenticateSurvey,(_req,res)=>res.json({code:0}))
+    app.use('/api/survey/auth',surveyAuthRouter)
     app.use('/api/survey/projects',surveyProjectsRouter)
     server=createServer(app)
     await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve))
@@ -143,7 +149,7 @@ suite('Survey realm, TOTP and project ACL — isolated PostgreSQL',()=>{
     await updateResearcherStatus(adminId,userId,'SUSPENDED')
     expect(await isActiveResearcher(userId)).toBe(false)
     await expect(invitePasswordReset(adminId,userId)).rejects.toThrow()
-    await expect(resetResearcherMfa(adminId,userId)).rejects.toThrow()
+    await expect(inviteResearcherMfaRebind(adminId,userId,'independent identity verification')).rejects.toThrow()
     const resumed=await updateResearcherStatus(adminId,userId,'ACTIVE')
     expect(resumed.status).toBe('ACTIVE')
     expect(await isActiveResearcher(userId)).toBe(true)
@@ -157,6 +163,59 @@ suite('Survey realm, TOTP and project ACL — isolated PostgreSQL',()=>{
     expect(pending.status).toBe('PENDING_MFA')
     expect(await isActiveResearcher(a.userId)).toBe(false)
     await expect(invitePasswordReset(adminId,a.userId)).resolves.toMatchObject({kind:'PASSWORD_RESET'})
+  })
+
+  it('keeps password-only reset and identity-verified MFA rebind separate',async()=>{
+    const login='svrecover_'+randomUUID().slice(0,8)
+    const initial=await inviteResearcher(adminId)
+    const initialClaim=requestStub()
+    await redeemResearcherInvite(initialClaim.req,initialClaim.res,initial.token,login,asPassword)
+    const account=await db.surveyAccount.findUniqueOrThrow({where:{normalizedLogin:login}})
+    const user=account.userId
+    const challenge=rawChallenge(initialClaim.cookies)
+    const setup=await startSurveyMfaEnrollment(challenge)
+    const secret=new URL(setup!.otpauthUri).searchParams.get('secret')!
+    const code=totpAt(secretFromBase32(secret),Math.floor(Date.now()/30000))
+    await completeSurveyMfa(challenge,code,'ENROLL')
+    const oldCredential=await db.surveyMfaCredential.findUniqueOrThrow({where:{userId:user}})
+    const stale=await invitePasswordReset(adminId,user)
+    await revokeInvite(adminId,stale.id)
+    await expect(redeemPasswordReset(stale.token,'NewResearcherPassword42')).rejects.toThrow()
+
+    const reset=await invitePasswordReset(adminId,user)
+    expect(reset.expiresAt.getTime()-Date.now()).toBeLessThanOrEqual(15*60_000)
+    await expect(redeemResearcherMfaRebind(initialClaim.req,initialClaim.res,reset.token,asPassword)).rejects.toThrow()
+    const csrf=(await http('/api/survey/auth/csrf')).data.data.csrfToken as string
+    const redeem=(path:string,token:string,password:string)=>http('/api/survey/auth/'+path,{
+      method:'POST',headers:{Cookie:'huisurvey_research_csrf='+csrf,'X-CSRF-Token':csrf,'Content-Type':'application/json'},
+      body:JSON.stringify({token,password}),
+    })
+    const resetReply=await redeem('reset-password',reset.token,'NewResearcherPassword42')
+    expect(resetReply.status).toBe(200)
+    expect(resetReply.data.data).toEqual({changed:true})
+    expect(resetReply.cookies.some(cookie=>cookie.startsWith('huisurvey_mfa_pending='))).toBe(false)
+    expect(await db.surveyMfaCredential.findUnique({where:{userId:user}})).toEqual(oldCredential)
+    expect(await db.surveyMfaRecoveryCode.count({where:{userId:user}})).toBe(10)
+    expect(await isActiveResearcher(user)).toBe(true)
+    await expect(redeemPasswordReset(reset.token,'AnotherPassword42')).rejects.toThrow()
+
+    const rebind=await inviteResearcherMfaRebind(adminId,user,'Pre-verified contact confirmed')
+    expect(await db.surveyMfaCredential.findUnique({where:{userId:user}})).toEqual(oldCredential)
+    await expect(redeemPasswordReset(rebind.token,'AnotherPassword42')).rejects.toThrow()
+    expect((await redeem('rebind-mfa',rebind.token,asPassword)).status).toBe(403)
+    const rebindReply=await redeem('rebind-mfa',rebind.token,'NewResearcherPassword42')
+    expect(rebindReply.status).toBe(200)
+    expect(rebindReply.data.data).toEqual({mfaRequired:true,enrolled:false})
+    expect((await redeem('rebind-mfa',rebind.token,'NewResearcherPassword42')).status).toBe(403)
+    expect(await db.surveyMfaCredential.findUnique({where:{userId:user}})).toBeNull()
+    expect(await db.surveyMfaRecoveryCode.count({where:{userId:user}})).toBe(0)
+    expect(await isActiveResearcher(user)).toBe(false)
+    const newChallenge=rawChallenge(rebindReply.cookies)
+    const newSetup=await startSurveyMfaEnrollment(newChallenge)
+    const newSecret=new URL(newSetup!.otpauthUri).searchParams.get('secret')!
+    const newCode=totpAt(secretFromBase32(newSecret),Math.floor(Date.now()/30000))
+    expect((await completeSurveyMfa(newChallenge,newCode,'ENROLL'))?.recoveryCodes).toHaveLength(10)
+    expect(await isActiveResearcher(user)).toBe(true)
   })
 
   it('permanently revokes the researcher grant, records audit and forbids restore',async()=>{

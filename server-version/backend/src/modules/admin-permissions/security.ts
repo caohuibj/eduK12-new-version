@@ -13,6 +13,7 @@ export { ADMIN_SESSION_SECONDS, ADMIN_STEP_UP_SECONDS, needsAdminKey, validAdmin
 
 const challengeCookie = 'eduk12_admin_challenge'
 export const adminSecretHash = (value: string) => createHash('sha256').update(value).digest('hex')
+export const adminRequiresTotp = () => process.env.ADMIN_REQUIRE_TOTP === 'true'
 export type AdminAuthenticationMethod = 'TOTP' | 'SECURITY_KEY'
 export function adminAuthOrigin() {
   const origin = process.env.ADMIN_AUTH_ORIGIN || process.env.ADMIN_WEBAUTHN_ORIGIN
@@ -62,6 +63,8 @@ export async function beginAdminLogin(req: Request, res: Response, userId: strin
   const principal = authenticatedPrincipal ?? await loadCurrentPrincipal(userId)
   if (!principal || principal.userId!==userId || inactiveAccountMessage(principal) || !['LEGACY', 'TRAINING'].includes(principal.accountDomain) || !needsAdminKey(principal))
     throw new AdminPermissionError(403, '管理账号不可用')
+  if (adminRequiresTotp() && method === 'SECURITY_KEY')
+    throw new AdminPermissionError(403, '管理员登录和操作验证使用 Authenticator 动态码')
   if (method !== 'SECURITY_KEY') {
     const enrolled = await prisma.adminTotpCredential.findUnique({ where: { userId }, select: { userId: true } })
     if (enrolled) {
@@ -69,7 +72,7 @@ export async function beginAdminLogin(req: Request, res: Response, userId: strin
         purpose: sessionId ? 'TOTP_STEP_UP' : 'TOTP_LOGIN', sessionId })
       return { adminTotpRequired: true as const }
     }
-    if (method === 'TOTP') throw new AdminPermissionError(403, '请先使用受控登记票据绑定 Authenticator')
+    if (method === 'TOTP' || adminRequiresTotp()) throw new AdminPermissionError(403, '请先使用受控登记票据绑定 Authenticator')
   }
   const { rpID } = adminWebAuthnConfig()
   const keys = await prisma.adminSecurityKey.findMany({ where: { userId } })
@@ -112,6 +115,7 @@ export async function issueAdminSession(req: Request, res: Response, userId: str
 }
 
 export async function finishAdminAuthentication(req: Request, res: Response, response: AuthenticationResponseJSON, sessionId?: string) {
+  if (adminRequiresTotp()) throw new AdminPermissionError(403, '请使用 Authenticator 动态码')
   const { origin, rpID } = adminWebAuthnConfig()
   const challenge = await consumeChallenge(req, sessionId ? ['STEP_UP'] : ['LOGIN'])
   if ((sessionId && (challenge.sessionId !== sessionId || challenge.userId !== req.user?.userId)) || (!sessionId && challenge.sessionId))
@@ -142,7 +146,7 @@ export async function beginAdminRegistration(req: Request, res: Response, userId
   const principal = await loadCurrentPrincipal(userId)
   const ticket = await prisma.adminSecurityChallenge.findUnique({ where: { idHash: adminSecretHash(enrollmentToken) } })
   if (!principal || inactiveAccountMessage(principal) || !needsAdminKey(principal)
-    || !ticket || ticket.purpose !== 'ENROLLMENT' || ticket.userId !== userId || ticket.expiresAt <= new Date()
+    || !ticket || ticket.purpose !== 'ENROLLMENT' || ticket.challenge !== '' || ticket.userId !== userId || ticket.expiresAt <= new Date()
     || ticket.tokenVersion !== principal.tokenVersion) throw new AdminPermissionError(403, '受控登记票据无效')
   const keys = await prisma.adminSecurityKey.findMany({ where: { userId } })
   if (keys.length >= 3) throw new AdminPermissionError(409, '安全密钥数量已达上限')
@@ -169,7 +173,7 @@ export async function finishAdminRegistration(req: Request, response: Registrati
   await prisma.$transaction(async tx => {
     const [current] = await tx.$queryRaw<Array<{ tokenVersion: number }>>`SELECT "token_version" AS "tokenVersion" FROM "users" WHERE "id"=${challenge.userId} FOR UPDATE`
     if (current?.tokenVersion !== challenge.tokenVersion || !challenge.enrollmentHash) throw new AdminPermissionError(403, '账号状态已变化')
-    const ticket = await tx.adminSecurityChallenge.deleteMany({ where: { idHash: challenge.enrollmentHash, purpose: 'ENROLLMENT',
+    const ticket = await tx.adminSecurityChallenge.deleteMany({ where: { idHash: challenge.enrollmentHash, purpose: 'ENROLLMENT', challenge: '',
       userId: challenge.userId, tokenVersion: challenge.tokenVersion, expiresAt: { gt: new Date() } } })
     if (ticket.count !== 1) throw new AdminPermissionError(403, '登记票据已失效或已使用')
     const count = await tx.adminSecurityKey.count({ where: { userId: challenge.userId } })

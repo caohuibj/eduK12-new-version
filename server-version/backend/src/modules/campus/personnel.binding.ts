@@ -1,7 +1,8 @@
 import {createCipheriv,createDecipheriv,createHmac,randomBytes,randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {CampusAdmissionError} from './admission.error'
-import {resolveOrganizationAccessContext} from '../organization/access'
+import {assertPersonnelGovernor} from '../education-roster/personnel-governance'
+export {assertPersonnelGovernor} from '../education-roster/personnel-governance'
 import {assertCurrentMembershipPersona} from '../organization/classRelationships'
 
 type Tx=Prisma.TransactionClient
@@ -31,12 +32,6 @@ const selection=Prisma.sql`id,organization_id AS "organizationId",kind,persona,c
 export async function personnelById(tx:Tx,org:string,id:string){
  const rows=await tx.$queryRaw<PersonnelRow[]>(Prisma.sql`SELECT ${selection} FROM campus_personnel WHERE organization_id=${org} AND id=${id} FOR UPDATE`)
  return rows[0]??personnelFail('PERSONNEL_NOT_FOUND',404)
-}
-export async function assertPersonnelGovernor(tx:Tx,actor:{userId:string;accountDomain?:string;platformRole:any},org:string){
- if(actor.accountDomain!=='SCHOOL')personnelFail('CAMPUS_GOVERNANCE_REQUIRED',403)
- const [ctx,user]=await Promise.all([resolveOrganizationAccessContext({principal:actor,organizationId:org},tx),tx.user.findUnique({where:{id:actor.userId},select:{isActive:true,isFrozen:true,expiresAt:true,accountDomain:true}})])
- if(!ctx||ctx.productDomain!=='SCHOOL'||ctx.organizationStatus!=='ACTIVE'||!ctx.membershipId||ctx.orgRole!=='ORG_ADMIN'||!ctx.canGovern||!user||user.accountDomain!=='SCHOOL'||!user.isActive||user.isFrozen||(user.expiresAt&&user.expiresAt<=new Date()))personnelFail('CAMPUS_GOVERNANCE_REQUIRED',403)
- return ctx!
 }
 /** A credential is person-bound even when redeemed through the old routes.
  * Old generic class codes cannot claim imported eligibilities. */

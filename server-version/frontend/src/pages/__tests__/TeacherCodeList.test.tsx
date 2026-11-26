@@ -41,17 +41,18 @@ describe('TeacherCodeList management actions', () => {
     mockDelete.mockResolvedValue({ code: 0, data: {} })
   })
 
-  it('connects the visible delete action to the existing teacher-code delete endpoint', async () => {
+  it('revokes through the existing endpoint and retains the code row', async () => {
     const user = userEvent.setup()
     render(<TeacherCodeList />)
 
     expect(await screen.findByText('ABC123')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: '删除教师码 ABC123' }))
+    await user.click(screen.getByRole('button', { name: '撤销教师码 ABC123' }))
     expect(screen.getByRole('dialog', { name: '确认操作' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '确认' }))
 
     expect(mockDelete).toHaveBeenCalledWith('/teacher-codes/code-1')
-    expect(screen.queryByText('ABC123')).not.toBeInTheDocument()
+    expect(screen.getByText('ABC123')).toBeInTheDocument()
+    expect(screen.getByText('已失效')).toBeInTheDocument()
   })
 })
 
@@ -121,14 +122,15 @@ describe('Training registration code pagination', () => {
     await screen.findByText('FIRST234')
     expect(mockGet).toHaveBeenLastCalledWith('/teacher-codes', {params: {page: 1, pageSize: 20}})
   })
-  it('returns to the previous page after deleting the last row on a later page', async () => {
+  it('keeps the revoked code as an inactive record on the current page', async () => {
     const user = userEvent.setup(); render(<TeacherCodeList training/>)
     await screen.findByText('FIRST234'); await user.click(screen.getByRole('button', {name: '下一页'})); await screen.findByText('SECOND234')
     await user.click(screen.getByText('详情与管理'))
-    await user.click(screen.getByRole('button', {name: '删除培训师注册码 SECOND234'})); await user.click(screen.getByRole('button', {name: '确认'}))
-    await screen.findByText('FIRST234')
+    await user.click(screen.getByRole('button', {name: '撤销培训师注册码 SECOND234'})); await user.click(screen.getByRole('button', {name: '确认'}))
+    expect(await screen.findByText('已失效')).toBeInTheDocument()
+    expect(screen.getByText('SECOND234')).toBeInTheDocument()
     expect(mockDelete).toHaveBeenCalledWith('/teacher-codes/SECOND234')
-    expect(mockGet).toHaveBeenLastCalledWith('/teacher-codes', {params: {page: 1, pageSize: 20}})
+    expect(mockGet).toHaveBeenLastCalledWith('/teacher-codes', {params: {page: 2, pageSize: 20}})
   })
   it('hides the previous page after a page request fails and refreshes the requested page', async () => {
     const user = userEvent.setup(); render(<TeacherCodeList training/>)

@@ -16,6 +16,7 @@ import {
   revokeTeachingAssessmentDelivery,
 } from './classRelationships'
 import { OrganizationDomainError } from './types'
+import { CampusAdmissionError } from '../campus/admission.error'
 import { createClassificationDimension, createOrganizationLabel, assignOrganizationLabel, endOrganizationLabelAssignment, createCounselorClientRelationship, endCounselorClientRelationship } from './classificationRelations'
 
 const unitSchema = z.object({
@@ -41,6 +42,9 @@ const deliveryGrantSchema = z.object({
 })
 
 function sendDomainError(res: Response, err: unknown) {
+  if (err instanceof CampusAdmissionError && err.code === 'CAMPUS_GOVERNANCE_REQUIRED') {
+    return res.status(err.statusCode).json({ code: err.code, message: '需要当前学校的 School 人员管理授权', data: null })
+  }
   if (err instanceof OrganizationDomainError) {
     return res.status(err.statusCode).json({ code: err.code, message: err.message, data: null })
   }
@@ -244,6 +248,7 @@ export const organizationAdminController = {
     try {
       return success(res, await assignStudentToClass({
         organizationId: req.params.organizationId,
+        actor: req.user!,
         ...parsed.data,
       }))
     } catch (err) {
@@ -255,6 +260,7 @@ export const organizationAdminController = {
     try {
       return success(res, await endStudentClassAssignment({
         organizationId: req.params.organizationId,
+        actor: req.user!,
         assignmentId: req.params.assignmentId,
       }))
     } catch (err) {
@@ -294,6 +300,7 @@ export const organizationAdminController = {
     try {
       return success(res, await assignStaffToClass({
         organizationId: req.params.organizationId,
+        actor: req.user!,
         ...parsed.data,
       }))
     } catch (err) {
@@ -305,6 +312,7 @@ export const organizationAdminController = {
     try {
       return success(res, await endStaffClassAssignment({
         organizationId: req.params.organizationId,
+        actor: req.user!,
         assignmentId: req.params.assignmentId,
       }))
     } catch (err) {

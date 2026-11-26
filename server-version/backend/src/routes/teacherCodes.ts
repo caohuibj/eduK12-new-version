@@ -19,7 +19,7 @@ const teacherCodeVerifyValueLimiter = createRedisRateLimiter({
 
 router.get('/', authenticate, requireAdmin, teacherCodeController.list)
 router.post('/', authenticate, requireAdmin, teacherCodeController.create)
-router.delete('/:id', authenticate, requireAdmin, teacherCodeController.delete)
+router.delete('/:id', authenticate, requireAdmin, teacherCodeController.revoke)
 router.post('/verify', teacherCodeVerifyIpLimiter, teacherCodeVerifyValueLimiter, teacherCodeController.verify)
 
 export default router

@@ -25,6 +25,8 @@ function errorMessage(error:unknown,fallback:string){
 function AdminKeyEnrollment(){
   const location=useLocation(),origins=productOrigins()
   const {mode}=useSurveyAppearance()
+  const activate=new URLSearchParams(location.search).get('activate')==='1'
+  const passwordLabel=activate?'设置密码':'当前密码'
   const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
   const systemEntry=isSystemLoginTarget(new URLSearchParams(location.search).get('returnTo'))
   const trainingEntry=isTrainingAdminPath(new URLSearchParams(location.search).get('returnTo')??'')
@@ -42,7 +44,7 @@ function AdminKeyEnrollment(){
     setBusy(true);setMessage('')
     try{
       await api.get('/auth/csrf')
-      if(method==='TOTP')setUri((await beginTotpEnrollment(input.username,input.password,input.enrollmentToken)).data!.otpauthUri)
+      if(method==='TOTP')setUri((await (activate?beginTotpEnrollment(input.username,input.password,input.enrollmentToken,true):beginTotpEnrollment(input.username,input.password,input.enrollmentToken))).data!.otpauthUri)
       else{await enrollSecurityKey(input.username,input.password,input.enrollmentToken);setRegistered(true);setMessage('安全密钥已登记，请前往管理员登录。')}
       setPassword('');setTicket('')
     }catch(error){setMessage(errorMessage(error,'绑定未完成'))}
@@ -88,12 +90,13 @@ function AdminKeyEnrollment(){
         <li>按浏览器提示触碰密钥，并输入密钥 PIN 或验证指纹；完成后返回管理员登录，选择硬件安全密钥。</li>
       </ol>}
     </details>}
+    {activate&&<p>请为新管理账号设置本人专用密码，至少 8 个字符，且包含字母和数字。</p>}
     <p>{method==='TOTP'
       ?'请向平台运维人员获取一次性绑定码（15 分钟内有效），然后按提示绑定手机验证器。绑定码只能使用一次。'
       :'请先向单位领取或自行准备硬件安全密钥，再向平台运维人员获取一次性绑定码。密钥需支持 FIDO2 和 PIN 或指纹验证。'}</p>
     {!registered&&!uri&&<form className="space-y-4" onInvalid={event=>{
       event.preventDefault()
-      const labels:Record<string,string>={username:'管理账号',password:'当前密码',enrollmentToken:'一次性绑定码'}
+      const labels:Record<string,string>={username:'管理账号',password:passwordLabel,enrollmentToken:'一次性绑定码'}
       const missing=Array.from(event.currentTarget.querySelectorAll('input')).filter(input=>input.validity.valueMissing).map(input=>labels[input.name]).filter(Boolean)
       setMessage(`请填写${missing.join('、')||'所有必填项'}后再${method==='TOTP'?'生成绑定二维码':'登记安全密钥'}。`)
     }} onSubmit={event=>{
@@ -103,10 +106,10 @@ function AdminKeyEnrollment(){
       void setup({username:String(values.get('username')||''),password:String(values.get('password')||''),enrollmentToken:String(values.get('enrollmentToken')||'')})
     }}>
       <label>验证方式<select className="input" value={method} disabled={busy} onChange={e=>{setMethod(e.target.value as typeof method);setMessage('')}}>
-        <option value="TOTP">Authenticator 动态码</option><option value="SECURITY_KEY">硬件安全密钥（需自备）</option>
+        <option value="TOTP">Authenticator 动态码</option>{!activate&&<option value="SECURITY_KEY">硬件安全密钥（需自备）</option>}
       </select></label>
       <label>管理账号<input name="username" className="input" value={username} autoComplete="username" required disabled={busy} onChange={e=>setUsername(e.target.value)}/></label>
-      <label>当前密码<input name="password" className="input" type="password" autoComplete="current-password" required value={password} disabled={busy} onChange={e=>setPassword(e.target.value)}/></label>
+      <label>{passwordLabel}<input name="password" className="input" type="password" autoComplete={activate?"new-password":"current-password"} required value={password} disabled={busy} onChange={e=>setPassword(e.target.value)}/></label>
       <label>一次性绑定码<input name="enrollmentToken" className="input" type="password" autoComplete="off" required value={ticket} disabled={busy} onChange={e=>setTicket(e.target.value)}/></label>
       <button className="btn-primary" type="submit" disabled={busy}>{busy?'正在准备…':method==='TOTP'?'生成绑定二维码':'登记安全密钥'}</button>
     </form>}

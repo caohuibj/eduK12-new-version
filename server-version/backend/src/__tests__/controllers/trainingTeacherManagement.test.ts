@@ -9,7 +9,7 @@ import {trainingTeacherManagement} from '../../controllers/trainingTeacherManage
 const actor={id:'actor',username:'admin',role:'STUDENT',platformRole:'STANDARD',accountDomain:'TRAINING',isActive:true,isFrozen:false,expiresAt:null,tokenVersion:4,updatedAt:new Date('2026-10-24T00:00:00Z')}
 const teacher={...actor,id:'teacher',username:'trainer',role:'TEACHER',tokenVersion:2,expiresAt:new Date('2020-01-01T00:00:00Z')}
 let rows:any[],protectedTarget:boolean
-const command=(action:TrainingTeacherCommand['action']='EXTEND'):TrainingTeacherCommand=>({actorUserId:'actor',targetUserId:'teacher',actorSession:{tokenVersion:4,adminSessionId:'verified',adminVerifiedAt:Date.now()/1000},expectedUpdatedAt:teacher.updatedAt.toISOString(),action,months:3})
+const command=(action:TrainingTeacherCommand['action']='EXTEND'):TrainingTeacherCommand=>({actorUserId:'actor',targetUserId:'teacher',actorSession:{tokenVersion:4,adminSessionId:'verified',adminVerifiedAt:Date.now()/1000},expectedUpdatedAt:teacher.updatedAt.toISOString(),action,months:3,reason:'培训师本人核验通过'})
 const response=()=>{const res:any={statusCode:200};res.setHeader=vi.fn();res.status=(status:number)=>{res.statusCode=status;return res};res.json=(body:any)=>{res.body=body;return res};return res}
 beforeEach(()=>{
  vi.clearAllMocks();vi.useFakeTimers();vi.setSystemTime(new Date('2026-10-24T03:00:00Z'));rows=[{...actor},{...teacher}];protectedTarget=false;entry.mockResolvedValue(undefined)
@@ -49,13 +49,16 @@ describe('Training teacher management account boundaries',()=>{
  })
  it('freezes and invalidates old sessions without changing expiry or course data',async()=>{
   await manageTrainingTeacher(command('FREEZE'));expect(db.user.update.mock.calls[0][0].data).toEqual({isFrozen:true,tokenVersion:{increment:1}})
-  expect(db.adminAuthorizationAudit.create.mock.calls[0][0].data.action).toBe('TRAINING_TEACHER_FREEZE')
+  expect(db.adminAuthorizationAudit.create.mock.calls[0][0].data).toMatchObject({
+    action:'TRAINING_TEACHER_FREEZE',reason:'培训师本人核验通过',
+  })
  })
  it('unfreezes without automatically renewing or approving the account',async()=>{
   rows[1].isFrozen=true;await manageTrainingTeacher(command('UNFREEZE'));expect(db.user.update.mock.calls[0][0].data).toEqual({isFrozen:false,tokenVersion:{increment:1}})
  })
  it('resets password, requires a change, invalidates sessions and never audits the secret',async()=>{
   await manageTrainingTeacher({...command('RESET_PASSWORD'),passwordHash:'synthetic-hash'});expect(db.user.update.mock.calls[0][0].data).toEqual({passwordHash:'synthetic-hash',mustChangePassword:true,tokenVersion:{increment:1}})
+  expect(db.adminAuthorizationAudit.create.mock.calls[0][0].data.reason).toBe('培训师本人核验通过')
   expect(JSON.stringify(db.adminAuthorizationAudit.create.mock.calls)).not.toContain('synthetic-hash')
  })
  it('keeps a permanent account permanent',async()=>{
@@ -67,12 +70,16 @@ describe('Training teacher management controller',()=>{
  it.each([{action:'EXTEND',months:-1},{action:'FREEZE',passwordHash:'attacker'},{action:'RESET_PASSWORD',temporaryPassword:'attacker'}])('rejects invalid or client-supplied credentials %j',async body=>{
   const res=response();await trainingTeacherManagement(request({...body,expectedUpdatedAt:teacher.updatedAt.toISOString()}),res);expect(res.statusCode).toBe(400);expect(db.user.update).not.toHaveBeenCalled()
  })
+ it.each(['FREEZE','RESET_PASSWORD'])('requires a reason for %s before writing',async action=>{
+  const res=response();await trainingTeacherManagement(request({action,expectedUpdatedAt:teacher.updatedAt.toISOString(),reason:' '}),res)
+  expect(res.statusCode).toBe(400);expect(generate).not.toHaveBeenCalled();expect(db.user.update).not.toHaveBeenCalled()
+ })
  it('delivers a random temporary password once with no-store headers',async()=>{
-  const res=response();await trainingTeacherManagement(request({action:'RESET_PASSWORD',expectedUpdatedAt:teacher.updatedAt.toISOString()}),res)
+  const res=response();await trainingTeacherManagement(request({action:'RESET_PASSWORD',expectedUpdatedAt:teacher.updatedAt.toISOString(),reason:'培训师本人核验通过'}),res)
   expect(res.statusCode).toBe(200);expect(res.setHeader).toHaveBeenCalledWith('Cache-Control','private, no-store, max-age=0');expect(res.body.data.temporaryPassword).toBe('SyntheticTemp123');expect(hash).toHaveBeenCalledWith('SyntheticTemp123')
  })
  it('rejects unauthorized reset before password generation or hashing',async()=>{
-  entry.mockRejectedValue(new AdminPermissionError(403,'缺少当前入口管理授权'));const res=response();await trainingTeacherManagement(request({action:'RESET_PASSWORD',expectedUpdatedAt:teacher.updatedAt.toISOString()}),res)
+  entry.mockRejectedValue(new AdminPermissionError(403,'缺少当前入口管理授权'));const res=response();await trainingTeacherManagement(request({action:'RESET_PASSWORD',expectedUpdatedAt:teacher.updatedAt.toISOString(),reason:'培训师本人核验通过'}),res)
   expect(res.statusCode).toBe(403);expect(generate).not.toHaveBeenCalled();expect(hash).not.toHaveBeenCalled()
  })
 })

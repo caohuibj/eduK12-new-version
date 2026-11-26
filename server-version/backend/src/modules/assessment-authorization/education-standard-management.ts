@@ -87,21 +87,24 @@ export async function educationStandardManagementGrants(actorId:string,scope:Edu
  id.parse(combinationId)
  return prisma.$transaction(async tx=>{
   await assertEducationConfigurationManager(tx,actorId,scope)
-  const rows=await tx.$queryRaw<Array<{id:string;userId:string;username:string;version:number;revokedAt:Date|null;validFrom:Date;expiresAt:Date;metadata:unknown}>>(Prisma.sql`
-   SELECT g.id,g.subject_id AS "userId",u.username,g.version,g.revoked_at AS "revokedAt",g.valid_from AS "validFrom",g.expires_at AS "expiresAt",e.metadata
+  const rows=await tx.$queryRaw<Array<{id:string;issuerId:string;userId:string;username:string;version:number;revokedAt:Date|null;validFrom:Date;expiresAt:Date;metadata:unknown}>>(Prisma.sql`
+   SELECT g.id,g.issuer_id AS "issuerId",g.subject_id AS "userId",u.username,g.version,g.revoked_at AS "revokedAt",g.valid_from AS "validFrom",g.expires_at AS "expiresAt",e.metadata
    FROM content_capability_grants g JOIN users u ON u.id=g.subject_id JOIN assessment_management_events e ON e.id=g.id AND e.action=${EDUCATION_STANDARD_USE_ACTION}
-   WHERE g.issuer_id=${actorId} AND g.product=${scope.product} AND g.scope_kind='ORGANIZATION' AND g.scope_id=${scope.organizationId}
-    AND e.actor_id=${actorId} AND e.resource_id=${combinationId} ${input.userId?Prisma.sql`AND g.subject_id=${input.userId}`:Prisma.empty}
+   WHERE g.product=${scope.product} AND g.scope_kind='ORGANIZATION' AND g.scope_id=${scope.organizationId}
+    AND e.actor_id=g.issuer_id AND e.resource_id=${combinationId}
+    AND (g.issuer_id=${actorId} OR EXISTS(
+      ${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`e.metadata#>>'{selectedBinding,binding,configuration,measurement,releaseId}'`)}
+    )) ${input.userId?Prisma.sql`AND g.subject_id=${input.userId}`:Prisma.empty}
     ${input.requestId?Prisma.sql`AND g.id=${input.requestId}`:Prisma.empty}
    ORDER BY g.created_at,g.id LIMIT ${size+1} OFFSET ${(input.page-1)*size}`)
   return {page:input.page,hasMore:rows.length>size,list:rows.slice(0,size).map(row=>{
    const metadata=educationStandardUseMetadata.parse(row.metadata),stored=readSelectedConfigurationBinding(metadata.selectedBinding)
    if(!stored)throw new AdminPermissionError(409,'精确配置审计身份不完整')
    const configuration=stored.binding.configuration,resourceKey=configuration.kind==='STANDARD_COMBINATION'?`education-source:STANDARD_SCALE:${combinationId}:${configuration.combinationHash}`:`education-source:COGNITIVE_PROFILE:${combinationId}:${metadata.artifactHash}`
-   const selected=readEducationStandardUseBinding(row.metadata,{id:row.id,issuerId:actorId,recipientId:row.userId,scope,resourceKey})
+   const selected=readEducationStandardUseBinding(row.metadata,{id:row.id,issuerId:row.issuerId,recipientId:row.userId,scope,resourceKey})
    return {id:row.id,userId:row.userId,username:row.username,version:row.version,revokedAt:row.revokedAt,validFrom:row.validFrom,expiresAt:row.expiresAt,
     configurationName:metadata.configurationName??null,selectedBinding:selectedConfigurationPointer(selected),configuration:selected.binding.configuration,authority:selected.binding.authorization.authority,
-    supersedes:metadata.supersedes??null,canManage:true}
+    supersedes:metadata.supersedes??null,canManage:true,canReplace:row.issuerId===actorId}
   })}
  },options)
 }
@@ -121,20 +124,20 @@ export async function educationStandardManagementOperation(actorId:string,scope:
  id.parse(combinationId);id.parse(requestId)
  return prisma.$transaction(async tx=>{
   await assertEducationConfigurationManager(tx,actorId,scope)
-  const [row]=await tx.$queryRaw<Array<{action:string;metadata:unknown;originalMetadata:unknown;grantId:string;userId:string;version:number;revokedAt:Date|null;validFrom:Date;expiresAt:Date;resourceKeys:string[]}>>(Prisma.sql`
-   SELECT e.action,e.metadata,original.metadata AS "originalMetadata",g.id AS "grantId",g.subject_id AS "userId",g.version,g.revoked_at AS "revokedAt",
+  const [row]=await tx.$queryRaw<Array<{action:string;metadata:unknown;originalMetadata:unknown;grantId:string;issuerId:string;userId:string;version:number;revokedAt:Date|null;validFrom:Date;expiresAt:Date;resourceKeys:string[]}>>(Prisma.sql`
+   SELECT e.action,e.metadata,original.metadata AS "originalMetadata",g.id AS "grantId",g.issuer_id AS "issuerId",g.subject_id AS "userId",g.version,g.revoked_at AS "revokedAt",
     g.valid_from AS "validFrom",g.expires_at AS "expiresAt",g.resource_keys AS "resourceKeys"
    FROM assessment_management_events e JOIN content_capability_grants g ON g.id=CASE WHEN e.action=${EDUCATION_STANDARD_USE_ACTION} THEN e.id ELSE e.metadata->>'grantId' END
    JOIN assessment_management_events original ON original.id=g.id AND original.action=${EDUCATION_STANDARD_USE_ACTION}
-    AND original.actor_id=${actorId} AND original.resource_id=${combinationId}
+    AND original.actor_id=g.issuer_id AND original.resource_id=${combinationId}
    WHERE e.id=${requestId} AND e.actor_id=${actorId} AND e.resource_id=${combinationId} AND e.action IN (${EDUCATION_STANDARD_USE_ACTION},${EDUCATION_STANDARD_REVOKE_ACTION})
-    AND g.issuer_id=${actorId} AND g.product=${scope.product} AND g.scope_kind='ORGANIZATION' AND g.scope_id=${scope.organizationId}
+    AND g.product=${scope.product} AND g.scope_kind='ORGANIZATION' AND g.scope_id=${scope.organizationId}
     AND g.resource_kind='material' AND g.capabilities=ARRAY['material.use']::text[] AND g.parent_grant_id IS NULL AND g.ancestry=ARRAY[g.id]::text[]
     AND g.remaining_delegation_depth=0 AND g.delegable_capabilities=ARRAY[]::text[]`)
   if(!row)return null
   if(row.resourceKeys.length!==1)throw new AdminPermissionError(409,'原精确配置审计身份不完整')
   const original=educationStandardUseMetadata.parse(row.originalMetadata),selected=readEducationStandardUseBinding(row.originalMetadata,
-   {id:row.grantId,issuerId:actorId,recipientId:row.userId,scope,resourceKey:row.resourceKeys[0]})
+   {id:row.grantId,issuerId:row.issuerId,recipientId:row.userId,scope,resourceKey:row.resourceKeys[0]})
   const {configuration,authorization}=selected.binding
   if((configuration.kind==='STANDARD_COMBINATION'?configuration.combinationId:configuration.configId)!==combinationId)throw new AdminPermissionError(409,'原配置与请求来源不一致')
   const grant={id:row.grantId,version:row.version,revokedAt:row.revokedAt}

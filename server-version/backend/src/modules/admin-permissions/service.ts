@@ -24,27 +24,46 @@ export async function assertEntryAdmin(db: Prisma.TransactionClient, userId: str
   return rows[0]
 }
 
+type LockedAdminAccount = {
+  id: string
+  tokenVersion: number
+  platformRole: string
+  accountDomain: string
+  isActive: boolean
+  isFrozen: boolean
+  expiresAt: Date | null
+  mustChangePassword: boolean
+}
+
+export async function lockAdminMutation(
+  tx: Prisma.TransactionClient,
+  input: { actorUserId: string; actorSession: AdminSessionProof },
+  targetUserId = input.actorUserId,
+): Promise<LockedAdminAccount | undefined> {
+  if (!validAdminProof(input.actorSession, ADMIN_STEP_UP_SECONDS))
+    throw new AdminPermissionError(403, '授权变更需要最近的管理员双因素验证')
+  const ids = [...new Set([input.actorUserId, targetUserId])].sort()
+  const locked = await tx.$queryRaw<LockedAdminAccount[]>`
+    SELECT "id","token_version" AS "tokenVersion","platform_role"::text AS "platformRole","account_domain" AS "accountDomain",
+      "is_active" AS "isActive","is_frozen" AS "isFrozen","expires_at" AS "expiresAt","must_change_password" AS "mustChangePassword"
+    FROM "users" WHERE "id" IN (${Prisma.join(ids)}) ORDER BY "id" FOR UPDATE`
+  const actor = locked.find(row => row.id === input.actorUserId)
+  if (!actor || actor.platformRole !== 'SYSTEM_ADMIN' || !actor.isActive || actor.isFrozen
+    || (actor.expiresAt && actor.expiresAt <= new Date()) || !['LEGACY', 'TRAINING'].includes(actor.accountDomain)
+    || actor.mustChangePassword || actor.tokenVersion !== input.actorSession.tokenVersion
+    || !validAdminProof(input.actorSession, ADMIN_STEP_UP_SECONDS))
+    throw new AdminPermissionError(403, '操作者会话已失效，请重新登录')
+  return locked.find(row => row.id === targetUserId)
+}
+
 // The caller supplies the version it actually reviewed. Retrying a committed
 // operation is idempotent; an older command cannot silently undo newer state.
 export async function changeEntryGrant(input: {
   actorUserId: string; targetUserId: string; entry: AdminEntry
   active: boolean; expectedVersion: number; reason: string; actorSession: AdminSessionProof
 }) {
-  if (!validAdminProof(input.actorSession, ADMIN_STEP_UP_SECONDS)) throw new AdminPermissionError(403, '授权变更需要最近的管理员双因素验证')
   return prisma.$transaction(async tx => {
-    // Stable user lock order serializes grants and account deactivation without
-    // a global lock. The actor is rechecked after locking, inside this mutation.
-    const ids = [...new Set([input.actorUserId, input.targetUserId])].sort()
-    const locked = await tx.$queryRaw<Array<{id:string;tokenVersion:number;platformRole:string;accountDomain:string;isActive:boolean;isFrozen:boolean;expiresAt:Date|null;mustChangePassword:boolean}>>`
-      SELECT "id","token_version" AS "tokenVersion","platform_role"::text AS "platformRole","account_domain" AS "accountDomain",
-        "is_active" AS "isActive","is_frozen" AS "isFrozen","expires_at" AS "expiresAt","must_change_password" AS "mustChangePassword"
-      FROM "users" WHERE "id" IN (${Prisma.join(ids)}) ORDER BY "id" FOR UPDATE`
-    const actor = locked.find(row=>row.id===input.actorUserId)
-    if (!actor || actor.platformRole!=='SYSTEM_ADMIN' || !actor.isActive || actor.isFrozen || (actor.expiresAt && actor.expiresAt<=new Date())
-      || !['LEGACY','TRAINING'].includes(actor.accountDomain) || actor.mustChangePassword || actor.tokenVersion !== input.actorSession.tokenVersion
-      || !validAdminProof(input.actorSession, ADMIN_STEP_UP_SECONDS))
-      throw new AdminPermissionError(403, '操作者会话已失效，请重新登录')
-    const target = locked.find(row=>row.id===input.targetUserId)
+    const target = await lockAdminMutation(tx, input, input.targetUserId)
     if (!target || !['LEGACY', 'TRAINING'].includes(target.accountDomain))
       throw new AdminPermissionError(404, '管理账号不存在或不属于管理身份域')
     if(input.active && (target.platformRole==='SYSTEM_ADMIN'||input.actorUserId===input.targetUserId))
