@@ -30,7 +30,7 @@ export function ClassroomDanmakuDisplay({classroomId,subscribe,readState,onPrese
         return queue===previous.queue?previous:{snapshot,queue}
       })
     }
-    const unavailable=()=>setDisplay(previous=>({...previous,queue:{...previous.queue,enabled:false,unavailable:true,active:[],pending:[],seen:[]}}))
+    const unavailable=()=>setDisplay(previous=>({...previous,queue:{...previous.queue,enabled:false,unavailable:true,active:[],pending:[],replay:[],seen:[]}}))
     const unsubscribe=subscribe(accept)
     void readState().then(result=>{
       if(!live)return
@@ -75,13 +75,19 @@ export function ClassroomDanmakuDisplay({classroomId,subscribe,readState,onPrese
   if(!enabled)return null
   const snapshot=display.snapshot!
   const full=mode==='DANMAKU'
+  const loop=snapshot.playback==='loop'
+  const review=snapshot.reviewMode==='review'
+  const presentationStatus=snapshot.paused?'已暂停滚动 · 恢复后继续展示有效消息'
+    :loop&&review?'循环播放 · 教师审核后上屏'
+    :loop?'循环播放':review?'教师审核后上屏':'实时展示 · 请友善表达'
   return <section className={'classroom-danmaku-display '+(full?'classroom-danmaku-display--full':'classroom-danmaku-display--compact')}
+    data-message-size={snapshot.messageSize??'standard'}
     aria-label={full?'独立弹幕大屏':'课堂弹幕展示区'}>
     <header className="classroom-danmaku-display__header">
       <div className="classroom-danmaku-display__heading">
         <span className="classroom-danmaku-display__eyebrow">{full?join?.name||'课堂互动':'课堂弹幕'}</span>
         <h2>{snapshot.topic||'说说你的想法'}</h2>
-        <p role="status">{snapshot.paused?'已暂停滚动 · 恢复后继续展示有效消息':snapshot.reviewMode==='review'?'教师审核后上屏':'实时展示 · 请友善表达'}</p>
+        <p role="status">{presentationStatus}</p>
       </div>
       {full&&<details className="classroom-danmaku-display__join"><summary>加入方式{join?' · '+join.code:''}</summary>
         {join?<div className="classroom-danmaku-display__join-content">
@@ -95,7 +101,7 @@ export function ClassroomDanmakuDisplay({classroomId,subscribe,readState,onPrese
       {Array.from({length:display.queue.trackCount},(_,lane)=>{
         const message=display.queue.active.find(item=>item.lane===lane)
         return <div key={lane} className="classroom-danmaku-display__track" data-danmaku-track={lane}>
-          {message&&<span key={message.id} className="classroom-danmaku-display__message" data-message-id={message.id}
+          {message&&<span key={`${message.id}:${message.beganAt}`} className="classroom-danmaku-display__message" data-message-id={message.id}
             style={{animationDuration:message.duration+'ms'}}>{message.text}</span>}
         </div>
       })}
@@ -104,7 +110,7 @@ export function ClassroomDanmakuDisplay({classroomId,subscribe,readState,onPrese
       </p>}
     </div>
     <footer className="classroom-danmaku-display__footer">
-      <span>{snapshot.paused?'暂停期间仍可发送，消息在有效期内展示':'高峰时优先展示近期弹幕'}</span>
+      <span>{snapshot.paused?'暂停期间仍可发送，消息在有效期内展示':loop?'有效弹幕会重复滚动，新弹幕优先':'高峰时优先展示近期弹幕'}</span>
       {display.queue.pending.length>0&&<span>待展示 {display.queue.pending.length} 条</span>}
     </footer>
   </section>

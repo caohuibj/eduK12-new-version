@@ -11,6 +11,7 @@ import apiClient from '../../api/client'
 import { Users, BookOpen, Clock } from 'lucide-react'
 import { sanitizeText } from '../../utils/sanitize'
 import { ClassroomRoundGuard, classroomRemainingTime } from '../../utils/classroomRound'
+import { useTrainingAppearance } from '../../training/appearanceContext'
 import {ClassroomDanmakuDisplay,type DanmakuPresentation} from './ClassroomDanmakuDisplay'
 import type {ClassroomDanmakuSnapshot,ClassroomDanmakuStateAck} from '../../types/classroomDanmaku'
 
@@ -42,6 +43,7 @@ interface Stats {
 
 // Classroom labels are displayed as text on the chart canvas.
 const safeChartText = (value: unknown): string => sanitizeText(String(value ?? ''))
+const chartColor = (style: CSSStyleDeclaration, token: string) => style.getPropertyValue(`--screen-${token}`).trim()
 
 const BigScreen: React.FC = () => {
   const { classroomId } = useParams<{ classroomId: string }>()
@@ -49,6 +51,8 @@ const BigScreen: React.FC = () => {
   const historyQuestionId = searchParams.get('history')
   const isHistoryMode = !!historyQuestionId
   const { isLoading: authLoading, user } = useAuth()
+  const appearance = useTrainingAppearance()
+  const screenTheme = appearance.enabled ? appearance.theme : 'dark'
 
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
   const questionRef = useRef<Question | null>(null)
@@ -272,6 +276,10 @@ const BigScreen: React.FC = () => {
     const instance = chartInstance.current
     const resize = () => instance.resize()
     window.addEventListener('resize', resize)
+    const style = getComputedStyle(chartRef.current)
+    const ink = chartColor(style, 'ink')
+    const muted = chartColor(style, 'muted')
+    const border = chartColor(style, 'border')
 
     // 兼容两种格式：{ value, label } 和 { key, text }
     const options = currentQuestion.questionContent.options || []
@@ -294,13 +302,16 @@ const BigScreen: React.FC = () => {
         left: 'center',
         top: 12,
         textStyle: {
-          color: '#ffffff',
+          color: ink,
           fontSize: 28,
         },
       },
       tooltip: {
         renderMode: 'richText',
         trigger: 'axis',
+        backgroundColor: chartColor(style, 'panel'),
+        borderColor: border,
+        textStyle: { color: ink },
         axisPointer: {
           type: 'shadow'
         },
@@ -325,13 +336,13 @@ const BigScreen: React.FC = () => {
         type: 'category',
         data: categories,
         axisLabel: {
-          color: '#ffffff',
+          color: ink,
           fontSize: 24,
           margin: 20,
         },
         axisLine: {
           lineStyle: {
-            color: '#30363d'
+            color: border
           }
         },
         axisTick: {
@@ -343,21 +354,21 @@ const BigScreen: React.FC = () => {
         minInterval: 1,
         name: '',
         nameTextStyle: {
-          color: '#8b949e',
+          color: muted,
           fontSize: 18,
         },
         axisLabel: {
-          color: '#8b949e',
+          color: muted,
           fontSize: 18,
         },
         axisLine: {
           lineStyle: {
-            color: '#30363d'
+            color: border
           }
         },
         splitLine: {
           lineStyle: {
-            color: '#21262d'
+            color: border
           }
         }
       },
@@ -369,8 +380,8 @@ const BigScreen: React.FC = () => {
           barWidth: '50%',
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#58A6FF' },
-              { offset: 1, color: '#1f6feb' }
+              { offset: 0, color: chartColor(style, 'bar-top') },
+              { offset: 1, color: chartColor(style, 'bar-bottom') }
             ]),
             borderRadius: [8, 8, 0, 0],
           },
@@ -379,7 +390,7 @@ const BigScreen: React.FC = () => {
             position: 'top',
             distance: 8,
             lineHeight: 24,
-            color: '#ffffff',
+            color: ink,
             fontSize: 20,
             formatter: (params: any) => {
               return `${params.value}人\n${percentages[params.dataIndex]}%`
@@ -387,10 +398,7 @@ const BigScreen: React.FC = () => {
           },
           emphasis: {
             itemStyle: {
-              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: '#79c0ff' },
-                { offset: 1, color: '#388bfd' }
-              ]),
+              color: chartColor(style, 'bar-top'),
             },
           },
         },
@@ -400,7 +408,7 @@ const BigScreen: React.FC = () => {
     instance.setOption(option)
     return () => window.removeEventListener('resize', resize)
 
-  }, [currentQuestion, stats, isFinished])
+  }, [currentQuestion, stats, isFinished, screenTheme])
 
   // 初始化/更新词云
   useEffect(() => {
@@ -428,6 +436,7 @@ const BigScreen: React.FC = () => {
     const instance = wordCloudInstance.current
     const resize = () => instance.resize()
     window.addEventListener('resize', resize)
+    const colors = chartColor(getComputedStyle(wordCloudRef.current), 'word-colors').split(/\s+/)
 
     // 优先使用后端分词结果，降级到前端简单分词
     let data: Array<{ name: string; value: number }>
@@ -485,12 +494,8 @@ const BigScreen: React.FC = () => {
           textStyle: {
             fontFamily: 'sans-serif',
             fontWeight: 'bold',
-            color: function () {
-              const colors = ['#58A6FF', '#00D9FF', '#0078D4', '#FFB900', '#107C10', '#E84855']
-              return colors[Math.floor(Math.random() * colors.length)]
-            },
           },
-          data,
+          data: data.map((entry, index) => ({ ...entry, textStyle: { color: colors[index % colors.length] } })),
         },
       ],
     }
@@ -498,26 +503,26 @@ const BigScreen: React.FC = () => {
     instance.setOption(option)
     return () => window.removeEventListener('resize', resize)
 
-  }, [currentQuestion, stats])
+  }, [currentQuestion, stats, screenTheme])
 
   if (!isConnected && !isHistoryMode && !classroomClosed) {
     return (
-      <div className="min-h-screen bg-[#0d1117] flex items-center justify-center">
-        <div className="text-white text-2xl">连接中...</div>
+      <div data-screen-theme={screenTheme} className="classroom-bigscreen-loading min-h-screen flex items-center justify-center">
+        <div className="text-2xl">连接中...</div>
       </div>
     )
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0d1117] flex items-center justify-center">
-        <div className="text-white text-2xl">加载历史数据...</div>
+      <div data-screen-theme={screenTheme} className="classroom-bigscreen-loading min-h-screen flex items-center justify-center">
+        <div className="text-2xl">加载历史数据...</div>
       </div>
     )
   }
 
   return (
-    <div className={"classroom-bigscreen min-h-screen bg-[#0d1117] text-white p-8"+(!isHistoryMode&&!classroomClosed&&danmakuView.enabled?" has-danmaku":"")}>
+    <div data-screen-theme={screenTheme} className={"classroom-bigscreen min-h-screen p-8"+(!isHistoryMode&&!classroomClosed&&danmakuView.enabled?" has-danmaku":"")}>
       {/* 顶部状态栏 */}
       <div className="classroom-bigscreen__header flex justify-between items-center mb-8">
         <div className="flex items-center gap-6">
@@ -532,17 +537,17 @@ const BigScreen: React.FC = () => {
           </div>
           {/* 倒计时 */}
           {!danmakuFull && countdown !== null && countdown > 0 && (
-            <div className="flex items-center gap-2 px-6 py-3 bg-orange-600/20 border-2 border-orange-500 rounded-lg">
-              <Clock className="w-8 h-8 text-orange-400" />
-              <span className="text-3xl font-bold text-orange-400">
+            <div className="classroom-bigscreen__timer flex items-center gap-2 px-6 py-3 border rounded-lg">
+              <Clock className="w-8 h-8" />
+              <span className="text-3xl font-bold">
                 {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
               </span>
             </div>
           )}
           {/* 已结束标记 */}
           {!danmakuFull && isFinished && currentQuestion && (
-            <div className="px-6 py-3 bg-green-600/20 border-2 border-green-500 rounded-lg">
-              <span className="text-2xl font-bold text-green-400">答题已结束</span>
+            <div className="classroom-bigscreen__finished px-6 py-3 border rounded-lg">
+              <span className="text-2xl font-bold">答题已结束</span>
             </div>
           )}
         </div>
@@ -567,7 +572,7 @@ const BigScreen: React.FC = () => {
               </>
             )}
             {stats?.unsupportedType && (
-              <span className="text-amber-300">该题型暂不支持统计</span>
+              <span className="classroom-bigscreen__notice">该题型暂不支持统计</span>
             )}
           </div>
           <a className="classroom-bigscreen__control-link" href={`/teacher/classrooms/${classroomId}/control`}>课堂控制</a>
@@ -582,7 +587,7 @@ const BigScreen: React.FC = () => {
               }
               window.close()
             }}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-base"
+            className="classroom-bigscreen__exit px-4 py-2 border rounded-lg text-base"
           >
             {isHistoryMode ? '关闭历史查看' : '退出大屏'}
           </button>
@@ -594,7 +599,7 @@ const BigScreen: React.FC = () => {
       {classroomClosed?(
         <section className="flex min-h-[360px] items-center justify-center text-center" role="status">
           <div><h2 className="text-3xl font-semibold mb-4">本次课堂互动已结束</h2>
-          <p className="text-gray-400">弹幕已停止，感谢同学们参与。</p></div>
+          <p className="classroom-bigscreen__muted">弹幕已停止，感谢同学们参与。</p></div>
         </section>
       ):currentQuestion &&
        (currentQuestion.questionContent.type === 'single_choice' ||
@@ -602,12 +607,12 @@ const BigScreen: React.FC = () => {
         (isFinished || stats) ? (
           <div className="classroom-bigscreen__visual-grid grid grid-cols-2 gap-8">
             {/* 左侧：题干和选项 */}
-            <div className="bg-[#161b22] rounded-lg p-8 overflow-y-auto">
+            <div className="classroom-bigscreen__panel rounded-lg p-8 overflow-y-auto">
               <div className="mb-8">
                 <div className="text-3xl font-bold mb-2">
                   第 {currentQuestion.questionIndex} 题
                 </div>
-                <div className="text-sm text-gray-400 mb-6">
+                <div className="text-sm classroom-bigscreen__muted mb-6">
                   {currentQuestion.questionContent.type === 'single_choice' ? '单选题' : '多选题'}
                 </div>
               </div>
@@ -627,15 +632,15 @@ const BigScreen: React.FC = () => {
                   return (
                     <div
                       key={optionValue}
-                      className="p-5 rounded-lg border-2 bg-[#21262d] border-gray-700 hover:border-blue-500 transition-colors"
+                      className="classroom-bigscreen__answer p-5 rounded-lg border"
                     >
                       <div className="flex justify-between items-center">
                         <div className="text-xl">
-                          <span className="font-bold mr-3 text-blue-400">{optionValue}.</span>
+                          <span className="classroom-bigscreen__option-key font-bold mr-3">{optionValue}.</span>
                           <span>{optionLabel}</span>
                         </div>
                         {stats && (
-                          <div className="text-lg text-gray-400">
+                          <div className="text-lg classroom-bigscreen__muted">
                             {count} 人 ({percentage}%)
                           </div>
                         )}
@@ -647,18 +652,18 @@ const BigScreen: React.FC = () => {
             </div>
 
             {/* 右侧：柱状图统计 */}
-            <div className="bg-[#161b22] rounded-lg p-4">
+            <div className="classroom-bigscreen__panel rounded-lg p-4">
               <div ref={chartRef} className="w-full h-full" />
             </div>
           </div>
         ) : (
           /* 答题中：只显示题目 */
-          <div className="bg-[#161b22] rounded-lg p-8 mx-auto max-w-4xl mt-8">
+          <div className="classroom-bigscreen__panel rounded-lg p-8 mx-auto max-w-4xl mt-8">
             <div className="mb-6">
               <div className="text-3xl font-bold mb-2">
                 第 {currentQuestion.questionIndex} 题
               </div>
-              <div className="text-sm text-gray-400">
+              <div className="text-sm classroom-bigscreen__muted">
                 {currentQuestion.questionContent.type === 'single_choice' ? '单选题' : '多选题'}
               </div>
             </div>
@@ -675,10 +680,10 @@ const BigScreen: React.FC = () => {
                 return (
                   <div
                     key={optionValue}
-                    className="p-5 rounded-lg border-2 bg-[#21262d] border-gray-700 hover:border-blue-500 transition-colors"
+                    className="classroom-bigscreen__answer p-5 rounded-lg border"
                   >
                     <div className="text-xl">
-                      <span className="font-bold mr-3 text-blue-400">{optionValue}.</span>
+                      <span className="classroom-bigscreen__option-key font-bold mr-3">{optionValue}.</span>
                       <span>{optionLabel}</span>
                     </div>
                   </div>
@@ -691,12 +696,12 @@ const BigScreen: React.FC = () => {
         /* 填空题/文本题：左侧题目 + 右侧词云 */
         <div className="classroom-bigscreen__visual-grid grid grid-cols-2 gap-8">
           {/* 左侧：题干 */}
-          <div className="bg-[#161b22] rounded-lg p-8 overflow-y-auto">
+          <div className="classroom-bigscreen__panel rounded-lg p-8 overflow-y-auto">
             <div className="mb-8">
               <div className="text-3xl font-bold mb-2">
                 第 {currentQuestion?.questionIndex || 1} 题
               </div>
-              <div className="text-sm text-gray-400 mb-6">
+              <div className="text-sm classroom-bigscreen__muted mb-6">
                 文本题
               </div>
             </div>
@@ -707,12 +712,12 @@ const BigScreen: React.FC = () => {
             
             {stats && stats.textAnswers && stats.textAnswers.length > 0 && (
               <div className="mt-8">
-                <div className="text-xl font-semibold mb-4 text-gray-400">
+                <div className="text-xl font-semibold mb-4 classroom-bigscreen__muted">
                   已收集 {stats.textAnswers.length} 条答案
                 </div>
                 <div className="space-y-2 max-h-64 overflow-y-auto">
                   {stats.textAnswers.slice(-10).reverse().map((answer, index) => (
-                    <div key={index} className="p-3 bg-[#21262d] rounded-lg text-lg">
+                    <div key={index} className="classroom-bigscreen__answer p-3 rounded-lg text-lg">
                       {answer.text}
                     </div>
                   ))}
@@ -722,12 +727,12 @@ const BigScreen: React.FC = () => {
           </div>
 
           {/* 右侧：词云统计 */}
-          <div className="bg-[#161b22] rounded-lg p-4">
+          <div className="classroom-bigscreen__panel rounded-lg p-4">
             {(stats?.wordCloud?.topWords || stats?.textAnswers?.length) ? (
               <div ref={wordCloudRef} className="w-full h-full" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <div className="text-center text-gray-400">
+                <div className="text-center classroom-bigscreen__muted">
                   <div className="text-6xl mb-4">💭</div>
                   <div className="text-xl">等待答案提交...</div>
                 </div>
@@ -740,7 +745,7 @@ const BigScreen: React.FC = () => {
         <div className="flex items-center justify-center" style={{height:'var(--classroom-question-height)'}}>
           <div className="text-center">
             <div className="text-6xl mb-4">📊</div>
-            <div className="text-2xl text-gray-400">
+            <div className="text-2xl classroom-bigscreen__muted">
               {isHistoryMode ? '加载中...' : '等待教师出题'}
             </div>
           </div>

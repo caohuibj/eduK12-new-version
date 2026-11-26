@@ -52,7 +52,7 @@ it('reads authority first and defaults to realtime; starts the chosen layout and
   fireEvent.change(screen.getByRole('combobox', { name: '滚动速度' }), { target: { value: 'fast' } })
   fireEvent.click(start)
   await waitFor(() => expect(test.emitWithAck).toHaveBeenLastCalledWith('teacher:danmaku:control', {
-    action: 'start', revision: 0, sessionId: null, settings: { topic: '本轮话题', displayMode: 'DANMAKU', reviewMode: 'realtime', speed: 'fast' },
+    action: 'start', revision: 0, sessionId: null, settings: { topic: '本轮话题', displayMode: 'DANMAKU', reviewMode: 'realtime', speed: 'fast', messageSize: 'standard', playback: 'once' },
   }))
   expect(await screen.findByText('弹幕已开启，学生现在可以发送。')).toBeInTheDocument()
   expect(screen.getByRole('link', { name: '打开课堂大屏' })).toHaveAttribute('href', '/bigscreen/classroom-1')
@@ -151,7 +151,7 @@ it('locks disconnected actions, recovers on reconnect and removes expired messag
 })
 
 it('defaults a stopped reviewed activity to realtime while preserving review for an active activity', async () => {
-  setup(initial({ enabled: true, sessionId: 'session-1', topic: '审核讨论', reviewMode: 'review' }))
+  setup(initial({ enabled: true, sessionId: 'session-1', topic: '审核讨论', reviewMode: 'review', messageSize: 'extra-large', playback: 'loop' }))
   await waitFor(() => expect(screen.getByRole('button', { name: '停止弹幕' })).toBeEnabled())
   expect(screen.getByRole('radio', { name: /审核后展示/ })).toBeChecked()
   // An unsaved active configuration must not carry review into the next round.
@@ -160,6 +160,8 @@ it('defaults a stopped reviewed activity to realtime while preserving review for
   fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: '停止弹幕' }))
   await screen.findByText('弹幕已停止，当前消息已清空。')
   expect(screen.getByRole('radio', { name: /实时展示（默认）/ })).toBeChecked()
+  expect(screen.getByRole('combobox', { name: '弹幕字号' })).toHaveValue('standard')
+  expect(screen.getByRole('combobox', { name: '播放方式' })).toHaveValue('once')
   // Review remains an explicit choice before starting the new activity.
   fireEvent.click(screen.getByRole('radio', { name: /审核后展示/ }))
   expect(screen.getByRole('radio', { name: /审核后展示/ })).toBeChecked()
@@ -180,4 +182,43 @@ it('refreshes an enabled activity once at its expiry without polling', async () 
   expect(screen.getByRole('radio', { name: /实时展示（默认）/ })).toBeChecked()
   act(() => vi.advanceTimersByTime(60000))
   expect(test.emitWithAck).toHaveBeenCalledTimes(2)
+})
+
+
+it('restores display options, saves the chosen size and turns looping off only after authority confirms', async () => {
+  const snapshot = initial({ enabled: true, sessionId: 'session-1', topic: '讨论', messageSize: 'large', playback: 'loop' })
+  const test = setup(snapshot)
+  const save = await screen.findByRole('button', { name: '保存弹幕设置' })
+  await waitFor(() => expect(save).toBeEnabled())
+  expect(screen.getByRole('combobox', { name: '弹幕字号' })).toHaveValue('large')
+  expect(screen.getByRole('combobox', { name: '播放方式' })).toHaveValue('loop')
+  expect(screen.getByText('字号：大')).toBeInTheDocument()
+  expect(screen.getByText('播放：循环展示')).toBeInTheDocument()
+  fireEvent.change(screen.getByRole('combobox', { name: '弹幕字号' }), { target: { value: 'extra-large' } })
+  fireEvent.change(screen.getByRole('combobox', { name: '播放方式' }), { target: { value: 'once' } })
+  expect(screen.getByText('字号：大')).toBeInTheDocument()
+  expect(screen.getByText('播放：循环展示')).toBeInTheDocument()
+  fireEvent.click(save)
+  await screen.findByText('弹幕设置已更新。')
+  expect(test.emitWithAck).toHaveBeenLastCalledWith('teacher:danmaku:control', {
+    action: 'configure', revision: 0, sessionId: 'session-1', settings: { topic: '讨论', displayMode: 'QUESTION', reviewMode: 'realtime', speed: 'normal', messageSize: 'extra-large', playback: 'once' },
+  })
+  expect(screen.getByText('字号：特大')).toBeInTheDocument()
+  expect(screen.getByText('播放：播放一次')).toBeInTheDocument()
+})
+
+it('keeps older snapshots compatible and enables loop with an explicit save', async () => {
+  const test = setup(initial({ enabled: true, sessionId: 'session-1', topic: '讨论' }))
+  const save = await screen.findByRole('button', { name: '保存弹幕设置' })
+  await waitFor(() => expect(save).toBeEnabled())
+  expect(screen.getByRole('combobox', { name: '弹幕字号' })).toHaveValue('standard')
+  expect(screen.getByRole('combobox', { name: '播放方式' })).toHaveValue('once')
+  fireEvent.change(screen.getByRole('combobox', { name: '播放方式' }), { target: { value: 'loop' } })
+  expect(screen.getByText(/最长5分钟/)).toBeInTheDocument()
+  expect(screen.getByText('播放：播放一次')).toBeInTheDocument()
+  fireEvent.click(save)
+  await screen.findByText('弹幕设置已更新。')
+  expect((test.emitWithAck.mock.calls[test.emitWithAck.mock.calls.length - 1]?.[1] as ClassroomDanmakuControl).settings?.playback).toBe('loop')
+  expect(screen.getByText('播放：循环展示')).toBeInTheDocument()
+  expect(screen.getByRole('radio', { name: /实时展示（默认）/ })).toBeChecked()
 })

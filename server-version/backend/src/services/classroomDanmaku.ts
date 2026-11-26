@@ -11,6 +11,8 @@ export type DanmakuSettings = {
     displayMode: 'QUESTION' | 'DANMAKU';
     reviewMode: 'review' | 'realtime';
     speed: 'slow' | 'normal' | 'fast';
+    messageSize: 'standard' | 'large' | 'extra-large';
+    playback: 'once' | 'loop';
 };
 export type DanmakuMessage = {
     id: string;
@@ -44,7 +46,7 @@ export type DanmakuRedis = {
         arguments: string[];
     }) => Promise<unknown>;
 };
-const settings = z.object({ topic: z.string().trim().max(80), displayMode: z.enum(['QUESTION', 'DANMAKU']), reviewMode: z.enum(['review', 'realtime']), speed: z.enum(['slow', 'normal', 'fast']) }).partial().strict();
+const settings = z.object({ topic: z.string().trim().max(80), displayMode: z.enum(['QUESTION', 'DANMAKU']), reviewMode: z.enum(['review', 'realtime']), speed: z.enum(['slow', 'normal', 'fast']), messageSize: z.enum(['standard', 'large', 'extra-large']), playback: z.enum(['once', 'loop']) }).partial().strict();
 export const danmakuControlSchema = z.object({ action: z.enum(['start', 'configure', 'pause', 'resume', 'clear', 'stop', 'approve', 'hide']), revision: z.number().int().nonnegative(), sessionId: z.string().uuid().nullable(), settings: settings.optional(), messageId: z.string().uuid().optional() }).strict();
 const sendSchema = z.object({ sessionId: z.string().uuid(), clientMessageId: z.string().uuid(), text: z.string().max(240) }).strict();
 const names: Record<string, string> = { CONFLICT: '弹幕状态已变化，请刷新后操作', STOPPED: '弹幕尚未开启或已停止', RATE_LIMIT: '发送过于频繁，请稍后再试', QUEUE_FULL: '待审核弹幕已满，请稍后再试', NOT_FOUND: '这条弹幕已移除或过期', INVALID: '弹幕参数不合法', UNAVAILABLE: '弹幕缓存暂不可用，请稍后再试', CLASSROOM_CLOSED: '课堂已结束' };
@@ -55,11 +57,15 @@ local stamp=redis.call('TIME')
 local now=tonumber(stamp[1])*1000+math.floor(tonumber(stamp[2])/1000)
 local input=cjson.decode(ARGV[1])
 local raw=redis.call('GET',KEYS[1])
-local state=raw and cjson.decode(raw) or {sessionId=cjson.null,revision=0,controlRevision=0,displayEpoch=now,enabled=false,paused=false,displayMode='QUESTION',reviewMode='realtime',topic='',speed='normal',expiresAt=cjson.null,messages={},pending={}}
+local state=raw and cjson.decode(raw) or {sessionId=cjson.null,revision=0,controlRevision=0,displayEpoch=now,enabled=false,paused=false,displayMode='QUESTION',reviewMode='realtime',topic='',speed='normal',messageSize='standard',playback='once',expiresAt=cjson.null,messages={},pending={}}
 state.messages=raw and cjson.decode(redis.call('GET',KEYS[5]) or '[]') or {}
 state.pending=raw and cjson.decode(redis.call('GET',KEYS[6]) or '[]') or {}
 state.removed=raw and cjson.decode(redis.call('GET',KEYS[7]) or '[]') or {}
-local changed=not raw
+local changed=not raw or state.messageSize==nil or state.playback==nil
+state.messageSize=state.messageSize or 'standard';state.playback=state.playback or 'once'
+local function approvedExpiresAt(createdAt)
+ return math.min(state.expiresAt,createdAt+(state.playback=='loop' and 300000 or 30000))
+end
 local function epoch() state.displayEpoch=math.max(now,state.displayEpoch+1) end
 local function resetDisplay()
  epoch();state.visibilityEpoch=state.displayEpoch;state.removed={}
@@ -100,18 +106,21 @@ local function failure(code,retry)
  save();return cjson.encode({ok=false,code=code,retryAfterMs=retry})
 end
 local function rememberVisible(message)
- local entry={epoch=state.visibilityEpoch or state.displayEpoch,expiresAt=message.expiresAt}
+ local entry={epoch=state.visibilityEpoch or state.displayEpoch,createdAt=message.createdAt,expiresAt=message.expiresAt}
  redis.call('SET',KEYS[8],cjson.encode(entry),'PX',entry.expiresAt-now)
 end
-local function removeVisible(id,expiresAt)
- -- A screen can still be playing this message after it leaves rolling history.
- redis.call('DEL',KEYS[8])
+local function recordRemoval(id,expiresAt)
  table.insert(state.removed,{id=id,expiresAt=expiresAt})
  if #state.removed>100 then
   -- Reset playback before dropping any live removal IDs.
   state.visibilityEpoch=state.visibilityEpoch or state.displayEpoch
   state.removed={};epoch()
  end
+end
+local function removeVisible(id,expiresAt)
+ -- Single-message marker access remains bound to the explicitly supplied key.
+ redis.call('DEL',KEYS[8])
+ recordRemoval(id,expiresAt)
 end
 if input.operation=='read' then return result() end
 if input.operation=='close' then
@@ -127,11 +136,24 @@ if input.operation=='control' then
  if action=='start' then
   if state.enabled then return failure('CONFLICT') end
   state.sessionId=input.newSessionId;state.enabled=true;state.paused=false;state.messages={};state.pending={};state.expiresAt=now+7200000;resetDisplay()
-  state.reviewMode='realtime'
+  state.reviewMode='realtime';state.messageSize='standard';state.playback='once'
  elseif not state.enabled then return failure('STOPPED') end
  if action=='stop' then stop();return result() end
  if action=='configure' or action=='start' then
+  local previousPlayback=state.playback
   for key,value in pairs(input.settings or {}) do state[key]=value end
+  if state.playback~=previousPlayback then
+   local retained={}
+   for _,message in ipairs(state.messages) do
+    local expiresAt=approvedExpiresAt(message.createdAt)
+    if expiresAt>now then
+     message.expiresAt=expiresAt;table.insert(retained,message)
+    else
+     recordRemoval(message.id,message.expiresAt)
+    end
+   end
+   state.messages=retained
+  end
  elseif action=='pause' then state.paused=true
  elseif action=='resume' then state.paused=false
  elseif action=='clear' then state.messages={};state.pending={};resetDisplay()
@@ -142,7 +164,7 @@ if input.operation=='control' then
    for _,message in ipairs(state.messages) do if message.id==input.messageId then return result() end end
    return failure('NOT_FOUND')
   end
-  found.status='approved';found.createdAt=now;found.expiresAt=math.min(state.expiresAt,now+30000);table.insert(state.messages,found)
+  found.status='approved';found.createdAt=now;found.expiresAt=approvedExpiresAt(now);table.insert(state.messages,found)
   rememberVisible(found)
   while #state.messages>${APPROVED_MODERATION_LIMIT} do table.remove(state.messages,1) end
  elseif action=='hide' then
@@ -159,8 +181,10 @@ if input.operation=='control' then
    local marker=redis.call('GET',KEYS[8])
    if not marker then return failure('NOT_FOUND') end
    local entry=cjson.decode(marker)
-   if entry.epoch~=(state.visibilityEpoch or state.displayEpoch) or entry.expiresAt<=now then return failure('NOT_FOUND') end
-   removeVisible(input.messageId,entry.expiresAt)
+   local expiresAt=entry.expiresAt
+   if state.playback~='loop' and type(entry.createdAt)=='number' then expiresAt=math.min(expiresAt,entry.createdAt+30000) end
+   if entry.epoch~=(state.visibilityEpoch or state.displayEpoch) or expiresAt<=now then return failure('NOT_FOUND') end
+   removeVisible(input.messageId,expiresAt)
   end
  end
  if action~='approve' and action~='hide' then state.controlRevision=state.controlRevision+1 end
@@ -184,7 +208,7 @@ if input.operation=='send' then
  end
  if state.reviewMode=='review' and #state.pending>=100 then return failure('QUEUE_FULL') end
  local status=state.reviewMode=='review' and 'pending' or 'approved'
- local message={id=input.messageId,text=input.text,status=status,createdAt=now,expiresAt=math.min(state.expiresAt,now+(status=='pending' and 300000 or 30000))}
+local message={id=input.messageId,text=input.text,status=status,createdAt=now,expiresAt=status=='pending' and math.min(state.expiresAt,now+300000) or approvedExpiresAt(now)}
  table.insert(state[status=='pending' and 'pending' or 'messages'],message)
  if status=='approved' then rememberVisible(message) end
  while #state.messages>${APPROVED_MODERATION_LIMIT} do table.remove(state.messages,1) end
@@ -229,7 +253,7 @@ const validKey = (value: string) => /^[a-zA-Z0-9_-]{1,100}$/.test(value);
 export class ClassroomDanmakuStore {
     constructor(private readonly redis: () => Promise<DanmakuRedis> = defaultRedis) { }
     private readonly versions = new Map<string, Pick<DanmakuSnapshot, 'sessionId' | 'revision' | 'controlRevision' | 'displayEpoch'>>();
-    unavailable(classroomId: string): DanmakuSnapshot { return { ...this.versions.get(classroomId), available: false, classroomId, sessionId: this.versions.get(classroomId)?.sessionId ?? null, revision: this.versions.get(classroomId)?.revision ?? 0, controlRevision: this.versions.get(classroomId)?.controlRevision ?? 0, displayEpoch: this.versions.get(classroomId)?.displayEpoch ?? 0, enabled: false, paused: false, displayMode: 'QUESTION', reviewMode: 'realtime', topic: '', speed: 'normal', expiresAt: null, messages: [], limits: DANMAKU_LIMITS }; }
+    unavailable(classroomId: string): DanmakuSnapshot { return { ...this.versions.get(classroomId), available: false, classroomId, sessionId: this.versions.get(classroomId)?.sessionId ?? null, revision: this.versions.get(classroomId)?.revision ?? 0, controlRevision: this.versions.get(classroomId)?.controlRevision ?? 0, displayEpoch: this.versions.get(classroomId)?.displayEpoch ?? 0, enabled: false, paused: false, displayMode: 'QUESTION', reviewMode: 'realtime', topic: '', speed: 'normal', messageSize: 'standard', playback: 'once', expiresAt: null, messages: [], limits: DANMAKU_LIMITS }; }
     private async perform(classroomId: string, input: Record<string, unknown>, senderSession = 'reader') {
         if (!validKey(classroomId) || !validKey(senderSession))
             throw new DanmakuError('INVALID', names.INVALID);
@@ -252,7 +276,7 @@ export class ClassroomDanmakuStore {
                 throw new DanmakuError(result.code ?? 'INVALID', names[result.code ?? 'INVALID'] ?? names.INVALID, result.retryAfterMs);
             const { removed, visibilityEpoch: _visibilityEpoch, ...raw } = result.snapshot;
             const messages = (value: unknown): DanmakuMessage[] => Array.isArray(value) ? value.map(message => ({ ...message, createdAt: new Date(message.createdAt).toISOString(), expiresAt: new Date(message.expiresAt).toISOString() })) : [];
-            const snapshot: DanmakuSnapshot = { ...raw, available: true, classroomId, expiresAt: typeof raw.expiresAt === 'number' ? new Date(raw.expiresAt).toISOString() : null, messages: messages(raw.messages), pending: messages(raw.pending), removedMessageIds: Array.isArray(removed) ? removed.map(message => message.id) : [], limits: DANMAKU_LIMITS } as DanmakuSnapshot;
+            const snapshot: DanmakuSnapshot = { ...raw, messageSize: raw.messageSize ?? 'standard', playback: raw.playback ?? 'once', available: true, classroomId, expiresAt: typeof raw.expiresAt === 'number' ? new Date(raw.expiresAt).toISOString() : null, messages: messages(raw.messages), pending: messages(raw.pending), removedMessageIds: Array.isArray(removed) ? removed.map(message => message.id) : [], limits: DANMAKU_LIMITS } as DanmakuSnapshot;
             this.versions.delete(classroomId);
             this.versions.set(classroomId, { sessionId: snapshot.sessionId, revision: snapshot.revision, controlRevision: snapshot.controlRevision, displayEpoch: snapshot.displayEpoch });
             if (this.versions.size > 200)

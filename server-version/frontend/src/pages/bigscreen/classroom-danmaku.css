@@ -1,35 +1,104 @@
+.classroom-bigscreen,
+.classroom-bigscreen-loading,
+.classroom-danmaku-display {
+  --screen-bg:#101a1b;
+  --screen-panel:#192628;
+  --screen-raised:#223232;
+  --screen-ink:#f0f7f3;
+  --screen-muted:#b3c9c2;
+  --screen-accent:#a1dfc3;
+  --screen-border:#476462;
+  --screen-bar-top:#92dfbf;
+  --screen-bar-bottom:#398d75;
+  --screen-word-colors:#a1dfc3 #acd4ff #efc483 #d6c3ff #f4acc4 #9ee7ec;
+  --screen-warning:#ffce9d;
+  --screen-warning-bg:#3d2d21;
+  --screen-danger:#ffc7bd;
+  --screen-danger-bg:#422b2c;
+  --screen-danger-hover:#583637;
+  --screen-chip-ink:#f3fff8;
+  --screen-chip-green:#234b3e;
+  --screen-chip-blue:#253c58;
+  --screen-chip-amber:#4b3a32;
+}
+.classroom-bigscreen[data-screen-theme='light'],
+.classroom-bigscreen-loading[data-screen-theme='light'],
+.classroom-bigscreen[data-screen-theme='light'] .classroom-danmaku-display {
+  --screen-bg:#f0f6f3;
+  --screen-panel:#fff;
+  --screen-raised:#eef5f0;
+  --screen-ink:#172e27;
+  --screen-muted:#4c665c;
+  --screen-accent:#185e4a;
+  --screen-border:#aabeb5;
+  --screen-bar-top:#2f886c;
+  --screen-bar-bottom:#175a48;
+  --screen-word-colors:#185e4a #245b8d #874b16 #654b93 #8b3158 #14646b;
+  --screen-warning:#803a0c;
+  --screen-warning-bg:#fff1e1;
+  --screen-danger:#942f2c;
+  --screen-danger-bg:#fff0ed;
+  --screen-danger-hover:#fce0da;
+  --screen-chip-ink:#172e27;
+  --screen-chip-green:#d7ebdf;
+  --screen-chip-blue:#dce9f8;
+  --screen-chip-amber:#f6e7d4;
+}
+.classroom-bigscreen,.classroom-bigscreen-loading { background:var(--screen-bg); color:var(--screen-ink); }
 .classroom-bigscreen { --classroom-question-height:calc(100vh - 180px); }
 .classroom-bigscreen.has-danmaku { --classroom-question-height:max(300px, calc(100vh - 500px)); }
 .classroom-bigscreen .classroom-bigscreen__visual-grid { height:var(--classroom-question-height); }
-.classroom-bigscreen .classroom-bigscreen__control-link { color:#b5d8ff; text-decoration:underline; text-underline-offset:4px; }
-.classroom-bigscreen .classroom-bigscreen__control-link:focus-visible,
-.classroom-danmaku-display :is(button,summary):focus-visible { outline:3px solid #9ddcc0; outline-offset:4px; }
-.classroom-danmaku-display { color:#f1f5f9; background:#111c20; border:1px solid #314b47; border-radius:18px; padding:20px 24px; margin-top:20px; min-width:0; overflow:hidden; }
+.classroom-bigscreen .classroom-bigscreen__panel { background:var(--screen-panel); border:1px solid var(--screen-border); }
+.classroom-bigscreen .classroom-bigscreen__answer { background:var(--screen-raised); border-color:var(--screen-border); }
+.classroom-bigscreen .classroom-bigscreen__muted { color:var(--screen-muted); }
+.classroom-bigscreen :is(.classroom-bigscreen__control-link,.classroom-bigscreen__option-key) { color:var(--screen-accent); }
+.classroom-bigscreen .classroom-bigscreen__control-link { display:inline-flex; align-items:center; text-decoration:underline; text-underline-offset:4px; }
+.classroom-bigscreen .classroom-bigscreen__notice { color:var(--screen-warning); }
+.classroom-bigscreen .classroom-bigscreen__timer { color:var(--screen-warning); background:var(--screen-warning-bg); border-color:currentColor; }
+.classroom-bigscreen .classroom-bigscreen__finished { color:var(--screen-accent); background:var(--screen-raised); border-color:var(--screen-border); }
+.classroom-bigscreen .classroom-bigscreen__exit { color:var(--screen-danger); background:var(--screen-danger-bg); border-color:currentColor; }
+.classroom-bigscreen .classroom-bigscreen__exit:hover { background:var(--screen-danger-hover); }
+.classroom-bigscreen__header :is(a,button):focus-visible,
+.classroom-danmaku-display :is(button,summary):focus-visible { outline:3px solid var(--screen-accent); outline-offset:4px; }
+.classroom-danmaku-display {
+  --danmaku-font:clamp(20px,1.72vw,26px);
+  --danmaku-pad:3px;
+  color:var(--screen-ink);
+  background:var(--screen-panel);
+  border:1px solid var(--screen-border);
+  border-radius:18px;
+  padding:20px 24px;
+  margin-top:20px;
+  min-width:0;
+  overflow:hidden;
+}
+.classroom-danmaku-display[data-message-size='large'] { --danmaku-font:clamp(23px,2.03vw,32px); }
+.classroom-danmaku-display[data-message-size='extra-large'] { --danmaku-font:clamp(26px,2.5vw,38px); }
 .classroom-danmaku-display__header { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:16px; }
 .classroom-danmaku-display__heading { min-width:0; flex:1 1 280px; }
-.classroom-danmaku-display__eyebrow { display:block; color:#9ddcc0; font-size:13px; letter-spacing:.04em; margin-bottom:6px; }
+.classroom-danmaku-display__eyebrow { display:block; color:var(--screen-accent); font-size:13px; letter-spacing:.04em; margin-bottom:6px; }
 .classroom-danmaku-display h2 { margin:0; font-size:clamp(22px,2.1vw,36px); line-height:1.4; overflow-wrap:anywhere; white-space:pre-wrap; }
-.classroom-danmaku-display__heading p { margin:8px 0 0; color:#b8c9c5; font-size:14px; }
+.classroom-danmaku-display__heading p { margin:8px 0 0; color:var(--screen-muted); font-size:14px; }
 .classroom-danmaku-display__join { max-width:100%; }
-.classroom-danmaku-display__join summary,.classroom-danmaku-display button { min-height:44px; border:1px solid #5a8073; border-radius:8px; padding:10px 14px; color:#e3f8ed; background:#1b3530; cursor:pointer; }
-.classroom-danmaku-display__join-content { display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin-top:12px; padding:16px; border-radius:12px; color:#142b25; background:#fff; max-width:400px; }
-.classroom-danmaku-display__join-content canvas { flex:none; }
+.classroom-danmaku-display__join summary,.classroom-danmaku-display button { min-height:44px; border:1px solid var(--screen-border); border-radius:8px; padding:10px 14px; color:var(--screen-accent); background:var(--screen-raised); cursor:pointer; }
+.classroom-danmaku-display__join-content { display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin-top:12px; padding:16px; border-radius:12px; color:var(--screen-ink); background:var(--screen-raised); max-width:400px; }
+.classroom-danmaku-display__join-content canvas { flex:none; padding:8px; background:#fff; }
 .classroom-danmaku-display__join-content strong { font-size:24px; }
 .classroom-danmaku-display__join-content p { max-width:180px; margin:8px 0 0; font-size:14px; line-height:1.6; }
-.classroom-danmaku-display__stage { position:relative; display:grid; gap:8px; min-height:200px; margin-top:18px; padding:12px 0; border-top:1px solid #2e4641; border-bottom:1px solid #2e4641; isolation:isolate; overflow:hidden; }
-.classroom-danmaku-display__track { position:relative; height:36px; min-width:0; overflow:hidden; }
-.classroom-danmaku-display__message { position:absolute; top:0; left:100%; display:block; width:max-content; max-width:none; padding:3px 14px; border:1px solid #486b5f; border-radius:999px; color:#f3fff8; background:#234b3e; font-size:18px; font-weight:600; line-height:28px; white-space:nowrap; animation:classroom-danmaku-display-flight linear both; will-change:transform; }
-.classroom-danmaku-display__track:nth-child(3n+2) .classroom-danmaku-display__message { background:#253c58; border-color:#4b6688; }
-.classroom-danmaku-display__track:nth-child(3n) .classroom-danmaku-display__message { background:#4b3a32; border-color:#806352; }
+.classroom-danmaku-display__stage { position:relative; display:grid; gap:8px; min-height:200px; margin-top:18px; padding:12px 0; border-block:1px solid var(--screen-border); isolation:isolate; overflow:hidden; }
+.classroom-danmaku-display__track { position:relative; height:calc(var(--danmaku-font) * 1.3 + var(--danmaku-pad) * 2 + 2px); min-width:0; overflow:hidden; }
+.classroom-danmaku-display__message { position:absolute; top:0; left:100%; display:block; width:max-content; max-width:none; padding:var(--danmaku-pad) 14px; border:1px solid var(--screen-border); border-radius:999px; color:var(--screen-chip-ink); background:var(--screen-chip-green); font-size:var(--danmaku-font); font-weight:600; line-height:1.3; white-space:nowrap; animation:classroom-danmaku-display-flight linear both; will-change:transform; }
+.classroom-danmaku-display__track:nth-child(3n+2) .classroom-danmaku-display__message { background:var(--screen-chip-blue); }
+.classroom-danmaku-display__track:nth-child(3n) .classroom-danmaku-display__message { background:var(--screen-chip-amber); }
 .classroom-danmaku-display__stage.is-paused .classroom-danmaku-display__message { animation-play-state:paused; }
-.classroom-danmaku-display__empty { position:absolute; inset:0; display:grid; place-items:center; margin:0; color:#9bb4ab; font-size:clamp(20px,2vw,30px); pointer-events:none; }
-.classroom-danmaku-display__footer { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; margin-top:12px; color:#a9c1b8; font-size:12px; }
-.classroom-danmaku-display--full { min-height:calc(100vh - 180px); background:radial-gradient(ellipse at top,#193a30,#101b1d 65%); padding:28px 32px; }
+.classroom-danmaku-display__empty { position:absolute; inset:0; display:grid; place-items:center; margin:0; color:var(--screen-muted); font-size:clamp(20px,2vw,30px); pointer-events:none; }
+.classroom-danmaku-display__footer { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; margin-top:12px; color:var(--screen-muted); font-size:12px; }
+.classroom-danmaku-display--full { --danmaku-font:clamp(24px,2.1875vw,34px); --danmaku-pad:4px; min-height:calc(100vh - 180px); background:radial-gradient(ellipse at top,var(--screen-raised),var(--screen-panel) 65%); padding:28px 32px; }
+.classroom-danmaku-display--full[data-message-size='large'] { --danmaku-font:clamp(28px,2.65625vw,42px); }
+.classroom-danmaku-display--full[data-message-size='extra-large'] { --danmaku-font:clamp(32px,3.28125vw,52px); }
 .classroom-danmaku-display--full .classroom-danmaku-display__stage { min-height:390px; gap:18px; margin-top:24px; padding:24px 0; }
-.classroom-danmaku-display--full .classroom-danmaku-display__track { height:50px; }
-.classroom-danmaku-display--full .classroom-danmaku-display__message { font-size:clamp(20px,1.6vw,30px); line-height:38px; padding:4px 20px; }
+.classroom-danmaku-display--full .classroom-danmaku-display__message { padding-inline:20px; }
 .classroom-danmaku-display--compact .classroom-danmaku-display__stage { min-height:0; gap:6px; }
-.classroom-danmaku-display--compact .classroom-danmaku-display__track { height:36px; }
 .classroom-danmaku-display--compact h2 { font-size:20px; }
 .classroom-danmaku-display--error { display:flex; flex-wrap:wrap; gap:16px; align-items:center; }
 @keyframes classroom-danmaku-display-flight { from { transform:translateX(0); } to { transform:translateX(calc(-100% - var(--danmaku-width,1200px))); } }
@@ -67,6 +136,11 @@
  * The overlay remains a separate grid row; long question content scrolls
  * inside its own panel instead of pushing the live messages off screen. */
 @media (min-width:700px) and (max-height:800px) and (orientation:landscape) {
+  .classroom-bigscreen:has(> .classroom-danmaku-display--full) { padding:12px; }
+  .classroom-bigscreen:has(> .classroom-danmaku-display--full) > .classroom-bigscreen__header { gap:12px; margin-bottom:12px; }
+  .classroom-bigscreen > .classroom-danmaku-display--full { min-height:0; margin-top:0; padding:16px; }
+  .classroom-bigscreen > .classroom-danmaku-display--full .classroom-danmaku-display__stage { min-height:0; gap:6px; margin-top:12px; padding-block:6px; }
+  .classroom-bigscreen > .classroom-danmaku-display--full .classroom-danmaku-display__footer { margin-top:8px; }
   .classroom-bigscreen:not(:has(> .classroom-danmaku-display--full)) {
     --classroom-question-height:100%;
     box-sizing:border-box;
@@ -139,8 +213,8 @@
   .classroom-bigscreen.has-danmaku > .classroom-danmaku-display--compact h2 { flex:1 1 40%; font-size:18px; line-height:24px; }
   .classroom-bigscreen.has-danmaku > .classroom-danmaku-display--compact .classroom-danmaku-display__heading p { margin:0; font-size:12px; line-height:18px; }
   .classroom-bigscreen.has-danmaku > .classroom-danmaku-display--compact .classroom-danmaku-display__stage { gap:4px; margin-top:8px; padding:4px 0; }
-  .classroom-bigscreen.has-danmaku > .classroom-danmaku-display--compact .classroom-danmaku-display__track { height:30px; }
-  .classroom-bigscreen.has-danmaku > .classroom-danmaku-display--compact .classroom-danmaku-display__message { padding:1px 12px; font-size:18px; line-height:26px; }
+  .classroom-bigscreen.has-danmaku > .classroom-danmaku-display--compact { --danmaku-pad:2px; }
+  .classroom-bigscreen.has-danmaku > .classroom-danmaku-display--compact .classroom-danmaku-display__message { padding-inline:12px; }
   .classroom-bigscreen.has-danmaku > .classroom-danmaku-display--compact .classroom-danmaku-display__footer { gap:4px 12px; margin-top:6px; font-size:11px; line-height:16px; }
 }
 @media (min-width:700px) and (max-height:800px) and (orientation:landscape) and (prefers-reduced-motion:reduce) {
