@@ -261,7 +261,11 @@ describe('course isLibrary', () => {
     }) as any, res)
     expect(mockPrisma.courseStudent.findMany).toHaveBeenCalledWith(expect.objectContaining({
       where: expect.objectContaining({
-        course: expect.objectContaining({isLibrary:false,courseType:{not:'CAMPUS_ACTIVITY'}}),
+        course: {
+          isLibrary: false,
+          courseType: { in: ['TRAINING_COURSE', 'LEGACY_COURSE'] },
+          creator: { accountDomain: { in: ['TRAINING', 'LEGACY'] } },
+        },
       }),
     }))
   })
