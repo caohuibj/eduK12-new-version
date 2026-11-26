@@ -85,30 +85,35 @@ describe('Survey FORM-only wave answer budgets (mocked transaction, real compila
     expect(mocks.tx.surveyWave.updateMany).not.toHaveBeenCalled()
   })
   it('rejects a checkpoint whose valid explicit refusals exceed the 64 KiB budget',async()=>{
-    const timeQuestions=Array.from({length:400},(_,i)=>({
-      itemKey:'time'+i,type:'TIME' as const,prompt:'Synthetic time',required:false,
-      allowRefusal:true,options:[],rows:[],timeZone:'UTC' as const,
-    }))
-    const definition:FormDraft={schemaVersion:2,pages:[
-      ...Array.from({length:5},(_,i)=>({pageKey:'page'+i,title:'Time',questions:timeQuestions.slice(i*80,(i+1)*80)})),
-      {pageKey:'last',title:'Text',questions:[
-        {itemKey:'long',type:'LONG_TEXT',prompt:'Synthetic text',required:false,
-          options:[],rows:[],maxLength:9000},
-      ]},
-    ]}
-    expect(assertSurveyDraft('FORM',definition,true)).toEqual(definition)
-    const answers=Object.fromEntries([
-      ...timeQuestions.map(q=>[q.itemKey,{_surveyRefusal:true}]),
-      ['long','\u0001'.repeat(9000)],
-    ])
-    expect(Buffer.byteLength(JSON.stringify({form0:answers}),'utf8')).toBeGreaterThan(65536)
-    expect(formWorstCaseAnswerBytes(definition)).toBeGreaterThanOrEqual(Buffer.byteLength(JSON.stringify(answers),'utf8'))
-    wave.instrumentIds=['draft0']
-    wave.checkpointPolicy={schemaVersion:1,enabled:true,ttlHours:24}
-    mocks.tx.surveyInstrumentDraft.findMany.mockResolvedValue([{
-      id:'draft0',instrumentKey:'form0',kind:'FORM',title:'Synthetic form',
+    const definitions:FormDraft[]=Array.from({length:2},(_,unit)=>{
+      const timeQuestions=Array.from({length:200},(_,i)=>({
+        itemKey:'time'+(unit*200+i),type:'TIME' as const,prompt:'Synthetic time',required:false,
+        allowRefusal:true,options:[],rows:[],timeZone:'UTC' as const,
+      }))
+      return {schemaVersion:2,pages:[
+        ...Array.from({length:3},(_,i)=>({pageKey:'page'+i,title:'Time',questions:timeQuestions.slice(i*80,(i+1)*80)})),
+        ...(unit===0?[{pageKey:'last',title:'Text',questions:[
+          {itemKey:'long',type:'LONG_TEXT' as const,prompt:'Synthetic text',required:false,
+            options:[],rows:[],maxLength:9000},
+        ]}]:[]),
+      ]}
+    })
+    const drafts=definitions.map((definition,i)=>({
+      id:'draft'+i,instrumentKey:'form'+i,kind:'FORM',title:'Synthetic form '+i,
       revision:0,catalogGrantId:null,definition,
-    }])
+    }))
+    const answers=Object.fromEntries(drafts.map(d=>{
+      expect(assertSurveyDraft('FORM',d.definition,true)).toEqual(d.definition)
+      const raw=Object.fromEntries(d.definition.pages.flatMap(p=>p.questions).map(q=>[
+        q.itemKey,q.type==='TIME'?{_surveyRefusal:true}:'\u0001'.repeat(9000),
+      ]))
+      expect(formWorstCaseAnswerBytes(d.definition)).toBeGreaterThanOrEqual(Buffer.byteLength(JSON.stringify(raw),'utf8'))
+      return [d.instrumentKey,raw]
+    }))
+    expect(Buffer.byteLength(JSON.stringify(answers),'utf8')).toBeGreaterThan(65536)
+    wave.instrumentIds=drafts.map(d=>d.id)
+    wave.checkpointPolicy={schemaVersion:1,enabled:true,ttlHours:24}
+    mocks.tx.surveyInstrumentDraft.findMany.mockResolvedValue(drafts)
     await expect(freeze()).rejects.toMatchObject({statusCode:409,message:expect.stringContaining('64KB')})
     expect(mocks.tx.$executeRaw).not.toHaveBeenCalled()
     expect(mocks.tx.surveyWave.updateMany).not.toHaveBeenCalled()
