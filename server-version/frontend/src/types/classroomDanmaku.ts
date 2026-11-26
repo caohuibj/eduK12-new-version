@@ -3,6 +3,8 @@ export interface ClassroomDanmakuSettings {
   displayMode: 'QUESTION' | 'DANMAKU'
   reviewMode: 'review' | 'realtime'
   speed: 'slow' | 'normal' | 'fast'
+  messageSize?: 'standard' | 'large' | 'extra-large'
+  playback?: 'once' | 'loop'
 }
 
 export interface ClassroomDanmakuMessage {

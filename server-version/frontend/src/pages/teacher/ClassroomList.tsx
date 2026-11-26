@@ -5,6 +5,7 @@ import { BookOpen, Copy, Download, Edit, ExternalLink, Plus, QrCode, Trash2, Use
 import { PageHeader } from '../../components/product-ui/PageHeader'
 import { ProductPage } from '../../components/product-ui/ProductPage'
 import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
+import './classroom-control.css'
 
 interface Classroom {
   id: string
@@ -150,7 +151,7 @@ const ClassroomList: React.FC = () => {
   }
 
   return (
-    <ProductPage width="management" className="space-y-6">
+    <ProductPage width="management" className="space-y-6 classroom-list-page">
       {feedback}
       <PageHeader
         title="课堂管理"

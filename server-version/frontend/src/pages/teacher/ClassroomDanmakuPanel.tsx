@@ -13,10 +13,13 @@ interface Props {
   emitWithAck?: <T>(event: string, data: unknown) => Promise<T>
 }
 
-const initialSettings: ClassroomDanmakuSettings = { topic: '', displayMode: 'QUESTION', reviewMode: 'realtime', speed: 'normal' }
+const initialSettings: ClassroomDanmakuSettings = { topic: '', displayMode: 'QUESTION', reviewMode: 'realtime', speed: 'normal', messageSize: 'standard', playback: 'once' }
+const messageSizeLabels = { standard: '标准', large: '大', 'extra-large': '特大' } as const
 const messagePageSize = 20
 const settingsFrom = (snapshot: ClassroomDanmakuSnapshot): ClassroomDanmakuSettings => ({
   topic: snapshot.topic, displayMode: snapshot.displayMode, reviewMode: snapshot.enabled ? snapshot.reviewMode : 'realtime', speed: snapshot.speed,
+  messageSize: snapshot.enabled ? snapshot.messageSize ?? 'standard' : 'standard',
+  playback: snapshot.enabled ? snapshot.playback ?? 'once' : 'once',
 })
 
 export default function ClassroomDanmakuPanel({ classroomId, isConnected, on, off, emitWithAck }: Props) {
@@ -195,7 +198,7 @@ export default function ClassroomDanmakuPanel({ classroomId, isConnected, on, of
     {snapshot && !snapshot.available && <ProductStatus kind="warning" title="弹幕服务暂不可用">当前状态无法确认或课堂已结束。请刷新状态；持续不可用时联系管理员。</ProductStatus>}
     <div className="classroom-danmaku__state">
       <strong>当前状态：{status}</strong>
-      {snapshot?.enabled && <><span>{snapshot.displayMode === 'QUESTION' ? '叠加题目' : '独立弹幕'}</span><span>{snapshot.reviewMode === 'review' ? '审核后展示' : '实时展示'}</span><p>话题：{snapshot.topic}</p></>}
+      {snapshot?.enabled && <><span>{snapshot.displayMode === 'QUESTION' ? '叠加题目' : '独立弹幕'}</span><span>{snapshot.reviewMode === 'review' ? '审核后展示' : '实时展示'}</span><span>字号：{messageSizeLabels[snapshot.messageSize ?? 'standard']}</span><span>播放：{snapshot.playback === 'loop' ? '循环展示' : '播放一次'}</span><p>话题：{snapshot.topic}</p></>}
       <ProductButton onClick={() => void refresh()} disabled={!isConnected || !emitWithAck || !!pending || reading}>{reading ? '读取中…' : '刷新状态'}</ProductButton>
     </div>
     <div className="classroom-danmaku__workspace">
@@ -213,8 +216,12 @@ export default function ClassroomDanmakuPanel({ classroomId, isConnected, on, of
           <label className="classroom-danmaku__choice"><input type="radio" name="danmaku-review" checked={settings.reviewMode === 'realtime'} onChange={() => changeSettings({ reviewMode: 'realtime' })} /><span><strong>实时展示（默认）</strong><span className="classroom-danmaku__hint">发送后直接显示，教师可随时隐藏。</span></span></label>
           <label className="classroom-danmaku__choice"><input type="radio" name="danmaku-review" checked={settings.reviewMode === 'review'} onChange={() => changeSettings({ reviewMode: 'review' })} /><span><strong>审核后展示</strong><span className="classroom-danmaku__hint">教师批准后才会出现在大屏。</span></span></label>
         </div><p className="classroom-danmaku__hint">切换实时展示不会自动批准已有的待审核消息。</p></fieldset>
-        <label className="staff-field"><span>滚动速度</span><select value={settings.speed} onChange={event => changeSettings({ speed: event.target.value as ClassroomDanmakuSettings['speed'] })}><option value="slow">慢速</option><option value="normal">标准</option><option value="fast">快速</option></select></label>
-        <p className="classroom-danmaku__hint">消息按系统时限自动移除，仅供当前课堂互动。停止弹幕会清空本轮消息并回到题目大屏。</p>
+        <div className="classroom-danmaku__presentation-settings">
+          <label className="staff-field"><span>滚动速度</span><select value={settings.speed} onChange={event => changeSettings({ speed: event.target.value as ClassroomDanmakuSettings['speed'] })}><option value="slow">慢速</option><option value="normal">标准</option><option value="fast">快速</option></select></label>
+          <label className="staff-field"><span>弹幕字号</span><select value={settings.messageSize ?? 'standard'} onChange={event => changeSettings({ messageSize: event.target.value as ClassroomDanmakuSettings['messageSize'] })} aria-describedby="classroom-danmaku-settings-help"><option value="standard">标准</option><option value="large">大</option><option value="extra-large">特大</option></select></label>
+          <label className="staff-field"><span>播放方式</span><select value={settings.playback ?? 'once'} onChange={event => changeSettings({ playback: event.target.value as ClassroomDanmakuSettings['playback'] })} aria-describedby="classroom-danmaku-settings-help"><option value="once">播放一次（默认）</option><option value="loop">循环展示</option></select></label>
+        </div>
+        <p id="classroom-danmaku-settings-help" className="classroom-danmaku__hint">{settings.playback === 'loop' ? '循环展示仍在有效期内的已通过弹幕，最长5分钟。关闭循环请选择“播放一次”。' : '当前有效弹幕每条最多播放一次，随后让新消息进入大屏。'}{snapshot?.enabled ? '修改后点击“保存弹幕设置”生效。' : '开启弹幕后生效。'}停止弹幕会清空本轮消息并回到题目大屏。</p>
         <div className="classroom-danmaku__actions"><ProductButton type="submit" variant="primary" disabled={locked}><MessageSquare size={16} aria-hidden="true" />{pending === 'start' || pending === 'configure' ? '确认中…' : snapshot?.enabled ? '保存弹幕设置' : '开启弹幕'}</ProductButton></div>
       </fieldset>
     </form>

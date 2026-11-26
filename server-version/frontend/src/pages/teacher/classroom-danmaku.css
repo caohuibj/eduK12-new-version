@@ -197,3 +197,51 @@
   .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__state > .hui-button { width: 100%; margin-left: 0; justify-content: center; }
   .hui-training.hui-app--teacher.training-teacher-visual .classroom-control-page .classroom-danmaku__live-controls { padding: 14px; }
 }
+
+
+.classroom-danmaku__presentation-settings {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  min-width: 0;
+}
+.classroom-danmaku__presentation-settings .staff-field { min-width: 0; }
+.classroom-danmaku__presentation-settings select { width: 100%; min-height: 44px; }
+@media (max-width: 640px) {
+  .classroom-danmaku__presentation-settings { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Classroom-only corrections: the Training night theme must not inherit paper cards. */
+@media screen {
+  .hui-training.hui-app--teacher.training-teacher-visual[data-training-theme="dark"] .classroom-control-page .classroom-danmaku :is(.classroom-danmaku__state, .classroom-danmaku__choice, .classroom-danmaku__empty, .classroom-danmaku__message, .classroom-danmaku__live-controls) {
+    background: var(--training-surface, #1c2420);
+    border-color: var(--training-border, #354339);
+    color: var(--training-ink, #e5e9df);
+  }
+  .hui-training.hui-app--teacher.training-teacher-visual[data-training-theme="dark"] .classroom-control-page .classroom-danmaku .classroom-danmaku__choice:has(input:checked) {
+    background: var(--tt-soft, #2b392b);
+    border-color: var(--training-bamboo, #bdd1a4);
+  }
+  .hui-training.hui-app--teacher.training-teacher-visual[data-training-theme="dark"] .classroom-control-page .classroom-danmaku__state > span {
+    background: var(--training-raised, #253029);
+    border-color: var(--training-border, #354339);
+    color: var(--training-ink, #e5e9df);
+  }
+  .hui-training.hui-app--teacher.training-teacher-visual[data-training-theme="dark"] .classroom-control-page .classroom-danmaku :is(.classroom-danmaku__settings-heading, .classroom-danmaku__config > .classroom-danmaku__actions, .classroom-danmaku__filters) {
+    border-color: var(--training-border, #354339);
+  }
+  .hui-training.hui-app--teacher.training-teacher-visual[data-training-theme="dark"] .classroom-control-page .classroom-danmaku__filters button {
+    background: var(--training-raised, #253029);
+    color: var(--training-muted, #a7b2a5);
+    border-color: var(--training-border, #354339);
+  }
+  .hui-training.hui-app--teacher.training-teacher-visual[data-training-theme="dark"] .classroom-control-page .classroom-danmaku__filters button[aria-pressed=true] {
+    background: var(--tt-soft, #2b392b);
+    color: var(--training-bamboo, #bdd1a4);
+    border-color: var(--training-bamboo, #bdd1a4);
+  }
+  .hui-training.hui-app--teacher.training-teacher-visual[data-training-theme="dark"] .classroom-control-page .classroom-danmaku__empty {
+    color: var(--training-muted, #a7b2a5);
+  }
+}
