@@ -6,7 +6,7 @@
  * establish a restricted student session.
  */
 
-import { Server as HttpServer } from 'http'
+import { Server as HttpServer, type IncomingHttpHeaders } from 'http'
 import { Server, Socket } from 'socket.io'
 import { createAdapter } from '@socket.io/redis-adapter'
 import { createClient } from 'redis'
@@ -15,14 +15,25 @@ import { getRedisUrl } from '../config/redis'
 import { config } from '../config'
 import { verifyToken } from '../utils/jwt'
 import { inactiveAccountMessage } from '../utils/accountStatus'
-import { UserRole } from '../types'
+import { canManageClassroom, findClassroomAccess } from '../middleware/classroomAccess'
 import { getCookieValue } from '../utils/authCookies'
-import { loadCurrentPrincipal } from '../modules/organization/principal'
+import { asBusinessPrincipal, loadCurrentPrincipal } from '../modules/organization/principal'
 import { needsAdminKey, validAdminProof } from '../modules/admin-permissions/security'
 import { isSessionRevoked } from '../utils/sessionRevocation'
 
+const trainingSession = (domain: string | undefined) => domain === undefined || domain === 'LEGACY' || domain === 'TRAINING'
+
 type SocketNext = (error?: Error) => void
 export type SocketRedisState = 'ready' | 'degraded' | 'failed'
+
+// Engine.IO's CORS response headers cover polling. WebSocket handshakes also
+// need a server-side Origin check before the browser's session cookie is used.
+export function isClassroomSocketOriginAllowed(headers: IncomingHttpHeaders): boolean {
+  const origin = headers.origin
+  if (origin === undefined || origin === config.corsOrigin) return true
+  const scheme = config.trustProxyHops > 0 && headers['x-forwarded-proto'] === 'https' ? 'https' : 'http'
+  return !!headers.host && origin === `${scheme}://${headers.host}`
+}
 
 const getSocketToken = (socket: Socket): string | null => {
   const cookieToken = getCookieValue(socket.handshake.headers.cookie, 'ptool_session')
@@ -89,6 +100,10 @@ export class SocketService {
         methods: ['GET', 'POST'],
         credentials: true,
       },
+      allowRequest: (req, accept) => {
+        const allowed = isClassroomSocketOriginAllowed(req.headers)
+        accept(allowed ? null : 'Origin not allowed', allowed)
+      },
       transports: ['websocket', 'polling'],
       pingTimeout: 60000,
       pingInterval: 25000,
@@ -140,14 +155,15 @@ export class SocketService {
           const payload = verifyToken(token)
           if (
             !payload ||
-            typeof payload.userId !== 'string' ||
+            typeof payload.userId !== 'string' || !trainingSession(payload.accountDomain) ||
             !Number.isInteger(payload.tokenVersion)
           ) {
             return next(new Error('Socket认证失败'))
           }
 
           const principal = await loadCurrentPrincipal(payload.userId)
-          const rejection = inactiveAccountMessage(principal)
+          const business = principal && asBusinessPrincipal(principal)
+          const rejection = inactiveAccountMessage(business)
           if (rejection) {
             return next(new Error(rejection))
           }
@@ -167,9 +183,8 @@ export class SocketService {
           socket.data.authenticated = true
           socket.data.userId = principal!.userId
           socket.data.tokenVersion = payload.tokenVersion
-          socket.data.userRole = principal!.role
+          socket.data.userRole = business!.role
           socket.data.platformRole = principal!.platformRole
-          socket.data.adminProof = { adminVerifiedAt: payload.adminVerifiedAt, adminSessionId: payload.adminSessionId }
         }
 
         logger.debug('Socket连接认证完成', {
@@ -206,17 +221,18 @@ export class SocketService {
       const token = getSocketToken(socket)
       const payload = token ? verifyToken(token) : null
       const principal = await loadCurrentPrincipal(socket.data.userId)
+      const business = principal && asBusinessPrincipal(principal)
       const revoked = token ? await isSessionRevoked(token) : true
 
       if (
-        !payload || payload.userId !== socket.data.userId ||
+        !payload || payload.userId !== socket.data.userId || !trainingSession(payload.accountDomain) ||
         !Number.isInteger(payload.tokenVersion) || payload.tokenVersion !== socket.data.tokenVersion ||
-        !principal ||
-        inactiveAccountMessage(principal) ||
+        !principal || !business ||
+        inactiveAccountMessage(business) ||
         principal.mustChangePassword ||
         principal.tokenVersion !== socket.data.tokenVersion || revoked === true || (revoked === null && config.nodeEnv === 'production')
         || !['LEGACY','TRAINING'].includes(principal.accountDomain)
-        || (needsAdminKey(principal) && !validAdminProof(socket.data.adminProof ?? {}))
+        || (needsAdminKey(principal) && !validAdminProof(payload))
       ) {
         socket.data.authenticationInvalidated = true
         socket.data.authenticated = false
@@ -227,7 +243,7 @@ export class SocketService {
         return false
       }
 
-      socket.data.userRole = principal.role
+      socket.data.userRole = business.role
       socket.data.platformRole = principal.platformRole
       return true
     } catch {
@@ -241,29 +257,24 @@ export class SocketService {
     }
   }
 
-  async revalidateManagerSockets(room: string): Promise<boolean> {
-    if (!this.classroomNamespace) {
-      return false
-    }
-
+  /** Deliver sensitive data only to recipients who still manage this classroom. */
+  async sendToClassroomManagers(classroomId: string, event: string, data: unknown): Promise<void> {
+    if (!this.classroomNamespace) return
+    const room = 'classroom:' + classroomId
     try {
-      const sockets = await this.classroomNamespace.in(room).fetchSockets()
-      await Promise.all(
-        sockets.map(async (socket: any) => {
-          const valid = await this.refreshAuthenticatedSocket(socket as Socket)
-          const managerRole =
-            socket.data.userRole === UserRole.ADMIN ||
-            socket.data.userRole === UserRole.TEACHER
-
-          if (!valid || !managerRole) {
-            socket.disconnect(true)
-          }
-        })
-      )
-      return true
+      const sockets = await this.classroomNamespace.in([room + ':teacher', room + ':bigscreen']).fetchSockets()
+      if (!sockets.length) return
+      const classroom = await findClassroomAccess(classroomId)
+      await Promise.all(sockets.map(async (socket: Socket) => {
+        if (!classroom || !await this.refreshAuthenticatedSocket(socket)
+          || !canManageClassroom(classroom, socket.data.userId, socket.data.userRole)) {
+          socket.disconnect(true)
+          return
+        }
+        socket.emit(event, data)
+      }))
     } catch {
-      logger.error('课堂 manager Socket 撤权校验失败')
-      return false
+      logger.error('课堂管理消息投递失败', { event })
     }
   }
 

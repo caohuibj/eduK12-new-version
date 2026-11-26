@@ -22,6 +22,15 @@ describe('logger redaction', () => {
     expect(output).not.toContain('should-not-leak')
     expect(output).not.toContain('学生的秘密回答')
   })
+  it('keeps real frames and discards the entire multiline exception header', () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const err = new Error('invalid record\n    at private student answer\nother private detail')
+    logger.error('request failed', err)
+    const output = JSON.stringify(spy.mock.calls)
+    expect(output).toContain('logger.test.ts')
+    expect(output).not.toMatch(/invalid record|private student answer|other private detail/)
+  })
+
   it('redacts public entry and recovery credentials from structured diagnostics', () => {
     const spy=vi.spyOn(console, 'info').mockImplementation(() => undefined)
     logger.info('anonymous lifecycle', {

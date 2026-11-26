@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { prisma } from '../config/database'
+import { asBusinessPrincipal } from '../modules/organization/principal'
+import { trainingCourseScope } from '../utils/courseAccess'
 import { UserRole } from '../types'
 import { forbidden, notFound, unauthorized } from '../utils/response'
 
@@ -18,14 +20,14 @@ export interface ClassroomAccessRecord {
  *
  * Course shares grant reusable course-content access. They do not grant
  * access to a classroom's roster, identities, answers, or live controls.
- * Classroom managers are administrators, the classroom creator, and the
- * course creator.
+ * Classroom managers are approved business teachers who created the
+ * classroom or its course. Training entry grants do not grant live data.
  */
 export async function findClassroomAccess(
   classroomId: string
 ): Promise<ClassroomAccessRecord | null> {
   return prisma.classroom.findUnique({
-    where: { id: classroomId },
+    where: { id: classroomId, course: trainingCourseScope },
     select: {
       id: true,
       courseId: true,
@@ -45,10 +47,6 @@ export function canManageClassroom(
   userId: string | undefined,
   role: UserRole | undefined
 ): boolean {
-  if (role === UserRole.ADMIN) {
-    return true
-  }
-
   if (!userId || role !== UserRole.TEACHER) {
     return false
   }
@@ -94,10 +92,12 @@ export const requireClassroomManager = (paramName: string = 'id') => {
         return notFound(res, '课堂不存在')
       }
 
-      if (!canManageClassroom(classroom, req.user.userId, req.user.role)) {
+      const business = asBusinessPrincipal(req.user)
+      if (!business || !canManageClassroom(classroom, business.userId, business.role)) {
         return forbidden(res, '无权限访问此课堂')
       }
 
+      req.user = business
       return next()
     } catch (error) {
       return next(error)

@@ -29,7 +29,6 @@ Page({
   itemStartTime: null,
 
   onLoad(options) {
-    console.log('assessment onLoad, options:', options)
     this.questionnaireId = options.id
     this.itemStartTime = Date.now()
     if (!this.questionnaireId) {
@@ -50,7 +49,6 @@ Page({
       const availableList = availableRes.data?.list || []
       const existingRecord = availableList.find(q => q.id === this.questionnaireId)
       
-      console.log('existingRecord:', existingRecord)
       
       if (existingRecord && existingRecord.completed && existingRecord.assessmentId) {
         console.log('问卷已完成，跳转到结果页')
@@ -63,10 +61,8 @@ Page({
       // 开始/继续测评
       console.log('调用 startAssessment API...')
       const response = await questionnairesApi.startAssessment(this.questionnaireId)
-      console.log('startAssessment 原始响应:', response)
       
       const data = response.data || response
-      console.log('startAssessment 数据:', JSON.stringify(data, null, 2))
       
       // 检查是否已完成
       if (data.questionnaireAssessment?.status === 'COMPLETED' || !data.currentScale) {
@@ -85,7 +81,7 @@ Page({
       }
       
     } catch (error) {
-      console.error('加载问卷失败:', error)
+      console.error('加载问卷失败')
       this.setData({ 
         loading: false,
         error: '加载失败: ' + (error.message || '未知错误')
@@ -185,7 +181,7 @@ Page({
         })
       }
     } catch (err) {
-      console.error('获取已有答案失败:', err)
+      console.error('获取已有答案失败')
     }
   },
 
@@ -231,7 +227,7 @@ Page({
         responseTime: responseTime
       })
     } catch (err) {
-      console.error('提交答案失败:', err)
+      console.error('提交答案失败')
     }
   },
 
@@ -327,7 +323,7 @@ Page({
         wx.showToast({ title: '进入下一个量表', icon: 'none' })
       }
     } catch (error) {
-      console.error('提交失败:', error)
+      console.error('提交失败')
       wx.showToast({ title: '提交失败', icon: 'none' })
     } finally {
       this.setData({ submitting: false })

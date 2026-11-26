@@ -54,7 +54,7 @@ describe('read-only registration code discovery', () => {
     m.course.mockResolvedValue(course); const res = response()
     await resolveTrainingCode({ body: { code: ' OLD123 ' } } as any, res, vi.fn())
     expect(res.body.data).toEqual({ kind: 'STUDENT', code: 'OLD123', course: { courseId: 'c', courseName: '合成课程' } })
-    expect(m.course).toHaveBeenCalledWith(expect.objectContaining({ where: { courseCode: 'OLD123' } }))
+    expect(m.course).toHaveBeenCalledWith(expect.objectContaining({ where: { courseCode: 'OLD123', courseType: { in: ['TRAINING_COURSE', 'LEGACY_COURSE'] }, creator: { accountDomain: { in: ['TRAINING', 'LEGACY'] } } } }))
   })
   it('preserves teacher uppercase normalization and remaining use allowance', async () => {
     m.teacher.mockResolvedValue({ ...teacher, usedCount: 1, maxUses: 2 }); const res = response()

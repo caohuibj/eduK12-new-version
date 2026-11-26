@@ -1,5 +1,17 @@
-import { CourseStudentStatus, UserRole } from '@prisma/client'
+import { CourseStudentStatus, Prisma, UserRole } from '@prisma/client'
 import { prisma } from '../config/database'
+
+// The training and historical legacy accounts share a catalog. School activities
+// and other product accounts use their own authorization rules.
+export const trainingAccountScope = { accountDomain: { in: ['TRAINING', 'LEGACY'] } } satisfies Prisma.UserWhereInput
+export const trainingShareRecipientScope = {
+  ...trainingAccountScope, role: { in: [UserRole.TEACHER, UserRole.ADMIN] }, isActive: true, isFrozen: false,
+} satisfies Prisma.UserWhereInput
+
+export const trainingCourseScope = {
+  courseType: { in: ['TRAINING_COURSE', 'LEGACY_COURSE'] },
+  creator: trainingAccountScope,
+} satisfies Prisma.CourseWhereInput
 
 export const ACTIVE_COURSE_STUDENT_STATUSES = [
   CourseStudentStatus.ACTIVE,

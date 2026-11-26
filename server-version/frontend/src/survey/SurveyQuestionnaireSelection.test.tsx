@@ -50,7 +50,9 @@ it('exposes four study tabs and restores legacy tools links inside publication',
  const tabs=within(screen.getByRole('tablist',{name:'研究工作分区'}))
  expect(tabs.getAllByRole('tab').map(tab=>tab.textContent)).toEqual(['研究设置','发布与采集','私有报告','数据'])
  expect(tabs.getByRole('tab',{name:'发布与采集'})).toHaveAttribute('aria-selected','true')
- expect(new URLSearchParams(window.location.search).get('section')).toBe('publish')
- expect(window.location.hash).toBe('#survey-wave-content')
+ await waitFor(()=>{
+  expect(new URLSearchParams(window.location.search).get('section')).toBe('publish')
+  expect(window.location.hash).toBe('#survey-wave-content')
+ })
  expect(screen.queryByRole('tab',{name:'研究工具'})).not.toBeInTheDocument()
 })

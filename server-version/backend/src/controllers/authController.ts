@@ -5,6 +5,7 @@ import { AdminPermissionError } from '../modules/admin-permissions/service'
 import { mobileDiscovery } from '../modules/mobile/discovery'
 import { changePasswordHandler } from './changePasswordController'
 import { Request, Response } from 'express'
+import { trainingCourseScope } from '../utils/courseAccess'
 import { prisma } from '../config/database'
 import { generateToken } from '../utils/jwt'
 import { hashPassword, comparePassword, isValidPassword, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '../utils/password'
@@ -328,7 +329,7 @@ export const authController = {
 
       // 查找课程
       const course = await prisma.course.findUnique({
-        where: { courseCode },
+        where: { courseCode, ...trainingCourseScope },
         select: { id: true, courseCode: true, status: true, endedAt: true, isRecruiting: true, isLibrary: true },
       })
 
@@ -358,7 +359,7 @@ export const authController = {
           await (tx as any).$executeRaw`SELECT id FROM "courses" WHERE id = ${course.id} FOR UPDATE`
         }
         const lockedCourse = await tx.course.findUnique({
-          where: { id: course.id },
+          where: { id: course.id, ...trainingCourseScope },
           select: { id: true, courseCode: true, status: true, endedAt: true, isRecruiting: true, isLibrary: true },
         })
         // The initial lookup only identifies the row to lock.  A teacher may

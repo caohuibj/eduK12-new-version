@@ -7,6 +7,11 @@ vi.mock('../../controllers/platformAccountController', () => ({ resetPasswordFor
 vi.mock('../../controllers/courseStudentPasswordController', () => ({ resetPasswordForCourseTeacher: vi.fn() }))
 import { courseController } from '../../controllers/courseController'
 
+const expectedTrainingScope = {
+  courseType: { in: ['TRAINING_COURSE', 'LEGACY_COURSE'] },
+  creator: { accountDomain: { in: ['TRAINING', 'LEGACY'] } },
+}
+
 const response = () => {
   const res: any = { json: vi.fn() }
   res.status = vi.fn(() => res)
@@ -22,7 +27,7 @@ it('counts only owned non-library courses before paging and preserves determinis
   const res = response()
   await courseController.list({ user: { userId: 'trainer', role: 'TEACHER' },
     query: { status: 'PUBLISHED', page: '2', pageSize: '2', excludeLibrary: 'true' } } as any, res)
-  const where = { creatorId: 'trainer', status: 'PUBLISHED', isLibrary: false, courseType: { not: 'CAMPUS_ACTIVITY' } }
+  const where = { creatorId: 'trainer', status: 'PUBLISHED', isLibrary: false, ...expectedTrainingScope }
   expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({ where, skip: 2, take: 2,
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] }))
   expect(mocks.count).toHaveBeenCalledWith({ where })
@@ -48,7 +53,7 @@ it.each([
   ['creator','desc',[{creator:{username:'desc'}},{createdAt:'desc'},{id:'desc'}]],
 ])('sorts all matching courses before paging: %s %s',async(sortBy,sortOrder,orderBy)=>{
   await courseController.list({user:{userId:'manager',role:'ADMIN'},query:{sortBy,sortOrder,creatorId:'trainer-2',page:'2',pageSize:'20'}} as any,response())
-  const where={courseType:{not:'CAMPUS_ACTIVITY'},creatorId:'trainer-2'}
+  const where={...expectedTrainingScope,creatorId:'trainer-2'}
   expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({where,orderBy,skip:20,take:20}))
   expect(mocks.count).toHaveBeenCalledWith({where})
 })
@@ -60,11 +65,11 @@ it('keeps creator and sort variants isolated in cache keys',async()=>{
 })
 it('intersects requested creator with teacher ownership rather than widening access',async()=>{
   await courseController.list({user:{userId:'trainer-1',role:'TEACHER'},query:{creatorId:'trainer-2'}} as any,response())
-  expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({where:{courseType:{not:'CAMPUS_ACTIVITY'},creatorId:'trainer-1',AND:[{creatorId:'trainer-2'}]}}))
+  expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({where:{...expectedTrainingScope,creatorId:'trainer-1',AND:[{creatorId:'trainer-2'}]}}))
 })
 it('retains active student membership while filtering by creator',async()=>{
   await courseController.list({user:{userId:'learner',role:'STUDENT'},query:{creatorId:'trainer-2',sortBy:'creator',sortOrder:'asc'}} as any,response())
-  expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({where:{courseType:{not:'CAMPUS_ACTIVITY'},creatorId:'trainer-2',isLibrary:false,students:{some:{studentId:'learner',status:{in:['ACTIVE','APPROVED']}}}}}))
+  expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({where:{...expectedTrainingScope,creatorId:'trainer-2',isLibrary:false,students:{some:{studentId:'learner',status:{in:['ACTIVE','APPROVED']}}}}}))
 })
 it.each([{sortBy:'title'},{sortOrder:'invalid'},{sortBy:['creator']},{creatorId:['trainer']},{creatorId:''}])('rejects invalid read-only query parameters: %j',async query=>{
   const res=response();await courseController.list({user:{userId:'manager',role:'ADMIN'},query} as any,res)

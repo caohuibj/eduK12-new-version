@@ -11,6 +11,8 @@ import { cache } from '../utils/cache'
 import { Messages, CACHE_TTL } from '../constants'
 import { z } from 'zod'
 import {
+  trainingShareRecipientScope,
+  trainingCourseScope,
   canAccessCourseContent,
   canAccessCourseRoster,
   hasActiveCourseMembership,
@@ -150,14 +152,12 @@ export const courseController = {
         return success(res, cached)
       }
 
-      let where: any = res.locals?.trainingOversight
-        ? {courseType: {in: ['TRAINING_COURSE','LEGACY_COURSE']}, creator: {accountDomain: {in: ['TRAINING','LEGACY']}}}
-        : { courseType: { not: 'CAMPUS_ACTIVITY' } }
+      const where: Prisma.CourseWhereInput = { ...trainingCourseScope }
       if (excludeLibrary) where.isLibrary = false
       if (keyword) where.OR = [{title:{contains:keyword,mode:'insensitive'}},{description:{contains:keyword,mode:'insensitive'}},{courseCode:{contains:keyword,mode:'insensitive'}}]
 
       if (status !== 'all') {
-        where.status = status
+        where.status = status as CourseStatus
       }
 
       // 教师只能看到自己创建的课程，管理员可以看到所有
@@ -552,7 +552,7 @@ export const courseController = {
 
       // 查找课程
       const course = await prisma.course.findUnique({
-        where: { courseCode }
+        where: { courseCode, ...trainingCourseScope }
       })
 
       if (!course || course.courseType === 'CAMPUS_ACTIVITY') {
@@ -566,7 +566,7 @@ export const courseController = {
         if (typeof (tx as any).$executeRaw === 'function') {
           await (tx as any).$executeRaw`SELECT id FROM "courses" WHERE id = ${course.id} FOR UPDATE`
         }
-        const lockedCourse = await tx.course.findUnique({ where: { id: course.id } })
+        const lockedCourse = await tx.course.findUnique({ where: { id: course.id, ...trainingCourseScope } })
         // The initial lookup only identifies the row to lock.  A teacher may
         // rotate the code while this request is waiting for that row lock;
         // accepting the refreshed row without comparing the submitted code
@@ -630,7 +630,7 @@ export const courseController = {
       if (!userId) return error(res, '未登录', -1, 401)
       const { size, cursor, offset } = listPage(req.query)
       const where = { studentId: userId, status: { in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED] },
-        course: { isLibrary: false, courseType: { not: 'CAMPUS_ACTIVITY' as const } } }
+        course: { ...trainingCourseScope, isLibrary: false } }
       const rows = await prisma.courseStudent.findMany({
         where: { ...where, ...cursorWhere('joinedAt', cursor) },
         select: { id: true, joinedAt: true, course: { select: {
@@ -661,25 +661,20 @@ export const courseController = {
       }
 
       const course = await prisma.course.findUnique({
-        where: { courseCode },
-        include: {
-          creator: {
-            select: {
-              nickname: true,
-            }
-          }
-        }
+        where: { courseCode, ...trainingCourseScope },
+        select: {
+          id: true, title: true, status: true, endedAt: true, isRecruiting: true, isLibrary: true,
+          creator: { select: { nickname: true } },
+        },
       })
 
-      if (!course || course.courseType === 'CAMPUS_ACTIVITY') {
-        return error(res, '课程码无效')
-      }
+      if (!course) return error(res, '课程码无效')
 
       if (!isCourseJoinable(course)) return error(res, courseJoinabilityMessage(course))
 
       return success(res, {
         courseId: course.id,
-        courseName: course.title, course,
+        courseName: course.title,
         teacherName: course.creator?.nickname,
         isRecruiting: course.isRecruiting,
       }, '课程码有效')
@@ -1446,9 +1441,9 @@ export const courseController = {
       const userId = req.user?.userId
       const userRole = req.user?.role
       const { id } = req.params
-      const { userIds } = req.body // 要分享给的用户ID数组
+      const { userIds } = req.body
 
-      if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+      if (!Array.isArray(userIds) || !userIds.length || !userIds.every(id => typeof id === 'string' && id.length > 0)) {
         return error(res, '请选择要分享的用户')
       }
 
@@ -1457,46 +1452,26 @@ export const courseController = {
         return forbidden(res, '只有管理员可以分享课程')
       }
 
-      // 检查课程是否存在
       const course = await prisma.course.findUnique({
-        where: { id }
+        where: { id, ...trainingCourseScope }, select: { creatorId: true },
       })
+      if (!course) return notFound(res, '课程不存在')
+      if (!userId || course.creatorId !== userId) return forbidden(res, '只能分享自己创建的课程')
 
-      if (!course) {
-        return notFound(res, '课程不存在')
-      }
-
-      // 只能分享自己创建的课程
-      if (course.creatorId !== userId) {
-        return forbidden(res, '只能分享自己创建的课程')
-      }
-
-      // 批量创建分享记录
-      const shareData = userIds.map(targetUserId => ({
-        courseId: id,
-        sharedBy: userId!,
-        sharedTo: targetUserId,
-      }))
-
-      // 使用 upsert 避免重复分享
-      for (const data of shareData) {
-        await prisma.courseShare.upsert({
-          where: {
-            courseId_sharedTo: {
-              courseId: data.courseId,
-              sharedTo: data.sharedTo
-            }
-          },
-          update: {}, // 已存在则不更新
-          create: data
+      const recipients = [...new Set<string>(userIds)]
+      const accepted = await prisma.$transaction(async tx => {
+        const count = await tx.user.count({ where: { id: { in: recipients }, ...trainingShareRecipientScope } })
+        if (count !== recipients.length) return false
+        await tx.courseShare.createMany({
+          data: recipients.map(sharedTo => ({ courseId: id, sharedBy: userId, sharedTo })),
+          skipDuplicates: true,
         })
-      }
+        return true
+      }, { isolationLevel: 'RepeatableRead' })
+      if (!accepted) return error(res, '请选择有效的培训账号', -1, 400)
 
-      logger.info('[分享课程] 课程已分享', { courseId: id, recipientCount: userIds.length })
-
-      return success(res, {
-        sharedCount: userIds.length
-      }, `课程已分享给 ${userIds.length} 个用户`)
+      logger.info('[分享课程] 课程已分享', { courseId: id, recipientCount: recipients.length })
+      return success(res, { sharedCount: recipients.length }, `课程已分享给 ${recipients.length} 个用户`)
     } catch (err) {
       logger.error('分享课程错误', err)
       return error(res, '分享课程失败')
@@ -1509,7 +1484,7 @@ export const courseController = {
       const userId = req.user?.userId
 
       const shares = await prisma.courseShare.findMany({
-        where: { sharedTo: userId },
+        where: { sharedTo: userId, course: trainingCourseScope },
         include: {
           course: {
             include: {
@@ -1575,7 +1550,7 @@ export const courseController = {
       const { shareId } = req.params
 
       const share = await prisma.courseShare.findUnique({
-        where: { id: shareId },
+        where: { id: shareId, course: trainingCourseScope },
         include: { course: true }
       })
 
@@ -1609,7 +1584,7 @@ export const courseController = {
 
       // 检查分享记录是否存在
       const share = await prisma.courseShare.findUnique({
-        where: { id: shareId },
+        where: { id: shareId, course: trainingCourseScope },
         include: {
           course: {
             include: {

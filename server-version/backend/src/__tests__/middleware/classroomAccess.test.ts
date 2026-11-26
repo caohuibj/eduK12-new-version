@@ -55,8 +55,8 @@ describe('classroom manager policy', () => {
     mockPrisma.classroom.findUnique.mockResolvedValue(classroom)
   })
 
-  it('allows administrators, classroom creators and course owners', () => {
-    expect(canManageClassroom(classroom, 'admin-1', UserRole.ADMIN)).toBe(true)
+  it('allows classroom creators and course owners, not an entry admin role', () => {
+    expect(canManageClassroom(classroom, 'admin-1', UserRole.ADMIN)).toBe(false)
     expect(canManageClassroom(classroom, 'teacher-creator', UserRole.TEACHER)).toBe(true)
     expect(canManageClassroom(classroom, 'course-owner', UserRole.TEACHER)).toBe(true)
   })
@@ -106,6 +106,26 @@ describe('classroom manager policy', () => {
 
     expect(res.statusCode).toBe(403)
     expect(next).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['teacher-creator', true, true],
+    ['course-owner', true, true],
+    ['other-teacher', true, false],
+    ['teacher-creator', false, false],
+  ] as const)('uses the approved business identity for %s (approved=%s)', async (userId, teacherApproved, allowed) => {
+    const req = { params: { id: classroom.id }, user: {
+      userId, role: UserRole.ADMIN, businessRole: UserRole.TEACHER, teacherApproved,
+    } } as any
+    const res = makeRes(), next = vi.fn()
+    await requireClassroomManager()(req, res, next)
+    if (allowed) {
+      expect(next).toHaveBeenCalledOnce()
+      expect(req.user.role).toBe(UserRole.TEACHER)
+    } else {
+      expect(res.statusCode).toBe(403)
+      expect(next).not.toHaveBeenCalled()
+    }
   })
 
   it('returns 404 when the classroom does not exist', async () => {

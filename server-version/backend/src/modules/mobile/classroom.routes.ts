@@ -2,7 +2,9 @@ import { Router } from 'express'
 import { z } from 'zod'
 import { config } from '../../config'
 import { prisma } from '../../config/database'
-import { authenticate } from '../../middleware/auth'
+import { authenticate, requireBusinessRole } from '../../middleware/auth'
+import { UserRole } from '../../types'
+import { trainingCourseScope } from '../../utils/courseAccess'
 import { findClassroomAccess, canManageClassroom } from '../../middleware/classroomAccess'
 import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
 import { checkClassroomLookupRateLimit, checkFailedClassroomCodeRateLimit } from '../../utils/classroomRateLimiter'
@@ -11,20 +13,20 @@ import { joinClassroomStudent, startClassroomQuestion, endClassroomQuestion, clo
 import { classroomSocketHandler } from '../../services/classroomSocketHandler'
 
 export const classroomRuntimeRouter=Router()
-classroomRuntimeRouter.use((_req,res,next)=>{res.set('Cache-Control','no-store');if(!config.miniClassroomEnabled)return notFound(res);next()},authenticate)
+classroomRuntimeRouter.use((_req,res,next)=>{res.set('Cache-Control','no-store');if(!config.miniClassroomEnabled)return notFound(res);next()},authenticate,requireBusinessRole(UserRole.STUDENT,UserRole.TEACHER))
 const id=z.string().regex(/^[A-Za-z0-9_-]{1,128}$/)
 const mutationLimit=createRedisRateLimiter({name:'mini-classroom-command',limit:120,windowSeconds:60,key:req=>req.user!.userId})
 classroomRuntimeRouter.use((req,res,next)=>req.method==='GET'?next():mutationLimit(req,res,next))
 const handle=(fn:(req:any,res:any)=>Promise<any>)=>(req:any,res:any,next:any)=>Promise.resolve().then(()=>fn(req,res)).catch(e=>{if(e instanceof z.ZodError)return error(res,'请求参数无效',-1,400);if(e instanceof ClassroomLifecycleError)return error(res,e.message,-1,e.statusCode);next(e)})
 async function manager(req:any){const classroom=await findClassroomAccess(id.parse(req.params.id));if(!classroom)throw new ClassroomLifecycleError('课堂不存在',404);if(!canManageClassroom(classroom,req.user.userId,req.user.role))throw new ClassroomLifecycleError('无权限访问此课堂',403);return classroom}
-async function participant(req:any){if(req.user.role!=='STUDENT')throw new ClassroomLifecycleError('需要学生身份',403);const session=await prisma.classroomSession.findUnique({where:{classroomId_studentId:{classroomId:id.parse(req.params.id),studentId:req.user.userId}}});if(!session||session.isTemporary||session.leftAt)throw new ClassroomLifecycleError('请先加入课堂',404);return session}
+async function participant(req:any){if(req.user.role!=='STUDENT')throw new ClassroomLifecycleError('需要学生身份',403);const session=await prisma.classroomSession.findUnique({where:{classroomId_studentId:{classroomId:id.parse(req.params.id),studentId:req.user.userId},classroom:{course:trainingCourseScope}}});if(!session||session.isTemporary||session.leftAt)throw new ClassroomLifecycleError('请先加入课堂',404);return session}
 classroomRuntimeRouter.post('/join',handle(async(req,res)=>{
  const body=z.object({code:z.string().regex(/^\d{6}$/)}).strict().parse(req.body)
  if(req.user.role!=='STUDENT')return forbidden(res)
  const limit=await checkClassroomLookupRateLimit(req.ip||'unknown')
  if(!limit.available)return error(res,'课堂入口暂不可用',-1,503)
  if(!limit.allowed){res.set('Retry-After',String(limit.retryAfterSeconds));return error(res,'请求过于频繁',-1,429)}
- const classroom=await prisma.classroom.findUnique({where:{code:body.code},select:{id:true,name:true,status:true}})
+ const classroom=await prisma.classroom.findUnique({where:{code:body.code,course:trainingCourseScope},select:{id:true,name:true,status:true}})
  if(!classroom||!['PREPARING','ACTIVE'].includes(classroom.status)){const failed=await checkFailedClassroomCodeRateLimit(req.ip||'unknown',body.code);if(!failed.available)return error(res,'课堂入口暂不可用',-1,503);if(!failed.allowed){res.set('Retry-After',String(failed.retryAfterSeconds));return error(res,'请求过于频繁',-1,429)}return notFound(res,'课堂不存在或当前不可加入')}
  const session=await joinClassroomStudent({classroomId:classroom.id,studentId:req.user.userId,isTemporary:false})
  return success(res,{classroomId:classroom.id,name:classroom.name,sessionId:session.id})
@@ -33,7 +35,7 @@ classroomRuntimeRouter.get('/:id/state',handle(async(req,res)=>{
  const classroomId=id.parse(req.params.id),student=req.user.role==='STUDENT'
  const session=student?await participant(req):null
  if(!student)await manager(req)
- const classroom=await prisma.classroom.findUnique({where:{id:classroomId},select:{id:true,name:true,status:true,code:true}})
+ const classroom=await prisma.classroom.findUnique({where:{id:classroomId,course:trainingCourseScope},select:{id:true,name:true,status:true,code:true}})
  if(!classroom)return notFound(res)
  let question=await prisma.classroomQuestion.findFirst({where:{classroomId,startedAt:{not:null},endedAt:null},select:{id:true,questionContent:true,questionIndex:true,timeLimit:true,startedAt:true,endedAt:true}})
  if(question?.startedAt&&Date.now()>=question.startedAt.getTime()+(question.timeLimit||60)*1000){const ended=await endClassroomQuestion(classroomId,question.id,{automatic:true,expectedStartedAt:question.startedAt});if(ended.changed)await classroomSocketHandler.notifyQuestionEnded(classroomId,question.id);question=null}
@@ -48,7 +50,7 @@ classroomRuntimeRouter.post('/:id/start',handle(async(req,res)=>{
  const result=await startClassroomQuestion(classroom,body.questionId,body.timeLimit??null)
  if(result.kind==='question-not-found')return notFound(res)
  if(result.kind==='conflict'||result.kind==='race-lost')return error(res,'其他题目正在进行中，请刷新',-1,409)
- if(result.kind==='started')classroomSocketHandler.notifyQuestionStarted(classroom.id,result.question)
+ if(result.kind==='started')await classroomSocketHandler.notifyQuestionStarted(classroom.id,result.question)
  return success(res,{question:result.question,started:result.kind==='started'})
 }))
 classroomRuntimeRouter.post('/:id/end',handle(async(req,res)=>{const body=z.object({questionId:id,startedAt:z.string().datetime()}).strict().parse(req.body),classroom=await manager(req);const result=await endClassroomQuestion(classroom.id,body.questionId,{expectedStartedAt:new Date(body.startedAt)});if(result.staleRound)return error(res,'题目已重新开始，请刷新后操作',-1,409);if(result.changed)await classroomSocketHandler.notifyQuestionEnded(classroom.id,body.questionId);return success(res,result)}))

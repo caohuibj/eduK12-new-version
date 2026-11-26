@@ -14,7 +14,7 @@ const {
     getClassroomNamespace: vi.fn(),
     broadcastToRoom: vi.fn(),
     getRoomConnectionCount: vi.fn(),
-    revalidateManagerSockets: vi.fn(),
+    sendToClassroomManagers: vi.fn(),
     refreshAuthenticatedSocket: vi.fn(),
   },
   mockPrisma: {
@@ -96,7 +96,7 @@ describe('classroom socket authorization boundary', () => {
     vi.clearAllMocks()
     mockPrisma.$transaction.mockImplementation(async callback=>callback(mockPrisma))
     mockSocketService.getClassroomNamespace.mockReturnValue(mockNamespace)
-    mockSocketService.revalidateManagerSockets.mockResolvedValue(true)
+    mockSocketService.sendToClassroomManagers.mockResolvedValue(undefined)
     mockSocketService.refreshAuthenticatedSocket.mockResolvedValue(true)
     mockCanManageClassroom.mockReturnValue(true)
     mockLookupLimit.mockResolvedValue({
@@ -276,7 +276,7 @@ describe('classroom socket authorization boundary', () => {
     await handlers.get('teacher:next')!()
 
     expect(socket.emit).toHaveBeenCalledWith('error', {
-      message: '需要经过认证的教师或管理员连接',
+      message: '需要经过认证的教师连接',
     })
     expect(mockFindClassroomAccess).not.toHaveBeenCalled()
     expect(mockSocketService.broadcastToRoom).not.toHaveBeenCalled()
@@ -329,19 +329,10 @@ describe('classroom socket authorization boundary', () => {
 
     await (handler as any).broadcastStats('classroom-1', 'question-1')
 
-    expect(mockSocketService.revalidateManagerSockets).toHaveBeenNthCalledWith(
-      1,
-      'classroom:classroom-1:teacher'
+    expect(mockSocketService.sendToClassroomManagers).toHaveBeenCalledWith(
+      'classroom-1', 'broadcast:stats', expect.any(Object)
     )
-    expect(mockSocketService.revalidateManagerSockets).toHaveBeenNthCalledWith(
-      2,
-      'classroom:classroom-1:bigscreen'
-    )
-    expect(mockSocketService.broadcastToRoom).toHaveBeenCalledWith(
-      'classroom:classroom-1:teacher',
-      'broadcast:stats',
-      expect.any(Object)
-    )
+    expect(mockSocketService.broadcastToRoom).not.toHaveBeenCalled()
   })
 
   it('does not require leftAt to be null for a server-bound student submit', async () => {
@@ -571,16 +562,15 @@ describe('classroom socket authorization boundary', () => {
 
       expect(ack).toHaveBeenCalledWith({ ok: true, started: true, question: managerQuestion })
     } else {
-      handler.notifyQuestionStarted('classroom-1', question)
+      await handler.notifyQuestionStarted('classroom-1', question)
     }
 
     expect(mockSocketService.broadcastToRoom.mock.calls).toEqual([
       ['classroom:classroom-1:students', 'broadcast:question', {
         ...managerQuestion, questionContent: participantQuestionContent,
       }],
-      ['classroom:classroom-1:teacher', 'broadcast:question', managerQuestion],
-      ['classroom:classroom-1:bigscreen', 'broadcast:question', managerQuestion],
     ])
+    expect(mockSocketService.sendToClassroomManagers).toHaveBeenCalledWith('classroom-1', 'broadcast:question', managerQuestion)
     expect(schedule).toHaveBeenCalledWith('classroom-1', question.id, 60, startedAt)
     expect(question.questionContent).toEqual(questionContentWithAnswers)
     expect(question.questionContent.correctAnswer).toBe('A')

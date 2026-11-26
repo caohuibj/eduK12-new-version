@@ -33,6 +33,10 @@ suite('business identities remain orthogonal to Training management over real HT
       templates[name]=template as typeof example
     }
     const app=express();app.use(express.json());app.use('/api',(await import('../../middleware/csrf')).csrfProtection)
+    app.use('/api/admin/training',(await import('../../routes/trainingAdmin')).default)
+    app.use('/api/mobile/classrooms',(await import('../../modules/mobile/classroom.routes')).classroomRuntimeRouter)
+    app.use('/api/mobile',(await import('../../modules/mobile/routes')).mobileRouter)
+    app.use('/api/classrooms',(await import('../../routes/classrooms')).default)
     app.use('/api/courses',(await import('../../routes/courses')).default)
     app.use('/api/situational',(await import('../../routes/situational')).default)
     app.use('/api/teacher/situational',(await import('../../routes/sjtTeacherParticipation')).default)
@@ -47,6 +51,80 @@ suite('business identities remain orthogonal to Training management over real HT
     const response=await fetch(base+'/api'+path,{method,headers:{Cookie:'ptool_session='+token+'; ptool_csrf=synthetic-csrf',Origin:'http://localhost:5174','Content-Type':'application/json','X-CSRF-Token':'synthetic-csrf',...(view?{'X-EduK12-Account-View':view}:{})},...(body===undefined?{}:{body:JSON.stringify(body)})})
     return {status:response.status,body:await response.json() as any}
   }
+  it('keeps campus courses and school accounts outside training discovery and sharing', async () => {
+    const school = await db.user.create({ data: { username: 'school-' + randomUUID(), role: 'TEACHER',
+      passwordHash: 'unusable', accountDomain: 'SCHOOL', teacherApproved: true } })
+    const org = await db.organization.create({ data: { id: randomUUID(), name: 'Synthetic school',
+      productDomain: 'SCHOOL', createdByUserId: school.id } })
+    const campus = await db.course.create({ data: { title: 'Synthetic campus activity', courseCode: randomUUID(),
+      courseType: 'CAMPUS_ACTIVITY', creatorId: school.id, organizationId: org.id, isRecruiting: false } })
+    const task = await db.assignment.create({ data: { courseId: campus.id, title: 'Synthetic campus task' } })
+    const classroom = await db.classroom.create({ data: { name: 'Synthetic campus classroom', code: randomUUID(), courseId: campus.id, creatorId: school.id } })
+    for (const id of [courses.teacher.id, campus.id, randomUUID()]) {
+      expect((await fetch(base + '/api/courses/' + id)).status).toBe(401)
+    }
+    const management = (path: string) => call('teacher', path, 'GET', undefined, 'MANAGEMENT')
+    for (const [domain, hidden] of [['courses', campus.id], ['assignments', task.id], ['classrooms', classroom.id]]) {
+      const listing = await management('/mobile/lists/' + domain)
+      expect(listing.status).toBe(200)
+      expect(listing.body.data.list.map((row: { id: string }) => row.id)).not.toContain(hidden)
+      expect((await management('/mobile/context/' + domain + '/' + hidden)).status).toBe(404)
+      expect((await management('/mobile/lists/' + domain + '?courseId=' + campus.id)).status).toBe(404)
+    }
+    expect((await management('/mobile/context/courses/' + courses.teacher.id)).status).toBe(200)
+    expect((await management('/mobile/context/users/' + school.id)).status).toBe(404)
+    const options = await management('/mobile/courses/' + courses.teacher.id + '/share-options?keyword=' + school.username)
+    expect(options.status).toBe(200)
+    expect(options.body.data.total).toBe(0)
+
+    const path = '/courses/' + courses.teacher.id + '/share'
+    const mixed = await call('teacher', path, 'POST', { userIds: [users.otherTeacher.id, school.id] }, 'MANAGEMENT')
+    expect(mixed.status).toBe(400)
+    expect(await db.courseShare.count({ where: { courseId: courses.teacher.id } })).toBe(0)
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const accepted = await call('teacher', path, 'POST', { userIds: [users.otherTeacher.id] }, 'MANAGEMENT')
+      expect(accepted.body.data.sharedCount).toBe(1)
+    }
+    expect(await db.courseShare.count({ where: { courseId: courses.teacher.id } })).toBe(1)
+  })
+
+  it('classroom data requires an approved teacher and ownership, independently of Training management', async () => {
+    const { config } = await import('../../config')
+    const previousFlag = config.miniClassroomEnabled
+    config.miniClassroomEnabled = true
+    try {
+      const createClassroom = (name: 'teacher' | 'otherTeacher') => db.classroom.create({ data: {
+        name: 'Synthetic classroom', code: randomUUID(), courseId: courses[name].id, creatorId: users[name].id,
+      } })
+      const owned = await createClassroom('teacher'), unrelated = await createClassroom('otherTeacher')
+      for (const classroom of [owned, unrelated]) {
+        await db.classroomQuestion.create({ data: { classroomId: classroom.id, questionIndex: 1,
+          questionContent: { question: 'Synthetic question', correctAnswer: 'A' } } })
+      }
+      const paths = (id: string) => ['/classrooms/' + id, '/classrooms/' + id + '/questions',
+        '/mobile/context/classrooms/' + id, '/mobile/classrooms/' + id + '/state']
+      for (const path of paths(owned.id)) {
+        expect((await call('teacher', path, 'GET', undefined, 'MANAGEMENT')).status).toBe(200)
+        expect((await call('pureAdmin', path, 'GET', undefined, 'MANAGEMENT')).status).toBe(403)
+      }
+      for (const path of paths(unrelated.id)) {
+        expect((await call('teacher', path, 'GET', undefined, 'MANAGEMENT')).status).toBe(403)
+      }
+      const listing = await call('teacher', '/mobile/lists/classrooms', 'GET', undefined, 'MANAGEMENT')
+      expect(listing.status).toBe(200)
+      expect(listing.body.data.list.map((row: {id: string}) => row.id)).toContain(owned.id)
+      expect(listing.body.data.list.map((row: {id: string}) => row.id)).not.toContain(unrelated.id)
+      await db.user.update({ where: { id: users.teacher.id }, data: { teacherApproved: false } })
+      try {
+        for (const path of paths(owned.id)) {
+          expect((await call('teacher', path, 'GET', undefined, 'MANAGEMENT')).status).toBe(403)
+        }
+      } finally {
+        await db.user.update({ where: { id: users.teacher.id }, data: { teacherApproved: true } })
+      }
+    } finally { config.miniClassroomEnabled = previousFlag }
+  })
+
   it('STUDENT + Training can join, see its actual tasks and retain management in the separate view',async()=>{
     expect((await call('student','/courses/join','POST',{courseCode:courses.teacher.courseCode})).status).toBe(200)
     // A pure ADMIN business label is not a student, even with a Training grant.
@@ -64,8 +142,9 @@ suite('business identities remain orthogonal to Training management over real HT
   it('teacher business view is restricted to its own course, while its explicit management view remains available',async()=>{
     expect((await call('teacher','/courses/'+courses.teacher.id+'/students','GET',undefined,'BUSINESS')).status).toBe(200)
     expect((await call('teacher','/courses/'+courses.otherTeacher.id+'/students','GET',undefined,'BUSINESS')).status).toBe(403)
-    expect((await call('teacher','/courses/'+courses.otherTeacher.id+'/students','GET',undefined,'MANAGEMENT')).status).toBe(200)
-    expect((await call('otherTeacher','/courses/'+courses.teacher.id+'/students','GET',undefined,'MANAGEMENT')).status).toBe(403)
+    expect((await call('teacher','/courses/'+courses.otherTeacher.id+'/students','GET',undefined,'MANAGEMENT')).status).toBe(403)
+    expect((await call('teacher','/admin/training/courses/'+courses.otherTeacher.id+'/students','GET',undefined,'MANAGEMENT')).status).toBe(200)
+    expect((await call('otherTeacher','/admin/training/courses/'+courses.teacher.id+'/students','GET',undefined,'MANAGEMENT')).status).toBe(403)
     expect((await call('teacher','/courses/'+courses.teacher.id+'/training-analysis/sources','GET',undefined,'BUSINESS')).status).toBe(200)
     expect((await call('teacher','/courses/'+courses.otherTeacher.id+'/training-analysis/sources','GET',undefined,'BUSINESS')).status).toBe(404)
     await db.user.update({where:{id:users.teacher.id},data:{teacherApproved:false}})

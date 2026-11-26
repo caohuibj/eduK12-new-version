@@ -36,7 +36,6 @@ export function previewDocument(url, allowDownload = false) {
       return
     }
 
-    console.log('[文档预览] URL:', url, '允许下载:', allowDownload)
     
     wx.showLoading({ title: '加载文档中...' })
     
@@ -45,7 +44,6 @@ export function previewDocument(url, allowDownload = false) {
       url: url,
       success: (res) => {
         if (res.statusCode === 200) {
-          console.log('[文档预览] 下载成功，临时路径:', res.tempFilePath)
           
           // 打开文档预览
           wx.openDocument({
@@ -58,7 +56,7 @@ export function previewDocument(url, allowDownload = false) {
               resolve()
             },
             fail: (err) => {
-              console.error('[文档预览] 打开失败:', err)
+              console.error('[文档预览] 打开失败')
               wx.hideLoading()
               
               // 如果打开失败，提示用户
@@ -82,7 +80,7 @@ export function previewDocument(url, allowDownload = false) {
       },
       fail: (err) => {
         wx.hideLoading()
-        console.error('[文档预览] 下载失败:', err)
+        console.error('[文档预览] 下载失败')
         wx.showToast({
           title: '文档下载失败',
           icon: 'none',

@@ -308,9 +308,9 @@ export const requireTeacher = (req:Request,res:Response,next:NextFunction) => {
   const domain=req.user.accountDomain
   if(!domain)return forbidden(res,'缺少当前产品身份，请重新登录')
   if(['LEGACY','TRAINING'].includes(domain)){
-    const role=req.user.businessRole??req.user.role
-    if(role!==UserRole.TEACHER)return forbidden(res,'此操作需要培训师业务身份，入口管理身份不授予私有业务数据权限')
-    req.user={...req.user,role:UserRole.TEACHER}
+    const business = asBusinessPrincipal(req.user)
+    if(business?.role!==UserRole.TEACHER)return forbidden(res,'此操作需要培训师业务身份，入口管理身份不授予私有业务数据权限')
+    req.user=business
     return next()
   }
   return requireRole(UserRole.TEACHER,UserRole.ADMIN)(req,res,next)

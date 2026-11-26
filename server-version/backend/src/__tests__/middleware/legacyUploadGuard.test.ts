@@ -26,6 +26,32 @@ describe('legacy upload guard', () => {
     expect(next).not.toHaveBeenCalled()
   })
 
+  it.each(['/ASSETS', '/assets//', '/%61ssets/example.pdf', '/images/../assets/example.pdf'])(
+    'protects equivalent paths to the asset namespace (%s)', path => {
+      const res = makeRes()
+      const next = vi.fn()
+      legacyUploadGuard(true)({ path } as any, res, next)
+      expect(res.statusCode).toBe(410)
+      expect(next).not.toHaveBeenCalled()
+    },
+  )
+
+  it.each(['/images/old%20photo.png', '/documents/旧讲义.pdf', '/assets-archive/image.png'])(
+    'passes a normal legacy path during migration (%s)', path => {
+      const next = vi.fn()
+      legacyUploadGuard(true)({ path } as any, makeRes(), next)
+      expect(next).toHaveBeenCalledOnce()
+    },
+  )
+
+  it('rejects invalid path encoding', () => {
+    const res = makeRes()
+    const next = vi.fn()
+    legacyUploadGuard(true)({ path: '/images/%' } as any, res, next)
+    expect(res.statusCode).toBe(400)
+    expect(next).not.toHaveBeenCalled()
+  })
+
   it('keeps legacy paths available only while explicitly enabled', () => {
     const res = makeRes()
     const next = vi.fn()

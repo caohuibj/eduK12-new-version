@@ -13,7 +13,7 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 vi.mock('../../utils/jwt', () => ({ verifyToken: mockVerifyToken }))
 vi.mock('../../utils/sessionRevocation', () => ({ isSessionRevoked: mockRevoked }))
 
-import { authenticate, authenticateSchool, authenticateHuiteacher, authenticateSurvey, optionalAuthenticate, requireSelfOrAdmin, requireStudent, invalidatePrincipalCache } from '../../middleware/auth'
+import { authenticate, authenticateSchool, authenticateHuiteacher, authenticateSurvey, optionalAuthenticate, requireSelfOrAdmin, requireStudent, requireTeacher, invalidatePrincipalCache } from '../../middleware/auth'
 
 beforeEach(() => {
   invalidatePrincipalCache()
@@ -356,5 +356,21 @@ describe('requireStudent', () => {
     requireStudent(req, res, next)
 
     expect(next).toHaveBeenCalledOnce()
+  })
+})
+
+describe('training teacher approval', () => {
+  it.each([false, true])('honors teacher approval (%s) for a teacher with a management grant', approved => {
+    const req = makeReq()
+    req.user = { ...activePrincipal, role: UserRole.ADMIN, businessRole: UserRole.TEACHER, teacherApproved: approved }
+    const res = makeRes(), next = vi.fn()
+    requireTeacher(req, res, next)
+    if (approved) {
+      expect(next).toHaveBeenCalledOnce()
+      expect(req.user.role).toBe(UserRole.TEACHER)
+    } else {
+      expect(next).not.toHaveBeenCalled()
+      expect(res.statusCode).toBe(403)
+    }
   })
 })

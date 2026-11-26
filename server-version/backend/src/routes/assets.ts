@@ -1,4 +1,5 @@
 import { Router, type Request, type Response } from 'express'
+import { asyncHandler } from '../middleware/asyncHandler'
 import { authenticate } from '../middleware/auth'
 import { issuePrivateAssetUrl, issuePublicAssetUrl, serveAsset } from '../services/assetStorage'
 import {
@@ -32,21 +33,21 @@ const assessmentMediaContent = async (req: Request, res: Response) => {
 // recovery headers reliably. Adapters exchange their existing authorization
 // for a short-lived, scope-bound capability URL, then media GET/HEAD/Range
 // requests use only that signed capability.
-router.get('/assessment-media/content', assessmentMediaContent)
-router.head('/assessment-media/content', assessmentMediaContent)
+router.get('/assessment-media/content', asyncHandler(assessmentMediaContent))
+router.head('/assessment-media/content', asyncHandler(assessmentMediaContent))
 
 // CI-only issuance seam used to prove that authenticated and anonymous
 // recovery credentials can be exchanged once, before native media requests.
-if (process.env.ASSESSMENT_VIDEO_E2E_FIXTURE === 'true') {
-  router.get('/assessment-media/e2e/auth-capabilities', authenticate, assessmentVideoE2EAuthenticatedCapabilities)
-  router.get('/assessment-media/e2e/public-capabilities', assessmentVideoE2EPublicCapabilities)
+if (process.env.NODE_ENV === 'test' && process.env.ASSESSMENT_VIDEO_E2E_FIXTURE === 'true') {
+  router.get('/assessment-media/e2e/auth-capabilities', authenticate, asyncHandler(assessmentVideoE2EAuthenticatedCapabilities))
+  router.get('/assessment-media/e2e/public-capabilities', asyncHandler(assessmentVideoE2EPublicCapabilities))
 }
 
 // Public issuance and delivery both require the X-Checkin-Token header.
-publicAssetRouter.get('/:id/url', issuePublicAssetUrl)
-publicAssetRouter.get('/:id/content', serveAsset)
+publicAssetRouter.get('/:id/url', asyncHandler(issuePublicAssetUrl))
+publicAssetRouter.get('/:id/content', asyncHandler(serveAsset))
 
-router.get('/:id/url', authenticate, issuePrivateAssetUrl)
-router.get('/:id/content', serveAsset)
+router.get('/:id/url', authenticate, asyncHandler(issuePrivateAssetUrl))
+router.get('/:id/content', asyncHandler(serveAsset))
 
 export default router

@@ -1,4 +1,4 @@
-import type {Prisma} from '@prisma/client'
+import { trainingCourseScope } from '../utils/courseAccess'
 import {Router, type Request, type Response, type NextFunction} from 'express'
 import {z} from 'zod'
 import {authenticate} from '../middleware/auth'
@@ -16,10 +16,7 @@ import {UserRole} from '../types'
 
 /** Management summaries and course supervision only. This router never grants
  * teacher authoring, respondent data, or access to another product's courses. */
-export const trainingAdminCourseScope: Prisma.CourseWhereInput = {
-  courseType: {in: ['TRAINING_COURSE', 'LEGACY_COURSE']},
-  creator: {accountDomain: {in: ['TRAINING', 'LEGACY']}},
-}
+export const trainingAdminCourseScope = trainingCourseScope
 export const trainingAdminCourseEdit = z.object({
   title: z.string().trim().min(1).max(200).optional(),
   description: z.string().max(10000).optional(),

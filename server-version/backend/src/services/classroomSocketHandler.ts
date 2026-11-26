@@ -1,3 +1,4 @@
+import { trainingCourseScope } from '../utils/courseAccess'
 import { classroomSubmissionStats } from './classroomSubmissionStats'
 import { startClassroomQuestion, endClassroomQuestion, closeClassroom, submitClassroomAnswer, joinClassroomStudent, leaveClassroomStudent, ClassroomLifecycleError } from './classroomLifecycleService'
 /**
@@ -212,8 +213,7 @@ export class ClassroomSocketHandler {
   private isManagerSocket(socket: Socket): boolean {
     return (
       socket.data.authenticated === true &&
-      (socket.data.userRole === UserRole.ADMIN ||
-        socket.data.userRole === UserRole.TEACHER)
+      socket.data.userRole === UserRole.TEACHER
     )
   }
 
@@ -262,7 +262,7 @@ export class ClassroomSocketHandler {
       !(await socketService.refreshAuthenticatedSocket(socket)) ||
       !this.isManagerSocket(socket)
     ) {
-      this.emitError(socket, '需要经过认证的教师或管理员连接')
+      this.emitError(socket, '需要经过认证的教师连接')
       return null
     }
 
@@ -418,7 +418,7 @@ export class ClassroomSocketHandler {
       }
 
       const classroom = await prisma.classroom.findUnique({
-        where: { code },
+        where: { code, course: trainingCourseScope },
         select: {
           id: true,
           code: true,
@@ -705,7 +705,6 @@ export class ClassroomSocketHandler {
       }
 
       const question = outcome.question
-      this.broadcastQuestionStarted(classroom.id, question)
 
       this.scheduleQuestionTimer(
         classroom.id,
@@ -714,6 +713,7 @@ export class ClassroomSocketHandler {
         question.startedAt
       )
 
+      await this.broadcastQuestionStarted(classroom.id, question)
       logger.info('教师开始答题', {
         classroomId: classroom.id,
         questionId: question.id,
@@ -1172,22 +1172,7 @@ export class ClassroomSocketHandler {
       return
     }
 
-    const room = 'classroom:' + classroomId
-    const managerRoomsValid = await Promise.all([
-      socketService.revalidateManagerSockets(room + ':teacher'),
-      socketService.revalidateManagerSockets(room + ':bigscreen'),
-    ])
-    if (managerRoomsValid.some((valid) => !valid)) {
-      return
-    }
-
-    // Statistics contain answer-derived data and are restricted to managers.
-    socketService.broadcastToRoom(room + ':teacher', 'broadcast:stats', stats)
-    socketService.broadcastToRoom(
-      room + ':bigscreen',
-      'broadcast:stats',
-      stats
-    )
+    await socketService.sendToClassroomManagers(classroomId, 'broadcast:stats', stats)
   }
 
   private async flushQuestionStatsAuthoritatively(
@@ -1205,20 +1190,19 @@ export class ClassroomSocketHandler {
   }
 
 
-  private broadcastQuestionStarted(classroomId: string, question: any): void {
+  private broadcastQuestionStarted(classroomId: string, question: any): Promise<void> {
     const room = 'classroom:' + classroomId
     const managerPayload = { ...classroomQuestionPayload(question) }
     socketService.broadcastToRoom(room + ':students', 'broadcast:question', {
       ...managerPayload,
       questionContent: participantQuestionContent(question.questionContent),
     })
-    socketService.broadcastToRoom(room + ':teacher', 'broadcast:question', managerPayload)
-    socketService.broadcastToRoom(room + ':bigscreen', 'broadcast:question', managerPayload)
+    return socketService.sendToClassroomManagers(classroomId, 'broadcast:question', managerPayload)
   }
 
-  notifyQuestionStarted(classroomId:string,question:any):void {
-    this.broadcastQuestionStarted(classroomId, question)
+  notifyQuestionStarted(classroomId:string,question:any):Promise<void> {
     this.scheduleQuestionTimer(classroomId,question.id,question.timeLimit||60,question.startedAt)
+    return this.broadcastQuestionStarted(classroomId, question)
   }
   async notifyQuestionEnded(classroomId:string,questionId:string):Promise<void>{
     const timerKey=classroomId+':'+questionId;const timer=this.activeTimers.get(timerKey);if(timer)clearTimeout(timer);this.activeTimers.delete(timerKey)
