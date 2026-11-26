@@ -29,6 +29,7 @@ async function administrator(req:Request) {
   await governance.authorizeAdmin(req.user!.userId,parsed.currentPassword)
 }
 surveyPlatformRouter.use(authenticate, requireSurveyManager)
+surveyPlatformRouter.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 surveyPlatformRouter.use((req,res,next)=>['GET','HEAD','OPTIONS'].includes(req.method)?next():requireRecentAdminKey(req,res,next))
 surveyPlatformRouter.get('/researchers',handler(req=>governance.researcherList(req.user!.userId,Math.min(1000,Math.max(1,Number(req.query.page)||1)))))
 surveyPlatformRouter.get('/researcher-invitations',handler(req=>
@@ -51,8 +52,10 @@ surveyPlatformRouter.post('/researchers/:id/revoke',handler(async req=>{
   await administrator(req)
   return governance.revokeResearcherPermanently(req.user!.userId,inviteId.parse(req.params.id))
 }))
-surveyPlatformRouter.post('/researchers/:id/mfa-reset',handler(async req=>{
-  await administrator(req);return governance.resetResearcherMfa(req.user!.userId,inviteId.parse(req.params.id))
+surveyPlatformRouter.post('/researchers/:id/mfa-rebind-invitations',handler(async req=>{
+  const input=password.extend({identityVerification:z.string().trim().min(3).max(500)}).parse(req.body)
+  await governance.authorizeAdmin(req.user!.userId,input.currentPassword)
+  return governance.inviteResearcherMfaRebind(req.user!.userId,inviteId.parse(req.params.id),input.identityVerification)
 }))
 surveyPlatformRouter.post('/researchers/:id/password-reset-invitations',handler(async req=>{
   await administrator(req);return governance.invitePasswordReset(req.user!.userId,inviteId.parse(req.params.id))
@@ -66,7 +69,6 @@ surveyPlatformRouter.get('/source-catalog',handler(req=>catalog.sourceCatalog(re
   organizationId:sourceRef.shape.organizationId.parse(req.query.organizationId)})))
 surveyPlatformRouter.get('/cognitive-profile-preview',handler(req=>catalog.previewSurveyCognitiveProfileSource(req.user!.userId,sourceRef.parse({kind:'COGNITIVE',sourceId:req.query.sourceId,sourceVersion:req.query.sourceVersion}))))
 surveyPlatformRouter.get('/researchers/:id/tool-grants',handler(req=>catalog.listToolGrants(req.user!.userId,inviteId.parse(req.params.id),page(req.query.page))))
-surveyPlatformRouter.use('/researchers/:id/tool-grant-requests',(_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 surveyPlatformRouter.get('/researchers/:id/tool-grant-requests/:requestId',handler(async req=>{
  return {operation:await catalog.readExactToolGrantRequest(req.user!.userId,inviteId.parse(req.params.id),inviteId.parse(req.params.requestId))}
 }))

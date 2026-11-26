@@ -17,6 +17,12 @@
 #   docker compose -f docker-compose.yml -f docker-compose.prod-override.example.yml config
 # ============================================================
 
+x-prod-admin-auth-env: &prod-admin-auth-env
+  ADMIN_AUTH_ORIGIN: ${ADMIN_AUTH_ORIGIN:-https://training.eduk12.top}
+  ADMIN_MFA_ENCRYPTION_KEY: ${ADMIN_MFA_ENCRYPTION_KEY:-}
+  ADMIN_REQUIRE_TOTP: ${ADMIN_REQUIRE_TOTP:-false}
+  ADMIN_WEBAUTHN_RP_ID: ${ADMIN_WEBAUTHN_RP_ID:-}
+
 x-prod-shared-env: &prod-shared-env
   NODE_ENV: production
   PORT: "3000"
@@ -226,7 +232,7 @@ services:
     cpu_shares: 1024
     mem_limit: 768m
     environment:
-      <<: *prod-shared-env
+      <<: [*prod-shared-env, *prod-admin-auth-env]
       BACKGROUND_WORKERS_ENABLED: "false"
       NODE_OPTIONS: "--max-old-space-size=384 --max-semi-space-size=16"
       MALLOC_ARENA_MAX: "2"
@@ -248,7 +254,7 @@ services:
     cpu_shares: 1024
     mem_limit: 768m
     environment:
-      <<: *prod-shared-env
+      <<: [*prod-shared-env, *prod-admin-auth-env]
       BACKGROUND_WORKERS_ENABLED: "false"
       NODE_OPTIONS: "--max-old-space-size=384 --max-semi-space-size=16"
       MALLOC_ARENA_MAX: "2"

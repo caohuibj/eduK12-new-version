@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { success, error, notFound } from '../utils/response'
@@ -90,23 +91,23 @@ export const teacherCodeController = {
       // 生成唯一教师码
       const code = await generateTeacherCode()
 
-      const teacherCode = await prisma.teacherCode.create({
-        data: {
-          code,
-          createdBy: userId,
-          maxUses,
-          accountValidityDays: accountValidityDays ?? null,
-          expiresAt: expiresAt ? new Date(expiresAt) : null,
-        },
-        include: {
-          creator: {
-            select: {
-              id: true,
-              nickname: true,
-              username: true,
-            }
-          }
-        }
+      const teacherCode = await prisma.$transaction(async tx => {
+        const created = await tx.teacherCode.create({
+          data: {
+            code, createdBy: userId, maxUses,
+            accountValidityDays: accountValidityDays ?? null,
+            expiresAt: expiresAt ? new Date(expiresAt) : null,
+          },
+          include: { creator: { select: { id: true, nickname: true, username: true } } },
+        })
+        await tx.adminAuthorizationAudit.create({
+          data: {
+            id: randomUUID(), actorUserId: userId, targetUserId: userId, entry: 'TRAINING',
+            action: 'TRAINING_TEACHER_CODE_CREATE',
+            reason: `注册码记录 ${created.id}，注册截止 ${created.expiresAt?.toISOString() ?? '不限时间'}`,
+          },
+        })
+        return created
       })
 
       return success(res, teacherCode, '教师码生成成功')
@@ -116,27 +117,38 @@ export const teacherCodeController = {
     }
   },
 
-  // 删除教师码
-  async delete(req: Request, res: Response) {
+  // Keep the code row so existing registrations retain their provenance.
+  async revoke(req: Request, res: Response) {
     try {
+      const actorUserId = req.user?.userId
+      if (!actorUserId) return error(res, '未登录', -1, 401)
       const { id } = req.params
-
-      const code = await prisma.teacherCode.findUnique({
-        where: { id }
+      const found = await prisma.$transaction(async tx => {
+        const code = await tx.teacherCode.findUnique({
+          where: { id },
+          select: { id: true, createdBy: true, expiresAt: true },
+        })
+        if (!code) return false
+        const result = await tx.teacherCode.updateMany({
+          where: { id, isActive: true },
+          data: { isActive: false },
+        })
+        if (result.count) {
+          await tx.adminAuthorizationAudit.create({
+            data: {
+              id: randomUUID(), actorUserId, targetUserId: code.createdBy, entry: 'TRAINING',
+              action: 'TRAINING_TEACHER_CODE_REVOKE',
+              reason: `注册码记录 ${code.id}，原注册截止 ${code.expiresAt?.toISOString() ?? '不限时间'}`,
+            },
+          })
+        }
+        return true
       })
-
-      if (!code) {
-        return notFound(res, '教师码不存在')
-      }
-
-      await prisma.teacherCode.delete({
-        where: { id }
-      })
-
-      return success(res, null, '教师码已删除')
+      if (!found) return notFound(res, '教师码不存在')
+      return success(res, null, '教师码已撤销')
     } catch (err) {
-      logger.error('删除教师码错误', err)
-      return error(res, '删除教师码失败')
+      logger.error('撤销教师码错误', err)
+      return error(res, '撤销教师码失败')
     }
   },
 

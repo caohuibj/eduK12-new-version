@@ -148,16 +148,18 @@ suite('administrator Authenticator ceremonies on actual API / PostgreSQL / Redis
     const f = await enrolled(); await login(f)
     const claims = jwt.verifyToken(decodeURIComponent(f.c.cookies.get('ptool_session')!))!
     const old = jwt.generateToken({ userId: claims.userId, username: claims.username, role: claims.role, accountDomain: claims.accountDomain,
-      tokenVersion: claims.tokenVersion, adminSessionId: claims.adminSessionId, adminVerifiedAt: Math.floor(Date.now() / 1000) - 301 })
+      tokenVersion: claims.tokenVersion, adminSessionId: claims.adminSessionId, adminAuthenticationMethod: claims.adminAuthenticationMethod, adminVerifiedAt: Math.floor(Date.now() / 1000) - 301 })
     f.c.cookies.set('ptool_session', encodeURIComponent(old))
     const grant = { active: true, expectedVersion: 0, reason: 'Synthetic TOTP-sensitive authorization check' }
-    const url = '/api/admin/permissions/accounts/' + f.user.id + '/entries/SURVEY'
+    const target = await fixture(false)
+    const url = '/api/admin/permissions/accounts/' + target.user.id + '/entries/SURVEY'
     expect((await f.c.call(url, 'PUT', grant)).status).toBe(403)
     expect((await f.c.call('/api/admin/security/step-up/options', 'POST', { method: 'TOTP' })).status).toBe(200)
     expect((await f.c.call('/api/admin/security/totp/step-up/verify', 'POST', { code: code(f.secret, 1) })).status).toBe(200)
     expect((await f.c.call(url, 'PUT', grant)).status).toBe(200)
-    // The grant increments tokenVersion. The previous session is immediately invalid.
-    expect((await f.c.call('/api/admin/permissions/accounts')).status).toBe(401)
+    expect((await db.user.findUniqueOrThrow({ where: { id: target.user.id } })).tokenVersion).toBe(target.user.tokenVersion + 1)
+    expect((await f.c.call('/api/admin/permissions/accounts')).status).toBe(200)
+    expect((await f.c.call('/api/admin/permissions/accounts/' + f.user.id + '/entries/SURVEY','PUT',grant)).status).toBe(403)
     const second = await enrolled(), req = { headers: {}, secure: false } as any
     const res = { append(_name: string, value: string) { req.headers.cookie = value.split(';')[0] } } as any
     await security.beginAdminLogin(req, res, second.user.id, 'original-session', undefined, 'TOTP')
@@ -186,6 +188,80 @@ suite('administrator Authenticator ceremonies on actual API / PostgreSQL / Redis
     expect((await f.c.call('/api/admin/permissions/accounts')).status).toBe(401)
     const ticket = JSON.parse(readFileSync(handoff, 'utf8')).enrollmentToken
     expect((await f.c.call('/api/admin/security/totp/registration/options', 'POST', { username: f.user.username, password: f.password, enrollmentToken: ticket })).status).toBe(200)
+  })
+  it('allows controlled rebinding with a current password while preserving a forced password change', async () => {
+    const f = await fixture()
+    await db.user.update({where:{id:f.user.id},data:{mustChangePassword:true}})
+    const secret = await setup(f)
+    expect((await f.c.call('/api/admin/security/totp/registration/verify','POST',{code:code(secret,-1)})).status).toBe(200)
+    expect((await db.user.findUniqueOrThrow({where:{id:f.user.id}})).mustChangePassword).toBe(true)
+    expect(Boolean(f.c.cookies.get('ptool_session'))).toBe(false)
+  })
+  it('under strict TOTP policy rejects a pre-existing session issued by a security key', async () => {
+    if (process.env.ADMIN_REQUIRE_TOTP !== 'true') return
+    const f = await enrolled()
+    await login(f)
+    const claims = jwt.verifyToken(decodeURIComponent(f.c.cookies.get('ptool_session')!))!
+    expect(claims.adminAuthenticationMethod).toBe('TOTP')
+    const token = jwt.generateToken({
+      userId: claims.userId, username: claims.username, role: claims.role, accountDomain: claims.accountDomain,
+      tokenVersion: claims.tokenVersion, adminSessionId: claims.adminSessionId,
+      adminVerifiedAt: claims.adminVerifiedAt, adminAuthenticationMethod: 'SECURITY_KEY',
+    })
+    f.c.cookies.set('ptool_session', encodeURIComponent(token))
+    expect((await f.c.call('/api/admin/permissions/accounts')).status).toBe(401)
+  })
+  it('provisions each explicit entry and consumes activation only after password and Authenticator setup', async () => {
+    const system = await enrolled()
+    await login(system)
+    const endpoint = '/api/admin/permissions/accounts'
+    const school = await db.organization.create({data:{id:randomUUID(),name:'Synthetic entry activation',
+      createdByUserId:system.user.id,productDomain:'SCHOOL'}})
+    const schoolPath = '/api/platform/education/organizations/' + school.id + '/products/'
+    const featurePaths = {
+      TRAINING: '/api/users',
+      SURVEY: '/api/platform/survey/researchers',
+      HUISCHOOL: schoolPath + 'HUISCHOOL/admins',
+      HUITEACHER: schoolPath + 'HUITEACHER/admins',
+    } as const
+    for (const entry of ['TRAINING','SURVEY','HUISCHOOL','HUITEACHER'] as const) {
+      const username = 'entry-test-' + randomUUID()
+      const created = await system.c.call(endpoint,'POST',{username,entry,reason:'Synthetic entry activation'})
+      expect(created.status).toBe(200)
+      const listed = await system.c.call(endpoint + '?keyword=' + username)
+      expect(listed.body.data.accounts).toEqual([expect.objectContaining({
+        username,platformRole:'STANDARD',operable:false,mfaStatus:'UNBOUND',
+      })])
+      const id = listed.body.data.accounts[0].id
+      let enrollmentToken = created.body.data.enrollmentToken as string
+      const manager = client()
+      await manager.call('/api/auth/csrf')
+      const password = 'OwnedByInvitee5-' + randomUUID()
+      const loginInput = {username,password,adminAuthMethod:'TOTP'}
+      expect((await manager.call('/api/auth/login','POST',loginInput)).status).toBe(401)
+      const activate = '/api/admin/security/totp/registration/options'
+      const binding = () => manager.call(activate,'POST',{username,password,enrollmentToken,activate:true})
+      if(entry==='TRAINING'){
+        const replacement = await system.c.call(endpoint + '/' + id + '/enrollment','POST',{reason:'Replace unused activation'})
+        expect(replacement.status).toBe(200)
+        expect((await binding()).status).toBe(403)
+        enrollmentToken = replacement.body.data.enrollmentToken
+      }
+      const options = await binding()
+      expect(options.status).toBe(200)
+      const secret = secretFromUri(options.body.data.otpauthUri)
+      expect((await manager.call('/api/admin/security/totp/registration/verify','POST',{code:code(secret,-1)})).status).toBe(200)
+      expect(Boolean(manager.cookies.get('ptool_session'))).toBe(false)
+      expect((await binding()).status).toBe(403)
+      expect((await manager.call('/api/auth/login','POST',loginInput)).body.data).toEqual({adminTotpRequired:true})
+      expect((await manager.call('/api/admin/security/totp/authentication/verify','POST',{code:code(secret)})).status).toBe(200)
+      expect((await manager.call('/api/auth/me')).body.data.entryGrants).toEqual([{entry,version:1}])
+      expect((await manager.call(endpoint)).status).toBe(403)
+      expect((await manager.call(featurePaths[entry])).status).toBe(200)
+      const other = entry==='HUISCHOOL'?'HUITEACHER':entry==='HUITEACHER'?'HUISCHOOL':'TRAINING'
+      if(other!==entry)expect((await manager.call(featurePaths[other])).status).toBe(403)
+      expect((await system.c.call(endpoint + '?keyword=' + username)).body.data.operableOnPage).toBe(1)
+    }
   })
   it('additional boundary: rejects replacing an enrolled secret even with a new valid operator ticket', async () => {
     const f = await enrolled(), before = await db.adminTotpCredential.findUniqueOrThrow({ where: { userId: f.user.id } })

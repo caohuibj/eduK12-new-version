@@ -38,7 +38,7 @@ export function schoolEntryLoginUrl(origin?: string, development?: boolean): str
   const origins = productOrigins(origin, development)
   return origins ? `${origins.school}/login` : null
 }
-export function surveyInvitationUrl(kind: 'claim' | 'reset-password', token: string, origin?: string, development?: boolean): string | null {
+export function surveyInvitationUrl(kind: 'claim' | 'reset-password' | 'rebind-mfa', token: string, origin?: string, development?: boolean): string | null {
   const origins = productOrigins(origin, development)
   return origins && token ? `${origins.survey}/${kind}#token=${encodeURIComponent(token)}` : null
 }

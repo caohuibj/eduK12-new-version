@@ -8,12 +8,12 @@ import { inactiveAccountMessage } from '../../utils/accountStatus'
 import { generateToken } from '../../utils/jwt'
 import { getCookie, setSessionCookie } from '../../utils/authCookies'
 import { AdminPermissionError } from './service'
-import { needsAdminKey } from './proof'
-export { ADMIN_SESSION_SECONDS, ADMIN_STEP_UP_SECONDS, needsAdminKey, validAdminProof } from './proof'
+import { adminRequiresTotp, needsAdminKey, type AdminAuthenticationMethod } from './proof'
+export { ADMIN_SESSION_SECONDS, ADMIN_STEP_UP_SECONDS, adminRequiresTotp, needsAdminKey, validAdminProof } from './proof'
+export type { AdminAuthenticationMethod } from './proof'
 
 const challengeCookie = 'eduk12_admin_challenge'
 export const adminSecretHash = (value: string) => createHash('sha256').update(value).digest('hex')
-export type AdminAuthenticationMethod = 'TOTP' | 'SECURITY_KEY'
 export function adminAuthOrigin() {
   const origin = process.env.ADMIN_AUTH_ORIGIN || process.env.ADMIN_WEBAUTHN_ORIGIN
   if (!origin) throw new AdminPermissionError(503, '管理员认证来源尚未配置')
@@ -62,6 +62,8 @@ export async function beginAdminLogin(req: Request, res: Response, userId: strin
   const principal = authenticatedPrincipal ?? await loadCurrentPrincipal(userId)
   if (!principal || principal.userId!==userId || inactiveAccountMessage(principal) || !['LEGACY', 'TRAINING'].includes(principal.accountDomain) || !needsAdminKey(principal))
     throw new AdminPermissionError(403, '管理账号不可用')
+  if (adminRequiresTotp() && method === 'SECURITY_KEY')
+    throw new AdminPermissionError(403, '管理员登录和操作验证使用 Authenticator 动态码')
   if (method !== 'SECURITY_KEY') {
     const enrolled = await prisma.adminTotpCredential.findUnique({ where: { userId }, select: { userId: true } })
     if (enrolled) {
@@ -69,7 +71,7 @@ export async function beginAdminLogin(req: Request, res: Response, userId: strin
         purpose: sessionId ? 'TOTP_STEP_UP' : 'TOTP_LOGIN', sessionId })
       return { adminTotpRequired: true as const }
     }
-    if (method === 'TOTP') throw new AdminPermissionError(403, '请先使用受控登记票据绑定 Authenticator')
+    if (method === 'TOTP' || adminRequiresTotp()) throw new AdminPermissionError(403, '请先使用受控登记票据绑定 Authenticator')
   }
   const { rpID } = adminWebAuthnConfig()
   const keys = await prisma.adminSecurityKey.findMany({ where: { userId } })
@@ -98,20 +100,21 @@ async function consumeChallenge(req: Request, purposes: string[]) {
   return challenge
 }
 
-export async function issueAdminSession(req: Request, res: Response, userId: string, expectedVersion: number, sessionId: string = randomUUID()) {
+export async function issueAdminSession(req: Request, res: Response, userId: string, expectedVersion: number, method: AdminAuthenticationMethod, sessionId: string = randomUUID()) {
   const principal = await loadCurrentPrincipal(userId)
   if (!principal || inactiveAccountMessage(principal) || principal.tokenVersion !== expectedVersion || !needsAdminKey(principal))
     throw new AdminPermissionError(403, '管理权限已变化，请重新登录')
   const now = Math.floor(Date.now() / 1000)
   setSessionCookie(req, res, generateToken({ accountDomain: principal.accountDomain,
     userId, username: principal.username, role: principal.role, tokenVersion: principal.tokenVersion,
-    mustChangePassword: principal.mustChangePassword, adminVerifiedAt: now, adminSessionId: sessionId }))
+    mustChangePassword: principal.mustChangePassword, adminVerifiedAt: now, adminSessionId: sessionId, adminAuthenticationMethod: method }))
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { nickname: true, avatarUrl: true } })
   return { user: { id: userId, username: principal.username, role: principal.role, businessRole: principal.businessRole, platformRole: principal.platformRole,
     entryGrants: principal.entryGrants ?? [], mustChangePassword: principal.mustChangePassword, ...user } }
 }
 
 export async function finishAdminAuthentication(req: Request, res: Response, response: AuthenticationResponseJSON, sessionId?: string) {
+  if (adminRequiresTotp()) throw new AdminPermissionError(403, '请使用 Authenticator 动态码')
   const { origin, rpID } = adminWebAuthnConfig()
   const challenge = await consumeChallenge(req, sessionId ? ['STEP_UP'] : ['LOGIN'])
   if ((sessionId && (challenge.sessionId !== sessionId || challenge.userId !== req.user?.userId)) || (!sessionId && challenge.sessionId))
@@ -134,7 +137,7 @@ export async function finishAdminAuthentication(req: Request, res: Response, res
     await tx.adminAuthorizationAudit.create({ data: { id: randomUUID(), actorUserId: key.userId, targetUserId: key.userId,
       action: sessionId ? 'ADMIN_KEY_STEP_UP' : 'ADMIN_KEY_LOGIN', reason: 'WebAuthn UP+UV; single-device credential' } })
   })
-  return issueAdminSession(req, res, key.userId, challenge.tokenVersion, sessionId)
+  return issueAdminSession(req, res, key.userId, challenge.tokenVersion, 'SECURITY_KEY', sessionId)
 }
 
 export async function beginAdminRegistration(req: Request, res: Response, userId: string, enrollmentToken: string) {
@@ -142,7 +145,7 @@ export async function beginAdminRegistration(req: Request, res: Response, userId
   const principal = await loadCurrentPrincipal(userId)
   const ticket = await prisma.adminSecurityChallenge.findUnique({ where: { idHash: adminSecretHash(enrollmentToken) } })
   if (!principal || inactiveAccountMessage(principal) || !needsAdminKey(principal)
-    || !ticket || ticket.purpose !== 'ENROLLMENT' || ticket.userId !== userId || ticket.expiresAt <= new Date()
+    || !ticket || ticket.purpose !== 'ENROLLMENT' || ticket.challenge !== '' || ticket.userId !== userId || ticket.expiresAt <= new Date()
     || ticket.tokenVersion !== principal.tokenVersion) throw new AdminPermissionError(403, '受控登记票据无效')
   const keys = await prisma.adminSecurityKey.findMany({ where: { userId } })
   if (keys.length >= 3) throw new AdminPermissionError(409, '安全密钥数量已达上限')
@@ -169,7 +172,7 @@ export async function finishAdminRegistration(req: Request, response: Registrati
   await prisma.$transaction(async tx => {
     const [current] = await tx.$queryRaw<Array<{ tokenVersion: number }>>`SELECT "token_version" AS "tokenVersion" FROM "users" WHERE "id"=${challenge.userId} FOR UPDATE`
     if (current?.tokenVersion !== challenge.tokenVersion || !challenge.enrollmentHash) throw new AdminPermissionError(403, '账号状态已变化')
-    const ticket = await tx.adminSecurityChallenge.deleteMany({ where: { idHash: challenge.enrollmentHash, purpose: 'ENROLLMENT',
+    const ticket = await tx.adminSecurityChallenge.deleteMany({ where: { idHash: challenge.enrollmentHash, purpose: 'ENROLLMENT', challenge: '',
       userId: challenge.userId, tokenVersion: challenge.tokenVersion, expiresAt: { gt: new Date() } } })
     if (ticket.count !== 1) throw new AdminPermissionError(403, '登记票据已失效或已使用')
     const count = await tx.adminSecurityKey.count({ where: { userId: challenge.userId } })

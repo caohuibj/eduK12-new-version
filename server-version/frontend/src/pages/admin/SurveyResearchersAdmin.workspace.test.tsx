@@ -82,9 +82,9 @@ describe('S05 administrator workspace',()=>{
   })
   it('matches existing researcher status restrictions without granting access through controls',async()=>{
     mount({unavailable:true});await ready();fireEvent.change(password(),{target:{value:'synthetic-password'}})
-    for(const n of [0,1])expect(screen.getByRole('button',{name:'重置 TOTP：合成研究者'+n})).toBeEnabled()
+    for(const n of [0,1])expect(screen.getByRole('button',{name:'恢复验证器：合成研究者'+n})).toBeEnabled()
     for(const n of [2,3]){
-      expect(screen.getByRole('button',{name:'重置 TOTP：合成研究者'+n})).toBeDisabled()
+      expect(screen.getByRole('button',{name:'恢复验证器：合成研究者'+n})).toBeDisabled()
       expect(screen.getByRole('button',{name:'密码重置邀请：合成研究者'+n})).toBeDisabled()
     }
     expect(screen.getByRole('button',{name:'恢复资格：合成研究者2'})).toBeEnabled()

@@ -8,6 +8,7 @@ import { encodeTotpSecret, matchTotpStep } from '../../utils/totp'
 import { cacheService } from '../../services/cacheService'
 import { loadCurrentPrincipal } from '../organization/principal'
 import { AdminPermissionError } from './service'
+import { ADMIN_ENTRY_ACTIVATION } from './provisioning'
 import { adminAuthOrigin, adminSecretHash, issueAdminSession, needsAdminKey } from './security'
 
 const pendingCookie = 'eduk12_admin_challenge'
@@ -42,7 +43,7 @@ async function lockedAdmin(tx: Prisma.TransactionClient, userId: string, version
 /** A server-issued ticket and the current password authorize initial binding.
  * Neither merely displaying the QR nor confirming it creates a login session.
  */
-export async function beginAdminTotpRegistration(req: Request, res: Response, userId: string, enrollmentToken: string) {
+export async function beginAdminTotpRegistration(req: Request, res: Response, userId: string, enrollmentToken: string, initialPasswordHash?: string) {
   adminAuthOrigin(); encryptionKey()
   const ticketHash = adminSecretHash(enrollmentToken)
   const result = await prisma.$transaction(async tx => {
@@ -50,12 +51,17 @@ export async function beginAdminTotpRegistration(req: Request, res: Response, us
     if (!ticket || ticket.userId !== userId || ticket.purpose !== 'ENROLLMENT' || ticket.expiresAt <= new Date()) return null
     const principal = await lockedAdmin(tx, userId, ticket.tokenVersion)
     if (!principal) return null
+    const activation = ticket.challenge === ADMIN_ENTRY_ACTIVATION
+    if (activation ? !initialPasswordHash || !principal.mustChangePassword : ticket.challenge !== '' || initialPasswordHash)
+      return null
     if (await tx.adminTotpCredential.findUnique({ where: { userId } }))
       throw new AdminPermissionError(409, 'Authenticator 已绑定；更换设备请使用受控恢复流程')
     const secret = randomBytes(20), pending = randomBytes(32).toString('base64url')
     await tx.adminSecurityChallenge.deleteMany({ where: { userId, purpose: 'TOTP_REGISTER' } })
     await tx.adminSecurityChallenge.create({ data: { idHash: adminSecretHash(pending), userId, tokenVersion: principal.tokenVersion,
-      purpose: 'TOTP_REGISTER', challenge: encryptSecret(userId, secret), enrollmentHash: ticketHash,
+      purpose: 'TOTP_REGISTER', challenge: initialPasswordHash
+        ? encryptSecret(userId, secret) + '|' + initialPasswordHash : encryptSecret(userId, secret),
+      enrollmentHash: ticketHash,
       expiresAt: new Date(Math.min(ticket.expiresAt.getTime(), Date.now() + 300_000)) } })
     return { pending, secret, username: principal.username }
   })
@@ -81,15 +87,22 @@ export async function finishAdminTotp(req: Request, res: Response, code: string,
       || (kind === 'STEP_UP' ? !sessionId || peek.sessionId !== sessionId || principal.userId !== req.user?.userId : Boolean(peek.sessionId))) return null
     const credential = await tx.adminTotpCredential.findUnique({ where: { userId: principal.userId } })
     if (kind === 'REGISTER' ? Boolean(credential) : !credential) return null
-    const secretCipher = kind === 'REGISTER' ? peek.challenge : credential!.secretCipher
+    const [pendingCipher, initialPasswordHash] = kind === 'REGISTER' ? peek.challenge.split('|') : []
+    const secretCipher = kind === 'REGISTER' ? pendingCipher : credential!.secretCipher
     const step = matchTotpStep(decryptSecret(principal.userId, secretCipher), code, credential?.lastUsedStep ?? -1n)
     if (step === null) return null
     if (kind === 'REGISTER') {
-      if (!peek.enrollmentHash) return null
+      if (!peek.enrollmentHash || (initialPasswordHash && !principal.mustChangePassword)) return null
       const ticket = await tx.adminSecurityChallenge.deleteMany({ where: { idHash: peek.enrollmentHash, userId: principal.userId,
-        purpose: 'ENROLLMENT', tokenVersion: principal.tokenVersion, expiresAt: { gt: new Date() } } })
+        purpose: 'ENROLLMENT', challenge: initialPasswordHash ? ADMIN_ENTRY_ACTIVATION : '',
+        tokenVersion: principal.tokenVersion, expiresAt: { gt: new Date() } } })
       if (ticket.count !== 1) return null
       await tx.adminTotpCredential.create({ data: { userId: principal.userId, secretCipher, lastUsedStep: BigInt(step) } })
+      if (initialPasswordHash) {
+        await tx.user.update({ where: { id: principal.userId }, data: {
+          passwordHash: initialPasswordHash, mustChangePassword: false, tokenVersion: { increment: 1 },
+        } })
+      }
     } else {
       const changed = await tx.adminTotpCredential.updateMany({ where: { userId: principal.userId, lastUsedStep: credential!.lastUsedStep }, data: { lastUsedStep: BigInt(step) } })
       if (changed.count !== 1) return null
@@ -102,7 +115,7 @@ export async function finishAdminTotp(req: Request, res: Response, code: string,
   // A wrong code must never roll it back and allow unlimited retries.
   if (!result) throw new AdminPermissionError(403, '动态码错误、已使用或验证已失效，请重新开始并使用新的动态码')
   if (kind === 'REGISTER') return { registered: true as const }
-  return issueAdminSession(req, res, result.userId, result.tokenVersion, sessionId)
+  return issueAdminSession(req, res, result.userId, result.tokenVersion, 'TOTP', sessionId)
 }
 
 /** Attempts are counted across newly issued challenges for the same account.

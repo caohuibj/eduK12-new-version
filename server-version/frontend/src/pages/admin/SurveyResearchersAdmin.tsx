@@ -8,8 +8,11 @@ import './survey-admin.css'
 import {useAuth} from '../../contexts/AuthContext'
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string;status:string;createdAt:string}
-type Invitation={id:string;kind:'INVITE';createdBy:string;createdAt:string;expiresAt:string;
-  status:'PENDING'|'EXPIRED'}
+type InvitationKind='INVITE'|'PASSWORD_RESET'|'MFA_REBIND'
+type Invitation={id:string;kind:InvitationKind;createdBy:string;createdAt:string;expiresAt:string;
+  targetLoginName?:string|null;status:'PENDING'|'EXPIRED'}
+const invitationTitle:Record<InvitationKind,string>={INVITE:'研究者开户邀请',PASSWORD_RESET:'密码恢复邀请',MFA_REBIND:'验证器重绑邀请'}
+const invitationPath:Record<InvitationKind,'claim'|'reset-password'|'rebind-mfa'>={INVITE:'claim',PASSWORD_RESET:'reset-password',MFA_REBIND:'rebind-mfa'}
 class PlatformRequestError extends Error {
   constructor(message:string,readonly outcome:'REJECTED'|'NOT_SENT'|'UNCONFIRMED',readonly code?:number|string){super(message)}
 }
@@ -94,6 +97,9 @@ export function SurveyResearchersWorkspace({actorId}:{actorId?:string}={}){
   const [busy,setBusy]=useState(false)
   const [loading,setLoading]=useState(true),[section,setSection]=useState<'researchers'|'invitations'|'tools'>('researchers')
   const [linkContext,setLinkContext]=useState('')
+  const [linkExpiry,setLinkExpiry]=useState('')
+  const [rebindFor,setRebindFor]=useState<string|null>(null)
+  const [identityVerification,setIdentityVerification]=useState('')
   const [unconfirmed,setUnconfirmed]=useState<string|null>(null)
   const sections=[['researchers','研究者','资格、认证与恢复'],['invitations','邀请','签发与未领取状态'],['tools','工具授权','对象与精确版本']] as const
   const statusLabel=(status:string)=>(({ACTIVE:'已激活',PENDING_MFA:'待绑定双因素认证',SUSPENDED:'已暂停',REVOKED:'已永久撤销',UNAVAILABLE:'资格不可用'} as Record<string,string>)[status]||'状态待核对')
@@ -108,23 +114,27 @@ export function SurveyResearchersWorkspace({actorId}:{actorId?:string}={}){
     }finally{setLoading(false)}
   }
   useEffect(()=>{void refresh().catch(e=>setError(e instanceof Error?e.message:'研究者列表暂不可用'))},[])
-  const act=async(path:string,context:string)=>{
+  const act=async(path:string,context:string,verificationNote?:string)=>{
     if(!productOrigins()){setError('当前地址不支持生成 Survey 链接');return}
     if(!ensureVerification(context))return
     setBusy(true);setError('');setNotice('');setLink('');setUnconfirmed(null)
     let acknowledged=false
-    const invitation=path==='/researcher-invitations'||path.endsWith('/password-reset-invitations')
+    const invitation=path==='/researcher-invitations'?'INVITE':path.endsWith('/password-reset-invitations')?'PASSWORD_RESET':
+      path.endsWith('/mfa-rebind-invitations')?'MFA_REBIND':null
     try{
-      const result=await platformApi<{id?:string;token?:string;kind?:string}>(path,'POST',{currentPassword:password})
-      if(invitation&&(!result.token||result.kind!==(path==='/researcher-invitations'?'INVITE':'PASSWORD_RESET')))
+      const result=await platformApi<{id?:string;token?:string;kind?:string;expiresAt?:string}>(path,'POST',{
+        currentPassword:password,...(verificationNote?{identityVerification:verificationNote}:{}),
+      })
+      if(invitation&&(!result.token||result.kind!==invitation))
         throw new PlatformRequestError('邀请回执缺少一次性链接或类型','UNCONFIRMED')
       acknowledged=true
-      if(result.token){
-        const endpoint=result.kind==='PASSWORD_RESET'?'reset-password':'claim'
-        const url=surveyInvitationUrl(endpoint,result.token)
+      if(invitation&&result.token){
+        const url=surveyInvitationUrl(invitationPath[invitation],result.token)
         if(!url)throw new Error('当前地址不支持生成 Survey 链接')
         setLink(url)
         setLinkContext(context)
+        setLinkExpiry(result.expiresAt?new Date(result.expiresAt).toLocaleString('zh-CN'):'')
+        if(invitation==='MFA_REBIND'){setRebindFor(null);setIdentityVerification('')}
         setNotice(context+'已签发。一次性链接仅在本次操作显示，请通过受控渠道交付。')
       }else setNotice(context+'已完成。')
       await refresh(1,1)
@@ -212,19 +222,19 @@ export function SurveyResearchersWorkspace({actorId}:{actorId?:string}={}){
     {link&&<div className="survey-admin-card"><p><strong>{linkContext}</strong> · 新签发的一次性链接：</p>
       <code className="block break-all my-3">{link}</code>
       <button className="btn-secondary" type="button" onClick={()=>void copyLink()}>复制链接</button>
-      <p className="text-sm text-gray-500">邀请 7 天有效；不包含研究者密码。请勿存入公开日志或群聊。</p>
+      <p className="text-sm text-gray-500">{linkExpiry&&<>有效至 {linkExpiry}。 </>}请通过已经核验的私密渠道交给本人。</p>
     </div>}
     <section role="tabpanel" id="survey-admin-panel-tools" aria-labelledby="survey-admin-tab-tools" hidden={section!=='tools'}>
       <SurveyCatalogGrants api={catalogApi} password={password} researchers={list} ensureVerification={ensureVerification} actorId={actorId}/>
     </section>
     <section role="tabpanel" id="survey-admin-panel-invitations" aria-labelledby="survey-admin-tab-invitations" hidden={section!=='invitations'} className="survey-admin-panel survey-admin-invitations">
-    <div className="survey-admin-section-heading"><div className="survey-admin-panel-heading"><span className="survey-admin-avatar"><MailPlus size={22} aria-hidden="true"/></span><div><h2>研究者邀请</h2><p>签发开户邀请，或查看尚未领取的邀请元数据。</p></div></div>
+    <div className="survey-admin-section-heading"><div className="survey-admin-panel-heading"><span className="survey-admin-avatar"><MailPlus size={22} aria-hidden="true"/></span><div><h2>研究者邀请</h2><p>签发开户邀请，查看或撤销待领取的开户及恢复邀请。</p></div></div>
       <button className="btn-primary" disabled={busy||loading} onClick={()=>void act('/researcher-invitations','研究者开户邀请')}><MailPlus size={16} aria-hidden="true"/>生成研究者邀请</button></div>
     <p className="survey-admin-inline-note"><ShieldCheck size={15} aria-hidden="true"/><span>链接仅在签发时显示一次；这里查看领取状态和有效期。</span></p>
     <div className="survey-admin-invitation-list">{pending.map(inv=><article className="survey-admin-card survey-admin-invitation-card" key={inv.id}>
       <details className="survey-admin-invitation-disclosure"><summary aria-label={'查看邀请：'+inv.id}>
         <span className="survey-admin-avatar"><Mail size={21} aria-hidden="true"/></span>
-        <span className="survey-admin-card-name"><h3>研究者开户邀请</h3><span>签发于 {new Date(inv.createdAt).toLocaleDateString('zh-CN')}</span></span>
+        <span className="survey-admin-card-name"><h3>{invitationTitle[inv.kind]}</h3><span>{inv.targetLoginName?inv.targetLoginName+' · ':''}签发于 {new Date(inv.createdAt).toLocaleDateString('zh-CN')}</span></span>
         <span className="survey-admin-badge" data-status={inv.status}>{inv.status==='PENDING'?'待领取':'已过期'}</span>
         <ChevronDown className="survey-admin-disclosure-chevron" size={18} aria-hidden="true"/>
       </summary><div className="survey-admin-invitation-body">
@@ -268,12 +278,23 @@ export function SurveyResearchersWorkspace({actorId}:{actorId?:string}={}){
       <div className="survey-admin-person-actions">
         {['ACTIVE','PENDING_MFA'].includes(person.status)&&<button className="btn-secondary" disabled={busy||loading} aria-label={'暂停资格：'+person.username} onClick={()=>void act('/researchers/'+person.id+'/suspend','暂停资格：'+person.username)}>暂停资格</button>}
         {person.status==='SUSPENDED'&&<button className="btn-secondary" disabled={busy||loading} aria-label={'恢复资格：'+person.username} onClick={()=>void act('/researchers/'+person.id+'/restore','恢复资格：'+person.username)}>恢复资格</button>}
-        <button className="btn-secondary" disabled={busy||loading||!['ACTIVE','PENDING_MFA'].includes(person.status)} aria-label={'重置 TOTP：'+person.username} onClick={()=>void act('/researchers/'+person.id+'/mfa-reset','重置 TOTP：'+person.username)}>重置验证器</button>
+        <button type="button" className="btn-secondary" disabled={busy||loading||!['ACTIVE','PENDING_MFA'].includes(person.status)}
+          aria-label={'恢复验证器：'+person.username} aria-expanded={rebindFor===person.id}
+          onClick={()=>{setRebindFor(rebindFor===person.id?null:person.id);setIdentityVerification('')}}>恢复验证器</button>
         {person.status!=='REVOKED'&&<button className="btn-secondary" disabled={busy||loading||!['ACTIVE','PENDING_MFA','SUSPENDED'].includes(person.status)}
           aria-label={'永久撤销资格：'+person.username} onClick={()=>{if(!ensureVerification('永久撤销研究者资格'))return;if(window.confirm('永久撤销 '+person.username+' 的研究者资格？此操作不可恢复，历史研究数据不会删除。'))void act('/researchers/'+person.id+'/revoke','永久撤销资格：'+person.username);else cancelled('永久撤销资格：'+person.username)}}>
           永久撤销资格</button>}
         <button className="btn-secondary" disabled={busy||loading||!['ACTIVE','PENDING_MFA'].includes(person.status)} aria-label={'密码重置邀请：'+person.username} onClick={()=>void act('/researchers/'+person.id+'/password-reset-invitations','密码重置邀请：'+person.username)}>密码重置邀请</button>
       </div>
+      {rebindFor===person.id&&<form onSubmit={e=>{
+        e.preventDefault()
+        void act('/researchers/'+person.id+'/mfa-rebind-invitations','验证器重绑邀请：'+person.username,identityVerification.trim())
+      }}>
+        <p>先通过登记的独立渠道核验本人。链接有效 15 分钟，领取时需要当前密码。验证器和恢复码都遗失时使用此流程。</p>
+        <label>身份核验记录 <input className="input" value={identityVerification} onChange={e=>setIdentityVerification(e.target.value)}
+          placeholder="例如通过预先登记的电话确认本人" maxLength={500} required/></label>
+        <button type="submit" className="btn-primary" disabled={busy||loading||identityVerification.trim().length<3}>签发验证器重绑邀请</button>
+      </form>}
       {!['ACTIVE','PENDING_MFA'].includes(person.status)&&<p className="text-sm">当前资格状态不能重置双因素认证或签发密码恢复邀请。资格恢复以后台现有规则为准。</p>}
         </div>
       </details>

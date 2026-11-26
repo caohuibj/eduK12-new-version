@@ -43,8 +43,8 @@ export async function enrollSecurityKey(username: string, password: string, enro
   if (!credential) throw new Error('安全密钥登记未完成，请重试。')
   return api.post('/admin/security/registration/verify', { response: serialize(credential as PublicKeyCredential) })
 }
-export async function beginTotpEnrollment(username: string, password: string, enrollmentToken: string) {
-  return api.post<{otpauthUri:string}>('/admin/security/totp/registration/options',{username,password,enrollmentToken})
+export async function beginTotpEnrollment(username: string, password: string, enrollmentToken: string, activate = false) {
+  return api.post<{otpauthUri:string}>('/admin/security/totp/registration/options',{username,password,enrollmentToken,...(activate ? {activate} : {})})
 }
 export async function confirmTotpEnrollment(code: string) {
   return api.post<{registered:true}>('/admin/security/totp/registration/verify',{code})

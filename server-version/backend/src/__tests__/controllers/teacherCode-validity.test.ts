@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { db } = vi.hoisted(() => ({ db: {
-  teacherCode: { findUnique: vi.fn(), create: vi.fn() },
+  teacherCode: { findUnique: vi.fn(), create: vi.fn(), updateMany: vi.fn() },
+  adminAuthorizationAudit: { create: vi.fn() },
   user: { findUnique: vi.fn(), create: vi.fn() },
   $executeRaw: vi.fn(), $transaction: vi.fn(),
 } }))
@@ -24,7 +25,8 @@ beforeEach(() => {
   db.teacherCode.findUnique.mockResolvedValue({id:'code',isActive:true,maxUses:1,usedCount:0,expiresAt:new Date('2026-10-25T02:00:00Z'),accountValidityDays:90})
   db.user.findUnique.mockResolvedValue(null)
   db.user.create.mockImplementation(async ({data}) => ({id:'teacher',...data}))
-  db.teacherCode.create.mockImplementation(async ({data}) => data)
+  db.teacherCode.create.mockImplementation(async ({data}) => ({id:'code-record',...data}))
+  db.teacherCode.updateMany.mockResolvedValue({count:1})
   db.$executeRaw.mockResolvedValue(1)
   db.$transaction.mockImplementation(async callback=>callback(db))
 })
@@ -36,6 +38,30 @@ describe('teacher code and account validity are independent', () => {
     await teacherCodeController.create({user:{userId:'admin'},body:{maxUses:1,expiresAt:'2026-11-01T00:00:00.000Z',accountValidityDays:180}} as any,res)
     expect(res.statusCode).toBe(200)
     expect(db.teacherCode.create.mock.calls[0][0].data).toMatchObject({createdBy:'admin',maxUses:1,expiresAt:new Date('2026-11-01T00:00:00Z'),accountValidityDays:180})
+  })
+  it('audits creation and redemption deadline without storing the invitation secret', async () => {
+    const res=response()
+    await teacherCodeController.create({user:{userId:'admin'},body:{expiresAt:'2026-11-01T00:00:00.000Z'}} as any,res)
+    expect(db.adminAuthorizationAudit.create.mock.calls[0][0].data).toMatchObject({
+      actorUserId:'admin',targetUserId:'admin',entry:'TRAINING',action:'TRAINING_TEACHER_CODE_CREATE',
+      reason:'注册码记录 code-record，注册截止 2026-11-01T00:00:00.000Z',
+    })
+    expect(JSON.stringify(db.adminAuthorizationAudit.create.mock.calls)).not.toContain('ABCD2345')
+  })
+  it('retains the code row and writes one audit entry for a repeated revoke', async () => {
+    db.teacherCode.findUnique.mockResolvedValue({id:'code-record',createdBy:'issuer',expiresAt:null})
+    db.teacherCode.updateMany.mockResolvedValueOnce({count:1}).mockResolvedValueOnce({count:0})
+    for(let retry=0;retry<2;retry++){
+      const res=response()
+      await teacherCodeController.revoke({user:{userId:'admin'},params:{id:'code-record'}} as any,res)
+      expect(res.statusCode).toBe(200)
+    }
+    expect(db.teacherCode.updateMany).toHaveBeenCalledWith({where:{id:'code-record',isActive:true},data:{isActive:false}})
+    expect(db.adminAuthorizationAudit.create).toHaveBeenCalledTimes(1)
+    expect(db.adminAuthorizationAudit.create.mock.calls[0][0].data).toMatchObject({
+      actorUserId:'admin',targetUserId:'issuer',action:'TRAINING_TEACHER_CODE_REVOKE',
+      reason:'注册码记录 code-record，原注册截止 不限时间',
+    })
   })
   it('keeps legacy defaults when no term is supplied', async () => {
     await teacherCodeController.create({user:{userId:'admin'},body:{}} as any,response())

@@ -5,7 +5,8 @@ vi.mock('./SurveyCatalogGrants',()=>({SurveyCatalogGrants:()=>null}))
 const response=(data:unknown)=>({ok:true,json:async()=>({code:0,data})})
 afterEach(()=>vi.unstubAllGlobals())
 describe('administrator one-time capability links',()=>{
-  it.each([['生成研究者邀请','claim','INVITE'],['密码重置邀请','reset-password','PASSWORD_RESET']])(
+  it.each([['生成研究者邀请','claim','INVITE'],['密码重置邀请','reset-password','PASSWORD_RESET'],
+    ['恢复验证器','rebind-mfa','MFA_REBIND']])(
     'displays and copies the matching local %s URL',async(label,path,kind)=>{
       const original=window
       vi.stubGlobal('window',new Proxy(original,{get(target,key){return key==='location'?{origin:'http://localhost:5173'}:Reflect.get(target,key)}}))
@@ -22,7 +23,13 @@ describe('administrator one-time capability links',()=>{
       await screen.findByText('synthetic-researcher')
       fireEvent.change(screen.getByLabelText('当前管理员密码（敏感操作再次验证）'),{target:{value:'synthetic-password'}})
       if(kind==='INVITE')fireEvent.click(screen.getByRole('tab',{name:/邀请 签发/}))
-      fireEvent.click(screen.getByRole('button',{name:label==='密码重置邀请'?label+'：synthetic-researcher':label}))
+      fireEvent.click(screen.getByRole('button',{name:kind==='INVITE'?label:label+'：synthetic-researcher'}))
+      if(kind==='MFA_REBIND'){
+        const issue=screen.getByRole('button',{name:'签发验证器重绑邀请'})
+        expect(issue).toBeDisabled()
+        fireEvent.change(screen.getByLabelText('身份核验记录'),{target:{value:'已通过登记电话核验本人'}})
+        fireEvent.click(issue)
+      }
       const link=`http://survey.localhost:5173/${path}#token=synthetic-token`
       expect(await screen.findByText(link)).toBeInTheDocument()
       fireEvent.click(screen.getByRole('button',{name:'复制链接'}))

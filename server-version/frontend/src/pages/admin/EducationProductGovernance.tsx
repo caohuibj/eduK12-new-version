@@ -10,9 +10,11 @@ const EducationStandardConfigurations=lazy(()=>import('./EducationStandardConfig
 
 type Product='HUISCHOOL'|'HUITEACHER'
 type Entitlement={product:Product;status:string;revision:number}
-type Grant={grantId:string;membershipId:string;loginName:string;grantedAt:string}
+type Grant={grantId:string;membershipId:string;loginName:string;grantedAt:string;effective:boolean}
+type School={id:string;name:string}
+type Candidate={membershipId:string;loginName:string;ready:boolean}
+type SearchPage<T>={list:T[];hasMore:boolean;page:number}
 type Envelope<T>={code:string|number;message:string;data:T}
-const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i
 const entitlementLabels:Record<string,string>={ACTIVE:'已开通',SUSPENDED:'已暂停'}
 const labels:Record<Product,string>={HUISCHOOL:'校园心理健康',HUITEACHER:'教师发展与学校改进'}
 const endpoint='/api/platform/education'
@@ -35,43 +37,60 @@ export default function EducationProductGovernance({product}:{product?:Product})
   const selectedProduct=product??(hasAdminEntry(user,'HUISCHOOL')?'HUISCHOOL':'HUITEACHER')
   const title=selectedProduct==='HUISCHOOL'?'校园心理健康产品治理':'教师发展与学校改进治理'
   const [school,setSchool]=useState('')
-  const [loaded,setLoaded]=useState('')
+  const [schools,setSchools]=useState<SearchPage<School>|null>(null)
+  const [loadedSchool,setLoadedSchool]=useState<School|null>(null)
+  const [selectionCurrent,setSelectionCurrent]=useState(false)
   const [products,setProducts]=useState<Entitlement[]>([])
-  const [grants,setGrants]=useState<Grant[]>([])
-  const [member,setMember]=useState('')
-  const [schoolAdmin,setSchoolAdmin]=useState('')
+  const [admins,setAdmins]=useState({list:[] as Grant[],truncated:false,effectiveCount:0})
+  const [person,setPerson]=useState('')
+  const [candidates,setCandidates]=useState<SearchPage<Candidate>|null>(null)
+  const [member,setMember]=useState<Candidate|null>(null)
   const [password,setPassword]=useState('')
   const [error,setError]=useState('')
   const [notice,setNotice]=useState('')
   const [busy,setBusy]=useState(false)
-  const teacherAllowed=selectedProduct==='HUITEACHER'&&hasAdminEntry(user,'HUITEACHER')
   const allowed=hasAdminEntry(user,selectedProduct)
-  const read=async (org:string)=>{
-    const [data,admins]=await Promise.all([
-      request<Entitlement[]>('/organizations/'+org+'/products'),
-      teacherAllowed?request<{list:Grant[];truncated:boolean}>('/organizations/'+org+'/teacher-admins'):Promise.resolve({list:[],truncated:false}),
+  const loaded=loadedSchool?.id
+  const adminPath=(id:string)=>'/organizations/'+id+'/products/'+selectedProduct
+  const searchParams=(keyword:string,page:number)=>'?'+new URLSearchParams({q:keyword.trim(),page:String(page)})
+  const read=async (target:School)=>{
+    const [data,roster]=await Promise.all([
+      request<Entitlement[]>('/organizations/'+target.id+'/products'),
+      request<typeof admins>(adminPath(target.id)+'/admins'),
     ])
-    setProducts(data);setGrants(admins.list);setLoaded(org)
+    setProducts(data);setAdmins(roster);setLoadedSchool(target);setSelectionCurrent(true)
   }
-  const load=()=>{
-    const org=school.trim()
-    if(!uuid.test(org)){setError('必须输入正式学校的 Organization UUID');return}
-    setBusy(true);setError('');setNotice('');setPassword('')
-    void read(org).catch(e=>{
-      setLoaded('');setProducts([]);setGrants([])
-      setError(e instanceof Error?e.message:'学校授权读取失败')
-    }).finally(()=>setBusy(false))
+  const run=async (operation:()=>Promise<void>)=>{
+    setBusy(true);setError('');setNotice('')
+    try{await operation()}catch(e){setError(e instanceof Error?e.message:'学校治理请求未完成')}
+    finally{setBusy(false)}
+  }
+  const searchSchools=(page=1)=>run(async()=>{
+    setSelectionCurrent(false);setPassword('');setSchools(null)
+    setSchools(await request<SearchPage<School>>('/organizations'+searchParams(school,page)))
+  })
+  const selectSchool=(target:School)=>run(async()=>{
+    setSelectionCurrent(false);setPassword('');setPerson('');setCandidates(null);setMember(null)
+    await read(target)
+  })
+  const searchPeople=(page=1)=>{
+    if(!loaded||!selectionCurrent)return
+    return run(async()=>{
+      setMember(null);setCandidates(null)
+      setCandidates(await request<SearchPage<Candidate>>(adminPath(loaded)+'/admin-candidates'+searchParams(person,page)))
+    })
   }
   const change=(message:string,send:(secret:string)=>Promise<unknown>)=>{
-    if(loaded&&school.trim()!==loaded){setError('学校编号已修改，请先重新查询学校，再执行操作。');return}
-    if(!loaded||!password){setError('请先加载学校并输入本次管理员密码');return}
-    if(!window.confirm(message+'\n学校编号：'+loaded))return
+    if(!loadedSchool||!selectionCurrent||!password){setError('请先选择学校并输入本次管理员密码');return}
+    if(!window.confirm(message+'\n学校：'+loadedSchool.name))return
     const secret=password
-    setPassword('');setBusy(true);setNotice('');setError('')
-    void send(secret).then(()=>read(loaded))
-      .then(()=>setNotice('已重新读取正式授权状态。'))
-      .catch(e=>setError(e instanceof Error?e.message:'本次操作未获授权'))
-      .finally(()=>setBusy(false))
+    setPassword('')
+    void run(async()=>{
+      await send(secret)
+      await read(loadedSchool)
+      setMember(null)
+      setNotice('已重新读取正式授权状态。')
+    })
   }
   if(!allowed)return <section className="epg-main">
     <h1>校园教育产品治理</h1>
@@ -93,19 +112,27 @@ export default function EducationProductGovernance({product}:{product?:Product})
     {notice&&<p role="status" className="epg-notice">{notice}</p>}
     <div className="epg-panel">
       <h2>选择正式学校</h2>
-      <label>学校 Organization UUID
-        <input value={school} autoComplete="off" placeholder="粘贴正式学校的组织编号（UUID）" aria-describedby="education-school-help" onChange={e=>{setSchool(e.target.value);setPassword('');setError('');setNotice('')}}/>
-      </label>
-      <p id="education-school-help" className="epg-help">请从正式学校的机构记录复制组织编号。本入口负责独立产品开通与配置授权，不创建学校。</p>
-      {loaded&&school.trim()!==loaded&&<p role="status" className="epg-scope-warning">学校编号已修改。请先查询新学校；下方原学校操作已停用。</p>}
-      <button type="button" onClick={load} disabled={busy||!uuid.test(school.trim())}>
-        查询学校产品授权</button>
+      <form onSubmit={event=>{event.preventDefault();void searchSchools()}}>
+        <label>学校名称
+          <input value={school} maxLength={100} autoComplete="off" disabled={busy}
+            onChange={event=>{setSchool(event.target.value);setSelectionCurrent(false);setSchools(null);setPassword('');setNotice('')}}/>
+        </label>
+        <button type="submit" disabled={busy||!school.trim()}>搜索学校</button>
+      </form>
+      {schools&&<div className="epg-actions" aria-label="学校搜索结果">
+        {schools.list.map(target=><button key={target.id} type="button" disabled={busy}
+          onClick={()=>void selectSchool(target)}>选择 {target.name}</button>)}
+        {!schools.list.length&&<p>没有匹配的学校。</p>}
+        {schools.page>1&&<button type="button" disabled={busy} onClick={()=>void searchSchools(schools.page-1)}>上一页学校</button>}
+        {schools.hasMore&&<button type="button" disabled={busy} onClick={()=>void searchSchools(schools.page+1)}>下一页学校</button>}
+      </div>}
+      {loadedSchool&&<p className="epg-help">当前学校 <strong>{loadedSchool.name}</strong></p>}
+      {loadedSchool&&!selectionCurrent&&<p role="status" className="epg-scope-warning">请从搜索结果选择学校。下方原学校操作已停用。</p>}
     </div>
-    {loaded&&<fieldset className="epg-school-controls" aria-label="已加载学校治理操作" disabled={school.trim()!==loaded}>
+    {loaded&&<fieldset key={loaded} className="epg-school-controls" aria-label="已加载学校治理操作" disabled={!selectionCurrent||busy}>
       <Suspense fallback={<p role="status">正在加载固定配置授权…</p>}><EducationStandardConfigurations actorId={user!.id} organizationId={loaded} product={selectedProduct}/><EducationCognitiveConfigurations actorId={user!.id} organizationId={loaded} product={selectedProduct}/></Suspense>
       <div className="epg-panel">
         <h2>独立产品开通</h2>
-        <p>组织 ID：<code>{loaded}</code></p>
         <div className="epg-grid">
           {[selectedProduct].map(product=>{
             const item=products.find(x=>x.product===product)
@@ -113,13 +140,13 @@ export default function EducationProductGovernance({product}:{product?:Product})
               <h3>{labels[product]}</h3>
               <p>{item?(entitlementLabels[item.status]??item.status):'尚未开通'} · 版本 {item?.revision??0}</p>
               <div className="epg-actions">
-                <button type="button" disabled={busy||item?.status==='ACTIVE'} onClick={()=>change(
+                <button type="button" disabled={busy||item?.status==='ACTIVE'||(product==='HUISCHOOL'&&!item&&!member)} onClick={()=>change(
                   '确认开通'+labels[product]+'？当前学校与账号不会因此获得另一产品的权限。',
                   secret=>request('/organizations/'+loaded+'/products/'+product,'PUT',{
                     action:'ACTIVATE',currentPassword:secret,
                     expectedRevision:item?.revision??0,
-                    ...(product==='HUISCHOOL'&&uuid.test(schoolAdmin.trim())
-                      ?{initialSchoolAdminMembershipId:schoolAdmin.trim()}:{}),
+                    ...(product==='HUISCHOOL'&&member
+                      ?{initialSchoolAdminMembershipId:member.membershipId}:{}),
                   }))}>开通</button>
                 <button type="button" disabled={busy||item?.status!=='ACTIVE'} onClick={()=>change(
                   '确认暂停'+labels[product]+'？共享身份不会删除。',
@@ -131,30 +158,41 @@ export default function EducationProductGovernance({product}:{product?:Product})
             </article>
           })}
         </div>
-        {selectedProduct==='HUISCHOOL'&&<label>School 独立管理员 Membership UUID（首次开通必填；须为本校组织管理员）
-          <input value={schoolAdmin} autoComplete="off"
-            onChange={e=>setSchoolAdmin(e.target.value)}/>
-        </label>}
       </div>
-      {teacherAllowed&&<div className="epg-panel">
-        <h2>Teacher 学校产品管理员</h2>
-        {grants.length?grants.map(g=><article className="epg-grant" key={g.grantId}>
-          <strong>{g.loginName}</strong>
-          <span>成员 {g.membershipId}</span>
-          <button type="button" disabled={busy} onClick={()=>change(
-            '确认撤销本项 Huiteacher 产品管理授权？',
-            secret=>request('/organizations/'+loaded+'/teacher-admins/'+g.grantId+'/revoke',
-              'POST',{currentPassword:secret}))}>撤销</button>
-        </article>):<p>本校暂无已授予的 Teacher 产品管理员。</p>}
-        <label>拟授权教师的正式 Membership UUID
-          <input value={member} autoComplete="off" onChange={e=>setMember(e.target.value)}/>
-        </label>
-        <button type="button" disabled={busy||!uuid.test(member.trim())} onClick={()=>change(
-          '确认只授予这名成员在本校的 Huiteacher 管理权限？',
-          secret=>request('/organizations/'+loaded+'/teacher-admins','POST',{
-            membershipId:member.trim(),currentPassword:secret,
-          }))}>授予 Teacher 产品管理员</button>
-      </div>}
+      <div className="epg-panel">
+        <h2>{selectedProduct==='HUISCHOOL'?'School':'Teacher'} 学校产品管理员</h2>
+        <p>可操作管理员 {admins.effectiveCount} 位。请先完成接任人的验证，再撤销原有授权。</p>
+        {admins.truncated&&<p>管理员列表仅显示靠前的记录。</p>}
+        {admins.list.length?admins.list.map(grant=><article className="epg-grant" key={grant.grantId}>
+          <strong>{grant.loginName}</strong>
+          <span>{grant.effective?'可操作':'当前不可操作'}</span>
+          <button type="button" disabled={grant.effective&&admins.effectiveCount<=1} onClick={()=>change(
+            '确认撤销 '+grant.loginName+' 的本产品管理权？',
+            secret=>request(adminPath(loaded)+'/admins/'+grant.grantId+'/revoke','POST',{currentPassword:secret}))}>撤销</button>
+        </article>):<p>本校暂无此产品管理员。</p>}
+        <form onSubmit={event=>{event.preventDefault();void searchPeople()}}>
+          <label>本校人员账号
+            <input value={person} maxLength={100} autoComplete="off"
+              onChange={event=>{setPerson(event.target.value);setCandidates(null);setMember(null)}}/>
+          </label>
+          <button type="submit">搜索人员</button>
+        </form>
+        {candidates&&<div className="epg-actions" aria-label="人员搜索结果">
+          {candidates.list.map(candidate=><button type="button" key={candidate.membershipId}
+            aria-pressed={member?.membershipId===candidate.membershipId} onClick={()=>setMember(candidate)}>
+            {candidate.loginName} · {candidate.ready?'验证已就绪':'待完成验证'}
+          </button>)}
+          {!candidates.list.length&&<p>没有匹配的人员。</p>}
+          {candidates.page>1&&<button type="button" onClick={()=>void searchPeople(candidates.page-1)}>上一页人员</button>}
+          {candidates.hasMore&&<button type="button" onClick={()=>void searchPeople(candidates.page+1)}>下一页人员</button>}
+        </div>}
+        {selectedProduct==='HUISCHOOL'&&!products.some(item=>item.product==='HUISCHOOL'&&item.status==='ACTIVE')&&<p>首次开通 School 前，请在这里选定首任管理员。</p>}
+        <button type="button" disabled={!member||!products.some(item=>item.product===selectedProduct&&item.status==='ACTIVE')} onClick={()=>{
+          if(!member)return
+          change('确认授予 '+member.loginName+' 本校的本产品管理权？',
+            secret=>request(adminPath(loaded)+'/admins','POST',{membershipId:member.membershipId,currentPassword:secret}))
+        }}>授予 {selectedProduct==='HUISCHOOL'?'School':'Teacher'} 产品管理员</button>
+      </div>
       <div className="epg-panel">
         <h2>管理员操作确认</h2>
         <label>本次平台管理员密码

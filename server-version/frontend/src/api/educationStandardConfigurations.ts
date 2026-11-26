@@ -8,7 +8,7 @@ export type EducationUseIssue={requestId:string;userId:string;combinationHash:st
  validFrom:string;expiresAt:string;configurationName:string;replaces?:{grantId:string;expectedVersion:number;reason:string}}
 export type EducationUseRevoke={requestId:string;expectedVersion:number;reason:string}
 export type EducationManagedUse={id:string;userId:string;username:string;version:number;revokedAt:string|null;validFrom:string;expiresAt:string;
- configurationName:string|null;canManage:true;supersedes?:{selectedBinding:{authorizationId:string;authorizationRevision:number;bindingHash:string;configurationHash:string};reason:string}|null}
+ configurationName:string|null;canManage:true;canReplace?:boolean;supersedes?:{selectedBinding:{authorizationId:string;authorizationRevision:number;bindingHash:string;configurationHash:string};reason:string}|null}
 export type EducationManagerOperation={kind:'ISSUE';grant:{id:string;version:number;revokedAt:string|null};request:EducationUseIssue}|
  {kind:'REVOKE';grant:{id:string;version:number;revokedAt:string|null};request:EducationUseRevoke}
 export type EducationPendingOperation={kind:'ISSUE';combinationId:string;body:EducationUseIssue;unknown:boolean}|

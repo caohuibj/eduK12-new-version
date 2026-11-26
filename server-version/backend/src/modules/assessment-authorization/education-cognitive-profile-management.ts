@@ -29,9 +29,12 @@ export async function educationCognitiveProfileManagementCatalog(actorId:string,
    COALESCE(c.status='PUBLISHED' AND c.measurement_release_id=m.id AND m.layer='MEASUREMENT' AND m.family='COGNITIVE' AND m.status='PUBLISHED'
     AND m.scope->>'kind'='PLATFORM' AND m.content_hash=e.metadata#>>'{configuration,measurement,contentHash}' AND t.template_hash IS NOT NULL AND p.decision='APPROVED' AND NOT p.paused,false) AS available,
    EXISTS(SELECT 1 FROM content_capability_grants own JOIN assessment_management_events issuance ON issuance.id=own.id AND issuance.action=${EDUCATION_STANDARD_USE_ACTION}
-    WHERE own.issuer_id=${actorId} AND own.product=${scope.product} AND own.scope_kind='ORGANIZATION' AND own.scope_id=${scope.organizationId}
-     AND issuance.actor_id=${actorId} AND issuance.resource_id=e.resource_id AND issuance.metadata->>'artifactHash'=e.metadata->>'artifactHash'
-     AND issuance.metadata#>>'{selectedBinding,binding,configuration,kind}'='COGNITIVE_PROFILE') AS "ownIssued",
+    WHERE own.product=${scope.product} AND own.scope_kind='ORGANIZATION' AND own.scope_id=${scope.organizationId}
+     AND issuance.actor_id=own.issuer_id AND issuance.resource_id=e.resource_id AND issuance.metadata->>'artifactHash'=e.metadata->>'artifactHash'
+     AND issuance.metadata#>>'{selectedBinding,binding,configuration,kind}'='COGNITIVE_PROFILE'
+     AND (own.issuer_id=${actorId} OR EXISTS(
+       ${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`issuance.metadata#>>'{selectedBinding,binding,configuration,measurement,releaseId}'`)}
+     ))) AS "hasManagedIssuance",
    COALESCE((SELECT jsonb_agg(jsonb_build_object('id',r.id,'version',r.version,'validFrom',r.valid_from AT TIME ZONE 'UTC','expiresAt',r.expires_at AT TIME ZONE 'UTC')) FROM (${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`m.id`)} ORDER BY g.id LIMIT 129) r),'[]'::jsonb) AS authorities
    FROM approvals e LEFT JOIN cognitive_test_configs c ON c.id=e.resource_id
    LEFT JOIN measurement_content_releases m ON m.id=e.metadata#>>'{configuration,measurement,releaseId}'
@@ -40,7 +43,7 @@ export async function educationCognitiveProfileManagementCatalog(actorId:string,
    ${discoveryJoin(records,{kind:Prisma.sql`'COGNITIVE'`,key:Prisma.sql`c.test_type`,version:Prisma.sql`NULL`,engine:Prisma.sql`c.engine_version`,scoring:Prisma.sql`c.scoring_version`})}
    )
    SELECT ids,terms,search_key,"configId",title,profile,"artifactHash",configuration,available,authorities,"classificationTags" FROM headers
-   WHERE (available AND jsonb_array_length(authorities)>0) OR "ownIssued"
+   WHERE (available AND jsonb_array_length(authorities)>0) OR "hasManagedIssuance"
    `,filters:{...input,keyword:[input.q,input.keyword].filter(Boolean).join(' ')},text:[Prisma.sql`v.title`,Prisma.sql`v.search_key`],order:Prisma.sql`v."configId",v."artifactHash"`,limit:size+1,offset:(input.page-1)*size}))
   const rows=catalog.list
   return {page:input.page,hasMore:rows.length>size,tagFacets:catalogTagFacets([catalog.facetTags]),list:rows.slice(0,size).map(({available,search_key:_searchKey,...row}:typeof rows[number]&{search_key?:string})=>({...row,assignable:available&&row.authorities.length>0&&row.authorities.length<=128,authorities:available&&row.authorities.length<=128?row.authorities:[],

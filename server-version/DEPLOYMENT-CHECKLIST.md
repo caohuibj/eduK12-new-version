@@ -48,6 +48,9 @@ docker compose up -d --no-build backend worker frontend
 - [ ] seed 只在明确需要并审核时运行；不得用 seed 代替恢复旧数据。
 - [ ] frontend 生产构建不启用 UI lab。
 - [ ] 启动 backend 与 worker，健康检查、管理员登录、Cookie/CSRF、私有资产能力正常。
+- [ ] 涉及管理员认证配置或服务切换时，使用正在运行的双 API 做一次管理认证配置验收。运行
+  `python3 server-version/scripts/release/admin-auth-check.py --compose-entry <生产 Compose 入口脚本的绝对路径>`。
+  检查仅返回配置类别与结果，首次启用和恢复步骤见[管理员 Authenticator 运维说明](../docs/admin-authenticator.md#生产启用与恢复验收)。
 
 `NOT VALID` 只跳过历史扫描，仍会拦截后续旧格式写入，所以停旧 writer 必须发生在 migrate 之前。本地 `release-verify-local.sh` 永不替 operator drain 生产。
 

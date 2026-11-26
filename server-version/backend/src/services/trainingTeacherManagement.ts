@@ -7,7 +7,7 @@ import { ADMIN_STEP_UP_SECONDS, validAdminProof, type AdminSessionProof } from '
 export type TrainingTeacherAction = 'EXTEND' | 'FREEZE' | 'UNFREEZE' | 'RESET_PASSWORD'
 export type TrainingTeacherCommand = {
   actorUserId: string; targetUserId: string; actorSession: AdminSessionProof
-  expectedUpdatedAt: string; action: TrainingTeacherAction; months?: number; passwordHash?: string
+  expectedUpdatedAt: string; action: TrainingTeacherAction; months?: number; passwordHash?: string; reason?: string
 }
 type Row = {
   id:string;username:string;role:string;platformRole:string;accountDomain:string
@@ -58,6 +58,10 @@ export async function trainingTeacherManagementPreflight(input:TrainingTeacherCo
  * share one transaction. This never grants roles, activates disabled accounts,
  * approves registration, changes course data or unfreezes implicitly. */
 export async function manageTrainingTeacher(input:TrainingTeacherCommand) {
+  const reason=input.reason?.trim()
+  if((input.action==='FREEZE'||input.action==='RESET_PASSWORD')&&(!reason||reason.length>500)) {
+    return reject(400,'请填写账号操作原因')
+  }
   return prisma.$transaction(async tx=>{
     const target=await lockAndAuthorize(tx,input)
     let data:Prisma.UserUpdateInput
@@ -77,7 +81,7 @@ export async function manageTrainingTeacher(input:TrainingTeacherCommand) {
       default:return reject(400,'不支持的培训师管理操作')
     }
     const updated=await tx.user.update({where:{id:target.id},data,select:{id:true,username:true,isFrozen:true,expiresAt:true,mustChangePassword:true,updatedAt:true}})
-    await tx.adminAuthorizationAudit.create({data:{id:randomUUID(),actorUserId:input.actorUserId,targetUserId:target.id,entry:'TRAINING',action:`TRAINING_TEACHER_${input.action}`,reason:input.action==='EXTEND'?`延长 ${input.months??12} 个月`:'Training 培训师账号管理'}})
+    await tx.adminAuthorizationAudit.create({data:{id:randomUUID(),actorUserId:input.actorUserId,targetUserId:target.id,entry:'TRAINING',action:`TRAINING_TEACHER_${input.action}`,reason:input.action==='EXTEND'?`延长 ${input.months??12} 个月`:reason??'解冻培训师账号'}})
     return {...updated,changed:true}
   })
 }

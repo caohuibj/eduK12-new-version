@@ -64,8 +64,9 @@ export default function SurveyApp(){
 }
 function SurveyApplication(){
   // Keep the entry stable when activation removes its one-time token from the URL.
-  const [initial]=useState<'home'|'feature'|'claim'|'reset'|'login'>(()=>
+  const [initial]=useState<'home'|'feature'|'claim'|'reset'|'rebind'|'login'>(()=>
     window.location.pathname==='/'?'home':window.location.pathname==='/claim'?'claim':window.location.pathname==='/reset-password'?'reset':
+      window.location.pathname==='/rebind-mfa'?'rebind':
       surveyFeatures.some(feature=>feature.path===window.location.pathname)?'feature':'login')
   const [initialStudy]=useState(readStudyLocation)
   const studyRestoreEpoch=useRef(0)
@@ -76,7 +77,7 @@ function SurveyApplication(){
     studyRestoreEpoch.current++;studyRestorePending.current=false
   },[])
   const activeFeature=surveyFeatures.find(feature=>feature.path===window.location.pathname)
-  const [screen,setScreen]=useState<'home'|'feature'|'claim'|'reset'|'login'|'mfa'|'work'>(initial)
+  const [screen,setScreen]=useState<'home'|'feature'|'claim'|'reset'|'rebind'|'login'|'mfa'|'work'>(initial)
   const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[enrolled,setEnrolled]=useState(true)
   const [writeBusy,setWriteBusy]=useState(false)
   const workInFlight=useRef({total:0,writes:0})
@@ -216,7 +217,7 @@ function SurveyApplication(){
       const me=await api<Researcher>('/auth/me')
       if(restoreEpoch!==studyRestoreEpoch.current)return
       setUser(me)
-      if(!openWorkspace&&['home','feature','claim','reset'].includes(initial))setScreen(initial)
+      if(!openWorkspace&&['home','feature','claim','reset','rebind'].includes(initial))setScreen(initial)
       else {
         // A forced-password session is allowed to read /auth/me and change
         // its password, but has no permission to list research projects.
@@ -250,10 +251,17 @@ function SurveyApplication(){
     setEnrolled(r.enrolled);setScreen('mfa');setPassword('');setUri('');setCode('')
   })}
   const activate=(e:FormEvent)=>{e.preventDefault();void work(async()=>{
-    const path=screen==='claim'?'/auth/claim':'/auth/reset-password'
+    if(screen==='reset'){
+      await api<{changed:true}>('/auth/reset-password','POST',{token:invite,password})
+      setUser(null);setScreen('login');setInvite('');setPassword('')
+      setNotice('密码已更新。请使用新密码和原验证器登录。')
+      window.history.replaceState(null,'','/login')
+      return
+    }
+    const path=screen==='claim'?'/auth/claim':'/auth/rebind-mfa'
     const payload=screen==='claim'?{token:invite,username,password}:{token:invite,password}
     const r=await api<{enrolled:boolean}>(path,'POST',payload)
-    setEnrolled(r.enrolled);setScreen('mfa');setInvite('');setPassword('')
+    setUser(null);setEnrolled(r.enrolled);setScreen('mfa');setInvite('');setPassword('')
     window.history.replaceState(null,'','/')
     setNotice('账号已设置，请完成双因素验证')
   })}
@@ -404,7 +412,7 @@ function SurveyApplication(){
   if(screen==='home')return <SurveyLanding signedIn={user!==null}/>
   if(screen==='feature'&&activeFeature)return <SurveyFeaturePage feature={activeFeature} signedIn={user!==null}/>
   // Entry styling deliberately stops before MFA, the workspace and all timed tasks.
-  const entryScreen=screen==='login'||screen==='claim'||screen==='reset'
+  const entryScreen=screen==='login'||screen==='claim'||screen==='reset'||screen==='rebind'
   return <div className={entryScreen?'survey-entry':'survey-researcher min-h-screen bg-slate-50 text-slate-800'}>
     {entryScreen&&<a className="survey-skip-link" href="#survey-entry-content">跳至主要内容</a>}
     {entryScreen?<SurveyPublicHeader entry/>:<header className="border-b border-slate-200 bg-white"><div className={'survey-researcher-header'+(user&&screen==='work'&&!user.mustChangePassword?' survey-researcher-header--navigation':'')}>
@@ -420,13 +428,15 @@ function SurveyApplication(){
       {loading&&<p role="status">正在核对研究者会话…</p>}
       {error&&!creating&&<p role="alert" className="p-4 border-l-4 border-red-600 bg-red-50">{error}</p>}
       {notice&&notice!=='研究草稿已保存'&&<p role="status" className="p-4 border-l-4 border-teal-600 bg-teal-50">{notice}</p>}
-      {!loading&&(screen==='claim'||screen==='reset')&&<SurveyEntryPanel title={screen==='claim'?'激活研究者身份':'恢复 Survey 密码'} intro={screen==='claim'
-          ?'使用管理员提供的一次性邀请，设置独立研究账号，然后绑定验证器。'
-          :'使用管理员提供的密码恢复邀请设置新密码，再完成双因素验证。'}>
+      {!loading&&(screen==='claim'||screen==='reset'||screen==='rebind')&&<SurveyEntryPanel
+        title={screen==='claim'?'激活研究者身份':screen==='reset'?'恢复 Survey 密码':'重新绑定 Survey 验证器'}
+        intro={screen==='claim'?'使用管理员提供的一次性邀请，设置独立研究账号，然后绑定验证器。':
+          screen==='reset'?'使用一次性密码恢复邀请设置新密码。登录时继续使用原验证器或恢复码。':
+            '使用身份核验后签发的一次性重绑邀请和当前密码，绑定新验证器。'}>
         <form onSubmit={activate} aria-busy={busy}>{field('一次性邀请凭证',invite,setInvite,'password')}
           {screen==='claim'&&field('研究者登录名',username,setUsername)}
-          {field('新密码（至少 8 位，字母与数字组合）',password,setPassword,'password')}
-          <button className="btn-primary" disabled={busy}>确认并绑定验证器</button></form>
+          {field(screen==='rebind'?'当前密码':'新密码（至少 8 位，字母与数字组合）',password,setPassword,'password')}
+          <button className="btn-primary" disabled={busy}>{screen==='reset'?'更新密码':'确认并绑定验证器'}</button></form>
         <p className="survey-entry-help">没有有效凭证，或凭证已失效？请联系为你开通账号的管理员。</p>
       </SurveyEntryPanel>}
       {!loading&&screen==='login'&&<SurveyEntryPanel title="研究者登录" intro="研究者由 Survey 入口管理员邀请开通，账户与培训和校园系统相互独立。">

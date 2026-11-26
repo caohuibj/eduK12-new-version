@@ -22,7 +22,8 @@ import { changeTeacherScaleLicense,TeacherScaleLicenseError } from './scaleLicen
 import { changeTeacherPersonalGrant,TeacherPersonalGrantError } from './personalScaleGrant.service'
 import {
   EducationProductGovernanceError, setEducationProductEntitlement,
-  readEducationProductEntitlements,listEducationTeacherAdmins, grantEducationProductAdmin, revokeEducationProductAdmin,
+  readEducationProductEntitlements,listEducationProductAdmins, grantEducationProductAdmin, revokeEducationProductAdmin,
+  listEducationProductAdminCandidates,searchEducationGovernanceSchools,
 } from '../organization/educationProductGovernance'
 
 const router=Router()
@@ -40,6 +41,7 @@ const entitlementInput=z.object({
 }).strict()
 const grantInput=z.object({membershipId:uuid,currentPassword:password}).strict()
 const revokeInput=z.object({currentPassword:password}).strict()
+const searchInput=z.object({q:z.string().trim().max(120).default(''),page:z.coerce.number().int().min(1).max(10000).default(1)}).strict()
 
 // Platform operator lives in Training realm; neither School nor Teacher
 // authenticated sessions may call these product-granting endpoints.
@@ -134,10 +136,15 @@ router.post(cognitiveConfigurationBase+'/:configId/use-grants/:grantId/revoke',h
  await adminStepUp(req,currentPassword)
  return revokeEducationStandardConfigurationUse(req.user!.userId,configurationScope(req),cognitiveConfigId(req),uuid.parse(req.params.grantId),input)
 }))
+router.get('/organizations',handle(req=>searchEducationGovernanceSchools(req.user!.userId,searchInput.parse(req.query))))
+router.get('/organizations/:organizationId/products/:product/admin-candidates',handle(req=>
+  listEducationProductAdminCandidates(req.user!.userId,uuid.parse(req.params.organizationId),product.parse(req.params.product),searchInput.parse(req.query))))
 router.get('/organizations/:organizationId/products',handle(req=>
   readEducationProductEntitlements(req.user!.userId,uuid.parse(req.params.organizationId))))
-router.get('/organizations/:organizationId/teacher-admins',handle(req=>
-  listEducationTeacherAdmins(req.user!.userId,uuid.parse(req.params.organizationId))))
+const productAdminPath='/organizations/:organizationId/products/:product/admins'
+const teacherAdminPath='/organizations/:organizationId/teacher-admins'
+router.get([productAdminPath,teacherAdminPath],handle(req=>
+  listEducationProductAdmins(req.user!.userId,uuid.parse(req.params.organizationId),product.parse(req.params.product??'HUITEACHER'))))
 router.put('/organizations/:organizationId/products/:product',handle(async req=>{
   const id=uuid.parse(req.params.organizationId)
   const p=product.parse(req.params.product) as EducationProduct
@@ -149,17 +156,17 @@ router.put('/organizations/:organizationId/products/:product',handle(async req=>
     initialSchoolAdminMembershipId:input.initialSchoolAdminMembershipId,
   })
 }))
-router.post('/organizations/:organizationId/teacher-admins',handle(async req=>{
+router.post([productAdminPath,teacherAdminPath],handle(async req=>{
   const org=uuid.parse(req.params.organizationId),input=grantInput.parse(req.body)
   await adminStepUp(req,input.currentPassword)
   return grantEducationProductAdmin({actorUserId:req.user!.userId,
-    organizationId:org,membershipId:input.membershipId})
+    organizationId:org,product:product.parse(req.params.product??'HUITEACHER'),membershipId:input.membershipId})
 }))
-router.post('/organizations/:organizationId/teacher-admins/:grantId/revoke',handle(async req=>{
+router.post([productAdminPath+'/:grantId/revoke',teacherAdminPath+'/:grantId/revoke'],handle(async req=>{
   const org=uuid.parse(req.params.organizationId),grantId=uuid.parse(req.params.grantId)
   const input=revokeInput.parse(req.body)
   await adminStepUp(req,input.currentPassword)
-  return revokeEducationProductAdmin({actorUserId:req.user!.userId,organizationId:org,grantId})
+  return revokeEducationProductAdmin({actorUserId:req.user!.userId,organizationId:org,product:product.parse(req.params.product??'HUITEACHER'),grantId})
 }))
 const licenseInput=z.object({
   action:z.enum(['GRANT','REVOKE']),currentPassword:password,

@@ -2,6 +2,9 @@ import { validDeliveryWindow } from './deliveryPolicy'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
+import type { AuthenticatedPrincipal } from '../../types'
+import { assertPersonnelGovernor } from '../education-roster/personnel-governance'
+import { appendAudit } from './service'
 import { OrganizationDomainError, OrganizationPersona } from './types'
 
 export type StaffClassRole = 'HOMEROOM' | 'TEACHING'
@@ -85,14 +88,39 @@ function mapConstraintError(err: any, primaryCode: string): never {
   throw err
 }
 
+type RosterOperator = Pick<AuthenticatedPrincipal, 'userId' | 'accountDomain' | 'platformRole'>
+
+async function writeClassAssignment<T extends StudentClassAssignmentRecord | StaffClassAssignmentRecord>(
+  input: { organizationId: string; actor?: RosterOperator },
+  action: 'STUDENT_CLASS_ASSIGNED' | 'STUDENT_CLASS_ASSIGNMENT_ENDED' | 'STAFF_CLASS_ASSIGNED' | 'STAFF_CLASS_ASSIGNMENT_ENDED',
+  write: (tx: Tx) => Promise<T>,
+): Promise<T> {
+  return prisma.$transaction(async tx => {
+    const { actor, organizationId } = input
+    if (actor?.accountDomain === 'SCHOOL') await assertPersonnelGovernor(tx, actor, organizationId)
+    const record = await write(tx)
+    if (actor) await appendAudit(tx, {
+      organizationId,
+      actorUserId: actor.userId,
+      action,
+      targetType: 'CLASS_ASSIGNMENT',
+      targetId: record.id,
+      domainEventId: randomUUID(),
+      payload: { membershipId: record.membershipId, classUnitId: record.classUnitId },
+    })
+    return record
+  })
+}
+
 export async function assignStudentToClass(input: {
   organizationId: string
   membershipId: string
   classUnitId: string
   isPrimary?: boolean
+  actor?: RosterOperator
 }): Promise<StudentClassAssignmentRecord> {
   try {
-    return await prisma.$transaction(async (tx) => {
+    return await writeClassAssignment(input, 'STUDENT_CLASS_ASSIGNED', async tx => {
       await assertCurrentMembershipPersona(tx, {
         organizationId: input.organizationId,
         membershipId: input.membershipId,
@@ -120,19 +148,22 @@ export async function assignStudentToClass(input: {
 export async function endStudentClassAssignment(input: {
   organizationId: string
   assignmentId: string
+  actor?: RosterOperator
 }): Promise<StudentClassAssignmentRecord> {
-  const rows = await prisma.$queryRaw<StudentClassAssignmentRecord[]>`
-    UPDATE "organization_student_class_assignments"
-    SET "valid_until" = transaction_timestamp()
-    WHERE "organization_id" = ${input.organizationId}
-      AND "id" = ${input.assignmentId}
-      AND "valid_until" IS NULL
-    RETURNING "id", "organization_id" AS "organizationId", "membership_id" AS "membershipId",
-      "class_unit_id" AS "classUnitId", "is_primary" AS "isPrimary",
-      "valid_from" AS "validFrom", "valid_until" AS "validUntil"
-  `
-  if (!rows[0]) throw new OrganizationDomainError('CLASS_ASSIGNMENT_NOT_CURRENT', '当前班级关系不存在', 404)
-  return rows[0]
+  return writeClassAssignment(input, 'STUDENT_CLASS_ASSIGNMENT_ENDED', async tx => {
+    const rows = await tx.$queryRaw<StudentClassAssignmentRecord[]>`
+      UPDATE "organization_student_class_assignments"
+      SET "valid_until" = transaction_timestamp()
+      WHERE "organization_id" = ${input.organizationId}
+        AND "id" = ${input.assignmentId}
+        AND "valid_until" IS NULL
+      RETURNING "id", "organization_id" AS "organizationId", "membership_id" AS "membershipId",
+        "class_unit_id" AS "classUnitId", "is_primary" AS "isPrimary",
+        "valid_from" AS "validFrom", "valid_until" AS "validUntil"
+    `
+    if (!rows[0]) throw new OrganizationDomainError('CLASS_ASSIGNMENT_NOT_CURRENT', '当前班级关系不存在', 404)
+    return rows[0]
+  })
 }
 
 export async function assignStaffToClass(input: {
@@ -140,9 +171,10 @@ export async function assignStaffToClass(input: {
   membershipId: string
   classUnitId: string
   staffRole: StaffClassRole
+  actor?: RosterOperator
 }): Promise<StaffClassAssignmentRecord> {
   try {
-    return await prisma.$transaction(async (tx) => {
+    return await writeClassAssignment(input, 'STAFF_CLASS_ASSIGNED', async tx => {
       await assertCurrentMembershipPersona(tx, {
         organizationId: input.organizationId,
         membershipId: input.membershipId,
@@ -170,19 +202,22 @@ export async function assignStaffToClass(input: {
 export async function endStaffClassAssignment(input: {
   organizationId: string
   assignmentId: string
+  actor?: RosterOperator
 }): Promise<StaffClassAssignmentRecord> {
-  const rows = await prisma.$queryRaw<StaffClassAssignmentRecord[]>`
-    UPDATE "organization_staff_class_assignments"
-    SET "valid_until" = transaction_timestamp()
-    WHERE "organization_id" = ${input.organizationId}
-      AND "id" = ${input.assignmentId}
-      AND "valid_until" IS NULL
-    RETURNING "id", "organization_id" AS "organizationId", "membership_id" AS "membershipId",
-      "class_unit_id" AS "classUnitId", "staff_role" AS "staffRole",
-      "valid_from" AS "validFrom", "valid_until" AS "validUntil"
-  `
-  if (!rows[0]) throw new OrganizationDomainError('STAFF_ASSIGNMENT_NOT_CURRENT', '当前教师班级关系不存在', 404)
-  return rows[0]
+  return writeClassAssignment(input, 'STAFF_CLASS_ASSIGNMENT_ENDED', async tx => {
+    const rows = await tx.$queryRaw<StaffClassAssignmentRecord[]>`
+      UPDATE "organization_staff_class_assignments"
+      SET "valid_until" = transaction_timestamp()
+      WHERE "organization_id" = ${input.organizationId}
+        AND "id" = ${input.assignmentId}
+        AND "valid_until" IS NULL
+      RETURNING "id", "organization_id" AS "organizationId", "membership_id" AS "membershipId",
+        "class_unit_id" AS "classUnitId", "staff_role" AS "staffRole",
+        "valid_from" AS "validFrom", "valid_until" AS "validUntil"
+    `
+    if (!rows[0]) throw new OrganizationDomainError('STAFF_ASSIGNMENT_NOT_CURRENT', '当前教师班级关系不存在', 404)
+    return rows[0]
+  })
 }
 
 export interface AssessmentDeliveryGrantRecord {
