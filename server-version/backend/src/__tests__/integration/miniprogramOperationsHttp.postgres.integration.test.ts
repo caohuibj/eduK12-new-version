@@ -39,7 +39,7 @@ const {createClassroomService}=require('../../../../miniprogram-v2/domains/class
 const DB=integrationDatabaseUrl('PARENT_PORTAL_TEST_DB_URL','PR26_INTEGRATION_DATABASE_URL')
 const suite=DB?describe:describe.skip
 let server:Server,base:string,hash:string,previousFlag:boolean,mediaDir:string
-const mediaAssets:string[]=[]
+const mediaAssets:string[]=[], teacherCodeIds:string[]=[]
 let teacher:any,otherTeacher:any,student:any,stranger:any,course:any,assignment:any,checkin:any,classroom:any,question:any
 const password='Synthetic-mini-operations-2026'
 const userIds:string[]=[],retainedAuditActors=new Set<string>()
@@ -75,7 +75,7 @@ suite('Mini role operations and shared classroom against actual HTTP/PostgreSQL/
   const app=express();app.use(express.json());app.use('/api',csrfProtection);app.use('/api/auth',authRoutes);app.use('/api/capabilities',capabilitiesRoutes);app.use('/api/mobile/classrooms',classroomRuntimeRouter);app.use('/api/mobile',mobileRouter);app.use('/api/courses',courseRoutes);app.use('/api/assignments',assignmentRoutes);app.use('/api/checkins',checkinRoutes);app.use('/api/assets',assetRoutes);app.use('/api/public/assets',publicAssetRouter);app.use('/api/users',userRoutes);app.use('/api/teacher-codes',teacherCodeRoutes);app.use('/api/parent-tool-policies',parentToolPolicyRouter);app.use((e:any,_q:any,r:any,_n:any)=>{console.error(e);r.status(500).json({code:-1,message:'fixture failure'})})
   server=app.listen(0,'127.0.0.1');await new Promise<void>(resolve=>server.once('listening',resolve));const address=server.address();if(!address||typeof address==='string')throw new Error('no listener');base='http://127.0.0.1:'+address.port
  })
- afterAll(async()=>{config.miniClassroomEnabled=previousFlag;(classroomSocketHandler as any).activeTimers.forEach((t:any)=>clearTimeout(t));(classroomSocketHandler as any).activeTimers.clear();if(server){server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()))}for(const id of mediaAssets){await prisma.assetReference.deleteMany({where:{assetId:id}});await discardUnreferencedAsset(await prisma.storedAsset.findUniqueOrThrow({where:{id}}))};if(mediaDir)await rm(mediaDir,{recursive:true,force:true});if(classroom)await prisma.classroom.delete({where:{id:classroom.id}});if(course)await prisma.course.delete({where:{id:course.id}});if(userIds.length){const disposable=userIds.filter(id=>!retainedAuditActors.has(id));await prisma.adminEntryGrant.deleteMany({where:{userId:{in:disposable}}});await prisma.user.deleteMany({where:{id:{in:disposable}}})};if(process.env.MINI_OPERATIONS_TEST_REDIS_URL)await cacheService.close();await prisma.$disconnect();vi.unstubAllEnvs()})
+ afterAll(async()=>{config.miniClassroomEnabled=previousFlag;(classroomSocketHandler as any).activeTimers.forEach((t:any)=>clearTimeout(t));(classroomSocketHandler as any).activeTimers.clear();if(server){server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()))}for(const id of mediaAssets){await prisma.assetReference.deleteMany({where:{assetId:id}});await discardUnreferencedAsset(await prisma.storedAsset.findUniqueOrThrow({where:{id}}))};if(mediaDir)await rm(mediaDir,{recursive:true,force:true});if(classroom)await prisma.classroom.delete({where:{id:classroom.id}});if(course)await prisma.course.delete({where:{id:course.id}});if(teacherCodeIds.length)await prisma.teacherCode.deleteMany({where:{id:{in:teacherCodeIds}}});if(userIds.length){const disposable=userIds.filter(id=>!retainedAuditActors.has(id));await prisma.adminEntryGrant.deleteMany({where:{userId:{in:disposable}}});await prisma.user.deleteMany({where:{id:{in:disposable}}})};if(process.env.MINI_OPERATIONS_TEST_REDIS_URL)await cacheService.close();await prisma.$disconnect();vi.unstubAllEnvs()})
  it('password-only manager login cannot establish a native management session',async()=>{
   const manager=await account('ADMIN'),c=client()
   await expect(c.runtime.session.login({username:manager.username,password})).rejects.toMatchObject({status:403})
@@ -126,7 +126,10 @@ suite('Mini role operations and shared classroom against actual HTTP/PostgreSQL/
   expect(parent.role).toBe('PARENT');expect(await prisma.parentStudentRelationship.count({where:{parentUserId:parent.id}})).toBe(0)
   expect((await a.runtime.operations.context('users',parent.id)).allowedActions).not.toContain('deactivate')
   const codeForm=await a.runtime.operations.prepare('teacherCodes',undefined,'create'),code=await a.runtime.operations.execute('teacherCodes',undefined,'create',codeForm,{maxUses:'1'});expect(code.code).toBeTruthy()
+  teacherCodeIds.push(code.id)
+  retainedAuditActors.add(admin.id)
   await a.runtime.operations.execute('teacherCodes',code.id,'delete',await a.runtime.operations.prepare('teacherCodes',code.id,'delete'),{})
+  expect(await prisma.teacherCode.findUniqueOrThrow({where:{id:code.id},select:{isActive:true}})).toEqual({isActive:false})
   await expect(a.runtime.api.put('/users/'+parent.id,{isActive:false})).rejects.toMatchObject({kind:'forbidden'})
   await prisma.user.update({where:{id:admin.id},data:{platformRole:'SYSTEM_ADMIN'}})
   await expect(a.runtime.operations.context('users',parent.id)).rejects.toMatchObject({kind:'forbidden',status:403})
