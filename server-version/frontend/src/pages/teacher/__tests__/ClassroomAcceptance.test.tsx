@@ -17,7 +17,12 @@ beforeEach(() => {
 })
 it('renders the QR inline without a popup and recovers from a generation failure', async () => {
   const popup = vi.spyOn(window, 'open').mockImplementation(() => null)
-  mocks.get.mockReset().mockResolvedValueOnce({ code: 0, data: classroom }).mockRejectedValueOnce({ message: '二维码暂不可用', status: 503 }).mockResolvedValue({ code: 0, data: { name: '验收课堂', code: '390765', qrcodeUrl: 'https://eduk12.top/join' } })
+  let qrAttempts = 0
+  mocks.get.mockImplementation(async (url: string) => {
+    if (!url.endsWith('/qrcode')) return { code: 0, data: classroom }
+    if (++qrAttempts === 1) throw { message: '二维码暂不可用', status: 503 }
+    return { code: 0, data: { name: '验收课堂', code: '390765', qrcodeUrl: 'https://eduk12.top/join' } }
+  })
   const context = vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => null)
   const view = show(<ClassroomControl />)
   await screen.findByText('验收课堂')
@@ -56,14 +61,59 @@ it('shows cumulative answers separately from current online progress', async () 
   show(<ClassroomControl />)
   await screen.findByText('答题进行中')
   act(() => mocks.listeners['broadcast:stats']({ questionId: 'q1', answerCount: 2, totalSessions: 1, activeAnswerCount: 1, submissionRate: 100 }))
-  act(() => mocks.listeners['broadcast:online']({ onlineCount: 1 }))
+  // A student session may be represented by multiple Socket connections.
+  act(() => mocks.listeners['broadcast:online']({ onlineCount: 2 }))
+  expect(screen.getByText('在线人数').nextElementSibling).toHaveTextContent('1')
   expect(screen.getByText('累计提交').nextElementSibling).toHaveTextContent('2')
   expect(screen.getByText('在线未提交').nextElementSibling).toHaveTextContent('0')
   expect(screen.getByText('在线提交率').nextElementSibling).toHaveTextContent('100%')
   act(() => mocks.listeners['broadcast:online']({ onlineCount: 0 }))
+  act(() => mocks.listeners['broadcast:stats']({ questionId: 'q1', answerCount: 2, totalSessions: 0, activeAnswerCount: 0, submissionRate: 0 }))
+  expect(screen.getByText('在线人数').nextElementSibling).toHaveTextContent('0')
   expect(screen.getByText('累计提交').nextElementSibling).toHaveTextContent('2')
   expect(screen.getByText('在线未提交').nextElementSibling).toHaveTextContent('0')
   expect(screen.getByText('在线提交率').nextElementSibling).toHaveTextContent('—')
+})
+it('loads online progress when a teacher enters an active classroom without any membership broadcast', async () => {
+  const stats = { questionId: 'q1', answerCount: 20, totalSessions: 30, activeAnswerCount: 20, submissionRate: 200 / 3 }
+  mocks.get.mockImplementation(async (url: string) => ({ code: 0, data: url.endsWith('/stats') ? { stats } : classroom }))
+  show(<ClassroomControl />)
+  await screen.findByText('答题进行中')
+  await waitFor(() => expect(screen.getByText('在线人数').nextElementSibling).toHaveTextContent('30'))
+  expect(screen.getByText('在线未提交').nextElementSibling).toHaveTextContent('10')
+  expect(screen.getByText('在线提交率').nextElementSibling).toHaveTextContent('67%')
+  expect(screen.getByText('在线 30 人')).toBeInTheDocument()
+  expect(mocks.get.mock.calls.filter(([url]) => url.endsWith('/stats'))).toHaveLength(1)
+})
+it('refreshes the snapshot after reconnect and skips a pending read when a new broadcast arrives', async () => {
+  const stats = { questionId: 'q1', answerCount: 2, totalSessions: 1, activeAnswerCount: 1, submissionRate: 100 }
+  mocks.get.mockImplementation(async (url: string) => ({ code: 0, data: url.endsWith('/stats') ? { stats } : classroom }))
+  show(<ClassroomControl />)
+  await screen.findByText('答题进行中')
+  act(() => {
+    mocks.listeners['broadcast:online']({ onlineCount: 2 })
+    mocks.listeners['broadcast:stats'](stats)
+  })
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 400)) })
+  expect(mocks.get.mock.calls.filter(([url]) => url.endsWith('/stats'))).toHaveLength(0)
+  act(() => mocks.listeners['teacher:joined']({ status: 'ACTIVE', currentQuestion: { ...question, questionId: question.id } }))
+  await waitFor(() => expect(mocks.get.mock.calls.filter(([url]) => url.endsWith('/stats'))).toHaveLength(1))
+})
+it('clears stats for a restarted question and ignores a late HTTP response from the previous round', async () => {
+  let resolveOld: (value: unknown) => void = () => { throw new Error('stats request not started') }
+  mocks.get.mockImplementation(async (url: string) => url.endsWith('/stats')
+    ? new Promise(resolve => { resolveOld = resolve })
+    : { code: 0, data: classroom })
+  show(<ClassroomControl />)
+  await screen.findByText('答题进行中')
+  await waitFor(() => expect(mocks.get.mock.calls.filter(([url]) => url.endsWith('/stats'))).toHaveLength(1))
+  act(() => mocks.listeners['broadcast:question']({ ...question, questionId: question.id, startedAt: '2026-10-04T00:02:00Z' }))
+  expect(screen.getByText('累计提交').nextElementSibling).toHaveTextContent('—')
+  await act(async () => resolveOld({ code: 0, data: { stats: { questionId: 'q1', answerCount: 20, totalSessions: 30, activeAnswerCount: 20, submissionRate: 200 / 3 } } }))
+  expect(screen.getByText('累计提交').nextElementSibling).toHaveTextContent('—')
+  act(() => mocks.listeners['broadcast:stats']({ questionId: 'q1', answerCount: 1, totalSessions: 2, activeAnswerCount: 1, submissionRate: 50 }))
+  expect(screen.getByText('累计提交').nextElementSibling).toHaveTextContent('1')
+  expect(screen.getByText('在线提交率').nextElementSibling).toHaveTextContent('50%')
 })
 it('saves three filled options and ignores the default fourth empty slot', async () => {
   mocks.get.mockImplementation(async (url: string) => ({ code: 0, data: url.endsWith('/questions') ? [] : { ...classroom, status: 'PREPARING' } }))

@@ -30,6 +30,7 @@ const ClassroomAnswer: React.FC = () => {
   const [isFinished, setIsFinished] = useState(false) // 答题是否已结束
   const [closedClassroomId, setClosedClassroomId] = useState<string | null>(null)
   const classroomClosed = !!classroomId && closedClassroomId === classroomId
+  const [joinUnavailable, setJoinUnavailable] = useState(false)
   const [notice, setNotice] = useState<{ kind: 'info' | 'error'; message: string } | null>(null)
 
   // Socket 连接只使用课堂码；session 由服务端创建并绑定。
@@ -37,7 +38,7 @@ const ClassroomAnswer: React.FC = () => {
     classroomId,
     classroomCode,
     role: 'student',
-    autoConnect: !authLoading && !!classroomId && !!classroomCode && !classroomClosed,
+    autoConnect: !authLoading && !!classroomId && !!classroomCode && !classroomClosed && !joinUnavailable,
   })
 
   useEffect(() => {
@@ -51,6 +52,7 @@ const ClassroomAnswer: React.FC = () => {
     setSubmitting(false)
     setCountdown(null)
     setIsFinished(false)
+    setJoinUnavailable(false)
     setNotice(null)
   }, [classroomId, classroomCode])
 
@@ -140,6 +142,11 @@ const ClassroomAnswer: React.FC = () => {
     const handleError = (data: { message?: string }) => {
       submittingRef.current = false
       setSubmitting(false)
+      if (data.message === '课堂不存在或当前不可加入') {
+        setCountdown(null)
+        setJoinUnavailable(true)
+        return
+      }
       setNotice({ kind: 'error', message: data.message || '发生错误' })
     }
     on('error', handleError)
@@ -388,12 +395,12 @@ const ClassroomAnswer: React.FC = () => {
     )
   }
 
-  if (classroomClosed) {
+  if (classroomClosed || joinUnavailable) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 classroom-answer-state">
         <div className="classroom-answer-state__card text-center">
-          <h1 className="text-xl font-semibold">课堂已结束</h1>
-          <p className="my-3 text-gray-600">感谢参与课堂互动。</p>
+          <h1 className="text-xl font-semibold">{classroomClosed ? '课堂已结束' : '课堂暂不可加入'}</h1>
+          <p className="my-3 text-gray-600">{classroomClosed ? '感谢参与课堂互动。' : '课堂不存在或当前不可加入，请返回入口确认课堂码。'}</p>
           <Link to="/student/classroom/enter" className="btn-secondary inline-block">返回课堂入口</Link>
         </div>
       </div>

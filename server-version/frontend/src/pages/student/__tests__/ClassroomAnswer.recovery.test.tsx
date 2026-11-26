@@ -65,6 +65,14 @@ it('keeps the anonymous participant on an ended-classroom page without a login r
   expect(screen.getByRole('link', { name: '返回课堂入口' })).toHaveAttribute('href', '/student/classroom/enter')
   expect(screen.queryByRole('button', { name: '提交答案' })).not.toBeInTheDocument()
 })
+it('offers a return to the classroom entrance when reconnecting after admission has closed', () => {
+  show()
+  receive(question)
+  act(() => mocks.listeners.error({ message: '课堂不存在或当前不可加入' }))
+  expect(screen.getByRole('heading', { name: '课堂暂不可加入' })).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: '返回课堂入口' })).toHaveAttribute('href', '/student/classroom/enter')
+  expect(screen.queryByRole('button', { name: '提交答案' })).not.toBeInTheDocument()
+})
 it('allows retry when the submission confirmation never arrives', () => {
   vi.useFakeTimers()
   try {
