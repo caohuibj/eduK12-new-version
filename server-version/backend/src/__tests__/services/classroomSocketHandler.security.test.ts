@@ -276,7 +276,7 @@ describe('classroom socket authorization boundary', () => {
     await handlers.get('teacher:next')!()
 
     expect(socket.emit).toHaveBeenCalledWith('error', {
-      message: '需要经过认证的教师或管理员连接',
+      message: '需要经过认证的教师连接',
     })
     expect(mockFindClassroomAccess).not.toHaveBeenCalled()
     expect(mockSocketService.broadcastToRoom).not.toHaveBeenCalled()
