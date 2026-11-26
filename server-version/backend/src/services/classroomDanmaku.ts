@@ -29,6 +29,7 @@ export type DanmakuSnapshot = DanmakuSettings & {
     expiresAt: string | null;
     messages: DanmakuMessage[];
     pending?: DanmakuMessage[];
+    removedMessageIds?: string[];
     limits: typeof DANMAKU_LIMITS;
 };
 export class DanmakuError extends Error {
@@ -54,14 +55,18 @@ local raw=redis.call('GET',KEYS[1])
 local state=raw and cjson.decode(raw) or {sessionId=cjson.null,revision=0,controlRevision=0,displayEpoch=now,enabled=false,paused=false,displayMode='QUESTION',reviewMode='realtime',topic='',speed='normal',expiresAt=cjson.null,messages={},pending={}}
 state.messages=raw and cjson.decode(redis.call('GET',KEYS[5]) or '[]') or {}
 state.pending=raw and cjson.decode(redis.call('GET',KEYS[6]) or '[]') or {}
+state.removed=raw and cjson.decode(redis.call('GET',KEYS[7]) or '[]') or {}
 local changed=not raw
 local function epoch() state.displayEpoch=math.max(now,state.displayEpoch+1) end
+local function resetDisplay()
+ epoch();state.visibilityEpoch=state.displayEpoch;state.removed={}
+end
 local function stop()
- state.enabled=false;state.paused=false;state.displayMode='QUESTION';state.sessionId=cjson.null;state.expiresAt=cjson.null;state.messages={};state.pending={};epoch()
+ state.enabled=false;state.paused=false;state.displayMode='QUESTION';state.sessionId=cjson.null;state.expiresAt=cjson.null;state.messages={};state.pending={};resetDisplay()
  state.controlRevision=state.controlRevision+1;state.revision=state.revision+1;changed=true
 end
 if state.enabled and type(state.expiresAt)=='number' and state.expiresAt<=now then stop() end
-for _,field in ipairs({'messages','pending'}) do
+for _,field in ipairs({'messages','pending','removed'}) do
  local retained={}
  for _,message in ipairs(state[field]) do if message.expiresAt>now then table.insert(retained,message) end end
  if #retained~=#state[field] then state[field]=retained;state.revision=state.revision+1;changed=true end
@@ -70,11 +75,11 @@ local function save()
  if changed then
   local ttl=7200000
   if state.enabled then ttl=math.max(1,state.expiresAt-now) end
-  local messages,pending=state.messages,state.pending
-  state.messages=nil;state.pending=nil
+  local messages,pending,removed=state.messages,state.pending,state.removed
+  state.messages=nil;state.pending=nil;state.removed=nil
   redis.call('SET',KEYS[1],cjson.encode(state),'PX',ttl)
-  state.messages=messages;state.pending=pending
-  for index,field in ipairs({'messages','pending'}) do
+  state.messages=messages;state.pending=pending;state.removed=removed
+  for index,field in ipairs({'messages','pending','removed'}) do
    local latest=0
    for _,message in ipairs(state[field]) do latest=math.max(latest,message.expiresAt) end
    if latest>now then redis.call('SET',KEYS[4+index],cjson.encode(state[field]),'PX',latest-now) else redis.call('DEL',KEYS[4+index]) end
@@ -86,6 +91,20 @@ local function result(extra)
 end
 local function failure(code,retry)
  save();return cjson.encode({ok=false,code=code,retryAfterMs=retry})
+end
+local function rememberVisible(message)
+ local entry={epoch=state.visibilityEpoch or state.displayEpoch,expiresAt=message.expiresAt}
+ redis.call('SET',KEYS[8],cjson.encode(entry),'PX',entry.expiresAt-now)
+end
+local function removeVisible(id,expiresAt)
+ -- A screen can still be playing this message after it leaves rolling history.
+ redis.call('DEL',KEYS[8])
+ table.insert(state.removed,{id=id,expiresAt=expiresAt})
+ if #state.removed>100 then
+  -- Reset playback before dropping any live removal IDs.
+  state.visibilityEpoch=state.visibilityEpoch or state.displayEpoch
+  state.removed={};epoch()
+ end
 end
 if input.operation=='read' then return result() end
 if input.operation=='close' then
@@ -100,7 +119,7 @@ if input.operation=='control' then
  if input.sessionId~=state.sessionId then return failure('CONFLICT') end
  if action=='start' then
   if state.enabled then return failure('CONFLICT') end
-  state.sessionId=input.newSessionId;state.enabled=true;state.paused=false;state.messages={};state.pending={};state.expiresAt=now+7200000;epoch()
+  state.sessionId=input.newSessionId;state.enabled=true;state.paused=false;state.messages={};state.pending={};state.expiresAt=now+7200000;resetDisplay()
   state.reviewMode='realtime'
  elseif not state.enabled then return failure('STOPPED') end
  if action=='stop' then stop();return result() end
@@ -108,7 +127,7 @@ if input.operation=='control' then
   for key,value in pairs(input.settings or {}) do state[key]=value end
  elseif action=='pause' then state.paused=true
  elseif action=='resume' then state.paused=false
- elseif action=='clear' then state.messages={};state.pending={};epoch()
+ elseif action=='clear' then state.messages={};state.pending={};resetDisplay()
  elseif action=='approve' then
   local found=nil
   for index,message in ipairs(state.pending) do if message.id==input.messageId then found=table.remove(state.pending,index);break end end
@@ -117,13 +136,25 @@ if input.operation=='control' then
    return failure('NOT_FOUND')
   end
   found.status='approved';found.createdAt=now;found.expiresAt=math.min(state.expiresAt,now+30000);table.insert(state.messages,found)
+  rememberVisible(found)
   while #state.messages>100 do table.remove(state.messages,1) end
  elseif action=='hide' then
   local found=false
   for _,field in ipairs({'messages','pending'}) do
-   for index=#state[field],1,-1 do if state[field][index].id==input.messageId then table.remove(state[field],index);found=true end end
+   for index=#state[field],1,-1 do
+    if state[field][index].id==input.messageId then
+     local removed=table.remove(state[field],index);found=true
+     if field=='messages' then removeVisible(removed.id,removed.expiresAt) end
+    end
+   end
   end
-  if not found then return failure('NOT_FOUND') end
+  if not found then
+   local marker=redis.call('GET',KEYS[8])
+   if not marker then return failure('NOT_FOUND') end
+   local entry=cjson.decode(marker)
+   if entry.epoch~=(state.visibilityEpoch or state.displayEpoch) or entry.expiresAt<=now then return failure('NOT_FOUND') end
+   removeVisible(input.messageId,entry.expiresAt)
+  end
  end
  if action~='approve' and action~='hide' then state.controlRevision=state.controlRevision+1 end
  state.revision=state.revision+1;changed=true;return result()
@@ -148,6 +179,7 @@ if input.operation=='send' then
  local status=state.reviewMode=='review' and 'pending' or 'approved'
  local message={id=input.messageId,text=input.text,status=status,createdAt=now,expiresAt=math.min(state.expiresAt,now+(status=='pending' and 300000 or 30000))}
  table.insert(state[status=='pending' and 'pending' or 'messages'],message)
+ if status=='approved' then rememberVisible(message) end
  while #state.messages>100 do table.remove(state.messages,1) end
  redis.call('SET',KEYS[3],'1','PX',3000)
  redis.call('ZADD',KEYS[4],now,input.clientMessageId);redis.call('PEXPIRE',KEYS[4],60000)
@@ -198,7 +230,7 @@ export class ClassroomDanmakuStore {
         const senderKey = senderSession + ':' + (input.sessionId ?? 'none');
         let timer: NodeJS.Timeout | undefined;
         try {
-            const work = (async () => { const client = await this.redis(); return client.eval(DANMAKU_SCRIPT, { keys: [prefix, prefix + ':dedup:' + senderKey + ':' + (input.clientMessageId ?? 'none'), prefix + ':cooldown:' + senderKey, prefix + ':rate:' + senderKey, prefix + ':messages', prefix + ':pending'], arguments: [JSON.stringify(input)] }); })();
+            const work = (async () => { const client = await this.redis(); return client.eval(DANMAKU_SCRIPT, { keys: [prefix, prefix + ':dedup:' + senderKey + ':' + (input.clientMessageId ?? 'none'), prefix + ':cooldown:' + senderKey, prefix + ':rate:' + senderKey, prefix + ':messages', prefix + ':pending', prefix + ':removed', prefix + ':visibility:' + (input.messageId ?? 'none')], arguments: [JSON.stringify(input)] }); })();
             const reply = await Promise.race([work, new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new DanmakuError('UNAVAILABLE', names.UNAVAILABLE)), 1500); timer.unref?.(); })]);
             const result = JSON.parse(String(reply)) as {
                 ok: boolean;
@@ -211,9 +243,9 @@ export class ClassroomDanmakuStore {
             };
             if (!result.ok)
                 throw new DanmakuError(result.code ?? 'INVALID', names[result.code ?? 'INVALID'] ?? names.INVALID, result.retryAfterMs);
-            const raw = result.snapshot;
+            const { removed, visibilityEpoch: _visibilityEpoch, ...raw } = result.snapshot;
             const messages = (value: unknown): DanmakuMessage[] => Array.isArray(value) ? value.map(message => ({ ...message, createdAt: new Date(message.createdAt).toISOString(), expiresAt: new Date(message.expiresAt).toISOString() })) : [];
-            const snapshot: DanmakuSnapshot = { ...raw, available: true, classroomId, expiresAt: typeof raw.expiresAt === 'number' ? new Date(raw.expiresAt).toISOString() : null, messages: messages(raw.messages), pending: messages(raw.pending), limits: DANMAKU_LIMITS } as DanmakuSnapshot;
+            const snapshot: DanmakuSnapshot = { ...raw, available: true, classroomId, expiresAt: typeof raw.expiresAt === 'number' ? new Date(raw.expiresAt).toISOString() : null, messages: messages(raw.messages), pending: messages(raw.pending), removedMessageIds: Array.isArray(removed) ? removed.map(message => message.id) : [], limits: DANMAKU_LIMITS } as DanmakuSnapshot;
             this.versions.delete(classroomId);
             this.versions.set(classroomId, { sessionId: snapshot.sessionId, revision: snapshot.revision, controlRevision: snapshot.controlRevision, displayEpoch: snapshot.displayEpoch });
             if (this.versions.size > 200)
@@ -249,9 +281,11 @@ export class ClassroomDanmakuStore {
     }
 }
 export function danmakuForRole(snapshot: DanmakuSnapshot, role: DanmakuRole): DanmakuSnapshot {
-    const { pending, ...publicState } = snapshot;
+    const { pending, removedMessageIds, ...publicState } = snapshot;
     if (role === 'teacher')
         return { ...publicState, pending: pending ?? [] };
-    return { ...publicState, messages: role === 'bigscreen' ? snapshot.messages : [] };
+    if (role === 'bigscreen')
+        return { ...publicState, removedMessageIds, messages: snapshot.messages };
+    return { ...publicState, messages: [] };
 }
 export const classroomDanmaku = new ClassroomDanmakuStore();

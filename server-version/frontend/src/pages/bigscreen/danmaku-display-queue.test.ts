@@ -57,6 +57,24 @@ describe('bounded classroom danmaku display',()=>{
     expect(queue.active.every(item=>item.lane<3)).toBe(true)
     expect(new Set([...queue.active,...queue.pending].map(item=>item.id)).size).toBe(6)
   })
+  it('keeps an in-flight message across rolling history updates and honors an explicit hide',()=>{
+    const first=message('first')
+    const initial=snapshot({removedMessageIds:[],messages:[first]})
+    const queue=reconcileDanmakuQueue(emptyDanmakuQueue(),initial,now)
+    const latest=Array.from({length:100},(_,i)=>message(`new-${i}`,500))
+    const rolled=reconcileDanmakuQueue(queue,snapshot({revision:2,removedMessageIds:[],messages:latest}),now+500)
+    expect(rolled.active.find(item=>item.id===first.id)).toBe(queue.active[0])
+    expect(rolled.pending).toHaveLength(DANMAKU_PENDING_LIMIT)
+    const hidden=reconcileDanmakuQueue(rolled,snapshot({revision:3,removedMessageIds:[first.id],messages:latest}),now+1000)
+    expect(hidden.active.find(item=>item.id===first.id)).toBeUndefined()
+  })
+  it('skips messages without enough time for the selected speed',()=>{
+    const queue=reconcileDanmakuQueue(emptyDanmakuQueue(),snapshot({messages:[
+      message('old',-29_000),message('fits',-18_000),
+    ]}),now)
+    expect(queue.active).toMatchObject([{id:'fits',duration:12_000,endsAt:now+12_000}])
+    expect(queue.pending).toEqual([])
+  })
   it('never renders pending, expired or out-of-contract text',()=>{
     const queue=reconcileDanmakuQueue(emptyDanmakuQueue(),snapshot({messages:[
       {...message('pending'),status:'pending'},message('expired',-30_001),

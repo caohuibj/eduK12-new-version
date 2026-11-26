@@ -48,7 +48,18 @@ describe.skipIf(!redisAvailable)('classroom danmaku atomic Redis lifecycle',()=>
   const approved=(await control(id,realtime,'approve',{messageId:sent.messageId})).snapshot
   expect(approved.pending).toEqual([]);expect(approved.messages).toHaveLength(1)
   expect(Date.parse(approved.messages[0].expiresAt)-Date.parse(approved.messages[0].createdAt)).toBe(30000)
-  expect((await control(id,approved,'hide',{messageId:sent.messageId})).snapshot.messages).toEqual([])
+  const hidden=(await control(id,approved,'hide',{messageId:sent.messageId})).snapshot
+  expect(hidden.messages).toEqual([])
+  expect(danmakuForRole(hidden,'bigscreen').removedMessageIds).toEqual([sent.messageId])
+  expect(danmakuForRole(hidden,'student')).not.toHaveProperty('removedMessageIds')
+  expect(danmakuForRole((await store.read(id)).snapshot,'bigscreen').removedMessageIds).toEqual([sent.messageId])
+  const removalKey=prefix(id)+':removed'
+  expect(await client.pTTL(removalKey)).toBeGreaterThan(0)
+  expect(await client.pTTL(removalKey)).toBeLessThanOrEqual(30000)
+  expect(JSON.parse((await client.get(removalKey))!)).toEqual([{id:sent.messageId,expiresAt:Date.parse(approved.messages[0].expiresAt)}])
+  const cleared=(await control(id,hidden,'clear')).snapshot
+  expect(danmakuForRole(cleared,'bigscreen').removedMessageIds).toEqual([])
+  expect(await client.exists(removalKey)).toBe(0)
  })
  it('allows student sends while paused and clear/stop prevent replay across sessions',async()=>{
   const {id,snapshot}=await start({displayMode:'DANMAKU'});const paused=(await control(id,snapshot,'pause')).snapshot
@@ -94,9 +105,18 @@ describe.skipIf(!redisAvailable)('classroom danmaku atomic Redis lifecycle',()=>
   await Promise.all(Array.from({length:100},()=>send(id,snapshot)))
   await expect(send(id,snapshot)).rejects.toMatchObject({code:'QUEUE_FULL'})
   const updated=(await control(id,snapshot,'configure',{settings:{reviewMode:'realtime'}})).snapshot
-  await Promise.all(Array.from({length:101},()=>send(id,updated)))
-  expect((await store.read(id)).snapshot.messages).toHaveLength(100)
-  expect((await store.read(id)).snapshot.pending).toHaveLength(100)
+  const first=await send(id,updated),second=await send(id,updated)
+  await Promise.all(Array.from({length:100},()=>send(id,updated)))
+  const latest=(await store.read(id)).snapshot
+  expect(latest.messages).toHaveLength(100)
+  expect(latest.pending).toHaveLength(100)
+  expect(latest.messages.some(message=>message.id===first.messageId)).toBe(false)
+  expect(danmakuForRole(latest,'bigscreen').removedMessageIds).toEqual([])
+  const hidden=(await control(id,latest,'hide',{messageId:first.messageId})).snapshot
+  expect(danmakuForRole(hidden,'bigscreen').removedMessageIds).toEqual([first.messageId])
+  expect(await client.exists(prefix(id)+':visibility:'+first.messageId)).toBe(0)
+  const cleared=(await control(id,hidden,'clear')).snapshot
+  await expect(control(id,cleared,'hide',{messageId:second.messageId})).rejects.toMatchObject({code:'NOT_FOUND'})
  })
  it('close is terminal even for an in-flight stale start and clears text keys',async()=>{
   const {id,snapshot}=await start();await send(id,snapshot);const closed=(await store.close(id)).snapshot

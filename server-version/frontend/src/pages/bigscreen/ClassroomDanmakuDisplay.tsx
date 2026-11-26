@@ -39,14 +39,14 @@ export function ClassroomDanmakuDisplay({classroomId,subscribe,readState,onPrese
     }).catch(()=>{if(live)unavailable()})
     return ()=>{live=false;unsubscribe()}
   },[classroomId,readState,subscribe])
+  const wake=nextDanmakuWake(display.queue)
   useEffect(()=>{
-    const wake=nextDanmakuWake(display.queue)
     if(wake===null)return
     const timer=window.setTimeout(()=>setDisplay(previous=>({
       ...previous,queue:advanceDanmakuQueue(previous.queue,Date.now()),
     })),Math.max(1,wake-Date.now()))
     return ()=>window.clearTimeout(timer)
-  },[display.queue])
+  },[wake])
   const enabled=display.queue.enabled
   const mode=enabled?display.snapshot?.displayMode??'QUESTION':'QUESTION'
   useEffect(()=>onPresentationChange({enabled,displayMode:mode}),[enabled,mode,onPresentationChange])
@@ -104,7 +104,7 @@ export function ClassroomDanmakuDisplay({classroomId,subscribe,readState,onPrese
       </p>}
     </div>
     <footer className="classroom-danmaku-display__footer">
-      <span>{snapshot.paused?'暂停期间仍可发送，消息在有效期内展示':'每条消息最多展示30秒'}</span>
+      <span>{snapshot.paused?'暂停期间仍可发送，消息在有效期内展示':'高峰时优先展示近期弹幕'}</span>
       {display.queue.pending.length>0&&<span>待展示 {display.queue.pending.length} 条</span>}
     </footer>
   </section>
