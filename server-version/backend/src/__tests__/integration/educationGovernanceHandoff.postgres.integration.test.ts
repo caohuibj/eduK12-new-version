@@ -21,7 +21,7 @@ const hash = 'a'.repeat(64)
 
 async function createSchool() {
   const makeUser = (accountDomain: 'SCHOOL' | 'TRAINING') => prisma.user.create({
-    data: { username: 'edu-handoff-'+randomUUID(), passwordHash: 'synthetic-only', accountDomain, role: 'TEACHER', teacherApproved: true },
+    data: { username: 'edu-handoff-'+randomUUID().replace(/-/g,'').slice(0,20), passwordHash: 'synthetic-only', accountDomain, role: 'TEACHER', teacherApproved: true },
   })
   const [previous, successor, teacher, entry, issuer] = await Promise.all([
     makeUser('SCHOOL'), makeUser('SCHOOL'), makeUser('SCHOOL'), makeUser('TRAINING'), makeUser('TRAINING'),
@@ -44,6 +44,13 @@ async function createSchool() {
   return { scope, organizationId, previous, successor, teacher, entry, issuer, previousM, successorM, teacherM }
 }
 
+const addLogin = (user:{id:string;username:string}) => prisma.campusAccount.create({
+  data:{userId:user.id,loginName:user.username,normalizedLogin:user.username},
+})
+const enable = (userId:string) => prisma.campusMfaCredential.create({
+  data:{userId,secretCipher:'synthetic-only',enabled:true,lastUsedStep:1n},
+})
+
 suite('education roster and administrator handoff on isolated PostgreSQL', () => {
   beforeAll(() => requireIsolatedReleaseDatabase(url!))
   afterAll(() => prisma.$disconnect())
@@ -51,9 +58,8 @@ suite('education roster and administrator handoff on isolated PostgreSQL', () =>
   it('counts only working School administrators and allows succession after enrollment', async () => {
     const f = await createSchool()
     const input = { actorUserId:f.entry.id, organizationId:f.organizationId, product:'HUISCHOOL' as const }
-    const enable = (userId: string) => prisma.campusMfaCredential.create({
-      data: { userId, secretCipher:'synthetic-only', enabled:true, lastUsedStep:1n },
-    })
+    await addLogin(f.previous)
+    await addLogin(f.successor)
     await enable(f.previous.id)
     const old = await prisma.educationProductRoleGrant.findFirstOrThrow({ where: { membershipId:f.previousM.id } })
     const next = await grantEducationProductAdmin({ ...input, membershipId:f.successorM.id })
@@ -73,6 +79,44 @@ suite('education roster and administrator handoff on isolated PostgreSQL', () =>
       effectiveCount:1,list:[{grantId:next.grantId,effective:true}],
     })
     await expect(listEducationProductAdmins(f.entry.id,f.organizationId,'HUITEACHER')).rejects.toMatchObject({statusCode:403})
+  })
+
+  it.each(['HUISCHOOL','HUITEACHER'] as const)('excludes enabled MFA without a campus login from %s administrator succession', async product => {
+    const f = await createSchool()
+    const input = {actorUserId:f.entry.id,organizationId:f.organizationId,product}
+    await addLogin(f.previous)
+    await enable(f.previous.id)
+    await enable(f.successor.id)
+    if(product==='HUITEACHER'){
+      await prisma.adminEntryGrant.create({data:{
+        id:randomUUID(),userId:f.entry.id,entry:product,grantedBy:f.entry.id,
+      }})
+      await prisma.educationProductEntitlement.create({data:{
+        organizationId:f.organizationId,product,status:'ACTIVE',grantedByUserId:f.entry.id,
+      }})
+      await grantEducationProductAdmin({...input,membershipId:f.previousM.id})
+    }
+    const old = await prisma.educationProductRoleGrant.findFirstOrThrow({
+      where:{membershipId:f.previousM.id,product,revokedAt:null},
+    })
+    expect((await listEducationProductAdminCandidates(f.entry.id,f.organizationId,product,{q:f.successor.username,page:1})).list).toEqual([])
+    await expect(grantEducationProductAdmin({...input,membershipId:f.successorM.id}))
+      .rejects.toMatchObject({code:'EDUCATION_ADMIN_INELIGIBLE'})
+    // An already-issued historical grant can exist without a usable login.
+    const historical = await prisma.educationProductRoleGrant.create({data:{
+      id:randomUUID(),organizationId:f.organizationId,membershipId:f.successorM.id,
+      product,role:'PRODUCT_ADMIN',grantedByUserId:f.entry.id,
+    }})
+    expect(await listEducationProductAdmins(f.entry.id,f.organizationId,product)).toMatchObject({
+      effectiveCount:1,list:[{grantId:old.id,effective:true},{grantId:historical.id,effective:false}],
+    })
+    await expect(revokeEducationProductAdmin({...input,grantId:old.id}))
+      .rejects.toMatchObject({code:'EDUCATION_LAST_ADMIN'})
+    await addLogin(f.successor)
+    await expect(revokeEducationProductAdmin({...input,grantId:old.id})).resolves.toMatchObject({revoked:true})
+    expect(await listEducationProductAdmins(f.entry.id,f.organizationId,product)).toMatchObject({
+      effectiveCount:1,list:[{grantId:historical.id,effective:true}],
+    })
   })
 
   it('requires the same School roster authority for individual writes and audits the operator', async () => {
