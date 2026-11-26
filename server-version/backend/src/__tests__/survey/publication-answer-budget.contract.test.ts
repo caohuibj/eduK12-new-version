@@ -84,6 +84,35 @@ describe('Survey FORM-only wave answer budgets (mocked transaction, real compila
     expect(mocks.tx.$executeRaw).not.toHaveBeenCalled()
     expect(mocks.tx.surveyWave.updateMany).not.toHaveBeenCalled()
   })
+  it('rejects a checkpoint whose valid explicit refusals exceed the 64 KiB budget',async()=>{
+    const timeQuestions=Array.from({length:400},(_,i)=>({
+      itemKey:'time'+i,type:'TIME' as const,prompt:'Synthetic time',required:false,
+      allowRefusal:true,options:[],rows:[],timeZone:'UTC' as const,
+    }))
+    const definition:FormDraft={schemaVersion:2,pages:[
+      ...Array.from({length:5},(_,i)=>({pageKey:'page'+i,title:'Time',questions:timeQuestions.slice(i*80,(i+1)*80)})),
+      {pageKey:'last',title:'Text',questions:[
+        {itemKey:'long',type:'LONG_TEXT',prompt:'Synthetic text',required:false,
+          options:[],rows:[],maxLength:9000},
+      ]},
+    ]}
+    expect(assertSurveyDraft('FORM',definition,true)).toEqual(definition)
+    const answers=Object.fromEntries([
+      ...timeQuestions.map(q=>[q.itemKey,{_surveyRefusal:true}]),
+      ['long','\u0001'.repeat(9000)],
+    ])
+    expect(Buffer.byteLength(JSON.stringify({form0:answers}),'utf8')).toBeGreaterThan(65536)
+    expect(formWorstCaseAnswerBytes(definition)).toBeGreaterThanOrEqual(Buffer.byteLength(JSON.stringify(answers),'utf8'))
+    wave.instrumentIds=['draft0']
+    wave.checkpointPolicy={schemaVersion:1,enabled:true,ttlHours:24}
+    mocks.tx.surveyInstrumentDraft.findMany.mockResolvedValue([{
+      id:'draft0',instrumentKey:'form0',kind:'FORM',title:'Synthetic form',
+      revision:0,catalogGrantId:null,definition,
+    }])
+    await expect(freeze()).rejects.toMatchObject({statusCode:409,message:expect.stringContaining('64KB')})
+    expect(mocks.tx.$executeRaw).not.toHaveBeenCalled()
+    expect(mocks.tx.surveyWave.updateMany).not.toHaveBeenCalled()
+  })
   it('rejects individually legal forms whose combined FINAL exceeds one MiB',async()=>{
     const answers=setup(3,7,10000,false)
     const canonical=prepareCanonicalSubmission({
