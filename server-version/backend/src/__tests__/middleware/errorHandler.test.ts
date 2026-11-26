@@ -20,6 +20,14 @@ const makeRes = () => {
 }
 
 describe('error handler disclosure boundary', () => {
+  it('hands partial responses to Express without writing another body', () => {
+    const res = makeRes(), next = vi.fn(), failure = new Error('stream interrupted')
+    res.headersSent = true
+    errorHandler(failure, {} as any, res, next)
+    expect(next).toHaveBeenCalledWith(failure)
+    expect(res.json).not.toHaveBeenCalled()
+  })
+
   it('returns a generic message for unknown server errors', () => {
     const res = makeRes()
 
@@ -39,6 +47,17 @@ describe('error handler disclosure boundary', () => {
     expect(res.body.code).toBe('ASSESSMENT_RUNTIME_UNAVAILABLE')
     expect(res.body.message).not.toContain('private')
     expect(res.setHeader).toHaveBeenCalledWith('Retry-After', '5')
+  })
+
+  it.each([
+    ['entity.parse.failed', 400], ['entity.too.large', 413], ['charset.unsupported', 415],
+  ])('excludes parser details from the %s response and error log', (type, statusCode) => {
+    const res = makeRes()
+    const calls = mockLogger.error.mock.calls.length
+    errorHandler(Object.assign(new Error('private input'), { type, statusCode, body: 'private body' }), {} as any, res, vi.fn())
+    expect(res.statusCode).toBe(statusCode)
+    expect(JSON.stringify(res.body)).not.toContain('private')
+    expect(mockLogger.error).toHaveBeenCalledTimes(calls)
   })
 
   it('keeps explicitly classified client errors usable', () => {

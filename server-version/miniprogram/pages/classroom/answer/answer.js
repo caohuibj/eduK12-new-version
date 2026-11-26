@@ -63,13 +63,11 @@ Page({
 
     // 监听学生加入成功
     this.socket.on('student:joined', (data) => {
-      console.log('学生已加入课堂', data)
       this.setData({ sessionId: data.sessionId })
     })
 
     // 监听接收题目
     this.socket.on('broadcast:question', (data) => {
-      console.log('收到题目', data)
       
       const questionType = data.questionContent.type
       const options = this.parseOptions(data.questionContent)
@@ -145,7 +143,7 @@ Page({
 
     // 监听错误
     this.socket.on('error', (err) => {
-      console.error('Socket错误', err)
+      console.error('Socket错误')
       wx.showToast({
         title: '连接错误',
         icon: 'none'
@@ -154,7 +152,7 @@ Page({
 
     // 连接Socket
     this.socket.connect().catch(err => {
-      console.error('Socket连接失败', err)
+      console.error('Socket连接失败')
       wx.showToast({
         title: '连接失败',
         icon: 'none'

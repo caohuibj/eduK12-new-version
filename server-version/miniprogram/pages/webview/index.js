@@ -53,12 +53,7 @@ Page({
     })
   },
 
-  onMessage(e) {
-    console.log('WebView message:', e.detail)
-  },
-
-  onError(e) {
-    console.error('WebView error:', e.detail)
+  onError() {
     wx.showToast({
       title: '页面加载失败',
       icon: 'none'

@@ -20,7 +20,7 @@
 x-prod-shared-env: &prod-shared-env
   NODE_ENV: production
   PORT: "3000"
-  DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
+  DATABASE_URL: ${DATABASE_URL_RUNTIME:?provision and verify the non-owner runtime role first}
   PRISMA_CONNECTION_POOL_SIZE: ${PRISMA_CONNECTION_POOL_SIZE:-12}
   PRISMA_POOL_TIMEOUT: ${PRISMA_POOL_TIMEOUT:-30}
   JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}

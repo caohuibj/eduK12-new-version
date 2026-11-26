@@ -12,6 +12,7 @@
 
 import { classroomSubmissionStats } from '../services/classroomSubmissionStats'
 import { Request, Response } from 'express'
+import type { ClassroomStatus, Prisma } from '@prisma/client'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
 import { UserRole } from '../types'
@@ -20,6 +21,7 @@ import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'
 import { randomInt } from 'crypto'
 import { StatsAggregator } from '../services/statsAggregator'
+import { trainingCourseScope } from '../utils/courseAccess'
 import { userCanManageClassroom } from '../middleware/classroomAccess'
 import {
   checkClassroomLookupRateLimit,
@@ -114,7 +116,7 @@ export const classroomController = {
 
       // 检查课程是否存在
       const course = await prisma.course.findUnique({
-        where: { id: courseId },
+        where: { id: courseId, ...trainingCourseScope },
       })
 
       if (!course) {
@@ -174,7 +176,7 @@ export const classroomController = {
       const userRole = req.user?.role
       const { courseId, status } = req.query
 
-      let where: any = {}
+      const where: Prisma.ClassroomWhereInput = { course: trainingCourseScope }
 
       // 按课程筛选
       if (courseId) {
@@ -183,7 +185,7 @@ export const classroomController = {
 
       // 按状态筛选
       if (status) {
-        where.status = status as string
+        where.status = status as ClassroomStatus
       }
 
       // 教师只能看到自己创建的课堂
@@ -305,7 +307,7 @@ export const classroomController = {
       }
 
       const classroom = await prisma.classroom.findUnique({
-        where: { code },
+        where: { code, course: trainingCourseScope },
         select: {
           id: true,
           code: true,

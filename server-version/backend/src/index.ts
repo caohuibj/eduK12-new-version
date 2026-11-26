@@ -233,6 +233,7 @@ app.use('/api', csrfProtection)
 // 静态文件服务 - 使用绝对路径
 logger.info('[Server] Static files configured', { uploadDir: config.uploadDir })
 app.use('/uploads', legacyUploadGuard(config.legacyUploadsEnabled), express.static(config.uploadDir, {
+  dotfiles: 'ignore',
   maxAge: '7d',
   immutable: true
 }))

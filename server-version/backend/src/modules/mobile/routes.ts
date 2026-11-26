@@ -3,11 +3,12 @@ import { config } from '../../config'
 import { randomUUID } from 'node:crypto'
 import { Router } from 'express'
 import { z } from 'zod'
+import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { authenticate, requireTeacher, requireAdmin } from '../../middleware/auth'
 import { asyncHandler } from '../../middleware/asyncHandler'
 import { success, forbidden, notFound, error } from '../../utils/response'
-import { canAccessCourseContent, canAccessCourseRoster, hasActiveCourseMembership } from '../../utils/courseAccess'
+import { canAccessCourseContent, canAccessCourseRoster, hasActiveCourseMembership, trainingAccountScope, trainingCourseScope, trainingShareRecipientScope } from '../../utils/courseAccess'
 import { canManageClassroom, findClassroomAccess } from '../../middleware/classroomAccess'
 import { requireOrganizationGovernance } from '../organization/access'
 import { UserRole } from '../../types'
@@ -40,7 +41,7 @@ mobileRouter.get('/context/:domain/:id', asyncHandler(async (req, res) => {
     const task = domain === 'assignments' ? await prisma.assignment.findUnique({ where: { id } })
       : domain === 'checkins' ? await prisma.checkin.findUnique({ where: { id } }) : null
     if (domain !== 'courses' && !task) return notFound(res)
-    const course = await prisma.course.findUnique({ where: { id: task?.courseId ?? id }, include: { shares: { select: { sharedTo: true } } } })
+    const course = await prisma.course.findUnique({ where: { id: task?.courseId ?? id, ...trainingCourseScope }, include: { shares: { select: { sharedTo: true } } } })
     if (!course) return notFound(res)
     if (actor.role === UserRole.STUDENT) {
       if (course.isLibrary || !(await hasActiveCourseMembership(course.id, actor.userId))) return forbidden(res)
@@ -77,7 +78,7 @@ mobileRouter.get('/context/:domain/:id', asyncHandler(async (req, res) => {
     fields = { courseId: classroom.courseId }
   } else if (domain === 'users' || domain === 'profile') {
     if (actor.userId !== id && actor.role !== UserRole.ADMIN) return forbidden(res)
-    const target = await prisma.user.findUnique({ where: { id }, select: { role: true, teacherApproved: true, isActive: true } })
+    const target = await prisma.user.findUnique({ where: { id, ...trainingAccountScope }, select: { role: true, teacherApproved: true, isActive: true } })
     if (!target) return notFound(res)
     actions.push('edit')
     if (domain === 'users' && actor.role === UserRole.ADMIN && target.role === UserRole.TEACHER) actions.push('extendAccount')
@@ -97,11 +98,11 @@ mobileRouter.get('/context/:domain/:id', asyncHandler(async (req, res) => {
 // One bounded roster query across owned courses, never per-course requests or
 // shared-course identities. Legacy ADMIN has the existing roster authority.
 mobileRouter.get('/courses/:id/share-options',requireAdmin,asyncHandler(async(req,res)=>{
-  const course=await prisma.course.findUnique({where:{id:idSchema.parse(req.params.id)}})
+  const course=await prisma.course.findUnique({where:{id:idSchema.parse(req.params.id),...trainingCourseScope}})
   if(!course)return notFound(res)
   if(!canAccessCourseRoster(course,req.user!.userId,req.user!.role))return forbidden(res)
   const {page,pageSize,keyword}=z.object({page:z.coerce.number().int().min(1).default(1),pageSize:z.coerce.number().int().min(1).max(50).default(20),keyword:z.string().max(100).optional()}).parse(req.query)
-  const where={role:{in:[UserRole.TEACHER,UserRole.ADMIN]},isActive:true,isFrozen:false,...(keyword?{OR:[{username:{contains:keyword}},{nickname:{contains:keyword}}]}:{})}
+  const where={...trainingShareRecipientScope,...(keyword?{OR:[{username:{contains:keyword}},{nickname:{contains:keyword}}]}:{})}
   const [list,total]=await Promise.all([prisma.user.findMany({where,select:{id:true,nickname:true,username:true},orderBy:{id:'asc'},skip:(page-1)*pageSize,take:pageSize}),prisma.user.count({where})])
   return success(res,{list,total,page,pageSize})
 }))
@@ -116,7 +117,7 @@ mobileRouter.get('/classrooms/:id/questions/:questionId/context', requireTeacher
 }))
 mobileRouter.get('/students', requireTeacher, asyncHandler(async (req, res) => {
   const pagination = z.object({ page: z.coerce.number().int().min(1).default(1), pageSize: z.coerce.number().int().min(1).max(50).default(20), keyword: z.string().max(100).optional() }).parse(req.query)
-  const where = { courseStudents: { some: { status: { in: ['ACTIVE','APPROVED'] as any }, course: req.user!.role === UserRole.ADMIN ? {} : { creatorId: req.user!.userId } } },
+  const where = { ...trainingAccountScope, courseStudents: { some: { status: { in: ['ACTIVE','APPROVED'] as any }, course: { ...trainingCourseScope, ...(req.user!.role === UserRole.ADMIN ? {} : { creatorId: req.user!.userId }) } } },
     ...(pagination.keyword ? { OR: [{ username: { contains: pagination.keyword } }, { nickname: { contains: pagination.keyword } }] } : {}) }
   const [list,total] = await Promise.all([
     prisma.user.findMany({ where, select: { id: true, nickname: true, username: true, isActive: true, isFrozen: true }, orderBy: { id: 'asc' }, skip: (pagination.page-1)*pagination.pageSize, take: pagination.pageSize }),
@@ -133,14 +134,15 @@ mobileRouter.get('/lists/:domain', asyncHandler(async (req, res) => {
   const actor=req.user!, staff=actor.role===UserRole.TEACHER||actor.role===UserRole.ADMIN
   if(!staff&&actor.role!==UserRole.STUDENT)return forbidden(res)
   if((domain==='classrooms'&&!staff)||(domain==='teacherCodes'&&actor.role!==UserRole.ADMIN))return forbidden(res)
-  let courseWhere:any=actor.role===UserRole.ADMIN?{}:actor.role===UserRole.TEACHER?{creatorId:actor.userId}:{isLibrary:false,students:{some:{studentId:actor.userId,status:{in:['ACTIVE','APPROVED']}}}}
+  const relationship: Prisma.CourseWhereInput = actor.role===UserRole.ADMIN?{}:actor.role===UserRole.TEACHER?{creatorId:actor.userId}:{isLibrary:false,students:{some:{studentId:actor.userId,status:{in:['ACTIVE','APPROVED']}}}}
+  let courseWhere: Prisma.CourseWhereInput = { ...trainingCourseScope, ...relationship }
   let allowedActions=collectionActions(domain,actor.role)
   if(courseId){
-    const course=await prisma.course.findUnique({where:{id:courseId},include:{shares:{select:{sharedTo:true}}}})
+    const course=await prisma.course.findUnique({where:{id:courseId,...trainingCourseScope},include:{shares:{select:{sharedTo:true}}}})
     if(!course)return notFound(res)
     if(actor.role===UserRole.STUDENT){if(course.isLibrary||!await hasActiveCourseMembership(courseId,actor.userId))return forbidden(res)}
     else if(!canAccessCourseContent(course,actor.userId,actor.role))return forbidden(res)
-    courseWhere={id:courseId};allowedActions=staff&&canAccessCourseRoster(course,actor.userId,actor.role)?['create']:[]
+    courseWhere={id:courseId,...trainingCourseScope};allowedActions=staff&&canAccessCourseRoster(course,actor.userId,actor.role)?['create']:[]
   }
   const title=keyword?{contains:keyword}:undefined
   const paging={skip:(page-1)*pageSize,take:pageSize,orderBy:{createdAt:'desc' as const}}
@@ -155,7 +157,7 @@ mobileRouter.get('/lists/:domain', asyncHandler(async (req, res) => {
     const where={course:courseWhere,...(title?{title}: {})}
     ;[list,total]=await Promise.all([prisma.checkin.findMany({where,...paging,select:{id:true,title:true,description:true,endTime:true,courseId:true}}),prisma.checkin.count({where})])
   }else if(domain==='classrooms'){
-    const where={...(actor.role===UserRole.ADMIN?{}:{creatorId:actor.userId}),...(courseId?{courseId}:{})}
+    const where={course:trainingCourseScope,...(actor.role===UserRole.ADMIN?{}:{creatorId:actor.userId}),...(courseId?{courseId}:{})}
     ;[list,total]=await Promise.all([prisma.classroom.findMany({where,...paging,select:{id:true,name:true,status:true,courseId:true}}),prisma.classroom.count({where})])
   }else{
     ;[list,total]=await Promise.all([prisma.teacherCode.findMany({...paging,select:{id:true,code:true,isActive:true,maxUses:true,usedCount:true,expiresAt:true}}),prisma.teacherCode.count()])

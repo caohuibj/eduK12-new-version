@@ -26,22 +26,26 @@ const redactText = (value: string): string => value
   .replace(SENSITIVE_TEXT, (_match, bearerPrefix, keyPrefix) => `${bearerPrefix || keyPrefix}[REDACTED]`)
   .replace(/((?:["']?start[_-]?intent["']?)\s*[:=]\s*["']?)[A-Za-z0-9_-]+/gi, '$1[REDACTED]')
 
-const redactStack = (stack: string): string => {
-  const lines = stack.split('\n')
-  // The first line is `Error: <raw message>` and can contain request input.
-  // Keep only the error class; retain sanitized frames for diagnosis.
-  return [`${lines[0]?.split(':')[0] || 'Error'}: [REDACTED]`, ...lines.slice(1).map(redactText)].join('\n')
+const redactStack = (error: Error): string | undefined => {
+  // V8 prefixes the frames with the entire message, which may span many lines.
+  const header = Error.prototype.toString.call(error) + '\n'
+  const stack = error.stack
+  if (typeof stack !== 'string' || !stack.startsWith(header)) return undefined
+  return stack.slice(header.length).split('\n')
+    .filter(line => /^\s+at /.test(line))
+    .map(redactText)
+    .join('\n')
 }
 
 const redactLogValue = (value: unknown, key?: string): unknown => {
   if (value instanceof Error) {
     return {
-      name: value.name,
+      name: value.constructor?.name || 'Error',
       // Error messages can contain database values or request input.  Keep
       // the class and sanitized stack for server-side diagnosis, never the
       // raw message.
       message: '[REDACTED]',
-      stack: value.stack ? redactStack(value.stack) : undefined,
+      stack: redactStack(value),
     }
   }
   if (key && SENSITIVE_KEY.test(key)) return '[REDACTED]'

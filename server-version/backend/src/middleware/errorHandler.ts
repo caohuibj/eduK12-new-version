@@ -16,7 +16,8 @@ const isTransientReadContentionError = (err: any): boolean => {
   return TRANSIENT_READ_PG_SQLSTATES.has(metaCode)
 }
 
-export const errorHandler = (err: any, req: Request & { requestId?: string }, res: Response, _next: NextFunction) => {
+export const errorHandler = (err: any, req: Request & { requestId?: string }, res: Response, next: NextFunction) => {
+  if (res.headersSent) return next(err)
   // Only the shared completion boundary classifies transient DB failures.
   // Preserve its safe retry contract in routes without a local busy mapper.
   if (err?.code === 'COMPLETION_BUSY') return completionBusy(res, err.retryAfterSeconds)
@@ -51,6 +52,18 @@ export const errorHandler = (err: any, req: Request & { requestId?: string }, re
     })
     res.setHeader('Retry-After', '1')
     return instrumentError(res, 'SERVICE_BUSY', '服务繁忙，请稍后重试', 503)
+  }
+  // Body parsers attach input fragments to their errors. Keep the status while
+  // excluding the dependency message and body from responses and diagnostics.
+  if (err?.type === 'entity.parse.failed' || err?.type === 'querystring.parse.rangeError'
+    || err?.type === 'request.size.invalid' || err?.type === 'request.aborted') {
+    return error(res, '请求体格式无效', -1, 400)
+  }
+  if (err?.type === 'entity.too.large' || err?.type === 'parameters.too.many') {
+    return error(res, '请求体超过限制', -1, 413)
+  }
+  if (err?.type === 'charset.unsupported' || err?.type === 'encoding.unsupported') {
+    return error(res, '不支持的请求编码', -1, 415)
   }
   const rawStatusCode = Number(err?.statusCode)
   const statusCode = Number.isInteger(rawStatusCode) && rawStatusCode >= 400 && rawStatusCode < 600

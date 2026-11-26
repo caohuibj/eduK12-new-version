@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { prisma } from '../config/database'
+import { trainingCourseScope } from '../utils/courseAccess'
 import { UserRole } from '../types'
 import { forbidden, notFound, unauthorized } from '../utils/response'
 
@@ -25,7 +26,7 @@ export async function findClassroomAccess(
   classroomId: string
 ): Promise<ClassroomAccessRecord | null> {
   return prisma.classroom.findUnique({
-    where: { id: classroomId },
+    where: { id: classroomId, course: trainingCourseScope },
     select: {
       id: true,
       courseId: true,

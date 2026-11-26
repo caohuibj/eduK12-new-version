@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { listEnabledSituationalFixtures } from '../../modules/situational/fixtures/fixture-registry'
 import { runnerSituationRuntimeDefinition } from '../../modules/situational/situation-runtime-definition'
 import {
   deriveAuthoritativeSituationalTrajectory,
@@ -94,4 +95,15 @@ describe('SIT-V2-E branching browser fixture', () => {
       status: 'not_calculable',
     })
   })
+})
+
+it('only includes explicitly enabled fixture packages in the test environment', () => {
+  try {
+    for (const flag of ['SITUATIONAL_VNEXT_E2E_FIXTURE', 'SITUATIONAL_BRANCHING_E2E_FIXTURE',
+      'SITUATIONAL_STATIC_VISUAL_FIXTURE', 'SITUATIONAL_VIDEO_E2E_FIXTURE']) vi.stubEnv(flag, 'true')
+    vi.stubEnv('NODE_ENV', 'production')
+    expect(listEnabledSituationalFixtures()).toEqual([])
+    vi.stubEnv('NODE_ENV', 'test')
+    expect(listEnabledSituationalFixtures()).toContain(SJT_BRANCHING_E2E_PACKAGE)
+  } finally { vi.unstubAllEnvs() }
 })

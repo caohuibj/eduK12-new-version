@@ -13,9 +13,10 @@ const proxy = {
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: '0.0.0.0',
+    host: '127.0.0.1',
     port: 5173,
-    allowedHosts: true,
+    // Product-host browser fixtures resolve these exact hosts to loopback.
+    allowedHosts: ['eduk12.top', 'www.eduk12.top', 'training.eduk12.top', 'survey.eduk12.top', 'school.eduk12.top', 'teacher.eduk12.top'],
     proxy,
   },
   preview: {

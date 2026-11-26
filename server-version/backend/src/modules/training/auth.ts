@@ -1,5 +1,6 @@
 import type { RequestHandler } from 'express'
 import { z } from 'zod'
+import { trainingCourseScope } from '../../utils/courseAccess'
 import { prisma } from '../../config/database'
 import { authController } from '../../controllers/authController'
 import { registrationRateLimit } from '../../middleware/registrationAdmission'
@@ -85,7 +86,7 @@ export const findCachedCourse = async (code: string) => {
   const generation = courseCacheGeneration
   const query = async (): Promise<CachedCourse['data']> => {
     const course = await prisma.course.findUnique({
-      where: { courseCode: code },
+      where: { courseCode: code, ...trainingCourseScope },
       select: {
         id: true,
         title: true,

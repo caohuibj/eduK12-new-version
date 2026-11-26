@@ -29,7 +29,6 @@ class ClassroomSocket {
         url += `&tempStudentId=${tempId}`
       }
 
-      console.log('连接Socket:', url)
 
       // 创建Socket连接
       this.socket = wx.connectSocket({
@@ -38,7 +37,7 @@ class ClassroomSocket {
           console.log('Socket连接中...')
         },
         fail: (err) => {
-          console.error('Socket连接失败', err)
+          console.error('Socket连接失败')
           reject(err)
         }
       })
@@ -56,10 +55,9 @@ class ClassroomSocket {
       wx.onSocketMessage((res) => {
         try {
           const data = JSON.parse(res.data)
-          console.log('收到消息:', data)
           this.trigger(data.event, data.data)
         } catch (err) {
-          console.error('解析消息失败', err)
+          console.error('解析消息失败')
         }
       })
 
@@ -77,7 +75,7 @@ class ClassroomSocket {
 
       // 监听Socket错误
       wx.onSocketError((err) => {
-        console.error('Socket错误', err)
+        console.error('Socket错误')
         this.trigger('error', err)
         reject(err)
       })
@@ -99,7 +97,7 @@ class ClassroomSocket {
         console.log('消息发送成功', event)
       },
       fail: (err) => {
-        console.error('消息发送失败', err)
+        console.error('消息发送失败')
       }
     })
   }
@@ -133,7 +131,7 @@ class ClassroomSocket {
         try {
           callback(data)
         } catch (err) {
-          console.error(`事件回调错误 [${event}]`, err)
+          console.error('事件回调错误')
         }
       })
     }
@@ -146,7 +144,7 @@ class ClassroomSocket {
     
     setTimeout(() => {
       this.connect().catch(err => {
-        console.error('重连失败', err)
+        console.error('重连失败')
       })
     }, 2000 * this.reconnectAttempts)
   }

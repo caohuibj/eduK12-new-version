@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import * as echarts from 'echarts'
+import * as echarts from 'echarts/core'
+import { BarChart } from 'echarts/charts'
+import { GridComponent, TitleComponent, TooltipComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
 import 'echarts-wordcloud'
 import { useClassroomSocket } from '../../hooks/useClassroomSocket'
 import { useAuth } from '../../contexts/AuthContext'
 import apiClient from '../../api/client'
 import { Users, BookOpen, Clock } from 'lucide-react'
 import { sanitizeText } from '../../utils/sanitize'
+
+echarts.use([BarChart, GridComponent, TitleComponent, TooltipComponent, CanvasRenderer])
 
 interface Question {
   questionId: string
@@ -29,8 +34,7 @@ interface Stats {
   }
 }
 
-// ECharts 5 is retained for the peer-compatible wordcloud plugin. Its HTML
-// tooltip renderer must never receive classroom-authored labels verbatim.
+// Classroom labels are displayed as text on the chart canvas.
 const safeChartText = (value: unknown): string => sanitizeText(String(value ?? ''))
 
 const BigScreen: React.FC = () => {
@@ -248,6 +252,7 @@ const BigScreen: React.FC = () => {
         },
       },
       tooltip: {
+        renderMode: 'richText',
         trigger: 'axis',
         axisPointer: {
           type: 'shadow'
@@ -257,8 +262,8 @@ const BigScreen: React.FC = () => {
           const opt = options[idx]
           const optValue = safeChartText(opt.value || opt.key)
           const optLabel = safeChartText(opt.label || opt.text)
-          return `${optValue}. ${optLabel}<br/>` +
-                 `选择人数: ${data[idx]} 人<br/>` +
+          return `${optValue}. ${optLabel}\n` +
+                 `选择人数: ${data[idx]} 人\n` +
                  `占比: ${percentages[idx]}%`
         },
       },

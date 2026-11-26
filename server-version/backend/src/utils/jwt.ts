@@ -5,6 +5,7 @@ import { JwtPayload } from '../types'
 
 export const generateToken = (payload: JwtPayload): string => {
   return jwt.sign(payload, config.jwtSecret, {
+    algorithm: 'HS256',
     expiresIn: config.jwtExpiresIn as any,
     // Distinct signed sessions, even from two logins during one second.
     jwtid: randomUUID(),
@@ -13,7 +14,12 @@ export const generateToken = (payload: JwtPayload): string => {
 
 export const verifyToken = (token: string): JwtPayload | null => {
   try {
-    return jwt.verify(token, config.jwtSecret) as JwtPayload
+    const claims = jwt.verify(token, config.jwtSecret, { algorithms: ['HS256'] })
+    if (typeof claims !== 'object' || claims.tokenType !== undefined ||
+      typeof claims.userId !== 'string' || !claims.userId.trim() ||
+      !Number.isSafeInteger(claims.tokenVersion) || claims.tokenVersion < 0 ||
+      !Number.isSafeInteger(claims.exp)) return null
+    return claims as JwtPayload
   } catch (error) {
     return null
   }
@@ -38,7 +44,7 @@ export const generateClassroomResumeToken = (
       sessionId,
     },
     config.jwtSecret,
-    { expiresIn: CLASSROOM_RESUME_TOKEN_TTL }
+    { algorithm: 'HS256', expiresIn: CLASSROOM_RESUME_TOKEN_TTL }
   )
 }
 
@@ -47,7 +53,7 @@ export const verifyClassroomResumeToken = (
   classroomId: string
 ): { sessionId: string } | null => {
   try {
-    const payload = jwt.verify(token, config.jwtSecret)
+    const payload = jwt.verify(token, config.jwtSecret, { algorithms: ['HS256'] })
     if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
       return null
     }
@@ -55,6 +61,7 @@ export const verifyClassroomResumeToken = (
     const candidate = payload as Record<string, unknown>
     if (
       candidate.tokenType !== CLASSROOM_RESUME_TOKEN_TYPE ||
+      !Number.isSafeInteger(candidate.exp) ||
       candidate.classroomId !== classroomId ||
       typeof candidate.sessionId !== 'string' ||
       !candidate.sessionId
