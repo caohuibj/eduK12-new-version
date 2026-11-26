@@ -38,8 +38,8 @@ export function advanceDanmakuQueue(queue:DanmakuDisplayQueue,now:number):Danmak
   return {...queue,active,pending:pending.slice(-DANMAKU_PENDING_LIMIT)}
 }
 
-/** Rolling history limits new candidates. A newer server reports explicit
- * removals separately so its history can rotate without interrupting a flight. */
+/** The moderation roster lets a flight continue while its text is absent from
+ * the rolling feed, and stops it once the teacher can no longer remove it. */
 export function reconcileDanmakuQueue(
   current:DanmakuDisplayQueue,snapshot:ClassroomDanmakuSnapshot,now:number,
 ):DanmakuDisplayQueue {
@@ -66,7 +66,9 @@ export function reconcileDanmakuQueue(
     &&Number.isFinite(Date.parse(message.expiresAt))&&Date.parse(message.expiresAt)>now)
   const allowed=new Set(messages.map(message=>message.id))
   const removed=Array.isArray(snapshot.removedMessageIds)?new Set(snapshot.removedMessageIds):null
-  const inFlight=queue.active.filter(message=>removed?!removed.has(message.id):allowed.has(message.id))
+  const olderModeration=Array.isArray(snapshot.olderModerationIds)?new Set(snapshot.olderModerationIds):null
+  const inFlight=queue.active.filter(message=>!removed?.has(message.id)
+    &&(allowed.has(message.id)||olderModeration?.has(message.id)||olderModeration===null&&removed!==null))
   const candidates=messages.slice(-(DANMAKU_TRACKS+DANMAKU_PENDING_LIMIT))
   const candidateIds=new Set(candidates.map(message=>message.id))
   const seen=new Set(queue.seen)

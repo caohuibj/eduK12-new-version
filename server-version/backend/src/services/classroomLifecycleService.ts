@@ -46,7 +46,7 @@ export async function startClassroomQuestion(classroom:ClassroomAccessRecord,que
           if (!candidate) return { kind: 'question-not-found' }
           if (candidate.startedAt && !candidate.endedAt) return { kind: 'already-active', question: candidate }
           const timeLimit = Math.max(1, Math.min(3600, Math.floor(requestedTimeLimit ?? candidate.timeLimit ?? 60)))
-          const startedAt = new Date()
+          const startedAt = new Date(Math.max(Date.now(), (candidate.startedAt?.getTime() ?? -1) + 1))
           // Compare-and-set on both lifecycle timestamps. This makes two
           // same-question starts idempotent instead of resetting the winner's
           // start time or timer.
@@ -122,19 +122,65 @@ export async function joinClassroomStudent(input:{classroomId:string;studentId:s
     return session
   })
 }
-export async function endClassroomQuestion(classroomId:string,questionId:string,options:{automatic?:boolean;expectedStartedAt?:Date}={}){
- return prisma.$transaction(async tx=>{
+type EndQuestionResult = {
+ changed: boolean
+ questionId: string
+ startedAt: Date | null
+ endedAt: Date | null
+ staleRound?: true
+}
+export async function endClassroomQuestion(classroomId:string,questionId:string,options:{automatic?:boolean;expectedStartedAt?:Date}={}):Promise<EndQuestionResult>{
+ return prisma.$transaction<EndQuestionResult>(async tx=>{
   await lockClassroom(tx,classroomId)
   const classroom=await tx.classroom.findUnique({where:{id:classroomId},select:{status:true}})
-  if(!classroom||classroom.status!=='ACTIVE'){if(options.automatic)return {changed:false,questionId};throw new ClassroomLifecycleError('课堂当前不可结束答题')}
+  if(!classroom||classroom.status!=='ACTIVE'){if(options.automatic)return {changed:false,questionId,startedAt:null,endedAt:null};throw new ClassroomLifecycleError('课堂当前不可结束答题')}
   const question=await tx.classroomQuestion.findFirst({where:{id:questionId,classroomId},select:{id:true,startedAt:true,endedAt:true,timeLimit:true}})
   if(!question)throw new ClassroomLifecycleError('题目不存在或不属于当前课堂',404)
-  if(!question.startedAt||question.endedAt)return {changed:false,questionId}
-  if(options.expectedStartedAt&&question.startedAt.getTime()!==options.expectedStartedAt.getTime())return {changed:false,questionId,staleRound:true}
-  if(options.automatic&&Date.now()<question.startedAt.getTime()+(question.timeLimit||60)*1000)return {changed:false,questionId}
-  const result=await tx.classroomQuestion.updateMany({where:{id:questionId,classroomId,startedAt:question.startedAt,endedAt:null},data:{endedAt:new Date()}})
-  return {changed:result.count>0,questionId}
+  const round={questionId,startedAt:question.startedAt,endedAt:question.endedAt}
+  if(options.expectedStartedAt&&question.startedAt?.getTime()!==options.expectedStartedAt.getTime())return {changed:false,...round,staleRound:true}
+  if(!question.startedAt||question.endedAt)return {changed:false,...round}
+  if(options.automatic&&Date.now()<question.startedAt.getTime()+(question.timeLimit||60)*1000)return {changed:false,...round}
+  const endedAt=new Date()
+  const result=await tx.classroomQuestion.updateMany({where:{id:questionId,classroomId,startedAt:question.startedAt,endedAt:null},data:{endedAt}})
+  return {changed:result.count>0,...round,endedAt:result.count>0?endedAt:null}
  })
+}
+const expiredRoundFinishes = new Map<string,Promise<EndQuestionResult>>()
+const recentlyFinishedExpiredRounds = new Map<string,number>()
+const RECENT_EXPIRED_ROUND_LIMIT = 256
+const RECENT_EXPIRED_ROUND_TTL_MS = 60_000
+
+// Only expired submissions use this process-local coalescing. The database
+// round CAS remains authoritative across processes; only the first local
+// caller may return the winning result and trigger its end notification.
+async function finishExpiredRound(classroomId:string,questionId:string,startedAt:Date):Promise<EndQuestionResult>{
+ const key=JSON.stringify([classroomId,questionId,startedAt.toISOString()])
+ const now=Date.now()
+ for(const [round,expiresAt] of recentlyFinishedExpiredRounds){
+  if(expiresAt<=now)recentlyFinishedExpiredRounds.delete(round)
+ }
+ if(recentlyFinishedExpiredRounds.has(key))throw new ClassroomLifecycleError('答题已结束，无法提交答案')
+ const pending=expiredRoundFinishes.get(key)
+ if(pending){
+  const ended=await pending
+  if(ended.staleRound)throw new ClassroomLifecycleError('题目已重新开始，请刷新后作答')
+  throw new ClassroomLifecycleError('答题已结束，无法提交答案')
+ }
+ const completion=endClassroomQuestion(classroomId,questionId,{automatic:true,expectedStartedAt:startedAt})
+ expiredRoundFinishes.set(key,completion)
+ try{
+  const ended=await completion
+  if(ended.staleRound)throw new ClassroomLifecycleError('题目已重新开始，请刷新后作答')
+  if(!ended.changed)throw new ClassroomLifecycleError('答题已结束，无法提交答案')
+  recentlyFinishedExpiredRounds.set(key,Date.now()+RECENT_EXPIRED_ROUND_TTL_MS)
+  if(recentlyFinishedExpiredRounds.size>RECENT_EXPIRED_ROUND_LIMIT){
+   const oldest=recentlyFinishedExpiredRounds.keys().next().value
+   if(oldest!==undefined)recentlyFinishedExpiredRounds.delete(oldest)
+  }
+  return ended
+ }finally{
+  if(expiredRoundFinishes.get(key)===completion)expiredRoundFinishes.delete(key)
+ }
 }
 export async function closeClassroom(classroomId:string){
  const result=await prisma.$transaction(async tx=>{await lockClassroom(tx,classroomId);const classroom=await tx.classroom.findUnique({where:{id:classroomId},select:{status:true}});if(!classroom)throw new ClassroomLifecycleError('课堂不存在',404);if(classroom.status==='ENDED')return {changed:false,classroomId};const endedAt=new Date();await tx.classroomQuestion.updateMany({where:{classroomId,startedAt:{not:null},endedAt:null},data:{endedAt}});await tx.classroom.update({where:{id:classroomId},data:{status:'ENDED',endedAt}});return {changed:true,classroomId}})
@@ -160,11 +206,11 @@ export async function submitClassroomAnswer(input:{classroomId:string;sessionId:
   const existing=await tx.classroomAnswer.findUnique({where:key})
   if(existing){
    if(canonicalHash(existing.answer)!==canonicalHash(input.answer))throw new ClassroomLifecycleError('您已提交过不同答案')
-   return {questionId:question.id,alreadySubmitted:true,expired:false,expiredStartedAt:null}
+   return {questionId:question.id,alreadySubmitted:true,expired:false,expiredStartedAt:null,startedAt:question.startedAt}
   }
   if(!question.startedAt||question.endedAt)throw new ClassroomLifecycleError('答题已结束，无法提交答案')
   if(question.timeLimit&&Date.now()>=question.startedAt.getTime()+question.timeLimit*1000){
-   return {questionId:question.id,alreadySubmitted:false,expired:true,expiredStartedAt:question.startedAt}
+   return {questionId:question.id,alreadySubmitted:false,expired:true,expiredStartedAt:question.startedAt,startedAt:question.startedAt}
   }
   // PostgreSQL arbitrates duplicates without aborting the interactive transaction.
   // A second equal payload is idempotent; a different payload never overwrites it.
@@ -173,19 +219,19 @@ export async function submitClassroomAnswer(input:{classroomId:string;sessionId:
    const stored=await tx.classroomAnswer.findUnique({where:key})
    if(!stored)throw new ClassroomLifecycleError('答案保存失败，请重试')
    if(canonicalHash(stored.answer)!==canonicalHash(input.answer))throw new ClassroomLifecycleError('您已提交过不同答案')
-   return {questionId:question.id,alreadySubmitted:true,expired:false,expiredStartedAt:null}
+   return {questionId:question.id,alreadySubmitted:true,expired:false,expiredStartedAt:null,startedAt:question.startedAt}
   }
-  return {questionId:question.id,alreadySubmitted:false,expired:false,expiredStartedAt:null}
+  return {questionId:question.id,alreadySubmitted:false,expired:false,expiredStartedAt:null,startedAt:question.startedAt}
  })
  // Never upgrade a shared classroom lock: simultaneous expired submissions could
  // deadlock each other. Reacquire the existing exclusive lifecycle barrier only
  // after commit, bound to the exact round that was observed as expired.
+ let endedAt:Date|null=null
  if(result.expired&&result.expiredStartedAt){
-  const ended=await endClassroomQuestion(input.classroomId,input.questionId,{automatic:true,expectedStartedAt:result.expiredStartedAt})
-  if(ended.staleRound)throw new ClassroomLifecycleError('题目已重新开始，请刷新后作答')
-  if(!ended.changed)throw new ClassroomLifecycleError('答题已结束，无法提交答案')
+  const ended=await finishExpiredRound(input.classroomId,input.questionId,result.expiredStartedAt)
+  endedAt=ended.endedAt
  }
- return {questionId:result.questionId,alreadySubmitted:result.alreadySubmitted,expired:result.expired}
+ return {questionId:result.questionId,alreadySubmitted:result.alreadySubmitted,expired:result.expired,startedAt:result.startedAt,endedAt}
 }
 export async function leaveClassroomStudent(input:{classroomId:string;sessionId:string;studentId:string}){
  return prisma.classroomSession.updateMany({where:{id:input.sessionId,classroomId:input.classroomId,studentId:input.studentId,leftAt:null},data:{leftAt:new Date()}})

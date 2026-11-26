@@ -10,6 +10,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import apiClient from '../../api/client'
 import { Users, BookOpen, Clock } from 'lucide-react'
 import { sanitizeText } from '../../utils/sanitize'
+import { ClassroomRoundGuard, classroomRemainingTime } from '../../utils/classroomRound'
 import {ClassroomDanmakuDisplay,type DanmakuPresentation} from './ClassroomDanmakuDisplay'
 import type {ClassroomDanmakuSnapshot,ClassroomDanmakuStateAck} from '../../types/classroomDanmaku'
 
@@ -20,10 +21,13 @@ interface Question {
   questionContent: any
   questionIndex: number
   timeLimit: number
+  startedAt?: string | null
+  remainingTime?: number
 }
 
 interface Stats {
   questionId: string
+  startedAt?: string | null
   unsupportedType?: boolean
   answerCount: number
   totalSessions: number
@@ -47,6 +51,8 @@ const BigScreen: React.FC = () => {
   const { isLoading: authLoading, user } = useAuth()
 
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
+  const questionRef = useRef<Question | null>(null)
+  const roundGuard = useRef(new ClassroomRoundGuard())
   const [stats, setStats] = useState<Stats | null>(null)
   const [onlineCount, setOnlineCount] = useState(0)
   const [countdown, setCountdown] = useState<number | null>(null)
@@ -57,6 +63,12 @@ const BigScreen: React.FC = () => {
   const danmakuFull=!isHistoryMode&&!classroomClosed&&danmakuView.enabled&&danmakuView.displayMode==='DANMAKU'
 
   useEffect(()=>{
+    roundGuard.current.reset()
+    questionRef.current = null
+    setCurrentQuestion(null)
+    setStats(null)
+    setCountdown(null)
+    setIsFinished(false)
     setClassroomClosed(false)
     setDanmakuView({enabled:false,displayMode:'QUESTION'})
   },[classroomId])
@@ -67,6 +79,8 @@ const BigScreen: React.FC = () => {
   const wordCloudInstance = useRef<echarts.ECharts | null>(null)
 
   const showClassroomClosed=useCallback(()=>{
+  roundGuard.current.close()
+  questionRef.current=null
   chartInstance.current?.dispose()
   wordCloudInstance.current?.dispose()
   chartInstance.current=null
@@ -151,57 +165,51 @@ const BigScreen: React.FC = () => {
     }
 
 
+    const joinedAtRevision = roundGuard.current.revision
+    const receiveQuestion = (data: Question) => {
+      const sameRound = roundGuard.current.matches(data)
+      if (!roundGuard.current.receive(data)) return false
+      const remaining = classroomRemainingTime(data)
+      if (remaining !== null && remaining <= 0) roundGuard.current.finish(data)
+      questionRef.current = data
+      setCurrentQuestion(data)
+      if (!sameRound) setStats(null)
+      setIsFinished(roundGuard.current.finished)
+      setCountdown(previousRemaining => {
+        if (!roundGuard.current.matches(data)) return previousRemaining
+        if (roundGuard.current.finished) return null
+        return sameRound && previousRemaining !== null && remaining !== null ? Math.min(previousRemaining, remaining) : remaining
+      })
+      return true
+    }
     on('bigscreen:joined', (data) => {
       if(data?.status==='ENDED'){showClassroomClosed();return}
-      
-      // 如果有当前题目，设置题目和状态
       if (data.currentQuestion) {
-        setCurrentQuestion({
-          questionId: data.currentQuestion.questionId,
-          questionContent: data.currentQuestion.questionContent,
-          questionIndex: data.currentQuestion.questionIndex,
-          timeLimit: data.currentQuestion.timeLimit,
-        })
-        
-        // 如果有剩余时间，启动倒计时
-        if (data.currentQuestion.remainingTime && data.currentQuestion.remainingTime > 0) {
-          setCountdown(data.currentQuestion.remainingTime)
-        }
+        if (!receiveQuestion(data.currentQuestion)) return
+        if (data.stats && roundGuard.current.matches(data.stats)) setStats(data.stats)
+      } else if (roundGuard.current.revision === joinedAtRevision) {
+        roundGuard.current.clear()
+        questionRef.current = null
+        setCurrentQuestion(null)
+        setStats(null)
+        setCountdown(null)
+        setIsFinished(false)
       }
-      
-      // 设置统计数据
-      if (data.stats) {
-        setStats(data.stats)
-      }
-      
-      // 设置在线人数
-      if (data.onlineCount !== undefined) {
-        setOnlineCount(data.onlineCount)
-      }
+      if (data.onlineCount !== undefined) setOnlineCount(data.onlineCount)
     })
 
-    on('broadcast:question', (data: Question) => {
-      setCurrentQuestion(data)
-      setStats(null)
-      setIsFinished(false)
-      
-      // 启动倒计时
-      if (data.timeLimit && data.timeLimit > 0) {
-        setCountdown(data.timeLimit)
-      } else {
-        setCountdown(null)
-      }
-    })
+    on('broadcast:question', receiveQuestion)
 
     on('broadcast:stats', (data: Stats) => {
-      setStats(data)
+      if (roundGuard.current.matches(data)) setStats(data)
     })
 
     on('broadcast:online', (data: { onlineCount: number }) => {
       setOnlineCount(data.onlineCount)
     })
 
-    on('broadcast:finished', () => {
+    on('broadcast:finished', (data) => {
+      if (!roundGuard.current.finish(data)) return
       setIsFinished(true)
       setCountdown(null)
     })
@@ -211,8 +219,8 @@ const BigScreen: React.FC = () => {
     on('broadcast:closed',showClassroomClosed)
 
     on('broadcast:next', (data) => {
-      const expectedQuestionId = data?.expectedQuestionId
-      if (!expectedQuestionId || expectedQuestionId === currentQuestion?.questionId) {
+      if (roundGuard.current.clear({ questionId: data?.expectedQuestionId, startedAt: data?.expectedStartedAt })) {
+        questionRef.current = null
         setCurrentQuestion(null)
         setStats(null)
         setIsFinished(false)
@@ -229,25 +237,24 @@ const BigScreen: React.FC = () => {
       off('broadcast:closed')
       off('broadcast:next')
     }
-  }, [currentQuestion?.questionId, isConnected, isHistoryMode, showClassroomClosed, on, off])
+  }, [classroomId, isConnected, isHistoryMode, showClassroomClosed, on, off])
 
   // 倒计时逻辑
   useEffect(() => {
     if (countdown === null || countdown <= 0) return
 
+    const round = questionRef.current
     const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev === null || prev <= 1) {
-          clearInterval(timer)
-          setIsFinished(true)
-          return 0
-        }
-        return prev - 1
-      })
+      if (!round || !roundGuard.current.matches(round) || roundGuard.current.finished) return
+      if (countdown <= 1) {
+        roundGuard.current.finish(round)
+        setCountdown(0)
+        setIsFinished(true)
+      } else setCountdown(countdown - 1)
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [countdown])
+  }, [countdown, currentQuestion?.questionId, currentQuestion?.startedAt])
 
   // 初始化/更新图表（柱状图）
   useEffect(() => {
@@ -570,6 +577,7 @@ const BigScreen: React.FC = () => {
               if (!isHistoryMode && !danmakuFull && currentQuestion && !isFinished) {
                 emit('bigscreen:close', {
                   questionId: currentQuestion.questionId,
+                  startedAt: currentQuestion.startedAt,
                 })
               }
               window.close()

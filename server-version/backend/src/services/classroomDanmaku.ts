@@ -3,6 +3,8 @@ import { createClient } from 'redis';
 import { z } from 'zod';
 import { getRedisUrl } from '../config/redis';
 export const DANMAKU_LIMITS = { maxTextLength: 60, cooldownMs: 3000, maxPerMinute: 10, messageTtlMs: 30000, pendingTtlMs: 300000 } as const;
+const DISPLAY_TEXT_LIMIT = 100;
+const APPROVED_MODERATION_LIMIT = 256;
 export type DanmakuRole = 'teacher' | 'bigscreen' | 'student';
 export type DanmakuSettings = {
     topic: string;
@@ -30,6 +32,7 @@ export type DanmakuSnapshot = DanmakuSettings & {
     messages: DanmakuMessage[];
     pending?: DanmakuMessage[];
     removedMessageIds?: string[];
+    olderModerationIds?: string[];
     limits: typeof DANMAKU_LIMITS;
 };
 export class DanmakuError extends Error {
@@ -87,7 +90,11 @@ local function save()
  end
 end
 local function result(extra)
- save();extra=extra or {};extra.ok=true;extra.snapshot=state;return cjson.encode(extra)
+ save()
+ -- Student acknowledgements only use session metadata; managers get their
+ -- message roster from a separate read after the send has committed.
+ if input.operation=='send' then state.messages=nil;state.pending=nil;state.removed=nil end
+ extra=extra or {};extra.ok=true;extra.snapshot=state;return cjson.encode(extra)
 end
 local function failure(code,retry)
  save();return cjson.encode({ok=false,code=code,retryAfterMs=retry})
@@ -137,7 +144,7 @@ if input.operation=='control' then
   end
   found.status='approved';found.createdAt=now;found.expiresAt=math.min(state.expiresAt,now+30000);table.insert(state.messages,found)
   rememberVisible(found)
-  while #state.messages>100 do table.remove(state.messages,1) end
+  while #state.messages>${APPROVED_MODERATION_LIMIT} do table.remove(state.messages,1) end
  elseif action=='hide' then
   local found=false
   for _,field in ipairs({'messages','pending'}) do
@@ -180,7 +187,7 @@ if input.operation=='send' then
  local message={id=input.messageId,text=input.text,status=status,createdAt=now,expiresAt=math.min(state.expiresAt,now+(status=='pending' and 300000 or 30000))}
  table.insert(state[status=='pending' and 'pending' or 'messages'],message)
  if status=='approved' then rememberVisible(message) end
- while #state.messages>100 do table.remove(state.messages,1) end
+ while #state.messages>${APPROVED_MODERATION_LIMIT} do table.remove(state.messages,1) end
  redis.call('SET',KEYS[3],'1','PX',3000)
  redis.call('ZADD',KEYS[4],now,input.clientMessageId);redis.call('PEXPIRE',KEYS[4],60000)
  redis.call('SET',KEYS[2],cjson.encode({digest=input.digest,messageId=input.messageId,status=status}),'PX',300000)
@@ -281,11 +288,14 @@ export class ClassroomDanmakuStore {
     }
 }
 export function danmakuForRole(snapshot: DanmakuSnapshot, role: DanmakuRole): DanmakuSnapshot {
-    const { pending, removedMessageIds, ...publicState } = snapshot;
+    const { pending, removedMessageIds, olderModerationIds: _olderModerationIds, ...publicState } = snapshot;
     if (role === 'teacher')
         return { ...publicState, pending: pending ?? [] };
-    if (role === 'bigscreen')
-        return { ...publicState, removedMessageIds, messages: snapshot.messages };
+    if (role === 'bigscreen') {
+        const messages = snapshot.messages.slice(-DISPLAY_TEXT_LIMIT);
+        const olderModerationIds = snapshot.messages.slice(0, snapshot.messages.length - messages.length).map(message => message.id);
+        return { ...publicState, removedMessageIds, messages, olderModerationIds };
+    }
     return { ...publicState, messages: [] };
 }
 export const classroomDanmaku = new ClassroomDanmakuStore();

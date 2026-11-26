@@ -34,15 +34,17 @@ describe.skipIf(!redisAvailable)('classroom danmaku atomic Redis lifecycle',()=>
  it('defaults to realtime before any question and role filters remove pending and identities',async()=>{
   const {id,snapshot}=await start();expect(snapshot.reviewMode).toBe('realtime');expect(snapshot.enabled).toBe(true)
   const result=await send(id,snapshot)
-  expect(result.status).toBe('approved');expect(result.snapshot.messages).toHaveLength(1)
-  expect(danmakuForRole(result.snapshot,'bigscreen').messages[0].text).toBe('合成弹幕')
+  expect(result.status).toBe('approved');expect(result.snapshot.messages).toEqual([])
+  const current=(await store.read(id)).snapshot
+  expect(danmakuForRole(current,'bigscreen').messages[0].text).toBe('合成弹幕')
   expect(danmakuForRole(result.snapshot,'student')).not.toHaveProperty('pending')
   expect(danmakuForRole(result.snapshot,'student').messages).toEqual([])
-  expect(Object.keys(result.snapshot.messages[0]).sort()).toEqual(['createdAt','expiresAt','id','status','text'])
+  expect(Object.keys(current.messages[0]).sort()).toEqual(['createdAt','expiresAt','id','status','text'])
  })
  it('keeps review messages pending when switching to realtime; approval resets a 30s TTL',async()=>{
   const {id,snapshot}=await start({reviewMode:'review'});const sent=await send(id,snapshot)
-  expect(sent.snapshot.pending).toHaveLength(1);expect(danmakuForRole(sent.snapshot,'bigscreen').messages).toEqual([])
+  expect(sent.snapshot.pending).toEqual([])
+  expect((await store.read(id)).snapshot.pending).toHaveLength(1)
   const realtime=(await control(id,snapshot,'configure',{settings:{reviewMode:'realtime'}})).snapshot
   expect(realtime.pending).toHaveLength(1);expect(realtime.messages).toEqual([])
   const approved=(await control(id,realtime,'approve',{messageId:sent.messageId})).snapshot
@@ -100,7 +102,7 @@ describe.skipIf(!redisAvailable)('classroom danmaku atomic Redis lifecycle',()=>
   const queue=JSON.parse((await client.get(prefix(id)+':messages'))!);queue[0].expiresAt=Date.now()-1;await client.set(prefix(id)+':messages',JSON.stringify(queue),{PX:30000})
   expect((await store.read(id)).snapshot.messages).toEqual([]);expect(await client.exists(prefix(id)+':messages')).toBe(0)
  })
- it('caps pending at 100 without charging failed submissions and visible history at 100',async()=>{
+ it('keeps older approved text available to teachers while bounding the displayed feed',async()=>{
   const {id,snapshot}=await start({reviewMode:'review'})
   await Promise.all(Array.from({length:100},()=>send(id,snapshot)))
   await expect(send(id,snapshot)).rejects.toMatchObject({code:'QUEUE_FULL'})
@@ -108,15 +110,32 @@ describe.skipIf(!redisAvailable)('classroom danmaku atomic Redis lifecycle',()=>
   const first=await send(id,updated),second=await send(id,updated)
   await Promise.all(Array.from({length:100},()=>send(id,updated)))
   const latest=(await store.read(id)).snapshot
-  expect(latest.messages).toHaveLength(100)
   expect(latest.pending).toHaveLength(100)
-  expect(latest.messages.some(message=>message.id===first.messageId)).toBe(false)
-  expect(danmakuForRole(latest,'bigscreen').removedMessageIds).toEqual([])
+  const teacher=danmakuForRole(latest,'teacher'),screen=danmakuForRole(latest,'bigscreen')
+  expect(teacher.messages).toHaveLength(102)
+  expect(teacher.messages[0].id).toBe(first.messageId)
+  expect(screen.messages).toHaveLength(100)
+  expect(screen.messages.some(message=>message.id===first.messageId)).toBe(false)
+  expect(screen.olderModerationIds).toEqual([first.messageId,second.messageId])
+  expect(danmakuForRole(latest,'student')).not.toHaveProperty('olderModerationIds')
   const hidden=(await control(id,latest,'hide',{messageId:first.messageId})).snapshot
   expect(danmakuForRole(hidden,'bigscreen').removedMessageIds).toEqual([first.messageId])
+  expect(danmakuForRole(hidden,'bigscreen').olderModerationIds).toEqual([second.messageId])
   expect(await client.exists(prefix(id)+':visibility:'+first.messageId)).toBe(0)
   const cleared=(await control(id,hidden,'clear')).snapshot
+  expect(danmakuForRole(cleared,'bigscreen').olderModerationIds).toEqual([])
   await expect(control(id,cleared,'hide',{messageId:second.messageId})).rejects.toMatchObject({code:'NOT_FOUND'})
+ })
+ it('drops the oldest moderation ID with its text once the bounded roster fills up',async()=>{
+  const {id,snapshot}=await start()
+  const first=await send(id,snapshot)
+  await Promise.all(Array.from({length:256},()=>send(id,snapshot)))
+  const current=(await store.read(id)).snapshot
+  expect(danmakuForRole(current,'teacher').messages).toHaveLength(256)
+  const screen=danmakuForRole(current,'bigscreen')
+  expect(screen.olderModerationIds).toHaveLength(156)
+  expect(screen.olderModerationIds).not.toContain(first.messageId)
+  expect(screen.messages.some(message=>message.id===first.messageId)).toBe(false)
  })
  it('close is terminal even for an in-flight stale start and clears text keys',async()=>{
   const {id,snapshot}=await start();await send(id,snapshot);const closed=(await store.close(id)).snapshot
@@ -138,7 +157,8 @@ describe.skipIf(!redisAvailable)('classroom danmaku atomic Redis lifecycle',()=>
    const raw=JSON.parse((await client.get(prefix(id)))!);raw.expiresAt=Date.now()+1000
    await client.set(prefix(id),JSON.stringify(raw),{PX:1000})
    const sent=await send(id,snapshot)
-   const queue=mode==='review'?sent.snapshot.pending!:sent.snapshot.messages
+   const current=(await store.read(id)).snapshot
+   const queue=mode==='review'?current.pending!:current.messages
    expect(Date.parse(queue[0].expiresAt)).toBe(raw.expiresAt)
    expect(await client.pTTL(prefix(id)+(mode==='review'?':pending':':messages'))).toBeLessThanOrEqual(1000)
    if(mode==='review'){

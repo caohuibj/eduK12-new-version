@@ -85,3 +85,45 @@ describe('BigScreen danmaku terminal lifecycle',()=>{
     expect(mocks.emitWithAck).not.toHaveBeenCalled()
   })
 })
+
+
+describe('BigScreen question round isolation', () => {
+  it('keeps the restarted round active when old finish/stats/next arrive', async () => {
+    render(tree())
+    await screen.findByRole('region', { name: '合成弹幕显示' })
+    act(() => mocks.present!({ enabled: false, displayMode: 'QUESTION' }))
+    const old = { questionId: 'question', questionIndex: 1, startedAt: '2026-10-04T00:00:00.000Z', remainingTime: 40, timeLimit: 60, questionContent: { type: 'single_choice', question: '当前题目', options: [] } }
+    const next = { ...old, startedAt: '2026-10-04T00:02:00.000Z', remainingTime: 50 }
+    act(() => mocks.listeners['broadcast:question'](old))
+    act(() => mocks.listeners['broadcast:question'](next))
+    act(() => mocks.listeners['broadcast:stats']({ questionId: 'question', startedAt: next.startedAt, answerCount: 1, totalSessions: 2, submissionRate: 50 }))
+    act(() => {
+      mocks.listeners['broadcast:finished']({ questionId: 'question', startedAt: old.startedAt })
+      mocks.listeners['broadcast:stats']({ questionId: 'question', startedAt: old.startedAt, answerCount: 99, totalSessions: 99, submissionRate: 100 })
+      mocks.listeners['broadcast:next']({ expectedQuestionId: 'question', expectedStartedAt: old.startedAt })
+    })
+    expect(screen.getByText('当前题目')).toBeInTheDocument()
+    expect(screen.queryByText('答题已结束')).toBeNull()
+    expect(screen.getByText('1 人已答')).toBeInTheDocument()
+  })
+})
+
+
+it('keeps a queued old countdown tick out of the new round and rejects its replay after clear', async () => {
+  vi.useFakeTimers()
+  try {
+    render(tree())
+    act(() => mocks.present!({ enabled: false, displayMode: 'QUESTION' }))
+    const old = { questionId: 'question', questionIndex: 1, startedAt: '2026-10-04T00:00:00Z', remainingTime: 1, timeLimit: 60, questionContent: { type: 'single_choice', question: '当前题目', options: [] } }
+    const next = { ...old, startedAt: '2026-10-04T00:02:00Z', remainingTime: 5 }
+    act(() => mocks.listeners['broadcast:question'](old))
+    act(() => {
+      mocks.listeners['broadcast:question'](next)
+      vi.advanceTimersByTime(1000)
+    })
+    expect(screen.getByText('0:05')).toBeInTheDocument()
+    act(() => mocks.listeners['broadcast:next']({ expectedQuestionId: 'question', expectedStartedAt: next.startedAt }))
+    act(() => mocks.listeners['broadcast:question'](next))
+    expect(screen.queryByText('当前题目')).toBeNull()
+  } finally { vi.useRealTimers() }
+})

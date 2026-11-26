@@ -166,3 +166,42 @@ it('allows retry when the submission confirmation never arrives', () => {
     expect(mocks.emit.mock.calls[0]).toEqual(mocks.emit.mock.calls[1])
   } finally { vi.useRealTimers() }
 })
+
+
+it('ignores an old same-question finish and next event after restart, including unbound legacy events', () => {
+  show(); receive(question)
+  const restarted = { ...question, startedAt: '2026-10-04T12:05:00.000Z', remainingTime: 80 }
+  receive(restarted)
+  fireEvent.click(screen.getByRole('button', { name: '绿色' }))
+  act(() => {
+    mocks.listeners['broadcast:finished']({ questionId: 'q1', startedAt: question.startedAt })
+    mocks.listeners['broadcast:next']({ expectedQuestionId: 'q1', expectedStartedAt: question.startedAt })
+    mocks.listeners['broadcast:finished']({ questionId: 'q1' })
+  })
+  expect(screen.getByRole('button', { name: '提交答案' })).toBeEnabled()
+  expect(screen.queryByText('答题已结束，无法提交')).toBeNull()
+  act(() => mocks.listeners['broadcast:finished']({ questionId: 'q1', startedAt: restarted.startedAt }))
+  expect(screen.getByText('答题已结束，无法提交')).toBeInTheDocument()
+})
+
+it('does not let a same-round replay reopen an already finished answer window', () => {
+  show(); receive(question)
+  act(() => mocks.listeners['broadcast:finished']({ questionId: 'q1', startedAt: question.startedAt }))
+  receive(question)
+  expect(screen.queryByRole('button', { name: '提交答案' })).toBeNull()
+  expect(screen.getByText('答题已结束，无法提交')).toBeInTheDocument()
+})
+
+
+it('does not let an already queued countdown tick subtract time from a restarted round', () => {
+  vi.useFakeTimers()
+  try {
+    show(); receive({ ...question, remainingTime: 1 })
+    act(() => {
+      mocks.listeners['broadcast:question']({ ...question, startedAt: '2026-10-04T12:05:00.000Z', remainingTime: 5 })
+      vi.advanceTimersByTime(1000)
+    })
+    expect(screen.getByText('0:05')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '提交答案' })).toBeInTheDocument()
+  } finally { vi.useRealTimers() }
+})

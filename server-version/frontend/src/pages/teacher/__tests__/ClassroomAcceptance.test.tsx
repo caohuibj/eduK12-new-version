@@ -111,7 +111,9 @@ it('clears stats for a restarted question and ignores a late HTTP response from 
   expect(screen.getByText('累计提交').nextElementSibling).toHaveTextContent('—')
   await act(async () => resolveOld({ code: 0, data: { stats: { questionId: 'q1', answerCount: 20, totalSessions: 30, activeAnswerCount: 20, submissionRate: 200 / 3 } } }))
   expect(screen.getByText('累计提交').nextElementSibling).toHaveTextContent('—')
-  act(() => mocks.listeners['broadcast:stats']({ questionId: 'q1', answerCount: 1, totalSessions: 2, activeAnswerCount: 1, submissionRate: 50 }))
+  act(() => mocks.listeners['broadcast:stats']({ questionId: 'q1', answerCount: 99, totalSessions: 99, activeAnswerCount: 99, submissionRate: 100 }))
+  expect(screen.getByText('累计提交').nextElementSibling).toHaveTextContent('—')
+  act(() => mocks.listeners['broadcast:stats']({ questionId: 'q1', startedAt: '2026-10-04T00:02:00Z', answerCount: 1, totalSessions: 2, activeAnswerCount: 1, submissionRate: 50 }))
   expect(screen.getByText('累计提交').nextElementSibling).toHaveTextContent('1')
   expect(screen.getByText('在线提交率').nextElementSibling).toHaveTextContent('50%')
 })
@@ -137,4 +139,38 @@ it('preserves remaining option values and saves a unique value after deleting an
   for (const { value, label } of options) fireEvent.change(screen.getByRole('textbox', { name: `选项 ${value}` }), { target: { value: label } })
   fireEvent.click(screen.getByRole('button', { name: '保存' }))
   await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/classrooms/class-1/questions', expect.objectContaining({ questionContent: expect.objectContaining({ options }) })))
+})
+
+
+it('ignores late same-question finish and stats after a restart without fetching old classroom state', async () => {
+  show(<ClassroomControl />)
+  await screen.findByText('答题进行中')
+  const startedAt = '2026-10-04T00:02:00.000Z'
+  act(() => mocks.listeners['broadcast:question']({ ...question, questionId: question.id, startedAt }))
+  act(() => mocks.listeners['broadcast:stats']({ questionId: 'q1', startedAt, answerCount: 1, totalSessions: 2, activeAnswerCount: 1, submissionRate: 50 }))
+  const calls = mocks.get.mock.calls.length
+  act(() => {
+    mocks.listeners['broadcast:stats']({ questionId: 'q1', startedAt: question.startedAt, answerCount: 99, totalSessions: 99, activeAnswerCount: 99, submissionRate: 100 })
+    mocks.listeners['broadcast:finished']({ questionId: 'q1', startedAt: question.startedAt })
+  })
+  expect(screen.getByText('答题进行中')).toBeInTheDocument()
+  expect(screen.getByText('累计提交').nextElementSibling).toHaveTextContent('1')
+  expect(mocks.get.mock.calls).toHaveLength(calls)
+})
+
+
+it('ignores a classroom read started by the old finish once a new same-question round arrives', async () => {
+  let resolveOld: (value: unknown) => void = () => { throw new Error('old classroom request missing') }
+  let classReads = 0
+  mocks.get.mockImplementation(async (url: string) => {
+    if (url.endsWith('/stats')) return { code: 0, data: { stats: { questionId: 'q1', startedAt: question.startedAt, answerCount: 0, totalSessions: 0, activeAnswerCount: 0, submissionRate: 0 } } }
+    if (++classReads === 1) return { code: 0, data: classroom }
+    return new Promise(resolve => { resolveOld = resolve })
+  })
+  show(<ClassroomControl />)
+  await screen.findByText('答题进行中')
+  act(() => mocks.listeners['broadcast:finished']({ questionId: 'q1', startedAt: question.startedAt }))
+  act(() => mocks.listeners['broadcast:question']({ ...question, questionId: question.id, startedAt: '2026-10-04T00:02:00Z' }))
+  await act(async () => resolveOld({ code: 0, data: { ...classroom, questions: [{ ...question, endedAt: '2026-10-04T00:01:00Z' }] } }))
+  expect(screen.getByText('答题进行中')).toBeInTheDocument()
 })
