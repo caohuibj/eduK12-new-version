@@ -197,6 +197,7 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
     // legacy role and the independent platform role.
     req.user = toRequestPrincipal(principal!)
     req.user.adminVerifiedAt = payload.adminVerifiedAt
+    req.user.adminAuthenticationMethod = payload.adminAuthenticationMethod
     req.user.adminSessionId = payload.adminSessionId
     // The view header selects only the current DB business identity. It never
     // supplies a role, grant or authentication proof. No header preserves the

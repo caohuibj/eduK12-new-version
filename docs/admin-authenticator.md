@@ -65,6 +65,6 @@
 ## 生产启用与恢复验收
 
 1. 核验历史系统管理员账号的实名归属。先启用一位主操作人，再验证独立的备用系统管理员或已授权的运维恢复通道。首位系统管理员和验证器遗失的受控恢复沿用 `admin-security-bootstrap`。
-2. 双 API 在现有生产 Compose 覆盖中使用同一 `ADMIN_AUTH_ORIGIN=https://training.eduk12.top` 和同一独立 `ADMIN_MFA_ENCRYPTION_KEY`。密钥通过现有私密配置交接，并与对应数据库备份分别受控保存。仅向 API 注入。已有硬件密钥管理员先验证 TOTP 后，再将两个 API 的 `ADMIN_REQUIRE_TOTP` 同步设为 `true` 并替换旧管理会话。兼容模式继续保留原 WebAuthn 能力。
+2. 双 API 在现有生产 Compose 覆盖中使用同一 `ADMIN_AUTH_ORIGIN=https://training.eduk12.top` 和同一独立 `ADMIN_MFA_ENCRYPTION_KEY`。密钥通过现有私密配置交接，并与对应数据库备份分别受控保存。仅向 API 注入。已有硬件密钥管理员先验证 TOTP 后，再将两个 API 的 `ADMIN_REQUIRE_TOTP` 同步设为 `true`。强制模式仅接受由 Authenticator 签发的管理会话，历史会话可能需要重新登录。兼容模式继续保留原 WebAuthn 能力。
 3. 用实际 Compose 入口执行 `server-version/scripts/release/admin-auth-check.py`，确认两台 API 配置一致。用五类实名账号分别完成正常登录和一项授权范围内的操作，核对入口权限、跨入口拒绝和密码阶段无法访问管理接口。
 4. 用专用验收账号演练遗失验证器。经核验后授权运维执行 `RECOVER`，通过私密渠道交接短期一次性票据。确认旧会话失效，重新绑定后验证新动态码，再复核授权范围。受控恢复保留原授权，禁止借恢复临时放宽登录要求。平台管理员的自助恢复码和网页重绑属于后续功能。

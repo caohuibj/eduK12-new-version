@@ -52,7 +52,7 @@ export async function beginAdminTotpRegistration(req: Request, res: Response, us
     const principal = await lockedAdmin(tx, userId, ticket.tokenVersion)
     if (!principal) return null
     const activation = ticket.challenge === ADMIN_ENTRY_ACTIVATION
-    if ((activation ? !initialPasswordHash || !principal.mustChangePassword : ticket.challenge !== '' || initialPasswordHash || principal.mustChangePassword))
+    if (activation ? !initialPasswordHash || !principal.mustChangePassword : ticket.challenge !== '' || initialPasswordHash)
       return null
     if (await tx.adminTotpCredential.findUnique({ where: { userId } }))
       throw new AdminPermissionError(409, 'Authenticator 已绑定；更换设备请使用受控恢复流程')
@@ -92,7 +92,7 @@ export async function finishAdminTotp(req: Request, res: Response, code: string,
     const step = matchTotpStep(decryptSecret(principal.userId, secretCipher), code, credential?.lastUsedStep ?? -1n)
     if (step === null) return null
     if (kind === 'REGISTER') {
-      if (!peek.enrollmentHash || principal.mustChangePassword !== Boolean(initialPasswordHash)) return null
+      if (!peek.enrollmentHash || (initialPasswordHash && !principal.mustChangePassword)) return null
       const ticket = await tx.adminSecurityChallenge.deleteMany({ where: { idHash: peek.enrollmentHash, userId: principal.userId,
         purpose: 'ENROLLMENT', challenge: initialPasswordHash ? ADMIN_ENTRY_ACTIVATION : '',
         tokenVersion: principal.tokenVersion, expiresAt: { gt: new Date() } } })
@@ -115,7 +115,7 @@ export async function finishAdminTotp(req: Request, res: Response, code: string,
   // A wrong code must never roll it back and allow unlimited retries.
   if (!result) throw new AdminPermissionError(403, '动态码错误、已使用或验证已失效，请重新开始并使用新的动态码')
   if (kind === 'REGISTER') return { registered: true as const }
-  return issueAdminSession(req, res, result.userId, result.tokenVersion, sessionId)
+  return issueAdminSession(req, res, result.userId, result.tokenVersion, 'TOTP', sessionId)
 }
 
 /** Attempts are counted across newly issued challenges for the same account.

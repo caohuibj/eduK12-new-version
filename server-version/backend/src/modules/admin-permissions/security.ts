@@ -8,13 +8,12 @@ import { inactiveAccountMessage } from '../../utils/accountStatus'
 import { generateToken } from '../../utils/jwt'
 import { getCookie, setSessionCookie } from '../../utils/authCookies'
 import { AdminPermissionError } from './service'
-import { needsAdminKey } from './proof'
-export { ADMIN_SESSION_SECONDS, ADMIN_STEP_UP_SECONDS, needsAdminKey, validAdminProof } from './proof'
+import { adminRequiresTotp, needsAdminKey, type AdminAuthenticationMethod } from './proof'
+export { ADMIN_SESSION_SECONDS, ADMIN_STEP_UP_SECONDS, adminRequiresTotp, needsAdminKey, validAdminProof } from './proof'
+export type { AdminAuthenticationMethod } from './proof'
 
 const challengeCookie = 'eduk12_admin_challenge'
 export const adminSecretHash = (value: string) => createHash('sha256').update(value).digest('hex')
-export const adminRequiresTotp = () => process.env.ADMIN_REQUIRE_TOTP === 'true'
-export type AdminAuthenticationMethod = 'TOTP' | 'SECURITY_KEY'
 export function adminAuthOrigin() {
   const origin = process.env.ADMIN_AUTH_ORIGIN || process.env.ADMIN_WEBAUTHN_ORIGIN
   if (!origin) throw new AdminPermissionError(503, '管理员认证来源尚未配置')
@@ -101,14 +100,14 @@ async function consumeChallenge(req: Request, purposes: string[]) {
   return challenge
 }
 
-export async function issueAdminSession(req: Request, res: Response, userId: string, expectedVersion: number, sessionId: string = randomUUID()) {
+export async function issueAdminSession(req: Request, res: Response, userId: string, expectedVersion: number, method: AdminAuthenticationMethod, sessionId: string = randomUUID()) {
   const principal = await loadCurrentPrincipal(userId)
   if (!principal || inactiveAccountMessage(principal) || principal.tokenVersion !== expectedVersion || !needsAdminKey(principal))
     throw new AdminPermissionError(403, '管理权限已变化，请重新登录')
   const now = Math.floor(Date.now() / 1000)
   setSessionCookie(req, res, generateToken({ accountDomain: principal.accountDomain,
     userId, username: principal.username, role: principal.role, tokenVersion: principal.tokenVersion,
-    mustChangePassword: principal.mustChangePassword, adminVerifiedAt: now, adminSessionId: sessionId }))
+    mustChangePassword: principal.mustChangePassword, adminVerifiedAt: now, adminSessionId: sessionId, adminAuthenticationMethod: method }))
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { nickname: true, avatarUrl: true } })
   return { user: { id: userId, username: principal.username, role: principal.role, businessRole: principal.businessRole, platformRole: principal.platformRole,
     entryGrants: principal.entryGrants ?? [], mustChangePassword: principal.mustChangePassword, ...user } }
@@ -138,7 +137,7 @@ export async function finishAdminAuthentication(req: Request, res: Response, res
     await tx.adminAuthorizationAudit.create({ data: { id: randomUUID(), actorUserId: key.userId, targetUserId: key.userId,
       action: sessionId ? 'ADMIN_KEY_STEP_UP' : 'ADMIN_KEY_LOGIN', reason: 'WebAuthn UP+UV; single-device credential' } })
   })
-  return issueAdminSession(req, res, key.userId, challenge.tokenVersion, sessionId)
+  return issueAdminSession(req, res, key.userId, challenge.tokenVersion, 'SECURITY_KEY', sessionId)
 }
 
 export async function beginAdminRegistration(req: Request, res: Response, userId: string, enrollmentToken: string) {

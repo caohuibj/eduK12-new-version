@@ -148,7 +148,7 @@ suite('administrator Authenticator ceremonies on actual API / PostgreSQL / Redis
     const f = await enrolled(); await login(f)
     const claims = jwt.verifyToken(decodeURIComponent(f.c.cookies.get('ptool_session')!))!
     const old = jwt.generateToken({ userId: claims.userId, username: claims.username, role: claims.role, accountDomain: claims.accountDomain,
-      tokenVersion: claims.tokenVersion, adminSessionId: claims.adminSessionId, adminVerifiedAt: Math.floor(Date.now() / 1000) - 301 })
+      tokenVersion: claims.tokenVersion, adminSessionId: claims.adminSessionId, adminAuthenticationMethod: claims.adminAuthenticationMethod, adminVerifiedAt: Math.floor(Date.now() / 1000) - 301 })
     f.c.cookies.set('ptool_session', encodeURIComponent(old))
     const grant = { active: true, expectedVersion: 0, reason: 'Synthetic TOTP-sensitive authorization check' }
     const target = await fixture(false)
@@ -188,6 +188,28 @@ suite('administrator Authenticator ceremonies on actual API / PostgreSQL / Redis
     expect((await f.c.call('/api/admin/permissions/accounts')).status).toBe(401)
     const ticket = JSON.parse(readFileSync(handoff, 'utf8')).enrollmentToken
     expect((await f.c.call('/api/admin/security/totp/registration/options', 'POST', { username: f.user.username, password: f.password, enrollmentToken: ticket })).status).toBe(200)
+  })
+  it('allows controlled rebinding with a current password while preserving a forced password change', async () => {
+    const f = await fixture()
+    await db.user.update({where:{id:f.user.id},data:{mustChangePassword:true}})
+    const secret = await setup(f)
+    expect((await f.c.call('/api/admin/security/totp/registration/verify','POST',{code:code(secret,-1)})).status).toBe(200)
+    expect((await db.user.findUniqueOrThrow({where:{id:f.user.id}})).mustChangePassword).toBe(true)
+    expect(Boolean(f.c.cookies.get('ptool_session'))).toBe(false)
+  })
+  it('under strict TOTP policy rejects a pre-existing session issued by a security key', async () => {
+    if (process.env.ADMIN_REQUIRE_TOTP !== 'true') return
+    const f = await enrolled()
+    await login(f)
+    const claims = jwt.verifyToken(decodeURIComponent(f.c.cookies.get('ptool_session')!))!
+    expect(claims.adminAuthenticationMethod).toBe('TOTP')
+    const token = jwt.generateToken({
+      userId: claims.userId, username: claims.username, role: claims.role, accountDomain: claims.accountDomain,
+      tokenVersion: claims.tokenVersion, adminSessionId: claims.adminSessionId,
+      adminVerifiedAt: claims.adminVerifiedAt, adminAuthenticationMethod: 'SECURITY_KEY',
+    })
+    f.c.cookies.set('ptool_session', encodeURIComponent(token))
+    expect((await f.c.call('/api/admin/permissions/accounts')).status).toBe(401)
   })
   it('provisions each explicit entry and consumes activation only after password and Authenticator setup', async () => {
     const system = await enrolled()

@@ -64,8 +64,6 @@ export async function issueEntryAdminEnrollment(input: Operator & { targetUserId
     const initialActivation = target.mustChangePassword && Boolean(await tx.adminAuthorizationAudit.findFirst({
       where: { targetUserId: target.id, action: 'CREATE_ENTRY_ADMIN' }, select: { id: true },
     }))
-    if (target.mustChangePassword && !initialActivation)
-      throw new AdminPermissionError(409, '请先完成当前账号的密码更新')
     const user = await tx.user.update({ where: { id: target.id }, data: { tokenVersion: { increment: 1 } } })
     await tx.adminSecurityChallenge.deleteMany({ where: { userId: target.id } })
     await tx.adminAuthorizationAudit.create({ data: {
