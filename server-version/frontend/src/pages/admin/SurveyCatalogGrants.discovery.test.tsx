@@ -71,3 +71,18 @@ describe('classification discovery and explicitly selected version grants',()=>{
   expect(api.mock.calls.filter(call=>call[1]==='POST')).toHaveLength(1)
  })
 })
+
+it('shows readable unavailable-source guidance without changing the exact reference or eligibility',async()=>{
+ const hash='a'.repeat(64),code='SOURCE_COGNITIVE_CONTROLLED_IDENTITY_UNSUPPORTED'
+ const api=vi.fn(async()=>({list:[{ref:{kind:'COGNITIVE',sourceId:'controlled-source',sourceVersion:hash},title:'合成受控任务',available:false,unsupportedReason:code}],page:1,hasMore:false,terminalReason:'END_OF_CATALOG'}))
+ render(<SurveyCatalogGrants api={api as CatalogApi} password="" researchers={[person]}/>)
+ expect(within(screen.getByLabelText('授权给研究者')).getByRole('option',{name:'研究者甲 · 已激活'})).toBeInTheDocument()
+ fireEvent.change(screen.getByLabelText('来源类型'),{target:{value:'COGNITIVE'}})
+ fireEvent.click(screen.getByRole('button',{name:'查询可授权版本'}));await screen.findByRole('heading',{name:'合成受控任务'})
+ fireEvent.click(screen.getByLabelText('版本详情与授权：合成受控任务'))
+ expect(screen.getByText(/当前 Survey 播放器只接通固定的 Go\/No-Go 120 试次协议/)).toBeVisible()
+ expect(screen.getByText(code)).not.toBeVisible();fireEvent.click(screen.getByText('查看技术原因'));expect(screen.getByText(code)).toBeVisible()
+ expect(screen.getByRole('button',{name:'授权此版本：合成受控任务 · '+hash+' → 未选择研究者'})).toBeDisabled()
+ fireEvent.click(screen.getByText('查看来源编号与内容摘要'));expect(screen.getByText('精确版本：'+hash)).toBeVisible()
+ expect(api.mock.calls.some(call=>(call as unknown[])[1]==='POST')).toBe(false)
+})

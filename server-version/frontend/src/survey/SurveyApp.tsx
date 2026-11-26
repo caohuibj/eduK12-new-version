@@ -429,7 +429,7 @@ function SurveyApplication(){
           <button className="btn-primary" disabled={busy}>确认并绑定验证器</button></form>
         <p className="survey-entry-help">没有有效凭证，或凭证已失效？请联系为你开通账号的管理员。</p>
       </SurveyEntryPanel>}
-      {!loading&&screen==='login'&&<SurveyEntryPanel title="研究者登录" intro="研究者仅由系统管理员邀请开通，账户与培训和校园系统相互独立。">
+      {!loading&&screen==='login'&&<SurveyEntryPanel title="研究者登录" intro="研究者由 Survey 入口管理员邀请开通，账户与培训和校园系统相互独立。">
         <form onSubmit={login} aria-busy={busy}>{field('研究者登录名',username,setUsername)}
           {field('密码',password,setPassword,'password')}
           <button className="btn-primary" disabled={busy}>进入双因素验证</button></form>

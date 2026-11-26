@@ -6,6 +6,7 @@ const mock=vi.hoisted(()=>({request:vi.fn(),user:{id:'manager',platformRole:'STA
 vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>({user:mock.user})}))
 vi.mock('../../api/surveyManagement',()=>({surveyManagementRequest:mock.request}))
 vi.mock('../../admin/AdminStepUp',()=>({default:()=> <p>身份验证</p>}))
+vi.mock('./GovernedToolLibrary',()=>({default:()=> <label>本次范围审批或暂停原因<textarea/></label>}))
 const item={catalogId:'standard:fixture:1',title:'完整内容工具',origin:'STANDARD_REGISTRY',exactVersion:{instrumentVersion:'1'},
  policyIdentity:{resourceKey:'standard:fixture:1',fingerprint:'a'.repeat(64)},policy:{decision:'PENDING',paused:false,version:0,reason:'未审批'},
  states:{content:{ready:true,reasons:[]},assignment:{ready:false,reasons:['尚未部署','尚未通过 Survey 范围审批']},deployment:{ready:false,reasons:['还需精确版本授权与准入核对']}}}
@@ -258,4 +259,16 @@ describe('Survey catalog server-side classification search',()=>{
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   expect(screen.getByRole('button',{name:'刷新'})).toBeEnabled()
  })
+})
+
+it('shows only the governed-view reason while preserving the separate catalog reason',async()=>{
+ render(<MemoryRouter><SurveyLibraryAdmin/></MemoryRouter>)
+ await screen.findByText('完整内容工具')
+ fireEvent.change(screen.getByLabelText('审批或暂停原因'),{target:{value:'保留目录原因'}})
+ fireEvent.click(screen.getByRole('tab',{name:'认知、SJT与组合'}))
+ expect(screen.queryByLabelText('审批或暂停原因')).not.toBeInTheDocument()
+ expect(screen.getByLabelText('本次范围审批或暂停原因')).toBeVisible()
+ fireEvent.click(screen.getByRole('tab',{name:'量表目录'}))
+ expect(await screen.findByLabelText('审批或暂停原因')).toHaveValue('保留目录原因')
+ expect(mock.request.mock.calls.every(call=>call[2]===undefined)).toBe(true)
 })
