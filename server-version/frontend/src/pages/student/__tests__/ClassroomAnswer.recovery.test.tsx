@@ -57,6 +57,14 @@ it('prevents new submissions when the restored deadline has already elapsed', ()
   expect(screen.getByText('答题已结束，无法提交')).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: '提交答案' })).toBeNull()
 })
+it('keeps the anonymous participant on an ended-classroom page without a login redirect', () => {
+  show()
+  receive(question)
+  act(() => mocks.listeners['broadcast:closed']({ classroomId: 'c1' }))
+  expect(screen.getByRole('heading', { name: '课堂已结束' })).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: '返回课堂入口' })).toHaveAttribute('href', '/student/classroom/enter')
+  expect(screen.queryByRole('button', { name: '提交答案' })).not.toBeInTheDocument()
+})
 it('allows retry when the submission confirmation never arrives', () => {
   vi.useFakeTimers()
   try {

@@ -180,10 +180,16 @@ const ClassroomQuestionEdit: React.FC = () => {
   }
 
   const handleAddOption = () => {
-    const nextValue = String.fromCharCode(65 + (formData.options?.length || 0))
-    setFormData({
-      ...formData,
-      options: [...(formData.options || []), { value: nextValue, label: '' }],
+    setFormData((previous) => {
+      const options = previous.options ?? []
+      const usedValues = new Set(options.map(option => option.value))
+      const valueAt = (index: number) => {
+        const letter = String.fromCharCode(65 + index % 26)
+        return index < 26 ? letter : letter + (Math.floor(index / 26) + 1)
+      }
+      let index = options.length
+      while (usedValues.has(valueAt(index))) index++
+      return { ...previous, options: [...options, { value: valueAt(index), label: '' }] }
     })
   }
 

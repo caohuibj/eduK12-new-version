@@ -1,10 +1,10 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, expect, it, vi } from 'vitest'
-const mocks = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), put: vi.fn(), listeners: {} as Record<string, (data: any) => void> }))
+const mocks = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), put: vi.fn(), emit: vi.fn(), listeners: {} as Record<string, (data: any) => void> }))
 vi.mock('../../../api/client', () => ({ default: { get: mocks.get, post: mocks.post, put: mocks.put } }))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ isLoading: false, user: { id: 'teacher-1' } }) }))
-vi.mock('../../../hooks/useClassroomSocket', () => ({ useClassroomSocket: () => ({ isConnected: true, connectionState: 'CONNECTED', emit: vi.fn(), manualRetry: vi.fn(), on: register, off: vi.fn() }) }))
+vi.mock('../../../hooks/useClassroomSocket', () => ({ useClassroomSocket: () => ({ isConnected: true, connectionState: 'CONNECTED', emit: mocks.emit, manualRetry: vi.fn(), on: register, off: vi.fn() }) }))
 function register(event: string, callback: (data: any) => void) { mocks.listeners[event] = callback }
 import ClassroomControl from '../ClassroomControl'
 import ClassroomQuestionEdit from '../ClassroomQuestionEdit'
@@ -39,6 +39,32 @@ it('shows ended after the finish event while the classroom itself stays ACTIVE',
   expect(await screen.findByText('答题已结束')).toBeInTheDocument()
   expect(screen.queryByText('答题进行中')).toBeNull()
 })
+it('keeps the closed classroom open so the teacher can generate its summary and revisit history', async () => {
+  show(<ClassroomControl />)
+  await screen.findByText('答题进行中')
+  const ended = { ...classroom, status: 'ENDED', questions: [{ ...question, endedAt: '2026-10-04T00:01:00Z' }] }
+  mocks.get.mockImplementation(async (url: string) => ({ code: 0, data: url.endsWith('/summary') ? null : ended }))
+  mocks.emit.mockImplementationOnce((_event, _data, ack) => ack({ ok: true }))
+  fireEvent.click(screen.getByRole('button', { name: '关闭课堂' }))
+  expect(await screen.findByRole('button', { name: '生成课堂小结' })).toBeEnabled()
+  expect(screen.getByRole('button', { name: '关闭课堂' })).toBeDisabled()
+  expect(screen.queryByRole('button', { name: '二维码' })).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: '历史大屏' }))
+  expect(screen.getByRole('button', { name: /第 1 题/ })).toBeEnabled()
+})
+it('shows cumulative answers separately from current online progress', async () => {
+  show(<ClassroomControl />)
+  await screen.findByText('答题进行中')
+  act(() => mocks.listeners['broadcast:stats']({ questionId: 'q1', answerCount: 2, totalSessions: 1, activeAnswerCount: 1, submissionRate: 100 }))
+  act(() => mocks.listeners['broadcast:online']({ onlineCount: 1 }))
+  expect(screen.getByText('累计提交').nextElementSibling).toHaveTextContent('2')
+  expect(screen.getByText('在线未提交').nextElementSibling).toHaveTextContent('0')
+  expect(screen.getByText('在线提交率').nextElementSibling).toHaveTextContent('100%')
+  act(() => mocks.listeners['broadcast:online']({ onlineCount: 0 }))
+  expect(screen.getByText('累计提交').nextElementSibling).toHaveTextContent('2')
+  expect(screen.getByText('在线未提交').nextElementSibling).toHaveTextContent('0')
+  expect(screen.getByText('在线提交率').nextElementSibling).toHaveTextContent('—')
+})
 it('saves three filled options and ignores the default fourth empty slot', async () => {
   mocks.get.mockImplementation(async (url: string) => ({ code: 0, data: url.endsWith('/questions') ? [] : { ...classroom, status: 'PREPARING' } }))
   mocks.post.mockResolvedValue({ code: 0, data: { ...question, id: 'q2' } })
@@ -48,4 +74,17 @@ it('saves three filled options and ignores the default fourth empty slot', async
   for (const [key, value] of [['A', '红色'], ['B', '绿色'], ['C', '蓝色']]) fireEvent.change(screen.getByRole('textbox', { name: `选项 ${key}` }), { target: { value } })
   fireEvent.click(screen.getByRole('button', { name: '保存' }))
   await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/classrooms/class-1/questions', expect.objectContaining({ questionContent: expect.objectContaining({ options: [{ value: 'A', label: '红色' }, { value: 'B', label: '绿色' }, { value: 'C', label: '蓝色' }] }) })))
+})
+it('preserves remaining option values and saves a unique value after deleting and adding an option', async () => {
+  mocks.get.mockImplementation(async (url: string) => ({ code: 0, data: url.endsWith('/questions') ? [] : { ...classroom, status: 'PREPARING' } }))
+  mocks.post.mockResolvedValue({ code: 0, data: { ...question, id: 'q2' } })
+  show(<ClassroomQuestionEdit />)
+  fireEvent.click(await screen.findByRole('button', { name: '添加题目' }))
+  fireEvent.click(screen.getByRole('button', { name: '删除选项 B' }))
+  fireEvent.click(screen.getByRole('button', { name: '添加选项' }))
+  fireEvent.change(screen.getByRole('textbox', { name: '题目内容' }), { target: { value: '颜色？' } })
+  const options = [{ value: 'A', label: '红色' }, { value: 'C', label: '蓝色' }, { value: 'D', label: '黄色' }, { value: 'E', label: '紫色' }]
+  for (const { value, label } of options) fireEvent.change(screen.getByRole('textbox', { name: `选项 ${value}` }), { target: { value: label } })
+  fireEvent.click(screen.getByRole('button', { name: '保存' }))
+  await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/classrooms/class-1/questions', expect.objectContaining({ questionContent: expect.objectContaining({ options }) })))
 })

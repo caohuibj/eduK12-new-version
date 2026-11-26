@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { useClassroomSocket } from '../../hooks/useClassroomSocket'
 import ClassroomQRCode from './ClassroomQRCode'
@@ -31,6 +31,15 @@ interface Classroom {
   questions: Question[]
 }
 
+type ClassroomStats = {
+  questionId: string
+  answerCount: number
+  totalSessions: number
+  activeAnswerCount: number
+  submissionRate: number
+  unsupportedType?: boolean
+}
+
 const questionFromSocket = (data: any): Question | null => {
   if (!data?.questionId) return null
   return {
@@ -45,7 +54,6 @@ const questionFromSocket = (data: any): Question | null => {
 
 const ClassroomControl: React.FC = () => {
   const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
   const { isLoading: authLoading, user } = useAuth()
   const { feedback, confirm, info } = useStaffFeedback()
 
@@ -53,8 +61,7 @@ const ClassroomControl: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
   const [onlineCount, setOnlineCount] = useState(0)
-  const [answerCount, setAnswerCount] = useState(0)
-  const [stats, setStats] = useState<any>(null)
+  const [stats, setStats] = useState<ClassroomStats | null>(null)
   const [closing, setClosing] = useState(false)
   const [activeTab, setActiveTab] = useState<string>('control')
   const [showQRCode, setShowQRCode] = useState(false)
@@ -65,11 +72,9 @@ const ClassroomControl: React.FC = () => {
   const refreshStats = useCallback(async () => {
     if (!id || !currentQuestion?.id) return
     try {
-      const response = await apiClient.get<{ stats?: any }>(`/classrooms/${id}/questions/${currentQuestion.id}/stats`)
+      const response = await apiClient.get<{ stats?: Omit<ClassroomStats, 'questionId'> }>(`/classrooms/${id}/questions/${currentQuestion.id}/stats`)
       if (response.code !== 0 || !response.data?.stats) throw new Error(response.message || '统计暂不可用')
-      setStats(response.data.stats)
-      setAnswerCount(response.data.stats.answerCount ?? 0)
-      setOnlineCount(response.data.stats.onlineCount ?? response.data.stats.totalSessions ?? 0)
+      setStats({ ...response.data.stats, questionId: currentQuestion.id })
       setStatsUnknown(Boolean(response.data.stats.unsupportedType))
     } catch (err) {
       setStatsUnknown(true)
@@ -81,7 +86,7 @@ const ClassroomControl: React.FC = () => {
   const { isConnected, connectionState, manualRetry, on, off, emit } = useClassroomSocket({
     classroomId: id!,
     role: 'teacher',
-    autoConnect: !authLoading && !!user,
+    autoConnect: !authLoading && !!user && !!classroom && classroom.status !== 'ENDED',
     onHttpFallback: refreshStats,
   })
 
@@ -103,11 +108,17 @@ const ClassroomControl: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [id, navigate])
+  }, [id])
 
   useEffect(() => {
     void fetchClassroom()
   }, [fetchClassroom])
+
+  useEffect(() => {
+    if (!isConnected) return
+    const timer = window.setTimeout(() => void refreshStats(), 350)
+    return () => window.clearTimeout(timer)
+  }, [isConnected, onlineCount, refreshStats])
 
   // 监听 Socket 事件
   useEffect(() => {
@@ -124,7 +135,6 @@ const ClassroomControl: React.FC = () => {
 
     // 实时统计
     on('broadcast:stats', (data) => {
-      setAnswerCount(data.answerCount)
       setStats(data)
       setStatsUnknown(Boolean(data.unsupportedType))
     })
@@ -263,10 +273,14 @@ const ClassroomControl: React.FC = () => {
     // The server ACK is emitted only after the transaction succeeds.
     emit('teacher:close', {}, (payload) => {
       const result = payload as { ok?: boolean; message?: string } | undefined
+      setClosing(false)
       if (result?.ok) {
-        navigate('/teacher/classrooms')
+        setConnectionNotice(null)
+        setActiveTab('control')
+        setCurrentQuestion(null)
+        setClassroom(previous => previous ? { ...previous, status: 'ENDED' } : previous)
+        void fetchClassroom()
       } else {
-        setClosing(false)
         setConnectionNotice(result?.message || '关闭课堂失败，请重试')
       }
     })
@@ -275,6 +289,11 @@ const ClassroomControl: React.FC = () => {
   if (loading) return <ProductPage width="management"><ProductStatus kind="pending" title="正在加载课堂控制">正在读取课堂状态和实时连接信息。</ProductStatus></ProductPage>
 
   if (!classroom) return <ProductPage width="management"><ProductStatus kind="error" title="课堂不可用" actions={<><ProductButton onClick={() => void fetchClassroom()}>重新加载</ProductButton> <Link to="/teacher/classrooms">返回课堂列表</Link></>}>{loadError || '课堂不存在，或当前账户无法访问。'}</ProductStatus></ProductPage>
+
+  const questionStats = stats?.questionId === currentQuestion?.id ? stats : null
+  const onlineStats = questionStats?.totalSessions === onlineCount ? questionStats : null
+  const unsubmitted = onlineCount === 0 ? 0 : onlineStats ? Math.max(0, onlineCount - onlineStats.activeAnswerCount) : null
+  const submissionProgress = onlineCount > 0 && onlineStats ? Math.round(onlineStats.submissionRate) : null
 
   return (
     <ProductPage width="management" className="space-y-6 classroom-control-page">
@@ -298,7 +317,7 @@ const ClassroomControl: React.FC = () => {
       {feedback}
       {classroom.status === 'ENDED' && <ClassroomSummary key={classroom.id} id={classroom.id} />}
 
-      <section className="staff-detail-header classroom-control-summary" aria-label="课堂实时状态">
+      {classroom.status !== 'ENDED' && <section className="staff-detail-header classroom-control-summary" aria-label="课堂实时状态">
         <div className="staff-detail-header__top">
           <div className="staff-detail-meta classroom-control-summary__meta">
             <span><Users className="w-4 h-4" aria-hidden="true" />在线 {onlineCount} 人</span>
@@ -317,7 +336,7 @@ const ClassroomControl: React.FC = () => {
             <ProductButton onClick={manualRetry}>重试连接</ProductButton>
           )}
         </div>
-      </section>
+      </section>}
 
       {connectionNotice && (
         <ProductStatus kind="info" title="课堂连接提示" announce="polite">
@@ -340,10 +359,10 @@ const ClassroomControl: React.FC = () => {
             <Monitor className="w-4 h-4" aria-hidden="true" />
             历史大屏
           </button>
-          <button type="button" aria-pressed={activeTab === 'qrcode'} onClick={() => setActiveTab('qrcode')}>
+          {classroom.status !== 'ENDED' && <button type="button" aria-pressed={activeTab === 'qrcode'} onClick={() => setActiveTab('qrcode')}>
             <QrCode className="w-4 h-4" aria-hidden="true" />
             二维码
-          </button>
+          </button>}
         </div>
       </div>
 
@@ -486,22 +505,22 @@ const ClassroomControl: React.FC = () => {
                 </ProductStatus>
               )}
 
-              {classroom.status === 'ACTIVE' && (
+              {classroom.status === 'ACTIVE' && currentQuestion && (
                 <div className="classroom-control-stats" aria-label="答题统计">
                   <dl className="staff-stat-grid">
                     <div className="staff-stat"><dt>在线人数</dt><dd>{onlineCount}</dd></div>
-                    <div className="staff-stat"><dt>已提交</dt><dd>{answerCount}</dd></div>
-                    <div className="staff-stat"><dt>未提交</dt><dd>{onlineCount - answerCount}</dd></div>
+                    <div className="staff-stat"><dt>累计提交</dt><dd>{questionStats?.answerCount ?? '—'}</dd></div>
+                    <div className="staff-stat"><dt>在线未提交</dt><dd>{unsubmitted ?? '—'}</dd></div>
                   </dl>
                   <div className="classroom-control-progress">
                     <div>
-                      <span>提交进度</span>
-                      <strong>{onlineCount > 0 ? Math.round((answerCount / onlineCount) * 100) : 0}%</strong>
+                      <span>在线提交率</span>
+                      <strong>{submissionProgress === null ? '—' : `${submissionProgress}%`}</strong>
                     </div>
                     <div className="classroom-control-progress__track" aria-hidden="true">
                       <div
                         className="classroom-control-progress__value"
-                        style={{ width: `${onlineCount > 0 ? (answerCount / onlineCount) * 100 : 0}%` }}
+                        style={{ width: `${submissionProgress ?? 0}%` }}
                       />
                     </div>
                   </div>
@@ -541,7 +560,7 @@ const ClassroomControl: React.FC = () => {
                       }`}
                       onClick={async () => {
                         if (question.endedAt) {
-                          const restart = await confirm({ title: '重新开始已完成题目？', body: '这会重新发起同一题目的课堂作答。服务器仍负责校验当前课堂状态。', confirmLabel: '重新开始' })
+                          const restart = await confirm({ title: '重新开始已完成题目？', body: '重新开始会清空本题已有作答及其统计。此操作无法恢复。', confirmLabel: '清空作答并重新开始', danger: true })
                           if (restart) handleStartSpecificQuestion(question)
                         } else if (!question.startedAt) {
                           handleStartSpecificQuestion(question)

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useClassroomSocket } from '../../hooks/useClassroomSocket'
 import { useAuth } from '../../contexts/AuthContext'
 import { AlertCircle, CheckCircle, Clock } from 'lucide-react'
@@ -16,7 +16,6 @@ const ClassroomAnswer: React.FC = () => {
   const { classroomId } = useParams<{ classroomId: string }>()
   const [searchParams] = useSearchParams()
   const classroomCode = searchParams.get('code') || ''
-  const navigate = useNavigate()
   const { isLoading: authLoading } = useAuth()
 
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
@@ -29,6 +28,8 @@ const ClassroomAnswer: React.FC = () => {
   const submittingRef = useRef(false)
   const [countdown, setCountdown] = useState<number | null>(null)
   const [isFinished, setIsFinished] = useState(false) // 答题是否已结束
+  const [closedClassroomId, setClosedClassroomId] = useState<string | null>(null)
+  const classroomClosed = !!classroomId && closedClassroomId === classroomId
   const [notice, setNotice] = useState<{ kind: 'info' | 'error'; message: string } | null>(null)
 
   // Socket 连接只使用课堂码；session 由服务端创建并绑定。
@@ -36,7 +37,7 @@ const ClassroomAnswer: React.FC = () => {
     classroomId,
     classroomCode,
     role: 'student',
-    autoConnect: !authLoading && !!classroomId && !!classroomCode,
+    autoConnect: !authLoading && !!classroomId && !!classroomCode && !classroomClosed,
   })
 
   useEffect(() => {
@@ -119,7 +120,9 @@ const ClassroomAnswer: React.FC = () => {
 
     // 课堂关闭
     on('broadcast:closed', () => {
-      navigate('/student', { state: { notice: '课堂已结束。' } })
+      setCountdown(null)
+      setSubmitting(false)
+      setClosedClassroomId(classroomId ?? null)
     })
 
     // 提交成功
@@ -149,7 +152,7 @@ const ClassroomAnswer: React.FC = () => {
       off('student:submitted')
       off('error', handleError)
     }
-  }, [authLoading, classroomId, classroomCode, on, off, navigate])
+  }, [authLoading, classroomId, classroomCode, on, off])
 
   // A missing confirmation must not leave the submit button locked indefinitely.
   useEffect(() => {
@@ -380,6 +383,18 @@ const ClassroomAnswer: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 classroom-answer-state">
         <div className="classroom-answer-state__card text-center text-gray-500">
           缺少课堂码，请返回扫码入口重新加入课堂
+        </div>
+      </div>
+    )
+  }
+
+  if (classroomClosed) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 classroom-answer-state">
+        <div className="classroom-answer-state__card text-center">
+          <h1 className="text-xl font-semibold">课堂已结束</h1>
+          <p className="my-3 text-gray-600">感谢参与课堂互动。</p>
+          <Link to="/student/classroom/enter" className="btn-secondary inline-block">返回课堂入口</Link>
         </div>
       </div>
     )

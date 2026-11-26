@@ -16,6 +16,7 @@ describe('training edition is presentation only', () => {
       { path: '/dashboard', label: '课程' },
       { path: '/media-library', label: '媒体' },
       { path: '/toolkit', label: '工具' },
+      { path: '/teacher/classrooms', label: '互动' },
       { path: '/profile', label: '我的账户' },
     ])
     expect(trainingNavigation('ADMIN')).toEqual([])

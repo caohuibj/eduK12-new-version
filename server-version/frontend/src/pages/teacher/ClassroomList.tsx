@@ -154,7 +154,7 @@ const ClassroomList: React.FC = () => {
       {feedback}
       <PageHeader
         title="课堂管理"
-        description="创建课堂、进入控制面板，并管理已结束课堂的数据导出。"
+        description="创建课堂、发起互动，并回看已结束课堂的统计与小结。"
         actions={(
           <Link to="/teacher/classrooms/create" className="btn-primary inline-flex items-center gap-2">
             <Plus className="h-4 w-4" aria-hidden="true" />创建课堂
@@ -219,11 +219,14 @@ const ClassroomList: React.FC = () => {
                             <Download className="h-4 w-4" aria-hidden="true" />
                           </button>
                         )}
-                        {(classroom.status === 'PREPARING' || classroom.status === 'ACTIVE') && (
-                          <Link to={`/teacher/classrooms/${classroom.id}/control`} className="text-green-600 hover:text-green-800" title="进入控制面板" aria-label={`进入 ${classroom.name} 控制面板`}>
-                            <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                          </Link>
-                        )}
+                        <Link
+                          to={`/teacher/classrooms/${classroom.id}/control`}
+                          className="text-green-600 hover:text-green-800"
+                          title={classroom.status === 'ENDED' ? '查看小结与历史' : '进入控制面板'}
+                          aria-label={classroom.status === 'ENDED' ? `查看 ${classroom.name} 的小结与历史` : `进入 ${classroom.name} 控制面板`}
+                        >
+                          <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                        </Link>
                         {classroom.status === 'PREPARING' && (
                           <>
                             <button
