@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "kstc2020_stp_assessment_teacher_en/1.0.0/1.1.0-teacher",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "A student and teacher compare a circuit sketch with the model before trying a revision.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

@@ -1,0 +1,96 @@
+{
+  "toolKey": "kstc2020_stp_assessment_teacher_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "Science teaching self-reflection | Choose the check by what you need to know",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "The 3 English item texts and order match the corresponding factor in Kang et al. Appendix B, pp. 510–513. The original study used five frequency positions; methods §3.1 lists only endpoints 1 = rarely and 5 = always. The project preserves numeric 2–4 and the complete-response 1–5 factor mean. No study averages, norms or thresholds are used."
+      }
+    },
+    "primaryScoreKeys": [
+      "stp_assessment"
+    ],
+    "scoreOrder": [
+      "stp_assessment"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "stp_assessment",
+        "scoreLabel": "Using science assessment in class (descriptive mean, 1–5)",
+        "headline": "Choose the check by what you need to know",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A teacher wants to see how learners explain why a bulb lights in one circuit and stays off in another. A quick drawing before instruction shows starting ideas. An explanation during practice reveals what needs feedback. A new circuit at the end shows what the learner can explain independently.\n\nThese three answers describe how you report using assessments to see starting points, guide learning in progress, and review achievement at the end, including your judgment about how well those checks work. Choose a method that produces evidence you can act on at that point in the lesson.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "For one learning goal, plan a brief starting prompt, a chance to use feedback, and an end task. Say what evidence you look for each time and what you will do if understanding is still incomplete."
+          },
+          {
+            "category": "reflection",
+            "text": "Check that the end task asks learners to show the same science goal, even if the question or example is new."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Kang, N.-H., Kang, H., Maeng, S., Park, J., & Jeong, E. (2020). Teacher Competency in Competency-Focused Science Teaching in the South Korean Context: Teacher Self-Assessment Instrument Development and Application. Asia-Pacific Science Education, 6(2), 480–513. https://doi.org/10.1163/23641177-BJA10012 (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). The project separates each published factor and supplies its own instructions, complete-answer rule and feedback.",
+      "This score is the mean of 3 responses, from 1 (rarely) to 5 (always), and requires all 3 answers. It describes self-reported practices and may include judgments about your understanding or effectiveness. It contains no objective performance score, norm, or cross-factor total.",
+      "The original study used the full instrument with 210 South Korean primary and secondary science teachers. This research and self-reflection version uses the published English item wording. The project has not obtained the Korean administration form. Separate use of this factor and equivalence to a Chinese version have not been established."
+    ],
+    "disclaimer": "For your own professional learning and research reflection as a science teacher. The result supports a conversation about practice and does not establish teaching quality, teacher eligibility, or student outcomes.",
+    "artworkKey": "kstc2020_stp_assessment_teacher_en/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
