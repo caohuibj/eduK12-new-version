@@ -1,0 +1,130 @@
+{
+  "toolKey": "csacs9_zh_cn",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.2.0-adult",
+  "title": "给念头和情绪留一点空间（试用）",
+  "report": {
+    "reportVersion": "1.2.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容和来源校对",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "依据公开中文题本、该平台精确 C 的计分及适用范围。保持 score-only、原 C 和 P。"
+      }
+    },
+    "primaryScoreKeys": [
+      "centering",
+      "transcending",
+      "self_as_context_total"
+    ],
+    "scoreOrder": [
+      "centering",
+      "transcending",
+      "self_as_context_total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "self_as_context_total",
+        "scoreLabel": "整体合计（9–63）",
+        "headline": "念头很响的时候，也可以先听完整",
+        "summary": "汇报前冒出一句「我肯定会讲砸」，这句话一大声，手里准备好的例子似乎都不管用了。给自己一点空间，是能听到这句话，同时还记得此刻有哪些事可以做。整份量表描述的是你平时如何留意和理解自己的经验。",
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "遇到熟悉的担心，可以在心里给它加个开头，比如「我注意到自己在担心」。再看看眼前有没有一件小事值得做。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "centering",
+        "scoreLabel": "起伏中稳住自己（4–28）",
+        "headline": "先回到眼前的一件事",
+        "summary": "有时候一条消息就能把心思带进十种猜测。这个部分关心的是情绪有起伏时，你还能不能稍微回到当下，留意到正在发生的事。",
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "试着找一个眼前的细节，例如手里这页纸、脚踩地的感觉，再给正在做的事选一步。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "transcending",
+        "scoreLabel": "退一步看自己的经历（5–35）",
+        "headline": "让当天的故事多留一页",
+        "summary": "一次没讲清楚，很容易变成「我总讲不好」。这一部分描述的是能不能回头看一看，把当时的感受和更完整的经历一同放在心里。",
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把某件糟心事写成两句。第一句说发生了什么，第二句写你后来发现的、当时没看到的另一点。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "现有计分用原作者总分口径与中文最终修订的九题结构。四题、五题两个合计的满分不同，读各自的描述即可。",
+      "这份反馈面向原配置内的成年大学生自评。用分数记录一次自我观察，避免将它作为心理治疗成效或能力分类。",
+      "Fang、Huang 与 Wang，2022，Appendix 1 与最终九题结构，doi:10.3389/fpsyg.2022.1051661，CC BY 4.0。中文题干继承论文公开附录，说明界面、反馈与插画为平台材料。"
+    ],
+    "disclaimer": "这是试用版自评报告，内容供自我反思及研究使用。仅凭一次作答不足以判断个人能力或身心状况。",
+    "artworkKey": "csacs9_zh_cn/1.0.1/1.2.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

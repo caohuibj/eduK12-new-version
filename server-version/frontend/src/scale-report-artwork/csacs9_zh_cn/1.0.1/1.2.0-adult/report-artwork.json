@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "csacs9_zh_cn/1.0.1/1.2.0-adult",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一名大学生坐在长椅上短暂停留，抱着笔记本看窗上变化的树叶倒影。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
