@@ -1,0 +1,96 @@
+{
+  "toolKey": "rpq2024_confidence8_teacher_self_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "RPQ-E | Look for what makes an explanation land",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "English RPQ-E 2024 Table 6 and original author scoring key: questions 11–18 form this component. The 8 responses ordered 1 (Very rarely) to 6 (Almost always) receive equal weight. Existing project complete-response rule and 1–6 component mean are retained. No norms, separate four-item component scores, or RPQ-E total."
+      }
+    },
+    "primaryScoreKeys": [
+      "confidence8"
+    ],
+    "scoreOrder": [
+      "confidence8"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "confidence8",
+        "scoreLabel": "Confidence in working with students (descriptive mean, 1–6)",
+        "headline": "Look for what makes an explanation land",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A teacher explains what a good answer should include. The plan feels clear until two students describe the task in different ways. By trying one example and asking each student to say what they would do first, the teacher gets a clearer picture of what was understood and which part still needs work.\n\nYour answers describe how often you felt prepared to work with students and confident in how clearly you communicated. Experience, a familiar group, a clear brief or advice from a colleague can shape that feeling. You can use it to choose a small check of what students actually understood. Even a lesson that feels smooth can benefit from a second look at the evidence.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Choose a lesson instruction or an explanation you give often. Have learners say the first step in their own words. Rework one phrase they understood differently from what you intended."
+          },
+          {
+            "category": "reflection",
+            "text": "If you feel less prepared for a particular conversation, identify whether you need a clearer example, some background information, or another educator to help you prepare."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Rogers, S. L., et al. (2024). Further development of the reflective practice questionnaire. PeerJ, 12, e16879. https://doi.org/10.7717/peerj.16879 (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). This is a project report for one component of the 30-item extended questionnaire (RPQ-E, Table 6).",
+      "In the source instructions, educators read “client” as “student.” This version is for adult educators reflecting on their own work. The source study recruited working university students across several professions, so this score supplies no teacher-specific norms or standalone validation.",
+      "The component mean includes all 8 answers and ranges from 1 to 6. The project retains a missing result if any response is absent. This report uses the component only, without a cutoff or a comparison with other RPQ-E scores."
+    ],
+    "disclaimer": "For your own professional reflection as an educator. The result describes your answers about experiences with teaching work and does not assess teaching quality, employment suitability, or student outcomes.",
+    "artworkKey": "rpq2024_confidence8_teacher_self_en/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
