@@ -241,11 +241,11 @@
     ],
     "notes": [
       "© 2020 Becerra, Preece & Gross. Becerra, R., Preece, D. A., & Gross, J. J. (2020). Assessing beliefs about emotions: Development and validation of the Emotion Beliefs Questionnaire. PLOS ONE, 15(4), e0231395. https://doi.org/10.1371/journal.pone.0231395. Original sixteen EBQ items were authored and published by these authors in PLOS ONE Table 3 and supplemental material under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). The Stanford author-supplied questionnaire/scoring PDF (https://spldev.sites.stanford.edu/sites/g/files/sbiybj19321/files/media/file/ebq_questionnaire_and_scoring_instructions_042020.pdf) is independently used to verify exact item order and seven SUM formulas; its own standalone PDF is not assumed to inherit unrestricted rights beyond the author's originally published article. The project independently translated the English items and three labeled anchors into a Chinese WORK DRAFT and wrote its own descriptive report. Credit, source, license URL and these changes must be retained; there is no author endorsement, human translation review or Chinese validation. OpenScales is discovery only: its 'mean_coded' scoring disagrees with the original author SUM instructions and was not reused.",
-      "文章原作者CC BY题项再分发权不等于平台用户使用授权、科学译审或临床用途。原样本与中文版缺口明确保留，本内容包为DRAFT/HIDDEN。"
+      "文章原作者CC BY题项再分发权不等于平台用户使用授权、科学译审或临床用途。原样本与中文版缺口明确保留；本内容包只以已标注的中文研究工作译稿和试用量尺形式发布。"
     ]
   },
   "executable": {
-    "releaseStatus": "DRAFT",
+    "releaseStatus": "PUBLISHED",
     "contentLocale": "zh-CN",
     "references": [
       {

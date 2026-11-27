@@ -20,6 +20,13 @@ const result = (responseValue: number, ageMonthsAtFreeze = 360) => buildScaleRes
 })
 
 describe('EBQ-16 1.0.3 editorial report', () => {
+  it('is directly approvable as an explicitly labelled production trial version', () => {
+    expect(executable.releaseStatus).toBe('PUBLISHED')
+    expect(source.catalog.catalogStatus).toBe('CANDIDATE')
+    expect(source.catalog.scientificMaturity).toBe('PILOT')
+    expect(source.catalog.identity.canonicalName).toContain('中文研究工作译稿')
+  })
+
   it('keeps the exact 16-item, seven-score author scoring contract', () => {
     expect(executable.definition.items).toHaveLength(16)
     expect(executable.definition.responseSets[0].options.map((option) => option.score)).toEqual([1, 2, 3, 4, 5, 6, 7])
