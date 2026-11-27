@@ -1,0 +1,162 @@
+{
+  "toolKey": "value_cost_physics_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "物理学习价值与时间取舍图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对项目原七题、两个独立均分及最少答题规则。两学段按原 1–6 分量尺估算，各保留五档。"
+      }
+    },
+    "primaryScoreKeys": [
+      "value",
+      "cost"
+    ],
+    "scoreOrder": [
+      "value",
+      "cost"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "value",
+        "headline": "从物理课带走一个能用的办法",
+        "summary": "小简过车棚时，发现撑起车的脚架，车一下子站稳了。回到课上，他才想到可以画出车接触地面的几个点，再对照老师讲的支撑问题。画完以后，他还想试着解释旁边那辆自行车为什么用另一种脚架也能站稳。\n\n这三道题记录你觉得学物理有多重要、多有用。想起一件真正发生过的事，再回头看哪个课堂概念在那里给了你帮助。",
+        "scoreLabel": "物理学习价值均分（试用版）",
+        "source": {
+          "type": "reference_context"
+        },
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "给身边的物品画一张图",
+            "summary": "挑一辆停稳的自行车或一把椅子，画出它和地面接触的位置。翻回课堂笔记看看哪个概念能帮你描述。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "找一个能解释的现象",
+            "summary": "挑一个课上实际见过的现象，写下一句话说清哪个物理概念能帮你理解。再给还缺一条证据的地方加个记号。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "区分能做、能解释、愿意深究",
+            "summary": "把画图、从现象找原因、自己提出一个问题各举一个例子。看看你目前在哪个环节最能感觉到物理有用。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "带一条物理线索回到日常",
+            "summary": "选一个你关心的日常物品，照课堂的方法画一张图或作一次安全观察。比较动手前的猜测和观察到的情形。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "讲清同一个办法能不能换场景用",
+            "summary": "把熟悉的物理解释讲给同学，请他举一个稍不一样的例子。一起找一条仍能用的理由和一处还要观察的差别。",
+            "guidance": []
+          }
+        ],
+        "guidance": [],
+        "provisional": true
+      },
+      {
+        "scoreKey": "cost",
+        "headline": "物理任务和其他事挤在一起时怎么办",
+        "summary": "那天，小简计划做一页画图题，还想赶上球队练习。他做完才发现，自己把同一幅图反复涂改了好几次。下一回，他先在草纸上标出三个确定的位置，把还拿不准的地方留给课间的一次提问。\n\n这四道题记录你感到学物理占用时间和需要取舍的程度。把它和你觉得这门课有多有价值分别理解。一次具体的时间记录能帮你找到可调整的小地方。",
+        "scoreLabel": "物理学习时间与取舍均分（试用版）",
+        "source": {
+          "type": "reference_context"
+        },
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "用一个小步骤收尾",
+            "summary": "开始一道画图题前写下这次要完成的一步。做完就核对这一处，再回到你原先安排的活动。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "问问哪一步占的时间最多",
+            "summary": "把看条件、画图和核对三段分开记。下次先试你最容易写清的那段，看看真正卡着的地方。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "把重的任务分在不同时段",
+            "summary": "画一张图和解释一组数据需要不同准备。把资料查找和独立练习分开约定时间，看看和其他活动哪里冲突。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "先留下一张有用的草图",
+            "summary": "先把已经确定的位置标在草图上，用一个问号留住没想通的地方。等问清楚再补线，就少一次把整张图重画。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "带实际花时记录商量安排",
+            "summary": "拿三次画图或计算的记录去找老师或家长，选一项下一周先拆小。也把你想保留的休息和活动写在同一张纸上。",
+            "guidance": []
+          }
+        ],
+        "guidance": [],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "学习价值按前三题的均分记录，至少答两题。时间与取舍按后四题的均分记录，至少答三题。两个结果分别阅读。",
+      "五档沿用原参数的试用区间。缺少匹配的学段时，可读两个通用故事。"
+    ],
+    "disclaimer": "可以挑一次真实的学习经历来理解这两个得分，也可带着一个具体问题跟同伴、老师或家长讨论。",
+    "artworkKey": "value_cost_physics_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

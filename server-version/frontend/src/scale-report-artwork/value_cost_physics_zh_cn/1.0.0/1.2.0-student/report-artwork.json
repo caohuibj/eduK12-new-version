@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "value_cost_physics_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "value-very-low.webp",
+      "alt": "学生从画出自行车和地面接触的点开始。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "value-low.webp",
+      "alt": "学生用课堂平衡示意图解释一次观察。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "low"
+    },
+    {
+      "file": "value-middle.webp",
+      "alt": "支撑草图、现象记录和新提出的问题分别摆在桌上。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "middle"
+    },
+    {
+      "file": "value-high.webp",
+      "alt": "学生画图对照两辆自行车的不同支撑方式。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "high"
+    },
+    {
+      "file": "value-very-high.webp",
+      "alt": "两个学生对照不同脚架的草图，说清仍可用的解释。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "very_high"
+    },
+    {
+      "file": "cost-very-low.webp",
+      "alt": "学生在草图上标完一个点，把铅笔放下准备结束当前练习。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "cost-low.webp",
+      "alt": "三张小图提示按看条件、画图和核对来分开记时。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "low"
+    },
+    {
+      "file": "cost-middle.webp",
+      "alt": "物理练习、运动装备与周计划分开摆放。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "middle"
+    },
+    {
+      "file": "cost-high.webp",
+      "alt": "学生在草图标出确定的部分，把未想通的一处做上记号。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "high"
+    },
+    {
+      "file": "cost-very-high.webp",
+      "alt": "学生和家长对照含有运动和休息的学习安排。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生观察自行车的脚架和车轮如何支撑车身。",
+    "width": 506,
+    "height": 506
+  }
+}
