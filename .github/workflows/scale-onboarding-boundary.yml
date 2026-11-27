@@ -128,7 +128,7 @@ jobs:
           const scope = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/scale-intake-scope.json', 'utf8'));
           const run = (command, args) => execFileSync(command, args, { stdio: 'inherit' });
           if (scope.toolKeys) {
-            run(process.execPath, ['node_modules/prisma/build/index.js', 'generate', '--no-engine']);
+            run(process.execPath, ['node_modules/prisma/build/index.js', 'generate']);
             run('npm', ['run', 'scale:check', '--', ...scope.toolKeys]);
           } else {
             run('npm', ['run', 'scale:instruments:check']);
