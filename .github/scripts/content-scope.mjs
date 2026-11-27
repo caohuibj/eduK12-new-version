@@ -382,7 +382,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     frontend_build:catalogDiscovery?false:frontendBuild, ui_required:uiRequired,
     media_selection:JSON.stringify(mediaSelection), media_groups:JSON.stringify(mediaSelection.length ? mediaPlan(mediaSelection) : []),
     cognitive_intake_light:result.cognitive_intake_light === true,cognitive_intake_plan:JSON.stringify(result.cognitive_intake_plan || null),
-    scale_intake_light: result.scale_intake_light === true, scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'),
+    scale_intake_light: result.scale_intake_light === true,
+    scale_release_mixed: result.scale_intake_light !== true && entries.some(entry=>isScaleReleaseAsset(entry.file)),
+    scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'),
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
       [key, Array.isArray(value) ? JSON.stringify(value) : value])) };

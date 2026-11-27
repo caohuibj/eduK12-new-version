@@ -21,7 +21,7 @@ export async function componentRevisionPrefill(actor:string,pointer:{releaseId:s
  if(row.combination_hash!==pointer.combinationHash)componentFail(409,'来源组合摘要不一致')
  const t=row.snapshot,part=t.parts.CONTENT,imported=databaseContentSource(part),source=getScaleInstrumentSource(t.toolKey,t.instrumentVersion)
  const metadata=imported?(part.payload as {administration:{metadata:NonNullable<ComponentDraft['changedParts']['CONTENT']>['metadata']}}).administration.metadata:source?{
-  title:source.catalog.identity.canonicalName,catalog:source.catalog,...Object.fromEntries(['instruction','applicability','disclosure','localization','usageRequirements','educationApplicability','educationExpertApplicability','educationalFeedback'].flatMap(k=>{const v=source[k as keyof typeof source];return v===undefined?[]:[[k,v]]})),
+  title:source.catalog.identity.canonicalName,catalog:source.catalog,...Object.fromEntries(['instruction','applicability','disclosure','dataCeiling','localization','usageRequirements','educationApplicability','educationExpertApplicability','educationalFeedback'].flatMap(k=>{const v=source[k as keyof typeof source];return v===undefined?[]:[[k,v]]})),
  }:null
  if(!metadata)componentFail(409,'没有可编辑的冻结来源元数据')
  return {toolKey:t.toolKey,configurationName:t.title+' · 新配置',baseCombination:pointer,changedParts:{

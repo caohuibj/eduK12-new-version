@@ -1,5 +1,5 @@
 import {afterEach,beforeEach,describe,it,expect,vi} from 'vitest'
-import {render,screen,fireEvent,waitFor} from '@testing-library/react'
+import {render,screen,fireEvent,waitFor,within} from '@testing-library/react'
 import ScaleComponentManager from './ScaleComponentManager'
 import {componentContentPlaceholder} from '../../api/scaleComponentImport'
 import {SCALE_BATCH_TEMPLATE} from '../../../../backend/src/modules/scale/component-import/synthetic-template'
@@ -128,6 +128,38 @@ describe('minimal system administrator component workspace',()=>{
   render(<ScaleComponentManager actorId="system"/>);fireEvent.click(await draftWorkspace())
   fireEvent.click(await screen.findByRole('button',{name:'明确不配置参数'}));fireEvent.click(screen.getByRole('button',{name:'保存草稿'}))
   await waitFor(()=>expect(mocks.api).toHaveBeenCalledWith('/component-drafts/draft1',{expectedRevision:3,draft:{toolKey:draft.toolKey,configurationName:draft.configurationName,baseCombination:null,changedParts:{REPORT:draft.changedParts.REPORT,PARAMETERS:{version:'none-v1',payload:null}}}}))
+ })
+ it('saves report visibility and artwork separately from the selected parameter and report content',async()=>{
+  const source=SCALE_BATCH_TEMPLATE.sources[0]
+  const definition=componentContentPlaceholder(JSON.parse(JSON.stringify(source.executable.definition))).report
+  const template={title:'固定模板',blocks:[],limitations:[],artworkKey:'example/1.0.0/before'}
+  const report={version:'2.0.0',payload:{definition,parameterVersion:'P1',template}}
+  const reportDraft={...draft,changedParts:{REPORT:report}}
+  const previous=mocks.api.getMockImplementation()!
+  mocks.api.mockImplementation(async(path:string,body?:{draft:object})=>
+   path==='/component-drafts/draft1'?body?{...reportDraft,...body.draft,revision:4}:reportDraft:previous(path,body)
+  )
+  render(<ScaleComponentManager actorId="system"/>)
+  fireEvent.click(await draftWorkspace())
+  fireEvent.click(await screen.findByText('报告展示范围与配图'))
+  fireEvent.click(screen.getByRole('button',{name:'设置报告展示范围'}))
+  const learner=screen.getByRole('group',{name:'作答者'})
+  fireEvent.click(within(learner).getByRole('checkbox',{name:'配图'}))
+  expect(within(screen.getByRole('group',{name:'研究者'})).getByRole('checkbox',{name:'配图'})).not.toBeChecked()
+  fireEvent.change(screen.getByLabelText('报告配图标识'),{target:{value:'example/1.0.0/active'}})
+  fireEvent.change(screen.getByLabelText('自定义模板配图标识'),{target:{value:'example/1.0.0/template'}})
+  fireEvent.click(screen.getByRole('button',{name:'保存草稿'}))
+  await waitFor(()=>expect(mocks.api).toHaveBeenCalledWith('/component-drafts/draft1',{
+   expectedRevision:3,draft:expect.objectContaining({changedParts:{
+    REPORT:{version:'2.0.0',payload:{
+     definition:{...definition,artworkKey:'example/1.0.0/active'},parameterVersion:'P1',
+     template:{...template,artworkKey:'example/1.0.0/template'},
+     reportVisibility:{schemaVersion:1,policyVersion:'2.0.0',unknownAudience:'DENY',audiences:{
+      respondent:{numericScores:false,references:false,scoreDerivedLabels:false,individualInterpretations:false,educationalContent:false,artwork:true},
+     }},
+    }},
+   }}),
+  }))
  })
  it('lets a frozen configuration expose its full definition for reading while keeping all writes disabled',async()=>{
   const previous=mocks.api.getMockImplementation()!

@@ -1,3 +1,4 @@
+import { GIT_RELEASE_USERNAME } from '../../utils/gitReleaseIdentity'
 import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import type { Request, Response } from 'express'
 import { generateRegistrationOptions, verifyRegistrationResponse, generateAuthenticationOptions,
@@ -130,7 +131,7 @@ export async function finishAdminAuthentication(req: Request, res: Response, res
   if (!verified.verified || !verified.authenticationInfo.userVerified || verified.authenticationInfo.credentialBackedUp
     || verified.authenticationInfo.credentialDeviceType !== 'singleDevice') throw new AdminPermissionError(403, '必须使用具有用户验证的独立安全密钥')
   await prisma.$transaction(async tx => {
-    const [current] = await tx.$queryRaw<Array<{ tokenVersion: number }>>`SELECT "token_version" AS "tokenVersion" FROM "users" WHERE "id"=${key.userId} FOR UPDATE`
+    const [current] = await tx.$queryRaw<Array<{ tokenVersion: number }>>`SELECT "token_version" AS "tokenVersion" FROM "users" WHERE "id"=${key.userId} AND username<>${GIT_RELEASE_USERNAME} FOR UPDATE`
     if (current?.tokenVersion !== challenge.tokenVersion) throw new AdminPermissionError(403, '账号权限已变化，请重新登录')
     const updated = await tx.adminSecurityKey.updateMany({ where: { id: key.id, counter: key.counter }, data: { counter: BigInt(verified.authenticationInfo.newCounter) } })
     if (updated.count !== 1) throw new AdminPermissionError(403, '安全密钥状态已变化，请重试')
@@ -170,7 +171,7 @@ export async function finishAdminRegistration(req: Request, response: Registrati
     throw new AdminPermissionError(403, '必须登记具有用户验证的独立安全密钥')
   const credential = verified.registrationInfo.credential
   await prisma.$transaction(async tx => {
-    const [current] = await tx.$queryRaw<Array<{ tokenVersion: number }>>`SELECT "token_version" AS "tokenVersion" FROM "users" WHERE "id"=${challenge.userId} FOR UPDATE`
+    const [current] = await tx.$queryRaw<Array<{ tokenVersion: number }>>`SELECT "token_version" AS "tokenVersion" FROM "users" WHERE "id"=${challenge.userId} AND username<>${GIT_RELEASE_USERNAME} FOR UPDATE`
     if (current?.tokenVersion !== challenge.tokenVersion || !challenge.enrollmentHash) throw new AdminPermissionError(403, '账号状态已变化')
     const ticket = await tx.adminSecurityChallenge.deleteMany({ where: { idHash: challenge.enrollmentHash, purpose: 'ENROLLMENT', challenge: '',
       userId: challenge.userId, tokenVersion: challenge.tokenVersion, expiresAt: { gt: new Date() } } })

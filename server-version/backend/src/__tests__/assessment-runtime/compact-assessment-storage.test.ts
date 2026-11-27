@@ -182,6 +182,9 @@ describe('report manifests and end-to-end representation equivalence',()=>{
    if(optionalFields==='feedback'||optionalFields==='identity-and-feedback')result.rawScoreFeedback=[{scoreKey:result.scores[0].key,rangeKey:'synthetic',text:'Frozen authored feedback'}]
    const record={id:id.assessmentId,attemptEpoch:1,submissionId:id.submissionId,submissionPayloadHash:id.payloadHash,compositeAttemptId:parent,compositeItemId:'item-one',completedAt:'2026-10-16T00:00:00.000Z',totalTime:123}
    const unit=buildScaleUnitReport({...(['identity','identity-and-feedback'].includes(optionalFields)?{assessmentId:record.id}:{}),itemId:record.compositeItemId,scaleId:result.instrument.scaleId,scaleCode:pkg.key,scaleName:result.instrument.name,result,completedAt:record.completedAt,totalTime:123})
+   if(optionalFields==='identity-and-feedback')Object.defineProperty(unit,'__scaleReportPresentation',{value:{
+    reportVersion:result.method.reportVersion,artworkKey:'sample/1.0.0/r2',introductions:[{scoreKey:result.scores[0].key,headline:'开篇',summary:'冻结报告开篇',guidance:[]}],
+   },enumerable:false})
    const report={id:parent,assessmentId:'questionnaire-one',name:'合成问卷',productKind:'QUESTIONNAIRE',reportMode:'COLLECTION',anonymousCode:null,completedAt:record.completedAt,totalTime:123,backgroundValues:[],unitReports:[unit]}
    samples=[{children:[{record,result,answers:fixture.answers,itemOrder:pkg.definition.items.map(i=>i.itemCode),canonical:canonicalFor(result),oldFieldBytes:0}],binding:{attemptId:parent,attemptEpoch:1,slotSetHash:'a'.repeat(64),contextHash:'e'.repeat(64),aggregateInputHash:'b'.repeat(64)},report,policies:[],whole:{schemaVersion:1,binding:{attemptId:parent,attemptEpoch:1},payloadHash:'d'.repeat(64),units:[{assessmentId:record.id,attemptEpoch:1,submissionId:id.submissionId,answers:fixture.answers}]},oldParentFieldBytes:0}]
   }
@@ -211,6 +214,8 @@ describe('report manifests and end-to-end representation equivalence',()=>{
    for(let i=0;i<restored.unitReports.length;i++){
     expect(Object.hasOwn(restored.unitReports[i],'assessmentId')).toBe(Object.hasOwn(sample.report.unitReports[i],'assessmentId'))
     expect(Object.hasOwn(restored.unitReports[i],'rawScoreFeedback')).toBe(Object.hasOwn(sample.report.unitReports[i],'rawScoreFeedback'))
+    expect(restored.unitReports[i].__scaleReportPresentation).toEqual(sample.report.unitReports[i].__scaleReportPresentation)
+    expect(Object.keys(restored.unitReports[i])).not.toContain('__scaleReportPresentation')
    }
    const raw=size(encryptCompactField({schemaVersion:1,value:packWholeRawEnvelope(sample.whole)}))
    const varied=normalize(sample.whole);let seed=28431

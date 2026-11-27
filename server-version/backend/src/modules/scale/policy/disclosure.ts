@@ -106,7 +106,9 @@ export function compileEffectiveDisclosure(
       scoreDerivedLabels: visible?.scoreDerivedLabels ?? false,
       individualInterpretations: visible?.individualInterpretations ?? false,
       educationalContent: visible?.educationalContent ?? false,
-      artwork: report?.audiences[audience]?.artwork ?? false,
+      artwork: report
+        ? report.audiences[audience]?.artwork ?? false
+        : Boolean(visible?.educationalContent || visible?.individualInterpretations),
     }
   }
   return effective

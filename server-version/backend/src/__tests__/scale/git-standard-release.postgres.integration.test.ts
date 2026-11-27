@@ -1,9 +1,19 @@
-import {randomUUID} from 'node:crypto'
-import {afterAll, beforeAll, describe, expect, it} from 'vitest'
+import { randomBytes, randomUUID } from 'node:crypto'
+import type { Request, Response } from 'express'
+import { GIT_RELEASE_USERNAME } from '../../utils/gitReleaseIdentity'
+import { authController } from '../../controllers/authController'
+import * as loginRate from '../../middleware/loginRateLimit'
+import { loadCurrentPrincipal } from '../../modules/organization/principal'
+import { adminSecretHash, beginAdminLogin, beginAdminRegistration, issueAdminSession } from '../../modules/admin-permissions/security'
+import { beginAdminTotpRegistration } from '../../modules/admin-permissions/totp'
+import { forceResetPasswordBySystemAdmin } from '../../services/accountAuthorityService'
+import { setUserActiveState } from '../../services/userLifecycleService'
+import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest'
 import {prisma} from '../../config/database'
 import {readApprovedToolEntryProducts} from '../../modules/assessment-governance/tool-entry-policy'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {syncGitScaleReleases, type GitScaleRelease} from '../../modules/scale/onboarding/git-release-publication'
+import {ensureGitScalePublisher} from '../../modules/scale/onboarding/git-release-actor'
 import {composeTriplet, sourceParts, type Part, type Triplet} from '../../modules/survey/standard-triplet.model'
 import {standardReleaseRow, withdrawStandardTriplet} from '../../modules/survey/standard-triplet.service'
 import {toolReference} from '../../modules/survey/tool-reference'
@@ -20,12 +30,12 @@ const commit=(character:string)=>character.repeat(40)
 let actorId:string
 let adminId:string
 
-function release(suffix:string,allowedEntries:GitScaleRelease['allowedEntries'],replaces?:string):GitScaleRelease{
-  const parts=Object.fromEntries(sourceParts(toolKey,'1.0.0').map(part=>[part.axis,part])) as Triplet['parts']
+function release(suffix:string,allowedEntries:GitScaleRelease['allowedEntries'],replaces?:string,key=toolKey):GitScaleRelease{
+  const parts=Object.fromEntries(sourceParts(key,'1.0.0').map(part=>[part.axis,part])) as Triplet['parts']
   const report={...parts.REPORT.payload as Triplet['definition']['report'],reportVersion:'pg-'+suffix}
   const payload={definition:report}
-  const changed:Part={...parts.REPORT,payload,version:report.reportVersion,hash:canonicalHash(payload),reference:toolReference('SCALE',toolKey,{gitAsset:true})}
-  return {releaseKey:'pg-'+suffix,triplet:composeTriplet(toolKey,{...parts,REPORT:changed}),allowedEntries,state:'ONLINE',replaces}
+  const changed:Part={...parts.REPORT,payload,version:report.reportVersion,hash:canonicalHash(payload),reference:toolReference('SCALE',key,{gitAsset:true})}
+  return {releaseKey:'pg-'+suffix,triplet:composeTriplet(key,{...parts,REPORT:changed}),allowedEntries,state:'ONLINE',replaces}
 }
 const sync=(sha:string,releases:GitScaleRelease[])=>syncGitScaleReleases(prisma,{actorId,gitCommitSha:commit(sha),releases})
 
@@ -33,7 +43,7 @@ suite('Git policy uses the existing exact scale publication lifecycle',()=>{
   beforeAll(async()=>{
     requireIsolatedReleaseDatabase(url!)
     const userData={passwordHash:'synthetic-not-a-login',platformRole:'SYSTEM_ADMIN' as const,accountDomain:'TRAINING',mustChangePassword:false}
-    actorId=(await prisma.user.upsert({where:{username:'SYSTEM_GIT_RELEASE'},update:{},create:{...userData,username:'SYSTEM_GIT_RELEASE'}})).id
+    actorId=await ensureGitScalePublisher(prisma)
     adminId=(await prisma.user.create({data:{...userData,username:'git_scale_test_admin_'+randomUUID()}})).id
   })
   afterAll(()=>prisma.$disconnect())
@@ -93,4 +103,58 @@ suite('Git policy uses the existing exact scale publication lifecycle',()=>{
     expect(await resolveScaleStartDeployment({db:prisma,scale,requestedMode:'COMPOSITE',exactStandard:{instrumentKey:key,instrumentVersion}}))
       .toMatchObject({kind:'MANAGED_V2',allowNewStarts:true})
   },30000)
+
+  it('rolls back every tool when the second tool cannot publish',async()=>{
+    const first = release('batch-first', ['SURVEY'])
+    const conflictingKey='wibps7_adolescent_zh_cn_research'
+    const broken = release('batch-second', ['SURVEY'], undefined, conflictingKey)
+    // The manifest is structurally valid. Its second tool fails on a database
+    // native-code collision after the first tool would otherwise be ONLINE.
+    await prisma.scale.create({data:{code:conflictingKey,name:'Synthetic conflicting code',creatorId:adminId}})
+    const eventCount = await prisma.surveyEvent.count({where:{actorUserId:actorId}})
+    await expect(sync('d',[first,broken])).rejects.toThrow('STANDARD_NATIVE_CONFLICT:'+conflictingKey)
+    expect(await prisma.$queryRaw`SELECT id FROM survey_standard_releases WHERE combination_hash IN (${first.triplet.combinationHash},${broken.triplet.combinationHash})`).toEqual([])
+    expect(await prisma.surveyEvent.count({where:{actorUserId:actorId}})).toBe(eventCount)
+  },30000)
+
+  it('keeps the Git publisher out of interactive authentication and credential recovery', async () => {
+    vi.stubEnv('ADMIN_AUTH_ORIGIN', 'http://localhost:5174')
+    vi.stubEnv('ADMIN_WEBAUTHN_RP_ID', 'localhost')
+    vi.stubEnv('ADMIN_MFA_ENCRYPTION_KEY', randomBytes(32).toString('hex'))
+    const ticket = randomBytes(32).toString('base64url')
+    const ordinaryTicket = randomBytes(32).toString('base64url')
+    const accounts = [[actorId, ticket], [adminId, ordinaryTicket]]
+    const req = { body: { username: GIT_RELEASE_USERNAME, password: 'UnusedPass0123' } } as Request
+    const res = { locals: {}, status: vi.fn().mockReturnThis(), json: vi.fn(), append: vi.fn() } as unknown as Response
+    try {
+      expect(await ensureGitScalePublisher(prisma)).toBe(actorId)
+      expect(await loadCurrentPrincipal(actorId)).toBeNull()
+      expect(await loadCurrentPrincipal(adminId)).toMatchObject({ userId: adminId, platformRole: 'SYSTEM_ADMIN' })
+      vi.spyOn(loginRate, 'recordLoginFailure').mockResolvedValue({ accountIpAllowed: true, accountGlobalAllowed: true, retryAfterSeconds: 0 })
+      for (const trainingEntrance of [false, true]) {
+        res.locals.trainingEntrance = trainingEntrance
+        await authController.login(req, res)
+        expect(res.status).toHaveBeenLastCalledWith(401)
+      }
+      await expect(forceResetPasswordBySystemAdmin({ actorUserId: adminId, targetUserId: actorId, passwordHash: 'unused-test-hash' })).rejects.toMatchObject({statusCode: 404})
+      await expect(setUserActiveState({ actorUserId: adminId, targetUserId: actorId, isActive: true })).rejects.toMatchObject({statusCode: 404})
+      for (const [userId, token] of accounts) {
+        await prisma.adminSecurityChallenge.create({ data: { idHash: adminSecretHash(token), userId, purpose: 'ENROLLMENT',
+          tokenVersion: 0, challenge: '', expiresAt: new Date(Date.now() + 60_000) } })
+      }
+      await expect(beginAdminLogin(req, res, actorId)).rejects.toMatchObject({statusCode: 403})
+      await expect(beginAdminRegistration(req, res, actorId, ticket)).rejects.toMatchObject({statusCode: 403})
+      await expect(beginAdminTotpRegistration(req, res, actorId, ticket)).rejects.toMatchObject({statusCode: 403})
+      await expect(issueAdminSession(req, res, actorId, 0, 'TOTP')).rejects.toMatchObject({statusCode: 403})
+      expect(res.append).not.toHaveBeenCalled()
+      expect(await beginAdminTotpRegistration(req, res, adminId, ordinaryTicket)).toHaveProperty('otpauthUri')
+    } finally {
+      const ticketHashes = accounts.map(([, token]) => adminSecretHash(token))
+      await prisma.adminSecurityChallenge.deleteMany({ where: { OR: [
+        { idHash: { in: ticketHashes } }, { enrollmentHash: { in: ticketHashes } },
+      ] } })
+      vi.restoreAllMocks()
+      vi.unstubAllEnvs()
+    }
+  })
 })

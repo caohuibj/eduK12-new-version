@@ -12,6 +12,7 @@ import {
   assertGitScalePublisher, publishScaleRelease, type GitScalePublication, type StandardRelease,
 } from '../../survey/standard-triplet.service'
 import {ensureStandardNativeScale} from './standard-release-native'
+import {activeScaleDeclarations} from '../declarative/replacement'
 
 export type GitScaleRelease = {
   releaseKey: string
@@ -44,29 +45,6 @@ const gitMarker=JSON.stringify([{gitRelease:{source:'SYSTEM_GIT_RELEASE'}}])
 const conflict=(reason:string)=>{throw new Error('STANDARD_GIT_'+reason)}
 const reason=(commit:string)=>'Git main '+commit
 
-/** Named successors replace their declared ancestors. A reverted or omitted
- * successor leaves any remaining ONLINE declaration eligible for reactivation. */
-export function activeGitScaleReleases(releases:readonly GitScaleRelease[], knownKeys:ReadonlySet<string> = new Set()){
-  const byKey=new Map(releases.map(release=>[release.releaseKey,release]))
-  if(byKey.size!==releases.length)conflict('DUPLICATE_RELEASE_KEY')
-  const superseded=new Set<string>()
-  for(const release of releases.filter(item=>item.state==='ONLINE')){
-    const seen=new Set([release.releaseKey])
-    let key=release.replaces
-    while(key){
-      if(seen.has(key))conflict('REPLACEMENT_CYCLE:'+key)
-      seen.add(key)
-      if(/^\d+\.\d+\.\d+\/default$/.test(key))break
-      if(!byKey.has(key)&&!knownKeys.has(key))conflict('REPLACEMENT_NOT_FOUND:'+key)
-      superseded.add(key)
-      key=byKey.get(key)?.replaces
-    }
-  }
-  const online=releases.filter(release=>release.state==='ONLINE'&&!superseded.has(release.releaseKey))
-  if(new Set(online.map(item=>item.triplet.combinationHash)).size!==online.length)conflict('DUPLICATE_COMBINATION')
-  return online
-}
-
 async function readSyncReceipts(tx:Prisma.TransactionClient,actorId:string,toolKey:string){
   const rows=await tx.$queryRaw<Array<{metadata:GitSyncReceipt}>>`SELECT DISTINCT ON (metadata->>'releaseId') metadata
     FROM survey_events WHERE actor_user_id=${actorId} AND action='GIT_STANDARD_RELEASE_SYNCED' AND metadata->>'toolKey'=${toolKey}
@@ -74,10 +52,8 @@ async function readSyncReceipts(tx:Prisma.TransactionClient,actorId:string,toolK
   return new Map(rows.map(({metadata})=>[metadata.releaseId,metadata]))
 }
 
-async function syncTool(tx:Prisma.TransactionClient,input:{actorId:string;gitCommitSha:string},toolKey:string,releases:readonly GitScaleRelease[]):Promise<SyncResult[]>{
+async function syncTool(tx:Prisma.TransactionClient,input:{actorId:string;gitCommitSha:string},toolKey:string,releases:readonly GitScaleRelease[],desired:readonly GitScaleRelease[]):Promise<SyncResult[]>{
   const {actorId,gitCommitSha}=input
-  await assertGitScalePublisher(tx,actorId)
-  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'standard-git-release:'+toolKey}))`
   // The shared publisher takes this lock before any release row lock. Taking the
   // same locks in order also serializes concurrent admin publication of a match.
   for(const hash of [...new Set(releases.map(release=>release.triplet.combinationHash))].sort()){
@@ -90,7 +66,6 @@ async function syncTool(tx:Prisma.TransactionClient,input:{actorId:string;gitCom
   const owned=rows.filter(row=>gitOrigin(row))
   if(owned.some(row=>row.approved_by!==actorId))conflict('DEPLOYMENT_IDENTITY_CHANGED:'+toolKey)
   const receipts=await readSyncReceipts(tx,actorId,toolKey)
-  const desired=activeGitScaleReleases(releases,new Set(owned.map(row=>gitOrigin(row)!.releaseKey)))
   const desiredHashes=new Set(desired.map(release=>release.triplet.combinationHash))
   const changes:SyncResult[]=[]
   const record=async(releaseKey:string,releaseId:string,releaseVersion:number,state:GitSyncReceipt['state'],allowedEntries:Products,
@@ -156,7 +131,6 @@ async function syncTool(tx:Prisma.TransactionClient,input:{actorId:string;gitCom
  * verified main revision. Omission withdraws only releases owned by Git. */
 export async function syncGitScaleReleases(db:PrismaClient,input:{actorId:string;gitCommitSha:string;releases:readonly GitScaleRelease[]}){
   if(!/^[a-f0-9]{40}$/.test(input.gitCommitSha))conflict('INVALID_COMMIT')
-  await assertGitScalePublisher(db,input.actorId)
   const byTool=new Map<string,GitScaleRelease[]>()
   for(const release of input.releases){
     exactStandardCombinationEntryProducts(release.allowedEntries)
@@ -165,10 +139,20 @@ export async function syncGitScaleReleases(db:PrismaClient,input:{actorId:string
     tool.push(release)
     byTool.set(key,tool)
   }
-  const previous=await db.$queryRaw<Array<{tool_key:string}>>`SELECT DISTINCT tool_key FROM survey_standard_releases
-    WHERE state='ONLINE' AND (reference->'approvals') @> ${gitMarker}::jsonb`
-  const results:SyncResult[]=[]
-  const toolKeys=[...new Set([...byTool.keys(),...previous.map(row=>row.tool_key)])].sort()
-  for(const toolKey of toolKeys)results.push(...await db.$transaction(tx=>syncTool(tx,input,toolKey,byTool.get(toolKey)??[]),{timeout:30000}))
-  return results
+  const desired=new Map([...byTool].map(([key,releases])=>{
+    if(new Set(releases.map(item=>item.triplet.combinationHash)).size!==releases.length)conflict('DUPLICATE_COMBINATION:'+key)
+    return [key,activeScaleDeclarations(releases)]
+  }))
+  return db.$transaction(async tx=>{
+    await assertGitScalePublisher(tx,input.actorId)
+    // A release commit represents a single desired state. Keep discovery under
+    // the same lock so two simultaneous syncs cannot merge unrelated commits.
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('standard-git-release-sync'))`
+    const previous=await tx.$queryRaw<Array<{tool_key:string}>>`SELECT DISTINCT tool_key FROM survey_standard_releases
+      WHERE state='ONLINE' AND (reference->'approvals') @> ${gitMarker}::jsonb`
+    const results:SyncResult[]=[]
+    const toolKeys=[...new Set([...byTool.keys(),...previous.map(row=>row.tool_key)])].sort()
+    for(const toolKey of toolKeys)results.push(...await syncTool(tx,input,toolKey,byTool.get(toolKey)??[],desired.get(toolKey)??[]))
+    return results
+  },{timeout:120000})
 }

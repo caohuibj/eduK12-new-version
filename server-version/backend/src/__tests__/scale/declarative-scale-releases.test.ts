@@ -4,6 +4,7 @@ import {join} from 'node:path'
 import {afterEach, beforeEach, describe, expect, it} from 'vitest'
 import {checkDeclaredScaleReleases} from '../../modules/scale/declarative/check'
 import {loadDeclaredScaleReleases} from '../../modules/scale/declarative/load'
+import {assertLiveScaleReportArtwork} from '../../modules/scale/declarative/live-artwork'
 import type {AssessmentReferenceSetDefinition} from '../../modules/assessment-reference/reference'
 import {sourceParts, type Part} from '../../modules/survey/standard-triplet.model'
 import type {ScaleDefinitionV2} from '../../modules/scale/scale-definition'
@@ -80,5 +81,42 @@ describe('Scale content directories', () => {
   it('accepts an empty Git declaration for a known tool after revert', () => {
     expect(checkDeclaredScaleReleases(root, {toolKeys: [toolKey]})).toEqual([])
     expect(() => checkDeclaredScaleReleases(root, {toolKeys: ['typo']})).toThrow('unknown Scale tool')
+  })
+
+  it('requires named predecessors in the same Git declaration and still accepts the legacy default', () => {
+    write(`parameters/${parameterVersion}.json`, parameter)
+    write(`reports/${reportVersion}.json`, report)
+    const changed = {...release, replaces: 'previous'}
+    write('releases.json', {toolKey, releases: [changed]})
+    expect(() => loadDeclaredScaleReleases(root)).toThrow('STANDARD_GIT_REPLACEMENT_NOT_FOUND:trial-1:previous')
+    const previous = {...release, releaseKey: 'previous', parameterVersion: 'default', reportVersion: 'default', state: 'WITHDRAWN'}
+    write('releases.json', {toolKey, releases: [previous, changed]})
+    expect(loadDeclaredScaleReleases(root).map(item => item.releaseKey)).toEqual(['previous', 'trial-1'])
+    write('releases.json', {toolKey, releases: [{...release, replaces: '1.0.0/default'}]})
+    expect(loadDeclaredScaleReleases(root)[0].replaces).toBe('1.0.0/default')
+  })
+
+  it('requires the approved artwork to match every installed frontend inventory before publishing', () => {
+    const key = `${toolKey}/${contentVersion}/${reportVersion}`
+    write(`parameters/${parameterVersion}.json`, parameter)
+    write(`reports/${reportVersion}.json`, {...report, report: {...report.report, artworkKey: key}})
+    write('releases.json', {toolKey, releases: [release]})
+    const releases = loadDeclaredScaleReleases(root)
+    expect(() => assertLiveScaleReportArtwork(root, releases)).toThrow('inventories are required')
+    const evidence = join(root, '.artwork')
+    mkdirSync(evidence)
+    const files = {
+      [key + '/report-artwork.json']: 'a'.repeat(40),
+      [key + '/picture.webp']: 'b'.repeat(40),
+    }
+    const inventory = (name: string, map: Record<string, string>) =>
+      writeFileSync(join(evidence, name + '.json'), JSON.stringify({schemaVersion: 1, files: map}))
+    inventory('approved', files)
+    inventory('live-aaa', files)
+    inventory('live-bbb', {...files, [key + '/picture.webp']: 'c'.repeat(40)})
+    expect(() => assertLiveScaleReportArtwork(root, releases)).toThrow('missing or stale Scale artwork')
+    inventory('live-bbb', files)
+    expect(() => assertLiveScaleReportArtwork(root, releases)).not.toThrow()
+    expect(() => assertLiveScaleReportArtwork('/irrelevant', releases.map(item => ({...item, state: 'WITHDRAWN'})))).not.toThrow()
   })
 })

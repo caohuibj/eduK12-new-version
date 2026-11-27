@@ -52,44 +52,92 @@ prepare_scale_sync() {
   [[ "$(git --no-replace-objects -C "$scale_repo" rev-parse --verify refs/remotes/origin/main)" = "$scale_main" ]] ||
     die 'Scale synchronization expects the approved, fetched origin/main commit'
 }
-sync_scale_releases() (
-  local path image
-  if ! "$apply"; then
-    printf '+ export Scale declarations from Git main %s and run scale:sync-releases in the ops container\n' "$scale_main"
-    return 0
-  fi
+verify_scale_ops() {
+  local image
   image="$("$entry" -f "$ops" --profile ops config --format json |
-    python3 -c 'import json,sys; print(json.load(sys.stdin)["services"]["migrate"].get("image",""))')"
+    python3 -c 'import json,re,sys
+from urllib.parse import urlsplit
+service=json.load(sys.stdin)["services"]["migrate"]
+environment=service.get("environment",{})
+def value(name):
+    result=environment.get(name)
+    if not isinstance(result,str) or not result.strip():
+        raise SystemExit("Scale release ops profile must provide "+name)
+    return result
+value("DATABASE_URL")
+value("SYSTEM_GIT_RELEASE_ACTOR_ID")
+if environment.get("NODE_ENV")=="production":
+    origin=urlsplit(value("CORS_ORIGIN"))
+    if origin.scheme not in ("http","https") or not origin.hostname or origin.username or origin.password or origin.path not in ("","/") or origin.query or origin.fragment:
+        raise SystemExit("Scale release ops profile needs an exact HTTP(S) CORS_ORIGIN")
+    for name in ("JWT_SECRET","ASSET_SIGNING_SECRET"):
+        if len(value(name))<32:
+            raise SystemExit("Scale release ops profile needs a valid "+name)
+    if not re.fullmatch(r"[a-fA-F0-9]{64}",value("DATA_ENCRYPTION_KEY")):
+        raise SystemExit("Scale release ops profile needs a valid DATA_ENCRYPTION_KEY")
+    if environment.get("COGNITIVE_MODULE_ENABLED")=="true" and not re.fullmatch(r"[a-fA-F0-9]{64}",value("DATA_PSEUDONYM_KEY")):
+        raise SystemExit("Scale release ops profile needs a valid DATA_PSEUDONYM_KEY")
+print(service.get("image",""))')"
   [[ "$image" =~ ^([^[:space:]@]+@)?sha256:[0-9a-f]{64}$ ]] || die 'Use a qualified immutable ops image in the overlay'
   docker image inspect --format '{{.Id}}' "$image" >/dev/null
+}
+sync_scale_releases() (
+  local path frontends container
+  if ! "$apply"; then
+    printf '+ export Scale declarations from Git main %s, confirm running frontend artwork, and run scale:sync-releases in the ops container\n' "$scale_main"
+    return 0
+  fi
+  umask 022
   path="$(mktemp -d)"
   trap 'rm -r -- "$path"' EXIT
   python3 - "$scale_repo" "$scale_main" "$path" <<'PY'
-import pathlib, re, subprocess, sys
+import json, pathlib, re, subprocess, sys
 
 repo, commit, output = sys.argv[1:]
 root = 'server-version/backend/src/modules/scale/instruments/'
+artwork = 'server-version/frontend/src/scale-report-artwork/'
 pattern = re.compile(r'[a-z][a-z0-9_]*/(?:releases\.json|(?:parameters|reports)/[a-zA-Z0-9][a-zA-Z0-9._-]*\.json)')
+artwork_pattern = re.compile(r'[a-z][a-z0-9_]*/\d+\.\d+\.\d+/[a-zA-Z0-9][a-zA-Z0-9._-]*/(?:report-artwork\.json|[a-z][a-z0-9_-]*\.webp)')
+artwork_inventory = {}
 
 def git(*args):
     return subprocess.check_output(['git', '--no-replace-objects', '-C', repo, *args])
 
-for record in git('ls-tree', '-rz', commit, '--', root).split(b'\0'):
+for record in git('ls-tree', '-rz', commit, '--', root, artwork).split(b'\0'):
     if not record:
         continue
     metadata, name = record.split(b'\t', 1)
     source = name.decode('utf-8')
+    mode, kind, oid = metadata.split()
+    if source.startswith(artwork):
+        relative_artwork = source.removeprefix(artwork)
+        if artwork_pattern.fullmatch(relative_artwork) and mode == b'100644' and kind == b'blob':
+            artwork_inventory[relative_artwork] = oid.decode('ascii')
+        continue
     relative = source.removeprefix(root)
     if not pattern.fullmatch(relative):
         continue
-    mode, kind, oid = metadata.split()
     if mode != b'100644' or kind != b'blob':
         raise SystemExit('Expected a regular Scale JSON asset: ' + relative)
     destination = pathlib.Path(output, relative)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_bytes(git('cat-file', 'blob', oid.decode('ascii')))
+
+evidence = pathlib.Path(output, '.artwork')
+evidence.mkdir()
+(evidence / 'approved.json').write_text(json.dumps({'schemaVersion': 1, 'files': artwork_inventory}), encoding='utf-8')
 PY
   chmod 0755 "$path"
+  frontends="$("$entry" ps --status running -q frontend)"
+  while IFS= read -r container; do
+    [[ -n "$container" ]] || continue
+    [[ "$container" =~ ^[a-f0-9]{12,64}$ ]] || die 'Unexpected running frontend container identity'
+    if ! docker cp "$container:/usr/local/share/eduk12/scale-artwork-inventory.json" "$path/.artwork/live-$container.json" >/dev/null 2>&1; then
+      # A missing image inventory matters only when the selected release uses artwork.
+      printf '{"schemaVersion":1,"files":{}}\n' > "$path/.artwork/live-$container.json"
+    fi
+    chmod 0644 "$path/.artwork/live-$container.json"
+  done <<< "$frontends"
   run "$entry" -f "$ops" --profile ops run --rm --no-deps --pull never \
     -v "$path:/scale-release-input:ro" migrate npm run scale:sync-releases -- /scale-release-input "$scale_main"
 )
@@ -97,6 +145,7 @@ if [[ -n "$scale_main" ]]; then prepare_scale_sync; fi
 if [[ "$mode" = content ]]; then
   if [[ -n "$scale_main" ]]; then
     (($# == 0)) || die 'A committed Scale release selects its own content command'
+    if "$apply"; then verify_scale_ops; fi
     sync_scale_releases
     exit 0
   fi
@@ -146,6 +195,7 @@ if "$apply"; then
 fi
 # The profile belongs to the existing entry; no daemon/global configuration changes.
 export EDUK12_RELEASE_OVERLAY="$live"
+if [[ -n "$scale_main" ]] && "$apply"; then verify_scale_ops; fi
 if [[ "$mode" = full ]]; then
   # Early read-only index-contract check, before any business service stops:
   # a broken index state fails fast here so the release never takes downtime

@@ -72,4 +72,18 @@ describe('compiled scale policy', () => {
     expect(resolveAudienceDisclosure(policy,'unregistered')).toEqual(DISCLOSURE_PRESETS.NONE())
     expect(compileEffectiveDisclosure(undefined,undefined,legacy)).toEqual(legacy)
   })
+
+  it('preserves implicit legacy artwork when a C data ceiling is introduced', () => {
+    const envelope = { schemaVersion: 1 as const, unknownAudience: 'DENY' as const }
+    const ceiling = { ...envelope, policyVersion: 'c2', audiences: {} }
+    const legacy = { ...envelope, policyVersion: 'old-r', audiences: {
+      subject: DISCLOSURE_PRESETS.EDUCATIONAL_ONLY(),
+      teacher: DISCLOSURE_PRESETS.SCORES(),
+    } }
+    const policy = compileEffectiveDisclosure(ceiling, undefined, legacy)
+    expect(resolveAudienceDisclosure(policy, 'subject')).toMatchObject({ artwork: true, rawAnswers: false })
+    expect(resolveAudienceDisclosure(policy, 'teacher')).toMatchObject({ artwork: false, numericScores: true })
+    expect(resolveAudienceDisclosure(compileEffectiveDisclosure(ceiling,
+      { ...envelope, policyVersion: 'new-r', audiences: {} }, legacy), 'subject')).toMatchObject({ artwork: false })
+  })
 })

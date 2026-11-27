@@ -27,7 +27,7 @@ export function selectScaleReleaseAssets(entries) {
   if(!match||files.has(file))return null;
   if(!(status==='A'&&oldMode==='000000'&&newMode==='100644'||
        status==='M'&&oldMode==='100644'&&newMode==='100644'||
-       status==='D'&&oldMode==='100644'&&newMode==='000000'))return null;
+       status==='D'&&match[2]==='releases.json'&&oldMode==='100644'&&newMode==='000000'))return null;
   tools.add(match[1]);files.add(file);
  }
  return {toolKeys:[...tools].sort(),files:[...files].sort()};

@@ -159,7 +159,7 @@ import { buildCognitiveSingleTaskReport } from '../cognitive/single-task-report'
 import { isTaskSatisfied } from '../assessment-runtime/form-policy'
 import { loadCompositeTypedFormValues } from '../assessment-runtime/typed-form-facts'
 import { typedCompositeFormQuestion, validateTypedCompositeSectionDefinition, legacyFormValueProjection } from '../assessment-runtime/typed-form'
-import { buildFormBackgroundReport, buildScaleUnitReport, SCALE_REPORT_DEFINITION_VERSION, SCALE_REPORT_DISCLAIMER } from '../reporting/scale-unit-report'
+import { attachScaleReportPresentation, buildFormBackgroundReport, buildScaleUnitReport, SCALE_REPORT_DEFINITION_VERSION, SCALE_REPORT_DISCLAIMER } from '../reporting/scale-unit-report'
 import {
   buildScaleResultForRecord,
   encryptScaleAnswers,
@@ -7183,6 +7183,7 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
                   scalePlanSlot?.instrumentClass ?? item.scale?.instrumentClass,
                 )
             Object.defineProperty(report, '__scaleProjectionPolicy', { value: policy, enumerable: false })
+            if (scalePlanSlot?.compiledPolicy?.sourceRuntimePolicyHash) attachScaleReportPresentation(report, scalePlanSlot.definition.report)
           }
           if (report.decryptError) {
             logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
@@ -7236,6 +7237,7 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
           const policy = batch ? resolveProjectionPolicyForAssessment(result, report.result, frozenRuntime)
             : await loadProjectionPolicyForAssessment(result, report.result, frozenRuntime)
           Object.defineProperty(report, '__scaleProjectionPolicy', { value: policy.policy, enumerable: false })
+          attachScaleReportPresentation(report, policy.reportDefinition)
         }
         if (report.decryptError) {
           logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
@@ -7845,7 +7847,9 @@ const materializeCompactReportFromFacts = async (attempt: any, binding: ReportJo
     const policy=await loadProjectionPolicyForAssessment(child,result,reuse?entry!.runtime:undefined)
     if(policy.snapshotError)throw new Error('Frozen report disclosure unavailable')
     const unit={itemId:item.id,type:'SCALE',kind:'scale',scaleId:item.scaleId,scaleCode:item.scale?.code,scaleName:item.scale?.name||'未知量表',result}
-    Object.defineProperty(unit,'__scaleProjectionPolicy',{value:policy.policy,enumerable:false});unitReports.push(unit)
+    Object.defineProperty(unit,'__scaleProjectionPolicy',{value:policy.policy,enumerable:false})
+    attachScaleReportPresentation(unit,policy.reportDefinition)
+    unitReports.push(unit)
   }
   const report={...(attempt.trainingFlowScope?{trainingFlow:trainingFlowProvenance(attempt.trainingFlowScope)}:{}),...(attempt.trainingVariantScope?.variant?{trainingVariant:trainingVariantProvenance(attempt.trainingVariantScope)}:{}),id:attempt.id,assessmentId:attempt.compositeAssessment.id,name:attempt.compositeAssessment.name,productKind:'QUESTIONNAIRE',reportMode:'COLLECTION_ONLY',
     anonymousCode:attempt.anonymousCode,completedAt:attempt.completedAt,totalTime:attempt.totalTime,backgroundValues,unitReports}

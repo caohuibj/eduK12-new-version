@@ -1,6 +1,6 @@
 import {useEffect,useId,useMemo,useRef,useState,type KeyboardEvent} from 'react'
 import {ArrowRight,CheckCircle2,Download,FileSpreadsheet,FolderOpen,LockKeyhole,RefreshCw,Upload} from 'lucide-react'
-import {componentRequest as api,uploadComponentWorkbook,downloadComponentTemplate,componentDocument,componentContentPlaceholder,type ComponentDocument,type ComponentDraft,type ComponentPointer,type ComponentPreview,type ImportResult,type ComponentAxis} from '../../api/scaleComponentImport'
+import {componentRequest as api,uploadComponentWorkbook,downloadComponentTemplate,componentDocument,componentContentPlaceholder,type ComponentDocument,type ComponentDraft,type ComponentPointer,type ComponentPreview,type ImportResult,type ComponentAxis,type ReportPayload} from '../../api/scaleComponentImport'
 import type {StandardOnboardingTarget} from '../../api/surveyStandard'
 import {ScaleDefinitionEditor} from '../ScaleDefinitionEditor'
 import type {ScaleDefinition} from '../scaleDefinitionEditorModel'
@@ -8,7 +8,7 @@ import {ReportTemplateFields} from '../../modules/assessment-core/report/ReportT
 import {EntryAdmissionChoices,type StandardCombinationEntryAdmissionProduct} from '../../components/scale-governance/EntryAdmissionChoices'
 import AdminStepUp from '../../admin/AdminStepUp'
 import ScaleComponentPreview from './ScaleComponentPreview'
-import { ScaleComponentReportEditor, type StandardReportDefinition } from './ScaleComponentReportEditor'
+import { ScaleComponentReportEditor, ScaleComponentReportPresentation, type StandardReportDefinition } from './ScaleComponentReportEditor'
 import type {StandardDelegationTarget} from './StandardDelegationPanel'
 import StandardEntryAssignmentLinks from './StandardEntryAssignmentLinks'
 import './scale-component-manager.css'
@@ -119,6 +119,12 @@ export default function ScaleComponentManager({actorId,initialCombination,initia
  },'正在批准并试运行；评分、报告和数据库回读通过后才会上线…')
  const c=advancedEdited?undefined:doc?.changedParts.CONTENT,rawReport=advancedEdited?null:doc?.changedParts.REPORT?.payload,r=rawReport&&typeof rawReport==='object'?rawReport:null,report=r?('definition'in r?r.definition:r):null,template=r&&'template'in r?r.template:null
  const effective=c?.definition??preview?.triplet?.definition
+ const updateReportPayload=(update:(payload:ReportPayload)=>ReportPayload)=>mutate(d=>{
+  const axis=d.changedParts.REPORT!
+  return {...d,changedParts:{...d.changedParts,REPORT:{...axis,payload:update(axis.payload!)}}}
+ })
+ const updateReportDefinition=(next:StandardReportDefinition)=>updateReportPayload(payload=>
+  'definition'in payload?{...payload,definition:next}:next)
  const updateC=(action:ScaleDefinition|((previous:ScaleDefinition)=>ScaleDefinition))=>mutate(d=>({...d,changedParts:{...d.changedParts,CONTENT:{...d.changedParts.CONTENT!,definition:componentContentPlaceholder(typeof action==='function'?action(d.changedParts.CONTENT!.definition):action)}}}))
  const setAxisVersion=(axis:ComponentAxis,version:string)=>mutate(d=>{
   if(axis==='REPORT'){const old=d.changedParts.REPORT!,p=old.payload;return {...d,changedParts:{...d.changedParts,REPORT:{version,payload:p?('definition'in p?{...p,definition:{...p.definition,reportVersion:version}}:{...p,reportVersion:version}):null}}}}
@@ -175,8 +181,19 @@ export default function ScaleComponentManager({actorId,initialCombination,initia
     </fieldset>}
     <fieldset disabled={busy||readOnly} className="component-fields"><legend>内容编辑</legend>
      {c&&simpleDefinition(c.definition)&&<details className="component-technical"><summary>使用已有量表编辑器编辑 C</summary><nav className="component-editor-tabs" aria-label="量表编辑内容">{(['basic','items','responses','scores'] as const).map(t=><button key={t} aria-pressed={tab===t} onClick={()=>setTab(t)}>{tabs[t]}</button>)}</nav><ScaleDefinitionEditor definition={c.definition} setDefinition={updateC} activeTab={tab} readOnly={readOnly} controlsDisabled={busy} saveDefinition={save} mediaEnabled={false}/></details>}
-     {isScoreOnlyReport(report)&&effective&&simpleDefinition(effective)&&<details className="component-technical"><summary>使用已有报告内容编辑器</summary><ScaleDefinitionEditor definition={{...effective,report}} setDefinition={action=>{const next=typeof action==='function'?action({...effective,report}):action;mutate(d=>{const old=d.changedParts.REPORT!;return {...d,changedParts:{...d.changedParts,REPORT:{...old,payload:old.payload&&'definition'in old.payload?{...old.payload,definition:next.report}:next.report}}}})}} activeTab="report" readOnly={readOnly} controlsDisabled={busy} saveDefinition={save} mediaEnabled={false}/></details>}
-     {report&&Array.isArray(report.interpretations)&&(!effective||!simpleDefinition(effective)||!isScoreOnlyReport(report))&&<details className="component-technical"><summary>使用分档阈值报告编辑器</summary><ScaleComponentReportEditor report={report} scoreLabels={Object.fromEntries((effective?.scoring.scores??[]).map(s=>[s.key,s.label]))} disabled={busy||readOnly} onChange={nextReport=>mutate(d=>{const old=d.changedParts.REPORT!;return {...d,changedParts:{...d.changedParts,REPORT:{...old,payload:old.payload&&'definition'in old.payload?{...old.payload,definition:nextReport}:nextReport}}}})}/></details>}
+     {report&&doc?.changedParts.REPORT&&<ScaleComponentReportPresentation
+      version={doc.changedParts.REPORT.version} disabled={busy||readOnly}
+      visibility={r&&'definition'in r?r.reportVisibility:undefined}
+      artworkKey={report.artworkKey} onArtworkChange={key=>updateReportDefinition({...report,artworkKey:key||undefined})}
+      templateArtworkKey={template?.artworkKey} onTemplateArtworkChange={template
+       ?key=>updateReportPayload(payload=>'definition'in payload?{...payload,template:{...template,artworkKey:key||undefined}}:payload)
+       :undefined}
+      onVisibilityChange={visibility=>updateReportPayload(payload=>'definition'in payload
+       ?{...payload,reportVisibility:visibility}
+       :{definition:payload,reportVisibility:visibility})}
+     />}
+     {isScoreOnlyReport(report)&&effective&&simpleDefinition(effective)&&<details className="component-technical"><summary>使用已有报告内容编辑器</summary><ScaleDefinitionEditor definition={{...effective,report}} setDefinition={action=>{const next=typeof action==='function'?action({...effective,report}):action;updateReportDefinition(next.report)}} activeTab="report" readOnly={readOnly} controlsDisabled={busy} saveDefinition={save} mediaEnabled={false}/></details>}
+     {report&&Array.isArray(report.interpretations)&&(!effective||!simpleDefinition(effective)||!isScoreOnlyReport(report))&&<details className="component-technical"><summary>使用分档阈值报告编辑器</summary><ScaleComponentReportEditor report={report} scoreLabels={Object.fromEntries((effective?.scoring.scores??[]).map(s=>[s.key,s.label]))} disabled={busy||readOnly} onChange={updateReportDefinition}/></details>}
      {template&&Array.isArray(template.blocks)&&effective&&simpleDefinition(effective)&&<details className="component-technical"><summary>使用已有报告结构编辑器</summary><ReportTemplateFields template={template} metricKeys={effective.scoring.scores.map(s=>s.key)} onChange={next=>mutate(d=>({...d,changedParts:{...d.changedParts,REPORT:{...d.changedParts.REPORT!,payload:{...d.changedParts.REPORT!.payload as object,template:next} as NonNullable<typeof r>}}}))}/></details>}
     </fieldset>
     <div className="component-fields"><button disabled={busy} className="component-disclosure" aria-expanded={advancedOpen||!doc} aria-controls={uid+'-definition'} onClick={()=>setAdvancedOpen(!advancedOpen)}>高级定义 · 完整 JSON{advancedOpen?'（收起）':'（展开）'}</button>

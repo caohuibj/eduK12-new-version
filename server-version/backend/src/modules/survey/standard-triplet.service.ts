@@ -2,6 +2,7 @@ import {scaleSourceClassificationTags,catalogClassificationTags,catalogTagFacets
 import {scaleAssessmentMediaReferences} from '../scale/scale-image-retention'
 import {retainAssessmentAssetReferences} from '../assessment-media/assessment-asset'
 import {authorizedTrainingMaterial} from '../assessment-media/training-materials'
+import { isProvisionedGitScalePublisher } from '../scale/onboarding/git-release-actor'
 import {ensureStandardNativeScale} from '../scale/onboarding/standard-release-native'
 import {computeDeclaredStandardTrial} from './standard-triplet.trial'
 import {approveStandardCombinationEntryPolicies,exactStandardCombinationEntryProducts} from '../assessment-governance/tool-entry-policy'
@@ -166,9 +167,7 @@ async function persistStandardTripletApproval(tx:Prisma.TransactionClient,actor:
   return input.requestId
 }
 export async function assertGitScalePublisher(tx:Db,actor:string){
- await assertStandardSystem(tx,actor)
- const [service]=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM users WHERE id=${actor} AND username='SYSTEM_GIT_RELEASE' FOR SHARE`
- if(!service)fail(403,'Git 量表发布需要 SYSTEM_GIT_RELEASE 部署身份')
+ if(!await isProvisionedGitScalePublisher(tx,actor))fail(403,'Git 量表发布需要 SYSTEM_GIT_RELEASE 部署身份')
 }
 
 /** Shared transaction for exact admin selections, component import, and Git sync.

@@ -9,7 +9,9 @@ async function main() {
   if (!actorId) throw new Error('The ops profile must provide SYSTEM_GIT_RELEASE_ACTOR_ID')
 
   const { loadDeclaredScaleReleases } = await import('../modules/scale/declarative/load')
+  const { assertLiveScaleReportArtwork } = await import('../modules/scale/declarative/live-artwork')
   const releases = loadDeclaredScaleReleases(inputRoot)
+  assertLiveScaleReportArtwork(inputRoot, releases)
   const { prisma } = await import('../config/database')
   try {
     const { syncGitScaleReleases } = await import('../modules/scale/onboarding/git-release-publication')

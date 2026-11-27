@@ -1,3 +1,4 @@
+import { GIT_RELEASE_USERNAME } from '../utils/gitReleaseIdentity'
 // Operator-only. No HTTP route can create/promote a SYSTEM_ADMIN or issue an
 // enrollment/recovery ticket. Real-account execution needs separate approval.
 import { readFileSync, writeFileSync, unlinkSync } from 'node:fs'
@@ -14,6 +15,7 @@ async function main() {
   const input = z.object({ action: z.enum(['CREATE_SYSTEM_ADMIN','ISSUE_ENROLLMENT','RECOVER']),
     username: z.string().regex(/^[A-Za-z0-9_.-]{4,64}$/), password: z.string().max(128).refine(isValidPassword).optional(),
     reason: z.string().trim().min(1).max(500) }).strict().parse(JSON.parse(readFileSync(0, 'utf8')))
+  if (input.username === GIT_RELEASE_USERNAME) throw new Error('Interactive credentials are not available for the Git release identity')
   const handoff = process.env.ADMIN_SECURITY_HANDOFF_FILE
   if (!handoff || !handoff.startsWith('/') || handoff.includes('\0')) throw new Error('Private absolute handoff file is required')
   if (input.action === 'CREATE_SYSTEM_ADMIN' && !input.password) throw new Error('Initial password required')

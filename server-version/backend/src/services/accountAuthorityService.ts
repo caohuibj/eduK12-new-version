@@ -1,3 +1,4 @@
+import { isGitReleaseAccount } from '../utils/gitReleaseIdentity'
 import { PlatformRole, Prisma } from '@prisma/client'
 import { prisma } from '../config/database'
 import {
@@ -98,7 +99,7 @@ export async function forceResetPasswordBySystemAdmin(input: {
       FOR UPDATE
     `
     const target = targets[0]
-    if (!target) {
+    if (!target || isGitReleaseAccount(target.id, target.username)) {
       throw new AccountAuthorityError('USER_NOT_FOUND', '用户不存在', 404)
     }
 

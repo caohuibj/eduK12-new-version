@@ -71,7 +71,9 @@ export const encryptCompactCompositeReport=async(report:any,binding:Binding,chil
       assertScaleFactsBinding(facts,child);units.push({assessmentId:child.id,sourceResultHash:facts.sourceResultHash})
     }
     if(unit.assessmentId !== undefined && unit.assessmentId !== child.id)throw new Error('Report assessment identity mismatch')
-    layoutUnits.push({...pick(unit,headerKeys),...(unit.assessmentId !== undefined?{hasAssessmentId:true}:{}),...(unit.rawScoreFeedback !== undefined?{hasRawScoreFeedback:true}:{}),...(unit.__scaleProjectionPolicy?{scaleProjectionPolicy:unit.__scaleProjectionPolicy}:{})})
+    layoutUnits.push({...pick(unit,headerKeys),...(unit.assessmentId !== undefined?{hasAssessmentId:true}:{}),...(unit.rawScoreFeedback !== undefined?{hasRawScoreFeedback:true}:{}),
+      ...(unit.__scaleProjectionPolicy?{scaleProjectionPolicy:unit.__scaleProjectionPolicy}:{}),
+      ...(unit.__scaleReportPresentation?{scaleReportPresentation:unit.__scaleReportPresentation}:{})})
   }
   const [layout]=await templates.saveMany([{kind:'COMPOSITE_REPORT_LAYOUT',value:{version:1,root:pick(report,rootStatic),units:layoutUnits}}])
   const personal=Object.fromEntries(Object.entries(report).filter(([key])=>!rootStatic.includes(key)&&key!=='unitReports'))
@@ -173,11 +175,12 @@ export const decryptCompactCompositeReport=async(encrypted:string,binding:Bindin
       if(frozenMetricDefinitions)Object.defineProperty(unit,'__frozenMetricDefinitions',{value:frozenMetricDefinitions,enumerable:false})
       unitReports.push(unit);continue
     }
-    const row=byId.get(source.assessmentId!)!,{scaleProjectionPolicy,hasAssessmentId,hasRawScoreFeedback,...header}=meta
+    const row=byId.get(source.assessmentId!)!,{scaleProjectionPolicy,scaleReportPresentation,hasAssessmentId,hasRawScoreFeedback,...header}=meta
     const {result}=await restoreCompactScaleFacts(facts[scaleIndex++],{canonical:false,reportOnly:sharedControlWritesEnabled()},templates)
     const unit={...header,...(hasAssessmentId === true?{assessmentId:source.assessmentId}:{}),...(hasRawScoreFeedback === true?{rawScoreFeedback:result.rawScoreFeedback}:{}),completedAt:row.completedAt,totalTime:row.totalTime,method:result.method,caveats:result.caveats,disclaimer:result.disclaimer,
       result,quality:result.quality,scores:result.scores,references:result.references,interpretations:result.interpretations}
     if(scaleProjectionPolicy)Object.defineProperty(unit,'__scaleProjectionPolicy',{value:scaleProjectionPolicy,enumerable:false})
+    if(scaleReportPresentation)Object.defineProperty(unit,'__scaleReportPresentation',{value:scaleReportPresentation,enumerable:false})
     unitReports.push(unit)
   }
   return {...layout.root,...manifest.personal,unitReports}

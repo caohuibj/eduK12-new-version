@@ -10,6 +10,7 @@ import {parameterPayloadSchema} from '../component-import/contract'
 import {listScaleInstrumentSources} from '../onboarding/instrument-registry'
 import {scaleReportVisibilitySchema} from '../policy/schema'
 import {scaleReportDefinitionSchema, type ScaleDefinitionV2} from '../scale-definition'
+import {activeScaleDeclarations} from './replacement'
 
 const toolKeySchema = z.string().max(120).regex(/^[a-z][a-z0-9_]*$/)
 const contentVersionSchema = z.string().regex(/^\d+\.\d+\.\d+$/)
@@ -187,15 +188,10 @@ function resolveTool(root: string, toolKey: string): DeclaredTool {
     candidates.set(triplet.combinationHash, triplet)
     releases.push({...release, toolKey, triplet})
   }
-  const byKey = new Map(releases.map(release => [release.releaseKey, release]))
-  for (const release of releases) {
-    const chain = new Set([release.releaseKey])
-    let predecessor = release.replaces
-    while (predecessor && byKey.has(predecessor)) {
-      if (chain.has(predecessor)) throw new Error(`${manifestPath}: cyclic replacement for ${release.releaseKey}`)
-      chain.add(predecessor)
-      predecessor = byKey.get(predecessor)?.replaces
-    }
+  try {
+    activeScaleDeclarations(releases)
+  } catch (error) {
+    throw new Error(`${manifestPath}: ${error instanceof Error ? error.message : String(error)}`)
   }
   return {releases, candidates: [...candidates.values()]}
 }

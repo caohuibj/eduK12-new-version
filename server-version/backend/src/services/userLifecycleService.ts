@@ -1,3 +1,4 @@
+import { isGitReleaseAccount } from '../utils/gitReleaseIdentity'
 import { prisma } from '../config/database'
 import {
   AccountAuthorityError,
@@ -35,14 +36,14 @@ export async function setUserActiveState(input: {
     return await prisma.$transaction(async (tx) => {
       await assertCurrentSystemAdmin(tx, input.actorUserId)
 
-      const targets = await tx.$queryRaw<UserStateRow[]>`
-        SELECT "id", "is_active" AS "isActive"
+      const targets = await tx.$queryRaw<Array<UserStateRow & { username: string }>>`
+        SELECT "id", "username", "is_active" AS "isActive"
         FROM "users"
         WHERE "id" = ${input.targetUserId} AND "account_domain" IN ('LEGACY','TRAINING')
         FOR UPDATE
       `
       const target = targets[0]
-      if (!target) {
+      if (!target || isGitReleaseAccount(target.id, target.username)) {
         throw new UserLifecycleError('USER_NOT_FOUND', '用户不存在', 404)
       }
 

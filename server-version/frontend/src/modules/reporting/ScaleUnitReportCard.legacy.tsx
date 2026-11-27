@@ -1,5 +1,6 @@
 import React from 'react'
 import { TrainingRawScoreFeedback, type MatchedRawScoreFeedback } from './TrainingRawScoreFeedback'
+import { ScaleReportArtworkHero, ScaleReportBandArtwork } from './ScaleReportArtwork'
 import {
   ReportCoreSummary,
   ReportDetails,
@@ -31,6 +32,8 @@ export type SafeScaleUnitReport = Pick<
   scores?: ExternalScaleScoreValue[]
   references?: ScaleReferenceValue[]
   interpretations?: ScaleInterpretationValue[]
+  artworkKey?: string
+  introductions?: Array<{ scoreKey: string; headline: string; summary: string; guidance?: string[] }>
   method?: ExternalScaleMethod | null
 }
 
@@ -158,6 +161,14 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
         {quality?.status && <span>数据质量：{qualityStatusLabel(quality.status)}</span>}
       </div>}
 
+      {!invalid && <ScaleReportArtworkHero artworkKey={report.artworkKey} />}
+      {!invalid && report.introductions?.map(entry => (
+        <ReportSection title={entry.headline} key={entry.scoreKey}>
+          <p className="whitespace-pre-line leading-relaxed">{entry.summary}</p>
+          {entry.guidance?.map(text => <p key={text} className="leading-relaxed">{text}</p>)}
+        </ReportSection>
+      ))}
+
       <ReportSection
         title={dimensionScores.length > 0 ? '结果概览' : '实际得分'}
         eyebrow="分数层"
@@ -208,25 +219,34 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportIma
         <div data-testid="scale-core-feedback">
           <ReportCoreSummary label="核心反馈">
             <div className="report-feedback-list">
-              {interpretations.map((interpretation) => (
-                <article key={interpretation.scoreKey} className="report-feedback">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h4>{interpretation.headline}</h4>
-                    {interpretation.label && <span className="text-sm font-normal text-gray-500">{interpretation.label}</span>}
-                  </div>
-                  <p className="whitespace-pre-line leading-relaxed">{interpretation.interpretation}</p>
-                  {interpretation.guidance.length > 0 && (
-                    <ul>
-                      {interpretation.guidance.map((entry, index) => (
-                        <li key={`${entry.category}-${index}`}><span className="font-medium">{guidanceLabel(entry.category)}：</span>{entry.text}</li>
-                      ))}
-                    </ul>
-                  )}
-                  {!compactMetadata && interpretation.limitations.length > 0 && (
-                    <p className="text-xs text-amber-700">解释限制：{interpretation.limitations.join('；')}</p>
-                  )}
-                </article>
-              ))}
+              {interpretations.map((interpretation) => {
+                const band = report.artworkKey && references.find(reference => reference.status === 'available'
+                  && reference.scoreKey === interpretation.scoreKey && reference.referenceVersion === interpretation.referenceVersion
+                  && reference.criterionBand)?.criterionBand
+                return (
+                  <article key={interpretation.scoreKey} className="report-feedback">
+                    <ScaleReportBandArtwork artworkKey={report.artworkKey} block={band ? { type: 'REFERENCE_BAND', metricKey: interpretation.scoreKey, bandKey: band.key } : undefined}>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4>{interpretation.headline}</h4>
+                          {interpretation.label && <span className="text-sm font-normal text-gray-500">{interpretation.label}</span>}
+                        </div>
+                        <p className="whitespace-pre-line leading-relaxed">{interpretation.interpretation}</p>
+                        {interpretation.guidance.length > 0 && (
+                          <ul>
+                            {interpretation.guidance.map((entry, index) => (
+                              <li key={`${entry.category}-${index}`}><span className="font-medium">{guidanceLabel(entry.category)}：</span>{entry.text}</li>
+                            ))}
+                          </ul>
+                        )}
+                        {!compactMetadata && interpretation.limitations.length > 0 && (
+                          <p className="text-xs text-amber-700">解释限制：{interpretation.limitations.join('；')}</p>
+                        )}
+                      </div>
+                    </ScaleReportBandArtwork>
+                  </article>
+                )
+              })}
             </div>
           </ReportCoreSummary>
         </div>
