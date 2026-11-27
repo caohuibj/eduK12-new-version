@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "wihic_cooperation_actual_en_lower_secondary_student/1.0.0/1.1.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "Three students carry out different parts of the same model-building activity.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
