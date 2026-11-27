@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "academic_self_concept_chemistry_zh_cn",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "63518b61b12ba18eeb5a07766e30b3dfa90a87d586b1fc859b66ca1cdcfef723",
+  "baseParametersHash": "57d286a19cb5df5894d74ef74031140011daadab917877a900f1fa1e7d00f25f",
+  "variants": [
+    {
+      "key": "student_chemistry_actions",
+      "title": "化学学习自评图文版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "Codex 内容编辑初审",
+            "reviewedAt": "2026-11-27T00:00:00Z",
+            "basis": "项目原施测中、后测四题及计分字典已比对；保留原有初中五档和高中三档的项目历史参考，不将参考位置解释为能力或绝对认同。"
+          }
+        },
+        "primaryScoreKeys": [
+          "academic_self_concept"
+        ],
+        "scoreOrder": [
+          "academic_self_concept"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "academic_self_concept",
+            "headline": "我怎么看自己的化学学习",
+            "source": {
+              "type": "reference_context"
+            },
+            "summary": "课上，老师指着一杯盐水问：“看不见盐粒了，盐到哪儿去了？”小岚在纸上画了一杯水，又把笔停住了。同桌问：“你看见了什么？你又是怎么想的？”她说：“我看见盐粒不见了，可这不能说明盐也不在了。”她把纸分成两栏，一栏画眼睛，一栏画一个小小的问号。一个原本答不上来的问题，就这样有了开头。\n\n学化学常常要从肉眼看到的现象，想象眼睛看不到的变化。你怎样看待自己学习化学的本领，心理学里叫“化学学科自我概念”。小岚原先觉得自己答题慢。换个角度看，她把“我看见了什么”和“我猜是怎么回事”分开了，这也是学化学的一种本领。回想这周的化学课，你有什么小进展，容易被一句“我学得怎么样”带过去？",
+            "bands": [
+              {
+                "key": "very_low",
+                "label": "回到你的化学课",
+                "summary": "这次，你给自己化学学习表现的评价落在项目参考组较低的一段。挑一个你还能说清的变化，哪怕只画两笔，再指着纸讲讲你看到了什么。能说清这一小步，就有了往下问的起点。",
+                "guidance": []
+              },
+              {
+                "key": "low",
+                "label": "回到你的化学课",
+                "summary": "这次均分在项目参考组里偏低。翻到最近没弄明白的一页，写下一句真正想问的话。比如：“水看起来一样，怎么知道里面还有盐？”带着这个具体问题去聊，比从头重读整章更容易开口。",
+                "guidance": []
+              },
+              {
+                "key": "middle",
+                "label": "回到你的化学课",
+                "summary": "你的均分落在项目参考组中间一段。下次看一道现象题，试试在纸上分两栏：左边记眼睛看见的，右边记你想到的解释。哪一栏更顺手，哪一栏还想找人聊一聊？",
+                "guidance": []
+              },
+              {
+                "key": "high",
+                "label": "回到你的化学课",
+                "summary": "这次均分在项目参考组里偏高。找一道你最近讲得通的化学题，圈出最关键的一条线索。如果同桌问“凭什么这样想”，你会先指给他看哪条？",
+                "guidance": []
+              },
+              {
+                "key": "very_high",
+                "label": "回到你的化学课",
+                "summary": "这次均分落在项目参考组较高的一段。挑一个你很有把握的解释，画成一张能交给同桌的图。听听同桌追问哪里，再补一笔；把别人也讲明白，常能发现自己还可以说得更准的地方。",
+                "guidance": []
+              }
+            ],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "把“我化学行不行”暂时放在一边，换一个能在今天回答的问题：“这个变化，我能说清哪一步？”"
+              }
+            ],
+            "scoreLabel": "化学学习自评均分（试用版）",
+            "provisional": true
+          }
+        ],
+        "limitations": [
+          "这份试用版采用项目中同学段学生的历史数据来分组，初中和高中的分界各自计算。单次结果只描述这次自评在该参考组中的位置。",
+          "至少回答三题才计算均分。报告中的均分不能换算成考试成绩。没有适用的历史参考时，只阅读共用故事和学习建议。"
+        ],
+        "disclaimer": "这份报告供参与研究的学生自己阅读，也可以拿来和老师聊聊最近的一次化学学习经历。",
+        "illustrationKey": "chemistry-self-concept-salt-v1"
+      }
+    }
+  ]
+}

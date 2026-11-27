@@ -35,6 +35,7 @@ suite('Wave1 registered content install and publication (isolated PostgreSQL)',{
    const row=await db.scale.findUniqueOrThrow({where:{code:key}});expect(row.status).toBe('PUBLISHED');expect(row.instrumentClass).toBe('STANDARD')
    const snapshots=await db.$queryRaw<Array<{source_hash:string;axes:{reportVersion:string};source_snapshot:{executable:{definition:{report:unknown}}}}>>`SELECT source_hash,axes,source_snapshot FROM scale_axis_snapshots WHERE scale_id=${row.id} ORDER BY axis_hash`
    const additionalReports: Record<string, string[]> = {
+    academic_self_concept_chemistry_zh_cn: ['1.2.0'],
     teacher_subject_liking_chemistry_zh_cn: ['1.1.1'],
     academic_self_concept_chinese_zh_cn: ['1.2.0','1.3.0'],
    }

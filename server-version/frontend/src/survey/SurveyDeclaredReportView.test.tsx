@@ -30,6 +30,18 @@ describe('SurveyDeclaredReportView', () => {
     expect(fetchSpy).not.toHaveBeenCalled()
   })
 
+  it.each(['very_low', 'low', 'middle', 'high', 'very_high'])('pairs the chemistry illustration only with its released historical band %s', band => {
+    const blocks = [{...bandBlock(band), referenceKind:'normative_distribution', text:'回到你的化学课'}]
+    const report = {generatorVersion:'DECLARATIVE_REPORT_V1' as const, illustrationKey:'chemistry-self-concept-salt-v1', blocks}
+    const page = render(<SurveyDeclaredReportView report={report} />)
+    const images = screen.getAllByRole('img')
+    expect(images).toHaveLength(2)
+    expect(images[0]).toHaveAttribute('src',expect.stringContaining('chemistry-self-concept-v1/story.webp'))
+    expect(images[1]).toHaveAttribute('src',expect.stringContaining('chemistry-self-concept-v1/'+band+'.webp'))
+    page.rerender(<SurveyDeclaredReportView report={{...report,blocks:[]}} />)
+    expect(screen.getAllByRole('img')).toHaveLength(1)
+  })
+
   const actionEdition = 'chinese-self-concept-door-with-actions-v2'
   const bandBlock = (bandKey: string, metricKey = 'academic_self_concept') => ({
     type: 'REFERENCE_BAND', metricKey, referenceKind: 'theoretical_range', bandKey,

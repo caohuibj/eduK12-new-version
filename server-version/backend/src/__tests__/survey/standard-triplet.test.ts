@@ -1,6 +1,7 @@
 import {describe,it,expect,afterAll} from 'vitest'
 import chineseActionMaterial from '../../modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-actions.json'
 import chineseReadingMaterial from '../../modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-variants.json'
+import {buildScaleResult} from '../../modules/scale/scale-result'
 import {scoreScale} from '../../modules/scale/scale-scoring'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {listScaleInstrumentSources} from '../../modules/scale/onboarding/instrument-registry'
@@ -70,6 +71,32 @@ describe('three independent versions and real synthetic scoring/report computati
    }
    expect(blocks).toContainEqual(expect.objectContaining({type:'METRIC',label:reading.scoreLabel}))
   }
+ })
+ it('retains distinct chemistry school-stage references for the authorized student report',()=>{
+  const key='academic_self_concept_chemistry_zh_cn', original=parts(key,'1.0.0')
+  const report=registeredParts(key).find(row=>row.axis==='REPORT'&&row.version==='1.2.0')
+  if(!report)throw new Error('Missing chemistry report')
+  const t=composeTriplet(key,{...original,REPORT:report})
+  expect(t.blockers).toEqual([])
+  expect(t.parts.CONTENT).toEqual(original.CONTENT)
+  expect(t.parts.PARAMETERS).toEqual(original.PARAMETERS)
+  expect(original.REPORT.hash).toEqual('dac5137016bbc81f09671fa320d0d53f1b81f9b65f2a5997405afd81573bf9f8')
+  expect(t.template?.illustrationKey).toBe('chemistry-self-concept-salt-v1')
+  for(const [grade,expected] of [['9',['very_low','low','middle','high','very_high']],['11',['low','middle','high','high','high']]] as const){
+   for(const [index,band] of expected.entries()){
+    const result=buildScaleResult({scaleId:key,instrumentKey:key,instrumentVersion:'1.0.0',name:t.title,
+     definition:t.definition,referenceSets:t.references,participantContext:{gradeLevel:grade},
+     answers:t.definition.items.map(item=>({itemCode:item.itemCode,responseValue:String(index+1)}))})
+    expect(result.scores[0].value).toBe(index+1)
+    expect(result.references[0].criterionBand?.key).toBe(band)
+    expect(result.interpretations[0].interpretation).toBe(t.definition.report.interpretations[0].bands.find(x=>x.key===band)?.summary)
+   }
+  }
+  const anonymous=buildScaleResult({scaleId:key,instrumentKey:key,instrumentVersion:'1.0.0',name:t.title,
+   definition:t.definition,referenceSets:t.references,answers:t.definition.items.map(item=>({itemCode:item.itemCode,responseValue:'3'}))})
+  expect(anonymous.scores[0].value).toBe(3)
+  expect(anonymous.references[0].status).toBe('unavailable')
+  expect(anonymous.interpretations[0].interpretation).toBe(t.definition.report.interpretations[0].summary)
  })
  it('a report-only change leaves content and parameters fixed, but creates a new combination',()=>{const s=ready[0],p=parts(s.identity.instrumentKey,s.identity.instrumentVersion),old=composeTriplet(s.identity.instrumentKey,p);const report=structuredClone(p.REPORT.payload) as any;report.reportVersion='new-report';report.interpretations[0].summary='Brief useful explanation.';p.REPORT={...p.REPORT,version:'new-report',payload:report,hash:canonicalHash(report)};const next=composeTriplet(s.identity.instrumentKey,p);expect(next.parts.CONTENT.hash).toBe(old.parts.CONTENT.hash);expect(next.parts.PARAMETERS.hash).toBe(old.parts.PARAMETERS.hash);expect(next.combinationHash).not.toBe(old.combinationHash);expect(next.blockers).toEqual([])})
  it('permits explicit empty parameters and no report while still scoring',()=>{const source=ready[0],p=parts(source.identity.instrumentKey,source.identity.instrumentVersion),empty=registeredParts(source.identity.instrumentKey).filter(p=>p.payload===null);p.PARAMETERS=empty.find(p=>p.axis==='PARAMETERS')!;p.REPORT=empty.find(p=>p.axis==='REPORT')!;const t=composeTriplet(source.identity.instrumentKey,p);expect(t.blockers).toEqual([]);expect(t.template).toBeNull();expect(t.references).toEqual([]);expect(computeStandardTrial(t,'no-report').every(c=>c.report===null&&c.scores.units.length===1)).toBe(true)})

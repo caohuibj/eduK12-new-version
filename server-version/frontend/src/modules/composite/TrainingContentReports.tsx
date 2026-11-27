@@ -1,5 +1,5 @@
 import type { CompositeReportAudience, TrainingContentReport } from './types'
-import { getDeclaredActionBand, type ChineseSelfConceptBand } from '../reporting/declaredReportActionBand'
+import { getDeclaredActionBand, type SelfConceptAction } from '../reporting/declaredReportActionBand'
 import { DeclaredBandFeedback, DeclaredReportIllustration } from '../reporting/DeclaredReportIllustration'
 import { ReportDetails, ReportSection } from '../reporting/ReportPrimitives'
 
@@ -10,7 +10,7 @@ function Metric({value}:{value:Record<string,unknown>}){
   const available=value.status==='INTERPRETABLE'&&value.display!=='REFERENCE_RESULT'&&typeof value.value==='number'&&Number.isFinite(value.value)
   return <><span>{available?String(value.value):'不可用'}</span>{text(value.unit)&&<span> {text(value.unit)}</span>}{value.status==='INVALID'&&<span>（质量无效）</span>}</>
 }
-function DeclaredBlock({value,showMetricKeys=true,actionBand}:{value:unknown;showMetricKeys?:boolean;actionBand?:ChineseSelfConceptBand}){
+function DeclaredBlock({value,showMetricKeys=true,actionBand}:{value:unknown;showMetricKeys?:boolean;actionBand?:SelfConceptAction}){
   const block=object(value)
   if(!block)return null
   switch(block.type){
