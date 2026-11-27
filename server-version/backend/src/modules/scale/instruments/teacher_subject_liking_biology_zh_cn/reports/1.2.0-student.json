@@ -1,0 +1,122 @@
+{
+  "toolKey": "teacher_subject_liking_biology_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "学生感知教师喜爱生物图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对项目3题、1–6 分选项、最少2题的均分计分及原理论分档。"
+      }
+    },
+    "primaryScoreKeys": [
+      "teacher_subject_liking"
+    ],
+    "scoreOrder": [
+      "teacher_subject_liking"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "teacher_subject_liking",
+        "headline": "老师拿着一片叶子讲了多久？",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "老师带了两片叶子进生物教室，先让大家画叶脉，再把两片叶子举在一起，说：“先看看哪里一样。”小原记住的是老师追问了三回，觉得老师真的喜欢研究叶子。同桌只记住自己画漏了一条线。后来他们对照笔记，才发现各自留意到的是不同细节。\n\n这份问卷记录你从课上感受到的老师对生物的兴趣。一次提问、一段解释，或者老师反复指给你看的细节，都可能影响课堂印象。把看见的事和自己的理解分开记，试着从中找一件可以继续探究的小事。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "画下一个课堂动作",
+            "summary": "回想老师在课上举起或指过什么，把它画在纸上。再写下你当时为什么注意到它。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "挑一处想看的细节",
+            "summary": "翻开那节课的图，自己先圈一处想看清的细节。找同学聊聊，问他怎么认出图上这个地方。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "比较两份课堂笔记",
+            "summary": "请同桌各选一个记得最清楚的课堂片段。对着笔记说说你们从哪里感受到老师对这部分感兴趣。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "复述一次课堂追问",
+            "summary": "选一个让你觉得老师很投入的现象。用课本图给同学讲老师怎样追问，再加一个你自己的问题。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "带着一个问题再观察",
+            "summary": "从课堂上老师常追问的问题里选一个。下次看叶片或看同类图时，先拿这个问题试一试，把发现带回课堂。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "在笔记上写下一个课堂细节，再写一句你是怎样理解它的。下次上课看看自己又留意到什么。"
+          }
+        ],
+        "scoreLabel": "学生感知教师喜爱生物均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "至少答2道题才计算均分。均分只描述你这次从课堂感受到的老师对学科的兴趣。",
+      "五档沿用按 1–6 分量尺估算的区间，用于选择一条试用建议。报告省略学段比较。"
+    ],
+    "disclaimer": "学生可以用这份报告回顾一次真实课堂经历，也可以拿一个具体问题跟同伴或老师聊一聊。",
+    "artworkKey": "teacher_subject_liking_biology_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "teacher_subject_liking_biology_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "teacher_subject_liking-very-low.webp",
+      "alt": "学生在笔记里画下老师举起的一片叶子。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "teacher_subject_liking-low.webp",
+      "alt": "学生指着书上想进一步辨认的一条叶脉。",
+      "width": 354,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "low"
+    },
+    {
+      "file": "teacher_subject_liking-middle.webp",
+      "alt": "同桌对照同一节生物课的不同记录。",
+      "width": 658,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "middle"
+    },
+    {
+      "file": "teacher_subject_liking-high.webp",
+      "alt": "课堂上老师指着黑板的叶片图，学生留意老师追问的细节。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "high"
+    },
+    {
+      "file": "teacher_subject_liking-very-high.webp",
+      "alt": "学生拿着叶片核对自己刚写下的记录。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "生物老师举起两片叶子，学生各自观察并记录。",
+    "width": 506,
+    "height": 506
+  }
+}
