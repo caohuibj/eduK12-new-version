@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "tswq_zh_cn/1.0.1/1.3.0-teacher-trial",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "两位老师课后看一份课堂作品，交流今天教学中的一处小进步。",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

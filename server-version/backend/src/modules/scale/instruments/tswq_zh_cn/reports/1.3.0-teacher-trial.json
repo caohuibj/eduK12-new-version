@@ -1,0 +1,130 @@
+{
+  "toolKey": "tswq_zh_cn",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0-teacher-trial",
+  "title": "教师主观幸福感｜从两个方向回顾一个月（试用版）",
+  "report": {
+    "reportVersion": "1.3.0-teacher-trial",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "依据 Renshaw 2020 英文指南和 2022 授权说明逐项核对现用 8 题、过去一个月、四级响应、奇偶题各 4–16 合计和总分 8–32。沿用独立中文工作稿及完整作答计算。该版本的本地译审与等值验证待补充，未套用谢家树等 2024 年发表修订版的研究结果。"
+      }
+    },
+    "primaryScoreKeys": [
+      "school_connectedness",
+      "teaching_efficacy",
+      "teacher_subjective_wellbeing"
+    ],
+    "scoreOrder": [
+      "school_connectedness",
+      "teaching_efficacy",
+      "teacher_subjective_wellbeing"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "school_connectedness",
+        "scoreLabel": "学校归属（4–16，试用）",
+        "headline": "在学校里，哪些时刻让你觉得有人可以商量",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有时只是一位同事认真听完你的不同意见，或者有人在难推进的课后主动问一句。这样的时刻，常比认识多少人更能说明你是否感到被接纳。\n\n这部分回顾过去一个月，你感到属于学校、能做自己、被关心和尊重的频率。已有可靠的联系可以保留。归属感也会受同伴互动、工作安排和学校支持影响。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "如果你想获得一点支持，先想清楚眼下需要的是有人听、一起备课，还是问清资源。选择一个你信任的人或适合的场合，提出一个具体需求。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "teaching_efficacy",
+        "scoreLabel": "教学效能感（4–16，试用）",
+        "headline": "回看一次让你觉得教学发挥作用的片段",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一次讲解终于让学生把两个概念分清，下一堂课的活动却没按预期展开。两件事都可能影响这段时间你对教学的感受。\n\n这四题整理过去一个月，你认为自己的教学有成效、能帮助学生学习、感到成功或有成就的频率。挑一个真实课堂片段，对照学生作品、回答或其他可观察反馈，能帮你更具体地理解这份自我感受。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "写下一次真实教学里用过的做法、收到的反馈和仍不清楚的地方。如有需要，带着一个具体的例子和同事一起看。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "teacher_subjective_wellbeing",
+        "scoreLabel": "教师整体工作体验（8–32，试用）",
+        "headline": "学校支持和教学体验，可以各看一眼",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有的人对最近的教学很有成就感，却希望找到可以商量工作的人。有人有同事可以依靠，也正为一项课堂任务费力。两种体验的整体分数可能相近。\n\n总分是学校归属和教学效能这两组题的合计。读报告时可以回到过去一个月的真实工作，先选一个希望保留的条件，或一项最需要支持的地方。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "与合适的人商量一个可执行的调整，比如澄清一项要求、和同事共享材料或减少一次无效来回。过一段时间回看实际工作是否更顺，不必用分数当成变化的唯一依据。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Renshaw, T. L. (2020). Teacher Subjective Wellbeing Questionnaire (TSWQ): Measure and user guide. Open Science Framework，https://osf.io/6548v。Renshaw, T. L., Long, A. C. J., & Cook, C. R. (2015). Assessing teachers’ positive psychological functioning at work. School Psychology Quarterly, 30(2), 289–306，https://doi.org/10.1037/spq0000112。问卷按 CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/) 署名，项目独立翻译并新增解释文案。",
+      "成人教师按过去一个月的经历自评。学校归属和教学效能各 4 题相加，每组 4–16，8 题合计 8–32。按项目规则每个分数使用各自题组的完整作答。当前译稿的本地效度和常模待补充。",
+      "谢家树等 2024 年《教师主观幸福感量表的中文修订》是独立发表的中文版本，研究证据对应其专用题本。本报告沿用项目独立简体中文工作译稿。"
+    ],
+    "disclaimer": "面向成年教师个人反思和研究试用，帮助回顾最近一个月的学校归属与教学感受。",
+    "artworkKey": "tswq_zh_cn/1.0.1/1.3.0-teacher-trial"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0-teacher-trial",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
