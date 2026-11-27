@@ -1,0 +1,101 @@
+{
+  "toolKey": "ctas2_cognitive_en",
+  "contentVersion": "1.0.1",
+  "parameterVersion": "default",
+  "version": "1.3.0",
+  "title": "When exam thoughts crowd the page (research pilot)",
+  "report": {
+    "reportVersion": "1.3.0",
+    "primaryScoreKeys": [
+      "cognitive_test_anxiety"
+    ],
+    "scoreOrder": [
+      "cognitive_test_anxiety"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "cognitive_test_anxiety",
+        "headline": "When exam thoughts crowd the page",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Before a test, a thought about the result can show up while you are still trying to read the first question. During the test, it can be hard to return to the task after getting stuck. The CTAS-2 asks how typical experiences like these feel across different stages of testing. The 24 answers give a single total, from 24 to 96. A larger total means that the descriptions of exam-related thinking and worry felt more typical overall. Two people with the same total may have quite different reasons for wanting support.\n\nOne useful conversation starts with a specific moment. Describe what you were trying to do, what was on your mind, and what would have made the next step easier. Exam conditions, accessibility and available support can help explain the situation.",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Pick one ordinary moment before, during, or after a test. Write down the task in front of you, the thought that showed up and one realistic support that might help."
+          },
+          {
+            "category": "strategy",
+            "text": "In low-pressure practice, rehearse one restart sequence for getting stuck: read what is being asked, note what you do know, and—only where the rules allow—decide whether to continue or move on and return. Use one sequence that fits the setting; it does not guarantee a result and does not require perfect calm."
+          },
+          {
+            "category": "support",
+            "text": "If exam-related worry repeatedly disrupts sleep, preparation or daily life, take one concrete example to a trusted educator, learning-support professional or qualified mental-health professional. No score threshold is required before a concern deserves attention, and asking for help is not evidence of poor effort."
+          }
+        ],
+        "scoreLabel": "Exam-related thinking and worry total (24–96; descriptive)",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "This report is for an English-language adult research pilot, based mainly on university evidence. It is not a Chinese K12 norm and must not be used for diagnosis, school ranking, selection or grade prediction.",
+      "Only one 24-item raw total is calculated. The report does not infer preparation, test-taking or post-test subscores, causes, percentile ranks or severity categories.",
+      "All 24 responses are required for a numeric total; the source package does not establish a defensible proration rule for missing items.",
+      "Cassady, J. C., Cognitive Test Anxiety Scale – 2nd Edition. Thomas, Cassady & Finch (2018), Journal of Psychoeducational Assessment. The author makes the original English scale available for attributed research use. This text and artwork were prepared by the platform."
+    ],
+    "disclaimer": "Research-oriented, non-diagnostic description only. Use is limited to the author-permitted research/professional scope with appropriate citation and any separately required platform authorization.",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "AI-assisted source and editorial review; not human expert or psychometric approval",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "Compared the repository 24-item English content, response anchors, sum scoring, no-reference policy and rights scope against the author-hosted CTAS-2 form and author permission page. No C, P, disclosure, authorization or runtime change is claimed."
+      }
+    },
+    "artworkKey": "ctas2_cognitive_en/1.0.1/1.3.0"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.3.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "subject": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "educationalContent": false,
+        "artwork": true
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "ctas2_cognitive_en/1.0.1/1.3.0",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "A university student at an exam desk pauses briefly to work out the first step.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
