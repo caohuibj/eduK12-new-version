@@ -1,0 +1,133 @@
+{
+  "toolKey": "texi_parent_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-parent-en",
+  "title": "TEXI Parent Observation (English, pilot)",
+  "report": {
+    "reportVersion": "1.2.0-parent-en",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "PARENT_REPORT",
+      "audience": "parent",
+      "locale": "en"
+    },
+    "primaryScoreKeys": [
+      "working_memory",
+      "inhibition"
+    ],
+    "scoreOrder": [
+      "working_memory",
+      "inhibition",
+      "total_mean"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "working_memory",
+        "scoreLabel": "Working Memory (observer-rated mean)",
+        "headline": "Look at how a sequence of steps is managed",
+        "summary": "Imagine that you ask your teenager to pack for a trip and give three instructions in a row. They might remember the last request while losing track of an earlier one, especially if the conversation is interrupted. This score averages nine observations about keeping track of instructions, steps, or plans. A higher mean means more of the difficulties described in these items fit what you observed.",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Pick one familiar routine and note which step was easy to follow and where the teenager needed a repeat or reminder. Ask what they remember about that moment before drawing a conclusion."
+          },
+          {
+            "category": "strategy",
+            "text": "Try making the order of one routine visible with two or three short notes. Observe whether that changes how easily the teenager picks up the next step."
+          }
+        ],
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true
+      },
+      {
+        "scoreKey": "inhibition",
+        "scoreLabel": "Inhibition (observer-rated mean)",
+        "headline": "Notice the start, pause, and stop points",
+        "summary": "A teenager might intend to put their phone down and start a household task but keep watching a video after the agreed time. On another day, they might start promptly when the next step is clear. This score averages eleven observations about putting a preferred activity aside, pausing a response, and starting or finishing some tasks. A higher mean reflects more difficulties as observed by you.",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Recall a transition that went smoothly and one that was harder. Note what the teenager was doing just before each change and what cues were available."
+          },
+          {
+            "category": "environment",
+            "text": "Agree together on a clear point to switch activities, such as the end of one video. Try giving the next step in advance and notice what happens."
+          }
+        ],
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true
+      },
+      {
+        "scoreKey": "total_mean",
+        "scoreLabel": "Overall item mean (Huisurvey summary)",
+        "headline": "Read the two kinds of observations first",
+        "summary": "This summary averages all 20 responses. It blends experiences across two groups of items, with nine relating to working memory and eleven to inhibition. Different patterns can produce the same overall mean. Read the two subscale means alongside the situations you actually observed.",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Choose a situation that helps explain one subscale response and jot down what you saw. If you discuss the result together, give the teenager room to describe their experience."
+          }
+        ],
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "The two subscale means summarise what you reported as the parent observer. Consider the teenager’s circumstances and how well you could see the situations in question.",
+      "Scores use the existing 1–5 response scale. The Working Memory and Inhibition means are the two published subscale results. The overall item mean is a Huisurvey descriptive summary. This pilot does not apply norms, score bands, or thresholds.",
+      "Use this English observer form for teenagers ages 13–19. Parent, teacher, and self-reports reflect different perspectives and should be considered separately.",
+      "Source: Thorell, Lazarević, Milovanović, and Bugarski Ignjatović (2020), Teenage Executive Functioning Inventory (TEXI), https://doi.org/10.1080/09297049.2020.1726885. English observer form and scoring guide: https://www.chexi.se/."
+    ],
+    "disclaimer": "This pilot report is for describing observations and reviewing everyday support. Please do not use these results for diagnosis, ranking, disciplinary decisions, or school placement.",
+    "artworkKey": "texi_parent_zh_cn/1.0.0/1.2.0-parent-en"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-parent-en",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "texi_parent_zh_cn/1.0.0/1.2.0-parent-en",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "At home, a teenager plans a simple routine using blank task cards while a parent listens nearby.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
