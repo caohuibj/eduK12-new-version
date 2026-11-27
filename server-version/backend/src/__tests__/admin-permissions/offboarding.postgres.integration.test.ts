@@ -35,13 +35,15 @@ describe.skipIf(!enabled)('entry offboarding on disposable PostgreSQL',()=>{
     requireIsolatedReleaseDatabase(url)
     if(process.env.NODE_ENV!=='test'||new URL(url).pathname!=='/entry_offboarding_ci_test')
       throw new Error('Entry offboarding requires the disposable entry_offboarding_ci_test database')
+    const researcherLogin='offboarding-'+researcherId.slice(0,18)
     await db.user.createMany({data:[
       {id:systemId,username:'offboarding-system-'+systemId,accountDomain:'TRAINING',platformRole:'SYSTEM_ADMIN',passwordHash:'synthetic-only'},
       {id:departingId,username:'offboarding-manager-'+departingId,accountDomain:'TRAINING',passwordHash:'synthetic-only'},
       {id:successorId,username:'offboarding-manager-'+successorId,accountDomain:'TRAINING',passwordHash:'synthetic-only'},
-      {id:researcherId,username:'offboarding-researcher-'+researcherId,accountDomain:'SURVEY',passwordHash:'synthetic-only'},
+      {id:researcherId,username:researcherLogin,accountDomain:'SURVEY',passwordHash:'synthetic-only'},
     ]})
     await db.adminTotpCredential.create({data:{userId:successorId,secretCipher:'synthetic-unusable'}})
+    await db.surveyAccount.create({data:{userId:researcherId,loginName:researcherLogin,normalizedLogin:researcherLogin}})
     for(const entry of ADMIN_ENTRIES)
       await changeEntryGrant({...actor(),targetUserId:departingId,entry,active:true,expectedVersion:0,reason:'Synthetic entry'})
     await changeEntryGrant({...actor(),targetUserId:successorId,entry:'SURVEY',active:true,expectedVersion:0,reason:'Synthetic successor entry'})
@@ -55,6 +57,9 @@ describe.skipIf(!enabled)('entry offboarding on disposable PostgreSQL',()=>{
       })
     await expect(previewEntryOffboarding(departingId,'TRAINING',successorId)).rejects.toMatchObject({statusCode:409})
     await expect(previewEntryOffboarding(departingId,'SURVEY',departingId)).rejects.toMatchObject({statusCode:409})
+    await db.user.update({where:{id:successorId},data:{role:'TEACHER',teacherApproved:false}})
+    await expect(previewEntryOffboarding(departingId,'SURVEY',successorId)).rejects.toMatchObject({statusCode:409})
+    await db.user.update({where:{id:successorId},data:{teacherApproved:true}})
     await expect(previewEntryOffboarding(departingId,'SURVEY',successorId))
       .resolves.toMatchObject({successors:expect.arrayContaining([expect.objectContaining({id:successorId})])})
   })

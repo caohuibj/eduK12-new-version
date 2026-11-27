@@ -23,6 +23,7 @@ function successorsSql(basis:EntryBasis) {
     FROM users u JOIN admin_entry_grants g ON g.user_id=u.id AND g.entry=${basis.entry} AND g.revoked_at IS NULL
     WHERE u.id<>${basis.userId} AND u.platform_role='STANDARD' AND u.account_domain IN ('TRAINING','LEGACY')
       AND u.is_active AND NOT u.is_frozen AND NOT u.must_change_password
+      AND (u.role<>'TEACHER' OR u.teacher_approved)
       AND (u.expires_at IS NULL OR u.expires_at>clock_timestamp())
       AND (EXISTS (SELECT 1 FROM admin_totp_credentials t WHERE t.user_id=u.id)
         OR (${!adminRequiresTotp()} AND EXISTS (SELECT 1 FROM admin_security_keys k WHERE k.user_id=u.id)))`
@@ -177,7 +178,7 @@ function trainingImpact(basis:EntryBasis) {
       SELECT c.id,CASE WHEN c.status='DRAFT' THEN 'DRAFT' ELSE 'COLLECTING' END,c.name,false,c.revision::text
       FROM composite_assessments c
       WHERE c.status IN ('DRAFT','PUBLISHED') AND (c.expires_at IS NULL OR c.expires_at>statement_timestamp())
-        AND (EXISTS (SELECT 1 FROM composite_assessment_items i WHERE i.composite_id=c.id
+        AND (EXISTS (SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=c.id
           AND i.standard_combination_source#>>'{reference,authority,authorityEntryGrantId}'=${basis.id}
           AND i.standard_combination_source#>>'{reference,authority,authorityEntryGrantVersion}'=${String(basis.version)})
          OR EXISTS (SELECT 1 FROM jsonb_array_elements(c.training_content_snapshot->'units') AS unit(value)
