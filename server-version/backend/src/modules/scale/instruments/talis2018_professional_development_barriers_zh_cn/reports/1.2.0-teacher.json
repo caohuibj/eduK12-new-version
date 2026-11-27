@@ -1,0 +1,93 @@
+{
+  "toolKey": "talis2018_professional_development_barriers_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-teacher",
+  "title": "教师专业发展参加条件回顾（试用）",
+  "report": {
+    "reportVersion": "1.2.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN"
+    },
+    "primaryScoreKeys": [
+      "development_barriers"
+    ],
+    "scoreOrder": [
+      "development_barriers"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "development_barriers",
+        "scoreLabel": "专业发展参与障碍自述均分",
+        "headline": "找出一次想参加却没能参加的活动",
+        "summary": "可能你已经找到想学的内容，却发现不符合报名条件，费用较高，单位缺少支持，或因为家庭安排抽不出时间。也可能是单位本来就很少提供相关机会。五题取 1–4 均分，分数较高表示你在本次作答中更认同这些限制存在。",
+        "source": {
+          "type": "score_only"
+        },
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选最近一次想参加的活动。写下从看到通知到最终决定的过程，找出实际卡住的一步。即使整体均分相近，各人卡住的条件也可能完全不同。"
+          },
+          {
+            "category": "strategy",
+            "text": "把卡住的一步转换成可以讨论的安排，例如提前公开报名条件、提供费用信息、协调家庭安排，或与单位沟通能否增加相关活动机会。挑一项目前最能落实的事开始。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "五题答全才计算。当前采用最终五题，未纳入原完整题组中的工作时间冲突和缺少激励，因此解读只覆盖本报告列出的五种条件。",
+      "分数描述参加条件，不能用于判断教师的学习意愿、努力程度或专业能力。",
+      "本项目按答全的题目取等权原始均分。结果不能直接与 OECD 因子分、国际调查结果或常模对照。当前试用报告没有独立常模、评分等级或阈值。",
+      "来源：OECD（2018），Teaching and Learning International Survey (TALIS): Teacher Questionnaire – Shanghai (People's Republic of China), ISCED 2（简体中文），https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip。",
+      "本内容改编自 OECD 原作。改编稿中的观点和论证不代表 OECD 或其成员国的官方观点。"
+    ],
+    "disclaimer": "供成人初中教师回顾本次作答。请勿用于教师绩效、录用、问责或学校排名。",
+    "artworkKey": "talis2018_professional_development_barriers_zh_cn/1.0.0/1.2.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
