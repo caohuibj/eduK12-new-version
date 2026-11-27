@@ -1,0 +1,100 @@
+{
+  "toolKey": "wihic_student_cohesiveness_actual_en_lower_secondary_student",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student",
+  "title": "WIHIC | Notice the small signs of belonging",
+  "report": {
+    "reportVersion": "1.1.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "Eight English items 1–8 and the five frequency choices match Fraser (2023), Appendix A Table A1. The appendix’s top answer is Almost Always. Source © Fraser 2023, CC BY 4.0. The project retains C and the eight-item complete-response mean (1–5), without thresholds. This version adds original feedback only, for the student who answered."
+      }
+    },
+    "primaryScoreKeys": [
+      "student_cohesiveness"
+    ],
+    "scoreOrder": [
+      "student_cohesiveness"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "student_cohesiveness",
+        "scoreLabel": "Classmate connection (1–5 average)",
+        "headline": "Notice the small signs of belonging",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Jay walks into a classroom where most students already know one another. At the next table, someone makes space, explains where the materials are, and asks Jay what they think. Nothing dramatic happens. A few small moments make it easier to feel part of the class.\n\nYour answers describe how often you felt that classmates knew you, made you feel welcome, or helped when the work got difficult. They also reflect the help you were able to give. If those moments felt rare, the class might need more chances for students to get to know one another. You can use this report to notice one moment of connection you’d like to see more often.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Think of a moment someone made it easier to join in. Was it a greeting, an invitation, a shared joke, or help with directions? Write down what they did and what difference it made."
+          },
+          {
+            "category": "strategy",
+            "text": "In a routine class task, try one low-pressure way to connect. Ask a partner how they started, or invite someone already at your table to compare notes."
+          },
+          {
+            "category": "support",
+            "text": "If being left out keeps happening or it feels unsafe to join, tell a trusted adult about a concrete example. Ask them to help change how partners or groups are formed."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "© Barry J. Fraser, 2023. Adapted from What Is Happening In this Class? (WIHIC), Appendix A, Table A1, in The Evolution of the Field of Learning Environments Research, Education Sciences, 13(3), 257. https://doi.org/10.3390/educsci13030257 (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). The project presents one part separately, with its own instruction, scoring of complete answers, and student feedback.",
+      "The result is the mean of eight answers about one class. The five original answer choices run from Almost Never (1) to Almost Always (5). If an answer is missing, this part has no score.",
+      "Using this separate eight-question form with English-reading students ages 12–15 in grades 7–9 is this project’s scope. This item set has no separate validation or group benchmark. Each part of WIHIC stands alone in the report."
+    ],
+    "disclaimer": "This report describes your experience in one class. It is for reflection and does not grade you, your classmates, or your teacher.",
+    "artworkKey": "wihic_student_cohesiveness_actual_en_lower_secondary_student/1.0.0/1.1.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
