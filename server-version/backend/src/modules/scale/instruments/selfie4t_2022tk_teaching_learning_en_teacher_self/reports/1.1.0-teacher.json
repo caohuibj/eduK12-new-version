@@ -1,0 +1,168 @@
+{
+  "toolKey": "selfie4t_2022tk_teaching_learning_en_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "SELFIEforTEACHERS | Use digital tools where they make learning easier to see",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "European Commission JRC129699 Toolkit Annex I: 5 English stems and 30 descriptions in Area 3 match the registered C after punctuation/whitespace normalization. The official 2023 JRC131282 guide supplies the six scored levels and zero-point not-aware option. Both documents carry CC BY 4.0 with source and change attribution. C, source options and P are unchanged."
+      }
+    },
+    "primaryScoreKeys": [
+      "competence_3_1",
+      "competence_3_2",
+      "competence_3_3",
+      "competence_3_4",
+      "competence_3_5"
+    ],
+    "scoreOrder": [
+      "competence_3_1",
+      "competence_3_2",
+      "competence_3_3",
+      "competence_3_4",
+      "competence_3_5"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_3_1",
+        "scoreLabel": "Teaching (self-position, 0–6)",
+        "headline": "Choose the learning work first",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A simulation can make a process visible; a printed example can make it easier to study at one’s own pace. The decision starts with what learners should do with the idea. This response describes how you plan and teach with digital technologies.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Pick one objective and identify the moment when digital support would help learners think, practise, or express the idea. Use the simplest arrangement that achieves it."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_3_2",
+        "scoreLabel": "Guidance (self-position, 0–6)",
+        "headline": "Help early enough for learners to act",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A small check-in can catch the moment a learner loses direction. Helpful guidance makes the next action clearer and leaves the learner space to take it. This response describes how you use digital tools to guide learning before, during, and after a task.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Ask learners for an early sign of progress, such as a first line, a short explanation, or a question. Respond with one usable hint and give them time to try again."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_3_3",
+        "scoreLabel": "Collaborative learning (self-position, 0–6)",
+        "headline": "Make the shared task need several minds",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A shared document can host four separate contributions with very little collaboration. A task that requires learners to weigh ideas, agree on a decision, and explain their reasoning creates a different kind of work. Your response concerns how you use digital tools to support that process.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Set one common question. Ask each learner to contribute evidence, let the group resolve one difference, and have the group record the reason for its decision."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_3_4",
+        "scoreLabel": "Self-regulated learning (self-position, 0–6)",
+        "headline": "Give learners a next decision they can own",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Making a plan, noticing what changed, and choosing a revision are habits students can practise. A digital checklist or learning log is useful when it helps them choose rather than simply track compliance. This response describes how you support that responsibility.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Ask learners to name a goal, select an approach, and pause once to judge progress. At the end, invite them to record what they would keep or change the next time."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_3_5",
+        "scoreLabel": "Emerging technologies (self-position, 0–6)",
+        "headline": "Pilot the new tool on a small, answerable question",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A new tool can make an activity possible, but it can also introduce cost, distraction, or uncertainty. A small trial lets you observe what it adds before making it part of normal teaching. This response describes your exploration and considered use of emerging tools.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Pick one low-stakes task and one criterion for success. Check accessibility, data use, and output quality before inviting learners to try it, then compare with a familiar route."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "© European Union 2022 and 2023. Adapted from Anastasia Economou, SELFIEforTEACHERS Toolkit (2022), doi:10.2760/626409, Annex I, and SELFIEforTEACHERS: Designing and developing a self-reflection tool for teachers’ digital competence (2023), doi:10.2760/561258, p.11 and Annex 1. Both CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). The project separates this area and supplies new instructions and feedback. No EU endorsement is implied.",
+      "Each competence stands alone. The six ordered A1–C2 statements are represented by 1–6. A selected zero records ‘I am not aware of this competence’; an omitted response stays missing. There is no area total, proficiency band, or rank.",
+      "This fixed English project adaptation is for primary and secondary teachers reflecting on their own practice. The separate area has no independent validation or Chinese-language equivalence."
+    ],
+    "disclaimer": "For teachers’ own professional learning and reflection. The selection describes self-reported practice in one area of the fixed English adaptation and supplies no appraisal, school ranking, or EU certification.",
+    "artworkKey": "selfie4t_2022tk_teaching_learning_en_teacher_self/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
