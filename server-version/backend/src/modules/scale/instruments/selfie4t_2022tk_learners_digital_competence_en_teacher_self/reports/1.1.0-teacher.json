@@ -1,0 +1,187 @@
+{
+  "toolKey": "selfie4t_2022tk_learners_digital_competence_en_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "SELFIEforTEACHERS | Help learners leave with a digital habit they can reuse",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "European Commission JRC129699 Toolkit Annex I: 6 English stems and 36 descriptions in Area 6 match the registered C after punctuation/whitespace normalization. The official 2023 JRC131282 guide supplies the six scored levels and zero-point not-aware option. Both documents carry CC BY 4.0 with source and change attribution. C, source options and P are unchanged."
+      }
+    },
+    "primaryScoreKeys": [
+      "competence_6_1",
+      "competence_6_2",
+      "competence_6_3",
+      "competence_6_4",
+      "competence_6_5",
+      "competence_6_6"
+    ],
+    "scoreOrder": [
+      "competence_6_1",
+      "competence_6_2",
+      "competence_6_3",
+      "competence_6_4",
+      "competence_6_5",
+      "competence_6_6"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_6_1",
+        "scoreLabel": "Information and data literacy (self-position, 0–6)",
+        "headline": "Trace a claim to where it started",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Repeating a claim on several sites does not turn it into several independent sources. Following it back to who measured, reported, or created the material is a teachable routine. This response concerns how you let learners practise that routine with digital information.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Offer two accounts of a familiar claim. Have learners trace one piece of evidence to the original source and explain who produced it, when, and what it actually shows."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_6_2",
+        "scoreLabel": "Communication and collaboration (self-position, 0–6)",
+        "headline": "Choose the channel and explain the choice",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A short question, a working document, and feedback on a draft serve different purposes. Digital collaboration includes knowing when to move a conversation and how to keep others in the loop. Your response describes how you structure chances for learners to practise these choices.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Set a shared task with named roles, one place for decisions, and one turn for a teammate to give specific feedback. Ask the group what became easier and what still got lost."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_6_3",
+        "scoreLabel": "Content creation (self-position, 0–6)",
+        "headline": "Build for a reader who isn’t already in the room",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A useful digital artefact helps a real audience understand or do something. Learners have to decide what to show, what to leave out, and how to credit the materials they use. This response concerns how you give learners opportunities to make and revise such work.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Have learners produce a small explainer for someone unfamiliar with the topic. Invite a reader to try it, then ask the creators to fix one point of confusion and check all credits."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_6_4",
+        "scoreLabel": "Safety and wellbeing (self-position, 0–6)",
+        "headline": "Practise a safe first move",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A realistic scenario gives learners a chance to discuss what they could do before a situation becomes urgent. A tense group chat, an unexpected permission request, or a notification that keeps interrupting can each prompt a different response. Your selected statement describes how you build safe, healthy choices into learning.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Use a fictional scenario and ask learners to choose a safe immediate action, name who they could contact for help, and explain how their action would protect themselves or another person."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_6_5",
+        "scoreLabel": "Responsible use (self-position, 0–6)",
+        "headline": "Pause before a small choice becomes public",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A copied image, a forwarded screenshot, and a rushed reply all leave traces. Responsible use includes checking what you may share, whose information appears, and what the audience is likely to do with it. This response records how you teach those choices.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Before a class project is shared, use a three-question check: who made this, who appears in it, and who should be able to see it? Let learners describe a change they made after answering."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_6_6",
+        "scoreLabel": "Problem-solving (self-position, 0–6)",
+        "headline": "Make an error a source of information",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "When a tool produces a surprising result, trying every button makes it harder to tell what happened. Changing one thing at a time makes the problem easier to explain and the solution easier to transfer. Your response concerns opportunities for learners to use that process with digital tools.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Set a safe troubleshooting task. Ask learners to describe what should have happened, change one variable, record the result, and tell a partner what they would try next."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "© European Union 2022 and 2023. Adapted from Anastasia Economou, SELFIEforTEACHERS Toolkit (2022), doi:10.2760/626409, Annex I, and SELFIEforTEACHERS: Designing and developing a self-reflection tool for teachers’ digital competence (2023), doi:10.2760/561258, p.11 and Annex 1. Both CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). The project separates this area and supplies new instructions and feedback. No EU endorsement is implied.",
+      "Each competence stands alone. The six ordered A1–C2 statements are represented by 1–6. A selected zero records ‘I am not aware of this competence’; an omitted response stays missing. There is no area total, proficiency band, or rank.",
+      "This fixed English project adaptation is for primary and secondary teachers reflecting on their own practice. The separate area has no independent validation or Chinese-language equivalence."
+    ],
+    "disclaimer": "For teachers’ own professional learning and reflection. The selection describes self-reported practice in one area of the fixed English adaptation and supplies no appraisal, school ranking, or EU certification.",
+    "artworkKey": "selfie4t_2022tk_learners_digital_competence_en_teacher_self/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
