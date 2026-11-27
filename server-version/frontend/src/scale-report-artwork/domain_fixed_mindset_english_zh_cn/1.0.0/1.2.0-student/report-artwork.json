@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "domain_fixed_mindset_english_zh_cn/1.0.0/1.2.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生把一个英语长句分成较短的意群，并用连接线重新读懂句子",
+    "width": 512,
+    "height": 512
+  },
+  "bands": [
+    {
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "very_low",
+      "file": "very-low.webp",
+      "alt": "学生对照前后两次英语阅读记录，圈出真正起作用的一条线索",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "low",
+      "file": "low.webp",
+      "alt": "学生从多个英语学习难点中只挑出一个具体卡点",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "middle",
+      "file": "middle.webp",
+      "alt": "学生比较一次顺利和一次卡住的英语学习经历",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "high",
+      "file": "high.webp",
+      "alt": "学生连续三天用同一种分句方法练习短小英语任务",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "very_high",
+      "file": "very-high.webp",
+      "alt": "学生和同伴把英语困难拆成三步，并先尝试最小的一步",
+      "width": 512,
+      "height": 512
+    }
+  ]
+}

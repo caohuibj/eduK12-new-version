@@ -1,0 +1,123 @@
+{
+  "toolKey": "domain_fixed_mindset_english_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "英语学习天赋信念｜学生行动版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "artworkKey": "domain_fixed_mindset_english_zh_cn/1.0.0/1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目自编英语学科替换版三题、六点认同选项、无反向计分、至少两题与均分规则；沿用默认 P wave1-20261001-v2 的初高中共同理论五档。报告不提供人群位置、常模或能力判断；未修改 C、P、阈值与缺失规则。"
+      }
+    },
+    "primaryScoreKeys": [
+      "domain_fixed_mindset"
+    ],
+    "scoreOrder": [
+      "domain_fixed_mindset"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "domain_fixed_mindset",
+        "headline": "一句“我不擅长”，不必写成结局",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "读一个英语长句时，小澄看到后半句就乱了。他在连接词前画了一道线，先读两小段，再把意思接起来。句子没有变，入手方式变了；这不能证明天赋发生了什么，却说明一次卡住还不足以替未来下结论。\n\n这份量表记录你有多认同“英语学习天赋大致固定、很难改变”。均分越高，表示越认同这种固定信念，但不代表更好或更差，也不代表实际英语水平。比起急着给自己贴标签，可以选一个很小的任务，留下“原来卡在哪—试了什么—后来怎样”的记录。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "把一次方法生效的过程留下来",
+            "summary": "找一句原来读不顺、后来稍微顺一些的句子。圈出真正帮到你的线索，例如连接词、上下文或分句，再写下它具体帮了哪一步。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "把“不会英语”缩成一个卡点",
+            "summary": "从单词、句子关系、听辨或开口表达里只选一项，写清现在最先卡住的位置。为这个位置找一个例子或问一个具体问题。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "让两次学习经历说话",
+            "summary": "各选一次学得顺和学得不顺的经历，记下任务、方法和得到的帮助。两张记录不必得出同一个结论，只用来补充你还没注意到的条件。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "做一个三天的小尝试",
+            "summary": "连续三天用同一种小方法练同一类任务，例如给长句分段。每次只记一句：哪里更顺，哪里还卡着。三次记录比一句“有天赋或没天赋”更具体。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "先让第一步变得可完成",
+            "summary": "请老师或同学把一个困难拆成两三步，只选最小的一步试一次。你不需要马上改变看法，只要记下哪种提示有用、下一步还缺什么。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "遇到“我就是不擅长”的念头时，先把它改写成一个能观察的句子：“我现在卡在____，准备试____。”"
+          }
+        ],
+        "scoreLabel": "英语学习天赋固定信念均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "三道题至少答两道，按已答题目计算均分。五档只是把 1—6 分可选范围等距分开，初中和高中共同使用；没有该英语版本的经验样本。",
+      "这些试用分段不是同学中的位置、全国常模、心理转折点或诊断界线，也不提供百分位。",
+      "较高分只表示更认同固定信念，不是英语能力上限；较低分只表示较少认同，也不能证明学习策略、实际进步或成长心态。"
+    ],
+    "disclaimer": "这份报告供七至十二年级学生回顾自己的英语学习信念。它不评价能力，也不预测未来成绩。"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
