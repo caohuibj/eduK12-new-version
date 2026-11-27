@@ -1,0 +1,21 @@
+{
+  "toolKey": "academic_self_concept_chinese_zh_cn",
+  "readiness": "READY",
+  "releases": [
+    {
+      "releaseKey": "asc-zh-2026-11",
+      "contentVersion": "1.0.0",
+      "contentHash": "10cef65ad9eb89761ea5c6806fdf9c707951d798ac0c34b185ea849ae15f9367",
+      "parameterVersion": "1.1.0-estimate",
+      "reportVersion": "1.3.1-student",
+      "allowedEntries": [
+        "TRAINING",
+        "SURVEY",
+        "SCHOOL"
+      ],
+      "state": "ONLINE",
+      "replaces": "1.0.0/default",
+      "reviewNote": "https://docs.google.com/document/d/14LRA8kH9RZoLtVAyPgdtd_lw6IeP4bHQhjv1SxsyvXU"
+    }
+  ]
+}

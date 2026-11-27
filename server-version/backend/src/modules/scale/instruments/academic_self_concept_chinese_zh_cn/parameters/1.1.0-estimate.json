@@ -1,0 +1,183 @@
+{
+  "toolKey": "academic_self_concept_chinese_zh_cn",
+  "contentVersion": "1.0.0",
+  "scoringVersion": "1.0.0",
+  "version": "1.1.0-estimate",
+  "referencePolicy": {
+    "type": "declared",
+    "selections": [
+      {
+        "scoreKey": "academic_self_concept",
+        "referenceVersion": "asc-chinese-theoretical-v1",
+        "referenceKind": "theoretical_range"
+      }
+    ]
+  },
+  "references": [
+    {
+      "schemaVersion": 1,
+      "instrumentType": "scale",
+      "instrumentKey": "academic_self_concept_chinese_zh_cn",
+      "referenceVersion": "asc-chinese-theoretical-v1",
+      "status": "ACTIVE",
+      "entries": [
+        {
+          "scoreKey": "academic_self_concept",
+          "referenceKind": "theoretical_range",
+          "evidenceLevel": "theoretical",
+          "provenanceType": "theoretical_score_range",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "population": {
+            "description": "语文／初中；量尺范围描述，无经验样本",
+            "language": "zh-CN",
+            "match": {
+              "gradeLevels": [
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          },
+          "source": {
+            "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; exact questionnaire/scoring audit"
+          },
+          "statistics": {},
+          "limitations": [
+            "描述区间暂定；没有该学科 exact-version 经验参考。"
+          ],
+          "disclaimer": "这是按题目可选分数范围形成的暂定描述，暂不提供样本排名或百分位。",
+          "governance": {
+            "schemaVersion": 1,
+            "kind": "THEORETICAL_RANGE",
+            "subjectKey": "chinese",
+            "schoolStage": "junior_secondary",
+            "locale": "zh-CN",
+            "populationKey": "chinese-junior_secondary-students",
+            "effectiveFrom": "2026-10-01T00:00:00Z",
+            "scoreRange": {
+              "min": 1,
+              "max": 5
+            },
+            "bandSource": "THEORETICAL_SCORE_RANGE",
+            "bands": [
+              {
+                "key": "very_low",
+                "label": "暂定量尺较低分段（非人群位置）",
+                "lower": 1,
+                "upper": 1.8
+              },
+              {
+                "key": "low",
+                "label": "暂定量尺偏低分段（非人群位置）",
+                "lower": 1.8,
+                "upper": 2.6
+              },
+              {
+                "key": "middle",
+                "label": "暂定量尺中间分段（非人群位置）",
+                "lower": 2.6,
+                "upper": 3.4
+              },
+              {
+                "key": "high",
+                "label": "暂定量尺偏高分段（非人群位置）",
+                "lower": 3.4,
+                "upper": 4.2
+              },
+              {
+                "key": "very_high",
+                "label": "暂定量尺较高分段（非人群位置）",
+                "lower": 4.2,
+                "upper": 5
+              }
+            ],
+            "sampleN": null,
+            "sourceDataset": "THEORETICAL_RANGE / authored scale anchors",
+            "sourceSnapshot": "academic_self_concept_chinese_zh_cn@1.0.0/range-v1",
+            "crossStageReReferenceAllowed": false,
+            "measurementHash": "10cef65ad9eb89761ea5c6806fdf9c707951d798ac0c34b185ea849ae15f9367"
+          }
+        },
+        {
+          "scoreKey": "academic_self_concept",
+          "referenceKind": "theoretical_range",
+          "evidenceLevel": "theoretical",
+          "provenanceType": "theoretical_score_range",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "population": {
+            "description": "语文／高中；量尺范围描述，无经验样本",
+            "language": "zh-CN",
+            "match": {
+              "gradeLevels": [
+                "10",
+                "11",
+                "12"
+              ]
+            }
+          },
+          "source": {
+            "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; exact questionnaire/scoring audit"
+          },
+          "statistics": {},
+          "limitations": [
+            "描述区间暂定；没有该学科 exact-version 经验参考。"
+          ],
+          "disclaimer": "这是按题目可选分数范围形成的暂定描述，暂不提供样本排名或百分位。",
+          "governance": {
+            "schemaVersion": 1,
+            "kind": "THEORETICAL_RANGE",
+            "subjectKey": "chinese",
+            "schoolStage": "upper_secondary",
+            "locale": "zh-CN",
+            "populationKey": "chinese-upper_secondary-students",
+            "effectiveFrom": "2026-10-01T00:00:00Z",
+            "scoreRange": {
+              "min": 1,
+              "max": 5
+            },
+            "bandSource": "THEORETICAL_SCORE_RANGE",
+            "bands": [
+              {
+                "key": "very_low",
+                "label": "暂定量尺较低分段（非人群位置）",
+                "lower": 1,
+                "upper": 1.8
+              },
+              {
+                "key": "low",
+                "label": "暂定量尺偏低分段（非人群位置）",
+                "lower": 1.8,
+                "upper": 2.6
+              },
+              {
+                "key": "middle",
+                "label": "暂定量尺中间分段（非人群位置）",
+                "lower": 2.6,
+                "upper": 3.4
+              },
+              {
+                "key": "high",
+                "label": "暂定量尺偏高分段（非人群位置）",
+                "lower": 3.4,
+                "upper": 4.2
+              },
+              {
+                "key": "very_high",
+                "label": "暂定量尺较高分段（非人群位置）",
+                "lower": 4.2,
+                "upper": 5
+              }
+            ],
+            "sampleN": null,
+            "sourceDataset": "THEORETICAL_RANGE / authored scale anchors",
+            "sourceSnapshot": "academic_self_concept_chinese_zh_cn@1.0.0/range-v1",
+            "crossStageReReferenceAllowed": false,
+            "measurementHash": "10cef65ad9eb89761ea5c6806fdf9c707951d798ac0c34b185ea849ae15f9367"
+          }
+        }
+      ]
+    }
+  ]
+}
