@@ -1,0 +1,128 @@
+{
+  "toolKey": "academic_self_concept_mathematics_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "数学学习自评图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "artworkKey": "academic_self_concept_mathematics_zh_cn/1.0.0/1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容审定",
+        "reviewedAt": "2026-11-27T00:00:00Z",
+        "basis": "逐题核对项目四题、五点选项、均分计分与三题最低作答规则；复核初中历史便利样本 n=735、高中历史便利样本 n=702 的分布与五档边界。参考只表示匹配项目样本中的相对位置，不作全国常模、能力或诊断解释。"
+      }
+    },
+    "primaryScoreKeys": [
+      "academic_self_concept"
+    ],
+    "scoreOrder": [
+      "academic_self_concept"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "academic_self_concept",
+        "headline": "我怎么看自己的数学学习",
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "数学课上，小安盯着一道几何题，脑中只剩一句：\"我数学不行。\"她没有从头重抄，而是先把已知角涂上颜色，又添了一条辅助线。同桌问：\"这条线帮你看见了什么？\"小安指着两个角说：\"至少这一步我能说明。下一步，我还不知道为什么能接上。\"一道还没做完的题，也已经留下了可以继续推理的落脚点。\n\n数学学科自我概念，是你对\"我数学学得怎么样\"形成的整体看法。它会受到成绩影响，却不等于成绩；解题速度、熟悉题型、能否讲清理由，也不是同一件事。研究中，学科自我概念与学习结果可能互相影响，但一次自评不能证明原因。读这份报告，更值得追问的是：最近一次解题时，哪一步是你独立看出来的，哪一步是在提示后接上的，哪一步还需要新的证据？",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "先找一个已知条件",
+            "summary": "这次均分在匹配的项目历史参考组中处于较低一段。它不是能力判定。挑一道最近见过的题，只标出一个你确定知道的条件，再画出条件之间的一条关系；先为\"我会的这一小步\"留下证据。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "找准第一处卡点",
+            "summary": "这次均分在匹配的项目历史参考组中偏低。把最近卡住的一题停在第一处真正不明白的步骤，写下一个能回答的问题：是不知道用哪个条件，还是知道条件却接不上理由？问题具体，求助才会更有用。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "比较三次解题经历",
+            "summary": "这次均分落在匹配项目参考组的中间一段，不等于\"一般\"。从最近三道题中各找一个例子：能独立完成、提示后完成、还没做通。比较这三类证据，比一次均分更能说明你现在怎样学习数学。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "讲清每一步的理由",
+            "summary": "这次均分在匹配的项目历史参考组中偏高。选一道你会做的题，先不展示答案，只向同伴解释每一步凭什么成立；请对方专门追问一处。能把把握说成理由，才更容易迁移到新题。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "改变条件，再检验",
+            "summary": "这次均分在匹配的项目历史参考组中处于较高一段。给一道熟悉题改一个条件，先预测原方法哪里还适用，再实际检验。检验时，写下一处原方法仍然成立的理由，或记下哪一步需要改。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "把\"我数学好不好\"改写成一条可检查的记录：哪一步是我独立想到的？它用了哪个条件？"
+          },
+          {
+            "category": "strategy",
+            "text": "本周做一次\"变一个条件\"练习：改动一道会做题的一个条件，先预测、再验证、最后写一句哪里需要修正。"
+          }
+        ],
+        "scoreLabel": "数学学习自评均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "均分来自四道正向题，至少回答三题；相同均分可能由不同回答组合形成。",
+      "初中 n=735、高中 n=702 是项目历史便利样本，只能描述匹配学段样本中的相对位置，不是全国、地区或学校常模；样本边界也不是心理阈值。",
+      "结果描述本次自我看法，不替代数学成绩或解题表现，也不能推断智力、天赋、因果关系或未来表现。",
+      "参考位置与原始均分回答不同的问题。同一均分在两个学段可能对应不同位置，请结合原作答选项理解均分。缺少年级或年级不在适用范围时，不给出历史参考位置。"
+    ],
+    "disclaimer": "这份报告供七至十二年级学生回顾本次对数学学习的看法，可与老师一起讨论，不用于排名、分流或诊断。"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
