@@ -1,0 +1,122 @@
+{
+  "toolKey": "academic_self_concept_english_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "英语学习自评图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "artworkKey": "academic_self_concept_english_zh_cn/1.0.0/1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目学科替换版四题、五点选项、均分计分和三题最低作答规则。英语版尚无同版本经验样本，五档仅为量尺范围的试用估算，不作为常模、能力或诊断界线。"
+      }
+    },
+    "primaryScoreKeys": [
+      "academic_self_concept"
+    ],
+    "scoreOrder": [
+      "academic_self_concept"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "academic_self_concept",
+        "headline": "我怎么看自己的英语学习",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "读一段英语对话时，小林卡在一个短语上，心里冒出一句：“我英语不行。”再看一眼，插图里有人撑伞，上一句又有个她认识的天气词。她顺着这两条线索试着猜，再读了下一句，发现自己猜对了一半。她把猜对的部分留下，把另一半改了改，继续往下读。\n\n你觉得自己英语学得怎么样，心理学上叫“英语学科自我概念”。它是你对英语学习形成的整体印象。这个印象会影响你愿不愿意再听一遍、开口试一句，也会因为一次次具体的学习经历而变化。下次冒出“小林那句话”时，先问问自己：“刚才哪条线索，帮我多懂了一点？”",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "先找到一条线索",
+            "summary": "拿一小段最近读过或听过的材料，找到一个认得的词，或一幅看懂的图。说说它让你猜到什么，再往下读一句。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "把卡住的地方标出来",
+            "summary": "给没听懂或没读懂的那一句做个记号。只问一个具体问题，比如“这两个音连起来说的是什么词？”把原句带给同伴或老师。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "做一张三栏笔记",
+            "summary": "选一段课堂材料，把内容分成三栏：已经懂了、借助提示才懂、还想确认。每栏留一个例子，选一件最想弄明白的事再练。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "合上书，再翻回去",
+            "summary": "把刚读懂的一段话用自己的话讲给同伴。讲完翻回原文，找一个刚才没说到的细节，想想它是否改变了你的理解。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "留下一次改猜测的记录",
+            "summary": "找一段比平时稍陌生的材料。根据上下文写下一个猜测，再用后文或词典核对。记住哪条证据让你改了主意，下次还能用上。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "本周留下一条英语学习记录。写下你看到或听到的线索、你当时的猜测，以及后来怎么核对。"
+          }
+        ],
+        "scoreLabel": "英语学习自评均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "至少答三题才计算本次均分。五档是把 1—5 分均匀分段得到的试用参考，暂没有同版本数据支持同年级比较。",
+      "缺少年级时，原均分仍可用来选择一条试用建议。报告省略学段参考。"
+    ],
+    "disclaimer": "这份报告适合七至十二年级学生自己读，也可以带着一个具体问题和老师聊一聊。"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

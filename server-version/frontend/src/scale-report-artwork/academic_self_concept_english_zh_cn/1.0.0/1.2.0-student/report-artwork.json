@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "academic_self_concept_english_zh_cn/1.0.0/1.2.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "三段式课堂插图：学生先被陌生表达难住，随后从画面和熟悉线索猜测意思，最后用一句话和同伴核对。",
+    "width": 1600,
+    "height": 900
+  },
+  "bands": [
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "very_low",
+      "file": "very_low.webp",
+      "alt": "学生在读物中圈出一条已经认出的图文线索。",
+      "width": 768,
+      "height": 768
+    },
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "low",
+      "file": "low.webp",
+      "alt": "学生用书签标出卡住的一页，并准备一个具体问题。",
+      "width": 768,
+      "height": 768
+    },
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "middle",
+      "file": "middle.webp",
+      "alt": "学生把已经明白、部分明白和仍想确认的内容分成三组。",
+      "width": 768,
+      "height": 768
+    },
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "high",
+      "file": "high.webp",
+      "alt": "学生借助画面顺序向同伴复述一段内容，并听取补充。",
+      "width": 768,
+      "height": 768
+    },
+    {
+      "scoreKey": "academic_self_concept",
+      "bandKey": "very_high",
+      "file": "very_high.webp",
+      "alt": "学生先预测新对话的意思，再根据后文修正自己的猜测。",
+      "width": 768,
+      "height": 768
+    }
+  ]
+}
