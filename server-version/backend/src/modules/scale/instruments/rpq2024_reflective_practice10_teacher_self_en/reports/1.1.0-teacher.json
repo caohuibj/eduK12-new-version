@@ -1,0 +1,100 @@
+{
+  "toolKey": "rpq2024_reflective_practice10_teacher_self_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "Reflective Practice Questionnaire | Turn one moment into a better question",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "Original Rogers et al. 2024 standalone English RPQ form (Table 5; same items first in RPQ-E Table 6 and original author form). Four items concern noticing assumptions and feelings in the moment; six focus on reflecting afterwards or improving practice. Six frequency options from Very rarely to Almost always; one descriptive 1–6 mean. Author allows use without formal permission; article CC BY 4.0. No cutoffs added."
+      }
+    },
+    "primaryScoreKeys": [
+      "reflective_practice10"
+    ],
+    "scoreOrder": [
+      "reflective_practice10"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "reflective_practice10",
+        "scoreLabel": "Reflective practice mean (1–6; descriptive)",
+        "headline": "Pause during the conversation. Revisit it after.",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A student gives a quick “I get it,” but their page is still blank. One reading is that they weren’t paying attention. A second is that they followed the example and didn’t know the first step on their own. Reflective practice starts in that gap. We notice what we’re assuming, look at what the other person may have experienced, then give one alternative a fair test.\n\nYour mean describes how often you reported thinking in this way during and after your work with students. Time, routine, and who you can talk things through with all shape those opportunities. A useful next step is to choose one classroom moment and carry one well-framed question into the next lesson.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Choose an interaction that left you unsure. Write down the precise words or actions you observed, your first interpretation, and one other plausible account."
+          },
+          {
+            "category": "strategy",
+            "text": "Try one small change next time. For example, after “I get it,” ask the student to show the first step or explain what they would try. Let the new evidence update your original interpretation."
+          },
+          {
+            "category": "support",
+            "text": "If a colleague can help, describe the exchange without identifying the learner. Ask what they would look for before deciding what happened."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Rogers, S. L., et al. (2024). Further development of the reflective practice questionnaire. PeerJ, 12, e16879. https://doi.org/10.7717/peerj.16879 (CC BY 4.0). Original English item text; this feedback is new project copy.",
+      "In the source instructions, teachers read “client” as “student.” The six response options range from Very rarely (1) to Almost always (6). The project requires all ten answers for the mean and does not impute missing responses.",
+      "This is the ten-item RPQ. Its one mean gives no basis for scoring the RPQ-E confidence, uncertainty/stress or work satisfaction scales, and has no local norms or high/low thresholds."
+    ],
+    "disclaimer": "This professional-development report records self-reported reflection. It provides no basis for teaching appraisal, ranking, or conclusions about individual learners.",
+    "artworkKey": "rpq2024_reflective_practice10_teacher_self_en/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
