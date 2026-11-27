@@ -90,6 +90,7 @@ export function ScaleComponentReportPresentation({
   onTemplateArtworkChange,
   disabled,
   onVisibilityChange,
+  capabilities = Object.keys(REPORT_CAPABILITIES) as Capability[],
 }: {
   version: string
   visibility?: ReportVisibility
@@ -99,6 +100,7 @@ export function ScaleComponentReportPresentation({
   onTemplateArtworkChange?: (key: string) => void
   disabled: boolean
   onVisibilityChange: (visibility: ReportVisibility) => void
+  capabilities?: readonly Capability[]
 }) {
   const updateVisibility = (audience: Audience, capability: Capability, checked: boolean) => {
     if (!visibility) return
@@ -121,7 +123,7 @@ export function ScaleComponentReportPresentation({
             {(Object.keys(REPORT_AUDIENCES) as Audience[]).map(audience => (
               <fieldset key={audience} disabled={disabled} className="min-w-0 space-y-2 rounded-lg border p-3">
                 <legend className="px-1 font-medium">{REPORT_AUDIENCES[audience]}</legend>
-                {(Object.keys(REPORT_CAPABILITIES) as Capability[]).map(capability => (
+                {capabilities.map(capability => (
                   <label key={capability} className="component-check">
                     <input type="checkbox" checked={visibility.audiences[audience]?.[capability] ?? false}
                       onChange={event => updateVisibility(audience, capability, event.target.checked)} />

@@ -1,3 +1,4 @@
+import { governedFormRawAnswersAllowed } from '../form/disclosure'
 import { calculateScoreRanges } from '../scale/scale-scoring'
 import { groupFormMetricType } from '../reporting/group-summary'
 import { parseFrozenSurveyCognitive } from './cognitive.definition'
@@ -1136,8 +1137,8 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
               score.measurement.scoreKey===input.selectScore.scoreKey).map(score=>
                 ({...score,...(score.measurement.provenance||meta.variant?{completionStatus}:{}),measurement:{...score.measurement,...frozenSourceMetadata(frozen),
                   ...(variantConfigByWave.get(wave.id)?{variantConfiguration:variantConfigByWave.get(wave.id)}:{})}})))
-          if(input.selectRaw!==false&&(!input.selectRaw||
-            frozen.instrumentKey===input.selectRaw.instrumentKey)){
+          if(input.selectRaw!==false&&(frozen.kind!=='FORM'||governedFormRawAnswersAllowed(frozen.sourceProvenance,'researcher'))
+            &&(!input.selectRaw||frozen.instrumentKey===input.selectRaw.instrumentKey)){
             const allItems=rawSchemaFor(snapshot,wave.ordinal).itemsByUnit.get(frozen)!
             // Group reports do not need text, ranking or structured allocation
             // fields. Filter before projecting/counting the 25k raw-row budget.

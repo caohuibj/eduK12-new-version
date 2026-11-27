@@ -128,6 +128,22 @@ class ContentReleaseExport(unittest.TestCase):
             set(included),
         )
 
+    def test_form_exports_only_declaration_files(self):
+        prefix = f'{MODULES}/form/templates/'
+        included = ('demographics_v1/releases.json', 'demographics_v1/1.0.0.json', 'demographics_v1/reports/1.1.0.json')
+        excluded = ('demographics_v1/sample.ts', 'demographics_v1/fixtures/extra.json', 'demographics_v1/reports/1..0.json')
+        for relative in included + excluded:
+            self.write(prefix + relative, '{}')
+        self.commit()
+        output = self.repo / 'exported'
+        output.mkdir()
+        result = self.export(output, 'content')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            {str(path.relative_to(output / 'form')) for path in (output / 'form').rglob('*') if path.is_file()},
+            set(included),
+        )
+
     def test_missing_scale_controls_fail_only_for_generalized_sync(self):
         (self.repo / (SCALE + '/releases.json')).unlink()
         self.commit()

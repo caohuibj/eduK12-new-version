@@ -8,6 +8,7 @@ const declarationDirectories = {
   bundle: 'assessment-bundle/packages',
   cognitive: 'cognitive/tasks',
   sjt: 'situational/instruments',
+  form: 'form/templates',
 } as const
 
 type Family = keyof typeof declarationDirectories
@@ -51,6 +52,13 @@ export async function checkContentRelease(repoRoot: string, selector: string) {
     const result = checkSjtGitRelease(root, toolKey)
     return { family, ...result }
   }
+  if (family === 'form') {
+    const { checkFormGitRelease } = await import('../form/git-release')
+    const { releases } = checkFormGitRelease(root, toolKey)
+    return { family, toolKey, releases: releases.map(({ releaseKey, contentVersion, reportVersion, contentHash, reportHash, state }) => ({
+      releaseKey, contentVersion, reportVersion, contentHash, reportHash, state,
+    })) }
+  }
   const { checkBundleGitRelease } = await import('../bundle-product/git-release')
   return { family, toolKey, releases: (await checkBundleGitRelease(root, toolKey)).versions }
 }
@@ -73,6 +81,7 @@ export async function syncContentReleases(
   const bundleRoot = requireDirectory(join(inputRoot, 'bundle'))
   const cognitiveRoot = requireDirectory(join(inputRoot, 'cognitive'))
   const sjtRoot = requireDirectory(join(inputRoot, 'sjt'))
+  const formRoot = requireDirectory(join(inputRoot, 'form'))
   const { loadDeclaredScaleReleases } = await import('../scale/declarative/load')
   const { assertLiveScaleReportArtwork } = await import('../scale/declarative/live-artwork')
   const releases = loadDeclaredScaleReleases(scaleRoot)
@@ -80,6 +89,7 @@ export async function syncContentReleases(
   const { syncGitScaleReleasesInTransaction } = await import('../scale/onboarding/git-release-publication')
   const { syncCognitiveGitReleases } = await import('../cognitive/git-release')
   const { syncSjtGitReleases } = await import('../situational/git-publish')
+  const { syncFormGitReleases } = await import('../form/git-release')
   const { syncBundleGitReleases } = await import('../bundle-product/git-release')
 
   return db.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -88,7 +98,8 @@ export async function syncContentReleases(
     const scale = await syncGitScaleReleasesInTransaction(tx, { actorId, gitCommitSha, releases })
     const cognitive = await syncCognitiveGitReleases(cognitiveRoot, tx, actorId, gitCommitSha)
     const sjt = await syncSjtGitReleases(sjtRoot, tx, actorId, gitCommitSha)
+    const form = await syncFormGitReleases(formRoot, tx, actorId, gitCommitSha)
     const bundle = await syncBundleGitReleases(bundleRoot, tx, actorId, gitCommitSha)
-    return { gitCommitSha, scale, cognitive, sjt, bundle }
+    return { gitCommitSha, scale, cognitive, sjt, form, bundle }
   }, { timeout: 120_000 })
 }

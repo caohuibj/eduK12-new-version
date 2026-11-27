@@ -1,3 +1,4 @@
+import { governedFormRawAnswersAllowed, renderGovernedFormCompletion } from '../form/disclosure'
 import {renderDeclaredReport,type ReportMetricFact,type ReportReferenceFact} from '../measurement-content/report-renderer'
 import {resolveAudienceDisclosure} from '../scale/policy/disclosure'
 import {parseFrozenSurveyCognitive} from './cognitive.definition'
@@ -18,6 +19,10 @@ export function resultMetrics(result:FrozenUnitResult):ReportMetricFact[]{
 }
 export function renderGovernedUnitReport(a:GovernedArtifact,result:FrozenUnitResult){
  if(!a.report)return null
+ if(result.kind==='FORM'){
+  const report=renderGovernedFormCompletion(a.report.template,a.unit?.provenance,'researcher')
+  return report??renderDeclaredReport({blocks:[],limitations:[]},[],[])
+ }
  const references:ReportReferenceFact[]=[]
  if(a.parameters&&a.unit){
   const m=prepareRelease(governedMeasurementInput(snapshotUnit(a.unit),{kind:'PLATFORM'},a.toolKey,a.version))
@@ -52,7 +57,7 @@ function fieldDisplay(question:FormQuestion,answers:Record<string,unknown>,missi
  return option(value)
 }
 /** Rendering consumes already computed/stored facts; it never runs any scorer. */
-export function renderPackageReport(spec:PackageReport,components:Array<{slotKey:string;unit:{ref:{kind:string};displayDefinition:unknown}}>,calculated:SurveyComputedFinal,keys:Record<string,string>){
+export function renderPackageReport(spec:PackageReport,components:Array<{slotKey:string;unit:{ref:{kind:string};displayDefinition:unknown;provenance?:Record<string,unknown>}}>,calculated:SurveyComputedFinal,keys:Record<string,string>){
  const metrics:ReportMetricFact[]=[],blocks:Array<{type:'TEXT';text:string}|{type:'METRIC';metricKey:string;label:string;display:'RAW'}>=[]
  const byComponent=new Map(components.map(c=>[c.slotKey,c])),byResult=new Map(calculated.units.map(u=>[u.instrumentKey,u]))
  const fields=new Map<string,Map<string,FormQuestion>>(),missing=new Map<string,Map<string,MissingItem['reason']>>(),metricFacts=new Map<string,Map<string,ReportMetricFact>>()
@@ -65,6 +70,7 @@ export function renderPackageReport(spec:PackageReport,components:Array<{slotKey
   if(!component||!result||result.notExecuted)throw new Error('组合报告缺少固定组件结果：'+b.slotKey)
   if(b.type==='FORM_FIELD'){
    if(component.unit.ref.kind!=='FORM')throw new Error('组合报告字段类型错误')
+   if(!governedFormRawAnswersAllowed(component.unit.provenance,'researcher'))return
    if(!fields.has(b.slotKey))fields.set(b.slotKey,new Map((component.unit.displayDefinition as FormDraft).pages.flatMap(p=>p.questions).map(q=>[q.itemKey,q])))
    if(!missing.has(b.slotKey))missing.set(b.slotKey,new Map(result.missing.map(m=>[m.itemKey,m.reason])))
    const question=fields.get(b.slotKey)!.get(b.itemKey);if(!question)throw new Error('组合报告字段未固定')

@@ -18,7 +18,7 @@ export async function persistGovernedPackageReports(tx:Prisma.TransactionClient,
  const rows:Prisma.Sql[]=[]
  for(const p of input.snapshot.governedPackages??[]){
   if(!p.report&&!p.nativeBundle)continue
-  const components=p.slots.map(s=>{const u=input.snapshot.units.find(u=>u.draftId===s.draftId&&u.instrumentKey===s.instrumentKey);if(!u)throw new Error('组合报告固定组件缺失');return {slotKey:s.slotKey,unit:{ref:{kind:u.kind},displayDefinition:u.displayDefinition}}})
+  const components=p.slots.map(s=>{const u=input.snapshot.units.find(u=>u.draftId===s.draftId&&u.instrumentKey===s.instrumentKey);if(!u)throw new Error('组合报告固定组件缺失');return {slotKey:s.slotKey,unit:{ref:{kind:u.kind},displayDefinition:u.displayDefinition,provenance:u.sourceProvenance}}})
   const report=p.report?renderPackageReport(p.report,components,input.calculated,Object.fromEntries(p.slots.map(s=>[s.slotKey,s.instrumentKey]))):null
   const saved=input.calculated.nativeBundleReports?.find(r=>r.importId===p.importId)
   const nativeBundle=p.nativeBundle?{status:saved?.status??'FAILED',profileView:saved?.views.researcher??null,factsHash:saved?.factsHash??null,

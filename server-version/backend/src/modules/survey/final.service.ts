@@ -2,7 +2,7 @@ import {computeSurveyNativeReports} from '../bundle-product/survey-native'
 import {loadSurveyTaskReceipts,assertSurveyReachedTaskReceipts} from './task-receipts'
 import { SURVEY_NATIVE_SJT_PROTOCOL,type SurveySituationalReceiptReference } from './situational-native.contract'
 import {persistGovernedPackageReports} from './governed-package.reports'
-import {projectSurveyParticipantFeedback,type SurveyParticipantFeedbackProjection} from './participant-feedback-response'
+import {mayShowSurveyFormCompletion,projectSurveyParticipantFeedback,type SurveyParticipantFeedbackProjection} from './participant-feedback-response'
 import {attachSurveyParticipantDeclaredReports,resolveSurveyDeclaredReportAsset} from './participant-declared-report'
 import {interpretSurveyFinal} from './final-interpretation.service'
 import type { SurveyCognitiveReference } from './cognitive.definition'
@@ -249,7 +249,7 @@ export async function submitResearchFinal(input:FinalInput){
     // Optional projection failure must not turn a durable answer into a retry;
     // the independent reader remains the recovery path. Flow/replay keep it too.
     let participantFeedbackReceipt
-    if(selectedSnapshot.units.some(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE')){
+    if(selectedSnapshot.units.some(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE'||mayShowSurveyFormCompletion(unit))){
       try{
         const end=wave.finishUntil??wave.closesAt
         const projected=projectSurveyParticipantFeedback(selectedSnapshot.units,calculated,
@@ -300,7 +300,7 @@ async function readGeneralForVerifiedAttempt(
   input:SurveyReadInput,
   valid:Awaited<ReturnType<typeof verifiedSurveyAttempt>>,
 ){
-  const hasFeedback=valid.compiledSnapshot.units.some(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE')
+  const hasFeedback=valid.compiledSnapshot.units.some(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE'||mayShowSurveyFormCompletion(unit))
   if(hasFeedback){
     // Read-start authorization contract (same pattern as Education ordinary feedback):
     // hold row locks ONLY while verifying live withdrawal, credential, consent,

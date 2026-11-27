@@ -51,3 +51,12 @@ test('SJT declaration-only releases do not select arbitrary stimulus or renderer
   assert.equal(gitContentReleaseSelector(path + 'reports/1.1.1.ts'), null)
   assert.throws(() => verifyGitContentHistory([entry(path + '1.1.0/content.json', 'M', '100644', '100644')]), /immutable/)
 })
+
+test('official Form controls and immutable C/R enter the declaration lane', () => {
+  const path = dir + 'form/templates/demographics_v1/'
+  assert.equal(gitContentReleaseSelector(path + '1.0.0.json'), 'form:demographics_v1')
+  assert.equal(gitContentReleaseSelector(path + 'reports/1.1.0.json'), 'form:demographics_v1')
+  assert.equal(gitContentReleaseSelector(path + 'reports/1..0.json'), null)
+  assert.equal(gitContentReleaseSelector(path + 'fixtures/unknown.json'), null)
+  assert.throws(() => verifyGitContentHistory([entry(path + '1.0.0.json', 'D', '100644', '000000')]), /immutable/)
+})

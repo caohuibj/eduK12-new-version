@@ -1,3 +1,5 @@
+import { previewFormTemplate, readFormRevisionTemplate, submitReviewedFormTemplate } from '../form/admin'
+import { previewFormTemplateImport } from '../form/import'
 import {surveyNativeSourceSchema} from '../bundle-product/survey-native'
 import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import {Router,type Request,type Response,type NextFunction} from 'express'
@@ -36,6 +38,15 @@ surveyGovernedToolsRouter.get('/versions/:id',handle(req=>service.governedDetail
 // Pending content intake only. Existing approval/trial writes retain step-up below.
 surveyGovernedToolsRouter.post('/submissions/original-form',handle(req=>service.submitOriginalForm(req.user!.userId,req.body)))
 surveyGovernedToolsRouter.use(requireRecentAdminKey)
+const formTemplateStepUp=(req:Request,work:(tx:import('@prisma/client').Prisma.TransactionClient)=>Promise<unknown>)=>prisma.$transaction(async tx=>{
+ await assertStandardSystem(tx,req.user!.userId,req.user!)
+ return work(tx)
+})
+surveyGovernedToolsRouter.get('/form-templates/:id/revision',handle(req=>formTemplateStepUp(req,tx=>readFormRevisionTemplate(tx,uuid.parse(req.params.id)))))
+surveyGovernedToolsRouter.post('/form-templates/import-preview',handle(req=>previewFormTemplateImport(req.body)))
+surveyGovernedToolsRouter.post('/form-templates/preview',handle(req=>formTemplateStepUp(req,tx=>previewFormTemplate(tx,req.user!.userId,req.body))))
+surveyGovernedToolsRouter.post('/form-templates/submissions',handle(req=>formTemplateStepUp(req,tx=>submitReviewedFormTemplate(tx,req.user!.userId,req.body))))
+
 const originalSjt=z.object({requestId:uuid,toolKey:z.string().regex(/^[a-z][a-z0-9_-]{0,100}$/),version,title:text,definition:z.record(z.string(),z.unknown()),statement:reason,parameterReleaseId:uuid.nullable().optional(),report:z.object({version,template:reportTemplateSchema}).strict().nullable(),reference:metadata}).strict()
 surveyGovernedToolsRouter.post('/original-sjt/preview',handle(req=>service.previewOriginalSjt(req.user!.userId,originalSjt.parse(req.body),req.user!)))
 surveyGovernedToolsRouter.post('/submissions/original-sjt',handle(req=>service.submitOriginalSjt(req.user!.userId,originalSjt.parse(req.body),req.user!)))
