@@ -13,7 +13,7 @@
         "SURVEY",
         "SCHOOL"
       ],
-      "state": "ONLINE",
+      "state": "WITHDRAWN",
       "replaces": "1.0.0/default",
       "reviewNote": "https://docs.google.com/document/d/14LRA8kH9RZoLtVAyPgdtd_lw6IeP4bHQhjv1SxsyvXU"
     }
