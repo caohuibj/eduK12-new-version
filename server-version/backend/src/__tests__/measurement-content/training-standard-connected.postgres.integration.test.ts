@@ -1,3 +1,4 @@
+import {trainingAdminProof} from '../helpers/training-admin-proof'
 import {randomUUID} from 'node:crypto'
 import {createServer,type Server} from 'node:http'
 import {Session} from 'node:inspector'
@@ -163,8 +164,8 @@ suite('real PostgreSQL/HTTP source costs and existing 21B issuance, without manu
    grantedBy:fixture.issuer.id,authorityGrantId:root,standardCombinationHash:fixture.pointer.combinationHash}})
   const original={userId:fixture.teacher.id,combination:fixture.pointer,measurementReleaseId:fixture.measurement.releaseId,useGrantId:useId,useGrantVersion:1}
   await db.$transaction(async tx=>{expect((await assertTrainingStandardUse(tx,original)).useGrantVersion).toBe(1)})
-  await expect(revokeTrainingStandardCombinationUse(fixture.issuer.id,useId,{expectedVersion:2,reason:'Stale synthetic review'})).rejects.toThrow('版本已变化')
-  expect(await revokeTrainingStandardCombinationUse(fixture.issuer.id,useId,{expectedVersion:1,reason:'Synthetic history revocation'})).toMatchObject({version:2,revoked:true})
+  await expect(revokeTrainingStandardCombinationUse(fixture.issuer.id,useId,{expectedVersion:2,reason:'Stale synthetic review'},trainingAdminProof())).rejects.toThrow('版本已变化')
+  expect(await revokeTrainingStandardCombinationUse(fixture.issuer.id,useId,{expectedVersion:1,reason:'Synthetic history revocation'},trainingAdminProof())).toMatchObject({version:2,revoked:true})
   await expect(db.$transaction(tx=>assertTrainingStandardUse(tx,original))).rejects.toThrow('使用授权不可用')
   await expect(db.materialGrant.delete({where:{id:useId}})).rejects.toThrow('Exact combination use history must be retained')
   await expect(db.materialGrant.update({where:{id:useId},data:{version:3,revokedAt:null,resourceId:randomUUID()}})).rejects.toThrow('Exact combination resource identity is immutable')

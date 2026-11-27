@@ -1,6 +1,5 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { isToolLicensingEnabled } from './runtime'
 
 type ReadFence = { before: Date; xid: string }
 
@@ -56,8 +55,20 @@ export async function settleOneToolPublication(fence: ReadFence) {
   }, { maxWait: 1000, timeout: 3000 })
 }
 
+// Booking switches govern new publications. Existing reservations remain
+// payable after a switch is disabled. The partial settlement index makes
+// this an idle probe without allocating an XID when there is nothing due.
+async function captureFenceIfDue(): Promise<ReadFence | undefined> {
+  const [fence] = await prisma.$queryRaw<ReadFence[]>`
+    SELECT statement_timestamp() AS "before", pg_current_xact_id()::text AS xid
+    WHERE EXISTS (
+      SELECT 1 FROM tool_license_charges WHERE settled_at IS NULL AND settle_after<=statement_timestamp()
+    )
+  `
+  return fence
+}
+
 export function startToolLicenseSettlement(onError: (cause: unknown) => void) {
-  if (!isToolLicensingEnabled('SCHOOL') && !isToolLicensingEnabled('TEACHER')) return () => {}
   let lastFence: ReadFence | undefined
   let running = false
   let stopped = false
@@ -65,8 +76,8 @@ export function startToolLicenseSettlement(onError: (cause: unknown) => void) {
     if (running || stopped) return
     running = true
     try {
-      const nextFence = await captureToolLicenseSettlementFence()
-      if (lastFence) {
+      const nextFence = await captureFenceIfDue()
+      if (nextFence && lastFence) {
         for (let index = 0; index < 10 && !stopped; index += 1) {
           if (await settleOneToolPublication(lastFence) === undefined) break
         }
@@ -80,6 +91,7 @@ export function startToolLicenseSettlement(onError: (cause: unknown) => void) {
   }
   const interval = setInterval(() => { void tick() }, 60_000)
   interval.unref()
+  void tick()
   return () => {
     stopped = true
     clearInterval(interval)

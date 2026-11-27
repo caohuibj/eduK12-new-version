@@ -3,6 +3,7 @@ import {MaterialResourceType,Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
 import {assertEntryAdmin,AdminPermissionError} from '../admin-permissions/service'
+import {ADMIN_STEP_UP_SECONDS,validAdminProof,type AdminSessionProof} from '../admin-permissions/proof'
 import {assertLibraryAuthority,libraryActor,assertExactTrainingDistributionDelegation} from '../scale-library-governance/authority'
 import {lockInstrumentSourceIdentity} from '../assessment-authorization/source-identity-lock'
 import {readCurrentStandardCombination} from './standard-combination-source'
@@ -85,7 +86,16 @@ export async function assertTrainingStandardUse(tx:Prisma.TransactionClient,inpu
  return {useGrantId:locked.id,useGrantVersion:locked.version,issuerId:locked.granted_by,...original}
 }
 
-export async function grantTrainingStandardCombinationUse(actorId:string,combinationId:string,raw:unknown){
+export class TrainingConfigurationStepUpError extends AdminPermissionError {
+ readonly code='ADMIN_KEY_STEP_UP_REQUIRED'
+ constructor(){super(403,'敏感操作需要重新完成管理员双因素验证')}
+}
+
+function requireConfigurationProof(proof:AdminSessionProof|undefined){
+ if(!proof||!validAdminProof(proof,ADMIN_STEP_UP_SECONDS))throw new TrainingConfigurationStepUpError()
+}
+
+export async function grantTrainingStandardCombinationUse(actorId:string,combinationId:string,raw:unknown,proof?:AdminSessionProof){
  const id=uuid.parse(combinationId),input=issueSchema.parse(raw)
  const requestIntent={actorId,combinationId:id,userId:input.userId,combinationHash:input.combinationHash,
   grantId:input.grantId??null,expectedGrantVersion:input.expectedGrantVersion??null,expectedUseVersion:input.expectedUseVersion??null,
@@ -100,6 +110,7 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
   const selected:AuthorityBinding='entryAuthority'in authority&&authority.entryAuthority
    ?binding({authorityEntryGrantId:authority.entryAuthority.grantId,authorityEntryGrantVersion:authority.entryAuthority.version})
    :binding({authorityGrantId:authority.grantId})
+  if('authorityEntryGrantId'in selected)requireConfigurationProof(proof)
   if(input.expectedGrantVersion!==undefined&&input.expectedGrantVersion!==authority.version)deny('入口分配权限已变化')
   await assertTrainingStandardRecipient(tx,input.userId)
   const source=await readCurrentStandardCombination(tx,{releaseId:id,combinationHash:input.combinationHash})
@@ -115,6 +126,7 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
   if(input.expectedUseId!==undefined&&prior?.id!==input.expectedUseId)throw new AdminPermissionError(409,'原使用权身份已变化，请回读原授权后再操作')
   const recorded=await tx.assessmentManagementEvent.findUnique({where:{id:input.requestId}})
   if(recorded){
+   if('authorityEntryGrantId'in selected)requireConfigurationProof(proof)
    const receipt=trainingStandardIssueReceiptSchema.safeParse(recorded.metadata)
    if(recorded.actorId!==actorId||recorded.resourceId!==id||recorded.action!=='STANDARD_COMBINATION_USE_GRANTED'||!receipt.success
     ||receipt.data.userId!==input.userId||receipt.data.combinationHash!==input.combinationHash||canonicalHash(binding(receipt.data))!==canonicalHash(selected)
@@ -149,6 +161,7 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
   }
   if(prior?.revokedAt&&(input.expectedUseVersion!==prior.version||prior.standardCombinationHash!==input.combinationHash))deny('重新分配须确认已撤销的使用权版本')
   if(!prior&&input.expectedUseVersion!==undefined)deny('使用权版本已变化')
+  if('authorityEntryGrantId'in selected)requireConfigurationProof(proof)
   const use=prior?prior.revokedAt?await tx.materialGrant.update({where:{id:prior.id,version:prior.version,revokedAt:{not:null}},
    data:{revokedAt:null,version:{increment:1},grantedBy:actorId,...columns(selected)}}):prior
    :await tx.materialGrant.create({data:{id:input.requestId,teacherId:input.userId,resourceType:MaterialResourceType.STANDARD_COMBINATION,
@@ -180,7 +193,7 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
  },options)
 }
 
-export async function revokeTrainingStandardCombinationUse(actorId:string,useId:string,raw:unknown){
+export async function revokeTrainingStandardCombinationUse(actorId:string,useId:string,raw:unknown,proof?:AdminSessionProof){
  const input=revokeSchema.parse(raw)
  return prisma.$transaction(async tx=>{
   const id=uuid.parse(useId)
@@ -189,12 +202,13 @@ export async function revokeTrainingStandardCombinationUse(actorId:string,useId:
   if(!grant||grant.resourceType!==MaterialResourceType.STANDARD_COMBINATION||!actor.systemAdmin&&grant.grantedBy!==actorId)deny()
   const assertRevokeAuthority=async()=>{
    const currentActor=await libraryActor(tx,actorId)
-   if(currentActor.systemAdmin)return
+   if(currentActor.systemAdmin){requireConfigurationProof(proof);return}
    if(grant.grantedBy!==actorId)deny()
    const basis=binding(grant)
    if('authorityEntryGrantId'in basis){
     const current=await assertEntryAdmin(tx,actorId,'TRAINING')
     if(current.grantId!==basis.authorityEntryGrantId||current.grantVersion!==basis.authorityEntryGrantVersion)deny('入口分配依据已变化')
+    requireConfigurationProof(proof)
    }else{
     const [source]=await tx.$queryRaw<Array<{combination_hash:string;measurement_release:{releaseId:string}|null}>>(Prisma.sql`
      SELECT combination_hash,measurement_release FROM survey_standard_releases WHERE id=${grant.resourceId} FOR SHARE`)

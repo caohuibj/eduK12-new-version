@@ -4,6 +4,7 @@ import api from '../api/client'
 import {UsersRound,KeyRound,Search,ChevronDown,ShieldCheck,History} from 'lucide-react'
 import {entryLabels,type AdminEntry} from './authority'
 import AdminStepUp from './AdminStepUp'
+import EntryOffboarding from './EntryOffboarding'
 import AdminContentPermissions from './AdminContentPermissions'
 import AdminToolLicenses from './AdminToolLicenses'
 import {StandardDelegationReviewPanel} from './StandardDelegationReviewPanel'
@@ -25,6 +26,7 @@ function PermissionsWorkspace({urlSearch}:{urlSearch:string}){
   const [accounts,setAccounts]=useState<Account[]>([]),[page,setPage]=useState(1),[keyword,setKeyword]=useState(''),[search,setSearch]=useState('')
   const [newUsername,setNewUsername]=useState(''),[newEntry,setNewEntry]=useState<AdminEntry>('TRAINING')
   const [enrollment,setEnrollment]=useState<Enrollment|null>(null),[operableOnPage,setOperableOnPage]=useState(0)
+  const [offboarding,setOffboarding]=useState<{account:Account;grant:Account['entries'][number]}|null>(null)
   const [reason,setReason]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const [audit,setAudit]=useState<Audit[]>([]),[auditLoading,setAuditLoading]=useState(false),[auditError,setAuditError]=useState('')
   const auditRequest=useRef(0)
@@ -57,14 +59,17 @@ function PermissionsWorkspace({urlSearch}:{urlSearch:string}){
     finally{setBusy(false)}
   }
   const change=async(account:Account,grant:Account['entries'][number])=>{
+    if(grant.active){setOffboarding({account,grant});return}
     if(!reason.trim()){setError('请填写授权变更原因');if(reasonPanel.current)reasonPanel.current.open=true;return}
-    if(!window.confirm(`${grant.active?'撤销':'授予'} ${account.username} 的${entryLabels[grant.entry]}权限？`))return
+    if(!window.confirm(`授予 ${account.username} 的${entryLabels[grant.entry]}权限？`))return
     setBusy(true);setError('');setNotice('')
-    try{await api.put(`/admin/permissions/accounts/${account.id}/entries/${grant.entry}`,{active:!grant.active,expectedVersion:grant.version,reason:reason.trim()});await load();setNotice('授权已更新，目标账号的旧会话已失效。')}
+    try{await api.put(`/admin/permissions/accounts/${account.id}/entries/${grant.entry}`,{active:true,expectedVersion:grant.version,reason:reason.trim()});await load();setNotice('授权已更新，目标账号的旧会话已失效。')}
     catch(e){setError(e instanceof Error?e.message:'操作未完成；请刷新核对当前权限后再试')}
     finally{setBusy(false)}
   }
   return <div className="system-page system-permissions">
+    {offboarding&&<EntryOffboarding account={offboarding.account} entry={offboarding.grant.entry} currentVersion={offboarding.grant.version}
+      onClose={()=>setOffboarding(null)} onComplete={()=>{setOffboarding(null);setNotice('入口权限已撤销，原会话已失效。');void load().catch(cause=>setError(cause.message))}}/>}
     <header className="sys-heading"><div><p className="system-eyebrow">身份与访问</p><h1>管理授权</h1><p>入口资格、工具许可与精确内容授权分别管理，每次变更保留处理依据。</p></div><span className="sys-heading-mark"><KeyRound size={26} aria-hidden="true"/></span></header>
     <nav className="sys-view-tabs" aria-label="授权管理视图"><button aria-pressed={view==='accounts'} onClick={()=>setView('accounts')}><UsersRound size={17} aria-hidden="true"/>入口管理员</button><button aria-pressed={view==='content'} onClick={()=>setView('content')}><KeyRound size={17} aria-hidden="true"/>精确内容授权</button><button aria-pressed={view==='tools'} onClick={()=>{setToolsVisited(true);setView('tools')}}><KeyRound size={17} aria-hidden="true"/>工具授权</button></nav>
     {error&&<p className="sys-message sys-error" role="alert">{error}</p>}{notice&&<p className="sys-message" role="status">{notice}</p>}

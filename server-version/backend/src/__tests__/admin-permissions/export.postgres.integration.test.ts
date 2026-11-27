@@ -17,7 +17,7 @@ suite('entry revocation fences actual export generation, publication and downloa
     const questionnaire=await db.questionnaire.create({data:{code:'export_'+randomUUID(),name:'合成空白导出边界',type:'COURSE',status:'DRAFT',creatorId:owner.id}});resourceId=questionnaire.id
   })
   afterAll(async()=>{await (await import('../../config/queue')).closeQueues(true);await db?.$disconnect()})
-  const change=(active:boolean,expectedVersion:number)=>permission.changeEntryGrant({actorUserId:systemId,actorSession:{tokenVersion:0,adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()},targetUserId:actorId,entry:'TRAINING',active,expectedVersion,reason:'synthetic export revocation'})
+  const change=(active:boolean,expectedVersion:number)=>permission.changeEntryGrant({actorUserId:systemId,actorSession:{tokenVersion:0,adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()},targetUserId:actorId,entry:'TRAINING',active,expectedVersion,offboarding:active?undefined:{mode:'EMERGENCY'},reason:'synthetic export revocation'})
   async function batch(version:number|undefined){
     const id=randomUUID()
     await db.exportBatch.create({data:{id,resourceType:'QUESTIONNAIRE',resourceId,createdBy:actorId,anonymized:false,formats:['csv'],

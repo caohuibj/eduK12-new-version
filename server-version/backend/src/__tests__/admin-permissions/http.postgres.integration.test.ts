@@ -87,7 +87,7 @@ suite('real HTTP middleware, routes and current PostgreSQL authority',()=>{
   })
   it('committed revocation denies the old session; new login principal has no revoked privilege',async()=>{
     const path='/admin/permissions/accounts/'+trainingId+'/entries/TRAINING'
-    expect((await call('system',path,'PUT',{active:false,expectedVersion:1,reason:'synthetic HTTP revoke'})).status).toBe(200)
+    expect((await call('system',path,'PUT',{active:false,offboarding:{mode:'EMERGENCY'},expectedVersion:1,reason:'synthetic HTTP revoke'})).status).toBe(200)
     expect((await call('training','/users')).status).toBe(401)
     users.get('training')!.tokenVersion++
     expect((await call('training','/users','GET',undefined,false)).status).toBe(403)

@@ -1,3 +1,4 @@
+import {trainingAdminProof} from '../helpers/training-admin-proof'
 import {afterAll,beforeAll,describe,it,expect} from 'vitest'
 import ExcelJS from 'exceljs'
 import {randomUUID} from 'node:crypto'
@@ -219,7 +220,7 @@ suite('database C source and existing exact publication lifecycle',()=>{
   const managers=await Promise.all(['TRAINING','SURVEY','HUISCHOOL','HUITEACHER'].map(async entry=>{const u=await create(entry);await prisma.adminEntryGrant.create({data:{id:randomUUID(),userId:u.id,entry:entry as never,grantedBy:actor}});return u}))
   const teacher=await create('teacher','TRAINING',true)
   const {grantTrainingStandardCombinationUse,listTrainingStandardCombinationChoices}=await import('../../modules/measurement-content/standard-combination-use')
-  const training=await grantTrainingStandardCombinationUse(managers[0].id,p.id,{requestId:randomUUID(),userId:teacher.id,combinationHash:p.combinationHash,configurationName:'合成固定配置'})
+  const training=await grantTrainingStandardCombinationUse(managers[0].id,p.id,{requestId:randomUUID(),userId:teacher.id,combinationHash:p.combinationHash,configurationName:'合成固定配置'},trainingAdminProof())
   expect((await listTrainingStandardCombinationChoices(teacher.id)).some(c=>c.combination.releaseId===p.id&&c.toolKey===w.key)).toBe(true)
   const native=databaseContentSource(row.snapshot.parts.CONTENT)!
   const frozen=await prisma.$transaction(async tx=>(await import('../../modules/composite/training-standard-combination')).freezeExactStandardScaleDefinition(tx,{...row.snapshot,instruction:(await import('../../modules/survey/standard-triplet.model')).frozenTripletInstruction(row.snapshot)}))

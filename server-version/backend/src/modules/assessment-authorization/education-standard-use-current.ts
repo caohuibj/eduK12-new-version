@@ -1,4 +1,5 @@
 import {Prisma} from '@prisma/client'
+import {currentEntryEvidenceJoin} from '../admin-permissions/current-entry-evidence'
 import {EDUCATION_STANDARD_USE_ACTION,educationStandardUseMetadata,readEducationStandardUseBinding,type EducationConfigurationScope} from './education-standard-use'
 import type {PrivateToolContext} from '../education-tools/private-tool.contracts'
 import {EducationAssessmentSourceError} from '../education-tools/assessment-resource.repository'
@@ -8,6 +9,23 @@ export type EducationUseHeader={id:string;subject_id:string;issuer_id:string;res
 export type EducationStandardCurrentEvidence={binding:ReturnType<typeof readEducationStandardUseBinding>;
  authority:{validFrom:Date;expiresAt:Date;issuerExpiresAt:Date|null;readAt:Date}|null}
 type Audit={id:string;actor_id:string;metadata:unknown}
+
+/** Kept in one place for publish and advisory license details. The caller
+ * supplies one row of pinned authority identifiers as w. */
+export function educationStandardAuthorityJoins(scope:EducationConfigurationScope){
+ return Prisma.sql`
+  JOIN content_capability_grants root ON root.id=w.root_id AND root.subject_id=w.issuer_id AND root.version::text=w.root_revision::text
+   AND root.product=${scope.product} AND root.scope_kind='ORGANIZATION' AND root.scope_id=${scope.organizationId} AND root.resource_kind='material'
+   AND (root.resource_keys@>ARRAY[w.measurement_id]::text[]
+    OR (w.exact_distribution_key IS NOT NULL AND root.resource_keys=ARRAY[w.exact_distribution_key]::text[]))
+   AND root.capabilities=ARRAY['material.distribute']::text[]
+   AND root.parent_grant_id IS NULL AND root.ancestry=ARRAY[root.id]::text[] AND root.revoked_at IS NULL
+   AND root.delegable_capabilities=ARRAY[]::text[] AND root.remaining_delegation_depth=0
+  ${currentEntryEvidenceJoin({issuerId:Prisma.sql`w.issuer_id`,entryId:Prisma.sql`w.entry_id`,entryRevision:Prisma.sql`w.entry_revision`,
+    entry:scope.product==='SCHOOL'?'HUISCHOOL':'HUITEACHER'})}
+  JOIN survey_tool_policies p ON p.product=${scope.product} AND p.resource_key=w.policy_key
+   AND p.fingerprint=w.policy_hash AND p.decision='APPROVED' AND NOT p.paused`
+}
 
 /** Two bounded reads of identity and current original authority, never source
  * bodies, compilation, latest profile/report, or professional suitability.
@@ -54,19 +72,7 @@ export async function readEducationStandardCurrentEvidence(tx:Prisma.Transaction
  const facts=await tx.$queryRaw<Array<{useId:string;validFrom:Date;expiresAt:Date;issuerExpiresAt:Date|null;readAt:Date}>>(Prisma.sql`
   SELECT w.use_id AS "useId",root.valid_from AS "validFrom",root.expires_at AS "expiresAt",u.expires_at AS "issuerExpiresAt",clock_timestamp() AS "readAt"
   FROM (VALUES ${Prisma.join(tuples)}) w(use_id,issuer_id,entry_id,entry_revision,root_id,root_revision,measurement_id,exact_distribution_key,policy_key,policy_hash)
-  JOIN content_capability_grants root ON root.id=w.root_id AND root.subject_id=w.issuer_id AND root.version=w.root_revision
-   AND root.product=${c.entry} AND root.scope_kind='ORGANIZATION' AND root.scope_id=${c.organizationId} AND root.resource_kind='material'
-   AND (root.resource_keys@>ARRAY[w.measurement_id]::text[]
-    OR (w.exact_distribution_key IS NOT NULL AND root.resource_keys=ARRAY[w.exact_distribution_key]::text[]))
-   AND root.capabilities=ARRAY['material.distribute']::text[]
-   AND root.parent_grant_id IS NULL AND root.ancestry=ARRAY[root.id]::text[] AND root.revoked_at IS NULL
-   AND root.delegable_capabilities=ARRAY[]::text[] AND root.remaining_delegation_depth=0
-  JOIN users u ON u.id=w.issuer_id AND u.account_domain IN ('TRAINING','LEGACY') AND u.platform_role='STANDARD'
-   AND u.is_active AND NOT u.is_frozen AND NOT u.must_change_password
-  JOIN admin_entry_grants e ON e.id=w.entry_id AND e.user_id=w.issuer_id AND e.version=w.entry_revision
-   AND e.entry=${c.entry==='SCHOOL'?'HUISCHOOL':'HUITEACHER'} AND e.revoked_at IS NULL
-  JOIN survey_tool_policies p ON p.product=${c.entry} AND p.resource_key=w.policy_key
-   AND p.fingerprint=w.policy_hash AND p.decision='APPROVED' AND NOT p.paused
+  ${educationStandardAuthorityJoins(scope)}
   ORDER BY root.id,e.id,w.use_id ${lock?Prisma.sql`FOR SHARE OF root,u,e,p`:Prisma.empty}`)
  for(const fact of facts){const item=result.get(fact.useId);if(item)item.authority=fact}
  return result

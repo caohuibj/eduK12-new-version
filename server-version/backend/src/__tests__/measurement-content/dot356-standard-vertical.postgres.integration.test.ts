@@ -204,7 +204,7 @@ suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
   await request(system,`/api/questionnaire-products/standard-combinations/${pointer.releaseId}/use-grants`,{requestId:randomUUID(),userId:teacher.id,combinationHash:pointer.combinationHash,grantId:root.id},403)
   const changeRole=async(active:boolean,expectedVersion:number)=>{
    const {changeEntryGrant}=await import('../../modules/admin-permissions/service')
-   await changeEntryGrant({actorUserId:system.id,targetUserId:issuer.id,entry:'TRAINING',active,expectedVersion,reason:'Isolated authority lifecycle check',actorSession:{...proof,tokenVersion:system.tokenVersion}})
+   await changeEntryGrant({actorUserId:system.id,targetUserId:issuer.id,entry:'TRAINING',active,expectedVersion,offboarding:active?undefined:{mode:'EMERGENCY'},reason:'Isolated authority lifecycle check',actorSession:{...proof,tokenVersion:system.tokenVersion}})
    issuer=await db.user.findUniqueOrThrow({where:{id:issuer.id}})
   }
   await changeRole(false,1)

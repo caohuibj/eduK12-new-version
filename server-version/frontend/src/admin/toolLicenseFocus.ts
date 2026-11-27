@@ -13,3 +13,15 @@ export function readToolLicenseFocus(params:URLSearchParams):ToolLicenseFocus{
   subjectId:subjectId&&/^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/i.test(subjectId)?subjectId:undefined,
  }
 }
+
+export function toolLicenseReviewPath(product:Product,subjectId:string,toolKey:string){
+ return '/admin/permissions?'+new URLSearchParams({view:'tools',product,subjectId,toolKey})
+}
+
+export function toolLicenseReviewReturnTo(path:string,search:string){
+ if(path!=='/admin/permissions')return null
+ const params=new URLSearchParams(search)
+ if(params.get('view')!=='tools')return null
+ const {product,subjectId,toolKey}=readToolLicenseFocus(params)
+ return product&&subjectId&&toolKey?toolLicenseReviewPath(product,subjectId,toolKey):null
+}

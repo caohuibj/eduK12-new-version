@@ -6,6 +6,7 @@ import {useCallback,useEffect,useRef,useState} from 'react'
 import ManagementDialog from '../components/staff-ui/ManagementDialog'
 import {eligibleGrantTeachers,materialGrantApi} from '../api/materialGrants'
 import {standardConfigurationGrantsApi as api,validStandardConfigurationChoice,validStandardConfigurationUse,type StandardConfigurationChoice,type StandardConfigurationUse} from '../api/standardConfigurationGrants'
+import type {ApiClientError} from '../api/client'
 import type {User} from '../types'
 import {useAuth} from '../contexts/AuthContext'
 import {useTrainingStandardConfigurationIssue,trainingIssueOutcome} from './useTrainingStandardConfigurationIssue'
@@ -73,7 +74,11 @@ function RecipientGrant({initialSubjectId,choice,onClose,issuer,replacement,reas
    if(!alive.current)return
    setNotice(action==='issue'?'已保存此固定配置的使用权，未授予改编或其他入口权限。':'已撤销新增使用权，历史作答和报告保留。')
    await read(userId)
-  }catch(cause){if(alive.current){setUncertain(true);setLoaded(false);setError(errorMessage(cause)+' 请先回读当前授权状态，勿重复提交。')}}
+  }catch(cause){
+   if(!alive.current)return
+   if((cause as ApiClientError)?.code==='ADMIN_KEY_STEP_UP_REQUIRED'){setError('完成管理员验证后，请再次确认原操作。');return}
+   setUncertain(true);setLoaded(false);setError(errorMessage(cause)+' 请先回读当前授权状态，勿重复提交。')
+  }
   finally{inFlight.current=false;if(alive.current)setBusy(false)}
  }
  const recipient=teachers.find(row=>row.id===userId)

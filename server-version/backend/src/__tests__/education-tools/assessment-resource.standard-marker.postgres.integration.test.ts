@@ -1,3 +1,4 @@
+import {trainingAdminProof} from '../helpers/training-admin-proof'
 import {randomUUID} from 'node:crypto'
 import {getContentRelease,publishContentRelease} from '../../modules/measurement-content/repository'
 import {beforeAll,afterAll,describe,it,expect} from 'vitest'
@@ -40,8 +41,8 @@ suite('Education exact standard marker real approved source',()=>{
   const combination={releaseId:approved.id,combinationHash:approved.combinationHash}
   const distributor=await db.user.create({data:{username:'std-marker-distributor-'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'TRAINING',role:'ADMIN'}})
   await db.adminEntryGrant.create({data:{id:randomUUID(),userId:distributor.id,entry:'TRAINING',grantedBy:system.id}})
-  await expect(grantTrainingStandardCombinationUse(system.id,approved.id,{requestId:randomUUID(),userId:teacher.id,combinationHash:approved.combinationHash})).rejects.toThrow('系统管理员不能代替入口管理员')
-  await grantTrainingStandardCombinationUse(distributor.id,approved.id,{requestId:randomUUID(),userId:teacher.id,combinationHash:approved.combinationHash})
+  await expect(grantTrainingStandardCombinationUse(system.id,approved.id,{requestId:randomUUID(),userId:teacher.id,combinationHash:approved.combinationHash},trainingAdminProof())).rejects.toThrow('系统管理员不能代替入口管理员')
+  await grantTrainingStandardCombinationUse(distributor.id,approved.id,{requestId:randomUUID(),userId:teacher.id,combinationHash:approved.combinationHash},trainingAdminProof())
   const course=await db.course.create({data:{creatorId:teacher.id,title:'Synthetic standard source',courseCode:randomUUID(),courseType:'TRAINING_COURSE',status:'PUBLISHED'}})
   const original=await db.compositeAssessment.create({data:{code:randomUUID(),name:'Original standard source',createdBy:teacher.id,productKind:'QUESTIONNAIRE',questionnaireType:'COURSE',questionnaireCourses:{create:{courseId:course.id}},items:{create:{type:'SCALE',scaleId:installed.scaleId,required:true,position:0}}},include:{questionnaireCourses:true,items:{include:{scale:true}}}})
   const marker=await db.$transaction(tx=>prepareTrainingStandardItemSource(tx,teacher.id,original,{id:original.items[0].id,scaleId:installed.scaleId!},combination))
@@ -76,7 +77,7 @@ suite('Education exact standard marker real approved source',()=>{
   const attemptId=randomUUID(),candidate=await db.$transaction(tx=>prepareTrainingContentAttemptBinding(tx,{compositeId:runtime.id,attemptId,epoch:1,snapshot:runtime.trainingContentSnapshot,snapshotHash:runtime.trainingContentSnapshotHash,composite:runtime,resolvedSituational:new Map()}))
   const parent=await db.compositeAssessmentAttempt.create({data:{id:attemptId,compositeAssessmentId:runtime.id,participantKey:'synthetic-marker-'+attemptId,trainingContentBinding:candidate!.binding,trainingContentBindingHash:candidate!.bindingHash}})
   expect(await db.$transaction(tx=>assertTrainingStandardCollectionAllowed(tx,parent.id,[runtime.items[0].scaleId!],[runtime.items[0].id]))).toEqual(new Set([runtime.items[0].scaleId]))
-  await revokeTrainingStandardCombinationUse(marker.authority.issuerId,marker.authority.useGrantId,{expectedVersion:marker.authority.useGrantVersion,reason:'Synthetic exact upstream withdrawal'})
+  await revokeTrainingStandardCombinationUse(marker.authority.issuerId,marker.authority.useGrantId,{expectedVersion:marker.authority.useGrantVersion,reason:'Synthetic exact upstream withdrawal'},trainingAdminProof())
   await expect(db.$transaction(tx=>assertTrainingStandardCollectionAllowed(tx,parent.id,[runtime.items[0].scaleId!],[runtime.items[0].id]))).rejects.toThrow('使用授权不可用')
   await db.$transaction(tx=>readTrainingStandardContentIdentity(tx,unit,{compositeId:runtime.id,ownerId:runtime.createdBy!}))
   const distribution=row.entry.educationOrigin.distribution
@@ -91,7 +92,7 @@ suite('Education exact standard marker real approved source',()=>{
   const upstream=await db.compositeAssessment.findUniqueOrThrow({where:{id:prior.source_composite_id},include:{items:true}})
   const previous=(upstream.trainingContentSnapshot as any).units[0].source.standardCombination.reference
   const use=await db.materialGrant.findUniqueOrThrow({where:{id:previous.authority.useGrantId}})
-  await grantTrainingStandardCombinationUse(previous.authority.issuerId,previous.combination.releaseId,{requestId:randomUUID(),userId:upstream.createdBy!,combinationHash:previous.combination.combinationHash,...(use.revokedAt?{expectedUseVersion:use.version}:{})})
+  await grantTrainingStandardCombinationUse(previous.authority.issuerId,previous.combination.releaseId,{requestId:randomUUID(),userId:upstream.createdBy!,combinationHash:previous.combination.combinationHash,...(use.revokedAt?{expectedUseVersion:use.version}:{})},trainingAdminProof())
   // A reissue gets a new source and frozen marker; it cannot revive the old one.
   const course=await db.course.create({data:{creatorId:upstream.createdBy!,title:'Synthetic new exact source',courseCode:randomUUID(),courseType:'TRAINING_COURSE',status:'PUBLISHED'}})
   const original=await db.compositeAssessment.create({data:{code:randomUUID(),name:'New standard source for Teacher',createdBy:upstream.createdBy!,productKind:'QUESTIONNAIRE',questionnaireType:'COURSE',questionnaireCourses:{create:{courseId:course.id}},items:{create:{type:'SCALE',scaleId:upstream.items[0].scaleId,required:true,position:0}}},include:{questionnaireCourses:true,items:{include:{scale:true}}}})
