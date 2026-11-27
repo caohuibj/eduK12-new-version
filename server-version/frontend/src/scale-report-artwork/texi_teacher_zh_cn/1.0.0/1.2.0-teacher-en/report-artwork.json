@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "texi_teacher_zh_cn/1.0.0/1.2.0-teacher-en",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "In a classroom, a teacher observes a teenager selecting a next-step card during a collaborative model-building task.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

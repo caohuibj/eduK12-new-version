@@ -1,0 +1,133 @@
+{
+  "toolKey": "texi_teacher_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-teacher-en",
+  "title": "TEXI Teacher Observation (English, pilot)",
+  "report": {
+    "reportVersion": "1.2.0-teacher-en",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "TEACHER_REPORT",
+      "audience": "teacher",
+      "locale": "en"
+    },
+    "primaryScoreKeys": [
+      "working_memory",
+      "inhibition"
+    ],
+    "scoreOrder": [
+      "working_memory",
+      "inhibition",
+      "total_mean"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "working_memory",
+        "scoreLabel": "Working Memory (observer-rated mean)",
+        "headline": "Notice what happens between instructions and action",
+        "summary": "When a class starts a group task, students may need to collect materials, read an example, and complete a first step. A student might handle each instruction separately yet lose track of the order when several are given together. This score averages nine observations about keeping track of directions, steps, and plans. A higher mean indicates that more of these difficulties matched what you observed.",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Choose one familiar lesson task. Record which directions the student acted on, where they asked for a repeat, and what was happening in the class at that point."
+          },
+          {
+            "category": "strategy",
+            "text": "Try posting the first two steps or leaving an example in view for the whole class. Observe whether the student can resume the task after a brief interruption."
+          }
+        ],
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true
+      },
+      {
+        "scoreKey": "inhibition",
+        "scoreLabel": "Inhibition (observer-rated mean)",
+        "headline": "Look at the handoff between activities",
+        "summary": "After an energetic group discussion, a student may keep talking while the class moves to individual work. The same student may switch more smoothly when there is a clear signal for what comes next. This score averages eleven observations about pausing responses, ending preferred activities, and starting or finishing tasks. A higher mean indicates that more of these difficulties matched your observations.",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Compare two class transitions or work periods. Note the activity, the cue you gave, and what the student did next. Include a situation where the switch went smoothly."
+          },
+          {
+            "category": "environment",
+            "text": "Try one consistent cue for the next transition and make the first step visible. Observe whether starting becomes easier in that classroom setting."
+          }
+        ],
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true
+      },
+      {
+        "scoreKey": "total_mean",
+        "scoreLabel": "Overall item mean (Huisurvey summary)",
+        "headline": "Use the two subscale means to understand the details",
+        "summary": "This summary averages all 20 responses, including nine working-memory items and eleven inhibition items. The same overall mean can describe different classroom patterns. Use the two subscales and your own observations to identify a setting worth looking at more closely.",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Write a short note about one classroom situation you observed. Leave room for the student or another observer to describe what happened from their perspective."
+          }
+        ],
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "The two subscale means summarise what you reported as the teacher observer. They describe the settings you have seen. The original 2020 study evaluated adolescent self-ratings and parent observations.",
+      "Scores use the existing 1–5 response scale. The Working Memory and Inhibition means are the two published subscale results. The overall item mean is a Huisurvey descriptive summary. This pilot does not apply norms, score bands, or thresholds.",
+      "Use this English observer form for teenagers ages 13–19. Parent, teacher, and self-reports reflect different perspectives and should be considered separately.",
+      "Source: Thorell, Lazarević, Milovanović, and Bugarski Ignjatović (2020), Teenage Executive Functioning Inventory (TEXI), https://doi.org/10.1080/09297049.2020.1726885. English observer form and scoring guide: https://www.chexi.se/."
+    ],
+    "disclaimer": "This pilot report is for describing observations and reviewing everyday support. Please do not use these results for diagnosis, ranking, disciplinary decisions, or school placement.",
+    "artworkKey": "texi_teacher_zh_cn/1.0.0/1.2.0-teacher-en"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-teacher-en",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
