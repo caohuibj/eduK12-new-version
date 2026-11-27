@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "ipip50_zh_cn_research/1.1.1/1.3.0",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "六位成年人围绕一本空白大书交流、协作、整理工具与展开想象，象征从五个并列角度理解日常人格倾向",
+    "width": 1536,
+    "height": 1024
+  },
+  "bands": [
+    {
+      "scoreKey": "extraversion",
+      "bandKey": "low",
+      "file": "extraversion-low.webp",
+      "alt": "两位成年人在安静咖啡馆进行一对一交流，象征低负担而有质量的社交方式",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "extraversion",
+      "bandKey": "middle",
+      "file": "extraversion-middle.webp",
+      "alt": "一位成年人从热闹谈话区走向安静阅读角，象征社交节奏会随场景调整",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "extraversion",
+      "bandKey": "high",
+      "file": "extraversion-high.webp",
+      "alt": "一位成年人在户外聚会中主动与多人交流，象征以连接和表达获得能量",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "agreeableness",
+      "bandKey": "low",
+      "file": "agreeableness-low.webp",
+      "alt": "两位成年人平静讨论一张空白卡片，象征清楚表达意见同时避免不必要伤害",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "agreeableness",
+      "bandKey": "middle",
+      "file": "agreeableness-middle.webp",
+      "alt": "两位成年人一边交谈一边搬运各自的资料箱，象征在关心他人与自身边界之间协商",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "agreeableness",
+      "bandKey": "high",
+      "file": "agreeableness-high.webp",
+      "alt": "一位成年人为难过的朋友递上热饮并耐心陪伴，象征体谅、倾听和支持",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "conscientiousness",
+      "bandKey": "low",
+      "file": "conscientiousness-low.webp",
+      "alt": "一位成年人把散乱任务整理成一小叠卡片并使用计时器，象征从一个可完成动作开始",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "conscientiousness",
+      "bandKey": "middle",
+      "file": "conscientiousness-middle.webp",
+      "alt": "一位成年人把任务卡片在收纳盘与进行中区域之间调整，象征随情境安排优先次序",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "conscientiousness",
+      "bandKey": "high",
+      "file": "conscientiousness-high.webp",
+      "alt": "一位成年人完成整齐的任务卡片后为自己准备休息，象征条理与弹性可以并存",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "emotional_stability",
+      "bandKey": "low",
+      "file": "emotional-stability-low.webp",
+      "alt": "雨夜里一位成年人在温暖室内给信任的人打电话，象征在起伏时主动寻找支持",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "emotional_stability",
+      "bandKey": "middle",
+      "file": "emotional-stability-middle.webp",
+      "alt": "一位成年人看着窗外乌云与阳光交替，象征情绪反应会随压力和恢复条件变化",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "emotional_stability",
+      "bandKey": "high",
+      "file": "emotional-stability-high.webp",
+      "alt": "一位成年人安静看着窗外阵雨与晴光，旁边备有雨具和支持提醒，象征平稳也包含准备与连接",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "intellect_imagination",
+      "bandKey": "low",
+      "file": "intellect-imagination-low.webp",
+      "alt": "一位成年人通过木制拼块和陶器进行具体探索，象征从看得见、摸得到的经验理解新事物",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "intellect_imagination",
+      "bandKey": "middle",
+      "file": "intellect-imagination-middle.webp",
+      "alt": "一位成年人把桥梁、棋局、自然、建筑与星空的想法画进笔记，象征在具体和想象之间来回探索",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "intellect_imagination",
+      "bandKey": "high",
+      "file": "intellect-imagination-high.webp",
+      "alt": "一位成年人用草图、模型和星空装置发展新想法，象征对抽象概念与想象活动的持续兴趣",
+      "width": 1536,
+      "height": 1024
+    }
+  ]
+}
