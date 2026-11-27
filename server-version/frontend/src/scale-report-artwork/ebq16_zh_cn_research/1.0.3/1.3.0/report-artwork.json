@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "ebq16_zh_cn_research/1.0.3/1.3.0",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位成年人把代表阳光、雨云、微风和道路的卡片摆在空白笔记本旁，象征带着好奇重新理解情绪信念",
+    "width": 1536,
+    "height": 1024
+  },
+  "bands": [
+    {
+      "scoreKey": "general_controllability",
+      "bandKey": "low",
+      "file": "low.webp",
+      "alt": "打开的活页本和可移动的天气卡片，象征为情绪变化保留多种可能",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "general_controllability",
+      "bandKey": "middle",
+      "file": "middle.webp",
+      "alt": "一位成年人同时观察雨云和阳光卡片，象征结合具体情境理解不同经验",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "general_controllability",
+      "bandKey": "high",
+      "file": "high.webp",
+      "alt": "厚重的旧活页本旁放着空白纸和铅笔，象征长期信念仍可被温和地重新审视",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "neg_usefulness",
+      "bandKey": "low",
+      "file": "low.webp",
+      "alt": "打开的活页本和可移动的天气卡片，象征为不舒服情绪的多种作用保留空间",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "neg_usefulness",
+      "bandKey": "middle",
+      "file": "middle.webp",
+      "alt": "一位成年人同时观察雨云和阳光卡片，象征在不同情境中看见情绪的信息与负担",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "neg_usefulness",
+      "bandKey": "high",
+      "file": "high.webp",
+      "alt": "厚重的旧活页本旁放着空白纸和铅笔，象征在真实经历基础上重新理解不舒服的情绪",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "pos_usefulness",
+      "bandKey": "low",
+      "file": "low.webp",
+      "alt": "打开的活页本和阳光卡片，象征允许愉快片刻拥有自己的价值",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "pos_usefulness",
+      "bandKey": "middle",
+      "file": "middle.webp",
+      "alt": "一位成年人比较两种天气卡片，象征同时保留愉快感受和现实核对",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "pos_usefulness",
+      "bandKey": "high",
+      "file": "high.webp",
+      "alt": "旧活页本旁留有空白纸，象征可以为安全而普通的愉快片刻重新留出空间",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "total",
+      "bandKey": "low",
+      "file": "low.webp",
+      "alt": "可移动的天气卡片和打开的活页本，象征情绪信念是一张可以继续补充的地图",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "total",
+      "bandKey": "middle",
+      "file": "middle.webp",
+      "alt": "两本空白笔记和不同天气卡片，象征总分背后可以同时存在多种具体经验",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "scoreKey": "total",
+      "bandKey": "high",
+      "file": "high.webp",
+      "alt": "厚重的旧本与崭新的空白纸并列，象征理解旧经验后仍能寻找一个安全的小例外",
+      "width": 1536,
+      "height": 1024
+    }
+  ]
+}
