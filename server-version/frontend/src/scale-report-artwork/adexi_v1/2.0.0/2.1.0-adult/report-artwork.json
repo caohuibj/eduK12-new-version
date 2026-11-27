@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "adexi_v1/2.0.0/2.1.0-adult",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "一位成年人出门前停在玄关，低头查看清单，旁边放着钥匙、资料和手机。",
+    "width": 960,
+    "height": 640
+  },
+  "bands": []
+}

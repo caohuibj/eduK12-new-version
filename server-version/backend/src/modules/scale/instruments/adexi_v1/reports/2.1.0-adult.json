@@ -1,0 +1,108 @@
+{
+  "toolKey": "adexi_v1",
+  "contentVersion": "2.0.0",
+  "parameterVersion": "default",
+  "version": "2.1.0-adult",
+  "title": "成年人日常执行功能自评（试用）",
+  "report": {
+    "reportVersion": "2.1.0-adult",
+    "primaryScoreKeys": [
+      "working_memory",
+      "inhibition"
+    ],
+    "scoreOrder": [
+      "working_memory",
+      "inhibition"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "working_memory",
+        "scoreLabel": "工作记忆相关困难（自评）",
+        "headline": "被打断之后，怎么接回下一步？",
+        "summary": "上班前，你原本打算把资料装进包、带上钥匙，再顺路办一件事。临出门时接了个电话，挂断后只记得其中一两件。工作记忆这一项关心的是你在做事的同时，能否把眼下要用的信息留在心里，比如记住刚听到的几条要求、记得事情做到哪一步。九道题的合计为 9–45 分。分数越高，表示你在这次自评里觉得这类困难更符合自己的近期体验。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想最近一件做到一半被打断的事。写下当时做到哪一步、回来时忘了什么，再想想哪条线索能帮你接上。"
+          },
+          {
+            "category": "strategy",
+            "text": "下次出门前，把一定要带的东西写成两三项，放在拿钥匙时能看到的地方。如果手头的事要先放一放，留一句「回来先做……」。"
+          }
+        ],
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true
+      },
+      {
+        "scoreKey": "inhibition",
+        "scoreLabel": "抑制相关困难（自评）",
+        "headline": "想立刻做，或者到了时间还想继续",
+        "summary": "本来打算看完这一段视频就收拾东西，下一段自动播出来，回过神时又过了十分钟。也可能是刚看到一条消息，还没想清楚就回了出去。抑制这一项关心的是遇到这些时刻，你能否先停一下、考虑后果，或结束一项自己喜欢的活动。五道题的合计为 5–25 分。分数越高，表示你在这次自评里觉得这类困难更符合自己的近期体验。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一次原本打算停下却继续了的经历，记下你原先想在哪个节点停，最后又是什么让你接着做下去。"
+          },
+          {
+            "category": "environment",
+            "text": "给自己留一个好执行的结束点。例如关掉自动连播，只看已经选好的那一段；如果一条消息让你很想马上回复，可以先存成草稿，过会儿再读一遍。"
+          }
+        ],
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "请结合实际情境读分数，比如当时是否同时在处理几件事，或手头任务是否经常被打断。两项分数反映本次自评，客观任务表现需要通过相应任务单独了解。",
+      "两部分的题数和分数范围不同，请分别阅读。此试用报告提供两项原始分，没有合计总分、等级、常模或百分位。",
+      "量表采用项目已授权的 ADEXI 中文适配版本。本报告沿用当前平台的两项原始合计分。"
+    ],
+    "disclaimer": "供成年人回顾近期日常体验。请勿用这个结果给个人贴标签，或用于录用、考核和排名。",
+    "artworkKey": "adexi_v1/2.0.0/2.1.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "2.1.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
