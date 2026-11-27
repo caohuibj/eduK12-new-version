@@ -1,0 +1,92 @@
+{
+  "toolKey": "ips9_2021_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-adult",
+  "title": "先给重要的事一个小开头（试用）",
+  "report": {
+    "reportVersion": "1.2.0-adult",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容和来源校对",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "依据公开中文题本、该平台精确 C 的计分及适用范围。保持 score-only、原 C 和 P。"
+      }
+    },
+    "primaryScoreKeys": [
+      "irrational_procrastination"
+    ],
+    "scoreOrder": [
+      "irrational_procrastination"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "irrational_procrastination",
+        "scoreLabel": "日常任务的拖延合计（9–45）",
+        "headline": "把「等我准备好」改成一个小动作",
+        "summary": "打开电脑要写一段作业，先顺手清了消息、排了文件，又把目录改了一遍。等桌面整齐了，真正想做的事却还停在原处。拖延有时就是这样发生的。眼前的小事容易做，重要的那件事又有些费力，推一推会立刻轻松一点。遇到突发事情，主动调整顺序也很正常。这份自评关心的是那种自己想先做、事后又觉得耽误了的延后。",
+        "source": {
+          "type": "score_only"
+        },
+        "bands": [],
+        "provisional": true,
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一件这周反复想起的任务，写下一个五分钟内能完成的动作，例如打开文档写一句最粗糙的提纲。先做这个动作，再判断接下来需要时间、资料还是帮助。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "9 题使用 1–5 作答，第 2、6、9 题反向后合计。得分高表示本次自报的拖延更多。没有适用于本次作答的常模或分档。",
+      "用于当前已配置的大学年龄段成人自评。若身体、时间或其他责任限制了任务安排，可以把这些条件一起记下来。",
+      "Shaw 与 Zhang，2021，Table 1，doi:10.3389/fpsyg.2021.768581，CC BY 4.0。题干保留已发表中文，作答说明、反馈文字和插图由平台制作。"
+    ],
+    "disclaimer": "这是试用版自评报告，内容供自我反思及研究使用。仅凭一次作答不足以判断个人能力或身心状况。",
+    "artworkKey": "ips9_2021_zh_cn/1.0.0/1.2.0-adult"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-adult",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
