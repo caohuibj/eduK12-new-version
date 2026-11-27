@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "academic_self_efficacy_chemistry_zh_cn/1.0.0/1.2.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "两位学生沿着过滤图的箭头找到自己想问的那一步。",
+    "width": 506,
+    "height": 506
+  },
+  "bands": [
+    {
+      "file": "very_low.webp",
+      "alt": "学生在实验图上圈出熟悉的烧杯并标出一条路线。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "low.webp",
+      "alt": "同伴指给学生看一张例图，学生在自己的笔记上画出两条路线。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "low"
+    },
+    {
+      "file": "middle.webp",
+      "alt": "学生对照实验图和记录示意图，确定从哪一种任务开始。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "middle"
+    },
+    {
+      "file": "high.webp",
+      "alt": "学生比较两种材料的过滤图，核对同一个分离原理。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "high"
+    },
+    {
+      "file": "very_high.webp",
+      "alt": "学生将预想的实验现象和课堂记录放在一起核对。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "academic_self_efficacy",
+      "bandKey": "very_high"
+    }
+  ]
+}

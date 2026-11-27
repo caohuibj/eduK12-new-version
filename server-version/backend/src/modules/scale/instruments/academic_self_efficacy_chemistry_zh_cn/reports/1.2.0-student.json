@@ -1,0 +1,122 @@
+{
+  "toolKey": "academic_self_efficacy_chemistry_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "化学学习自我效能图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "artworkKey": "academic_self_efficacy_chemistry_zh_cn/1.0.0/1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对项目原五题、1–5 分选项、至少回答四题的均分规则及同版本的分学段试用历史参考。保留原参数定义。"
+      }
+    },
+    "primaryScoreKeys": [
+      "academic_self_efficacy"
+    ],
+    "scoreOrder": [
+      "academic_self_efficacy"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "academic_self_efficacy",
+        "headline": "一张实验图，从哪里接着看？",
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "课堂上，小澄能看懂装着泥水的烧杯，却没想明白图里的液体怎么从上方的烧杯走到下方。她沿着液体移动的方向在图边画了几支箭头，发现自己能说出前后两个容器的区别，中间那一步还没弄明白。她把疑问缩成一句：“哪一部分留在滤纸上，哪一部分进到下面？”同桌听见了，也翻开了实验图。\n\n当你问“给我一道这样的化学题，我能做到哪一步？”你正在判断自己的学习自我效能。一次练习之后，你有了新的依据：读懂了一条信息、靠一幅图继续往下做，或发现什么时候问一句最管用。这种把握会随着任务和经验变化。回想最近一次卡住的化学学习，你有什么办法让自己多做成了一步？",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "找一条能确认的信息",
+            "summary": "找一张课堂实验图，圈出一个认得的容器。再给它旁边的一条箭头写一句话，说明什么从哪里往哪里去。翻回课本核对这句话，下一步就从你已经确认的地方开始。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "用一个提示继续",
+            "summary": "请同桌示范一次，怎么从过滤图上找出固体和液体各到哪里。换一张相近的图，自己给两条路线做记号。把仍拿不准的地方留成一个问题。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "比较两种任务的把握",
+            "summary": "选一张实验图和一道解释现象的题，做前各写下自己预计能完成哪一步。做完圈出最需要提示的地方。下次只挑这一步来练。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "把用过的方法带到新题",
+            "summary": "找一道用同样原理、换了材料的课本题。先画路线，再解释为什么可以这么分开。做完看看哪些步骤独立完成，哪些要查图。留下一个下一次还用得上的判断。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "拿证据校对一次预测",
+            "summary": "读一组没见过的实验记录。先预测哪个现象能区分两种解释，再去看完整记录。结果与你的预测不同时，在纸边补一句“哪条证据让我换了想法”。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "在笔记上留三行：我原先觉得能完成哪一步、实际做到哪里、下次想怎么开始。选一次化学学习把三行填完就够了。"
+          }
+        ],
+        "scoreLabel": "化学学习自我效能均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "五道题至少答四道，按已答题目算均分。均分描述你这次对自己学会化学和处理困难任务有多大把握。",
+      "初中和高中使用各自的项目历史试用参考。缺少适用年级时，仍可阅读故事与共同练习。"
+    ],
+    "disclaimer": "这份报告供七至十二年级学生回顾化学学习，选出一件想跟老师或同伴讨论的事。"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
