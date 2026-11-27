@@ -74,6 +74,7 @@ function tools(product:ToolLicenseProduct){
   JOIN scales native ON ${standardNativeScaleJoin('native','s')} AND native.status='PUBLISHED' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
   WHERE s.state='ONLINE' AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED'
    AND m.content_hash=s.measurement_release->>'contentHash' AND ${releaseNotStopped(Prisma.sql`m.id`)}
+   AND NOT EXISTS(SELECT 1 FROM scale_library_emergency_stops stop WHERE stop.target_kind='TRAINING_SCALE' AND stop.target_id=native.id)
    AND ${approved(product,Prisma.sql`'standard-release:'||s.id`,Prisma.sql`s.combination_hash`)}`]
 
  // Exact approved profiles are the common public cognitive source. Survey's

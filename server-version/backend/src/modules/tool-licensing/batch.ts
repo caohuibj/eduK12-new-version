@@ -133,7 +133,13 @@ export async function createToolLicenseBatch(actor: ToolLicenseActor, raw: unkno
     if (committed) return { requestId, licenses: await issuedReceipts(tx, ids, digest) }
 
     await lockToolLicenseSubjects(tx, scope.product, subjectIds)
-    const review = await readPreview(tx, actor, scope)
+    const review = await readPreview(tx, actor, scope).catch(error => {
+      // Subject eligibility is already reported in conflicts. A catalog rejection
+      // here invalidates the preview and the administrator can edit the selection.
+      if (error instanceof AdminPermissionError && error.statusCode === 403)
+        throw new AdminPermissionError(409, '所选工具已不在可授权范围，请调整工具后重新预览')
+      throw error
+    })
     if (review.conflicts.length || review.previewDigest !== previewDigest)
       throw new AdminPermissionError(409, '对象、工具或授权状态已变化，请重新预览后再签发')
 

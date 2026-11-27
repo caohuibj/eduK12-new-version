@@ -311,7 +311,7 @@ it('retains the same confirmed request after a network interruption and an expir
  client.post.mockRejectedValueOnce(new Error('签发连接中断'))
  fireEvent.click(within(preview).getByRole('button',{name:'确认批量签发 2 份许可'}))
  const pending=await screen.findByRole('region',{name:'待核对批量签发'})
- const submitted=client.post.mock.calls.at(-1)?.[1]
+ const submitted=client.post.mock.calls[client.post.mock.calls.length-1]?.[1]
  await screen.findByText(/原批次已保留/)
  client.post.mockRejectedValueOnce(Object.assign(new Error('操作验证已过期'),{status:403}))
  fireEvent.click(within(pending).getByRole('button',{name:'重试同一批次并核对结果'}))

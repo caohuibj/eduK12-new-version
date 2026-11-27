@@ -140,11 +140,11 @@ describe('expanded education publication source and allocation contract',()=>{
  ] as const)('resolves exact %s leaf without a release UUID as the commercial key',async(provider,kind,key,expected)=>{
   shared.expanded.mockReturnValue(true)
   const f=fixture()
-  Object.assign(f.row,{sourceProvider:provider,kind,toolKey:key})
+  Object.assign(f.row,{sourceProvider:provider,kind,toolKey:key,profileArtifactHash:hash})
   expect(await resolveEducationPublicationTools(f.tx,f.input)).toEqual([{trackId:f.track.id,key:expected}])
   const sql=f.query.mock.calls[0][0]
   expect(sql.text).toContain("f.snapshot_hash=leaf.value->>'contentHash'")
-  expect(sql.text).toContain("cm.content_hash=leaf.value->>'contentHash'")
+  expect(sql.text).toContain("p.fingerprint=leaf.value->>'profileArtifactHash'")
   expect(sql.text).toContain("sm.content_hash=leaf.value->>'contentHash'")
   expect(sql.text).toContain("submission.snapshot_hash=leaf.value->>'contentHash'")
   expect(sql.text).not.toContain('SELECT *')
@@ -154,6 +154,16 @@ describe('expanded education publication source and allocation contract',()=>{
   Object.assign(f.row,{sourceProvider:provider,kind})
   expect(await authorizeEducationStandardPublication(f.tx,f.input)).toBe(false)
   expect(shared.authorize).not.toHaveBeenCalled()
+ })
+ it.each(['SCHOOL','TEACHER'] as const)('meters only the pinned profile among same-type %s cognitive leaves',async product=>{
+  shared.expanded.mockReturnValue(true)
+  const f=fixture(product)
+  const pinned={...f.row,leafCount:2,sourceProvider:'COGNITIVE_CONFIG',kind:'COGNITIVE',profileArtifactHash:hash,toolKey:'gonogo'}
+  const legacy={...pinned,position:2,profileArtifactHash:null,toolKey:null}
+  f.query.mockResolvedValue([{...legacy,position:1,leafCount:1}])
+  expect(await resolveEducationPublicationTools(f.tx,f.input)).toEqual([])
+  f.query.mockResolvedValue([pinned,legacy])
+  expect(await resolveEducationPublicationTools(f.tx,f.input)).toEqual([{trackId:f.track.id,key:'COGNITIVE:gonogo'}])
  })
  it('deduplicates repeated commercial leaves but keeps each distinct key in one composition',async()=>{
   shared.expanded.mockReturnValue(true)
@@ -216,7 +226,7 @@ describe('expanded education publication source and allocation contract',()=>{
  it.each(['PUBLIC_FORM','COGNITIVE_CONFIG','SJT_RELEASE','LIBRARY_SCALE'])('fails a broken exact %s binding rather than silently skipping a known tool',async provider=>{
   shared.expanded.mockReturnValue(true)
   const f=fixture(),kind=provider==='PUBLIC_FORM'?'FORM':provider==='COGNITIVE_CONFIG'?'COGNITIVE':provider==='SJT_RELEASE'?'SJT':'SCALE'
-  Object.assign(f.row,{sourceProvider:provider,kind,toolKey:null})
+  Object.assign(f.row,{sourceProvider:provider,kind,toolKey:null,profileArtifactHash:hash})
   await expect(authorizeEducationStandardPublication(f.tx,f.input)).rejects.toBeInstanceOf(shared.AccessError)
   expect(shared.authorize).not.toHaveBeenCalled()
  })

@@ -9,7 +9,7 @@ type Product='SCHOOL'|'TEACHER'
 type Track={id:string;resourceKey:string;resourceVersion?:string;resourcePolicy:RunResourcePolicy}
 type SourceInput={product:Product;organizationId:string;tracks:readonly Track[]}
 type FrozenLeaf={id:string;resourceKey:string;manifestHash:string;origin:unknown;leafCount:number;position:number;
- sourceProvider:string|null;kind:string|null;versionId:string|null;contentHash:string|null;toolKey:string|null}
+ profileArtifactHash:string|null;sourceProvider:string|null;kind:string|null;versionId:string|null;contentHash:string|null;toolKey:string|null}
 type FrozenDelivery={id:string;product:string;organizationId:string;originProduct:string;originOrganizationId:string;originId:string;
  runtimeId:string;originRuntimeId:string;runtimeHash:string;originRuntimeHash:string;family:string;provider:string|null;
  nativeBundle:unknown;versionId:string|null;contentHash:string|null;toolKey:string|null;
@@ -44,11 +44,11 @@ export async function resolveEducationPublicationTools(tx:Prisma.TransactionClie
     c.training_content_snapshot#>'{educationBinding,origin}' AS origin,
     CASE WHEN jsonb_typeof(c.training_content_snapshot#>'{educationBinding,manifest}')='array'
      THEN jsonb_array_length(c.training_content_snapshot#>'{educationBinding,manifest}') ELSE -1 END AS "leafCount",
-    leaf.position::int AS position,leaf.value->>'sourceProvider' AS "sourceProvider",leaf.value->>'kind' AS kind,
+    leaf.value->>'profileArtifactHash' AS "profileArtifactHash",leaf.position::int AS position,leaf.value->>'sourceProvider' AS "sourceProvider",leaf.value->>'kind' AS kind,
     leaf.value->>'versionId' AS "versionId",leaf.value->>'contentHash' AS "contentHash",
     CASE leaf.value->>'sourceProvider'
      WHEN 'STANDARD_SCALE' THEN s.tool_key WHEN 'PUBLIC_FORM' THEN f.tool_key
-     WHEN 'COGNITIVE_CONFIG' THEN CASE WHEN cm.id IS NOT NULL THEN config.test_type END
+     WHEN 'COGNITIVE_CONFIG' THEN profile.test_type
      WHEN 'SJT_RELEASE' THEN CASE WHEN sm.id IS NOT NULL AND (sjt.id IS NULL OR mapping.id IS NULL)
       THEN COALESCE(sjt.instrument_key,mapping.instrument_key) END
      WHEN 'LIBRARY_SCALE' THEN lm.content_key END AS "toolKey"
@@ -59,9 +59,12 @@ export async function resolveEducationPublicationTools(tx:Prisma.TransactionClie
     AND s.id=leaf.value->>'versionId' AND s.combination_hash=leaf.value->>'contentHash'
    LEFT JOIN survey_governed_tools f ON leaf.value->>'sourceProvider'='PUBLIC_FORM' AND f.family='FORM'
     AND f.id=leaf.value->>'versionId' AND f.snapshot_hash=leaf.value->>'contentHash'
-   LEFT JOIN cognitive_test_configs config ON leaf.value->>'sourceProvider'='COGNITIVE_CONFIG' AND config.id=leaf.value->>'versionId'
-   LEFT JOIN measurement_content_releases cm ON cm.id=config.measurement_release_id AND cm.family='COGNITIVE'
-    AND cm.content_hash=leaf.value->>'contentHash'
+   LEFT JOIN LATERAL (
+    SELECT c.test_type FROM (SELECT 1) anchor ${educationCognitiveProfileHeaderJoins(input.product)}
+    WHERE leaf.value->>'sourceProvider'='COGNITIVE_CONFIG' AND c.id=leaf.value->>'versionId'
+     AND p.fingerprint=leaf.value->>'profileArtifactHash' AND m.content_hash=leaf.value->>'contentHash'
+    LIMIT 1
+   ) profile ON true
    LEFT JOIN sjt_author_releases sjt ON leaf.value->>'sourceProvider'='SJT_RELEASE' AND sjt.id=leaf.value->>'versionId'
    LEFT JOIN static_sjt_measurement_mappings mapping ON leaf.value->>'sourceProvider'='SJT_RELEASE' AND mapping.id=leaf.value->>'versionId'
    LEFT JOIN measurement_content_releases sm ON sm.id=COALESCE(sjt.measurement_release_id,mapping.measurement_release_id)
@@ -88,7 +91,7 @@ export async function resolveEducationPublicationTools(tx:Prisma.TransactionClie
     ||new Set(leaves.map(leaf=>leaf.position)).size!==first.leafCount)
     throw new ToolLicenseAccessError('冻结教育问卷的单元清单不完整')
    for(const leaf of leaves){
-    if(leaf.sourceProvider==='PRIVATE_VERSION')continue
+    if(leaf.sourceProvider==='PRIVATE_VERSION'||(leaf.sourceProvider==='COGNITIVE_CONFIG'&&leaf.profileArtifactHash===null))continue
     const family=sourceFamilies[leaf.sourceProvider??'']
     if(!family||family!==leaf.kind)throw new ToolLicenseAccessError('冻结教育问卷的公共工具类型无法核对')
     if(!expanded&&leaf.sourceProvider!=='STANDARD_SCALE')continue

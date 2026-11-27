@@ -156,4 +156,19 @@ describe.skipIf(!isolated)('bulk tool licensing on isolated PostgreSQL', () => {
     expect(await prisma.toolLicense.findUnique({ where: { id: request.requestId } })).toBeNull()
     expect((await readToolLicense(collisionId)).subjectId).toBe(schoolIds[8])
   })
+
+  it('invalidates an uncommitted batch when its only native scale is stopped after preview', async () => {
+    const request = draft(schoolIds.slice(2, 4))
+    const review = await previewToolLicenseBatch(actor(), request)
+    expect(review.conflicts).toEqual([])
+    const scale = await prisma.scale.findUniqueOrThrow({ where: { code: prefix } })
+    await prisma.$executeRaw`
+      INSERT INTO scale_library_emergency_stops(target_kind,target_id,actor_id,reason)
+      VALUES ('TRAINING_SCALE',${scale.id},${adminIds[0]},'合成停用回归')
+    `
+    await expect(createToolLicenseBatch(actor(), { ...request, previewDigest: review.previewDigest }))
+      .rejects.toMatchObject({ statusCode: 409 })
+    await expect(previewToolLicenseBatch(actor(), request)).rejects.toMatchObject({ statusCode: 403 })
+    expect(await countIssued(request.subjectIds)).toBe(0)
+  })
 })
