@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "domain_fixed_mindset_chinese_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "very-low.webp",
+      "alt": "学生把两处阅读线索放到同一个解释旁边。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "low.webp",
+      "alt": "学生用两色比较两次读同一篇文章留下的标记。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "low"
+    },
+    {
+      "file": "middle.webp",
+      "alt": "学生选出一处还没解释清的句子，准备写下具体问题。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "middle"
+    },
+    {
+      "file": "high.webp",
+      "alt": "老师示范怎样找原文证据，学生在另一段尝试相同步骤。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "high"
+    },
+    {
+      "file": "very-high.webp",
+      "alt": "两名同伴并排看原文和草稿，为下次讨论各标一个细节。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生对照书页前后出现的灯，尝试写下一条解释。",
+    "width": 512,
+    "height": 512
+  }
+}

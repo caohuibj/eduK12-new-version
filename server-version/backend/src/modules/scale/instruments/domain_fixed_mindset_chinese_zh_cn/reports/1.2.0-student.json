@@ -1,0 +1,127 @@
+{
+  "toolKey": "domain_fixed_mindset_chinese_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "我如何看待语文学习天赋（试用）",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容草稿核对",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "按项目原题核对构念、计分与既有参考。此版面向学生试用，报告文案与拟配图待审。"
+      }
+    },
+    "primaryScoreKeys": [
+      "domain_fixed_mindset"
+    ],
+    "scoreOrder": [
+      "domain_fixed_mindset"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "domain_fixed_mindset",
+        "scoreLabel": "语文学科天赋固定信念均分（试用）",
+        "headline": "把读懂的地方和卡住的一步写下来",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "语文课读一篇写老街的文章。小安能说出故事讲了什么，却回答不上来为什么作者反复写门前的灯。她回到原文，分别圈出灯第一次出现和结尾再出现的两处，发现同一个细节在前后写法里起的作用可能不同。她在草稿上补了一句自己的解释，也留下了一个想问的问题。\n\n这三道题记录你有多认同“语文学习天赋大致确定、很难改变”。你可以拿一次阅读或写作练习做例子，把当时的判断、自己已经找到的证据和需要帮助的地方分开记。这个小练习只用来认识眼前的学习过程。",
+        "provisional": true,
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "找两处能说明观点的原文",
+            "summary": "挑一篇刚读过的短文，找出两处能支持同一个解释的细节。给同桌讲讲哪一处最有说服力。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "对照两次做过的标记",
+            "summary": "拿出同一篇文章先后两次的草稿，分别标出你自己找到的线索和听到提示才补上的线索。选一个下次还可以先找的细节。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "把卡住的地方问具体",
+            "summary": "找出一处暂时解释不清的句子。写下读到这句之前发生了什么，再问自己：我缺的是词义、人物前后的变化，还是原文证据？",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "学一处示范，再试一处新句子",
+            "summary": "请老师示范怎样用原文支持一条解释。合上示范，到另一段找一句对应的证据，把你能独立说清的那一步记下来。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "带着原文和草稿去讨论",
+            "summary": "把一段没读透的原文和自己的解释放在一起。请同伴指出一句可能有用的话，再和对方约定下一次各核对一个细节。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一段最近读过的文字。写下你能从原文解释的一处，也写下一处还想核对的地方。"
+          },
+          {
+            "category": "strategy",
+            "text": "回看两次读同一篇文章时的草稿，分别标记自己找到的线索和提示后补上的线索。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "三道正向题按原选项取等权均分，至少两题有有效答案才计算。较高均分表示这次更认同语文学科天赋较固定的说法。",
+      "五个试用区间来自 1–6 的可选分数范围，只用于挑选反思建议。没有可用于这份题本的经验常模。",
+      "分数描述一次题目认同，无法推断成绩、能力上限或你采用的学习方法。较少认同固定说法也不足以证明形成了某种相反的信念。"
+    ],
+    "disclaimer": "本报告供七至十二年级学生回顾语文学习中的看法。请勿用于能力鉴定、诊断、排名或分流。",
+    "artworkKey": "domain_fixed_mindset_chinese_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
