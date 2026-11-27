@@ -55,7 +55,36 @@ test('formal Git scope CLI keeps mixed shared dependencies out of light intake a
   assert.deepEqual(requiredChecks(needs,false),['scope','content','codeql']);assert.deepEqual(failedChecks(needs,false),[]);assert.deepEqual(recheckCognitiveIntake(needs,{base,head:good,cwd:dir}),[]);
   for(const value of [undefined,'false']) {const falseNeeds={scope:{result:'success',outputs:{...outputs,cognitive:value,cognitive_intake_light:value}},codeql:{result:'success'}};assert.ok(recheckCognitiveIntake(falseNeeds,{base,head:good,cwd:dir}).includes('recomputed-cognitive-intake'));assert.ok(recheckCognitiveIntake(falseNeeds,{base,head:good,cwd:dir}).includes('content'));}
   for(const name of ['scope','content','codeql'])for(const result of [undefined,'failure','skipped','cancelled'])assert.ok(recheckCognitiveIntake({...needs,[name]:{result}},{base,head:good,cwd:dir}).includes(name));
-  for(const file of ['server-version/backend/package-lock.json','server-version/backend/src/modules/cognitive/schemas/reaction.config.ts','server-version/backend/src/modules/scale/instruments/a/1.0.0/instrument.ts']) {git('reset','--hard',good);put(file,'{}');git('add','.');git('commit','-qm','unsupported mixed');const result=run();if(file==='server-version/backend/package-lock.json'){assert.notEqual(result.status,0);assert.match(result.stderr,/UNSUPPORTED_COGNITIVE_INTAKE:shared-or-mixed-input/);}else{assert.equal(result.status,0,result.stderr);const mixed=JSON.parse(result.stdout);assert.equal(mixed.cognitive_intake_light,false,file);assert.equal(mixed.codeql,true);if(file.includes('/schemas/')){assert.equal(mixed.scenario,'platform',file);assert.equal(mixed.frontend_build,true);for(const flag of Object.keys(acceptanceFor([])))assert.equal(mixed[flag],true,flag);}else{assert.equal(mixed.scenario,'content',file);assert.equal(mixed.content,true);assert.equal(mixed.scale,true);assert.equal(mixed.cognitive,true);assert.equal(mixed.validationClosure,'all-bundles');assert.equal(mixed.frontend_build,false);for(const flag of Object.keys(acceptanceFor([])))assert.equal(mixed[flag],false,flag);}}}
+  for(const [file,scenario] of [
+    ['server-version/backend/package-lock.json',null],
+    ['server-version/backend/src/modules/cognitive/schemas/reaction.config.ts','cognitive-product'],
+    ['server-version/backend/src/modules/scale/instruments/a/1.0.0/instrument.ts','content'],
+  ]) {
+    git('reset','--hard',good);put(file,'{}');git('add','.');git('commit','-qm','unsupported mixed');
+    const result=run();
+    if(scenario===null) {
+      assert.notEqual(result.status,0);
+      assert.match(result.stderr,/UNSUPPORTED_COGNITIVE_INTAKE:shared-or-mixed-input/);
+      continue;
+    }
+    assert.equal(result.status,0,result.stderr);
+    const mixed=JSON.parse(result.stdout);
+    assert.equal(mixed.scenario,scenario,file);
+    assert.equal(mixed.cognitive_intake_light,false,file);
+    assert.equal(mixed.cognitive,true);
+    assert.equal(mixed.codeql,true);
+    assert.equal(mixed.frontend_build,false);
+    for(const flag of Object.keys(acceptanceFor([])))assert.equal(mixed[flag],false,flag);
+    if(scenario==='cognitive-product') {
+      assert.equal(mixed.application_route,'cognitive-product');
+      const productOutputs=Object.fromEntries(Object.entries(mixed).map(([key,value])=>[key,String(value)]));
+      assert.deepEqual(requiredChecks({scope:{result:'success',outputs:productOutputs}},false),['scope','cognitive-product','docker','codeql']);
+    } else {
+      assert.equal(mixed.content,true);
+      assert.equal(mixed.scale,true);
+      assert.equal(mixed.validationClosure,'all-bundles');
+    }
+  }
   git('reset','--hard',good);put(root+'hearts-and-flowers/package.ts','export const nativeCandidate=1');git('add','.');git('commit','-qm','unregistered native');const native=run();assert.notEqual(native.status,0);assert.match(native.stderr,/missing-task-package/);
   git('reset','--hard',good);put('server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/instrument.ts','export const candidate=1');git('add','.');git('commit','-qm','actual native boundary');const realNative=run();assert.notEqual(realNative.status,0);assert.match(realNative.stderr,/native-candidate-not-registered-in-task-packages/);assert.equal(JSON.parse(realNative.stdout).status,'UNSUPPORTED_NATIVE_CANDIDATE');
   git('reset','--hard',good);put('server-version/frontend/src/modules/cognitive/tasks/reaction/ReactionTask.tsx','export const Runner=1');git('add','.');git('commit','-qm','browser');const browser=run();assert.equal(browser.status,0,browser.stderr);const browserScope=JSON.parse(browser.stdout);assert.equal(JSON.parse(browserScope.cognitive_intake_plan).status,'UNSUPPORTED_SELECTED_BROWSER');assert.ok(recheckCognitiveIntake({scope:{result:'success',outputs:Object.fromEntries(Object.entries(browserScope).map(([k,v])=>[k,typeof v==='string'?v:String(v)]))},content:{result:'success'},codeql:{result:'success'}},{base,head:git('rev-parse','HEAD'),cwd:dir}).includes('unsupported-or-mixed-cognitive-intake'));
