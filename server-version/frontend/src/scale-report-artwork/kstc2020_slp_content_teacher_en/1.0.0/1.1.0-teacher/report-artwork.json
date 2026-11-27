@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "kstc2020_slp_content_teacher_en/1.0.0/1.1.0-teacher",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "Two science teachers compare student examples with the goal of a plant-growth lesson.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
