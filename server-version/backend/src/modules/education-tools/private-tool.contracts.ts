@@ -11,6 +11,6 @@ export const updatePrivateToolInput=z.object({expectedRevision:z.number().int().
 export const freezePrivateToolInput=z.object({expectedRevision:z.number().int().positive(),expectedContentHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict()
 export const previewPrivateToolInput=z.object({answers:z.unknown().optional(),rawScores:z.record(z.string(), z.number().finite()).optional()}).strict()
 export class EducationPrivateToolError extends Error {
- constructor(readonly code:string,readonly statusCode=409,readonly issues:unknown[]=[]){super(code)}
+ constructor(readonly code:string,readonly statusCode=409,readonly issues:unknown[]=[],message=code){super(message)}
 }
 export function privateToolFail(code:string,status=409,issues:unknown[]=[]):never{throw new EducationPrivateToolError(code,status,issues)}

@@ -7,7 +7,7 @@ import {assertEntryAdmin,AdminPermissionError} from '../admin-permissions/servic
 import {libraryActor,assertExactTrainingDistributionDelegation} from '../scale-library-governance/authority'
 import {trainingStandardIssueReceiptSchema,trainingReplacementIntent} from './standard-combination-use'
 import {canonicalHash} from '../assessment-runtime/canonical'
-import {standardNativeScaleJoin} from '../scale/component-import/native-source'
+import {standardAvailability} from './eligible-standard'
 import {readSelectedConfigurationBinding} from '../assessment-authorization/selected-configuration'
 import {selectedConfigurationPointer} from '../assessment-authorization/standard-configuration-binding'
 
@@ -28,22 +28,20 @@ export async function trainingStandardManagementCatalog(actorId:string,raw:unkno
   return prisma.$transaction(async tx=>{
     await manager(tx,actorId)
     const records=catalogDiscoveryRecords()
+    const {joins,available,measurementAvailable}=standardAvailability('TRAINING','r')
     const [catalog]=await tx.$queryRaw<Array<{facetTags:CatalogClassificationTag[];list:Array<{id:string;title:string;toolKey:string;instrumentVersion:string;
       combinationHash:string;state:string;contentVersion:string;parametersVersion:string;reportVersion:string;
-      entryDecision:string;entryPaused:boolean;nativeStatus:string|null;measurementReleaseId:string|null;classificationTags:CatalogClassificationTag[]}>}>>(discoveryPageSql({source:Prisma.sql`
+      entryDecision:string;entryPaused:boolean;nativeStatus:string|null;measurementAvailable:boolean;available:boolean;classificationTags:CatalogClassificationTag[]}>}>>(discoveryPageSql({source:Prisma.sql`
       SELECT r.created_at,discovery.ids,discovery.terms,COALESCE(discovery.tags,'[]'::jsonb) AS "classificationTags",r.id,r.snapshot->>'title' AS title,r.tool_key AS "toolKey",r.snapshot->>'instrumentVersion' AS "instrumentVersion",
         r.combination_hash AS "combinationHash",r.state,
         r.snapshot#>>'{parts,CONTENT,version}' AS "contentVersion",
         r.snapshot#>>'{parts,PARAMETERS,version}' AS "parametersVersion",
         r.snapshot#>>'{parts,REPORT,version}' AS "reportVersion",p.decision AS "entryDecision",p.paused AS "entryPaused",
-        native.status::text AS "nativeStatus",r.measurement_release->>'releaseId' AS "measurementReleaseId"
-      FROM survey_standard_releases r
-      JOIN survey_tool_policies p ON p.resource_key='standard-release:'||r.id
-        AND p.fingerprint=r.combination_hash AND p.product='TRAINING'
-      LEFT JOIN scales native ON ${standardNativeScaleJoin('native')}
-        AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
+        native.status::text AS "nativeStatus",COALESCE(${measurementAvailable},false) AS "measurementAvailable",
+        COALESCE(${available},false) AS available
+      FROM survey_standard_releases r ${joins}
       ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`r.tool_key`,version:Prisma.sql`r.snapshot->>'instrumentVersion'`,metadata:Prisma.sql`r.snapshot#>'{parts,CONTENT,reference,metadata}'`,locale:Prisma.sql`r.snapshot#>>'{definition,versionAxes,locale}'`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})}
-      WHERE (p.decision='APPROVED' OR EXISTS(SELECT 1 FROM material_grants g
+      WHERE p.product IS NOT NULL AND (p.decision='APPROVED' OR EXISTS(SELECT 1 FROM material_grants g
         WHERE g.resource_type='STANDARD_COMBINATION' AND g.resource_id=r.id))
       `,filters:input,text:[Prisma.sql`v.title`,Prisma.sql`v."toolKey"`,Prisma.sql`v."instrumentVersion"`],order:Prisma.sql`v."toolKey",v.created_at,v.id`,limit:size+1,offset:(currentPage-1)*size}))
     const rows=catalog.list
@@ -51,9 +49,9 @@ export async function trainingStandardManagementCatalog(actorId:string,raw:unkno
       id:row.id,title:row.title,toolKey:row.toolKey,instrumentVersion:row.instrumentVersion,classificationTags:row.classificationTags,
       combinationHash:row.combinationHash,state:row.state,
       versions:{CONTENT:row.contentVersion,PARAMETERS:row.parametersVersion,REPORT:row.reportVersion},
-      assignable:row.state==='ONLINE'&&row.entryDecision==='APPROVED'&&!row.entryPaused&&row.nativeStatus==='PUBLISHED'&&Boolean(row.measurementReleaseId),
+      assignable:row.available,
       unavailableReason:row.state!=='ONLINE'?'该组合当前不接受新增使用':row.entryDecision!=='APPROVED'?'该配置未获当前 Training 入口批准':row.entryPaused?'Training 入口已暂停新增使用':
-        row.nativeStatus!=='PUBLISHED'?'原生量表尚未装载或发布':!row.measurementReleaseId?'缺少已批准测量版本':null,
+        row.nativeStatus!=='PUBLISHED'?'原生量表尚未装载或发布':!row.measurementAvailable?'已批准测量版本不可用':!row.available?'该版本已停止新增分配':null,
     }))}
   },options)
 }

@@ -15,6 +15,7 @@ import {educationEntry} from './admin/education-entry'
 import React, { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import {standardAssignmentReturnTo} from '../admin/standardAssignmentTarget'
 import { adminReturnTo } from '../admin/authority'
 import { useAuth } from '../contexts/AuthContext'
 import { Link } from 'react-router-dom'
@@ -29,15 +30,18 @@ const AdminLogin: React.FC = () => {
   const { login } = useAuth()
   const { mode } = useSurveyAppearance()
   const origins=productOrigins()
-  const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
-  const systemEntry=isSystemLoginTarget(new URLSearchParams(location.search).get('returnTo'))
-  const trainingEntry=isTrainingAdminPath(new URLSearchParams(location.search).get('returnTo')??'')
+  const returnTo=new URLSearchParams(location.search).get('returnTo')
+  const assignment=standardAssignmentReturnTo(returnTo)
+  const entryPath=assignment?.split('?')[0]??returnTo
+  const surveyEntry=Boolean(origins&&entryPath===SURVEY_ADMIN_PATH)
+  const systemEntry=isSystemLoginTarget(returnTo)
+  const trainingEntry=isTrainingAdminPath(entryPath??'')
   const homeOrigin=new URL(origins?.admin??window.location.origin)
   if(import.meta.env.DEV&&['localhost','127.0.0.1'].includes(homeOrigin.hostname))homeOrigin.hostname='training.localhost'
   const trainingHome=homeOrigin.origin+'/'
   const educationProduct=educationEntry(location.search)
   const Shell = systemEntry ? SystemAdminEntryShell : trainingEntry ? TrainingAdminLoginShell : educationProduct ? EducationAdminEntryShell : surveyEntry ? SurveyAdminEntryShell : AuthShell
-  const trainingRecovery = trainingEntry && readReauthReturn()?.target === new URLSearchParams(location.search).get('returnTo')
+  const trainingRecovery = trainingEntry && readReauthReturn()?.target === returnTo
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [method, setMethod] = useState<'TOTP' | 'SECURITY_KEY'>('TOTP')
@@ -54,7 +58,7 @@ const AdminLogin: React.FC = () => {
 
     try {
       const user = await login(formData.username, formData.password, undefined, 'admin', {method,...(method==='TOTP'?{code}:{})})
-      if(user) navigate(adminReturnTo(user,new URLSearchParams(location.search).get('returnTo')),{replace:true})
+      if(user) navigate(adminReturnTo(user,returnTo),{replace:true})
     } catch (err: any) {
       setError(err.message || '登录失败')
     } finally {
@@ -145,9 +149,9 @@ const AdminLogin: React.FC = () => {
         </button>
       </form>
       {surveyEntry?<div className="survey-admin-auth-tools">
-        <Link to={surveyAppearanceHref('/admin/security/enroll?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode)}>首次绑定 Authenticator</Link>
+        <Link to={surveyAppearanceHref('/admin/security/enroll?returnTo='+encodeURIComponent(assignment??SURVEY_ADMIN_PATH),mode)}>首次绑定 Authenticator</Link>
       </div>:trainingEntry?<>
-        <div className="training-login-enroll"><span>第一次使用？</span><Link to="/admin/security/enroll?returnTo=%2Fadmin%2Ftraining">首次绑定 Authenticator</Link></div>
+        <div className="training-login-enroll"><span>第一次使用？</span><Link to={'/admin/security/enroll?returnTo='+encodeURIComponent(assignment??'/admin/training')}>首次绑定 Authenticator</Link></div>
         <details className="training-login-help">
           <summary>登录方法说明</summary>
           <div className="training-login-instructions">
@@ -160,7 +164,7 @@ const AdminLogin: React.FC = () => {
             <p>已绑定实体安全密钥时，可在「验证方式」中切换为硬件安全密钥，再按提示连接密钥并验证。尚未绑定时，请使用 Authenticator。</p>
           </div>
         </details>
-      </>:<p className="mt-4"><Link to={systemEntry?'/admin/security/enroll?returnTo='+encodeURIComponent(SYSTEM_HOME):educationProduct?`/admin/security/enroll?returnTo=${encodeURIComponent(educationProduct==='School'?'/admin/huischool':'/admin/huiteacher')}`:'/admin/security/enroll'}>首次绑定 Authenticator</Link></p>}
+      </>:<p className="mt-4"><Link to={systemEntry?'/admin/security/enroll?returnTo='+encodeURIComponent(SYSTEM_HOME):educationProduct?`/admin/security/enroll?returnTo=${encodeURIComponent(assignment??(educationProduct==='School'?'/admin/huischool':'/admin/huiteacher'))}`:'/admin/security/enroll'}>首次绑定 Authenticator</Link></p>}
     </Shell>
   )
 }

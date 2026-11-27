@@ -6,7 +6,7 @@ import {useEffect,useRef,useState} from 'react'
 import {educationConfigurationBase,educationConfigurationRequest as request,EducationConfigurationHttpError,isEducationPending,sameEducationOperation,
  type EducationManagerProduct,type EducationConfigurationChoice,type EducationManagedUse,type EducationPendingOperation,type EducationManagerOperation} from '../../api/educationStandardConfigurations'
 
-type Props={actorId:string;organizationId:string;product:EducationManagerProduct}
+type Props={initialTool?:string;initialRelease?:string;actorId:string;organizationId:string;product:EducationManagerProduct}
 type Recipient={userId:string;username:string;membershipId:string}
 type Page<T>={page:number;hasMore:boolean;list:T[];tagFacets?:CatalogTagFacets}
 type ReportPreview={title:string;report:{reportVersion?:string;audienceContract?:{audience?:string};interpretations?:Array<{headline?:string;summary?:string}>}}
@@ -29,8 +29,8 @@ function ConfigurationSession(props:Props){
  const [initial]=useState(()=>restored(storageKey,props)),[pending,setPending]=useState<EducationPendingOperation|null>(initial.pending)
  const [blocked,setBlocked]=useState(Boolean(initial.error)),[storageError,setStorageError]=useState(initial.error),[checkedAbsent,setCheckedAbsent]=useState(false)
  const [page,setPage]=useState(1),[more,setMore]=useState(false),[rows,setRows]=useState<EducationConfigurationChoice[]>([]),[loading,setLoading]=useState(false)
- const [filters,setFilters]=useState({...EMPTY_CATALOG_FILTERS}),[applied,setApplied]=useState({...EMPTY_CATALOG_FILTERS}),[facets,setFacets]=useState(EMPTY_CATALOG_FACETS)
- const [combinationId,setCombinationId]=useState(initial.pending?.combinationId??''),[recipients,setRecipients]=useState<Recipient[]>([]),[recipientId,setRecipientId]=useState('')
+ const [filters,setFilters]=useState({...EMPTY_CATALOG_FILTERS,keyword:props.initialTool?.slice(0,100)??''}),[applied,setApplied]=useState(filters),[facets,setFacets]=useState(EMPTY_CATALOG_FACETS)
+ const [combinationId,setCombinationId]=useState(initial.pending?.combinationId??props.initialRelease??''),[recipients,setRecipients]=useState<Recipient[]>([]),[recipientId,setRecipientId]=useState('')
  const [recipientPage,setRecipientPage]=useState(1),[recipientMore,setRecipientMore]=useState(false),[q,setQ]=useState(''),[search,setSearch]=useState('')
  const [authorityId,setAuthorityId]=useState(''),[name,setName]=useState(''),[from,setFrom]=useState(''),[until,setUntil]=useState(''),[password,setPassword]=useState('')
  const [grants,setGrants]=useState<EducationManagedUse[]>([]),[grantPage,setGrantPage]=useState(1),[grantMore,setGrantMore]=useState(false)
@@ -42,10 +42,11 @@ function ConfigurationSession(props:Props){
  useEffect(()=>{
   let alive=true;setLoading(true)
   void request<Page<EducationConfigurationChoice>>(base+'?'+catalogQuery(page,applied)).then(value=>{
-   if(alive){setRows(old=>page===1?value.list:Array.from(new Map([...old,...value.list].map(row=>[row.id,row])).values()));setMore(value.hasMore);setFacets(value.tagFacets??EMPTY_CATALOG_FACETS)}
+   if(alive){const list=props.initialTool ? value.list.filter(row=>row.toolKey===props.initialTool) : value.list
+    setRows(old=>page===1?list:Array.from(new Map([...old,...list].map(row=>[row.id,row])).values()));setMore(value.hasMore);setFacets(value.tagFacets??EMPTY_CATALOG_FACETS)}
   }).catch(reason=>{if(alive)setError(message(reason))}).finally(()=>{if(alive)setLoading(false)})
   return()=>{alive=false}
- },[base,page,applied])
+ },[base,page,applied,props.initialTool])
  useEffect(()=>{
   let alive=true;setRecipients([]);setRecipientId('');setPreview(null)
   if(!choice)return
@@ -58,12 +59,12 @@ function ConfigurationSession(props:Props){
  },[base,choice,recipientPage,search,replacementRecipient])
  useEffect(()=>{
   let alive=true;setGrants([])
-  if(!combinationId)return
+  if(!combinationId||(!choice&&pending?.combinationId!==combinationId))return
   void request<Page<EducationManagedUse>>(base+'/'+combinationId+'/use-grants?page='+grantPage).then(value=>{
    if(alive){setGrants(value.list);setGrantMore(value.hasMore)}
   }).catch(reason=>{if(alive)setError(message(reason))})
   return()=>{alive=false}
- },[base,combinationId,grantPage])
+ },[base,combinationId,grantPage,choice?.id,pending?.combinationId])
  useEffect(()=>{
   if(!pending)return
   const protect=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue=''}
@@ -142,7 +143,7 @@ function ConfigurationSession(props:Props){
    <button disabled={locked} onClick={()=>{setReplacement(null);setReplacementReason('');setError('')}}>取消替换配置</button></section>}
   {loading&&<p role="status">正在读取本校可分发配置…</p>}
   <CatalogDiscoveryFilters label="教育固定量表配置检索" filters={filters} facets={facets} onChange={setFilters} disabled={locked||loading} onApply={value=>{select('');setRows([]);setPage(1);setApplied({...value,keyword:value.keyword.trim()})}}/>
-  {!loading&&!error&&!rows.length&&<p>{catalogQuery(1,applied)!=='page=1'?'没有匹配的可分发配置，可调整条件或清除筛选。':'当前没有可分发配置。请先完成原件装载、入口批准及本校精确分发委托。'}</p>}
+  {!loading&&!error&&!rows.length&&<p>{props.initialTool?'尚未找到此工具的本校可分发配置，请核对工具准入与当前入口管理员的分发委托。':catalogQuery(1,applied)!=='page=1'?'没有匹配的可分发配置，可调整条件或清除筛选。':'当前没有可分发配置。请先完成原件装载、入口批准及本校精确分发委托。'}</p>}
   <ApprovedScaleAxes choices={rows.filter(row=>row.assignable)} disabled={locked||loading} scopeLabel="当前已读取的本校可分发配置，可继续读取更多配置" onSelect={select}/>
   <label>已批准量表配置<select value={combinationId} disabled={locked} onChange={event=>select(event.target.value)}>
    <option value="">选择固定配置</option>{rows.map(row=><option key={row.id} value={row.id}>{row.title} · C {row.versions.CONTENT} / P {row.versions.PARAMETERS} / R {row.versions.REPORT}{row.assignable?'':' · 不可新分配'}</option>)}

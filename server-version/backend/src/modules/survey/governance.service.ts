@@ -167,11 +167,11 @@ export async function redeemResearcherMfaRebind(req:Request,res:Response,raw:str
   await beginSurveyMfaChallenge(req,res,user.id,user.tokenVersion)
   return {mfaRequired:true,enrolled:false}
 }
-export async function researcherList(actorId:string,page:number,keyword='') {
+export async function researcherList(actorId:string,page:number,keyword='',userId?:string) {
   await assertSurveyManager(prisma,actorId)
   const skip=(page-1)*25
   const search=keyword.trim().toLowerCase().replace(/[\\%_]/g,value=>'\\'+value)
-  const rows=await prisma.surveyAccount.findMany({where:search?{normalizedLogin:{contains:search}}:undefined,
+  const rows=await prisma.surveyAccount.findMany({where:userId?{userId}:search?{normalizedLogin:{contains:search}}:undefined,
     orderBy:[{createdAt:'desc'},{userId:'asc'}],skip,take:25})
   const grants=await prisma.surveyResearcherGrant.findMany({where:{userId:{in:rows.map(x=>x.userId)}}})
   return {page,pageSize:25,list:rows.map(account=>({

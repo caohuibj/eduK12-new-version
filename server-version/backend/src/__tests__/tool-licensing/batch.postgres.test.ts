@@ -3,7 +3,11 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { createToolLicenseBatch, previewToolLicenseBatch } from '../../modules/tool-licensing/batch'
-import { createToolLicense, editToolLicense, readToolLicense, terminateToolLicense } from '../../modules/tool-licensing/management'
+import { listLicenseTools } from '../../modules/tool-licensing/directory'
+import { listTaggedLicenseTools, updateToolCatalogTags } from '../../modules/tool-licensing/tags'
+import { readStandardDelegationCoverage } from '../../modules/measurement-content/standard-delegations.service'
+import { authorizeToolPublication } from '../../modules/tool-licensing/runtime'
+import { listToolLicenses, readOwnToolLicense, createToolLicense, editToolLicense, readToolLicense, terminateToolLicense } from '../../modules/tool-licensing/management'
 
 const db = new URL(process.env.DATABASE_URL ?? 'postgresql://localhost/no_database')
 const isolated = ['localhost', '127.0.0.1'].includes(db.hostname)
@@ -11,7 +15,8 @@ const isolated = ['localhost', '127.0.0.1'].includes(db.hostname)
 const prefix = 'batch-license-fixture-' + randomUUID()
 const toolKey = 'SCALE:' + prefix
 const adminIds = [randomUUID(), randomUUID()]
-const schoolIds = Array.from({ length: 9 }, () => randomUUID())
+const measurements:string[]=[]
+const schoolIds = Array.from({ length: 71 }, () => randomUUID())
 const actor = (index = 0) => ({
   actorUserId: adminIds[index],
   actorSession: { adminSessionId: randomUUID(), adminVerifiedAt: Math.floor(Date.now() / 1000),
@@ -30,8 +35,46 @@ const singleDraft = (batch: ReturnType<typeof draft>, subjectId: string, request
 const countIssued = async (subjectIds: string[]) =>
   prisma.toolLicense.count({ where: { product: 'SCHOOL', subjectId: { in: subjectIds } } })
 
+async function installStandard(key:string,version:string) {
+  const measurement = randomUUID()
+  const standard = randomUUID()
+  const trial = randomUUID()
+  const contentHash = 'b'.repeat(64)
+  const combinationHash = randomUUID().replace(/-/g, '').repeat(2)
+  await prisma.measurementContentRelease.create({ data: {
+    id: measurement, layer: 'MEASUREMENT', family: 'SCALE', key, version, hashScheme: 'SHA256',
+    contentHash, content: {}, scope: { kind: 'PLATFORM' }, assetRefs: [], publishedBy: adminIds[0],
+  } })
+  if(version==='1.0.0')await prisma.scale.create({ data: { code: key, name: key, creatorId: adminIds[0], status: 'PUBLISHED',
+    instrumentClass: 'STANDARD', instrumentVersion: '1.0.0', measurementReleaseId: measurement } })
+  await prisma.$executeRaw`
+    INSERT INTO survey_standard_releases (id,tool_key,combination_hash,snapshot,reference,state,approved_by)
+    VALUES (${standard},${key},${combinationHash},
+      jsonb_build_object('instrumentVersion','1.0.0','title',${key}::text),'{}','APPROVED',${adminIds[0]})
+  `
+  await prisma.$executeRaw`
+    INSERT INTO survey_standard_trials(id,release_id,run_id,case_index,answers,scores,report,record_hash)
+    SELECT ${trial}||case_index,${standard},${trial},case_index,'[]','{}','{}',${contentHash}
+    FROM generate_series(0,2) case_index
+  `
+  await prisma.$executeRaw`
+    UPDATE survey_standard_releases SET state='ONLINE',latest_trial=${trial},
+      measurement_release=jsonb_build_object('releaseId',${measurement}::text,'contentHash',${contentHash}::text)
+    WHERE id=${standard}
+  `
+  await prisma.surveyToolPolicy.create({ data: {
+    product: 'SCHOOL', resourceKey: 'standard-release:' + standard, fingerprint: combinationHash,
+    decision: 'APPROVED', reason: '合成目录', reviewedBy: adminIds[0],
+  } })
+  return {standard,measurement}
+}
+
 describe.skipIf(!isolated)('bulk tool licensing on isolated PostgreSQL', () => {
   beforeAll(async () => {
+    if (process.env.PERF_SQL_EVENT_COUNT === '1') {
+      const events = prisma as unknown as { $on(type:'query', cb:(event:{query:string})=>void):void }
+      events.$on('query', event => measurements.push(event.query))
+    }
     await prisma.user.createMany({ data: adminIds.map((id, index) => ({
       id, username: prefix + '-admin-' + index, passwordHash: '-', role: 'ADMIN', platformRole: 'SYSTEM_ADMIN',
     })) })
@@ -44,36 +87,7 @@ describe.skipIf(!isolated)('bulk tool licensing on isolated PostgreSQL', () => {
         VALUES (${id},'HUISCHOOL',${adminIds[0]})
       `
     }
-    const measurement = randomUUID()
-    const standard = randomUUID()
-    const trial = randomUUID()
-    const contentHash = 'b'.repeat(64)
-    const combinationHash = randomUUID().replace(/-/g, '').repeat(2)
-    await prisma.measurementContentRelease.create({ data: {
-      id: measurement, layer: 'MEASUREMENT', family: 'SCALE', key: prefix, version: '1.0.0', hashScheme: 'SHA256',
-      contentHash, content: {}, scope: { kind: 'PLATFORM' }, assetRefs: [], publishedBy: adminIds[0],
-    } })
-    await prisma.scale.create({ data: { code: prefix, name: prefix, creatorId: adminIds[0], status: 'PUBLISHED',
-      instrumentClass: 'STANDARD', instrumentVersion: '1.0.0', measurementReleaseId: measurement } })
-    await prisma.$executeRaw`
-      INSERT INTO survey_standard_releases (id,tool_key,combination_hash,snapshot,reference,state,approved_by)
-      VALUES (${standard},${prefix},${combinationHash},
-        jsonb_build_object('instrumentVersion','1.0.0','title',${prefix}::text),'{}','APPROVED',${adminIds[0]})
-    `
-    await prisma.$executeRaw`
-      INSERT INTO survey_standard_trials(id,release_id,run_id,case_index,answers,scores,report,record_hash)
-      SELECT ${trial}||case_index,${standard},${trial},case_index,'[]','{}','{}',${contentHash}
-      FROM generate_series(0,2) case_index
-    `
-    await prisma.$executeRaw`
-      UPDATE survey_standard_releases SET state='ONLINE',latest_trial=${trial},
-        measurement_release=jsonb_build_object('releaseId',${measurement}::text,'contentHash',${contentHash}::text)
-      WHERE id=${standard}
-    `
-    await prisma.surveyToolPolicy.create({ data: {
-      product: 'SCHOOL', resourceKey: 'standard-release:' + standard, fingerprint: combinationHash,
-      decision: 'APPROVED', reason: '合成目录', reviewedBy: adminIds[0],
-    } })
+    await installStandard(prefix,'1.0.0')
   })
 
   afterAll(() => prisma.$disconnect())
@@ -157,6 +171,55 @@ describe.skipIf(!isolated)('bulk tool licensing on isolated PostgreSQL', () => {
     expect((await readToolLicense(collisionId)).subjectId).toBe(schoolIds[8])
   })
 
+  it.each([[2,9],[10,11],[50,21]])('issues %i recipients and measures the reviewed batch', async (size,offset) => {
+    const request = draft(schoolIds.slice(offset,offset+size))
+    measurements.length=0
+    const start=performance.now()
+    const preview=await previewToolLicenseBatch(actor(),request)
+    const confirm=performance.now()
+    const issued=await createToolLicenseBatch(actor(),{...request,previewDigest:preview.previewDigest})
+    const end=performance.now()
+    expect(issued.licenses).toHaveLength(size)
+    if (process.env.PERF_SQL_EVENT_COUNT === '1') {
+      const reads=measurements.filter(sql=>/FROM organizations o JOIN education_product_entitlements e/.test(sql)).length
+      const writes=measurements.filter(sql=>/INSERT INTO tool_license(?:s|_items|_events)\s*\(/i.test(sql)).length
+      console.info('LICENSE_BATCH_MEASURE',JSON.stringify({size,reads,writes,previewMs:confirm-start,issueMs:end-confirm}))
+      expect(reads).toBe(2)
+      expect(writes).toBe(3)
+      expect(measurements.filter(sql=>sql.includes('FROM "users" WHERE "id" IN'))).toHaveLength(1)
+    }
+  })
+
+  it('shows reservations, identifies quota conflicts, and distinguishes continuous renewals from gaps',async()=>{
+    const ids=schoolIds.slice(9,11)
+    const licenses=await prisma.toolLicense.findMany({where:{subjectId:{in:ids}}})
+    const license=licenses[0]
+    const close=new Date(Date.now()+60_000)
+    const previous=process.env.SCHOOL_TOOL_LICENSING_ENABLED
+    process.env.SCHOOL_TOOL_LICENSING_ENABLED='true'
+    try {
+      const publish=(quantity:number)=>prisma.$transaction(tx=>authorizeToolPublication(tx,{
+        product:'SCHOOL',subjectId:license.subjectId,toolKeys:[toolKey],publicationId:randomUUID(),
+        education:{closesAt:close,maxResponses:quantity,frozenResponses:quantity},
+      }))
+      await publish(4)
+      await expect(publish(3)).rejects.toThrow('本次需要预留 3 份，可用 2 份')
+      const own=await readOwnToolLicense('SCHOOL',license.subjectId,adminIds[0])
+      expect(own.license?.tools[0]).toMatchObject({limit:6,used:4,reserved:4})
+      for(const [index,current] of licenses.entries()){
+        const next={...singleDraft(draft(ids),current.subjectId),
+          startsAt:new Date(current.expiresAt.getTime()+index*86400000).toISOString(),
+          expiresAt:new Date(current.expiresAt.getTime()+7*86400000).toISOString()}
+        const issued=await createToolLicense(actor(),next)
+        const list=await listToolLicenses({product:'SCHOOL',subjectId:current.subjectId,status:'EXPIRING'})
+        expect(list.list[0]).toMatchObject({nextLicenseId:index===0?issued.id:null,missingTools:[]})
+      }
+    } finally {
+      if(previous===undefined)delete process.env.SCHOOL_TOOL_LICENSING_ENABLED
+      else process.env.SCHOOL_TOOL_LICENSING_ENABLED=previous
+    }
+  })
+
   it('invalidates an uncommitted batch when its only native scale is stopped after preview', async () => {
     const request = draft(schoolIds.slice(2, 4))
     const review = await previewToolLicenseBatch(actor(), request)
@@ -170,5 +233,29 @@ describe.skipIf(!isolated)('bulk tool licensing on isolated PostgreSQL', () => {
       .rejects.toMatchObject({ statusCode: 409 })
     await expect(previewToolLicenseBatch(actor(), request)).rejects.toMatchObject({ statusCode: 403 })
     expect(await countIssued(request.subjectIds)).toBe(0)
+  })
+
+  it('keeps a licensed tool and its tags selectable while any exact version remains eligible',async()=>{
+    const key=prefix+'-siblings'
+    const stable='SCALE:'+key
+    const first=await installStandard(key,'1.0.0')
+    const other=await installStandard(key,'1.0.1')
+    const tag='合成版本-'+randomUUID().slice(0,8)
+    await updateToolCatalogTags({...actor(),platformRole:'SYSTEM_ADMIN'},{product:'SCHOOL',toolKey:stable,tags:[tag],expectedRevision:0})
+    const stop=(measurement:string)=>prisma.$executeRaw`
+      INSERT INTO scale_library_emergency_stops(target_kind,target_id,actor_id,reason)
+      VALUES ('RELEASE',${measurement},${adminIds[0]},'合成版本停用回归')`
+    const directory=()=>listLicenseTools(prisma,'SCHOOL',{key:stable})
+    const tags=()=>listTaggedLicenseTools({product:'SCHOOL',tag})
+    const cover=(id:string)=>prisma.$transaction(tx=>readStandardDelegationCoverage(tx,id,'SCHOOL'))
+    await stop(first.measurement)
+    expect((await directory()).list.map(tool=>tool.key)).toEqual([stable])
+    expect((await tags()).list.map(tool=>tool.key)).toEqual([stable])
+    expect((await cover(first.standard)).assignable).toBe(false)
+    expect((await cover(other.standard)).assignable).toBe(true)
+    await stop(other.measurement)
+    expect((await directory()).list).toEqual([])
+    expect((await tags()).list).toEqual([])
+    expect((await cover(other.standard)).assignable).toBe(false)
   })
 })

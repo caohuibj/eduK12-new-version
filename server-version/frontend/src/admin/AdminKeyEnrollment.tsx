@@ -1,3 +1,4 @@
+import {standardAssignmentReturnTo} from './standardAssignmentTarget'
 import SystemAdminEntryShell from './SystemAdminEntryShell'
 import {SYSTEM_HOME,isSystemLoginTarget} from './systemWorkspace'
 import {isTrainingAdminPath} from './trainingPages'
@@ -27,15 +28,18 @@ function AdminKeyEnrollment(){
   const {mode}=useSurveyAppearance()
   const activate=new URLSearchParams(location.search).get('activate')==='1'
   const passwordLabel=activate?'设置密码':'当前密码'
-  const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
-  const systemEntry=isSystemLoginTarget(new URLSearchParams(location.search).get('returnTo'))
-  const trainingEntry=isTrainingAdminPath(new URLSearchParams(location.search).get('returnTo')??'')
+  const returnTo=new URLSearchParams(location.search).get('returnTo')
+  const assignment=standardAssignmentReturnTo(returnTo)
+  const entryPath=assignment?.split('?')[0]??returnTo
+  const surveyEntry=Boolean(origins&&entryPath===SURVEY_ADMIN_PATH)
+  const systemEntry=isSystemLoginTarget(returnTo)
+  const trainingEntry=isTrainingAdminPath(entryPath??'')
   const homeOrigin=new URL(origins?.admin??window.location.origin)
   if(import.meta.env.DEV&&['localhost','127.0.0.1'].includes(homeOrigin.hostname))homeOrigin.hostname='training.localhost'
   const trainingHome=homeOrigin.origin+'/'
   const educationProduct=educationEntry(location.search)
   const Shell=systemEntry?SystemAdminEntryShell:educationProduct?EducationAdminEntryShell:surveyEntry?SurveyAdminEntryShell:AuthShell
-  const loginPath=systemEntry?'/admin/login?returnTo='+encodeURIComponent(SYSTEM_HOME):educationProduct?`/admin/login?returnTo=${encodeURIComponent(educationProduct==='School'?'/admin/huischool':'/admin/huiteacher')}`:surveyEntry?surveyAppearanceHref('/admin/login?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode):trainingEntry?'/admin/login?returnTo=%2Fadmin%2Ftraining':'/admin/login'
+  const loginPath=systemEntry?'/admin/login?returnTo='+encodeURIComponent(SYSTEM_HOME):educationProduct?`/admin/login?returnTo=${encodeURIComponent(assignment??(educationProduct==='School'?'/admin/huischool':'/admin/huiteacher'))}`:surveyEntry?surveyAppearanceHref('/admin/login?returnTo='+encodeURIComponent(assignment??SURVEY_ADMIN_PATH),mode):trainingEntry?'/admin/login?returnTo='+encodeURIComponent(assignment??'/admin/training'):'/admin/login'
   const [username,setUsername]=useState(''),[password,setPassword]=useState(''),[ticket,setTicket]=useState('')
   const [method,setMethod]=useState<'TOTP'|'SECURITY_KEY'>('TOTP')
   const [uri,setUri]=useState(''),[code,setCode]=useState('')

@@ -1,16 +1,16 @@
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
-import { AdminPermissionError, lockAdminMutation } from '../admin-permissions/service'
+import { AdminPermissionError } from '../admin-permissions/service'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import {
   createToolLicenseSchema, editToolLicenseSchema, toolLicenseId,
   type ToolLicenseProduct, type ToolLicenseSubjectType,
 } from './contracts'
-import { requireLicenseSubject, type LicenseSubject, type LicenseTool } from './directory'
+import { eligibleBatchSubjects, type LicenseSubject, type LicenseTool } from './directory'
 import {
   findOverlappingToolLicenseSubjects, lockToolLicenseSubjects, readToolLicenseIssueTime,
-  validateToolLicenseItems, writeNewToolLicense, type ToolLicenseActor,
+  validateToolLicenseItems, writeNewToolLicenses, lockLicenseActor, type ToolLicenseActor,
 } from './management'
 
 const maxRecipients = 50
@@ -48,19 +48,16 @@ const stableScope = (scope: Scope) => ({
   tools: [...scope.tools].sort((left, right) => left.key < right.key ? -1 : Number(left.key > right.key)),
 })
 
-async function readPreview(tx: Tx, actor: ToolLicenseActor, scope: Scope) {
+async function readPreview(tx: Tx, actor: ToolLicenseActor, scope: Scope, lock = false) {
   const stable = stableScope(scope)
   const subjects: LicenseSubject[] = []
   const conflicts: Conflict[] = []
-  const tools = await validateToolLicenseItems(tx, scope.product, stable.tools)
   const overlapping = await findOverlappingToolLicenseSubjects(tx, { ...scope, subjectIds: stable.subjectIds })
+  const eligible = await eligibleBatchSubjects(tx, scope.product, stable.subjectIds, lock)
   for (const subjectId of stable.subjectIds) {
-    let subject: LicenseSubject
-    try {
-      subject = await requireLicenseSubject(tx, scope.product, subjectId)
-    } catch (error) {
-      if (!(error instanceof AdminPermissionError) || error.statusCode !== 403) throw error
-      conflicts.push({ subjectId, label: '待核对对象', reason: error.message })
+    const subject = eligible.get(subjectId)
+    if (!subject) {
+      conflicts.push({ subjectId, label: '待核对对象', reason: '授权对象当前资格或对应产品开通状态不可用' })
       continue
     }
     subjects.push(subject)
@@ -68,6 +65,7 @@ async function readPreview(tx: Tx, actor: ToolLicenseActor, scope: Scope) {
       conflicts.push({ subjectId, label: subject.label, reason: '此入口已有与所选期限重叠的许可' })
     }
   }
+  const tools = await validateToolLicenseItems(tx, scope.product, stable.tools)
   const reviewed = {
     requestId: stable.requestId, product: stable.product,
     startsAt: stable.startsAt, expiresAt: stable.expiresAt, reason: stable.reason, subjects, tools, conflicts,
@@ -125,15 +123,18 @@ export async function createToolLicenseBatch(actor: ToolLicenseActor, raw: unkno
   const ids = subjectIds.map((subjectId, index) => receiptId(requestId, subjectId, index))
   const digest = canonicalHash({ scope: stable, actorId: actor.actorUserId, previewDigest })
   return prisma.$transaction(async tx => {
-    await lockAdminMutation(tx, actor)
+    const recheck = await lockLicenseActor(tx, actor)
     // PostgreSQL keeps the one-bigint lock namespace separate from the
     // product/subject locks, which also synchronize ordinary single issuance.
     await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock(hashtextextended('tool-license-batch:'||${requestId}::text,0))`
     const [committed] = await tx.$queryRaw<Array<{ id: string }>>`SELECT id FROM tool_licenses WHERE id=${requestId}`
-    if (committed) return { requestId, licenses: await issuedReceipts(tx, ids, digest) }
+    if (committed) {
+      recheck()
+      return { requestId, licenses: await issuedReceipts(tx, ids, digest) }
+    }
 
     await lockToolLicenseSubjects(tx, scope.product, subjectIds)
-    const review = await readPreview(tx, actor, scope).catch(error => {
+    const review = await readPreview(tx, actor, scope, true).catch(error => {
       // Subject eligibility is already reported in conflicts. A catalog rejection
       // here invalidates the preview and the administrator can edit the selection.
       if (error instanceof AdminPermissionError && error.statusCode === 403)
@@ -143,15 +144,13 @@ export async function createToolLicenseBatch(actor: ToolLicenseActor, raw: unkno
     if (review.conflicts.length || review.previewDigest !== previewDigest)
       throw new AdminPermissionError(409, '对象、工具或授权状态已变化，请重新预览后再签发')
 
-    await lockAdminMutation(tx, actor)
     const issuedAt = await readToolLicenseIssueTime(tx, scope.expiresAt)
-    for (const [index, subject] of review.subjects.entries()) {
-      await writeNewToolLicense(tx, {
-        id: ids[index], product: scope.product, subject, actor, digest,
-        startsAt: scope.startsAt, expiresAt: scope.expiresAt, reason: scope.reason,
-        entries: review.tools, batchIssuedAt: issuedAt,
-      })
-    }
+    recheck()
+    await writeNewToolLicenses(tx, {
+      recipients: review.subjects.map((subject, index) => ({ id: ids[index], subject })),
+      product: scope.product, actor, digest, startsAt: scope.startsAt, expiresAt: scope.expiresAt,
+      reason: scope.reason, entries: review.tools, batchIssuedAt: issuedAt,
+    })
     return { requestId, licenses: await issuedReceipts(tx, ids, digest) }
   }, options)
 }

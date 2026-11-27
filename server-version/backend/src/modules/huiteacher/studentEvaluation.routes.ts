@@ -58,7 +58,7 @@ const wrap=(fn:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
     if(typeof known?.statusCode==='number'&&known.statusCode>=400&&known.statusCode<500)
       return res.status(known.statusCode).json({
         code:known.code??'HUITEACHER_STUDENT_EVAL_DENIED',
-        message:known.code==='TOOL_PUBLICATION_LICENSE'||known.code==='RUN_INTAKE_DEADLINE'
+        message:['TOOL_PUBLICATION_LICENSE','RUN_INTAKE_DEADLINE','PUBLIC_SOURCE_USE_REQUIRED'].includes(known.code??'')
           ?known.message:'请求未获授权或任务状态已改变',data:null,
       })
     throw e

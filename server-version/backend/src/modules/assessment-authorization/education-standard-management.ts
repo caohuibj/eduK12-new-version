@@ -1,4 +1,4 @@
-import {standardNativeScaleJoin} from '../scale/component-import/native-source'
+import {standardAvailability} from '../measurement-content/eligible-standard'
 import {catalogDiscoveryRecords,discoveryPageSql,discoveryJoin} from '../survey/catalog-discovery'
 import {catalogDiscoveryQueryFields,catalogTagFacets,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import {Prisma} from '@prisma/client'
@@ -38,22 +38,21 @@ export async function educationStandardManagementCatalog(actorId:string,scope:Ed
  return prisma.$transaction(async tx=>{
   await assertEducationConfigurationManager(tx,actorId,scope)
   const records=catalogDiscoveryRecords()
+  const {joins,approved,measurementAvailable,available}=standardAvailability(scope.product)
   const roots=educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`s.measurement_release->>'releaseId'`,
    Prisma.sql`'education-source:STANDARD_SCALE:'||s.id||':'||s.combination_hash`)
   const [catalog]=await tx.$queryRaw<Array<{facetTags:CatalogClassificationTag[];list:Array<{id:string;title:string;toolKey:string;instrumentVersion:string;combinationHash:string;state:string;
-   contentVersion:string;parametersVersion:string;reportVersion:string;approved:boolean;nativeStatus:string|null;measurementId:string|null;measurementAvailable:boolean;organizationAvailable:boolean;
+   contentVersion:string;parametersVersion:string;reportVersion:string;approved:boolean;nativeStatus:string|null;measurementAvailable:boolean;available:boolean;organizationAvailable:boolean;
    authorities:Array<{id:string;version:number;validFrom:string;expiresAt:string}>;classificationTags:CatalogClassificationTag[]}>}>>(discoveryPageSql({source:Prisma.sql`
    SELECT s.created_at,discovery.ids,discovery.terms,COALESCE(discovery.tags,'[]'::jsonb) AS "classificationTags",s.id,s.snapshot->>'title' AS title,s.tool_key AS "toolKey",s.snapshot->>'instrumentVersion' AS "instrumentVersion",s.combination_hash AS "combinationHash",s.state,
     s.snapshot#>>'{parts,CONTENT,version}' AS "contentVersion",s.snapshot#>>'{parts,PARAMETERS,version}' AS "parametersVersion",s.snapshot#>>'{parts,REPORT,version}' AS "reportVersion",
-    COALESCE(p.decision='APPROVED' AND NOT p.paused,false) AS approved,native.status::text AS "nativeStatus",s.measurement_release->>'releaseId' AS "measurementId",
-    COALESCE(m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED' AND m.content_hash=s.measurement_release->>'contentHash',false) AS "measurementAvailable",
+    COALESCE(${approved},false) AS approved,native.status::text AS "nativeStatus",
+    COALESCE(${measurementAvailable},false) AS "measurementAvailable",COALESCE(${available},false) AS available,
     EXISTS(SELECT 1 FROM organizations o JOIN education_product_entitlements ent ON ent.organization_id=o.id
      AND ent.product=${scope.product==='SCHOOL'?'HUISCHOOL':'HUITEACHER'} AND ent.status='ACTIVE' WHERE o.id=${scope.organizationId} AND o.product_domain='SCHOOL' AND o.status='ACTIVE') AS "organizationAvailable",
     COALESCE((SELECT jsonb_agg(jsonb_build_object('id',r.id,'version',r.version,'validFrom',r.valid_from AT TIME ZONE 'UTC','expiresAt',r.expires_at AT TIME ZONE 'UTC'))
      FROM (${roots} ORDER BY g.id LIMIT 129) r),'[]'::jsonb) AS authorities
-   FROM survey_standard_releases s LEFT JOIN survey_tool_policies p ON p.product=${scope.product} AND p.resource_key='standard-release:'||s.id AND p.fingerprint=s.combination_hash
-   LEFT JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId'
-   LEFT JOIN scales native ON ${standardNativeScaleJoin('native','s')} AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
+   FROM survey_standard_releases s ${joins}
    ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`s.tool_key`,version:Prisma.sql`s.snapshot->>'instrumentVersion'`,metadata:Prisma.sql`s.snapshot#>'{parts,CONTENT,reference,metadata}'`,locale:Prisma.sql`s.snapshot#>>'{definition,versionAxes,locale}'`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})}
    WHERE (EXISTS(${roots}) OR EXISTS(
     SELECT 1 FROM content_capability_grants own JOIN assessment_management_events e ON e.id=own.id AND e.action=${EDUCATION_STANDARD_USE_ACTION}
@@ -63,9 +62,9 @@ export async function educationStandardManagementCatalog(actorId:string,scope:Ed
   return {page:input.page,hasMore:rows.length>size,tagFacets:catalogTagFacets([catalog.facetTags]),list:rows.slice(0,size).map(row=>({
    id:row.id,title:row.title,toolKey:row.toolKey,classificationTags:row.classificationTags,instrumentVersion:row.instrumentVersion,combinationHash:row.combinationHash,
    versions:{CONTENT:row.contentVersion,PARAMETERS:row.parametersVersion,REPORT:row.reportVersion},authorities:row.authorities.length<=128?row.authorities:[],
-   assignable:row.organizationAvailable&&row.state==='ONLINE'&&row.approved&&row.nativeStatus==='PUBLISHED'&&row.measurementAvailable&&row.authorities.length>0&&row.authorities.length<=128,
+   assignable:row.organizationAvailable&&row.available&&row.authorities.length>0&&row.authorities.length<=128,
    unavailableReason:!row.organizationAvailable?'本校当前产品已暂停或尚未开通':row.state!=='ONLINE'?'该配置已停止新增使用':!row.approved?'该配置未获当前入口批准或已暂停':row.nativeStatus!=='PUBLISHED'?'原生量表尚未装载或发布':
-    !row.measurementAvailable?'已批准测量版本不可用':!row.authorities.length?'当前缺少本校、本来源的精确分发委托':row.authorities.length>128?'精确分发委托过多，请整理后选择':null,
+    !row.measurementAvailable?'已批准测量版本不可用':!row.available?'该版本已停止新增分配':!row.authorities.length?'当前缺少本校、本来源的精确分发委托':row.authorities.length>128?'精确分发委托过多，请整理后选择':null,
   }))}
  },options)
 }

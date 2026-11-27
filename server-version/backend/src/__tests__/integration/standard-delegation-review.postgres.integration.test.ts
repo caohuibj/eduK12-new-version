@@ -16,7 +16,7 @@ suite('exact grant account review and handoff (isolated PostgreSQL)',()=>{
  it('uses one original grant, verifies impact and successor, and keeps the original configuration immutable',async()=>{
   const url=process.env.DATABASE_URL??''
   requireIsolatedReleaseDatabase(url)
-  if(process.env.NODE_ENV!=='test'||new URL(url).port!=='55434'||new URL(url).pathname!=='/tool_licensing_student_final_test_20261127')
+  if(process.env.NODE_ENV!=='test'||!['55434',...(process.env.GITHUB_ACTIONS==='true'?['5432']:[])].includes(new URL(url).port)||new URL(url).pathname!=='/tool_licensing_student_final_test_20261127')
    throw new Error('The seeded isolated Teacher student test database is required')
   const authors=await installStudentStandardFixtures('_'+randomUUID().slice(0,8))
   const source={id:authors.declared.versionId,hash:authors.declared.contentHash}
@@ -69,11 +69,25 @@ suite('exact grant account review and handoff (isolated PostgreSQL)',()=>{
    .rejects.toMatchObject({statusCode:409})
   await expect(withdrawStandardDelegationReview(system.id,proof(),incumbent.id,oldId,{...withdraw,successorGrantId:oldId}))
    .rejects.toMatchObject({statusCode:409})
-  await expect(withdrawStandardDelegationReview(system.id,proof(),incumbent.id,oldId,withdraw))
+  const continuation={...withdraw,continueIds:[oldUse.id]}
+  await expect(withdrawStandardDelegationReview(system.id,proof(),incumbent.id,oldId,continuation))
+   .rejects.toMatchObject({statusCode:409})
+  // A successor grant with the right identity but a shorter period cannot cover the old configuration.
+  await grantEducationStandardConfigurationUse(successor.id,scope,source.id,{
+   ...use(input.requestId,'仍需补足期限'),expiresAt:new Date(Date.parse(expiresAt)-1000).toISOString(),
+  })
+  await expect(withdrawStandardDelegationReview(system.id,proof(),incumbent.id,oldId,continuation))
+   .rejects.toMatchObject({statusCode:409})
+  await grantEducationStandardConfigurationUse(successor.id,scope,source.id,use(input.requestId,'接任人重新签发配置'))
+  const reviewed=await readStandardDelegationReview(system.id,proof(),incumbent.id,oldId,{successorGrantId:input.requestId})
+  expect(reviewed.affected.list).toMatchObject([{id:oldUse.id,reissued:true}])
+  await expect(withdrawStandardDelegationReview(system.id,proof(),incumbent.id,oldId,continuation))
    .resolves.toMatchObject({changed:true,version:2})
+  await expect(withdrawStandardDelegationReview(system.id,proof(),incumbent.id,oldId,continuation))
+   .resolves.toMatchObject({changed:false,version:2})
+  await expect(withdrawStandardDelegationReview(system.id,proof(),incumbent.id,oldId,withdraw))
+   .rejects.toMatchObject({statusCode:409})
   expect((await read()).grant.status).toBe('REVOKED')
   expect(await db.assessmentManagementEvent.findUniqueOrThrow({where:{id:oldUse.id}})).toEqual(original)
-  await expect(grantEducationStandardConfigurationUse(successor.id,scope,source.id,use(input.requestId,'接任人重新签发配置')))
-   .resolves.toMatchObject({changed:true,version:1})
  },45_000)
 })

@@ -25,6 +25,14 @@ beforeEach(()=>{
 })
 afterEach(()=>{vi.unstubAllGlobals();vi.unstubAllEnvs()})
 describe('administrator login flow',()=>{
+  it('retains the licensed school and tool when an entry administrator signs in',async()=>{
+    const destination='/admin/huischool?standardTool=licensed_scale&subjectId=11260000-0000-4000-8000-000000000001'
+    login.mockResolvedValue({code:0,data:{user:{id:'school-admin',username:'school-admin',role:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'HUISCHOOL',version:1}]}}})
+    mount('/admin/login?returnTo='+encodeURIComponent(destination))
+    expect(screen.getByRole('heading',{name:'School 管理员登录'})).toBeInTheDocument()
+    submit()
+    expect(await screen.findByText('destination:'+destination)).toBeInTheDocument()
+  })
   it('keeps Survey appearance through login and enrollment without theming the generic entry',async()=>{
     login.mockResolvedValue({code:0,data:{user:{id:'survey-admin',username:'survey-admin',role:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'SURVEY',version:1}]}}})
     window.history.replaceState(null,'','/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers&appearance=dark')

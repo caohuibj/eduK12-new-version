@@ -49,6 +49,33 @@ describe('standard delegation account handoff',()=>{
   expect(confirm).toHaveBeenLastCalledWith(expect.stringContaining('1 份固定配置'))
  })
 
+ it('shows outstanding chosen configurations and submits only after checking the successor’s reissue',async()=>{
+  vi.spyOn(window,'confirm').mockReturnValue(true)
+  let reissued=false
+  vi.mocked(api.get).mockImplementation(async url=>({
+   code:0,message:'成功',data:url.includes('/grants/')?{...detail,
+    candidates:[{...detail.candidates[0],grantId:'successor-grant'}],
+    affected:{...detail.affected,list:[{...detail.affected.list[0],reissued}]},
+   }:{list:[grant],hasMore:false},
+  }))
+  await openGrant()
+  fireEvent.click(screen.getByRole('checkbox',{name:/延续 校内教师/}))
+  fireEvent.click(screen.getByRole('button',{name:/接任人账号 · 接任人姓名/}))
+  expect(await screen.findByText(/待重发/)).toBeVisible()
+  fireEvent.change(screen.getByLabelText('分发委托变更原因'),{target:{value:'保留被选配置'}})
+  fireEvent.click(screen.getByRole('button',{name:'完成交接并撤销原委托'}))
+  expect(await screen.findByRole('alert')).toHaveTextContent('尚未重发')
+  expect(api.post).not.toHaveBeenCalled()
+  reissued=true
+  fireEvent.click(screen.getByRole('button',{name:'核对重发记录'}))
+  expect(await screen.findByText(/已重发/)).toBeVisible()
+  fireEvent.click(screen.getByRole('button',{name:'完成交接并撤销原委托'}))
+  await waitFor(()=>expect(api.post).toHaveBeenCalledWith(base+'/grants/origin-grant/revoke',{
+   expectedVersion:1,reason:'保留被选配置',impactDigest:detail.affected.digest,
+   successorGrantId:'successor-grant',continueIds:['dependent-grant'],
+  }))
+ })
+
  it('does not retry an uncertain signing with a different identity',async()=>{
   vi.spyOn(window,'confirm').mockReturnValue(true)
   vi.mocked(api.post).mockRejectedValueOnce(new Error('连接中断'))
