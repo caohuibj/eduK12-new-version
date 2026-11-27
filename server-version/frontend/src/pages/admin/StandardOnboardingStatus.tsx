@@ -21,7 +21,11 @@ const gapLabels:Record<string,string>={
  VERSIONED_SCORER_NOT_REGISTERED:'所需版本的专用计分器尚未安装登记，单独导入 JSON 不能补齐。',
 }
 
-export default function StandardOnboardingStatus({onOpenWorkspace}:{onOpenWorkspace?:(target:StandardOnboardingTarget,workspace:'import'|'drafts')=>void}={}){
+type Props={
+ onOpenWorkspace?:(target:StandardOnboardingTarget,workspace:'import'|'drafts')=>void
+ onFindCombination?:(target:StandardOnboardingTarget)=>void
+}
+export default function StandardOnboardingStatus({onOpenWorkspace,onFindCombination}:Props={}){
  const [rows,setRows]=useState<StandardOnboardingEntry[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[keyword,setKeyword]=useState('')
  const requestVersion=useRef(0),appliedQuery=useRef('')
  const [cursors,setCursors]=useState<Array<string|null>>([null]),[pageIndex,setPageIndex]=useState(0),[nextCursor,setNextCursor]=useState<string|null>(null)
@@ -48,7 +52,9 @@ export default function StandardOnboardingStatus({onOpenWorkspace}:{onOpenWorksp
   {error&&<p role="alert" className="sys-message sys-error">{error}。请重新读取；当前未展示旧状态。</p>}
   {!loading&&!error&&<>
    <p role="status">第 {pageIndex+1} 页 · 本页 {rows.length} 个精确版本。</p>
-   <div className="sys-records">{rows.map(row=><article className="sys-standard-history" key={row.instrumentKey+'@'+row.instrumentVersion} aria-label={row.name+' · '+row.instrumentVersion}>
+   <div className="sys-records">{rows.map(row=>{
+    const target={instrumentKey:row.instrumentKey,instrumentVersion:row.instrumentVersion,name:row.name}
+    return <article className="sys-standard-history" key={row.instrumentKey+'@'+row.instrumentVersion} aria-label={row.name+' · '+row.instrumentVersion}>
     <h3>{row.name} · {row.instrumentVersion}</h3><p>{row.instrumentKey}</p><p className="sys-badge">{row.stage}</p>
     <dl className="sys-facts">
      <div><dt>内容导入</dt><dd>{row.states.imported?'已导入可执行内容':'仅目录资料，尚无可执行内容'}</dd></div>
@@ -66,11 +72,13 @@ export default function StandardOnboardingStatus({onOpenWorkspace}:{onOpenWorksp
      const action=row.nextActions.find(item=>item.code===code)
      return <li key={code}>{action?<><strong>{action.stage}</strong> · 责任角色：{action.owner}<p>{action.next}</p></>:<p>{/[\u3400-\u9fff]/.test(code)?code:gapLabels[code]??'请将下方阻断标识交给内容与治理负责人核对来源、授权及版本材料，补齐后重新审核。'}</p>}<details className="sys-technical"><summary>阻断标识</summary><code>{code}</code></details></li>
     })}</ul></div>:<p>当前未列出内容阻断；这不代替组合批准、试运行及入口授权。</p>}
-    {onOpenWorkspace&&<div className="system-actions"><p>目录记录不会自动生成可编辑草稿。按待办补齐内容后导入，或查找之前保存的草稿继续处理。</p>
-     <button type="button" onClick={()=>onOpenWorkspace({instrumentKey:row.instrumentKey,instrumentVersion:row.instrumentVersion,name:row.name},'import')}>补齐内容并导入</button>
-     <button type="button" onClick={()=>onOpenWorkspace({instrumentKey:row.instrumentKey,instrumentVersion:row.instrumentVersion,name:row.name},'drafts')}>查找已有草稿</button>
+    {(onOpenWorkspace||onFindCombination&&row.states.imported)&&<div className="system-actions">
+     {onOpenWorkspace&&<><p>按待办补齐内容后导入，或打开之前保存的草稿。</p>
+     <button type="button" onClick={()=>onOpenWorkspace(target,'import')}>补齐内容并导入</button>
+     <button type="button" onClick={()=>onOpenWorkspace(target,'drafts')}>查找已有草稿</button></>}
+     {onFindCombination&&row.states.imported&&<button type="button" onClick={()=>onFindCombination(target)}>查找该量表的组合上线状态</button>}
     </div>}
-   </article>)}</div>
+   </article>})}</div>
    {!rows.length&&<p>{appliedQuery.current?'没有符合检索条件的精确版本。':pageIndex?'本页没有接入记录，请返回上一页或刷新。':'尚无标准量表接入记录。'}</p>}
    <nav aria-label="接入状态分页"><button type="button" disabled={!pageIndex||loading} onClick={previous}>上一页</button><button type="button" disabled={!nextCursor||loading} onClick={next}>下一页</button></nav>
   </>}

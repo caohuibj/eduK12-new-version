@@ -11,7 +11,7 @@ import {platformSurveyOriginGuard} from '../../modules/survey/originGuard'
 import {surveyStandardTripletRouter} from '../../modules/survey/standard-triplet.routes'
 import {listScaleInstrumentSources} from '../../modules/scale/onboarding/instrument-registry'
 import {sourceParts,composeTriplet,type Axis,type Part} from '../../modules/survey/standard-triplet.model'
-import {previewStandardTriplet,approveStandardTriplet,standardReleaseRow,runStandardTrial,withdrawStandardTriplet,assertStandardSystem} from '../../modules/survey/standard-triplet.service'
+import {previewStandardTriplet,approveStandardTriplet,standardReleaseRow,runStandardTrial,assertStandardSystem} from '../../modules/survey/standard-triplet.service'
 import {grantCatalogSource} from '../../modules/survey/catalog.service'
 import {getCatalogSourceSnapshot} from '../../modules/survey/catalog.sources'
 import {importCatalogDraft} from '../../modules/survey/builder.service'
@@ -20,14 +20,25 @@ import {createWave,getWave} from '../../modules/survey/waves.service'
 import {prepareWave,openWave} from '../../modules/survey/waves.publish'
 import {startSingleUnlinkedWave} from '../../modules/survey/admission.service'
 import {getOwnResearchTask} from '../../modules/survey/task.public'
+import {readSurveyCheckpoint,saveSurveyCheckpoint} from '../../modules/survey/checkpoint.service'
 import {submitResearchFinal} from '../../modules/survey/final.service'
 import {readSurveyStoredReport} from '../../modules/survey/report-results.service'
 const suite=process.env.SURVEY_TRIPLET_ISOLATED==='1'?describe:describe.skip
 suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
  let system:any,manager:any,training:any,owner:string,server:Server,base:string,onlineId:string,pid:string,wid:string,finalId:string,instrumentKey:string
- const proof={adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()}
+ let opened:Awaited<ReturnType<typeof openWave>>
+ const proof={adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID(),adminAuthenticationMethod:'TOTP' as const}
+ const foreignOrigin='http://survey.localhost:5173'
  const sources=listScaleInstrumentSources().filter(s=>s.executable)
  function input(index:number){const source=sources[index],p=Object.fromEntries(sourceParts(source.identity.instrumentKey,source.identity.instrumentVersion).map(p=>[p.axis,p])) as Record<Axis,Part>,triplet=composeTriplet(source.identity.instrumentKey,p);return {toolKey:triplet.toolKey,CONTENT:p.CONTENT.hash,PARAMETERS:p.PARAMETERS.hash,REPORT:p.REPORT.hash,expectedCombinationHash:triplet.combinationHash,requestId:randomUUID(),reason:'Isolated synthetic review only',allowedProducts:['SURVEY']}}
+ async function middleTrialSubmission(){
+  const [,sample]=await db.$queryRaw<Array<{answers:Record<string,string>}>>`SELECT answers FROM survey_standard_trials WHERE release_id=${onlineId} ORDER BY case_index`
+  return {
+   submissionId:randomUUID(),
+   answers:{[instrumentKey]:sample.answers},
+   itemTimings:{[instrumentKey]:Object.fromEntries(Object.keys(sample.answers).map(key=>[key,{schemaVersion:1,firstResponseMs:1000,activeTimeMs:1500,changeCount:0,visits:1,revisitCount:0,interrupted:false,recoveredWithoutClock:false}]))},
+  }
+ }
  beforeAll(async()=>{
   const u=new URL(process.env.DATABASE_URL!);if(u.port!=='55433'||!(u.pathname.startsWith('/survey_triplet_test_')||/^\/eduk12_ci355_license_entrytriplet_test_[a-f0-9]{10}$/.test(u.pathname)))throw new Error('Schema-only Survey test database required')
   vi.stubEnv('SURVEY_WORKSPACE_ENABLED','true');vi.stubEnv('SURVEY_PUBLICATION_ENABLED','true')
@@ -55,7 +66,7 @@ suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
   expect((await call(manager,'/onboarding-status')).status).toBe(403)
   expect((await call(training,'/onboarding-status')).status).toBe(403)
   expect((await call(system,'/onboarding-status',undefined,{tokenVersion:99})).status).toBe(401)
-  expect((await call(system,'/onboarding-status',undefined,{},true,'http://training.localhost:5173')).status).toBe(403)
+  expect((await call(system,'/onboarding-status',undefined,{},true,foreignOrigin)).status).toBe(403)
   expect(await db.scale.count()).toBe(before)
  })
  it('rechecks session revocation inside transactional authorization',async()=>{await db.user.update({where:{id:system.id},data:{tokenVersion:1}});try{await expect(db.$transaction(tx=>assertStandardSystem(tx,system.id,{...proof,tokenVersion:0}))).rejects.toMatchObject({statusCode:403})}finally{await db.user.update({where:{id:system.id},data:{tokenVersion:0}})}})
@@ -66,7 +77,7 @@ suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
   expect((await call(system,'/approve',request,{adminVerifiedAt:Math.floor(Date.now()/1000)-301})).status).toBe(403)
   expect((await call(system,'/approve',request,{tokenVersion:99})).status).toBe(401)
   expect((await call(system,'/approve',request,{},false)).status).toBe(403)
-  expect((await call(system,'/approve',request,{},true,'http://training.localhost:5173')).status).toBe(403)
+  expect((await call(system,'/approve',request,{},true,foreignOrigin)).status).toBe(403)
  })
  it('approves, computes scores and report, commits and reads back trial rows before ONLINE, with no grants',async()=>{
   const request=input(0),before=await db.$queryRaw`SELECT id FROM survey_tool_grants`
@@ -100,22 +111,50 @@ suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
   pid=randomUUID();await db.surveyProject.create({data:{id:pid,ownerUserId:owner,title:'Isolated standard triplet fixture',collectionMode:'SINGLE_UNLINKED'}})
   const draft=await importCatalogDraft(owner,pid,grant.id,{requestId:randomUUID(),instrumentKey:'approvedscale',title:'Approved synthetic test copy'})
   await publishSurveyMeasurementDraft(owner,pid,draft.id,draft.revision)
-  const wave=await createWave(owner,pid,{requestId:randomUUID(),title:'Trial downstream',consentText:'Synthetic isolated trial consent, no human response.',generalText:'Synthetic test.',instrumentIds:[draft.id],allowNewParticipants:true});wid=wave.id
-  await prepareWave(owner,pid,wid,wave.revision);const frozen=await getWave(owner,pid,wid),opened=await openWave(owner,pid,wid,frozen.revision)
+  const wave=await createWave(owner,pid,{requestId:randomUUID(),title:'Trial downstream',consentText:'Synthetic isolated trial consent, no human response.',generalText:'Synthetic test.',instrumentIds:[draft.id],allowNewParticipants:true,checkpointPolicy:{schemaVersion:1,enabled:true,ttlHours:1}});wid=wave.id
+  await prepareWave(owner,pid,wid,wave.revision)
+  const frozen=await getWave(owner,pid,wid)
+  opened=await openWave(owner,pid,wid,frozen.revision)
   const admitted=await startSingleUnlinkedWave({ ...surveyStartKeys('standard-triplet'),publicId:opened.publicId,waveId:wid,entryToken:opened.entrySecret,consentVersion:1,consent:true})
   const task=await getOwnResearchTask({publicId:opened.publicId,attemptId:admitted.attemptId,accessCredential:admitted.accessCredential});instrumentKey=task.units[0].instrumentKey
-  const cases=(await db.$queryRaw<any[]>`SELECT answers FROM survey_standard_trials WHERE release_id=${onlineId} ORDER BY case_index`)[1]
-  await submitResearchFinal({publicId:opened.publicId,attemptId:admitted.attemptId,accessCredential:admitted.accessCredential,submissionId:randomUUID(),answers:{[instrumentKey]:cases.answers},itemTimings:{[instrumentKey]:Object.fromEntries(Object.keys(cases.answers).map(key=>[key,{schemaVersion:1,firstResponseMs:1000,activeTimeMs:1500,changeCount:0,visits:1,revisitCount:0,interrupted:false,recoveredWithoutClock:false}]))}})
+  await submitResearchFinal({publicId:opened.publicId,attemptId:admitted.attemptId,accessCredential:admitted.accessCredential,...await middleTrialSubmission()})
   finalId=(await db.surveyWaveFinal.findFirstOrThrow({where:{projectId:pid}})).id
   const report=await readSurveyStoredReport(owner,{projectId:pid,waveId:wid,finalId,instrumentKey});expect(report.report.blocks.some(b=>b.type==='METRIC')).toBe(true)
   await expect(readSurveyStoredReport(manager.id,{projectId:pid,waveId:wid,finalId,instrumentKey})).rejects.toThrow()
  },60000)
  it('allows explicit no-parameter/no-report approval without inventing feedback',async()=>{const request=input(2);request.PARAMETERS=(await import('../../modules/assessment-runtime/canonical')).canonicalHash(null);request.REPORT=request.PARAMETERS;const p=await previewStandardTriplet(db,system.id,request);expect(p.blockers).toEqual([]);const state=await approveStandardTriplet(system.id,{...request,expectedCombinationHash:p.combinationHash});expect(state.state,state.blockers.join()).toBe('ONLINE');const rows=await db.$queryRaw<any[]>`SELECT report,scores FROM survey_standard_trials WHERE release_id=${state.id}`;expect(rows).toHaveLength(3);expect(rows.every(r=>r.report===null&&r.scores.units.length===1)).toBe(true)})
- it('withdraws future source use while preserving actual committed FINAL and stored report',async()=>{
+ it('blocks new admission after withdrawal but lets an admitted participant recover, save and FINAL-submit the frozen version',async()=>{
   const before=await db.surveyWaveFinal.findUniqueOrThrow({where:{id:finalId}}),r=await standardReleaseRow(db,onlineId)
-  await withdrawStandardTriplet(system.id,onlineId,r.version,'Synthetic withdrawal')
+  const entry={publicId:opened.publicId,waveId:wid,entryToken:opened.entrySecret,consentVersion:1,consent:true}
+  const startInput={...entry,...surveyStartKeys('before-withdrawal')}
+  const admitted=await startSingleUnlinkedWave(startInput)
+  const participant={publicId:entry.publicId,attemptId:admitted.attemptId,accessCredential:admitted.accessCredential}
+  const task=await getOwnResearchTask(participant)
+  expect(task.status).toBe('STARTED')
+  expect(await db.surveyWaveFinal.count({where:{attemptId:admitted.attemptId}})).toBe(0)
+
+  const withdrawal=await call(system,'/'+onlineId+'/withdraw',{expectedVersion:r.version,reason:'Synthetic withdrawal'})
+  expect(withdrawal.status,JSON.stringify(withdrawal.body)).toBe(200)
+  expect((await standardReleaseRow(db,onlineId)).state).toBe('WITHDRAWN')
   await expect(getCatalogSourceSnapshot({actorUserId:manager.id,ref:{kind:'SCALE',sourceId:'survey-standard:'+onlineId,sourceVersion:r.combination_hash}},db)).rejects.toThrow()
+  const attemptCount=await db.surveyWaveAttempt.count({where:{waveId:wid}})
+  await expect(startSingleUnlinkedWave({...entry,...surveyStartKeys('after-withdrawal')})).rejects.toMatchObject({
+   statusCode:409,message:expect.stringContaining('停止新入场'),
+  })
+  expect(await db.surveyWaveAttempt.count({where:{waveId:wid}})).toBe(attemptCount)
+  await expect(startSingleUnlinkedWave(startInput)).resolves.toMatchObject({attemptId:admitted.attemptId,recovered:true})
+  await expect(getOwnResearchTask(participant)).resolves.toMatchObject({status:'STARTED',definitionDigest:task.definitionDigest,units:task.units})
+
+  const submission=await middleTrialSubmission()
+  await expect(saveSurveyCheckpoint(participant,{revision:0,answers:submission.answers,itemTimings:submission.itemTimings})).resolves.toMatchObject({revision:1})
+  await expect(readSurveyCheckpoint(participant)).resolves.toMatchObject({revision:1,checkpoint:{answers:submission.answers}})
+  await submitResearchFinal({...participant,...submission})
+  const completed=await db.surveyWaveFinal.findUniqueOrThrow({where:{attemptId:admitted.attemptId}})
+  expect(completed).toMatchObject({publicationId:before.publicationId,definitionDigest:task.definitionDigest,submissionId:submission.submissionId})
+  expect((await readSurveyStoredReport(owner,{projectId:pid,waveId:wid,finalId:completed.id,instrumentKey})).report.blocks.some(b=>b.type==='METRIC')).toBe(true)
+  await submitResearchFinal({...participant,...submission})
+  expect(await db.surveyWaveFinal.findUniqueOrThrow({where:{attemptId:admitted.attemptId}})).toEqual(completed)
   expect(await db.surveyWaveFinal.findUniqueOrThrow({where:{id:finalId}})).toEqual(before)
   expect((await readSurveyStoredReport(owner,{projectId:pid,waveId:wid,finalId,instrumentKey})).report.blocks.length).toBeGreaterThan(0)
- })
+ },60000)
 })
