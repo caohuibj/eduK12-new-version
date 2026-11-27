@@ -1,0 +1,96 @@
+{
+  "toolKey": "rpq2024_work_satisfaction4_teacher_self_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "RPQ-E | Notice which parts of the work feel worth returning to",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "English RPQ-E 2024 Table 6 and original author scoring key: questions 27–30 form this component. The 4 responses ordered 1 (Very rarely) to 6 (Almost always) receive equal weight. Existing project complete-response rule and 1–6 component mean are retained. No norms, separate four-item component scores, or RPQ-E total."
+      }
+    },
+    "primaryScoreKeys": [
+      "work_satisfaction4"
+    ],
+    "scoreOrder": [
+      "work_satisfaction4"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "work_satisfaction4",
+        "scoreLabel": "Satisfaction with your teaching work (descriptive mean, 1–6)",
+        "headline": "Notice which parts of the work feel worth returning to",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "At the end of a busy week, a teacher recalls a short discussion in which students began to explain an idea to one another. The week had demanding parts, too. Going back to that one useful moment helps the teacher see which kind of work felt worthwhile, and which conditions gave it room to happen.\n\nYour answers describe how often the work felt fulfilling, meaningful, enjoyable or rewarding to you. Some parts of teaching may feel satisfying even when other parts feel hard. Useful patterns can point to moments you want to protect, as well as conditions that need attention. The average offers a starting place for that reflection.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Choose one school activity that felt worthwhile. Note what made it possible, such as time to prepare, a colleague’s help, or a chance to see a learner’s progress."
+          },
+          {
+            "category": "environment",
+            "text": "Identify one condition that would make room for more of that experience. Think of a small change you can try and one kind of support that belongs with the wider team."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Rogers, S. L., et al. (2024). Further development of the reflective practice questionnaire. PeerJ, 12, e16879. https://doi.org/10.7717/peerj.16879 (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). This is a project report for one component of the 30-item extended questionnaire (RPQ-E, Table 6).",
+      "In the source instructions, educators read “client” as “student.” This version is for adult educators reflecting on their own work. The source study recruited working university students across several professions, so this score supplies no teacher-specific norms or standalone validation.",
+      "The component mean includes all 4 answers and ranges from 1 to 6. The project retains a missing result if any response is absent. This report uses the component only, without a cutoff or a comparison with other RPQ-E scores."
+    ],
+    "disclaimer": "For your own professional reflection as an educator. The result describes your answers about experiences with teaching work and does not assess teaching quality, employment suitability, or student outcomes.",
+    "artworkKey": "rpq2024_work_satisfaction4_teacher_self_en/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
