@@ -1,0 +1,117 @@
+{
+  "toolKey": "tutoring_necessity_chinese_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "语文课外补习信念图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对项目自编三题、六个正向选项、至少答两道后取均分及两学段已有理论分档。"
+      }
+    },
+    "primaryScoreKeys": [
+      "tutoring_necessity"
+    ],
+    "scoreOrder": [
+      "tutoring_necessity"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "tutoring_necessity",
+        "headline": "先弄清是哪一段写不下去",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "小曼写了一段读后感，越看越觉得说不清楚，第一反应是问要不要额外补补。老师看过草稿后，请她先把“我为什么这么想”单独标出来。她发现两句话都在重复情节，缺的是能支持自己感受的一处细节。她回到文章里找了一个例子，这段话终于能接着写。\n\n这几道题记录你怎么看课外补习的帮助和必要性。你可以从一件具体的阅读或写作任务判断现在需要什么支持，并试着用一项独立练习看它是否能帮你往前走。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "先独立补出一个细节",
+            "summary": "拿一段上课写过的文字，合上示范，把一句较笼统的话换成一个实际看到的情节。读给自己听，看看意思有没有更清楚。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "带一段真实草稿去请教",
+            "summary": "圈出最想弄懂的一句话，带着原文去问老师或同学。请对方只指一处线索，接着自己补写。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "给两项任务分别找帮助",
+            "summary": "把一次读不懂和一次写不清分开记。阅读可以找一个关键段落，写作可以先听同伴说他读懂了哪里，再决定先动哪一处。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "隔一天用新片段再试一次",
+            "summary": "用过一次提示后，第二天换一小段文章或一份新草稿。看看自己能否独立找出支持这段话的细节。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "商量一个能看到结果的目标",
+            "summary": "带一份练习去和老师或家长商量。先约定自己想学会哪一步，再选择目前可获得的支持。下次用一小段独立作品核对。",
+            "guidance": []
+          }
+        ],
+        "guidance": [],
+        "scoreLabel": "语文课外补习信念均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "三道题至少答两道，按已答题目计算均分。分数用来回顾你当时的看法。",
+      "初中与高中沿用相同的理论五档。报告根据当前均分提供一条试用建议。"
+    ],
+    "disclaimer": "可从一个真实课堂片段读这份报告，挑其中一个做法试一试。",
+    "artworkKey": "tutoring_necessity_chinese_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

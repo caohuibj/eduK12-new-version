@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "tutoring_necessity_chinese_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "tutoring_necessity-very-low.webp",
+      "alt": "学生合上示范，在自己的段落里补出一个实际情节。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "tutoring_necessity-low.webp",
+      "alt": "学生指着草稿中的一句向同伴请教。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "low"
+    },
+    {
+      "file": "tutoring_necessity-middle.webp",
+      "alt": "阅读和写作的两份练习并排摆放，分别找可用的帮助。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "middle"
+    },
+    {
+      "file": "tutoring_necessity-high.webp",
+      "alt": "学生带着下一次写的练习和老师核对自己独立完成的步骤。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "high"
+    },
+    {
+      "file": "tutoring_necessity-very-high.webp",
+      "alt": "学生和可信成人围着一份草稿讨论一个具体练习目标。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生带着一段圈出疑问的草稿，同老师一起查找原文细节。",
+    "width": 506,
+    "height": 506
+  }
+}
