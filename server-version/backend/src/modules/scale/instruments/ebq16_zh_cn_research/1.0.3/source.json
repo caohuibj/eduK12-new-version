@@ -189,13 +189,13 @@
   },
   "disclosure": {
     "schemaVersion": 1,
-    "policyVersion": "ebq16_zh_cn_research-1.0.1",
+    "policyVersion": "ebq16_zh_cn_research-1.0.3-report",
     "audiences": {
       "respondent": {
         "numericScores": true,
-        "references": false,
+        "references": true,
         "individualInterpretations": true,
-        "scoreDerivedLabels": false,
+        "scoreDerivedLabels": true,
         "resultQualityDetails": true,
         "rawAnswers": false,
         "itemScores": false,
@@ -204,9 +204,9 @@
       },
       "subject": {
         "numericScores": true,
-        "references": false,
+        "references": true,
         "individualInterpretations": true,
-        "scoreDerivedLabels": false,
+        "scoreDerivedLabels": true,
         "resultQualityDetails": true,
         "rawAnswers": false,
         "itemScores": false,
@@ -215,9 +215,9 @@
       },
       "researcher": {
         "numericScores": true,
-        "references": false,
+        "references": true,
         "individualInterpretations": true,
-        "scoreDerivedLabels": false,
+        "scoreDerivedLabels": true,
         "resultQualityDetails": true,
         "rawAnswers": false,
         "itemScores": true,
