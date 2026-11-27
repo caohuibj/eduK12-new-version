@@ -72,7 +72,7 @@ export function composeTriplet(key:string,parts:Record<Axis,Part>):Triplet{
  const variant=parts.REPORT.reference.metadata.reportVariant as {title?:unknown}|undefined
  const baseTitle=imported?String(metadata.title):source!.catalog.identity.canonicalName
  const title=typeof variant?.title==='string'?baseTitle+' · '+variant.title:baseTitle
- const compiled=compileStandardCombinationReport(title,definition,parts.REPORT.payload!==null)
+ const compiled=compileStandardCombinationReport(title,definition,parts.REPORT.payload!==null,parameters.references)
  const template=selectedReport.template??compiled.template,reportBlockers=compiled.blockers
  if(template)try{validateReportTemplateBindings(template,definition.scoring.scores.map(s=>s.key),selectedReport.assetRefs.map(a=>a.assetId))}catch(e){blockers.push(e instanceof Error?e.message:'报告引用不存在的指标或素材')}
  blockers.push(...reportBlockers)

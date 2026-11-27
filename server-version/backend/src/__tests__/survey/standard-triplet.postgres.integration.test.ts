@@ -125,14 +125,14 @@ suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
   const report=await readSurveyStoredReport(owner,{projectId:pid,waveId:wid,finalId,instrumentKey});expect(report.report.blocks.some(b=>b.type==='METRIC')).toBe(true)
   await expect(readSurveyStoredReport(manager.id,{projectId:pid,waveId:wid,finalId,instrumentKey})).rejects.toThrow()
  },60000)
- it('persists two distinct four-answer submissions and replays the same licensed mean report',async()=>{
+ it('publishes the selected mean report and reads all five actions from anonymous submissions',async()=>{
   const key='academic_self_concept_chinese_zh_cn', parts=registeredParts(key)
   function part(axis:Axis,version:string){
    const row=parts.find(value=>value.axis===axis&&value.version===version)
    if(!row)throw new Error(`Missing ${axis}/${version}`)
    return row
   }
-  const selected=composeTriplet(key,{CONTENT:part('CONTENT','1.0.0:1.0.0'),PARAMETERS:part('PARAMETERS','wave1-20261001-v2'),REPORT:part('REPORT','1.3.0')})
+  const selected=composeTriplet(key,{CONTENT:part('CONTENT','1.0.0:1.0.0'),PARAMETERS:part('PARAMETERS','wave1-20261001-v2'),REPORT:part('REPORT','1.3.1')})
   const approved=await approveStandardTriplet(system.id,{toolKey:key,CONTENT:selected.parts.CONTENT.hash,PARAMETERS:selected.parts.PARAMETERS.hash,
    REPORT:selected.parts.REPORT.hash,expectedCombinationHash:selected.combinationHash,requestId:randomUUID(),reason:'Synthetic student mean report',allowedProducts:['SURVEY']})
   expect(approved.state,approved.blockers.join()).toBe('ONLINE')
@@ -145,7 +145,8 @@ suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
   await prepareWave(owner,project.id,wave.id,wave.revision,undefined,[{instrumentId:draft.id,feedback:{policyVersion:'SURVEY_RAW_METRICS_V1',
    mode:'DESCRIPTIVE',metricKeys:['academic_self_concept'],release:'AFTER_FINAL'}}])
   const prepared=await getWave(owner,project.id,wave.id),opened=await openWave(owner,project.id,wave.id,prepared.revision)
-  async function submitAndRead(values:number[]){
+  async function submitAndRead(values:number[],bandKey:string){
+   const mean=values.reduce((sum,value)=>sum+value,0)/values.length
    const admitted=await startSingleUnlinkedWave({...surveyStartKeys('mean-report'),publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true})
    const participant={publicId:opened.publicId,attemptId:admitted.attemptId,accessCredential:admitted.accessCredential}
    const answers=Object.fromEntries(values.map((v,i)=>['i_'+i,'o_'+(v-1)]))
@@ -155,19 +156,32 @@ suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
    const saved=decryptUnifiedRuntimePayload<SurveyComputedFinal>(row.resultsCipher)
    expect(canonicalHash(saved)).toBe(row.resultsHash)
    expect(saved.units[0].rawAnswers).toEqual(answers)
-   expect(saved.units[0].privateScoring).toMatchObject({scores:[{key:'academic_self_concept',value:3.5}]})
+   expect(saved.units[0].privateScoring).toMatchObject({scores:[{key:'academic_self_concept',value:mean}]})
    const own=await readGeneralForOwnAttempt(participant)
    if(!('measurements' in own)||own.kind!=='DESCRIPTIVE')throw new Error('Expected disclosed individual report')
    const measurement=own.measurements[0]
    if(!('declaredReport' in measurement)||!measurement.declaredReport)throw new Error('Expected frozen student report after database read')
-   expect(measurement.declaredReport).toMatchObject({illustrationKey:'chinese-self-concept-door-with-actions-v2',blocks:expect.arrayContaining([
-    expect.objectContaining({type:'METRIC',value:3.5,label:'语文学习自评均分（试用版）'}),
-   ])})
+   expect(saved.interpretation?.units[0].references).toEqual([expect.objectContaining({status:'UNAVAILABLE',reason:'MISSING_CONTEXT'})])
+   expect(measurement.declaredReport).toMatchObject({illustrationKey:'chinese-self-concept-door-with-score-actions-v3',
+    blocks:expect.arrayContaining([expect.objectContaining({type:'METRIC',value:mean,label:'语文学习自评均分（试用版）'})])})
+   const feedback=measurement.declaredReport.blocks.filter(b=>(b as {type:string}).type==='SCORE_FEEDBACK')
+   const authored=selected.definition.report.interpretations[0].bands.find(b=>b.key===bandKey)!
+   expect(feedback).toEqual([{type:'SCORE_FEEDBACK',metricKey:'academic_self_concept',bandKey,text:authored.label+'\n'+authored.summary,guidance:[]}])
+   expect(measurement).not.toHaveProperty('rawScoreFeedback')
+   expect(measurement.declaredReport).not.toHaveProperty('standardScoreBands')
    expect(JSON.stringify(measurement.declaredReport)).not.toMatch(/itemScores|rawAnswers|responseValue/)
    expect(final).toMatchObject({participantFeedbackReceipt:{measurements:[{declaredReport:measurement.declaredReport}]}})
    return {report:measurement.declaredReport,hash:row.resultsHash}
   }
-  const first=await submitAndRead([3,4,3,4]), second=await submitAndRead([5,2,5,2])
+  const examples=[
+   {answers:[1,1,2,2],key:'very_low'},{answers:[2,2,2,3],key:'low'},
+   {answers:[3,3,3,3],key:'middle'},{answers:[3,4,3,4],key:'high'},
+   {answers:[4,5,4,5],key:'very_high'},
+  ]
+  const reports=[]
+  for(const example of examples)reports.push(await submitAndRead(example.answers,example.key))
+  await expect(submitAndRead([3,4,5],'high')).rejects.toThrow('完整选择有效的响应选项')
+  const first=reports[3],second=await submitAndRead([5,2,5,2],'high')
   expect(first.hash).not.toBe(second.hash)
   expect(first.report).toEqual(second.report)
  },60000)

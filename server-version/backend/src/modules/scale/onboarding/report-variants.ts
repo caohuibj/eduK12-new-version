@@ -3,6 +3,7 @@ import {canonicalHash} from '../../assessment-runtime/canonical'
 import {scaleReportDefinitionSchema} from '../scale-definition'
 import type {ScaleInstrumentSourceV1} from './types'
 import {scaleSourceAxisPayloads} from './source-snapshot'
+import chineseSelfConceptScoreActions from '../instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-score-actions.json'
 import chineseSelfConceptActions from '../instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-actions.json'
 import chineseSelfConcept from '../instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-variants.json'
 import cfq from '../instruments/cfq7_zh_cn_research/1.0.1/report-variants.json'
@@ -71,6 +72,10 @@ const materials=[
   {
     material: chineseSelfConcept,
     origin: {path:'server-version/backend/src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-variants.json'},
+  },
+  {
+    material: chineseSelfConceptScoreActions,
+    origin: {path:'server-version/backend/src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-score-actions.json'},
   },
   {
     material: chineseSelfConceptActions,

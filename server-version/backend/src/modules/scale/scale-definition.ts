@@ -127,6 +127,7 @@ const interpretationSchema = z.object({
   source: z.discriminatedUnion('type', [
     z.object({ type: z.literal('score_only') }),
     z.object({ type: z.literal('reference_context') }),
+    z.object({ type: z.literal('shared_theoretical_range') }),
     z.object({ type: z.literal('reference'), referenceVersion: z.string().min(1), referenceKind: z.enum(['normative_distribution', 'criterion_threshold', 'descriptive_sample', 'theoretical_range']) }),
   ]).default({ type: 'score_only' }),
   summary: z.string().min(1),

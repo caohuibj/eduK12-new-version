@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "academic_self_concept_chinese_zh_cn",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "10cef65ad9eb89761ea5c6806fdf9c707951d798ac0c34b185ea849ae15f9367",
+  "baseParametersHash": "05552d804bcea2ec19bf4aa73a7089a46857139c0fca4ba9fb6abaaee2531f8b",
+  "variants": [
+    {
+      "key": "student_reading_score_actions",
+      "title": "语文学习自评行动图版（按均分）",
+      "report": {
+        "reportVersion": "1.3.1",
+        "illustrationKey": "chinese-self-concept-door-with-score-actions-v3",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "Codex 内容编辑初审",
+            "reviewedAt": "2026-11-27T00:00:00Z",
+            "basis": "已与项目原始问卷、计分字典和语文版题本核对。按原有均分分段选用一段反馈和一件可尝试的小事。同一均分显示同一段，不解读单题或推断学生能力。课堂故事为本报告原创；五个分段均为试用估计。"
+          }
+        },
+        "primaryScoreKeys": [
+          "academic_self_concept"
+        ],
+        "scoreOrder": [
+          "academic_self_concept"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "academic_self_concept",
+            "headline": "我怎么看自己的语文学习",
+            "source": {
+              "type": "shared_theoretical_range"
+            },
+            "summary": "语文课上，黑板上写着：“她抬手要敲门，又轻轻放下。”老师问：“要是把‘又’擦掉，你读起来有什么不同？”小禾一下没想好，心想：“我语文不行。”同桌轻声问：“那你读出了什么？”小禾说：“她在犹豫呀。我就是没想通，她在怕什么。”老师听见了，说：“你从她手上的动作读出了犹豫。咱们往前翻一段，看看她来见谁。”\n\n你心里对“我语文学得怎么样”的判断，就是心理学里说的“语文学科自我概念”。这种看法会随着经历改变，也可能影响你下次愿不愿意举手。小禾一开始只想着自己没答上来。听老师说“你读出了犹豫”，她才发现，原来自己已经读懂了一层。想想最近的语文课，有没有哪件这样的小事，也值得算进去？",
+            "bands": [
+              {
+                "key": "very_low",
+                "label": "回到你的语文课",
+                "summary": "从这次的回答看，你可能觉得自己语文学得不太好。翻开最近读过的课文，给你读懂的一句话画条线。要是用自己的话讲一讲，你会怎么说？",
+                "guidance": []
+              },
+              {
+                "key": "low",
+                "label": "回到你的语文课",
+                "summary": "这次，你对“我语文学得好”这句话不太认同。读课文时遇到想问的地方，不妨在那里夹一张书签。下次找老师聊语文，就翻到那一页。",
+                "guidance": []
+              },
+              {
+                "key": "middle",
+                "label": "回到你的语文课",
+                "summary": "这次的均分落在中间一档。最近读过的课文里，哪些地方你已经读懂了，哪些地方还想问一问？在书边各记一处，你就有了比一个分数更具体的答案。",
+                "guidance": []
+              },
+              {
+                "key": "high",
+                "label": "回到你的语文课",
+                "summary": "从这次的回答看，你觉得自己的语文学得不错。挑一段最近读懂的课文，圈出给你提示的词句。要是同桌问你怎么读出来的，你会指给他看哪一句？",
+                "guidance": []
+              },
+              {
+                "key": "very_high",
+                "label": "回到你的语文课",
+                "summary": "你对自己的语文学习很有信心。挑一段你觉得读透了的课文，合上书讲给同桌听。再翻回原文，看看哪些细节讲准了，哪些还可以补上一笔。",
+                "guidance": []
+              }
+            ],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "下次想说“我语文不行”时，试着问自己：“我已经读懂了什么？还有哪一句没想通？”"
+              }
+            ],
+            "provisional": true,
+            "scoreLabel": "语文学习自评均分（试用版）"
+          }
+        ],
+        "limitations": [
+          "均分取自你实际回答的题目，至少要答三题。各档的分界是初步估计，目前还没有足够的同年级学生数据作参照。"
+        ],
+        "disclaimer": "这份报告记录你这一次对语文学习的看法，适合七至十二年级学生自己读，也可以和老师一起聊。"
+      }
+    }
+  ]
+}

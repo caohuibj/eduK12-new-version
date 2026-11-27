@@ -16,6 +16,7 @@ function DeclaredBlock({value,showMetricKeys=true,actionBand}:{value:unknown;sho
   switch(block.type){
     case 'TEXT':return <p className="whitespace-pre-wrap">{text(block.text)}</p>
     case 'METRIC':return <p>{text(block.label)||(showMetricKeys?text(block.metricKey):'测评指标')}：<Metric value={block}/></p>
+    case 'SCORE_FEEDBACK':
     case 'REFERENCE_BAND':return <DeclaredBandFeedback band={actionBand}>
       <div><p>{text(block.text)}</p>{Array.isArray(block.guidance)&&<ul>{block.guidance.filter(line=>typeof line==='string').map((line,index)=><li key={index}>{line}</li>)}</ul>}</div>
     </DeclaredBandFeedback>

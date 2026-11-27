@@ -127,9 +127,10 @@ export async function attachSurveyParticipantDeclaredReports(
         referenceKind: ref.referenceKind,
         status: ref.status === 'AVAILABLE' ? 'AVAILABLE' : 'UNAVAILABLE',
         bandKey: ref.values?.bandKey ?? null,
+        reason: ref.reason,
       }))
 
-    const proseDisclosure = report.content.template.illustrationKey && candidate.unit.nativeBundleReport
+    const proseDisclosure = candidate.unit.nativeBundleReport
       ? resolveAudienceDisclosure(candidate.unit.nativeBundleReport.policy.disclosure,'subject') : undefined
     const declaredReport = renderDeclaredReport(report.content.template, metricFacts, referenceFacts, proseDisclosure)
     nextMeasurements[candidate.index] = {

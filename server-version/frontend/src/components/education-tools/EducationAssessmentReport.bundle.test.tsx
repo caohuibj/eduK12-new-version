@@ -50,6 +50,12 @@ it('uses only the disclosed band for school action art and removes illustrations
    mode:'INDIVIDUAL_SUMMARY',reports:[{itemId:'chinese',status,rendered:result}]} as unknown as EducationFeedbackData)
  const {rerender}=render(<EducationAssessmentReport data={dto(report)}/>)
  expect(screen.getByRole('img',{name:/橙色书签/})).toBeInTheDocument()
+ const scoreReport={...report,illustrationKey:'chinese-self-concept-door-with-score-actions-v3',
+   blocks:report.blocks.map(block=>({...block,type:'SCORE_FEEDBACK'}))}
+ rerender(<EducationAssessmentReport data={dto(scoreReport)}/>)
+ expect(screen.getByRole('img',{name:/橙色书签/})).toBeInTheDocument()
+ rerender(<EducationAssessmentReport data={dto(scoreReport,'WITHHELD')}/>)
+ expect(screen.queryByRole('img')).toBeNull()
  rerender(<EducationAssessmentReport data={dto({...report,blocks:[]})}/>)
  expect(screen.getAllByRole('img')).toHaveLength(1)
  expect(screen.queryByRole('img',{name:/橙色书签/})).toBeNull()

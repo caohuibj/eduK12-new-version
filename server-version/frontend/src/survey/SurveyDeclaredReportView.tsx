@@ -138,6 +138,7 @@ export function SurveyDeclaredReportView({
                 {str(raw.label) || '测评指标'}：<MetricCell value={raw} />
               </p>
             )
+          case 'SCORE_FEEDBACK':
           case 'REFERENCE_BAND':
             return (
               <DeclaredBandFeedback key={index} band={action?.index === index ? action.band : undefined}>

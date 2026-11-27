@@ -35,6 +35,21 @@ describe('SurveyDeclaredReportView', () => {
     type: 'REFERENCE_BAND', metricKey, referenceKind: 'theoretical_range', bandKey,
     text: '这次的语文学习印象', guidance: [],
   })
+  it('uses the authorized score feedback to illustrate an anonymous report without a reference population', () => {
+    const scoreEdition = 'chinese-self-concept-door-with-score-actions-v3'
+    const feedback = { ...bandBlock('high'), type: 'SCORE_FEEDBACK', text: '圈出给你提示的词句。' }
+    const report = { generatorVersion: 'DECLARATIVE_REPORT_V1' as const, illustrationKey: scoreEdition, blocks: [feedback] }
+    const { rerender } = render(<SurveyDeclaredReportView report={report} />)
+    expect(screen.getAllByRole('img')).toHaveLength(2)
+    expect(screen.getByRole('img', { name: /放大镜/ }).parentElement).toHaveTextContent(feedback.text)
+    rerender(<SurveyDeclaredReportView report={{ ...report, illustrationKey: actionEdition }} />)
+    expect(screen.getAllByRole('img')).toHaveLength(1)
+    rerender(<SurveyDeclaredReportView report={{ ...report, blocks: [bandBlock('high')] }} />)
+    expect(screen.getAllByRole('img')).toHaveLength(1)
+    rerender(<SurveyDeclaredReportView report={{ ...report, blocks: [] }} />)
+    expect(screen.queryByText(feedback.text)).toBeNull()
+    expect(screen.getAllByRole('img')).toHaveLength(1)
+  })
   it.each(['very_low', 'low', 'middle', 'high', 'very_high'])('renders only the disclosed %s action beside its feedback', band => {
     const report = { generatorVersion: 'DECLARATIVE_REPORT_V1' as const, illustrationKey: actionEdition,
       blocks: [bandBlock('middle', 'other_score'), bandBlock(band)] }

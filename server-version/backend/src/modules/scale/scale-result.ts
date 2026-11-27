@@ -246,7 +246,7 @@ const interpretationFor = (
   let interpretation = configured.summary
   let guidance = configured.guidance
   let referenceVersion: string | null = null
-  if (configured.source.type === 'reference' || configured.source.type === 'reference_context') {
+  if (configured.source.type !== 'score_only') {
     if (!reference) return {
       scoreKey: score.key,
       headline: configured.headline,

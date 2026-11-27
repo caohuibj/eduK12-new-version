@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { CHINESE_SELF_CONCEPT_ACTIONS, type ChineseSelfConceptBand } from './declaredReportActionBand'
+import { CHINESE_SELF_CONCEPT_ACTIONS, CHINESE_SELF_CONCEPT_SCORE_ACTIONS, type ChineseSelfConceptBand } from './declaredReportActionBand'
 import underline from '../../assets/chinese-self-concept-actions-v2/very_low.webp'
 import bookmark from '../../assets/chinese-self-concept-actions-v2/low.webp'
 import notes from '../../assets/chinese-self-concept-actions-v2/middle.webp'
@@ -8,7 +8,8 @@ import retelling from '../../assets/chinese-self-concept-actions-v2/very_high.we
 import doorComic from '../../assets/chinese-self-concept-door-v1.webp'
 
 export function DeclaredReportIllustration({ illustrationKey }: { illustrationKey?: string }) {
-  if (illustrationKey !== 'chinese-self-concept-door-v1' && illustrationKey !== CHINESE_SELF_CONCEPT_ACTIONS) return null
+  const editions = ['chinese-self-concept-door-v1', CHINESE_SELF_CONCEPT_ACTIONS, CHINESE_SELF_CONCEPT_SCORE_ACTIONS]
+  if (!illustrationKey || !editions.includes(illustrationKey)) return null
   return (
     <figure className="my-4 w-full max-w-3xl">
       <a href={doorComic} target="_blank" rel="noreferrer" className="block">
