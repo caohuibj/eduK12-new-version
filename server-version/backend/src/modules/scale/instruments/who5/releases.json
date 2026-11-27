@@ -1,0 +1,19 @@
+{
+  "toolKey": "who5",
+  "readiness": "READY",
+  "releases": [
+    {
+      "releaseKey": "who5-2026-11",
+      "contentVersion": "1.0.0",
+      "contentHash": "fb2b137e47c50d8a8139db5c4fed8b81363d66f7a268dea32cff4e8f33dc6664",
+      "parameterVersion": "1.1.0-who2024",
+      "reportVersion": "1.1.0-student",
+      "allowedEntries": [
+        "TRAINING"
+      ],
+      "state": "ONLINE",
+      "replaces": "1.0.0/default",
+      "reviewNote": "非商业用途。审阅 https://docs.google.com/document/d/1BbhHlBuSXwQswA4TnYouAQpuKdkOWjPkX7EEyKXEuXY"
+    }
+  ]
+}

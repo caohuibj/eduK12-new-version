@@ -1,0 +1,112 @@
+{
+  "toolKey": "who5",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "1.1.0-who2024",
+  "version": "1.1.0-student",
+  "report": {
+    "reportVersion": "1.1.0-student",
+    "artworkKey": "who5/1.0.0/1.1.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-27T00:00:00Z",
+        "basis": "核对 WHO 2024 英文手册计分页及所附 Chinese PR 题本。只对五题总分使用手册建议的参考界值；不生成中国中小学生常模。两段反馈和插画均为平台原创。"
+      }
+    },
+    "primaryScoreKeys": [
+      "raw_total"
+    ],
+    "scoreOrder": [
+      "raw_total",
+      "percentage"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "raw_total",
+        "headline": "这两周，你过得怎么样？",
+        "source": {
+          "type": "reference",
+          "referenceVersion": "who5-who2024-raw13-v1",
+          "referenceKind": "criterion_threshold"
+        },
+        "summary": "有时，一件小事比一句“我挺好的”更能说清近况。比如，原本很爱画画，最近翻开本子却提不起笔；又或者，课间走到窗边，忽然有兴致把落在树梢的小鸟画下来。回想过去两周，哪个瞬间最像你的日常？",
+        "bands": [
+          {
+            "key": "who5_under_13",
+            "label": "找个人，讲一件最近的事",
+            "summary": "按你这次的回答，过去两周，觉得轻松、有劲或有兴致的时刻，合起来比较少。不知道怎样开口时，可以找个信任的人，讲一件最近发生的小事，比如“最近做喜欢的事也有点提不起劲”。如果这样的感受持续，或已经影响睡觉、上课和日常生活，可以请对方陪你找学校心理老师或专业人员聊聊。",
+            "guidance": []
+          },
+          {
+            "key": "who5_from_13",
+            "label": "记住一件让你觉得还不错的小事",
+            "summary": "回想这两周，有没有哪个片刻，让你觉得“我还挺喜欢这样”？可能是放学路上聊得投缘，也可能是终于腾出十分钟画画。把那一刻记下来，顺手写一句“下次什么时候还可以再来一次”。这两周如果也有难熬的事，同样值得告诉一个愿意听你说话的人。",
+            "guidance": []
+          }
+        ],
+        "guidance": [],
+        "scoreLabel": "五题总分（满分 25）"
+      },
+      {
+        "scoreKey": "percentage",
+        "headline": "同一个结果，也可以写成百分制",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "若想用百分制看结果，把五题总分乘以四即可。比如，原始分 15 分换算后是 60 分，两种写法说的是同一次回答。",
+        "bands": [],
+        "guidance": [],
+        "scoreLabel": "百分制换算分（满分 100）"
+      }
+    ],
+    "limitations": [
+      "这五题记录的是过去两周的整体感受。相同的总分，可以来自很不一样的生活经历。",
+      "量表原作 © WHO 2024，CC BY-NC-SA 3.0 IGO。中文版为 WHO 收录的 Chinese PR 译本。平台撰写了学生解读并制作插画。",
+      "手册建议以 13 分作为了解近况的参考界值，目前缺少可用于比较的中国中小学生常模。"
+    ],
+    "disclaimer": "WHO-5 可作为了解近况的起点。分数本身不能诊断疾病；无论本次得分多少，持续的困扰都值得认真对待。"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
