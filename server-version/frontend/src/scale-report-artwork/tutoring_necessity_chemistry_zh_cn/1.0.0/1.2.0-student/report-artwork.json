@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "tutoring_necessity_chemistry_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "tutoring_necessity-very-low.webp",
+      "alt": "学生向老师提问，随后独立尝试一张相似的练习。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "tutoring_necessity-low.webp",
+      "alt": "一本例题、一张板书和讨论中的同学说明同一难点可以有不同的支持。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "low"
+    },
+    {
+      "file": "tutoring_necessity-middle.webp",
+      "alt": "有帮助、需要支持和学习基础是三个可分别想清的问题。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "middle"
+    },
+    {
+      "file": "tutoring_necessity-high.webp",
+      "alt": "学生与家长看着课本商量一个可核对的小目标。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "high"
+    },
+    {
+      "file": "tutoring_necessity-very-high.webp",
+      "alt": "学生把获得的提示转成自己的练习步骤。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生把化学难题拆开，考虑可以怎样提问、找帮助和独立检查。",
+    "width": 506,
+    "height": 506
+  }
+}
