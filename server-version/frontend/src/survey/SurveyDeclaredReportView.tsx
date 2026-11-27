@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react'
+import { getDeclaredActionBand } from '../modules/reporting/declaredReportActionBand'
+import { DeclaredBandFeedback, DeclaredReportIllustration } from '../modules/reporting/DeclaredReportIllustration'
 import type { SurveyImageProof } from './SurveyParticipantImage'
 
 export interface SurveyDeclaredReport {
   generatorVersion: 'DECLARATIVE_REPORT_V1'
   title?: string | null
+  illustrationKey?: string
   blocks: unknown[]
   limitations?: string[]
   disclaimer?: string | null
 }
+
+export const SURVEY_TRIAL_SCORE_SUFFIX = '（试用版）'
 
 const isObj = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === 'object' && !Array.isArray(v)
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
@@ -88,10 +93,12 @@ function MetricCell({ value }: { value: Record<string, unknown> }) {
     && value.display !== 'REFERENCE_RESULT'
     && typeof value.value === 'number'
     && Number.isFinite(value.value)
+  const unit = str(value.unit)
+  const trialScore = str(value.label).trimEnd().endsWith(SURVEY_TRIAL_SCORE_SUFFIX)
   return (
     <>
       <span>{available ? String(value.value) : '暂不可用'}</span>
-      {str(value.unit) && <span> {str(value.unit)}</span>}
+      {unit && <span> {trialScore && unit === 'points' ? '分' : unit}</span>}
       {value.status === 'INVALID' && <span>（质量无效）</span>}
     </>
   )
@@ -115,9 +122,11 @@ export function SurveyDeclaredReportView({
   report: SurveyDeclaredReport
   proof?: SurveyImageProof
 }) {
+  const action = getDeclaredActionBand(report.illustrationKey, report.blocks)
   return (
     <section className="border-l-2 border-sky-300 pl-3 space-y-2" aria-label="完整工具报告">
       {typeof report.title === 'string' && report.title && <h5 className="font-semibold text-sm">{report.title}</h5>}
+      <DeclaredReportIllustration illustrationKey={report.illustrationKey} />
       {report.blocks.map((raw, index) => {
         if (!isObj(raw)) return null
         switch (raw.type) {
@@ -131,16 +140,18 @@ export function SurveyDeclaredReportView({
             )
           case 'REFERENCE_BAND':
             return (
-              <div key={index} className="rounded bg-slate-50 p-2.5 space-y-1.5 text-sm">
-                <p className="whitespace-pre-wrap">{str(raw.text)}</p>
-                {Array.isArray(raw.guidance) && raw.guidance.length > 0 && (
-                  <ul className="list-disc pl-5 space-y-1 text-slate-700">
-                    {raw.guidance.filter((line): line is string => typeof line === 'string').map((line, i) => (
-                      <li key={i}>{line}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+              <DeclaredBandFeedback key={index} band={action?.index === index ? action.band : undefined}>
+                <div className="rounded bg-slate-50 p-2.5 space-y-1.5 text-sm">
+                  <p className="whitespace-pre-wrap">{str(raw.text)}</p>
+                  {Array.isArray(raw.guidance) && raw.guidance.length > 0 && (
+                    <ul className="list-disc pl-5 space-y-1 text-slate-700">
+                      {raw.guidance.filter((line): line is string => typeof line === 'string').map((line, i) => (
+                        <li key={i}>{line}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </DeclaredBandFeedback>
             )
           case 'ASSET':
             return proof && typeof raw.assetId === 'string' ? (

@@ -848,6 +848,32 @@ describe('participant stored raw feedback display',()=>{
     expect(result.compareDocumentPosition(details)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(screen.queryByText('我的变化')).not.toBeInTheDocument()
   })
+  it('shows matching trial scores once and preserves unmarked legacy score rows',async()=>{
+    taskValue={...taskValue,status:'COMPLETED'}
+    const metric=(key:string,value:number)=>({key,label:'原始 '+key,value,unit:null,status:'OK'})
+    const block=(metricKey:string,value:number,display='RAW',status='INTERPRETABLE')=>({
+      type:'METRIC',metricKey,label:'报告 '+metricKey+'（试用版）',value,unit:'points',status,display,
+    })
+    generalReply=()=>response({kind:'DESCRIPTIVE',text:'感谢参与',disclaimer:'受控指标',completedAt:'2026-10-17T00:00:00Z',measurements:[{
+      feedbackKind:'RAW_METRICS',instrumentKey:'scale',title:'语文自评',measurementReleaseId:'release',quality:'interpretable',
+      metrics:[metric('均分',3.5),metric('不同值',2),metric('仅参照',3),metric('不可用',4),metric('未列',1),metric('普通得分',2.75)],
+      declaredReport:{generatorVersion:'DECLARATIVE_REPORT_V1',blocks:[
+        {...block('均分',3.5),label:'本次均分（试用版）'},block('不同值',3),
+        block('仅参照',3,'REFERENCE_RESULT'),block('不可用',4,'RAW','UNAVAILABLE'),
+        {...block('普通得分',2.75),label:'普通得分'},
+      ]},
+    }]})
+    render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    const score=await screen.findByText('本次均分（试用版）：')
+    expect(score).toHaveTextContent('3.5 分')
+    expect(score).not.toHaveTextContent('points')
+    expect(screen.getByText('普通得分：')).toHaveTextContent('2.75 points')
+    expect(screen.queryByText(/原始 均分/)).toBeNull()
+    for(const text of ['原始 不同值：2','原始 仅参照：3','原始 不可用：4','原始 未列：1','原始 普通得分：2.75']){
+      expect(screen.getByText(text+'（已计算）')).toBeInTheDocument()
+    }
+  })
   it('preserves cognitive ratio percent, millisecond units and existing pilot labeling',async()=>{
     taskValue={...taskValue,status:'COMPLETED'}
     generalReply=()=>response({kind:'DESCRIPTIVE',text:'感谢参与',disclaimer:'认知说明',completedAt:'2026-10-17T00:00:00Z',measurements:[{

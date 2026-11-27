@@ -92,6 +92,7 @@ export function frozenTripletInstruction(triplet:Triplet):FrozenScaleInstruction
 }
 export function tripletSnapshot(triplet:Triplet,releaseId:string,measurement?:{releaseId:string;contentHash:string}):CatalogSourceSnapshot{
  const {display,mapping}=canonicalScalePresentation(triplet.definition,'ONE_BY_ONE'),instruction=frozenTripletInstruction(triplet)
+ const provisionalScoreKeys=triplet.definition.report.interpretations.filter(entry=>entry.provisional).map(entry=>entry.scoreKey)
  return {ref:{kind:'SCALE',sourceId:'survey-standard:'+releaseId,sourceVersion:triplet.combinationHash},title:triplet.title,...(instruction?{instruction:instruction.text}:{}),displayDefinition:display,compiledDefinition:json(triplet.definition),definitionDigest:canonicalHash(triplet.definition),scoringDigest:canonicalHash(triplet.definition.scoring),adapterVersion:'survey-catalog-scale-v2',answerMapping:mapping,
- provenance:{instrumentClass:'STANDARD',standardInstrumentVersion:triplet.instrumentVersion,surveyStandardReleaseId:releaseId,code:triplet.toolKey,triplet:standardAxisHashes(triplet.parts),toolReference:triplet.reference,reportConfigured:triplet.parts.REPORT.payload!==null,parametersConfigured:triplet.parts.PARAMETERS.payload!==null,...(measurement?{sourceMeasurementRelease:measurement}:{})}}
+ provenance:{...(provisionalScoreKeys.length?{provisionalScoreKeys}:{}),instrumentClass:'STANDARD',standardInstrumentVersion:triplet.instrumentVersion,surveyStandardReleaseId:releaseId,code:triplet.toolKey,triplet:standardAxisHashes(triplet.parts),toolReference:triplet.reference,reportConfigured:triplet.parts.REPORT.payload!==null,parametersConfigured:triplet.parts.PARAMETERS.payload!==null,...(measurement?{sourceMeasurementRelease:measurement}:{})}}
 }

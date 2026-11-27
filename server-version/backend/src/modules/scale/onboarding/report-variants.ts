@@ -3,6 +3,8 @@ import {canonicalHash} from '../../assessment-runtime/canonical'
 import {scaleReportDefinitionSchema} from '../scale-definition'
 import type {ScaleInstrumentSourceV1} from './types'
 import {scaleSourceAxisPayloads} from './source-snapshot'
+import chineseSelfConceptActions from '../instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-actions.json'
+import chineseSelfConcept from '../instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-variants.json'
 import cfq from '../instruments/cfq7_zh_cn_research/1.0.1/report-variants.json'
 import efficacy from '../instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/report-variants.json'
 import procrastination from '../instruments/bps9_zh_cn_research/1.0.0/report-variants.json'
@@ -66,6 +68,14 @@ import reviewed54 from '../instruments/wibps7_adolescent_zh_cn_research/1.0.0/re
 // Explicit reviewed material intake, not a directory scan or a mutable version
 // store. The ordinary source stays the default and owns the only C/scorer/P.
 const materials=[
+  {
+    material: chineseSelfConcept,
+    origin: {path:'server-version/backend/src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-variants.json'},
+  },
+  {
+    material: chineseSelfConceptActions,
+    origin: {path:'server-version/backend/src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-actions.json'},
+  },
   {material:cfq,origin:{commit:'6fa885ec74ca01350db25c44bd61c700648b05d1',path:'docs/scale-intake/materials-three-20261029/cfq7_zh_cn_research/report-variants.json'}},
   {material:efficacy,origin:{commit:'6fa885ec74ca01350db25c44bd61c700648b05d1',path:'docs/scale-intake/materials-three-20261029/ipip_neo_c1_self_efficacy10_zh_cn_research/report-variants.json'}},
   {material:procrastination,origin:{commit:'6fa885ec74ca01350db25c44bd61c700648b05d1',path:'docs/scale-intake/materials-three-20261029/bps9_zh_cn_research/report-variants.json'}},
@@ -139,9 +149,12 @@ export function readScaleReportVariantMaterial(source:ScaleInstrumentSourceV1,ra
  return material
 }
 export function listScaleReportVariants(source:ScaleInstrumentSourceV1){
- const selected=materials.find(({material})=>material.instrumentKey===source.identity.instrumentKey&&material.instrumentVersion===source.identity.instrumentVersion)
- if(!selected)return []
- const material=readScaleReportVariantMaterial(source,selected.material)
- return material.variants.map(variant=>({...variant,baseContentHash:material.baseContentHash,baseParametersHash:material.baseParametersHash,
-  materialHash:canonicalHash(material),origin:selected.origin}))
+ const groups=materials.filter(({material})=>material.instrumentKey===source.identity.instrumentKey&&material.instrumentVersion===source.identity.instrumentVersion)
+ const variants=groups.flatMap(({material:raw,origin})=>{
+  const material=readScaleReportVariantMaterial(source,raw),materialHash=canonicalHash(material)
+  return material.variants.map(variant=>({...variant,baseContentHash:material.baseContentHash,baseParametersHash:material.baseParametersHash,materialHash,origin}))
+ })
+ if(groups.length>1 && (new Set(variants.map(v=>v.key)).size!==variants.length || new Set(variants.map(v=>v.report.reportVersion)).size!==variants.length))
+  throw new Error('SCALE_REPORT_VARIANT_VERSION_CONFLICT')
+ return variants
 }

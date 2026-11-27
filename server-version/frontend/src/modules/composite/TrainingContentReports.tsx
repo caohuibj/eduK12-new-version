@@ -1,4 +1,6 @@
 import type { CompositeReportAudience, TrainingContentReport } from './types'
+import { getDeclaredActionBand, type ChineseSelfConceptBand } from '../reporting/declaredReportActionBand'
+import { DeclaredBandFeedback, DeclaredReportIllustration } from '../reporting/DeclaredReportIllustration'
 import { ReportDetails, ReportSection } from '../reporting/ReportPrimitives'
 
 const text=(value:unknown)=>typeof value==='string'?value:''
@@ -8,13 +10,15 @@ function Metric({value}:{value:Record<string,unknown>}){
   const available=value.status==='INTERPRETABLE'&&value.display!=='REFERENCE_RESULT'&&typeof value.value==='number'&&Number.isFinite(value.value)
   return <><span>{available?String(value.value):'不可用'}</span>{text(value.unit)&&<span> {text(value.unit)}</span>}{value.status==='INVALID'&&<span>（质量无效）</span>}</>
 }
-function DeclaredBlock({value,showMetricKeys=true}:{value:unknown;showMetricKeys?:boolean}){
+function DeclaredBlock({value,showMetricKeys=true,actionBand}:{value:unknown;showMetricKeys?:boolean;actionBand?:ChineseSelfConceptBand}){
   const block=object(value)
   if(!block)return null
   switch(block.type){
     case 'TEXT':return <p className="whitespace-pre-wrap">{text(block.text)}</p>
     case 'METRIC':return <p>{text(block.label)||(showMetricKeys?text(block.metricKey):'测评指标')}：<Metric value={block}/></p>
-    case 'REFERENCE_BAND':return <div><p>{text(block.text)}</p>{Array.isArray(block.guidance)&&<ul>{block.guidance.filter(line=>typeof line==='string').map((line,index)=><li key={index}>{line}</li>)}</ul>}</div>
+    case 'REFERENCE_BAND':return <DeclaredBandFeedback band={actionBand}>
+      <div><p>{text(block.text)}</p>{Array.isArray(block.guidance)&&<ul>{block.guidance.filter(line=>typeof line==='string').map((line,index)=><li key={index}>{line}</li>)}</ul>}</div>
+    </DeclaredBandFeedback>
     // No asset URL is authorized by this DTO. Never render a URL, image or media element.
     case 'ASSET':return <p>图片替代文本：{text(block.alt)||'未提供说明'}（未提供授权资源链接）</p>
     case 'CHART':{
@@ -27,8 +31,10 @@ function DeclaredBlock({value,showMetricKeys=true}:{value:unknown;showMetricKeys
 /** Data-only rendering shared by entry-specific authorized projections. This
  * accepts no transport and grants no participant access to Training reports. */
 export function DeclaredReportContent({report,showMetricKeys=true}:{report:NonNullable<TrainingContentReport['rendered']>;showMetricKeys?:boolean}){
+  const action = getDeclaredActionBand(report.illustrationKey, report.blocks)
   return <>
-    {Array.isArray(report.blocks)&&report.blocks.map((block,i)=><DeclaredBlock key={i} value={block} showMetricKeys={showMetricKeys}/>)}
+    <DeclaredReportIllustration illustrationKey={report.illustrationKey} />
+    {Array.isArray(report.blocks)&&report.blocks.map((block,i)=><DeclaredBlock key={i} value={block} showMetricKeys={showMetricKeys} actionBand={action?.index===i?action.band:undefined}/>)}
     {(!!report.limitations?.length||!!report.disclaimer)&&<ReportDetails title="阅读说明与解释边界">
       {Array.isArray(report.limitations)&&report.limitations.length>0&&<ul>{report.limitations.filter(line=>typeof line==='string').map((line,i)=><li key={i}>{line}</li>)}</ul>}
       {typeof report.disclaimer==='string'&&report.disclaimer&&<p>{report.disclaimer}</p>}

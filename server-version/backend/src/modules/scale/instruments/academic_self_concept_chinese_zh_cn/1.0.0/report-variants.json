@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "academic_self_concept_chinese_zh_cn",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "10cef65ad9eb89761ea5c6806fdf9c707951d798ac0c34b185ea849ae15f9367",
+  "baseParametersHash": "05552d804bcea2ec19bf4aa73a7089a46857139c0fca4ba9fb6abaaee2531f8b",
+  "variants": [
+    {
+      "key": "student_reading",
+      "title": "语文学习自评读图版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "illustrationKey": "chinese-self-concept-door-v1",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "Codex 内容编辑初审",
+            "reviewedAt": "2026-11-27T00:00:00Z",
+            "basis": "核对项目原始问卷、计分字典及语文版题本。个体反馈只取现有均分的理论区间，同一均分对应同一段文字。原创课堂故事供所有学生阅读。分段为试用估计。"
+          }
+        },
+        "primaryScoreKeys": [
+          "academic_self_concept"
+        ],
+        "scoreOrder": [
+          "academic_self_concept"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "academic_self_concept",
+            "headline": "我怎么看自己的语文学习",
+            "source": {
+              "type": "reference_context"
+            },
+            "summary": "语文课上，黑板上写着：“她抬手要敲门，又轻轻放下。”老师问这个“又”字有什么味道。小禾心里冒出一句：“我语文不行。”同桌问她读出了什么。她说：“我知道她在犹豫，就是没想通她在怕什么。”老师在她的批注旁写：“你从动作里读出了犹豫。再往前找找，她来见谁？”\n\n心理学把“我觉得自己语文学得怎么样”叫作语文学科自我概念。这份印象，有时会影响一个人愿不愿意开口试试。小禾把“我不行”说得具体了一点，就有了一个可以问出口的问题。老师指出她已经读懂的那一处，也给了她重新看待自己的依据。读自己的报告时，也可以把整体印象放回一次具体的经历里。",
+            "bands": [
+              {
+                "key": "very_low",
+                "label": "这次的语文学习印象",
+                "summary": "这次，你对自己语文学习的评价比较保留。先把目光放到一小处，想想最近读的课文里，有哪一句你能用自己的话说清楚。",
+                "guidance": []
+              },
+              {
+                "key": "low",
+                "label": "这次的语文学习印象",
+                "summary": "说起目前的语文学习，你的整体评价稍偏向保留。要是想跟老师聊聊，可以从最近一次读课文时“我懂到了哪儿”说起。",
+                "guidance": []
+              },
+              {
+                "key": "middle",
+                "label": "这次的语文学习印象",
+                "summary": "你这次对自己语文学习的整体评价落在中间。回到最近一堂语文课，哪一个片段最能说明你为什么这样看自己？",
+                "guidance": []
+              },
+              {
+                "key": "high",
+                "label": "这次的语文学习印象",
+                "summary": "从这次的回答看，你对自己的语文学习总体比较肯定。回想最近一次你觉得“这段我读懂了”的时候，哪一句原文能帮你把这份把握说清楚？",
+                "guidance": []
+              },
+              {
+                "key": "very_high",
+                "label": "这次的语文学习印象",
+                "summary": "这次，你对自己的语文学习给出了很肯定的评价。讲起最近一次读得有把握的课文时，可以挑一个字，说说它为什么值得留意。",
+                "guidance": []
+              }
+            ],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "下次遇到一处读不懂的地方，在书边留一条两行批注：“我已经读出了____。我还想问____。”下次和老师聊这段，就从那个空格说起。\n\n把“我不行”说准一点。“我是哪一句还没想通？”"
+              }
+            ],
+            "provisional": true,
+            "scoreLabel": "语文学习自评均分（试用版）"
+          }
+        ],
+        "limitations": [
+          "试用版用你实际回答的均分写反馈，至少需答三题。分段是初步估计，语文版尚无同年级学生的常模。"
+        ],
+        "disclaimer": "供七至十二年级学生回顾本次对语文学习的看法。"
+      }
+    }
+  ]
+}

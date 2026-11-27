@@ -88,7 +88,8 @@ export function projectEducationDeclaredUnitReports(input:Omit<Parameters<typeof
     })
     const needsReference=report.content.template.blocks.some(block=>block.type==='REFERENCE_BAND'||block.type==='METRIC'&&block.display==='REFERENCE_RESULT')
     const missingReference=needsReference&&report.content.template.blocks.some(block=>(block.type==='REFERENCE_BAND'||block.type==='METRIC'&&block.display==='REFERENCE_RESULT')&&!references.some(reference=>reference.metricKey===block.metricKey&&reference.status==='AVAILABLE'&&(block.type!=='REFERENCE_BAND'||reference.referenceKind===block.referenceKind)))
-    return {...base,status:'READY',...(missingReference?{message:'当前没有适用且获准的参考或阈值，未作等级与阈值解释。'}:{}),rendered:restrictDeclaredEducationReport(renderDeclaredReport(report.content.template,metrics,references),input.disclosureByItem?.get(unit.itemId))}
+    const proseDisclosure=input.disclosureByItem?.get(unit.itemId) ?? bound.source.educationStandard?.respondentDisclosure
+    return {...base,status:'READY',...(missingReference?{message:'当前没有适用且获准的参考或阈值，未作等级与阈值解释。'}:{}),rendered:restrictDeclaredEducationReport(renderDeclaredReport(report.content.template,metrics,references,proseDisclosure),input.disclosureByItem?.get(unit.itemId))}
   })
 }
 

@@ -11,6 +11,8 @@ import { integrationDatabaseUrl } from '../../integration/integration-env'
 import { listScaleInstrumentSources,getScaleInstrumentRuntimePolicy } from '../../../modules/scale/onboarding/instrument-registry'
 import { installScaleInstrument,planScaleInstrumentInstall } from '../../../modules/scale/onboarding/install'
 import { planStandardScalePublication,publishStandardScale } from '../../../modules/scale/onboarding/publish'
+import chineseActions from '../../../modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-actions.json'
+import chineseReading from '../../../modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-variants.json'
 import chemistryHistory from '../../../modules/scale/instruments/teacher_subject_liking_chemistry_zh_cn/1.0.0/report-variants.json'
 const wave1Keys=new Set(['academic_self_concept','academic_self_efficacy','domain_fixed_mindset','teacher_subject_liking','tutoring_necessity','value_cost'].flatMap(family=>
  ['mathematics','chemistry','physics','biology','english','chinese'].map(subject=>`${family}_${subject}_zh_cn`)))
@@ -32,14 +34,22 @@ suite('Wave1 registered content install and publication (isolated PostgreSQL)',{
    expect(preview.blockers,key).toEqual([]);await publishStandardScale(db,{...publication,expectedProofHash:preview.proofHash})
    const row=await db.scale.findUniqueOrThrow({where:{code:key}});expect(row.status).toBe('PUBLISHED');expect(row.instrumentClass).toBe('STANDARD')
    const snapshots=await db.$queryRaw<Array<{source_hash:string;axes:{reportVersion:string};source_snapshot:{executable:{definition:{report:unknown}}}}>>`SELECT source_hash,axes,source_snapshot FROM scale_axis_snapshots WHERE scale_id=${row.id} ORDER BY axis_hash`
-   const expectedReports=key==='teacher_subject_liking_chemistry_zh_cn'?['1.1.0','1.1.1']:['1.1.0']
+   const additionalReports: Record<string, string[]> = {
+    teacher_subject_liking_chemistry_zh_cn: ['1.1.1'],
+    academic_self_concept_chinese_zh_cn: ['1.2.0','1.3.0'],
+   }
+   const expectedReports = ['1.1.0',...(additionalReports[key]??[])]
    expect(snapshots.map(snapshot=>snapshot.axes.reportVersion).sort()).toEqual(expectedReports)
    for(const snapshot of snapshots)expect(snapshot.source_hash).toMatch(/^[a-f0-9]{64}$/)
+   if(key===chineseReading.instrumentKey)for(const edition of [chineseReading,chineseActions]){
+    const expected=edition.variants[0].report
+    expect(snapshots.find(snapshot=>snapshot.axes.reportVersion===expected.reportVersion)?.source_snapshot.executable.definition.report).toEqual(expected)
+   }
    if(key==='teacher_subject_liking_chemistry_zh_cn')expect(snapshots.find(snapshot=>snapshot.axes.reportVersion==='1.1.0')!.source_snapshot.executable.definition.report).toEqual(chemistryHistory.variants[0].report)
    await expect(db.$executeRaw`UPDATE scale_axis_snapshots SET source_hash=${'b'.repeat(64)} WHERE scale_id=${row.id}`).rejects.toThrow()
    await expect(db.$executeRaw`DELETE FROM scale_axis_snapshots WHERE scale_id=${row.id}`).rejects.toThrow()
    expect((await installScaleInstrument(db,input)).deploymentAlreadyActive).toBe(true)
-   if(key==='teacher_subject_liking_chemistry_zh_cn')expect(await db.$queryRaw`SELECT source_hash,axes,source_snapshot FROM scale_axis_snapshots WHERE scale_id=${row.id} ORDER BY axis_hash`).toEqual(snapshots)
+   if(additionalReports[key])expect(await db.$queryRaw`SELECT source_hash,axes,source_snapshot FROM scale_axis_snapshots WHERE scale_id=${row.id} ORDER BY axis_hash`).toEqual(snapshots)
    expect(await db.assessmentReferenceSet.count({where:{instrumentKey:key,status:'ACTIVE'}})).toBe(1)
   }
   expect(sources).toHaveLength(36)

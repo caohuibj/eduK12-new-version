@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+// Public artwork bundled with the client. Private or uploaded images still require ASSET bindings.
+export const reportIllustrationKeySchema=z.enum(['chinese-self-concept-door-v1','chinese-self-concept-door-with-actions-v2'])
+
 const prose=z.string().trim().min(1).max(20000)
 const key=z.string().trim().min(1).max(240)
 /** Declarative display only: metric values and band membership are resolved from
@@ -16,6 +19,7 @@ export const reportBlockSchema=z.discriminatedUnion('type',[
 ])
 export const reportTemplateSchema=z.object({
   title:prose.optional(),
+  illustrationKey:reportIllustrationKeySchema.optional(),
   blocks:z.array(reportBlockSchema).max(500).default([]),
   limitations:z.array(prose).max(100).default([]),
   disclaimer:prose.optional(),

@@ -14,7 +14,10 @@ import {
   resolveSurveyDeclaredReportAsset,
 } from '../../modules/survey/participant-declared-report'
 import type { ResearchFrozenUnit } from '../../modules/survey/publication.service'
-import type { SurveyComputedFinal } from '../../modules/survey/final.compute'
+import { buildScaleResult } from '../../modules/scale/scale-result'
+import { composeTriplet, registeredParts, tripletSnapshot, type Axis } from '../../modules/survey/standard-triplet.model'
+import { projectSurveyParticipantFeedback } from '../../modules/survey/participant-feedback-response'
+import { computeSurveyFinal, type SurveyComputedFinal } from '../../modules/survey/final.compute'
 import type { SurveyParticipantFeedbackProjection } from '../../modules/survey/participant-feedback-response'
 
 const mocks = vi.hoisted(() => ({
@@ -230,6 +233,79 @@ describe('Survey participant declared report rendering and asset authorization',
 
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  it('renders the same report for equal means, using only an available frozen reference band', async () => {
+    const key = 'academic_self_concept_chinese_zh_cn'
+    const all = registeredParts(key)
+    function part(axis: Axis, version: string) {
+      const selected = all.find(candidate => candidate.axis === axis && candidate.version === version)
+      if (!selected) throw new Error(`Missing ${axis} ${version}`)
+      return selected
+    }
+    const content = part('CONTENT','1.0.0:1.0.0'), parameters = part('PARAMETERS','wave1-20261001-v2')
+    const current = composeTriplet(key,{CONTENT:content,PARAMETERS:parameters,REPORT:part('REPORT','1.3.0')})
+    const old = composeTriplet(key,{CONTENT:content,PARAMETERS:parameters,REPORT:part('REPORT','1.1.0')})
+    const snapshot = tripletSnapshot(current,'synthetic-four-questions')
+    const scoreKey = 'academic_self_concept'
+    const unit = baseSurveyScaleUnit({
+      sourceDigest:snapshot.definitionDigest,scoringDigest:snapshot.scoringDigest,sourceProvenance:snapshot.provenance,
+      displayDefinition:snapshot.displayDefinition,compiledDefinition:snapshot.compiledDefinition,sourceAnswerMapping:snapshot.answerMapping,
+      contentSelection:{referencePolicy:{policyVersion:'EXACT_POPULATION_PRIORITY_V1',measurementReleaseId,choices:[]},reportRelease:{releaseId:reportReleaseId,contentHash:hashC}},
+      participantFeedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',metricKeys:[scoreKey],release:'AFTER_FINAL'},
+    })
+    const releases=[
+      [measurementReleaseId,{releaseId:measurementReleaseId,layer:'MEASUREMENT',contentHash:hashA,status:'PUBLISHED',content:{metrics:[{metricKey:scoreKey,unit:'points'}]}}],
+      [reportReleaseId,{releaseId:reportReleaseId,layer:'REPORT',contentHash:hashC,status:'PUBLISHED',content:{
+        audience:'student',measurements:[{releaseId:measurementReleaseId,contentHash:hashA}],metricKeys:[scoreKey],
+        generatorVersion:'DECLARATIVE_REPORT_V1',template:current.template}}],
+    ] as const
+    mocks.getContentReleaseBatch.mockResolvedValue(new Map<string, unknown>(releases))
+    function native(values:number[],hasGrade:boolean,previous=false) {
+      return buildScaleResult({scaleId:'fixture',instrumentKey:key,name:current.title,instrumentVersion:'1.0.0',
+        definition:previous?old.definition:current.definition,referenceSets:current.references,participantContext:hasGrade?{gradeLevel:'8'}:{},
+        answers:values.map((value,i)=>({itemCode:current.definition.items[i].itemCode,responseValue:String(value)}))})
+    }
+    async function finished(values:number[],hasGrade=true) {
+      const answers=Object.fromEntries(values.map((value,i)=>['i_'+i,'o_'+(value-1)]))
+      const timings=Object.fromEntries(Object.keys(answers).map(k=>[k,{schemaVersion:1,firstResponseMs:500,activeTimeMs:700,changeCount:0,visits:1,revisitCount:0,interrupted:false,recoveredWithoutClock:false}]))
+      const calculated=computeSurveyFinal({schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:'synthetic',waveId:'synthetic',
+        collectionMode:'SINGLE_UNLINKED',consentVersion:1,linkageNoticeConfirmed:false,consentDigest:hashA,runtimeStatus:'SURVEY_FINAL_V1',units:[unit]},
+        {scale_a:answers},null,undefined,'FINAL',{scale_a:timings})
+      const reference=native(values,hasGrade).references.find(candidate=>candidate.criterionBand)
+      calculated.interpretation={schemaVersion:1,contentBindingHash:hashB,units:[{instrumentKey:'scale_a',status:'INTERPRETED',
+        references:reference?.criterionBand?[{metricKey:scoreKey,referenceKind:reference.referenceKind,status:'AVAILABLE',
+          values:{bandKey:reference.criterionBand.key,z:reference.z,t:reference.t,percentile:reference.percentile,meanDifference:reference.meanDifference}}]:[],
+        report:{status:'READY',generatorVersion:'DECLARATIVE_REPORT_V1'}}]}
+      const projection=projectSurveyParticipantFeedback([unit],calculated,false)
+      if(projection?.kind!=='DESCRIPTIVE')throw new Error('Expected participant feedback')
+      expect(projection.measurements[0].metrics[0]).toMatchObject({label:'学科自我概念（试用版）',value:values.reduce((a,b)=>a+b)/values.length})
+      const reads=mocks.getContentReleaseBatch.mock.calls.length
+      const attached=await attachSurveyParticipantDeclaredReports([unit],calculated,projection)
+      expect(mocks.getContentReleaseBatch).toHaveBeenCalledTimes(reads+1)
+      if(attached.kind!=='DESCRIPTIVE')throw new Error('Expected descriptive feedback')
+      const item=attached.measurements[0]
+      if(!('declaredReport' in item)||!item.declaredReport)throw new Error('Expected frozen report')
+      expect(item.declaredReport).toMatchObject({illustrationKey:'chinese-self-concept-door-with-actions-v2'})
+      expect(item.declaredReport.blocks[0]).toMatchObject({type:'METRIC',label:'语文学习自评均分（试用版）'})
+      expect(JSON.stringify(item.declaredReport)).not.toMatch(/itemScores|rawAnswers|responseValue/)
+      return item.declaredReport
+    }
+    const first=await finished([3,4,3,4])
+    expect(await finished([5,2,5,2])).toEqual(first)
+    expect(await finished([4,4,3,3])).toEqual(first)
+    expect(first.blocks.map(block=>(block as {type:string}).type)).toEqual(['METRIC','REFERENCE_BAND','TEXT','TEXT'])
+    expect(first.blocks[1]).toMatchObject({bandKey:'high'})
+    for(const [index,band] of current.definition.report.interpretations[0].bands.entries()){
+      const rendered = await finished(Array(4).fill(index+1))
+      const matches = rendered.blocks.filter(block=>typeof block==='object' && block!==null && 'type' in block && block.type==='REFERENCE_BAND')
+      expect(matches).toEqual([expect.objectContaining({bandKey:band.key,text:band.label+'\n'+band.summary})])
+    }
+    expect((await finished([3,4,3,4],false)).blocks.map(block=>(block as {type:string}).type)).toEqual(['METRIC','TEXT','TEXT'])
+    expect(native([4,4,3],true)).toMatchObject({quality:{status:'limited'}})
+    expect(native([4,4],true).scores[0].value).toBeNull()
+    expect(native([3,4,3,4],true,true).scores[0].label).not.toContain('试用版')
+    expect(old.template).not.toHaveProperty('illustrationKey')
   })
 
   it('renders bound DECLARATIVE_REPORT_V1 with threshold-matched bands and authorizes referenced ASSET image', async () => {

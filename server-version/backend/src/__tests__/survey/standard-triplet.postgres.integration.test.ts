@@ -10,7 +10,7 @@ import {errorHandler} from '../../middleware/errorHandler'
 import {platformSurveyOriginGuard} from '../../modules/survey/originGuard'
 import {surveyStandardTripletRouter} from '../../modules/survey/standard-triplet.routes'
 import {listScaleInstrumentSources} from '../../modules/scale/onboarding/instrument-registry'
-import {sourceParts,composeTriplet,type Axis,type Part} from '../../modules/survey/standard-triplet.model'
+import {sourceParts,registeredParts,composeTriplet,type Axis,type Part} from '../../modules/survey/standard-triplet.model'
 import {previewStandardTriplet,approveStandardTriplet,standardReleaseRow,runStandardTrial,assertStandardSystem} from '../../modules/survey/standard-triplet.service'
 import {grantCatalogSource} from '../../modules/survey/catalog.service'
 import {getCatalogSourceSnapshot} from '../../modules/survey/catalog.sources'
@@ -21,7 +21,10 @@ import {prepareWave,openWave} from '../../modules/survey/waves.publish'
 import {startSingleUnlinkedWave} from '../../modules/survey/admission.service'
 import {getOwnResearchTask} from '../../modules/survey/task.public'
 import {readSurveyCheckpoint,saveSurveyCheckpoint} from '../../modules/survey/checkpoint.service'
-import {submitResearchFinal} from '../../modules/survey/final.service'
+import {readGeneralForOwnAttempt,submitResearchFinal} from '../../modules/survey/final.service'
+import {decryptUnifiedRuntimePayload} from '../../modules/assessment-runtime/security'
+import {canonicalHash} from '../../modules/assessment-runtime/canonical'
+import type {SurveyComputedFinal} from '../../modules/survey/final.compute'
 import {readSurveyStoredReport} from '../../modules/survey/report-results.service'
 const suite=process.env.SURVEY_TRIPLET_ISOLATED==='1'?describe:describe.skip
 suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
@@ -121,6 +124,52 @@ suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
   finalId=(await db.surveyWaveFinal.findFirstOrThrow({where:{projectId:pid}})).id
   const report=await readSurveyStoredReport(owner,{projectId:pid,waveId:wid,finalId,instrumentKey});expect(report.report.blocks.some(b=>b.type==='METRIC')).toBe(true)
   await expect(readSurveyStoredReport(manager.id,{projectId:pid,waveId:wid,finalId,instrumentKey})).rejects.toThrow()
+ },60000)
+ it('persists two distinct four-answer submissions and replays the same licensed mean report',async()=>{
+  const key='academic_self_concept_chinese_zh_cn', parts=registeredParts(key)
+  function part(axis:Axis,version:string){
+   const row=parts.find(value=>value.axis===axis&&value.version===version)
+   if(!row)throw new Error(`Missing ${axis}/${version}`)
+   return row
+  }
+  const selected=composeTriplet(key,{CONTENT:part('CONTENT','1.0.0:1.0.0'),PARAMETERS:part('PARAMETERS','wave1-20261001-v2'),REPORT:part('REPORT','1.3.0')})
+  const approved=await approveStandardTriplet(system.id,{toolKey:key,CONTENT:selected.parts.CONTENT.hash,PARAMETERS:selected.parts.PARAMETERS.hash,
+   REPORT:selected.parts.REPORT.hash,expectedCombinationHash:selected.combinationHash,requestId:randomUUID(),reason:'Synthetic student mean report',allowedProducts:['SURVEY']})
+  expect(approved.state,approved.blockers.join()).toBe('ONLINE')
+  const grant=await grantCatalogSource(manager.id,owner,{kind:'SCALE',sourceId:'survey-standard:'+approved.id,sourceVersion:selected.combinationHash})
+  const project=await db.surveyProject.create({data:{id:randomUUID(),ownerUserId:owner,title:'Synthetic mean replay',collectionMode:'SINGLE_UNLINKED'}})
+  const draft=await importCatalogDraft(owner,project.id,grant.id,{requestId:randomUUID(),instrumentKey:'reading',title:selected.title})
+  await publishSurveyMeasurementDraft(owner,project.id,draft.id,draft.revision)
+  const wave=await createWave(owner,project.id,{requestId:randomUUID(),title:'Synthetic reading',consentText:'Synthetic test only, no human response.',
+   generalText:'Synthetic receipt',instrumentIds:[draft.id],allowNewParticipants:true})
+  await prepareWave(owner,project.id,wave.id,wave.revision,undefined,[{instrumentId:draft.id,feedback:{policyVersion:'SURVEY_RAW_METRICS_V1',
+   mode:'DESCRIPTIVE',metricKeys:['academic_self_concept'],release:'AFTER_FINAL'}}])
+  const prepared=await getWave(owner,project.id,wave.id),opened=await openWave(owner,project.id,wave.id,prepared.revision)
+  async function submitAndRead(values:number[]){
+   const admitted=await startSingleUnlinkedWave({...surveyStartKeys('mean-report'),publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true})
+   const participant={publicId:opened.publicId,attemptId:admitted.attemptId,accessCredential:admitted.accessCredential}
+   const answers=Object.fromEntries(values.map((v,i)=>['i_'+i,'o_'+(v-1)]))
+   const timings=Object.fromEntries(Object.keys(answers).map(id=>[id,{schemaVersion:1,firstResponseMs:450,activeTimeMs:700,changeCount:0,visits:1,revisitCount:0,interrupted:false,recoveredWithoutClock:false}]))
+   const final=await submitResearchFinal({...participant,submissionId:randomUUID(),answers:{reading:answers},itemTimings:{reading:timings}})
+   const row=await db.surveyWaveFinal.findUniqueOrThrow({where:{attemptId:admitted.attemptId}})
+   const saved=decryptUnifiedRuntimePayload<SurveyComputedFinal>(row.resultsCipher)
+   expect(canonicalHash(saved)).toBe(row.resultsHash)
+   expect(saved.units[0].rawAnswers).toEqual(answers)
+   expect(saved.units[0].privateScoring).toMatchObject({scores:[{key:'academic_self_concept',value:3.5}]})
+   const own=await readGeneralForOwnAttempt(participant)
+   if(!('measurements' in own)||own.kind!=='DESCRIPTIVE')throw new Error('Expected disclosed individual report')
+   const measurement=own.measurements[0]
+   if(!('declaredReport' in measurement)||!measurement.declaredReport)throw new Error('Expected frozen student report after database read')
+   expect(measurement.declaredReport).toMatchObject({illustrationKey:'chinese-self-concept-door-with-actions-v2',blocks:expect.arrayContaining([
+    expect.objectContaining({type:'METRIC',value:3.5,label:'语文学习自评均分（试用版）'}),
+   ])})
+   expect(JSON.stringify(measurement.declaredReport)).not.toMatch(/itemScores|rawAnswers|responseValue/)
+   expect(final).toMatchObject({participantFeedbackReceipt:{measurements:[{declaredReport:measurement.declaredReport}]}})
+   return {report:measurement.declaredReport,hash:row.resultsHash}
+  }
+  const first=await submitAndRead([3,4,3,4]), second=await submitAndRead([5,2,5,2])
+  expect(first.hash).not.toBe(second.hash)
+  expect(first.report).toEqual(second.report)
  },60000)
  it('allows explicit no-parameter/no-report approval without inventing feedback',async()=>{const request=input(2);request.PARAMETERS=(await import('../../modules/assessment-runtime/canonical')).canonicalHash(null);request.REPORT=request.PARAMETERS;const p=await previewStandardTriplet(db,system.id,request);expect(p.blockers).toEqual([]);const state=await approveStandardTriplet(system.id,{...request,expectedCombinationHash:p.combinationHash});expect(state.state,state.blockers.join()).toBe('ONLINE');const rows=await db.$queryRaw<any[]>`SELECT report,scores FROM survey_standard_trials WHERE release_id=${state.id}`;expect(rows).toHaveLength(3);expect(rows.every(r=>r.report===null&&r.scores.units.length===1)).toBe(true)})
  it('blocks new admission after withdrawal but lets an admitted participant recover, save and FINAL-submit the frozen version',async()=>{

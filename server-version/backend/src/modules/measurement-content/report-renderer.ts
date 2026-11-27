@@ -1,10 +1,11 @@
+import type { DisclosureCapabilitiesV1 } from '../scale/policy/types'
 import type { ReportTemplate } from './report-template'
 import type { ReferenceKind } from '../assessment-reference/reference'
 export const DECLARATIVE_REPORT_GENERATOR='DECLARATIVE_REPORT_V1'
 export interface ReportMetricFact {metricKey:string;value:number|null;unit:string;status:'INTERPRETABLE'|'UNAVAILABLE'|'INVALID'}
 export interface ReportReferenceFact {metricKey:string;referenceKind:ReferenceKind;status:'AVAILABLE'|'UNAVAILABLE';bandKey:string|null}
 /** Data-only nodes; no scoring, HTML, script, latest lookup or reference calculation. */
-export function renderDeclaredReport(template:ReportTemplate,metrics:readonly ReportMetricFact[],references:readonly ReportReferenceFact[]){
+export function renderDeclaredReport(template:ReportTemplate,metrics:readonly ReportMetricFact[],references:readonly ReportReferenceFact[],proseDisclosure?:Pick<DisclosureCapabilitiesV1,'individualInterpretations'|'educationalContent'>){
   const byMetric=new Map(metrics.map(m=>[m.metricKey,m]))
   if(byMetric.size!==metrics.length)throw new Error('REPORT_DUPLICATE_METRIC_FACT')
   const interpretable=(fact:ReportMetricFact|undefined)=>fact?.status==='INTERPRETABLE'&&typeof fact.value==='number'&&Number.isFinite(fact.value)
@@ -20,5 +21,6 @@ export function renderDeclaredReport(template:ReportTemplate,metrics:readonly Re
     if(block.type==='CHART')return [{...block,metrics:block.metricKeys.map(display)}]
     return [block]
   })
-  return {generatorVersion:DECLARATIVE_REPORT_GENERATOR,title:template.title??null,blocks,limitations:template.limitations,disclaimer:template.disclaimer??null}
+  const mayShowIllustration = !proseDisclosure || proseDisclosure.educationalContent || proseDisclosure.individualInterpretations
+  return {generatorVersion:DECLARATIVE_REPORT_GENERATOR,...(template.illustrationKey && mayShowIllustration ? {illustrationKey:template.illustrationKey} : {}),title:template.title??null,blocks,limitations:template.limitations,disclaimer:template.disclaimer??null}
 }
