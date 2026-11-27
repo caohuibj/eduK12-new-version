@@ -3,6 +3,7 @@ import { validateReferenceSetDefinition } from '../../assessment-reference/refer
 import { parseScaleCatalogManifest } from '../library/catalog-manifest'
 import { parseLocalizationManifest } from '../library/localization-manifest'
 import { hashScaleDefinition, validateScaleDefinition } from '../scale-definition'
+import { reportArtworkKeyFor } from '../../measurement-content/report-artwork'
 import { getScaleCustomScorerKeys, scoreScale } from '../scale-scoring'
 import type { ScaleInstrumentSourceV1 } from './types'
 
@@ -95,6 +96,10 @@ export const validateScaleInstrumentSource = (source: ScaleInstrumentSourceV1, o
     message: issue.message,
     severity: issue.severity,
   }))
+  const artworkKey=source.executable.definition.report.artworkKey
+  if(artworkKey&&artworkKey!==reportArtworkKeyFor(source.identity.instrumentKey,source.identity.instrumentVersion,source.executable.definition.report.reportVersion)){
+    issues.push({path:'executable.definition.report.artworkKey',message:'报告配图标识与量表、量表版本或报告版本不一致',severity:'error'})
+  }
 
   issues.push(...validateAudienceReport(source.executable.definition))
   const scoreKeys = new Set(source.executable.definition.scoring.scores.map((score) => score.key))

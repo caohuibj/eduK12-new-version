@@ -1,4 +1,5 @@
 import type { CompositeReportAudience, TrainingContentReport } from './types'
+import {ScaleReportArtworkHero,ScaleReportBandArtwork} from '../reporting/ScaleReportArtwork'
 import { ReportDetails, ReportSection } from '../reporting/ReportPrimitives'
 
 const text=(value:unknown)=>typeof value==='string'?value:''
@@ -8,13 +9,13 @@ function Metric({value}:{value:Record<string,unknown>}){
   const available=value.status==='INTERPRETABLE'&&value.display!=='REFERENCE_RESULT'&&typeof value.value==='number'&&Number.isFinite(value.value)
   return <><span>{available?String(value.value):'不可用'}</span>{text(value.unit)&&<span> {text(value.unit)}</span>}{value.status==='INVALID'&&<span>（质量无效）</span>}</>
 }
-function DeclaredBlock({value,showMetricKeys=true}:{value:unknown;showMetricKeys?:boolean}){
+function DeclaredBlock({value,showMetricKeys=true,artworkKey}:{value:unknown;showMetricKeys?:boolean;artworkKey?:string}){
   const block=object(value)
   if(!block)return null
   switch(block.type){
     case 'TEXT':return <p className="whitespace-pre-wrap">{text(block.text)}</p>
     case 'METRIC':return <p>{text(block.label)||(showMetricKeys?text(block.metricKey):'测评指标')}：<Metric value={block}/></p>
-    case 'REFERENCE_BAND':return <div><p>{text(block.text)}</p>{Array.isArray(block.guidance)&&<ul>{block.guidance.filter(line=>typeof line==='string').map((line,index)=><li key={index}>{line}</li>)}</ul>}</div>
+    case 'REFERENCE_BAND':return <ScaleReportBandArtwork artworkKey={artworkKey} block={block}><div><p>{text(block.text)}</p>{Array.isArray(block.guidance)&&<ul>{block.guidance.filter(line=>typeof line==='string').map((line,index)=><li key={index}>{line}</li>)}</ul>}</div></ScaleReportBandArtwork>
     // No asset URL is authorized by this DTO. Never render a URL, image or media element.
     case 'ASSET':return <p>图片替代文本：{text(block.alt)||'未提供说明'}（未提供授权资源链接）</p>
     case 'CHART':{
@@ -28,7 +29,8 @@ function DeclaredBlock({value,showMetricKeys=true}:{value:unknown;showMetricKeys
  * accepts no transport and grants no participant access to Training reports. */
 export function DeclaredReportContent({report,showMetricKeys=true}:{report:NonNullable<TrainingContentReport['rendered']>;showMetricKeys?:boolean}){
   return <>
-    {Array.isArray(report.blocks)&&report.blocks.map((block,i)=><DeclaredBlock key={i} value={block} showMetricKeys={showMetricKeys}/>)}
+    <ScaleReportArtworkHero artworkKey={report.artworkKey}/>
+    {Array.isArray(report.blocks)&&report.blocks.map((block,i)=><DeclaredBlock key={i} value={block} showMetricKeys={showMetricKeys} artworkKey={report.artworkKey}/>)}
     {(!!report.limitations?.length||!!report.disclaimer)&&<ReportDetails title="阅读说明与解释边界">
       {Array.isArray(report.limitations)&&report.limitations.length>0&&<ul>{report.limitations.filter(line=>typeof line==='string').map((line,i)=><li key={i}>{line}</li>)}</ul>}
       {typeof report.disclaimer==='string'&&report.disclaimer&&<p>{report.disclaimer}</p>}

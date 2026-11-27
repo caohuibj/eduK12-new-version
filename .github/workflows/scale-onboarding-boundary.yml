@@ -117,6 +117,8 @@ jobs:
       - name: selected source scoring parameters reports and affected dependencies
         working-directory: server-version/backend
         run: node --import tsx scripts/scale-intake-selected-check.ts
+      - name: selected version-local report artwork manifests and WebP files
+        run: node .github/scripts/scale-report-artwork.mjs
   boundary:
     # Declarations only: schemas, source references, golden scoring cases and
     # report/template compatibility. No app build, database or lifecycle fixture.

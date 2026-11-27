@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import {reportArtworkKeySchema} from './report-artwork'
 
 const prose=z.string().trim().min(1).max(20000)
 const key=z.string().trim().min(1).max(240)
@@ -16,6 +17,7 @@ export const reportBlockSchema=z.discriminatedUnion('type',[
 ])
 export const reportTemplateSchema=z.object({
   title:prose.optional(),
+  artworkKey:reportArtworkKeySchema.optional(),
   blocks:z.array(reportBlockSchema).max(500).default([]),
   limitations:z.array(prose).max(100).default([]),
   disclaimer:prose.optional(),
