@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "tutoring_necessity_english_zh_cn/1.0.0/1.2.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生面对英语听力、阅读和表达任务，平等比较老师、同伴、示范、工具、自主练习与课外帮助等路径。",
+    "width": 512,
+    "height": 512
+  },
+  "bands": [
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "very_low",
+      "file": "very-low.webp",
+      "alt": "学生在老师给出一个听力提示后，用新的短音频独立检查理解。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "low",
+      "file": "low.webp",
+      "alt": "一个英语任务周围连接重听、示范、老师、同伴、词典和课外帮助等平等路径。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "middle",
+      "file": "middle.webp",
+      "alt": "学生分别观察不同支持带来的帮助、当前需要和长期基础，练习把判断分开。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "high",
+      "file": "high.webp",
+      "alt": "学生先设定理解新短音频主要场景与行动的目标，再用新材料核对。",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "tutoring_necessity",
+      "bandKey": "very_high",
+      "file": "very-high.webp",
+      "alt": "三格连续场景呈现获得反馈、再次尝试和独立完成新的英语表达任务。",
+      "width": 512,
+      "height": 512
+    }
+  ]
+}
