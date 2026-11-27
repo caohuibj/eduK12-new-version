@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "kstc2020_slp_environment_teacher_en/1.0.0/1.1.0-teacher",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "A science teacher arranges shared observation materials and clears space around the lab tables.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

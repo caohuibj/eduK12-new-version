@@ -1,0 +1,96 @@
+{
+  "toolKey": "kstc2020_slp_environment_teacher_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "Science teaching self-reflection | Set up the room for the thinking you want",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "The 10 English item texts and order match the corresponding factor in Kang et al. Appendix B, pp. 510–513. The original study used five frequency positions; methods §3.1 lists only endpoints 1 = rarely and 5 = always. The project preserves numeric 2–4 and the complete-response 1–5 factor mean. No study averages, norms or thresholds are used."
+      }
+    },
+    "primaryScoreKeys": [
+      "slp_environment"
+    ],
+    "scoreOrder": [
+      "slp_environment"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "slp_environment",
+        "scoreLabel": "Planning the science learning environment (descriptive mean, 1–5)",
+        "headline": "Set up the room for the thinking you want",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A class is comparing how quickly shallow and deep dishes of water change over several days. The plan works best when every group can see the starting level, find the same materials, and tell which observations matter. Moving a table, switching to a clearer container, or providing a recording sheet can make the learning goal easier to reach.\n\nThese answers describe what you report taking into account as you prepare science lessons, from learner needs and available tools to curriculum goals, assessment, and local resources. Some items also ask how effectively you think you arrange those conditions. Look for one change that would give more students a fair chance to do the intended science.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Take an upcoming practical lesson and write down what learners should be able to explain. Walk through the layout, materials and first task from a student’s seat. Change one barrier you find."
+          },
+          {
+            "category": "reflection",
+            "text": "Look at a few examples of earlier work. Use one difficulty you noticed to adjust the materials or the way students will record evidence."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Kang, N.-H., Kang, H., Maeng, S., Park, J., & Jeong, E. (2020). Teacher Competency in Competency-Focused Science Teaching in the South Korean Context: Teacher Self-Assessment Instrument Development and Application. Asia-Pacific Science Education, 6(2), 480–513. https://doi.org/10.1163/23641177-BJA10012 (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). The project separates each published factor and supplies its own instructions, complete-answer rule and feedback.",
+      "This score is the mean of 10 responses, from 1 (rarely) to 5 (always), and requires all 10 answers. It describes self-reported practices and may include judgments about your understanding or effectiveness. It contains no objective performance score, norm, or cross-factor total.",
+      "The original study used the full instrument with 210 South Korean primary and secondary science teachers. This research and self-reflection version uses the published English item wording. The project has not obtained the Korean administration form. Separate use of this factor and equivalence to a Chinese version have not been established."
+    ],
+    "disclaimer": "For your own professional learning and research reflection as a science teacher. The result supports a conversation about practice and does not establish teaching quality, teacher eligibility, or student outcomes.",
+    "artworkKey": "kstc2020_slp_environment_teacher_en/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
