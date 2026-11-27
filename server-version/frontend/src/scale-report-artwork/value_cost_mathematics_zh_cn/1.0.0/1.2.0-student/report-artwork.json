@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "value_cost_mathematics_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "value-very-low.webp",
+      "alt": "学生指着两条校园路线，在便签记录一个待查的量。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "value",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "value-low.webp",
+      "alt": "学生把课堂比例题中的一段线与路线图中的一段对应起来。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "value",
+      "bandKey": "low"
+    },
+    {
+      "file": "value-middle.webp",
+      "alt": "学生在比例题和地图上分别圈出需要比较的线段。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "value",
+      "bandKey": "middle"
+    },
+    {
+      "file": "value-high.webp",
+      "alt": "两名学生围着一张比例简图讨论画面中还缺的一个理由。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "value",
+      "bandKey": "high"
+    },
+    {
+      "file": "value-very-high.webp",
+      "alt": "学生用尺在摊位布置图和实际范围之间核对同一条边。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "value",
+      "bandKey": "very_high"
+    },
+    {
+      "file": "cost-very-low.webp",
+      "alt": "学生在一个预留时段核对两道题，核完后合上本子。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "cost",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "cost-low.webp",
+      "alt": "学生对照短时间空档，只圈出一个需要核对的步骤。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "cost",
+      "bandKey": "low"
+    },
+    {
+      "file": "cost-middle.webp",
+      "alt": "学生把数学任务、原有活动和可用空档画成三格，并移动一张任务卡。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "cost",
+      "bandKey": "middle"
+    },
+    {
+      "file": "cost-high.webp",
+      "alt": "学生把数学任务分成两个步骤，只拿一处卡点向老师请教。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "cost",
+      "bandKey": "high"
+    },
+    {
+      "file": "cost-very-high.webp",
+      "alt": "学生和可信成人一起看一周安排，保留原有活动与休息，移动一张可调整的任务卡。",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "cost",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生用尺比较练习册和校园路线图，准备核对实际距离。",
+    "width": 512,
+    "height": 512
+  }
+}

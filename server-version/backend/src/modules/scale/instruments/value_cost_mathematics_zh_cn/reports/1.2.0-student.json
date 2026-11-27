@@ -1,0 +1,172 @@
+{
+  "toolKey": "value_cost_mathematics_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "数学学习的价值与时间取舍",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容草稿核对",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对登记题本、两维不同的最低有效题数、独立均分和初高中分档。价值和成本保留原参考与证据等级；成本解释标记试用。学生图文草稿待审。"
+      }
+    },
+    "primaryScoreKeys": [
+      "value",
+      "cost"
+    ],
+    "scoreOrder": [
+      "value",
+      "cost"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "value",
+        "scoreLabel": "数学学习价值均分（试用版）",
+        "headline": "这道题解决了什么问题？",
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "运动会前，小岑和同桌要画一张校园集合路线图。他们发现两张图上同样长的一段线，代表的实际距离不一样。小岑翻回课上学的比例尺，换算了其中一段，再和同桌商量在哪个路口集合。\n\n这三道题记录你觉得数学有多重要、你有多重视它，以及你觉得它有什么用。你可以从一件眼下关心的事出发，找找数学在哪一步帮你看清了问题。也可以记下暂时还看不出联系的地方。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "带一个真实问题去问",
+            "summary": "从你最近关心的事里选一个问题，比如哪条集合路线更短。只写你需要知道的一个量，再问老师或同学，课堂上哪种方法可以帮你比较。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "给一道题找一个用途",
+            "summary": "挑一道已经做过的比例或图表题，把它改写成你碰过的小问题。试着补完一句话：“我会用这一步来决定……”如果一时找不到用途，记下你想问的一点。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "对照课本和生活中的一次用法",
+            "summary": "把一道比例尺题和一张校园地图放在一起。分别写下两处需要估算的量，再圈出两种用法共同的一步。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "把理由讲给同伴听",
+            "summary": "选一个你觉得值得用数学核对的决定，画张简图向同伴说明这里用了什么关系。请对方指出一处凭图仍看不清的地方，再补上理由。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "换个情境检验一种方法",
+            "summary": "把你在地图上会用的方法带去一个新情境，例如按比例布置摊位。先写下它可能适用的一步，再用实际长度核对。发现条件不同时，把差别记下来。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "从最近一次实际选择写起：当时要决定什么？数学帮你比较了哪两个量？还有什么信息它无法告诉你？"
+          }
+        ]
+      },
+      {
+        "scoreKey": "cost",
+        "scoreLabel": "数学学习时间与取舍均分（试用版）",
+        "headline": "这一周，数学和哪些安排撞在一起？",
+        "provisional": true,
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "同一周，小岑想把路线图里的比例题弄懂，也要准备社团排练。她原打算把整页订正都放在排练前，翻开本子才发现只剩很短一段空档。她先圈出最卡的一处，写好准备问的那句话，把剩下的订正留给下一次能专心的时间。\n\n后四道题关心数学功课是否占用太多时间、你能否腾出学习时间，以及是否觉得要舍弃其他安排。可以先记录这一周卡在哪个时段、哪项任务最占时间，再决定需要什么支持。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "留出一段原本用得顺的时间",
+            "summary": "回想这周哪段时间做数学比较顺。把它留给一个已经说得清的小任务，例如核对两道订正。做完就停，记下这段安排哪里好用。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "把任务放进真实的空档",
+            "summary": "看看一次课后或晚饭前的空档，写下一个能做完的数学步骤。优先圈出问题或核对一道题，别把整页订正都挤进同一段时间。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "看清一处时间冲突",
+            "summary": "选一个数学与其他安排挤在一起的晚上，画三格分别填上数学、原有活动和可调整空档。圈出最值得先完成的一步，并记下哪项安排暂时保留。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "分开今天必须做的事和可延后的事",
+            "summary": "把最占时间的一项数学任务拆成“今天先做哪一步”和“哪一步可以请教”。带着具体卡点找老师或同伴，商量可以分开完成的部分。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "带着时间记录商量一个可行安排",
+            "summary": "写下这周一次真实冲突，以及被挤掉的活动或休息。把记录带给老师或可信赖的成人，一起定一个能开始的小目标，并确认哪项其他安排需要保留。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "记录一次计划用多久、实际卡在哪一步和下一次准备如何调整。用具体任务讨论时间安排。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "价值和时间与取舍分别以原选项 1–6 取均分。价值使用前三题，至少两题有效；时间与取舍使用后四题，至少三题有效。两项分数各自解释。",
+      "初中与高中的分段来自各自的项目历史便利样本。分段说明在匹配参考组中的相对位置，原始均分仍要结合原选项理解。缺少匹配年级时省略历史分段。",
+      "时间与取舍是试用解释。题目既问到时间安排也问到要舍弃的活动，均分不能换算成每周小时，也不能用来判断是否勤奋。"
+    ],
+    "disclaimer": "这份报告用来回顾你如何看待数学，以及这一周可以怎样安排学习。可以同时觉得数学有用、又觉得时间紧张。请勿用于排名、分流或诊断。",
+    "artworkKey": "value_cost_mathematics_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
