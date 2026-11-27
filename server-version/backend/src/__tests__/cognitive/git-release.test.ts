@@ -39,12 +39,12 @@ describe('declarative Cognitive publication', () => {
 
   it('returns the masked response while preserving server-only numeric and quality facts',()=>{
     const disclosure=compileEffectiveDisclosure(undefined,{schemaVersion:1,policyVersion:'fixture',unknownAudience:'DENY',
-      audiences:{respondent:{numericScores:false,references:false,scoreDerivedLabels:false,
+      audiences:{respondent:{numericScores:false,references:true,scoreDerivedLabels:true,
         individualInterpretations:false,educationalContent:true,artwork:false}}},undefined)
     const snapshot=parseCognitiveResultSnapshot({schemaVersion:1,completedAt:'2026-11-28T00:00:00Z',testType:'gonogo',
       configVersion:'synthetic',engineVersion:'1.0.0',scoringVersion:'1.0.0',protocolSignature:'a'.repeat(64),profile:'standard',
       metrics:{hitRate:.8},quality:{state:'interpretable',flags:{privateFlag:true},reasons:['private']},
-      references:[{metricKey:'hitRate'}],report:{headline:[],user:[],detail:[]},assessmentContext:null,effectiveDisclosure:disclosure})
+      references:[{metricKey:'hitRate',observed:.8}],report:{headline:[],user:[],detail:[]},assessmentContext:null,effectiveDisclosure:disclosure})
     expect(cognitiveParticipantResult(snapshot)).toMatchObject({metrics:{},qualityFlags:{},references:[],quality:{reasons:[]}})
     expect(snapshot.metrics).toEqual({hitRate:.8})
   })

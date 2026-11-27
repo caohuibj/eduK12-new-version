@@ -19,6 +19,7 @@ export const reportMetaSchema = z
     referenceVersion: z.string().optional(),
     referenceBand: z.string().optional(),
     declaredRelease: z.object({
+      measurementOrigin: z.object({version:z.string().min(1).max(240),instrumentVersion:z.string().min(1).max(240)}).strict().optional(),
       parameterVersion: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/),
       title: z.string().min(1).max(200),
       introduction: z.string().max(4000),

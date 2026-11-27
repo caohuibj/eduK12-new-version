@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '../../types'
+import { compileEffectiveDisclosure } from '../../modules/scale/policy/disclosure'
 
 const mocks = vi.hoisted(() => ({
   assignment: vi.fn(), cohort: vi.fn(), count: vi.fn(), findMany: vi.fn(),
@@ -12,7 +13,7 @@ import { listProfessionalReports } from '../../modules/cognitive/professional-re
 import { cognitiveProfessionalReportsQuerySchema } from '../../modules/cognitive/cognitive.schema'
 
 const report = { title: '反应时', qualityState: 'limited', conclusion: '保留记录', disclaimer: '本次任务', practicalTips: [], headline: [{ key: 'validTrialCount', value: 5 }], user: [], detail: [], quality: [], method: { testType: 'reaction' } }
-const snapshot = () => encryptCognitivePayload({ schemaVersion: 1, completedAt: new Date().toISOString(), testType: 'reaction', engineVersion: '1.0.0', scoringVersion: '1.1.0', configVersion: '1.1.0', protocolSignature: 'a'.repeat(64), profile: 'standard', metrics: { medianRtMs: 305, validTrialCount: 5 }, quality: { state: 'limited', flags: {}, reasons: [] }, report, references: [{ metricKey: 'medianRtMs' }, { metricKey: 'validTrialCount' }], assessmentContext: null })
+const snapshot = (extra: Record<string, unknown> = {}) => encryptCognitivePayload({ ...extra, schemaVersion: 1, completedAt: new Date().toISOString(), testType: 'reaction', engineVersion: '1.0.0', scoringVersion: '1.1.0', configVersion: '1.1.0', protocolSignature: 'a'.repeat(64), profile: 'standard', metrics: { medianRtMs: 305, validTrialCount: 5 }, quality: { state: 'limited', flags: {}, reasons: [] }, report, references: [{ metricKey: 'medianRtMs' }, { metricKey: 'validTrialCount' }], assessmentContext: null })
 const input = { userId: 'owner-teacher', role: UserRole.TEACHER, assignmentId: 'a1', offset: 0 }
 beforeEach(() => {
   vi.clearAllMocks(); process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
@@ -38,6 +39,16 @@ describe('professional frozen report reading', () => {
     expect(query.select).toEqual({ id: true, finishedAt: true, attemptNo: true, compositeAttemptId: true, resultSnapshotEncrypted: true })
     expect(result.records[0].reportId).toMatch(/^CR-[A-F0-9]{24}$/)
     expect(JSON.stringify(result)).not.toContain('random-session-one')
+  })
+  it('enforces the separate teacher policy even when all result data are visible to respondents', async () => {
+    const effectiveDisclosure = compileEffectiveDisclosure(undefined, {schemaVersion:1, policyVersion:'teacher-test', unknownAudience:'DENY', audiences:{
+      respondent:{numericScores:true,references:true,scoreDerivedLabels:true,individualInterpretations:true,educationalContent:true,artwork:false},
+    }}, undefined)
+    mocks.findMany.mockResolvedValueOnce([{ id:'report', attemptNo:1, compositeAttemptId:null,
+      resultSnapshotEncrypted:snapshot({effectiveDisclosure}) }])
+    const row = (await listProfessionalReports(input)).records[0]
+    expect(row.report).toMatchObject({headline:[],user:[],detail:[],quality:[],conclusion:'',practicalTips:[],method:{}})
+    expect(row.references).toEqual([])
   })
   it('keeps record references stable when new records change their page position', async () => {
     const first = (await listProfessionalReports(input)).records[0]

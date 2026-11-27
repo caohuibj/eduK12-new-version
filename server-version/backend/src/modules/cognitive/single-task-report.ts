@@ -180,7 +180,8 @@ export const buildCognitiveSingleTaskReport = (input: {
       label: qualityDefinitions[key]?.label ?? key,
       active: value === true,
     }))
-  const hiddenReference = !interpretable || visibility&&!visibility.references || !input.reference || input.reference.mode === 'none'
+  const referenceVisible = !visibility || (visibility.numericScores && visibility.references && visibility.scoreDerivedLabels)
+  const hiddenReference = !interpretable || !referenceVisible || !input.reference || input.reference.mode === 'none'
     ? null
     : input.reference
 

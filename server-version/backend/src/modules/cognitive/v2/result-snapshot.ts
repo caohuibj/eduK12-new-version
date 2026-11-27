@@ -55,6 +55,6 @@ export function cognitiveParticipantResult(snapshot:CognitiveResultSnapshot) {
   const metrics=policy?Object.fromEntries(Object.entries(snapshot.metrics).filter(([key])=>allowed.has(key))):snapshot.metrics
   const quality=policy&&!policy.resultQualityDetails?{state:snapshot.quality.state,flags:{},reasons:[]}:snapshot.quality
   return {metrics,quality,qualityFlags:quality.flags,
-    references:policy&&(!policy.references||!policy.scoreDerivedLabels)?[]:referencesForCognitiveResult(snapshot),
+    references:policy&&(!policy.numericScores||!policy.references||!policy.scoreDerivedLabels)?[]:referencesForCognitiveResult(snapshot),
     report:snapshot.report,assessmentContext:snapshot.assessmentContext}
 }

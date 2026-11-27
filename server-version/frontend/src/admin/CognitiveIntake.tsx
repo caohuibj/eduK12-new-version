@@ -4,6 +4,7 @@ import api from '../api/client'
 import {useAuth} from '../contexts/AuthContext'
 import {apiErrorMessage} from '../utils/apiErrorMessage'
 import AdminStepUp from './AdminStepUp'
+import CognitiveReportRevisionEditor from './CognitiveReportRevisionEditor'
 
 type Identity={testType:string;configVersion:string;engineVersion:string;scoringVersion:string}
 type InstallPlan={action:'CREATE_DRAFT'|'ALREADY_PRESENT'|'BLOCKED'|'CREATED_DRAFT';reasons:string[];configId?:string;status?:'DRAFT'|'PUBLISHED'|'RETIRED';sourceHash?:string}
@@ -226,6 +227,15 @@ function CognitiveIntakeWorkspace(){
           </div></details></article>)}</div>
         {pages>1&&<nav className="system-actions" aria-label="认知候选分页"><button type="button" disabled={busy||page===1} onClick={()=>setPage(value=>value-1)}>上一页</button><span>第 {page} / {pages} 页</span><button type="button" disabled={busy||page===pages} onClick={()=>setPage(value=>value+1)}>下一页</button></nav>}
       </section>
+      <CognitiveReportRevisionEditor onSelectForApproval={source=>{
+        if(!catalog||locked.current)return
+        const choice=identity(source)
+        const candidate:Candidate={...choice,name:source.name,reportVersion:source.configVersion,
+          profiles:source.profiles,reportMetrics:[],plan:{action:'ALREADY_PRESENT',status:'PUBLISHED',configId:source.id,reasons:[]}}
+        setCatalog(old=>old?{...old,registered:[candidate,...old.registered.filter(item=>key(item)!==key(choice))]}:old)
+        setSelectedKey(key(choice));setPreview(null);setProfilePreview(null);setProfileStatus('')
+        setProfileKey(source.profiles[0]?.key??'standard')
+      }}/>
       <section className="sys-panel" aria-label="待审核认知候选"><h2>待审核候选</h2><p className="sys-muted">保留已开发内容与具体缺口，当前不能从这里安装。</p>
         {catalog&&!catalog.pending.length&&<p>当前没有待审核候选。</p>}
         <div className="sys-records">{catalog?.pending.map(row=><article className="sys-record" key={row.testType}><details><summary><span className="sys-record-heading"><strong>{row.testType}</strong><small>PR{row.sourcePR} · 待审核</small></span><ChevronDown size={17} aria-hidden="true"/></summary><div className="sys-record-body"><ul>{row.reasons.map((reason,index)=><li key={index}>{reason}</li>)}</ul></div></details></article>)}</div>

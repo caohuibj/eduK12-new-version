@@ -12,7 +12,7 @@ npm run content:check -- scale:who5 cognitive:gonogo sjt:cpj-cj01-sd-baseline fo
 
 Scale 维持独立冻结的题本 C、参数 P 和报告 R。仅改阈值或报告时追加对应版本文件，在 `releases.json` 选择准确的版本和入口。已有 Scale 流程及素材校验见[标准量表导入与优化](scale-content-workflow.md)。
 
-Cognitive 的 `modules/cognitive/tasks/<task>/` 可在 `parameters/` 和 `reports/` 追加 P/R 版本，使用 `releases.json` 选择已登记的引擎、计分版本与入口。P 绑定引擎与计分实现，R 选择精确 P；引擎 fixture 随已部署的 ops 镜像维护。新增任务、交互、刺激与算法沿用代码评审和镜像发布。撤下旧选择保留既有作答，后台紧急暂停继续优先。
+Cognitive 的 `modules/cognitive/tasks/<task>/` 可在 `parameters/` 和 `reports/` 追加 P/R 版本，使用 `releases.json` 选择已登记的引擎、计分版本与入口。P 绑定引擎与计分实现，R 选择精确 P；引擎 fixture 随已部署的 ops 镜像维护。新增任务、交互、刺激与算法沿用代码评审和镜像发布。撤下旧选择保留既有作答，后台紧急暂停继续优先。平台管理员可从已上线的精确配置复制报告，预览四类受众的实际可见内容，完成 MFA 后保存新版。新版继续复用原测量版本，入口和对象授权需要沿用独立审批。
 
 SJT 在 `modules/situational/instruments/<toolKey>/` 保存 `<C>/content.json`、`parameters/<P>.json`、`reports/<R>.json` 和 `releases.json`。检查编译精确 C/P/R 并运行已声明的 golden cases。媒体只声明既有资产标识，发布事务校验内容摘要和使用范围。早期 `instrument.json` 仍可只读检查，保持原发布状态。当前新增路径接入 Survey 已支持的静态图文作答和研究报告。平台管理员可在 SJT 治理中导入既有 Excel 工作簿，填写报告和入口范围，预览后经 MFA 提交审核。工作簿仍按原规则校验计分和 golden cases。仅改报告时沿用原 C/P。
 

@@ -225,7 +225,7 @@ function legacyParticipantResult(
       ? Object.fromEntries(Object.entries(result.metrics).filter(([key])=>visibleKeys.has(key)))
       : {},
     qualityFlags: visibility.resultQualityDetails ? result.qualityFlags : {},
-    reference: visibility.references&&visibility.scoreDerivedLabels ? result.reference : undefined,
+    reference: visibility.references&&visibility.scoreDerivedLabels&&visibility.numericScores ? result.reference : undefined,
   }
 }
 

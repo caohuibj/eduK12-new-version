@@ -52,12 +52,13 @@ export function publishedCognitiveConfigMeasurement(input: {
   testType:string;configVersion:string;engineVersion:string;scoringVersion:string;config:unknown
 }):ReleaseInput {
   const metadata=reportMetaSchema.safeParse((input.config as {report?:unknown}|null)?.report)
-  const declared=metadata.success&&metadata.data.declaredRelease!==undefined
+  const declared=metadata.success?metadata.data.declaredRelease:undefined
+  const origin=declared?.measurementOrigin
   const measurement=cognitiveMeasurementRelease({
-    ...input,localId:input.testType,version:input.configVersion,
-    configVersion:declared?input.engineVersion:input.configVersion,scope:{kind:'PLATFORM'},
+    ...input,localId:input.testType,version:origin?.version??input.configVersion,
+    configVersion:origin?.instrumentVersion??(declared?input.engineVersion:input.configVersion),scope:{kind:'PLATFORM'},
   })
-  if(declared&&measurement.layer==='MEASUREMENT') {
+  if(declared&&!origin&&measurement.layer==='MEASUREMENT') {
     return {...measurement,version:'git-execution-v1:'+measurement.content.measurementHash}
   }
   return measurement
