@@ -1,0 +1,142 @@
+{
+  "toolKey": "selfie4t_2022tk_assessment_en_teacher_self",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher",
+  "title": "SELFIEforTEACHERS | Make feedback worth acting on",
+  "report": {
+    "reportVersion": "1.1.0-teacher",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "European Commission JRC129699 2022 Toolkit Annex I pp.58–59: all three English stems and 18 A1–C2 descriptions match the registered C after punctuation and whitespace normalization. JRC131282 official 2023 guide p.11 / Annex 1 specifies six scored levels and a seventh zero-point not-aware option. Both documents carry CC BY 4.0 with change attribution. Keep the three scores and original C/P mapping independent."
+      }
+    },
+    "primaryScoreKeys": [
+      "competence_4_1",
+      "competence_4_2",
+      "competence_4_3"
+    ],
+    "scoreOrder": [
+      "competence_4_1",
+      "competence_4_2",
+      "competence_4_3"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "competence_4_1",
+        "scoreLabel": "Assessment strategies (self-position, 0–6)",
+        "headline": "Decide what the assessment is for",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "At the end of a lesson, a teacher could ask a digital quiz to count correct answers. A second version asks learners to pick an answer and explain the clue they used. The second version can reveal which idea the class may need to revisit. The difference lies in the question the teacher wanted to answer about learning.\n\nYour selected statement describes how you currently choose and use digital tools within that process. Pick one teaching decision a small check could inform. A simpler tool may be the better choice if it is accessible and gives you the evidence you need.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Before choosing a tool, finish the sentence ‘I need to find out whether learners can …’. Create one check that makes their reasoning visible and decide how you will act on two possible answers."
+          },
+          {
+            "category": "environment",
+            "text": "Offer an accessible way to respond when a device, connection, language feature, or interface hinders participation. Keep the intended learning outcome the same."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_4_2",
+        "scoreLabel": "Analysing evidence (self-position, 0–6)",
+        "headline": "Make the dashboard answerable to real work",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A tidy graph can show a class pattern quickly. One student example can tell you which interpretation of that pattern is plausible. A missing submission might reflect a barrier to access, while an incorrect solution can reveal the very idea students are working through. Use the numbers to decide where to look; use examples to decide what the numbers mean.\n\nYour selected statement describes how you collect, look at, and use digital learning evidence. It can point towards a better question about learning while the original work is still available to check.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Choose one pattern in a digital result. Read or observe a small set of relevant learner examples from different parts of that pattern before picking your next instructional step."
+          },
+          {
+            "category": "environment",
+            "text": "Record only the information needed for the decision. Use the setting’s approved data-handling and sharing practices."
+          }
+        ]
+      },
+      {
+        "scoreKey": "competence_4_3",
+        "scoreLabel": "Feedback and planning (self-position, 0–6)",
+        "headline": "Build in one chance to use the feedback",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "A well-written comment can vanish into a notification list. The same comment becomes useful when a learner can see which part it refers to, what to try next, and when they will get a chance to try it. The learning signal comes from what changes in the second attempt.\n\nYour selected statement describes how you currently use digital tools to give, receive, and learn from feedback. Use a single feedback loop to decide what is worth keeping in your routine.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Point to one feature of a learner’s current work and give one achievable next action. Build in enough time for them to apply it and show what changed."
+          },
+          {
+            "category": "reflection",
+            "text": "Review a few second attempts. Ask learners which part of the feedback helped them act and whether the way it arrived made it easy to use."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "© European Union 2022 and 2023. Adapted from Anastasia Economou, SELFIEforTEACHERS Toolkit (2022), doi:10.2760/626409, Annex I, and SELFIEforTEACHERS: Designing and developing a self-reflection tool for teachers’ digital competence (2023), doi:10.2760/561258, p.11 and Annex 1. Both CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). The project separates the Assessment area and supplies new instructions and feedback. No EU endorsement is implied.",
+      "Each competence stands alone. A1–C2 are the six ordered self-descriptions represented by 1–6. A selected zero records ‘I am not aware of this competence’; an omitted response stays missing. There is no area total, proficiency band, or population rank.",
+      "This is the fixed English adaptation for teachers in primary and secondary education. These three responses describe self-reported practice; this standalone area has no separate validation or Chinese-language equivalence."
+    ],
+    "disclaimer": "Use this teacher self-reflection for professional learning. It describes choices in one part of the project’s fixed English toolkit adaptation and issues no EU certificate or teacher appraisal.",
+    "artworkKey": "selfie4t_2022tk_assessment_en_teacher_self/1.0.0/1.1.0-teacher"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

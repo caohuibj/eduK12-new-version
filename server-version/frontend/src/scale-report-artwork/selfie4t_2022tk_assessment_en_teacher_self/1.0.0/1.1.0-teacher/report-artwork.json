@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "selfie4t_2022tk_assessment_en_teacher_self/1.0.0/1.1.0-teacher",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "A teacher asks a question on a tablet, reviews two shape arrangements, and watches a student revise a solution.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}
