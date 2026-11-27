@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { checkSjtGitRelease, readSjtGitReleasePlan } from '../../modules/situational/git-release'
 import legacy from '../../modules/situational/instruments/sjt-assertiveness-golden/1.0.0/instrument.json'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
+import { prepareGovernedSjtWorkbook, governedSjtWorkbookMeasurementInput } from '../../modules/situational/authoring/governed-workbook'
 
 let root: string | undefined
 let toolKey = 'sample-sjt'
@@ -193,3 +194,75 @@ it.skipIf(process.env.SJT_GIT_RELEASE_ISOLATED !== '1')('publishes and rolls bac
     expect((await governedRow(prisma, secondRow.id)).state).toBe('WITHDRAWN')
   } finally { await prisma.$disconnect() }
 }, 100000)
+
+
+const workbookCandidate = () => ({
+  requestId: randomUUID(), releaseVersion: '1.0.0', reportVersion: '1.0.0', statement: 'Synthetic validation only.',
+  template: {
+    templateVersion: 'sjt-upload-v1', instrumentKey: 'sample-workbook-' + randomUUID().slice(0,8), instrumentVersion: '1.0.0',
+    title: 'Synthetic workbook', licenseStatus: 'self_authored', redistribution: 'allowed', respondentType: 'teacher_self_report',
+    entryNodeKey: 'node', author: 'Synthetic example author', sourceNote: 'Synthetic internal validation only.',
+    disclaimer: 'Synthetic validation, no empirical claim.',
+    nodes: [{ nodeKey: 'node', motherSceneKey: 'mother', title: 'A classroom choice', stimulus: 'A fictional example.' }],
+    questions: [{ nodeKey: 'node', questionKey: 'choice', prompt: 'What would you choose?', kind: 'CORE',
+      purpose: 'PROFESSIONAL_JUDGMENT', required: true, order: 1 }],
+    options: ['A', 'B'].map(optionKey => ({ questionKey: 'choice', optionKey, label: 'Choice ' + optionKey })),
+    transitions: ['A', 'B'].map(optionKey => ({ nodeKey: 'node', optionKey, nextNodeKey: 'END', bridgeText: '' })),
+    metrics: [{ metricKey: 'effort', label: 'Effort', construct: 'practice', role: 'primary' }],
+    opportunities: [{ nodeKey: 'node', metricKey: 'effort', applicability: 'OPPORTUNITY' }],
+    scores: ['A', 'B'].map((optionKey, contribution) => ({ nodeKey: 'node', optionKey, metricKey: 'effort', contribution })),
+    feedback: ['A', 'B'].map(optionKey => ({ questionKey: 'choice', optionKey, kind: 'ACTION', text: 'Example action.' })),
+    comparisons: [],
+    cases: ['A', 'B'].map((responseValue, effort) => ({ name: 'Choice ' + responseValue,
+      responses: [{ nodeKey: 'node', questionKey: 'choice', responseValue }], expected: { effort } })),
+  },
+  reportTemplate: { title: 'Research report' }, reportVisibility: visibility,
+})
+
+it('prepares a validated workbook without widening entry or recipient access', () => {
+  const candidate = workbookCandidate()
+  const first = prepareGovernedSjtWorkbook(candidate)
+  const later = prepareGovernedSjtWorkbook({ ...candidate, releaseVersion: '1.0.1', reportVersion: '1.0.1', reportTemplate: { title: 'Revised report' } })
+  expect(first.artifact.unit?.nativeSituational?.protocol).toBe('SITUATIONAL_NATIVE_V1')
+  expect(first.artifact.report?.audience).toBe('researcher')
+  expect(first.preview.contentVersion).toBe(later.preview.contentVersion)
+  expect(first.preview.reportVersion).not.toBe(later.preview.reportVersion)
+  expect(governedSjtWorkbookMeasurementInput(first.artifact.unit!)).toEqual(governedSjtWorkbookMeasurementInput(later.artifact.unit!))
+  expect(() => prepareGovernedSjtWorkbook({ ...candidate, template: { ...candidate.template, redistribution: 'restricted' } }))
+    .toThrow('SJT_GIT_REDISTRIBUTION_NOT_AUTHORIZED')
+})
+
+it.skipIf(process.env.SJT_GIT_RELEASE_ISOLATED !== '1')('uses existing MFA approval and trial for a workbook and its report-only revision', async () => {
+  const url = new URL(process.env.DATABASE_URL!)
+  if (url.hostname !== '127.0.0.1' || url.port !== '55488' || url.pathname !== '/eduk12_sjt_git_test') {
+    throw new Error('A disposable SJT Git release database is required')
+  }
+  const { prisma } = await import('../../config/database')
+  const { approveGovernedTool, governedRow, previewGovernedWorkbookSjt, submitGovernedWorkbookSjt } =
+    await import('../../modules/survey/governed-tool.service')
+  try {
+    const admin = await prisma.user.create({ data: {
+      username: 'sjt-git-admin-' + randomUUID(), passwordHash: 'synthetic-only',
+      role: 'STUDENT', platformRole: 'SYSTEM_ADMIN', accountDomain: 'TRAINING',
+    } })
+    const proof={adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID(),tokenVersion:0}
+    const candidate = workbookCandidate()
+    await expect(previewGovernedWorkbookSjt(admin.id, candidate, { ...proof, adminVerifiedAt: 0 })).rejects.toMatchObject({ statusCode:403 })
+    const preview = await previewGovernedWorkbookSjt(admin.id, candidate, proof)
+    expect(preview.metricKeys.length).toBeGreaterThan(0)
+    const submit = async (input: typeof candidate) => {
+      const submitted = await submitGovernedWorkbookSjt(admin.id, input, proof)
+      expect(submitted.state).toBe('SUBMITTED')
+      expect((await governedRow(prisma,submitted.id)).measurement_release).toBeNull()
+      const release = await approveGovernedTool(admin.id, submitted.id, { expectedVersion:submitted.version, hash:submitted.hash,
+        decision:'APPROVE', reason:'Synthetic review only', allowedProducts:['SURVEY'] }, proof)
+      expect(release.state,release.blockers.join('；')).toBe('ONLINE')
+      return governedRow(prisma,release.id)
+    }
+    const original = await submit(candidate)
+    const revised = await submit({ ...candidate, requestId:randomUUID(), releaseVersion:'1.0.1', reportVersion:'1.0.1', reportTemplate:{title:'Revised report'} })
+    expect(revised.measurement_release).toEqual(original.measurement_release)
+    expect(revised.snapshot.report?.version).toBe('1.0.1')
+    expect(revised.snapshot.report?.effectiveDisclosure).toEqual(original.snapshot.report?.effectiveDisclosure)
+  } finally { await prisma.$disconnect() }
+},100000)

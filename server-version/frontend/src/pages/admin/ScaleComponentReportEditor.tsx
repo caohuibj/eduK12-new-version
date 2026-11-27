@@ -90,6 +90,7 @@ export function ScaleComponentReportPresentation({
   onTemplateArtworkChange,
   disabled,
   onVisibilityChange,
+  visibleAudiences = Object.keys(REPORT_AUDIENCES) as Audience[],
   capabilities = Object.keys(REPORT_CAPABILITIES) as Capability[],
 }: {
   version: string
@@ -100,6 +101,7 @@ export function ScaleComponentReportPresentation({
   onTemplateArtworkChange?: (key: string) => void
   disabled: boolean
   onVisibilityChange: (visibility: ReportVisibility) => void
+  visibleAudiences?: readonly Audience[]
   capabilities?: readonly Capability[]
 }) {
   const updateVisibility = (audience: Audience, capability: Capability, checked: boolean) => {
@@ -120,7 +122,7 @@ export function ScaleComponentReportPresentation({
         <p className="component-help">这些设置按报告版本冻结。原始答卷、单题分和计分方法仍受题本权限约束。</p>
         {visibility ? (
           <div className="grid gap-3 sm:grid-cols-2">
-            {(Object.keys(REPORT_AUDIENCES) as Audience[]).map(audience => (
+            {visibleAudiences.map(audience => (
               <fieldset key={audience} disabled={disabled} className="min-w-0 space-y-2 rounded-lg border p-3">
                 <legend className="px-1 font-medium">{REPORT_AUDIENCES[audience]}</legend>
                 {capabilities.map(capability => (

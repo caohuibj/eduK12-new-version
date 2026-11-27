@@ -24,6 +24,7 @@ export async function bindGovernedToolContent(tx:Prisma.TransactionClient,unit:R
   for(const e of entries)binding.referencePolicy.choices.push({releaseId:reference.releaseId,contentHash:reference.contentHash,entryKey:referenceEntryKey(e.definition),priority:0,metricKey:e.metricKey,referenceKind:e.referenceKind})
  }
  if(a.report){
+  if(unit.kind==='SJT'&&a.unit?.provenance.sjtWorkbookRelease&&a.report.effectiveDisclosure)binding.reportDisclosure=a.report.effectiveDisclosure
   let upstreamReport: Awaited<ReturnType<typeof getContentRelease>> = null
   if(unit.kind==='SJT'&&a.unit?.provenance.sjtGitRelease){
    const git=sjtGitFrozenBindingSchema.parse(a.unit.provenance.sjtGitRelease)

@@ -9,7 +9,9 @@ import {catalogDiscoveryRecords,standardDiscoveryMetadataJoin,discoveryPageSql,j
 import {catalogTagFacets,type CatalogClassificationTag,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {approveToolEntryPolicies,assertToolEntryPolicy,exactToolEntryProducts,readApprovedToolEntryProducts} from '../assessment-governance/tool-entry-policy'
 import {inspectTrainingGovernedDefinition} from '../questionnaire-product/training-governed-definition'
-import {ownGovernedMedia,retainGovernedMedia} from './governed-tool.media'
+import {assertSjtAuthorMedia} from '../situational/authoring/media'
+import {governedSjtWorkbookMeasurementInput,prepareGovernedSjtWorkbook} from '../situational/authoring/governed-workbook'
+import {governedMediaRefs,ownGovernedMedia,retainGovernedMedia} from './governed-tool.media'
 import {randomUUID} from 'node:crypto'
 import {Prisma,type PrismaClient} from '@prisma/client'
 import {prisma} from '../../config/database'
@@ -195,7 +197,11 @@ async function completeGovernedTrial(tx:Prisma.TransactionClient,row:GovernedRow
    await assertGovernedMeasurement(tx,row.family,measurement)
    pointer=measurement
   }else{
-   const content=await publishContentRelease(tx,governedMeasurementInput(snapshotUnit(row.snapshot.unit),{kind:'PLATFORM',ownerId:row.approved_by},'survey-governed:'+row.id,row.snapshot_hash),actor)
+   const unit=row.snapshot.unit
+   const input=row.family==='SJT'&&unit.provenance.sjtWorkbookRelease
+    ?governedSjtWorkbookMeasurementInput(unit)
+    :governedMeasurementInput(snapshotUnit(unit),{kind:'PLATFORM',ownerId:row.approved_by},'survey-governed:'+row.id,row.snapshot_hash)
+   const content=await publishContentRelease(tx,input,actor)
    if(content.layer!=='MEASUREMENT'||content.status!=='PUBLISHED')throw new Error('内容版本无法发布')
    pointer={releaseId:content.releaseId,contentHash:content.contentHash}
   }
@@ -323,6 +329,26 @@ export function originalSjtArtifact(actor:string,input:OriginalSjtSubmission):Go
 }
 export async function previewOriginalSjt(actor:string,input:OriginalSjtSubmission,proof:AdminSessionProof){await assertStandardSystem(prisma,actor,proof);const a=originalSjtArtifact(actor,input);const measurement=(await import('../measurement-content/release')).prepareRelease(governedMeasurementInput(snapshotUnit(a.unit!),{kind:'PLATFORM'},input.toolKey,input.version));const parameters=measurement.layer==='MEASUREMENT'?await prisma.$queryRaw<Array<{id:string;key:string;version:string}>>`SELECT r.id,r.content_key AS key,r.version FROM measurement_content_releases r JOIN measurement_content_releases m ON m.id=r.content#>>'{measurement,releaseId}' WHERE r.layer='REFERENCE' AND r.family='SJT' AND r.status='PUBLISHED' AND r.scope->>'kind'='PLATFORM' AND m.content->>'measurementHash'=${measurement.content.measurementHash} ORDER BY r.published_at DESC,r.id LIMIT 100`:[];return {blockers:artifactBlockers(a),metrics:artifactMetrics(a),parameters}}
 export async function submitOriginalSjt(actor:string,input:OriginalSjtSubmission,proof:AdminSessionProof){return prisma.$transaction(async tx=>{await assertStandardSystem(tx,actor,proof);const a=originalSjtArtifact(actor,input);a.parameters=await selectedParameters(tx,input.parameterReleaseId);a.unit!.provenance.governedMedia=await ownGovernedMedia(tx,actor,input.requestId,a.unit!);return insertSubmission(tx,actor,input.requestId,a)})}
+
+export async function previewGovernedWorkbookSjt(actor:string,raw:unknown,proof:AdminSessionProof){
+ await assertStandardSystem(prisma,actor,proof)
+ const prepared=prepareWorkbookSjtOrFail(raw)
+ return prepared.preview
+}
+function prepareWorkbookSjtOrFail(raw:unknown){
+ try{return prepareGovernedSjtWorkbook(raw)}
+ catch(cause){if(cause instanceof z.ZodError)throw cause;return governedFail(409,cause instanceof Error?cause.message:'SJT 工作簿未通过检查')}
+}
+export async function submitGovernedWorkbookSjt(actor:string,raw:unknown,proof:AdminSessionProof){
+ const {artifact,template,requestId}=prepareWorkbookSjtOrFail(raw)
+ return prisma.$transaction(async tx=>{
+  await assertStandardSystem(tx,actor,proof)
+  await assertSjtAuthorMedia(tx,actor,template)
+  const unit=artifact.unit!
+  unit.provenance.governedMedia={schemaVersion:1,references:governedMediaRefs(unit),sharedBy:actor}
+  return insertSubmission(tx,actor,requestId,artifact)
+ },{timeout:20000})
+}
 
 /** Accept only an already validated Form artifact built by the MFA route. */
 export async function insertFormTemplateSubmission(tx:Prisma.TransactionClient,actor:string,id:string,artifact:GovernedArtifact){
