@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "texi_self_en/1.0.0/1.1.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "A teenager uses a visual reminder at school and sets a phone aside before starting a task at home.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

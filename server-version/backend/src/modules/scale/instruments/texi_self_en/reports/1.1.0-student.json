@@ -1,0 +1,111 @@
+{
+  "toolKey": "texi_self_en",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student",
+  "title": "TEXI | Make the next step easier to find",
+  "report": {
+    "reportVersion": "1.1.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "The current author-hosted English TEXI self-report PDF, SHA-256 028c92fedc3eab247137bea0a2899e5fb066393bf8961a3f252e8230f9d469a6, matches all 20 item texts, their order, the five answer labels and the self-report instruction after formatting normalization. The official TEXI scoring sheet defines a 9-item working-memory mean and an 11-item inhibition mean, both 1–5. The author website allows free use of listed forms in research and clinical work; the source publication is CC BY 4.0. This content version changes the English feedback only."
+      }
+    },
+    "primaryScoreKeys": [
+      "working_memory",
+      "inhibition"
+    ],
+    "scoreOrder": [
+      "working_memory",
+      "inhibition"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "working_memory",
+        "scoreLabel": "Keeping track of steps (9 answers, 1–5 average)",
+        "headline": "Put the next step where you can see it",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Sam is getting ready for class. The instruction sounded clear at first: get a notebook, collect the worksheet, and start at the second example. Halfway across the room, the last part has slipped away. Sam writes a three-word list on scrap paper. The list keeps the job in sight while Sam concentrates on doing it.\n\nThis part of your report is about keeping instructions or a plan in mind while you do something, remembering what comes next, and finding another way when you get stuck. Noise, unfamiliar instructions or trying to remember several things at once can change how difficult this feels. Use the result to pick one situation where an extra clue could make the next step easier.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "For a job with several steps, put two or three words for each step where you can see them. Tick off one step at a time and check what comes next."
+          },
+          {
+            "category": "support",
+            "text": "If a long explanation is hard to hold in your head, ask to see someone do the first step or ask for a short written version. You can also say back the first part to check you understood."
+          }
+        ]
+      },
+      {
+        "scoreKey": "inhibition",
+        "scoreLabel": "Pausing, switching and getting started (11 answers, 1–5 average)",
+        "headline": "Give yourself a place to pause and switch",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "Alex is absorbed in a game and plans to stop after one round. Then another round starts, and the homework still feels far away. Alex tries pausing at a natural break, moving the phone to a chosen spot and opening the first question before planning the rest. The change gives that first minute a clearer job.\n\nThis part combines your answers about pausing before acting, switching away from something interesting, and starting or finishing tasks. It also includes situations where excitement or a quick reaction is hard to manage. A single answer may depend on what was going on. Choose a transition that matters to you and look for a cue or a change you can try.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "Pick one time when it is hard to switch. Agree on a cue you can notice, such as the end of a round or a reminder, and make the first step of the next activity small enough to start right away."
+          },
+          {
+            "category": "support",
+            "text": "If you often get stuck even after trying a few changes, share one example with someone you trust. You can ask for help organising the task or making the transition less abrupt."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Thorell, L. B., Lazarević, N., Milovanović, I., & Bugarski Ignjatović, V. (2020, online). Psychometric properties of the Teenage Executive Functioning Inventory (TEXI). https://doi.org/10.1080/09297049.2020.1726885 (CC BY 4.0). The English form and scoring sheet are available from https://chexi.se/translations and https://chexi.se/subscales1.",
+      "The 2020 study included 302 adolescents ages 13–19 in Serbia and parent reports. This report uses the English teenager’s own answers. Parent and teacher versions are separate.",
+      "The two averages, from 1 to 5, use 9 and 11 questions respectively. Each area needs all of its answers under the project’s rule. A higher average means more of the difficulties in that group were reported. There is no combined score, age rank or diagnosis in this report."
+    ],
+    "disclaimer": "This report helps you notice what can make everyday tasks easier. It describes your own answers and cannot tell how clever you are or diagnose a condition.",
+    "artworkKey": "texi_self_en/1.0.0/1.1.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
