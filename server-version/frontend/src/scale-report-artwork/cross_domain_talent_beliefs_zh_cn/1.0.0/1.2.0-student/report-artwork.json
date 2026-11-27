@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "cross_domain_talent_beliefs_zh_cn/1.0.0/1.2.0-student",
+  "bands": [],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生并排查看科学观察笔记和地理路线图。",
+    "width": 512,
+    "height": 512
+  }
+}

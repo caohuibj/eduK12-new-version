@@ -1,0 +1,96 @@
+{
+  "toolKey": "cross_domain_talent_beliefs_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "我怎么看不同学科的天赋差异（试用）",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容草稿核对",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "按项目原题核对构念、计分与既有参考。此版面向学生试用，报告文案与拟配图待审。"
+      }
+    },
+    "primaryScoreKeys": [
+      "cross_domain_talent_beliefs"
+    ],
+    "scoreOrder": [
+      "cross_domain_talent_beliefs"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "cross_domain_talent_beliefs",
+        "scoreLabel": "跨学科天赋差异信念均分（试用）",
+        "headline": "回到两次具体的课堂经历",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "午休时，小禾回想起这周的两节课。做科学观察记录时，她很快画出了发生变化的地方。另一节课要根据地图给同伴讲路线，她准备了一会儿才讲清方向。她想，自己有时会把这样的差别理解成“不同学科里，我的天赋高低不同”。\n\n这四道题记录你有多认同天赋在不同学科之间有高低差异，包括你对自己和对一般人的看法。想读懂自己的回答，可以任选两次课堂经历，分别写下那次要完成的任务、自己做到了哪一步，以及哪些条件你还没有看清。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选两门课各一次具体经历。每次只记三件事：当时要做什么，你做了什么，哪些信息还不够。"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一项你印象较深的表现，写成一句可以观察的话。把“我在这门课有天赋”改写成“这次我能独立把路线讲给同桌听”，再记下当时用过的线索。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "四道正向题按原选项取等权均分，至少三题有有效答案才计算。较高均分表示更认同学科之间有天赋高低差异的说法。",
+      "均分描述一次对题目陈述的认同。四题合为一个信念指标，单次回答无法鉴定自己或他人的真实天赋，也无法排列各学科的能力。",
+      "此为项目自编试用指标。既有题本无分数分段、常模或百分位。"
+    ],
+    "disclaimer": "本报告供学习反思和描述性研究。请勿用于选科分流、能力鉴定、诊断或排名。",
+    "artworkKey": "cross_domain_talent_beliefs_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
