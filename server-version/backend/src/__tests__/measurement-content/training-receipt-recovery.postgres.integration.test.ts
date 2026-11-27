@@ -1,3 +1,4 @@
+import {trainingAdminProof} from '../helpers/training-admin-proof'
 import {randomUUID} from 'node:crypto'
 import {createServer,type Server} from 'node:http'
 import {afterAll,describe,expect,it} from 'vitest'
@@ -75,7 +76,7 @@ suite('accepted STANDARD whole receipt actual report-worker recovery',()=>{
   const online=await standard.approveStandardTriplet(system.id,{...selection,requestId:randomUUID(),expectedCombinationHash:preview.combinationHash,reason:'Synthetic receipt worker recovery',allowedProducts:['TRAINING']})
   expect(online.state,online.blockers.join()).toBe('ONLINE')
   const pointer={releaseId:online.id,combinationHash:online.combinationHash}
-  await (await import('../../modules/measurement-content/standard-combination-use')).grantTrainingStandardCombinationUse(issuer.id,online.id,{requestId:randomUUID(),userId:teacher.id,combinationHash:pointer.combinationHash})
+  await (await import('../../modules/measurement-content/standard-combination-use')).grantTrainingStandardCombinationUse(issuer.id,online.id,{requestId:randomUUID(),userId:teacher.id,combinationHash:pointer.combinationHash},trainingAdminProof())
   const course=await db.course.create({data:{creatorId:teacher.id,title:'Synthetic receipt recovery',courseType:'TRAINING_COURSE',courseCode:randomUUID(),status:'PUBLISHED'}})
   await db.courseStudent.create({data:{courseId:course.id,studentId:student.id,status:'ACTIVE'}})
   let q=await call(teacher,'/api/questionnaire-products',{requestId:randomUUID(),name:'Receipt worker synthetic',questionnaireType:'COURSE',courseIds:[course.id]})

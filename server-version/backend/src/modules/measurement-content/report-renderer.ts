@@ -37,5 +37,8 @@ export function renderDeclaredReport(template:ReportTemplate,metrics:readonly Re
     return [block]
   })
   const mayShowIllustration = !proseDisclosure || proseDisclosure.educationalContent || proseDisclosure.individualInterpretations
-  return {generatorVersion:DECLARATIVE_REPORT_GENERATOR,...(template.illustrationKey && mayShowIllustration ? {illustrationKey:template.illustrationKey} : {}),title:template.title??null,blocks,limitations:template.limitations,disclaimer:template.disclaimer??null}
+  return {generatorVersion:DECLARATIVE_REPORT_GENERATOR,
+    ...(template.illustrationKey && mayShowIllustration ? {illustrationKey:template.illustrationKey} : {}),
+    ...(template.artworkKey?{artworkKey:template.artworkKey}:{}),
+    title:template.title??null,blocks,limitations:template.limitations,disclaimer:template.disclaimer??null}
 }

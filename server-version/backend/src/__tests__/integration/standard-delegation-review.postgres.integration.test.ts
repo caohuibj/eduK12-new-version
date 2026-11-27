@@ -5,6 +5,7 @@ import {grantEducationStandardConfigurationUse} from '../../modules/assessment-a
 import {issueStandardDelegation,readStandardDelegationCoverage} from '../../modules/measurement-content/standard-delegations.service'
 import {issueStandardDelegationSuccessor,listStandardDelegationReview,readStandardDelegationReview,
  withdrawStandardDelegationReview} from '../../modules/measurement-content/standard-delegation-review'
+import {ownAssignmentSummary} from '../../modules/tool-licensing/assignment-summary'
 import {requireIsolatedReleaseDatabase} from './integration-env'
 import {installStudentStandardFixtures} from './studentStandardSource.fixture'
 import {approveStandardCombinationEntryPolicies} from '../../modules/assessment-governance/tool-entry-policy'
@@ -46,6 +47,13 @@ suite('exact grant account review and handoff (isolated PostgreSQL)',()=>{
   const use=(authorityGrantId:string,title:string)=>({requestId:randomUUID(),userId:business.id,combinationHash:source.hash,authorityGrantId,
    expectedAuthorityVersion:1,validFrom,expiresAt,configurationName:title})
   const oldUse=await grantEducationStandardConfigurationUse(incumbent.id,scope,source.id,use(oldId,'原固定配置'))
+  const [{tool_key}]=await db.$queryRaw<{tool_key:string}[]>`SELECT tool_key FROM survey_standard_releases WHERE id=${source.id}`
+  const key='SCALE:'+tool_key
+  const assignment=async()=> (await ownAssignmentSummary('TEACHER',school.id,business.id,[key])).get(key)
+  await expect(assignment()).resolves.toMatchObject({state:'RECORDED',reselectIfPinned:false})
+  await db.user.update({where:{id:incumbent.id},data:{isFrozen:true}})
+  await expect(assignment()).resolves.toMatchObject({state:'AUTHORITY_LOST',canAssignVersion:true,reselectIfPinned:true})
+  await db.user.update({where:{id:incumbent.id},data:{isFrozen:false}})
   const original=await db.assessmentManagementEvent.findUniqueOrThrow({where:{id:oldUse.id}})
   const list=await listStandardDelegationReview(system.id,proof(),incumbent.id,{})
   expect(list.list).toEqual([expect.objectContaining({id:oldId,releaseId:source.id,exact:true})])
@@ -88,6 +96,7 @@ suite('exact grant account review and handoff (isolated PostgreSQL)',()=>{
   await expect(withdrawStandardDelegationReview(system.id,proof(),incumbent.id,oldId,withdraw))
    .rejects.toMatchObject({statusCode:409})
   expect((await read()).grant.status).toBe('REVOKED')
+  await expect(assignment()).resolves.toMatchObject({state:'RECORDED',reselectIfPinned:true})
   expect(await db.assessmentManagementEvent.findUniqueOrThrow({where:{id:oldUse.id}})).toEqual(original)
  },45_000)
 })

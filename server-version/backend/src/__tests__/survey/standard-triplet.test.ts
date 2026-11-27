@@ -4,6 +4,7 @@ import chineseReadingMaterial from '../../modules/scale/instruments/academic_sel
 import {scoreScale} from '../../modules/scale/scale-scoring'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {listScaleInstrumentSources} from '../../modules/scale/onboarding/instrument-registry'
+import {scaleReportVariantMaterialHash} from '../../modules/scale/onboarding/report-variants'
 import {sourceParts,registeredParts,composeTriplet,type Axis,type Part} from '../../modules/survey/standard-triplet.model'
 import {renderDeclaredReport,type ReportMetricFact} from '../../modules/measurement-content/report-renderer'
 import {computeStandardTrial} from '../../modules/survey/standard-triplet.service'
@@ -39,11 +40,11 @@ describe('three independent versions and real synthetic scoring/report computati
   if(!previous||!report)throw new Error('Missing a registered Chinese reading report')
   expect(previous.hash).toBe('3d75845f36466bb0fd8bc85baf342f3d84de44ccc1e26998f492316e711d834b')
   expect(previous.payload).toEqual(chineseReadingMaterial.variants[0].report)
-  expect(previous.reference.metadata.reportVariant).toMatchObject({materialHash:'f9c07a0d693bcaef0fc1b3d0f4f4eda6d21f48d7fb5a1210cd7d2ec8d1346841'})
+  expect(previous.reference.metadata.reportVariant).toMatchObject({materialHash:'ca7a14b1ee0a2dee679eff56cb008bf4d54fc77e086bcc86ad2c85e5237a6c39'})
   expect(composeTriplet(key,{...original,REPORT:previous}).template?.illustrationKey).toBe('chinese-self-concept-door-v1')
   const candidate=composeTriplet(key,{...original,REPORT:report})
   expect(report.reference.metadata.reportVariant).toMatchObject({
-   materialHash:canonicalHash(chineseActionMaterial),
+   materialHash:scaleReportVariantMaterialHash(chineseActionMaterial,chineseActionMaterial.variants[0]),
    origin:{path:'server-version/backend/src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-actions.json'},
   })
   expect(report.payload).toEqual(chineseActionMaterial.variants[0].report)

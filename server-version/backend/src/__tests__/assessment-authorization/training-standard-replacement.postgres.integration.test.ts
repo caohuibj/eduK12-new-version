@@ -1,3 +1,4 @@
+import {trainingAdminProof} from '../helpers/training-admin-proof'
 import {randomUUID} from 'node:crypto'
 import {createServer,type Server} from 'node:http'
 import {writeFile} from 'node:fs/promises'
@@ -121,7 +122,7 @@ suite('Training replacement locks original and target revisions independently',(
   const input=(reason:string)=>({requestId:randomUUID(),userId:teacher.id,combinationHash:full.combination_hash,configurationName:'明确回到完整报告',expectedUseId:old.id,expectedUseVersion:6,
    replaces:{grantId:target.id,expectedVersion:5,reason}})
   const one=input('Concurrent A'),two=input('Concurrent B')
-  const results=await Promise.allSettled([service.grantTrainingStandardCombinationUse(manager.id,full.id,one),service.grantTrainingStandardCombinationUse(manager.id,full.id,two)])
+  const results=await Promise.allSettled([service.grantTrainingStandardCombinationUse(manager.id,full.id,one,trainingAdminProof()),service.grantTrainingStandardCombinationUse(manager.id,full.id,two,trainingAdminProof())])
   expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(1);const failures=results.filter(r=>r.status==='rejected') as PromiseRejectedResult[];expect(failures).toHaveLength(1);expect(failures[0].reason).toMatchObject({statusCode:409})
   expect(await db.materialGrant.findUniqueOrThrow({where:{id:old.id}})).toMatchObject({version:7,revokedAt:null});expect(await db.materialGrant.findUniqueOrThrow({where:{id:target.id}})).toMatchObject({version:6,revokedAt:expect.any(Date)})
   const original=await call(manager,'/api/questionnaire-products/standard-combinations/'+empty.id+'/use-requests/'+body.requestId)

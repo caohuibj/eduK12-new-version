@@ -1,5 +1,7 @@
 import {isSurveyCognitiveProfileRef,parseSurveyCognitiveProfileRef} from '../survey/cognitive-profile.source'
 import {Prisma} from '@prisma/client'
+import {SURVEY_WAVE_HANDOFF_ACTION} from '../admin-permissions/offboarding'
+import {currentEntryEvidenceJoin} from '../admin-permissions/current-entry-evidence'
 import {z} from 'zod'
 import type {CatalogSourceSnapshot} from '../survey/catalog.sources'
 import {SurveyGovernanceError} from '../survey/governance.service'
@@ -52,7 +54,8 @@ export function surveyStandardSourceForRecheck<T extends SurveyUseRow&{snapshot:
 }
 /** Only new typed sourced drafts pay this bounded authority read. No latest,
  * source compilation, current R lookup or history/report permission coupling. */
-export async function assertSurveyStandardUseAuthority(tx:Prisma.TransactionClient,rows:readonly SurveyUseRow[]){
+export async function assertSurveyStandardUseAuthority(tx:Prisma.TransactionClient,rows:readonly SurveyUseRow[],
+ collection?:{waveId:string;publicationId:string}){
  const wanted=rows.flatMap(row=>{const selected=readSurveyStandardUse(row);if(!selected)return []
   const a=selected.binding.authorization.authority[0];return [{useId:row.id,issuerId:row.createdBy,entryId:a.id,entryRevision:a.revision}]})
  if(!wanted.length)return
@@ -62,11 +65,42 @@ export async function assertSurveyStandardUseAuthority(tx:Prisma.TransactionClie
  const values=wanted.map(w=>Prisma.sql`(${w.useId},${w.issuerId},${w.entryId},${w.entryRevision}::int)`)
  const valid=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT w.use_id AS id
   FROM (VALUES ${Prisma.join(values)}) w(use_id,issuer_id,entry_id,entry_revision)
-  JOIN users u ON u.id=w.issuer_id AND u.platform_role='STANDARD' AND u.account_domain IN ('TRAINING','LEGACY')
-   AND u.is_active AND NOT u.is_frozen AND NOT u.must_change_password AND (u.expires_at IS NULL OR u.expires_at>clock_timestamp())
-  JOIN admin_entry_grants e ON e.id=w.entry_id AND e.user_id=w.issuer_id AND e.entry='SURVEY' AND e.version=w.entry_revision AND e.revoked_at IS NULL
+  ${currentEntryEvidenceJoin({issuerId:Prisma.sql`w.issuer_id`,entryId:Prisma.sql`w.entry_id`,entryRevision:Prisma.sql`w.entry_revision`,entry:'SURVEY'})}
+  WHERE (u.expires_at IS NULL OR u.expires_at>clock_timestamp())
   ORDER BY e.id,w.use_id FOR SHARE OF u,e`)
- if(valid.length!==wanted.length)fail('原研究入口管理资格已变化，请管理员重新配置；原已发布数据保留')
+ if(valid.length===wanted.length)return
+ if(collection){
+  const validated=new Set(valid.map(row=>row.id))
+  const missing=wanted.filter(row=>!validated.has(row.useId))
+  const previous=missing.map(row=>Prisma.sql`(${row.useId},${row.issuerId})`)
+  try{
+   const covered=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`
+    WITH recorded AS MATERIALIZED (
+     SELECT a.target_user_id,CASE WHEN a.action=${SURVEY_WAVE_HANDOFF_ACTION} THEN a.reason::jsonb END AS link
+     FROM admin_authorization_audits a
+     WHERE a.action=${SURVEY_WAVE_HANDOFF_ACTION} AND a.entry='SURVEY'
+       AND a.target_user_id=ANY(${missing.map(row=>row.issuerId)}::text[])
+       AND starts_with(a.id,${'survey-handoff:'+collection.waveId+':'})
+    )
+    SELECT w.use_id AS id FROM (VALUES ${Prisma.join(previous)}) w(use_id,issuer_id)
+    JOIN recorded h ON h.target_user_id=w.issuer_id AND h.link->>'useId'=w.use_id AND h.link->>'publicationId'=${collection.publicationId}
+    JOIN survey_tool_grants original ON original.id=w.use_id AND original.status='ACTIVE'
+    JOIN survey_tool_grants candidate ON candidate.id=h.link->>'replacementId'
+      AND candidate.status='ACTIVE' AND candidate.user_id=original.user_id AND candidate.created_by=h.link->>'successorId'
+      AND candidate.snapshot->'ref'=original.snapshot->'ref'
+      AND candidate.snapshot#>'{provenance,selectedBinding,binding,configuration}'=original.snapshot#>'{provenance,selectedBinding,binding,configuration}'
+    JOIN users issuer ON issuer.id=candidate.created_by AND issuer.platform_role='STANDARD' AND issuer.account_domain IN ('TRAINING','LEGACY')
+      AND issuer.is_active AND NOT issuer.is_frozen AND NOT issuer.must_change_password
+      AND (issuer.expires_at IS NULL OR issuer.expires_at>clock_timestamp())
+    JOIN admin_entry_grants e ON e.id=h.link->>'successorEntryId' AND e.version::text=h.link->>'successorVersion'
+      AND e.user_id=issuer.id AND e.entry='SURVEY' AND e.revoked_at IS NULL
+      AND candidate.snapshot#>>'{provenance,selectedBinding,binding,authorization,authority,0,id}'=e.id
+      AND candidate.snapshot#>>'{provenance,selectedBinding,binding,authorization,authority,0,revision}'=e.version::text
+    ORDER BY e.id,candidate.id FOR SHARE OF issuer,e,candidate NOWAIT`)
+   if(new Set(covered.map(row=>row.id)).size===missing.length)return
+  }catch(error){const e=error as {code?:string;meta?:{code?:string}};if(e.code==='55P03'||e.meta?.code==='55P03')return fail('接任研究管理员状态正在变化，请稍后重试');throw error}
+ }
+ fail('原研究入口管理资格已变化，请管理员重新配置；原已发布数据保留')
 }
 
 /** New admission only. Verify the original frozen binding against its exact

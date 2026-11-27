@@ -4,7 +4,7 @@ import type {StoredRelease} from './repository'
 import {scaleMeasurementRelease} from './scale'
 import type {ScaleDefinitionV2} from '../scale/scale-definition'
 import type {AssessmentReferenceSetDefinition} from '../assessment-reference/reference'
-import {frozenReportTemplateSchema,reportTemplateSchema,type ReportTemplate} from './report-template'
+import {frozenReportTemplateSchema,type ReportTemplate} from './report-template'
 import {z} from 'zod'
 export const standardCombinationPointerSchema=z.object({releaseId:z.string().guid(),combinationHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict()
 
@@ -22,7 +22,7 @@ export type StandardCombinationRecord={
 export function selectedStandardReport(payload:unknown){
  if(payload&&typeof payload==='object'&&'definition'in payload&&'template'in payload){
   const p=payload as {definition:ScaleDefinitionV2['report'];template:unknown;assetRefs?:unknown}
-  return {definition:p.definition,template:reportTemplateSchema.parse(p.template),assetRefs:z.array(assetReference).parse(p.assetRefs??[])}
+  return {definition:p.definition,template:frozenReportTemplateSchema.parse(p.template),assetRefs:z.array(assetReference).parse(p.assetRefs??[])}
  }
  return {definition:payload as ScaleDefinitionV2['report']|null,template:null,assetRefs:[]}
 }
@@ -63,7 +63,11 @@ export function compileStandardCombinationReport(title:string,definition:ScaleDe
   for(const band of text.bands)for(const selection of selected)blocks.push({type:'REFERENCE_BAND',metricKey:key,referenceKind:selection.referenceKind,bandKey:band.key,text:band.label+'\n'+band.summary,guidance:band.guidance.map(g=>g.text)})
   if(definition.report.illustrationKey)blocks.push(...narrative)
  }
- return {template:configured?frozenReportTemplateSchema.parse({title,blocks,...(standardScoreBands?{standardScoreBands}:{}),...(definition.report.illustrationKey?{illustrationKey:definition.report.illustrationKey}:{}),limitations:definition.report.limitations,disclaimer:definition.report.disclaimer}):null,blockers}
+ return {template:configured?frozenReportTemplateSchema.parse({title,blocks,
+  ...(standardScoreBands?{standardScoreBands}:{}),
+  ...(definition.report.illustrationKey?{illustrationKey:definition.report.illustrationKey}:{}),
+  ...(definition.report.artworkKey?{artworkKey:definition.report.artworkKey}:{}),
+  limitations:definition.report.limitations,disclaimer:definition.report.disclaimer}):null,blockers}
 }
 
 /** Preserve the existing approved-combination hash scheme byte for byte.

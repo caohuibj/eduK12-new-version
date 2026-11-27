@@ -9,8 +9,8 @@ import {
   toolLicenseSubjectType, type ToolLicenseFamily, type ToolLicenseProduct, type ToolLicenseSubjectType,
 } from './contracts'
 import { requireLicenseSubject, requireLicenseTools, type LicenseSubject } from './directory'
-import { isToolLicensingEnabled } from './runtime'
-import { ownAssignmentSummary } from './assignment-summary'
+import { commercialEnrollmentAtSql, commercialRolloutMode, isToolLicensingEnabled } from './runtime'
+import { ownAssignmentSummary, type AssignmentSummary } from './assignment-summary'
 
 type Tx = Prisma.TransactionClient
 export type ToolLicenseActor = { actorUserId: string; actorSession: AdminSessionProof }
@@ -33,6 +33,8 @@ type LicenseRow = {
   tools: LicenseItem[]
   nextLicenseId?: string | null
   missingTools?: string[]
+  effectiveAt?: Date | null
+  evaluatedAt?: Date
 }
 const options = { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted, maxWait: 5000, timeout: 10000 }
 const fail = (status: number, message: string): never => { throw new AdminPermissionError(status, message) }
@@ -40,11 +42,13 @@ const periodStatus = Prisma.sql`CASE WHEN l.terminated_at IS NOT NULL THEN 'TERM
   WHEN l.expires_at<=statement_timestamp() THEN 'EXPIRED'
   WHEN l.starts_at>statement_timestamp() THEN 'SCHEDULED'
   ELSE 'ACTIVE' END`
-const projection = (quota = false, renewal = false) => Prisma.sql`
+const projection = (quota = false, renewal = false, includeEnrollment = false) => Prisma.sql`
   SELECT l.id,l.product,l.subject_id AS "subjectId",l.subject_type AS "subjectType",
     l.subject_label AS "subjectLabel",l.starts_at AS "startsAt",l.expires_at AS "expiresAt",
     l.terminated_at AS "terminatedAt",l.revision,l.request_digest AS "requestDigest",
     ${periodStatus} AS status,e.reason,
+    ${includeEnrollment ? Prisma.sql`${commercialEnrollmentAtSql(Prisma.sql`l.product`,Prisma.sql`l.subject_id`)} AS "effectiveAt",
+      statement_timestamp() AS "evaluatedAt",` : Prisma.empty}
     ${renewal ? Prisma.sql`next.id AS "nextLicenseId",ARRAY(
       SELECT i.name FROM tool_license_items i WHERE i.license_id=l.id AND i.removed_at IS NULL
       AND next.id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM tool_license_items n WHERE n.license_id=next.id
@@ -63,9 +67,14 @@ const projection = (quota = false, renewal = false) => Prisma.sql`
     AND n.subject_id=l.subject_id AND n.starts_at=l.expires_at AND n.terminated_at IS NULL ORDER BY n.id LIMIT 1) next ON true` : Prisma.empty}
 `
 
+function enrollmentView(product:ToolLicenseProduct, effectiveAt:Date|null, evaluatedAt:Date) {
+  const enabled=isToolLicensingEnabled(product)
+  return {mode:commercialRolloutMode(enabled,effectiveAt,evaluatedAt),effectiveAt}
+}
+
 function publicView(row: LicenseRow) {
-  const { requestDigest: _requestDigest, ...view } = row
-  return view
+  const {requestDigest:_requestDigest,effectiveAt,evaluatedAt,...view}=row
+  return evaluatedAt ? {...view,enrollment:enrollmentView(row.product,effectiveAt??null,evaluatedAt)} : view
 }
 
 async function readRow(db: Tx, id: string) {
@@ -96,7 +105,7 @@ export async function listToolLicenses(raw: unknown) {
     ? Prisma.sql`AND ${periodStatus}='ACTIVE' AND l.expires_at<=statement_timestamp()+INTERVAL '30 days'`
     : status ? Prisma.sql`AND ${periodStatus}=${status}` : Prisma.empty
   const rows = await prisma.$queryRaw<LicenseRow[]>(Prisma.sql`
-    ${projection(false, status === 'EXPIRING')} WHERE l.product=${product}
+    ${projection(false, status === 'EXPIRING', true)} WHERE l.product=${product}
     ${subjectId ? Prisma.sql`AND l.subject_id=${subjectId}` : Prisma.empty}
     ${toolKey || family ? Prisma.sql`AND EXISTS (SELECT 1 FROM tool_license_items item
       WHERE item.license_id=l.id AND item.removed_at IS NULL
@@ -113,7 +122,7 @@ export async function listToolLicenses(raw: unknown) {
  * system administration. These records describe commercial permission only. */
 export async function readOwnToolLicense(product: ToolLicenseProduct, subjectId: string, userId: string) {
   const [row] = await prisma.$queryRaw<LicenseRow[]>(Prisma.sql`
-    ${projection(product === 'SCHOOL' || product === 'TEACHER')} WHERE l.product=${product} AND l.subject_id=${subjectId}
+    ${projection(product === 'SCHOOL' || product === 'TEACHER', false, true)} WHERE l.product=${product} AND l.subject_id=${subjectId}
     ORDER BY CASE WHEN l.terminated_at IS NOT NULL OR l.expires_at<=statement_timestamp() THEN 2
       WHEN l.starts_at>statement_timestamp() THEN 1 ELSE 0 END,
       CASE WHEN l.starts_at>statement_timestamp() THEN l.starts_at END ASC,
@@ -121,11 +130,16 @@ export async function readOwnToolLicense(product: ToolLicenseProduct, subjectId:
   `)
   const assignments = row?.status === 'ACTIVE'
     ? await ownAssignmentSummary(product, subjectId, userId, row.tools.map(tool => tool.key))
-    : new Map()
+    : new Map<string,AssignmentSummary>()
   return {
+    enrollment: enrollmentView(product,row?.effectiveAt??null,row?.evaluatedAt??new Date()),
     enforcing: isToolLicensingEnabled(product),
     license: row ? { product, subjectId, startsAt: row.startsAt, expiresAt: row.expiresAt, status: row.status,
-      tools: row.tools.map(tool => ({ ...tool, assignment: assignments.get(tool.key) ?? 'CHECK_IN_CATALOG' })),
+      tools: row.tools.map(tool => {
+        const version = assignments.get(tool.key)
+        return {...tool,assignment:version?.state??'CHECK_IN_CATALOG',canAssignVersion:version?.canAssignVersion??false,
+          reselectIfPinned:version?.reselectIfPinned??false}
+      }),
     } : null,
   }
 }

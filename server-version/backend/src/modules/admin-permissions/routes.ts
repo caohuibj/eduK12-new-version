@@ -14,7 +14,8 @@ import { comparePassword, hashPassword, isValidPassword } from '../../utils/pass
 import { getSessionToken } from '../../utils/authCookies'
 import { verifyToken } from '../../utils/jwt'
 import { success, error } from '../../utils/response'
-import { ADMIN_ENTRIES, AdminPermissionError, changeEntryGrant } from './service'
+import { SURVEY_WAVE_HANDOFF_ACTION } from './offboarding'
+import { ADMIN_ENTRIES, AdminPermissionError, changeEntryGrant, previewEntryOffboarding } from './service'
 import { beginAdminRegistration, finishAdminRegistration, beginAdminLogin, finishAdminAuthentication, adminAuthOrigin, adminRequiresTotp, adminSecretHash } from './security'
 import { beginAdminTotpRegistration, finishAdminTotp, adminTotpAttemptLimiter } from './totp'
 import { requireRecentAdminKey, requireSystemAdmin } from './guards'
@@ -169,14 +170,25 @@ adminPermissionsRouter.post('/accounts/:id/enrollment', requireRecentAdminKey, h
   return issueEntryAdminEnrollment({ targetUserId: z.string().guid().parse(req.params.id),
     actorUserId: req.user!.userId, actorSession: req.user!, reason })
 }))
+adminPermissionsRouter.get('/accounts/:id/entries/:entry/offboarding',handle(async(req,res)=>{
+  res.setHeader('Cache-Control','no-store')
+  const {successorId}=z.object({successorId:z.string().guid().optional()}).strict().parse(req.query)
+  return previewEntryOffboarding(z.string().guid().parse(req.params.id),z.enum(ADMIN_ENTRIES).parse(req.params.entry),successorId)
+}))
+const impactDigest=z.string().regex(/^[a-f0-9]{64}$/)
+const offboarding=z.discriminatedUnion('mode',[
+  z.strictObject({mode:z.literal('PLANNED'),digest:impactDigest,successorId:z.string().guid().optional()}),
+  z.strictObject({mode:z.literal('EMERGENCY'),digest:impactDigest.optional()}),
+])
 adminPermissionsRouter.put('/accounts/:id/entries/:entry', requireRecentAdminKey, handle(req => {
-  const body = z.object({ active: z.boolean(), expectedVersion: z.number().int().min(0), reason: z.string().trim().min(1).max(500) }).strict().parse(req.body)
+  const body = z.object({ active: z.boolean(), expectedVersion: z.number().int().min(0), reason: enrollmentReason, offboarding:offboarding.optional() }).strict()
+    .refine(input=>input.active?!input.offboarding:Boolean(input.offboarding),'请选择撤权方式').parse(req.body)
   return changeEntryGrant({ actorUserId: req.user!.userId, targetUserId: z.string().guid().parse(req.params.id),
     entry: z.enum(ADMIN_ENTRIES).parse(req.params.entry), actorSession: req.user!, ...body })
 }))
 adminPermissionsRouter.get('/audit', handle(req => {
   const input = z.object({ targetUserId: z.string().guid(), page: z.coerce.number().int().min(1).max(10000).default(1) }).strict().parse(req.query)
-  return prisma.adminAuthorizationAudit.findMany({ where: { targetUserId: input.targetUserId }, take: 25, skip: (input.page - 1) * 25,
+  return prisma.adminAuthorizationAudit.findMany({ where: { targetUserId: input.targetUserId, action:{not:SURVEY_WAVE_HANDOFF_ACTION} }, take: 25, skip: (input.page - 1) * 25,
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] })
 }))
 

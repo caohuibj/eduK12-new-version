@@ -1,12 +1,12 @@
 import {randomUUID} from 'node:crypto'
 import {writeFile} from 'node:fs/promises'
-import {beforeAll,afterAll,describe,it,expect} from 'vitest'
+import {beforeAll,afterAll,describe,it,expect,vi} from 'vitest'
 import {requireIsolatedReleaseDatabase} from '../integration/integration-env'
 const suite=process.env.PRECISE_SURVEY_STANDARD_USE==='1'?describe:describe.skip
 suite('Survey exact standard grant and frozen original manager authority',()=>{
  let db:any,system:any,manager:any,entry:any,service:any,builder:any,publication:any,first:any,second:any,legacy:any
  const sources:any[]=[],owners:any[]=[],projects:string[]=[],drafts:any[]=[],published:any[]=[],observations:any[]=[]
- const proof={adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()}
+ const proof={adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID(),adminAuthenticationMethod:'TOTP' as const}
  const exact={requestId:randomUUID(),configurationName:'固定完整报告'}
  beforeAll(async()=>{
   const url=process.env.PRECISE_EDUCATION_TEST_DATABASE_URL
@@ -41,6 +41,7 @@ suite('Survey exact standard grant and frozen original manager authority',()=>{
   publication=await import('../../modules/survey/publication.service')
  },30000)
  afterAll(async()=>{
+  vi.unstubAllEnvs()
   await writeFile(process.env.PRECISE_SURVEY_STANDARD_USE_EVIDENCE??'/tmp/survey-standard-use.json',JSON.stringify({productionAccessed:false,
    scope:'Internal service, import, explicit measurement publication, actual frozen waves and new admission guard; no HTTP/browser/participant attempt',observations},null,2)+'\n')
   if(db){await (await import('../../config/queue')).closeQueues(true);await db.$disconnect()}
@@ -107,17 +108,52 @@ suite('Survey exact standard grant and frozen original manager authority',()=>{
   const read=await db.$transaction((tx:any)=>service.catalogSnapshotsForDrafts(tx,owners[0].id,[first.id],false))
   expect(read.get(first.id).provenance.selectedBinding).toEqual(first.sourceProvenance.selectedBinding)
  })
- it('withdraws the original manager entry through the normal system API and blocks new imports/freezes/START without rewriting history',async()=>{
+ it('requires planned handoff of open waves and validates the current exact successor approval during new admission',async()=>{
   if(published.length!==2)throw Error('Prior publications failed; dependent revoke forbidden')
-  await (await import('../../modules/admin-permissions/service')).changeEntryGrant({actorUserId:system.id,targetUserId:manager.id,entry:'SURVEY',active:false,
-   expectedVersion:entry.version,reason:'Synthetic original Survey manager withdrawn',actorSession:{...proof,tokenVersion:system.tokenVersion}})
+  const permissions=await import('../../modules/admin-permissions/service')
+  const policy=await import('../../modules/survey/tool-policy')
+  const successor=await db.user.create({data:{username:'synthetic-survey-successor-'+randomUUID(),passwordHash:'!synthetic-no-login',accountDomain:'TRAINING'}})
+  await db.adminTotpCredential.create({data:{userId:successor.id,secretCipher:'synthetic-only'}})
+  const actorSession={...proof,tokenVersion:system.tokenVersion}
+  const change={actorUserId:system.id,targetUserId:manager.id,entry:'SURVEY' as const,active:false,
+    expectedVersion:entry.version,reason:'Synthetic original Survey manager withdrawn',actorSession}
+  await permissions.changeEntryGrant({...change,targetUserId:successor.id,active:true,expectedVersion:0})
+  vi.stubEnv('SURVEY_PUBLICATION_ENABLED','true')
+  const {openWave}=await import('../../modules/survey/waves.publish')
+  for(const [i,row] of published.entries()){
+   const wave=await db.surveyWave.findUniqueOrThrow({where:{id:row.compiledSnapshot.waveId}})
+   await openWave(owners[i].id,projects[i],wave.id,wave.revision)
+  }
+  const preview=()=>permissions.previewEntryOffboarding(manager.id,'SURVEY',successor.id)
+  const before=await preview()
+  expect(before.counts).toMatchObject({collecting:2,configurations:2,pending:4})
+  const revoke=(digest:string)=>permissions.changeEntryGrant({...change,offboarding:{mode:'PLANNED',digest,successorId:successor.id}})
+  await expect(revoke(before.digest)).rejects.toMatchObject({statusCode:409})
+  const reissued=[]
+  for(const [i,owner] of owners.entries())reissued.push(await service.grantCatalogSource(successor.id,owner.id,sources[i],
+    {requestId:randomUUID(),configurationName:'接任续发'+i}))
+  await expect(revoke(before.digest)).rejects.toMatchObject({statusCode:409})
+  const after=await preview()
+  expect(after.counts).toMatchObject({collecting:2,configurations:2,pending:0})
+  await expect(revoke(after.digest)).resolves.toMatchObject({changed:true,version:entry.version+1})
+
+  const admit=(i:number,publicationId=published[i].id)=>db.$transaction((tx:any)=>
+    policy.assertSurveyPublicationNotPaused(tx,published[i].compiledSnapshot,undefined,publicationId))
+  await expect(admit(0)).resolves.toBeUndefined()
+  await expect(admit(1)).resolves.toBeUndefined()
+  await expect(admit(0,randomUUID())).rejects.toThrow('管理资格已变化')
   await expect(builder.importCatalogDraft(owners[0].id,projects[0],first.id,{requestId:randomUUID(),instrumentKey:'later',title:'Later'})).rejects.toThrow('管理资格已变化')
   await expect((await import('../../modules/survey/measurement-publication.service')).publishSurveyMeasurementDraft(owners[0].id,projects[0],drafts[0].id,0)).rejects.toThrow('管理资格已变化')
-  await expect(db.$transaction((tx:any)=>(import('../../modules/survey/tool-policy').then(module=>module.assertSurveyPublicationNotPaused(tx,published[0].compiledSnapshot))))).rejects.toThrow('管理资格已变化')
+
+  await service.revokeToolGrant(successor.id,reissued[0].id)
+  await expect(admit(0)).rejects.toThrow('管理资格已变化')
+  await expect(admit(1)).resolves.toBeUndefined()
+  await permissions.changeEntryGrant({...change,targetUserId:successor.id,expectedVersion:1,offboarding:{mode:'EMERGENCY'}})
+  await expect(admit(1)).rejects.toThrow('管理资格已变化')
   const history=await db.$transaction((tx:any)=>service.catalogSnapshotsForDrafts(tx,owners[0].id,[first.id],false))
   expect(history.get(first.id).provenance.selectedBinding).toEqual(first.sourceProvenance.selectedBinding)
   for(const row of published)expect(await db.surveyPublication.findUniqueOrThrow({where:{id:row.id}})).toEqual(row)
-  expect((await db.$queryRaw`SELECT count(*)::int AS n FROM survey_tool_grants`)[0].n).toBe(3)
-  observations.push({originalEntryWithdrawn:true,newUseBlocked:true,frozenHistoryUnchanged:true})
- })
+  expect((await db.$queryRaw`SELECT count(*)::int AS n FROM survey_tool_grants`)[0].n).toBe(5)
+  observations.push({originalEntryWithdrawn:true,plannedWavesContinue:true,emergencyStopsNewAdmission:true,newUseBlocked:true,frozenHistoryUnchanged:true})
+ },30000)
 })

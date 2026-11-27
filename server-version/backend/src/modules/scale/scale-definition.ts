@@ -1,5 +1,6 @@
 import {materialListSchema,publicMaterial} from '../assessment-media/material'
 import { reportIllustrationKeySchema } from '../measurement-content/report-template'
+import {reportArtworkKeySchema} from '../measurement-content/report-artwork'
 import { hasImmutableCanonicalValue } from '../assessment-runtime/canonical'
 import { rawScoreFeedbackSchema, rawScoreFeedbackBindingIssues } from './raw-score-feedback'
 import { validateAudienceReport } from './library/audience-report-gate'
@@ -143,6 +144,7 @@ export type ScaleInterpretationDefinition = z.infer<typeof interpretationSchema>
 
 export const scaleReportDefinitionSchema = z.object({
   illustrationKey: reportIllustrationKeySchema.optional(),
+  artworkKey: reportArtworkKeySchema.optional(),
   rawScoreFeedback: rawScoreFeedbackSchema.optional(),
   audienceContract: z.object({ schemaVersion: z.literal(1), respondent: z.enum(['STUDENT_SELF','ADULT_SELF','PARENT_REPORT','TEACHER_REPORT','OBSERVER_REPORT']), audience: z.enum(['student','parent','teacher']), locale: z.string().min(1), longitudinalMetricKeys: z.array(z.string().min(1)).max(100).optional(), qcReview: z.object({ reviewer: z.string().min(1), reviewedAt: z.string().datetime(), basis: z.string().min(1) }).strict().optional() }).strict().optional(),
   reportVersion: z.string().min(1),

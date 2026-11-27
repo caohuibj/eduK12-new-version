@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { getDeclaredActionBand } from '../modules/reporting/declaredReportActionBand'
 import { DeclaredBandFeedback, DeclaredReportIllustration } from '../modules/reporting/DeclaredReportIllustration'
+import {ScaleReportArtworkHero,ScaleReportBandArtwork} from '../modules/reporting/ScaleReportArtwork'
 import type { SurveyImageProof } from './SurveyParticipantImage'
 
 export interface SurveyDeclaredReport {
   generatorVersion: 'DECLARATIVE_REPORT_V1'
   title?: string | null
   illustrationKey?: string
+  artworkKey?: string
   blocks: unknown[]
   limitations?: string[]
   disclaimer?: string | null
@@ -127,6 +129,7 @@ export function SurveyDeclaredReportView({
     <section className="border-l-2 border-sky-300 pl-3 space-y-2" aria-label="完整工具报告">
       {typeof report.title === 'string' && report.title && <h5 className="font-semibold text-sm">{report.title}</h5>}
       <DeclaredReportIllustration illustrationKey={report.illustrationKey} />
+      <ScaleReportArtworkHero artworkKey={report.artworkKey}/>
       {report.blocks.map((raw, index) => {
         if (!isObj(raw)) return null
         switch (raw.type) {
@@ -139,10 +142,8 @@ export function SurveyDeclaredReportView({
               </p>
             )
           case 'SCORE_FEEDBACK':
-          case 'REFERENCE_BAND':
-            return (
-              <DeclaredBandFeedback key={index} band={action?.index === index ? action.band : undefined}>
-                <div className="rounded bg-slate-50 p-2.5 space-y-1.5 text-sm">
+          case 'REFERENCE_BAND': {
+            const content = <div className="rounded bg-slate-50 p-2.5 space-y-1.5 text-sm">
                   <p className="whitespace-pre-wrap">{str(raw.text)}</p>
                   {Array.isArray(raw.guidance) && raw.guidance.length > 0 && (
                     <ul className="list-disc pl-5 space-y-1 text-slate-700">
@@ -152,8 +153,10 @@ export function SurveyDeclaredReportView({
                     </ul>
                   )}
                 </div>
-              </DeclaredBandFeedback>
-            )
+            return report.artworkKey
+              ? <ScaleReportBandArtwork key={index} artworkKey={report.artworkKey} block={raw}>{content}</ScaleReportBandArtwork>
+              : <DeclaredBandFeedback key={index} band={action?.index === index ? action.band : undefined}>{content}</DeclaredBandFeedback>
+          }
           case 'ASSET':
             return proof && typeof raw.assetId === 'string' ? (
               <SurveyDeclaredReportImage key={index} assetId={raw.assetId} alt={str(raw.alt)} proof={proof} />

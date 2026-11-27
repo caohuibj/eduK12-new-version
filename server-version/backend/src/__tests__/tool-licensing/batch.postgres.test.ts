@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { createToolLicenseBatch, previewToolLicenseBatch } from '../../modules/tool-licensing/batch'
@@ -217,6 +217,58 @@ describe.skipIf(!isolated)('bulk tool licensing on isolated PostgreSQL', () => {
     } finally {
       if(previous===undefined)delete process.env.SCHOOL_TOOL_LICENSING_ENABLED
       else process.env.SCHOOL_TOOL_LICENSING_ENABLED=previous
+    }
+  })
+
+  it('starts commercial enforcement at the first effective term and keeps it through renewal gaps', async () => {
+    const firstSubject = randomUUID()
+    const now = Date.now()
+    const scheduled = new Date(now + 60_000)
+    const insertTerm = ({ id = randomUUID(), startsAt, expiresAt, terminatedAt = null }: {
+      id?: string; startsAt: Date; expiresAt: Date; terminatedAt?: Date | null
+    }) => prisma.toolLicense.create({ data: {
+      id, product: 'TRAINING', subjectType: 'USER', subjectId: firstSubject, subjectLabel: prefix,
+      startsAt, expiresAt, terminatedAt, requestDigest: 'rollout-fixture',
+    } })
+    const publish = (requireIssuedLicense = false, publicationId = randomUUID()) =>
+      prisma.$transaction(tx => authorizeToolPublication(tx, {
+        product: 'TRAINING', subjectId: firstSubject, toolKeys: [toolKey], publicationId, requireIssuedLicense,
+      }))
+    vi.stubEnv('TRAINING_STANDARD_TOOL_LICENSING_ENABLED', 'true')
+    try {
+      await expect(publish()).resolves.toBeUndefined()
+      await expect(publish(true)).rejects.toMatchObject({ code: 'TOOL_PUBLICATION_LICENSE' })
+      const upcoming = await insertTerm({ startsAt: scheduled, expiresAt: new Date(now + 600_000) })
+      await expect(publish()).resolves.toBeUndefined()
+      await expect(publish(true)).rejects.toThrow('尚未生效或已结束')
+
+      // Cancellation at the scheduled cutover is equivalent to cancellation before it.
+      await prisma.toolLicense.update({ where: { id: upcoming.id }, data: { terminatedAt: scheduled } })
+      await insertTerm({
+        startsAt: new Date(now - 300_000), expiresAt: new Date(now - 240_000), terminatedAt: new Date(now - 310_000),
+      })
+      await expect(publish()).resolves.toBeUndefined()
+
+      const current = await insertTerm({ startsAt: new Date(now - 20_000), expiresAt: new Date(now + 30_000) })
+      await expect(publish()).rejects.toThrow('不包含所选工具')
+      await prisma.toolLicenseItem.create({ data: {
+        licenseId: current.id, toolKey, name: prefix, family: 'SCALE', usageLimit: 1,
+      } })
+      const publicationId = randomUUID()
+      await expect(publish(false, publicationId)).resolves.toBeUndefined()
+      expect(await prisma.toolLicenseCharge.count({ where: { publicationId } })).toBe(1)
+
+      await prisma.toolLicense.update({ where: { id: current.id }, data: { expiresAt: new Date(now - 5_000) } })
+      await expect(publish()).rejects.toThrow('尚未生效或已结束')
+      await insertTerm({ startsAt: new Date(now + 120_000), expiresAt: new Date(now + 720_000) })
+      await expect(publish()).rejects.toThrow('尚未生效或已结束')
+      await prisma.toolLicense.update({ where: { id: current.id }, data: { terminatedAt: new Date(now - 10_000) } })
+      await expect(publish()).rejects.toThrow('尚未生效或已结束')
+      vi.stubEnv('TRAINING_STANDARD_TOOL_LICENSING_ENABLED', 'false')
+      vi.stubEnv('TRAINING_TOOL_LICENSING_ENABLED', 'false')
+      await expect(publish()).resolves.toBeUndefined()
+    } finally {
+      vi.unstubAllEnvs()
     }
   })
 

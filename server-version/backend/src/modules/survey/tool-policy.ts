@@ -43,7 +43,7 @@ export async function assertSurveyToolPolicy(tx:Prisma.TransactionClient,identit
 }
 /** Fresh new-parent admission only. Frozen execution and report/data authority
  * have separate boundaries; never call this on an existing Attempt's writes. */
-export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClient,snapshot:ResearchFrozenPublication,knownIdentities?:ReadonlyMap<string,PolicyIdentity>){
+export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClient,snapshot:ResearchFrozenPublication,knownIdentities?:ReadonlyMap<string,PolicyIdentity>,publicationId?:string){
  await assertFrozenPackageAdmissions(tx,snapshot)
  const typedUses=await readFrozenSurveyStandardUses(tx,snapshot.projectId,snapshot.units)
  const checkedSjtAuthorities=new Set<string>()
@@ -99,5 +99,5 @@ export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClie
   await assertSurveyToolPolicy(tx,identity,false)
  }
  // Check the original issuer's current expiry AFTER later source/policy waits.
- await assertSurveyStandardUseAuthority(tx,typedUses.rows)
+ await assertSurveyStandardUseAuthority(tx,typedUses.rows,publicationId ? {waveId:snapshot.waveId,publicationId} : undefined)
 }

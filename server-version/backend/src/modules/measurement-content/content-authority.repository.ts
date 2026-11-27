@@ -13,7 +13,7 @@ import {
  * Content capabilities grant none of those rights. Never accept actorId from a body.
  * Use READ COMMITTED transactions; locks are held through the protected write.
  */
-type GrantRow = {
+export type GrantRow = {
   id: string; subject_id: string; issuer_id: string; parent_grant_id: string | null;
   product: ContentAuthorityScope['product']; scope_kind: ContentAuthorityScope['scopeKind']; scope_id: string;
   resource_kind: ContentAuthorityScope['resourceKind']; resource_keys: string[];
@@ -35,7 +35,12 @@ async function currentGrant(db: Prisma.TransactionClient, grantId: string): Prom
   // Read the clock AFTER locks: a revoke/other transaction may have held us
   // beyond expiry. Query projection timestamps may be evaluated before lock wait.
   const [clock] = await db.$queryRaw<Array<{ now: Date }>>(Prisma.sql`SELECT clock_timestamp() AS now`)
-  if (!clock || !rows.length || rows.some(r => !r.subject_active || r.subject_frozen || (r.subject_expires_at && r.subject_expires_at <= clock.now)))
+  if (!clock) throw new ContentAuthorityError('CONTENT_AUTHORITY_DENIED')
+  return currentContentGrantFromRows(rows, grantId, clock.now)
+}
+
+export function currentContentGrantFromRows(rows: readonly GrantRow[], grantId: string, now: Date) {
+  if (!rows.length || rows.some(r => !r.subject_active || r.subject_frozen || (r.subject_expires_at && r.subject_expires_at <= now)))
     throw new ContentAuthorityError('CONTENT_AUTHORITY_DENIED')
   const grants = rows.map((r): ContentGrant => ({
     id: r.id, subjectId: r.subject_id, issuerId: r.issuer_id, parentGrantId: r.parent_grant_id,
@@ -45,7 +50,7 @@ async function currentGrant(db: Prisma.TransactionClient, grantId: string): Prom
     remainingDelegationDepth: r.remaining_delegation_depth, validFrom: r.valid_from,
     expiresAt: r.expires_at, ancestry: r.ancestry, version: r.version, revokedAt: r.revoked_at,
   }))
-  return assertContentGrantChain(grants, grantId, clock.now)
+  return assertContentGrantChain(grants, grantId, now)
 }
 export async function assertContentAuthority(db: Prisma.TransactionClient, input: {
   actorId: string; grantId: string; capability: ContentCapability; scope: ContentAuthorityScope;
