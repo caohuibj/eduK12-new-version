@@ -1,0 +1,123 @@
+{
+  "toolKey": "teacher_subject_liking_mathematics_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "我感受到的数学课堂兴趣｜学生行动版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "artworkKey": "teacher_subject_liking_mathematics_zh_cn/1.0.0/1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目自编数学学科替换版三题、六点认同选项、无反向计分、至少两题与均分规则；沿用默认 P wave1-20261001-v2 的初高中共同理论五档。报告只解释学生感知，不推断教师真实内心、教学质量或课堂频率；未修改 C、P、阈值与缺失规则。"
+      }
+    },
+    "primaryScoreKeys": [
+      "teacher_subject_liking"
+    ],
+    "scoreOrder": [
+      "teacher_subject_liking"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "teacher_subject_liking",
+        "headline": "我从数学课里感受到多少好奇与投入",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "一道几何题讲完后，老师没有马上翻页，而是把图形转了一个方向，问大家：\"如果换个角度，还能看出同样的关系吗？\"小宁注意到老师又画了一条辅助线，觉得老师很想把问题追到底；同桌却只把它当作另一种解法。两个人看到同一段课堂，也可能留下不同感受。\n\n这份量表记录的，是你从课堂表现中感受到老师是否喜欢数学、觉得数学有趣。均分越高，表示你平均越认同这些描述；它仍然只是这一次的学生感知。它不是教师自评，也不能替老师说明真实想法或评价教学质量。比起给老师下结论，更有用的是回到一个具体片段，分开写下：你看到了什么，以及你怎样理解。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "先记一个看得见的片段",
+            "summary": "下节课只选一个瞬间，记下老师画了什么、问了什么或怎样换了例子；再另起一行写你的感受。先不猜老师心里怎么想。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "带一个小问题去听课",
+            "summary": "课前准备一个具体问题，例如“这个图形换个方向，关系还在吗”。课堂中留意哪一步给了线索，课后把它补在问题旁边。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "让两个课堂片段互相补充",
+            "summary": "各记一个让你感到投入的片段和一个感觉普通的片段，只写发生了什么。两段经历不必合成一句长期评价。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "把课堂里的好奇变成一个变式",
+            "summary": "从老师讲过的例子里只改一个条件，先猜结果会怎样，再画图或算一小步。把仍不确定的地方留成一个可问的问题。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "沿着一个精彩之处多走一步",
+            "summary": "挑一个让你印象深的解法，试着找第二条路线，或问问为什么两条路线会相遇。感受到热情之后，再留下属于自己的探索痕迹。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "用两行小记录把“老师做了什么”和“我怎样感受”分开，比猜测老师的内心更可靠。"
+          }
+        ],
+        "scoreLabel": "学生感知教师数学兴趣均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "三道题至少答两道，按已答题目计算均分。五档只是把 1—6 分可选范围等距分开，初中和高中共同使用；没有该数学版本的经验样本。",
+      "这些试用分段不是同学中的位置、全国常模或经验证的心理界线，也不提供百分位。",
+      "结果是学生感知，不是教师自评、教师真实兴趣或教学质量，不能用于教师排名与问责；一次均分也不能说明印象怎样形成。"
+    ],
+    "disclaimer": "这份报告供七至十二年级学生回顾数学课堂体验。它不评价教师，也不替任何人作长期判断。"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
