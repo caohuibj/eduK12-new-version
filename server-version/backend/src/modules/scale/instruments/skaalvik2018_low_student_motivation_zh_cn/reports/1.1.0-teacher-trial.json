@@ -1,0 +1,92 @@
+{
+  "toolKey": "skaalvik2018_low_student_motivation_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-teacher-trial",
+  "title": "感受到的学生投入困难｜教师自评（试用版）",
+  "report": {
+    "reportVersion": "1.1.0-teacher-trial",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "teacher",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题对照 Skaalvik 与 Skaalvik（2018）已公开英文题文、六级作答端点及已登记简体中文工作译稿。按 2026-10-30 项目已批准的独立使用形式保留 4 题、数字中间选项和完整作答 1–6 均分。新 R 仅调整试用反馈，中文本地效度证据仍待补充。"
+      }
+    },
+    "primaryScoreKeys": [
+      "low_student_motivation"
+    ],
+    "scoreOrder": [
+      "low_student_motivation"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "low_student_motivation",
+        "scoreLabel": "感受到的学生投入困难（1–6 均分，试用）",
+        "headline": "看看学生是从哪一步停下来的",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有一项任务才发下去不久，几位学生就停笔了。老师请他们说说准备从哪一步开始，才发现有人没读懂要求，也有人试过后没找到方向。两个相似的停顿，需要的帮助不同。\n\n这部分回顾你看到的兴趣、认真程度、努力投入和遇难时是否坚持。均分越高，表示你越认同这类学生投入困难出现在当前教学中。可以先从一项任务的要求、难度和可用帮助找线索。",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选一项参与不理想的任务，观察学生卡在启动、理解要求、继续尝试，还是收到反馈以后。找一种更清楚的起步方式，只试这一处，再看有多少学生能继续。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Skaalvik, E. M., & Skaalvik, S. (2018). Job demands and job resources as predictors of teacher motivation and well-being. Social Psychology of Education, 21, 1251–1275，§3.2，https://doi.org/10.1007/s11218-018-9464-8，CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)。项目对该组公开英文题文作简体中文翻译并新增教师反馈。",
+      "本组 4 题取 1–6 分均值，按项目规则须全部作答，中间选项 2–5 只用数字。参考参数暂无适用的常模和分档。",
+      "适用于理解中文的成年教师回顾当前学校工作条件。原研究在挪威进行，对象为 1–10 年级教师。当前中文为项目工作译稿，适用于个人反思和研究试用。"
+    ],
+    "disclaimer": "用于成年教师本人回顾感受到的工作条件和所需支持，适用范围为个人反思与研究试用。",
+    "artworkKey": "skaalvik2018_low_student_motivation_zh_cn/1.0.0/1.1.0-teacher-trial"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-teacher-trial",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
