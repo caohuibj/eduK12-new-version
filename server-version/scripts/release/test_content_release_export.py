@@ -96,6 +96,22 @@ class ContentReleaseExport(unittest.TestCase):
         self.assertTrue((legacy / '.artwork/approved.json').exists())
         self.assertFalse((legacy / 'bundle').exists())
 
+    def test_cognitive_exports_only_declaration_files(self):
+        prefix = f'{MODULES}/cognitive/tasks/'
+        included = ('gonogo/releases.json', 'gonogo/parameters/1.1.0.json', 'gonogo/reports/1.1.0.json')
+        excluded = ('gonogo/seeds.ts', 'gonogo/task-package.json', 'gonogo/fixtures/baseline.json')
+        for relative in included + excluded:
+            self.write(prefix + relative, '{}')
+        self.commit()
+        output = self.repo / 'exported'
+        output.mkdir()
+        result = self.export(output, 'content')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            {str(path.relative_to(output / 'cognitive')) for path in (output / 'cognitive').rglob('*') if path.is_file()},
+            set(included),
+        )
+
     def test_missing_scale_controls_fail_only_for_generalized_sync(self):
         (self.repo / (SCALE + '/releases.json')).unlink()
         self.commit()

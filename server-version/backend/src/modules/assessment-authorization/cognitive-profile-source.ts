@@ -2,7 +2,7 @@ import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {AdminPermissionError} from '../admin-permissions/service'
 import {getContentRelease,requirePublishedContentRelease} from '../measurement-content/repository'
-import {cognitiveMeasurementRelease} from '../measurement-content/cognitive'
+import {publishedCognitiveConfigMeasurement} from '../measurement-content/cognitive'
 import {requireCognitiveRegistryEntry} from '../cognitive/cognitive.registry'
 import {assertCognitiveProductEligible} from '../cognitive/product-eligibility'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -30,9 +30,7 @@ async function publishedConfig(tx:Tx,configId:string){
  * prove the normal published M, rather than publishing a missing dependency. */
 export async function preparePublishedCognitiveProfile(tx:Tx,configId:string,profile:CognitiveProfile){
  const config=await publishedConfig(tx,configId),entry=requireCognitiveRegistryEntry(config.testType,config.engineVersion,config.scoringVersion)
- const measurement=await requirePublishedContentRelease(tx,cognitiveMeasurementRelease({localId:config.testType,version:config.configVersion,
-  testType:config.testType,configVersion:config.configVersion,engineVersion:config.engineVersion,scoringVersion:config.scoringVersion,
-  config:config.config,scope:{kind:'PLATFORM'}}))
+ const measurement=await requirePublishedContentRelease(tx,publishedCognitiveConfigMeasurement(config))
  if(measurement.releaseId!==config.measurementReleaseId)unavailable('原生配置与已发布测量来源不一致')
  const artifact=buildCognitiveProfileArtifact({config,entry,profile,measurement:{releaseId:measurement.releaseId,contentHash:measurement.contentHash}})
  return {config,artifact,artifactHash:cognitiveProfileArtifactHash(artifact)}

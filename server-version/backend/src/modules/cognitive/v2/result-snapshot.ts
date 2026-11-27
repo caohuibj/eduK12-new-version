@@ -1,5 +1,7 @@
 import { z } from 'zod'
 import type { CognitiveResultSnapshot } from './types'
+import { effectiveDisclosurePolicySchema } from '../../scale/policy/schema'
+import { resolveAudienceDisclosure } from '../../scale/policy/disclosure'
 
 const qualityStateSchema = z.enum(['interpretable', 'limited', 'invalid'])
 
@@ -20,6 +22,7 @@ export const cognitiveResultSnapshotSchema = z.object({
   }).strict(),
   references: z.array(z.record(z.string(), z.unknown())),
   report: z.record(z.string(), z.unknown()),
+  effectiveDisclosure: effectiveDisclosurePolicySchema.optional(),
   assessmentContext: z.object({
     schemaVersion: z.literal(1),
     snapshotHash: z.string().min(1),
@@ -34,3 +37,24 @@ export const parseCognitiveResultSnapshot = (value: unknown): CognitiveResultSna
 export const referencesForCognitiveResult = (
   snapshot: CognitiveResultSnapshot,
 ): CognitiveResultSnapshot['references'] => snapshot.quality.state === 'invalid' ? [] : snapshot.references
+
+
+/** Keep authoritative metrics in the immutable result for governed consumers.
+ * The participant projection may only return metrics already visible in the
+ * frozen report, and never resolves a live configuration. */
+export function cognitiveParticipantResult(snapshot:CognitiveResultSnapshot) {
+  const policy=snapshot.effectiveDisclosure?resolveAudienceDisclosure(snapshot.effectiveDisclosure,'respondent'):undefined
+  const allowed=new Set<string>()
+  if(policy?.numericScores){
+    for(const layer of ['headline','user','detail']){
+      const items=snapshot.report[layer]
+      if(!Array.isArray(items))continue
+      for(const item of items)if(item&&typeof item.key==='string')allowed.add(item.key)
+    }
+  }
+  const metrics=policy?Object.fromEntries(Object.entries(snapshot.metrics).filter(([key])=>allowed.has(key))):snapshot.metrics
+  const quality=policy&&!policy.resultQualityDetails?{state:snapshot.quality.state,flags:{},reasons:[]}:snapshot.quality
+  return {metrics,quality,qualityFlags:quality.flags,
+    references:policy&&(!policy.references||!policy.scoreDerivedLabels)?[]:referencesForCognitiveResult(snapshot),
+    report:snapshot.report,assessmentContext:snapshot.assessmentContext}
+}

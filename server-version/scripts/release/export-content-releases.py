@@ -8,6 +8,7 @@ from pathlib import Path
 MODULES = 'server-version/backend/src/modules/'
 SCALE_ROOT = MODULES + 'scale/instruments/'
 BUNDLE_ROOT = MODULES + 'assessment-bundle/packages/'
+COGNITIVE_ROOT = MODULES + 'cognitive/tasks/'
 ARTWORK_ROOT = 'server-version/frontend/src/scale-report-artwork/'
 SCALE_FILES = re.compile(
     r'[a-z][a-z0-9_]*/(?:releases\.json|(?:parameters|reports)/[a-zA-Z0-9][a-zA-Z0-9._-]*\.json)'
@@ -16,6 +17,9 @@ BUNDLE_FILES = re.compile(
     r'[a-z][a-z0-9_]*/(?:releases\.json|[0-9]+\.[0-9]+\.[0-9]+/'
     r'(?:manifest|rules|report|publication|scientific|evidence-map|context|profile|'
     r'fixtures/(?:valid|missing|invalid|not-applicable))\.json)'
+)
+COGNITIVE_FILES = re.compile(
+    r'[a-z][a-z0-9_-]{0,79}/(?:releases\.json|(?:parameters|reports)/[A-Za-z0-9][A-Za-z0-9._-]{0,79}\.json)'
 )
 ARTWORK_FILES = re.compile(
     r'[a-z][a-z0-9_]*/\d+\.\d+\.\d+/[a-zA-Z0-9][a-zA-Z0-9._-]*/'
@@ -39,6 +43,7 @@ def export_releases(repo: str, commit: str, output: Path, profile: str) -> None:
     families = [(SCALE_ROOT, SCALE_FILES, scale)]
     if profile == 'content':
         families.append((BUNDLE_ROOT, BUNDLE_FILES, output / 'bundle'))
+        families.append((COGNITIVE_ROOT, COGNITIVE_FILES, output / 'cognitive'))
     for _, _, directory in families:
         directory.mkdir(exist_ok=True)
     roots = [root for root, _, _ in families]

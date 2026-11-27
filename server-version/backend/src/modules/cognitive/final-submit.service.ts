@@ -26,7 +26,7 @@ import { runAuthoritativeScorer } from './v2/authoritative-scorer'
 import { readCognitiveAssessmentContext } from './v2/assessment-context'
 import { loadCognitiveReferenceSets, resolveCognitiveMetricReferences } from './v2/reference-adapter'
 import { projectThreeLayerReport, referencesForReportReading } from './v2/report'
-import { parseCognitiveResultSnapshot } from './v2/result-snapshot'
+import { cognitiveParticipantResult, parseCognitiveResultSnapshot } from './v2/result-snapshot'
 import type { CognitiveResultSnapshot, TrialEnvelope } from './v2/types'
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import {
@@ -77,14 +77,7 @@ type PreparedCognitivePayload = {
 }
 
 const responseFromSnapshot = (sessionId: string, snapshot: CognitiveResultSnapshot) => {
-  const result = {
-    metrics: snapshot.metrics,
-    quality: snapshot.quality,
-    qualityFlags: snapshot.quality.flags,
-    references: snapshot.quality.state === 'invalid' ? [] : snapshot.references,
-    report: snapshot.report,
-    assessmentContext: snapshot.assessmentContext,
-  }
+  const result = cognitiveParticipantResult(snapshot)
   return {
     sessionId,
     status: 'COMPLETED' as const,
@@ -271,6 +264,9 @@ const prepareFinalCognitiveData = async (
     profile: report.method.profile,
     metrics: scored.metrics,
     quality: scored.quality,
+    ...(freeze.frozenReport?.participantPresentation?.declaredRelease
+      ? {effectiveDisclosure:freeze.frozenReport.participantPresentation.declaredRelease.effectiveDisclosure}
+      : {}),
     references: referencesForReportReading(report, resolvedReferences) as unknown as Array<Record<string, unknown>>,
     report: report as unknown as Record<string, unknown>,
     assessmentContext: contextState.reference,

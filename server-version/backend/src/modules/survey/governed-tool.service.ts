@@ -16,7 +16,7 @@ import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {AdminPermissionError} from '../admin-permissions/service'
 import type {AdminSessionProof} from '../admin-permissions/proof'
-import {assertStandardSystem} from './standard-triplet.service'
+import {assertGitScalePublisher,assertStandardSystem} from './standard-triplet.service'
 import {assertSurveyLibraryManager} from './admin-role'
 import {assertSurveyToolPolicy,readToolPolicies} from './tool-policy'
 import {getContentRelease,publishContentRelease} from '../measurement-content/repository'
@@ -156,22 +156,116 @@ export async function governedComponentOptions(actor:string,page=1,query=''){
  }
  return {list,page,hasMore:selected.length>25}
 }
+async function approveGovernedArtifact(tx:Prisma.TransactionClient,row:GovernedRow,allowedProducts:unknown,actor:string,reason:string,preservePause=false){
+ const products=exactToolEntryProducts(allowedProducts)
+ if(products.includes('TRAINING')){
+  const adapter=inspectTrainingGovernedDefinition(row.snapshot)
+  if(!adapter.available)governedFail(409,'不能批准 Training 投放：'+adapter.reason)
+ }
+ const blockers=artifactBlockers(row.snapshot)
+ if(blockers.length)governedFail(409,blockers.join('；'))
+ await assertGovernedDependencies(tx,row.snapshot)
+ if(products.includes('TRAINING'))for(const component of [...row.snapshot.components].sort((a,b)=>a.source.id.localeCompare(b.source.id)))
+  await assertToolEntryPolicy(tx,{resourceKey:'governed-release:'+component.source.id,fingerprint:component.source.hash},'TRAINING')
+ await approveToolEntryPolicies(tx,governedPolicyIdentity(row),products,actor,reason,{preservePause})
+}
+function governedTrialCases(row:GovernedRow){
+ return [0,1,2].map(index=>computeGovernedTrial(row.snapshot,row.id,index))
+}
+async function persistGovernedTrialCases(tx:Prisma.TransactionClient,row:GovernedRow,runId:string,cases:ReturnType<typeof governedTrialCases>){
+ for(const c of cases)await tx.$executeRaw`INSERT INTO survey_governed_trials(id,tool_id,run_id,case_index,result,result_hash) VALUES(${randomUUID()},${row.id},${runId},${c.result.caseIndex},${JSON.stringify(c.result)}::jsonb,${c.hash})`
+}
+async function readBackGovernedTrialCases(db:Db,row:GovernedRow,runId:string,cases:ReturnType<typeof governedTrialCases>){
+ const read=await db.$queryRaw<Array<{case_index:number;result:unknown;result_hash:string}>>`SELECT case_index,result,result_hash FROM survey_governed_trials WHERE tool_id=${row.id} AND run_id=${runId} ORDER BY case_index`
+ if(read.length!==3||read.some((c,i)=>c.case_index!==i||canonicalHash(c.result)!==c.result_hash||c.result_hash!==cases[i].hash))
+  throw new Error('试运行数据库回读记录不一致')
+}
+type MeasurementPointer=NonNullable<GovernedRow['measurement_release']>
+async function assertGovernedMeasurement(tx:Prisma.TransactionClient,family:GovernedFamily,pointer:MeasurementPointer){
+ const release=await getContentRelease(tx,pointer.releaseId,true)
+ if(!release||release.layer!=='MEASUREMENT'||release.family!==family||release.scope.kind!=='PLATFORM'
+    ||release.contentHash!==pointer.contentHash||release.status!=='PUBLISHED')governedFail(409,'精确题本发布版本不可用于新增使用')
+}
+async function completeGovernedTrial(tx:Prisma.TransactionClient,row:GovernedRow,runId:string,actor:string,measurement?:MeasurementPointer){
+ if(row.state!=='TRIAL_RUNNING'||row.latest_trial!==runId||!row.approved_by)governedFail(409,'试运行已被替换')
+ await assertGovernedDependencies(tx,row.snapshot)
+ let pointer:MeasurementPointer|null=null
+ if(row.snapshot.unit&&row.family!=='FORM'){
+  if(measurement){
+   await assertGovernedMeasurement(tx,row.family,measurement)
+   pointer=measurement
+  }else{
+   const content=await publishContentRelease(tx,governedMeasurementInput(snapshotUnit(row.snapshot.unit),{kind:'PLATFORM',ownerId:row.approved_by},'survey-governed:'+row.id,row.snapshot_hash),actor)
+   if(content.layer!=='MEASUREMENT'||content.status!=='PUBLISHED')throw new Error('内容版本无法发布')
+   pointer={releaseId:content.releaseId,contentHash:content.contentHash}
+  }
+ }else if(measurement)governedFail(400,'该工具不接受单工具题本发布绑定')
+ await tx.$executeRaw`UPDATE survey_governed_tools SET state='ONLINE',version=version+1,lease_until=NULL,blockers='[]',measurement_release=${pointer?JSON.stringify(pointer):'null'}::jsonb WHERE id=${row.id}`
+ await audit(tx,actor,'GOVERNED_TRIAL_PASSED_ONLINE',{id:row.id,runId,caseCount:3,databaseReadback:true,researcherGrantsCreated:0})
+}
+
+type GitGovernedSyncOptions={gitCommitSha:string;allowedProducts:unknown;online:boolean;measurement?:MeasurementPointer}
+type GitGovernedSyncReceipt={version:number;state:'ONLINE'|'WITHDRAWN';allowedProducts:string[]}
+/** Synchronize one verified Git declaration within the deployment transaction.
+ * Use the same blocker, policy and trial gates as interactive approval. Receipts
+ * distinguish a Git withdrawal from an independent human emergency hold. */
+export async function reconcileGitGovernedArtifact(tx:Prisma.TransactionClient,actor:string,artifact:GovernedArtifact,options:GitGovernedSyncOptions){
+ await assertGitScalePublisher(tx,actor)
+ if(!/^[0-9a-f]{40}$/.test(options.gitCommitSha))governedFail(400,'Git 发布提交无效')
+ const products=exactToolEntryProducts(options.allowedProducts),reason='Git main '+options.gitCommitSha
+ const identityKey=canonicalHash([artifact.family,artifact.toolKey,artifact.version])
+ await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'git-governed-release:'+identityKey}))`
+ const [existing]=await tx.$queryRaw<GovernedRow[]>`SELECT * FROM survey_governed_tools
+   WHERE family=${artifact.family} AND tool_key=${artifact.toolKey} AND tool_version=${artifact.version} FOR UPDATE`
+ const syncReceipt=async(row:GovernedRow,state:GitGovernedSyncReceipt['state'],action:string)=>{
+  await audit(tx,actor,'GIT_GOVERNED_RELEASE_SYNCED',{id:row.id,hash:row.snapshot_hash,version:row.version,state,
+   allowedProducts:products,gitCommitSha:options.gitCommitSha,action})
+  return {...governedView(row),action}
+ }
+ if(existing){
+  if(existing.submitted_by!==actor||existing.approved_by!==actor)governedFail(409,'该工具版本由人工管理，不能通过 Git 覆盖')
+  if(existing.snapshot_hash!==canonicalHash(artifact)||canonicalHash(existing.snapshot)!==existing.snapshot_hash
+      ||options.measurement&&canonicalHash(existing.measurement_release)!==canonicalHash(options.measurement))
+   governedFail(409,'该 Git 工具版本已冻结，请新增版本')
+  const [receipt]=await tx.$queryRaw<Array<{metadata:GitGovernedSyncReceipt}>>`SELECT metadata FROM survey_events
+    WHERE actor_user_id=${actor} AND action='GIT_GOVERNED_RELEASE_SYNCED' AND metadata->>'id'=${existing.id}
+    ORDER BY (metadata->>'version')::int DESC,created_at DESC LIMIT 1`
+  if(existing.state==='WITHDRAWN'&&(receipt?.metadata.state!=='WITHDRAWN'||receipt.metadata.version!==existing.version))
+   return {...governedView(existing),action:'MANUAL_HOLD'}
+  if(!options.online){
+   if(existing.state==='WITHDRAWN')return {...governedView(existing),action:'UNCHANGED'}
+   if(existing.state!=='ONLINE')governedFail(409,'Git 工具状态已变化')
+   await tx.$executeRaw`UPDATE survey_governed_tools SET state='WITHDRAWN',version=version+1,reason=${reason} WHERE id=${existing.id}`
+   return syncReceipt(await governedRow(tx,existing.id),'WITHDRAWN','WITHDRAWN')
+  }
+  if(existing.state==='ONLINE'&&canonicalHash(receipt?.metadata.allowedProducts??null)===canonicalHash(products))
+   return {...governedView(existing),action:'UNCHANGED'}
+  if(existing.state!=='ONLINE'&&existing.state!=='WITHDRAWN')governedFail(409,'Git 工具状态已变化')
+  if(existing.measurement_release)await assertGovernedMeasurement(tx,existing.family,existing.measurement_release)
+  await approveGovernedArtifact(tx,existing,products,actor,reason,true)
+  await tx.$executeRaw`UPDATE survey_governed_tools SET state='ONLINE',version=version+1,reason=${reason} WHERE id=${existing.id}`
+  return syncReceipt(await governedRow(tx,existing.id),'ONLINE',existing.state==='WITHDRAWN'?'RESTORED':'SCOPE_CHANGED')
+ }
+ if(!options.online)return {id:null,action:'ABSENT'}
+ const id=randomUUID(),runId=randomUUID()
+ await insertSubmission(tx,actor,id,artifact)
+ const row=await governedRow(tx,id,true)
+ await approveGovernedArtifact(tx,row,products,actor,reason)
+ await tx.$executeRaw`UPDATE survey_governed_tools SET state='APPROVED',version=version+1,approved_by=${actor},
+   approved_at=clock_timestamp(),approval_reason=${reason},reason=${reason} WHERE id=${id}`
+ await audit(tx,actor,'GOVERNED_TOOL_APPROVE',{id,hash:row.snapshot_hash,reason,allowedProducts:products,researcherGrantsCreated:0})
+ await tx.$executeRaw`UPDATE survey_governed_tools SET state='TRIAL_RUNNING',version=version+1,latest_trial=${runId},blockers='[]' WHERE id=${id}`
+ const cases=governedTrialCases(row)
+ await persistGovernedTrialCases(tx,row,runId,cases)
+ await readBackGovernedTrialCases(tx,row,runId,cases)
+ await completeGovernedTrial(tx,await governedRow(tx,id,true),runId,actor,options.measurement)
+ return syncReceipt(await governedRow(tx,id),'ONLINE','PUBLISHED')
+}
 export async function approveGovernedTool(actor:string,id:string,input:{expectedVersion:number;hash:string;reason:string;decision:'APPROVE'|'RETURN';allowedProducts?:unknown},proof:AdminSessionProof){
  const row=await prisma.$transaction(async tx=>{
   await assertStandardSystem(tx,actor,proof);const r=await governedRow(tx,id,true)
   if(r.version!==input.expectedVersion||r.snapshot_hash!==input.hash||r.state!=='SUBMITTED')governedFail(409,'审批内容或状态已变化，请刷新')
-  if(input.decision==='APPROVE'){
-   const products=exactToolEntryProducts(input.allowedProducts)
-   if(products.includes('TRAINING')){
-    const adapter=inspectTrainingGovernedDefinition(r.snapshot)
-    if(!adapter.available)governedFail(409,'不能批准 Training 投放：'+adapter.reason)
-   }
-   const blockers=artifactBlockers(r.snapshot);if(blockers.length)governedFail(409,blockers.join('；'))
-   await assertGovernedDependencies(tx,r.snapshot)
-   if(products.includes('TRAINING'))for(const component of [...r.snapshot.components].sort((a,b)=>a.source.id.localeCompare(b.source.id)))
-    await assertToolEntryPolicy(tx,{resourceKey:'governed-release:'+component.source.id,fingerprint:component.source.hash},'TRAINING')
-   await approveToolEntryPolicies(tx,governedPolicyIdentity(r),products,actor,input.reason)
-  }
+  if(input.decision==='APPROVE')await approveGovernedArtifact(tx,r,input.allowedProducts,actor,input.reason)
   await tx.$executeRaw`UPDATE survey_governed_tools SET state=${input.decision==='APPROVE'?'APPROVED':'RETURNED'},version=version+1,approved_by=${input.decision==='APPROVE'?actor:null},approved_at=${input.decision==='APPROVE'?new Date():null},approval_reason=${input.decision==='APPROVE'?input.reason:null},reason=${input.reason} WHERE id=${id}`
   await audit(tx,actor,'GOVERNED_TOOL_'+input.decision,{id,hash:r.snapshot_hash,reason:input.reason,allowedProducts:input.allowedProducts??[],researcherGrantsCreated:0})
   return governedRow(tx,id)
@@ -188,22 +282,15 @@ export async function runGovernedTrial(actor:string,id:string,version:number,pro
   return row
  })
  try{
-  const cases=[0,1,2].map(i=>computeGovernedTrial(r.snapshot,id,i))
-  await prisma.$transaction(async tx=>{await assertStandardSystem(tx,actor,proof);for(const c of cases)await tx.$executeRaw`INSERT INTO survey_governed_trials(id,tool_id,run_id,case_index,result,result_hash) VALUES(${randomUUID()},${id},${runId},${c.result.caseIndex},${JSON.stringify(c.result)}::jsonb,${c.hash})`})
-  const read=await prisma.$queryRaw<Array<{case_index:number;result:unknown;result_hash:string}>>`SELECT case_index,result,result_hash FROM survey_governed_trials WHERE tool_id=${id} AND run_id=${runId} ORDER BY case_index`
-  if(read.length!==3||read.some((c,i)=>c.case_index!==i||canonicalHash(c.result)!==c.result_hash||c.result_hash!==cases[i].hash))throw new Error('试运行数据库提交与回读记录不一致')
+  const cases=governedTrialCases(r)
   await prisma.$transaction(async tx=>{
-   await assertStandardSystem(tx,actor,proof);const current=await governedRow(tx,id,true)
-   if(current.state!=='TRIAL_RUNNING'||current.latest_trial!==runId)governedFail(409,'试运行已被替换')
-   await assertGovernedDependencies(tx,current.snapshot)
-   let pointer:{releaseId:string;contentHash:string}|null=null
-   if(r.snapshot.unit&&r.family!=='FORM'){
-    const measurement=await publishContentRelease(tx,governedMeasurementInput(snapshotUnit(r.snapshot.unit),{kind:'PLATFORM',ownerId:r.approved_by!},'survey-governed:'+id,r.snapshot_hash),actor)
-    if(measurement.layer!=='MEASUREMENT'||measurement.status!=='PUBLISHED')throw new Error('内容版本无法发布')
-    pointer={releaseId:measurement.releaseId,contentHash:measurement.contentHash}
-   }
-   await tx.$executeRaw`UPDATE survey_governed_tools SET state='ONLINE',version=version+1,lease_until=NULL,blockers='[]',measurement_release=${pointer?JSON.stringify(pointer):'null'}::jsonb WHERE id=${id}`
-   await audit(tx,actor,'GOVERNED_TRIAL_PASSED_ONLINE',{id,runId,caseCount:3,databaseReadback:true,researcherGrantsCreated:0})
+   await assertStandardSystem(tx,actor,proof)
+   await persistGovernedTrialCases(tx,r,runId,cases)
+  })
+  await readBackGovernedTrialCases(prisma,r,runId,cases)
+  await prisma.$transaction(async tx=>{
+   await assertStandardSystem(tx,actor,proof)
+   await completeGovernedTrial(tx,await governedRow(tx,id,true),runId,actor)
   },{timeout:20000})
  }catch(e){await prisma.$transaction(async tx=>{const current=await governedRow(tx,id,true);if(current.state==='TRIAL_RUNNING'&&current.latest_trial===runId){const blockers=[e instanceof Error?e.message:'自动试运行失败'];await tx.$executeRaw`UPDATE survey_governed_tools SET state='TRIAL_FAILED',version=version+1,lease_until=NULL,blockers=${JSON.stringify(blockers)}::jsonb WHERE id=${id}`;await audit(tx,actor,'GOVERNED_TRIAL_FAILED',{id,runId,blockers})}})}
  return governedView(await governedRow(prisma,id))

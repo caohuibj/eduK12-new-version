@@ -5,6 +5,7 @@ import { createHash } from 'crypto'
 import { decryptCognitivePayload, encryptCognitivePayload, encryptCompactCognitivePayload } from './cognitive.security'
 import { compactAssessmentStorageEnabled } from '../assessment-runtime/compact-field-codec'
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
+import { reportMetaSchema, type ReportMeta } from './schemas/report-meta'
 import { BAD_REQUEST } from './cognitive.errors'
 import type {
   CognitiveProfile,
@@ -67,15 +68,37 @@ export const mergeProfileConfig = <TConfig, TTrial>(
   if (!definition) {
     throw BAD_REQUEST(`该任务未声明 Profile ${profile}`)
   }
+  const source = baseConfig as Record<string, unknown>
   const merged = {
-    ...(baseConfig as Record<string, unknown>),
+    ...source,
     ...definition.configPatch,
+    ...(cognitiveDeclaredReport(source) ? {report:source.report} : {}),
   }
   const parsed = entry.configSchema.safeParse(merged)
   if (!parsed.success) {
     throw BAD_REQUEST('Profile 配置与任务 schema 不匹配')
   }
   return parsed.data
+}
+
+export function cognitiveDeclaredReport(config:unknown) {
+  const report=(config as {report?:{declaredRelease?:unknown}}|null)?.report
+  if(!report?.declaredRelease)return undefined
+  const parsed=reportMetaSchema.safeParse(report)
+  return parsed.success ? parsed.data.declaredRelease : undefined
+}
+
+export function requireDeclaredCognitiveReport(config:unknown):NonNullable<ReportMeta['declaredRelease']>{
+  const report=cognitiveDeclaredReport(config)
+  if(!report)throw Error('Cognitive configuration schema did not retain the declarative report')
+  return report
+}
+
+export function cognitiveRunnerConfig(config:unknown){
+  if(!cognitiveDeclaredReport(config))return config
+  const value=config as Record<string,unknown>&{report:ReportMeta}
+  const {declaredRelease:_privateReport,...report}=value.report
+  return {...value,report}
 }
 
 export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
@@ -95,8 +118,19 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
     profile: input.profile,
     reportVersion,
   })
-  const participantPresentation = resolveParticipantPresentation({ ...input.entry, reportVersion })
-  if (!participantPresentation) throw new Error(`COG_PRESENTATION_MISSING: ${input.entry.testType}/${input.entry.engineVersion}/${input.entry.scoringVersion}`)
+  const declared=cognitiveDeclaredReport(resolvedConfig)
+  const originalPresentation = resolveParticipantPresentation({ ...input.entry, reportVersion:declared?undefined:reportVersion })
+  if (!originalPresentation) throw new Error(`COG_PRESENTATION_MISSING: ${input.entry.testType}/${input.entry.engineVersion}/${input.entry.scoringVersion}`)
+  // The Git R may change prose and narrow disclosure. Registered metric
+  // gates and installed trial/scoring definitions remain authoritative.
+  const participantPresentation: CognitiveParticipantPresentationV1 = declared ? {
+    ...originalPresentation,
+    presentationVersion:reportVersion!,
+    title:declared.title,
+    practicalTips:declared.practicalTips,
+    disclaimer:declared.disclaimer,
+    declaredRelease:{introduction:declared.introduction,effectiveDisclosure:declared.effectiveDisclosure},
+  } : originalPresentation
   const v2 = buildCognitiveV2TaskDefinition(input.entry as unknown as RegistryEntry<unknown, unknown>)
   const reading = participantPresentation.reportReading
   const isReport3 = reading?.version === '3.0.0'
@@ -141,7 +175,7 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
   const resolvedReport: FrozenReportSnapshot = {
     presentationVersion: participantPresentation.presentationVersion,
     participantPresentation,
-    v2ReportDefinition: isReport3 ? { ...v2.report, version: reading.version } : v2.report,
+    v2ReportDefinition: !declared && isReport3 ? { ...v2.report, version: reading.version } : v2.report,
     v2MetricDefinitions,
     v2QualityDefinitions,
     profile: input.profile,
@@ -149,7 +183,7 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
     profileDefinitionVersion: input.entry.profileDefinitionVersion,
     metricDefinitionVersion: input.entry.metricDefinitionVersion,
     qualityDefinitionVersion: input.entry.qualityDefinitionVersion,
-    reportDefinitionVersion: isReport3 ? reading.version : input.entry.reportDefinitionVersion,
+    reportDefinitionVersion: declared ? reportVersion! : isReport3 ? reading.version : input.entry.reportDefinitionVersion,
     reportCaveats: protocolPresentation?.reportCaveats ?? profileDefinition.reportCaveats,
     metricDefinitions,
     qualityDefinitions,

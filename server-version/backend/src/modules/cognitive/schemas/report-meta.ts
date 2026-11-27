@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { effectiveDisclosurePolicySchema } from '../../scale/policy/schema'
 
 /**
  * Provisional Reference Metadata（Milestone E §6 / §13）。
@@ -17,6 +18,14 @@ export const reportMetaSchema = z
     referenceMode: z.enum(['none', 'simulated', 'literature']),
     referenceVersion: z.string().optional(),
     referenceBand: z.string().optional(),
+    declaredRelease: z.object({
+      parameterVersion: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/),
+      title: z.string().min(1).max(200),
+      introduction: z.string().max(4000),
+      practicalTips: z.array(z.string().min(1).max(2000)).max(30),
+      disclaimer: z.string().min(1).max(4000),
+      effectiveDisclosure: effectiveDisclosurePolicySchema,
+    }).strict().optional(),
   })
   .strict()
 

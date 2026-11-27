@@ -14,6 +14,7 @@ import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
 import { instrumentError } from '../../utils/response'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
 import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
+import { requireRecentAdminKey } from '../admin-permissions/guards'
 import {cognitiveProfileConfigurationsRouter} from './profile-configurations.routes'
 
 /**
@@ -46,8 +47,8 @@ router.get('/tests/:testType', authenticate, requireTeacher, cognitiveController
 router.get('/configs', authenticate, requireTeacher, cognitiveController.listConfigs)
 router.use('/profile-configurations',cognitiveProfileConfigurationsRouter)
 router.patch('/configs/:id/access-policy', authenticate, requireAdmin, newAuthoring, cognitiveController.updateAccessPolicy)
-router.post('/configs/:id/publish', authenticate, requireSystemAdmin, newAuthoring, cognitiveReleaseController.publishConfig)
-router.post('/configs/:id/retire', authenticate, requireSystemAdmin, cognitiveReleaseController.retireConfig)
+router.post('/configs/:id/publish', authenticate, requireSystemAdmin, requireRecentAdminKey, newAuthoring, cognitiveReleaseController.publishConfig)
+router.post('/configs/:id/retire', authenticate, requireSystemAdmin, requireRecentAdminKey, cognitiveReleaseController.retireConfig)
 
 // 我的认知测评（学生分发列表，必须在 /:id 之前）
 router.get('/assignments/my', authenticate, cognitiveController.myAssignments)

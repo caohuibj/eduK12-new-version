@@ -1,3 +1,4 @@
+import type { AudienceDisclosurePolicyV1 } from '../../scale/policy/types'
 import type { ZodType } from 'zod'
 import type {
   AssessmentReferenceEntry,
@@ -145,6 +146,7 @@ export interface CognitiveResultSnapshot {
   quality: QualityAssessment
   references: Array<Record<string, unknown>>
   report: Record<string, unknown>
+  effectiveDisclosure?: AudienceDisclosurePolicyV1
   assessmentContext: CognitiveAssessmentContextReference | null
 }
 

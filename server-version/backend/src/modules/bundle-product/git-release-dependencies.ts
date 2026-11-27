@@ -1,13 +1,43 @@
 import type { Prisma } from '@prisma/client'
+import { GIT_RELEASE_ACTOR_ID } from '../../utils/gitReleaseIdentity'
+import { AdminPermissionError } from '../admin-permissions/service'
+import { readApprovedCognitiveProfileArtifact } from '../assessment-authorization/cognitive-profile-approved-source'
+import { exactStandardCombinationEntryProducts } from '../assessment-governance/tool-entry-policy'
 import type { DeclarativePackage } from '../assessment-bundle/onboarding/contract'
 import { assertAssessmentOperationallyActive } from '../assessment-governance/operational-hold'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { getContentRelease } from '../measurement-content/repository'
-import { cognitiveMeasurementRelease } from '../measurement-content/cognitive'
+import { publishedCognitiveConfigMeasurement } from '../measurement-content/cognitive'
 import { prepareRelease } from '../measurement-content/release'
 import { getScaleInstrumentSource } from '../scale/onboarding/instrument-registry'
 import { scaleSourceAxisPayloads } from '../scale/onboarding/source-snapshot'
 import { readStaticSjtMeasurementForStart } from '../situational/static-measurement-release'
+
+async function hasGitCognitiveAdmission(tx: Prisma.TransactionClient, configId: string, profile: string) {
+  const events = { actorId: GIT_RELEASE_ACTOR_ID, resourceId: configId }
+  const owned = await tx.assessmentManagementEvent.findFirst({
+    where: { ...events, action: 'COGNITIVE_GIT_CONFIG_PUBLISHED' }, select: { id: true },
+  })
+  if (!owned) return true
+
+  // Preserve native PUBLISHED status after Git withdrawal for attempts that
+  // already started. New Bundles must have exact, currently approved admission.
+  const latest = await tx.assessmentManagementEvent.findFirst({
+    where: { ...events, action: 'COGNITIVE_GIT_PROFILE_SYNCED' },
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], select: { metadata: true },
+  })
+  const receipt = latest?.metadata as { artifactHash?: string; allowedProducts?: unknown[] } | null | undefined
+  if (!receipt?.artifactHash || !receipt.allowedProducts?.length) return false
+  for (const product of exactStandardCombinationEntryProducts(receipt.allowedProducts)) {
+    try {
+      await readApprovedCognitiveProfileArtifact(tx, configId, profile, receipt.artifactHash, product)
+      return true
+    } catch (error) {
+      if (!(error instanceof AdminPermissionError)) throw error
+    }
+  }
+  return false
+}
 
 /** Git publication requires actual released dependencies as well as the package
  * compiler's exact selectors. Form slots are immutable inline context in Bundle. */
@@ -46,8 +76,8 @@ export async function assertGitBundleDependencies(tx: Prisma.TransactionClient, 
       const dependency = pack.manifest.cognitiveDependencies.find(value => value.slotKey === slot.slotKey)
       if (!dependency || dependency.configVersion !== version) throw new Error('BUNDLE_GIT_COGNITIVE_NOT_ONLINE:' + slot.slotKey)
       assertAssessmentOperationallyActive({ family: 'COGNITIVE', key, version: dependency.engineVersion, scoringVersion: dependency.scoringVersion })
-      const [row] = await tx.$queryRaw<Array<{ measurementReleaseId: string | null; config: unknown }>>`
-        SELECT measurement_release_id AS "measurementReleaseId", config FROM cognitive_test_configs
+      const [row] = await tx.$queryRaw<Array<{ id: string; measurementReleaseId: string | null; config: unknown }>>`
+        SELECT id, measurement_release_id AS "measurementReleaseId", config FROM cognitive_test_configs
         WHERE test_type = ${key} AND config_version = ${dependency.configVersion}
           AND engine_version = ${dependency.engineVersion} AND scoring_version = ${dependency.scoringVersion}
           AND status = 'PUBLISHED'
@@ -55,13 +85,13 @@ export async function assertGitBundleDependencies(tx: Prisma.TransactionClient, 
       `
       if (!row?.measurementReleaseId) throw new Error('BUNDLE_GIT_COGNITIVE_NOT_ONLINE:' + slot.slotKey)
       const release = await getContentRelease(tx, row.measurementReleaseId, true)
-      const expected = prepareRelease(cognitiveMeasurementRelease({
-        localId: key, version, testType: key, configVersion: version, engineVersion: dependency.engineVersion,
-        scoringVersion: dependency.scoringVersion, config: row.config, scope: { kind: 'PLATFORM' },
+      const expected = prepareRelease(publishedCognitiveConfigMeasurement({
+        testType: key, configVersion: version, engineVersion: dependency.engineVersion,
+        scoringVersion: dependency.scoringVersion, config: row.config,
       }))
       if (!release || release.layer !== 'MEASUREMENT' || release.family !== 'COGNITIVE' ||
         release.status !== 'PUBLISHED' || release.key !== expected.key || release.version !== expected.version ||
-        release.contentHash !== expected.contentHash) {
+        release.contentHash !== expected.contentHash || !await hasGitCognitiveAdmission(tx, row.id, dependency.profile)) {
         throw new Error('BUNDLE_GIT_COGNITIVE_NOT_ONLINE:' + slot.slotKey)
       }
     }

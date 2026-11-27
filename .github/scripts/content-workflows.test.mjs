@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {bundleReleaseSelector} from './git-content-release-scope.mjs';
+import {gitContentReleaseSelector} from './git-content-release-scope.mjs';
 import {runInNewContext} from 'node:vm';
 import {regressionGroups} from './backend-regression-selection.mjs';
 import { createRequire } from 'node:module';
@@ -553,7 +553,7 @@ test('content source selection checks its reverse reference and leaves unrelated
  const manifests={affected:{definition:{slots:[{unitType:'SCALE',instrumentKey:'changed',instrumentVersion:'1.0.0'}]}},privateDraft:{definition:{status:'DRAFT',slots:[{unitType:'SCALE',instrumentKey:'PRIVATE_CHEXI',instrumentVersion:'1.0.0'}]}}};
  const calls=[],base='a'.repeat(40);let report;
  runInNewContext(command,{
-  bundleReleaseSelector,
+  gitContentReleaseSelector,
   fs:{readdirSync:p=>p===root?Object.keys(manifests):['1.0.0'],readFileSync:p=>JSON.stringify(manifests[p.split('/').at(-3)]),writeFileSync:(_,text)=>{report=JSON.parse(text)}},
   execFileSync:(exe,args)=>{if(exe==='git')return 'server-version/backend/src/modules/scale/instruments/changed/1.0.0/source.json\0';calls.push(args)},
   verifyHistory:()=>{throw Error('Unchanged Bundle history is unrelated')},process:{env:{BUNDLE_CONTENT_BASE_SHA:base,BUNDLE_CONTENT_EVIDENCE:'fixture'},execPath:'node'},Buffer,

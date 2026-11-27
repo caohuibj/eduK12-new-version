@@ -1,3 +1,4 @@
+import type { AudienceDisclosurePolicyV1 } from '../scale/policy/types'
 import type { CognitiveProfile } from './cognitive.types'
 import type { CognitiveProtocolPresentationV1 } from './protocol-presentation.types'
 
@@ -56,4 +57,5 @@ export interface CognitiveParticipantPresentationV1 {
   practicalTips: string[]
   protocols: Partial<Record<CognitiveProfile, CognitiveProtocolPresentationV1>>
   reportReading?: CognitiveReportReadingPolicy
+  declaredRelease?: { introduction:string;effectiveDisclosure:AudienceDisclosurePolicyV1 }
 }

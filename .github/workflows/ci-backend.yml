@@ -185,11 +185,11 @@ jobs:
           CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           node --input-type=module <<'JS'
-          import {bundleReleaseSelector} from '../../.github/scripts/git-content-release-scope.mjs';
+          import {gitContentReleaseSelector} from '../../.github/scripts/git-content-release-scope.mjs';
           import {execFileSync} from 'node:child_process';
           const base = process.env.CONTENT_BASE_SHA;
           const files=execFileSync('git',['diff','--name-only','-z',base,'HEAD'],{encoding:'utf8'}).split('\0');
-          const selectors=[...new Set(files.map(bundleReleaseSelector).filter(Boolean))];
+          const selectors=[...new Set(files.map(gitContentReleaseSelector).filter(Boolean))];
           if(selectors.length)execFileSync('npm',['run','content:check','--',...selectors],{stdio:'inherit'});
           JS
       - name: native Form strict input, real HTTP authority and PostgreSQL save/readback

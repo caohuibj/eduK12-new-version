@@ -22,8 +22,8 @@ vi.mock('../../modules/cognitive/v2/registry', () => ({
   getCognitiveV2TaskDefinition: mockGetDefinition,
 }))
 
-vi.mock('../../modules/measurement-content/cognitive', () => ({ cognitiveMeasurementRelease: vi.fn(() => ({})) }))
-vi.mock('../../modules/measurement-content/repository', () => ({ publishContentRelease: vi.fn(async () => ({ releaseId: 'content-1' })), transitionContentRelease: vi.fn() }))
+vi.mock('../../modules/measurement-content/cognitive', () => ({ publishedCognitiveConfigMeasurement: vi.fn(() => ({})) }))
+vi.mock('../../modules/measurement-content/repository', () => ({ publishContentRelease: vi.fn(async () => ({ releaseId: 'content-1', status: 'PUBLISHED', layer: 'MEASUREMENT' })), transitionContentRelease: vi.fn() }))
 
 import {
   publishCognitiveConfig,

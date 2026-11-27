@@ -1,3 +1,4 @@
+import { resolveAudienceDisclosure } from '../scale/policy/disclosure'
 import type { CognitiveProfile, MetricDefinition, QualityDefinition, SingleTaskReportDefinition } from './cognitive.types'
 import type { CognitiveReference } from './reference'
 import type { FrozenReportSnapshot } from './profile-freeze'
@@ -148,6 +149,9 @@ export const buildCognitiveSingleTaskReport = (input: {
     scoringVersion: input.scoringVersion,
     profile: input.profile,
   })
+  const declaration=presentation?.declaredRelease
+  const visibility=declaration?resolveAudienceDisclosure(declaration.effectiveDisclosure,'respondent'):undefined
+  const scoresVisible=!visibility||visibility.numericScores
   const interpretable = input.qualityFlags.interpretable !== false
   const metricVisible = (key: string) => {
     if (presentation?.singleHiddenMetrics.includes(key)) return false
@@ -166,9 +170,9 @@ export const buildCognitiveSingleTaskReport = (input: {
     metricDefinitions,
     presentation,
   )
-  const showProductIndex = input.frozenReport?.protocolShowProductIndex
+  const showProductIndex = scoresVisible && (input.frozenReport?.protocolShowProductIndex
     ?? protocolPresentation?.showProductIndex
-    ?? (reportDefinition?.showProductIndex !== false)
+    ?? (reportDefinition?.showProductIndex !== false))
   const qualityFlags = Object.entries(input.qualityFlags)
     .filter(([key]) => key !== 'interpretable')
     .map(([key, value]) => ({
@@ -176,7 +180,7 @@ export const buildCognitiveSingleTaskReport = (input: {
       label: qualityDefinitions[key]?.label ?? key,
       active: value === true,
     }))
-  const hiddenReference = !interpretable || !input.reference || input.reference.mode === 'none'
+  const hiddenReference = !interpretable || visibility&&!visibility.references || !input.reference || input.reference.mode === 'none'
     ? null
     : input.reference
 
@@ -189,20 +193,20 @@ export const buildCognitiveSingleTaskReport = (input: {
     title: presentation?.title ?? reportDefinition?.title ?? input.testType,
     interpretable,
     qualityState: interpretable ? 'interpretable' : 'insufficient',
-    qualityFlags,
-    interpretationSummary: interpretable
+    qualityFlags:visibility&&!visibility.resultQualityDetails?[]:qualityFlags,
+    interpretationSummary: interpretable&&(!visibility||visibility.individualInterpretations)
       ? input.frozenReport?.participantConclusion ?? protocolPresentation?.participantConclusion ?? null
       : null,
-    headline: interpretable && headlineKey && metricVisible(headlineKey) ? metricView(headlineKey, input.metrics, metricDefinitions, presentation) : null,
+    headline: scoresVisible && interpretable && headlineKey && metricVisible(headlineKey) ? metricView(headlineKey, input.metrics, metricDefinitions, presentation) : null,
     productIndex: showProductIndex && interpretable ? { label: '任务表现指数', value: input.score } : null,
     showProductIndex,
-    primaryMetrics: interpretable ? primaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions, presentation)) : [],
-    secondaryMetrics: interpretable ? secondaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions, presentation)) : [],
+    primaryMetrics: scoresVisible && interpretable ? primaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions, presentation)) : [],
+    secondaryMetrics: scoresVisible && interpretable ? secondaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions, presentation)) : [],
     caveats: input.frozenReport?.reportCaveats
       ?? protocolPresentation?.reportCaveats
       ?? frozen.reportCaveats
       ?? [],
-    practicalTips: (presentation ? presentation.suppressTips : legacySuppressTips(input.testType)) ? [] : presentation?.practicalTips ?? reportDefinition?.practicalTips ?? [],
+    practicalTips: visibility&&!visibility.educationalContent || (presentation ? presentation.suppressTips : legacySuppressTips(input.testType)) ? [] : presentation?.practicalTips ?? reportDefinition?.practicalTips ?? [],
     method: {
       testType: input.testType,
       engineVersion: input.engineVersion,

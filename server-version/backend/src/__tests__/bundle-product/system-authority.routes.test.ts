@@ -126,10 +126,16 @@ describe('global content routes with trusted-principal authentication fixtures a
     for (const handler of [fixture.listDrafts, fixture.preview, fixture.save, fixture.getDraft, fixture.approve]) expect(handler).not.toHaveBeenCalled()
   })
   it.each(['TEACHER', 'STUDENT'])('allows SYSTEM_ADMIN with %s business identity to publish and retire Cognitive configs', async role => {
-    fixture.principal = principal({ role, businessRole: role, platformRole: 'SYSTEM_ADMIN' })
+    fixture.principal = principal({ role, businessRole: role, platformRole: 'SYSTEM_ADMIN', adminVerifiedAt: Math.floor(Date.now()/1000) })
     for (const action of ['publish', 'retire']) expect(await call('POST', `/api/cognitive/configs/synthetic-config/${action}`)).toBe(200)
     expect(fixture.publishConfig).toHaveBeenCalledOnce()
     expect(fixture.retireConfig).toHaveBeenCalledOnce()
+  })
+  it('requires administrator step-up before Cognitive publication or retirement', async () => {
+    fixture.principal = principal({ platformRole: 'SYSTEM_ADMIN' })
+    for (const action of ['publish', 'retire']) expect(await call('POST', `/api/cognitive/configs/synthetic-config/${action}`)).toBe(403)
+    expect(fixture.publishConfig).not.toHaveBeenCalled()
+    expect(fixture.retireConfig).not.toHaveBeenCalled()
   })
   it.each(denied)('denies $name before Cognitive publication or retirement', async ({ value }) => {
     fixture.principal = value

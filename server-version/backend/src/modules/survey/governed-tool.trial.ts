@@ -51,7 +51,20 @@ export function syntheticCognitiveTrials(seed:string,index=1,frozen?:FrozenSurve
   }
   return trials
  }
- return gonogoSequence(seed,120,.25).map((trialType,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*1300,endedAtPerfMs:trialIndex*1300+800,payload:{trialType,responded:trialType==='go',rtMs:trialType==='go'?240+index*80:null,interrupted:false}}))}
+ const config=frozen?.sessionSnapshot.config as Record<string,number>|undefined
+ if(frozen?.schemaVersion===2&&frozen.sessionSnapshot.testType==='reaction'&&config){
+  const foreperiod=config.foreperiodMinMs,rt=Math.max(160,Math.min(config.timeoutMs,240+index*80))
+  return Array.from({length:frozen.maxTrials},(_,trialIndex)=>createTrialEnvelope({
+   trialIndex,phase:'test',startedAtPerfMs:trialIndex*(foreperiod+rt),endedAtPerfMs:(trialIndex+1)*(foreperiod+rt),
+   payload:{foreperiodMs:foreperiod,rtMs:rt,prematureCount:0,interrupted:false,inputMode:'keyboard'},
+  }))
+ }
+ const count=config?.totalTrials??120,ratio=config?.nogoRatio??.25,stimulus=config?.stimulusMs??800,interval=config?.isiMs??500
+ const rt=Math.max(config?.validRtFloorMs??100,Math.min(stimulus,240+index*80))
+ return gonogoSequence(seed,count,ratio).map((trialType,trialIndex)=>createTrialEnvelope({
+  trialIndex,phase:'test',startedAtPerfMs:trialIndex*(stimulus+interval),endedAtPerfMs:trialIndex*(stimulus+interval)+stimulus,
+  payload:{trialType,responded:trialType==='go',rtMs:trialType==='go'?rt:null,interrupted:false},
+ }))}
 export function syntheticUnitAnswers(unit:ResearchFrozenUnit,index:number):Record<string,unknown>{
  if(unit.kind==='FORM')return syntheticFormAnswers(unit.displayDefinition as FormDraft,index)
  if(unit.kind==='COGNITIVE')return {}

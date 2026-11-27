@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { bundleReleaseSelector, verifyGitContentHistory } from './git-content-release-scope.mjs'
+import { bundleReleaseSelector, gitContentReleaseSelector, isCognitiveRuntimePath, verifyGitContentHistory } from './git-content-release-scope.mjs'
 
 const dir = 'server-version/backend/src/modules/'
 const scale = dir + 'scale/instruments/example/'
@@ -23,4 +23,22 @@ test('only appends immutable Scale and Bundle version files', () => {
     assert.throws(() => verifyGitContentHistory([entry(file, 'M', '100644', '100644')]), /immutable/)
     assert.throws(() => verifyGitContentHistory([entry(file, 'D', '100644', '000000')]), /immutable/)
   }
+})
+
+test('only the exact Cognitive Git P/R files enter the declaration lane', () => {
+  const task = dir + 'cognitive/tasks/gonogo/'
+  assert.equal(gitContentReleaseSelector(task + 'releases.json'), 'cognitive:gonogo')
+  assert.equal(gitContentReleaseSelector(task + 'reports/2026-11.json'), 'cognitive:gonogo')
+  assert.equal(isCognitiveRuntimePath(task + 'reports/2026-11.json'), false)
+  assert.equal(gitContentReleaseSelector(task + 'reports/review.ts'), null)
+  assert.equal(isCognitiveRuntimePath(task + 'reports/review.ts'), true)
+  assert.equal(isCognitiveRuntimePath(task + 'fixtures/real.json'), true)
+  assert.throws(() => verifyGitContentHistory([entry(task + 'reports/2026-11.json', 'M', '100644', '100644')]), /immutable/)
+})
+
+test('published manifest identities stay present when a deployment is withdrawn', () => {
+  const change = entry(bundle + 'releases.json', 'M', '100644', '100644')
+  const readBaseFile = () => '{"releases":[{"version":"1.0.0","status":"ONLINE"}]}'
+  verifyGitContentHistory([change], { readBaseFile, readHeadFile: () => '{"releases":[{"version":"1.0.0","status":"HOLD"}]}' })
+  assert.throws(() => verifyGitContentHistory([change], { readBaseFile, readHeadFile: () => '{"releases":[]}' }), /Keep existing/)
 })

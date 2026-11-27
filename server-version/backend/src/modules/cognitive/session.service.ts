@@ -1,3 +1,4 @@
+import { resolveAudienceDisclosure } from '../scale/policy/disclosure'
 import { isLoadedCompositeParticipantFeedbackDeferred } from '../assessment-policy/participant-feedback'
 import { trainingFeedbackAttemptSelect, trainingFeedbackParentSelect } from '../composite/training-feedback-binding'
 import { trainingPersistenceMetadata } from '../composite/training-persistence.policy'
@@ -15,7 +16,7 @@ import {
   getParticipantKey,
 } from './cognitive.security'
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
-import { hashResolvedConfig, readFrozenReport, type FrozenReportSnapshot } from './profile-freeze'
+import { cognitiveRunnerConfig, hashResolvedConfig, readFrozenReport, type FrozenReportSnapshot } from './profile-freeze'
 import { lockSession } from './session-lock'
 import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota } from './attempt-quota'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
@@ -28,7 +29,7 @@ import {
   sessionConfigFromStoredValue,
 } from './v2/session-snapshot'
 import { cognitivePresentationAssetReferences } from './v2/presentation'
-import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from './v2/result-snapshot'
+import { cognitiveParticipantResult, parseCognitiveResultSnapshot } from './v2/result-snapshot'
 import { compileCognitiveRuntime } from '../assessment-runtime/compiler'
 import { isRelationalCohortOnlyCompositeAttempt } from '../assessment-relational/result-authority'
 import { freezeExactReferenceBindings, type ExactReferenceDb } from '../assessment-runtime/reference-binding'
@@ -197,13 +198,34 @@ export const loadCognitiveSessionConfig = loadSharedCognitiveRuntime
 
 const v2ResultFromSnapshot = (encrypted: string) => {
   const snapshot = parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(encrypted))
+  return cognitiveParticipantResult(snapshot)
+}
+
+function legacyParticipantResult(
+  frozenReport: FrozenReportSnapshot | null,
+  result: {
+    score: number
+    metrics: Record<string, unknown>
+    qualityFlags: Record<string, unknown>
+    reference: ReturnType<typeof resolveCognitiveReferenceForResult> | undefined
+    singleTaskReport: ReturnType<typeof buildCognitiveSingleTaskReport>
+  },
+) {
+  const declaration=frozenReport?.participantPresentation?.declaredRelease
+  if (!declaration) return result
+  const visibility=resolveAudienceDisclosure(declaration.effectiveDisclosure,'respondent')
+  const view=result.singleTaskReport
+  const visibleKeys=new Set(view
+    ? [...view.primaryMetrics,...view.secondaryMetrics,...(view.headline?[view.headline]:[])].map(metric=>metric.key)
+    : [])
   return {
-    metrics: snapshot.metrics,
-    quality: snapshot.quality,
-    qualityFlags: snapshot.quality.flags,
-    references: referencesForCognitiveResult(snapshot),
-    report: snapshot.report,
-    assessmentContext: snapshot.assessmentContext,
+    ...result,
+    score: visibility.numericScores ? result.score : null,
+    metrics: visibility.numericScores
+      ? Object.fromEntries(Object.entries(result.metrics).filter(([key])=>visibleKeys.has(key)))
+      : {},
+    qualityFlags: visibility.resultQualityDetails ? result.qualityFlags : {},
+    reference: visibility.references&&visibility.scoreDerivedLabels ? result.reference : undefined,
   }
 }
 
@@ -354,7 +376,7 @@ const buildRunnerPayload = async (session: {
     configVersion: session.configVersion,
     engineVersion: session.engineVersion,
     scoringVersion: session.scoringVersion,
-    config: validatedConfig,
+    config: cognitiveRunnerConfig(validatedConfig),
     ...(snapshot ? { protocol: snapshot.protocol, protocolSignature: snapshot.protocolSignature } : {}),
     ...(snapshot?.presentation ? { presentation: snapshot.presentation } : {}),
     randomSeed: session.randomSeed,
@@ -547,7 +569,7 @@ export const getSession = async (userId: string, sessionId: string) => {
       status: session.status,
       finishedAt: session.finishedAt,
       result: score !== null && metrics !== null && qualityFlags !== null
-        ? { score, metrics, qualityFlags, reference, singleTaskReport }
+        ? legacyParticipantResult(frozenReport, { score, metrics, qualityFlags, reference, singleTaskReport })
         : null,
     }
   }
@@ -640,7 +662,7 @@ export const getPublicSession = async (recoveryTokenHash: string, sessionId: str
     ...runnerPayload,
     finishedAt: session.finishedAt,
     result: score !== null && metrics !== null && qualityFlags !== null
-      ? { score, metrics, qualityFlags, reference, singleTaskReport }
+      ? legacyParticipantResult(frozenReport, { score, metrics, qualityFlags, reference, singleTaskReport })
       : null,
   }
 }

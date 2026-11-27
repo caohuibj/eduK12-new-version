@@ -2,6 +2,7 @@ import { canonicalHash, canonicalJsonString } from '../assessment-runtime/canoni
 import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
 import { evaluateCognitiveProductReadiness } from '../cognitive/library/product-readiness'
 import { resolveCognitiveFinalMaxTrials } from '../cognitive/v2/final-submission-budget'
+import { reportMetaSchema } from '../cognitive/schemas/report-meta'
 import { ContentReleaseError, type ReleaseInput } from './release'
 
 export interface CognitiveReleaseSource {
@@ -42,4 +43,22 @@ export function cognitiveMeasurementRelease(input:CognitiveReleaseSource):Releas
       measurementHashScheme:'COGNITIVE_MEASUREMENT_PROJECTION_V1',scoringVersion:d.scoringVersion,
       runnerKey:d.testType,runnerVersion:d.engineVersion,locale:'und',localizationVersion:'unversioned',
       metrics:Object.values(d.metrics).map(m=>({metricKey:m.key,unit:m.unit,direction:m.direction})),executable}}
+}
+
+
+/** A Cognitive runtime must freeze its effective execution config. Multiple
+ * report-only releases may point at an identical published execution config. */
+export function publishedCognitiveConfigMeasurement(input: {
+  testType:string;configVersion:string;engineVersion:string;scoringVersion:string;config:unknown
+}):ReleaseInput {
+  const metadata=reportMetaSchema.safeParse((input.config as {report?:unknown}|null)?.report)
+  const declared=metadata.success&&metadata.data.declaredRelease!==undefined
+  const measurement=cognitiveMeasurementRelease({
+    ...input,localId:input.testType,version:input.configVersion,
+    configVersion:declared?input.engineVersion:input.configVersion,scope:{kind:'PLATFORM'},
+  })
+  if(declared&&measurement.layer==='MEASUREMENT') {
+    return {...measurement,version:'git-execution-v1:'+measurement.content.measurementHash}
+  }
+  return measurement
 }

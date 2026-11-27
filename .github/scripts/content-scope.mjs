@@ -1,4 +1,4 @@
-import {bundleReleaseSelector,verifyGitContentHistory} from './git-content-release-scope.mjs';
+import {gitContentReleaseSelector,isCognitiveRuntimePath,verifyGitContentHistory} from './git-content-release-scope.mjs';
 import {unitOnly} from './ci-qualification.mjs';
 import {studentDiscoveryScope} from './student-discovery-scope.mjs';
 import {readEdgeScope,edgeConfigOutputs} from './edge-config-scope.mjs';
@@ -26,7 +26,9 @@ const frontendSrc = 'server-version/frontend/src/';
 export function domainFor(file) {
   if (typeof file !== 'string' || file.split('/').some(part => !part || part === '..' || part === '.')
       || /[\\\x00-\x1f\x7f]/.test(file)) return null;
-  if (bundleReleaseSelector(file) || new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/(manifest|evidence-map|rules|report|profile|scientific|publication|context)\\.json$`).test(file)
+  const selector = gitContentReleaseSelector(file);
+  if (selector) return selector.split(':')[0];
+  if (new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/(manifest|evidence-map|rules|report|profile|scientific|publication|context)\\.json$`).test(file)
       || new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/fixtures/(valid|missing|invalid|not-applicable)\\.json$`).test(file)
       || new RegExp(`^${modules}assessment-bundle/ci-fixtures/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+\\.json$`).test(file)
       || file === `${modules}assessment-bundle/generated/packages.json`) return 'bundle';
@@ -331,13 +333,16 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE !== 'true')
     throw new Error('Choose a step_probe for component CI, or explicitly set full_acceptance=true for whole-platform CI');
   const entries = event === 'workflow_dispatch' ? [] : changedEntries(base);
-  verifyGitContentHistory(entries);
+  verifyGitContentHistory(entries, {
+    readBaseFile:file=>gitContent(base,file),
+    readHeadFile:file=>gitContent(head,file),
+  });
   const files = entries.map(entry => entry.file);
   const result = event === 'workflow_dispatch'
     ? { maintenance:false, content:false, presentation:false, frontend:false, documentation:false, domains:[] }
     : classifyChanges(entries, full, {readHeadFile:file=>gitContent('HEAD',file),readBaseFile:file=>gitContent(base,file)});
   const mixedContent=result.content && result.domains.length>1;
-  const cognitiveCandidate=entries.some(e=>/^server-version\/(?:backend\/src\/modules\/cognitive\/(?:tasks|generated|content-candidates)\/|frontend\/src\/modules\/cognitive\/(?:(?:tasks|generated)\/|native-runners\.tsx$))/.test(e.file));
+  const cognitiveCandidate=files.some(isCognitiveRuntimePath);
   const cognitiveMixed = cognitiveCandidate && !mixedContent && !result.cognitive_intake_light && cognitiveMixedProductScope(entries, file=>gitContent('HEAD',file),file=>gitContent(base,file));
   if (cognitiveMixed) Object.assign(result, {maintenance:false,content:false,presentation:false,documentation:false,frontend:false,frontend_test:false,backend_modules:false,domains:[...new Set([...result.domains,'cognitive'])]});
   if(cognitiveCandidate && !mixedContent && !result.cognitive_intake_light && !cognitiveMixed && !full && event!=='workflow_dispatch') {
@@ -367,8 +372,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     : result.presentation ? 'presentation' : frontendTest ? 'frontend-test' : frontend ? 'frontend' : 'platform';
   // Local pages are covered by related tests and one frontend build. The broad
   // student/** visual inventory does not require every platform browser fixture.
+  const releaseOnly=files.length>0&&files.every(file=>gitContentReleaseSelector(file));
   const selectedAcceptance = acceptanceFor(files);
-  const acceptance = catalogDiscovery || result.presentation || result.cognitive_intake_light || affectedFrontend || backendModules || copy || frontendTest || backendUnit || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
+  const acceptance = releaseOnly || catalogDiscovery || result.presentation || result.cognitive_intake_light || affectedFrontend || backendModules || copy || frontendTest || backendUnit || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
     for (const key of Object.keys(acceptance)) acceptance[key] = true;
   const plan = runnerPlan({ profile:process.env.CI_RUNNER_PROFILE || 'hosted', scenario });
@@ -386,7 +392,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     cognitive_intake_light:result.cognitive_intake_light === true,cognitive_intake_plan:JSON.stringify(result.cognitive_intake_plan || null),
     scale_intake_light: result.scale_intake_light === true,
     scale_release_mixed: result.scale_intake_light !== true && entries.some(entry=>isScaleReleaseAsset(entry.file)),
-    scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'),
+    scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive') && (result.cognitive_intake_light || cognitiveMixed || files.some(file=>domainFor(file)==='cognitive' && isCognitiveRuntimePath(file))),
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
       [key, Array.isArray(value) ? JSON.stringify(value) : value])) };

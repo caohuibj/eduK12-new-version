@@ -3,6 +3,7 @@ import {governedMediaBlocker} from './governed-tool.media'
 import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {reportTemplateSchema,validateReportTemplateBindings,type ReportTemplate} from '../measurement-content/report-template'
+import type {AudienceDisclosurePolicyV1} from '../scale/policy/types'
 import {prepareRelease,type ReleaseInput} from '../measurement-content/release'
 import {scaleMeasurementRelease} from '../measurement-content/scale'
 import {sjtMeasurementRelease} from '../measurement-content/sjt'
@@ -27,7 +28,7 @@ export const packageReportSchema=z.object({version:z.string().trim().min(1).max(
 export type PackageReport=z.infer<typeof packageReportSchema>
 export type GovernedParameter=Extract<StoredRelease,{layer:'REFERENCE'}>&{sourceMeasurementHash:string}
 export type GovernedArtifact={nativeBundle?:SurveyNativeBundle;schemaVersion:1;family:GovernedFamily;toolKey:string;version:string;title:string;
- unit:CatalogSourceSnapshot|null;parameters:GovernedParameter|null;report:{version:string;template:ReportTemplate;audience?:'student'|'researcher'}|null;
+ unit:CatalogSourceSnapshot|null;parameters:GovernedParameter|null;report:{version:string;template:ReportTemplate;audience?:'student'|'researcher';effectiveDisclosure?:AudienceDisclosurePolicyV1;assetRefs?:ReleaseInput['assetRefs']}|null;
  components:Array<{slotKey:string;title:string;source:{type:'STANDARD'|'GOVERNED';id:string;hash:string};unit:CatalogSourceSnapshot}>;
  packageReport:PackageReport|null;reference:ToolReference}
 export type GovernedRow={id:string;family:GovernedFamily;tool_key:string;tool_version:string;title:string;snapshot:GovernedArtifact;snapshot_hash:string;reference:ToolReference;
@@ -93,9 +94,11 @@ export function artifactBlockers(a:GovernedArtifact):string[]{
      for(const e of a.parameters.content.entries)if(!metrics.includes(e.metricKey))blockers.push('参数引用未知指标：'+e.metricKey)
      for(const item of a.parameters.content.entries){const e=item.definition as unknown as import('../assessment-reference/reference').AssessmentReferenceEntry;if(e.instrumentVersion!==prepared.content.instrumentVersion||e.scoringVersion!==prepared.content.scoringVersion)blockers.push('参数引用的内容或计分版本不匹配');if(e.governance&&e.governance.measurementHash!==a.parameters.sourceMeasurementHash)blockers.push('参数的测量指纹绑定不一致')}
      const original=a.parameters.sourceMeasurementHash
-     if(original!==prepared.content.measurementHash)blockers.push('参数绑定的测量内容版本不匹配')
+     const compiledSource=a.unit.ref.kind==='COGNITIVE'?parseFrozenSurveyCognitive(a.unit.compiledDefinition):null
+     const validMeasurement=compiledSource?.schemaVersion===2?compiledSource.sourceMeasurement.content.measurementHash:prepared.content.measurementHash
+     if(original!==validMeasurement)blockers.push('参数绑定的测量内容版本不匹配')
     }
-    if(a.report){validateReportTemplateBindings(reportTemplateSchema.parse(a.report.template),metrics,[]);for(const b of a.report.template.blocks)if(b.type==='REFERENCE_BAND'&&!a.parameters?.content.entries.some(e=>e.metricKey===b.metricKey&&e.referenceKind===b.referenceKind&&(e.definition as unknown as import('../assessment-reference/reference').AssessmentReferenceEntry).statistics.thresholds?.some(t=>t.key===b.bandKey)))blockers.push('报告区间未对应已配置的参数阈值：'+b.metricKey)}
+    if(a.report){validateReportTemplateBindings(reportTemplateSchema.parse(a.report.template),metrics,a.report.assetRefs?.map(asset=>asset.assetId)??[]);for(const b of a.report.template.blocks)if(b.type==='REFERENCE_BAND'&&!a.parameters?.content.entries.some(e=>e.metricKey===b.metricKey&&e.referenceKind===b.referenceKind&&(e.definition as unknown as import('../assessment-reference/reference').AssessmentReferenceEntry).statistics.thresholds?.some(t=>t.key===b.bandKey)))blockers.push('报告区间未对应已配置的参数阈值：'+b.metricKey)}
    }
   }
  }catch(e){blockers.push(e instanceof Error?e.message:'内容版本或运行格式不完整')}

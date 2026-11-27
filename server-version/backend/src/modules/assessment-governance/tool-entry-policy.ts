@@ -130,9 +130,9 @@ export async function readApprovedToolEntryProducts(tx:Prisma.TransactionClient,
   WHERE resource_key=${identity.resourceKey} AND fingerprint=${identity.fingerprint} ORDER BY product`
  return {approvedProducts:rows.filter(row=>row.decision==='APPROVED'&&!row.paused).map(row=>row.product),hasPriorPolicy:rows.length>0}
 }
-export async function approveToolEntryPolicies(tx:Prisma.TransactionClient,identity:PolicyIdentity,rawProducts:unknown,actorId:string,reason:string){
+export async function approveToolEntryPolicies(tx:Prisma.TransactionClient,identity:PolicyIdentity,rawProducts:unknown,actorId:string,reason:string,options:{preservePause?:boolean}={}){
  const products=exactToolEntryProducts(rawProducts)
- return writeEntryPolicies(tx,identity,products,actorId,reason)
+ return writeEntryPolicies(tx,identity,products,actorId,reason,options.preservePause??false)
 }
 export async function approveStandardCombinationEntryPolicies(tx:Prisma.TransactionClient,identity:PolicyIdentity,rawProducts:unknown,actorId:string,reason:string,options:{preservePause?:boolean}={}){
  if(!/^standard-release:[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(identity.resourceKey)
@@ -141,10 +141,10 @@ export async function approveStandardCombinationEntryPolicies(tx:Prisma.Transact
 }
 /** The system profile publisher supplies the server-resolved artifact hash.
  * Approval never grants a recipient use or asserts an entry adapter is ready. */
-export async function approveCognitiveProfileEntryPolicies(tx:Prisma.TransactionClient,identity:PolicyIdentity,rawProducts:unknown,actorId:string,reason:string){
+export async function approveCognitiveProfileEntryPolicies(tx:Prisma.TransactionClient,identity:PolicyIdentity,rawProducts:unknown,actorId:string,reason:string,options:{preservePause?:boolean}={}){
  if(!/^cognitive-profile:[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}:(experience|standard|research)$/i.test(identity.resourceKey)
   ||!/^[a-f0-9]{64}$/.test(identity.fingerprint))throw new AdminPermissionError(400,'认知入口批准必须指向精确配置和 profile')
- return writeEntryPolicies(tx,identity,exactStandardCombinationEntryProducts(rawProducts),actorId,reason)
+ return writeEntryPolicies(tx,identity,exactStandardCombinationEntryProducts(rawProducts),actorId,reason,options.preservePause??false)
 }
 async function writeEntryPolicies<T extends StandardCombinationEntryProduct>(tx:Prisma.TransactionClient,identity:PolicyIdentity,products:T[],actorId:string,reason:string,preservePause=false){
  await lockToolPolicyMutation(tx,[identity])
