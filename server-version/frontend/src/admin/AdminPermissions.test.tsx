@@ -7,9 +7,10 @@ vi.mock('../api/client',()=>({default:client}))
 vi.mock('../contexts/AuthContext',()=>({useAuth:()=>({user:{id:'system',username:'system_admin',platformRole:'SYSTEM_ADMIN'}})}))
 vi.mock('./AdminStepUp',()=>({default:()=> <p>独立身份验证</p>}))
 const renderPermissions=(path='/admin/permissions')=>render(<MemoryRouter initialEntries={[path]}><AdminPermissions/></MemoryRouter>)
+const accounts={data:{accounts:[{id:'survey',username:'survey_manager',platformRole:'STANDARD',entries:[{entry:'SURVEY',active:true,version:7}]}]}}
 beforeEach(()=>{
  vi.clearAllMocks();sessionStorage.clear();vi.spyOn(window,'confirm').mockReturnValue(false)
- client.get.mockResolvedValue({data:{accounts:[{id:'survey',username:'survey_manager',platformRole:'STANDARD',entries:[{entry:'SURVEY',active:true,version:7}]}]}})
+ client.get.mockResolvedValue(accounts)
  client.put.mockResolvedValue({})
 })
 it('opens the governed tool’s exact catalog and license records without selecting or issuing a tool',async()=>{
@@ -32,22 +33,27 @@ it('opens the governed tool’s exact catalog and license records without select
  await waitFor(()=>expect(client.get).toHaveBeenCalledWith('/admin/permissions/tool-licenses?product=SURVEY&page=1'))
  expect(client.put).not.toHaveBeenCalled()
 })
-it('requires a reason and explicit confirmation before sending the original versioned grant change',async()=>{
+it('requires an impact review and a reason before sending the planned versioned grant change',async()=>{
+ const path='/admin/permissions/accounts/survey/entries/SURVEY'
+ const digest='a'.repeat(64)
+ client.get.mockImplementation(async (url:string)=>url===path+'/offboarding'
+  ? {data:{version:7,digest,counts:{collecting:0,drafts:0,configurations:0,pending:0},items:[],successors:[]}}
+  : accounts)
  renderPermissions()
  const name=await screen.findByText('survey_manager',{selector:'strong'})
  expect(screen.getByRole('button',{name:'撤销 survey_manager SURVEY'})).not.toBeVisible()
  fireEvent.click(name.closest('summary')!)
  fireEvent.click(screen.getByRole('button',{name:'撤销 survey_manager SURVEY'}))
- expect(screen.getByRole('alert')).toHaveTextContent('请填写授权变更原因')
- expect(screen.getByLabelText('本次变更原因')).toBeVisible();expect(client.put).not.toHaveBeenCalled()
- fireEvent.change(screen.getByLabelText('本次变更原因'),{target:{value:'精确资格复核'}})
- fireEvent.click(screen.getByRole('button',{name:'撤销 survey_manager SURVEY'}))
- expect(window.confirm).toHaveBeenCalled();expect(client.put).not.toHaveBeenCalled()
- vi.mocked(window.confirm).mockReturnValue(true)
- fireEvent.click(screen.getByRole('button',{name:'撤销 survey_manager SURVEY'}))
- await waitFor(()=>expect(client.put).toHaveBeenCalledWith('/admin/permissions/accounts/survey/entries/SURVEY',{active:false,expectedVersion:7,reason:'精确资格复核'}))
+ expect(await screen.findByText(/待处理 0 项/)).toBeVisible()
+ const confirm=screen.getByRole('button',{name:'确认交接并撤权'})
+ expect(confirm).toBeDisabled()
+ expect(client.get).toHaveBeenCalledWith(path+'/offboarding')
+ expect(client.put).not.toHaveBeenCalled()
+ fireEvent.change(screen.getByLabelText('撤权原因'),{target:{value:'精确资格复核'}})
+ fireEvent.click(confirm)
+ await waitFor(()=>expect(client.put).toHaveBeenCalledWith(path,{active:false,expectedVersion:7,reason:'精确资格复核',offboarding:{mode:'PLANNED',digest}}))
  expect(client.put).toHaveBeenCalledTimes(1)
- await screen.findByText('授权已更新，目标账号的旧会话已失效。')
+ await screen.findByText('入口权限已撤销，原会话已失效。')
 })
 it('retains a content draft when switching local views and never issues it implicitly',async()=>{
  renderPermissions();await screen.findByText('survey_manager',{selector:'strong'})
