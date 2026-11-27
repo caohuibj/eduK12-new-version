@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "wihic_equity_actual_en_lower_secondary_student/1.0.0/1.1.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "A teacher leaves time to think and invites students around the room to share their ideas in several ways.",
+    "width": 1440,
+    "height": 810
+  },
+  "bands": []
+}

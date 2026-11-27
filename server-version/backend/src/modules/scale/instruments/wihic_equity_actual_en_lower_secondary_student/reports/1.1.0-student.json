@@ -1,0 +1,96 @@
+{
+  "toolKey": "wihic_equity_actual_en_lower_secondary_student",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.1.0-student",
+  "title": "WIHIC | Notice who gets a chance to be heard",
+  "report": {
+    "reportVersion": "1.1.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "en",
+      "qcReview": {
+        "reviewer": "Codex source and editorial review",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "Eight English items 49–56 and the five frequency choices match Fraser (2023), Appendix A Table A1. The appendix’s top answer is Almost Always. Source © Fraser 2023, CC BY 4.0. The project retains C and the eight-item complete-response mean (1–5), without thresholds. This version adds original feedback only, for the student who answered."
+      }
+    },
+    "primaryScoreKeys": [
+      "equity"
+    ],
+    "scoreOrder": [
+      "equity"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "equity",
+        "scoreLabel": "Fair chances in class (1–5 average)",
+        "headline": "Notice who gets a chance to be heard",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "An answer is called out before several students have had time to think. Later, the teacher gives everyone a minute to write and then asks for ideas from different parts of the room. More students have a chance to be heard. A small change can help people take part in a fairer way.\n\nYour answers describe whether you felt you had chances to ask, answer, get help and receive encouragement that were like the chances available to others. That is your view of what happened in one class. A repeated pattern is worth talking about. You can ask for support without needing to sort it out by yourself.",
+        "provisional": true,
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "If a moment felt fair or unfair, note what happened and what change might have helped. Focus on the chance you had, such as time to answer or a way to ask for help."
+          },
+          {
+            "category": "support",
+            "text": "If the pattern keeps happening or you feel shut out, choose an adult you trust at school. You can share one example in private or write it down. Adults are responsible for making the classroom fair."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "© Barry J. Fraser, 2023. Adapted from What Is Happening In this Class? (WIHIC), Appendix A, Table A1, in The Evolution of the Field of Learning Environments Research, Education Sciences, 13(3), 257. https://doi.org/10.3390/educsci13030257 (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). The project presents one part separately, with its own instruction, scoring of complete answers, and student feedback.",
+      "The result is the mean of eight answers about one class. The five original answer choices run from Almost Never (1) to Almost Always (5). If an answer is missing, this part has no score.",
+      "Using this separate eight-question form with English-reading students ages 12–15 in grades 7–9 is this project’s scope. This item set has no separate validation or group benchmark. Each part of WIHIC stands alone in the report."
+    ],
+    "disclaimer": "This report describes your experience in one class. It is for reflection and does not grade you, your classmates, or your teacher.",
+    "artworkKey": "wihic_equity_actual_en_lower_secondary_student/1.0.0/1.1.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.1.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": true,
+        "educationalContent": false,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
