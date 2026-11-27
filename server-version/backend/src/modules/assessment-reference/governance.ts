@@ -1,5 +1,9 @@
 import type { AssessmentReferenceEntry } from './reference'
 
+export function governanceBandFor<T extends {lower:number;upper:number}>(bands:readonly T[],value:number){
+  return bands.find((band,index)=>(index===0?value>=band.lower:value>band.lower)&&value<=band.upper)
+}
+
 export interface ReferenceGovernanceV1 {
   schemaVersion: 1
   kind: 'THEORETICAL_RANGE' | 'LOCAL_PILOT' | 'LOCAL_REFERENCE' | 'MULTISITE_REFERENCE' | 'VALIDATED_NORM' | 'CRITERION'

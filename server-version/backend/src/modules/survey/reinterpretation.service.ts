@@ -133,7 +133,7 @@ export async function createSurveyReinterpretation(actorId:string,raw:unknown){
       scores.filter(score=>template!.content.metricKeys.includes(score.measurement.scoreKey)).map(score=>({metricKey:score.measurement.scoreKey,value:score.value,
         unit:measurement.content.metrics.find(metric=>metric.metricKey===score.measurement.scoreKey)!.unit,
         status:score.quality?.status==='interpretable'&&facts.metrics.find(metric=>metric.key===score.measurement.scoreKey)?.status==='OK'?'INTERPRETABLE':score.quality?.status==='invalid'?'INVALID':'UNAVAILABLE'})),
-      personal.references.map(reference=>({metricKey:reference.metricKey,referenceKind:reference.referenceKind,status:reference.status==='AVAILABLE'?'AVAILABLE':'UNAVAILABLE',bandKey:reference.values?.bandKey??null}))):null
+      personal.references.map(reference=>({metricKey:reference.metricKey,referenceKind:reference.referenceKind,status:reference.status==='AVAILABLE'?'AVAILABLE':'UNAVAILABLE',bandKey:reference.values?.bandKey??null,reason:reference.reason}))):null
     const artifact:Artifact={schemaVersion:1,sourceFinalHash:saved!.sourceFinalHash,sourceBindingHash:canonicalHash(saved!.binding),binding,referencePolicy:policy,interpretation,report,generatorVersion:DECLARATIVE_REPORT_GENERATOR}
     const cipher=encryptUnifiedRuntimePayload(artifact),artifactHash=canonicalHash(artifact)
     if(Buffer.byteLength(cipher)>2*1024*1024)throw new SurveyAnalyticsError(413,'单份解释工件超出大小限制')

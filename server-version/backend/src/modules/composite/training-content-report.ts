@@ -120,8 +120,8 @@ export async function readTrainingContentReports(db:Prisma.TransactionClient,inp
    rendered:renderDeclaredReport(report.content.template,metrics,interpreted.references.filter(reference=>disclosure.referenceMetricKeys.has(reference.metricKey)).map(reference=>{
     const selected=referenceBinding?.units.find(u=>u.itemId===bound.itemId)?.references.find(r=>r.metricKey===reference.metricKey&&r.referenceKind===reference.referenceKind)
     const revoked=selected?.status==='SELECTED'&&referenceReleases.some(r=>r.releaseId===selected.releaseId&&r.status==='REVOKED')
-    return {metricKey:reference.metricKey,referenceKind:reference.referenceKind,status:reference.status==='AVAILABLE'&&!revoked?'AVAILABLE':'UNAVAILABLE',bandKey:reference.values?.bandKey??null}
-   }))})
+    return {metricKey:reference.metricKey,referenceKind:reference.referenceKind,status:reference.status==='AVAILABLE'&&!revoked?'AVAILABLE':'UNAVAILABLE',bandKey:reference.values?.bandKey??null,reason:selected?.status==='UNAVAILABLE'?selected.reason:undefined}
+   }),disclosure.capabilities)})
  }
  return receipt.interpretation.units.map(u=>renderedByItem.get(u.instrumentKey)??{itemId:u.instrumentKey,status:u.report.status,
   reportRelease:byItem.get(u.instrumentKey)?.report??null,lifecycleNotices:[],rendered:null})

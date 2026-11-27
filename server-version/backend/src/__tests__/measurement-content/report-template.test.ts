@@ -12,6 +12,17 @@ describe('report content is not a second numeric authority',()=>{
     }
     expect(()=>reportTemplateSchema.parse({blocks:[{type:'TEXT',text:'说明',minInclusive:10}]})).toThrow()
   })
+  it('does not admit compiled score ranges through ordinary report authoring',()=>{
+    expect(reportTemplateSchema.safeParse({title:'private',standardScoreBands:{metricKey:'score',ranges:[]}}).success).toBe(false)
+    expect(reportTemplateSchema.safeParse({blocks:[{type:'SCORE_FEEDBACK',metricKey:'score',bandKey:'high',text:'text'}]}).success).toBe(false)
+  })
+  it('only accepts bundled artwork keys and leaves older report templates unchanged',()=>{
+    expect(reportTemplateSchema.parse({title:'报告'})).not.toHaveProperty('illustrationKey')
+    for(const illustrationKey of ['chinese-self-concept-door-v1','chinese-self-concept-door-with-actions-v2']){
+      expect(reportTemplateSchema.parse({title:'报告',illustrationKey})).toHaveProperty('illustrationKey',illustrationKey)
+    }
+    expect(reportTemplateSchema.safeParse({title:'报告',illustrationKey:'https://example.org/other.png'}).success).toBe(false)
+  })
   it('qualifies identical band names by reference kind, never an arbitrary norm version',()=>{
     const base={type:'REFERENCE_BAND',metricKey:'total',bandKey:'high',text:'Interpretation'}
     expect(()=>reportTemplateSchema.parse({blocks:[base]})).toThrow()

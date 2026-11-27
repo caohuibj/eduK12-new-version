@@ -23,7 +23,7 @@ import {SurveyTimedScale} from './SurveyTimedScale'
 import {SurveyScaleTimingTracker,sealSurveyScaleTimings,
   type SurveyWaveScaleTimings} from './survey-scale-timing'
 import {SurveyParticipantImage} from './SurveyParticipantImage'
-import {SurveyDeclaredReportView,isSurveyDeclaredReport,type SurveyDeclaredReport} from './SurveyDeclaredReportView'
+import {SurveyDeclaredReportView,isSurveyDeclaredReport,SURVEY_TRIAL_SCORE_SUFFIX,type SurveyDeclaredReport} from './SurveyDeclaredReportView'
 import { resolveClientSurveyFlow,type PublicFlow } from './flow.client'
 import { resolveSurveyCheckpointDraft,sameSurveyCheckpointAnswers } from './checkpoint-recovery'
 import { readRecruitmentEntry, rememberRecruitmentEntry, clearRecruitmentEntry, isRecruitmentEntryToken } from './recruitment-entry'
@@ -51,6 +51,23 @@ type ParticipantFeedbackBase={instrumentKey:string;title:string;quality:string;r
 type ParticipantFeedback=ParticipantFeedbackBase&(
   {feedbackKind:'RAW_METRICS';measurementReleaseId:string;metrics:{key:string;label:string;value:number|null;unit:null;status:string}[]}
   |{feedbackKind?:undefined;measurementDigest:string;maturity:'PILOT';metrics:{key:string;label:string;value:number|null;unit:'ratio'|'ms';status:string}[]})
+function visibleFeedbackMetrics(measurement: ParticipantFeedback) {
+  if (measurement.feedbackKind !== 'RAW_METRICS' || !measurement.declaredReport) return measurement.metrics
+  const byKey = new Map(measurement.metrics.map(metric => [metric.key, metric]))
+  const reported = new Set<typeof measurement.metrics[number]>()
+  for (const candidate of measurement.declaredReport.blocks) {
+    if (!candidate || typeof candidate !== 'object') continue
+    const block = candidate as Record<string, unknown>
+    if (block.type !== 'METRIC' || block.display !== 'RAW' || block.status !== 'INTERPRETABLE'
+      || typeof block.metricKey !== 'string' || typeof block.label !== 'string'
+      || !block.label.trimEnd().endsWith(SURVEY_TRIAL_SCORE_SUFFIX)) continue
+    const metric = byKey.get(block.metricKey)
+    if (metric?.status === 'OK' && Number.isFinite(metric.value) && metric.value === block.value) {
+      reported.add(metric)
+    }
+  }
+  return measurement.metrics.filter(metric => !reported.has(metric))
+}
 type NativeFeedback={importId:string;title:string;status:string;factsHash:string|null;profileView:BundleProfileView|null;derivedView?:DerivedBundleView|null}
 type General={nativeBundles?:NativeFeedback[];kind:'GENERAL_ONLY'|'DESCRIPTIVE';text:string;disclaimer:string;completedAt:string;pending?:boolean;measurements?:ParticipantFeedback[]}
 type FinalResponse={status:string;attemptId?:string;receiptId?:string;completedAt?:string;
@@ -1331,7 +1348,7 @@ export default function SurveyPublicApp(){
             {general.measurements?.map(measurement=><article key={measurement.instrumentKey} className="space-y-2">
               <h4 className="font-medium">{measurement.title}</h4>
               <p className="text-xs">{measurement.feedbackKind==='RAW_METRICS'?feedbackQualityText(measurement.quality):'试点测量 · 质量状态：'+measurement.quality}。仅反映本次条件下的表现。</p>
-              {measurement.metrics.map(metric=><p key={metric.key}>{metric.label}：{metric.value===null?'不可计算':measurement.feedbackKind==='RAW_METRICS'?String(metric.value):metric.unit==='ratio'?(metric.value*100).toFixed(1)+'%':metric.unit==='ms'?metric.value+' ms':String(metric.value)}（{measurement.feedbackKind==='RAW_METRICS'?feedbackMetricStatusText(metric.status):metric.status}）</p>)}
+              {visibleFeedbackMetrics(measurement).map(metric=><p key={metric.key}>{metric.label}：{metric.value===null?'不可计算':measurement.feedbackKind==='RAW_METRICS'?String(metric.value):metric.unit==='ratio'?(metric.value*100).toFixed(1)+'%':metric.unit==='ms'?metric.value+' ms':String(metric.value)}（{measurement.feedbackKind==='RAW_METRICS'?feedbackMetricStatusText(metric.status):metric.status}）</p>)}
               {measurement.feedbackKind==='RAW_METRICS'&&measurement.rawScoreFeedback?.map((feedback,index)=><section className="border-l-2 border-slate-300 pl-3 space-y-2" key={feedback.scoreKey+':'+index} aria-label="原始分描述性反馈">
                 <p className="whitespace-pre-wrap text-sm">{feedback.text}</p>
                 {completion&&feedback.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item} purpose="report" proof={{publicId,attemptId:completion.attemptId,...completion.proof}}/>)}

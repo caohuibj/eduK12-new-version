@@ -49,8 +49,14 @@ describe('ordinary native disclosure ceiling on declared R',()=>{
  it('keeps permitted numeric blocks and strips forbidden interpretations without changing saved facts',async()=>{
   const f=await educationReportFixture(),unit=f.origin.units[0],before=JSON.stringify(f.receipt)
   const {DISCLOSURE_PRESETS}=await import('../../modules/scale/policy/disclosure')
+  const release=[...f.releases.values()].find(candidate=>candidate.layer==='REPORT')
+  if(release?.layer!=='REPORT')throw new Error('Expected REPORT fixture')
+  release.content.template.illustrationKey='chinese-self-concept-door-v1'
+  const full=projectEducationDeclaredUnitReports({...f,units:f.origin.units,disclosureByItem:new Map([[unit.itemId,DISCLOSURE_PRESETS.FULL_REPORT()]])})[0]
+  expect(full.rendered).toHaveProperty('illustrationKey','chinese-self-concept-door-v1')
   const report=projectEducationDeclaredUnitReports({...f,units:f.origin.units,disclosureByItem:new Map([[unit.itemId,DISCLOSURE_PRESETS.SCORES()]])})[0]
   expect(report.status).toBe('READY')
+  expect(report.rendered).not.toHaveProperty('illustrationKey')
   expect(report.rendered!.blocks.every(block=>block.type==='METRIC'||block.type==='CHART')).toBe(true)
   expect(report.rendered!.blocks.some(block=>block.type==='METRIC')).toBe(true)
   expect(JSON.stringify(f.receipt)).toBe(before)

@@ -11,11 +11,15 @@ import { inspectScaleContent } from './scale-onboarding-check.mjs'
 import { inspectSelectedScaleImports } from '../../../.github/scripts/declarative-content.mjs'
 import { parseScaleInstrumentSourceSchema } from '../src/modules/scale/onboarding/schema'
 import { validateScaleInstrumentSource } from '../src/modules/scale/onboarding/validate-instrument'
-import { hashScaleDefinition, isScaleContentItem } from '../src/modules/scale/scale-definition'
+import { hashScaleDefinition, isScaleContentItem, type ScaleReportDefinition } from '../src/modules/scale/scale-definition'
 import { canonicalHash } from '../src/modules/assessment-runtime/canonical'
 import { referenceSetHash } from '../src/modules/assessment-runtime/reference-binding'
 import { snapshotScaleInstrumentSource } from '../src/modules/scale/onboarding/source-snapshot'
 import { buildScaleResult, parseScaleResultV2, type ScaleResultV2 } from '../src/modules/scale/scale-result'
+import { readScaleReportVariantMaterial } from '../src/modules/scale/onboarding/report-variants'
+import { compileStandardCombinationReport } from '../src/modules/measurement-content/standard-combination'
+import { standardReportParameterBlockers } from '../src/modules/measurement-content/standard-report-parameters'
+import { validateReportTemplateBindings, type ReportTemplate } from '../src/modules/measurement-content/report-template'
 import type { ScaleInstrumentSourceV1 } from '../src/modules/scale/onboarding/types'
 import type { ScaleAnswer } from '../src/modules/scale/scale-scoring'
 
@@ -126,6 +130,11 @@ export function checkSelectedSource(source: ScaleInstrumentSourceV1) {
   }
   const executable = source.executable, definition = executable.definition
   assert.ok(!definition.scoring.scorerKey && !(executable.scorerPlugins?.length), 'CUSTOM_SCORER_REQUIRES_PLATFORM_ROUTE')
+  const compiledReport = compileStandardCombinationReport(source.catalog.identity.canonicalName, definition, true, executable.references)
+  assert.deepEqual(compiledReport.blockers, [], 'REPORT_TEMPLATE_COMPILE_BLOCKER')
+  assert.ok(compiledReport.template, 'REPORT_TEMPLATE_MISSING')
+  validateReportTemplateBindings(compiledReport.template, definition.scoring.scores.map(score => score.key), [])
+  checkSelectedReportDisclosureCompatibility(source, definition.report, compiledReport.template)
   const cache = new Map<string, ScaleResultV2>()
   const run = (answers: ScaleAnswer[]) => {
     const key = canonicalHash(answers)
@@ -193,6 +202,78 @@ export function checkSelectedSource(source: ScaleInstrumentSourceV1) {
   return { ...source.identity, status: executable.releaseStatus, administrationEligibility: 'not-evaluated',
     goldenCases: executable.goldenCases.length, scoringExecutions: cache.size,
     referencePolicy: definition.referencePolicy.type, issues: validation.issues }
+}
+
+/** A selected report with declared bands must be consumable by at least one
+ * audience represented by its own audience contract. This mirrors the
+ * runtime's existing fail-closed requirements without widening them or adding
+ * a participant-side lookup: numeric results, references, interpretations and
+ * derived labels must all already be allowed by the frozen source policy. */
+export function checkSelectedReportDisclosureCompatibility(
+  source: ScaleInstrumentSourceV1,
+  report: ScaleReportDefinition,
+  template: ReportTemplate,
+) {
+  const bandBlocks = template.blocks.filter(block => block.type === 'REFERENCE_BAND')
+  if (!bandBlocks.length) return { bandBlocks: 0, audience: report.audienceContract?.audience ?? null, disclosedBy: [] as string[] }
+  const audience = report.audienceContract?.audience
+  assert.ok(audience, 'REPORT_BAND_TARGET_AUDIENCE_REQUIRED')
+  const targetAudiences = audience === 'student'
+    ? ['respondent', 'subject'] as const
+    : audience === 'teacher'
+      ? ['teacher'] as const
+      : ['respondent'] as const
+  const disclosedBy = targetAudiences.filter(target => {
+    const capabilities = source.disclosure?.audiences[target]
+    return capabilities?.numericScores
+      && capabilities.references
+      && capabilities.individualInterpretations
+      && capabilities.scoreDerivedLabels
+  })
+  assert.ok(disclosedBy.length, `REPORT_REFERENCE_BANDS_NOT_DISCLOSED:${audience}:${targetAudiences.join(',')}`)
+  return { bandBlocks: bandBlocks.length, audience, disclosedBy }
+}
+
+/** Report-only material reuses the selected source's immutable C/P axes. Check
+ * its schema/hash binding and its actual score/reference/template consumers,
+ * without rescoring the unchanged golden fixtures for every writing variant. */
+export function checkSelectedReportVariants(source: ScaleInstrumentSourceV1, raw: unknown) {
+  assert.ok(source.executable, 'REPORT_VARIANT_SOURCE_NOT_EXECUTABLE')
+  const material = readScaleReportVariantMaterial(source, raw)
+  return material.variants.map(variant => {
+    const definition = { ...source.executable!.definition, report: variant.report }
+    const candidate: ScaleInstrumentSourceV1 = { ...source, executable: { ...source.executable!, definition } }
+    const validation = validateScaleInstrumentSource(candidate, { executeGoldenCases: false })
+    assert.equal(validation.valid, true, JSON.stringify(validation.issues))
+    assert.deepEqual(standardReportParameterBlockers(definition, source.executable!.references, true), [], 'REPORT_PARAMETER_BAND_MISMATCH')
+    const compiled = compileStandardCombinationReport(source.catalog.identity.canonicalName, definition, true, source.executable!.references)
+    assert.deepEqual(compiled.blockers, [], 'REPORT_TEMPLATE_COMPILE_BLOCKER')
+    assert.ok(compiled.template, 'REPORT_TEMPLATE_MISSING')
+    assert.equal(compiled.template.artworkKey,variant.report.artworkKey,'REPORT_ARTWORK_FREEZE_MISMATCH')
+    validateReportTemplateBindings(compiled.template, definition.scoring.scores.map(score => score.key), [])
+    checkSelectedReportDisclosureCompatibility(source, variant.report, compiled.template)
+    return { key: variant.key, reportVersion: variant.report.reportVersion, artworkKey: variant.report.artworkKey ?? null }
+  })
+}
+
+export function checkSelectedReportVariantHistory(previous: unknown, next: unknown) {
+  const material = (value: unknown) => {
+    assert.ok(value && typeof value === 'object' && Array.isArray((value as { variants?: unknown }).variants), 'REPORT_VARIANT_HISTORY_INVALID')
+    return value as { instrumentKey: unknown; instrumentVersion: unknown; baseContentHash: unknown; baseParametersHash: unknown; variants: Array<{ key?: unknown; report?: { reportVersion?: unknown } }> }
+  }
+  const before = material(previous), after = material(next)
+  for (const key of ['instrumentKey', 'instrumentVersion', 'baseContentHash', 'baseParametersHash'] as const) {
+    assert.equal(after[key], before[key], `REPORT_VARIANT_HISTORY_${key.toUpperCase()}_CHANGED`)
+  }
+  const byKey = new Map(after.variants.map(variant => [variant.key, variant]))
+  const byVersion = new Map(after.variants.map(variant => [variant.report?.reportVersion, variant]))
+  for (const variant of before.variants) {
+    const current = byKey.get(variant.key)
+    assert.ok(current, `REPORT_VARIANT_REMOVED:${String(variant.key)}`)
+    assert.equal(current.report?.reportVersion, variant.report?.reportVersion, `REPORT_VARIANT_VERSION_REBOUND:${String(variant.key)}`)
+    assert.equal(canonicalHash(current), canonicalHash(variant), `REPORT_VARIANT_REWRITTEN:${String(variant.key)}`)
+    assert.equal(byVersion.get(variant.report?.reportVersion)?.key, variant.key, `REPORT_VARIANT_VERSION_REUSED:${String(variant.report?.reportVersion)}`)
+  }
 }
 
 /** Static reverse dependencies in the existing generated declarative manifest.
@@ -349,10 +430,20 @@ export async function main() {
     results.push(checkSelectedSource(source))
     sources.push(source)
   }
+  const reportVariants = []
+  for (const file of (selection.files as string[]).filter(file => file.endsWith('/report-variants.json'))) {
+    const match = /^server-version\/backend\/src\/modules\/scale\/instruments\/([a-z][a-z0-9_]*)\/(\d+\.\d+\.\d+)\/report-variants\.json$/.exec(file)
+    assert.ok(match, `REPORT_VARIANT_PATH:${file}`)
+    const source = sources.find(source => source.identity.instrumentKey === match[1] && source.identity.instrumentVersion === match[2])
+    assert.ok(source, `REPORT_VARIANT_SOURCE_MISSING:${file}`)
+    const raw=JSON.parse(git(['show', `${head}:${file}`]))
+    if(git(['ls-tree','--name-only',base,'--',file]).trim())checkSelectedReportVariantHistory(JSON.parse(git(['show',`${base}:${file}`])),raw)
+    reportVariants.push(...checkSelectedReportVariants(source,raw))
+  }
   const bundleDependencies = checkSelectedBundleDependencies(sources, JSON.parse(git(['show', `${head}:server-version/backend/src/modules/assessment-bundle/generated/packages.json`])))
   const builtinPaths = git(['ls-tree', '-r', '--name-only', head, '--', 'server-version/backend/src/modules/assessment-bundle/bundles']).trim().split('\n').filter(path => path.endsWith('.ts'))
   const builtinDependencies = checkSelectedBuiltinDependencies(sources, Object.fromEntries(builtinPaths.map(path => [path, git(['show', `${head}:${path}`])])), path => git(['show', `${head}:${path}`]))
-  console.log(JSON.stringify({ builtinDependencies, bundleDependencies, status: 'SCALE_INTAKE_SELECTED_PASSED', base, head, checked: results.length, results,
+  console.log(JSON.stringify({ builtinDependencies, bundleDependencies, reportVariants, status: 'SCALE_INTAKE_SELECTED_PASSED', base, head, checked: results.length, results,
     boundary: 'content-contract-only; generator checked separately; no scientific, copyright, publication or deployment approval' }))
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

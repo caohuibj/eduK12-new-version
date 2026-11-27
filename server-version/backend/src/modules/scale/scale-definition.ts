@@ -1,4 +1,6 @@
 import {materialListSchema,publicMaterial} from '../assessment-media/material'
+import { reportIllustrationKeySchema } from '../measurement-content/report-template'
+import {reportArtworkKeySchema} from '../measurement-content/report-artwork'
 import { hasImmutableCanonicalValue } from '../assessment-runtime/canonical'
 import { rawScoreFeedbackSchema, rawScoreFeedbackBindingIssues } from './raw-score-feedback'
 import { validateAudienceReport } from './library/audience-report-gate'
@@ -119,11 +121,14 @@ const guidanceSchema = z.object({
 })
 
 const interpretationSchema = z.object({
+  scoreLabel: z.string().trim().min(1).max(160).optional(),
+  provisional: z.literal(true).optional(),
   scoreKey: z.string().min(1),
   headline: z.string().min(1),
   source: z.discriminatedUnion('type', [
     z.object({ type: z.literal('score_only') }),
     z.object({ type: z.literal('reference_context') }),
+    z.object({ type: z.literal('shared_theoretical_range') }),
     z.object({ type: z.literal('reference'), referenceVersion: z.string().min(1), referenceKind: z.enum(['normative_distribution', 'criterion_threshold', 'descriptive_sample', 'theoretical_range']) }),
   ]).default({ type: 'score_only' }),
   summary: z.string().min(1),
@@ -138,6 +143,8 @@ const interpretationSchema = z.object({
 export type ScaleInterpretationDefinition = z.infer<typeof interpretationSchema>
 
 export const scaleReportDefinitionSchema = z.object({
+  illustrationKey: reportIllustrationKeySchema.optional(),
+  artworkKey: reportArtworkKeySchema.optional(),
   rawScoreFeedback: rawScoreFeedbackSchema.optional(),
   audienceContract: z.object({ schemaVersion: z.literal(1), respondent: z.enum(['STUDENT_SELF','ADULT_SELF','PARENT_REPORT','TEACHER_REPORT','OBSERVER_REPORT']), audience: z.enum(['student','parent','teacher']), locale: z.string().min(1), longitudinalMetricKeys: z.array(z.string().min(1)).max(100).optional(), qcReview: z.object({ reviewer: z.string().min(1), reviewedAt: z.string().datetime(), basis: z.string().min(1) }).strict().optional() }).strict().optional(),
   reportVersion: z.string().min(1),

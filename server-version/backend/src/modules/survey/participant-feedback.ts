@@ -82,7 +82,9 @@ export function rawParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnit
   const metrics=policy.metricKeys.flatMap(key=>{
     const score=scores.find(s=>s.key===key)
     const frozenLabel=defined.find(metric=>metric.key===key)?.label
-    const label=typeof frozenLabel==='string'&&frozenLabel.trim()?frozenLabel:key
+    const baseLabel=typeof frozenLabel==='string'&&frozenLabel.trim()?frozenLabel:key
+    const provisional=unit.sourceProvenance?.provisionalScoreKeys
+    const label=Array.isArray(provisional)&&provisional.includes(key)&&!baseLabel.endsWith('（试用版）')?baseLabel+'（试用版）':baseLabel
     return score?.status==='calculated'&&score.value!==null
       ?[{key,label,value:score.value,unit:null,status:'OK' as const}]:[]
   })

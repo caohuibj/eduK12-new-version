@@ -3,6 +3,11 @@ import {canonicalHash} from '../../assessment-runtime/canonical'
 import {scaleReportDefinitionSchema} from '../scale-definition'
 import type {ScaleInstrumentSourceV1} from './types'
 import {scaleSourceAxisPayloads} from './source-snapshot'
+import chineseSelfConceptScoreActions from '../instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-score-actions.json'
+import chineseSelfConceptActions from '../instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-actions.json'
+import chineseSelfConcept from '../instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-variants.json'
+import {reportArtworkKeyFor} from '../../measurement-content/report-artwork'
+import {GENERATED_SCALE_REPORT_VARIANT_MATERIALS} from './report-variants.generated'
 import cfq from '../instruments/cfq7_zh_cn_research/1.0.1/report-variants.json'
 import efficacy from '../instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/report-variants.json'
 import procrastination from '../instruments/bps9_zh_cn_research/1.0.0/report-variants.json'
@@ -66,6 +71,18 @@ import reviewed54 from '../instruments/wibps7_adolescent_zh_cn_research/1.0.0/re
 // Explicit reviewed material intake, not a directory scan or a mutable version
 // store. The ordinary source stays the default and owns the only C/scorer/P.
 const materials=[
+  {
+    material: chineseSelfConcept,
+    origin: {path:'server-version/backend/src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-variants.json'},
+  },
+  {
+    material: chineseSelfConceptScoreActions,
+    origin: {path:'server-version/backend/src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-score-actions.json'},
+  },
+  {
+    material: chineseSelfConceptActions,
+    origin: {path:'server-version/backend/src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-actions.json'},
+  },
   {material:cfq,origin:{commit:'6fa885ec74ca01350db25c44bd61c700648b05d1',path:'docs/scale-intake/materials-three-20261029/cfq7_zh_cn_research/report-variants.json'}},
   {material:efficacy,origin:{commit:'6fa885ec74ca01350db25c44bd61c700648b05d1',path:'docs/scale-intake/materials-three-20261029/ipip_neo_c1_self_efficacy10_zh_cn_research/report-variants.json'}},
   {material:procrastination,origin:{commit:'6fa885ec74ca01350db25c44bd61c700648b05d1',path:'docs/scale-intake/materials-three-20261029/bps9_zh_cn_research/report-variants.json'}},
@@ -135,13 +152,32 @@ export function readScaleReportVariantMaterial(source:ScaleInstrumentSourceV1,ra
   ||material.baseContentHash!==canonicalHash(parts.content)||material.baseParametersHash!==canonicalHash(parts.parameters))throw new Error('SCALE_REPORT_VARIANT_SOURCE_MISMATCH')
  const versions=[parts.report.reportVersion,...material.variants.map(v=>v.report.reportVersion)]
  if(new Set(versions).size!==versions.length||new Set(material.variants.map(v=>v.key)).size!==material.variants.length)throw new Error('SCALE_REPORT_VARIANT_VERSION_CONFLICT')
- for(const variant of material.variants)if(!variant.report.interpretations.length)throw new Error('SCALE_REPORT_VARIANT_EMPTY')
+ for(const variant of material.variants){
+  if(!variant.report.interpretations.length)throw new Error('SCALE_REPORT_VARIANT_EMPTY')
+  if(variant.report.artworkKey&&variant.report.artworkKey!==reportArtworkKeyFor(source.identity.instrumentKey,source.identity.instrumentVersion,variant.report.reportVersion))throw new Error('SCALE_REPORT_ARTWORK_IDENTITY_MISMATCH')
+ }
  return material
 }
+type ReportVariantMaterial=z.infer<typeof schema>
+export const scaleReportVariantMaterialHash=(material:ReportVariantMaterial,variant:ReportVariantMaterial['variants'][number])=>canonicalHash({
+ schemaVersion:material.schemaVersion,instrumentKey:material.instrumentKey,instrumentVersion:material.instrumentVersion,
+ baseContentHash:material.baseContentHash,baseParametersHash:material.baseParametersHash,variant,
+})
 export function listScaleReportVariants(source:ScaleInstrumentSourceV1){
- const selected=materials.find(({material})=>material.instrumentKey===source.identity.instrumentKey&&material.instrumentVersion===source.identity.instrumentVersion)
- if(!selected)return []
- const material=readScaleReportVariantMaterial(source,selected.material)
- return material.variants.map(variant=>({...variant,baseContentHash:material.baseContentHash,baseParametersHash:material.baseParametersHash,
-  materialHash:canonicalHash(material),origin:selected.origin}))
+ const groups=materials.filter(({material})=>material.instrumentKey===source.identity.instrumentKey&&material.instrumentVersion===source.identity.instrumentVersion)
+ const generated=GENERATED_SCALE_REPORT_VARIANT_MATERIALS.find(({material})=>{
+  const value=material as {instrumentKey?:unknown;instrumentVersion?:unknown}
+  return value.instrumentKey===source.identity.instrumentKey&&value.instrumentVersion===source.identity.instrumentVersion
+ })
+ const selected=groups.length?groups:(generated?[{material:generated.material,origin:{kind:'VERSION_DIRECTORY',path:generated.path}}]:[])
+ const variants=selected.flatMap(({material:raw,origin})=>{
+  const material=readScaleReportVariantMaterial(source,raw)
+  return material.variants.map(variant=>({...variant,baseContentHash:material.baseContentHash,baseParametersHash:material.baseParametersHash,
+   // Hash one immutable variant envelope, so appending a later R does not mutate
+   // the provenance identity of already selectable reports or frozen results.
+   materialHash:scaleReportVariantMaterialHash(material,variant),origin}))
+ })
+ if(selected.length>1 && (new Set(variants.map(v=>v.key)).size!==variants.length || new Set(variants.map(v=>v.report.reportVersion)).size!==variants.length))
+  throw new Error('SCALE_REPORT_VARIANT_VERSION_CONFLICT')
+ return variants
 }

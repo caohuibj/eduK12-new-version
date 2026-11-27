@@ -3,7 +3,13 @@ import { readFileSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { test } from 'node:test'
-import { checkSelectedHistory, checkSelectedSource, readSelectedSource, checkSelectedBundleDependencies, checkSelectedBuiltinDependencies } from './scale-intake-selected-check'
+import { checkSelectedHistory, checkSelectedSource, readSelectedSource, checkSelectedBundleDependencies, checkSelectedBuiltinDependencies, checkSelectedReportVariants, checkSelectedReportVariantHistory } from './scale-intake-selected-check'
+import cfqVariants from '../src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/report-variants.json'
+import chineseScoreActions from '../src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-score-actions.json'
+import chineseActions from '../src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-actions.json'
+import chineseReading from '../src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/report-variants.json'
+import { canonicalHash } from '../src/modules/assessment-runtime/canonical'
+import { scaleSourceAxisPayloads } from '../src/modules/scale/onboarding/source-snapshot'
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const file = 'server-version/backend/src/modules/scale/instruments/academic_self_concept_biology_zh_cn/1.0.0/instrument.ts'
 const source = () => JSON.parse(readFileSync(resolve(repo, file.replace('instrument.ts', 'source.json')), 'utf8'))
@@ -122,4 +128,63 @@ test('catalog axis revision permits source clarification without changing C P or
  assert.doesNotThrow(()=>checkSelectedHistory(old,next))
  assert.deepEqual(next.executable,old.executable)
  assert.deepEqual(next.identity,old.identity)
+})
+
+test('version-local report material keeps C/P compatibility and binds artwork to exact C/R identity', () => {
+ const cfqFile='server-version/backend/src/modules/scale/instruments/cfq7_zh_cn_research/1.0.1/instrument.ts'
+ const cfq=JSON.parse(readFileSync(resolve(repo,cfqFile.replace('instrument.ts','source.json')),'utf8'))
+ const material=structuredClone(cfqVariants),report=material.variants[0].report
+ report.artworkKey=`${cfq.identity.instrumentKey}/${cfq.identity.instrumentVersion}/${report.reportVersion}`
+ assert.deepEqual(checkSelectedReportVariants(cfq,material),[{key:material.variants[0].key,reportVersion:report.reportVersion,artworkKey:report.artworkKey}])
+ report.artworkKey=`other_scale/${cfq.identity.instrumentVersion}/${report.reportVersion}`
+ assert.throws(()=>checkSelectedReportVariants(cfq,material),/SCALE_REPORT_ARTWORK_IDENTITY_MISMATCH/)
+})
+
+test('published Chinese self-concept R1.2.0, R1.3.0 and R1.3.1 compile from the same frozen theoretical P', () => {
+ const value=JSON.parse(readFileSync(resolve(repo,'server-version/backend/src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/source.json'),'utf8'))
+ assert.deepEqual([chineseReading,chineseActions,chineseScoreActions].flatMap(material=>checkSelectedReportVariants(value,material)),[
+  {key:'student_reading',reportVersion:'1.2.0',artworkKey:null},
+  {key:'student_reading_actions',reportVersion:'1.3.0',artworkKey:null},
+  {key:'student_reading_score_actions',reportVersion:'1.3.1',artworkKey:null},
+ ])
+ const broken=structuredClone(chineseScoreActions)
+ broken.variants[0].report.interpretations[0].bands[0].key='not-in-frozen-parameter'
+ assert.throws(()=>checkSelectedReportVariants(value,broken),/REPORT_REFERENCE_BAND_COVERAGE_REQUIRED|REPORT_PARAMETER_BAND_MISMATCH|REPORT_TEMPLATE_COMPILE_BLOCKER/)
+})
+
+test('later report variants append without rewriting a previously selectable R identity', () => {
+ const previous=structuredClone(cfqVariants),next=structuredClone(cfqVariants)
+ next.variants.push({...structuredClone(next.variants[0]),key:'later',title:'后续报告',report:{...structuredClone(next.variants[0].report),reportVersion:'9.9.9'}})
+ assert.doesNotThrow(()=>checkSelectedReportVariantHistory(previous,next))
+ next.variants[0].title+=' changed'
+ assert.throws(()=>checkSelectedReportVariantHistory(previous,next),/REPORT_VARIANT_REWRITTEN/)
+ assert.throws(()=>checkSelectedReportVariantHistory(previous,{...previous,variants:[]}),/REPORT_VARIANT_REMOVED/)
+})
+
+test('ordinary report artwork identity is checked without adding a participant gate', () => {
+ const value=source(),report=value.executable.definition.report
+ report.artworkKey=`other_scale/${value.identity.instrumentVersion}/${report.reportVersion}`
+ assert.throws(()=>checkSelectedSource(value),/报告配图标识/)
+})
+
+test('default declared bands require existing target-audience reference and label disclosure', () => {
+ const accepted=source()
+ assert.doesNotThrow(()=>checkSelectedSource(accepted))
+ const noReferences=source()
+ for(const audience of ['respondent','subject'])noReferences.disclosure.audiences[audience].references=false
+ assert.throws(()=>checkSelectedSource(noReferences),/REPORT_REFERENCE_BANDS_NOT_DISCLOSED:student:respondent,subject/)
+ const noLabels=source()
+ for(const audience of ['respondent','subject'])noLabels.disclosure.audiences[audience].scoreDerivedLabels=false
+ assert.throws(()=>checkSelectedSource(noLabels),/REPORT_REFERENCE_BANDS_NOT_DISCLOSED:student:respondent,subject/)
+})
+
+test('optional report variants use the same declared-band disclosure check', () => {
+ const value=source(),parts=scaleSourceAxisPayloads(value)
+ const material={schemaVersion:1,instrumentKey:value.identity.instrumentKey,instrumentVersion:value.identity.instrumentVersion,
+  baseContentHash:canonicalHash(parts.content),baseParametersHash:canonicalHash(parts.parameters),variants:[{
+   key:'alternate',title:'替代报告',report:{...structuredClone(value.executable.definition.report),reportVersion:'9.9.9'},
+  }]}
+ assert.doesNotThrow(()=>checkSelectedReportVariants(value,material))
+ for(const audience of ['respondent','subject'])value.disclosure.audiences[audience].references=false
+ assert.throws(()=>checkSelectedReportVariants(value,material),/REPORT_REFERENCE_BANDS_NOT_DISCLOSED:student:respondent,subject/)
 })

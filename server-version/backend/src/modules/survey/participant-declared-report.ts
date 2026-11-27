@@ -1,3 +1,4 @@
+import { resolveAudienceDisclosure } from '../scale/policy/disclosure'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { isParticipantReportAudience } from '../assessment-policy/tool-report-eligibility'
@@ -126,9 +127,12 @@ export async function attachSurveyParticipantDeclaredReports(
         referenceKind: ref.referenceKind,
         status: ref.status === 'AVAILABLE' ? 'AVAILABLE' : 'UNAVAILABLE',
         bandKey: ref.values?.bandKey ?? null,
+        reason: ref.reason,
       }))
 
-    const declaredReport = renderDeclaredReport(report.content.template, metricFacts, referenceFacts)
+    const proseDisclosure = candidate.unit.nativeBundleReport
+      ? resolveAudienceDisclosure(candidate.unit.nativeBundleReport.policy.disclosure,'subject') : undefined
+    const declaredReport = renderDeclaredReport(report.content.template, metricFacts, referenceFacts, proseDisclosure)
     nextMeasurements[candidate.index] = {
       ...item,
       declaredReport,

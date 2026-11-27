@@ -84,11 +84,20 @@ export function projectEducationDeclaredUnitReports(input:Omit<Parameters<typeof
         available=available&&release.status!=='REVOKED'
       }
       return {metricKey:reference.metricKey,referenceKind:reference.referenceKind,
-        status:available?'AVAILABLE' as const:'UNAVAILABLE' as const,bandKey:available?reference.values?.bandKey??null:null}
+        status:available?'AVAILABLE' as const:'UNAVAILABLE' as const,bandKey:available?reference.values?.bandKey??null:null,reason:slot.status==='UNAVAILABLE'?slot.reason:undefined}
     })
-    const needsReference=report.content.template.blocks.some(block=>block.type==='REFERENCE_BAND'||block.type==='METRIC'&&block.display==='REFERENCE_RESULT')
-    const missingReference=needsReference&&report.content.template.blocks.some(block=>(block.type==='REFERENCE_BAND'||block.type==='METRIC'&&block.display==='REFERENCE_RESULT')&&!references.some(reference=>reference.metricKey===block.metricKey&&reference.status==='AVAILABLE'&&(block.type!=='REFERENCE_BAND'||reference.referenceKind===block.referenceKind)))
-    return {...base,status:'READY',...(missingReference?{message:'当前没有适用且获准的参考或阈值，未作等级与阈值解释。'}:{}),rendered:restrictDeclaredEducationReport(renderDeclaredReport(report.content.template,metrics,references),input.disclosureByItem?.get(unit.itemId))}
+    const proseDisclosure=input.disclosureByItem?.get(unit.itemId) ?? bound.source.educationStandard?.respondentDisclosure
+    const rendered=restrictDeclaredEducationReport(renderDeclaredReport(report.content.template,metrics,references,proseDisclosure),input.disclosureByItem?.get(unit.itemId))
+    const shownScoreMetrics=new Set(rendered.blocks.flatMap(block=>{
+      const shown=block as {type?:string;metricKey?:string}
+      return shown.type==='SCORE_FEEDBACK'&&shown.metricKey?[shown.metricKey]:[]
+    }))
+    const missingReference=report.content.template.blocks.some(block=>{
+      if(block.type==='REFERENCE_BAND'&&block.referenceKind==='theoretical_range'&&shownScoreMetrics.has(block.metricKey))return false
+      return (block.type==='REFERENCE_BAND'||block.type==='METRIC'&&block.display==='REFERENCE_RESULT')
+        &&!references.some(ref=>ref.metricKey===block.metricKey&&ref.status==='AVAILABLE'&&(block.type!=='REFERENCE_BAND'||ref.referenceKind===block.referenceKind))
+    })
+    return {...base,status:'READY',...(missingReference?{message:'当前没有适用且获准的参考或阈值，未作等级与阈值解释。'}:{}),rendered}
   })
 }
 
@@ -102,6 +111,7 @@ function restrictDeclaredEducationReport(report:ReturnType<typeof renderDeclared
   if(block.type==='TEXT')return rule.individualInterpretations||rule.educationalContent
   if(block.type==='METRIC')return block.display==='REFERENCE_RESULT'?rule.references&&rule.scoreDerivedLabels:rule.numericScores
   if(block.type==='CHART')return rule.numericScores
+  if(block.type==='SCORE_FEEDBACK')return rule.numericScores&&rule.references&&rule.individualInterpretations&&rule.scoreDerivedLabels
   if(block.type==='REFERENCE_BAND')return rule.references&&rule.individualInterpretations&&rule.scoreDerivedLabels
   return false
  })}

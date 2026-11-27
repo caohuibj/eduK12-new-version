@@ -1,4 +1,8 @@
 import { z } from 'zod'
+import {reportArtworkKeySchema} from './report-artwork'
+
+// Public artwork bundled with the client. Private or uploaded images still require ASSET bindings.
+export const reportIllustrationKeySchema=z.enum(['chinese-self-concept-door-v1','chinese-self-concept-door-with-actions-v2','chinese-self-concept-door-with-score-actions-v3'])
 
 const prose=z.string().trim().min(1).max(20000)
 const key=z.string().trim().min(1).max(240)
@@ -16,11 +20,21 @@ export const reportBlockSchema=z.discriminatedUnion('type',[
 ])
 export const reportTemplateSchema=z.object({
   title:prose.optional(),
+  illustrationKey:reportIllustrationKeySchema.optional(),
+  artworkKey:reportArtworkKeySchema.optional(),
   blocks:z.array(reportBlockSchema).max(500).default([]),
   limitations:z.array(prose).max(100).default([]),
   disclaimer:prose.optional(),
 }).strict().refine(t=>Boolean(t.title)||t.blocks.length>0,'Report requires display content')
-export type ReportTemplate=z.infer<typeof reportTemplateSchema>
+// Only a standard combination producer can add this field after comparing its
+// selected theoretical P entries. Authored/private templates still use the strict schema above.
+export const frozenReportTemplateSchema = reportTemplateSchema.safeExtend({
+  standardScoreBands: z.object({
+    metricKey: key,
+    ranges: z.array(z.object({key, lower:z.number().finite(), upper:z.number().finite()}).strict()).min(3).max(5),
+  }).strict().optional(),
+})
+export type ReportTemplate=z.infer<typeof frozenReportTemplateSchema>
 
 export class ReportTemplateBindingError extends Error {
   constructor(readonly code:'REPORT_TEMPLATE_METRIC_UNKNOWN'|'REPORT_TEMPLATE_ASSET_UNKNOWN'){super(code);this.name='ReportTemplateBindingError'}

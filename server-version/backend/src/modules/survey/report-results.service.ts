@@ -70,7 +70,7 @@ export async function readSurveyStoredReport(actorId:string,input:{projectId:str
         unit:measurement.content.metrics.find(m=>m.metricKey===score.measurement.scoreKey)?.unit??score.measurement.unit??'unknown',
         status:score.quality?.status==='interpretable'&&score.status===(measurement.family==='COGNITIVE'?'OK':'calculated')?'INTERPRETABLE':score.quality?.status==='invalid'?'INVALID':'UNAVAILABLE'}))
     const references:ReportReferenceFact[]=interpreted!.references.filter(ref=>allowed.has(ref.metricKey)).map(ref=>({metricKey:ref.metricKey,
-      referenceKind:ref.referenceKind,status:ref.status==='AVAILABLE'?'AVAILABLE':'UNAVAILABLE',bandKey:ref.values?.bandKey??null}))
+      referenceKind:ref.referenceKind,status:ref.status==='AVAILABLE'?'AVAILABLE':'UNAVAILABLE',bandKey:ref.values?.bandKey??null,reason:ref.reason}))
     return {accessAudience:'researcher' as const,intendedAudience:report.content.audience,sourceFinalHash:saved!.sourceFinalHash,
       contentBindingHash:saved!.interpretation!.contentBindingHash,reportRelease:bound!.report,
       interpretationSemantics:'SAVED_AT_FINAL_NO_RECALCULATION' as const,lifecycleNotices,

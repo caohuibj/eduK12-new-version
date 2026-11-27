@@ -27,3 +27,38 @@ it('renders only the server-projected saved joint text and removes it outside pe
  rerender(<EducationAssessmentReport data={{...data,mode:'COMPLETION_ONLY'}}/>)
  expect(screen.queryByText('本次获准解释')).not.toBeInTheDocument()
 })
+
+it('shows the built-in comic only when the returned educational report includes it and disclosure is open',()=>{
+ const projected={generatorVersion:'DECLARATIVE_REPORT_V1',title:'语文报告',blocks:[],limitations:[],disclaimer:null}
+ const unit={itemId:'chinese',status:'READY',rendered:{...projected,illustrationKey:'chinese-self-concept-door-v1'}}
+ const data={schemaVersion:1,kind:'EDUCATION_ASSESSMENT_PERSONAL_REPORT',state:'READY',mode:'INDIVIDUAL_SUMMARY',reports:[unit]}
+ const view=(dto:unknown)=><EducationAssessmentReport data={dto as EducationFeedbackData}/>
+ const {rerender}=render(view(data))
+ expect(screen.getByRole('img',{name:/小禾.*她在怕什么/})).toBeInTheDocument()
+ rerender(view({...data,reports:[{...unit,rendered:projected}]}))
+ expect(screen.queryByRole('img')).toBeNull()
+ rerender(view({...data,mode:'COMPLETION_ONLY'}))
+ expect(screen.queryByRole('img')).toBeNull()
+ rerender(view({...data,reports:[{...unit,status:'REVOKED'}]}))
+ expect(screen.queryByRole('img')).toBeNull()
+})
+
+it('uses only the disclosed band for school action art and removes illustrations when access is withheld',()=>{
+ const report={generatorVersion:'DECLARATIVE_REPORT_V1',title:'语文报告',illustrationKey:'chinese-self-concept-door-with-actions-v2',
+   blocks:[{type:'REFERENCE_BAND',metricKey:'academic_self_concept',bandKey:'low',text:'一次读书经历'}],limitations:[],disclaimer:null}
+ const dto=(result:typeof report,status='READY')=>({schemaVersion:1,kind:'EDUCATION_ASSESSMENT_PERSONAL_REPORT',state:'READY',
+   mode:'INDIVIDUAL_SUMMARY',reports:[{itemId:'chinese',status,rendered:result}]} as unknown as EducationFeedbackData)
+ const {rerender}=render(<EducationAssessmentReport data={dto(report)}/>)
+ expect(screen.getByRole('img',{name:/橙色书签/})).toBeInTheDocument()
+ const scoreReport={...report,illustrationKey:'chinese-self-concept-door-with-score-actions-v3',
+   blocks:report.blocks.map(block=>({...block,type:'SCORE_FEEDBACK'}))}
+ rerender(<EducationAssessmentReport data={dto(scoreReport)}/>)
+ expect(screen.getByRole('img',{name:/橙色书签/})).toBeInTheDocument()
+ rerender(<EducationAssessmentReport data={dto(scoreReport,'WITHHELD')}/>)
+ expect(screen.queryByRole('img')).toBeNull()
+ rerender(<EducationAssessmentReport data={dto({...report,blocks:[]})}/>)
+ expect(screen.getAllByRole('img')).toHaveLength(1)
+ expect(screen.queryByRole('img',{name:/橙色书签/})).toBeNull()
+ rerender(<EducationAssessmentReport data={dto(report,'WITHHELD')}/>)
+ expect(screen.queryByRole('img')).toBeNull()
+})

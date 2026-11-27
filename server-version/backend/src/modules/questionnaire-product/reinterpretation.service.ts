@@ -157,7 +157,7 @@ export async function createTrainingReinterpretation(context:TrainingReinterpret
    facts.metrics.filter(metric=>template!.content.metricKeys.includes(metric.key)).map(metric=>({metricKey:metric.key,value:metric.value,
     unit:measurement.content.metrics.find(m=>m.metricKey===metric.key)!.unit,
     status:facts.quality==='interpretable'&&metric.status==='OK'?'INTERPRETABLE':facts.quality==='invalid'?'INVALID':'UNAVAILABLE'})),
-   personal.references.map(reference=>({metricKey:reference.metricKey,referenceKind:reference.referenceKind,status:reference.status==='AVAILABLE'?'AVAILABLE':'UNAVAILABLE',bandKey:reference.values?.bandKey??null}))):null
+   personal.references.map(reference=>({metricKey:reference.metricKey,referenceKind:reference.referenceKind,status:reference.status==='AVAILABLE'?'AVAILABLE':'UNAVAILABLE',bandKey:reference.values?.bandKey??null,reason:reference.reason}))):null
   const artifact:TrainingInterpretationArtifact={schemaVersion:1,semantics:'EXPLICIT_IMMUTABLE_INTERPRETATION',actorId:c.actorId,reason:input.reason,
    courseId:c.courseId,compositeId:c.compositeId,attemptId:c.attemptId,attemptEpoch:parent.attemptEpoch,itemId:input.itemId,
    sourceAggregateHash:parent.aggregateInputHash!,sourceBindingHash:parent.trainingContentBindingHash!,sourceReceiptHash:parent.trainingContentInterpretationHash!,

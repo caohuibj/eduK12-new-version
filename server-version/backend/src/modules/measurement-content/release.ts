@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { reportTemplateSchema, validateReportTemplateBindings } from './report-template'
+import { frozenReportTemplateSchema, validateReportTemplateBindings } from './report-template'
 import { canonicalHash, canonicalJsonString } from '../assessment-runtime/canonical'
 
 export const CONTENT_HASH_SCHEME = 'MEASUREMENT_CONTENT_CANONICAL_V1' as const
@@ -50,7 +50,7 @@ export const reportContent = z.object({
   language: text,
   generatorVersion: text,
   // Text/layout only. Numeric reference rules belong to reference releases.
-  template: reportTemplateSchema,
+  template: frozenReportTemplateSchema,
 }).strict()
 const common = {
   family: releaseFamily, key: text, version: text, scope: contentScope,

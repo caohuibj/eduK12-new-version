@@ -5,7 +5,7 @@ type Axis='CONTENT'|'PARAMETERS'|'REPORT'
 export type ApprovedScaleChoice={id:string;toolKey:string;title:string;versions:Record<Axis,string>}
 type Props={choices:ApprovedScaleChoice[];disabled?:boolean;onSelect:(id:string)=>void;scopeLabel?:string}
 const axes:Axis[]=['CONTENT','PARAMETERS','REPORT']
-const labels:Record<Axis,string>={CONTENT:'题本 C',PARAMETERS:'解释参数 P',REPORT:'报告 R'}
+const labels:Record<Axis,string>={CONTENT:'题本 C',PARAMETERS:'解释参数 P',REPORT:'报告版本'}
 const empty:Record<Axis,string>={CONTENT:'',PARAMETERS:'',REPORT:''}
 const versionLabel=(axis:Axis,value:string)=>value==='none-v1'?(axis==='REPORT'?'不反馈（明确未配置）':axis==='PARAMETERS'?'未配置阈值或常模':value):value
 
@@ -22,7 +22,7 @@ export default function ApprovedScaleAxes({choices,disabled=false,onSelect,scope
  const selected=matches.find(choice=>choice.id===exact)
  function chooseAxis(axis:Axis,value:string){setSelection(old=>({...old,[axis]:value}));setExact('')}
  return <details className="approved-scale-axes"><summary>按题本、参数和报告查找已批准配置</summary>
-  <p>{scopeLabel}；仅查找已批准且当前可分配的完整组合。不会为新搭配代作系统审批。请核对人群、用途及报告措辞，专业搭配由管理员决定。</p>
+  <p>{scopeLabel}。请选择已批准且当前可分配的组合，并核对适用人群、用途和报告措辞。管理员在签发授权时选定报告版本，这笔授权随即固定使用所选版本。</p>
   <fieldset disabled={disabled}><legend>手选 C/P/R 查找配置</legend>
    <label>量表工具<select value={tools.some(value=>value.key===tool)?tool:''} onChange={event=>{setTool(event.target.value);setSelection(empty);setExact('')}}>
     <option value="">选择量表工具</option>{tools.map(value=><option key={value.key} value={value.key}>{value.title}</option>)}
