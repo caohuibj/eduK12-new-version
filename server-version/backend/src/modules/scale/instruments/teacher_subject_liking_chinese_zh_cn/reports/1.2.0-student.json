@@ -1,0 +1,122 @@
+{
+  "toolKey": "teacher_subject_liking_chinese_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "学生感知教师喜爱语文图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对项目3题、1–6 分选项、最少2题的均分计分及原理论分档。"
+      }
+    },
+    "primaryScoreKeys": [
+      "teacher_subject_liking"
+    ],
+    "scoreOrder": [
+      "teacher_subject_liking"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "teacher_subject_liking",
+        "headline": "老师在哪个字上停了一下？",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "语文课上，老师把一段短文读了两遍。第一遍很快，第二遍在一句话中间停了一下，又请同学试着换个地方停。小雅觉得老师对这个小变化特别有兴趣。同桌却说：“我还在想，刚才到底是什么意思？”他们听的是同一节课，留下的线索却各有不同。\n\n这几道题记录你从课堂上感受到的老师对语文的兴趣。老师愿意在哪个字上停一停，哪段文字读完后还想追问，都可能成为你形成印象的线索。试着分别写下一件你听见的事和自己的理解。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "记下一次具体停顿",
+            "summary": "找一句老师多读了一遍的话，在笔记里记下停顿在哪里。再写一句你是怎么理解这次停顿的。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "带着一个词再读",
+            "summary": "选一个课堂上你没听出趣味的词，带着“如果换一个词会怎样”再读一次。听听你和同桌的读法各有什么不同。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "听两种讲法",
+            "summary": "找两个片段，一个是老师反复追问的，一个是很快带过的。说说你从每个片段记住了什么，自己想再查哪一处。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "把读法讲给同桌听",
+            "summary": "选一个你觉得老师讲得有趣的细节，合上书说给同桌听。请对方指出哪一句最让他明白你的发现。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "把课堂线索带进新文章",
+            "summary": "从印象最深的讲法里挑一种，去试读一段以前没读过的短文。留下一处你自己发现的细节，带到下节课再聊。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "在笔记上写下一个课堂细节，再写一句你是怎样理解它的。下次上课看看自己又留意到什么。"
+          }
+        ],
+        "scoreLabel": "学生感知教师喜爱语文均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "至少答2道题才计算均分。均分只描述你这次从课堂感受到的老师对学科的兴趣。",
+      "五档沿用按 1–6 分量尺估算的区间，用于选择一条试用建议。报告省略学段比较。"
+    ],
+    "disclaimer": "学生可以用这份报告回顾一次真实课堂经历，也可以拿一个具体问题跟同伴或老师聊一聊。",
+    "artworkKey": "teacher_subject_liking_chinese_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

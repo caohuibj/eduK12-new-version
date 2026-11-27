@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "teacher_subject_liking_chinese_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "teacher_subject_liking-very-low.webp",
+      "alt": "学生用铅笔在短文上标出一次停顿。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "teacher_subject_liking-low.webp",
+      "alt": "两个同学各读一遍，同看一个标出的词。",
+      "width": 378,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "low"
+    },
+    {
+      "file": "teacher_subject_liking-middle.webp",
+      "alt": "学生并排比较两个课堂阅读片段的笔记。",
+      "width": 378,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "middle"
+    },
+    {
+      "file": "teacher_subject_liking-high.webp",
+      "alt": "学生合上书，给同桌讲自己的发现。",
+      "width": 378,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "high"
+    },
+    {
+      "file": "teacher_subject_liking-very-high.webp",
+      "alt": "学生借课堂读法标出新短文里的一个细节。",
+      "width": 378,
+      "height": 506,
+      "scoreKey": "teacher_subject_liking",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "老师在课堂上朗读，两位学生留心的细节各有不同。",
+    "width": 506,
+    "height": 506
+  }
+}
