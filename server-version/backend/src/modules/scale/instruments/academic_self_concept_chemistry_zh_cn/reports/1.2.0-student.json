@@ -1,0 +1,122 @@
+{
+  "toolKey": "academic_self_concept_chemistry_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "化学学习自评图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-27T00:00:00Z",
+        "basis": "按项目原施测中、后测四道正向题与计分字典审定，沿用初中五档和高中三档的项目历史参考。平台第二与第四选项措辞略有不同，参考结果供试用。"
+      }
+    },
+    "primaryScoreKeys": [
+      "academic_self_concept"
+    ],
+    "scoreOrder": [
+      "academic_self_concept"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "academic_self_concept",
+        "headline": "我怎么看自己的化学学习",
+        "source": {
+          "type": "reference_context"
+        },
+        "summary": "课上，老师指着一杯盐水问：“看不见盐粒了，盐到哪儿去了？”小岚在纸上画了一杯水，又把笔停住了。同桌问：“你看见了什么？你又是怎么想的？”她说：“我看见盐粒不见了，可这不能说明盐也不在了。”她把纸分成两栏，一栏画眼睛，一栏画一个小小的问号。一个原本答不上来的问题，就这样有了开头。\n\n学化学常常要从肉眼看到的现象，想象眼睛看不到的变化。你怎样看待自己学习化学的本领，心理学里叫“化学学科自我概念”。小岚原先觉得自己答题慢。换个角度看，她把“我看见了什么”和“我猜是怎么回事”分开了，这也是学化学的一种本领。回想这周的化学课，你有什么小进展，容易被一句“我学得怎么样”带过去？",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "回到你的化学课",
+            "summary": "挑一个你还记得的变化，画两笔，再指着纸讲讲你看到了什么。能把现象说清，已经迈出了做解释的第一步。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "回到你的化学课",
+            "summary": "翻到最近没想明白的一页，写下一句真正想问的话，比如“水看起来一样，怎么知道里面还有盐？”带着具体问题去找同桌或老师，比从头重读整章更容易开口。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "回到你的化学课",
+            "summary": "下次看一道现象题，把纸分成两栏。左边写眼睛看到的，右边写你想到的解释。先填好一栏，再找一条线索把两边接起来。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "回到你的化学课",
+            "summary": "找一道最近讲得明白的题，圈出支持你判断的一条线索。让同桌问一句“凭什么”，试着只用这条线索来回答。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "回到你的化学课",
+            "summary": "把一个有把握的解释画成一张图，请同桌照着图把过程讲一遍。他停住的地方，很可能就是你能再补一条线索的地方。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "下次觉得自己“化学学不明白”时，先找一个具体的变化，问问：“我看到了什么？我现在能说清哪一步？”"
+          }
+        ],
+        "scoreLabel": "化学学习自评均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "至少答三题才计算本次均分。试用分组使用本项目同学段学生的历史数据，初中和高中的分界不同。该参考只帮助你理解这一次的自评。",
+      "缺少适用学段时，仍可阅读故事和通用建议。均分仅供你回顾自己对化学学习的看法。"
+    ],
+    "disclaimer": "这份报告适合参加项目的中学生自己读，也可以带着一个具体问题和老师聊一聊。",
+    "artworkKey": "academic_self_concept_chemistry_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

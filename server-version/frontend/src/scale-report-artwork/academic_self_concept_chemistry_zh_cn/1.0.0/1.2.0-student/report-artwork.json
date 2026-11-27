@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "academic_self_concept_chemistry_zh_cn/1.0.0/1.2.0-student",
+  "hero": {
+    "file": "story.webp",
+    "alt": "两个学生对照一杯盐水、盐粒和示意图讨论自己看到的变化",
+    "width": 512,
+    "height": 512
+  },
+  "bands": [
+    {
+      "file": "very_low.webp",
+      "alt": "学生在纸上画下看到的现象",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "academic_self_concept",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "low.webp",
+      "alt": "学生把写在便签上的问题拿给同桌看",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "academic_self_concept",
+      "bandKey": "low"
+    },
+    {
+      "file": "middle.webp",
+      "alt": "学生把看到的现象和想到的解释分栏记录",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "academic_self_concept",
+      "bandKey": "middle"
+    },
+    {
+      "file": "high.webp",
+      "alt": "学生指着示意图上的一条线索向同桌解释",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "academic_self_concept",
+      "bandKey": "high"
+    },
+    {
+      "file": "very_high.webp",
+      "alt": "学生把自己画好的化学示意图交给同桌",
+      "width": 512,
+      "height": 512,
+      "scoreKey": "academic_self_concept",
+      "bandKey": "very_high"
+    }
+  ]
+}
