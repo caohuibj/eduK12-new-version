@@ -1,0 +1,162 @@
+{
+  "toolKey": "value_cost_biology_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "生物学习价值与时间取舍图文版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "核对项目原七题、两个独立均分及最少答题规则。两学段按原 1–6 分量尺估算，各保留五档。"
+      }
+    },
+    "primaryScoreKeys": [
+      "value",
+      "cost"
+    ],
+    "scoreOrder": [
+      "value",
+      "cost"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "value",
+        "headline": "课本上的生物知识能帮你看懂什么",
+        "summary": "下过一场雨，小夏发现花盆里一排苗长得不一样。她原先只记得课本里有一张发芽图，回看课堂记录才想到，可以把光照、水分和最初的状态分别记下来。两天后，她没有把所有不同都归给同一个原因，却多了一个能继续观察的问题。\n\n这三道题记录你觉得学生物有多重要、多有用。想起一件真正发生过的事，再回头看哪个课堂概念在那里给了你帮助。",
+        "scoreLabel": "生物学习价值均分（试用版）",
+        "source": {
+          "type": "reference_context"
+        },
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "找一个生活里的问题",
+            "summary": "选一件身边的现象，例如一片叶子为什么在晒过后变软。带着它回看课本里学到的一个概念。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "给一个概念连上观察",
+            "summary": "从课本挑一个词，画一条线连到你见过的现象，再给仍解释不了的一处留一个问号。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "把有用的地方举出来",
+            "summary": "想想哪项生物知识帮你观察，哪项帮你解释，哪项能提醒你继续提问。每类各写一个实际例子。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "挑一件这周能观察的事",
+            "summary": "选一个你愿意弄清的现象，记两次观察。每次只写条件和变化，看看新记录能说明什么。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "把一个解释讲给同伴",
+            "summary": "选一张观察笔记讲给同学听，请他追问一条依据。用一条观察回答，再留下一个新问题。",
+            "guidance": []
+          }
+        ],
+        "guidance": [],
+        "provisional": true
+      },
+      {
+        "scoreKey": "cost",
+        "headline": "学生活动多时，把时间花在哪一步",
+        "summary": "同一周，小夏要交观察记录，还要参加合唱排练。她翻开记录本，发现最费时间的是每次都从头整理照片。把观察图挑出来后，她给下一次记了一个固定位置，第二天只用补上当天的变化。\n\n这四道题记录你感到学生物占用时间和需要取舍的程度。把它和你觉得这门课有多有价值分别理解。一次具体的时间记录能帮你找到可调整的小地方。",
+        "scoreLabel": "生物学习时间与取舍均分（试用版）",
+        "source": {
+          "type": "reference_context"
+        },
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "留住学完后的休息",
+            "summary": "给一次生物练习标出开始和结束。看看有没有一段工作结束得很自然，留住后面的休息时间。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "找出做得最顺的一段",
+            "summary": "把观察、挑图片、写说明分三行记下。圈一段最顺手的步骤，留住下次能直接照着做的办法。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "把碰在一起的安排摊开看",
+            "summary": "把观察记录、其他作业和活动日期写在一起。找一项可以提前完成的准备工作，给观察留一个固定位置。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "少从头找一遍材料",
+            "summary": "从最近一次任务里找最费时间的一步，是找图、查资料还是改说明。先提前把这一种材料放到同一处，再看耗时变化。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "带一周记录一起商量",
+            "summary": "拿三次生物任务的记录和老师或家长讨论，选一项要先做、一项可简化的工作，把活动和休息也写进安排。",
+            "guidance": []
+          }
+        ],
+        "guidance": [],
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "学习价值按前三题的均分记录，至少答两题。时间与取舍按后四题的均分记录，至少答三题。两个结果分别阅读。",
+      "五档沿用原参数的试用区间。缺少匹配的学段时，可读两个通用故事。"
+    ],
+    "disclaimer": "可以挑一次真实的学习经历来理解这两个得分，也可带着一个具体问题跟同伴、老师或家长讨论。",
+    "artworkKey": "value_cost_biology_zh_cn/1.0.0/1.2.0-student"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}

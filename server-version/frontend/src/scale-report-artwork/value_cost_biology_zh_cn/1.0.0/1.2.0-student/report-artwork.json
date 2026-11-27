@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "value_cost_biology_zh_cn/1.0.0/1.2.0-student",
+  "bands": [
+    {
+      "file": "value-very-low.webp",
+      "alt": "学生举着一片变软的叶子，想从身边的现象开始。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "value-low.webp",
+      "alt": "植物叶片和课本结构图在同一页相互对应。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "low"
+    },
+    {
+      "file": "value-middle.webp",
+      "alt": "观察、解释和提问三件事分别用小场景表示。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "middle"
+    },
+    {
+      "file": "value-high.webp",
+      "alt": "学生回到一排花盆前补上第二次观察。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "high"
+    },
+    {
+      "file": "value-very-high.webp",
+      "alt": "两个同学围着一张植物观察图讨论各自的发现。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "value",
+      "bandKey": "very_high"
+    },
+    {
+      "file": "cost-very-low.webp",
+      "alt": "学生合上生物笔记、伸个懒腰，给练习留一个收尾。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "very_low"
+    },
+    {
+      "file": "cost-low.webp",
+      "alt": "生物照片、观察图和书面说明分别放在同一张桌上。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "low"
+    },
+    {
+      "file": "cost-middle.webp",
+      "alt": "观察记录、合唱排练与其他活动同时写在日程里。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "middle"
+    },
+    {
+      "file": "cost-high.webp",
+      "alt": "学生把照片和笔记放在一起，准备下次继续用。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "high"
+    },
+    {
+      "file": "cost-very-high.webp",
+      "alt": "家长和学生一起看包括休息与活动的一周安排。",
+      "width": 506,
+      "height": 506,
+      "scoreKey": "cost",
+      "bandKey": "very_high"
+    }
+  ],
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生举起发芽观察图，旁边是种着小苗的花盆。",
+    "width": 506,
+    "height": 506
+  }
+}
