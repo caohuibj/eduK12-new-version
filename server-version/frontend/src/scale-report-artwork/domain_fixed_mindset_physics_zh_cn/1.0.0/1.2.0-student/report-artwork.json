@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "artworkKey": "domain_fixed_mindset_physics_zh_cn/1.0.0/1.2.0-student",
+  "hero": {
+    "file": "hero.webp",
+    "alt": "学生把斜面题的文字条件画成物体、方向和关系图",
+    "width": 512,
+    "height": 512
+  },
+  "bands": [
+    {
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "very_low",
+      "file": "very-low.webp",
+      "alt": "学生对照物理题修改前后的两张图，圈出改变的一条关系",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "low",
+      "file": "low.webp",
+      "alt": "学生把一道物理题整理成已知、未知和关系三个部分",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "middle",
+      "file": "middle.webp",
+      "alt": "学生把实验中看到的现象和自己的解释分栏记录",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "high",
+      "file": "high.webp",
+      "alt": "学生在得到一个提示后比较两道结构相近的物理题",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "scoreKey": "domain_fixed_mindset",
+      "bandKey": "very_high",
+      "file": "very-high.webp",
+      "alt": "学生和老师把一个物理难点拆成三张可尝试的小步骤卡",
+      "width": 512,
+      "height": 512
+    }
+  ]
+}

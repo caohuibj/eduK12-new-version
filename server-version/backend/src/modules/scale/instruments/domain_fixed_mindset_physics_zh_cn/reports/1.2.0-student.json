@@ -1,0 +1,123 @@
+{
+  "toolKey": "domain_fixed_mindset_physics_zh_cn",
+  "contentVersion": "1.0.0",
+  "parameterVersion": "default",
+  "version": "1.2.0-student",
+  "title": "物理学习天赋信念｜学生行动版",
+  "report": {
+    "reportVersion": "1.2.0-student",
+    "artworkKey": "domain_fixed_mindset_physics_zh_cn/1.0.0/1.2.0-student",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "STUDENT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "Codex 内容编辑初审",
+        "reviewedAt": "2026-11-28T00:00:00Z",
+        "basis": "逐题核对项目自编物理学科替换版三题、六点认同选项、无反向计分、至少两题与均分规则；沿用默认 P wave1-20261001-v2 的初高中共同理论五档。报告不提供人群位置、常模或能力判断；未修改 C、P、阈值与缺失规则。"
+      }
+    },
+    "primaryScoreKeys": [
+      "domain_fixed_mindset"
+    ],
+    "scoreOrder": [
+      "domain_fixed_mindset"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "domain_fixed_mindset",
+        "headline": "看不懂的题，可以先变成一张图",
+        "source": {
+          "type": "shared_theoretical_range"
+        },
+        "summary": "看到一道斜面题，小越盯着一大段文字，不知道该用哪个公式。他先画出物体，再把题目里的方向和条件标到图上。题还没有全部做完，但第一步已经从“完全没路”变成“知道缺哪条关系”。\n\n这份量表记录你有多认同“物理学习天赋大致固定、很难改变”。均分越高，表示越认同这种固定信念，但不代表更好或更差，也不代表实际物理能力。一次画图、一次提示或一次重试，不能回答天赋是什么；它们可以帮你看清，这个具体任务中有哪些步骤会随着方法和支持发生变化。",
+        "bands": [
+          {
+            "key": "very_low",
+            "label": "把一次改进画出来",
+            "summary": "找一道后来想明白一点的题，把最初的图和修改后的图放在一起。圈出真正改变的一条线、一个方向或一个条件。",
+            "guidance": []
+          },
+          {
+            "key": "low",
+            "label": "先找已知、未知和关系",
+            "summary": "从一道题里只做三件事：框出已知量，圈出要找的量，画一条可能的关系线。先不求完整答案，看看第一步缺什么。",
+            "guidance": []
+          },
+          {
+            "key": "middle",
+            "label": "把现象和解释分开记",
+            "summary": "回想一次实验或例题，左边写你实际看到或读到的条件，右边写你的解释。若两边接不上，就把缺少的证据留成一个问题。",
+            "guidance": []
+          },
+          {
+            "key": "high",
+            "label": "用同类题做一次小比较",
+            "summary": "先做一道题并记下最先卡住的地方；获得一个针对性提示后，再做一道结构相近的题。只比较两次的步骤，不把结果变成能力结论。",
+            "guidance": []
+          },
+          {
+            "key": "very_high",
+            "label": "只让第一步松动一点",
+            "summary": "请老师或同学帮你把一个难点拆成两三步，只选最小的一步开始。记下哪条提示让图更清楚、哪一处仍不明白。",
+            "guidance": []
+          }
+        ],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "想说“我没有物理天赋”时，先补一句：“这道题我还没把____画清楚。”让判断回到一个可以继续处理的步骤。"
+          }
+        ],
+        "scoreLabel": "物理学习天赋固定信念均分（试用版）",
+        "provisional": true
+      }
+    ],
+    "limitations": [
+      "三道题至少答两道，按已答题目计算均分。五档只是把 1—6 分可选范围等距分开，初中和高中共同使用；没有该物理版本的经验样本。",
+      "这些试用分段不是同学中的位置、全国常模、心理转折点或诊断界线，也不提供百分位。",
+      "较高分只表示更认同固定信念，不是物理能力上限；较低分只表示较少认同，也不能证明学习策略、实际进步或成长心态。"
+    ],
+    "disclaimer": "这份报告供七至十二年级学生回顾自己的物理学习信念。它不评价能力，也不预测未来成绩。"
+  },
+  "reportVisibility": {
+    "schemaVersion": 1,
+    "policyVersion": "1.2.0-student",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "scoreDerivedLabels": true,
+        "individualInterpretations": true,
+        "educationalContent": true,
+        "artwork": true
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "scoreDerivedLabels": false,
+        "individualInterpretations": false,
+        "educationalContent": false,
+        "artwork": false
+      }
+    },
+    "unknownAudience": "DENY"
+  }
+}
